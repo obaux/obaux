@@ -1,5 +1,5 @@
 - 👋 Hi, I’m @obaux
-- 👀 I’m interested in product design, innovation through design process and exploration; and I dabble in animation
+- 👀 I’m interested in product design, innovation through design process and exploration; for fun, I dabble in animation, and digital painting.
 - 🌱 I’m currently learning after effects and jitter.video
 - 💞️ I’m looking to collaborate on troubleshooting questions
 - 📫 How to reach me at willre@gmail.com
