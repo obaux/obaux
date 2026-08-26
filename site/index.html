@@ -1,0 +1,570 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Will's Move Out Garage Sale</title>
+<style>
+  :root {
+    --bg: #faf7f2;
+    --card: #ffffff;
+    --ink: #201c16;
+    --muted: #6b6459;
+    --line: #e7e1d6;
+    --accent: #c1552c;
+    --accent-ink: #ffffff;
+    --sold: #2f7d4f;
+    --danger: #b3261e;
+    --radius: 14px;
+    --shadow: 0 1px 2px rgba(30,25,15,.06), 0 8px 24px rgba(30,25,15,.06);
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  a { color: var(--accent); }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 20px 16px 80px; }
+
+  header.hero {
+    text-align: center;
+    padding: 36px 16px 24px;
+  }
+  header.hero h1 {
+    font-size: clamp(1.5rem, 4vw, 2.3rem);
+    margin: 0 0 10px;
+    line-height: 1.25;
+  }
+  header.hero p {
+    color: var(--muted);
+    max-width: 620px;
+    margin: 0 auto;
+    font-size: 0.98rem;
+    line-height: 1.5;
+  }
+
+  .topbar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 18px;
+  }
+  .pill {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 8px 14px;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: var(--shadow);
+  }
+  .pill button {
+    border: none;
+    background: none;
+    color: var(--accent);
+    font: inherit;
+    cursor: pointer;
+    padding: 0;
+    text-decoration: underline;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    border: 1px solid var(--line);
+    background: var(--card);
+    color: var(--ink);
+    border-radius: 10px;
+    padding: 9px 14px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    font-weight: 600;
+  }
+  .btn:hover { border-color: #d8cfc0; }
+  .btn.primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--accent-ink);
+  }
+  .btn.primary:hover { filter: brightness(1.05); }
+  .btn.ghost {
+    background: transparent;
+    border-color: transparent;
+    color: var(--muted);
+    text-decoration: underline;
+  }
+  .btn:disabled { opacity: .5; cursor: not-allowed; }
+  .btn.small { padding: 6px 10px; font-size: 0.78rem; }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 18px;
+    margin-top: 28px;
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+  }
+  .card.sold { opacity: 0.72; }
+  .placeholder {
+    height: 150px;
+    background: linear-gradient(155deg, #f1ece2, #e9e2d3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 3.4rem;
+  }
+  .sold-badge {
+    position: absolute;
+    top: 12px;
+    left: -34px;
+    transform: rotate(-38deg);
+    background: var(--sold);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.72rem;
+    letter-spacing: 0.06em;
+    padding: 4px 40px;
+    box-shadow: 0 2px 6px rgba(0,0,0,.2);
+  }
+  .card-body {
+    padding: 14px 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1;
+  }
+  .card-body h3 {
+    margin: 0;
+    font-size: 1.02rem;
+    line-height: 1.3;
+  }
+  .bid-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+  .bid-amount {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--ink);
+  }
+  .bidder {
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+  .countdown {
+    font-size: 0.76rem;
+    color: var(--muted);
+  }
+  .countdown.urgent { color: var(--danger); font-weight: 600; }
+  .bid-form {
+    display: flex;
+    gap: 6px;
+    margin-top: auto;
+  }
+  .bid-form input[type="number"] {
+    flex: 1;
+    min-width: 0;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 8px 10px;
+    font-size: 0.9rem;
+  }
+  .msg {
+    font-size: 0.76rem;
+    min-height: 14px;
+  }
+  .msg.error { color: var(--danger); }
+  .msg.ok { color: var(--sold); }
+  .admin-row {
+    display: flex;
+    gap: 6px;
+    border-top: 1px dashed var(--line);
+    padding-top: 8px;
+    margin-top: 4px;
+  }
+  .pay-link {
+    display: inline-block;
+    margin-top: 4px;
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+
+  footer {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.8rem;
+    margin-top: 50px;
+    line-height: 1.6;
+  }
+
+  .modal-overlay {
+    position: fixed; inset: 0;
+    background: rgba(30,25,15,.45);
+    display: flex; align-items: center; justify-content: center;
+    padding: 20px;
+    z-index: 50;
+  }
+  .modal {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 26px 22px;
+    max-width: 340px;
+    width: 100%;
+    box-shadow: var(--shadow);
+    text-align: center;
+  }
+  .modal h2 { margin: 0 0 6px; font-size: 1.15rem; }
+  .modal p { color: var(--muted); font-size: 0.88rem; margin: 0 0 16px; }
+  .modal input[type="text"], .modal input[type="password"] {
+    width: 100%;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 0.95rem;
+    margin-bottom: 12px;
+  }
+  .hidden { display: none !important; }
+  .status-banner {
+    text-align: center;
+    font-size: 0.85rem;
+    color: var(--danger);
+    margin-top: 12px;
+  }
+</style>
+</head>
+<body>
+
+<div id="nameModal" class="modal-overlay hidden">
+  <div class="modal">
+    <h2>Who's bidding?</h2>
+    <p>Just your first name (and last initial if you'd like) — no password needed, this is just for friends.</p>
+    <form id="nameForm">
+      <input type="text" id="nameInput" placeholder="e.g. Jamie K." maxlength="40" required autofocus />
+      <button type="submit" class="btn primary" style="width:100%">Let's go</button>
+    </form>
+  </div>
+</div>
+
+<div id="adminModal" class="modal-overlay hidden">
+  <div class="modal">
+    <h2>Admin sign-in</h2>
+    <p>Enter the admin passphrase to mark items sold.</p>
+    <form id="adminForm">
+      <input type="password" id="adminInput" placeholder="Passphrase" required />
+      <button type="submit" class="btn primary" style="width:100%">Enter</button>
+    </form>
+  </div>
+</div>
+
+<div class="wrap">
+  <header class="hero">
+    <h1>Will's Move Out Virtual Garage Sale</h1>
+    <p>
+      Everything below is up for grabs. Bid on anything you want — highest bid wins when
+      the timer runs out (bidding closes <strong>1 week</strong> after each item is listed).
+      Free drop off may be available upon request. Minneapolis &amp; St. Paul only.
+    </p>
+    <div class="topbar">
+      <div class="pill" id="whoPill">
+        Signed in as <strong id="whoName">&nbsp;</strong>
+        <button id="changeNameBtn">change</button>
+      </div>
+      <button class="btn ghost small" id="adminToggleBtn">Admin</button>
+    </div>
+  </header>
+
+  <div id="loadError" class="status-banner hidden"></div>
+
+  <div class="grid" id="grid"></div>
+
+  <footer>
+    <p>Questions or want to arrange pickup? Reach out to Will directly.<br />
+    Winning bidders pay via the Stripe link on their item once it's marked sold.</p>
+  </footer>
+</div>
+
+<script type="module">
+  import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+
+  const SUPABASE_URL = "https://spnilculhefkvbyomwre.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InNwbmlsY3VsaGVma3ZieW9td3JlIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODc3ODAzOTAsImV4cCI6MjEwMzM1NjM5MH0.q1LONSF2pVqxvjDs_6h3VV2lk2FdAM2S4Ja-DItErpo";
+
+  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  const NAME_KEY = "gs_bidder_name";
+  const ADMIN_KEY = "gs_admin_pass"; // sessionStorage only, never persisted to disk/repo
+
+  const grid = document.getElementById("grid");
+  const nameModal = document.getElementById("nameModal");
+  const nameForm = document.getElementById("nameForm");
+  const nameInput = document.getElementById("nameInput");
+  const whoName = document.getElementById("whoName");
+  const changeNameBtn = document.getElementById("changeNameBtn");
+  const adminModal = document.getElementById("adminModal");
+  const adminForm = document.getElementById("adminForm");
+  const adminInput = document.getElementById("adminInput");
+  const adminToggleBtn = document.getElementById("adminToggleBtn");
+  const loadError = document.getElementById("loadError");
+
+  let items = [];
+  let isAdmin = !!sessionStorage.getItem(ADMIN_KEY);
+
+  function money(cents) {
+    return (cents / 100).toLocaleString("en-US", { style: "currency", currency: "USD" });
+  }
+
+  function getName() {
+    return localStorage.getItem(NAME_KEY) || "";
+  }
+
+  function ensureName() {
+    const n = getName();
+    if (!n) {
+      nameModal.classList.remove("hidden");
+      nameInput.focus();
+    } else {
+      whoName.textContent = n;
+    }
+  }
+
+  nameForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const v = nameInput.value.trim();
+    if (!v) return;
+    localStorage.setItem(NAME_KEY, v);
+    whoName.textContent = v;
+    nameModal.classList.add("hidden");
+  });
+
+  changeNameBtn.addEventListener("click", () => {
+    nameInput.value = getName();
+    nameModal.classList.remove("hidden");
+    nameInput.focus();
+  });
+
+  adminToggleBtn.addEventListener("click", () => {
+    if (isAdmin) {
+      isAdmin = false;
+      sessionStorage.removeItem(ADMIN_KEY);
+      adminToggleBtn.textContent = "Admin";
+      render();
+    } else {
+      adminModal.classList.remove("hidden");
+      adminInput.focus();
+    }
+  });
+
+  adminForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const pass = adminInput.value;
+    // Validate by attempting a harmless no-op-ish call: try setting stripe link
+    // on a non-existent item id (0) so a wrong passphrase is rejected without
+    // side effects, and a right one is confirmed.
+    const { error } = await supabase.rpc("set_stripe_link", {
+      p_item_id: 0,
+      p_passphrase: pass,
+      p_link: null,
+    });
+    if (error && error.message && error.message.includes("Invalid admin passphrase")) {
+      alert("Wrong passphrase.");
+      return;
+    }
+    sessionStorage.setItem(ADMIN_KEY, pass);
+    isAdmin = true;
+    adminToggleBtn.textContent = "Exit admin";
+    adminModal.classList.add("hidden");
+    adminInput.value = "";
+    render();
+  });
+
+  function timeLeftLabel(closesAt) {
+    const diff = new Date(closesAt).getTime() - Date.now();
+    if (diff <= 0) return { label: "Bidding closed", urgent: true };
+    const days = Math.floor(diff / 86400000);
+    const hours = Math.floor((diff % 86400000) / 3600000);
+    const mins = Math.floor((diff % 3600000) / 60000);
+    let label;
+    if (days > 0) label = `${days}d ${hours}h left`;
+    else if (hours > 0) label = `${hours}h ${mins}m left`;
+    else label = `${mins}m left`;
+    return { label, urgent: diff < 12 * 3600000 };
+  }
+
+  function cardTemplate(item) {
+    const closed = item.status === "sold" || new Date(item.closes_at).getTime() <= Date.now();
+    const t = timeLeftLabel(item.closes_at);
+    const minNext = item.current_bid_cents + 100;
+
+    return `
+      <div class="card ${item.status === 'sold' ? 'sold' : ''}" data-id="${item.id}">
+        ${item.status === "sold" ? '<div class="sold-badge">SOLD</div>' : ""}
+        <div class="placeholder">${item.emoji}</div>
+        <div class="card-body">
+          <h3>${item.title}</h3>
+          <div class="bid-row">
+            <span>Current bid<br /><span class="bid-amount">${money(item.current_bid_cents)}</span></span>
+            <span class="countdown ${t.urgent ? 'urgent' : ''}">${t.label}</span>
+          </div>
+          <div class="bidder">${item.current_bidder_name ? `High bidder: ${escapeHtml(item.current_bidder_name)}` : "No bids yet"}</div>
+
+          ${
+            item.status === "sold"
+              ? item.stripe_payment_link
+                ? `<a class="pay-link" href="${item.stripe_payment_link}" target="_blank" rel="noopener">Pay via Stripe →</a>`
+                : `<div class="bidder">Sold — payment link coming soon</div>`
+              : closed
+              ? `<div class="bidder">Bidding closed — awaiting sale confirmation</div>`
+              : `
+                <form class="bid-form" data-id="${item.id}">
+                  <input type="number" min="${(minNext / 100).toFixed(2)}" step="0.50" placeholder="$${(minNext / 100).toFixed(2)}+" required />
+                  <button type="submit" class="btn primary">Bid</button>
+                </form>
+              `
+          }
+          <div class="msg" id="msg-${item.id}"></div>
+
+          ${
+            isAdmin
+              ? `<div class="admin-row">
+                  ${
+                    item.status === "sold"
+                      ? `<button class="btn small" data-action="reopen" data-id="${item.id}">Reopen</button>`
+                      : `<button class="btn small" data-action="sold" data-id="${item.id}">Mark sold</button>`
+                  }
+                  <button class="btn small" data-action="link" data-id="${item.id}">Set Stripe link</button>
+                </div>`
+              : ""
+          }
+        </div>
+      </div>
+    `;
+  }
+
+  function escapeHtml(s) {
+    const div = document.createElement("div");
+    div.textContent = s;
+    return div.innerHTML;
+  }
+
+  function render() {
+    grid.innerHTML = items.map(cardTemplate).join("");
+    attachHandlers();
+  }
+
+  function attachHandlers() {
+    grid.querySelectorAll(".bid-form").forEach((form) => {
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const id = Number(form.dataset.id);
+        const input = form.querySelector("input");
+        const dollars = parseFloat(input.value);
+        const msgEl = document.getElementById(`msg-${id}`);
+        msgEl.textContent = "";
+        msgEl.className = "msg";
+
+        const name = getName();
+        if (!name) {
+          ensureName();
+          return;
+        }
+        if (!dollars || dollars <= 0) return;
+
+        const submitBtn = form.querySelector("button");
+        submitBtn.disabled = true;
+        const { error } = await supabase.rpc("place_bid", {
+          p_item_id: id,
+          p_bidder_name: name,
+          p_amount_cents: Math.round(dollars * 100),
+        });
+        submitBtn.disabled = false;
+
+        if (error) {
+          msgEl.textContent = error.message.replace(/^.*: /, "");
+          msgEl.className = "msg error";
+        } else {
+          msgEl.textContent = "Bid placed!";
+          msgEl.className = "msg ok";
+          input.value = "";
+        }
+      });
+    });
+
+    grid.querySelectorAll("[data-action]").forEach((btn) => {
+      btn.addEventListener("click", async () => {
+        const id = Number(btn.dataset.id);
+        const action = btn.dataset.action;
+        const pass = sessionStorage.getItem(ADMIN_KEY);
+        if (!pass) return;
+
+        if (action === "sold") {
+          const { error } = await supabase.rpc("mark_item_sold", { p_item_id: id, p_passphrase: pass });
+          if (error) alert(error.message);
+        } else if (action === "reopen") {
+          const { error } = await supabase.rpc("reopen_item", { p_item_id: id, p_passphrase: pass });
+          if (error) alert(error.message);
+        } else if (action === "link") {
+          const link = prompt("Paste the Stripe Payment Link URL for this item:");
+          if (link === null) return;
+          const { error } = await supabase.rpc("set_stripe_link", { p_item_id: id, p_passphrase: pass, p_link: link });
+          if (error) alert(error.message);
+        }
+      });
+    });
+  }
+
+  async function loadItems() {
+    const { data, error } = await supabase
+      .from("items")
+      .select("*")
+      .order("id", { ascending: true });
+    if (error) {
+      loadError.textContent = "Couldn't load items: " + error.message;
+      loadError.classList.remove("hidden");
+      return;
+    }
+    loadError.classList.add("hidden");
+    items = data;
+    render();
+  }
+
+  // Live updates for everyone watching
+  supabase
+    .channel("items-changes")
+    .on("postgres_changes", { event: "*", schema: "public", table: "items" }, loadItems)
+    .subscribe();
+
+  // Tick countdowns
+  setInterval(() => {
+    document.querySelectorAll(".countdown").forEach((el, i) => {
+      const item = items[i];
+      if (!item) return;
+      const t = timeLeftLabel(item.closes_at);
+      el.textContent = t.label;
+      el.className = "countdown" + (t.urgent ? " urgent" : "");
+    });
+  }, 30000);
+
+  ensureName();
+  loadItems();
+</script>
+</body>
+</html>
