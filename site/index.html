@@ -3,251 +3,415 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Will's Move Out Garage Sale</title>
+<title>Will's Move-Out Garage Sale</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
-    --bg: #faf7f2;
-    --card: #ffffff;
-    --ink: #201c16;
-    --muted: #6b6459;
-    --line: #e7e1d6;
-    --accent: #c1552c;
-    --accent-ink: #ffffff;
-    --sold: #2f7d4f;
-    --danger: #b3261e;
-    --radius: 14px;
-    --shadow: 0 1px 2px rgba(30,25,15,.06), 0 8px 24px rgba(30,25,15,.06);
+    --bg: #ffffff;
+    --ink: #111111;
+    --muted: #6a6a6a;
+    --line: #111111;
+    --line-soft: #dcdcdc;
+    --accent: #d4211c;
+    --sold: #111111;
+    --danger: #d4211c;
   }
   * { box-sizing: border-box; }
   html, body {
     margin: 0; padding: 0;
     background: var(--bg);
     color: var(--ink);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: "Inter", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
   }
-  a { color: var(--accent); }
-  .wrap { max-width: 1100px; margin: 0 auto; padding: 20px 16px 80px; }
+  a { color: inherit; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 28px 20px 90px; }
+
+  .label {
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--muted);
+  }
 
   header.hero {
-    text-align: center;
-    padding: 36px 16px 24px;
+    border-bottom: 2px solid var(--line);
+    padding-bottom: 28px;
+  }
+  header.hero .eyebrow {
+    margin: 0 0 10px;
   }
   header.hero h1 {
-    font-size: clamp(1.5rem, 4vw, 2.3rem);
-    margin: 0 0 10px;
-    line-height: 1.25;
+    font-size: clamp(1.9rem, 5vw, 3.2rem);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin: 0 0 14px;
+    line-height: 1.05;
   }
-  header.hero p {
+  header.hero .lede {
     color: var(--muted);
-    max-width: 620px;
-    margin: 0 auto;
+    max-width: 640px;
     font-size: 0.98rem;
-    line-height: 1.5;
+    line-height: 1.55;
+    margin: 0 0 22px;
+  }
+  header.hero .lede strong { color: var(--ink); }
+
+  .contact-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    border: 2px solid var(--line);
+    background: var(--ink);
+    color: #fff;
+    text-decoration: none;
+    padding: 8px 16px 8px 8px;
+    font-weight: 600;
+    font-size: 0.88rem;
+    border-radius: 999px;
+    max-width: 100%;
+  }
+  .contact-btn span:last-child { white-space: normal; }
+  @media (max-width: 420px) {
+    .contact-btn { font-size: 0.78rem; padding: 7px 14px 7px 6px; }
+  }
+  .contact-btn .avatar {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: #fff;
+    display: block;
+  }
+  .contact-btn .avatar-fallback {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: #fff;
+    color: var(--ink);
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.8rem;
   }
 
   .topbar {
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     flex-wrap: wrap;
-    margin-top: 18px;
+    margin-top: 22px;
   }
-  .pill {
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: 999px;
-    padding: 8px 14px;
+  .who {
     font-size: 0.85rem;
+    color: var(--muted);
     display: flex;
     align-items: center;
     gap: 8px;
-    box-shadow: var(--shadow);
   }
-  .pill button {
+  .who strong { color: var(--ink); }
+  .link-btn {
     border: none;
     background: none;
-    color: var(--accent);
+    color: var(--ink);
     font: inherit;
     cursor: pointer;
     padding: 0;
     text-decoration: underline;
+    text-underline-offset: 2px;
   }
   .btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 6px;
-    border: 1px solid var(--line);
-    background: var(--card);
+    border: 1.5px solid var(--line);
+    background: #fff;
     color: var(--ink);
-    border-radius: 10px;
-    padding: 9px 14px;
-    font-size: 0.9rem;
-    cursor: pointer;
+    border-radius: 0;
+    padding: 9px 16px;
+    font-size: 0.82rem;
     font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
   }
-  .btn:hover { border-color: #d8cfc0; }
+  .btn:hover { background: var(--ink); color: #fff; }
   .btn.primary {
-    background: var(--accent);
-    border-color: var(--accent);
-    color: var(--accent-ink);
+    background: var(--ink);
+    border-color: var(--ink);
+    color: #fff;
   }
-  .btn.primary:hover { filter: brightness(1.05); }
-  .btn.ghost {
-    background: transparent;
-    border-color: transparent;
-    color: var(--muted);
-    text-decoration: underline;
-  }
-  .btn:disabled { opacity: .5; cursor: not-allowed; }
-  .btn.small { padding: 6px 10px; font-size: 0.78rem; }
+  .btn.primary:hover { background: var(--accent); border-color: var(--accent); }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  .btn.small { padding: 6px 10px; font-size: 0.68rem; }
 
   .grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 18px;
-    margin-top: 28px;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 1px;
+    background: var(--line);
+    margin-top: 0;
+    border: 1px solid var(--line);
   }
 
   .card {
-    background: var(--card);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
-    overflow: hidden;
+    background: #fff;
     display: flex;
     flex-direction: column;
     position: relative;
   }
-  .card.sold { opacity: 0.72; }
-  .placeholder {
-    height: 150px;
-    background: linear-gradient(155deg, #f1ece2, #e9e2d3);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 3.4rem;
+  .card.sold .carousel img,
+  .card.sold .placeholder-tile { filter: grayscale(1); opacity: 0.55; }
+
+  .index-no {
+    position: absolute;
+    top: 10px; left: 10px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    background: #fff;
+    padding: 2px 6px;
+    z-index: 2;
+    letter-spacing: 0.05em;
   }
   .sold-badge {
     position: absolute;
-    top: 12px;
-    left: -34px;
-    transform: rotate(-38deg);
-    background: var(--sold);
+    top: 10px; right: 10px;
+    background: var(--accent);
     color: #fff;
     font-weight: 700;
-    font-size: 0.72rem;
-    letter-spacing: 0.06em;
-    padding: 4px 40px;
-    box-shadow: 0 2px 6px rgba(0,0,0,.2);
+    font-size: 0.68rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    z-index: 2;
   }
+
+  .carousel {
+    position: relative;
+    height: 200px;
+    overflow: hidden;
+    background: #f4f4f4;
+    border-bottom: 1px solid var(--line);
+  }
+  .carousel-track {
+    display: flex;
+    height: 100%;
+    transition: transform 0.25s ease;
+  }
+  .carousel-slide {
+    flex: 0 0 100%;
+    height: 100%;
+  }
+  .carousel-slide img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .carousel-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #fff;
+    border: 1px solid var(--line);
+    width: 28px; height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1rem;
+    line-height: 1;
+    padding: 0;
+    z-index: 3;
+  }
+  .carousel-arrow:hover { background: var(--ink); color: #fff; }
+  .carousel-arrow.prev { left: 8px; }
+  .carousel-arrow.next { right: 8px; }
+  .carousel-dots {
+    position: absolute;
+    bottom: 8px; left: 0; right: 0;
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+    z-index: 3;
+  }
+  .carousel-dots .dot {
+    width: 5px; height: 5px;
+    background: rgba(255,255,255,.6);
+    border: 1px solid var(--ink);
+  }
+  .carousel-dots .dot.active { background: var(--ink); }
+
+  .placeholder-tile {
+    height: 200px;
+    background: #f4f4f4;
+    border-bottom: 1px solid var(--line);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .placeholder-tile .tile-index {
+    font-size: 2.6rem;
+    font-weight: 800;
+    color: var(--line-soft);
+    letter-spacing: -0.02em;
+  }
+
   .card-body {
-    padding: 14px 14px 16px;
+    padding: 16px 16px 18px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
     flex: 1;
   }
   .card-body h3 {
     margin: 0;
-    font-size: 1.02rem;
+    font-size: 1rem;
+    font-weight: 700;
     line-height: 1.3;
   }
-  .bid-row {
+  .stat-line {
     display: flex;
     justify-content: space-between;
     align-items: baseline;
+    border-top: 1px solid var(--line-soft);
+    padding-top: 8px;
+  }
+  .stat-line .label { font-size: 0.65rem; }
+  .stat-line .value {
     font-size: 0.85rem;
-    color: var(--muted);
+    font-weight: 600;
   }
   .bid-amount {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: var(--ink);
+    font-size: 1.4rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
   }
   .bidder {
-    font-size: 0.78rem;
-    color: var(--muted);
-  }
-  .countdown {
     font-size: 0.76rem;
     color: var(--muted);
   }
-  .countdown.urgent { color: var(--danger); font-weight: 600; }
+  .countdown { font-size: 0.72rem; color: var(--muted); }
+  .countdown.urgent { color: var(--accent); font-weight: 700; }
+
   .bid-form {
     display: flex;
     gap: 6px;
     margin-top: auto;
+    padding-top: 6px;
   }
   .bid-form input[type="number"] {
     flex: 1;
     min-width: 0;
-    border: 1px solid var(--line);
-    border-radius: 8px;
+    border: 1.5px solid var(--line);
+    border-radius: 0;
     padding: 8px 10px;
     font-size: 0.9rem;
+    font-family: inherit;
   }
   .msg {
-    font-size: 0.76rem;
+    font-size: 0.72rem;
     min-height: 14px;
   }
   .msg.error { color: var(--danger); }
-  .msg.ok { color: var(--sold); }
+  .msg.ok { color: var(--ink); font-weight: 600; }
+
   .admin-row {
     display: flex;
+    flex-wrap: wrap;
     gap: 6px;
-    border-top: 1px dashed var(--line);
-    padding-top: 8px;
+    border-top: 1px dashed var(--line-soft);
+    padding-top: 10px;
     margin-top: 4px;
   }
   .pay-link {
     display: inline-block;
-    margin-top: 4px;
+    margin-top: 2px;
     font-size: 0.85rem;
-    font-weight: 600;
+    font-weight: 700;
+    text-decoration: underline;
+  }
+
+  .edit-form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    border-top: 1px dashed var(--line-soft);
+    padding-top: 10px;
+    margin-top: 4px;
+  }
+  .edit-form label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--muted);
+    display: block;
+    margin-bottom: 3px;
+  }
+  .edit-form input {
+    width: 100%;
+    border: 1.5px solid var(--line);
+    padding: 6px 8px;
+    font-size: 0.85rem;
+    font-family: inherit;
+  }
+  .edit-form .edit-actions {
+    display: flex;
+    gap: 6px;
   }
 
   footer {
-    text-align: center;
     color: var(--muted);
     font-size: 0.8rem;
-    margin-top: 50px;
+    margin-top: 60px;
     line-height: 1.6;
+    border-top: 2px solid var(--line);
+    padding-top: 20px;
   }
 
   .modal-overlay {
     position: fixed; inset: 0;
-    background: rgba(30,25,15,.45);
+    background: rgba(17,17,17,.5);
     display: flex; align-items: center; justify-content: center;
     padding: 20px;
     z-index: 50;
   }
   .modal {
-    background: var(--card);
-    border-radius: var(--radius);
-    padding: 26px 22px;
+    background: #fff;
+    border: 2px solid var(--line);
+    padding: 28px 24px;
     max-width: 340px;
     width: 100%;
-    box-shadow: var(--shadow);
-    text-align: center;
+    position: relative;
   }
-  .modal h2 { margin: 0 0 6px; font-size: 1.15rem; }
-  .modal p { color: var(--muted); font-size: 0.88rem; margin: 0 0 16px; }
+  .modal-close {
+    position: absolute;
+    top: 10px; right: 10px;
+    border: none;
+    background: none;
+    font-size: 1.3rem;
+    line-height: 1;
+    cursor: pointer;
+    color: var(--ink);
+    padding: 4px 8px;
+  }
+  .modal h2 { margin: 0 0 8px; font-size: 1.1rem; font-weight: 800; }
+  .modal p { color: var(--muted); font-size: 0.85rem; margin: 0 0 16px; line-height: 1.5; }
   .modal input[type="text"], .modal input[type="password"] {
     width: 100%;
-    border: 1px solid var(--line);
-    border-radius: 8px;
+    border: 1.5px solid var(--line);
     padding: 10px 12px;
     font-size: 0.95rem;
-    margin-bottom: 12px;
+    margin-bottom: 14px;
+    font-family: inherit;
   }
   .hidden { display: none !important; }
   .status-banner {
-    text-align: center;
     font-size: 0.85rem;
     color: var(--danger);
-    margin-top: 12px;
+    margin-top: 16px;
   }
 </style>
 </head>
@@ -255,6 +419,7 @@
 
 <div id="nameModal" class="modal-overlay hidden">
   <div class="modal">
+    <button class="modal-close" data-close="name" aria-label="Close">&times;</button>
     <h2>Who's bidding?</h2>
     <p>Just your first name (and last initial if you'd like) — no password needed, this is just for friends.</p>
     <form id="nameForm">
@@ -266,8 +431,9 @@
 
 <div id="adminModal" class="modal-overlay hidden">
   <div class="modal">
+    <button class="modal-close" data-close="admin" aria-label="Close">&times;</button>
     <h2>Admin sign-in</h2>
-    <p>Enter the admin passphrase to mark items sold.</p>
+    <p>Enter the admin passphrase to mark items sold and edit listings.</p>
     <form id="adminForm">
       <input type="password" id="adminInput" placeholder="Passphrase" required />
       <button type="submit" class="btn primary" style="width:100%">Enter</button>
@@ -277,27 +443,34 @@
 
 <div class="wrap">
   <header class="hero">
-    <h1>Will's Move Out Virtual Garage Sale</h1>
-    <p>
+    <p class="eyebrow label">Minneapolis &amp; St. Paul</p>
+    <h1>Will's Move-Out Garage Sale</h1>
+    <p class="lede">
       Everything below is up for grabs. Bid on anything you want — highest bid wins when
-      the timer runs out (bidding closes <strong>1 week</strong> after each item is listed).
-      Free drop off may be available upon request. Minneapolis &amp; St. Paul only.
+      the timer runs out (bidding closes <strong>one week</strong> after each item is listed).
+      Free drop off may be available upon request.
     </p>
+    <a class="contact-btn" href="sms:+12673095465">
+      <img class="avatar" src="images/will.png" alt="Will" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+      <span class="avatar-fallback" style="display:none">W</span>
+      <span>Questions? Text Will — (267) 309-5465</span>
+    </a>
+
     <div class="topbar">
-      <div class="pill" id="whoPill">
-        Signed in as <strong id="whoName">&nbsp;</strong>
-        <button id="changeNameBtn">change</button>
+      <div class="who">
+        <span id="whoBlock" class="hidden">Signed in as <strong id="whoName"></strong> · <button class="link-btn" id="changeNameBtn">change</button></span>
+        <span id="whoBlockEmpty">Not signed in yet</span>
       </div>
-      <button class="btn ghost small" id="adminToggleBtn">Admin</button>
+      <button class="btn small" id="adminToggleBtn">Admin</button>
     </div>
   </header>
 
   <div id="loadError" class="status-banner hidden"></div>
 
-  <div class="grid" id="grid"></div>
+  <div class="grid" id="grid" style="margin-top: 28px;"></div>
 
   <footer>
-    <p>Questions or want to arrange pickup? Reach out to Will directly.<br />
+    <p>Questions or want to arrange pickup? Text Will directly.<br />
     Winning bidders pay via the Stripe link on their item once it's marked sold.</p>
   </footer>
 </div>
@@ -317,6 +490,8 @@
   const nameModal = document.getElementById("nameModal");
   const nameForm = document.getElementById("nameForm");
   const nameInput = document.getElementById("nameInput");
+  const whoBlock = document.getElementById("whoBlock");
+  const whoBlockEmpty = document.getElementById("whoBlockEmpty");
   const whoName = document.getElementById("whoName");
   const changeNameBtn = document.getElementById("changeNameBtn");
   const adminModal = document.getElementById("adminModal");
@@ -327,8 +502,11 @@
 
   let items = [];
   let isAdmin = !!sessionStorage.getItem(ADMIN_KEY);
+  const carouselIndex = {};   // item id -> current slide
+  const editingItem = {};     // item id -> bool, inline edit form open
 
   function money(cents) {
+    if (cents === null || cents === undefined) return "—";
     return (cents / 100).toLocaleString("en-US", { style: "currency", currency: "USD" });
   }
 
@@ -336,30 +514,51 @@
     return localStorage.getItem(NAME_KEY) || "";
   }
 
-  function ensureName() {
+  function refreshWho() {
     const n = getName();
-    if (!n) {
-      nameModal.classList.remove("hidden");
-      nameInput.focus();
-    } else {
+    if (n) {
       whoName.textContent = n;
+      whoBlock.classList.remove("hidden");
+      whoBlockEmpty.classList.add("hidden");
+    } else {
+      whoBlock.classList.add("hidden");
+      whoBlockEmpty.classList.remove("hidden");
     }
   }
+
+  function openNameModal() {
+    nameInput.value = getName();
+    nameModal.classList.remove("hidden");
+    nameInput.focus();
+  }
+  function closeNameModal() { nameModal.classList.add("hidden"); }
+  function closeAdminModal() { adminModal.classList.add("hidden"); }
+
+  document.querySelectorAll("[data-close]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      if (btn.dataset.close === "name") closeNameModal();
+      else closeAdminModal();
+    });
+  });
+  [nameModal, adminModal].forEach((overlay) => {
+    overlay.addEventListener("click", (e) => {
+      if (e.target === overlay) overlay.classList.add("hidden");
+    });
+  });
 
   nameForm.addEventListener("submit", (e) => {
     e.preventDefault();
     const v = nameInput.value.trim();
     if (!v) return;
     localStorage.setItem(NAME_KEY, v);
-    whoName.textContent = v;
-    nameModal.classList.add("hidden");
+    refreshWho();
+    closeNameModal();
   });
 
-  changeNameBtn.addEventListener("click", () => {
-    nameInput.value = getName();
-    nameModal.classList.remove("hidden");
-    nameInput.focus();
-  });
+  changeNameBtn.addEventListener("click", openNameModal);
+  whoBlockEmpty.addEventListener("click", openNameModal);
+  whoBlockEmpty.style.cursor = "pointer";
+  whoBlockEmpty.style.textDecoration = "underline";
 
   adminToggleBtn.addEventListener("click", () => {
     if (isAdmin) {
@@ -376,9 +575,8 @@
   adminForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     const pass = adminInput.value;
-    // Validate by attempting a harmless no-op-ish call: try setting stripe link
-    // on a non-existent item id (0) so a wrong passphrase is rejected without
-    // side effects, and a right one is confirmed.
+    // Validate by attempting a harmless no-op-ish call on a non-existent item
+    // id (0) so a wrong passphrase is rejected without side effects.
     const { error } = await supabase.rpc("set_stripe_link", {
       p_item_id: 0,
       p_passphrase: pass,
@@ -391,7 +589,7 @@
     sessionStorage.setItem(ADMIN_KEY, pass);
     isAdmin = true;
     adminToggleBtn.textContent = "Exit admin";
-    adminModal.classList.add("hidden");
+    closeAdminModal();
     adminInput.value = "";
     render();
   });
@@ -409,20 +607,83 @@
     return { label, urgent: diff < 12 * 3600000 };
   }
 
-  function cardTemplate(item) {
+  function escapeHtml(s) {
+    const div = document.createElement("div");
+    div.textContent = s;
+    return div.innerHTML;
+  }
+
+  function mediaTemplate(item, indexLabel) {
+    const images = item.images || [];
+    if (images.length === 0) {
+      return `<div class="placeholder-tile"><span class="tile-index">${indexLabel}</span></div>`;
+    }
+    const idx = ((carouselIndex[item.id] || 0) % images.length + images.length) % images.length;
+    carouselIndex[item.id] = idx;
+    return `
+      <div class="carousel" data-id="${item.id}">
+        <div class="carousel-track" style="transform: translateX(-${idx * 100}%)">
+          ${images.map((src) => `<div class="carousel-slide"><img src="${escapeHtml(src)}" loading="lazy" alt="${escapeHtml(item.title)}" /></div>`).join("")}
+        </div>
+        ${images.length > 1 ? `
+          <button class="carousel-arrow prev" data-carousel-id="${item.id}" data-dir="-1" aria-label="Previous photo">&lsaquo;</button>
+          <button class="carousel-arrow next" data-carousel-id="${item.id}" data-dir="1" aria-label="Next photo">&rsaquo;</button>
+          <div class="carousel-dots">
+            ${images.map((_, i) => `<span class="dot ${i === idx ? "active" : ""}"></span>`).join("")}
+          </div>
+        ` : ""}
+      </div>
+    `;
+  }
+
+  function editFormTemplate(item) {
+    return `
+      <div class="edit-form" data-edit-id="${item.id}">
+        <div>
+          <label>Title</label>
+          <input type="text" data-field="title" value="${escapeHtml(item.title)}" />
+        </div>
+        <div>
+          <label>Retail value ($)</label>
+          <input type="number" step="0.01" min="0" data-field="retail" value="${item.retail_value_cents != null ? (item.retail_value_cents / 100).toFixed(2) : ""}" />
+        </div>
+        <div>
+          <label>Starting bid ($)</label>
+          <input type="number" step="0.01" min="0" data-field="starting" value="${(item.starting_bid_cents / 100).toFixed(2)}" />
+        </div>
+        <div class="edit-actions">
+          <button class="btn small primary" data-action="save-edit" data-id="${item.id}" type="button">Save</button>
+          <button class="btn small" data-action="cancel-edit" data-id="${item.id}" type="button">Cancel</button>
+        </div>
+      </div>
+    `;
+  }
+
+  function cardTemplate(item, position) {
     const closed = item.status === "sold" || new Date(item.closes_at).getTime() <= Date.now();
     const t = timeLeftLabel(item.closes_at);
     const minNext = item.current_bid_cents + 100;
+    const indexLabel = String(position + 1).padStart(2, "0");
 
     return `
-      <div class="card ${item.status === 'sold' ? 'sold' : ''}" data-id="${item.id}">
-        ${item.status === "sold" ? '<div class="sold-badge">SOLD</div>' : ""}
-        <div class="placeholder">${item.emoji}</div>
+      <div class="card ${item.status === "sold" ? "sold" : ""}" data-id="${item.id}">
+        <span class="index-no">${indexLabel}</span>
+        ${item.status === "sold" ? '<div class="sold-badge">Sold</div>' : ""}
+        ${mediaTemplate(item, indexLabel)}
         <div class="card-body">
-          <h3>${item.title}</h3>
-          <div class="bid-row">
-            <span>Current bid<br /><span class="bid-amount">${money(item.current_bid_cents)}</span></span>
-            <span class="countdown ${t.urgent ? 'urgent' : ''}">${t.label}</span>
+          <h3>${escapeHtml(item.title)}</h3>
+
+          <div class="stat-line">
+            <span class="label">Retail value</span>
+            <span class="value">${item.retail_value_cents != null ? money(item.retail_value_cents) : "—"}</span>
+          </div>
+
+          <div class="stat-line">
+            <span>
+              <span class="label">Current bid</span><br />
+              <span class="bid-amount">${money(item.current_bid_cents)}</span>
+            </span>
+            <span class="countdown ${t.urgent ? "urgent" : ""}">${t.label}</span>
           </div>
           <div class="bidder">${item.current_bidder_name ? `High bidder: ${escapeHtml(item.current_bidder_name)}` : "No bids yet"}</div>
 
@@ -450,8 +711,11 @@
                       ? `<button class="btn small" data-action="reopen" data-id="${item.id}">Reopen</button>`
                       : `<button class="btn small" data-action="sold" data-id="${item.id}">Mark sold</button>`
                   }
-                  <button class="btn small" data-action="link" data-id="${item.id}">Set Stripe link</button>
-                </div>`
+                  <button class="btn small" data-action="link" data-id="${item.id}">Stripe link</button>
+                  <button class="btn small" data-action="photos" data-id="${item.id}">Photos</button>
+                  <button class="btn small" data-action="toggle-edit" data-id="${item.id}">${editingItem[item.id] ? "Close" : "Edit"}</button>
+                </div>
+                ${editingItem[item.id] ? editFormTemplate(item) : ""}`
               : ""
           }
         </div>
@@ -459,14 +723,8 @@
     `;
   }
 
-  function escapeHtml(s) {
-    const div = document.createElement("div");
-    div.textContent = s;
-    return div.innerHTML;
-  }
-
   function render() {
-    grid.innerHTML = items.map(cardTemplate).join("");
+    grid.innerHTML = items.map((item, i) => cardTemplate(item, i)).join("");
     attachHandlers();
   }
 
@@ -483,7 +741,7 @@
 
         const name = getName();
         if (!name) {
-          ensureName();
+          openNameModal();
           return;
         }
         if (!dollars || dollars <= 0) return;
@@ -508,6 +766,8 @@
       });
     });
 
+    items.forEach((item) => attachCarouselHandlersFor(item.id));
+
     grid.querySelectorAll("[data-action]").forEach((btn) => {
       btn.addEventListener("click", async () => {
         const id = Number(btn.dataset.id);
@@ -526,6 +786,51 @@
           if (link === null) return;
           const { error } = await supabase.rpc("set_stripe_link", { p_item_id: id, p_passphrase: pass, p_link: link });
           if (error) alert(error.message);
+        } else if (action === "photos") {
+          const item = items.find((it) => it.id === id);
+          const current = (item && item.images ? item.images : []).join(", ");
+          const input = prompt("Photo URLs for this item, comma-separated (1-3 recommended):", current);
+          if (input === null) return;
+          const list = input.split(",").map((s) => s.trim()).filter(Boolean);
+          const { error } = await supabase.rpc("set_item_images", { p_item_id: id, p_passphrase: pass, p_images: list });
+          if (error) alert(error.message);
+        } else if (action === "toggle-edit") {
+          editingItem[id] = !editingItem[id];
+          render();
+        } else if (action === "cancel-edit") {
+          editingItem[id] = false;
+          render();
+        } else if (action === "save-edit") {
+          const wrap = grid.querySelector(`.edit-form[data-edit-id="${id}"]`);
+          const title = wrap.querySelector('[data-field="title"]').value.trim();
+          const retail = wrap.querySelector('[data-field="retail"]').value;
+          const starting = wrap.querySelector('[data-field="starting"]').value;
+          const { error } = await supabase.rpc("admin_edit_item", {
+            p_item_id: id,
+            p_passphrase: pass,
+            p_title: title,
+            p_retail_value_cents: retail === "" ? null : Math.round(parseFloat(retail) * 100),
+            p_starting_bid_cents: Math.round(parseFloat(starting) * 100),
+          });
+          if (error) { alert(error.message); return; }
+          editingItem[id] = false;
+        }
+      });
+    });
+  }
+
+  function attachCarouselHandlersFor(id) {
+    const scope = grid.querySelector(`.card[data-id="${id}"]`);
+    if (!scope) return;
+    scope.querySelectorAll(".carousel-arrow").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const dir = Number(btn.dataset.dir);
+        carouselIndex[id] = (carouselIndex[id] || 0) + dir;
+        const item = items.find((it) => it.id === id);
+        const cardEl = scope.querySelector(".carousel");
+        if (item && cardEl) {
+          cardEl.outerHTML = mediaTemplate(item, "");
+          attachCarouselHandlersFor(id);
         }
       });
     });
@@ -554,7 +859,7 @@
 
   // Tick countdowns
   setInterval(() => {
-    document.querySelectorAll(".countdown").forEach((el, i) => {
+    grid.querySelectorAll(".countdown").forEach((el, i) => {
       const item = items[i];
       if (!item) return;
       const t = timeLeftLabel(item.closes_at);
@@ -563,7 +868,7 @@
     });
   }, 30000);
 
-  ensureName();
+  refreshWho();
   loadItems();
 </script>
 </body>
