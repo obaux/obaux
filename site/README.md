@@ -5,11 +5,12 @@ Static site (`index.html`) + a Supabase backend for bids/sold-status, deployed v
 ## How it works
 - **Sign in**: friends just type a name (stored in their browser, no password) — attached to their bids.
 - **Bidding**: each item has a starting bid and a 1-week close timer from when it was listed. Any bid must beat the current highest bid. All bids write straight to Supabase (Postgres) through a security-definer function that enforces "must be higher" and "not closed/sold" — the public anon key can only call that function, not edit rows directly.
-- **Admin**: the "Admin" button prompts for a passphrase (given to Will separately, not stored in this repo) to mark an item sold or paste in its Stripe Payment Link. Sold status and the payment link are then visible to everyone.
-- **Realtime**: the page subscribes to Supabase realtime changes, so all viewers see new bids/sold status without refreshing.
+- **Admin**: the "Admin" button prompts for a passphrase (given to Will separately, not stored in this repo) to mark an item sold, paste in its Stripe Payment Link, set its photos, or edit its title / retail value / starting bid. Everything an admin changes is visible to everyone immediately.
+- **Photos**: each card is a carousel (arrows + dots) of the item's `images`. Admin sets them via the **Photos** button (comma-separated URLs or relative paths — see `images/README.md`). No photos yet → a numbered placeholder tile shows instead.
+- **Realtime**: the page subscribes to Supabase realtime changes, so all viewers see new bids/sold status/edits without refreshing.
 
 ## Backend
-Supabase project: `wills-garage-sale` (id `spnilculhefkvbyomwre`). Tables: `items`, `bids`, `admin_config`. RPC functions: `place_bid`, `mark_item_sold`, `reopen_item`, `set_stripe_link`.
+Supabase project: `wills-garage-sale` (id `spnilculhefkvbyomwre`). Tables: `items`, `bids`, `admin_config`. RPC functions: `place_bid`, `mark_item_sold`, `reopen_item`, `set_stripe_link`, `set_item_images`, `admin_edit_item`.
 
 The anon key embedded in `index.html` is meant to be public — Row Level Security plus the RPC functions above are what actually gate writes.
 
