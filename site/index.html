@@ -148,6 +148,7 @@
   .btn.primary:hover { background: var(--accent); border-color: var(--accent); }
   .btn:disabled { opacity: .45; cursor: not-allowed; }
   .btn.small { padding: 6px 10px; font-size: 0.68rem; }
+  .btn.danger:hover { background: var(--danger); color: #fff; }
 
   .grid {
     display: grid;
@@ -414,6 +415,29 @@
     color: var(--danger);
     margin-top: 16px;
   }
+
+  .toast {
+    position: fixed;
+    left: 50%;
+    bottom: 24px;
+    transform: translateX(-50%) translateY(0);
+    background: var(--ink);
+    color: #fff;
+    font-size: 0.82rem;
+    font-weight: 600;
+    padding: 12px 20px;
+    z-index: 100;
+    max-width: calc(100% - 32px);
+    text-align: center;
+    box-shadow: 0 4px 16px rgba(0,0,0,.25);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+  }
+  .toast.error { background: var(--danger); }
+  .toast.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(-50%) translateY(8px);
+  }
 </style>
 </head>
 <body>
@@ -476,6 +500,8 @@
   </footer>
 </div>
 
+<div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+
 <script type="module">
   import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
@@ -500,6 +526,15 @@
   const adminInput = document.getElementById("adminInput");
   const adminToggleBtn = document.getElementById("adminToggleBtn");
   const loadError = document.getElementById("loadError");
+  const toast = document.getElementById("toast");
+
+  let toastTimer = null;
+  function showToast(message, type = "success") {
+    clearTimeout(toastTimer);
+    toast.textContent = message;
+    toast.className = "toast" + (type === "error" ? " error" : "");
+    toastTimer = setTimeout(() => toast.classList.add("hidden"), 3000);
+  }
 
   let items = [];
   let isAdmin = !!sessionStorage.getItem(ADMIN_KEY);
@@ -567,6 +602,7 @@
       sessionStorage.removeItem(ADMIN_KEY);
       adminToggleBtn.textContent = "Admin";
       render();
+      showToast("Admin mode off.");
     } else {
       adminModal.classList.remove("hidden");
       adminInput.focus();
@@ -584,7 +620,7 @@
       p_link: null,
     });
     if (error && error.message && error.message.includes("Invalid admin passphrase")) {
-      alert("Wrong passphrase.");
+      showToast("Wrong passphrase.", "error");
       return;
     }
     sessionStorage.setItem(ADMIN_KEY, pass);
@@ -593,6 +629,7 @@
     closeAdminModal();
     adminInput.value = "";
     render();
+    showToast("Admin mode on.");
   });
 
   function timeLeftLabel(closesAt) {
@@ -715,6 +752,7 @@
                   <button class="btn small" data-action="link" data-id="${item.id}">Stripe link</button>
                   <button class="btn small" data-action="photos" data-id="${item.id}">Photos</button>
                   <button class="btn small" data-action="toggle-edit" data-id="${item.id}">${editingItem[item.id] ? "Close" : "Edit"}</button>
+                  <button class="btn small danger" data-action="delete" data-id="${item.id}">Delete</button>
                 </div>
                 ${editingItem[item.id] ? editFormTemplate(item) : ""}`
               : ""
@@ -776,17 +814,28 @@
         const pass = sessionStorage.getItem(ADMIN_KEY);
         if (!pass) return;
 
+        const itemTitle = (items.find((it) => it.id === id) || {}).title || "Item";
+
         if (action === "sold") {
           const { error } = await supabase.rpc("mark_item_sold", { p_item_id: id, p_passphrase: pass });
-          if (error) alert(error.message);
+          if (error) { showToast(error.message.replace(/^.*: /, ""), "error"); return; }
+          await loadItems();
+          const confirmed = items.find((it) => it.id === id)?.status === "sold";
+          showToast(confirmed ? `"${itemTitle}" marked as sold.` : "Marked sold, but the site didn't confirm it — check and retry.", confirmed ? "success" : "error");
         } else if (action === "reopen") {
           const { error } = await supabase.rpc("reopen_item", { p_item_id: id, p_passphrase: pass });
-          if (error) alert(error.message);
+          if (error) { showToast(error.message.replace(/^.*: /, ""), "error"); return; }
+          await loadItems();
+          const confirmed = items.find((it) => it.id === id)?.status === "open";
+          showToast(confirmed ? `"${itemTitle}" reopened for bidding.` : "Reopened, but the site didn't confirm it — check and retry.", confirmed ? "success" : "error");
         } else if (action === "link") {
           const link = prompt("Paste the Stripe Payment Link URL for this item:");
           if (link === null) return;
           const { error } = await supabase.rpc("set_stripe_link", { p_item_id: id, p_passphrase: pass, p_link: link });
-          if (error) alert(error.message);
+          if (error) { showToast(error.message.replace(/^.*: /, ""), "error"); return; }
+          await loadItems();
+          const confirmed = items.find((it) => it.id === id)?.stripe_payment_link === link;
+          showToast(confirmed ? "Stripe link saved." : "Saved, but the site didn't confirm it — check and retry.", confirmed ? "success" : "error");
         } else if (action === "photos") {
           const item = items.find((it) => it.id === id);
           const current = (item && item.images ? item.images : []).join(", ");
@@ -794,7 +843,11 @@
           if (input === null) return;
           const list = input.split(",").map((s) => s.trim()).filter(Boolean);
           const { error } = await supabase.rpc("set_item_images", { p_item_id: id, p_passphrase: pass, p_images: list });
-          if (error) alert(error.message);
+          if (error) { showToast(error.message.replace(/^.*: /, ""), "error"); return; }
+          await loadItems();
+          const saved = items.find((it) => it.id === id)?.images || [];
+          const confirmed = saved.length === list.length && saved.every((v, i) => v === list[i]);
+          showToast(confirmed ? "Photos updated." : "Saved, but the site didn't confirm it — check and retry.", confirmed ? "success" : "error");
         } else if (action === "toggle-edit") {
           editingItem[id] = !editingItem[id];
           render();
@@ -806,15 +859,29 @@
           const title = wrap.querySelector('[data-field="title"]').value.trim();
           const retail = wrap.querySelector('[data-field="retail"]').value;
           const starting = wrap.querySelector('[data-field="starting"]').value;
+          const retailCents = retail === "" ? null : Math.round(parseFloat(retail) * 100);
+          const startingCents = Math.round(parseFloat(starting) * 100);
           const { error } = await supabase.rpc("admin_edit_item", {
             p_item_id: id,
             p_passphrase: pass,
             p_title: title,
-            p_retail_value_cents: retail === "" ? null : Math.round(parseFloat(retail) * 100),
-            p_starting_bid_cents: Math.round(parseFloat(starting) * 100),
+            p_retail_value_cents: retailCents,
+            p_starting_bid_cents: startingCents,
           });
-          if (error) { alert(error.message); return; }
+          if (error) { showToast(error.message.replace(/^.*: /, ""), "error"); return; }
           editingItem[id] = false;
+          await loadItems();
+          const saved = items.find((it) => it.id === id);
+          const confirmed = saved && saved.title === title && saved.retail_value_cents === retailCents && saved.starting_bid_cents === startingCents;
+          showToast(confirmed ? "Item updated." : "Saved, but the site didn't confirm it — check and retry.", confirmed ? "success" : "error");
+        } else if (action === "delete") {
+          const ok = confirm(`Delete "${itemTitle}" permanently? This can't be undone.`);
+          if (!ok) return;
+          const { error } = await supabase.rpc("delete_item", { p_item_id: id, p_passphrase: pass });
+          if (error) { showToast(error.message.replace(/^.*: /, ""), "error"); return; }
+          await loadItems();
+          const stillThere = items.some((it) => it.id === id);
+          showToast(stillThere ? "Delete didn't confirm — check and retry." : `"${itemTitle}" deleted.`, stillThere ? "error" : "success");
         }
       });
     });
