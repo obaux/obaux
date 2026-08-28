@@ -512,25 +512,18 @@
 <div class="wrap">
   <header class="hero">
     <p class="eyebrow label">Minneapolis &amp; St. Paul</p>
-    <h1>Will's Move-Out Garage Sale</h1>
+    <h1>I'll miss you MSP — Virtual Garage Sale</h1>
     <p class="lede">
-      Everything below is up for grabs. Bid on anything you want — highest bid wins when
-      the timer runs out (bidding closes <strong>one week</strong> after each item is listed).
-      Free drop off may be available upon request.
+      I've embraced the nomad life, and that means everything here must go. Bid on
+      anything below — highest bid wins when the timer runs out (bidding closes
+      <strong>one week</strong> after each item is listed). Free drop off may be
+      available upon request.
     </p>
     <a class="contact-btn" href="sms:+12673095465">
       <img class="avatar" src="images/will.png" alt="Will" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
       <span class="avatar-fallback" style="display:none">W</span>
       <span>Questions? Text Will — (267) 309-5465</span>
     </a>
-
-    <div class="topbar">
-      <div class="who">
-        <span id="whoBlock" class="hidden">Signed in as <strong id="whoName"></strong> · <button class="link-btn" id="changeNameBtn">change</button></span>
-        <span id="whoBlockEmpty">Not signed in yet</span>
-      </div>
-      <button class="btn small" id="adminToggleBtn">Admin</button>
-    </div>
 
     <div class="filters">
       <input type="text" id="searchInput" class="search-input" placeholder="Search items…" autocomplete="off" />
@@ -546,6 +539,14 @@
   <footer>
     <p>Questions or want to arrange pickup? Text Will directly.<br />
     Winning bidders pay via the Stripe link on their item once it's marked sold.</p>
+
+    <div class="topbar">
+      <div class="who">
+        <span id="whoBlock" class="hidden">Signed in as <strong id="whoName"></strong> · <button class="link-btn" id="changeNameBtn">change</button></span>
+        <span id="whoBlockEmpty">Not signed in yet</span>
+      </div>
+      <button class="btn small" id="adminToggleBtn">Admin</button>
+    </div>
   </footer>
 </div>
 
@@ -755,7 +756,7 @@
     return `
       <div class="carousel" data-id="${item.id}">
         <div class="carousel-track" style="transform: translateX(-${idx * 100}%)">
-          ${images.map((src) => `<div class="carousel-slide"><img src="${escapeHtml(src)}" loading="lazy" alt="${escapeHtml(item.title)}" /></div>`).join("")}
+          ${images.map((src) => `<div class="carousel-slide"><img data-src="${escapeHtml(src)}" loading="lazy" alt="${escapeHtml(item.title)}" /></div>`).join("")}
         </div>
         ${images.length > 1 ? `
           <button class="carousel-arrow prev" data-carousel-id="${item.id}" data-dir="-1" aria-label="Previous photo">&lsaquo;</button>
@@ -862,6 +863,22 @@
     `;
   }
 
+  function hydrateImages(scopeEl) {
+    scopeEl.querySelectorAll("img[data-src]").forEach((img) => {
+      img.src = img.dataset.src;
+      img.removeAttribute("data-src");
+    });
+  }
+
+  const mediaObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        hydrateImages(entry.target);
+        mediaObserver.unobserve(entry.target);
+      }
+    });
+  }, { rootMargin: "300px 0px" });
+
   function render() {
     renderChips();
     visibleItems = getFilteredItems();
@@ -909,6 +926,7 @@
     });
 
     visibleItems.forEach((item) => attachCarouselHandlersFor(item.id));
+    grid.querySelectorAll(".card").forEach((cardEl) => mediaObserver.observe(cardEl));
 
     grid.querySelectorAll("[data-action]").forEach((btn) => {
       btn.addEventListener("click", async () => {
@@ -1003,6 +1021,7 @@
         const cardEl = scope.querySelector(".carousel");
         if (item && cardEl) {
           cardEl.outerHTML = mediaTemplate(item, "");
+          hydrateImages(scope);
           attachCarouselHandlersFor(id);
         }
       });
