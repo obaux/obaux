@@ -159,15 +159,25 @@
     width: 40px;
     height: 40px;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 5px;
     background: #fff;
     border: 1.5px solid var(--line);
     cursor: pointer;
     padding: 0;
     z-index: 70;
   }
-  .menu-btn svg { width: 18px; height: 13px; color: var(--ink); }
+  .menu-btn .bar {
+    width: 18px;
+    height: 2px;
+    background: var(--ink);
+    transition: transform 0.25s ease, opacity 0.15s ease;
+  }
+  .menu-btn.open .bar:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .menu-btn.open .bar:nth-child(2) { opacity: 0; }
+  .menu-btn.open .bar:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
   .drawer-overlay {
     position: fixed;
@@ -191,7 +201,9 @@
     transition: transform 0.25s ease;
   }
   .drawer.open { transform: translateX(0); }
-  .drawer .modal-close { top: 16px; right: 16px; }
+  @media (max-width: 640px) {
+    .drawer { width: 50vw; }
+  }
 
   .drawer-section {
     border-top: 1px solid var(--hairline);
@@ -216,14 +228,35 @@
     flex-direction: column;
     gap: 12px;
   }
+  .search-wrap {
+    position: relative;
+    max-width: 360px;
+  }
   .search-input {
     width: 100%;
-    max-width: 360px;
     border: 1.5px solid var(--line);
-    padding: 10px 14px;
+    padding: 10px 34px 10px 14px;
     font-size: 0.9rem;
     font-family: inherit;
   }
+  .search-clear {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 36px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--muted);
+    font-size: 1.2rem;
+    line-height: 1;
+    padding: 0;
+  }
+  .search-clear:hover { color: var(--ink); }
   .category-chips {
     display: flex;
     flex-wrap: wrap;
@@ -375,6 +408,9 @@
     line-height: 1;
     padding: 0;
     z-index: 3;
+  }
+  @media (max-width: 640px) {
+    .carousel-arrow { display: none; }
   }
   .carousel-arrow:hover { background: var(--ink); color: #fff; }
   .carousel-arrow.prev { left: 8px; }
@@ -644,7 +680,7 @@
 <div class="wrap">
   <header class="hero">
     <p class="eyebrow label">Minneapolis &amp; St. Paul</p>
-    <h1>I'll miss you MSP — Virtual Garage Sale</h1>
+    <h1>I'll miss you MSP<br />Virtual Garage Sale</h1>
     <p class="lede">
       I've embraced the nomad life, and that means everything here must go. Bid on
       anything below — highest bid wins when the timer runs out (bidding closes
@@ -682,19 +718,18 @@
 </div>
 
 <button type="button" class="menu-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false">
-  <svg viewBox="0 0 20 14" fill="none" stroke="currentColor" stroke-width="1.5">
-    <line x1="0" y1="1" x2="20" y2="1"/>
-    <line x1="0" y1="7" x2="20" y2="7"/>
-    <line x1="0" y1="13" x2="20" y2="13"/>
-  </svg>
+  <span class="bar"></span>
+  <span class="bar"></span>
+  <span class="bar"></span>
 </button>
 
 <div class="drawer-overlay hidden" id="drawerOverlay"></div>
 <aside class="drawer" id="drawer" aria-label="Search, filters, and account menu">
-  <button class="modal-close" id="drawerCloseBtn" aria-label="Close menu">&times;</button>
-
   <div class="filters">
-    <input type="text" id="searchInput" class="search-input" placeholder="Search items…" autocomplete="off" />
+    <div class="search-wrap">
+      <input type="text" id="searchInput" class="search-input" placeholder="Search items…" autocomplete="off" />
+      <button type="button" class="search-clear hidden" id="searchClearBtn" aria-label="Clear search">&times;</button>
+    </div>
     <div class="category-chips" id="categoryChips"></div>
   </div>
 
@@ -755,7 +790,6 @@
   const menuBtn = document.getElementById("menuBtn");
   const drawer = document.getElementById("drawer");
   const drawerOverlay = document.getElementById("drawerOverlay");
-  const drawerCloseBtn = document.getElementById("drawerCloseBtn");
   const contactsBtn = document.getElementById("contactsBtn");
   const contactsModal = document.getElementById("contactsModal");
   const contactsList = document.getElementById("contactsList");
@@ -782,6 +816,7 @@
     if (e.key === "Escape") closePaymentTooltip();
   });
   const searchInput = document.getElementById("searchInput");
+  const searchClearBtn = document.getElementById("searchClearBtn");
   const categoryChips = document.getElementById("categoryChips");
   const emptyState = document.getElementById("emptyState");
 
@@ -818,13 +853,23 @@
       btn.addEventListener("click", () => {
         activeCategory = btn.dataset.category;
         render();
+        closeDrawer();
       });
     });
   }
 
   searchInput.addEventListener("input", () => {
     searchQuery = searchInput.value;
+    searchClearBtn.classList.toggle("hidden", searchQuery.length === 0);
     render();
+  });
+
+  searchClearBtn.addEventListener("click", () => {
+    searchInput.value = "";
+    searchQuery = "";
+    searchClearBtn.classList.add("hidden");
+    render();
+    searchInput.focus();
   });
 
   let toastTimer = null;
@@ -878,18 +923,19 @@
   function openDrawer() {
     drawer.classList.add("open");
     drawerOverlay.classList.remove("hidden");
+    menuBtn.classList.add("open");
     menuBtn.setAttribute("aria-expanded", "true");
   }
   function closeDrawer() {
     drawer.classList.remove("open");
     drawerOverlay.classList.add("hidden");
+    menuBtn.classList.remove("open");
     menuBtn.setAttribute("aria-expanded", "false");
   }
   menuBtn.addEventListener("click", () => {
     if (drawer.classList.contains("open")) closeDrawer();
     else openDrawer();
   });
-  drawerCloseBtn.addEventListener("click", closeDrawer);
   drawerOverlay.addEventListener("click", closeDrawer);
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") closeDrawer();
@@ -1069,10 +1115,14 @@
         <div class="card-body">
           <h3>${escapeHtml(item.title)}</h3>
 
-          <div class="stat-line">
-            <span class="label">Retail value</span>
-            <span class="value">${item.retail_value_cents != null ? money(item.retail_value_cents) : "—"}</span>
-          </div>
+          ${
+            item.retail_value_cents != null
+              ? `<div class="stat-line">
+                  <span class="label">Retail value</span>
+                  <span class="value">${money(item.retail_value_cents)}</span>
+                </div>`
+              : ""
+          }
 
           <div class="stat-line">
             <span>
@@ -1269,22 +1319,41 @@
     });
   }
 
+  function navigateCarousel(id, dir, scope) {
+    carouselIndex[id] = (carouselIndex[id] || 0) + dir;
+    const item = items.find((it) => it.id === id);
+    const cardEl = scope.querySelector(".carousel");
+    if (item && cardEl) {
+      cardEl.outerHTML = mediaTemplate(item, "");
+      hydrateImages(scope);
+      attachCarouselHandlersFor(id);
+    }
+  }
+
   function attachCarouselHandlersFor(id) {
     const scope = grid.querySelector(`.card[data-id="${id}"]`);
     if (!scope) return;
     scope.querySelectorAll(".carousel-arrow").forEach((btn) => {
       btn.addEventListener("click", () => {
-        const dir = Number(btn.dataset.dir);
-        carouselIndex[id] = (carouselIndex[id] || 0) + dir;
-        const item = items.find((it) => it.id === id);
-        const cardEl = scope.querySelector(".carousel");
-        if (item && cardEl) {
-          cardEl.outerHTML = mediaTemplate(item, "");
-          hydrateImages(scope);
-          attachCarouselHandlersFor(id);
-        }
+        navigateCarousel(id, Number(btn.dataset.dir), scope);
       });
     });
+
+    const carouselEl = scope.querySelector(".carousel");
+    if (carouselEl) {
+      let startX = null;
+      carouselEl.addEventListener("touchstart", (e) => {
+        startX = e.touches[0].clientX;
+      }, { passive: true });
+      carouselEl.addEventListener("touchend", (e) => {
+        if (startX === null) return;
+        const delta = e.changedTouches[0].clientX - startX;
+        startX = null;
+        if (Math.abs(delta) > 40) {
+          navigateCarousel(id, delta < 0 ? 1 : -1, scope);
+        }
+      });
+    }
   }
 
   async function loadItems() {
