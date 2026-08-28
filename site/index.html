@@ -288,31 +288,41 @@
     display: flex;
     align-items: center;
     gap: 6px;
-    max-width: 360px;
-    min-height: 38px;
-    border-bottom: 1.5px solid var(--line);
+    min-height: 44px;
+    cursor: pointer;
   }
   .category-label {
-    font-size: 0.78rem;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--muted);
+    font-size: 0.9rem;
+    font-weight: 400;
+    color: var(--ink);
     white-space: nowrap;
   }
+  .category-control {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    border-bottom: 1.5px solid var(--line);
+    padding-bottom: 3px;
+  }
   .category-select {
-    flex: 1;
-    min-height: 38px;
+    appearance: none;
+    -webkit-appearance: none;
     border: none;
-    background: #fff;
+    background: none;
     color: var(--ink);
-    padding: 8px 4px;
-    font-size: 0.78rem;
+    padding: 0;
+    font-size: 0.9rem;
     font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
     font-family: inherit;
+    line-height: 1.4;
     cursor: pointer;
+  }
+  .category-select:focus { outline: none; }
+  .category-caret {
+    width: 9px;
+    height: auto;
+    color: var(--ink);
+    flex-shrink: 0;
   }
 
   .empty-state {
@@ -891,10 +901,15 @@
       <input type="text" id="searchInput" class="search-input" placeholder="Search items…" autocomplete="off" />
       <button type="button" class="search-clear hidden" id="searchClearBtn" aria-label="Clear search">&times;</button>
     </div>
-    <div class="category-wrap">
+    <label class="category-wrap" for="categorySelect">
       <span class="category-label">Category:</span>
-      <select id="categorySelect" class="category-select"></select>
-    </div>
+      <span class="category-control">
+        <select id="categorySelect" class="category-select"></select>
+        <svg class="category-caret" viewBox="0 0 10 6" aria-hidden="true">
+          <path d="M0 0h10L5 6z" fill="currentColor" />
+        </svg>
+      </span>
+    </label>
   </div>
 
   <div class="drawer-section drawer-bio">
