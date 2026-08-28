@@ -73,9 +73,9 @@
   .payment-label { margin-right: 2px; }
   .payment-icon {
     display: block;
-    width: 34px;
+    width: 22px;
     height: auto;
-    color: var(--ink);
+    color: var(--muted);
   }
   .info-btn {
     width: 38px;
@@ -119,6 +119,7 @@
     font-size: 0.88rem;
     border-radius: 999px;
     max-width: 100%;
+    margin: 0 0 12px;
   }
   .contact-btn span:last-child { white-space: normal; }
   @media (max-width: 420px) {
@@ -184,6 +185,13 @@
     inset: 0;
     background: rgba(17,17,17,.4);
     z-index: 64;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease;
+  }
+  .drawer-overlay.open {
+    opacity: 1;
+    pointer-events: auto;
   }
 
   .drawer {
@@ -355,6 +363,7 @@
     .card-body { padding: 10px 10px 12px; gap: 6px; }
     .card-body h3 { font-size: 0.85rem; }
     .bid-amount { font-size: 1.1rem; }
+    .card-price { font-size: 0.78rem; }
   }
 
   .card {
@@ -363,7 +372,9 @@
     flex-direction: column;
     position: relative;
     cursor: pointer;
+    transition: opacity 0.2s ease, transform 0.2s ease;
   }
+  .card:hover { opacity: 0.9; }
   .card.sold .carousel img,
   .card.sold .placeholder-tile { filter: grayscale(1); opacity: 0.55; }
 
@@ -493,6 +504,12 @@
     font-weight: 500;
     letter-spacing: -0.02em;
   }
+  .card-price {
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--muted);
+    letter-spacing: -0.01em;
+  }
   .bidder {
     font-size: 0.76rem;
     color: var(--muted);
@@ -582,6 +599,13 @@
     display: flex; align-items: center; justify-content: center;
     padding: 20px;
     z-index: 50;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+  }
+  .modal-overlay.open {
+    opacity: 1;
+    pointer-events: auto;
   }
   .modal {
     background: #fff;
@@ -590,7 +614,10 @@
     max-width: 340px;
     width: 100%;
     position: relative;
+    transform: scale(0.96);
+    transition: transform 0.2s ease;
   }
+  .modal-overlay.open .modal { transform: scale(1); }
   .contacts-modal {
     max-width: 520px;
     text-align: left;
@@ -673,6 +700,15 @@
     background: #fff;
     z-index: 80;
     overflow-y: auto;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(12px);
+    transition: opacity 0.22s ease, transform 0.22s ease;
+  }
+  .item-overlay.open {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
   }
   .item-overlay-close {
     position: fixed;
@@ -757,7 +793,7 @@
 </head>
 <body>
 
-<div id="nameModal" class="modal-overlay hidden">
+<div id="nameModal" class="modal-overlay">
   <div class="modal">
     <button class="modal-close" data-close="name" aria-label="Close">&times;</button>
     <h2>Who's bidding?</h2>
@@ -770,7 +806,7 @@
   </div>
 </div>
 
-<div id="adminModal" class="modal-overlay hidden">
+<div id="adminModal" class="modal-overlay">
   <div class="modal">
     <button class="modal-close" data-close="admin" aria-label="Close">&times;</button>
     <h2>Admin sign-in</h2>
@@ -792,6 +828,11 @@
       <strong>one week</strong> after each item is listed). Free drop off may be
       available upon request.
     </p>
+    <a class="contact-btn" href="sms:+12673095465">
+      <img class="avatar" src="images/will.jpg" alt="Will" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
+      <span class="avatar-fallback" style="display:none">W</span>
+      <span>Questions? Text Will — (267) 309-5465</span>
+    </a>
     <div class="payment-row">
       <span class="payment-label label">Accepted forms of payment</span>
       <svg class="payment-icon" viewBox="0 0 24 16" fill="none" stroke="currentColor" stroke-width="1.5" role="img" aria-label="Card payments accepted">
@@ -809,11 +850,6 @@
         Only credit/debit cards accepted. Payments are made at the end of the bid period.
       </div>
     </div>
-    <a class="contact-btn" href="sms:+12673095465">
-      <img class="avatar" src="images/will.jpg" alt="Will" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-      <span class="avatar-fallback" style="display:none">W</span>
-      <span>Questions? Text Will — (267) 309-5465</span>
-    </a>
   </header>
 
   <div id="loadError" class="status-banner hidden"></div>
@@ -828,7 +864,7 @@
   <span class="bar"></span>
 </button>
 
-<div class="drawer-overlay hidden" id="drawerOverlay"></div>
+<div class="drawer-overlay" id="drawerOverlay"></div>
 <aside class="drawer" id="drawer" aria-label="Search, filters, and account menu">
   <div class="filters">
     <div class="search-wrap">
@@ -862,12 +898,12 @@
   </div>
 </aside>
 
-<div id="itemOverlay" class="item-overlay hidden">
+<div id="itemOverlay" class="item-overlay">
   <button type="button" class="item-overlay-close" id="itemOverlayClose" aria-label="Close">&times;</button>
   <div class="item-overlay-inner" id="itemOverlayInner"></div>
 </div>
 
-<div id="contactsModal" class="modal-overlay hidden">
+<div id="contactsModal" class="modal-overlay">
   <div class="modal contacts-modal">
     <button class="modal-close" data-close="contacts" aria-label="Close">&times;</button>
     <h2>Bidder contacts</h2>
@@ -1028,22 +1064,22 @@
   function openNameModal() {
     nameInput.value = getName();
     contactInput.value = getContact();
-    nameModal.classList.remove("hidden");
+    nameModal.classList.add("open");
     nameInput.focus();
   }
-  function closeNameModal() { nameModal.classList.add("hidden"); }
-  function closeAdminModal() { adminModal.classList.add("hidden"); }
-  function closeContactsModal() { contactsModal.classList.add("hidden"); }
+  function closeNameModal() { nameModal.classList.remove("open"); }
+  function closeAdminModal() { adminModal.classList.remove("open"); }
+  function closeContactsModal() { contactsModal.classList.remove("open"); }
 
   function openDrawer() {
     drawer.classList.add("open");
-    drawerOverlay.classList.remove("hidden");
+    drawerOverlay.classList.add("open");
     menuBtn.classList.add("open");
     menuBtn.setAttribute("aria-expanded", "true");
   }
   function closeDrawer() {
     drawer.classList.remove("open");
-    drawerOverlay.classList.add("hidden");
+    drawerOverlay.classList.remove("open");
     menuBtn.classList.remove("open");
     menuBtn.setAttribute("aria-expanded", "false");
   }
@@ -1065,7 +1101,7 @@
   });
   [nameModal, adminModal, contactsModal].forEach((overlay) => {
     overlay.addEventListener("click", (e) => {
-      if (e.target === overlay) overlay.classList.add("hidden");
+      if (e.target === overlay) overlay.classList.remove("open");
     });
   });
 
@@ -1094,7 +1130,7 @@
       render();
       showToast("Admin mode off.");
     } else {
-      adminModal.classList.remove("hidden");
+      adminModal.classList.add("open");
       adminInput.focus();
     }
   });
@@ -1142,7 +1178,7 @@
         )
         .join("");
     }
-    contactsModal.classList.remove("hidden");
+    contactsModal.classList.add("open");
   });
 
   function timeLeftLabel(closesAt) {
@@ -1228,7 +1264,7 @@
         <div class="card-body">
           <h3>${escapeHtml(item.title)}</h3>
           <div class="stat-line">
-            <span class="bid-amount">${money(item.current_bid_cents)}</span>
+            <span class="card-price">${money(item.current_bid_cents)}</span>
             <span class="countdown ${t.urgent ? "urgent" : ""}">${t.label}</span>
           </div>
         </div>
@@ -1432,18 +1468,18 @@
     hydrateImages(itemOverlayInner);
     attachOverlayHandlers(item);
     loadBidHistory(id);
-    itemOverlay.classList.remove("hidden");
+    itemOverlay.classList.add("open");
     document.body.style.overflow = "hidden";
   }
 
   function closeItemOverlay() {
-    itemOverlay.classList.add("hidden");
+    itemOverlay.classList.remove("open");
     document.body.style.overflow = "";
   }
 
   itemOverlayClose.addEventListener("click", closeItemOverlay);
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && !itemOverlay.classList.contains("hidden")) closeItemOverlay();
+    if (e.key === "Escape" && itemOverlay.classList.contains("open")) closeItemOverlay();
   });
 
   function attachOverlayHandlers(item) {
@@ -1609,7 +1645,7 @@
       el.textContent = t.label;
       el.className = "countdown" + (t.urgent ? " urgent" : "");
     });
-    if (!itemOverlay.classList.contains("hidden")) {
+    if (itemOverlay.classList.contains("open")) {
       const openCard = itemOverlayInner.querySelector(".card");
       const openItem = openCard && items.find((it) => it.id === Number(openCard.dataset.id));
       const el = itemOverlayInner.querySelector(".countdown");
