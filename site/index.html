@@ -61,6 +61,14 @@
   }
   header.hero .lede strong { color: var(--ink); }
 
+  .payment-icon {
+    display: block;
+    width: 34px;
+    height: auto;
+    color: var(--ink);
+    margin: 0 0 18px;
+  }
+
   .contact-btn {
     display: inline-flex;
     align-items: center;
@@ -519,6 +527,10 @@
       <strong>one week</strong> after each item is listed). Free drop off may be
       available upon request.
     </p>
+    <svg class="payment-icon" viewBox="0 0 24 16" fill="none" stroke="currentColor" stroke-width="1.5" role="img" aria-label="Card payments accepted">
+      <rect x="0.75" y="0.75" width="22.5" height="14.5" rx="2"/>
+      <line x1="0.75" y1="5" x2="23.25" y2="5"/>
+    </svg>
     <a class="contact-btn" href="sms:+12673095465">
       <img class="avatar" src="images/will.png" alt="Will" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
       <span class="avatar-fallback" style="display:none">W</span>
@@ -581,7 +593,7 @@
   const categoryChips = document.getElementById("categoryChips");
   const emptyState = document.getElementById("emptyState");
 
-  const CATEGORIES = ["Furniture", "Decor", "Bedding & Textiles", "Kitchen", "Tech & Photo", "Storage & Household"];
+  const CATEGORIES = ["Furniture", "Decor", "Bedding & Textiles", "Kitchen", "Tech & Photo", "Storage & Household", "Accessories"];
   let searchQuery = "";
   let activeCategory = "All";
   let visibleItems = [];

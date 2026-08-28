@@ -5,3 +5,12 @@
 
 ## Ordering rule
 When a set of photos for one item is named `Name 1`, `Name`, `Name 2`, `Name 3` (a bare, unnumbered file among numbered ones), display them in the order they were written: **1, bare, 2, 3** — the unnumbered file is not automatically the cover photo, it slots in exactly where it falls in that sequence.
+
+## Uploading a new batch of photos (workflow)
+When photos are pushed straight to GitHub (web upload, wherever they land — `site/`, repo root, `site/images/`, etc.), process them as:
+1. Group files by their label (the filename with the trailing number stripped) — each distinct label is one item, one photo set.
+2. If a label matches an existing item's title, add those photos to that item instead of creating a new one (ask if it's ambiguous, e.g. could be a second unit of the same thing).
+3. For each new label: pick a category from the existing set (add a new one only if nothing fits), a reasonable starting bid (no need to guess retail value — leave it unset unless given), and rename the files into `images/items/<slug>-1.<ext>`, `-2`, etc., following the ordering rule above.
+4. Create a real Stripe product + price (`custom_unit_amount` enabled, minimum = starting bid) + Payment Link for each new item, same account/flow as the rest of the catalog.
+5. Insert the item into Supabase (`slug`, `title` = the image label verbatim, `starting_bid_cents`, `current_bid_cents` = same, `category`, `images`, `stripe_payment_link`).
+6. Commit the renamed files, push to the working branch, and offer to merge — don't merge without being asked.
