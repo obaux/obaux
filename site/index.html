@@ -61,6 +61,48 @@
   }
   header.hero .lede strong { color: var(--ink); }
 
+  .payment-row {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    margin: 0 0 18px;
+  }
+  .payment-icon {
+    display: block;
+    width: 34px;
+    height: auto;
+    color: var(--ink);
+  }
+  .info-btn {
+    width: 38px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    padding: 0;
+    color: var(--muted);
+    cursor: pointer;
+  }
+  .info-btn:hover,
+  .info-btn[aria-expanded="true"] { color: var(--ink); }
+  .info-btn svg { width: 16px; height: 16px; }
+  .tooltip {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    margin-top: 4px;
+    background: var(--ink);
+    color: #fff;
+    font-size: 0.78rem;
+    line-height: 1.4;
+    padding: 10px 12px;
+    max-width: 260px;
+    z-index: 5;
+  }
+
   .contact-btn {
     display: inline-flex;
     align-items: center;
@@ -113,6 +155,48 @@
     gap: 8px;
   }
   .who strong { color: var(--ink); }
+
+  .filters {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .search-input {
+    width: 100%;
+    max-width: 360px;
+    border: 1.5px solid var(--line);
+    padding: 10px 14px;
+    font-size: 0.9rem;
+    font-family: inherit;
+  }
+  .category-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .chip {
+    border: 1.5px solid var(--line);
+    background: #fff;
+    color: var(--ink);
+    padding: 6px 14px;
+    font-size: 0.72rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+  }
+  .chip:hover { background: var(--hairline); }
+  .chip.active { background: var(--ink); border-color: var(--ink); color: #fff; }
+
+  .empty-state {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.9rem;
+    padding: 60px 20px;
+    border: 1px solid var(--hairline);
+    margin-top: 28px;
+  }
   .link-btn {
     border: none;
     background: none;
@@ -352,7 +436,8 @@
     display: block;
     margin-bottom: 3px;
   }
-  .edit-form input {
+  .edit-form input,
+  .edit-form select {
     width: 100%;
     border: 1.5px solid var(--line);
     padding: 6px 8px;
@@ -469,17 +554,49 @@
 <div class="wrap">
   <header class="hero">
     <p class="eyebrow label">Minneapolis &amp; St. Paul</p>
-    <h1>Will's Move-Out Garage Sale</h1>
+    <h1>I'll miss you MSP — Virtual Garage Sale</h1>
     <p class="lede">
-      Everything below is up for grabs. Bid on anything you want — highest bid wins when
-      the timer runs out (bidding closes <strong>one week</strong> after each item is listed).
-      Free drop off may be available upon request.
+      I've embraced the nomad life, and that means everything here must go. Bid on
+      anything below — highest bid wins when the timer runs out (bidding closes
+      <strong>one week</strong> after each item is listed). Free drop off may be
+      available upon request.
     </p>
+    <div class="payment-row">
+      <svg class="payment-icon" viewBox="0 0 24 16" fill="none" stroke="currentColor" stroke-width="1.5" role="img" aria-label="Card payments accepted">
+        <rect x="0.75" y="0.75" width="22.5" height="14.5" rx="2"/>
+        <line x1="0.75" y1="5" x2="23.25" y2="5"/>
+      </svg>
+      <button type="button" class="info-btn" id="paymentInfoBtn" aria-expanded="false" aria-label="Payment info">
+        <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4">
+          <circle cx="8" cy="8" r="6.5"/>
+          <line x1="8" y1="7.2" x2="8" y2="11.2"/>
+          <circle cx="8" cy="4.8" r="0.75" fill="currentColor" stroke="none"/>
+        </svg>
+      </button>
+      <div class="tooltip hidden" id="paymentTooltip" role="tooltip">
+        Only credit/debit cards accepted. Payments are made at the end of the bid period.
+      </div>
+    </div>
     <a class="contact-btn" href="sms:+12673095465">
       <img class="avatar" src="images/will.png" alt="Will" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
       <span class="avatar-fallback" style="display:none">W</span>
       <span>Questions? Text Will — (267) 309-5465</span>
     </a>
+
+    <div class="filters">
+      <input type="text" id="searchInput" class="search-input" placeholder="Search items…" autocomplete="off" />
+      <div class="category-chips" id="categoryChips"></div>
+    </div>
+  </header>
+
+  <div id="loadError" class="status-banner hidden"></div>
+  <div id="emptyState" class="empty-state hidden">No items match your search.</div>
+
+  <div class="grid" id="grid" style="margin-top: 28px;"></div>
+
+  <footer>
+    <p>Questions or want to arrange pickup? Text Will directly.<br />
+    Winning bidders pay via the Stripe link on their item once it's marked sold.</p>
 
     <div class="topbar">
       <div class="who">
@@ -488,15 +605,6 @@
       </div>
       <button class="btn small" id="adminToggleBtn">Admin</button>
     </div>
-  </header>
-
-  <div id="loadError" class="status-banner hidden"></div>
-
-  <div class="grid" id="grid" style="margin-top: 28px;"></div>
-
-  <footer>
-    <p>Questions or want to arrange pickup? Text Will directly.<br />
-    Winning bidders pay via the Stripe link on their item once it's marked sold.</p>
   </footer>
 </div>
 
@@ -527,6 +635,71 @@
   const adminToggleBtn = document.getElementById("adminToggleBtn");
   const loadError = document.getElementById("loadError");
   const toast = document.getElementById("toast");
+  const paymentInfoBtn = document.getElementById("paymentInfoBtn");
+  const paymentTooltip = document.getElementById("paymentTooltip");
+
+  function closePaymentTooltip() {
+    paymentTooltip.classList.add("hidden");
+    paymentInfoBtn.setAttribute("aria-expanded", "false");
+  }
+  paymentInfoBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const open = paymentTooltip.classList.toggle("hidden") === false;
+    paymentInfoBtn.setAttribute("aria-expanded", String(open));
+  });
+  document.addEventListener("click", (e) => {
+    if (!paymentTooltip.classList.contains("hidden") && !paymentTooltip.contains(e.target) && e.target !== paymentInfoBtn) {
+      closePaymentTooltip();
+    }
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closePaymentTooltip();
+  });
+  const searchInput = document.getElementById("searchInput");
+  const categoryChips = document.getElementById("categoryChips");
+  const emptyState = document.getElementById("emptyState");
+
+  const CATEGORIES = ["Furniture", "Decor", "Bedding & Textiles", "Kitchen", "Tech & Photo", "Storage & Household", "Accessories"];
+  let searchQuery = "";
+  let activeCategory = "All";
+  let visibleItems = [];
+
+  function fuzzyMatch(query, text) {
+    if (!query) return true;
+    query = query.toLowerCase();
+    text = (text || "").toLowerCase();
+    let qi = 0;
+    for (let i = 0; i < text.length && qi < query.length; i++) {
+      if (text[i] === query[qi]) qi++;
+    }
+    return qi === query.length;
+  }
+
+  function getFilteredItems() {
+    return items.filter((item) => {
+      const matchesCategory = activeCategory === "All" || item.category === activeCategory;
+      const matchesSearch = fuzzyMatch(searchQuery.trim(), item.title);
+      return matchesCategory && matchesSearch;
+    });
+  }
+
+  function renderChips() {
+    const all = ["All", ...CATEGORIES];
+    categoryChips.innerHTML = all
+      .map((cat) => `<button type="button" class="chip ${cat === activeCategory ? "active" : ""}" data-category="${escapeHtml(cat)}">${escapeHtml(cat)}</button>`)
+      .join("");
+    categoryChips.querySelectorAll(".chip").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        activeCategory = btn.dataset.category;
+        render();
+      });
+    });
+  }
+
+  searchInput.addEventListener("input", () => {
+    searchQuery = searchInput.value;
+    render();
+  });
 
   let toastTimer = null;
   function showToast(message, type = "success") {
@@ -661,7 +834,7 @@
     return `
       <div class="carousel" data-id="${item.id}">
         <div class="carousel-track" style="transform: translateX(-${idx * 100}%)">
-          ${images.map((src) => `<div class="carousel-slide"><img src="${escapeHtml(src)}" loading="lazy" alt="${escapeHtml(item.title)}" /></div>`).join("")}
+          ${images.map((src) => `<div class="carousel-slide"><img data-src="${escapeHtml(src)}" loading="lazy" alt="${escapeHtml(item.title)}" /></div>`).join("")}
         </div>
         ${images.length > 1 ? `
           <button class="carousel-arrow prev" data-carousel-id="${item.id}" data-dir="-1" aria-label="Previous photo">&lsaquo;</button>
@@ -688,6 +861,12 @@
         <div>
           <label>Starting bid ($)</label>
           <input type="number" step="0.01" min="0" data-field="starting" value="${(item.starting_bid_cents / 100).toFixed(2)}" />
+        </div>
+        <div>
+          <label>Category</label>
+          <select data-field="category">
+            ${CATEGORIES.map((cat) => `<option value="${escapeHtml(cat)}" ${item.category === cat ? "selected" : ""}>${escapeHtml(cat)}</option>`).join("")}
+          </select>
         </div>
         <div class="edit-actions">
           <button class="btn small primary" data-action="save-edit" data-id="${item.id}" type="button">Save</button>
@@ -762,8 +941,27 @@
     `;
   }
 
+  function hydrateImages(scopeEl) {
+    scopeEl.querySelectorAll("img[data-src]").forEach((img) => {
+      img.src = img.dataset.src;
+      img.removeAttribute("data-src");
+    });
+  }
+
+  const mediaObserver = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        hydrateImages(entry.target);
+        mediaObserver.unobserve(entry.target);
+      }
+    });
+  }, { rootMargin: "300px 0px" });
+
   function render() {
-    grid.innerHTML = items.map((item, i) => cardTemplate(item, i)).join("");
+    renderChips();
+    visibleItems = getFilteredItems();
+    emptyState.classList.toggle("hidden", visibleItems.length > 0);
+    grid.innerHTML = visibleItems.map((item, i) => cardTemplate(item, i)).join("");
     attachHandlers();
   }
 
@@ -805,7 +1003,8 @@
       });
     });
 
-    items.forEach((item) => attachCarouselHandlersFor(item.id));
+    visibleItems.forEach((item) => attachCarouselHandlersFor(item.id));
+    grid.querySelectorAll(".card").forEach((cardEl) => mediaObserver.observe(cardEl));
 
     grid.querySelectorAll("[data-action]").forEach((btn) => {
       btn.addEventListener("click", async () => {
@@ -859,6 +1058,7 @@
           const title = wrap.querySelector('[data-field="title"]').value.trim();
           const retail = wrap.querySelector('[data-field="retail"]').value;
           const starting = wrap.querySelector('[data-field="starting"]').value;
+          const category = wrap.querySelector('[data-field="category"]').value;
           const retailCents = retail === "" ? null : Math.round(parseFloat(retail) * 100);
           const startingCents = Math.round(parseFloat(starting) * 100);
           const { error } = await supabase.rpc("admin_edit_item", {
@@ -867,12 +1067,13 @@
             p_title: title,
             p_retail_value_cents: retailCents,
             p_starting_bid_cents: startingCents,
+            p_category: category,
           });
           if (error) { showToast(error.message.replace(/^.*: /, ""), "error"); return; }
           editingItem[id] = false;
           await loadItems();
           const saved = items.find((it) => it.id === id);
-          const confirmed = saved && saved.title === title && saved.retail_value_cents === retailCents && saved.starting_bid_cents === startingCents;
+          const confirmed = saved && saved.title === title && saved.retail_value_cents === retailCents && saved.starting_bid_cents === startingCents && saved.category === category;
           showToast(confirmed ? "Item updated." : "Saved, but the site didn't confirm it — check and retry.", confirmed ? "success" : "error");
         } else if (action === "delete") {
           const ok = confirm(`Delete "${itemTitle}" permanently? This can't be undone.`);
@@ -898,6 +1099,7 @@
         const cardEl = scope.querySelector(".carousel");
         if (item && cardEl) {
           cardEl.outerHTML = mediaTemplate(item, "");
+          hydrateImages(scope);
           attachCarouselHandlersFor(id);
         }
       });
@@ -928,7 +1130,7 @@
   // Tick countdowns
   setInterval(() => {
     grid.querySelectorAll(".countdown").forEach((el, i) => {
-      const item = items[i];
+      const item = visibleItems[i];
       if (!item) return;
       const t = timeLeftLabel(item.closes_at);
       el.textContent = t.label;
