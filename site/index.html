@@ -204,6 +204,7 @@
     border-left: 2px solid var(--line);
     padding: 64px 22px 24px;
     overflow-y: auto;
+    overflow-x: hidden;
     z-index: 65;
     transform: translateX(100%);
     transition: transform 0.25s ease;
@@ -254,6 +255,7 @@
     display: flex;
     flex-direction: column;
     gap: 12px;
+    min-width: 0;
   }
   .search-wrap {
     position: relative;
@@ -296,11 +298,15 @@
     font-weight: 400;
     color: var(--ink);
     white-space: nowrap;
+    flex-shrink: 0;
   }
+  /* min-width:0 lets the select shrink below its widest option, so a long
+     category truncates instead of widening the drawer. */
   .category-control {
     display: inline-flex;
     align-items: center;
     gap: 7px;
+    min-width: 0;
     border-bottom: 1.5px solid var(--line);
     padding-bottom: 3px;
   }
@@ -316,6 +322,23 @@
     font-family: inherit;
     line-height: 1.4;
     cursor: pointer;
+    min-width: 0;
+    max-width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+  /* Off-screen twin of the select's text, measured to size the select to the
+     selected word rather than to its widest option. */
+  .category-sizer {
+    position: absolute;
+    visibility: hidden;
+    pointer-events: none;
+    white-space: pre;
+    font-size: 0.9rem;
+    font-weight: 500;
+    font-family: inherit;
+    line-height: 1.4;
   }
   .category-select:focus { outline: none; }
   .category-caret {
@@ -905,6 +928,7 @@
       <span class="category-label">Category:</span>
       <span class="category-control">
         <select id="categorySelect" class="category-select"></select>
+        <span class="category-sizer" id="categorySizer" aria-hidden="true"></span>
         <svg class="category-caret" viewBox="0 0 10 6" aria-hidden="true">
           <path d="M0 0h10L5 6z" fill="currentColor" />
         </svg>
@@ -1010,6 +1034,7 @@
   const searchInput = document.getElementById("searchInput");
   const searchClearBtn = document.getElementById("searchClearBtn");
   const categorySelect = document.getElementById("categorySelect");
+  const categorySizer = document.getElementById("categorySizer");
   const emptyState = document.getElementById("emptyState");
 
   const CATEGORIES = ["Furniture", "Decor", "Bedding & Textiles", "Kitchen", "Tech & Photo", "Storage & Household", "Accessories"];
@@ -1036,6 +1061,13 @@
     });
   }
 
+  // Size the select to the selected word so the underline hugs it, while
+  // max-width keeps a long category from widening the drawer.
+  function syncCategoryWidth() {
+    categorySizer.textContent = categorySelect.value;
+    categorySelect.style.width = categorySizer.offsetWidth + "px";
+  }
+
   function initCategorySelect() {
     const all = ["All", ...CATEGORIES];
     categorySelect.innerHTML = all.map((cat) => `<option value="${escapeHtml(cat)}">${escapeHtml(cat)}</option>`).join("");
@@ -1044,6 +1076,8 @@
       render();
       closeDrawer();
     });
+    // Web fonts land after first paint; re-measure once they do.
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(syncCategoryWidth);
   }
 
   searchInput.addEventListener("input", () => {
@@ -1400,6 +1434,7 @@
 
   function render() {
     categorySelect.value = activeCategory;
+    syncCategoryWidth();
     visibleItems = getFilteredItems();
     emptyState.classList.toggle("hidden", visibleItems.length > 0);
     grid.innerHTML = visibleItems.map((item, i) => cardTemplate(item, i)).join("");
