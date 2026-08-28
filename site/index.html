@@ -26,6 +26,7 @@
     color: var(--ink);
     font-family: "Google Sans Flex", "Helvetica Neue", Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
   }
   a { color: inherit; }
   .wrap { max-width: 1180px; margin: 0 auto; padding: 28px 20px 90px; }
@@ -65,9 +66,11 @@
     position: relative;
     display: flex;
     align-items: center;
-    gap: 2px;
+    gap: 8px;
+    flex-wrap: wrap;
     margin: 0 0 18px;
   }
+  .payment-label { margin-right: 2px; }
   .payment-icon {
     display: block;
     width: 34px;
@@ -92,7 +95,7 @@
   .tooltip {
     position: absolute;
     top: 100%;
-    left: 0;
+    right: 0;
     margin-top: 4px;
     background: var(--ink);
     color: #fff;
@@ -139,25 +142,76 @@
     font-size: 0.8rem;
   }
 
-  .topbar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 12px;
-    flex-wrap: wrap;
-    margin-top: 22px;
-  }
   .who {
     font-size: 0.85rem;
     color: var(--muted);
     display: flex;
     align-items: center;
     gap: 8px;
+    flex-wrap: wrap;
   }
   .who strong { color: var(--ink); }
 
+  .menu-btn {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    border: 1.5px solid var(--line);
+    cursor: pointer;
+    padding: 0;
+    z-index: 70;
+  }
+  .menu-btn svg { width: 18px; height: 13px; color: var(--ink); }
+
+  .drawer-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(17,17,17,.4);
+    z-index: 64;
+  }
+
+  .drawer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: min(340px, 85vw);
+    background: #fff;
+    border-left: 2px solid var(--line);
+    padding: 64px 22px 24px;
+    overflow-y: auto;
+    z-index: 65;
+    transform: translateX(100%);
+    transition: transform 0.25s ease;
+  }
+  .drawer.open { transform: translateX(0); }
+  .drawer .modal-close { top: 16px; right: 16px; }
+
+  .drawer-section {
+    border-top: 1px solid var(--hairline);
+    padding-top: 18px;
+    margin-top: 18px;
+  }
+  .drawer-footer-text {
+    color: var(--muted);
+    font-size: 0.85rem;
+    line-height: 1.6;
+    margin: 0;
+  }
+  .drawer-admin-row {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
   .filters {
-    margin-top: 20px;
+    margin-top: 0;
     display: flex;
     flex-direction: column;
     gap: 12px;
@@ -598,6 +652,7 @@
       available upon request.
     </p>
     <div class="payment-row">
+      <span class="payment-label label">Accepted forms of payment</span>
       <svg class="payment-icon" viewBox="0 0 24 16" fill="none" stroke="currentColor" stroke-width="1.5" role="img" aria-label="Card payments accepted">
         <rect x="0.75" y="0.75" width="22.5" height="14.5" rx="2"/>
         <line x1="0.75" y1="5" x2="23.25" y2="5"/>
@@ -618,32 +673,48 @@
       <span class="avatar-fallback" style="display:none">W</span>
       <span>Questions? Text Will — (267) 309-5465</span>
     </a>
-
-    <div class="filters">
-      <input type="text" id="searchInput" class="search-input" placeholder="Search items…" autocomplete="off" />
-      <div class="category-chips" id="categoryChips"></div>
-    </div>
   </header>
 
   <div id="loadError" class="status-banner hidden"></div>
   <div id="emptyState" class="empty-state hidden">No items match your search.</div>
 
   <div class="grid" id="grid" style="margin-top: 28px;"></div>
-
-  <footer>
-    <p>Questions or want to arrange pickup? Text Will directly.<br />
-    Winning bidders pay via the Stripe link on their item once it's marked sold.</p>
-
-    <div class="topbar">
-      <div class="who">
-        <span id="whoBlock" class="hidden">Signed in as <strong id="whoName"></strong> · <button class="link-btn" id="changeNameBtn">change</button></span>
-        <span id="whoBlockEmpty">Not signed in yet</span>
-      </div>
-      <button class="btn small hidden" id="contactsBtn">Contacts</button>
-      <button class="btn small" id="adminToggleBtn">Admin</button>
-    </div>
-  </footer>
 </div>
+
+<button type="button" class="menu-btn" id="menuBtn" aria-label="Open menu" aria-expanded="false">
+  <svg viewBox="0 0 20 14" fill="none" stroke="currentColor" stroke-width="1.5">
+    <line x1="0" y1="1" x2="20" y2="1"/>
+    <line x1="0" y1="7" x2="20" y2="7"/>
+    <line x1="0" y1="13" x2="20" y2="13"/>
+  </svg>
+</button>
+
+<div class="drawer-overlay hidden" id="drawerOverlay"></div>
+<aside class="drawer" id="drawer" aria-label="Search, filters, and account menu">
+  <button class="modal-close" id="drawerCloseBtn" aria-label="Close menu">&times;</button>
+
+  <div class="filters">
+    <input type="text" id="searchInput" class="search-input" placeholder="Search items…" autocomplete="off" />
+    <div class="category-chips" id="categoryChips"></div>
+  </div>
+
+  <div class="drawer-section">
+    <p class="drawer-footer-text">Questions or want to arrange pickup? Text Will directly.<br />
+    Winning bidders pay via the Stripe link on their item once it's marked sold.</p>
+  </div>
+
+  <div class="drawer-section">
+    <div class="who">
+      <span id="whoBlock" class="hidden">Signed in as <strong id="whoName"></strong> · <button class="link-btn" id="changeNameBtn">change</button></span>
+      <span id="whoBlockEmpty">Not signed in yet</span>
+    </div>
+  </div>
+
+  <div class="drawer-section drawer-admin-row">
+    <button class="btn small hidden" id="contactsBtn">Contacts</button>
+    <button class="btn small" id="adminToggleBtn">Admin</button>
+  </div>
+</aside>
 
 <div id="contactsModal" class="modal-overlay hidden">
   <div class="modal contacts-modal">
@@ -681,6 +752,10 @@
   const adminForm = document.getElementById("adminForm");
   const adminInput = document.getElementById("adminInput");
   const adminToggleBtn = document.getElementById("adminToggleBtn");
+  const menuBtn = document.getElementById("menuBtn");
+  const drawer = document.getElementById("drawer");
+  const drawerOverlay = document.getElementById("drawerOverlay");
+  const drawerCloseBtn = document.getElementById("drawerCloseBtn");
   const contactsBtn = document.getElementById("contactsBtn");
   const contactsModal = document.getElementById("contactsModal");
   const contactsList = document.getElementById("contactsList");
@@ -799,6 +874,26 @@
   function closeNameModal() { nameModal.classList.add("hidden"); }
   function closeAdminModal() { adminModal.classList.add("hidden"); }
   function closeContactsModal() { contactsModal.classList.add("hidden"); }
+
+  function openDrawer() {
+    drawer.classList.add("open");
+    drawerOverlay.classList.remove("hidden");
+    menuBtn.setAttribute("aria-expanded", "true");
+  }
+  function closeDrawer() {
+    drawer.classList.remove("open");
+    drawerOverlay.classList.add("hidden");
+    menuBtn.setAttribute("aria-expanded", "false");
+  }
+  menuBtn.addEventListener("click", () => {
+    if (drawer.classList.contains("open")) closeDrawer();
+    else openDrawer();
+  });
+  drawerCloseBtn.addEventListener("click", closeDrawer);
+  drawerOverlay.addEventListener("click", closeDrawer);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeDrawer();
+  });
 
   document.querySelectorAll("[data-close]").forEach((btn) => {
     btn.addEventListener("click", () => {
