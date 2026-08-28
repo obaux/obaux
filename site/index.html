@@ -1115,10 +1115,14 @@
         <div class="card-body">
           <h3>${escapeHtml(item.title)}</h3>
 
-          <div class="stat-line">
-            <span class="label">Retail value</span>
-            <span class="value">${item.retail_value_cents != null ? money(item.retail_value_cents) : "—"}</span>
-          </div>
+          ${
+            item.retail_value_cents != null
+              ? `<div class="stat-line">
+                  <span class="label">Retail value</span>
+                  <span class="value">${money(item.retail_value_cents)}</span>
+                </div>`
+              : ""
+          }
 
           <div class="stat-line">
             <span>
