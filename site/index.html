@@ -113,6 +113,48 @@
     gap: 8px;
   }
   .who strong { color: var(--ink); }
+
+  .filters {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .search-input {
+    width: 100%;
+    max-width: 360px;
+    border: 1.5px solid var(--line);
+    padding: 10px 14px;
+    font-size: 0.9rem;
+    font-family: inherit;
+  }
+  .category-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .chip {
+    border: 1.5px solid var(--line);
+    background: #fff;
+    color: var(--ink);
+    padding: 6px 14px;
+    font-size: 0.72rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    cursor: pointer;
+  }
+  .chip:hover { background: var(--hairline); }
+  .chip.active { background: var(--ink); border-color: var(--ink); color: #fff; }
+
+  .empty-state {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.9rem;
+    padding: 60px 20px;
+    border: 1px solid var(--hairline);
+    margin-top: 28px;
+  }
   .link-btn {
     border: none;
     background: none;
@@ -352,7 +394,8 @@
     display: block;
     margin-bottom: 3px;
   }
-  .edit-form input {
+  .edit-form input,
+  .edit-form select {
     width: 100%;
     border: 1.5px solid var(--line);
     padding: 6px 8px;
@@ -488,9 +531,15 @@
       </div>
       <button class="btn small" id="adminToggleBtn">Admin</button>
     </div>
+
+    <div class="filters">
+      <input type="text" id="searchInput" class="search-input" placeholder="Search items…" autocomplete="off" />
+      <div class="category-chips" id="categoryChips"></div>
+    </div>
   </header>
 
   <div id="loadError" class="status-banner hidden"></div>
+  <div id="emptyState" class="empty-state hidden">No items match your search.</div>
 
   <div class="grid" id="grid" style="margin-top: 28px;"></div>
 
@@ -527,6 +576,51 @@
   const adminToggleBtn = document.getElementById("adminToggleBtn");
   const loadError = document.getElementById("loadError");
   const toast = document.getElementById("toast");
+  const searchInput = document.getElementById("searchInput");
+  const categoryChips = document.getElementById("categoryChips");
+  const emptyState = document.getElementById("emptyState");
+
+  const CATEGORIES = ["Furniture", "Decor", "Bedding & Textiles", "Kitchen", "Tech & Photo", "Storage & Household"];
+  let searchQuery = "";
+  let activeCategory = "All";
+  let visibleItems = [];
+
+  function fuzzyMatch(query, text) {
+    if (!query) return true;
+    query = query.toLowerCase();
+    text = (text || "").toLowerCase();
+    let qi = 0;
+    for (let i = 0; i < text.length && qi < query.length; i++) {
+      if (text[i] === query[qi]) qi++;
+    }
+    return qi === query.length;
+  }
+
+  function getFilteredItems() {
+    return items.filter((item) => {
+      const matchesCategory = activeCategory === "All" || item.category === activeCategory;
+      const matchesSearch = fuzzyMatch(searchQuery.trim(), item.title);
+      return matchesCategory && matchesSearch;
+    });
+  }
+
+  function renderChips() {
+    const all = ["All", ...CATEGORIES];
+    categoryChips.innerHTML = all
+      .map((cat) => `<button type="button" class="chip ${cat === activeCategory ? "active" : ""}" data-category="${escapeHtml(cat)}">${escapeHtml(cat)}</button>`)
+      .join("");
+    categoryChips.querySelectorAll(".chip").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        activeCategory = btn.dataset.category;
+        render();
+      });
+    });
+  }
+
+  searchInput.addEventListener("input", () => {
+    searchQuery = searchInput.value;
+    render();
+  });
 
   let toastTimer = null;
   function showToast(message, type = "success") {
@@ -689,6 +783,12 @@
           <label>Starting bid ($)</label>
           <input type="number" step="0.01" min="0" data-field="starting" value="${(item.starting_bid_cents / 100).toFixed(2)}" />
         </div>
+        <div>
+          <label>Category</label>
+          <select data-field="category">
+            ${CATEGORIES.map((cat) => `<option value="${escapeHtml(cat)}" ${item.category === cat ? "selected" : ""}>${escapeHtml(cat)}</option>`).join("")}
+          </select>
+        </div>
         <div class="edit-actions">
           <button class="btn small primary" data-action="save-edit" data-id="${item.id}" type="button">Save</button>
           <button class="btn small" data-action="cancel-edit" data-id="${item.id}" type="button">Cancel</button>
@@ -763,7 +863,10 @@
   }
 
   function render() {
-    grid.innerHTML = items.map((item, i) => cardTemplate(item, i)).join("");
+    renderChips();
+    visibleItems = getFilteredItems();
+    emptyState.classList.toggle("hidden", visibleItems.length > 0);
+    grid.innerHTML = visibleItems.map((item, i) => cardTemplate(item, i)).join("");
     attachHandlers();
   }
 
@@ -805,7 +908,7 @@
       });
     });
 
-    items.forEach((item) => attachCarouselHandlersFor(item.id));
+    visibleItems.forEach((item) => attachCarouselHandlersFor(item.id));
 
     grid.querySelectorAll("[data-action]").forEach((btn) => {
       btn.addEventListener("click", async () => {
@@ -859,6 +962,7 @@
           const title = wrap.querySelector('[data-field="title"]').value.trim();
           const retail = wrap.querySelector('[data-field="retail"]').value;
           const starting = wrap.querySelector('[data-field="starting"]').value;
+          const category = wrap.querySelector('[data-field="category"]').value;
           const retailCents = retail === "" ? null : Math.round(parseFloat(retail) * 100);
           const startingCents = Math.round(parseFloat(starting) * 100);
           const { error } = await supabase.rpc("admin_edit_item", {
@@ -867,12 +971,13 @@
             p_title: title,
             p_retail_value_cents: retailCents,
             p_starting_bid_cents: startingCents,
+            p_category: category,
           });
           if (error) { showToast(error.message.replace(/^.*: /, ""), "error"); return; }
           editingItem[id] = false;
           await loadItems();
           const saved = items.find((it) => it.id === id);
-          const confirmed = saved && saved.title === title && saved.retail_value_cents === retailCents && saved.starting_bid_cents === startingCents;
+          const confirmed = saved && saved.title === title && saved.retail_value_cents === retailCents && saved.starting_bid_cents === startingCents && saved.category === category;
           showToast(confirmed ? "Item updated." : "Saved, but the site didn't confirm it — check and retry.", confirmed ? "success" : "error");
         } else if (action === "delete") {
           const ok = confirm(`Delete "${itemTitle}" permanently? This can't be undone.`);
@@ -928,7 +1033,7 @@
   // Tick countdowns
   setInterval(() => {
     grid.querySelectorAll(".countdown").forEach((el, i) => {
-      const item = items[i];
+      const item = visibleItems[i];
       if (!item) return;
       const t = timeLeftLabel(item.closes_at);
       el.textContent = t.label;
