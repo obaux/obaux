@@ -168,7 +168,7 @@
     border: 1.5px solid var(--line);
     cursor: pointer;
     padding: 0;
-    z-index: 70;
+    z-index: 90;
   }
   .menu-btn .bar {
     width: 18px;
@@ -184,7 +184,7 @@
     position: fixed;
     inset: 0;
     background: rgba(17,17,17,.4);
-    z-index: 64;
+    z-index: 84;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.25s ease;
@@ -205,7 +205,7 @@
     padding: 64px 22px 24px;
     overflow-y: auto;
     overflow-x: hidden;
-    z-index: 65;
+    z-index: 85;
     transform: translateX(100%);
     transition: transform 0.25s ease;
   }
@@ -414,6 +414,52 @@
     .card-body h3 { font-size: 0.85rem; }
     .bid-amount { font-size: 1.1rem; }
     .card-price { font-size: 0.78rem; }
+  }
+
+  /* First-load placeholders so the grid reads as loading, not empty. */
+  .skeleton-card {
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+  }
+  .skeleton-media {
+    aspect-ratio: 1 / 1;
+    border-bottom: 1px solid var(--hairline);
+  }
+  .skeleton-body {
+    padding: 16px 16px 26px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1;
+  }
+  .skeleton-line {
+    height: 11px;
+    width: 100%;
+  }
+  .skeleton-line.title { width: 78%; }
+  .skeleton-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 2px;
+  }
+  .skeleton-row .skeleton-line { width: 32%; }
+  .shimmer {
+    background: linear-gradient(90deg, #f2f2f2 25%, #e4e4e4 37%, #f2f2f2 63%);
+    background-size: 400% 100%;
+    animation: shimmer 1.4s ease infinite;
+  }
+  @keyframes shimmer {
+    0% { background-position: 100% 50%; }
+    100% { background-position: 0 50%; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .shimmer { animation: none; }
+  }
+  @media (max-width: 640px) {
+    .skeleton-body { padding: 10px 10px 18px; gap: 6px; }
   }
 
   .card {
@@ -652,7 +698,7 @@
     background: rgba(17,17,17,.5);
     display: flex; align-items: center; justify-content: center;
     padding: 20px;
-    z-index: 50;
+    z-index: 95;
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.2s ease;
@@ -1075,6 +1121,8 @@
       activeCategory = categorySelect.value;
       render();
       closeDrawer();
+      // Filtering is a browse action — drop back to the grid to show the result.
+      closeItemOverlay();
     });
     // Web fonts land after first paint; re-measure once they do.
     if (document.fonts && document.fonts.ready) document.fonts.ready.then(syncCategoryWidth);
@@ -1432,6 +1480,22 @@
     });
   }, { rootMargin: "300px 0px" });
 
+  // Placeholder cards for the first fetch, so the grid doesn't read as empty.
+  function renderSkeletons(count = 8) {
+    grid.innerHTML = Array.from({ length: count }, () => `
+      <div class="skeleton-card" aria-hidden="true">
+        <div class="skeleton-media shimmer"></div>
+        <div class="skeleton-body">
+          <div class="skeleton-line title shimmer"></div>
+          <div class="skeleton-row">
+            <div class="skeleton-line shimmer"></div>
+            <div class="skeleton-line shimmer"></div>
+          </div>
+        </div>
+      </div>
+    `).join("");
+  }
+
   function render() {
     categorySelect.value = activeCategory;
     syncCategoryWidth();
@@ -1551,7 +1615,9 @@
 
   itemOverlayClose.addEventListener("click", closeItemOverlay);
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && itemOverlay.classList.contains("open")) closeItemOverlay();
+    if (e.key !== "Escape") return;
+    if (drawer.classList.contains("open")) return;
+    if (itemOverlay.classList.contains("open")) closeItemOverlay();
   });
 
   function attachOverlayHandlers(item) {
@@ -1695,6 +1761,7 @@
     if (error) {
       loadError.textContent = "Couldn't load items: " + error.message;
       loadError.classList.remove("hidden");
+      grid.innerHTML = "";
       return;
     }
     loadError.classList.add("hidden");
@@ -1731,6 +1798,7 @@
 
   initCategorySelect();
   refreshWho();
+  renderSkeletons();
   loadItems();
 </script>
 </body>
