@@ -23,6 +23,23 @@ public `anon`/`authenticated` roles by column-level GRANT, and `bidder_outreach`
 has RLS on with no policies and no grants at all — both are readable only via the
 service role. Never copy phone numbers or emails into this repo; it is public.
 
+## Off-platform / bundled sales
+
+Some sales happen outside the normal auction flow — a buyer closes early on a
+flat bundle price covering both live-site items and things that were never
+listed (sold directly, off-grid). Before summarizing what a buyer owes or has
+bought, check `public.direct_sales` in Supabase, not just `items`/`bids`:
+
+```sql
+select buyer_name, items, linked_item_ids, total_cents, stripe_payment_link, sold_at
+from public.direct_sales
+order by sold_at desc;
+```
+
+Same privacy posture as `bidder_outreach`: RLS on, no grants to `anon`/`authenticated`,
+service-role only. When a bundle pulls a live item out of open bidding (marking it
+`sold` early), tell Will to notify whoever was next in line that it's no longer available.
+
 ## Other conventions
 
 - Item photos and the batch-upload workflow: see `site/images/README.md`.
