@@ -952,6 +952,26 @@ Will verified OIC Philadelphia, so `verified` is true and the badge shows.
 inventing a profile id to fill the column would make the audit trail worse
 rather than better. The timestamp and the migration are the record.
 
+### D-061 — The SMS review is a page, not a pull request
+The twelve message drafts are the one thing in this project that cannot ship
+without a person, and the person is not a developer. Asking Will to read
+`sms-templates.ts` would have made the sign-off harder than the thing it gates.
+
+The review sheet renders each message the way it actually arrives — as a
+notification on a lock screen, in both languages — because that is the whole
+safety argument: assume somebody else is holding the phone. It lives at
+https://claude.ai/code/artifact/f1dfb8d4-f64d-47c4-97d3-6a67f4c0eb09 and is
+pinned. Do not rebuild it; update it in place if the copy changes.
+
+Reading the drafts back for that page found one defect worth recording here, in
+case the page is ever lost: the Spanish copy drops accents to stay inside the
+cheaper GSM-7 encoding, which is right for `codigo` and `pagina` — but **ñ is in
+the GSM-7 basic set and costs nothing**, so `manana` in `appointment_24h` is a
+misspelling with no upside, in the message a member is most likely to act on.
+Two open questions are Will's: whether the Spanish check-in should accept SÍ/NO
+rather than the English YES/NO the parser listens for, and whether a case
+manager's first name belongs in a text at all.
+
 ---
 
 ## Notes for whoever picks this up next
