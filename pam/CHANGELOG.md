@@ -1,5 +1,38 @@
 # Changelog
 
+## [0.3.0] — 2026-09-12 · Libraries, and the Education category
+
+### Added — 52 Free Library branches, and a second import source
+
+`City_Facilities_pub` is imported through an allow-list, `city_facility_map`:
+libraries to Education, city health centres and staffed recreation and older
+adult centres to Home and family. The other ~2,900 rows in that layer —
+playgrounds, statues, fuel pumps, police stations, and a detention centre — are
+skipped at import, not filtered in the UI. A database invariant asserts the
+detention centre never becomes a place.
+
+Education is no longer empty: 52 libraries, free and walk-in, which is the best
+answer PAM currently has for a GED, a computer, or a job application.
+
+### Added — category filter on `/places`
+
+All three categories are always offered, including Workforce, which has nothing
+in it yet and says so rather than disappearing.
+
+### Fixed — walking directions could send someone to the wrong building
+
+The city's facilities feed keeps geometry current and lets address text rot: one
+library imported with correct coordinates and an address five miles away. The Go
+link is now built from the place's own point, so directions and the map pin
+cannot disagree. The address remains the fallback and still drives the Google
+listing search.
+
+### Fixed — duplicate and mis-filed facilities
+
+The same building appearing as two assets is imported once. A museum filed under
+`Library Specialized` is not imported as a library. "Library Branch - Santore"
+reads as "Santore Library".
+
 ## [0.2.0] — 2026-09-12 · The catalogue is real
 
 ### Added — a places screen backed by Supabase

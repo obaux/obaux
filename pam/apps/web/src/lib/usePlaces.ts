@@ -27,6 +27,12 @@ export interface NearbyPlace {
   address: string | null;
   phone: string | null;
   placeId: string | null;
+  /**
+   * The place's own point. Directions are built from this rather than the
+   * address, which the city feeds do not keep current (see 0023).
+   */
+  lat: number | null;
+  lon: number | null;
   meters: number;
   /**
    * Whether PAM holds opening hours for this place at all. False everywhere
@@ -62,6 +68,8 @@ interface ServicesNearRow {
   address: string | null;
   phone: string | null;
   place_id: string | null;
+  lat: number | null;
+  lon: number | null;
   meters: number;
   has_hours: boolean;
 }
@@ -107,6 +115,8 @@ export function usePlaces({ lat, lon, category, limit = 20 }: PlacesQuery): Plac
             address: row.address,
             phone: row.phone,
             placeId: row.place_id,
+            lat: row.lat,
+            lon: row.lon,
             meters: row.meters,
             hasHours: row.has_hours,
           })),

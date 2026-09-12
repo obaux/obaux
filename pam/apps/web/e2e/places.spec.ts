@@ -25,6 +25,8 @@ const ROWS = [
     address: '100 S Broad St Philadelphia, PA 19110',
     phone: null,
     place_id: null,
+    lat: 39.94738,
+    lon: -75.175,
     meters: 222.56625541,
     has_hours: false,
   },
@@ -37,6 +39,8 @@ const ROWS = [
     address: '112 N Broad St Philadelphia, PA 19102',
     phone: '+12155550142',
     place_id: null,
+    lat: null,
+    lon: null,
     meters: 2896.5,
     has_hours: false,
   },
@@ -98,6 +102,41 @@ test.describe('the places screen', () => {
 
     await expect(page.getByRole('heading', { name: 'Places' })).toBeVisible();
     await expect(page.locator('.astryx-empty-state')).toBeVisible();
+  });
+
+  test('filters by category, and an empty category says so', async ({ page }) => {
+    // The three categories are fixed, so all three are always offered. Workforce
+    // has no places imported yet; a member who taps it must be told that, not
+    // shown a blank screen (§0).
+    await page.route(RPC, (route) => {
+      const body = route.request().postData() ?? '';
+      const empty = body.includes('workforce');
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: empty ? '[]' : JSON.stringify(ROWS),
+      });
+    });
+    await page.goto('/places/');
+    await expect(page.getByRole('heading', { name: 'J J Peters' })).toBeVisible();
+
+    await page.getByRole('button', { name: 'Work and money' }).click();
+    await expect(page.locator('.astryx-empty-state')).toBeVisible();
+
+    await page.getByRole('button', { name: 'All' }).click();
+    await expect(page.getByRole('heading', { name: 'J J Peters' })).toBeVisible();
+  });
+
+  test('walking directions go to the point, not the address', async ({ page }) => {
+    await page.route(RPC, (route) =>
+      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(ROWS) }),
+    );
+    await page.goto('/places/');
+
+    // First row carries coordinates; second has none and falls back.
+    const links = page.getByRole('link', { name: 'Go' });
+    await expect(links.first()).toHaveAttribute('href', /destination=39\.94738%2C-75\.175/);
+    await expect(links.nth(1)).toHaveAttribute('href', /destination=112%20N%20Broad/);
   });
 
   test('has no WCAG A/AA violations with real rows on it', async ({ page }) => {

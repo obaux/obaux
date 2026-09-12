@@ -770,6 +770,48 @@ The two `NEXT_PUBLIC_` values in CI are therefore deliberate nonsense. What is
 being tested is the screen's contract with a payload, and the payload in the
 spec is the exact one the live RPC returned as the `anon` role.
 
+### D-049 — The allow-list is the import
+`City_Facilities_pub` is 3,197 rows and almost none of them are services:
+playgrounds, statues, salt sheds, fuel pumps, police stations, and `Detention
+Center Adult`. A source that broad cannot be imported and then filtered in the
+UI — one missed filter and a product built for people leaving prison shows
+somebody a prison.
+
+So `city_facility_map` names the seven facility types PAM is willing to call a
+service, and anything not in it is skipped at import. It is a table rather than
+a `CASE` for two reasons: adding a type is then a migration a human can read and
+argue with, and the whole set is reviewable in one query. A database invariant
+asserts a detention centre never becomes a place.
+
+What is in it: Free Library branches (regional and specialized included), which
+are the entire Education category on day one — free, walk-in, no enrolment, and
+the best answer PAM has to "I need a GED, a computer, or to apply for a job and
+I have no money"; city health centres; and staffed recreation and older adult
+centres, as distinct from the playground equipment and basketball courts that
+make up most of this layer's "recreation".
+
+### D-050 — Directions are built from the point, not from the address
+`The Rosenbach Museum & Library` imported with geometry on Delancey Street,
+which is right, and an `asset_addr` of "3001 E Allegheny Ave", which is five
+miles away. The city keeps its geometry current and lets the address text rot,
+and nothing in the row says which to believe.
+
+PAM was building the Go link from the address, so a row like that walks somebody
+across the city to a building that is not there. That is worse than a blank
+screen, because the person acts on it.
+
+`destination=lat,lng` routes to the point. It also means the directions and the
+map pin cannot disagree, since both read the same column — the same "one source
+of truth" rule already applied to category colour. The address stays for the
+Google listing *search*, where being wrong costs a worse search result rather
+than a wasted journey, and remains the fallback for a place with no geometry.
+
+### D-051 — All three category filters are always shown, including empty ones
+Workforce has no places. The filter still offers it, and a member who taps it
+gets the "nothing here" notice explaining why rather than a button that was
+never there. A control that appears and disappears with the data teaches nobody
+anything, and §0 already requires that an empty result explain itself.
+
 ---
 
 ## Notes for whoever picks this up next

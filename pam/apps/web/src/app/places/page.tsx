@@ -2,11 +2,19 @@
 
 import * as stylex from '@stylexjs/stylex';
 import { VStack } from '@astryxdesign/core/VStack';
+import { HStack } from '@astryxdesign/core/HStack';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { Button } from '@astryxdesign/core/Button';
 import { Notice, PlaceCard } from '@pam/ui';
-import { CATEGORY_DEFINITIONS, NOTICES, distanceLabel } from '@pam/config';
+import {
+  CATEGORY_DEFINITIONS,
+  CATEGORY_LIST,
+  NOTICES,
+  distanceLabel,
+  type Category,
+} from '@pam/config';
+import { useState } from 'react';
 import { useI18n } from '@/lib/i18n';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { usePlaces, METRES_PER_MILE } from '@/lib/usePlaces';
@@ -42,6 +50,8 @@ const styles = stylex.create({
     paddingBlock: '24px',
   },
   title: { fontSize: '28px', lineHeight: 1.2 },
+  // §2.5 — a filter is a control, so it clears the 48px floor like every other.
+  filter: { minHeight: '48px', fontSize: '17px' },
   area: { fontSize: '17px' },
   source: { fontSize: '15px', lineHeight: 1.5 },
   back: { minHeight: '48px', fontSize: '17px' },
@@ -50,7 +60,8 @@ const styles = stylex.create({
 export default function PlacesPage() {
   const { t, locale } = useI18n();
   const supportPhone = useSupportPhone();
-  const state = usePlaces({ ...PHILADELPHIA_CITY_HALL, limit: 20 });
+  const [category, setCategory] = useState<Category | undefined>(undefined);
+  const state = usePlaces({ ...PHILADELPHIA_CITY_HALL, ...(category ? { category } : {}), limit: 20 });
 
   return (
     <main {...stylex.props(styles.page)}>
@@ -63,6 +74,32 @@ export default function PlacesPage() {
             {t('places.defaultArea')}
           </Text>
         </VStack>
+
+        {/*
+          The three categories are fixed (§2.5) and always all shown, even when
+          one is empty: a filter that appears and disappears teaches a member
+          nothing, and an empty result explains itself (§0). Workforce has no
+          places yet and will say so rather than vanish.
+        */}
+        <HStack gap={2} wrap="wrap" role="group" aria-label={t('places.filterLabel')}>
+          <Button
+            label={t('places.all')}
+            variant={category === undefined ? 'primary' : 'secondary'}
+            aria-pressed={category === undefined}
+            onClick={() => setCategory(undefined)}
+            xstyle={styles.filter}
+          />
+          {CATEGORY_LIST.map((definition) => (
+            <Button
+              key={definition.key}
+              label={t(definition.labelKey)}
+              variant={category === definition.key ? 'primary' : 'secondary'}
+              aria-pressed={category === definition.key}
+              onClick={() => setCategory(definition.key)}
+              xstyle={styles.filter}
+            />
+          ))}
+        </HStack>
 
         {state.status === 'loading' ? (
           <Text type="supporting" xstyle={styles.area}>
@@ -105,6 +142,8 @@ export default function PlacesPage() {
                     {...(miles ? { distanceLabel: t(miles.key, miles.vars) } : {})}
                     phone={place.phone}
                     address={place.address}
+                    lat={place.lat}
+                    lon={place.lon}
                     placeId={place.placeId}
                     labels={{
                       call: t('action.call'),

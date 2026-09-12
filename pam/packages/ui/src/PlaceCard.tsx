@@ -34,8 +34,18 @@ export interface PlaceCardProps {
   isOpenNow?: boolean;
   openNowLabel?: string;
   phone?: string | null;
-  /** Street address, used to build the directions link. */
+  /**
+   * Street address. Shown to Google as part of the listing search; NOT used for
+   * directions when coordinates are available — see `directionsHref`.
+   */
   address?: string | null;
+  /**
+   * The place's own coordinates. Preferred over the address for directions: the
+   * city's feeds keep geometry current and let address text rot, and a stale
+   * address routes somebody to the wrong building.
+   */
+  lat?: number | null;
+  lon?: number | null;
   /** Google's id for this place, when the importer has resolved one. */
   placeId?: string | null;
   /**
@@ -75,9 +85,28 @@ const styles = stylex.create({
 /**
  * Walking directions by default (§5.1). Many members do not have a car, and a
  * driving route to a place two blocks away is worse than useless.
+ *
+ * Coordinates win over the address whenever we have them. `The Rosenbach Museum
+ * & Library` arrived from the city's facilities layer with correct geometry and
+ * an address five miles away — the feeds maintain the point and let the text
+ * rot. Routing to a point also means the directions and the map pin cannot
+ * disagree, since both come from the same column.
+ *
+ * The address remains the fallback, because a place with no geometry and a good
+ * address is still worth a link.
  */
-function directionsHref(address: string): string {
-  const q = encodeURIComponent(address);
+export function directionsHref(
+  address?: string | null,
+  lat?: number | null,
+  lon?: number | null,
+): string | undefined {
+  const destination =
+    typeof lat === 'number' && typeof lon === 'number' && Number.isFinite(lat) && Number.isFinite(lon)
+      ? `${lat},${lon}`
+      : address;
+  if (!destination) return undefined;
+
+  const q = encodeURIComponent(destination);
   return `https://www.google.com/maps/dir/?api=1&destination=${q}&travelmode=walking`;
 }
 
@@ -107,6 +136,8 @@ export function PlaceCard({
   name,
   category,
   categoryLabel,
+  lat,
+  lon,
   distanceLabel,
   isOpenNow,
   openNowLabel,
@@ -172,8 +203,8 @@ export function PlaceCard({
           <Button
             label={labels.go}
             variant="secondary"
-            href={address ? directionsHref(address) : undefined}
-            isDisabled={!address}
+            href={directionsHref(address, lat, lon)}
+            isDisabled={!directionsHref(address, lat, lon)}
             target="_blank"
             rel="noreferrer"
             xstyle={styles.action}

@@ -425,3 +425,103 @@ begin
   raise notice 'ok    a place with no address still links by name';
 end;
 $$;
+
+-- ===========================================================================
+\echo ''
+\echo '--- City facilities: the allow-list is the filter (0022, 0023) ---'
+-- ===========================================================================
+-- The live layer is 3,197 assets and almost none are services. The fixture
+-- carries one of each thing that must NOT become a place, alongside the two
+-- that must.
+select public.ingest_city_facilities('{
+  "features": [
+    {"geometry": {"coordinates": [-75.15526, 39.93710]},
+     "properties": {"objectid": 101, "asset_name": "Library Branch - Santore",
+       "site_name": "Library Branch - Santore", "asset_addr": "932 S 7TH ST",
+       "asset_subt1_desc": "Library Branch", "not_public": "N", "status": "A"}},
+    {"geometry": {"coordinates": [-75.16260, 39.94624]},
+     "properties": {"objectid": 102, "asset_name": "Older Adult Center - Juniata Park",
+       "site_name": "Juniata Park Older Adult Center", "asset_addr": "1231 E SEDGLEY AVE",
+       "asset_subt1_desc": "Older Adult Center", "not_public": "N", "status": "A"}},
+    {"geometry": {"coordinates": [-75.16260, 39.94624]},
+     "properties": {"objectid": 103, "asset_name": "Older Adult Center - Juniata Park",
+       "site_name": "Juniata Park Older Adult Center", "asset_addr": "1231 E SEDGLEY AVE",
+       "asset_subt1_desc": "Older Adult Center", "not_public": "N", "status": "A"}},
+    {"geometry": {"coordinates": [-75.17500, 39.94738]},
+     "properties": {"objectid": 104, "asset_name": "The Rosenbach Museum & Library",
+       "asset_addr": "3001 E ALLEGHENY AVE",
+       "asset_subt1_desc": "Library Specialized", "not_public": "N", "status": "A"}},
+    {"geometry": {"coordinates": [-75.13000, 39.99000]},
+     "properties": {"objectid": 105, "asset_name": "Curran-Fromhold Correctional Facility",
+       "asset_addr": "7901 STATE RD",
+       "asset_subt1_desc": "Detention Center Adult", "not_public": "N", "status": "A"}},
+    {"geometry": {"coordinates": [-75.14000, 39.95000]},
+     "properties": {"objectid": 106, "asset_name": "Basketball Court",
+       "asset_subt1_desc": "Basketball Court", "not_public": "N", "status": "A"}},
+    {"geometry": {"coordinates": [-75.14500, 39.95500]},
+     "properties": {"objectid": 107, "asset_name": "Staff Only Building",
+       "asset_subt1_desc": "Health Center", "not_public": "Y", "status": "A"}},
+    {"geometry": {"coordinates": [-75.14600, 39.95600]},
+     "properties": {"objectid": 108, "asset_name": "Closed Health Center",
+       "asset_subt1_desc": "Health Center", "not_public": "N", "status": "X"}}
+  ]
+}'::jsonb, '11111111-0000-0000-0000-000000000001');
+
+do $$
+declare
+  n integer;
+  v text;
+begin
+  -- A system built for people leaving prison must never send one back to one.
+  if exists (select 1 from public.services where source_ref = 'cityfac:105') then
+    raise exception 'FAIL  a detention centre was imported as a service';
+  end if;
+  raise notice 'ok    carceral facilities are never services';
+
+  if exists (select 1 from public.services where source_ref = 'cityfac:106') then
+    raise exception 'FAIL  a basketball court was imported as a service';
+  end if;
+  raise notice 'ok    a facility type absent from the allow-list is not imported';
+
+  if exists (select 1 from public.services where source_ref in ('cityfac:107','cityfac:108')) then
+    raise exception 'FAIL  a non-public or retired facility was imported';
+  end if;
+  raise notice 'ok    facilities the public cannot enter are skipped';
+
+  -- A museum charges admission. The city files one under Library Specialized.
+  if exists (select 1 from public.services where source_ref = 'cityfac:104') then
+    raise exception 'FAIL  a museum was imported as a library';
+  end if;
+  raise notice 'ok    a museum is not a library';
+
+  select count(*) into n from public.services where source_ref like 'cityfac:%';
+  if n <> 2 then
+    raise exception 'FAIL  expected 2 imported facilities, got %', n;
+  end if;
+  raise notice 'ok    the same building at the same point is imported once';
+
+  select name into v from public.services where source_ref = 'cityfac:101';
+  if v <> 'Santore Library' then
+    raise exception 'FAIL  library name not said the way a person says it, got %', v;
+  end if;
+  select category::text into v from public.services where source_ref = 'cityfac:101';
+  if v <> 'education' then
+    raise exception 'FAIL  a library did not land in education, got %', v;
+  end if;
+  raise notice 'ok    a library is a School and training place, named plainly';
+
+  select name into v from public.services where source_ref = 'cityfac:102';
+  if v <> 'Juniata Park Older Adult Center' then
+    raise exception 'FAIL  facility name not reordered, got %', v;
+  end if;
+  raise notice 'ok    "Type - Place" is reordered into something sayable';
+
+  -- D-045 again, for the second source.
+  select count(*) into n from public.services
+  where source_ref like 'cityfac:%' and subcategory is not null;
+  if n > 0 then
+    raise exception 'FAIL  % facility row(s) carry a subcategory PAM invented', n;
+  end if;
+  raise notice 'ok    the facilities import adds no condition label either';
+end;
+$$;

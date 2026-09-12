@@ -1,6 +1,6 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { PlaceCard, googlePlaceHref } from '../src/PlaceCard.js';
+import { PlaceCard, googlePlaceHref, directionsHref } from '../src/PlaceCard.js';
 import { PointsBadge } from '../src/PointsBadge.js';
 import { HelpBar } from '../src/HelpBar.js';
 import { VoiceInput } from '../src/VoiceInput.js';
@@ -210,6 +210,40 @@ describe('Google listing fallback (city data has no hours or phone)', () => {
       'query_place_id=ChIJabc123',
     );
     expect(googlePlaceHref('Comhar', '1 Main St')).not.toContain('query_place_id');
+  });
+});
+
+describe('directions go to the point, not to a string', () => {
+  // The Rosenbach imported from the city's facilities layer with correct
+  // geometry and an address five miles from it. The feeds maintain the point
+  // and let the text rot, so a directions link built from the address walks
+  // somebody to the wrong building.
+  it('routes to coordinates when the place has them', () => {
+    const href = directionsHref('3001 E Allegheny Ave, Philadelphia, PA', 39.94738, -75.175);
+    expect(href).toContain('destination=39.94738%2C-75.175');
+    expect(href).not.toContain('Allegheny');
+    expect(href).toContain('travelmode=walking');
+  });
+
+  it('falls back to the address when there is no point', () => {
+    expect(directionsHref('1 Main St', null, null)).toContain('destination=1%20Main%20St');
+  });
+
+  it('offers nothing rather than a link to nowhere', () => {
+    expect(directionsHref(null, null, null)).toBeUndefined();
+    expect(directionsHref(undefined, Number.NaN, -75.175)).toBeUndefined();
+  });
+
+  it('the card itself uses the point', () => {
+    render(
+      <PlaceCard
+        name="Santore Library" category="education" categoryLabel="School and training"
+        address="3001 E Allegheny Ave" lat={39.9371} lon={-75.15526} labels={labels}
+      />,
+    );
+    expect(screen.getByRole('link', { name: 'Go' })).toHaveAttribute(
+      'href', expect.stringContaining('destination=39.9371%2C-75.15526'),
+    );
   });
 });
 
