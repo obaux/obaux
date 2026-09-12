@@ -1,5 +1,31 @@
 # Changelog
 
+## [0.5.0] — 2026-09-12 · Rec centres, evening centres, and a verified partner
+
+### Added — 166 Parks & Recreation program sites
+
+From the department's own list of staffed sites with programming, not the
+asset register that counts basketball courts. Addresses are borrowed from the
+properties layer only when the match is safe to believe: a name match once
+punctuation is stripped, or a centroid within 60 metres. Seven sites get no
+address rather than the wrong one.
+
+### Added — the city's six Community Evening Resource Centers
+
+Open in the evening as an alternative to a young person being taken into
+custody, with addresses and phone numbers. The rest of the Department of Human
+Services' family page is citywide programmes with no location, which PAM cannot
+show yet without pretending they are somewhere.
+
+### Added — OIC Philadelphia is verified
+
+### Security — three more words that give somebody away
+
+`juvenile`, `incarcerat` and `domestic violence` join the list of names that
+must never appear in a text message or a push notification. A notification
+naming a domestic violence service can reach the person somebody is getting away
+from. Every row already in the catalogue was re-checked against the new rule.
+
 ## [0.4.0] — 2026-09-12 · Work and money, and a place to start from
 
 ### Added — OIC Philadelphia fills the Work and money category

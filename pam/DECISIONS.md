@@ -884,6 +884,74 @@ every one of those is easier to get right with real buttons than with a custom
 listbox. The list is populated before anything is typed, so somebody who does
 not know what to enter is not left staring at an empty box.
 
+### D-056 — Rec centres come back, from the department's own list
+0022 imported rec centres from the City Facilities asset register and 0024 threw
+them out, because that layer counts basketball courts and playground equipment
+as "recreation" and 205 rows arrived with most of them not being places with
+anyone in them.
+
+Parks & Recreation publishes its own list of *program sites*: 168 points, 157
+staffed recreation centres, 6 older adult centres, 3 environmental education
+centres, 2 pools. That is the thing a member can walk into, and it is what the
+department's own locations page is built on.
+
+Pools are left out of the allow-list: two seasonal outdoor pools are not
+something to plan around, and PAM has no way to say "closed until June".
+
+### D-057 — An address is only borrowed when the match is safe to believe
+The program sites carry no address; the properties layer does. Matching them by
+name gets 87 of 168, because the two layers punctuate differently — "Joseph F
+Vogt Playground" against "Joseph F. Vogt Playground".
+
+So the match is spatial with a name check as the guard: nearest property
+centroid within 400m, accepted only if the names agree once punctuation is
+stripped, or the centroid is within 60m. 161 of 168 get an address.
+
+The guard is the point. Without it "Wissinoming Park" matches the centroid of
+Margaret Tartaglione Park 102m away and inherits its address — and an address on
+a card is something a person acts on. The 7 sites that fail the guard get no
+address at all: directions come from the point (D-050), so they still work, and
+the Google lookup falls back to the name, which is a worse search rather than a
+wrong journey.
+
+### D-058 — Three more words that give somebody away
+The disclosure list in 0017 was drawn entirely from behavioural health
+providers. Two new sources bring names that clear it and disclose just as badly:
+"Juvenile Justice Center", "Support for incarcerated parents", "Get help with
+domestic violence".
+
+The last is the sharpest. A notification naming a domestic violence service can
+reach the person somebody is trying to get away from — that is a safety
+question, not a privacy one. `juvenile`, `incarcerat` and `domestic violence`
+are added; plain `justice` is left out, because it would catch Justice Bell Park
+and every civic building.
+
+Every row already in the catalogue is re-flagged, not left at whatever the rule
+said when it arrived.
+
+### D-059 — DHS gave six places and a gap worth naming
+The Department of Human Services' "For families" page is mostly citywide
+programmes with no address: housing help, parenting classes, support for
+incarcerated parents, domestic violence help. PAM's model is "a place you can
+walk into", so those cannot be cards without pretending they are somewhere, and
+attaching them to a department office would send somebody to the wrong building.
+
+What is place-based is the six Community Evening Resource Centers — one per part
+of the city, open in the evening as an alternative to a young person being taken
+into custody. For a parent who has just come home that is the difference between
+a phone call at 10pm and a court date. They are entered by hand with their
+addresses and phone numbers.
+
+The gap is now the most valuable thing PAM could build next: a way to list a
+service that is not a place. It is written up in STATUS rather than worked
+around.
+
+### D-060 — OIC is verified, with no admin to sign it
+Will verified OIC Philadelphia, so `verified` is true and the badge shows.
+`verified_by` stays null: there is still no admin account to point at, and
+inventing a profile id to fill the column would make the audit trail worse
+rather than better. The timestamp and the migration are the record.
+
 ---
 
 ## Notes for whoever picks this up next

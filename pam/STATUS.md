@@ -1,8 +1,7 @@
 # PAM — where the project stands
 
-Last updated 2026-09-12, after all three categories were filled and the places
-screen learned where the member is. Newest session log:
-`docs/sessions/2026-09-12-workforce-and-location.md`.
+Last updated 2026-09-12, after the recreation and evening-centre sources landed.
+Newest session log: `docs/sessions/2026-09-12-parks-and-evening-centers.md`.
 
 This is the handover document: what exists, what is proven, what is live, and
 what the next person needs to know before touching anything.
@@ -35,7 +34,7 @@ going — without help?*
 ## What is live
 
 **Supabase project `pam`** — `shobqzuhicoiymtumiaz`, us-east-1 (closest region to
-Philadelphia). Twenty-six migrations applied. The database is real and reachable;
+Philadelphia). Thirty migrations applied. The database is real and reachable;
 the app is not deployed anywhere yet.
 
 There is **no admin account**, which means no invite can be issued and nobody can
@@ -73,7 +72,7 @@ Numbers here are from the last run, not aspirations.
 | Typecheck | 5/5 packages | — |
 | `@pam/config` tests | 142 pass | No SMS can send unreviewed, over 160 chars, with emoji, or with a term that reveals justice involvement. Locales are key-for-key. The transparency screen matches its contract. |
 | `@pam/ui` tests | 43 pass | Every component is axe-clean. `PlaceCard` offers exactly three actions in a fixed order. Reduced motion is respected. The mic hides when unsupported. |
-| Database suite | 116 checks pass | See below |
+| Database suite | 122 checks pass | See below |
 | Live RLS fingerprint | identical to local | The deployed policy set is provably the one that was penetration-tested: `ce9636c3b77e4827368e6575742b899c`, 73 policies on both |
 | Live anonymous attack | 0 rows leaked | A signed-out caller reads no profiles, messages, invites or audit rows on the real database, while still reaching the support number and the public catalogue |
 | Browser a11y + theme | 81 pass | No WCAG AA violations at 320px or iPhone SE. Every control clears 48px. No horizontal scroll. The Astryx theme really resolves. Runs in dark mode as well as light. |
@@ -204,7 +203,7 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 - `packages/config/transparency.ts` — a promise made to people with little reason
   to trust promises. Widening it fails tests by design; change the contract
   first and tell members before it ships.
-- `DECISIONS.md` — 56 decisions with their reasoning, and the open questions.
+- `DECISIONS.md` — 61 decisions with their reasoning, and the open questions.
 
 ---
 

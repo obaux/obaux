@@ -615,3 +615,98 @@ begin
   raise notice 'ok    areas holds no record of who chose what';
 end;
 $$;
+
+-- ===========================================================================
+\echo ''
+\echo '--- Parks & Recreation sites, and the address they borrow (0027) ---'
+-- ===========================================================================
+-- Two program sites, and two properties: one whose name matches, and one that
+-- is merely nearby with a different name. The second must not lend its address.
+select public.ingest_ppr_sites(
+  '{"features": [
+    {"geometry": {"coordinates": [-75.1725, 40.0310]},
+     "properties": {"objectid": 901, "park_name": "Joseph F Vogt Playground",
+       "program_type": "PPR_REC"}},
+    {"geometry": {"coordinates": [-75.1400, 39.9500]},
+     "properties": {"objectid": 902, "park_name": "Wissinoming Park",
+       "program_type": "PPR_REC"}},
+    {"geometry": {"coordinates": [-75.1500, 39.9600]},
+     "properties": {"objectid": 903, "park_name": "Seasonal Pool",
+       "program_type": "POOL"}}
+  ]}'::jsonb,
+  '{"features": [
+    {"attributes": {"official_name": "Joseph F. Vogt Playground",
+      "address_911": "4351 UNRUH AVE", "zip_code": "19135"},
+     "centroid": {"x": -8368164.4, "y": 4870448.1}},
+    {"attributes": {"official_name": "Margaret Tartaglione Park",
+      "address_911": "5801 FRANKFORD AVE", "zip_code": "19135"},
+     "centroid": {"x": -8364413.0, "y": 4858679.1}}
+  ]}'::jsonb,
+  '11111111-0000-0000-0000-000000000001');
+
+do $$
+declare v text; n integer;
+begin
+  if exists (select 1 from public.services where source_ref = 'pprsite:903') then
+    raise exception 'FAIL  a seasonal pool was imported as a service';
+  end if;
+  raise notice 'ok    a program type absent from the allow-list is not imported';
+
+  -- Punctuation differs, so this only matches once names are normalised.
+  select address into v from public.services where source_ref = 'pprsite:901';
+  if v is null or v not like '4351 Unruh Ave%' then
+    raise exception 'FAIL  a name-matched property did not lend its address, got %', v;
+  end if;
+  raise notice 'ok    a site takes the address of the property it shares a name with';
+
+  -- The nearby property has a different name and is too far to trust. An
+  -- address on a card is something a person acts on, so no address is correct.
+  select address into v from public.services where source_ref = 'pprsite:902';
+  if v is not null then
+    raise exception 'FAIL  a site borrowed the address of a different park, got %', v;
+  end if;
+  raise notice 'ok    a site does not borrow the address of the park next door';
+end;
+$$;
+
+-- ===========================================================================
+\echo ''
+\echo '--- Words that give somebody away (0028, 0029) ---'
+-- ===========================================================================
+do $$
+declare n integer;
+begin
+  -- A notification naming a domestic violence service can reach the person
+  -- somebody is getting away from. This is a safety rule, not a privacy one.
+  if not public.name_discloses_condition('Get help with domestic violence') then
+    raise exception 'FAIL  a domestic violence service was not flagged';
+  end if;
+  if not public.name_discloses_condition('Support for incarcerated parents') then
+    raise exception 'FAIL  an incarceration service was not flagged';
+  end if;
+  if not public.name_discloses_condition('Juvenile Justice Center') then
+    raise exception 'FAIL  a juvenile justice site was not flagged';
+  end if;
+  raise notice 'ok    incarceration, juvenile and domestic violence names are flagged';
+
+  -- Broad, but not so broad that ordinary places get caught.
+  if public.name_discloses_condition('Santore Library')
+     or public.name_discloses_condition('Awbury Park and Recreation Center') then
+    raise exception 'FAIL  a neutral place was flagged as disclosing';
+  end if;
+  raise notice 'ok    ordinary places are not flagged';
+
+  select count(*) into n from public.services where source_ref like 'cerc:%';
+  if n <> 6 then
+    raise exception 'FAIL  expected 6 evening resource centres, got %', n;
+  end if;
+  if not (select bool_and(name_may_disclose) from public.services
+          where source_ref in ('cerc:northwest','cerc:central')) then
+    raise exception 'FAIL  a centre hosted at a justice site was not flagged';
+  end if;
+  if not (select bool_and(is_active) from public.services where source_ref like 'cerc:%') then
+    raise exception 'FAIL  a flagged centre was hidden rather than flagged';
+  end if;
+  raise notice 'ok    the evening centres are listed, and the disclosing ones are flagged';
+end;
+$$;
