@@ -10,13 +10,14 @@ import { Button } from '@astryxdesign/core/Button';
 import {
   BigButton,
   HelpBar,
+  Notice,
   PersonCard,
   PlaceCard,
   PointsBadge,
   StepHeader,
   VoiceInput,
 } from '@pam/ui';
-import { CATEGORY_LIST, TRANSPARENCY_SCREEN } from '@pam/config';
+import { CATEGORY_LIST, NOTICES, TRANSPARENCY_SCREEN } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 
@@ -149,6 +150,45 @@ export default function Page() {
               clickAction={() => setPoints((p) => p + 100)}
             />
           </HStack>
+        </VStack>
+
+        <VStack gap={3} xstyle={styles.section}>
+          <Text type="supporting" xstyle={styles.sectionTitle}>
+            Notice · nothing here, and why
+          </Text>
+          {/*
+            The case that prompted this: an admin opens a member who is in
+            another region, every query returns null, and without a notice the
+            screen is simply blank.
+          */}
+          <Notice
+            notice="admin_out_of_region"
+            title={t(NOTICES.admin_out_of_region.titleKey)}
+            body={t(NOTICES.admin_out_of_region.bodyKey)}
+            supportPhone={supportPhone}
+            callLabel={t('help.callSupport')}
+          />
+        </VStack>
+
+        <VStack gap={3} xstyle={styles.section}>
+          <Text type="supporting" xstyle={styles.sectionTitle}>
+            Notice · a problem to act on
+          </Text>
+          <Notice
+            notice="account_limited"
+            title={t(NOTICES.account_limited.titleKey)}
+            body={t(NOTICES.account_limited.bodyKey)}
+            supportPhone={supportPhone}
+            callLabel={t('help.callSupport')}
+          />
+          <Notice
+            notice="something_went_wrong"
+            title={t(NOTICES.something_went_wrong.titleKey)}
+            body={t(NOTICES.something_went_wrong.bodyKey)}
+            supportPhone={supportPhone}
+            callLabel={t('help.callSupport')}
+            retry={{ label: t('action.next'), onPress: () => undefined }}
+          />
         </VStack>
 
         <VStack gap={3} xstyle={styles.section}>

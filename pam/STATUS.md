@@ -106,6 +106,9 @@ oversight:
 - **No member-facing flow.** No onboarding, no invite redemption screen, no map,
   no enrollment, no chat. The web route is a component gallery that proves the
   stack renders, not a product.
+- **Notices exist but are not wired to real failures.** Every condition has
+  plain-language copy and a component (D-035), and the demo renders three of
+  them. Connecting them to actual query results is Phase 1.
 - **No five-tab member shell.** `AppShell` + `TabList` is the first UI task of
   Phase 1. The layout question is settled: Help merges into the bottom dock
   above the tabs, not a sixth tab and not a second fixed bar (D-029).

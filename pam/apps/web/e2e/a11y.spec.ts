@@ -152,3 +152,34 @@ test.describe('Astryx theme', () => {
     expect(responses.every((s) => s === 200), `font responses: ${responses}`).toBe(true);
   });
 });
+
+/**
+ * What must survive a failed network.
+ *
+ * Lazy loading is how PAM stays inside the §12 budget, and it is dangerous in
+ * exactly one place: anything a member needs when the network has ALREADY
+ * failed. A chunk that cannot download is a blank screen at the moment someone
+ * is most stuck, which is the dead end §0 forbids.
+ *
+ * So the help path must be in the server-rendered HTML, not behind a chunk.
+ */
+test.describe('the help path does not depend on JavaScript', () => {
+  test('the support number is in the HTML itself', async ({ request }) => {
+    const html = await (await request.get('/')).text();
+    // Not queried from the browser — read straight off the wire, the way a
+    // member on a dying connection receives it.
+    expect(html).toMatch(/href="tel:\+\d{8,15}"/);
+  });
+
+  test('help still works with JavaScript disabled', async ({ browser }) => {
+    const context = await browser.newContext({ javaScriptEnabled: false });
+    const page = await context.newPage();
+    await page.goto('/');
+
+    const help = page.getByRole('link', { name: /Need help/ });
+    await expect(help).toBeVisible();
+    await expect(help).toHaveAttribute('href', /^tel:/);
+
+    await context.close();
+  });
+});

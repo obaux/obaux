@@ -512,6 +512,74 @@ is visible, because a business name is not a condition.
 A Places key supersedes all of this — `place_id` makes the match exact and
 neither spelling matters.
 
+### D-035 — Every dead end gets a message that explains itself
+*(Will, 2026-09-12)*
+
+Will's example: an admin opens a member in another region, `admin_covers()`
+returns false, every query comes back null, and the screen is blank. On screen
+that is indistinguishable from a bug, and §0 forbids it: "Never dead-end."
+
+`@pam/config/notices` now holds every condition PAM can land in — out of region,
+suspended, limited, feature turned off, the four invite failures, empty
+searches, offline, and a catch-all. Each says what happened, why when the reason
+is safe to give, and what to do next, which is usually a phone number.
+
+Three rules, all enforced by tests:
+
+- **Never blame the reader.** "You do not have permission" says they did
+  something wrong. "This person is in a different area" says what is true.
+- **Never leak more than the reader is entitled to.** The out-of-region notice
+  tells an admin about their own scope and deliberately does not confirm whether
+  that person exists — otherwise the screen becomes a way to enumerate members
+  across every region.
+- **Never dead-end.** Every notice either offers the support line or names a
+  next step. The catch-all always offers the phone, because everything
+  unhandled lands there.
+
+The four invite failures keep separate keys so they are distinguishable in logs
+and to an admin, while §10 step 3 still shows one plain sentence per case.
+
+### D-036 — Notices are built from Card, not Astryx's Banner
+Astryx's `Banner` is the right component by design and the wrong one by weight:
+its dismiss control carries a tooltip, so importing it pulls the whole
+overlay/layer subsystem. A message that must work when everything else has
+failed is the wrong place to spend that.
+
+What Banner offered that matters — the alert role, the status colour, the icon —
+is a few lines on `Card`. `EmptyState` is kept as-is; it is light.
+
+Nothing is dismissable, which is also Astryx's own guidance for errors: a member
+should not be able to swipe away the reason their account is paused.
+
+### D-037 — Lazy load what is optional, never what is needed when the network fails
+*(Will, 2026-09-12)*
+
+The §12 budget is 500 kB of first-load JS, and the build went 70 kB over. Two
+causes, and neither was the one I first assumed — I twice removed a component I
+suspected and the number barely moved.
+
+The real cause was **the Supabase client, statically imported by
+`useSupportPhone`**: roughly 86 kB gzipped, in the first load of every route, for
+a lookup that is pure enhancement. The support number is already on screen from
+the env value before that code runs.
+
+Will asked whether lazy loading would help. It did: importing the client inside
+the effect brought the page from 568 kB to **481.6 kB**, back under budget.
+
+The rule this establishes, which matters more than the saving:
+
+- **Lazy load** anything optional or route-specific — the map, chat, provider
+  and admin surfaces, and any enhancement over a working fallback.
+- **Never lazy load** anything a member needs when the network has *already*
+  failed: the error notices, the help bar, the offline banner. A chunk that
+  cannot download is a blank screen at the exact moment someone is most stuck —
+  it manufactures the dead end §0 forbids. Two browser tests now assert the help
+  path is in the server-rendered HTML and works with JavaScript disabled.
+
+**The margin is thin: 18.4 kB.** The next target is Astryx's i18n message
+catalogue, which ships strings for every component in the library —
+`@astryx.alertDialog.*`, `@astryx.avatarGroup.*` — not just the ones PAM uses.
+
 ---
 
 ## Notes for whoever picks this up next

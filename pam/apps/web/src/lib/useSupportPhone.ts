@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { createClient } from './supabase';
 
 /**
  * PAM's support line.
@@ -16,6 +15,18 @@ import { createClient } from './supabase';
  * first paint and swaps if the database has a newer one. If the fetch fails —
  * offline, which is the normal case for this audience (§12) — the fallback
  * stands. There is no state in which the HelpBar has no number.
+ *
+ * The Supabase client is imported dynamically, inside the effect. It is roughly
+ * 60 kB gzipped and nothing on first paint depends on it: the number is already
+ * on screen from the env value before this runs. Importing it statically put the
+ * whole client library in the first load of every route for a lookup that is
+ * pure enhancement — §12 budgets 500 kB for a 3G connection, and this was an
+ * eighth of it.
+ *
+ * Deferring it is safe precisely because the fallback is not a degraded state.
+ * Anything a member needs when the network has ALREADY failed — the error
+ * notices, the help bar itself — must stay eagerly loaded, because a chunk that
+ * cannot download is a blank screen at the exact moment someone needs help.
  */
 export function useSupportPhone(): string {
   const fallback = process.env['NEXT_PUBLIC_SUPPORT_PHONE'] ?? '+12673095265';
@@ -26,6 +37,7 @@ export function useSupportPhone(): string {
 
     const load = async () => {
       try {
+        const { createClient } = await import('./supabase');
         const supabase = createClient();
         const { data } = await supabase
           .from('app_settings')

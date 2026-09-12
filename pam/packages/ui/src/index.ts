@@ -16,5 +16,6 @@ export { PersonCard, type PersonCardProps } from './PersonCard.js';
 export { StepHeader, type StepHeaderProps } from './StepHeader.js';
 export { PointsBadge, type PointsBadgeProps } from './PointsBadge.js';
 export { HelpBar, type HelpBarProps } from './HelpBar.js';
+export { Notice, type NoticeProps } from './Notice.js';
 export { VoiceInput, type VoiceInputProps, type SpeechRecognizer } from './VoiceInput.js';
 export { pam } from './tokens.stylex.js';

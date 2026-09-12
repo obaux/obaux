@@ -12,6 +12,7 @@ export * from './sms-templates.js';
 export * from './transparency.js';
 export * from './points.js';
 export * from './language.js';
+export * from './notices.js';
 
 /** Languages at launch (§2.3). [ASK WILL] on any additional language. */
 export const SUPPORTED_LOCALES = ['en', 'es'] as const;
