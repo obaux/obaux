@@ -13,6 +13,11 @@ import { Badge } from '@astryxdesign/core/Badge';
  * of them open, so the role chip is not decoration: it is the answer to "whose
  * screen am I looking at".
  *
+ * The chip is grey on purpose. It is orientation, not news: a coloured chip in
+ * the corner of every screen competes with the things that genuinely need
+ * attention — an account paused, a feature switched off — and those are the
+ * only badges on these screens that should catch an eye.
+ *
  * The mark is type, not an image. There is no brand yet (that is Phase 6), and
  * a logo file would be a request on a 3G connection to say three letters that
  * the font already draws.
@@ -20,8 +25,6 @@ import { Badge } from '@astryxdesign/core/Badge';
 export interface AppHeaderProps {
   /** Plain-language role name, already translated. Omitted for signed-out. */
   roleLabel?: string | null;
-  /** Colour of the role chip. Defaults to neutral. */
-  roleTone?: 'neutral' | 'info' | 'warning';
 }
 
 const styles = stylex.create({
@@ -37,12 +40,12 @@ const styles = stylex.create({
   },
 });
 
-export function AppHeader({ roleLabel, roleTone = 'neutral' }: AppHeaderProps) {
+export function AppHeader({ roleLabel }: AppHeaderProps) {
   return (
     <header {...stylex.props(styles.header)}>
       <HStack gap={2} align="center" wrap="wrap">
         <Text xstyle={styles.mark}>PAM</Text>
-        {roleLabel ? <Badge variant={roleTone} label={roleLabel} /> : null}
+        {roleLabel ? <Badge variant="neutral" label={roleLabel} /> : null}
       </HStack>
     </header>
   );

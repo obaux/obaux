@@ -14,6 +14,7 @@ const USER = '**/auth/v1/user*';
 const PROFILES = '**/rest/v1/profiles*';
 const POINTS = '**/rest/v1/rpc/member_points*';
 const INVITE = '**/rest/v1/rpc/create_invite*';
+const CONTROLS = '**/rest/v1/access_controls*';
 
 const ADMIN_ID = 'de3b9c2e-ec2f-403b-93e5-86e6ee75349b';
 
@@ -49,8 +50,10 @@ async function signedInAs(
   page: import('@playwright/test').Page,
   role: 'admin' | 'member',
   members: unknown[] = [],
+  controls: unknown[] = [],
 ) {
   await seedSession(page);
+  await page.route(CONTROLS, (route) => route.fulfill(json(controls)));
   await page.route(USER, (route) => route.fulfill(json({ id: ADMIN_ID, phone: '12673095265' })));
   await page.route(POINTS, (route) => route.fulfill(json(250)));
   await page.route(PROFILES, (route) => {
@@ -90,15 +93,19 @@ test.describe('the case manager screen', () => {
   });
 
   test('an admin sees their caseload', async ({ page }) => {
-    await signedInAs(page, 'admin', [
-      { id: 'm1', first_name: 'Marcus', access_status: 'active', last_active_at: '2026-09-10T14:00:00Z' },
-      { id: 'm2', first_name: 'Tanya', access_status: 'limited', last_active_at: null },
-    ]);
+    await signedInAs(
+      page,
+      'admin',
+      [
+        { id: 'm1', first_name: 'Marcus', access_status: 'active', last_active_at: '2026-09-10T14:00:00Z' },
+        { id: 'm2', first_name: 'Tanya', access_status: 'limited', last_active_at: null },
+      ],
+      [{ subject_id: 'm2', feature: 'chat' }],
+    );
     await page.goto('/admin/');
 
     await expect(page.getByRole('heading', { name: 'Marcus' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Tanya' })).toBeVisible();
-    await expect(page.getByText('Some things turned off')).toBeVisible();
     await expect(page.getByText('Has not opened PAM yet')).toBeVisible();
 
     // An avatar per person, so the caseload reads as people rather than rows.
@@ -141,6 +148,36 @@ test.describe('the case manager screen', () => {
     await expect(page.getByRole('heading', { name: 'We could not make a code' })).toBeVisible();
   });
 
+  test('the status chip says what is actually switched off', async ({ page }) => {
+    // "Some things turned off" is the member's wording and answers nothing on a
+    // caseload: off how, and which? The case manager's next move is to explain
+    // it or undo it, and both need the specifics.
+    await signedInAs(
+      page,
+      'admin',
+      [
+        { id: 'm1', first_name: 'Marcus', access_status: 'limited', last_active_at: null },
+        { id: 'm2', first_name: 'Tanya', access_status: 'limited', last_active_at: null },
+        { id: 'm3', first_name: 'Dee', access_status: 'suspended', last_active_at: null },
+      ],
+      [
+        { subject_id: 'm1', feature: 'chat' },
+        { subject_id: 'm2', feature: 'chat' },
+        { subject_id: 'm2', feature: 'map' },
+        { subject_id: 'm2', feature: 'points' },
+      ],
+    );
+    await page.goto('/admin/');
+    await expect(page.getByRole('heading', { name: 'Marcus' })).toBeVisible();
+
+    await expect(page.getByText('Messages off')).toBeVisible();
+    // Past two, the names stop fitting a chip and the detail belongs on the
+    // member's own screen.
+    await expect(page.getByText('3 things off')).toBeVisible();
+    await expect(page.getByText('Paused')).toBeVisible();
+    await expect(page.getByText('Some things turned off')).toHaveCount(0);
+  });
+
   test('the transparency promise is shown to the admin, not only to members', async ({ page }) => {
     await signedInAs(page, 'admin', []);
     await page.goto('/admin/');
@@ -171,9 +208,12 @@ test.describe('the case manager screen', () => {
   });
 
   test('has no WCAG A/AA violations', async ({ page }) => {
-    await signedInAs(page, 'admin', [
-      { id: 'm1', first_name: 'Marcus', access_status: 'limited', last_active_at: null },
-    ]);
+    await signedInAs(
+      page,
+      'admin',
+      [{ id: 'm1', first_name: 'Marcus', access_status: 'limited', last_active_at: null }],
+      [{ subject_id: 'm1', feature: 'chat' }],
+    );
     await page.goto('/admin/');
     await expect(page.getByRole('heading', { name: 'Marcus' })).toBeVisible();
 

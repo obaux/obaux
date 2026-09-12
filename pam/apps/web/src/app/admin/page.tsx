@@ -50,6 +50,32 @@ const styles = stylex.create({
   note: { fontSize: '15px', lineHeight: 1.5 },
 });
 
+/**
+ * What the status chip should say.
+ *
+ * "Some things turned off" is the member's wording, and on a caseload it
+ * answers nothing: off how, and which? A case manager needs the specifics,
+ * because the next thing they do is either explain it or undo it. Beyond two
+ * features the names stop fitting a chip, so it becomes a count and the detail
+ * moves to the member's own screen.
+ */
+function statusChip(
+  member: { accessStatus: string; featuresOff: string[] },
+  t: (key: string, vars?: Record<string, string | number>) => string,
+): { label: string; tone: 'error' | 'warning' } | null {
+  if (member.accessStatus === 'suspended') {
+    return { label: t('admin.status.suspended'), tone: 'error' };
+  }
+  if (member.accessStatus !== 'limited') return null;
+
+  const names = member.featuresOff.map((f) => t(`feature.${f}`));
+  if (names.length === 0) return { label: t('admin.status.limited'), tone: 'warning' };
+  if (names.length <= 2) {
+    return { label: t('admin.status.off', { features: names.join(', ') }), tone: 'warning' };
+  }
+  return { label: t('admin.status.offCount', { count: names.length }), tone: 'warning' };
+}
+
 function whenLastActive(iso: string | null, locale: string): string | null {
   if (!iso) return null;
   return new Intl.DateTimeFormat(locale, { month: 'short', day: 'numeric' }).format(new Date(iso));
@@ -156,7 +182,7 @@ export default function AdminPage() {
   return (
     <main {...stylex.props(styles.page)}>
       <VStack gap={4}>
-        <AppHeader roleLabel={t('role.admin')} roleTone="info" />
+        <AppHeader roleLabel={t('role.admin')} />
         <VStack gap={1}>
           <Heading level={1} xstyle={styles.title}>
             {t('admin.title')}
@@ -258,6 +284,7 @@ export default function AdminPage() {
           <VStack gap={3}>
             {caseload.members.map((member) => {
               const when = whenLastActive(member.lastActiveAt, locale);
+              const chip = statusChip(member, t);
               return (
                 <Card key={member.id} xstyle={styles.card}>
                   <VStack gap={2}>
@@ -278,12 +305,7 @@ export default function AdminPage() {
                       </Heading>
                     </HStack>
                     <HStack gap={2} wrap="wrap" align="center">
-                      {member.accessStatus !== 'active' ? (
-                        <Badge
-                          variant={member.accessStatus === 'suspended' ? 'error' : 'warning'}
-                          label={t(`admin.status.${member.accessStatus}`)}
-                        />
-                      ) : null}
+                      {chip ? <Badge variant={chip.tone} label={chip.label} /> : null}
                       {member.points !== null ? (
                         <Text type="supporting" xstyle={styles.meta}>
                           {t('admin.points', { count: member.points })}

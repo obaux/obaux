@@ -19,6 +19,14 @@ export interface CaseloadMember {
   id: string;
   firstName: string | null;
   accessStatus: 'active' | 'limited' | 'suspended';
+  /**
+   * The features an admin has switched off for this person, by name.
+   *
+   * "Limited" on its own tells a case manager nothing they can act on — off
+   * how, and since when? These are the actual rows behind that status, so the
+   * list can say "Messages off" instead.
+   */
+  featuresOff: string[];
   lastActiveAt: string | null;
   points: number | null;
 }
@@ -67,6 +75,20 @@ export function useCaseload(enabled: boolean): { state: CaseloadState; refresh: 
           return;
         }
 
+        // What has been switched off, for everyone on the list at once. These
+        // are the admin's own actions on the member, not facts about the
+        // member — the affected person is shown their own version of this.
+        const { data: controls } = await supabase
+          .from('access_controls')
+          .select('subject_id, feature')
+          .eq('allowed', false)
+          .in('subject_id', rows.map((r) => r.id));
+
+        const offByMember = new Map<string, string[]>();
+        for (const row of (controls ?? []) as { subject_id: string; feature: string }[]) {
+          offByMember.set(row.subject_id, [...(offByMember.get(row.subject_id) ?? []), row.feature]);
+        }
+
         // Points come from a function rather than a column, because the ledger
         // is append-only and the balance is its sum. One call per member is
         // fine at caseload size and wrong at city size; when it stops being
@@ -85,6 +107,7 @@ export function useCaseload(enabled: boolean): { state: CaseloadState; refresh: 
             id: row.id,
             firstName: row.first_name,
             accessStatus: row.access_status,
+            featuresOff: offByMember.get(row.id) ?? [],
             lastActiveAt: row.last_active_at,
             points: balances[i] ?? null,
           })),

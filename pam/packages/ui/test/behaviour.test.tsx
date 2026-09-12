@@ -285,7 +285,7 @@ describe('the header says which app you are in', () => {
   });
 
   it('names the role when there is one', () => {
-    render(<AppHeader roleLabel="Case manager" roleTone="info" />);
+    render(<AppHeader roleLabel="Case manager" />);
     expect(screen.getByText('PAM')).toBeInTheDocument();
     expect(screen.getByText('Case manager')).toBeInTheDocument();
   });
