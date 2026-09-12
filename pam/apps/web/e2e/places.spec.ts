@@ -123,7 +123,7 @@ test.describe('the places screen', () => {
     await page.getByRole('button', { name: 'Work and money' }).click();
     await expect(page.locator('.astryx-empty-state')).toBeVisible();
 
-    await page.getByRole('button', { name: 'All' }).click();
+    await page.getByRole('button', { name: 'All', exact: true }).click();
     await expect(page.getByRole('heading', { name: 'J J Peters' })).toBeVisible();
   });
 

@@ -200,8 +200,14 @@ select test.check('unlinked provider cannot read the member profile',
 \echo '--- Import review queue is hidden from members (§5.2) ---'
 -- ===========================================================================
 select test.as_user(:'marcus');
+-- Scoped to the fixture rows: migrations seed a real catalogue (0025), and a
+-- bare count here would break every time a place is added, which is not what
+-- this test is about.
 select test.check('member sees only reviewed, active services',
-  (select count(*) from public.services), 2);
+  (select count(*) from public.services
+   where id in ('44444444-0000-0000-0000-000000000001',
+                '44444444-0000-0000-0000-000000000002',
+                '44444444-0000-0000-0000-000000000003')), 2);
 select test.check('member cannot see an unreviewed import row',
   (select count(*) from public.services where needs_review), 0);
 
@@ -266,11 +272,16 @@ select set_config('request.jwt.claim.sub', '', false);
 -- Two of the three fixture services are published; the third is an unreviewed
 -- import row, which must stay hidden from everyone but an admin (§5.2).
 select test.check('anon can read published services',
-  (select count(*) from public.services), 2);
+  (select count(*) from public.services
+   where id in ('44444444-0000-0000-0000-000000000001',
+                '44444444-0000-0000-0000-000000000002',
+                '44444444-0000-0000-0000-000000000003')), 2);
 select test.check('anon cannot see the unreviewed import row',
   (select count(*) from public.services where needs_review), 0);
 select test.check('anon can read orgs',
-  (select count(*) from public.orgs), 2);
+  (select count(*) from public.orgs
+   where id in ('22222222-0000-0000-0000-000000000001',
+                '22222222-0000-0000-0000-000000000002')), 2);
 select test.check('anon can read the subcategory list',
   (select count(*) from public.service_subcategories), 18);
 select test.check('anon can read badges',

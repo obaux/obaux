@@ -1,5 +1,34 @@
 # Changelog
 
+## [0.4.0] — 2026-09-12 · Work and money, and a place to start from
+
+### Added — OIC Philadelphia fills the Work and money category
+
+Six programmes at 1231 N Broad St: information technology, culinary arts,
+digital media and audio engineering, insurance, healthcare, and reentry support.
+Curated from the organisation's own pages rather than imported, and marked as
+such. It brings the first phone number and the first opening hours into the
+catalogue — so the first card in PAM whose primary action is Call.
+
+All three categories now have real places in them.
+
+### Added — a member can change where the list is measured from
+
+The area is a button, not a label. Tapping it opens a search over the city's ZIP
+codes, populated before anything is typed; typing a street address looks it up
+live against the City of Philadelphia's public property API, which needs no key.
+
+The typed address goes to the city and nowhere else — not to PAM's server, not
+into a log, not into a table. The chosen area is kept on the device. If the
+address lookup is unavailable, the ZIP list still answers.
+
+### Changed — only libraries are kept from the city facilities layer
+
+205 recreation centres and 8 older adult centres were crowding out food,
+housing, ID and legal help under Home and family — none of which PAM has yet.
+The 52 libraries stay; the allow-list machinery is unchanged, so re-adding a
+facility type is one row.
+
 ## [0.3.0] — 2026-09-12 · Libraries, and the Education category
 
 ### Added — 52 Free Library branches, and a second import source

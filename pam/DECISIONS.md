@@ -812,6 +812,78 @@ gets the "nothing here" notice explaining why rather than a button that was
 never there. A control that appears and disappears with the data teaches nobody
 anything, and §0 already requires that an empty result explain itself.
 
+### D-052 — Libraries only, from the city facilities layer
+Will's call, and the right one. 205 recreation centres and 8 older adult centres
+under "Home and family" crowded out the things somebody leaving prison is
+actually looking for — food, housing, ID, legal help — none of which PAM has
+yet. A category that is nine-tenths rec centres teaches a member that the
+category is not worth opening.
+
+The allow-list table and the ingest are unchanged; only the rows in the table
+went. Re-adding a facility type is one INSERT, and the machinery around it —
+the exclusions, the dedupe, the tests — is what took the work.
+
+### D-053 — OIC Philadelphia is curated, not imported, and gets a row per programme
+Will named the source. It is one nonprofit's website, not a feed, so the entry
+is `source = 'manual'` and every fact was read off the organisation's own pages,
+including the schema.org `LocalBusiness` block that carries its phone number and
+opening hours.
+
+Six rows at one address is not duplication. A member scanning "Work and money"
+is choosing between culinary and IT, not between buildings, and the card shows a
+name — so a single "OIC Philadelphia" row would hide the only thing that helps
+somebody choose.
+
+Subcategories *are* set here, which 0022 refused to do. That is not a
+contradiction of D-045: the rule forbids PAM inventing a label the source cannot
+support, and here the organisation names its own programmes.
+
+This also brings the first opening hours into the database. The shape is
+documented in the migration. It still licenses no "Open now" chip (D-044) —
+evaluating one needs the member's timezone and a holiday calendar, and being
+wrong sends somebody to a locked door.
+
+"OIC Reentry Support Services" carries the organisation's own name for its
+programme, so the 0017 trigger flags it as disclosing. That is correct and
+nothing overrides it: the name is shown, because a member has to be able to ask
+for the right programme at the desk, and it never goes into an SMS (§9).
+
+### D-054 — The area picker asks the city, and PAM remembers nothing
+Two layers. The ZIP codes live in `public.areas` and always answer — they need
+no network beyond Supabase, and a ZIP is the one location a person can type from
+memory, which is what §10's onboarding step already asks for. A street address
+is looked up live against the City of Philadelphia's public property API, which
+needs no key and sends `access-control-allow-origin: *`, so the browser asks it
+directly.
+
+Two things follow, and both are deliberate:
+
+**PAM never sees the typed address.** It goes to the city's public address list
+and nowhere else — not to PAM's server, not into a log, not into a table. Where
+somebody is staying is exactly the fact this audience has the most reason to
+guard, and the safest way to hold it is not to. The chosen area is kept in
+`localStorage` on that device. A database invariant asserts `areas` has not
+grown a column naming a person.
+
+**The address lookup is an enhancement, never a dependency.** If the city API is
+slow, blocked or offline, the ZIP list still answers and the screen says nothing
+about the failure, because there is nothing a member could do with that.
+
+The centroid of a ZIP is the mean of the city's own property points in it, not
+the centre of its polygon: it is where people live, which is the right centre
+for "what is near me".
+
+### D-055 — The area is the button
+Closed, the picker is a button labelled "Showing places near City Hall", with a
+short "Change" beside it. The area itself is the control, so a member can see
+that it is theirs to set without reading anything.
+
+Open, it is a text input and a list of ordinary buttons — not a combobox widget.
+This has to work with a screen reader, with a thumb, and at 200% text (§12), and
+every one of those is easier to get right with real buttons than with a custom
+listbox. The list is populated before anything is typed, so somebody who does
+not know what to enter is not left staring at an empty box.
+
 ---
 
 ## Notes for whoever picks this up next

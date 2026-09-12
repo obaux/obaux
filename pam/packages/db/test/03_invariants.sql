@@ -494,9 +494,16 @@ begin
   end if;
   raise notice 'ok    a museum is not a library';
 
+  -- 0024: only libraries. Rec centres and older adult centres were crowding out
+  -- food, housing and ID help in a category that has none of them yet.
+  if exists (select 1 from public.services where source_ref in ('cityfac:102','cityfac:103')) then
+    raise exception 'FAIL  a non-library facility was imported';
+  end if;
+  raise notice 'ok    only libraries come from the city facilities layer';
+
   select count(*) into n from public.services where source_ref like 'cityfac:%';
-  if n <> 2 then
-    raise exception 'FAIL  expected 2 imported facilities, got %', n;
+  if n <> 1 then
+    raise exception 'FAIL  expected 1 imported facility, got %', n;
   end if;
   raise notice 'ok    the same building at the same point is imported once';
 
@@ -510,11 +517,6 @@ begin
   end if;
   raise notice 'ok    a library is a School and training place, named plainly';
 
-  select name into v from public.services where source_ref = 'cityfac:102';
-  if v <> 'Juniata Park Older Adult Center' then
-    raise exception 'FAIL  facility name not reordered, got %', v;
-  end if;
-  raise notice 'ok    "Type - Place" is reordered into something sayable';
 
   -- D-045 again, for the second source.
   select count(*) into n from public.services
@@ -523,5 +525,93 @@ begin
     raise exception 'FAIL  % facility row(s) carry a subcategory PAM invented', n;
   end if;
   raise notice 'ok    the facilities import adds no condition label either';
+end;
+$$;
+
+-- ===========================================================================
+\echo ''
+\echo '--- OIC Philadelphia, the Work and money category (0025) ---'
+-- ===========================================================================
+do $$
+declare
+  n integer;
+  v text;
+  h jsonb;
+begin
+  select count(*) into n from public.services where category = 'workforce';
+  if n = 0 then
+    raise exception 'FAIL  the Work and money category is empty';
+  end if;
+  raise notice 'ok    Work and money has places in it';
+
+  -- The first real opening hours in the catalogue. The shape is a contract:
+  -- a screen that reads it wrongly would claim a place is open when it is shut.
+  select hours into h from public.services where source_ref = 'oic:culinary-arts';
+  if h is null or h ->> 'tz' is null or h -> 'weekly' -> 'mon' is null then
+    raise exception 'FAIL  hours are missing or not in the documented shape';
+  end if;
+  if jsonb_array_length(h -> 'weekly' -> 'sun') <> 0 then
+    raise exception 'FAIL  a closed day should be an empty array';
+  end if;
+  raise notice 'ok    opening hours are stored in the documented shape';
+
+  -- §9: the organisation's own programme name discloses, so it must be flagged
+  -- out of SMS — and must still be shown, because a member has to be able to
+  -- ask for it by name at the desk.
+  if not (select name_may_disclose from public.services where source_ref = 'oic:reentry') then
+    raise exception 'FAIL  a disclosing programme name was not flagged';
+  end if;
+  if not (select is_active from public.services where source_ref = 'oic:reentry') then
+    raise exception 'FAIL  a disclosing programme name was hidden rather than flagged';
+  end if;
+  raise notice 'ok    a disclosing programme name is flagged, not hidden';
+
+  -- A curated entry is not an import, and must not claim to be one.
+  select source::text into v from public.services where source_ref = 'oic:reentry';
+  if v <> 'manual' then
+    raise exception 'FAIL  a hand-curated entry claims to be an import, got %', v;
+  end if;
+  raise notice 'ok    a hand-curated entry is recorded as manual';
+end;
+$$;
+
+-- ===========================================================================
+\echo ''
+\echo '--- Areas: somewhere to start from (0026) ---'
+-- ===========================================================================
+do $$
+declare
+  n integer;
+begin
+  select count(*) into n from public.areas where kind = 'zip';
+  if n < 40 then
+    raise exception 'FAIL  expected the city''s ZIP codes, got %', n;
+  end if;
+  raise notice 'ok    the ZIP codes a member can choose from are seeded';
+
+  -- An empty query has to return something: somebody who does not know what to
+  -- type must still be offered somewhere to start (§0, never dead-end).
+  select count(*) into n from public.search_areas('', 8);
+  if n = 0 then
+    raise exception 'FAIL  an empty query offered nothing';
+  end if;
+  raise notice 'ok    an empty query still offers somewhere to start';
+
+  select count(*) into n from public.search_areas('19104', 8);
+  if n = 0 then
+    raise exception 'FAIL  a real ZIP code found nothing';
+  end if;
+  raise notice 'ok    a ZIP code a member types resolves';
+
+  -- The table is public reference data and must never accumulate anything
+  -- about who looked at what.
+  if exists (
+    select 1 from information_schema.columns
+    where table_schema = 'public' and table_name = 'areas'
+      and column_name in ('profile_id', 'member_id', 'user_id', 'searched_by')
+  ) then
+    raise exception 'FAIL  areas has grown a column that identifies a person';
+  end if;
+  raise notice 'ok    areas holds no record of who chose what';
 end;
 $$;

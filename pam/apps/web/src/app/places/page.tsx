@@ -14,10 +14,12 @@ import {
   distanceLabel,
   type Category,
 } from '@pam/config';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useI18n } from '@/lib/i18n';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { usePlaces, METRES_PER_MILE } from '@/lib/usePlaces';
+import { CITY_HALL, loadOrigin, saveOrigin, type AreaOption } from '@/lib/useAreaSearch';
+import { AreaPicker } from './AreaPicker';
 
 /**
  * The first screen in PAM that shows real data.
@@ -40,8 +42,6 @@ import { usePlaces, METRES_PER_MILE } from '@/lib/usePlaces';
  * where "you" is would be the same kind of quiet lie.
  */
 
-const PHILADELPHIA_CITY_HALL = { lat: 39.9526, lon: -75.1652 };
-
 const styles = stylex.create({
   page: {
     maxWidth: '520px',
@@ -61,7 +61,26 @@ export default function PlacesPage() {
   const { t, locale } = useI18n();
   const supportPhone = useSupportPhone();
   const [category, setCategory] = useState<Category | undefined>(undefined);
-  const state = usePlaces({ ...PHILADELPHIA_CITY_HALL, ...(category ? { category } : {}), limit: 20 });
+
+  /*
+   * City Hall until the member says otherwise. Their choice lives in
+   * localStorage and nowhere else — see D-054 — so it is read after mount
+   * rather than during render, which would not match the static HTML.
+   */
+  const [area, setArea] = useState<AreaOption>(CITY_HALL);
+  useEffect(() => setArea(loadOrigin()), []);
+
+  const chooseArea = (next: AreaOption) => {
+    setArea(next);
+    saveOrigin(next);
+  };
+
+  const state = usePlaces({
+    lat: area.lat,
+    lon: area.lon,
+    ...(category ? { category } : {}),
+    limit: 20,
+  });
 
   return (
     <main {...stylex.props(styles.page)}>
@@ -70,10 +89,9 @@ export default function PlacesPage() {
           <Heading level={1} xstyle={styles.title}>
             {t('places.title')}
           </Heading>
-          <Text type="supporting" xstyle={styles.area}>
-            {t('places.defaultArea')}
-          </Text>
         </VStack>
+
+        <AreaPicker area={area} onChange={chooseArea} />
 
         {/*
           The three categories are fixed (§2.5) and always all shown, even when
