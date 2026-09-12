@@ -139,3 +139,31 @@ Three things, none of which exist yet:
 
 Every super admin action belongs in the audit log, which already rejects UPDATE
 and DELETE at the database level, including from the service role.
+
+## A5 — Flagging a place that has closed (12 September 2026, Will)
+
+The SOP has an import review queue (§5.2) for places arriving, and nothing for
+places leaving. Added:
+
+- **Any signed-in person can flag a place** — member, program manager, case
+  manager. Whoever walked there finds out first.
+- **The flag hides it immediately.** Not a queue: hidden until decided.
+- **Only a super admin decides**, keep or remove, with a note. Removal sets
+  `removed_at`, which the importers cannot clear (see D-072 for why this is not
+  a DELETE).
+
+This replaces what a case manager was previously going to use feature switches
+for. A stale listing is a catalogue problem, not a member problem, and it should
+never have been solved by restricting a person.
+
+## A6 — Messaging is never switchable off (12 September 2026, Will)
+
+Removed from §4.1's controllable features, and refused by the database. Every
+other switch degrades an experience; that one isolates somebody from the people
+the product exists to connect them to.
+
+**Still open:** whether a case manager can *read* chats. Will has asked for it
+with a sensitive-information warning. It reverses the §4.1 transparency promise
+shown to members at onboarding — "they cannot see what you write in your
+chats" — so it needs the screen rewritten before it ships, or narrowing to
+flagged messages only, which the contract already allows.

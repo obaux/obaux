@@ -745,3 +745,112 @@ begin
   delete from public.access_controls where subject_id = v_member and feature = 'map';
 end;
 $$;
+
+-- ===========================================================================
+\echo ''
+\echo '--- A flagged place disappears until somebody decides (0032, 0033) ---'
+-- ===========================================================================
+do $$
+declare
+  v_member uuid := '33333333-0000-0000-0000-00000000000c';
+  v_admin  uuid := '33333333-0000-0000-0000-00000000000a';
+  v_service uuid := '44444444-0000-0000-0000-000000000001';
+  v_flag uuid;
+  n integer;
+  ok boolean := false;
+begin
+  -- The person who finds out a place has closed is whoever walked there, so
+  -- anyone signed in can say so.
+  perform set_config('request.jwt.claim.sub', v_member::text, true);
+  v_flag := (public.flag_service(v_service, 'Door was locked, sign says moved')).id;
+
+  if (select is_active from public.services where id = v_service) then
+    raise exception 'FAIL  a flagged place stayed in the catalogue';
+  end if;
+  raise notice 'ok    a flag hides the place at once, before anybody reviews it';
+
+  -- Hiding immediately is the whole point: a live place hidden for a week
+  -- costs one wasted search; a closed place left up costs somebody a bus fare
+  -- and an afternoon.
+  select count(*) into n from public.service_flags where id = v_flag and status = 'pending';
+  if n <> 1 then raise exception 'FAIL  the flag was not recorded as pending'; end if;
+
+  -- A case manager is not the decider.
+  perform set_config('request.jwt.claim.sub', v_admin::text, true);
+  begin
+    perform public.resolve_service_flag(v_flag, 'remove');
+  exception when others then
+    ok := true;
+  end;
+  if not ok then
+    raise exception 'FAIL  a case manager decided the fate of a flagged place';
+  end if;
+  raise notice 'ok    only a super admin decides';
+
+  -- Promote, decide to keep, and the place comes back.
+  update public.profiles set role = 'super_admin' where id = v_admin;
+  perform set_config('request.jwt.claim.sub', v_admin::text, true);
+  perform public.resolve_service_flag(v_flag, 'keep', 'Phoned them, still open');
+
+  if not (select is_active from public.services where id = v_service) then
+    raise exception 'FAIL  keeping a place did not put it back';
+  end if;
+  raise notice 'ok    keep puts the place back in the catalogue';
+
+  -- And removing takes it out for good.
+  v_flag := (public.flag_service(v_service, 'Confirmed closed')).id;
+  perform public.resolve_service_flag(v_flag, 'remove', 'Confirmed with the city');
+
+  if (select removed_at from public.services where id = v_service) is null then
+    raise exception 'FAIL  removing a place did not mark it removed';
+  end if;
+  if (select is_active from public.services where id = v_service) then
+    raise exception 'FAIL  a removed place is still in the catalogue';
+  end if;
+  raise notice 'ok    remove takes the place out, and says when';
+
+  -- A super admin is still a case manager: every policy written against
+  -- is_admin() must keep meaning what it meant.
+  if not public.is_admin() then
+    raise exception 'FAIL  a super admin lost their case manager powers';
+  end if;
+  raise notice 'ok    a super admin is a case manager with more, not a different role';
+
+  update public.profiles set role = 'admin' where id = v_admin;
+end;
+$$;
+
+-- ===========================================================================
+\echo ''
+\echo '--- An import cannot resurrect a removed place (0032) ---'
+-- ===========================================================================
+-- This is why "remove" is a column and not a DELETE. A deleted row comes back
+-- on the next import run and the super admin's decision is silently undone.
+do $$
+declare
+  v_ref text;
+  v_id uuid;
+begin
+  select source_ref, id into v_ref, v_id
+  from public.services where source_ref like 'cityfac:%' limit 1;
+
+  update public.services set is_active = false, removed_at = now() where id = v_id;
+
+  perform public.ingest_city_facilities(
+    format('{"features": [
+      {"geometry": {"coordinates": [-75.15526, 39.93710]},
+       "properties": {"objectid": %s, "asset_name": "Library Branch - Santore",
+         "asset_addr": "932 S 7TH ST", "asset_subt1_desc": "Library Branch",
+         "not_public": "N", "status": "A"}}
+    ]}', replace(v_ref, 'cityfac:', ''))::jsonb,
+    '11111111-0000-0000-0000-000000000001');
+
+  if (select is_active from public.services where id = v_id) then
+    raise exception 'FAIL  an import put a removed place back in the catalogue';
+  end if;
+  if (select removed_at from public.services where id = v_id) is null then
+    raise exception 'FAIL  an import cleared the removal';
+  end if;
+  raise notice 'ok    an import updates a removed place without un-removing it';
+end;
+$$;

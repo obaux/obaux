@@ -1117,6 +1117,45 @@ The general rule this is an instance of: member-facing copy is written to spare
 somebody, and admin-facing copy is written so somebody can act. Reusing one for
 the other reads as tidy and loses the thing the screen exists for.
 
+### D-071 — Anyone can flag a place, and it hides before anybody reviews it
+Will's design. PAM's catalogue is 800 places scraped from city feeds that go
+stale quietly: a programme closes, a building changes hands, and the feed keeps
+listing it for a year. The people who find out first are the ones who walked
+there — a member, a program manager, a case manager — so any of them can flag a
+place, and the flag hides it **immediately**, before a super admin looks at it.
+
+That asymmetry is the decision. Hiding a live place for a few days costs
+somebody one wasted search. Leaving a closed one up costs somebody a bus fare,
+an afternoon, and some of the small amount of faith they have left in being told
+the truth. The queue runs in the direction of the cheaper mistake.
+
+A super admin then keeps it or removes it, and both are recorded with a note.
+
+### D-072 — "Remove from the database" is a column, not a DELETE
+Will asked for removal to mean gone. It does, and the mechanism is `removed_at`
+rather than `delete from services`, for two reasons that would each break the
+feature:
+
+1. **`enrollments.service_id` cascades.** Deleting a service erases the record
+   that somebody signed up for it. That is their history, not ours to drop.
+2. **The importers upsert on `(source, source_ref)`.** A deleted row returns on
+   the next import run and the super admin's decision is silently undone.
+   `removed_at` is a decision the importer cannot overwrite — there is a test
+   that runs an import against a removed row and checks it stays removed.
+
+A hard delete is still available to somebody with the service key who knows what
+cascades. It is not a button in the product.
+
+### D-073 — A super admin is a case manager with more, not a different role
+`is_admin()` answers true for both, so not one of the 73 existing policies
+changes meaning, and `is_super_admin()` is the new narrower question. A super
+admin keeps a caseload; they are not a separate kind of person with a separate
+copy of the app.
+
+Adding the enum value and using it have to be separate migrations — Postgres
+refuses to use a new enum value in the transaction that added it. That is why
+0032 and 0033 are split, and the split is load-bearing rather than tidiness.
+
 ---
 
 ## Notes for whoever picks this up next
