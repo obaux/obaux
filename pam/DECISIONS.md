@@ -1073,6 +1073,37 @@ the screen unchanged.
 Neither is a refusal. Both are decisions whose cost lands on people with very
 little margin, and they should be made on purpose.
 
+### D-069 — Anyone can register as a supervising admin, and unverified is visible
+Will's decision, made directly after the concern was put to him: supervising
+admins sign themselves up. Programme managers can do either. Only super admins
+are created from inside the app. This reverses §10 step 6 and the reversal is
+recorded in `docs/sop-amendments.md` A2, because the next person to read the SOP
+should not assume a rule that is gone.
+
+What makes it survivable is not the sign-up screen, it is two things already in
+the database, which must now be treated as load-bearing rather than incidental:
+a supervising admin's caseload comes only from people who redeemed *their*
+invite, so a new account sees nobody and cannot go looking; and the member is
+shown who invited them, by name, before they accept.
+
+One addition is not optional. A self-registered supervising admin is
+**unverified** until a super admin verifies them, and the member deciding
+whether to redeem is shown that — the same pattern already used for
+organisations (§6.4). It costs a genuine officer a badge and nothing else. It is
+the difference between somebody saying they are a case manager and PAM saying
+so, and the person carrying the cost of that difference is the one with the
+least room to absorb it.
+
+### D-070 — A status chip names what is switched off
+"Some things turned off" is the member's wording. On a caseload it answers
+nothing an admin can act on: off how, which, since when? The chip now names the
+features from the access rows themselves, and becomes a count past two, where
+names stop fitting and the detail belongs on the member's own screen.
+
+The general rule this is an instance of: member-facing copy is written to spare
+somebody, and admin-facing copy is written so somebody can act. Reusing one for
+the other reads as tidy and loses the thing the screen exists for.
+
 ---
 
 ## Notes for whoever picks this up next

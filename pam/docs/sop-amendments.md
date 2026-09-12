@@ -39,29 +39,56 @@ Notes that matter for the build:
 ## A2 — Role pills at sign-up (12 September 2026, Will)
 
 > "During sign up, they can see pills to specify their role."
+> "Supervising admins are not invite-only, they can create an account, and use
+> this by inviting their case load participants. The business owners / program
+> managers are both by invite, or by creating an account themselves."
 
-**This contradicts SOP §10 step 6: "Role is set by invite type and never
-self-selected."** That rule is not decoration — it is the thing that stops a
-stranger signing up as a supervising admin and watching returning citizens.
-CLAUDE.md lists it among the rules enforced by tests rather than convention.
+**This reverses SOP §10 step 6: "Role is set by invite type and never
+self-selected."** Will was asked directly and confirmed directly. Recorded here
+so that the next person to read §10 knows the rule is gone rather than being
+quietly broken.
 
-The request and the rule can both be satisfied, because they are about different
-roles:
+Who can create their own account, as decided:
 
-- **Safe to self-select: member, and program admin.** A member choosing "I am
-  coming home" gains nothing they could not get from an invite. A program admin
-  who self-registers can list a program and see nothing about any member until
-  an enrolment exists — and their organisation badge stays unverified until a
-  human verifies it (§6.4), so a self-registered organisation cannot pass itself
-  off as vouched-for.
-- **Never self-selectable: supervising admin.** It comes from an invite issued
-  by a super admin, because it is the role that can watch people.
-- **Never listed at all: super admin.** Will's own instruction, and correct.
+| Role | Invite | Self sign-up |
+|---|---|---|
+| member | yes, from their supervising admin | — |
+| program admin | yes | **yes** |
+| supervising admin | — | **yes** |
+| super admin | never | never — created from inside the super admin screen |
 
-**Status: not built. Needs Will's explicit confirmation**, because if he means
-the supervising admin pill too, that is a deliberate decision to let anyone
-claim oversight of returning citizens, and it should be made in writing rather
-than inferred from a sentence.
+### What follows from it, and is not optional
+
+The concern was that a self-declared supervising admin could watch returning
+citizens. Two properties of the existing design already contain most of it, and
+they now have to be *kept* rather than merely being true by accident:
+
+1. **A supervising admin sees nobody until somebody redeems their invite.** The
+   caseload comes from `admin_assignments`, which is written at redemption and
+   points at the admin who issued the code. A fresh self-registered account sees
+   an empty list. It cannot browse, search, or reach a member it did not invite —
+   that is a rule in the database, not a screen behaviour.
+2. **The member is told who invited them, by name, before they accept.** The
+   §4.1 transparency screen is shown at redemption and names the person and what
+   they will be able to see. Somebody who does not recognise the name can stop
+   there.
+
+One thing that must be **added**, by the same logic that already governs
+organisations (§6.4):
+
+3. **A self-registered supervising admin is unverified until a super admin
+   verifies them**, and a member redeeming their invite is shown that. An
+   invited admin — invited by someone already verified — is verified on arrival.
+   This costs a self-registering officer nothing except a badge, and it is the
+   difference between "somebody says they are a case manager" and "PAM says so".
+
+Without (3) the model is: anybody can register as a supervising admin, invite a
+person by phone number, and on redemption see that person's programmes, visits,
+points and activity. With (3) they still can — but the person deciding whether
+to redeem can see that nobody has vouched for them.
+
+**Status: decided, not built.** Needs the sign-up screens, an `is_verified`
+concept on admin profiles, and the redemption screen to show it.
 
 ## A3 — What "view the full database" means (12 September 2026, Will)
 
