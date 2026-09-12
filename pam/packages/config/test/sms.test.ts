@@ -5,6 +5,8 @@ import {
   renderSms,
   assertSmsIsSafe,
   UnreviewedTemplateError,
+  isGsm7,
+  nonGsm7Characters,
   SmsContentError,
   unreviewedTemplateKeys,
   shortenToFit,
@@ -141,5 +143,33 @@ describe('long real-world values', () => {
 
   it('leaves a short value untouched', () => {
     expect(shortenToFit('123 Main St', 34)).toBe('123 Main St');
+  });
+});
+
+describe('every message fits the cheap encoding', () => {
+  // One character outside GSM-7 halves the limit from 160 to 70 and splits one
+  // message into two — a doubled bill on every reminder. The Spanish copy is
+  // written without accents for this reason, and this is what keeps it that way
+  // when somebody helpfully "corrects" it.
+  it.each(Object.values(SMS_TEMPLATES))('$key stays in GSM-7', (template) => {
+    expect(nonGsm7Characters(template.en)).toEqual([]);
+    expect(nonGsm7Characters(template.es)).toEqual([]);
+  });
+
+  it('allows the characters that are free, and only those', () => {
+    // ñ is in the basic set, so "mañana" is spelled correctly at no cost.
+    expect(isGsm7('mañana')).toBe(true);
+    // These are not, and would double the cost of the message carrying them.
+    expect(nonGsm7Characters('código')).toEqual(['ó']);
+    expect(nonGsm7Characters('página')).toEqual(['á']);
+    expect(isGsm7('sí')).toBe(false);
+  });
+
+  it('keeps the reply words the parser listens for', () => {
+    // Will's call: the Spanish check-in keeps YES and NO, because those are the
+    // words the reply parser matches. Changing the copy without changing the
+    // parser would silently drop every Spanish reply.
+    expect(SMS_TEMPLATES.attendance_check.es).toContain('YES');
+    expect(SMS_TEMPLATES.attendance_check.es).toContain('NO');
   });
 });

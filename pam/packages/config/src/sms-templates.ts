@@ -144,10 +144,21 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
     reviewedBy: '',
     isFirstContact: false,
   },
+  /**
+   * The Spanish copy is written without accents so it stays inside GSM-7, the
+   * cheap SMS encoding: one accented character outside that set switches the
+   * whole message to UCS-2 and halves the limit from 160 to 70, splitting one
+   * message into two.
+   *
+   * `ñ` is the exception — it IS in the GSM-7 basic set, so it costs nothing,
+   * and "manana" without it is not a word. Reviewed with Will: keep the English
+   * YES/NO the reply parser listens for, keep the rest accent-free, take the
+   * free fix.
+   */
   appointment_24h: {
     key: 'appointment_24h',
     en: 'PAM: You have a visit tomorrow at {time}. {address}. Tap for directions: {link}',
-    es: 'PAM: Tiene una visita manana a las {time}. {address}. Toque para llegar: {link}',
+    es: 'PAM: Tiene una visita mañana a las {time}. {address}. Toque para llegar: {link}',
     vars: ['time', 'address', 'link'],
     maxVarLengths: { address: 34 },
     reviewedBy: '',
@@ -292,6 +303,38 @@ export function shortenToFit(value: string, max: number): string {
 }
 
 /** Emoji, pictographs and dingbats — §9 forbids all of them in SMS. */
+/**
+ * The characters GSM-7 can carry — the cheap SMS encoding.
+ *
+ * One character outside this set switches the whole message to UCS-2, which
+ * halves the limit from 160 to 70 and splits one message into two. That is a
+ * doubled bill on every reminder, and on a pilot budget it is the difference
+ * between reminding everybody and reminding half of them.
+ *
+ * This is why the Spanish copy is written without accents. It is also why `ñ`
+ * is allowed to stay: it is in this set, so "mañana" is spelled correctly at no
+ * cost. Anything added to the Spanish copy has to pass this check.
+ */
+const GSM7_CHARS = new Set(
+  (
+    '@£$¥èéùìòÇ\nØø\rÅåΔ_ΦΓΛΩΠΨΣΘΞÆæßÉ !"#¤%&\'()*+,-./0123456789:;<=>?' +
+    '¡ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÑÜ§¿abcdefghijklmnopqrstuvwxyzäöñüà' +
+    // The extension table. These cost two characters each rather than one, so
+    // they are legal but not free.
+    '^{}\\[~]|€'
+  ).split(''),
+);
+
+/** Every character in `text` fits the cheap encoding. */
+export function isGsm7(text: string): boolean {
+  return [...text].every((c) => GSM7_CHARS.has(c));
+}
+
+/** The characters in `text` that would force the expensive encoding. */
+export function nonGsm7Characters(text: string): string[] {
+  return [...new Set([...text].filter((c) => !GSM7_CHARS.has(c)))];
+}
+
 const EMOJI_PATTERN =
   /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE00}-\u{FE0F}\u{1F000}-\u{1F2FF}]/u;
 
