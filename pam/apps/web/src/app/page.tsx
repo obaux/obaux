@@ -153,7 +153,7 @@ export default function Page() {
             firstName="Nia"
             roleLine="I can help you get your GED."
             sharedTags={[t('category.sub.ged_high_school'), t('category.sub.computer_skills')]}
-            orgBadgeLabel="Riverside Learning Center"
+            orgBadgeLabel="Example Learning Center"
             messageLabel={t('action.sendMessage')}
           />
         </VStack>
