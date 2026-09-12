@@ -107,8 +107,12 @@ oversight:
   no enrollment, no chat. The web route is a component gallery that proves the
   stack renders, not a product.
 - **No five-tab member shell.** `AppShell` + `TabList` is the first UI task of
-  Phase 1.
-- **No importer.** The sources are registered; nothing fetches them.
+  Phase 1. The layout question is settled: Help merges into the bottom dock
+  above the tabs, not a sixth tab and not a second fixed bar (D-029).
+- **No importer.** Two Philadelphia sources are verified and active — City
+  Facilities (3,197 features) and DBHIDS provider locations — but nothing fetches
+  them yet. Endpoints were confirmed by request through `pg_net` from the
+  database, since the build sandbox blocks all external egress (D-030).
 - **No SMS is sendable.** Every template ships `reviewedBy: ''` and `renderSms`
   throws on an unreviewed one. This is a gate, not a gap — a human has to read
   the copy against §9 first.
@@ -155,7 +159,7 @@ always the boundary; the grant never was.*
 |---|---|---|---|
 | 1 | **Create the first admin** | Everything | No admin means no invite means no users. One command, needs the service role key. |
 | 2 | **Review the SMS copy** and record a name in `reviewedBy` | Phase 2 | Nothing can text a member until someone signs off against §9. |
-| 3 | **Resolve the Philadelphia endpoints** | Phase 1 importer | Four sources registered, all inactive. This environment cannot reach those hosts, so none could be verified. PA 211's licence is now cleared; its endpoint is not. |
+| 3 | **Get the PA 211 export URL** from the 211 contact | 211 data only | Licence cleared and the host reachable, but it serves a consumer search UI rather than a feed. Philadelphia's own datasets are verified and active. |
 | 4 | Brand colours and logo | Phase 6 | Category pins use Astryx palette defaults chosen for hue separation at AAA contrast. |
 | 5 | Whether points redeem for real rewards | Phase 3 | Built behind a flag, shipped off. |
 | 6 | Retention: missed-appointment history beyond 90 days | Phase 5 | No purge job. Keeping this data indefinitely is the wrong default for this population. |

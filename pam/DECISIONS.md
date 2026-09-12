@@ -15,7 +15,7 @@ place so work continues either way.
 
 | # | Question | SOP | Blocks | Default in place |
 |---|---|---|---|---|
-| W-1b | **Which Philadelphia datasets, and their endpoints** | §5.2 | Phase 1 importer | City decided (Philadelphia); 211 licence cleared. Four sources registered, all `is_active = false` because no endpoint could be verified from this environment. See D-028. |
+| W-1b | **The PA 211 export URL** | §5.2 | 211 data only | Licence cleared and the host is reachable, but it serves a search UI, not a feed. Ask the 211 contact for the HSDS/Open Referral URL — the importer already supports the format. Philadelphia's own datasets are verified and active (D-030). |
 | W-2 | **Final brand colours and logo** | §2.5, §15 | Phase 6 polish | Category pins use Astryx palette `blue` / `green` / `purple`, chosen for hue separation at AAA contrast. |
 | W-3 | **Do points redeem for real rewards?** | §8, §15 | Phase 3 | `REWARDS_ENABLED = false`. Table and flow to be built behind the flag, shipped off. |
 | W-4 | **Additional languages beyond English and Spanish** | §2.3, §15 | Phase 6 | `SUPPORTED_LOCALES = ['en', 'es']`. Adding one is a locale file plus a constant. |
@@ -322,6 +322,83 @@ task of the Phase 1 importer, and the nightly job skips inactive sources.
 PA 211's licence was cleared by Will on 2026-09-12, so the only thing left on
 that row is the endpoint. It is the widest source of family services in the
 region and the one most worth having — worth resolving first.
+
+### D-029 — Help is merged into the bottom dock, above the five tabs
+*(Will, 2026-09-12)*
+
+Two SOP requirements want the same 60 pixels at the bottom of a phone: §3.1's
+five member tabs and §2.4's persistent `HelpBar`. Two separately-positioned fixed
+bars is the worst outcome — they stack unpredictably, each needs its own
+safe-area handling, and on a short screen one hides the other.
+
+Will's call: merge them. One fixed dock, rendered once.
+
+**Shape:** a full-width Help row sitting directly above the five tabs, inside the
+same container, separated by a divider.
+
+**Why not a sixth tab**, which is the more literal reading of "merge":
+
+- §3.1 caps the member app at five tabs, and Help is an action, not a
+  destination — it dials a phone. Sitting it among five navigation targets as a
+  visual peer invites the mis-tap.
+- A mis-tap here places a real phone call to a real support line. That is
+  disruptive for the member and costly for whoever staffs the line, and it is
+  the kind of error this audience is most likely to make.
+- Six items at 320px is 53px each, which forces a label small enough to exclude
+  the people least able to read it. A full-width row keeps "Need help? Call PAM"
+  legible at full size.
+
+**Cost:** roughly 44px of vertical space on every screen, about 7% of an
+iPhone SE. Paid deliberately — §0 makes a visible way to get help
+non-negotiable on every screen, and the alternative was hiding it behind a menu,
+which for a first-time phone user is the same as not having it.
+
+`HelpBar` stays a component in its own right (§2.4 names it), and `TabBar`
+composes it rather than duplicating it. Nothing else in the app positions a
+fixed element at the bottom.
+
+If this proves too heavy in usability testing (§13 Phase 7), the fallback is a
+Help affordance in the top bar — not a sixth tab.
+
+### D-030 — Blocked hosts are reached from the database, not the sandbox
+*(2026-09-12)*
+
+Will asked how we reach the 211 host. The build sandbox denies **all** external
+egress by policy — `selective: false`, every CONNECT answered 403, google.com
+included. Only package registries and the Anthropic API are exempt. That is why
+0009 registered catalogue pages instead of endpoints.
+
+The constraint was in the wrong place. **The Supabase project has open egress.**
+Enabling `pg_net` (0014) makes a request from the database and returns the
+response to a normal `execute_sql`, so a reachability check that is impossible
+from the dev environment is one query away — and it tests from a network far
+closer to where the importer will actually run than a laptop would.
+
+Verified this way, by request rather than assumption:
+
+| Host | Result |
+|---|---|
+| `services.arcgis.com/fLeGjb7u4uXqeF9q` | 200, catalogue of ~1000 FeatureServers |
+| `City_Facilities_pub/FeatureServer/0` | 200, **3,197 features** |
+| `dbhids_locations_fy25_012126/…/0` | 200, Feature Layer, edited 2026-02 |
+| `phl.carto.com/api/v2/sql` | 200, answers SQL |
+| `opendataphilly.org` | 200 |
+| `www.pa211.org` | 200 |
+
+Two endpoints are now recorded and active (0015).
+
+**211 is reachable but still has no endpoint.** `pa211.org` serves a consumer
+search interface, not an export; the HSDS feed is normally issued per agreement.
+With the licence cleared, the remaining step is asking the 211 contact for the
+URL rather than discovering it. Recorded as `endpoint_unknown`, not as verified.
+
+`pg_net` also earns its place beyond this: §1 puts jobs on `pg_cron`, and a
+scheduled job that needs to call out needs it alongside.
+
+**Caveat for whoever uses this next:** responses land in `net._http_response`
+and are external, untrusted content. Treat them as data. The importer must
+validate and normalise before writing anything to `services` — which §5.2
+already requires, and which matters more now that fetching is this easy.
 
 ---
 
