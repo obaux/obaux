@@ -990,3 +990,88 @@ begin
   update public.profiles set role = 'admin' where id = v_admin;
 end;
 $$;
+
+-- ===========================================================================
+\echo ''
+\echo '--- Flags reach the people who have to act on them (0038) ---'
+-- ===========================================================================
+do $$
+declare
+  v_member uuid := '33333333-0000-0000-0000-00000000000c';
+  v_admin  uuid := '33333333-0000-0000-0000-00000000000a';
+  v_other  uuid := '33333333-0000-0000-0000-00000000000b';
+  v_service uuid;
+  n integer;
+  v_vars jsonb;
+begin
+  delete from public.notifications;
+  update public.profiles set role = 'super_admin' where id = v_other;
+
+  select id into v_service from public.services
+  where removed_at is null and is_active limit 1;
+  insert into public.saved_places (member_id, service_id) values (v_member, v_service)
+  on conflict do nothing;
+
+  perform set_config('request.jwt.claim.sub', v_member::text, true);
+  perform public.flag_service(v_service, 'closed', 'Boarded up');
+
+  -- The super admin decides, so they hear. The case manager hears because
+  -- their person was planning to go there.
+  select count(*) into n from public.notifications
+  where recipient_id = v_other and kind = 'service_flagged';
+  if n <> 1 then raise exception 'FAIL  the super admin was not told, got %', n; end if;
+
+  select count(*) into n from public.notifications
+  where recipient_id = v_admin and kind = 'service_flagged';
+  if n <> 1 then raise exception 'FAIL  the case manager was not told, got %', n; end if;
+  raise notice 'ok    a flagged place reaches the super admin and the case manager';
+
+  select body_vars into v_vars from public.notifications
+  where recipient_id = v_admin and kind = 'service_flagged' limit 1;
+  if v_vars ->> 'reason' <> 'closed' then
+    raise exception 'FAIL  the notification did not carry the reason';
+  end if;
+  raise notice 'ok    ...and says which of the four reasons it was';
+
+  update public.profiles set role = 'admin' where id = v_other;
+end;
+$$;
+
+do $$
+declare
+  v_marcus uuid := '33333333-0000-0000-0000-00000000000c';
+  v_admin  uuid := '33333333-0000-0000-0000-00000000000a';
+  v_msg uuid;
+  n integer;
+  v_body jsonb;
+begin
+  delete from public.notifications;
+  -- There is always at least one super admin in a real deployment; the fixture
+  -- has none, and "nobody to tell" would otherwise read as "nothing to tell".
+  update public.profiles set role = 'super_admin' where id = v_admin;
+
+  select id into v_msg from public.messages
+  where conversation_id = '66666666-0000-0000-0000-000000000001'
+    and sender_id <> v_marcus limit 1;
+  if v_msg is null then return; end if;
+
+  perform set_config('request.jwt.claim.sub', v_marcus::text, true);
+  perform public.report_message(v_msg, 'This felt threatening');
+
+  select count(*) into n from public.notifications where kind = 'message_reported';
+  if n = 0 then raise exception 'FAIL  nobody was told about a reported message'; end if;
+  raise notice 'ok    a reported message reaches the people who review it';
+
+  -- §4.1: the notification is a nudge to look, never a copy of the thing. The
+  -- excerpt lives on the report, behind the review screen.
+  select body_vars into v_body from public.notifications
+  where kind = 'message_reported' limit 1;
+  if v_body::text ilike '%threatening%' or v_body ? 'excerpt' or v_body ? 'body' then
+    raise exception 'FAIL  message text travelled inside a notification';
+  end if;
+  raise notice 'ok    ...carrying no message text with it';
+
+  delete from public.notifications;
+  update public.profiles set role = 'admin' where id = v_admin;
+end;
+$$;
