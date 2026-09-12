@@ -8,8 +8,9 @@ import { Card } from '@astryxdesign/core/Card';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { Badge } from '@astryxdesign/core/Badge';
+import { Avatar } from '@astryxdesign/core/Avatar';
 import { Button } from '@astryxdesign/core/Button';
-import { BigButton, Notice } from '@pam/ui';
+import { AppHeader, BigButton, Notice } from '@pam/ui';
 import { NOTICES } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { useSupportPhone } from '@/lib/useSupportPhone';
@@ -84,9 +85,12 @@ export default function AdminPage() {
   if (session.status === 'loading') {
     return (
       <main {...stylex.props(styles.page)}>
-        <Text type="supporting" xstyle={styles.region}>
-          {t('places.loading')}
-        </Text>
+        <VStack gap={3}>
+          <AppHeader />
+          <Text type="supporting" xstyle={styles.region}>
+            {t('places.loading')}
+          </Text>
+        </VStack>
       </main>
     );
   }
@@ -95,6 +99,7 @@ export default function AdminPage() {
     return (
       <main {...stylex.props(styles.page)}>
         <VStack gap={4}>
+          <AppHeader />
           <Notice
             notice="service_not_available"
             title={t('admin.signedOut.title')}
@@ -112,13 +117,16 @@ export default function AdminPage() {
     const key = session.offline ? 'offline' : 'something_went_wrong';
     return (
       <main {...stylex.props(styles.page)}>
-        <Notice
-          notice={key}
-          title={t(NOTICES[key].titleKey)}
-          body={t(NOTICES[key].bodyKey)}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
-        />
+        <VStack gap={4}>
+          <AppHeader />
+          <Notice
+            notice={key}
+            title={t(NOTICES[key].titleKey)}
+            body={t(NOTICES[key].bodyKey)}
+            supportPhone={supportPhone}
+            callLabel={t('help.callSupport')}
+          />
+        </VStack>
       </main>
     );
   }
@@ -129,6 +137,7 @@ export default function AdminPage() {
     return (
       <main {...stylex.props(styles.page)}>
         <VStack gap={4}>
+          <AppHeader roleLabel={t(`role.${session.session.role}`)} />
           <Notice
             notice="service_not_available"
             title={t('admin.notAdmin.title')}
@@ -147,6 +156,7 @@ export default function AdminPage() {
   return (
     <main {...stylex.props(styles.page)}>
       <VStack gap={4}>
+        <AppHeader roleLabel={t('role.admin')} roleTone="info" />
         <VStack gap={1}>
           <Heading level={1} xstyle={styles.title}>
             {t('admin.title')}
@@ -251,9 +261,22 @@ export default function AdminPage() {
               return (
                 <Card key={member.id} xstyle={styles.card}>
                   <VStack gap={2}>
-                    <Heading level={3} xstyle={styles.name}>
-                      {member.firstName ?? '—'}
-                    </Heading>
+                    {/*
+                      A face, or the initial standing in for one. Astryx draws
+                      the fallback from the name, so the list reads as people
+                      rather than rows before anybody has uploaded a photo.
+
+                      No `src`: a member's photo is not on the §4.1 list of what
+                      an admin may see, and fetching it here would widen the
+                      contract by a column. The initial is PAM's own rendering
+                      of a name the admin is already entitled to.
+                    */}
+                    <HStack gap={3} align="center">
+                      <Avatar size="lg" name={member.firstName ?? '?'} />
+                      <Heading level={3} xstyle={styles.name}>
+                        {member.firstName ?? '—'}
+                      </Heading>
+                    </HStack>
                     <HStack gap={2} wrap="wrap" align="center">
                       {member.accessStatus !== 'active' ? (
                         <Badge

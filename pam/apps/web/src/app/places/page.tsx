@@ -6,7 +6,7 @@ import { HStack } from '@astryxdesign/core/HStack';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { Button } from '@astryxdesign/core/Button';
-import { Notice, PlaceCard } from '@pam/ui';
+import { AppHeader, Notice, PlaceCard } from '@pam/ui';
 import {
   CATEGORY_DEFINITIONS,
   CATEGORY_LIST,
@@ -85,6 +85,7 @@ export default function PlacesPage() {
   return (
     <main {...stylex.props(styles.page)}>
       <VStack gap={4}>
+        <AppHeader />
         <VStack gap={1}>
           <Heading level={1} xstyle={styles.title}>
             {t('places.title')}

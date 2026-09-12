@@ -100,6 +100,12 @@ test.describe('the case manager screen', () => {
     await expect(page.getByRole('heading', { name: 'Tanya' })).toBeVisible();
     await expect(page.getByText('Some things turned off')).toBeVisible();
     await expect(page.getByText('Has not opened PAM yet')).toBeVisible();
+
+    // An avatar per person, so the caseload reads as people rather than rows.
+    // No photo is fetched: a member's picture is not on the §4.1 list, so the
+    // initial stands in — PAM's own rendering of a name the admin already has.
+    await expect(page.getByRole('img', { name: 'Marcus' })).toBeVisible();
+    await expect(page.getByRole('img', { name: 'Tanya' })).toBeVisible();
   });
 
   test('an empty caseload explains itself', async ({ page }) => {

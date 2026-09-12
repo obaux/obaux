@@ -1,6 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { PlaceCard, googlePlaceHref, directionsHref } from '../src/PlaceCard.js';
+import { AppHeader } from '../src/AppHeader.js';
 import { PointsBadge } from '../src/PointsBadge.js';
 import { HelpBar } from '../src/HelpBar.js';
 import { VoiceInput } from '../src/VoiceInput.js';
@@ -270,5 +271,27 @@ describe('Google lookup uses the organisation name, not the tidied one', () => {
     );
     expect(screen.getByRole('link', { name: 'Hours' }).getAttribute('href'))
       .toContain(encodeURIComponent('Bethesda Project, 609 S 15th St'));
+  });
+});
+
+describe('the header says which app you are in', () => {
+  // PAM is one codebase serving a member, a programme's staff and an officer,
+  // from the same components. The similarity is the point and the risk: the
+  // chip is what answers "whose screen is this" when two are open at once.
+  it('shows the wordmark on its own for the member app', () => {
+    render(<AppHeader />);
+    expect(screen.getByText('PAM')).toBeInTheDocument();
+    expect(screen.queryByText('Case manager')).not.toBeInTheDocument();
+  });
+
+  it('names the role when there is one', () => {
+    render(<AppHeader roleLabel="Case manager" roleTone="info" />);
+    expect(screen.getByText('PAM')).toBeInTheDocument();
+    expect(screen.getByText('Case manager')).toBeInTheDocument();
+  });
+
+  it('is a banner landmark, so a screen reader can skip it', () => {
+    render(<AppHeader roleLabel="Case manager" />);
+    expect(screen.getByRole('banner')).toBeInTheDocument();
   });
 });
