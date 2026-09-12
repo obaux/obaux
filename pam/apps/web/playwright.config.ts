@@ -39,6 +39,23 @@ export default defineConfig({
       },
     },
     {
+      /*
+       * Dark mode, at the same narrow width.
+       *
+       * Every check ran in the default light scheme until PAM shipped a page
+       * that was illegible in dark: the theme's colours are `light-dark()`
+       * pairs, so text went near-white while the page stayed on the browser's
+       * white canvas. Nothing caught it, because nothing looked.
+       */
+      name: 'dark-320',
+      use: {
+        ...devices['Desktop Chrome'],
+        viewport: { width: 320, height: 640 },
+        colorScheme: 'dark',
+        launchOptions: launch,
+      },
+    },
+    {
       // iPhone SE viewport on Chromium rather than WebKit: CI images commonly
       // ship Chromium only, and what these tests measure — contrast, target
       // size, overflow at a narrow width — does not depend on the engine.

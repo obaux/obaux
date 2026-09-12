@@ -630,6 +630,48 @@ The Points section was captioned "PointsBadge · respects prefers-reduced-motion
 Removed at Will's request. Honouring reduced motion is a requirement (§8, §12)
 enforced by a unit test, not a feature to advertise on the screen.
 
+### D-041 — PAM was illegible in dark mode, and every test passed
+*(Will, 2026-09-12)*
+
+Will opened a review build and said the text and background lacked contrast. He
+was right, and it was a real bug in the app rather than the review vehicle.
+
+Astryx's reset deliberately leaves the body background and colour to the
+application, and nothing set them. That is invisible in light mode and breaks
+dark mode outright: the theme's colours are `light-dark()` pairs, so in dark
+mode the text resolved to near-white while the page stayed on the browser's
+default white canvas. Secondary text measured **2.67:1** against 4.5:1 required.
+
+theme-neutral ships the right token — `--color-background-body`,
+`light-dark(#f1f1f1, #1b1b1b)`. It simply had to be used.
+
+**Why nothing caught it.** Every accessibility check ran in the default colour
+scheme, which is light. axe has a colour-contrast rule and it passed, because in
+light mode the page genuinely is fine. The suite now runs a third project,
+`dark-320`, at the same narrow width with `colorScheme: 'dark'`, and two tests
+assert the body paints an explicit background rather than compositing against
+whatever the browser decides.
+
+The general lesson, which is worth more than the fix: **a passing accessibility
+suite only covers the conditions it runs under.** §2.2 asks for light and dark
+from the start; the tests only ever saw one of them.
+
+### D-042 — The review build is static, and that was the right trade
+The published review is the real export — real theme, real components, real copy
+— with the React hydration bundle stripped. Next hydrates the whole document,
+and inside an artifact's own `<head>`/`<body>` wrapper that mismatch makes React
+clear the DOM to blank.
+
+Re-hydrating inside an artifact is possible but means fighting Next's
+document-level hydration and its root-relative asset paths. The right vehicle
+for a genuinely interactive URL is an ordinary static host; GitHub Pages for this
+repository is already taken by the garage sale, so that is a Vercel or Netlify
+decision when it is wanted.
+
+What the static build costs is interaction — the points counter, the save
+toggle. What it kept is everything a visual review is for, and it earned its
+place immediately: it is how D-041 was found.
+
 ---
 
 ## Notes for whoever picks this up next

@@ -201,3 +201,35 @@ test.describe('the help path does not depend on JavaScript', () => {
     expect(results.violations).toEqual([]);
   });
 });
+
+/**
+ * The page paints its own background.
+ *
+ * Astryx's reset leaves the body background and colour to the app. Left unset,
+ * light mode looks fine and dark mode breaks: the theme's colours are
+ * `light-dark()` pairs, so text resolves near-white while the page sits on the
+ * browser's default white canvas. Secondary text measured 2.67:1.
+ */
+test.describe('theme colours', () => {
+  test('body has an explicit background from the theme, not a transparent default', async ({ page }) => {
+    await page.goto('/');
+    await page.waitForLoadState('networkidle');
+
+    const { bg, color } = await page.evaluate(() => ({
+      bg: getComputedStyle(document.body).backgroundColor,
+      color: getComputedStyle(document.body).color,
+    }));
+
+    // A transparent body is the bug: it means the page composites against
+    // whatever the browser decides, which is not the theme.
+    expect(bg, 'body background is transparent').not.toMatch(/rgba\(0, 0, 0, 0\)|transparent/);
+    expect(color).not.toBe('');
+  });
+
+  test('the help screen paints its background too', async ({ page }) => {
+    await page.goto('/help/');
+    await page.waitForLoadState('networkidle');
+    const bg = await page.evaluate(() => getComputedStyle(document.body).backgroundColor);
+    expect(bg).not.toMatch(/rgba\(0, 0, 0, 0\)|transparent/);
+  });
+});

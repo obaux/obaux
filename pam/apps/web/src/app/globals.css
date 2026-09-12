@@ -81,6 +81,20 @@
      * component (an error boundary, a third-party embed) still renders in the
      * theme face instead of browser-default serif.
      */
+    /*
+     * The page background and text colour.
+     *
+     * Astryx's reset deliberately leaves both to the app, and until now nothing
+     * set them. That is invisible in light mode and breaks dark mode outright:
+     * the theme's colours are `light-dark()` pairs, so in dark mode the text
+     * resolved to near-white while the page stayed on the browser's default
+     * white canvas. Secondary text came out at 2.67:1 — PAM was illegible in
+     * dark mode, and the a11y suite never saw it because it only ran light.
+     *
+     * theme-neutral ships the right token for this; it just had to be used.
+     */
+    background-color: var(--color-background-body);
+    color: var(--color-text-primary);
     font-family: var(--font-family-body);
     font-size: var(--pam-body-size);
     line-height: 1.55;
