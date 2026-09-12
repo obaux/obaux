@@ -37,9 +37,13 @@ going — without help?*
 Philadelphia). Thirty migrations applied. The database is real and reachable;
 the app is not deployed anywhere yet.
 
-There is **no admin account**, which means no invite can be issued and nobody can
-sign up. That is the single thing standing between the current state and a
-usable pilot:
+**The first admin exists** — Will, Philadelphia, created 12 September and proven
+by generating a live invite code (`9T3YTVMT`, valid 30 days). Invites can now be
+issued. What is still missing is a way to *log in*: PAM is phone-sign-in only and
+Supabase sends that code through an SMS provider that has not been configured, so
+nobody can complete a sign-in yet.
+
+To create further admins from a machine with the service role key:
 
 ```bash
 SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... \
@@ -166,7 +170,7 @@ always the boundary; the grant never was.*
 
 | # | Needs | Blocks | Note |
 |---|---|---|---|
-| 1 | **Create the first admin** | Everything | No admin means no invite means no users. One command, needs the service role key. |
+| 1 | ~~Create the first admin~~ **Done** | — | Will, Philadelphia, created 12 Sept and verified by generating a live invite code. Sign-in still needs an SMS provider configured in Supabase — see row 9. |
 | 2 | **Review the SMS copy** and record a name in `reviewedBy` | Phase 2 | Nothing can text a member until someone signs off against §9. **A review sheet is prepared and waiting**: all twelve messages rendered as lock-screen notifications in both languages, with the two open questions — https://claude.ai/code/artifact/f1dfb8d4-f64d-47c4-97d3-6a67f4c0eb09 |
 | 3 | **Get the PA 211 export URL** from the 211 contact | 211 data only | Licence cleared and the host reachable, but it serves a consumer search UI rather than a feed. Philadelphia's own datasets are verified and active. |
 | 4 | **A Google Places API key** | Hours and phone on imported places | `place_id` is null on all 525 imported providers, so the Hours action is a Google *search*, not a direct listing. A key would give phone numbers and structured hours — and until PAM has hours it will not show an open/closed state at all (D-044). |
@@ -174,6 +178,7 @@ always the boundary; the grant never was.*
 | 6 | Whether points redeem for real rewards | Phase 3 | Built behind a flag, shipped off. |
 | 7 | Retention: missed-appointment history beyond 90 days | Phase 5 | No purge job. Keeping this data indefinitely is the wrong default for this population. |
 | 8 | Pilot partner orgs and usability test scheduling | Phase 7 | Five members, three providers, two admins. |
+| 9 | **An SMS provider in Supabase** | Anyone signing in | PAM is phone-sign-in only, and Supabase sends that code through its own SMS provider, configured in the dashboard. Until it is set, the admin account exists but nobody can log in. |
 
 ---
 
