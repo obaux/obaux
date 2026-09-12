@@ -105,6 +105,29 @@ select cron.unschedule('dispatch-sms');
 The first two are ten minutes and unblock the whole product. The last two can
 follow.
 
+### If sign-in answers "Database error finding user"
+
+Seen on 12 September, on the very first real sign-in attempt. It is not the
+phone provider and not the code: an account created through the admin API can
+end up with empty-but-NULL columns that the auth service reads as text, and it
+fails looking the person up before it ever reaches Twilio. One-off repair, safe
+to re-run:
+
+```sql
+update auth.users set
+  confirmation_token         = coalesce(confirmation_token, ''),
+  recovery_token             = coalesce(recovery_token, ''),
+  email_change               = coalesce(email_change, ''),
+  email_change_token_new     = coalesce(email_change_token_new, ''),
+  email_change_token_current = coalesce(email_change_token_current, ''),
+  phone_change               = coalesce(phone_change, ''),
+  phone_change_token         = coalesce(phone_change_token, ''),
+  reauthentication_token     = coalesce(reauthentication_token, '');
+```
+
+Worth re-running after seeding any new admin, until we confirm it has stopped
+happening.
+
 ### Checked on 12 September 2026
 
 Sign-in is still not possible. Asking the live project for a sign-in code
