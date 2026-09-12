@@ -1009,6 +1009,70 @@ change in two places at once — and `SÍ` is outside GSM-7, so it also costs.
 Will's call: keep YES/NO for the pilot. A test asserts the copy and the parser
 agree, so they cannot drift apart silently.
 
+### D-065 — The case manager screen does two things, and the invite code is the product
+`/admin` shows a caseload and makes an invite. Everything else an admin can do —
+turning a feature off, pausing an account, making an introduction — hangs off a
+single member, and belongs on a member's own screen rather than as controls
+scattered across a list.
+
+The invite code is set at 40px, which a test asserts. It is read down a phone
+line or written on a card; that is also why its alphabet drops 0/O, 1/I/L, 2/Z,
+5/S and 8/B. "Legible across a room" is the requirement, and a stylesheet edit
+could quietly undo it.
+
+The §4.1 transparency contract is on this page, in the same words members agree
+to at onboarding. A promise only the person taking it on faith can see is a
+weaker promise. A test reads the member cards for the two things §4.1 forbids,
+which is what would catch a careless `select('*')`.
+
+### D-066 — Plain supabase-js, not the SSR client
+The app was built on `@supabase/ssr`'s browser client, which keeps the session
+in a cookie so a server can read it. PAM has no server: it is a static export,
+wrapped by Capacitor into an app served from a local file scheme where cookie
+behaviour is a coin toss.
+
+A session that quietly fails to persist signs somebody out mid-enrolment, which
+is the exact failure §12's 90-day rule exists to prevent. `supabase-js` with
+localStorage is the store that works in a browser and in the shell.
+
+It surfaced from the test side: a browser test could not seed a session at all,
+because the client was looking somewhere the test had not thought to put one.
+That is worth remembering — the awkward test was describing a real defect.
+
+### D-067 — Amendments to the SOP are recorded, not absorbed
+The build SOP came as a document rather than a file, so there was nowhere to
+write a change to it down. `docs/sop-amendments.md` is that place, and it exists
+because the SOP's rules are load-bearing: several are enforced by tests, and a
+new requirement that quietly reverses one is how a safety property disappears
+without anybody deciding to remove it.
+
+Each amendment names the section it touches and says whether it **contradicts**
+the original. Two of the first four do.
+
+### D-068 — Two of the new admin requirements are not built, deliberately
+Will asked for four things: a super admin role, role pills at sign-up, a full
+database view, and program admin chat. Two are straightforward and two are not.
+
+**Role pills at sign-up contradict §10 step 6** — "role is set by invite type and
+never self-selected" — which is the rule that stops a stranger signing up as a
+parole officer and watching returning citizens. Member and program admin are
+safe to self-select; supervising admin is not, and super admin is not listed at
+all (Will's own instruction). Built as proposed in A2, this works. Built
+literally, it does not. It needs his confirmation in writing rather than my
+inference from a sentence.
+
+**"View the full database" is in tension with the transparency contract.** PAM
+tells members, in the app, that the person who invited them cannot read their
+messages or their buddy posts. A super admin with unrestricted access can. The
+recommendation is a super admin who sees everything except those two things,
+enforced in the database — the promise stays literally true and nothing
+operational is lost. The alternative is full access with the transparency screen
+rewritten to say so, before it ships. What is not an option is full access with
+the screen unchanged.
+
+Neither is a refusal. Both are decisions whose cost lands on people with very
+little margin, and they should be made on purpose.
+
 ---
 
 ## Notes for whoever picks this up next

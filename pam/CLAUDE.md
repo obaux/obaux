@@ -21,6 +21,9 @@ help?**
    session changed, what it got wrong, and what it left half-done.
 3. **`DECISIONS.md`** — only the entries relevant to what you are about to
    touch. It is long by design; do not read it end to end every time.
+4. **`docs/sop-amendments.md`** — changes to the build SOP since it was handed
+   over, including the ones that contradict it. Read this before trusting a rule
+   you remember from the SOP itself.
 
 Do not re-derive state by reading source files when `STATUS.md` already answers
 the question. Do not repeat a decision that `DECISIONS.md` already settled — if
