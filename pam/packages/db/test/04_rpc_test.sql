@@ -217,7 +217,7 @@ do $$
 begin
   begin
     perform public.admin_set_feature_access(
-      '33333333-0000-0000-0000-00000000000c', 'chat', false, '   ');
+      '33333333-0000-0000-0000-00000000000c', 'map', false, '   ');
     raise exception 'FAIL  a blank reason was accepted';
   exception when others then
     if sqlerrm like 'FAIL%' then raise; end if;
@@ -231,9 +231,9 @@ declare
   logged integer;
 begin
   perform public.admin_set_feature_access(
-    '33333333-0000-0000-0000-00000000000c', 'chat', false,
+    '33333333-0000-0000-0000-00000000000c', 'buddies', false,
     'Paused at the member''s request while they settle in',
-    'Chat is off for now. Call the person who invited you with questions.');
+    'The buddy feed is off for now. Call the person who invited you with questions.');
 
   select count(*) into logged from public.audit_log
   where action = 'access.set' and target_id = '33333333-0000-0000-0000-00000000000c';
@@ -261,19 +261,39 @@ $$;
 \echo ''
 \echo '--- access_controls actually blocks the write it names (§4) ---'
 
+-- Marcus had the buddy feed turned off above. A switched-off feature is refused
+-- by the policy, not merely hidden by a screen — otherwise it is decoration.
 select test.as_user(:'marcus');
 do $$
 begin
   begin
-    -- Marcus had chat turned off above. The policy, not the UI, must refuse.
-    insert into public.messages (conversation_id, sender_id, body)
-    values ('66666666-0000-0000-0000-000000000001',
-            '33333333-0000-0000-0000-00000000000c', 'can I still talk?');
-    raise exception 'FAIL  a member with chat disabled was able to send a message';
+    insert into public.activities (member_id, kind, visibility, body)
+    values ('33333333-0000-0000-0000-00000000000c', 'note', 'buddies', 'still here?');
+    raise exception 'FAIL  a member with the buddy feed disabled could still post';
   exception when others then
     if sqlerrm like 'FAIL%' then raise; end if;
-    raise notice 'ok    chat disabled blocks the write server-side (%)', left(sqlerrm, 40);
+    raise notice 'ok    a switched-off feature blocks the write server-side (%)', left(sqlerrm, 40);
   end;
+end;
+$$;
+
+\echo ''
+\echo '--- ...and messaging is never one of them (0031) ---'
+do $$
+declare n integer;
+begin
+  -- The inverse, and the one that matters most: whatever an admin has done,
+  -- a member can still reach the people this product connected them to.
+  insert into public.messages (conversation_id, sender_id, body)
+  values ('66666666-0000-0000-0000-000000000001',
+          '33333333-0000-0000-0000-00000000000c', 'can I still talk?');
+
+  select count(*) into n from public.messages
+  where sender_id = '33333333-0000-0000-0000-00000000000c'
+    and body = 'can I still talk?';
+
+  if n <> 1 then raise exception 'FAIL  a member could not send a message'; end if;
+  raise notice 'ok    a member can always send a message';
 end;
 $$;
 
@@ -390,6 +410,32 @@ begin
     raise exception 'FAIL  an out-of-region admin read points (got %)', v;
   end if;
   raise notice 'ok    an out-of-region admin gets null';
+end;
+$$;
+
+reset role;
+
+-- ===========================================================================
+\echo ''
+\echo '--- Messaging is refused through the admin RPC too (0031) ---'
+-- ===========================================================================
+set role authenticated;
+select test.as_user(:'admin_north');
+
+do $$
+begin
+  -- The trigger is the boundary, but this is the path an admin panel takes, so
+  -- it is the one worth proving: a case manager cannot cut somebody off from
+  -- the people this product exists to connect them to.
+  begin
+    perform public.admin_set_feature_access(
+      '33333333-0000-0000-0000-00000000000c', 'chat', false,
+      'Any reason at all', 'Anything at all');
+    raise exception 'FAIL  an admin switched off a member''s messages';
+  exception when others then
+    if sqlerrm like 'FAIL%' then raise; end if;
+    raise notice 'ok    an admin cannot switch off a member''s messages';
+  end;
 end;
 $$;
 

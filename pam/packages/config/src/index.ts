@@ -32,14 +32,31 @@ export type Role = (typeof ROLES)[number];
 export const ACCESS_STATUSES = ['active', 'limited', 'suspended'] as const;
 export type AccessStatus = (typeof ACCESS_STATUSES)[number];
 
+/**
+ * What a case manager can switch off for one person (§4.1).
+ *
+ * **Messages are not on this list and must not be added.** Will's call, and it
+ * is the right shape of rule: a returning citizen cut off from messaging is cut
+ * off from the people PAM exists to connect them to, and the person doing the
+ * cutting is the one with power over them. Everything else here degrades
+ * somebody's experience; that one isolates them.
+ *
+ * The database refuses a `chat` row as well (migration 0031), because a list in
+ * TypeScript only governs the screens that read it.
+ */
 export const CONTROLLABLE_FEATURES = [
-  'chat',
   'mentor_discovery',
   'buddies',
   'map',
   'points',
   'provider_listing',
 ] as const;
+
+/**
+ * Kept out of CONTROLLABLE_FEATURES on purpose. Named here so the exclusion is
+ * a decision somebody can find, rather than an omission somebody "fixes".
+ */
+export const NEVER_CONTROLLABLE_FEATURES = ['chat'] as const;
 export type ControllableFeature = (typeof CONTROLLABLE_FEATURES)[number];
 
 /**

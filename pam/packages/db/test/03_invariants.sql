@@ -710,3 +710,38 @@ begin
   raise notice 'ok    the evening centres are listed, and the disclosing ones are flagged';
 end;
 $$;
+
+-- ===========================================================================
+\echo ''
+\echo '--- Messages cannot be switched off for anyone (0031) ---'
+-- ===========================================================================
+do $$
+declare
+  v_admin uuid := '33333333-0000-0000-0000-00000000000a';
+  v_member uuid := '33333333-0000-0000-0000-00000000000c';
+  ok boolean := false;
+begin
+  -- Every other switch degrades an experience. This one isolates somebody from
+  -- the people the product exists to connect them to, and the person holding
+  -- the switch is the one with power over them.
+  begin
+    insert into public.access_controls (subject_id, feature, allowed, set_by, reason)
+    values (v_member, 'chat', false, v_admin, 'test');
+  exception when others then
+    ok := true;
+  end;
+
+  if not ok then
+    raise exception 'FAIL  messaging was switched off for a member';
+  end if;
+  raise notice 'ok    messaging cannot be switched off, not even by the service role';
+
+  -- The rest of the switches still work, or the feature is useless.
+  insert into public.access_controls (subject_id, feature, allowed, set_by, reason)
+  values (v_member, 'map', false, v_admin, 'test')
+  on conflict (subject_id, feature) do update set allowed = false;
+  raise notice 'ok    the other switches still work';
+
+  delete from public.access_controls where subject_id = v_member and feature = 'map';
+end;
+$$;
