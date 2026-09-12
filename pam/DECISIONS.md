@@ -972,6 +972,43 @@ Two open questions are Will's: whether the Spanish check-in should accept SÍ/NO
 rather than the English YES/NO the parser listens for, and whether a case
 manager's first name belongs in a text at all.
 
+### D-062 — A facilitation text names the person, not the role
+Will's call, from the review sheet. When an admin introduces a member to a
+programme, the text says "Katherine connected you with a program that can help"
+rather than "Someone connected you...".
+
+The argument against was that a first name is the one place a message hints
+somebody official is involved. The argument for, which won: a text from a
+stranger about a programme reads like spam, and a member who cannot tell whether
+to trust it does not tap. A first name is also the least identifying thing the
+sender has — never a title, never a surname, never the agency, all of which stay
+forbidden by the §9 word list.
+
+So the draft stands as written. What this decision really fixes is that it
+cannot drift: "Katherine" is a variable, and the code that fills it must pass a
+first name and nothing else.
+
+### D-063 — Spanish stays in the cheap encoding, and a test holds the line
+One character outside GSM-7 halves an SMS from 160 characters to 70 and splits
+it into two — a doubled bill on every reminder, which on a pilot budget is the
+difference between reminding everybody and reminding half of them. That is why
+the Spanish copy reads `codigo` and `pagina`.
+
+`ñ` is the exception: it is *in* the GSM-7 basic set, so it costs nothing, and
+`manana` was simply a misspelling in the message a member is most likely to act
+on. Fixed.
+
+`isGsm7()` and a test over every template now hold the line, because the obvious
+next contribution to this file is somebody helpfully restoring the other
+accents.
+
+### D-064 — The Spanish check-in keeps the English YES and NO
+`attendance_check` asks "Pudo ir hoy? Responda YES or NO." Those two words are
+what the reply parser matches. Accepting SÍ as well is a better message and a
+change in two places at once — and `SÍ` is outside GSM-7, so it also costs.
+Will's call: keep YES/NO for the pilot. A test asserts the copy and the parser
+agree, so they cannot drift apart silently.
+
 ---
 
 ## Notes for whoever picks this up next

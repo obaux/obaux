@@ -127,6 +127,11 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
   /**
    * §9: admin-originated SMS never says parole/probation/officer/case manager.
    * The admin's FIRST NAME only — never a title, never a full name.
+   *
+   * Reviewed with Will (D-062): the name stays. A text from a stranger about a
+   * programme reads like spam, and a member who cannot tell whether to trust it
+   * does not tap. Whatever fills `adminFirstName` must pass a first name and
+   * nothing else — a surname or a title here would defeat the whole rule.
    */
   facilitation_member: {
     key: 'facilitation_member',
