@@ -3,8 +3,15 @@
 Last updated 2026-09-12, end of the Phase 0 build.
 
 This is the handover document: what exists, what is proven, what is live, and
-what the next person needs to know before touching anything. `DECISIONS.md` has
-the reasoning behind each choice; this is the state.
+what the next person needs to know before touching anything.
+
+**It is the only document that is always current.** `docs/sessions/` is the
+history — one immutable log per build session, saying what changed and what the
+session got wrong. `DECISIONS.md` is the reasoning behind each choice.
+`CHANGELOG.md` is the user-visible record.
+
+Start a session by reading this file and the newest session log. End one by
+writing a new session log and updating this file. `CLAUDE.md` states the rule.
 
 ---
 
