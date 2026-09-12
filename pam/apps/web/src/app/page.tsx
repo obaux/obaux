@@ -109,7 +109,7 @@ export default function Page() {
               distanceLabel={t('places.miles', { count: (index + 1) * 0.6 })}
               isOpenNow={index !== 1}
               openNowLabel={t('places.openNow')}
-              phone="+15555550100"
+              phone={index === 2 ? undefined : '+15555550100'}
               address="123 Main St"
               isSaved={index === 0 ? saved : false}
               onSave={index === 0 ? () => setSaved((s) => !s) : undefined}
@@ -118,6 +118,7 @@ export default function Page() {
                 go: t('action.go'),
                 save: t('action.save'),
                 saved: t('places.saved'),
+                hours: t('action.hours'),
               }}
             />
           ))}

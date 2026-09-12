@@ -1,11 +1,11 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { PlaceCard } from '../src/PlaceCard.js';
+import { PlaceCard, googlePlaceHref } from '../src/PlaceCard.js';
 import { PointsBadge } from '../src/PointsBadge.js';
 import { HelpBar } from '../src/HelpBar.js';
 import { VoiceInput } from '../src/VoiceInput.js';
 
-const labels = { call: 'Call', go: 'Go', save: 'Save', saved: 'Saved' };
+const labels = { call: 'Call', go: 'Go', save: 'Save', saved: 'Saved', hours: 'Hours' };
 
 function mockReducedMotion(reduced: boolean): void {
   vi.stubGlobal(
@@ -156,5 +156,46 @@ describe('VoiceInput (§0 voice + tap paths)', () => {
       />,
     );
     expect(screen.getByRole('textbox', { name: /Your name/ })).toHaveValue('Marcus');
+  });
+});
+
+describe('Google listing fallback (city data has no hours or phone)', () => {
+  it('shows Hours instead of a dead Call button when there is no phone number', () => {
+    render(
+      <PlaceCard
+        name="Mental Health Partnerships" category="family_services"
+        categoryLabel="Home and family" address="1 Main St, PA 19104" labels={labels}
+      />,
+    );
+    // Still three actions, still in the same order a member has learned.
+    const names = screen.getAllByRole('link').concat(screen.getAllByRole('button'))
+      .map((el) => el.textContent?.trim());
+    expect(names).toEqual(['Hours', 'Go', 'Save']);
+
+    const hours = screen.getByRole('link', { name: 'Hours' });
+    expect(hours.getAttribute('href')).toContain('google.com/maps/search/');
+    expect(hours.getAttribute('href')).toContain(
+      encodeURIComponent('Mental Health Partnerships, 1 Main St, PA 19104'),
+    );
+  });
+
+  it('prefers Call when a phone number is known', () => {
+    render(
+      <PlaceCard
+        name="Comhar" category="family_services" categoryLabel="Home and family"
+        phone="+12155550100" address="1 Main St" labels={labels}
+      />,
+    );
+    expect(screen.getByRole('link', { name: 'Call' })).toHaveAttribute(
+      'href', 'tel:+12155550100',
+    );
+    expect(screen.queryByRole('link', { name: 'Hours' })).not.toBeInTheDocument();
+  });
+
+  it('anchors the lookup to a place id when the importer has resolved one', () => {
+    expect(googlePlaceHref('Comhar', '1 Main St', 'ChIJabc123')).toContain(
+      'query_place_id=ChIJabc123',
+    );
+    expect(googlePlaceHref('Comhar', '1 Main St')).not.toContain('query_place_id');
   });
 });

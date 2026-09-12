@@ -37,7 +37,7 @@ async function expectNoViolations(container: HTMLElement): Promise<void> {
   expect(results.violations).toHaveLength(0);
 }
 
-const placeLabels = { call: 'Call', go: 'Go', save: 'Save', saved: 'Saved' };
+const placeLabels = { call: 'Call', go: 'Go', save: 'Save', saved: 'Saved', hours: 'Hours' };
 
 describe('accessibility', () => {
   it('BigButton', async () => {

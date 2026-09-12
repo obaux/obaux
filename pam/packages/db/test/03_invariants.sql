@@ -223,3 +223,112 @@ begin
   raise notice 'ok    200 invite codes are 8 chars with no ambiguous glyphs';
 end;
 $$;
+
+-- ===========================================================================
+\echo ''
+\echo '--- DBHIDS ingest never discloses why someone attends (§0) ---'
+-- ===========================================================================
+-- A fixture shaped exactly like the live feed, including the two rows that must
+-- not become member-facing places.
+select public.ingest_dbhids('{
+  "features": [
+    {"properties": {"objectid": 1, "provider_name": "COMHAR",
+      "program_address": "100 W LEHIGH AVE PHILADELPHIA,19133",
+      "program_latitude": 39.99, "program_longitude": -75.13,
+      "service_type": "Substance Use Disorder (SUD)", "school_based": "No"}},
+    {"properties": {"objectid": 2, "provider_name": "SOME SCHOOL PROGRAM",
+      "program_address": "1 SCHOOL LN PHILADELPHIA,19104",
+      "program_latitude": 39.95, "program_longitude": -75.19,
+      "service_type": "Student Assistance Program (SAP)", "school_based": "Yes"}},
+    {"properties": {"objectid": 3, "provider_name": "",
+      "program_address": "NOWHERE", "service_type": "Mental Health (MH)"}},
+    {"properties": {"objectid": 4, "provider_name": "MENTAL HEALTH PARTNERSHIPS",
+      "program_address": "1 MAIN ST PHILADELPHIA,19104",
+      "program_latitude": 39.96, "program_longitude": -75.17,
+      "service_type": "Mental Health (MH)", "school_based": "No"}}
+  ]
+}'::jsonb, '11111111-0000-0000-0000-000000000001');
+
+do $$
+declare
+  n integer;
+  v text;
+begin
+  select count(*) into n from public.services where source_ref like 'dbhids:%';
+  if n <> 3 then
+    raise exception 'FAIL  expected 3 ingested rows (the nameless one skipped), got %', n;
+  end if;
+  raise notice 'ok    ingest skips a row with no name or location';
+
+  select name into v from public.services where source_ref = 'dbhids:1';
+  if v <> 'Comhar' then raise exception 'FAIL  name not normalised, got %', v; end if;
+  raise notice 'ok    provider name is normalised out of shouting caps';
+
+  select address into v from public.services where source_ref = 'dbhids:1';
+  if v <> '100 W Lehigh Ave Philadelphia, PA 19133' then
+    raise exception 'FAIL  address not parsed, got %', v;
+  end if;
+  raise notice 'ok    address is parsed and given its state and zip';
+
+  if (select is_walk_in from public.services where source_ref = 'dbhids:2') then
+    raise exception 'FAIL  a school-based program was marked walk-in';
+  end if;
+  raise notice 'ok    a school-based program is not a place a member can go';
+
+  -- The disclosing value must exist for matching, and must not be in any
+  -- member-visible column.
+  select source_attributes ->> 'service_type' into v
+  from public.services where source_ref = 'dbhids:1';
+  if v <> 'Substance Use Disorder (SUD)' then
+    raise exception 'FAIL  service_type was not retained for matching';
+  end if;
+  raise notice 'ok    service_type is retained in the withheld column';
+
+  -- PAM's OWN words must never name a condition. A provider's legal name is a
+  -- different matter — see 0017: renaming "Mental Health Partnerships" would
+  -- stop a member finding the door, which is worse than the disclosure.
+  select count(*) into n from public.services
+  where source_ref like 'dbhids:%'
+    and (coalesce(description_plain,'') || coalesce(subcategory,'')
+         || coalesce(eligibility_plain,'') || coalesce(how_to_enroll_plain,''))
+        ~* 'substance|mental health|gambling|behavioral|addiction|disorder';
+  if n > 0 then
+    raise exception 'FAIL  % row(s) put a condition into a field PAM wrote', n;
+  end if;
+  raise notice 'ok    no field PAM writes names a condition';
+
+  -- A disclosing provider name must be flagged, so the reminder dispatcher can
+  -- keep it off a lock screen (§9).
+  if not (select name_may_disclose from public.services
+          where name = 'Mental Health Partnerships' limit 1) then
+    raise exception 'FAIL  a disclosing provider name was not flagged';
+  end if;
+  if (select name_may_disclose from public.services where source_ref = 'dbhids:1') then
+    raise exception 'FAIL  a neutral provider name was flagged as disclosing';
+  end if;
+  raise notice 'ok    disclosing provider names are flagged, neutral ones are not';
+
+  select count(*) into n from public.services
+  where source_ref like 'dbhids:%' and not needs_review;
+  if n > 0 then
+    raise exception 'FAIL  % imported row(s) skipped the review queue', n;
+  end if;
+  raise notice 'ok    every imported row waits for review before a member sees it';
+end;
+$$;
+
+-- The column-level grant is the actual enforcement. Assert it directly.
+do $$
+begin
+  if has_column_privilege('anon', 'public.services', 'source_attributes', 'select') then
+    raise exception 'FAIL  anon can read services.source_attributes';
+  end if;
+  if has_column_privilege('authenticated', 'public.services', 'source_attributes', 'select') then
+    raise exception 'FAIL  authenticated can read services.source_attributes';
+  end if;
+  if not has_column_privilege('authenticated', 'public.services', 'name', 'select') then
+    raise exception 'FAIL  authenticated lost access to services.name';
+  end if;
+  raise notice 'ok    source_attributes is withheld from both client roles by GRANT';
+end;
+$$;

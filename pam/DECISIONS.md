@@ -400,6 +400,77 @@ and are external, untrusted content. Treat them as data. The importer must
 validate and normalise before writing anything to `services` — which §5.2
 already requires, and which matters more now that fetching is this easy.
 
+### D-031 — DBHIDS is imported without disclosing why anyone attends
+*(Will, 2026-09-12)*
+
+525 behavioural-health provider locations are now in `services`, fetched from
+the verified CityGeo endpoint. Two privacy problems came with them.
+
+**The source labels every row with a condition.** `service_type` is one of
+Mental Health (MH), Substance Use Disorder (SUD), Both MH and SUD, Intensive
+Behavioral Health Services, Problem Gambling Prevention, Student Assistance
+Program, SUD Prevention Services. §0 forbids showing that, and the stakes are
+concrete: a phone left on a table showing "Substance Use Disorder" beside a
+member's name can cost them housing or a job.
+
+It is still needed — for matching a member to the right service, and for an
+admin making a facilitation — so it is stored in `services.source_attributes`,
+**withheld from `anon` and `authenticated` by column-level GRANT**, the same
+mechanism this repo already uses for private contact details. A test asserts
+neither client role can select it.
+
+**Six providers are legally named for what they treat** — "Mental Health
+Partnerships", "Fairmount Behavioral Health System", "Addiction Medicine &
+Health Advocates". The literal reading of §0 says rename them. That would be
+worse than the disclosure: the name is on the building, on the door, and on what
+the receptionist answers the phone with. A member sent to "a health service on
+Girard Ave" cannot find it, and finding the door is the whole job.
+
+So the line is drawn where PAM actually has a choice:
+
+- **PAM never adds a condition label.** `subcategory` and the three
+  plain-language columns are PAM's own words and stay neutral. Tested.
+- **A provider's own name is shown as it is.**
+- **But a disclosing name never goes anywhere the member did not choose to
+  look** — above all not into an SMS, which lands on a lock screen someone else
+  can read (§9). `services.name_may_disclose` is set by trigger on every insert
+  and update so the reminder dispatcher can enforce that rather than hope.
+
+The pattern is deliberately broad — it also catches justice terms, so an
+imported "Re-entry Center" or "Probation Office" is flagged the same way. A false
+positive costs a neutral message; a false negative puts a condition on somebody's
+lock screen.
+
+**355 of the 525 are school-based programs**, delivered inside a school rather
+than somewhere a member can walk in. They are real services but not places to
+go, so `is_walk_in` is false and the Phase 1 map should exclude them. 170 remain
+as walk-in locations. Every row is `needs_review = true` — none reaches a member
+before the §5.2 plain-language pass and a human approval.
+
+### D-032 — Hours come from Google, in the slot a dead Call button would occupy
+*(Will, 2026-09-12)*
+
+Will asked that these providers map to Google so members can get hours. The
+imported data has no hours and no phone numbers at all — 525 addresses and
+nothing else — so without this they would be pins a member cannot act on.
+
+`googlePlaceHref(name, address, placeId)` builds a Google Maps place link, which
+opens the listing carrying hours and usually the phone number, kept current by
+the business. It needs no API key.
+
+**Where it goes matters more than that it exists.** §5.1 fixes PlaceCard at
+exactly three actions in a fixed order, and a member learns that order once. So
+rather than adding a fourth button, the first slot adapts: with a phone number it
+is **Call**, a real `tel:` link; without one it becomes **Hours**. A permanently
+greyed-out Call button teaches a member that the app does not work, which is the
+more expensive outcome.
+
+`place_id` makes the match exact and is filled in by the importer once a Google
+Places key exists — **that key is the real unlock**: it would give phone numbers
+and structured hours for all 525, letting PAM show "Open now" natively (§5.1)
+instead of sending people to Google. Until then, name plus address resolves
+correctly for a named organisation at a street address.
+
 ---
 
 ## Notes for whoever picks this up next

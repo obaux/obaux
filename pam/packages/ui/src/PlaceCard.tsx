@@ -27,10 +27,12 @@ export interface PlaceCardProps {
   phone?: string | null;
   /** Street address, used to build the directions link. */
   address?: string | null;
+  /** Google's id for this place, when the importer has resolved one. */
+  placeId?: string | null;
   isSaved?: boolean;
   onSave?: () => void;
   onCall?: () => void;
-  labels: { call: string; go: string; save: string; saved: string };
+  labels: { call: string; go: string; save: string; saved: string; hours: string };
 }
 
 /**
@@ -64,6 +66,28 @@ function directionsHref(address: string): string {
   return `https://www.google.com/maps/dir/?api=1&destination=${q}&travelmode=walking`;
 }
 
+/**
+ * The place's own Google listing, where its opening hours and phone number are.
+ *
+ * PAM's imported city data mostly has neither: the DBHIDS feed, for instance,
+ * gives 525 addresses with no hours and no phone at all. Google has both for
+ * most of these places, kept current by the businesses themselves, so pointing
+ * at the listing is worth more to a member than an empty "Hours" row in PAM.
+ *
+ * Needs no API key. `place_id` makes the match exact and is filled in by the
+ * importer once a Places key exists; without one, name plus address resolves
+ * correctly for a named organisation at a street address.
+ */
+export function googlePlaceHref(
+  name: string,
+  address?: string | null,
+  placeId?: string | null,
+): string {
+  const query = encodeURIComponent(address ? `${name}, ${address}` : name);
+  const base = `https://www.google.com/maps/search/?api=1&query=${query}`;
+  return placeId ? `${base}&query_place_id=${encodeURIComponent(placeId)}` : base;
+}
+
 export function PlaceCard({
   name,
   category,
@@ -73,6 +97,7 @@ export function PlaceCard({
   openNowLabel,
   phone,
   address,
+  placeId,
   isSaved = false,
   onSave,
   onCall,
@@ -100,15 +125,34 @@ export function PlaceCard({
         </HStack>
 
         <HStack gap={2}>
-          {/* A tel: link, not a handler: it still works if JS has not hydrated. */}
-          <Button
-            label={labels.call}
-            variant="primary"
-            href={phone ? `tel:${phone}` : undefined}
-            isDisabled={!phone}
-            clickAction={onCall}
-            xstyle={styles.action}
-          />
+          {/*
+            Three actions, always, in the same order (§5.1) — but the first slot
+            adapts to what is actually known about the place.
+
+            With a phone number it is Call, a real tel: link that works before
+            hydration. Without one it becomes Hours, opening the place's Google
+            listing where the hours and usually the phone number live. Most
+            imported city records have no phone, and a permanently greyed-out
+            Call button teaches a member that the app does not work.
+          */}
+          {phone ? (
+            <Button
+              label={labels.call}
+              variant="primary"
+              href={`tel:${phone}`}
+              clickAction={onCall}
+              xstyle={styles.action}
+            />
+          ) : (
+            <Button
+              label={labels.hours}
+              variant="primary"
+              href={googlePlaceHref(name, address, placeId)}
+              target="_blank"
+              rel="noreferrer"
+              xstyle={styles.action}
+            />
+          )}
           <Button
             label={labels.go}
             variant="secondary"
