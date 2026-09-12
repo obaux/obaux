@@ -82,3 +82,73 @@ test.describe('accessibility', () => {
     await expect(help).toHaveAttribute('href', /^tel:/);
   });
 });
+
+/**
+ * The design system is actually applied.
+ *
+ * The first build imported all three Astryx stylesheets correctly and still
+ * rendered every component unstyled, in browser-default serif, because Astryx
+ * is applied by the `<Theme>` provider and not by the CSS alone. Nothing caught
+ * it: the build passed, axe passed, and the unit tests passed on accessible
+ * names. Only a screenshot showed it.
+ *
+ * These assertions are cheap and would have failed loudly.
+ */
+test.describe('Astryx theme', () => {
+  test('resolves theme typography rather than browser defaults', async ({ page }) => {
+    await page.goto('/');
+    await page.waitForLoadState('networkidle');
+
+    const fonts = await page.evaluate(() => {
+      const of = (sel: string) => {
+        const el = document.querySelector(sel);
+        return el ? getComputedStyle(el).fontFamily : '';
+      };
+      return { heading: of('h1'), text: of('.astryx-text'), button: of('button') };
+    });
+
+    // A serif computed value means no Astryx rule matched the element.
+    for (const [where, family] of Object.entries(fonts)) {
+      expect(family, `${where} fell back to a browser default font`).not.toMatch(
+        /^"?(Times|Times New Roman|serif)"?$/i,
+      );
+      expect(family, `${where} is not on the theme font stack`).toContain('Figtree');
+    }
+  });
+
+  test('defines its theme tokens on the document', async ({ page }) => {
+    await page.goto('/');
+    // Next splits the three Astryx stylesheets across separate chunks, and the
+    // theme sheet is the last to land. Until it does, `--font-family-body`
+    // resolves to the base stack without the theme face. Assert the settled
+    // state — the transient one is harmless here because both stacks are sans
+    // fallbacks and the webfont loads with `display: swap` regardless.
+    await page.waitForLoadState('networkidle');
+
+    const tokens = await page.evaluate(() => {
+      const root = getComputedStyle(document.documentElement);
+      return {
+        body: root.getPropertyValue('--font-family-body').trim(),
+        textPrimary: root.getPropertyValue('--color-text-primary').trim(),
+        radius: root.getPropertyValue('--radius-element').trim(),
+      };
+    });
+
+    expect(tokens.body, 'theme font token missing').toContain('Figtree');
+    expect(tokens.textPrimary, 'theme colour token missing').not.toBe('');
+    expect(tokens.radius, 'theme radius token missing').not.toBe('');
+  });
+
+  test('loads the self-hosted theme font', async ({ page }) => {
+    const responses: number[] = [];
+    page.on('response', (r) => {
+      if (r.url().endsWith('.woff2')) responses.push(r.status());
+    });
+
+    await page.goto('/');
+    await page.waitForLoadState('networkidle');
+
+    expect(responses.length, 'no webfont was requested').toBeGreaterThan(0);
+    expect(responses.every((s) => s === 200), `font responses: ${responses}`).toBe(true);
+  });
+});

@@ -1,5 +1,20 @@
 import type { Metadata, Viewport } from 'next';
-import { I18nProvider } from '@/lib/i18n';
+import { Providers } from '@/lib/providers';
+
+/*
+ * Setup order matters and is prescribed by Astryx's own agent docs
+ * (.claude/CLAUDE.md): "without these, components render unstyled."
+ *
+ * These are JS imports, not CSS `@import`s. Next's CSS pipeline mangles
+ * `@import ... layer(x)` into an invalid `@media layer(x)` block, which silently
+ * dropped the entire Astryx reset on the first build.
+ *
+ * layers.css is first so the cascade order is fixed before any layer is used.
+ */
+import './layers.css';
+import '@astryxdesign/core/reset.css';
+import '@astryxdesign/core/astryx.css';
+import '@astryxdesign/theme-neutral/theme.css';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -24,11 +39,11 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    // lang is overwritten client-side once the member's language is known.
+    // lang is set from the member's language once onboarding has run.
     // §2.2: default to system colour scheme, with a manual toggle in Settings.
     <html lang="en" suppressHydrationWarning>
       <body>
-        <I18nProvider>{children}</I18nProvider>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

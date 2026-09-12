@@ -1,35 +1,57 @@
 /*
- * Cascade layer order — SOP §2.2.
- *
- * Astryx ships cascade-layered CSS (`astryx.css` declares `@layer astryx-base`
- * internally). §2.2 requires declaring the order explicitly and putting project
- * CSS in a named layer, so that import order never silently decides who wins.
- *
- * Lowest priority first. PAM's own layer is last, so its overrides beat Astryx
- * defaults without a single `!important` (§2.3 forbids them).
- *
- * Note: only `reset.css` needs an explicit `layer()` on import — it is a plain
- * reset with no layer of its own. The other two self-layer, and double-layering
- * them on import produces broken output through Next's CSS pipeline.
+ * PAM's own styles. Layer order is declared in layers.css, which is imported
+ * before the Astryx sheets — see the comment there for why that ordering is
+ * load-bearing rather than cosmetic.
  */
-@layer reset, astryx-base, stylex, pam;
-
-@import '@astryxdesign/core/reset.css' layer(reset);
-@import '@astryxdesign/core/astryx.css';
-@import '@astryxdesign/theme-neutral/theme.css';
 
 /*
- * The @stylex directive is replaced at build time by @stylexjs/postcss-plugin
- * with every rule StyleX generated across the app and @pam/ui. Without it the
- * components render with correct class names and no rules behind them — which
- * looks like a styling bug and is really a missing build step.
+ * Figtree, self-hosted.
+ *
+ * theme-neutral is designed around Figtree. `next/font` cannot be used here:
+ * it requires SWC, and this app builds with Babel so the StyleX transform can
+ * run (DECISIONS.md D-010). Serving the files ourselves is the better trade
+ * anyway — §12 budgets a 3G first load, and a font fetched from a third-party
+ * origin costs an extra DNS lookup, TLS handshake and round trip on exactly the
+ * connections PAM has to work on. It also keeps members off a Google origin.
+ *
+ * One variable file per subset, 30 KB total. `font-display: swap` means text is
+ * readable in the fallback face immediately rather than invisible while loading.
  */
+@font-face {
+  font-family: 'Figtree';
+  font-style: normal;
+  font-weight: 300 900;
+  font-display: swap;
+  src: url('/fonts/figtree-latin.woff2') format('woff2');
+  /* Spanish accents live in the latin range, so es never waits on latin-ext. */
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA,
+    U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193,
+    U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: 'Figtree';
+  font-style: normal;
+  font-weight: 300 900;
+  font-display: swap;
+  src: url('/fonts/figtree-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF,
+    U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020,
+    U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
 @layer stylex {
   @stylex;
 }
 
 @layer pam {
   :root {
+    /*
+     * theme-neutral already points its font tokens at Figtree with a system
+     * fallback; the @font-face rules above are what make the first name in that
+     * stack actually resolve. Nothing to override here.
+     */
+
     /*
      * §2.5 token overrides. 18px body on mobile is the floor, not the target;
      * desktop relaxes to 16px where reading distance is shorter.
@@ -52,6 +74,14 @@
   }
 
   body {
+    /*
+     * Astryx's reset deliberately leaves body unstyled — its components carry
+     * the type tokens, and its house rule is that components do all layout.
+     * Setting the family here anyway means any text that ends up outside a
+     * component (an error boundary, a third-party embed) still renders in the
+     * theme face instead of browser-default serif.
+     */
+    font-family: var(--font-family-body);
     font-size: var(--pam-body-size);
     line-height: 1.55;
     margin: 0;

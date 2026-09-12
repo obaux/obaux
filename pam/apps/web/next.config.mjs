@@ -9,8 +9,15 @@ const nextConfig = {
   output: 'export',
   images: { unoptimized: true },
 
-  // Workspace packages ship TypeScript source; Next compiles them in place.
-  transpilePackages: ['@pam/ui', '@pam/config', '@pam/db', '@astryxdesign/core'],
+  // Workspace packages ship TypeScript source, so Next compiles them in place.
+  //
+  // @astryxdesign/core is deliberately NOT listed. It ships compiled JS whose
+  // StyleX class names are keyed to the precompiled astryx.css it also ships.
+  // Transpiling it re-runs the StyleX transform over its source and mints fresh
+  // class names that nothing in that stylesheet matches — every Astryx
+  // component then renders with no styles at all, which is what made the first
+  // build come out in browser-default serif.
+  transpilePackages: ['@pam/ui', '@pam/config', '@pam/db'],
 
   eslint: { ignoreDuringBuilds: false },
   typescript: { ignoreBuildErrors: false },
