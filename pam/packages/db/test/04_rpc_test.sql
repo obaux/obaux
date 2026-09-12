@@ -440,3 +440,77 @@ end;
 $$;
 
 reset role;
+
+-- ===========================================================================
+\echo ''
+\echo '--- A case manager sees a message only when somebody reports it (0034) ---'
+-- ===========================================================================
+set role authenticated;
+select test.as_user(:'marcus');
+
+do $$
+declare
+  v_msg uuid;
+  rep public.reports;
+  ok boolean := false;
+begin
+  -- Somebody else's message in Marcus's own conversation.
+  select id into v_msg from public.messages
+  where conversation_id = '66666666-0000-0000-0000-000000000001'
+    and sender_id <> '33333333-0000-0000-0000-00000000000c'
+  limit 1;
+
+  if v_msg is null then
+    raise notice 'skip  no counterpart message in the fixture';
+    return;
+  end if;
+
+  rep := public.report_message(v_msg, 'This felt threatening');
+
+  -- The quote is the database's copy of what was sent, not the reporter's.
+  if rep.target_excerpt is null then
+    raise exception 'FAIL  the report carried no excerpt';
+  end if;
+  if rep.target_excerpt <> (select body from public.messages where id = v_msg) then
+    raise exception 'FAIL  the excerpt is not what was actually sent';
+  end if;
+  raise notice 'ok    the reported message is quoted by the database';
+
+  -- A hand-written "quote" reviewed by somebody with power over you is a way
+  -- to do harm with the safety feature. The direct route is closed.
+  begin
+    insert into public.reports (reporter_id, target_type, target_id, reason, target_excerpt)
+    values ('33333333-0000-0000-0000-00000000000c', 'message', v_msg,
+            'made up', 'words the other person never wrote');
+  exception when others then
+    ok := true;
+  end;
+  if not ok then
+    raise exception 'FAIL  a reporter wrote their own excerpt into a report';
+  end if;
+  raise notice 'ok    a reporter cannot write the quote themselves';
+end;
+$$;
+
+-- And the boundary that makes option C true at all: an admin cannot read the
+-- messages table, reported or not. The excerpt on the report is the only route.
+select test.as_user(:'admin_north');
+do $$
+declare n integer;
+begin
+  select count(*) into n from public.messages;
+  if n <> 0 then
+    raise exception 'FAIL  a case manager read % message row(s)', n;
+  end if;
+  raise notice 'ok    a case manager cannot read the messages table at all';
+
+  select count(*) into n from public.reports
+  where target_type = 'message' and target_excerpt is not null;
+  if n < 1 then
+    raise exception 'FAIL  a case manager cannot see the reported excerpt';
+  end if;
+  raise notice 'ok    ...and sees the reported message through the report';
+end;
+$$;
+
+reset role;

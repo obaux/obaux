@@ -162,8 +162,9 @@ Removed from §4.1's controllable features, and refused by the database. Every
 other switch degrades an experience; that one isolates somebody from the people
 the product exists to connect them to.
 
-**Still open:** whether a case manager can *read* chats. Will has asked for it
-with a sensitive-information warning. It reverses the §4.1 transparency promise
-shown to members at onboarding — "they cannot see what you write in your
-chats" — so it needs the screen rewritten before it ships, or narrowing to
-flagged messages only, which the contract already allows.
+**Settled:** a case manager sees a message **only when somebody reports it as
+unsafe** — the narrow path §4.1 already promised, and the one option of three
+that required no change to what members are told. `messages` has no admin policy
+at all; the quoted excerpt on the report is the only route, and since 0034 the
+database writes that quote rather than the reporter. The transparency screen
+stands as written.

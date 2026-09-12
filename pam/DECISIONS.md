@@ -1156,6 +1156,33 @@ Adding the enum value and using it have to be separate migrations — Postgres
 refuses to use a new enum value in the transaction that added it. That is why
 0032 and 0033 are split, and the split is load-bearing rather than tidiness.
 
+### D-074 — A case manager sees a message only when it is reported, and the database writes the quote
+Will's choice, from three options put to him: not supervised chat, not
+super-admin-only reading, but the narrow path the §4.1 contract already
+promised — "a message only if someone says it is not safe".
+
+It is the option that costs nothing in honesty, because the transparency screen
+members agree to already says exactly this. Nothing had to be rewritten.
+
+Most of it was already built, and built well: `messages` has **no admin policy
+at all**, so a case manager cannot read that table under any circumstance, and
+`reports.target_excerpt` is the single route by which message text ever reaches
+one. The absence of a policy is what makes the promise true, rather than a
+convention somebody could relax.
+
+**What was missing was who writes the excerpt.** `reports_insert_reporter`
+checked only that the reporter was the caller, so a member could file a report
+against any message id with a `target_excerpt` they had typed themselves — words
+the other person never wrote — and a case manager would read fabricated text as
+the evidence. For this population that is not theoretical griefing: an
+accusation with a quote attached, reviewed by somebody with power over you, is a
+way to do real harm using the safety feature.
+
+`report_message()` now copies the excerpt from the message row, checks the
+caller is in the conversation, and refuses a report on your own message. The
+direct insert route is closed for message reports. A report about a profile, a
+place or a post carries no quote and is unchanged.
+
 ---
 
 ## Notes for whoever picks this up next

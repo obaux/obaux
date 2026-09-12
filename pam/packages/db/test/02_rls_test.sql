@@ -152,8 +152,10 @@ select test.check('admin CAN see that a connection exists, and its kind',
 \echo '--- Messages reach conversation members only (§4) ---'
 -- ===========================================================================
 select test.as_user(:'marcus');
+-- Both sides of the one seeded conversation. The count is the point: a
+-- participant reads every message in it and nothing from anywhere else.
 select test.check('participant reads the conversation',
-  (select count(*) from public.messages), 1);
+  (select count(*) from public.messages), 2);
 
 select test.as_user(:'tanya');
 select test.check('non-participant reads nothing',

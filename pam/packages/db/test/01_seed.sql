@@ -88,7 +88,11 @@ insert into public.conversation_members (conversation_id, profile_id) values
 
 insert into public.messages (id, conversation_id, sender_id, body) values
   ('77777777-0000-0000-0000-000000000001', '66666666-0000-0000-0000-000000000001',
-   '33333333-0000-0000-0000-00000000000c', 'Hi, I would like help with GED classes.');
+   '33333333-0000-0000-0000-00000000000c', 'Hi, I would like help with GED classes.'),
+  -- The other side of the conversation, so the reporting path has something a
+  -- member could actually report: their own words are not a safety report.
+  ('77777777-0000-0000-0000-000000000002', '66666666-0000-0000-0000-000000000001',
+   '33333333-0000-0000-0000-00000000000f', 'Come by Tuesday and ask for me.');
 
 -- Buddy-visible and private activities for the feed tests.
 insert into public.activities (id, member_id, type, points, visibility) values
