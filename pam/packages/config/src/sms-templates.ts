@@ -24,7 +24,9 @@ export type SmsTemplateKey =
   | 'attendance_check'
   | 'attendance_missed_followup'
   | 'connection_request'
-  | 'access_limited_notice';
+  | 'access_limited_notice'
+  | 'saved_place_closed'
+  | 'saved_place_closed_private';
 
 export interface SmsTemplate {
   readonly key: SmsTemplateKey;
@@ -209,6 +211,37 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
     key: 'connection_request',
     en: 'PAM: Someone on PAM wants to connect. Open PAM to reply: {link}',
     es: 'PAM: Alguien en PAM quiere conectar. Abra PAM para responder: {link}',
+    vars: ['link'],
+    reviewedBy: '',
+    isFirstContact: false,
+  },
+  /**
+   * A place somebody saved has been taken out of the catalogue.
+   *
+   * Two versions of the same message, and which one sends is not a style
+   * choice. `saved_place_closed` names the place; `saved_place_closed_private`
+   * does not, and is used whenever the place's name would disclose why somebody
+   * went there (`services.name_may_disclose`). "Fairmount Behavioral Health is
+   * not open any more" on a lock screen tells a roommate something the member
+   * never chose to tell them — which is the whole reason that flag exists.
+   *
+   * The wording says the place is closed, not that it was "not useful". A flag
+   * means somebody reported it as gone; it is not a review, and PAM should not
+   * put a judgement of an organisation into a member's messages.
+   */
+  saved_place_closed: {
+    key: 'saved_place_closed',
+    en: 'PAM: {place} is not open any more. Open PAM to find another place: {link}',
+    es: 'PAM: {place} ya no esta abierto. Abra PAM para buscar otro lugar: {link}',
+    vars: ['place', 'link'],
+    maxVarLengths: { place: 40 },
+    reviewedBy: '',
+    isFirstContact: false,
+  },
+  saved_place_closed_private: {
+    key: 'saved_place_closed_private',
+    en: 'PAM: A place you saved is not open any more. Open PAM to find another: {link}',
+    es: 'PAM: Un lugar que guardo ya no esta abierto. Abra PAM para buscar otro: {link}',
     vars: ['link'],
     reviewedBy: '',
     isFirstContact: false,

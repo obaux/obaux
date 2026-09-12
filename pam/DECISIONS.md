@@ -1183,6 +1183,53 @@ caller is in the conversation, and refuses a report on your own message. The
 direct insert route is closed for message reports. A report about a profile, a
 place or a post carries no quote and is unchanged.
 
+### D-075 — Delete looks like a delete and behaves like a column
+Will's call on the super admin's button: present it as an ordinary delete —
+confirm, gone, off the list — while the mechanism stays `removed_at` (D-072).
+The two are not in tension. A person should not have to understand a soft-delete
+to take a closed programme out of a catalogue; they should press Delete and have
+it be gone. What the column buys is that it stays gone when the importer next
+runs, and that somebody's enrolment history survives.
+
+The one place the difference must show is a super admin's own view, which can
+list removed places and put one back. A delete a person cannot undo is a worse
+delete, not a purer one.
+
+### D-076 — Removing a place texts the people who saved it, and never names a place that gives them away
+Somebody saves a place because they mean to go there. When it is removed, the
+member who saved it is the person the removal is actually about — and until now
+they would have found out by walking there.
+
+Two templates, and which one sends is not a style choice.
+`saved_place_closed` names the place; `saved_place_closed_private` does not, and
+is used whenever `services.name_may_disclose` is true. "Fairmount Behavioral
+Health is not open any more" on a lock screen tells a roommate something the
+member never chose to tell them. That flag was built in 0017 and widened in
+0028; this is its first real use, and it covers eleven places in the current
+catalogue.
+
+**The wording says the place is closed, not that it was "not useful".** Will
+asked for the latter and I did not write it, for two reasons worth recording
+rather than quietly acting on: a flag means somebody reported the place as gone,
+which is not a judgement of its quality; and putting "not useful" in a member's
+messages publishes a verdict on an organisation that PAM has not reached and
+would not be able to defend. If the intent was to capture *why* it was removed,
+the resolution note on the flag is the place for it, and it stays internal.
+
+### D-077 — An outbox that carries a template key, never a body
+`reminders` is bound to an appointment by a not-null foreign key and cannot
+carry anything else, so `outbound_messages` is the general queue.
+
+A queued row holds a template key and its variables — never rendered text. The
+body is built at send time from a template with a human's name on it, so a row
+sitting in the queue cannot carry words nobody signed off, and a copy change
+reaches messages that are already queued. A test asserts the table has not grown
+a `body` column.
+
+Nothing dispatches yet: no SMS provider is configured. Rows queue and wait,
+which is the right behaviour for messages that must not send until the copy is
+reviewed.
+
 ---
 
 ## Notes for whoever picks this up next

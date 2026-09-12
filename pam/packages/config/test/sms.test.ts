@@ -25,6 +25,8 @@ const WORST_CASE_VARS: Readonly<Record<string, string>> = {
   time: '10:00 AM',
   address: '1234 Martin Luther King Jr Blvd',
   supportPhone: '555-555-0134',
+  // A real imported name, at the length where the budget starts clipping it.
+  place: 'West Philadelphia Community Health Center',
 };
 
 const keys = Object.keys(SMS_TEMPLATES) as SmsTemplateKey[];

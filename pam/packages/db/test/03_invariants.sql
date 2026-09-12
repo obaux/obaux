@@ -854,3 +854,86 @@ begin
   raise notice 'ok    an import updates a removed place without un-removing it';
 end;
 $$;
+
+-- ===========================================================================
+\echo ''
+\echo '--- Removing a place tells the people who saved it (0035) ---'
+-- ===========================================================================
+do $$
+declare
+  v_member uuid := '33333333-0000-0000-0000-00000000000c';
+  v_admin  uuid := '33333333-0000-0000-0000-00000000000a';
+  v_plain uuid;
+  v_discloses uuid;
+  v_flag uuid;
+  v_template text;
+  v_vars jsonb;
+begin
+  update public.profiles set role = 'super_admin' where id = v_admin;
+
+  -- A place with a neutral name, saved by a member.
+  select id into v_plain from public.services
+  where not name_may_disclose and removed_at is null limit 1;
+  insert into public.saved_places (member_id, service_id) values (v_member, v_plain)
+  on conflict do nothing;
+
+  perform set_config('request.jwt.claim.sub', v_admin::text, true);
+  v_flag := (public.flag_service(v_plain, 'Closed')).id;
+  perform public.resolve_service_flag(v_flag, 'remove', 'Confirmed');
+
+  select template_key, vars into v_template, v_vars
+  from public.outbound_messages where member_id = v_member
+  order by created_at desc limit 1;
+
+  if v_template <> 'saved_place_closed' then
+    raise exception 'FAIL  a neutral place did not use the named template, got %', v_template;
+  end if;
+  if v_vars ->> 'place' is null then
+    raise exception 'FAIL  the message carries no place name to render';
+  end if;
+  raise notice 'ok    the people who saved a place are told it is gone';
+
+  -- And a place whose own name gives somebody away is never named in a text.
+  select id into v_discloses from public.services
+  where name_may_disclose and removed_at is null limit 1;
+
+  if v_discloses is not null then
+    insert into public.saved_places (member_id, service_id) values (v_member, v_discloses)
+    on conflict do nothing;
+
+    v_flag := (public.flag_service(v_discloses, 'Closed')).id;
+    perform public.resolve_service_flag(v_flag, 'remove', 'Confirmed');
+
+    -- Ordering by time is no help: every row in one transaction shares a
+    -- timestamp. Assert on the set instead, which is the stronger claim.
+    if not exists (
+      select 1 from public.outbound_messages
+      where member_id = v_member and template_key = 'saved_place_closed_private'
+    ) then
+      raise exception 'FAIL  no private notice was queued for a disclosing place';
+    end if;
+
+    if exists (
+      select 1 from public.outbound_messages o
+      where o.member_id = v_member
+        and o.vars ->> 'place' = (select name from public.services where id = v_discloses)
+    ) then
+      raise exception 'FAIL  a disclosing place name was queued into a message';
+    end if;
+    raise notice 'ok    a name that gives somebody away never reaches a lock screen';
+  end if;
+
+  -- The queue carries a template key, never a body: nothing can send words a
+  -- human has not signed off.
+  if exists (
+    select 1 from information_schema.columns
+    where table_schema = 'public' and table_name = 'outbound_messages'
+      and column_name in ('body', 'message', 'text')
+  ) then
+    raise exception 'FAIL  the outbox grew a column that could carry unreviewed words';
+  end if;
+  raise notice 'ok    the queue holds a template key, not a message body';
+
+  update public.profiles set role = 'admin' where id = v_admin;
+end;
+$$;
