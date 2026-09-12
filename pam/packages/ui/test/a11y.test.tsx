@@ -97,7 +97,7 @@ describe('accessibility', () => {
 
   it('HelpBar', async () => {
     const { container } = render(
-      <HelpBar supportPhone="+15555550199" label="Need help? Call PAM" />,
+      <HelpBar label="Help" />,
     );
     await expectNoViolations(container);
   });

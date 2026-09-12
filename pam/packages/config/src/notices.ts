@@ -100,8 +100,11 @@ export const NOTICES: Readonly<Record<NoticeKey, NoticeDefinition>> = {
     title: 'This person is in a different area',
     body:
       'You can only see people in your own area. If they should be on your list, ' +
-      'call PAM support and we can move them.',
-    offersSupport: true,
+      'ask PAM support to move them.',
+    // No call button here. Help is always one tap away in the bottom bar, and a
+    // second Call button on a screen that is not an emergency competes with the
+    // persistent one — the member learns two places to look instead of one.
+    offersSupport: false,
     audience: 'admin',
   }),
 

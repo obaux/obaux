@@ -580,6 +580,56 @@ The rule this establishes, which matters more than the saving:
 catalogue, which ships strings for every component in the library —
 `@astryx.alertDialog.*`, `@astryx.avatarGroup.*` — not just the ones PAM uses.
 
+### D-038 — One place to find help, not one per screen
+*(Will, 2026-09-12)*
+
+The out-of-region notice carried its own "Call PAM for help" button. Removed.
+
+Help is persistent and one tap away in the bottom bar, and a second call button
+on an individual screen teaches a member two places to look for the same thing.
+It is also not an emergency: the admin simply cannot see someone outside their
+area, and the notice still names the next step in words ("ask PAM support to
+move them").
+
+The exception is a screen the member cannot get *past*. `account_suspended`
+keeps its own call button, because someone stuck at sign-in never reaches the
+bottom bar at all. That distinction — is the persistent Help reachable from
+here? — is what decides whether a notice carries its own call.
+
+### D-039 — Help is a screen, and takes one slot in the bottom bar
+*(Will, 2026-09-12)*
+
+`HelpBar` was a full-width row pinned to the bottom that dialled straight out.
+Two things were wrong with that once the five member tabs (§3.1) needed the same
+space:
+
+- **It took the whole row.** It is now a compact item sized to sit alongside the
+  tabs, so the bottom bar has room for the rest of the navigation.
+- **It answered only one question.** It now leads to `/help`, which can say what
+  PAM support does, when someone answers, and what to do if nobody does — and
+  can grow a second route later without finding new space at the bottom of a
+  phone.
+
+The cost is one extra tap before dialling, and one extra page load. Both are
+paid deliberately; the tap is cheap and the page is 1 kB.
+
+**What was protected while changing it.** §0's guarantee is that help works when
+nothing else does, so the whole path stays real anchors: the Help control is an
+`<a>`, the help screen renders the phone number into static HTML from the env
+value, and a browser test walks the entire route — tap Help, reach a `tel:`
+link, find a way back — **with JavaScript disabled**.
+
+**A deployment bug this surfaced.** The static export was emitting `help.html`
+rather than `help/index.html`, so `/help` would 404 on any static host without
+extensionless rewrites — and inside the Capacitor bundle, which is served off
+the filesystem with no server at all. `trailingSlash: true` fixes it. The one
+screen that must never fail was the one that would have.
+
+### D-040 — Demo labels describe the component, not its implementation
+The Points section was captioned "PointsBadge · respects prefers-reduced-motion".
+Removed at Will's request. Honouring reduced motion is a requirement (§8, §12)
+enforced by a unit test, not a feature to advertise on the screen.
+
 ---
 
 ## Notes for whoever picks this up next

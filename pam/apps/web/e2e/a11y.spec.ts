@@ -75,11 +75,13 @@ test.describe('accessibility', () => {
     expect(overflows).toBe(false);
   });
 
-  test('help is reachable from the page without JavaScript (§0 never dead-end)', async ({ page }) => {
+  test('help is reachable from every screen (§0 never dead-end)', async ({ page }) => {
     await page.goto('/');
-    const help = page.getByRole('link', { name: /Need help/ });
+    const help = page.getByRole('link', { name: /Help/ });
     await expect(help).toBeVisible();
-    await expect(help).toHaveAttribute('href', /^tel:/);
+    // It now leads to the help screen rather than dialling, so it can explain
+    // what support does and leave room in the bottom bar for the five tabs.
+    await expect(help).toHaveAttribute('href', '/help/');
   });
 });
 
@@ -164,22 +166,38 @@ test.describe('Astryx theme', () => {
  * So the help path must be in the server-rendered HTML, not behind a chunk.
  */
 test.describe('the help path does not depend on JavaScript', () => {
-  test('the support number is in the HTML itself', async ({ request }) => {
-    const html = await (await request.get('/')).text();
-    // Not queried from the browser — read straight off the wire, the way a
-    // member on a dying connection receives it.
+  test('the support number is in the help screen HTML itself', async ({ request }) => {
+    // Read straight off the wire, the way a member on a dying connection
+    // receives it — not queried from a hydrated browser.
+    const html = await (await request.get('/help/')).text();
     expect(html).toMatch(/href="tel:\+\d{8,15}"/);
   });
 
-  test('help still works with JavaScript disabled', async ({ browser }) => {
+  test('the whole path works with JavaScript disabled', async ({ browser }) => {
     const context = await browser.newContext({ javaScriptEnabled: false });
     const page = await context.newPage();
-    await page.goto('/');
 
-    const help = page.getByRole('link', { name: /Need help/ });
+    await page.goto('/');
+    const help = page.getByRole('link', { name: /Help/ });
     await expect(help).toBeVisible();
-    await expect(help).toHaveAttribute('href', /^tel:/);
+
+    // Follow it the way a member would, with nothing hydrated.
+    await help.click();
+    await expect(page.getByRole('link', { name: /Call PAM/ })).toHaveAttribute('href', /^tel:/);
+    // And a way back, which §0 also requires.
+    await expect(page.getByRole('link', { name: /Go back/ })).toBeVisible();
 
     await context.close();
+  });
+
+  test('the help screen has no accessibility violations', async ({ page }) => {
+    await page.goto('/help/');
+    const results = await new AxeBuilder({ page })
+      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
+      .analyze();
+    if (results.violations.length > 0) {
+      console.error(results.violations.map((v) => `${v.id}: ${v.help}`).join('\n'));
+    }
+    expect(results.violations).toEqual([]);
   });
 });

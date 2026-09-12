@@ -1,52 +1,53 @@
 import * as stylex from '@stylexjs/stylex';
 import { Button } from '@astryxdesign/core/Button';
+import { PhoneIcon } from './icons.js';
 
 /**
- * "Need help? Call PAM" (§2.4).
+ * "Help" — the persistent way out of a stuck screen (§2.4, §0).
  *
  * §0: "Never dead-end. Every screen has a visible way back and a visible
- * 'Get help'." This is that guarantee, so it is a plain `tel:` anchor pinned to
- * the bottom of the viewport: it works with no JavaScript, no network, and no
- * successful sign-in. If a member is lost enough to need it, the app is the
- * last thing that should have to be working.
+ * 'Get help'." This is that guarantee, and it is deliberately small: it shares
+ * the bottom bar with the five member tabs (§3.1), so it takes the space of one
+ * item rather than a full-width row (D-029, D-039).
+ *
+ * It navigates to the help screen rather than dialling directly. A raw `tel:`
+ * is one tap faster and answers only one question; the help screen can say what
+ * PAM support does, when someone answers, and what to do in the meantime — and
+ * it can grow a second route later without finding new space at the bottom of a
+ * phone.
+ *
+ * Both the button and the number it leads to are real anchors, so the whole
+ * path works with no JavaScript. What it costs is one extra page load: on a
+ * dead connection that page has to already be cached. See DECISIONS.md D-039.
  */
 export interface HelpBarProps {
-  /** PAM's support line in E.164. */
-  supportPhone: string;
-  /** Localised, e.g. "Need help? Call PAM". */
+  /** Where the help screen lives. */
+  href?: string;
+  /** Localised, e.g. "Help". Keep it to one word — it shares a row with 5 tabs. */
   label: string;
+  /**
+   * Renders as a compact item sized to sit in the bottom bar (the default), or
+   * full width for a standalone screen with room to spare.
+   */
+  variant?: 'compact' | 'block';
+  xstyle?: stylex.StyleXStyles;
 }
 
 const styles = stylex.create({
-  bar: {
-    position: 'fixed',
-    insetInline: 0,
-    bottom: 0,
-    zIndex: 50,
-    display: 'flex',
-    justifyContent: 'center',
-    // Clears the home indicator on iOS and gesture bars on Android.
-    paddingBlock: '8px',
-    paddingBottom: 'calc(8px + env(safe-area-inset-bottom, 0px))',
-    paddingInline: '16px',
-    backgroundColor: 'var(--astryx-color-surface, rgba(255,255,255,0.96))',
-    borderTopWidth: '1px',
-    borderTopStyle: 'solid',
-    borderTopColor: 'var(--astryx-color-border, rgba(0,0,0,0.12))',
-    backdropFilter: 'blur(8px)',
-  },
-  button: { minHeight: '48px', width: '100%', maxWidth: '480px', fontSize: '17px' },
+  // §2.5 — still a real target even though it is no longer full width.
+  base: { minHeight: '48px', fontSize: '15px' },
+  compact: { paddingInline: '12px' },
+  block: { width: '100%', fontSize: '17px' },
 });
 
-export function HelpBar({ supportPhone, label }: HelpBarProps) {
+export function HelpBar({ href = '/help/', label, variant = 'compact', xstyle }: HelpBarProps) {
   return (
-    <div {...stylex.props(styles.bar)}>
-      <Button
-        label={label}
-        variant="secondary"
-        href={`tel:${supportPhone}`}
-        xstyle={styles.button}
-      />
-    </div>
+    <Button
+      label={label}
+      variant="secondary"
+      href={href}
+      icon={<PhoneIcon />}
+      xstyle={[styles.base, variant === 'block' ? styles.block : styles.compact, xstyle]}
+    />
   );
 }

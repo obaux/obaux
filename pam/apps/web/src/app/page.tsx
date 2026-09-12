@@ -140,7 +140,7 @@ export default function Page() {
 
         <VStack gap={3} xstyle={styles.section}>
           <Text type="supporting" xstyle={styles.sectionTitle}>
-            PointsBadge · respects prefers-reduced-motion
+            PointsBadge
           </Text>
           <HStack gap={3} align="center" wrap="wrap">
             <PointsBadge points={points} label={t('home.points')} />
@@ -219,7 +219,7 @@ export default function Page() {
         </VStack>
       </VStack>
 
-      <HelpBar supportPhone={supportPhone} label={t('help.needHelp')} />
+      <HelpBar label={t('nav.help')} />
     </main>
   );
 }

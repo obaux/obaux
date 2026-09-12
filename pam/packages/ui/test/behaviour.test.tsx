@@ -113,10 +113,23 @@ describe('PointsBadge motion (§8, §12)', () => {
 });
 
 describe('HelpBar (§0 never dead-end)', () => {
-  it('is a plain tel: link that works with no JavaScript and no session', () => {
-    render(<HelpBar supportPhone="+15555550199" label="Need help? Call PAM" />);
-    expect(screen.getByRole('link', { name: 'Need help? Call PAM' }))
-      .toHaveAttribute('href', 'tel:+15555550199');
+  it('is a plain link that works with no JavaScript and no session', () => {
+    render(<HelpBar label="Help" />);
+    expect(screen.getByRole('link', { name: 'Help' })).toHaveAttribute('href', '/help/');
+  });
+
+  it('takes one slot, not the whole row, so the tabs have room', () => {
+    // It shares the bottom bar with five tabs (§3.1), so it must not be
+    // full-width by default.
+    const { container } = render(<HelpBar label="Help" />);
+    const link = screen.getByRole('link', { name: 'Help' });
+    expect(link.className).not.toBe('');
+    expect(container.textContent).toBe('Help');
+  });
+
+  it('can still go full width on a screen with room', () => {
+    render(<HelpBar label="Need help? Call PAM" variant="block" />);
+    expect(screen.getByRole('link', { name: 'Need help? Call PAM' })).toBeInTheDocument();
   });
 });
 

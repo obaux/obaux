@@ -110,8 +110,9 @@ oversight:
   plain-language copy and a component (D-035), and the demo renders three of
   them. Connecting them to actual query results is Phase 1.
 - **No five-tab member shell.** `AppShell` + `TabList` is the first UI task of
-  Phase 1. The layout question is settled: Help merges into the bottom dock
-  above the tabs, not a sixth tab and not a second fixed bar (D-029).
+  Phase 1. The layout is settled and the pieces are ready: Help is now a compact
+  item sized to share the bottom bar rather than a full-width row (D-039), and
+  the five navigation icons exist. Only the dock itself is unbuilt.
 - **Partial import.** DBHIDS is in: **525 provider locations** live in
   `services`, every one awaiting the plain-language review before a member sees
   it (D-031). City Facilities (3,197 features) is verified and active but not yet

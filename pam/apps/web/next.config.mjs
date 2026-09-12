@@ -9,6 +9,15 @@ const nextConfig = {
   output: 'export',
   images: { unoptimized: true },
 
+  // Emit `help/index.html` rather than `help.html`.
+  //
+  // Without this, `/help` 404s on any static host that does not rewrite
+  // extensionless paths — and, more importantly, inside the Capacitor bundle,
+  // where the app is served straight off the filesystem with no server at all.
+  // A member tapping Help would get a blank error page, which is the one screen
+  // that must never fail (§0).
+  trailingSlash: true,
+
   // Workspace packages ship TypeScript source, so Next compiles them in place.
   //
   // @astryxdesign/core is deliberately NOT listed. It ships compiled JS whose

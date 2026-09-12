@@ -28,14 +28,31 @@ describe('Notice — the out-of-region case Will raised', () => {
     expect(screen.getByText(/only see people in your own area/i)).toBeInTheDocument();
   });
 
-  it('offers a way to contact support, as a real tel: link', () => {
+  it('does not repeat the call button that already lives in the bottom bar', () => {
     render(
       <Notice
         notice="admin_out_of_region" title={n.title} body={n.body}
         supportPhone={SUPPORT} callLabel="Call PAM"
       />,
     );
-    // A handler would need JavaScript and a working session. An anchor does not.
+    // D-038: Help is persistent and one tap away. A second Call button here
+    // teaches two places to look for the same thing, and this is not an
+    // emergency — the admin simply cannot see someone outside their area.
+    expect(screen.queryByRole('link', { name: /Call PAM/ })).not.toBeInTheDocument();
+    // The way forward is still named, in words.
+    expect(screen.getByText(/ask PAM support/i)).toBeInTheDocument();
+  });
+
+  it('still offers the call where the reader really is stuck', () => {
+    // A suspended account cannot reach the bottom bar at all — they cannot get
+    // past the sign-in screen — so that notice keeps its own call button.
+    const suspended = NOTICES.account_suspended;
+    render(
+      <Notice
+        notice="account_suspended" title={suspended.title} body={suspended.body}
+        supportPhone={SUPPORT} callLabel="Call PAM"
+      />,
+    );
     expect(screen.getByRole('link', { name: /Call PAM/ })).toHaveAttribute(
       'href', `tel:${SUPPORT}`,
     );
