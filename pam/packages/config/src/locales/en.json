@@ -149,7 +149,7 @@
   "notice.something_went_wrong.body": "This is not your fault. Try again, or call PAM and we will help.",
   "notice.something_went_wrong.title": "Something went wrong",
   "notify.markRead": "Mark as read",
-  "notify.message_reported": "Someone reported a message as unsafe",
+  "notify.message_reported": "Someone said a message is not safe",
   "notify.none": "Nothing needs you right now.",
   "notify.service_flagged": "Someone reported a place: {reason}",
   "notify.service_removed": "A place was taken off the list",

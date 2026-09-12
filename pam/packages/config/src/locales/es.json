@@ -149,7 +149,7 @@
   "notice.something_went_wrong.body": "Esto no es culpa suya. Intente otra vez, o llame a PAM y le ayudamos.",
   "notice.something_went_wrong.title": "Algo salio mal",
   "notify.markRead": "Marcar como leido",
-  "notify.message_reported": "Alguien reporto un mensaje como inseguro",
+  "notify.message_reported": "Alguien dijo que un mensaje no es seguro",
   "notify.none": "Nada necesita su atencion ahora.",
   "notify.service_flagged": "Alguien reporto un lugar: {reason}",
   "notify.service_removed": "Un lugar salio de la lista",

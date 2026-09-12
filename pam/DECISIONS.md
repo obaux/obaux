@@ -1272,6 +1272,34 @@ The alternative — texting the unverified claim — means PAM repeats an
 accusation about an organisation to everybody who saved it, on the word of one
 passer-by. The flag is a signal to look, not a finding.
 
+### D-080 — A flag is routed to the people it is about, not broadcast
+Will, this session: a flag has to reach the case manager too, not only the
+super admin. But "notify every admin" turns a caseload notice into a staff-wide
+bulletin about somebody's day, which is exactly what §4.1 exists to prevent. So
+each of the two events has a named audience:
+
+| What happened | Who hears about it |
+| --- | --- |
+| **A place is flagged** | every super admin — they decide whether it stays or goes — **and** the case managers of the members who saved it, because their person was planning to go there |
+| **A message is reported** | every super admin **and** the case manager of the member the report is *about* — the sender of the reported message, not the person who reported it |
+
+Two consequences worth keeping in mind:
+
+- A case manager with nobody affected hears nothing. That is the feature. The
+  audience is derived from `saved_places` for a place and from the message's
+  sender for a report, so it is the relationship that decides, never a role
+  list.
+- The reporter is not notified as a reporter. Reporting is not a status, and a
+  notice back to the reporter would tell the rest of the room who spoke up.
+
+The notification itself carries a locale key and variables, never a sentence and
+never a line of somebody's message (0038). A case manager who needs the words
+reads them through the review screen, behind the sensitive-information warning
+(D-074). A notification is a nudge to look, not a copy of the thing.
+
+Routed by database triggers on `service_flags` and `reports` rather than by the
+RPCs, so a second code path cannot quietly stop the notices.
+
 ---
 
 ## Notes for whoever picks this up next

@@ -1,8 +1,8 @@
 # PAM — where the project stands
 
-Last updated 2026-09-12, after the case manager screen, sign-in, and the role
-model landing. Newest session log:
-`docs/sessions/2026-09-12-admin-panel-and-roles.md`.
+Last updated 2026-09-12, after the text-message dispatcher went live and the
+rules for who hears about a flag were settled. Newest session log:
+`docs/sessions/2026-09-12-the-dispatcher.md`.
 
 This is the handover document: what exists, what is proven, what is live, and
 what the next person needs to know before touching anything.
@@ -35,8 +35,18 @@ going — without help?*
 ## What is live
 
 **Supabase project `pam`** — `shobqzuhicoiymtumiaz`, us-east-1 (closest region to
-Philadelphia). Thirty migrations applied. The database is real and reachable;
+Philadelphia). Forty-one migrations applied. The database is real and reachable;
 the app is not deployed anywhere yet.
+
+**The text-message dispatcher is live and running** — the `dispatch-sms` function
+is deployed and a database schedule calls it every five minutes. It sends
+nothing, on purpose: no human has signed off the copy, so every message is
+refused and the refusal is recorded on the message. Proved against the live
+project with one real queued notice: `claimed 1, sent 0 — copy is not signed
+off`. Quiet hours, the STOP list and atomic claiming are enforced in the
+database, not in the function. Signing the copy and adding the Twilio
+credentials is what turns it on; nothing needs redeploying. See
+`docs/sms-setup.md`.
 
 **The first admin exists** — Will, Philadelphia, created 12 September and proven
 by generating a live invite code (`9T3YTVMT`, valid 30 days). Invites can now be
@@ -75,9 +85,9 @@ Numbers here are from the last run, not aspirations.
 | Check | Result | What it actually proves |
 |---|---|---|
 | Typecheck | 5/5 packages | — |
-| `@pam/config` tests | 156 pass | No SMS can send unreviewed, over 160 chars, with emoji, or with a term that reveals justice involvement. Locales are key-for-key. The transparency screen matches its contract. |
+| `@pam/config` tests | 192 pass | No SMS can send unreviewed, over 160 chars, with emoji, or with a term that reveals justice involvement. Locales are key-for-key. The transparency screen matches its contract. |
 | `@pam/ui` tests | 46 pass | Every component is axe-clean. `PlaceCard` offers exactly three actions in a fixed order. Reduced motion is respected. The mic hides when unsupported. |
-| Database suite | 122 checks pass | See below |
+| Database suite | 152 checks pass | See below |
 | Live RLS fingerprint | identical to local | The deployed policy set is provably the one that was penetration-tested: `ce9636c3b77e4827368e6575742b899c`, 73 policies on both |
 | Live anonymous attack | 0 rows leaked | A signed-out caller reads no profiles, messages, invites or audit rows on the real database, while still reaching the support number and the public catalogue |
 | Browser a11y + theme | 111 pass | No WCAG AA violations at 320px or iPhone SE. Every control clears 48px. No horizontal scroll. The Astryx theme really resolves. Runs in dark mode as well as light. |
@@ -127,15 +137,20 @@ oversight:
 - **No Google Places key**, so no phone numbers and no structured hours. The 525
   imported records have neither, and PlaceCard sends members to the Google
   listing instead (D-032). A key would let PAM show "Open now" natively.
-- **No SMS is sendable.** Every template ships `reviewedBy: ''` and `renderSms`
-  throws on an unreviewed one. This is a gate, not a gap — a human has to read
-  the copy against §9 first.
+- **No SMS is sendable, though everything to send one now exists.** The
+  dispatcher is deployed and on a clock; every template ships `reviewedBy: ''`
+  and both the renderer and the dispatcher refuse an unreviewed one. This is a
+  gate, not a gap — a human has to read the copy against §9 first.
+- **Notifications have nowhere to be read.** A flagged place and a reported
+  message now write notices to the people who have to act (A7, D-080), but the
+  notification bar in the case manager and super admin headers is not built, so
+  the rows accumulate unseen.
 - **No device build.** Capacitor is configured; `cap add ios/android` has never
   been run.
 
 ---
 
-## Four bugs worth remembering
+## Five bugs worth remembering
 
 Each of these passed a build, and most passed the tests too. They are recorded
 because the *class* will recur.
@@ -167,6 +182,17 @@ always the boundary; the grant never was.*
 
 ---
 
+**A message was marked sent that was never sent.** The dispatcher claims a
+message as sent, then reports back if it fails. Reporting a failure called a
+database function that returns nothing, and asking an empty answer for JSON
+throws — so the report died and the row stayed marked sent. Every unit test
+passed; none of them could see it, because they all tested rendering, which is
+pure. What caught it was running the deployed function against the live database
+with one real queued row. *The refusal path is the path that runs in production
+while the copy is unsigned, so it earned the first live test, not the last.*
+
+---
+
 ## What needs a human
 
 | # | Needs | Blocks | Note |
@@ -179,7 +205,8 @@ always the boundary; the grant never was.*
 | 6 | Whether points redeem for real rewards | Phase 3 | Built behind a flag, shipped off. |
 | 7 | Retention: missed-appointment history beyond 90 days | Phase 5 | No purge job. Keeping this data indefinitely is the wrong default for this population. |
 | 8 | Pilot partner orgs and usability test scheduling | Phase 7 | Five members, three providers, two admins. |
-| 9 | **An SMS provider in Supabase** | Anyone signing in | PAM is phone-sign-in only, and Supabase sends that code through its own SMS provider, configured in the dashboard. Until it is set, the admin account exists but nobody can log in. |
+| 9 | **Point Supabase at Twilio** — Authentication → Providers → Phone | Anyone signing in | **The single thing blocking the product.** Twilio is paid for and working, but Supabase has not been pointed at it: asking the live project for a sign-in code answers `Unsupported phone provider`. Account SID, Auth Token, Verify Service SID. |
+| 10 | **Twilio credentials into the dispatcher's secrets** | Reminders and notices | `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, and either `TWILIO_MESSAGING_SERVICE_SID` or `TWILIO_FROM_NUMBER`, under Edge Functions → dispatch-sms. Until then the dispatcher records "Twilio is not configured" instead of sending. |
 
 ---
 

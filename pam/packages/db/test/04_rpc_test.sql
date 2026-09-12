@@ -514,3 +514,106 @@ end;
 $$;
 
 reset role;
+
+-- ===========================================================================
+\echo ''
+\echo '--- The queue decides who is texted, not the dispatcher (0039) ---'
+-- ===========================================================================
+-- The dispatcher can be redeployed by anybody with access to the project. These
+-- promises cannot be, because they are enforced here: a member who said stop is
+-- never texted again, and nobody is woken at 3am.
+
+set local role postgres;
+
+do $$
+declare
+  marcus uuid := '33333333-0000-0000-0000-00000000000c';
+  tanya  uuid := '33333333-0000-0000-0000-00000000000d';
+  nia    uuid := '33333333-0000-0000-0000-000000000011';
+  n integer;
+  claimed_ids uuid[];
+begin
+  -- Everyone needs a number, or they fail for a different reason than we are
+  -- testing. Fixture numbers, not anybody's.
+  update public.profiles set phone = '+12025550101' where id = marcus;
+  update public.profiles set phone = '+12025550102' where id = tanya;
+  update public.profiles set phone = null            where id = nia;
+
+  -- Marcus is available now; Tanya replied STOP; Nia has no number.
+  insert into public.notification_preferences (member_id, sms_stopped_at)
+  values (tanya, now())
+  on conflict (member_id) do update set sms_stopped_at = now();
+
+  insert into public.outbound_messages (id, member_id, template_key, vars) values
+    ('aaaaaaa1-0000-0000-0000-000000000001', marcus, 'attendance_check', '{}'),
+    ('aaaaaaa1-0000-0000-0000-000000000002', tanya,  'attendance_check', '{}'),
+    ('aaaaaaa1-0000-0000-0000-000000000003', nia,    'attendance_check', '{}');
+
+  -- Quiet hours wrap midnight, so the window has to be tested on both sides.
+  if not public.in_quiet_hours(marcus, '2026-09-12 22:30:00-04'::timestamptz) then
+    raise exception 'FAIL  a member would be texted at 22:30';
+  end if;
+  if not public.in_quiet_hours(marcus, '2026-09-12 03:00:00-04'::timestamptz) then
+    raise exception 'FAIL  a member would be texted at 03:00';
+  end if;
+  if public.in_quiet_hours(marcus, '2026-09-12 13:00:00-04'::timestamptz) then
+    raise exception 'FAIL  a member would not be texted at 13:00';
+  end if;
+  raise notice 'ok    quiet hours cover the night and wrap midnight';
+
+  select array_agg(id) into claimed_ids from public.claim_outbound_messages(50);
+
+  if not ('aaaaaaa1-0000-0000-0000-000000000001' = any(coalesce(claimed_ids, '{}')))
+     and not public.in_quiet_hours(marcus) then
+    raise exception 'FAIL  an available member was not claimed';
+  end if;
+
+  if 'aaaaaaa1-0000-0000-0000-000000000002' = any(coalesce(claimed_ids, '{}')) then
+    raise exception 'FAIL  a member who replied STOP was handed to the dispatcher';
+  end if;
+  if 'aaaaaaa1-0000-0000-0000-000000000003' = any(coalesce(claimed_ids, '{}')) then
+    raise exception 'FAIL  a member with no phone number was handed to the dispatcher';
+  end if;
+  raise notice 'ok    a STOP and a missing number never reach the dispatcher';
+
+  select count(*) into n from public.outbound_messages
+  where id = 'aaaaaaa1-0000-0000-0000-000000000002' and status = 'cancelled';
+  if n <> 1 then
+    raise exception 'FAIL  a STOP left the message queued to be retried forever';
+  end if;
+  raise notice 'ok    a STOP takes the message out of the queue for good';
+
+  -- Claiming is what stops two overlapping runs sending the same reminder.
+  select count(*) into n from public.claim_outbound_messages(50);
+  if n <> 0 then
+    raise exception 'FAIL  a second run claimed % message(s) the first one took', n;
+  end if;
+  raise notice 'ok    a second run finds nothing left to send';
+end;
+$$;
+
+-- The dispatcher reporting a failure has to be able to correct the optimistic
+-- claim, or a message nobody received stays recorded as sent.
+do $$
+declare
+  v_status text;
+begin
+  perform public.mark_outbound_failed(
+    'aaaaaaa1-0000-0000-0000-000000000001', 'copy is not signed off');
+
+  select status::text into v_status from public.outbound_messages
+  where id = 'aaaaaaa1-0000-0000-0000-000000000001';
+
+  if v_status <> 'failed' then
+    raise exception 'FAIL  a message that never sent is still recorded as %', v_status;
+  end if;
+  raise notice 'ok    a message that did not send stops being recorded as sent';
+end;
+$$;
+
+delete from public.outbound_messages
+where id in ('aaaaaaa1-0000-0000-0000-000000000001',
+             'aaaaaaa1-0000-0000-0000-000000000002',
+             'aaaaaaa1-0000-0000-0000-000000000003');
+
+reset role;

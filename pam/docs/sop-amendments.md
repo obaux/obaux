@@ -168,3 +168,31 @@ that required no change to what members are told. `messages` has no admin policy
 at all; the quoted excerpt on the report is the only route, and since 0034 the
 database writes that quote rather than the reporter. The transparency screen
 stands as written.
+
+## A7 — Who is told when something is flagged (12 September 2026, Will)
+
+> "When a message is flagged, or a program is flagged, make sure to notify the
+> case managers also, not just the admin."
+
+A flag reaches the people it is about. It is not broadcast to staff.
+
+| Event | Audience |
+| --- | --- |
+| A place is flagged | Every super admin (they decide whether it stays or goes) **and** the case managers of the members who saved that place — their person was planning to go there. |
+| A message is reported | Every super admin **and** the case manager of the member the report is *about*: the **sender** of the reported message, not the person who reported it. |
+
+### What follows from it, and is not optional
+
+1. The audience is derived from the relationship — `saved_places` for a place,
+   the message's sender for a report — never from a role list. A case manager
+   with nobody affected is told nothing.
+2. The reporter is never notified *as the reporter*. Reporting is not a status,
+   and a notice back would tell the room who spoke up.
+3. A notification carries a locale key and variables. Never a sentence, and
+   never a line of anybody's message. §4.1 still decides who may read the words;
+   a case manager reads them through the review screen behind the
+   sensitive-information warning.
+4. Both notices are written by database triggers, so a second code path cannot
+   silently stop them.
+5. Each panel — case manager and super admin — carries the list in its top bar,
+   and the same notices appear inside the affected person's profile card.

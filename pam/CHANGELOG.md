@@ -1,5 +1,32 @@
 # Changelog
 
+## [0.6.0] — 2026-09-12 · The dispatcher, and who hears about a flag
+
+### Added — PAM can send a text message, and deliberately does not
+
+The dispatcher is live and wakes every five minutes to send what is due. It
+refuses every message today, because no human has signed off the copy — and it
+writes the refusal onto the message rather than going quiet. Signing the copy is
+what turns it on; nothing has to be rebuilt.
+
+Quiet hours (21:00–07:00, per person), a member who replied STOP, and a member
+with no phone number are all decided in the database rather than in the sender,
+where they cannot be redeployed away. Two overlapping runs can never both send
+the same reminder.
+
+### Added — a flag reaches the people it is about
+
+A flagged place tells every super admin and the case managers of the members who
+saved it. A reported message tells every super admin and the case manager of the
+member the report is about — the sender, not the person who reported it. Nobody
+else is told, and the notice carries no words anybody wrote.
+
+### Fixed — a message could be recorded as sent when it never was
+
+The failure path in the dispatcher could itself fail, leaving a message marked
+sent that nobody received. Found by running the deployed sender against the real
+database rather than by a test.
+
 ## [0.5.0] — 2026-09-12 · Rec centres, evening centres, and a verified partner
 
 ### Added — 166 Parks & Recreation program sites
