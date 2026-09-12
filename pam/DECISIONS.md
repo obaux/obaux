@@ -15,14 +15,24 @@ place so work continues either way.
 
 | # | Question | SOP | Blocks | Default in place |
 |---|---|---|---|---|
-| W-1 | **Target city and resource data sources** | §5.2, §15 | Phase 1 importer | Importer supports CSV, JSON, GeoJSON, Socrata, ArcGIS and HSDS/Open Referral. No source registered. |
+| W-1b | **Which Philadelphia datasets, and the PA 211 agreement** | §5.2 | Phase 1 importer | City is decided (Philadelphia). Four sources are registered but `is_active = false` — the endpoints could not be verified from the build environment, and PA 211 needs a data-sharing agreement. See D-028. |
 | W-2 | **Final brand colours and logo** | §2.5, §15 | Phase 6 polish | Category pins use Astryx palette `blue` / `green` / `purple`, chosen for hue separation at AAA contrast. |
 | W-3 | **Do points redeem for real rewards?** | §8, §15 | Phase 3 | `REWARDS_ENABLED = false`. Table and flow to be built behind the flag, shipped off. |
 | W-4 | **Additional languages beyond English and Spanish** | §2.3, §15 | Phase 6 | `SUPPORTED_LOCALES = ['en', 'es']`. Adding one is a locale file plus a constant. |
 | W-5 | **Pilot partner orgs and test scheduling** | §13, §15 | Phase 7 | — |
 | W-6 | **Missed-appointment history retention beyond 90 days** | §15 | Phase 5 | No purge job yet. Data is kept indefinitely, which is the wrong default for this population — needs an answer before pilot. |
-| W-7 | **PAM support phone number** | §2.4 | Phase 1 | `HelpBar` reads `NEXT_PUBLIC_SUPPORT_PHONE`; a placeholder is used in the demo. Every screen shows this number, so it must be real and answered. |
 | W-8 | **Who reviews SMS copy?** | §9 | Phase 2 | Every template ships with `reviewedBy: ''` and `renderSms` refuses to send an unreviewed one. Nothing can text a member until a person signs off. |
+
+---
+
+## Answered by Will — 2026-09-12
+
+- **Target city: Philadelphia.** Region seeded, four import sources registered
+  (D-028).
+- **Support line: +1 267 309 5265**, and it will change over time — so it is a
+  row in `app_settings`, not a constant (D-027).
+- **Provision Supabase: yes.** Project `pam` (`shobqzuhicoiymtumiaz`), us-east-1,
+  all 12 migrations applied and verified (D-003).
 
 ---
 
@@ -50,17 +60,24 @@ current, the SOP wins:
 Worth revisiting with Will before the pilot: Capacitor 6 is two majors behind,
 which will matter for iOS/Android SDK support at store-submission time.
 
-### D-003 — No Supabase project provisioned yet
-Creating one is a billable resource on Will's account and an outward-facing
-action, so it waits for an explicit go-ahead. Everything is ready: migrations
-are complete, ordered, and verified against a real Postgres 16 + PostGIS, and
-`seed-admin.ts` creates the first admin. See `packages/db/README.md` for the
-three commands to run once a project exists.
+### D-003 — Supabase project `pam` is live *(updated 2026-09-12)*
+Will approved provisioning. Project `pam` (`shobqzuhicoiymtumiaz`), us-east-1 —
+the closest region to Philadelphia. All 12 migrations are applied.
 
-The database tests do **not** need a project: they stand up a throwaway
+The RLS was verified rather than assumed: the applied policy set was fingerprinted
+against the locally-tested one and they match exactly —
+`ce9636c3b77e4827368e6575742b899c`, 73 policies on both. A signed-out caller was
+then attacked directly on the live database and reads zero profiles, messages,
+invites or audit rows, while still reaching the support number and the public
+catalogue.
+
+The first admin still needs creating — `pnpm --filter @pam/db seed:admin`, which
+needs the service role key. No admin exists yet, so no invite can be issued yet.
+
+The database tests still do **not** need the project: they stand up a throwaway
 Postgres, apply a small shim reproducing the parts of Supabase the migrations
 depend on (`auth.users`, `auth.uid()`, the three roles), and run the real
-migrations and policies against it.
+migrations and policies against it. Every change below was proved there first.
 
 ### D-004 — RLS lives in one migration, not beside each table
 `0007_rls.sql` holds every policy. Co-locating policies with their tables reads
@@ -205,6 +222,103 @@ both directions, and tested from both sides.
 §0 and §9 both forbid language that reveals justice involvement.
 `assertSmsIsSafe` runs on every outbound message and `findDignityViolations`
 runs over every locale string in CI. A reviewer can miss a word; a test does not.
+
+### D-024 — Astryx is applied by a provider, not by importing its CSS
+Will flagged that the first build did not look like Astryx. It did not, and the
+cause was that `<Theme theme={neutralTheme}>` was never wrapped around the app.
+The three stylesheets loaded with 200s and every component still rendered
+unthemed, in browser-default serif, because Astryx puts its theme class on the
+subtree from React. The `/built` theme import pairs with the precompiled CSS and
+skips runtime injection, which is what makes it work under static export.
+
+Three setup faults came out with it:
+
+- `@import '…' layer(reset)` was rewritten by Next's CSS pipeline into an
+  invalid `@media layer(reset)` block, silently dropping the entire reset. The
+  Astryx sheets declare their own layers, so they are now plain JS imports from
+  the app entry — the form Astryx's own agent docs prescribe — with the layer
+  order declared up front in `layers.css`.
+- `@astryxdesign/core` was in `transpilePackages`, which re-ran the StyleX
+  transform over its source and minted class names the shipped stylesheet does
+  not contain.
+- theme-neutral asks for Figtree and nothing loaded it.
+
+Underneath all of it: I skipped `astryx init` and built against guessed APIs.
+The CLI is now a dependency and its generated conventions are committed at
+`apps/web/.claude/CLAUDE.md`. Reading them is what found the provider.
+
+Three browser tests now assert the theme is really applied — computed typography
+is not a browser default, the theme tokens resolve on the document, and the
+webfont returns 200. Nothing caught this before: the build passed, axe passed,
+and the unit tests passed on accessible names.
+
+### D-025 — SECURITY DEFINER helpers are guarded, not just granted
+Supabase's security advisors, run against the live project, flagged something the
+local suite could not see: PostgREST exposes every `public` function at
+`/rest/v1/rpc/<name>`, so a definer helper taking a caller-supplied id can be
+invoked directly with somebody else's. The RLS policies were correct; the leak
+was around them.
+
+`member_points(<any member>)` returned that member's balance to anyone.
+`are_buddies`, `is_blocked_between` and `feature_allowed` let a caller probe the
+social graph and another user's access controls.
+
+Each now carries a self-participation guard. Every policy already passes
+`auth.uid()` as one argument, so RLS evaluation is unchanged — only a direct
+call with someone else's id is affected. Eight tests assert both halves: the
+probe fails, and the legitimate reader still gets their answer.
+
+The thorough fix is to move internal helpers into a `private` schema PostgREST
+does not expose. That means recreating all 73 policies to reference it, so it is
+Phase 1 work rather than a same-sitting change to a live database.
+
+### D-026 — `for all` policies are evaluated on SELECT, and that bit
+Revoking EXECUTE from `anon` on those helpers (0011) looked like the tidy fix and
+broke signed-out reads: a policy declared `for all` covers SELECT too, so reading
+`services` evaluated the provider's *write* policy, called `feature_allowed`, and
+failed with "permission denied for function" instead of returning the catalogue.
+A member who is not signed in could not see the places that can help — the §0
+failure this product cannot have.
+
+0012 restores the grants and states the real boundary: after D-025 every one of
+these helpers is anchored to `auth.uid()`, which is null for a signed-out caller,
+so each returns false or the harmless default. **The guard is the boundary; the
+grant never was.** Revoking only broke legitimate reads.
+
+What stays off the anonymous surface is the set with no signed-out use:
+`member_points`, `create_invite`, `admin_set_*`, `redeem_invite`, and
+`generate_invite_code` (callable by nobody — `create_invite` uses it internally
+as definer).
+
+Splitting write policies off `for all` so a read never evaluates a write rule is
+the structural improvement, and is Phase 1 work.
+
+### D-027 — The support number is a database row, not a constant
+Will gave the number as +1 267 309 5265 and said it will change. It appears in
+the HelpBar on every screen, so a redeploy to change it is how a wrong number
+stays live for a week. It lives in `app_settings.support_phone`, which an admin
+can edit, and is readable by signed-out visitors — someone who cannot get into
+the app still has to be able to call.
+
+`useSupportPhone()` paints the env fallback immediately and swaps if the database
+has a newer value. If the fetch fails — offline, the normal case for this
+audience — the fallback stands. There is no state in which the HelpBar has no
+number.
+
+### D-028 — Philadelphia sources are registered but inactive
+Four sources are seeded against the Philadelphia region: the OpenDataPhilly
+health and human services catalogue, its Health Centers dataset, the City's
+ArcGIS open data portal, and PA 211 Southeast.
+
+Every one is `is_active = false`, and `source_url` points at a catalogue page a
+human can open rather than a FeatureServer endpoint. The build environment's
+egress proxy blocks all four hosts, so no endpoint could be verified — and an
+invented URL in a source registry is worse than an absent one, because the
+importer would appear to be configured. Resolving the real endpoints is the first
+task of the Phase 1 importer, and the nightly job skips inactive sources.
+
+PA 211 additionally needs a data-sharing agreement before use. It is the widest
+source of family services in the region and the one most worth having.
 
 ---
 

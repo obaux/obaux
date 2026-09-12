@@ -290,3 +290,107 @@ end;
 $$;
 
 reset role;
+
+\echo ''
+\echo '--- SECURITY DEFINER helpers do not answer for other people (0010) ---'
+
+set role authenticated;
+
+-- Supabase exposes every public function over PostgREST, so a definer function
+-- taking a caller-supplied id is directly callable with someone else's. These
+-- assert the self-participation guards hold.
+-- Tanya: same region as Marcus, but not a buddy and not on his chats.
+select test.as_user('33333333-0000-0000-0000-00000000000d');
+do $$
+declare
+  v integer;
+begin
+  v := public.member_points('33333333-0000-0000-0000-00000000000c');
+  if v is not null then
+    raise exception 'FAIL  a member read another member''s points balance (got %)', v;
+  end if;
+  raise notice 'ok    member_points returns null for someone else''s id';
+end;
+$$;
+
+do $$
+begin
+  if public.are_buddies('33333333-0000-0000-0000-00000000000c',
+                        '33333333-0000-0000-0000-000000000011') then
+    raise exception 'FAIL  a non-participant probed the buddy graph';
+  end if;
+  raise notice 'ok    are_buddies refuses a pair the caller is not in';
+end;
+$$;
+
+do $$
+begin
+  if public.is_blocked_between('33333333-0000-0000-0000-00000000000c',
+                               '33333333-0000-0000-0000-000000000013') then
+    raise exception 'FAIL  a non-participant probed block relationships';
+  end if;
+  raise notice 'ok    is_blocked_between refuses a pair the caller is not in';
+end;
+$$;
+
+do $$
+begin
+  -- Marcus had chat turned off earlier. A stranger must not learn that.
+  if not public.feature_allowed('33333333-0000-0000-0000-00000000000c', 'chat') then
+    raise exception 'FAIL  a stranger read another user''s access controls';
+  end if;
+  raise notice 'ok    feature_allowed hides another user''s access controls';
+end;
+$$;
+
+-- The people who SHOULD see these still do.
+select test.as_user(:'marcus');
+do $$
+declare
+  v integer;
+begin
+  v := public.member_points('33333333-0000-0000-0000-00000000000c');
+  if v is distinct from 100 then
+    raise exception 'FAIL  a member cannot read their own balance (got %)', v;
+  end if;
+  raise notice 'ok    a member still reads their own balance';
+end;
+$$;
+
+do $$
+begin
+  if not public.are_buddies('33333333-0000-0000-0000-00000000000c',
+                            '33333333-0000-0000-0000-000000000011') then
+    raise exception 'FAIL  a participant cannot see their own buddy link';
+  end if;
+  raise notice 'ok    a participant still sees their own buddy link';
+end;
+$$;
+
+select test.as_user(:'admin_north');
+do $$
+declare
+  v integer;
+begin
+  v := public.member_points('33333333-0000-0000-0000-00000000000c');
+  if v is distinct from 100 then
+    raise exception 'FAIL  an admin cannot read caseload points (got %)', v;
+  end if;
+  raise notice 'ok    an admin still reads their caseload''s points';
+end;
+$$;
+
+select test.as_user(:'admin_south');
+do $$
+declare
+  v integer;
+begin
+  v := public.member_points('33333333-0000-0000-0000-00000000000c');
+  if v is not null then
+    raise exception 'FAIL  an out-of-region admin read points (got %)', v;
+  end if;
+  raise notice 'ok    an out-of-region admin gets null';
+end;
+$$;
+
+reset role;

@@ -60,9 +60,20 @@ and `pgcrypto`. It creates a throwaway cluster and cleans up after itself.
 
 ### Environment
 
-Copy `apps/web/.env.example` to `apps/web/.env.local`. No Supabase project has
-been provisioned yet — see `DECISIONS.md` D-003 for the three commands to run
-once one exists.
+Copy `apps/web/.env.example` to `apps/web/.env.local` and fill in the Supabase
+publishable key from the dashboard.
+
+**Supabase project `pam`** (`shobqzuhicoiymtumiaz`, us-east-1) is live with all
+12 migrations applied. The first admin does not exist yet — nothing can issue an
+invite until it does:
+
+```bash
+SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... \
+  pnpm --filter @pam/db seed:admin -- --phone +1... --name ... --region Philadelphia
+```
+
+**Pilot city: Philadelphia.** The region is seeded and four import sources are
+registered, all inactive until their endpoints are confirmed — see D-028.
 
 ---
 
@@ -85,10 +96,21 @@ the policies with one test user per role and is the highest-value check in the
 repo. `points_ledger` and `audit_log` reject UPDATE and DELETE even from
 `service_role`, because that is what Edge Functions run as.
 
+**Astryx is applied by `<Theme>`, not by importing its CSS.** All three
+stylesheets can load with 200s and every component still render unthemed. If the
+app looks like browser defaults, check the provider in `src/lib/providers.tsx`
+first. Run `pnpm exec astryx doctor`, and read `apps/web/.claude/CLAUDE.md` —
+those are Astryx's own conventions and they override defaults. See D-024.
+
 **Astryx is built for dense desktop UI; PAM is not.** Its default button is
 32px and its text input is 20px tall. The 48px floor is applied once, globally,
 in the `pam` cascade layer, and the browser suite fails the build if any control
 slips under. See D-008.
+
+**A `for all` RLS policy is evaluated on SELECT too.** That is how revoking a
+function grant broke signed-out reads of the service catalogue. If a public read
+starts failing with "permission denied for function", a write policy is being
+evaluated on the read path. See D-026.
 
 **StyleX fails silently when misconfigured.** If components render unstyled,
 the `@stylex;` directive resolved to nothing — check that
@@ -114,9 +136,16 @@ D-011.
 
 ## Next
 
-Phase 1: invite generation and redemption, onboarding including the
-transparency step, the map and list with three-category filters, and the city
-resource importer against one sample source.
+Phase 1: invite generation and redemption, onboarding including the transparency
+step, the map and list with three-category filters, and the Philadelphia
+importer.
 
-`DECISIONS.md` lists the eight open questions for Will. W-1 (target city and
-data sources) and W-7 (the support phone number) block Phase 1.
+Two pieces of groundwork carry into it, both logged in `DECISIONS.md`:
+
+- move the internal RLS helpers into a `private` schema PostgREST does not
+  expose, and split write policies off `for all` (D-025, D-026)
+- resolve the real Philadelphia endpoints and activate the sources (D-028)
+
+The demo route is still a component gallery rather than the real Home tab.
+Building the five-tab member shell on `AppShell` + `TabList` is the first UI task
+of Phase 1.

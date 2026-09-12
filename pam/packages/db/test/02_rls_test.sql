@@ -210,3 +210,100 @@ select test.check('admin sees the unreviewed row for review',
   (select count(*) from public.services where needs_review), 1);
 
 reset role;
+
+-- ===========================================================================
+\echo ''
+\echo '--- app_settings: world-readable, admin-writable (§0 never dead-end) ---'
+-- ===========================================================================
+set role authenticated;
+select test.as_user(:'marcus');
+
+select test.check('a member can read the support number',
+  (select count(*) from public.app_settings where key = 'support_phone'), 1);
+
+-- An RLS-filtered UPDATE matches no rows and returns quietly rather than
+-- raising, so the meaningful assertion is that the value did not move.
+do $$
+declare
+  before_value text;
+  after_value text;
+begin
+  select value into before_value from public.app_settings where key = 'support_phone';
+  update public.app_settings set value = '+15555550000' where key = 'support_phone';
+  select value into after_value from public.app_settings where key = 'support_phone';
+
+  if after_value is distinct from before_value then
+    raise exception 'FAIL  a member changed the support number (% -> %)',
+      before_value, after_value;
+  end if;
+  raise notice 'ok    a member cannot change the support number';
+end;
+$$;
+
+-- Anonymous too: someone who cannot sign in still has to be able to reach help.
+set role anon;
+select set_config('request.jwt.claim.sub', '', false);
+select test.check('a signed-out visitor can still read the support number',
+  (select count(*) from public.app_settings where key = 'support_phone'), 1);
+
+set role authenticated;
+select test.as_user(:'admin_north');
+select test.check('an admin can read it',
+  (select count(*) from public.app_settings where key = 'support_phone'), 1);
+
+reset role;
+
+-- ===========================================================================
+\echo ''
+\echo '--- A signed-out visitor can still reach the public catalogue (§0) ---'
+-- ===========================================================================
+-- Regression guard for 0011/0012. A `for all` policy is evaluated on SELECT
+-- too, so revoking EXECUTE on a helper one of them calls turns a public read
+-- into "permission denied for function" rather than an empty result.
+set role anon;
+select set_config('request.jwt.claim.sub', '', false);
+
+-- Two of the three fixture services are published; the third is an unreviewed
+-- import row, which must stay hidden from everyone but an admin (§5.2).
+select test.check('anon can read published services',
+  (select count(*) from public.services), 2);
+select test.check('anon cannot see the unreviewed import row',
+  (select count(*) from public.services where needs_review), 0);
+select test.check('anon can read orgs',
+  (select count(*) from public.orgs), 2);
+select test.check('anon can read the subcategory list',
+  (select count(*) from public.service_subcategories), 18);
+select test.check('anon can read badges',
+  (select count(*) from public.badges), 6);
+select test.check('anon still sees no profiles',
+  (select count(*) from public.profiles), 0);
+select test.check('anon still sees no messages',
+  (select count(*) from public.messages), 0);
+select test.check('anon still sees no invites',
+  (select count(*) from public.invites), 0);
+select test.check('anon still sees no enrollments',
+  (select count(*) from public.enrollments), 0);
+
+-- The guards, not the grants, are what protect these. Assert that directly:
+-- a signed-out caller gets a useless answer from every one.
+do $$
+begin
+  if public.are_buddies('33333333-0000-0000-0000-00000000000c',
+                        '33333333-0000-0000-0000-000000000011') then
+    raise exception 'FAIL  anon probed the buddy graph';
+  end if;
+  if public.is_blocked_between('33333333-0000-0000-0000-00000000000c',
+                               '33333333-0000-0000-0000-000000000013') then
+    raise exception 'FAIL  anon probed block relationships';
+  end if;
+  if public.admin_covers('33333333-0000-0000-0000-00000000000c') then
+    raise exception 'FAIL  anon passed an admin_covers check';
+  end if;
+  if not public.feature_allowed('33333333-0000-0000-0000-00000000000c', 'chat') then
+    raise exception 'FAIL  anon read another user''s access controls';
+  end if;
+  raise notice 'ok    every helper is information-free for a signed-out caller';
+end;
+$$;
+
+reset role;

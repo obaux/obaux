@@ -18,6 +18,7 @@ import {
 } from '@pam/ui';
 import { CATEGORY_LIST, TRANSPARENCY_SCREEN } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
+import { useSupportPhone } from '@/lib/useSupportPhone';
 
 /**
  * Phase 0 demo build.
@@ -47,10 +48,9 @@ const styles = stylex.create({
   note: { fontSize: '15px', lineHeight: 1.5 },
 });
 
-const SUPPORT_PHONE = process.env['NEXT_PUBLIC_SUPPORT_PHONE'] ?? '+15555550199';
-
 export default function Page() {
   const { t, locale } = useI18n();
+  const supportPhone = useSupportPhone();
   const [name, setName] = useState('');
   const [saved, setSaved] = useState(false);
   const [points, setPoints] = useState(250);
@@ -178,7 +178,7 @@ export default function Page() {
         </VStack>
       </VStack>
 
-      <HelpBar supportPhone={SUPPORT_PHONE} label={t('help.needHelp')} />
+      <HelpBar supportPhone={supportPhone} label={t('help.needHelp')} />
     </main>
   );
 }

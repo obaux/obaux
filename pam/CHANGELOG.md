@@ -1,5 +1,83 @@
 # Changelog
 
+## [0.1.1] — 2026-09-12 · Astryx applied, Supabase live, Philadelphia seeded
+
+### Fixed — the design system was never applied
+
+Will flagged that the build did not look like Astryx. It did not. Astryx puts its
+theme on the subtree from React, and the app was never wrapped in `<Theme>`, so
+all three stylesheets loaded with 200s and every component rendered unthemed in
+browser-default serif.
+
+Three setup faults came out with it:
+
+- `@import '…' layer(reset)` was rewritten by Next's CSS pipeline into an
+  invalid `@media layer(reset)` block, dropping the entire Astryx reset.
+- `@astryxdesign/core` sat in `transpilePackages`, re-running the StyleX
+  transform over its source and minting class names its shipped stylesheet does
+  not contain.
+- theme-neutral asks for Figtree and nothing loaded it. Self-hosted now — two
+  variable subsets, 30 KB, no third-party round trip on a 3G first load.
+
+`astryx init` had been skipped entirely and the UI built against guessed APIs.
+The CLI is now a dependency and its conventions are committed at
+`apps/web/.claude/CLAUDE.md`.
+
+Three browser tests assert the theme is really applied: computed typography is
+not a browser default, the theme tokens resolve, and the webfont returns 200.
+
+### Added — Supabase project `pam`
+
+`shobqzuhicoiymtumiaz`, us-east-1, all 12 migrations applied.
+
+The RLS was verified rather than trusted: the applied policy set was
+fingerprinted against the locally-tested one and matches exactly —
+`ce9636c3b77e4827368e6575742b899c`, 73 policies on both.
+
+### Fixed — two security findings on the live project
+
+Supabase's advisors caught a class of hole the local suite could not see.
+PostgREST exposes every `public` function at `/rest/v1/rpc/<name>`, so a
+`SECURITY DEFINER` helper taking a caller-supplied id can be called with someone
+else's. The policies were correct; the leak was around them.
+
+- `member_points(<any member>)` returned that member's points balance to anyone,
+  signed in or not.
+- `are_buddies`, `is_blocked_between` and `feature_allowed` let a caller probe
+  the social graph and another user's access controls.
+
+Each now carries a self-participation guard, and three trigger functions have a
+pinned `search_path`. Eight tests assert both halves: the probe fails, and the
+legitimate reader still gets their answer.
+
+The first attempt at the fix — revoking `EXECUTE` from `anon` — broke signed-out
+reads, because a policy declared `for all` is evaluated on SELECT too. Reading
+`services` evaluated the provider's *write* policy and failed with "permission
+denied for function": a member not signed in could not see the places that can
+help. Corrected, with a regression test covering the whole anonymous read path.
+
+### Added — Philadelphia pilot and the support line
+
+- Philadelphia region seeded, centred on City Hall.
+- Four import sources registered, all `is_active = false`: their endpoints could
+  not be verified because the build environment blocks those hosts, and an
+  invented URL in a source registry is worse than an absent one.
+- `app_settings` table, so the support line (+1 267 309 5265) can change without
+  a redeploy. Readable signed-out, admin-writable, tested both ways.
+
+### Verified
+
+| Check | Result |
+|---|---|
+| Typecheck, 5 packages | pass |
+| Unit tests (`@pam/config`, `@pam/ui`) | 133 pass |
+| Database suite, local | 80 checks pass |
+| Live RLS fingerprint vs local | identical, 73 policies |
+| Live anonymous read attack | 0 profiles, messages, invites, audit rows |
+| Browser a11y + theme, 320px and iPhone SE | 18 pass |
+| First-load JS | 478 kB of the 500 kB budget |
+
+
 ## [0.1.0] — 2026-09-12 · Phase 0: Foundation
 
 First commit. Everything a later phase needs, and nothing a later phase owns.
