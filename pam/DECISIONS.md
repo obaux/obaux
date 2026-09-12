@@ -1073,26 +1073,39 @@ the screen unchanged.
 Neither is a refusal. Both are decisions whose cost lands on people with very
 little margin, and they should be made on purpose.
 
-### D-069 — Anyone can register as a supervising admin, and unverified is visible
-Will's decision, made directly after the concern was put to him: supervising
-admins sign themselves up. Programme managers can do either. Only super admins
-are created from inside the app. This reverses §10 step 6 and the reversal is
-recorded in `docs/sop-amendments.md` A2, because the next person to read the SOP
-should not assume a rule that is gone.
+### D-069 — Case managers and program managers register themselves; members and super admins do not
+Will's decision, made after the concern was put to him twice.
 
-What makes it survivable is not the sign-up screen, it is two things already in
-the database, which must now be treated as load-bearing rather than incidental:
-a supervising admin's caseload comes only from people who redeemed *their*
-invite, so a new account sees nobody and cannot go looking; and the member is
-shown who invited them, by name, before they accept.
+| Role | By invite | Creates their own account |
+|---|---|---|
+| member | yes, from their case manager | no |
+| program manager | yes | yes |
+| case manager | yes | yes |
+| super admin | only from an existing super admin | no |
 
-One addition is not optional. A self-registered supervising admin is
-**unverified** until a super admin verifies them, and the member deciding
-whether to redeem is shown that — the same pattern already used for
-organisations (§6.4). It costs a genuine officer a badge and nothing else. It is
-the difference between somebody saying they are a case manager and PAM saying
-so, and the person carrying the cost of that difference is the one with the
-least room to absorb it.
+This reverses §10 step 6 and the reversal is recorded in
+`docs/sop-amendments.md` A2, because the next person to read the SOP should not
+assume a rule that is gone.
+
+**One role, not two.** An earlier draft of this entry invented a "supervising
+admin" separate from a case manager. There is one account type for whoever
+oversees a returning citizen, whatever their job title, and it is called case
+manager — the phrase a member recognises and the one the app's copy already
+uses.
+
+What makes self-registration survivable is not the sign-up screen, it is two
+things already in the database that must now be treated as load-bearing rather
+than incidental: a case manager's caseload comes only from people who redeemed
+*their* invite, so a new account sees nobody and cannot go looking; and the
+member is shown who invited them, by name, before they accept.
+
+One addition is not optional. A self-registered case manager is **unverified**
+until a super admin verifies them, and the member deciding whether to redeem is
+shown that — the same pattern already used for organisations (§6.4). It costs a
+genuine case manager a badge and nothing else. It is the difference between
+somebody saying they are a case manager and PAM saying so, and the person
+carrying the cost of that difference is the one with the least room to absorb
+it.
 
 ### D-070 — A status chip names what is switched off
 "Some things turned off" is the member's wording. On a caseload it answers

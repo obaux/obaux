@@ -20,75 +20,79 @@ with the admin role splitting in two and a new role above it.
 |---|---|---|
 | **member** | A returning citizen | Finds places and people, enrols, keeps going. Unchanged. |
 | **program admin** (was `provider`) | Staff at an agency or nonprofit | Adds and edits their own programs, and **chats with members directly** — new. |
-| **supervising admin** (was `admin`) | Parole and probation officers, case managers | Watches their caseload's activity, within the §4.1 limits. Unchanged in substance; renamed so it is not confused with the role below. |
+| **case manager** (was `admin`) | Case managers, and parole and probation officers — **one account type, two job titles** | Watches their caseload's activity, within the §4.1 limits. Unchanged in substance. |
 | **super admin** (new) | Will, and whoever he adds | Sees the error log, adds programs by hand, views the database, and creates other super admins. |
 
 Notes that matter for the build:
 
-- **Super admins are never invited and never self-selected.** They are created
-  from inside the super admin screen by an existing super admin. The first one
-  exists already, seeded directly (see STATUS).
+- **Super admins are created only by an existing super admin**, from inside the
+  super admin screen. Never self-selected at sign-up, never issued by anyone
+  else. The first one exists already, seeded directly (see STATUS).
+- **"Supervising admin" was my word and it caused a mix-up.** Will confirmed
+  there is one role for whoever oversees a returning citizen, whether their job
+  title is case manager or probation officer. The role is called **case
+  manager** throughout, because that is the phrase a member recognises and the
+  one already used in the app's own copy.
 - **A program admin chatting with a member is new surface.** §4.1 currently
   says a provider reaches a member only through an enrolment, an appointment or
   a connection. Direct chat has to keep that gate or it becomes a way for any
   registered organisation to message any member.
-- **Renaming `provider` and `admin`** touches the database enum, every access
-  rule, and the transparency screen's wording. It is worth doing once and
-  deliberately, not drifting into.
+- **Renaming `provider` → program manager** touches the database enum, every
+  access rule, and the transparency screen's wording. Worth doing once and
+  deliberately, not drifting into. `admin` keeps its name in the database and
+  reads as "case manager" everywhere a person sees it.
 
-## A2 — Role pills at sign-up (12 September 2026, Will)
+## A2 — Who can create their own account (12 September 2026, Will)
 
 > "During sign up, they can see pills to specify their role."
-> "Supervising admins are not invite-only, they can create an account, and use
-> this by inviting their case load participants. The business owners / program
-> managers are both by invite, or by creating an account themselves."
 
 **This reverses SOP §10 step 6: "Role is set by invite type and never
-self-selected."** Will was asked directly and confirmed directly. Recorded here
-so that the next person to read §10 knows the rule is gone rather than being
-quietly broken.
+self-selected."** Will was asked directly, twice, and confirmed. Recorded here
+so the next person to read §10 knows the rule is gone rather than quietly
+broken.
 
-Who can create their own account, as decided:
-
-| Role | Invite | Self sign-up |
+| Role | By invite | Creates their own account |
 |---|---|---|
-| member | yes, from their supervising admin | — |
-| program admin | yes | **yes** |
-| supervising admin | — | **yes** |
-| super admin | never | never — created from inside the super admin screen |
+| member | yes, from their case manager | **no** |
+| program manager | yes | **yes** |
+| case manager | yes | **yes** |
+| super admin | only from an existing super admin | **no** |
+
+So the sign-up pills offer two choices — *I run a program* and *I work with
+people coming home* — and a member never sees them, because a member arrives
+holding a code.
 
 ### What follows from it, and is not optional
 
-The concern was that a self-declared supervising admin could watch returning
-citizens. Two properties of the existing design already contain most of it, and
-they now have to be *kept* rather than merely being true by accident:
+The concern was that a self-declared case manager could watch returning
+citizens. Two properties of the existing design contain most of it, and they now
+have to be **kept deliberately** rather than being true by accident:
 
-1. **A supervising admin sees nobody until somebody redeems their invite.** The
-   caseload comes from `admin_assignments`, which is written at redemption and
-   points at the admin who issued the code. A fresh self-registered account sees
-   an empty list. It cannot browse, search, or reach a member it did not invite —
-   that is a rule in the database, not a screen behaviour.
+1. **A case manager sees nobody until somebody redeems their invite.** The
+   caseload comes from `admin_assignments`, written at redemption and pointing
+   at the admin who issued the code. A fresh self-registered account sees an
+   empty list, and cannot browse, search or reach a member it did not invite.
+   That is a rule in the database, not a screen behaviour.
 2. **The member is told who invited them, by name, before they accept.** The
-   §4.1 transparency screen is shown at redemption and names the person and what
-   they will be able to see. Somebody who does not recognise the name can stop
-   there.
+   §4.1 transparency screen is shown at redemption and names the person and
+   exactly what they will be able to see. Somebody who does not recognise the
+   name can stop there.
 
-One thing that must be **added**, by the same logic that already governs
+One thing must be **added**, by the same logic that already governs
 organisations (§6.4):
 
-3. **A self-registered supervising admin is unverified until a super admin
-   verifies them**, and a member redeeming their invite is shown that. An
-   invited admin — invited by someone already verified — is verified on arrival.
-   This costs a self-registering officer nothing except a badge, and it is the
-   difference between "somebody says they are a case manager" and "PAM says so".
+3. **A self-registered case manager is unverified until a super admin verifies
+   them**, and a member redeeming their invite is shown that. An invited case
+   manager — invited by somebody already verified — arrives verified. This costs
+   a real case manager a badge and nothing else.
 
-Without (3) the model is: anybody can register as a supervising admin, invite a
-person by phone number, and on redemption see that person's programmes, visits,
-points and activity. With (3) they still can — but the person deciding whether
-to redeem can see that nobody has vouched for them.
+Without (3): anybody registers as a case manager, invites a person by phone
+number, and on redemption sees that person's programmes, visits, points and
+activity. With (3) they still can — but the person deciding whether to redeem
+can see that nobody has vouched for them.
 
-**Status: decided, not built.** Needs the sign-up screens, an `is_verified`
-concept on admin profiles, and the redemption screen to show it.
+**Status: decided, not built.** Needs the sign-up screens, a verified flag on
+case manager profiles, and the redemption screen to show it.
 
 ## A3 — What "view the full database" means (12 September 2026, Will)
 
