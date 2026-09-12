@@ -25,8 +25,7 @@ export type SmsTemplateKey =
   | 'attendance_missed_followup'
   | 'connection_request'
   | 'access_limited_notice'
-  | 'saved_place_closed'
-  | 'saved_place_closed_private';
+  | 'saved_place_closed';
 
 export interface SmsTemplate {
   readonly key: SmsTemplateKey;
@@ -90,6 +89,43 @@ export const FORBIDDEN_SMS_TERMS: readonly string[] = [
 ];
 
 export const SMS_MAX_LENGTH = 160;
+
+/**
+ * Why a place came out of the catalogue, in the words a member reads.
+ *
+ * These live here rather than in the locale bundles because they end up inside
+ * a text message, which means they are subject to every §9 rule and belong in
+ * the same review pass as the templates themselves. The dispatcher looks up the
+ * phrase by key in the member's own language; the queue carries the key, never
+ * the phrase, so a correction here reaches messages that are already waiting.
+ *
+ * Spanish uses verb phrases rather than adjectives on purpose: "cerrado" has to
+ * agree with the gender of a noun the database does not know.
+ */
+export const SERVICE_FLAG_REASONS = {
+  closed: {
+    en: 'closed, so there is no need to go',
+    es: 'ya no abre, no hace falta ir',
+  },
+  moved: {
+    en: 'at a new address now',
+    es: 'cambio de direccion',
+  },
+  not_accepting: {
+    en: 'not taking new people, so there is no need to go',
+    es: 'no acepta gente nueva, no hace falta ir',
+  },
+  wrong_info: {
+    en: 'listed wrong here',
+    es: 'esta mal anotado aqui',
+  },
+} as const;
+
+export type ServiceFlagReason = keyof typeof SERVICE_FLAG_REASONS;
+
+export const SERVICE_FLAG_REASON_KEYS = Object.keys(
+  SERVICE_FLAG_REASONS,
+) as ServiceFlagReason[];
 
 const STOP_SUFFIX_EN = ' Reply STOP to stop texts.';
 const STOP_SUFFIX_ES = ' Responda STOP para no recibir mensajes.';
@@ -218,31 +254,30 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
   /**
    * A place somebody saved has been taken out of the catalogue.
    *
-   * Two versions of the same message, and which one sends is not a style
-   * choice. `saved_place_closed` names the place; `saved_place_closed_private`
-   * does not, and is used whenever the place's name would disclose why somebody
-   * went there (`services.name_may_disclose`). "Fairmount Behavioral Health is
-   * not open any more" on a lock screen tells a roommate something the member
-   * never chose to tell them — which is the whole reason that flag exists.
+   * **It never names the place**, and that is Will's call rather than a
+   * limitation. Naming it would add nothing a member needs — they saved it, and
+   * the app will show them which one — while turning every message into a
+   * disclosure problem: "Fairmount Behavioral Health is closed" on a lock
+   * screen tells a roommate something the member never chose to tell them.
+   * There was a second, nameless template for exactly those places; not naming
+   * any of them deleted the branch and the risk with it.
    *
-   * The wording says the place is closed, not that it was "not useful". A flag
-   * means somebody reported it as gone; it is not a review, and PAM should not
-   * put a judgement of an organisation into a member's messages.
+   * The wording says what is wrong and offers a way on. It never says the place
+   * was "not useful": a flag means somebody reported it as gone, which is not a
+   * review, and a verdict on an organisation does not belong in a member's
+   * messages.
+   *
+   * Both bodies are short enough to carry the STOP line and stay under 160 even
+   * with the longest reason — including the mismatched case the length test
+   * measures, where an English reason lands in the Spanish body. That cannot
+   * happen in practice, but a template with no headroom is one edit from
+   * splitting every notice into two messages.
    */
   saved_place_closed: {
     key: 'saved_place_closed',
-    en: 'PAM: {place} is not open any more. Open PAM to find another place: {link}',
-    es: 'PAM: {place} ya no esta abierto. Abra PAM para buscar otro lugar: {link}',
-    vars: ['place', 'link'],
-    maxVarLengths: { place: 40 },
-    reviewedBy: '',
-    isFirstContact: false,
-  },
-  saved_place_closed_private: {
-    key: 'saved_place_closed_private',
-    en: 'PAM: A place you saved is not open any more. Open PAM to find another: {link}',
-    es: 'PAM: Un lugar que guardo ya no esta abierto. Abra PAM para buscar otro: {link}',
-    vars: ['link'],
+    en: 'PAM: A place you saved is {reason}. Find others in PAM: {link}',
+    es: 'PAM: Un lugar que guardo {reason}. Vea otros en PAM: {link}',
+    vars: ['reason', 'link'],
     reviewedBy: '',
     isFirstContact: false,
   },

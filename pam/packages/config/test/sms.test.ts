@@ -7,6 +7,8 @@ import {
   UnreviewedTemplateError,
   isGsm7,
   nonGsm7Characters,
+  SERVICE_FLAG_REASONS,
+  SERVICE_FLAG_REASON_KEYS,
   SmsContentError,
   unreviewedTemplateKeys,
   shortenToFit,
@@ -26,7 +28,8 @@ const WORST_CASE_VARS: Readonly<Record<string, string>> = {
   address: '1234 Martin Luther King Jr Blvd',
   supportPhone: '555-555-0134',
   // A real imported name, at the length where the budget starts clipping it.
-  place: 'West Philadelphia Community Health Center',
+  // The longest reason phrase, so the length assertion sees the worst case.
+  reason: 'not taking new people, so there is no need to go',
 };
 
 const keys = Object.keys(SMS_TEMPLATES) as SmsTemplateKey[];
@@ -173,5 +176,45 @@ describe('every message fits the cheap encoding', () => {
     // parser would silently drop every Spanish reply.
     expect(SMS_TEMPLATES.attendance_check.es).toContain('YES');
     expect(SMS_TEMPLATES.attendance_check.es).toContain('NO');
+  });
+});
+
+
+describe('why a place came out of the catalogue', () => {
+  // These phrases end up inside a text message, so they are subject to every
+  // §9 rule and belong in the same review pass as the templates.
+  it.each(SERVICE_FLAG_REASON_KEYS)('%s reads as plain language in both languages', (key) => {
+    const reason = SERVICE_FLAG_REASONS[key];
+    for (const phrase of [reason.en, reason.es]) {
+      expect(phrase.length).toBeGreaterThan(0);
+      expect(nonGsm7Characters(phrase)).toEqual([]);
+      // A reason is a fragment dropped into a sentence, not a sentence.
+      expect(phrase).not.toMatch(/[.!?]$/);
+      expect(phrase[0]).toBe(phrase[0]?.toLowerCase());
+    }
+  });
+
+  it('never says why in words that blame the place or the reader', () => {
+    // A flag means somebody reported the place as gone. It is not a review, and
+    // a verdict on an organisation does not belong in a member's messages.
+    for (const key of SERVICE_FLAG_REASON_KEYS) {
+      const { en, es } = SERVICE_FLAG_REASONS[key];
+      expect(`${en} ${es}`.toLowerCase()).not.toMatch(/useless|not useful|bad|poor|inutil|malo/);
+    }
+  });
+
+  it('fits the message with the longest reason', () => {
+    const longest = SERVICE_FLAG_REASON_KEYS.map((k) => SERVICE_FLAG_REASONS[k]);
+    for (const locale of ['en', 'es'] as const) {
+      for (const reason of longest) {
+        const body = renderSms({
+          key: 'saved_place_closed',
+          locale,
+          vars: { ...WORST_CASE_VARS, reason: reason[locale] },
+          allowUnreviewed: true,
+        });
+        expect(body.length).toBeLessThanOrEqual(SMS_MAX_LENGTH);
+      }
+    }
   });
 });

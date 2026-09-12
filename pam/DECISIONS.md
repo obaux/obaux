@@ -1195,26 +1195,30 @@ The one place the difference must show is a super admin's own view, which can
 list removed places and put one back. A delete a person cannot undo is a worse
 delete, not a purer one.
 
-### D-076 — Removing a place texts the people who saved it, and never names a place that gives them away
+### D-076 — Removing a place texts the people who saved it, and never names it
 Somebody saves a place because they mean to go there. When it is removed, the
 member who saved it is the person the removal is actually about — and until now
 they would have found out by walking there.
 
-Two templates, and which one sends is not a style choice.
-`saved_place_closed` names the place; `saved_place_closed_private` does not, and
-is used whenever `services.name_may_disclose` is true. "Fairmount Behavioral
-Health is not open any more" on a lock screen tells a roommate something the
-member never chose to tell them. That flag was built in 0017 and widened in
-0028; this is its first real use, and it covers eleven places in the current
-catalogue.
+**The notice never names the place.** Will's call, and it is better and smaller
+at once. Naming it adds nothing a member needs — they saved it, and the app
+shows them which one when they open it — while making every message a disclosure
+question. An earlier version of this had two templates, the second one nameless,
+for the eleven places whose own names give somebody away (`name_may_disclose`,
+0017 and 0028). Naming none of them deleted the branch, the flag lookup and the
+risk together. The safest version of a message is the one that carries nothing
+it does not need.
 
-**The wording says the place is closed, not that it was "not useful".** Will
-asked for the latter and I did not write it, for two reasons worth recording
-rather than quietly acting on: a flag means somebody reported the place as gone,
-which is not a judgement of its quality; and putting "not useful" in a member's
-messages publishes a verdict on an organisation that PAM has not reached and
-would not be able to defend. If the intent was to capture *why* it was removed,
-the resolution note on the flag is the place for it, and it stays internal.
+So the message says what is wrong and offers a way on:
+
+> PAM: A place you saved is closed, so there is no need to go. Find others in PAM: …
+
+**It never says the place was "not useful".** Will asked for that wording and I
+did not write it, for reasons worth recording rather than quietly acting on: a
+flag means somebody reported the place as gone, which is not a judgement of its
+quality, and putting a verdict on an organisation into a member's messages
+publishes something PAM has not checked and could not defend. Where that belongs
+is the resolution note on the flag, which stays internal.
 
 ### D-077 — An outbox that carries a template key, never a body
 `reminders` is bound to an appointment by a not-null foreign key and cannot
@@ -1229,6 +1233,44 @@ a `body` column.
 Nothing dispatches yet: no SMS provider is configured. Rows queue and wait,
 which is the right behaviour for messages that must not send until the copy is
 reviewed.
+
+### D-078 — Four reasons, chosen from a list, all the way to the message
+Will: standardise the reasons and have the person pick one.
+
+    closed          the place has shut
+    moved           it is somewhere else now
+    not_accepting   still there, not taking new people
+    wrong_info      what PAM says about it is wrong
+
+Free text was the wrong shape for all of it. The reason survives into a text
+message, and §9 copy has to be reviewed and translated — nobody can review a
+sentence a stranger will type next week. Four fixed keys can be written once,
+translated once, and signed off once.
+
+Three consequences worth keeping:
+
+- **The phrases live in `@pam/config`, not the locale bundles.** They end up
+  inside an SMS, so they are subject to every §9 gate and belong in the same
+  review pass as the templates. A test checks each one is plain, lowercase,
+  unpunctuated, inside GSM-7, and free of any word that judges the place.
+- **The queue carries the key, never the phrase.** The dispatcher renders it in
+  the member's own language at send time, so a wording change reaches messages
+  that are already waiting, and a queued row can never hold words nobody signed
+  off.
+- **Spanish uses verb phrases, not adjectives.** "cerrado" has to agree with the
+  gender of a noun the database does not know.
+
+The free-text note stays, beside the reason, and stays internal: it goes to the
+super admin deciding and never into a message.
+
+### D-079 — The super admin can correct the reason before members are told
+The flagger reports what they saw from the pavement; the super admin is the one
+who checks. `resolve_service_flag` takes an optional reason that overrides the
+flagger's, and that is the one members are told.
+
+The alternative — texting the unverified claim — means PAM repeats an
+accusation about an organisation to everybody who saved it, on the word of one
+passer-by. The flag is a signal to look, not a finding.
 
 ---
 

@@ -762,7 +762,7 @@ begin
   -- The person who finds out a place has closed is whoever walked there, so
   -- anyone signed in can say so.
   perform set_config('request.jwt.claim.sub', v_member::text, true);
-  v_flag := (public.flag_service(v_service, 'Door was locked, sign says moved')).id;
+  v_flag := (public.flag_service(v_service, 'moved', 'Door was locked, sign on it says moved')).id;
 
   if (select is_active from public.services where id = v_service) then
     raise exception 'FAIL  a flagged place stayed in the catalogue';
@@ -798,7 +798,7 @@ begin
   raise notice 'ok    keep puts the place back in the catalogue';
 
   -- And removing takes it out for good.
-  v_flag := (public.flag_service(v_service, 'Confirmed closed')).id;
+  v_flag := (public.flag_service(v_service, 'closed', 'Confirmed closed')).id;
   perform public.resolve_service_flag(v_flag, 'remove', 'Confirmed with the city');
 
   if (select removed_at from public.services where id = v_service) is null then
@@ -878,7 +878,7 @@ begin
   on conflict do nothing;
 
   perform set_config('request.jwt.claim.sub', v_admin::text, true);
-  v_flag := (public.flag_service(v_plain, 'Closed')).id;
+  v_flag := (public.flag_service(v_plain, 'closed')).id;
   perform public.resolve_service_flag(v_flag, 'remove', 'Confirmed');
 
   select template_key, vars into v_template, v_vars
@@ -886,12 +886,16 @@ begin
   order by created_at desc limit 1;
 
   if v_template <> 'saved_place_closed' then
-    raise exception 'FAIL  a neutral place did not use the named template, got %', v_template;
-  end if;
-  if v_vars ->> 'place' is null then
-    raise exception 'FAIL  the message carries no place name to render';
+    raise exception 'FAIL  the wrong template was queued, got %', v_template;
   end if;
   raise notice 'ok    the people who saved a place are told it is gone';
+
+  -- 0037: no notice names a place. Naming one added nothing a member needs and
+  -- made every message a disclosure question.
+  if v_vars ? 'place' then
+    raise exception 'FAIL  a place name was queued into a message';
+  end if;
+  raise notice 'ok    the notice never names the place';
 
   -- And a place whose own name gives somebody away is never named in a text.
   select id into v_discloses from public.services
@@ -901,26 +905,19 @@ begin
     insert into public.saved_places (member_id, service_id) values (v_member, v_discloses)
     on conflict do nothing;
 
-    v_flag := (public.flag_service(v_discloses, 'Closed')).id;
+    v_flag := (public.flag_service(v_discloses, 'closed')).id;
     perform public.resolve_service_flag(v_flag, 'remove', 'Confirmed');
 
-    -- Ordering by time is no help: every row in one transaction shares a
-    -- timestamp. Assert on the set instead, which is the stronger claim.
-    if not exists (
-      select 1 from public.outbound_messages
-      where member_id = v_member and template_key = 'saved_place_closed_private'
-    ) then
-      raise exception 'FAIL  no private notice was queued for a disclosing place';
-    end if;
-
+    -- The disclosure branch used to matter here. It no longer can: since 0037
+    -- nothing names a place, so a name that would give somebody away has
+    -- nowhere to appear. Asserted on the set, because every row in one
+    -- transaction shares a timestamp and ordering by time proves nothing.
     if exists (
-      select 1 from public.outbound_messages o
-      where o.member_id = v_member
-        and o.vars ->> 'place' = (select name from public.services where id = v_discloses)
+      select 1 from public.outbound_messages o where o.member_id = v_member and o.vars ? 'place'
     ) then
-      raise exception 'FAIL  a disclosing place name was queued into a message';
+      raise exception 'FAIL  a place name was queued into a message';
     end if;
-    raise notice 'ok    a name that gives somebody away never reaches a lock screen';
+    raise notice 'ok    a name that gives somebody away has nowhere to appear';
   end if;
 
   -- The queue carries a template key, never a body: nothing can send words a
@@ -933,6 +930,62 @@ begin
     raise exception 'FAIL  the outbox grew a column that could carry unreviewed words';
   end if;
   raise notice 'ok    the queue holds a template key, not a message body';
+
+  update public.profiles set role = 'admin' where id = v_admin;
+end;
+$$;
+
+-- ===========================================================================
+\echo ''
+\echo '--- The reason is one of four, and it reaches the message (0036) ---'
+-- ===========================================================================
+do $$
+declare
+  v_member uuid := '33333333-0000-0000-0000-00000000000c';
+  v_admin  uuid := '33333333-0000-0000-0000-00000000000a';
+  v_service uuid;
+  v_flag uuid;
+  v_vars jsonb;
+  ok boolean := false;
+begin
+  update public.profiles set role = 'super_admin' where id = v_admin;
+  perform set_config('request.jwt.claim.sub', v_admin::text, true);
+
+  select id into v_service from public.services
+  where not name_may_disclose and removed_at is null and is_active limit 1;
+  insert into public.saved_places (member_id, service_id) values (v_member, v_service)
+  on conflict do nothing;
+
+  -- Free text is not a reason. Nobody can review a sentence a stranger will
+  -- type next week, and this one ends up in a text message.
+  begin
+    perform public.flag_service(v_service, 'it seemed closed to me');
+  exception when others then
+    ok := true;
+  end;
+  if not ok then raise exception 'FAIL  a free-text reason was accepted'; end if;
+  raise notice 'ok    the reason has to be one of the four';
+
+  v_flag := (public.flag_service(v_service, 'moved', 'New sign points up the block')).id;
+
+  -- A super admin can correct it: the flagger reported what they saw from the
+  -- pavement, and PAM should text what it has actually confirmed.
+  perform public.resolve_service_flag(v_flag, 'remove', 'Called them', 'not_accepting');
+
+  select vars into v_vars from public.outbound_messages
+  where member_id = v_member and vars ->> 'reason_key' = 'not_accepting' limit 1;
+
+  if v_vars is null then
+    raise exception 'FAIL  the confirmed reason did not reach the message';
+  end if;
+  raise notice 'ok    the reason a super admin confirmed is the one members are told';
+
+  -- The queue carries the key, so a wording change reaches messages already
+  -- waiting, and the phrase stays under review.
+  if v_vars ? 'reason' then
+    raise exception 'FAIL  a rendered phrase was queued instead of its key';
+  end if;
+  raise notice 'ok    the queue carries the reason key, not the sentence';
 
   update public.profiles set role = 'admin' where id = v_admin;
 end;
