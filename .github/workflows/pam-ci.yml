@@ -44,7 +44,14 @@ jobs:
       - name: Unit tests
         run: pnpm --filter @pam/config --filter @pam/ui test
 
+      # Deliberately not the real project. The browser checks stub the RPC
+      # response, so the client only has to construct — pointing CI at the live
+      # database would make a test suite depend on a network and a key, and
+      # would tell us nothing the stub does not.
       - name: Build web
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: https://stub.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: stub-anon-key-for-ci
         run: pnpm --filter @pam/web build
 
       - name: Check first-load JS against the §12 budget

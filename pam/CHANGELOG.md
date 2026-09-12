@@ -1,5 +1,38 @@
 # Changelog
 
+## [0.2.0] — 2026-09-12 · The catalogue is real
+
+### Added — a places screen backed by Supabase
+
+`/places` lists the nearest walk-in services from the live catalogue through one
+RPC, `services_near`, which runs `security invoker` so RLS decides what comes
+back. Distances are formatted by `distanceLabel()`; no card claims a place is
+open, because PAM still holds no hours.
+
+Four states, all of which the screen renders: loading, results, nothing found,
+and a failed query — the last two as plain-language notices with a working phone
+number, never a blank list.
+
+### Fixed — PAM was labelling 525 providers with a health subcategory
+
+The DBHIDS import wrote `subcategory = 'health_counseling'` on every row. A
+provider's own name is theirs to keep, but the subcategory is PAM's word, and
+the source gives no honest basis for one. Imported rows now carry none, and a
+database invariant fails the build if that changes.
+
+### Fixed — the whole catalogue was invisible to members
+
+Every imported row sat in the review queue, which the public-catalogue policy
+hides. The queue exists to keep unapproved plain-language rewrites off a
+member's screen; these rows contain no PAM-authored prose at all. They are
+published, and a trigger returns any row to the queue the moment plain-language
+copy is written to it.
+
+### Security
+
+`name_discloses_condition`, `url_encode_component` and `google_place_url` now
+pin their `search_path`.
+
 ## [0.1.2] — 2026-09-12 · Cards that only say what they know
 
 ### Fixed — a distance read `1.7999999999999998 miles`

@@ -47,6 +47,8 @@ const styles = stylex.create({
   },
   sectionTitle: { fontSize: '14px', textTransform: 'uppercase', letterSpacing: '0.08em' },
   note: { fontSize: '15px', lineHeight: 1.5 },
+  // §2.5 — every control clears the 48px floor, including this one.
+  linkButton: { minHeight: '48px', fontSize: '17px' },
 });
 
 /**
@@ -118,6 +120,12 @@ export default function Page() {
           <Text type="supporting" xstyle={styles.sectionTitle}>
             PlaceCard · the three fixed categories
           </Text>
+          <Button
+            label="See the real catalogue"
+            variant="secondary"
+            href="/places/"
+            xstyle={styles.linkButton}
+          />
           <Text type="supporting" xstyle={styles.note}>
             Sample data. These are placeholder names, not listings — nothing on this page reads
             from the database, so do not expect a match in Google. Real cards are built from the

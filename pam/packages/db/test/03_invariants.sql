@@ -316,12 +316,54 @@ begin
   end if;
   raise notice 'ok    disclosing provider names are flagged, neutral ones are not';
 
+  -- An import has no honest basis for a subcategory: the only source field that
+  -- would distinguish these is `service_type`, which is withheld precisely
+  -- because every value of it discloses. PAM naming one anyway would be PAM
+  -- adding a condition label, which §0 forbids (0020).
   select count(*) into n from public.services
-  where source_ref like 'dbhids:%' and not needs_review;
+  where source = 'city_import' and subcategory is not null;
   if n > 0 then
-    raise exception 'FAIL  % imported row(s) skipped the review queue', n;
+    raise exception 'FAIL  % imported row(s) carry a subcategory PAM invented', n;
   end if;
-  raise notice 'ok    every imported row waits for review before a member sees it';
+  raise notice 'ok    an import adds no condition label of its own';
+
+  -- The review queue guards PAM's words, not the city's facts. A row with a
+  -- name, an address and a point, and no PAM-authored prose in it, has nothing
+  -- awaiting approval and is publishable.
+  select count(*) into n from public.services
+  where source_ref like 'dbhids:%'
+    and needs_review
+    and description_plain is null
+    and eligibility_plain is null
+    and how_to_enroll_plain is null;
+  if n > 0 then
+    raise exception 'FAIL  % imported row(s) held for review with nothing to review', n;
+  end if;
+  raise notice 'ok    imported places with no PAM copy in them reach members';
+end;
+$$;
+
+-- Writing plain-language copy puts a row back in the queue, whoever writes it
+-- and whether or not they remember to. This is what keeps an unreviewed rewrite
+-- (§5.2 step 6) off a member's screen once the importer starts producing them.
+do $$
+declare
+  v_id uuid;
+  v_flag boolean;
+begin
+  select id into v_id from public.services where source_ref like 'dbhids:%' and not needs_review limit 1;
+  if v_id is null then
+    raise exception 'FAIL  no published imported row to test the review trigger against';
+  end if;
+
+  update public.services set description_plain = 'A place that can help.' where id = v_id;
+  select needs_review into v_flag from public.services where id = v_id;
+  if not v_flag then
+    raise exception 'FAIL  a new plain-language rewrite did not return the row to review';
+  end if;
+
+  update public.services set description_plain = null, needs_review = false where id = v_id;
+  raise notice 'ok    new plain-language copy returns a row to the review queue';
 end;
 $$;
 

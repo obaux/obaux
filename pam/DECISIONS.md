@@ -706,6 +706,70 @@ and the section is labelled as sample data. The previous names were plausible
 enough that the first reviewer went looking for them in Google Maps — reasonably,
 since the card offers exactly that link.
 
+### D-045 — An import adds no condition label of its own
+The DBHIDS ingest was writing `subcategory = 'health_counseling'` on all 525
+rows. §0 draws a careful line and 0017 already sat on it: a provider's own name
+is theirs and is shown as it is, because a member has to be able to find the
+door. But `subcategory` is **PAM's** word. Applying a health label to every
+imported row is PAM saying out loud why somebody is at a place.
+
+The feed gives no honest basis for one anyway. The only field that would
+distinguish these rows is `service_type`, which is exactly the column withheld
+from client roles because every one of its values discloses. So imported rows
+now carry no subcategory. `category = 'family_services'` stays — it is neutral,
+and it is what colours the pin.
+
+A database invariant fails the build if any `city_import` row has a subcategory.
+It has to be reintroduced by a human with a real reason, one row at a time.
+
+### D-046 — The review queue guards PAM's words, not the city's facts
+Every imported row was flagged `needs_review`, and the public-catalogue policy
+hides flagged rows, so the catalogue was empty to every member — 525 real places
+that nobody could see.
+
+§5.2 is about not putting an unapproved plain-language rewrite in front of a
+member. These rows contain no PAM-authored prose at all: no description, no
+eligibility, no enrolment steps. With the invented subcategory gone (D-045)
+there is nothing in them awaiting anyone's approval — a name, an address, a
+point on a map, and a neutral category, all straight from the city.
+
+So the flag is cleared for exactly those rows, and a trigger raises it again the
+moment any plain-language column is written, whoever writes it and whether or
+not they remember to. Clearing it stays a deliberate act: an admin approving
+words.
+
+What a member gets is thin and true — a real place, how far it is, how to get
+there, a link to its Google listing for hours. The description arrives with the
+Phase 1 rewrite step, and `needs_review` will be doing its real job then.
+
+### D-047 — One RPC, `security invoker`, is how the app reads the catalogue
+`services_near(lat, lon, category, limit, max_meters)` is the only query the
+places screen makes.
+
+It is a function rather than a PostgREST filter because distance is the whole
+point and `geo` is a geography column: a browser cannot sort by proximity
+without either PostGIS or downloading the table. `p_limit` is clamped to 50 so
+it is not a bulk export either.
+
+It is `security invoker`, which matters more than the convenience. RLS decides
+what comes back — the same policy set that was penetration-tested — so the app
+cannot widen its own access by asking differently, and a future signed-in
+version of this screen needs no second code path. It returns metres and lets the
+caller format them (D-043), and it returns `has_hours` as a boolean rather than
+the hours themselves, so a screen can tell that it must fall back to Google
+without ever being handed something it might render as an open/closed claim
+(D-044).
+
+### D-048 — CI builds against a stub Supabase URL, not the real project
+The browser checks stub the RPC response, so the client only has to construct.
+Pointing CI at the live database would make the suite depend on a network and a
+key, and would tell us nothing the stub does not — while making a red build the
+normal state whenever the project sleeps.
+
+The two `NEXT_PUBLIC_` values in CI are therefore deliberate nonsense. What is
+being tested is the screen's contract with a payload, and the payload in the
+spec is the exact one the live RPC returned as the `anon` role.
+
 ---
 
 ## Notes for whoever picks this up next
