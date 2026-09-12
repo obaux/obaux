@@ -1,0 +1,43 @@
+{
+  "name": "@pam/web",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "vitest run --passWithNoTests",
+    "test:a11y": "playwright test",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@astryxdesign/core": "^0.6.0",
+    "@astryxdesign/theme-neutral": "^0.6.0",
+    "@pam/config": "workspace:*",
+    "@pam/db": "workspace:*",
+    "@pam/ui": "workspace:*",
+    "@stylexjs/stylex": "^0.19.0",
+    "@supabase/ssr": "^0.5.2",
+    "@supabase/supabase-js": "^2.47.10",
+    "next": "15.5.25",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.10.1",
+    "@babel/preset-react": "^7.29.7",
+    "@babel/preset-typescript": "^7.29.7",
+    "@playwright/test": "^1.49.1",
+    "@stylexjs/babel-plugin": "^0.19.0",
+    "@stylexjs/postcss-plugin": "^0.19.0",
+    "@types/node": "^22.10.2",
+    "@types/react": "^19.0.2",
+    "@types/react-dom": "^19.0.2",
+    "autoprefixer": "^10.5.6",
+    "postcss": "^8.4.49",
+    "serve": "^14.2.6",
+    "typescript": "^5.7.2",
+    "vitest": "^2.1.8"
+  }
+}

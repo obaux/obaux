@@ -1,0 +1,22 @@
+{
+  "name": "@pam/db",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": { ".": "./src/index.ts" },
+  "scripts": {
+    "test": "bash scripts/test-db.sh",
+    "typecheck": "tsc -p tsconfig.json",
+    "seed:admin": "tsx scripts/seed-admin.ts",
+    "migrate": "supabase db push"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.47.10"
+  },
+  "devDependencies": {
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2"
+  }
+}

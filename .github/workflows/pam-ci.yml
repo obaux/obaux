@@ -1,0 +1,128 @@
+name: PAM CI
+
+# Scoped to pam/** so the garage sale Pages deploy is never triggered by this
+# project, and vice versa.
+on:
+  push:
+    paths: ['pam/**', '.github/workflows/pam-ci.yml']
+  pull_request:
+    paths: ['pam/**', '.github/workflows/pam-ci.yml']
+  workflow_dispatch:
+
+concurrency:
+  group: pam-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: pam
+
+jobs:
+  checks:
+    name: Types, unit tests, build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pam/pnpm-lock.yaml
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm -r typecheck
+
+      # Covers the SMS safety gates, the dignity-language rules, locale parity,
+      # the transparency contract, and the a11y structure of every component.
+      - name: Unit tests
+        run: pnpm --filter @pam/config --filter @pam/ui test
+
+      - name: Build web
+        run: pnpm --filter @pam/web build
+
+      - name: Check first-load JS against the §12 budget
+        run: node scripts/check-bundle-budget.mjs
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: web-export
+          path: pam/apps/web/out
+          retention-days: 3
+
+  database:
+    name: Migrations and RLS
+    runs-on: ubuntu-latest
+
+    # The migrations need PostGIS for geography columns and pgcrypto for invite
+    # codes, so the image has to carry both.
+    services:
+      postgres:
+        image: postgis/postgis:16-3.4
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: pam_test
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install psql
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client
+
+      # This is the job that proves the §4.1 privacy promises hold: one test
+      # user per role attempting cross-role reads (§13 Phase 7).
+      - name: Apply migrations and run the RLS penetration suite
+        env:
+          PAM_TEST_DSN: postgresql://postgres:postgres@localhost:5432/pam_test
+        run: bash packages/db/scripts/test-db.sh
+
+  a11y:
+    name: Accessibility (browser)
+    runs-on: ubuntu-latest
+    needs: checks
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pam/pnpm-lock.yaml
+
+      - run: pnpm install --frozen-lockfile
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: web-export
+          path: pam/apps/web/out
+
+      - name: Install Chromium
+        run: pnpm --filter @pam/web exec playwright install --with-deps chromium
+
+      # §12 is build-blocking: any WCAG AA violation fails here, as do
+      # undersized touch targets and horizontal overflow at 320px.
+      - name: axe + layout checks
+        run: pnpm --filter @pam/web test:a11y
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: pam/apps/web/playwright-report
+          retention-days: 7

@@ -1,0 +1,337 @@
+/**
+ * SMS templates — SOP §9.
+ *
+ * Assume every phone is shared or visible to someone else. A message that
+ * reveals justice involvement can cost a member their housing or their job.
+ * These rules are enforced here, in code, not left to the caller:
+ *
+ *  - never name justice terms, programs that imply justice involvement,
+ *    other users' full names, or health/legal detail
+ *  - "PAM:" prefix, one clear action, <= 160 characters, no emoji
+ *  - STOP instruction on the first message to a number, and monthly after
+ *  - every template carries `reviewedBy`; an unreviewed template cannot send
+ */
+
+export type SmsTemplateKey =
+  | 'invite_member'
+  | 'invite_provider'
+  | 'verify_code'
+  | 'facilitation_member'
+  | 'facilitation_provider'
+  | 'appointment_24h'
+  | 'appointment_2h'
+  | 'appointment_morning_of'
+  | 'attendance_check'
+  | 'attendance_missed_followup'
+  | 'connection_request'
+  | 'access_limited_notice';
+
+export interface SmsTemplate {
+  readonly key: SmsTemplateKey;
+  /**
+   * Template body. `{placeholders}` are filled by `renderSms`.
+   * Written in plain language at a 5th-grade reading level.
+   */
+  readonly en: string;
+  readonly es: string;
+  /** Named placeholders this template expects. Render fails if any is missing. */
+  readonly vars: readonly string[];
+  /**
+   * Who signed off on the copy against §9. An empty string means NOT reviewed,
+   * and `renderSms` will refuse to render it. Do not fill this in for your own
+   * draft — it is a human sign-off field.
+   */
+  readonly reviewedBy: string;
+  /** True when this is the first message PAM sends a number — forces STOP text. */
+  readonly isFirstContact: boolean;
+  /**
+   * Per-variable length budget. A value longer than its budget is shortened at
+   * a word boundary rather than pushing the body over 160 characters.
+   *
+   * This exists because a reminder that throws is a reminder that never sends.
+   * A member missing their appointment because their street address was long is
+   * a far worse outcome than a slightly clipped address next to a maps link.
+   */
+  readonly maxVarLengths?: Readonly<Record<string, number>>;
+}
+
+/**
+ * Words that must never appear in an outbound SMS. Checked case-insensitively
+ * against the rendered body. This is a backstop against a careless edit, not a
+ * substitute for review.
+ */
+export const FORBIDDEN_SMS_TERMS: readonly string[] = [
+  'parole',
+  'probation',
+  'officer',
+  'case manager',
+  'inmate',
+  'prisoner',
+  'offender',
+  'ex-offender',
+  'convict',
+  'conviction',
+  'felon',
+  'felony',
+  'incarcerat',
+  'reentry',
+  're-entry',
+  'halfway house',
+  'correctional',
+  'corrections',
+  'jail',
+  'prison',
+  'release',
+  'supervision',
+  'court',
+  'sentence',
+];
+
+export const SMS_MAX_LENGTH = 160;
+
+const STOP_SUFFIX_EN = ' Reply STOP to stop texts.';
+const STOP_SUFFIX_ES = ' Responda STOP para no recibir mensajes.';
+
+/**
+ * The catalogue.
+ *
+ * `reviewedBy: ''` on every entry is deliberate — these are drafts written by
+ * the build agent. Will (or a delegate) reviews the copy against §9 and fills
+ * in the name. Until then `renderSms` throws, so nothing can ship unreviewed.
+ */
+export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
+  invite_member: {
+    key: 'invite_member',
+    en: "PAM: You've been invited to PAM, an app for finding help and people near you. Tap to join: {link}",
+    es: 'PAM: Le invitaron a PAM, una app para encontrar ayuda y personas cerca. Toque para entrar: {link}',
+    vars: ['link'],
+    reviewedBy: '',
+    isFirstContact: true,
+  },
+  invite_provider: {
+    key: 'invite_provider',
+    en: 'PAM: You have been invited to list your services on PAM. Tap to set up your page: {link}',
+    es: 'PAM: Le invitaron a publicar sus servicios en PAM. Toque para crear su pagina: {link}',
+    vars: ['link'],
+    reviewedBy: '',
+    isFirstContact: true,
+  },
+  verify_code: {
+    key: 'verify_code',
+    en: 'PAM: Your code is {code}. It works for 10 minutes.',
+    es: 'PAM: Su codigo es {code}. Sirve por 10 minutos.',
+    vars: ['code'],
+    reviewedBy: '',
+    isFirstContact: false,
+  },
+  /**
+   * §9: admin-originated SMS never says parole/probation/officer/case manager.
+   * The admin's FIRST NAME only — never a title, never a full name.
+   */
+  facilitation_member: {
+    key: 'facilitation_member',
+    en: 'PAM: {adminFirstName} connected you with a program that can help. Open PAM to say hi: {link}',
+    es: 'PAM: {adminFirstName} le conecto con un programa que puede ayudar. Abra PAM para saludar: {link}',
+    vars: ['adminFirstName', 'link'],
+    reviewedBy: '',
+    isFirstContact: false,
+  },
+  facilitation_provider: {
+    key: 'facilitation_provider',
+    en: 'PAM: Someone was introduced to your program. Open PAM to reply: {link}',
+    es: 'PAM: Alguien fue presentado a su programa. Abra PAM para responder: {link}',
+    vars: ['link'],
+    reviewedBy: '',
+    isFirstContact: false,
+  },
+  appointment_24h: {
+    key: 'appointment_24h',
+    en: 'PAM: You have a visit tomorrow at {time}. {address}. Tap for directions: {link}',
+    es: 'PAM: Tiene una visita manana a las {time}. {address}. Toque para llegar: {link}',
+    vars: ['time', 'address', 'link'],
+    maxVarLengths: { address: 34 },
+    reviewedBy: '',
+    isFirstContact: false,
+  },
+  appointment_2h: {
+    key: 'appointment_2h',
+    en: 'PAM: Your visit is at {time} today. {address}. Tap for directions: {link}',
+    es: 'PAM: Su visita es hoy a las {time}. {address}. Toque para llegar: {link}',
+    vars: ['time', 'address', 'link'],
+    maxVarLengths: { address: 34 },
+    reviewedBy: '',
+    isFirstContact: false,
+  },
+  appointment_morning_of: {
+    key: 'appointment_morning_of',
+    en: 'PAM: Today at {time} you have a visit. {address}. Tap for directions: {link}',
+    es: 'PAM: Hoy a las {time} tiene una visita. {address}. Toque para llegar: {link}',
+    vars: ['time', 'address', 'link'],
+    maxVarLengths: { address: 34 },
+    reviewedBy: '',
+    isFirstContact: false,
+  },
+  attendance_check: {
+    key: 'attendance_check',
+    en: 'PAM: Did you make it today? Reply YES or NO.',
+    es: 'PAM: Pudo ir hoy? Responda YES o NO.',
+    vars: [],
+    reviewedBy: '',
+    isFirstContact: false,
+  },
+  /** §7.2: a missed visit is never penalised. Gentle, one action, no guilt. */
+  attendance_missed_followup: {
+    key: 'attendance_missed_followup',
+    en: 'PAM: No problem. We saved a step to set up a new time. Open PAM when you are ready: {link}',
+    es: 'PAM: No hay problema. Guardamos un paso para buscar otra fecha. Abra PAM cuando pueda: {link}',
+    vars: ['link'],
+    reviewedBy: '',
+    isFirstContact: false,
+  },
+  /** §6.2: no names in a connection-request SMS. */
+  connection_request: {
+    key: 'connection_request',
+    en: 'PAM: Someone on PAM wants to connect. Open PAM to reply: {link}',
+    es: 'PAM: Alguien en PAM quiere conectar. Abra PAM para responder: {link}',
+    vars: ['link'],
+    reviewedBy: '',
+    isFirstContact: false,
+  },
+  access_limited_notice: {
+    key: 'access_limited_notice',
+    en: 'PAM: Some parts of PAM are turned off for now. Call {supportPhone} with questions.',
+    es: 'PAM: Algunas partes de PAM estan apagadas por ahora. Llame al {supportPhone} si tiene preguntas.',
+    vars: ['supportPhone'],
+    reviewedBy: '',
+    isFirstContact: false,
+  },
+};
+
+export class UnreviewedTemplateError extends Error {
+  constructor(key: SmsTemplateKey) {
+    super(
+      `SMS template "${key}" has no reviewedBy and cannot be sent. ` +
+        'A human must review the copy against SOP §9 and record their name.',
+    );
+    this.name = 'UnreviewedTemplateError';
+  }
+}
+
+export class SmsContentError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'SmsContentError';
+  }
+}
+
+export interface RenderSmsOptions {
+  readonly key: SmsTemplateKey;
+  readonly locale: 'en' | 'es';
+  readonly vars?: Readonly<Record<string, string>>;
+  /** Force the STOP suffix — true for first contact and the monthly reminder. */
+  readonly includeStop?: boolean;
+  /**
+   * Escape hatch for tests only. Skips the reviewedBy gate. Never set this in
+   * application code; the dispatcher does not pass it.
+   */
+  readonly allowUnreviewed?: boolean;
+}
+
+/**
+ * Renders a template to a sendable body, or throws.
+ *
+ * Throwing is the point: a reminder that fails loudly in the dispatcher is
+ * recoverable, a text that outs someone to their roommate is not.
+ */
+export function renderSms(options: RenderSmsOptions): string {
+  const { key, locale, vars = {}, includeStop, allowUnreviewed = false } = options;
+  const template = SMS_TEMPLATES[key];
+
+  if (!template.reviewedBy && !allowUnreviewed) {
+    throw new UnreviewedTemplateError(key);
+  }
+
+  let body = locale === 'es' ? template.es : template.en;
+
+  for (const name of template.vars) {
+    const value = vars[name];
+    if (value === undefined || value === '') {
+      throw new SmsContentError(`Template "${key}" is missing required variable "${name}".`);
+    }
+    const budget = template.maxVarLengths?.[name];
+    const fitted = budget === undefined ? value : shortenToFit(value, budget);
+    body = body.split(`{${name}}`).join(fitted);
+  }
+
+  const leftover = body.match(/\{[a-zA-Z0-9_]+\}/);
+  if (leftover) {
+    throw new SmsContentError(`Template "${key}" left an unfilled placeholder: ${leftover[0]}`);
+  }
+
+  if (includeStop ?? template.isFirstContact) {
+    body += locale === 'es' ? STOP_SUFFIX_ES : STOP_SUFFIX_EN;
+  }
+
+  assertSmsIsSafe(body, key);
+  return body;
+}
+
+/**
+ * Shortens a value to `max` characters, preferring a word boundary.
+ *
+ * No ellipsis: the three characters are better spent on the address itself, and
+ * a trailing "..." reads as an error to someone scanning a text quickly. The
+ * maps link in the same message carries the exact destination anyway.
+ */
+export function shortenToFit(value: string, max: number): string {
+  if (value.length <= max) return value;
+  const cut = value.slice(0, max);
+  const lastSpace = cut.lastIndexOf(' ');
+  // Only fall back to a hard cut when the first word alone exceeds the budget.
+  return (lastSpace > max * 0.6 ? cut.slice(0, lastSpace) : cut).trimEnd();
+}
+
+/** Emoji, pictographs and dingbats — §9 forbids all of them in SMS. */
+const EMOJI_PATTERN =
+  /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{FE00}-\u{FE0F}\u{1F000}-\u{1F2FF}]/u;
+
+/**
+ * Final gate before a body reaches Twilio. Exported so the dispatcher can
+ * re-check a body it assembled from any path, not just `renderSms`.
+ */
+export function assertSmsIsSafe(body: string, key?: string): void {
+  const where = key ? ` (template "${key}")` : '';
+
+  if (!body.startsWith('PAM:')) {
+    throw new SmsContentError(`SMS must start with the "PAM:" prefix${where}.`);
+  }
+  if (body.length > SMS_MAX_LENGTH) {
+    throw new SmsContentError(
+      `SMS is ${body.length} characters, over the ${SMS_MAX_LENGTH} limit${where}.`,
+    );
+  }
+  if (EMOJI_PATTERN.test(body)) {
+    throw new SmsContentError(`SMS must not contain emoji${where}.`);
+  }
+
+  const lowered = body.toLowerCase();
+  for (const term of FORBIDDEN_SMS_TERMS) {
+    if (lowered.includes(term)) {
+      throw new SmsContentError(
+        `SMS contains the forbidden term "${term}"${where}. ` +
+          'Outbound texts must never reveal justice involvement (SOP §9).',
+      );
+    }
+  }
+}
+
+/** True when every template has a recorded reviewer. CI asserts this before a release build. */
+export function allTemplatesReviewed(): boolean {
+  return Object.values(SMS_TEMPLATES).every((t) => t.reviewedBy.length > 0);
+}
+
+export function unreviewedTemplateKeys(): SmsTemplateKey[] {
+  return Object.values(SMS_TEMPLATES)
+    .filter((t) => !t.reviewedBy)
+    .map((t) => t.key);
+}

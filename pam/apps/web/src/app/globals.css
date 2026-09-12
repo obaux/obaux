@@ -1,0 +1,130 @@
+/*
+ * Cascade layer order — SOP §2.2.
+ *
+ * Astryx ships cascade-layered CSS (`astryx.css` declares `@layer astryx-base`
+ * internally). §2.2 requires declaring the order explicitly and putting project
+ * CSS in a named layer, so that import order never silently decides who wins.
+ *
+ * Lowest priority first. PAM's own layer is last, so its overrides beat Astryx
+ * defaults without a single `!important` (§2.3 forbids them).
+ *
+ * Note: only `reset.css` needs an explicit `layer()` on import — it is a plain
+ * reset with no layer of its own. The other two self-layer, and double-layering
+ * them on import produces broken output through Next's CSS pipeline.
+ */
+@layer reset, astryx-base, stylex, pam;
+
+@import '@astryxdesign/core/reset.css' layer(reset);
+@import '@astryxdesign/core/astryx.css';
+@import '@astryxdesign/theme-neutral/theme.css';
+
+/*
+ * The @stylex directive is replaced at build time by @stylexjs/postcss-plugin
+ * with every rule StyleX generated across the app and @pam/ui. Without it the
+ * components render with correct class names and no rules behind them — which
+ * looks like a styling bug and is really a missing build step.
+ */
+@layer stylex {
+  @stylex;
+}
+
+@layer pam {
+  :root {
+    /*
+     * §2.5 token overrides. 18px body on mobile is the floor, not the target;
+     * desktop relaxes to 16px where reading distance is shorter.
+     */
+    --pam-body-size: 18px;
+    --pam-touch-target-min: 48px;
+    --pam-big-button-height: 64px;
+  }
+
+  @media (min-width: 768px) {
+    :root {
+      --pam-body-size: 16px;
+    }
+  }
+
+  html {
+    /* §12: text must scale to 200% without breaking layout, so never px-lock. */
+    font-size: 100%;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    font-size: var(--pam-body-size);
+    line-height: 1.55;
+    margin: 0;
+    /* Room for the fixed HelpBar so it never covers the last control. */
+    padding-bottom: calc(72px + env(safe-area-inset-bottom, 0px));
+    min-height: 100dvh;
+  }
+
+  /*
+   * Visually hidden but announced. Used for the true points value behind the
+   * animated counter, and anywhere a visual affordance needs a spoken name.
+   */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  /*
+   * §2.5 minimum touch target, applied globally.
+   *
+   * Astryx is built for dense desktop interfaces: its TextInput renders a 20px
+   * inner <input> and its default Button is 32px. Both are fine for a mouse and
+   * both fail the 48px floor PAM needs for a thumb on a cracked screen.
+   *
+   * This is a deliberate, system-wide override rather than a per-component fix,
+   * because the rule is system-wide — a component added next month should clear
+   * the floor without anyone remembering to make it. The Playwright suite
+   * measures every interactive control on the page and fails the build if one
+   * slips under.
+   *
+   * Longer term this belongs in the copied theme's tokens (§2.5 names
+   * `astryx theme add neutral` for exactly this). See DECISIONS.md D-008.
+   */
+  button,
+  input,
+  select,
+  textarea,
+  a[role='button'],
+  [role='button'],
+  [role='switch'],
+  [role='checkbox'],
+  [role='radio'] {
+    min-height: var(--pam-touch-target-min);
+  }
+
+  /* Inputs also need the vertical padding, or the text sits against the top. */
+  input,
+  textarea,
+  select {
+    padding-block: 12px;
+  }
+
+  /* §12: every flow completable with tap only — never hide the focus ring. */
+  :focus-visible {
+    outline: 3px solid currentColor;
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
