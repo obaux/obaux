@@ -199,3 +199,29 @@ describe('Google listing fallback (city data has no hours or phone)', () => {
     expect(googlePlaceHref('Comhar', '1 Main St')).not.toContain('query_place_id');
   });
 });
+
+describe('Google lookup uses the organisation name, not the tidied one', () => {
+  it('searches for the real spelling when one is given', () => {
+    render(
+      <PlaceCard
+        name="Apm" lookupName="APM" category="family_services"
+        categoryLabel="Home and family" address="1912 N 4th St" labels={labels}
+      />,
+    );
+    // The member reads "Apm"; Google is asked for "APM", which is on the sign.
+    expect(screen.getByRole('heading', { name: 'Apm' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Hours' }).getAttribute('href'))
+      .toContain(encodeURIComponent('APM, 1912 N 4th St'));
+  });
+
+  it('falls back to the displayed name when there is no other spelling', () => {
+    render(
+      <PlaceCard
+        name="Bethesda Project" category="family_services"
+        categoryLabel="Home and family" address="609 S 15th St" labels={labels}
+      />,
+    );
+    expect(screen.getByRole('link', { name: 'Hours' }).getAttribute('href'))
+      .toContain(encodeURIComponent('Bethesda Project, 609 S 15th St'));
+  });
+});

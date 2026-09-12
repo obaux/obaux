@@ -29,6 +29,12 @@ export interface PlaceCardProps {
   address?: string | null;
   /** Google's id for this place, when the importer has resolved one. */
   placeId?: string | null;
+  /**
+   * The organisation's own spelling, for the Google lookup only. Imported names
+   * are normalised for reading — which turns the acronym "APM" into "Apm" — and
+   * that is a worse search term than what is on the sign. Defaults to `name`.
+   */
+  lookupName?: string | null;
   isSaved?: boolean;
   onSave?: () => void;
   onCall?: () => void;
@@ -98,6 +104,7 @@ export function PlaceCard({
   phone,
   address,
   placeId,
+  lookupName,
   isSaved = false,
   onSave,
   onCall,
@@ -147,7 +154,7 @@ export function PlaceCard({
             <Button
               label={labels.hours}
               variant="primary"
-              href={googlePlaceHref(name, address, placeId)}
+              href={googlePlaceHref(lookupName || name, address, placeId)}
               target="_blank"
               rel="noreferrer"
               xstyle={styles.action}

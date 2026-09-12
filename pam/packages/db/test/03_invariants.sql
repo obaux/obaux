@@ -264,6 +264,14 @@ begin
   if v <> 'Comhar' then raise exception 'FAIL  name not normalised, got %', v; end if;
   raise notice 'ok    provider name is normalised out of shouting caps';
 
+  -- The lookup keeps the organisation's own spelling: initcap turns the
+  -- acronym APM into "Apm", which is a worse query and not what is on the sign.
+  select lookup_name into v from public.services where source_ref = 'dbhids:1';
+  if v <> 'COMHAR' then
+    raise exception 'FAIL  lookup_name lost the original spelling, got %', v;
+  end if;
+  raise notice 'ok    the Google lookup keeps the organisation''s own spelling';
+
   select address into v from public.services where source_ref = 'dbhids:1';
   if v <> '100 W Lehigh Ave Philadelphia, PA 19133' then
     raise exception 'FAIL  address not parsed, got %', v;
@@ -330,5 +338,48 @@ begin
     raise exception 'FAIL  authenticated lost access to services.name';
   end if;
   raise notice 'ok    source_attributes is withheld from both client roles by GRANT';
+end;
+$$;
+
+-- ===========================================================================
+\echo ''
+\echo '--- google_place_url matches googlePlaceHref byte for byte (0018) ---'
+-- ===========================================================================
+-- Two implementations of one string is how they drift. The expected values
+-- below were produced by Node's encodeURIComponent via the @pam/ui helper; if
+-- either side changes, this fails.
+do $$
+declare
+  got text;
+begin
+  got := public.google_place_url('Mental Health Partnerships', '1 Main St, PA 19104');
+  if got <> 'https://www.google.com/maps/search/?api=1&query=Mental%20Health%20Partnerships%2C%201%20Main%20St%2C%20PA%2019104' then
+    raise exception 'FAIL  plain name+address mismatch: %', got;
+  end if;
+  raise notice 'ok    name and address encode identically to the UI helper';
+
+  got := public.google_place_url('Comhar', '1 Main St', 'ChIJabc123');
+  if got !~ 'query_place_id=ChIJabc123$' then
+    raise exception 'FAIL  place_id not appended: %', got;
+  end if;
+  raise notice 'ok    a resolved place_id anchors the lookup';
+
+  got := public.google_place_url('Nombre Español & Co', 'Calle Ñ 1');
+  -- encodeURIComponent('Nombre Español & Co, Calle Ñ 1')
+  if got <> 'https://www.google.com/maps/search/?api=1&query=Nombre%20Espa%C3%B1ol%20%26%20Co%2C%20Calle%20%C3%91%201' then
+    raise exception 'FAIL  multi-byte or reserved characters mismatch: %', got;
+  end if;
+  raise notice 'ok    accents and ampersands encode as UTF-8 bytes, like the UI';
+
+  if public.google_place_url('') is not null or public.google_place_url('   ') is not null then
+    raise exception 'FAIL  a nameless place produced a URL';
+  end if;
+  raise notice 'ok    a place with no name produces no link';
+
+  got := public.google_place_url('Comhar');
+  if got <> 'https://www.google.com/maps/search/?api=1&query=Comhar' then
+    raise exception 'FAIL  name-only mismatch: %', got;
+  end if;
+  raise notice 'ok    a place with no address still links by name';
 end;
 $$;

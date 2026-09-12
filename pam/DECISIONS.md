@@ -471,6 +471,47 @@ and structured hours for all 525, letting PAM show "Open now" natively (§5.1)
 instead of sending people to Google. Until then, name plus address resolves
 correctly for a named organisation at a street address.
 
+### D-033 — The Google link exists twice, and a test keeps the two identical
+*(2026-09-12)*
+
+`googlePlaceHref` in `@pam/ui` builds the member's link. `public.google_place_url`
+builds the same string in SQL, because it is needed server-side too: the Phase 5
+admin CSV export, the importer once it has a Places key, and anyone checking by
+hand whether a row resolves.
+
+Two implementations of one string is how they drift, so a database test asserts
+they are **byte-identical** — including the UTF-8 percent-encoding of accents and
+ampersands, checked against values Node's `encodeURIComponent` produced. Postgres
+has no `encodeURIComponent`, so `url_encode_component` reproduces its unreserved
+set exactly (`A-Z a-z 0-9 - _ . ! ~ * ' ( )`).
+
+**What was verified, and what was not.** The URLs are well-formed, Google returns
+200, and each response echoes the query it was given. That proves the link is
+accepted and carries the right search. It does **not** prove each one lands on
+the correct listing — Google Maps renders client-side, so the server HTML never
+contains the resolved place. Confirming that needs the Places API or a human
+tapping a few. Recorded as unverified rather than counted as working.
+
+### D-034 — Display name and lookup name are different fields
+*(2026-09-12)*
+
+The DBHIDS feed is entirely uppercase, and shouting at a member is not plain
+language (§0), so the ingest runs `initcap`. Generating the real URLs exposed the
+cost: `initcap` turns the acronym **"APM" into "Apm"** and "CATCH" into "Catch".
+
+That is right for the card and wrong for the lookup. "Apm" is a worse query for
+Google and is not what is written on the building — and the sign is what a member
+matches against when they arrive.
+
+So the two names are now two columns: `name` is normalised for reading,
+`lookup_name` keeps the organisation's own spelling and is used only to build the
+Google link. The original was already in `source_attributes`, but that column is
+withheld from client roles (0016) so a browser could not reach it; `lookup_name`
+is visible, because a business name is not a condition.
+
+A Places key supersedes all of this — `place_id` makes the match exact and
+neither spelling matters.
+
 ---
 
 ## Notes for whoever picks this up next
