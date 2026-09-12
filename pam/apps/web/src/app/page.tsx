@@ -17,7 +17,7 @@ import {
   StepHeader,
   VoiceInput,
 } from '@pam/ui';
-import { CATEGORY_LIST, NOTICES, TRANSPARENCY_SCREEN } from '@pam/config';
+import { CATEGORY_LIST, NOTICES, TRANSPARENCY_SCREEN, distanceLabel } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 
@@ -49,12 +49,32 @@ const styles = stylex.create({
   note: { fontSize: '15px', lineHeight: 1.5 },
 });
 
+/**
+ * Placeholder names, deliberately unmistakable for real listings. An earlier
+ * version used plausible-sounding org names, and the first reviewer went looking
+ * for them in Google Maps — reasonably, since the card offers a Google link.
+ */
+const SAMPLE_PLACE_NAMES = [
+  'Example Learning Center',
+  'Example Workforce Center',
+  'Example Food Pantry',
+];
+
 export default function Page() {
   const { t, locale } = useI18n();
   const supportPhone = useSupportPhone();
   const [name, setName] = useState('');
   const [saved, setSaved] = useState(false);
   const [points, setPoints] = useState(250);
+
+  /**
+   * Distance is formatted in one place, from @pam/config, so the number and its
+   * plural always agree and no raw float reaches a card.
+   */
+  const formatDistance = (miles: number): string | undefined => {
+    const label = distanceLabel(miles, locale);
+    return label ? t(label.key, label.vars) : undefined;
+  };
 
   return (
     <main {...stylex.props(styles.page)}>
@@ -98,18 +118,18 @@ export default function Page() {
           <Text type="supporting" xstyle={styles.sectionTitle}>
             PlaceCard · the three fixed categories
           </Text>
+          <Text type="supporting" xstyle={styles.note}>
+            Sample data. These are placeholder names, not listings — nothing on this page reads
+            from the database, so do not expect a match in Google. Real cards are built from the
+            imported providers, which carry no hours yet, so no card claims to be open.
+          </Text>
           {CATEGORY_LIST.map((category, index) => (
             <PlaceCard
               key={category.key}
-              name={
-                ['Riverside Learning Center', 'Southside Works', 'Eastside Family Pantry'][index] ??
-                'Service'
-              }
+              name={SAMPLE_PLACE_NAMES[index] ?? 'Example service'}
               category={category.key}
               categoryLabel={t(category.labelKey)}
-              distanceLabel={t('places.miles', { count: (index + 1) * 0.6 })}
-              isOpenNow={index !== 1}
-              openNowLabel={t('places.openNow')}
+              distanceLabel={formatDistance((index + 1) * 0.6)}
               phone={index === 2 ? undefined : '+15555550100'}
               address="123 Main St"
               isSaved={index === 0 ? saved : false}

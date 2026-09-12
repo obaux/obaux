@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.1.2] — 2026-09-12 · Cards that only say what they know
+
+### Fixed — a distance read `1.7999999999999998 miles`
+
+The demo interpolated a raw float into `{count} miles`. Distance is now built by
+`distanceLabel()` in `@pam/config`: rounded to one decimal, pluralised from the
+rounded value, locale-formatted (so Spanish gets its decimal comma), and omitted
+entirely when the number is not a real measurement. Below a tenth of a mile it
+says "Less than 0.1 miles" rather than inventing precision a GPS fix lacks.
+
+### Fixed — a card claimed "Open now" about a place Google said was closed
+
+The chip was a hard-coded boolean in the component gallery. PAM has no hours for
+any imported provider — that is why the Hours action links out to Google — so no
+card claims an open state until real hours exist. The sample places are now
+plainly named as examples, and the gallery says it is sample data.
+
+### Fixed — `pnpm -w test` failed in `apps/web`
+
+Vitest was collecting the Playwright specs. Collection is now scoped to `src/`.
+
 ## [0.1.1] — 2026-09-12 · Astryx applied, Supabase live, Philadelphia seeded
 
 ### Fixed — the design system was never applied

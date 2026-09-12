@@ -672,6 +672,40 @@ What the static build costs is interaction — the points counter, the save
 toggle. What it kept is everything a visual review is for, and it earned its
 place immediately: it is how D-041 was found.
 
+### D-043 — Distance is formatted in one place, and rounds honestly
+`distanceLabel()` in `@pam/config` is the only way a distance reaches a screen.
+It returns a locale key and its variables, not a finished string, so Spanish
+keeps its decimal comma and its own plural rule, and the copy stays in the
+bundles.
+
+It rounds to one decimal and picks singular or plural from the *rounded* value,
+so "1 mile" and "1.1 miles" can never disagree with the number beside them.
+Below a tenth of a mile it says "Less than 0.1 miles": a straight-line GPS
+distance cannot tell one storefront from the next, and a card that claims
+"0.03 miles" is claiming precision PAM does not have. A distance that is NaN,
+infinite or negative returns `null` — the chip is omitted. No distance is better
+than a wrong one.
+
+The bug that prompted this: `(2 + 1) * 0.6` is `1.7999999999999998` in IEEE 754,
+and the demo interpolated it straight into `{count} miles`. Will read it on a
+card. A regression test now pins that exact expression.
+
+### D-044 — PAM does not say a place is open until it knows the hours
+The demo cards carried a hard-coded "Open now" chip. Will checked one against
+Google, which said closed. Nothing in PAM knew either way: all 525 imported
+DBHIDS providers have `hours = null`, which is the whole reason the Hours action
+sends people to the Google listing (D-032).
+
+`isOpenNow` is now documented as derivable only from real hours, and the demo
+passes nothing. The card sits next to a Google link, so a wrong "Open now" sends
+someone across town to a locked door — the worst failure mode this product has.
+Populating hours needs a Google Places key, which is still a needs-a-human item.
+
+The sample cards were also renamed to "Example Learning Center" and the like,
+and the section is labelled as sample data. The previous names were plausible
+enough that the first reviewer went looking for them in Google Maps — reasonably,
+since the card offers exactly that link.
+
 ---
 
 ## Notes for whoever picks this up next

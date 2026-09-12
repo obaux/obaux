@@ -20,8 +20,17 @@ export interface PlaceCardProps {
   name: string;
   category: Category;
   categoryLabel: string;
-  /** Pre-formatted for the member's locale, e.g. "1.2 miles". */
+  /**
+   * Pre-formatted for the member's locale, e.g. "1.2 miles". Build it with
+   * `distanceLabel()` from @pam/config; do not interpolate a raw number.
+   */
   distanceLabel?: string;
+  /**
+   * Only ever pass this when it is derived from real opening hours for this
+   * place. The card sits next to a Google link, so a wrong "Open now" sends
+   * someone across town to a locked door — leave it undefined and the chip
+   * does not render.
+   */
   isOpenNow?: boolean;
   openNowLabel?: string;
   phone?: string | null;

@@ -1,6 +1,8 @@
 # PAM — where the project stands
 
-Last updated 2026-09-12, end of the Phase 0 build.
+Last updated 2026-09-12, after the DBHIDS import and the first round of
+visual review fixes. Newest session log:
+`docs/sessions/2026-09-12-dbhids-import-and-honest-cards.md`.
 
 This is the handover document: what exists, what is proven, what is live, and
 what the next person needs to know before touching anything.
@@ -33,7 +35,7 @@ going — without help?*
 ## What is live
 
 **Supabase project `pam`** — `shobqzuhicoiymtumiaz`, us-east-1 (closest region to
-Philadelphia). Thirteen migrations applied. The database is real and reachable;
+Philadelphia). Nineteen migrations applied. The database is real and reachable;
 the app is not deployed anywhere yet.
 
 There is **no admin account**, which means no invite can be issued and nobody can
@@ -69,13 +71,13 @@ Numbers here are from the last run, not aspirations.
 | Check | Result | What it actually proves |
 |---|---|---|
 | Typecheck | 5/5 packages | — |
-| `@pam/config` tests | 113 pass | No SMS can send unreviewed, over 160 chars, with emoji, or with a term that reveals justice involvement. Locales are key-for-key. The transparency screen matches its contract. |
-| `@pam/ui` tests | 20 pass | Every component is axe-clean. `PlaceCard` offers exactly three actions in a fixed order. Reduced motion is respected. The mic hides when unsupported. |
-| Database suite | 83 checks pass | See below |
+| `@pam/config` tests | 142 pass | No SMS can send unreviewed, over 160 chars, with emoji, or with a term that reveals justice involvement. Locales are key-for-key. The transparency screen matches its contract. |
+| `@pam/ui` tests | 39 pass | Every component is axe-clean. `PlaceCard` offers exactly three actions in a fixed order. Reduced motion is respected. The mic hides when unsupported. |
+| Database suite | 98 checks pass | See below |
 | Live RLS fingerprint | identical to local | The deployed policy set is provably the one that was penetration-tested: `ce9636c3b77e4827368e6575742b899c`, 73 policies on both |
 | Live anonymous attack | 0 rows leaked | A signed-out caller reads no profiles, messages, invites or audit rows on the real database, while still reaching the support number and the public catalogue |
-| Browser a11y + theme | 18 pass | No WCAG AA violations at 320px or iPhone SE. Every control clears 48px. No horizontal scroll. The Astryx theme really resolves. |
-| First-load JS | 478 kB of 500 kB | §12 budget, measured gzipped on what `index.html` actually loads |
+| Browser a11y + theme | 42 pass | No WCAG AA violations at 320px or iPhone SE. Every control clears 48px. No horizontal scroll. The Astryx theme really resolves. Runs in dark mode as well as light. |
+| First-load JS | 432 kB of 500 kB | §12 budget, measured gzipped on what `index.html` actually loads |
 
 ### The database suite is the one that matters
 
@@ -168,7 +170,7 @@ always the boundary; the grant never was.*
 | 1 | **Create the first admin** | Everything | No admin means no invite means no users. One command, needs the service role key. |
 | 2 | **Review the SMS copy** and record a name in `reviewedBy` | Phase 2 | Nothing can text a member until someone signs off against §9. |
 | 3 | **Get the PA 211 export URL** from the 211 contact | 211 data only | Licence cleared and the host reachable, but it serves a consumer search UI rather than a feed. Philadelphia's own datasets are verified and active. |
-| 4 | **A Google Places API key** | Hours and phone on imported places | Would give phone numbers and structured hours for all 525 imported providers, so PAM can show "Open now" itself instead of linking out. |
+| 4 | **A Google Places API key** | Hours and phone on imported places | `place_id` is null on all 525 imported providers, so the Hours action is a Google *search*, not a direct listing. A key would give phone numbers and structured hours — and until PAM has hours it will not show an open/closed state at all (D-044). |
 | 5 | Brand colours and logo | Phase 6 | Category pins use Astryx palette defaults chosen for hue separation at AAA contrast. |
 | 6 | Whether points redeem for real rewards | Phase 3 | Built behind a flag, shipped off. |
 | 7 | Retention: missed-appointment history beyond 90 days | Phase 5 | No purge job. Keeping this data indefinitely is the wrong default for this population. |
@@ -202,7 +204,7 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 - `packages/config/transparency.ts` — a promise made to people with little reason
   to trust promises. Widening it fails tests by design; change the contract
   first and tell members before it ships.
-- `DECISIONS.md` — 29 decisions with their reasoning, and the open questions.
+- `DECISIONS.md` — 44 decisions with their reasoning, and the open questions.
 
 ---
 
