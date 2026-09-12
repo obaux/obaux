@@ -13,8 +13,9 @@ Every decision here is measured against one question:
 > Can a person who hasn't used a phone in 8 years enroll in a program, get to
 > it, and keep going — without help?
 
-**Status: Phase 0 (Foundation) complete.** See `CHANGELOG.md` for what was built
-and verified, and `DECISIONS.md` for why.
+**Status: Phase 0 (Foundation) complete.** `STATUS.md` is the handover document —
+what exists, what is proven, what is live, and what needs a human. `CHANGELOG.md`
+is the history and `DECISIONS.md` the reasoning.
 
 ---
 

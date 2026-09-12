@@ -15,7 +15,7 @@ place so work continues either way.
 
 | # | Question | SOP | Blocks | Default in place |
 |---|---|---|---|---|
-| W-1b | **Which Philadelphia datasets, and the PA 211 agreement** | §5.2 | Phase 1 importer | City is decided (Philadelphia). Four sources are registered but `is_active = false` — the endpoints could not be verified from the build environment, and PA 211 needs a data-sharing agreement. See D-028. |
+| W-1b | **Which Philadelphia datasets, and their endpoints** | §5.2 | Phase 1 importer | City decided (Philadelphia); 211 licence cleared. Four sources registered, all `is_active = false` because no endpoint could be verified from this environment. See D-028. |
 | W-2 | **Final brand colours and logo** | §2.5, §15 | Phase 6 polish | Category pins use Astryx palette `blue` / `green` / `purple`, chosen for hue separation at AAA contrast. |
 | W-3 | **Do points redeem for real rewards?** | §8, §15 | Phase 3 | `REWARDS_ENABLED = false`. Table and flow to be built behind the flag, shipped off. |
 | W-4 | **Additional languages beyond English and Spanish** | §2.3, §15 | Phase 6 | `SUPPORTED_LOCALES = ['en', 'es']`. Adding one is a locale file plus a constant. |
@@ -29,6 +29,8 @@ place so work continues either way.
 
 - **Target city: Philadelphia.** Region seeded, four import sources registered
   (D-028).
+- **PA 211 is cleared for use.** The licence blocker is gone; the endpoint is
+  still unverified, so the source stays inactive (D-028).
 - **Support line: +1 267 309 5265**, and it will change over time — so it is a
   row in `app_settings`, not a constant (D-027).
 - **Provision Supabase: yes.** Project `pam` (`shobqzuhicoiymtumiaz`), us-east-1,
@@ -317,8 +319,9 @@ invented URL in a source registry is worse than an absent one, because the
 importer would appear to be configured. Resolving the real endpoints is the first
 task of the Phase 1 importer, and the nightly job skips inactive sources.
 
-PA 211 additionally needs a data-sharing agreement before use. It is the widest
-source of family services in the region and the one most worth having.
+PA 211's licence was cleared by Will on 2026-09-12, so the only thing left on
+that row is the endpoint. It is the widest source of family services in the
+region and the one most worth having — worth resolving first.
 
 ---
 
