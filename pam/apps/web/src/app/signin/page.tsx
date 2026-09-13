@@ -138,7 +138,12 @@ export default function SignInPage() {
 
   return (
     <Page align="center" gap={3}>
-      <AppHeader align="center" isSticky />
+      {/*
+        The mark is identity here, not navigation: there is nowhere to go until
+        somebody is in, and the 48px tap target a link needs costs 22px of the
+        height the consent sentence is fighting for.
+      */}
+      <AppHeader align="center" isSticky homeHref={null} />
 
       {/*
         The slides belong to the first step only. Somebody waiting on a code has

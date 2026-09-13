@@ -7,7 +7,7 @@ import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { Button } from '@astryxdesign/core/Button';
 import { Icon } from '@astryxdesign/core/Icon';
-import { AppHeader, BigButton, Notice, NotificationList, Page, TextLink } from '@pam/ui';
+import { AppHeader, BigButton, Notice, NotificationList, Page, PageTitle, TextLink } from '@pam/ui';
 import { useI18n } from '@/lib/i18n';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
@@ -46,28 +46,19 @@ export default function NotificationsPage() {
 
   return (
     <Page gap={3}>
-        {/* Top left, before anything else on the screen. */}
-        <HStack gap={2} align="center" wrap="wrap">
-          <Button
-            label={t('admin.back')}
-            variant="ghost"
-            href="/admin/"
-            icon={<Icon icon="chevronLeft" />}
-            xstyle={styles.back}
-          />
-        </HStack>
-
         <AppHeader roleLabel={signedIn ? t(`role.${session.session.role}`) : undefined} />
 
+        {/*
+          The way back sits beside the title, the way it does on every other
+          screen now — it used to be a row of its own above the mark (D-103).
+        */}
+        <PageTitle
+          title={t('notify.title')}
+          subtitle={unread > 0 ? t('notify.unread', { count: unread }) : undefined}
+          backHref="/"
+          backLabel={t('nav.back.home')}
+        />
         <VStack gap={1}>
-          <Heading level={1} xstyle={styles.title}>
-            {t('notify.title')}
-          </Heading>
-          {unread > 0 ? (
-            <Text type="supporting" xstyle={styles.count}>
-              {t('notify.unread', { count: unread })}
-            </Text>
-          ) : null}
         </VStack>
 
         {session.status === 'signed-out' || session.status === 'no-profile' ? (

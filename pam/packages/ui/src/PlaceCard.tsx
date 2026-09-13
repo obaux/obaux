@@ -6,7 +6,7 @@ import { Text } from '@astryxdesign/core/Text';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Badge, type BadgeVariant } from '@astryxdesign/core/Badge';
 import { Button } from '@astryxdesign/core/Button';
-import { Icon } from '@astryxdesign/core/Icon';
+import { BookmarkIcon } from './icons.js';
 import { CATEGORY_DEFINITIONS, type Category } from '@pam/config';
 
 /**
@@ -80,6 +80,9 @@ const styles = stylex.create({
   meta: { fontSize: '16px' },
   // §0 / §2.5 — every action here clears the 48px minimum target.
   action: { minHeight: '48px', flexGrow: 1, fontSize: '17px' },
+  // Saved is a mark, not a word: it keeps the 48px target and stops growing,
+  // so Call and Go take the width the label gave back.
+  savedAction: { minHeight: '48px', minWidth: '48px', flexGrow: 0, fontSize: '20px' },
   openNow: { fontWeight: 600 },
 });
 
@@ -218,18 +221,25 @@ export function PlaceCard({
             xstyle={styles.action}
           />
           {/*
-            Saved used to be told by the button turning filled. With every
-            action secondary, the state is told in words — the label becomes
-            "Saved" — and by a tick beside it, so it does not rest on colour
-            either. `aria-pressed` carries the same fact to a screen reader.
+            Once it is saved the button becomes the bookmark alone, with no word
+            beside it (Will, 13 September) — the filled mark is the state, the
+            way it is everywhere else on a phone, and the row stops spending a
+            third of its width saying so.
+
+            The word does not disappear, it moves: `label` is the accessible
+            name either way, so a screen reader still hears "Saved", and
+            `aria-pressed` says which state the control is in. An icon-only
+            button with no name is the classic way to make a control invisible
+            to somebody who cannot see it.
           */}
           <Button
             label={isSaved ? labels.saved : labels.save}
+            isIconOnly={isSaved}
+            icon={isSaved ? <BookmarkIcon isFilled /> : undefined}
             variant="secondary"
-            icon={isSaved ? <Icon icon="check" /> : undefined}
             clickAction={onSave}
             aria-pressed={isSaved}
-            xstyle={styles.action}
+            xstyle={isSaved ? styles.savedAction : styles.action}
           />
         </HStack>
       </VStack>

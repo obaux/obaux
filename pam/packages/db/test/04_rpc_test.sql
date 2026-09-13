@@ -690,3 +690,61 @@ begin
   end if;
 end;
 $$;
+
+\echo ''
+\echo '--- Saved places come back as places, and only your own ---'
+
+-- 0044. The table has existed since 0003 with nothing writing to it; this is
+-- the read behind the Save button, and the question worth asking is whether one
+-- member can reach another member's list.
+do $$
+declare
+  v_marcus uuid := '33333333-0000-0000-0000-00000000000c';
+  v_tanya  uuid;
+  v_service uuid;
+  n integer;
+  v_lat double precision;
+begin
+  select id into v_service from public.services where geo is not null limit 1;
+  if v_service is null then
+    raise exception 'FAIL  the seed has no service with a point to save';
+  end if;
+
+  select id into v_tanya from public.profiles
+  where role = 'member' and id <> v_marcus limit 1;
+
+  set local role postgres;
+  insert into public.saved_places (member_id, service_id)
+  values (v_marcus, v_service)
+  on conflict do nothing;
+  set local role authenticated;
+
+  perform set_config('request.jwt.claim.sub', v_marcus::text, true);
+  select count(*) into n from public.saved_places_mine();
+  if n < 1 then
+    raise exception 'FAIL  a member cannot read the place they just saved';
+  end if;
+  raise notice 'ok    a member reads their own saved places';
+
+  -- The point comes back as a number, not as geography. A card builds its
+  -- directions link from this, and an address string is what 0023 replaced.
+  select lat into v_lat from public.saved_places_mine() limit 1;
+  if v_lat is null then
+    raise exception 'FAIL  a saved place came back without its own coordinates';
+  end if;
+  raise notice 'ok    a saved place carries the point, not an address string';
+
+  if v_tanya is not null then
+    perform set_config('request.jwt.claim.sub', v_tanya::text, true);
+    select count(*) into n from public.saved_places_mine();
+    if n <> 0 then
+      raise exception 'FAIL  another member read % rows of somebody else''s saved list', n;
+    end if;
+    raise notice 'ok    one member cannot read another member''s saved places';
+  end if;
+
+  set local role postgres;
+  delete from public.saved_places where member_id = v_marcus and service_id = v_service;
+  set local role authenticated;
+end;
+$$;

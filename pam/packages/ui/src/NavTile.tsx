@@ -1,3 +1,5 @@
+'use client';
+
 import type { ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { ClickableCard } from '@astryxdesign/core/ClickableCard';
@@ -5,6 +7,7 @@ import { HStack } from '@astryxdesign/core/HStack';
 import { VStack } from '@astryxdesign/core/VStack';
 import { Text } from '@astryxdesign/core/Text';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
+import { Press } from './motion.js';
 import { pam } from './tokens.stylex.js';
 
 /**
@@ -71,6 +74,7 @@ const styles = stylex.create({
 
 export function NavTile({ href, label, description, icon, alertLabel }: NavTileProps) {
   return (
+    <Press>
     <ClickableCard
       label={alertLabel ? `${label}, ${alertLabel}` : label}
       href={href}
@@ -90,5 +94,6 @@ export function NavTile({ href, label, description, icon, alertLabel }: NavTileP
         {alertLabel ? <span aria-hidden="true" {...stylex.props(styles.dot)} /> : null}
       </HStack>
     </ClickableCard>
+    </Press>
   );
 }

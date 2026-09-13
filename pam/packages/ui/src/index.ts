@@ -20,6 +20,7 @@ export { Notice, type NoticeProps } from './Notice.js';
 export { AppHeader, type AppHeaderProps } from './AppHeader.js';
 export { AreaChip, type AreaChipProps } from './AreaChip.js';
 export { Page, type PageProps } from './Page.js';
+export { PageTitle, type PageTitleProps } from './PageTitle.js';
 export {
   OnboardingSlides,
   type OnboardingSlidesProps,
@@ -37,6 +38,7 @@ export { VoiceInput, type VoiceInputProps, type SpeechRecognizer } from './Voice
 export { TextField, type TextFieldProps } from './TextField.js';
 export {
   BellIcon,
+  BookmarkIcon,
   EditIcon,
   HomeIcon,
   MeIcon,
@@ -45,4 +47,14 @@ export {
   PlacesIcon,
   PlanIcon,
 } from './icons.js';
+export { SavedStrip, type SavedStripProps, type SavedStripPlace } from './SavedStrip.js';
+export {
+  MotionProvider,
+  PageEnter,
+  CardEnter,
+  ScrollReveal,
+  Press,
+  AnimatePresence,
+  PAM_MOTION,
+} from './motion.js';
 export { pam } from './tokens.stylex.js';

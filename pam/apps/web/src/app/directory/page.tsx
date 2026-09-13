@@ -10,7 +10,7 @@ import { Text } from '@astryxdesign/core/Text';
 import { Badge } from '@astryxdesign/core/Badge';
 import { Avatar } from '@astryxdesign/core/Avatar';
 import { Selector } from '@astryxdesign/core/Selector';
-import { AppHeader, BigButton, Notice, NotificationBell, Page, TextLink } from '@pam/ui';
+import { AppHeader, BigButton, Notice, NotificationBell, Page, PageTitle, ScrollReveal, TextLink } from '@pam/ui';
 import { NOTICES, ROLES, type Role } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { useSupportPhone } from '@/lib/useSupportPhone';
@@ -171,16 +171,16 @@ export default function DirectoryPage() {
         }
       />
 
-      <VStack gap={1}>
-        <Heading level={1} xstyle={styles.title}>
-          {t('directory.title')}
-        </Heading>
-        {directory.status === 'ready' ? (
-          <Text type="supporting" xstyle={styles.count}>
-            {t('directory.count', { count: directory.people.length })}
-          </Text>
-        ) : null}
-      </VStack>
+      <PageTitle
+        title={t('directory.title')}
+        subtitle={
+          directory.status === 'ready'
+            ? t('directory.count', { count: directory.people.length })
+            : undefined
+        }
+        backHref="/"
+        backLabel={t('nav.back.home')}
+      />
 
       {directory.status === 'loading' ? (
         <Text type="supporting" xstyle={styles.count}>
@@ -210,10 +210,11 @@ export default function DirectoryPage() {
 
       {directory.status === 'ready' ? (
         <VStack gap={3}>
-          {directory.people.map((person) => {
+          {directory.people.map((person, index) => {
             const when = whenLastActive(person.lastActiveAt, locale);
             return (
-              <Card key={person.id} xstyle={styles.card}>
+              <ScrollReveal key={person.id} index={index}>
+              <Card xstyle={styles.card}>
                 <VStack gap={2}>
                   <HStack gap={3} align="center">
                     {/*
@@ -245,12 +246,12 @@ export default function DirectoryPage() {
                   </HStack>
                 </VStack>
               </Card>
+              </ScrollReveal>
             );
           })}
         </VStack>
       ) : null}
 
-      <TextLink label={t('admin.back')} href="/" />
     </Page>
   );
 }

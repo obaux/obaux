@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { settled } from './settled';
 
 /**
  * The case manager's screen.
@@ -220,6 +221,8 @@ test.describe('the case manager screen', () => {
     await page.goto('/admin/');
     await expect(page.getByRole('heading', { name: 'Marcus' })).toBeVisible();
 
+    await settled(page);
+
     const results = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
       .analyze();
@@ -288,8 +291,11 @@ test.describe('what has happened that a case manager has to act on', () => {
     await expect(page.getByRole('heading', { name: 'Notifications' })).toBeVisible();
     await expect(page.getByText('Someone reported a place: closed')).toBeVisible();
     await expect(page.getByText('Someone said a message is not safe')).toBeVisible();
-    // §0: never dead-end.
-    await expect(page.getByRole('link', { name: 'Back' })).toHaveAttribute('href', '/admin/');
+    // §0: never dead-end. Back sits beside the title on every screen now and
+    // goes home rather than to whichever screen opened this one — a case
+    // manager, a super admin and a member all reach this list, and home is the
+    // one place all three of them can carry on from.
+    await expect(page.getByRole('link', { name: 'Back to Home' })).toHaveAttribute('href', '/');
     await expect(page.getByRole('link', { name: 'Get help' })).toBeVisible();
   });
 
@@ -322,6 +328,8 @@ test.describe('what has happened that a case manager has to act on', () => {
   test('has no WCAG A/AA violations', async ({ page }) => {
     await signedInAs(page, 'admin', [], [], notifications);
     await page.goto('/notifications/');
+
+    await settled(page);
 
     const results = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])

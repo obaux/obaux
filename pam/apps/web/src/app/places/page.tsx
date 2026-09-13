@@ -6,9 +6,9 @@ import { HStack } from '@astryxdesign/core/HStack';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { Button } from '@astryxdesign/core/Button';
-import { AppHeader, Notice, PlaceCard } from '@pam/ui';
+import { AppHeader, Notice, PageTitle, PlaceCard, ScrollReveal } from '@pam/ui';
 import {
-  CATEGORY_DEFINITIONS,
+  categoryLabelKey,
   CATEGORY_LIST,
   NOTICES,
   distanceLabel,
@@ -18,6 +18,8 @@ import { useEffect, useState } from 'react';
 import { useI18n } from '@/lib/i18n';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { usePlaces, METRES_PER_MILE } from '@/lib/usePlaces';
+import { useSavedPlaces } from '@/lib/useSavedPlaces';
+import { useSession } from '@/lib/useSession';
 import { CITY_HALL, loadOrigin, saveOrigin, type AreaOption } from '@/lib/useAreaSearch';
 import { AreaSearch, AreaTrigger } from './AreaPicker';
 
@@ -76,6 +78,16 @@ export default function PlacesPage() {
    */
   const [isPickingArea, setIsPickingArea] = useState(false);
 
+  /*
+   * Save now writes. It used to flip a boolean in this component, which is why
+   * a member could save a place, walk to the bus stop, reopen PAM and find it
+   * gone (D-102).
+   */
+  const { state: session } = useSession();
+  const { isSaved, save, unsave, failed: saveFailed } = useSavedPlaces(
+    session.status === 'signed-in',
+  );
+
   const chooseArea = (next: AreaOption) => {
     setArea(next);
     saveOrigin(next);
@@ -103,9 +115,17 @@ export default function PlacesPage() {
           <AreaSearch onChange={chooseArea} onClose={() => setIsPickingArea(false)} />
         ) : null}
 
-        <Heading level={1} xstyle={styles.title}>
-          {t('places.title')}
-        </Heading>
+        <PageTitle title={t('places.title')} backHref="/" backLabel={t('nav.back.home')} />
+
+        {saveFailed ? (
+          <Notice
+            notice="something_went_wrong"
+            title={t('saved.failed.title')}
+            body={t('saved.failed.body')}
+            supportPhone={supportPhone}
+            callLabel={t('help.callSupport')}
+          />
+        ) : null}
 
         {/*
           The three categories are fixed (§2.5) and always all shown, even when
@@ -162,21 +182,40 @@ export default function PlacesPage() {
         {state.status === 'ready' ? (
           <>
             <VStack gap={3}>
-              {state.places.map((place) => {
+              {state.places.map((place, index) => {
                 const miles = distanceLabel(place.meters / METRES_PER_MILE, locale);
+                const saved = isSaved(place.id);
                 return (
+                  <ScrollReveal key={place.id} index={index}>
                   <PlaceCard
-                    key={place.id}
                     name={place.name}
                     lookupName={place.lookupName}
                     category={place.category}
-                    categoryLabel={t(CATEGORY_DEFINITIONS[place.category].labelKey)}
+                    categoryLabel={t(categoryLabelKey(place.category))}
                     {...(miles ? { distanceLabel: t(miles.key, miles.vars) } : {})}
                     phone={place.phone}
                     address={place.address}
                     lat={place.lat}
                     lon={place.lon}
                     placeId={place.placeId}
+                    isSaved={saved}
+                    onSave={() => {
+                      if (saved) {
+                        void unsave(place.id);
+                        return;
+                      }
+                      void save({
+                        id: place.id,
+                        name: place.name,
+                        lookupName: place.lookupName,
+                        category: place.category,
+                        address: place.address ?? null,
+                        phone: place.phone ?? null,
+                        placeId: place.placeId ?? null,
+                        lat: place.lat ?? null,
+                        lon: place.lon ?? null,
+                      });
+                    }}
                     labels={{
                       call: t('action.call'),
                       go: t('action.go'),
@@ -185,6 +224,7 @@ export default function PlacesPage() {
                       hours: t('action.hours'),
                     }}
                   />
+                  </ScrollReveal>
                 );
               })}
             </VStack>
@@ -194,7 +234,8 @@ export default function PlacesPage() {
           </>
         ) : null}
 
-        <Button label={t('places.back')} variant="secondary" href="/" xstyle={styles.back} />
+        {/* The way back is beside the title now; this is the way on. */}
+        <Button label={t('saved.title')} variant="secondary" href="/saved/" xstyle={styles.back} />
       </VStack>
     </main>
   );

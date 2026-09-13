@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { settled } from './settled';
 
 /**
  * Choosing where the list is measured from.
@@ -134,6 +135,8 @@ test.describe('choosing an area', () => {
     await page.goto('/places/');
     await page.getByRole('button', { name: 'Change the area' }).click();
     await expect(page.getByRole('option', { name: '19104' })).toBeVisible();
+
+    await settled(page);
 
     const results = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])

@@ -1,6 +1,9 @@
+'use client';
+
 import * as stylex from '@stylexjs/stylex';
 import { Button } from '@astryxdesign/core/Button';
 import type { ReactNode } from 'react';
+import { Press } from './motion.js';
 
 /**
  * The primary call to action, everywhere in PAM (§2.4).
@@ -49,17 +52,19 @@ export function BigButton({
   xstyle,
 }: BigButtonProps) {
   return (
-    <Button
-      label={label}
-      variant={variant}
-      size="lg"
-      width="100%"
-      icon={icon}
-      href={href}
-      isDisabled={isDisabled}
-      isLoading={isLoading}
-      clickAction={onPress}
-      xstyle={[styles.root, xstyle]}
-    />
+    <Press>
+      <Button
+        label={label}
+        variant={variant}
+        size="lg"
+        width="100%"
+        icon={icon}
+        href={href}
+        isDisabled={isDisabled}
+        isLoading={isLoading}
+        clickAction={onPress}
+        xstyle={[styles.root, xstyle]}
+      />
+    </Press>
   );
 }

@@ -10,7 +10,7 @@ import { Text } from '@astryxdesign/core/Text';
 import { Badge } from '@astryxdesign/core/Badge';
 import { Avatar } from '@astryxdesign/core/Avatar';
 import { Button } from '@astryxdesign/core/Button';
-import { AppHeader, BigButton, Notice, NotificationBell, Page, TextLink } from '@pam/ui';
+import { AppHeader, BigButton, Notice, NotificationBell, Page, PageTitle, TextLink } from '@pam/ui';
 import { NOTICES } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { useSupportPhone } from '@/lib/useSupportPhone';
@@ -207,16 +207,12 @@ export default function AdminPage() {
           }
         />
 
-        <VStack gap={1}>
-          <Heading level={1} xstyle={styles.title}>
-            {t('admin.title')}
-          </Heading>
-          {me.regionName ? (
-            <Text type="supporting" xstyle={styles.region}>
-              {t('admin.subtitle', { region: me.regionName })}
-            </Text>
-          ) : null}
-        </VStack>
+        <PageTitle
+          title={t('admin.title')}
+          subtitle={me.regionName ? t('admin.subtitle', { region: me.regionName }) : undefined}
+          backHref="/"
+          backLabel={t('nav.back.home')}
+        />
 
         {invite ? (
           <Card xstyle={styles.card}>

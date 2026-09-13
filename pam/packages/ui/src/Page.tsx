@@ -1,6 +1,9 @@
+'use client';
+
 import type { ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { VStack } from '@astryxdesign/core/VStack';
+import { PageEnter } from './motion.js';
 import { pam } from './tokens.stylex.js';
 
 /**
@@ -14,6 +17,11 @@ import { pam } from './tokens.stylex.js';
  *
  * `width` exists because two screens legitimately differ: a long legal document
  * reads better wider than a form does.
+ *
+ * It is also where a screen's arrival lives. Every screen in PAM goes through
+ * this component, so putting the fade here means no screen can forget it and no
+ * two screens can disagree about it — and somebody who asked their phone for
+ * less motion gets none of it, decided once in `MotionProvider`.
  */
 export interface PageProps {
   readonly children: ReactNode;
@@ -40,9 +48,11 @@ const styles = stylex.create({
 export function Page({ children, width = 'app', align = 'start', gap = 4 }: PageProps) {
   return (
     <main {...stylex.props(styles.page, styles[width], align === 'center' && styles.centred)}>
-      <VStack gap={gap} align={align === 'center' ? 'center' : undefined}>
-        {children}
-      </VStack>
+      <PageEnter>
+        <VStack gap={gap} align={align === 'center' ? 'center' : undefined}>
+          {children}
+        </VStack>
+      </PageEnter>
     </main>
   );
 }

@@ -34,6 +34,13 @@ export default defineConfig({
       name: 'narrow-320',
       use: {
         ...devices['Desktop Chrome'],
+        // Animations off, for two reasons. It makes every assertion
+        // deterministic — axe measures contrast on an element mid-fade and
+        // fails it, and a box measured mid-transform is 8px from where it
+        // lands. And it is a real member's setting: this is exactly what
+        // somebody with vestibular sensitivity gets, so the whole suite runs
+        // against that path. The animated path has its own spec (motion.spec.ts).
+        reducedMotion: 'reduce',
         viewport: { width: 320, height: 640 },
         launchOptions: launch,
       },
@@ -50,6 +57,13 @@ export default defineConfig({
       name: 'dark-320',
       use: {
         ...devices['Desktop Chrome'],
+        // Animations off, for two reasons. It makes every assertion
+        // deterministic — axe measures contrast on an element mid-fade and
+        // fails it, and a box measured mid-transform is 8px from where it
+        // lands. And it is a real member's setting: this is exactly what
+        // somebody with vestibular sensitivity gets, so the whole suite runs
+        // against that path. The animated path has its own spec (motion.spec.ts).
+        reducedMotion: 'reduce',
         viewport: { width: 320, height: 640 },
         colorScheme: 'dark',
         launchOptions: launch,
@@ -63,6 +77,13 @@ export default defineConfig({
       name: 'iphone-se-viewport',
       use: {
         ...devices['Desktop Chrome'],
+        // Animations off, for two reasons. It makes every assertion
+        // deterministic — axe measures contrast on an element mid-fade and
+        // fails it, and a box measured mid-transform is 8px from where it
+        // lands. And it is a real member's setting: this is exactly what
+        // somebody with vestibular sensitivity gets, so the whole suite runs
+        // against that path. The animated path has its own spec (motion.spec.ts).
+        reducedMotion: 'reduce',
         viewport: { width: 375, height: 667 },
         isMobile: false,
         hasTouch: true,

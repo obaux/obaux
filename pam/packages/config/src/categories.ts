@@ -102,3 +102,22 @@ export function subcategoriesFor(category: Category): readonly Subcategory[] {
 export function isSubcategoryOf(category: Category, subcategory: string): boolean {
   return subcategoriesFor(category).some((s) => s.key === subcategory);
 }
+
+/**
+ * The label key for a category, for data that may not be one.
+ *
+ * `CATEGORY_DEFINITIONS[key].labelKey` reads fine and throws on `undefined` —
+ * and the screen that does it is the home screen, so one unexpected category in
+ * the catalogue is a white page rather than one odd-looking card. The database
+ * enum makes that unlikely, not impossible: an import, a migration or a fixture
+ * can all produce a value the front end has never heard of, and one of them did
+ * (a fixture, on a screenshot run, which is exactly the cheap way to find out).
+ *
+ * The fallback is the generic word for what all three categories are, because a
+ * member reading "Help" learns nothing false — unlike a blank screen, which
+ * teaches them the app is broken.
+ */
+export function categoryLabelKey(key: string): string {
+  return (CATEGORY_DEFINITIONS as Record<string, CategoryDefinition | undefined>)[key]?.labelKey
+    ?? 'category.unknown';
+}

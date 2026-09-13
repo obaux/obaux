@@ -9,6 +9,14 @@
  * gzipped, because that is what actually crosses the network on a first visit.
  * Summing every chunk in the output directory would count code that only loads
  * on other routes and would fail the build for the wrong reason.
+ *
+ * One exception, and it is a correction rather than a loophole: Next marks its
+ * legacy polyfill chunk `noModule`, so every browser that supports ES modules —
+ * which is every browser that can run this app at all, since the design system
+ * needs `light-dark()` and container queries — skips the download entirely. It
+ * was being counted anyway, and at 38 kB gzipped that is nearly 8% of the
+ * budget spent on bytes no member has ever received. The budget is about what a
+ * phone downloads; this now measures that.
  */
 import { readFileSync, statSync } from 'node:fs';
 import { gzipSync } from 'node:zlib';
@@ -27,7 +35,24 @@ try {
   process.exit(1);
 }
 
-const scripts = [...new Set([...html.matchAll(/\/_next\/static\/[^"']+?\.js/g)].map((m) => m[0]))];
+/**
+ * Every script tag, with whether the browser will actually fetch it. A
+ * `noModule` script is downloaded only by browsers with no ES module support,
+ * and PAM does not run in one.
+ */
+const tags = [...html.matchAll(/<script[^>]*src="(\/_next\/static\/[^"']+?\.js)"[^>]*>/g)];
+const legacyOnly = new Set(
+  tags.filter((t) => /\bnoModule\b/i.test(t[0])).map((t) => t[1]),
+);
+const scripts = [...new Set(tags.map((t) => t[1]))].filter((src) => !legacyOnly.has(src));
+
+if (legacyOnly.size > 0) {
+  console.log(
+    `Not counted (noModule — modern browsers do not fetch it): ${[...legacyOnly]
+      .map((s) => s.replace('/_next/static/chunks/', ''))
+      .join(', ')}\n`,
+  );
+}
 
 if (scripts.length === 0) {
   console.error('Found no scripts in the exported HTML — the budget check would pass vacuously.');

@@ -3,25 +3,32 @@
 import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
+import { HStack } from '@astryxdesign/core/HStack';
 import * as stylex from '@stylexjs/stylex';
 import {
   AppHeader,
   BigButton,
   BellIcon,
+  CardEnter,
   HelpBar,
   NavTile,
   Notice,
   NotificationBell,
+  PageEnter,
   PeopleIcon,
   Page,
   PlacesIcon,
   PlanIcon,
+  Press,
+  SavedStrip,
+  TextLink,
 } from '@pam/ui';
-import { NOTICES } from '@pam/config';
+import { categoryLabelKey, NOTICES } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
 import { useNotifications } from '@/lib/useNotifications';
+import { useSavedPlaces } from '@/lib/useSavedPlaces';
 
 /**
  * Home.
@@ -52,6 +59,7 @@ import { useNotifications } from '@/lib/useNotifications';
 const styles = stylex.create({
   title: { fontSize: '28px', lineHeight: 1.2 },
   intro: { fontSize: '18px', lineHeight: 1.5 },
+  section: { fontSize: '17px' },
 });
 
 export default function HomePage() {
@@ -61,6 +69,7 @@ export default function HomePage() {
 
   const signedIn = session.status === 'signed-in';
   const { state: notifications } = useNotifications(signedIn);
+  const { state: saved, unsave, failed: saveFailed } = useSavedPlaces(signedIn);
   const unread =
     notifications.status === 'ready'
       ? notifications.items.filter((item) => !item.isRead).length
@@ -161,6 +170,43 @@ export default function HomePage() {
       <Heading level={1} xstyle={styles.title}>
         {me.firstName ? t('home.greeting', { name: me.firstName }) : t('home.title')}
       </Heading>
+
+      {/*
+        The places they kept, before the menu. Somebody who has saved anything
+        has said what matters to them, and a home screen that makes them tap
+        twice to see it is a home screen answering its own questions first.
+      */}
+      {saved.status === 'ready' && saved.places.length > 0 ? (
+        <VStack gap={2}>
+          <HStack gap={2} align="center" justify="between" wrap="nowrap">
+            <Heading level={2} xstyle={styles.section}>
+              {t('saved.title')}
+            </Heading>
+            <TextLink label={t('saved.seeAll')} href="/saved/" size="quiet" />
+          </HStack>
+          <SavedStrip
+            places={saved.places.map((place) => ({
+              id: place.id,
+              name: place.name,
+              categoryLabel: t(categoryLabelKey(place.category)),
+              href: '/saved/',
+            }))}
+            label={t('saved.title')}
+            removeLabel={(name) => t('saved.remove', { name })}
+            onRemove={(id) => void unsave(id)}
+          />
+        </VStack>
+      ) : null}
+
+      {saveFailed ? (
+        <Notice
+          notice="something_went_wrong"
+          title={t('saved.failed.title')}
+          body={t('saved.failed.body')}
+          supportPhone={supportPhone}
+          callLabel={t('help.callSupport')}
+        />
+      ) : null}
 
       <VStack gap={2}>
         {isCaseManager ? (

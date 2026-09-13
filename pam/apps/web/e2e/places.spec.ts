@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { settled } from './settled';
 
 /**
  * The places screen, which is the first one backed by real data.
@@ -145,6 +146,8 @@ test.describe('the places screen', () => {
     );
     await page.goto('/places/');
     await expect(page.getByRole('heading', { name: 'J J Peters' })).toBeVisible();
+
+    await settled(page);
 
     const results = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])

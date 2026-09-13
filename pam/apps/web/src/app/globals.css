@@ -47,6 +47,22 @@
 @layer pam {
   :root {
     /*
+     * Every colour in the theme is a `light-dark()` pair, and `light-dark()`
+     * resolves against `color-scheme`. Astryx sets that on the element its
+     * <Theme> provider renders, which is correct and arrives with the theme
+     * stylesheet — the last of the three to land. Until it does, the browser's
+     * default `color-scheme: normal` resolves every pair to its DARK side, so a
+     * light-mode page paints near-white text on a near-white ground for as long
+     * as that takes. Measured mid-load: 1.13:1.
+     *
+     * Declaring it on the root fixes the resolution from the first paint, and
+     * costs nothing afterwards — Astryx's own declaration still wins inside the
+     * themed subtree, and "light dark" simply means "follow the device", which
+     * is what §2.2 asks for anyway.
+     */
+    color-scheme: light dark;
+
+    /*
      * theme-neutral already points its font tokens at Figtree with a system
      * fallback; the @font-face rules above are what make the first name in that
      * stack actually resolve. Nothing to override here.

@@ -15,7 +15,8 @@
   "dependencies": {
     "@astryxdesign/core": "^0.6.0",
     "@pam/config": "workspace:*",
-    "@stylexjs/stylex": "^0.19.0"
+    "@stylexjs/stylex": "^0.19.0",
+    "framer-motion": "^13.2.0"
   },
   "peerDependencies": {
     "react": "^19.0.0",

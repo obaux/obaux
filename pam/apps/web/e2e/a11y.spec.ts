@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { settled } from './settled';
 import { A11Y } from '@pam/config';
 
 /**
@@ -13,6 +14,8 @@ import { A11Y } from '@pam/config';
 test.describe('accessibility', () => {
   test('has no WCAG A/AA violations', async ({ page }) => {
     await page.goto('/');
+
+    await settled(page);
 
     const results = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
@@ -199,6 +202,7 @@ test.describe('the help path does not depend on JavaScript', () => {
 
   test('the help screen has no accessibility violations', async ({ page }) => {
     await page.goto('/help/');
+    await settled(page);
     const results = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])
       .analyze();

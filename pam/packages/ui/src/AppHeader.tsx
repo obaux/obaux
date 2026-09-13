@@ -3,6 +3,7 @@ import * as stylex from '@stylexjs/stylex';
 import { HStack } from '@astryxdesign/core/HStack';
 import { Badge } from '@astryxdesign/core/Badge';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
+import { pam } from './tokens.stylex.js';
 
 /**
  * The wordmark, and who you are signed in as.
@@ -55,6 +56,12 @@ export interface AppHeaderProps {
    * strip would cost a phone screen's worth of height on every screen.
    */
   isSticky?: boolean;
+  /**
+   * Where the mark leads. Home by default, because a logo that does nothing is
+   * a logo people tap anyway (Will, 13 September) — and on the way in there is
+   * nowhere to go, so sign-in passes `null`.
+   */
+  homeHref?: string | null;
 }
 
 const styles = stylex.create({
@@ -72,6 +79,13 @@ const styles = stylex.create({
     zIndex: 1,
     paddingBlock: '8px',
   },
+  markLink: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    // The mark is 26px; the tap target around it is not.
+    minHeight: pam.touchTargetMin,
+    textDecoration: 'none',
+  },
   mark: {
     // Sized by height so the aspect ratio comes from the artwork, and set in px
     // because this is a piece of art at a fixed size, not text that should grow
@@ -87,15 +101,31 @@ export function AppHeader({
   align = 'start',
   trailing,
   isSticky = false,
+  homeHref = '/',
 }: AppHeaderProps) {
+  const mark = (
+    <picture>
+      <source srcSet="/pam-wordmark-dark.svg" media="(prefers-color-scheme: dark)" />
+      <img src="/pam-wordmark-light.svg" alt="PAM" {...stylex.props(styles.mark)} />
+    </picture>
+  );
+
   return (
     <header {...stylex.props(styles.header, isSticky && styles.sticky)}>
       <HStack gap={2} align="center" justify={trailing ? 'between' : align} wrap="nowrap">
         <HStack gap={2} align="center" wrap="wrap">
-          <picture>
-            <source srcSet="/pam-wordmark-dark.svg" media="(prefers-color-scheme: dark)" />
-            <img src="/pam-wordmark-light.svg" alt="PAM" {...stylex.props(styles.mark)} />
-          </picture>
+          {/*
+            A real anchor, so it works with no JavaScript and middle-clicks the
+            way every other logo on the web does. The `alt` is already "PAM", so
+            the link announces itself as "PAM" — which is what it goes to.
+          */}
+          {homeHref ? (
+            <a href={homeHref} {...stylex.props(styles.markLink)}>
+              {mark}
+            </a>
+          ) : (
+            mark
+          )}
           {roleLabel ? <Badge variant="neutral" label={roleLabel} /> : null}
         </HStack>
         {trailing}

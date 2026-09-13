@@ -84,6 +84,7 @@ const SCREENS = [
   // The super admin's own screen. Every other role meets a closed door here,
   // which is itself worth photographing — a closed door is a screen too.
   { name: '5b-everyone', path: '/directory/' },
+  { name: '5c-saved', path: '/saved/' },
   { name: '6-notifications', path: '/notifications/' },
   { name: '7-privacy', path: '/privacy/' },
   { name: '8-terms', path: '/terms/' },
@@ -116,6 +117,45 @@ const DIRECTORY_PEOPLE = [
     region_name: 'Philadelphia',
     access_status: 'limited',
     last_active_at: new Date(Date.now() - 86_400_000).toISOString(),
+  },
+];
+
+const SAVED_PLACES = [
+  {
+    id: 's1',
+    name: 'Example Learning Center',
+    lookup_name: 'Example Learning Center',
+    category: 'education',
+    subcategory: null,
+    address: '123 Main St',
+    phone: '+12155550100',
+    place_id: null,
+    lat: 39.9526,
+    lon: -75.1652,
+  },
+  {
+    id: 's2',
+    name: 'Example Workforce Center',
+    lookup_name: 'Example Workforce Center',
+    category: 'workforce',
+    subcategory: null,
+    address: '456 Market St',
+    phone: null,
+    place_id: null,
+    lat: 39.9515,
+    lon: -75.1605,
+  },
+  {
+    id: 's3',
+    name: 'Example Food Pantry',
+    lookup_name: 'Example Food Pantry',
+    category: 'family_services',
+    subcategory: null,
+    address: '789 Broad St',
+    phone: '+12155550111',
+    place_id: null,
+    lat: 39.9612,
+    lon: -75.1583,
   },
 ];
 
@@ -189,6 +229,8 @@ async function stub(page, profile) {
   await page.route('**/rest/v1/rpc/directory_people*', (r) =>
     r.fulfill(json(DIRECTORY_PEOPLE)),
   );
+  await page.route('**/rest/v1/rpc/saved_places_mine*', (r) => r.fulfill(json(SAVED_PLACES)));
+  await page.route('**/rest/v1/saved_places*', (r) => r.fulfill(json([])));
 }
 
 const server = spawn('npx', ['serve', 'apps/web/out', '-l', String(PORT), '--no-clipboard'], {

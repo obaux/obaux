@@ -1,6 +1,7 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 import en from '@pam/config/locales/en.json';
+import { settled } from './settled';
 
 /**
  * The sign-in screen has to say that PAM will text you, and how to stop, before
@@ -24,6 +25,10 @@ test.describe('consent to be texted', () => {
   });
 
   test('is on screen without scrolling, where somebody types their number', async ({ page }) => {
+    // Measured on the settled page: the webfont swapping in changes every line
+    // height on the screen, and a box measured before it lands is measuring a
+    // layout no member ever sees.
+    await settled(page);
     // Where it sits is a design decision and may move again. What cannot move is
     // that somebody sees it before they hand over a number — so this asserts it
     // is inside the viewport, not that it is above or below anything.
@@ -188,6 +193,7 @@ test.describe('agreeing to reminders', () => {
 
   test('has no WCAG A/AA violations', async ({ page }) => {
     await page.goto('/reminders/');
+    await settled(page);
     const results = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
       .analyze();

@@ -1,5 +1,6 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { settled } from './settled';
 
 /**
  * The super admin's screen, and the filter in its header.
@@ -169,6 +170,8 @@ test.describe('everyone, for the person running PAM', () => {
     await signedInAs(page, 'super_admin');
     await page.goto('/directory/');
     await expect(page.getByRole('heading', { name: 'Marcus' })).toBeVisible();
+
+    await settled(page);
 
     const results = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])

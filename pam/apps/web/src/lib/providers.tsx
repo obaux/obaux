@@ -3,6 +3,7 @@
 import type { ReactNode } from 'react';
 import { Theme } from '@astryxdesign/core/theme';
 import { pamTheme } from '../theme/pam.js';
+import { MotionProvider } from '@pam/ui';
 import { I18nProvider } from './i18n';
 import type { Locale } from '@pam/config';
 
@@ -32,7 +33,14 @@ export function Providers({
 }) {
   return (
     <Theme theme={pamTheme} mode="system">
-      <I18nProvider locale={locale}>{children}</I18nProvider>
+      {/*
+        Motion is a provider too, and a lazy one: the animation features are a
+        separate chunk that arrives after the page is usable, so a screen on a
+        bad connection renders and works before anything moves (D-104).
+      */}
+      <MotionProvider>
+        <I18nProvider locale={locale}>{children}</I18nProvider>
+      </MotionProvider>
     </Theme>
   );
 }

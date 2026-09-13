@@ -125,3 +125,25 @@ export function EditIcon(props: SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
+
+/**
+ * A bookmark, filled or not.
+ *
+ * The one icon in the set that carries state rather than naming a destination:
+ * filled means kept, outline means not. Filled is drawn the same shape at the
+ * same weight, so the two read as one control changing rather than two icons
+ * swapping.
+ */
+export function BookmarkIcon({ isFilled = false, ...props }: SVGProps<SVGSVGElement> & { isFilled?: boolean }) {
+  return (
+    <svg
+      {...svgProps}
+      fill={isFilled ? 'currentColor' : 'none'}
+      stroke="currentColor"
+      {...props}
+    >
+      <path d="M6.5 3.5h11a1 1 0 0 1 1 1V20l-6.5-4-6.5 4V4.5a1 1 0 0 1 1-1z" />
+    </svg>
+  );
+}
+

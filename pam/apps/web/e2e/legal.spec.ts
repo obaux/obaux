@@ -1,6 +1,8 @@
 import AxeBuilder from '@axe-core/playwright';
+import { settled } from './settled';
 import { expect, test } from '@playwright/test';
 import en from '@pam/config/locales/en.json';
+
 
 /**
  * The privacy notice and the terms.
@@ -17,6 +19,7 @@ for (const [name, path] of [
   test.describe(name, () => {
     test.beforeEach(async ({ page }) => {
       await page.goto(path);
+      await settled(page);
     });
 
     test('has a contents list, one entry per section', async ({ page }) => {
@@ -61,6 +64,7 @@ for (const [name, path] of [
     });
 
     test('has no WCAG A/AA violations', async ({ page }) => {
+      await settled(page);
       const results = await new AxeBuilder({ page })
         .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
         .analyze();
