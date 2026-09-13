@@ -56,7 +56,7 @@ Two consequences worth knowing before submitting:
 
 ## "How do end-users consent to receive messages?", to paste as written
 
-1022 characters, so it just clears a 1024 cap — count before editing it.
+1006 characters, so it clears a 1024 cap — count before editing it.
 
 **This is the third version, and the app changed twice under it.** The first
 described consent as implied by typing a number; rejected with **30925,
@@ -72,14 +72,20 @@ That last move is not a workaround, it is the right shape:
 - **It is a members' question.** Reminders are about visits somebody plans. A
   case manager signing in to look at their caseload never meets the screen,
   because nothing in their work depends on being texted one.
-- **A screen has room to be honest.** What is sent, how often, never at night,
-  STOP, HELP, rates — all of it fits without shrinking to fine print, and that
-  page is the screenshot the registration wants.
+- **A screen has room to be honest.** What is sent, how often, STOP, HELP,
+  rates — all of it fits without shrinking to fine print, and that page is the
+  screenshot the registration wants.
+
+A promise that used to be on this screen and is not any more: *"never at
+night."* The dispatcher really does hold a message until morning (0039), but
+sign-in codes go out whenever somebody asks for one, and a person reading a
+screen about text messages does not separate the two. Will's call, and the right
+one — a promise that is true of most messages is not a promise.
 
 The sign-in screen still carries the one line the code itself needs: *"PAM texts
 you a code to sign in. Reply STOP to stop texts. Rates may apply."*
 
-> End users opt in inside the PAM app, on a screen dedicated to that choice, and nothing is pre-selected. A person is invited by a staff member and enters their own mobile number on the sign-in screen to request a one-time code; PAM has no passwords, so requesting the code is the request to be texted it. After signing in, a member sees a "Text reminders" screen listing exactly what would be sent (a reminder before a visit they planned, a note if a place they saved closes or moves, a note when someone wants to connect), the frequency (a few messages a week at most, never at night), and that STOP stops them permanently, HELP reaches a person, and message and data rates may apply. On that screen is a checkbox, UNCHECKED by default: "Yes, text me reminders". Ticking it and saving is the active consent. A "Not now" button records the decline, and PAM works fully either way, so consent is never required to use PAM. Numbers are never bought, rented, imported, or entered by staff for anyone else. Screenshot attached.
+> End users opt in inside the PAM app, on a screen dedicated to that choice, and nothing is pre-selected. A person is invited by a staff member and enters their own mobile number on the sign-in screen to request a one-time code; PAM has no passwords, so requesting the code is the request to be texted it. After signing in, a member sees a "Text reminders" screen listing exactly what would be sent (a reminder before a visit they planned, a note if a place they saved closes or moves, a note when someone wants to connect), the frequency (a few messages a week at most), and that STOP stops them permanently, HELP reaches a person, and message and data rates may apply. On that screen is a checkbox, UNCHECKED by default: "Yes, text me reminders". Ticking it and saving is the active consent. A "Not now" button records the decline, and PAM works fully either way, so consent is never required to use PAM. Numbers are never bought, rented, imported, or entered by staff for anyone else. Screenshot attached.
 
 Attach the **Text reminders** screenshot, not the sign-in one. The reviewer is
 checking that the box is really unticked and that the wording quoted here is
