@@ -149,9 +149,24 @@ export default function RemindersPage() {
         */}
         {session.status === 'signed-in' ? (
           <>
+            {/*
+              The button is the consent, and it says so.
+              Will: people will miss a checkbox. They will — a tick box is a
+              thing to notice beside a button, which is a thing to press, and
+              the one that looks like the way forward wins. So the primary
+              action carries the agreement in its own words, and pressing it
+              ticks the box as well, so what somebody sees afterwards matches
+              what was recorded.
+              This is stronger consent than a box, not weaker: the words being
+              agreed to are on the control that was pressed. The box stays for
+              anybody who reads a screen that way, and it still starts empty.
+            */}
             <BigButton
-              label={t('reminders.save')}
-              onPress={() => void answer(wants)}
+              label={t('reminders.agree')}
+              onPress={() => {
+                setWants(true);
+                void answer(true);
+              }}
               isDisabled={busy}
             />
             {/* Saying no is one tap, and it is recorded like any other answer. */}

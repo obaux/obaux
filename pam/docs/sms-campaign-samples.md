@@ -56,7 +56,7 @@ Two consequences worth knowing before submitting:
 
 ## "How do end-users consent to receive messages?", to paste as written
 
-1006 characters, so it clears a 1024 cap — count before editing it.
+1019 characters, so it clears a 1024 cap — count before editing it.
 
 **This is the third version, and the app changed twice under it.** The first
 described consent as implied by typing a number; rejected with **30925,
@@ -85,7 +85,7 @@ one — a promise that is true of most messages is not a promise.
 The sign-in screen still carries the one line the code itself needs: *"PAM texts
 you a code to sign in. Reply STOP to stop texts. Rates may apply."*
 
-> End users opt in inside the PAM app, on a screen dedicated to that choice, and nothing is pre-selected. A person is invited by a staff member and enters their own mobile number on the sign-in screen to request a one-time code; PAM has no passwords, so requesting the code is the request to be texted it. After signing in, a member sees a "Text reminders" screen listing exactly what would be sent (a reminder before a visit they planned, a note if a place they saved closes or moves, a note when someone wants to connect), the frequency (a few messages a week at most), and that STOP stops them permanently, HELP reaches a person, and message and data rates may apply. On that screen is a checkbox, UNCHECKED by default: "Yes, text me reminders". Ticking it and saving is the active consent. A "Not now" button records the decline, and PAM works fully either way, so consent is never required to use PAM. Numbers are never bought, rented, imported, or entered by staff for anyone else. Screenshot attached.
+> End users opt in inside the PAM app, on a screen dedicated to that choice, and nothing is pre-selected. A person is invited by a staff member and enters their own mobile number on the sign-in screen to request a one-time code; PAM has no passwords, so requesting the code is the request to be texted it. After signing in, a member sees a "Text reminders" screen listing exactly what would be sent (a reminder before a visit they planned, a note if a place they saved closes or moves, a note when someone wants to connect), the frequency (a few messages a week at most), and that STOP stops them permanently, HELP reaches a person, and rates may apply. On that screen is a checkbox, UNCHECKED by default, and a button labelled "Agree to receive texts"; pressing it is the active consent and ticks the box. A "Not now" button records the decline, and PAM works fully either way, so consent is never required to use PAM. Numbers are never bought, rented, imported, or entered by staff for anyone else. Screenshot attached.
 
 Attach the **Text reminders** screenshot, not the sign-in one. The reviewer is
 checking that the box is really unticked and that the wording quoted here is

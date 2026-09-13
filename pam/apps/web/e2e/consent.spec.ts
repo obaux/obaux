@@ -112,7 +112,45 @@ test.describe('agreeing to reminders', () => {
 
     await page.goto('/reminders/');
     await expect(page.getByRole('button', { name: 'Not now' })).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Save' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Agree to receive texts' })).toBeVisible();
+  });
+
+  test('the primary button carries the agreement, and ticks the box with it', async ({ page }) => {
+    // A tick box beside a button loses: one is a thing to notice, the other is
+    // the way forward. So the agreement is in the button's own words, and
+    // pressing it leaves the box showing what was actually recorded.
+    const id = 'de3b9c2e-ec2f-403b-93e5-86e6ee75349b';
+    await page.addInitScript((userId: string) => {
+      const session = {
+        access_token: 'test-access-token',
+        refresh_token: 'test-refresh-token',
+        token_type: 'bearer',
+        expires_in: 3600,
+        expires_at: Math.floor(Date.now() / 1000) + 3600,
+        user: { id: userId, aud: 'authenticated', role: 'authenticated' },
+      };
+      for (const ref of ['stub', 'shobqzuhicoiymtumiaz']) {
+        window.localStorage.setItem(`sb-${ref}-auth-token`, JSON.stringify(session));
+      }
+    }, id);
+    const json = (body: unknown) => ({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(body),
+    });
+    await page.route('**/auth/v1/user*', (route) => route.fulfill(json({ id })));
+    await page.route('**/rest/v1/profiles*', (route) =>
+      route.fulfill(json({ id, role: 'member', first_name: 'Marcus', region_id: null, regions: null })),
+    );
+    await page.route('**/rest/v1/notification_preferences*', (route) => route.fulfill(json(null)));
+
+    await page.goto('/reminders/');
+    const box = page.getByRole('checkbox', { name: /reminders/i });
+    await expect(box).not.toBeChecked();
+
+    await page.getByRole('button', { name: 'Agree to receive texts' }).click();
+    await expect(box).toBeChecked();
+    await expect(page.getByText(/You can change this whenever you want/i)).toBeVisible();
   });
 
   test('has no WCAG A/AA violations', async ({ page }) => {
