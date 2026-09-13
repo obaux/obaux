@@ -109,17 +109,6 @@ export default function SignInPage() {
             <Text type="supporting" xstyle={styles.hint}>
               {t('signin.phone.hint')}
             </Text>
-            {/*
-              Consent, in the place where consent is actually given: directly
-              above the button, where somebody reads it before they act rather
-              than after. US carriers require the person to have agreed knowingly
-              before an application may text them, and they review this screen —
-              but the reason to put it here is that it is true and a member
-              deserves to know what they are agreeing to.
-            */}
-            <Text type="supporting" xstyle={styles.consent}>
-              {t('signin.phone.consent')}
-            </Text>
             <BigButton
               label={state.step === 'sending' ? t('signin.sending') : t('signin.phone.action')}
               onPress={() => void sendCode(phone)}
@@ -138,6 +127,24 @@ export default function SignInPage() {
         ) : null}
 
         <Button label={t('help.title')} variant="ghost" href="/help/" xstyle={styles.link} />
+
+        {/*
+          What PAM will send, and how to stop it, at the foot of the screen.
+          Below the action rather than above it: the screen is short enough that
+          it is on screen without scrolling either way, and a member reaching for
+          the button should meet the button, not a paragraph.
+
+          It still has to be here, and visible, on the same screen where somebody
+          types their number — US carriers review this before an application may
+          send at all, and the e2e test asserts it is on screen without scrolling
+          rather than asserting where it sits, so this can be moved again without
+          breaking anything that matters.
+        */}
+        {onCodeStep || state.step === 'done' ? null : (
+          <Text type="supporting" xstyle={styles.consent}>
+            {t('signin.phone.consent')}
+          </Text>
+        )}
       </VStack>
     </main>
   );

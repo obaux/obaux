@@ -167,11 +167,12 @@ Cost is a few dollars one-off for the brand and roughly a dollar fifty a month
 for the campaign, plus the per-message price.
 
 **The opt-in wording on the sign-in screen is PAM's job, not paperwork.** It is
-now on the screen, directly above the button: *"PAM will text you. A code now,
+now on the screen, at the foot of it below the help link: *"PAM will text you. A code now,
 and reminders for visits you plan. Reply STOP any time to stop. Reply HELP for
 help. Text and data rates may apply."* — in both languages, and held there by a
 browser test, because removing it would quietly cost the pilot its ability to
-text anybody.
+text anybody. The test asserts it is on screen without scrolling rather than
+where it sits, so the layout can change without breaking the requirement.
 
 The sample messages to paste into the campaign are in
 `docs/sms-campaign-samples.md`, generated from the same file the dispatcher
