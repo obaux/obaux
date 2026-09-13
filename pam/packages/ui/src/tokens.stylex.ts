@@ -36,4 +36,14 @@ export const pam = stylex.defineVars({
   titleSize: '28px',
   /** A link that is not the primary action: readable, and still 48px to hit. */
   linkSize: '17px',
+  /**
+   * The mark's own colour: deep green on light grounds, coral on dark ones.
+   *
+   * It is not an Astryx theme colour and should not become one — the theme
+   * carries accent, text and surface, and this is artwork. It is a token rather
+   * than a hex typed into a component because the wordmark, the onboarding
+   * illustrations and anything else drawn in PAM's own colour have to move
+   * together the day the brand does.
+   */
+  brandMark: 'light-dark(#0F5847, #F55E4B)',
 });

@@ -1,253 +1,201 @@
 'use client';
 
-import { useState } from 'react';
-import * as stylex from '@stylexjs/stylex';
-import { VStack } from '@astryxdesign/core/VStack';
-import { HStack } from '@astryxdesign/core/HStack';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
-import { Button } from '@astryxdesign/core/Button';
+import { VStack } from '@astryxdesign/core/VStack';
+import * as stylex from '@stylexjs/stylex';
 import {
+  AppHeader,
   BigButton,
+  BellIcon,
   HelpBar,
+  NavTile,
   Notice,
-  PersonCard,
-  PlaceCard,
-  PointsBadge,
-  StepHeader,
-  VoiceInput,
+  NotificationBell,
+  PeopleIcon,
+  Page,
+  PlacesIcon,
+  PlanIcon,
 } from '@pam/ui';
-import { CATEGORY_LIST, NOTICES, TRANSPARENCY_SCREEN, distanceLabel } from '@pam/config';
+import { NOTICES } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { useSupportPhone } from '@/lib/useSupportPhone';
+import { useSession } from '@/lib/useSession';
+import { useNotifications } from '@/lib/useNotifications';
 
 /**
- * Phase 0 demo build.
+ * Home.
  *
- * Each phase ends with a demo and an acceptance checklist (§13). This page is
- * Phase 0's: it renders every §2.4 component against the real Astryx theme with
- * real i18n strings, so "the foundation works" is something you can look at
- * rather than something the README claims.
+ * This route was the Phase 0 demo — every component rendered once against real
+ * strings, with sample places and a points counter wired to a `+100` button. It
+ * proved the foundation and then stayed up long enough to be the first thing a
+ * member would have seen, which is a demo asking somebody to trust it with
+ * their phone number.
  *
- * Phase 1 replaces this route with the real Home tab (§3.1).
+ * What replaces it is a menu, and nothing else. PAM's home is not a feed and
+ * not a dashboard of numbers: it is the shortest list of places to go, each one
+ * named in the member's own words, with what is waiting shown as a count rather
+ * than implied by a coloured dot. Points, a plan and a next step belong here
+ * eventually (§3.1) — when there is a real one to show. A home screen that
+ * invents its own content is worse than a short one.
+ *
+ * Every piece is from the component library: `AppHeader`, `NotificationBell`,
+ * `NavTile`, `Notice`, `BigButton`, `HelpBar`, and the icon set. Nothing is
+ * styled here that is not layout, and no sentence on the screen is typed into
+ * this file — every string comes through i18n, so Spanish keeps up key for key.
+ *
+ * Role decides the tiles, not the route: a case manager gets their caseload, a
+ * member gets places. Both get the same screen underneath, which is what makes
+ * the role chip in the header worth having.
  */
 
 const styles = stylex.create({
-  page: {
-    maxWidth: '520px',
-    marginInline: 'auto',
-    paddingInline: '16px',
-    paddingBlock: '24px',
-  },
-  section: {
-    paddingBlock: '20px',
-    borderTopWidth: '1px',
-    borderTopStyle: 'solid',
-    borderTopColor: 'var(--astryx-color-border, rgba(0,0,0,0.12))',
-  },
-  sectionTitle: { fontSize: '14px', textTransform: 'uppercase', letterSpacing: '0.08em' },
-  note: { fontSize: '15px', lineHeight: 1.5 },
-  // §2.5 — every control clears the 48px floor, including this one.
-  linkButton: { minHeight: '48px', fontSize: '17px' },
+  title: { fontSize: '28px', lineHeight: 1.2 },
+  intro: { fontSize: '18px', lineHeight: 1.5 },
 });
 
-/**
- * Placeholder names, deliberately unmistakable for real listings. An earlier
- * version used plausible-sounding org names, and the first reviewer went looking
- * for them in Google Maps — reasonably, since the card offers a Google link.
- */
-const SAMPLE_PLACE_NAMES = [
-  'Example Learning Center',
-  'Example Workforce Center',
-  'Example Food Pantry',
-];
-
-export default function Page() {
-  const { t, locale } = useI18n();
+export default function HomePage() {
+  const { t } = useI18n();
   const supportPhone = useSupportPhone();
-  const [name, setName] = useState('');
-  const [saved, setSaved] = useState(false);
-  const [points, setPoints] = useState(250);
+  const { state: session } = useSession();
 
-  /**
-   * Distance is formatted in one place, from @pam/config, so the number and its
-   * plural always agree and no raw float reaches a card.
+  const signedIn = session.status === 'signed-in';
+  const { state: notifications } = useNotifications(signedIn);
+  const unread =
+    notifications.status === 'ready'
+      ? notifications.items.filter((item) => !item.isRead).length
+      : 0;
+
+  /*
+   * The first paint, before the session is known — and the whole screen for
+   * anybody whose JavaScript never runs.
+   *
+   * It carries the way to get help, which is not decoration here: this state is
+   * what a dying connection actually shows somebody, and a screen with nothing
+   * on it but the word "loading" is the dead end §0 forbids.
+   *
+   * It does not offer sign-in. Whether that is the right next step is exactly
+   * what is still being worked out, and a link that may be about to be replaced
+   * by a different one in the same place is how somebody ends up tapping the
+   * wrong thing.
    */
-  const formatDistance = (miles: number): string | undefined => {
-    const label = distanceLabel(miles, locale);
-    return label ? t(label.key, label.vars) : undefined;
-  };
+  if (session.status === 'loading') {
+    return (
+      <Page gap={3}>
+        <AppHeader />
+        <Text type="supporting" xstyle={styles.intro}>
+          {t('places.loading')}
+        </Text>
+        <HelpBar label={t('nav.help')} variant="block" />
+      </Page>
+    );
+  }
 
-  return (
-    <main {...stylex.props(styles.page)}>
-      <VStack gap={4}>
+  if (session.status === 'error') {
+    const key = session.offline ? 'offline' : 'something_went_wrong';
+    return (
+      <Page gap={4}>
+        <AppHeader />
+        <Notice
+          notice={key}
+          title={t(NOTICES[key].titleKey)}
+          body={t(NOTICES[key].bodyKey)}
+          supportPhone={supportPhone}
+          callLabel={t('help.callSupport')}
+        />
+        <HelpBar label={t('nav.help')} variant="block" />
+      </Page>
+    );
+  }
+
+  /*
+   * Signed out — and "no profile" with it, which is an account that exists in
+   * the sign-in system and has no PAM record yet. Both need the same thing: say
+   * what PAM is for in one line, and offer the one door. No tiles, because
+   * every one of them would ask for a sign-in on arrival.
+   */
+  if (session.status === 'signed-out' || session.status === 'no-profile') {
+    return (
+      <Page gap={4}>
+        <AppHeader />
         <VStack gap={1}>
-          <Heading level={1}>{t('app.name')}</Heading>
-          <Text type="supporting" xstyle={styles.note}>
+          <Heading level={1} xstyle={styles.title}>
+            {t('app.name')}
+          </Heading>
+          <Text type="supporting" xstyle={styles.intro}>
             {t('app.tagline')}
           </Text>
-          <Text type="supporting" xstyle={styles.note}>
-            Phase 0 foundation check · locale: {locale}
-          </Text>
         </VStack>
+        <BigButton label={t('signin.title')} href="/signin/" />
+        <HelpBar label={t('nav.help')} variant="block" />
+      </Page>
+    );
+  }
 
-        <VStack gap={3} xstyle={styles.section}>
-          <Text type="supporting" xstyle={styles.sectionTitle}>
-            StepHeader
-          </Text>
-          <StepHeader
-            current={2}
-            total={4}
-            title={t('onboarding.name.title')}
-            progressLabel={t('step.progress', { current: 2, total: 4 })}
-          />
-        </VStack>
+  const { session: me } = session;
+  const isStaff = me.role !== 'member';
 
-        <VStack gap={3} xstyle={styles.section}>
-          <Text type="supporting" xstyle={styles.sectionTitle}>
-            VoiceInput
-          </Text>
-          <VoiceInput
-            label={t('onboarding.name.title')}
-            value={name}
-            onChange={setName}
-            language={locale === 'es' ? 'es-US' : 'en-US'}
-            micLabels={{ start: t('voice.start'), listening: t('voice.listening') }}
-          />
-        </VStack>
-
-        <VStack gap={3} xstyle={styles.section}>
-          <Text type="supporting" xstyle={styles.sectionTitle}>
-            PlaceCard · the three fixed categories
-          </Text>
-          <Button
-            label="See the real catalogue"
-            variant="secondary"
-            href="/places/"
-            xstyle={styles.linkButton}
-          />
-          <Text type="supporting" xstyle={styles.note}>
-            Sample data. These are placeholder names, not listings — nothing on this page reads
-            from the database, so do not expect a match in Google. Real cards are built from the
-            imported providers, which carry no hours yet, so no card claims to be open.
-          </Text>
-          {CATEGORY_LIST.map((category, index) => (
-            <PlaceCard
-              key={category.key}
-              name={SAMPLE_PLACE_NAMES[index] ?? 'Example service'}
-              category={category.key}
-              categoryLabel={t(category.labelKey)}
-              distanceLabel={formatDistance((index + 1) * 0.6)}
-              phone={index === 2 ? undefined : '+15555550100'}
-              address="123 Main St"
-              isSaved={index === 0 ? saved : false}
-              onSave={index === 0 ? () => setSaved((s) => !s) : undefined}
-              labels={{
-                call: t('action.call'),
-                go: t('action.go'),
-                save: t('action.save'),
-                saved: t('places.saved'),
-                hours: t('action.hours'),
-              }}
+  return (
+    <Page gap={4}>
+      <AppHeader
+        roleLabel={t(`role.${me.role}`)}
+        trailing={
+          notifications.status === 'ready' ? (
+            <NotificationBell
+              href="/notifications/"
+              label={t('notify.title')}
+              unreadCount={unread}
+              unreadLabel={t('notify.unread', { count: unread })}
             />
-          ))}
-        </VStack>
+          ) : null
+        }
+      />
 
-        <VStack gap={3} xstyle={styles.section}>
-          <Text type="supporting" xstyle={styles.sectionTitle}>
-            PersonCard
-          </Text>
-          <PersonCard
-            firstName="Nia"
-            roleLine="I can help you get your GED."
-            sharedTags={[t('category.sub.ged_high_school'), t('category.sub.computer_skills')]}
-            orgBadgeLabel="Example Learning Center"
-            messageLabel={t('action.sendMessage')}
+      {/*
+        Their own name if PAM has one. It often does not — a member can be
+        invited and signed in before onboarding asks — so the fallback is the
+        screen's plain name rather than "Hi, there", which reads like a mail
+        merge that failed.
+      */}
+      <Heading level={1} xstyle={styles.title}>
+        {me.firstName ? t('home.greeting', { name: me.firstName }) : t('home.title')}
+      </Heading>
+
+      <VStack gap={2}>
+        {isStaff ? (
+          <NavTile
+            href="/admin/"
+            icon={<PeopleIcon />}
+            label={t('admin.title')}
+            description={t('home.go.caseload')}
           />
-        </VStack>
+        ) : null}
 
-        <VStack gap={3} xstyle={styles.section}>
-          <Text type="supporting" xstyle={styles.sectionTitle}>
-            PointsBadge
-          </Text>
-          <HStack gap={3} align="center" wrap="wrap">
-            <PointsBadge points={points} label={t('home.points')} />
-            <Button
-              label="+100"
-              variant="secondary"
-              clickAction={() => setPoints((p) => p + 100)}
-            />
-          </HStack>
-        </VStack>
+        <NavTile
+          href="/places/"
+          icon={<PlacesIcon />}
+          label={t('places.title')}
+          description={t('home.go.places')}
+        />
 
-        <VStack gap={3} xstyle={styles.section}>
-          <Text type="supporting" xstyle={styles.sectionTitle}>
-            Notice · nothing here, and why
-          </Text>
-          {/*
-            The case that prompted this: an admin opens a member who is in
-            another region, every query returns null, and without a notice the
-            screen is simply blank.
-          */}
-          <Notice
-            notice="admin_out_of_region"
-            title={t(NOTICES.admin_out_of_region.titleKey)}
-            body={t(NOTICES.admin_out_of_region.bodyKey)}
-            supportPhone={supportPhone}
-            callLabel={t('help.callSupport')}
-          />
-        </VStack>
+        <NavTile
+          href="/notifications/"
+          icon={<BellIcon />}
+          label={t('notify.title')}
+          description={t('home.go.notifications')}
+          countLabel={unread > 0 ? t('notify.unread', { count: unread }) : undefined}
+        />
 
-        <VStack gap={3} xstyle={styles.section}>
-          <Text type="supporting" xstyle={styles.sectionTitle}>
-            Notice · a problem to act on
-          </Text>
-          <Notice
-            notice="account_limited"
-            title={t(NOTICES.account_limited.titleKey)}
-            body={t(NOTICES.account_limited.bodyKey)}
-            supportPhone={supportPhone}
-            callLabel={t('help.callSupport')}
-          />
-          <Notice
-            notice="something_went_wrong"
-            title={t(NOTICES.something_went_wrong.titleKey)}
-            body={t(NOTICES.something_went_wrong.bodyKey)}
-            supportPhone={supportPhone}
-            callLabel={t('help.callSupport')}
-            retry={{ label: t('action.next'), onPress: () => undefined }}
-          />
-        </VStack>
-
-        <VStack gap={3} xstyle={styles.section}>
-          <Text type="supporting" xstyle={styles.sectionTitle}>
-            Transparency screen copy (§4.1)
-          </Text>
-          <Heading level={2}>{t(TRANSPARENCY_SCREEN.titleKey)}</Heading>
-          <Text xstyle={styles.note}>{t(TRANSPARENCY_SCREEN.canSeeHeadingKey)}</Text>
-          <VStack gap={1.5}>
-            {TRANSPARENCY_SCREEN.canSee.map((line) => (
-              <Text key={line.key} xstyle={styles.note}>
-                • {t(line.key)}
-              </Text>
-            ))}
-          </VStack>
-          <Text xstyle={styles.note}>{t(TRANSPARENCY_SCREEN.cannotSeeHeadingKey)}</Text>
-          <VStack gap={1.5}>
-            {TRANSPARENCY_SCREEN.cannotSee.map((line) => (
-              <Text key={line.key} xstyle={styles.note}>
-                • {t(line.key)}
-              </Text>
-            ))}
-          </VStack>
-          <Text type="supporting" xstyle={styles.note}>
-            {t(TRANSPARENCY_SCREEN.footerKey)}
-          </Text>
-          <BigButton label={t(TRANSPARENCY_SCREEN.confirmKey)} />
-        </VStack>
+        <NavTile
+          href="/reminders/"
+          icon={<PlanIcon />}
+          label={t('reminders.title')}
+          description={t('home.go.reminders')}
+        />
       </VStack>
 
-      <HelpBar label={t('nav.help')} />
-    </main>
+      {/* §0 — a visible way to get help, on the screen everybody starts from. */}
+      <HelpBar label={t('nav.help')} variant="block" />
+    </Page>
   );
 }

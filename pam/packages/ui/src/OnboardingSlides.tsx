@@ -1,0 +1,162 @@
+'use client';
+
+import { useEffect, useRef, useState, type ReactNode } from 'react';
+import * as stylex from '@stylexjs/stylex';
+import { Carousel } from '@astryxdesign/core/Carousel';
+import { HStack } from '@astryxdesign/core/HStack';
+import { VStack } from '@astryxdesign/core/VStack';
+import { Text } from '@astryxdesign/core/Text';
+import { pam } from './tokens.stylex.js';
+
+/**
+ * What PAM is, before somebody has any reason to care.
+ *
+ * Three slides, one idea each, above the sign-in card. Somebody arriving here
+ * has been handed a link by a case manager and has no idea what they are about
+ * to type their phone number into — and the answer has to land in the seconds
+ * before they decide it is not worth it.
+ *
+ * One point per slide, because two points per slide is a paragraph. The picture
+ * carries the drama and the line carries the meaning; neither is decoration for
+ * the other.
+ *
+ * No card, no border: the slides sit on the page itself so the card below is
+ * unmistakably the thing to act on. One primary action per screen (§2.5), and
+ * nothing up here competes with it.
+ *
+ * Dots under the slides, and no arrows. A carousel that looks like a single
+ * picture is a carousel nobody swipes, so something has to say there are three
+ * — but arrows are controls, and this screen's whole job is to have one. The
+ * first attempt let the next slide peek in at the edge instead, which on a
+ * 390px phone cut a sentence mid-word and read as a rendering fault rather than
+ * an invitation.
+ *
+ * The dots are a picture of where you are, not a way to move: they are hidden
+ * from assistive technology, because the carousel already announces "slide 2 of
+ * 3" and a row of buttons repeating that is noise to somebody who cannot see
+ * it. Nothing here is the only route to anything — every slide's words are in
+ * the page whether or not anybody swipes.
+ */
+
+export interface OnboardingSlide {
+  readonly id: string;
+  /** Small, single-colour, drawn from the icon set. Decorative — the line carries the meaning. */
+  readonly icon: ReactNode;
+  /** One sentence, plain language. */
+  readonly text: string;
+}
+
+export interface OnboardingSlidesProps {
+  readonly slides: readonly OnboardingSlide[];
+  /** Names the region for a screen reader, e.g. "How PAM works". */
+  readonly label: string;
+}
+
+const styles = stylex.create({
+  region: {
+    width: '100%',
+    // Named as a container so a slide can be sized against it. The carousel
+    // wraps every child in a flex item of its own with no width, so a slide
+    // asking for 100% is asking its own content how wide it is — and a
+    // sentence answers "as wide as one line", which is how the first build ran
+    // a slide off the side of the phone. `cqw` measures the region instead,
+    // which is the phone minus the page's own padding.
+    containerType: 'inline-size',
+  },
+  slide: {
+    // One slide per screen, snapping, so a swipe lands on a whole idea rather
+    // than half of two.
+    width: '100cqw',
+    flexShrink: 0,
+    paddingInline: '8px',
+    paddingBlock: '8px',
+    textAlign: 'center',
+  },
+  art: {
+    // Large enough to read as a picture rather than an icon, small enough that
+    // the card below it is still on screen on a 320px phone without scrolling —
+    // and the consent line inside that card has to be, before anybody types a
+    // number.
+    fontSize: '44px',
+    lineHeight: 1,
+    // The mark's own green in light, its coral in dark: the illustration is
+    // brand, not chrome.
+    color: pam.brandMark,
+  },
+  line: { fontSize: '18px', lineHeight: 1.45 },
+  dot: {
+    width: '8px',
+    height: '8px',
+    borderRadius: '50%',
+    backgroundColor: 'currentColor',
+    opacity: 0.25,
+    // Colour is inherited, so the dots follow the text and stay legible in both
+    // themes without either one being named here.
+    transitionProperty: 'opacity',
+    transitionDuration: '150ms',
+  },
+  here: { opacity: 1, backgroundColor: pam.brandMark },
+});
+
+export function OnboardingSlides({ slides, label }: OnboardingSlidesProps) {
+  const region = useRef<HTMLElement>(null);
+  const [here, setHere] = useState(0);
+
+  /**
+   * Which slide is being looked at.
+   *
+   * Read from the slides themselves rather than from the carousel's scroll
+   * position: the scroll container belongs to Astryx and is not ours to reach
+   * into, and an observer keeps working if it ever changes how it scrolls.
+   */
+  useEffect(() => {
+    const root = region.current;
+    if (!root || typeof IntersectionObserver === 'undefined') return;
+
+    const items = Array.from(root.querySelectorAll('[data-slide]'));
+    const observer = new IntersectionObserver(
+      (entries) => {
+        for (const entry of entries) {
+          if (!entry.isIntersecting) continue;
+          const index = Number((entry.target as HTMLElement).dataset.slide);
+          if (!Number.isNaN(index)) setHere(index);
+        }
+      },
+      { threshold: 0.6 },
+    );
+
+    for (const item of items) observer.observe(item);
+    return () => observer.disconnect();
+  }, [slides]);
+
+  return (
+    <section ref={region} aria-label={label} {...stylex.props(styles.region)}>
+      {/*
+        The name lives on the section, not on the carousel inside it. Both
+        carrying it made two regions with the same name, which a screen reader
+        reads as two different things to move between.
+      */}
+      <Carousel gap={0} hasSnap hasButtons={false} hasEdgeFade={false}>
+        {slides.map((slide, index) => (
+          <div key={slide.id} data-slide={index} {...stylex.props(styles.slide)}>
+            <VStack gap={2} align="center">
+              <div aria-hidden="true" {...stylex.props(styles.art)}>
+                {slide.icon}
+              </div>
+              <Text xstyle={styles.line}>{slide.text}</Text>
+            </VStack>
+          </div>
+        ))}
+      </Carousel>
+
+      <HStack gap={1} justify="center" align="center" aria-hidden="true">
+        {slides.map((slide, index) => (
+          <span
+            key={slide.id}
+            {...stylex.props(styles.dot, index === here && styles.here)}
+          />
+        ))}
+      </HStack>
+    </section>
+  );
+}

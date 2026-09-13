@@ -227,3 +227,63 @@ test.describe('phone and code fields', () => {
     expect(outlines.frame).toBe('solid');
   });
 });
+
+/**
+ * What PAM is, above the form.
+ *
+ * Somebody arriving has been handed a link and has no reason yet to type their
+ * phone number into it. Three slides answer that, and all three have to be in
+ * the page rather than revealed only by a swipe — a carousel whose content
+ * exists only after a gesture hides two thirds of the explanation from a
+ * keyboard, a screen reader, and anybody whose finger does not drag cleanly.
+ */
+test.describe('the way in explains itself', () => {
+  test('says what PAM does, one idea at a time, before the form', async ({ page }) => {
+    await page.goto('/signin/');
+    for (const key of ['onboarding.1', 'onboarding.2', 'onboarding.3'] as const) {
+      await expect(page.getByText(en[key])).toBeAttached();
+    }
+  });
+
+  test('the card is still the thing to act on', async ({ page }) => {
+    // The slides are context. If they push the button off the screen they have
+    // stopped being context and started being the screen.
+    await page.goto('/signin/');
+    const button = page.getByRole('button', { name: en['signin.phone.action'] });
+    const box = await button.boundingBox();
+    const viewport = page.viewportSize();
+    expect(box, 'the button has no box').not.toBeNull();
+    expect(box!.y + box!.height).toBeLessThanOrEqual(viewport!.height);
+  });
+
+  test('there is no second way out competing with it', async ({ page }) => {
+    // Get help was removed from this screen deliberately (Will, 13 September,
+    // amendment A9). Every failure state still renders PAM's number in a
+    // notice — which the next test is what makes that removal defensible.
+    await page.goto('/signin/');
+    await expect(page.getByRole('link', { name: 'Get help' })).toHaveCount(0);
+  });
+
+  test('when sending the code fails, the number to call is on the screen', async ({ page }) => {
+    // This is the whole justification for A9: help is absent while nothing is
+    // wrong and present the moment something is. Delete this and the screen is
+    // a dead end for exactly the person §0 was written for.
+    await page.route('**/auth/v1/otp*', (route) =>
+      route.fulfill({
+        status: 500,
+        contentType: 'application/json',
+        body: JSON.stringify({ message: 'nope' }),
+      }),
+    );
+
+    await page.goto('/signin/');
+    await page.getByLabel('Your phone number').fill('215 555 0100');
+    await page.getByRole('button', { name: en['signin.phone.action'] }).click();
+
+    await expect(page.getByText(en['signin.failed.send.title'])).toBeVisible();
+    await expect(page.getByRole('link', { name: en['help.callSupport'] })).toHaveAttribute(
+      'href',
+      /^tel:/,
+    );
+  });
+});

@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { HStack } from '@astryxdesign/core/HStack';
 import { Badge } from '@astryxdesign/core/Badge';
+import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 
 /**
  * The wordmark, and who you are signed in as.
@@ -45,12 +46,31 @@ export interface AppHeaderProps {
    * to the thing that opens it.
    */
   trailing?: ReactNode;
+  /**
+   * Keeps the mark at the top of the window while the screen scrolls under it.
+   *
+   * For the way in, where the mark is the only thing saying which app this is
+   * and the screen above the form scrolls (Will, 13 September). Inside the app
+   * the header shares its row with the role chip and the bell, and pinning that
+   * strip would cost a phone screen's worth of height on every screen.
+   */
+  isSticky?: boolean;
 }
 
 const styles = stylex.create({
   header: {
     width: '100%',
     paddingBlock: '4px',
+  },
+  sticky: {
+    position: 'sticky',
+    top: 0,
+    // Paints its own ground, or the page scrolls through it. The body's own
+    // token, so it is the same colour the page is already painted in and the
+    // strip is invisible until something passes under it.
+    backgroundColor: colorVars['--color-background-body'],
+    zIndex: 1,
+    paddingBlock: '8px',
   },
   mark: {
     // Sized by height so the aspect ratio comes from the artwork, and set in px
@@ -62,9 +82,14 @@ const styles = stylex.create({
   },
 });
 
-export function AppHeader({ roleLabel, align = 'start', trailing }: AppHeaderProps) {
+export function AppHeader({
+  roleLabel,
+  align = 'start',
+  trailing,
+  isSticky = false,
+}: AppHeaderProps) {
   return (
-    <header {...stylex.props(styles.header)}>
+    <header {...stylex.props(styles.header, isSticky && styles.sticky)}>
       <HStack gap={2} align="center" justify={trailing ? 'between' : align} wrap="nowrap">
         <HStack gap={2} align="center" wrap="wrap">
           <picture>

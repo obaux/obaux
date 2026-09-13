@@ -19,6 +19,12 @@ export { HelpBar, type HelpBarProps } from './HelpBar.js';
 export { Notice, type NoticeProps } from './Notice.js';
 export { AppHeader, type AppHeaderProps } from './AppHeader.js';
 export { Page, type PageProps } from './Page.js';
+export {
+  OnboardingSlides,
+  type OnboardingSlidesProps,
+  type OnboardingSlide,
+} from './OnboardingSlides.js';
+export { NavTile, type NavTileProps } from './NavTile.js';
 export { TextLink, type TextLinkProps } from './TextLink.js';
 export { NotificationBell, type NotificationBellProps } from './NotificationBell.js';
 export {
@@ -28,5 +34,13 @@ export {
 } from './NotificationList.js';
 export { VoiceInput, type VoiceInputProps, type SpeechRecognizer } from './VoiceInput.js';
 export { TextField, type TextFieldProps } from './TextField.js';
-export { BellIcon } from './icons.js';
+export {
+  BellIcon,
+  HomeIcon,
+  MeIcon,
+  PeopleIcon,
+  PhoneIcon,
+  PlacesIcon,
+  PlanIcon,
+} from './icons.js';
 export { pam } from './tokens.stylex.js';

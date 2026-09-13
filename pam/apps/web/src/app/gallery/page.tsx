@@ -8,8 +8,14 @@ import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import {
   AppHeader,
+  BellIcon,
   BigButton,
   HelpBar,
+  NavTile,
+  OnboardingSlides,
+  PeopleIcon,
+  PlacesIcon,
+  PlanIcon,
   Notice,
   NotificationBell,
   NotificationList,
@@ -85,6 +91,51 @@ export default function GalleryPage() {
           <AppHeader roleLabel="Program manager" />
           <AppHeader roleLabel="Super admin" />
           <AppHeader align="center" />
+          <AppHeader align="center" isSticky />
+        </VStack>
+      </Section>
+
+      <Section
+        title="What PAM is"
+        note="Three slides, one idea each, above the sign-in card. Swipe them."
+      >
+        <OnboardingSlides
+          label="How PAM works"
+          slides={[
+            {
+              id: 'places',
+              icon: <PlacesIcon />,
+              text: 'Find places near you that can help — food, work, school, a doctor.',
+            },
+            {
+              id: 'people',
+              icon: <PeopleIcon />,
+              text: 'A real person can point you to the right one and answer questions.',
+            },
+            {
+              id: 'plan',
+              icon: <PlanIcon />,
+              text: 'PAM reminds you before you go, so nothing gets missed.',
+            },
+          ]}
+        />
+      </Section>
+
+      <Section title="Somewhere to go" note="The home screen is a menu. The whole tile is the target.">
+        <VStack gap={2}>
+          <NavTile
+            href="#"
+            icon={<PlacesIcon />}
+            label="Places"
+            description="Food, work, school and health near you."
+          />
+          <NavTile
+            href="#"
+            icon={<BellIcon />}
+            label="Notifications"
+            description="What has happened and needs you."
+            countLabel="2 new"
+          />
         </VStack>
       </Section>
 

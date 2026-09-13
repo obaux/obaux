@@ -211,3 +211,23 @@ their very first sign-in is the wrong place to imply they might need rescuing.
 The rule is unchanged everywhere else. Anyone adding a second exception should
 be able to say the same three things about it: one question, no failure mode,
 and help one tap away wherever the person lands next.
+
+
+## A9 — A second screen without a help link (13 September 2026, Will)
+
+The way in (`/signin/`) is the second and, for now, last exception to §0's
+"every screen has a visible way to get help". Will asked for the link removed
+when the screen was rebuilt around the onboarding slides: between the slides and
+the card it read as a fourth thing to decide before anybody had decided the
+first.
+
+A8 set the bar for an exception — one question, no failure mode help would fix,
+and help one tap away wherever the person lands next. Sign-in clears two of
+those three outright, and answers the third differently: signing in *can* fail,
+and every one of its failure states already renders a notice carrying PAM's
+number. The help path is therefore present exactly when it is useful and absent
+when it is noise, which is a stronger position than a permanent ghost button.
+
+What is not negotiable, and is asserted by a browser test: the number appears on
+this screen the moment anything goes wrong. Anybody removing that has removed
+the exception's justification, not just a notice.

@@ -7,6 +7,9 @@ import { NotificationList } from '../src/NotificationList.js';
 import { PointsBadge } from '../src/PointsBadge.js';
 import { HelpBar } from '../src/HelpBar.js';
 import { VoiceInput } from '../src/VoiceInput.js';
+import { NavTile } from '../src/NavTile.js';
+import { OnboardingSlides } from '../src/OnboardingSlides.js';
+import { PlacesIcon } from '../src/icons.js';
 
 const labels = { call: 'Call', go: 'Go', save: 'Save', saved: 'Saved', hours: 'Hours' };
 
@@ -382,5 +385,79 @@ describe('the notification list (A7)', () => {
   it('says so plainly when there is nothing, rather than showing an empty box', () => {
     render(<NotificationList items={[]} labels={labels} />);
     expect(screen.getByText(labels.empty)).toBeInTheDocument();
+  });
+});
+
+describe('the home screen tiles', () => {
+  it('is one link for the whole tile, not a small link inside a big card', () => {
+    // A 48px link sitting inside a card that also looks tappable is how
+    // somebody taps twice and believes the app is broken.
+    render(
+      <NavTile
+        href="/places/"
+        icon={<PlacesIcon />}
+        label="Places"
+        description="Food, work, school and health near you."
+      />,
+    );
+    const link = screen.getByRole('link', { name: 'Places' });
+    expect(link).toHaveAttribute('href', '/places/');
+    expect(screen.getAllByRole('link')).toHaveLength(1);
+  });
+
+  it('says what it is for, not just what it is called', () => {
+    render(
+      <NavTile
+        href="/places/"
+        icon={<PlacesIcon />}
+        label="Places"
+        description="Food, work, school and health near you."
+      />,
+    );
+    expect(screen.getByText('Food, work, school and health near you.')).toBeInTheDocument();
+  });
+
+  it('shows what is waiting as a word, and shows nothing when nothing is', () => {
+    const { rerender } = render(
+      <NavTile
+        href="/notifications/"
+        icon={<PlacesIcon />}
+        label="Notifications"
+        description="What has happened and needs you."
+        countLabel="2 new"
+      />,
+    );
+    expect(screen.getByText('2 new')).toBeInTheDocument();
+
+    rerender(
+      <NavTile
+        href="/notifications/"
+        icon={<PlacesIcon />}
+        label="Notifications"
+        description="What has happened and needs you."
+      />,
+    );
+    expect(screen.queryByText('2 new')).not.toBeInTheDocument();
+  });
+});
+
+describe('the way in explains itself first', () => {
+  const slides = [
+    { id: 'places', icon: <PlacesIcon />, text: 'Find places near you that can help.' },
+    { id: 'people', icon: <PlacesIcon />, text: 'A real person can point you to the right one.' },
+    { id: 'plan', icon: <PlacesIcon />, text: 'PAM reminds you before you go.' },
+  ];
+
+  it('puts every slide in the page, so nothing depends on being able to swipe', () => {
+    // A carousel that only reveals its content to a swipe hides two thirds of
+    // the explanation from a keyboard, a screen reader, and anybody whose
+    // finger does not drag cleanly on a cracked screen.
+    render(<OnboardingSlides slides={slides} label="How PAM works" />);
+    for (const slide of slides) expect(screen.getByText(slide.text)).toBeInTheDocument();
+  });
+
+  it('names itself, so it can be skipped rather than waded through', () => {
+    render(<OnboardingSlides slides={slides} label="How PAM works" />);
+    expect(screen.getByRole('region', { name: 'How PAM works' })).toBeInTheDocument();
   });
 });

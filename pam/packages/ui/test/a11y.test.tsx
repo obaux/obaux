@@ -8,6 +8,9 @@ import { StepHeader } from '../src/StepHeader.js';
 import { PointsBadge } from '../src/PointsBadge.js';
 import { HelpBar } from '../src/HelpBar.js';
 import { VoiceInput } from '../src/VoiceInput.js';
+import { NavTile } from '../src/NavTile.js';
+import { OnboardingSlides } from '../src/OnboardingSlides.js';
+import { PlacesIcon } from '../src/icons.js';
 
 /**
  * §12 makes accessibility build-blocking: "a11y test fails build on any WCAG AA
@@ -40,6 +43,32 @@ async function expectNoViolations(container: HTMLElement): Promise<void> {
 const placeLabels = { call: 'Call', go: 'Go', save: 'Save', saved: 'Saved', hours: 'Hours' };
 
 describe('accessibility', () => {
+  it('NavTile', async () => {
+    const { container } = render(
+      <NavTile
+        href="/places/"
+        icon={<PlacesIcon />}
+        label="Places"
+        description="Food, work, school and health near you."
+        countLabel="2 new"
+      />,
+    );
+    await expectNoViolations(container);
+  });
+
+  it('OnboardingSlides', async () => {
+    const { container } = render(
+      <OnboardingSlides
+        label="How PAM works"
+        slides={[
+          { id: 'a', icon: <PlacesIcon />, text: 'Find places near you that can help.' },
+          { id: 'b', icon: <PlacesIcon />, text: 'A real person can answer questions.' },
+        ]}
+      />,
+    );
+    await expectNoViolations(container);
+  });
+
   it('BigButton', async () => {
     const { container } = render(<BigButton label="Start" />);
     await expectNoViolations(container);

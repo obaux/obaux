@@ -53,8 +53,11 @@ test.describe('accessibility', () => {
   });
 
   test('the primary button is 64px tall (§2.5)', async ({ page }) => {
+    // Signed out, home has exactly one primary action and it is the door in.
+    // It is a real link rather than a button so it survives a dead connection,
+    // which is also why this asks for the link role.
     await page.goto('/');
-    const big = page.getByRole('button', { name: 'I understand' });
+    const big = page.getByRole('link', { name: 'Sign in' });
     const box = await big.boundingBox();
     expect(box?.height).toBe(A11Y.primaryButtonHeightPx);
   });
@@ -98,7 +101,11 @@ test.describe('accessibility', () => {
  */
 test.describe('Astryx theme', () => {
   test('resolves theme typography rather than browser defaults', async ({ page }) => {
-    await page.goto('/');
+    // Measured on sign-in rather than home: it is the one screen carrying all
+    // three kinds of element at once — a heading, body text and a real
+    // <button> — and home is deliberately built from links, which would leave
+    // the button check silently measuring nothing.
+    await page.goto('/signin/');
     await page.waitForLoadState('networkidle');
 
     const fonts = await page.evaluate(() => {

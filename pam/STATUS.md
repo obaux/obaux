@@ -1,8 +1,8 @@
 # PAM — where the project stands
 
-Last updated 2026-09-13, after sign-in started working end to end and the
-privacy and terms pages landed. Newest session log:
-`docs/sessions/2026-09-13-sign-in-and-the-two-pages.md`.
+Last updated 2026-09-13, after the way in and the home screen were rebuilt from
+the component library. Newest session log:
+`docs/sessions/2026-09-13-the-front-door-and-the-home-screen.md`.
 
 This is the handover document: what exists, what is proven, what is live, and
 what the next person needs to know before touching anything.
@@ -88,7 +88,7 @@ SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... \
 |---|---|---|
 | `packages/config` | The product's rules as code: the three fixed categories and their subcategories, SMS templates with the §9 safety gates, the §4.1 transparency contract, points/levels/badges, the §0 dignity-language checks, en + es bundles | Complete for Phase 0 |
 | `packages/db` | 13 migrations: full §4 model, RLS on every table, the admin layer, server-side RPCs, `app_settings`, the Philadelphia seed | Complete and deployed |
-| `packages/ui` | The seven §2.4 components — `BigButton`, `PlaceCard`, `PersonCard`, `StepHeader`, `PointsBadge`, `HelpBar`, `VoiceInput` | Complete for Phase 0 |
+| `packages/ui` | The §2.4 components — `BigButton`, `PlaceCard`, `PersonCard`, `StepHeader`, `PointsBadge`, `HelpBar`, `VoiceInput` — plus the shared shell the screens stopped retyping: `Page`, `AppHeader`, `TextField`, `TextLink`, `Notice`, `NotificationBell`, `NotificationList`, `NavTile`, `OnboardingSlides`, the icon set and PAM's own tokens | Complete for Phase 0 |
 | `apps/web` | Next.js 15 + React 19, static export, Astryx themed and working, i18n, PWA manifest, Supabase client, runtime support-phone lookup | Foundation only — see gaps |
 | `apps/native` | Capacitor 6 config wrapping the web export; native speech recogniser wired to `VoiceInput` | Config only, never built for a device |
 
@@ -136,9 +136,14 @@ Phase 0 owns foundations. These are Phase 1–7 and their absence is not an
 oversight:
 
 - **No member-facing flow.** No onboarding, no invite redemption screen, no map,
-  no enrollment, no chat. Sign-in, the places list, the case manager screen, and
-  the privacy and terms pages are the exceptions — they exist and work. The web route is a component gallery that proves the
-  stack renders, not a product.
+  no enrollment, no chat. Sign-in, home, the reminders question, the places list,
+  the notifications list, the case manager screen, and the privacy and terms
+  pages are the exceptions — they exist and work.
+- **Home is a menu, and only a menu.** It lists where to go and what is waiting.
+  No next step, no points, no plan: PAM has no real ones yet, and a home screen
+  that invents its own content is worse than a short one (D-098). `/gallery/` is
+  the workbench where every component is rendered in the states nobody can
+  navigate to.
 - **Notices exist but are not wired to real failures.** Every condition has
   plain-language copy and a component (D-035), and the demo renders three of
   them. Connecting them to actual query results is Phase 1.
@@ -234,7 +239,7 @@ while the copy is unsigned, so it earned the first live test, not the last.*
 node scripts/journeys.mjs     # every screen, every role, both themes
 ```
 
-Writes `docs/journeys/index.html` — 70 screenshots of the built app against
+Writes `docs/journeys/index.html` — 90 screenshots of the built app against
 stubbed data. Open it in a browser to review the whole product at once, which is
 the only way to see the class of problem no test catches (D-091).
 
@@ -265,8 +270,9 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
   to trust promises. Widening it fails tests by design; change the contract
   first and tell members before it ships.
 - `DECISIONS.md` — 70 decisions with their reasoning, and the open questions.
-- `docs/sop-amendments.md` — four changes to the SOP since handover, two of
+- `docs/sop-amendments.md` — nine changes to the SOP since handover, several of
   which contradict it. Read before trusting a rule you remember from the SOP.
+  A8 and A9 are the two screens that deliberately carry no help link.
 
 ---
 

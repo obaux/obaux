@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.9.0] — 2026-09-13 · A front door, and a home worth landing on
+
+### Changed — sign-in says what PAM is before it asks for your number
+
+Three slides above the form, one idea each: a place to look, a person to ask, a
+reminder so nothing gets missed. The mark stays at the top of the screen while
+the rest scrolls. Signing in is now one block — the heading, the field, the
+button and the sentence about texts all sit together in the same card, with the
+sentence directly under the button that hands the number over.
+
+### Changed — home is the app, not a demo of it
+
+The first screen after signing in was a demonstration page with sample places
+and a points counter. It is now a short menu of real places to go — your people,
+places near you, what is waiting, whether PAM texts you — greeting you by name
+when PAM knows it, with unread counts written as words. Nothing on it is
+invented: the plan and the points arrive when there are real ones to show.
+
 ## [0.8.0] — 2026-09-13 · Reminders are something you ask for
 
 ### Changed — the tick box that starts unticked

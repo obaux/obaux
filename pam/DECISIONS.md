@@ -1567,6 +1567,60 @@ component that changed shows up in the sheet next to the screens it would have
 broken. Not linked from the app: a member has no reason to land there, and it is
 a workbench rather than a secret.
 
+### D-096 — The way in explains itself before it asks for anything
+Sign-in used to open with a title and a field. Somebody arriving has been handed
+a link by a case manager and has no idea what PAM is; the number is the first
+thing asked and the last thing they should have to give on faith.
+
+Three slides now sit above the card — a place to look, a person to ask, a
+reminder so it does not get missed — one idea each, swipeable, with dots saying
+there are three. Every slide's words are in the page whether or not anybody
+swipes, so nothing about the explanation depends on a gesture.
+
+Two attempts failed on a real phone before this one. A slide asking for `width:
+100%` sizes itself against the flex item Astryx wraps it in, which has no width
+of its own, so the sentence ran off the side of the screen; the region is now a
+container and the slide is `100cqw`. Letting the next slide peek in at the edge
+as the "there is more" signal cut a sentence mid-word, which reads as a
+rendering fault rather than an invitation — hence dots.
+
+### D-097 — No "Get help" on the way in
+The second deliberate exception to §0's "every screen has a visible way to get
+help", after `/reminders/` (A7). Will asked for it removed: between the slides
+and the card it read as a fourth thing to decide before anybody had decided the
+first.
+
+The path it guarded is not closed. Every failure on that screen renders a notice
+carrying PAM's number — which is where somebody stuck actually is — and help is
+one tap away on every screen they reach next. A browser test asserts the link is
+absent, so its return is a decision rather than a drift.
+
+### D-098 — The home screen is a menu, and says nothing it does not know
+`/` was the Phase 0 demo: every component rendered once against sample places, a
+points counter wired to a `+100` button, and placeholder names chosen to be
+unmistakably fake. It proved the foundation, and then stayed up long enough to be
+the first thing a member would have seen.
+
+What replaces it is a short menu — where to go, named in the member's own words,
+with what is waiting shown as a readable count. It carries no next step, no
+points and no plan, because PAM does not have real ones yet, and a home screen
+that invents its own content is worse than a short one. Role decides the tiles:
+a case manager's list starts with their people.
+
+Every piece comes from `@pam/ui`, and the one thing the library did not have —
+a whole-card link to somewhere else — was added to it as `NavTile` rather than
+assembled on the page. A tile built on the page is a tile the next screen builds
+again, slightly differently.
+
+### D-099 — PAM's own colour is a token, not a hex
+The wordmark is deep green on light grounds and coral on dark ones, and the
+onboarding illustrations are drawn in the same pair. That pair now lives once,
+as `pam.brandMark`, beside the sizing floor.
+
+It is deliberately not an Astryx theme colour. The theme carries accent, text and
+surface — the roles a component reasons about — and this is artwork. What it
+needs is to move in one edit the day the brand does.
+
 ---
 
 ## Notes for whoever picks this up next

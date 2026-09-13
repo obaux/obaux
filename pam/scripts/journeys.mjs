@@ -76,14 +76,17 @@ const ROLES = {
 const SCREENS = [
   { name: '1-sign-in', path: '/signin/' },
   { name: '2-reminders', path: '/reminders/' },
-  { name: '3-places', path: '/places/' },
-  { name: '4-caseload', path: '/admin/' },
-  { name: '5-notifications', path: '/notifications/' },
-  { name: '6-privacy', path: '/privacy/' },
-  { name: '7-terms', path: '/terms/' },
+  // Where everybody lands after the code works, and the screen that differs
+  // most by role — a member is offered places, a case manager their caseload.
+  { name: '3-home', path: '/' },
+  { name: '4-places', path: '/places/' },
+  { name: '5-caseload', path: '/admin/' },
+  { name: '6-notifications', path: '/notifications/' },
+  { name: '7-privacy', path: '/privacy/' },
+  { name: '8-terms', path: '/terms/' },
   // Not a journey — the workbench. Photographed with the screens so a change to
   // a component shows up next to the screens it would have broken.
-  { name: '8-components', path: '/gallery/' },
+  { name: '9-components', path: '/gallery/' },
 ];
 
 const NOTIFICATIONS = [
