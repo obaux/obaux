@@ -20,6 +20,24 @@ export type SignInStep =
   | { step: 'done' }
   | { step: 'failed'; reason: 'send' | 'verify'; phone: string | null };
 
+/**
+ * Says why sign-in failed, to the console only.
+ *
+ * A member is shown plain language and a phone number to call — "this is not
+ * your fault" — and that is all they should ever see. But every cause looks the
+ * same from that screen: unset configuration, a provider that is not connected,
+ * a number a carrier will not accept in trial, a network that dropped. Losing
+ * the difference cost this project most of a day, so the real error goes where
+ * somebody helping can read it.
+ *
+ * Never the phone number: a console log is copied into bug reports and support
+ * threads, and a number identifies the person.
+ */
+function reportSignInProblem(step: 'send' | 'verify', error: unknown): void {
+  const detail = error instanceof Error ? error.message : String(error);
+  console.error(`PAM sign-in failed at "${step}": ${detail}`);
+}
+
 /** Digits in, E.164 out. A member types what is on their phone bill. */
 export function toE164(input: string): string | null {
   const digits = input.replace(/\D/g, '');
@@ -48,8 +66,10 @@ export function usePhoneSignIn(): {
     try {
       const { createClient } = await import('./supabase');
       const { error } = await createClient().auth.signInWithOtp({ phone });
+      if (error) reportSignInProblem('send', error);
       setState(error ? { step: 'failed', reason: 'send', phone } : { step: 'code', phone });
-    } catch {
+    } catch (error) {
+      reportSignInProblem('send', error);
       setState({ step: 'failed', reason: 'send', phone });
     }
   };
@@ -66,8 +86,10 @@ export function usePhoneSignIn(): {
         token: code.replace(/\D/g, ''),
         type: 'sms',
       });
+      if (error) reportSignInProblem('verify', error);
       setState(error ? { step: 'failed', reason: 'verify', phone } : { step: 'done' });
-    } catch {
+    } catch (error) {
+      reportSignInProblem('verify', error);
       setState({ step: 'failed', reason: 'verify', phone });
     }
   };
