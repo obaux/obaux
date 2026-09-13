@@ -1,0 +1,201 @@
+/**
+ * A contact sheet of every screen, for every kind of person, in both themes.
+ *
+ * The problem this solves: PAM has four roles and a Twilio account that will
+ * only text one verified number, so "sign in as a program manager and look" is
+ * not available — and will not be until the carrier registration clears. Even
+ * then, walking six screens in four roles by hand is twenty minutes nobody
+ * spends before shipping a copy change.
+ *
+ * So the screens are photographed against stubbed data: real pages, real
+ * components, real CSS, fake answers from the network. Every run writes
+ * docs/journeys/<role>/<screen>.png and an index.html that lays them out side
+ * by side. Open that file in a browser and the whole product is in front of
+ * you.
+ *
+ * What it is not: a test. Nothing here asserts anything — e2e/ does that. This
+ * is for looking, which is the thing no assertion replaces (the unthemed-build
+ * disaster in DECISIONS D-008 passed every check it had).
+ *
+ *   pnpm --filter @pam/web build && node scripts/journeys.mjs
+ */
+import { chromium } from '@playwright/test';
+import { mkdirSync, writeFileSync, rmSync } from 'node:fs';
+import { spawn } from 'node:child_process';
+
+const OUT = new URL('../docs/journeys/', import.meta.url).pathname;
+const PORT = 3123;
+const BASE = `http://127.0.0.1:${PORT}`;
+const ADMIN_ID = 'de3b9c2e-ec2f-403b-93e5-86e6ee75349b';
+
+const json = (body) => ({
+  status: 200,
+  contentType: 'application/json',
+  body: JSON.stringify(body),
+});
+
+/** Everyone PAM serves, and what the database would say about them. */
+const ROLES = {
+  'signed-out': null,
+  member: { role: 'member', first_name: 'Marcus' },
+  provider: { role: 'provider', first_name: 'Alice' },
+  'case-manager': { role: 'admin', first_name: 'Dana' },
+  'super-admin': { role: 'super_admin', first_name: 'Will' },
+};
+
+/** The journey, in the order a person meets it. */
+const SCREENS = [
+  { name: '1-sign-in', path: '/signin/' },
+  { name: '2-reminders', path: '/reminders/' },
+  { name: '3-places', path: '/places/' },
+  { name: '4-caseload', path: '/admin/' },
+  { name: '5-notifications', path: '/notifications/' },
+  { name: '6-privacy', path: '/privacy/' },
+  { name: '7-terms', path: '/terms/' },
+];
+
+const NOTIFICATIONS = [
+  {
+    id: 'n1',
+    kind: 'service_flagged',
+    body_key: 'notify.service_flagged',
+    body_vars: { reason: 'closed' },
+    subject_type: 'service',
+    subject_id: 's1',
+    created_at: new Date().toISOString(),
+    read_at: null,
+  },
+  {
+    id: 'n2',
+    kind: 'message_reported',
+    body_key: 'notify.message_reported',
+    body_vars: {},
+    subject_type: 'report',
+    subject_id: 'r1',
+    created_at: new Date(Date.now() - 86_400_000).toISOString(),
+    read_at: null,
+  },
+];
+
+const CASELOAD = [
+  { id: 'm1', first_name: 'Marcus', access_status: 'active', last_active_at: new Date().toISOString() },
+  { id: 'm2', first_name: 'Tanya', access_status: 'active', last_active_at: null },
+];
+
+async function stub(page, profile) {
+  if (profile) {
+    await page.addInitScript((userId) => {
+      const session = {
+        access_token: 'preview',
+        refresh_token: 'preview',
+        token_type: 'bearer',
+        expires_in: 3600,
+        expires_at: Math.floor(Date.now() / 1000) + 3600,
+        user: { id: userId, aud: 'authenticated', role: 'authenticated' },
+      };
+      for (const ref of ['stub', 'shobqzuhicoiymtumiaz']) {
+        window.localStorage.setItem(`sb-${ref}-auth-token`, JSON.stringify(session));
+      }
+    }, ADMIN_ID);
+    await page.route('**/auth/v1/user*', (r) => r.fulfill(json({ id: ADMIN_ID })));
+  } else {
+    await page.route('**/auth/v1/**', (r) => r.fulfill({ status: 401, body: '{}' }));
+  }
+
+  await page.route('**/rest/v1/profiles*', (r) =>
+    r.request().url().includes('role=eq.member')
+      ? r.fulfill(json(CASELOAD))
+      : r.fulfill(
+          json({
+            id: ADMIN_ID,
+            ...profile,
+            region_id: '0195b1c0-0000-4000-8000-000000000001',
+            regions: { name: 'Philadelphia' },
+          }),
+        ),
+  );
+  await page.route('**/rest/v1/notifications*', (r) => r.fulfill(json(NOTIFICATIONS)));
+  await page.route('**/rest/v1/notification_preferences*', (r) => r.fulfill(json(null)));
+  await page.route('**/rest/v1/access_controls*', (r) => r.fulfill(json([])));
+  await page.route('**/rest/v1/rpc/member_points*', (r) => r.fulfill(json(250)));
+  await page.route('**/rest/v1/rpc/services_near*', (r) => r.fulfill(json([])));
+}
+
+const server = spawn('npx', ['serve', 'apps/web/out', '-l', String(PORT), '--no-clipboard'], {
+  cwd: new URL('..', import.meta.url).pathname,
+  stdio: 'ignore',
+});
+await new Promise((resolve) => setTimeout(resolve, 2500));
+
+rmSync(OUT, { recursive: true, force: true });
+const browser = await chromium.launch({
+  executablePath: process.env.PLAYWRIGHT_CHROMIUM_PATH || undefined,
+});
+
+const shots = [];
+for (const [roleName, profile] of Object.entries(ROLES)) {
+  mkdirSync(`${OUT}${roleName}`, { recursive: true });
+  for (const theme of ['light', 'dark']) {
+    for (const screen of SCREENS) {
+      const page = await browser.newPage({
+        viewport: { width: 390, height: 844 },
+        deviceScaleFactor: 2,
+        colorScheme: theme,
+      });
+      await stub(page, profile);
+      await page.goto(`${BASE}${screen.path}`, { waitUntil: 'networkidle' }).catch(() => {});
+      await page.waitForTimeout(350);
+      const file = `${roleName}/${screen.name}-${theme}.png`;
+      await page.screenshot({ path: `${OUT}${file}`, fullPage: true });
+      shots.push({ role: roleName, screen: screen.name, theme, file, path: screen.path });
+      await page.close();
+    }
+  }
+  console.log(`photographed ${roleName}`);
+}
+await browser.close();
+server.kill();
+
+const roles = [...new Set(shots.map((s) => s.role))];
+writeFileSync(
+  `${OUT}index.html`,
+  `<!doctype html><meta charset="utf-8"><title>PAM journeys</title>
+<style>
+ body{font:16px/1.5 system-ui;margin:0;padding:24px;background:#fafafa;color:#111}
+ h1{font-size:22px} h2{font-size:18px;margin:32px 0 4px;text-transform:capitalize}
+ p.note{color:#555;max-width:60ch}
+ .row{display:flex;gap:12px;overflow-x:auto;padding:8px 0}
+ figure{margin:0;flex:0 0 auto;width:200px}
+ img{width:100%;border:1px solid #ddd;border-radius:8px;background:#fff}
+ figcaption{font-size:12px;color:#555;padding-top:4px}
+ .theme{font-size:12px;color:#888;margin-top:12px}
+</style>
+<h1>PAM — every screen, every role</h1>
+<p class="note">Generated from the built app against stubbed data: real pages and
+real styles, fake answers from the network. Nothing here talks to the live
+database, so it stays truthful about the interface and says nothing about the
+data.</p>
+${roles
+  .map(
+    (role) => `<h2>${role.replace(/-/g, ' ')}</h2>` +
+      ['light', 'dark']
+        .map(
+          (theme) =>
+            `<div class="theme">${theme}</div><div class="row">` +
+            shots
+              .filter((s) => s.role === role && s.theme === theme)
+              .map(
+                (s) =>
+                  `<figure><a href="${s.file}"><img src="${s.file}" alt="${role} ${s.screen}"></a>` +
+                  `<figcaption>${s.screen.replace(/^\d-/, '')}<br>${s.path}</figcaption></figure>`,
+              )
+              .join('') +
+            `</div>`,
+        )
+        .join(''),
+  )
+  .join('')}
+`,
+);
+
+console.log(`\n${shots.length} screenshots -> docs/journeys/index.html`);

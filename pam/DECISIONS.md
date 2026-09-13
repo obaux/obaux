@@ -1477,6 +1477,37 @@ One link between the two services still has to be made by hand — the app's URL
 in Supabase → Authentication → URL Configuration — because only Supabase can be
 told which addresses it trusts.
 
+### D-090 — Everybody is asked about texts, and the examples match the role
+Will, after signing in as a super admin and not seeing the reminders screen:
+staff are texted too. They are — an introduction to their programme, a change to
+their account — and an account that was never asked has consent off, so the
+dispatcher cancels those messages rather than sending them. Safe, silent, and a
+feature that quietly does not work.
+
+So the screen is shown to anybody who has never answered, and the examples
+change with the role: a member sees visits and saved places, staff see
+introductions and account changes. Showing a member's examples to a programme
+lead would be asking somebody to agree to messages that never arrive, which
+teaches people that a consent screen is noise.
+
+### D-091 — The whole product is photographed, for looking at
+PAM has four roles, and Twilio will text exactly one verified number until the
+carrier registration clears — so "sign in as a program manager and look" is not
+available, and will not be for weeks. Even afterwards, walking seven screens in
+five states by hand is twenty minutes nobody spends before a copy change.
+
+`node scripts/journeys.mjs` builds the app, photographs every screen for every
+role in both themes against stubbed data, and writes `docs/journeys/index.html`
+— 70 images, the whole product on one page.
+
+It asserts nothing. `e2e/` does that, and the one failure this project has had
+that mattered most (D-008, every component rendering unthemed) passed every
+check it had and was caught by a screenshot. This exists for the thing no
+assertion replaces.
+
+The output is gitignored: 14 MB of PNGs regenerated on demand does not belong in
+a public repository's history.
+
 ---
 
 ## Notes for whoever picks this up next

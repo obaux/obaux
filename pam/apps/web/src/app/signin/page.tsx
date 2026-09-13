@@ -70,10 +70,14 @@ export default function SignInPage() {
   /**
    * Where somebody lands after the code works.
    *
-   * A member who has never been asked goes to the reminders screen once, and
-   * everybody else goes to the app. A case manager signing in to look at their
-   * caseload never meets that question — nothing about their work depends on
-   * being texted, and the front door is not the place to ask (D-086).
+   * Anybody who has never been asked goes to the reminders screen once, and
+   * everybody else goes straight to the app.
+   *
+   * It was members only until Will noticed the hole: staff are texted too — an
+   * introduction to their programme, a change to their account — and an account
+   * that was never asked has consent switched off, so those messages are
+   * cancelled rather than sent. Silent and safe, but a feature that quietly
+   * does not work. The screen adjusts its examples by role (D-090).
    */
   useEffect(() => {
     if (state.step !== 'done') return;
@@ -89,17 +93,10 @@ export default function SignInPage() {
         const { data: auth } = await supabase.auth.getUser();
         if (cancelled || !auth.user) return;
 
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('role')
-          .eq('id', auth.user.id)
-          .maybeSingle();
-
-        const isMember = (profile as { role?: string } | null)?.role === 'member';
-        const asked = isMember ? await getReminderConsent(auth.user.id) : true;
+        const asked = await getReminderConsent(auth.user.id);
         if (cancelled) return;
 
-        router.replace(isMember && asked === null ? '/reminders/' : '/');
+        router.replace(asked === null ? '/reminders/' : '/');
       } catch {
         // A redirect that cannot decide still has to go somewhere.
         if (!cancelled) router.replace('/');

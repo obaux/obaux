@@ -228,6 +228,16 @@ while the copy is unsigned, so it earned the first live test, not the last.*
 
 ---
 
+## Looking at it
+
+```bash
+node scripts/journeys.mjs     # every screen, every role, both themes
+```
+
+Writes `docs/journeys/index.html` — 70 screenshots of the built app against
+stubbed data. Open it in a browser to review the whole product at once, which is
+the only way to see the class of problem no test catches (D-091).
+
 ## Picking it up
 
 ```bash

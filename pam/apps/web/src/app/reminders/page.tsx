@@ -62,6 +62,17 @@ export default function RemindersPage() {
   const supportPhone = useSupportPhone();
   const { state: session } = useSession();
 
+  const signedIn = session.status === 'signed-in';
+  /**
+   * Staff get different messages, so they are shown a different list.
+   *
+   * A program lead is never texted about a visit they planned — they are texted
+   * when somebody is introduced to their programme. Showing a member's examples
+   * to staff would be asking them to agree to something that never arrives,
+   * which is the fastest way to teach somebody that a consent screen is noise.
+   */
+  const isStaff = session.status === 'signed-in' && session.session.role !== 'member';
+
   /** What was chosen last time, when there is a last time. */
   const [already, setAlready] = useState<boolean | null>(null);
   const [busy, setBusy] = useState(false);
@@ -102,15 +113,26 @@ export default function RemindersPage() {
           <Heading level={1} xstyle={styles.title}>
             {t('reminders.title')}
           </Heading>
-          <Text xstyle={styles.intro}>{t('reminders.intro')}</Text>
+          <Text xstyle={styles.intro}>
+            {t(isStaff ? 'reminders.introStaff' : 'reminders.intro')}
+          </Text>
         </VStack>
 
         <Card padding={4} xstyle={styles.card}>
           <VStack gap={2}>
             <Text xstyle={styles.heading}>{t('reminders.what')}</Text>
-            <Text xstyle={styles.item}>{t('reminders.what.1')}</Text>
-            <Text xstyle={styles.item}>{t('reminders.what.2')}</Text>
-            <Text xstyle={styles.item}>{t('reminders.what.3')}</Text>
+            {isStaff ? (
+              <>
+                <Text xstyle={styles.item}>{t('reminders.what.staff1')}</Text>
+                <Text xstyle={styles.item}>{t('reminders.what.staff2')}</Text>
+              </>
+            ) : (
+              <>
+                <Text xstyle={styles.item}>{t('reminders.what.1')}</Text>
+                <Text xstyle={styles.item}>{t('reminders.what.2')}</Text>
+                <Text xstyle={styles.item}>{t('reminders.what.3')}</Text>
+              </>
+            )}
             <Text type="supporting" xstyle={styles.small}>
               {t('reminders.how')}
             </Text>
