@@ -126,6 +126,49 @@ Until step 2 is approved, sign-in works only for numbers on the verified list.
 That is a hard limit on how many people can be in the pilot, and it is worth
 knowing before inviting anybody.
 
+### Registering as a business, step by step
+
+Two registrations, done in order, both in the Twilio console. Neither is instant,
+and the second is reviewed by the phone carriers rather than by Twilio.
+
+**First: the Primary Customer Profile** (Trust Hub → Customer Profiles). This is
+who Oba Design is. Have ready:
+
+- The legal business name **exactly as it appears on the IRS EIN letter** — a
+  mismatch here is the single most common rejection, including "LLC" vs "L.L.C."
+- The EIN itself. If Oba Design does not have one, it is free and takes about
+  fifteen minutes at irs.gov; registering as a sole proprietor instead is
+  possible but carriers cap how much it may send, which a caseload of reminders
+  will hit.
+- Business type (LLC, corporation, sole proprietorship), registered address, and
+  the website.
+- A contact person: name, job title, email and phone. Use the business email. The
+  phone here is who Twilio calls about the account — it is not the number
+  messages come from, and it can be changed later.
+
+**Then: the A2P brand and campaign** (Messaging → Regulatory Compliance → A2P
+10DLC). The brand is the business, and is usually approved within hours. The
+campaign describes what PAM actually sends, and takes a few days. It asks for:
+
+- **Use case.** PAM sends sign-in codes and appointment reminders — "Mixed" or
+  "Low Volume Mixed" covers both. Not marketing, which is held to a higher bar.
+- **Sample messages.** Paste the real ones from the review sheet, placeholders
+  and all. Invented samples that do not match what goes out are a rejection.
+- **How people opt in.** This is the part carriers actually scrutinise, and the
+  part that is about PAM's screens rather than paperwork: a member is invited by
+  their case manager, types their own number into the sign-in screen, and that
+  screen has to say, in plain words, that PAM will text them and how to stop.
+  Expect to supply a screenshot of it.
+- The phone number the messages come from — the one already bought. Numbers can
+  be added to or removed from a campaign afterwards, so swapping the sending
+  number later does not mean registering again.
+
+Cost is a few dollars one-off for the brand and roughly a dollar fifty a month
+for the campaign, plus the per-message price.
+
+**The opt-in wording on the sign-in screen is PAM's job, not paperwork.** It has
+to exist before the campaign is submitted, because the reviewer looks at it.
+
 ### If sign-in answers "Database error finding user"
 
 Seen on 12 September, on the very first real sign-in attempt. It is not the
