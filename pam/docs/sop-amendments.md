@@ -196,3 +196,18 @@ A flag reaches the people it is about. It is not broadcast to staff.
    silently stop them.
 5. Each panel — case manager and super admin — carries the list in its top bar,
    and the same notices appear inside the affected person's profile card.
+
+
+## A8 — One screen without a help link (13 September 2026, Will)
+
+§0 says every screen carries a visible way to get help. The reminders screen
+(`/reminders/`) is the single exception, on Will's call.
+
+It asks one question with two answers, both one tap away, and neither can fail
+in a way that calling PAM would fix. A third button beside them makes the
+question look harder than it is — and the screen a member is sent to right after
+their very first sign-in is the wrong place to imply they might need rescuing.
+
+The rule is unchanged everywhere else. Anyone adding a second exception should
+be able to say the same three things about it: one question, no failure mode,
+and help one tap away wherever the person lands next.

@@ -33,6 +33,15 @@ import { setReminderConsent } from '@/lib/useReminderConsent';
  *
  * Either button is an answer. "Not now" writes the same row with false, so
  * nobody is asked twice and a decision is never inferred from silence.
+ *
+ * **No help link here, deliberately** (Will, 13 September) — the one exception
+ * to §0's "every screen has a visible way to get help". This screen asks one
+ * question with two answers, both one tap away, and neither can fail in a way
+ * calling PAM would fix. A third button next to them makes the question look
+ * harder than it is, and the screen a member is sent to right after their first
+ * sign-in is the wrong place to imply they might need rescuing. Help is one tap
+ * away everywhere they land next, and the signed-out state below still carries
+ * the support number.
  */
 
 const styles = stylex.create({
@@ -163,7 +172,6 @@ export default function RemindersPage() {
           </>
         )}
 
-        <Button label={t('help.title')} variant="ghost" href="/help/" xstyle={styles.link} />
       </VStack>
     </main>
   );
