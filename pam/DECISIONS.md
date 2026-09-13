@@ -1428,6 +1428,23 @@ theme is "system" today, so the browser's scheme and the app's always agree.
 When Settings gains a manual light/dark switch, this has to switch with it —
 `<picture>` cannot see an app-level choice.
 
+### D-088 — Consent is a button, not a box
+The reminders screen had a tick box *and* a button. Will: the box is redundant —
+drop it.
+
+It was. A box beside a button is either missed (leaving somebody who wanted
+reminders without them, which is the failure that matters) or ticked and then
+confirmed, which is the same decision made twice. What earns its place is the
+one control somebody actually presses.
+
+So the screen offers two buttons, **Agree to receive texts** and **Not now**,
+and the words being agreed to are on the control itself. For the carrier this
+is stronger than the box, not weaker: 30925 asks for an unambiguous affirmative
+act, and nothing on the screen can arrive pre-selected because nothing is
+selectable. For a member it is one less thing to decode.
+
+The ordering rule if both are somehow used: the button pressed is the answer.
+
 ---
 
 ## Notes for whoever picks this up next

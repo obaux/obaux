@@ -18,16 +18,15 @@ import { Badge } from '@astryxdesign/core/Badge';
  * attention — an account paused, a feature switched off — and those are the
  * only badges on these screens that should catch an eye.
  *
- * The mark is the real wordmark now (13 September). Two files rather than one:
- * the artwork is lime on dark grounds and deep green on light ones, and neither
- * survives the other's background. `<picture>` picks between them from the
- * browser's own colour scheme, with no JavaScript and no flash of the wrong one
- * — and one `alt` on the `<img>`, so a screen reader hears "PAM" once, not
- * twice.
+ * The mark is the real wordmark. Two files rather than one: the artwork is
+ * coral on dark grounds and deep green on light ones, and neither survives the
+ * other's background. `<picture>` picks between them from the browser's own
+ * colour scheme, with no JavaScript and no flash of the wrong one — and one
+ * `alt` on the `<img>`, so a screen reader hears "PAM" once, not twice.
  *
- * Static files rather than inlined SVG: the two marks are 40 kB of path data
- * between them, which is fine as a cached asset next to the page and would be
- * ruinous inside the JavaScript bundle that §12 caps at 500 kB.
+ * Static files rather than inlined SVG. At 5.7 kB each that is now a close call
+ * either way, but keeping them out of the JavaScript bundle costs nothing and
+ * §12's 500 kB budget has under 8 kB of headroom left.
  */
 export interface AppHeaderProps {
   /** Plain-language role name, already translated. Omitted for signed-out. */

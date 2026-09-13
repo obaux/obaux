@@ -7,7 +7,6 @@ import { Card } from '@astryxdesign/core/Card';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { Button } from '@astryxdesign/core/Button';
-import { CheckboxInput } from '@astryxdesign/core/CheckboxInput';
 import { AppHeader, BigButton, Notice } from '@pam/ui';
 import { useI18n } from '@/lib/i18n';
 import { useSupportPhone } from '@/lib/useSupportPhone';
@@ -26,13 +25,15 @@ import { setReminderConsent } from '@/lib/useReminderConsent';
  * caseload does not meet it at all, because nothing about their day depends on
  * being texted a reminder.
  *
- * **For the carrier.** A2P registration wants active, unambiguous consent: an
- * unticked box, a clear statement of what is sent and how often, STOP and HELP,
- * and rates. All of that fits here without turning the front door into a
- * contract, and this screen is the screenshot that goes with the registration.
+ * **For the carrier.** A2P registration wants active, unambiguous consent, a
+ * clear statement of what is sent and how often, STOP and HELP, and rates. All
+ * of that fits here without turning the front door into a contract, and this
+ * screen is the screenshot that goes with the registration.
  *
  * Either button is an answer. "Not now" writes the same row with false, so
- * nobody is asked twice and a decision is never inferred from silence.
+ * nobody is asked twice and a decision is never inferred from silence — and
+ * nothing on this screen arrives pre-selected, because there is nothing to
+ * select: the agreement is the button, in the button's own words.
  *
  * **No help link here, deliberately** (Will, 13 September) — the one exception
  * to §0's "every screen has a visible way to get help". This screen asks one
@@ -61,19 +62,21 @@ export default function RemindersPage() {
   const supportPhone = useSupportPhone();
   const { state: session } = useSession();
 
-  const [wants, setWants] = useState(false);
+  /** What was chosen last time, when there is a last time. */
+  const [already, setAlready] = useState<boolean | null>(null);
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
   const [failed, setFailed] = useState(false);
 
-  // A second visit should show what was chosen last time, not an empty box.
+  // A second visit should say what was chosen last time rather than asking as
+  // if nothing had been decided.
   useEffect(() => {
     if (session.status !== 'signed-in') return;
     let cancelled = false;
     void (async () => {
       const { getReminderConsent } = await import('@/lib/useReminderConsent');
       const current = await getReminderConsent(session.session.userId);
-      if (!cancelled && current !== null) setWants(current);
+      if (!cancelled) setAlready(current);
     })();
     return () => {
       cancelled = true;
@@ -114,19 +117,7 @@ export default function RemindersPage() {
           </VStack>
         </Card>
 
-        {/*
-          Unticked, always. A2P 10DLC 30925 is the rule and the reason is the
-          same one PAM would give anyway: a box somebody did not tick is not an
-          answer they gave.
-        */}
-        <CheckboxInput
-          label={t('reminders.optIn')}
-          value={wants}
-          onChange={(checked) => setWants(checked)}
-          xstyle={styles.box}
-        />
-
-        {done ? (
+        {done || already === true ? (
           <Text type="supporting" xstyle={styles.small}>
             {t('reminders.saved')}
           </Text>
@@ -151,22 +142,22 @@ export default function RemindersPage() {
           <>
             {/*
               The button is the consent, and it says so.
-              Will: people will miss a checkbox. They will — a tick box is a
-              thing to notice beside a button, which is a thing to press, and
-              the one that looks like the way forward wins. So the primary
-              action carries the agreement in its own words, and pressing it
-              ticks the box as well, so what somebody sees afterwards matches
-              what was recorded.
-              This is stronger consent than a box, not weaker: the words being
-              agreed to are on the control that was pressed. The box stays for
-              anybody who reads a screen that way, and it still starts empty.
+
+              There was a tick box here as well and it earned nothing: people
+              read a button as the way forward and a box as decoration beside
+              it, so the box was either missed — leaving somebody who wanted
+              reminders without them — or pressed and then confirmed, which is
+              the same decision twice.
+
+              Two buttons, one question, and the words being agreed to are on
+              the control that gets pressed. That is a stronger record of
+              consent than a box whose meaning lives in the text next to it,
+              and nothing here can be pre-selected, because there is nothing to
+              select.
             */}
             <BigButton
               label={t('reminders.agree')}
-              onPress={() => {
-                setWants(true);
-                void answer(true);
-              }}
+              onPress={() => void answer(true)}
               isDisabled={busy}
             />
             {/* Saying no is one tap, and it is recorded like any other answer. */}

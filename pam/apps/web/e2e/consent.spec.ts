@@ -59,11 +59,12 @@ test.describe('agreeing to reminders', () => {
     await expect(page.getByRole('checkbox')).toHaveCount(0);
   });
 
-  test('starts unticked on its own screen', async ({ page }) => {
+  test('nothing on the screen is pre-selected, because nothing is selectable', async ({ page }) => {
+    // 30925 asks that consent be an active, unambiguous act. There is no box to
+    // arrive pre-ticked: the agreement is a button whose own label is what is
+    // being agreed to.
     await page.goto('/reminders/');
-    const box = page.getByRole('checkbox', { name: /reminders/i });
-    await expect(box).toBeVisible();
-    await expect(box).not.toBeChecked();
+    await expect(page.getByRole('checkbox')).toHaveCount(0);
   });
 
   test('says what is sent, how often, and how to stop', async ({ page }) => {
@@ -75,10 +76,10 @@ test.describe('agreeing to reminders', () => {
   });
 
   test('signed out, it still explains the choice and points at sign-in', async ({ page }) => {
-    // Hiding the question behind a sign-in explains nothing. The choice is
-    // shown; the thing to do next is sign in, so that is the button.
+    // Hiding the question behind a sign-in explains nothing. What PAM would
+    // send is shown; the thing to do next is sign in, so that is the button.
     await page.goto('/reminders/');
-    await expect(page.getByRole('checkbox', { name: /reminders/i })).toBeVisible();
+    await expect(page.getByText(/reminder before a visit/i)).toBeVisible();
     await expect(page.getByRole('link', { name: 'Sign in' })).toBeVisible();
   });
 
@@ -115,10 +116,10 @@ test.describe('agreeing to reminders', () => {
     await expect(page.getByRole('button', { name: 'Agree to receive texts' })).toBeVisible();
   });
 
-  test('the primary button carries the agreement, and ticks the box with it', async ({ page }) => {
+  test('the agreement is the button, and the decline is the other one', async ({ page }) => {
     // A tick box beside a button loses: one is a thing to notice, the other is
-    // the way forward. So the agreement is in the button's own words, and
-    // pressing it leaves the box showing what was actually recorded.
+    // the way forward. So the words being agreed to are on the control that
+    // gets pressed, and there is exactly one other way out of the screen.
     const id = 'de3b9c2e-ec2f-403b-93e5-86e6ee75349b';
     await page.addInitScript((userId: string) => {
       const session = {
@@ -145,11 +146,7 @@ test.describe('agreeing to reminders', () => {
     await page.route('**/rest/v1/notification_preferences*', (route) => route.fulfill(json(null)));
 
     await page.goto('/reminders/');
-    const box = page.getByRole('checkbox', { name: /reminders/i });
-    await expect(box).not.toBeChecked();
-
     await page.getByRole('button', { name: 'Agree to receive texts' }).click();
-    await expect(box).toBeChecked();
     await expect(page.getByText(/You can change this whenever you want/i)).toBeVisible();
   });
 
