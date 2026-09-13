@@ -102,7 +102,7 @@ Numbers here are from the last run, not aspirations.
 |---|---|---|
 | Typecheck | 5/5 packages | — |
 | `@pam/config` tests | 202 pass | No SMS can send unreviewed, over 160 chars, with emoji, or with a term that reveals justice involvement. Locales are key-for-key. The transparency screen matches its contract. |
-| `@pam/ui` tests | 53 pass | Every component is axe-clean. `PlaceCard` offers exactly three actions in a fixed order. Reduced motion is respected. The mic hides when unsupported. |
+| `@pam/ui` tests | 56 pass | Every component is axe-clean. `PlaceCard` offers exactly three actions in a fixed order. Reduced motion is respected. The mic hides when unsupported. |
 | Database suite | 152 checks pass | See below |
 | Live RLS fingerprint | identical to local | The deployed policy set is provably the one that was penetration-tested: `ce9636c3b77e4827368e6575742b899c`, 73 policies on both |
 | Live anonymous attack | 0 rows leaked | A signed-out caller reads no profiles, messages, invites or audit rows on the real database, while still reaching the support number and the public catalogue |
@@ -219,7 +219,7 @@ while the copy is unsigned, so it earned the first live test, not the last.*
 | 2 | **Review the SMS copy** and record a name in `reviewedBy` | Phase 2 | Nothing can text a member until someone signs off against §9. **A review sheet is prepared and waiting**: all twelve messages rendered as lock-screen notifications in both languages, with the two open questions — https://claude.ai/code/artifact/f1dfb8d4-f64d-47c4-97d3-6a67f4c0eb09 |
 | 3 | **Get the PA 211 export URL** from the 211 contact | 211 data only | Licence cleared and the host reachable, but it serves a consumer search UI rather than a feed. Philadelphia's own datasets are verified and active. |
 | 4 | **A Google Places API key** | Hours and phone on imported places | `place_id` is null on all 525 imported providers, so the Hours action is a Google *search*, not a direct listing. A key would give phone numbers and structured hours — and until PAM has hours it will not show an open/closed state at all (D-044). |
-| 5 | Brand colours and logo | Phase 6 | Category pins use Astryx palette defaults chosen for hue separation at AAA contrast. |
+| 5 | ~~Brand colours and logo~~ **Logo done** | Phase 6 | Category pins use Astryx palette defaults chosen for hue separation at AAA contrast. |
 | 6 | Whether points redeem for real rewards | Phase 3 | Built behind a flag, shipped off. |
 | 7 | Retention: missed-appointment history beyond 90 days | Phase 5 | No purge job. Keeping this data indefinitely is the wrong default for this population. |
 | 8 | Pilot partner orgs and usability test scheduling | Phase 7 | Five members, three providers, two admins. |

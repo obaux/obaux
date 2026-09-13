@@ -282,14 +282,34 @@ describe('the header says which app you are in', () => {
   // chip is what answers "whose screen is this" when two are open at once.
   it('shows the wordmark on its own for the member app', () => {
     render(<AppHeader />);
-    expect(screen.getByText('PAM')).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: 'PAM' })).toBeInTheDocument();
     expect(screen.queryByText('Case manager')).not.toBeInTheDocument();
   });
 
   it('names the role when there is one', () => {
     render(<AppHeader roleLabel="Case manager" />);
-    expect(screen.getByText('PAM')).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: 'PAM' })).toBeInTheDocument();
     expect(screen.getByText('Case manager')).toBeInTheDocument();
+  });
+
+  it('says "PAM" once, not once per artwork', () => {
+    // Two files — lime on dark grounds, deep green on light ones — chosen by
+    // <picture>. Only the <img> carries the alt, so a screen reader announces
+    // the name once whichever one the browser paints.
+    render(<AppHeader />);
+    expect(screen.getAllByRole('img', { name: 'PAM' })).toHaveLength(1);
+  });
+
+  it('carries a mark for each colour scheme, so neither ground eats it', () => {
+    const { container } = render(<AppHeader />);
+    const sources = [...container.querySelectorAll('source')].map((el) => ({
+      media: el.getAttribute('media'),
+      src: el.getAttribute('srcset'),
+    }));
+    expect(sources).toEqual([
+      { media: '(prefers-color-scheme: dark)', src: '/pam-wordmark-dark.svg' },
+    ]);
+    expect(container.querySelector('img')).toHaveAttribute('src', '/pam-wordmark-light.svg');
   });
 
   it('is a banner landmark, so a screen reader can skip it', () => {

@@ -1407,6 +1407,27 @@ Three things this design gets that a checkbox on sign-in did not:
   consent cannot be required for service use) and the thing PAM would want
   regardless: nobody should have to accept texts to get help.
 
+### D-087 — The wordmark is two files, chosen by the browser
+The real PAM mark arrived on 13 September as two SVGs: lime green for dark
+grounds, deep green for light ones. Neither survives the other's background, so
+picking one would have meant a mark that disappears for half the people using
+it.
+
+`<picture>` with a `prefers-color-scheme` source does the choosing. No
+JavaScript, no flash of the wrong artwork on load, and only the `<img>` carries
+the `alt`, so a screen reader says "PAM" once rather than once per file.
+
+**Static files, not inlined SVG.** The two marks are 40 kB of path data between
+them. As cached assets beside the page that is unremarkable; inside the
+JavaScript bundle it would have eaten five times the headroom left under the
+500 kB budget in §12. Coordinates were rounded to two decimals on the way in,
+which took about 20% off without a visible difference on a 26px mark.
+
+What this does not yet handle: an in-app theme toggle. `mode` on the Astryx
+theme is "system" today, so the browser's scheme and the app's always agree.
+When Settings gains a manual light/dark switch, this has to switch with it —
+`<picture>` cannot see an app-level choice.
+
 ---
 
 ## Notes for whoever picks this up next

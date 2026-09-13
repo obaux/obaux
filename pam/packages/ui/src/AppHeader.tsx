@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { HStack } from '@astryxdesign/core/HStack';
-import { Text } from '@astryxdesign/core/Text';
 import { Badge } from '@astryxdesign/core/Badge';
 
 /**
@@ -19,9 +18,16 @@ import { Badge } from '@astryxdesign/core/Badge';
  * attention — an account paused, a feature switched off — and those are the
  * only badges on these screens that should catch an eye.
  *
- * The mark is type, not an image. There is no brand yet (that is Phase 6), and
- * a logo file would be a request on a 3G connection to say three letters that
- * the font already draws.
+ * The mark is the real wordmark now (13 September). Two files rather than one:
+ * the artwork is lime on dark grounds and deep green on light ones, and neither
+ * survives the other's background. `<picture>` picks between them from the
+ * browser's own colour scheme, with no JavaScript and no flash of the wrong one
+ * — and one `alt` on the `<img>`, so a screen reader hears "PAM" once, not
+ * twice.
+ *
+ * Static files rather than inlined SVG: the two marks are 40 kB of path data
+ * between them, which is fine as a cached asset next to the page and would be
+ * ruinous inside the JavaScript bundle that §12 caps at 500 kB.
  */
 export interface AppHeaderProps {
   /** Plain-language role name, already translated. Omitted for signed-out. */
@@ -48,10 +54,12 @@ const styles = stylex.create({
     paddingBlock: '4px',
   },
   mark: {
-    fontSize: '22px',
-    fontWeight: 700,
-    // The three letters are read as a name, not an acronym being spelled out.
-    letterSpacing: '0.06em',
+    // Sized by height so the aspect ratio comes from the artwork, and set in px
+    // because this is a piece of art at a fixed size, not text that should grow
+    // with a reader's font settings.
+    height: '26px',
+    width: 'auto',
+    display: 'block',
   },
 });
 
@@ -60,7 +68,10 @@ export function AppHeader({ roleLabel, align = 'start', trailing }: AppHeaderPro
     <header {...stylex.props(styles.header)}>
       <HStack gap={2} align="center" justify={trailing ? 'between' : align} wrap="nowrap">
         <HStack gap={2} align="center" wrap="wrap">
-          <Text xstyle={styles.mark}>PAM</Text>
+          <picture>
+            <source srcSet="/pam-wordmark-dark.svg" media="(prefers-color-scheme: dark)" />
+            <img src="/pam-wordmark-light.svg" alt="PAM" {...stylex.props(styles.mark)} />
+          </picture>
           {roleLabel ? <Badge variant="neutral" label={roleLabel} /> : null}
         </HStack>
         {trailing}
