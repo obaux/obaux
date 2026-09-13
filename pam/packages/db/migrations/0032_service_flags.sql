@@ -1,0 +1,41 @@
+-- 0032 — "This place is gone." Anyone can say so, and the catalogue believes
+-- them until a super admin decides.
+--
+-- Will's design, and it is the right one for this data. PAM's catalogue is
+-- 800-odd places scraped from city feeds that go stale quietly: a programme
+-- closes, a building changes hands, a phone number stops working, and the feed
+-- carries on listing it for a year. The people who find out first are the ones
+-- who walked there — and being sent to a closed door is the worst thing this
+-- product can do to somebody.
+--
+-- So: a member, a program manager or a case manager can flag a place. The flag
+-- hides it immediately — no queue, no debate, because the cost of hiding a live
+-- place for a week is a fraction of the cost of sending one person to a closed
+-- one. A super admin then decides: put it back, or take it out for good.
+--
+-- ## "Remove from the database" means removed, not deleted
+--
+-- Two reasons a DELETE would be the wrong verb here:
+--
+--   1. `enrollments.service_id` cascades. Deleting a service erases the record
+--      that somebody signed up for it — their history, not ours to drop.
+--   2. The importers upsert on (source, source_ref). A deleted row comes back
+--      on the next import run, and the super admin's decision is silently
+--      undone. `removed_at` is a decision the importer cannot overwrite.
+--
+-- A hard delete stays available to somebody with the service key who knows what
+-- cascades. It is not a button in the product.
+
+-- ---------------------------------------------------------------------------
+-- The super admin role.
+--
+-- A superset of admin, not a sibling: a super admin is still a case manager and
+-- keeps a caseload. `is_admin()` therefore answers true for both, so no
+-- existing policy changes meaning, and `is_super_admin()` is the new, narrower
+-- question.
+
+alter type public.user_role add value if not exists 'super_admin';
+
+-- Postgres will not let a new enum value be used in the same transaction that
+-- added it, so everything below lives in 0033. Splitting the migration is not
+-- tidiness — it is the only way this applies cleanly on a fresh database.

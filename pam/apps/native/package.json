@@ -1,0 +1,28 @@
+{
+  "name": "@pam/native",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "build:web": "pnpm --filter @pam/web build",
+    "sync": "pnpm build:web && cap sync",
+    "open:ios": "cap open ios",
+    "open:android": "cap open android",
+    "add:ios": "cap add ios",
+    "add:android": "cap add android",
+    "typecheck": "tsc -p tsconfig.json",
+    "test": "echo \"no unit tests: native is a Capacitor shell over the web build\""
+  },
+  "dependencies": {
+    "@capacitor-community/speech-recognition": "^6.0.1",
+    "@capacitor/android": "^6.2.0",
+    "@capacitor/core": "^6.2.0",
+    "@capacitor/geolocation": "^6.1.0",
+    "@capacitor/ios": "^6.2.0",
+    "@capacitor/push-notifications": "^6.0.3",
+    "@pam/ui": "workspace:*"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.2.0",
+    "typescript": "^5.7.2"
+  }
+}

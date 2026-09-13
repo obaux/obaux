@@ -46,3 +46,24 @@ service-role only. When a bundle pulls a live item out of open bidding (marking 
 - Admin RPCs use pgcrypto's `crypt()`, which lives in the `extensions` schema —
   every `security definer` admin function needs `set search_path = public, extensions`.
 - Don't merge to `main` without Will asking.
+
+## PAM — a second project in this repo
+
+`pam/` holds PAM, a separate product (a social system connecting returning
+citizens to services, mentors and case managers). It is unrelated to the garage
+sale and has its own stack, database and CI.
+
+**If you are working in `pam/`, read `pam/CLAUDE.md` first.** It carries that
+project's rules, several of which are enforced by tests rather than convention.
+
+Two conventions there matter before you touch anything:
+
+- **Start by reading `pam/STATUS.md` and the newest file in
+  `pam/docs/sessions/`.** STATUS says where the project is; the session logs say
+  how it got there and what the last session left unfinished.
+- **End every build session by writing a session log and updating STATUS.md.**
+  A session that leaves no record has to be reconstructed from a diff by the
+  next one.
+
+The two projects share this repository and nothing else. `.github/workflows/`
+scopes each workflow by path so neither triggers the other.

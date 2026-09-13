@@ -1,0 +1,94 @@
+import type { SVGProps } from 'react';
+
+/**
+ * Navigation icons.
+ *
+ * Astryx's semantic icon set is UI chrome — close, chevron, search, microphone.
+ * It has nothing for home, map, people, plan or profile, and its docs say to
+ * pass an SVG component directly for anything outside that set. These are those
+ * components.
+ *
+ * They copy Astryx's own icon conventions exactly (24 viewBox, no fill,
+ * currentColor stroke at 1.5, round caps and joins, 1em box, aria-hidden) so
+ * they size and colour identically to a built-in icon wherever they are used.
+ *
+ * Drawn plainly on purpose. A member may be reading these without their glasses,
+ * in sun, on a cracked screen, having not used a phone in years — a clever icon
+ * is a worse icon here.
+ */
+
+const svgProps: SVGProps<SVGSVGElement> = {
+  xmlns: 'http://www.w3.org/2000/svg',
+  viewBox: '0 0 24 24',
+  fill: 'none',
+  stroke: 'currentColor',
+  strokeWidth: 1.5,
+  strokeLinecap: 'round',
+  strokeLinejoin: 'round',
+  width: '1em',
+  height: '1em',
+  'aria-hidden': true,
+};
+
+/** A house. Home. */
+export function HomeIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <path d="M3 10.5 12 3l9 7.5" />
+      <path d="M5 9.5V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9.5" />
+      <path d="M9.5 21v-6h5v6" />
+    </svg>
+  );
+}
+
+/** A map pin. Places. */
+export function PlacesIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <path d="M12 21s7-5.5 7-11a7 7 0 1 0-14 0c0 5.5 7 11 7 11z" />
+      <circle cx="12" cy="10" r="2.5" />
+    </svg>
+  );
+}
+
+/** Two figures. People. */
+export function PeopleIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <circle cx="9" cy="8" r="3.5" />
+      <path d="M2.5 20a6.5 6.5 0 0 1 13 0" />
+      <path d="M16.5 5.2a3.5 3.5 0 0 1 0 6.6" />
+      <path d="M18 14.5a6.5 6.5 0 0 1 3.5 5.5" />
+    </svg>
+  );
+}
+
+/** A checklist. My Plan. */
+export function PlanIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <rect x="4" y="4" width="16" height="17" rx="2" />
+      <path d="M8 2.5v3M16 2.5v3M4 9.5h16" />
+      <path d="m8.5 14 2 2 4-4" />
+    </svg>
+  );
+}
+
+/** One figure. Me. */
+export function MeIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <circle cx="12" cy="8" r="3.75" />
+      <path d="M4.5 20.5a7.5 7.5 0 0 1 15 0" />
+    </svg>
+  );
+}
+
+/** A handset. Help — this one dials. */
+export function PhoneIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <path d="M7.5 3.5h-2a2 2 0 0 0-2 2.2A16.5 16.5 0 0 0 18.3 20.5a2 2 0 0 0 2.2-2v-2a1.5 1.5 0 0 0-1.2-1.5l-2.6-.5a1.5 1.5 0 0 0-1.5.6l-.8 1.1a12.5 12.5 0 0 1-5.1-5.1l1.1-.8a1.5 1.5 0 0 0 .6-1.5L10.5 5a1.5 1.5 0 0 0-1.5-1.2z" />
+    </svg>
+  );
+}

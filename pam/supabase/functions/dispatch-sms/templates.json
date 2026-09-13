@@ -1,0 +1,167 @@
+{
+  "templates": {
+    "invite_member": {
+      "key": "invite_member",
+      "en": "PAM: You've been invited to PAM, an app for finding help and people near you. Tap to join: {link}",
+      "es": "PAM: Le invitaron a PAM, una app para encontrar ayuda y personas cerca. Toque para entrar: {link}",
+      "vars": [
+        "link"
+      ],
+      "reviewedBy": "",
+      "isFirstContact": true
+    },
+    "invite_provider": {
+      "key": "invite_provider",
+      "en": "PAM: You have been invited to list your services on PAM. Tap to set up your page: {link}",
+      "es": "PAM: Le invitaron a publicar sus servicios en PAM. Toque para crear su pagina: {link}",
+      "vars": [
+        "link"
+      ],
+      "reviewedBy": "",
+      "isFirstContact": true
+    },
+    "verify_code": {
+      "key": "verify_code",
+      "en": "PAM: Your code is {code}. It works for 10 minutes.",
+      "es": "PAM: Su codigo es {code}. Sirve por 10 minutos.",
+      "vars": [
+        "code"
+      ],
+      "reviewedBy": "",
+      "isFirstContact": false
+    },
+    "facilitation_member": {
+      "key": "facilitation_member",
+      "en": "PAM: {adminFirstName} connected you with a program that can help. Open PAM to say hi: {link}",
+      "es": "PAM: {adminFirstName} le conecto con un programa que puede ayudar. Abra PAM para saludar: {link}",
+      "vars": [
+        "adminFirstName",
+        "link"
+      ],
+      "reviewedBy": "",
+      "isFirstContact": false
+    },
+    "facilitation_provider": {
+      "key": "facilitation_provider",
+      "en": "PAM: Someone was introduced to your program. Open PAM to reply: {link}",
+      "es": "PAM: Alguien fue presentado a su programa. Abra PAM para responder: {link}",
+      "vars": [
+        "link"
+      ],
+      "reviewedBy": "",
+      "isFirstContact": false
+    },
+    "appointment_24h": {
+      "key": "appointment_24h",
+      "en": "PAM: You have a visit tomorrow at {time}. {address}. Tap for directions: {link}",
+      "es": "PAM: Tiene una visita mañana a las {time}. {address}. Toque para llegar: {link}",
+      "vars": [
+        "time",
+        "address",
+        "link"
+      ],
+      "maxVarLengths": {
+        "address": 34
+      },
+      "reviewedBy": "",
+      "isFirstContact": false
+    },
+    "appointment_2h": {
+      "key": "appointment_2h",
+      "en": "PAM: Your visit is at {time} today. {address}. Tap for directions: {link}",
+      "es": "PAM: Su visita es hoy a las {time}. {address}. Toque para llegar: {link}",
+      "vars": [
+        "time",
+        "address",
+        "link"
+      ],
+      "maxVarLengths": {
+        "address": 34
+      },
+      "reviewedBy": "",
+      "isFirstContact": false
+    },
+    "appointment_morning_of": {
+      "key": "appointment_morning_of",
+      "en": "PAM: Today at {time} you have a visit. {address}. Tap for directions: {link}",
+      "es": "PAM: Hoy a las {time} tiene una visita. {address}. Toque para llegar: {link}",
+      "vars": [
+        "time",
+        "address",
+        "link"
+      ],
+      "maxVarLengths": {
+        "address": 34
+      },
+      "reviewedBy": "",
+      "isFirstContact": false
+    },
+    "attendance_check": {
+      "key": "attendance_check",
+      "en": "PAM: Did you make it today? Reply YES or NO.",
+      "es": "PAM: Pudo ir hoy? Responda YES o NO.",
+      "vars": [],
+      "reviewedBy": "",
+      "isFirstContact": false
+    },
+    "attendance_missed_followup": {
+      "key": "attendance_missed_followup",
+      "en": "PAM: No problem. We saved a step to set up a new time. Open PAM when you are ready: {link}",
+      "es": "PAM: No hay problema. Guardamos un paso para buscar otra fecha. Abra PAM cuando pueda: {link}",
+      "vars": [
+        "link"
+      ],
+      "reviewedBy": "",
+      "isFirstContact": false
+    },
+    "connection_request": {
+      "key": "connection_request",
+      "en": "PAM: Someone on PAM wants to connect. Open PAM to reply: {link}",
+      "es": "PAM: Alguien en PAM quiere conectar. Abra PAM para responder: {link}",
+      "vars": [
+        "link"
+      ],
+      "reviewedBy": "",
+      "isFirstContact": false
+    },
+    "saved_place_closed": {
+      "key": "saved_place_closed",
+      "en": "PAM: A place you saved is {reason}. Find others in PAM: {link}",
+      "es": "PAM: Un lugar que guardo {reason}. Vea otros en PAM: {link}",
+      "vars": [
+        "reason",
+        "link"
+      ],
+      "reviewedBy": "",
+      "isFirstContact": false
+    },
+    "access_limited_notice": {
+      "key": "access_limited_notice",
+      "en": "PAM: Some parts of PAM are turned off for now. Call {supportPhone} with questions.",
+      "es": "PAM: Algunas partes de PAM estan apagadas por ahora. Llame al {supportPhone} si tiene preguntas.",
+      "vars": [
+        "supportPhone"
+      ],
+      "reviewedBy": "",
+      "isFirstContact": false
+    }
+  },
+  "reasons": {
+    "closed": {
+      "en": "closed, so there is no need to go",
+      "es": "ya no abre, no hace falta ir"
+    },
+    "moved": {
+      "en": "at a new address now",
+      "es": "cambio de direccion"
+    },
+    "not_accepting": {
+      "en": "not taking new people, so there is no need to go",
+      "es": "no acepta gente nueva, no hace falta ir"
+    },
+    "wrong_info": {
+      "en": "listed wrong here",
+      "es": "esta mal anotado aqui"
+    }
+  }
+}
