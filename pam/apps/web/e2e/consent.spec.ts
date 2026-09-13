@@ -255,6 +255,9 @@ test.describe('the way in explains itself', () => {
     // The slides are context. If they push the button off the screen they have
     // stopped being context and started being the screen.
     await page.goto('/signin/');
+    // On the settled page: the screen arrives with a CSS fade that starts 8px
+    // low, and a box measured during it is 8px from where it lands.
+    await settled(page);
     const button = page.getByRole('button', { name: en['signin.phone.action'] });
     const box = await button.boundingBox();
     const viewport = page.viewportSize();

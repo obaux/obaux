@@ -147,3 +147,33 @@ export function BookmarkIcon({ isFilled = false, ...props }: SVGProps<SVGSVGElem
   );
 }
 
+/** An arrow leaving a box. Send this to somebody. */
+export function ShareIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <path d="M12 3.5v11" />
+      <path d="m8 7.5 4-4 4 4" />
+      <path d="M5.5 13.5V19a1.5 1.5 0 0 0 1.5 1.5h10a1.5 1.5 0 0 0 1.5-1.5v-5.5" />
+    </svg>
+  );
+}
+
+/** A flag on a pole. Tell somebody this listing is wrong. */
+export function FlagIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <path d="M6 21V4" />
+      <path d="M6 4.5h10.5l-2 3.75 2 3.75H6" />
+    </svg>
+  );
+}
+
+/** A star. Points — the only place in PAM that keeps a score. */
+export function StarIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} fill="currentColor" stroke="none" {...props}>
+      <path d="m12 3.6 2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8L3.5 9.8l5.9-.9z" />
+    </svg>
+  );
+}
+

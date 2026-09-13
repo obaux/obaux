@@ -19,6 +19,7 @@ import { useI18n } from '@/lib/i18n';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { usePlaces, METRES_PER_MILE } from '@/lib/usePlaces';
 import { useSavedPlaces } from '@/lib/useSavedPlaces';
+import { sharePlace } from '@/lib/sharePlace';
 import { useSession } from '@/lib/useSession';
 import { CITY_HALL, loadOrigin, saveOrigin, type AreaOption } from '@/lib/useAreaSearch';
 import { AreaSearch, AreaTrigger } from './AreaPicker';
@@ -198,6 +199,8 @@ export default function PlacesPage() {
                     lat={place.lat}
                     lon={place.lon}
                     placeId={place.placeId}
+                    onShare={() => void sharePlace(place.name, place.address)}
+                    flagHref={`/flag/?place=${encodeURIComponent(place.id)}`}
                     isSaved={saved}
                     onSave={() => {
                       if (saved) {
@@ -222,6 +225,9 @@ export default function PlacesPage() {
                       save: t('action.save'),
                       saved: t('places.saved'),
                       hours: t('action.hours'),
+                      more: t('place.more'),
+                      share: t('place.share'),
+                      flag: t('place.flag'),
                     }}
                   />
                   </ScrollReveal>

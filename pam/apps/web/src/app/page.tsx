@@ -4,6 +4,7 @@ import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { HStack } from '@astryxdesign/core/HStack';
+import { Button } from '@astryxdesign/core/Button';
 import * as stylex from '@stylexjs/stylex';
 import {
   AppHeader,
@@ -20,7 +21,7 @@ import {
   PlacesIcon,
   PlanIcon,
   Press,
-  SavedStrip,
+  StarIcon,
   TextLink,
 } from '@pam/ui';
 import { categoryLabelKey, NOTICES } from '@pam/config';
@@ -29,6 +30,8 @@ import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
 import { useNotifications } from '@/lib/useNotifications';
 import { useSavedPlaces } from '@/lib/useSavedPlaces';
+import { usePoints } from '@/lib/usePoints';
+import { SavedStripLazy } from './SavedStripLazy';
 
 /**
  * Home.
@@ -60,6 +63,9 @@ const styles = stylex.create({
   title: { fontSize: '28px', lineHeight: 1.2 },
   intro: { fontSize: '18px', lineHeight: 1.5 },
   section: { fontSize: '17px' },
+  // A chip, not a call to action: 48px to hit like everything else, and quiet
+  // enough that it does not compete with the tiles below it.
+  points: { minHeight: '48px', fontSize: '15px' },
 });
 
 export default function HomePage() {
@@ -70,6 +76,7 @@ export default function HomePage() {
   const signedIn = session.status === 'signed-in';
   const { state: notifications } = useNotifications(signedIn);
   const { state: saved, unsave, failed: saveFailed } = useSavedPlaces(signedIn);
+  const points = usePoints(session.status === 'signed-in' ? session.session.userId : null);
   const unread =
     notifications.status === 'ready'
       ? notifications.items.filter((item) => !item.isRead).length
@@ -167,9 +174,30 @@ export default function HomePage() {
         screen's plain name rather than "Hi, there", which reads like a mail
         merge that failed.
       */}
-      <Heading level={1} xstyle={styles.title}>
-        {me.firstName ? t('home.greeting', { name: me.firstName }) : t('home.title')}
-      </Heading>
+      {/*
+        The name and the points on one line (Will, 13 September). The balance is
+        a link rather than a badge: points mean levels and badges (§8), and
+        those need a screen — until it exists this goes to the saved list, which
+        is the only place points currently come from.
+
+        It is absent, not zero, while the balance is unknown or the call fails.
+        A points chip is the least important thing on this screen and a "0" that
+        turns into "35" a second later reads as losing something.
+      */}
+      <HStack gap={2} align="center" justify="between" wrap="wrap">
+        <Heading level={1} xstyle={styles.title}>
+          {me.firstName ? t('home.greeting', { name: me.firstName }) : t('home.title')}
+        </Heading>
+        {points !== null ? (
+          <Button
+            label={t('points.summary', { count: points })}
+            variant="secondary"
+            href="/saved/"
+            icon={<StarIcon />}
+            xstyle={styles.points}
+          />
+        ) : null}
+      </HStack>
 
       {/*
         The places they kept, before the menu. Somebody who has saved anything
@@ -184,7 +212,7 @@ export default function HomePage() {
             </Heading>
             <TextLink label={t('saved.seeAll')} href="/saved/" size="quiet" />
           </HStack>
-          <SavedStrip
+          <SavedStripLazy
             places={saved.places.map((place) => ({
               id: place.id,
               name: place.name,

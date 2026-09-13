@@ -40,7 +40,16 @@ async function expectNoViolations(container: HTMLElement): Promise<void> {
   expect(results.violations).toHaveLength(0);
 }
 
-const placeLabels = { call: 'Call', go: 'Go', save: 'Save', saved: 'Saved', hours: 'Hours' };
+const placeLabels = {
+  call: 'Call',
+  go: 'Go',
+  save: 'Save',
+  saved: 'Saved',
+  hours: 'Hours',
+  more: 'More about this place',
+  share: 'Share this place',
+  flag: 'Something is wrong here',
+};
 
 describe('accessibility', () => {
   it('NavTile', async () => {

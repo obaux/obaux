@@ -40,6 +40,9 @@ export {
   BellIcon,
   BookmarkIcon,
   EditIcon,
+  FlagIcon,
+  ShareIcon,
+  StarIcon,
   HomeIcon,
   MeIcon,
   PeopleIcon,
@@ -54,7 +57,8 @@ export {
   CardEnter,
   ScrollReveal,
   Press,
-  AnimatePresence,
+  MaskedList,
+  MaskedItem,
   PAM_MOTION,
 } from './motion.js';
 export { pam } from './tokens.stylex.js';

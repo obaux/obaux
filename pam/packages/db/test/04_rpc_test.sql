@@ -302,9 +302,22 @@ $$;
 do $$
 declare
   bal integer;
+  expected integer;
 begin
+  -- Computed from the ledger rather than hard-coded. It used to assert a flat
+  -- 100 and broke the day saving a place started earning points (0045) — the
+  -- seed saves places, so the seeded balance moved. A test that has to be
+  -- edited every time a real rule lands is a test that stops meaning anything.
+  select coalesce(sum(delta), 0) into expected
+  from public.points_ledger where member_id = '33333333-0000-0000-0000-00000000000c';
+
   bal := public.member_points('33333333-0000-0000-0000-00000000000c');
-  if bal <> 100 then raise exception 'FAIL  balance was %, expected 100', bal; end if;
+  if bal <> expected then
+    raise exception 'FAIL  member_points said %, the ledger says %', bal, expected;
+  end if;
+  if bal <= 0 then
+    raise exception 'FAIL  the seeded member has no points at all, so this proves nothing';
+  end if;
   raise notice 'ok    member_points returns the ledger sum (%)', bal;
 end;
 $$;
@@ -369,8 +382,11 @@ do $$
 declare
   v integer;
 begin
+  -- A number, not a specific number: what is being proved here is that the
+  -- guard lets the owner through, and the seeded balance moves whenever a real
+  -- points rule lands (0045 was the first).
   v := public.member_points('33333333-0000-0000-0000-00000000000c');
-  if v is distinct from 100 then
+  if v is null or v <= 0 then
     raise exception 'FAIL  a member cannot read their own balance (got %)', v;
   end if;
   raise notice 'ok    a member still reads their own balance';
@@ -393,7 +409,7 @@ declare
   v integer;
 begin
   v := public.member_points('33333333-0000-0000-0000-00000000000c');
-  if v is distinct from 100 then
+  if v is null or v <= 0 then
     raise exception 'FAIL  an admin cannot read caseload points (got %)', v;
   end if;
   raise notice 'ok    an admin still reads their caseload''s points';
@@ -745,6 +761,88 @@ begin
 
   set local role postgres;
   delete from public.saved_places where member_id = v_marcus and service_id = v_service;
+  set local role authenticated;
+end;
+$$;
+
+\echo ''
+\echo '--- Saving a place earns points, once ---'
+
+-- 0045. The rule has been in the config since it was written; this is the
+-- first thing to implement it, and the interesting case is the second save.
+do $$
+declare
+  v_marcus uuid := '33333333-0000-0000-0000-00000000000c';
+  v_admin  uuid := '33333333-0000-0000-0000-00000000000a';
+  v_service uuid;
+  v_before integer;
+  v_after integer;
+  n integer;
+begin
+  -- A place he has never saved — never, not "does not have saved now". The
+  -- award is once per place forever, so a place he saved and unsaved earlier in
+  -- this file still has its ledger row and would earn nothing. (That is the
+  -- rule working; it is just not what this first assertion is measuring.)
+  set local role postgres;
+  select s.id into v_service
+  from public.services s
+  where not exists (
+    select 1 from public.saved_places sp
+    where sp.service_id = s.id and sp.member_id = v_marcus
+  )
+  and not exists (
+    select 1 from public.points_ledger pl
+    where pl.subject_id = s.id and pl.member_id = v_marcus
+  )
+  limit 1;
+  if v_service is null then
+    raise exception 'FAIL  the seed has no unsaved service to test with';
+  end if;
+
+  select coalesce(sum(delta), 0) into v_before
+  from public.points_ledger where member_id = v_marcus;
+
+  insert into public.saved_places (member_id, service_id) values (v_marcus, v_service);
+
+  select coalesce(sum(delta), 0) into v_after
+  from public.points_ledger where member_id = v_marcus;
+  if v_after - v_before <> 5 then
+    raise exception 'FAIL  saving a place earned % points, expected 5', v_after - v_before;
+  end if;
+  raise notice 'ok    saving a place earns five points';
+
+  -- Unsave, save again: the farm. It earns nothing the second time, and the
+  -- first award is still there.
+  delete from public.saved_places where member_id = v_marcus and service_id = v_service;
+  select coalesce(sum(delta), 0) into v_after
+  from public.points_ledger where member_id = v_marcus;
+  if v_after - v_before <> 5 then
+    raise exception 'FAIL  unsaving changed the balance by %', v_after - v_before - 5;
+  end if;
+  raise notice 'ok    unsaving takes nothing back';
+
+  insert into public.saved_places (member_id, service_id) values (v_marcus, v_service);
+  select coalesce(sum(delta), 0) into v_after
+  from public.points_ledger where member_id = v_marcus;
+  if v_after - v_before <> 5 then
+    raise exception 'FAIL  saving the same place twice earned % points', v_after - v_before;
+  end if;
+  raise notice 'ok    saving the same place again earns nothing';
+
+  -- Staff are not on the board.
+  insert into public.saved_places (member_id, service_id) values (v_admin, v_service);
+  select count(*) into n from public.points_ledger where member_id = v_admin;
+  if n <> 0 then
+    raise exception 'FAIL  a case manager earned points for saving a place';
+  end if;
+  raise notice 'ok    staff earn nothing: points are a member mechanic';
+
+  -- The saved rows go; the ledger rows stay, because the ledger is append-only
+  -- (0007) and tidying up after a test is not a reason to rewrite somebody's
+  -- history. Later assertions read the sum rather than a fixed number for
+  -- exactly this reason.
+  delete from public.saved_places where service_id = v_service
+    and member_id in (v_marcus, v_admin);
   set local role authenticated;
 end;
 $$;

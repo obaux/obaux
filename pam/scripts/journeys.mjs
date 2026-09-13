@@ -85,6 +85,7 @@ const SCREENS = [
   // which is itself worth photographing — a closed door is a screen too.
   { name: '5b-everyone', path: '/directory/' },
   { name: '5c-saved', path: '/saved/' },
+  { name: '5d-flag', path: '/flag/?place=s1' },
   { name: '6-notifications', path: '/notifications/' },
   { name: '7-privacy', path: '/privacy/' },
   { name: '8-terms', path: '/terms/' },
@@ -231,6 +232,7 @@ async function stub(page, profile) {
   );
   await page.route('**/rest/v1/rpc/saved_places_mine*', (r) => r.fulfill(json(SAVED_PLACES)));
   await page.route('**/rest/v1/saved_places*', (r) => r.fulfill(json([])));
+  await page.route('**/rest/v1/rpc/flag_service*', (r) => r.fulfill(json({ id: 'flag-1' })));
 }
 
 const server = spawn('npx', ['serve', 'apps/web/out', '-l', String(PORT), '--no-clipboard'], {

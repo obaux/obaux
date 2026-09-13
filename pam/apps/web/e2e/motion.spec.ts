@@ -38,6 +38,10 @@ test.describe('with motion on', () => {
   });
 
   test('a press is felt, and let go of', async ({ page }) => {
+    // The press is CSS — `:has(:active)` on the wrapper — because swapping a
+    // button when the animation chunk lands would remount it, and a tap in that
+    // window would hit a node being replaced. So this reads the wrapper's
+    // transform, which is the thing the rule moves.
     await page.goto('/signin/');
     const button = page.getByRole('button', { name: 'Send me a code' });
     const wrapper = () =>

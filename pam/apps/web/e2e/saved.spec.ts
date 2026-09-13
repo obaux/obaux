@@ -132,6 +132,27 @@ test.describe('keeping a place', () => {
       .toBe(true);
   });
 
+  test('points show beside the name, and only once they are known', async ({ page }) => {
+    // Saving earns five points in the database (0045). The home screen shows
+    // the balance next to the greeting — absent, never "0", while unknown.
+    await signedIn(page, [PLACE]);
+    await page.route('**/rest/v1/rpc/member_points*', (route) => route.fulfill(json(35)));
+    await page.goto('/');
+
+    await expect(page.getByRole('link', { name: '35 points' })).toBeVisible();
+  });
+
+  test('a balance PAM cannot read is shown as nothing, not as zero', async ({ page }) => {
+    // member_points returns null to anybody not entitled to the number, and a
+    // "0 points" chip that becomes "35" a second later reads as losing points.
+    await signedIn(page, [PLACE]);
+    await page.route('**/rest/v1/rpc/member_points*', (route) => route.fulfill(json(null)));
+    await page.goto('/');
+
+    await expect(page.getByRole('heading', { name: 'Hi, Marcus' })).toBeVisible();
+    await expect(page.getByText(/points/)).toHaveCount(0);
+  });
+
   test('the full list is the same card as the search, not a lesser one', async ({ page }) => {
     await signedIn(page, [PLACE]);
     await page.goto('/saved/');

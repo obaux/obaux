@@ -18,6 +18,7 @@ import { useI18n } from '@/lib/i18n';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
 import { useSavedPlaces } from '@/lib/useSavedPlaces';
+import { sharePlace } from '@/lib/sharePlace';
 
 /**
  * Everything a member kept.
@@ -168,12 +169,17 @@ export default function SavedPage() {
                 placeId={place.placeId ?? undefined}
                 isSaved
                 onSave={() => void unsave(place.id)}
+                onShare={() => void sharePlace(place.name, place.address)}
+                flagHref={`/flag/?place=${encodeURIComponent(place.id)}`}
                 labels={{
                   call: t('action.call'),
                   go: t('action.go'),
                   save: t('action.save'),
                   saved: t('places.saved'),
                   hours: t('action.hours'),
+                  more: t('place.more'),
+                  share: t('place.share'),
+                  flag: t('place.flag'),
                 }}
               />
             </ScrollReveal>

@@ -11,7 +11,16 @@ import { NavTile } from '../src/NavTile.js';
 import { OnboardingSlides } from '../src/OnboardingSlides.js';
 import { PlacesIcon } from '../src/icons.js';
 
-const labels = { call: 'Call', go: 'Go', save: 'Save', saved: 'Saved', hours: 'Hours' };
+const labels = {
+  call: 'Call',
+  go: 'Go',
+  save: 'Save',
+  saved: 'Saved',
+  hours: 'Hours',
+  more: 'More about this place',
+  share: 'Share this place',
+  flag: 'Something is wrong here',
+};
 
 function mockReducedMotion(reduced: boolean): void {
   vi.stubGlobal(

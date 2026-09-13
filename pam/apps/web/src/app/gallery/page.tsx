@@ -54,7 +54,16 @@ const styles = stylex.create({
   card: { width: '100%' },
 });
 
-const PLACE_LABELS = { call: 'Call', go: 'Go', save: 'Save', saved: 'Saved', hours: 'Hours' };
+const PLACE_LABELS = {
+  call: 'Call',
+  go: 'Go',
+  save: 'Save',
+  saved: 'Saved',
+  hours: 'Hours',
+  more: 'More about this place',
+  share: 'Share this place',
+  flag: 'Something is wrong here',
+};
 
 function Section({ title, note, children }: { title: string; note?: string; children: React.ReactNode }) {
   return (
@@ -172,6 +181,17 @@ export default function GalleryPage() {
             phone="+12155550100"
             address="1234 Market St, Philadelphia"
             distanceLabel="1.2 miles"
+            onShare={() => {}}
+            flagHref="/flag/"
+            labels={PLACE_LABELS}
+          />
+          <PlaceCard
+            name="A place whose name is long enough to need the two-line clamp, so the menu keeps its corner"
+            category="family_services"
+            categoryLabel="Home and family"
+            address="900 Spring Garden St"
+            onShare={() => {}}
+            flagHref="/flag/"
             labels={PLACE_LABELS}
           />
           <PlaceCard

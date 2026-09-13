@@ -7,7 +7,7 @@ import { Text } from '@astryxdesign/core/Text';
 import { IconButton } from '@astryxdesign/core/IconButton';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { BookmarkIcon } from './icons.js';
-import { AnimatePresence, PAM_MOTION, m } from './motion.js';
+import { MaskedItem, MaskedList } from './motion.js';
 import { pam } from './tokens.stylex.js';
 
 /**
@@ -104,29 +104,14 @@ export function SavedStrip({ places, label, removeLabel, onRemove }: SavedStripP
     <section aria-label={label} {...stylex.props(styles.region)}>
       <Carousel gap={2} hasButtons={false} hasEdgeFade>
         {/*
-          No `layout` and no `popLayout`. Both animate the surviving squares
-          into the gap, which is prettier and costs framer-motion's layout
-          projection — about 12 kB gzipped and the most expensive thing it does
-          at runtime, on the cheapest phone PAM supports. The mask is what
-          carries the removal; the squares after it close up immediately, which
-          nobody reads as broken (D-105).
+          The mask lives in the motion runtime, which may never arrive — a slow
+          connection gets no animation chunk at all. Then this is a plain
+          wrapper and a removed square simply goes, which nobody reads as
+          broken; the bookmark filling in is what said it worked.
         */}
-        <AnimatePresence initial={false}>
+        <MaskedList>
           {places.map((place) => (
-            <m.div
-              key={place.id}
-              initial={{ opacity: 0, scale: 0.94 }}
-              animate={{ opacity: 1, scale: 1, clipPath: 'inset(0% 0% 0% 0% round 16px)' }}
-              exit={{
-                // The mask: the square wipes away to its left edge and fades,
-                // so the eye follows the removal rather than noticing a gap.
-                clipPath: 'inset(0% 100% 0% 0% round 16px)',
-                opacity: 0,
-                transition: PAM_MOTION.exit,
-              }}
-              transition={PAM_MOTION.enter}
-              {...stylex.props(styles.card)}
-            >
+            <MaskedItem key={place.id} className={stylex.props(styles.card).className}>
               <a href={place.href} {...stylex.props(styles.link)}>
                 <VStack gap={1}>
                   <Text xstyle={styles.name}>{place.name}</Text>
@@ -142,9 +127,9 @@ export function SavedStrip({ places, label, removeLabel, onRemove }: SavedStripP
                 onClick={() => onRemove(place.id)}
                 xstyle={styles.bookmark}
               />
-            </m.div>
+            </MaskedItem>
           ))}
-        </AnimatePresence>
+        </MaskedList>
       </Carousel>
     </section>
   );

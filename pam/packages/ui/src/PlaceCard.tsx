@@ -6,7 +6,10 @@ import { Text } from '@astryxdesign/core/Text';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Badge, type BadgeVariant } from '@astryxdesign/core/Badge';
 import { Button } from '@astryxdesign/core/Button';
-import { BookmarkIcon } from './icons.js';
+import { DropdownMenu } from '@astryxdesign/core/DropdownMenu';
+import { IconButton } from '@astryxdesign/core/IconButton';
+import { Icon } from '@astryxdesign/core/Icon';
+import { BookmarkIcon, FlagIcon, ShareIcon } from './icons.js';
 import { CATEGORY_DEFINITIONS, type Category } from '@pam/config';
 
 /**
@@ -58,7 +61,21 @@ export interface PlaceCardProps {
   isSaved?: boolean;
   onSave?: () => void;
   onCall?: () => void;
-  labels: { call: string; go: string; save: string; saved: string; hours: string };
+  /** Hand the place to somebody else. Omit and the menu drops the item. */
+  onShare?: () => void;
+  /** Where "Something is wrong" goes. Omit and the menu drops the item. */
+  flagHref?: string;
+  labels: {
+    call: string;
+    go: string;
+    save: string;
+    saved: string;
+    hours: string;
+    /** The menu's accessible name, e.g. "More about this place". */
+    more: string;
+    share: string;
+    flag: string;
+  };
 }
 
 /**
@@ -76,7 +93,20 @@ function categoryBadgeVariant(category: Category): BadgeVariant {
 
 const styles = stylex.create({
   card: { width: '100%' },
-  name: { fontSize: '20px', lineHeight: 1.3 },
+  name: {
+    fontSize: '20px',
+    lineHeight: 1.3,
+    // Two lines, then an ellipsis: the menu keeps its corner whatever the
+    // catalogue calls a place, and "Philadelphia Office of Adult Education
+    // and Workforce Readiness — North" does not push it off the card.
+    display: '-webkit-box',
+    WebkitLineClamp: 2,
+    WebkitBoxOrient: 'vertical',
+    overflow: 'hidden',
+    minWidth: 0,
+  },
+  // The menu never shrinks; the name gives way first.
+  more: { flexShrink: 0, minHeight: '48px', minWidth: '48px' },
   meta: { fontSize: '16px' },
   // §0 / §2.5 — every action here clears the 48px minimum target.
   action: { minHeight: '48px', flexGrow: 1, fontSize: '17px' },
@@ -152,14 +182,63 @@ export function PlaceCard({
   isSaved = false,
   onSave,
   onCall,
+  onShare,
+  flagHref,
   labels,
 }: PlaceCardProps) {
+  const hasMenu = Boolean(onShare || flagHref);
+
   return (
     <Card padding={4} xstyle={styles.card}>
       <VStack gap={2}>
-        <Heading level={3} xstyle={styles.name}>
-          {name}
-        </Heading>
+        {/*
+          The name and the everything-else menu share a row. The three actions
+          along the bottom are the ones a member came for; share and flag are
+          the ones they need twice a year, and a fourth and fifth button in that
+          row would shrink Call to fit them (Will, 13 September).
+
+          The name truncates to two lines rather than pushing the menu off the
+          card. Two, not one: a place is often "Mt. Airy Learning Tree —
+          Germantown Avenue", and the first half of that is several places.
+        */}
+        <HStack gap={2} align="start" justify="between" wrap="nowrap">
+          <Heading level={3} xstyle={styles.name}>
+            {name}
+          </Heading>
+          {hasMenu ? (
+            <DropdownMenu
+              button={{
+                label: labels.more,
+                icon: <Icon icon="moreHorizontal" />,
+                isIconOnly: true,
+                variant: 'ghost',
+              }}
+              hasChevron={false}
+              placement="below"
+              alignment="end"
+              presentation="adaptive"
+              items={[
+                ...(onShare
+                  ? [{ id: 'share', label: labels.share, icon: <ShareIcon />, onClick: onShare }]
+                  : []),
+                ...(flagHref
+                  ? [
+                      {
+                        id: 'flag',
+                        label: labels.flag,
+                        icon: <FlagIcon />,
+                        onClick: () => {
+                          // A real navigation, so the flag screen has its own
+                          // address and its own Back.
+                          window.location.assign(flagHref);
+                        },
+                      },
+                    ]
+                  : []),
+              ]}
+            />
+          ) : null}
+        </HStack>
 
         <HStack gap={2} align="center" wrap="wrap">
           <Badge variant={categoryBadgeVariant(category)} label={categoryLabel} />
