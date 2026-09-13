@@ -97,12 +97,12 @@ Numbers here are from the last run, not aspirations.
 | Check | Result | What it actually proves |
 |---|---|---|
 | Typecheck | 5/5 packages | — |
-| `@pam/config` tests | 201 pass | No SMS can send unreviewed, over 160 chars, with emoji, or with a term that reveals justice involvement. Locales are key-for-key. The transparency screen matches its contract. |
-| `@pam/ui` tests | 46 pass | Every component is axe-clean. `PlaceCard` offers exactly three actions in a fixed order. Reduced motion is respected. The mic hides when unsupported. |
+| `@pam/config` tests | 202 pass | No SMS can send unreviewed, over 160 chars, with emoji, or with a term that reveals justice involvement. Locales are key-for-key. The transparency screen matches its contract. |
+| `@pam/ui` tests | 53 pass | Every component is axe-clean. `PlaceCard` offers exactly three actions in a fixed order. Reduced motion is respected. The mic hides when unsupported. |
 | Database suite | 152 checks pass | See below |
 | Live RLS fingerprint | identical to local | The deployed policy set is provably the one that was penetration-tested: `ce9636c3b77e4827368e6575742b899c`, 73 policies on both |
 | Live anonymous attack | 0 rows leaked | A signed-out caller reads no profiles, messages, invites or audit rows on the real database, while still reaching the support number and the public catalogue |
-| Browser a11y + theme | 153 pass | No WCAG AA violations at 320px or iPhone SE. Every control clears 48px. No horizontal scroll. The Astryx theme really resolves. Runs in dark mode as well as light. |
+| Browser a11y + theme | 171 pass | No WCAG AA violations at 320px or iPhone SE. Every control clears 48px. No horizontal scroll. The Astryx theme really resolves. Runs in dark mode as well as light. |
 | First-load JS | 490.1 kB of 500 kB | §12 budget, measured gzipped on what `index.html` actually loads |
 
 ### The database suite is the one that matters
@@ -150,12 +150,14 @@ oversight:
 - **No Google Places key**, so no phone numbers and no structured hours. The 525
   imported records have neither, and PlaceCard sends members to the Google
   listing instead (D-032). A key would let PAM show "Open now" natively.
-- **No SMS is sendable, though everything to send one now exists.** The
-  dispatcher is deployed and on a clock; every template ships `reviewedBy: ''`
-  and both the renderer and the dispatcher refuse an unreviewed one. This is a
-  gate, not a gap — a human has to read the copy against §9 first.
-- **Notifications are readable on the case manager screen** — a bar under the
-  header, closed by default, saying how many are new in words. Still to come:
+- **The SMS copy is signed off** (13 September, Will) and the dispatcher is
+  deployed with it. The only thing still stopping a real text is the Twilio
+  credentials in the function's secrets — and, beyond that, the carrier
+  registration. Blank `reviewedBy` still stops everything, and a new template
+  starts blank.
+- **Notifications are readable on the case manager screen** — a bell in the
+  header with the count in words, opening a one-line-per-row panel. Still to
+  come:
   the same bar on the super admin panel, and opening a row to the person or
   place it is about, which needs the member profile screen to exist first.
 - **No device build.** Capacitor is configured; `cap add ios/android` has never

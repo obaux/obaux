@@ -7,7 +7,7 @@
       "vars": [
         "link"
       ],
-      "reviewedBy": "",
+      "reviewedBy": "Will (Oba), 13 September 2026",
       "isFirstContact": true
     },
     "invite_provider": {
@@ -17,7 +17,7 @@
       "vars": [
         "link"
       ],
-      "reviewedBy": "",
+      "reviewedBy": "Will (Oba), 13 September 2026",
       "isFirstContact": true
     },
     "verify_code": {
@@ -27,7 +27,7 @@
       "vars": [
         "code"
       ],
-      "reviewedBy": "",
+      "reviewedBy": "Will (Oba), 13 September 2026",
       "isFirstContact": false
     },
     "facilitation_member": {
@@ -38,7 +38,7 @@
         "adminFirstName",
         "link"
       ],
-      "reviewedBy": "",
+      "reviewedBy": "Will (Oba), 13 September 2026",
       "isFirstContact": false
     },
     "facilitation_provider": {
@@ -48,7 +48,7 @@
       "vars": [
         "link"
       ],
-      "reviewedBy": "",
+      "reviewedBy": "Will (Oba), 13 September 2026",
       "isFirstContact": false
     },
     "appointment_24h": {
@@ -63,7 +63,7 @@
       "maxVarLengths": {
         "address": 34
       },
-      "reviewedBy": "",
+      "reviewedBy": "Will (Oba), 13 September 2026",
       "isFirstContact": false
     },
     "appointment_2h": {
@@ -78,7 +78,7 @@
       "maxVarLengths": {
         "address": 34
       },
-      "reviewedBy": "",
+      "reviewedBy": "Will (Oba), 13 September 2026",
       "isFirstContact": false
     },
     "appointment_morning_of": {
@@ -93,7 +93,7 @@
       "maxVarLengths": {
         "address": 34
       },
-      "reviewedBy": "",
+      "reviewedBy": "Will (Oba), 13 September 2026",
       "isFirstContact": false
     },
     "attendance_check": {
@@ -101,7 +101,7 @@
       "en": "PAM: Did you make it today? Reply YES or NO.",
       "es": "PAM: Pudo ir hoy? Responda YES o NO.",
       "vars": [],
-      "reviewedBy": "",
+      "reviewedBy": "Will (Oba), 13 September 2026",
       "isFirstContact": false
     },
     "attendance_missed_followup": {
@@ -111,7 +111,7 @@
       "vars": [
         "link"
       ],
-      "reviewedBy": "",
+      "reviewedBy": "Will (Oba), 13 September 2026",
       "isFirstContact": false
     },
     "connection_request": {
@@ -121,7 +121,7 @@
       "vars": [
         "link"
       ],
-      "reviewedBy": "",
+      "reviewedBy": "Will (Oba), 13 September 2026",
       "isFirstContact": false
     },
     "saved_place_closed": {
@@ -132,7 +132,7 @@
         "reason",
         "link"
       ],
-      "reviewedBy": "",
+      "reviewedBy": "Will (Oba), 13 September 2026",
       "isFirstContact": false
     },
     "access_limited_notice": {
@@ -142,7 +142,7 @@
       "vars": [
         "supportPhone"
       ],
-      "reviewedBy": "",
+      "reviewedBy": "Will (Oba), 13 September 2026",
       "isFirstContact": false
     }
   },

@@ -47,12 +47,30 @@ describe('the shipped bundle', () => {
     }
   });
 
-  it('sends nothing at all, because no copy is signed off yet', () => {
-    // This is the current, intended state of the product. When Will reviews the
-    // copy, this expectation flips — do not delete the test.
-    for (const key of Object.keys(REAL.templates)) {
-      expect(() => render(REAL, key, 'en', VARS)).toThrow(UnsendableError);
+  it('carries the sign-off, so the dispatcher will actually send', () => {
+    // Flipped on 13 September 2026, when Will approved the copy. The bundle is
+    // generated from the reviewed source, so a name missing here means the
+    // bundle is stale — and a stale bundle is how words nobody read reach a
+    // phone.
+    for (const template of Object.values(REAL.templates)) {
+      expect(template.reviewedBy, `${template.key} has no name against it`).not.toBe('');
     }
+    for (const key of Object.keys(REAL.templates)) {
+      expect(() => render(REAL, key, 'en', VARS)).not.toThrow();
+    }
+  });
+
+  it('still refuses a template whose name has been taken off', () => {
+    // The gate itself, on a copy of the bundle. It has to keep working now that
+    // the real catalogue no longer exercises it.
+    const unsigned: Bundle = {
+      reasons: REAL.reasons,
+      templates: {
+        ...REAL.templates,
+        verify_code: { ...REAL.templates['verify_code']!, reviewedBy: '' },
+      },
+    };
+    expect(() => render(unsigned, 'verify_code', 'en', VARS)).toThrow(UnsendableError);
   });
 });
 

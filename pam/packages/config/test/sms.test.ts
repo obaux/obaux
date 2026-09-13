@@ -12,6 +12,7 @@ import {
   SmsContentError,
   unreviewedTemplateKeys,
   shortenToFit,
+  type SmsTemplate,
   type SmsTemplateKey,
 } from '../src/sms-templates.js';
 
@@ -35,16 +36,30 @@ const WORST_CASE_VARS: Readonly<Record<string, string>> = {
 const keys = Object.keys(SMS_TEMPLATES) as SmsTemplateKey[];
 
 describe('SMS templates', () => {
-  it('ships with every template unreviewed, so nothing can send by accident', () => {
-    // This is the intended starting state. When Will reviews the copy and fills
-    // in reviewedBy, flip this expectation — do not delete the test.
-    expect(unreviewedTemplateKeys().sort()).toEqual(keys.sort());
+  it('has a human recorded against every template', () => {
+    // Flipped on 13 September 2026: Will read all thirteen and approved them.
+    // The test stays, pointing the other way — a template that loses its name,
+    // or a new one added without one, stops the whole catalogue from sending
+    // and should fail here first.
+    expect(unreviewedTemplateKeys()).toEqual([]);
+    for (const key of keys) expect(SMS_TEMPLATES[key].reviewedBy).not.toBe('');
   });
 
-  it('refuses to render an unreviewed template', () => {
-    expect(() => renderSms({ key: 'invite_member', locale: 'en', vars: WORST_CASE_VARS })).toThrow(
-      UnreviewedTemplateError,
-    );
+  it('still refuses to render a template whose name has been taken off', () => {
+    // The gate is what keeps unread copy off somebody's phone, so it is tested
+    // against the real catalogue rather than trusted because it once worked.
+    // Readonly is a compile-time promise, so the entry is swapped and restored.
+    const catalogue = SMS_TEMPLATES as Record<string, SmsTemplate>;
+    const signed = catalogue['invite_member']!;
+    catalogue['invite_member'] = { ...signed, reviewedBy: '' };
+    try {
+      expect(() =>
+        renderSms({ key: 'invite_member', locale: 'en', vars: WORST_CASE_VARS }),
+      ).toThrow(UnreviewedTemplateError);
+      expect(unreviewedTemplateKeys()).toEqual(['invite_member']);
+    } finally {
+      catalogue['invite_member'] = signed;
+    }
   });
 
   describe.each(keys)('%s', (key) => {

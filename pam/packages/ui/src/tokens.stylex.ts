@@ -16,6 +16,11 @@ import * as stylex from '@stylexjs/stylex';
  */
 export const pam = stylex.defineVars({
   touchTargetMin: '48px',
+  // A text field's frame, not just its tap area. Astryx's largest input draws a
+  // 36px box, which is under PAM's floor: the target was already 48px, so the
+  // box you could hit was bigger than the box you could see, and on a phone a
+  // person aims at the drawing.
+  fieldHeight: '56px',
   bigButtonHeight: '64px',
   bodyTextMobile: '18px',
   bodyTextDesktop: '16px',

@@ -4,14 +4,17 @@ import { useId, useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { VStack } from '@astryxdesign/core/VStack';
 import { HStack } from '@astryxdesign/core/HStack';
+import { Card } from '@astryxdesign/core/Card';
 import { Text } from '@astryxdesign/core/Text';
 import { Badge } from '@astryxdesign/core/Badge';
 import { Button } from '@astryxdesign/core/Button';
+import { IconButton } from '@astryxdesign/core/IconButton';
+import { BellIcon } from './icons.js';
 
 /**
  * What has happened that somebody has to act on.
  *
- * Two events reach this bar: a place was flagged, and a message was reported.
+ * Two events reach this list: a place was flagged, and a message was reported.
  * Both are routed to the people they are actually about (A7 / D-080) — every
  * super admin, plus the case managers of the members affected — so what appears
  * here is never a staff-wide bulletin. If it is in your list, it concerns
@@ -29,6 +32,10 @@ import { Button } from '@astryxdesign/core/Button';
  *  - **It does not mark things read by being looked at.** Reading a list is not
  *    the same as dealing with what is in it, and a count that clears itself
  *    hides work.
+ *
+ * The bell is a button in the header row, and the list opens beneath it rather
+ * than pushing the page down — a caseload is what the screen is for, and it
+ * should not move every time somebody checks whether anything is new.
  */
 
 export interface NotificationItem {
@@ -43,9 +50,9 @@ export interface NotificationItem {
 export interface NotificationBarProps {
   readonly items: readonly NotificationItem[];
   readonly labels: {
-    /** "Notifications" */
+    /** "Notifications" — the bell's accessible name. */
     readonly title: string;
-    /** Already-filled, e.g. "3 new". Omitted when nothing is unread. */
+    /** Already-filled, e.g. "3 new". Shown only when something is unread. */
     readonly unread?: string;
     /** "Nothing needs you right now." */
     readonly empty: string;
@@ -58,39 +65,45 @@ export interface NotificationBarProps {
 }
 
 const styles = stylex.create({
-  bar: { width: '100%' },
-  toggle: { minHeight: '48px', fontSize: '17px' },
+  // The anchor the panel hangs from. Nothing visual.
+  root: { position: 'relative', display: 'inline-flex' },
+  // 48px stands even though the glyph is small: the touch target is the rule,
+  // not the drawing (§2.5).
+  bell: { minHeight: '48px', minWidth: '48px', fontSize: '22px' },
   panel: {
-    width: '100%',
-    borderWidth: '1px',
-    borderStyle: 'solid',
-    borderColor: 'rgba(127, 127, 127, 0.35)',
-    borderRadius: '12px',
-    padding: '8px',
+    position: { default: 'absolute', '@media (max-width: 400px)': 'fixed' },
+    insetBlockStart: { default: 'calc(100% + 4px)', '@media (max-width: 400px)': null },
+    insetInlineEnd: { default: 0, '@media (max-width: 400px)': null },
+    // On a narrow phone the panel stops hanging off the bell and becomes a
+    // sheet the width of the screen, because 300px of popover beside a 320px
+    // screen is a panel half off the edge.
+    left: { default: null, '@media (max-width: 400px)': '8px' },
+    right: { default: null, '@media (max-width: 400px)': '8px' },
+    top: { default: null, '@media (max-width: 400px)': '64px' },
+    width: { default: '320px', '@media (max-width: 400px)': 'auto' },
+    maxWidth: '92vw',
+    maxHeight: '60vh',
+    overflowY: 'auto',
+    zIndex: 20,
   },
-  row: {
-    width: '100%',
-    borderRadius: '8px',
-    paddingInline: '8px',
-    paddingBlock: '4px',
-    backgroundColor: { default: 'transparent', ':hover': 'rgba(127, 127, 127, 0.10)' },
-  },
-  // Unread is carried by weight and a word, never by colour alone.
-  unreadRow: { backgroundColor: 'rgba(127, 127, 127, 0.14)' },
-  text: { fontSize: '17px', lineHeight: 1.4, textAlign: 'start' },
-  when: { fontSize: '15px' },
-  // Full width and left-aligned: these are lines of text to read down, not
-  // labels to centre. A centred row above a left-aligned date reads as two
-  // unrelated things.
-  open: {
-    width: '100%',
+  row: { width: '100%' },
+  // Reserved so a read row does not shuffle left where an unread one has a tick.
+  tickSpacer: { minWidth: '40px' },
+  // Smaller than body text on purpose: this is a list to scan, not to read.
+  text: {
+    flexGrow: 1,
+    flexShrink: 1,
+    minWidth: 0,
     minHeight: '48px',
-    fontSize: '17px',
+    fontSize: '15px',
+    lineHeight: 1.3,
     textAlign: 'start',
     justifyContent: 'flex-start',
+    paddingInline: '6px',
   },
-  action: { minHeight: '48px', fontSize: '15px' },
-  empty: { fontSize: '17px', paddingInline: '8px', paddingBlock: '8px' },
+  when: { fontSize: '13px', flexShrink: 0, whiteSpace: 'nowrap' },
+  check: { minHeight: '48px', minWidth: '40px', fontSize: '15px', flexShrink: 0 },
+  empty: { fontSize: '15px', paddingBlock: '8px' },
 });
 
 export function NotificationBar({ items, labels, onSelect, onMarkRead }: NotificationBarProps) {
@@ -99,64 +112,68 @@ export function NotificationBar({ items, labels, onSelect, onMarkRead }: Notific
   const unreadCount = items.filter((item) => !item.isRead).length;
 
   return (
-    <div {...stylex.props(styles.bar)}>
-      <VStack gap={1}>
-        <HStack gap={2} align="center" wrap="wrap">
-          <Button
-            label={labels.title}
-            variant="ghost"
-            onClick={() => setIsOpen((open) => !open)}
-            aria-expanded={isOpen}
-            aria-controls={panelId}
-            xstyle={styles.toggle}
-          />
-          {/* The count is a word, not a dot: "3 new" survives being read aloud. */}
-          {unreadCount > 0 && labels.unread ? (
-            <Badge variant="neutral" label={labels.unread} />
-          ) : null}
-        </HStack>
-
-        {isOpen ? (
-          <div id={panelId} {...stylex.props(styles.panel)}>
-            {items.length === 0 ? (
-              <Text type="supporting" xstyle={styles.empty}>
-                {labels.empty}
-              </Text>
-            ) : (
-              <VStack gap={1}>
-                {items.map((item) => (
-                  <div
-                    key={item.id}
-                    {...stylex.props(styles.row, !item.isRead && styles.unreadRow)}
-                  >
-                    <VStack gap={0}>
-                      <Button
-                        label={item.text}
-                        variant="ghost"
-                        onClick={() => onSelect?.(item.id)}
-                        xstyle={styles.open}
-                      />
-                      <HStack gap={2} align="center" wrap="wrap">
-                        <Text type="supporting" xstyle={styles.when}>
-                          {item.when}
-                        </Text>
-                        {item.isRead ? null : (
-                          <Button
-                            label={labels.markRead}
-                            variant="ghost"
-                            onClick={() => onMarkRead?.(item.id)}
-                            xstyle={styles.action}
-                          />
-                        )}
-                      </HStack>
-                    </VStack>
-                  </div>
-                ))}
-              </VStack>
-            )}
-          </div>
+    <div {...stylex.props(styles.root)}>
+      <HStack gap={1} align="center">
+        <IconButton
+          label={labels.title}
+          icon={<BellIcon />}
+          variant="ghost"
+          onClick={() => setIsOpen((open) => !open)}
+          aria-expanded={isOpen}
+          aria-controls={panelId}
+          xstyle={styles.bell}
+        />
+        {/* The count is a word, not a dot: "3 new" survives being read aloud. */}
+        {unreadCount > 0 && labels.unread ? (
+          <Badge variant="neutral" label={labels.unread} />
         ) : null}
-      </VStack>
+      </HStack>
+
+      {isOpen ? (
+        <Card id={panelId} padding={2} xstyle={styles.panel}>
+          {items.length === 0 ? (
+            <Text type="supporting" xstyle={styles.empty}>
+              {labels.empty}
+            </Text>
+          ) : (
+            <VStack gap={0}>
+              {items.map((item) => (
+                /*
+                  One row, one line high. The line, when it happened and the way
+                  to clear it sit side by side rather than stacked: a list of
+                  three things should be readable in a glance, and stacking each
+                  row into two lines turned a short list into a scroll.
+                */
+                <HStack key={item.id} gap={1} align="center" wrap="nowrap" xstyle={styles.row}>
+                  <Button
+                    label={item.text}
+                    variant="ghost"
+                    onClick={() => onSelect?.(item.id)}
+                    xstyle={styles.text}
+                  />
+                  <Text type="supporting" xstyle={styles.when}>
+                    {item.when}
+                  </Text>
+                  {item.isRead ? (
+                    <span {...stylex.props(styles.tickSpacer)} aria-hidden="true" />
+                  ) : (
+                    // A tick, labelled for anybody not looking at it. Unread is
+                    // carried by this control being here at all, so the state
+                    // never depends on seeing a colour.
+                    <IconButton
+                      label={labels.markRead}
+                      icon={<span aria-hidden="true">✓</span>}
+                      variant="ghost"
+                      onClick={() => onMarkRead?.(item.id)}
+                      xstyle={styles.check}
+                    />
+                  )}
+                </HStack>
+              ))}
+            </VStack>
+          )}
+        </Card>
+      ) : null}
     </div>
   );
 }

@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { HStack } from '@astryxdesign/core/HStack';
 import { Text } from '@astryxdesign/core/Text';
@@ -32,6 +33,13 @@ export interface AppHeaderProps {
    * is rather than to be navigated past.
    */
   align?: 'start' | 'center';
+  /**
+   * Anything that belongs in the header row itself, at the end — today, the
+   * notification bell. A slot rather than a `notifications` prop: the header
+   * should not know what a notification is, and the panel's open state belongs
+   * to the thing that opens it.
+   */
+  trailing?: ReactNode;
 }
 
 const styles = stylex.create({
@@ -47,12 +55,15 @@ const styles = stylex.create({
   },
 });
 
-export function AppHeader({ roleLabel, align = 'start' }: AppHeaderProps) {
+export function AppHeader({ roleLabel, align = 'start', trailing }: AppHeaderProps) {
   return (
     <header {...stylex.props(styles.header)}>
-      <HStack gap={2} align="center" justify={align} wrap="wrap">
-        <Text xstyle={styles.mark}>PAM</Text>
-        {roleLabel ? <Badge variant="neutral" label={roleLabel} /> : null}
+      <HStack gap={2} align="center" justify={trailing ? 'between' : align} wrap="nowrap">
+        <HStack gap={2} align="center" wrap="wrap">
+          <Text xstyle={styles.mark}>PAM</Text>
+          {roleLabel ? <Badge variant="neutral" label={roleLabel} /> : null}
+        </HStack>
+        {trailing}
       </HStack>
     </header>
   );

@@ -199,38 +199,37 @@ export default function AdminPage() {
   return (
     <main {...stylex.props(styles.page)}>
       <VStack gap={4}>
-        <AppHeader roleLabel={t('role.admin')} />
-
         {/*
-          What has happened that this case manager has to act on: a place one of
-          their people saved was flagged, or a message in their caseload was
-          reported. Nothing else reaches here, and no row carries anybody's
-          words (A7 / D-080).
-
-          It sits under the header rather than inside it: on a 320px screen a
-          bell competing with the wordmark and the role chip wins an argument it
-          should not be in, and this list is worth a full row when it has
-          anything in it.
+          The bell sits in the header row, where somebody looks to find out
+          whether anything needs them, and the list opens beneath it without
+          moving the caseload. What reaches it: a place one of their people
+          saved was flagged, or a message in their caseload was reported.
+          Nothing else, and no row carries anybody's words (A7 / D-080).
         */}
-        {notifications.status === 'ready' ? (
-          <NotificationBar
-            items={notifications.items.map((item) => ({
-              id: item.id,
-              text: t(item.bodyKey, item.bodyVars),
-              when: whenHappened(item.createdAt, locale, t),
-              isRead: item.isRead,
-            }))}
-            labels={{
-              title: t('notify.title'),
-              unread: t('notify.unread', {
-                count: notifications.items.filter((i) => !i.isRead).length,
-              }),
-              empty: t('notify.none'),
-              markRead: t('notify.markRead'),
-            }}
-            onMarkRead={(id) => void markRead(id)}
-          />
-        ) : null}
+        <AppHeader
+          roleLabel={t('role.admin')}
+          trailing={
+            notifications.status === 'ready' ? (
+              <NotificationBar
+                items={notifications.items.map((item) => ({
+                  id: item.id,
+                  text: t(item.bodyKey, item.bodyVars),
+                  when: whenHappened(item.createdAt, locale, t),
+                  isRead: item.isRead,
+                }))}
+                labels={{
+                  title: t('notify.title'),
+                  unread: t('notify.unread', {
+                    count: notifications.items.filter((i) => !i.isRead).length,
+                  }),
+                  empty: t('notify.none'),
+                  markRead: t('notify.markRead'),
+                }}
+                onMarkRead={(id) => void markRead(id)}
+              />
+            ) : null
+          }
+        />
 
         <VStack gap={1}>
           <Heading level={1} xstyle={styles.title}>

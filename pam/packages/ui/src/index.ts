@@ -24,4 +24,6 @@ export {
   type NotificationItem,
 } from './NotificationBar.js';
 export { VoiceInput, type VoiceInputProps, type SpeechRecognizer } from './VoiceInput.js';
+export { TextField, type TextFieldProps } from './TextField.js';
+export { BellIcon } from './icons.js';
 export { pam } from './tokens.stylex.js';

@@ -92,3 +92,20 @@ export function PhoneIcon(props: SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
+
+/**
+ * A bell. Things that have happened and need somebody.
+ *
+ * Astryx's icon registry has no bell, and its `Icon` takes an SVG component for
+ * exactly this case — so this is one more glyph in PAM's own small set, not a
+ * second icon system. Drawn quiet on purpose: no motion lines, no clapper
+ * swinging. These are things to attend to, not alarms.
+ */
+export function BellIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <path d="M18 8.5a6 6 0 1 0-12 0c0 5-2 6-2 6h16s-2-1-2-6" />
+      <path d="M10.2 18.5a2.2 2.2 0 0 0 3.6 0" />
+    </svg>
+  );
+}

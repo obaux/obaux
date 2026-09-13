@@ -233,3 +233,18 @@ test.describe('theme colours', () => {
     expect(bg).not.toMatch(/rgba\(0, 0, 0, 0\)|transparent/);
   });
 });
+
+test.describe('a field is as big as its target (§2.5)', () => {
+  /**
+   * The touch target was always 48px. The drawn box was 36, so the area you
+   * could hit was larger than the area you could see — and on a phone a person
+   * aims at the drawing, then believes they missed when they did not.
+   */
+  test('the sign-in field is drawn at least as large as the 48px floor', async ({ page }) => {
+    await page.goto('/signin/');
+    const field = page.getByLabel('Your phone number');
+    const box = await field.boundingBox();
+    expect(box).not.toBeNull();
+    expect(box!.height, `the field is drawn ${box!.height}px tall`).toBeGreaterThanOrEqual(48);
+  });
+});

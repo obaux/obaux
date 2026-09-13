@@ -131,19 +131,28 @@ const STOP_SUFFIX_EN = ' Reply STOP to stop texts.';
 const STOP_SUFFIX_ES = ' Responda STOP para no recibir mensajes.';
 
 /**
- * The catalogue.
+ * Who read this copy and signed it off.
  *
- * `reviewedBy: ''` on every entry is deliberate — these are drafts written by
- * the build agent. Will (or a delegate) reviews the copy against §9 and fills
- * in the name. Until then `renderSms` throws, so nothing can ship unreviewed.
+ * Every template shipped with this empty, and `renderSms` threw on an
+ * unreviewed one, so PAM could not text anybody until a person had read the
+ * words. Will read all thirteen and approved them on 13 September 2026, and
+ * this is that record.
+ *
+ * It is not decoration. Emptying it stops every message again, which is the
+ * correct behaviour for copy nobody has read — so **a new template starts empty
+ * and stays empty until a human says otherwise**, and rewording an existing one
+ * means asking again. An agent must never fill this in on its own authority.
  */
+const REVIEWED_BY = 'Will (Oba), 13 September 2026';
+
+/** The catalogue. */
 export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
   invite_member: {
     key: 'invite_member',
     en: "PAM: You've been invited to PAM, an app for finding help and people near you. Tap to join: {link}",
     es: 'PAM: Le invitaron a PAM, una app para encontrar ayuda y personas cerca. Toque para entrar: {link}',
     vars: ['link'],
-    reviewedBy: '',
+    reviewedBy: REVIEWED_BY,
     isFirstContact: true,
   },
   invite_provider: {
@@ -151,7 +160,7 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
     en: 'PAM: You have been invited to list your services on PAM. Tap to set up your page: {link}',
     es: 'PAM: Le invitaron a publicar sus servicios en PAM. Toque para crear su pagina: {link}',
     vars: ['link'],
-    reviewedBy: '',
+    reviewedBy: REVIEWED_BY,
     isFirstContact: true,
   },
   verify_code: {
@@ -159,7 +168,7 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
     en: 'PAM: Your code is {code}. It works for 10 minutes.',
     es: 'PAM: Su codigo es {code}. Sirve por 10 minutos.',
     vars: ['code'],
-    reviewedBy: '',
+    reviewedBy: REVIEWED_BY,
     isFirstContact: false,
   },
   /**
@@ -176,7 +185,7 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
     en: 'PAM: {adminFirstName} connected you with a program that can help. Open PAM to say hi: {link}',
     es: 'PAM: {adminFirstName} le conecto con un programa que puede ayudar. Abra PAM para saludar: {link}',
     vars: ['adminFirstName', 'link'],
-    reviewedBy: '',
+    reviewedBy: REVIEWED_BY,
     isFirstContact: false,
   },
   facilitation_provider: {
@@ -184,7 +193,7 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
     en: 'PAM: Someone was introduced to your program. Open PAM to reply: {link}',
     es: 'PAM: Alguien fue presentado a su programa. Abra PAM para responder: {link}',
     vars: ['link'],
-    reviewedBy: '',
+    reviewedBy: REVIEWED_BY,
     isFirstContact: false,
   },
   /**
@@ -204,7 +213,7 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
     es: 'PAM: Tiene una visita mañana a las {time}. {address}. Toque para llegar: {link}',
     vars: ['time', 'address', 'link'],
     maxVarLengths: { address: 34 },
-    reviewedBy: '',
+    reviewedBy: REVIEWED_BY,
     isFirstContact: false,
   },
   appointment_2h: {
@@ -213,7 +222,7 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
     es: 'PAM: Su visita es hoy a las {time}. {address}. Toque para llegar: {link}',
     vars: ['time', 'address', 'link'],
     maxVarLengths: { address: 34 },
-    reviewedBy: '',
+    reviewedBy: REVIEWED_BY,
     isFirstContact: false,
   },
   appointment_morning_of: {
@@ -222,7 +231,7 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
     es: 'PAM: Hoy a las {time} tiene una visita. {address}. Toque para llegar: {link}',
     vars: ['time', 'address', 'link'],
     maxVarLengths: { address: 34 },
-    reviewedBy: '',
+    reviewedBy: REVIEWED_BY,
     isFirstContact: false,
   },
   attendance_check: {
@@ -230,7 +239,7 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
     en: 'PAM: Did you make it today? Reply YES or NO.',
     es: 'PAM: Pudo ir hoy? Responda YES o NO.',
     vars: [],
-    reviewedBy: '',
+    reviewedBy: REVIEWED_BY,
     isFirstContact: false,
   },
   /** §7.2: a missed visit is never penalised. Gentle, one action, no guilt. */
@@ -239,7 +248,7 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
     en: 'PAM: No problem. We saved a step to set up a new time. Open PAM when you are ready: {link}',
     es: 'PAM: No hay problema. Guardamos un paso para buscar otra fecha. Abra PAM cuando pueda: {link}',
     vars: ['link'],
-    reviewedBy: '',
+    reviewedBy: REVIEWED_BY,
     isFirstContact: false,
   },
   /** §6.2: no names in a connection-request SMS. */
@@ -248,7 +257,7 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
     en: 'PAM: Someone on PAM wants to connect. Open PAM to reply: {link}',
     es: 'PAM: Alguien en PAM quiere conectar. Abra PAM para responder: {link}',
     vars: ['link'],
-    reviewedBy: '',
+    reviewedBy: REVIEWED_BY,
     isFirstContact: false,
   },
   /**
@@ -278,7 +287,7 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
     en: 'PAM: A place you saved is {reason}. Find others in PAM: {link}',
     es: 'PAM: Un lugar que guardo {reason}. Vea otros en PAM: {link}',
     vars: ['reason', 'link'],
-    reviewedBy: '',
+    reviewedBy: REVIEWED_BY,
     isFirstContact: false,
   },
   access_limited_notice: {
@@ -286,7 +295,7 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
     en: 'PAM: Some parts of PAM are turned off for now. Call {supportPhone} with questions.',
     es: 'PAM: Algunas partes de PAM estan apagadas por ahora. Llame al {supportPhone} si tiene preguntas.',
     vars: ['supportPhone'],
-    reviewedBy: '',
+    reviewedBy: REVIEWED_BY,
     isFirstContact: false,
   },
 };

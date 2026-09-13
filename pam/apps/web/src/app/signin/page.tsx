@@ -8,8 +8,7 @@ import { HStack } from '@astryxdesign/core/HStack';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { Button } from '@astryxdesign/core/Button';
-import { TextInput } from '@astryxdesign/core/TextInput';
-import { AppHeader, BigButton, Notice } from '@pam/ui';
+import { AppHeader, BigButton, Notice, TextField } from '@pam/ui';
 import { useI18n } from '@/lib/i18n';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { usePhoneSignIn } from '@/lib/usePhoneSignIn';
@@ -101,7 +100,7 @@ export default function SignInPage() {
           <Card padding={4} xstyle={styles.card}>
             {onCodeStep ? (
               <VStack gap={3}>
-                <TextInput
+                <TextField
                   id={codeId}
                   label={t('signin.code.label')}
                   value={code}
@@ -127,7 +126,7 @@ export default function SignInPage() {
               </VStack>
             ) : (
               <VStack gap={3}>
-                <TextInput
+                <TextField
                   id={phoneId}
                   label={t('signin.phone.label')}
                   value={phone}

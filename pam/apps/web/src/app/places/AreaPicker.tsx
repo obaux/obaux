@@ -2,11 +2,11 @@
 
 import { useId, useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
+import { TextField } from '@pam/ui';
 import { VStack } from '@astryxdesign/core/VStack';
 import { HStack } from '@astryxdesign/core/HStack';
 import { Text } from '@astryxdesign/core/Text';
 import { Button } from '@astryxdesign/core/Button';
-import { TextInput } from '@astryxdesign/core/TextInput';
 import { useI18n } from '@/lib/i18n';
 import { useAreaSearch, type AreaOption } from '@/lib/useAreaSearch';
 
@@ -89,7 +89,7 @@ export function AreaPicker({
 
   return (
     <VStack gap={2}>
-      <TextInput
+      <TextField
         id={inputId}
         label={t('places.areaPrompt')}
         value={query}

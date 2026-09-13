@@ -1300,6 +1300,52 @@ reads them through the review screen, behind the sensitive-information warning
 Routed by database triggers on `service_flags` and `reports` rather than by the
 RPCs, so a second code path cannot quietly stop the notices.
 
+### D-081 — The SMS copy is signed off, and the gate now points the other way
+Will read all thirteen messages on 13 September 2026 and approved them, so
+`reviewedBy` carries his name and the dispatcher will send once Twilio
+credentials exist.
+
+The tests that asserted "nothing is reviewed" were not deleted, they were
+turned around: they now assert every template has a name, and a second test
+blanks one deliberately to prove the refusal still works. A gate nothing
+exercises is a gate nobody notices has broken.
+
+What has not changed: **a new template starts empty**, and rewording an existing
+one means asking again. An agent must never fill this field in on its own
+authority — the field exists precisely because code cannot judge whether a
+sentence is safe to send to somebody whose phone is shared.
+
+### D-082 — A field is drawn as big as its touch target
+Will: "the touch target is larger than the input field frame."
+
+Astryx draws its largest text input at 36px. PAM's floor is a 48px target, which
+the field met by extending the hit area past its own border — so the area you
+could hit was larger than the area you could see. On a phone a person aims at
+the drawing, and then believes they missed when they did not.
+
+`TextField` in `@pam/ui` raises the frame to 56px and is used everywhere instead
+of Astryx's `TextInput` directly. A browser test measures the drawn box rather
+than the target, because the target was never the thing that was wrong.
+
+### D-083 — The notification list is a bell, and one line per row
+The first version was a full-width bar with a "Notifications" button and
+two-line rows. Will: use a bell, make the rows smaller.
+
+Both were right for a reason worth keeping: this is a list to *scan*, and the
+first version was built at the size of the thing it sits next to — the caseload
+— rather than at the size of its own job. The bell now sits in the header row
+where somebody looks to find out whether anything needs them, and the panel
+opens over the page instead of pushing the caseload down, so checking costs
+nothing.
+
+The count stays a word ("2 new") rather than a dot: it survives being read
+aloud, and it does not depend on seeing a colour.
+
+The glyph is PAM's own, because Astryx's registry has no bell and its `Icon`
+takes a component for exactly this case. That is not a second icon system — the
+drawing is handed to Astryx's `IconButton`, and colour and size come from the
+theme.
+
 ---
 
 ## Notes for whoever picks this up next
