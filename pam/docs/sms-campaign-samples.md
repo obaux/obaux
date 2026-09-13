@@ -25,6 +25,48 @@ edited there, regenerate this list rather than editing it here.
 - **Message volume:** low. A sign-in code when somebody signs in, and at most a
   few reminders a week per person.
 
+## The campaign description, to paste as written
+
+> This campaign sends low-volume messages from PAM, an app by Oba that connects
+> people to community programs, services and the staff who support them. People
+> receive messages only after they enter their own phone number on PAM's sign-in
+> screen, which states that PAM will text them and how to stop.
+>
+> Messages are account notifications and appointment reminders. A person first
+> receives a one-time sign-in code, because PAM uses a phone number instead of a
+> password. After that they may receive reminders about appointments they
+> scheduled in the app (the day before, the morning of, or two hours ahead), a
+> short check-in asking whether they made it, a notice when a place they saved is
+> no longer open or has moved, a notice that someone wants to connect with them,
+> and, for staff accounts, a notice that they have been introduced to someone or
+> that their account access has changed.
+>
+> Volume is low and throughput is low: a sign-in code when a person signs in, and
+> at most a few reminders per person per week. Nothing is promotional. PAM sends
+> no marketing, no advertising, and no third-party content, and does not share or
+> sell phone numbers.
+>
+> Every message identifies PAM by name, stays within a single segment, and is
+> sent in English or Spanish according to the person's own setting. Replying STOP
+> ends all messages immediately and permanently; no setting inside the app can
+> restart them. Replying HELP returns support contact information. A support
+> phone number staffed by a person is shown in the app on every screen.
+
+### The shorter fields, if the form asks separately
+
+- **Campaign use case:** Low Volume Mixed — account notification and customer
+  care.
+- **Description of opt-in:** The person is invited by a staff member, then enters
+  their own phone number on PAM's sign-in screen to request a code. That screen
+  states that PAM will text them, that STOP stops it, that HELP gets help, and
+  that message and data rates may apply. A screenshot is attached.
+- **Opt-in keywords:** none. Consent is given in the app, not by texting a
+  keyword to a number.
+- **Opt-out message:** You will not get any more texts from PAM. Reply START to
+  get them again.
+- **Help message:** PAM: Call {supportPhone} and a person will help you.
+- **Age-gated or affiliate marketing:** No.
+
 ## The messages
 
 **1. Sign-in code (the one carriers care most about)**
