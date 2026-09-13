@@ -167,6 +167,14 @@ export default function AdminPage() {
             supportPhone={supportPhone}
             callLabel={t('help.callSupport')}
           />
+          {/*
+            A super admin lands here from habit, not by mistake: this is the
+            staff screen they knew about. Say where their own list is rather
+            than leaving them at a closed door (§0).
+          */}
+          {session.session.role === 'super_admin' ? (
+            <TextLink label={t('directory.title')} href="/directory/" />
+          ) : null}
           <TextLink label={t('admin.back')} href="/" />
       </Page>
     );

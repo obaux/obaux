@@ -25,9 +25,22 @@ export function isSupportedLocale(value: string): value is Locale {
   return (SUPPORTED_LOCALES as readonly string[]).includes(value);
 }
 
-/** Roles (§3). Role is set by invite type and never self-selected (§10 step 6). */
-export const ROLES = ['member', 'provider', 'admin'] as const;
+/**
+ * Roles (§3). Role is set by invite type and never self-selected (§10 step 6).
+ *
+ * `super_admin` is the one nobody is invited into: it is PAM's own operator,
+ * added to the database in 0032 for deciding flagged places and absent from
+ * this list until 0043 gave that person a screen. The code was already
+ * rendering `role.super_admin` from a session — the type was simply behind the
+ * database, which is the quiet kind of wrong that holds until somebody writes a
+ * switch and finds a case missing.
+ */
+export const ROLES = ['member', 'provider', 'admin', 'super_admin'] as const;
 export type Role = (typeof ROLES)[number];
+
+/** The roles an invite can grant. A super admin is made by hand, never invited. */
+export const INVITABLE_ROLES = ['member', 'provider', 'admin'] as const;
+export type InvitableRole = (typeof INVITABLE_ROLES)[number];
 
 /** §4.1 access control. */
 export const ACCESS_STATUSES = ['active', 'limited', 'suspended'] as const;

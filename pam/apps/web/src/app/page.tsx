@@ -133,7 +133,8 @@ export default function HomePage() {
   }
 
   const { session: me } = session;
-  const isStaff = me.role !== 'member';
+  const isCaseManager = me.role === 'admin';
+  const isSuperAdmin = me.role === 'super_admin';
 
   return (
     <Page gap={4}>
@@ -162,12 +163,25 @@ export default function HomePage() {
       </Heading>
 
       <VStack gap={2}>
-        {isStaff ? (
+        {isCaseManager ? (
           <NavTile
             href="/admin/"
             icon={<PeopleIcon />}
             label={t('admin.title')}
             description={t('home.go.caseload')}
+          />
+        ) : null}
+
+        {/*
+          A super admin's list is everybody, not a caseload — a different screen
+          with a different promise behind it (D-101).
+        */}
+        {isSuperAdmin ? (
+          <NavTile
+            href="/directory/"
+            icon={<PeopleIcon />}
+            label={t('directory.title')}
+            description={t('home.go.directory')}
           />
         ) : null}
 

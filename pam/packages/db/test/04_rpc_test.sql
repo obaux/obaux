@@ -617,3 +617,76 @@ where id in ('aaaaaaa1-0000-0000-0000-000000000001',
              'aaaaaaa1-0000-0000-0000-000000000003');
 
 reset role;
+
+\echo ''
+\echo '--- The people directory is a super admin surface, and only that ---'
+
+-- 0043 added the first read a super admin has over other people's accounts.
+-- PostgREST exposes every function in `public`, so the interesting question is
+-- not "does it work for Will" but "what does it hand to everybody else".
+do $$
+declare
+  v_marcus uuid := '33333333-0000-0000-0000-00000000000c';
+  v_admin  uuid := '33333333-0000-0000-0000-00000000000a';
+  n integer;
+  v_role text;
+begin
+  -- A member calling it directly gets nothing. Not an error — nothing. There is
+  -- no difference between "you may not" and "there is no one", so there is
+  -- nothing to probe.
+  perform set_config('request.jwt.claim.sub', v_marcus::text, true);
+  select count(*) into n from public.directory_people(null);
+  if n <> 0 then
+    raise exception 'FAIL  a member read % rows of the people directory', n;
+  end if;
+  raise notice 'ok    a member gets nothing from the directory';
+
+  -- A case manager is not a super admin either. Their own caseload is theirs;
+  -- everybody else's is not.
+  perform set_config('request.jwt.claim.sub', v_admin::text, true);
+  select count(*) into n from public.directory_people(null);
+  if n <> 0 then
+    raise exception 'FAIL  a case manager read % rows of the people directory', n;
+  end if;
+  raise notice 'ok    a case manager gets nothing from the directory';
+
+  -- Promoted, the same call answers.
+  update public.profiles set role = 'super_admin' where id = v_admin;
+  perform set_config('request.jwt.claim.sub', v_admin::text, true);
+  select count(*) into n from public.directory_people(null);
+  if n < 2 then
+    raise exception 'FAIL  a super admin sees % accounts, expected the seed', n;
+  end if;
+  raise notice 'ok    a super admin sees the accounts';
+
+  -- And the filter filters, rather than being decoration over the same list.
+  select count(*) into n from public.directory_people('member');
+  if n = 0 then
+    raise exception 'FAIL  filtering to members returned nothing';
+  end if;
+  select count(*) into n
+  from public.directory_people('member') d
+  where d.role <> 'member';
+  if n <> 0 then
+    raise exception 'FAIL  filtering to members returned % rows that are not', n;
+  end if;
+  raise notice 'ok    the role filter returns only that role';
+
+  -- The column list is the promise. A phone number is the one field on this
+  -- table that reaches a person directly, and it is not here — this fails at
+  -- parse time if somebody ever adds it.
+  begin
+    execute 'select phone from public.directory_people(null)';
+    raise exception 'FAIL  the directory now returns a phone number';
+  exception
+    when undefined_column then
+      raise notice 'ok    the directory carries no contact details';
+  end;
+
+  update public.profiles set role = 'admin' where id = v_admin;
+  select role::text into v_role from public.profiles where id = v_admin;
+  if v_role <> 'admin' then
+    raise exception 'FAIL  the test left the case manager promoted';
+  end if;
+end;
+$$;

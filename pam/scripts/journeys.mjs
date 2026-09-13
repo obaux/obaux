@@ -81,12 +81,42 @@ const SCREENS = [
   { name: '3-home', path: '/' },
   { name: '4-places', path: '/places/' },
   { name: '5-caseload', path: '/admin/' },
+  // The super admin's own screen. Every other role meets a closed door here,
+  // which is itself worth photographing — a closed door is a screen too.
+  { name: '5b-everyone', path: '/directory/' },
   { name: '6-notifications', path: '/notifications/' },
   { name: '7-privacy', path: '/privacy/' },
   { name: '8-terms', path: '/terms/' },
   // Not a journey — the workbench. Photographed with the screens so a change to
   // a component shows up next to the screens it would have broken.
   { name: '9-components', path: '/gallery/' },
+];
+
+const DIRECTORY_PEOPLE = [
+  {
+    id: 'd1',
+    first_name: 'Marcus',
+    role: 'member',
+    region_name: 'Philadelphia',
+    access_status: 'active',
+    last_active_at: new Date().toISOString(),
+  },
+  {
+    id: 'd2',
+    first_name: 'Alice',
+    role: 'provider',
+    region_name: 'Philadelphia',
+    access_status: 'active',
+    last_active_at: null,
+  },
+  {
+    id: 'd3',
+    first_name: 'Dana',
+    role: 'admin',
+    region_name: 'Philadelphia',
+    access_status: 'limited',
+    last_active_at: new Date(Date.now() - 86_400_000).toISOString(),
+  },
 ];
 
 const NOTIFICATIONS = [
@@ -154,6 +184,11 @@ async function stub(page, profile) {
   await page.route('**/rest/v1/access_controls*', (r) => r.fulfill(json([])));
   await page.route('**/rest/v1/rpc/member_points*', (r) => r.fulfill(json(250)));
   await page.route('**/rest/v1/rpc/services_near*', (r) => r.fulfill(json([])));
+  // The people directory. Stubbed rather than seeded, like every other query
+  // here: this sheet is a picture of the screens, not of the database.
+  await page.route('**/rest/v1/rpc/directory_people*', (r) =>
+    r.fulfill(json(DIRECTORY_PEOPLE)),
+  );
 }
 
 const server = spawn('npx', ['serve', 'apps/web/out', '-l', String(PORT), '--no-clipboard'], {
