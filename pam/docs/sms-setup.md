@@ -105,6 +105,27 @@ select cron.unschedule('dispatch-sms');
 The first two are ten minutes and unblock the whole product. The last two can
 follow.
 
+### Twilio has to be out of trial before it will text a real member
+
+Error **21608** — *"to send messages or make calls to unverified numbers, you
+must have an approved Primary Compliance Profile"* — means the Twilio account is
+still in trial mode. A trial account will only text numbers you have personally
+verified in the console, which is fine for testing and useless for a pilot: a
+member cannot verify themselves into somebody else's Twilio account.
+
+Two ways forward, and PAM needs both eventually:
+
+1. **Now, for testing:** Twilio console → Phone Numbers → Verified Caller IDs →
+   add your own number. Sign-in starts working for you within a minute.
+2. **Before any real member:** complete the Primary Compliance Profile in the
+   Twilio console (business details, a contact person), and register the number
+   for A2P 10DLC — US carriers require it for application-sent texts. Approval is
+   not instant, so start it well before the pilot, not the week of.
+
+Until step 2 is approved, sign-in works only for numbers on the verified list.
+That is a hard limit on how many people can be in the pilot, and it is worth
+knowing before inviting anybody.
+
 ### If sign-in answers "Database error finding user"
 
 Seen on 12 September, on the very first real sign-in attempt. It is not the
