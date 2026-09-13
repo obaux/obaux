@@ -4,6 +4,7 @@ import { useId, useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { VStack } from '@astryxdesign/core/VStack';
 import { Card } from '@astryxdesign/core/Card';
+import { HStack } from '@astryxdesign/core/HStack';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { Button } from '@astryxdesign/core/Button';
@@ -49,6 +50,7 @@ const styles = stylex.create({
   link: { minHeight: '48px', fontSize: '17px' },
   consent: { fontSize: '15px', lineHeight: 1.5 },
   card: { width: '100%' },
+  legalLink: { minHeight: '48px', fontSize: '15px' },
   // The field's own label reads left-to-right even on a centred page: a label
   // sitting over the left edge of the box it names is easier to tie to it, and
   // a centred one above a full-width input floats loose.
@@ -174,6 +176,27 @@ export default function SignInPage() {
             {t('signin.phone.consent')}
           </Text>
         ) : null}
+
+        {/*
+          The two pages somebody is entitled to read before they hand over a
+          number. Ghost buttons rather than small print: they are 48px targets
+          like everything else, because a rule nobody can tap is a rule nobody
+          reads.
+        */}
+        <HStack gap={2} justify="center" wrap="wrap">
+          <Button
+            label={t('legal.privacy')}
+            variant="ghost"
+            href="/privacy/"
+            xstyle={styles.legalLink}
+          />
+          <Button
+            label={t('legal.terms')}
+            variant="ghost"
+            href="/terms/"
+            xstyle={styles.legalLink}
+          />
+        </HStack>
       </VStack>
     </main>
   );

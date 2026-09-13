@@ -14,6 +14,7 @@ export * from './points.js';
 export * from './language.js';
 export * from './notices.js';
 export * from './distance.js';
+export * from './legal.js';
 
 /** Languages at launch (§2.3). [ASK WILL] on any additional language. */
 export const SUPPORTED_LOCALES = ['en', 'es'] as const;

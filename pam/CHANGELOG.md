@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.7.0] — 2026-09-13 · A working front door
+
+### Added — sign-in actually signs you in
+
+A code reaches a real phone. One screen for everybody: member, program manager,
+case manager, super admin. The form sits in a card with a single button, the
+mark is centred above it, and what PAM will text you is said on the screen
+before you hand over a number — in both languages.
+
+### Added — Privacy and Terms
+
+Two pages anybody can read before they join, each with a contents list that
+marks the section being read. Plain sentences, no defined terms. The privacy
+page restates, word for word, the same limits the app shows a member after they
+join — and a test fails if the two ever disagree.
+
+### Fixed — an account created by the seeding script could not sign in
+
+It failed looking the person up before it ever reached the text message, with an
+error that pointed nowhere near the cause.
+
 ## [0.6.0] — 2026-09-12 · The dispatcher, and who hears about a flag
 
 ### Added — PAM can send a text message, and deliberately does not

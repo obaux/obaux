@@ -1,8 +1,8 @@
 # PAM — where the project stands
 
-Last updated 2026-09-12, after the text-message dispatcher went live and the
-rules for who hears about a flag were settled. Newest session log:
-`docs/sessions/2026-09-12-the-dispatcher.md`.
+Last updated 2026-09-13, after sign-in started working end to end and the
+privacy and terms pages landed. Newest session log:
+`docs/sessions/2026-09-13-sign-in-and-the-two-pages.md`.
 
 This is the handover document: what exists, what is proven, what is live, and
 what the next person needs to know before touching anything.
@@ -48,11 +48,18 @@ database, not in the function. Signing the copy and adding the Twilio
 credentials is what turns it on; nothing needs redeploying. See
 `docs/sms-setup.md`.
 
+**Sign-in works.** Supabase is pointed at Twilio, and a real code reached a real
+phone on 13 September. One door for every role: what you see after the code comes
+from the account, never from which link you followed.
+
+The limit now is Twilio's, not PAM's: the account is still in trial, so only
+numbers verified by hand in the Twilio console can receive a text. The pilot
+cannot start until the compliance profile and carrier registration are approved —
+see `docs/sms-setup.md`, and `docs/sms-campaign-samples.md` for the samples that
+submission asks for.
+
 **The first admin exists** — Will, Philadelphia, created 12 September and proven
-by generating a live invite code (`9T3YTVMT`, valid 30 days). Invites can now be
-issued. What is still missing is a way to *log in*: PAM is phone-sign-in only and
-Supabase sends that code through an SMS provider that has not been configured, so
-nobody can complete a sign-in yet.
+by generating a live invite code (`9T3YTVMT`, valid 30 days).
 
 To create further admins from a machine with the service role key:
 
@@ -85,13 +92,13 @@ Numbers here are from the last run, not aspirations.
 | Check | Result | What it actually proves |
 |---|---|---|
 | Typecheck | 5/5 packages | — |
-| `@pam/config` tests | 192 pass | No SMS can send unreviewed, over 160 chars, with emoji, or with a term that reveals justice involvement. Locales are key-for-key. The transparency screen matches its contract. |
+| `@pam/config` tests | 201 pass | No SMS can send unreviewed, over 160 chars, with emoji, or with a term that reveals justice involvement. Locales are key-for-key. The transparency screen matches its contract. |
 | `@pam/ui` tests | 46 pass | Every component is axe-clean. `PlaceCard` offers exactly three actions in a fixed order. Reduced motion is respected. The mic hides when unsupported. |
 | Database suite | 152 checks pass | See below |
 | Live RLS fingerprint | identical to local | The deployed policy set is provably the one that was penetration-tested: `ce9636c3b77e4827368e6575742b899c`, 73 policies on both |
 | Live anonymous attack | 0 rows leaked | A signed-out caller reads no profiles, messages, invites or audit rows on the real database, while still reaching the support number and the public catalogue |
-| Browser a11y + theme | 111 pass | No WCAG AA violations at 320px or iPhone SE. Every control clears 48px. No horizontal scroll. The Astryx theme really resolves. Runs in dark mode as well as light. |
-| First-load JS | 485.4 kB of 500 kB | §12 budget, measured gzipped on what `index.html` actually loads |
+| Browser a11y + theme | 153 pass | No WCAG AA violations at 320px or iPhone SE. Every control clears 48px. No horizontal scroll. The Astryx theme really resolves. Runs in dark mode as well as light. |
+| First-load JS | 490.1 kB of 500 kB | §12 budget, measured gzipped on what `index.html` actually loads |
 
 ### The database suite is the one that matters
 
@@ -120,7 +127,8 @@ Phase 0 owns foundations. These are Phase 1–7 and their absence is not an
 oversight:
 
 - **No member-facing flow.** No onboarding, no invite redemption screen, no map,
-  no enrollment, no chat. The web route is a component gallery that proves the
+  no enrollment, no chat. Sign-in, the places list, the case manager screen, and
+  the privacy and terms pages are the exceptions — they exist and work. The web route is a component gallery that proves the
   stack renders, not a product.
 - **Notices exist but are not wired to real failures.** Every condition has
   plain-language copy and a component (D-035), and the demo renders three of
