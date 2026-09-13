@@ -205,6 +205,7 @@
   "signin.failed.verify.body": "Los codigos dejan de servir despues de 10 minutos. Pida uno nuevo, o llame a PAM.",
   "signin.failed.verify.title": "Ese codigo no sirvio",
   "signin.phone.action": "Enviarme un codigo",
+  "signin.phone.consent": "PAM le enviara mensajes. Un codigo ahora, y recordatorios de sus visitas. Responda STOP para no recibir mas. Responda HELP para ayuda. Pueden aplicar cargos.",
   "signin.phone.hint": "Le enviamos un codigo por mensaje. No hay contrasena que recordar.",
   "signin.phone.invalid": "Eso no parece un numero. Intente otra vez con el codigo de area, como 215 555 0100.",
   "signin.phone.label": "Su numero de telefono",

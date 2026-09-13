@@ -31,6 +31,7 @@ const styles = stylex.create({
   title: { fontSize: '28px', lineHeight: 1.2 },
   hint: { fontSize: '17px', lineHeight: 1.5 },
   quiet: { fontSize: '17px' },
+  consent: { fontSize: '15px', lineHeight: 1.5 },
   link: { minHeight: '48px', fontSize: '17px' },
 });
 
@@ -107,6 +108,17 @@ export default function SignInPage() {
             />
             <Text type="supporting" xstyle={styles.hint}>
               {t('signin.phone.hint')}
+            </Text>
+            {/*
+              Consent, in the place where consent is actually given: directly
+              above the button, where somebody reads it before they act rather
+              than after. US carriers require the person to have agreed knowingly
+              before an application may text them, and they review this screen —
+              but the reason to put it here is that it is true and a member
+              deserves to know what they are agreeing to.
+            */}
+            <Text type="supporting" xstyle={styles.consent}>
+              {t('signin.phone.consent')}
             </Text>
             <BigButton
               label={state.step === 'sending' ? t('signin.sending') : t('signin.phone.action')}

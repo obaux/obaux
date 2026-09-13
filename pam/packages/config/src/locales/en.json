@@ -205,6 +205,7 @@
   "signin.failed.verify.body": "Codes stop working after 10 minutes. Ask for a new one, or call PAM.",
   "signin.failed.verify.title": "That code did not work",
   "signin.phone.action": "Send me a code",
+  "signin.phone.consent": "PAM will text you. A code now, and reminders for visits you plan. Reply STOP any time to stop. Reply HELP for help. Text and data rates may apply.",
   "signin.phone.hint": "We text you a code. No password to remember.",
   "signin.phone.invalid": "That does not look like a phone number. Try again with the area code, like 215 555 0100.",
   "signin.phone.label": "Your phone number",

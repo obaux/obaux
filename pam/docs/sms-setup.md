@@ -166,8 +166,16 @@ campaign describes what PAM actually sends, and takes a few days. It asks for:
 Cost is a few dollars one-off for the brand and roughly a dollar fifty a month
 for the campaign, plus the per-message price.
 
-**The opt-in wording on the sign-in screen is PAM's job, not paperwork.** It has
-to exist before the campaign is submitted, because the reviewer looks at it.
+**The opt-in wording on the sign-in screen is PAM's job, not paperwork.** It is
+now on the screen, directly above the button: *"PAM will text you. A code now,
+and reminders for visits you plan. Reply STOP any time to stop. Reply HELP for
+help. Text and data rates may apply."* — in both languages, and held there by a
+browser test, because removing it would quietly cost the pilot its ability to
+text anybody.
+
+The sample messages to paste into the campaign are in
+`docs/sms-campaign-samples.md`, generated from the same file the dispatcher
+sends from.
 
 ### If sign-in answers "Database error finding user"
 
