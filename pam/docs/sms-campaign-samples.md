@@ -25,6 +25,35 @@ edited there, regenerate this list rather than editing it here.
 - **Message volume:** low. A sign-in code when somebody signs in, and at most a
   few reminders a week per person.
 
+## "Opt-in message" — what a person receives right after consenting
+
+The first message anybody gets from PAM is their sign-in code, because
+submitting their number *is* the consent and the code is the answer to it.
+Carriers expect that first message to carry the brand, the rates warning and
+both keywords, so it reads:
+
+> PAM: Your code is 123456. It works for 10 minutes. Msg & data rates may apply. Reply HELP for help, STOP to stop.
+
+113 characters, one segment.
+
+**Where this message actually comes from, which matters.** Sign-in codes are sent
+by Twilio Verify, called by Supabase — not by PAM's own dispatcher. So the
+wording above is set in the Twilio console under Verify → Services → the PAM
+service → message template, not in `packages/config/src/sms-templates.ts`. The
+`verify_code` template in this repo is not the text that sends while sign-in
+goes through Verify; it exists for the day PAM sends its own codes.
+
+Two consequences worth knowing before submitting:
+
+1. Custom Verify templates go through their own Twilio approval, and a default
+   template will say something closer to *"Your PAM verification code is:
+   123456"* — no rates line, no keywords. Submit the wording you will actually
+   have. If the custom template is not approved in time, declare the default and
+   correct it later rather than declaring copy that does not send.
+2. If Verify will not carry the wording at all, the alternative is switching
+   Supabase from Twilio Verify to plain Twilio messaging, where the text is
+   entirely ours. That is a bigger change and not worth making for this alone.
+
 ## "How do end-users consent to receive messages?", to paste as written
 
 989 characters, so it clears a 1024 cap. This is the field campaigns are
