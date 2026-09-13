@@ -1541,6 +1541,32 @@ see, following its corner radius. Done in `globals.css` so it is true of every
 field in the app rather than of the one that was complained about, with a
 browser test asserting the input has no ring and the frame does.
 
+### D-094 — A repeated style block is a component nobody wrote yet
+Five screens each declared `link: { minHeight: '48px', fontSize: '17px' }`, and
+six declared their own page width and padding with the numbers slightly
+different in each — 520 here, 560 there, 720 on the legal pages. Nobody notices
+that on any one screen. Everybody notices the day the padding changes and one
+screen does not follow.
+
+The giveaway was the 48px: that is PAM's touch-target rule (§2.5), which should
+be stated once and obeyed, not retyped by whoever writes the next screen.
+
+So `Page` and `TextLink` now live in `@pam/ui`, with the measurements as tokens.
+A screen says what it is, not how wide it is. `Page` keeps a `width` because two
+kinds of screen legitimately differ — a form and a long legal document — and
+that is a choice worth naming rather than a number worth copying.
+
+### D-095 — The components have a page of their own
+`/gallery/` renders every `@pam/ui` component in the states that matter,
+including the ones nobody can navigate to: an empty list, a failure notice, a
+disabled button, a person with no photo. Those are most of what somebody on a
+bad connection actually sees.
+
+It is photographed by `scripts/journeys.mjs` alongside the real screens, so a
+component that changed shows up in the sheet next to the screens it would have
+broken. Not linked from the app: a member has no reason to land there, and it is
+a workbench rather than a secret.
+
 ---
 
 ## Notes for whoever picks this up next

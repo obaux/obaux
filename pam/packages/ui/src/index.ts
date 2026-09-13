@@ -18,6 +18,8 @@ export { PointsBadge, type PointsBadgeProps } from './PointsBadge.js';
 export { HelpBar, type HelpBarProps } from './HelpBar.js';
 export { Notice, type NoticeProps } from './Notice.js';
 export { AppHeader, type AppHeaderProps } from './AppHeader.js';
+export { Page, type PageProps } from './Page.js';
+export { TextLink, type TextLinkProps } from './TextLink.js';
 export { NotificationBell, type NotificationBellProps } from './NotificationBell.js';
 export {
   NotificationList,

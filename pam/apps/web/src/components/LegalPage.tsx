@@ -6,7 +6,7 @@ import { VStack } from '@astryxdesign/core/VStack';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { Button } from '@astryxdesign/core/Button';
-import { AppHeader } from '@pam/ui';
+import { AppHeader, Page, TextLink } from '@pam/ui';
 import type { LegalDocument } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 
@@ -27,7 +27,6 @@ import { useI18n } from '@/lib/i18n';
  */
 
 const styles = stylex.create({
-  page: { maxWidth: '720px', marginInline: 'auto', paddingInline: '16px', paddingBlock: '24px' },
   title: { fontSize: '28px', lineHeight: 1.2 },
   intro: { fontSize: '18px', lineHeight: 1.5 },
   updated: { fontSize: '15px' },
@@ -54,7 +53,6 @@ const styles = stylex.create({
   section: { width: '100%', scrollMarginBlockStart: '16px' },
   sectionTitle: { fontSize: '21px', lineHeight: 1.3 },
   body: { fontSize: '18px', lineHeight: 1.6 },
-  footerLink: { minHeight: '48px', fontSize: '17px' },
 });
 
 export function LegalPage({ doc }: { doc: LegalDocument }) {
@@ -132,8 +130,7 @@ export function LegalPage({ doc }: { doc: LegalDocument }) {
   }, [doc]);
 
   return (
-    <main {...stylex.props(styles.page)}>
-      <VStack gap={4}>
+    <Page width="read">
         <AppHeader />
 
         <Heading level={1} id="top" xstyle={styles.title}>
@@ -189,26 +186,13 @@ export function LegalPage({ doc }: { doc: LegalDocument }) {
 
         {/* Never dead-end (§0): back up the page, a way on, and a way to a person. */}
         <VStack gap={1}>
-          <Button
-            label={t('legal.backToTop')}
-            variant="ghost"
-            href="#top"
-            xstyle={styles.footerLink}
-          />
-          <Button
+          <TextLink label={t('legal.backToTop')} href="#top" />
+          <TextLink
             label={doc.id === 'privacy' ? t('legal.terms') : t('legal.privacy')}
-            variant="ghost"
             href={doc.id === 'privacy' ? '/terms/' : '/privacy/'}
-            xstyle={styles.footerLink}
           />
-          <Button
-            label={t('help.title')}
-            variant="ghost"
-            href="/help/"
-            xstyle={styles.footerLink}
-          />
+          <TextLink label={t('help.title')} href="/help/" />
         </VStack>
-      </VStack>
-    </main>
+    </Page>
   );
 }

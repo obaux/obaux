@@ -81,6 +81,9 @@ const SCREENS = [
   { name: '5-notifications', path: '/notifications/' },
   { name: '6-privacy', path: '/privacy/' },
   { name: '7-terms', path: '/terms/' },
+  // Not a journey — the workbench. Photographed with the screens so a change to
+  // a component shows up next to the screens it would have broken.
+  { name: '8-components', path: '/gallery/' },
 ];
 
 const NOTIFICATIONS = [

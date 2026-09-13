@@ -9,7 +9,7 @@ import { HStack } from '@astryxdesign/core/HStack';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { Button } from '@astryxdesign/core/Button';
-import { AppHeader, BigButton, Notice, TextField } from '@pam/ui';
+import { AppHeader, BigButton, Notice, Page, TextField, TextLink } from '@pam/ui';
 import { useI18n } from '@/lib/i18n';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { usePhoneSignIn } from '@/lib/usePhoneSignIn';
@@ -37,20 +37,11 @@ import { usePhoneSignIn } from '@/lib/usePhoneSignIn';
  */
 
 const styles = stylex.create({
-  page: {
-    maxWidth: '520px',
-    marginInline: 'auto',
-    paddingInline: '16px',
-    paddingBlock: '32px',
-    textAlign: 'center',
-  },
   title: { fontSize: '28px', lineHeight: 1.2 },
   hint: { fontSize: '17px', lineHeight: 1.5 },
   quiet: { fontSize: '17px' },
-  link: { minHeight: '48px', fontSize: '17px' },
   consent: { fontSize: '15px', lineHeight: 1.5 },
   card: { width: '100%' },
-  legalLink: { minHeight: '48px', fontSize: '15px' },
   // The field's own label reads left-to-right even on a centred page: a label
   // sitting over the left edge of the box it names is easier to tie to it, and
   // a centred one above a full-width input floats loose.
@@ -113,8 +104,7 @@ export default function SignInPage() {
   const onFirstStep = !onCodeStep && state.step !== 'done';
 
   return (
-    <main {...stylex.props(styles.page)}>
-      <VStack gap={4} align="center">
+    <Page align="center">
         <AppHeader align="center" />
 
         <Heading level={1} xstyle={styles.title}>
@@ -160,12 +150,10 @@ export default function SignInPage() {
                   onPress={() => void verifyCode(code)}
                   isDisabled={busy || code.trim().length === 0}
                 />
-                <Button
+                <TextLink
                   label={t('signin.code.resend')}
-                  variant="ghost"
                   onClick={() => void sendCode(state.phone)}
                   isDisabled={busy}
-                  xstyle={styles.link}
                 />
               </VStack>
             ) : (
@@ -193,15 +181,10 @@ export default function SignInPage() {
         )}
 
         {state.step === 'failed' && state.phone !== null ? (
-          <Button
-            label={t('signin.phone.label')}
-            variant="ghost"
-            onClick={startOver}
-            xstyle={styles.link}
-          />
+          <TextLink label={t('signin.phone.label')} onClick={startOver} />
         ) : null}
 
-        <Button label={t('help.title')} variant="ghost" href="/help/" xstyle={styles.link} />
+        <TextLink label={t('help.title')} href="/help/" />
 
         {/*
           What PAM will send, and how to stop it, at the foot of the screen.
@@ -228,20 +211,9 @@ export default function SignInPage() {
           reads.
         */}
         <HStack gap={2} justify="center" wrap="wrap">
-          <Button
-            label={t('legal.privacy')}
-            variant="ghost"
-            href="/privacy/"
-            xstyle={styles.legalLink}
-          />
-          <Button
-            label={t('legal.terms')}
-            variant="ghost"
-            href="/terms/"
-            xstyle={styles.legalLink}
-          />
+          <TextLink label={t('legal.privacy')} href="/privacy/" size="quiet" />
+          <TextLink label={t('legal.terms')} href="/terms/" size="quiet" />
         </HStack>
-      </VStack>
-    </main>
+    </Page>
   );
 }

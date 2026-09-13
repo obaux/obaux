@@ -7,7 +7,7 @@ import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { Button } from '@astryxdesign/core/Button';
 import { Icon } from '@astryxdesign/core/Icon';
-import { AppHeader, BigButton, Notice, NotificationList } from '@pam/ui';
+import { AppHeader, BigButton, Notice, NotificationList, Page, TextLink } from '@pam/ui';
 import { useI18n } from '@/lib/i18n';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
@@ -28,11 +28,9 @@ import { whenHappened } from '@/lib/when';
  */
 
 const styles = stylex.create({
-  page: { maxWidth: '560px', marginInline: 'auto', paddingInline: '16px', paddingBlock: '20px' },
   back: { minHeight: '48px', fontSize: '17px' },
   title: { fontSize: '28px', lineHeight: 1.2 },
   count: { fontSize: '17px' },
-  link: { minHeight: '48px', fontSize: '17px' },
 });
 
 export default function NotificationsPage() {
@@ -47,8 +45,7 @@ export default function NotificationsPage() {
     state.status === 'ready' ? state.items.filter((item) => !item.isRead).length : 0;
 
   return (
-    <main {...stylex.props(styles.page)}>
-      <VStack gap={3}>
+    <Page gap={3}>
         {/* Top left, before anything else on the screen. */}
         <HStack gap={2} align="center" wrap="wrap">
           <Button
@@ -116,8 +113,7 @@ export default function NotificationsPage() {
         ) : null}
 
         {/* Never dead-end: a way back, and a way to a person. */}
-        <Button label={t('help.title')} variant="ghost" href="/help/" xstyle={styles.link} />
-      </VStack>
-    </main>
+        <TextLink label={t('help.title')} href="/help/" />
+    </Page>
   );
 }

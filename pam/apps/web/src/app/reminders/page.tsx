@@ -8,7 +8,7 @@ import { Card } from '@astryxdesign/core/Card';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { Button } from '@astryxdesign/core/Button';
-import { AppHeader, BigButton, Notice } from '@pam/ui';
+import { AppHeader, BigButton, Notice, Page, TextLink } from '@pam/ui';
 import { useI18n } from '@/lib/i18n';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
@@ -47,7 +47,6 @@ import { setReminderConsent } from '@/lib/useReminderConsent';
  */
 
 const styles = stylex.create({
-  page: { maxWidth: '520px', marginInline: 'auto', paddingInline: '16px', paddingBlock: '28px' },
   title: { fontSize: '28px', lineHeight: 1.2 },
   intro: { fontSize: '18px', lineHeight: 1.5 },
   card: { width: '100%' },
@@ -55,7 +54,6 @@ const styles = stylex.create({
   item: { fontSize: '17px', lineHeight: 1.45 },
   small: { fontSize: '15px', lineHeight: 1.5 },
   box: { width: '100%', minHeight: '48px', textAlign: 'start' },
-  link: { minHeight: '48px', fontSize: '17px' },
 });
 
 export default function RemindersPage() {
@@ -125,8 +123,7 @@ export default function RemindersPage() {
   };
 
   return (
-    <main {...stylex.props(styles.page)}>
-      <VStack gap={4}>
+    <Page>
         <AppHeader />
 
         <VStack gap={2}>
@@ -203,12 +200,10 @@ export default function RemindersPage() {
               isDisabled={busy}
             />
             {/* Saying no is one tap, and it is recorded like any other answer. */}
-            <Button
+            <TextLink
               label={t('reminders.skip')}
-              variant="ghost"
               onClick={() => void answer(false)}
               isDisabled={busy}
-              xstyle={styles.link}
             />
           </>
         ) : session.status === 'loading' ? null : (
@@ -220,7 +215,6 @@ export default function RemindersPage() {
           </>
         )}
 
-      </VStack>
-    </main>
+    </Page>
   );
 }

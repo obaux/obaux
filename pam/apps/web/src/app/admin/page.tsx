@@ -10,7 +10,7 @@ import { Text } from '@astryxdesign/core/Text';
 import { Badge } from '@astryxdesign/core/Badge';
 import { Avatar } from '@astryxdesign/core/Avatar';
 import { Button } from '@astryxdesign/core/Button';
-import { AppHeader, BigButton, Notice, NotificationBell } from '@pam/ui';
+import { AppHeader, BigButton, Notice, NotificationBell, Page, TextLink } from '@pam/ui';
 import { NOTICES } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { useSupportPhone } from '@/lib/useSupportPhone';
@@ -34,13 +34,14 @@ import { useNotifications } from '@/lib/useNotifications';
  */
 
 const styles = stylex.create({
-  page: { maxWidth: '560px', marginInline: 'auto', paddingInline: '16px', paddingBlock: '28px' },
   title: { fontSize: '28px', lineHeight: 1.2 },
+  // A secondary button, which is a button and not a link: it keeps the 48px
+  // floor but reads as an action.
+  secondary: { minHeight: '48px', fontSize: '17px' },
   region: { fontSize: '17px' },
   card: { width: '100%' },
   name: { fontSize: '20px', lineHeight: 1.3 },
   meta: { fontSize: '16px' },
-  link: { minHeight: '48px', fontSize: '17px' },
   // The code is read aloud down a phone line. It is the largest thing here.
   code: {
     fontSize: '40px',
@@ -112,21 +113,18 @@ export default function AdminPage() {
 
   if (session.status === 'loading') {
     return (
-      <main {...stylex.props(styles.page)}>
-        <VStack gap={3}>
+      <Page gap={3}>
           <AppHeader />
           <Text type="supporting" xstyle={styles.region}>
             {t('places.loading')}
           </Text>
-        </VStack>
-      </main>
+      </Page>
     );
   }
 
   if (session.status === 'signed-out' || session.status === 'no-profile') {
     return (
-      <main {...stylex.props(styles.page)}>
-        <VStack gap={4}>
+      <Page gap={4}>
           <AppHeader />
           <Notice
             notice="service_not_available"
@@ -136,16 +134,14 @@ export default function AdminPage() {
             callLabel={t('help.callSupport')}
           />
           <BigButton label={t('signin.title')} href="/signin/" />
-        </VStack>
-      </main>
+      </Page>
     );
   }
 
   if (session.status === 'error') {
     const key = session.offline ? 'offline' : 'something_went_wrong';
     return (
-      <main {...stylex.props(styles.page)}>
-        <VStack gap={4}>
+      <Page gap={4}>
           <AppHeader />
           <Notice
             notice={key}
@@ -154,8 +150,7 @@ export default function AdminPage() {
             supportPhone={supportPhone}
             callLabel={t('help.callSupport')}
           />
-        </VStack>
-      </main>
+      </Page>
     );
   }
 
@@ -163,8 +158,7 @@ export default function AdminPage() {
     // Not a permission error to scold somebody with — a plain statement of what
     // this screen is, and a way to get it fixed if it is wrong (§0).
     return (
-      <main {...stylex.props(styles.page)}>
-        <VStack gap={4}>
+      <Page gap={4}>
           <AppHeader roleLabel={t(`role.${session.session.role}`)} />
           <Notice
             notice="service_not_available"
@@ -173,17 +167,15 @@ export default function AdminPage() {
             supportPhone={supportPhone}
             callLabel={t('help.callSupport')}
           />
-          <Button label={t('admin.back')} variant="secondary" href="/" xstyle={styles.link} />
-        </VStack>
-      </main>
+          <TextLink label={t('admin.back')} href="/" />
+      </Page>
     );
   }
 
   const { session: me } = session;
 
   return (
-    <main {...stylex.props(styles.page)}>
-      <VStack gap={4}>
+    <Page gap={4}>
         {/*
           The bell says how many things need this case manager; the list is a
           screen of its own. A glance belongs in the header, the work does not
@@ -240,14 +232,9 @@ export default function AdminPage() {
                   onClick={() => {
                     void navigator.clipboard?.writeText(invite.code).then(() => setCopied(true));
                   }}
-                  xstyle={styles.link}
+                  xstyle={styles.secondary}
                 />
-                <Button
-                  label={t('admin.invite.another')}
-                  variant="ghost"
-                  onClick={() => setInvite(null)}
-                  xstyle={styles.link}
-                />
+                <TextLink label={t('admin.invite.another')} onClick={() => setInvite(null)} />
               </HStack>
             </VStack>
           </Card>
@@ -263,7 +250,7 @@ export default function AdminPage() {
               variant="secondary"
               onClick={() => void makeInvite('provider')}
               isDisabled={inviteBusy}
-              xstyle={styles.link}
+              xstyle={styles.secondary}
             />
           </VStack>
         )}
@@ -362,15 +349,9 @@ export default function AdminPage() {
         </Card>
 
         <HStack gap={2} wrap="wrap">
-          <Button label={t('admin.back')} variant="ghost" href="/" xstyle={styles.link} />
-          <Button
-            label={t('signin.signout')}
-            variant="ghost"
-            onClick={() => void signOut().then(() => window.location.reload())}
-            xstyle={styles.link}
-          />
+          <TextLink label={t('admin.back')} href="/" />
+          <TextLink label={t('signin.signout')} onClick={() => void signOut().then(() => window.location.reload())} />
         </HStack>
-      </VStack>
-    </main>
+    </Page>
   );
 }

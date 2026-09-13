@@ -26,4 +26,14 @@ export const pam = stylex.defineVars({
   bodyTextDesktop: '16px',
   cardGap: '12px',
   screenPadding: '16px',
+  /**
+   * How wide a screen reads at. Not a phone width — a column that stays
+   * readable when the same build is opened on a laptop, which is where staff
+   * use PAM.
+   */
+  pageWidth: '560px',
+  /** A page title. One size, so every screen announces itself the same way. */
+  titleSize: '28px',
+  /** A link that is not the primary action: readable, and still 48px to hit. */
+  linkSize: '17px',
 });
