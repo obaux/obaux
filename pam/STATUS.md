@@ -53,10 +53,15 @@ phone on 13 September. One door for every role: what you see after the code come
 from the account, never from which link you followed.
 
 The limit now is Twilio's, not PAM's: the account is still in trial, so only
-numbers verified by hand in the Twilio console can receive a text. The pilot
-cannot start until the compliance profile and carrier registration are approved —
-see `docs/sms-setup.md`, and `docs/sms-campaign-samples.md` for the samples that
-submission asks for.
+numbers verified by hand in the Twilio console can receive a text. **The carrier
+registration was submitted on 13 September and is in review** — brand under Oba,
+campaign under PAM. Until it is approved the pilot cannot start, however finished
+the app is. What was filed is in `docs/sms-campaign-samples.md`; setup and the
+known traps are in `docs/sms-setup.md`.
+
+One correction already made in flight: the first submission declared no embedded
+links, which nine of the thirteen messages carry. Worth knowing if a later
+question asks why the campaign was resubmitted.
 
 **The first admin exists** — Will, Philadelphia, created 12 September and proven
 by generating a live invite code (`9T3YTVMT`, valid 30 days).
