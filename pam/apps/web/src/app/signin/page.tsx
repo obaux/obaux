@@ -145,6 +145,7 @@ export default function SignInPage() {
               <VStack gap={3}>
                 <TextField
                   id={codeId}
+                  purpose="code"
                   label={t('signin.code.label')}
                   value={code}
                   onChange={(next) => setCode(next)}
@@ -171,6 +172,7 @@ export default function SignInPage() {
               <VStack gap={3}>
                 <TextField
                   id={phoneId}
+                  purpose="phone"
                   label={t('signin.phone.label')}
                   value={phone}
                   onChange={(next) => setPhone(next)}

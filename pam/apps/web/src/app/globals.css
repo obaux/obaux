@@ -161,6 +161,29 @@
     outline-offset: 2px;
   }
 
+  /*
+   * A text field is drawn as one box, so it should light up as one box.
+   *
+   * The ring belongs on the frame a person can see, not on the <input> inside
+   * it: the input is 48px tall inside a 56px frame, so focusing drew a second
+   * rectangle floating within the first — which reads as a stray element, and
+   * at the top of the sign-in screen it collided with the label above it.
+   *
+   * The ring is not weakened, only moved. It keeps the 3px width and follows
+   * the frame's own corner radius, so it is the same indicator around the shape
+   * that is actually there.
+   */
+  :is(input, textarea):focus-visible {
+    outline: none;
+  }
+
+  :has(> input:focus-visible),
+  :has(> textarea:focus-visible) {
+    outline: 3px solid currentColor;
+    outline-offset: 2px;
+    border-radius: 12px;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     *,
     *::before,

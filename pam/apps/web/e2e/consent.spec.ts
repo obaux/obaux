@@ -194,3 +194,36 @@ test.describe('agreeing to reminders', () => {
     expect(results.violations).toEqual([]);
   });
 });
+
+/**
+ * The keyboard and the autofill hint.
+ *
+ * A person typing their own phone number on a QWERTY keyboard, one thumb, in
+ * bright sun, is the §0 test case. Four attributes decide whether they get a
+ * keypad and their own number offered above it, and all four have to agree —
+ * so `purpose` on TextField sets them together and this proves they arrive.
+ */
+test.describe('phone and code fields', () => {
+  test('the phone field asks for a keypad and offers the person their number', async ({ page }) => {
+    await page.goto('/signin/');
+    const phone = page.getByLabel('Your phone number');
+    await expect(phone).toHaveAttribute('type', 'tel');
+    await expect(phone).toHaveAttribute('autocomplete', 'tel');
+    await expect(phone).toHaveAttribute('inputmode', 'tel');
+  });
+
+  test('focus lights up the whole field, not a box inside it', async ({ page }) => {
+    await page.goto('/signin/');
+    const phone = page.getByLabel('Your phone number');
+    await phone.focus();
+
+    // The ring belongs on the frame a person can see. A second rectangle drawn
+    // inside the first reads as a stray element — and collided with the label.
+    const outlines = await phone.evaluate((el) => ({
+      input: getComputedStyle(el).outlineStyle,
+      frame: getComputedStyle(el.parentElement as HTMLElement).outlineStyle,
+    }));
+    expect(outlines.input).toBe('none');
+    expect(outlines.frame).toBe('solid');
+  });
+});

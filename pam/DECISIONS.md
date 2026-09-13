@@ -1508,6 +1508,39 @@ assertion replaces.
 The output is gitignored: 14 MB of PNGs regenerated on demand does not belong in
 a public repository's history.
 
+### D-092 — A field says what it is for, and the rest follows
+Will: the phone field should offer the person's own number, and it should be
+easy.
+
+Getting a keypad and an autofill suggestion out of a browser takes four
+attributes that have to agree — `type`, `autoComplete`, `inputMode` and a stable
+`name` — and every one is easy to get subtly wrong in a way nobody notices until
+somebody is typing their own number on a QWERTY keyboard with one thumb.
+
+So `TextField` takes a `purpose` (`phone`, `code`, `address`, `name`) and sets
+all four. A screen says what the field is; the design system decides how. Adding
+a purpose fixes every screen that uses it, which is the property that makes this
+a system rather than a folder of components.
+
+`code` matters as much as `phone`: `autocomplete="one-time-code"` is what makes
+iOS offer the code from Messages above the keyboard and Android fill it in — the
+difference between one tap and leaving the app to memorise six digits.
+
+`inputMode` is the one attribute Astryx deliberately omits from its props, and
+`type="tel"` is outside its allowed set. Both reach the input through the same
+spread as everything else, so the cast in that file is about the type
+definition, not the behaviour.
+
+### D-093 — The focus ring goes on the frame, not the input
+The `<input>` is 48px tall inside a 56px frame, so focusing it drew a second
+rectangle floating inside the first — and at the top of the sign-in screen that
+ring collided with the label above it.
+
+The ring is not weakened, only moved: same 3px, on the box a person can actually
+see, following its corner radius. Done in `globals.css` so it is true of every
+field in the app rather than of the one that was complained about, with a
+browser test asserting the input has no ring and the frame does.
+
 ---
 
 ## Notes for whoever picks this up next
