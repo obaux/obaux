@@ -115,3 +115,13 @@ export function BellIcon(props: SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
+
+/** A pencil. Change what this says. */
+export function EditIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <path d="M4 20h4l10.5-10.5a2.8 2.8 0 0 0-4-4L4 16z" />
+      <path d="M13.5 6.5l4 4" />
+    </svg>
+  );
+}

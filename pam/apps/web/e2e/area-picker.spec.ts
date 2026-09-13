@@ -50,15 +50,35 @@ test.describe('choosing an area', () => {
     await page.goto('/places/');
 
     // Tapping the area itself opens the picker: a member should not have to
-    // read the word "Change" to discover that this is theirs to set.
-    await page.getByRole('button', { name: /Showing places near City Hall/ }).click();
-    await expect(page.getByRole('textbox', { name: 'Where are you staying now?' })).toBeVisible();
+    // find the pencil to discover that this is theirs to set.
+    await page.getByRole('button', { name: 'Near City Hall' }).click();
+    await expect(page.getByRole('textbox', { name: 'ZIP code or address' })).toBeVisible();
+  });
+
+  test('the pencil beside it does the same thing, and says so', async ({ page }) => {
+    // It is a picture with no word next to it, so its accessible name has to
+    // carry the whole meaning — "Change the area", not "Edit".
+    await stub(page);
+    await page.goto('/places/');
+
+    await page.getByRole('button', { name: 'Change the area' }).click();
+    await expect(page.getByRole('textbox', { name: 'ZIP code or address' })).toBeVisible();
+  });
+
+  test('lives in the header, so the list starts at the top of the page', async ({ page }) => {
+    await stub(page);
+    await page.goto('/places/');
+
+    const inHeader = await page
+      .getByRole('button', { name: 'Near City Hall' })
+      .evaluate((el) => Boolean(el.closest('header')));
+    expect(inHeader, 'the area control is not in the header').toBe(true);
   });
 
   test('offers somewhere to start before anything is typed', async ({ page }) => {
     await stub(page);
     await page.goto('/places/');
-    await page.getByRole('button', { name: 'Change' }).click();
+    await page.getByRole('button', { name: 'Change the area' }).click();
 
     // No typing yet, and there are already options. Somebody who does not know
     // what to enter is not left staring at an empty box.
@@ -68,13 +88,13 @@ test.describe('choosing an area', () => {
   test('remembers the choice on this device', async ({ page }) => {
     await stub(page);
     await page.goto('/places/');
-    await page.getByRole('button', { name: 'Change' }).click();
+    await page.getByRole('button', { name: 'Change the area' }).click();
     await page.getByRole('option', { name: '19122' }).click();
 
-    await expect(page.getByRole('button', { name: /Showing places near 19122/ })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Near 19122' })).toBeVisible();
 
     await page.reload();
-    await expect(page.getByRole('button', { name: /Showing places near 19122/ })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Near 19122' })).toBeVisible();
   });
 
   test('a street address still resolves when the city API answers', async ({ page }) => {
@@ -91,8 +111,8 @@ test.describe('choosing an area', () => {
       }),
     );
     await page.goto('/places/');
-    await page.getByRole('button', { name: 'Change' }).click();
-    await page.getByRole('textbox', { name: 'Where are you staying now?' }).fill('1231 N Broad');
+    await page.getByRole('button', { name: 'Change the area' }).click();
+    await page.getByRole('textbox', { name: 'ZIP code or address' }).fill('1231 N Broad');
 
     await expect(page.getByRole('option', { name: /1231-39 N Broad St, 19122/ })).toBeVisible();
   });
@@ -101,8 +121,8 @@ test.describe('choosing an area', () => {
     await stub(page);
     await page.route(CARTO, (route) => route.abort());
     await page.goto('/places/');
-    await page.getByRole('button', { name: 'Change' }).click();
-    await page.getByRole('textbox', { name: 'Where are you staying now?' }).fill('1231 N Broad');
+    await page.getByRole('button', { name: 'Change the area' }).click();
+    await page.getByRole('textbox', { name: 'ZIP code or address' }).fill('1231 N Broad');
 
     // The address lookup failed and the screen says nothing about it, because
     // there is nothing a member can do with that. The ZIPs are still there.
@@ -112,7 +132,7 @@ test.describe('choosing an area', () => {
   test('has no WCAG A/AA violations while open', async ({ page }) => {
     await stub(page);
     await page.goto('/places/');
-    await page.getByRole('button', { name: 'Change' }).click();
+    await page.getByRole('button', { name: 'Change the area' }).click();
     await expect(page.getByRole('option', { name: '19104' })).toBeVisible();
 
     const results = await new AxeBuilder({ page })

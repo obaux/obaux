@@ -2,9 +2,8 @@
 
 import { useId, useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
-import { TextField } from '@pam/ui';
+import { AreaChip, TextField } from '@pam/ui';
 import { VStack } from '@astryxdesign/core/VStack';
-import { HStack } from '@astryxdesign/core/HStack';
 import { Text } from '@astryxdesign/core/Text';
 import { Button } from '@astryxdesign/core/Button';
 import { useI18n } from '@/lib/i18n';
@@ -13,32 +12,29 @@ import { useAreaSearch, type AreaOption } from '@/lib/useAreaSearch';
 /**
  * Where the list is measured from, and how a member changes it.
  *
- * Closed, it is a button showing the current area — not a label. A person has
- * to be able to see that this is something they can change without reading
- * anything, which is why the area itself is the control rather than a line of
- * text with a link beside it.
+ * Two pieces, because they live in two places (Will, 13 September). Closed, it
+ * is a chip in the header — the area and a pencil, out of the way of the list.
+ * Open, it is a search panel directly under that header, where the input lands
+ * next to the thing that opened it.
  *
- * Open, it is a plain text input and a list of results. Not a combobox widget:
- * the results are ordinary buttons in a list, each clearing 48px, because this
- * has to work with a screen reader, with a thumb, and at 200% text (§12), and
- * every one of those is easier to get right with real buttons than with a
- * custom listbox.
+ * The panel is a plain text input and a list of results, not a combobox widget:
+ * the results are ordinary buttons, each clearing 48px, because this has to
+ * work with a screen reader, with a thumb, and at 200% text (§12), and every
+ * one of those is easier to get right with real buttons than with a custom
+ * listbox.
  *
- * The search is offered as soon as it is opened, with no typing: the ZIP list
- * comes back on an empty query, so somebody who does not know what to type
- * still sees options.
+ * The search is offered as soon as it opens, with no typing: the ZIP list comes
+ * back on an empty query, so somebody who does not know what to type still sees
+ * options.
+ *
+ * The page owns `isOpen` rather than this file, because the two pieces are on
+ * opposite sides of the header and both have to agree about it.
  */
 
 const styles = stylex.create({
-  area: {
-    minHeight: '48px',
-    fontSize: '17px',
-    justifyContent: 'flex-start',
-    textAlign: 'left',
-  },
-  change: { minHeight: '48px', fontSize: '17px' },
   hint: { fontSize: '15px', lineHeight: 1.5 },
   privacy: { fontSize: '14px', lineHeight: 1.5 },
+  cancel: { minHeight: '48px', fontSize: '17px' },
   option: {
     minHeight: '48px',
     fontSize: '17px',
@@ -49,49 +45,44 @@ const styles = stylex.create({
   list: { width: '100%' },
 });
 
-export function AreaPicker({
-  area,
+/** The header piece: where we are measuring from, and the way to change it. */
+export function AreaTrigger({ area, onOpen }: { area: AreaOption; onOpen: () => void }) {
+  const { t } = useI18n();
+
+  return (
+    <AreaChip
+      label={t('places.near', { area: area.label })}
+      changeLabel={t('places.changeArea')}
+      onChange={onOpen}
+    />
+  );
+}
+
+/** The panel under the header: type an area, pick one. */
+export function AreaSearch({
   onChange,
+  onClose,
 }: {
-  area: AreaOption;
   onChange: (next: AreaOption) => void;
+  onClose: () => void;
 }) {
   const { t } = useI18n();
-  const [isOpen, setIsOpen] = useState(false);
   const [query, setQuery] = useState('');
-  const { options, isSearching } = useAreaSearch(isOpen ? query : '');
+  const { options, isSearching } = useAreaSearch(query);
   const inputId = useId();
-
-  if (!isOpen) {
-    return (
-      <HStack gap={2} wrap="wrap" align="center">
-        <Button
-          label={t('places.showingNear', { area: area.label })}
-          variant="secondary"
-          onClick={() => {
-            setQuery('');
-            setIsOpen(true);
-          }}
-          xstyle={styles.area}
-        />
-        <Button
-          label={t('places.changeArea')}
-          variant="ghost"
-          onClick={() => {
-            setQuery('');
-            setIsOpen(true);
-          }}
-          xstyle={styles.change}
-        />
-      </HStack>
-    );
-  }
 
   return (
     <VStack gap={2}>
+      {/*
+        The label is the two words that say what to type. It used to be a
+        question — "Where are you staying now?" — which is the right thing to
+        ask during onboarding and the wrong thing to put over a field somebody
+        opened on purpose, knowing exactly what it is for.
+      */}
       <TextField
         id={inputId}
-        label={t('places.areaPrompt')}
+        purpose="address"
+        label={t('places.areaLabel')}
         value={query}
         onChange={(next) => setQuery(next)}
         width="100%"
@@ -100,10 +91,6 @@ export function AreaPicker({
         {t('places.areaHint')}
       </Text>
 
-      {/*
-        A live region, so a screen reader hears that results changed without the
-        focus being yanked out of the input somebody is still typing in.
-      */}
       <VStack gap={1} xstyle={styles.list} role="listbox" aria-label={t('places.areaResults')}>
         {options.map((option) => (
           <Button
@@ -113,13 +100,17 @@ export function AreaPicker({
             role="option"
             onClick={() => {
               onChange(option);
-              setIsOpen(false);
+              onClose();
             }}
             xstyle={styles.option}
           />
         ))}
       </VStack>
 
+      {/*
+        A live region, so a screen reader hears that results changed without the
+        focus being yanked out of the input somebody is still typing in.
+      */}
       <div role="status" aria-live="polite">
         {isSearching && options.length === 0 ? (
           <Text type="supporting" xstyle={styles.hint}>
@@ -140,8 +131,8 @@ export function AreaPicker({
       <Button
         label={t('places.areaCancel')}
         variant="ghost"
-        onClick={() => setIsOpen(false)}
-        xstyle={styles.change}
+        onClick={onClose}
+        xstyle={styles.cancel}
       />
     </VStack>
   );

@@ -18,6 +18,7 @@ export { PointsBadge, type PointsBadgeProps } from './PointsBadge.js';
 export { HelpBar, type HelpBarProps } from './HelpBar.js';
 export { Notice, type NoticeProps } from './Notice.js';
 export { AppHeader, type AppHeaderProps } from './AppHeader.js';
+export { AreaChip, type AreaChipProps } from './AreaChip.js';
 export { Page, type PageProps } from './Page.js';
 export {
   OnboardingSlides,
@@ -36,6 +37,7 @@ export { VoiceInput, type VoiceInputProps, type SpeechRecognizer } from './Voice
 export { TextField, type TextFieldProps } from './TextField.js';
 export {
   BellIcon,
+  EditIcon,
   HomeIcon,
   MeIcon,
   PeopleIcon,

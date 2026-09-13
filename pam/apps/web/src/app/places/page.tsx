@@ -19,7 +19,7 @@ import { useI18n } from '@/lib/i18n';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { usePlaces, METRES_PER_MILE } from '@/lib/usePlaces';
 import { CITY_HALL, loadOrigin, saveOrigin, type AreaOption } from '@/lib/useAreaSearch';
-import { AreaPicker } from './AreaPicker';
+import { AreaSearch, AreaTrigger } from './AreaPicker';
 
 /**
  * The first screen in PAM that shows real data.
@@ -70,6 +70,12 @@ export default function PlacesPage() {
   const [area, setArea] = useState<AreaOption>(CITY_HALL);
   useEffect(() => setArea(loadOrigin()), []);
 
+  /*
+   * The area control is in two places — a chip in the header and a search
+   * panel under it — so the page holds the state both of them read (D-100).
+   */
+  const [isPickingArea, setIsPickingArea] = useState(false);
+
   const chooseArea = (next: AreaOption) => {
     setArea(next);
     saveOrigin(next);
@@ -85,14 +91,21 @@ export default function PlacesPage() {
   return (
     <main {...stylex.props(styles.page)}>
       <VStack gap={4}>
-        <AppHeader />
-        <VStack gap={1}>
-          <Heading level={1} xstyle={styles.title}>
-            {t('places.title')}
-          </Heading>
-        </VStack>
+        {/*
+          The area rides in the header now. It used to take a full row of the
+          page to say something that is true of every card below it.
+        */}
+        <AppHeader
+          trailing={<AreaTrigger area={area} onOpen={() => setIsPickingArea(true)} />}
+        />
 
-        <AreaPicker area={area} onChange={chooseArea} />
+        {isPickingArea ? (
+          <AreaSearch onChange={chooseArea} onClose={() => setIsPickingArea(false)} />
+        ) : null}
+
+        <Heading level={1} xstyle={styles.title}>
+          {t('places.title')}
+        </Heading>
 
         {/*
           The three categories are fixed (§2.5) and always all shown, even when
