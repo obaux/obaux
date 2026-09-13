@@ -56,8 +56,9 @@ The limit now is Twilio's, not PAM's: the account is still in trial, so only
 numbers verified by hand in the Twilio console can receive a text. **The carrier registration was rejected
 on 13 September (30925) and needs resubmitting** — brand under Oba, campaign
 under PAM. The rejection was right: consent was implied rather than actively
-given, so PAM now has a tick box that starts unticked, and reminders are off for
-anybody who never ticks it (D-085). Until it is approved the pilot cannot start, however finished
+given. PAM now asks on a screen of its own (`/reminders/`), shown to a member
+after their first sign-in, with a box that starts unticked; reminders stay off
+for anybody who never ticks it (D-085, D-086). Sign-in is back to one job. Until it is approved the pilot cannot start, however finished
 the app is. What was filed is in `docs/sms-campaign-samples.md`; setup and the
 known traps are in `docs/sms-setup.md`.
 
@@ -105,7 +106,7 @@ Numbers here are from the last run, not aspirations.
 | Database suite | 152 checks pass | See below |
 | Live RLS fingerprint | identical to local | The deployed policy set is provably the one that was penetration-tested: `ce9636c3b77e4827368e6575742b899c`, 73 policies on both |
 | Live anonymous attack | 0 rows leaked | A signed-out caller reads no profiles, messages, invites or audit rows on the real database, while still reaching the support number and the public catalogue |
-| Browser a11y + theme | 183 pass | No WCAG AA violations at 320px or iPhone SE. Every control clears 48px. No horizontal scroll. The Astryx theme really resolves. Runs in dark mode as well as light. |
+| Browser a11y + theme | 192 pass | No WCAG AA violations at 320px or iPhone SE. Every control clears 48px. No horizontal scroll. The Astryx theme really resolves. Runs in dark mode as well as light. |
 | First-load JS | 490.1 kB of 500 kB | §12 budget, measured gzipped on what `index.html` actually loads |
 
 ### The database suite is the one that matters

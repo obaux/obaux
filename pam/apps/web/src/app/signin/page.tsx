@@ -1,6 +1,7 @@
 'use client';
 
-import { useId, useState } from 'react';
+import { useEffect, useId, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import * as stylex from '@stylexjs/stylex';
 import { VStack } from '@astryxdesign/core/VStack';
 import { Card } from '@astryxdesign/core/Card';
@@ -8,7 +9,6 @@ import { HStack } from '@astryxdesign/core/HStack';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { Button } from '@astryxdesign/core/Button';
-import { CheckboxInput } from '@astryxdesign/core/CheckboxInput';
 import { AppHeader, BigButton, Notice, TextField } from '@pam/ui';
 import { useI18n } from '@/lib/i18n';
 import { useSupportPhone } from '@/lib/useSupportPhone';
@@ -51,9 +51,6 @@ const styles = stylex.create({
   consent: { fontSize: '15px', lineHeight: 1.5 },
   card: { width: '100%' },
   legalLink: { minHeight: '48px', fontSize: '15px' },
-  // Left-aligned on a centred screen: a tick box and its label read as one
-  // line, and centring them puts the box in the middle of a sentence.
-  consentBox: { width: '100%', minHeight: '48px', textAlign: 'start' },
   // The field's own label reads left-to-right even on a centred page: a label
   // sitting over the left edge of the box it names is easier to tie to it, and
   // a centred one above a full-width input floats loose.
@@ -64,21 +61,55 @@ export default function SignInPage() {
   const { t } = useI18n();
   const supportPhone = useSupportPhone();
   const { state, sendCode, verifyCode, startOver } = usePhoneSignIn();
+  const router = useRouter();
   const [phone, setPhone] = useState('');
-  /**
-   * Reminders are a separate yes, and it starts as no.
-   *
-   * A carrier rejected PAM's first registration for exactly this (30925: "opt-in
-   * must be unchecked by default"), and they were right. Asking for a sign-in
-   * code is asking to be texted one; agreeing to be texted next Tuesday about a
-   * place you looked up is a different thing, on a phone somebody else may be
-   * holding. Leaving it unticked costs a member nothing — sign-in works either
-   * way, which is also what stops consent becoming a toll on getting help.
-   */
-  const [wantsReminders, setWantsReminders] = useState(false);
   const [code, setCode] = useState('');
   const phoneId = useId();
   const codeId = useId();
+
+  /**
+   * Where somebody lands after the code works.
+   *
+   * A member who has never been asked goes to the reminders screen once, and
+   * everybody else goes to the app. A case manager signing in to look at their
+   * caseload never meets that question — nothing about their work depends on
+   * being texted, and the front door is not the place to ask (D-086).
+   */
+  useEffect(() => {
+    if (state.step !== 'done') return;
+    let cancelled = false;
+
+    void (async () => {
+      try {
+        const [{ createClient }, { getReminderConsent }] = await Promise.all([
+          import('@/lib/supabase'),
+          import('@/lib/useReminderConsent'),
+        ]);
+        const supabase = createClient();
+        const { data: auth } = await supabase.auth.getUser();
+        if (cancelled || !auth.user) return;
+
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', auth.user.id)
+          .maybeSingle();
+
+        const isMember = (profile as { role?: string } | null)?.role === 'member';
+        const asked = isMember ? await getReminderConsent(auth.user.id) : true;
+        if (cancelled) return;
+
+        router.replace(isMember && asked === null ? '/reminders/' : '/');
+      } catch {
+        // A redirect that cannot decide still has to go somewhere.
+        if (!cancelled) router.replace('/');
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [state.step, router]);
 
   const busy = state.step === 'sending' || state.step === 'verifying';
   const onCodeStep = state.step === 'code' || state.step === 'verifying';
@@ -128,7 +159,7 @@ export default function SignInPage() {
                 </Text>
                 <BigButton
                   label={busy ? t('signin.verifying') : t('signin.code.action')}
-                  onPress={() => void verifyCode(code, wantsReminders)}
+                  onPress={() => void verifyCode(code)}
                   isDisabled={busy || code.trim().length === 0}
                 />
                 <Button
@@ -152,13 +183,6 @@ export default function SignInPage() {
                 <Text type="supporting" xstyle={styles.hint}>
                   {t('signin.phone.hint')}
                 </Text>
-                <CheckboxInput
-                  label={t('signin.phone.remindMe')}
-                  description={t('signin.phone.remindMeNote')}
-                  value={wantsReminders}
-                  onChange={(checked) => setWantsReminders(checked)}
-                  xstyle={styles.consentBox}
-                />
                 <BigButton
                   label={state.step === 'sending' ? t('signin.sending') : t('signin.phone.action')}
                   onPress={() => void sendCode(phone)}

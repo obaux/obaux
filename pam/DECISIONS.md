@@ -1380,6 +1380,33 @@ what stops consent becoming a toll on getting help.
 Anybody already in `notification_preferences` was switched off rather than
 grandfathered in. They predate the box and never agreed to anything.
 
+### D-086 — The reminders question is a screen, and only members are asked
+Will: the sign-in screen was carrying too much, and not all of it applies to
+everybody — a case manager or a program lead does not need reminders about
+visits they are not making.
+
+Both halves are right, and they point the same way. Sign-in went back to one
+job: a number, a button, and the one line the code itself needs. The question
+"may PAM text you about the things you plan?" moved to `/reminders/`, shown to a
+**member** once, right after their first sign-in. Staff never meet it; they can
+reach the same screen later if they want it.
+
+The carrier requirement (30925: unticked by default, active consent) is met
+better by the screen than by the box on the front door, because a screen has
+room to say what is actually sent, how often, never at night, STOP, HELP and
+rates — without any of it shrinking to fine print. That page is the screenshot
+filed with the registration.
+
+Three things this design gets that a checkbox on sign-in did not:
+
+- **No row means nobody has asked yet**, which is not the same as a no. That is
+  what lets the app show the screen exactly once.
+- **"Not now" writes the decline.** A decision is never inferred from silence,
+  and nobody is asked twice.
+- **Sign-in still works either way**, which is the other half of the rule (30923:
+  consent cannot be required for service use) and the thing PAM would want
+  regardless: nobody should have to accept texts to get help.
+
 ---
 
 ## Notes for whoever picks this up next

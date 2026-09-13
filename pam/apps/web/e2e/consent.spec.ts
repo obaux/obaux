@@ -1,3 +1,4 @@
+import AxeBuilder from '@axe-core/playwright';
 import { expect, test } from '@playwright/test';
 import en from '@pam/config/locales/en.json';
 
@@ -44,37 +45,81 @@ test.describe('consent to be texted', () => {
 });
 
 /**
- * Reminders are a separate yes, and it starts as no.
+ * Reminders are a separate yes, asked on their own screen.
  *
  * A carrier rejected PAM's first campaign with 30925 — "opt-in must be
- * unchecked by default; active consent required" — and these are the tests that
- * keep the fix in place. A tick box that arrives pre-ticked, or a sign-in that
- * refuses to proceed without it, both fail here.
+ * unchecked by default; active consent required" — and the box that answers it
+ * lives at /reminders/, not on the way in. Sign-in stays one job.
  */
 test.describe('agreeing to reminders', () => {
-  test.beforeEach(async ({ page }) => {
+  test('is not asked on the way in', async ({ page }) => {
+    // Signing in is one job. Somebody getting into the app should not have to
+    // weigh up a messaging policy to do it.
     await page.goto('/signin/');
+    await expect(page.getByRole('checkbox')).toHaveCount(0);
   });
 
-  test('starts unticked', async ({ page }) => {
+  test('starts unticked on its own screen', async ({ page }) => {
+    await page.goto('/reminders/');
     const box = page.getByRole('checkbox', { name: /reminders/i });
     await expect(box).toBeVisible();
     await expect(box).not.toBeChecked();
   });
 
-  test('is not a condition of signing in', async ({ page }) => {
-    // Consent cannot be the price of getting help (30923). The button is live
-    // with the box untouched.
-    await page.getByLabel('Your phone number').fill('215 555 0100');
-    await expect(page.getByRole('button', { name: 'Send me a code' })).toBeEnabled();
+  test('says what is sent, how often, and how to stop', async ({ page }) => {
+    await page.goto('/reminders/');
+    await expect(page.getByText(/reminder before a visit/i)).toBeVisible();
+    await expect(page.getByText(/few messages a week at most/i)).toBeVisible();
+    await expect(page.getByText(/Reply STOP/)).toBeVisible();
+    await expect(page.getByText(/rates may apply/i)).toBeVisible();
   });
 
-  test('ticks and unticks, and says it can be changed later', async ({ page }) => {
-    const box = page.getByRole('checkbox', { name: /reminders/i });
-    await box.check();
-    await expect(box).toBeChecked();
-    await box.uncheck();
-    await expect(box).not.toBeChecked();
-    await expect(page.getByText(/change this later/i)).toBeVisible();
+  test('signed out, it still explains the choice and points at sign-in', async ({ page }) => {
+    // Hiding the question behind a sign-in explains nothing. The choice is
+    // shown; the thing to do next is sign in, so that is the button.
+    await page.goto('/reminders/');
+    await expect(page.getByRole('checkbox', { name: /reminders/i })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Sign in' })).toBeVisible();
+  });
+
+  test('signed in, saying no is one tap and is a real answer', async ({ page }) => {
+    // "Not now" writes the answer rather than doing nothing, so nobody is asked
+    // twice and silence is never read as consent either way.
+    const id = 'de3b9c2e-ec2f-403b-93e5-86e6ee75349b';
+    await page.addInitScript((userId: string) => {
+      const session = {
+        access_token: 'test-access-token',
+        refresh_token: 'test-refresh-token',
+        token_type: 'bearer',
+        expires_in: 3600,
+        expires_at: Math.floor(Date.now() / 1000) + 3600,
+        user: { id: userId, aud: 'authenticated', role: 'authenticated' },
+      };
+      for (const ref of ['stub', 'shobqzuhicoiymtumiaz']) {
+        window.localStorage.setItem(`sb-${ref}-auth-token`, JSON.stringify(session));
+      }
+    }, id);
+    const json = (body: unknown) => ({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(body),
+    });
+    await page.route('**/auth/v1/user*', (route) => route.fulfill(json({ id })));
+    await page.route('**/rest/v1/profiles*', (route) =>
+      route.fulfill(json({ id, role: 'member', first_name: 'Marcus', region_id: null, regions: null })),
+    );
+    await page.route('**/rest/v1/notification_preferences*', (route) => route.fulfill(json(null)));
+
+    await page.goto('/reminders/');
+    await expect(page.getByRole('button', { name: 'Not now' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Save' })).toBeVisible();
+  });
+
+  test('has no WCAG A/AA violations', async ({ page }) => {
+    await page.goto('/reminders/');
+    const results = await new AxeBuilder({ page })
+      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+      .analyze();
+    expect(results.violations).toEqual([]);
   });
 });
