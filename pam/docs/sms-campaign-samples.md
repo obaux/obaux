@@ -25,6 +25,34 @@ edited there, regenerate this list rather than editing it here.
 - **Message volume:** low. A sign-in code when somebody signs in, and at most a
   few reminders a week per person.
 
+## The resubmission checklist
+
+Every field, with the answer and the reason it is worded that way. Work down it
+in order; the two marked **rejected before** are where this campaign has already
+failed once each.
+
+| Field | Answer |
+|---|---|
+| Brand | **Oba** — the registered LLC, matching the EIN letter exactly. PAM is the campaign beneath it, not the brand. |
+| Use case | **Low Volume Mixed** — account notifications (sign-in codes) and appointment reminders |
+| Embedded links | **Yes** ← *rejected before.* Nine of the thirteen messages carry `{link}`. |
+| Embedded phone numbers | **Yes** — `access_limited_notice` ends "Call {supportPhone} with questions" |
+| Age-gated content | No |
+| Direct lending or loan arrangement | No |
+| Affiliate marketing | No |
+| Opt-in type | **Web form / in-app**, not a keyword. Nobody texts a keyword to a number. |
+| Opt-in description | ← *rejected before (30925).* Paste the answer below, attach the **Text reminders** screenshot. |
+| Opt-out | Reply **STOP**. Honoured immediately and permanently; no in-app setting can override it. |
+| Help | Reply **HELP**. |
+| Privacy policy URL | `https://web-ten-umber-88.vercel.app/privacy/` |
+| Terms URL | `https://web-ten-umber-88.vercel.app/terms/` |
+| Sample messages | All thirteen, below, placeholders intact |
+
+**Before submitting, open both URLs in a private window.** A reviewer fetches
+them signed out, from a machine that has never seen the site. A page behind a
+login, or a deployment that has moved, is rejection 30921 or 30933 and costs
+another round.
+
 ## "Opt-in message" — what a person receives right after consenting
 
 The first message anybody gets from PAM is their sign-in code, because
@@ -56,7 +84,7 @@ Two consequences worth knowing before submitting:
 
 ## "How do end-users consent to receive messages?", to paste as written
 
-1016 characters, so it clears a 1024 cap — count before editing it.
+1022 characters, so it clears a 1024 cap — count before editing it.
 
 **This is the third version, and the app changed twice under it.** The first
 described consent as implied by typing a number; rejected with **30925,
@@ -85,7 +113,7 @@ one — a promise that is true of most messages is not a promise.
 The sign-in screen still carries the one line the code itself needs: *"PAM texts
 you a code to sign in. Reply STOP to stop texts. Rates may apply."*
 
-> End users opt in inside the PAM app, on a screen dedicated to that choice, and nothing is pre-selected. A person is invited by a staff member and enters their own mobile number on the sign-in screen to request a one-time code; PAM has no passwords, so requesting the code is the request to be texted it. After signing in, a member sees a "Text reminders" screen listing what would be sent (a reminder before a planned visit, a note if a place they saved closes or moves, a note when someone wants to connect), the frequency (a few messages a week at most), and that STOP stops them permanently, HELP reaches a person, and rates may apply. Consent is a button labelled "Agree to receive texts": pressing it is the affirmative act, and the words agreed to are on the control itself. There is no checkbox, so nothing can arrive pre-selected. A "Not now" button records the decline, and PAM works either way, so consent is never required to use PAM. Numbers are never bought, rented, or entered by staff for anyone else.
+> End users opt in inside the PAM app, on a screen dedicated to that choice, and nothing is pre-selected. A person is invited by a staff member and enters their own mobile number on the sign-in screen to request a one-time code; PAM has no passwords, so requesting the code is the request to be texted it. After signing in, the person is shown a "Text reminders" screen listing what would be sent (for a member: a reminder before a planned visit, a note if a saved place closes or moves, a note when someone wants to connect), how often (a few messages a week at most), and that STOP stops them permanently, HELP reaches a person, and rates may apply. Consent is a button labelled "Agree to receive texts": pressing it is the affirmative act, and the words agreed to are on the control itself. There is no checkbox, so nothing can arrive pre-selected. A "Not now" button records the decline, and PAM works either way, so consent is never required to use PAM. Numbers are never bought, rented, or entered by staff for anyone.
 
 Attach the **Text reminders** screenshot, not the sign-in one. The reviewer is
 checking that the box is really unticked and that the wording quoted here is
