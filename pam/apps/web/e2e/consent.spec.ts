@@ -145,9 +145,45 @@ test.describe('agreeing to reminders', () => {
     );
     await page.route('**/rest/v1/notification_preferences*', (route) => route.fulfill(json(null)));
 
+    // Saving has to go somewhere. It used to record the answer and stay on the
+    // same screen, which looks exactly like a button that does nothing.
+    await page.route('**/rest/v1/rpc/services_near*', (route) => route.fulfill(json([])));
+
     await page.goto('/reminders/');
     await page.getByRole('button', { name: 'Agree to receive texts' }).click();
-    await expect(page.getByText(/You can change this whenever you want/i)).toBeVisible();
+    await expect(page).toHaveURL(/\/places\//);
+  });
+
+  test('declining moves on too, rather than sitting there', async ({ page }) => {
+    const id = 'de3b9c2e-ec2f-403b-93e5-86e6ee75349b';
+    await page.addInitScript((userId: string) => {
+      const session = {
+        access_token: 'test-access-token',
+        refresh_token: 'test-refresh-token',
+        token_type: 'bearer',
+        expires_in: 3600,
+        expires_at: Math.floor(Date.now() / 1000) + 3600,
+        user: { id: userId, aud: 'authenticated', role: 'authenticated' },
+      };
+      for (const ref of ['stub', 'shobqzuhicoiymtumiaz']) {
+        window.localStorage.setItem(`sb-${ref}-auth-token`, JSON.stringify(session));
+      }
+    }, id);
+    const json2 = (body: unknown) => ({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(body),
+    });
+    await page.route('**/auth/v1/user*', (route) => route.fulfill(json2({ id })));
+    await page.route('**/rest/v1/profiles*', (route) =>
+      route.fulfill(json2({ id, role: 'member', first_name: 'Marcus', region_id: null, regions: null })),
+    );
+    await page.route('**/rest/v1/notification_preferences*', (route) => route.fulfill(json2(null)));
+    await page.route('**/rest/v1/rpc/services_near*', (route) => route.fulfill(json2([])));
+
+    await page.goto('/reminders/');
+    await page.getByRole('button', { name: 'Not now' }).click();
+    await expect(page).toHaveURL(/\/places\//);
   });
 
   test('has no WCAG A/AA violations', async ({ page }) => {

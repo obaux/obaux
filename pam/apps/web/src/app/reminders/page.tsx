@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import * as stylex from '@stylexjs/stylex';
 import { VStack } from '@astryxdesign/core/VStack';
 import { Card } from '@astryxdesign/core/Card';
@@ -59,6 +60,7 @@ const styles = stylex.create({
 
 export default function RemindersPage() {
   const { t } = useI18n();
+  const router = useRouter();
   const supportPhone = useSupportPhone();
   const { state: session } = useSession();
 
@@ -94,14 +96,32 @@ export default function RemindersPage() {
     };
   }, [session]);
 
+  /**
+   * Answering has to take somebody somewhere.
+   *
+   * It used to save and stay put, with a line of small grey text underneath.
+   * Will pressed the button and nothing appeared to happen — which was exactly
+   * right: the answer was recorded and the screen looked identical. A screen
+   * that swallows the only action on it is a dead end (§0), whatever it wrote
+   * to the database.
+   *
+   * So a saved answer moves on, to the screen that person actually came for: a
+   * member to the places they can go, staff to their own panel.
+   */
   const answer = async (value: boolean) => {
     if (session.status !== 'signed-in') return;
     setBusy(true);
     setFailed(false);
     const saved = await setReminderConsent(session.session.userId, value);
-    setBusy(false);
-    if (saved) setDone(true);
-    else setFailed(true);
+
+    if (!saved) {
+      setBusy(false);
+      setFailed(true);
+      return;
+    }
+
+    setDone(true);
+    router.replace(isStaff ? '/admin/' : '/places/');
   };
 
   return (
