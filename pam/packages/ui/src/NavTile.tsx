@@ -4,7 +4,6 @@ import { ClickableCard } from '@astryxdesign/core/ClickableCard';
 import { HStack } from '@astryxdesign/core/HStack';
 import { VStack } from '@astryxdesign/core/VStack';
 import { Text } from '@astryxdesign/core/Text';
-import { Badge } from '@astryxdesign/core/Badge';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { pam } from './tokens.stylex.js';
 
@@ -22,9 +21,12 @@ import { pam } from './tokens.stylex.js';
  * `ClickableCard` with `href` gives a real anchor underneath, so it works with
  * no JavaScript, opens in a new tab, and lands in browser history.
  *
- * `count` is for things waiting — unread notifications — as a word, never a
- * bare coloured dot: a badge somebody cannot read is a badge that only worries
- * them.
+ * `alertLabel` is for things waiting — unread notifications. It is drawn as a
+ * dot and announced as words: the dot says "there is something here" at a
+ * glance, and the tile's accessible name carries "2 new" for anybody who
+ * cannot see it. A coloured dot on its own would be meaning carried by shape
+ * and colour alone, which WCAG 1.4.1 forbids, and a number nobody acts on
+ * differently is a second thing to read for nothing (Will, 13 September).
  */
 export interface NavTileProps {
   readonly href: string;
@@ -34,8 +36,11 @@ export interface NavTileProps {
   readonly description: string;
   /** Drawn from the icon set. Decorative — the label carries the meaning. */
   readonly icon: ReactNode;
-  /** Already-filled, e.g. "2 new". Shown only when there is something waiting. */
-  readonly countLabel?: string;
+  /**
+   * Already-filled, e.g. "2 new". Drawn as a dot and added to the tile's
+   * accessible name. Omit when nothing is waiting.
+   */
+  readonly alertLabel?: string;
 }
 
 const styles = stylex.create({
@@ -53,15 +58,25 @@ const styles = stylex.create({
     color: colorVars['--color-icon-accent'],
   },
   label: { fontSize: '18px', fontWeight: 600 },
-  // The count is short and the description is long, so without this the count
-  // is what gets squeezed — and "2 ne…" is worse than no badge at all.
-  count: { flexShrink: 0 },
+  dot: {
+    // The description can run to two lines; the dot never gives up its space.
+    flexShrink: 0,
+    width: '12px',
+    height: '12px',
+    borderRadius: '50%',
+    backgroundColor: colorVars['--color-accent'],
+  },
   description: { fontSize: '15px', lineHeight: 1.4 },
 });
 
-export function NavTile({ href, label, description, icon, countLabel }: NavTileProps) {
+export function NavTile({ href, label, description, icon, alertLabel }: NavTileProps) {
   return (
-    <ClickableCard label={label} href={href} padding={4} xstyle={styles.card}>
+    <ClickableCard
+      label={alertLabel ? `${label}, ${alertLabel}` : label}
+      href={href}
+      padding={4}
+      xstyle={styles.card}
+    >
       <HStack gap={3} align="center" wrap="nowrap" xstyle={styles.body}>
         <span aria-hidden="true" {...stylex.props(styles.art)}>
           {icon}
@@ -72,7 +87,7 @@ export function NavTile({ href, label, description, icon, countLabel }: NavTileP
             {description}
           </Text>
         </VStack>
-        {countLabel ? <Badge variant="neutral" label={countLabel} xstyle={styles.count} /> : null}
+        {alertLabel ? <span aria-hidden="true" {...stylex.props(styles.dot)} /> : null}
       </HStack>
     </ClickableCard>
   );

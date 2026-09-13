@@ -6,6 +6,7 @@ import { Text } from '@astryxdesign/core/Text';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Badge, type BadgeVariant } from '@astryxdesign/core/Badge';
 import { Button } from '@astryxdesign/core/Button';
+import { Icon } from '@astryxdesign/core/Icon';
 import { CATEGORY_DEFINITIONS, type Category } from '@pam/config';
 
 /**
@@ -176,6 +177,13 @@ export function PlaceCard({
             Three actions, always, in the same order (§5.1) — but the first slot
             adapts to what is actually known about the place.
 
+            All three are secondary (Will, 13 September). A card in a list of
+            cards has no single most important action: which of Call, Go and
+            Save matters depends entirely on why somebody is looking, and a
+            filled first button was answering that question for them. It also
+            put a primary button in every row of a long list, which is a screen
+            shouting in three places at once rather than one (§2.5).
+
             With a phone number it is Call, a real tel: link that works before
             hydration. Without one it becomes Hours, opening the place's Google
             listing where the hours and usually the phone number live. Most
@@ -185,7 +193,7 @@ export function PlaceCard({
           {phone ? (
             <Button
               label={labels.call}
-              variant="primary"
+              variant="secondary"
               href={`tel:${phone}`}
               clickAction={onCall}
               xstyle={styles.action}
@@ -193,7 +201,7 @@ export function PlaceCard({
           ) : (
             <Button
               label={labels.hours}
-              variant="primary"
+              variant="secondary"
               href={googlePlaceHref(lookupName || name, address, placeId)}
               target="_blank"
               rel="noreferrer"
@@ -209,9 +217,16 @@ export function PlaceCard({
             rel="noreferrer"
             xstyle={styles.action}
           />
+          {/*
+            Saved used to be told by the button turning filled. With every
+            action secondary, the state is told in words — the label becomes
+            "Saved" — and by a tick beside it, so it does not rest on colour
+            either. `aria-pressed` carries the same fact to a screen reader.
+          */}
           <Button
             label={isSaved ? labels.saved : labels.save}
-            variant={isSaved ? 'primary' : 'secondary'}
+            variant="secondary"
+            icon={isSaved ? <Icon icon="check" /> : undefined}
             clickAction={onSave}
             aria-pressed={isSaved}
             xstyle={styles.action}

@@ -50,7 +50,7 @@ describe('accessibility', () => {
         icon={<PlacesIcon />}
         label="Places"
         description="Food, work, school and health near you."
-        countLabel="2 new"
+        alertLabel="2 new"
       />,
     );
     await expectNoViolations(container);

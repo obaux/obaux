@@ -183,7 +183,7 @@ export default function HomePage() {
           icon={<BellIcon />}
           label={t('notify.title')}
           description={t('home.go.notifications')}
-          countLabel={unread > 0 ? t('notify.unread', { count: unread }) : undefined}
+          alertLabel={unread > 0 ? t('notify.unread', { count: unread }) : undefined}
         />
 
         <NavTile

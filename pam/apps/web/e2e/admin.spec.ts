@@ -272,8 +272,10 @@ test.describe('what has happened that a case manager has to act on', () => {
     await signedInAs(page, 'admin', [], [], notifications);
     await page.goto('/admin/');
 
-    await expect(page.getByText('1 new')).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Notifications' })).toHaveAttribute(
+    // The count is a dot beside the bell rather than a "1 new" chip (Will, 13
+    // September), so the number lives in the link's accessible name — where a
+    // screen reader still hears it and this test can still check it.
+    await expect(page.getByRole('link', { name: 'Notifications, 1 new' })).toHaveAttribute(
       'href',
       '/notifications/',
     );

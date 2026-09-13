@@ -6,7 +6,7 @@ import { Carousel } from '@astryxdesign/core/Carousel';
 import { HStack } from '@astryxdesign/core/HStack';
 import { VStack } from '@astryxdesign/core/VStack';
 import { Text } from '@astryxdesign/core/Text';
-import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
+import { colorVars, spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
 
 /**
  * What PAM is, before somebody has any reason to care.
@@ -79,30 +79,43 @@ const styles = stylex.create({
     // than half of two.
     width: '100cqw',
     flexShrink: 0,
-    paddingInline: '8px',
-    paddingBlock: '4px',
+    // 24px each side. A line of text running to the edge of a phone is harder
+    // to read and looks like an accident; the card below it is inset by the
+    // same amount, so the two now line up.
+    paddingInline: spacingVars['--spacing-6'],
+    paddingBlock: spacingVars['--spacing-1'],
     textAlign: 'center',
   },
   art: {
     /*
      * Half the screen, with a floor and a ceiling.
      *
-     * 36vh of picture plus its line and the dots comes to about half the
+     * The picture plus its line and the dots comes to a little under half the
      * window, which is the proportion that makes this read as onboarding. The
      * third term is the one that matters and is measured, not guessed: the
      * mark, the line, the dots and the sign-in card down to the last word of
-     * the consent sentence occupy 512px at the narrowest supported width,
+     * the consent sentence occupy 536px at the narrowest supported width,
      * where the text wraps hardest — and that sentence has to be on screen
      * without scrolling, because US carriers require it there before a number
-     * is typed. So on a tall phone the picture takes its 36vh, and on a 640px
+     * is typed. So on a tall phone the picture takes its 26vh, and on a 640px
      * one it gives way instead of pushing the sentence under the fold.
      */
-    height: 'clamp(120px, 36vh, calc(100vh - 512px))',
+    height: 'clamp(96px, 26vh, calc(100vh - 536px))',
+    // Centred on the slide and capped, so the artwork stays a picture on a
+    // wide screen instead of stretching into a banner.
     width: '100%',
+    maxWidth: '280px',
+    marginInline: 'auto',
     objectFit: 'contain',
     display: 'block',
   },
-  line: { fontSize: '18px', lineHeight: 1.45, minHeight: '52px' },
+  line: {
+    fontSize: '18px',
+    lineHeight: 1.45,
+    minHeight: '52px',
+    // 24px of air under the words, before the dots and the card below them.
+    paddingBlockEnd: spacingVars['--spacing-6'],
+  },
   dot: {
     width: '8px',
     height: '8px',

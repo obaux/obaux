@@ -134,7 +134,7 @@ export default function GalleryPage() {
             icon={<BellIcon />}
             label="Notifications"
             description="What has happened and needs you."
-            countLabel="2 new"
+            alertLabel="2 new"
           />
         </VStack>
       </Section>

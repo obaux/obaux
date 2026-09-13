@@ -322,13 +322,15 @@ describe('the header says which app you are in', () => {
 });
 
 describe('the bell (A7)', () => {
-  it('says how many are new in words, not only a colour', () => {
-    // A dot tells a screen reader nothing, and tells a colour-blind reader less
-    // than it tells everybody else.
+  it('says how many are new in its name, so the dot is never the only telling', () => {
+    // The mark beside the bell is a dot rather than a count (Will, 13
+    // September). A dot tells a screen reader nothing and tells a colour-blind
+    // reader less than it tells everybody else, so the number lives in the
+    // link's accessible name instead of disappearing with the badge.
     render(
       <NotificationBell href="/notifications/" label="Notifications" unreadCount={2} unreadLabel="2 new" />,
     );
-    expect(screen.getByText('2 new')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Notifications, 2 new' })).toBeInTheDocument();
   });
 
   it('says nothing at all when nothing is new', () => {
@@ -336,13 +338,14 @@ describe('the bell (A7)', () => {
       <NotificationBell href="/notifications/" label="Notifications" unreadCount={0} unreadLabel="0 new" />,
     );
     expect(screen.queryByText('0 new')).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Notifications' })).toBeInTheDocument();
   });
 
   it('is a real link, so the list has its own address and its own Back', () => {
     render(
       <NotificationBell href="/notifications/" label="Notifications" unreadCount={1} unreadLabel="1 new" />,
     );
-    expect(screen.getByRole('link', { name: 'Notifications' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'Notifications, 1 new' })).toHaveAttribute(
       'href',
       '/notifications/',
     );
@@ -417,17 +420,19 @@ describe('the home screen tiles', () => {
     expect(screen.getByText('Food, work, school and health near you.')).toBeInTheDocument();
   });
 
-  it('shows what is waiting as a word, and shows nothing when nothing is', () => {
+  it('says what is waiting in its name, so a dot is never the only telling', () => {
+    // The dot is the glance. The words are what a screen reader gets, and what
+    // anybody who cannot tell the dot from the icon beside it gets.
     const { rerender } = render(
       <NavTile
         href="/notifications/"
         icon={<PlacesIcon />}
         label="Notifications"
         description="What has happened and needs you."
-        countLabel="2 new"
+        alertLabel="2 new"
       />,
     );
-    expect(screen.getByText('2 new')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Notifications, 2 new' })).toBeInTheDocument();
 
     rerender(
       <NavTile
@@ -437,7 +442,7 @@ describe('the home screen tiles', () => {
         description="What has happened and needs you."
       />,
     );
-    expect(screen.queryByText('2 new')).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Notifications' })).toBeInTheDocument();
   });
 });
 

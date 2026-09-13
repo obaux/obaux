@@ -102,10 +102,16 @@ export function PhoneIcon(props: SVGProps<SVGSVGElement>) {
  * swinging. These are things to attend to, not alarms.
  */
 export function BellIcon(props: SVGProps<SVGSVGElement>) {
+  /*
+   * Filled, unlike the navigation icons, which are drawn in line (Will, 13
+   * September). It is the one glyph in the set that has to be found rather
+   * than read — a solid shape survives a cracked screen, bright sun and a
+   * small size in a way an outline does not.
+   */
   return (
-    <svg {...svgProps} {...props}>
-      <path d="M18 8.5a6 6 0 1 0-12 0c0 5-2 6-2 6h16s-2-1-2-6" />
-      <path d="M10.2 18.5a2.2 2.2 0 0 0 3.6 0" />
+    <svg {...svgProps} fill="currentColor" stroke="none" {...props}>
+      <path d="M12 2.5a6.5 6.5 0 0 0-6.5 6.5c0 4.2-1.6 5.6-2.2 6.1a.9.9 0 0 0 .6 1.6h16.2a.9.9 0 0 0 .6-1.6c-.6-.5-2.2-1.9-2.2-6.1A6.5 6.5 0 0 0 12 2.5z" />
+      <path d="M9.6 18.4a2.5 2.5 0 0 0 4.8 0z" />
     </svg>
   );
 }
