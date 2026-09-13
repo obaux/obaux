@@ -25,6 +25,21 @@ edited there, regenerate this list rather than editing it here.
 - **Message volume:** low. A sign-in code when somebody signs in, and at most a
   few reminders a week per person.
 
+## "How do end-users consent to receive messages?", to paste as written
+
+989 characters, so it clears a 1024 cap. This is the field campaigns are
+rejected on most often, and the reason is nearly always an answer that describes
+the app instead of describing the moment of consent. This one names the act (a
+person typing their own number), quotes the words on screen at that moment,
+states what the consent is not (bought, imported, entered by staff, pre-checked,
+a condition of service), and says how it is withdrawn.
+
+> End users opt in inside the PAM app. A person is invited by a staff member at a community organization, then opens PAM and enters their own mobile number on the sign-in screen to request a code. Before the number is submitted, that screen displays: "PAM will text you a code to sign in. Later, we may text you reminders and updates about your account. Reply STOP to stop texts. Reply HELP for help. Text and data rates may apply." Submitting the number is the affirmative act of consent. The same screen links to PAM's privacy notice and terms of service. Numbers are never entered by staff on someone else's behalf, purchased, rented, imported, or obtained from any third party, and there is no pre-checked box. Consent is not required to receive services from any organization listed in PAM. A person may withdraw consent at any time by replying STOP, which ends all messages permanently and cannot be overridden by any setting in the app. A screenshot of the sign-in screen is attached.
+
+Attach the sign-in screenshot with it. A reviewer is checking that the wording
+quoted here is really on that screen — which is why the browser test holds it
+there.
+
 ## The campaign description, to paste as written
 
 The field caps at **1024 characters**. What follows is 1004, so it fits with a
