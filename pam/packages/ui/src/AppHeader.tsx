@@ -25,6 +25,13 @@ import { Badge } from '@astryxdesign/core/Badge';
 export interface AppHeaderProps {
   /** Plain-language role name, already translated. Omitted for signed-out. */
   roleLabel?: string | null;
+  /**
+   * Where the mark sits. Left inside the app, where it shares a row with the
+   * role chip and screens are scanned from the left; centred on the way in,
+   * where it is the only thing on its line and is there to say which app this
+   * is rather than to be navigated past.
+   */
+  align?: 'start' | 'center';
 }
 
 const styles = stylex.create({
@@ -40,10 +47,10 @@ const styles = stylex.create({
   },
 });
 
-export function AppHeader({ roleLabel }: AppHeaderProps) {
+export function AppHeader({ roleLabel, align = 'start' }: AppHeaderProps) {
   return (
     <header {...stylex.props(styles.header)}>
-      <HStack gap={2} align="center" wrap="wrap">
+      <HStack gap={2} align="center" justify={align} wrap="wrap">
         <Text xstyle={styles.mark}>PAM</Text>
         {roleLabel ? <Badge variant="neutral" label={roleLabel} /> : null}
       </HStack>
