@@ -104,17 +104,17 @@ export default function GalleryPage() {
           slides={[
             {
               id: 'places',
-              icon: <PlacesIcon />,
+              image: '/onboarding/places.svg',
               text: 'Find places near you that can help — food, work, school, a doctor.',
             },
             {
               id: 'people',
-              icon: <PeopleIcon />,
+              image: '/onboarding/people.svg',
               text: 'A real person can point you to the right one and answer questions.',
             },
             {
               id: 'plan',
-              icon: <PlanIcon />,
+              image: '/onboarding/plan.svg',
               text: 'PAM reminds you before you go, so nothing gets missed.',
             },
           ]}

@@ -1,12 +1,12 @@
 'use client';
 
-import { useEffect, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { Carousel } from '@astryxdesign/core/Carousel';
 import { HStack } from '@astryxdesign/core/HStack';
 import { VStack } from '@astryxdesign/core/VStack';
 import { Text } from '@astryxdesign/core/Text';
-import { pam } from './tokens.stylex.js';
+import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 
 /**
  * What PAM is, before somebody has any reason to care.
@@ -19,6 +19,13 @@ import { pam } from './tokens.stylex.js';
  * One point per slide, because two points per slide is a paragraph. The picture
  * carries the drama and the line carries the meaning; neither is decoration for
  * the other.
+ *
+ * It takes half the screen, which is what makes it read as an onboarding
+ * slideshow rather than an icon somebody left above a form (Will, 13
+ * September). "Half" is bounded, not literal: the sign-in card below it carries
+ * the sentence about text messages that US carriers require to be on screen
+ * before a number is typed, so the picture gives way on a short phone rather
+ * than pushing that sentence under the fold.
  *
  * No card, no border: the slides sit on the page itself so the card below is
  * unmistakably the thing to act on. One primary action per screen (§2.5), and
@@ -40,8 +47,12 @@ import { pam } from './tokens.stylex.js';
 
 export interface OnboardingSlide {
   readonly id: string;
-  /** Small, single-colour, drawn from the icon set. Decorative — the line carries the meaning. */
-  readonly icon: ReactNode;
+  /**
+   * Artwork for the slide, as a URL. Decorative: it is hidden from assistive
+   * technology and the line below carries the meaning, so nothing is lost if it
+   * never loads.
+   */
+  readonly image: string;
   /** One sentence, plain language. */
   readonly text: string;
 }
@@ -69,21 +80,29 @@ const styles = stylex.create({
     width: '100cqw',
     flexShrink: 0,
     paddingInline: '8px',
-    paddingBlock: '8px',
+    paddingBlock: '4px',
     textAlign: 'center',
   },
   art: {
-    // Large enough to read as a picture rather than an icon, small enough that
-    // the card below it is still on screen on a 320px phone without scrolling —
-    // and the consent line inside that card has to be, before anybody types a
-    // number.
-    fontSize: '44px',
-    lineHeight: 1,
-    // The mark's own green in light, its coral in dark: the illustration is
-    // brand, not chrome.
-    color: pam.brandMark,
+    /*
+     * Half the screen, with a floor and a ceiling.
+     *
+     * 36vh of picture plus its line and the dots comes to about half the
+     * window, which is the proportion that makes this read as onboarding. The
+     * third term is the one that matters and is measured, not guessed: the
+     * mark, the line, the dots and the sign-in card down to the last word of
+     * the consent sentence occupy 512px at the narrowest supported width,
+     * where the text wraps hardest — and that sentence has to be on screen
+     * without scrolling, because US carriers require it there before a number
+     * is typed. So on a tall phone the picture takes its 36vh, and on a 640px
+     * one it gives way instead of pushing the sentence under the fold.
+     */
+    height: 'clamp(120px, 36vh, calc(100vh - 512px))',
+    width: '100%',
+    objectFit: 'contain',
+    display: 'block',
   },
-  line: { fontSize: '18px', lineHeight: 1.45 },
+  line: { fontSize: '18px', lineHeight: 1.45, minHeight: '52px' },
   dot: {
     width: '8px',
     height: '8px',
@@ -95,7 +114,7 @@ const styles = stylex.create({
     transitionProperty: 'opacity',
     transitionDuration: '150ms',
   },
-  here: { opacity: 1, backgroundColor: pam.brandMark },
+  here: { opacity: 1, backgroundColor: colorVars['--color-accent'] },
 });
 
 export function OnboardingSlides({ slides, label }: OnboardingSlidesProps) {
@@ -140,9 +159,12 @@ export function OnboardingSlides({ slides, label }: OnboardingSlidesProps) {
         {slides.map((slide, index) => (
           <div key={slide.id} data-slide={index} {...stylex.props(styles.slide)}>
             <VStack gap={2} align="center">
-              <div aria-hidden="true" {...stylex.props(styles.art)}>
-                {slide.icon}
-              </div>
+              {/*
+                `alt=""` and aria-hidden together: the artwork says nothing the
+                line does not, and a screen reader announcing a filename or a
+                second description of the same idea is noise.
+              */}
+              <img src={slide.image} alt="" aria-hidden="true" {...stylex.props(styles.art)} />
               <Text xstyle={styles.line}>{slide.text}</Text>
             </VStack>
           </div>

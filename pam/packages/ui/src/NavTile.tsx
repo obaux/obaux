@@ -5,6 +5,7 @@ import { HStack } from '@astryxdesign/core/HStack';
 import { VStack } from '@astryxdesign/core/VStack';
 import { Text } from '@astryxdesign/core/Text';
 import { Badge } from '@astryxdesign/core/Badge';
+import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { pam } from './tokens.stylex.js';
 
 /**
@@ -46,7 +47,10 @@ const styles = stylex.create({
   art: {
     fontSize: '28px',
     lineHeight: 1,
-    color: pam.brandMark,
+    // The theme's accent, which is the logo's green in both modes. Naming a hex
+    // here would be a second place for the brand to live, and the two would
+    // drift the first time one of them moved.
+    color: colorVars['--color-icon-accent'],
   },
   label: { fontSize: '18px', fontWeight: 600 },
   // The count is short and the description is long, so without this the count

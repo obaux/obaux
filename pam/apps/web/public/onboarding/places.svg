@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 240" role="img" aria-label="">
+  <!-- Placeholder artwork. Flat, few shapes, no faces and no text: it has to
+       read at a glance on a cracked screen in sun, and it will be replaced by
+       commissioned illustration before the pilot. -->
+  <rect width="320" height="240" rx="20" fill="#E7EFE6"/>
+  <path d="M0 176h320v44a20 20 0 0 1-20 20H20a20 20 0 0 1-20-20z" fill="#CFE0CC"/>
+  <rect x="34" y="96" width="66" height="84" rx="8" fill="#0F5847" opacity=".18"/>
+  <rect x="112" y="72" width="74" height="108" rx="8" fill="#0F5847" opacity=".28"/>
+  <rect x="198" y="112" width="60" height="68" rx="8" fill="#0F5847" opacity=".18"/>
+  <path d="M160 28c-21 0-38 17-38 38 0 27 38 60 38 60s38-33 38-60c0-21-17-38-38-38z" fill="#0F5847"/>
+  <circle cx="160" cy="65" r="13" fill="#E7EFE6"/>
+</svg>

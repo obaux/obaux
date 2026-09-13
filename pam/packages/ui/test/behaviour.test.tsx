@@ -443,9 +443,9 @@ describe('the home screen tiles', () => {
 
 describe('the way in explains itself first', () => {
   const slides = [
-    { id: 'places', icon: <PlacesIcon />, text: 'Find places near you that can help.' },
-    { id: 'people', icon: <PlacesIcon />, text: 'A real person can point you to the right one.' },
-    { id: 'plan', icon: <PlacesIcon />, text: 'PAM reminds you before you go.' },
+    { id: 'places', image: '/onboarding/places.svg', text: 'Find places near you that can help.' },
+    { id: 'people', image: '/onboarding/people.svg', text: 'A real person can point you to the right one.' },
+    { id: 'plan', image: '/onboarding/plan.svg', text: 'PAM reminds you before you go.' },
   ];
 
   it('puts every slide in the page, so nothing depends on being able to swipe', () => {

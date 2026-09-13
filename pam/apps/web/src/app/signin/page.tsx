@@ -14,9 +14,6 @@ import {
   Notice,
   OnboardingSlides,
   Page,
-  PeopleIcon,
-  PlacesIcon,
-  PlanIcon,
   TextField,
   TextLink,
 } from '@pam/ui';
@@ -87,9 +84,9 @@ export default function SignInPage() {
    */
   const slides = useMemo(
     () => [
-      { id: 'places', icon: <PlacesIcon />, text: t('onboarding.1') },
-      { id: 'people', icon: <PeopleIcon />, text: t('onboarding.2') },
-      { id: 'plan', icon: <PlanIcon />, text: t('onboarding.3') },
+      { id: 'places', image: '/onboarding/places.svg', text: t('onboarding.1') },
+      { id: 'people', image: '/onboarding/people.svg', text: t('onboarding.2') },
+      { id: 'plan', image: '/onboarding/plan.svg', text: t('onboarding.3') },
     ],
     [t],
   );

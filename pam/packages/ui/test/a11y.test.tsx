@@ -61,8 +61,8 @@ describe('accessibility', () => {
       <OnboardingSlides
         label="How PAM works"
         slides={[
-          { id: 'a', icon: <PlacesIcon />, text: 'Find places near you that can help.' },
-          { id: 'b', icon: <PlacesIcon />, text: 'A real person can answer questions.' },
+          { id: 'a', image: '/onboarding/places.svg', text: 'Find places near you that can help.' },
+          { id: 'b', image: '/onboarding/people.svg', text: 'A real person can answer questions.' },
         ]}
       />,
     );
