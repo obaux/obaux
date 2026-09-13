@@ -6,6 +6,7 @@ import { HStack } from '@astryxdesign/core/HStack';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { Button } from '@astryxdesign/core/Button';
+import { Icon } from '@astryxdesign/core/Icon';
 import { AppHeader, BigButton, Notice, NotificationList } from '@pam/ui';
 import { useI18n } from '@/lib/i18n';
 import { useSupportPhone } from '@/lib/useSupportPhone';
@@ -54,7 +55,7 @@ export default function NotificationsPage() {
             label={t('admin.back')}
             variant="ghost"
             href="/admin/"
-            icon="chevronLeft"
+            icon={<Icon icon="chevronLeft" />}
             xstyle={styles.back}
           />
         </HStack>

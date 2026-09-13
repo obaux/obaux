@@ -5,7 +5,6 @@ import { VStack } from '@astryxdesign/core/VStack';
 import { HStack } from '@astryxdesign/core/HStack';
 import { Text } from '@astryxdesign/core/Text';
 import { Button } from '@astryxdesign/core/Button';
-import { IconButton } from '@astryxdesign/core/IconButton';
 
 /**
  * What has happened that somebody has to act on.
@@ -64,9 +63,8 @@ const styles = stylex.create({
     paddingInline: '4px',
   },
   when: { fontSize: '15px', flexShrink: 0, whiteSpace: 'nowrap' },
-  check: { minHeight: '48px', minWidth: '48px', fontSize: '17px', flexShrink: 0 },
-  // Reserved so a read row does not shuffle left where an unread one has a tick.
-  tickSpacer: { minWidth: '48px' },
+  check: { minHeight: '48px', fontSize: '15px' },
+  meta: { paddingInline: '4px' },
   empty: { fontSize: '17px' },
 });
 
@@ -92,31 +90,35 @@ export function NotificationList({
           by side rather than stacked: this is a list to scan, and stacking each
           row into two lines turns a short list into a scroll.
         */
-        <HStack key={item.id} gap={2} align="center" wrap="nowrap" xstyle={styles.row}>
+        <VStack key={item.id} gap={0} xstyle={styles.row}>
+          {/*
+            The line, then when and the tick beneath it. On a screen of its own
+            there is room to show the whole sentence, and a notice cut off at
+            "Someone said a message i…" is a notice somebody has to open to
+            understand — which defeats a list meant for scanning.
+          */}
           <Button
             label={item.text}
             variant="ghost"
             onClick={() => onSelect?.(item.id)}
             xstyle={styles.text}
           />
-          <Text type="supporting" xstyle={styles.when}>
-            {item.when}
-          </Text>
-          {item.isRead ? (
-            <span {...stylex.props(styles.tickSpacer)} aria-hidden="true" />
-          ) : (
-            // A tick, labelled for anybody not looking at it. Unread is carried
-            // by this control being here at all, so the state never depends on
-            // seeing a colour.
-            <IconButton
-              label={labels.markRead}
-              icon={<span aria-hidden="true">✓</span>}
-              variant="ghost"
-              onClick={() => onMarkRead?.(item.id)}
-              xstyle={styles.check}
-            />
-          )}
-        </HStack>
+          <HStack gap={2} align="center" wrap="wrap" xstyle={styles.meta}>
+            <Text type="supporting" xstyle={styles.when}>
+              {item.when}
+            </Text>
+            {item.isRead ? null : (
+              // Labelled in words here: a screen has room, and "Mark as read"
+              // beats a tick somebody has to hover to understand.
+              <Button
+                label={labels.markRead}
+                variant="ghost"
+                onClick={() => onMarkRead?.(item.id)}
+                xstyle={styles.check}
+              />
+            )}
+          </HStack>
+        </VStack>
       ))}
     </VStack>
   );
