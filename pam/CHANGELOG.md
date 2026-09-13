@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.8.0] — 2026-09-13 · Reminders are something you ask for
+
+### Changed — the tick box that starts unticked
+
+Text reminders are now a separate, deliberate yes. The sign-in screen asks, the
+box starts empty, and signing in works whether or not it is ticked — nobody has
+to accept texts to get help. A person who never ticks it still gets every
+sign-in code they ask for and nothing else.
+
+### Added — notifications have a screen
+
+Reached from a bell in the case manager's header, with Back where every phone
+puts it. What has happened, when, and a tick to clear it.
+
 ## [0.7.0] — 2026-09-13 · A working front door
 
 ### Added — sign-in actually signs you in

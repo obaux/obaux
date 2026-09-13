@@ -53,15 +53,18 @@ phone on 13 September. One door for every role: what you see after the code come
 from the account, never from which link you followed.
 
 The limit now is Twilio's, not PAM's: the account is still in trial, so only
-numbers verified by hand in the Twilio console can receive a text. **The carrier
-registration was submitted on 13 September and is in review** — brand under Oba,
-campaign under PAM. Until it is approved the pilot cannot start, however finished
+numbers verified by hand in the Twilio console can receive a text. **The carrier registration was rejected
+on 13 September (30925) and needs resubmitting** — brand under Oba, campaign
+under PAM. The rejection was right: consent was implied rather than actively
+given, so PAM now has a tick box that starts unticked, and reminders are off for
+anybody who never ticks it (D-085). Until it is approved the pilot cannot start, however finished
 the app is. What was filed is in `docs/sms-campaign-samples.md`; setup and the
 known traps are in `docs/sms-setup.md`.
 
-One correction already made in flight: the first submission declared no embedded
-links, which nine of the thirteen messages carry. Worth knowing if a later
-question asks why the campaign was resubmitted.
+Two corrections so far: the first submission declared no embedded links, which
+nine of the thirteen messages carry, and the second was rejected for pre-implied
+consent. The current opt-in answer and description to paste are in
+`docs/sms-campaign-samples.md`.
 
 **The first admin exists** — Will, Philadelphia, created 12 September and proven
 by generating a live invite code (`9T3YTVMT`, valid 30 days).
@@ -102,7 +105,7 @@ Numbers here are from the last run, not aspirations.
 | Database suite | 152 checks pass | See below |
 | Live RLS fingerprint | identical to local | The deployed policy set is provably the one that was penetration-tested: `ce9636c3b77e4827368e6575742b899c`, 73 policies on both |
 | Live anonymous attack | 0 rows leaked | A signed-out caller reads no profiles, messages, invites or audit rows on the real database, while still reaching the support number and the public catalogue |
-| Browser a11y + theme | 171 pass | No WCAG AA violations at 320px or iPhone SE. Every control clears 48px. No horizontal scroll. The Astryx theme really resolves. Runs in dark mode as well as light. |
+| Browser a11y + theme | 183 pass | No WCAG AA violations at 320px or iPhone SE. Every control clears 48px. No horizontal scroll. The Astryx theme really resolves. Runs in dark mode as well as light. |
 | First-load JS | 490.1 kB of 500 kB | §12 budget, measured gzipped on what `index.html` actually loads |
 
 ### The database suite is the one that matters
@@ -155,9 +158,8 @@ oversight:
   credentials in the function's secrets — and, beyond that, the carrier
   registration. Blank `reviewedBy` still stops everything, and a new template
   starts blank.
-- **Notifications are readable on the case manager screen** — a bell in the
-  header with the count in words, opening a one-line-per-row panel. Still to
-  come:
+- **Notifications have a screen of their own** at `/notifications/`, reached
+  from a bell in the case manager's header. Still to come:
   the same bar on the super admin panel, and opening a row to the person or
   place it is about, which needs the member profile screen to exist first.
 - **No device build.** Capacitor is configured; `cap add ios/android` has never

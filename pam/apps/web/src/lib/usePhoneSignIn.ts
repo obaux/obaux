@@ -32,7 +32,7 @@ export function toE164(input: string): string | null {
 export function usePhoneSignIn(): {
   state: SignInStep;
   sendCode: (phone: string) => Promise<void>;
-  verifyCode: (code: string) => Promise<void>;
+  verifyCode: (code: string, wantsReminders?: boolean) => Promise<void>;
   startOver: () => void;
 } {
   const [state, setState] = useState<SignInStep>({ step: 'phone' });
@@ -54,18 +54,41 @@ export function usePhoneSignIn(): {
     }
   };
 
-  const verifyCode = async (code: string): Promise<void> => {
+  /**
+   * Records that somebody ticked the reminders box, once they are signed in.
+   *
+   * Written after the code is verified rather than before, because until then
+   * there is no account to record it against. A failure here is deliberately
+   * silent to the member: reminders staying off is the safe direction, and a
+   * sign-in that succeeded should not present itself as broken.
+   */
+  const recordReminderConsent = async (userId: string): Promise<void> => {
+    try {
+      const { createClient } = await import('./supabase');
+      await createClient()
+        .from('notification_preferences')
+        .upsert({ member_id: userId, sms_enabled: true }, { onConflict: 'member_id' });
+    } catch {
+      // Left off. A member can turn reminders on again from their own settings.
+    }
+  };
+
+  const verifyCode = async (code: string, wantsReminders = false): Promise<void> => {
     const phone = 'phone' in state ? state.phone : null;
     if (!phone) return;
 
     setState({ step: 'verifying', phone });
     try {
       const { createClient } = await import('./supabase');
-      const { error } = await createClient().auth.verifyOtp({
+      const { data, error } = await createClient().auth.verifyOtp({
         phone,
         token: code.replace(/\D/g, ''),
         type: 'sms',
       });
+
+      if (!error && wantsReminders && data.user) {
+        await recordReminderConsent(data.user.id);
+      }
       setState(error ? { step: 'failed', reason: 'verify', phone } : { step: 'done' });
     } catch {
       setState({ step: 'failed', reason: 'verify', phone });

@@ -56,18 +56,29 @@ Two consequences worth knowing before submitting:
 
 ## "How do end-users consent to receive messages?", to paste as written
 
-989 characters, so it clears a 1024 cap. This is the field campaigns are
-rejected on most often, and the reason is nearly always an answer that describes
-the app instead of describing the moment of consent. This one names the act (a
-person typing their own number), quotes the words on screen at that moment,
-states what the consent is not (bought, imported, entered by staff, pre-checked,
-a condition of service), and says how it is withdrawn.
+979 characters, so it clears a 1024 cap.
 
-> End users opt in inside the PAM app. A person is invited by a staff member at a community organization, then opens PAM and enters their own mobile number on the sign-in screen to request a code. Before the number is submitted, that screen displays: "PAM will text you a code to sign in. Later, we may text you reminders and updates about your account. Reply STOP to stop texts. Reply HELP for help. Text and data rates may apply." Submitting the number is the affirmative act of consent. The same screen links to PAM's privacy notice and terms of service. Numbers are never entered by staff on someone else's behalf, purchased, rented, imported, or obtained from any third party, and there is no pre-checked box. Consent is not required to receive services from any organization listed in PAM. A person may withdraw consent at any time by replying STOP, which ends all messages permanently and cannot be overridden by any setting in the app. A screenshot of the sign-in screen is attached.
+**This answer changed on 13 September after a rejection**, and the app changed
+with it. The first submission described consent as implied by typing a number
+and tapping a button, and the carrier rejected it with **30925: "opt-in must be
+unchecked by default; active consent required."** They were right. Describing it
+differently would not have fixed it — a tick box that starts unticked had to
+exist, so one was built.
 
-Attach the sign-in screenshot with it. A reviewer is checking that the wording
-quoted here is really on that screen — which is why the browser test holds it
-there.
+The distinction the answer turns on, which is also the honest one: a sign-in
+code is not the same promise as a reminder. PAM has no passwords, so asking for
+a code *is* asking to be texted one. A reminder arrives days later, unprompted,
+on a phone somebody else may be holding. Those get separate answers, and the
+second one starts as no.
+
+Sign-in works with the box untouched. That is deliberate and it also answers
+30923, "message consent cannot be required for service use": nobody has to
+accept texts to get help.
+
+> End users opt in inside the PAM app, and reminders are never pre-selected. A person is invited by a staff member, then enters their own mobile number on PAM's sign-in screen to request a one-time sign-in code. PAM has no passwords, so requesting the code is the request to be texted it. On that same screen is a checkbox, UNCHECKED by default: "Also text me reminders about things I plan. You can change this later. Reply STOP any time." Ticking it is the active consent for reminders and account notices. The sign-in button works whether or not it is ticked, so messaging consent is never a condition of using PAM or of getting help from any organization listed in it. The screen also states that PAM will text a code, that STOP stops texts, that HELP gets help, and that rates may apply, and links to the privacy notice and terms. Numbers are never bought, rented, imported, or entered by staff for someone else. Consent is withdrawn by replying STOP. A screenshot is attached.
+
+Attach the sign-in screenshot. The reviewer is checking that the box is really
+unticked and that the wording quoted here is really on that screen.
 
 ## The campaign description, to paste as written
 

@@ -18,11 +18,12 @@ export { PointsBadge, type PointsBadgeProps } from './PointsBadge.js';
 export { HelpBar, type HelpBarProps } from './HelpBar.js';
 export { Notice, type NoticeProps } from './Notice.js';
 export { AppHeader, type AppHeaderProps } from './AppHeader.js';
+export { NotificationBell, type NotificationBellProps } from './NotificationBell.js';
 export {
-  NotificationBar,
-  type NotificationBarProps,
+  NotificationList,
+  type NotificationListProps,
   type NotificationItem,
-} from './NotificationBar.js';
+} from './NotificationList.js';
 export { VoiceInput, type VoiceInputProps, type SpeechRecognizer } from './VoiceInput.js';
 export { TextField, type TextFieldProps } from './TextField.js';
 export { BellIcon } from './icons.js';

@@ -10,7 +10,7 @@ import { Text } from '@astryxdesign/core/Text';
 import { Badge } from '@astryxdesign/core/Badge';
 import { Avatar } from '@astryxdesign/core/Avatar';
 import { Button } from '@astryxdesign/core/Button';
-import { AppHeader, BigButton, Notice, NotificationBar } from '@pam/ui';
+import { AppHeader, BigButton, Notice, NotificationBell } from '@pam/ui';
 import { NOTICES } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { useSupportPhone } from '@/lib/useSupportPhone';
@@ -77,21 +77,6 @@ function statusChip(
   return { label: t('admin.status.offCount', { count: names.length }), tone: 'warning' };
 }
 
-/**
- * When something happened, said the way a person would say it.
- *
- * Today and yesterday are named rather than dated, because that is the
- * difference that decides whether somebody acts now — "13 Sept" makes a reader
- * do arithmetic to answer "is this new?".
- */
-function whenHappened(iso: string, locale: string, t: (k: string) => string): string {
-  const then = new Date(iso);
-  const days = Math.floor((Date.now() - then.getTime()) / 86_400_000);
-  if (days <= 0) return t('when.today');
-  if (days === 1) return t('when.yesterday');
-  return new Intl.DateTimeFormat(locale, { month: 'short', day: 'numeric' }).format(then);
-}
-
 function whenLastActive(iso: string | null, locale: string): string | null {
   if (!iso) return null;
   return new Intl.DateTimeFormat(locale, { month: 'short', day: 'numeric' }).format(new Date(iso));
@@ -104,7 +89,7 @@ export default function AdminPage() {
 
   const isAdmin = session.status === 'signed-in' && session.session.role === 'admin';
   const { state: caseload, refresh } = useCaseload(isAdmin);
-  const { state: notifications, markRead } = useNotifications(isAdmin);
+  const { state: notifications } = useNotifications(isAdmin);
 
   const [invite, setInvite] = useState<CreatedInvite | null>(null);
   const [inviteBusy, setInviteBusy] = useState(false);
@@ -200,32 +185,23 @@ export default function AdminPage() {
     <main {...stylex.props(styles.page)}>
       <VStack gap={4}>
         {/*
-          The bell sits in the header row, where somebody looks to find out
-          whether anything needs them, and the list opens beneath it without
-          moving the caseload. What reaches it: a place one of their people
-          saved was flagged, or a message in their caseload was reported.
-          Nothing else, and no row carries anybody's words (A7 / D-080).
+          The bell says how many things need this case manager; the list is a
+          screen of its own. A glance belongs in the header, the work does not
+          (D-084). What reaches it: a place one of their people saved was
+          flagged, or a message in their caseload was reported. Nothing else,
+          and no row carries anybody's words (A7 / D-080).
         */}
         <AppHeader
           roleLabel={t('role.admin')}
           trailing={
             notifications.status === 'ready' ? (
-              <NotificationBar
-                items={notifications.items.map((item) => ({
-                  id: item.id,
-                  text: t(item.bodyKey, item.bodyVars),
-                  when: whenHappened(item.createdAt, locale, t),
-                  isRead: item.isRead,
-                }))}
-                labels={{
-                  title: t('notify.title'),
-                  unread: t('notify.unread', {
-                    count: notifications.items.filter((i) => !i.isRead).length,
-                  }),
-                  empty: t('notify.none'),
-                  markRead: t('notify.markRead'),
-                }}
-                onMarkRead={(id) => void markRead(id)}
+              <NotificationBell
+                href="/notifications/"
+                label={t('notify.title')}
+                unreadCount={notifications.items.filter((i) => !i.isRead).length}
+                unreadLabel={t('notify.unread', {
+                  count: notifications.items.filter((i) => !i.isRead).length,
+                })}
               />
             ) : null
           }

@@ -1346,6 +1346,40 @@ takes a component for exactly this case. That is not a second icon system — th
 drawing is handed to Astryx's `IconButton`, and colour and size come from the
 theme.
 
+### D-084 — The notification list is a screen, not a panel
+Will: notifications need their own screen with a back button.
+
+A panel is right for a glance and wrong for the job that follows. This is a list
+somebody works through one item at a time, leaving to look at a person or a
+place and coming back — and on a phone a panel covers the thing it is about and
+closes if you breathe on it.
+
+So the bell is a real link to `/notifications/`. That also buys three things a
+panel cannot have: the list has an address, the browser's own Back works, and it
+survives a dropped connection.
+
+### D-085 — Reminders are a separate yes, and it starts as no
+The carrier rejected PAM's campaign with 30925: "opt-in must be unchecked by
+default; active consent required." That is a product problem, not a wording one,
+and the rejection was correct.
+
+Two kinds of message, two answers:
+
+- **The sign-in code.** PAM has no passwords, so asking for a code is asking to
+  be texted one. Nobody is surprised by it and nothing else works without it.
+- **Reminders and notices.** They arrive days later, unprompted, on a phone
+  somebody else may be holding. Wanting help finding a food pantry is not
+  agreeing to be texted about it next Tuesday.
+
+So the sign-in screen carries a tick box that starts unticked, `sms_enabled`
+now defaults to false (0042), and a member who never ticks it gets every code
+they ask for and nothing else. **Sign-in works either way** — which is the other
+half of the rule (30923: consent cannot be required for service use), and is
+what stops consent becoming a toll on getting help.
+
+Anybody already in `notification_preferences` was switched off rather than
+grandfathered in. They predate the box and never agreed to anything.
+
 ---
 
 ## Notes for whoever picks this up next

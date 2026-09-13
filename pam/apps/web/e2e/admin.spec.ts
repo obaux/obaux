@@ -268,20 +268,32 @@ test.describe('what has happened that a case manager has to act on', () => {
     },
   ];
 
-  test('says how many are new, and opens to the list', async ({ page }) => {
+  test('the bell says how many are new, and leads to the list', async ({ page }) => {
     await signedInAs(page, 'admin', [], [], notifications);
     await page.goto('/admin/');
 
     await expect(page.getByText('1 new')).toBeVisible();
-    await page.getByRole('button', { name: 'Notifications' }).click();
+    await expect(page.getByRole('link', { name: 'Notifications' })).toHaveAttribute(
+      'href',
+      '/notifications/',
+    );
+  });
+
+  test('the list is its own screen, with a way back', async ({ page }) => {
+    await signedInAs(page, 'admin', [], [], notifications);
+    await page.goto('/notifications/');
+
+    await expect(page.getByRole('heading', { name: 'Notifications' })).toBeVisible();
     await expect(page.getByText('Someone reported a place: closed')).toBeVisible();
     await expect(page.getByText('Someone said a message is not safe')).toBeVisible();
+    // §0: never dead-end.
+    await expect(page.getByRole('link', { name: 'Back' })).toHaveAttribute('href', '/admin/');
+    await expect(page.getByRole('link', { name: 'Get help' })).toBeVisible();
   });
 
   test('dates the new one as today rather than making somebody do arithmetic', async ({ page }) => {
     await signedInAs(page, 'admin', [], [], notifications);
-    await page.goto('/admin/');
-    await page.getByRole('button', { name: 'Notifications' }).click();
+    await page.goto('/notifications/');
 
     await expect(page.getByText('Today')).toBeVisible();
     await expect(page.getByText('Yesterday')).toBeVisible();
@@ -290,10 +302,9 @@ test.describe('what has happened that a case manager has to act on', () => {
   test('carries no words anybody wrote', async ({ page }) => {
     // §4.1: a notification is a nudge to look, never a copy of the thing. The
     // message body lives behind the review screen and its warning, and must not
-    // leak into a list that sits on the front page of the panel.
+    // leak into this list.
     await signedInAs(page, 'admin', [], [], notifications);
-    await page.goto('/admin/');
-    await page.getByRole('button', { name: 'Notifications' }).click();
+    await page.goto('/notifications/');
 
     const body = await page.locator('main').innerText();
     expect(body).not.toMatch(/"|“|”/);
@@ -301,17 +312,14 @@ test.describe('what has happened that a case manager has to act on', () => {
 
   test('says plainly when there is nothing', async ({ page }) => {
     await signedInAs(page, 'admin', [], [], []);
-    await page.goto('/admin/');
+    await page.goto('/notifications/');
 
-    await expect(page.getByText('1 new')).toBeHidden();
-    await page.getByRole('button', { name: 'Notifications' }).click();
     await expect(page.getByText('Nothing needs you right now.')).toBeVisible();
   });
 
-  test('has no WCAG A/AA violations with the list open', async ({ page }) => {
+  test('has no WCAG A/AA violations', async ({ page }) => {
     await signedInAs(page, 'admin', [], [], notifications);
-    await page.goto('/admin/');
-    await page.getByRole('button', { name: 'Notifications' }).click();
+    await page.goto('/notifications/');
 
     const results = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])

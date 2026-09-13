@@ -42,3 +42,39 @@ test.describe('consent to be texted', () => {
     await expect(page.getByText(en['signin.phone.consent'])).toBeVisible();
   });
 });
+
+/**
+ * Reminders are a separate yes, and it starts as no.
+ *
+ * A carrier rejected PAM's first campaign with 30925 — "opt-in must be
+ * unchecked by default; active consent required" — and these are the tests that
+ * keep the fix in place. A tick box that arrives pre-ticked, or a sign-in that
+ * refuses to proceed without it, both fail here.
+ */
+test.describe('agreeing to reminders', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/signin/');
+  });
+
+  test('starts unticked', async ({ page }) => {
+    const box = page.getByRole('checkbox', { name: /reminders/i });
+    await expect(box).toBeVisible();
+    await expect(box).not.toBeChecked();
+  });
+
+  test('is not a condition of signing in', async ({ page }) => {
+    // Consent cannot be the price of getting help (30923). The button is live
+    // with the box untouched.
+    await page.getByLabel('Your phone number').fill('215 555 0100');
+    await expect(page.getByRole('button', { name: 'Send me a code' })).toBeEnabled();
+  });
+
+  test('ticks and unticks, and says it can be changed later', async ({ page }) => {
+    const box = page.getByRole('checkbox', { name: /reminders/i });
+    await box.check();
+    await expect(box).toBeChecked();
+    await box.uncheck();
+    await expect(box).not.toBeChecked();
+    await expect(page.getByText(/change this later/i)).toBeVisible();
+  });
+});

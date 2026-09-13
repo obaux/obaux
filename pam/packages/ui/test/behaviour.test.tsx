@@ -2,7 +2,8 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import { PlaceCard, googlePlaceHref, directionsHref } from '../src/PlaceCard.js';
 import { AppHeader } from '../src/AppHeader.js';
-import { NotificationBar } from '../src/NotificationBar.js';
+import { NotificationBell } from '../src/NotificationBell.js';
+import { NotificationList } from '../src/NotificationList.js';
 import { PointsBadge } from '../src/PointsBadge.js';
 import { HelpBar } from '../src/HelpBar.js';
 import { VoiceInput } from '../src/VoiceInput.js';
@@ -297,44 +298,49 @@ describe('the header says which app you are in', () => {
   });
 });
 
-describe('NotificationBar (A7)', () => {
-  const labels = {
-    title: 'Notifications',
-    unread: '2 new',
-    empty: 'Nothing needs you right now.',
-    markRead: 'Mark as read',
-  };
+describe('the bell (A7)', () => {
+  it('says how many are new in words, not only a colour', () => {
+    // A dot tells a screen reader nothing, and tells a colour-blind reader less
+    // than it tells everybody else.
+    render(
+      <NotificationBell href="/notifications/" label="Notifications" unreadCount={2} unreadLabel="2 new" />,
+    );
+    expect(screen.getByText('2 new')).toBeInTheDocument();
+  });
+
+  it('says nothing at all when nothing is new', () => {
+    render(
+      <NotificationBell href="/notifications/" label="Notifications" unreadCount={0} unreadLabel="0 new" />,
+    );
+    expect(screen.queryByText('0 new')).not.toBeInTheDocument();
+  });
+
+  it('is a real link, so the list has its own address and its own Back', () => {
+    render(
+      <NotificationBell href="/notifications/" label="Notifications" unreadCount={1} unreadLabel="1 new" />,
+    );
+    expect(screen.getByRole('link', { name: 'Notifications' })).toHaveAttribute(
+      'href',
+      '/notifications/',
+    );
+  });
+});
+
+describe('the notification list (A7)', () => {
+  const labels = { empty: 'Nothing needs you right now.', markRead: 'Mark as read' };
   const items = [
     { id: 'a', text: 'Someone reported a place: closed', when: 'Today', isRead: false },
     { id: 'b', text: 'Someone said a message is not safe', when: 'Yesterday', isRead: false },
     { id: 'c', text: 'A place was taken off the list', when: 'Sept 9', isRead: true },
   ];
 
-  it('says how many are new in words, not only a colour', () => {
-    render(<NotificationBar items={items} labels={labels} />);
-    // A dot tells a screen reader nothing and tells a colour-blind reader less
-    // than it tells everybody else.
-    expect(screen.getByText('2 new')).toBeInTheDocument();
-  });
-
-  it('starts closed, so the list does not push the caseload off the screen', () => {
-    render(<NotificationBar items={items} labels={labels} />);
-    expect(screen.queryByText(items[0]!.text)).not.toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Notifications' })).toHaveAttribute(
-      'aria-expanded',
-      'false',
-    );
-  });
-
-  it('opens to the list, newest first as given', () => {
-    render(<NotificationBar items={items} labels={labels} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Notifications' }));
+  it('shows every notice, newest first as given', () => {
+    render(<NotificationList items={items} labels={labels} />);
     for (const item of items) expect(screen.getByText(item.text)).toBeInTheDocument();
   });
 
   it('offers "mark as read" only on the ones that are not read', () => {
-    render(<NotificationBar items={items} labels={labels} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Notifications' }));
+    render(<NotificationList items={items} labels={labels} />);
     expect(screen.getAllByRole('button', { name: 'Mark as read' })).toHaveLength(2);
   });
 
@@ -342,25 +348,19 @@ describe('NotificationBar (A7)', () => {
     // Reading a list is not dealing with what is in it, and a count that clears
     // itself hides work from the person who has to do it.
     const onMarkRead = vi.fn();
-    render(<NotificationBar items={items} labels={labels} onMarkRead={onMarkRead} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Notifications' }));
+    render(<NotificationList items={items} labels={labels} onMarkRead={onMarkRead} />);
     expect(onMarkRead).not.toHaveBeenCalled();
-    expect(screen.getByText('2 new')).toBeInTheDocument();
   });
 
   it('opens a row to whatever it is about', () => {
     const onSelect = vi.fn();
-    render(<NotificationBar items={items} labels={labels} onSelect={onSelect} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Notifications' }));
+    render(<NotificationList items={items} labels={labels} onSelect={onSelect} />);
     fireEvent.click(screen.getByRole('button', { name: items[1]!.text }));
     expect(onSelect).toHaveBeenCalledWith('b');
   });
 
   it('says so plainly when there is nothing, rather than showing an empty box', () => {
-    render(<NotificationBar items={[]} labels={labels} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Notifications' }));
+    render(<NotificationList items={[]} labels={labels} />);
     expect(screen.getByText(labels.empty)).toBeInTheDocument();
-    // Nothing unread means no count at all, not "0 new".
-    expect(screen.queryByText('2 new')).not.toBeInTheDocument();
   });
 });
