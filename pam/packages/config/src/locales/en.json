@@ -306,5 +306,7 @@
   "transparency.title": "What the person who invited you can see",
   "voice.listening": "Listening",
   "voice.start": "Tap to talk",
-  "voice.stop": "Stop"
+  "voice.stop": "Stop",
+  "when.today": "Today",
+  "when.yesterday": "Yesterday"
 }

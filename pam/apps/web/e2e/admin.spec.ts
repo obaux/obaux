@@ -15,6 +15,7 @@ const PROFILES = '**/rest/v1/profiles*';
 const POINTS = '**/rest/v1/rpc/member_points*';
 const INVITE = '**/rest/v1/rpc/create_invite*';
 const CONTROLS = '**/rest/v1/access_controls*';
+const NOTIFICATIONS = '**/rest/v1/notifications*';
 
 const ADMIN_ID = 'de3b9c2e-ec2f-403b-93e5-86e6ee75349b';
 
@@ -51,8 +52,10 @@ async function signedInAs(
   role: 'admin' | 'member',
   members: unknown[] = [],
   controls: unknown[] = [],
+  notifications: unknown[] = [],
 ) {
   await seedSession(page);
+  await page.route(NOTIFICATIONS, (route) => route.fulfill(json(notifications)));
   await page.route(CONTROLS, (route) => route.fulfill(json(controls)));
   await page.route(USER, (route) => route.fulfill(json({ id: ADMIN_ID, phone: '12673095265' })));
   await page.route(POINTS, (route) => route.fulfill(json(250)));
@@ -228,6 +231,91 @@ test.describe('the case manager screen', () => {
           .join('\n\n'),
       );
     }
+    expect(results.violations).toEqual([]);
+  });
+});
+
+
+/**
+ * The notification bar (A7 / D-080).
+ *
+ * A case manager is told when a place one of their people saved is flagged, and
+ * when a message in their caseload is reported. What is tested here is not that
+ * a list renders — it is that the list says enough to act on and never more
+ * than §4.1 allows.
+ */
+test.describe('what has happened that a case manager has to act on', () => {
+  const notifications = [
+    {
+      id: 'n1',
+      kind: 'service_flagged',
+      body_key: 'notify.service_flagged',
+      body_vars: { reason: 'closed' },
+      subject_type: 'service',
+      subject_id: 's1',
+      created_at: new Date().toISOString(),
+      read_at: null,
+    },
+    {
+      id: 'n2',
+      kind: 'message_reported',
+      body_key: 'notify.message_reported',
+      body_vars: {},
+      subject_type: 'report',
+      subject_id: 'r1',
+      created_at: new Date(Date.now() - 86_400_000).toISOString(),
+      read_at: '2026-09-13T00:00:00Z',
+    },
+  ];
+
+  test('says how many are new, and opens to the list', async ({ page }) => {
+    await signedInAs(page, 'admin', [], [], notifications);
+    await page.goto('/admin/');
+
+    await expect(page.getByText('1 new')).toBeVisible();
+    await page.getByRole('button', { name: 'Notifications' }).click();
+    await expect(page.getByText('Someone reported a place: closed')).toBeVisible();
+    await expect(page.getByText('Someone said a message is not safe')).toBeVisible();
+  });
+
+  test('dates the new one as today rather than making somebody do arithmetic', async ({ page }) => {
+    await signedInAs(page, 'admin', [], [], notifications);
+    await page.goto('/admin/');
+    await page.getByRole('button', { name: 'Notifications' }).click();
+
+    await expect(page.getByText('Today')).toBeVisible();
+    await expect(page.getByText('Yesterday')).toBeVisible();
+  });
+
+  test('carries no words anybody wrote', async ({ page }) => {
+    // §4.1: a notification is a nudge to look, never a copy of the thing. The
+    // message body lives behind the review screen and its warning, and must not
+    // leak into a list that sits on the front page of the panel.
+    await signedInAs(page, 'admin', [], [], notifications);
+    await page.goto('/admin/');
+    await page.getByRole('button', { name: 'Notifications' }).click();
+
+    const body = await page.locator('main').innerText();
+    expect(body).not.toMatch(/"|“|”/);
+  });
+
+  test('says plainly when there is nothing', async ({ page }) => {
+    await signedInAs(page, 'admin', [], [], []);
+    await page.goto('/admin/');
+
+    await expect(page.getByText('1 new')).toBeHidden();
+    await page.getByRole('button', { name: 'Notifications' }).click();
+    await expect(page.getByText('Nothing needs you right now.')).toBeVisible();
+  });
+
+  test('has no WCAG A/AA violations with the list open', async ({ page }) => {
+    await signedInAs(page, 'admin', [], [], notifications);
+    await page.goto('/admin/');
+    await page.getByRole('button', { name: 'Notifications' }).click();
+
+    const results = await new AxeBuilder({ page })
+      .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
+      .analyze();
     expect(results.violations).toEqual([]);
   });
 });

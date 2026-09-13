@@ -18,5 +18,10 @@ export { PointsBadge, type PointsBadgeProps } from './PointsBadge.js';
 export { HelpBar, type HelpBarProps } from './HelpBar.js';
 export { Notice, type NoticeProps } from './Notice.js';
 export { AppHeader, type AppHeaderProps } from './AppHeader.js';
+export {
+  NotificationBar,
+  type NotificationBarProps,
+  type NotificationItem,
+} from './NotificationBar.js';
 export { VoiceInput, type VoiceInputProps, type SpeechRecognizer } from './VoiceInput.js';
 export { pam } from './tokens.stylex.js';

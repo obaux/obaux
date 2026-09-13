@@ -10,12 +10,13 @@ import { Text } from '@astryxdesign/core/Text';
 import { Badge } from '@astryxdesign/core/Badge';
 import { Avatar } from '@astryxdesign/core/Avatar';
 import { Button } from '@astryxdesign/core/Button';
-import { AppHeader, BigButton, Notice } from '@pam/ui';
+import { AppHeader, BigButton, Notice, NotificationBar } from '@pam/ui';
 import { NOTICES } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession, signOut } from '@/lib/useSession';
 import { useCaseload, createInvite, type CreatedInvite } from '@/lib/useCaseload';
+import { useNotifications } from '@/lib/useNotifications';
 
 /**
  * The case manager's screen (§4.1).
@@ -76,6 +77,21 @@ function statusChip(
   return { label: t('admin.status.offCount', { count: names.length }), tone: 'warning' };
 }
 
+/**
+ * When something happened, said the way a person would say it.
+ *
+ * Today and yesterday are named rather than dated, because that is the
+ * difference that decides whether somebody acts now — "13 Sept" makes a reader
+ * do arithmetic to answer "is this new?".
+ */
+function whenHappened(iso: string, locale: string, t: (k: string) => string): string {
+  const then = new Date(iso);
+  const days = Math.floor((Date.now() - then.getTime()) / 86_400_000);
+  if (days <= 0) return t('when.today');
+  if (days === 1) return t('when.yesterday');
+  return new Intl.DateTimeFormat(locale, { month: 'short', day: 'numeric' }).format(then);
+}
+
 function whenLastActive(iso: string | null, locale: string): string | null {
   if (!iso) return null;
   return new Intl.DateTimeFormat(locale, { month: 'short', day: 'numeric' }).format(new Date(iso));
@@ -88,6 +104,7 @@ export default function AdminPage() {
 
   const isAdmin = session.status === 'signed-in' && session.session.role === 'admin';
   const { state: caseload, refresh } = useCaseload(isAdmin);
+  const { state: notifications, markRead } = useNotifications(isAdmin);
 
   const [invite, setInvite] = useState<CreatedInvite | null>(null);
   const [inviteBusy, setInviteBusy] = useState(false);
@@ -183,6 +200,38 @@ export default function AdminPage() {
     <main {...stylex.props(styles.page)}>
       <VStack gap={4}>
         <AppHeader roleLabel={t('role.admin')} />
+
+        {/*
+          What has happened that this case manager has to act on: a place one of
+          their people saved was flagged, or a message in their caseload was
+          reported. Nothing else reaches here, and no row carries anybody's
+          words (A7 / D-080).
+
+          It sits under the header rather than inside it: on a 320px screen a
+          bell competing with the wordmark and the role chip wins an argument it
+          should not be in, and this list is worth a full row when it has
+          anything in it.
+        */}
+        {notifications.status === 'ready' ? (
+          <NotificationBar
+            items={notifications.items.map((item) => ({
+              id: item.id,
+              text: t(item.bodyKey, item.bodyVars),
+              when: whenHappened(item.createdAt, locale, t),
+              isRead: item.isRead,
+            }))}
+            labels={{
+              title: t('notify.title'),
+              unread: t('notify.unread', {
+                count: notifications.items.filter((i) => !i.isRead).length,
+              }),
+              empty: t('notify.none'),
+              markRead: t('notify.markRead'),
+            }}
+            onMarkRead={(id) => void markRead(id)}
+          />
+        ) : null}
+
         <VStack gap={1}>
           <Heading level={1} xstyle={styles.title}>
             {t('admin.title')}

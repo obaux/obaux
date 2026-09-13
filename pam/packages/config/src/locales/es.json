@@ -306,5 +306,7 @@
   "transparency.title": "Lo que puede ver la persona que le invito",
   "voice.listening": "Escuchando",
   "voice.start": "Toque para hablar",
-  "voice.stop": "Parar"
+  "voice.stop": "Parar",
+  "when.today": "Hoy",
+  "when.yesterday": "Ayer"
 }

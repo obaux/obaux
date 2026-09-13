@@ -154,10 +154,10 @@ oversight:
   dispatcher is deployed and on a clock; every template ships `reviewedBy: ''`
   and both the renderer and the dispatcher refuse an unreviewed one. This is a
   gate, not a gap — a human has to read the copy against §9 first.
-- **Notifications have nowhere to be read.** A flagged place and a reported
-  message now write notices to the people who have to act (A7, D-080), but the
-  notification bar in the case manager and super admin headers is not built, so
-  the rows accumulate unseen.
+- **Notifications are readable on the case manager screen** — a bar under the
+  header, closed by default, saying how many are new in words. Still to come:
+  the same bar on the super admin panel, and opening a row to the person or
+  place it is about, which needs the member profile screen to exist first.
 - **No device build.** Capacitor is configured; `cap add ios/android` has never
   been run.
 
