@@ -27,30 +27,17 @@ edited there, regenerate this list rather than editing it here.
 
 ## The campaign description, to paste as written
 
-> This campaign sends low-volume messages from PAM, an app by Oba that connects
-> people to community programs, services and the staff who support them. People
-> receive messages only after they enter their own phone number on PAM's sign-in
-> screen, which states that PAM will text them and how to stop.
+The field caps at **1024 characters**. What follows is 1004, so it fits with a
+little room — if you edit it, count before you paste. Every message type a person
+can receive is named on purpose: reviewers compare the description against the
+samples and, later, against real traffic, and a description narrower than what
+actually sends is how an approved campaign gets suspended.
+
+> PAM is an app by Oba that connects people to community programs, services and the staff who support them. People receive messages only after entering their own phone number on PAM's sign-in screen, which states that PAM will text them and how to stop.
 >
-> Messages are account notifications and appointment reminders. A person first
-> receives a one-time sign-in code, because PAM uses a phone number instead of a
-> password. After that they may receive reminders about appointments they
-> scheduled in the app (the day before, the morning of, or two hours ahead), a
-> short check-in asking whether they made it, a notice when a place they saved is
-> no longer open or has moved, a notice that someone wants to connect with them,
-> and, for staff accounts, a notice that they have been introduced to someone or
-> that their account access has changed.
+> Messages are account notifications and appointment reminders, at low volume and low throughput. A person first receives a one-time sign-in code, because PAM uses a phone number instead of a password. After that they may receive: reminders for appointments they scheduled in the app, a check-in asking whether they made it, a notice when a place they saved has closed or moved, a notice that someone wants to connect, and, for staff, a notice of an introduction or an account change.
 >
-> Volume is low and throughput is low: a sign-in code when a person signs in, and
-> at most a few reminders per person per week. Nothing is promotional. PAM sends
-> no marketing, no advertising, and no third-party content, and does not share or
-> sell phone numbers.
->
-> Every message identifies PAM by name, stays within a single segment, and is
-> sent in English or Spanish according to the person's own setting. Replying STOP
-> ends all messages immediately and permanently; no setting inside the app can
-> restart them. Replying HELP returns support contact information. A support
-> phone number staffed by a person is shown in the app on every screen.
+> Nothing is promotional. PAM sends no marketing, no advertising and no third-party content, and does not sell or share phone numbers. Every message names PAM and fits one segment, in English or Spanish. STOP ends all messages permanently; HELP returns support contact.
 
 ### The shorter fields, if the form asks separately
 
