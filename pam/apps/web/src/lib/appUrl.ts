@@ -1,3 +1,5 @@
+import { APP_URL } from './project';
+
 /**
  * Where PAM lives on the web.
  *
@@ -5,16 +7,15 @@
  * a member ever taps — before there is an app on their phone, and possibly
  * before they have decided to install one. It has to resolve to a real page.
  *
- * Set `NEXT_PUBLIC_APP_URL` in the hosting environment. The fallback is the
- * origin the page was served from, which is right in a browser and wrong in the
- * Capacitor shell (where the origin is a local file server), so the shell build
- * must set it explicitly.
+ * The address is checked in (see ./project), so a link is correct in a browser,
+ * in the Capacitor shell and in a preview build without anybody setting
+ * anything. It was briefly the origin the page was served from, which is right
+ * in a browser and wrong in the shell, where the origin is a local file server —
+ * and a text message saying `capacitor://localhost` is a dead end for whoever
+ * receives it.
  */
 export function appUrl(): string {
-  const configured = process.env['NEXT_PUBLIC_APP_URL'];
-  if (configured) return configured.replace(/\/+$/, '');
-  if (typeof window !== 'undefined') return window.location.origin;
-  return 'http://localhost:3000';
+  return APP_URL;
 }
 
 /**

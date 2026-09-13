@@ -1,25 +1,24 @@
-import { describe, expect, it, afterEach } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { appUrl, inviteLink } from './appUrl';
-
-const original = process.env['NEXT_PUBLIC_APP_URL'];
-afterEach(() => {
-  if (original === undefined) delete process.env['NEXT_PUBLIC_APP_URL'];
-  else process.env['NEXT_PUBLIC_APP_URL'] = original;
-});
+import { APP_URL } from './project';
 
 describe('the address every invite points at', () => {
-  it('uses the configured public URL', () => {
-    process.env['NEXT_PUBLIC_APP_URL'] = 'https://pam.example.app';
-    expect(inviteLink('9T3YTVMT')).toBe('https://pam.example.app/j/9T3YTVMT');
+  it('is the checked-in address, so a link works with nothing configured', () => {
+    // The failure this prevents: a deploy where a dashboard field was left
+    // blank, and every invite text carries a link to localhost.
+    expect(appUrl()).toBe(APP_URL);
+    expect(appUrl()).toMatch(/^https:\/\//);
   });
 
-  it('tolerates a trailing slash, which a hosting dashboard will add', () => {
-    process.env['NEXT_PUBLIC_APP_URL'] = 'https://pam.example.app/';
-    expect(appUrl()).toBe('https://pam.example.app');
+  it('carries no trailing slash, so a link never doubles one', () => {
+    expect(appUrl().endsWith('/')).toBe(false);
+  });
+
+  it('builds an invite link from it', () => {
+    expect(inviteLink('9T3YTVMT')).toBe(`${APP_URL}/j/9T3YTVMT`);
   });
 
   it('escapes the code rather than trusting it', () => {
-    process.env['NEXT_PUBLIC_APP_URL'] = 'https://pam.example.app';
-    expect(inviteLink('AB/CD?x')).toBe('https://pam.example.app/j/AB%2FCD%3Fx');
+    expect(inviteLink('AB/CD?x')).toBe(`${APP_URL}/j/AB%2FCD%3Fx`);
   });
 });

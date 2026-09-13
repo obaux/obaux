@@ -1445,6 +1445,38 @@ selectable. For a member it is one less thing to decode.
 
 The ordering rule if both are somehow used: the button pressed is the answer.
 
+### D-089 — The project is configured in code, not in a dashboard
+Will: the Vercel/Supabase linking is too complicated. It was, and the complexity
+bought nothing.
+
+The Supabase URL, the publishable key and the public address are now checked in
+at `apps/web/src/lib/project.ts`. **PAM needs no configuration to run.** Clone
+and `pnpm dev` works. Connect the repo to Vercel and the deploy works. Wrap it
+with Capacitor and the app works. An environment variable still overrides any of
+them, for a staging project or a fork.
+
+The failure this removes is the one that actually happened: those values are
+compiled into the bundle at build time, they lived only in a gitignored
+`.env.local`, and the first real deploy went out without them. The site looked
+perfect and failed silently on the one screen every person starts on, with an
+error message written to reassure a member rather than to diagnose anything.
+
+**Why committing the key is safe, since it will look alarming in a public repo.**
+The publishable key is designed to ship inside client JavaScript — it is already
+in the bundle of every deployed copy, readable with View Source, as it is on
+every Supabase project in the world. It grants nothing by itself: the access
+rules in `packages/db` are the boundary, and `pnpm --filter @pam/db test` attacks
+them with one test user per role. If publishing this key mattered, that suite
+would be what was broken.
+
+What must never join it: the service role key, which bypasses every policy, and
+any Twilio credential. Those live in Edge Function secrets. `project.test.ts`
+fails the build if something shaped like one appears in that file.
+
+One link between the two services still has to be made by hand — the app's URL
+in Supabase → Authentication → URL Configuration — because only Supabase can be
+told which addresses it trusts.
+
 ---
 
 ## Notes for whoever picks this up next

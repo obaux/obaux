@@ -15,29 +15,27 @@ build is a folder of static files, which any host can serve.
    - **Root Directory**: `pam/apps/web`
    - **Framework Preset**: Other — `vercel.json` in that folder carries the real
      build commands, because the build has to run from the monorepo root.
-3. **Environment Variables**, for Production and Preview both:
+3. Deploy.
 
-   | Name | Value |
-   |---|---|
-   | `NEXT_PUBLIC_SUPABASE_URL` | `https://shobqzuhicoiymtumiaz.supabase.co` |
-   | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | the publishable key from Supabase → Project Settings → API |
-   | `NEXT_PUBLIC_APP_URL` | the URL Vercel gives you, e.g. `https://pam.vercel.app` |
-   | `NEXT_PUBLIC_SUPPORT_PHONE` | `+12673095265` |
+**There is no environment-variable step.** There used to be, and it cost an
+afternoon: the Supabase address and key are compiled into the app at build time,
+they lived only in a gitignored `.env.local`, and a deploy without them produced
+a site that looked perfect and failed silently at the one screen everybody
+starts on. They are checked in now (`apps/web/src/lib/project.ts`), which is
+safe for the reasons written in that file and guarded by a test.
 
-   The publishable key is designed to ship in browser code and is protected by
-   the access rules in the database, which the test suite verifies. The service
-   key is a different thing and belongs nowhere near this list.
-4. Deploy. Every push to a branch gets its own preview URL; `main` becomes the
-   production one.
+Every push to a branch gets its own preview URL; `main` becomes the production
+one.
 
 ## After the first deploy
 
-- Set `NEXT_PUBLIC_APP_URL` to the URL you actually got, and redeploy. Until it
-  is set, invite links fall back to the origin the page was served from — right
-  in a browser, wrong inside the phone app, where the origin is a local file
-  server.
-- Add the same URL to Supabase → Authentication → URL Configuration, so sign-in
-  redirects are accepted.
+- **Add the URL to Supabase → Authentication → URL Configuration**, or sign-in
+  redirects are rejected. This is the one link between the two services that
+  still has to be made by hand, because only Supabase can be told which
+  addresses it trusts.
+- If the URL is not the one in `apps/web/src/lib/project.ts`, change it there
+  and push. Invite links are built from that value, and a link in a text message
+  has to point at the address that actually answers.
 - When a real domain exists, add it in Vercel, update `NEXT_PUBLIC_APP_URL`, and
   update Supabase. Links already sent keep working as long as the old URL
   redirects.

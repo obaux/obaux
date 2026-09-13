@@ -1,4 +1,5 @@
 import { createClient as createSupabaseClient } from '@supabase/supabase-js';
+import { SUPABASE_PUBLISHABLE_KEY, SUPABASE_URL } from './project';
 
 /**
  * The browser Supabase client.
@@ -20,17 +21,11 @@ import { createClient as createSupabaseClient } from '@supabase/supabase-js';
  * a browser and in the shell.
  */
 export function createClient() {
-  const url = process.env['NEXT_PUBLIC_SUPABASE_URL'];
-  const anonKey = process.env['NEXT_PUBLIC_SUPABASE_ANON_KEY'];
-
-  if (!url || !anonKey) {
-    throw new Error(
-      'NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY must be set. ' +
-        'Copy .env.example to .env.local and fill them in.',
-    );
-  }
-
-  return createSupabaseClient(url, anonKey, {
+  // No configuration step, and nothing to forget: the project this app talks to
+  // is checked in (see ./project), and an environment variable only overrides
+  // it. A build that cannot reach the database because a dashboard field was
+  // left blank is a failure mode PAM does not have.
+  return createSupabaseClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
     auth: {
       persistSession: true,
       autoRefreshToken: true,
