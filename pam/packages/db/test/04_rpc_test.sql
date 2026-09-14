@@ -846,3 +846,204 @@ begin
   set local role authenticated;
 end;
 $$;
+
+\echo ''
+\echo '--- Nobody promotes themselves (0046) ---'
+
+-- This suite exists because for several weeks they could. `profiles_update_self`
+-- checks `id = auth.uid()` and stops there, and `role` is an ordinary column on
+-- that table, so one UPDATE from the browser turned any account into the one
+-- that can see every account in PAM. The fix is column-level privilege, and a
+-- privilege is exactly the kind of thing that gets dropped by a later migration
+-- recreating a grant. These assertions are the tripwire.
+
+set role authenticated;
+select test.as_user(:'marcus');
+
+do $$
+declare
+  v_role public.user_role;
+begin
+  begin
+    update public.profiles set role = 'super_admin' where id = auth.uid();
+    raise exception 'FAIL  a member promoted themselves to super_admin';
+  exception when insufficient_privilege then
+    raise notice 'ok    a member cannot write their own role';
+  end;
+
+  -- A refusal that leaves the value changed would be worse than no refusal.
+  select role into v_role from public.profiles where id = auth.uid();
+  if v_role <> 'member' then
+    raise exception 'FAIL  the role is now %', v_role;
+  end if;
+end;
+$$;
+
+do $$
+begin
+  begin
+    update public.profiles set access_status = 'active' where id = auth.uid();
+    raise exception 'FAIL  an account can un-suspend itself';
+  exception when insufficient_privilege then
+    raise notice 'ok    a member cannot write their own access_status';
+  end;
+
+  begin
+    update public.profiles set region_id = '11111111-0000-0000-0000-000000000002'
+    where id = auth.uid();
+    raise exception 'FAIL  a member moved themselves to another region';
+  exception when insufficient_privilege then
+    raise notice 'ok    a member cannot move themselves between regions';
+  end;
+
+  begin
+    update public.profiles set phone = '+15555559999' where id = auth.uid();
+    raise exception 'FAIL  a member rewrote their own verified phone';
+  exception when insufficient_privilege then
+    raise notice 'ok    a member cannot rewrite the phone they verified with';
+  end;
+end;
+$$;
+
+-- The columns a person is supposed to own still work. A lockdown that also
+-- locks out the settings screen is a bug found by a user rather than a test.
+do $$
+begin
+  update public.profiles set first_name = 'Marcus', bio = 'Back home.'
+  where id = auth.uid();
+  raise notice 'ok    a member still edits their own name and bio';
+end;
+$$;
+
+do $$
+begin
+  begin
+    insert into public.profiles (id, role) values
+      ('33333333-0000-0000-0000-0000000000f3', 'super_admin');
+    raise exception 'FAIL  a client created a profile';
+  exception when insufficient_privilege then
+    raise notice 'ok    a profile cannot be created from the browser';
+  end;
+end;
+$$;
+
+\echo ''
+\echo '--- Signing up (0046) ---'
+
+reset role;
+insert into auth.users (id, phone) values
+  ('33333333-0000-0000-0000-0000000000aa', '+15555550991'),
+  ('33333333-0000-0000-0000-0000000000ab', '+15555550992'),
+  ('33333333-0000-0000-0000-0000000000ac', '+15555550993');
+
+set role authenticated;
+select test.as_user('33333333-0000-0000-0000-0000000000aa');
+
+do $$
+declare
+  p public.profiles;
+begin
+  -- Lower case and a stray space, the way a phone keyboard hands it over.
+  p := public.start_membership('Dee', 'Reeves', '  north ', 'es');
+  if p.role <> 'member' then
+    raise exception 'FAIL  start_membership created a %', p.role;
+  end if;
+  if p.region_id is null then
+    raise exception 'FAIL  the city did not resolve to a region';
+  end if;
+  if p.first_name <> 'Dee' or p.last_name <> 'Reeves' then
+    raise exception 'FAIL  the name came back as % %', p.first_name, p.last_name;
+  end if;
+  if p.preferred_language <> 'es' then
+    raise exception 'FAIL  the language came back as %', p.preferred_language;
+  end if;
+  raise notice 'ok    signing up makes a member in the city they typed';
+
+  begin
+    perform public.start_membership('Dee', 'Reeves', 'North');
+    raise exception 'FAIL  signing up twice made a second profile';
+  exception when others then
+    if sqlerrm like 'FAIL%' then raise; end if;
+    raise notice 'ok    an account can only be created once';
+  end;
+end;
+$$;
+
+-- The property that makes this function safe to expose: there is no argument
+-- that names a role, so there is nothing to pass 'admin' to. Proven by asking
+-- the catalogue rather than by reading the source.
+reset role;
+select test.check(
+  'start_membership takes no role argument',
+  (select count(*)
+     from pg_proc p, unnest(coalesce(p.proargnames, '{}')) as a
+    where p.proname = 'start_membership'
+      and p.pronamespace = 'public'::regnamespace
+      and a ilike '%role%')::int,
+  0);
+
+set role authenticated;
+select test.as_user('33333333-0000-0000-0000-0000000000ab');
+
+do $$
+declare n int;
+begin
+  begin
+    perform public.start_membership('Ray', 'Ortiz', 'Scranton');
+    raise exception 'FAIL  a city PAM does not serve made a profile anyway';
+  exception when sqlstate 'P0002' then
+    raise notice 'ok    an unserved city is refused, and says so';
+  end;
+
+  select count(*) into n from public.profiles where id = auth.uid();
+  if n <> 0 then
+    raise exception 'FAIL  a half-made profile was left behind';
+  end if;
+
+  perform public.join_waiting_city('Scranton', true);
+  select count(*) into n from public.waiting_cities
+  where user_id = auth.uid() and wants_updates;
+  if n <> 1 then
+    raise exception 'FAIL  the waiting list did not record the opt-in';
+  end if;
+  raise notice 'ok    an unserved city can leave a name and ask to hear back';
+end;
+$$;
+
+select test.as_user('33333333-0000-0000-0000-0000000000ac');
+
+do $$
+declare n int;
+begin
+  perform public.request_staff_access('admin', 'Val', 'Okonkwo', 'North');
+
+  select count(*) into n from public.profiles where id = auth.uid();
+  if n <> 0 then
+    raise exception 'FAIL  claiming a staff role created an account';
+  end if;
+  raise notice 'ok    claiming a staff role creates no account';
+
+  select count(*) into n from public.staff_requests
+  where user_id = auth.uid() and wants_role = 'admin';
+  if n <> 1 then
+    raise exception 'FAIL  the request was not recorded';
+  end if;
+
+  begin
+    perform public.request_staff_access('super_admin', 'Val', 'Okonkwo', 'North');
+    raise exception 'FAIL  somebody asked to be a super admin';
+  exception when others then
+    if sqlerrm like 'FAIL%' then raise; end if;
+    raise notice 'ok    super admin is not a role anybody can ask for';
+  end;
+end;
+$$;
+
+-- One person's claim is not another person's business.
+select test.as_user(:'marcus');
+select test.check(
+  'a member cannot read somebody else''s staff request',
+  (select count(*) from public.staff_requests), 0);
+select test.check(
+  'a member cannot read somebody else''s waiting-list row',
+  (select count(*) from public.waiting_cities), 0);
