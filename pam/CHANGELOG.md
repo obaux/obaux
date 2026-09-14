@@ -1,5 +1,37 @@
 # Changelog
 
+## [0.10.0] — 2026-09-14 · Places you keep, points you earn
+
+### Added — saving a place actually saves it
+
+Save on a place card writes it down. Home carries the places you kept as a row
+of cards you swipe; the full list is its own screen with the same cards as the
+search. Removing one is the bookmark you saved it with.
+
+### Added — points, and what they are for
+
+Keeping a place earns five points, counted by the database rather than the app.
+The number beside your name opens a screen that shows the ladder — Returned,
+Rooted, Builder, Provider, Pillar, Elder, Chief — where you are standing on it,
+and the badges for each kind of help. Nothing on it compares you to anybody.
+
+### Added — telling PAM a place is wrong
+
+A menu in the corner of every place: share it, or report it. Reporting is four
+plain reasons and a note you can skip, and it says on the screen that nobody at
+the place is told who reported it.
+
+### Added — a screen for the people running PAM
+
+Everyone on PAM, filtered by what they are, with a switch to see the app the way
+each kind of person sees it.
+
+### Changed — the way in, and the way around
+
+Sign-in opens with three slides saying what PAM is. Buttons wear the logo's
+greens. Every screen has its way back in the same place, beside the title, and
+the mark goes home. Animation throughout, on connections that can carry it.
+
 ## [0.9.0] — 2026-09-13 · A front door, and a home worth landing on
 
 ### Changed — sign-in says what PAM is before it asks for your number

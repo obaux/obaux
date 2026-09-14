@@ -1613,6 +1613,11 @@ assembled on the page. A tile built on the page is a tile the next screen builds
 again, slightly differently.
 
 ### D-099 — PAM's own colour is a token, not a hex
+**Superseded by D-101 the same day.** The token was the right instinct and the
+wrong home: the brand belongs in the Astryx theme, where every component reads
+it, not in PAM's own sizing tokens where only the components that remembered to
+look would. `pam.brandMark` no longer exists.
+
 The wordmark is deep green on light grounds and coral on dark ones, and the
 onboarding illustrations are drawn in the same pair. That pair now lives once,
 as `pam.brandMark`, beside the sizing floor.
@@ -1620,6 +1625,173 @@ as `pam.brandMark`, beside the sizing floor.
 It is deliberately not an Astryx theme colour. The theme carries accent, text and
 surface — the roles a component reasons about — and this is artwork. What it
 needs is to move in one edit the day the brand does.
+
+### D-100 — The buttons wear the logo, in a real theme
+PAM's primary buttons were the neutral theme's near-black in light and
+near-white in dark, because that is what "accent" meant. The mark is deep green
+(`#0F5847`) on light grounds and the bright green Will supplied (`#DCE068`) on
+dark ones, and the buttons are now the same two colours.
+
+Done as an Astryx theme (`apps/web/src/theme/pam.theme.ts`), not as CSS
+overrides, so every component that reads the accent follows — badges, links,
+focus rings, the icons on the home tiles — rather than buttons alone.
+
+The two greens are not a light/dark pair of one hue and were never meant to be:
+one is a deep ground carrying white text, the other a bright fill carrying
+near-black. That inversion is why every state is named per mode rather than left
+to a generic tint. Measured, worst case 7.1:1, against a 4.5 floor.
+
+**The states are set on the overlay tokens, not on `background-color`.** Astryx
+paints hover and pressed as a translucent layer over the fill, so a theme's
+`:hover { backgroundColor }` loses silently — the first version looked correct
+in review and did nothing at all.
+
+**The source is `pam.theme.ts`, not `pam.ts`.** With both present, an import of
+`./pam.js` resolves to the TypeScript source and drags the theme compiler into
+the browser bundle: 4 kB of §12's budget spent on a build tool.
+
+### D-101 — The brand lives in one place, and it is the theme
+`pam.brandMark` (D-099) lasted a day. Once the theme carried the greens, a
+second definition in `@pam/ui`'s tokens was a copy that would drift the first
+time one of them moved. Components use `--color-accent` and
+`--color-icon-accent`.
+
+Still true, and the reason D-099 existed: the wordmark artwork is not a theme
+colour. It is two SVG files, picked by `prefers-color-scheme`, and it is the one
+place PAM's colour is a picture rather than a role.
+
+### D-102 — Saving a place writes it down
+`saved_places` existed from 0003 and nothing ever wrote to it: Save changed the
+button's own label and forgot by the next screen. That is fine in a demo and a
+betrayal to somebody standing at a bus stop trying to remember an address.
+
+The write is optimistic and rolls back on failure. A tap that waits 800ms on a
+bad connection is a tap somebody repeats, and a card that says "Saved" when the
+row never landed is worse than one that visibly failed.
+
+`saved_places_mine()` (0044) returns the same columns as `services_near`, so one
+card component reads both. A plain select could not: `services.geo` is a
+geography column, and a card builds its directions link from the point.
+
+### D-103 — One way back, beside the title
+The back arrow had been landing wherever each screen felt like putting it — top
+left on notifications, at the foot of the page on Places and the caseload,
+nowhere at all on several. `PageTitle` owns it now, and it is a real link rather
+than `history.back()`: it survives a cold open from a text message, where there
+is no history to go back through.
+
+It goes home rather than to whichever screen opened this one. A member, a case
+manager and a super admin all reach the notifications list, and home is the one
+place all three of them can carry on from.
+
+The mark in the header is also a link home — except on the way in, where there
+is nowhere to go and the 48px target a link needs costs 22px of the height the
+consent sentence is fighting for.
+
+### D-104 — Animation is separately budgeted, and optional
+Framer Motion is behind a dynamic import (`motion-runtime.tsx` is the only
+module that imports it), so it is a chunk of its own that is never part of the
+first load. The budget check measures it against its own 40 kB ceiling and fails
+the build if it ever leaks into the app's bundle.
+
+It is fetched only when the connection can carry it: no Data Saver, better than
+2G. On a $40 prepaid plan, 37 kB of easing curves is not a trade PAM gets to
+make on somebody's behalf — and a member who never gets it loses nothing but
+motion.
+
+**The page fade and the button press are CSS, deliberately.** Both wrap things a
+member may be touching, and swapping the wrapper when the chunk lands remounts
+them — a tap in that window hits a node being replaced and does nothing. A
+dropped tap on the one button somebody came to press is not worth 120ms of
+scale. What is left for the library wraps cards and list rows, where a swap is
+invisible.
+
+### D-105 — The §12 budget counts what a phone downloads
+The check was counting Next's legacy polyfill chunk, which carries `noModule` —
+every browser that can run PAM (the design system needs `light-dark()` and
+container queries) skips it entirely. That was 38 kB of the 500 kB budget spent
+on bytes no member has ever received.
+
+Not a loophole: the budget exists to protect a member on a throttled connection,
+and it now measures what that member actually fetches.
+
+### D-106 — A super admin has a screen, and it is a function not a policy
+The role existed from 0032 with nowhere to go: `admin_covers()` requires
+`is_admin()`, which is `role = 'admin'` exactly, so the person operating PAM
+opened the case manager screen and was told it was not for them.
+
+`/directory/` is that screen. The access behind it is `directory_people()`
+(0043) rather than a policy, because a policy widening `profiles` for super
+admins widens every query in the product at once, forever. This widens one call
+with a fixed column list: name, role, region, status, last active — the same
+five facts the caseload already shows. No phone, no goals, no messages.
+
+The guard is inside the function: PostgREST exposes everything in `public`, so a
+member or case manager calling it directly gets zero rows rather than an error,
+and there is nothing to probe. The database suite proves both refusals and that
+the phone column cannot come back.
+
+**Open for Will:** the transparency screen tells a member what the person who
+invited them can see and says "if this changes, we will tell you first". It says
+nothing about the PAM team. A directory of accounts does not contradict it, but
+it sits close enough to deserve a line.
+
+### D-107 — Five points for keeping a place, awarded by the database
+`POINTS_RULES.save_place` had said `{ points: 5, verification: 'automatic' }`
+since the config was written and nothing implemented it. A trigger on
+`saved_places` does (0045), not the browser: a client that can award itself
+points is a score nobody can believe, and §8's premise is that points mean
+something.
+
+Once per place, forever — `subject_id` plus a unique index closes the
+save/unsave/save farm. Unsaving does not take the points back: the ledger is
+append-only by design, and clawing back points somebody earned for a real thing
+they did teaches them the app is playing games with them. Staff earn nothing;
+points are a member mechanic.
+
+`subject_id` is deliberately not a foreign key. The ledger is history, and a
+place leaving the catalogue does not make it untrue that somebody once saved it.
+
+### D-108 — A super admin can switch the view, and it changes only the view
+One codebase serves four very different screens, and the person running PAM had
+only ever seen one of them. The role chip in the header is now a switcher.
+
+**It changes what is drawn and nothing else.** Every query still runs as the
+signed-in person, under the same row-level rules; the database does not know the
+setting exists. The chip reads "Viewing as Member" while it is switched and the
+screen carries a notice saying it is still their own account. A browser test
+asserts every id asked for is their own — the day that stops being true, this
+has become impersonation, which is a different product and one that would have
+to be argued in front of the people it is about.
+
+Kept in `sessionStorage`, not the URL: a shared link should never put somebody
+in a view they did not choose.
+
+### D-109 — Badge names come from the village, not the gym
+Returned, Rooted, Builder, Provider, Pillar, Elder, Chief — then the category
+pairs (Scholar/Griot, Craftsman/Cornerstone, Anchor/Steward) and the one-offs.
+Will's names, and they are the decision: the vocabulary a system uses about
+somebody becomes the vocabulary they use about themselves, and for a returning
+citizen that is not a small thing.
+
+Two specifics worth keeping. **Sankofa** — the Akan symbol for going back to
+fetch what was left — names a return after a gap, so a lapse reads as coming
+back rather than failing; for this population that distinction is the difference
+between opening the app again and not. **Steward**, not Patriarch: not every
+member is a man, and Steward says the same thing about somebody holding a
+household together.
+
+Elder, Chief and Drum carry `blockedBy` and show "Coming later" on the screen:
+they need a buddy system PAM does not have — member/mentor and member/case
+manager are the only relationships modelled. Defined now because the names are
+the decision; hidden badges appear from nowhere the day they ship.
+
+### D-110 — Two tiles came off the home screen
+Notifications is the bell in the header, now a filled button rather than an
+outline: it is the only route to the things that need somebody, and a menu that
+offers the same destination twice is a menu arguing with itself. Text reminders
+belongs to signing up — it is asked once, and a permanent tile invites somebody
+to re-answer a decision already made.
 
 ---
 

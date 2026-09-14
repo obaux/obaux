@@ -1,8 +1,8 @@
 # PAM — where the project stands
 
-Last updated 2026-09-13, after the way in and the home screen were rebuilt from
-the component library. Newest session log:
-`docs/sessions/2026-09-13-the-front-door-and-the-home-screen.md`.
+Last updated 2026-09-14. The member-facing product is real now: saving, points,
+badges, reporting a place, and a screen for the person running PAM. Newest
+session log: `docs/sessions/2026-09-14-saving-points-and-the-people-screen.md`.
 
 This is the handover document: what exists, what is proven, what is live, and
 what the next person needs to know before touching anything.
@@ -52,20 +52,25 @@ credentials is what turns it on; nothing needs redeploying. See
 phone on 13 September. One door for every role: what you see after the code comes
 from the account, never from which link you followed.
 
-The limit now is Twilio's, not PAM's: the account is still in trial, so only
-numbers verified by hand in the Twilio console can receive a text. **The carrier registration was rejected
-on 13 September (30925) and needs resubmitting** — brand under Oba, campaign
-under PAM. The rejection was right: consent was implied rather than actively
-given. PAM now asks on a screen of its own (`/reminders/`), shown to a member
-after their first sign-in, with a box that starts unticked; reminders stay off
-for anybody who never ticks it (D-085, D-086). Sign-in is back to one job. Until it is approved the pilot cannot start, however finished
-the app is. What was filed is in `docs/sms-campaign-samples.md`; setup and the
-known traps are in `docs/sms-setup.md`.
+**The carrier campaign was APPROVED on 13 September.** Two rejections got there:
+the first submission declared no embedded links, which nine of the thirteen
+messages carry; the second was rejected for implied consent (30925), which was
+right — PAM now asks on a screen of its own, with nothing pre-selected, and the
+agreement is the button's own words (D-085, D-086).
 
-Two corrections so far: the first submission declared no embedded links, which
-nine of the thirteen messages carry, and the second was rejected for pre-implied
-consent. The current opt-in answer and description to paste are in
-`docs/sms-campaign-samples.md`.
+What is left before a real text sends, all of it a human's:
+
+1. Twilio credentials into the `dispatch-sms` Edge Function secrets — use the
+   **Messaging Service SID**, not a bare from-number: the A2P approval attaches
+   to the service.
+2. Somebody has to answer the reminders question. Every existing row has
+   `sms_enabled = false` (0042 made consent opt-in), so nothing sends to anyone
+   until they say yes — including Will's own account.
+3. The HELP auto-reply on the Messaging Service, matching what was filed.
+
+The account is still in trial: only numbers verified by hand in the Twilio
+console can receive a text. Setup and the known traps are in
+`docs/sms-setup.md`; what was filed is in `docs/sms-campaign-samples.md`.
 
 **The first admin exists** — Will, Philadelphia, created 12 September and proven
 by generating a live invite code (`9T3YTVMT`, valid 30 days).
@@ -135,10 +140,13 @@ result with one test user per role. It proves:
 Phase 0 owns foundations. These are Phase 1–7 and their absence is not an
 oversight:
 
-- **No member-facing flow.** No onboarding, no invite redemption screen, no map,
-  no enrollment, no chat. Sign-in, home, the reminders question, the places list,
-  the notifications list, the case manager screen, and the privacy and terms
-  pages are the exceptions — they exist and work.
+- **No sign-up flow.** No onboarding, no invite redemption screen, no map, no
+  enrollment, no chat. A person can sign in and use what exists — but nothing
+  yet creates a profile for somebody new, which is the next task.
+- **What does exist and works:** sign-in, home, saved places, points and badges,
+  the places list, reporting a place, the notifications list, the reminders
+  question, the case manager screen, the people directory, and the privacy and
+  terms pages.
 - **Home is a menu, and only a menu.** It lists where to go and what is waiting.
   No next step, no points, no plan: PAM has no real ones yet, and a home screen
   that invents its own content is worse than a short one (D-098). `/gallery/` is
@@ -239,7 +247,7 @@ while the copy is unsigned, so it earned the first live test, not the last.*
 node scripts/journeys.mjs     # every screen, every role, both themes
 ```
 
-Writes `docs/journeys/index.html` — 90 screenshots of the built app against
+Writes `docs/journeys/index.html` — 130 screenshots of the built app against
 stubbed data. Open it in a browser to review the whole product at once, which is
 the only way to see the class of problem no test catches (D-091).
 
@@ -269,7 +277,7 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 - `packages/config/transparency.ts` — a promise made to people with little reason
   to trust promises. Widening it fails tests by design; change the contract
   first and tell members before it ships.
-- `DECISIONS.md` — 70 decisions with their reasoning, and the open questions.
+- `DECISIONS.md` — 110 decisions with their reasoning, and the open questions.
 - `docs/sop-amendments.md` — nine changes to the SOP since handover, several of
   which contradict it. Read before trusting a rule you remember from the SOP.
   A8 and A9 are the two screens that deliberately carry no help link.
