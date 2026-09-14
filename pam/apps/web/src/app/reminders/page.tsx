@@ -124,7 +124,7 @@ export default function RemindersPage() {
 
   return (
     <Page>
-        <AppHeader />
+        <AppHeader roleLabel={signedIn ? t(`role.${session.session.role}`) : undefined} />
 
         <VStack gap={2}>
           <Heading level={1} xstyle={styles.title}>

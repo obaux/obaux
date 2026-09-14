@@ -9,6 +9,7 @@ import { AppHeader, Notice, OnboardingSlides, Page, TextLink } from '@pam/ui';
 import { useI18n } from '@/lib/i18n';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { usePhoneSignIn } from '@/lib/usePhoneSignIn';
+import { useSession } from '@/lib/useSession';
 import { PhoneSignInCard } from './PhoneSignInCard';
 
 /**
@@ -45,8 +46,34 @@ export default function SignInPage() {
   const flow = usePhoneSignIn();
   const { state, startOver } = flow;
   const router = useRouter();
+  const { state: session } = useSession();
   const [phone, setPhone] = useState('');
   const [code, setCode] = useState('');
+
+  /** Came here from "Sign out": say it happened. */
+  const [justSignedOut, setJustSignedOut] = useState(false);
+  useEffect(() => {
+    setJustSignedOut(new URLSearchParams(window.location.search).get('out') === '1');
+  }, []);
+
+  /**
+   * Somebody who is already in does not get asked for their phone again.
+   *
+   * The audit of the way in (14 September) found this screen showing the phone
+   * field to a signed-in person — who would type it, get a second code, and
+   * end up exactly where they started. A signed-in account goes home; a
+   * verified phone with no account goes to finish signing up. The one time
+   * this screen is right for a signed-in person is the moment after sign-out,
+   * and that is a signed-out session by the time the redirect would run.
+   */
+  useEffect(() => {
+    if (state.step !== 'phone') return;
+    if (session.status === 'signed-in') {
+      router.replace(session.session.isOnboarded ? '/' : '/join/');
+    } else if (session.status === 'no-profile') {
+      router.replace('/join/');
+    }
+  }, [session, state.step, router]);
 
   /**
    * What PAM is, in three sentences: a place to look, a person to ask, a
@@ -93,12 +120,14 @@ export default function SignInPage() {
 
         const { data: profile } = await supabase
           .from('profiles')
-          .select('id')
+          .select('id, onboarded_at')
           .eq('id', auth.user.id)
           .maybeSingle();
         if (cancelled) return;
 
-        if (!profile) {
+        // No record, or a record whose setup was never finished: both belong
+        // in the flow, which picks up at whichever step is outstanding.
+        if (!profile || profile.onboarded_at === null) {
           router.replace('/join/');
           return;
         }
@@ -136,6 +165,10 @@ export default function SignInPage() {
         above it is now in the way.
       */}
       {onFirstStep ? <OnboardingSlides slides={slides} label={t('onboarding.label')} /> : null}
+
+      {justSignedOut && state.step === 'phone' ? (
+        <Text xstyle={styles.quiet}>{t('signin.signedOut')}</Text>
+      ) : null}
 
       {state.step === 'failed' ? (
         <Notice

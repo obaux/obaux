@@ -1128,3 +1128,112 @@ end;
 $$;
 
 set role authenticated;
+
+\echo ''
+\echo '--- Four kinds of people, four ways in (0049) ---'
+
+-- A super admin of their own, so this block does not depend on what an earlier
+-- one did to admin_north.
+reset role;
+insert into auth.users (id, phone) values
+  ('33333333-0000-0000-0000-0000000000b0', '+15555550880'),
+  ('33333333-0000-0000-0000-0000000000b1', '+15555550881'),
+  ('33333333-0000-0000-0000-0000000000b2', '+15555550882');
+insert into public.profiles (id, role, first_name, access_status)
+values ('33333333-0000-0000-0000-0000000000b0', 'super_admin', 'Owner', 'active');
+
+set role authenticated;
+select test.as_user(:'admin_north');
+
+do $$
+begin
+  begin
+    perform public.create_invite('admin');
+    raise exception 'FAIL  a case manager made a case manager';
+  exception when others then
+    if sqlerrm like 'FAIL%' then raise; end if;
+    raise notice 'ok    a case manager cannot invite a case manager';
+  end;
+end;
+$$;
+
+select test.as_user('33333333-0000-0000-0000-0000000000b0');
+
+do $$
+declare
+  inv public.invites;
+  n   int;
+begin
+  select count(*) into n from public.regions;
+  if n < 2 then
+    raise exception 'FAIL  a super admin reads % regions and cannot say which city an invite is for', n;
+  end if;
+  raise notice 'ok    a super admin can see the regions';
+
+  begin
+    perform public.create_invite('admin');
+    raise exception 'FAIL  an admin invite was made for no city';
+  exception when others then
+    if sqlerrm like 'FAIL%' then raise; end if;
+    raise notice 'ok    a super admin has to say which city a case manager is for';
+  end;
+
+  begin
+    perform public.create_invite('super_admin', null, '11111111-0000-0000-0000-000000000002');
+    raise exception 'FAIL  somebody was invited to be a super admin';
+  exception when others then
+    if sqlerrm like 'FAIL%' then raise; end if;
+    raise notice 'ok    nobody is invited to be a super admin';
+  end;
+
+  inv := public.create_invite('admin', null, '11111111-0000-0000-0000-000000000002');
+  if inv.role <> 'admin' or inv.region_id <> '11111111-0000-0000-0000-000000000002' then
+    raise exception 'FAIL  the admin invite came back as % in %', inv.role, inv.region_id;
+  end if;
+  if inv.assigned_admin_id is not null then
+    raise exception 'FAIL  a super admin invite carries a caseload';
+  end if;
+  perform set_config('pam.admin_code', inv.code, false);
+  raise notice 'ok    a super admin can invite a case manager into a city';
+
+  inv := public.create_invite('member', null, '11111111-0000-0000-0000-000000000001');
+  perform set_config('pam.member_code', inv.code, false);
+  raise notice 'ok    ...and a member, who lands on nobody''s caseload';
+end;
+$$;
+
+-- The code a super admin made turns a verified phone into a case manager for
+-- the south, with the two columns sign-up asks for filled in.
+select test.as_user('33333333-0000-0000-0000-0000000000b1');
+do $$
+declare p public.profiles;
+begin
+  p := public.redeem_invite(current_setting('pam.admin_code'), 'Kim', 'en', 'Adeyemi', 'South');
+  if p.role <> 'admin' then
+    raise exception 'FAIL  redeemed as %', p.role;
+  end if;
+  if p.region_id <> '11111111-0000-0000-0000-000000000002' then
+    raise exception 'FAIL  the case manager landed in the wrong region';
+  end if;
+  if p.last_name <> 'Adeyemi' or p.home_city <> 'South' then
+    raise exception 'FAIL  last name and city did not reach the profile';
+  end if;
+  raise notice 'ok    redeeming the code makes a case manager, with a last name and a city';
+end;
+$$;
+
+select test.as_user('33333333-0000-0000-0000-0000000000b2');
+do $$
+declare p public.profiles; n int;
+begin
+  p := public.redeem_invite(current_setting('pam.member_code'), 'Ana');
+  if p.role <> 'member' then
+    raise exception 'FAIL  redeemed as %', p.role;
+  end if;
+  select count(*) into n from public.admin_assignments where member_id = p.id;
+  if n <> 0 then
+    raise exception 'FAIL  a member a super admin invited was put on a caseload';
+  end if;
+  raise notice 'ok    the three-argument call still works, and no caseload is invented';
+end;
+$$;

@@ -10,6 +10,7 @@ import { colorVars, spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { AppHeader, BigButton, Notice, Page, PageTitle, StarIcon } from '@pam/ui';
 import { BADGES, badgeForPoints, nextBadge, type BadgeDefinition } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
+import { NotIn } from '../NotIn';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
 import { usePoints } from '@/lib/usePoints';
@@ -149,19 +150,12 @@ export default function PointsPage() {
   const { state: session } = useSession();
   const points = usePoints(session.status === 'signed-in' ? session.session.userId : null);
 
-  if (session.status === 'signed-out' || session.status === 'no-profile') {
+  if (session.status === 'signed-out' || session.status === 'no-profile' || session.status === 'suspended') {
     return (
       <Page gap={4}>
         <AppHeader />
         <PageTitle title={t('points.title')} backHref="/" backLabel={t('nav.back.home')} />
-        <Notice
-          notice="service_not_available"
-          title={t('directory.signedOut.title')}
-          body={t('reminders.signedOut')}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
-        />
-        <BigButton label={t('signin.title')} href="/signin/" />
+        <NotIn status={session.status} title={t('directory.signedOut.title')} body={t('reminders.signedOut')} />
       </Page>
     );
   }

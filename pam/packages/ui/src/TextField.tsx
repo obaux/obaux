@@ -32,7 +32,14 @@ import { pam } from './tokens.stylex.js';
  * So a screen says what the field is, and this decides the rest. Adding a
  * purpose here fixes every screen that uses it.
  */
-export type FieldPurpose = 'phone' | 'code' | 'address' | 'name' | 'lastName' | 'city';
+export type FieldPurpose =
+  | 'phone'
+  | 'code'
+  | 'inviteCode'
+  | 'address'
+  | 'name'
+  | 'lastName'
+  | 'city';
 
 /**
  * The attributes each purpose sets, as plain HTML.
@@ -59,6 +66,18 @@ const PURPOSES: Record<FieldPurpose, Record<string, string>> = {
     inputMode: 'numeric',
     htmlName: 'code',
     name: 'code',
+  },
+  /**
+   * An invite code: eight capitals somebody read out or texted. Not a one-time
+   * code — the browser must not offer the sign-in code here — and the keyboard
+   * opens in capitals because the code is shown in them.
+   */
+  inviteCode: {
+    autoComplete: 'off',
+    autoCapitalize: 'characters',
+    spellCheck: 'false',
+    htmlName: 'inviteCode',
+    name: 'inviteCode',
   },
   address: { autoComplete: 'street-address', htmlName: 'address', name: 'address' },
   name: { autoComplete: 'given-name', htmlName: 'firstName', name: 'firstName' },

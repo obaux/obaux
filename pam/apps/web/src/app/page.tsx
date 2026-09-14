@@ -25,6 +25,7 @@ import {
 } from '@pam/ui';
 import { categoryLabelKey, NOTICES, ROLES } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
+import { NotIn } from './NotIn';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
 import { useNotifications } from '@/lib/useNotifications';
@@ -128,12 +129,17 @@ export default function HomePage() {
   }
 
   /*
-   * Signed out — and "no profile" with it, which is an account that exists in
-   * the sign-in system and has no PAM record yet. Both need the same thing: say
-   * what PAM is for in one line, and offer the one door. No tiles, because
-   * every one of them would ask for a sign-in on arrival.
+   * Signed out, half signed up, or paused. Say what PAM is for in one line and
+   * offer the one door that is right for that person — which used to be the
+   * same "Sign in" for all three, and for a verified phone with no account yet
+   * that was the door they had just walked through. No tiles, because every
+   * one of them would ask for a sign-in on arrival.
    */
-  if (session.status === 'signed-out' || session.status === 'no-profile') {
+  if (
+    session.status === 'signed-out' ||
+    session.status === 'no-profile' ||
+    session.status === 'suspended'
+  ) {
     return (
       <Page gap={4}>
         <AppHeader />
@@ -145,7 +151,15 @@ export default function HomePage() {
             {t('app.tagline')}
           </Text>
         </VStack>
-        <BigButton label={t('signin.title')} href="/signin/" />
+        {/*
+          Three people, three doors: sign in, finish signing up, or — for a
+          paused account — a plain statement and the way to sign out.
+        */}
+        {session.status === 'signed-out' ? (
+          <BigButton label={t('signin.title')} href="/signin/" />
+        ) : (
+          <NotIn status={session.status} title={t('app.name')} body={t('app.tagline')} />
+        )}
         <HelpBar label={t('nav.help')} variant="block" />
       </Page>
     );

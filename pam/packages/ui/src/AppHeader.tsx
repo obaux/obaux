@@ -2,6 +2,8 @@ import type { ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { HStack } from '@astryxdesign/core/HStack';
 import { Badge } from '@astryxdesign/core/Badge';
+import { IconButton } from '@astryxdesign/core/IconButton';
+import { MeIcon } from './icons.js';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { pam } from './tokens.stylex.js';
 
@@ -68,6 +70,16 @@ export interface AppHeaderProps {
    * nowhere to go, so sign-in passes `null`.
    */
   homeHref?: string | null;
+  /**
+   * Where the person's own account is — a button at the end of the row, on
+   * every screen a signed-in person sees, because the way out has to be in the
+   * same place every time. Rendered whenever there is a `roleLabel` (that is,
+   * somebody is signed in); `null` hides it on the account screen itself and
+   * on the way in.
+   */
+  accountHref?: string | null;
+  /** The button's accessible name, e.g. "Your account". */
+  accountLabel?: string;
 }
 
 const styles = stylex.create({
@@ -92,6 +104,12 @@ const styles = stylex.create({
     minHeight: pam.touchTargetMin,
     textDecoration: 'none',
   },
+  account: {
+    minHeight: pam.touchTargetMin,
+    minWidth: pam.touchTargetMin,
+    fontSize: '22px',
+    color: colorVars['--color-icon-accent'],
+  },
   mark: {
     // Sized by height so the aspect ratio comes from the artwork, and set in px
     // because this is a piece of art at a fixed size, not text that should grow
@@ -109,7 +127,20 @@ export function AppHeader({
   trailing,
   isSticky = false,
   homeHref = '/',
+  accountHref = '/account/',
+  accountLabel = 'Your account',
 }: AppHeaderProps) {
+  const showAccount = accountHref !== null && Boolean(roleLabel || roleControl);
+  const account = showAccount ? (
+    <IconButton
+      label={accountLabel}
+      icon={<MeIcon />}
+      variant="ghost"
+      href={accountHref ?? undefined}
+      xstyle={styles.account}
+    />
+  ) : null;
+
   const mark = (
     <picture>
       <source srcSet="/pam-wordmark-dark.svg" media="(prefers-color-scheme: dark)" />
@@ -119,7 +150,12 @@ export function AppHeader({
 
   return (
     <header {...stylex.props(styles.header, isSticky && styles.sticky)}>
-      <HStack gap={2} align="center" justify={trailing ? 'between' : align} wrap="nowrap">
+      <HStack
+        gap={2}
+        align="center"
+        justify={trailing || account ? 'between' : align}
+        wrap="nowrap"
+      >
         <HStack gap={2} align="center" wrap="wrap">
           {/*
             A real anchor, so it works with no JavaScript and middle-clicks the
@@ -135,7 +171,12 @@ export function AppHeader({
           )}
           {roleControl ?? (roleLabel ? <Badge variant="neutral" label={roleLabel} /> : null)}
         </HStack>
-        {trailing}
+        {trailing || account ? (
+          <HStack gap={1} align="center" wrap="nowrap">
+            {trailing}
+            {account}
+          </HStack>
+        ) : null}
       </HStack>
     </header>
   );

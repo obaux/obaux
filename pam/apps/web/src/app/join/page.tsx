@@ -32,10 +32,13 @@ import { setReminderConsent } from '@/lib/useReminderConsent';
 import {
   finishSetup,
   joinWaitingCity,
+  redeemInvite,
   servedCities,
   submitDetails,
+  type InviteProblem,
   type JoinKind,
 } from '@/lib/useJoin';
+import { NOTICES } from '@pam/config';
 import { PhoneSignInCard } from '../signin/PhoneSignInCard';
 
 /**
@@ -136,6 +139,19 @@ export default function JoinPage() {
   const [lastName, setLastName] = useState('');
   const [city, setCity] = useState('');
   const [kind, setKind] = useState<JoinKind>('member');
+  /**
+   * A code from the person who invited them. Optional: a member can come in
+   * without one, and a program lead or case manager cannot come in without one
+   * (0049). Prefilled from `?code=` so an invite can be sent as a link.
+   */
+  const [inviteCode, setInviteCode] = useState('');
+  const [inviteProblem, setInviteProblem] = useState<InviteProblem | null>(null);
+  /** Whether step 2 made an account, as opposed to recording a request. */
+  const [hasAccount, setHasAccount] = useState(false);
+  useEffect(() => {
+    const fromLink = new URLSearchParams(window.location.search).get('code');
+    if (fromLink) setInviteCode(fromLink.toUpperCase());
+  }, []);
   const [wantsUpdates, setWantsUpdates] = useState(false);
   const [cities, setCities] = useState<readonly string[]>([]);
   const [busy, setBusy] = useState(false);
@@ -145,6 +161,7 @@ export default function JoinPage() {
   const firstId = useId();
   const lastId = useId();
   const cityId = useId();
+  const codeFieldId = useId();
 
   /**
    * Who is signed in, asked of the sign-in system rather than of the profile.
@@ -183,8 +200,20 @@ export default function JoinPage() {
     if (phase !== null) return;
     if (session.status === 'signed-out') setPhase('phone');
     else if (session.status === 'no-profile') setPhase('details');
-    else if (session.status === 'signed-in') setPhase('privacy');
-  }, [session.status, phase]);
+    else if (session.status === 'signed-in') {
+      // Finished already: there is nothing here for them. Otherwise pick up at
+      // step 3, as whatever the account says they are.
+      if (session.session.isOnboarded) {
+        router.replace('/');
+        return;
+      }
+      const role = session.session.role;
+      if (role === 'member' || role === 'provider' || role === 'admin') setKind(role);
+      setHasAccount(true);
+      setFirstName((current) => current || (session.session.firstName ?? ''));
+      setPhase('privacy');
+    }
+  }, [session, phase, router]);
 
   /** Step 1 ends where step 2 begins: a verified phone with no profile yet. */
   useEffect(() => {
@@ -204,7 +233,7 @@ export default function JoinPage() {
   }, [phase]);
 
   const isStaff = kind !== 'member';
-  /** Staff never reach the texts step: there is no account to attach it to. */
+  /** Staff are not asked about reminders at sign-up: four steps, not five. */
   const total = isStaff ? 4 : 5;
 
   const submit = async () => {
@@ -219,6 +248,22 @@ export default function JoinPage() {
     setInvalid(null);
     setBusy(true);
     setFailed(false);
+    setInviteProblem(null);
+
+    // A code decides everything the radio buttons would have: the invite
+    // carries the role and the city, chosen by the person who made it.
+    if (inviteCode.trim() !== '') {
+      const redeemed = await redeemInvite(inviteCode, { firstName, lastName, city, language: locale });
+      setBusy(false);
+      if (redeemed.result === 'failed') {
+        setInviteProblem(redeemed.problem);
+        return;
+      }
+      setKind(redeemed.role === 'super_admin' ? 'admin' : redeemed.role);
+      setHasAccount(true);
+      setPhase('privacy');
+      return;
+    }
 
     const outcome = await submitDetails({
       firstName,
@@ -231,7 +276,23 @@ export default function JoinPage() {
 
     if (outcome.result === 'failed') setFailed(true);
     else if (outcome.result === 'city-not-served') setPhase('waiting');
-    else setPhase('privacy');
+    else {
+      setHasAccount(outcome.result === 'member');
+      setPhase('privacy');
+    }
+  };
+
+  /** Staff with an account: nothing to ask about texts, so this is the end. */
+  const finishStaff = async () => {
+    if (!userId) return;
+    setBusy(true);
+    const finished = await finishSetup(userId, false);
+    setBusy(false);
+    if (!finished) {
+      setFailed(true);
+      return;
+    }
+    setPhase('done');
   };
 
   const answerTexts = async (wants: boolean) => {
@@ -258,19 +319,19 @@ export default function JoinPage() {
   if (phase === null) {
     return (
       <Page gap={3}>
-        <AppHeader homeHref={null} />
+        <AppHeader homeHref={null} accountHref={null} />
         <Text xstyle={styles.intro}>{t('places.loading')}</Text>
       </Page>
     );
   }
 
-  const step = STEP[phase];
+  const step = phase === 'done' && isStaff ? 4 : STEP[phase];
 
   return (
     <Page gap={4}>
       {/* No way home from a flow that has not finished: the way out is the
           steps themselves, and the mark is identity here as it is on sign-in. */}
-      <AppHeader homeHref={null} />
+      <AppHeader homeHref={null} accountHref={null} />
 
       <StepHeader
         current={step}
@@ -358,21 +419,51 @@ export default function JoinPage() {
             ) : null}
 
             {/*
+              The code, if there is one. It sits above the three sentences
+              because it replaces them: a person with a code was told what
+              they are by the person who gave it to them.
+            */}
+            <TextField
+              id={codeFieldId}
+              purpose="inviteCode"
+              label={t('join.code.label')}
+              value={inviteCode}
+              onChange={(next) => setInviteCode(next.toUpperCase())}
+              width="100%"
+              xstyle={styles.field}
+            />
+            <Text type="supporting" xstyle={styles.small}>
+              {t('join.code.hint')}
+            </Text>
+
+            {inviteProblem ? (
+              <Notice
+                notice={inviteProblem}
+                title={t(NOTICES[inviteProblem].titleKey)}
+                body={t(NOTICES[inviteProblem].bodyKey)}
+                supportPhone={supportPhone}
+                callLabel={t('help.callSupport')}
+              />
+            ) : null}
+
+            {/*
               Three sentences about the person, not three roles. Always one
               selected, and the first one is the one most people arriving here
               are — asking somebody to declare themselves before they have seen
               anything is hard enough without a blank set of buttons.
             */}
-            <RadioList
-              label={t('join.details.fit')}
-              value={kind}
-              onChange={(next) => setKind(next as JoinKind)}
-              xstyle={styles.choices}
-            >
-              {KINDS.map((option) => (
-                <RadioListItem key={option.kind} value={option.kind} label={t(option.key)} />
-              ))}
-            </RadioList>
+            {inviteCode.trim() === '' ? (
+              <RadioList
+                label={t('join.details.fit')}
+                value={kind}
+                onChange={(next) => setKind(next as JoinKind)}
+                xstyle={styles.choices}
+              >
+                {KINDS.map((option) => (
+                  <RadioListItem key={option.kind} value={option.kind} label={t(option.key)} />
+                ))}
+              </RadioList>
+            ) : null}
 
             <BigButton
               label={busy ? t('join.saving') : t('action.next')}
@@ -482,19 +573,30 @@ export default function JoinPage() {
               ))}
             </VStack>
           </Card>
-          {/*
-            Nothing was created, and saying so is the whole screen. Somebody who
-            believes they have an account and does not will try to sign in, fail
-            silently, and never come back.
-          */}
-          <Notice
-            notice="service_not_available"
-            title={t('join.staff.title')}
-            body={t('join.staff.body')}
-            supportPhone={supportPhone}
-            callLabel={t('help.callSupport')}
-          />
-          <BigButton label={t('action.done')} href="/" />
+          {hasAccount ? (
+            // Came in by code: the account exists, and this is the last step.
+            <BigButton
+              label={busy ? t('join.saving') : t(TRANSPARENCY_SCREEN.confirmKey)}
+              onPress={() => void finishStaff()}
+              isDisabled={busy}
+            />
+          ) : (
+            <>
+              {/*
+                Nothing was created, and saying so is the whole screen. Somebody
+                who believes they have an account and does not will try to sign
+                in, fail silently, and never come back.
+              */}
+              <Notice
+                notice="service_not_available"
+                title={t('join.staff.title')}
+                body={t('join.staff.body')}
+                supportPhone={supportPhone}
+                callLabel={t('help.callSupport')}
+              />
+              <BigButton label={t('action.done')} href="/" />
+            </>
+          )}
         </>
       ) : null}
 
@@ -528,7 +630,18 @@ export default function JoinPage() {
         </Card>
       ) : null}
 
-      {phase === 'done' ? (
+      {phase === 'done' && isStaff ? (
+        <Card padding={4} xstyle={styles.card}>
+          <VStack gap={3} xstyle={styles.celebrate}>
+            <Text xstyle={styles.body}>
+              {t('join.done.staff', { name: firstName.trim() || t('app.name') })}
+            </Text>
+            <BigButton label={t('join.done.action')} onPress={() => router.replace('/')} />
+          </VStack>
+        </Card>
+      ) : null}
+
+      {phase === 'done' && !isStaff ? (
         <Card padding={4} xstyle={styles.card}>
           <VStack gap={3} xstyle={styles.celebrate}>
             <span aria-hidden="true" {...stylex.props(styles.medal)}>

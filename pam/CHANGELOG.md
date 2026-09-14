@@ -1,5 +1,32 @@
 # Changelog
 
+## [0.12.0] — 2026-09-14 · The way out, and four ways in
+
+### Added — your account, and sign out
+
+A button in the corner of every screen opens your account: who PAM thinks you
+are, and a way to sign out. Signing out takes you to the sign-in screen and
+says so.
+
+### Added — a code from the person who invited you
+
+If somebody gave you a code, there is a place for it on the second step of
+signing up. The code decides what kind of account you get. A code can also be
+sent as a link.
+
+### Added — the person running PAM can invite case managers
+
+From the people screen: pick a city, make a code, read it out or text it.
+
+### Changed — the way in stops looping
+
+Signing in while already signed in goes home instead of asking for your phone
+again. A phone that is verified but not set up is sent to finish setting up,
+not to sign in again. A paused account is told so once, plainly, with the way
+to sign out.
+
+### Changed — "Send it again" waits thirty seconds, and says how long
+
 ## [0.11.0] — 2026-09-14 · A way in
 
 ### Added — signing up

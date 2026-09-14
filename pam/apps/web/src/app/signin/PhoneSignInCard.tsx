@@ -91,10 +91,19 @@ export function PhoneSignInCard({
             onPress={() => void verifyCode(code)}
             isDisabled={busy || code.trim().length === 0}
           />
+          {/*
+            Thirty seconds between codes, said on the link itself. A person
+            who taps "send it again" three times gets three codes and a carrier
+            that stops delivering; a person who can see the count waits.
+          */}
           <TextLink
-            label={t('signin.code.resend')}
+            label={
+              flow.resendIn > 0
+                ? t('signin.code.resendIn', { seconds: flow.resendIn })
+                : t('signin.code.resend')
+            }
             onClick={() => void sendCode(state.phone)}
-            isDisabled={busy}
+            isDisabled={busy || flow.resendIn > 0}
           />
         </VStack>
       ) : (

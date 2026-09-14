@@ -130,7 +130,7 @@ export function useCaseload(enabled: boolean): { state: CaseloadState; refresh: 
 export interface CreatedInvite {
   code: string;
   expiresAt: string;
-  role: 'member' | 'provider';
+  role: 'member' | 'provider' | 'admin';
 }
 
 /**
@@ -140,19 +140,37 @@ export interface CreatedInvite {
  * phone or writes it on a card. That is why the alphabet has no 0/O, 1/I/L,
  * 2/Z, 5/S or 8/B in it — every character survives being said out loud.
  */
-export async function createInvite(role: 'member' | 'provider'): Promise<CreatedInvite | null> {
+export async function createInvite(
+  role: 'member' | 'provider' | 'admin',
+  /** Which city, when the caller has none of their own — a super admin (0049). */
+  regionId?: string,
+): Promise<CreatedInvite | null> {
   try {
     const { createClient } = await import('./supabase');
-    const { data, error } = await createClient().rpc('create_invite', { p_role: role });
+    const { data, error } = await createClient().rpc('create_invite', {
+      p_role: role,
+      ...(regionId ? { p_region_id: regionId } : {}),
+    });
     if (error || !data) return null;
 
     const invite = (Array.isArray(data) ? data[0] : data) as {
       code: string;
       expires_at: string;
-      role: 'member' | 'provider';
+      role: 'member' | 'provider' | 'admin';
     };
     return { code: invite.code, expiresAt: invite.expires_at, role: invite.role };
   } catch {
     return null;
+  }
+}
+
+/** The cities PAM serves, with ids, for somebody allowed to see them. */
+export async function listRegions(): Promise<{ id: string; name: string }[]> {
+  try {
+    const { createClient } = await import('./supabase');
+    const { data } = await createClient().from('regions').select('id, name').order('name');
+    return (data ?? []) as { id: string; name: string }[];
+  } catch {
+    return [];
   }
 }

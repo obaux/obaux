@@ -1833,6 +1833,40 @@ client writes the fact that setup finished; the database decides what it is
 worth. Same reasoning as D-107, and it matters more here: the first number a
 member ever sees is the worst one to have made up.
 
+### D-115 — One account screen, one way out, in the same corner everywhere
+`/account/` is the only place that signs anybody out, and every signed-in
+screen carries the same button to it at the end of the header. Not a link at
+the foot of one screen (which is what there was, on the case manager's screen
+only) and not a menu: a person on a borrowed phone needs to find the way out
+without knowing the app, and the way to make that true is to put it in the
+same place on every screen and nowhere else. Sign-out lands on the sign-in
+screen and says so — a sign-out that reloads the current page shows a
+signed-out version of it and leaves somebody wondering whether anything
+happened.
+
+### D-116 — Four kinds of people, four doors, and nobody picks their own role
+member: self-serve, or a case manager's code. provider: asks at sign-up, then a
+code. admin: a code only a super admin can make, into a named city. super
+admin: the seeding script. The line that holds across all four is that a role
+which can see other people's rows is handed out by a person who is answerable
+for it, and the invite carries the role. A super admin's member invite lands
+on nobody's caseload, because a super admin has none — a case manager picks
+them up from the directory. Nobody is invited to run PAM.
+
+### D-117 — The invite code is optional, and it replaces the question
+Step 2 has a code field above the three "which one fits you" sentences, and
+the sentences disappear the moment the field has anything in it. A person with
+a code was told what they are by whoever gave it to them; asking again invites
+a contradiction the screen cannot resolve. `/join/?code=` prefills it so a
+code can travel as a link.
+
+### D-118 — Thirty seconds between codes, counted on the screen
+The live logs show what happens without it: three requests in eight minutes,
+no sign-in. Verification services rate-limit on their side, silently; the
+screen says "Send it again in 24s" so the person is told to wait rather than
+quietly refused. Enforced in the hook, not just disabled on the link, so a
+second tap during the wait does nothing at all.
+
 ---
 
 ## Notes for whoever picks this up next

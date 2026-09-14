@@ -9,6 +9,7 @@ import { Button } from '@astryxdesign/core/Button';
 import { Icon } from '@astryxdesign/core/Icon';
 import { AppHeader, BigButton, Notice, NotificationList, Page, PageTitle } from '@pam/ui';
 import { useI18n } from '@/lib/i18n';
+import { NotIn } from '../NotIn';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
 import { useNotifications } from '@/lib/useNotifications';
@@ -61,16 +62,9 @@ export default function NotificationsPage() {
         <VStack gap={1}>
         </VStack>
 
-        {session.status === 'signed-out' || session.status === 'no-profile' ? (
+        {session.status === 'signed-out' || session.status === 'no-profile' || session.status === 'suspended' ? (
           <>
-            <Notice
-              notice="service_not_available"
-              title={t('admin.signedOut.title')}
-              body={t('admin.signedOut.body')}
-              supportPhone={supportPhone}
-              callLabel={t('help.callSupport')}
-            />
-            <BigButton label={t('signin.title')} href="/signin/" />
+            <NotIn status={session.status} title={t('admin.signedOut.title')} body={t('admin.signedOut.body')} />
           </>
         ) : null}
 

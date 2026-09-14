@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 /**
  * Phone sign-in. There is no password anywhere in PAM (§9).
@@ -47,16 +47,42 @@ export function toE164(input: string): string | null {
   return null;
 }
 
+/**
+ * How long "Send it again" waits before it will.
+ *
+ * A code takes a few seconds to arrive and a person who taps the link three
+ * times in a minute gets three codes, of which only the last one works — and a
+ * carrier that sees the pattern stops delivering to that number. The live logs
+ * on the night of the 14th show exactly that: one phone, three requests in
+ * eight minutes, no sign-in. Thirty seconds is what the major verification
+ * services enforce on their side; enforcing it on the screen means the person
+ * is told to wait rather than silently rate-limited.
+ */
+export const RESEND_WAIT_SECONDS = 30;
+
 /** What the hook hands back, named so a screen can take it as a prop. */
 export interface PhoneSignIn {
   state: SignInStep;
   sendCode: (phone: string) => Promise<void>;
   verifyCode: (code: string) => Promise<void>;
   startOver: () => void;
+  /** Seconds until "Send it again" works. 0 when it does. */
+  resendIn: number;
 }
 
 export function usePhoneSignIn(): PhoneSignIn {
   const [state, setState] = useState<SignInStep>({ step: 'phone' });
+  const [resendAt, setResendAt] = useState<number | null>(null);
+  const [now, setNow] = useState(() => Date.now());
+
+  // Tick once a second while somebody is waiting, and not otherwise.
+  useEffect(() => {
+    if (resendAt === null || resendAt <= now) return;
+    const id = setInterval(() => setNow(Date.now()), 1000);
+    return () => clearInterval(id);
+  }, [resendAt, now]);
+
+  const resendIn = resendAt === null ? 0 : Math.max(0, Math.ceil((resendAt - now) / 1000));
 
   const sendCode = async (input: string): Promise<void> => {
     const phone = toE164(input);
@@ -65,11 +91,20 @@ export function usePhoneSignIn(): PhoneSignIn {
       return;
     }
 
+    // Asked for again too soon: keep the code step, say nothing new. The
+    // screen's own label already says how long is left.
+    if (resendAt !== null && resendAt > Date.now()) return;
+
     setState({ step: 'sending' });
     try {
       const { createClient } = await import('./supabase');
       const { error } = await createClient().auth.signInWithOtp({ phone });
       if (error) reportSignInProblem('send', error);
+      if (!error) {
+        const at = Date.now() + RESEND_WAIT_SECONDS * 1000;
+        setResendAt(at);
+        setNow(Date.now());
+      }
       setState(error ? { step: 'failed', reason: 'send', phone } : { step: 'code', phone });
     } catch (error) {
       reportSignInProblem('send', error);
@@ -97,5 +132,11 @@ export function usePhoneSignIn(): PhoneSignIn {
     }
   };
 
-  return { state, sendCode, verifyCode, startOver: () => setState({ step: 'phone' }) };
+  return {
+    state,
+    sendCode,
+    verifyCode,
+    startOver: () => setState({ step: 'phone' }),
+    resendIn,
+  };
 }

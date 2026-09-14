@@ -13,8 +13,9 @@ import { Button } from '@astryxdesign/core/Button';
 import { AppHeader, BigButton, Notice, NotificationBell, Page, PageTitle, TextLink } from '@pam/ui';
 import { NOTICES } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
+import { NotIn } from '../NotIn';
 import { useSupportPhone } from '@/lib/useSupportPhone';
-import { useSession, signOut } from '@/lib/useSession';
+import { useSession } from '@/lib/useSession';
 import { useCaseload, createInvite, type CreatedInvite } from '@/lib/useCaseload';
 import { useNotifications } from '@/lib/useNotifications';
 
@@ -122,18 +123,11 @@ export default function AdminPage() {
     );
   }
 
-  if (session.status === 'signed-out' || session.status === 'no-profile') {
+  if (session.status === 'signed-out' || session.status === 'no-profile' || session.status === 'suspended') {
     return (
       <Page gap={4}>
           <AppHeader />
-          <Notice
-            notice="service_not_available"
-            title={t('admin.signedOut.title')}
-            body={t('admin.signedOut.body')}
-            supportPhone={supportPhone}
-            callLabel={t('help.callSupport')}
-          />
-          <BigButton label={t('signin.title')} href="/signin/" />
+          <NotIn status={session.status} title={t('admin.signedOut.title')} body={t('admin.signedOut.body')} />
       </Page>
     );
   }
@@ -354,7 +348,7 @@ export default function AdminPage() {
 
         <HStack gap={2} wrap="wrap">
           <TextLink label={t('admin.back')} href="/" />
-          <TextLink label={t('signin.signout')} onClick={() => void signOut().then(() => window.location.reload())} />
+          <TextLink label={t('account.title')} href="/account/" />
         </HStack>
     </Page>
   );

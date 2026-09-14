@@ -1,9 +1,9 @@
 # PAM — where the project stands
 
-Last updated 2026-09-14. The member-facing product is real now: signing up,
-saving, points, badges, reporting a place, and a screen for the person running
-PAM. Newest session log:
-`docs/sessions/2026-09-14-signing-up-and-the-hole-it-found.md`.
+Last updated 2026-09-14. The member-facing product is real now: signing up
+and signing out, invite codes for all four kinds of account, saving, points,
+badges, reporting a place, and a screen for the person running PAM. Newest
+session log: `docs/sessions/2026-09-14-the-way-in-and-the-way-out.md`.
 
 This is the handover document: what exists, what is proven, what is live, and
 what the next person needs to know before touching anything.
@@ -36,7 +36,7 @@ going — without help?*
 ## What is live
 
 **Supabase project `pam`** — `shobqzuhicoiymtumiaz`, us-east-1 (closest region to
-Philadelphia). Forty-eight migrations applied. The database is real and reachable;
+Philadelphia). Forty-nine migrations applied. The database is real and reachable;
 the app is not deployed anywhere yet.
 
 **The text-message dispatcher is live and running** — the `dispatch-sms` function
@@ -49,9 +49,21 @@ database, not in the function. Signing the copy and adding the Twilio
 credentials is what turns it on; nothing needs redeploying. See
 `docs/sms-setup.md`.
 
-**Sign-in works.** Supabase is pointed at Twilio, and a real code reached a real
-phone on 13 September. One door for every role: what you see after the code comes
-from the account, never from which link you followed.
+**Sign-in and sign-up work, and sign-out exists.** Supabase is pointed at
+Twilio, and a real code reached a real phone on 13 September; a real member
+signed themselves up on the 14th. One door for every role: what you see after
+the code comes from the account, never from which link you followed. Every
+signed-in screen carries the same button to `/account/`, which is the way out.
+
+**How each kind of account gets in** (0049): a member signs up alone or with a
+case manager's code; a program lead asks at sign-up and gets a code; a case
+manager gets a code only a super admin can make, from the people screen, into a
+named city; a super admin is made by the seeding script and nothing else.
+
+**The Twilio account is still in trial.** Only numbers verified by hand in the
+Twilio console receive a code. A tester with an unverified number sees "we
+sent you a code" and nothing arrives — which is what the logs show happened on
+the 14th.
 
 **The carrier campaign was APPROVED on 13 September.** Two rejections got there:
 the first submission declared no embedded links, which nine of the thirteen
@@ -112,8 +124,8 @@ Numbers here are from the last run, not aspirations.
 | Database suite | 152 checks pass | See below |
 | Live RLS fingerprint | identical to local | The deployed policy set is provably the one that was penetration-tested: `ce9636c3b77e4827368e6575742b899c`, 73 policies on both |
 | Live anonymous attack | 0 rows leaked | A signed-out caller reads no profiles, messages, invites or audit rows on the real database, while still reaching the support number and the public catalogue |
-| Browser a11y + theme | 354 pass | No WCAG AA violations at 320px or iPhone SE. Every control clears 48px. No horizontal scroll. The Astryx theme really resolves. Runs in dark mode as well as light. |
-| First-load JS | 498.3 kB of 500 kB — 1.7 kB of headroom, and shrinking | §12 budget, measured gzipped on what `index.html` actually loads |
+| Browser a11y + theme | 381 pass | No WCAG AA violations at 320px or iPhone SE. Every control clears 48px. No horizontal scroll. The Astryx theme really resolves. Runs in dark mode as well as light. |
+| First-load JS | 499.7 kB of 500 kB — 0.3 kB of headroom; the next shared component breaches it | §12 budget, measured gzipped on what `index.html` actually loads |
 
 ### The database suite is the one that matters
 
@@ -141,10 +153,9 @@ result with one test user per role. It proves:
 Phase 0 owns foundations. These are Phase 1–7 and their absence is not an
 oversight:
 
-- **No invite redemption screen, no map, no enrollment, no chat.** Sign-up now
-  exists — `/join/`, five steps — so a person with nobody to invite them can
-  create their own member account. An invite code still has no screen to be
-  typed into.
+- **No map, no enrollment, no chat.** Sign-up exists — `/join/`, five steps —
+  and an invite code is typed into its second step, or arrives as
+  `/join/?code=`.
 - **Nothing reviews `staff_requests`.** Sign-up records people who say they run
   a program or carry a caseload; the rows are there and a super admin can read
   them, but there is no screen and no notification. The screen promises a call
@@ -161,9 +172,10 @@ oversight:
 - **Notices exist but are not wired to real failures.** Every condition has
   plain-language copy and a component (D-035), and the demo renders three of
   them. Connecting them to actual query results is Phase 1.
-- **The §12 budget has 1.7 kB left.** Sign-up pulled ProgressBar, CheckboxInput
-  and RadioList into the shared chunk. The next component on a shared screen
-  breaches it; splitting the Astryx imports is now the next infrastructure task.
+- **The §12 budget has 0.3 kB left.** Sign-up, the account screen and the
+  invite card each pulled a little more Astryx into the shared chunk. The next
+  component on a shared screen breaches it; splitting the Astryx imports is the
+  next infrastructure task, before any more UI.
 - **No five-tab member shell.** `AppShell` + `TabList` is the first UI task of
   Phase 1. The layout is settled and the pieces are ready: Help is now a compact
   item sized to share the bottom bar rather than a full-width row (D-039), and
@@ -246,7 +258,8 @@ while the copy is unsigned, so it earned the first live test, not the last.*
 | 7 | Retention: missed-appointment history beyond 90 days | Phase 5 | No purge job. Keeping this data indefinitely is the wrong default for this population. |
 | 8 | Pilot partner orgs and usability test scheduling | Phase 7 | Five members, three providers, two admins. |
 | 9 | **Point Supabase at Twilio** — Authentication → Providers → Phone | Anyone signing in | **The single thing blocking the product.** Twilio is paid for and working, but Supabase has not been pointed at it: asking the live project for a sign-in code answers `Unsupported phone provider`. Account SID, Auth Token, Verify Service SID. |
-| 10a | **Who calls the people who ask to help?** | Program leads and case managers getting accounts | Sign-up collects them as requests in `staff_requests`, and the screen says somebody will call within a day or two. Nobody works that list yet, and nothing tells them there is one. |
+| 10a | **Who calls the people who ask to help?** | Program leads and case managers getting accounts | Sign-up collects them as requests in `staff_requests`, and the screen says somebody will call within a day or two. Nobody works that list yet, and nothing tells them there is one. The code they need can now be made from the people screen. |
+| 10c | **Take Twilio out of trial**, or verify each tester's number by hand | Anybody whose number is not verified | In trial, a code to an unverified number is not sent and nothing says so. The live logs on the 14th show one phone asking three times. |
 | 10b | **A line about the PAM team on the transparency screen** | A promise already made | Members were told they would hear first if what is visible changes, and the directory now shows a super admin every account (name, role, region, status, last active; never messages or contact details). Proposed, for `packages/config/transparency.ts`: *"The PAM team can see your name, your city and the last day you used PAM. Never your messages."* It is a change to the contract, so it wants Will's word. |
 | 10 | **Twilio credentials into the dispatcher's secrets** | Reminders and notices | `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, and either `TWILIO_MESSAGING_SERVICE_SID` or `TWILIO_FROM_NUMBER`, under Edge Functions → dispatch-sms. Until then the dispatcher records "Twilio is not configured" instead of sending. |
 

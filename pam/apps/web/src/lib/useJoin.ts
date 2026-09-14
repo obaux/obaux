@@ -75,6 +75,64 @@ export async function submitDetails(details: JoinDetails): Promise<JoinOutcome> 
   }
 }
 
+/** What went wrong with a code, in the database's own words (0008). */
+export type InviteProblem =
+  | 'invite_not_found'
+  | 'invite_already_used'
+  | 'invite_expired'
+  | 'invite_phone_mismatch'
+  | 'something_went_wrong';
+
+export type RedeemOutcome =
+  | { result: 'redeemed'; role: JoinKind | 'super_admin' }
+  | { result: 'failed'; problem: InviteProblem };
+
+/**
+ * Turn a code somebody was given into the account it was made for.
+ *
+ * The invite carries the role and the region, chosen by the person who made
+ * it — a case manager for members and programs, the person running PAM for a
+ * case manager (0049). The screen sends the name and city alongside so an
+ * invited person is not the one person PAM has no last name for.
+ *
+ * The four failure words are the function's own (`INVITE_NOT_FOUND` and so
+ * on). They are mapped here, once, to the notice keys that already exist for
+ * them — the screen shows the plain sentence and the distinction stays out of
+ * it, which is what 0008 intended.
+ */
+export async function redeemInvite(
+  code: string,
+  details: Omit<JoinDetails, 'kind'>,
+): Promise<RedeemOutcome> {
+  try {
+    const { createClient } = await import('./supabase');
+    const { data, error } = await createClient().rpc('redeem_invite', {
+      p_code: code.trim().toUpperCase(),
+      p_first_name: details.firstName.trim(),
+      p_preferred_language: details.language,
+      p_last_name: details.lastName.trim(),
+      p_home_city: details.city.trim(),
+    });
+    if (error) {
+      const message = String((error as { message?: string }).message ?? '');
+      const problem: InviteProblem = message.includes('INVITE_NOT_FOUND')
+        ? 'invite_not_found'
+        : message.includes('INVITE_ALREADY_USED')
+          ? 'invite_already_used'
+          : message.includes('INVITE_EXPIRED')
+            ? 'invite_expired'
+            : message.includes('INVITE_PHONE_MISMATCH')
+              ? 'invite_phone_mismatch'
+              : 'something_went_wrong';
+      return { result: 'failed', problem };
+    }
+    const profile = (Array.isArray(data) ? data[0] : data) as { role?: string } | null;
+    return { result: 'redeemed', role: (profile?.role ?? 'member') as JoinKind | 'super_admin' };
+  } catch {
+    return { result: 'failed', problem: 'something_went_wrong' };
+  }
+}
+
 /** Leave a name for a city PAM is not in yet. `wantsUpdates` is their choice. */
 export async function joinWaitingCity(city: string, wantsUpdates: boolean): Promise<boolean> {
   try {

@@ -109,6 +109,7 @@ export default function PlacesPage() {
           page to say something that is true of every card below it.
         */}
         <AppHeader
+          roleLabel={session.status === 'signed-in' ? t(`role.${session.session.role}`) : undefined}
           trailing={<AreaTrigger area={area} onOpen={() => setIsPickingArea(true)} />}
         />
 

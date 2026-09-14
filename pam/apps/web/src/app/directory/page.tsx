@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { VStack } from '@astryxdesign/core/VStack';
 import { HStack } from '@astryxdesign/core/HStack';
@@ -10,12 +10,25 @@ import { Text } from '@astryxdesign/core/Text';
 import { Badge } from '@astryxdesign/core/Badge';
 import { Avatar } from '@astryxdesign/core/Avatar';
 import { Selector } from '@astryxdesign/core/Selector';
-import { AppHeader, BigButton, Notice, NotificationBell, Page, PageTitle, ScrollReveal, TextLink } from '@pam/ui';
+import { Button } from '@astryxdesign/core/Button';
+import { RadioList, RadioListItem } from '@astryxdesign/core/RadioList';
+import {
+  AppHeader,
+  BigButton,
+  Notice,
+  NotificationBell,
+  Page,
+  PageTitle,
+  ScrollReveal,
+  TextLink,
+} from '@pam/ui';
 import { NOTICES, ROLES, type Role } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
+import { NotIn } from '../NotIn';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
 import { useDirectory } from '@/lib/useDirectory';
+import { createInvite, listRegions, type CreatedInvite } from '@/lib/useCaseload';
 import { useNotifications } from '@/lib/useNotifications';
 
 /**
@@ -49,6 +62,9 @@ const styles = stylex.create({
   card: { width: '100%' },
   // The header is a tight row: the filter gives way before the mark does.
   filter: { maxWidth: '48vw' },
+  code: { fontSize: '32px', fontWeight: 700, letterSpacing: '0.12em', fontVariantNumeric: 'tabular-nums' },
+  note: { fontSize: '15px', lineHeight: 1.5 },
+  secondary: { minHeight: '48px' },
 });
 
 /** "All", then one option per role, in the order somebody thinks of them. */
@@ -75,6 +91,51 @@ export default function DirectoryPage() {
       ? notifications.items.filter((item) => !item.isRead).length
       : 0;
 
+  /**
+   * Bringing somebody in.
+   *
+   * The person running PAM is the only one who can make a case manager (0049),
+   * and they have no city of their own, so the card asks which city first. The
+   * code is the product: read down the phone or texted, eight characters that
+   * survive being said out loud.
+   */
+  const [regions, setRegions] = useState<{ id: string; name: string }[]>([]);
+  const [regionId, setRegionId] = useState<string>('');
+  const [invite, setInvite] = useState<CreatedInvite | null>(null);
+  const [inviteBusy, setInviteBusy] = useState(false);
+  const [inviteFailed, setInviteFailed] = useState<'city' | 'failed' | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    if (!isSuperAdmin) return;
+    let cancelled = false;
+    void listRegions().then((list) => {
+      if (cancelled) return;
+      setRegions(list);
+      if (list.length === 1) setRegionId(list[0]!.id);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [isSuperAdmin]);
+
+  const makeInvite = async (role: 'member' | 'provider' | 'admin') => {
+    if (!regionId) {
+      setInviteFailed('city');
+      return;
+    }
+    setInviteBusy(true);
+    setInviteFailed(null);
+    const created = await createInvite(role, regionId);
+    setInviteBusy(false);
+    if (created) {
+      setInvite(created);
+      setCopied(false);
+    } else {
+      setInviteFailed('failed');
+    }
+  };
+
   if (session.status === 'loading') {
     return (
       <Page gap={3}>
@@ -86,18 +147,11 @@ export default function DirectoryPage() {
     );
   }
 
-  if (session.status === 'signed-out' || session.status === 'no-profile') {
+  if (session.status === 'signed-out' || session.status === 'no-profile' || session.status === 'suspended') {
     return (
       <Page gap={4}>
         <AppHeader />
-        <Notice
-          notice="service_not_available"
-          title={t('directory.signedOut.title')}
-          body={t('directory.signedOut.body')}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
-        />
-        <BigButton label={t('signin.title')} href="/signin/" />
+        <NotIn status={session.status} title={t('directory.signedOut.title')} body={t('directory.signedOut.body')} />
       </Page>
     );
   }
@@ -181,6 +235,89 @@ export default function DirectoryPage() {
         backHref="/"
         backLabel={t('nav.back.home')}
       />
+
+      <Card xstyle={styles.card}>
+        <VStack gap={3}>
+          <Heading level={2} xstyle={styles.name}>
+            {t('directory.invite.title')}
+          </Heading>
+          {invite ? (
+            <>
+              <Text type="supporting" xstyle={styles.note}>
+                {t('admin.invite.ready')}
+              </Text>
+              <Text xstyle={styles.code}>{invite.code}</Text>
+              <Text type="supporting" xstyle={styles.note}>
+                {t('admin.invite.expires', {
+                  date: new Intl.DateTimeFormat(locale, { month: 'long', day: 'numeric' }).format(
+                    new Date(invite.expiresAt),
+                  ),
+                })}
+              </Text>
+              <HStack gap={2} wrap="wrap">
+                <Button
+                  label={copied ? t('admin.invite.copied') : t('admin.invite.copy')}
+                  variant="secondary"
+                  onClick={() => {
+                    void navigator.clipboard?.writeText(invite.code).then(() => setCopied(true));
+                  }}
+                  xstyle={styles.secondary}
+                />
+                <TextLink label={t('admin.invite.another')} onClick={() => setInvite(null)} />
+              </HStack>
+            </>
+          ) : (
+            <>
+              {regions.length > 1 ? (
+                <RadioList
+                  label={t('directory.invite.city')}
+                  value={regionId}
+                  onChange={(next) => setRegionId(String(next))}
+                >
+                  {regions.map((region) => (
+                    <RadioListItem key={region.id} value={region.id} label={region.name} />
+                  ))}
+                </RadioList>
+              ) : null}
+              {inviteFailed === 'city' ? (
+                <Text type="supporting" xstyle={styles.note}>
+                  {t('directory.invite.pickCity')}
+                </Text>
+              ) : null}
+              <VStack gap={2}>
+                <BigButton
+                  label={inviteBusy ? t('admin.invite.creating') : t('directory.invite.admin')}
+                  onPress={() => void makeInvite('admin')}
+                  isDisabled={inviteBusy}
+                />
+                <Button
+                  label={t('directory.invite.provider')}
+                  variant="secondary"
+                  onClick={() => void makeInvite('provider')}
+                  isDisabled={inviteBusy}
+                  xstyle={styles.secondary}
+                />
+                <Button
+                  label={t('directory.invite.member')}
+                  variant="secondary"
+                  onClick={() => void makeInvite('member')}
+                  isDisabled={inviteBusy}
+                  xstyle={styles.secondary}
+                />
+              </VStack>
+            </>
+          )}
+          {inviteFailed === 'failed' ? (
+            <Notice
+              notice="something_went_wrong"
+              title={t('admin.invite.failed.title')}
+              body={t('admin.invite.failed.body')}
+              supportPhone={supportPhone}
+              callLabel={t('help.callSupport')}
+            />
+          ) : null}
+        </VStack>
+      </Card>
 
       {directory.status === 'loading' ? (
         <Text type="supporting" xstyle={styles.count}>
