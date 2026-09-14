@@ -5,7 +5,7 @@ import { Carousel } from '@astryxdesign/core/Carousel';
 import { VStack } from '@astryxdesign/core/VStack';
 import { Text } from '@astryxdesign/core/Text';
 import { IconButton } from '@astryxdesign/core/IconButton';
-import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
+import { colorVars, spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { BookmarkIcon } from './icons.js';
 import { MaskedItem, MaskedList } from './motion.js';
 import { pam } from './tokens.stylex.js';
@@ -13,10 +13,18 @@ import { pam } from './tokens.stylex.js';
 /**
  * The places a member kept, on the way past.
  *
- * Squares, swiped sideways, three-and-a-bit on screen at a time. A member keeps
- * a handful of places and wants them at a glance from home — not a list to
- * scroll past on the way to everything else. The full list is its own screen,
- * reached from the heading beside this.
+ * Squares, swiped sideways, one and a half on screen at a time (Will, 14
+ * September). The half is the affordance: a card cut by the edge of the screen
+ * is the only thing that says "there are more of these" without a control
+ * saying it. A member keeps a handful of places and wants them at a glance from
+ * home — not a list to scroll past on the way to everything else.
+ *
+ * The row runs to the edge of the screen rather than stopping at the page's
+ * gutter, and fades out there rather than being chopped. Both matter: a strip
+ * that stops short of the edge looks like it ended, and a hard cut looks like a
+ * rendering fault. The negative margin is what lets it out of the page's
+ * padding, and the mask is what makes the edge soft — deliberately not
+ * `overflow: hidden`, which would clip the cards' own shadows.
  *
  * The bookmark in each corner is the way out, in the same place it was in when
  * the place was saved. Tapping it removes the place and the square leaves under
@@ -50,14 +58,37 @@ export interface SavedStripProps {
   readonly onRemove: (id: string) => void;
 }
 
-const SQUARE = '136px';
-
 const styles = stylex.create({
-  region: { width: '100%' },
+  region: {
+    // Out of the page's 16px gutter on both sides, so the row reaches the
+    // screen. The container itself never clips: the fade below does that work.
+    width: 'calc(100% + 32px)',
+    marginInline: '-16px',
+    // Named as a container so a card can be sized against the row.
+    containerType: 'inline-size',
+    // The soft end: opaque until the last 48px, then gone by the edge. A mask
+    // rather than a gradient overlay, so it works on whatever the page colour
+    // happens to be in either mode.
+    maskImage: 'linear-gradient(to right, black calc(100% - 48px), transparent)',
+  },
+  /** Puts the first card back where the page's own content starts. */
+  track: { paddingInline: '16px' },
   card: {
     position: 'relative',
-    width: SQUARE,
-    height: SQUARE,
+    /*
+     * One and a half cards in view. The row is the screen minus its gutters, so
+     * two-thirds of it puts the second card's edge in sight and the third out
+     * of it — capped, so this stays a strip of cards on a tablet rather than
+     * two enormous tiles.
+     */
+    width: 'min(62cqw, 220px)',
+    /*
+     * Wide rather than square. At one and a half per view a card is ~230px
+     * across, and a square that size is mostly empty — a name, a category and
+     * a bookmark do not fill it, and the empty half reads as something that
+     * failed to load. 132px is the height those three things actually need.
+     */
+    height: '132px',
     flexShrink: 0,
     borderRadius: '16px',
     backgroundColor: colorVars['--color-background-card'],
@@ -102,7 +133,11 @@ const styles = stylex.create({
 export function SavedStrip({ places, label, removeLabel, onRemove }: SavedStripProps) {
   return (
     <section aria-label={label} {...stylex.props(styles.region)}>
-      <Carousel gap={2} hasButtons={false} hasEdgeFade>
+      {/*
+        The same 8px between cards that the tiles on the home screen use, so the
+        two blocks on that screen are spaced by one rule rather than two.
+      */}
+      <Carousel gap={2} hasButtons={false} hasEdgeFade={false} xstyle={styles.track}>
         {/*
           The mask lives in the motion runtime, which may never arrive — a slow
           connection gets no animation chunk at all. Then this is a plain

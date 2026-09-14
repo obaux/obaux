@@ -34,6 +34,12 @@ export interface AppHeaderProps {
   /** Plain-language role name, already translated. Omitted for signed-out. */
   roleLabel?: string | null;
   /**
+   * Replaces the role chip with a control — today, a super admin's view
+   * switcher. A slot rather than a `roles` prop: the header should not know
+   * what a role switch is, and the choice belongs to the screen that acts on it.
+   */
+  roleControl?: ReactNode;
+  /**
    * Where the mark sits. Left inside the app, where it shares a row with the
    * role chip and screens are scanned from the left; centred on the way in,
    * where it is the only thing on its line and is there to say which app this
@@ -98,6 +104,7 @@ const styles = stylex.create({
 
 export function AppHeader({
   roleLabel,
+  roleControl,
   align = 'start',
   trailing,
   isSticky = false,
@@ -126,7 +133,7 @@ export function AppHeader({
           ) : (
             mark
           )}
-          {roleLabel ? <Badge variant="neutral" label={roleLabel} /> : null}
+          {roleControl ?? (roleLabel ? <Badge variant="neutral" label={roleLabel} /> : null)}
         </HStack>
         {trailing}
       </HStack>

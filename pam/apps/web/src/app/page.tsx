@@ -9,28 +9,28 @@ import * as stylex from '@stylexjs/stylex';
 import {
   AppHeader,
   BigButton,
-  BellIcon,
   CardEnter,
   HelpBar,
   NavTile,
   Notice,
   NotificationBell,
   PageEnter,
+  RoleSwitch,
   PeopleIcon,
   Page,
   PlacesIcon,
-  PlanIcon,
   Press,
   StarIcon,
   TextLink,
 } from '@pam/ui';
-import { categoryLabelKey, NOTICES } from '@pam/config';
+import { categoryLabelKey, NOTICES, ROLES } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
 import { useNotifications } from '@/lib/useNotifications';
 import { useSavedPlaces } from '@/lib/useSavedPlaces';
 import { usePoints } from '@/lib/usePoints';
+import { useViewAs } from '@/lib/useViewAs';
 import { SavedStripLazy } from './SavedStripLazy';
 
 /**
@@ -77,6 +77,9 @@ export default function HomePage() {
   const { state: notifications } = useNotifications(signedIn);
   const { state: saved, unsave, failed: saveFailed } = useSavedPlaces(signedIn);
   const points = usePoints(session.status === 'signed-in' ? session.session.userId : null);
+  const { viewAs, setViewAs } = useViewAs(
+    session.status === 'signed-in' ? session.session.role : null,
+  );
   const unread =
     notifications.status === 'ready'
       ? notifications.items.filter((item) => !item.isRead).length
@@ -149,13 +152,33 @@ export default function HomePage() {
   }
 
   const { session: me } = session;
-  const isCaseManager = me.role === 'admin';
-  const isSuperAdmin = me.role === 'super_admin';
+
+  /*
+   * A super admin can look at the screen the way each role gets it (D-108).
+   * `viewAs` changes what is drawn and nothing else: every query above already
+   * ran, as them, under the same rules. Nobody else's data is anywhere near
+   * this screen.
+   */
+  const viewed = viewAs ?? me.role;
+  const isCaseManager = viewed === 'admin';
+  const isSuperAdmin = viewed === 'super_admin';
 
   return (
     <Page gap={4}>
       <AppHeader
-        roleLabel={t(`role.${me.role}`)}
+        roleLabel={t(`role.${viewed}`)}
+        roleControl={
+          me.role === 'super_admin' ? (
+            <RoleSwitch
+              value={viewed}
+              ownValue={me.role}
+              label={t('view.switch')}
+              viewingLabel={(roleLabel) => t('view.as', { role: roleLabel })}
+              options={ROLES.map((role) => ({ value: role, label: t(`role.${role}`) }))}
+              onChange={(next) => setViewAs(next as typeof me.role)}
+            />
+          ) : undefined
+        }
         trailing={
           notifications.status === 'ready' ? (
             <NotificationBell
@@ -176,9 +199,8 @@ export default function HomePage() {
       */}
       {/*
         The name and the points on one line (Will, 13 September). The balance is
-        a link rather than a badge: points mean levels and badges (§8), and
-        those need a screen — until it exists this goes to the saved list, which
-        is the only place points currently come from.
+        a link to the points screen, which is where the badges and the ladder
+        are — a number with nowhere to go is a number nobody believes.
 
         It is absent, not zero, while the balance is unknown or the call fails.
         A points chip is the least important thing on this screen and a "0" that
@@ -192,7 +214,7 @@ export default function HomePage() {
           <Button
             label={t('points.summary', { count: points })}
             variant="secondary"
-            href="/saved/"
+            href="/points/"
             icon={<StarIcon />}
             xstyle={styles.points}
           />
@@ -236,6 +258,21 @@ export default function HomePage() {
         />
       ) : null}
 
+      {viewAs && viewAs !== me.role ? (
+        <Notice
+          notice="admin_out_of_region"
+          title={t('view.as', { role: t(`role.${viewed}`) })}
+          body={t('view.notice', { role: t(`role.${viewed}`) })}
+        />
+      ) : null}
+
+      {/*
+        Two tiles came off this screen (Will, 14 September). Notifications is
+        the bell in the header — the same destination twice is a menu arguing
+        with itself. Text reminders belongs to signing up: it is the one
+        question PAM asks once, and a permanent tile invites somebody to
+        re-answer a decision that is already made.
+      */}
       <VStack gap={2}>
         {isCaseManager ? (
           <NavTile
@@ -266,20 +303,6 @@ export default function HomePage() {
           description={t('home.go.places')}
         />
 
-        <NavTile
-          href="/notifications/"
-          icon={<BellIcon />}
-          label={t('notify.title')}
-          description={t('home.go.notifications')}
-          alertLabel={unread > 0 ? t('notify.unread', { count: unread }) : undefined}
-        />
-
-        <NavTile
-          href="/reminders/"
-          icon={<PlanIcon />}
-          label={t('reminders.title')}
-          description={t('home.go.reminders')}
-        />
       </VStack>
 
       {/* §0 — a visible way to get help, on the screen everybody starts from. */}

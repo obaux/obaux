@@ -296,7 +296,10 @@ test.describe('what has happened that a case manager has to act on', () => {
     // manager, a super admin and a member all reach this list, and home is the
     // one place all three of them can carry on from.
     await expect(page.getByRole('link', { name: 'Back to Home' })).toHaveAttribute('href', '/');
-    await expect(page.getByRole('link', { name: 'Get help' })).toBeVisible();
+    // No help link on this screen (Will, 14 September): the way back is the
+    // arrow beside the title, and nothing in a list of notices is a problem
+    // support can solve.
+    await expect(page.getByRole('link', { name: 'Get help' })).toHaveCount(0);
   });
 
   test('dates the new one as today rather than making somebody do arithmetic', async ({ page }) => {

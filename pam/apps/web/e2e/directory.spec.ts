@@ -166,6 +166,56 @@ test.describe('everyone, for the person running PAM', () => {
     expect(text, 'a phone number reached the directory').not.toMatch(/\+?\d[\d ()-]{8,}/);
   });
 
+  test('a super admin can look at the screen each role gets', async ({ page }) => {
+    // One codebase, four very different screens. A case manager reporting that
+    // "the tile is missing" is describing a screen the person running PAM has
+    // never had (Will, 14 September).
+    await signedInAs(page, 'super_admin');
+    await page.route('**/rest/v1/rpc/member_points*', (route) => route.fulfill(json(400)));
+    await page.route('**/rest/v1/rpc/saved_places_mine*', (route) => route.fulfill(json([])));
+    await page.goto('/');
+
+    // Their own screen first: the directory tile, no caseload tile.
+    await expect(page.getByRole('link', { name: /Everyone/ })).toBeVisible();
+
+    await page.getByRole('button', { name: 'Super admin' }).click();
+    await page
+      .getByRole('menuitem', { name: 'Case manager' })
+      .or(page.getByRole('button', { name: 'Case manager' }))
+      .first()
+      .click();
+
+    // Now the case manager's arrangement — and a notice saying plainly that
+    // this is still their own account, not somebody else's.
+    await expect(page.getByRole('link', { name: /Your people/ })).toBeVisible();
+    await expect(page.getByText(/nobody else’s information is shown/)).toBeVisible();
+  });
+
+  test('switching the view never changes whose data is asked for', async ({ page }) => {
+    // The switch is a rendering choice. If it ever started changing the query,
+    // it would be impersonation, which is a different product decision and one
+    // that would have to be argued in front of the people it is about.
+    const asked: string[] = [];
+    await signedInAs(page, 'super_admin');
+    await page.route('**/rest/v1/rpc/member_points*', (route) => {
+      asked.push(String((route.request().postDataJSON() as { p_member_id: string }).p_member_id));
+      return route.fulfill(json(400));
+    });
+    await page.route('**/rest/v1/rpc/saved_places_mine*', (route) => route.fulfill(json([])));
+
+    await page.goto('/');
+    await page.getByRole('button', { name: 'Super admin' }).click();
+    await page
+      .getByRole('menuitem', { name: 'Member' })
+      .or(page.getByRole('button', { name: 'Member' }))
+      .first()
+      .click();
+    await expect(page.getByText(/nobody else’s information is shown/)).toBeVisible();
+
+    // Every id asked for is the signed-in person's own.
+    expect(new Set(asked)).toEqual(new Set([WILL]));
+  });
+
   test('has no WCAG A/AA violations', async ({ page }) => {
     await signedInAs(page, 'super_admin');
     await page.goto('/directory/');

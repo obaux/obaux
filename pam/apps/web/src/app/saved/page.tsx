@@ -6,7 +6,6 @@ import * as stylex from '@stylexjs/stylex';
 import {
   AppHeader,
   BigButton,
-  HelpBar,
   Notice,
   Page,
   PageTitle,
@@ -33,6 +32,11 @@ import { sharePlace } from '@/lib/sharePlace';
  * no separate delete: the control that put a place in the list is the control
  * that takes it out, which is one fewer thing to learn and one fewer thing to
  * hit by accident.
+ *
+ * No help bar (Will, 14 September). This is a list of things the member chose,
+ * with the way back beside the title and a phone number on every card that has
+ * one. A support button at the foot of it answers a question nobody reading
+ * their own saved places is asking.
  */
 
 const styles = stylex.create({
@@ -54,7 +58,6 @@ export default function SavedPage() {
         <Text type="supporting" xstyle={styles.note}>
           {t('places.loading')}
         </Text>
-        <HelpBar label={t('nav.help')} variant="block" />
       </Page>
     );
   }
@@ -89,7 +92,6 @@ export default function SavedPage() {
           supportPhone={supportPhone}
           callLabel={t('help.callSupport')}
         />
-        <HelpBar label={t('nav.help')} variant="block" />
       </Page>
     );
   }
@@ -187,7 +189,6 @@ export default function SavedPage() {
         </VStack>
       ) : null}
 
-      <HelpBar label={t('nav.help')} variant="block" />
     </Page>
   );
 }

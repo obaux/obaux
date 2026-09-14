@@ -7,7 +7,7 @@ import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { Button } from '@astryxdesign/core/Button';
 import { Icon } from '@astryxdesign/core/Icon';
-import { AppHeader, BigButton, Notice, NotificationList, Page, PageTitle, TextLink } from '@pam/ui';
+import { AppHeader, BigButton, Notice, NotificationList, Page, PageTitle } from '@pam/ui';
 import { useI18n } from '@/lib/i18n';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
@@ -103,8 +103,12 @@ export default function NotificationsPage() {
           />
         ) : null}
 
-        {/* Never dead-end: a way back, and a way to a person. */}
-        <TextLink label={t('help.title')} href="/help/" />
+        {/*
+          No help link here (Will, 14 September). The way back is the arrow
+          beside the title, and every notice in this list is either something to
+          read or something to act on — none of them is a problem support can
+          solve. Help is one tap away on the screen this came from.
+        */}
     </Page>
   );
 }

@@ -3,11 +3,11 @@
 import { Suspense, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import * as stylex from '@stylexjs/stylex';
+import { spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { VStack } from '@astryxdesign/core/VStack';
 import { Card } from '@astryxdesign/core/Card';
 import { Text } from '@astryxdesign/core/Text';
-import { RadioList } from '@astryxdesign/core/RadioList';
-import { RadioListItem } from '@astryxdesign/core/RadioList';
+import { RadioList, RadioListItem } from '@astryxdesign/core/RadioList';
 import { TextArea } from '@astryxdesign/core/TextArea';
 import { AppHeader, BigButton, HelpBar, Notice, Page, PageTitle, TextLink } from '@pam/ui';
 import { SERVICE_FLAG_REASON_KEYS, type ServiceFlagReason } from '@pam/config';
@@ -41,6 +41,12 @@ const styles = stylex.create({
   intro: { fontSize: '18px', lineHeight: 1.5 },
   card: { width: '100%' },
   note: { fontSize: '15px', lineHeight: 1.5 },
+  /*
+   * 12px between the four reasons (Will, 14 September). They arrived touching,
+   * and four touching rows read as one block of text rather than four things to
+   * choose between — which is exactly the moment somebody taps the wrong one.
+   */
+  reasons: { rowGap: spacingVars['--spacing-3'] },
 });
 
 function FlagForm() {
@@ -92,15 +98,19 @@ function FlagForm() {
       <Page gap={4}>
         <AppHeader />
         <PageTitle title={t('flag.title')} backHref="/places/" backLabel={t('nav.back.places')} />
+        {/*
+          No phone number and no help bar on this screen (Will, 14 September).
+          Every other notice in PAM appears because something went wrong and
+          offers a person to call; this one is a thank-you. Offering help here
+          implies the member has a problem they have just created, which is the
+          opposite of what they did.
+        */}
         <Notice
           notice="service_not_available"
           title={t('flag.done.title')}
           body={t('flag.done.body')}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
         />
-        <BigButton label={t('places.title')} href="/places/" />
-        <HelpBar label={t('nav.help')} variant="block" />
+        <BigButton label={t('action.goBack')} href="/places/" />
       </Page>
     );
   }
@@ -136,17 +146,23 @@ function FlagForm() {
             isLabelHidden
             value={reason}
             onChange={(next) => setReason(next as ServiceFlagReason)}
+            xstyle={styles.reasons}
           >
             {SERVICE_FLAG_REASON_KEYS.map((key) => (
               <RadioListItem key={key} value={key} label={t(`flag.reason.${key}`)} />
             ))}
           </RadioList>
 
+          {/*
+            Two rows, not three. The note is the fifth case and optional; a box
+            the size of a paragraph asks for a paragraph, and the person filling
+            this in is often standing outside a locked door.
+          */}
           <TextArea
             label={t('flag.note')}
             value={note}
             onChange={(next) => setNote(next)}
-            rows={3}
+            rows={2}
             width="100%"
           />
 

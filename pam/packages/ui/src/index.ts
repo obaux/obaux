@@ -21,6 +21,7 @@ export { AppHeader, type AppHeaderProps } from './AppHeader.js';
 export { AreaChip, type AreaChipProps } from './AreaChip.js';
 export { Page, type PageProps } from './Page.js';
 export { PageTitle, type PageTitleProps } from './PageTitle.js';
+export { RoleSwitch, type RoleSwitchProps } from './RoleSwitch.js';
 export {
   OnboardingSlides,
   type OnboardingSlidesProps,

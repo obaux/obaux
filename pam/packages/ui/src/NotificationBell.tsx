@@ -12,6 +12,13 @@ import { pam } from './tokens.stylex.js';
  * dropped connection, can be opened in a new tab, and puts the list in browser
  * history where Back behaves the way anybody expects.
  *
+ * **Filled, not ghost** (Will, 14 September). It used to be a quiet outline in
+ * the corner, which is what you do with a control people can afford to miss —
+ * and this is the opposite: it is the only route to the things that need
+ * somebody, and since the home screen stopped carrying a notifications tile it
+ * is the *only* route. The brand fill puts the label at 8.4:1 in light and
+ * 13.3:1 in dark, where the ghost version depended on the page behind it.
+ *
  * **A dot, not a count** (Will, 13 September). "2 new" beside the bell was a
  * second thing to read in a header that is already carrying a wordmark and a
  * role chip, and the exact number changes nothing about what somebody does
@@ -41,17 +48,22 @@ const styles = stylex.create({
   root: { position: 'relative', display: 'inline-flex' },
   // 48px stands even though the glyph is smaller than that: the touch target is
   // the rule, not the drawing (§2.5).
-  bell: { minHeight: pam.touchTargetMin, minWidth: pam.touchTargetMin, fontSize: '28px' },
+  bell: {
+    minHeight: pam.touchTargetMin,
+    minWidth: pam.touchTargetMin,
+    fontSize: '24px',
+    borderRadius: '14px',
+  },
   dot: {
     position: 'absolute',
-    top: '8px',
-    right: '8px',
-    width: '12px',
-    height: '12px',
+    top: '-2px',
+    right: '-2px',
+    width: '14px',
+    height: '14px',
     borderRadius: '50%',
-    backgroundColor: colorVars['--color-accent'],
-    // A ring of the page's own colour, so the dot reads as a separate mark
-    // rather than part of the bell it sits on.
+    // On a filled button the dot has to differ from the fill, so it takes the
+    // button's own label colour and a ring of the page behind it.
+    backgroundColor: colorVars['--color-error'],
     borderWidth: '2px',
     borderStyle: 'solid',
     borderColor: colorVars['--color-background-body'],
@@ -66,7 +78,7 @@ export function NotificationBell({ href, label, unreadLabel, unreadCount }: Noti
       <IconButton
         label={hasNew && unreadLabel ? `${label}, ${unreadLabel}` : label}
         icon={<BellIcon />}
-        variant="ghost"
+        variant="primary"
         href={href}
         xstyle={styles.bell}
       />

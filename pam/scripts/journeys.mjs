@@ -86,6 +86,7 @@ const SCREENS = [
   { name: '5b-everyone', path: '/directory/' },
   { name: '5c-saved', path: '/saved/' },
   { name: '5d-flag', path: '/flag/?place=s1' },
+  { name: '5e-points', path: '/points/' },
   { name: '6-notifications', path: '/notifications/' },
   { name: '7-privacy', path: '/privacy/' },
   { name: '8-terms', path: '/terms/' },
@@ -223,7 +224,7 @@ async function stub(page, profile) {
   await page.route('**/rest/v1/notifications*', (r) => r.fulfill(json(NOTIFICATIONS)));
   await page.route('**/rest/v1/notification_preferences*', (r) => r.fulfill(json(null)));
   await page.route('**/rest/v1/access_controls*', (r) => r.fulfill(json([])));
-  await page.route('**/rest/v1/rpc/member_points*', (r) => r.fulfill(json(250)));
+  await page.route('**/rest/v1/rpc/member_points*', (r) => r.fulfill(json(400)));
   await page.route('**/rest/v1/rpc/services_near*', (r) => r.fulfill(json([])));
   // The people directory. Stubbed rather than seeded, like every other query
   // here: this sheet is a picture of the screens, not of the database.
@@ -261,6 +262,25 @@ for (const [roleName, { profile }] of Object.entries(ROLES)) {
       await stub(page, profile);
       await page.goto(`${BASE}${screen.path}`, { waitUntil: 'networkidle' }).catch(() => {});
       await page.waitForTimeout(350);
+
+      /*
+       * Scroll the whole page, then come back.
+       *
+       * Cards reveal themselves as they are scrolled to, so a full-page shot of
+       * a screen taller than the window captures everything below the fold at
+       * opacity 0 — the points ladder came out with its bottom half blank. This
+       * walks the page the way a person would, which settles every reveal, and
+       * returns to the top so the shot starts where the screen does.
+       */
+      await page.evaluate(async () => {
+        const step = window.innerHeight * 0.8;
+        for (let y = 0; y < document.body.scrollHeight; y += step) {
+          window.scrollTo(0, y);
+          await new Promise((resolve) => setTimeout(resolve, 60));
+        }
+        window.scrollTo(0, 0);
+        await new Promise((resolve) => setTimeout(resolve, 120));
+      });
       const file = `${roleName}/${screen.name}-${theme}.png`;
       await page.screenshot({ path: `${OUT}${file}`, fullPage: true });
       shots.push({ role: roleName, screen: screen.name, theme, file, path: screen.path });
