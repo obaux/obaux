@@ -130,5 +130,21 @@ export const pamTheme = defineTheme({
         '--color-overlay-pressed': 'light-dark(#0F584733, #DCE06833)',
       },
     },
+    /*
+     * The progress bar under the sign-up steps.
+     *
+     * Its fill does read `--color-accent` — but the base theme re-points that
+     * token *inside* the component, `.astryx-progressbar[data-variant=accent] {
+     * --color-accent: <the neutral status blue> }`, so the brand never reaches
+     * it and the first screenshot of sign-up had a blue bar over green buttons.
+     * Setting the same token at the same place is what wins.
+     *
+     * Third time this shape has cost a screenshot: the property a theme sets is
+     * not always the property the component draws with. Look at the generated
+     * CSS, not at the token list.
+     */
+    progressbar: {
+      'variant:accent': { '--color-accent': 'light-dark(#0F5847, #DCE068)' },
+    },
   },
 });

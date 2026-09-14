@@ -1,5 +1,38 @@
 # Changelog
 
+## [0.11.0] — 2026-09-14 · A way in
+
+### Added — signing up
+
+PAM has a front door. Five steps: your phone, your name and the city you live
+in, a screen saying what other people can see, whether you want texts, and the
+points you have already earned by the time you get there. A bar across the top
+says how far along you are.
+
+The question about what kind of person you are is asked in plain words —
+someone in need of support, someone willing to help, a parole officer or case
+manager — and it changes what the privacy screen tells you, because those three
+people need to know different things.
+
+If PAM is not in your city yet, it says so, says where it is, and offers to text
+you when it opens. Nothing is ticked for you.
+
+### Added — your first points
+
+Finishing setup earns 25 points and the first badge, Returned. The number counts
+up on the last screen, so you land on home with something already on the board.
+
+### Changed — signing in knows the difference between you and a stranger
+
+A verified phone with no PAM account now goes to sign-up instead of a home
+screen offering the door you just came through.
+
+### Fixed — an account could make itself the account that sees everything
+
+Any signed-in account could have given itself the top level of access by editing
+its own record. Nothing had; it is now impossible, enforced by the database
+rather than by the screens.
+
 ## [0.10.0] — 2026-09-14 · Places you keep, points you earn
 
 ### Added — saving a place actually saves it

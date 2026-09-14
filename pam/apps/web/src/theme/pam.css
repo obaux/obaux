@@ -639,7 +639,7 @@
   }
 
   .astryx-progressbar[data-variant="accent"] {
-    --color-accent: var(--astryx-theme-neutral-color-status-fill-accent);
+    --color-accent: light-dark(#0F5847, #DCE068);
   }
 
   .astryx-progressbar[data-variant="success"] {

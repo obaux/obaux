@@ -490,7 +490,7 @@ export const pamTheme = {
         "--color-background-muted": "var(--color-border-emphasized)"
       },
       "variant:accent": {
-        "--color-accent": "var(--astryx-theme-neutral-color-status-fill-accent)"
+        "--color-accent": "light-dark(#0F5847, #DCE068)"
       },
       "variant:success": {
         "--color-success": "var(--astryx-theme-neutral-color-status-fill-success)"

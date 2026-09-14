@@ -47,12 +47,15 @@ export function toE164(input: string): string | null {
   return null;
 }
 
-export function usePhoneSignIn(): {
+/** What the hook hands back, named so a screen can take it as a prop. */
+export interface PhoneSignIn {
   state: SignInStep;
   sendCode: (phone: string) => Promise<void>;
   verifyCode: (code: string) => Promise<void>;
   startOver: () => void;
-} {
+}
+
+export function usePhoneSignIn(): PhoneSignIn {
   const [state, setState] = useState<SignInStep>({ step: 'phone' });
 
   const sendCode = async (input: string): Promise<void> => {

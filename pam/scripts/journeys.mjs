@@ -75,6 +75,9 @@ const ROLES = {
 /** The journey, in the order a person meets it. */
 const SCREENS = [
   { name: '1-sign-in', path: '/signin/' },
+  // Sign-up, which for the stubbed profiles below lands on step 3 — the
+  // screen that says what other people can see, and the one worth looking at.
+  { name: '1b-sign-up', path: '/join/' },
   { name: '2-reminders', path: '/reminders/' },
   // Where everybody lands after the code works, and the screen that differs
   // most by role — a member is offered places, a case manager their caseload.
@@ -234,6 +237,9 @@ async function stub(page, profile) {
   await page.route('**/rest/v1/rpc/saved_places_mine*', (r) => r.fulfill(json(SAVED_PLACES)));
   await page.route('**/rest/v1/saved_places*', (r) => r.fulfill(json([])));
   await page.route('**/rest/v1/rpc/flag_service*', (r) => r.fulfill(json({ id: 'flag-1' })));
+  await page.route('**/rest/v1/rpc/served_cities*', (r) =>
+    r.fulfill(json([{ city: 'Philadelphia' }])),
+  );
 }
 
 const server = spawn('npx', ['serve', 'apps/web/out', '-l', String(PORT), '--no-clipboard'], {

@@ -1047,3 +1047,84 @@ select test.check(
 select test.check(
   'a member cannot read somebody else''s waiting-list row',
   (select count(*) from public.waiting_cities), 0);
+
+\echo ''
+\echo '--- Finishing setup earns the first points (0047) ---'
+
+set role authenticated;
+select test.as_user('33333333-0000-0000-0000-0000000000aa');
+
+do $$
+declare
+  v_before bigint;
+  v_after  bigint;
+begin
+  select coalesce(sum(delta), 0) into v_before
+  from public.points_ledger where member_id = auth.uid();
+
+  update public.profiles set onboarded_at = now() where id = auth.uid();
+
+  select coalesce(sum(delta), 0) into v_after
+  from public.points_ledger where member_id = auth.uid();
+  if v_after - v_before <> 25 then
+    raise exception 'FAIL  finishing setup earned % points, expected 25', v_after - v_before;
+  end if;
+  raise notice 'ok    finishing setup earns twenty-five points';
+
+  -- A client that writes the column in a loop must not farm it.
+  update public.profiles set onboarded_at = now() where id = auth.uid();
+  select coalesce(sum(delta), 0) into v_after
+  from public.points_ledger where member_id = auth.uid();
+  if v_after - v_before <> 25 then
+    raise exception 'FAIL  finishing setup twice earned % points', v_after - v_before;
+  end if;
+  raise notice 'ok    it cannot be earned twice';
+end;
+$$;
+
+-- Staff finish setup too, and points are a member mechanic.
+select test.as_user(:'admin_north');
+do $$
+declare n bigint;
+begin
+  update public.profiles set onboarded_at = now() where id = auth.uid();
+  select count(*) into n from public.points_ledger
+  where member_id = auth.uid() and reason = 'finish_setup';
+  if n <> 0 then
+    raise exception 'FAIL  a case manager earned points for finishing setup';
+  end if;
+  raise notice 'ok    staff earn nothing for finishing setup';
+end;
+$$;
+
+\echo ''
+\echo '--- The cities PAM serves are public; the regions table is not (0048) ---'
+
+set role anon;
+select set_config('request.jwt.claim.sub', '', false);
+
+select test.check(
+  'a signed-out visitor still reads no region rows',
+  (select count(*) from public.regions), 0);
+
+-- Two from the fixture (North, South) plus Philadelphia, which 0009 seeds into
+-- every build. Counted through the function precisely because `regions` itself
+-- reads as empty from here.
+select test.check(
+  'a signed-out visitor can see which cities PAM is in',
+  (select count(*) from public.served_cities()), 3);
+
+do $$
+begin
+  -- Names only. An id is what ties an account to a region.
+  if (select count(*) from pg_proc p
+      where p.proname = 'served_cities'
+        and p.pronamespace = 'public'::regnamespace
+        and pg_get_function_result(p.oid) ilike '%uuid%') > 0 then
+    raise exception 'FAIL  served_cities returns an id';
+  end if;
+  raise notice 'ok    served_cities returns names and nothing else';
+end;
+$$;
+
+set role authenticated;

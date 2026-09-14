@@ -1,25 +1,15 @@
 'use client';
 
-import { useEffect, useId, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import * as stylex from '@stylexjs/stylex';
-import { VStack } from '@astryxdesign/core/VStack';
-import { Card } from '@astryxdesign/core/Card';
 import { HStack } from '@astryxdesign/core/HStack';
-import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
-import {
-  AppHeader,
-  BigButton,
-  Notice,
-  OnboardingSlides,
-  Page,
-  TextField,
-  TextLink,
-} from '@pam/ui';
+import { AppHeader, Notice, OnboardingSlides, Page, TextLink } from '@pam/ui';
 import { useI18n } from '@/lib/i18n';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { usePhoneSignIn } from '@/lib/usePhoneSignIn';
+import { PhoneSignInCard } from './PhoneSignInCard';
 
 /**
  * The only way into PAM, and the same door for everybody: a member, a program
@@ -30,9 +20,9 @@ import { usePhoneSignIn } from '@/lib/usePhoneSignIn';
  * The screen is two things stacked. Above: three slides saying what PAM is,
  * one idea each, because somebody arriving has been handed a link and has no
  * reason yet to type their phone number into it. Below: the card, which is the
- * whole job — a heading, a field, a button, and the sentence about texts that
- * has to be read before the number is handed over. Everything the card needs
- * is inside the card; nothing else on the screen asks for anything.
+ * whole job. The card itself lives in `PhoneSignInCard` — step 1 of `/join/`
+ * is the same act and shows the same thing, including the consent sentence the
+ * carriers reviewed.
  *
  * The mark stays pinned at the top while the rest scrolls, so the answer to
  * "what am I signing in to" never leaves the screen (Will, 13 September).
@@ -43,39 +33,20 @@ import { usePhoneSignIn } from '@/lib/usePhoneSignIn';
  * decide before anybody has decided the first. The path it guarded is still
  * open where it matters: every failure on this screen renders a Notice
  * carrying PAM's number, which is where somebody stuck actually is.
- *
- * Known gap: Astryx's TextInput takes no `inputMode` prop, so `purpose` on
- * TextField sets the attribute directly — the code field needs a numeric
- * keypad, and for somebody who has not held a phone in years that is a real
- * cost rather than a nicety.
- *
- * Two steps in one route, because they are one thought: give us your number,
- * type what we sent. Each shows a single primary action, and the thing a member
- * will actually hit — a code that never arrives — is a state with a way out
- * rather than a spinner that never resolves (§0).
  */
 
 const styles = stylex.create({
-  title: { fontSize: '28px', lineHeight: 1.2 },
-  hint: { fontSize: '17px', lineHeight: 1.5 },
   quiet: { fontSize: '17px' },
-  consent: { fontSize: '15px', lineHeight: 1.5 },
-  card: { width: '100%' },
-  // The field's own label reads left-to-right even on a centred page: a label
-  // sitting over the left edge of the box it names is easier to tie to it, and
-  // a centred one above a full-width input floats loose.
-  field: { textAlign: 'start' },
 });
 
 export default function SignInPage() {
   const { t } = useI18n();
   const supportPhone = useSupportPhone();
-  const { state, sendCode, verifyCode, startOver } = usePhoneSignIn();
+  const flow = usePhoneSignIn();
+  const { state, startOver } = flow;
   const router = useRouter();
   const [phone, setPhone] = useState('');
   const [code, setCode] = useState('');
-  const phoneId = useId();
-  const codeId = useId();
 
   /**
    * What PAM is, in three sentences: a place to look, a person to ask, a
@@ -94,14 +65,17 @@ export default function SignInPage() {
   /**
    * Where somebody lands after the code works.
    *
-   * Anybody who has never been asked goes to the reminders screen once, and
-   * everybody else goes straight to the app.
+   * Three ways out, in the order they are decided.
    *
-   * It was members only until Will noticed the hole: staff are texted too — an
-   * introduction to their programme, a change to their account — and an account
-   * that was never asked has consent switched off, so those messages are
-   * cancelled rather than sent. Silent and safe, but a feature that quietly
-   * does not work. The screen adjusts its examples by role (D-090).
+   * **No profile** means the phone is verified and PAM has no record of this
+   * person: they are signing up, not signing in, and the flow picks them up at
+   * step 2 with the step behind them already done. Until sign-up existed this
+   * case landed on a home screen that offered them the door they had just come
+   * through.
+   *
+   * Then the reminders question, once, for anybody who has never been asked —
+   * staff included, because staff are texted too and an account that was never
+   * asked has consent switched off (D-090). Everybody else goes to the app.
    */
   useEffect(() => {
     if (state.step !== 'done') return;
@@ -116,6 +90,18 @@ export default function SignInPage() {
         const supabase = createClient();
         const { data: auth } = await supabase.auth.getUser();
         if (cancelled || !auth.user) return;
+
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('id')
+          .eq('id', auth.user.id)
+          .maybeSingle();
+        if (cancelled) return;
+
+        if (!profile) {
+          router.replace('/join/');
+          return;
+        }
 
         const asked = await getReminderConsent(auth.user.id);
         if (cancelled) return;
@@ -132,9 +118,8 @@ export default function SignInPage() {
     };
   }, [state.step, router]);
 
-  const busy = state.step === 'sending' || state.step === 'verifying';
-  const onCodeStep = state.step === 'code' || state.step === 'verifying';
-  const onFirstStep = !onCodeStep && state.step !== 'done';
+  const onFirstStep =
+    state.step !== 'code' && state.step !== 'verifying' && state.step !== 'done';
 
   return (
     <Page align="center" gap={3}>
@@ -169,79 +154,13 @@ export default function SignInPage() {
       {state.step === 'done' ? <Text xstyle={styles.quiet}>{t('signin.verifying')}</Text> : null}
 
       {state.step === 'done' ? null : (
-        <Card padding={4} xstyle={styles.card}>
-          {onCodeStep ? (
-            <VStack gap={3}>
-              <Heading level={1} xstyle={styles.title}>
-                {t('signin.title')}
-              </Heading>
-              <TextField
-                id={codeId}
-                purpose="code"
-                label={t('signin.code.label')}
-                value={code}
-                onChange={(next) => setCode(next)}
-                width="100%"
-                xstyle={styles.field}
-              />
-              <Text type="supporting" xstyle={styles.hint}>
-                {t('signin.code.hint', { phone: state.phone })}
-              </Text>
-              <BigButton
-                label={busy ? t('signin.verifying') : t('signin.code.action')}
-                onPress={() => void verifyCode(code)}
-                isDisabled={busy || code.trim().length === 0}
-              />
-              <TextLink
-                label={t('signin.code.resend')}
-                onClick={() => void sendCode(state.phone)}
-                isDisabled={busy}
-              />
-            </VStack>
-          ) : (
-            <VStack gap={3}>
-              {/*
-                The heading sits inside the card with the field it names, so the
-                task is one block rather than a title floating above a box.
-              */}
-              <Heading level={1} xstyle={styles.title}>
-                {t('signin.title')}
-              </Heading>
-              <TextField
-                id={phoneId}
-                purpose="phone"
-                label={t('signin.phone.label')}
-                value={phone}
-                onChange={(next) => setPhone(next)}
-                width="100%"
-                xstyle={styles.field}
-              />
-              <Text type="supporting" xstyle={styles.hint}>
-                {t('signin.phone.hint')}
-              </Text>
-              <BigButton
-                label={state.step === 'sending' ? t('signin.sending') : t('signin.phone.action')}
-                onPress={() => void sendCode(phone)}
-                isDisabled={state.step === 'sending' || phone.trim().length === 0}
-              />
-              {/*
-                What PAM will send, and how to stop it — directly under the
-                button that hands over the number, inside the same card, so it
-                is part of the act rather than small print further down the
-                page.
-
-                It has to be here and visible on the same screen where somebody
-                types their number: US carriers review this before an
-                application may send at all, and the browser test asserts it is
-                on screen without scrolling rather than asserting where it sits,
-                so it can move again without breaking anything that matters.
-              */}
-              <Text type="supporting" xstyle={styles.consent}>
-                {t('signin.phone.consent')}
-              </Text>
-            </VStack>
-          )}
-        </Card>
+        <PhoneSignInCard
+          flow={flow}
+          phone={phone}
+          onPhoneChange={setPhone}
+          code={code}
+          onCodeChange={setCode}
+        />
       )}
 
       {state.step === 'failed' && state.phone !== null ? (

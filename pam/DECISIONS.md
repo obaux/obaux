@@ -1793,6 +1793,46 @@ offers the same destination twice is a menu arguing with itself. Text reminders
 belongs to signing up — it is asked once, and a permanent tile invites somebody
 to re-answer a decision already made.
 
+### D-111 — What a person may change about themselves is a grant, not a policy
+`profiles_update_self` checked `id = auth.uid()` and nothing else, and `role` is
+an ordinary column, so any signed-in account could write itself `super_admin`.
+RLS chooses rows; it cannot choose columns. So the fix is column-level
+privilege: UPDATE is revoked table-wide from `anon` and `authenticated`, and
+comes back as a named list of the fourteen columns a person actually owns.
+Declarative, and it holds for code paths nobody has written yet.
+
+The order is the trap. A table-wide grant covers every column and a column-level
+REVOKE cannot carve a hole in one — the first version of 0046 applied cleanly
+and the promotion still worked. Revoke the table grant first.
+
+`security definer` functions are unaffected, which is the point: role changes
+belong to `redeem_invite`, to the admin RPCs that write `audit_log`, and to
+`start_membership`, whose role is a literal with no parameter to pass.
+
+### D-112 — A staff role is a claim, not a choice
+"Someone willing to help" and "Parole Officer or Case Manager" write a row in
+`staff_requests` and create no account. Those roles read other people's
+information; a claim typed into a form is not a credential, and the alternative
+is a sign-up screen that hands out the ability to see members to anybody who
+picks the third radio button. A human verifies and sends an invite.
+
+### D-113 — Sign-up is one route with a bar across the top
+`/join/` holds all five steps rather than five routes, so the progress bar is
+one component's state rather than a number each screen has to know about itself,
+and a step can be added without renumbering anything. `/signin/` stays its own
+door for people who already have an account, and both render the same
+`PhoneSignInCard` — the consent sentence on it is what the carriers reviewed,
+and two copies of it would drift.
+
+The bar is not decoration: somebody deciding whether they have time for this
+needs a number, and the honest number here is small.
+
+### D-114 — The first points are awarded by the database
+25 for finishing setup, from a trigger on `onboarded_at` (0047), once ever. The
+client writes the fact that setup finished; the database decides what it is
+worth. Same reasoning as D-107, and it matters more here: the first number a
+member ever sees is the worst one to have made up.
+
 ---
 
 ## Notes for whoever picks this up next

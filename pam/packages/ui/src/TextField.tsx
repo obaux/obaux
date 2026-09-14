@@ -32,7 +32,7 @@ import { pam } from './tokens.stylex.js';
  * So a screen says what the field is, and this decides the rest. Adding a
  * purpose here fixes every screen that uses it.
  */
-export type FieldPurpose = 'phone' | 'code' | 'address' | 'name';
+export type FieldPurpose = 'phone' | 'code' | 'address' | 'name' | 'lastName' | 'city';
 
 /**
  * The attributes each purpose sets, as plain HTML.
@@ -62,6 +62,13 @@ const PURPOSES: Record<FieldPurpose, Record<string, string>> = {
   },
   address: { autoComplete: 'street-address', htmlName: 'address', name: 'address' },
   name: { autoComplete: 'given-name', htmlName: 'firstName', name: 'firstName' },
+  lastName: { autoComplete: 'family-name', htmlName: 'lastName', name: 'lastName' },
+  /**
+   * A city, not a street. `address-level2` is the autofill token phones already
+   * hold, which on the sign-up screen is the difference between tapping a
+   * suggestion and spelling "Philadelphia" on a cracked keyboard.
+   */
+  city: { autoComplete: 'address-level2', htmlName: 'city', name: 'city' },
 };
 
 export interface TextFieldProps extends TextInputProps {

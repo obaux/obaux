@@ -1,8 +1,9 @@
 # PAM — where the project stands
 
-Last updated 2026-09-14. The member-facing product is real now: saving, points,
-badges, reporting a place, and a screen for the person running PAM. Newest
-session log: `docs/sessions/2026-09-14-saving-points-and-the-people-screen.md`.
+Last updated 2026-09-14. The member-facing product is real now: signing up,
+saving, points, badges, reporting a place, and a screen for the person running
+PAM. Newest session log:
+`docs/sessions/2026-09-14-signing-up-and-the-hole-it-found.md`.
 
 This is the handover document: what exists, what is proven, what is live, and
 what the next person needs to know before touching anything.
@@ -35,7 +36,7 @@ going — without help?*
 ## What is live
 
 **Supabase project `pam`** — `shobqzuhicoiymtumiaz`, us-east-1 (closest region to
-Philadelphia). Forty-one migrations applied. The database is real and reachable;
+Philadelphia). Forty-eight migrations applied. The database is real and reachable;
 the app is not deployed anywhere yet.
 
 **The text-message dispatcher is live and running** — the `dispatch-sms` function
@@ -107,12 +108,12 @@ Numbers here are from the last run, not aspirations.
 |---|---|---|
 | Typecheck | 5/5 packages | — |
 | `@pam/config` tests | 202 pass | No SMS can send unreviewed, over 160 chars, with emoji, or with a term that reveals justice involvement. Locales are key-for-key. The transparency screen matches its contract. |
-| `@pam/ui` tests | 56 pass | Every component is axe-clean. `PlaceCard` offers exactly three actions in a fixed order. Reduced motion is respected. The mic hides when unsupported. |
+| `@pam/ui` tests | 63 pass | Every component is axe-clean. `PlaceCard` offers exactly three actions in a fixed order. Reduced motion is respected. The mic hides when unsupported. |
 | Database suite | 152 checks pass | See below |
 | Live RLS fingerprint | identical to local | The deployed policy set is provably the one that was penetration-tested: `ce9636c3b77e4827368e6575742b899c`, 73 policies on both |
 | Live anonymous attack | 0 rows leaked | A signed-out caller reads no profiles, messages, invites or audit rows on the real database, while still reaching the support number and the public catalogue |
-| Browser a11y + theme | 192 pass | No WCAG AA violations at 320px or iPhone SE. Every control clears 48px. No horizontal scroll. The Astryx theme really resolves. Runs in dark mode as well as light. |
-| First-load JS | 490.1 kB of 500 kB | §12 budget, measured gzipped on what `index.html` actually loads |
+| Browser a11y + theme | 354 pass | No WCAG AA violations at 320px or iPhone SE. Every control clears 48px. No horizontal scroll. The Astryx theme really resolves. Runs in dark mode as well as light. |
+| First-load JS | 498.3 kB of 500 kB — 1.7 kB of headroom, and shrinking | §12 budget, measured gzipped on what `index.html` actually loads |
 
 ### The database suite is the one that matters
 
@@ -140,13 +141,18 @@ result with one test user per role. It proves:
 Phase 0 owns foundations. These are Phase 1–7 and their absence is not an
 oversight:
 
-- **No sign-up flow.** No onboarding, no invite redemption screen, no map, no
-  enrollment, no chat. A person can sign in and use what exists — but nothing
-  yet creates a profile for somebody new, which is the next task.
-- **What does exist and works:** sign-in, home, saved places, points and badges,
-  the places list, reporting a place, the notifications list, the reminders
-  question, the case manager screen, the people directory, and the privacy and
-  terms pages.
+- **No invite redemption screen, no map, no enrollment, no chat.** Sign-up now
+  exists — `/join/`, five steps — so a person with nobody to invite them can
+  create their own member account. An invite code still has no screen to be
+  typed into.
+- **Nothing reviews `staff_requests`.** Sign-up records people who say they run
+  a program or carry a caseload; the rows are there and a super admin can read
+  them, but there is no screen and no notification. The screen promises a call
+  within a day or two, so somebody has to be told to look.
+- **What does exist and works:** sign-up, sign-in, home, saved places, points
+  and badges, the places list, reporting a place, the notifications list, the
+  reminders question, the case manager screen, the people directory, and the
+  privacy and terms pages.
 - **Home is a menu, and only a menu.** It lists where to go and what is waiting.
   No next step, no points, no plan: PAM has no real ones yet, and a home screen
   that invents its own content is worse than a short one (D-098). `/gallery/` is
@@ -155,6 +161,9 @@ oversight:
 - **Notices exist but are not wired to real failures.** Every condition has
   plain-language copy and a component (D-035), and the demo renders three of
   them. Connecting them to actual query results is Phase 1.
+- **The §12 budget has 1.7 kB left.** Sign-up pulled ProgressBar, CheckboxInput
+  and RadioList into the shared chunk. The next component on a shared screen
+  breaches it; splitting the Astryx imports is now the next infrastructure task.
 - **No five-tab member shell.** `AppShell` + `TabList` is the first UI task of
   Phase 1. The layout is settled and the pieces are ready: Help is now a compact
   item sized to share the bottom bar rather than a full-width row (D-039), and
@@ -237,6 +246,8 @@ while the copy is unsigned, so it earned the first live test, not the last.*
 | 7 | Retention: missed-appointment history beyond 90 days | Phase 5 | No purge job. Keeping this data indefinitely is the wrong default for this population. |
 | 8 | Pilot partner orgs and usability test scheduling | Phase 7 | Five members, three providers, two admins. |
 | 9 | **Point Supabase at Twilio** — Authentication → Providers → Phone | Anyone signing in | **The single thing blocking the product.** Twilio is paid for and working, but Supabase has not been pointed at it: asking the live project for a sign-in code answers `Unsupported phone provider`. Account SID, Auth Token, Verify Service SID. |
+| 10a | **Who calls the people who ask to help?** | Program leads and case managers getting accounts | Sign-up collects them as requests in `staff_requests`, and the screen says somebody will call within a day or two. Nobody works that list yet, and nothing tells them there is one. |
+| 10b | **A line about the PAM team on the transparency screen** | A promise already made | Members were told they would hear first if what is visible changes, and the directory now shows a super admin every account (name, role, region, status, last active; never messages or contact details). Proposed, for `packages/config/transparency.ts`: *"The PAM team can see your name, your city and the last day you used PAM. Never your messages."* It is a change to the contract, so it wants Will's word. |
 | 10 | **Twilio credentials into the dispatcher's secrets** | Reminders and notices | `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, and either `TWILIO_MESSAGING_SERVICE_SID` or `TWILIO_FROM_NUMBER`, under Edge Functions → dispatch-sms. Until then the dispatcher records "Twilio is not configured" instead of sending. |
 
 ---
@@ -286,8 +297,8 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ## Next
 
-Phase 1: invite generation and redemption, onboarding including the transparency
-step, the map and list with three-category filters, and the Philadelphia
+Phase 1: invite redemption (generation works, and sign-up covers the person who
+has no code), the map and list with three-category filters, and the Philadelphia
 importer. The first UI task is the five-tab member shell on `AppShell` +
 `TabList`.
 
