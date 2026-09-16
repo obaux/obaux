@@ -721,9 +721,18 @@ declare
   n integer;
   v_lat double precision;
 begin
-  select id into v_service from public.services where geo is not null limit 1;
+  -- Deliberately specific about which row. `where geo is not null limit 1`
+  -- was picking whatever the heap handed back first, and by this point in the
+  -- suite earlier tests have deactivated one place (0035) and flagged another
+  -- (0033) — so the row was sometimes one a member is not allowed to see, and
+  -- this assertion failed for a reason that had nothing to do with saving.
+  -- Found when 0050 rewrote every description and changed the heap order.
+  select id into v_service from public.services
+  where geo is not null and is_active and not needs_review
+  order by id
+  limit 1;
   if v_service is null then
-    raise exception 'FAIL  the seed has no service with a point to save';
+    raise exception 'FAIL  the seed has no visible service with a point to save';
   end if;
 
   select id into v_tanya from public.profiles
@@ -1237,3 +1246,98 @@ begin
   raise notice 'ok    the three-argument call still works, and no caseload is invented';
 end;
 $$;
+
+\echo ''
+\echo '--- Every place says what it is (0050) ---'
+
+set role authenticated;
+select test.as_user(:'marcus');
+
+do $$
+declare
+  n_blank   int;
+  n_long    int;
+  v_desc    text;
+begin
+  -- The seed's services are fixture rows, so this asserts the shape of the
+  -- rule rather than a count that changes with every import.
+  select count(*) into n_long from public.services
+  where description_plain is not null and length(description_plain) > 200;
+  if n_long <> 0 then
+    raise exception 'FAIL  % descriptions are over 200 characters', n_long;
+  end if;
+  raise notice 'ok    no description runs past 200 characters';
+
+  -- As the owner, not as a member: a member has no UPDATE on `services` at
+  -- all, so the statement would touch no rows, raise nothing, and "pass" while
+  -- proving the constraint does not exist.
+  set local role postgres;
+  begin
+    update public.services set description_plain = repeat('x', 201)
+    where id = (select id from public.services order by id limit 1);
+    raise exception 'FAIL  a 201-character description was accepted';
+  exception when check_violation then
+    raise notice 'ok    the length is a constraint, not an intention';
+  end;
+  set local role authenticated;
+end;
+$$;
+
+-- What a member is entitled to see about one place, and what they are not.
+reset role;
+insert into public.services (id, name, category, address, is_active, needs_review, is_walk_in, description_plain, audience)
+values
+  ('55555555-0000-0000-0000-000000000001', 'Open Door Center', 'education',
+   '1 Main St', true, false, true, 'A place that says what it is.', 'students'),
+  ('55555555-0000-0000-0000-000000000002', 'Not Reviewed Yet', 'education',
+   '2 Main St', true, true, true, 'Should not be readable.', null);
+
+-- Writing plain-language copy raises `needs_review` on insert too (0020), so
+-- the published row has to be approved the way a person would approve it.
+update public.services set needs_review = false
+where id = '55555555-0000-0000-0000-000000000001';
+
+set role authenticated;
+select test.as_user(:'marcus');
+
+do $$
+declare
+  r record;
+  n int;
+begin
+  select * into r from public.service_detail('55555555-0000-0000-0000-000000000001');
+  if r.id is null then
+    raise exception 'FAIL  a member cannot read a published place';
+  end if;
+  if r.description_plain is null or r.audience <> 'students' then
+    raise exception 'FAIL  the detail call dropped the description or the audience';
+  end if;
+  raise notice 'ok    a member reads one place, with what it is and who it is for';
+
+  select count(*) into n from public.service_detail('55555555-0000-0000-0000-000000000002');
+  if n <> 0 then
+    raise exception 'FAIL  a place still under review answered %', n;
+  end if;
+  raise notice 'ok    a place under review answers nothing';
+end;
+$$;
+
+-- `audience` is the badge's source, so it may only ever hold what the UI knows
+-- how to draw.
+reset role;
+do $$
+begin
+  begin
+    insert into public.services (id, name, category, address, is_active, audience)
+    values ('55555555-0000-0000-0000-000000000003', 'Bad Audience', 'education', '3 Main St', true, 'grown-ups');
+    raise exception 'FAIL  an unknown audience was accepted';
+  exception when check_violation then
+    raise notice 'ok    audience holds only the values the screen can draw';
+  end;
+end;
+$$;
+
+delete from public.services where id in (
+  '55555555-0000-0000-0000-000000000001',
+  '55555555-0000-0000-0000-000000000002');
+set role authenticated;
