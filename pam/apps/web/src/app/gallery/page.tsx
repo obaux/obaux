@@ -166,7 +166,7 @@ export default function GalleryPage() {
 
       <Section
         title="What PAM is"
-        note="A full-bleed hero the sign-in card rides up over, redesigned 16 September from a Figma reference — the mark (white, larger), a region pill and the locale switcher sit over the art via the header slot. The art itself is a placeholder gradient wash, not the commissioned photography Figma shows: this sandbox's network policy blocks every request to figma.com, including the asset URLs the Figma MCP server itself returned, so the real illustrations could not be fetched this session — see OnboardingSlides' own file comment."
+        note="A full-bleed hero the sign-in card rides up over, redesigned 16 September from a Figma reference — the mark (white, larger), a region pill and the locale switcher sit over the art via the header slot, on the exact gradient stops Will specified (40.88%/66.12%) so white text and the mark stay legible over whatever photo is underneath."
       >
         <OnboardingSlides
           label="How PAM works"
@@ -174,17 +174,17 @@ export default function GalleryPage() {
           slides={[
             {
               id: 'places',
-              image: '/onboarding/places.svg',
+              image: '/onboarding/hero-city.webp',
               text: 'Find places near you that can help — food, work, school, a doctor.',
             },
             {
               id: 'people',
-              image: '/onboarding/people.svg',
+              image: '/onboarding/hero-phone.webp',
               text: 'A real person can point you to the right one and answer questions.',
             },
             {
               id: 'plan',
-              image: '/onboarding/plan.svg',
+              image: '/onboarding/hero-sneakers.webp',
               text: 'PAM reminds you before you go, so nothing gets missed.',
             },
           ]}

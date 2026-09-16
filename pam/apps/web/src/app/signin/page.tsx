@@ -122,9 +122,9 @@ export default function SignInPage() {
    */
   const slides = useMemo(
     () => [
-      { id: 'places', image: '/onboarding/places.svg', text: t('onboarding.1') },
-      { id: 'people', image: '/onboarding/people.svg', text: t('onboarding.2') },
-      { id: 'plan', image: '/onboarding/plan.svg', text: t('onboarding.3') },
+      { id: 'places', image: '/onboarding/hero-city.webp', text: t('onboarding.1') },
+      { id: 'people', image: '/onboarding/hero-phone.webp', text: t('onboarding.2') },
+      { id: 'plan', image: '/onboarding/hero-sneakers.webp', text: t('onboarding.3') },
     ],
     [t],
   );

@@ -19,13 +19,12 @@ import { Text } from '@astryxdesign/core/Text';
  * about to type their phone number into — and the answer has to land in the
  * seconds before they decide it is not worth it.
  *
- * **`slide.image` still points at the placeholder icon set, not the
- * commissioned photography the Figma file shows.** Pulling those
- * illustrations in was the ask, and this session could not: the sandbox's
- * network policy refuses every request to figma.com, including the Figma
- * MCP server's own asset URLs, so there was no way to fetch the actual
- * bytes. Once real photography exists, `slide.image` is a straight URL
- * swap — the background treatment below is already built for it.
+ * `slide.image` takes the commissioned illustration directly — the Figma
+ * MCP server's own asset URLs were unreachable from this sandbox (its
+ * network policy blocks every request to figma.com), so the three files
+ * came from Will via Google Drive instead and were resized/recompressed on
+ * the way in (each roughly 600 kB of source art down to 30-70 kB of WebP at
+ * 900px wide, well past what a phone hero needs).
  *
  * The gradient is the exact stop set Will asked for (16 September): fully
  * transparent through 40.88%, opaque to 50% black by 66.12%, so white text

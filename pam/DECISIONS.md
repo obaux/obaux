@@ -2140,6 +2140,26 @@ or add any share-related schema. Recorded here rather than left implicit so
 the gap is visible in the decisions log, not only in a session note that
 could go unread.
 
+### D-135 — The sign-in hero's illustrations came in over Google Drive, resized on the way
+The Figma MCP server's own asset URLs were unreachable from this sandbox (its
+network policy blocks every request to figma.com, confirmed both via `curl`
+and via the MCP server's own returned URLs), so real photography for
+`OnboardingSlides` could not be pulled from the Figma file directly — see
+D-134's session and the one this closes. Will shared the three source files
+(city crowd, a two-way flip-phone image, sneakers) through Google Drive
+instead. Each arrived around 600 kB; resized to 900px wide and re-encoded as
+WebP at quality 68 (`sharp`, installed as a throwaway dev dependency, not
+committed to the repo), landing at 29-73 kB apiece — comfortably clear of
+`next/image`'s absence here (this is a static export with no image
+optimizer, so the file on disk *is* what ships) and nowhere close to the §12
+budget it doesn't count against (these are `public/` assets, not bundled
+JS). Filenames describe content (`hero-city.webp`, `hero-phone.webp`,
+`hero-sneakers.webp`), not slide position, after the source files' own Drive
+names ("Slide 1/2/3") turned out not to match the order their content best
+paired with `onboarding.1`/`.2`/`.3`'s copy — a maintainer swapping one
+image for another later should not have to guess which "slide N" a filename
+meant.
+
 ---
 
 ## Notes for whoever picks this up next

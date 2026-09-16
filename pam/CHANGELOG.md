@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.19.0] — 2026-09-16 · A real sign-in hero
+
+### Changed — sign-in is now a full-bleed photo hero, not a small icon on a card
+
+The three "what PAM is" slides above the sign-in form now show full-bleed
+illustrated artwork with a dark gradient wash, the PAM mark in white and
+larger, a "Philadelphia" pill, and the locale switcher — all laid over the
+art rather than in a plain header above it. The sign-in card now rides up
+over the bottom edge of the hero instead of sitting below it, with more
+padding around its own content.
+
+### Fixed — the sign-in consent line stays on screen without scrolling
+
+A layout regression from this same redesign briefly pushed the required
+"PAM texts you a code..." consent sentence below the fold on the shortest
+supported phone screens. Caught before shipping by the existing automated
+check for exactly this.
+
 ## [0.18.0] — 2026-09-16 · A consistent top bar, everywhere
 
 ### Added — Program leads and Case managers: an IG-stories-style people strip on Home
