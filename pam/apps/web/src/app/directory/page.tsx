@@ -32,7 +32,8 @@ import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
 import { useDirectory } from '@/lib/useDirectory';
 import { createInvite, listRegions, type CreatedInvite } from '@/lib/useCaseload';
-import { useViewedRole } from '@/lib/useViewedRole';
+import { useRoleView } from '@/lib/useViewedRole';
+import { RoleSwitchControl } from '../RoleSwitchControl';
 
 /**
  * Everyone on PAM, for the person running it.
@@ -89,7 +90,7 @@ export default function DirectoryPage() {
   // shows what a program actually sees (D-108, useViewedRole) — the same
   // door everyone else meets — rather than the full directory regardless.
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
-  const viewedRole = useViewedRole(trueRole);
+  const { viewedRole, setViewAs } = useRoleView(trueRole);
   const isSuperAdmin = viewedRole === 'super_admin';
   const [filter, setFilter] = useState<Filter>('all');
   const { state: directory } = useDirectory(isSuperAdmin, filter as Role | 'all');
@@ -185,6 +186,11 @@ export default function DirectoryPage() {
       <Page gap={4}>
         <AppHeader
           roleLabel={viewedRole ? t(`role.${viewedRole}`) : undefined}
+          roleControl={
+            trueRole === 'super_admin' ? (
+              <RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} />
+            ) : undefined
+          }
           trailing={<HeaderBell enabled={trueRole !== null} role={viewedRole} />}
         />
         <Notice
@@ -203,6 +209,7 @@ export default function DirectoryPage() {
     <Page gap={4}>
       <AppHeader
         roleLabel={t('role.super_admin')}
+        roleControl={<RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} />}
         trailing={
           <HStack gap={1} align="center" wrap="nowrap">
             {/*

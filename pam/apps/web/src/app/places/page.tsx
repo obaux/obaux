@@ -31,7 +31,8 @@ import { usePlaces, METRES_PER_MILE } from '@/lib/usePlaces';
 import { useSavedPlaces } from '@/lib/useSavedPlaces';
 import { placeStatus, useNow } from '@/lib/usePlaceStatus';
 import { useSession } from '@/lib/useSession';
-import { useDemoRole } from '@/lib/useViewedRole';
+import { useRoleView } from '@/lib/useViewedRole';
+import { RoleSwitchControl } from '../RoleSwitchControl';
 import { CITY_HALL, loadOrigin, saveOrigin, type AreaOption } from '@/lib/useAreaSearch';
 import { AreaSearch, AreaTrigger } from './AreaPicker';
 
@@ -74,17 +75,29 @@ const styles = stylex.create({
   title: { fontSize: '28px', lineHeight: 1.2 },
   /*
    * Narrower and shorter than §2.5's 48px control floor, on purpose (Will, 16
-   * September: "make those tabs smaller... free up more screen real estate").
-   * §2.5 sets 48px for a control someone has to reliably hit once to act — a
-   * sign-in field, a primary button. A filter row is scanned, not aimed at:
-   * five chips read together, missing one by a few pixels lands on its
-   * neighbour, which is still a category filter, not a wrong action taken.
-   * That is the line this exception holds: nothing that fails destructively
-   * or irreversibly gets this treatment, and 5 chips at this size still clear
-   * 44px, which is the smaller floor still used elsewhere for exactly this
-   * kind of low-stakes, self-correcting control.
+   * September: "make those tabs smaller... free up more screen real estate",
+   * and again the same day: "the filter chips... need to match the smaller
+   * size used in Saved"). §2.5 sets 48px for a control someone has to
+   * reliably hit once to act — a sign-in field, a primary button. A filter
+   * row is scanned, not aimed at: five chips read together, missing one by a
+   * few pixels lands on its neighbour, which is still a category filter, not
+   * a wrong action taken. That is the line this exception holds: nothing
+   * that fails destructively or irreversibly gets this treatment.
+   *
+   * The chip needs a real `href` to actually render at this height — Astryx's
+   * `Button` enforces the 48px floor on the `<button>` element regardless of
+   * any `xstyle` override (min-height, padding, size — none of it moves the
+   * number), but not on the `<a>` element it renders when `href` is set. So
+   * every chip below carries a real `href` and cancels the navigation itself
+   * with `preventDefault`, the same page it's already on — a link that goes
+   * nowhere new, which is what makes it size like "Saved" (a genuine link)
+   * rather than like a plain button. `role="button"` puts the *semantics*
+   * back the way they were: this is a toggle a member acts on, not a place
+   * to navigate to, and an anchor with no role override reads to a screen
+   * reader and to `aria-pressed` alike as a link — `aria-pressed` on a plain
+   * link is an axe violation on its own, caught the first time this shipped.
    */
-  chip: { minHeight: '40px', fontSize: '15px', paddingInline: '14px' },
+  chip: { minHeight: '40px', fontSize: '15px', paddingInline: '14px', paddingBlock: '8px' },
   area: { fontSize: '17px' },
   source: { fontSize: '15px', lineHeight: 1.5 },
 });
@@ -118,7 +131,7 @@ export default function PlacesPage() {
    */
   const { state: session } = useSession();
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
-  const demoRole = useDemoRole(trueRole);
+  const { demoRole, setViewAs } = useRoleView(trueRole);
   // One clock for the whole list; `placeStatus` is pure from there.
   const now = useNow();
   const { isSaved, save, unsave, failed: saveFailed } = useSavedPlaces(
@@ -147,6 +160,11 @@ export default function PlacesPage() {
       <AppHeader
         roleLabel={
           session.status === 'signed-in' ? t(`role.${demoRole ?? session.session.role}`) : undefined
+        }
+        roleControl={
+          trueRole === 'super_admin' ? (
+            <RoleSwitchControl trueRole={trueRole} viewedRole={demoRole ?? trueRole} onChange={setViewAs} />
+          ) : undefined
         }
         trailing={
           <HStack gap={1} align="center" wrap="nowrap">
@@ -185,8 +203,11 @@ export default function PlacesPage() {
         <Button
           label={t('places.all')}
           variant={category === 'all' ? 'primary' : 'secondary'}
+          size="sm"
+          href="/places/"
+          role="button"
           aria-pressed={category === 'all'}
-          onClick={() => setCategory('all')}
+          onClick={(e) => { e.preventDefault(); setCategory('all'); }}
           xstyle={styles.chip}
         />
         {CATEGORY_LIST.map((definition) => (
@@ -194,14 +215,18 @@ export default function PlacesPage() {
             key={definition.key}
             label={t(definition.labelKey)}
             variant={category === definition.key ? 'primary' : 'secondary'}
+            size="sm"
+            href="/places/"
+            role="button"
             aria-pressed={category === definition.key}
-            onClick={() => setCategory(definition.key)}
+            onClick={(e) => { e.preventDefault(); setCategory(definition.key); }}
             xstyle={styles.chip}
           />
         ))}
         <Button
           label={t('places.filter.saved')}
           variant="secondary"
+          size="sm"
           icon={<BookmarkIcon isFilled />}
           href="/saved/"
           xstyle={styles.chip}

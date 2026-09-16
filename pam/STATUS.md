@@ -12,8 +12,12 @@ icon on sign-in, an onboarding step, and account settings all read and write
 `profiles.preferred_language` — and there is a shared, dismissible banner for
 saying something happened outside a screen's own layout. A place's own screen
 now returns to wherever it was opened from (Home, Places, or Saved) instead of
-always to Places. Newest session log:
-`docs/sessions/2026-09-16-back-where-you-came-from.md`.
+always to Places. The header is now content-consistent across every signed-in
+screen — the same compact role-preview icon, the same merged area/edit
+control, the same bell — though it still reloads on navigation (D-134); Home's
+people preview for Case manager/Program/Super admin previews is now a
+scrollable stories-style strip rather than a stacked list. Newest session log:
+`docs/sessions/2026-09-16-a-consistent-top-bar.md`.
 
 This is the handover document: what exists, what is proven, what is live, and
 what the next person needs to know before touching anything.
@@ -135,7 +139,7 @@ Numbers here are from the last run, not aspirations.
 | Live RLS fingerprint | identical to local | The deployed policy set is provably the one that was penetration-tested: `ce9636c3b77e4827368e6575742b899c`, 73 policies on both |
 | Live anonymous attack | 0 rows leaked | A signed-out caller reads no profiles, messages, invites or audit rows on the real database, while still reaching the support number and the public catalogue |
 | Browser a11y + theme (Playwright, full suite) | 426 pass | No WCAG AA violations at 320px or iPhone SE. Every control clears 48px. No horizontal scroll. The Astryx theme really resolves. Runs in dark mode as well as light. |
-| First-load JS | 500.9 kB of 500 kB — **0.9 kB over budget**, disclosed and unresolved | §12 budget, measured gzipped on what `index.html` actually loads; see 2026-09-16 session logs |
+| First-load JS | 501.1 kB of 500 kB — **1.1 kB over budget**, disclosed and unresolved | §12 budget, measured gzipped on what `index.html` actually loads; see 2026-09-16 session logs |
 
 ### The database suite is the one that matters
 
@@ -232,6 +236,14 @@ oversight:
   ("Viewing as Program") already says it, in the header, on every screen.
 - **No device build.** Capacitor is configured; `cap add ios/android` has never
   been run.
+- **The top bar is content-consistent, not yet architecturally persistent.**
+  Every signed-in screen now renders the same role-preview control, area
+  chip, and bell (16 September), but each navigation is still a full page
+  reload — Will chose the fuller "client-side routing everywhere" option over
+  this lighter fix (D-134) and it has not been built.
+- **Sharing a place with a case manager's people is not built.** Will chose a
+  fully persisted version (real table, RLS, a notification to the recipient)
+  over a UI-only stand-in (D-134); nothing exists yet — no migration, no UI.
 
 ---
 

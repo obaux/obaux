@@ -1,7 +1,5 @@
 import * as stylex from '@stylexjs/stylex';
-import { HStack } from '@astryxdesign/core/HStack';
 import { Button } from '@astryxdesign/core/Button';
-import { IconButton } from '@astryxdesign/core/IconButton';
 import { EditIcon } from './icons.js';
 import { pam } from './tokens.stylex.js';
 
@@ -14,18 +12,26 @@ import { pam } from './tokens.stylex.js';
  * In the header it costs nothing (Will, 13 September) and the list starts at
  * the top of the page where it belongs.
  *
- * Two targets for one job, deliberately. The area itself is a button because a
- * person has to be able to tell it is changeable without reading anything, and
- * the pencil beside it is the same action for anybody who reads the area as a
- * label rather than a control. Both clear 48px.
+ * **One control, not two** (Will, 16 September: "the edit button and location
+ * button should be one, not two separate buttons"). It used to be two
+ * side-by-side targets doing the same thing — the area's own name as a
+ * button, and a second, pencil-only button beside it — on the reasoning that
+ * somebody reading the area as a label rather than a control still needed a
+ * way to find "change" by picture alone. That reasoning did not need two
+ * targets, only the pencil visible on the one target both people tap. The
+ * pencil now sits at the *end* of the label rather than the front, which is
+ * what actually frees the row width Will asked for — a leading icon pushes
+ * every character of the area name over by its own width, where a trailing
+ * one only costs space the label wasn't using.
  *
- * The pencil is a picture with no word beside it, so its accessible name has to
- * carry the whole meaning — "Change the area", not "Edit".
+ * The visible text is the area name; the accessible name is the fuller
+ * sentence ("Change the area: Near City Hall"), so a screen reader hears what
+ * the button does, not just where it currently reads from.
  */
 export interface AreaChipProps {
   /** The area, already localised and short, e.g. "Near 19122". */
   readonly label: string;
-  /** What the pencil does, for a screen reader: "Change the area". */
+  /** The button's accessible name, e.g. "Change the area: Near City Hall". */
   readonly changeLabel: string;
   readonly onChange: () => void;
 }
@@ -42,20 +48,18 @@ const styles = stylex.create({
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
   },
-  pencil: { minHeight: pam.touchTargetMin, minWidth: pam.touchTargetMin, fontSize: '20px' },
 });
 
 export function AreaChip({ label, changeLabel, onChange }: AreaChipProps) {
   return (
-    <HStack gap={0.5} align="center" wrap="nowrap">
-      <Button label={label} variant="ghost" onClick={onChange} xstyle={styles.area} />
-      <IconButton
-        label={changeLabel}
-        icon={<EditIcon />}
-        variant="ghost"
-        onClick={onChange}
-        xstyle={styles.pencil}
-      />
-    </HStack>
+    <Button
+      label={changeLabel}
+      variant="ghost"
+      onClick={onChange}
+      endContent={<EditIcon />}
+      xstyle={styles.area}
+    >
+      {label}
+    </Button>
   );
 }

@@ -15,7 +15,8 @@ import { HeaderBell } from '../HeaderBell';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
 import { usePoints } from '@/lib/usePoints';
-import { useDemoRole } from '@/lib/useViewedRole';
+import { useRoleView } from '@/lib/useViewedRole';
+import { RoleSwitchControl } from '../RoleSwitchControl';
 
 /**
  * What the points are for.
@@ -151,7 +152,7 @@ export default function PointsPage() {
   const supportPhone = useSupportPhone();
   const { state: session } = useSession();
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
-  const demoRole = useDemoRole(trueRole);
+  const { demoRole, setViewAs } = useRoleView(trueRole);
   const points = usePoints(session.status === 'signed-in' ? session.session.userId : null);
 
   if (session.status === 'signed-out' || session.status === 'no-profile' || session.status === 'suspended') {
@@ -174,6 +175,11 @@ export default function PointsPage() {
       <AppHeader
         roleLabel={
           session.status === 'signed-in' ? t(`role.${demoRole ?? session.session.role}`) : undefined
+        }
+        roleControl={
+          trueRole === 'super_admin' ? (
+            <RoleSwitchControl trueRole={trueRole} viewedRole={demoRole ?? trueRole} onChange={setViewAs} />
+          ) : undefined
         }
         trailing={<HeaderBell enabled={session.status === 'signed-in'} role={demoRole ?? trueRole} />}
       />

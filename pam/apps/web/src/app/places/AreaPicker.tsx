@@ -48,11 +48,15 @@ const styles = stylex.create({
 /** The header piece: where we are measuring from, and the way to change it. */
 export function AreaTrigger({ area, onOpen }: { area: AreaOption; onOpen: () => void }) {
   const { t } = useI18n();
+  const near = t('places.near', { area: area.label });
 
   return (
     <AreaChip
-      label={t('places.near', { area: area.label })}
-      changeLabel={t('places.changeArea')}
+      label={near}
+      // The same formatted string the visible text uses ("Near City Hall"),
+      // not the bare area name — so the accessible name actually contains
+      // what a sighted person reads on the chip, word for word.
+      changeLabel={t('places.changeArea', { area: near })}
       onChange={onOpen}
     />
   );

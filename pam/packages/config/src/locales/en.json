@@ -364,7 +364,7 @@
   "places.areaResults": "Areas you can choose",
   "places.areaSearching": "Looking...",
   "places.back": "Back",
-  "places.changeArea": "Change the area",
+  "places.changeArea": "Change the area: {area}",
   "places.filter.saved": "Saved",
   "places.filterLabel": "Show",
   "places.flag": "Report a problem",

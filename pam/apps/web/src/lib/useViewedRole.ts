@@ -40,3 +40,26 @@ export function useDemoRole(trueRole: Role | null): Role | null {
   const viewed = useViewedRole(trueRole);
   return viewed && viewed !== trueRole ? viewed : null;
 }
+
+/**
+ * Everything a screen needs to both *read* the preview and let a super admin
+ * *change* it from that same screen (Will, 16 September: the switcher
+ * "should be present on all views", not only Home). `useViewedRole` and
+ * `useDemoRole` each call their own separate `useViewAs`, which is fine for
+ * reading — sessionStorage is the shared source of truth — but a `RoleSwitch`
+ * wired to one of those private instances would update sessionStorage without
+ * updating the *page's own* `viewedRole`, so the header would say one role and
+ * the content underneath it would keep showing another until the next
+ * navigation. One `useViewAs` call, shared by both, is what Home already did;
+ * this is that same shape for every other screen.
+ */
+export function useRoleView(trueRole: Role | null): {
+  readonly viewedRole: Role | null;
+  readonly demoRole: Role | null;
+  readonly setViewAs: (role: Role) => void;
+} {
+  const { viewAs, setViewAs } = useViewAs(trueRole);
+  const viewedRole = viewAs ?? trueRole;
+  const demoRole = viewAs && viewAs !== trueRole ? viewAs : null;
+  return { viewedRole, demoRole, setViewAs };
+}

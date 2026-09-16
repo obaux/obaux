@@ -184,6 +184,16 @@ export function FlagIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+/** A shield. Privacy. */
+export function ShieldIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <path d="M12 2.5 4.5 5.5v5.7c0 5 3.2 8.6 7.5 10.3 4.3-1.7 7.5-5.3 7.5-10.3V5.5z" />
+      <path d="m8.8 12 2.3 2.3 4.1-4.6" />
+    </svg>
+  );
+}
+
 /** A globe. Language. */
 export function GlobeIcon(props: SVGProps<SVGSVGElement>) {
   return (

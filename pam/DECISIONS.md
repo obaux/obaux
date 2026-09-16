@@ -2085,6 +2085,61 @@ removed from both locale bundles as dead copy. The privacy guarantee itself
 never load-bearing prose, just a restatement of what D-108's own comment
 already argues at length.
 
+### D-131 — Astryx's `Button` floors a `<button>` at 48px tall, but not an `<a>`
+The Places category chips (`variant="ghost"`, no `size` prop set to anything
+small) rendered 8px taller than the same chips on Saved, despite identical
+props on paper. Size, padding, icon presence and `aria-pressed` were all ruled
+out one at a time by reading computed styles directly; the actual cause was
+tag choice — Astryx enforces a 48px `min-height` on `<button>`-tag rendering
+specifically, with no matching rule found anywhere in the stylesheet, layers,
+or adopted style sheets (it appears to be in the component's own JS, not
+CSS). The same component rendered as `<a>` (passing `href`) does not carry
+the floor. Fixed by giving every chip a real `href="/places/"` plus
+`onClick={(e) => { e.preventDefault(); ... }}`, paired with explicit
+`role="button"` and `aria-pressed` so an anchor still announces as a toggle
+button rather than a link (a bare `<a aria-pressed>` fails axe's
+`aria-allowed-attr`). Worth knowing before reaching for a `size` prop or a
+custom `minHeight` override next time a control is shorter than expected.
+
+### D-132 — A widely-fanned-out lazy component can leak its dependencies into the shared bundle
+`RoleSwitch` went from one dynamic-import call site to eleven (Will, 16
+September: "should be present on all views"). Adding
+`DropdownMenuRadioGroup`/`DropdownMenuRadioItem` to it — previously used only
+by `LanguageSwitcher`, which is statically imported — pushed Home's first-load
+JS from 0.9 kB to 3.2 kB over the §12 budget, even though `RoleSwitch` itself
+stayed a deferred chunk. Confirmed by grepping the built chunk contents for
+`DropdownMenuRadio`: it had been promoted into the "loads on every route"
+vendor chunk by webpack's automatic splitting, because enough different pages
+now pulled it in. Fixed by reverting `RoleSwitch` to `DropdownMenu`'s plain
+`items` array with a `✓` `endContent` instead of the radio-group compound
+components, landing at 1.1 kB over instead of 3.2 kB. The general shape:
+before adding a new shared dependency to a component that many pages
+dynamically import, check whether that dependency is otherwise unused
+elsewhere — widening its user base is what gets it hoisted.
+
+### D-133 — Dummy places resolve locally, the same "real data wins silently" pattern as dummy people
+The Family Services example place saved on a member's profile threw when
+opened, because `/place/?id=…`'s `useServiceDetail` only ever queried
+`services_near`/`service_by_id` over the network, and a `dummy-place-*` id
+matches no row there. `DUMMY_PLACES_BY_ID` (built from the three
+`EXAMPLE_*` places already in `dummy-places.ts`) is checked first, resolving
+synchronously with no network call; a real id still falls through to the
+real query exactly as before. Mirrors the same rule dummy people, dummy
+notifications, and dummy interested-people lists already follow: dummy data
+only ever fills a genuine gap, never overrides or races a real answer.
+
+### D-134 — Two large pieces of Will's 16 September request are deferred, not done
+Asked which of two approaches to take for two parts of a longer list, Will
+chose the fuller option both times — client-side routing everywhere (for a
+genuinely non-reloading top bar) and a full persisted share-places feature
+(table, RLS, notification) rather than UI-only stand-ins. Neither is started.
+This session limited itself to making header *content* consistent across
+screens (the same role control, area chip, and bell everywhere) within the
+existing per-page-reload navigation, and did not touch routing architecture
+or add any share-related schema. Recorded here rather than left implicit so
+the gap is visible in the decisions log, not only in a session note that
+could go unread.
+
 ---
 
 ## Notes for whoever picks this up next

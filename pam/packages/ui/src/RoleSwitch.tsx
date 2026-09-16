@@ -1,8 +1,7 @@
 'use client';
 
-import * as stylex from '@stylexjs/stylex';
 import { DropdownMenu } from '@astryxdesign/core/DropdownMenu';
-import { pam } from './tokens.stylex.js';
+import { PeopleIcon } from './icons.js';
 
 /**
  * Which role's screen a super admin is looking at.
@@ -22,34 +21,41 @@ import { pam } from './tokens.stylex.js';
  * entirely, and would have to be argued for on its own terms, in front of the
  * people it is about.
  *
- * The chip says so while it is switched: "Viewing as Member", not "Member". A
- * super admin who forgets which mode they are in and files a bug about a
- * missing screen costs an afternoon; one who forgets and believes they are
- * seeing somebody's data costs trust.
+ * **An icon now, not a label chip** (Will, 16 September: "should be much
+ * smaller, it's taking up too much real estate... similar to what we did with
+ * locale dropdown on sign in"). It used to spell out "Viewing as Member" in
+ * full on the trigger itself, which was the clearest possible statement of
+ * "you are not looking at your own screen" but cost a header's worth of width
+ * doing it — on every screen, for the one person who can ever see it. The
+ * open menu still marks the current selection with a leading check, so
+ * nothing about *knowing which mode you're in* was given up, only the
+ * permanently-spelled-out trigger text. The icon's own accessible name still
+ * carries the full sentence via `label`.
+ *
+ * Built on `DropdownMenu`'s plain `items` array rather than its
+ * `DropdownMenuRadioGroup`/`DropdownMenuRadioItem` compound components on
+ * purpose: this file is dynamically imported from eleven different screens
+ * now (Will, 16 September: "should be present on all views"), all through
+ * one shared chunk, and pulling in the radio-group code specifically —
+ * unused by anything else this app dynamically imports — got that chunk
+ * promoted into the bundle every screen loads up front, §12's Home budget
+ * included, rather than staying deferred to the one role that ever opens it.
+ * A leading check character in the label does the same job the radio dot
+ * did, at none of that cost.
  */
 export interface RoleSwitchProps {
   /** The role being viewed, which may not be the signed-in role. */
   readonly value: string;
   /** Options as `{ value, label }`, already localised and ordered. */
   readonly options: readonly { readonly value: string; readonly label: string }[];
-  /** The control's accessible name, e.g. "Switch the view". */
+  /** The control's accessible name, e.g. "Switch the view". Combined with the current selection for the trigger's own name. */
   readonly label: string;
-  /** What the trigger reads when a role other than their own is selected. */
+  /** What the trigger's accessible name adds when a role other than their own is selected. */
   readonly viewingLabel: (roleLabel: string) => string;
   /** The signed-in person's own role, so "their own screen" can be named. */
   readonly ownValue: string;
   readonly onChange: (value: string) => void;
 }
-
-const styles = stylex.create({
-  trigger: {
-    minHeight: pam.touchTargetMin,
-    fontSize: '15px',
-    // A chip, not a button: it sits beside a wordmark and must not look like
-    // the screen's action.
-    borderRadius: '999px',
-  },
-});
 
 export function RoleSwitch({
   value,
@@ -61,18 +67,23 @@ export function RoleSwitch({
 }: RoleSwitchProps) {
   const current = options.find((option) => option.value === value);
   const isOwn = value === ownValue;
-  const text = current ? (isOwn ? current.label : viewingLabel(current.label)) : label;
+  const accessibleName = current
+    ? `${label}: ${isOwn ? current.label : viewingLabel(current.label)}`
+    : label;
 
   return (
     <DropdownMenu
-      button={{ label: text, variant: 'secondary', xstyle: styles.trigger }}
-      presentation="adaptive"
+      button={{ label: accessibleName, icon: <PeopleIcon />, isIconOnly: true, variant: 'ghost' }}
+      hasChevron={false}
       placement="below"
       alignment="start"
       items={options.map((option) => ({
         id: option.value,
         label: option.label,
         onClick: () => onChange(option.value),
+        // A trailing check rather than `DropdownMenuRadioGroup`'s own
+        // indicator — see the file comment on why this stays off it.
+        endContent: option.value === value ? '✓' : undefined,
       }))}
     />
   );

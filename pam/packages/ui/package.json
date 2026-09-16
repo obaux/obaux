@@ -9,6 +9,7 @@
     ".": "./src/index.ts",
     "./RoleSwitch": "./src/RoleSwitch.tsx",
     "./SavedStrip": "./src/SavedStrip.tsx",
+    "./PeopleStrip": "./src/PeopleStrip.tsx",
     "./PlaceDetail": "./src/PlaceDetail.tsx",
     "./Skeletons": "./src/Skeletons.tsx"
   },

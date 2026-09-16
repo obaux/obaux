@@ -28,7 +28,8 @@ import { NotIn } from '../NotIn';
 import { HeaderBell } from '../HeaderBell';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
-import { useViewedRole } from '@/lib/useViewedRole';
+import { useRoleView } from '@/lib/useViewedRole';
+import { RoleSwitchControl } from '../RoleSwitchControl';
 
 /**
  * One person, for a case manager or a program to look at.
@@ -51,11 +52,19 @@ import { useViewedRole } from '@/lib/useViewedRole';
 
 const styles = stylex.create({
   title: { fontSize: '26px', lineHeight: 1.2 },
-  card: { width: '100%' },
+  card: { width: '100%', position: 'relative' },
   section: { fontSize: '17px' },
   name: { fontSize: '18px' },
   meta: { fontSize: '16px' },
   note: { fontSize: '15px', lineHeight: 1.5 },
+  // Stretched-link pattern (same as `PersonRow`): the heading is a real
+  // anchor, widened over the whole card with `::after`, so the card is one
+  // tap target rather than a link buried inside otherwise-dead space.
+  link: {
+    color: 'inherit',
+    textDecoration: 'none',
+    '::after': { content: '""', position: 'absolute', inset: 0 },
+  },
 });
 
 function lookup(id: string | null): DummyPerson | null {
@@ -75,7 +84,7 @@ function PersonScreen() {
   const { state: session } = useSession();
 
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
-  const viewedRole = useViewedRole(trueRole);
+  const { viewedRole, setViewAs } = useRoleView(trueRole);
   // The same audience the three lists that link here already gate on.
   const canView = viewedRole === 'admin' || viewedRole === 'provider' || viewedRole === 'super_admin';
 
@@ -118,6 +127,11 @@ function PersonScreen() {
       <Page gap={4}>
         <AppHeader
           roleLabel={viewedRole ? t(`role.${viewedRole}`) : undefined}
+          roleControl={
+            trueRole === 'super_admin' ? (
+              <RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} />
+            ) : undefined
+          }
           trailing={<HeaderBell enabled={trueRole !== null} role={viewedRole} />}
         />
         <Notice
@@ -137,7 +151,15 @@ function PersonScreen() {
   if (!person) {
     return (
       <Page gap={4}>
-        <AppHeader roleLabel={t(`role.${viewedRole}`)} trailing={<HeaderBell enabled role={viewedRole} />} />
+        <AppHeader
+          roleLabel={t(`role.${viewedRole}`)}
+          roleControl={
+            trueRole === 'super_admin' ? (
+              <RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} />
+            ) : undefined
+          }
+          trailing={<HeaderBell enabled role={viewedRole} />}
+        />
         <PageTitle title={t('person.notFound.title')} backHref="/" backLabel={t('nav.back.home')} />
         <Notice
           notice="service_not_available"
@@ -156,20 +178,28 @@ function PersonScreen() {
 
   return (
     <Page gap={4}>
-      <AppHeader roleLabel={t(`role.${viewedRole}`)} trailing={<HeaderBell enabled role={viewedRole} />} />
+      <AppHeader
+        roleLabel={t(`role.${viewedRole}`)}
+        roleControl={
+          trueRole === 'super_admin' ? (
+            <RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} />
+          ) : undefined
+        }
+        trailing={<HeaderBell enabled role={viewedRole} />}
+      />
       <PageTitle title={person.firstName} backHref="/" backLabel={t('nav.back.home')} />
 
       <VStack gap={4}>
+        {/*
+          The name is not repeated here (Will, 16 September) — the page title
+          already is it. What this row adds is what the title cannot say:
+          where they are, and which language PAM answers them in.
+        */}
         <HStack gap={2} align="center" wrap="wrap">
           <Avatar size="lg" name={person.firstName} />
-          <VStack gap={0.5}>
-            <Heading level={2} xstyle={styles.name}>
-              {person.firstName}
-            </Heading>
-            <Text type="supporting" xstyle={styles.meta}>
-              {t(`role.${person.role}`)} · {person.regionName}
-            </Text>
-          </VStack>
+          <Text type="supporting" xstyle={styles.meta}>
+            {t(`role.${person.role}`)} · {person.regionName} · {t(`language.${person.language}`)}
+          </Text>
         </HStack>
 
         <HStack gap={2} wrap="wrap" align="center">
@@ -205,7 +235,9 @@ function PersonScreen() {
                   <Card key={place.id} xstyle={styles.card}>
                     <VStack gap={1}>
                       <Heading level={3} xstyle={styles.name}>
-                        {place.name}
+                        <a href={`/place/?id=${encodeURIComponent(place.id)}`} {...stylex.props(styles.link)}>
+                          {place.name}
+                        </a>
                       </Heading>
                       <Text type="supporting" xstyle={styles.meta}>
                         {place.address}

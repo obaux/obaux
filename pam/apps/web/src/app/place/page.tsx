@@ -15,13 +15,15 @@ import {
 } from '@pam/ui';
 import { PlaceDetailSkeleton } from '@pam/ui/Skeletons';
 import { categoryLabelKey, distanceLabel, NOTICES, type Category } from '@pam/config';
+import { DUMMY_PLACES_BY_ID, isDummyPlaceId } from '@pam/config/dummy-places';
 import { useI18n } from '@/lib/i18n';
 import { HeaderBell } from '../HeaderBell';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
 import { useSavedPlaces } from '@/lib/useSavedPlaces';
 import { usePlaceStatus, weekLines } from '@/lib/usePlaceStatus';
-import { useDemoRole } from '@/lib/useViewedRole';
+import { useRoleView } from '@/lib/useViewedRole';
+import { RoleSwitchControl } from '../RoleSwitchControl';
 import { sharePlace } from '@/lib/sharePlace';
 
 /**
@@ -92,6 +94,37 @@ function useServiceDetail(id: string | null): State {
       setState({ status: 'missing' });
       return;
     }
+
+    // A dummy saved place never lived in `services` — see
+    // `DUMMY_PLACES_BY_ID`'s own comment for what asking the network for it
+    // used to do instead.
+    if (isDummyPlaceId(id)) {
+      const dummy = DUMMY_PLACES_BY_ID[id];
+      setState(
+        dummy
+          ? {
+              status: 'ready',
+              place: {
+                id: dummy.id,
+                name: dummy.name,
+                lookupName: dummy.name,
+                category: dummy.category,
+                address: dummy.address,
+                phone: dummy.phone,
+                website: null,
+                placeId: null,
+                lat: dummy.lat,
+                lon: dummy.lon,
+                description: dummy.description,
+                audience: null,
+                hours: null,
+              },
+            }
+          : { status: 'missing' },
+      );
+      return;
+    }
+
     let cancelled = false;
 
     void (async () => {
@@ -150,16 +183,35 @@ function PlaceScreen() {
   const { state: session } = useSession();
   const signedIn = session.status === 'signed-in';
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
-  const demoRole = useDemoRole(trueRole);
+  const { demoRole, setViewAs } = useRoleView(trueRole);
   const { isSaved, save, unsave } = useSavedPlaces(signedIn, demoRole);
 
   const place = state.status === 'ready' ? state.place : null;
   const status = usePlaceStatus(place?.id ?? '', place?.hours ?? null, t, locale);
 
+  /*
+   * The header is not bare here (Will, 16 September: "the top bar in Places
+   * profile should be consistent") — the session is already resolved by the
+   * time this screen is deciding whether the *place* loaded, so there is no
+   * reason for it to show less than every other screen does at this point:
+   * the role chip, the switcher for a super admin, and the bell.
+   */
+  const header = (
+    <AppHeader
+      roleLabel={signedIn ? t(`role.${demoRole ?? session.session.role}`) : undefined}
+      roleControl={
+        trueRole === 'super_admin' ? (
+          <RoleSwitchControl trueRole={trueRole} viewedRole={demoRole ?? trueRole} onChange={setViewAs} />
+        ) : undefined
+      }
+      trailing={<HeaderBell enabled={signedIn} role={demoRole ?? trueRole} />}
+    />
+  );
+
   if (state.status === 'loading') {
     return (
       <Page gap={4}>
-        <AppHeader />
+        {header}
         <PlaceDetailSkeleton label={t('common.loading')} />
       </Page>
     );
@@ -170,7 +222,7 @@ function PlaceScreen() {
       state.status === 'error' && state.offline ? 'offline' : 'something_went_wrong';
     return (
       <Page gap={4}>
-        <AppHeader />
+        {header}
         <PageTitle
           title={t('places.title')}
           backHref={back.href}
@@ -194,10 +246,7 @@ function PlaceScreen() {
 
   return (
     <Page gap={4}>
-      <AppHeader
-        roleLabel={signedIn ? t(`role.${demoRole ?? session.session.role}`) : undefined}
-        trailing={<HeaderBell enabled={signedIn} role={demoRole ?? trueRole} />}
-      />
+      {header}
       <PageTitle title={place!.name} backHref={back.href} backLabel={t(back.labelKey)} />
 
       <PlaceDetail
