@@ -1,4 +1,4 @@
-import type { AccessStatus, Role } from './index.js';
+import type { AccessStatus, Locale, Role } from './index.js';
 
 /**
  * Sample people — for every list of humans that has nobody in it yet.
@@ -64,6 +64,8 @@ export interface DummyPerson {
   readonly accessStatus: AccessStatus;
   /** ISO timestamp, or null for "has not opened PAM yet". */
   readonly lastActiveAt: string | null;
+  /** `profiles.preferred_language` — see `/person/`, which shows this instead of repeating the name. */
+  readonly language: Locale;
   /** Members only. */
   readonly points?: number;
   /** Programs only — the organisation they run, not a person's own name. */
@@ -82,6 +84,7 @@ export const DUMMY_MEMBERS: readonly DummyPerson[] = [
     regionName: 'Philadelphia',
     accessStatus: 'active',
     lastActiveAt: hoursAgo(4),
+    language: 'en',
     points: 175,
   },
   {
@@ -91,6 +94,7 @@ export const DUMMY_MEMBERS: readonly DummyPerson[] = [
     regionName: 'Philadelphia',
     accessStatus: 'active',
     lastActiveAt: daysAgo(1),
+    language: 'es',
     points: 420,
   },
   {
@@ -100,6 +104,7 @@ export const DUMMY_MEMBERS: readonly DummyPerson[] = [
     regionName: 'Philadelphia',
     accessStatus: 'limited',
     lastActiveAt: daysAgo(3),
+    language: 'es',
     points: 50,
   },
   {
@@ -109,6 +114,7 @@ export const DUMMY_MEMBERS: readonly DummyPerson[] = [
     regionName: 'Philadelphia',
     accessStatus: 'active',
     lastActiveAt: daysAgo(6),
+    language: 'en',
     points: 300,
   },
   {
@@ -118,6 +124,7 @@ export const DUMMY_MEMBERS: readonly DummyPerson[] = [
     regionName: 'Philadelphia',
     accessStatus: 'suspended',
     lastActiveAt: daysAgo(14),
+    language: 'en',
     points: 25,
   },
   {
@@ -127,6 +134,7 @@ export const DUMMY_MEMBERS: readonly DummyPerson[] = [
     regionName: 'Philadelphia',
     accessStatus: 'active',
     lastActiveAt: null,
+    language: 'es',
     points: 0,
   },
 ];
@@ -140,6 +148,7 @@ export const DUMMY_PROGRAM_LEADS: readonly DummyPerson[] = [
     regionName: 'Philadelphia',
     accessStatus: 'active',
     lastActiveAt: hoursAgo(2),
+    language: 'en',
     orgName: 'Example Learning Center',
   },
   {
@@ -149,6 +158,7 @@ export const DUMMY_PROGRAM_LEADS: readonly DummyPerson[] = [
     regionName: 'Philadelphia',
     accessStatus: 'active',
     lastActiveAt: daysAgo(2),
+    language: 'es',
     orgName: 'Example Workforce Center',
   },
   {
@@ -158,6 +168,7 @@ export const DUMMY_PROGRAM_LEADS: readonly DummyPerson[] = [
     regionName: 'Philadelphia',
     accessStatus: 'active',
     lastActiveAt: daysAgo(5),
+    language: 'en',
     orgName: 'Example Food Pantry',
   },
   {
@@ -167,6 +178,7 @@ export const DUMMY_PROGRAM_LEADS: readonly DummyPerson[] = [
     regionName: 'Philadelphia',
     accessStatus: 'active',
     lastActiveAt: null,
+    language: 'es',
     orgName: 'Example Trade School',
   },
 ];
@@ -180,6 +192,7 @@ export const DUMMY_CASE_MANAGERS: readonly DummyPerson[] = [
     regionName: 'Philadelphia',
     accessStatus: 'active',
     lastActiveAt: hoursAgo(6),
+    language: 'en',
   },
   {
     id: 'dummy-a2',
@@ -188,6 +201,7 @@ export const DUMMY_CASE_MANAGERS: readonly DummyPerson[] = [
     regionName: 'Philadelphia',
     accessStatus: 'active',
     lastActiveAt: daysAgo(2),
+    language: 'es',
   },
 ];
 

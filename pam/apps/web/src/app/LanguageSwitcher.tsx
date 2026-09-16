@@ -1,7 +1,10 @@
 'use client';
 
 import { useCallback } from 'react';
-import { Badge } from '@astryxdesign/core/Badge';
+import * as stylex from '@stylexjs/stylex';
+import { Text } from '@astryxdesign/core/Text';
+import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
+import type { StyleXStyles } from '@stylexjs/stylex';
 import {
   DropdownMenu,
   DropdownMenuRadioGroup,
@@ -33,7 +36,33 @@ const OPTIONS: readonly { value: Locale; labelKey: 'language.en' | 'language.es'
   { value: 'es', labelKey: 'language.es' },
 ];
 
-export function LanguageSwitcher({ variant = 'icon' }: { readonly variant?: 'icon' | 'row' }) {
+const styles = stylex.create({
+  // Astryx's own Badge has no plain/white variant, and no xstyle to add one —
+  // this is a small chip built from Text instead, painted with the card
+  // background (white in light mode) rather than Badge's muted grey (Will,
+  // 16 September: "make chip white"), with room on its own left edge so it
+  // reads as a separate thing from the icon+label beside it rather than
+  // crowding against them.
+  chip: {
+    fontSize: '15px',
+    fontWeight: 600,
+    color: colorVars['--color-text-primary'],
+    backgroundColor: colorVars['--color-background-card'],
+    borderRadius: '999px',
+    paddingInline: '10px',
+    paddingBlock: '4px',
+    marginInlineStart: '8px',
+  },
+});
+
+export function LanguageSwitcher({
+  variant = 'icon',
+  rowStyle,
+}: {
+  readonly variant?: 'icon' | 'row';
+  /** The same row style every other Settings item uses, for the trigger button. */
+  readonly rowStyle?: StyleXStyles;
+}) {
   const { locale, setLocale, t } = useI18n();
   const { state: session } = useSession();
 
@@ -82,7 +111,11 @@ export function LanguageSwitcher({ variant = 'icon' }: { readonly variant?: 'ico
       button={{
         label: t('language.title'),
         variant: 'ghost',
-        endContent: <Badge variant="neutral" label={t(locale === 'en' ? 'language.en' : 'language.es')} />,
+        icon: <GlobeIcon />,
+        endContent: (
+          <Text xstyle={styles.chip}>{t(locale === 'en' ? 'language.en' : 'language.es')}</Text>
+        ),
+        xstyle: rowStyle,
       }}
     >
       {items}

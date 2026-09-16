@@ -28,7 +28,8 @@ import { PersonRow } from '../PersonRow';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
 import { useCaseload, createInvite, type CreatedInvite } from '@/lib/useCaseload';
-import { useViewedRole } from '@/lib/useViewedRole';
+import { useRoleView } from '@/lib/useViewedRole';
+import { RoleSwitchControl } from '../RoleSwitchControl';
 
 /**
  * The case manager's screen (§4.1).
@@ -115,7 +116,7 @@ export default function AdminPage() {
   // just Home's tiles. Before this, every screen but Home asked the real role
   // directly, so leaving Home reset the preview (Will, 16 September).
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
-  const viewedRole = useViewedRole(trueRole);
+  const { viewedRole, setViewAs } = useRoleView(trueRole);
   const isAdmin = viewedRole === 'admin';
   const { state: caseload, refresh } = useCaseload(isAdmin);
 
@@ -177,7 +178,15 @@ export default function AdminPage() {
     // this screen is, and a way to get it fixed if it is wrong (§0).
     return (
       <Page gap={4}>
-          <AppHeader roleLabel={viewedRole ? t(`role.${viewedRole}`) : undefined} trailing={<HeaderBell enabled={trueRole !== null} role={viewedRole} />} />
+          <AppHeader
+            roleLabel={viewedRole ? t(`role.${viewedRole}`) : undefined}
+            roleControl={
+              trueRole === 'super_admin' ? (
+                <RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} />
+              ) : undefined
+            }
+            trailing={<HeaderBell enabled={trueRole !== null} role={viewedRole} />}
+          />
           <Notice
             notice="service_not_available"
             title={t('admin.notAdmin.title')}
@@ -211,7 +220,15 @@ export default function AdminPage() {
           flagged, or a message in their caseload was reported. Nothing else,
           and no row carries anybody's words (A7 / D-080).
         */}
-        <AppHeader roleLabel={t('role.admin')} trailing={<HeaderBell enabled={isAdmin} role={viewedRole} />} />
+        <AppHeader
+          roleLabel={t('role.admin')}
+          roleControl={
+            trueRole === 'super_admin' ? (
+              <RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} />
+            ) : undefined
+          }
+          trailing={<HeaderBell enabled={isAdmin} role={viewedRole} />}
+        />
 
         <PageTitle
           title={t('admin.title')}

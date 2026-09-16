@@ -1,5 +1,57 @@
 # Changelog
 
+## [0.18.0] — 2026-09-16 · A consistent top bar, everywhere
+
+### Added — Program leads and Case managers: an IG-stories-style people strip on Home
+
+While previewing Program or Case manager, Home now shows people as a
+horizontal, scrollable row of circular avatars with a name underneath,
+instead of a stacked list — the same shape as a stories row, with masked
+edges and a mocked highlight ring standing in for future activity or
+unread-message signals. Frees up a phone screen's worth of vertical space
+that a row-per-person list was costing before the menu underneath was even
+reached.
+
+### Changed — the "Viewing as" role switcher is now a small icon, present on every screen
+
+It used to spell out "Viewing as Member" in full on every screen a super
+admin could see, and only appeared on some of them. It is now a compact icon
+button, matching the locale switcher on sign-in, and shows up consistently
+across Home, Places, Saved, the place screen, the directory, the case
+manager screen, notifications, points, and account.
+
+### Changed — Places category filter chips now match Saved's smaller size
+
+The chips were 8px taller than the same style of chip on Saved, from an
+underlying Astryx quirk rather than a chosen size. All five chips (All,
+the three categories, and Saved) now render at the same height.
+
+### Fixed — the example Family services place, saved to a member's profile, no longer errors
+
+Opening it now shows the place's own screen, the same as any real saved
+place.
+
+### Changed — the location editor is one button, not two
+
+The area chip in the header used to be an area-name button next to a
+separate pencil button doing the same thing. It is now one button, with the
+pencil trailing the area name rather than leading it.
+
+### Changed — Settings: consistent sizing, added icons, left alignment
+
+Every row on the account screen now shares one font size and is left-aligned
+behind a leading icon. The language row's chip is white, with more room
+between its icon, its label, and the chip that shows the current language.
+
+### Changed — Case manager and Program lead people lists no longer show a location under each name
+
+### Changed — a person's own profile no longer repeats their name under the page title
+
+Shows their location and preferred language instead, since the title above
+already says who this is.
+
+### Added — the design system gallery now includes the role switcher, the area chip, and the people strip
+
 ## [0.17.0] — 2026-09-16 · Back where you came from
 
 ### Fixed — a saved place on Home opened the full saved list, not the place

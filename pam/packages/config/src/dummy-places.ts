@@ -79,3 +79,24 @@ export const DUMMY_SAVED_BY_PERSON: Readonly<Record<string, readonly DummySavedP
   'dummy-m2': [EXAMPLE_WORKFORCE_CENTER],
   'dummy-m4': [EXAMPLE_LEARNING_CENTER],
 };
+
+/**
+ * Every example place, by its own id — for `/place/?id=…` when the id is one
+ * of these (`dummy-place-…`) rather than a real row in `services`.
+ *
+ * Before this, tapping "Example Food Pantry" from a member's saved-places
+ * card on `/person/` sent a real `service_detail` lookup for an id that does
+ * not exist in the database — Supabase answered "not found", and the screen
+ * showed an error rather than the place it was already looking at the words
+ * for. A dummy id never reaches the network now; see `isDummyPlaceId`.
+ */
+export const DUMMY_PLACES_BY_ID: Readonly<Record<string, DummySavedPlace>> = Object.fromEntries(
+  [EXAMPLE_LEARNING_CENTER, EXAMPLE_FOOD_PANTRY, EXAMPLE_WORKFORCE_CENTER].map((place) => [
+    place.id,
+    place,
+  ]),
+);
+
+export function isDummyPlaceId(id: string): boolean {
+  return id.startsWith('dummy-place-');
+}

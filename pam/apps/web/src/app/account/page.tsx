@@ -9,23 +9,26 @@ import { Card } from '@astryxdesign/core/Card';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { Badge } from '@astryxdesign/core/Badge';
+import { Button } from '@astryxdesign/core/Button';
 import {
   AppHeader,
+  BellIcon,
   BigButton,
   HelpBar,
   Loading,
   Notice,
   Page,
   PageTitle,
-  TextLink,
+  ShieldIcon,
 } from '@pam/ui';
 import { NOTICES } from '@pam/config';
 import { DUMMY_SELF } from '@pam/config/dummy-people';
 import { useI18n } from '@/lib/i18n';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession, signOut } from '@/lib/useSession';
-import { useDemoRole } from '@/lib/useViewedRole';
+import { useRoleView } from '@/lib/useViewedRole';
 import { LanguageSwitcher } from '../LanguageSwitcher';
+import { RoleSwitchControl } from '../RoleSwitchControl';
 
 /**
  * Your account — and the way out.
@@ -65,6 +68,21 @@ const styles = stylex.create({
   value: { fontSize: '18px', lineHeight: 1.4 },
   note: { fontSize: '15px', lineHeight: 1.5 },
   intro: { fontSize: '18px', lineHeight: 1.5 },
+  /*
+   * One size, one alignment, for every row in Settings (Will, 16 September:
+   * "ensure all items in button areas are using a consistent font size...
+   * add icons... left align for easier readability"). The Language row used
+   * to be its own dropdown-menu button, sized and centred by Astryx's own
+   * default rather than by this file — that mismatch was the thing that made
+   * it read as inconsistent, not a difference in wording.
+   */
+  row: {
+    width: '100%',
+    minHeight: '48px',
+    fontSize: '17px',
+    justifyContent: 'flex-start',
+    textAlign: 'left',
+  },
 });
 
 export default function AccountPage() {
@@ -74,7 +92,7 @@ export default function AccountPage() {
   const { state: session } = useSession();
   const [busy, setBusy] = useState(false);
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
-  const demoRole = useDemoRole(trueRole);
+  const { demoRole, setViewAs } = useRoleView(trueRole);
   const dummySelf = demoRole ? DUMMY_SELF[demoRole] : undefined;
 
   const leave = async () => {
@@ -136,6 +154,11 @@ export default function AccountPage() {
     <Page gap={4}>
       <AppHeader
         roleLabel={session.status === 'signed-in' ? t(`role.${demoRole ?? session.session.role}`) : undefined}
+        roleControl={
+          trueRole === 'super_admin' ? (
+            <RoleSwitchControl trueRole={trueRole} viewedRole={demoRole ?? trueRole} onChange={setViewAs} />
+          ) : undefined
+        }
         accountHref={null}
       />
       <PageTitle title={t('account.title')} backHref="/" backLabel={t('nav.back.home')} />
@@ -195,9 +218,21 @@ export default function AccountPage() {
           <Heading level={2} xstyle={styles.value}>
             {t('account.settings')}
           </Heading>
-          <TextLink label={t('reminders.settings')} href="/reminders/" />
-          <TextLink label={t('legal.privacy')} href="/privacy/" />
-          <LanguageSwitcher variant="row" />
+          <Button
+            label={t('reminders.settings')}
+            variant="ghost"
+            icon={<BellIcon />}
+            href="/reminders/"
+            xstyle={styles.row}
+          />
+          <Button
+            label={t('legal.privacy')}
+            variant="ghost"
+            icon={<ShieldIcon />}
+            href="/privacy/"
+            xstyle={styles.row}
+          />
+          <LanguageSwitcher variant="row" rowStyle={styles.row} />
         </VStack>
       ) : null}
 

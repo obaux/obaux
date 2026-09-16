@@ -364,7 +364,7 @@
   "places.areaResults": "Areas que puede elegir",
   "places.areaSearching": "Buscando...",
   "places.back": "Atras",
-  "places.changeArea": "Cambiar la zona",
+  "places.changeArea": "Cambiar la zona: {area}",
   "places.filter.saved": "Guardados",
   "places.filterLabel": "Mostrar",
   "places.flag": "Reportar un problema",

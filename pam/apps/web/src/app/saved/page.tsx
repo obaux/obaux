@@ -12,7 +12,8 @@ import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
 import { useSavedPlaces } from '@/lib/useSavedPlaces';
 import { placeStatus, useNow } from '@/lib/usePlaceStatus';
-import { useDemoRole } from '@/lib/useViewedRole';
+import { useRoleView } from '@/lib/useViewedRole';
+import { RoleSwitchControl } from '../RoleSwitchControl';
 
 /**
  * Everything a member kept.
@@ -54,7 +55,7 @@ export default function SavedPage() {
 
   const signedIn = session.status === 'signed-in';
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
-  const demoRole = useDemoRole(trueRole);
+  const { demoRole, setViewAs } = useRoleView(trueRole);
   const { state, unsave, failed } = useSavedPlaces(signedIn, demoRole);
   const now = useNow();
 
@@ -96,7 +97,15 @@ export default function SavedPage() {
 
   return (
     <Page gap={4}>
-      <AppHeader roleLabel={t(`role.${demoRole ?? session.session.role}`)} trailing={<HeaderBell enabled={signedIn} role={demoRole ?? trueRole} />} />
+      <AppHeader
+        roleLabel={t(`role.${demoRole ?? session.session.role}`)}
+        roleControl={
+          trueRole === 'super_admin' ? (
+            <RoleSwitchControl trueRole={trueRole} viewedRole={demoRole ?? trueRole} onChange={setViewAs} />
+          ) : undefined
+        }
+        trailing={<HeaderBell enabled={signedIn} role={demoRole ?? trueRole} />}
+      />
 
       <PageTitle
         title={t('saved.title')}

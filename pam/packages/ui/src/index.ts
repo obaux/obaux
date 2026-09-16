@@ -59,6 +59,7 @@ export {
   FlagIcon,
   GlobeIcon,
   ShareIcon,
+  ShieldIcon,
   StarIcon,
   HomeIcon,
   MeIcon,

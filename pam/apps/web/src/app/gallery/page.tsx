@@ -8,6 +8,7 @@ import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import {
   AppHeader,
+  AreaChip,
   BellIcon,
   BigButton,
   HelpBar,
@@ -25,10 +26,12 @@ import {
   PlacesIcon,
   PlanIcon,
   PointsBadge,
+  RoleSwitch,
   StepHeader,
   TextField,
   TextLink,
 } from '@pam/ui';
+import { PeopleStrip } from '@pam/ui/PeopleStrip';
 
 /**
  * Every PAM component, in the states that matter.
@@ -109,6 +112,55 @@ export default function GalleryPage() {
           <AppHeader align="center" />
           <AppHeader align="center" isSticky />
         </VStack>
+      </Section>
+
+      <Section
+        title="Viewing as"
+        note="A super admin's role preview, an icon now rather than a spelled-out chip (Will, 16 September: 'much smaller... similar to what we did with locale dropdown'). Present on every screen a super admin sees, not only Home."
+      >
+        <VStack gap={2}>
+          <AppHeader
+            roleControl={
+              <RoleSwitch
+                value="super_admin"
+                ownValue="super_admin"
+                label="Switch the view"
+                viewingLabel={(roleLabel) => `Viewing as ${roleLabel}`}
+                options={[
+                  { value: 'super_admin', label: 'Super admin' },
+                  { value: 'admin', label: 'Case manager' },
+                  { value: 'provider', label: 'Program lead' },
+                  { value: 'member', label: 'Member' },
+                ]}
+                onChange={() => {}}
+              />
+            }
+          />
+          <AppHeader
+            roleControl={
+              <RoleSwitch
+                value="member"
+                ownValue="super_admin"
+                label="Switch the view"
+                viewingLabel={(roleLabel) => `Viewing as ${roleLabel}`}
+                options={[
+                  { value: 'super_admin', label: 'Super admin' },
+                  { value: 'admin', label: 'Case manager' },
+                  { value: 'provider', label: 'Program lead' },
+                  { value: 'member', label: 'Member' },
+                ]}
+                onChange={() => {}}
+              />
+            }
+          />
+        </VStack>
+      </Section>
+
+      <Section
+        title="Where a screen is measured from"
+        note="One control in the header, not a button plus a separate pencil (Will, 16 September: 'the edit button and location button should be one'). The pencil trails the label so it costs space the label wasn't using."
+      >
+        <AreaChip label="Near City Hall" changeLabel="Change the area: Near City Hall" onChange={() => {}} />
       </Section>
 
       <Section
@@ -260,6 +312,23 @@ export default function GalleryPage() {
             onMessage={() => {}}
           />
         </VStack>
+      </Section>
+
+      <Section
+        title="People, at a glance"
+        note="A case manager or program lead's own list, as a horizontal strip of circles rather than a row per person (Will, 16 September: 'copying a similar layout to IG stories'). Scrolls past the page's own gutter and fades at the edge; the ring is a mocked stand-in for activity, not real yet — see PeopleStrip's own comment."
+      >
+        <PeopleStrip
+          label="Your people"
+          people={[
+            { id: '1', firstName: 'Jordan', href: '#', hasActivity: true },
+            { id: '2', firstName: 'Keisha', href: '#', hasActivity: false },
+            { id: '3', firstName: 'Miguel', href: '#', hasActivity: true },
+            { id: '4', firstName: 'Aaliyah', href: '#', hasActivity: false },
+            { id: '5', firstName: 'A Name Long Enough To Truncate', href: '#', hasActivity: true },
+            { id: '6', firstName: 'Priya', href: '#', hasActivity: false },
+          ]}
+        />
       </Section>
 
       <Section

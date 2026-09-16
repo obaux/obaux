@@ -12,7 +12,8 @@ import { NotIn } from '../NotIn';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
 import { useNotifications, unreadCount } from '@/lib/useNotifications';
-import { useViewedRole } from '@/lib/useViewedRole';
+import { useRoleView } from '@/lib/useViewedRole';
+import { RoleSwitchControl } from '../RoleSwitchControl';
 import { whenHappened } from '@/lib/when';
 
 /**
@@ -69,7 +70,7 @@ export default function NotificationsPage() {
 
   const signedIn = session.status === 'signed-in';
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
-  const viewedRole = useViewedRole(trueRole);
+  const { viewedRole, setViewAs } = useRoleView(trueRole);
   const { state, markAllSeen } = useNotifications(signedIn);
   const unread = unreadCount(state);
 
@@ -88,7 +89,14 @@ export default function NotificationsPage() {
 
   return (
     <Page gap={3}>
-        <AppHeader roleLabel={signedIn ? t(`role.${viewedRole}`) : undefined} />
+        <AppHeader
+          roleLabel={signedIn ? t(`role.${viewedRole}`) : undefined}
+          roleControl={
+            trueRole === 'super_admin' ? (
+              <RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} />
+            ) : undefined
+          }
+        />
 
         {/*
           The way back sits beside the title, the way it does on every other

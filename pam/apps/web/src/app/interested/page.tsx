@@ -13,7 +13,8 @@ import { HeaderBell } from '../HeaderBell';
 import { PersonRow } from '../PersonRow';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
-import { useViewedRole } from '@/lib/useViewedRole';
+import { useRoleView } from '@/lib/useViewedRole';
+import { RoleSwitchControl } from '../RoleSwitchControl';
 import { whenHappened } from '@/lib/when';
 
 /**
@@ -39,7 +40,7 @@ export default function InterestedPage() {
   const { state: session } = useSession();
 
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
-  const viewedRole = useViewedRole(trueRole);
+  const { viewedRole, setViewAs } = useRoleView(trueRole);
   const isProvider = viewedRole === 'provider';
 
   if (session.status === 'loading') {
@@ -84,6 +85,11 @@ export default function InterestedPage() {
       <Page gap={4}>
         <AppHeader
           roleLabel={viewedRole ? t(`role.${viewedRole}`) : undefined}
+          roleControl={
+            trueRole === 'super_admin' ? (
+              <RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} />
+            ) : undefined
+          }
           trailing={<HeaderBell enabled={trueRole !== null} role={viewedRole} />}
         />
         <Notice
@@ -100,7 +106,15 @@ export default function InterestedPage() {
 
   return (
     <Page gap={4}>
-      <AppHeader roleLabel={t('role.provider')} trailing={<HeaderBell enabled={isProvider} role={viewedRole} />} />
+      <AppHeader
+        roleLabel={t('role.provider')}
+        roleControl={
+          trueRole === 'super_admin' ? (
+            <RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} />
+          ) : undefined
+        }
+        trailing={<HeaderBell enabled={isProvider} role={viewedRole} />}
+      />
 
       <PageTitle
         title={t('interested.title')}
