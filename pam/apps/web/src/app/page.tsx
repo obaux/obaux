@@ -33,6 +33,7 @@ import { usePoints } from '@/lib/usePoints';
 import { useViewAs } from '@/lib/useViewAs';
 import { SavedStripLazy } from './SavedStripLazy';
 import { RoleSwitchLazy } from './RoleSwitchLazy';
+import { HomePeoplePreviewLazy } from './HomePeoplePreviewLazy';
 
 /**
  * Home.
@@ -241,7 +242,7 @@ export default function HomePage() {
               id: place.id,
               name: place.name,
               categoryLabel: t(categoryLabelKey(place.category)),
-              href: '/saved/',
+              href: `/place/?id=${encodeURIComponent(place.id)}&from=home`,
             }))}
             label={t('saved.title')}
             removeLabel={(name) => t('saved.remove', { name })}
@@ -258,6 +259,19 @@ export default function HomePage() {
           supportPhone={supportPhone}
           callLabel={t('help.callSupport')}
         />
+      ) : null}
+
+      {/*
+        A taste of the people list, while previewing a role that has one
+        (Will, 16 September: "pull in the dummy names for viewing modes into
+        the dashboard home page"). Only while a preview is genuinely active —
+        `demoRole` — never for a real account's own Home, real or empty; the
+        full example roster already lives on the screen each role tile below
+        leads to. A member's own preview shows nothing here: a member has no
+        people list to preview.
+      */}
+      {demoRole === 'admin' || demoRole === 'super_admin' || demoRole === 'provider' ? (
+        <HomePeoplePreviewLazy role={demoRole} />
       ) : null}
 
       {/*

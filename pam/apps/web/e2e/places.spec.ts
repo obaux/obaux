@@ -92,10 +92,12 @@ test.describe('the places screen', () => {
     await expect(page.getByRole('link', { name: 'Go' })).toHaveCount(0);
     await expect(page.getByRole('button', { name: 'More about this place' })).toHaveCount(0);
 
-    // The whole card is one link, and it goes to the place.
+    // The whole card is one link, and it goes to the place — carrying where it
+    // came from, so that screen's own back link returns here rather than to
+    // Home (Will, 16 September).
     await expect(page.getByRole('link', { name: 'J J Peters' })).toHaveAttribute(
       'href',
-      `/place/?id=${ROWS[0]!.id}`,
+      `/place/?id=${ROWS[0]!.id}&from=places`,
     );
   });
 

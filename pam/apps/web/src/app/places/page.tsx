@@ -242,7 +242,7 @@ export default function PlacesPage() {
                 <ScrollReveal key={place.id} index={index}>
                 <PlaceCard
                   name={place.name}
-                  href={`/place/?id=${encodeURIComponent(place.id)}`}
+                  href={`/place/?id=${encodeURIComponent(place.id)}&from=places`}
                   description={place.description}
                   {...(miles ? { distanceLabel: t(miles.key, miles.vars) } : {})}
                   status={placeStatus(place.id, place.hours, now, t, locale)}

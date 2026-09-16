@@ -1,5 +1,30 @@
 # Changelog
 
+## [0.17.0] — 2026-09-16 · Back where you came from
+
+### Fixed — a saved place on Home opened the full saved list, not the place
+
+Tapping a place card in Home's "Places you saved" strip now opens that
+place's own screen, the way tapping it anywhere else already did.
+
+### Fixed — "back" now returns to wherever a place was opened from
+
+Opening a place from Home and going back now returns to Home. Opening it
+from Places returns to Places; from Saved, to Saved. It used to always
+return to Places, regardless of where the tap came from.
+
+### Changed — sign-in: merged the password line into the consent sentence
+
+"No password to remember" is now part of the sentence under the button
+("PAM texts you a code to sign in. No password to remember. Reply STOP...")
+rather than a separate line above it, freeing up a line of vertical space.
+
+### Added — a taste of the example people, on Home itself
+
+While a super admin previews Case manager, Program, or Super admin, Home now
+shows three example people from that role's own list, with a link to see
+the rest — instead of only reaching them through the menu tiles below.
+
 ## [0.16.0] — 2026-09-16 · One place for a message, one place for a language
 
 ### Added — a banner for things that already happened

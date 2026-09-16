@@ -10,8 +10,10 @@ fills every people list and notification feed for a first look at PAM before
 real data exists. Locale is now a real, switchable preference — a language
 icon on sign-in, an onboarding step, and account settings all read and write
 `profiles.preferred_language` — and there is a shared, dismissible banner for
-saying something happened outside a screen's own layout. Newest session log:
-`docs/sessions/2026-09-16-one-place-for-a-message.md`.
+saying something happened outside a screen's own layout. A place's own screen
+now returns to wherever it was opened from (Home, Places, or Saved) instead of
+always to Places. Newest session log:
+`docs/sessions/2026-09-16-back-where-you-came-from.md`.
 
 This is the handover document: what exists, what is proven, what is live, and
 what the next person needs to know before touching anything.
@@ -133,7 +135,7 @@ Numbers here are from the last run, not aspirations.
 | Live RLS fingerprint | identical to local | The deployed policy set is provably the one that was penetration-tested: `ce9636c3b77e4827368e6575742b899c`, 73 policies on both |
 | Live anonymous attack | 0 rows leaked | A signed-out caller reads no profiles, messages, invites or audit rows on the real database, while still reaching the support number and the public catalogue |
 | Browser a11y + theme (Playwright, full suite) | 426 pass | No WCAG AA violations at 320px or iPhone SE. Every control clears 48px. No horizontal scroll. The Astryx theme really resolves. Runs in dark mode as well as light. |
-| First-load JS | 500.8 kB of 500 kB — **0.8 kB over budget**, disclosed and unresolved | §12 budget, measured gzipped on what `index.html` actually loads; see 2026-09-16 session logs |
+| First-load JS | 500.9 kB of 500 kB — **0.9 kB over budget**, disclosed and unresolved | §12 budget, measured gzipped on what `index.html` actually loads; see 2026-09-16 session logs |
 
 ### The database suite is the one that matters
 

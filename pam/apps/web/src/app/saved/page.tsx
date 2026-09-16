@@ -151,7 +151,7 @@ export default function SavedPage() {
             <ScrollReveal key={place.id} index={index}>
               <PlaceCard
                 name={place.name}
-                href={`/place/?id=${encodeURIComponent(place.id)}`}
+                href={`/place/?id=${encodeURIComponent(place.id)}&from=saved`}
                 description={place.description}
                 status={placeStatus(place.id, place.hours, now, t, locale)}
                 audienceLabel={place.audience ? t(`place.audience.${place.audience}`) : null}

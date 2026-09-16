@@ -43,6 +43,25 @@ import { sharePlace } from '@/lib/sharePlace';
  * notice for all three cases, because a member does not need to know which.
  */
 
+/**
+ * Where "back" goes — wherever the card that opened this screen actually
+ * sat, not always `/places/` (Will, 16 September: "if I'm in Places and I
+ * open a place, going back should take me to places, not home"). Every
+ * link into `/place/` now carries `?from=`; a short token from a small
+ * fixed set rather than a raw path, so this never has to trust or validate
+ * an arbitrary URL. A bare `/place/?id=…` — a shared link, or an old one —
+ * still falls back to Places, which was this screen's only behaviour before.
+ */
+const BACK_TARGETS = {
+  home: { href: '/', labelKey: 'nav.back.home' },
+  places: { href: '/places/', labelKey: 'nav.back.places' },
+  saved: { href: '/saved/', labelKey: 'nav.back.saved' },
+} as const;
+
+function resolveBack(from: string | null): { href: string; labelKey: string } {
+  return BACK_TARGETS[from as keyof typeof BACK_TARGETS] ?? BACK_TARGETS.places;
+}
+
 interface Detail {
   id: string;
   name: string;
@@ -126,6 +145,7 @@ function PlaceScreen() {
   const params = useSearchParams();
   const id = params.get('id');
   const state = useServiceDetail(id);
+  const back = resolveBack(params.get('from'));
 
   const { state: session } = useSession();
   const signedIn = session.status === 'signed-in';
@@ -153,8 +173,8 @@ function PlaceScreen() {
         <AppHeader />
         <PageTitle
           title={t('places.title')}
-          backHref="/places/"
-          backLabel={t('nav.back.places')}
+          backHref={back.href}
+          backLabel={t(back.labelKey)}
         />
         <Notice
           notice={state.status === 'missing' ? 'service_not_available' : key}
@@ -178,7 +198,7 @@ function PlaceScreen() {
         roleLabel={signedIn ? t(`role.${demoRole ?? session.session.role}`) : undefined}
         trailing={<HeaderBell enabled={signedIn} role={demoRole ?? trueRole} />}
       />
-      <PageTitle title={place!.name} backHref="/places/" backLabel={t('nav.back.places')} />
+      <PageTitle title={place!.name} backHref={back.href} backLabel={t(back.labelKey)} />
 
       <PlaceDetail
         category={place!.category}
