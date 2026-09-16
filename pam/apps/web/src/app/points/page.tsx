@@ -15,6 +15,7 @@ import { HeaderBell } from '../HeaderBell';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
 import { usePoints } from '@/lib/usePoints';
+import { useDemoRole } from '@/lib/useViewedRole';
 
 /**
  * What the points are for.
@@ -149,6 +150,8 @@ export default function PointsPage() {
   const { t } = useI18n();
   const supportPhone = useSupportPhone();
   const { state: session } = useSession();
+  const trueRole = session.status === 'signed-in' ? session.session.role : null;
+  const demoRole = useDemoRole(trueRole);
   const points = usePoints(session.status === 'signed-in' ? session.session.userId : null);
 
   if (session.status === 'signed-out' || session.status === 'no-profile' || session.status === 'suspended') {
@@ -169,8 +172,10 @@ export default function PointsPage() {
   return (
     <Page gap={4}>
       <AppHeader
-        roleLabel={session.status === 'signed-in' ? t(`role.${session.session.role}`) : undefined}
-        trailing={<HeaderBell enabled={session.status === 'signed-in'} />}
+        roleLabel={
+          session.status === 'signed-in' ? t(`role.${demoRole ?? session.session.role}`) : undefined
+        }
+        trailing={<HeaderBell enabled={session.status === 'signed-in'} role={demoRole ?? trueRole} />}
       />
 
       <PageTitle

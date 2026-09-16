@@ -75,11 +75,14 @@ export default function HomePage() {
   const { state: session } = useSession();
 
   const signedIn = session.status === 'signed-in';
-  const { state: saved, unsave, failed: saveFailed } = useSavedPlaces(signedIn);
+  const trueRole = session.status === 'signed-in' ? session.session.role : null;
+  const { viewAs, setViewAs } = useViewAs(trueRole);
+  // See useSavedPlaces: a preview is a demo, not a second account. Only a
+  // super admin can ever have `viewAs` set at all (useViewAs enforces that),
+  // so this only ever routes real members' and staff's own saves for real.
+  const demoRole = viewAs && viewAs !== trueRole ? viewAs : null;
+  const { state: saved, unsave, failed: saveFailed } = useSavedPlaces(signedIn, demoRole);
   const points = usePoints(session.status === 'signed-in' ? session.session.userId : null);
-  const { viewAs, setViewAs } = useViewAs(
-    session.status === 'signed-in' ? session.session.role : null,
-  );
 
   /*
    * The first paint, before the session is known — and the whole screen for
@@ -169,6 +172,7 @@ export default function HomePage() {
   const viewed = viewAs ?? me.role;
   const isCaseManager = viewed === 'admin';
   const isSuperAdmin = viewed === 'super_admin';
+  const isProvider = viewed === 'provider';
 
   return (
     <Page gap={4}>
@@ -186,7 +190,7 @@ export default function HomePage() {
             />
           ) : undefined
         }
-        trailing={<HeaderBell enabled={signedIn} />}
+        trailing={<HeaderBell enabled={signedIn} role={viewed} />}
       />
 
       {/*
@@ -283,6 +287,20 @@ export default function HomePage() {
             icon={<PeopleIcon />}
             label={t('directory.title')}
             description={t('home.go.directory')}
+          />
+        ) : null}
+
+        {/*
+          A program's own list — who wants in, not a caseload and not
+          everyone (Will, 16 September). No real query behind it yet: see
+          `/interested/` and `@pam/config/dummy-people`.
+        */}
+        {isProvider ? (
+          <NavTile
+            href="/interested/"
+            icon={<PeopleIcon />}
+            label={t('interested.title')}
+            description={t('home.go.interested')}
           />
         ) : null}
 

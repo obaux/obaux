@@ -20,9 +20,11 @@ import {
   TextLink,
 } from '@pam/ui';
 import { NOTICES } from '@pam/config';
+import { DUMMY_SELF } from '@pam/config/dummy-people';
 import { useI18n } from '@/lib/i18n';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession, signOut } from '@/lib/useSession';
+import { useDemoRole } from '@/lib/useViewedRole';
 
 /**
  * Your account — and the way out.
@@ -42,6 +44,18 @@ import { useSession, signOut } from '@/lib/useSession';
  * Sign out goes to the sign-in screen, which says so. A sign-out that reloads
  * the page the person was on shows them a signed-out version of it and leaves
  * them wondering whether anything happened.
+ *
+ * **A super admin previewing a role sees an example account, not their own**
+ * (Will, 16 September: "the Profile screen should also populate with an
+ * example program, case manager, and member. Not just super admin profile.")
+ * Before this, "Viewing as Program" showed Will's own real name and city
+ * under a "Program" badge — his own account, mislabelled, rather than a
+ * demonstration of what a program's account looks like. While a preview is
+ * active this screen shows the matching example from `@pam/config/dummy-people`
+ * instead; signing out here still signs the real, signed-in account out.
+ * Previewing "Super admin" shows the real thing, because that is the one role
+ * `DUMMY_SELF` deliberately has no entry for — a super admin looking at their
+ * own screen needs no stand-in.
  */
 
 const styles = stylex.create({
@@ -58,6 +72,9 @@ export default function AccountPage() {
   const supportPhone = useSupportPhone();
   const { state: session } = useSession();
   const [busy, setBusy] = useState(false);
+  const trueRole = session.status === 'signed-in' ? session.session.role : null;
+  const demoRole = useDemoRole(trueRole);
+  const dummySelf = demoRole ? DUMMY_SELF[demoRole] : undefined;
 
   const leave = async () => {
     setBusy(true);
@@ -117,7 +134,7 @@ export default function AccountPage() {
   return (
     <Page gap={4}>
       <AppHeader
-        roleLabel={session.status === 'signed-in' ? t(`role.${session.session.role}`) : undefined}
+        roleLabel={session.status === 'signed-in' ? t(`role.${demoRole ?? session.session.role}`) : undefined}
         accountHref={null}
       />
       <PageTitle title={t('account.title')} backHref="/" backLabel={t('nav.back.home')} />
@@ -146,26 +163,27 @@ export default function AccountPage() {
               <Text type="supporting" xstyle={styles.label}>
                 {t('account.name')}
               </Text>
-              <Text xstyle={styles.value}>{session.session.firstName ?? '—'}</Text>
+              <Text xstyle={styles.value}>{dummySelf?.firstName ?? session.session.firstName ?? '—'}</Text>
             </VStack>
             <VStack gap={0.5}>
               <Text type="supporting" xstyle={styles.label}>
                 {t('account.kind')}
               </Text>
               <HStack gap={2} align="center">
-                <Badge variant="neutral" label={t(`role.${session.session.role}`)} />
+                <Badge variant="neutral" label={t(`role.${demoRole ?? session.session.role}`)} />
+                {dummySelf?.orgName ? <Badge variant="neutral" label={dummySelf.orgName} /> : null}
               </HStack>
             </VStack>
-            {session.session.regionName ? (
+            {(dummySelf?.regionName ?? session.session.regionName) ? (
               <VStack gap={0.5}>
                 <Text type="supporting" xstyle={styles.label}>
                   {t('account.city')}
                 </Text>
-                <Text xstyle={styles.value}>{session.session.regionName}</Text>
+                <Text xstyle={styles.value}>{dummySelf?.regionName ?? session.session.regionName}</Text>
               </VStack>
             ) : null}
             <Text type="supporting" xstyle={styles.note}>
-              {t('account.change')}
+              {dummySelf ? t('example.people.note') : t('account.change')}
             </Text>
           </VStack>
         </Card>

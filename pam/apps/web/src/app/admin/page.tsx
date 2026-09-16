@@ -7,14 +7,24 @@ import { HStack } from '@astryxdesign/core/HStack';
 import { Card } from '@astryxdesign/core/Card';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
-import { Badge } from '@astryxdesign/core/Badge';
-import { Avatar } from '@astryxdesign/core/Avatar';
 import { Button } from '@astryxdesign/core/Button';
-import { AppHeader, BigButton, Loading, Notice, Page, PageTitle, TextLink } from '@pam/ui';
+import {
+  AppHeader,
+  BigButton,
+  Loading,
+  Notice,
+  Page,
+  PageTitle,
+  TextLink,
+} from '@pam/ui';
+import { PersonRowSkeletonList } from '@pam/ui/Skeletons';
 import { NOTICES } from '@pam/config';
+import { USE_DUMMY_PEOPLE } from '@pam/config/dummy-flag';
+import { DUMMY_MEMBERS, DUMMY_PROGRAM_LEADS } from '@pam/config/dummy-people';
 import { useI18n } from '@/lib/i18n';
 import { NotIn } from '../NotIn';
 import { HeaderBell } from '../HeaderBell';
+import { PersonRow } from '../PersonRow';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
 import { useCaseload, createInvite, type CreatedInvite } from '@/lib/useCaseload';
@@ -83,6 +93,16 @@ function statusChip(
 function whenLastActive(iso: string | null, locale: string): string | null {
   if (!iso) return null;
   return new Intl.DateTimeFormat(locale, { month: 'short', day: 'numeric' }).format(new Date(iso));
+}
+
+/** The simpler chip a dummy row gets — no `featuresOff` to explain, unlike a real one. */
+function dummyChip(
+  accessStatus: string,
+  t: (key: string) => string,
+): { label: string; tone: 'error' | 'warning' } | null {
+  if (accessStatus === 'suspended') return { label: t('admin.status.suspended'), tone: 'error' };
+  if (accessStatus === 'limited') return { label: t('admin.status.limited'), tone: 'warning' };
+  return null;
 }
 
 export default function AdminPage() {
@@ -157,7 +177,7 @@ export default function AdminPage() {
     // this screen is, and a way to get it fixed if it is wrong (§0).
     return (
       <Page gap={4}>
-          <AppHeader roleLabel={viewedRole ? t(`role.${viewedRole}`) : undefined} trailing={<HeaderBell enabled={trueRole !== null} />} />
+          <AppHeader roleLabel={viewedRole ? t(`role.${viewedRole}`) : undefined} trailing={<HeaderBell enabled={trueRole !== null} role={viewedRole} />} />
           <Notice
             notice="service_not_available"
             title={t('admin.notAdmin.title')}
@@ -191,7 +211,7 @@ export default function AdminPage() {
           flagged, or a message in their caseload was reported. Nothing else,
           and no row carries anybody's words (A7 / D-080).
         */}
-        <AppHeader roleLabel={t('role.admin')} trailing={<HeaderBell enabled={isAdmin} />} />
+        <AppHeader roleLabel={t('role.admin')} trailing={<HeaderBell enabled={isAdmin} role={viewedRole} />} />
 
         <PageTitle
           title={t('admin.title')}
@@ -255,11 +275,15 @@ export default function AdminPage() {
           />
         ) : null}
 
+        <Heading level={2} xstyle={styles.name}>
+          {t('admin.members.title')}
+        </Heading>
+
         {caseload.status === 'loading' ? (
-          <Loading label={t('common.loading')} variant="inline" />
+          <PersonRowSkeletonList label={t('common.loading')} />
         ) : null}
 
-        {caseload.status === 'empty' ? (
+        {caseload.status === 'empty' && !USE_DUMMY_PEOPLE ? (
           <Notice
             notice="no_caseload_members"
             title={t('admin.caseload.empty.title')}
@@ -285,39 +309,77 @@ export default function AdminPage() {
               const when = whenLastActive(member.lastActiveAt, locale);
               const chip = statusChip(member, t);
               return (
-                <Card key={member.id} xstyle={styles.card}>
-                  <VStack gap={2}>
-                    {/*
-                      A face, or the initial standing in for one. Astryx draws
-                      the fallback from the name, so the list reads as people
-                      rather than rows before anybody has uploaded a photo.
-
-                      No `src`: a member's photo is not on the §4.1 list of what
-                      an admin may see, and fetching it here would widen the
-                      contract by a column. The initial is PAM's own rendering
-                      of a name the admin is already entitled to.
-                    */}
-                    <HStack gap={3} align="center">
-                      <Avatar size="lg" name={member.firstName ?? '?'} />
-                      <Heading level={3} xstyle={styles.name}>
-                        {member.firstName ?? '—'}
-                      </Heading>
-                    </HStack>
-                    <HStack gap={2} wrap="wrap" align="center">
-                      {chip ? <Badge variant={chip.tone} label={chip.label} /> : null}
-                      {member.points !== null ? (
-                        <Text type="supporting" xstyle={styles.meta}>
-                          {t('admin.points', { count: member.points })}
-                        </Text>
-                      ) : null}
-                      <Text type="supporting" xstyle={styles.meta}>
-                        {when ? t('admin.lastActive', { when }) : t('admin.lastActive.never')}
-                      </Text>
-                    </HStack>
-                  </VStack>
-                </Card>
+                <PersonRow
+                  key={member.id}
+                  firstName={member.firstName}
+                  chip={chip}
+                  meta={[
+                    ...(member.points !== null ? [t('admin.points', { count: member.points })] : []),
+                    when ? t('admin.lastActive', { when }) : t('admin.lastActive.never'),
+                  ]}
+                />
               );
             })}
+          </VStack>
+        ) : null}
+
+        {/*
+          Real caseload is empty — every case manager's, until invites go out —
+          so this is what the screen shows instead: the same list, made of
+          people who do not exist, so a first look at PAM has something to look
+          at (Will, 16 September). The moment `useCaseload` stops returning
+          `'empty'`, this disappears on its own; see `@pam/config/dummy-people`.
+        */}
+        {caseload.status === 'empty' && USE_DUMMY_PEOPLE ? (
+          <VStack gap={3}>
+            {DUMMY_MEMBERS.map((member) => {
+              const when = whenLastActive(member.lastActiveAt, locale);
+              return (
+                <PersonRow
+                  key={member.id}
+                  firstName={member.firstName}
+                  href={`/person/?id=${member.id}`}
+                  chip={dummyChip(member.accessStatus, t)}
+                  meta={[
+                    ...(member.points !== undefined ? [t('admin.points', { count: member.points })] : []),
+                    when ? t('admin.lastActive', { when }) : t('admin.lastActive.never'),
+                  ]}
+                />
+              );
+            })}
+            <Text type="supporting" xstyle={styles.note}>
+              {t('example.people.note')}
+            </Text>
+          </VStack>
+        ) : null}
+
+        {/*
+          "Program leads" — the providers a case manager works with, which PAM
+          has no relationship to query yet (Will, 16 September). Always the
+          same example set until that exists; see `@pam/config/dummy-people`.
+        */}
+        {USE_DUMMY_PEOPLE ? (
+          <VStack gap={3}>
+            <Heading level={2} xstyle={styles.name}>
+              {t('admin.programLeads.title')}
+            </Heading>
+            {DUMMY_PROGRAM_LEADS.map((lead) => {
+              const when = whenLastActive(lead.lastActiveAt, locale);
+              return (
+                <PersonRow
+                  key={lead.id}
+                  firstName={lead.firstName}
+                  href={`/person/?id=${lead.id}`}
+                  meta={[
+                    ...(lead.orgName ? [lead.orgName] : []),
+                    when ? t('admin.lastActive', { when }) : t('admin.lastActive.never'),
+                  ]}
+                />
+              );
+            })}
+            <Text type="supporting" xstyle={styles.note}>
+              {t('example.people.note')}
+            </Text>
           </VStack>
         ) : null}
 

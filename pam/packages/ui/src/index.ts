@@ -23,6 +23,14 @@ export { StepHeader, type StepHeaderProps } from './StepHeader.js';
 export { PointsBadge, type PointsBadgeProps } from './PointsBadge.js';
 export { HelpBar, type HelpBarProps } from './HelpBar.js';
 export { Loading, type LoadingProps } from './Loading.js';
+/*
+ * `Skeletons` is deliberately NOT re-exported here, the same call `hours.ts`
+ * and `dummy-data`'s split made on 16 September: Places, the place screen,
+ * the caseload, the directory and a person's profile are the only five
+ * screens that use it, none of them is Home, and Home measurably picked up
+ * its weight anyway the one time it sat in this barrel. Import it as
+ * `@pam/ui/Skeletons`.
+ */
 export { Notice, type NoticeProps } from './Notice.js';
 export { AppHeader, type AppHeaderProps } from './AppHeader.js';
 export { AreaChip, type AreaChipProps } from './AreaChip.js';

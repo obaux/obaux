@@ -9,7 +9,8 @@
     ".": "./src/index.ts",
     "./RoleSwitch": "./src/RoleSwitch.tsx",
     "./SavedStrip": "./src/SavedStrip.tsx",
-    "./PlaceDetail": "./src/PlaceDetail.tsx"
+    "./PlaceDetail": "./src/PlaceDetail.tsx",
+    "./Skeletons": "./src/Skeletons.tsx"
   },
   "scripts": {
     "typecheck": "tsc -p tsconfig.json",

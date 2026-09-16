@@ -5,8 +5,10 @@ and signing out, invite codes for all four kinds of account, saving, points,
 badges, reporting a place, and a screen for the person running PAM. Every place
 now says what it is and has a screen of its own. Notifications are readable —
 a place or a person's name, not just "something happened" — and follow you
-around the app rather than living only on Home. Newest session log:
-`docs/sessions/2026-09-16-a-bell-worth-trusting.md`.
+around the app rather than living only on Home. A demo/dummy-data layer now
+fills every people list and notification feed for a first look at PAM before
+real data exists — see `docs/sessions/2026-09-16-what-the-app-can-do.md`,
+which is the newest session log.
 
 This is the handover document: what exists, what is proven, what is live, and
 what the next person needs to know before touching anything.
@@ -127,8 +129,8 @@ Numbers here are from the last run, not aspirations.
 | Database suite | 152 checks pass | See below |
 | Live RLS fingerprint | identical to local | The deployed policy set is provably the one that was penetration-tested: `ce9636c3b77e4827368e6575742b899c`, 73 policies on both |
 | Live anonymous attack | 0 rows leaked | A signed-out caller reads no profiles, messages, invites or audit rows on the real database, while still reaching the support number and the public catalogue |
-| Browser a11y + theme | 393 pass | No WCAG AA violations at 320px or iPhone SE. Every control clears 48px. No horizontal scroll. The Astryx theme really resolves. Runs in dark mode as well as light. |
-| First-load JS | 499.8 kB of 500 kB — 0.2 kB of headroom; the next shared component breaches it | §12 budget, measured gzipped on what `index.html` actually loads |
+| Browser a11y + theme (Playwright, full suite) | 426 pass | No WCAG AA violations at 320px or iPhone SE. Every control clears 48px. No horizontal scroll. The Astryx theme really resolves. Runs in dark mode as well as light. |
+| First-load JS | 500.5 kB of 500 kB — **0.5 kB over budget**, disclosed and unresolved | §12 budget, measured gzipped on what `index.html` actually loads; see 2026-09-16 session log |
 
 ### The database suite is the one that matters
 
