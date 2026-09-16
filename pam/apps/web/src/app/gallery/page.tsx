@@ -285,16 +285,16 @@ export default function GalleryPage() {
           <Card padding={3} xstyle={styles.card}>
             <NotificationList
               items={[
-                { id: 'a', text: 'Someone reported a place: closed', when: 'Today', isRead: false },
-                { id: 'b', text: 'Someone said a message is not safe', when: 'Yesterday', isRead: true },
+                { id: 'a', text: 'J J Peters was reported: closed', when: 'Today', isNew: true },
+                { id: 'b', text: 'A message from Marcus was reported', when: 'Yesterday', isNew: false },
               ]}
-              labels={{ empty: 'Nothing needs you right now.', markRead: 'Mark as read' }}
+              labels={{ empty: 'Nothing needs you right now.', new: 'New' }}
             />
           </Card>
           <Card padding={3} xstyle={styles.card}>
             <NotificationList
               items={[]}
-              labels={{ empty: 'Nothing needs you right now.', markRead: 'Mark as read' }}
+              labels={{ empty: 'Nothing needs you right now.', new: 'New' }}
             />
           </Card>
         </VStack>

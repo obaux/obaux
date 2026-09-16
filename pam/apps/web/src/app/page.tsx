@@ -14,7 +14,6 @@ import {
   Loading,
   NavTile,
   Notice,
-  NotificationBell,
   Page,
   PageEnter,
   PeopleIcon,
@@ -26,9 +25,9 @@ import {
 import { categoryLabelKey, NOTICES, ROLES } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { NotIn } from './NotIn';
+import { HeaderBell } from './HeaderBell';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
-import { useNotifications } from '@/lib/useNotifications';
 import { useSavedPlaces } from '@/lib/useSavedPlaces';
 import { usePoints } from '@/lib/usePoints';
 import { useViewAs } from '@/lib/useViewAs';
@@ -76,16 +75,11 @@ export default function HomePage() {
   const { state: session } = useSession();
 
   const signedIn = session.status === 'signed-in';
-  const { state: notifications } = useNotifications(signedIn);
   const { state: saved, unsave, failed: saveFailed } = useSavedPlaces(signedIn);
   const points = usePoints(session.status === 'signed-in' ? session.session.userId : null);
   const { viewAs, setViewAs } = useViewAs(
     session.status === 'signed-in' ? session.session.role : null,
   );
-  const unread =
-    notifications.status === 'ready'
-      ? notifications.items.filter((item) => !item.isRead).length
-      : 0;
 
   /*
    * The first paint, before the session is known — and the whole screen for
@@ -192,16 +186,7 @@ export default function HomePage() {
             />
           ) : undefined
         }
-        trailing={
-          notifications.status === 'ready' ? (
-            <NotificationBell
-              href="/notifications/"
-              label={t('notify.title')}
-              unreadCount={unread}
-              unreadLabel={t('notify.unread', { count: unread })}
-            />
-          ) : null
-        }
+        trailing={<HeaderBell enabled={signedIn} />}
       />
 
       {/*
@@ -268,14 +253,6 @@ export default function HomePage() {
           body={t('saved.failed.body')}
           supportPhone={supportPhone}
           callLabel={t('help.callSupport')}
-        />
-      ) : null}
-
-      {viewAs && viewAs !== me.role ? (
-        <Notice
-          notice="admin_out_of_region"
-          title={t('view.as', { role: t(`role.${viewed}`) })}
-          body={t('view.notice', { role: t(`role.${viewed}`) })}
         />
       ) : null}
 

@@ -3,8 +3,10 @@
 Last updated 2026-09-16. The member-facing product is real now: signing up
 and signing out, invite codes for all four kinds of account, saving, points,
 badges, reporting a place, and a screen for the person running PAM. Every place
-now says what it is and has a screen of its own. Newest session log:
-`docs/sessions/2026-09-16-what-each-place-is.md`.
+now says what it is and has a screen of its own. Notifications are readable —
+a place or a person's name, not just "something happened" — and follow you
+around the app rather than living only on Home. Newest session log:
+`docs/sessions/2026-09-16-a-bell-worth-trusting.md`.
 
 This is the handover document: what exists, what is proven, what is live, and
 what the next person needs to know before touching anything.
@@ -206,9 +208,21 @@ oversight:
   registration. Blank `reviewedBy` still stops everything, and a new template
   starts blank.
 - **Notifications have a screen of their own** at `/notifications/`, reached
-  from a bell in the case manager's header. Still to come:
-  the same bar on the super admin panel, and opening a row to the person or
-  place it is about, which needs the member profile screen to exist first.
+  from a bell that is now on every signed-in screen (16 September) — it used
+  to exist only on Home, the case manager screen and the directory, so
+  leaving Home for anywhere else lost the way back to a flagged place. A row
+  says the place or the person's name, not just that something happened, and
+  is a log line rather than a button: nothing here is clicked, and nothing is
+  marked read one at a time — the whole list is marked seen the moment it is
+  opened, which is what clears the bell for next time.
+- **A super admin's "Viewing as" preview now follows them off Home.** It used
+  to be read only by the Home screen, so a super admin who picked "Program"
+  there and then opened Places, Saved, the case manager screen or the
+  directory fell straight back to their own role — the header said one thing
+  and the next screen said another. Every screen that gates on role now reads
+  the same stored preview, and the redundant sentence under the switcher
+  ("This is what a Program sees...") is gone — the switcher's own chip
+  ("Viewing as Program") already says it, in the header, on every screen.
 - **No device build.** Capacitor is configured; `cap add ios/android` has never
   been run.
 

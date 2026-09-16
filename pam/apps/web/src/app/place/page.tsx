@@ -16,6 +16,7 @@ import {
 } from '@pam/ui';
 import { categoryLabelKey, distanceLabel, NOTICES, type Category } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
+import { HeaderBell } from '../HeaderBell';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
 import { useSavedPlaces } from '@/lib/useSavedPlaces';
@@ -172,6 +173,7 @@ function PlaceScreen() {
     <Page gap={4}>
       <AppHeader
         roleLabel={signedIn ? t(`role.${session.session.role}`) : undefined}
+        trailing={<HeaderBell enabled={signedIn} />}
       />
       <PageTitle title={place!.name} backHref="/places/" backLabel={t('nav.back.places')} />
 

@@ -14,6 +14,7 @@ import {
 import { NOTICES } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { NotIn } from '../NotIn';
+import { HeaderBell } from '../HeaderBell';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
 import { useSavedPlaces } from '@/lib/useSavedPlaces';
@@ -86,7 +87,7 @@ export default function SavedPage() {
 
   return (
     <Page gap={4}>
-      <AppHeader roleLabel={t(`role.${session.session.role}`)} />
+      <AppHeader roleLabel={t(`role.${session.session.role}`)} trailing={<HeaderBell enabled={signedIn} />} />
 
       <PageTitle
         title={t('saved.title')}

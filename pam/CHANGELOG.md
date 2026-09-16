@@ -1,5 +1,38 @@
 # Changelog
 
+## [0.14.0] — 2026-09-16 · A bell worth trusting
+
+### Changed — the notification bell only lights up when there is something new
+
+It used to stay filled all the time. Now it is quiet — bordered, like the
+account button beside it — until something needs you, and both icons in the
+corner are bigger and drawn the same way.
+
+### Changed — notifications say the place, or the person
+
+"Someone reported a place: closed" is now "Example Learning Center was
+reported: It is closed." A reported message now names who it was from.
+Nothing about the message itself is ever shown.
+
+### Changed — notifications are a log now, not a list of chores
+
+Nothing in the list is clickable, and nothing needs to be marked read one at a
+time. Opening the list is enough — the bell goes quiet on its own, and the
+newest lines are marked "New" so you still know what changed since last time.
+
+### Changed — the bell is on every screen, not just three of them
+
+Before, leaving Home for Places, a place's own screen, Saved or Points lost
+the way back to anything that needed attention. It didn't come back until you
+went home again. Now it is wherever you are.
+
+### Changed — a super admin's "Viewing as" choice follows them everywhere
+
+Picking "Viewing as Program" used to work only on the home screen; opening
+anything else quietly went back to showing the super admin's own screen. It
+now holds everywhere, and the redundant sentence explaining the preview is
+gone — the label on the switcher already says it.
+
 ## [0.13.0] — 2026-09-16 · What each place is
 
 ### Added — every place now says what it is

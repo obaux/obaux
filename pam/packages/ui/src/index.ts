@@ -53,6 +53,7 @@ export {
   StarIcon,
   HomeIcon,
   MeIcon,
+  MeIconFilled,
   PeopleIcon,
   PhoneIcon,
   PlacesIcon,

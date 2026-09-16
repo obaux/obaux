@@ -3,7 +3,7 @@ import * as stylex from '@stylexjs/stylex';
 import { HStack } from '@astryxdesign/core/HStack';
 import { Badge } from '@astryxdesign/core/Badge';
 import { IconButton } from '@astryxdesign/core/IconButton';
-import { MeIcon } from './icons.js';
+import { MeIconFilled } from './icons.js';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { pam } from './tokens.stylex.js';
 
@@ -107,8 +107,18 @@ const styles = stylex.create({
   account: {
     minHeight: pam.touchTargetMin,
     minWidth: pam.touchTargetMin,
-    fontSize: '22px',
+    // Matches the bell (Will, 16 September): two icons of different sizes in
+    // the same corner read as one of them mattering less.
+    fontSize: '28px',
+    borderRadius: '14px',
     color: colorVars['--color-icon-accent'],
+    // A light shade around it (Will, 16 September) — a button that is only an
+    // icon needs some edge to be found by touch, and `--color-border` is a
+    // tint of the page rather than a line drawn on it, so it reads as a frame,
+    // not a fence.
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    borderColor: colorVars['--color-border'],
   },
   mark: {
     // Sized by height so the aspect ratio comes from the artwork, and set in px
@@ -134,7 +144,7 @@ export function AppHeader({
   const account = showAccount ? (
     <IconButton
       label={accountLabel}
-      icon={<MeIcon />}
+      icon={<MeIconFilled />}
       variant="ghost"
       href={accountHref ?? undefined}
       xstyle={styles.account}

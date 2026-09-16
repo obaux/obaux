@@ -17,7 +17,6 @@ import {
   BigButton,
   Loading,
   Notice,
-  NotificationBell,
   Page,
   PageTitle,
   ScrollReveal,
@@ -26,11 +25,12 @@ import {
 import { NOTICES, ROLES, type Role } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { NotIn } from '../NotIn';
+import { HeaderBell } from '../HeaderBell';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
 import { useDirectory } from '@/lib/useDirectory';
 import { createInvite, listRegions, type CreatedInvite } from '@/lib/useCaseload';
-import { useNotifications } from '@/lib/useNotifications';
+import { useViewedRole } from '@/lib/useViewedRole';
 
 /**
  * Everyone on PAM, for the person running it.
@@ -82,15 +82,15 @@ export default function DirectoryPage() {
   const supportPhone = useSupportPhone();
   const { state: session } = useSession();
 
-  const isSuperAdmin = session.status === 'signed-in' && session.session.role === 'super_admin';
+  // See admin/page.tsx: the same preview a super admin picks on Home now
+  // follows them here, so "Viewing as Program" and then opening this screen
+  // shows what a program actually sees (D-108, useViewedRole) — the same
+  // door everyone else meets — rather than the full directory regardless.
+  const trueRole = session.status === 'signed-in' ? session.session.role : null;
+  const viewedRole = useViewedRole(trueRole);
+  const isSuperAdmin = viewedRole === 'super_admin';
   const [filter, setFilter] = useState<Filter>('all');
   const { state: directory } = useDirectory(isSuperAdmin, filter as Role | 'all');
-  const { state: notifications } = useNotifications(isSuperAdmin);
-
-  const unread =
-    notifications.status === 'ready'
-      ? notifications.items.filter((item) => !item.isRead).length
-      : 0;
 
   /**
    * Bringing somebody in.
@@ -176,7 +176,10 @@ export default function DirectoryPage() {
     // and not a blank page (§0).
     return (
       <Page gap={4}>
-        <AppHeader roleLabel={t(`role.${session.session.role}`)} />
+        <AppHeader
+          roleLabel={viewedRole ? t(`role.${viewedRole}`) : undefined}
+          trailing={<HeaderBell enabled={trueRole !== null} />}
+        />
         <Notice
           notice="service_not_available"
           title={t('directory.notSuper.title')}
@@ -212,14 +215,7 @@ export default function DirectoryPage() {
               onChange={(next) => setFilter(next as Filter)}
               xstyle={styles.filter}
             />
-            {notifications.status === 'ready' ? (
-              <NotificationBell
-                href="/notifications/"
-                label={t('notify.title')}
-                unreadCount={unread}
-                unreadLabel={t('notify.unread', { count: unread })}
-              />
-            ) : null}
+            <HeaderBell enabled={isSuperAdmin} />
           </HStack>
         }
       />

@@ -147,6 +147,22 @@ test.describe('everyone, for the person running PAM', () => {
     await expect(page.getByRole('link', { name: 'Back' })).toBeVisible();
   });
 
+  test('a super admin previewing "Program" meets the same closed door a program would', async ({ page }) => {
+    // The preview a super admin sets on Home is written to sessionStorage
+    // (D-108) and every screen now reads it, not just Home's tiles (Will, 16
+    // September). This is the screen that used to disagree with the header:
+    // the badge said "Viewing as Program" and the list underneath it kept
+    // showing every account anyway.
+    await page.addInitScript(() => sessionStorage.setItem('pam.view-as', 'provider'));
+    await signedInAs(page, 'super_admin');
+    await page.goto('/directory/');
+
+    await expect(
+      page.getByRole('heading', { name: 'This screen is for the PAM team' }),
+    ).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Everyone', exact: true })).toHaveCount(0);
+  });
+
   test('a signed-out visitor is told what this is, and how to get in', async ({ page }) => {
     await page.route(USER, (route) => route.fulfill({ status: 401, body: '{}' }));
     await page.goto('/directory/');
@@ -185,10 +201,12 @@ test.describe('everyone, for the person running PAM', () => {
       .first()
       .click();
 
-    // Now the case manager's arrangement — and a notice saying plainly that
-    // this is still their own account, not somebody else's.
+    // Now the case manager's arrangement. The switcher's own chip is the
+    // telling — "Viewing as Case manager" — rather than a second, separate
+    // sentence repeating it underneath (Will, 16 September: "no need to show
+    // text saying which user, since the top bar does the communicating").
     await expect(page.getByRole('link', { name: /Your people/ })).toBeVisible();
-    await expect(page.getByText(/nobody else’s information is shown/)).toBeVisible();
+    await expect(page.getByRole('button', { name: /Viewing as Case manager/ })).toBeVisible();
   });
 
   test('switching the view never changes whose data is asked for', async ({ page }) => {
@@ -210,7 +228,7 @@ test.describe('everyone, for the person running PAM', () => {
       .or(page.getByRole('button', { name: 'Member' }))
       .first()
       .click();
-    await expect(page.getByText(/nobody else’s information is shown/)).toBeVisible();
+    await expect(page.getByRole('button', { name: /Viewing as Member/ })).toBeVisible();
 
     // Every id asked for is the signed-in person's own.
     expect(new Set(asked)).toEqual(new Set([WILL]));

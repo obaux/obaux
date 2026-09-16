@@ -320,11 +320,11 @@ describe('the bell (A7)', () => {
 });
 
 describe('the notification list (A7)', () => {
-  const labels = { empty: 'Nothing needs you right now.', markRead: 'Mark as read' };
+  const labels = { empty: 'Nothing needs you right now.', new: 'New' };
   const items = [
-    { id: 'a', text: 'Someone reported a place: closed', when: 'Today', isRead: false },
-    { id: 'b', text: 'Someone said a message is not safe', when: 'Yesterday', isRead: false },
-    { id: 'c', text: 'A place was taken off the list', when: 'Sept 9', isRead: true },
+    { id: 'a', text: 'J J Peters was reported: closed', when: 'Today', isNew: true },
+    { id: 'b', text: 'A message from Marcus was reported', when: 'Yesterday', isNew: true },
+    { id: 'c', text: 'Example Learning Center was taken off the list', when: 'Sept 9', isNew: false },
   ];
 
   it('shows every notice, newest first as given', () => {
@@ -332,24 +332,17 @@ describe('the notification list (A7)', () => {
     for (const item of items) expect(screen.getByText(item.text)).toBeInTheDocument();
   });
 
-  it('offers "mark as read" only on the ones that are not read', () => {
+  it('labels the ones that are new, and only those', () => {
     render(<NotificationList items={items} labels={labels} />);
-    expect(screen.getAllByRole('button', { name: 'Mark as read' })).toHaveLength(2);
+    expect(screen.getAllByText('New')).toHaveLength(2);
   });
 
-  it('never marks anything read just because the list was opened', () => {
-    // Reading a list is not dealing with what is in it, and a count that clears
-    // itself hides work from the person who has to do it.
-    const onMarkRead = vi.fn();
-    render(<NotificationList items={items} labels={labels} onMarkRead={onMarkRead} />);
-    expect(onMarkRead).not.toHaveBeenCalled();
-  });
-
-  it('opens a row to whatever it is about', () => {
-    const onSelect = vi.fn();
-    render(<NotificationList items={items} labels={labels} onSelect={onSelect} />);
-    fireEvent.click(screen.getByRole('button', { name: items[1]!.text }));
-    expect(onSelect).toHaveBeenCalledWith('b');
+  it('is a log, not a form: nothing here is a button', () => {
+    // A row used to be a ghost button with no `onSelect` wired to it anywhere
+    // in the app — tappable, and doing nothing. A log line does not need to be
+    // clickable to be read.
+    render(<NotificationList items={items} labels={labels} />);
+    expect(screen.queryAllByRole('button')).toHaveLength(0);
   });
 
   it('says so plainly when there is nothing, rather than showing an empty box', () => {

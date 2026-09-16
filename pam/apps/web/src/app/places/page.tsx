@@ -6,14 +6,7 @@ import { HStack } from '@astryxdesign/core/HStack';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { Button } from '@astryxdesign/core/Button';
-import {
-  AppHeader,
-  Loading,
-  Notice,
-  PageTitle,
-  PlaceCard,
-  ScrollReveal,
-} from '@pam/ui';
+import { AppHeader, Loading, Notice, PageTitle, PlaceCard, ScrollReveal } from '@pam/ui';
 import {
   categoryLabelKey,
   CATEGORY_LIST,
@@ -23,6 +16,7 @@ import {
 } from '@pam/config';
 import { useEffect, useState } from 'react';
 import { useI18n } from '@/lib/i18n';
+import { HeaderBell } from '../HeaderBell';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { usePlaces, METRES_PER_MILE } from '@/lib/usePlaces';
 import { useSavedPlaces } from '@/lib/useSavedPlaces';
@@ -119,7 +113,12 @@ export default function PlacesPage() {
         */}
         <AppHeader
           roleLabel={session.status === 'signed-in' ? t(`role.${session.session.role}`) : undefined}
-          trailing={<AreaTrigger area={area} onOpen={() => setIsPickingArea(true)} />}
+          trailing={
+            <HStack gap={1} align="center" wrap="nowrap">
+              <AreaTrigger area={area} onOpen={() => setIsPickingArea(true)} />
+              <HeaderBell enabled={session.status === 'signed-in'} />
+            </HStack>
+          }
         />
 
         {isPickingArea ? (

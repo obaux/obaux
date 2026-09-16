@@ -84,6 +84,22 @@ export function MeIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+/**
+ * One figure, filled. The header's account button (Will, 16 September): the
+ * bell beside it is a solid shape, and a line-drawn person next to it read as
+ * two different weights of icon rather than one system. Same silhouette as
+ * `MeIcon`, closed into one path so it survives a small size the way the bell
+ * does — this is the one to reach for beside `BellIcon`, not the outline.
+ */
+export function MeIconFilled(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} fill="currentColor" stroke="none" {...props}>
+      <circle cx="12" cy="8" r="3.75" />
+      <path d="M4.5 20.5a7.5 7.5 0 0 1 15 0 .9.9 0 0 1-.9.9H5.4a.9.9 0 0 1-.9-.9z" />
+    </svg>
+  );
+}
+
 /** A handset. Help — this one dials. */
 export function PhoneIcon(props: SVGProps<SVGSVGElement>) {
   return (

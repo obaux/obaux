@@ -50,7 +50,7 @@ async function seedSession(page: import('@playwright/test').Page) {
 
 async function signedInAs(
   page: import('@playwright/test').Page,
-  role: 'admin' | 'member',
+  role: 'admin' | 'member' | 'super_admin',
   members: unknown[] = [],
   controls: unknown[] = [],
   notifications: unknown[] = [],
@@ -94,6 +94,30 @@ test.describe('the case manager screen', () => {
     await expect(page.getByRole('heading', { name: 'This screen is for case managers' })).toBeVisible();
     await expect(page.getByText(/does not open this/)).toBeVisible();
     await expect(page.getByRole('link', { name: /Call PAM/ })).toBeVisible();
+  });
+
+  test('a super admin previewing "Case manager" sees this screen, not a closed door', async ({ page }) => {
+    // Home's role switcher writes the choice to sessionStorage (D-108); any
+    // screen that reads it should agree with the header about who it is
+    // drawing for (Will, 16 September — "make sure all pages are properly
+    // showing based on the user's permissions").
+    await page.addInitScript(() => sessionStorage.setItem('pam.view-as', 'admin'));
+    await signedInAs(page, 'super_admin');
+    await page.goto('/admin/');
+
+    await expect(page.getByRole('heading', { name: 'Nobody on your list yet' })).toBeVisible();
+    await expect(page.getByText('This screen is for case managers')).toHaveCount(0);
+  });
+
+  test('without a preview, a super admin meets the same closed door as anybody else', async ({ page }) => {
+    await signedInAs(page, 'super_admin');
+    await page.goto('/admin/');
+
+    await expect(page.getByRole('heading', { name: 'This screen is for case managers' })).toBeVisible();
+    // Their real list is one tap away rather than a dead end (§0) — this is
+    // the one thing this branch still asks about the *real* role, not the
+    // previewed one.
+    await expect(page.getByRole('link', { name: 'Everyone' })).toBeVisible();
   });
 
   test('an admin sees their caseload', async ({ page }) => {
@@ -253,7 +277,7 @@ test.describe('what has happened that a case manager has to act on', () => {
       id: 'n1',
       kind: 'service_flagged',
       body_key: 'notify.service_flagged',
-      body_vars: { reason: 'closed' },
+      body_vars: { reason: 'closed', place: 'Example Learning Center' },
       subject_type: 'service',
       subject_id: 's1',
       created_at: new Date().toISOString(),
@@ -263,7 +287,7 @@ test.describe('what has happened that a case manager has to act on', () => {
       id: 'n2',
       kind: 'message_reported',
       body_key: 'notify.message_reported',
-      body_vars: {},
+      body_vars: { name: 'Marcus' },
       subject_type: 'report',
       subject_id: 'r1',
       created_at: new Date(Date.now() - 86_400_000).toISOString(),
@@ -289,8 +313,8 @@ test.describe('what has happened that a case manager has to act on', () => {
     await page.goto('/notifications/');
 
     await expect(page.getByRole('heading', { name: 'Notifications' })).toBeVisible();
-    await expect(page.getByText('Someone reported a place: closed')).toBeVisible();
-    await expect(page.getByText('Someone said a message is not safe')).toBeVisible();
+    await expect(page.getByText('Example Learning Center was reported: It is closed')).toBeVisible();
+    await expect(page.getByText('A message from Marcus was reported')).toBeVisible();
     // §0: never dead-end. Back sits beside the title on every screen now and
     // goes home rather than to whichever screen opened this one — a case
     // manager, a super admin and a member all reach this list, and home is the

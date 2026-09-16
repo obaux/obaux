@@ -11,6 +11,7 @@ import { AppHeader, BigButton, Notice, Page, PageTitle, StarIcon } from '@pam/ui
 import { BADGES, badgeForPoints, nextBadge, type BadgeDefinition } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { NotIn } from '../NotIn';
+import { HeaderBell } from '../HeaderBell';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
 import { usePoints } from '@/lib/usePoints';
@@ -167,7 +168,10 @@ export default function PointsPage() {
 
   return (
     <Page gap={4}>
-      <AppHeader roleLabel={session.status === 'signed-in' ? t(`role.${session.session.role}`) : undefined} />
+      <AppHeader
+        roleLabel={session.status === 'signed-in' ? t(`role.${session.session.role}`) : undefined}
+        trailing={<HeaderBell enabled={session.status === 'signed-in'} />}
+      />
 
       <PageTitle
         title={t('points.title')}

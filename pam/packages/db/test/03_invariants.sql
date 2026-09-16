@@ -1001,14 +1001,15 @@ declare
   v_admin  uuid := '33333333-0000-0000-0000-00000000000a';
   v_other  uuid := '33333333-0000-0000-0000-00000000000b';
   v_service uuid;
+  v_service_name text;
   n integer;
   v_vars jsonb;
 begin
   delete from public.notifications;
   update public.profiles set role = 'super_admin' where id = v_other;
 
-  select id into v_service from public.services
-  where removed_at is null and is_active limit 1;
+  select id, name into v_service, v_service_name from public.services
+  where removed_at is null and is_active order by id limit 1;
   insert into public.saved_places (member_id, service_id) values (v_member, v_service)
   on conflict do nothing;
 
@@ -1033,6 +1034,14 @@ begin
   end if;
   raise notice 'ok    ...and says which of the four reasons it was';
 
+  -- 0053: the flagged place's own name travels with it, so a case manager
+  -- does not have to open the list to learn which of their people's places
+  -- this is about.
+  if v_vars ->> 'place' <> v_service_name then
+    raise exception 'FAIL  the notification did not carry the place''s name, got %', v_vars ->> 'place';
+  end if;
+  raise notice 'ok    ...and says which place';
+
   update public.profiles set role = 'admin' where id = v_other;
 end;
 $$;
@@ -1042,6 +1051,8 @@ declare
   v_marcus uuid := '33333333-0000-0000-0000-00000000000c';
   v_admin  uuid := '33333333-0000-0000-0000-00000000000a';
   v_msg uuid;
+  v_sender uuid;
+  v_sender_name text;
   n integer;
   v_body jsonb;
 begin
@@ -1050,10 +1061,11 @@ begin
   -- has none, and "nobody to tell" would otherwise read as "nothing to tell".
   update public.profiles set role = 'super_admin' where id = v_admin;
 
-  select id into v_msg from public.messages
+  select id, sender_id into v_msg, v_sender from public.messages
   where conversation_id = '66666666-0000-0000-0000-000000000001'
-    and sender_id <> v_marcus limit 1;
+    and sender_id <> v_marcus order by id limit 1;
   if v_msg is null then return; end if;
+  select first_name into v_sender_name from public.profiles where id = v_sender;
 
   perform set_config('request.jwt.claim.sub', v_marcus::text, true);
   perform public.report_message(v_msg, 'This felt threatening');
@@ -1070,6 +1082,14 @@ begin
     raise exception 'FAIL  message text travelled inside a notification';
   end if;
   raise notice 'ok    ...carrying no message text with it';
+
+  -- 0053: the name is the one thing here that IS allowed with the message —
+  -- the sender's own name, which §4.1 already lets a case manager see about
+  -- their own person, just not on this screen until now.
+  if v_sender_name is not null and v_body ->> 'name' <> v_sender_name then
+    raise exception 'FAIL  the notification did not carry the sender''s name, got %', v_body ->> 'name';
+  end if;
+  raise notice 'ok    ...but does carry whose message it was';
 
   delete from public.notifications;
   update public.profiles set role = 'admin' where id = v_admin;

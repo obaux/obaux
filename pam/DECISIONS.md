@@ -1986,6 +1986,105 @@ now declare subpath exports (`@pam/ui/SavedStrip`, `@pam/ui/RoleSwitch`,
 That, plus keeping `hours.ts` out of the config barrel, is what put the build
 back under §12's 500 kB with room to spare.
 
+### D-126 — The bell is filled only when there is something new
+The brand fill on the notification bell was permanent (D-084ish, 14 September)
+— it stayed lit whether or not anything was waiting, on the logic that it was
+the only route to the list. Will, 16 September: don't make the alert button
+primary unless new alerts exist. A caught-up caseload and an ignored one had
+been wearing the same colour; the fill is now the news itself; a quiet bell is
+bordered like the account button beside it (ghost, `--color-border`), and only
+turns primary — filled, brand-coloured — while `unreadCount > 0`. The
+accessible name still carries the count either way, so nothing here depends on
+seeing the fill.
+
+Both header icons are now drawn filled (a new `MeIconFilled`, matching
+`BellIcon`'s existing solid style) and sized to match each other — they used to
+be two different weights of icon sharing a corner. The account button also
+carries the light border Will asked for; the bell picks up the same border in
+its quiet state, for the same reason (see the file comment): two icons in one
+corner reading as one system, not one important-looking control and one
+afterthought.
+
+### D-127 — A notification is a log line, not a task
+`NotificationList` used to wrap every row in a ghost `Button` with an
+`onSelect` callback — and nothing in the app ever passed one. Every row looked
+clickable and did nothing. Each row also carried its own "Mark as read"
+button. Will, 16 September: don't make alert items clickable, they're just
+logs, and there's no need to mark them read — it creates unnecessary tasks.
+
+Both are gone. Rows are plain text. What used to be `read_at`'s job — deciding
+whether to show the "Mark as read" button — is now purely "did this arrive
+since the list was last opened", drawn as a small "New" label with no control
+attached. The bell still needs to go quiet on its own, so `useNotifications`
+gained `markAllSeen()`: one write, everything currently unread, fired once by
+the notifications screen the moment its list is actually on screen — never by
+a tap, and never touching the list already rendered, so the "New" labels
+somebody is looking at do not flicker away under them. Only the *next* visit,
+and the bell before it, see the cleared count.
+
+### D-128 — Notifications say the place, or the person (reverses part of A7's silence on names)
+"Someone reported a place: closed" and "Someone said a message is not safe"
+told a case manager that something had happened and made them open the list to
+learn what. Will, 16 September: "the alert should be more descriptive, saying
+the place name, or person's name." 0053 adds `place` to `service_flagged`'s
+`body_vars` (the flagged service's own `services.name`) and `name` to
+`message_reported`'s (the reported message's sender — `profiles.first_name`,
+looked up server-side, in the trigger, same as the routing itself).
+
+A7 never said a notification could not carry a name — it said no message text
+travels with it, which still holds exactly as written (0053's comment quotes
+it). A name is one of the five facts a case manager and a super admin are
+already entitled to read about their own people, the same five §4.1 names
+anywhere else in the product (the caseload card, the directory row). This puts
+one of those five facts on the notification a screen earlier than it already
+was, not on a screen it had never been on.
+
+`notify.service_flagged`'s `{reason}` is translated at render time through the
+existing `flag.reason.*` keys — it always carried the raw database enum
+('closed') before this session, untranslated, which is a bug this session
+found and fixed while it was already in the file, not something 0053 changed.
+
+### D-129 — A super admin's role preview now follows them off Home
+`useViewAs` already existed and was already correct — a rendering choice
+stored in `sessionStorage`, never touching which rows a query is allowed to
+see. What was missing is that only Home ever asked it the question. Every
+other screen that gates content by role — the case manager screen, the
+directory — asked `session.session.role` directly, so choosing "Viewing as
+Program" on Home and then opening Places or the case manager screen silently
+reverted to the real role the instant Home was left (Will, 16 September: "on
+the top of alerts, it seems like I can't view it from the view of different
+users" — the *notifications bell*, present only on three screens before this
+session, made this the easiest place to notice it, but the bug was general).
+
+`useViewedRole(trueRole)` is the fix, shared by every screen: it reads the same
+`useViewAs` a page already had access to and returns the previewed role when
+one is set, the real one otherwise. `admin/page.tsx` and `directory/page.tsx`
+now gate `isAdmin` / `isSuperAdmin` on the *viewed* role rather than the real
+one — so a super admin previewing "Case manager" sees the case manager screen
+(their own, typically empty, caseload, drawn as a case manager's screen — the
+same "layout, not identity" principle Home's tiles already used), and,
+symmetrically, a super admin previewing "Program" meets the same closed door a
+program actually would. Nothing about *whose data* a query can reach changed —
+every affected query still runs, unconditionally, as the real `auth.uid()`.
+
+One link on `admin`'s closed-door screen — "your list is at the directory" —
+stays keyed to the *real* role, deliberately: a super admin previewing
+"Member" still has their own people list to get back to, and that link is
+about what they can actually do, not what they are currently looking at.
+
+### D-130 — The redundant "Viewing as" sentence is gone
+The switcher's own chip already says "Viewing as Program" while a preview is
+active (D-108) — in the header, on every screen, now that D-129 threads the
+preview everywhere. Home also carried a separate `Notice` card underneath
+repeating the same fact in a full sentence: *"This is what a Program sees. It
+is your own account — nobody else's information is shown."* Will, 16
+September: no need to show text saying which user, since the top bar does the
+communicating — that's redundant. The card is removed; `view.notice` is
+removed from both locale bundles as dead copy. The privacy guarantee itself
+(nobody else's information is shown) was already true and stays true — it was
+never load-bearing prose, just a restatement of what D-108's own comment
+already argues at length.
+
 ---
 
 ## Notes for whoever picks this up next
