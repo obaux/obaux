@@ -12,7 +12,11 @@
     "./transparency": "./src/transparency.ts",
     "./points": "./src/points.ts",
     "./locales/*": "./src/locales/*",
-    "./hours": "./src/hours.ts"
+    "./hours": "./src/hours.ts",
+    "./dummy-flag": "./src/dummy-flag.ts",
+    "./dummy-people": "./src/dummy-people.ts",
+    "./dummy-notifications": "./src/dummy-notifications.ts",
+    "./dummy-places": "./src/dummy-places.ts"
   },
   "scripts": {
     "typecheck": "tsc -p tsconfig.json",

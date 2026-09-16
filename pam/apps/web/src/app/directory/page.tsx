@@ -7,8 +7,6 @@ import { HStack } from '@astryxdesign/core/HStack';
 import { Card } from '@astryxdesign/core/Card';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
-import { Badge } from '@astryxdesign/core/Badge';
-import { Avatar } from '@astryxdesign/core/Avatar';
 import { Selector } from '@astryxdesign/core/Selector';
 import { Button } from '@astryxdesign/core/Button';
 import { RadioList, RadioListItem } from '@astryxdesign/core/RadioList';
@@ -22,10 +20,14 @@ import {
   ScrollReveal,
   TextLink,
 } from '@pam/ui';
+import { PersonRowSkeletonList } from '@pam/ui/Skeletons';
 import { NOTICES, ROLES, type Role } from '@pam/config';
+import { USE_DUMMY_PEOPLE } from '@pam/config/dummy-flag';
+import { DUMMY_EVERYONE } from '@pam/config/dummy-people';
 import { useI18n } from '@/lib/i18n';
 import { NotIn } from '../NotIn';
 import { HeaderBell } from '../HeaderBell';
+import { PersonRow } from '../PersonRow';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
 import { useDirectory } from '@/lib/useDirectory';
@@ -91,6 +93,11 @@ export default function DirectoryPage() {
   const isSuperAdmin = viewedRole === 'super_admin';
   const [filter, setFilter] = useState<Filter>('all');
   const { state: directory } = useDirectory(isSuperAdmin, filter as Role | 'all');
+  // The filter is real: it asks the same question of the example set that it
+  // asks the database, so switching it while the real directory is empty
+  // still demonstrates what it does.
+  const dummyPeople =
+    filter === 'all' ? DUMMY_EVERYONE : DUMMY_EVERYONE.filter((p) => p.role === filter);
 
   /**
    * Bringing somebody in.
@@ -178,7 +185,7 @@ export default function DirectoryPage() {
       <Page gap={4}>
         <AppHeader
           roleLabel={viewedRole ? t(`role.${viewedRole}`) : undefined}
-          trailing={<HeaderBell enabled={trueRole !== null} />}
+          trailing={<HeaderBell enabled={trueRole !== null} role={viewedRole} />}
         />
         <Notice
           notice="service_not_available"
@@ -215,7 +222,7 @@ export default function DirectoryPage() {
               onChange={(next) => setFilter(next as Filter)}
               xstyle={styles.filter}
             />
-            <HeaderBell enabled={isSuperAdmin} />
+            <HeaderBell enabled={isSuperAdmin} role={viewedRole} />
           </HStack>
         }
       />
@@ -225,7 +232,9 @@ export default function DirectoryPage() {
         subtitle={
           directory.status === 'ready'
             ? t('directory.count', { count: directory.people.length })
-            : undefined
+            : directory.status === 'empty' && USE_DUMMY_PEOPLE
+              ? t('directory.count', { count: dummyPeople.length })
+              : undefined
         }
         backHref="/"
         backLabel={t('nav.back.home')}
@@ -315,10 +324,10 @@ export default function DirectoryPage() {
       </Card>
 
       {directory.status === 'loading' ? (
-        <Loading label={t('common.loading')} variant="inline" />
+        <PersonRowSkeletonList label={t('common.loading')} />
       ) : null}
 
-      {directory.status === 'empty' ? (
+      {directory.status === 'empty' && !USE_DUMMY_PEOPLE ? (
         <Notice
           notice="no_caseload_members"
           title={t('directory.empty.title')}
@@ -344,41 +353,59 @@ export default function DirectoryPage() {
             const when = whenLastActive(person.lastActiveAt, locale);
             return (
               <ScrollReveal key={person.id} index={index}>
-              <Card xstyle={styles.card}>
-                <VStack gap={2}>
-                  <HStack gap={3} align="center">
-                    {/*
-                      The initial, never a photo: a photo is not among the five
-                      facts this screen is entitled to, and fetching one would
-                      widen the contract by a column.
-                    */}
-                    <Avatar size="lg" name={person.firstName ?? '?'} />
-                    <VStack gap={0.5}>
-                      <Heading level={3} xstyle={styles.name}>
-                        {person.firstName ?? '—'}
-                      </Heading>
-                      <Text type="supporting" xstyle={styles.meta}>
-                        {t(`role.${person.role}`)}
-                        {person.regionName ? ` · ${person.regionName}` : ''}
-                      </Text>
-                    </VStack>
-                  </HStack>
-                  <HStack gap={2} wrap="wrap" align="center">
-                    {person.accessStatus === 'suspended' ? (
-                      <Badge variant="error" label={t('admin.status.suspended')} />
-                    ) : null}
-                    {person.accessStatus === 'limited' ? (
-                      <Badge variant="warning" label={t('admin.status.limited')} />
-                    ) : null}
-                    <Text type="supporting" xstyle={styles.meta}>
-                      {when ? t('admin.lastActive', { when }) : t('admin.lastActive.never')}
-                    </Text>
-                  </HStack>
-                </VStack>
-              </Card>
+                <PersonRow
+                  firstName={person.firstName}
+                  chip={
+                    person.accessStatus === 'suspended'
+                      ? { label: t('admin.status.suspended'), tone: 'error' }
+                      : person.accessStatus === 'limited'
+                        ? { label: t('admin.status.limited'), tone: 'warning' }
+                        : null
+                  }
+                  meta={[
+                    person.regionName ? `${t(`role.${person.role}`)} · ${person.regionName}` : t(`role.${person.role}`),
+                    when ? t('admin.lastActive', { when }) : t('admin.lastActive.never'),
+                  ]}
+                />
               </ScrollReveal>
             );
           })}
+        </VStack>
+      ) : null}
+
+      {/*
+        The real directory is empty — nobody has actually signed up yet — so
+        this is the example set, filtered the same way the real one would be
+        (Will, 16 September). Disappears the moment `useDirectory` stops
+        returning `'empty'`; see `@pam/config/dummy-people`.
+      */}
+      {directory.status === 'empty' && USE_DUMMY_PEOPLE ? (
+        <VStack gap={3}>
+          {dummyPeople.map((person, index) => {
+            const when = whenLastActive(person.lastActiveAt, locale);
+            return (
+              <ScrollReveal key={person.id} index={index}>
+                <PersonRow
+                  firstName={person.firstName}
+                  href={`/person/?id=${person.id}`}
+                  chip={
+                    person.accessStatus === 'suspended'
+                      ? { label: t('admin.status.suspended'), tone: 'error' }
+                      : person.accessStatus === 'limited'
+                        ? { label: t('admin.status.limited'), tone: 'warning' }
+                        : null
+                  }
+                  meta={[
+                    `${t(`role.${person.role}`)} · ${person.regionName}`,
+                    when ? t('admin.lastActive', { when }) : t('admin.lastActive.never'),
+                  ]}
+                />
+              </ScrollReveal>
+            );
+          })}
+          <Text type="supporting" xstyle={styles.note}>
+            {t('example.people.note')}
+          </Text>
         </VStack>
       ) : null}
 

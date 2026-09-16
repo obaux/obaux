@@ -178,7 +178,11 @@ test.describe('keeping a place', () => {
     await page.goto('/saved/');
 
     await expect(page.getByRole('heading', { name: 'Nothing saved yet' })).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Places' })).toBeVisible();
+    // Relabelled "Return" and shrunk to match Help's sizing, with the Call PAM
+    // button removed from this particular empty state (Will, 16 September) —
+    // there is nothing here support can solve.
+    await expect(page.getByRole('link', { name: 'Return' })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Call PAM/ })).toHaveCount(0);
   });
 
   test('has no WCAG A/AA violations', async ({ page }) => {

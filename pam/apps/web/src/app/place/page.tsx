@@ -6,7 +6,6 @@ import {
   AppHeader,
   BigButton,
   HelpBar,
-  Loading,
   Notice,
   Page,
   PageTitle,
@@ -14,6 +13,7 @@ import {
   directionsHref,
   googlePlaceHref,
 } from '@pam/ui';
+import { PlaceDetailSkeleton } from '@pam/ui/Skeletons';
 import { categoryLabelKey, distanceLabel, NOTICES, type Category } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { HeaderBell } from '../HeaderBell';
@@ -21,6 +21,7 @@ import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
 import { useSavedPlaces } from '@/lib/useSavedPlaces';
 import { usePlaceStatus, weekLines } from '@/lib/usePlaceStatus';
+import { useDemoRole } from '@/lib/useViewedRole';
 import { sharePlace } from '@/lib/sharePlace';
 
 /**
@@ -128,16 +129,18 @@ function PlaceScreen() {
 
   const { state: session } = useSession();
   const signedIn = session.status === 'signed-in';
-  const { isSaved, save, unsave } = useSavedPlaces(signedIn);
+  const trueRole = session.status === 'signed-in' ? session.session.role : null;
+  const demoRole = useDemoRole(trueRole);
+  const { isSaved, save, unsave } = useSavedPlaces(signedIn, demoRole);
 
   const place = state.status === 'ready' ? state.place : null;
   const status = usePlaceStatus(place?.id ?? '', place?.hours ?? null, t, locale);
 
   if (state.status === 'loading') {
     return (
-      <Page gap={3}>
+      <Page gap={4}>
         <AppHeader />
-        <Loading label={t('common.loading')} variant="screen" />
+        <PlaceDetailSkeleton label={t('common.loading')} />
       </Page>
     );
   }
@@ -172,8 +175,8 @@ function PlaceScreen() {
   return (
     <Page gap={4}>
       <AppHeader
-        roleLabel={signedIn ? t(`role.${session.session.role}`) : undefined}
-        trailing={<HeaderBell enabled={signedIn} />}
+        roleLabel={signedIn ? t(`role.${demoRole ?? session.session.role}`) : undefined}
+        trailing={<HeaderBell enabled={signedIn} role={demoRole ?? trueRole} />}
       />
       <PageTitle title={place!.name} backHref="/places/" backLabel={t('nav.back.places')} />
 
@@ -242,16 +245,18 @@ function PlaceScreen() {
 }
 
 /**
- * `useSearchParams` needs a Suspense boundary in an exported app, and the
- * fallback is the same spinner every other screen shows while it waits.
+ * `useSearchParams` needs a Suspense boundary in an exported app. The fallback
+ * is the same skeleton the screen itself shows once it is past this and
+ * waiting on `service_detail` — there is no moment on this route the shape of
+ * a place is not already known.
  */
 export default function PlacePage() {
   return (
     <Suspense
       fallback={
-        <Page gap={3}>
+        <Page gap={4}>
           <AppHeader />
-          <Loading label="Loading" variant="screen" />
+          <PlaceDetailSkeleton label="Loading" />
         </Page>
       }
     >

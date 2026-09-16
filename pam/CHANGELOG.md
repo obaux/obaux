@@ -1,5 +1,59 @@
 # Changelog
 
+## [0.15.0] — 2026-09-16 · What the app can do
+
+### Added — example people, and a profile for each
+
+The case manager's screen, the directory, and a new "people interested in
+your program" screen for program leads now show an example roster — labelled
+as an example — whenever the real list is genuinely empty, so a first look at
+PAM has something to look at. Each person now opens into a profile of their
+own at `/person/?id=…`; a case manager or program lead can see a member there
+and the places they saved.
+
+### Added — example notifications, and an example profile per role
+
+The notifications screen and bell show an example notification when the real
+list is empty, one per kind of account. The account screen now shows an
+example provider, case manager, or member profile while previewing that
+role — previously only the super admin's own, real profile ever appeared.
+
+### Fixed — saving a place while previewing a role no longer touches your real account
+
+A super admin who saved a place while previewing "Member" was writing a real
+row under their own account, which then reappeared in every other preview.
+Saving while previewing now stays local to that preview and never reaches
+the database.
+
+### Changed — Places: a fifth "Saved" chip, smaller filters, and a fixed transition glitch
+
+"Saved" is now the fifth chip in the category filter row, carrying the
+bookmark icon, so the separate "Places you saved" button below the list is
+gone. The filter chips are smaller, to make room. Places and Home now line up
+edge to edge and both fade in the same way — Places was the one screen not
+using the app's shared page frame.
+
+### Changed — the empty "Places you saved" screen
+
+No Call PAM button — there is nothing there support can solve. The button
+back to Places is smaller and now says "Return".
+
+### Added — animated skeleton loaders for places and people
+
+Places, a place's own screen, and every list of people now show a shaped,
+animated placeholder while loading, instead of a spinner. Every other screen
+still uses the spinner.
+
+### Changed — the logo
+
+Both the light and dark wordmarks are updated across the app.
+
+### Known issue
+
+First-load JavaScript on Home is 500.5 kB gzipped against the 500 kB §12
+budget — 0.5 kB over, carried forward rather than fixed by trimming copy
+further this release.
+
 ## [0.14.0] — 2026-09-16 · A bell worth trusting
 
 ### Changed — the notification bell only lights up when there is something new

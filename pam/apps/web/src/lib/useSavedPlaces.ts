@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
-import type { Category } from '@pam/config';
+import type { Category, Role } from '@pam/config';
 
 /**
  * The places a member kept.
@@ -22,6 +22,20 @@ import type { Category } from '@pam/config';
  * **It keeps the whole set in memory.** A member has a handful of saved places,
  * not thousands, so every screen that cares can ask "is this one saved" without
  * a query per card.
+ *
+ * **A role preview is a demo, not a second account** (Will, 16 September).
+ * Saving is `saved_places.member_id = auth.uid()` — one row set per real
+ * account, whatever role's screen it is currently being looked at through.
+ * Before this, a super admin who tapped Save while "Viewing as Member" wrote
+ * a real row under their own super-admin account, and it kept showing up in
+ * every other preview too — the opposite of what a preview is supposed to
+ * demonstrate. Pass `demoRole` whenever the caller is currently previewing a
+ * role that is not the signed-in account's own, and this hook stops touching
+ * Supabase entirely: it reads and writes a local, per-role list seeded from
+ * `@pam/config/dummy-places`, kept in `sessionStorage` so it survives a
+ * navigation but never reaches the database and never leaks into a different
+ * preview. Leave `demoRole` unset (or `null`) for real use, including for a
+ * super admin looking at their own, real "Super admin" screen.
  */
 
 export interface SavedPlace {
@@ -78,7 +92,10 @@ function toPlace(row: ServiceRow): SavedPlace {
   };
 }
 
-export function useSavedPlaces(enabled: boolean): {
+export function useSavedPlaces(
+  enabled: boolean,
+  demoRole?: Role | null,
+): {
   state: SavedPlacesState;
   /** True while the set is known and contains this place. */
   isSaved: (serviceId: string) => boolean;
@@ -95,6 +112,17 @@ export function useSavedPlaces(enabled: boolean): {
       setState({ status: 'ready', places: [] });
       return;
     }
+
+    if (demoRole) {
+      let cancelled = false;
+      void import('./savedPlacesDemo').then(({ readDemoSaved }) => {
+        if (!cancelled) setState({ status: 'ready', places: readDemoSaved(demoRole) });
+      });
+      return () => {
+        cancelled = true;
+      };
+    }
+
     let cancelled = false;
 
     const load = async () => {
@@ -124,7 +152,7 @@ export function useSavedPlaces(enabled: boolean): {
     return () => {
       cancelled = true;
     };
-  }, [enabled]);
+  }, [enabled, demoRole]);
 
   const isSaved = useCallback(
     (serviceId: string) =>
@@ -136,8 +164,15 @@ export function useSavedPlaces(enabled: boolean): {
     async (place: SavedPlace) => {
       if (state.status !== 'ready' || state.places.some((p) => p.id === place.id)) return;
       const before = state.places;
+      const after = [place, ...before];
       setFailed(false);
-      setState({ status: 'ready', places: [place, ...before] });
+      setState({ status: 'ready', places: after });
+
+      if (demoRole) {
+        const { writeDemoSaved } = await import('./savedPlacesDemo');
+        writeDemoSaved(demoRole, after);
+        return;
+      }
 
       try {
         const { createClient } = await import('./supabase');
@@ -156,15 +191,22 @@ export function useSavedPlaces(enabled: boolean): {
         setFailed(true);
       }
     },
-    [state],
+    [state, demoRole],
   );
 
   const unsave = useCallback(
     async (serviceId: string) => {
       if (state.status !== 'ready') return;
       const before = state.places;
+      const after = before.filter((place) => place.id !== serviceId);
       setFailed(false);
-      setState({ status: 'ready', places: before.filter((place) => place.id !== serviceId) });
+      setState({ status: 'ready', places: after });
+
+      if (demoRole) {
+        const { writeDemoSaved } = await import('./savedPlacesDemo');
+        writeDemoSaved(demoRole, after);
+        return;
+      }
 
       try {
         const { createClient } = await import('./supabase');
@@ -183,7 +225,7 @@ export function useSavedPlaces(enabled: boolean): {
         setFailed(true);
       }
     },
-    [state],
+    [state, demoRole],
   );
 
   return { state, isSaved, save, unsave, failed };

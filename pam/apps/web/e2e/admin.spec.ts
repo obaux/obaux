@@ -105,7 +105,10 @@ test.describe('the case manager screen', () => {
     await signedInAs(page, 'super_admin');
     await page.goto('/admin/');
 
-    await expect(page.getByRole('heading', { name: 'Nobody on your list yet' })).toBeVisible();
+    // An empty real caseload shows the example roster (Will, 16 September)
+    // rather than the real "Nobody on your list yet" notice — either way,
+    // this is the case manager's own screen, not a closed door.
+    await expect(page.getByRole('heading', { name: 'Jordan' })).toBeVisible();
     await expect(page.getByText('This screen is for case managers')).toHaveCount(0);
   });
 
@@ -121,32 +124,42 @@ test.describe('the case manager screen', () => {
   });
 
   test('an admin sees their caseload', async ({ page }) => {
+    // "Dante", not "Marcus" — a dummy program lead is also named Marcus
+    // further down this same screen (Will, 16 September's example roster),
+    // and a fixture sharing that name makes every locator here ambiguous.
     await signedInAs(
       page,
       'admin',
       [
-        { id: 'm1', first_name: 'Marcus', access_status: 'active', last_active_at: '2026-09-10T14:00:00Z' },
+        { id: 'm1', first_name: 'Dante', access_status: 'active', last_active_at: '2026-09-10T14:00:00Z' },
         { id: 'm2', first_name: 'Tanya', access_status: 'limited', last_active_at: null },
       ],
       [{ subject_id: 'm2', feature: 'chat' }],
     );
     await page.goto('/admin/');
 
-    await expect(page.getByRole('heading', { name: 'Marcus' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Dante' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Tanya' })).toBeVisible();
-    await expect(page.getByText('Has not opened PAM yet')).toBeVisible();
+    // "Has not opened PAM yet" can also land on a dummy program lead further
+    // down the same screen (Will, 16 September) — .first() keeps this test
+    // about the real caseload row, not the example roster below it.
+    await expect(page.getByText('Has not opened PAM yet').first()).toBeVisible();
 
     // An avatar per person, so the caseload reads as people rather than rows.
     // No photo is fetched: a member's picture is not on the §4.1 list, so the
     // initial stands in — PAM's own rendering of a name the admin already has.
-    await expect(page.getByRole('img', { name: 'Marcus' })).toBeVisible();
+    await expect(page.getByRole('img', { name: 'Dante' })).toBeVisible();
     await expect(page.getByRole('img', { name: 'Tanya' })).toBeVisible();
   });
 
   test('an empty caseload explains itself', async ({ page }) => {
     await signedInAs(page, 'admin', []);
     await page.goto('/admin/');
-    await expect(page.getByRole('heading', { name: 'Nobody on your list yet' })).toBeVisible();
+    // The real "Nobody on your list yet" notice is replaced by the example
+    // roster while `USE_DUMMY_PEOPLE` is on (Will, 16 September) — labelled
+    // as an example, not left blank.
+    await expect(page.getByRole('heading', { name: 'Jordan' })).toBeVisible();
+    await expect(page.getByText('Example people, so you can see how this looks.').first()).toBeVisible();
   });
 
   test('the invite code is the biggest thing on the screen once it exists', async ({ page }) => {
@@ -184,7 +197,7 @@ test.describe('the case manager screen', () => {
       page,
       'admin',
       [
-        { id: 'm1', first_name: 'Marcus', access_status: 'limited', last_active_at: null },
+        { id: 'm1', first_name: 'Dante', access_status: 'limited', last_active_at: null },
         { id: 'm2', first_name: 'Tanya', access_status: 'limited', last_active_at: null },
         { id: 'm3', first_name: 'Dee', access_status: 'suspended', last_active_at: null },
       ],
@@ -196,7 +209,7 @@ test.describe('the case manager screen', () => {
       ],
     );
     await page.goto('/admin/');
-    await expect(page.getByRole('heading', { name: 'Marcus' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Dante' })).toBeVisible();
 
     await expect(page.getByText('Messages off')).toBeVisible();
     // Past two, the names stop fitting a chip and the detail belongs on the
@@ -218,14 +231,14 @@ test.describe('the case manager screen', () => {
 
   test('nothing outside the caseload contract is on the page', async ({ page }) => {
     await signedInAs(page, 'admin', [
-      { id: 'm1', first_name: 'Marcus', access_status: 'active', last_active_at: '2026-09-10T14:00:00Z' },
+      { id: 'm1', first_name: 'Dante', access_status: 'active', last_active_at: '2026-09-10T14:00:00Z' },
     ]);
     await page.goto('/admin/');
-    await expect(page.getByRole('heading', { name: 'Marcus' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Dante' })).toBeVisible();
 
     // Scoped to the member's own card, because the page also carries the
     // promise *not* to show these things, which says the words out loud.
-    const card = page.locator('.astryx-card').filter({ hasText: 'Marcus' });
+    const card = page.locator('.astryx-card').filter({ hasText: 'Dante' });
     const text = (await card.innerText()).toLowerCase();
 
     // §4.1 forbids these outright. A careless `select('*')` is what this catches.
@@ -239,11 +252,11 @@ test.describe('the case manager screen', () => {
     await signedInAs(
       page,
       'admin',
-      [{ id: 'm1', first_name: 'Marcus', access_status: 'limited', last_active_at: null }],
+      [{ id: 'm1', first_name: 'Dante', access_status: 'limited', last_active_at: null }],
       [{ subject_id: 'm1', feature: 'chat' }],
     );
     await page.goto('/admin/');
-    await expect(page.getByRole('heading', { name: 'Marcus' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Dante' })).toBeVisible();
 
     await settled(page);
 
@@ -345,11 +358,18 @@ test.describe('what has happened that a case manager has to act on', () => {
     expect(body).not.toMatch(/"|“|”/);
   });
 
-  test('says plainly when there is nothing', async ({ page }) => {
+  test('shows the example set rather than nothing, while it is on', async ({ page }) => {
+    // The real empty state — "Nothing needs you right now." — is replaced by
+    // an example notification while `USE_DUMMY_PEOPLE` is on (Will, 16
+    // September), captioned so it reads as an example rather than real
+    // activity. `USE_DUMMY_PEOPLE` is a build-time constant (`dummy-flag.ts`),
+    // so this test cannot also exercise the real empty state without flipping
+    // it and rebuilding — see that file for how to turn it off.
     await signedInAs(page, 'admin', [], [], []);
     await page.goto('/notifications/');
 
-    await expect(page.getByText('Nothing needs you right now.')).toBeVisible();
+    await expect(page.getByText('Example Food Pantry was reported: It is closed')).toBeVisible();
+    await expect(page.getByText('Examples, so you can see what this looks like.')).toBeVisible();
   });
 
   test('has no WCAG A/AA violations', async ({ page }) => {

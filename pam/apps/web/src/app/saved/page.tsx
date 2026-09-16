@@ -1,16 +1,9 @@
 'use client';
 
+import * as stylex from '@stylexjs/stylex';
 import { VStack } from '@astryxdesign/core/VStack';
-import {
-  AppHeader,
-  BigButton,
-  Loading,
-  Notice,
-  Page,
-  PageTitle,
-  PlaceCard,
-  ScrollReveal,
-} from '@pam/ui';
+import { Button } from '@astryxdesign/core/Button';
+import { AppHeader, Loading, Notice, Page, PageTitle, PlaceCard, ScrollReveal } from '@pam/ui';
 import { NOTICES } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { NotIn } from '../NotIn';
@@ -19,6 +12,7 @@ import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
 import { useSavedPlaces } from '@/lib/useSavedPlaces';
 import { placeStatus, useNow } from '@/lib/usePlaceStatus';
+import { useDemoRole } from '@/lib/useViewedRole';
 
 /**
  * Everything a member kept.
@@ -38,7 +32,20 @@ import { placeStatus, useNow } from '@/lib/usePlaceStatus';
  * with the way back beside the title and a phone number on every card that has
  * one. A support button at the foot of it answers a question nobody reading
  * their own saved places is asking.
+ *
+ * **The empty state carries no call button either** (Will, 16 September):
+ * saving nothing yet is not a problem support can solve, so the notice loses
+ * its "Call PAM" action (`supportPhone` withheld from this one `Notice`), and
+ * the way to Places below it is a plain secondary button — the size Help
+ * itself is drawn at elsewhere — rather than the screen's one primary action,
+ * because reading an empty list is not the thing this screen exists to do.
  */
+
+const styles = stylex.create({
+  // Sized like the Help control elsewhere, not like BigButton's 64px: this is
+  // the way out of an empty state, not the screen's one primary action.
+  return: { minHeight: '48px', fontSize: '17px' },
+});
 
 export default function SavedPage() {
   const { t, locale } = useI18n();
@@ -46,7 +53,9 @@ export default function SavedPage() {
   const { state: session } = useSession();
 
   const signedIn = session.status === 'signed-in';
-  const { state, unsave, failed } = useSavedPlaces(signedIn);
+  const trueRole = session.status === 'signed-in' ? session.session.role : null;
+  const demoRole = useDemoRole(trueRole);
+  const { state, unsave, failed } = useSavedPlaces(signedIn, demoRole);
   const now = useNow();
 
   if (session.status === 'loading') {
@@ -87,7 +96,7 @@ export default function SavedPage() {
 
   return (
     <Page gap={4}>
-      <AppHeader roleLabel={t(`role.${session.session.role}`)} trailing={<HeaderBell enabled={signedIn} />} />
+      <AppHeader roleLabel={t(`role.${demoRole ?? session.session.role}`)} trailing={<HeaderBell enabled={signedIn} role={demoRole ?? trueRole} />} />
 
       <PageTitle
         title={t('saved.title')}
@@ -131,14 +140,8 @@ export default function SavedPage() {
       */}
       {state.status === 'ready' && state.places.length === 0 ? (
         <>
-          <Notice
-            notice="no_places_found"
-            title={t('saved.empty.title')}
-            body={t('saved.empty.body')}
-            supportPhone={supportPhone}
-            callLabel={t('help.callSupport')}
-          />
-          <BigButton label={t('places.title')} href="/places/" />
+          <Notice notice="no_places_found" title={t('saved.empty.title')} body={t('saved.empty.body')} />
+          <Button label={t('action.return')} variant="secondary" href="/places/" xstyle={styles.return} />
         </>
       ) : null}
 
