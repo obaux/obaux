@@ -302,9 +302,10 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
   to trust promises. Widening it fails tests by design; change the contract
   first and tell members before it ships.
 - `DECISIONS.md` — 110 decisions with their reasoning, and the open questions.
-- `docs/sop-amendments.md` — nine changes to the SOP since handover, several of
+- `docs/sop-amendments.md` — ten changes to the SOP since handover, several of
   which contradict it. Read before trusting a rule you remember from the SOP.
-  A8 and A9 are the two screens that deliberately carry no help link.
+  A8 and A9 are the two screens that deliberately carry no help link; A10 is why
+  the waiting state carries no words.
 
 ---
 

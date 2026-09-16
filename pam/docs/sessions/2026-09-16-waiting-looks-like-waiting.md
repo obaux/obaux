@@ -54,7 +54,9 @@ role is not rare.
 
 ## Decisions
 
-D-119 (waiting is a spinner, not a sentence).
+D-119 (waiting is a spinner, not a sentence), and amendment **A10**, which is
+the same call written as a standing rule: §2.4 expects copy here and there is
+none, so the next session reads why before putting a sentence back.
 
 ## Verified
 

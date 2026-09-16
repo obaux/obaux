@@ -231,3 +231,37 @@ when it is noise, which is a stronger position than a permanent ghost button.
 What is not negotiable, and is asserted by a browser test: the number appears on
 this screen the moment anything goes wrong. Anybody removing that has removed
 the exception's justification, not just a notice.
+
+
+## A10 — Waiting is a spinner, not a sentence (16 September 2026, Will)
+
+§2.4 asks for plain language on every screen, and the SOP's loading guidance
+assumes copy. PAM's waiting state is now a centred spinner with no visible
+words, on Will's call.
+
+The reason is that the state is not one screen, it is all of them. PAM is a
+static export and the header's links are real anchors, so changing tab is a full
+page load: every screen shows its waiting state every time somebody moves. One
+sentence therefore has to be true everywhere, and the one we had — "Finding
+places nearby..." — was true on two screens out of nine. It greeted people on
+the way to their own account, their saved places and a caseload.
+
+**Where this contradicts the original.** §2.4 would have this state carry
+plain-language copy. It carries none. The argument is that plain language is a
+rule about *explaining*, and this state has nothing to explain: it resolves in
+under a second, or it becomes an error notice that does explain, in words, with
+a phone number. A ring needs no reading level and no translation, which is worth
+more here than a sentence that has to be right in English, in Spanish, and in
+whatever PAM is translated into next.
+
+**What did not change, and is asserted by a browser test.** §0 still holds: the
+home screen's waiting state keeps its help bar, because a screen with nothing on
+it but a ring is exactly the dead end §0 forbids, and this state is what a dying
+connection actually shows somebody. The label is announced to screen readers in
+the member's own language even though it is never drawn. And the spinner slows
+under `prefers-reduced-motion` rather than stopping — a still ring reads as a
+broken image, and what was promised to somebody who asked for less motion was
+less, not none.
+
+Anyone replacing this with copy again should be able to name a sentence that is
+true on every screen in PAM, including the ones that do not exist yet.
