@@ -1,5 +1,59 @@
 # Changelog
 
+## [0.17.0] — 2026-09-16 · Back where you came from
+
+### Fixed — a saved place on Home opened the full saved list, not the place
+
+Tapping a place card in Home's "Places you saved" strip now opens that
+place's own screen, the way tapping it anywhere else already did.
+
+### Fixed — "back" now returns to wherever a place was opened from
+
+Opening a place from Home and going back now returns to Home. Opening it
+from Places returns to Places; from Saved, to Saved. It used to always
+return to Places, regardless of where the tap came from.
+
+### Changed — sign-in: merged the password line into the consent sentence
+
+"No password to remember" is now part of the sentence under the button
+("PAM texts you a code to sign in. No password to remember. Reply STOP...")
+rather than a separate line above it, freeing up a line of vertical space.
+
+### Added — a taste of the example people, on Home itself
+
+While a super admin previews Case manager, Program, or Super admin, Home now
+shows three example people from that role's own list, with a link to see
+the rest — instead of only reaching them through the menu tiles below.
+
+## [0.16.0] — 2026-09-16 · One place for a message, one place for a language
+
+### Added — a banner for things that already happened
+
+Signing out used to leave a plain sentence sitting in the sign-in screen's own
+column. It is now a dismissible banner over the top of the page — the first
+thing to use PAM's new shared spot for saying something happened, manually
+dismissed for now.
+
+### Added — English and Spanish, switchable everywhere
+
+A language icon on the sign-in screen, beside the mark, opens a panel to
+choose English or Español — the mark stays centred either way. Onboarding
+now asks directly, defaulting to whatever was already chosen. Signed in,
+the choice is saved to the account and follows a person to their next
+sign-in, on this device or another; it can also be changed from account
+settings. Previously PAM shipped both language bundles but had no way to
+actually switch between them at runtime.
+
+### Changed — account settings: Sign Out is the last thing on the screen
+
+Help now sits among the other settings, above Sign Out rather than below it.
+
+### Changed — the sign-in slideshow's first line, and its width
+
+New first line: "See what your city has to offer — Learning, Earning, and
+Family Support." All three slides now wrap to better-balanced lines instead
+of a long first line and a short, one-word second line.
+
 ## [0.15.0] — 2026-09-16 · What the app can do
 
 ### Added — example people, and a profile for each

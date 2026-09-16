@@ -124,9 +124,6 @@ export function PhoneSignInCard({
             width="100%"
             xstyle={styles.field}
           />
-          <Text type="supporting" xstyle={styles.hint}>
-            {t('signin.phone.hint')}
-          </Text>
           <BigButton
             label={state.step === 'sending' ? t('signin.sending') : t('signin.phone.action')}
             onPress={() => void sendCode(phone)}

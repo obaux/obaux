@@ -86,6 +86,23 @@ const styles = stylex.create({
   header: {
     width: '100%',
     paddingBlock: '4px',
+    position: 'relative',
+  },
+  /*
+   * `align="center"` exists for exactly one screen (the way in), where the
+   * mark is the only thing that matters and has to stay dead-centre even
+   * once something sits in the corner beside it (Will, 16 September, adding
+   * the language switcher: "Make sure the logo remains symmetrical"). Taking
+   * `trailing` out of the centred flex row and floating it over the header
+   * instead — rather than switching to `justify: 'between'`, which is what
+   * every other screen does — is what keeps the centring math about the mark
+   * alone, whatever width `trailing` ends up being.
+   */
+  trailingFloating: {
+    position: 'absolute',
+    top: '50%',
+    right: 0,
+    transform: 'translateY(-50%)',
   },
   sticky: {
     position: 'sticky',
@@ -141,6 +158,10 @@ export function AppHeader({
   accountLabel = 'Your account',
 }: AppHeaderProps) {
   const showAccount = accountHref !== null && Boolean(roleLabel || roleControl);
+  // Signed-in screens keep the mark left and grow the row to the right
+  // (`justify: 'between'`); the way in centres the mark, and there is never
+  // an account button there to also need balancing — see `trailingFloating`.
+  const centeredWithTrailing = align === 'center' && !showAccount && Boolean(trailing);
   const account = showAccount ? (
     <IconButton
       label={accountLabel}
@@ -163,7 +184,7 @@ export function AppHeader({
       <HStack
         gap={2}
         align="center"
-        justify={trailing || account ? 'between' : align}
+        justify={centeredWithTrailing ? align : trailing || account ? 'between' : align}
         wrap="nowrap"
       >
         <HStack gap={2} align="center" wrap="wrap">
@@ -181,13 +202,16 @@ export function AppHeader({
           )}
           {roleControl ?? (roleLabel ? <Badge variant="neutral" label={roleLabel} /> : null)}
         </HStack>
-        {trailing || account ? (
+        {!centeredWithTrailing && (trailing || account) ? (
           <HStack gap={1} align="center" wrap="nowrap">
             {trailing}
             {account}
           </HStack>
         ) : null}
       </HStack>
+      {centeredWithTrailing ? (
+        <span {...stylex.props(styles.trailingFloating)}>{trailing}</span>
+      ) : null}
     </header>
   );
 }

@@ -45,7 +45,7 @@ export interface SavedStripPlace {
   readonly name: string;
   /** Already localised, e.g. "School and training". */
   readonly categoryLabel: string;
-  /** Where the card goes. The full list, until a place has its own screen. */
+  /** Where the card goes — that place's own screen, with `?from=home` so its back link returns here. */
   readonly href: string;
 }
 

@@ -169,7 +169,7 @@ test.describe('keeping a place', () => {
     await expect(page.getByRole('button', { name: 'Saved' })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Example Learning Center' })).toHaveAttribute(
       'href',
-      `/place/?id=${PLACE.id}`,
+      `/place/?id=${PLACE.id}&from=saved`,
     );
   });
 

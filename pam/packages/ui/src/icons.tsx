@@ -184,6 +184,17 @@ export function FlagIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+/** A globe. Language. */
+export function GlobeIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M3 12h18" />
+      <path d="M12 3a14 14 0 0 1 0 18a14 14 0 0 1 0-18z" />
+    </svg>
+  );
+}
+
 /** A star. Points — the only place in PAM that keeps a score. */
 export function StarIcon(props: SVGProps<SVGSVGElement>) {
   return (

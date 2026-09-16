@@ -10,6 +10,8 @@ import { useI18n } from '@/lib/i18n';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { usePhoneSignIn } from '@/lib/usePhoneSignIn';
 import { useSession } from '@/lib/useSession';
+import { useAlertBanner } from '@/lib/alertBanner';
+import { LanguageSwitcher } from '../LanguageSwitcher';
 import { PhoneSignInCard } from './PhoneSignInCard';
 
 /**
@@ -49,11 +51,17 @@ export default function SignInPage() {
   const { state: session } = useSession();
   const [phone, setPhone] = useState('');
   const [code, setCode] = useState('');
+  const { show: showAlert } = useAlertBanner();
 
-  /** Came here from "Sign out": say it happened. */
-  const [justSignedOut, setJustSignedOut] = useState(false);
+  /**
+   * Came here from "Sign out": say it happened, once, in the banner every
+   * screen shares — not a sentence sitting in this screen's own column, which
+   * is what it was before (Will, 16 September).
+   */
   useEffect(() => {
-    setJustSignedOut(new URLSearchParams(window.location.search).get('out') === '1');
+    if (new URLSearchParams(window.location.search).get('out') !== '1') return;
+    showAlert({ status: 'info', title: t('signin.signedOut') });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   /**
@@ -157,7 +165,7 @@ export default function SignInPage() {
         somebody is in, and the 48px tap target a link needs costs 22px of the
         height the consent sentence is fighting for.
       */}
-      <AppHeader align="center" isSticky homeHref={null} />
+      <AppHeader align="center" isSticky homeHref={null} trailing={<LanguageSwitcher />} />
 
       {/*
         The slides belong to the first step only. Somebody waiting on a code has
@@ -165,10 +173,6 @@ export default function SignInPage() {
         above it is now in the way.
       */}
       {onFirstStep ? <OnboardingSlides slides={slides} label={t('onboarding.label')} /> : null}
-
-      {justSignedOut && state.step === 'phone' ? (
-        <Text xstyle={styles.quiet}>{t('signin.signedOut')}</Text>
-      ) : null}
 
       {state.step === 'failed' ? (
         <Notice
