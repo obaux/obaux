@@ -1,5 +1,75 @@
 # Changelog
 
+## [0.14.0] — 2026-09-16 · A bell worth trusting
+
+### Changed — the notification bell only lights up when there is something new
+
+It used to stay filled all the time. Now it is quiet — bordered, like the
+account button beside it — until something needs you, and both icons in the
+corner are bigger and drawn the same way.
+
+### Changed — notifications say the place, or the person
+
+"Someone reported a place: closed" is now "Example Learning Center was
+reported: It is closed." A reported message now names who it was from.
+Nothing about the message itself is ever shown.
+
+### Changed — notifications are a log now, not a list of chores
+
+Nothing in the list is clickable, and nothing needs to be marked read one at a
+time. Opening the list is enough — the bell goes quiet on its own, and the
+newest lines are marked "New" so you still know what changed since last time.
+
+### Changed — the bell is on every screen, not just three of them
+
+Before, leaving Home for Places, a place's own screen, Saved or Points lost
+the way back to anything that needed attention. It didn't come back until you
+went home again. Now it is wherever you are.
+
+### Changed — a super admin's "Viewing as" choice follows them everywhere
+
+Picking "Viewing as Program" used to work only on the home screen; opening
+anything else quietly went back to showing the super admin's own screen. It
+now holds everywhere, and the redundant sentence explaining the preview is
+gone — the label on the switcher already says it.
+
+## [0.13.0] — 2026-09-16 · What each place is
+
+### Added — every place now says what it is
+
+All 754 places carry one short sentence about what they do and who can walk in,
+written from the city's own records or the place's published information. A
+place's website is listed where there is one.
+
+### Added — a screen for each place
+
+Tapping a place opens its own screen: what it is, how to get there as the one
+big button, the address, the week's opening hours, and then calling, the
+website, saving, sharing and "something is wrong here" as full-width rows you
+can read. It has its own link, so you can send a place to somebody.
+
+### Added — open or closed on the card
+
+Places show whether they are open. **These are sample opening hours for now.**
+The place's screen says so, in those words, until PAM has checked the real ones.
+
+### Added — places inside a school, or for young people only, are marked
+
+A badge on the card and at the top of the place's screen, above the phone
+number, so nobody works out the bus to a door that is not for them.
+
+### Changed — the place card is simpler
+
+Name, distance, open or closed, one sentence, and save. Call and Go and the
+corner menu moved inside, where they are labelled. The whole card is now the
+button.
+
+### Fixed — walking directions go to the place, not to an old address
+
+Directions were quietly using the written address instead of the place's actual
+location, which sends people to the wrong building when a listing is out of
+date.
+
 ## [0.12.1] — 2026-09-16 · Waiting looks like waiting
 
 ### Changed — no more "Finding places nearby..." on screens that find no places

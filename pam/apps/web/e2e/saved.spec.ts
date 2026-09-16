@@ -42,6 +42,10 @@ const PLACE = {
   lon: -75.16,
   meters: 900,
   has_hours: false,
+  description_plain: 'Free classes and a computer room. Walk in and ask at the desk.',
+  website: null,
+  audience: null,
+  hours: null,
 };
 
 async function signedIn(page: import('@playwright/test').Page, saved: unknown[]) {
@@ -157,10 +161,16 @@ test.describe('keeping a place', () => {
     await signedIn(page, [PLACE]);
     await page.goto('/saved/');
 
-    // §5.1: the same three actions, in the same order, wherever a place appears.
-    await expect(page.getByRole('link', { name: 'Call' })).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Go' })).toBeVisible();
+    // §5.1: a place looks the same wherever it appears. The saved list draws
+    // the search card — the sentence, the Save that is already on, and the
+    // whole card as one link into the place — rather than a name and an
+    // address, which is what it used to be.
+    await expect(page.getByText(/Free classes and a computer room/)).toBeVisible();
     await expect(page.getByRole('button', { name: 'Saved' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Example Learning Center' })).toHaveAttribute(
+      'href',
+      `/place/?id=${PLACE.id}`,
+    );
   });
 
   test('an empty list teaches the button rather than apologising', async ({ page }) => {

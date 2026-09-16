@@ -14,6 +14,12 @@ export * from './points.js';
 export * from './language.js';
 export * from './notices.js';
 export * from './distance.js';
+/*
+ * `hours` is deliberately NOT re-exported here. It is a places concern, and a
+ * barrel export puts it in the first load of every screen — including home,
+ * which has no places on it. Import it as `@pam/config/hours`; §12's budget
+ * had 0.2 kB of headroom and this cost 0.6 (16 September).
+ */
 export * from './legal.js';
 
 /** Languages at launch (§2.3). [ASK WILL] on any additional language. */

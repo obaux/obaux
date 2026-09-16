@@ -10,23 +10,15 @@ import { Text } from '@astryxdesign/core/Text';
 import { Badge } from '@astryxdesign/core/Badge';
 import { Avatar } from '@astryxdesign/core/Avatar';
 import { Button } from '@astryxdesign/core/Button';
-import {
-  AppHeader,
-  BigButton,
-  Loading,
-  Notice,
-  NotificationBell,
-  Page,
-  PageTitle,
-  TextLink,
-} from '@pam/ui';
+import { AppHeader, BigButton, Loading, Notice, Page, PageTitle, TextLink } from '@pam/ui';
 import { NOTICES } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { NotIn } from '../NotIn';
+import { HeaderBell } from '../HeaderBell';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
 import { useCaseload, createInvite, type CreatedInvite } from '@/lib/useCaseload';
-import { useNotifications } from '@/lib/useNotifications';
+import { useViewedRole } from '@/lib/useViewedRole';
 
 /**
  * The case manager's screen (§4.1).
@@ -98,9 +90,14 @@ export default function AdminPage() {
   const supportPhone = useSupportPhone();
   const { state: session } = useSession();
 
-  const isAdmin = session.status === 'signed-in' && session.session.role === 'admin';
+  // A super admin previewing "Case manager" from Home sees this screen too —
+  // their own account, drawn as a case manager's (D-108, useViewedRole) — not
+  // just Home's tiles. Before this, every screen but Home asked the real role
+  // directly, so leaving Home reset the preview (Will, 16 September).
+  const trueRole = session.status === 'signed-in' ? session.session.role : null;
+  const viewedRole = useViewedRole(trueRole);
+  const isAdmin = viewedRole === 'admin';
   const { state: caseload, refresh } = useCaseload(isAdmin);
-  const { state: notifications } = useNotifications(isAdmin);
 
   const [invite, setInvite] = useState<CreatedInvite | null>(null);
   const [inviteBusy, setInviteBusy] = useState(false);
@@ -160,7 +157,7 @@ export default function AdminPage() {
     // this screen is, and a way to get it fixed if it is wrong (§0).
     return (
       <Page gap={4}>
-          <AppHeader roleLabel={t(`role.${session.session.role}`)} />
+          <AppHeader roleLabel={viewedRole ? t(`role.${viewedRole}`) : undefined} trailing={<HeaderBell enabled={trueRole !== null} />} />
           <Notice
             notice="service_not_available"
             title={t('admin.notAdmin.title')}
@@ -171,9 +168,11 @@ export default function AdminPage() {
           {/*
             A super admin lands here from habit, not by mistake: this is the
             staff screen they knew about. Say where their own list is rather
-            than leaving them at a closed door (§0).
+            than leaving them at a closed door (§0). Their *real* account, not
+            the previewed one — a super admin previewing "Member" still has a
+            people list of their own to get to.
           */}
-          {session.session.role === 'super_admin' ? (
+          {trueRole === 'super_admin' ? (
             <TextLink label={t('directory.title')} href="/directory/" />
           ) : null}
           <TextLink label={t('admin.back')} href="/" />
@@ -192,21 +191,7 @@ export default function AdminPage() {
           flagged, or a message in their caseload was reported. Nothing else,
           and no row carries anybody's words (A7 / D-080).
         */}
-        <AppHeader
-          roleLabel={t('role.admin')}
-          trailing={
-            notifications.status === 'ready' ? (
-              <NotificationBell
-                href="/notifications/"
-                label={t('notify.title')}
-                unreadCount={notifications.items.filter((i) => !i.isRead).length}
-                unreadLabel={t('notify.unread', {
-                  count: notifications.items.filter((i) => !i.isRead).length,
-                })}
-              />
-            ) : null
-          }
-        />
+        <AppHeader roleLabel={t('role.admin')} trailing={<HeaderBell enabled={isAdmin} />} />
 
         <PageTitle
           title={t('admin.title')}

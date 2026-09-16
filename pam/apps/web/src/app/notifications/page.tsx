@@ -1,39 +1,39 @@
 'use client';
 
+import { useEffect } from 'react';
 import { VStack } from '@astryxdesign/core/VStack';
-import { HStack } from '@astryxdesign/core/HStack';
-import { Heading } from '@astryxdesign/core/Heading';
-import { Button } from '@astryxdesign/core/Button';
-import { Icon } from '@astryxdesign/core/Icon';
-import {
-  AppHeader,
-  BigButton,
-  Loading,
-  Notice,
-  NotificationList,
-  Page,
-  PageTitle,
-} from '@pam/ui';
+import { AppHeader, Loading, Notice, NotificationList, Page, PageTitle } from '@pam/ui';
 import { useI18n } from '@/lib/i18n';
 import { NotIn } from '../NotIn';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
-import { useNotifications } from '@/lib/useNotifications';
+import { useNotifications, unreadCount, type NotificationRow } from '@/lib/useNotifications';
 import { whenHappened } from '@/lib/when';
 
 /**
- * Everything that has happened and needs somebody.
+ * Everything that has happened, as a log.
  *
  * A screen rather than a panel hanging off the bell. A panel is right for a
- * glance and wrong for the job that follows — a list somebody works through,
- * one item at a time, leaving and coming back. On a phone a panel also covers
- * the thing it is about, and closes if you breathe on it.
+ * glance and wrong for a list this long — on a phone it covers the thing it is
+ * about, and closes if you breathe on it.
  *
  * Back is the first thing on the screen, top left, where every other app on the
  * phone puts it (§0: never dead-end). It is a real link, so the browser's own
  * Back does the same thing.
+ *
+ * Nothing on this screen is a task (Will, 16 September): no row is a button,
+ * nothing here is marked read one line at a time. The whole list is marked
+ * seen the moment it is on screen, which is what clears the bell for next
+ * time — see `useNotifications`'s `markAllSeen`.
  */
 
+/** "closed", from the database, becomes the words a member reads on the flag screen. */
+function describe(item: NotificationRow, t: (key: string, vars?: Record<string, string>) => string) {
+  if (item.kind === 'service_flagged' && typeof item.bodyVars['reason'] === 'string') {
+    return t(item.bodyKey, { ...item.bodyVars, reason: t(`flag.reason.${item.bodyVars['reason']}`) });
+  }
+  return t(item.bodyKey, item.bodyVars);
+}
 
 export default function NotificationsPage() {
   const { t, locale } = useI18n();
@@ -41,10 +41,15 @@ export default function NotificationsPage() {
   const { state: session } = useSession();
 
   const signedIn = session.status === 'signed-in';
-  const { state, markRead } = useNotifications(signedIn);
+  const { state, markAllSeen } = useNotifications(signedIn);
+  const unread = unreadCount(state);
 
-  const unread =
-    state.status === 'ready' ? state.items.filter((item) => !item.isRead).length : 0;
+  // Once, the moment the list is actually on screen — not on every render, and
+  // not because somebody tapped something. See the file comment.
+  useEffect(() => {
+    if (state.status === 'ready' && unread > 0) void markAllSeen();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.status]);
 
   return (
     <Page gap={3}>
@@ -87,12 +92,11 @@ export default function NotificationsPage() {
           <NotificationList
             items={state.items.map((item) => ({
               id: item.id,
-              text: t(item.bodyKey, item.bodyVars),
+              text: describe(item, t),
               when: whenHappened(item.createdAt, locale, t),
-              isRead: item.isRead,
+              isNew: !item.isRead,
             }))}
-            labels={{ empty: t('notify.none'), markRead: t('notify.markRead') }}
-            onMarkRead={(id) => void markRead(id)}
+            labels={{ empty: t('notify.none'), new: t('notify.new') }}
           />
         ) : null}
 

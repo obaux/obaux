@@ -11,7 +11,13 @@
  */
 
 export { BigButton, type BigButtonProps } from './BigButton.js';
-export { PlaceCard, type PlaceCardProps } from './PlaceCard.js';
+export {
+  PlaceCard,
+  type PlaceCardProps,
+  directionsHref,
+  googlePlaceHref,
+} from './PlaceCard.js';
+export { PlaceDetail, type PlaceDetailProps } from './PlaceDetail.js';
 export { PersonCard, type PersonCardProps } from './PersonCard.js';
 export { StepHeader, type StepHeaderProps } from './StepHeader.js';
 export { PointsBadge, type PointsBadgeProps } from './PointsBadge.js';
@@ -47,6 +53,7 @@ export {
   StarIcon,
   HomeIcon,
   MeIcon,
+  MeIconFilled,
   PeopleIcon,
   PhoneIcon,
   PlacesIcon,

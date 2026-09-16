@@ -34,6 +34,10 @@ export interface SavedPlace {
   readonly placeId: string | null;
   readonly lat: number | null;
   readonly lon: number | null;
+  /** The same three the search card uses, so the two cards match (0052). */
+  readonly description?: string | null;
+  readonly audience?: string | null;
+  readonly hours?: unknown;
 }
 
 export type SavedPlacesState =
@@ -51,6 +55,10 @@ interface ServiceRow {
   place_id: string | null;
   lat: number | null;
   lon: number | null;
+  description_plain?: string | null;
+  website?: string | null;
+  audience?: string | null;
+  hours?: unknown;
 }
 
 function toPlace(row: ServiceRow): SavedPlace {
@@ -64,6 +72,9 @@ function toPlace(row: ServiceRow): SavedPlace {
     placeId: row.place_id,
     lat: row.lat,
     lon: row.lon,
+    description: row.description_plain ?? null,
+    audience: row.audience ?? null,
+    hours: row.hours ?? null,
   };
 }
 

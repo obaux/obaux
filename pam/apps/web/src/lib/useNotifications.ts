@@ -14,6 +14,12 @@ import { useCallback, useEffect, useState } from 'react';
  * A row carries a locale key and its variables, never a sentence and never
  * anybody's words. The key is translated at render time, which means a reworded
  * notice reaches rows that were written before the rewording.
+ *
+ * `read_at` used to be a per-row task — a "Mark as read" button on every line.
+ * It is now purely "has this person opened the list since this arrived"
+ * (Will, 16 September): nobody marks anything, the notifications screen marks
+ * everything the moment it opens (`markAllSeen`), and `isRead` survives only as
+ * the bell's dot and the list's own "New" label — both read-only.
  */
 export interface NotificationRow {
   id: string;
@@ -34,9 +40,21 @@ export type NotificationsState =
 /** Newest first, and capped: a list nobody can reach the bottom of is a list. */
 const LIMIT = 30;
 
+export function unreadCount(state: NotificationsState): number {
+  return state.status === 'ready' ? state.items.filter((item) => !item.isRead).length : 0;
+}
+
 export function useNotifications(enabled: boolean): {
   state: NotificationsState;
-  markRead: (id: string) => Promise<void>;
+  /**
+   * Everything currently unread, in one write. Called once, by the
+   * notifications screen itself, the moment its list is on screen — never by
+   * a tap, because reading a log is not a task somebody completes one line at
+   * a time (see the file comment). Does not touch `state`: the list stays
+   * exactly as it looked when it opened, "New" labels and all, and only the
+   * *next* visit — and the bell before it — sees the cleared count.
+   */
+  markAllSeen: () => Promise<void>;
   refresh: () => void;
 } {
   const [state, setState] = useState<NotificationsState>({ status: 'loading' });
@@ -100,44 +118,24 @@ export function useNotifications(enabled: boolean): {
     };
   }, [enabled, nonce]);
 
-  /**
-   * Marking one read. Applied locally first so the list responds immediately on
-   * a slow connection, then written; a failed write puts it back rather than
-   * leaving somebody looking at a list that quietly disagrees with the database.
-   */
-  const markRead = useCallback(async (id: string) => {
-    setState((current) =>
-      current.status === 'ready'
-        ? {
-            status: 'ready',
-            items: current.items.map((item) =>
-              item.id === id ? { ...item, isRead: true } : item,
-            ),
-          }
-        : current,
-    );
-
+  const markAllSeen = useCallback(async () => {
     try {
       const { createClient } = await import('./supabase');
       const supabase = createClient();
+      // RLS restricts this to the signed-in person's own rows regardless
+      // (`recipient_id = auth.uid()`), so the `is` filter is what keeps the
+      // write cheap, not what keeps it safe.
       const { error } = await supabase
         .from('notifications')
         .update({ read_at: new Date().toISOString() })
-        .eq('id', id);
+        .is('read_at', null);
       if (error) throw error;
     } catch {
-      setState((current) =>
-        current.status === 'ready'
-          ? {
-              status: 'ready',
-              items: current.items.map((item) =>
-                item.id === id ? { ...item, isRead: false } : item,
-              ),
-            }
-          : current,
-      );
+      // Silent on purpose: this is housekeeping for the *next* visit, not
+      // something this one is waiting on. Worst case, the bell stays lit one
+      // visit longer than it needed to.
     }
   }, []);
 
-  return { state, markRead, refresh };
+  return { state, markAllSeen, refresh };
 }

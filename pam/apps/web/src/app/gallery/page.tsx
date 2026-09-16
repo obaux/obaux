@@ -21,6 +21,7 @@ import {
   PeopleIcon,
   PersonCard,
   PlaceCard,
+  PlaceDetail,
   PlacesIcon,
   PlanIcon,
   PointsBadge,
@@ -55,16 +56,21 @@ const styles = stylex.create({
   card: { width: '100%' },
 });
 
-const PLACE_LABELS = {
-  call: 'Call',
-  go: 'Go',
-  save: 'Save',
+const DETAIL_LABELS = {
+  directions: 'How to get there',
+  call: 'Call this place',
+  website: 'Their website',
+  hours: 'Opening hours',
+  hoursOnGoogle: 'Check hours on Google',
+  about: 'What this place is',
+  address: 'Address',
+  save: 'Save this place',
   saved: 'Saved',
-  hours: 'Hours',
-  more: 'More about this place',
   share: 'Share this place',
   flag: 'Something is wrong here',
 };
+
+const PLACE_LABELS = { save: 'Save', saved: 'Saved' };
 
 function Section({ title, note, children }: { title: string; note?: string; children: React.ReactNode }) {
   return (
@@ -173,36 +179,69 @@ export default function GalleryPage() {
         </VStack>
       </Section>
 
-      <Section title="A place" note="Three actions, always the same three, always in this order (§5.1).">
+      <Section
+        title="A place, in a list"
+        note="The four facts that decide whether to go, and Save. Everything else is one tap inside."
+      >
         <VStack gap={3}>
           <PlaceCard
             name="Riverside Learning Center"
-            category="education"
-            categoryLabel="School and training"
-            phone="+12155550100"
-            address="1234 Market St, Philadelphia"
+            href="/place/?id=demo"
+            description="GED classes and help with reading. Free, and you can start any Monday."
             distanceLabel="1.2 miles"
-            onShare={() => {}}
-            flagHref="/flag/"
+            status={{ isOpen: true, label: 'Open until 5:00pm' }}
+            onSave={() => {}}
             labels={PLACE_LABELS}
           />
           <PlaceCard
-            name="A place whose name is long enough to need the two-line clamp, so the menu keeps its corner"
-            category="family_services"
-            categoryLabel="Home and family"
-            address="900 Spring Garden St"
-            onShare={() => {}}
-            flagHref="/flag/"
+            name="A place whose name is long enough to need the two-line clamp, so the bookmark keeps its corner"
+            href="/place/?id=demo"
+            description="A city recreation center run by Philadelphia Parks & Recreation. Free activities, sports and space for the neighborhood."
+            distanceLabel="0.4 miles"
+            status={{ isOpen: false, label: 'Closed · opens 9:00am' }}
+            audienceLabel="In a school · students only"
+            isSaved
+            onSave={() => {}}
             labels={PLACE_LABELS}
           />
           <PlaceCard
-            name="A place with no phone and no distance"
-            category="workforce"
-            categoryLabel="Work and money"
-            address="500 Broad St"
+            name="A place PAM has no hours for"
+            href="/place/?id=demo"
+            description="Nothing claims it is open or shut — an unknown is not a closure."
+            distanceLabel="2.6 miles"
             labels={PLACE_LABELS}
           />
         </VStack>
+      </Section>
+
+      <Section
+        title="A place, on its own screen"
+        note="Where the actions that left the card went: labelled rows, not icons behind a menu."
+      >
+        <PlaceDetail
+          name="Riverside Learning Center"
+          category="education"
+          categoryLabel="School and training"
+          description="GED classes and help with reading. Free, and you can start any Monday."
+          address="1234 Market St, Philadelphia"
+          distanceLabel="1.2 miles"
+          status={{ isOpen: true, label: 'Open until 5:00pm' }}
+          weekLines={[
+            { day: 'Monday', hours: '9:00 AM – 5:00 PM' },
+            { day: 'Tuesday', hours: '9:00 AM – 5:00 PM' },
+            { day: 'Sunday', hours: 'Closed' },
+          ]}
+          hoursArePlaceholder
+          placeholderNote="These are sample hours while PAM checks the real ones. Call before you go."
+          phone="+12155550100"
+          website="https://example.org"
+          directionsHref="https://www.google.com/maps/dir/?api=1&destination=1234%20Market%20St&travelmode=walking"
+          hoursHref="https://www.google.com/maps/search/?api=1&query=Riverside"
+          onSave={() => {}}
+          onShare={() => {}}
+          flagHref="/flag/"
+          labels={DETAIL_LABELS}
+        />
       </Section>
 
       <Section title="A person">
@@ -246,16 +285,16 @@ export default function GalleryPage() {
           <Card padding={3} xstyle={styles.card}>
             <NotificationList
               items={[
-                { id: 'a', text: 'Someone reported a place: closed', when: 'Today', isRead: false },
-                { id: 'b', text: 'Someone said a message is not safe', when: 'Yesterday', isRead: true },
+                { id: 'a', text: 'J J Peters was reported: closed', when: 'Today', isNew: true },
+                { id: 'b', text: 'A message from Marcus was reported', when: 'Yesterday', isNew: false },
               ]}
-              labels={{ empty: 'Nothing needs you right now.', markRead: 'Mark as read' }}
+              labels={{ empty: 'Nothing needs you right now.', new: 'New' }}
             />
           </Card>
           <Card padding={3} xstyle={styles.card}>
             <NotificationList
               items={[]}
-              labels={{ empty: 'Nothing needs you right now.', markRead: 'Mark as read' }}
+              labels={{ empty: 'Nothing needs you right now.', new: 'New' }}
             />
           </Card>
         </VStack>

@@ -1886,6 +1886,205 @@ Astryx's Spinner slows to a third of its speed under `prefers-reduced-motion`
 rather than stopping — a still ring reads as a broken image, and the promise
 made to somebody who asked for less motion was less, not none.
 
+### D-120 — A place gets a screen of its own, and the card answers one question
+The card carried Call, Go and Save, plus share and report behind a "⋯" in the
+corner. That is five decisions per card and twenty in a screenful, all of them
+about *how to get there* — a question nobody asks until they have chosen the
+place. Will, 16 September: the card should show only what decides whether to
+go.
+
+So the card is name, distance, open or shut, one sentence, and Save. Everything
+else moved to `/place/?id=…`, where the way there is the one primary action
+(§2.5) and calling, the hours, the website, share and report are full-width
+labelled rows. A corner menu is where a feature goes to be unused, and
+reporting a place that has closed is the single most valuable thing a member
+can tell PAM.
+
+The whole card is the link, not a "More" affordance in the corner: a 48px
+target on a 300px card is the one the member this app is for will miss. The
+heading carries the real anchor and a pseudo-element on it covers the card, so
+there is exactly one link in the accessibility tree, named for the place, with
+Save layered above it. `/place/?id=…` is also shareable, which is the point of
+it having an address at all — a case manager can text a member a place.
+
+### D-121 — PAM says what a place does, in PAM's own words (supersedes part of 0017)
+0017 said PAM adds no words of its own to a provider's listing, and D-045 said
+an import invents no label. Both were about not putting a condition on somebody
+else's name. But 754 places reached members as a name and an address, and "J J
+Peters" tells a member nothing — the neutrality rule was protecting providers
+by failing members.
+
+Put to Will as the one blocking product decision of the session, with the
+behavioural-health places named as the hard case. His answer: **say what it
+does, everywhere.** 0050 writes `description_plain` for all 754, capped at 200
+characters by a check constraint, sourced from the city's own service_type /
+park_name / asset_name fields and, for the twelve hand-added places, from
+published sources.
+
+The SMS half of 0017 stands untouched: `name_may_disclose` still governs what
+may go in a text, and a description may never be sent in one. A screen somebody
+chose to open is not a message that arrives on a lock screen. Recorded as
+amendment A11.
+
+### D-122 — Opening hours are a stand-in behind one flag, and the screen says so
+D-044 said PAM never claims a place is open, because it had no hours. That
+still holds for real data — nothing invents an "Open now" out of nothing. But
+Will asked for a demo that shows open and closed, with `enrich-places` deferred
+until nearer kick-off, so `USE_PLACEHOLDER_HOURS` in `@pam/config/hours` is the
+one line to flip when the real hours land.
+
+`hoursFor()` returns real hours when the row has them and a deterministic
+stand-in (four shapes, chosen by a hash of the id, so a place does not change
+its hours between screens) when it does not, flagged `isReal: false`. Nothing
+downstream can confuse the two: the detail screen prints "These are sample
+hours while PAM checks the real ones. Call before you go." whenever the flag is
+false, and an unknown answer is `unknown`, never `closed` — a place wrongly
+called closed is a member who does not set off.
+
+The clock is read once per screen and re-read every minute, and is null until
+the browser runs: this is a static export, so anything derived from "now" at
+build time is either wrong by months or a hydration mismatch.
+
+`hours.ts` is deliberately **not** re-exported from `@pam/config`'s barrel.
+Through the barrel it landed in the first load of every screen and cost the
+last kilobyte of §12's budget.
+
+### D-123 — Who may actually walk in is a badge, above everything else
+Some places in the catalogue are inside a school, and the evening centres are
+for 10 to 17 year olds. An adult who reads the description, works out the bus
+and then finds a door that is not for them has been failed by the screen, not
+by the place. 0050 adds `audience` (`students` or `youth`, constrained), and it
+renders as a badge — above the phone number on the detail screen, and on the
+card — because somebody scanning a list does not read sentences (Will, 16
+September). Will: "Mark if inside a school", then "Make it visible to users".
+
+A new column on `services` is invisible until it is named in the column-level
+GRANT 0016 introduced. That is the trap this schema sets, and 0050 grants
+`audience` explicitly.
+
+### D-124 — `services_near` never returned the point it sorted by
+Found while wiring the detail screen: the RPC took a member's location,
+ordered by distance, returned `meters` — and never returned `lat`/`lon`. So
+every "Go" link in the product had been silently falling back to the address
+string, which 0023 records as the field the city feeds let rot while keeping
+the geometry current. The card looked right and routed to a stale address.
+0051 returns the point from both `services_near` and `service_detail`; 0052
+does the same for `saved_places_mine` so the saved list draws the same card as
+the search rather than a lesser one.
+
+`create or replace function` cannot change a return type, so both migrations
+drop the function first. A migration that only replaces will fail in an
+environment where the old signature exists — which is every environment that
+matters.
+
+### D-125 — A subpath export, not a barrel, is what makes a lazy chunk lazy
+`SavedStripLazy` was loading `import('@pam/ui')`, which pulls the barrel, which
+imports every component in the library. Measured: the split did nothing at all
+— webpack hoisted the shared parts straight back into the first load. Packages
+now declare subpath exports (`@pam/ui/SavedStrip`, `@pam/ui/RoleSwitch`,
+`@pam/config/hours`) and the lazy imports name the module, not the package.
+That, plus keeping `hours.ts` out of the config barrel, is what put the build
+back under §12's 500 kB with room to spare.
+
+### D-126 — The bell is filled only when there is something new
+The brand fill on the notification bell was permanent (D-084ish, 14 September)
+— it stayed lit whether or not anything was waiting, on the logic that it was
+the only route to the list. Will, 16 September: don't make the alert button
+primary unless new alerts exist. A caught-up caseload and an ignored one had
+been wearing the same colour; the fill is now the news itself; a quiet bell is
+bordered like the account button beside it (ghost, `--color-border`), and only
+turns primary — filled, brand-coloured — while `unreadCount > 0`. The
+accessible name still carries the count either way, so nothing here depends on
+seeing the fill.
+
+Both header icons are now drawn filled (a new `MeIconFilled`, matching
+`BellIcon`'s existing solid style) and sized to match each other — they used to
+be two different weights of icon sharing a corner. The account button also
+carries the light border Will asked for; the bell picks up the same border in
+its quiet state, for the same reason (see the file comment): two icons in one
+corner reading as one system, not one important-looking control and one
+afterthought.
+
+### D-127 — A notification is a log line, not a task
+`NotificationList` used to wrap every row in a ghost `Button` with an
+`onSelect` callback — and nothing in the app ever passed one. Every row looked
+clickable and did nothing. Each row also carried its own "Mark as read"
+button. Will, 16 September: don't make alert items clickable, they're just
+logs, and there's no need to mark them read — it creates unnecessary tasks.
+
+Both are gone. Rows are plain text. What used to be `read_at`'s job — deciding
+whether to show the "Mark as read" button — is now purely "did this arrive
+since the list was last opened", drawn as a small "New" label with no control
+attached. The bell still needs to go quiet on its own, so `useNotifications`
+gained `markAllSeen()`: one write, everything currently unread, fired once by
+the notifications screen the moment its list is actually on screen — never by
+a tap, and never touching the list already rendered, so the "New" labels
+somebody is looking at do not flicker away under them. Only the *next* visit,
+and the bell before it, see the cleared count.
+
+### D-128 — Notifications say the place, or the person (reverses part of A7's silence on names)
+"Someone reported a place: closed" and "Someone said a message is not safe"
+told a case manager that something had happened and made them open the list to
+learn what. Will, 16 September: "the alert should be more descriptive, saying
+the place name, or person's name." 0053 adds `place` to `service_flagged`'s
+`body_vars` (the flagged service's own `services.name`) and `name` to
+`message_reported`'s (the reported message's sender — `profiles.first_name`,
+looked up server-side, in the trigger, same as the routing itself).
+
+A7 never said a notification could not carry a name — it said no message text
+travels with it, which still holds exactly as written (0053's comment quotes
+it). A name is one of the five facts a case manager and a super admin are
+already entitled to read about their own people, the same five §4.1 names
+anywhere else in the product (the caseload card, the directory row). This puts
+one of those five facts on the notification a screen earlier than it already
+was, not on a screen it had never been on.
+
+`notify.service_flagged`'s `{reason}` is translated at render time through the
+existing `flag.reason.*` keys — it always carried the raw database enum
+('closed') before this session, untranslated, which is a bug this session
+found and fixed while it was already in the file, not something 0053 changed.
+
+### D-129 — A super admin's role preview now follows them off Home
+`useViewAs` already existed and was already correct — a rendering choice
+stored in `sessionStorage`, never touching which rows a query is allowed to
+see. What was missing is that only Home ever asked it the question. Every
+other screen that gates content by role — the case manager screen, the
+directory — asked `session.session.role` directly, so choosing "Viewing as
+Program" on Home and then opening Places or the case manager screen silently
+reverted to the real role the instant Home was left (Will, 16 September: "on
+the top of alerts, it seems like I can't view it from the view of different
+users" — the *notifications bell*, present only on three screens before this
+session, made this the easiest place to notice it, but the bug was general).
+
+`useViewedRole(trueRole)` is the fix, shared by every screen: it reads the same
+`useViewAs` a page already had access to and returns the previewed role when
+one is set, the real one otherwise. `admin/page.tsx` and `directory/page.tsx`
+now gate `isAdmin` / `isSuperAdmin` on the *viewed* role rather than the real
+one — so a super admin previewing "Case manager" sees the case manager screen
+(their own, typically empty, caseload, drawn as a case manager's screen — the
+same "layout, not identity" principle Home's tiles already used), and,
+symmetrically, a super admin previewing "Program" meets the same closed door a
+program actually would. Nothing about *whose data* a query can reach changed —
+every affected query still runs, unconditionally, as the real `auth.uid()`.
+
+One link on `admin`'s closed-door screen — "your list is at the directory" —
+stays keyed to the *real* role, deliberately: a super admin previewing
+"Member" still has their own people list to get back to, and that link is
+about what they can actually do, not what they are currently looking at.
+
+### D-130 — The redundant "Viewing as" sentence is gone
+The switcher's own chip already says "Viewing as Program" while a preview is
+active (D-108) — in the header, on every screen, now that D-129 threads the
+preview everywhere. Home also carried a separate `Notice` card underneath
+repeating the same fact in a full sentence: *"This is what a Program sees. It
+is your own account — nobody else's information is shown."* Will, 16
+September: no need to show text saying which user, since the top bar does the
+communicating — that's redundant. The card is removed; `view.notice` is
+removed from both locale bundles as dead copy. The privacy guarantee itself
+(nobody else's information is shown) was already true and stays true — it was
+never load-bearing prose, just a restatement of what D-108's own comment
+already argues at length.
+
 ---
 
 ## Notes for whoever picks this up next

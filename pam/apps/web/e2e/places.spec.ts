@@ -12,7 +12,9 @@ import { settled } from './settled';
  * tested is the screen's contract with that payload:
  *
  *   - a distance from metres never reaches the page as a raw float (D-043)
- *   - nothing claims a place is open, because PAM has no hours (D-044)
+ *   - the card carries only what decides whether to go: name, distance, open
+ *     or shut, one sentence, and Save (Will, 16 September). Calling, the
+ *     directions and the rest live on the place's own screen — `place.spec.ts`
  *   - a failed query is a message and a phone number, never a blank list (§0)
  */
 
@@ -30,6 +32,10 @@ const ROWS = [
     lon: -75.175,
     meters: 222.56625541,
     has_hours: false,
+    description_plain: 'A city recreation center with a gym, courts and free programs for the neighbourhood.',
+    website: null,
+    audience: null,
+    hours: null,
   },
   {
     id: 'e9aea5a0-896b-4c73-8dc9-a7ae1ff02ed5',
@@ -44,6 +50,10 @@ const ROWS = [
     lon: null,
     meters: 2896.5,
     has_hours: false,
+    description_plain: 'Treatment and counselling for mental health and substance use. Call first to ask what is free.',
+    website: 'https://example.org/jfk',
+    audience: null,
+    hours: null,
   },
 ];
 
@@ -65,24 +75,42 @@ test.describe('the places screen', () => {
     await expect(page.getByText(/\d\.\d{3,}/)).toHaveCount(0);
   });
 
-  test('never says a place is open, because PAM does not know', async ({ page }) => {
+  test('the card answers one question, and the rest is one tap inside', async ({ page }) => {
     await page.route(RPC, (route) =>
       route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(ROWS) }),
     );
     await page.goto('/places/');
     await expect(page.getByRole('heading', { name: 'J J Peters' })).toBeVisible();
 
-    await expect(page.getByText(/open now/i)).toHaveCount(0);
-    // No phone means the first action sends the member to the Google listing
-    // for hours; a phone means it dials.
-    await expect(page.getByRole('link', { name: 'Hours' }).first()).toHaveAttribute(
+    // The sentence that says what the place is, which is what a name alone
+    // never does — "J J Peters" could be a lawyer.
+    await expect(page.getByText(/free programs for the neighbourhood/)).toBeVisible();
+
+    // Save is the only control on the card. Call, Go and the corner menu moved
+    // to the place's own screen, where they have room to be labelled.
+    await expect(page.getByRole('link', { name: 'Call' })).toHaveCount(0);
+    await expect(page.getByRole('link', { name: 'Go' })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'More about this place' })).toHaveCount(0);
+
+    // The whole card is one link, and it goes to the place.
+    await expect(page.getByRole('link', { name: 'J J Peters' })).toHaveAttribute(
       'href',
-      /google\.com\/maps\/search/,
+      `/place/?id=${ROWS[0]!.id}`,
     );
-    await expect(page.getByRole('link', { name: 'Call' }).first()).toHaveAttribute(
-      'href',
-      'tel:+12155550142',
+  });
+
+  test('says open or shut, and never guesses when it does not know', async ({ page }) => {
+    await page.route(RPC, (route) =>
+      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(ROWS) }),
     );
+    await page.goto('/places/');
+    await expect(page.getByRole('heading', { name: 'J J Peters' })).toBeVisible();
+
+    // Placeholder hours stand in until `enrich-places` runs, so a card says one
+    // or the other — but never both, and never "Open now" on a place PAM has
+    // no hours for at all. What it must not do is say nothing at all and leave
+    // a member to find a locked door.
+    await expect(page.getByText(/^(Open until|Closed)/).first()).toBeVisible();
   });
 
   test('a failed query is explained, not left blank', async ({ page }) => {
@@ -126,18 +154,6 @@ test.describe('the places screen', () => {
 
     await page.getByRole('button', { name: 'All', exact: true }).click();
     await expect(page.getByRole('heading', { name: 'J J Peters' })).toBeVisible();
-  });
-
-  test('walking directions go to the point, not the address', async ({ page }) => {
-    await page.route(RPC, (route) =>
-      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(ROWS) }),
-    );
-    await page.goto('/places/');
-
-    // First row carries coordinates; second has none and falls back.
-    const links = page.getByRole('link', { name: 'Go' });
-    await expect(links.first()).toHaveAttribute('href', /destination=39\.94738%2C-75\.175/);
-    await expect(links.nth(1)).toHaveAttribute('href', /destination=112%20N%20Broad/);
   });
 
   test('has no WCAG A/AA violations with real rows on it', async ({ page }) => {
