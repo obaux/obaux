@@ -57,6 +57,7 @@ export {
   BookmarkIcon,
   EditIcon,
   FlagIcon,
+  GlobeIcon,
   ShareIcon,
   StarIcon,
   HomeIcon,

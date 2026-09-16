@@ -94,7 +94,11 @@ test.describe('the way out', () => {
 
     await expect(page).toHaveURL(/\/signin\/\?out=1/);
     await expect(page.getByText(/You are signed out/)).toBeVisible();
-    await expect(page.getByLabel('Your phone number')).toBeVisible();
+    // Scoped to the textbox role: the banner's own dismiss button carries an
+    // accessible name built from the banner's text ("Dismiss You are signed
+    // out... with your phone number..."), which also matches a plain
+    // `getByLabel('Your phone number')` by substring.
+    await expect(page.getByRole('textbox', { name: 'Your phone number' })).toBeVisible();
   });
 
   test('the sign-in screen sends a signed-in person home, not back to the phone field', async ({

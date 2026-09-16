@@ -1,5 +1,34 @@
 # Changelog
 
+## [0.16.0] — 2026-09-16 · One place for a message, one place for a language
+
+### Added — a banner for things that already happened
+
+Signing out used to leave a plain sentence sitting in the sign-in screen's own
+column. It is now a dismissible banner over the top of the page — the first
+thing to use PAM's new shared spot for saying something happened, manually
+dismissed for now.
+
+### Added — English and Spanish, switchable everywhere
+
+A language icon on the sign-in screen, beside the mark, opens a panel to
+choose English or Español — the mark stays centred either way. Onboarding
+now asks directly, defaulting to whatever was already chosen. Signed in,
+the choice is saved to the account and follows a person to their next
+sign-in, on this device or another; it can also be changed from account
+settings. Previously PAM shipped both language bundles but had no way to
+actually switch between them at runtime.
+
+### Changed — account settings: Sign Out is the last thing on the screen
+
+Help now sits among the other settings, above Sign Out rather than below it.
+
+### Changed — the sign-in slideshow's first line, and its width
+
+New first line: "See what your city has to offer — Learning, Earning, and
+Family Support." All three slides now wrap to better-balanced lines instead
+of a long first line and a short, one-word second line.
+
 ## [0.15.0] — 2026-09-16 · What the app can do
 
 ### Added — example people, and a profile for each

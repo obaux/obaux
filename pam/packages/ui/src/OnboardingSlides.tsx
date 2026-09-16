@@ -115,6 +115,23 @@ const styles = stylex.create({
     minHeight: '52px',
     // 24px of air under the words, before the dots and the card below them.
     paddingBlockEnd: spacingVars['--spacing-6'],
+    /*
+     * Narrower than the slide it sits in, and centred (Will, 16 September:
+     * "reduce it, so we have more balance, bring in more into 2nd line to
+     * avoid any widows"). At the full slide width a short sentence wraps to a
+     * long first line and a one- or two-word second line — the classic
+     * widow. Matching the artwork's own 280px cap wraps every current slide
+     * to two lines of comparable length instead. `textWrap: balance` is the
+     * actual fix where a browser supports it — it asks the layout engine to
+     * even the lines out for whatever text ends up here, rather than this
+     * component guessing a width against three sentences that will not stay
+     * these three sentences — and degrades to ordinary wrapping, against the
+     * same 280px cap, where it is not supported (§12's low-end Android 9
+     * target predates it).
+     */
+    maxWidth: '280px',
+    marginInline: 'auto',
+    textWrap: 'balance',
   },
   dot: {
     width: '8px',

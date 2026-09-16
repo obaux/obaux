@@ -23,7 +23,7 @@ import {
   TextField,
   TextLink,
 } from '@pam/ui';
-import { TRANSPARENCY_SCREEN, badgeForPoints } from '@pam/config';
+import { TRANSPARENCY_SCREEN, badgeForPoints, type Locale } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { usePhoneSignIn } from '@/lib/usePhoneSignIn';
@@ -127,7 +127,7 @@ const KINDS: readonly { readonly kind: JoinKind; readonly key: string }[] = [
 ];
 
 export default function JoinPage() {
-  const { t, locale } = useI18n();
+  const { t, locale, setLocale } = useI18n();
   const router = useRouter();
   const supportPhone = useSupportPhone();
   const { state: session } = useSession();
@@ -418,6 +418,26 @@ export default function JoinPage() {
                 {t(`join.details.need.${invalid}`)}
               </Text>
             ) : null}
+
+            {/*
+              Defaults to whatever is already active — a language switched on
+              the way in, before this screen, or English otherwise — and
+              switching it here changes the whole screen's own copy live, not
+              just what gets submitted (Will, 16 September: "ask them to
+              select their default language... what is set in the form
+              becomes their default language"). `submitDetails`/`redeemInvite`
+              already send this locale as `language` — that part was here
+              before this control was; only the way to change it is new.
+            */}
+            <RadioList
+              label={t('onboarding.language.title')}
+              value={locale}
+              onChange={(next) => setLocale(next as Locale)}
+              xstyle={styles.choices}
+            >
+              <RadioListItem value="en" label={t('language.en')} />
+              <RadioListItem value="es" label={t('language.es')} />
+            </RadioList>
 
             {/*
               The code, if there is one. It sits above the three sentences

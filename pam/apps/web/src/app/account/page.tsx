@@ -25,6 +25,7 @@ import { useI18n } from '@/lib/i18n';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession, signOut } from '@/lib/useSession';
 import { useDemoRole } from '@/lib/useViewedRole';
+import { LanguageSwitcher } from '../LanguageSwitcher';
 
 /**
  * Your account — and the way out.
@@ -196,8 +197,17 @@ export default function AccountPage() {
           </Heading>
           <TextLink label={t('reminders.settings')} href="/reminders/" />
           <TextLink label={t('legal.privacy')} href="/privacy/" />
+          <LanguageSwitcher variant="row" />
         </VStack>
       ) : null}
+
+      {/*
+        Help sits among the other settings, and Sign Out is the last thing on
+        the screen (Will, 16 September) — it used to be the other way round,
+        which put the way out of the account above the way to get help with
+        it.
+      */}
+      <HelpBar label={t('nav.help')} variant="block" />
 
       <VStack gap={2}>
         <BigButton
@@ -210,8 +220,6 @@ export default function AccountPage() {
           {t('account.signout.body')}
         </Text>
       </VStack>
-
-      <HelpBar label={t('nav.help')} variant="block" />
     </Page>
   );
 }

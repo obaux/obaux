@@ -1,7 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { Role } from '@pam/config';
+import { DEFAULT_LOCALE, isSupportedLocale, type Locale, type Role } from '@pam/config';
 
 /**
  * Who is signed in, and what they are allowed to be shown.
@@ -36,6 +36,8 @@ export interface Session {
   regionName: string | null;
   /** Finished the sign-up steps. False sends somebody back into the flow. */
   isOnboarded: boolean;
+  /** `profiles.preferred_language` — see `LocaleSync`. */
+  locale: Locale;
 }
 
 export type SessionState =
@@ -76,7 +78,9 @@ export function useSession(): { state: SessionState; refresh: () => void } {
 
         const { data: profile, error } = await supabase
           .from('profiles')
-          .select('id, role, first_name, region_id, access_status, onboarded_at, regions(name)')
+          .select(
+            'id, role, first_name, region_id, access_status, onboarded_at, preferred_language, regions(name)',
+          )
           .eq('id', auth.user.id)
           .maybeSingle();
 
@@ -104,6 +108,9 @@ export function useSession(): { state: SessionState; refresh: () => void } {
             regionId: (profile.region_id as string | null) ?? null,
             regionName: Array.isArray(region) ? (region[0]?.name ?? null) : (region?.name ?? null),
             isOnboarded: profile.onboarded_at !== null && profile.onboarded_at !== undefined,
+            locale: isSupportedLocale(profile.preferred_language as string)
+              ? (profile.preferred_language as Locale)
+              : DEFAULT_LOCALE,
           },
         });
       } catch {
