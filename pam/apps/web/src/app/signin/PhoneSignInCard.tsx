@@ -42,7 +42,13 @@ const styles = stylex.create({
   title: { fontSize: '28px', lineHeight: 1.2 },
   stepTitle: { fontSize: '20px', lineHeight: 1.3 },
   hint: { fontSize: '17px', lineHeight: 1.5 },
-  consent: { fontSize: '15px', lineHeight: 1.5 },
+  // Every word here is the sentence carriers reviewed and filed against this
+  // exact screen (D-085, D-086, docs/sms-campaign-samples.md) — shortening it
+  // needs a new carrier submission, not a design pass. Tightened to read as
+  // less visual weight under the button instead (Will, 16 September), the
+  // way the Figma redesign's shorter-looking line does, without dropping the
+  // STOP/rates language that line is missing.
+  consent: { fontSize: '14px', lineHeight: 1.35 },
   card: { width: '100%' },
   // The field's own label reads left-to-right even on a centred page: a label
   // sitting over the left edge of the box it names is easier to tie to it, and
@@ -68,7 +74,11 @@ export function PhoneSignInCard({
   const titleStyle = headingLevel === 1 ? styles.title : styles.stepTitle;
 
   return (
-    <Card padding={4} xstyle={styles.card}>
+    // More breathing room around the card's own content (Will, 16 September,
+    // matching the Figma redesign's roomier card) — one spacing step up from
+    // the rest of the app's cards, since this is the one screen where the
+    // card is the entire job rather than one of several things on the page.
+    <Card padding={5} xstyle={styles.card}>
       {onCodeStep ? (
         <VStack gap={3}>
           <Heading level={headingLevel} xstyle={titleStyle}>

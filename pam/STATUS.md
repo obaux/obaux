@@ -16,8 +16,11 @@ always to Places. The header is now content-consistent across every signed-in
 screen — the same compact role-preview icon, the same merged area/edit
 control, the same bell — though it still reloads on navigation (D-134); Home's
 people preview for Case manager/Program/Super admin previews is now a
-scrollable stories-style strip rather than a stacked list. Newest session log:
-`docs/sessions/2026-09-16-a-consistent-top-bar.md`.
+scrollable stories-style strip rather than a stacked list. Sign-in is now a
+full-bleed photo hero — real commissioned illustrations, sourced via Google
+Drive after Figma's own asset URLs proved unreachable from this sandbox
+(D-135) — with the card riding up over its bottom edge. Newest session log:
+`docs/sessions/2026-09-16-a-real-sign-in-hero.md`.
 
 This is the handover document: what exists, what is proven, what is live, and
 what the next person needs to know before touching anything.

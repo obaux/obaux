@@ -57,6 +57,7 @@ const styles = stylex.create({
   note: { fontSize: '15px' },
   row: { width: '100%' },
   card: { width: '100%' },
+  heroMark: { height: '32px', width: 'auto', display: 'block' },
 });
 
 const DETAIL_LABELS = {
@@ -165,24 +166,25 @@ export default function GalleryPage() {
 
       <Section
         title="What PAM is"
-        note="Three slides, one idea each, above the sign-in card. Swipe them."
+        note="A full-bleed hero the sign-in card rides up over, redesigned 16 September from a Figma reference — the mark (white, larger), a region pill and the locale switcher sit over the art via the header slot, on the exact gradient stops Will specified (40.88%/66.12%) so white text and the mark stay legible over whatever photo is underneath."
       >
         <OnboardingSlides
           label="How PAM works"
+          header={<img src="/pam-wordmark-white.svg" alt="PAM" {...stylex.props(styles.heroMark)} />}
           slides={[
             {
               id: 'places',
-              image: '/onboarding/places.svg',
+              image: '/onboarding/hero-city.webp',
               text: 'Find places near you that can help — food, work, school, a doctor.',
             },
             {
               id: 'people',
-              image: '/onboarding/people.svg',
+              image: '/onboarding/hero-phone.webp',
               text: 'A real person can point you to the right one and answer questions.',
             },
             {
               id: 'plan',
-              image: '/onboarding/plan.svg',
+              image: '/onboarding/hero-sneakers.webp',
               text: 'PAM reminds you before you go, so nothing gets missed.',
             },
           ]}
