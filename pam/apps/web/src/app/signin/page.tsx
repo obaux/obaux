@@ -68,7 +68,7 @@ const styles = stylex.create({
     width: '100%',
     maxWidth: '440px',
     marginInline: 'auto',
-    marginBlockStart: '-40px',
+    marginBlockStart: '-32px',
     position: 'relative',
     zIndex: 1,
   },

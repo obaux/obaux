@@ -5,7 +5,6 @@ import * as stylex from '@stylexjs/stylex';
 import { Carousel } from '@astryxdesign/core/Carousel';
 import { HStack } from '@astryxdesign/core/HStack';
 import { Text } from '@astryxdesign/core/Text';
-import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 
 /**
  * What PAM is, before somebody has any reason to care.
@@ -20,16 +19,19 @@ import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
  * about to type their phone number into — and the answer has to land in the
  * seconds before they decide it is not worth it.
  *
- * **The artwork is a placeholder wash, not the commissioned photography the
- * Figma file shows.** Pulling those illustrations in was the ask, and this
- * session could not: the sandbox's network policy refuses every request to
- * figma.com, including the Figma MCP server's own asset URLs, so there was no
- * way to fetch the actual bytes. What ships instead is a per-slide gradient
- * (the same category tones Places already uses for its pins) under the
- * existing placeholder icon, doing only the one job real art was doing here —
- * dark enough at the bottom third that white text and a white mark stay
- * legible. Swap in the real files by replacing the three URLs `HERO_ART`
- * points at; nothing else about this component needs to change.
+ * **`slide.image` still points at the placeholder icon set, not the
+ * commissioned photography the Figma file shows.** Pulling those
+ * illustrations in was the ask, and this session could not: the sandbox's
+ * network policy refuses every request to figma.com, including the Figma
+ * MCP server's own asset URLs, so there was no way to fetch the actual
+ * bytes. Once real photography exists, `slide.image` is a straight URL
+ * swap — the background treatment below is already built for it.
+ *
+ * The gradient is the exact stop set Will asked for (16 September): fully
+ * transparent through 40.88%, opaque to 50% black by 66.12%, so white text
+ * and a white mark stay legible over the bottom third of whatever photo
+ * lands there. `lightgray` is the CSS spec's own fallback fill while an
+ * image is loading or missing, not a design choice.
  *
  * `header` is a slot rather than a prop for the mark/badge/switcher
  * themselves, the same reasoning `AppHeader`'s own `trailing` slot uses: this
@@ -73,21 +75,6 @@ export interface OnboardingSlidesProps {
 }
 
 const styles = stylex.create({
-  /**
-   * One tone per slide, echoing the category-pin palette Places already
-   * draws from (pins use Astryx palette blue/green/purple for hue
-   * separation) — see the file comment on why this is a gradient instead of
-   * the real illustration.
-   */
-  heroTone0: {
-    backgroundImage: `linear-gradient(135deg, ${colorVars['--color-border-teal']}, ${colorVars['--color-border-green']})`,
-  },
-  heroTone1: {
-    backgroundImage: `linear-gradient(135deg, ${colorVars['--color-border-orange']}, ${colorVars['--color-border-pink']})`,
-  },
-  heroTone2: {
-    backgroundImage: `linear-gradient(135deg, ${colorVars['--color-border-blue']}, ${colorVars['--color-border-purple']})`,
-  },
   // Full-bleed: the hero runs past the page's own side gutter, the same
   // negative-margin technique `SavedStrip`/`PeopleStrip` use, so the photo
   // reaches both edges of the phone the way it does in the design.
@@ -107,35 +94,24 @@ const styles = stylex.create({
   slide: {
     width: '100cqw',
     flexShrink: 0,
-    // Tall enough to carry the header, the art, and the text without the
-    // card below it fighting for the same space on a short phone — bounded
-    // so it never eats more than about half the window either.
-    height: 'clamp(360px, 62vh, 620px)',
+    // Bounded well short of "about half the window": the consent sentence
+    // under the card's button is what carriers review before PAM may send
+    // anything (`consent.spec.ts` asserts it stays on screen with no
+    // scrolling, on the shortest supported viewport), and the card sits
+    // below this hero, not beside it — so the hero's own height is a
+    // budget the card's content has to fit under, not a proportion chosen
+    // for looks alone.
+    height: 'clamp(220px, 38vh, 420px)',
     position: 'relative',
     display: 'flex',
     flexDirection: 'column',
     justifyContent: 'flex-end',
     paddingInline: '24px',
-    paddingBlockEnd: '56px',
+    paddingBlockEnd: '40px',
   },
   art: {
     position: 'absolute',
     inset: 0,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    // The dark wash the real photography would carry (see the file comment):
-    // transparent through the upper two-thirds, dark enough by the bottom
-    // that the white text and the white mark above it stay legible.
-    backgroundImage:
-      'linear-gradient(180deg, transparent 45%, rgba(0,0,0,0.55) 78%, rgba(0,0,0,0.7) 100%)',
-  },
-  icon: {
-    width: 'min(58%, 220px)',
-    aspectRatio: '4 / 3',
-    objectFit: 'contain',
-    borderRadius: '20px',
-    boxShadow: '0 12px 32px rgba(0,0,0,0.25)',
   },
   header: {
     position: 'absolute',
@@ -171,7 +147,17 @@ const styles = stylex.create({
   here: { opacity: 1, width: '20px', borderRadius: '4px' },
 });
 
-const HERO_TONES = [styles.heroTone0, styles.heroTone1, styles.heroTone2];
+/**
+ * `background` is a shorthand StyleX cannot express statically once one of
+ * its layers is a per-slide URL — the same reason a dynamic `<img src>` is
+ * ordinary here and elsewhere in this codebase rather than a token. Kept as
+ * one string, verbatim, rather than split into layers: it is easier to tell
+ * this still matches what was asked for than to prove two or three separate
+ * declarations still compose to it.
+ */
+function heroBackground(image: string): string {
+  return `linear-gradient(180deg, rgba(0, 0, 0, 0.00) 40.88%, rgba(0, 0, 0, 0.50) 66.12%), url(${image}) lightgray 50% / cover no-repeat`;
+}
 
 export function OnboardingSlides({ slides, label, header }: OnboardingSlidesProps) {
   const region = useRef<HTMLElement>(null);
@@ -212,22 +198,23 @@ export function OnboardingSlides({ slides, label, header }: OnboardingSlidesProp
         reads as two different things to move between.
       */}
       <Carousel gap={0} hasSnap hasButtons={false} hasEdgeFade={false} xstyle={styles.track}>
-        {slides.map((slide, index) => {
-          const tone = HERO_TONES[index % HERO_TONES.length] ?? HERO_TONES[0];
-          return (
-            <div key={slide.id} data-slide={index} {...stylex.props(styles.slide, tone)}>
-              <div {...stylex.props(styles.art)}>
-                {/*
-                  `alt=""` and aria-hidden together: the artwork says nothing
-                  the line does not, and a screen reader announcing a filename
-                  or a second description of the same idea is noise.
-                */}
-                <img src={slide.image} alt="" aria-hidden="true" {...stylex.props(styles.icon)} />
-              </div>
-              <Text xstyle={styles.line}>{slide.text}</Text>
-            </div>
-          );
-        })}
+        {slides.map((slide, index) => (
+          <div key={slide.id} data-slide={index} {...stylex.props(styles.slide)}>
+            {/*
+              `aria-hidden` here, not `alt=""` on an `<img>`: the artwork is a
+              CSS background precisely so the dynamic per-slide URL never has
+              to be a StyleX token (see `heroBackground`'s own comment). It
+              says nothing the line below does not, so nothing is lost by
+              keeping it out of the accessibility tree entirely.
+            */}
+            <div
+              aria-hidden="true"
+              {...stylex.props(styles.art)}
+              style={{ background: heroBackground(slide.image) }}
+            />
+            <Text xstyle={styles.line}>{slide.text}</Text>
+          </div>
+        ))}
       </Carousel>
 
       {header ? <div {...stylex.props(styles.header)}>{header}</div> : null}
