@@ -2,8 +2,9 @@
 
 Last updated 2026-09-16. The member-facing product is real now: signing up
 and signing out, invite codes for all four kinds of account, saving, points,
-badges, reporting a place, and a screen for the person running PAM. Newest
-session log: `docs/sessions/2026-09-16-waiting-looks-like-waiting.md`.
+badges, reporting a place, and a screen for the person running PAM. Every place
+now says what it is and has a screen of its own. Newest session log:
+`docs/sessions/2026-09-16-what-each-place-is.md`.
 
 This is the handover document: what exists, what is proven, what is live, and
 what the next person needs to know before touching anything.
@@ -36,7 +37,7 @@ going — without help?*
 ## What is live
 
 **Supabase project `pam`** — `shobqzuhicoiymtumiaz`, us-east-1 (closest region to
-Philadelphia). Forty-nine migrations applied. The database is real and reachable;
+Philadelphia). Fifty-one migrations applied, through 0052. The database is real and reachable;
 the app is not deployed anywhere yet.
 
 **The text-message dispatcher is live and running** — the `dispatch-sms` function
@@ -161,7 +162,8 @@ oversight:
   them, but there is no screen and no notification. The screen promises a call
   within a day or two, so somebody has to be told to look.
 - **What does exist and works:** sign-up, sign-in, home, saved places, points
-  and badges, the places list, reporting a place, the notifications list, the
+  and badges, the places list, a screen per place at `/place/?id=…`, reporting
+  a place, the notifications list, the
   reminders question, the case manager screen, the people directory, and the
   privacy and terms pages.
 - **Home is a menu, and only a menu.** It lists where to go and what is waiting.
@@ -172,22 +174,32 @@ oversight:
 - **Notices exist but are not wired to real failures.** Every condition has
   plain-language copy and a component (D-035), and the demo renders three of
   them. Connecting them to actual query results is Phase 1.
-- **The §12 budget has 0.2 kB left.** Sign-up, the account screen and the
-  invite card each pulled a little more Astryx into the shared chunk. The next
-  component on a shared screen breaches it; splitting the Astryx imports is the
-  next infrastructure task, before any more UI.
+- **The §12 budget has 0.4 kB left** — 499.6 kB gz against a 500 kB ceiling,
+  plus a 36.5 kB animation chunk against its separate 40 kB one. The place
+  screen fitted only because the lazy imports stopped going through package
+  barrels: `import('@pam/ui')` pulls every component in the library, so a
+  "lazy" chunk contained the whole thing and webpack hoisted the shared parts
+  back into the first load (D-125). Packages now declare subpath exports, and
+  `@pam/config/hours` is deliberately absent from that package's barrel. The
+  next component on a shared screen still breaches the budget.
 - **No five-tab member shell.** `AppShell` + `TabList` is the first UI task of
   Phase 1. The layout is settled and the pieces are ready: Help is now a compact
   item sized to share the bottom bar rather than a full-width row (D-039), and
   the five navigation icons exist. Only the dock itself is unbuilt.
-- **Partial import.** DBHIDS is in: **525 provider locations** live in
-  `services`, every one awaiting the plain-language review before a member sees
-  it (D-031). City Facilities (3,197 features) is verified and active but not yet
-  fetched. Endpoints were confirmed through `pg_net` from the database, since the
+- **Partial import, now described.** **754 active places** live in `services`
+  — DBHIDS providers plus the city's recreation and facility feeds and twelve
+  hand-added places. As of 0050 every one carries a `description_plain` of at
+  most 200 characters, 230 carry a website, and 361 are marked with who may
+  walk in. None is hidden for review. City Facilities (3,197 features) is
+  verified and active but not yet fetched. Endpoints were confirmed through `pg_net` from the database, since the
   build sandbox blocks all external egress (D-030).
-- **No Google Places key**, so no phone numbers and no structured hours. The 525
-  imported records have neither, and PlaceCard sends members to the Google
-  listing instead (D-032). A key would let PAM show "Open now" natively.
+- **Opening hours are a stand-in, and the screen says so.** The Google Maps key
+  is in Supabase Edge Function secrets, but `enrich-places` is not written —
+  deferred by Will until nearer kick-off. Until then `USE_PLACEHOLDER_HOURS` in
+  `@pam/config/hours` makes cards show open or closed from a deterministic
+  stand-in, and the place screen prints "These are sample hours while PAM checks
+  the real ones. Call before you go." Flipping that one boolean is the whole
+  swap (D-122). Real phone numbers are still thin: 12 of 754.
 - **The SMS copy is signed off** (13 September, Will) and the dispatcher is
   deployed with it. The only thing still stopping a real text is the Twilio
   credentials in the function's secrets — and, beyond that, the carrier
@@ -252,15 +264,15 @@ while the copy is unsigned, so it earned the first live test, not the last.*
 | 1 | ~~Create the first admin~~ **Done** | — | Will, Philadelphia, created 12 Sept and verified by generating a live invite code. Sign-in still needs an SMS provider configured in Supabase — see row 9. |
 | 2 | **Review the SMS copy** and record a name in `reviewedBy` | Phase 2 | Nothing can text a member until someone signs off against §9. **A review sheet is prepared and waiting**: all twelve messages rendered as lock-screen notifications in both languages, with the two open questions — https://claude.ai/code/artifact/f1dfb8d4-f64d-47c4-97d3-6a67f4c0eb09 |
 | 3 | **Get the PA 211 export URL** from the 211 contact | 211 data only | Licence cleared and the host reachable, but it serves a consumer search UI rather than a feed. Philadelphia's own datasets are verified and active. |
-| 4 | **A Google Places API key** | Hours and phone on imported places | `place_id` is null on all 525 imported providers, so the Hours action is a Google *search*, not a direct listing. A key would give phone numbers and structured hours — and until PAM has hours it will not show an open/closed state at all (D-044). |
+| 4 | ~~A Google Places API key~~ **Done — but `enrich-places` is not written** | Real hours and phone numbers | Will added the key to Supabase Edge Function secrets on 16 September, and deferred building `enrich-places` until nearer kick-off. Until it runs, `place_id` is null on every imported row, hours are the stand-in described above, and only 12 of 754 places have a phone. |
 | 5 | ~~Brand colours and logo~~ **Logo done** | Phase 6 | Category pins use Astryx palette defaults chosen for hue separation at AAA contrast. |
 | 6 | Whether points redeem for real rewards | Phase 3 | Built behind a flag, shipped off. |
 | 7 | Retention: missed-appointment history beyond 90 days | Phase 5 | No purge job. Keeping this data indefinitely is the wrong default for this population. |
 | 8 | Pilot partner orgs and usability test scheduling | Phase 7 | Five members, three providers, two admins. |
 | 9 | ~~Point Supabase at Twilio~~ **Done** | — | Verified on 14 September from the auth logs: a real code, a real `user_signedup` with `provider: phone`, and a member profile a minute later. This row read "the single thing blocking the product" until 16 September, when the logs said otherwise. |
 | 10a | **Who calls the people who ask to help?** | Program leads and case managers getting accounts | Sign-up collects them as requests in `staff_requests`, and the screen says somebody will call within a day or two. Nobody works that list yet, and nothing tells them there is one. The code they need can now be made from the people screen. |
-| 9b | **754 places, and not one of them says what it is** | Every member, on the screen the product is named for | Counted on the live database, 16 September: of 754 active places, **0 have a description, 0 have "how to enroll", 6 have hours, 12 have a phone**. A member gets a name, a category and a pin. §5.2's plain-language fields were always meant to be filled by the importer's rewrite step, which was never built — and D-031's "awaiting review before a member sees it" is not what the data says: `needs_review` is false on all 754, so they are all visible. This is the gap between PAM and a list of addresses. |
-| 10c | **Take Twilio out of trial**, or verify each tester's number by hand | Anybody whose number is not verified | In trial, a code to an unverified number is not sent and nothing says so. The live logs on the 14th show one phone asking three times. |
+| 9b | ~~754 places, and not one of them says what it is~~ **Done** | — | 0050, 16 September: all 754 carry a description of at most 200 characters, written from the city's own `service_type` / `park_name` / `asset_name` fields or, for the twelve hand-added places, from published sources. 230 have a website and 361 are marked `audience`. Verified live: 754 active, 754 described, 0 hidden for review, longest 152 characters. This reversed the screen half of 0017 and needed Will's word — see A11 and D-121. The words are sourced, not invented, but **no provider has read their own entry yet.** |
+| 10c | **Confirm the Twilio account's state** | Anybody whose number is not verified | This row said the account was in trial. Will, 16 September: the Twilio console says it is active. That earlier claim came from a 13–14 September finding and was repeated afterwards without re-checking; this session did not verify it either way, so it stands as Will's word and unverified here. If it is active the trial concern is gone; if not, a code to an unverified number is not sent and nothing says so — the live logs on the 14th show one phone asking three times. Carrier registration is a separate question (row 10). |
 | 10b | **A line about the PAM team on the transparency screen** | A promise already made | Members were told they would hear first if what is visible changes, and the directory now shows a super admin every account (name, role, region, status, last active; never messages or contact details). Proposed, for `packages/config/transparency.ts`: *"The PAM team can see your name, your city and the last day you used PAM. Never your messages."* It is a change to the contract, so it wants Will's word. |
 | 10 | **Twilio credentials into the dispatcher's secrets** | Reminders and notices | `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, and either `TWILIO_MESSAGING_SERVICE_SID` or `TWILIO_FROM_NUMBER`, under Edge Functions → dispatch-sms. Until then the dispatcher records "Twilio is not configured" instead of sending. |
 

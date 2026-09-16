@@ -38,70 +38,65 @@ function mockReducedMotion(reduced: boolean): void {
   );
 }
 
-describe('PlaceCard actions (§5.1)', () => {
-  it('offers exactly three actions, in the fixed order Call / Go / Save', () => {
+describe('PlaceCard — the four facts that decide whether to go', () => {
+  const card = (extra: Record<string, unknown> = {}) =>
     render(
       <PlaceCard
         name="Riverside Learning Center"
-        category="education"
-        categoryLabel="School and training"
-        phone="+15555550100"
-        address="123 Main St"
+        href="/place/?id=abc"
+        description="GED classes and help with reading. Free."
+        distanceLabel="0.4 miles"
         labels={labels}
+        {...extra}
       />,
     );
-    const names = screen.getAllByRole('link').concat(screen.getAllByRole('button'))
-      .map((el) => el.textContent?.trim());
-    expect(names).toEqual(['Call', 'Go', 'Save']);
+
+  it('carries the name, the distance and one sentence — and nothing else to decide', () => {
+    card({ status: { isOpen: true, label: 'Open until 5:00pm' } });
+
+    expect(screen.getByRole('heading', { name: /Riverside/ })).toBeInTheDocument();
+    expect(screen.getByText('0.4 miles')).toBeInTheDocument();
+    expect(screen.getByText('Open until 5:00pm')).toBeInTheDocument();
+    expect(screen.getByText(/GED classes/)).toBeInTheDocument();
   });
 
-  it('makes Call a real tel: link so it works without JavaScript', () => {
-    render(
-      <PlaceCard
-        name="X" category="education" categoryLabel="School"
-        phone="+15555550100" address="123 Main St" labels={labels}
-      />,
-    );
-    expect(screen.getByRole('link', { name: 'Call' })).toHaveAttribute('href', 'tel:+15555550100');
+  it('is one link, over the whole card, named for the place', () => {
+    // A "More" link in the corner is a 48px target on a 300px card, and the
+    // member most likely to miss it is the one this app is for.
+    card();
+    const links = screen.getAllByRole('link');
+    expect(links).toHaveLength(1);
+    expect(links[0]).toHaveAccessibleName(/Riverside Learning Center/);
+    expect(links[0]).toHaveAttribute('href', '/place/?id=abc');
   });
 
-  it('defaults directions to walking, not driving', () => {
-    render(
-      <PlaceCard
-        name="X" category="education" categoryLabel="School"
-        phone="+15555550100" address="123 Main St" labels={labels}
-      />,
-    );
-    const go = screen.getByRole('link', { name: 'Go' });
-    expect(go.getAttribute('href')).toContain('travelmode=walking');
-    expect(go.getAttribute('href')).toContain(encodeURIComponent('123 Main St'));
-  });
-
-  it('disables Call when there is no phone number rather than linking nowhere', () => {
-    render(
-      <PlaceCard name="X" category="education" categoryLabel="School" labels={labels} />,
-    );
-    // Rendered as a disabled control, never as a tel: link with no number.
+  it('offers Save and nothing else — the rest moved inside', () => {
+    card({ onSave: () => {} });
+    const buttons = screen.getAllByRole('button');
+    expect(buttons.map((b) => b.getAttribute('aria-label') ?? b.textContent?.trim())).toEqual([
+      'Save',
+    ]);
+    expect(screen.queryByRole('link', { name: 'Go' })).not.toBeInTheDocument();
     expect(screen.queryByRole('link', { name: 'Call' })).not.toBeInTheDocument();
   });
 
-  it('reports saved state to assistive tech', () => {
-    render(
-      <PlaceCard name="X" category="education" categoryLabel="School" isSaved labels={labels} />,
-    );
-    expect(screen.getByRole('button', { name: 'Saved' })).toHaveAttribute('aria-pressed', 'true');
+  it('reports saved state to assistive tech, with the word it dropped', () => {
+    card({ onSave: () => {}, isSaved: true });
+    const saved = screen.getByRole('button', { name: 'Saved' });
+    expect(saved).toHaveAttribute('aria-pressed', 'true');
   });
 
-  it('colours the category chip from the shared config token', () => {
-    const { rerender } = render(
-      <PlaceCard name="X" category="education" categoryLabel="School" labels={labels} />,
-    );
-    const badge = screen.getByText('School');
-    expect(badge.closest('[data-variant]')?.getAttribute('data-variant')).toBe('blue');
+  it('shows who a place is for as a badge, not as prose', () => {
+    // "Mark if inside a school. Make it visible to users." (Will, 16 September)
+    card({ audienceLabel: 'In a school' });
+    expect(screen.getByText('In a school')).toBeInTheDocument();
+  });
 
-    rerender(<PlaceCard name="X" category="workforce" categoryLabel="Work" labels={labels} />);
-    expect(screen.getByText('Work').closest('[data-variant]')?.getAttribute('data-variant'))
-      .toBe('green');
+  it('says nothing about opening hours when PAM does not know them', () => {
+    // Not "Closed" — a place PAM knows nothing about is not a place that is
+    // shut, and sending somebody away is as costly as sending them across town.
+    card({ status: null });
+    expect(screen.queryByText(/Open|Closed/)).not.toBeInTheDocument();
   });
 });
 
@@ -188,44 +183,21 @@ describe('VoiceInput (§0 voice + tap paths)', () => {
   });
 });
 
-describe('Google listing fallback (city data has no hours or phone)', () => {
-  it('shows Hours instead of a dead Call button when there is no phone number', () => {
-    render(
-      <PlaceCard
-        name="Mental Health Partnerships" category="family_services"
-        categoryLabel="Home and family" address="1 Main St, PA 19104" labels={labels}
-      />,
-    );
-    // Still three actions, still in the same order a member has learned.
-    const names = screen.getAllByRole('link').concat(screen.getAllByRole('button'))
-      .map((el) => el.textContent?.trim());
-    expect(names).toEqual(['Hours', 'Go', 'Save']);
-
-    const hours = screen.getByRole('link', { name: 'Hours' });
-    expect(hours.getAttribute('href')).toContain('google.com/maps/search/');
-    expect(hours.getAttribute('href')).toContain(
-      encodeURIComponent('Mental Health Partnerships, 1 Main St, PA 19104'),
-    );
-  });
-
-  it('prefers Call when a phone number is known', () => {
-    render(
-      <PlaceCard
-        name="Comhar" category="family_services" categoryLabel="Home and family"
-        phone="+12155550100" address="1 Main St" labels={labels}
-      />,
-    );
-    expect(screen.getByRole('link', { name: 'Call' })).toHaveAttribute(
-      'href', 'tel:+12155550100',
-    );
-    expect(screen.queryByRole('link', { name: 'Hours' })).not.toBeInTheDocument();
-  });
-
+describe('the Google listing fallback (city data has no hours or phone)', () => {
+  // The buttons this used to assert on now live on the place's own screen; the
+  // link builders are still the thing worth pinning down, because a wrong one
+  // sends somebody to the wrong building.
   it('anchors the lookup to a place id when the importer has resolved one', () => {
     expect(googlePlaceHref('Comhar', '1 Main St', 'ChIJabc123')).toContain(
       'query_place_id=ChIJabc123',
     );
     expect(googlePlaceHref('Comhar', '1 Main St')).not.toContain('query_place_id');
+  });
+
+  it('searches by name and address when it has not', () => {
+    expect(googlePlaceHref('Mental Health Partnerships', '1 Main St, PA 19104')).toContain(
+      encodeURIComponent('Mental Health Partnerships, 1 Main St, PA 19104'),
+    );
   });
 });
 
@@ -250,42 +222,27 @@ describe('directions go to the point, not to a string', () => {
     expect(directionsHref(undefined, Number.NaN, -75.175)).toBeUndefined();
   });
 
-  it('the card itself uses the point', () => {
-    render(
-      <PlaceCard
-        name="Santore Library" category="education" categoryLabel="School and training"
-        address="3001 E Allegheny Ave" lat={39.9371} lon={-75.15526} labels={labels}
-      />,
-    );
-    expect(screen.getByRole('link', { name: 'Go' })).toHaveAttribute(
-      'href', expect.stringContaining('destination=39.9371%2C-75.15526'),
-    );
+  it('treats a NaN coordinate as no coordinate', () => {
+    // `typeof NaN === 'number'`, so a naive check builds
+    // "destination=NaN,-75.175" and sends somebody nowhere at all.
+    expect(directionsHref('1 Main St', Number.NaN, -75.175)).toContain('1%20Main%20St');
   });
 });
 
 describe('Google lookup uses the organisation name, not the tidied one', () => {
-  it('searches for the real spelling when one is given', () => {
-    render(
-      <PlaceCard
-        name="Apm" lookupName="APM" category="family_services"
-        categoryLabel="Home and family" address="1912 N 4th St" labels={labels}
-      />,
+  // Imported names are normalised for reading, which turns the acronym "APM"
+  // into "Apm" — a worse search term than what is on the sign. The caller
+  // passes the real spelling; the member still reads the tidy one.
+  it('searches for the spelling that is on the building', () => {
+    expect(googlePlaceHref('APM', '1912 N 4th St')).toContain(
+      encodeURIComponent('APM, 1912 N 4th St'),
     );
-    // The member reads "Apm"; Google is asked for "APM", which is on the sign.
-    expect(screen.getByRole('heading', { name: 'Apm' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Hours' }).getAttribute('href'))
-      .toContain(encodeURIComponent('APM, 1912 N 4th St'));
   });
 
   it('falls back to the displayed name when there is no other spelling', () => {
-    render(
-      <PlaceCard
-        name="Bethesda Project" category="family_services"
-        categoryLabel="Home and family" address="609 S 15th St" labels={labels}
-      />,
+    expect(googlePlaceHref('Bethesda Project', '609 S 15th St')).toContain(
+      encodeURIComponent('Bethesda Project, 609 S 15th St'),
     );
-    expect(screen.getByRole('link', { name: 'Hours' }).getAttribute('href'))
-      .toContain(encodeURIComponent('Bethesda Project, 609 S 15th St'));
   });
 });
 

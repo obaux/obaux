@@ -11,13 +11,13 @@ import {
   PlaceCard,
   ScrollReveal,
 } from '@pam/ui';
-import { categoryLabelKey, NOTICES } from '@pam/config';
+import { NOTICES } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { NotIn } from '../NotIn';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
 import { useSavedPlaces } from '@/lib/useSavedPlaces';
-import { sharePlace } from '@/lib/sharePlace';
+import { placeStatus, useNow } from '@/lib/usePlaceStatus';
 
 /**
  * Everything a member kept.
@@ -40,12 +40,13 @@ import { sharePlace } from '@/lib/sharePlace';
  */
 
 export default function SavedPage() {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const supportPhone = useSupportPhone();
   const { state: session } = useSession();
 
   const signedIn = session.status === 'signed-in';
   const { state, unsave, failed } = useSavedPlaces(signedIn);
+  const now = useNow();
 
   if (session.status === 'loading') {
     return (
@@ -146,28 +147,13 @@ export default function SavedPage() {
             <ScrollReveal key={place.id} index={index}>
               <PlaceCard
                 name={place.name}
-                lookupName={place.lookupName ?? undefined}
-                category={place.category}
-                categoryLabel={t(categoryLabelKey(place.category))}
-                phone={place.phone ?? undefined}
-                address={place.address ?? undefined}
-                lat={place.lat ?? undefined}
-                lon={place.lon ?? undefined}
-                placeId={place.placeId ?? undefined}
+                href={`/place/?id=${encodeURIComponent(place.id)}`}
+                description={place.description}
+                status={placeStatus(place.id, place.hours, now, t, locale)}
+                audienceLabel={place.audience ? t(`place.audience.${place.audience}`) : null}
                 isSaved
                 onSave={() => void unsave(place.id)}
-                onShare={() => void sharePlace(place.name, place.address)}
-                flagHref={`/flag/?place=${encodeURIComponent(place.id)}`}
-                labels={{
-                  call: t('action.call'),
-                  go: t('action.go'),
-                  save: t('action.save'),
-                  saved: t('places.saved'),
-                  hours: t('action.hours'),
-                  more: t('place.more'),
-                  share: t('place.share'),
-                  flag: t('place.flag'),
-                }}
+                labels={{ save: t('action.save'), saved: t('places.saved') }}
               />
             </ScrollReveal>
           ))}

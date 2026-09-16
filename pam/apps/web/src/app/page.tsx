@@ -20,7 +20,6 @@ import {
   PeopleIcon,
   PlacesIcon,
   Press,
-  RoleSwitch,
   StarIcon,
   TextLink,
 } from '@pam/ui';
@@ -34,6 +33,7 @@ import { useSavedPlaces } from '@/lib/useSavedPlaces';
 import { usePoints } from '@/lib/usePoints';
 import { useViewAs } from '@/lib/useViewAs';
 import { SavedStripLazy } from './SavedStripLazy';
+import { RoleSwitchLazy } from './RoleSwitchLazy';
 
 /**
  * Home.
@@ -182,7 +182,7 @@ export default function HomePage() {
         roleLabel={t(`role.${viewed}`)}
         roleControl={
           me.role === 'super_admin' ? (
-            <RoleSwitch
+            <RoleSwitchLazy
               value={viewed}
               ownValue={me.role}
               label={t('view.switch')}

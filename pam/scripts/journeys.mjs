@@ -83,6 +83,10 @@ const SCREENS = [
   // most by role — a member is offered places, a case manager their caseload.
   { name: '3-home', path: '/' },
   { name: '4-places', path: '/places/' },
+  // One place, on its own screen — where the way there, the hours and the
+  // quieter actions live now that the card carries only what decides whether
+  // to go.
+  { name: '4b-place', path: '/place/?id=s1' },
   { name: '5-caseload', path: '/admin/' },
   // The super admin's own screen. Every other role meets a closed door here,
   // which is itself worth photographing — a closed door is a screen too.
@@ -137,6 +141,11 @@ const SAVED_PLACES = [
     place_id: null,
     lat: 39.9526,
     lon: -75.1652,
+    description_plain:
+      'Free classes, a computer room and help getting a GED. Walk in and ask at the front desk.',
+    website: 'https://example.org/learning',
+    audience: null,
+    hours: null,
   },
   {
     id: 's2',
@@ -149,6 +158,11 @@ const SAVED_PLACES = [
     place_id: null,
     lat: 39.9515,
     lon: -75.1605,
+    description_plain:
+      'Job training, help with a resume and openings posted every week. Free for people who live in the city.',
+    website: null,
+    audience: null,
+    hours: null,
   },
   {
     id: 's3',
@@ -161,6 +175,11 @@ const SAVED_PLACES = [
     place_id: null,
     lat: 39.9612,
     lon: -75.1583,
+    description_plain:
+      'Groceries to take home, no appointment. Bring a bag if you have one.',
+    website: null,
+    audience: null,
+    hours: null,
   },
 ];
 
@@ -228,7 +247,12 @@ async function stub(page, profile) {
   await page.route('**/rest/v1/notification_preferences*', (r) => r.fulfill(json(null)));
   await page.route('**/rest/v1/access_controls*', (r) => r.fulfill(json([])));
   await page.route('**/rest/v1/rpc/member_points*', (r) => r.fulfill(json(400)));
-  await page.route('**/rest/v1/rpc/services_near*', (r) => r.fulfill(json([])));
+  // The places list and one place's own screen draw the same rows, because
+  // they are the same card and the same RPC shape.
+  await page.route('**/rest/v1/rpc/services_near*', (r) =>
+    r.fulfill(json(SAVED_PLACES.map((place, i) => ({ ...place, meters: 400 + i * 900 })))),
+  );
+  await page.route('**/rest/v1/rpc/service_detail*', (r) => r.fulfill(json([SAVED_PLACES[0]])));
   // The people directory. Stubbed rather than seeded, like every other query
   // here: this sheet is a picture of the screens, not of the database.
   await page.route('**/rest/v1/rpc/directory_people*', (r) =>

@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest';
 import axe from 'axe-core';
 import { BigButton } from '../src/BigButton.js';
 import { PlaceCard } from '../src/PlaceCard.js';
+import { PlaceDetail } from '../src/PlaceDetail.js';
 import { PersonCard } from '../src/PersonCard.js';
 import { StepHeader } from '../src/StepHeader.js';
 import { PointsBadge } from '../src/PointsBadge.js';
@@ -41,13 +42,18 @@ async function expectNoViolations(container: HTMLElement): Promise<void> {
   expect(results.violations).toHaveLength(0);
 }
 
-const placeLabels = {
-  call: 'Call',
-  go: 'Go',
-  save: 'Save',
+const placeLabels = { save: 'Save', saved: 'Saved' };
+
+const detailLabels = {
+  directions: 'How to get there',
+  call: 'Call this place',
+  website: 'Their website',
+  hours: 'Opening hours',
+  hoursOnGoogle: 'Check hours on Google',
+  about: 'What this place is',
+  address: 'Address',
+  save: 'Save this place',
   saved: 'Saved',
-  hours: 'Hours',
-  more: 'More about this place',
   share: 'Share this place',
   flag: 'Something is wrong here',
 };
@@ -91,14 +97,42 @@ describe('accessibility', () => {
         <h2>Nearby</h2>
         <PlaceCard
           name="Riverside Learning Center"
+          href="/place/?id=abc"
+          description="GED classes and help with reading. Free to join."
+          distanceLabel="1.2 miles"
+          status={{ isOpen: true, label: 'Open until 5:00pm' }}
+          audienceLabel="In a school"
+          onSave={() => {}}
+          labels={placeLabels}
+        />
+      </main>,
+    );
+    await expectNoViolations(container);
+  });
+
+  it('PlaceDetail', async () => {
+    const { container } = render(
+      <main>
+        <PlaceDetail
+          name="Riverside Learning Center"
           category="education"
           categoryLabel="School and training"
-          distanceLabel="1.2 miles"
-          isOpenNow
-          openNowLabel="Open now"
-          phone="+15555550100"
+          description="GED classes and help with reading."
           address="123 Main St"
-          labels={placeLabels}
+          distanceLabel="1.2 miles"
+          status={{ isOpen: true, label: 'Open until 5:00pm' }}
+          weekLines={[{ day: 'Monday', hours: '9:00am – 5:00pm' }]}
+          hoursArePlaceholder
+          placeholderNote="Sample hours. Call to check before you go."
+          audienceLabel="In a school"
+          phone="+15555550100"
+          website="https://example.org"
+          directionsHref="https://maps.example/x"
+          hoursHref="https://maps.example/y"
+          onSave={() => {}}
+          onShare={() => {}}
+          flagHref="/flag/?place=abc"
+          labels={detailLabels}
         />
       </main>,
     );

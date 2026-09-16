@@ -1,5 +1,42 @@
 # Changelog
 
+## [0.13.0] — 2026-09-16 · What each place is
+
+### Added — every place now says what it is
+
+All 754 places carry one short sentence about what they do and who can walk in,
+written from the city's own records or the place's published information. A
+place's website is listed where there is one.
+
+### Added — a screen for each place
+
+Tapping a place opens its own screen: what it is, how to get there as the one
+big button, the address, the week's opening hours, and then calling, the
+website, saving, sharing and "something is wrong here" as full-width rows you
+can read. It has its own link, so you can send a place to somebody.
+
+### Added — open or closed on the card
+
+Places show whether they are open. **These are sample opening hours for now.**
+The place's screen says so, in those words, until PAM has checked the real ones.
+
+### Added — places inside a school, or for young people only, are marked
+
+A badge on the card and at the top of the place's screen, above the phone
+number, so nobody works out the bus to a door that is not for them.
+
+### Changed — the place card is simpler
+
+Name, distance, open or closed, one sentence, and save. Call and Go and the
+corner menu moved inside, where they are labelled. The whole card is now the
+button.
+
+### Fixed — walking directions go to the place, not to an old address
+
+Directions were quietly using the written address instead of the place's actual
+location, which sends people to the wrong building when a listing is out of
+date.
+
 ## [0.12.1] — 2026-09-16 · Waiting looks like waiting
 
 ### Changed — no more "Finding places nearby..." on screens that find no places

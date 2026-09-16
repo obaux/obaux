@@ -107,11 +107,12 @@ test.describe('reporting a place', () => {
     await expect(page.getByRole('link', { name: 'Back to Places' })).toBeVisible();
   });
 
-  test('reaches this screen from the place card menu', async ({ page }) => {
-    // The menu in the card's corner is the only route in, so it is the route
-    // that has to work.
+  test('reaches this screen from the place\'s own screen', async ({ page }) => {
+    // Reporting a place used to sit behind a "⋯" in the corner of the card,
+    // which guaranteed nobody would find it. It is now a labelled row on the
+    // place's screen — so that screen is the route that has to work.
     await signedIn(page);
-    await page.route('**/rest/v1/rpc/services_near*', (route) =>
+    await page.route('**/rest/v1/rpc/service_detail*', (route) =>
       route.fulfill(
         json([
           {
@@ -125,24 +126,18 @@ test.describe('reporting a place', () => {
             place_id: null,
             lat: 39.95,
             lon: -75.16,
-            meters: 900,
-            has_hours: false,
+            description_plain: 'Free classes and a computer room. Walk in and ask at the desk.',
+            website: null,
+            audience: null,
+            hours: null,
           },
         ]),
       ),
     );
     await page.route('**/rest/v1/rpc/saved_places_mine*', (route) => route.fulfill(json([])));
 
-    await page.goto('/places/');
-    await page.getByRole('button', { name: 'More about this place' }).click();
-
-    // The menu is a popover with a mouse and a bottom sheet on a touch screen
-    // (Astryx's `adaptive` presentation), and the row is a menuitem in one and
-    // a button in the other. The member sees one thing; the test accepts both.
-    const flagItem = page
-      .getByRole('menuitem', { name: 'Something is wrong here' })
-      .or(page.getByRole('button', { name: 'Something is wrong here' }));
-    await flagItem.first().click();
+    await page.goto(`/place/?id=${PLACE}`);
+    await page.getByRole('link', { name: 'Something is wrong here' }).click();
 
     await expect(page).toHaveURL(new RegExp(`/flag/\\?place=${PLACE}$`));
   });

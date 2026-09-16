@@ -11,7 +11,8 @@
     "./sms-templates": "./src/sms-templates.ts",
     "./transparency": "./src/transparency.ts",
     "./points": "./src/points.ts",
-    "./locales/*": "./src/locales/*"
+    "./locales/*": "./src/locales/*",
+    "./hours": "./src/hours.ts"
   },
   "scripts": {
     "typecheck": "tsc -p tsconfig.json",

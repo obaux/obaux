@@ -26,7 +26,7 @@ import { useI18n } from '@/lib/i18n';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { usePlaces, METRES_PER_MILE } from '@/lib/usePlaces';
 import { useSavedPlaces } from '@/lib/useSavedPlaces';
-import { sharePlace } from '@/lib/sharePlace';
+import { placeStatus, useNow } from '@/lib/usePlaceStatus';
 import { useSession } from '@/lib/useSession';
 import { CITY_HALL, loadOrigin, saveOrigin, type AreaOption } from '@/lib/useAreaSearch';
 import { AreaSearch, AreaTrigger } from './AreaPicker';
@@ -92,6 +92,8 @@ export default function PlacesPage() {
    * gone (D-102).
    */
   const { state: session } = useSession();
+  // One clock for the whole list; `placeStatus` is pure from there.
+  const now = useNow();
   const { isSaved, save, unsave, failed: saveFailed } = useSavedPlaces(
     session.status === 'signed-in',
   );
@@ -196,17 +198,13 @@ export default function PlacesPage() {
                   <ScrollReveal key={place.id} index={index}>
                   <PlaceCard
                     name={place.name}
-                    lookupName={place.lookupName}
-                    category={place.category}
-                    categoryLabel={t(categoryLabelKey(place.category))}
+                    href={`/place/?id=${encodeURIComponent(place.id)}`}
+                    description={place.description}
                     {...(miles ? { distanceLabel: t(miles.key, miles.vars) } : {})}
-                    phone={place.phone}
-                    address={place.address}
-                    lat={place.lat}
-                    lon={place.lon}
-                    placeId={place.placeId}
-                    onShare={() => void sharePlace(place.name, place.address)}
-                    flagHref={`/flag/?place=${encodeURIComponent(place.id)}`}
+                    status={placeStatus(place.id, place.hours, now, t, locale)}
+                    audienceLabel={
+                      place.audience ? t(`place.audience.${place.audience}`) : null
+                    }
                     isSaved={saved}
                     onSave={() => {
                       if (saved) {
@@ -225,16 +223,7 @@ export default function PlacesPage() {
                         lon: place.lon ?? null,
                       });
                     }}
-                    labels={{
-                      call: t('action.call'),
-                      go: t('action.go'),
-                      save: t('action.save'),
-                      saved: t('places.saved'),
-                      hours: t('action.hours'),
-                      more: t('place.more'),
-                      share: t('place.share'),
-                      flag: t('place.flag'),
-                    }}
+                    labels={{ save: t('action.save'), saved: t('places.saved') }}
                   />
                   </ScrollReveal>
                 );

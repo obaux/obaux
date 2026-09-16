@@ -265,3 +265,35 @@ less, not none.
 
 Anyone replacing this with copy again should be able to name a sentence that is
 true on every screen in PAM, including the ones that do not exist yet.
+
+## A11 — PAM says what a place does, in its own words (16 September 2026, Will)
+
+0017 and §0 between them said PAM adds no words of its own to a provider's
+listing: a provider's name is theirs, shown as it is, and nothing PAM writes may
+imply what a member is there for. PAM now writes one sentence about every place
+in the catalogue, and shows it on the card and on the place's own screen.
+
+**Where this contradicts the original.** The neutrality rule was written to stop
+PAM labelling a person by labelling a place — "substance use treatment" beside
+somebody's name on a shared screen is a disclosure they did not make. The rule
+worked, and it left 754 places reaching members as a name and an address. "J J
+Peters" tells nobody anything. Protecting a provider's framing at the cost of a
+member's ability to choose is the wrong trade, and it was made by default rather
+than decided.
+
+Put to Will explicitly, with the 524 behavioural-health places named as the hard
+case. His answer was to say what each place does, everywhere.
+
+**What did not change.** The SMS half of 0017 stands exactly as written.
+`name_may_disclose` still governs what may appear in a text message, and a
+description may never be put in one. The distinction is consent in the ordinary
+sense: a screen is something a member opened, on their own phone, at a moment
+they chose. A text arrives on a lock screen somebody else may be holding, and
+the SOP's rule that no SMS may reveal justice involvement is untouched.
+
+**What the words may be.** Plainly what the place does and who may walk in, at
+most 200 characters — a check constraint, not a guideline. From the source data
+or a published source, never invented: `enrich-places` is not written yet and
+nothing here guesses. The `flag_unapproved_rewrite` trigger still flags any
+plain-language column a provider has edited, and 0050's approval step clears
+`needs_review` only for rows PAM itself wrote and no provider has touched.

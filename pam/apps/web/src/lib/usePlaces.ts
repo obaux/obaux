@@ -35,10 +35,19 @@ export interface NearbyPlace {
   lon: number | null;
   meters: number;
   /**
-   * Whether PAM holds opening hours for this place at all. False everywhere
-   * today, which is why no screen may show an open/closed state (D-044).
+   * Whether PAM holds opening hours for this place at all. True for six rows
+   * out of 754 today. `hoursFor()` in @pam/config decides what a screen may
+   * show when it is false (D-044, and the placeholder Will asked for on 16
+   * September).
    */
   hasHours: boolean;
+  /** The place's own hours as stored, or null. Parsed by `hoursFor()`. */
+  hours: unknown;
+  /** One sentence about what this place is (0050). */
+  description: string | null;
+  website: string | null;
+  /** 'students' or 'youth' when narrower than anybody; null otherwise. */
+  audience: string | null;
 }
 
 /**
@@ -72,6 +81,10 @@ interface ServicesNearRow {
   lon: number | null;
   meters: number;
   has_hours: boolean;
+  description_plain: string | null;
+  website: string | null;
+  audience: string | null;
+  hours: unknown;
 }
 
 export function usePlaces({ lat, lon, category, limit = 20 }: PlacesQuery): PlacesState {
@@ -119,6 +132,10 @@ export function usePlaces({ lat, lon, category, limit = 20 }: PlacesQuery): Plac
             lon: row.lon,
             meters: row.meters,
             hasHours: row.has_hours,
+            hours: row.hours ?? null,
+            description: row.description_plain,
+            website: row.website,
+            audience: row.audience,
           })),
         });
       } catch {

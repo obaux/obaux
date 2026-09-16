@@ -1341,3 +1341,28 @@ delete from public.services where id in (
   '55555555-0000-0000-0000-000000000001',
   '55555555-0000-0000-0000-000000000002');
 set role authenticated;
+
+\echo ''
+\echo '--- A place hands back the point it was sorted by (0051) ---'
+
+set role authenticated;
+select test.as_user(:'marcus');
+
+do $$
+declare r record;
+begin
+  -- Philadelphia City Hall, which the seed centres the region on.
+  select * into r from public.services_near(39.9526, -75.1652, null, 1);
+  if r.id is null then
+    raise exception 'FAIL  nothing near the middle of the pilot city';
+  end if;
+  if r.lat is null or r.lon is null then
+    raise exception 'FAIL  the nearest place came back without a point, so directions fall back to a string';
+  end if;
+  -- Not asserting a description here: the fixture's services are inserted by
+  -- the seed, which runs after the migration that writes them, so these rows
+  -- legitimately have none. That the column comes back at all is the part this
+  -- can prove, and 0050's own tests cover the words.
+  raise notice 'ok    the list carries the point it sorted by';
+end;
+$$;

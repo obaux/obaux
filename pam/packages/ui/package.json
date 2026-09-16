@@ -6,7 +6,10 @@
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./RoleSwitch": "./src/RoleSwitch.tsx",
+    "./SavedStrip": "./src/SavedStrip.tsx",
+    "./PlaceDetail": "./src/PlaceDetail.tsx"
   },
   "scripts": {
     "typecheck": "tsc -p tsconfig.json",
