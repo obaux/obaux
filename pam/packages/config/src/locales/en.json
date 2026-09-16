@@ -452,6 +452,7 @@
   "saved.remove": "Remove {name} from your saved places",
   "saved.seeAll": "See all",
   "saved.title": "Places you saved",
+  "signin.city": "Philadelphia",
   "signin.code.action": "Sign in",
   "signin.code.hint": "Sent to {phone}. It works for 10 minutes.",
   "signin.code.label": "The code we texted you",

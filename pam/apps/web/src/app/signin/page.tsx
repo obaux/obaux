@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import * as stylex from '@stylexjs/stylex';
 import { HStack } from '@astryxdesign/core/HStack';
+import { VStack } from '@astryxdesign/core/VStack';
 import { Text } from '@astryxdesign/core/Text';
 import { AppHeader, Notice, OnboardingSlides, Page, TextLink } from '@pam/ui';
 import { useI18n } from '@/lib/i18n';
@@ -40,6 +41,37 @@ import { PhoneSignInCard } from './PhoneSignInCard';
 
 const styles = stylex.create({
   quiet: { fontSize: '17px' },
+  // The hero and the card it overlaps are one visual unit, so they are one
+  // child of the page's own VStack — the page's usual gap sits above this
+  // block and below it, but nothing splits the block itself in two.
+  heroGroup: { width: '100%' },
+  heroHeader: { position: 'relative', width: '100%' },
+  heroBrand: { width: 'fit-content', marginInline: 'auto' },
+  // Larger and always white (Will, 16 September) — the themed mark
+  // `AppHeader` renders elsewhere picks dark or light ink to sit on the
+  // page's own background, which is the wrong call directly over art, in
+  // either theme.
+  heroMark: { height: '40px', width: 'auto', display: 'block' },
+  heroCity: {
+    fontSize: '14px',
+    fontWeight: 600,
+    color: '#262626',
+    backgroundColor: '#FFFFFF',
+    borderRadius: '999px',
+    paddingInline: '12px',
+    paddingBlock: '4px',
+  },
+  heroGlobe: { position: 'absolute', top: 0, right: 0 },
+  // Rides up over the hero's bottom edge rather than sitting flush under it —
+  // the floating-card treatment the Figma redesign shows.
+  overlapCard: {
+    width: '100%',
+    maxWidth: '440px',
+    marginInline: 'auto',
+    marginBlockStart: '-40px',
+    position: 'relative',
+    zIndex: 1,
+  },
 });
 
 export default function SignInPage() {
@@ -158,51 +190,87 @@ export default function SignInPage() {
   const onFirstStep =
     state.step !== 'code' && state.step !== 'verifying' && state.step !== 'done';
 
+  const failedNotice =
+    state.step === 'failed' ? (
+      <Notice
+        notice="something_went_wrong"
+        title={t(`signin.failed.${state.reason}.title`)}
+        body={
+          state.phone === null
+            ? t('signin.phone.invalid')
+            : t(`signin.failed.${state.reason}.body`)
+        }
+        supportPhone={supportPhone}
+        callLabel={t('help.callSupport')}
+      />
+    ) : null;
+
+  const card =
+    state.step === 'done' ? (
+      <Text xstyle={styles.quiet}>{t('signin.verifying')}</Text>
+    ) : (
+      <PhoneSignInCard
+        flow={flow}
+        phone={phone}
+        onPhoneChange={setPhone}
+        code={code}
+        onCodeChange={setCode}
+      />
+    );
+
+  const resendLink =
+    state.step === 'failed' && state.phone !== null ? (
+      <TextLink label={t('signin.phone.label')} onClick={startOver} />
+    ) : null;
+
+  /*
+   * The mark, the region, and the locale switcher, overlaid on the hero
+   * rather than in a header row above it (Will, 16 September, matching the
+   * Figma redesign). The mark and the "Philadelphia" pill are centred as one
+   * group; the switcher sits in its own top-right corner rather than beside
+   * them, so it stays reachable without disturbing that centring — the same
+   * split `AppHeader`'s own `align="center"` mode uses for its `trailing`
+   * slot.
+   */
+  const heroHeader = (
+    <div {...stylex.props(styles.heroHeader)}>
+      <VStack gap={1} align="center" xstyle={styles.heroBrand}>
+        <img src="/pam-wordmark-white.svg" alt="PAM" {...stylex.props(styles.heroMark)} />
+        <Text xstyle={styles.heroCity}>{t('signin.city')}</Text>
+      </VStack>
+      <div {...stylex.props(styles.heroGlobe)}>
+        <LanguageSwitcher tone="onPhoto" />
+      </div>
+    </div>
+  );
+
   return (
     <Page align="center" gap={3}>
-      {/*
-        The mark is identity here, not navigation: there is nowhere to go until
-        somebody is in, and the 48px tap target a link needs costs 22px of the
-        height the consent sentence is fighting for.
-      */}
-      <AppHeader align="center" isSticky homeHref={null} trailing={<LanguageSwitcher />} />
-
-      {/*
-        The slides belong to the first step only. Somebody waiting on a code has
-        already decided what PAM is; what they need is the field, and a pitch
-        above it is now in the way.
-      */}
-      {onFirstStep ? <OnboardingSlides slides={slides} label={t('onboarding.label')} /> : null}
-
-      {state.step === 'failed' ? (
-        <Notice
-          notice="something_went_wrong"
-          title={t(`signin.failed.${state.reason}.title`)}
-          body={
-            state.phone === null
-              ? t('signin.phone.invalid')
-              : t(`signin.failed.${state.reason}.body`)
-          }
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
-        />
-      ) : null}
-
-      {state.step === 'done' ? <Text xstyle={styles.quiet}>{t('signin.verifying')}</Text> : null}
-
-      {state.step === 'done' ? null : (
-        <PhoneSignInCard
-          flow={flow}
-          phone={phone}
-          onPhoneChange={setPhone}
-          code={code}
-          onCodeChange={setCode}
-        />
+      {onFirstStep ? (
+        // Somebody waiting on a code has already decided what PAM is: the
+        // hero belongs to the first step only, and the card rides up over
+        // its bottom edge instead of sitting in a header-then-card stack.
+        <VStack gap={0} align="center" xstyle={styles.heroGroup}>
+          <OnboardingSlides slides={slides} label={t('onboarding.label')} header={heroHeader} />
+          <VStack gap={3} align="center" xstyle={styles.overlapCard}>
+            {failedNotice}
+            {card}
+            {resendLink}
+          </VStack>
+        </VStack>
+      ) : (
+        <>
+          {/*
+            The mark is identity here, not navigation: there is nowhere to go
+            until somebody is in, and the 48px tap target a link needs costs
+            22px of the height the consent sentence is fighting for.
+          */}
+          <AppHeader align="center" isSticky homeHref={null} trailing={<LanguageSwitcher />} />
+          {failedNotice}
+          {card}
+          {resendLink}
+        </>
       )}
-
-      {state.step === 'failed' && state.phone !== null ? (
-        <TextLink label={t('signin.phone.label')} onClick={startOver} />
-      ) : null}
 
       {/*
         The two pages somebody is entitled to read before they hand over a

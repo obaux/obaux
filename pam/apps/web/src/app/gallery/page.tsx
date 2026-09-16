@@ -57,6 +57,7 @@ const styles = stylex.create({
   note: { fontSize: '15px' },
   row: { width: '100%' },
   card: { width: '100%' },
+  heroMark: { height: '32px', width: 'auto', display: 'block' },
 });
 
 const DETAIL_LABELS = {
@@ -165,10 +166,11 @@ export default function GalleryPage() {
 
       <Section
         title="What PAM is"
-        note="Three slides, one idea each, above the sign-in card. Swipe them."
+        note="A full-bleed hero the sign-in card rides up over, redesigned 16 September from a Figma reference — the mark (white, larger), a region pill and the locale switcher sit over the art via the header slot. The art itself is a placeholder gradient wash, not the commissioned photography Figma shows: this sandbox's network policy blocks every request to figma.com, including the asset URLs the Figma MCP server itself returned, so the real illustrations could not be fetched this session — see OnboardingSlides' own file comment."
       >
         <OnboardingSlides
           label="How PAM works"
+          header={<img src="/pam-wordmark-white.svg" alt="PAM" {...stylex.props(styles.heroMark)} />}
           slides={[
             {
               id: 'places',

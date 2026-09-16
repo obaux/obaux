@@ -452,6 +452,7 @@
   "saved.remove": "Quitar {name} de sus lugares guardados",
   "saved.seeAll": "Ver todos",
   "saved.title": "Lugares que guardó",
+  "signin.city": "Philadelphia",
   "signin.code.action": "Entrar",
   "signin.code.hint": "Enviado al {phone}. Sirve por 10 minutos.",
   "signin.code.label": "El codigo que le enviamos",

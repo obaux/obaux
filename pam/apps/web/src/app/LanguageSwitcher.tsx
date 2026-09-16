@@ -53,15 +53,31 @@ const styles = stylex.create({
     paddingBlock: '4px',
     marginInlineStart: '8px',
   },
+  /*
+   * A ghost icon button is transparent by design, which disappears on a
+   * photo the way it never does on a plain page. Over the sign-in hero the
+   * trigger needs a scrim of its own to read as a control rather than a
+   * loose icon floating on the art (Will, 16 September, working from a Figma
+   * redesign showing exactly this treatment) — a translucent dark circle,
+   * regardless of light/dark theme, since it sits on art, not on the page.
+   */
+  onPhoto: {
+    backgroundColor: 'rgba(38, 38, 38, 0.35)',
+    color: '#FFFFFF',
+    borderRadius: '17px',
+  },
 });
 
 export function LanguageSwitcher({
   variant = 'icon',
   rowStyle,
+  tone,
 }: {
   readonly variant?: 'icon' | 'row';
   /** The same row style every other Settings item uses, for the trigger button. */
   readonly rowStyle?: StyleXStyles;
+  /** `'onPhoto'` swaps the icon trigger's usual transparent ghost for a scrim that stays legible over artwork — see the sign-in hero. */
+  readonly tone?: 'onPhoto';
 }) {
   const { locale, setLocale, t } = useI18n();
   const { state: session } = useSession();
@@ -96,7 +112,13 @@ export function LanguageSwitcher({
   if (variant === 'icon') {
     return (
       <DropdownMenu
-        button={{ label: t('language.title'), icon: <GlobeIcon />, isIconOnly: true, variant: 'ghost' }}
+        button={{
+          label: t('language.title'),
+          icon: <GlobeIcon />,
+          isIconOnly: true,
+          variant: 'ghost',
+          xstyle: tone === 'onPhoto' ? styles.onPhoto : undefined,
+        }}
         hasChevron={false}
         placement="below"
         alignment="end"
