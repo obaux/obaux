@@ -14,6 +14,7 @@ import { colorVars, spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
 import {
   AppHeader,
   BigButton,
+  Loading,
   Notice,
   Page,
   PointsBadge,
@@ -320,7 +321,7 @@ export default function JoinPage() {
     return (
       <Page gap={3}>
         <AppHeader homeHref={null} accountHref={null} />
-        <Text xstyle={styles.intro}>{t('places.loading')}</Text>
+        <Loading label={t('common.loading')} variant="screen" />
       </Page>
     );
   }

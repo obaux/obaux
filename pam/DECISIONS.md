@@ -1867,6 +1867,25 @@ screen says "Send it again in 24s" so the person is told to wait rather than
 quietly refused. Enforced in the hook, not just disabled on the link, so a
 second tap during the wait does nothing at all.
 
+### D-119 — Waiting is a spinner, not a sentence
+Every screen said "Finding places nearby..." while it worked out who was signed
+in, including the ones that were not finding places. Moving between tabs is a
+full page load in a static export, so that was the sentence on the way to the
+account screen, the saved list and the caseload (Will, 16 September).
+
+A spinner says the one true thing — something is happening — in every language
+and at every reading level, which is the reason to prefer it here over copy that
+has to be right four different ways. §2.4's plain-language rule is about
+explaining, and this state has nothing to explain: it resolves in under a
+second or it becomes an error notice that does explain.
+
+The label is announced and never drawn, and the help bar stays on the home
+screen's waiting state: a screen with nothing on it but a ring is the dead end
+§0 forbids, and this state is what a dying connection actually shows somebody.
+Astryx's Spinner slows to a third of its speed under `prefers-reduced-motion`
+rather than stopping — a still ring reads as a broken image, and the promise
+made to somebody who asked for less motion was less, not none.
+
 ---
 
 ## Notes for whoever picks this up next

@@ -143,6 +143,15 @@ export const pamTheme = defineTheme({
      * not always the property the component draws with. Look at the generated
      * CSS, not at the token list.
      */
+    /*
+     * The waiting spinner, which is `Loading`'s whole screen — 28px in the
+     * middle of an empty phone is a speck. The stroke goes up with it, or a
+     * 40px ring drawn at 4px reads as a thin outline rather than something
+     * moving.
+     */
+    spinner: {
+      'size:xl': { '--spinner-diameter': '40px', '--spinner-stroke-width': '4px' },
+    },
     progressbar: {
       'variant:accent': { '--color-accent': 'light-dark(#0F5847, #DCE068)' },
     },

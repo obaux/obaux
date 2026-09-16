@@ -511,6 +511,12 @@ export const pamTheme = {
       "base": {
         "padding": "var(--spacing-3)"
       }
+    },
+    "spinner": {
+      "size:xl": {
+        "--spinner-diameter": "40px",
+        "--spinner-stroke-width": "4px"
+      }
     }
   },
   __onDark: {

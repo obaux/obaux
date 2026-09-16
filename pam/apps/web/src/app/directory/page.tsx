@@ -15,6 +15,7 @@ import { RadioList, RadioListItem } from '@astryxdesign/core/RadioList';
 import {
   AppHeader,
   BigButton,
+  Loading,
   Notice,
   NotificationBell,
   Page,
@@ -140,9 +141,7 @@ export default function DirectoryPage() {
     return (
       <Page gap={3}>
         <AppHeader />
-        <Text type="supporting" xstyle={styles.count}>
-          {t('places.loading')}
-        </Text>
+        <Loading label={t('common.loading')} variant="screen" />
       </Page>
     );
   }
@@ -320,9 +319,7 @@ export default function DirectoryPage() {
       </Card>
 
       {directory.status === 'loading' ? (
-        <Text type="supporting" xstyle={styles.count}>
-          {t('places.loading')}
-        </Text>
+        <Loading label={t('common.loading')} variant="inline" />
       ) : null}
 
       {directory.status === 'empty' ? (

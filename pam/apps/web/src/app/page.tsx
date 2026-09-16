@@ -11,15 +11,16 @@ import {
   BigButton,
   CardEnter,
   HelpBar,
+  Loading,
   NavTile,
   Notice,
   NotificationBell,
-  PageEnter,
-  RoleSwitch,
-  PeopleIcon,
   Page,
+  PageEnter,
+  PeopleIcon,
   PlacesIcon,
   Press,
+  RoleSwitch,
   StarIcon,
   TextLink,
 } from '@pam/ui';
@@ -103,9 +104,7 @@ export default function HomePage() {
     return (
       <Page gap={3}>
         <AppHeader />
-        <Text type="supporting" xstyle={styles.intro}>
-          {t('places.loading')}
-        </Text>
+        <Loading label={t('common.loading')} variant="screen" />
         <HelpBar label={t('nav.help')} variant="block" />
       </Page>
     );

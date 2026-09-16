@@ -9,7 +9,16 @@ import { Card } from '@astryxdesign/core/Card';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { Badge } from '@astryxdesign/core/Badge';
-import { AppHeader, BigButton, HelpBar, Notice, Page, PageTitle, TextLink } from '@pam/ui';
+import {
+  AppHeader,
+  BigButton,
+  HelpBar,
+  Loading,
+  Notice,
+  Page,
+  PageTitle,
+  TextLink,
+} from '@pam/ui';
 import { NOTICES } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { useSupportPhone } from '@/lib/useSupportPhone';
@@ -63,9 +72,7 @@ export default function AccountPage() {
     return (
       <Page gap={3}>
         <AppHeader accountHref={null} />
-        <Text type="supporting" xstyle={styles.intro}>
-          {t('places.loading')}
-        </Text>
+        <Loading label={t('common.loading')} variant="screen" />
       </Page>
     );
   }

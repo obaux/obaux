@@ -6,6 +6,7 @@ import { NotificationBell } from '../src/NotificationBell.js';
 import { NotificationList } from '../src/NotificationList.js';
 import { PointsBadge } from '../src/PointsBadge.js';
 import { HelpBar } from '../src/HelpBar.js';
+import { Loading } from '../src/Loading.js';
 import { VoiceInput } from '../src/VoiceInput.js';
 import { NavTile } from '../src/NavTile.js';
 import { OnboardingSlides } from '../src/OnboardingSlides.js';
@@ -473,5 +474,33 @@ describe('the way in explains itself first', () => {
   it('names itself, so it can be skipped rather than waded through', () => {
     render(<OnboardingSlides slides={slides} label="How PAM works" />);
     expect(screen.getByRole('region', { name: 'How PAM works' })).toBeInTheDocument();
+  });
+});
+
+/**
+ * The spinner that replaced "Finding places nearby..." on every screen.
+ *
+ * Two things matter and neither is the animation: that a screen reader is told
+ * something is happening, in the member's own language, and that the words are
+ * not also painted on the screen — a ring plus a word is two things to read
+ * where one will do, in whichever language PAM has not been translated into
+ * yet.
+ */
+describe('Loading', () => {
+  it('announces itself to a screen reader without drawing the word', () => {
+    const { container } = render(<Loading label="Cargando" />);
+
+    expect(screen.getByRole('status')).toHaveAccessibleName('Cargando');
+    expect(container.textContent).toBe('');
+  });
+
+  it('fills the screen by default, and sits in the flow when asked', () => {
+    // The default is the one that matters: a spinner tucked under the header
+    // is not "in the middle of the screen", which is the whole request.
+    const { container: screenful } = render(<Loading label="Loading" />);
+    const { container: inline } = render(<Loading label="Loading" variant="inline" />);
+
+    const box = (root: HTMLElement) => root.firstElementChild as HTMLElement;
+    expect(box(screenful).className).not.toBe(box(inline).className);
   });
 });

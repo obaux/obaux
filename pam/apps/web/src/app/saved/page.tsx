@@ -1,11 +1,10 @@
 'use client';
 
 import { VStack } from '@astryxdesign/core/VStack';
-import { Text } from '@astryxdesign/core/Text';
-import * as stylex from '@stylexjs/stylex';
 import {
   AppHeader,
   BigButton,
+  Loading,
   Notice,
   Page,
   PageTitle,
@@ -40,10 +39,6 @@ import { sharePlace } from '@/lib/sharePlace';
  * their own saved places is asking.
  */
 
-const styles = stylex.create({
-  note: { fontSize: '15px', lineHeight: 1.5 },
-});
-
 export default function SavedPage() {
   const { t } = useI18n();
   const supportPhone = useSupportPhone();
@@ -56,9 +51,7 @@ export default function SavedPage() {
     return (
       <Page gap={3}>
         <AppHeader />
-        <Text type="supporting" xstyle={styles.note}>
-          {t('places.loading')}
-        </Text>
+        <Loading label={t('common.loading')} variant="screen" />
       </Page>
     );
   }
@@ -116,9 +109,7 @@ export default function SavedPage() {
       ) : null}
 
       {state.status === 'loading' ? (
-        <Text type="supporting" xstyle={styles.note}>
-          {t('places.loading')}
-        </Text>
+        <Loading label={t('common.loading')} variant="inline" />
       ) : null}
 
       {state.status === 'error' ? (

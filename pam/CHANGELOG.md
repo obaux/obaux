@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.12.1] — 2026-09-16 · Waiting looks like waiting
+
+### Changed — no more "Finding places nearby..." on screens that find no places
+
+Every screen showed that line while it worked out who was signed in — your
+account, your saved places, the caseload. There is now a loading circle in the
+middle of the screen instead, until the screen is ready.
+
 ## [0.12.0] — 2026-09-14 · The way out, and four ways in
 
 ### Added — your account, and sign out

@@ -1,13 +1,19 @@
 'use client';
 
-import * as stylex from '@stylexjs/stylex';
 import { VStack } from '@astryxdesign/core/VStack';
 import { HStack } from '@astryxdesign/core/HStack';
 import { Heading } from '@astryxdesign/core/Heading';
-import { Text } from '@astryxdesign/core/Text';
 import { Button } from '@astryxdesign/core/Button';
 import { Icon } from '@astryxdesign/core/Icon';
-import { AppHeader, BigButton, Notice, NotificationList, Page, PageTitle } from '@pam/ui';
+import {
+  AppHeader,
+  BigButton,
+  Loading,
+  Notice,
+  NotificationList,
+  Page,
+  PageTitle,
+} from '@pam/ui';
 import { useI18n } from '@/lib/i18n';
 import { NotIn } from '../NotIn';
 import { useSupportPhone } from '@/lib/useSupportPhone';
@@ -28,11 +34,6 @@ import { whenHappened } from '@/lib/when';
  * Back does the same thing.
  */
 
-const styles = stylex.create({
-  back: { minHeight: '48px', fontSize: '17px' },
-  title: { fontSize: '28px', lineHeight: 1.2 },
-  count: { fontSize: '17px' },
-});
 
 export default function NotificationsPage() {
   const { t, locale } = useI18n();
@@ -69,9 +70,7 @@ export default function NotificationsPage() {
         ) : null}
 
         {state.status === 'loading' && signedIn ? (
-          <Text type="supporting" xstyle={styles.count}>
-            {t('places.loading')}
-          </Text>
+          <Loading label={t('common.loading')} variant="inline" />
         ) : null}
 
         {state.status === 'error' ? (

@@ -11,17 +11,18 @@ import {
   BellIcon,
   BigButton,
   HelpBar,
+  Loading,
   NavTile,
-  OnboardingSlides,
-  PeopleIcon,
-  PlacesIcon,
-  PlanIcon,
   Notice,
   NotificationBell,
   NotificationList,
+  OnboardingSlides,
   Page,
+  PeopleIcon,
   PersonCard,
   PlaceCard,
+  PlacesIcon,
+  PlanIcon,
   PointsBadge,
   StepHeader,
   TextField,
@@ -220,6 +221,13 @@ export default function GalleryPage() {
             onMessage={() => {}}
           />
         </VStack>
+      </Section>
+
+      <Section
+        title="Waiting"
+        note="What every screen shows while it works out who is signed in. The screen variant centres in the window; this one is drawn inline so the page below it stays readable."
+      >
+        <Loading label="Loading" variant="inline" />
       </Section>
 
       <Section title="Points and steps">

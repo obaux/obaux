@@ -10,7 +10,16 @@ import { Text } from '@astryxdesign/core/Text';
 import { Badge } from '@astryxdesign/core/Badge';
 import { Avatar } from '@astryxdesign/core/Avatar';
 import { Button } from '@astryxdesign/core/Button';
-import { AppHeader, BigButton, Notice, NotificationBell, Page, PageTitle, TextLink } from '@pam/ui';
+import {
+  AppHeader,
+  BigButton,
+  Loading,
+  Notice,
+  NotificationBell,
+  Page,
+  PageTitle,
+  TextLink,
+} from '@pam/ui';
 import { NOTICES } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { NotIn } from '../NotIn';
@@ -116,9 +125,7 @@ export default function AdminPage() {
     return (
       <Page gap={3}>
           <AppHeader />
-          <Text type="supporting" xstyle={styles.region}>
-            {t('places.loading')}
-          </Text>
+          <Loading label={t('common.loading')} variant="screen" />
       </Page>
     );
   }
@@ -264,9 +271,7 @@ export default function AdminPage() {
         ) : null}
 
         {caseload.status === 'loading' ? (
-          <Text type="supporting" xstyle={styles.region}>
-            {t('places.loading')}
-          </Text>
+          <Loading label={t('common.loading')} variant="inline" />
         ) : null}
 
         {caseload.status === 'empty' ? (

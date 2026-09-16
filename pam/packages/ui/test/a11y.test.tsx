@@ -7,6 +7,7 @@ import { PersonCard } from '../src/PersonCard.js';
 import { StepHeader } from '../src/StepHeader.js';
 import { PointsBadge } from '../src/PointsBadge.js';
 import { HelpBar } from '../src/HelpBar.js';
+import { Loading } from '../src/Loading.js';
 import { VoiceInput } from '../src/VoiceInput.js';
 import { NavTile } from '../src/NavTile.js';
 import { OnboardingSlides } from '../src/OnboardingSlides.js';
@@ -125,6 +126,11 @@ describe('accessibility', () => {
     const { container } = render(
       <StepHeader current={2} total={4} title="What should we call you?" progressLabel="Step 2 of 4" />,
     );
+    await expectNoViolations(container);
+  });
+
+  it('Loading', async () => {
+    const { container } = render(<Loading label="Loading" />);
     await expectNoViolations(container);
   });
 

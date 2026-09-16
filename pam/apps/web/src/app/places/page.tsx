@@ -6,7 +6,14 @@ import { HStack } from '@astryxdesign/core/HStack';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { Button } from '@astryxdesign/core/Button';
-import { AppHeader, Notice, PageTitle, PlaceCard, ScrollReveal } from '@pam/ui';
+import {
+  AppHeader,
+  Loading,
+  Notice,
+  PageTitle,
+  PlaceCard,
+  ScrollReveal,
+} from '@pam/ui';
 import {
   categoryLabelKey,
   CATEGORY_LIST,
@@ -156,9 +163,7 @@ export default function PlacesPage() {
         </HStack>
 
         {state.status === 'loading' ? (
-          <Text type="supporting" xstyle={styles.area}>
-            {t('places.loading')}
-          </Text>
+          <Loading label={t('common.loading')} variant="inline" />
         ) : null}
 
         {state.status === 'empty' ? (
