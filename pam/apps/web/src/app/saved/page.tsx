@@ -10,6 +10,7 @@ import { NotIn } from '../NotIn';
 import { HeaderBell } from '../HeaderBell';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
+import { useDemoView } from '@/lib/useDemoView';
 import { useSavedPlaces } from '@/lib/useSavedPlaces';
 import { placeStatus, useNow } from '@/lib/usePlaceStatus';
 import { useRoleView } from '@/lib/useViewedRole';
@@ -56,7 +57,12 @@ export default function SavedPage() {
   const signedIn = session.status === 'signed-in';
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
   const { demoRole, setViewAs } = useRoleView(trueRole);
-  const { state, unsave, failed } = useSavedPlaces(signedIn, demoRole);
+  const isDemo = useDemoView(session);
+  // An account granted the demo view has no real saved places of its own to
+  // show; it gets the same example set a role preview does (see
+  // useSavedPlaces's own comment), keyed by its real role rather than a
+  // previewed one.
+  const { state, unsave, failed } = useSavedPlaces(signedIn, demoRole ?? (isDemo ? trueRole : null));
   const now = useNow();
 
   if (session.status === 'loading') {

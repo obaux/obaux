@@ -31,6 +31,7 @@ import { usePlaces, METRES_PER_MILE } from '@/lib/usePlaces';
 import { useSavedPlaces } from '@/lib/useSavedPlaces';
 import { placeStatus, useNow } from '@/lib/usePlaceStatus';
 import { useSession } from '@/lib/useSession';
+import { useDemoView } from '@/lib/useDemoView';
 import { useRoleView } from '@/lib/useViewedRole';
 import { RoleSwitchControl } from '../RoleSwitchControl';
 import { CITY_HALL, loadOrigin, saveOrigin, type AreaOption } from '@/lib/useAreaSearch';
@@ -132,11 +133,12 @@ export default function PlacesPage() {
   const { state: session } = useSession();
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
   const { demoRole, setViewAs } = useRoleView(trueRole);
+  const isDemo = useDemoView(session);
   // One clock for the whole list; `placeStatus` is pure from there.
   const now = useNow();
   const { isSaved, save, unsave, failed: saveFailed } = useSavedPlaces(
     session.status === 'signed-in',
-    demoRole,
+    demoRole ?? (isDemo ? trueRole : null),
   );
 
   const chooseArea = (next: AreaOption) => {

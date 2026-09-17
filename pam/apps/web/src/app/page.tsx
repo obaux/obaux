@@ -29,6 +29,7 @@ import { NotIn } from './NotIn';
 import { HeaderBell } from './HeaderBell';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
+import { useDemoView } from '@/lib/useDemoView';
 import { useSavedPlaces } from '@/lib/useSavedPlaces';
 import { usePoints } from '@/lib/usePoints';
 import { useViewAs } from '@/lib/useViewAs';
@@ -97,7 +98,11 @@ export default function HomePage() {
   // super admin can ever have `viewAs` set at all (useViewAs enforces that),
   // so this only ever routes real members' and staff's own saves for real.
   const demoRole = viewAs && viewAs !== trueRole ? viewAs : null;
-  const { state: saved, unsave, failed: saveFailed } = useSavedPlaces(signedIn, demoRole);
+  const isDemo = useDemoView(session);
+  const { state: saved, unsave, failed: saveFailed } = useSavedPlaces(
+    signedIn,
+    demoRole ?? (isDemo ? trueRole : null),
+  );
   const points = usePoints(session.status === 'signed-in' ? session.session.userId : null);
 
   /*

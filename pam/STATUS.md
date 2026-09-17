@@ -43,8 +43,11 @@ happens to be empty — wired into five of the screens that already had an
 example-data fallback, not yet all of them (D-155). All of it — migrations
 0054 through 0059 — is live on the real database (D-156). **PAM can text for
 real now** (D-158): Twilio credentials are in place and proved with an actual
-message sent end-to-end. Newest session log:
-`docs/sessions/2026-09-17-everyone-list-and-program-requests.md`.
+message sent end-to-end. The demo view now covers a member's saved places too,
+alongside the five screens already wired (D-159) — what remains before HELP
+matches the filed carrier wording is five minutes in the Twilio Console, not
+code. Newest session log:
+`docs/sessions/2026-09-17-remaining-demo-view-and-help-reply.md`.
 
 This is the handover document: what exists, what is proven, what is live, and
 what the next person needs to know before touching anything.
@@ -126,7 +129,8 @@ sending in general:
    that. Somebody still has to say yes on the reminders screen before PAM
    texts them one, including Will's own account.
 2. The HELP auto-reply on the Messaging Service, matching what was filed with
-   the carrier, is not yet confirmed set up.
+   the carrier, is not yet confirmed set up — see row 15 above and D-159 for
+   the exact console steps, since no tool here can set it.
 
 The account is still in trial: only numbers verified by hand in the Twilio
 console can receive a text. Setup and the known traps are in
@@ -348,7 +352,8 @@ while the copy is unsigned, so it earned the first live test, not the last.*
 | 11 | ~~Sign off `staff_request_approved`'s wording~~ **Done** | — | Will, 17 September. `pnpm --filter @pam/config test` is green. |
 | 12 | ~~Migrations 0054 through 0057 are local only~~ **Done** | — | Applied to the live Supabase project 17 September, along with two follow-ups `get_advisors` surfaced: `notify_on_staff_request` (0058) was callable directly via PostgREST, unlike its two siblings in 0038 — its own migration run never got the schema-level default-privileges lockdown 0038's did; and `staff_requests` had two foreign keys with no covering index (0059). `/requests/`, `/join/`'s program step, and the demo view all work against the real database now. |
 | 13 | ~~Sign off `staff_request_denied`'s wording too~~ **Done** | — | Will, 17 September. Still sent with quiet-hours/STOP enforcement deliberately skipped, at Will's own instruction (D-152) — that was never what this row was about. |
-| 14 | **The demo view is not wired into every screen yet** | An account granted it still sees real data on `place`, `person`, `HomePeoplePreview`, and the saved-places dummy path | The mechanism (`useDemoView`) is built and proven on five screens (D-155); finishing the rest is the same pattern repeated, not new design. |
+| 14 | ~~The demo view is not wired into every screen yet~~ **Done, with two of the four found to need no change** | — | The saved-places dummy path (`useSavedPlaces`, called from Home, Places, Saved and the place screen) now falls back to the same example set a role preview uses whenever the signed-in account itself has `is_demo = true`. `person` and `HomePeoplePreview` turned out not to be gaps: `person` never resolves a real profile at all — it is dummy-only by the §4.1 `ADMIN_CAN_SEE` transparency limit documented in its own file — and `HomePeoplePreview` is explicitly documented to appear only during an active role preview, never on a real account's own Home, demo or not. Widening either would be a new design decision, not a mechanical fix — see D-159. |
+| 15 | **The HELP auto-reply on the Messaging Service is not yet configured** | Anyone who texts HELP to a PAM number gets Twilio's generic default, not PAM's filed wording | Console steps and the exact filed reply are in D-159 and `docs/sms-campaign-samples.md`. No tool in this session can set it — it needs five minutes in the Twilio Console. |
 
 ---
 

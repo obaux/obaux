@@ -2539,6 +2539,70 @@ sign-off, queued one real `staff_request_denied` message to his own account
 dispatcher run. That is the actual proof; a passing HTTP status alone was not
 going to be represented as one.
 
+### D-159 — Finishing the demo view: one real gap, two that were not gaps, and the HELP reply
+Will, 17 September: "let's finish the remainders before pushing" — the two
+items STATUS.md row 14 (demo view) and the SMS setup notes (HELP auto-reply)
+still listed as open.
+
+**Demo view.** STATUS.md named four screens as unwired: `place`, `person`,
+`HomePeoplePreview`, and the saved-places dummy path. Reading all four before
+touching any of them found only one was actually a gap:
+
+- **Saved places was real.** `useSavedPlaces` only takes the dummy branch when
+  a super admin is actively *previewing* a role (`demoRole`), a separate,
+  pre-existing mechanism from an account's own `is_demo` flag. A member
+  account granted the demo view hit the real `saved_places_mine()` RPC like
+  anyone else and got a real, empty list — never PAM's example saved places.
+  Fixed by computing `demoRole ?? (isDemo ? trueRole : null)` at each of the
+  four call sites (`page.tsx`, `places/page.tsx`, `saved/page.tsx`,
+  `place/page.tsx`) and passing that in, rather than changing the hook
+  itself — the hook already does the right thing once it is told to. Reuses
+  `DUMMY_SAVED_BY_ROLE`, which only has a `member` entry; a demo account with
+  any other role gets an empty list either way, same as today, because only a
+  member saves places at all.
+- **`person` was never a gap.** Its own docblock already says why: it never
+  resolves a real profile, for any account — "Real people have no profile
+  yet, on purpose... widening that list is Will's call to make deliberately,
+  with members told first, not a side effect of this screen existing." A
+  demo account visiting `/person/?id=…` gets exactly what a real account
+  gets: a match against `DUMMY_EVERYONE` or "not found." There is no real
+  data behind this screen to leak, so there is nothing to wire. The ids the
+  directory screen hands it in demo mode are already `DUMMY_EVERYONE` ids,
+  so the link already resolves.
+- **`HomePeoplePreview` was never a gap either.** Its own comment says it
+  renders only "while a preview is genuinely active — `demoRole` — never for
+  a real account's own Home, real or empty." Making it also show for
+  `isDemo` (no preview active) would be new behaviour contradicting that
+  documented choice, not "the same pattern repeated." Left alone; flagged
+  here rather than silently forced in, since only Will can decide whether a
+  demo account's own Home should get a people strip it was deliberately built
+  not to have.
+
+So the STATUS.md row's own framing — "the same pattern repeated, not new
+design" — was true for one of the four and not for the other two. Read each
+screen before assuming the label fit.
+
+**HELP auto-reply.** No tool in this session can write to Twilio (confirmed:
+only `twilio__search` / `twilio__retrieve`, both read-only). What follows is
+what Will needs to do by hand, five minutes in the Console, to match what was
+filed with the carrier (`docs/sms-campaign-samples.md`, "Help message: PAM:
+Call {supportPhone} and a person will help you."):
+
+1. Twilio Console → **Messaging → Services** → the PAM Messaging Service.
+2. Open the **Opt-Out Management** tab and enable **Advanced Opt-Out** if it
+   is not already on.
+3. In the **Help** section, keep the `HELP` keyword (required, cannot be
+   removed) and set the reply to `PAM: Call +12673095265 and a person will
+   help you.` — swap that number for whatever `app_settings.support_phone`
+   holds if Will has changed it since (`useSupportPhone.ts`'s own fallback,
+   which is what shipped with the filed campaign).
+4. Save, then text `HELP` to a PAM number from a verified test phone and
+   confirm that reply arrives instead of Twilio's generic default.
+
+This only affects numbers in that Messaging Service; STOP and START were
+already reviewed in the same tab as part of the original filing and do not
+need to change.
+
 ---
 
 ## Notes for whoever picks this up next

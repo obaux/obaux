@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.24.4] — 2026-09-17 · Demo view covers saved places too
+
+An account with the demo view granted no longer hits a real, empty saved-
+places query on Home, Places, Saved, or the place screen — it now sees the
+same example saved places a role preview shows. `person` and
+`HomePeoplePreview` were checked and found to already behave correctly (no
+change needed there — see D-159).
+
 ## [0.24.3] — 2026-09-17 · PAM can text for real
 
 Twilio credentials are configured and proved with a real message, sent
