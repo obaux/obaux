@@ -3273,6 +3273,44 @@ on; disclosed, not fixed, the same way every other bundle regression today
 was. Full Playwright suite re-run for completeness. See the session log
 for the full numbers and what remains.
 
+### D-171 — A super admin cannot send or start any message, confirmed by Will, not a bug to fix
+
+Testing the live deployment surfaced what looked like a bug: a super admin
+(Will's own account — the only non-member account that existed in the live
+database at the time) got no "Messages" tile on Home and, navigating to
+`/messages/` directly, saw "not for your role." The role checks behind
+this (`canMessage`, `isStaff` in `apps/web/src/app/messages/page.tsx`, and
+the Home tile's own guard) test for `role === 'member' || role === 'admin'
+|| role === 'provider'` — `super_admin` (a real, distinct value in
+`user_role`, not just a `viewAs` preview label) was never included.
+
+Asked Will directly rather than assuming either way, since this is a real
+product/privacy decision, not a rendering bug: **a super admin cannot send
+messages to a member, a case manager, or a program — confirmed.** The
+existing exclusion is correct behaviour, not a gap. No code change follows
+from this entry; it exists so a future session reading `canMessage`'s
+role list doesn't "fix" it by adding `super_admin`.
+
+**Why this makes sense with everything else built today**: a super admin
+already cannot read message content unless they happen to be a genuine
+participant (D-159/D-074's model, untouched), and D-159 through D-169
+spent the whole day narrowing what staff can see about a member specifically
+*because* the person holding broad access is the one transparency.ts
+promises restraint from. Letting a super admin also *originate* messages
+would be a materially different, wider power than anything else in that
+promise — this decision keeps the boundary where the day's other work
+already drew it, rather than opening a new one.
+
+**Separately, and not a bug**: testing also found the live database
+currently has zero `admin` and zero `provider` accounts — only Will's
+`super_admin` and two plain members. So even with the role check aside,
+there is nobody yet whose account can exercise the "case manager messages
+their caseload" or "program messages an enrolled member" paths for real.
+Testing those requires creating a real case-manager or program-admin
+account (an invite code, generated from the super admin's own account) and
+giving it an actual caseload assignment or enrollment before `/messages/`'s
+"Start a conversation" section will show anyone.
+
 ---
 
 ## Notes for whoever picks this up next
