@@ -25,7 +25,8 @@ export type SmsTemplateKey =
   | 'attendance_missed_followup'
   | 'connection_request'
   | 'access_limited_notice'
-  | 'saved_place_closed';
+  | 'saved_place_closed'
+  | 'staff_request_approved';
 
 export interface SmsTemplate {
   readonly key: SmsTemplateKey;
@@ -249,6 +250,27 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
     es: 'PAM: No hay problema. Guardamos un paso para buscar otra fecha. Abra PAM cuando pueda: {link}',
     vars: ['link'],
     reviewedBy: REVIEWED_BY,
+    isFirstContact: false,
+  },
+  /**
+   * A pending case-manager or program-lead request was approved (0054).
+   *
+   * **Names no role.** "case manager" is a `FORBIDDEN_SMS_TERMS` entry — this
+   * message has to read the same for both roles anyway, so it says only that
+   * the request was approved, matching how `facilitation_member` already
+   * handles "admin" as a first name with no title.
+   *
+   * **Ships unreviewed.** `reviewedBy: ''` until Will signs off on the exact
+   * wording — see the session log. `pnpm --filter @pam/config test` will fail
+   * on `has a human recorded against every template` until then; that is the
+   * gate working as intended, not a bug to route around.
+   */
+  staff_request_approved: {
+    key: 'staff_request_approved',
+    en: 'PAM: Your request was approved. Open PAM to get started: {link}',
+    es: 'PAM: Su solicitud fue aprobada. Abra PAM para empezar: {link}',
+    vars: ['link'],
+    reviewedBy: '',
     isFirstContact: false,
   },
   /** §6.2: no names in a connection-request SMS. */

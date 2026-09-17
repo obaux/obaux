@@ -27,8 +27,12 @@ which already had it and is where a member is actually choosing something
 splash screen first (D-146). The shared alert banner is now a solid-colour,
 single-row, in-flow composition instead of Astryx's own translucent `Banner`,
 fixing both a readability complaint and an overlap with the header (D-143,
-D-144, D-145). Newest session log:
-`docs/sessions/2026-09-17-hero-motion-and-a-quieter-sign-in.md`.
+D-144, D-145). A pending case-manager or program-lead request is now decided
+for real, not just recorded: a super admin reviews it at `/requests/`
+(reached from the Everyone list, not from the notification itself — D-148),
+approving creates the account immediately with the phone already on file
+(D-149). Newest session log:
+`docs/sessions/2026-09-17-deciding-a-staff-request.md`.
 
 This is the handover document: what exists, what is proven, what is live, and
 what the next person needs to know before touching anything.
@@ -181,15 +185,21 @@ oversight:
 - **No map, no enrollment, no chat.** Sign-up exists — `/join/`, five steps —
   and an invite code is typed into its second step, or arrives as
   `/join/?code=`.
-- **Nothing reviews `staff_requests`.** Sign-up records people who say they run
-  a program or carry a caseload; the rows are there and a super admin can read
-  them, but there is no screen and no notification. The screen promises a call
-  within a day or two, so somebody has to be told to look.
+- **`staff_requests` is now reviewed, for real (17 September, D-148/D-149).**
+  A pending claim notifies every super admin (a plain alert, not a clickable
+  one — D-148) and is decided on a new screen, `/requests/`, linked from the
+  Everyone list: approve creates the real account immediately, phone pulled
+  from `auth.users`; deny records the decision and creates nothing. The
+  approval SMS is written but unreviewed (`reviewedBy: ''`) and cannot send
+  until Will signs off on the wording — see row 2 of "What needs a human."
+  **The denial SMS is not built** — a real gap, not an oversight (D-150):
+  denial has no profile to safely queue a message against without
+  reinventing §7.2's quiet-hours/STOP enforcement from scratch.
 - **What does exist and works:** sign-up, sign-in, home, saved places, points
   and badges, the places list, a screen per place at `/place/?id=…`, reporting
   a place, the notifications list, the
-  reminders question, the case manager screen, the people directory, and the
-  privacy and terms pages.
+  reminders question, the case manager screen, the people directory, deciding
+  a staff request, and the privacy and terms pages.
 - **Home is a menu, and only a menu.** It lists where to go and what is waiting.
   No next step, no points, no plan: PAM has no real ones yet, and a home screen
   that invents its own content is worse than a short one (D-098). `/gallery/` is
@@ -319,6 +329,8 @@ while the copy is unsigned, so it earned the first live test, not the last.*
 | 10c | **Confirm the Twilio account's state** | Anybody whose number is not verified | This row said the account was in trial. Will, 16 September: the Twilio console says it is active. That earlier claim came from a 13–14 September finding and was repeated afterwards without re-checking; this session did not verify it either way, so it stands as Will's word and unverified here. If it is active the trial concern is gone; if not, a code to an unverified number is not sent and nothing says so — the live logs on the 14th show one phone asking three times. Carrier registration is a separate question (row 10). |
 | 10b | **A line about the PAM team on the transparency screen** | A promise already made | Members were told they would hear first if what is visible changes, and the directory now shows a super admin every account (name, role, region, status, last active; never messages or contact details). Proposed, for `packages/config/transparency.ts`: *"The PAM team can see your name, your city and the last day you used PAM. Never your messages."* It is a change to the contract, so it wants Will's word. |
 | 10 | **Twilio credentials into the dispatcher's secrets** | Reminders and notices | `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, and either `TWILIO_MESSAGING_SERVICE_SID` or `TWILIO_FROM_NUMBER`, under Edge Functions → dispatch-sms. Until then the dispatcher records "Twilio is not configured" instead of sending. |
+| 11 | **Sign off `staff_request_approved`'s wording** | `/requests/` approvals can text the person | `reviewedBy: ''` in `packages/config/src/sms-templates.ts` — the new template that tells somebody their case-manager/program-lead request was approved. `pnpm --filter @pam/config test` is red until this is done; that is the gate working as intended (D-151). |
+| 12 | **Migration `0054_staff_review.sql` is local only** | `/requests/` cannot decide anything on the live database yet | Passes the full `@pam/db` penetration suite locally but has not been applied to the live Supabase project — needs `mcp__Supabase__apply_migration` and `get_advisors` afterward, per CLAUDE.md. |
 
 ---
 

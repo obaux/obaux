@@ -247,6 +247,13 @@ export default function DirectoryPage() {
         backLabel={t('nav.back.home')}
       />
 
+      {/*
+        Where a pending case-manager/program-lead claim actually gets decided
+        (0054) — the notification that one arrived only ever points here, it
+        is never a button on the notification itself (D-080).
+      */}
+      <TextLink label={t('requests.title')} href="/requests/" />
+
       <Card xstyle={styles.card}>
         <VStack gap={3}>
           <Heading level={2} xstyle={styles.name}>

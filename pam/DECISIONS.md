@@ -2346,6 +2346,60 @@ neutral-theme tokens for exactly this reason: added
 that fixes a test is a lead, not a diagnosis — the actual defect was three
 files away from the one that made the symptom disappear.*
 
+### D-148 — Reviewing a staff request is a screen, reached from the Everyone list, not a notification you can act on
+Will, 17 September: super admins need to actually approve or deny the case-
+manager and program-lead requests `staff_requests` has been silently
+collecting since 0046 — nobody has ever reviewed one. Two shapes were
+possible: put approve/deny buttons directly on the notification that says one
+arrived, or keep the notification a plain alert and put the actual decision
+on a dedicated screen. The second was chosen and confirmed with Will before
+building: `NotificationList`'s own docblock states, as a deliberate 16
+September reversal, that a notification row is "a line in a log, not a thing
+with a state of its own to manage" — no row anywhere in PAM is currently
+clickable or carries an action, and putting one here would be the first
+exception to a rule stated in the component's own comments, not a schema
+addition. `notify.staff_request_pending` fires (via a trigger on
+`staff_requests`, matching the existing `notify_on_service_flag`/
+`notify_on_report` pattern from 0038) and says only that something is
+waiting; the new `/requests/` screen, linked from the Everyone list, is where
+it actually gets decided.
+
+### D-149 — Approving creates the account immediately; there is no separate invite step
+The obvious alternative — approving a staff request just makes an invite code
+the person still has to redeem — asks somebody who already told PAM who they
+are to prove it a second time. Since the requester is already signed in
+(`staff_requests.user_id` is their own `auth.uid()`, set when they claimed
+the role at sign-up) and their phone already lives on `auth.users`,
+`review_staff_request` creates the profile directly, in the same insert
+shape `redeem_invite` (0049) already uses. The region is still asked for
+explicitly at approval time, the same way `create_invite` asks a super admin
+which city a case-manager invite is for — the city a requester typed at
+sign-up is what they wrote, not necessarily the region PAM should file them
+under.
+
+### D-150 — The "denied" SMS is not built, and was not quietly skipped
+Will asked for an SMS on both outcomes — approved and denied. Approved is
+built: it reuses `outbound_messages`, the one existing safe path to a phone,
+which already enforces §7.2's quiet hours and STOP list because it joins
+`notification_preferences` by `member_id`, and a freshly-approved account has
+one. A denial creates no profile, so there is no `member_id` to hang a queued
+message on — and building a second, phone-only sending path in the same pass
+would mean either reinventing quiet-hours/STOP enforcement from scratch or
+quietly shipping a message that bypasses both, on the one part of this
+codebase (`packages/db/migrations/0039_dispatcher_claim.sql`'s own file
+comment) that says explicitly why those checks live in the database and not
+merely in convention. `review_staff_request('denied')` records the decision
+and stops there; sending the denial text is real, scoped work for a
+follow-up, not a corner to cut now. Flagged to Will directly rather than
+built partially.
+
+### D-151 — `staff_request_approved` ships unreviewed, same as every new template
+`reviewedBy: ''` on the new SMS template, matching how every other template
+in this file has always started. `pnpm --filter @pam/config test` fails on
+`has a human recorded against every template` until Will reads the exact
+wording and signs off — that is §9's gate doing its job, not a bug introduced
+by this session, and the fix is Will's approval, not a code change.
+
 ---
 
 ## Notes for whoever picks this up next

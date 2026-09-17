@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.23.0] — 2026-09-17 · Deciding a staff request
+
+### Added — a super admin can approve or deny a case-manager or program-lead request
+
+A new screen, reached from the Everyone list, lists every pending request and
+lets a super admin pick a city and approve it — which creates the real
+account immediately — or deny it. A notification tells every super admin
+when one comes in.
+
+### Added — an approval text, pending sign-off
+
+Not sending yet: the wording needs a human's approval first, the same rule
+every other message in the app already follows.
+
 ## [0.22.0] — 2026-09-17 · Hero motion, a quieter sign-in
 
 ### Changed — the sign-in hero's slide transition eases in and out, and holds each slide two seconds longer

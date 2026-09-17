@@ -60,6 +60,9 @@ function describe(
   if (bodyKey === 'notify.service_flagged' && typeof bodyVars['reason'] === 'string') {
     return t(bodyKey, { ...bodyVars, reason: t(`flag.reason.${bodyVars['reason']}`) });
   }
+  if (bodyKey === 'notify.staff_request_pending' && typeof bodyVars['role'] === 'string') {
+    return t(bodyKey, { ...bodyVars, role: t(`role.${bodyVars['role']}`) });
+  }
   return t(bodyKey, bodyVars);
 }
 
