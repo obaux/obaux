@@ -2180,6 +2180,37 @@ supported viewport, with room to spare, because the card's own content
 in that earlier pass. A future height increase should re-run that spec
 before shipping, not after.
 
+### D-137 — Looping is an explicit `scrollTo(0)`, not `Carousel`'s own `hasLoop`
+Will, 17 September, reported the autoplay wrap showed "a blank gap" going
+from the last slide back to the first. `Carousel`'s built-in `hasLoop` wraps
+by continuing to scroll past the last real item, which — with nothing
+there to scroll into — shows empty track before it corrects itself. There
+was never anything to actually wrap around: all three slides already exist
+at indices 0-2, so looping is just "go back to a slide that's already
+there," the same as a manual dot-tap would do. Fixed by dropping `hasLoop`
+and driving both autoplay and the loop-back with `carousel.current
+.scrollTo((here + 1) % slides.length)` directly.
+
+### D-138 — The hero runs flush to the real top and sides of the viewport
+Two related reports, same session: the hero "isn't touching top of screen,"
+and its corner radius should go. Both were consequences of the hero
+inheriting layout meant for a screen with content stacked in a column, not
+a full-bleed photo: `Page`'s own 24px top padding pushed the hero down from
+the true top (cancelled with a matching `-24px` margin on the hero's own
+wrapping group — the same negative-margin technique the hero's *sides*
+already used), and the bottom corner radius, meant to read against a screen
+that had visible page background around it, had nothing left to read
+against once the hero reached every edge. The hero's internal header
+(mark, badge, globe) moved from `top: 16px` to `top: 24px` to compensate —
+without the page's own padding above it, 16px alone sat too close to a
+phone's own status bar.
+
+Fixing "touching top" also revealed the dots bug below it (D-137's sibling,
+same report): dots positioned `bottom: 24px` inside the hero were sitting
+inside the sign-in card's own 32px overlap band, covered by the card's
+opaque white surface. Not missing — covered. Moved to `bottom: 48px`,
+clear of the overlap.
+
 ---
 
 ## Notes for whoever picks this up next
