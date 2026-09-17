@@ -27,6 +27,8 @@ export interface DirectoryPerson {
   readonly regionName: string | null;
   readonly accessStatus: 'active' | 'limited' | 'suspended';
   readonly lastActiveAt: string | null;
+  /** Granted by a super admin (0057). See `useDemoView`. */
+  readonly isDemo: boolean;
 }
 
 export type DirectoryState =
@@ -67,6 +69,7 @@ export function useDirectory(
           region_name: string | null;
           access_status: DirectoryPerson['accessStatus'];
           last_active_at: string | null;
+          is_demo: boolean;
         }[];
 
         if (rows.length === 0) {
@@ -83,6 +86,7 @@ export function useDirectory(
             regionName: row.region_name,
             accessStatus: row.access_status,
             lastActiveAt: row.last_active_at,
+            isDemo: Boolean(row.is_demo),
           })),
         });
       } catch {
@@ -99,4 +103,18 @@ export function useDirectory(
   }, [enabled, role, nonce]);
 
   return { state, refresh };
+}
+
+/** Grants or revokes the demo view on one account (0057). Super admin only. */
+export async function setDemoView(userId: string, enabled: boolean): Promise<boolean> {
+  try {
+    const { createClient } = await import('./supabase');
+    const { error } = await createClient().rpc('set_demo_view', {
+      p_user_id: userId,
+      p_enabled: enabled,
+    });
+    return !error;
+  } catch {
+    return false;
+  }
 }

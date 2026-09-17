@@ -2346,13 +2346,207 @@ neutral-theme tokens for exactly this reason: added
 that fixes a test is a lead, not a diagnosis — the actual defect was three
 files away from the one that made the symptom disappear.*
 
-### D-148 — Member-to-member chat is scoped to accepted connections, and that scope is enforced by the client, not the database — flagged for Will
 
-**Superseded by D-152, same day.** Will corrected the whole premise: PAM's
+### D-148 — Reviewing a staff request is a screen, reached from the Everyone list, not a notification you can act on
+Will, 17 September: super admins need to actually approve or deny the case-
+manager and program-lead requests `staff_requests` has been silently
+collecting since 0046 — nobody has ever reviewed one. Two shapes were
+possible: put approve/deny buttons directly on the notification that says one
+arrived, or keep the notification a plain alert and put the actual decision
+on a dedicated screen. The second was chosen and confirmed with Will before
+building: `NotificationList`'s own docblock states, as a deliberate 16
+September reversal, that a notification row is "a line in a log, not a thing
+with a state of its own to manage" — no row anywhere in PAM is currently
+clickable or carries an action, and putting one here would be the first
+exception to a rule stated in the component's own comments, not a schema
+addition. `notify.staff_request_pending` fires (via a trigger on
+`staff_requests`, matching the existing `notify_on_service_flag`/
+`notify_on_report` pattern from 0038) and says only that something is
+waiting; the new `/requests/` screen, linked from the Everyone list, is where
+it actually gets decided.
+
+### D-149 — Approving creates the account immediately; there is no separate invite step
+The obvious alternative — approving a staff request just makes an invite code
+the person still has to redeem — asks somebody who already told PAM who they
+are to prove it a second time. Since the requester is already signed in
+(`staff_requests.user_id` is their own `auth.uid()`, set when they claimed
+the role at sign-up) and their phone already lives on `auth.users`,
+`review_staff_request` creates the profile directly, in the same insert
+shape `redeem_invite` (0049) already uses. The region is still asked for
+explicitly at approval time, the same way `create_invite` asks a super admin
+which city a case-manager invite is for — the city a requester typed at
+sign-up is what they wrote, not necessarily the region PAM should file them
+under.
+
+### D-150 — The "denied" SMS is not built, and was not quietly skipped
+Will asked for an SMS on both outcomes — approved and denied. Approved is
+built: it reuses `outbound_messages`, the one existing safe path to a phone,
+which already enforces §7.2's quiet hours and STOP list because it joins
+`notification_preferences` by `member_id`, and a freshly-approved account has
+one. A denial creates no profile, so there is no `member_id` to hang a queued
+message on — and building a second, phone-only sending path in the same pass
+would mean either reinventing quiet-hours/STOP enforcement from scratch or
+quietly shipping a message that bypasses both, on the one part of this
+codebase (`packages/db/migrations/0039_dispatcher_claim.sql`'s own file
+comment) that says explicitly why those checks live in the database and not
+merely in convention. `review_staff_request('denied')` records the decision
+and stops there; sending the denial text is real, scoped work for a
+follow-up, not a corner to cut now. Flagged to Will directly rather than
+built partially.
+
+### D-151 — `staff_request_approved` ships unreviewed, same as every new template
+`reviewedBy: ''` on the new SMS template, matching how every other template
+in this file has always started. `pnpm --filter @pam/config test` fails on
+`has a human recorded against every template` until Will reads the exact
+wording and signs off — that is §9's gate doing its job, not a bug introduced
+by this session, and the fix is Will's approval, not a code change.
+
+### D-152 — The denial SMS deliberately skips quiet-hours/STOP enforcement, on Will's explicit instruction
+D-150 flagged that a denial has no profile, so `outbound_messages`' §7.2
+quiet-hours/STOP-list machinery (keyed by `member_id`) cannot cover it. Will,
+17 September, having read that flag: send it anyway, skip the safety system
+for this one message, and put PAM's support number in it so a real question
+has somewhere to go. Built exactly as asked, not softened: `outbound_messages`
+gained a nullable `member_id` plus its own `phone`/`locale` columns
+(0055_staff_denied_sms.sql), and `claim_outbound_messages` claims a
+phone-only row the moment it is due, with no `in_quiet_hours` check and no
+STOP-list check — both explicitly named exceptions in the function's own
+comment and in the migration's file comment, not a silent gap. Every other
+§9 rule still applies in full: 160 characters, no emoji, the forbidden-term
+list, `reviewedBy` before it can ever send. Scoped narrowly on purpose — the
+exception is this one template only, not a general "phone-only messages skip
+safety" precedent, and any future phone-only template should be its own
+deliberate decision, not an assumed extension of this one.
+
+### D-153 — Approving a program lead's request adds their program to `services` automatically
+Will, 17 September, explaining why duplicate-avoidance on self-service
+program submission (the deferred Part 5 of this request) matters: program
+leads will be adding their own programs. Since 0056 already collects the
+program's details at the point they claim the role, and `services`' fields
+are exactly what that form collects, `review_staff_request`'s approval branch
+now inserts the row directly rather than making a super admin retype
+everything from a phone call. `services`' own existing trigger marks it
+`needs_review = true` the moment a `*_plain` column is written, the same as
+any other manually-entered place — no new review mechanism was built,
+because one already existed and already fires here unchanged.
+
+### D-154 — The program-details step is its own onboarding phase, only for a program lead claiming the role themselves
+Will asked for a Google Maps auto-fill option too; §5.2/`STATUS.md` already
+documents that the Edge Function it would need (`enrich-places`) does not
+exist and was deliberately deferred by Will until nearer kick-off. Rather
+than build a button that cannot do anything yet, this ships manual entry
+only, with the field set matching `services` exactly (D-153's insert depends
+on that match) so the Maps option can plug into the same fields later without
+reshaping the form. Scoped to self-claim only: somebody redeeming an invite
+code for the `provider` role already has an account and a person who made
+that invite to talk to — the extra step is for the one path where nobody has
+met them yet.
+
+### D-155 — The demo view is a per-account grant, not a session-only preview like `useViewAs`
+Will's first description of this ("a screen toggle with dummy data ... for
+showcasing purposes") sounded like it could reuse the existing "Viewing as"
+preview (D-108), and the scoping conversation confirmed it does not: Will
+wants a super admin to grant *another* account a standing view that shows
+PAM's existing example data everywhere, not a session-only rendering choice
+about the viewer's own screen. `profiles.is_demo` (0057) is a real, persisted
+column, set only by `set_demo_view` (super admin only, audited). The existing
+`USE_DUMMY_PEOPLE` empty-state fallback is reused rather than replaced —
+`useDemoView()` ORs into each screen's existing "show the example set" check,
+so an account already sees the exact dummy content that screen has always
+had, just no longer gated on its real data being empty.
+
+**Not every screen is wired yet.** `directory_people`, `useSession`, and the
+five screens that already had a `USE_DUMMY_PEOPLE` check of their own
+(directory, admin, notifications, plus the two shared components,
+`HeaderBell` and `PersonRow`) now read it. `place`, `person`,
+`HomePeoplePreview` and the saved-places dummy path do not yet — they were
+identified but not reached this session (see the session log). The
+mechanism (`useDemoView`, threaded from `useSession`) is the same for all of
+them; it is repetition, not a new pattern, to finish.
+
+### D-156 — Migrations 0054–0057 applied live, with two fixes `get_advisors` caught
+Will, 17 September: "push live." Applied all four to the real Supabase
+project (`shobqzuhicoiymtumiaz`) via `mcp__Supabase__apply_migration`, then
+ran `get_advisors` per CLAUDE.md's standing instruction — it catches what the
+local suite cannot. Two real findings, both fixed with their own small
+migrations rather than folded silently into an already-applied one:
+
+- **0058** — `notify_on_staff_request()` (0054) was directly callable by
+  `anon`/`authenticated` via PostgREST. Its two siblings from 0038,
+  `notify_on_service_flag`/`notify_on_report`, were never explicitly revoked
+  either and the advisor does not flag them — 0011's schema-level
+  default-privileges change reached them because they were created in the
+  same migration run that set it, and did not reach a function created in a
+  later, separate run. Revoked explicitly rather than relying on which
+  session created the function next time.
+- **0059** — `staff_requests` had two unindexed foreign keys:
+  `region_id` (new, this session) and `reviewed_by` (0046, always
+  unindexed — not something this session broke, but on the same table and
+  free to fix in the same pass). Both now have covering indexes.
+
+Neither fix changes any behaviour this session already tested — both are
+migrations 0054–0057 should have shipped with, caught by the one check that
+only runs against a real database.
+
+### D-157 — `staff_request_approved`/`staff_request_denied` signed off; a hand-transcription error in the live deploy, caught and fixed
+Will, 17 September: "Approve SMS." `reviewedBy` set to `'Will (Oba), 17
+September 2026'` on both templates in `packages/config/src/sms-templates.ts`,
+regenerating `supabase/functions/dispatch-sms/templates.json` via the
+existing `zz-generate-dispatcher-bundle.test.ts` generator — `pnpm --filter
+@pam/config test` went green (225 passed).
+
+Reviewed copy in the source is not reviewed copy in production: the deployed
+Edge Function bundle is a separate artifact, and `dispatch-sms` was still
+running the version from before this session (version 8, `templates.json`
+unregenerated). Deployed the three function files
+(`index.ts`/`render.ts`/`templates.json`) via
+`mcp__Supabase__deploy_edge_function`.
+
+**The first deploy attempt (version 9) shipped a real bug**: retyping
+`templates.json` by hand for the tool call, the `reasons` object lost
+`wrong_info` entirely and `not_accepting`'s English/Spanish text was
+overwritten with `wrong_info`'s. Caught immediately by re-reading the
+deployed function back with `mcp__Supabase__get_edge_function` and diffing
+it against the local file, rather than assuming the deploy call that
+returned `"success"` had shipped what was intended — a tool call succeeding
+says the bytes were accepted, not that they were the right bytes. Fixed with
+a version-10 redeploy built directly from the actual file contents, then
+verified again by reading it back. No harm done: the dispatcher only ever
+renders a `reason` string when a `saved_place_closed` message is queued, and
+Twilio credentials are still unconfigured (row 10, "What needs a human"), so
+nothing had gone out. *A hand-retyped JSON blob in a tool call is exactly
+the kind of edit this project's own generator (`zz-generate-dispatcher-
+bundle.test.ts`) exists to make unnecessary — the mistake was retyping
+`templates.json` instead of reading its exact bytes back into the deploy
+call, not the sign-off itself.*
+
+### D-158 — Twilio credentials wired up, proved with one real message
+Will, 17 September: "Wire up Twilio credentials." I have no tool that sets
+Supabase Edge Function secrets and never see the credential values — those
+had to be added by Will directly in the dashboard, which also keeps them out
+of this chat's log. First attempt bundled all three values under one secret
+literally named `dispatch-sms`; the function reads three separately-named
+env vars (`TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`,
+`TWILIO_MESSAGING_SERVICE_SID`), so that didn't work — corrected once
+explained.
+
+Confirmed live rather than assumed: the cron schedule (`*/5 * * * *`) was
+running and returning `200 OK` even before real credentials existed, because
+an empty message queue means `sendViaTwilio` is never called — a green
+function log proves nothing about Twilio specifically. With Will's explicit
+sign-off, queued one real `staff_request_denied` message to his own account
+(the support-line number, so no test data invented) and watched it move from
+`scheduled` to `status: sent, failure_reason: null` on the next real
+dispatcher run. That is the actual proof; a passing HTTP status alone was not
+going to be represented as one.
+
+### D-159 — Member-to-member chat is scoped to accepted connections, and that scope is enforced by the client, not the database — flagged for Will
+
+**Superseded by D-163, same day.** Will corrected the whole premise: PAM's
 messaging is staff-to-member (a case manager with their caseload, a program
 admin with their enrolled members), never member-to-member. Everything below
 about *how* to scope eligibility client-side and flag the RLS gap honestly
-turned out to be the right instinct applied to the wrong relationship — D-152
+turned out to be the right instinct applied to the wrong relationship — D-163
 keeps the shape of this reasoning and replaces `connections` with the
 caseload/enrollment relationships that already existed for other screens.
 Left in place, unedited below, as the record of what was actually built and
@@ -2405,9 +2599,9 @@ not of the database — exactly the RPC-surface class of bug `packages/db`'s
 own README already warns about (row-level security does not cover every
 write path; a client that skips the intended screen skips the gate too).
 
-### D-149 — `conversations.last_message_at` is written by nothing; the conversation list derives recency from `messages` directly
+### D-160 — `conversations.last_message_at` is written by nothing; the conversation list derives recency from `messages` directly
 
-**Unaffected by D-152's correction** — this is a fact about the schema, not
+**Unaffected by D-163's correction** — this is a fact about the schema, not
 about who is allowed to message whom, and `useConversations` (which this
 entry describes) still works the same way for staff-to-member conversations
 as it did for the wrong member-to-member ones.
@@ -2435,12 +2629,12 @@ insert, the same shape `notifications`' routing triggers already use — left
 for a follow-up rather than done as a drive-by inside a UI session, since it
 touches RLS review and the db test suite's own migration count.
 
-### D-150 — Messages is real member functionality and does not honour a super admin's role preview
+### D-161 — Messages is real member functionality and does not honour a super admin's role preview
 
-**Extended by D-152, same day**, not superseded: the reasoning below is
+**Extended by D-163, same day**, not superseded: the reasoning below is
 unchanged, only the set of roles it applies to grew from "member" to
 "member, case manager, program admin" once messaging was corrected from
-member-to-member to staff-to-member. Read this entry for the *why*; D-152
+member-to-member to staff-to-member. Read this entry for the *why*; D-163
 for the corrected scope.
 
 Every other screen that gates on role reads `useViewedRole`/`useRoleView`, so
@@ -2463,7 +2657,7 @@ Excluding it from the preview system entirely is the conservative choice;
 giving it a proper demo layer, if a super admin ever needs to see what this
 screen looks like, is future work.
 
-### D-151 — A small, disclosed bundle-budget regression from this session's new locale strings
+### D-162 — A small, disclosed bundle-budget regression from this session's new locale strings
 
 §12's budget was already 0.7 kB over (500.7 kB gz, D-140's session).
 Building this feature's UI added roughly 20 new keys to `en.json`/`es.json`
@@ -2478,7 +2672,7 @@ that use it. Measured before and after, isolating each change:
   cost about 0.2 kB — reverted. Home's new "Messages" tile reuses the
   already-shared `PeopleIcon` instead (see the comment on that `NavTile`).
   At the time this was written a member never saw it duplicated on their own
-  screen; D-152's correction to staff-to-member messaging means a case
+  screen; D-163's correction to staff-to-member messaging means a case
   manager or program admin now does see it twice (their caseload/interested
   tile and the Messages tile both use `PeopleIcon`) — noted there as an
   accepted small cosmetic cost, not fixed here.
@@ -2495,18 +2689,18 @@ route only loads the keys it uses) is bigger than this session's scope. The
 code (6.3 kB and 6.2 kB per the build's own "Size" column) is code-split
 the ordinary Next.js way, since nothing else in the app imports from them.
 
-**Updated by D-152's correction, same day**: the rescoped copy (new
+**Updated by D-163's correction, same day**: the rescoped copy (new
 `messages.empty.body.member`/`.staff`, `messages.start.empty.*`, a widened
 `messages.notForRole.*`, and the two new transparency-contract lines) added
 another ~0.2 kB. Measured after the correction: 501.0 kB gz, "over by 1.0
 kB." Same trade as above, same reasoning, not re-litigated per kilobyte.
 
-### D-152 — Messaging corrected to staff-to-member (case manager/program admin ↔ member), not member-to-member — supersedes D-148
+### D-163 — Messaging corrected to staff-to-member (case manager/program admin ↔ member), not member-to-member — supersedes D-159
 
-Will's correction, same day as D-148/149/150: PAM's messaging is a case
+Will's correction, same day as D-159/160/161: PAM's messaging is a case
 manager or a program admin reaching a member they are actually responsible
 for, never a member reaching another member. The earlier build's whole
-"accepted mentor/buddy connection" eligibility model (D-148) was the wrong
+"accepted mentor/buddy connection" eligibility model (D-159) was the wrong
 relationship — A1's own reasoning about program-admin chat already said the
 right one out loud: *"Direct chat has to keep that gate or it becomes a way
 for any registered organisation to message any member"* — and the "gate" it
@@ -2532,10 +2726,10 @@ existing relationships rather than inventing a new one, per instruction:
   it; that would be scope this correction was explicitly told not to take on.
 - A **member** gets no "start a conversation" affordance anywhere. They see
   conversations already begun with them (`useConversations`, unchanged in
-  shape from D-148, just no longer fed by a "who can I message" list at all
+  shape from D-159, just no longer fed by a "who can I message" list at all
   for members) and can reply inside one.
 
-**The RLS gap from D-148 is still open, reframed for the new relationships.**
+**The RLS gap from D-159 is still open, reframed for the new relationships.**
 `conversations_insert_participant` and `conversation_members_insert` still
 only check "active account, `chat` on" — nothing about caseload or
 enrollment. So today, at the database layer:
@@ -2558,33 +2752,33 @@ conversation: if the inserting caller's role is `'admin'`, `admin_covers(new
 member's profile_id)`; if `'provider'`, `provider_linked_to(...)`; and if
 `'member'`, refuse outright — a member may be *added* to a conversation
 (when staff adds them) but should never be the one whose insert creates the
-second row. This is more precise than D-148's version of the same flag
+second row. This is more precise than D-159's version of the same flag
 because the eligibility functions to check already exist and are already
 used elsewhere (`admin_covers`, `provider_linked_to`) — this is a smaller,
 more mechanical fix than writing a new relationship from scratch would have
 been.
 
-Same conservative call as D-148: shipped now, with this written out in full,
+Same conservative call as D-159: shipped now, with this written out in full,
 rather than blocked on the migration. Still needs Will's word on whether
 that trade is right for this feature specifically, given it now involves
 staff accounts with real caseload access rather than peers.
 
-### D-153 — A conversation partner needed a new `profiles` read policy, and the transparency contract needed a new line — both because a case manager is now a real participant, not a third party
+### D-164 — A conversation partner needed a new `profiles` read policy, and the transparency contract needed a new line — both because a case manager is now a real participant, not a third party
 
-**Point 1 below (the new `profiles` policy) is superseded by D-154, same
+**Point 1 below (the new `profiles` policy) is superseded by D-165, same
 day**: Will's follow-up found that the raw row policy described here handed
 back `last_active_at` and `phone` along with the name — replaced with a
 column-limited function. Point 2 (the transparency contract change) is
 unaffected and still stands as written.
 
-Two things D-152's correction exposed that D-148's original design never hit:
+Two things D-163's correction exposed that D-159's original design never hit:
 
 **1. A member could not have read their case manager's or program's name at
 all.** `profiles` had four `select` policies before this session — self,
 discoverable-mentor, connected (via `connections`), admin-caseload, and
 provider-linked — and every one of them either requires `id = auth.uid()` or
 runs from *staff's* side down to a member. None let a member read a staff
-profile. Under the wrong D-148 model this never surfaced, because a member's
+profile. Under the wrong D-159 model this never surfaced, because a member's
 only conversation partner was ever another member (readable via
 `profiles_select_connected`). Under the corrected model, a member's *only*
 conversation partner is staff, and there was no policy for it at all — the
@@ -2592,7 +2786,7 @@ conversation list and thread header would have rendered a name-shaped blank
 for every real member, for every conversation, always. Caught by tracing
 which `profiles` policy would actually answer the query before shipping it,
 not by a test (there is no test for this — see "Left undone" in the session
-log). Fixed in `0054_conversation_partner_visibility.sql`:
+log). Fixed in `0060_conversation_partner_visibility.sql`:
 `profiles_select_conversation_partner`, letting anyone read the profile of
 someone they share a `conversation_members` row with, symmetrically (staff
 already had their own path to a member's profile; this is what a member
@@ -2644,15 +2838,15 @@ Both changes are in this session's diff and covered by `pnpm --filter
 check `en.json` matches `transparency.ts`'s English source word for word,
 and that both locale bundles carry every key) — 211 tests still pass.
 `pnpm --filter @pam/db test` was not run (this sandbox is missing the
-`postgis` extension), so `0054`'s policy is unverified against the live
+`postgis` extension), so `0060`'s policy is unverified against the live
 penetration suite; flagged in the session log as needing that run before
 this ships anywhere real.
 
-### D-154 — A conversation partner reads a name and a role, never activity info — a function replaces D-153's raw policy, uniformly, not just for program admins
+### D-165 — A conversation partner reads a name and a role, never activity info — a function replaces D-164's raw policy, uniformly, not just for program admins
 
 Will's follow-up, same day: a program admin must not see a member's
 "activity" info — `last_active_at`, named explicitly, "and anything else in
-that vein" — through the messaging surface. Audited D-153's
+that vein" — through the messaging surface. Audited D-164's
 `profiles_select_conversation_partner` to answer it precisely: a `for
 select` policy has no concept of "some columns" — the moment it made the row
 readable at all, `last_active_at`, `phone`, `bio`, `tags` and `home_zip`
@@ -2664,7 +2858,7 @@ column-shaped requirement.
 `directory_people()` already solved this shape of problem for the super
 admin directory — a `SECURITY DEFINER` function with a fixed, short column
 list, guarded by an internal check rather than a table-wide grant. Migration
-0055 drops the D-153 policy and adds `conversation_partners()`: `first_name`
+0061 drops the D-164 policy and adds `conversation_partners()`: `first_name`
 and `role`, nothing else, scoped to `mine.profile_id = auth.uid()` inside
 the function body (never a caller-supplied id — the exact RPC-surface trap
 `CLAUDE.md` and `member_points()`'s own history already warn about).
@@ -2702,7 +2896,7 @@ of that to the messaging UI, it should get the same scrutiny this session
 gave `last_active_at`, not an assumption that the same restraint already
 covers it.
 
-**Closed by D-155, the same day's next follow-up — this paragraph is now
+**Closed by D-166, the same day's next follow-up — this paragraph is now
 history, not a live gap.** `profiles_select_provider_linked` (0007, pre-existing,
 unrelated to any messaging work) already grants a program admin the *whole*
 `profiles` row — `last_active_at` and `phone` included — for any member
@@ -2725,21 +2919,21 @@ admins can't see activity info" to read as more true than it currently is.
 Verified: `pnpm --filter @pam/config test` (211, unaffected — this is a
 `packages/db`/`apps/web` change), `pnpm -r typecheck` clean, full Playwright
 suite unaffected (nothing about visible copy changed). `pnpm --filter
-@pam/db test` still not run in this sandbox (missing `postgis`) — `0055`,
-like `0054` before it, is unverified against the live RLS penetration
+@pam/db test` still not run in this sandbox (missing `postgis`) — `0061`,
+like `0060` before it, is unverified against the live RLS penetration
 suite. This is now two consecutive migrations in one day that need that run
 before anything here should be trusted against the real database.
 
-### D-155 — Program admins never see member activity, anywhere — not just through messaging
+### D-166 — Program admins never see member activity, anywhere — not just through messaging
 
-Will, widening D-154's closing note into an explicit instruction: "program
+Will, widening D-165's closing note into an explicit instruction: "program
 admins don't see activity, across entire app." Not scoped to messaging.
 
-**Closed the pre-existing gap D-154 had flagged and deliberately not
+**Closed the pre-existing gap D-165 had flagged and deliberately not
 fixed**: `profiles_select_provider_linked` (0007) was the one remaining raw
 row policy handing a provider the whole `profiles` row — `last_active_at`
 and `phone` included — for any member linked through an enrollment, an
-appointment, or a connection, with no conversation required. Migration 0056
+appointment, or a connection, with no conversation required. Migration 0062
 drops it and adds `provider_linked_members()`, following `conversation_partners()`'s
 own pattern from the day before (which followed `directory_people()`'s,
 0043): a `SECURITY DEFINER` function, a fixed two-column list (`id`,
@@ -2785,16 +2979,16 @@ passed (unaffected — this is a `packages/db`/`apps/web` change), `pnpm
 --filter @pam/ui test` 65 passed, `pnpm --filter @pam/web build` succeeds,
 bundle budget unchanged. `pnpm --filter @pam/db test` still cannot run in
 this sandbox (missing `postgis`) — this is now three consecutive same-day
-migrations (0054, superseded; 0055; 0056) that have never been run through
+migrations (0060, superseded; 0061; 0062) that have never been run through
 the RLS penetration suite, on top of a hand-written new test block that has
 also never executed. Read all three, and the new `02`/`04` test blocks,
 directly before trusting any of it against the live project.
 
-### D-156 — The transparency contract, re-audited line by line, not just amended again
+### D-167 — The transparency contract, re-audited line by line, not just amended again
 
 Will's instruction was explicit: re-check every line in `transparency.ts`
 against what the code actually does right now, not just append a new one —
-the file has had three same-day passes (0054 → 0055 → 0056) and needed to
+the file has had three same-day passes (0060 → 0061 → 0062) and needed to
 say what is true today, not what an earlier draft assumed.
 
 **Added, stated plainly and positively rather than left as a silent
@@ -2812,10 +3006,10 @@ the one place naming the second one plainly was necessary to keep the
 promise honest, rather than leaving "they" ambiguous between two different
 sets of facts.
 
-**Re-verified, not just re-asserted, that D-153's case-manager-as-participant
+**Re-verified, not just re-asserted, that D-164's case-manager-as-participant
 line is still accurate** after today's further narrowing: `canSee.directMessages`
 ("Everything you say to them, if they message you directly") describes
-message *content* visibility, which today's changes (0055, 0056) never
+message *content* visibility, which today's changes (0061, 0062) never
 touched — those closed a *profile-metadata* leak, not message content.
 Confirmed unchanged and still true.
 
@@ -2836,7 +3030,7 @@ mislead a fourth reader. The corresponding locale keys
 
 **Also corrected the file's own top-of-file claim.** It said
 `admin_visibility.test.ts` enforces `ADMIN_CAN_SEE` against the live RLS
-policy set — D-153 already found this file does not exist anywhere in the
+policy set — D-164 already found this file does not exist anywhere in the
 repository; the in-file comment itself now says so plainly, rather than
 leaving that correction only in `DECISIONS.md` where a future reader of
 `transparency.ts` alone would not see it.
@@ -2860,9 +3054,9 @@ wording — checked again here for any assertion on the removed
 `chatMetadata` text or the new `programActivity` line; found none, so
 nothing else needed updating there).
 
-### D-157 — `admin_visibility.test.ts` is built, as `04_transparency_contract_test.sql`, and this sandbox turns out to have `postgis` after all
+### D-168 — `admin_visibility.test.ts` is built, as `04_transparency_contract_test.sql`, and this sandbox turns out to have `postgis` after all
 
-Will asked for the file `transparency.ts`'s own comment referenced and D-153
+Will asked for the file `transparency.ts`'s own comment referenced and D-164
 found does not exist. Built it as `packages/db/test/04_transparency_contract_test.sql`
 — matching the existing suite's own naming and directory convention
 (`0[234]_*.sql`, picked up automatically by `pnpm --filter @pam/db test`'s
@@ -2886,12 +3080,12 @@ whole RLS suite.
    conversations, opposite answers.
 3. A program admin gets nothing back from `last_active_at` or `phone`
    through **either** function that reaches a member —
-   `conversation_partners()` (0055) and `provider_linked_members()` (0056)
+   `conversation_partners()` (0061) and `provider_linked_members()` (0062)
    — checked from the same real account (Alice, who is genuinely both
    linked and a conversation participant), with the same
    `undefined_column`-on-`execute` technique `directory_people()`'s own
-   test and 0056's own test block already established. Deliberately
-   overlaps 0056's own coverage for these two columns, per instruction: that
+   test and 0062's own test block already established. Deliberately
+   overlaps 0062's own coverage for these two columns, per instruction: that
    block proves the *function* is correct; this one proves the
    *transparency contract* holds across both paths a program admin can
    actually take, which is the promise a member reads.
@@ -2929,22 +3123,22 @@ anything, rather than hardcoding a number that depends on another file's
 side effect — the honest fix, not a magic "3."
 
 **This sandbox has `postgis` installed now, and did not before today.**
-Every prior entry today (D-152 through D-156) says `pnpm --filter @pam/db
+Every prior entry today (D-163 through D-167) says `pnpm --filter @pam/db
 test` "cannot run here" — true when written, and then addressed directly:
 `apt-get install postgresql-16-postgis-3` succeeded (one dependency 404'd
 on the first attempt from a stale package index; `apt-get update` first
 fixed it). With that plus the `pgcrypto` extension (already present),
 `pnpm --filter @pam/db test` ran for real, standing up a throwaway cluster
 exactly the way `scripts/test-db.sh` describes, applying every migration
-through `0056` and every test file including this new one.
+through `0062` and every test file including this new one.
 
 **Result: 221 checks pass, 0 failures — the highest-value check in the repo
 (`CLAUDE.md`'s own words) actually ran, for the first time today, against
 everything built across all four of today's sessions.** This retroactively
 answers the "unverified against the live RLS penetration suite" caveat on
-D-152, D-155 and D-156: `0055`, `0056`, and this file are no longer
-hand-reviewed-only. `0054` remains superseded and was never re-tested on
-its own (it no longer exists as a live policy — `0056` and `0055` together
+D-163, D-166 and D-167: `0061`, `0062`, and this file are no longer
+hand-reviewed-only. `0060` remains superseded and was never re-tested on
+its own (it no longer exists as a live policy — `0062` and `0061` together
 are what runs).
 
 STATUS.md rows 13 and 16 are updated from "needs running" / "needs
@@ -2953,7 +3147,7 @@ fresh sandbox should not assume it is permanently unavailable — it was one
 `apt-get install` away here, and this environment note may not hold for
 every future one.
 
-### D-158 — Migrations 0054–0056 deployed live; a real drift found and a concurrency rule added, not deployed around
+### D-169 — Migrations 0060–0062 deployed live; a real drift found and a concurrency rule added, not deployed around
 
 Deploying today's messaging migrations to the live project
 (`shobqzuhicoiymtumiaz`) surfaced a real gap between the repo and the live
@@ -2971,7 +3165,7 @@ schema, discovered before anything was applied rather than after:
   committed but does not appear in the live migration list at all — deployed
   is missing it, for a reason nobody recorded.
 
-Neither was this session's to fix. `0054`/`0055`/`0056` create and drop
+Neither was this session's to fix. `0060`/`0061`/`0062` create and drop
 objects (`profiles_select_conversation_partner`,
 `profiles_select_provider_linked`, `conversation_partners()`,
 `provider_linked_members()`) that don't overlap anything the six unknown
@@ -2993,6 +3187,91 @@ session it's applied, treating `STATUS.md`/`DECISIONS.md`/`CHANGELOG.md` as
 shared files to pull before overwriting, and preferring separate branches
 for concurrent work) — a direct, load-bearing consequence of this session
 almost deploying blind into another session's undocumented live changes.
+
+**Addendum, same-day merge (D-170)**: the local files these migrations live
+in are no longer named `0054`/`0055`/`0056` — merging `origin/main` found
+its own, real, independently-numbered `0054`–`0059` (the `staff_requests`
+review work the six live-only migrations above turned out to be), so this
+session's three were renamed to `0060`/`0061`/`0062` to keep the repository
+from having two different files claiming the same number. **The live
+Supabase project still records them by their old names** —
+`mcp__Supabase__list_migrations` shows `version: 20260917190303, name:
+0054_conversation_partner_visibility` (and `...190313`/`0055_...`,
+`...190322`/`0056_...`), unchanged since deploy. This is cosmetic, not
+functional: Supabase's actual migration key is the timestamp `version`, not
+the `name` string, so nothing here needs to be re-applied and the rename
+changes no live behaviour. It does mean a future session's own "check
+`list_migrations` against local files" habit (the rule this very entry
+added to `CLAUDE.md`) will see three live names with no matching local file
+and should read this note rather than treat it as the same kind of drift
+the six unknown migrations above were. See D-170 for the merge itself.
+
+### D-170 — Merging with the other concurrent PAM session: renumbered, not overwritten
+
+Will ran `git merge origin/main` on this branch to bring in the other
+concurrent session's real work — the `staff_requests` review screen
+(`0054`–`0059`, D-148 through D-158 above) and Twilio going live — and it
+stopped on conflicts. Both sessions had continued numbering from the same
+shared point (last shared migration `0053`, last shared decision D-147)
+without knowing about each other, so both migrations and decisions
+collided at the same numbers with completely different content:
+`0054`/`0055`/`0056` (this session's conversation-partner and
+provider-linked visibility work vs. the other session's staff-review
+work), and D-148 through D-158 (eleven entries each, different topics
+entirely).
+
+**Resolved by renumbering this session's work to come after the other
+session's, not the reverse** — `0054`→`0060`, `0055`→`0061`, `0056`→`0062`
+(`git mv`, preserving history), and D-148→D-159 through D-158→D-169, in the
+same relative order, with every cross-reference between this session's own
+entries updated to match (`D-152 supersedes D-148` became `D-163
+supersedes D-159`, and so on through all eleven). The other session's
+`0054`–`0059` and D-148–D-158 are untouched, exactly as merged from
+`origin/main`. The choice of which side renumbers is arbitrary in
+principle — either could have moved — but this session's own migrations
+were already flagged (D-169, formerly D-158) as deployed *after* the
+six live-only migrations that turned out to be the other session's, so
+numbering this session's after the other session's keeps the on-disk order
+matching the order things actually happened in, which the alternative
+would not have.
+
+**Every cross-reference was grepped for, not assumed complete from memory**:
+the migration files' own header comments (which named their old migration
+number and cited `D-152`/`D-154`/etc. by number), `packages/db/test/04_transparency_contract_test.sql`
+and its comment referencing `0055`/`0056`, `STATUS.md`, `CHANGELOG.md`, and
+all five of this session's session logs. A single missed reference —
+inside a migration's own SQL comment, in a doc pointing at the wrong
+D-number — would actively mislead the next reader, which is worse than the
+conflict itself; see the session log for exactly what was checked and how.
+
+**`CHANGELOG.md` and `STATUS.md` conflicts were resolved by keeping both
+sides' content, not choosing one.** Both are shared handover documents and
+both sessions' work is real and needs to survive in them — interleaving the
+two narratives sentence-by-sentence would have made both harder to read, so
+each side's own block stayed intact with its own heading, ordered by when
+each session's work actually happened.
+
+**Locale files (`en.json`/`es.json`) were merged additively**: each side
+added different new keys for different features (this session's
+`messages.*`/`transparency.*` changes, the other session's staff-review and
+program-submission copy), and both sets of keys are present in the
+resolved files with no duplicates and no key silently dropped.
+
+Verified against the fully merged, renumbered state — not just each side
+independently — including `pnpm --filter @pam/db test` against the combined
+migration set (the other session's `0054`–`0059` plus this session's
+renumbered `0060`–`0062`) run together for the first time: **235 checks
+pass, 0 failures** (was 221 for this session's own migrations alone; the
+other session's own `staff_review`/`demo_view` etc. coverage brings the
+combined total up). `pnpm -r typecheck` clean; `@pam/config test` 225
+passed (225 = this session's 211 plus the other session's 14 new SMS
+tests); `@pam/ui test` 65 passed; `@pam/web build` succeeds, 25 routes.
+Bundle budget is now over by 3.3 kB (503.3 kB gz, was 501.0 kB for this
+session alone) — both sessions independently added first-load weight, and
+reconciling that is real, separate follow-up work this merge did not take
+on; disclosed, not fixed, the same way every other bundle regression today
+was. Full Playwright suite re-run for completeness. See the session log
+for the full numbers and what remains.
 
 ---
 

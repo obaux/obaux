@@ -1,14 +1,14 @@
 # Changelog
 
-## [0.28.0] — 2026-09-17 · Messaging privacy migrations deployed live
+## [0.30.0] — 2026-09-17 · Messaging privacy migrations deployed live
 
-### Deployed — `0055_conversation_partner_no_activity`, `0056_provider_linked_no_activity`
+### Deployed — `0061_conversation_partner_no_activity`, `0062_provider_linked_no_activity`
 
 The migrations that limit what a conversation partner or a program admin can
 read about a member (name and role only — never `last_active_at` or `phone`)
 are now live on the Supabase project, not just verified locally.
 `get_advisors` (security) ran clean afterward. No user-facing change — this
-is the guarantee `0.27.0`'s test suite already proved, now actually in
+is the guarantee `0.29.0`'s test suite already proved, now actually in
 effect.
 
 ### Found, not fixed — live/repo migration drift
@@ -18,9 +18,9 @@ matching file in this repo (`staff_review`, `staff_denied_sms`,
 `program_submission`, `demo_view`, `lock_notify_on_staff_request`,
 `staff_requests_indexes`), and one committed local migration
 (`0052_saved_places_say_what_they_are`) that was never deployed. Neither is
-resolved here — see `STATUS.md` and D-158.
+resolved here — see `STATUS.md` and D-169.
 
-## [0.27.0] — 2026-09-17 · The transparency contract is now tested against a real database
+## [0.29.0] — 2026-09-17 · The transparency contract is now tested against a real database
 
 ### Added — `admin_visibility.test.ts`, built as `packages/db/test/04_transparency_contract_test.sql`
 
@@ -37,17 +37,17 @@ full.
 
 ### Fixed — this sandbox is no longer missing `postgis`
 
-Every one of today's four migrations (`0054` through `0056`) had been
+Every one of today's four migrations (`0060` through `0062`) had been
 verified only by careful reading, not by execution — this sandbox lacked
 the `postgis` extension `pnpm --filter @pam/db test` requires. Installed
 it. **221 database checks now pass, 0 failures**, against every migration
 and every test file written today, for real.
 
-## [0.26.0] — 2026-09-17 · Program admins never see member activity, anywhere in the app
+## [0.28.0] — 2026-09-17 · Program admins never see member activity, anywhere in the app
 
 ### Fixed — the pre-existing enrollment/appointment link also exposed a member's activity info to program admins
 
-Independent of the messaging fix in [0.25.0] below: `profiles_select_provider_linked`,
+Independent of the messaging fix in [0.27.0] below: `profiles_select_provider_linked`,
 a policy predating any of today's messaging work, let a program admin read
 `last_active_at` and `phone` for any member they reach through an
 enrollment, an appointment, or a connection — no conversation required.
@@ -66,11 +66,11 @@ code actually does today rather than amending it a fourth time in one day
 used it,"* that described a capability no policy has ever actually
 granted, predating today's messaging work entirely.
 
-## [0.25.0] — 2026-09-17 · A conversation partner sees a name and a role, nothing else
+## [0.27.0] — 2026-09-17 · A conversation partner sees a name and a role, nothing else
 
 ### Fixed — the new messaging surface no longer exposes a member's activity info (or a staff person's) to a conversation partner
 
-The `profiles` read policy added in [0.24.0] below, so a member could see
+The `profiles` read policy added in [0.26.0] below, so a member could see
 who was messaging them, turned out to hand back the *whole* profile row —
 `last_active_at`, `phone`, everything — to any conversation partner,
 regardless of role. Replaced with `conversation_partners()`, a database
@@ -79,17 +79,17 @@ conversation with the caller, following the same pattern `/directory/`
 already used for a super admin's account list. Nobody sees activity info
 through this path now — not a program admin, not a member, and case
 managers are unaffected, since they already have real caseload visibility
-through an entirely separate, untouched path. See D-154.
+through an entirely separate, untouched path. See D-165.
 
 **Not fully closed**: an older, pre-existing policy already lets a program
 admin read a member's `last_active_at` and `phone` directly, independent of
-messaging — flagged, not fixed, in D-154's closing note.
+messaging — flagged, not fixed, in D-165's closing note.
 
-## [0.24.0] — 2026-09-17 · Messaging corrected to staff-to-member
+## [0.26.0] — 2026-09-17 · Messaging corrected to staff-to-member
 
 ### Changed — messaging is a case manager or program admin reaching a member, never member-to-member
 
-Corrects [0.23.0] below, shipped the same day and corrected before anyone
+Corrects [0.25.0] below, shipped the same day and corrected before anyone
 used it. A case manager can now message members on their caseload; a
 program admin can message members enrolled in their program; a member can
 see and reply within a conversation staff already started, but cannot start
@@ -98,14 +98,14 @@ one themselves and cannot message another member. The earlier
 
 Reuses the same caseload and enrollment relationships `/admin/`'s "Your
 people" screen and program screens already query — nothing new was
-invented. See D-152 (supersedes D-148/149/150) for the full reasoning, and
+invented. See D-163 (supersedes D-159/160/161) for the full reasoning, and
 for the RLS gap this still leaves open: who may *start* a conversation is
 enforced by this screen today, not by the database.
 
 ### Added — a member can read their case manager's or program's name
 
 New database policy (`profiles_select_conversation_partner`, migration
-0054): a member had no way to read a staff person's profile before this,
+0060): a member had no way to read a staff person's profile before this,
 because every existing `profiles` policy ran from staff down to a member,
 never the reverse. Without it, `/messages/` would have shown a member every
 conversation with no name attached.
@@ -124,9 +124,9 @@ participant: a report is still the only route in.
 ### Fixed — nothing; another small, disclosed cost
 
 §12's budget moved from 500.8 kB to 501.0 kB gz (now 1.0 kB over) from this
-correction's rescoped copy. See D-151's update.
+correction's rescoped copy. See D-162's update.
 
-## [0.23.0] — 2026-09-17 · Member-to-member messaging (corrected same day — see [0.24.0] above)
+## [0.25.0] — 2026-09-17 · Member-to-member messaging (corrected same day — see [0.26.0] above)
 
 ### Added — a member can message a mentor or buddy they are already connected to
 
@@ -138,19 +138,75 @@ admin read policy at all, so a case manager still only ever sees a message
 if it is reported (D-074), unchanged by this release.
 
 **Who can start a conversation is scoped to accepted `connections`**, never
-an open directory of every member — see D-148 for the full reasoning and a
+an open directory of every member — see D-159 for the full reasoning and a
 gap flagged for a follow-up migration: the scope is enforced by this screen
 today, not by the database itself.
 
 Reachable from a new "Messages" tile on Home, shown only to a signed-in
 member's own real account — it is deliberately not part of the super admin
-role-preview system (D-150).
+role-preview system (D-161).
 
 ### Fixed — nothing; a real, if tiny, cost
 
 Adding this feature's copy pushed §12's already-disclosed 0.7 kB overage to
-0.8 kB (D-151). The two new routes add nothing to the shared first-load
+0.8 kB (D-162). The two new routes add nothing to the shared first-load
 bundle themselves.
+
+## [0.24.3] — 2026-09-17 · PAM can text for real
+
+Twilio credentials are configured and proved with a real message, sent
+end-to-end through the live dispatcher to a real phone.
+
+## [0.24.2] — 2026-09-17 · Both new text messages signed off
+
+The approval and denial texts for a case-manager/program-lead request are
+reviewed and live. No text has actually gone anywhere yet — Twilio still
+isn't configured — but nothing is blocking either message from sending the
+moment it is.
+
+## [0.24.1] — 2026-09-17 · Live
+
+Migrations 0054 through 0057 (the Everyone list's Requests screen, the
+denial text, program submission, and the demo view) applied to the real
+database. Two small fixes caught by the post-deploy security/performance
+check: a trigger function that was reachable directly when it shouldn't
+have been, and two missing indexes.
+
+## [0.24.0] — 2026-09-17 · The Everyone list, a program's own details, and a demo view
+
+### Added — a denial now texts the person too
+
+At Will's explicit request, sent straight to the phone with the usual safety
+check skipped for this one message — PAM's number is in it, so a real
+question has somewhere to go.
+
+### Added — a program lead can tell PAM about their program at sign-up
+
+A new step, manual entry only, when somebody picks "Program." Approving
+their request now adds it straight to the catalogue.
+
+### Added — a super admin can grant any account a demo view
+
+From the Everyone list. An account with it sees PAM's existing example data
+everywhere that screen already had one, whether or not its own data is
+empty — for showing the app off without showing anybody's real information.
+Not yet wired into every screen.
+
+## [0.23.0] — 2026-09-17 · Deciding a staff request
+
+### Added — a super admin can approve or deny a case-manager or program-lead request
+
+A new screen, reached from the Everyone list, lists every pending request and
+lets a super admin pick a city and approve it — which creates the real
+account immediately — or deny it. A notification tells every super admin
+when one comes in.
+
+### Added — an approval text, pending sign-off
+
+Not sending yet: the wording needs a human's approval first, the same rule
+every other message in the app already follows.
+
+
 
 ## [0.22.0] — 2026-09-17 · Hero motion, a quieter sign-in
 

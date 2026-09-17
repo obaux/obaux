@@ -1,8 +1,8 @@
--- 0055 — A conversation partner reads a name and a role, never activity info.
+-- 0061 — A conversation partner reads a name and a role, never activity info.
 --
--- Will's follow-up on 0054: a program admin must not see a member's
+-- Will's follow-up on 0060: a program admin must not see a member's
 -- "activity" info — `last_active_at`, and anything in that vein — through
--- the new messaging surface. Auditing what 0054's
+-- the new messaging surface. Auditing what 0060's
 -- `profiles_select_conversation_partner` actually granted: the whole
 -- `profiles` row, to ANY conversation partner, of ANY role — `last_active_at`,
 -- `phone`, `bio`, `tags`, `home_zip`, all of it. A raw `for select` policy has
@@ -13,7 +13,7 @@
 -- problem: a SECURITY DEFINER function with a fixed, short column list —
 -- `first_name` and `role`, nothing else — guarded by conversation membership
 -- inside the function body rather than a table-wide grant. See DECISIONS.md
--- D-154 for the full reasoning, including why this is deliberately uniform
+-- D-165 for the full reasoning, including why this is deliberately uniform
 -- across every caller's role rather than program-admin-specific: nobody
 -- needs `last_active_at` to know who is messaging them or who they are
 -- messaging, so nobody gets it through this path — not a member, not a
@@ -51,7 +51,7 @@ $$;
 comment on function public.conversation_partners is
   'For every conversation the caller is in, the other participant''s name and '
   'role — nothing else. Replaces the raw profiles_select_conversation_partner '
-  'policy (0054), which exposed the whole profiles row including '
+  'policy (0060), which exposed the whole profiles row including '
   'last_active_at and phone to any conversation partner. The guard is '
   '"mine.profile_id = auth.uid()" inside the function body, not the grant: '
   'PostgREST exposes every function in public to any signed-in caller (0007, '
@@ -65,10 +65,10 @@ grant execute on function public.conversation_partners() to authenticated;
 -- `profiles_select_provider_linked` (0007) already grants a program admin the
 -- WHOLE profiles row -- including last_active_at and phone -- for any member
 -- linked via enrollment, appointment, or connection, independent of whether a
--- conversation exists at all. Narrowing 0054's conversation-specific policy
+-- conversation exists at all. Narrowing 0060's conversation-specific policy
 -- does not close that older, wider path: a program admin who has never
 -- messaged a member they are enrolled with can still read that member's
 -- last_active_at today by querying `profiles` directly. This is a
 -- pre-existing general provider-role RLS question, not something this
 -- session's messaging work introduced, and is out of scope for this
--- migration -- see DECISIONS.md D-154's closing note.
+-- migration -- see DECISIONS.md D-165's closing note.

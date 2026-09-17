@@ -183,9 +183,9 @@ select test.check('non-buddy sees no activities at all',
 
 -- ===========================================================================
 \echo ''
-\echo '--- Providers reach members only through provider_linked_members(), never profiles directly (§4, D-155) ---'
+\echo '--- Providers reach members only through provider_linked_members(), never profiles directly (§4, D-166) ---'
 -- ===========================================================================
--- 0056 dropped profiles_select_provider_linked: a raw row policy cannot
+-- 0062 dropped profiles_select_provider_linked: a raw row policy cannot
 -- expose some columns and not others, and Will confirmed program admins
 -- never see a member's activity info — last_active_at, along with
 -- everything else that policy used to hand back — anywhere in the app. A
@@ -198,7 +198,7 @@ select test.check('linked provider reads the member through provider_linked_memb
   (select count(*) from public.provider_linked_members() where id = :'marcus'), 1);
 select test.check('linked provider sees the enrollment',
   (select count(*) from public.enrollments where member_id = :'marcus'), 1);
-select test.check('linked provider CANNOT read the member profile directly (0056)',
+select test.check('linked provider CANNOT read the member profile directly (0062)',
   (select count(*) from public.profiles where id = :'marcus'), 0);
 
 select test.as_user(:'bob');

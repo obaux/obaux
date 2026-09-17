@@ -1,13 +1,13 @@
--- 0056 — Program admins never see a member's activity info, app-wide.
+-- 0062 — Program admins never see a member's activity info, app-wide.
 --
--- Will, confirming and widening D-154's closing note: "program admins don't
+-- Will, confirming and widening D-165's closing note: "program admins don't
 -- see activity, across entire app" — a blanket product rule, not something
 -- scoped to messaging. `profiles_select_provider_linked` (0007) is the one
 -- place left that could hand it to them: a raw row policy granting a
 -- provider the WHOLE `profiles` row — `last_active_at`, `phone`, `bio`,
 -- everything — for any member linked through an enrollment, an appointment,
 -- or a connection, with no conversation required. It predates messaging
--- entirely and is unaffected by 0054/0055.
+-- entirely and is unaffected by 0060/0061.
 --
 -- Closed the same way, for the same reason a raw policy cannot expose some
 -- columns and not others: a SECURITY DEFINER function with a fixed column

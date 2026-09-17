@@ -27,50 +27,80 @@ which already had it and is where a member is actually choosing something
 splash screen first (D-146). The shared alert banner is now a solid-colour,
 single-row, in-flow composition instead of Astryx's own translucent `Banner`,
 fixing both a readability complaint and an overlap with the header (D-143,
-D-144, D-145). **There is now a first chat/messaging surface, staff-to-member**:
+D-144, D-145).
+
+**A pending case-manager or program-lead request is now decided for
+real, not just recorded**: a super admin reviews it at `/requests/`
+(reached from the Everyone list, not from the notification itself — D-148),
+approving creates the account immediately with the phone already on file
+(D-149). A denial now texts the person too, at Will's explicit instruction to
+skip the usual quiet-hours/STOP safety check for this one message and include
+PAM's number (D-152) — both the approval and denial texts are signed off and
+live (Will, 17 September). Approving a program lead who left their program's
+details at sign-up (a new step in `/join/`, manual entry only — D-154) adds
+the program straight to the catalogue (D-153). A super admin can grant any
+account a demo view from the Everyone list, showing PAM's existing example
+data everywhere that account looks rather than only when its own data
+happens to be empty — wired into five of the screens that already had an
+example-data fallback, not yet all of them (D-155). All of it — migrations
+0054 through 0059 — is live on the real database (D-156). **PAM can text for
+real now** (D-158): Twilio credentials are in place and proved with an actual
+message sent end-to-end. Session log:
+`docs/sessions/2026-09-17-everyone-list-and-program-requests.md`.
+
+**There is now a first chat/messaging surface, staff-to-member, too**:
 a case manager can message their caseload, a program admin can message
 members enrolled in their program, and a member can see and reply within a
 conversation staff already started — never member-to-member. `/messages/`
 lists conversations plus, for staff, anyone eligible they haven't messaged
 yet; `/messages/thread/` reads and sends within one. A first version of this
 (17 September, same day) wrongly scoped it to member-to-member "connections"
-and was corrected on Will's direction before anyone used it — see D-152,
-superseding D-148/149/150. D-074's supervised-chat model still holds for
+and was corrected on Will's direction before anyone used it — see D-163,
+superseding D-159/160/161. D-074's supervised-chat model still holds for
 anyone *not* in a conversation (a case manager reads it only if it's
 reported), and now explicitly covers the case of a case manager who *is* a
 participant too — §4.1's transparency contract was widened to say so
-(D-153). **A conversation partner reads a name and a role, nothing else** —
-D-153's own first version handed back a whole `profiles` row, including
+(D-164). **A conversation partner reads a name and a role, nothing else** —
+D-164's own first version handed back a whole `profiles` row, including
 `last_active_at` and `phone`, to any conversation partner; replaced same day
 with a column-limited function following 0043's `directory_people`
-precedent (D-154), so a program admin (or anyone) never sees activity info
+precedent (D-165), so a program admin (or anyone) never sees activity info
 through this path. **"Program admins don't see activity, across the entire
 app" is now a real, closed guarantee, not just a messaging-surface one**
-(D-155, Will's confirmation and widening of D-154's closing note): the
+(D-166, Will's confirmation and widening of D-165's closing note): the
 older, pre-existing `profiles_select_provider_linked` policy — which let a
 program admin read a member's `last_active_at` and `phone` through any
 enrollment/appointment link, no conversation required — is gone, replaced
-by `provider_linked_members()` (0056), the same column-limited-function
+by `provider_linked_members()` (0062), the same column-limited-function
 pattern. Case managers are unaffected throughout; this is provider-role-specific.
 The §4.1 transparency screen was re-audited line by line, not just amended
-again (D-156): it now says the program-activity guarantee plainly and
+again (D-167): it now says the program-activity guarantee plainly and
 positively, and a stale, never-actually-true `canSee.chatMetadata` line
 (predating all three of today's messaging sessions) was found and removed.
 Who may *start* a conversation is still a client-side restraint, not a
-database one — see D-152 for the gap and the migration that would close it.
+database one — see D-163 for the gap and the migration that would close it.
 **All of it is now actually verified, not just written**: `admin_visibility.test.ts`,
 the test `transparency.ts` had claimed enforces this contract but which did
-not exist (D-153), is built (`04_transparency_contract_test.sql`, D-157) —
+not exist (D-164), is built (`04_transparency_contract_test.sql`, D-168) —
 and this sandbox turned out not to be permanently missing `postgis` after
 all; installing it let `pnpm --filter @pam/db test` run for real against
-every migration through `0056`. **221 checks pass, 0 failures.** `0055` and
-`0056` are now deployed to the live Supabase project (`0054` was superseded
-before deploy) and `get_advisors` came back clean. Deploying surfaced real
-drift between this repo and the live schema — unrelated to messaging, not
-caused by or fixed in this session — see the drift note under "What is
-live" and D-158; `pam/CLAUDE.md` gained a "Working alongside another PAM
-session" section as a direct result. Newest
-session log: `docs/sessions/2026-09-17-deploy-and-concurrency-rules.md`.
+every migration through `0062`. **221 checks pass, 0 failures.** `0060`,
+`0061` and `0062` are all recorded as deployed to the live Supabase project
+(`0060`'s policy was superseded by `0061` in the same deploy, the same way
+it now is locally) and `get_advisors` came back clean. Deploying surfaced
+real drift between this repo and the live schema — unrelated to messaging,
+not caused by or fixed in that session — see the drift note under "What is
+live" and D-169; `pam/CLAUDE.md` gained a "Working alongside another PAM
+session" section as a direct result. Session log:
+`docs/sessions/2026-09-17-deploy-and-concurrency-rules.md`.
+
+**Both of the above were built by two concurrent PAM sessions working the
+same day without knowing about each other**, which collided on the same
+migration numbers (`0054`–`0056`) and the same decision numbers (D-148
+through D-158) — reconciled by a merge that renumbered the messaging
+session's migrations to `0060`–`0062` and its decisions to D-159–D-169,
+in place, with every cross-reference updated to match (D-170). Newest
+session log: `docs/sessions/2026-09-17-reconciling-a-concurrent-merge.md`.
 
 This is the handover document: what exists, what is proven, what is live, and
 what the next person needs to know before touching anything.
@@ -106,29 +136,40 @@ going — without help?*
 Philadelphia). The database is real and reachable; the app is not deployed
 anywhere yet.
 
-**The live migration ledger and this repo have drifted, and it is not fully
-reconciled.** `0054`–`0056` (this session's messaging-privacy migrations) are
-now deployed and verified via `get_advisors` (clean). But the live project
-also carries six migrations with no matching file in this repo on any branch
-— `staff_review`, `staff_denied_sms`, `program_submission`, `demo_view`,
-`lock_notify_on_staff_request`, `staff_requests_indexes`, all applied 17
-September — almost certainly Will's other concurrent session building the
-`staff_requests` review flow directly against the live database. Separately,
-committed local migration `0052_saved_places_say_what_they_are.sql` does
-**not** appear in the live ledger at all. Neither gap was this session's to
-close; see D-158. **Do not assume the live schema matches this branch's
-migration files** until both are reconciled — check
-`mcp__Supabase__list_migrations` against `packages/db/migrations/` before
-deploying anything further.
+**The "six unknown live migrations" this repo could not explain are now
+explained: they were the other concurrent PAM session's own committed
+work**, merged into this branch as `0054`–`0059` (`staff_review`,
+`staff_denied_sms`, `program_submission`, `demo_view`,
+`lock_notify_on_staff_request`, `staff_requests_indexes`) — see D-170 for
+the merge that reconciled two independently-numbered sessions' migrations
+and decisions in one pass. This session's own three messaging-privacy
+migrations were renamed `0060`–`0062` to make room and are also deployed
+and verified via `get_advisors` (clean); the live project still records
+them under their original deploy-time names (`0054_conversation_partner_visibility`
+etc. — a cosmetic mismatch, not a functional one, since Supabase tracks
+migrations by timestamp, not the filename's number prefix — see D-169's
+addendum).
 
-**The text-message dispatcher is live and running** — the `dispatch-sms` function
-is deployed and a database schedule calls it every five minutes. It sends
-nothing, on purpose: no human has signed off the copy, so every message is
-refused and the refusal is recorded on the message. Proved against the live
-project with one real queued notice: `claimed 1, sent 0 — copy is not signed
-off`. Quiet hours, the STOP list and atomic claiming are enforced in the
-database, not in the function. Signing the copy and adding the Twilio
-credentials is what turns it on; nothing needs redeploying. See
+**One real gap is still unreconciled, and this merge did not resolve it:**
+committed local migration `0052_saved_places_say_what_they_are.sql` does
+**not** appear in the live migration ledger at all. This is a genuine
+local-vs-live deployment gap, not a file-numbering collision — merging the
+two sessions' repos together cannot fix a migration nobody has deployed.
+Check `mcp__Supabase__list_migrations` against `packages/db/migrations/`
+before assuming this has been resolved, and see D-169/D-170 for what has
+and has not been checked so far.
+
+**The text-message dispatcher is live, running, and sending for real (17
+September).** The `dispatch-sms` function is deployed and a database schedule
+calls it every five minutes. Twilio credentials are in place and proved with a
+real end-to-end test: a signed-off template queued to Will's own number came
+back `status: sent`, no failure reason, picked up by the very next scheduled
+run. Quiet hours, the STOP list and atomic claiming are enforced in the
+database, not in the function. All sixteen templates in the catalogue are now
+signed off — the original thirteen (13 September) plus the two built this
+week, `staff_request_approved` and `staff_request_denied` (17 September) —
+so nothing is currently held back at the `reviewedBy` gate; the next template
+anyone adds still starts blank and stays refused until it is read. See
 `docs/sms-setup.md`.
 
 **Sign-in and sign-up work, and sign-out exists.** Supabase is pointed at
@@ -153,15 +194,18 @@ messages carry; the second was rejected for implied consent (30925), which was
 right — PAM now asks on a screen of its own, with nothing pre-selected, and the
 agreement is the button's own words (D-085, D-086).
 
-What is left before a real text sends, all of it a human's:
+~~What was left before a real text sends~~ — **done, 17 September**: Twilio
+credentials are in the `dispatch-sms` Edge Function secrets (the Messaging
+Service SID, not a bare from-number, so the A2P approval carries through) and
+proved with a real message. What is still open, neither of them a blocker on
+sending in general:
 
-1. Twilio credentials into the `dispatch-sms` Edge Function secrets — use the
-   **Messaging Service SID**, not a bare from-number: the A2P approval attaches
-   to the service.
-2. Somebody has to answer the reminders question. Every existing row has
-   `sms_enabled = false` (0042 made consent opt-in), so nothing sends to anyone
-   until they say yes — including Will's own account.
-3. The HELP auto-reply on the Messaging Service, matching what was filed.
+1. Reminder-type texts specifically are opt-in per account (`sms_enabled =
+   false` by default, 0042) — nothing about Twilio being configured changes
+   that. Somebody still has to say yes on the reminders screen before PAM
+   texts them one, including Will's own account.
+2. The HELP auto-reply on the Messaging Service, matching what was filed with
+   the carrier, is not yet confirmed set up.
 
 The account is still in trial: only numbers verified by hand in the Twilio
 console can receive a text. Setup and the known traps are in
@@ -203,11 +247,11 @@ Numbers here are from the last run, not aspirations.
 | Typecheck | 5/5 packages | — |
 | `@pam/config` tests | 202 pass | No SMS can send unreviewed, over 160 chars, with emoji, or with a term that reveals justice involvement. Locales are key-for-key. The transparency screen matches its contract. |
 | `@pam/ui` tests | 66 pass | Every component is axe-clean. `PlaceCard` offers exactly three actions in a fixed order. Reduced motion is respected. The mic hides when unsupported. |
-| Database suite | 221 checks pass | See below. Grew from 152 across today's four messaging sessions — `0055`/`0056`'s own coverage plus `04_transparency_contract_test.sql` (D-157), all now actually run, not just written: this sandbox lacked `postgis` for the first four sessions today, `apt-get install postgresql-16-postgis-3` closed that during the fifth |
-| Live RLS fingerprint | **not re-verified since 0054–0056 deployed** | This row's last "identical to local" claim predates today. `0054`–`0056` are now live and `get_advisors` came back clean, but the fingerprint comparison itself hasn't been re-run, and the live project also carries six undocumented migrations this repo can't fingerprint (see D-158, and the drift note under "What is live") |
+| Database suite | 235 checks pass | See below. Grew from 152 across today's messaging sessions (to 221 — `0061`/`0062`'s own coverage plus `04_transparency_contract_test.sql`, D-168) and then to 235 once merged with the other concurrent session's own `staff_review`/`demo_view` coverage (D-170) — the combined migration set (`0001`–`0062`) run together for the first time, not each session's own subset in isolation |
+| Live RLS fingerprint | **not re-verified since `0060`–`0062` deployed** | This row's last "identical to local" claim predates today. `0060`–`0062` (deployed under their original names, `0054`–`0056`) are now live and `get_advisors` came back clean, but the fingerprint comparison itself hasn't been re-run against the combined migration set — this repo and the other concurrent session's are now merged, but neither has been re-fingerprinted since (see D-169/D-170, and the drift note under "What is live") |
 | Live anonymous attack | 0 rows leaked | A signed-out caller reads no profiles, messages, invites or audit rows on the real database, while still reaching the support number and the public catalogue |
 | Browser a11y + theme (Playwright, full suite) | 426 pass | No WCAG AA violations at 320px or iPhone SE. Every control clears 48px. No horizontal scroll. The Astryx theme really resolves. Runs in dark mode as well as light. |
-| First-load JS | 501.0 kB of 500 kB — **1.0 kB over budget**, disclosed and unresolved | §12 budget, measured gzipped on what `index.html` actually loads; `/signin` and `/gallery` carry `OnboardingSlides`' `framer-motion` weight on their own subpath export (D-140), every other route unaffected. Grew from 500.7 kB across two messaging sessions (D-151), entirely new locale strings — irreducible without lazy-loading translations per route, which is out of scope; `/messages` and `/messages/thread` themselves add nothing to this shared measurement |
+| First-load JS | 503.3 kB of 500 kB — **3.3 kB over budget**, disclosed and unresolved | §12 budget, measured gzipped on what `index.html` actually loads; `/signin` and `/gallery` carry `OnboardingSlides`' `framer-motion` weight on their own subpath export (D-140), every other route unaffected. Grew from 500.7 kB across the messaging sessions alone (1.0 kB, D-162), entirely new locale strings — irreducible without lazy-loading translations per route, which is out of scope. **Grew a further 2.3 kB when merged with the other concurrent session's own additions** (D-170) — two sessions each independently added first-load weight without seeing the other's budget impact; reconciling the combined total is real, undone follow-up work, not something this merge's own reconciliation took on |
 
 ### The database suite is the one that matters
 
@@ -238,42 +282,46 @@ oversight:
 - **No map, no enrollment.** Sign-up exists — `/join/`, five steps — and an
   invite code is typed into its second step, or arrives as `/join/?code=`.
 - **Chat exists now, staff-to-member.** `/messages/` and `/messages/thread/`
-  (17 September, corrected same day — D-152) work against a case manager's
+  (17 September, corrected same day — D-163) work against a case manager's
   real caseload (`admin_covers()`, the same relationship `/admin/` already
   uses) and a program admin's real enrolled members (`provider_linked_to()`),
   and against real conversations either has already started with a member. A
   member sees and replies but never starts one. Scoping who may *start* a
   conversation is a client-side choice today, not a database-enforced one —
-  see D-152 for exactly what a follow-up migration should check. A member
+  see D-163 for exactly what a follow-up migration should check. A member
   reading a staff person's name in a conversation needed a new `profiles`
-  read policy, and a widened §4.1 transparency contract (D-153), because a
+  read policy, and a widened §4.1 transparency contract (D-164), because a
   case manager who is a real conversation participant reads more than the
-  contract previously disclosed. That first read policy (0054) handed back
+  contract previously disclosed. That first read policy (0060) handed back
   the whole `profiles` row — `last_active_at`, `phone`, everything — to any
-  conversation partner of any role; replaced same day (0055,
-  `conversation_partners()`, D-154) with a two-column function so nobody,
+  conversation partner of any role; replaced same day (0061,
+  `conversation_partners()`, D-165) with a two-column function so nobody,
   including a program admin, sees activity info through this path.
-  **Closed app-wide, same day (0056, D-155)**: the older, pre-existing
+  **Closed app-wide, same day (0062, D-166)**: the older, pre-existing
   `profiles_select_provider_linked` policy — which let a program admin read
   a member's `last_active_at` and `phone` through any
   enrollment/appointment link, no conversation required — is gone too,
   replaced by `provider_linked_members()` (id, first name only). "Program
   admins don't see activity, across the entire app" is now true, not just
   true of messaging. Case managers are unaffected. The transparency screen
-  was re-audited line by line (D-156) rather than amended piecemeal a
+  was re-audited line by line (D-167) rather than amended piecemeal a
   fourth time. `admin_visibility.test.ts` — the test that comment claimed
   enforces the contract but did not exist — is now built and passing
-  (`04_transparency_contract_test.sql`, D-157), part of the 221-check
+  (`04_transparency_contract_test.sql`, D-168), part of the 221-check
   database suite that ran for real once this sandbox got `postgis`.
-- **Nothing reviews `staff_requests`.** Sign-up records people who say they run
-  a program or carry a caseload; the rows are there and a super admin can read
-  them, but there is no screen and no notification. The screen promises a call
-  within a day or two, so somebody has to be told to look.
+- **`staff_requests` is now reviewed, for real (17 September, D-148/D-149).**
+  A pending claim notifies every super admin (a plain alert, not a clickable
+  one — D-148) and is decided on a new screen, `/requests/`, linked from the
+  Everyone list: approve creates the real account immediately, phone pulled
+  from `auth.users`; deny records the decision and creates nothing. Both the
+  approval and denial SMS are signed off and live (Will, 17 September) — the
+  denial text skips the usual quiet-hours/STOP check by explicit instruction
+  (D-150, D-152), a deliberate exception, not a general precedent.
 - **What does exist and works:** sign-up, sign-in, home, saved places, points
   and badges, the places list, a screen per place at `/place/?id=…`, reporting
   a place, the notifications list, the
-  reminders question, the case manager screen, the people directory, and the
-  privacy and terms pages.
+  reminders question, the case manager screen, the people directory, deciding
+  a staff request, and the privacy and terms pages.
 - **Home is a menu, and only a menu.** It lists where to go and what is waiting.
   No next step, no points, no plan: PAM has no real ones yet, and a home screen
   that invents its own content is worse than a short one (D-098). `/gallery/` is
@@ -398,17 +446,21 @@ while the copy is unsigned, so it earned the first live test, not the last.*
 | 7 | Retention: missed-appointment history beyond 90 days | Phase 5 | No purge job. Keeping this data indefinitely is the wrong default for this population. |
 | 8 | Pilot partner orgs and usability test scheduling | Phase 7 | Five members, three providers, two admins. |
 | 9 | ~~Point Supabase at Twilio~~ **Done** | — | Verified on 14 September from the auth logs: a real code, a real `user_signedup` with `provider: phone`, and a member profile a minute later. This row read "the single thing blocking the product" until 16 September, when the logs said otherwise. |
-| 10a | **Who calls the people who ask to help?** | Program leads and case managers getting accounts | Sign-up collects them as requests in `staff_requests`, and the screen says somebody will call within a day or two. Nobody works that list yet, and nothing tells them there is one. The code they need can now be made from the people screen. |
+| 10a | ~~Who calls the people who ask to help?~~ **Done** | — | Resolved by the other concurrent session's `/requests/` screen (D-148/D-149): a super admin is notified when a claim arrives and reviews it there, approving or denying for real. Sign-up still collects the request in `staff_requests`; it is now worked, not just recorded. |
 | 9b | ~~754 places, and not one of them says what it is~~ **Done** | — | 0050, 16 September: all 754 carry a description of at most 200 characters, written from the city's own `service_type` / `park_name` / `asset_name` fields or, for the twelve hand-added places, from published sources. 230 have a website and 361 are marked `audience`. Verified live: 754 active, 754 described, 0 hidden for review, longest 152 characters. This reversed the screen half of 0017 and needed Will's word — see A11 and D-121. The words are sourced, not invented, but **no provider has read their own entry yet.** |
 | 10c | **Confirm the Twilio account's state** | Anybody whose number is not verified | This row said the account was in trial. Will, 16 September: the Twilio console says it is active. That earlier claim came from a 13–14 September finding and was repeated afterwards without re-checking; this session did not verify it either way, so it stands as Will's word and unverified here. If it is active the trial concern is gone; if not, a code to an unverified number is not sent and nothing says so — the live logs on the 14th show one phone asking three times. Carrier registration is a separate question (row 10). |
 | 10b | **A line about the PAM team on the transparency screen** | A promise already made | Members were told they would hear first if what is visible changes, and the directory now shows a super admin every account (name, role, region, status, last active; never messages or contact details). Proposed, for `packages/config/transparency.ts`: *"The PAM team can see your name, your city and the last day you used PAM. Never your messages."* It is a change to the contract, so it wants Will's word. |
-| 10 | **Twilio credentials into the dispatcher's secrets** | Reminders and notices | `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, and either `TWILIO_MESSAGING_SERVICE_SID` or `TWILIO_FROM_NUMBER`, under Edge Functions → dispatch-sms. Until then the dispatcher records "Twilio is not configured" instead of sending. |
-| 11 | **Confirm client-side caseload/enrollment scoping in `/messages/` is an acceptable interim state (D-152)** | Staff-to-member messaging | RLS lets a client create a conversation with any profile id; only `useMessageableMembers`'s own restraint (a case manager's real caseload, a program admin's real enrolled members) keeps this screen scoped to real relationships. A follow-up migration should enforce it at the database layer — see D-152 for exactly what to check. Shipped now, conservatively, rather than blocked on that migration; flagged for Will's word on whether that trade is right, given it now involves staff accounts with real caseload access rather than peers. |
-| 12 | **Wire `report_message()` (0034) to a UI action in the thread view** | Member safety | The RPC is complete and correct at the database layer; nothing in `/messages/thread/` calls it yet. D-074's whole premise is that a report is the *only* route a case manager who is **not** a participant ever has into message content — a chat surface with no way to file one is a real gap, not a nice-to-have. |
-| 13 | ~~Run `pnpm --filter @pam/db test` against migrations 0054, 0055 and 0056~~ **Done (D-157); now also deployed live (D-158)** | — | This sandbox turned out not to be permanently missing `postgis` — `apt-get install postgresql-16-postgis-3` closed the gap. `pnpm --filter @pam/db test` ran for real: **221 checks pass, 0 failures.** `0054` was superseded before deploy; `0055` and `0056` are now applied to the live Supabase project, and `get_advisors` (security) came back clean. Deploying also surfaced live/repo drift unrelated to this work — see the "What is live" drift note and D-158 — left for Will to reconcile. |
-| 14 | ~~`profiles_select_provider_linked` grants activity info~~ **Done — closed app-wide (0056, D-155)** | — | Was: a program admin could read `last_active_at`/`phone` for any enrolled member with no conversation required. Replaced with `provider_linked_members()` (id, first name only). Will confirmed this needed to be a blanket rule, not just a messaging-surface one, and the transparency screen now says so (D-156). Case managers unaffected. |
-| 15 | **Decide whether `profiles.phone` needs a column-level `REVOKE` more broadly still** | Staff/member privacy | The provider-role exposure is now closed everywhere it was found (D-154, D-155 — `conversation_partners()` and `provider_linked_members()` both return name/role only). `profiles_select_admin_caseload` (case managers) still exposes the whole row, including `phone`, for a caseload/region member — untouched, since every instruction so far has been explicitly provider-role-specific, not about case managers. The `bidder_contact`-style column grant pattern used elsewhere in this repo would close it if Will wants that too. |
-| 16 | ~~Build `admin_visibility.test.ts`~~ **Done, as `04_transparency_contract_test.sql` (D-157)** | — | `transparency.ts`'s own file comment used to claim a test by that name enforces `ADMIN_CAN_SEE` against live RLS; it never existed (D-153, D-156). Built and run: `packages/db/test/04_transparency_contract_test.sql`, covering the four contract lines that changed today (case-manager participation, non-participation, program-admin activity via both read paths, and total visibility) against a real database, not just documentation. Passes, per row 13. |
+| 10 | ~~Twilio credentials into the dispatcher's secrets~~ **Done** | — | Will, 17 September. Confirmed with a real end-to-end test: a `staff_request_denied` text queued to Will's own number was picked up by the 5-minute dispatcher cycle and sent successfully (`status: sent`, no failure reason). PAM can now text for real. |
+| 11 | ~~Sign off `staff_request_approved`'s wording~~ **Done** | — | Will, 17 September. `pnpm --filter @pam/config test` is green. |
+| 12 | ~~Migrations 0054 through 0057 are local only~~ **Done** | — | Applied to the live Supabase project 17 September, along with two follow-ups `get_advisors` surfaced: `notify_on_staff_request` (0058) was callable directly via PostgREST, unlike its two siblings in 0038 — its own migration run never got the schema-level default-privileges lockdown 0038's did; and `staff_requests` had two foreign keys with no covering index (0059). `/requests/`, `/join/`'s program step, and the demo view all work against the real database now. |
+| 13 | ~~Sign off `staff_request_denied`'s wording too~~ **Done** | — | Will, 17 September. Still sent with quiet-hours/STOP enforcement deliberately skipped, at Will's own instruction (D-152) — that was never what this row was about. |
+| 14 | **The demo view is not wired into every screen yet** | An account granted it still sees real data on `place`, `person`, `HomePeoplePreview`, and the saved-places dummy path | The mechanism (`useDemoView`) is built and proven on five screens (D-155); finishing the rest is the same pattern repeated, not new design. |
+| 15 | **Confirm client-side caseload/enrollment scoping in `/messages/` is an acceptable interim state (D-163)** | Staff-to-member messaging | RLS lets a client create a conversation with any profile id; only `useMessageableMembers`'s own restraint (a case manager's real caseload, a program admin's real enrolled members) keeps this screen scoped to real relationships. A follow-up migration should enforce it at the database layer — see D-163 for exactly what to check. Shipped now, conservatively, rather than blocked on that migration; flagged for Will's word on whether that trade is right, given it now involves staff accounts with real caseload access rather than peers. |
+| 16 | **Wire `report_message()` (0034) to a UI action in the thread view** | Member safety | The RPC is complete and correct at the database layer; nothing in `/messages/thread/` calls it yet. D-074's whole premise is that a report is the *only* route a case manager who is **not** a participant ever has into message content — a chat surface with no way to file one is a real gap, not a nice-to-have. |
+| 17 | ~~Run `pnpm --filter @pam/db test` against migrations 0060, 0061 and 0062~~ **Done (D-168); now also deployed live (D-169)** | — | This sandbox turned out not to be permanently missing `postgis` — `apt-get install postgresql-16-postgis-3` closed the gap. `pnpm --filter @pam/db test` ran for real: **221 checks pass, 0 failures.** `0060` was superseded (locally) before deploy but is still recorded live under its deploy-time name; `0061` and `0062` are also applied to the live Supabase project, and `get_advisors` (security) came back clean. Deploying also surfaced live/repo drift unrelated to this work — see the "What is live" drift note and D-169 — left for Will to reconcile. Deployed and merged under different numbers than they were built with — see D-170. |
+| 18 | ~~`profiles_select_provider_linked` grants activity info~~ **Done — closed app-wide (0062, D-166)** | — | Was: a program admin could read `last_active_at`/`phone` for any enrolled member with no conversation required. Replaced with `provider_linked_members()` (id, first name only). Will confirmed this needed to be a blanket rule, not just a messaging-surface one, and the transparency screen now says so (D-167). Case managers unaffected. |
+| 19 | **Decide whether `profiles.phone` needs a column-level `REVOKE` more broadly still** | Staff/member privacy | The provider-role exposure is now closed everywhere it was found (D-165, D-166 — `conversation_partners()` and `provider_linked_members()` both return name/role only). `profiles_select_admin_caseload` (case managers) still exposes the whole row, including `phone`, for a caseload/region member — untouched, since every instruction so far has been explicitly provider-role-specific, not about case managers. The `bidder_contact`-style column grant pattern used elsewhere in this repo would close it if Will wants that too. |
+| 20 | ~~Build `admin_visibility.test.ts`~~ **Done, as `04_transparency_contract_test.sql` (D-168)** | — | `transparency.ts`'s own file comment used to claim a test by that name enforces `ADMIN_CAN_SEE` against live RLS; it never existed (D-164, D-167). Built and run: `packages/db/test/04_transparency_contract_test.sql`, covering the four contract lines that changed today (case-manager participation, non-participation, program-admin activity via both read paths, and total visibility) against a real database, not just documentation. Passes, per row 17. |
 
 ---
 
@@ -469,11 +521,15 @@ move the internal RLS helpers into a `private` schema PostgREST does not expose
 write rule (D-026).
 
 Two pieces follow directly from the messaging work now that verification has
-caught up with it: the migration that closes D-152's gap (who may start a
+caught up with it: the migration that closes D-163's gap (who may start a
 conversation — a case manager's caseload, a program admin's enrolled
 members — should be a database rule, not just this screen's own restraint),
 and wiring `report_message()` to a visible action in the thread view.
-`admin_visibility.test.ts` is built and passing (D-157); deploying today's
-four migrations (`0053` onward through `0056`) to the live Supabase project
-is still undone and worth doing deliberately, with `mcp__Supabase__get_advisors`
-run afterward per `CLAUDE.md`'s own instruction.
+`admin_visibility.test.ts` is built and passing (D-168); this session's four
+migrations (`0060` onward through `0062`) are deployed and verified
+(D-169), and reconciled with the other concurrent session's own `0054`–`0059`
+by the merge that renumbered them (D-170). What is still genuinely
+undone: `0052_saved_places_say_what_they_are.sql` has never reached the
+live project, and the live RLS fingerprint has not been re-verified since
+either session's migrations deployed — see the drift note under "What is
+live" and the "Live RLS fingerprint" row under "What is proven."

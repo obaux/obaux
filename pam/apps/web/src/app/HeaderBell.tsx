@@ -33,19 +33,27 @@ import { useNotifications, unreadCount } from '@/lib/useNotifications';
  * this component sits on every signed-in screen including Home, and the day
  * `@pam/config/dummy-notifications` loaded statically here cost the first
  * load 1.2 kB nobody using a real, populated caseload would ever need.
+ *
+ * `isDemo` (0057) widens the same fallback: an account a super admin has put
+ * in the demo view sees the example count even when its real list is not
+ * empty. Optional and only threaded through the screens that already read
+ * `useDemoView` themselves — everywhere else still reads `role` alone, the
+ * same as before this existed.
  */
 export function HeaderBell({
   enabled,
   role,
+  isDemo = false,
 }: {
   readonly enabled: boolean;
   readonly role?: Role | null;
+  readonly isDemo?: boolean;
 }) {
   const { t } = useI18n();
   const { state } = useNotifications(enabled);
   const [dummyUnread, setDummyUnread] = useState<number | null>(null);
 
-  const needsDummy = state.status === 'ready' && state.items.length === 0 && Boolean(role);
+  const needsDummy = state.status === 'ready' && (state.items.length === 0 || isDemo) && Boolean(role);
 
   useEffect(() => {
     if (!needsDummy) return;

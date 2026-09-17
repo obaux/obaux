@@ -23,7 +23,7 @@ import { useCallback, useEffect, useState } from 'react';
  */
 export interface NotificationRow {
   id: string;
-  kind: 'service_flagged' | 'service_removed' | 'message_reported';
+  kind: 'service_flagged' | 'service_removed' | 'message_reported' | 'staff_request_pending';
   bodyKey: string;
   bodyVars: Record<string, string>;
   subjectType: string | null;

@@ -3,9 +3,9 @@
 --
 -- Will asked for this directly: `transparency.ts`'s own file comment used to
 -- claim an `admin_visibility.test.ts` enforces `ADMIN_CAN_SEE` against live
--- RLS. It did not exist anywhere in this repository (D-153, D-156). This is
+-- RLS. It did not exist anywhere in this repository (D-164, D-167). This is
 -- that test, scoped specifically to what changed across today's three
--- messaging sessions (D-152 through D-156) — not a restatement of the whole
+-- messaging sessions (D-163 through D-167) — not a restatement of the whole
 -- suite.
 --
 -- Four things, matching the four lines of the contract that moved today:
@@ -20,8 +20,8 @@
 --      full and this file does not duplicate it.
 --   3. A program admin never receives `last_active_at` or `phone` for a
 --      member through either read path that reaches one —
---      `conversation_partners()` (0055) or `provider_linked_members()`
---      (0056) — matching `transparency.cannotSee.programActivity`.
+--      `conversation_partners()` (0061) or `provider_linked_members()`
+--      (0062) — matching `transparency.cannotSee.programActivity`.
 --   4. A case manager never receives a member's message content except
 --      through participation (point 1) or a report (point 2's boundary) —
 --      restated here as the single positive claim the other two points
@@ -65,7 +65,7 @@ select count(*) as convo1_msg_count from public.messages where conversation_id =
 -- ===========================================================================
 -- Inserted as the table owner, the same way 01_seed.sql sets up its own
 -- conversation — this file is testing read policies against a known state,
--- not the insert path (D-152 already covers what that needs and flags what
+-- not the insert path (D-163 already covers what that needs and flags what
 -- it still does not enforce).
 set local role postgres;
 
@@ -116,7 +116,7 @@ select test.check('a case manager''s total message visibility is exactly the con
 -- ===========================================================================
 -- Alice is genuinely both: provider_linked_to Marcus (enrollment, 01_seed.sql)
 -- AND a conversation_members row in convo1 (also 01_seed.sql) — the two read
--- paths D-154/D-155 each closed, exercised from the same real account.
+-- paths D-165/D-166 each closed, exercised from the same real account.
 select test.as_user(:'alice');
 
 select test.check('a linked, participating program admin still reads the conversation content itself',
@@ -140,7 +140,7 @@ begin
       raise notice 'ok    conversation_partners() carries no contact details (checked as a program admin)';
   end;
 
-  -- Same two checks against the other path (0056). Deliberately duplicates
+  -- Same two checks against the other path (0062). Deliberately duplicates
   -- part of that migration's own test block in 04_rpc_test.sql: that block
   -- proves the function itself is correct; this one proves the transparency
   -- *contract* holds across BOTH functions a program admin can call, which
@@ -187,4 +187,4 @@ select test.check('...and nothing from the messages table either',
   (select count(*) from public.messages), 0);
 
 \echo ''
-\echo 'ok    transparency contract (D-155, D-156) holds against the live database'
+\echo 'ok    transparency contract (D-166, D-167) holds against the live database'

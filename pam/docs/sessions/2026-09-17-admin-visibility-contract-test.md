@@ -2,11 +2,20 @@
 
 **Phase:** 1 (closing the last flagged gap from today's four messaging sessions) · **Sessions so far:** 29
 
+> **Renumbering note, added during a same-day merge with a concurrent PAM
+> session (D-170):** this log's migration numbers (`0054`–`0056`) and
+> decision numbers (D-148 through D-158) were this session's own at the
+> time of writing. A later merge found a concurrent session had
+> independently used the same numbers for unrelated work, so this
+> session's were renamed `0054`→`0060`, `0055`→`0061`, `0056`→`0062`, and
+> D-148→D-159 through D-158→D-169. **The numbers below have been updated
+> to match** — this log otherwise reads exactly as originally written.
+
 ## What changed
 
 Will asked for the last piece named across today's work: `transparency.ts`'s
 own file comment claimed a test called `admin_visibility.test.ts` enforces
-`ADMIN_CAN_SEE` against live RLS. D-153 had already found it does not exist
+`ADMIN_CAN_SEE` against live RLS. D-164 had already found it does not exist
 anywhere in the repository. Built it — as `packages/db/test/04_transparency_contract_test.sql`,
 matching the existing suite's naming and directory convention rather than
 inventing a new location, picked up automatically by `pnpm --filter @pam/db
@@ -28,7 +37,7 @@ sessions:
 3. A program admin (Alice, genuinely both linked via enrollment and a real
    conversation participant) gets nothing back from `last_active_at` or
    `phone` through either function that reaches a member —
-   `conversation_partners()` (0055) and `provider_linked_members()` (0056)
+   `conversation_partners()` (0061) and `provider_linked_members()` (0062)
    — checked with the same `undefined_column`-on-`execute` technique
    `directory_people()`'s own test already established.
 4. Restated from a third account (Ray, who participates in nothing): total
@@ -45,14 +54,14 @@ have a different answer than every prior session assumed.** `apt-get
 install postgresql-16-postgis-3` succeeded (one dependency 404'd on the
 first attempt from a stale package index; `apt-get update` fixed it).
 `pgcrypto` was already present. `pnpm --filter @pam/db test` ran for real
-for the first time today, against every migration through `0056` and every
+for the first time today, against every migration through `0062` and every
 test file, old and new.
 
 **221 checks pass, 0 failures.**
 
 This retroactively answers the "unverified against the live RLS penetration
 suite" caveat every one of today's four earlier session logs carries for
-`0054`/`0055`/`0056`. Those logs are not edited — they are an accurate
+`0060`/`0061`/`0062`. Those logs are not edited — they are an accurate
 record of what was true when each was written — but `STATUS.md`, which is
 always current, now says the real thing: verified, not flagged.
 
@@ -95,16 +104,16 @@ instead of at the end.
 
 ## Decisions
 
-- **D-157** — the new test file's scope and reasoning, the two bugs it
+- **D-168** — the new test file's scope and reasoning, the two bugs it
   caught in itself, and the `postgis` finding. Also updates the
-  "unverified" framing in D-152/D-155/D-156 by pointing to this entry
+  "unverified" framing in D-163/D-166/D-167 by pointing to this entry
   rather than editing them.
 
 ## Verified
 
 | Check | Result |
 |---|---|
-| `pnpm --filter @pam/db test` | **221 checks pass, 0 failures** — every migration `0001` through `0056`, every existing test file, and the new `04_transparency_contract_test.sql`, against a real throwaway Postgres 16 + PostGIS 3 + pgcrypto cluster, standing up and tearing down the way `scripts/test-db.sh` describes |
+| `pnpm --filter @pam/db test` | **221 checks pass, 0 failures** — every migration `0001` through `0062`, every existing test file, and the new `04_transparency_contract_test.sql`, against a real throwaway Postgres 16 + PostGIS 3 + pgcrypto cluster, standing up and tearing down the way `scripts/test-db.sh` describes |
 | `pnpm -r typecheck` | 5/5 packages clean |
 | `pnpm --filter @pam/config test` | 211 passed, unaffected |
 | `pnpm --filter @pam/ui test` | 65 passed, unaffected |
@@ -121,7 +130,7 @@ instead of at the end.
   Deploying, and running `mcp__Supabase__get_advisors` afterward per
   `CLAUDE.md`'s own instruction, is real, undone work — not something this
   session's local-only verification substitutes for.
-- **D-152's own gap** (who may start a conversation should be a database
+- **D-163's own gap** (who may start a conversation should be a database
   rule) is unchanged by this session — this session tested what exists, it
   did not add new enforcement.
 - No message-reporting UI, same gap flagged since the first of today's four
@@ -129,7 +138,7 @@ instead of at the end.
 
 ## Needs a human
 
-- **Deploy `0053` through `0056`** to the live Supabase project, deliberately
+- **Deploy `0053` through `0062`** to the live Supabase project, deliberately
   — not implied by "the local tests pass" — and run
   `mcp__Supabase__get_advisors` afterward.
 - Nothing else new; every open question from the day's four earlier

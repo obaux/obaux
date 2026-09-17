@@ -2,6 +2,15 @@
 
 **Phase:** 1 (correcting the scope of this same day's chat/messaging UI) · **Sessions so far:** 26
 
+> **Renumbering note, added during a same-day merge with a concurrent PAM
+> session (D-170):** this log's migration numbers (`0054`–`0056`) and
+> decision numbers (D-148 through D-158) were this session's own at the
+> time of writing. A later merge found a concurrent session had
+> independently used the same numbers for unrelated work, so this
+> session's were renamed `0054`→`0060`, `0055`→`0061`, `0056`→`0062`, and
+> D-148→D-159 through D-158→D-169. **The numbers below have been updated
+> to match** — this log otherwise reads exactly as originally written.
+
 ## What changed
 
 Corrects the previous session's build (`docs/sessions/2026-09-17-member-to-member-messaging.md`,
@@ -66,7 +75,7 @@ from both `en.json` and `es.json`.
 
 **The whole previous session was the wrong relationship, and nothing in its
 own verification caught it** — it typechecked, its tests passed, its RLS
-reasoning (D-148) was honest and correct *about the relationship it chose*.
+reasoning (D-159) was honest and correct *about the relationship it chose*.
 The mistake was upstream of all of that: reading A1's own text about
 "program admin chat needing a gate" and inferring the gate meant
 peer-to-peer connections, rather than the caseload/enrollment relationship
@@ -85,23 +94,23 @@ cannot ship silently, and it did its job.
 
 ## Decisions
 
-- **D-152** (supersedes D-148, extends D-150) — the corrected staff-to-member
+- **D-163** (supersedes D-159, extends D-161) — the corrected staff-to-member
   eligibility model, reusing `admin_covers()`/`provider_linked_to()` rather
   than inventing a new relationship, and the RLS gap this still leaves open
   (nothing at the database layer stops a case manager or program admin
   starting a conversation outside their caseload/org, or a member starting
   one at all) — flagged in full, with what a follow-up migration should
   check.
-- **D-153** — the new `profiles_select_conversation_partner` policy (0054)
+- **D-164** — the new `profiles_select_conversation_partner` policy (0060)
   and why it was necessary for the feature to function at all, plus the
   §4.1 transparency contract change and its reasoning. Also notes that
   `admin_visibility.test.ts`, referenced by `transparency.ts`'s own file
   comment as the thing that keeps `ADMIN_CAN_SEE` honest against real RLS,
   does not exist anywhere in this repository — flagged, not silently
   trusted or quietly built.
-- **D-149, D-150, D-151** — D-149 unaffected (a fact about the schema, not
-  the relationship model); D-150's "not previewable" reasoning extended from
-  member-only to all three eligible roles; D-151's bundle numbers updated
+- **D-160, D-161, D-162** — D-160 unaffected (a fact about the schema, not
+  the relationship model); D-161's "not previewable" reasoning extended from
+  member-only to all three eligible roles; D-162's bundle numbers updated
   (500.8 kB → 501.0 kB gz) for this correction's additional copy.
 
 ## Verified
@@ -112,18 +121,18 @@ cannot ship silently, and it did its job.
 | `pnpm --filter @pam/config test` | 211 passed — same count as before the correction; two keys removed (`messages.row.mentor`/`.buddy`), several added, transparency-screen assertions (word-for-word `en.json` match, en/es key parity, dignity-language) all still pass |
 | `pnpm --filter @pam/ui test` | 65 passed, unchanged |
 | `pnpm --filter @pam/web build` | succeeds, static export |
-| `node scripts/check-bundle-budget.mjs` | 501.0 kB gz — over budget by 1.0 kB (was 0.8 kB before this correction; see D-151's update) |
+| `node scripts/check-bundle-budget.mjs` | 501.0 kB gz — over budget by 1.0 kB (was 0.8 kB before this correction; see D-162's update) |
 | Playwright, full suite, all 3 viewport/theme projects (`PLAYWRIGHT_CHROMIUM_PATH` as in the previous session) — first run caught the stale `join.spec.ts` assertion (3 failures, 423 passed), fixed, re-run | 426 passed, 0 failed |
-| `pnpm --filter @pam/db test` | **not run** — this sandbox is missing the `postgis` extension, same limitation as the previous session. `0054`'s new policy is therefore unverified against the RLS penetration suite; flagged in DECISIONS.md D-153 and STATUS.md row 13 |
+| `pnpm --filter @pam/db test` | **not run** — this sandbox is missing the `postgis` extension, same limitation as the previous session. `0060`'s new policy is therefore unverified against the RLS penetration suite; flagged in DECISIONS.md D-164 and STATUS.md row 13 |
 
 ## Left undone
 
-- **D-152's RLS gap.** The database still does not enforce "a case manager
+- **D-163's RLS gap.** The database still does not enforce "a case manager
   may only start a conversation with their own caseload" or "a program admin
   only with their own org's enrolled members" — that is `useMessageableMembers`'s
   own restraint, client-side. Exactly what a follow-up migration should
-  check is written out in D-152.
-- **`profiles_select_conversation_partner` (0054) needs the real `@pam/db`
+  check is written out in D-163.
+- **`profiles_select_conversation_partner` (0060) needs the real `@pam/db`
   test suite**, not just careful reading, before it should be trusted
   against the live project.
 - **`profiles.phone` column-level exposure.** The new policy grants row-level
@@ -137,16 +146,16 @@ cannot ship silently, and it did its job.
 - **Icon duplication on Home for staff.** A case manager or program admin now
   sees `PeopleIcon` twice on their Home screen (their caseload/interested
   tile, and the new Messages tile) — a small, accepted cosmetic cost, not
-  fixed this session (see D-151's addendum).
+  fixed this session (see D-162's addendum).
 
 ## Needs a human
 
-- **D-152, explicitly**: same question the previous session asked about
-  D-148, now sharper — is shipping the UI now, with the database-layer gap
+- **D-163, explicitly**: same question the previous session asked about
+  D-159, now sharper — is shipping the UI now, with the database-layer gap
   fully documented, an acceptable interim state given the parties involved
   are staff accounts with real caseload/enrollment access, not peers?
-- **`0054`'s policy needs to run through `pnpm --filter @pam/db test`** on a
+- **`0060`'s policy needs to run through `pnpm --filter @pam/db test`** on a
   machine with `postgis` before this is trusted against the live project.
 - **Whether `profiles.phone` should be column-restricted** for conversation
-  partners specifically (D-153) — a real but currently-unexploited exposure,
+  partners specifically (D-164) — a real but currently-unexploited exposure,
   Will's call on priority.
