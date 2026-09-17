@@ -37,6 +37,7 @@ import { ReportedPlacesLazy } from './ReportedPlacesLazy';
 import { useSavedPlaces } from '@/lib/useSavedPlaces';
 import { placeStatus, useNow } from '@/lib/usePlaceStatus';
 import { useSession } from '@/lib/useSession';
+import { useDemoView } from '@/lib/useDemoView';
 import { useRoleView } from '@/lib/useViewedRole';
 import { RoleSwitchControl } from '../RoleSwitchControl';
 import { CITY_HALL, loadOrigin, saveOrigin, type AreaOption } from '@/lib/useAreaSearch';
@@ -180,9 +181,10 @@ function PlacesScreen() {
   // params do, and a reset in between would lose the bell's deep link.)
   // One clock for the whole list; `placeStatus` is pure from there.
   const now = useNow();
+  const isDemo = useDemoView(session);
   const { isSaved, save, unsave, failed: saveFailed } = useSavedPlaces(
     session.status === 'signed-in',
-    demoRole,
+    demoRole ?? (isDemo ? trueRole : null),
   );
 
   const chooseArea = (next: AreaOption) => {

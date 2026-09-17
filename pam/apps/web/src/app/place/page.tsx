@@ -20,6 +20,7 @@ import { useI18n } from '@/lib/i18n';
 import { HeaderBell } from '../HeaderBell';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
+import { useDemoView } from '@/lib/useDemoView';
 import { useSavedPlaces } from '@/lib/useSavedPlaces';
 import { usePlaceStatus, weekLines } from '@/lib/usePlaceStatus';
 import { useRoleView } from '@/lib/useViewedRole';
@@ -184,7 +185,8 @@ function PlaceScreen() {
   const signedIn = session.status === 'signed-in';
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
   const { demoRole, setViewAs } = useRoleView(trueRole);
-  const { isSaved, save, unsave } = useSavedPlaces(signedIn, demoRole);
+  const isDemo = useDemoView(session);
+  const { isSaved, save, unsave } = useSavedPlaces(signedIn, demoRole ?? (isDemo ? trueRole : null));
 
   const place = state.status === 'ready' ? state.place : null;
   const status = usePlaceStatus(place?.id ?? '', place?.hours ?? null, t, locale);
