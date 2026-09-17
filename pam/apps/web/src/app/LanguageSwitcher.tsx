@@ -62,10 +62,19 @@ const styles = stylex.create({
    * regardless of light/dark theme, since it sits on art, not on the page.
    */
   onPhoto: {
-    backgroundColor: 'rgba(38, 38, 38, 0.35)',
+    // Darker still (Will, 17 September) — a lighter scrim read as barely
+    // there against some of the brighter photos.
+    backgroundColor: 'rgba(15, 15, 15, 0.6)',
     color: '#FFFFFF',
     borderRadius: '17px',
   },
+  // 2x the glyph Astryx's own icon set draws at, and a heavier stroke to
+  // match (Will, 17 September) — a barely-there hairline globe read as an
+  // afterthought floating on the art, next to a mark and a pill both drawn
+  // with real weight. CSS `width`/`stroke-width` on the `<svg>` beat the
+  // element's own presentation attributes, so this overrides `icons.tsx`'s
+  // shared `1em`/`1.5` defaults without needing a variant on the icon itself.
+  onPhotoGlyph: { width: '2em', height: '2em', strokeWidth: 2.5 },
 });
 
 export function LanguageSwitcher({
@@ -114,7 +123,12 @@ export function LanguageSwitcher({
       <DropdownMenu
         button={{
           label: t('language.title'),
-          icon: <GlobeIcon />,
+          icon:
+            tone === 'onPhoto' ? (
+              <GlobeIcon {...stylex.props(styles.onPhotoGlyph)} />
+            ) : (
+              <GlobeIcon />
+            ),
           isIconOnly: true,
           variant: 'ghost',
           xstyle: tone === 'onPhoto' ? styles.onPhoto : undefined,

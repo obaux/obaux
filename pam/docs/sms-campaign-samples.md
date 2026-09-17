@@ -111,7 +111,10 @@ screen about text messages does not separate the two. Will's call, and the right
 one — a promise that is true of most messages is not a promise.
 
 The sign-in screen still carries the one line the code itself needs: *"PAM texts
-you a code to sign in. Reply STOP to stop texts. Rates may apply."*
+you a code to sign in. No password to remember."* The STOP/rates language moved
+to the reminders screen below (D-139, 17 September) — sign-in codes are not
+optional the way reminders are, so the room to be honest about STOP, HELP and
+rates belongs on the screen where a member is actually choosing something.
 
 > End users opt in inside the PAM app, on a screen dedicated to that choice, and nothing is pre-selected. A person is invited by a staff member and enters their own mobile number on the sign-in screen to request a one-time code; PAM has no passwords, so requesting the code is the request to be texted it. After signing in, the person is shown a "Text reminders" screen listing what would be sent (for a member: a reminder before a planned visit, a note if a saved place closes or moves, a note when someone wants to connect), how often (a few messages a week at most), and that STOP stops them permanently, HELP reaches a person, and rates may apply. Consent is a button labelled "Agree to receive texts": pressing it is the affirmative act, and the words agreed to are on the control itself. There is no checkbox, so nothing can arrive pre-selected. A "Not now" button records the decline, and PAM works either way, so consent is never required to use PAM. Numbers are never bought, rented, or entered by staff for anyone.
 

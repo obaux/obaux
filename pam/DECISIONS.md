@@ -2211,6 +2211,141 @@ inside the sign-in card's own 32px overlap band, covered by the card's
 opaque white surface. Not missing — covered. Moved to `bottom: 48px`,
 clear of the overlap.
 
+### D-139 — The STOP/rates line moves off sign-in, onto reminders
+Will, 17 September, asked to drop "Reply STOP to stop texts. Rates may
+apply." from under the sign-in button. Flagged first rather than done on
+request: `consent.spec.ts` guards this exact text with a docblock warning
+that carrier registration reviews it. Checked before implementing —
+`docs/sms-campaign-samples.md` already says the screenshot filed with the
+campaign was always the **reminders** screen, not sign-in, so this removal
+does not touch what carriers approved. Will's reasoning for removing it
+anyway: sign-in codes are not optional the way reminders are (§9), so the
+room to be honest about STOP, HELP and rates belongs on `/reminders/`,
+where a member is actually choosing something — it already carries all
+three. Sign-in keeps only the line the code itself needs: "PAM texts you a
+code to sign in. No password to remember." Both `consent.spec.ts` and
+`join.spec.ts` (step 1 of sign-up reuses the same card) updated to match.
+
+### D-140 — `OnboardingSlides` gets a subpath export, not a barrel one
+Adding `framer-motion`'s `animate()` to `OnboardingSlides` (D-141) leaked
+~30kB into every route's bundle — confirmed via `check-bundle-budget.mjs`
+showing `/account`, `/points`, `/privacy` and other routes that never
+render the hero jumping ~30kB each. Root cause is the same one D-125/D-132
+already named: `packages/ui/src/index.ts` is a barrel, nearly every page
+imports something from `@pam/ui`, and StyleX/webpack cannot separate "this
+route uses `OnboardingSlides`" from "this route imports anything at all
+from this package." Fixed the same way those two were: removed
+`OnboardingSlides` from the main barrel, added a
+`"./OnboardingSlides": "./src/OnboardingSlides.tsx"` entry to
+`packages/ui/package.json`'s `exports`, and pointed both actual consumers
+(`/signin/`, `/gallery/`) at `@pam/ui/OnboardingSlides` directly. Only those
+two routes now carry the weight (`/signin` 529kB, `/gallery` 507kB); every
+other route is back to its pre-change size.
+
+### D-141 — The carousel's own transition is hand-driven, not the browser's
+Will, 17 September: the slide transition was "too abrupt," and each slide
+should hold two seconds longer. `Carousel`'s `scrollTo()` calls the native
+`scrollTo({behavior: 'smooth'})`, which has no way to set an easing curve
+or duration — so a custom ease needs to drive `scrollLeft` by hand.
+`framer-motion` was already a `packages/ui` dependency, so `scrollToEased()`
+uses its value-based `animate(from, to, {duration, ease, onUpdate})` to walk
+the scroll container's `scrollLeft` over 600ms with a standard ease-in-out
+curve, replacing the direct `carousel.current.scrollTo()` calls from D-137.
+`AUTOPLAY_MS` moved from 4000 to 6000. Fully skipped under
+`prefers-reduced-motion`, matching D-136 — reduced-motion users still get
+instant jumps via swipe or a dot tap, just no animated glide and no
+autoplay.
+
+### D-142 — Slide images preload behind a skeleton, not a blank frame
+Same request as D-141: on a slow connection, an unloaded slide image was an
+empty frame that made the layout jump into place once it arrived. Each
+slide now tracks its own `loaded` state via a `new Image()` probe with an
+`onload` handler, and renders Astryx's own `Skeleton` at the slide's full
+size until its image reports ready — sized identically to the real art so
+nothing reflows when it swaps in.
+
+### D-143 — `AlertBannerHost` is a custom composition, not Astryx's `Banner`
+Will, 17 September: the sign-out banner "is transparent and makes it hard
+to read" over the sign-in hero photo, and separately asked for it to sit
+above the page rather than overlapping the nav or logo. Investigated
+Astryx's `Banner` source directly rather than guessing: its four status
+colours (`info`/`warning`/`error`/`success`) resolve to the `-muted` token
+variants, which are deliberately ~20% alpha — exactly the "transparent"
+complaint, and by design, not a bug, so no prop on `Banner` fixes it.
+Separately, `Banner`'s own `xstyle` prop only reaches its outer root frame,
+never the inner `.header` where padding and icon size live, which also
+blocked the later "make it thinner" request (D-145) from being done through
+`Banner` at all. Replaced with a small custom composition in
+`AlertBannerHost.tsx` using Astryx's own `HStack`/`Text`/`Button`/`IconButton`
+primitives directly, styled with the *solid* semantic colour tokens
+(`--color-accent`/`-on-accent` etc., the same pairing a filled `Button`
+variant uses) instead of the muted ones. `TextLink` was tried first for the
+action slot and dropped — it has no `xstyle` escape hatch by design, so
+Astryx's own `Button` (`variant="ghost"`) is used instead, matching the
+established "reach for the primitive when the wrapper doesn't fit" pattern
+already used by `Notice`/`AreaChip`/`PeopleStrip`.
+
+### D-144 — `AlertBannerHost` is in-flow, not `position: fixed`
+The second half of the same report: the banner should sit "on top of the
+page" without overlapping the nav or logo below it. `AlertBannerProvider`
+already renders its `Host` as a normal sibling immediately before
+`children` — the fixed positioning was the only thing making it float over
+content instead of pushing it down. Removed, so the banner now occupies
+real layout space above whatever screen is showing, the same way any other
+block element would.
+
+### D-145 — The banner shrinks to a single compact row
+Will, 17 September, a follow-up on the same component: "too tall," and its
+buttons too large. `Banner`'s `.header` padding is unreachable via `xstyle`
+(D-143), which is moot now that `AlertBannerHost` is its own composition —
+rebuilt as one `HStack` (title, optional description, optional action, and
+a dismiss `IconButton`) at `paddingBlock: 10px`, `fontSize: 15px` title /
+`14px` description, instead of `Banner`'s multi-line stacked layout. Both
+buttons still clear the 48px §2.5 floor (`minHeight`/`minWidth: 48px`) —
+the row got shorter by trimming padding and font size, not by shrinking a
+touch target below the rule that exists for it.
+
+### D-146 — Home redirects a signed-out visitor straight to `/signin/`
+Will, 17 September, with a screenshot of Home's dark splash screen ("PAM
+helps you find people and places...", a Sign in button, a Help button):
+kill that screen for anyone signed out, and go straight to sign-in. Added a
+`useEffect` on Home that calls `router.replace('/signin/')` the moment
+`session.status === 'signed-out'`, rendering the same `Loading` state the
+screen already shows while session status is still resolving — so there is
+no flash of the old splash before the redirect fires. The splash content
+itself still exists and still renders for the other two states that use it
+(`no-profile`, `suspended`), which are real states a signed-out redirect
+must not swallow. `a11y.spec.ts`'s 64px-primary-button test moved from `/`
+to `/account/`, which still shows its own inline "Sign in" link for a
+signed-out visitor landing there directly — Home no longer has one to find.
+
+### D-147 — The neutral theme's `--color-on-warning` needed its own override
+Surfaced as a genuinely confusing regression: after D-140/D-143's changes,
+`admin.spec.ts`'s WCAG check started failing at 320px, light mode only, on
+the case manager screen's "Messages off" badge — 1.69:1 contrast, nowhere
+near the tests that were passing minutes earlier on the same code.
+Bisected by reverting files one at a time and rebuilding between each
+(`git stash push -- <file>`, rebuild, re-run, `git stash pop`) rather than
+guessing from the diff — reverting `AlertBannerHost.tsx` alone made it pass
+again, which was the wrong lead: nothing in that file touches the admin
+screen or its Badge. Reading the actual generated CSS (`--color-warning:
+light-dark(#4b3900, #f8d36a)` paired with a *flat*, non-`light-dark`,
+`--color-on-warning: #111111`) showed the real bug: `@astryxdesign/theme-
+neutral`, the vendor theme `pam.theme.ts` extends, ships that pair
+unconditionally. In dark mode, `#111111` text on `#f8d36a` reads fine; in
+light mode, the same `#111111` sits on `#4b3900` — dark text on a dark
+fill, 1.69:1. This was always latent; the module-loading change from moving
+`OnboardingSlides` off the barrel (D-140) evidently shifted a CSS chunk's
+load order enough to newly surface it in Playwright, but the defect itself
+predates this session and had nothing to do with the file bisection first
+implicated. Fixed at the one place PAM already overrides individual
+neutral-theme tokens for exactly this reason: added
+`'--color-on-warning': ['#FFFFFF', '#111111']` to `pam.theme.ts`'s own
+`tokens`, regenerating `pam.css`/`pam.js` via `astryx theme build`. White on
+`#4b3900` measures 11.1:1; the dark-mode pairing is unchanged. *A revert
+that fixes a test is a lead, not a diagnosis — the actual defect was three
+files away from the one that made the symptom disappear.*
+
 ---
 
 ## Notes for whoever picks this up next

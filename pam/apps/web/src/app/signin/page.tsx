@@ -6,7 +6,8 @@ import * as stylex from '@stylexjs/stylex';
 import { HStack } from '@astryxdesign/core/HStack';
 import { VStack } from '@astryxdesign/core/VStack';
 import { Text } from '@astryxdesign/core/Text';
-import { AppHeader, Notice, OnboardingSlides, Page, TextLink } from '@pam/ui';
+import { AppHeader, Notice, Page, TextLink } from '@pam/ui';
+import { OnboardingSlides } from '@pam/ui/OnboardingSlides';
 import { useI18n } from '@/lib/i18n';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { usePhoneSignIn } from '@/lib/usePhoneSignIn';
@@ -238,7 +239,7 @@ export default function SignInPage() {
    */
   const heroHeader = (
     <div {...stylex.props(styles.heroHeader)}>
-      <VStack gap={2} align="center" xstyle={styles.heroBrand}>
+      <VStack gap={4} align="center" xstyle={styles.heroBrand}>
         <img src="/pam-wordmark-white.svg" alt="PAM" {...stylex.props(styles.heroMark)} />
         <Text xstyle={styles.heroCity}>{t('signin.city')}</Text>
       </VStack>

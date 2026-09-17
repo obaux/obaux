@@ -93,6 +93,14 @@ export const pamTheme = defineTheme({
     // The focus ring follows the brand. Measured above: 7.6:1 and 13.4:1
     // against the page, where the rule is 3:1.
     '--focus-outline-color': 'var(--color-accent)',
+    // The neutral theme's own `--color-on-warning` is a flat `#111111`, not a
+    // light/dark pair, paired against `--color-warning: light-dark(#4b3900,
+    // #f8d36a)`. In dark mode that is dark text on the light gold fill and
+    // reads fine; in light mode it is dark text on the *dark* gold fill —
+    // 1.69:1, an axe-caught WCAG AA failure surfaced 17 September on the case
+    // manager screen's "Messages off" badge. White clears 11.1:1 on #4b3900;
+    // the dark-mode value is unchanged.
+    '--color-on-warning': ['#FFFFFF', '#111111'],
   },
 
   components: {

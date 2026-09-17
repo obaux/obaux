@@ -1,5 +1,46 @@
 # Changelog
 
+## [0.22.0] — 2026-09-17 · Hero motion, a quieter sign-in
+
+### Changed — the sign-in hero's slide transition eases in and out, and holds each slide two seconds longer
+
+The transition used the browser's own instant scroll before; it now animates
+over 600ms with a custom ease, skipped entirely under reduced motion.
+
+### Added — slide images preload behind a skeleton
+
+A slow connection no longer jumps the layout while a slide's photo loads.
+
+### Changed — the locale switcher's icon on the hero is larger, bolder, and sits on a darker chip
+
+### Fixed — the hero no longer paints under the status bar on browsers that don't reserve space for it
+
+### Changed — darker gradient wash, Medium-weight slide text, more room around the dots
+
+### Removed — "Reply STOP to stop texts. Rates may apply." from the sign-in screen
+
+It moved to the reminders screen, which already carries it and is the
+screen a member is actually choosing something on — sign-in codes aren't
+optional the way reminders are.
+
+### Changed — a signed-out visitor lands straight on sign-in, not a splash screen first
+
+### Changed — corner radius on the hero is now responsive
+
+None on mobile, where the hero reaches every edge; matches the sign-in
+card's own radius on wider screens where it doesn't.
+
+### Fixed — the alert banner is now readable and thinner
+
+It used to render nearly transparent (Astryx's own translucent status
+colours) and could overlap the header below it. Rebuilt as a solid-colour,
+in-flow, single-row banner.
+
+### Fixed — a latent contrast bug in a warning badge, at 320px in light mode
+
+Traced to the underlying design system's own colour pairing, not anything
+this app set directly; overridden in PAM's own theme.
+
 ## [0.21.0] — 2026-09-17 · Flush to the edges
 
 ### Fixed — the sign-in hero now touches the true top of the screen

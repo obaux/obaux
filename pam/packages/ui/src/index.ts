@@ -37,11 +37,13 @@ export { AreaChip, type AreaChipProps } from './AreaChip.js';
 export { Page, type PageProps } from './Page.js';
 export { PageTitle, type PageTitleProps } from './PageTitle.js';
 export { RoleSwitch, type RoleSwitchProps } from './RoleSwitch.js';
-export {
-  OnboardingSlides,
-  type OnboardingSlidesProps,
-  type OnboardingSlide,
-} from './OnboardingSlides.js';
+/*
+ * `OnboardingSlides` is deliberately NOT re-exported here, the same call
+ * `PlaceDetail`/`RoleSwitch` made (D-125/D-132): only `/signin/` and the
+ * component gallery use it, and adding `framer-motion` to it leaked ~30kB
+ * into every route's bundle through this barrel before anybody noticed
+ * (17 September). Import it as `@pam/ui/OnboardingSlides`.
+ */
 export { NavTile, type NavTileProps } from './NavTile.js';
 export { TextLink, type TextLinkProps } from './TextLink.js';
 export { NotificationBell, type NotificationBellProps } from './NotificationBell.js';

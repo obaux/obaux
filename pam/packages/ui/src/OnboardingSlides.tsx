@@ -2,8 +2,10 @@
 
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
+import { animate } from 'framer-motion';
 import { Carousel, type CarouselHandle } from '@astryxdesign/core/Carousel';
 import { HStack } from '@astryxdesign/core/HStack';
+import { Skeleton } from '@astryxdesign/core/Skeleton';
 import { Text } from '@astryxdesign/core/Text';
 
 /**
@@ -48,15 +50,16 @@ import { Text } from '@astryxdesign/core/Text';
  * somebody who cannot see it. Nothing here is the only route to anything —
  * every slide's words are in the page whether or not anybody swipes.
  *
- * **Autoplays every 4 seconds** (Will, 17 September), looping back to the
+ * **Autoplays every 6 seconds** (Will, 17 September, 4 seconds; bumped to 6
+ * the same day — "an extra 2 seconds of viewing time"), looping back to the
  * first slide after the last — but never for somebody who asked their
  * device for less motion. `prefers-reduced-motion` is the same check
  * `PointsBadge` already makes for its own count-up (§8, §12): unrequested
  * motion that keeps happening on a timer, with no way to stop it, is exactly
  * what that setting exists to turn off, not a nicety to skip only under a
- * spinner. A manual swipe resets the 4-second clock rather than fighting it,
- * so a slide somebody is still reading does not get yanked out from under
- * them mid-read.
+ * spinner. A manual swipe resets the clock rather than fighting it, so a
+ * slide somebody is still reading does not get yanked out from under them
+ * mid-read.
  *
  * The wrap from the last slide back to the first is a direct `scrollTo(0)`,
  * not `Carousel`'s own `hasLoop`/`scrollNext()` wrap-around (Will, 17
@@ -65,6 +68,24 @@ import { Text } from '@astryxdesign/core/Text';
  * track before correcting itself). There is nothing to wrap around: three
  * real slides already exist at indices 0-2, so "loop" is just "go back to a
  * slide that's already there," the same call a manual dot-tap would make.
+ *
+ * That `scrollTo` used the browser's own native smooth scroll at first,
+ * which reads as a blunt, short snap rather than a real transition (Will,
+ * 17 September: "too abrupt... more ease in/out") — the Web platform has no
+ * way to hand a native scroll a custom easing curve or duration. Framer
+ * Motion's `animate()` drives `scrollLeft` by hand instead, frame by frame,
+ * on a real ease-in-out curve — the same shape `motion.tsx`'s own
+ * `PAM_MOTION` uses elsewhere in this package. Skipped entirely under
+ * reduced motion, same as autoplay itself: the scroll simply jumps.
+ *
+ * A slide's artwork is preloaded before it is treated as ready, and a
+ * `Skeleton` — the same shimmer placeholder the places and people lists
+ * already use while they load — fills the frame until then (Will, 17
+ * September: "so the layout doesn't jump with slower internet speeds"). The
+ * hero's own height never actually depends on the image (it is a CSS
+ * background, not an `<img>`, inside a frame sized by `vh`), so nothing here
+ * reflows either way — the skeleton is about the image popping in abruptly
+ * once it finally arrives, not about layout shift.
  */
 
 export interface OnboardingSlide {
@@ -102,12 +123,20 @@ const styles = stylex.create({
     position: 'relative',
   },
   track: {
-    // No corner radius (Will, 17 September) — the hero runs flush to the
-    // top and sides of the screen, so a rounded corner had nothing to read
-    // against. `overflow: hidden` stays: it is what keeps a slide's
-    // full-bleed background from spilling past the scroll track's own
-    // edge, not what the radius was for.
+    // No corner radius under `pam.pageWidth` (560px) — the hero runs flush
+    // to the top and sides of the screen there, so a rounded corner has
+    // nothing to read against. Above it, `Page` itself caps out and centres,
+    // so the hero stops reaching the real viewport edges and a square corner
+    // is what looks like a mistake instead — cut off sharp against page
+    // background visible on both sides (Will, 17 September). Rounded to
+    // match the sign-in card's own corners once that's true. `overflow:
+    // hidden` stays regardless: it is what keeps a slide's full-bleed
+    // background from spilling past the scroll track's own edge, not what
+    // the radius was for.
     overflow: 'hidden',
+    '@media (min-width: 561px)': {
+      borderRadius: '25px',
+    },
   },
   slide: {
     width: '100cqw',
@@ -130,26 +159,41 @@ const styles = stylex.create({
     position: 'absolute',
     inset: 0,
   },
+  skeleton: {
+    position: 'absolute',
+    inset: 0,
+  },
   header: {
     position: 'absolute',
-    // The hero now sits flush against the real top of the viewport (Will,
-    // 17 September), so this offset is the only thing keeping the mark and
-    // the globe button clear of a phone's own status bar / notch — bumped
-    // up from 16px now that there is no page padding sitting above it too.
-    top: '24px',
+    // The hero now sits flush against the real top of the viewport, so this
+    // offset is the only thing keeping the mark and the globe button clear
+    // of a phone's own status bar / notch. `env(safe-area-inset-top)` adds
+    // whatever room the device's own notch/Dynamic Island actually needs on
+    // top of the flat 24px (Will, 17 September: Arc on iOS paints the photo
+    // straight under its status bar — since `viewport-fit=cover` is already
+    // set in `layout.tsx`, `env()` reports the real inset there — while
+    // Chrome keeps its own opaque bar outside the page and never needs the
+    // extra room, where `env()` reports 0 and this is just 24px, unchanged).
+    top: 'calc(24px + env(safe-area-inset-top, 0px))',
     insetInline: '16px',
     zIndex: 1,
   },
   line: {
     position: 'relative',
     fontSize: '18px',
+    fontWeight: 500,
     lineHeight: 1.45,
     color: '#FFFFFF',
     textAlign: 'center',
     textWrap: 'balance',
     maxWidth: '320px',
     marginInline: 'auto',
-    paddingBlockEnd: '20px',
+    // 28px, not the 20px this carried before: the dots sit at a fixed
+    // 48px from the hero's own bottom edge (see `dots`, clear of the
+    // sign-in card's overlap), and this is what leaves a clean 12px of air
+    // between the text's own bottom edge and the top of the dots row
+    // rather than the two nearly touching (Will, 17 September).
+    paddingBlockEnd: '28px',
   },
   dots: {
     position: 'absolute',
@@ -187,7 +231,11 @@ const styles = stylex.create({
  * declarations still compose to it.
  */
 function heroBackground(image: string): string {
-  return `linear-gradient(180deg, rgba(0, 0, 0, 0.00) 40.88%, rgba(0, 0, 0, 0.50) 66.12%), url(${image}) lightgray 50% / cover no-repeat`;
+  // Darker than the stop set first specified (0.50 at 66.12%) — Will, 17
+  // September, after the taller hero and some of the brighter photos left
+  // the white text and mark reading thin in places. Same two stops, same
+  // shape, just a deeper floor.
+  return `linear-gradient(180deg, rgba(0, 0, 0, 0.00) 40.88%, rgba(0, 0, 0, 0.70) 66.12%), url(${image}) lightgray 50% / cover no-repeat`;
 }
 
 /** Mirrors `PointsBadge`'s own hook — see that file for why it starts `true`. */
@@ -207,13 +255,70 @@ function usePrefersReducedMotion(): boolean {
   return reduced;
 }
 
-const AUTOPLAY_MS = 4000;
+const AUTOPLAY_MS = 6000;
+// Astryx's own `Skeleton` doc and `PAM_MOTION` both settle on this shape for
+// "something is finishing" — not a fixed guess at how long a photo takes to
+// arrive, but a ceiling long enough that a slow connection still gets a
+// smoothly-eased scroll rather than a hard jump.
+const SCROLL_EASE_MS = 600;
 
 export function OnboardingSlides({ slides, label, header }: OnboardingSlidesProps) {
   const region = useRef<HTMLElement>(null);
   const carousel = useRef<CarouselHandle>(null);
   const [here, setHere] = useState(0);
+  const [loaded, setLoaded] = useState<ReadonlySet<string>>(new Set());
   const reducedMotion = usePrefersReducedMotion();
+
+  /**
+   * Preload every slide's artwork up front (there are only three, each
+   * already trimmed to 30-70 kB — see the file comment) rather than one at
+   * a time as the carousel reaches it, so autoplay never advances into a
+   * slide whose image hasn't arrived yet.
+   */
+  useEffect(() => {
+    let cancelled = false;
+    const images = slides.map((slide) => {
+      const img = new Image();
+      img.onload = () => {
+        if (cancelled) return;
+        setLoaded((prev) => (prev.has(slide.id) ? prev : new Set(prev).add(slide.id)));
+      };
+      img.src = slide.image;
+      return img;
+    });
+    return () => {
+      cancelled = true;
+      for (const img of images) img.onload = null;
+    };
+  }, [slides]);
+
+  /**
+   * The eased scroll `scrollTo`'s own file comment describes — animates
+   * `scrollLeft` on the actual scroll container by hand, since the native
+   * smooth-scroll the DOM offers has no way to take a custom curve. Finds
+   * the container itself (two levels above a slide: `Carousel` wraps every
+   * slide in its own APG `group` wrapper, which the actual scroller then
+   * wraps) rather than trusting a ref Astryx doesn't expose.
+   */
+  const scrollToEased = (index: number) => {
+    const slideEl = region.current?.querySelector<HTMLElement>(`[data-slide="${index}"]`);
+    const scroller = slideEl?.parentElement?.parentElement;
+    if (!scroller) {
+      carousel.current?.scrollTo(index);
+      return;
+    }
+    if (reducedMotion) {
+      scroller.scrollLeft = index * scroller.clientWidth;
+      return;
+    }
+    animate(scroller.scrollLeft, index * scroller.clientWidth, {
+      duration: SCROLL_EASE_MS / 1000,
+      ease: [0.4, 0, 0.2, 1],
+      onUpdate: (value) => {
+        scroller.scrollLeft = value;
+      },
+    });
+  };
 
   /**
    * Which slide is being looked at.
@@ -253,9 +358,10 @@ export function OnboardingSlides({ slides, label, header }: OnboardingSlidesProp
   useEffect(() => {
     if (reducedMotion || slides.length < 2) return;
     const timer = setInterval(() => {
-      carousel.current?.scrollTo((here + 1) % slides.length);
+      scrollToEased((here + 1) % slides.length);
     }, AUTOPLAY_MS);
     return () => clearInterval(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- scrollToEased closes over `here`/`reducedMotion`, both already deps
   }, [here, reducedMotion, slides.length]);
 
   return (
@@ -282,11 +388,15 @@ export function OnboardingSlides({ slides, label, header }: OnboardingSlidesProp
               says nothing the line below does not, so nothing is lost by
               keeping it out of the accessibility tree entirely.
             */}
-            <div
-              aria-hidden="true"
-              {...stylex.props(styles.art)}
-              style={{ background: heroBackground(slide.image) }}
-            />
+            {loaded.has(slide.id) ? (
+              <div
+                aria-hidden="true"
+                {...stylex.props(styles.art)}
+                style={{ background: heroBackground(slide.image) }}
+              />
+            ) : (
+              <Skeleton width="100%" height="100%" radius="none" xstyle={styles.skeleton} />
+            )}
             <Text xstyle={styles.line}>{slide.text}</Text>
           </div>
         ))}
