@@ -2160,6 +2160,26 @@ paired with `onboarding.1`/`.2`/`.3`'s copy — a maintainer swapping one
 image for another later should not have to guess which "slide N" a filename
 meant.
 
+### D-136 — The sign-in hero autoplays, but never against `prefers-reduced-motion`
+Will, 17 September: make the hero take roughly half the page and autoplay
+every 4 seconds. Autoplay is exactly the kind of unrequested, recurring
+motion §8/§12 exist to let somebody turn off — so it is gated behind the
+same `prefers-reduced-motion` check `PointsBadge` already makes for its own
+count-up, not just skipped under a spinner or a one-time entrance animation.
+Under reduced motion the carousel still swipes by hand; it simply never
+advances on its own. A manual swipe resets the 4-second timer rather than
+racing it, so a slide somebody is mid-read on does not get pulled out from
+under them.
+
+Growing the hero back up (from the `clamp(220px, 38vh, 420px)` D-134/D-135's
+session had shrunk it to, fixing a real carrier-consent regression) to
+`clamp(280px, 50vh, 520px)` was re-verified against `consent.spec.ts`
+directly rather than assumed safe — it still passes on the shortest
+supported viewport, with room to spare, because the card's own content
+(padding, gaps, the consent line's tightened type) had already been trimmed
+in that earlier pass. A future height increase should re-run that spec
+before shipping, not after.
+
 ---
 
 ## Notes for whoever picks this up next

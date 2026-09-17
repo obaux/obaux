@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
-import { Carousel } from '@astryxdesign/core/Carousel';
+import { Carousel, type CarouselHandle } from '@astryxdesign/core/Carousel';
 import { HStack } from '@astryxdesign/core/HStack';
 import { Text } from '@astryxdesign/core/Text';
 
@@ -47,6 +47,16 @@ import { Text } from '@astryxdesign/core/Text';
  * announces "slide 2 of 3", and a row of buttons repeating that is noise to
  * somebody who cannot see it. Nothing here is the only route to anything —
  * every slide's words are in the page whether or not anybody swipes.
+ *
+ * **Autoplays every 4 seconds** (Will, 17 September), looping back to the
+ * first slide after the last — but never for somebody who asked their
+ * device for less motion. `prefers-reduced-motion` is the same check
+ * `PointsBadge` already makes for its own count-up (§8, §12): unrequested
+ * motion that keeps happening on a timer, with no way to stop it, is exactly
+ * what that setting exists to turn off, not a nicety to skip only under a
+ * spinner. A manual swipe resets the 4-second clock rather than fighting it,
+ * so a slide somebody is still reading does not get yanked out from under
+ * them mid-read.
  */
 
 export interface OnboardingSlide {
@@ -93,14 +103,13 @@ const styles = stylex.create({
   slide: {
     width: '100cqw',
     flexShrink: 0,
-    // Bounded well short of "about half the window": the consent sentence
-    // under the card's button is what carriers review before PAM may send
-    // anything (`consent.spec.ts` asserts it stays on screen with no
-    // scrolling, on the shortest supported viewport), and the card sits
-    // below this hero, not beside it — so the hero's own height is a
-    // budget the card's content has to fit under, not a proportion chosen
-    // for looks alone.
-    height: 'clamp(220px, 38vh, 420px)',
+    // Roughly half the window (Will, 17 September), which is also the
+    // ceiling `consent.spec.ts` sets from the other direction: the card's
+    // own content — the field, the button, and the consent sentence
+    // carriers review before PAM may send anything — has to fit in
+    // whatever's left, unscrolled, on the shortest supported viewport.
+    // Verified against that spec at 50vh rather than assumed.
+    height: 'clamp(280px, 50vh, 520px)',
     position: 'relative',
     display: 'flex',
     flexDirection: 'column',
@@ -133,6 +142,7 @@ const styles = stylex.create({
     position: 'absolute',
     insetInline: 0,
     bottom: '24px',
+    zIndex: 1,
   },
   dot: {
     width: '8px',
@@ -140,6 +150,10 @@ const styles = stylex.create({
     borderRadius: '50%',
     backgroundColor: '#FFFFFF',
     opacity: 0.4,
+    // A photo has bright patches a plain white dot can vanish into; the
+    // same reasoning as the hero's own gradient wash, just for a much
+    // smaller shape.
+    filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.45))',
     transitionProperty: 'opacity, width',
     transitionDuration: '150ms',
   },
@@ -158,9 +172,30 @@ function heroBackground(image: string): string {
   return `linear-gradient(180deg, rgba(0, 0, 0, 0.00) 40.88%, rgba(0, 0, 0, 0.50) 66.12%), url(${image}) lightgray 50% / cover no-repeat`;
 }
 
+/** Mirrors `PointsBadge`'s own hook — see that file for why it starts `true`. */
+function usePrefersReducedMotion(): boolean {
+  const [reduced, setReduced] = useState(true);
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return;
+    const query = window.matchMedia('(prefers-reduced-motion: reduce)');
+    setReduced(query.matches);
+
+    const onChange = (event: MediaQueryListEvent) => setReduced(event.matches);
+    query.addEventListener('change', onChange);
+    return () => query.removeEventListener('change', onChange);
+  }, []);
+
+  return reduced;
+}
+
+const AUTOPLAY_MS = 4000;
+
 export function OnboardingSlides({ slides, label, header }: OnboardingSlidesProps) {
   const region = useRef<HTMLElement>(null);
+  const carousel = useRef<CarouselHandle>(null);
   const [here, setHere] = useState(0);
+  const reducedMotion = usePrefersReducedMotion();
 
   /**
    * Which slide is being looked at.
@@ -189,6 +224,20 @@ export function OnboardingSlides({ slides, label, header }: OnboardingSlidesProp
     return () => observer.disconnect();
   }, [slides]);
 
+  /**
+   * Advance one slide every 4 seconds, looping past the last back to the
+   * first. Restarted whenever `here` changes — including from a manual
+   * swipe, via the same observer above — so a slide somebody just moved to
+   * gets its own full 4 seconds rather than inheriting whatever was left on
+   * the clock. Never runs at all under reduced motion (see the file
+   * comment).
+   */
+  useEffect(() => {
+    if (reducedMotion || slides.length < 2) return;
+    const timer = setInterval(() => carousel.current?.scrollNext(), AUTOPLAY_MS);
+    return () => clearInterval(timer);
+  }, [here, reducedMotion, slides.length]);
+
   return (
     <section ref={region} aria-label={label} {...stylex.props(styles.region)}>
       {/*
@@ -196,7 +245,15 @@ export function OnboardingSlides({ slides, label, header }: OnboardingSlidesProp
         carrying it made two regions with the same name, which a screen reader
         reads as two different things to move between.
       */}
-      <Carousel gap={0} hasSnap hasButtons={false} hasEdgeFade={false} xstyle={styles.track}>
+      <Carousel
+        gap={0}
+        hasSnap
+        hasLoop
+        hasButtons={false}
+        hasEdgeFade={false}
+        handleRef={carousel}
+        xstyle={styles.track}
+      >
         {slides.map((slide, index) => (
           <div key={slide.id} data-slide={index} {...stylex.props(styles.slide)}>
             {/*
