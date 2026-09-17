@@ -56,10 +56,12 @@ test.describe('accessibility', () => {
   });
 
   test('the primary button is 64px tall (§2.5)', async ({ page }) => {
-    // Signed out, home has exactly one primary action and it is the door in.
-    // It is a real link rather than a button so it survives a dead connection,
-    // which is also why this asks for the link role.
-    await page.goto('/');
+    // Signed out, /account/ has exactly one primary action and it is the
+    // door in (Home itself redirects a signed-out visitor straight to
+    // /signin/ rather than showing one — see page.tsx). It is a real link
+    // rather than a button so it survives a dead connection, which is also
+    // why this asks for the link role.
+    await page.goto('/account/');
     const big = page.getByRole('link', { name: 'Sign in' });
     const box = await big.boundingBox();
     expect(box?.height).toBe(A11Y.primaryButtonHeightPx);

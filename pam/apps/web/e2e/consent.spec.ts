@@ -4,24 +4,24 @@ import en from '@pam/config/locales/en.json';
 import { settled } from './settled';
 
 /**
- * The sign-in screen has to say that PAM will text you, and how to stop, before
- * you hand over a phone number.
+ * The sign-in screen has to say that PAM will text you a code, before you hand
+ * over a phone number — nobody should learn they signed up for text messages by
+ * receiving one.
  *
- * It is a promise to the member first: nobody should learn they signed up for
- * text messages by receiving one. It is also what US carriers review before they
- * will let an application send at all, and a screenshot of this screen is filed
- * with that registration — so a well-meaning tidy-up that removes it costs the
- * pilot its ability to text anybody.
+ * The STOP/rates language used to live here too (D-139, 17 September): it moved
+ * to `/reminders/`, the screen a member actually has to weigh a messaging policy
+ * on, since sign-in codes are not optional the way reminders are. The carrier
+ * registration's own screenshot was always that reminders screen, not this one
+ * (docs/sms-campaign-samples.md) — so this removal did not touch what was filed.
  */
 test.describe('consent to be texted', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/signin/');
   });
 
-  test('says PAM will text you, and how to stop, on the screen', async ({ page }) => {
+  test('says PAM will text you a code, on the screen', async ({ page }) => {
     const consent = page.getByText(en['signin.phone.consent']);
     await expect(consent).toBeVisible();
-    await expect(consent).toContainText('STOP');
   });
 
   test('is on screen without scrolling, where somebody types their number', async ({ page }) => {

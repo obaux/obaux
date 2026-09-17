@@ -17,7 +17,6 @@ import {
   Notice,
   NotificationBell,
   NotificationList,
-  OnboardingSlides,
   Page,
   PeopleIcon,
   PersonCard,
@@ -32,6 +31,7 @@ import {
   TextLink,
 } from '@pam/ui';
 import { PeopleStrip } from '@pam/ui/PeopleStrip';
+import { OnboardingSlides } from '@pam/ui/OnboardingSlides';
 
 /**
  * Every PAM component, in the states that matter.

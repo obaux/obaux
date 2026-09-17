@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
@@ -8,7 +10,6 @@ import { Button } from '@astryxdesign/core/Button';
 import * as stylex from '@stylexjs/stylex';
 import {
   AppHeader,
-  BigButton,
   CardEnter,
   HelpBar,
   Loading,
@@ -52,7 +53,7 @@ import { HomePeoplePreviewLazy } from './HomePeoplePreviewLazy';
  * invents its own content is worse than a short one.
  *
  * Every piece is from the component library: `AppHeader`, `NotificationBell`,
- * `NavTile`, `Notice`, `BigButton`, `HelpBar`, and the icon set. Nothing is
+ * `NavTile`, `Notice`, `HelpBar`, and the icon set. Nothing is
  * styled here that is not layout, and no sentence on the screen is typed into
  * this file — every string comes through i18n, so Spanish keeps up key for key.
  *
@@ -72,8 +73,22 @@ const styles = stylex.create({
 
 export default function HomePage() {
   const { t } = useI18n();
+  const router = useRouter();
   const supportPhone = useSupportPhone();
   const { state: session } = useSession();
+
+  /*
+   * Nobody signed in has no reason to see Home at all (Will, 17 September:
+   * "kill this screen... just go straight to login screen") — the door was
+   * already the one thing this screen offered somebody in that state, so
+   * skipping straight to it removes a stop, not a choice. `no-profile` and
+   * `suspended` stay on this screen below: neither is "not logged in" —
+   * one is mid-signup, the other is a paused account — and each needs its
+   * own explanation `NotIn` gives, not a silent redirect.
+   */
+  useEffect(() => {
+    if (session.status === 'signed-out') router.replace('/signin/');
+  }, [session.status, router]);
 
   const signedIn = session.status === 'signed-in';
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
@@ -126,17 +141,29 @@ export default function HomePage() {
   }
 
   /*
-   * Signed out, half signed up, or paused. Say what PAM is for in one line and
-   * offer the one door that is right for that person — which used to be the
-   * same "Sign in" for all three, and for a verified phone with no account yet
-   * that was the door they had just walked through. No tiles, because every
-   * one of them would ask for a sign-in on arrival.
+   * The redirect above hasn't landed yet (or JavaScript never runs at all,
+   * where it never will) — same shape as the `loading` state above, so
+   * somebody on a slow connection sees "something is happening," not a
+   * flash of a screen about to be replaced. Never a dead end either way:
+   * the help bar is still here for whoever's redirect this is not.
    */
-  if (
-    session.status === 'signed-out' ||
-    session.status === 'no-profile' ||
-    session.status === 'suspended'
-  ) {
+  if (session.status === 'signed-out') {
+    return (
+      <Page gap={3}>
+        <AppHeader />
+        <Loading label={t('common.loading')} variant="screen" />
+        <HelpBar label={t('nav.help')} variant="block" />
+      </Page>
+    );
+  }
+
+  /*
+   * Half signed up, or paused. Say what PAM is for in one line and explain
+   * the one thing that's true for that person — a verified phone with no
+   * account yet, or a paused account and the way to sign out. No tiles,
+   * because either one would ask for a sign-in on arrival.
+   */
+  if (session.status === 'no-profile' || session.status === 'suspended') {
     return (
       <Page gap={4}>
         <AppHeader />
@@ -148,15 +175,7 @@ export default function HomePage() {
             {t('app.tagline')}
           </Text>
         </VStack>
-        {/*
-          Three people, three doors: sign in, finish signing up, or — for a
-          paused account — a plain statement and the way to sign out.
-        */}
-        {session.status === 'signed-out' ? (
-          <BigButton label={t('signin.title')} href="/signin/" />
-        ) : (
-          <NotIn status={session.status} title={t('app.name')} body={t('app.tagline')} />
-        )}
+        <NotIn status={session.status} title={t('app.name')} body={t('app.tagline')} />
         <HelpBar label={t('nav.help')} variant="block" />
       </Page>
     );

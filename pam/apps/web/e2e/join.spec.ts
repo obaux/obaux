@@ -239,14 +239,14 @@ test.describe('signing up', () => {
   });
 
   test('a signed-out visitor starts at the phone, with the consent sentence', async ({ page }) => {
-    // Step 1 is the same card as /signin/, including the sentence the carriers
-    // reviewed — which has to be on screen where the number is typed.
+    // Step 1 is the same card as /signin/, including the sentence saying PAM
+    // will text a code — the STOP/rates language moved to /reminders/ (D-139).
     await page.route(USER, (route) => route.fulfill({ status: 401, body: '{}' }));
     await page.goto('/join/');
 
     await expect(page.getByText('Step 1 of 5').first()).toBeVisible();
     await expect(page.getByLabel('Your phone number')).toBeVisible();
-    await expect(page.getByText(/Reply STOP to stop texts/)).toBeVisible();
+    await expect(page.getByText(/PAM texts you a code to sign in/)).toBeVisible();
   });
 
   test('has no WCAG A/AA violations', async ({ page }) => {

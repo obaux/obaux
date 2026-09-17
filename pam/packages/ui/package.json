@@ -11,7 +11,8 @@
     "./SavedStrip": "./src/SavedStrip.tsx",
     "./PeopleStrip": "./src/PeopleStrip.tsx",
     "./PlaceDetail": "./src/PlaceDetail.tsx",
-    "./Skeletons": "./src/Skeletons.tsx"
+    "./Skeletons": "./src/Skeletons.tsx",
+    "./OnboardingSlides": "./src/OnboardingSlides.tsx"
   },
   "scripts": {
     "typecheck": "tsc -p tsconfig.json",

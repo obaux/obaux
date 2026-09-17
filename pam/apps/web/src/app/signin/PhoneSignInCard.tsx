@@ -42,12 +42,6 @@ const styles = stylex.create({
   title: { fontSize: '28px', lineHeight: 1.2 },
   stepTitle: { fontSize: '20px', lineHeight: 1.3 },
   hint: { fontSize: '17px', lineHeight: 1.5 },
-  // Every word here is the sentence carriers reviewed and filed against this
-  // exact screen (D-085, D-086, docs/sms-campaign-samples.md) — shortening it
-  // needs a new carrier submission, not a design pass. Tightened to read as
-  // less visual weight under the button instead (Will, 16 September), the
-  // way the Figma redesign's shorter-looking line does, without dropping the
-  // STOP/rates language that line is missing.
   consent: { fontSize: '14px', lineHeight: 1.35 },
   card: { width: '100%' },
   // The field's own label reads left-to-right even on a centred page: a label
@@ -140,15 +134,18 @@ export function PhoneSignInCard({
             isDisabled={state.step === 'sending' || phone.trim().length === 0}
           />
           {/*
-            What PAM will send, and how to stop it — directly under the button
-            that hands over the number, inside the same card, so it is part of
-            the act rather than small print further down the page.
+            What PAM will send, directly under the button that hands over the
+            number, inside the same card, so it is part of the act rather
+            than small print further down the page.
 
-            It has to be here and visible on the same screen where somebody
-            types their number: US carriers review this before an application
-            may send at all, and the browser test asserts it is on screen
-            without scrolling rather than asserting where it sits, so it can
-            move again without breaking anything that matters.
+            The STOP/rates line used to sit here too, and was removed
+            (D-139, Will, 17 September): it is the reminders question at
+            /reminders/, not this screen, that a member has to actually
+            weigh — STOP, HELP and rates all live there, in the room a
+            checkbox-free consent screen actually needs. The carrier
+            registration's own screenshot was always the reminders screen
+            (docs/sms-campaign-samples.md), not this one, so nothing filed
+            changes.
           */}
           <Text type="supporting" xstyle={styles.consent}>
             {t('signin.phone.consent')}
