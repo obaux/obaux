@@ -33,14 +33,15 @@ for real, not just recorded: a super admin reviews it at `/requests/`
 approving creates the account immediately with the phone already on file
 (D-149). A denial now texts the person too, at Will's explicit instruction to
 skip the usual quiet-hours/STOP safety check for this one message and include
-PAM's number (D-152) — the approval text still ships unreviewed, pending
-sign-off. Approving a program lead who left their program's details at
-sign-up (a new step in `/join/`, manual entry only — D-154) adds the program
-straight to the catalogue (D-153). A super admin can grant any account a demo
-view from the Everyone list, showing PAM's existing example data everywhere
-that account looks rather than only when its own data happens to be empty —
-wired into five of the screens that already had an example-data fallback,
-not yet all of them (D-155). Newest session log:
+PAM's number (D-152) — both the approval and denial texts are signed off and
+live (Will, 17 September). Approving a program lead who left their program's
+details at sign-up (a new step in `/join/`, manual entry only — D-154) adds
+the program straight to the catalogue (D-153). A super admin can grant any
+account a demo view from the Everyone list, showing PAM's existing example
+data everywhere that account looks rather than only when its own data
+happens to be empty — wired into five of the screens that already had an
+example-data fallback, not yet all of them (D-155). All of it — migrations
+0054 through 0059 — is live on the real database (D-156). Newest session log:
 `docs/sessions/2026-09-17-everyone-list-and-program-requests.md`.
 
 This is the handover document: what exists, what is proven, what is live, and
@@ -198,12 +199,10 @@ oversight:
   A pending claim notifies every super admin (a plain alert, not a clickable
   one — D-148) and is decided on a new screen, `/requests/`, linked from the
   Everyone list: approve creates the real account immediately, phone pulled
-  from `auth.users`; deny records the decision and creates nothing. The
-  approval SMS is written but unreviewed (`reviewedBy: ''`) and cannot send
-  until Will signs off on the wording — see row 2 of "What needs a human."
-  **The denial SMS is not built** — a real gap, not an oversight (D-150):
-  denial has no profile to safely queue a message against without
-  reinventing §7.2's quiet-hours/STOP enforcement from scratch.
+  from `auth.users`; deny records the decision and creates nothing. Both the
+  approval and denial SMS are signed off and live (Will, 17 September) — the
+  denial text skips the usual quiet-hours/STOP check by explicit instruction
+  (D-150, D-152), a deliberate exception, not a general precedent.
 - **What does exist and works:** sign-up, sign-in, home, saved places, points
   and badges, the places list, a screen per place at `/place/?id=…`, reporting
   a place, the notifications list, the
@@ -338,9 +337,9 @@ while the copy is unsigned, so it earned the first live test, not the last.*
 | 10c | **Confirm the Twilio account's state** | Anybody whose number is not verified | This row said the account was in trial. Will, 16 September: the Twilio console says it is active. That earlier claim came from a 13–14 September finding and was repeated afterwards without re-checking; this session did not verify it either way, so it stands as Will's word and unverified here. If it is active the trial concern is gone; if not, a code to an unverified number is not sent and nothing says so — the live logs on the 14th show one phone asking three times. Carrier registration is a separate question (row 10). |
 | 10b | **A line about the PAM team on the transparency screen** | A promise already made | Members were told they would hear first if what is visible changes, and the directory now shows a super admin every account (name, role, region, status, last active; never messages or contact details). Proposed, for `packages/config/transparency.ts`: *"The PAM team can see your name, your city and the last day you used PAM. Never your messages."* It is a change to the contract, so it wants Will's word. |
 | 10 | **Twilio credentials into the dispatcher's secrets** | Reminders and notices | `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, and either `TWILIO_MESSAGING_SERVICE_SID` or `TWILIO_FROM_NUMBER`, under Edge Functions → dispatch-sms. Until then the dispatcher records "Twilio is not configured" instead of sending. |
-| 11 | **Sign off `staff_request_approved`'s wording** | `/requests/` approvals can text the person | `reviewedBy: ''` in `packages/config/src/sms-templates.ts` — the new template that tells somebody their case-manager/program-lead request was approved. `pnpm --filter @pam/config test` is red until this is done; that is the gate working as intended (D-151). |
+| 11 | ~~Sign off `staff_request_approved`'s wording~~ **Done** | — | Will, 17 September. `pnpm --filter @pam/config test` is green. |
 | 12 | ~~Migrations 0054 through 0057 are local only~~ **Done** | — | Applied to the live Supabase project 17 September, along with two follow-ups `get_advisors` surfaced: `notify_on_staff_request` (0058) was callable directly via PostgREST, unlike its two siblings in 0038 — its own migration run never got the schema-level default-privileges lockdown 0038's did; and `staff_requests` had two foreign keys with no covering index (0059). `/requests/`, `/join/`'s program step, and the demo view all work against the real database now. |
-| 13 | **Sign off `staff_request_denied`'s wording too** | The denial text cannot send until reviewed, same as the approval one | `reviewedBy: ''` in `packages/config/src/sms-templates.ts`. Sent with quiet-hours/STOP enforcement deliberately skipped, at Will's own instruction (D-152) — the review gate on the wording itself still applies. |
+| 13 | ~~Sign off `staff_request_denied`'s wording too~~ **Done** | — | Will, 17 September. Still sent with quiet-hours/STOP enforcement deliberately skipped, at Will's own instruction (D-152) — that was never what this row was about. |
 | 14 | **The demo view is not wired into every screen yet** | An account granted it still sees real data on `place`, `person`, `HomePeoplePreview`, and the saved-places dummy path | The mechanism (`useDemoView`) is built and proven on five screens (D-155); finishing the rest is the same pattern repeated, not new design. |
 
 ---
