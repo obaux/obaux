@@ -3313,6 +3313,204 @@ giving it an actual caseload assignment or enrollment before `/messages/`'s
 
 ---
 
+### D-172 — Messaging's Home tile and screen now follow the previewed role, like every other screen; real data still never does
+
+D-171 confirmed a super admin cannot send a real message. The fix that shipped
+alongside it (`canMessage`/`isStaff` reading `trueRole`, never `viewedRole`)
+had a side effect nobody had asked for: the Messages tile on Home, and
+`/messages/` itself, stopped appearing during **any** "Viewing as" preview,
+for **any** role — a case manager previewing their own role saw no Messages
+tile either. Every other previewable screen (`/admin/`, `/directory/`,
+`/interested/`) gates on `viewedRole`; messaging was the one exception, and
+Will flagged it as a bug on 17 September testing the live deployment, not a
+deliberate restriction.
+
+**The fix separates two questions that D-171's original code conflated:
+what does this screen show, and what account does its data run as.**
+`apps/web/src/app/page.tsx`'s Messages tile and `apps/web/src/app/messages/page.tsx`'s
+`canMessage`/`isStaff` now read `viewedRole` — the same preview-aware role
+`/admin/` already gates on — so the tile and the screen's chrome appear
+during any preview, matching every other screen. What still reads `trueRole`,
+never `viewedRole`: `useConversations` and `useMessageableMembers`, the two
+hooks that touch the database, and the only two things `openConversation`
+(a real write) is ever reachable from. D-171 itself is unaffected by this:
+for a super admin, `trueRole` is never `member`/`admin`/`provider`, so those
+hooks never run while previewing, full stop — not "run and come back empty",
+literally never called.
+
+**What fills the resulting gap** — a preview showing chrome around a screen
+whose real data never loads — is the same "real always wins, silently"
+fallback `/admin/` already established for `DUMMY_MEMBERS`: a new
+`@pam/config/dummy-conversations` (`DUMMY_CONVERSATIONS`, `DUMMY_STARTABLE`),
+rendered by `apps/web/src/app/messages/DummyRows.tsx` whenever a preview is
+active (`viewedRole !== trueRole`) or the demo-view grant (0057) is on, or
+whenever the real, non-previewed account's own real list comes back
+genuinely empty — the same three conditions `/admin/`'s dummy fallback
+already composes.
+
+**The one place this could not simply copy `/admin/`'s pattern: real write
+actions.** `/admin/`'s dummy `PersonRow`s are tappable — they link to
+`/person/`, a page that is itself entirely dummy-data-only, so nothing real
+is at risk. `/messages/`'s real action, `openConversation`, is a live insert
+under the caller's own signed-in account. A tappable dummy row that quietly
+called it during a preview would be exactly the backdoor D-171 closed, just
+moved one layer down. So `DummyConversations`/`DummyStartable` render as
+plain, non-interactive `Card`s — no `href`, no `onClick`, nothing to tap —
+deliberately weaker interactivity than `/admin/`'s own dummy rows, because
+messaging's real action is a write and `/admin/`'s is not. See the file
+comment in `dummy-conversations.ts` and in `DummyRows.tsx` for the full
+reasoning; this was flagged in advance as safety-relevant and is recorded
+here for that reason, not as routine documentation.
+
+### D-173 — A demo-only "send a message" on `/person/`, layered on top of D-171/D-172, not in tension with either
+
+Will asked for one more piece of demo realism after D-172 shipped: while
+previewing as a case manager or program admin and looking at a dummy member
+on `/person/`, be able to compose something and have it visibly "arrive" when
+switching the preview to Member and opening `/messages/`. Confirmed
+explicitly, unprompted for this exact question: **not a real send** — no real
+recipient, no row in `messages` or `conversations`, nothing that touches
+Supabase at all.
+
+**This does not reopen or soften D-171.** D-171 is a guarantee about the
+*real* system: a super admin's real account can never call `openConversation`
+or write a real message, previewing or not, and nothing here changes that —
+`sendDemoMessage` (`apps/web/src/lib/demoMessages.ts`) never imports
+`./supabase`, never calls a Supabase client, and has no path to either RPC.
+What this adds is a second, explicitly client-only layer sitting entirely
+above the real system, the same category of thing `DUMMY_MEMBERS`/
+`DUMMY_EVERYONE` already are elsewhere in this app: fictional content a real
+account can look at and manipulate locally, that never reaches, resembles,
+or risks a real database row. The distinction worth keeping straight for
+whoever reads this next: **D-171 is a real-system guarantee** (what a super
+admin's account can make Supabase do); **D-173 is a demo-simulation feature**
+(what the screen can make sessionStorage remember). Conflating "can
+demo-send" with "can really send" would be a mistake reading this code later
+without this entry.
+
+**Where it lives, and why sessionStorage**: `apps/web/src/lib/demoMessages.ts`
+stores at most one composed message per staff role (`admin` or `provider`)
+in `sessionStorage`, the same mechanism `useViewAs` already uses for "which
+role am I previewing" and for the identical reason — it should survive a
+"Viewing as" switch within the same tab (so composing on `/person/` as a case
+manager and then switching to Member shows it), and should be gone the next
+time PAM is opened, because nothing here is real content that should outlive
+the session it was typed in. Keyed by *sending role*, not by the specific
+dummy person the composer was open on: `/messages/`'s own member-preview has
+no notion of "which member you are" — `DUMMY_CONVERSATIONS.member` is one
+fixed example set for every member preview, not a per-identity roster — so a
+message cannot honestly promise to "arrive" for one specific dummy person
+over another. One message per staff role is the most this composition can
+truthfully deliver, and the copy on both ends (`person.message.demoNote`,
+the preview row's own timestamp bump) says only that much.
+
+**Rendering**: `apps/web/src/app/messages/DummyRows.tsx`'s `DummyConversations`
+reads the stored demo message (if any) and, only for the `member` preview,
+bumps the matching example row (the one whose `otherRole` matches the
+sender) to unread with the composed text shown as a preview line — a display
+substitution only, on an already-non-interactive row; it never turns that
+row tappable, and D-172's "no `href`, no `onClick`" guarantee is untouched.
+
+### D-174 — A super admin's preview greets by an example name, not their own (Home)
+
+Will's third refinement in this arc: previewing "as" a role while Home still
+greets by "Hi, Will" reads as one account wearing a badge, not a
+demonstration of what that role's account looks like. `apps/web/src/app/account/page.tsx`
+already solved exactly this for the account screen (`DUMMY_SELF`, Will,
+16 September) — Home's greeting adopts the identical substitution: while a
+preview is genuinely active (`demoRole` — never for a real member's, case
+manager's or program's own real Home), the greeting reads the matching
+`DUMMY_SELF[demoRole].firstName` instead of `me.firstName`. Previewing
+"Super admin" still shows the real name, because `DUMMY_SELF` deliberately
+carries no entry for it — a super admin looking at their own screen needs no
+stand-in, same as `/account/`.
+
+The one difference from `/account/`'s own version: Home already sits inside
+§12's bundle-budget measurement (`/account/` does not), so `DUMMY_SELF` is
+loaded with a dynamic `import('@pam/config/dummy-people')` inside a
+`useEffect` gated on `demoRole`, the same pattern `HeaderBell` already uses
+for `dummy-notifications` — almost nobody hitting Home is a super admin
+mid-preview, so almost nobody should pay to download this. A first, static
+version of this cost Home's first-load 0.8 kB before being rewritten this
+way; the dynamic version costs 0.3 kB, all of it the new `useState`/`useEffect`
+wiring itself rather than the data file, which is what does not load until
+asked for.
+
+### D-175 — A clickable program badge on a caseload member's row, real data + a demo version, genuine enrollment only
+
+Will's fourth ask in this arc: a clickable badge naming which program a
+member is connected to, opening that program's own `/place/?id=…` screen.
+Confirmed this is not a privacy widening before building anything: a service
+is public catalogue data (`services`, publicly readable when active and
+reviewed), and the connection itself — "member X is enrolled in service Y"
+— is already something a case manager or program admin can legitimately
+see through `enrollments`' existing RLS (`enrollments_select_admin`, using
+`admin_covers(member_id)` — the same function `useCaseload` already relies
+on) or a program's own `provider_linked_to()`. Nothing here reads a column
+or a row that was not already reachable; it only surfaces something already
+legitimate in a new place.
+
+**Built once, reused twice.** `apps/web/src/app/ProgramBadge.tsx` wraps
+Astryx's own `Token` component with `href` set — the library's existing
+pattern for a clickable chip, not a hand-rolled `Badge` inside an `<a>`.
+`PersonRow` grew a `programBadge` slot so both the real caseload row
+(`/admin/`) and any future list built on the same component can use it
+without redefining the shape.
+
+**Where it is real, and why not everywhere it could technically go**: only
+`/admin/`'s caseload rows, wired to `useCaseload`'s new `program` field —
+not a program admin's own screens. A case manager's caseload legitimately
+spans members enrolled in different programs, so naming *which* program a
+given row belongs to adds real information; a program admin's own view is
+always their own org, so the same badge would say nothing they don't
+already know from the screen it's on. Recorded here rather than added
+mechanically to every list that shows a member, per the instruction that
+came with this ask.
+
+**"Genuine enrollment" is `enrollments.status in ('enrolled', 'active')`,
+never a region match.** `admin_covers()` has two arms — a real caseload
+assignment, or simply sharing this admin's region — and a program badge
+built on the second arm would misrepresent a coincidence of geography as a
+program connection nobody actually made. `interested`, `requested` and
+`dropped` are excluded too: a badge naming a program somebody merely
+expressed interest in, asked to join, or has since left is not "connected
+to it" in the sense this badge is meant to say. A member with more than one
+live enrollment gets the most recently updated one — one badge per row, not
+a list.
+
+**No new migration, no new RPC.** `useCaseload` extended its existing
+plain-client query with one more `enrollments` select, joined to `services`
+by PostgREST's nested-select syntax — both tables' existing RLS already
+scope it correctly for the caller (`enrollments_select_admin`,
+`services_select_admin`), the same "ask broadly, let RLS narrow" pattern
+this file's own comment already describes for the caseload query itself.
+Nothing here needed `SECURITY DEFINER` or a new function the way
+`conversation_partners()`/`provider_linked_members()` did, because unlike
+those, this select does not need to hand back columns the requesting role
+would not otherwise be allowed to see — an admin can already read the whole
+`enrollments` row and the whole `services` row for anyone on their caseload.
+
+**Demo version, on `/person/`**: `DummyPerson` (`@pam/config/dummy-people`)
+grew an optional `program` field, populated for three of the six example
+members (Jordan/Keisha/Miguel), each pointing at a `dummy-place-…` id
+already defined in `dummy-places.ts` — reusing names and ids already in
+this branch's demo work rather than inventing a fourth set, and resolving
+through `/place/`'s existing demo-safe path (`isDummyPlaceId`/
+`DUMMY_PLACES_BY_ID`) instead of a real, nonexistent `services` row. The
+other three dummy members carry no `program`, on purpose, to keep
+demonstrating the "no badge without a genuine connection" rule rather than
+implying every member has one.
+
+**Never paired with a row that is itself a link.** `/admin/`'s dummy
+caseload rows each have their own card-wide `href` to `/person/`; a second,
+nested `<a>` for the program badge inside the same card would contest the
+same tap the way `PersonRow`'s own `trailing` doc comment already warns
+against. The badge appears only on rows with no `href` of their own — real
+caseload rows (no profile page exists for a real member yet) and
+`/person/`'s own top-level badge row, which sits outside any card.
+
+---
+
 ## Notes for whoever picks this up next
 
 - `pnpm --filter @pam/db test` is the highest-value check in the repo. It is the

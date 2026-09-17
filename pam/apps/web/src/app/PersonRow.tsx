@@ -9,6 +9,7 @@ import { Text } from '@astryxdesign/core/Text';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Badge } from '@astryxdesign/core/Badge';
 import { Avatar } from '@astryxdesign/core/Avatar';
+import { ProgramBadge } from './ProgramBadge';
 
 /**
  * One person, on a list a case manager, a program, or a super admin reads.
@@ -36,6 +37,15 @@ export interface PersonRowProps {
   /** Extra facts, in order — points, an org name, last active, and so on. */
   readonly meta: readonly string[];
   /**
+   * Which program this person is genuinely connected to (a real
+   * `enrollments` row, `status` in `enrolled`/`active` — never shown for
+   * someone only in the same region or only "interested"). `null`/omitted
+   * for anyone with no such connection; see `useCaseload` for where this
+   * comes from on a real row, and `/person/`'s own dummy version for a
+   * preview.
+   */
+  readonly programBadge?: { readonly name: string; readonly serviceId: string } | null;
+  /**
    * A control that belongs to this specific row rather than the list — the
    * Everyone list's demo-view toggle (0057) is the one user of this today.
    * Never paired with `href`: the two are different rows' jobs (a dummy row
@@ -56,7 +66,7 @@ const styles = stylex.create({
   },
 });
 
-export function PersonRow({ firstName, href, chip, meta, trailing }: PersonRowProps) {
+export function PersonRow({ firstName, href, chip, meta, programBadge, trailing }: PersonRowProps) {
   return (
     <Card xstyle={styles.card}>
       <VStack gap={2}>
@@ -77,6 +87,7 @@ export function PersonRow({ firstName, href, chip, meta, trailing }: PersonRowPr
         </HStack>
         <HStack gap={2} wrap="wrap" align="center">
           {chip ? <Badge variant={chip.tone} label={chip.label} /> : null}
+          {programBadge ? <ProgramBadge name={programBadge.name} serviceId={programBadge.serviceId} /> : null}
           {meta.map((line) => (
             <Text key={line} type="supporting" xstyle={styles.meta}>
               {line}

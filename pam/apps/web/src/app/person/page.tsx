@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense } from 'react';
+import { Suspense, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import * as stylex from '@stylexjs/stylex';
 import { VStack } from '@astryxdesign/core/VStack';
@@ -10,6 +10,7 @@ import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { Badge } from '@astryxdesign/core/Badge';
 import { Avatar } from '@astryxdesign/core/Avatar';
+import { TextArea } from '@astryxdesign/core/TextArea';
 import {
   AppHeader,
   BigButton,
@@ -30,6 +31,8 @@ import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
 import { useRoleView } from '@/lib/useViewedRole';
 import { RoleSwitchControl } from '../RoleSwitchControl';
+import { sendDemoMessage, type DemoSender } from '@/lib/demoMessages';
+import { ProgramBadge } from '../ProgramBadge';
 
 /**
  * One person, for a case manager or a program to look at.
@@ -48,6 +51,17 @@ import { RoleSwitchControl } from '../RoleSwitchControl';
  * first, not a side effect of this screen existing. Until that happens, a
  * real id here answers "we could not find that person", exactly as a mistyped
  * one does.
+ *
+ * **"Send a message" here is a demo simulation, not a real send (D-173).**
+ * A case manager or program admin previewing this screen for a dummy member
+ * can compose a line of text; it is stored client-side only
+ * (`@/lib/demoMessages`) and never reaches `openConversation`, `messages`,
+ * or `conversations`. D-171 — a super admin cannot send or start any *real*
+ * message — is untouched by this: nothing on this screen is a real account
+ * sending to a real person, the same way nothing else on this dummy-only
+ * page is a real write. Switching "Viewing as" to Member and opening
+ * `/messages/` shows the composed text having "arrived", by design — see
+ * `DummyConversations` in `../messages/DummyRows.tsx`.
  */
 
 const styles = stylex.create({
@@ -65,7 +79,68 @@ const styles = stylex.create({
     textDecoration: 'none',
     '::after': { content: '""', position: 'absolute', inset: 0 },
   },
+  compose: { width: '100%' },
 });
+
+/**
+ * The demo-only compose box (D-173). `sender` is the previewed staff role —
+ * always `admin` or `provider`, since this only ever renders for one of
+ * those two (see the render site below) — and is what `sendDemoMessage`
+ * keys the stored message by, not the specific dummy person on screen; see
+ * `@/lib/demoMessages` for why.
+ */
+function DemoMessageComposer({
+  sender,
+  name,
+  t,
+}: {
+  readonly sender: DemoSender;
+  readonly name: string;
+  readonly t: (key: string, vars?: Record<string, string | number>) => string;
+}) {
+  const [draft, setDraft] = useState('');
+  const [sent, setSent] = useState(false);
+
+  const submit = () => {
+    sendDemoMessage(sender, draft);
+    setDraft('');
+    setSent(true);
+  };
+
+  return (
+    <VStack gap={2}>
+      <Heading level={2} xstyle={styles.section}>
+        {t('person.message.title')}
+      </Heading>
+      <Text type="supporting" xstyle={styles.note}>
+        {t('person.message.demoNote', { name })}
+      </Text>
+      <TextArea
+        label={t('person.message.placeholder')}
+        isLabelHidden
+        placeholder={t('person.message.placeholder')}
+        value={draft}
+        onChange={(next) => {
+          setDraft(next);
+          setSent(false);
+        }}
+        rows={2}
+        width="100%"
+        xstyle={styles.compose}
+      />
+      <BigButton
+        label={t('person.message.send')}
+        onPress={submit}
+        isDisabled={draft.trim() === ''}
+      />
+      {sent ? (
+        <Text type="supporting" xstyle={styles.note}>
+          {t('person.message.sent')}
+        </Text>
+      ) : null}
+    </VStack>
+  );
+}
 
 function lookup(id: string | null): DummyPerson | null {
   if (!id) return null;
@@ -210,6 +285,9 @@ function PersonScreen() {
             <Badge variant="warning" label={t('admin.status.limited')} />
           ) : null}
           {person.orgName ? <Badge variant="neutral" label={person.orgName} /> : null}
+          {person.program ? (
+            <ProgramBadge name={person.program.name} serviceId={person.program.serviceId} />
+          ) : null}
           {person.points !== undefined ? (
             <Text type="supporting" xstyle={styles.meta}>
               {t('admin.points', { count: person.points })}
@@ -249,6 +327,17 @@ function PersonScreen() {
               </VStack>
             )}
           </VStack>
+        ) : null}
+
+        {/*
+          Demo-only "Send a message" (D-173) — only for a case manager or
+          program admin (the two roles messaging actually lets start a
+          conversation, per `/messages/`) looking at a dummy member. Never
+          for `super_admin` previewing "as itself": D-171 already settled
+          that a super admin does not message at all, real or simulated.
+        */}
+        {person.role === 'member' && (viewedRole === 'admin' || viewedRole === 'provider') ? (
+          <DemoMessageComposer sender={viewedRole} name={person.firstName} t={t} />
         ) : null}
 
         <Text type="supporting" xstyle={styles.note}>

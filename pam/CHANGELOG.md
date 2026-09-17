@@ -1,5 +1,59 @@
 # Changelog
 
+## [0.32.0] — 2026-09-17 · A clickable program badge on a caseload member's row
+
+### Added — which program a member is genuinely connected to, and a link to it
+
+A case manager's caseload row now names the program a member is actually
+enrolled in, when there is one, as a clickable badge that opens that
+program's own place screen (`/place/?id=…`). Never shown for a member who
+only shares this case manager's region, and never for someone merely
+"interested" or who has since left a program — only a live enrollment
+(D-175). No new data is exposed: a service is already public, and the
+enrollment link is already something a case manager can see. Also mocked up
+on `/person/`'s example member view, for a preview.
+
+## [0.31.0] — 2026-09-17 · Messaging is previewable again; a demo-only "send" on `/person/`
+
+### Fixed — the Messages tile and `/messages/` now appear during any role preview
+
+Gating messaging on the real, signed-in role only (D-171) had the side
+effect of hiding the Home Messages tile and `/messages/` itself during
+**any** "Viewing as" preview, for any role — inconsistent with every other
+previewable screen and flagged as a bug testing the live deployment (Will,
+17 September). Both now gate visibility on the previewed role, the same as
+`/admin/`, `/directory/` and `/interested/`. Real conversations, the real
+"who can I message" list, and the ability to actually send or start a
+conversation still only ever run under the real, signed-in account's true
+permissions — never a previewed one; see D-172.
+
+### Added — example conversations and people to message during a preview
+
+A preview (or a real, empty account) now shows realistic example
+conversations and an example "Start a conversation" list on `/messages/`,
+the same "real always wins, silently" fallback `/admin/` already uses for
+its own people list (`@pam/config/dummy-conversations`, D-172). Every
+example row is plain and non-interactive — no tap on it can ever reach a
+real send.
+
+### Added — a demo-only "send a message" on `/person/`
+
+Previewing as a case manager or program admin and looking at an example
+member on `/person/` now offers a compose box. Sending it never touches
+Supabase — the composed text is stored client-side only, for this session,
+and shows up as an "arrived" message on `/messages/`'s example
+conversations once the preview switches to Member (D-173). Does not change
+D-171: a super admin's real account still cannot send or start any real
+message.
+
+### Changed — a super admin's preview greets by an example name
+
+Home's greeting now reads a role-matching example first name
+(`DUMMY_SELF`, the same substitution `/account/` already makes) while a
+"Viewing as" preview is active, instead of the real signed-in account's own
+name (D-174). A real member's, case manager's or program's own Home is
+unaffected — this only ever applies to a super admin actively previewing.
+
 ## [0.30.0] — 2026-09-17 · Messaging privacy migrations deployed live
 
 ### Deployed — `0061_conversation_partner_no_activity`, `0062_provider_linked_no_activity`

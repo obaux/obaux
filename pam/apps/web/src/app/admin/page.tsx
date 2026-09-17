@@ -45,6 +45,15 @@ import { RoleSwitchControl } from '../RoleSwitchControl';
  * onboarding and asked to trust it. An admin should be looking at it too, so
  * that the promise is visible from both sides rather than only the side that
  * has to take it on faith.
+ *
+ * **A caseload member's row now names which program they are genuinely
+ * enrolled in, when there is one** (D-175) — a case manager's caseload can
+ * span members in several different programs, unlike a program admin's own
+ * screen, which is always their own org and would have gained nothing from
+ * repeating it. Not shown on the dummy caseload rows below: `/person/`
+ * already carries the demo version of this badge (D-175), and every dummy
+ * `PersonRow` here has its own full-card `href` to `/person/`, which a
+ * second, nested link inside the same card would fight for the tap.
  */
 
 const styles = stylex.create({
@@ -332,6 +341,7 @@ export default function AdminPage() {
                   key={member.id}
                   firstName={member.firstName}
                   chip={chip}
+                  programBadge={member.program}
                   meta={[
                     ...(member.points !== null ? [t('admin.points', { count: member.points })] : []),
                     when ? t('admin.lastActive', { when }) : t('admin.lastActive.never'),

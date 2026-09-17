@@ -102,6 +102,33 @@ session's migrations to `0060`–`0062` and its decisions to D-159–D-169,
 in place, with every cross-reference updated to match (D-170). Newest
 session log: `docs/sessions/2026-09-17-reconciling-a-concurrent-merge.md`.
 
+**Messaging is previewable again, a super admin can demo-send a message, and
+a caseload row now names a member's real program.** `/messages/`'s Home tile
+and the screen itself had been gated on the real signed-in role only
+(D-171), which meant they never appeared during any "Viewing as" preview —
+inconsistent with `/admin/`, `/directory/` and `/interested/`, and flagged as
+a bug (Will, 17 September). Now gated on the previewed role, matching those
+three; real conversations and real "who can I message" data still only ever
+run under the true, signed-in account's own permissions, never a previewed
+one, and a preview's real gap is filled with non-interactive example
+conversations (D-172). A super admin previewing a case manager or program
+admin can also compose a message on `/person/` that visibly "arrives" on
+`/messages/`'s example conversations once the preview switches to Member —
+entirely client-side, sessionStorage only, never touching `messages` or
+`conversations`, and explicitly not a reopening of D-171 (D-173). Home's own
+greeting now reads an example name while a preview is active, reusing
+`/account/`'s existing `DUMMY_SELF` substitution (D-174). Separately, a case
+manager's caseload row now shows a clickable badge naming the program a
+member is genuinely enrolled in (never a region-only match), opening that
+program's own `/place/` screen — real data via existing RLS, no new
+migration, plus a demo version on `/person/` (D-175). Session log:
+`docs/sessions/2026-09-17-messaging-preview-and-demo-send.md`. One
+verification gap: the Playwright a11y suite could not run in this sandbox —
+`chromium_headless_shell` could not be downloaded (the agent proxy blocks
+`cdn.playwright.dev`, not a missing-package problem) — so this session's UI
+has not been checked against the 426-pass baseline in "What is proven"
+below; a future session with a working browser download path should run it.
+
 This is the handover document: what exists, what is proven, what is live, and
 what the next person needs to know before touching anything.
 
@@ -250,8 +277,8 @@ Numbers here are from the last run, not aspirations.
 | Database suite | 235 checks pass | See below. Grew from 152 across today's messaging sessions (to 221 — `0061`/`0062`'s own coverage plus `04_transparency_contract_test.sql`, D-168) and then to 235 once merged with the other concurrent session's own `staff_review`/`demo_view` coverage (D-170) — the combined migration set (`0001`–`0062`) run together for the first time, not each session's own subset in isolation |
 | Live RLS fingerprint | **not re-verified since `0060`–`0062` deployed** | This row's last "identical to local" claim predates today. `0060`–`0062` (deployed under their original names, `0054`–`0056`) are now live and `get_advisors` came back clean, but the fingerprint comparison itself hasn't been re-run against the combined migration set — this repo and the other concurrent session's are now merged, but neither has been re-fingerprinted since (see D-169/D-170, and the drift note under "What is live") |
 | Live anonymous attack | 0 rows leaked | A signed-out caller reads no profiles, messages, invites or audit rows on the real database, while still reaching the support number and the public catalogue |
-| Browser a11y + theme (Playwright, full suite) | 426 pass | No WCAG AA violations at 320px or iPhone SE. Every control clears 48px. No horizontal scroll. The Astryx theme really resolves. Runs in dark mode as well as light. |
-| First-load JS | 503.3 kB of 500 kB — **3.3 kB over budget**, disclosed and unresolved | §12 budget, measured gzipped on what `index.html` actually loads; `/signin` and `/gallery` carry `OnboardingSlides`' `framer-motion` weight on their own subpath export (D-140), every other route unaffected. Grew from 500.7 kB across the messaging sessions alone (1.0 kB, D-162), entirely new locale strings — irreducible without lazy-loading translations per route, which is out of scope. **Grew a further 2.3 kB when merged with the other concurrent session's own additions** (D-170) — two sessions each independently added first-load weight without seeing the other's budget impact; reconciling the combined total is real, undone follow-up work, not something this merge's own reconciliation took on |
+| Browser a11y + theme (Playwright, full suite) | 426 pass **as of the last sandbox that could run it** — **not re-run this session** | No WCAG AA violations at 320px or iPhone SE. Every control clears 48px. No horizontal scroll. The Astryx theme really resolves. Runs in dark mode as well as light. This session's sandbox could not download `chromium_headless_shell` (agent proxy blocks `cdn.playwright.dev`) — see the messaging-preview paragraph above and its session log. |
+| First-load JS | 503.6 kB of 500 kB — **3.6 kB over budget**, disclosed and unresolved | §12 budget, measured gzipped on what `index.html` actually loads; `/signin` and `/gallery` carry `OnboardingSlides`' `framer-motion` weight on their own subpath export (D-140), every other route unaffected. Grew from 500.7 kB across the messaging sessions alone (1.0 kB, D-162), entirely new locale strings — irreducible without lazy-loading translations per route, which is out of scope. Grew a further 2.3 kB when merged with the other concurrent session's own additions (D-170). **Grew a further 0.3 kB today** (D-174's dynamic-import wiring for the preview greeting) — the messaging-preview/demo-send/program-badge session's other additions (D-172, D-173, D-175) all landed off Home's own bundle and did not move this number, though D-175's `Token` component does add real weight to `/admin/`, `/person/` and `/directory/` individually (~4 kB each), not tracked by this check |
 
 ### The database suite is the one that matters
 
@@ -462,6 +489,8 @@ while the copy is unsigned, so it earned the first live test, not the last.*
 | 19 | **Decide whether `profiles.phone` needs a column-level `REVOKE` more broadly still** | Staff/member privacy | The provider-role exposure is now closed everywhere it was found (D-165, D-166 — `conversation_partners()` and `provider_linked_members()` both return name/role only). `profiles_select_admin_caseload` (case managers) still exposes the whole row, including `phone`, for a caseload/region member — untouched, since every instruction so far has been explicitly provider-role-specific, not about case managers. The `bidder_contact`-style column grant pattern used elsewhere in this repo would close it if Will wants that too. |
 | 20 | ~~Build `admin_visibility.test.ts`~~ **Done, as `04_transparency_contract_test.sql` (D-168)** | — | `transparency.ts`'s own file comment used to claim a test by that name enforces `ADMIN_CAN_SEE` against live RLS; it never existed (D-164, D-167). Built and run: `packages/db/test/04_transparency_contract_test.sql`, covering the four contract lines that changed today (case-manager participation, non-participation, program-admin activity via both read paths, and total visibility) against a real database, not just documentation. Passes, per row 17. |
 | 21 | ~~Can a super admin send messages?~~ **Confirmed: no (D-171)** | — | A super admin gets no "Messages" tile and `/messages/` reads "not for your role" for that account — this is correct, confirmed by Will, not a bug. Testing on the live deployment also found the live database has **zero `admin` and zero `provider` accounts** — only Will's `super_admin` and two plain members — so the caseload/enrollment messaging paths need a real case-manager or program-admin account (invite-created, with an actual caseload assignment or enrollment) before `/messages/`'s "Start a conversation" section will show anyone. |
+| 22 | ~~Messaging never appeared during a role preview~~ **Fixed (D-172)** | — | Was gating `canMessage`/`isStaff` and the Home tile on the real role only, so a preview never showed them for any role — a bug, not the restriction D-171 actually called for. Now gates visibility on `viewedRole`, matching `/admin/`/`/directory/`/`/interested/`; real data/writes still only ever follow `trueRole`. |
+| 23 | **Run the Playwright a11y suite against this session's changes** | Confidence in the new `DummyConversations`/`DummyStartable`/`DemoMessageComposer`/`ProgramBadge` UI | Could not run in this sandbox: `playwright install` fails downloading `chromium_headless_shell` (`cdn.playwright.dev` blocked by the agent proxy — a network-policy gap, not a missing-package one the way `postgis` was). The 426-pass figure in "What is proven" predates this session's changes. |
 
 ---
 

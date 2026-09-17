@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
@@ -101,6 +101,30 @@ export default function HomePage() {
   const points = usePoints(session.status === 'signed-in' ? session.session.userId : null);
 
   /*
+   * The example first name a preview greets by (D-173) — `@pam/config/dummy-people`
+   * loaded only once `demoRole` actually asks for one, the same dynamic-import
+   * reasoning `HeaderBell` gives for `dummy-notifications`: this file sits on
+   * every signed-in screen including Home, which is exactly what §12's budget
+   * measures, and almost nobody hitting Home is a super admin mid-preview.
+   */
+  const [dummySelfName, setDummySelfName] = useState<string | null>(null);
+  useEffect(() => {
+    if (!demoRole) {
+      setDummySelfName(null);
+      return;
+    }
+    let cancelled = false;
+    void (async () => {
+      const { DUMMY_SELF } = await import('@pam/config/dummy-people');
+      if (cancelled) return;
+      setDummySelfName(DUMMY_SELF[demoRole]?.firstName ?? null);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [demoRole]);
+
+  /*
    * The first paint, before the session is known — and the whole screen for
    * anybody whose JavaScript never runs.
    *
@@ -193,6 +217,7 @@ export default function HomePage() {
   const isCaseManager = viewed === 'admin';
   const isSuperAdmin = viewed === 'super_admin';
   const isProvider = viewed === 'provider';
+  const greetingName = demoRole ? (dummySelfName ?? me.firstName) : me.firstName;
 
   return (
     <Page gap={4}>
@@ -230,7 +255,17 @@ export default function HomePage() {
       */}
       <HStack gap={2} align="center" justify="between" wrap="wrap">
         <Heading level={1} xstyle={styles.title}>
-          {me.firstName ? t('home.greeting', { name: me.firstName }) : t('home.title')}
+          {/*
+            A super admin actively previewing a role sees an example name for
+            it, not their own (D-173) — the same substitution `/account/`
+            already makes with `DUMMY_SELF`, for the same reason: "Viewing as
+            Program" greeting Will by his own real name read as his account
+            wearing a badge, not a demonstration of what a program's account
+            looks like. A real member, case manager or program's own Home
+            always shows their own real name; `demoRole` is `null` for
+            everyone but a super admin who has actually changed the preview.
+          */}
+          {greetingName ? t('home.greeting', { name: greetingName }) : t('home.title')}
         </Heading>
         {points !== null ? (
           <Button
@@ -349,8 +384,19 @@ export default function HomePage() {
           wrong member-to-member build — see the file comment in
           `/messages/page.tsx`). A member, a case manager and a program
           admin can all message and be messaged, so all three get this
-          tile — gated on the account's own role, never a super admin's
-          "Viewing as" choice, for the same reason D-150 gave.
+          tile.
+
+          Gated on `viewed`, the same preview-aware role every other tile
+          on this screen uses — not `me.role` (D-172, correcting D-152's
+          own reasoning). Gating on the real role only meant the tile never
+          appeared during any "Viewing as" preview, for any role, which was
+          inconsistent with the caseload/directory/interested tiles above
+          and was flagged as a bug (Will, 17 September). `/messages/`
+          itself still only ever fetches or writes under the real signed-in
+          account's own true permissions — `viewed` only decides whether
+          this tile, and that screen's content, gets drawn at all; see the
+          file comment there for how a preview renders example content
+          instead of a real, empty screen.
 
           Reuses `PeopleIcon` rather than a new icon component: one more
           icon in the shared `@pam/ui` barrel is one more thing every route
@@ -360,7 +406,7 @@ export default function HomePage() {
           icon twice on the same screen — a small, accepted cosmetic cost,
           not a functional one.
         */}
-        {me.role === 'member' || me.role === 'admin' || me.role === 'provider' ? (
+        {viewed === 'member' || viewed === 'admin' || viewed === 'provider' ? (
           <NavTile
             href="/messages/"
             icon={<PeopleIcon />}

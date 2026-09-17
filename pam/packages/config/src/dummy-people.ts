@@ -70,6 +70,15 @@ export interface DummyPerson {
   readonly points?: number;
   /** Programs only — the organisation they run, not a person's own name. */
   readonly orgName?: string;
+  /**
+   * Members only — the program they are genuinely enrolled in, if any
+   * (D-175). Mirrors the real rule `useCaseload` applies: never present just
+   * because a member and a case manager share a region, only for an actual
+   * connection. `serviceId` is a `dummy-place-…` id from `dummy-places.ts`,
+   * so the badge's link resolves through that file's own demo-safe path
+   * rather than hitting a real, nonexistent `services` row.
+   */
+  readonly program?: { readonly name: string; readonly serviceId: string };
 }
 
 const hoursAgo = (n: number) => new Date(Date.now() - n * 3_600_000).toISOString();
@@ -86,6 +95,7 @@ export const DUMMY_MEMBERS: readonly DummyPerson[] = [
     lastActiveAt: hoursAgo(4),
     language: 'en',
     points: 175,
+    program: { name: 'Example Learning Center', serviceId: 'dummy-place-learning' },
   },
   {
     id: 'dummy-m2',
@@ -96,6 +106,7 @@ export const DUMMY_MEMBERS: readonly DummyPerson[] = [
     lastActiveAt: daysAgo(1),
     language: 'es',
     points: 420,
+    program: { name: 'Example Workforce Center', serviceId: 'dummy-place-workforce' },
   },
   {
     id: 'dummy-m3',
@@ -106,6 +117,7 @@ export const DUMMY_MEMBERS: readonly DummyPerson[] = [
     lastActiveAt: daysAgo(3),
     language: 'es',
     points: 50,
+    program: { name: 'Example Food Pantry', serviceId: 'dummy-place-food' },
   },
   {
     id: 'dummy-m4',

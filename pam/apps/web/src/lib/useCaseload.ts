@@ -29,6 +29,17 @@ export interface CaseloadMember {
   featuresOff: string[];
   lastActiveAt: string | null;
   points: number | null;
+  /**
+   * The program this member is genuinely connected to, if any — a real
+   * `enrollments` row (`status` in `enrolled`/`active`, never `interested`,
+   * `requested` or `dropped`), never inferred from being in the same region
+   * as this admin. `admin_covers()` has two arms — a real caseload
+   * assignment, or just sharing this admin's region — and a shared region on
+   * its own is not a program connection worth naming; see D-175. `null` when
+   * there is none, or when the member has more than one and this is simply
+   * the most recently updated.
+   */
+  program: { name: string; serviceId: string } | null;
 }
 
 export type CaseloadState =
@@ -100,6 +111,34 @@ export function useCaseload(enabled: boolean): { state: CaseloadState; refresh: 
           }),
         );
 
+        /*
+         * Which program each caseload member is actually enrolled in, for the
+         * program badge (D-175). `enrollments` (RLS: `enrollments_select_admin`,
+         * `admin_covers(member_id)` — the same function that already scoped
+         * `rows` above) joined to `services`, which this admin can always read
+         * (`services_select_admin`). Only a genuine, current connection counts
+         * — `enrolled`/`active` — never `interested`, `requested` or `dropped`,
+         * and never inferred from a region-only match. A member with more than
+         * one live enrollment gets the most recently updated; one badge per row.
+         */
+        const { data: enrollments } = await supabase
+          .from('enrollments')
+          .select('member_id, updated_at, services(id, name)')
+          .in('member_id', rows.map((r) => r.id))
+          .in('status', ['enrolled', 'active'])
+          .order('updated_at', { ascending: false });
+
+        const programByMember = new Map<string, { name: string; serviceId: string }>();
+        for (const row of (enrollments ?? []) as {
+          member_id: string;
+          services: { id: string; name: string }[] | { id: string; name: string } | null;
+        }[]) {
+          if (programByMember.has(row.member_id)) continue;
+          const service = Array.isArray(row.services) ? row.services[0] : row.services;
+          if (!service) continue;
+          programByMember.set(row.member_id, { name: service.name, serviceId: service.id });
+        }
+
         if (cancelled) return;
         setState({
           status: 'ready',
@@ -110,6 +149,7 @@ export function useCaseload(enabled: boolean): { state: CaseloadState; refresh: 
             featuresOff: offByMember.get(row.id) ?? [],
             lastActiveAt: row.last_active_at,
             points: balances[i] ?? null,
+            program: programByMember.get(row.id) ?? null,
           })),
         });
       } catch {

@@ -16,7 +16,8 @@
     "./dummy-flag": "./src/dummy-flag.ts",
     "./dummy-people": "./src/dummy-people.ts",
     "./dummy-notifications": "./src/dummy-notifications.ts",
-    "./dummy-places": "./src/dummy-places.ts"
+    "./dummy-places": "./src/dummy-places.ts",
+    "./dummy-conversations": "./src/dummy-conversations.ts"
   },
   "scripts": {
     "typecheck": "tsc -p tsconfig.json",
