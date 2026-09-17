@@ -38,9 +38,11 @@ import {
   submitDetails,
   type InviteProblem,
   type JoinKind,
+  type ProgramDetails,
 } from '@/lib/useJoin';
 import { NOTICES } from '@pam/config';
 import { PhoneSignInCard } from '../signin/PhoneSignInCard';
+import { ProgramDetailsStep } from './ProgramDetailsStep';
 
 /**
  * Signing up: five steps, and four of them are one question each.
@@ -79,17 +81,33 @@ import { PhoneSignInCard } from '../signin/PhoneSignInCard';
  * something true about this app in the first minute: things you do here count.
  */
 
-type Phase = 'phone' | 'details' | 'waiting' | 'waitingDone' | 'privacy' | 'texts' | 'done';
+type Phase = 'phone' | 'details' | 'program' | 'waiting' | 'waitingDone' | 'privacy' | 'texts' | 'done';
 
-/** Which of the five steps a phase is, for the bar. */
+/**
+ * Which step a phase is, for the bar. 'program' and the shift it causes to
+ * every step after it exist only for a program lead claiming the role
+ * themselves (0056) — invited straight in by code, or claiming any other
+ * role, never sees it, so those paths keep the numbers they always had.
+ */
 const STEP: Record<Phase, number> = {
   phone: 1,
   details: 2,
+  program: 3,
   waiting: 2,
   waitingDone: 2,
   privacy: 3,
   texts: 4,
   done: 5,
+};
+
+const EMPTY_PROGRAM: ProgramDetails = {
+  name: '',
+  category: 'education',
+  subcategory: '',
+  description: '',
+  address: '',
+  phone: '',
+  website: '',
 };
 
 const styles = stylex.create({
@@ -158,6 +176,8 @@ export default function JoinPage() {
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState(false);
   const [invalid, setInvalid] = useState<'name' | 'city' | null>(null);
+  const [program, setProgram] = useState<ProgramDetails>(EMPTY_PROGRAM);
+  const [programInvalid, setProgramInvalid] = useState(false);
 
   const firstId = useId();
   const lastId = useId();
@@ -234,8 +254,12 @@ export default function JoinPage() {
   }, [phase]);
 
   const isStaff = kind !== 'member';
-  /** Staff are not asked about reminders at sign-up: four steps, not five. */
-  const total = isStaff ? 4 : 5;
+  // A program lead claiming the role themselves gets one extra step to say
+  // what their program is (0056) — invited by code, they skip it entirely,
+  // since the role and its details would come from whoever invited them, not
+  // from a form.
+  const claimsProgramSelf = kind === 'provider' && inviteCode.trim() === '';
+  const total = kind === 'member' || claimsProgramSelf ? 5 : 4;
 
   const submit = async () => {
     if (firstName.trim() === '') {
@@ -247,13 +271,13 @@ export default function JoinPage() {
       return;
     }
     setInvalid(null);
-    setBusy(true);
-    setFailed(false);
-    setInviteProblem(null);
 
     // A code decides everything the radio buttons would have: the invite
     // carries the role and the city, chosen by the person who made it.
     if (inviteCode.trim() !== '') {
+      setBusy(true);
+      setFailed(false);
+      setInviteProblem(null);
       const redeemed = await redeemInvite(inviteCode, { firstName, lastName, city, language: locale });
       setBusy(false);
       if (redeemed.result === 'failed') {
@@ -266,6 +290,14 @@ export default function JoinPage() {
       return;
     }
 
+    // A program lead answers one more question before anything is recorded.
+    if (claimsProgramSelf) {
+      setPhase('program');
+      return;
+    }
+
+    setBusy(true);
+    setFailed(false);
     const outcome = await submitDetails({
       firstName,
       lastName,
@@ -281,6 +313,29 @@ export default function JoinPage() {
       setHasAccount(outcome.result === 'member');
       setPhase('privacy');
     }
+  };
+
+  const submitProgram = async () => {
+    if (program.name.trim() === '') {
+      setProgramInvalid(true);
+      return;
+    }
+    setProgramInvalid(false);
+    setBusy(true);
+    setFailed(false);
+    const outcome = await submitDetails({
+      firstName,
+      lastName,
+      city,
+      kind,
+      language: locale,
+      program,
+    });
+    setBusy(false);
+
+    if (outcome.result === 'failed') setFailed(true);
+    else if (outcome.result === 'city-not-served') setPhase('waiting');
+    else setPhase('privacy');
   };
 
   /** Staff with an account: nothing to ask about texts, so this is the end. */
@@ -326,7 +381,18 @@ export default function JoinPage() {
     );
   }
 
-  const step = phase === 'done' && isStaff ? 4 : STEP[phase];
+  // 'program' shifts every step after it by one, only on the one path that
+  // ever shows it — everyone else keeps the numbers STEP already has.
+  const step =
+    phase === 'done'
+      ? kind === 'member'
+        ? 5
+        : claimsProgramSelf
+          ? 5
+          : 4
+      : phase === 'privacy' && claimsProgramSelf
+        ? 4
+        : STEP[phase];
 
   return (
     <Page gap={4}>
@@ -492,6 +558,18 @@ export default function JoinPage() {
               isDisabled={busy}
             />
           </VStack>
+        </Card>
+      ) : null}
+
+      {phase === 'program' ? (
+        <Card padding={4} xstyle={styles.card}>
+          <ProgramDetailsStep
+            value={program}
+            onChange={setProgram}
+            onSubmit={() => void submitProgram()}
+            busy={busy}
+            invalid={programInvalid}
+          />
         </Card>
       ) : null}
 

@@ -1,5 +1,39 @@
 # Changelog
 
+## [0.24.0] — 2026-09-17 · The Everyone list, a program's own details, and a demo view
+
+### Added — a denial now texts the person too
+
+At Will's explicit request, sent straight to the phone with the usual safety
+check skipped for this one message — PAM's number is in it, so a real
+question has somewhere to go.
+
+### Added — a program lead can tell PAM about their program at sign-up
+
+A new step, manual entry only, when somebody picks "Program." Approving
+their request now adds it straight to the catalogue.
+
+### Added — a super admin can grant any account a demo view
+
+From the Everyone list. An account with it sees PAM's existing example data
+everywhere that screen already had one, whether or not its own data is
+empty — for showing the app off without showing anybody's real information.
+Not yet wired into every screen.
+
+## [0.23.0] — 2026-09-17 · Deciding a staff request
+
+### Added — a super admin can approve or deny a case-manager or program-lead request
+
+A new screen, reached from the Everyone list, lists every pending request and
+lets a super admin pick a city and approve it — which creates the real
+account immediately — or deny it. A notification tells every super admin
+when one comes in.
+
+### Added — an approval text, pending sign-off
+
+Not sending yet: the wording needs a human's approval first, the same rule
+every other message in the app already follows.
+
 ## [0.22.0] — 2026-09-17 · Hero motion, a quieter sign-in
 
 ### Changed — the sign-in hero's slide transition eases in and out, and holds each slide two seconds longer

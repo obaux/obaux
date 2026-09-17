@@ -1366,3 +1366,231 @@ begin
   raise notice 'ok    the list carries the point it sorted by';
 end;
 $$;
+
+\echo ''
+\echo '--- Deciding a staff request, for real (0054) ---'
+
+reset role;
+insert into auth.users (id, phone) values
+  ('33333333-0000-0000-0000-0000000000c0', '+15555550970'),
+  ('33333333-0000-0000-0000-0000000000c1', '+15555550971'),
+  ('33333333-0000-0000-0000-0000000000c2', '+15555550972');
+insert into public.profiles (id, role, first_name, access_status)
+values ('33333333-0000-0000-0000-0000000000c0', 'super_admin', 'Owner', 'active');
+
+set role authenticated;
+select test.as_user('33333333-0000-0000-0000-0000000000c1');
+do $$ begin perform public.request_staff_access('admin', 'Priya', 'Nair', 'North'); end; $$;
+
+select test.as_user(:'admin_north');
+do $$
+begin
+  begin
+    perform public.review_staff_request('33333333-0000-0000-0000-0000000000c1', 'approved',
+      '11111111-0000-0000-0000-000000000001');
+    raise exception 'FAIL  a case manager decided a staff request';
+  exception when others then
+    if sqlerrm like 'FAIL%' then raise; end if;
+    raise notice 'ok    only a super admin can decide a staff request';
+  end;
+end;
+$$;
+
+select test.as_user('33333333-0000-0000-0000-0000000000c0');
+do $$
+declare
+  p public.profiles;
+  req public.staff_requests;
+  n int;
+begin
+  begin
+    perform public.review_staff_request('33333333-0000-0000-0000-0000000000c1', 'approved');
+    raise exception 'FAIL  approval went through with no city named';
+  exception when others then
+    if sqlerrm like 'FAIL%' then raise; end if;
+    raise notice 'ok    approving still has to say which city (like create_invite, 0049)';
+  end;
+
+  req := public.review_staff_request('33333333-0000-0000-0000-0000000000c1', 'approved',
+    '11111111-0000-0000-0000-000000000001');
+  if req.decision <> 'approved' or req.reviewed_by <> auth.uid() or req.reviewed_at is null then
+    raise exception 'FAIL  the request was not marked decided';
+  end if;
+  raise notice 'ok    approving records the decision, reviewer and time';
+
+  select * into p from public.profiles where id = '33333333-0000-0000-0000-0000000000c1';
+  if p.role <> 'admin' or p.region_id <> '11111111-0000-0000-0000-000000000001' then
+    raise exception 'FAIL  the approved account came back as % in %', p.role, p.region_id;
+  end if;
+  if p.phone <> '+15555550971' or p.first_name <> 'Priya' or p.last_name <> 'Nair' then
+    raise exception 'FAIL  the approved profile is missing what the request carried';
+  end if;
+  raise notice 'ok    approving creates the real account, phone pulled from auth.users';
+
+  begin
+    perform public.review_staff_request('33333333-0000-0000-0000-0000000000c1', 'approved',
+      '11111111-0000-0000-0000-000000000001');
+    raise exception 'FAIL  an already-decided request was decided again';
+  exception when others then
+    if sqlerrm like 'FAIL%' then raise; end if;
+    raise notice 'ok    a decided request cannot be decided again';
+  end;
+end;
+$$;
+
+-- outbound_messages carries no admin carve-out (0035: "what a member is being
+-- texted is not on the §4.1 list") — checked with RLS bypassed, the same way
+-- 03_invariants.sql checks the equivalent queue for 0035/0036/0037.
+reset role;
+do $$
+declare n int;
+begin
+  select count(*) into n from public.outbound_messages
+  where member_id = '33333333-0000-0000-0000-0000000000c1'
+    and template_key = 'staff_request_approved';
+  if n <> 1 then
+    raise exception 'FAIL  the approval text was not queued';
+  end if;
+  raise notice 'ok    approving queues the approval text through the normal outbox';
+end;
+$$;
+set role authenticated;
+
+-- A denial: no profile, no queued message, decision recorded.
+select test.as_user('33333333-0000-0000-0000-0000000000c2');
+do $$ begin perform public.request_staff_access('provider', 'Sam', 'Reyes', 'South'); end; $$;
+
+select test.as_user('33333333-0000-0000-0000-0000000000c0');
+do $$
+declare
+  req public.staff_requests;
+  n int;
+begin
+  req := public.review_staff_request('33333333-0000-0000-0000-0000000000c2', 'denied');
+  if req.decision <> 'denied' then
+    raise exception 'FAIL  the denial was not recorded';
+  end if;
+
+  select count(*) into n from public.profiles where id = '33333333-0000-0000-0000-0000000000c2';
+  if n <> 0 then
+    raise exception 'FAIL  a denied request still got an account';
+  end if;
+  raise notice 'ok    denying records the decision and creates no account';
+end;
+$$;
+
+-- The denial text is queued straight to the phone (0055) — checked with RLS
+-- bypassed, since a phone-only row's member_id is null and matches nobody's
+-- auth.uid(), including the super admin who just made the decision.
+reset role;
+do $$
+declare n int;
+begin
+  select count(*) into n from public.outbound_messages
+  where phone = '+15555550972' and member_id is null and template_key = 'staff_request_denied';
+  if n <> 1 then
+    raise exception 'FAIL  the denial text was not queued to the phone';
+  end if;
+  raise notice 'ok    denying queues the denial text straight to the phone, no profile needed';
+end;
+$$;
+set role authenticated;
+
+-- Approving a program lead who left program details adds the program too.
+reset role;
+insert into auth.users (id, phone) values ('33333333-0000-0000-0000-0000000000c3', '+15555550973');
+set role authenticated;
+select test.as_user('33333333-0000-0000-0000-0000000000c3');
+do $$
+begin
+  perform public.request_staff_access(
+    'provider', 'Jo', 'Alvarez', 'North',
+    'Northside Tutoring', 'education', 'literacy_esl',
+    'Free reading help, evenings.', '10 Elm St', '+15555550001', 'https://example.org'
+  );
+end;
+$$;
+
+select test.as_user('33333333-0000-0000-0000-0000000000c0');
+do $$
+begin
+  perform public.review_staff_request('33333333-0000-0000-0000-0000000000c3', 'approved',
+    '11111111-0000-0000-0000-000000000001');
+end;
+$$;
+
+reset role;
+do $$
+declare n int;
+begin
+  select count(*) into n from public.services
+  where name = 'Northside Tutoring' and category = 'education' and subcategory = 'literacy_esl';
+  if n <> 1 then
+    raise exception 'FAIL  the program was not added on approval';
+  end if;
+  raise notice 'ok    approving a program lead with program details adds it to services';
+end;
+$$;
+delete from public.services where name = 'Northside Tutoring';
+set role authenticated;
+
+\echo ''
+\echo '--- The demo view, granted per account (0057) ---'
+
+select test.as_user(:'marcus');
+do $$
+declare v_marcus uuid := '33333333-0000-0000-0000-00000000000c';
+begin
+  begin
+    perform public.set_demo_view(v_marcus, true);
+    raise exception 'FAIL  a member granted themselves the demo view';
+  exception when others then
+    if sqlerrm like 'FAIL%' then raise; end if;
+    raise notice 'ok    only a super admin can grant the demo view';
+  end;
+end;
+$$;
+
+select test.as_user('33333333-0000-0000-0000-0000000000c0');
+do $$
+declare
+  v_marcus uuid := '33333333-0000-0000-0000-00000000000c';
+  n int;
+begin
+  perform public.set_demo_view(v_marcus, true);
+  select count(*) into n from public.directory_people(null) where id = v_marcus and is_demo;
+  if n <> 1 then
+    raise exception 'FAIL  the directory does not show the demo flag as set';
+  end if;
+  raise notice 'ok    granting shows up on the directory';
+
+  perform public.set_demo_view(v_marcus, false);
+  select count(*) into n from public.directory_people(null) where id = v_marcus and is_demo;
+  if n <> 0 then
+    raise exception 'FAIL  revoking did not clear the flag';
+  end if;
+  raise notice 'ok    revoking clears it again';
+
+  begin
+    perform public.set_demo_view('99999999-0000-0000-0000-000000000000', true);
+    raise exception 'FAIL  an account that does not exist was granted the demo view';
+  exception when others then
+    if sqlerrm like 'FAIL%' then raise; end if;
+    raise notice 'ok    granting it to nobody is refused';
+  end;
+end;
+$$;
+
+-- Somebody else's claim is still not this super admin's business to skip past.
+do $$
+begin
+  begin
+    perform public.review_staff_request('99999999-0000-0000-0000-000000000000', 'approved',
+      '11111111-0000-0000-0000-000000000001');
+    raise exception 'FAIL  a request that does not exist was decided';
+  exception when others then
+    if sqlerrm like 'FAIL%' then raise; end if;
+    raise notice 'ok    deciding a request that does not exist is refused';
+  end;
+end;
+$$;

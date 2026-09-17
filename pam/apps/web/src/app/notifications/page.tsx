@@ -13,6 +13,7 @@ import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
 import { useNotifications, unreadCount } from '@/lib/useNotifications';
 import { useRoleView } from '@/lib/useViewedRole';
+import { useDemoView } from '@/lib/useDemoView';
 import { RoleSwitchControl } from '../RoleSwitchControl';
 import { whenHappened } from '@/lib/when';
 
@@ -60,6 +61,9 @@ function describe(
   if (bodyKey === 'notify.service_flagged' && typeof bodyVars['reason'] === 'string') {
     return t(bodyKey, { ...bodyVars, reason: t(`flag.reason.${bodyVars['reason']}`) });
   }
+  if (bodyKey === 'notify.staff_request_pending' && typeof bodyVars['role'] === 'string') {
+    return t(bodyKey, { ...bodyVars, role: t(`role.${bodyVars['role']}`) });
+  }
   return t(bodyKey, bodyVars);
 }
 
@@ -73,8 +77,13 @@ export default function NotificationsPage() {
   const { viewedRole, setViewAs } = useRoleView(trueRole);
   const { state, markAllSeen } = useNotifications(signedIn);
   const unread = unreadCount(state);
+  const isDemo = useDemoView(session);
 
-  const showDummy = USE_DUMMY_PEOPLE && state.status === 'ready' && state.items.length === 0 && Boolean(viewedRole);
+  const showDummy =
+    USE_DUMMY_PEOPLE &&
+    state.status === 'ready' &&
+    (state.items.length === 0 || isDemo) &&
+    Boolean(viewedRole);
   const dummyItems = showDummy ? DUMMY_NOTIFICATIONS[viewedRole!] : [];
   const dummyUnread = dummyItems.filter((item) => item.isNew).length;
   const shownUnread = showDummy ? dummyUnread : unread;

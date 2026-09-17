@@ -2346,6 +2346,123 @@ neutral-theme tokens for exactly this reason: added
 that fixes a test is a lead, not a diagnosis — the actual defect was three
 files away from the one that made the symptom disappear.*
 
+### D-148 — Reviewing a staff request is a screen, reached from the Everyone list, not a notification you can act on
+Will, 17 September: super admins need to actually approve or deny the case-
+manager and program-lead requests `staff_requests` has been silently
+collecting since 0046 — nobody has ever reviewed one. Two shapes were
+possible: put approve/deny buttons directly on the notification that says one
+arrived, or keep the notification a plain alert and put the actual decision
+on a dedicated screen. The second was chosen and confirmed with Will before
+building: `NotificationList`'s own docblock states, as a deliberate 16
+September reversal, that a notification row is "a line in a log, not a thing
+with a state of its own to manage" — no row anywhere in PAM is currently
+clickable or carries an action, and putting one here would be the first
+exception to a rule stated in the component's own comments, not a schema
+addition. `notify.staff_request_pending` fires (via a trigger on
+`staff_requests`, matching the existing `notify_on_service_flag`/
+`notify_on_report` pattern from 0038) and says only that something is
+waiting; the new `/requests/` screen, linked from the Everyone list, is where
+it actually gets decided.
+
+### D-149 — Approving creates the account immediately; there is no separate invite step
+The obvious alternative — approving a staff request just makes an invite code
+the person still has to redeem — asks somebody who already told PAM who they
+are to prove it a second time. Since the requester is already signed in
+(`staff_requests.user_id` is their own `auth.uid()`, set when they claimed
+the role at sign-up) and their phone already lives on `auth.users`,
+`review_staff_request` creates the profile directly, in the same insert
+shape `redeem_invite` (0049) already uses. The region is still asked for
+explicitly at approval time, the same way `create_invite` asks a super admin
+which city a case-manager invite is for — the city a requester typed at
+sign-up is what they wrote, not necessarily the region PAM should file them
+under.
+
+### D-150 — The "denied" SMS is not built, and was not quietly skipped
+Will asked for an SMS on both outcomes — approved and denied. Approved is
+built: it reuses `outbound_messages`, the one existing safe path to a phone,
+which already enforces §7.2's quiet hours and STOP list because it joins
+`notification_preferences` by `member_id`, and a freshly-approved account has
+one. A denial creates no profile, so there is no `member_id` to hang a queued
+message on — and building a second, phone-only sending path in the same pass
+would mean either reinventing quiet-hours/STOP enforcement from scratch or
+quietly shipping a message that bypasses both, on the one part of this
+codebase (`packages/db/migrations/0039_dispatcher_claim.sql`'s own file
+comment) that says explicitly why those checks live in the database and not
+merely in convention. `review_staff_request('denied')` records the decision
+and stops there; sending the denial text is real, scoped work for a
+follow-up, not a corner to cut now. Flagged to Will directly rather than
+built partially.
+
+### D-151 — `staff_request_approved` ships unreviewed, same as every new template
+`reviewedBy: ''` on the new SMS template, matching how every other template
+in this file has always started. `pnpm --filter @pam/config test` fails on
+`has a human recorded against every template` until Will reads the exact
+wording and signs off — that is §9's gate doing its job, not a bug introduced
+by this session, and the fix is Will's approval, not a code change.
+
+### D-152 — The denial SMS deliberately skips quiet-hours/STOP enforcement, on Will's explicit instruction
+D-150 flagged that a denial has no profile, so `outbound_messages`' §7.2
+quiet-hours/STOP-list machinery (keyed by `member_id`) cannot cover it. Will,
+17 September, having read that flag: send it anyway, skip the safety system
+for this one message, and put PAM's support number in it so a real question
+has somewhere to go. Built exactly as asked, not softened: `outbound_messages`
+gained a nullable `member_id` plus its own `phone`/`locale` columns
+(0055_staff_denied_sms.sql), and `claim_outbound_messages` claims a
+phone-only row the moment it is due, with no `in_quiet_hours` check and no
+STOP-list check — both explicitly named exceptions in the function's own
+comment and in the migration's file comment, not a silent gap. Every other
+§9 rule still applies in full: 160 characters, no emoji, the forbidden-term
+list, `reviewedBy` before it can ever send. Scoped narrowly on purpose — the
+exception is this one template only, not a general "phone-only messages skip
+safety" precedent, and any future phone-only template should be its own
+deliberate decision, not an assumed extension of this one.
+
+### D-153 — Approving a program lead's request adds their program to `services` automatically
+Will, 17 September, explaining why duplicate-avoidance on self-service
+program submission (the deferred Part 5 of this request) matters: program
+leads will be adding their own programs. Since 0056 already collects the
+program's details at the point they claim the role, and `services`' fields
+are exactly what that form collects, `review_staff_request`'s approval branch
+now inserts the row directly rather than making a super admin retype
+everything from a phone call. `services`' own existing trigger marks it
+`needs_review = true` the moment a `*_plain` column is written, the same as
+any other manually-entered place — no new review mechanism was built,
+because one already existed and already fires here unchanged.
+
+### D-154 — The program-details step is its own onboarding phase, only for a program lead claiming the role themselves
+Will asked for a Google Maps auto-fill option too; §5.2/`STATUS.md` already
+documents that the Edge Function it would need (`enrich-places`) does not
+exist and was deliberately deferred by Will until nearer kick-off. Rather
+than build a button that cannot do anything yet, this ships manual entry
+only, with the field set matching `services` exactly (D-153's insert depends
+on that match) so the Maps option can plug into the same fields later without
+reshaping the form. Scoped to self-claim only: somebody redeeming an invite
+code for the `provider` role already has an account and a person who made
+that invite to talk to — the extra step is for the one path where nobody has
+met them yet.
+
+### D-155 — The demo view is a per-account grant, not a session-only preview like `useViewAs`
+Will's first description of this ("a screen toggle with dummy data ... for
+showcasing purposes") sounded like it could reuse the existing "Viewing as"
+preview (D-108), and the scoping conversation confirmed it does not: Will
+wants a super admin to grant *another* account a standing view that shows
+PAM's existing example data everywhere, not a session-only rendering choice
+about the viewer's own screen. `profiles.is_demo` (0057) is a real, persisted
+column, set only by `set_demo_view` (super admin only, audited). The existing
+`USE_DUMMY_PEOPLE` empty-state fallback is reused rather than replaced —
+`useDemoView()` ORs into each screen's existing "show the example set" check,
+so an account already sees the exact dummy content that screen has always
+had, just no longer gated on its real data being empty.
+
+**Not every screen is wired yet.** `directory_people`, `useSession`, and the
+five screens that already had a `USE_DUMMY_PEOPLE` check of their own
+(directory, admin, notifications, plus the two shared components,
+`HeaderBell` and `PersonRow`) now read it. `place`, `person`,
+`HomePeoplePreview` and the saved-places dummy path do not yet — they were
+identified but not reached this session (see the session log). The
+mechanism (`useDemoView`, threaded from `useSession`) is the same for all of
+them; it is repetition, not a new pattern, to finish.
+
 ---
 
 ## Notes for whoever picks this up next

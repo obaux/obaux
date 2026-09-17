@@ -114,6 +114,26 @@
       "reviewedBy": "Will (Oba), 13 September 2026",
       "isFirstContact": false
     },
+    "staff_request_approved": {
+      "key": "staff_request_approved",
+      "en": "PAM: Your request was approved. Open PAM to get started: {link}",
+      "es": "PAM: Su solicitud fue aprobada. Abra PAM para empezar: {link}",
+      "vars": [
+        "link"
+      ],
+      "reviewedBy": "",
+      "isFirstContact": false
+    },
+    "staff_request_denied": {
+      "key": "staff_request_denied",
+      "en": "PAM: Your request was not approved. Questions? Call {supportPhone}.",
+      "es": "PAM: Su solicitud no fue aprobada. Preguntas? Llame al {supportPhone}.",
+      "vars": [
+        "supportPhone"
+      ],
+      "reviewedBy": "",
+      "isFirstContact": false
+    },
     "connection_request": {
       "key": "connection_request",
       "en": "PAM: Someone on PAM wants to connect. Open PAM to reply: {link}",
