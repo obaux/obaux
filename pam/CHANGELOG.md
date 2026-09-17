@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.24.3] — 2026-09-17 · PAM can text for real
+
+Twilio credentials are configured and proved with a real message, sent
+end-to-end through the live dispatcher to a real phone.
+
 ## [0.24.2] — 2026-09-17 · Both new text messages signed off
 
 The approval and denial texts for a case-manager/program-lead request are
