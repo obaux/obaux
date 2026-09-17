@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.24.1] — 2026-09-17 · Live
+
+Migrations 0054 through 0057 (the Everyone list's Requests screen, the
+denial text, program submission, and the demo view) applied to the real
+database. Two small fixes caught by the post-deploy security/performance
+check: a trigger function that was reachable directly when it shouldn't
+have been, and two missing indexes.
+
 ## [0.24.0] — 2026-09-17 · The Everyone list, a program's own details, and a demo view
 
 ### Added — a denial now texts the person too
