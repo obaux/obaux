@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.28.0] — 2026-09-17 · Messaging privacy migrations deployed live
+
+### Deployed — `0055_conversation_partner_no_activity`, `0056_provider_linked_no_activity`
+
+The migrations that limit what a conversation partner or a program admin can
+read about a member (name and role only — never `last_active_at` or `phone`)
+are now live on the Supabase project, not just verified locally.
+`get_advisors` (security) ran clean afterward. No user-facing change — this
+is the guarantee `0.27.0`'s test suite already proved, now actually in
+effect.
+
+### Found, not fixed — live/repo migration drift
+
+Deploying surfaced six migrations applied to the live project with no
+matching file in this repo (`staff_review`, `staff_denied_sms`,
+`program_submission`, `demo_view`, `lock_notify_on_staff_request`,
+`staff_requests_indexes`), and one committed local migration
+(`0052_saved_places_say_what_they_are`) that was never deployed. Neither is
+resolved here — see `STATUS.md` and D-158.
+
 ## [0.27.0] — 2026-09-17 · The transparency contract is now tested against a real database
 
 ### Added — `admin_visibility.test.ts`, built as `packages/db/test/04_transparency_contract_test.sql`

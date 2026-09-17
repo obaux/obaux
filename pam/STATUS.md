@@ -63,8 +63,14 @@ the test `transparency.ts` had claimed enforces this contract but which did
 not exist (D-153), is built (`04_transparency_contract_test.sql`, D-157) —
 and this sandbox turned out not to be permanently missing `postgis` after
 all; installing it let `pnpm --filter @pam/db test` run for real against
-every migration through `0056`. **221 checks pass, 0 failures.** Newest
-session log: `docs/sessions/2026-09-17-admin-visibility-contract-test.md`.
+every migration through `0056`. **221 checks pass, 0 failures.** `0055` and
+`0056` are now deployed to the live Supabase project (`0054` was superseded
+before deploy) and `get_advisors` came back clean. Deploying surfaced real
+drift between this repo and the live schema — unrelated to messaging, not
+caused by or fixed in this session — see the drift note under "What is
+live" and D-158; `pam/CLAUDE.md` gained a "Working alongside another PAM
+session" section as a direct result. Newest
+session log: `docs/sessions/2026-09-17-deploy-and-concurrency-rules.md`.
 
 This is the handover document: what exists, what is proven, what is live, and
 what the next person needs to know before touching anything.
@@ -97,8 +103,23 @@ going — without help?*
 ## What is live
 
 **Supabase project `pam`** — `shobqzuhicoiymtumiaz`, us-east-1 (closest region to
-Philadelphia). Fifty-one migrations applied, through 0052. The database is real and reachable;
-the app is not deployed anywhere yet.
+Philadelphia). The database is real and reachable; the app is not deployed
+anywhere yet.
+
+**The live migration ledger and this repo have drifted, and it is not fully
+reconciled.** `0054`–`0056` (this session's messaging-privacy migrations) are
+now deployed and verified via `get_advisors` (clean). But the live project
+also carries six migrations with no matching file in this repo on any branch
+— `staff_review`, `staff_denied_sms`, `program_submission`, `demo_view`,
+`lock_notify_on_staff_request`, `staff_requests_indexes`, all applied 17
+September — almost certainly Will's other concurrent session building the
+`staff_requests` review flow directly against the live database. Separately,
+committed local migration `0052_saved_places_say_what_they_are.sql` does
+**not** appear in the live ledger at all. Neither gap was this session's to
+close; see D-158. **Do not assume the live schema matches this branch's
+migration files** until both are reconciled — check
+`mcp__Supabase__list_migrations` against `packages/db/migrations/` before
+deploying anything further.
 
 **The text-message dispatcher is live and running** — the `dispatch-sms` function
 is deployed and a database schedule calls it every five minutes. It sends
@@ -183,7 +204,7 @@ Numbers here are from the last run, not aspirations.
 | `@pam/config` tests | 202 pass | No SMS can send unreviewed, over 160 chars, with emoji, or with a term that reveals justice involvement. Locales are key-for-key. The transparency screen matches its contract. |
 | `@pam/ui` tests | 66 pass | Every component is axe-clean. `PlaceCard` offers exactly three actions in a fixed order. Reduced motion is respected. The mic hides when unsupported. |
 | Database suite | 221 checks pass | See below. Grew from 152 across today's four messaging sessions — `0055`/`0056`'s own coverage plus `04_transparency_contract_test.sql` (D-157), all now actually run, not just written: this sandbox lacked `postgis` for the first four sessions today, `apt-get install postgresql-16-postgis-3` closed that during the fifth |
-| Live RLS fingerprint | identical to local | The deployed policy set is provably the one that was penetration-tested: `ce9636c3b77e4827368e6575742b899c`, 73 policies on both |
+| Live RLS fingerprint | **not re-verified since 0054–0056 deployed** | This row's last "identical to local" claim predates today. `0054`–`0056` are now live and `get_advisors` came back clean, but the fingerprint comparison itself hasn't been re-run, and the live project also carries six undocumented migrations this repo can't fingerprint (see D-158, and the drift note under "What is live") |
 | Live anonymous attack | 0 rows leaked | A signed-out caller reads no profiles, messages, invites or audit rows on the real database, while still reaching the support number and the public catalogue |
 | Browser a11y + theme (Playwright, full suite) | 426 pass | No WCAG AA violations at 320px or iPhone SE. Every control clears 48px. No horizontal scroll. The Astryx theme really resolves. Runs in dark mode as well as light. |
 | First-load JS | 501.0 kB of 500 kB — **1.0 kB over budget**, disclosed and unresolved | §12 budget, measured gzipped on what `index.html` actually loads; `/signin` and `/gallery` carry `OnboardingSlides`' `framer-motion` weight on their own subpath export (D-140), every other route unaffected. Grew from 500.7 kB across two messaging sessions (D-151), entirely new locale strings — irreducible without lazy-loading translations per route, which is out of scope; `/messages` and `/messages/thread` themselves add nothing to this shared measurement |
@@ -384,7 +405,7 @@ while the copy is unsigned, so it earned the first live test, not the last.*
 | 10 | **Twilio credentials into the dispatcher's secrets** | Reminders and notices | `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, and either `TWILIO_MESSAGING_SERVICE_SID` or `TWILIO_FROM_NUMBER`, under Edge Functions → dispatch-sms. Until then the dispatcher records "Twilio is not configured" instead of sending. |
 | 11 | **Confirm client-side caseload/enrollment scoping in `/messages/` is an acceptable interim state (D-152)** | Staff-to-member messaging | RLS lets a client create a conversation with any profile id; only `useMessageableMembers`'s own restraint (a case manager's real caseload, a program admin's real enrolled members) keeps this screen scoped to real relationships. A follow-up migration should enforce it at the database layer — see D-152 for exactly what to check. Shipped now, conservatively, rather than blocked on that migration; flagged for Will's word on whether that trade is right, given it now involves staff accounts with real caseload access rather than peers. |
 | 12 | **Wire `report_message()` (0034) to a UI action in the thread view** | Member safety | The RPC is complete and correct at the database layer; nothing in `/messages/thread/` calls it yet. D-074's whole premise is that a report is the *only* route a case manager who is **not** a participant ever has into message content — a chat surface with no way to file one is a real gap, not a nice-to-have. |
-| 13 | ~~Run `pnpm --filter @pam/db test` against migrations 0054, 0055 and 0056~~ **Done (D-157)** | — | This sandbox turned out not to be permanently missing `postgis` — `apt-get install postgresql-16-postgis-3` closed the gap. `pnpm --filter @pam/db test` ran for real against every migration through `0056` and every test file, including the new `04_transparency_contract_test.sql`: **221 checks pass, 0 failures.** This is local-only verification, not a deployment — none of today's four migrations have been applied to the live Supabase project (see the "Live RLS fingerprint" row above, which now describes the *deployed* policy set only, not what is in this branch). |
+| 13 | ~~Run `pnpm --filter @pam/db test` against migrations 0054, 0055 and 0056~~ **Done (D-157); now also deployed live (D-158)** | — | This sandbox turned out not to be permanently missing `postgis` — `apt-get install postgresql-16-postgis-3` closed the gap. `pnpm --filter @pam/db test` ran for real: **221 checks pass, 0 failures.** `0054` was superseded before deploy; `0055` and `0056` are now applied to the live Supabase project, and `get_advisors` (security) came back clean. Deploying also surfaced live/repo drift unrelated to this work — see the "What is live" drift note and D-158 — left for Will to reconcile. |
 | 14 | ~~`profiles_select_provider_linked` grants activity info~~ **Done — closed app-wide (0056, D-155)** | — | Was: a program admin could read `last_active_at`/`phone` for any enrolled member with no conversation required. Replaced with `provider_linked_members()` (id, first name only). Will confirmed this needed to be a blanket rule, not just a messaging-surface one, and the transparency screen now says so (D-156). Case managers unaffected. |
 | 15 | **Decide whether `profiles.phone` needs a column-level `REVOKE` more broadly still** | Staff/member privacy | The provider-role exposure is now closed everywhere it was found (D-154, D-155 — `conversation_partners()` and `provider_linked_members()` both return name/role only). `profiles_select_admin_caseload` (case managers) still exposes the whole row, including `phone`, for a caseload/region member — untouched, since every instruction so far has been explicitly provider-role-specific, not about case managers. The `bidder_contact`-style column grant pattern used elsewhere in this repo would close it if Will wants that too. |
 | 16 | ~~Build `admin_visibility.test.ts`~~ **Done, as `04_transparency_contract_test.sql` (D-157)** | — | `transparency.ts`'s own file comment used to claim a test by that name enforces `ADMIN_CAN_SEE` against live RLS; it never existed (D-153, D-156). Built and run: `packages/db/test/04_transparency_contract_test.sql`, covering the four contract lines that changed today (case-manager participation, non-participation, program-admin activity via both read paths, and total visibility) against a real database, not just documentation. Passes, per row 13. |

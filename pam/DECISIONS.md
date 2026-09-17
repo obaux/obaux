@@ -2953,6 +2953,47 @@ fresh sandbox should not assume it is permanently unavailable — it was one
 `apt-get install` away here, and this environment note may not hold for
 every future one.
 
+### D-158 — Migrations 0054–0056 deployed live; a real drift found and a concurrency rule added, not deployed around
+
+Deploying today's messaging migrations to the live project
+(`shobqzuhicoiymtumiaz`) surfaced a real gap between the repo and the live
+schema, discovered before anything was applied rather than after:
+
+- **Six live-only migrations** (`staff_review`, `staff_denied_sms`,
+  `program_submission`, `demo_view`, `lock_notify_on_staff_request`,
+  `staff_requests_indexes`), all applied 17 September, exist in
+  `mcp__Supabase__list_migrations` with no matching file anywhere in this
+  repo's git history (`git log --all` on every branch). Names line up with
+  the "who calls the people who ask to help?" `staff_requests` review work
+  `STATUS.md` still lists as unbuilt — almost certainly Will's second,
+  concurrent session working live on that feature without committing yet.
+- **One local-only gap**: `0052_saved_places_say_what_they_are.sql` is
+  committed but does not appear in the live migration list at all — deployed
+  is missing it, for a reason nobody recorded.
+
+Neither was this session's to fix. `0054`/`0055`/`0056` create and drop
+objects (`profiles_select_conversation_partner`,
+`profiles_select_provider_linked`, `conversation_partners()`,
+`provider_linked_members()`) that don't overlap anything the six unknown
+migrations plausibly touch (`staff_requests` review, not messaging or
+profile visibility), so they were deployed as planned, in order, and
+`mcp__Supabase__get_advisors` (security) came back clean — the only findings
+are the same "SECURITY DEFINER is PostgREST-exposed" class every other RPC
+in this project already produces by design, nothing new.
+
+The `0052` gap and the six undocumented migrations are left exactly as
+found — not silently patched over, not deployed around — for Will to explain
+or reconcile, since guessing at someone else's in-flight work is worse than
+asking.
+
+**What changed as a result**: `CLAUDE.md` gained a "Working alongside
+another PAM session" section (checking `list_migrations` against local
+files before any live deploy, committing a migration's file in the same
+session it's applied, treating `STATUS.md`/`DECISIONS.md`/`CHANGELOG.md` as
+shared files to pull before overwriting, and preferring separate branches
+for concurrent work) — a direct, load-bearing consequence of this session
+almost deploying blind into another session's undocumented live changes.
+
 ---
 
 ## Notes for whoever picks this up next
