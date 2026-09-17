@@ -41,7 +41,9 @@ account a demo view from the Everyone list, showing PAM's existing example
 data everywhere that account looks rather than only when its own data
 happens to be empty — wired into five of the screens that already had an
 example-data fallback, not yet all of them (D-155). All of it — migrations
-0054 through 0059 — is live on the real database (D-156). Newest session log:
+0054 through 0059 — is live on the real database (D-156). **PAM can text for
+real now** (D-158): Twilio credentials are in place and proved with an actual
+message sent end-to-end. Newest session log:
 `docs/sessions/2026-09-17-everyone-list-and-program-requests.md`.
 
 This is the handover document: what exists, what is proven, what is live, and
@@ -78,14 +80,17 @@ going — without help?*
 Philadelphia). Fifty-one migrations applied, through 0052. The database is real and reachable;
 the app is not deployed anywhere yet.
 
-**The text-message dispatcher is live and running** — the `dispatch-sms` function
-is deployed and a database schedule calls it every five minutes. It sends
-nothing, on purpose: no human has signed off the copy, so every message is
-refused and the refusal is recorded on the message. Proved against the live
-project with one real queued notice: `claimed 1, sent 0 — copy is not signed
-off`. Quiet hours, the STOP list and atomic claiming are enforced in the
-database, not in the function. Signing the copy and adding the Twilio
-credentials is what turns it on; nothing needs redeploying. See
+**The text-message dispatcher is live, running, and sending for real (17
+September).** The `dispatch-sms` function is deployed and a database schedule
+calls it every five minutes. Twilio credentials are in place and proved with a
+real end-to-end test: a signed-off template queued to Will's own number came
+back `status: sent`, no failure reason, picked up by the very next scheduled
+run. Quiet hours, the STOP list and atomic claiming are enforced in the
+database, not in the function. All sixteen templates in the catalogue are now
+signed off — the original thirteen (13 September) plus the two built this
+week, `staff_request_approved` and `staff_request_denied` (17 September) —
+so nothing is currently held back at the `reviewedBy` gate; the next template
+anyone adds still starts blank and stays refused until it is read. See
 `docs/sms-setup.md`.
 
 **Sign-in and sign-up work, and sign-out exists.** Supabase is pointed at
@@ -110,15 +115,18 @@ messages carry; the second was rejected for implied consent (30925), which was
 right — PAM now asks on a screen of its own, with nothing pre-selected, and the
 agreement is the button's own words (D-085, D-086).
 
-What is left before a real text sends, all of it a human's:
+~~What was left before a real text sends~~ — **done, 17 September**: Twilio
+credentials are in the `dispatch-sms` Edge Function secrets (the Messaging
+Service SID, not a bare from-number, so the A2P approval carries through) and
+proved with a real message. What is still open, neither of them a blocker on
+sending in general:
 
-1. Twilio credentials into the `dispatch-sms` Edge Function secrets — use the
-   **Messaging Service SID**, not a bare from-number: the A2P approval attaches
-   to the service.
-2. Somebody has to answer the reminders question. Every existing row has
-   `sms_enabled = false` (0042 made consent opt-in), so nothing sends to anyone
-   until they say yes — including Will's own account.
-3. The HELP auto-reply on the Messaging Service, matching what was filed.
+1. Reminder-type texts specifically are opt-in per account (`sms_enabled =
+   false` by default, 0042) — nothing about Twilio being configured changes
+   that. Somebody still has to say yes on the reminders screen before PAM
+   texts them one, including Will's own account.
+2. The HELP auto-reply on the Messaging Service, matching what was filed with
+   the carrier, is not yet confirmed set up.
 
 The account is still in trial: only numbers verified by hand in the Twilio
 console can receive a text. Setup and the known traps are in
@@ -336,7 +344,7 @@ while the copy is unsigned, so it earned the first live test, not the last.*
 | 9b | ~~754 places, and not one of them says what it is~~ **Done** | — | 0050, 16 September: all 754 carry a description of at most 200 characters, written from the city's own `service_type` / `park_name` / `asset_name` fields or, for the twelve hand-added places, from published sources. 230 have a website and 361 are marked `audience`. Verified live: 754 active, 754 described, 0 hidden for review, longest 152 characters. This reversed the screen half of 0017 and needed Will's word — see A11 and D-121. The words are sourced, not invented, but **no provider has read their own entry yet.** |
 | 10c | **Confirm the Twilio account's state** | Anybody whose number is not verified | This row said the account was in trial. Will, 16 September: the Twilio console says it is active. That earlier claim came from a 13–14 September finding and was repeated afterwards without re-checking; this session did not verify it either way, so it stands as Will's word and unverified here. If it is active the trial concern is gone; if not, a code to an unverified number is not sent and nothing says so — the live logs on the 14th show one phone asking three times. Carrier registration is a separate question (row 10). |
 | 10b | **A line about the PAM team on the transparency screen** | A promise already made | Members were told they would hear first if what is visible changes, and the directory now shows a super admin every account (name, role, region, status, last active; never messages or contact details). Proposed, for `packages/config/transparency.ts`: *"The PAM team can see your name, your city and the last day you used PAM. Never your messages."* It is a change to the contract, so it wants Will's word. |
-| 10 | **Twilio credentials into the dispatcher's secrets** | Reminders and notices | `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, and either `TWILIO_MESSAGING_SERVICE_SID` or `TWILIO_FROM_NUMBER`, under Edge Functions → dispatch-sms. Until then the dispatcher records "Twilio is not configured" instead of sending. |
+| 10 | ~~Twilio credentials into the dispatcher's secrets~~ **Done** | — | Will, 17 September. Confirmed with a real end-to-end test: a `staff_request_denied` text queued to Will's own number was picked up by the 5-minute dispatcher cycle and sent successfully (`status: sent`, no failure reason). PAM can now text for real. |
 | 11 | ~~Sign off `staff_request_approved`'s wording~~ **Done** | — | Will, 17 September. `pnpm --filter @pam/config test` is green. |
 | 12 | ~~Migrations 0054 through 0057 are local only~~ **Done** | — | Applied to the live Supabase project 17 September, along with two follow-ups `get_advisors` surfaced: `notify_on_staff_request` (0058) was callable directly via PostgREST, unlike its two siblings in 0038 — its own migration run never got the schema-level default-privileges lockdown 0038's did; and `staff_requests` had two foreign keys with no covering index (0059). `/requests/`, `/join/`'s program step, and the demo view all work against the real database now. |
 | 13 | ~~Sign off `staff_request_denied`'s wording too~~ **Done** | — | Will, 17 September. Still sent with quiet-hours/STOP enforcement deliberately skipped, at Will's own instruction (D-152) — that was never what this row was about. |

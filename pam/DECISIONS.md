@@ -2519,6 +2519,30 @@ bundle.test.ts`) exists to make unnecessary — the mistake was retyping
 `templates.json` instead of reading its exact bytes back into the deploy
 call, not the sign-off itself.*
 
+### D-158 — Twilio credentials wired up, proved with one real message
+Will, 17 September: "Wire up Twilio credentials." I have no tool that sets
+Supabase Edge Function secrets and never see the credential values — those
+had to be added by Will directly in the dashboard, which also keeps them out
+of this chat's log. First attempt bundled all three values under one secret
+literally named `dispatch-sms`; the function reads three separately-named
+env vars (`TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`,
+`TWILIO_MESSAGING_SERVICE_SID`), so that didn't work — corrected once
+explained.
+
+Confirmed live rather than assumed: the cron schedule (`*/5 * * * *`) was
+running and returning `200 OK` even before real credentials existed, because
+an empty message queue means `sendViaTwilio` is never called — a green
+function log proves nothing about Twilio specifically. With Will's explicit
+sign-off, queued one real `staff_request_denied` message to his own account
+(the support-line number, so no test data invented) and watched it move from
+`scheduled` to `status: sent, failure_reason: null` on the next real
+dispatcher run. That is the actual proof; a passing HTTP status alone was not
+going to be represented as one.
+
+---
+
+## Notes for whoever picks this up next
+
 - `pnpm --filter @pam/db test` is the highest-value check in the repo. It is the
   only thing standing between a policy edit and a privacy breach.
 - The transparency screen is a promise to people with very little reason to
