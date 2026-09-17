@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.20.0] — 2026-09-17 · The hero autoplays
+
+### Changed — the sign-in hero is taller, and now advances on its own
+
+The three-slide hero now takes roughly half the screen (up from about a
+third) and autoplays to the next slide every 4 seconds, looping back to the
+first after the last. A manual swipe still works at any time and resets the
+4-second timer. Autoplay never runs for anyone whose device asks for
+reduced motion — the carousel stays swipe-only for them.
+
+### Changed — more space between the mark and the "Philadelphia" pill
+
+### Fixed — the slide dots stay visible against bright parts of the photos
+
+A drop shadow keeps the white dots readable regardless of what's behind
+them.
+
 ## [0.19.0] — 2026-09-16 · A real sign-in hero
 
 ### Changed — sign-in is now a full-bleed photo hero, not a small icon on a card

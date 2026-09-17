@@ -234,7 +234,7 @@ export default function SignInPage() {
    */
   const heroHeader = (
     <div {...stylex.props(styles.heroHeader)}>
-      <VStack gap={1} align="center" xstyle={styles.heroBrand}>
+      <VStack gap={2} align="center" xstyle={styles.heroBrand}>
         <img src="/pam-wordmark-white.svg" alt="PAM" {...stylex.props(styles.heroMark)} />
         <Text xstyle={styles.heroCity}>{t('signin.city')}</Text>
       </VStack>

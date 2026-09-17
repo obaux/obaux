@@ -1,6 +1,6 @@
 # PAM — where the project stands
 
-Last updated 2026-09-16. The member-facing product is real now: signing up
+Last updated 2026-09-17. The member-facing product is real now: signing up
 and signing out, invite codes for all four kinds of account, saving, points,
 badges, reporting a place, and a screen for the person running PAM. Every place
 now says what it is and has a screen of its own. Notifications are readable —
@@ -19,8 +19,10 @@ people preview for Case manager/Program/Super admin previews is now a
 scrollable stories-style strip rather than a stacked list. Sign-in is now a
 full-bleed photo hero — real commissioned illustrations, sourced via Google
 Drive after Figma's own asset URLs proved unreachable from this sandbox
-(D-135) — with the card riding up over its bottom edge. Newest session log:
-`docs/sessions/2026-09-16-a-real-sign-in-hero.md`.
+(D-135) — with the card riding up over its bottom edge. The hero now takes
+about half the screen and autoplays every 4 seconds (never under reduced
+motion, D-136). Newest session log:
+`docs/sessions/2026-09-17-hero-autoplay-and-sizing.md`.
 
 This is the handover document: what exists, what is proven, what is live, and
 what the next person needs to know before touching anything.
