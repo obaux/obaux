@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.24.0] — 2026-09-17 · The Everyone list, a program's own details, and a demo view
+
+### Added — a denial now texts the person too
+
+At Will's explicit request, sent straight to the phone with the usual safety
+check skipped for this one message — PAM's number is in it, so a real
+question has somewhere to go.
+
+### Added — a program lead can tell PAM about their program at sign-up
+
+A new step, manual entry only, when somebody picks "Program." Approving
+their request now adds it straight to the catalogue.
+
+### Added — a super admin can grant any account a demo view
+
+From the Everyone list. An account with it sees PAM's existing example data
+everywhere that screen already had one, whether or not its own data is
+empty — for showing the app off without showing anybody's real information.
+Not yet wired into every screen.
+
 ## [0.23.0] — 2026-09-17 · Deciding a staff request
 
 ### Added — a super admin can approve or deny a case-manager or program-lead request

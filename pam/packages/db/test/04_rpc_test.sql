@@ -1479,6 +1479,108 @@ begin
 end;
 $$;
 
+-- The denial text is queued straight to the phone (0055) — checked with RLS
+-- bypassed, since a phone-only row's member_id is null and matches nobody's
+-- auth.uid(), including the super admin who just made the decision.
+reset role;
+do $$
+declare n int;
+begin
+  select count(*) into n from public.outbound_messages
+  where phone = '+15555550972' and member_id is null and template_key = 'staff_request_denied';
+  if n <> 1 then
+    raise exception 'FAIL  the denial text was not queued to the phone';
+  end if;
+  raise notice 'ok    denying queues the denial text straight to the phone, no profile needed';
+end;
+$$;
+set role authenticated;
+
+-- Approving a program lead who left program details adds the program too.
+reset role;
+insert into auth.users (id, phone) values ('33333333-0000-0000-0000-0000000000c3', '+15555550973');
+set role authenticated;
+select test.as_user('33333333-0000-0000-0000-0000000000c3');
+do $$
+begin
+  perform public.request_staff_access(
+    'provider', 'Jo', 'Alvarez', 'North',
+    'Northside Tutoring', 'education', 'literacy_esl',
+    'Free reading help, evenings.', '10 Elm St', '+15555550001', 'https://example.org'
+  );
+end;
+$$;
+
+select test.as_user('33333333-0000-0000-0000-0000000000c0');
+do $$
+begin
+  perform public.review_staff_request('33333333-0000-0000-0000-0000000000c3', 'approved',
+    '11111111-0000-0000-0000-000000000001');
+end;
+$$;
+
+reset role;
+do $$
+declare n int;
+begin
+  select count(*) into n from public.services
+  where name = 'Northside Tutoring' and category = 'education' and subcategory = 'literacy_esl';
+  if n <> 1 then
+    raise exception 'FAIL  the program was not added on approval';
+  end if;
+  raise notice 'ok    approving a program lead with program details adds it to services';
+end;
+$$;
+delete from public.services where name = 'Northside Tutoring';
+set role authenticated;
+
+\echo ''
+\echo '--- The demo view, granted per account (0057) ---'
+
+select test.as_user(:'marcus');
+do $$
+declare v_marcus uuid := '33333333-0000-0000-0000-00000000000c';
+begin
+  begin
+    perform public.set_demo_view(v_marcus, true);
+    raise exception 'FAIL  a member granted themselves the demo view';
+  exception when others then
+    if sqlerrm like 'FAIL%' then raise; end if;
+    raise notice 'ok    only a super admin can grant the demo view';
+  end;
+end;
+$$;
+
+select test.as_user('33333333-0000-0000-0000-0000000000c0');
+do $$
+declare
+  v_marcus uuid := '33333333-0000-0000-0000-00000000000c';
+  n int;
+begin
+  perform public.set_demo_view(v_marcus, true);
+  select count(*) into n from public.directory_people(null) where id = v_marcus and is_demo;
+  if n <> 1 then
+    raise exception 'FAIL  the directory does not show the demo flag as set';
+  end if;
+  raise notice 'ok    granting shows up on the directory';
+
+  perform public.set_demo_view(v_marcus, false);
+  select count(*) into n from public.directory_people(null) where id = v_marcus and is_demo;
+  if n <> 0 then
+    raise exception 'FAIL  revoking did not clear the flag';
+  end if;
+  raise notice 'ok    revoking clears it again';
+
+  begin
+    perform public.set_demo_view('99999999-0000-0000-0000-000000000000', true);
+    raise exception 'FAIL  an account that does not exist was granted the demo view';
+  exception when others then
+    if sqlerrm like 'FAIL%' then raise; end if;
+    raise notice 'ok    granting it to nobody is refused';
+  end;
+end;
+$$;
+
 -- Somebody else's claim is still not this super admin's business to skip past.
 do $$
 begin

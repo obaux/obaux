@@ -28,12 +28,28 @@ export type JoinOutcome =
   | { result: 'staff' }
   | { result: 'failed' };
 
+/**
+ * What a program lead already knows about their own program, collected on
+ * the extra step self-claiming `provider` adds (0056). Manual entry only —
+ * see `ProgramDetailsStep` for why. Left undefined for every other kind.
+ */
+export interface ProgramDetails {
+  readonly name: string;
+  readonly category: string;
+  readonly subcategory: string;
+  readonly description: string;
+  readonly address: string;
+  readonly phone: string;
+  readonly website: string;
+}
+
 export interface JoinDetails {
   readonly firstName: string;
   readonly lastName: string;
   readonly city: string;
   readonly kind: JoinKind;
   readonly language: string;
+  readonly program?: ProgramDetails;
 }
 
 /**
@@ -63,11 +79,23 @@ export async function submitDetails(details: JoinDetails): Promise<JoinOutcome> 
       return isCityNotServed(error) ? { result: 'city-not-served' } : { result: 'failed' };
     }
 
+    const program = details.program;
     const { error } = await supabase.rpc('request_staff_access', {
       p_wants_role: details.kind,
       p_first_name: details.firstName.trim(),
       p_last_name: details.lastName.trim(),
       p_city: details.city.trim(),
+      ...(program
+        ? {
+            p_program_name: program.name.trim(),
+            p_program_category: program.category,
+            p_program_subcategory: program.subcategory,
+            p_program_description: program.description.trim(),
+            p_program_address: program.address.trim(),
+            p_program_phone: program.phone.trim(),
+            p_program_website: program.website.trim(),
+          }
+        : {}),
     });
     return error ? { result: 'failed' } : { result: 'staff' };
   } catch {

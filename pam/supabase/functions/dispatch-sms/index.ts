@@ -25,7 +25,9 @@ import { localeOf, render, UnsendableError } from './render.ts';
 
 interface Due {
   id: string;
-  member_id: string;
+  // null only for a phone-only row (0055) — a denied staff request, which has
+  // no profile. Not read here either way; carried through for the log.
+  member_id: string | null;
   phone: string;
   locale: string;
   template_key: string;

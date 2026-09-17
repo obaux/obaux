@@ -38,6 +38,13 @@ export interface Session {
   isOnboarded: boolean;
   /** `profiles.preferred_language` — see `LocaleSync`. */
   locale: Locale;
+  /**
+   * Granted by a super admin, from the Everyone list (0057). When true, every
+   * screen that has an example data set shows it regardless of whether this
+   * account's own data is empty — for showing PAM off without showing
+   * anybody's real information. See `useDemoView`.
+   */
+  isDemo: boolean;
 }
 
 export type SessionState =
@@ -79,7 +86,7 @@ export function useSession(): { state: SessionState; refresh: () => void } {
         const { data: profile, error } = await supabase
           .from('profiles')
           .select(
-            'id, role, first_name, region_id, access_status, onboarded_at, preferred_language, regions(name)',
+            'id, role, first_name, region_id, access_status, onboarded_at, preferred_language, is_demo, regions(name)',
           )
           .eq('id', auth.user.id)
           .maybeSingle();
@@ -111,6 +118,7 @@ export function useSession(): { state: SessionState; refresh: () => void } {
             locale: isSupportedLocale(profile.preferred_language as string)
               ? (profile.preferred_language as Locale)
               : DEFAULT_LOCALE,
+            isDemo: Boolean(profile.is_demo),
           },
         });
       } catch {

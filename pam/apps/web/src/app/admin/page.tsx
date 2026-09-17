@@ -29,6 +29,7 @@ import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
 import { useCaseload, createInvite, type CreatedInvite } from '@/lib/useCaseload';
 import { useRoleView } from '@/lib/useViewedRole';
+import { useDemoView } from '@/lib/useDemoView';
 import { RoleSwitchControl } from '../RoleSwitchControl';
 
 /**
@@ -118,6 +119,7 @@ export default function AdminPage() {
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
   const { viewedRole, setViewAs } = useRoleView(trueRole);
   const isAdmin = viewedRole === 'admin';
+  const isDemo = useDemoView(session);
   const { state: caseload, refresh } = useCaseload(isAdmin);
 
   const [invite, setInvite] = useState<CreatedInvite | null>(null);
@@ -185,7 +187,7 @@ export default function AdminPage() {
                 <RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} />
               ) : undefined
             }
-            trailing={<HeaderBell enabled={trueRole !== null} role={viewedRole} />}
+            trailing={<HeaderBell enabled={trueRole !== null} role={viewedRole} isDemo={isDemo} />}
           />
           <Notice
             notice="service_not_available"
@@ -227,7 +229,7 @@ export default function AdminPage() {
               <RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} />
             ) : undefined
           }
-          trailing={<HeaderBell enabled={isAdmin} role={viewedRole} />}
+          trailing={<HeaderBell enabled={isAdmin} role={viewedRole} isDemo={isDemo} />}
         />
 
         <PageTitle
@@ -300,7 +302,7 @@ export default function AdminPage() {
           <PersonRowSkeletonList label={t('common.loading')} />
         ) : null}
 
-        {caseload.status === 'empty' && !USE_DUMMY_PEOPLE ? (
+        {caseload.status === 'empty' && !USE_DUMMY_PEOPLE && !isDemo ? (
           <Notice
             notice="no_caseload_members"
             title={t('admin.caseload.empty.title')}
@@ -320,7 +322,7 @@ export default function AdminPage() {
           />
         ) : null}
 
-        {caseload.status === 'ready' ? (
+        {caseload.status === 'ready' && !isDemo ? (
           <VStack gap={3}>
             {caseload.members.map((member) => {
               const when = whenLastActive(member.lastActiveAt, locale);
@@ -347,7 +349,7 @@ export default function AdminPage() {
           at (Will, 16 September). The moment `useCaseload` stops returning
           `'empty'`, this disappears on its own; see `@pam/config/dummy-people`.
         */}
-        {caseload.status === 'empty' && USE_DUMMY_PEOPLE ? (
+        {(caseload.status === 'empty' || isDemo) && USE_DUMMY_PEOPLE ? (
           <VStack gap={3}>
             {DUMMY_MEMBERS.map((member) => {
               const when = whenLastActive(member.lastActiveAt, locale);

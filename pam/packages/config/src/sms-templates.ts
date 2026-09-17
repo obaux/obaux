@@ -26,7 +26,8 @@ export type SmsTemplateKey =
   | 'connection_request'
   | 'access_limited_notice'
   | 'saved_place_closed'
-  | 'staff_request_approved';
+  | 'staff_request_approved'
+  | 'staff_request_denied';
 
 export interface SmsTemplate {
   readonly key: SmsTemplateKey;
@@ -270,6 +271,28 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
     en: 'PAM: Your request was approved. Open PAM to get started: {link}',
     es: 'PAM: Su solicitud fue aprobada. Abra PAM para empezar: {link}',
     vars: ['link'],
+    reviewedBy: '',
+    isFirstContact: false,
+  },
+  /**
+   * A pending case-manager or program-lead request was denied (0055).
+   *
+   * **Sent with no `member_id` at all** — a denial creates no profile, so
+   * this is the one template in the catalogue queued straight to a phone
+   * number, skipping the quiet-hours/STOP check every other message goes
+   * through (Will, 17 September — deliberate, see `0055_staff_denied_sms.sql`
+   * and DECISIONS.md). Names no role, same reason as `staff_request_approved`.
+   * Carries `{supportPhone}` because Will asked specifically that someone
+   * denied has somewhere real to ask why.
+   *
+   * **Ships unreviewed.** `reviewedBy: ''` until Will signs off on the exact
+   * wording — see the session log.
+   */
+  staff_request_denied: {
+    key: 'staff_request_denied',
+    en: 'PAM: Your request was not approved. Questions? Call {supportPhone}.',
+    es: 'PAM: Su solicitud no fue aprobada. Preguntas? Llame al {supportPhone}.',
+    vars: ['supportPhone'],
     reviewedBy: '',
     isFirstContact: false,
   },

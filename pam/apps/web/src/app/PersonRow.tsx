@@ -1,5 +1,6 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { Card } from '@astryxdesign/core/Card';
 import { VStack } from '@astryxdesign/core/VStack';
@@ -34,6 +35,14 @@ export interface PersonRowProps {
   readonly chip?: { readonly label: string; readonly tone: 'error' | 'warning' } | null;
   /** Extra facts, in order — points, an org name, last active, and so on. */
   readonly meta: readonly string[];
+  /**
+   * A control that belongs to this specific row rather than the list — the
+   * Everyone list's demo-view toggle (0057) is the one user of this today.
+   * Never paired with `href`: the two are different rows' jobs (a dummy row
+   * that opens something, a real row with a control on it), and `href`'s own
+   * full-card overlay link would sit on top of anything placed here.
+   */
+  readonly trailing?: ReactNode;
 }
 
 const styles = stylex.create({
@@ -47,21 +56,24 @@ const styles = stylex.create({
   },
 });
 
-export function PersonRow({ firstName, href, chip, meta }: PersonRowProps) {
+export function PersonRow({ firstName, href, chip, meta, trailing }: PersonRowProps) {
   return (
     <Card xstyle={styles.card}>
       <VStack gap={2}>
-        <HStack gap={3} align="center">
-          <Avatar size="lg" name={firstName ?? '?'} />
-          <Heading level={3} xstyle={styles.name}>
-            {href ? (
-              <a href={href} {...stylex.props(styles.link)}>
-                {firstName ?? '—'}
-              </a>
-            ) : (
-              (firstName ?? '—')
-            )}
-          </Heading>
+        <HStack gap={3} align="center" justify="between">
+          <HStack gap={3} align="center">
+            <Avatar size="lg" name={firstName ?? '?'} />
+            <Heading level={3} xstyle={styles.name}>
+              {href ? (
+                <a href={href} {...stylex.props(styles.link)}>
+                  {firstName ?? '—'}
+                </a>
+              ) : (
+                (firstName ?? '—')
+              )}
+            </Heading>
+          </HStack>
+          {trailing}
         </HStack>
         <HStack gap={2} wrap="wrap" align="center">
           {chip ? <Badge variant={chip.tone} label={chip.label} /> : null}

@@ -2400,6 +2400,69 @@ in this file has always started. `pnpm --filter @pam/config test` fails on
 wording and signs off — that is §9's gate doing its job, not a bug introduced
 by this session, and the fix is Will's approval, not a code change.
 
+### D-152 — The denial SMS deliberately skips quiet-hours/STOP enforcement, on Will's explicit instruction
+D-150 flagged that a denial has no profile, so `outbound_messages`' §7.2
+quiet-hours/STOP-list machinery (keyed by `member_id`) cannot cover it. Will,
+17 September, having read that flag: send it anyway, skip the safety system
+for this one message, and put PAM's support number in it so a real question
+has somewhere to go. Built exactly as asked, not softened: `outbound_messages`
+gained a nullable `member_id` plus its own `phone`/`locale` columns
+(0055_staff_denied_sms.sql), and `claim_outbound_messages` claims a
+phone-only row the moment it is due, with no `in_quiet_hours` check and no
+STOP-list check — both explicitly named exceptions in the function's own
+comment and in the migration's file comment, not a silent gap. Every other
+§9 rule still applies in full: 160 characters, no emoji, the forbidden-term
+list, `reviewedBy` before it can ever send. Scoped narrowly on purpose — the
+exception is this one template only, not a general "phone-only messages skip
+safety" precedent, and any future phone-only template should be its own
+deliberate decision, not an assumed extension of this one.
+
+### D-153 — Approving a program lead's request adds their program to `services` automatically
+Will, 17 September, explaining why duplicate-avoidance on self-service
+program submission (the deferred Part 5 of this request) matters: program
+leads will be adding their own programs. Since 0056 already collects the
+program's details at the point they claim the role, and `services`' fields
+are exactly what that form collects, `review_staff_request`'s approval branch
+now inserts the row directly rather than making a super admin retype
+everything from a phone call. `services`' own existing trigger marks it
+`needs_review = true` the moment a `*_plain` column is written, the same as
+any other manually-entered place — no new review mechanism was built,
+because one already existed and already fires here unchanged.
+
+### D-154 — The program-details step is its own onboarding phase, only for a program lead claiming the role themselves
+Will asked for a Google Maps auto-fill option too; §5.2/`STATUS.md` already
+documents that the Edge Function it would need (`enrich-places`) does not
+exist and was deliberately deferred by Will until nearer kick-off. Rather
+than build a button that cannot do anything yet, this ships manual entry
+only, with the field set matching `services` exactly (D-153's insert depends
+on that match) so the Maps option can plug into the same fields later without
+reshaping the form. Scoped to self-claim only: somebody redeeming an invite
+code for the `provider` role already has an account and a person who made
+that invite to talk to — the extra step is for the one path where nobody has
+met them yet.
+
+### D-155 — The demo view is a per-account grant, not a session-only preview like `useViewAs`
+Will's first description of this ("a screen toggle with dummy data ... for
+showcasing purposes") sounded like it could reuse the existing "Viewing as"
+preview (D-108), and the scoping conversation confirmed it does not: Will
+wants a super admin to grant *another* account a standing view that shows
+PAM's existing example data everywhere, not a session-only rendering choice
+about the viewer's own screen. `profiles.is_demo` (0057) is a real, persisted
+column, set only by `set_demo_view` (super admin only, audited). The existing
+`USE_DUMMY_PEOPLE` empty-state fallback is reused rather than replaced —
+`useDemoView()` ORs into each screen's existing "show the example set" check,
+so an account already sees the exact dummy content that screen has always
+had, just no longer gated on its real data being empty.
+
+**Not every screen is wired yet.** `directory_people`, `useSession`, and the
+five screens that already had a `USE_DUMMY_PEOPLE` check of their own
+(directory, admin, notifications, plus the two shared components,
+`HeaderBell` and `PersonRow`) now read it. `place`, `person`,
+`HomePeoplePreview` and the saved-places dummy path do not yet — they were
+identified but not reached this session (see the session log). The
+mechanism (`useDemoView`, threaded from `useSession`) is the same for all of
+them; it is repetition, not a new pattern, to finish.
+
 ---
 
 ## Notes for whoever picks this up next

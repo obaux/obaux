@@ -31,8 +31,17 @@ D-144, D-145). A pending case-manager or program-lead request is now decided
 for real, not just recorded: a super admin reviews it at `/requests/`
 (reached from the Everyone list, not from the notification itself — D-148),
 approving creates the account immediately with the phone already on file
-(D-149). Newest session log:
-`docs/sessions/2026-09-17-deciding-a-staff-request.md`.
+(D-149). A denial now texts the person too, at Will's explicit instruction to
+skip the usual quiet-hours/STOP safety check for this one message and include
+PAM's number (D-152) — the approval text still ships unreviewed, pending
+sign-off. Approving a program lead who left their program's details at
+sign-up (a new step in `/join/`, manual entry only — D-154) adds the program
+straight to the catalogue (D-153). A super admin can grant any account a demo
+view from the Everyone list, showing PAM's existing example data everywhere
+that account looks rather than only when its own data happens to be empty —
+wired into five of the screens that already had an example-data fallback,
+not yet all of them (D-155). Newest session log:
+`docs/sessions/2026-09-17-everyone-list-and-program-requests.md`.
 
 This is the handover document: what exists, what is proven, what is live, and
 what the next person needs to know before touching anything.
@@ -330,7 +339,9 @@ while the copy is unsigned, so it earned the first live test, not the last.*
 | 10b | **A line about the PAM team on the transparency screen** | A promise already made | Members were told they would hear first if what is visible changes, and the directory now shows a super admin every account (name, role, region, status, last active; never messages or contact details). Proposed, for `packages/config/transparency.ts`: *"The PAM team can see your name, your city and the last day you used PAM. Never your messages."* It is a change to the contract, so it wants Will's word. |
 | 10 | **Twilio credentials into the dispatcher's secrets** | Reminders and notices | `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, and either `TWILIO_MESSAGING_SERVICE_SID` or `TWILIO_FROM_NUMBER`, under Edge Functions → dispatch-sms. Until then the dispatcher records "Twilio is not configured" instead of sending. |
 | 11 | **Sign off `staff_request_approved`'s wording** | `/requests/` approvals can text the person | `reviewedBy: ''` in `packages/config/src/sms-templates.ts` — the new template that tells somebody their case-manager/program-lead request was approved. `pnpm --filter @pam/config test` is red until this is done; that is the gate working as intended (D-151). |
-| 12 | **Migration `0054_staff_review.sql` is local only** | `/requests/` cannot decide anything on the live database yet | Passes the full `@pam/db` penetration suite locally but has not been applied to the live Supabase project — needs `mcp__Supabase__apply_migration` and `get_advisors` afterward, per CLAUDE.md. |
+| 12 | **Migrations 0054 through 0057 are local only** | `/requests/`, `/join/`'s program step, and the demo view cannot do anything on the live database yet | All pass the full `@pam/db` penetration suite locally but have not been applied to the live Supabase project — needs `mcp__Supabase__apply_migration` and `get_advisors` afterward, per CLAUDE.md. |
+| 13 | **Sign off `staff_request_denied`'s wording too** | The denial text cannot send until reviewed, same as the approval one | `reviewedBy: ''` in `packages/config/src/sms-templates.ts`. Sent with quiet-hours/STOP enforcement deliberately skipped, at Will's own instruction (D-152) — the review gate on the wording itself still applies. |
+| 14 | **The demo view is not wired into every screen yet** | An account granted it still sees real data on `place`, `person`, `HomePeoplePreview`, and the saved-places dummy path | The mechanism (`useDemoView`) is built and proven on five screens (D-155); finishing the rest is the same pattern repeated, not new design. |
 
 ---
 

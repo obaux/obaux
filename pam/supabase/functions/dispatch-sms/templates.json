@@ -124,6 +124,16 @@
       "reviewedBy": "",
       "isFirstContact": false
     },
+    "staff_request_denied": {
+      "key": "staff_request_denied",
+      "en": "PAM: Your request was not approved. Questions? Call {supportPhone}.",
+      "es": "PAM: Su solicitud no fue aprobada. Preguntas? Llame al {supportPhone}.",
+      "vars": [
+        "supportPhone"
+      ],
+      "reviewedBy": "",
+      "isFirstContact": false
+    },
     "connection_request": {
       "key": "connection_request",
       "en": "PAM: Someone on PAM wants to connect. Open PAM to reply: {link}",

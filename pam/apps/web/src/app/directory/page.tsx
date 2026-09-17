@@ -8,6 +8,7 @@ import { Card } from '@astryxdesign/core/Card';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { Selector } from '@astryxdesign/core/Selector';
+import { Switch } from '@astryxdesign/core/Switch';
 import { Button } from '@astryxdesign/core/Button';
 import { RadioList, RadioListItem } from '@astryxdesign/core/RadioList';
 import {
@@ -30,9 +31,10 @@ import { HeaderBell } from '../HeaderBell';
 import { PersonRow } from '../PersonRow';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
-import { useDirectory } from '@/lib/useDirectory';
+import { useDirectory, setDemoView } from '@/lib/useDirectory';
 import { createInvite, listRegions, type CreatedInvite } from '@/lib/useCaseload';
 import { useRoleView } from '@/lib/useViewedRole';
+import { useDemoView } from '@/lib/useDemoView';
 import { RoleSwitchControl } from '../RoleSwitchControl';
 
 /**
@@ -92,8 +94,9 @@ export default function DirectoryPage() {
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
   const { viewedRole, setViewAs } = useRoleView(trueRole);
   const isSuperAdmin = viewedRole === 'super_admin';
+  const isDemo = useDemoView(session);
   const [filter, setFilter] = useState<Filter>('all');
-  const { state: directory } = useDirectory(isSuperAdmin, filter as Role | 'all');
+  const { state: directory, refresh: refreshDirectory } = useDirectory(isSuperAdmin, filter as Role | 'all');
   // The filter is real: it asks the same question of the example set that it
   // asks the database, so switching it while the real directory is empty
   // still demonstrates what it does.
@@ -108,6 +111,14 @@ export default function DirectoryPage() {
    * code is the product: read down the phone or texted, eight characters that
    * survive being said out loud.
    */
+  const [demoBusyId, setDemoBusyId] = useState<string | null>(null);
+  const toggleDemo = async (personId: string, next: boolean) => {
+    setDemoBusyId(personId);
+    await setDemoView(personId, next);
+    setDemoBusyId(null);
+    refreshDirectory();
+  };
+
   const [regions, setRegions] = useState<{ id: string; name: string }[]>([]);
   const [regionId, setRegionId] = useState<string>('');
   const [invite, setInvite] = useState<CreatedInvite | null>(null);
@@ -191,7 +202,7 @@ export default function DirectoryPage() {
               <RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} />
             ) : undefined
           }
-          trailing={<HeaderBell enabled={trueRole !== null} role={viewedRole} />}
+          trailing={<HeaderBell enabled={trueRole !== null} role={viewedRole} isDemo={isDemo} />}
         />
         <Notice
           notice="service_not_available"
@@ -229,7 +240,7 @@ export default function DirectoryPage() {
               onChange={(next) => setFilter(next as Filter)}
               xstyle={styles.filter}
             />
-            <HeaderBell enabled={isSuperAdmin} role={viewedRole} />
+            <HeaderBell enabled={isSuperAdmin} role={viewedRole} isDemo={isDemo} />
           </HStack>
         }
       />
@@ -237,9 +248,9 @@ export default function DirectoryPage() {
       <PageTitle
         title={t('directory.title')}
         subtitle={
-          directory.status === 'ready'
+          directory.status === 'ready' && !isDemo
             ? t('directory.count', { count: directory.people.length })
-            : directory.status === 'empty' && USE_DUMMY_PEOPLE
+            : (directory.status === 'empty' || isDemo) && USE_DUMMY_PEOPLE
               ? t('directory.count', { count: dummyPeople.length })
               : undefined
         }
@@ -361,7 +372,7 @@ export default function DirectoryPage() {
         />
       ) : null}
 
-      {directory.status === 'ready' ? (
+      {directory.status === 'ready' && !isDemo ? (
         <VStack gap={3}>
           {directory.people.map((person, index) => {
             const when = whenLastActive(person.lastActiveAt, locale);
@@ -380,6 +391,15 @@ export default function DirectoryPage() {
                     person.regionName ? `${t(`role.${person.role}`)} · ${person.regionName}` : t(`role.${person.role}`),
                     when ? t('admin.lastActive', { when }) : t('admin.lastActive.never'),
                   ]}
+                  trailing={
+                    <Switch
+                      label={t('directory.demoView')}
+                      isLabelHidden
+                      value={person.isDemo}
+                      isDisabled={demoBusyId === person.id}
+                      onChange={(next) => void toggleDemo(person.id, next)}
+                    />
+                  }
                 />
               </ScrollReveal>
             );
@@ -393,7 +413,7 @@ export default function DirectoryPage() {
         (Will, 16 September). Disappears the moment `useDirectory` stops
         returning `'empty'`; see `@pam/config/dummy-people`.
       */}
-      {directory.status === 'empty' && USE_DUMMY_PEOPLE ? (
+      {directory.status !== 'loading' && (directory.status === 'empty' || isDemo) && USE_DUMMY_PEOPLE ? (
         <VStack gap={3}>
           {dummyPeople.map((person, index) => {
             const when = whenLastActive(person.lastActiveAt, locale);
