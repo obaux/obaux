@@ -57,6 +57,14 @@ import { Text } from '@astryxdesign/core/Text';
  * spinner. A manual swipe resets the 4-second clock rather than fighting it,
  * so a slide somebody is still reading does not get yanked out from under
  * them mid-read.
+ *
+ * The wrap from the last slide back to the first is a direct `scrollTo(0)`,
+ * not `Carousel`'s own `hasLoop`/`scrollNext()` wrap-around (Will, 17
+ * September: "loop slides so there's no blank gap" — `hasLoop` scrolled
+ * past the end looking for a fourth item that does not exist, showing empty
+ * track before correcting itself). There is nothing to wrap around: three
+ * real slides already exist at indices 0-2, so "loop" is just "go back to a
+ * slide that's already there," the same call a manual dot-tap would make.
  */
 
 export interface OnboardingSlide {
@@ -94,10 +102,11 @@ const styles = stylex.create({
     position: 'relative',
   },
   track: {
-    // Rounded only at the bottom: the top is the very top of the screen, and
-    // rounding a corner nothing else meets would look like a mistake.
-    borderBottomLeftRadius: '25px',
-    borderBottomRightRadius: '25px',
+    // No corner radius (Will, 17 September) — the hero runs flush to the
+    // top and sides of the screen, so a rounded corner had nothing to read
+    // against. `overflow: hidden` stays: it is what keeps a slide's
+    // full-bleed background from spilling past the scroll track's own
+    // edge, not what the radius was for.
     overflow: 'hidden',
   },
   slide: {
@@ -123,7 +132,11 @@ const styles = stylex.create({
   },
   header: {
     position: 'absolute',
-    top: '16px',
+    // The hero now sits flush against the real top of the viewport (Will,
+    // 17 September), so this offset is the only thing keeping the mark and
+    // the globe button clear of a phone's own status bar / notch — bumped
+    // up from 16px now that there is no page padding sitting above it too.
+    top: '24px',
     insetInline: '16px',
     zIndex: 1,
   },
@@ -141,7 +154,12 @@ const styles = stylex.create({
   dots: {
     position: 'absolute',
     insetInline: 0,
-    bottom: '24px',
+    // Clear of the sign-in card's own overlap (it rides up 32px over the
+    // hero's bottom edge — see signin/page.tsx's `overlapCard`): dots
+    // positioned inside that band were sitting under the card, not
+    // missing, just covered by an opaque white surface drawn on top of
+    // them (Will, 17 September: "the dots are not showing").
+    bottom: '48px',
     zIndex: 1,
   },
   dot: {
@@ -234,7 +252,9 @@ export function OnboardingSlides({ slides, label, header }: OnboardingSlidesProp
    */
   useEffect(() => {
     if (reducedMotion || slides.length < 2) return;
-    const timer = setInterval(() => carousel.current?.scrollNext(), AUTOPLAY_MS);
+    const timer = setInterval(() => {
+      carousel.current?.scrollTo((here + 1) % slides.length);
+    }, AUTOPLAY_MS);
     return () => clearInterval(timer);
   }, [here, reducedMotion, slides.length]);
 
@@ -248,7 +268,6 @@ export function OnboardingSlides({ slides, label, header }: OnboardingSlidesProp
       <Carousel
         gap={0}
         hasSnap
-        hasLoop
         hasButtons={false}
         hasEdgeFade={false}
         handleRef={carousel}

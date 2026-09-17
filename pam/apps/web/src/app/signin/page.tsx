@@ -44,7 +44,11 @@ const styles = stylex.create({
   // The hero and the card it overlaps are one visual unit, so they are one
   // child of the page's own VStack — the page's usual gap sits above this
   // block and below it, but nothing splits the block itself in two.
-  heroGroup: { width: '100%' },
+  // Cancels `Page`'s own 24px top padding (Will, 17 September: "the slider
+  // isn't touching top of screen") — the hero is meant to run flush to the
+  // very top of the viewport, the same reasoning `OnboardingSlides`' own
+  // negative side margins already use to reach both edges.
+  heroGroup: { width: '100%', marginBlockStart: '-24px' },
   heroHeader: { position: 'relative', width: '100%' },
   heroBrand: { width: 'fit-content', marginInline: 'auto' },
   // Larger and always white (Will, 16 September) — the themed mark

@@ -1,5 +1,24 @@
 # Changelog
 
+## [0.21.0] — 2026-09-17 · Flush to the edges
+
+### Fixed — the sign-in hero now touches the true top of the screen
+
+It used to sit 24px below it, inheriting padding meant for a page with
+content in a column rather than a full-bleed photo.
+
+### Fixed — the slide dots were covered, not missing
+
+They sat inside the sign-in card's own overlap band and were covered by
+the card's opaque surface. Moved clear of it.
+
+### Fixed — looping from the last slide to the first no longer shows a blank flash
+
+### Removed — the hero's corner radius
+
+Now flush to every edge of the screen, so a rounded corner had nothing
+left to read against.
+
 ## [0.20.0] — 2026-09-17 · The hero autoplays
 
 ### Changed — the sign-in hero is taller, and now advances on its own

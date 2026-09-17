@@ -20,9 +20,11 @@ scrollable stories-style strip rather than a stacked list. Sign-in is now a
 full-bleed photo hero — real commissioned illustrations, sourced via Google
 Drive after Figma's own asset URLs proved unreachable from this sandbox
 (D-135) — with the card riding up over its bottom edge. The hero now takes
-about half the screen and autoplays every 4 seconds (never under reduced
-motion, D-136). Newest session log:
-`docs/sessions/2026-09-17-hero-autoplay-and-sizing.md`.
+about half the screen, runs flush to the top and every side (no corner
+radius), and autoplays every 4 seconds by looping directly back to the
+first slide rather than scrolling past the end (never under reduced
+motion, D-136, D-137, D-138). Newest session log:
+`docs/sessions/2026-09-17-hero-edge-to-edge.md`.
 
 This is the handover document: what exists, what is proven, what is live, and
 what the next person needs to know before touching anything.
