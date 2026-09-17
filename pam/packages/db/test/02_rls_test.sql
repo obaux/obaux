@@ -183,17 +183,29 @@ select test.check('non-buddy sees no activities at all',
 
 -- ===========================================================================
 \echo ''
-\echo '--- Providers reach members only through a link (§4) ---'
+\echo '--- Providers reach members only through provider_linked_members(), never profiles directly (§4, D-155) ---'
 -- ===========================================================================
+-- 0056 dropped profiles_select_provider_linked: a raw row policy cannot
+-- expose some columns and not others, and Will confirmed program admins
+-- never see a member's activity info — last_active_at, along with
+-- everything else that policy used to hand back — anywhere in the app. A
+-- linked provider now reaches a member through provider_linked_members()
+-- (id, first_name only) instead; a direct `profiles` read returns nothing
+-- for anyone, linked or not. See 04_rpc_test.sql for the function's own
+-- coverage, including the column list.
 select test.as_user(:'alice');
-select test.check('linked provider sees the enrolled member',
-  (select count(*) from public.profiles where id = :'marcus'), 1);
+select test.check('linked provider reads the member through provider_linked_members()',
+  (select count(*) from public.provider_linked_members() where id = :'marcus'), 1);
 select test.check('linked provider sees the enrollment',
   (select count(*) from public.enrollments where member_id = :'marcus'), 1);
+select test.check('linked provider CANNOT read the member profile directly (0056)',
+  (select count(*) from public.profiles where id = :'marcus'), 0);
 
 select test.as_user(:'bob');
 select test.check('unlinked provider sees no enrollment',
   (select count(*) from public.enrollments where member_id = :'marcus'), 0);
+select test.check('unlinked provider gets nothing from provider_linked_members() either',
+  (select count(*) from public.provider_linked_members() where id = :'marcus'), 0);
 select test.check('unlinked provider cannot read the member profile',
   (select count(*) from public.profiles where id = :'marcus'), 0);
 

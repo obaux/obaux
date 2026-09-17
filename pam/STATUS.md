@@ -27,8 +27,44 @@ which already had it and is where a member is actually choosing something
 splash screen first (D-146). The shared alert banner is now a solid-colour,
 single-row, in-flow composition instead of Astryx's own translucent `Banner`,
 fixing both a readability complaint and an overlap with the header (D-143,
-D-144, D-145). Newest session log:
-`docs/sessions/2026-09-17-hero-motion-and-a-quieter-sign-in.md`.
+D-144, D-145). **There is now a first chat/messaging surface, staff-to-member**:
+a case manager can message their caseload, a program admin can message
+members enrolled in their program, and a member can see and reply within a
+conversation staff already started — never member-to-member. `/messages/`
+lists conversations plus, for staff, anyone eligible they haven't messaged
+yet; `/messages/thread/` reads and sends within one. A first version of this
+(17 September, same day) wrongly scoped it to member-to-member "connections"
+and was corrected on Will's direction before anyone used it — see D-152,
+superseding D-148/149/150. D-074's supervised-chat model still holds for
+anyone *not* in a conversation (a case manager reads it only if it's
+reported), and now explicitly covers the case of a case manager who *is* a
+participant too — §4.1's transparency contract was widened to say so
+(D-153). **A conversation partner reads a name and a role, nothing else** —
+D-153's own first version handed back a whole `profiles` row, including
+`last_active_at` and `phone`, to any conversation partner; replaced same day
+with a column-limited function following 0043's `directory_people`
+precedent (D-154), so a program admin (or anyone) never sees activity info
+through this path. **"Program admins don't see activity, across the entire
+app" is now a real, closed guarantee, not just a messaging-surface one**
+(D-155, Will's confirmation and widening of D-154's closing note): the
+older, pre-existing `profiles_select_provider_linked` policy — which let a
+program admin read a member's `last_active_at` and `phone` through any
+enrollment/appointment link, no conversation required — is gone, replaced
+by `provider_linked_members()` (0056), the same column-limited-function
+pattern. Case managers are unaffected throughout; this is provider-role-specific.
+The §4.1 transparency screen was re-audited line by line, not just amended
+again (D-156): it now says the program-activity guarantee plainly and
+positively, and a stale, never-actually-true `canSee.chatMetadata` line
+(predating all three of today's messaging sessions) was found and removed.
+Who may *start* a conversation is still a client-side restraint, not a
+database one — see D-152 for the gap and the migration that would close it.
+**All of it is now actually verified, not just written**: `admin_visibility.test.ts`,
+the test `transparency.ts` had claimed enforces this contract but which did
+not exist (D-153), is built (`04_transparency_contract_test.sql`, D-157) —
+and this sandbox turned out not to be permanently missing `postgis` after
+all; installing it let `pnpm --filter @pam/db test` run for real against
+every migration through `0056`. **221 checks pass, 0 failures.** Newest
+session log: `docs/sessions/2026-09-17-admin-visibility-contract-test.md`.
 
 This is the handover document: what exists, what is proven, what is live, and
 what the next person needs to know before touching anything.
@@ -132,7 +168,7 @@ SUPABASE_URL=... SUPABASE_SERVICE_ROLE_KEY=... \
 | `packages/config` | The product's rules as code: the three fixed categories and their subcategories, SMS templates with the §9 safety gates, the §4.1 transparency contract, points/levels/badges, the §0 dignity-language checks, en + es bundles | Complete for Phase 0 |
 | `packages/db` | 13 migrations: full §4 model, RLS on every table, the admin layer, server-side RPCs, `app_settings`, the Philadelphia seed | Complete and deployed |
 | `packages/ui` | The §2.4 components — `BigButton`, `PlaceCard`, `PersonCard`, `StepHeader`, `PointsBadge`, `HelpBar`, `VoiceInput` — plus the shared shell the screens stopped retyping: `Page`, `AppHeader`, `TextField`, `TextLink`, `Notice`, `NotificationBell`, `NotificationList`, `NavTile`, `OnboardingSlides`, `Loading`, the icon set and PAM's own tokens | Complete for Phase 0 |
-| `apps/web` | Next.js 15 + React 19, static export, Astryx themed and working, i18n, PWA manifest, Supabase client, runtime support-phone lookup | Foundation only — see gaps |
+| `apps/web` | Next.js 15 + React 19, static export, Astryx themed and working, i18n, PWA manifest, Supabase client, runtime support-phone lookup, staff-to-member messaging (`/messages/`, `/messages/thread/`) | Foundation, plus the first chat surface — see gaps |
 | `apps/native` | Capacitor 6 config wrapping the web export; native speech recogniser wired to `VoiceInput` | Config only, never built for a device |
 
 ---
@@ -146,11 +182,11 @@ Numbers here are from the last run, not aspirations.
 | Typecheck | 5/5 packages | — |
 | `@pam/config` tests | 202 pass | No SMS can send unreviewed, over 160 chars, with emoji, or with a term that reveals justice involvement. Locales are key-for-key. The transparency screen matches its contract. |
 | `@pam/ui` tests | 66 pass | Every component is axe-clean. `PlaceCard` offers exactly three actions in a fixed order. Reduced motion is respected. The mic hides when unsupported. |
-| Database suite | 152 checks pass | See below |
+| Database suite | 221 checks pass | See below. Grew from 152 across today's four messaging sessions — `0055`/`0056`'s own coverage plus `04_transparency_contract_test.sql` (D-157), all now actually run, not just written: this sandbox lacked `postgis` for the first four sessions today, `apt-get install postgresql-16-postgis-3` closed that during the fifth |
 | Live RLS fingerprint | identical to local | The deployed policy set is provably the one that was penetration-tested: `ce9636c3b77e4827368e6575742b899c`, 73 policies on both |
 | Live anonymous attack | 0 rows leaked | A signed-out caller reads no profiles, messages, invites or audit rows on the real database, while still reaching the support number and the public catalogue |
 | Browser a11y + theme (Playwright, full suite) | 426 pass | No WCAG AA violations at 320px or iPhone SE. Every control clears 48px. No horizontal scroll. The Astryx theme really resolves. Runs in dark mode as well as light. |
-| First-load JS | 500.7 kB of 500 kB — **0.7 kB over budget**, disclosed and unresolved | §12 budget, measured gzipped on what `index.html` actually loads; `/signin` and `/gallery` carry `OnboardingSlides`' `framer-motion` weight on their own subpath export (D-140), every other route unaffected |
+| First-load JS | 501.0 kB of 500 kB — **1.0 kB over budget**, disclosed and unresolved | §12 budget, measured gzipped on what `index.html` actually loads; `/signin` and `/gallery` carry `OnboardingSlides`' `framer-motion` weight on their own subpath export (D-140), every other route unaffected. Grew from 500.7 kB across two messaging sessions (D-151), entirely new locale strings — irreducible without lazy-loading translations per route, which is out of scope; `/messages` and `/messages/thread` themselves add nothing to this shared measurement |
 
 ### The database suite is the one that matters
 
@@ -178,9 +214,36 @@ result with one test user per role. It proves:
 Phase 0 owns foundations. These are Phase 1–7 and their absence is not an
 oversight:
 
-- **No map, no enrollment, no chat.** Sign-up exists — `/join/`, five steps —
-  and an invite code is typed into its second step, or arrives as
-  `/join/?code=`.
+- **No map, no enrollment.** Sign-up exists — `/join/`, five steps — and an
+  invite code is typed into its second step, or arrives as `/join/?code=`.
+- **Chat exists now, staff-to-member.** `/messages/` and `/messages/thread/`
+  (17 September, corrected same day — D-152) work against a case manager's
+  real caseload (`admin_covers()`, the same relationship `/admin/` already
+  uses) and a program admin's real enrolled members (`provider_linked_to()`),
+  and against real conversations either has already started with a member. A
+  member sees and replies but never starts one. Scoping who may *start* a
+  conversation is a client-side choice today, not a database-enforced one —
+  see D-152 for exactly what a follow-up migration should check. A member
+  reading a staff person's name in a conversation needed a new `profiles`
+  read policy, and a widened §4.1 transparency contract (D-153), because a
+  case manager who is a real conversation participant reads more than the
+  contract previously disclosed. That first read policy (0054) handed back
+  the whole `profiles` row — `last_active_at`, `phone`, everything — to any
+  conversation partner of any role; replaced same day (0055,
+  `conversation_partners()`, D-154) with a two-column function so nobody,
+  including a program admin, sees activity info through this path.
+  **Closed app-wide, same day (0056, D-155)**: the older, pre-existing
+  `profiles_select_provider_linked` policy — which let a program admin read
+  a member's `last_active_at` and `phone` through any
+  enrollment/appointment link, no conversation required — is gone too,
+  replaced by `provider_linked_members()` (id, first name only). "Program
+  admins don't see activity, across the entire app" is now true, not just
+  true of messaging. Case managers are unaffected. The transparency screen
+  was re-audited line by line (D-156) rather than amended piecemeal a
+  fourth time. `admin_visibility.test.ts` — the test that comment claimed
+  enforces the contract but did not exist — is now built and passing
+  (`04_transparency_contract_test.sql`, D-157), part of the 221-check
+  database suite that ran for real once this sandbox got `postgis`.
 - **Nothing reviews `staff_requests`.** Sign-up records people who say they run
   a program or carry a caseload; the rows are there and a super admin can read
   them, but there is no screen and no notification. The screen promises a call
@@ -319,6 +382,12 @@ while the copy is unsigned, so it earned the first live test, not the last.*
 | 10c | **Confirm the Twilio account's state** | Anybody whose number is not verified | This row said the account was in trial. Will, 16 September: the Twilio console says it is active. That earlier claim came from a 13–14 September finding and was repeated afterwards without re-checking; this session did not verify it either way, so it stands as Will's word and unverified here. If it is active the trial concern is gone; if not, a code to an unverified number is not sent and nothing says so — the live logs on the 14th show one phone asking three times. Carrier registration is a separate question (row 10). |
 | 10b | **A line about the PAM team on the transparency screen** | A promise already made | Members were told they would hear first if what is visible changes, and the directory now shows a super admin every account (name, role, region, status, last active; never messages or contact details). Proposed, for `packages/config/transparency.ts`: *"The PAM team can see your name, your city and the last day you used PAM. Never your messages."* It is a change to the contract, so it wants Will's word. |
 | 10 | **Twilio credentials into the dispatcher's secrets** | Reminders and notices | `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, and either `TWILIO_MESSAGING_SERVICE_SID` or `TWILIO_FROM_NUMBER`, under Edge Functions → dispatch-sms. Until then the dispatcher records "Twilio is not configured" instead of sending. |
+| 11 | **Confirm client-side caseload/enrollment scoping in `/messages/` is an acceptable interim state (D-152)** | Staff-to-member messaging | RLS lets a client create a conversation with any profile id; only `useMessageableMembers`'s own restraint (a case manager's real caseload, a program admin's real enrolled members) keeps this screen scoped to real relationships. A follow-up migration should enforce it at the database layer — see D-152 for exactly what to check. Shipped now, conservatively, rather than blocked on that migration; flagged for Will's word on whether that trade is right, given it now involves staff accounts with real caseload access rather than peers. |
+| 12 | **Wire `report_message()` (0034) to a UI action in the thread view** | Member safety | The RPC is complete and correct at the database layer; nothing in `/messages/thread/` calls it yet. D-074's whole premise is that a report is the *only* route a case manager who is **not** a participant ever has into message content — a chat surface with no way to file one is a real gap, not a nice-to-have. |
+| 13 | ~~Run `pnpm --filter @pam/db test` against migrations 0054, 0055 and 0056~~ **Done (D-157)** | — | This sandbox turned out not to be permanently missing `postgis` — `apt-get install postgresql-16-postgis-3` closed the gap. `pnpm --filter @pam/db test` ran for real against every migration through `0056` and every test file, including the new `04_transparency_contract_test.sql`: **221 checks pass, 0 failures.** This is local-only verification, not a deployment — none of today's four migrations have been applied to the live Supabase project (see the "Live RLS fingerprint" row above, which now describes the *deployed* policy set only, not what is in this branch). |
+| 14 | ~~`profiles_select_provider_linked` grants activity info~~ **Done — closed app-wide (0056, D-155)** | — | Was: a program admin could read `last_active_at`/`phone` for any enrolled member with no conversation required. Replaced with `provider_linked_members()` (id, first name only). Will confirmed this needed to be a blanket rule, not just a messaging-surface one, and the transparency screen now says so (D-156). Case managers unaffected. |
+| 15 | **Decide whether `profiles.phone` needs a column-level `REVOKE` more broadly still** | Staff/member privacy | The provider-role exposure is now closed everywhere it was found (D-154, D-155 — `conversation_partners()` and `provider_linked_members()` both return name/role only). `profiles_select_admin_caseload` (case managers) still exposes the whole row, including `phone`, for a caseload/region member — untouched, since every instruction so far has been explicitly provider-role-specific, not about case managers. The `bidder_contact`-style column grant pattern used elsewhere in this repo would close it if Will wants that too. |
+| 16 | ~~Build `admin_visibility.test.ts`~~ **Done, as `04_transparency_contract_test.sql` (D-157)** | — | `transparency.ts`'s own file comment used to claim a test by that name enforces `ADMIN_CAN_SEE` against live RLS; it never existed (D-153, D-156). Built and run: `packages/db/test/04_transparency_contract_test.sql`, covering the four contract lines that changed today (case-manager participation, non-participation, program-admin activity via both read paths, and total visibility) against a real database, not just documentation. Passes, per row 13. |
 
 ---
 
@@ -377,3 +446,13 @@ Two pieces of security groundwork carry into it, both in `DECISIONS.md`:
 move the internal RLS helpers into a `private` schema PostgREST does not expose
 (D-025), and split write policies off `for all` so a read never evaluates a
 write rule (D-026).
+
+Two pieces follow directly from the messaging work now that verification has
+caught up with it: the migration that closes D-152's gap (who may start a
+conversation — a case manager's caseload, a program admin's enrolled
+members — should be a database rule, not just this screen's own restraint),
+and wiring `report_message()` to a visible action in the thread view.
+`admin_visibility.test.ts` is built and passing (D-157); deploying today's
+four migrations (`0053` onward through `0056`) to the live Supabase project
+is still undone and worth doing deliberately, with `mcp__Supabase__get_advisors`
+run afterward per `CLAUDE.md`'s own instruction.

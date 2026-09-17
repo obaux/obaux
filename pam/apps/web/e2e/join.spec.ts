@@ -151,7 +151,7 @@ test.describe('signing up', () => {
 
     // Step 3: what is visible, and what is not.
     await expect(page.getByRole('heading', { name: 'What others can see' })).toBeVisible();
-    await expect(page.getByText('What you write in your chats')).toBeVisible();
+    await expect(page.getByText('What you say to someone else')).toBeVisible();
 
     expect(calls.start, 'start_membership was not called').toHaveLength(1);
     const sent = Object.keys(calls.start[0]!).join(' ');

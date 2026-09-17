@@ -708,6 +708,65 @@ end;
 $$;
 
 \echo ''
+\echo '--- A linked provider reads a name, never activity info (0056, D-155) ---'
+
+-- Replaces the raw profiles_select_provider_linked policy this suite used to
+-- exercise directly (see 02_rls_test.sql). Same two questions
+-- directory_people's own coverage above asks of a different function: does
+-- the guard actually gate it, and is the column list actually short.
+do $$
+declare
+  v_marcus uuid := '33333333-0000-0000-0000-00000000000c';
+  v_alice  uuid := '33333333-0000-0000-0000-00000000000f'; -- linked (enrolled) provider
+  v_bob    uuid := '33333333-0000-0000-0000-000000000010'; -- unlinked provider
+  n integer;
+begin
+  -- A member calling it gets nothing — this is a provider-only function.
+  perform set_config('request.jwt.claim.sub', v_marcus::text, true);
+  select count(*) into n from public.provider_linked_members();
+  if n <> 0 then
+    raise exception 'FAIL  a member read % rows from provider_linked_members()', n;
+  end if;
+  raise notice 'ok    a member gets nothing from provider_linked_members()';
+
+  -- The unlinked provider is a provider, but this member is not theirs.
+  perform set_config('request.jwt.claim.sub', v_bob::text, true);
+  select count(*) into n from public.provider_linked_members() where id = v_marcus;
+  if n <> 0 then
+    raise exception 'FAIL  an unlinked provider read the member anyway';
+  end if;
+  raise notice 'ok    an unlinked provider gets nothing for this member';
+
+  -- The linked provider is the actual case this function exists for.
+  perform set_config('request.jwt.claim.sub', v_alice::text, true);
+  select count(*) into n from public.provider_linked_members() where id = v_marcus;
+  if n <> 1 then
+    raise exception 'FAIL  a linked provider read % rows for their own enrolled member', n;
+  end if;
+  raise notice 'ok    a linked provider reads their enrolled member';
+
+  -- The column list is the promise, the same way it is for directory_people.
+  -- last_active_at is the fact Will named explicitly; phone is the contact
+  -- detail 0043 already treats as the one column that must never be here.
+  begin
+    execute 'select last_active_at from public.provider_linked_members()';
+    raise exception 'FAIL  provider_linked_members() now returns last_active_at';
+  exception
+    when undefined_column then
+      raise notice 'ok    provider_linked_members() carries no activity info';
+  end;
+
+  begin
+    execute 'select phone from public.provider_linked_members()';
+    raise exception 'FAIL  provider_linked_members() now returns a phone number';
+  exception
+    when undefined_column then
+      raise notice 'ok    provider_linked_members() carries no contact details';
+  end;
+end;
+$$;
+
+\echo ''
 \echo '--- Saved places come back as places, and only your own ---'
 
 -- 0044. The table has existed since 0003 with nothing writing to it; this is

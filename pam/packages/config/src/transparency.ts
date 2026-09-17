@@ -10,14 +10,34 @@
  * rule. Two things follow, and both are load-bearing:
  *
  *  1. RLS policies in packages/db are written to match ADMIN_CAN_SEE exactly.
- *     `admin_visibility.test.ts` asserts the policy set and this list agree.
- *  2. Adding a field to an admin screen without adding it here is a bug, and
- *     the test will fail. Widen this list only with Will's sign-off, and tell
- *     members before it takes effect — a transparency screen that quietly
- *     grows is worse than none.
+ *  2. Adding a field to an admin screen without adding it here is a bug.
+ *     Widen this list only with Will's sign-off, and tell members before it
+ *     takes effect — a transparency screen that quietly grows is worse than
+ *     none.
+ *
+ * **`admin_visibility.test.ts`, referenced by an earlier version of this
+ * comment as the thing enforcing point 1, does not exist anywhere in this
+ * repository** — checked directly (D-153). Point 1 is upheld today by
+ * whoever edits `packages/db` reading this file first, the way `CLAUDE.md`
+ * already asks, not by an automated diff between this list and the live
+ * policy set. Building that test is real, worthwhile follow-up work; this
+ * file does not currently do what it used to claim it does.
  */
 
-/** Canonical, machine-checkable statement of §4.1 caseload visibility. */
+/**
+ * Canonical, machine-checkable statement of §4.1 caseload visibility.
+ *
+ * `conversation_metadata_exists_and_last_activity` was removed in this same
+ * pass (D-155), found while re-checking every line against the live code as
+ * asked, not something today's messaging work broke: no policy anywhere in
+ * `packages/db` — before or after any of today's migrations — has ever let a
+ * case manager see that a conversation exists without being a member of it.
+ * There is no "metadata only" visibility mode; a case manager either
+ * participates (`messages_in_conversations_they_started_with_you`, below)
+ * or sees nothing about a conversation except a reported excerpt
+ * (`flagged_messages_routed_through_reports`). The old line described a
+ * capability the schema never granted.
+ */
 export const ADMIN_CAN_SEE = [
   'goals',
   'enrollments_and_statuses',
@@ -25,8 +45,18 @@ export const ADMIN_CAN_SEE = [
   'points_and_level',
   'last_active_date',
   'active_connections_names_and_kind',
-  'conversation_metadata_exists_and_last_activity',
   'flagged_messages_routed_through_reports',
+  /**
+   * Added when messaging shipped as staff-to-member rather than
+   * member-to-member (D-152, correcting D-148/149/150). If the person who
+   * invited you messages you directly, they are a participant in that
+   * conversation, not a third party reading over your shoulder — they read
+   * what you both wrote in it the ordinary way any conversation member does.
+   * This does NOT widen what they see of a conversation they are not in;
+   * `flagged_messages_routed_through_reports` above is still the only route
+   * into that.
+   */
+  'messages_in_conversations_they_started_with_you',
 ] as const;
 
 export type AdminVisibleField = (typeof ADMIN_CAN_SEE)[number];
@@ -37,6 +67,19 @@ export const ADMIN_CANNOT_SEE = [
   'buddy_feed_posts',
   'members_outside_caseload_or_region',
   'other_regions',
+  /**
+   * Will, confirming and widening D-154's messaging-only finding: "program
+   * admins don't see activity, across entire app" (D-155). Everywhere else
+   * on this list, "the admin" means whoever §4.1 is actually about — mostly
+   * the case manager who invited a member. This one entry is the single
+   * place the two roles genuinely differ: `last_active_date` above is still
+   * true of a case manager, and false of a program admin, in every path
+   * that reaches a member's profile — `admin_covers()` for a case manager,
+   * `provider_linked_to()` for a program admin, now through
+   * `provider_linked_members()` (0056) rather than a raw table read that
+   * could not draw this distinction at all.
+   */
+  'member_activity_for_a_program',
 ] as const;
 
 export type AdminHiddenField = (typeof ADMIN_CANNOT_SEE)[number];
@@ -98,21 +141,31 @@ export const TRANSPARENCY_SCREEN: {
       en: 'The names of people you connect with, and if they are a mentor or buddy',
     },
     {
-      key: 'transparency.canSee.chatMetadata',
-      en: 'That a chat exists, and the last day you used it',
-    },
-    {
       key: 'transparency.canSee.flagged',
       en: 'A message only if someone says it is not safe',
+    },
+    {
+      key: 'transparency.canSee.directMessages',
+      en: 'Everything you say to them, if they message you directly',
     },
   ],
 
   cannotSeeHeadingKey: 'transparency.cannotSee.heading',
   cannotSeeHeading: 'They cannot see:',
   cannotSee: [
-    { key: 'transparency.cannotSee.messages', en: 'What you write in your chats' },
+    { key: 'transparency.cannotSee.messages', en: 'What you say to someone else' },
     { key: 'transparency.cannotSee.buddyFeed', en: 'What you share with your buddies' },
     { key: 'transparency.cannotSee.otherPeople', en: 'Anyone who is not on their list' },
+    /**
+     * D-155 — stated plainly and positively, not left as a silent absence
+     * from `canSee` above. "A program" is ordinary member-facing wording
+     * already used elsewhere on this same screen and on Home (`role.provider`
+     * reads "Program"), not a staff title §9 would forbid naming.
+     */
+    {
+      key: 'transparency.cannotSee.programActivity',
+      en: 'A program never sees the last day you used PAM',
+    },
   ],
 
   footerKey: 'transparency.footer',

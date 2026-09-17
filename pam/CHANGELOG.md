@@ -1,5 +1,137 @@
 # Changelog
 
+## [0.27.0] — 2026-09-17 · The transparency contract is now tested against a real database
+
+### Added — `admin_visibility.test.ts`, built as `packages/db/test/04_transparency_contract_test.sql`
+
+`transparency.ts`'s own file comment used to claim a test by that name
+enforces the §4.1 contract against live RLS. It did not exist. Built and
+run: a case manager who participates in a conversation reads its full
+history; the same case manager, covering the same member but not a
+participant in a *different* conversation, reads nothing from it; a
+program admin gets no activity info back from either function that reaches
+a member (`conversation_partners()`, `provider_linked_members()`); and a
+case manager who participates in nothing gets nothing. Deliberately does
+not re-test the report path — an existing test already covers that in
+full.
+
+### Fixed — this sandbox is no longer missing `postgis`
+
+Every one of today's four migrations (`0054` through `0056`) had been
+verified only by careful reading, not by execution — this sandbox lacked
+the `postgis` extension `pnpm --filter @pam/db test` requires. Installed
+it. **221 database checks now pass, 0 failures**, against every migration
+and every test file written today, for real.
+
+## [0.26.0] — 2026-09-17 · Program admins never see member activity, anywhere in the app
+
+### Fixed — the pre-existing enrollment/appointment link also exposed a member's activity info to program admins
+
+Independent of the messaging fix in [0.25.0] below: `profiles_select_provider_linked`,
+a policy predating any of today's messaging work, let a program admin read
+`last_active_at` and `phone` for any member they reach through an
+enrollment, an appointment, or a connection — no conversation required.
+Closed the same way: a database function
+(`provider_linked_members()`) returning only a name, never a raw table
+read. "Program admins don't see activity, across the entire app" is now
+true everywhere it was checked, not just through messaging. Case managers
+and super admins are unaffected — this is provider-role-specific.
+
+### Changed — the §4.1 transparency screen states this plainly
+
+A new line under "They cannot see": *"A program never sees the last day
+you used PAM."* Re-checked every other line on the screen against what the
+code actually does today rather than amending it a fourth time in one day
+— found and removed one line, *"That a chat exists, and the last day you
+used it,"* that described a capability no policy has ever actually
+granted, predating today's messaging work entirely.
+
+## [0.25.0] — 2026-09-17 · A conversation partner sees a name and a role, nothing else
+
+### Fixed — the new messaging surface no longer exposes a member's activity info (or a staff person's) to a conversation partner
+
+The `profiles` read policy added in [0.24.0] below, so a member could see
+who was messaging them, turned out to hand back the *whole* profile row —
+`last_active_at`, `phone`, everything — to any conversation partner,
+regardless of role. Replaced with `conversation_partners()`, a database
+function returning exactly two columns (name, role) for whoever shares a
+conversation with the caller, following the same pattern `/directory/`
+already used for a super admin's account list. Nobody sees activity info
+through this path now — not a program admin, not a member, and case
+managers are unaffected, since they already have real caseload visibility
+through an entirely separate, untouched path. See D-154.
+
+**Not fully closed**: an older, pre-existing policy already lets a program
+admin read a member's `last_active_at` and `phone` directly, independent of
+messaging — flagged, not fixed, in D-154's closing note.
+
+## [0.24.0] — 2026-09-17 · Messaging corrected to staff-to-member
+
+### Changed — messaging is a case manager or program admin reaching a member, never member-to-member
+
+Corrects [0.23.0] below, shipped the same day and corrected before anyone
+used it. A case manager can now message members on their caseload; a
+program admin can message members enrolled in their program; a member can
+see and reply within a conversation staff already started, but cannot start
+one themselves and cannot message another member. The earlier
+"accepted mentor/buddy connection" model is gone.
+
+Reuses the same caseload and enrollment relationships `/admin/`'s "Your
+people" screen and program screens already query — nothing new was
+invented. See D-152 (supersedes D-148/149/150) for the full reasoning, and
+for the RLS gap this still leaves open: who may *start* a conversation is
+enforced by this screen today, not by the database.
+
+### Added — a member can read their case manager's or program's name
+
+New database policy (`profiles_select_conversation_partner`, migration
+0054): a member had no way to read a staff person's profile before this,
+because every existing `profiles` policy ran from staff down to a member,
+never the reverse. Without it, `/messages/` would have shown a member every
+conversation with no name attached.
+
+### Changed — the §4.1 transparency screen now says what a direct message means
+
+"Everything you say to them, if they message you directly" is a new line
+under "They can see." A case manager who is a genuine participant in a
+conversation reads it the ordinary way any participant does — a real
+widening the screen did not previously disclose. "What you write in your
+chats" (under "They cannot see") is now "What you say to someone else,"
+since the old wording was no longer true for the only kind of conversation
+that exists. D-074 is unchanged for a case manager who is *not* a
+participant: a report is still the only route in.
+
+### Fixed — nothing; another small, disclosed cost
+
+§12's budget moved from 500.8 kB to 501.0 kB gz (now 1.0 kB over) from this
+correction's rescoped copy. See D-151's update.
+
+## [0.23.0] — 2026-09-17 · Member-to-member messaging (corrected same day — see [0.24.0] above)
+
+### Added — a member can message a mentor or buddy they are already connected to
+
+Two new screens: `/messages/` lists every conversation a member has, plus
+anyone with an accepted mentor or buddy connection they haven't messaged
+yet, and `/messages/thread/` reads and sends within one conversation. Built
+entirely on the existing database and its RLS — `messages` still has no
+admin read policy at all, so a case manager still only ever sees a message
+if it is reported (D-074), unchanged by this release.
+
+**Who can start a conversation is scoped to accepted `connections`**, never
+an open directory of every member — see D-148 for the full reasoning and a
+gap flagged for a follow-up migration: the scope is enforced by this screen
+today, not by the database itself.
+
+Reachable from a new "Messages" tile on Home, shown only to a signed-in
+member's own real account — it is deliberately not part of the super admin
+role-preview system (D-150).
+
+### Fixed — nothing; a real, if tiny, cost
+
+Adding this feature's copy pushed §12's already-disclosed 0.7 kB overage to
+0.8 kB (D-151). The two new routes add nothing to the shared first-load
+bundle themselves.
+
 ## [0.22.0] — 2026-09-17 · Hero motion, a quieter sign-in
 
 ### Changed — the sign-in hero's slide transition eases in and out, and holds each slide two seconds longer

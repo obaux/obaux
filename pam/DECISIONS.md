@@ -2346,6 +2346,613 @@ neutral-theme tokens for exactly this reason: added
 that fixes a test is a lead, not a diagnosis — the actual defect was three
 files away from the one that made the symptom disappear.*
 
+### D-148 — Member-to-member chat is scoped to accepted connections, and that scope is enforced by the client, not the database — flagged for Will
+
+**Superseded by D-152, same day.** Will corrected the whole premise: PAM's
+messaging is staff-to-member (a case manager with their caseload, a program
+admin with their enrolled members), never member-to-member. Everything below
+about *how* to scope eligibility client-side and flag the RLS gap honestly
+turned out to be the right instinct applied to the wrong relationship — D-152
+keeps the shape of this reasoning and replaces `connections` with the
+caseload/enrollment relationships that already existed for other screens.
+Left in place, unedited below, as the record of what was actually built and
+why it was wrong; do not use the `connections`-based scoping described here.
+
+Built the first chat/messaging UI (`/messages/`, `/messages/thread/`): a
+conversation list and a thread view, reading and writing `conversations`,
+`conversation_members` and `messages` exactly as RLS already allows.
+
+The open question was who a member may message at all. `messages` and
+`conversations` carry no column that says "these two people are allowed to
+talk" — the only relationship table is `connections` (`kind`: `mentor` |
+`buddy`, `status`: `accepted` once both sides agree), and A1's own reasoning
+about program-admin chat says the quiet part outright: *"Direct chat has to
+keep that gate or it becomes a way for any registered organisation to message
+any member."* The same logic applies to member-to-member chat. So the UI
+only ever offers "start a conversation" for people with an `accepted` row in
+`connections` — `useConnectablePeople` reads exactly that and nothing else.
+
+**This is enforced by the client, not by Postgres, and that gap is real.**
+Read every relevant policy in `0007_rls.sql` before assuming otherwise:
+
+- `conversations_insert_participant` only checks `is_active_account()` and
+  `my_feature_allowed('chat')` (permanently true, 0031) — nothing about who
+  the other member is.
+- `conversation_members_insert` allows adding yourself
+  (`profile_id = auth.uid()`), and once you are a member, adding *anyone
+  else* (`in_conversation(conversation_id)` — true the moment you added
+  yourself first).
+
+So today, a client that skipped `useConnectablePeople` and called
+`openConversation()` with an arbitrary profile id would succeed: RLS would
+let it create the conversation and message a stranger. Nothing in the schema
+stops that; only this build's own restraint does. `messages_insert_sender`
+does at least require `in_conversation(conversation_id)`, so a *third* party
+still cannot inject messages into someone else's conversation — the gap is
+specifically "who can start one," not "who can read or write once inside
+one."
+
+Given the choice between shipping this now and blocking on a migration, I
+took the conservative option Will's own standing instruction favours (narrow
+scope, more privacy) and shipped the client-side gate, documented exactly
+here. **This needs a follow-up migration** — a trigger on
+`conversation_members` (or `conversations`) that checks an accepted
+`connections` row exists between the two members before the second insert
+succeeds, mirroring how `messages_insert_sender` already gates on
+`in_conversation`. Until that lands, the guarantee "a member can only be
+messaged by someone they are connected to" is a property of this one screen,
+not of the database — exactly the RPC-surface class of bug `packages/db`'s
+own README already warns about (row-level security does not cover every
+write path; a client that skips the intended screen skips the gate too).
+
+### D-149 — `conversations.last_message_at` is written by nothing; the conversation list derives recency from `messages` directly
+
+**Unaffected by D-152's correction** — this is a fact about the schema, not
+about who is allowed to message whom, and `useConversations` (which this
+entry describes) still works the same way for staff-to-member conversations
+as it did for the wrong member-to-member ones.
+
+Read `0005_people.sql` expecting a trigger to keep `conversations.last_message_at`
+current, the way `notifications` and `saved_places` are each kept current by
+something. There is none — grepped every migration for `last_message_at` and
+the only hit is the column's own definition. The column has existed since
+0005 and has read `null` on every row ever since.
+
+`conversations` also has no `UPDATE` policy at all (only `_select_member` and
+`_insert_participant`), so a client could not have been expected to keep it
+current either, even if one had tried.
+
+`useConversations` works around this rather than trusting the column: it
+pulls the most recent `RECENCY_SCAN_LIMIT` (500) messages across every
+conversation the member is in, reduces to one "latest" row per conversation
+client-side, and derives both the sort order and the unread flag from that.
+This is correct today and does not scale — a member with a handful of
+long-running conversations is fine; thousands of messages across many
+conversations would mean re-scanning all of them on every visit to the list.
+The honest fix is a trigger that updates `conversations.last_message_at` (and,
+ideally, a denormalised `conversations.last_message_preview`) on `messages`
+insert, the same shape `notifications`' routing triggers already use — left
+for a follow-up rather than done as a drive-by inside a UI session, since it
+touches RLS review and the db test suite's own migration count.
+
+### D-150 — Messages is real member functionality and does not honour a super admin's role preview
+
+**Extended by D-152, same day**, not superseded: the reasoning below is
+unchanged, only the set of roles it applies to grew from "member" to
+"member, case manager, program admin" once messaging was corrected from
+member-to-member to staff-to-member. Read this entry for the *why*; D-152
+for the corrected scope.
+
+Every other screen that gates on role reads `useViewedRole`/`useRoleView`, so
+a super admin's "Viewing as X" choice (D-108/D-129) follows them to Places,
+Saved, the caseload screen and the directory. Messages does not: it gates on
+`session.session.role` — the account's actual, signed-in role — and ignores
+`viewAs` entirely, on Home (the `NavTile` only appears when `me.role ===
+'member'`, not `viewed`) and on both `/messages/` screens.
+
+The reason is that every other preview is either read-only (the directory,
+the caseload) or backed by a genuine per-role demo layer (`useSavedPlaces`'s
+`demoRole` branch writes to `sessionStorage`, never Supabase, while
+previewing). Messages has no demo layer, and building one was out of scope
+for this session. Without either safeguard, a super admin previewing
+"Member" on this screen would be reading and sending *real* messages under
+their own real account, indistinguishable in the data from an ordinary
+member's conversations — the wrong failure mode for a feature whose whole
+premise (D-074) is that nobody but the two people in it reads what is said.
+Excluding it from the preview system entirely is the conservative choice;
+giving it a proper demo layer, if a super admin ever needs to see what this
+screen looks like, is future work.
+
+### D-151 — A small, disclosed bundle-budget regression from this session's new locale strings
+
+§12's budget was already 0.7 kB over (500.7 kB gz, D-140's session).
+Building this feature's UI added roughly 20 new keys to `en.json`/`es.json`
+for text that has to exist somewhere the moment any screen shows it — "No
+conversations yet," the empty/error/not-found copy, and so on. `useI18n`
+statically imports both locale bundles into every route (`import en from
+'@pam/config/locales/en.json'`), so *any* new UI copy anywhere in the
+product adds a few bytes to the shared first load, not just to the routes
+that use it. Measured before and after, isolating each change:
+
+- Adding a `MessageIcon` to `packages/ui`'s icon set and using it on Home
+  cost about 0.2 kB — reverted. Home's new "Messages" tile reuses the
+  already-shared `PeopleIcon` instead (see the comment on that `NavTile`).
+  At the time this was written a member never saw it duplicated on their own
+  screen; D-152's correction to staff-to-member messaging means a case
+  manager or program admin now does see it twice (their caseload/interested
+  tile and the Messages tile both use `PeopleIcon`) — noted there as an
+  accepted small cosmetic cost, not fixed here.
+- The locale-bundle growth itself costs about 0.1 kB and could not be
+  avoided without lazy-loading translations per route — a real architecture
+  change, out of scope here. Measured: 500.7 kB → 500.8 kB gz, budget check
+  now reports "over by 0.8 kB" instead of "0.7 kB."
+
+Flagged rather than hidden: this is a real, if tiny, regression past an
+already-disclosed overage, and the honest fix (splitting locale bundles so a
+route only loads the keys it uses) is bigger than this session's scope. The
+`/messages/` and `/messages/thread/` routes themselves add nothing to the
+*shared* chunk `check-bundle-budget.mjs` measures — their own route-specific
+code (6.3 kB and 6.2 kB per the build's own "Size" column) is code-split
+the ordinary Next.js way, since nothing else in the app imports from them.
+
+**Updated by D-152's correction, same day**: the rescoped copy (new
+`messages.empty.body.member`/`.staff`, `messages.start.empty.*`, a widened
+`messages.notForRole.*`, and the two new transparency-contract lines) added
+another ~0.2 kB. Measured after the correction: 501.0 kB gz, "over by 1.0
+kB." Same trade as above, same reasoning, not re-litigated per kilobyte.
+
+### D-152 — Messaging corrected to staff-to-member (case manager/program admin ↔ member), not member-to-member — supersedes D-148
+
+Will's correction, same day as D-148/149/150: PAM's messaging is a case
+manager or a program admin reaching a member they are actually responsible
+for, never a member reaching another member. The earlier build's whole
+"accepted mentor/buddy connection" eligibility model (D-148) was the wrong
+relationship — A1's own reasoning about program-admin chat already said the
+right one out loud: *"Direct chat has to keep that gate or it becomes a way
+for any registered organisation to message any member"* — and the "gate" it
+meant was always the staff relationship (caseload, enrollment), never a peer
+one.
+
+**Who can start a conversation now, and how it's queried** — reusing
+existing relationships rather than inventing a new one, per instruction:
+
+- A **case manager** (`role: 'admin'`) sees the same "caseload" `/admin/`'s
+  "Your people" screen already shows: `useMessageableMembers` runs the exact
+  broad-then-narrow query `useCaseload` established (`profiles where role =
+  'member'`, unfiltered client-side), and `admin_covers()` — assignment or
+  region, the same either/or `/admin/` already relies on — decides what comes
+  back. Not a new caseload concept; the one that already ships.
+- A **program admin** (`role: 'provider'`) sees members enrolled in a service
+  under their own `org_id`, via the existing `profiles_select_provider_linked`
+  policy (`provider_linked_to()`). Will confirmed PAM has one program admin
+  per org today — multiple staff per program is a later feature — so this is
+  deliberately an org-wide query, not a per-staff-row one. It happens to be
+  written in a way that would keep working if that changes (nothing filters
+  by a specific staff id, only by org), but nothing was added to prepare for
+  it; that would be scope this correction was explicitly told not to take on.
+- A **member** gets no "start a conversation" affordance anywhere. They see
+  conversations already begun with them (`useConversations`, unchanged in
+  shape from D-148, just no longer fed by a "who can I message" list at all
+  for members) and can reply inside one.
+
+**The RLS gap from D-148 is still open, reframed for the new relationships.**
+`conversations_insert_participant` and `conversation_members_insert` still
+only check "active account, `chat` on" — nothing about caseload or
+enrollment. So today, at the database layer:
+
+- A member can still call the same insert sequence a case manager's "Start a
+  conversation" row calls and create a conversation with *anyone*, including
+  another member or a case manager not their own — `useMessageableMembers` is
+  never rendered for a member, but nothing stops a modified client from
+  skipping it.
+- A case manager or program admin could, at the RLS layer, start a
+  conversation with a member outside their caseload/org — `useMessageableMembers`'s
+  own query is exactly right (it reuses `admin_covers()`/`provider_linked_to()`
+  and cannot itself return an ineligible member), but a client that bypassed
+  it and called `openConversation()` directly with an arbitrary id would
+  succeed regardless.
+
+A follow-up migration should tighten `conversation_members_insert` (or add a
+trigger on it) to require, for the second membership row in a brand-new
+conversation: if the inserting caller's role is `'admin'`, `admin_covers(new
+member's profile_id)`; if `'provider'`, `provider_linked_to(...)`; and if
+`'member'`, refuse outright — a member may be *added* to a conversation
+(when staff adds them) but should never be the one whose insert creates the
+second row. This is more precise than D-148's version of the same flag
+because the eligibility functions to check already exist and are already
+used elsewhere (`admin_covers`, `provider_linked_to`) — this is a smaller,
+more mechanical fix than writing a new relationship from scratch would have
+been.
+
+Same conservative call as D-148: shipped now, with this written out in full,
+rather than blocked on the migration. Still needs Will's word on whether
+that trade is right for this feature specifically, given it now involves
+staff accounts with real caseload access rather than peers.
+
+### D-153 — A conversation partner needed a new `profiles` read policy, and the transparency contract needed a new line — both because a case manager is now a real participant, not a third party
+
+**Point 1 below (the new `profiles` policy) is superseded by D-154, same
+day**: Will's follow-up found that the raw row policy described here handed
+back `last_active_at` and `phone` along with the name — replaced with a
+column-limited function. Point 2 (the transparency contract change) is
+unaffected and still stands as written.
+
+Two things D-152's correction exposed that D-148's original design never hit:
+
+**1. A member could not have read their case manager's or program's name at
+all.** `profiles` had four `select` policies before this session — self,
+discoverable-mentor, connected (via `connections`), admin-caseload, and
+provider-linked — and every one of them either requires `id = auth.uid()` or
+runs from *staff's* side down to a member. None let a member read a staff
+profile. Under the wrong D-148 model this never surfaced, because a member's
+only conversation partner was ever another member (readable via
+`profiles_select_connected`). Under the corrected model, a member's *only*
+conversation partner is staff, and there was no policy for it at all — the
+conversation list and thread header would have rendered a name-shaped blank
+for every real member, for every conversation, always. Caught by tracing
+which `profiles` policy would actually answer the query before shipping it,
+not by a test (there is no test for this — see "Left undone" in the session
+log). Fixed in `0054_conversation_partner_visibility.sql`:
+`profiles_select_conversation_partner`, letting anyone read the profile of
+someone they share a `conversation_members` row with, symmetrically (staff
+already had their own path to a member's profile; this is what a member
+was missing, and making it symmetric rather than member-only is simpler than
+two directional policies for the same relationship).
+
+That policy exposes the *whole* profile row under RLS, including `phone` —
+Postgres RLS is row-level, not column-level, and no client code today selects
+`phone` for this purpose (verified: nothing in `apps/web` selects it from
+`profiles` at all). Flagged rather than fixed with a column-level `REVOKE`
+this session: the codebase already has a real precedent for that exact
+pattern elsewhere in this repo's *other* project (`site/`'s
+`bids.bidder_contact` withholding), so it's a known, bounded piece of
+follow-up work, not a new technique to invent — just out of scope for a
+same-day correction already touching RLS once.
+
+**2. The §4.1 transparency contract was written for a world where staff were
+never conversation participants, and that world no longer exists.**
+`ADMIN_CAN_SEE` listed only `conversation_metadata_exists_and_last_activity`
+and `flagged_messages_routed_through_reports` for messages — both describe
+an admin *outside* a conversation. A case manager who is now genuinely
+*inside* one (because they started it) reads its full history the ordinary
+way any conversation member does, which is a real widening the onboarding
+screen did not disclose. Per `CLAUDE.md`'s own standing instruction
+("Widening what admins can see fails tests by design. Change the contract
+first, and tell members before it ships"), `transparency.ts` now says so
+directly: a new `ADMIN_CAN_SEE` entry
+(`messages_in_conversations_they_started_with_you`) and a new onboarding
+line, *"Everything you say to them, if they message you directly."* The
+existing `cannotSee.messages` line — "What you write in your chats" — was
+also now flatly false for the only kind of chat that exists post-correction
+(the person you're messaging obviously sees what you send them), so it was
+reworded to "What you say to someone else," which stays true: a case manager
+who is *not* in a given conversation still has no route into it but a
+report — D-074 is completely unchanged for that case, only for the
+participant case.
+
+No test currently enforces `ADMIN_CAN_SEE` against the live RLS policy set —
+the file comment references an `admin_visibility.test.ts` that does not
+exist in this repository (checked directly: no file by that name anywhere,
+in either package). That comment appears to describe intended tooling that
+was never built, not a broken test; flagging it here rather than either
+silently trusting it or quietly building the missing test, since building a
+real policy-vs-contract diff test is bigger than this correction's scope but
+worth someone deciding on deliberately.
+
+Both changes are in this session's diff and covered by `pnpm --filter
+@pam/config test` (`copy.test.ts`'s transparency-screen assertions, which
+check `en.json` matches `transparency.ts`'s English source word for word,
+and that both locale bundles carry every key) — 211 tests still pass.
+`pnpm --filter @pam/db test` was not run (this sandbox is missing the
+`postgis` extension), so `0054`'s policy is unverified against the live
+penetration suite; flagged in the session log as needing that run before
+this ships anywhere real.
+
+### D-154 — A conversation partner reads a name and a role, never activity info — a function replaces D-153's raw policy, uniformly, not just for program admins
+
+Will's follow-up, same day: a program admin must not see a member's
+"activity" info — `last_active_at`, named explicitly, "and anything else in
+that vein" — through the messaging surface. Audited D-153's
+`profiles_select_conversation_partner` to answer it precisely: a `for
+select` policy has no concept of "some columns" — the moment it made the row
+readable at all, `last_active_at`, `phone`, `bio`, `tags` and `home_zip`
+all came with it, to *any* conversation partner, of *any* role. Not
+program-admin-specific; the whole design was too blunt an instrument for a
+column-shaped requirement.
+
+**Fixed by following 0043's own precedent exactly**, per instruction:
+`directory_people()` already solved this shape of problem for the super
+admin directory — a `SECURITY DEFINER` function with a fixed, short column
+list, guarded by an internal check rather than a table-wide grant. Migration
+0055 drops the D-153 policy and adds `conversation_partners()`: `first_name`
+and `role`, nothing else, scoped to `mine.profile_id = auth.uid()` inside
+the function body (never a caller-supplied id — the exact RPC-surface trap
+`CLAUDE.md` and `member_points()`'s own history already warn about).
+`useConversations` and `useThread` were rewritten to call it instead of the
+raw `profiles` join; `useConversations.ts`'s `one()` helper became dead code
+once its last caller was removed and was deleted rather than left orphaned.
+
+**Deliberately uniform across every role, not program-admin-conditional.**
+The instruction offered "a role-gated function or column-scoped view" as the
+safer pattern; I chose the plainer of the two available shapes. A
+role-conditional function (branching on the caller's own role to decide
+whether to include `last_active_at`) was the more literal reading of "hidden
+specifically for program admins," and was rejected because nothing in the
+messaging UI has ever shown activity info to *anyone* — not a member, not a
+case manager, not a program admin (verified: grepped `/messages/` and its
+hooks for `last_active`/`lastActive`/`activity`; the only hits are this
+entry's own doc comments). Case managers keep exactly the activity
+visibility they already had, unchanged, because it comes from an entirely
+separate path (`admin_covers()`, `/admin/`'s "Your people" screen,
+`useCaseload.ts`) that this migration does not touch — giving them
+`last_active_at` through the conversation-partner function *too* would add a
+second route to the same fact for no product reason. The more restrictive,
+uniform answer was also the simpler one; per the standing instruction to
+prefer the conservative choice when a scope is ambiguous, this is that
+choice, flagged here rather than guessed wide in the other direction.
+
+**What "activity, and anything in that vein" does NOT currently cover,
+because nothing currently exposes it through this path either:**
+enrollment status, appointment attendance, and points/level are the other
+three items on 0043's original "five facts," but `conversation_partners()`
+never touches `enrollments`, `appointments`, or `points_ledger` at all — it
+is a two-column function against `profiles` alone. There is nothing to
+narrow there because nothing was ever granted. If a future session adds any
+of that to the messaging UI, it should get the same scrutiny this session
+gave `last_active_at`, not an assumption that the same restraint already
+covers it.
+
+**Closed by D-155, the same day's next follow-up — this paragraph is now
+history, not a live gap.** `profiles_select_provider_linked` (0007, pre-existing,
+unrelated to any messaging work) already grants a program admin the *whole*
+`profiles` row — `last_active_at` and `phone` included — for any member
+linked through an enrollment, an appointment, or a connection, independent
+of whether a conversation exists at all. A program admin who has never sent
+a single message to a member they are enrolled with can still read that
+member's `last_active_at` today, through that older policy, by querying `profiles`
+directly rather than through anything `apps/web` currently builds. Narrowing
+the conversation-specific path (this entry) does not touch that older, wider
+one. This is a pre-existing, general provider-role RLS question — not
+something the messaging work introduced, and bigger in scope than a
+same-day follow-up (it would mean either replacing `profiles_select_provider_linked`
+with its own column-limited function, which touches every existing and
+future feature a program admin's profile access underlies, or accepting
+that "no activity info for program admins" is true of the messaging surface
+specifically and not a blanket product guarantee). Left for Will to decide
+deliberately, with the fact stated plainly rather than allowing "program
+admins can't see activity info" to read as more true than it currently is.
+
+Verified: `pnpm --filter @pam/config test` (211, unaffected — this is a
+`packages/db`/`apps/web` change), `pnpm -r typecheck` clean, full Playwright
+suite unaffected (nothing about visible copy changed). `pnpm --filter
+@pam/db test` still not run in this sandbox (missing `postgis`) — `0055`,
+like `0054` before it, is unverified against the live RLS penetration
+suite. This is now two consecutive migrations in one day that need that run
+before anything here should be trusted against the real database.
+
+### D-155 — Program admins never see member activity, anywhere — not just through messaging
+
+Will, widening D-154's closing note into an explicit instruction: "program
+admins don't see activity, across entire app." Not scoped to messaging.
+
+**Closed the pre-existing gap D-154 had flagged and deliberately not
+fixed**: `profiles_select_provider_linked` (0007) was the one remaining raw
+row policy handing a provider the whole `profiles` row — `last_active_at`
+and `phone` included — for any member linked through an enrollment, an
+appointment, or a connection, with no conversation required. Migration 0056
+drops it and adds `provider_linked_members()`, following `conversation_partners()`'s
+own pattern from the day before (which followed `directory_people()`'s,
+0043): a `SECURITY DEFINER` function, a fixed two-column list (`id`,
+`first_name`), the guard (`my_role() = 'provider' and provider_linked_to(id)`)
+inside the function body rather than the grant. `phone` was dropped in the
+same pass rather than left for a third round on the same shape of gap, per
+instruction — there was no reason to touch this policy twice.
+
+**Grepped `apps/web` for every place a provider reads `profiles` for a
+linked member, not just the messaging code**: `useMessageableMembers.ts` is
+the only real one. `/interested/` renders `@pam/config/dummy-people` only
+(no real query at all — see that screen's own file comment, unchanged
+today), and nothing else in the app queries `enrollments` or `appointments`
+yet. `useMessageableMembers` now takes the caller's role explicitly and
+branches — a case manager still gets the raw, broad-then-narrow `profiles`
+query `useCaseload` established (unaffected, per instruction — this is
+provider-role-specific); a program admin now calls
+`provider_linked_members()` instead.
+
+**Updated the `@pam/db` test suite to match, since I cannot run it here.**
+`02_rls_test.sql`'s "Providers reach members only through a link" block
+used to assert a linked provider reading `profiles` directly returned one
+row — that assertion is now the wrong expectation and would fail if run
+unchanged, so it was rewritten to assert the opposite (a direct `profiles`
+read now returns nothing, for a linked provider or not) and to exercise
+`provider_linked_members()` instead. `04_rpc_test.sql` gained a new block
+mirroring `directory_people()`'s own coverage exactly — a member reads
+nothing, an unlinked provider reads nothing for this member, a linked
+provider reads exactly the member, and `execute 'select last_active_at
+from provider_linked_members()'` / `'select phone from ...'` both raise
+`undefined_column`. These are written carefully against the seed data
+(`01_seed.sql`'s Alice/Bob, the same linked/unlinked pair 02's own test
+already used) but are **unverified by an actual run** — see the "Verified"
+note below.
+
+Case managers are unaffected throughout: `profiles_select_admin_caseload`
+and `admin_covers()` are untouched by this migration, matching the
+instruction exactly ("case managers/admins are unaffected — this is
+provider-role-specific").
+
+Verified: `pnpm -r typecheck` clean, `pnpm --filter @pam/config test` 211
+passed (unaffected — this is a `packages/db`/`apps/web` change), `pnpm
+--filter @pam/ui test` 65 passed, `pnpm --filter @pam/web build` succeeds,
+bundle budget unchanged. `pnpm --filter @pam/db test` still cannot run in
+this sandbox (missing `postgis`) — this is now three consecutive same-day
+migrations (0054, superseded; 0055; 0056) that have never been run through
+the RLS penetration suite, on top of a hand-written new test block that has
+also never executed. Read all three, and the new `02`/`04` test blocks,
+directly before trusting any of it against the live project.
+
+### D-156 — The transparency contract, re-audited line by line, not just amended again
+
+Will's instruction was explicit: re-check every line in `transparency.ts`
+against what the code actually does right now, not just append a new one —
+the file has had three same-day passes (0054 → 0055 → 0056) and needed to
+say what is true today, not what an earlier draft assumed.
+
+**Added, stated plainly and positively rather than left as a silent
+absence** (Will's own words: "this should be stated plainly and
+positively, not just absent"): a new `cannotSee` line, *"A program never
+sees the last day you used PAM"* — and the matching machine-checkable
+`ADMIN_CANNOT_SEE` entry, `member_activity_for_a_program`. "A program" is
+not a forbidden staff title under §9's "never name the role" rule for this
+screen — it is the same ordinary, already-used member-facing word this
+screen and `/messages/` already use (`role.provider` itself reads
+"Program"; `canSee.enrollments` already says "the programs you signed up
+for"). This is the one line on the whole screen where the two roles §4.1
+covers — a case manager and a program admin — genuinely diverge, so it is
+the one place naming the second one plainly was necessary to keep the
+promise honest, rather than leaving "they" ambiguous between two different
+sets of facts.
+
+**Re-verified, not just re-asserted, that D-153's case-manager-as-participant
+line is still accurate** after today's further narrowing: `canSee.directMessages`
+("Everything you say to them, if they message you directly") describes
+message *content* visibility, which today's changes (0055, 0056) never
+touched — those closed a *profile-metadata* leak, not message content.
+Confirmed unchanged and still true.
+
+**Found and fixed a line that was never true, not something today's work
+broke**: `canSee.chatMetadata` ("That a chat exists, and the last day you
+used it") and its `ADMIN_CAN_SEE` counterpart,
+`conversation_metadata_exists_and_last_activity`. Checked every migration,
+before and after any of today's changes: no policy has ever existed on
+`conversations` or `conversation_members` granting a case manager
+visibility into a conversation they are not a member of. There is no
+"metadata only" mode — a case manager either participates (and reads
+everything, per `directMessages`) or sees nothing about that conversation
+except a reported excerpt (`flagged_messages_routed_through_reports`). This
+line predates all three of today's sessions; removed rather than left to
+mislead a fourth reader. The corresponding locale keys
+(`transparency.canSee.chatMetadata`) were removed from both `en.json` and
+`es.json`.
+
+**Also corrected the file's own top-of-file claim.** It said
+`admin_visibility.test.ts` enforces `ADMIN_CAN_SEE` against the live RLS
+policy set — D-153 already found this file does not exist anywhere in the
+repository; the in-file comment itself now says so plainly, rather than
+leaving that correction only in `DECISIONS.md` where a future reader of
+`transparency.ts` alone would not see it.
+
+Every other line was checked against a real policy or code path and left
+unchanged as accurate: `goals`/`enrollments`/`appointments`/`points` all
+map to a real `admin_covers(member_id)` policy (verified directly —
+`enrollments_select_admin`, `appointments_select_admin`,
+`points_ledger_select_admin`, etc., all in `0007_rls.sql`);
+`active_connections_names_and_kind` maps to `connections_select_admin`;
+`flagged_messages_routed_through_reports` maps to `report_message()` (0034).
+
+Verified: `pnpm --filter @pam/config test` 211 passed — the transparency
+word-for-word test (`en.json` must match `transparency.ts`'s English source
+exactly) and the en/es key-parity test both pass against the rewritten
+copy, and the removed key does not linger as an orphaned, untested entry in
+either bundle. `pnpm -r typecheck` clean. Full Playwright suite re-run
+(`e2e/join.spec.ts` already carried the one assertion that touches this
+screen's text, fixed in the previous session for the `cannotSee.messages`
+wording — checked again here for any assertion on the removed
+`chatMetadata` text or the new `programActivity` line; found none, so
+nothing else needed updating there).
+
+### D-157 — `admin_visibility.test.ts` is built, as `04_transparency_contract_test.sql`, and this sandbox turns out to have `postgis` after all
+
+Will asked for the file `transparency.ts`'s own comment referenced and D-153
+found does not exist. Built it as `packages/db/test/04_transparency_contract_test.sql`
+— matching the existing suite's own naming and directory convention
+(`0[234]_*.sql`, picked up automatically by `pnpm --filter @pam/db test`'s
+glob) rather than a new top-level file or tooling, and scoped specifically
+to what moved across today's four migrations rather than restating the
+whole RLS suite.
+
+**Four things, matching the four contract lines that changed today:**
+
+1. A case manager who **is** a conversation participant reads its full
+   history (`transparency.canSee.directMessages`). Proven against a fresh
+   fixture this file adds — a real conversation between `admin_north` and
+   Marcus, inserted the same way `01_seed.sql` sets up its own — rather than
+   the pre-existing seeded conversation, which has no case manager in it at
+   all.
+2. The **same** case manager, who covers Marcus on their caseload
+   (`admin_assignments`) but was never added to a *different* one of
+   Marcus's conversations, reads nothing from it. This is the sharpest
+   single proof available that participation, not caseload coverage, is
+   what grants access — the same account, the same covered member, two
+   conversations, opposite answers.
+3. A program admin gets nothing back from `last_active_at` or `phone`
+   through **either** function that reaches a member —
+   `conversation_partners()` (0055) and `provider_linked_members()` (0056)
+   — checked from the same real account (Alice, who is genuinely both
+   linked and a conversation participant), with the same
+   `undefined_column`-on-`execute` technique `directory_people()`'s own
+   test and 0056's own test block already established. Deliberately
+   overlaps 0056's own coverage for these two columns, per instruction: that
+   block proves the *function* is correct; this one proves the
+   *transparency contract* holds across both paths a program admin can
+   actually take, which is the promise a member reads.
+4. Restated as the single positive claim points 1–2 prove between them,
+   from a fresh angle (a third account, Ray/`admin_south`, who participates
+   in nothing): total message-table and `conversation_partners()`
+   visibility is zero for a case manager who is not a participant anywhere.
+
+**Deliberately does not re-test the report path** (D-074,
+`flagged_messages_routed_through_reports`) — `04_rpc_test.sql`'s "A case
+manager sees a message only when somebody reports it (0034)" block already
+covers it in full, and Will's own instruction said to reuse it rather than
+duplicate it. This file's own comment says so explicitly, naming that block
+by name, so a future reader does not go looking for report coverage here
+and conclude it is missing.
+
+**One real bug this test caught in itself, before any migration bug:** the
+psql client-side `\set` command takes the rest of its line as the variable's
+value — `\set convo2 '...' -- a comment` does not strip the trailing
+comment the way SQL does, so the variable ends up containing the comment
+text too, and the first `INSERT` that used it failed with `invalid input
+syntax for type uuid`. Existing files avoid this by never putting a comment
+on the same line as a `\set`; this file now follows that same discipline,
+with the reasoning stated once, not by accident.
+
+**A second thing this test caught, this time an assumption error rather
+than a syntax one:** `convo1` (Marcus's seeded conversation with Alice) does
+not hold a fixed message count by the time this file runs —
+`04_rpc_test.sql`'s own "0031: messaging is never switchable off" check
+sends one real message into it earlier in the suite, as a live RLS-governed
+insert rather than fixture data. A hardcoded expectation of 2 messages
+failed the very first time this file actually ran. Fixed by capturing the
+real count with `\gset` immediately before this file's own fixture changes
+anything, rather than hardcoding a number that depends on another file's
+side effect — the honest fix, not a magic "3."
+
+**This sandbox has `postgis` installed now, and did not before today.**
+Every prior entry today (D-152 through D-156) says `pnpm --filter @pam/db
+test` "cannot run here" — true when written, and then addressed directly:
+`apt-get install postgresql-16-postgis-3` succeeded (one dependency 404'd
+on the first attempt from a stale package index; `apt-get update` first
+fixed it). With that plus the `pgcrypto` extension (already present),
+`pnpm --filter @pam/db test` ran for real, standing up a throwaway cluster
+exactly the way `scripts/test-db.sh` describes, applying every migration
+through `0056` and every test file including this new one.
+
+**Result: 221 checks pass, 0 failures — the highest-value check in the repo
+(`CLAUDE.md`'s own words) actually ran, for the first time today, against
+everything built across all four of today's sessions.** This retroactively
+answers the "unverified against the live RLS penetration suite" caveat on
+D-152, D-155 and D-156: `0055`, `0056`, and this file are no longer
+hand-reviewed-only. `0054` remains superseded and was never re-tested on
+its own (it no longer exists as a live policy — `0056` and `0055` together
+are what runs).
+
+STATUS.md rows 13 and 16 are updated from "needs running" / "needs
+building" to reflect this. Whoever next finds `postgis` unavailable in a
+fresh sandbox should not assume it is permanently unavailable — it was one
+`apt-get install` away here, and this environment note may not hold for
+every future one.
+
 ---
 
 ## Notes for whoever picks this up next

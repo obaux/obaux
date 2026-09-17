@@ -344,6 +344,31 @@ export default function HomePage() {
           description={t('home.go.places')}
         />
 
+        {/*
+          Staff-to-member messaging (D-152: corrected from an earlier,
+          wrong member-to-member build — see the file comment in
+          `/messages/page.tsx`). A member, a case manager and a program
+          admin can all message and be messaged, so all three get this
+          tile — gated on the account's own role, never a super admin's
+          "Viewing as" choice, for the same reason D-150 gave.
+
+          Reuses `PeopleIcon` rather than a new icon component: one more
+          icon in the shared `@pam/ui` barrel is one more thing every route
+          downloads (§12; see D-151, already 0.8 kB over before this tile).
+          The trade is that a case manager or program admin now sees this
+          tile beside their caseload/interested tile with the matching
+          icon twice on the same screen — a small, accepted cosmetic cost,
+          not a functional one.
+        */}
+        {me.role === 'member' || me.role === 'admin' || me.role === 'provider' ? (
+          <NavTile
+            href="/messages/"
+            icon={<PeopleIcon />}
+            label={t('messages.title')}
+            description={t('home.go.messages')}
+          />
+        ) : null}
+
       </VStack>
 
       {/* §0 — a visible way to get help, on the screen everybody starts from. */}
