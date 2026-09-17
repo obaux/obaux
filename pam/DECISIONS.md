@@ -2463,9 +2463,29 @@ identified but not reached this session (see the session log). The
 mechanism (`useDemoView`, threaded from `useSession`) is the same for all of
 them; it is repetition, not a new pattern, to finish.
 
----
+### D-156 — Migrations 0054–0057 applied live, with two fixes `get_advisors` caught
+Will, 17 September: "push live." Applied all four to the real Supabase
+project (`shobqzuhicoiymtumiaz`) via `mcp__Supabase__apply_migration`, then
+ran `get_advisors` per CLAUDE.md's standing instruction — it catches what the
+local suite cannot. Two real findings, both fixed with their own small
+migrations rather than folded silently into an already-applied one:
 
-## Notes for whoever picks this up next
+- **0058** — `notify_on_staff_request()` (0054) was directly callable by
+  `anon`/`authenticated` via PostgREST. Its two siblings from 0038,
+  `notify_on_service_flag`/`notify_on_report`, were never explicitly revoked
+  either and the advisor does not flag them — 0011's schema-level
+  default-privileges change reached them because they were created in the
+  same migration run that set it, and did not reach a function created in a
+  later, separate run. Revoked explicitly rather than relying on which
+  session created the function next time.
+- **0059** — `staff_requests` had two unindexed foreign keys:
+  `region_id` (new, this session) and `reviewed_by` (0046, always
+  unindexed — not something this session broke, but on the same table and
+  free to fix in the same pass). Both now have covering indexes.
+
+Neither fix changes any behaviour this session already tested — both are
+migrations 0054–0057 should have shipped with, caught by the one check that
+only runs against a real database.
 
 - `pnpm --filter @pam/db test` is the highest-value check in the repo. It is the
   only thing standing between a policy edit and a privacy breach.
