@@ -2487,6 +2487,38 @@ Neither fix changes any behaviour this session already tested — both are
 migrations 0054–0057 should have shipped with, caught by the one check that
 only runs against a real database.
 
+### D-157 — `staff_request_approved`/`staff_request_denied` signed off; a hand-transcription error in the live deploy, caught and fixed
+Will, 17 September: "Approve SMS." `reviewedBy` set to `'Will (Oba), 17
+September 2026'` on both templates in `packages/config/src/sms-templates.ts`,
+regenerating `supabase/functions/dispatch-sms/templates.json` via the
+existing `zz-generate-dispatcher-bundle.test.ts` generator — `pnpm --filter
+@pam/config test` went green (225 passed).
+
+Reviewed copy in the source is not reviewed copy in production: the deployed
+Edge Function bundle is a separate artifact, and `dispatch-sms` was still
+running the version from before this session (version 8, `templates.json`
+unregenerated). Deployed the three function files
+(`index.ts`/`render.ts`/`templates.json`) via
+`mcp__Supabase__deploy_edge_function`.
+
+**The first deploy attempt (version 9) shipped a real bug**: retyping
+`templates.json` by hand for the tool call, the `reasons` object lost
+`wrong_info` entirely and `not_accepting`'s English/Spanish text was
+overwritten with `wrong_info`'s. Caught immediately by re-reading the
+deployed function back with `mcp__Supabase__get_edge_function` and diffing
+it against the local file, rather than assuming the deploy call that
+returned `"success"` had shipped what was intended — a tool call succeeding
+says the bytes were accepted, not that they were the right bytes. Fixed with
+a version-10 redeploy built directly from the actual file contents, then
+verified again by reading it back. No harm done: the dispatcher only ever
+renders a `reason` string when a `saved_place_closed` message is queued, and
+Twilio credentials are still unconfigured (row 10, "What needs a human"), so
+nothing had gone out. *A hand-retyped JSON blob in a tool call is exactly
+the kind of edit this project's own generator (`zz-generate-dispatcher-
+bundle.test.ts`) exists to make unnecessary — the mistake was retyping
+`templates.json` instead of reading its exact bytes back into the deploy
+call, not the sign-off itself.*
+
 - `pnpm --filter @pam/db test` is the highest-value check in the repo. It is the
   only thing standing between a policy edit and a privacy breach.
 - The transparency screen is a promise to people with very little reason to

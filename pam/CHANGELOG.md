@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.24.2] — 2026-09-17 · Both new text messages signed off
+
+The approval and denial texts for a case-manager/program-lead request are
+reviewed and live. No text has actually gone anywhere yet — Twilio still
+isn't configured — but nothing is blocking either message from sending the
+moment it is.
+
 ## [0.24.1] — 2026-09-17 · Live
 
 Migrations 0054 through 0057 (the Everyone list's Requests screen, the
