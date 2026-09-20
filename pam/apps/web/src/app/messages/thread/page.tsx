@@ -142,7 +142,12 @@ function ThreadScreen() {
     return (
       <Page gap={4}>
         {header}
-        <DemoThreadLazy conversationId={conversationId} speechLanguage={speechLanguage} supportPhone={supportPhone} />
+        <DemoThreadLazy
+          conversationId={conversationId}
+          role={viewedRole ?? 'member'}
+          speechLanguage={speechLanguage}
+          supportPhone={supportPhone}
+        />
         <Text type="supporting" xstyle={styles.note}>
           {t('messages.thread.example.body')}
         </Text>

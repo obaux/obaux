@@ -33,6 +33,16 @@ when, and whether it has been looked at (D-178). A case manager sees
 reports about their own people only; a super admin sees all (migration
 `0065`).
 
+### Added — example conversations you can open from any example name
+
+While a super admin previews a role (or an account has nothing real yet),
+Messages shows a coherent set of example conversations — Jordan with his
+case manager Teresa and his program Sandra; Teresa with Jordan and Keisha;
+Sandra with Jordan and Miguel — the same messages from either side. Tapping
+any example name (a conversation row, a "Start a conversation" row, or
+"Message {name}" on an example person's profile) opens it in the chat
+screen, with a composer that sends nowhere real (D-183).
+
 ### Added — unread messages, in the app
 
 The Home Messages tile shows how many conversations have something new,

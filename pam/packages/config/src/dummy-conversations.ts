@@ -1,128 +1,206 @@
 import type { Role } from './index.js';
 
 /**
- * Example conversations and example people to message, for `/messages/`
- * while a super admin is previewing a role (D-172) or a real account's own
- * conversations are genuinely empty — the same "real always wins, silently"
- * rule `dummy-people.ts` set on 16 September, applied to messaging.
+ * Example conversations, for `/messages/` and `/messages/thread/` while a
+ * super admin is previewing a role (D-172, D-180, D-183) or a real
+ * account's own list is genuinely empty — the same "real always wins,
+ * silently" rule `dummy-people.ts` set on 16 September.
  *
- * Split into its own file rather than folded into `dummy-people.ts`, for the
- * same bundle-budget reason `dummy-notifications.ts` gives: nothing on Home
- * needs this, only `/messages/`, so nothing outside that route should pay to
+ * ## One cast, written once
+ *
+ * The people are `dummy-people.ts`'s: Jordan (`dummy-m1`), Keisha
+ * (`dummy-m2`) and Miguel (`dummy-m3`) are members; Teresa (`dummy-a1`) is
+ * the case manager; Sandra (`dummy-p1`) runs Example Learning Center — the
+ * same program the D-175 badge already puts on Jordan and Miguel. Four
+ * threads connect them, and each thread is written **once**, from the
+ * conversation's own point of view (`from: 'member' | 'staff'`), never per
+ * role. Whichever role is previewing, `dummyThreadFor()` flips `mine` for
+ * their side of it — so Teresa's conversation with Jordan seen as Teresa
+ * and seen as Jordan is the same eight messages, and cannot drift into two
+ * different stories (D-183).
+ *
+ * ## Ids carry the pair
+ *
+ * A conversation id is `dummy-conv-<memberId>-<staffId>`. The thread screen
+ * recognises the prefix (`isDummyConversationId`, the same shape `/place/`
+ * uses for `dummy-place-…`) and reads both names back out of the id — which
+ * is also what lets a "Start a conversation" row, or `/person/`'s "Message
+ * Aaliyah", open an example thread for a pair that has no written thread
+ * yet: an empty chat log and a composer, backed by the session-only store in
+ * `demoMessages.ts`. Nothing about a `dummy-conv-` id ever reaches
+ * `useThread`, `open_direct_conversation()` or `messages`.
+ *
+ * Split into its own file for the bundle-budget reason `dummy-notifications.ts`
+ * gives: nothing on Home needs this, so nothing outside `/messages/` should
  * download it.
- *
- * **These rows are never wired to a real action.** A conversation row opens
- * `/messages/thread/?id=dummy-conv-…`, which the thread screen recognises
- * (`isDummyConversationId`) and answers from `DUMMY_THREADS` below plus a
- * session-only demo store (`demoMessages.ts`) — never from `useThread`, never
- * calling `openConversation` or inserting a real message. The "Start a
- * conversation" rows have no `href` and no `onClick` at all. `/admin/`'s dummy `PersonRow`s
- * *are* tappable, because they only ever navigate to `/person/`, a read-only
- * demo page — nothing on that screen writes anything. Messaging is
- * different: its one real action (`openConversation`, then sending inside
- * the thread it creates) is a write under the caller's real, signed-in
- * account, and D-171 already settled that a super admin must never
- * originate a real message, full stop. A dummy row that *looked* tappable
- * and quietly called that RPC under whichever real account was doing the
- * previewing would be exactly the backdoor D-171 closed. See the file
- * comment in `apps/web/src/app/messages/page.tsx` for how this composes
- * with `viewedRole`.
  */
-
-export interface DummyConversation {
-  readonly id: string;
-  readonly otherFirstName: string;
-  readonly otherRole: Role;
-  readonly lastMessageAt: string;
-  readonly unread: boolean;
-}
 
 const hoursAgo = (n: number) => new Date(Date.now() - n * 3_600_000).toISOString();
-const daysAgo = (n: number) => new Date(Date.now() - n * 86_400_000).toISOString();
+const daysAgo = (n: number, hour = 10) =>
+  new Date(Date.now() - n * 86_400_000 - (10 - hour) * 3_600_000).toISOString();
 
-/** One example set per role that can message at all — member, admin, provider. Nothing for super_admin (D-171). */
-export const DUMMY_CONVERSATIONS: Readonly<Record<'member' | 'admin' | 'provider', readonly DummyConversation[]>> = {
-  member: [
-    { id: 'dummy-conv-1', otherFirstName: 'Teresa', otherRole: 'admin', lastMessageAt: hoursAgo(3), unread: true },
-    { id: 'dummy-conv-2', otherFirstName: 'Sandra', otherRole: 'provider', lastMessageAt: daysAgo(2), unread: false },
-  ],
-  admin: [
-    { id: 'dummy-conv-3', otherFirstName: 'Jordan', otherRole: 'member', lastMessageAt: hoursAgo(1), unread: true },
-    { id: 'dummy-conv-4', otherFirstName: 'Keisha', otherRole: 'member', lastMessageAt: daysAgo(1), unread: false },
-  ],
-  provider: [
-    { id: 'dummy-conv-5', otherFirstName: 'Miguel', otherRole: 'member', lastMessageAt: hoursAgo(5), unread: false },
-  ],
-};
-
-export interface DummyMessageablePerson {
-  readonly profileId: string;
-  readonly firstName: string;
-}
-
-/**
- * Who a previewed role's "Start a conversation" list shows. A member's list is
- * their own case manager and program (D-176) — the same two people their
- * example conversations already name, since in the real thing the list and
- * the conversations are the same relationships.
- */
-export const DUMMY_STARTABLE: Readonly<Record<'member' | 'admin' | 'provider', readonly DummyMessageablePerson[]>> = {
-  member: [
-    { profileId: 'dummy-start-4', firstName: 'Chris' },
-  ],
-  admin: [
-    { profileId: 'dummy-start-1', firstName: 'Aaliyah' },
-    { profileId: 'dummy-start-2', firstName: 'Devon' },
-  ],
-  provider: [{ profileId: 'dummy-start-3', firstName: 'Priya' }],
-};
+/** The side of a two-person conversation a message came from. */
+export type DummySide = 'member' | 'staff';
 
 export interface DummyThreadMessage {
   readonly id: string;
-  /** True when the previewed person said it; false for the other side. */
-  readonly mine: boolean;
+  readonly from: DummySide;
   readonly body: string;
   readonly at: string;
 }
 
-/**
- * What each example conversation holds, for the demo thread screen (D-180).
- * Written from the previewed role's own side — so `member`'s conversation
- * with Teresa reads with Teresa's lines as "theirs", and `admin`'s
- * conversation with Jordan reads with Jordan's lines as "theirs".
- */
-export const DUMMY_THREADS: Readonly<Record<string, readonly DummyThreadMessage[]>> = {
-  'dummy-conv-1': [
-    { id: 'dummy-msg-1a', mine: false, body: 'Hi Jordan — how did the first class go?', at: daysAgo(1) },
-    { id: 'dummy-msg-1b', mine: true, body: 'Good. The room was easy to find.', at: daysAgo(1) },
-    { id: 'dummy-msg-1c', mine: false, body: 'Great. Same time Thursday. Call me if the bus is late.', at: hoursAgo(3) },
-  ],
-  'dummy-conv-2': [
-    { id: 'dummy-msg-2a', mine: false, body: 'Your spot in the computer class is confirmed for Monday.', at: daysAgo(2) },
-    { id: 'dummy-msg-2b', mine: true, body: 'Thank you. What should I bring?', at: daysAgo(2) },
-  ],
-  'dummy-conv-3': [
-    { id: 'dummy-msg-3a', mine: true, body: 'Hi Jordan — checking in. How is the week going?', at: daysAgo(1) },
-    { id: 'dummy-msg-3b', mine: false, body: 'Going okay. I got to the class on time.', at: hoursAgo(1) },
-  ],
-  'dummy-conv-4': [
-    { id: 'dummy-msg-4a', mine: true, body: 'Keisha, the food pantry is open Saturdays now.', at: daysAgo(1) },
-  ],
-  'dummy-conv-5': [
-    { id: 'dummy-msg-5a', mine: false, body: 'Is the Tuesday session still on?', at: hoursAgo(6) },
-    { id: 'dummy-msg-5b', mine: true, body: 'Yes — 10am, ask for Sandra at the desk.', at: hoursAgo(5) },
-  ],
-};
+const CONVERSATION_PREFIX = 'dummy-conv-';
 
 export function isDummyConversationId(id: string): boolean {
-  return id.startsWith('dummy-conv-');
+  return id.startsWith(CONVERSATION_PREFIX);
 }
 
-/** The other person in an example conversation, by its id, for the thread title. */
-export function dummyConversationById(id: string): DummyConversation | null {
-  for (const rows of Object.values(DUMMY_CONVERSATIONS)) {
-    const hit = rows.find((c) => c.id === id);
-    if (hit) return hit;
-  }
-  return null;
+/** The example conversation between a member and a staff person, by their `DummyPerson.id`s. */
+export function dummyConversationIdBetween(memberId: string, staffId: string): string {
+  return `${CONVERSATION_PREFIX}${memberId}-${staffId}`;
 }
+
+/** The two `DummyPerson.id`s an example conversation id names, or null. */
+export function dummyConversationPair(id: string): { memberId: string; staffId: string } | null {
+  if (!isDummyConversationId(id)) return null;
+  // `dummy-m1-dummy-a1` — ids are `dummy-<letter><n>`, so split on the second `dummy-`.
+  const rest = id.slice(CONVERSATION_PREFIX.length);
+  const cut = rest.indexOf('-dummy-');
+  if (cut < 0) return null;
+  return { memberId: rest.slice(0, cut), staffId: rest.slice(cut + 1) };
+}
+
+function thread(pair: string, messages: readonly [DummySide, string, string][]): [string, DummyThreadMessage[]] {
+  return [
+    pair,
+    messages.map(([from, body, at], i) => ({ id: `${pair}-${i + 1}`, from, body, at })),
+  ];
+}
+
+/**
+ * The written threads. Newest message last; the newest is from the *other*
+ * side of whoever is more likely to be previewing, so a list has something
+ * unread to show. A missed session is handled kindly; nothing here names a
+ * conviction or a status — the dignity rules apply to examples too.
+ */
+export const DUMMY_THREADS: Readonly<Record<string, readonly DummyThreadMessage[]>> = Object.fromEntries([
+  // Jordan (member) and Teresa (case manager)
+  thread(dummyConversationIdBetween('dummy-m1', 'dummy-a1'), [
+    ['staff', 'Hi Jordan, it is Teresa. I put you down for the GED class at Example Learning Center. It starts Monday at 10.', daysAgo(6, 9)],
+    ['member', 'Thank you. Which bus goes there?', daysAgo(6, 12)],
+    ['staff', 'The 47 stops right outside. It runs every 15 minutes in the morning.', daysAgo(6, 12)],
+    ['member', 'Got it. I will be there.', daysAgo(5, 8)],
+    ['staff', 'How did Monday go?', daysAgo(4, 16)],
+    ['member', 'Good. The room was easy to find and the teacher is patient.', daysAgo(4, 18)],
+    ['staff', 'That is great to hear. Your ID appointment is Thursday at 2. Bring the letter I gave you.', daysAgo(2, 11)],
+    ['member', 'Thursday at 2. I have the letter.', daysAgo(2, 13)],
+    ['staff', 'One more thing: the class moved to room 12 this week. Same time.', hoursAgo(3)],
+  ]),
+  // Jordan (member) and Sandra (program: Example Learning Center)
+  thread(dummyConversationIdBetween('dummy-m1', 'dummy-p1'), [
+    ['staff', 'Hi Jordan, this is Sandra at Example Learning Center. Your spot in the GED class is confirmed.', daysAgo(5, 11)],
+    ['member', 'Thank you. What should I bring?', daysAgo(5, 14)],
+    ['staff', 'Just yourself. We have notebooks and pens. Ask for me at the front desk.', daysAgo(5, 14)],
+    ['member', 'I might be a few minutes late Wednesday. The bus was slow last time.', daysAgo(3, 8)],
+    ['staff', 'No problem at all. Come in quietly and take any seat.', daysAgo(3, 8)],
+    ['staff', 'We missed you Wednesday. Is everything okay?', daysAgo(1, 12)],
+    ['member', 'Sorry. My shift ran over. Can I still come Friday?', hoursAgo(20)],
+    ['staff', 'Of course. Friday at 10. See you then.', hoursAgo(19)],
+  ]),
+  // Keisha (member) and Teresa (case manager)
+  thread(dummyConversationIdBetween('dummy-m2', 'dummy-a1'), [
+    ['staff', 'Hi Keisha, it is Teresa. The food pantry on Broad Street is open Saturdays now, 9 to 1.', daysAgo(4, 10)],
+    ['member', 'Good to know. Do I need to sign up first?', daysAgo(4, 15)],
+    ['staff', 'No sign-up. Bring a bag if you have one.', daysAgo(4, 15)],
+    ['member', 'I went Saturday. They were kind. Thank you.', daysAgo(2, 14)],
+    ['staff', 'I am glad. Do you still want help with the computer class?', daysAgo(1, 9)],
+    ['member', 'Yes. Evenings are better for me.', hoursAgo(5)],
+  ]),
+  // Miguel (member) and Sandra (program: Example Learning Center)
+  thread(dummyConversationIdBetween('dummy-m3', 'dummy-p1'), [
+    ['member', 'Hi. Is the Tuesday session still on?', daysAgo(3, 9)],
+    ['staff', 'Yes. 10 in the morning, room 8. Ask for Sandra at the desk.', daysAgo(3, 9)],
+    ['member', 'Thank you. I will be there.', daysAgo(3, 10)],
+    ['staff', 'You did well today. Same time next week.', daysAgo(2, 12)],
+    ['member', 'Can we start at 10:30 next time? My bus gets in late.', hoursAgo(26)],
+    ['staff', 'Yes, 10:30 works. I will save you a seat.', hoursAgo(25)],
+  ]),
+]);
+
+/**
+ * What a preview of `role` is looking at: the example conversations that
+ * belong to "you" — `DUMMY_SELF` in `dummy-people.ts`: Jordan for a member,
+ * Teresa for a case manager, Sandra for a program (D-183).
+ */
+export const DUMMY_SELF_ID: Readonly<Record<'member' | 'admin' | 'provider', string>> = {
+  member: 'dummy-m1',
+  admin: 'dummy-a1',
+  provider: 'dummy-p1',
+};
+
+/** Which side of a conversation `role` sits on. */
+export function dummySideFor(role: Role): DummySide {
+  return role === 'member' ? 'member' : 'staff';
+}
+
+/** An example thread as `role` would read it — the written messages with `mine` flipped for their side. */
+export function dummyThreadFor(
+  conversationId: string,
+  role: Role,
+): readonly { id: string; body: string; at: string; mine: boolean }[] {
+  const side = dummySideFor(role);
+  return (DUMMY_THREADS[conversationId] ?? []).map((m) => ({
+    id: m.id,
+    body: m.body,
+    at: m.at,
+    mine: m.from === side,
+  }));
+}
+
+export interface DummyConversation {
+  readonly id: string;
+  /** The other person's `DummyPerson.id`. */
+  readonly otherId: string;
+  readonly lastMessageAt: string | null;
+  /** The newest message is from the other side, unread for this viewer. */
+  readonly unread: boolean;
+  readonly preview: { readonly body: string; readonly mine: boolean } | null;
+}
+
+/** The example conversation list for a preview of `role`, newest first (D-183). */
+export function dummyConversationsFor(role: 'member' | 'admin' | 'provider'): readonly DummyConversation[] {
+  const self = DUMMY_SELF_ID[role];
+  const side = dummySideFor(role);
+  return Object.entries(DUMMY_THREADS)
+    .map(([id, messages]) => {
+      const pair = dummyConversationPair(id);
+      if (!pair) return null;
+      const otherId = side === 'member' ? pair.staffId : pair.memberId;
+      const selfId = side === 'member' ? pair.memberId : pair.staffId;
+      if (selfId !== self) return null;
+      const last = messages[messages.length - 1] ?? null;
+      return {
+        id,
+        otherId,
+        lastMessageAt: last?.at ?? null,
+        unread: last !== null && last.from !== side,
+        preview: last ? { body: last.body, mine: last.from === side } : null,
+      };
+    })
+    .filter((c): c is DummyConversation => c !== null)
+    .sort((a, b) => (b.lastMessageAt ?? '').localeCompare(a.lastMessageAt ?? ''));
+}
+
+/**
+ * Who a preview of `role` could *start* a conversation with — people on
+ * their example list who have no thread yet. A case manager's caseload
+ * beyond the two she is already talking to; a program's other enrolled
+ * member. A member (Jordan) already has both of his people in the list
+ * above, so his is empty — which is also the real rule: a member's staff
+ * are exactly the people already in their conversations.
+ */
+export const DUMMY_STARTABLE: Readonly<Record<'member' | 'admin' | 'provider', readonly string[]>> = {
+  member: [],
+  admin: ['dummy-m4', 'dummy-m5'],
+  provider: ['dummy-m6'],
+};

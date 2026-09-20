@@ -3679,6 +3679,55 @@ SMS queue: `notify()` writes only to `notifications`, and
 functions; `05_messenger_test.sql` asserts the queue is unchanged by a
 message. The trigger function is revoked from every role (0041, 0058).
 
+### D-183 — One cast of example conversations, written once and mirrored; every dummy name leads into the example chat (supersedes D-173's compose box)
+
+Will (20 September): "Create dummy data for conversations between program
+and member, between case manager and member, and between member and
+programs and case managers. When I click on their names, I want to see the
+conversation example in the Chat UI."
+
+**The data.** `dummy-conversations.ts` now holds four threads for one cast
+drawn from `dummy-people.ts`: Jordan ↔ Teresa (case manager), Jordan ↔
+Sandra (Example Learning Center — the program the D-175 badge already puts
+on him), Keisha ↔ Teresa, Miguel ↔ Sandra (Miguel's badge moved to the same
+program so the cast is coherent). Six to nine messages each, over a week —
+a bus line, a room change, an ID appointment, pantry hours, a missed
+session handled kindly — with the newest from the other side so a list has
+something unread. Each thread is written **once**, per message as
+`from: 'member' | 'staff'`; `dummyThreadFor(id, role)` flips `mine` for
+whichever side is previewing, and `dummyConversationsFor(role)` derives
+the list (unread, preview, order) from the same rows. The member preview
+of Jordan's chat with Teresa and the case-manager preview of Teresa's chat
+with Jordan are therefore the same messages by construction — there is no
+second copy to drift. Bodies stay English like every other dummy body;
+only UI chrome goes through i18n.
+
+**The ids carry the pair**: `dummy-conv-<memberId>-<staffId>`. The thread
+screen reads both names back out of the id, which is what makes an *empty*
+example thread possible: a "Start a conversation" row for Aaliyah, or
+`/person/`'s "Message Aaliyah", opens a chat log with no history and a
+composer, and what gets typed there lives in the session-only store keyed
+by that id (`demoMessages.ts`). Nothing with a `dummy-conv-` prefix is
+ever handed to `useThread` or `open_direct_conversation()`; D-172's
+guarantee holds by construction rather than by a list of exceptions.
+
+**Where taps go.** `/messages/` example rows and example "Start a
+conversation" rows → the example thread (rows there are tappable now,
+where D-172 had left the start rows inert because there was nothing safe
+to open). `/admin/` caseload rows, `/interested/` rows and Home's people
+strip already open `/person/` for a dummy person (stretched link, one
+target per row) — `/person/` gained a secondary "Message {name}" button
+that opens the pair's example thread for the previewed staff role. That
+button replaces D-173's compose box: one place to demo-send, and it is the
+chat itself, so D-173's per-role message store and the row override it fed
+are removed. Real people keep the real flow (`open_direct_conversation()`,
+once deployed); a real person never gets a `dummy-conv-` id.
+
+**Previews match the pairings.** `DUMMY_SELF_ID` (Jordan, Teresa, Sandra)
+is what each role's preview "is", the same people `DUMMY_SELF` names on
+`/account/`. A member preview's start list is empty on purpose — Jordan's
+two staff are already in his conversations, which is also the real rule.
+
 ---
 
 ## Notes for whoever picks this up next

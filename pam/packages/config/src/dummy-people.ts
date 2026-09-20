@@ -117,7 +117,7 @@ export const DUMMY_MEMBERS: readonly DummyPerson[] = [
     lastActiveAt: daysAgo(3),
     language: 'es',
     points: 50,
-    program: { name: 'Example Food Pantry', serviceId: 'dummy-place-food' },
+    program: { name: 'Example Learning Center', serviceId: 'dummy-place-learning' },
   },
   {
     id: 'dummy-m4',

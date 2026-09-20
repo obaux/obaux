@@ -57,7 +57,18 @@ as a chat log, sending, reporting, the example thread sending nowhere, and
 - `reportMessage.ts`, `MESSAGE_REPORT_REASONS` in `@pam/config`, 35 new
   locale keys in en and es.
 
-Decisions: D-176 through D-182.
+**Same day, follow-up from Will (D-183):** the example conversations were
+thin and the two sides did not mirror. `dummy-conversations.ts` rewritten
+around one cast (Jordan/Keisha/Miguel ↔ Teresa/Sandra), four threads of 6–9
+messages written once with `from: member|staff` and flipped per previewed
+role; ids carry the pair (`dummy-conv-<member>-<staff>`) so empty example
+threads exist for pairs with no history. Every example name now opens the
+example chat: `/messages/` rows and start rows, and `/person/`'s new
+"Message {name}" button (which replaces D-173's compose box; D-173's
+per-role store removed from `demoMessages.ts`). `/admin/`, `/interested/`
+and Home's strip already reach `/person/`. Two new e2e tests.
+
+Decisions: D-176 through D-183.
 
 ## What was wrong, and what missed it
 
@@ -108,6 +119,8 @@ touched that the check covers, so the next one runs them first.
 - D-181 — Astryx Chat on the thread route only.
 - D-182 — unread count on the tile (a number, for once) and a bell row per
   message, never a text.
+- D-183 — one cast of mirrored example conversations; every example name
+  opens the example chat; supersedes D-173's compose box.
 
 ## Verified
 
@@ -118,8 +131,8 @@ touched that the check covers, so the next one runs them first.
 | `pnpm --filter @pam/ui test` | 65 pass |
 | `pnpm --filter @pam/db test` | **272 checks pass, 0 failures** (was 235) — migrations `0001`–`0065` plus the new `05_messenger_test.sql` |
 | `pnpm --filter @pam/web build` | 25 routes + `/reports/`, static export |
-| `node scripts/check-bundle-budget.mjs` | 504.7 kB gz on `/` (was 503.6; +1.1 kB, locale strings + `Badge`). Shared first load unchanged at 349 kB. The Chat chunk (217 kB raw) is in no route's first load; `/messages/thread` first load 497 kB |
-| Playwright a11y (full suite, `PLAYWRIGHT_CHROMIUM_PATH=/opt/pw-browsers/chromium-1194/chrome-linux/chrome`) | **450 pass, 0 failures** — 426 from before plus the 24 (8 × 3 projects) in the new `e2e/messages.spec.ts`; axe clean on the thread, the example thread and `/reports/` at 320px, dark and iPhone SE |
+| `node scripts/check-bundle-budget.mjs` | 504.6 kB gz on `/` (was 503.6; +1.0 kB, locale strings + `Badge`). Shared first load unchanged at 349 kB. The Chat chunk (217 kB raw) and the example threads are in no route's shared first load; `/messages/thread` first load 497 kB |
+| Playwright a11y (full suite, `PLAYWRIGHT_CHROMIUM_PATH=/opt/pw-browsers/chromium-1194/chrome-linux/chrome`) | **456 pass, 0 failures** — 426 from before plus 30 (10 × 3 projects) in the new `e2e/messages.spec.ts`; axe clean on the thread, the example thread and `/reports/` at 320px, dark and iPhone SE |
 
 ## Left undone
 

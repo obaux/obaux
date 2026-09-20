@@ -129,7 +129,9 @@ test.describe('the conversation list', () => {
 
     await expect(page.getByRole('heading', { name: 'Teresa' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Message your case manager or program' })).toBeVisible();
-    await expect(page.getByText(/Example people/)).toHaveCount(2);
+    await expect(page.getByText(/Example people/)).toHaveCount(1);
+    // Jordan's two people are already in his conversations; the list says so.
+    await expect(page.getByText('People on your list will show up here.')).toBeVisible();
   });
 });
 
@@ -184,11 +186,13 @@ test.describe('a conversation', () => {
       realWrites += 1;
       return route.fulfill(json([]));
     });
-    await page.goto('/messages/thread/?id=dummy-conv-1');
+    await page.goto('/messages/thread/?id=dummy-conv-dummy-m1-dummy-a1');
     await settled(page);
 
     await expect(page.getByRole('heading', { name: 'Teresa', level: 1 })).toBeVisible();
     await expect(page.getByRole('log')).toBeVisible();
+    // The same thread Teresa's own preview reads, from Jordan's side (D-183).
+    await expect(page.getByRole('log').getByText(/room 12/)).toBeVisible();
     await expect(page.getByText(/example conversation/)).toBeVisible();
     // Nothing to report in an example: a report has real recipients.
     await expect(page.getByRole('button', { name: 'Report' })).toHaveCount(0);
@@ -200,6 +204,32 @@ test.describe('a conversation', () => {
 
     const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
     expect(results.violations).toEqual([]);
+  });
+});
+
+test.describe('an example person', () => {
+  test('a case manager preview can message a member from their profile, into an example chat', async ({ page }) => {
+    await page.addInitScript(() => sessionStorage.setItem('pam.view-as', 'admin'));
+    await signedInAs(page, 'super_admin');
+    await page.goto('/person/?id=dummy-m4');
+    await settled(page);
+
+    await page.getByRole('link', { name: 'Message Aaliyah' }).click();
+    await expect(page.getByRole('heading', { name: 'Aaliyah', level: 1 })).toBeVisible();
+    // No written thread for this pair: an empty log and a composer.
+    await expect(page.getByText('Nothing here yet. Say hello.')).toBeVisible();
+    await page.getByRole('textbox').fill('Hi Aaliyah, it is Teresa.');
+    await page.getByRole('button', { name: /send/i }).click();
+    await expect(page.getByRole('log').getByText('Hi Aaliyah, it is Teresa.')).toBeVisible();
+  });
+
+  test('the staff side of a conversation is the member side, flipped', async ({ page }) => {
+    await page.addInitScript(() => sessionStorage.setItem('pam.view-as', 'admin'));
+    await signedInAs(page, 'super_admin');
+    await page.goto('/messages/');
+    await settled(page);
+    await expect(page.getByRole('heading', { name: 'Jordan' })).toBeVisible();
+    await expect(page.getByText('You: One more thing: the class moved to room 12 this week. Same time.')).toBeVisible();
   });
 });
 
