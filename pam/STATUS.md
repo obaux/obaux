@@ -142,7 +142,10 @@ the case manager assigned to the sender or the reporter (`0065`, which
 also narrows a policy that had let every case manager in every region read
 every report). A new message lights the recipient's bell and the Home tile
 shows an unread count; nothing about messages ever queues a text (`0064`).
-**`0063`–`0065` are local only — not deployed** (Will reviews and deploys).
+**`0063`–`0065` are deployed** (Will, 20 September: merged to `main` and
+applied to the live project after a `list_migrations` check; `get_advisors`
+clean — `can_message()`/`notify_on_message()` are not callable by any role,
+the four new RPCs by `authenticated` only).
 Example conversations are one mirrored cast, and every example name — a
 conversation row, a start row, "Message {name}" on `/person/` — opens the
 example chat (D-183). DB suite: 272 checks pass. Session log:
@@ -179,8 +182,10 @@ going — without help?*
 ## What is live
 
 **Supabase project `pam`** — `shobqzuhicoiymtumiaz`, us-east-1 (closest region to
-Philadelphia). The database is real and reachable; the app is not deployed
-anywhere yet.
+Philadelphia). The database is real and reachable. **The web app is deployed
+on Vercel** (project `web`, auto-deploys from `main`):
+https://web-will-3199s-projects.vercel.app — production is `main` at `c0a6334`
+as of 20 September.
 
 **The "six unknown live migrations" this repo could not explain are now
 explained: they were the other concurrent PAM session's own committed
@@ -196,14 +201,14 @@ etc. — a cosmetic mismatch, not a functional one, since Supabase tracks
 migrations by timestamp, not the filename's number prefix — see D-169's
 addendum).
 
-**One real gap is still unreconciled, and this merge did not resolve it:**
-committed local migration `0052_saved_places_say_what_they_are.sql` does
-**not** appear in the live migration ledger at all. This is a genuine
-local-vs-live deployment gap, not a file-numbering collision — merging the
-two sessions' repos together cannot fix a migration nobody has deployed.
-Check `mcp__Supabase__list_migrations` against `packages/db/migrations/`
-before assuming this has been resolved, and see D-169/D-170 for what has
-and has not been checked so far.
+**The `0052` gap is closed.** `0052_saved_places_say_what_they_are.sql` sat
+committed but undeployed from 16 to 20 September — a genuine local-vs-live
+gap, not a numbering collision. Applied on 20 September together with
+`0063`–`0065`, after a `list_migrations` check found no new live-only drift.
+As of that check, every file in `packages/db/migrations/` is on the live
+project (this session's `0060`–`0062` under their deploy-time names — D-169
+addendum). Keep running the check before any deploy; it is what found the
+gap in the first place.
 
 **The text-message dispatcher is live, running, and sending for real (17
 September).** The `dispatch-sms` function is deployed and a database schedule
@@ -516,7 +521,7 @@ while the copy is unsigned, so it earned the first live test, not the last.*
 | 21 | ~~Can a super admin send messages?~~ **Confirmed: no (D-171)** | — | A super admin gets no "Messages" tile and `/messages/` reads "not for your role" for that account — this is correct, confirmed by Will, not a bug. Testing on the live deployment also found the live database has **zero `admin` and zero `provider` accounts** — only Will's `super_admin` and two plain members — so the caseload/enrollment messaging paths need a real case-manager or program-admin account (invite-created, with an actual caseload assignment or enrollment) before `/messages/`'s "Start a conversation" section will show anyone. |
 | 22 | ~~Messaging never appeared during a role preview~~ **Fixed (D-172)** | — | Was gating `canMessage`/`isStaff` and the Home tile on the real role only, so a preview never showed them for any role — a bug, not the restriction D-171 actually called for. Now gates visibility on `viewedRole`, matching `/admin/`/`/directory/`/`/interested/`; real data/writes still only ever follow `trueRole`. |
 | 23 | ~~Run the Playwright a11y suite against this session's changes~~ **Done 20 September** with `PLAYWRIGHT_CHROMIUM_PATH=/opt/pw-browsers/chromium-1194/chrome-linux/chrome` | Confidence in the new `DummyConversations`/`DummyStartable`/`DemoMessageComposer`/`ProgramBadge` UI | Could not run in this sandbox: `playwright install` fails downloading `chromium_headless_shell` (`cdn.playwright.dev` blocked by the agent proxy — a network-policy gap, not a missing-package one the way `postgis` was). The 426-pass figure in "What is proven" predates this session's changes. |
-| 24 | **Deploy `0063`, `0064`, `0065`** | The messenger's database rules, bell rows and report audience | Local only, deliberately. Run `mcp__Supabase__list_migrations` first (`0052` is still undeployed), then `get_advisors`. Until deployed, the live `open_direct_conversation()`/`messageable_people()`/`reports_for_review()` RPCs do not exist and `/messages/` will show an error on the start list. |
+| 24 | ~~Deploy `0063`, `0064`, `0065`~~ **Done, with `0052` (Will, 20 September)** | — | `list_migrations` checked first: no new live-only drift since the 17th. All four applied in order; `get_advisors` (security) clean. `0052` closes the saved-places gap that had been open since the 16th. The live ledger records this session's earlier three under their deploy-time names (`0054_…`–`0056_…`, D-169 addendum) and these four under their real names. |
 | 25 | **D-178's audience** | Who reads a reported message | The reporter's case manager is included alongside the sender's. Say if it should be the sender's only. |
 
 ---
