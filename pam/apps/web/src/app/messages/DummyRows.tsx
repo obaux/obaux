@@ -8,7 +8,7 @@ import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { Badge } from '@astryxdesign/core/Badge';
 import { Avatar } from '@astryxdesign/core/Avatar';
-import { DUMMY_CONVERSATIONS, DUMMY_STARTABLE } from '@pam/config/dummy-conversations';
+import { DUMMY_CONVERSATIONS, DUMMY_STARTABLE, DUMMY_THREADS } from '@pam/config/dummy-conversations';
 import { useI18n } from '@/lib/i18n';
 import { whenHappened } from '@/lib/when';
 import { useDemoMessages } from '@/lib/demoMessages';
@@ -18,16 +18,19 @@ import { useDemoMessages } from '@/lib/demoMessages';
  * `/messages/` shows a super admin previewing a role, or a real account whose
  * own real list is genuinely empty (D-172).
  *
- * **Nothing here is tappable, on purpose.** `/admin/`'s dummy `PersonRow`s
- * link to `/person/`, a read-only demo page, so tapping one is safe under any
- * identity. A real row on `/messages/` is different: tapping it calls
- * `openConversation`, a real write under the caller's own signed-in account.
- * D-171 already settled that a super admin must never originate a real
- * message, previewing or not — so these rows render as plain `Card`s with no
- * `href` and no `onClick`, not because nothing *could* be built for a fake
- * thread, but so that a real RPC call can never reach a super admin's real
- * account through this screen, now or after some later edit. See the file
- * comment in `../../../../packages/config/src/dummy-conversations.ts`.
+ * **An example conversation row opens an example thread** (D-180):
+ * `/messages/thread/?id=dummy-conv-…`, which that screen recognises and
+ * answers from `DUMMY_THREADS` and a session-only store — the same
+ * `ThreadView` as a real thread, never `useThread`, never a real insert.
+ * That is the demo-safe path `dummy-places.ts` already established for
+ * `/place/?id=dummy-place-…`, applied to messaging.
+ *
+ * **The "Start a conversation" rows stay non-interactive, on purpose**
+ * (D-172). A real row there calls `openConversation`, a real write under
+ * the caller's own signed-in account, and D-171 settled that a super admin
+ * must never originate a real message, previewing or not — so these render
+ * as plain `Card`s with no `href` and no `onClick`. See the file comment in
+ * `../../../../packages/config/src/dummy-conversations.ts`.
  *
  * Loaded only through `DummyRowsLazy` (`next/dynamic`), the same reasoning
  * `SavedStripLazy` and `HomePeoplePreviewLazy` give: this renders during a
@@ -36,11 +39,33 @@ import { useDemoMessages } from '@/lib/demoMessages';
  */
 
 const styles = stylex.create({
-  row: { width: '100%' },
+  row: { width: '100%', position: 'relative' },
   name: { fontSize: '20px', lineHeight: 1.3 },
   meta: { fontSize: '16px' },
+  preview: {
+    fontSize: '16px',
+    lineHeight: 1.4,
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+  },
   note: { fontSize: '15px', lineHeight: 1.5 },
+  // Stretched-link, the same as `PersonRow`: the heading is a real anchor
+  // widened over the whole card, so the card is one target.
+  link: {
+    color: 'inherit',
+    textDecoration: 'none',
+    '::after': { content: '""', position: 'absolute', inset: 0 },
+  },
 });
+
+/** The last line of the example thread behind a row — the same preview a real row gets (D-179). */
+function lastLine(conversationId: string, t: (key: string, vars?: Record<string, string | number>) => string): string {
+  const thread = DUMMY_THREADS[conversationId] ?? [];
+  const last = thread[thread.length - 1];
+  if (!last) return t('messages.preview.none');
+  return last.mine ? t('messages.preview.you', { text: last.body }) : last.body;
+}
 
 export function DummyConversations({ role }: { readonly role: 'member' | 'admin' | 'provider' }) {
   const { t, locale } = useI18n();
@@ -69,7 +94,9 @@ export function DummyConversations({ role }: { readonly role: 'member' | 'admin'
             <HStack gap={3} align="center">
               <Avatar size="lg" name={c.otherFirstName} />
               <Heading level={3} xstyle={styles.name}>
-                {c.otherFirstName}
+                <a href={`/messages/thread/?id=${encodeURIComponent(c.id)}`} {...stylex.props(styles.link)}>
+                  {c.otherFirstName}
+                </a>
               </Heading>
             </HStack>
             <HStack gap={2} wrap="wrap" align="center">
@@ -79,11 +106,9 @@ export function DummyConversations({ role }: { readonly role: 'member' | 'admin'
                 {whenHappened(c.lastMessageAt, locale, t)}
               </Text>
             </HStack>
-            {'previewText' in c ? (
-              <Text type="supporting" xstyle={styles.meta}>
-                {c.previewText}
-              </Text>
-            ) : null}
+            <Text type="supporting" xstyle={styles.preview}>
+              {'previewText' in c ? c.previewText : lastLine(c.id, t)}
+            </Text>
           </VStack>
         </Card>
       ))}
@@ -94,7 +119,7 @@ export function DummyConversations({ role }: { readonly role: 'member' | 'admin'
   );
 }
 
-export function DummyStartable({ role }: { readonly role: 'admin' | 'provider' }) {
+export function DummyStartable({ role }: { readonly role: 'member' | 'admin' | 'provider' }) {
   const { t } = useI18n();
   const rows = DUMMY_STARTABLE[role];
 

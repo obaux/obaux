@@ -1,68 +1,55 @@
 'use client';
 
-import { Suspense, useState } from 'react';
+import { Suspense, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import * as stylex from '@stylexjs/stylex';
-import { VStack } from '@astryxdesign/core/VStack';
-import { HStack } from '@astryxdesign/core/HStack';
-import { Card } from '@astryxdesign/core/Card';
 import { Text } from '@astryxdesign/core/Text';
-import { TextArea } from '@astryxdesign/core/TextArea';
-import { AppHeader, BigButton, HelpBar, Loading, Notice, Page, PageTitle } from '@pam/ui';
-import { NOTICES } from '@pam/config';
+import { AppHeader, HelpBar, Loading, Notice, Page, PageTitle } from '@pam/ui';
+import { NOTICES, type MessageReportReason } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { NotIn } from '../../NotIn';
 import { HeaderBell } from '../../HeaderBell';
+import { RoleSwitchControl } from '../../RoleSwitchControl';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
-import { useThread, type ThreadMessage } from '@/lib/useThread';
-import { whenHappened } from '@/lib/when';
+import { useRoleView } from '@/lib/useViewedRole';
+import { useThread } from '@/lib/useThread';
+import { reportMessage } from '@/lib/reportMessage';
+import { ThreadViewLazy } from '../ThreadViewLazy';
+import { DemoThreadLazy } from '../DemoThreadLazy';
 
 /**
  * One conversation — read what has been said, and send the next thing.
  *
- * Messaging is staff-to-member (D-152): a member, their case manager, or
- * their program admin can all land here, and all three read this screen the
- * same way — `useThread` checks conversation *membership*, never role. A
- * case manager who is themselves a participant reads the full history the
- * ordinary way any conversation member does (§4.1's transparency contract now
- * says so explicitly — `transparency.canSee.directMessages`). What has not
- * changed is D-074: a case manager who is *not* in a conversation still has
- * no route into it except a report, because there is still no `admin_covers`
- * policy on `messages` anywhere — this screen only ever renders what
+ * Messaging is staff-to-member (D-163, D-176): a member, their case manager,
+ * or their program admin can all land here, and all three read this screen
+ * the same way — `useThread` checks conversation *membership*, never role.
+ * A case manager who is themselves a participant reads the full history the
+ * ordinary way any conversation member does (§4.1's transparency contract
+ * says so — `transparency.canSee.directMessages`). What has not changed is
+ * D-074: a case manager who is *not* in a conversation still has no route
+ * into it except a report, because there is still no `admin_covers` policy
+ * on `messages` anywhere — this screen only ever renders what
  * `in_conversation()` already allows.
  *
- * One primary action: `Send`. Nothing else on this screen is a `BigButton`.
+ * Drawn with Astryx's Chat family through `ThreadView` (D-181). One primary
+ * action: the send button. Reporting a message (D-177) is a secondary action
+ * on the other person's messages, inside `ThreadView`.
+ *
+ * **An example conversation** (`?id=dummy-conv-…`, D-180) — what a super
+ * admin's role preview opens from `/messages/`'s example rows — renders
+ * through `DemoThreadLazy` instead: the same `ThreadView`, fed from
+ * `DUMMY_THREADS` and a session-only store, never from `useThread`, never
+ * inserting a real row. Gated on the previewed role, the way `/messages/`
+ * itself is (D-172); a real thread is gated on the real one.
  */
 
 const styles = stylex.create({
-  intro: { fontSize: '18px', lineHeight: 1.5 },
-  thread: { width: '100%' },
-  bubble: { maxWidth: '82%', width: 'auto' },
-  bubbleWrap: { width: '100%' },
-  body: { fontSize: '17px', lineHeight: 1.4, whiteSpace: 'pre-wrap' },
-  time: { fontSize: '13px' },
-  empty: { fontSize: '17px', lineHeight: 1.5 },
-  compose: { width: '100%' },
+  note: { fontSize: '15px', lineHeight: 1.5 },
 });
 
-function MessageBubble({ message, locale, t }: {
-  readonly message: ThreadMessage;
-  readonly locale: string;
-  readonly t: (key: string, vars?: Record<string, string | number>) => string;
-}) {
-  return (
-    <HStack justify={message.mine ? 'end' : 'start'} wrap="nowrap" xstyle={styles.bubbleWrap}>
-      <Card variant={message.mine ? 'blue' : 'muted'} padding={3} xstyle={styles.bubble}>
-        <VStack gap={1}>
-          <Text xstyle={styles.body}>{message.body}</Text>
-          <Text type="supporting" xstyle={styles.time}>
-            {whenHappened(message.createdAt, locale, t)}
-          </Text>
-        </VStack>
-      </Card>
-    </HStack>
-  );
+function isDummyId(id: string | null): boolean {
+  return id !== null && id.startsWith('dummy-conv-');
 }
 
 function ThreadScreen() {
@@ -71,20 +58,25 @@ function ThreadScreen() {
   const { state: session } = useSession();
   const params = useSearchParams();
   const conversationId = params.get('id');
+  const demo = isDummyId(conversationId);
 
   const signedIn = session.status === 'signed-in';
-  const canMessage =
-    signedIn &&
-    (session.session.role === 'member' ||
-      session.session.role === 'admin' ||
-      session.session.role === 'provider');
-  const { state, send, sending, sendFailed } = useThread(canMessage ? conversationId : null);
-  const [draft, setDraft] = useState('');
+  const trueRole = session.status === 'signed-in' ? session.session.role : null;
+  const { viewedRole, setViewAs } = useRoleView(trueRole);
+  const realCanMessage = trueRole === 'member' || trueRole === 'admin' || trueRole === 'provider';
+  const viewedCanMessage = viewedRole === 'member' || viewedRole === 'admin' || viewedRole === 'provider';
+  // A real thread runs as the real account (D-171); an example thread is
+  // drawn for whichever role is being previewed and touches nothing real.
+  const canMessage = demo ? viewedCanMessage : realCanMessage;
 
-  const submit = async () => {
-    const ok = await send(draft);
-    if (ok) setDraft('');
-  };
+  const { state, send, sending, sendFailed } = useThread(signedIn && realCanMessage && !demo ? conversationId : null);
+
+  const report = useCallback(
+    (messageId: string, reason: MessageReportReason) => reportMessage(messageId, reason),
+    [],
+  );
+
+  const speechLanguage = locale === 'es' ? 'es-US' : 'en-US';
 
   if (session.status === 'loading') {
     return (
@@ -122,10 +114,18 @@ function ThreadScreen() {
     );
   }
 
+  const header = (
+    <AppHeader
+      roleLabel={t(`role.${viewedRole}`)}
+      roleControl={<RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} />}
+      trailing={<HeaderBell enabled={signedIn} role={viewedRole} />}
+    />
+  );
+
   if (!canMessage) {
     return (
       <Page gap={4}>
-        <AppHeader trailing={<HeaderBell enabled={signedIn} role={session.session.role} />} />
+        {header}
         <PageTitle title={t('messages.title')} backHref="/messages/" backLabel={t('nav.back.messages')} />
         <Notice
           notice="no_mentors_found"
@@ -138,11 +138,24 @@ function ThreadScreen() {
     );
   }
 
+  if (demo && conversationId) {
+    return (
+      <Page gap={4}>
+        {header}
+        <DemoThreadLazy conversationId={conversationId} speechLanguage={speechLanguage} supportPhone={supportPhone} />
+        <Text type="supporting" xstyle={styles.note}>
+          {t('messages.thread.example.body')}
+        </Text>
+        <HelpBar label={t('nav.help')} variant="block" />
+      </Page>
+    );
+  }
+
   const title = state.status === 'ready' ? (state.otherName ?? t('messages.thread.someone')) : t('messages.title');
 
   return (
     <Page gap={4}>
-      <AppHeader trailing={<HeaderBell enabled={signedIn} role={session.session.role} />} />
+      {header}
       <PageTitle title={title} backHref="/messages/" backLabel={t('nav.back.messages')} />
 
       {state.status === 'loading' ? <Loading label={t('common.loading')} variant="inline" /> : null}
@@ -168,46 +181,16 @@ function ThreadScreen() {
       ) : null}
 
       {state.status === 'ready' ? (
-        <>
-          <VStack gap={3} xstyle={styles.thread}>
-            {state.messages.length === 0 ? (
-              <Text type="supporting" xstyle={styles.empty}>
-                {t('messages.thread.empty')}
-              </Text>
-            ) : (
-              state.messages.map((message) => (
-                <MessageBubble key={message.id} message={message} locale={locale} t={t} />
-              ))
-            )}
-          </VStack>
-
-          {sendFailed ? (
-            <Notice
-              notice="something_went_wrong"
-              title={t('messages.thread.failed.title')}
-              body={t('messages.thread.failed.body')}
-              supportPhone={supportPhone}
-              callLabel={t('help.callSupport')}
-            />
-          ) : null}
-
-          <TextArea
-            label={t('messages.thread.placeholder')}
-            isLabelHidden
-            placeholder={t('messages.thread.placeholder')}
-            value={draft}
-            onChange={(next) => setDraft(next)}
-            rows={2}
-            width="100%"
-            xstyle={styles.compose}
-          />
-
-          <BigButton
-            label={sending ? t('messages.thread.sending') : t('messages.thread.send')}
-            onPress={() => void submit()}
-            isDisabled={sending || draft.trim() === ''}
-          />
-        </>
+        <ThreadViewLazy
+          messages={state.messages}
+          otherName={state.otherName}
+          onSend={send}
+          sending={sending}
+          sendFailed={sendFailed}
+          onReport={report}
+          speechLanguage={speechLanguage}
+          supportPhone={supportPhone}
+        />
       ) : null}
 
       <HelpBar label={t('nav.help')} variant="block" />

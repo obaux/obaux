@@ -6,6 +6,7 @@ import { ClickableCard } from '@astryxdesign/core/ClickableCard';
 import { HStack } from '@astryxdesign/core/HStack';
 import { VStack } from '@astryxdesign/core/VStack';
 import { Text } from '@astryxdesign/core/Text';
+import { Badge } from '@astryxdesign/core/Badge';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { Press } from './motion.js';
 import { pam } from './tokens.stylex.js';
@@ -44,6 +45,14 @@ export interface NavTileProps {
    * accessible name. Omit when nothing is waiting.
    */
   readonly alertLabel?: string;
+  /**
+   * How many things are waiting behind this tile, when the number itself is
+   * what somebody acts on — unread messages (D-182). Drawn as an Astryx
+   * `Badge` (counts are what a Badge is for) and added to the tile's
+   * accessible name through `alertLabel`, which the caller still supplies so
+   * the words stay translated. Omit when nothing is waiting.
+   */
+  readonly count?: number;
 }
 
 const styles = stylex.create({
@@ -72,7 +81,7 @@ const styles = stylex.create({
   description: { fontSize: '15px', lineHeight: 1.4 },
 });
 
-export function NavTile({ href, label, description, icon, alertLabel }: NavTileProps) {
+export function NavTile({ href, label, description, icon, alertLabel, count }: NavTileProps) {
   return (
     <Press>
     <ClickableCard
@@ -91,7 +100,13 @@ export function NavTile({ href, label, description, icon, alertLabel }: NavTileP
             {description}
           </Text>
         </VStack>
-        {alertLabel ? <span aria-hidden="true" {...stylex.props(styles.dot)} /> : null}
+        {count !== undefined && count > 0 ? (
+          <span aria-hidden="true">
+            <Badge variant="info" label={String(count)} />
+          </span>
+        ) : alertLabel ? (
+          <span aria-hidden="true" {...stylex.props(styles.dot)} />
+        ) : null}
       </HStack>
     </ClickableCard>
     </Press>

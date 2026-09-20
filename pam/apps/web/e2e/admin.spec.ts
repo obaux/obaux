@@ -17,6 +17,8 @@ const POINTS = '**/rest/v1/rpc/member_points*';
 const INVITE = '**/rest/v1/rpc/create_invite*';
 const CONTROLS = '**/rest/v1/access_controls*';
 const NOTIFICATIONS = '**/rest/v1/notifications*';
+// The program badge's enrollment lookup (D-175) — nobody enrolled, in these tests.
+const ENROLLMENTS = '**/rest/v1/enrollments*';
 
 const ADMIN_ID = 'de3b9c2e-ec2f-403b-93e5-86e6ee75349b';
 
@@ -58,6 +60,7 @@ async function signedInAs(
   await seedSession(page);
   await page.route(NOTIFICATIONS, (route) => route.fulfill(json(notifications)));
   await page.route(CONTROLS, (route) => route.fulfill(json(controls)));
+  await page.route(ENROLLMENTS, (route) => route.fulfill(json([])));
   await page.route(USER, (route) => route.fulfill(json({ id: ADMIN_ID, phone: '12673095265' })));
   await page.route(POINTS, (route) => route.fulfill(json(250)));
   await page.route(PROFILES, (route) => {

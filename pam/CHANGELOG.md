@@ -1,5 +1,45 @@
 # Changelog
 
+## [0.33.0] — 2026-09-20 · The messenger, finished: real chat components, both directions, report, review, unread
+
+### Changed — the conversation screen is Astryx's chat, not a sketch of one
+
+`/messages/thread/` now uses the design system's Chat family: a proper
+chat log, sender-aligned bubbles with names and times, a composer with a
+microphone that hides itself when the phone cannot listen, and one big
+send button (D-181). An example conversation a preview opens draws through
+the same component (D-180).
+
+### Added — a member can message their own case manager and program
+
+"Start a conversation" now appears for members too, listing their own case
+manager and the program(s) they are enrolled with — and nobody else
+(D-176). Never another member.
+
+### Changed — who may message whom is enforced by the database
+
+A conversation can only exist between a case manager and a member on their
+caseload, or a program and a member enrolled with it. Anything else —
+including a super admin — is refused by the database itself, not just
+missing from the screen (migration `0063`, D-176).
+
+### Added — report a message, and a screen for what was reported
+
+Every message from the other person has a "Report" action with four plain
+reasons; the reporter is thanked and told exactly what happens next
+(D-177). Case managers and super admins have a new "Reported messages"
+screen listing only what was reported — the excerpt, who, about whom, why,
+when, and whether it has been looked at (D-178). A case manager sees
+reports about their own people only; a super admin sees all (migration
+`0065`).
+
+### Added — unread messages, in the app
+
+The Home Messages tile shows how many conversations have something new,
+and every new message lights the bell with "New message from {name}" — no
+message text, and never a text message (migration `0064`, D-182). Each
+conversation row now shows the last thing said (D-179).
+
 ## [0.32.0] — 2026-09-17 · A clickable program badge on a caseload member's row
 
 ### Added — which program a member is genuinely connected to, and a link to it

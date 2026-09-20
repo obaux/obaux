@@ -76,3 +76,52 @@ export function useDemoMessages(): DemoMessages {
   }, []);
   return messages;
 }
+
+// ---------------------------------------------------------------------------
+// Demo threads (D-180): what a preview typed into an example conversation on
+// `/messages/thread/?id=dummy-conv-…`. Same store, same rules — this tab,
+// this session, never Supabase.
+
+const THREADS_KEY = 'pam.demo-threads';
+
+export interface DemoThreadMessage {
+  readonly id: string;
+  readonly body: string;
+  readonly at: string;
+}
+
+type DemoThreads = Record<string, DemoThreadMessage[]>;
+
+function readThreads(): DemoThreads {
+  try {
+    const raw = sessionStorage.getItem(THREADS_KEY);
+    return raw ? (JSON.parse(raw) as DemoThreads) : {};
+  } catch {
+    return {};
+  }
+}
+
+/** Appends a demo-only message to an example conversation. Never touches `messages`. */
+export function sendDemoThreadMessage(conversationId: string, text: string): DemoThreadMessage | null {
+  const trimmed = text.trim();
+  if (!trimmed) return null;
+  const threads = readThreads();
+  const message = { id: `demo-${Date.now()}`, body: trimmed, at: new Date().toISOString() };
+  threads[conversationId] = [...(threads[conversationId] ?? []), message];
+  try {
+    sessionStorage.setItem(THREADS_KEY, JSON.stringify(threads));
+  } catch {
+    // Not persisting is survivable; the message still shows until the screen changes.
+  }
+  return message;
+}
+
+/** The demo-only messages typed into one example conversation this session. */
+export function useDemoThread(conversationId: string | null): readonly DemoThreadMessage[] {
+  const [messages, setMessages] = useState<readonly DemoThreadMessage[]>([]);
+  useEffect(() => {
+    if (!conversationId) return;
+    setMessages(readThreads()[conversationId] ?? []);
+  }, [conversationId]);
+  return messages;
+}

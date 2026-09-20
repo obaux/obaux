@@ -37,6 +37,15 @@ export interface ConversationRow {
   readonly otherName: string | null;
   readonly otherRole: Role | null;
   readonly lastMessageAt: string | null;
+  /**
+   * The last thing said, for the row's one-line preview (D-179). Read from
+   * the same `messages` select the recency scan already does — a
+   * participant's own read, under `messages_select_conversation_member`;
+   * no new policy, and nothing an admin who is not in the conversation can
+   * reach through this hook either.
+   */
+  readonly lastMessageBody: string | null;
+  readonly lastMessageMine: boolean;
   /** A message from the other person arrived since this was last opened. */
   readonly unread: boolean;
 }
@@ -62,6 +71,7 @@ interface PartnerRow {
 interface LatestMessageRow {
   conversation_id: string;
   sender_id: string;
+  body: string | null;
   created_at: string;
 }
 
@@ -116,7 +126,7 @@ export function useConversations(enabled: boolean): {
             supabase.rpc('conversation_partners'),
             supabase
               .from('messages')
-              .select('conversation_id, sender_id, created_at')
+              .select('conversation_id, sender_id, body, created_at')
               .in('conversation_id', ids)
               .order('created_at', { ascending: false })
               .limit(RECENCY_SCAN_LIMIT),
@@ -165,6 +175,8 @@ export function useConversations(enabled: boolean): {
               otherName: other?.name ?? null,
               otherRole: other?.role ?? null,
               lastMessageAt: latestMsg?.created_at ?? null,
+              lastMessageBody: latestMsg?.body ?? null,
+              lastMessageMine: latestMsg ? latestMsg.sender_id === me : false,
               unread,
             };
           })

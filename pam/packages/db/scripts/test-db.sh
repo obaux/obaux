@@ -35,7 +35,7 @@ run_suite() {
   "${_psql[@]}" -f "$HERE/test/01_seed.sql" >/dev/null
 
   local failed=0
-  for f in "$HERE"/test/0[234]_*.sql; do
+  for f in "$HERE"/test/0[2-9]_*.sql; do
     if ! "${_psql[@]}" -f "$f" 2>&1 \
         | sed -E 's/^psql:[^ ]+ //; s/^NOTICE:  //' \
         | grep -E '^(ok |FAIL|ERROR|--- )'; then

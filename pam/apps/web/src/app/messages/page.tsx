@@ -45,9 +45,15 @@ import { DummyConversationsLazy, DummyStartableLazy } from './DummyRowsLazy';
  *     people `/admin/`'s "Your people" screen shows, via `admin_covers()`.
  *   - A **program admin** (`role: 'provider'`) sees members enrolled in a
  *     service under their org, via `provider_linked_to()`.
- *   - A **member** starts nothing. They see only conversations already begun
- *     with them, and can reply inside one — no "Start a conversation"
- *     section renders for a member at all.
+ *   - A **member** — since D-176, superseding D-163's "a member starts
+ *     nothing" — sees their own case manager and the program admin(s) of
+ *     whatever they are enrolled in, and may start a conversation with
+ *     them. Never another member.
+ *
+ * All three lists are one function, `messageable_people()` (0063), which is
+ * also the rule `open_direct_conversation()` enforces — so a name shown here
+ * is one the database will actually open, and nothing else can be opened
+ * from anywhere (D-176 closed the gap D-163 left).
  *
  * **Preview-aware, but real data never follows the preview (D-172).**
  * Visibility of every section below — whether this screen shows anything at
@@ -82,6 +88,13 @@ const styles = stylex.create({
   row: { width: '100%', position: 'relative' },
   name: { fontSize: '20px', lineHeight: 1.3 },
   meta: { fontSize: '16px' },
+  preview: {
+    fontSize: '16px',
+    lineHeight: 1.4,
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
+  },
   section: { fontSize: '17px' },
   link: {
     color: 'inherit',
@@ -95,6 +108,7 @@ function ConversationRowView({
   otherRoleLabel,
   when,
   unread,
+  preview,
   href,
   labels,
 }: {
@@ -102,6 +116,8 @@ function ConversationRowView({
   readonly otherRoleLabel: string | null;
   readonly when: string | null;
   readonly unread: boolean;
+  /** The last thing said — one line, cut by the row, never a second row (D-179). */
+  readonly preview: string;
   readonly href: string;
   readonly labels: { readonly someone: string; readonly new: string };
 }) {
@@ -126,6 +142,9 @@ function ConversationRowView({
             </Text>
           ) : null}
         </HStack>
+        <Text type="supporting" xstyle={styles.preview}>
+          {preview}
+        </Text>
       </VStack>
     </Card>
   );
@@ -148,6 +167,9 @@ export default function MessagesPage() {
   // role, the same as every other previewable screen (D-172).
   const canMessage = viewedRole === 'member' || viewedRole === 'admin' || viewedRole === 'provider';
   const isStaff = viewedRole === 'admin' || viewedRole === 'provider';
+  // Everyone who can message can start a conversation (D-176) — the list
+  // just differs by role, and the database decides it, not this screen.
+  const canStart = canMessage;
 
   // Real data fetched, and the only account any real write below could ever
   // run as, always follows the TRUE role, never the preview (D-171, D-172).
@@ -155,13 +177,9 @@ export default function MessagesPage() {
   // `trueRole` is never in the list below, so these two hooks simply never
   // run while a preview is active — not merely "run and come back empty".
   const realCanMessage = trueRole === 'member' || trueRole === 'admin' || trueRole === 'provider';
-  const realIsStaff = trueRole === 'admin' || trueRole === 'provider';
 
   const { state: conversations } = useConversations(signedIn && realCanMessage);
-  const { state: messageable } = useMessageableMembers(
-    signedIn && realIsStaff,
-    trueRole === 'admin' || trueRole === 'provider' ? trueRole : null,
-  );
+  const { state: messageable } = useMessageableMembers(signedIn && realCanMessage);
 
   const messagedIds = useMemo(() => {
     if (conversations.status !== 'ready') return new Set<string>();
@@ -248,6 +266,13 @@ export default function MessagesPage() {
               otherRoleLabel={c.otherRole ? t(`role.${c.otherRole}`) : null}
               when={c.lastMessageAt ? whenHappened(c.lastMessageAt, locale, t) : null}
               unread={c.unread}
+              preview={
+                c.lastMessageBody === null
+                  ? t('messages.preview.none')
+                  : c.lastMessageMine
+                    ? t('messages.preview.you', { text: c.lastMessageBody })
+                    : c.lastMessageBody
+              }
               href={`/messages/thread/?id=${encodeURIComponent(c.id)}`}
               labels={rowLabels}
             />
@@ -281,13 +306,13 @@ export default function MessagesPage() {
         <DummyConversationsLazy role={viewedRole} />
       ) : null}
 
-      {isStaff ? (
+      {canStart ? (
         <VStack gap={2}>
           <Heading level={2} xstyle={styles.section}>
-            {t('messages.start.title')}
+            {t(isStaff ? 'messages.start.title' : 'messages.start.member.title')}
           </Heading>
 
-          {!previewing && realIsStaff && messageable.status === 'loading' ? (
+          {!previewing && realCanMessage && messageable.status === 'loading' ? (
             <Loading label={t('common.loading')} variant="inline" />
           ) : null}
 
@@ -339,7 +364,7 @@ export default function MessagesPage() {
             genuinely empty. Non-interactive — see `DummyRowsLazy`.
           */}
           {USE_DUMMY_PEOPLE &&
-          (viewedRole === 'admin' || viewedRole === 'provider') &&
+          (viewedRole === 'member' || viewedRole === 'admin' || viewedRole === 'provider') &&
           (previewing || (messageable.status === 'ready' && startable.length === 0)) ? (
             <DummyStartableLazy role={viewedRole} />
           ) : null}

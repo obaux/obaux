@@ -77,6 +77,16 @@ export const CONTROLLABLE_FEATURES = [
  * a decision somebody can find, rather than an omission somebody "fixes".
  */
 export const NEVER_CONTROLLABLE_FEATURES = ['chat'] as const;
+
+/**
+ * Why a message is being reported (D-177) — a fixed list, the same shape as
+ * `SERVICE_FLAG_REASONS` (0036): the person picks one, the key is what
+ * `report_message()` stores, and the words a reviewer reads come from the
+ * locale bundle (`messages.report.reason.*`), never from free text a member
+ * typed about somebody with power over them.
+ */
+export const MESSAGE_REPORT_REASONS = ['threatening', 'unwanted', 'scam', 'other'] as const;
+export type MessageReportReason = (typeof MESSAGE_REPORT_REASONS)[number];
 export type ControllableFeature = (typeof CONTROLLABLE_FEATURES)[number];
 
 /**

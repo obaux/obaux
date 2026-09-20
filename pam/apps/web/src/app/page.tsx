@@ -31,6 +31,7 @@ import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
 import { useSavedPlaces } from '@/lib/useSavedPlaces';
 import { usePoints } from '@/lib/usePoints';
+import { UnreadMessagesLazy } from './UnreadMessagesLazy';
 import { useViewAs } from '@/lib/useViewAs';
 import { SavedStripLazy } from './SavedStripLazy';
 import { RoleSwitchLazy } from './RoleSwitchLazy';
@@ -99,6 +100,16 @@ export default function HomePage() {
   const demoRole = viewAs && viewAs !== trueRole ? viewAs : null;
   const { state: saved, unsave, failed: saveFailed } = useSavedPlaces(signedIn, demoRole);
   const points = usePoints(session.status === 'signed-in' ? session.session.userId : null);
+
+  /*
+   * Unread messages, for the Messages tile's count (D-182). Real data, real
+   * role only — the same `trueRole` gate `/messages/` uses (D-172): a super
+   * admin's preview sees the tile but never a count, because their account
+   * has no conversations to count (D-171). Counted by a lazily loaded
+   * headless component so `useConversations` stays out of Home's first load.
+   */
+  const realCanMessage = trueRole === 'member' || trueRole === 'admin' || trueRole === 'provider';
+  const [unreadMessages, setUnreadMessages] = useState(0);
 
   /*
    * The example first name a preview greets by (D-173) — `@pam/config/dummy-people`
@@ -217,10 +228,13 @@ export default function HomePage() {
   const isCaseManager = viewed === 'admin';
   const isSuperAdmin = viewed === 'super_admin';
   const isProvider = viewed === 'provider';
+  // Reported messages are reviewed by a case manager or a super admin (D-178).
+  const isReviewer = isCaseManager || isSuperAdmin;
   const greetingName = demoRole ? (dummySelfName ?? me.firstName) : me.firstName;
 
   return (
     <Page gap={4}>
+      {signedIn && realCanMessage ? <UnreadMessagesLazy enabled onCount={setUnreadMessages} /> : null}
       <AppHeader
         roleLabel={t(`role.${viewed}`)}
         roleControl={
@@ -412,6 +426,23 @@ export default function HomePage() {
             icon={<PeopleIcon />}
             label={t('messages.title')}
             description={t('home.go.messages')}
+            count={unreadMessages}
+            alertLabel={unreadMessages > 0 ? t('notify.unread', { count: unreadMessages }) : undefined}
+          />
+        ) : null}
+
+        {/*
+          Messages somebody said were not safe — the one route a message ever
+          takes to a case manager or a super admin (D-074, D-178). Gated on
+          the previewed role like every other tile; the screen fetches as the
+          real one.
+        */}
+        {isReviewer ? (
+          <NavTile
+            href="/reports/"
+            icon={<PeopleIcon />}
+            label={t('reports.title')}
+            description={t('home.go.reports')}
           />
         ) : null}
 

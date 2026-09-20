@@ -3509,6 +3509,176 @@ against. The badge appears only on rows with no `href` of their own — real
 caseload rows (no profile page exists for a real member yet) and
 `/person/`'s own top-level badge row, which sits outside any card.
 
+### D-176 — Who may open a conversation is a database rule; a member may message their own staff (supersedes the "a member starts nothing" part of D-163)
+
+Will's messenger brief (20 September) said two things D-163 had left the
+other way round. First, "and vice versa": a member may start a chat with
+their active case manager and with the program admin(s) of whatever they
+are enrolled in — not only reply to one staff already opened. Second, "no
+open messaging outside these relationships" — which D-163 had shipped as a
+component's restraint (`useMessageableMembers`) and explicitly flagged as
+an RLS gap: `conversations_insert_participant` and
+`conversation_members_insert` (0007) let any active account create a
+conversation with any profile id, and `profile_id = auth.uid()` even let an
+account add itself to any conversation whose id it learned and then read it
+through `in_conversation()`.
+
+**0063 makes the rule the database's.** `can_message(a, b)` is true for
+exactly two shapes, in either direction: an active `admin_assignments` row
+(case manager ↔ assigned member — not `admin_covers()`'s region arm, since
+sharing a city is not a relationship), and an `enrollments` row whose
+service belongs to a program admin's org. `open_direct_conversation(p_other)`
+is now the only door — the two insert policies are dropped, so no client
+can create a conversation or a membership row directly — and it checks
+`can_message()`, the caller's role (`member`/`admin`/`provider`; a super
+admin is refused, so D-171 is a database fact now), and reuses an existing
+direct conversation between the pair. `messageable_people()` lists the same
+rule for the caller, so the screen and the database cannot disagree about
+who is reachable; `useMessageableMembers` reads it for all three roles.
+
+What this deliberately does not do: member ↔ member (still nothing, still
+nowhere), staff ↔ staff, group or broadcast, or anything through the region
+arm. `05_messenger_test.sql` proves the forbidden pairs are refused —
+member→member, super admin→anyone, staff→unrelated or region-only member,
+cross-org program admin→member — and the allowed pairs succeed both ways
+and land in the same conversation.
+
+D-163's other parts stand: staff-to-member, the transparency contract line
+for a participating case manager, D-074 untouched.
+
+### D-177 — Reporting a message is a fixed-list reason, from the thread, on the other person's messages only
+
+`report_message()` (0034) has existed since the first messaging session
+with no UI. It is wired now, from `ThreadView`: a "Report" action on each
+message the other person sent — never on your own, because 0034 refuses
+that and a control that is always refused should not be drawn — opening a
+`RadioList` of four reasons and a secondary "Send report" button (the send
+button stays the screen's one primary action).
+
+The reasons are a fixed list (`MESSAGE_REPORT_REASONS`: threatening,
+unwanted, scam, other), the same shape as flagging a place (0036): the key
+is what is stored, the words come from the locale bundle at render time.
+0034 accepts free text, so this is a choice, not a constraint — and the
+reason it is made is the one 0034 itself gives for the excerpt: a
+reviewer with power over the reporter should read reviewed words, not a
+sentence typed in anger. Refusal and offline both end in a `Notice` with
+the support number; success ends in a thank-you that says exactly what
+happens next ("PAM and the person who invited you can now see this one
+message. Nothing else from the chat.").
+
+### D-178 — `/reports/` shows reported messages to the people D-074 named, and the policy now says so too
+
+D-074's model — a case manager sees a message only when somebody reports
+it — has had a database half (0034's excerpt) and no screen. `/reports/`
+is that screen, and it lists reports and nothing else: excerpt, who
+reported, who it is about, reason, when, and whether it has been looked
+at. No link into the conversation, because there is still no admin policy
+on `messages` and this decision does not add one.
+
+**Who sees it was wider and wronger than D-074 before 0065.**
+`reports_admin_review` (0007) was `for all using (is_admin())`: every case
+manager in every region could read and edit every report, and a super admin
+— who is not `is_admin()` — could read none. 0065 replaces it with
+`report_visible_to_me()`: every super admin, plus a case manager with an
+active `admin_assignments` row for the sender **or the reporter** of a
+message report. The reporter's case manager is included on purpose, and it
+is the one place this reads D-074 slightly wider than "the sender's case
+manager": a member reporting their own program admin's message would
+otherwise have nobody but a super admin able to see it, and the member's
+trust relationship (`transparency.ts`, "the person who invited you") is
+with their own case manager. The notification trigger (0038) already
+routes to the sender's case manager only; the two are now different sets
+on purpose, and Will can narrow this to match if he disagrees. Not the
+region arm, either way.
+
+**No contract change.** "A message only if someone says it is not safe"
+(`transparency.canSee.flagged`) is what this screen is; the audience is
+narrower than the policy it replaces, not wider. `reports_for_review()`
+carries the first names and roles on the row, following
+`conversation_partners()` (0061), because a program admin who sent a
+reported message is on nobody's caseload and a raw `profiles` join would
+have shown "somebody" for exactly the rows the screen exists for.
+
+List-only: `reports` has `resolved_at`/`resolution`, nothing writes them,
+and what "looked at" obliges is a product decision. `reports_update_review`
+keeps the write possible for the same audience so that decision does not
+need another policy migration when it comes.
+
+### D-179 — The conversation list shows the last message, from the read it already does
+
+A row now ends with one line: the last thing said, prefixed "You:" when it
+was yours. `useConversations` already scanned `messages` for recency and
+the unread flag; the body rides the same select (`body` added to the column
+list) under the same policy (`messages_select_conversation_member`). No new
+policy, and no new visibility: a case manager who is not in a conversation
+still cannot reach this hook's rows.
+
+### D-180 — An example conversation opens an example thread, through the real thread component
+
+D-172 made the example conversation rows on `/messages/` non-interactive
+because there was nothing safe to open. Now there is: `/messages/thread/
+?id=dummy-conv-…` is recognised by the thread screen (the same
+`isDummy…` shape `/place/` uses for `dummy-place-…`) and rendered by
+`DemoThread` — `DUMMY_THREADS` plus whatever this tab typed
+(`demoMessages.ts`, sessionStorage) — through the very same `ThreadView`
+the real thread uses. The demo cannot drift from the real thing, and it
+never touches `useThread`, `open_direct_conversation()` or `messages`.
+Gated on the previewed role (like `/messages/` itself, D-172); a real
+thread is still gated on the real one (D-171). No report action in an
+example thread: a report has real recipients. The "Start a conversation"
+example rows stay non-interactive (D-172's reasoning is unchanged — a real
+row there is a real write).
+
+### D-181 — The thread is Astryx's Chat family, loaded only on that route
+
+The hand-rolled `MessageBubble` (a `Card` with a `maxWidth`) is gone;
+`ThreadView` composes `ChatMessageList` > `ChatMessage` >
+`ChatMessageBubble` + `ChatMessageMetadata`, and `ChatComposer` with
+`ChatComposerInput`, `ChatSendButton` and `ChatDictationButton`. What the
+library gives that the sketch did not: a real chat log (`role="log"`,
+`aria-live="polite"`), sender-aware alignment that screen readers also get,
+a composer that handles Enter/Shift-Enter and IME composition, and
+dictation that hides itself when the browser has no speech recognition —
+the same §1 rule `VoiceInput` follows. PAM's rules are kept on top: 64px
+send button, 48px mic and report controls, 18px message text, one primary
+action.
+
+Bundle: `@astryxdesign/core/Chat` is imported only by `ThreadView`, which
+is loaded through `ThreadViewLazy` (`next/dynamic`, subpath import —
+D-125). The Chat chunk is 217 kB raw and appears in no route's first load;
+`/messages/thread`'s first load is 497 kB, Home's shared first load is
+unchanged at 349 kB. Home's total moved 503.6 → 504.7 kB — the new locale
+strings (the same irreducible cause as D-162) plus `Badge` inside
+`NavTile` (D-182); `useConversations` was kept out of it deliberately, see
+D-182.
+
+### D-182 — Unread messages: a count on the Home tile, and a bell notification per message — never a text
+
+Two parts, both in-app, per the brief ("no SMS").
+
+**The tile.** `NavTile` gained a `count` prop drawn as an Astryx `Badge`
+(counts are what a Badge is for) beside the label, with the existing
+`alertLabel` carrying "{n} new" into the accessible name. This is the one
+place `NavTile`'s "a dot, not a number" rule (Will, 13 September) is set aside, on Will's explicit ask:
+unread messages are the case where the number is what somebody acts on.
+The count comes from `useConversations`' unread flag — real data, real
+role (D-172) — through a headless, lazily loaded `UnreadMessages`
+component rather than a hook on Home, so the list's machinery stays out of
+the first load a hook could not be kept out of. A first version called the
+hook directly and cost Home 3.2 kB; this version costs it nothing.
+
+**The bell.** 0064 adds `message_received` to `notifications` and a
+trigger, `notify_on_message()`, in 0038's `notify_on_*` pattern: every
+other member of the conversation gets a row, `notify.message_received`
+("New message from {name}"), the sender's first name and nothing else —
+`body_key` + `body_vars` is a locale key by design, so a notification can
+never quote a message. The existing bell, list and mark-seen work with no
+change. Checked, not assumed, that nothing routes `notifications` to the
+SMS queue: `notify()` writes only to `notifications`, and
+`outbound_messages` is written only by the saved-place and staff-request
+functions; `05_messenger_test.sql` asserts the queue is unchanged by a
+message. The trigger function is revoked from every role (0041, 0058).
+
 ---
 
 ## Notes for whoever picks this up next
