@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.35.0] — 2026-09-21 · A ring means something new from that person
+
+Home's people strip is real for a case manager and a program admin now,
+and the ring on an avatar means one of two things: an unread message from
+them, or a place they saved since you last looked (D-198). Lit people come
+first, newest first; tapping somebody with an unread message opens the
+conversation. The onboarding screen says so — *"When you save a new place
+— not which one. A program you joined sees this too."* — and the database
+gives out exactly that: a time per person, never the place
+(`people_activity()`, `0067`, D-199). The example strip follows the same
+rule.
+
 ## [0.34.2] — 2026-09-21 · Polish from the phone
 
 The composer has its padding back and no longer lights up when tapped

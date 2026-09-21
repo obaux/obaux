@@ -68,6 +68,12 @@ export interface DummyPerson {
   readonly language: Locale;
   /** Members only. */
   readonly points?: number;
+  /**
+   * Members only: when they last saved a place, or absent. Only a time — the
+   * example strip lights a ring on it (D-198) exactly as `people_activity()`
+   * (0067) would for a real member, and neither says which place.
+   */
+  readonly lastSavedAt?: string;
   /** Programs only — the organisation they run, not a person's own name. */
   readonly orgName?: string;
   /**
@@ -125,9 +131,10 @@ export const DUMMY_MEMBERS: readonly DummyPerson[] = [
     role: 'member',
     regionName: 'Philadelphia',
     accessStatus: 'active',
-    lastActiveAt: daysAgo(6),
+    lastActiveAt: hoursAgo(2),
     language: 'en',
     points: 300,
+    lastSavedAt: hoursAgo(2),
   },
   {
     id: 'dummy-m5',

@@ -16,11 +16,13 @@ import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
  * phone screen before the menu underneath it is even reached. A strip
  * answers the same question — "who's here" — in the height of one row.
  *
- * The ring is a mocked stand-in for activity or an unread message (Will:
- * "Mock this highlight/activity border... for display purposes") — nothing
- * behind it is real yet. It exists so the *shape* of "this moves someone to
- * the front" is visible before the feature that actually decides it is
- * built, the same reasoning the dummy-data files already use elsewhere.
+ * The ring means "something new from this person" (D-198): an unread
+ * message to the viewer, or a place they saved since the viewer last looked.
+ * Which, and the order — lit people first, newest first — is decided by
+ * `rankPeople` in `@pam/config/people-activity`, not here; this component
+ * only draws what it is told. It was a mock until 21 September (Will: "Mock
+ * this highlight/activity border... for display purposes"); it is real now,
+ * on the real strip and the example one alike.
  *
  * Same masking technique as `SavedStrip`: the row runs past the page's own
  * gutter and fades at the edge rather than being cut, and a CSS mask rather
@@ -31,8 +33,13 @@ export interface PeopleStripPerson {
   readonly id: string;
   readonly firstName: string;
   readonly href: string;
-  /** A mocked stand-in for real activity — see the file comment. */
+  /** Something new from this person — see the file comment. */
   readonly hasActivity?: boolean;
+  /**
+   * Read to a screen reader after the name when the ring is lit, e.g. "new
+   * message" — a coloured border is not a label.
+   */
+  readonly activityLabel?: string;
 }
 
 export interface PeopleStripProps {
@@ -76,6 +83,14 @@ const styles = stylex.create({
     // between a status and something that just wants attention.
     borderColor: colorVars['--color-accent'],
   },
+  srOnly: {
+    position: 'absolute',
+    width: '1px',
+    height: '1px',
+    overflow: 'hidden',
+    clipPath: 'inset(50%)',
+    whiteSpace: 'nowrap',
+  },
   name: {
     fontSize: '13px',
     lineHeight: 1.3,
@@ -98,6 +113,9 @@ export function PeopleStrip({ people, label }: PeopleStripProps) {
                 <Avatar size="lg" name={person.firstName} tooltip={false} />
               </span>
               <Text xstyle={styles.name}>{person.firstName}</Text>
+              {person.hasActivity && person.activityLabel ? (
+                <span {...stylex.props(styles.srOnly)}>{person.activityLabel}</span>
+              ) : null}
             </VStack>
           </a>
         ))}

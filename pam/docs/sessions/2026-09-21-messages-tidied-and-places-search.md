@@ -153,3 +153,82 @@ error names a file that does not exist.
 - D-189 gives a case manager the Reported list read-only; if Will wants
   case managers to decide flags too, `resolve_service_flag()` (0036) is
   super-admin-only and would need its own change.
+
+---
+
+# Later still — the people strip's ring is real (branch `claude/pam-people-rings`)
+
+Same day, after the polish pass. One migration, **not applied to the live
+project** (Will deploys after approving the wording).
+
+## What changed
+
+- **Contract first.** `packages/config/src/transparency.ts`: a new
+  `ADMIN_CAN_SEE` entry `new_save_without_the_place` and a new `canSee`
+  line, `transparency.canSee.saves` — en *"When you save a new place — not
+  which one. A program you joined sees this too."*, es *"Cuando guarda un
+  lugar nuevo — no cual. Un programa donde se inscribio tambien lo ve."*
+  The contract tests failed on the `.ts` change alone (missing key, drift)
+  and passed once both locale files carried it. Also: `join.privacy.admin.4`
+  and `join.privacy.provider.4` (the staff onboarding lists grew from three
+  lines to four; `join/page.tsx` maps `[1, 2, 3, 4]`), `admin.seeing.body`
+  on `/admin/`, and `privacy.s.who-can-see.p1`, all en and es.
+- `packages/db/migrations/0067_people_activity.sql` — `people_activity()`
+  returning `(profile_id, last_saved_at)` for everyone `can_message()`
+  allows (0063's relationship, the same one the strip lists by), members
+  only, `security definer`, guard inside, `search_path = public,
+  extensions`, revoked from `anon`, granted to `authenticated`.
+- `packages/db/test/07_people_activity_test.sql` — 16 checks: the column
+  shape from `pg_proc` (two columns, no service/name/`last_active_at`),
+  grants, Dana sees Marcus's newest save and nothing for Tanya (region
+  only), Dana in the south sees nobody, Alice sees Marcus and nobody else,
+  Bob (no enrolled members) nobody, a member and a super admin zero rows,
+  and neither staff role can read `saved_places` itself.
+- `packages/config/src/people-activity.ts` — `rankPeople`, `isNewSave`,
+  `peopleSeenKey`, with `test/people-activity.test.ts` (6 tests).
+- `packages/ui/src/PeopleStrip.tsx` — the ring is real; `activityLabel`
+  is read out after the name when lit.
+- `apps/web`: `HomePeopleSection` (shared layout), `HomePeople` +
+  `HomePeopleLazy` (real accounts: `messageable_people` + `useConversations`
+  + new `usePeopleActivity` + `peopleSeen` localStorage), `HomePeoplePreview`
+  rewritten onto the same section and rule (Keisha unread, Aaliyah's new
+  `lastSavedAt` in `dummy-people.ts`). Home renders the real strip for a
+  real case manager/program admin when not previewing, and lets it own the
+  unread count (`UnreadMessagesLazy` stays for members).
+- `apps/web/e2e/people-strip.spec.ts` — five tests: order and reasons,
+  hrefs (message → thread, else `/person/`), last-looked behaviour across a
+  reload, tile size ≥ 48px, and the example strip under a preview.
+  `join.spec.ts` asserts the new contract line is on the onboarding screen.
+
+## Decisions
+
+- D-198 — ring semantics and ordering; `can_message()` over
+  `admin_covers()`; last-looked in the browser; real accounts get the strip.
+- D-199 — the contract widening: what members are told, that the place is
+  still never shown, D-166 narrowed by exactly one fact on Will's
+  instruction; `/person/` saved places stay example-only for real people.
+
+No SOP amendment: §4.1's word-for-word rule still holds.
+
+## Verified
+
+| Check | Result |
+|---|---|
+| `pnpm -r typecheck` | 5/5 |
+| `pnpm --filter @pam/config test` | 231 pass (225 + 6) |
+| `pnpm --filter @pam/ui test` | 65 pass |
+| `pnpm --filter @pam/db test` | **302 checks pass, 0 failures** (was 286) — `0001`–`0067` plus `07_people_activity_test.sql` |
+| `pnpm --filter @pam/web build` | static export OK |
+| `node scripts/check-bundle-budget.mjs` | 505.4 kB gz on `/` (was 505.0); the real and example strips, `useConversations` and `dummy-*` are all lazy chunks |
+| Playwright (full suite) | **495 pass, 0 failures** (480 + 5 new tests × 3 projects) |
+
+## Left undone
+
+- **Will approves the wording, then deploys `0067`.** Until then the real
+  strip lights message rings only (`usePeopleActivity` fails quiet on the
+  missing RPC).
+- The privacy page's who-can-see paragraph still says "and that a chat
+  exists" — a line D-167 removed from the screen. Not touched here; worth
+  its own pass.
+- `next lint` prompts interactively in this sandbox (pre-existing; not a
+  check any session has run).

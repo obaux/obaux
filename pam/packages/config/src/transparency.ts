@@ -57,6 +57,17 @@ export const ADMIN_CAN_SEE = [
    * into that.
    */
   'messages_in_conversations_they_started_with_you',
+  /**
+   * Added for the Home people strip (D-199, 21 September). Will allowed
+   * programs exactly one fact about a member's activity: that they saved a
+   * new place, and when — never which place. `people_activity()` (0067)
+   * returns `(profile_id, last_saved_at)` and nothing else, for the same
+   * people `messageable_people()` lists, so a case manager and a program
+   * admin both get this line. It is the single narrowing of D-166's "never
+   * any activity, anywhere" for a program, and it is stated on the screen
+   * rather than left to be inferred from a lit ring.
+   */
+  'new_save_without_the_place',
 ] as const;
 
 export type AdminVisibleField = (typeof ADMIN_CAN_SEE)[number];
@@ -78,6 +89,11 @@ export const ADMIN_CANNOT_SEE = [
    * `provider_linked_to()` for a program admin, now through
    * `provider_linked_members()` (0056) rather than a raw table read that
    * could not draw this distinction at all.
+   *
+   * Narrowed by exactly one fact on 21 September (D-199): a program now
+   * learns *that* a member saved a new place, and when — see
+   * `new_save_without_the_place` above. Everything else this entry covers
+   * (the last day used, and the place itself) is still never shown.
    */
   'member_activity_for_a_program',
 ] as const;
@@ -147,6 +163,16 @@ export const TRANSPARENCY_SCREEN: {
     {
       key: 'transparency.canSee.directMessages',
       en: 'Everything you say to them, if they message you directly',
+    },
+    /**
+     * D-199 — the one activity fact a program is also allowed. "A program"
+     * is the same ordinary member-facing word `cannotSee.programActivity`
+     * below already uses, and the two lines are meant to be read together:
+     * a program sees this, and never the last day you used PAM.
+     */
+    {
+      key: 'transparency.canSee.saves',
+      en: 'When you save a new place — not which one. A program you joined sees this too.',
     },
   ],
 

@@ -665,7 +665,7 @@ export default function JoinPage() {
           <Card padding={4} xstyle={styles.card}>
             <VStack gap={3}>
               <Text xstyle={styles.intro}>{t(`join.privacy.${kind}.intro`)}</Text>
-              {[1, 2, 3].map((n) => (
+              {[1, 2, 3, 4].map((n) => (
                 <Text key={n} xstyle={styles.item}>
                   {t(`join.privacy.${kind}.${n}`)}
                 </Text>

@@ -3968,6 +3968,116 @@ unchanged); Home's saved-place cards have their gap back — `Carousel gap`
 never applied because the masked list is one React child and so one
 slide, so the card carries the same spacing token itself.
 
+### D-198 — A ring on a person means something new from them: an unread message, or a place they saved since you last looked
+
+Home's people strip carried a mocked ring on every other avatar since 16
+September, so the shape of "activity moves people to the front" could be
+seen before anything decided it. It is real now, and it means exactly two
+things, in this order of precedence: an unread message from that person to
+the viewer, or a place they saved since the viewer last looked at the
+strip. Nothing else — not the last day they opened PAM, not points, not a
+visit — because those are not "something new from them" that the viewer
+should act on, and a ring that lights for everything is a ring nobody
+looks at.
+
+**Ordering.** Lit people move to the front, most recent activity first;
+everybody else keeps the order they arrived in (first name A–Z from
+`messageable_people()`), so an unlit strip reads as it always did. A person
+with both an unread message and a new save is lit for the message, and
+tapping them opens that conversation — the thing waiting for an answer.
+Anybody else opens `/person/` as before. The rule is one pure function,
+`rankPeople` in `@pam/config/people-activity`, with its own unit tests; the
+real strip and the example strip both call it, so a super admin's preview
+cannot show a rule the real screen does not follow.
+
+**Where the two facts come from.** Unread: `useConversations`, which
+already knows each conversation's other person and whether its newest
+message is unread — `HomePeople` owns that hook for Home while it is
+mounted and reports the unread count upward the way `UnreadMessages` did,
+so the Messages tile and the rings come from one query rather than two.
+New saves: `people_activity()` (0067, D-199). Who is on the strip at all:
+`messageable_people()` (0063) — the same list the messenger offers, chosen
+over `admin_covers()` because a ring on somebody the viewer may not even
+talk to would be a signal with no action behind it, and because it is the
+one relationship the database already enforces for both roles.
+
+**"Since you last looked" lives in the browser.** `localStorage`, per
+account (`pam.peopleSeen.<id>`), read once on mount and then moved to now:
+this visit's rings are judged against the previous visit, the next visit's
+against this one. A server-side "seen" column was the alternative and was
+not taken: it would be one more row of per-account activity stored about
+staff for a convenience, and losing it costs nothing — with no stored
+value, a save inside the last seven days counts as new and anything older
+does not, so a first visit or a cleared browser is not a wall of rings.
+
+**Real accounts get the strip now.** Until today only a preview showed it.
+A real case manager or program admin sees their own people; an empty real
+list renders nothing — Home does not invent people, and the full screen
+behind "see all" already shows the example set when there is nobody yet.
+The example strip follows the same rule on example data: Keisha's written
+thread ends with her message (unread for Teresa) and Aaliyah's example
+record carries a save two hours ago, so those two are lit and in front. A
+super admin's own preview of Everyone has no conversations (D-171), so only
+the save lights there. Nothing about `/person/`'s saved-places list
+changed: for a real person it is still example-only, because the place
+itself is still never shown (D-199).
+
+The ring's reason is also read out — "New message" / "Saved a new place",
+visually hidden after the name — because a coloured border is not a label.
+Both strings are new locale keys (`people.new.*`), en and es.
+
+### D-199 — The transparency contract widens by exactly one fact, on Will's instruction: that you saved a new place, and when — never which one
+
+D-166 stands: a program never sees a member's activity. Today Will allowed
+programs one fact — that a member saved a new place — so the Home strip can
+light a ring for a program admin as well as a case manager, and the
+contract says so before the code does, the way D-164 and D-167 did.
+
+**What members are told.** A new `canSee` line on the onboarding screen,
+in both languages:
+
+- en: *"When you save a new place — not which one. A program you joined
+  sees this too."*
+- es: *"Cuando guarda un lugar nuevo — no cual. Un programa donde se
+  inscribio tambien lo ve."*
+
+The second sentence is there because this is the one line on the screen
+where "they" (the person who invited you) and "a program" get the same
+fact, and `cannotSee.programActivity` — "A program never sees the last day
+you used PAM" — sits a few lines below it. Read together they are exact: a
+program sees that you saved, and never the day you were last here. The
+matching machine-checkable entry is `new_save_without_the_place` in
+`ADMIN_CAN_SEE`; `member_activity_for_a_program` stays in
+`ADMIN_CANNOT_SEE` with a comment naming the one narrowing. The staff side
+of onboarding gained a fourth line each (`join.privacy.admin.4`,
+`join.privacy.provider.4`), the case manager's "What you can see" card on
+`/admin/` names it, and the privacy page's who-can-see paragraph does too.
+
+**What is still never shown.** The place. `people_activity()` (0067)
+returns two columns, `profile_id` and `last_saved_at`, and the db test
+asserts the shape from `pg_proc` — no column that could carry a service id
+or a name, and never `last_active_at`. `saved_places` itself keeps its one
+policy (`saved_places_own`); a case manager and a program admin still
+cannot read the table, and the test proves that from both accounts. The
+function is `security definer` with the guard inside (`my_role() in
+('admin', 'provider')` and `can_message()` per row), `search_path = public,
+extensions`, revoked from `anon`, granted to `authenticated`. A member and
+a super admin get zero rows.
+
+**Why `can_message()` and not `admin_covers()`.** The strip lists
+`messageable_people()`, so the activity has to be for exactly that set — a
+time for somebody who is not on the strip would be an answer to a question
+nobody asked. `can_message()` is also the narrower rule: an active
+assignment or an enrollment, never the region arm, so Tanya (region only)
+gets no row for Dana. The db test checks her by name.
+
+**Not an SOP amendment.** §4.1's rule is that the screen and
+`transparency.ts` match word for word and that anything not listed is not
+visible; both still hold. D-166 was a decision, and this is its one
+recorded narrowing. Will's approval of the exact wording above is what the
+report asks for; if he changes a word, `copy.test.ts` will fail until
+`en.json` and `transparency.ts` agree again, which is the point of it.
+
 ---
 
 ## Notes for whoever picks this up next

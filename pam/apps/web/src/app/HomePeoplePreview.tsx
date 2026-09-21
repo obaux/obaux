@@ -1,14 +1,10 @@
 'use client';
 
-import * as stylex from '@stylexjs/stylex';
-import { VStack } from '@astryxdesign/core/VStack';
-import { HStack } from '@astryxdesign/core/HStack';
-import { Heading } from '@astryxdesign/core/Heading';
-import { Text } from '@astryxdesign/core/Text';
+import { useMemo } from 'react';
 import { DUMMY_MEMBERS, DUMMY_EVERYONE, DUMMY_INTERESTED } from '@pam/config/dummy-people';
-import { TextLink } from '@pam/ui';
-import { PeopleStrip } from '@pam/ui/PeopleStrip';
-import { useI18n } from '@/lib/i18n';
+import { dummyConversationsFor } from '@pam/config/dummy-conversations';
+import { rankPeople } from '@pam/config/people-activity';
+import { HomePeopleSection } from './HomePeopleSection';
 
 /**
  * A taste of the example people, on Home itself, while a super admin is
@@ -26,12 +22,13 @@ import { useI18n } from '@/lib/i18n';
  * height of one row, and leaves room to grow to more people later without
  * growing the screen with it.
  *
- * The highlighted ring on some avatars is a mock — see `PeopleStrip`'s own
- * comment — standing in for the activity or unread-message signal Will asked
- * to see the *shape* of ("this should help free up vertical real estate, and
- * allow activity, or messages... to move people up to the front"). Nothing
- * behind it is real: it is on every other person in the example set, always,
- * not tied to anything that happened.
+ * The rings are the real rule on example data (D-198), not the every-other-
+ * person mock this file carried until 21 September: an unread message in
+ * `DUMMY_THREADS` (Keisha's, for a case manager) and a recent `lastSavedAt`
+ * in `dummy-people` (Aaliyah's) light exactly the people the real strip
+ * would, ranked by the same `rankPeople`. A preview has no "last looked", so
+ * the week-long fallback applies; a super admin's preview of Everyone has no
+ * conversations of its own (D-171), so only the save lights there.
  *
  * Loaded lazily (see `HomePeoplePreviewLazy`) for the same reason
  * `RoleSwitchLazy` is: this renders for exactly the one role — a super admin
@@ -39,52 +36,31 @@ import { useI18n } from '@/lib/i18n';
  * see it, so nobody else's first load should carry its weight.
  */
 
-const styles = stylex.create({
-  section: { fontSize: '17px' },
-  note: { fontSize: '15px', lineHeight: 1.5 },
-});
-
-const CONTENT: Record<
-  'admin' | 'super_admin' | 'provider',
-  { titleKey: string; seeAllHref: string; people: readonly { id: string; firstName: string }[] }
-> = {
-  admin: { titleKey: 'admin.members.title', seeAllHref: '/admin/', people: DUMMY_MEMBERS },
-  super_admin: {
-    titleKey: 'directory.title',
-    seeAllHref: '/directory/',
-    people: DUMMY_EVERYONE.slice(0, 6),
-  },
-  provider: {
-    titleKey: 'interested.title',
-    seeAllHref: '/interested/',
-    people: DUMMY_INTERESTED.map((interest) => interest.person),
-  },
-};
+const PEOPLE = {
+  admin: DUMMY_MEMBERS,
+  super_admin: DUMMY_EVERYONE.slice(0, 6),
+  provider: DUMMY_INTERESTED.map((interest) => interest.person),
+} as const;
 
 export function HomePeoplePreview({ role }: { readonly role: 'admin' | 'super_admin' | 'provider' }) {
-  const { t } = useI18n();
-  const { titleKey, seeAllHref, people } = CONTENT[role];
+  const ranked = useMemo(() => {
+    const unreadBy = new Map<string, { at: string; conversationId: string }>();
+    if (role !== 'super_admin') {
+      for (const c of dummyConversationsFor(role)) {
+        if (c.unread && c.lastMessageAt) unreadBy.set(c.otherId, { at: c.lastMessageAt, conversationId: c.id });
+      }
+    }
+    return rankPeople(
+      PEOPLE[role].map((person) => ({
+        id: person.id,
+        firstName: person.firstName,
+        conversationId: unreadBy.get(person.id)?.conversationId ?? null,
+        lastSavedAt: person.lastSavedAt ?? null,
+      })),
+      (p) => ({ unreadAt: unreadBy.get(p.id)?.at ?? null, lastSavedAt: p.lastSavedAt }),
+      null,
+    );
+  }, [role]);
 
-  return (
-    <VStack gap={2}>
-      <HStack gap={2} align="center" justify="between" wrap="nowrap">
-        <Heading level={2} xstyle={styles.section}>
-          {t(titleKey)}
-        </Heading>
-        <TextLink label={t('saved.seeAll')} href={seeAllHref} size="quiet" />
-      </HStack>
-      <PeopleStrip
-        label={t(titleKey)}
-        people={people.map((person, index) => ({
-          id: person.id,
-          firstName: person.firstName,
-          href: `/person/?id=${person.id}`,
-          hasActivity: index % 2 === 0,
-        }))}
-      />
-      <Text type="supporting" xstyle={styles.note}>
-        {t('example.people.note')}
-      </Text>
-    </VStack>
-  );
+  return <HomePeopleSection role={role} ranked={ranked} isExample />;
 }

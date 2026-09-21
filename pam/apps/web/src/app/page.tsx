@@ -36,6 +36,7 @@ import { useViewAs } from '@/lib/useViewAs';
 import { SavedStripLazy } from './SavedStripLazy';
 import { RoleSwitchLazy } from './RoleSwitchLazy';
 import { HomePeoplePreviewLazy } from './HomePeoplePreviewLazy';
+import { HomePeopleLazy } from './HomePeopleLazy';
 
 /**
  * Home.
@@ -110,6 +111,13 @@ export default function HomePage() {
    */
   const realCanMessage = trueRole === 'member' || trueRole === 'admin' || trueRole === 'provider';
   const [unreadMessages, setUnreadMessages] = useState(0);
+  /*
+   * A real case manager or program admin gets their people strip (D-198),
+   * which owns the conversation list for Home and reports the same unread
+   * count — one query, not two. Not while previewing: a preview shows the
+   * example strip below, and the tile keeps the real count from here.
+   */
+  const realPeopleStrip = !demoRole && (trueRole === 'admin' || trueRole === 'provider');
 
   /*
    * The example first name a preview greets by (D-173) — `@pam/config/dummy-people`
@@ -232,7 +240,9 @@ export default function HomePage() {
 
   return (
     <Page gap={4}>
-      {signedIn && realCanMessage ? <UnreadMessagesLazy enabled onCount={setUnreadMessages} /> : null}
+      {signedIn && realCanMessage && !realPeopleStrip ? (
+        <UnreadMessagesLazy enabled onCount={setUnreadMessages} />
+      ) : null}
       <AppHeader
         roleLabel={t(`role.${viewed}`)}
         roleControl={
@@ -338,6 +348,13 @@ export default function HomePage() {
       */}
       {demoRole === 'admin' || demoRole === 'super_admin' || demoRole === 'provider' ? (
         <HomePeoplePreviewLazy role={demoRole} />
+      ) : null}
+      {signedIn && realPeopleStrip && (trueRole === 'admin' || trueRole === 'provider') ? (
+        <HomePeopleLazy
+          role={trueRole}
+          accountId={session.session.userId}
+          onUnreadCount={setUnreadMessages}
+        />
       ) : null}
 
       {/*
