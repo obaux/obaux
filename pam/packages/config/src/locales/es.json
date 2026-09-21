@@ -477,7 +477,7 @@
   "privacy.s.what-we-keep.p2": "En que se inscribe, las visitas que planea, si fue, y los puntos que gana.",
   "privacy.s.what-we-keep.p3": "Los mensajes que escribe en PAM. Los guardamos para que pueda leerlos despues.",
   "privacy.s.what-we-keep.title": "Que guardamos",
-  "privacy.s.who-can-see.p1": "La persona que le invito ve en que trabaja, los programas donde entro, sus visitas, sus puntos, el ultimo dia que uso PAM, cuando guarda un lugar nuevo (no cual), con quien conecta, y que existe un chat.",
+  "privacy.s.who-can-see.p1": "La persona que le invito ve en que trabaja, los programas donde entro, sus visitas, sus puntos, el ultimo dia que uso PAM, cuando guarda un lugar nuevo (no cual), y con quien conecta.",
   "privacy.s.who-can-see.p2": "No puede leer sus mensajes. No ve lo que comparte con sus amigos. No ve a personas que no estan en su lista.",
   "privacy.s.who-can-see.p3": "Ve un mensaje suyo solo si alguien lo reporta como inseguro. Ve ese mensaje y nada mas del chat.",
   "privacy.s.who-can-see.p4": "Es la misma lista que le mostramos al entrar. Si cambia, se lo decimos antes.",

@@ -477,7 +477,7 @@
   "privacy.s.what-we-keep.p2": "What you sign up for, the visits you plan, whether you went, and the points you earn.",
   "privacy.s.what-we-keep.p3": "The messages you send in PAM. We keep them so you can read them later.",
   "privacy.s.what-we-keep.title": "What we keep",
-  "privacy.s.who-can-see.p1": "The person who invited you can see what you are working on, the programs you joined, your visits, your points, the last day you used PAM, when you save a new place (not which one), who you connect with, and that a chat exists.",
+  "privacy.s.who-can-see.p1": "The person who invited you can see what you are working on, the programs you joined, your visits, your points, the last day you used PAM, when you save a new place (not which one), and who you connect with.",
   "privacy.s.who-can-see.p2": "They cannot read your messages. They cannot see what you share with your buddies. They cannot see people who are not on their list.",
   "privacy.s.who-can-see.p3": "They see one of your messages only if someone reports it as not safe. Then they see that message, and nothing else from the chat.",
   "privacy.s.who-can-see.p4": "This is the same list we show you when you join. If it ever changes, we will tell you first.",
