@@ -67,6 +67,20 @@ function describe(
   return t(bodyKey, bodyVars);
 }
 
+/**
+ * Where a row leads (D-185): the thing it names, when that thing has a
+ * screen. A reported message → the Reported section of Messages; a new
+ * message → its conversation; a reported place → the Reported places. A
+ * place taken off the list has nowhere to go and stays a line of text.
+ */
+function hrefFor(kind: string, subjectId: string | null): string | undefined {
+  if (kind === 'message_reported') return '/messages/?show=reported';
+  if (kind === 'message_received' && subjectId) return `/messages/thread/?id=${encodeURIComponent(subjectId)}`;
+  if (kind === 'service_flagged') return '/places/?filter=reported';
+  if (kind === 'staff_request_pending') return '/requests/';
+  return undefined;
+}
+
 export default function NotificationsPage() {
   const { t, locale } = useI18n();
   const supportPhone = useSupportPhone();
@@ -147,6 +161,7 @@ export default function NotificationsPage() {
               text: describe(item.bodyKey, item.bodyVars, t),
               when: whenHappened(item.createdAt, locale, t),
               isNew: !item.isRead,
+              href: hrefFor(item.kind, item.subjectId),
             }))}
             labels={{ empty: t('notify.none'), new: t('notify.new') }}
           />
@@ -160,6 +175,7 @@ export default function NotificationsPage() {
                 text: describe(item.bodyKey, item.bodyVars, t),
                 when: whenHappened(item.createdAt, locale, t),
                 isNew: item.isNew,
+                href: hrefFor(item.bodyKey.replace('notify.', ''), null),
               }))}
               labels={{ empty: t('notify.none'), new: t('notify.new') }}
             />

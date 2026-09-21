@@ -228,8 +228,6 @@ export default function HomePage() {
   const isCaseManager = viewed === 'admin';
   const isSuperAdmin = viewed === 'super_admin';
   const isProvider = viewed === 'provider';
-  // Reported messages are reviewed by a case manager or a super admin (D-178).
-  const isReviewer = isCaseManager || isSuperAdmin;
   const greetingName = demoRole ? (dummySelfName ?? me.firstName) : me.firstName;
 
   return (
@@ -420,7 +418,7 @@ export default function HomePage() {
           icon twice on the same screen — a small, accepted cosmetic cost,
           not a functional one.
         */}
-        {viewed === 'member' || viewed === 'admin' || viewed === 'provider' ? (
+        {viewed === 'member' || viewed === 'admin' || viewed === 'provider' || viewed === 'super_admin' ? (
           <NavTile
             href="/messages/"
             icon={<PeopleIcon />}
@@ -431,20 +429,6 @@ export default function HomePage() {
           />
         ) : null}
 
-        {/*
-          Messages somebody said were not safe — the one route a message ever
-          takes to a case manager or a super admin (D-074, D-178). Gated on
-          the previewed role like every other tile; the screen fetches as the
-          real one.
-        */}
-        {isReviewer ? (
-          <NavTile
-            href="/reports/"
-            icon={<PeopleIcon />}
-            label={t('reports.title')}
-            description={t('home.go.reports')}
-          />
-        ) : null}
 
       </VStack>
 

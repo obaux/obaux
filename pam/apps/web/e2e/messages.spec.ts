@@ -116,9 +116,41 @@ test.describe('the conversation list', () => {
     await page.goto('/messages/');
     await settled(page);
 
-    await expect(page.getByRole('heading', { name: 'Marcus' })).toBeVisible();
+    // A row, not a card (D-186): the name is the row's link, and the last
+    // thing said sits under it with the unread mark at the end.
+    await expect(page.getByRole('link', { name: /Marcus/ })).toBeVisible();
     await expect(page.getByText('Is the class still on Tuesday?')).toBeVisible();
     await expect(page.getByText('New', { exact: true })).toBeVisible();
+    // A case manager looking at a member: nothing under the name (D-187).
+    await expect(page.getByText('Member', { exact: true })).toHaveCount(0);
+    // Reported is a section of this screen for a case manager (D-184).
+    await expect(page.getByRole('radio', { name: 'Reported' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'New message' })).toBeVisible();
+  });
+
+  test('"New message" opens a picker with a search box, and picking opens the chat', async ({ page }) => {
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    await page.route(PEOPLE, (route) =>
+      route.fulfill(
+        json([
+          { profile_id: OTHER, first_name: 'Marcus', role: 'member' },
+          { profile_id: 'a2', first_name: 'Tanya', role: 'member' },
+        ]),
+      ),
+    );
+    await page.route('**/rest/v1/rpc/open_direct_conversation*', (route) => route.fulfill(json(CONVO)));
+    await page.goto('/messages/');
+    await settled(page);
+
+    await page.getByRole('button', { name: 'New message' }).click();
+    const sheet = page.getByRole('dialog', { name: 'Who do you want to message?' });
+    await expect(sheet).toBeVisible();
+    await expect(sheet.getByRole('button', { name: /Tanya/ })).toBeVisible();
+    await sheet.getByRole('textbox').fill('mar');
+    await expect(sheet.getByRole('button', { name: /Tanya/ })).toHaveCount(0);
+    await sheet.getByRole('button', { name: /Marcus/ }).click();
+    await expect(page).toHaveURL(new RegExp(`/messages/thread/\\?id=${CONVO}`));
   });
 
   test('a member previewing sees example conversations and who they can message', async ({ page }) => {
@@ -127,11 +159,20 @@ test.describe('the conversation list', () => {
     await page.goto('/messages/');
     await settled(page);
 
-    await expect(page.getByRole('heading', { name: 'Teresa' })).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Message your case manager or program' })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Teresa/ })).toBeVisible();
+    // A member sees who the other person is to them (D-187): the case
+    // manager as "Case manager", the program by its name.
+    await expect(page.getByRole('link', { name: /Teresa Case manager/ })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Sandra Example Learning Center/ })).toBeVisible();
     await expect(page.getByText(/Example people/)).toHaveCount(1);
-    // Jordan's two people are already in his conversations; the list says so.
-    await expect(page.getByText('People on your list will show up here.')).toBeVisible();
+    // No Reported section for a member (D-184).
+    await expect(page.getByRole('radio', { name: 'Reported' })).toHaveCount(0);
+
+    // The picker lists the example cast and a pick opens the example thread.
+    await page.getByRole('button', { name: 'New message' }).click();
+    const sheet = page.getByRole('dialog', { name: 'Who do you want to message?' });
+    await sheet.getByRole('button', { name: /Sandra/ }).click();
+    await expect(page).toHaveURL(/dummy-conv-dummy-m1-dummy-p1/);
   });
 });
 
@@ -228,7 +269,7 @@ test.describe('an example person', () => {
     await signedInAs(page, 'super_admin');
     await page.goto('/messages/');
     await settled(page);
-    await expect(page.getByRole('heading', { name: 'Jordan' })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Jordan/ })).toBeVisible();
     await expect(page.getByText('You: One more thing: the class moved to room 12 this week. Same time.')).toBeVisible();
   });
 });
@@ -258,10 +299,11 @@ test.describe('reported messages', () => {
         ]),
       ),
     );
-    await page.goto('/reports/');
+    await page.goto('/messages/?show=reported');
     await settled(page);
 
-    await expect(page.getByRole('heading', { name: 'Reported messages' })).toBeVisible();
+    // Reported lives inside Messages now (D-184), reached by the bell's row.
+    await expect(page.getByRole('radio', { name: 'Reported' })).toBeChecked();
     await expect(page.getByText('Come alone or else.')).toBeVisible();
     await expect(page.getByText('Reported by Marcus')).toBeVisible();
     await expect(page.getByRole('heading', { name: /About Sandra/ })).toBeVisible();
@@ -272,11 +314,65 @@ test.describe('reported messages', () => {
     expect(results.violations).toEqual([]);
   });
 
-  test('a member meets a plain statement, not a permission error', async ({ page }) => {
-    await signedInAs(page, 'member');
-    await page.goto('/reports/');
+  test('a super admin sees Reported and nothing to send, and a preview sees the example set', async ({ page }) => {
+    await signedInAs(page, 'super_admin');
+    await page.route(REPORTS, (route) => route.fulfill(json([])));
+    await page.goto('/messages/');
     await settled(page);
-    await expect(page.getByRole('heading', { name: 'This page is not for you' })).toBeVisible();
-    await expect(page.getByRole('link', { name: /Back/ })).toBeVisible();
+
+    // D-171: no conversations, no "New message" — Reported only, with the
+    // example reports while nothing real has been reported (D-184).
+    await expect(page.getByRole('button', { name: 'New message' })).toHaveCount(0);
+    await expect(page.getByRole('radio', { name: 'Reported' })).toHaveCount(0);
+    await expect(page.getByText('Can you just give me your home address so I can drop it off.')).toBeVisible();
+    await expect(page.getByRole('heading', { name: /About Keisha/ })).toBeVisible();
+    await expect(page.getByText(/Example people/)).toBeVisible();
+  });
+
+  test('the bell row for a reported message leads to the Reported section', async ({ page }) => {
+    await signedInAs(page, 'admin');
+    await page.route(NOTIFICATIONS, (route) =>
+      route.fulfill(
+        json([
+          {
+            id: 'n2',
+            kind: 'message_reported',
+            body_key: 'notify.message_reported',
+            body_vars: { name: 'Marcus' },
+            subject_type: 'report',
+            subject_id: 'r1',
+            created_at: new Date().toISOString(),
+            read_at: null,
+          },
+        ]),
+      ),
+    );
+    await page.goto('/notifications/');
+    await settled(page);
+    await expect(page.getByRole('link', { name: 'A message from Marcus was reported' })).toHaveAttribute(
+      'href',
+      '/messages/?show=reported',
+    );
+  });
+});
+
+test.describe('reported places (D-189)', () => {
+  test('a case manager preview sees the example reported places, and a decision clears one', async ({ page }) => {
+    await page.addInitScript(() => sessionStorage.setItem('pam.view-as', 'admin'));
+    await signedInAs(page, 'super_admin');
+    await page.route('**/rest/v1/rpc/services_near*', (route) => route.fulfill(json([])));
+    await page.route('**/rest/v1/rpc/flagged_services*', (route) => route.fulfill(json([])));
+    await page.goto('/places/?filter=reported');
+    await settled(page);
+
+    await expect(page.getByRole('button', { name: 'Reported' })).toHaveAttribute('aria-pressed', 'true');
+    await expect(page.getByRole('heading', { name: 'Example Workforce Center' })).toBeVisible();
+    await expect(page.getByText(/Something here is wrong/)).toBeVisible();
+    await page.getByRole('button', { name: 'Keep it' }).first().click();
+    await expect(page.getByRole('heading', { name: 'Example Workforce Center' })).toHaveCount(0);
+    await expect(page.getByRole('heading', { name: 'Example Food Pantry' })).toBeVisible();
+
+    const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
+    expect(results.violations).toEqual([]);
   });
 });

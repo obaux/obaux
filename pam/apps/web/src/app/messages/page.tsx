@@ -1,16 +1,13 @@
 'use client';
 
-import { useMemo } from 'react';
+import { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import * as stylex from '@stylexjs/stylex';
-import { Card } from '@astryxdesign/core/Card';
-import { VStack } from '@astryxdesign/core/VStack';
-import { HStack } from '@astryxdesign/core/HStack';
-import { Heading } from '@astryxdesign/core/Heading';
+import { List } from '@astryxdesign/core/List';
 import { Text } from '@astryxdesign/core/Text';
-import { Badge } from '@astryxdesign/core/Badge';
-import { Avatar } from '@astryxdesign/core/Avatar';
-import { AppHeader, HelpBar, Loading, Notice, Page, PageTitle } from '@pam/ui';
-import { NOTICES } from '@pam/config';
+import { SegmentedControl, SegmentedControlItem } from '@astryxdesign/core/SegmentedControl';
+import { AppHeader, BigButton, HelpBar, Loading, Notice, Page, PageTitle } from '@pam/ui';
+import { NOTICES, type Role } from '@pam/config';
 import { USE_DUMMY_PEOPLE } from '@pam/config/dummy-flag';
 import { useI18n } from '@/lib/i18n';
 import { NotIn } from '../NotIn';
@@ -22,180 +19,134 @@ import { useDemoView } from '@/lib/useDemoView';
 import { RoleSwitchControl } from '../RoleSwitchControl';
 import { useConversations } from '@/lib/useConversations';
 import { useMessageableMembers } from '@/lib/useMessageableMembers';
+import { useReports } from '@/lib/useReports';
+import { openConversation } from '@/lib/openConversation';
 import { whenHappened } from '@/lib/when';
-import { StartConversationRow } from './StartConversationRow';
-import { DummyConversationsLazy, DummyStartableLazy } from './DummyRowsLazy';
+import { ConversationRow } from './ConversationRow';
+import { ReportsList } from './ReportsList';
+import { DummyConversationsLazy, DummyReportsLazy } from './DummyRowsLazy';
+import { NewMessagePickerLazy } from './NewMessagePickerLazy';
+import type { PickablePerson } from './NewMessagePicker';
 
 /**
- * Who a case manager or a program admin can message, who a member has
- * already been messaged by, and every conversation any of the three already
- * have.
+ * Messages: every conversation this person is in, and — for a case manager
+ * or a super admin — the messages somebody said were not safe.
  *
- * **Messaging in PAM is staff-to-member, not member-to-member.** An earlier
- * version of this screen scoped "who can you message" to accepted
- * mentor/buddy `connections` — wrong, corrected on Will's direction (see
- * D-152, superseding D-148/D-149/D-150). A1's own reasoning already said the
- * quiet part: staff reaching a member has to go through the relationship
- * that already exists — a case manager's caseload, a program's enrollment —
- * never an open directory.
+ * **Messaging in PAM is staff-to-member, not member-to-member** (D-163,
+ * D-176): a case manager and the members on their caseload, a program admin
+ * and the members enrolled with them, in either direction. `messageable_people()`
+ * (0063) is the list and `open_direct_conversation()` is the rule, so a name
+ * offered here is one the database will open and nothing else can be opened.
  *
- * Who may *start* a new conversation, and with whom:
+ * **Two sections, one control** (D-184). A member or a program sees their
+ * conversations. A case manager sees conversations and "Reported"; a super
+ * admin sees "Reported" only — D-171: a super admin has no conversations
+ * and no way to start one, so no "New message" is drawn for them. The
+ * bell's "a message from … was reported" lands on `?show=reported`.
  *
- *   - A **case manager** (`role: 'admin'`) sees their caseload — the same
- *     people `/admin/`'s "Your people" screen shows, via `admin_covers()`.
- *   - A **program admin** (`role: 'provider'`) sees members enrolled in a
- *     service under their org, via `provider_linked_to()`.
- *   - A **member** — since D-176, superseding D-163's "a member starts
- *     nothing" — sees their own case manager and the program admin(s) of
- *     whatever they are enrolled in, and may start a conversation with
- *     them. Never another member.
+ * **One primary action**: "New message" (D-186), which opens a picker of
+ * everyone this person may reach, with a search box. The people-card list
+ * that used to sit under the conversations is gone.
  *
- * All three lists are one function, `messageable_people()` (0063), which is
- * also the rule `open_direct_conversation()` enforces — so a name shown here
- * is one the database will actually open, and nothing else can be opened
- * from anywhere (D-176 closed the gap D-163 left).
- *
- * **Preview-aware, but real data never follows the preview (D-172).**
- * Visibility of every section below — whether this screen shows anything at
- * all, whether the "Start a conversation" list appears — is gated on
- * `viewedRole`, the same as every other screen a super admin can preview
- * (`/admin/`, `/directory/`, `/interested/`). Before D-172 this screen was
- * the one exception, gated on `trueRole` alone, which meant the Home tile
- * and this screen simply never showed during any preview — a real bug, not
- * a deliberate restriction (Will, 17 September).
- *
- * What D-150's original worry still correctly rules out: reading or sending
- * a *real* message under a previewed identity. That is why `useConversations`
- * and `useMessageableMembers` below are still enabled only by `trueRole` —
- * the real, signed-in account's own true permissions, never `viewedRole`.
- * A super admin previewing "Case manager" sees this screen's chrome and
- * layout, but the data behind it is still queried as themselves, under
- * D-171 ("a super admin cannot send or start any message") — which for a
- * super admin's own real account means no real conversations and no real
- * "who can I message" list ever load here, preview or not.
- *
- * What fills the gap: `DummyConversationsLazy`/`DummyStartableLazy`
- * (`@pam/config/dummy-conversations`), the same "real always wins, silently"
- * fallback `/admin/` already uses for `DUMMY_MEMBERS` — shown whenever a
- * preview is active, or whenever the real, non-previewed account's own real
- * list comes back genuinely empty. Every dummy row is plain, non-interactive
- * markup with no `href` and no `onClick` — seeing example content is safe;
- * a tap that could reach `openConversation` would not be. See the file
- * comment in `dummy-conversations.ts` and D-172 for why.
+ * **Preview-aware, but real data never follows the preview (D-172).** What
+ * is drawn follows `viewedRole`; `useConversations`, `useMessageableMembers`
+ * and `useReports` are enabled by `trueRole` only. A preview, or a genuinely
+ * empty real list, shows the example set (D-183, D-184) through the same
+ * row components the real data uses.
  */
 
 const styles = stylex.create({
-  row: { width: '100%', position: 'relative' },
-  name: { fontSize: '20px', lineHeight: 1.3 },
-  meta: { fontSize: '16px' },
-  preview: {
-    fontSize: '16px',
-    lineHeight: 1.4,
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap',
-  },
-  section: { fontSize: '17px' },
-  link: {
-    color: 'inherit',
-    textDecoration: 'none',
-    '::after': { content: '""', position: 'absolute', inset: 0 },
-  },
+  note: { fontSize: '15px', lineHeight: 1.5 },
+  control: { width: '100%' },
 });
 
-function ConversationRowView({
-  otherName,
-  otherRoleLabel,
-  when,
-  unread,
-  preview,
-  href,
-  labels,
-}: {
-  readonly otherName: string | null;
-  readonly otherRoleLabel: string | null;
-  readonly when: string | null;
-  readonly unread: boolean;
-  /** The last thing said — one line, cut by the row, never a second row (D-179). */
-  readonly preview: string;
-  readonly href: string;
-  readonly labels: { readonly someone: string; readonly new: string };
-}) {
-  const name = otherName ?? labels.someone;
-  return (
-    <Card xstyle={styles.row}>
-      <VStack gap={2}>
-        <HStack gap={3} align="center">
-          <Avatar size="lg" name={name} />
-          <Heading level={3} xstyle={styles.name}>
-            <a href={href} {...stylex.props(styles.link)}>
-              {name}
-            </a>
-          </Heading>
-        </HStack>
-        <HStack gap={2} wrap="wrap" align="center">
-          {otherRoleLabel ? <Badge variant="neutral" label={otherRoleLabel} /> : null}
-          {unread ? <Badge variant="info" label={labels.new} /> : null}
-          {when ? (
-            <Text type="supporting" xstyle={styles.meta}>
-              {when}
-            </Text>
-          ) : null}
-        </HStack>
-        <Text type="supporting" xstyle={styles.preview}>
-          {preview}
-        </Text>
-      </VStack>
-    </Card>
-  );
+type Section = 'conversations' | 'reported';
+
+function contextFor(
+  viewer: Role | null,
+  otherRole: Role | null,
+  programName: string | null,
+  t: (key: string) => string,
+): string | null {
+  if (viewer !== 'member' || !otherRole) return null;
+  if (otherRole === 'provider') return programName ?? t('role.provider');
+  if (otherRole === 'admin') return t('role.admin');
+  return null;
 }
 
-export default function MessagesPage() {
+function MessagesScreen() {
   const { t, locale } = useI18n();
   const supportPhone = useSupportPhone();
   const { state: session } = useSession();
+  const params = useSearchParams();
 
   const signedIn = session.status === 'signed-in';
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
   const { viewedRole, demoRole, setViewAs } = useRoleView(trueRole);
   const isDemo = useDemoView(session);
-  // A preview is active, or the account is in the separate demo-view grant
-  // (0057) — either way, real data is not what this screen should draw.
   const previewing = demoRole !== null || isDemo;
 
-  // Visibility/rendering — what this screen draws — follows the previewed
-  // role, the same as every other previewable screen (D-172).
+  // What is drawn follows the previewed role (D-172).
   const canMessage = viewedRole === 'member' || viewedRole === 'admin' || viewedRole === 'provider';
-  const isStaff = viewedRole === 'admin' || viewedRole === 'provider';
-  // Everyone who can message can start a conversation (D-176) — the list
-  // just differs by role, and the database decides it, not this screen.
-  const canStart = canMessage;
+  const canReview = viewedRole === 'admin' || viewedRole === 'super_admin';
+  const hasScreen = canMessage || canReview;
 
-  // Real data fetched, and the only account any real write below could ever
-  // run as, always follows the TRUE role, never the preview (D-171, D-172).
-  // For a super admin (the only account that can ever be previewing),
-  // `trueRole` is never in the list below, so these two hooks simply never
-  // run while a preview is active — not merely "run and come back empty".
+  // What is fetched follows the true role, never the preview (D-171, D-172).
   const realCanMessage = trueRole === 'member' || trueRole === 'admin' || trueRole === 'provider';
+  const realCanReview = trueRole === 'admin' || trueRole === 'super_admin';
 
   const { state: conversations } = useConversations(signedIn && realCanMessage);
   const { state: messageable } = useMessageableMembers(signedIn && realCanMessage);
+  const { state: reports } = useReports(signedIn && realCanReview);
 
-  const messagedIds = useMemo(() => {
-    if (conversations.status !== 'ready') return new Set<string>();
-    return new Set(
-      conversations.conversations
-        .map((c) => c.otherProfileId)
-        .filter((id): id is string => id !== null),
-    );
-  }, [conversations]);
+  const [chosen, setChosen] = useState<Section>('conversations');
+  // `?show=reported` is where the bell's row lands (D-185). Read in an
+  // effect, not the initialiser: in a static export the params arrive after
+  // the first render.
+  useEffect(() => {
+    if (params.get('show') === 'reported') setChosen('reported');
+  }, [params]);
+  // A super admin has no conversations to show, so Reported is their only
+  // section; anyone who cannot review only has Conversations.
+  const section: Section = viewedRole === 'super_admin' ? 'reported' : canReview ? chosen : 'conversations';
+  const setSection = setChosen;
 
-  const startable = useMemo(() => {
+  const [picking, setPicking] = useState(false);
+  const [dummyPicker, setDummyPicker] = useState<{
+    people: readonly PickablePerson[];
+    hrefFor: (id: string) => string;
+  } | null>(null);
+
+  const realPeople = useMemo<readonly PickablePerson[]>(() => {
     if (messageable.status !== 'ready') return [];
-    return messageable.people.filter((p) => !messagedIds.has(p.profileId));
-  }, [messageable, messagedIds]);
+    return messageable.people.map((p) => ({
+      id: p.profileId,
+      name: p.firstName ?? t('messages.thread.someone'),
+      context: contextFor(trueRole, p.role, null, t),
+    }));
+  }, [messageable, trueRole, t]);
 
-  const rowLabels = { someone: t('messages.thread.someone'), new: t('notify.new') };
+  // The example cast for a preview, loaded with the picker rather than the page.
+  useEffect(() => {
+    if (!picking || !previewing || !canMessage) return;
+    let cancelled = false;
+    void import('./DummyRows').then((mod) => {
+      if (cancelled) return;
+      setDummyPicker(mod.dummyPickerPeople(viewedRole as 'member' | 'admin' | 'provider', t));
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [picking, previewing, canMessage, viewedRole, t]);
+
+  const pick = useCallback(
+    async (id: string): Promise<string | null> => {
+      if (previewing) return dummyPicker ? dummyPicker.hrefFor(id) : null;
+      const conversationId = await openConversation(id);
+      return conversationId ? `/messages/thread/?id=${encodeURIComponent(conversationId)}` : null;
+    },
+    [previewing, dummyPicker],
+  );
 
   if (session.status === 'loading') {
     return (
@@ -216,6 +167,11 @@ export default function MessagesPage() {
     );
   }
 
+  const showConversations = canMessage && section === 'conversations';
+  const showReported = canReview && section === 'reported';
+  const realEmptyConversations = !previewing && conversations.status === 'empty';
+  const realEmptyReports = !previewing && reports.status === 'ready' && reports.reports.length === 0;
+
   return (
     <Page gap={4}>
       <AppHeader
@@ -226,7 +182,7 @@ export default function MessagesPage() {
 
       <PageTitle title={t('messages.title')} backHref="/" backLabel={t('nav.back.home')} />
 
-      {!canMessage ? (
+      {!hasScreen ? (
         <Notice
           notice="no_mentors_found"
           title={t('messages.notForRole.title')}
@@ -236,18 +192,27 @@ export default function MessagesPage() {
         />
       ) : null}
 
-      {/*
-        Real conversations: only for the real, non-previewed account, and
-        only while its real query is actually running (`realCanMessage`).
-        A preview never reaches loading/error/empty here at all — see
-        `previewing` above — so there is nothing to show while it is active
-        except the dummy section below.
-      */}
-      {canMessage && !previewing && realCanMessage && conversations.status === 'loading' ? (
+      {canMessage && canReview ? (
+        <SegmentedControl
+          value={section}
+          onChange={(next) => setSection(next as Section)}
+          label={t('messages.sections')}
+          layout="fill"
+          size="lg"
+          xstyle={styles.control}
+        >
+          <SegmentedControlItem value="conversations" label={t('messages.section.conversations')} />
+          <SegmentedControlItem value="reported" label={t('messages.section.reported')} />
+        </SegmentedControl>
+      ) : null}
+
+      {/* ---- Conversations ---- */}
+
+      {showConversations && !previewing && realCanMessage && conversations.status === 'loading' ? (
         <Loading label={t('common.loading')} variant="inline" />
       ) : null}
 
-      {canMessage && !previewing && conversations.status === 'error' ? (
+      {showConversations && !previewing && conversations.status === 'error' ? (
         <Notice
           notice={conversations.offline ? 'offline' : 'something_went_wrong'}
           title={t(NOTICES[conversations.offline ? 'offline' : 'something_went_wrong'].titleKey)}
@@ -257,15 +222,13 @@ export default function MessagesPage() {
         />
       ) : null}
 
-      {canMessage && !previewing && conversations.status === 'ready' && conversations.conversations.length > 0 ? (
-        <VStack gap={3}>
+      {showConversations && !previewing && conversations.status === 'ready' && conversations.conversations.length > 0 ? (
+        <List hasDividers density="spacious">
           {conversations.conversations.map((c) => (
-            <ConversationRowView
+            <ConversationRow
               key={c.id}
-              otherName={c.otherName}
-              otherRoleLabel={c.otherRole ? t(`role.${c.otherRole}`) : null}
-              when={c.lastMessageAt ? whenHappened(c.lastMessageAt, locale, t) : null}
-              unread={c.unread}
+              name={c.otherName ?? t('messages.thread.someone')}
+              context={contextFor(trueRole, c.otherRole, c.otherProgramName, t)}
               preview={
                 c.lastMessageBody === null
                   ? t('messages.preview.none')
@@ -273,105 +236,95 @@ export default function MessagesPage() {
                     ? t('messages.preview.you', { text: c.lastMessageBody })
                     : c.lastMessageBody
               }
+              when={c.lastMessageAt ? whenHappened(c.lastMessageAt, locale, t) : null}
+              unread={c.unread}
+              unreadLabel={t('notify.new')}
               href={`/messages/thread/?id=${encodeURIComponent(c.id)}`}
-              labels={rowLabels}
             />
           ))}
-        </VStack>
+        </List>
       ) : null}
 
-      {/*
-        The real, non-previewed account's own list is genuinely empty, and
-        example content is turned off (`USE_DUMMY_PEOPLE`) — the plain empty
-        state, same wording as before D-172.
-      */}
-      {canMessage && !previewing && !USE_DUMMY_PEOPLE && conversations.status === 'empty' ? (
+      {showConversations && realEmptyConversations && !USE_DUMMY_PEOPLE ? (
         <Notice
           notice="no_mentors_found"
           title={t('messages.empty.title')}
-          body={t(isStaff ? 'messages.empty.body.staff' : 'messages.empty.body.member')}
+          body={t(viewedRole === 'member' ? 'messages.empty.body.member' : 'messages.empty.body.staff')}
         />
       ) : null}
 
-      {/*
-        Example conversations (D-172): a preview is active, or the real
-        account's own real list came back genuinely empty — the same
-        "real always wins, silently" rule `/admin/` already applies to
-        `DUMMY_MEMBERS`. Never interactive; see `DummyRowsLazy`.
-      */}
-      {canMessage &&
+      {showConversations &&
       USE_DUMMY_PEOPLE &&
-      (previewing || conversations.status === 'empty') &&
+      (previewing || realEmptyConversations) &&
       (viewedRole === 'member' || viewedRole === 'admin' || viewedRole === 'provider') ? (
         <DummyConversationsLazy role={viewedRole} />
       ) : null}
 
-      {canStart ? (
-        <VStack gap={2}>
-          <Heading level={2} xstyle={styles.section}>
-            {t(isStaff ? 'messages.start.title' : 'messages.start.member.title')}
-          </Heading>
+      {/*
+        The one primary action (D-186): everyone this person may message, in a
+        sheet with a search box. Never for a super admin (D-171).
+      */}
+      {showConversations ? (
+        <BigButton label={t('messages.new.action')} onPress={() => setPicking(true)} />
+      ) : null}
 
-          {!previewing && realCanMessage && messageable.status === 'loading' ? (
-            <Loading label={t('common.loading')} variant="inline" />
-          ) : null}
+      {picking ? (
+        <NewMessagePickerLazy
+          isOpen={picking}
+          onOpenChange={setPicking}
+          people={previewing ? (dummyPicker?.people ?? []) : realPeople}
+          onPick={pick}
+        />
+      ) : null}
 
-          {!previewing && messageable.status === 'error' ? (
-            <Notice
-              notice={messageable.offline ? 'offline' : 'something_went_wrong'}
-              title={t(NOTICES[messageable.offline ? 'offline' : 'something_went_wrong'].titleKey)}
-              body={t(NOTICES[messageable.offline ? 'offline' : 'something_went_wrong'].bodyKey)}
-              supportPhone={supportPhone}
-              callLabel={t('help.callSupport')}
-            />
-          ) : null}
+      {/* ---- Reported ---- */}
 
-          {!previewing && !USE_DUMMY_PEOPLE && messageable.status === 'ready' && startable.length === 0 ? (
-            <Notice
-              notice="no_caseload_members"
-              title={t('messages.start.empty.title')}
-              body={t('messages.start.empty.body')}
-            />
-          ) : null}
+      {showReported && !previewing && realCanReview && reports.status === 'loading' ? (
+        <Loading label={t('common.loading')} variant="inline" />
+      ) : null}
 
-          {/*
-            Real, tappable rows — only for the real, non-previewed account.
-            Each one is a live `openConversation` call; never rendered while
-            `previewing` (D-172).
-          */}
-          {!previewing && startable.length > 0 ? (
-            <VStack gap={3}>
-              {startable.map((person) => (
-                <StartConversationRow
-                  key={person.profileId}
-                  profileId={person.profileId}
-                  firstName={person.firstName}
-                  labels={{
-                    someone: rowLabels.someone,
-                    failedTitle: t('messages.start.failed.title'),
-                    failedBody: t('messages.start.failed.body'),
-                    callSupport: t('help.callSupport'),
-                  }}
-                  supportPhone={supportPhone}
-                />
-              ))}
-            </VStack>
-          ) : null}
+      {showReported && !previewing && reports.status === 'error' ? (
+        <Notice
+          notice={reports.offline ? 'offline' : 'something_went_wrong'}
+          title={t(NOTICES[reports.offline ? 'offline' : 'something_went_wrong'].titleKey)}
+          body={t(NOTICES[reports.offline ? 'offline' : 'something_went_wrong'].bodyKey)}
+          supportPhone={supportPhone}
+          callLabel={t('help.callSupport')}
+        />
+      ) : null}
 
-          {/*
-            Example people to message (D-172): a preview, or the real
-            account's own real "Start a conversation" list came back
-            genuinely empty. Non-interactive — see `DummyRowsLazy`.
-          */}
-          {USE_DUMMY_PEOPLE &&
-          (viewedRole === 'member' || viewedRole === 'admin' || viewedRole === 'provider') &&
-          (previewing || (messageable.status === 'ready' && startable.length === 0)) ? (
-            <DummyStartableLazy role={viewedRole} />
-          ) : null}
-        </VStack>
+      {showReported && !previewing && reports.status === 'ready' && reports.reports.length > 0 ? (
+        <ReportsList reports={reports.reports} />
+      ) : null}
+
+      {showReported && realEmptyReports && !USE_DUMMY_PEOPLE ? (
+        <Notice notice="no_caseload_members" title={t('reports.empty.title')} body={t('reports.empty.body')} />
+      ) : null}
+
+      {showReported && USE_DUMMY_PEOPLE && (previewing || realEmptyReports) ? <DummyReportsLazy /> : null}
+
+      {showReported ? (
+        <Text type="supporting" xstyle={styles.note}>
+          {t('reports.intro')}
+        </Text>
       ) : null}
 
       <HelpBar label={t('nav.help')} variant="block" />
     </Page>
+  );
+}
+
+/** `useSearchParams` needs a Suspense boundary in an exported app (see `/place/`). */
+export default function MessagesPage() {
+  return (
+    <Suspense
+      fallback={
+        <Page gap={3}>
+          <AppHeader />
+        </Page>
+      }
+    >
+      <MessagesScreen />
+    </Suspense>
   );
 }

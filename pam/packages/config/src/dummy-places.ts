@@ -100,3 +100,37 @@ export const DUMMY_PLACES_BY_ID: Readonly<Record<string, DummySavedPlace>> = Obj
 export function isDummyPlaceId(id: string): boolean {
   return id.startsWith('dummy-place-');
 }
+
+export interface DummyFlag {
+  readonly id: string;
+  readonly place: DummySavedPlace;
+  /** One of 0036's four reasons. */
+  readonly reason: 'closed' | 'moved' | 'not_accepting' | 'wrong_info';
+  readonly note: string | null;
+  readonly count: number;
+  readonly flaggedAt: string;
+}
+
+/**
+ * Reported places, for the "Reported" chip a case manager or super admin
+ * preview sees on `/places/` (D-189) — the same two places, and the same
+ * reasons, the example bell rows already name in `dummy-notifications.ts`.
+ */
+export const DUMMY_FLAGS: readonly DummyFlag[] = [
+  {
+    id: 'dummy-flag-1',
+    place: EXAMPLE_WORKFORCE_CENTER,
+    reason: 'wrong_info',
+    note: 'The phone number rings a fax machine.',
+    count: 2,
+    flaggedAt: new Date(Date.now() - 3_600_000).toISOString(),
+  },
+  {
+    id: 'dummy-flag-2',
+    place: EXAMPLE_FOOD_PANTRY,
+    reason: 'closed',
+    note: null,
+    count: 1,
+    flaggedAt: new Date(Date.now() - 3 * 3_600_000).toISOString(),
+  },
+];

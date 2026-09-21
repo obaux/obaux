@@ -204,3 +204,64 @@ export const DUMMY_STARTABLE: Readonly<Record<'member' | 'admin' | 'provider', r
   admin: ['dummy-m4', 'dummy-m5'],
   provider: ['dummy-m6'],
 };
+
+/**
+ * Who a preview of `role` can pick in "New message" (D-186): everyone on
+ * their example list — the people already in their conversations plus
+ * `DUMMY_STARTABLE` — the way `messageable_people()` lists everyone a real
+ * account may reach whether or not a conversation exists yet. Each entry
+ * carries the example conversation a pick opens.
+ */
+export function dummyPickerFor(
+  role: 'member' | 'admin' | 'provider',
+): readonly { readonly personId: string; readonly conversationId: string }[] {
+  const self = DUMMY_SELF_ID[role];
+  const inConversations = dummyConversationsFor(role).map((c) => ({ personId: c.otherId, conversationId: c.id }));
+  const startable = DUMMY_STARTABLE[role].map((id) => ({
+    personId: id,
+    conversationId: role === 'member' ? dummyConversationIdBetween(self, id) : dummyConversationIdBetween(id, self),
+  }));
+  return [...inConversations, ...startable];
+}
+
+export interface DummyReport {
+  readonly id: string;
+  /** Who said it — a `DummyPerson.id`. */
+  readonly aboutId: string;
+  /** Who said it was not safe — a `DummyPerson.id`. */
+  readonly reporterId: string;
+  /** A `MESSAGE_REPORT_REASONS` key. */
+  readonly reason: string;
+  readonly excerpt: string;
+  readonly createdAt: string;
+  readonly resolvedAt: string | null;
+}
+
+/**
+ * Reported messages, for the "Reported" section a case manager or super
+ * admin preview sees (D-184) — the same cast, and the same two names the
+ * example bell rows already use (`dummy-notifications.ts`: "A message from
+ * Keisha was reported" for a super admin, "…from Jordan…" for a case
+ * manager). The excerpts are plain and mild on purpose: an example of the
+ * *mechanism*, not of anybody's worst day.
+ */
+export const DUMMY_REPORTS: readonly DummyReport[] = [
+  {
+    id: 'dummy-report-1',
+    aboutId: 'dummy-m2',
+    reporterId: 'dummy-a1',
+    reason: 'unwanted',
+    excerpt: 'Can you just give me your home address so I can drop it off.',
+    createdAt: daysAgo(1, 15),
+    resolvedAt: null,
+  },
+  {
+    id: 'dummy-report-2',
+    aboutId: 'dummy-m1',
+    reporterId: 'dummy-p1',
+    reason: 'other',
+    excerpt: 'Stop asking me about Friday. I said I would come.',
+    createdAt: daysAgo(2, 9),
+    resolvedAt: daysAgo(1, 11),
+  },
+];

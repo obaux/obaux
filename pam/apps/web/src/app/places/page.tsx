@@ -1,10 +1,13 @@
 'use client';
 
 import * as stylex from '@stylexjs/stylex';
+import { Suspense } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { HStack } from '@astryxdesign/core/HStack';
 import { VStack } from '@astryxdesign/core/VStack';
 import { Text } from '@astryxdesign/core/Text';
 import { Button } from '@astryxdesign/core/Button';
+import { TextInput } from '@astryxdesign/core/TextInput';
 import {
   AppHeader,
   BookmarkIcon,
@@ -24,10 +27,13 @@ import {
   type Category,
 } from '@pam/config';
 import { useEffect, useState } from 'react';
+import { USE_DUMMY_PEOPLE } from '@pam/config/dummy-flag';
 import { useI18n } from '@/lib/i18n';
 import { HeaderBell } from '../HeaderBell';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { usePlaces, METRES_PER_MILE } from '@/lib/usePlaces';
+import { useFlaggedPlaces } from '@/lib/useFlaggedPlaces';
+import { ReportedPlacesLazy } from './ReportedPlacesLazy';
 import { useSavedPlaces } from '@/lib/useSavedPlaces';
 import { placeStatus, useNow } from '@/lib/usePlaceStatus';
 import { useSession } from '@/lib/useSession';
@@ -102,13 +108,39 @@ const styles = stylex.create({
   source: { fontSize: '15px', lineHeight: 1.5 },
 });
 
-/** "All", then one chip per category, then Saved — a link, not a filter. */
-type Filter = Category | 'all';
+/** "All", then one chip per category, then Reported (reviewers), then Saved — a link, not a filter. */
+type Filter = Category | 'all' | 'reported';
 
-export default function PlacesPage() {
+/** A pause after typing, so a member on a slow phone is not searching on every letter. */
+function useDebounced(value: string, ms: number): string {
+  const [debounced, setDebounced] = useState(value);
+  useEffect(() => {
+    const handle = setTimeout(() => setDebounced(value), ms);
+    return () => clearTimeout(handle);
+  }, [value, ms]);
+  return debounced;
+}
+
+function PlacesScreen() {
   const { t, locale } = useI18n();
   const supportPhone = useSupportPhone();
+  const params = useSearchParams();
   const [category, setCategory] = useState<Filter>('all');
+  // `?filter=reported` is where the bell's "place was reported" row lands
+  // (D-185, D-189). Read in an effect: in a static export the params arrive
+  // after the first render.
+  useEffect(() => {
+    if (params.get('filter') === 'reported') setCategory('reported');
+  }, [params]);
+
+  /*
+   * Search by name or address (D-188). The list on the client is only ever
+   * the nearest 20, so the words go to the database (`services_search`,
+   * 0066) once they settle, and the category chips still apply to what
+   * comes back.
+   */
+  const [query, setQuery] = useState('');
+  const debouncedQuery = useDebounced(query, 300);
 
   /*
    * City Hall until the member says otherwise. Their choice lives in
@@ -132,6 +164,20 @@ export default function PlacesPage() {
   const { state: session } = useSession();
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
   const { demoRole, setViewAs } = useRoleView(trueRole);
+  const viewedRole = demoRole ?? trueRole;
+  /*
+   * Reported places (D-189): a chip only a reviewer sees — drawn for the
+   * previewed role, fetched for the real one (D-172). A member never sees
+   * the chip, and `flagged_services()` would answer them nothing anyway.
+   */
+  const canReview = viewedRole === 'admin' || viewedRole === 'super_admin';
+  const realCanReview = trueRole === 'admin' || trueRole === 'super_admin';
+  const showingReported = canReview && category === 'reported';
+  const { state: flagged, refresh: refreshFlagged } = useFlaggedPlaces(showingReported && realCanReview);
+  // Somebody who cannot review but arrives on `?filter=reported` simply sees
+  // the ordinary list: `showingReported` is false and the chip is not drawn.
+  // (Not reset in an effect: the previewed role arrives a render after the
+  // params do, and a reset in between would lose the bell's deep link.)
   // One clock for the whole list; `placeStatus` is pure from there.
   const now = useNow();
   const { isSaved, save, unsave, failed: saveFailed } = useSavedPlaces(
@@ -147,9 +193,11 @@ export default function PlacesPage() {
   const state = usePlaces({
     lat: area.lat,
     lon: area.lon,
-    ...(category === 'all' ? {} : { category }),
+    ...(category === 'all' || category === 'reported' ? {} : { category }),
     limit: 20,
+    query: debouncedQuery,
   });
+  const searching = debouncedQuery.trim() !== '';
 
   return (
     <Page gap={4}>
@@ -179,6 +227,17 @@ export default function PlacesPage() {
       ) : null}
 
       <PageTitle title={t('places.title')} backHref="/" backLabel={t('nav.back.home')} />
+
+      <TextInput
+        label={t('places.search')}
+        isLabelHidden
+        placeholder={t('places.search')}
+        value={query}
+        onChange={setQuery}
+        hasClear
+        startIcon="search"
+        width="100%"
+      />
 
       {saveFailed ? (
         <Notice
@@ -223,6 +282,18 @@ export default function PlacesPage() {
             xstyle={styles.chip}
           />
         ))}
+        {canReview ? (
+          <Button
+            label={t('places.filter.reported')}
+            variant={category === 'reported' ? 'primary' : 'secondary'}
+            size="sm"
+            href="/places/?filter=reported"
+            role="button"
+            aria-pressed={category === 'reported'}
+            onClick={(e) => { e.preventDefault(); setCategory('reported'); }}
+            xstyle={styles.chip}
+          />
+        ) : null}
         <Button
           label={t('places.filter.saved')}
           variant="secondary"
@@ -233,21 +304,33 @@ export default function PlacesPage() {
         />
       </HStack>
 
-      {state.status === 'loading' ? (
+      {showingReported ? (
+        <ReportedPlacesLazy
+          state={realCanReview ? flagged : { status: 'empty' }}
+          previewing={demoRole !== null || !realCanReview}
+          canResolve={trueRole === 'super_admin' && demoRole === null}
+          useDummy={USE_DUMMY_PEOPLE}
+          onResolved={refreshFlagged}
+          now={now}
+          supportPhone={supportPhone}
+        />
+      ) : null}
+
+      {!showingReported && state.status === 'loading' ? (
         <PlaceCardSkeletonList label={t('common.loading')} count={4} />
       ) : null}
 
-      {state.status === 'empty' ? (
+      {!showingReported && state.status === 'empty' ? (
         <Notice
           notice="no_places_found"
-          title={t(NOTICES.no_places_found.titleKey)}
-          body={t(NOTICES.no_places_found.bodyKey)}
+          title={t(searching ? 'places.search.none.title' : NOTICES.no_places_found.titleKey)}
+          body={t(searching ? 'places.search.none.body' : NOTICES.no_places_found.bodyKey)}
           supportPhone={supportPhone}
           callLabel={t('help.callSupport')}
         />
       ) : null}
 
-      {state.status === 'error' ? (
+      {!showingReported && state.status === 'error' ? (
         <Notice
           notice={state.offline ? 'offline' : 'something_went_wrong'}
           title={t(NOTICES[state.offline ? 'offline' : 'something_went_wrong'].titleKey)}
@@ -257,7 +340,7 @@ export default function PlacesPage() {
         />
       ) : null}
 
-      {state.status === 'ready' ? (
+      {!showingReported && state.status === 'ready' ? (
         <>
           <VStack gap={3}>
             {state.places.map((place, index) => {
@@ -304,5 +387,20 @@ export default function PlacesPage() {
         </>
       ) : null}
     </Page>
+  );
+}
+
+/** `useSearchParams` needs a Suspense boundary in an exported app (see `/place/`). */
+export default function PlacesPage() {
+  return (
+    <Suspense
+      fallback={
+        <Page gap={3}>
+          <AppHeader />
+        </Page>
+      }
+    >
+      <PlacesScreen />
+    </Suspense>
   );
 }

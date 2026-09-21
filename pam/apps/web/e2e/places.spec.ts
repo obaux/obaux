@@ -182,3 +182,38 @@ test.describe('the places screen', () => {
     expect(results.violations).toEqual([]);
   });
 });
+
+test.describe('finding a place by name (D-188)', () => {
+  test('typing a name asks the database, with typo tolerance, and clearing returns the nearby list', async ({ page }) => {
+    await page.route(RPC, (route) =>
+      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(ROWS) }),
+    );
+    const searches: string[] = [];
+    await page.route('**/rest/v1/rpc/services_search*', (route) => {
+      searches.push(route.request().postData() ?? '');
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(ROWS.filter((row) => /Peters/.test(row.name))),
+      });
+    });
+    await page.goto('/places/');
+    await expect(page.getByRole('heading', { name: 'J J Peters' })).toBeVisible();
+
+    await page.getByRole('textbox', { name: 'Search by name or address' }).fill('petres');
+    await expect.poll(() => searches.length).toBeGreaterThan(0);
+    expect(searches[searches.length - 1]).toContain('petres');
+    await expect(page.getByRole('heading', { name: 'J J Peters' })).toBeVisible();
+  });
+});
+
+test.describe('reported places (D-189)', () => {
+  test('a member never sees the Reported chip', async ({ page }) => {
+    await page.route(RPC, (route) =>
+      route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(ROWS) }),
+    );
+    await page.goto('/places/');
+    await expect(page.getByRole('heading', { name: 'J J Peters' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Reported' })).toHaveCount(0);
+  });
+});

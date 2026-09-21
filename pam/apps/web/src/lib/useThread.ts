@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import type { Role } from '@pam/config';
 
 /**
  * One conversation: who is in it, and what has been said.
@@ -37,6 +38,9 @@ export type ThreadState =
       status: 'ready';
       meId: string;
       otherName: string | null;
+      otherRole: Role | null;
+      /** The organisation's name when the other person is a program admin (0066, D-187). */
+      otherProgramName: string | null;
       kind: 'direct' | 'mentor';
       messages: readonly ThreadMessage[];
     }
@@ -114,10 +118,15 @@ export function useThread(conversationId: string | null): {
           return;
         }
 
-        const otherName =
-          ((partners ?? []) as { conversation_id: string; first_name: string | null }[]).find(
-            (row) => row.conversation_id === conversationId,
-          )?.first_name ?? null;
+        const partner =
+          (
+            (partners ?? []) as {
+              conversation_id: string;
+              first_name: string | null;
+              role: Role;
+              program_name: string | null;
+            }[]
+          ).find((row) => row.conversation_id === conversationId) ?? null;
         const conv = one(mine.conversations);
 
         const { data: rows, error: messagesError } = await supabase
@@ -136,7 +145,9 @@ export function useThread(conversationId: string | null): {
         setState({
           status: 'ready',
           meId: me,
-          otherName,
+          otherName: partner?.first_name ?? null,
+          otherRole: partner?.role ?? null,
+          otherProgramName: partner?.program_name ?? null,
           kind: conv?.kind ?? 'direct',
           messages: ((rows ?? []) as MessageRow[]).map((row) => ({
             id: row.id,

@@ -36,6 +36,8 @@ export interface ConversationRow {
   readonly otherProfileId: string | null;
   readonly otherName: string | null;
   readonly otherRole: Role | null;
+  /** The organisation's name when the other person is a program admin (0066, D-187). */
+  readonly otherProgramName: string | null;
   readonly lastMessageAt: string | null;
   /**
    * The last thing said, for the row's one-line preview (D-179). Read from
@@ -66,6 +68,7 @@ interface PartnerRow {
   profile_id: string;
   first_name: string | null;
   role: Role;
+  program_name: string | null;
 }
 
 interface LatestMessageRow {
@@ -140,13 +143,14 @@ export function useConversations(enabled: boolean): {
 
         const otherByConversation = new Map<
           string,
-          { id: string; name: string | null; role: Role | null }
+          { id: string; name: string | null; role: Role | null; programName: string | null }
         >();
         for (const row of (partners ?? []) as PartnerRow[]) {
           otherByConversation.set(row.conversation_id, {
             id: row.profile_id,
             name: row.first_name,
             role: row.role,
+            programName: row.program_name ?? null,
           });
         }
 
@@ -174,6 +178,7 @@ export function useConversations(enabled: boolean): {
               otherProfileId: other?.id ?? null,
               otherName: other?.name ?? null,
               otherRole: other?.role ?? null,
+              otherProgramName: other?.programName ?? null,
               lastMessageAt: latestMsg?.created_at ?? null,
               lastMessageBody: latestMsg?.body ?? null,
               lastMessageMine: latestMsg ? latestMsg.sender_id === me : false,

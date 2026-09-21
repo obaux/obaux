@@ -67,6 +67,12 @@ interface PlacesQuery {
   lon: number;
   category?: Category;
   limit?: number;
+  /**
+   * Words typed into the search box (D-188). Non-empty switches the call
+   * from `services_near` to `services_search` (0066): the list on the client
+   * is only ever the nearest 20, so the database has to answer a name.
+   */
+  query?: string;
 }
 
 interface ServicesNearRow {
@@ -87,7 +93,7 @@ interface ServicesNearRow {
   hours: unknown;
 }
 
-export function usePlaces({ lat, lon, category, limit = 20 }: PlacesQuery): PlacesState {
+export function usePlaces({ lat, lon, category, limit = 20, query = '' }: PlacesQuery): PlacesState {
   const [state, setState] = useState<PlacesState>({ status: 'loading' });
 
   useEffect(() => {
@@ -97,12 +103,21 @@ export function usePlaces({ lat, lon, category, limit = 20 }: PlacesQuery): Plac
       try {
         const { createClient } = await import('./supabase');
         const supabase = createClient();
-        const { data, error } = await supabase.rpc('services_near', {
-          p_lat: lat,
-          p_lon: lon,
-          p_category: category ?? null,
-          p_limit: limit,
-        });
+        const q = query.trim();
+        const { data, error } = q
+          ? await supabase.rpc('services_search', {
+              p_query: q,
+              p_lat: lat,
+              p_lon: lon,
+              p_category: category ?? null,
+              p_limit: limit,
+            })
+          : await supabase.rpc('services_near', {
+              p_lat: lat,
+              p_lon: lon,
+              p_category: category ?? null,
+              p_limit: limit,
+            });
 
         if (cancelled) return;
         if (error) {
@@ -148,7 +163,7 @@ export function usePlaces({ lat, lon, category, limit = 20 }: PlacesQuery): Plac
     return () => {
       cancelled = true;
     };
-  }, [lat, lon, category, limit]);
+  }, [lat, lon, category, limit, query]);
 
   return state;
 }

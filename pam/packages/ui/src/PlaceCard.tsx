@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { Card } from '@astryxdesign/core/Card';
 import { VStack } from '@astryxdesign/core/VStack';
@@ -62,6 +63,17 @@ export interface PlaceCardProps {
   readonly audienceLabel?: string | null;
   readonly isSaved?: boolean;
   readonly onSave?: () => void;
+  /**
+   * Why this place was reported, already worded ("It is closed · 2 reports")
+   * — shown to reviewers on the Reported filter only (D-189). A badge in the
+   * error tone: this card is a place somebody said is wrong, not one to go to.
+   */
+  readonly flagLabel?: string | null;
+  /**
+   * The reviewer's decision controls, rendered under the card body, above
+   * the stretched link so they take the tap. Only a super admin gets these.
+   */
+  readonly flagActions?: ReactNode;
   readonly labels: {
     readonly save: string;
     readonly saved: string;
@@ -113,6 +125,7 @@ const styles = stylex.create({
    * Above the stretched link, or it is not clickable — and given its own
    * stacking context so the shadow of a pressed card does not cover it.
    */
+  actions: { position: 'relative', zIndex: 1, width: '100%' },
   save: {
     position: 'relative',
     zIndex: 1,
@@ -133,6 +146,8 @@ export function PlaceCard({
   audienceLabel,
   isSaved = false,
   onSave,
+  flagLabel,
+  flagActions,
   labels,
 }: PlaceCardProps) {
   return (
@@ -185,12 +200,19 @@ export function PlaceCard({
             </Text>
           ) : null}
           {audienceLabel ? <Badge variant="warning" label={audienceLabel} /> : null}
+          {flagLabel ? <Badge variant="error" label={flagLabel} /> : null}
         </HStack>
 
         {description ? (
           <Text type="supporting" xstyle={styles.description}>
             {description}
           </Text>
+        ) : null}
+
+        {flagActions ? (
+          <HStack gap={2} wrap="wrap" xstyle={styles.actions}>
+            {flagActions}
+          </HStack>
         ) : null}
       </VStack>
     </Card>

@@ -1,5 +1,31 @@
 # Changelog
 
+## [0.34.0] — 2026-09-21 · Messages tidied, reported things where they belong, and a search box for places
+
+### Changed — Messages
+
+Conversations are compact rows now — avatar, name, who they are to you,
+the last thing said, the time — instead of cards (D-186). "Start a
+conversation" is a single **New message** button that opens a picker with
+a search box (D-186). A member sees "Case manager" or the program's name
+under a name; staff see nothing under a member's (D-187). Reported
+messages moved from their own screen into a **Reported** section of
+Messages for case managers and super admins, with example reports while
+nothing real has been reported (D-184); the Home tile for it is gone.
+
+### Changed — the bell
+
+A notification row now opens the thing it is about: a reported message,
+a conversation, the reported places, a staff request (D-185).
+
+### Added — Places
+
+A search box at the top of Places finds a place by name or address, typo
+and all (`0066`, D-188). Case managers and super admins get a **Reported**
+chip that shows places somebody said are closed, moved or wrong, with the
+reason on the card and — for a super admin — the decision right there
+(`0066`, D-189).
+
 ## [0.33.0] — 2026-09-20 · The messenger, finished: real chat components, both directions, report, review, unread
 
 ### Changed — the conversation screen is Astryx's chat, not a sketch of one

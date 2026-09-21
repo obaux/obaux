@@ -62,6 +62,14 @@ export function DemoThread({
     <>
       <PageTitle
         title={other?.firstName ?? t('messages.thread.someone')}
+        subtitle={
+          // D-187: a member sees who this is to them; staff see nothing under a member's name.
+          role === 'member' && other?.role === 'provider'
+            ? (other.orgName ?? t('role.provider'))
+            : role === 'member' && other?.role === 'admin'
+              ? t('role.admin')
+              : undefined
+        }
         backHref="/messages/"
         backLabel={t('nav.back.messages')}
       />

@@ -157,11 +157,21 @@ function ThreadScreen() {
   }
 
   const title = state.status === 'ready' ? (state.otherName ?? t('messages.thread.someone')) : t('messages.title');
+  // What the name alone cannot say (D-187): a member sees "Case manager" or
+  // the program's name under it; staff looking at a member see nothing.
+  const context =
+    state.status === 'ready' && trueRole === 'member'
+      ? state.otherRole === 'provider'
+        ? (state.otherProgramName ?? t('role.provider'))
+        : state.otherRole === 'admin'
+          ? t('role.admin')
+          : undefined
+      : undefined;
 
   return (
     <Page gap={4}>
       {header}
-      <PageTitle title={title} backHref="/messages/" backLabel={t('nav.back.messages')} />
+      <PageTitle title={title} subtitle={context} backHref="/messages/" backLabel={t('nav.back.messages')} />
 
       {state.status === 'loading' ? <Loading label={t('common.loading')} variant="inline" /> : null}
 

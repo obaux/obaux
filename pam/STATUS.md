@@ -1,6 +1,6 @@
 # PAM — where the project stands
 
-Last updated 2026-09-20. The member-facing product is real now: signing up
+Last updated 2026-09-21. The member-facing product is real now: signing up
 and signing out, invite codes for all four kinds of account, saving, points,
 badges, reporting a place, and a screen for the person running PAM. Every place
 now says what it is and has a screen of its own. Notifications are readable —
@@ -151,6 +151,19 @@ conversation row, a start row, "Message {name}" on `/person/` — opens the
 example chat (D-183). DB suite: 272 checks pass. Session log:
 `docs/sessions/2026-09-20-messenger.md`.
 
+**21 September (branch `claude/pam-messenger-2`, D-184–D-189):** Messages
+is rows, not cards; "New message" is one button that opens a picker with a
+search box; a member sees "Case manager" or the program's name under a
+name, staff see nothing under a member's. Reported messages moved into a
+Reported section of Messages (case manager: beside Conversations; super
+admin: Reported only), with an example set, and the `/reports/` screen and
+Home tile are gone. Bell rows link to what they name. Places has a search
+box (typo-tolerant, answered by `services_search`, `0066`) and a Reported
+chip for reviewers with the decision on the card (`flagged_services`,
+`0066`) — no reviewer screen for flags existed before. **`0066` is local
+only — not deployed.** DB suite: 286 checks pass. Session log:
+`docs/sessions/2026-09-21-messages-tidied-and-places-search.md`.
+
 This is the handover document: what exists, what is proven, what is live, and
 what the next person needs to know before touching anything.
 
@@ -298,11 +311,11 @@ Numbers here are from the last run, not aspirations.
 | Typecheck | 5/5 packages | — |
 | `@pam/config` tests | 202 pass | No SMS can send unreviewed, over 160 chars, with emoji, or with a term that reveals justice involvement. Locales are key-for-key. The transparency screen matches its contract. |
 | `@pam/ui` tests | 66 pass | Every component is axe-clean. `PlaceCard` offers exactly three actions in a fixed order. Reduced motion is respected. The mic hides when unsupported. |
-| Database suite | 272 checks pass | See below. Grew from 152 across today's messaging sessions (to 221 — `0061`/`0062`'s own coverage plus `04_transparency_contract_test.sql`, D-168) and then to 235 once merged with the other concurrent session's own `staff_review`/`demo_view` coverage (D-170) — the combined migration set (`0001`–`0062`) run together for the first time, not each session's own subset in isolation |
+| Database suite | 286 checks pass | See below. Grew from 152 across today's messaging sessions (to 221 — `0061`/`0062`'s own coverage plus `04_transparency_contract_test.sql`, D-168) and then to 235 once merged with the other concurrent session's own `staff_review`/`demo_view` coverage (D-170) — the combined migration set (`0001`–`0062`) run together for the first time, not each session's own subset in isolation |
 | Live RLS fingerprint | **not re-verified since `0060`–`0062` deployed** | This row's last "identical to local" claim predates today. `0060`–`0062` (deployed under their original names, `0054`–`0056`) are now live and `get_advisors` came back clean, but the fingerprint comparison itself hasn't been re-run against the combined migration set — this repo and the other concurrent session's are now merged, but neither has been re-fingerprinted since (see D-169/D-170, and the drift note under "What is live") |
 | Live anonymous attack | 0 rows leaked | A signed-out caller reads no profiles, messages, invites or audit rows on the real database, while still reaching the support number and the public catalogue |
-| Browser a11y + theme (Playwright, full suite) | **456 pass** (20 September; `PLAYWRIGHT_CHROMIUM_PATH=/opt/pw-browsers/chromium-1194/chrome-linux/chrome` — the sandbox's own Chromium, no download needed) | No WCAG AA violations at 320px or iPhone SE. Every control clears 48px. No horizontal scroll. The Astryx theme really resolves. Runs in dark mode as well as light. Includes the new `e2e/messages.spec.ts` (thread, example thread, report, `/reports/`). The 17th's `admin.spec.ts` failures from D-175's unstubbed `enrollments` query are fixed in the spec. |
-| First-load JS | 504.6 kB of 500 kB — **4.6 kB over budget**, disclosed and unresolved | §12 budget, measured gzipped on what `index.html` actually loads; `/signin` and `/gallery` carry `OnboardingSlides`' `framer-motion` weight on their own subpath export (D-140), every other route unaffected. Grew from 500.7 kB across the messaging sessions alone (1.0 kB, D-162), entirely new locale strings — irreducible without lazy-loading translations per route, which is out of scope. Grew a further 2.3 kB when merged with the other concurrent session's own additions (D-170). Grew 0.3 kB on the 17th (D-174), **and 1.0 kB on 20 September** (the messenger's locale strings and `Badge` in `NavTile`; `useConversations` and the whole Chat family were kept out of Home's first load — D-181, D-182) — the messaging-preview/demo-send/program-badge session's other additions (D-172, D-173, D-175) all landed off Home's own bundle and did not move this number, though D-175's `Token` component does add real weight to `/admin/`, `/person/` and `/directory/` individually (~4 kB each), not tracked by this check |
+| Browser a11y + theme (Playwright, full suite) | **471 pass** (20 September; `PLAYWRIGHT_CHROMIUM_PATH=/opt/pw-browsers/chromium-1194/chrome-linux/chrome` — the sandbox's own Chromium, no download needed) | No WCAG AA violations at 320px or iPhone SE. Every control clears 48px. No horizontal scroll. The Astryx theme really resolves. Runs in dark mode as well as light. Includes the new `e2e/messages.spec.ts` (thread, example thread, report, `/reports/`). The 17th's `admin.spec.ts` failures from D-175's unstubbed `enrollments` query are fixed in the spec. |
+| First-load JS | 504.8 kB of 500 kB — **4.8 kB over budget**, disclosed and unresolved | §12 budget, measured gzipped on what `index.html` actually loads; `/signin` and `/gallery` carry `OnboardingSlides`' `framer-motion` weight on their own subpath export (D-140), every other route unaffected. Grew from 500.7 kB across the messaging sessions alone (1.0 kB, D-162), entirely new locale strings — irreducible without lazy-loading translations per route, which is out of scope. Grew a further 2.3 kB when merged with the other concurrent session's own additions (D-170). Grew 0.3 kB on the 17th (D-174), **and 1.0 kB on 20 September** (the messenger's locale strings and `Badge` in `NavTile`; `useConversations` and the whole Chat family were kept out of Home's first load — D-181, D-182) — the messaging-preview/demo-send/program-badge session's other additions (D-172, D-173, D-175) all landed off Home's own bundle and did not move this number, though D-175's `Token` component does add real weight to `/admin/`, `/person/` and `/directory/` individually (~4 kB each), not tracked by this check |
 
 ### The database suite is the one that matters
 
@@ -523,6 +536,7 @@ while the copy is unsigned, so it earned the first live test, not the last.*
 | 23 | ~~Run the Playwright a11y suite against this session's changes~~ **Done 20 September** with `PLAYWRIGHT_CHROMIUM_PATH=/opt/pw-browsers/chromium-1194/chrome-linux/chrome` | Confidence in the new `DummyConversations`/`DummyStartable`/`DemoMessageComposer`/`ProgramBadge` UI | Could not run in this sandbox: `playwright install` fails downloading `chromium_headless_shell` (`cdn.playwright.dev` blocked by the agent proxy — a network-policy gap, not a missing-package one the way `postgis` was). The 426-pass figure in "What is proven" predates this session's changes. |
 | 24 | ~~Deploy `0063`, `0064`, `0065`~~ **Done, with `0052` (Will, 20 September)** | — | `list_migrations` checked first: no new live-only drift since the 17th. All four applied in order; `get_advisors` (security) clean. `0052` closes the saved-places gap that had been open since the 16th. The live ledger records this session's earlier three under their deploy-time names (`0054_…`–`0056_…`, D-169 addendum) and these four under their real names. |
 | 25 | **D-178's audience** | Who reads a reported message | The reporter's case manager is included alongside the sender's. Say if it should be the sender's only. |
+| 26 | **Deploy `0066`** | Places search, the Reported chip, the program name under a program admin | Local only, deliberately. `list_migrations` first, then `get_advisors` (0066 adds the `pg_trgm` extension in `extensions`). |
 
 ---
 

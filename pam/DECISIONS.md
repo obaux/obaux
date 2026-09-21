@@ -3728,6 +3728,111 @@ is what each role's preview "is", the same people `DUMMY_SELF` names on
 `/account/`. A member preview's start list is empty on purpose — Jordan's
 two staff are already in his conversations, which is also the real rule.
 
+### D-184 — Reported messages live inside Messages, with an example set; the real path was already proven
+
+Will (21 September, from the live URL as super admin): the bell said "A
+message from Keisha was reported" and `/reports/` showed nothing. Two
+halves. The demo half was a real gap: `/reports/` was the one previewable
+screen with no "real always wins, silently" fallback. `DUMMY_REPORTS`
+(`dummy-conversations.ts`) now carries two example reports on the same
+cast — about Keisha (the super admin's example bell row) and about Jordan
+(the case manager's) — and the Reported section shows them when a preview
+is active or the real list is genuinely empty. The real half was checked
+before anything was built: `03_invariants.sql` already proves
+`report_message()` → `notify_on_report` reaches every super admin and the
+sender's case manager, and `05_messenger_test.sql` proves
+`reports_for_review()` answers exactly those callers — no link was missing,
+so no migration for it.
+
+**No separate screen.** The `/reports/` route and its Home tile are gone;
+"Reported" is a `SegmentedControl` section of `/messages/` for a case
+manager (beside Conversations) and the only section a super admin gets —
+D-171 unchanged: no conversations, no "New message" for them. `?show=reported`
+is where the bell's row lands. One primary action per screen holds:
+Reported is a list, and the screen's one `BigButton` ("New message") is
+drawn only on the Conversations section.
+
+### D-185 — A bell row leads to the thing it names (partly reversing D-080's "not clickable")
+
+D-080 made every notification row inert because `onSelect` had no caller
+and each row carried a pointless "Mark as read". Will's ask to land on the
+reported item reverses the first half only: a row is now the stretched
+link every other row in PAM is — a reported message → `/messages/?show=reported`,
+a new message → its conversation, a reported place → `/places/?filter=reported`,
+a staff request → `/requests/`. A place taken off the list has nowhere to
+go and stays a line of text. Still nothing is marked read by a tap; the
+list clears itself on open exactly as before.
+
+### D-186 — A conversation is a row, and "New message" is a picker in a sheet
+
+The card-per-conversation (avatar and a big heading, then a second row of
+badges) spent two rows on one fact. `ConversationRow` is Astryx's
+`ListItem` with `href` — avatar, name, a context line and the last thing
+said, the time and an unread mark at the end — 48px stated, 18px preview,
+the library's own invisible-anchor pattern rather than a hand-rolled
+stretched link. `pnpm exec astryx build "conversation list"` pointed at
+`List`; CLAUDE.md's "dense data = rows, never Card-wrapped list items" says
+the same.
+
+The "Start a conversation" people-cards at the foot of the screen are
+gone. One `BigButton`, "New message", opens `NewMessagePicker`: a
+`BottomSheet` (`height="tall"`, so the keyboard has room) with a `TextInput`
+search box on top and a `List` of everyone `messageable_people()` returns
+(a preview gets the example cast via `dummyPickerFor`). `Typeahead` was
+weighed and set aside — it is a single-value combobox for a form field; what
+this needs is a list somebody taps a row in. Matching is a normalised
+substring over name and context line, hand-rolled in a dozen lines: the
+list is a caseload, not a catalogue, and nothing is downloaded for it. A
+pick calls `open_direct_conversation()` (or opens the example thread) and
+navigates; the picker is loaded lazily on first tap.
+
+### D-187 — Who the other person is to you, under their name — and nothing under a member's
+
+In a conversation list row and at the top of a thread: a member sees
+"Case manager" under their case manager's name and the program's name
+under a program admin's; a case manager or a program looking at a member
+sees nothing under the name — a member is a person, not a category, and
+"Member" would say only what the screen already knows. The program's name
+comes from `conversation_partners()` (0066 adds `program_name`: the
+partner's `orgs.name` when they are a provider — public reference data,
+`orgs_select_all`, so nothing about a person widens). For the examples it
+is the dummy program's `orgName`, the same name D-175's badge uses.
+
+### D-188 — Places search is answered by the database, with pg_trgm
+
+`usePlaces` loads the nearest 20 within ten miles (`services_near`), never
+the whole catalogue, so a name a member types cannot be matched on the
+client. 0066 enables `pg_trgm` (in `extensions`, like every extension here)
+and adds `services_search(p_query, p_lat, p_lon, p_category, p_limit)`:
+a substring match on name, lookup name or address scores 1.0; otherwise
+the best of trigram `word_similarity` and `similarity` against the three,
+kept at pg_trgm's own 0.3 threshold ("ged clases" finds "GED Classes" at
+about 0.6; an unrelated place scores under 0.2); best match first, nearest
+second. `security invoker`, so a member still sees only the published
+catalogue — `06_search_and_flags_test.sql` checks the unreviewed row never
+surfaces. The screen debounces 300 ms and keeps the category chips
+applied; no client-side matching library, and no client fuzzy code at all.
+
+### D-189 — Reported places are a filter on Places, for reviewers, with the decision on the card
+
+Nothing in the app showed `service_flags` to anybody before this: a flag
+was written, the bell said so, and the only way to decide was a database
+call. Now `/places/` has a "Reported" chip beside the category chips,
+drawn for a case manager or super admin preview (D-172) and fetched for
+the real one. `flagged_services()` (0066) joins open flags to their
+places — `flag_service()` sets `is_active = false`, so a flagged place has
+already left `services_near`'s answer and this is the only way to see it —
+guarded inside for `is_admin()` or `is_super_admin()`. The same `PlaceCard`,
+with the reason (and "· 2 reports" when more than one) as an error-tone
+badge, and — only for a real super admin — "Keep it" / "Take it off the
+list", the two choices `resolve_service_flag()` offers. A case manager sees
+the list; the function would refuse their decision, so the buttons are not
+drawn. A member never sees the chip. The bell's "place was reported" row
+lands on `?filter=reported`. Previews and an empty real list show
+`DUMMY_FLAGS` — Example Workforce Center (wrong info, 2 reports) and
+Example Food Pantry (closed), the same two places the example bell rows
+name; an example decision only clears the card.
+
 ---
 
 ## Notes for whoever picks this up next
