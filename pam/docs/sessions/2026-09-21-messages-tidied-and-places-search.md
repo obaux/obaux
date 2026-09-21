@@ -232,3 +232,99 @@ No SOP amendment: §4.1's word-for-word rule still holds.
   its own pass.
 - `next lint` prompts interactively in this sandbox (pre-existing; not a
   check any session has run).
+
+---
+
+# Later still — four more phone touchups (branch `claude/pam-messenger-touchups`)
+
+Same day, after Will merged the polish and people-rings branches to
+`main`, deployed `0067` live, approved the transparency wording, and fixed
+the privacy page's own stale "and that a chat exists" line (`main`,
+commit `a5cb258`). Branched from `main` at that point. Four asks from a
+fresh round of phone screenshots.
+
+## What changed
+
+- **Messages loses its help bar too.** `apps/web/src/app/messages/page.tsx`
+  drops `HelpBar` and its import. New SOP paragraph, `docs/sop-amendments.md`
+  A15: not A14's kind of exception (shape — two pinned bars, no room for a
+  third) but A9's kind (multiple actions, not one question; every failure
+  state already carries the number; help is one tap via the header mark to
+  Home). A14's own text and `ThreadFrame`'s file comment both said the
+  thread's way back "leads to Messages, which carries the help bar" — no
+  longer true, corrected in both places rather than left as a
+  discrepancy for the next reader.
+- **The thread's dead space below the composer is gone.** Root cause
+  traced, not guessed: `globals.css` pads every `body` by `72px + the
+  safe area` for the fixed `HelpBar`; the thread has none (A14) but its
+  own frame was still sized `calc(100dvh - 72px - env(safe-area-inset-bottom))`
+  to stop the document scrolling under it (D-192's session) — correct for
+  that problem, but it left the same 72px-plus as a permanent, visible
+  strip of nothing. `ThreadFrame`'s `frame` is `position: fixed; inset: 0`
+  now: out of flow, sized by the real viewport regardless of `body`'s own
+  padding, with the composer's own bottom inset reading the actual
+  `env(safe-area-inset-bottom, 0px)` rather than the 72px sized for a bar
+  this screen never draws. Side padding also moved from a literal `16px`
+  to Astryx's own `spacingVars['--spacing-3']` token (importable in
+  `apps/web` — the earlier cross-package failure was specific to
+  `@pam/ui`'s own `defineVars` file, not to Astryx's tokens).
+- **The send icon matches the mic icon.** Checked Astryx's icon registry
+  directly (`defaultIcons.tsx`): `arrowUp` and `microphone` share the same
+  1.5px stroke — there is no separate weight prop to reach for. The actual
+  gap: `ChatDictationButton` sizes its mic through `<Icon icon="microphone"
+  size="md" />` (an explicit 20px box); `ChatSendButton`'s own default
+  `sendIcon` is the bare, unwrapped registry SVG, which falls back to
+  `Button`'s own 16px icon slot instead. Same stroke, smaller box — reads
+  both smaller and proportionally thicker at once, which is exactly what
+  the screenshot showed. Fixed by passing `sendIcon={<Icon icon="arrowUp"
+  size="md" />}` in `ThreadView.tsx` — Astryx's own component, no
+  hand-drawn SVG.
+- **Message rows sit closer, and bubbles are wider.** `ChatMessageList`'s
+  `density` prop sets a row's gap *and* its own side padding together;
+  `density="spacious"` → `density="compact"` in `ThreadView.tsx` answers
+  both halves of the ask with one prop, not a hand-tuned override. Checked
+  before shipping: every message still carries its own name/timestamp
+  row, so tighter spacing never runs two different senders' bubbles
+  together, and Report (the 48px control inside a message row) is
+  unaffected by row spacing.
+- `apps/web/e2e/messages.spec.ts` — four new tests: no help link on
+  Messages (plus the header mark still points home); the thread frame's
+  own box now equals the viewport exactly; the send icon and mic icon
+  render the same size; and the message list reads `data-density="compact"`
+  with an 8px computed gap, with Report still clearing 48px.
+
+## Decisions
+
+- D-200 — Messages loses its help bar (A15); A14's stale claim corrected.
+- D-201 — `ThreadFrame` is `position: fixed; inset: 0`; the composer's
+  bottom inset is the real safe-area token, not the HelpBar's 72px.
+- D-202 — the send icon is explicitly sized through `Icon`, matching the
+  mic; Astryx has no weight prop to match instead.
+- D-203 — `ChatMessageList` runs `density="compact"`, tightening the gap
+  and widening bubbles at once.
+
+## Verified
+
+| Check | Result |
+|---|---|
+| `pnpm -r typecheck` | 5/5 |
+| `pnpm --filter @pam/config test` | 231 pass (unchanged) |
+| `pnpm --filter @pam/ui test` | 65 pass (unchanged) |
+| `pnpm --filter @pam/web build` | static export OK |
+| `node scripts/check-bundle-budget.mjs` | 505.3 kB gz on `/` (was 505.4 — the token swap and the `Icon` import cost nothing measurable) |
+| Playwright (full suite) | **507 pass, 0 failures** (495 + 4 new tests × 3 projects) |
+
+`packages/db` untouched this pass — not re-run (no db changes to verify);
+the 302-check figure from `0067`'s own session still stands and `0067`
+is live.
+
+## Left undone
+
+- Nothing outstanding from this round's own four asks.
+- `next lint` still prompts interactively in this sandbox (pre-existing;
+  not a check any session has run).
+
+## Needs a human
+
+Nothing. `claude/pam-messenger-touchups` is pushed, not merged — same
+standing instruction as every branch this session touched.

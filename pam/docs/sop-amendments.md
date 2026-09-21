@@ -351,8 +351,12 @@ and A9 already named.
 screen. Three things make it the right call here. The person on this screen
 is already in a conversation with their case manager or their program — a
 human who can help, one message away, which is more than a phone number is.
-The way back is pinned at the top of the screen and leads to Messages, which
-carries the help bar and the support number. And the thread is the one screen
+The way back is pinned at the top of the screen and leads to Messages —
+which, since A15, is itself a fourth exception and no longer carries the
+bar; the chain now runs thread → Messages → the header's own mark → Home,
+which always does, two taps rather than one. That is a real loosening of
+the third test below, recorded here rather than left for the next reader
+to notice as a discrepancy. And the thread is the one screen
 in PAM with two pinned bars — header and composer — so a third would come out
 of the messages, which is the screen's reason to exist.
 
@@ -362,3 +366,40 @@ signed-out states of the same route are ordinary `Page`s whose notices carry
 the support number as they always did — only a conversation that actually
 loaded is without the bar. The browser suite asserts the thread has no help
 link, so the next person to add one back has to read this first.
+
+
+## A15 — A fourth screen without a help link: the Messages index (21 September 2026, Will)
+
+`/messages/` loses its `HelpBar` on Will's call, tested on the phone
+alongside A13/A14's screens the same day.
+
+**This is not A8's test restated.** A8 set the bar for an exception — one
+question, no failure mode help would fix, and help one tap away wherever
+the person lands next — and A9 already found a screen that fails the first
+part of that test outright (sign-in is not one question) and stands on the
+third instead. Messages is the same kind of exception, not A14's: A14 is
+about *shape* (a screen with two pinned bars has no room for a third), and
+Messages scrolls normally and has room. It is A9's kind of exception —
+multiple actions, not one question — carried a screen further:
+
+- **Not one question.** Messages lists every conversation, offers "New
+  message," and (for staff) switches to Reported. Removing the bar cannot
+  rest on A8's letter here, the way it did for the reminders screen.
+- **No failure mode help would fix that the screen does not already
+  handle.** Both scans this screen runs — conversations and reports —
+  already render `Notice` with the support number the moment either
+  fails offline or otherwise; a permanent bar sat above states that
+  already carry the number to reach for.
+- **Help one tap away wherever the person lands next.** From Messages: a
+  conversation (which itself has no bar, A14, but is reached only from
+  here) or a tap on the header's own mark, which always leads Home — and
+  Home always carries the bar. The chain from a conversation is therefore
+  two taps to Help, not one; recorded as a real loosening in A14's own
+  text above, not left as a silent gap between the two amendments.
+
+**What did not change.** The signed-out, loading and error states of this
+route are ordinary `Page`s that still carry the notice pattern with the
+support number, same as every other screen — only the loaded, ordinary
+list is without the bar. `messages.spec.ts` asserts no help link renders
+on the loaded screen, the same way `admin.spec.ts` and `consent.spec.ts`
+already assert it for their own exceptions.

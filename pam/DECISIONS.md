@@ -4078,6 +4078,116 @@ recorded narrowing. Will's approval of the exact wording above is what the
 report asks for; if he changes a word, `copy.test.ts` will fail until
 `en.json` and `transparency.ts` agree again, which is the point of it.
 
+### D-200 — Messages loses its help bar too (A15); the thread's own text is corrected to match
+
+Will's fourth phone-tested ask, same day as A13/A14: `/messages/` no
+longer carries `HelpBar`. It is a distinct exception from the thread's
+(A14) — that one is about *shape* (a screen with two pinned bars has no
+room for a third); Messages scrolls normally and has room, so it needed
+its own test, not a ride on A14's. Full reasoning in `docs/sop-amendments.md`,
+A15: Messages is not "one question" the way A8 tests for, so it stands on
+A9's alternate framing instead — every failure state it can reach already
+renders `Notice` with the support number, and help is one tap away via the
+header's own mark, which always leads Home, which always carries the bar.
+
+**This makes a sentence in A14 (and in `ThreadFrame`'s own file comment)
+false**, not just outdated: both said the thread's way back "leads to
+Messages, which carries the help bar." Fixed both in place rather than
+left for the next reader to notice as a discrepancy — the real chain from
+a conversation to Help is now two taps (thread → Messages → the header
+mark → Home), not one, and A14 says so.
+
+`apps/web/src/app/messages/page.tsx` drops the `HelpBar` import and its
+one render (the loading/signed-out/error branches never rendered it
+anyway — same pattern the thread page already uses). `messages.spec.ts`
+asserts no help link on the loaded screen and that the header's mark still
+points at `/`.
+
+### D-201 — The thread's dead space under the composer was the HelpBar's own reserved room, not the composer's padding; `ThreadFrame` is `position: fixed` now
+
+Will's screenshot: a noticeable empty strip between the composer and the
+phone's edge. The instinct would be to cut the composer's own padding, but
+`ChatComposer`'s padding is exactly what D-195 already tuned — reverted
+*from* `density="compact"` because that "took the text to the box's edge."
+Re-shrinking it would undo that fix for the sake of a problem it did not
+cause.
+
+The actual cause: `globals.css` pads every page's `body` by `72px + the
+safe area` so a scrolling page's last control never sits under the fixed
+`HelpBar`. The thread has no bar (A14) but still lived inside that `body`,
+and `ThreadFrame`'s own height was deliberately shrunk to
+`calc(100dvh - 72px - env(safe-area-inset-bottom))` to stop the *document*
+scrolling by that same amount under the pinned frame (D-192's session).
+Correct fix for that problem, wrong side effect: it left a permanent, real
+72px-plus strip of nothing between the composer and the true bottom of the
+screen, on every phone, because a bar that is never drawn here still had
+its room reserved.
+
+`ThreadFrame`'s `frame` is `position: fixed; inset: 0` now instead. Taken
+out of the document's flow entirely, it is sized by the real viewport
+regardless of what `body`'s own padding reserves elsewhere — the old
+problem (document scrolling under the frame) cannot recur because the
+frame is no longer part of that flow to scroll under. The composer's own
+bottom inset is `env(safe-area-inset-bottom, 0px)` — the actual device
+value, not the 72px sized for a bar this screen never draws — which is the
+"verify against the actual iPhone safe-area token rather than a guessed
+number" Will's brief asked for. Also tightened while in the file: the
+frame's own side padding moved from a literal `16px` to Astryx's
+`spacingVars['--spacing-3']` (12px) — a token, not a number, and importable
+here (the cross-package problem an earlier session hit was specific to
+`@pam/ui`'s own `defineVars` file, not to Astryx's tokens, which several
+other `apps/web` files already import).
+
+New test in `messages.spec.ts`: the frame's own box now equals the
+viewport exactly (`y = 0`, `y + height = viewport height`), and the
+composer's box still ends at or above that edge.
+
+### D-202 — The send icon was never actually the mic icon's size; Astryx has no separate weight to match, so it is matched by size instead
+
+Will's screenshot: the send arrow read heavier and, at the same time,
+smaller inside its 48px square than the mic beside it — which sounds like
+two different problems and turns out to be one. Checked the registry
+directly (`defaultIcons.tsx`): `arrowUp` and `microphone` share the exact
+same fallback SVG properties, `strokeWidth: 1.5` included. Astryx's `Icon`
+has no weight prop at all — confirmed by reading the component, not
+guessed — so there was never a "weight" to pass; the brief's suggestion of
+matching a weight prop does not apply to this design system.
+
+The real gap: `ChatDictationButton` sizes its mic explicitly —
+`<Icon icon="microphone" size="md" />`, a fixed 20px box (`Icon`'s own
+`sizeStyles.md`). `ChatSendButton`'s own default `sendIcon` is the bare
+registry SVG (`useIcon('arrowUp')`), never wrapped in `Icon`, so it falls
+back to `Button`'s own icon slot for `size="md"` — 16px, not 20px
+(`Button.tsx`'s `iconSizes.md`). Same 1.5px stroke on a smaller box reads
+proportionally thicker, which is exactly "heavier and a bit small" at
+once. Fixed by passing `sendIcon={<Icon icon="arrowUp" size="md" />}` to
+`ChatSendButton` in `ThreadView.tsx` — Astryx's own component, the same
+size prop the mic already uses, no hand-drawn SVG. New test measures both
+rendered `<svg>` boxes and asserts they match.
+
+### D-203 — The message row gap moved from `spacious` to `compact`, which also freed up the bubble's own side room
+
+Will's same screenshot: bubbles read narrow, with too much air between
+them. `ChatMessageList`'s `density` prop sets both a row's gap *and* its
+own side padding together (`gapSpacious`: 24px gap, 24px inline padding;
+`gapCompact`: 8px and 8px) — one number was doing both jobs, so changing
+`density="spacious"` to `density="compact"` in `ThreadView.tsx` answers
+both halves of the ask without a hand-tuned override: adjacent messages
+sit closer, and every bubble's `max(80%, 280px)` cap now measures against
+a wider container. Nothing here is an `xstyle` override; it is the
+component's own density scale, used as it is meant to be.
+
+Checked the grouping concern the brief raised before shipping it: every
+message in this screen already carries its own name/timestamp row (never
+merged into a Slack-style run), so a tighter gap does not make two
+different senders' bubbles touch — there is always a labelled row between
+them. `ChatMessageList` reflects its density as `data-density` on the log
+element, which the new test reads directly rather than measuring rendered
+distance (which would also include that metadata row's own height and
+prove nothing about the gap itself). Report — the one 48px control living
+inside a message row — is re-checked at its own floor in the same test;
+row spacing does not change a control's own size.
+
 ---
 
 ## Notes for whoever picks this up next

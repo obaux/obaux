@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.35.1] — 2026-09-21 · More touchups from the phone
+
+Messages loses its help bar too — a fourth screen without one (A15); tap
+the logo to reach Home, which always has one. The conversation screen no
+longer leaves a dead strip below the composer (it reaches the true bottom
+of the phone now); bubbles use more of the width and sit closer together;
+and the send button's arrow finally matches the mic icon's size, which
+also fixes it reading heavier than it should.
+
 ## [0.35.0] — 2026-09-21 · A ring means something new from that person
 
 Home's people strip is real for a case manager and a program admin now,

@@ -129,6 +129,16 @@ test.describe('the conversation list', () => {
     await expect(page.getByRole('button', { name: 'New message' })).toBeVisible();
   });
 
+  test('has no help link (A15) — the logo is one tap back to Home, which always has one', async ({ page }) => {
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    await page.goto('/messages/');
+    await settled(page);
+
+    await expect(page.getByRole('link', { name: /Help/ })).toHaveCount(0);
+    await expect(page.getByRole('link', { name: 'PAM' })).toHaveAttribute('href', '/');
+  });
+
   test('the title switches sections for a case manager, by tap and by keyboard', async ({ page }) => {
     await signedInAs(page, 'admin');
     await withOneConversation(page);
@@ -279,6 +289,100 @@ test.describe('a conversation', () => {
     // The last message sits above the composer, never under it.
     const lastBox = await last.boundingBox();
     expect(lastBox!.y + lastBox!.height).toBeLessThanOrEqual(sendBefore!.y);
+  });
+
+  test('the frame reaches the true bottom of the screen — no dead strip under the composer', async ({ page }) => {
+    // Will's screenshot, 21 September: the composer sat well above the
+    // physical edge, in the space `globals.css` reserves for a HelpBar this
+    // screen never draws (A14). `ThreadFrame` is `position: fixed; inset: 0`
+    // now, so the frame's own box should exactly match the viewport instead
+    // of stopping short.
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+
+    const viewport = page.viewportSize();
+    const frame = page.locator('main');
+    const box = await frame.boundingBox();
+    expect(box).not.toBeNull();
+    expect(box!.y).toBe(0);
+    expect(Math.round(box!.y + box!.height)).toBe(viewport!.height);
+
+    // The composer's own box still ends at or above the frame's bottom edge
+    // — it never runs off-screen or under a device's safe area.
+    const composer = page.locator('.astryx-chat-composer');
+    const composerBox = await composer.boundingBox();
+    expect(composerBox).not.toBeNull();
+    expect(composerBox!.y + composerBox!.height).toBeLessThanOrEqual(box!.y + box!.height);
+  });
+
+  test('the send icon matches the mic icon\'s size (D-192 addendum)', async ({ page }) => {
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+
+    const send = page.getByRole('button', { name: /send/i }).locator('svg');
+    const mic = page.getByRole('button', { name: 'Speak your message' }).locator('svg');
+    const sendBox = await send.boundingBox();
+    const micBox = await mic.boundingBox();
+    expect(sendBox).not.toBeNull();
+    expect(micBox).not.toBeNull();
+    // Both are Astryx's 'md' Icon size (20px) — same box, not just close.
+    expect(Math.round(sendBox!.width)).toBe(Math.round(micBox!.width));
+    expect(Math.round(sendBox!.height)).toBe(Math.round(micBox!.height));
+  });
+
+  test('message rows sit close together, and every control still clears 48px', async ({ page }) => {
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    await page.route(MESSAGES, (route) =>
+      route.fulfill(
+        json([
+          {
+            id: 'm-1',
+            conversation_id: CONVO,
+            sender_id: OTHER,
+            body: 'First message.',
+            created_at: new Date(Date.now() - 120_000).toISOString(),
+          },
+          {
+            id: 'm-2',
+            conversation_id: CONVO,
+            sender_id: ME,
+            body: 'Second message.',
+            created_at: new Date(Date.now() - 60_000).toISOString(),
+          },
+        ]),
+      ),
+    );
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+
+    // `density="compact"` (was `spacious`): Astryx reflects the prop as
+    // `data-density` on the log, and the row gap it renders is 8px, not the
+    // old 24px. Reading the computed style rather than the bubbles'
+    // on-screen distance, which also includes each message's own
+    // name/timestamp row and would not isolate the row gap itself.
+    const log = page.getByRole('log');
+    await expect(log).toHaveAttribute('data-density', 'compact');
+    const gap = await log.evaluate((el) => getComputedStyle(el.firstElementChild as Element).gap);
+    expect(gap).toBe('8px');
+
+    const first = page.getByText('First message.');
+    const second = page.getByText('Second message.');
+    const firstBox = await first.boundingBox();
+    const secondBox = await second.boundingBox();
+    // Still a real, positive gap: two different senders' bubbles never touch.
+    expect(secondBox!.y).toBeGreaterThan(firstBox!.y + firstBox!.height);
+
+    // Report — the one 48px control that sits inside a message row — still
+    // clears the floor after the tighten.
+    const report = page.getByRole('button', { name: 'Report' });
+    const reportBox = await report.boundingBox();
+    expect(reportBox!.height).toBeGreaterThanOrEqual(48);
+    expect(reportBox!.width).toBeGreaterThanOrEqual(48);
   });
 
   test('tapping into the composer draws no ring; Tab into it does (D-195)', async ({ page }) => {

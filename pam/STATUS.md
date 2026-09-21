@@ -183,10 +183,20 @@ Then the people strip's ring became real (branch
 `claude/pam-people-rings`, D-198, D-199): a real case manager or program
 admin sees their own people on Home, lit and in front when there is an
 unread message from them or a place they saved since the viewer last
-looked; the transparency contract gained one line (approved wording
-pending — see row 27) and `0067` adds `people_activity()`, a time per
-person and never the place. **`0067` is local only — not deployed.** DB
-suite: 302 checks. Playwright: 495.
+looked; the transparency contract gained one line. DB suite: 302 checks.
+Playwright: 495. **Merged to `main` the same day (Will): `0067` deployed
+live, wording approved as proposed, and a matching stale line on the long
+privacy page ("and that a chat exists," missed by D-167's cleanup of the
+short screen) removed.** Then a fourth round of phone touchups (branch
+`claude/pam-messenger-touchups`, A15, D-200–D-203): Messages loses its
+help bar too — a distinct exception from the thread's, its own SOP
+paragraph — reachable in one tap via the header mark to Home; the thread's
+dead strip below the composer is gone (`ThreadFrame` is `position: fixed;
+inset: 0` now, clearing the real safe-area inset instead of the 72px
+sized for a bar this screen never draws); the send icon is sized to match
+the mic icon (Astryx has no separate weight prop — checked directly); and
+the message list runs `density="compact"`, which tightens the row gap and
+widens the bubbles at once. Playwright: 507.
 
 This is the handover document: what exists, what is proven, what is live, and
 what the next person needs to know before touching anything.
@@ -333,13 +343,13 @@ Numbers here are from the last run, not aspirations.
 | Check | Result | What it actually proves |
 |---|---|---|
 | Typecheck | 5/5 packages | — |
-| `@pam/config` tests | 202 pass | No SMS can send unreviewed, over 160 chars, with emoji, or with a term that reveals justice involvement. Locales are key-for-key. The transparency screen matches its contract. |
-| `@pam/ui` tests | 66 pass | Every component is axe-clean. `PlaceCard` offers exactly three actions in a fixed order. Reduced motion is respected. The mic hides when unsupported. |
-| Database suite | 286 checks pass | See below. Grew from 152 across today's messaging sessions (to 221 — `0061`/`0062`'s own coverage plus `04_transparency_contract_test.sql`, D-168) and then to 235 once merged with the other concurrent session's own `staff_review`/`demo_view` coverage (D-170) — the combined migration set (`0001`–`0062`) run together for the first time, not each session's own subset in isolation |
+| `@pam/config` tests | 231 pass (21 September) | No SMS can send unreviewed, over 160 chars, with emoji, or with a term that reveals justice involvement. Locales are key-for-key. The transparency screen matches its contract, including the new `new_save_without_the_place` line (D-199). |
+| `@pam/ui` tests | 65 pass | Every component is axe-clean. `PlaceCard` offers exactly three actions in a fixed order. Reduced motion is respected. The mic hides when unsupported. |
+| Database suite | 302 checks pass (21 September, `0001`–`0067`) | See below. Grew from 286 with `07_people_activity_test.sql` (D-199): 16 checks that `people_activity()` returns a time and nothing else, only for `can_message()`'s own relationship, and that a case manager or a program admin still cannot read `saved_places` directly. `0067` is now live. |
 | Live RLS fingerprint | **not re-verified since `0060`–`0062` deployed** | This row's last "identical to local" claim predates today. `0060`–`0062` (deployed under their original names, `0054`–`0056`) are now live and `get_advisors` came back clean, but the fingerprint comparison itself hasn't been re-run against the combined migration set — this repo and the other concurrent session's are now merged, but neither has been re-fingerprinted since (see D-169/D-170, and the drift note under "What is live") |
 | Live anonymous attack | 0 rows leaked | A signed-out caller reads no profiles, messages, invites or audit rows on the real database, while still reaching the support number and the public catalogue |
-| Browser a11y + theme (Playwright, full suite) | **480 pass** (21 September; `PLAYWRIGHT_CHROMIUM_PATH=/opt/pw-browsers/chromium-1194/chrome-linux/chrome` — the sandbox's own Chromium, no download needed) | No WCAG AA violations at 320px or iPhone SE. Every control clears 48px. No horizontal scroll. The Astryx theme really resolves. Runs in dark mode as well as light. Includes the new `e2e/messages.spec.ts` (thread, example thread, report, `/reports/`). The 17th's `admin.spec.ts` failures from D-175's unstubbed `enrollments` query are fixed in the spec. |
-| First-load JS | 504.8 kB of **600 kB** — within budget, 95.2 kB to spare (ceiling raised from 500 on 21 September: A12, D-191) | §12 budget, measured gzipped on what `index.html` actually loads; `/signin` and `/gallery` carry `OnboardingSlides`' `framer-motion` weight on their own subpath export (D-140), every other route unaffected. Grew from 500.7 kB across the messaging sessions alone (1.0 kB, D-162), entirely new locale strings — irreducible without lazy-loading translations per route, which is out of scope. Grew a further 2.3 kB when merged with the other concurrent session's own additions (D-170). Grew 0.3 kB on the 17th (D-174), **and 1.0 kB on 20 September** (the messenger's locale strings and `Badge` in `NavTile`; `useConversations` and the whole Chat family were kept out of Home's first load — D-181, D-182) — the messaging-preview/demo-send/program-badge session's other additions (D-172, D-173, D-175) all landed off Home's own bundle and did not move this number, though D-175's `Token` component does add real weight to `/admin/`, `/person/` and `/directory/` individually (~4 kB each), not tracked by this check |
+| Browser a11y + theme (Playwright, full suite) | **507 pass** (21 September, `claude/pam-messenger-touchups`; `PLAYWRIGHT_CHROMIUM_PATH=/opt/pw-browsers/chromium-1194/chrome-linux/chrome`) | No WCAG AA violations at 320px or iPhone SE. Every control clears 48px. No horizontal scroll. The Astryx theme really resolves. Runs in dark mode as well as light. Includes the people strip (D-198) and the fourth round of phone touchups (A15, D-200–D-203): no help link on Messages, the thread frame fills the true viewport, the send icon matches the mic icon, and message rows measure the compact density directly rather than by on-screen distance. |
+| First-load JS | 505.3 kB of **600 kB** — within budget, 94.7 kB to spare (ceiling raised from 500 on 21 September: A12, D-191) | §12 budget, measured gzipped on what `index.html` actually loads; `/signin` and `/gallery` carry `OnboardingSlides`' `framer-motion` weight on their own subpath export (D-140), every other route unaffected. Grew from 500.7 kB across the messaging sessions alone (1.0 kB, D-162), entirely new locale strings — irreducible without lazy-loading translations per route, which is out of scope. Grew a further 2.3 kB when merged with the other concurrent session's own additions (D-170). Grew 0.3 kB on the 17th (D-174), **and 1.0 kB on 20 September** (the messenger's locale strings and `Badge` in `NavTile`; `useConversations` and the whole Chat family were kept out of Home's first load — D-181, D-182) — the messaging-preview/demo-send/program-badge session's other additions (D-172, D-173, D-175) all landed off Home's own bundle and did not move this number, though D-175's `Token` component does add real weight to `/admin/`, `/person/` and `/directory/` individually (~4 kB each), not tracked by this check |
 
 ### The database suite is the one that matters
 

@@ -6,7 +6,7 @@ import * as stylex from '@stylexjs/stylex';
 import { List } from '@astryxdesign/core/List';
 import { Text } from '@astryxdesign/core/Text';
 import { DropdownMenu } from '@astryxdesign/core/DropdownMenu';
-import { AppHeader, BigButton, HelpBar, Loading, Notice, Page, PageTitle } from '@pam/ui';
+import { AppHeader, BigButton, Loading, Notice, Page, PageTitle } from '@pam/ui';
 import { NOTICES, type Role } from '@pam/config';
 import { USE_DUMMY_PEOPLE } from '@pam/config/dummy-flag';
 import { useI18n } from '@/lib/i18n';
@@ -326,7 +326,12 @@ function MessagesScreen() {
         </Text>
       ) : null}
 
-      <HelpBar label={t('nav.help')} variant="block" />
+      {/*
+        No help link on this screen (A15) — the fourth in PAM without one.
+        The header's own mark is one tap back to Home, which always carries
+        the HelpBar; this screen already carries the number on every failure
+        state it can reach (conversations, reports).
+      */}
     </Page>
   );
 }

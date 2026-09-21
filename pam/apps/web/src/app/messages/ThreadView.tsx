@@ -55,10 +55,33 @@ import { whenHappened } from '@/lib/when';
  * button is worse than no button. Report is an icon-only 48px button on the
  * other person's messages, named for a screen reader and nothing more.
  *
+ * The send button's icon is `<Icon icon="arrowUp" size="md" />`, not
+ * `ChatSendButton`'s own default (Will's screenshot, 21 September: the
+ * arrow read heavier than the mic glyph beside it, and small in its 48px
+ * square). The two were never actually matched: `ChatDictationButton`
+ * sizes its mic through `<Icon icon="microphone" size="md" />` — an
+ * explicit 20px box — while `ChatSendButton`'s own default `sendIcon` is
+ * the bare registry SVG, unwrapped, which falls back to the *button's*
+ * 16px icon slot instead. Same 1.5px stroke, smaller box, so it read both
+ * smaller and (proportionally) thicker. Astryx has no separate icon-weight
+ * prop to reach for — checked the registry (`defaultIcons.tsx`) directly —
+ * so the fix is sizing the arrow through the same `Icon` component and the
+ * same `size="md"` the mic already uses, not a hand-drawn SVG.
+ *
+ * `ChatMessageList` runs `density="compact"` (was `spacious`, Will's same
+ * screenshot: too much air between bubbles, and too much side padding).
+ * Astryx's density scale sets a message row's gap *and* its side padding
+ * together (`ChatMessageList.tsx`'s `gapCompact`/`gapSpacious`), so this one
+ * prop both tightens the row gap and, incidentally, gives bubbles more of
+ * the phone's width — nothing here is hand-overridden. Every message still
+ * carries its own name/timestamp row, so a tighter gap does not run two
+ * bubbles from the same sender together without a visible break, and
+ * Report stays its own 48px control regardless of row spacing.
+ *
  * `ChatLayout` (D-192) owns the scrolling: the messages scroll, the
  * composer stays docked at the bottom as a sticky flex item, so the last
  * message is never under it. The frame around this — the pinned headers —
- * is `ThreadFrame`.
+ * is `ThreadFrame`, which also owns the composer's true bottom inset.
  *
  * Reporting (D-177) lives here too, on the other person's messages only:
  * `report_message()` already refuses a report of your own words, and a
@@ -196,7 +219,9 @@ export function ThreadView({
           xstyle={styles.square}
         />
       }
-      sendButton={<ChatSendButton size="md" xstyle={styles.square} />}
+      sendButton={
+        <ChatSendButton size="md" sendIcon={<Icon icon="arrowUp" size="md" />} xstyle={styles.square} />
+      }
     />
   );
 
@@ -204,7 +229,7 @@ export function ThreadView({
     <ChatLayout composer={composer} density="compact" scrollButton={<ScrollToBottom />} xstyle={styles.layout}>
     <VStack gap={4} xstyle={styles.messages}>
       <ChatMessageList
-        density="spacious"
+        density="compact"
         align="top"
         xstyle={styles.list}
         emptyState={
