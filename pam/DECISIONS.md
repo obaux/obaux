@@ -3872,6 +3872,48 @@ in two languages, and the discipline of route-only loading is the thing to
 keep, not a number just above today's figure. The animation ceiling (40 kB)
 is untouched; nothing about how the measurement is taken changed.
 
+### D-192 — The thread is a pinned frame: header and composer stay, only the messages scroll
+
+Will, on a phone: the name and the input box moved with the history. Every
+other screen is `Page`, a column that scrolls with the document, and that
+is right for a list or a form. A conversation is the one screen where the
+two things you are holding on to — who you are talking to, where you type
+— must not move. `ThreadFrame` is a full-height flex column (`100dvh`, so
+it follows the mobile keyboard) with `Page`'s width and gutter and no
+arrival fade; `ChatLayout` inside it owns the scroll region and docks the
+composer as a *sticky flex item* — the library's own layout contract, not
+`position: fixed` — which is what keeps the last message above the composer
+rather than under it. The app header and the thread header sit in the
+pinned block above. Two bars pinned, no third: the help bar is not on this
+screen (A14, D-194).
+
+**Send is a 48px square, not the 64px primary** (A13). The mic and the
+Report action are the same square, icon-only, named for screen readers
+(`ChatSendButton`/`ChatDictationButton` take `size`; the square is an
+`xstyle` on top, since neither offers 48 as a size). The composer runs at
+`density="compact"` with no wrapper around the input: the input is its own
+text and padding, and the browser suite checks it still clears 48px rather
+than a wrapper being added to make the number.
+
+### D-193 — The thread header is one row: back, the name, a Token beside it
+
+D-187 put "Case manager" / the program's name under the name as a subtitle.
+On a phone that was a second line of header on every conversation. It is
+now a `Token` (`size="sm"`) beside the name on the same row, cut with an
+ellipsis at 40% of the row rather than ever wrapping; the name itself is
+20px, not the 28px page-title scale, and cuts with an ellipsis too; the
+back control stays 48px. Staff looking at a member get the name alone. The
+conversation-list rows (D-186) keep their own context *line* — a list row
+has the room and a header does not.
+
+### D-194 — No help link on the conversation screen (A14)
+
+See A14 for the reasoning in full: the person is already talking to a
+human who can help, the pinned way back leads to Messages which has the
+bar, and a third pinned bar would come out of the messages. The route's
+not-found, error and signed-out states keep their support-number notices.
+`messages.spec.ts` asserts the thread has no help link.
+
 ---
 
 ## Notes for whoever picks this up next

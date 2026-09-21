@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.34.1] — 2026-09-21 · The conversation screen fits a phone
+
+The name you are talking to and the box you type in stay put; only the
+messages scroll (D-192). Send, the microphone and Report are 48px squares,
+so the conversation gets the space a 64px button used to take (A13). The
+header is one row — the name with "Case manager" or the program's name
+beside it (D-193) — and this screen has no help link: the way back leads to
+Messages, which has one (A14, D-194).
+
 ## [0.34.0] — 2026-09-21 · Messages tidied, reported things where they belong, and a search box for places
 
 ### Changed — Messages

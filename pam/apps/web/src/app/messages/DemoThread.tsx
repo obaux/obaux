@@ -1,13 +1,13 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { PageTitle } from '@pam/ui';
 import type { Role } from '@pam/config';
 import { dummyConversationPair, dummySideFor, dummyThreadFor } from '@pam/config/dummy-conversations';
 import { DUMMY_EVERYONE } from '@pam/config/dummy-people';
 import { useI18n } from '@/lib/i18n';
 import { sendDemoThreadMessage, useDemoThread } from '@/lib/demoMessages';
 import { ThreadView } from './ThreadView';
+import { ThreadHeader } from './ThreadFrame';
 
 /**
  * An example conversation, for a role preview (D-180, D-183): the written
@@ -58,18 +58,19 @@ export function DemoThread({
     return true;
   };
 
+  const context =
+    // D-187: a member sees who this is to them; staff see nothing beside a member's name.
+    role === 'member' && other?.role === 'provider'
+      ? (other.orgName ?? t('role.provider'))
+      : role === 'member' && other?.role === 'admin'
+        ? t('role.admin')
+        : null;
+
   return (
     <>
-      <PageTitle
-        title={other?.firstName ?? t('messages.thread.someone')}
-        subtitle={
-          // D-187: a member sees who this is to them; staff see nothing under a member's name.
-          role === 'member' && other?.role === 'provider'
-            ? (other.orgName ?? t('role.provider'))
-            : role === 'member' && other?.role === 'admin'
-              ? t('role.admin')
-              : undefined
-        }
+      <ThreadHeader
+        name={other?.firstName ?? t('messages.thread.someone')}
+        context={context}
         backHref="/messages/"
         backLabel={t('nav.back.messages')}
       />

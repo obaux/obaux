@@ -318,3 +318,47 @@ it was costing more than it protected.
 the picker, example data and the reported-places list all load on their own
 routes, not Home, and that discipline is what keeps a bigger number from
 becoming a slope. 600 is a ceiling to build under, not a target to reach.
+
+## A13 — The chat composer's send button is 48px, not 64 (21 September 2026, Will)
+
+CLAUDE.md's rule is "48px minimum touch target, 64px primary buttons". The
+message thread's one primary action — Send — is drawn at 48×48, a square
+icon button beside the input, on Will's call after using the screen on a
+phone.
+
+**Where this contradicts the original.** The 64px number, for one screen.
+The rule was written for a screen with one big thing to do — sign in, save,
+send a report — where the button is tapped once and can afford to be the
+largest thing there. A chat's primary action is tapped dozens of times per
+screen and sits at the bottom of every conversation; at 64px it took a
+quarter of the visible message area on an iPhone SE, and the message area is
+what the screen is for.
+
+**What did not change.** The 48px floor holds, and the browser suite checks
+every control on the thread against it — send, mic and Report are 48px
+squares, the input clears 48px on its own text and padding with no wrapper
+around it. Every other screen's primary action is still `BigButton` at 64px.
+Anyone shrinking a second primary action should be able to say why that
+screen's action repeats the way a chat's does.
+
+## A14 — A third screen without a help link: the conversation (21 September 2026, Will)
+
+§0 says every screen has a visible way to get help. The message thread —
+`/messages/thread/` — has none, on Will's call, joining the two screens A8
+and A9 already named.
+
+**Where this contradicts the original.** The letter of the rule, on one
+screen. Three things make it the right call here. The person on this screen
+is already in a conversation with their case manager or their program — a
+human who can help, one message away, which is more than a phone number is.
+The way back is pinned at the top of the screen and leads to Messages, which
+carries the help bar and the support number. And the thread is the one screen
+in PAM with two pinned bars — header and composer — so a third would come out
+of the messages, which is the screen's reason to exist.
+
+**What did not change.** The way back is always visible (it is pinned, so
+more visible than on any scrolling screen). The error, not-found and
+signed-out states of the same route are ordinary `Page`s whose notices carry
+the support number as they always did — only a conversation that actually
+loaded is without the bar. The browser suite asserts the thread has no help
+link, so the next person to add one back has to read this first.

@@ -4,7 +4,7 @@ import { Suspense, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import * as stylex from '@stylexjs/stylex';
 import { Text } from '@astryxdesign/core/Text';
-import { AppHeader, HelpBar, Loading, Notice, Page, PageTitle } from '@pam/ui';
+import { AppHeader, Loading, Notice, Page, PageTitle } from '@pam/ui';
 import { NOTICES, type MessageReportReason } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { NotIn } from '../../NotIn';
@@ -16,6 +16,7 @@ import { useRoleView } from '@/lib/useViewedRole';
 import { useThread } from '@/lib/useThread';
 import { reportMessage } from '@/lib/reportMessage';
 import { ThreadViewLazy } from '../ThreadViewLazy';
+import { ThreadFrame, ThreadHeader, ThreadTop } from '../ThreadFrame';
 import { DemoThreadLazy } from '../DemoThreadLazy';
 
 /**
@@ -32,8 +33,11 @@ import { DemoThreadLazy } from '../DemoThreadLazy';
  * on `messages` anywhere — this screen only ever renders what
  * `in_conversation()` already allows.
  *
- * Drawn with Astryx's Chat family through `ThreadView` (D-181). One primary
- * action: the send button. Reporting a message (D-177) is a secondary action
+ * Drawn with Astryx's Chat family through `ThreadView` (D-181), inside
+ * `ThreadFrame` (D-192): the app header and a one-row thread header pinned
+ * at the top, the composer pinned at the bottom, only the messages
+ * scrolling. No help link on this screen (A14, D-194): back leads to
+ * Messages, which has one. One primary action: the 48px send button (A13). Reporting a message (D-177) is a secondary action
  * on the other person's messages, inside `ThreadView`.
  *
  * **An example conversation** (`?id=dummy-conv-…`, D-180) — what a super
@@ -139,39 +143,68 @@ function ThreadScreen() {
   }
 
   if (demo && conversationId) {
+    // `DemoThreadLazy` draws its own `ThreadHeader` inside the pinned block
+    // (it knows the pair) and the same `ThreadView` as a real thread.
     return (
-      <Page gap={4}>
-        {header}
+      <ThreadFrame>
+        <ThreadTop>
+          {header}
+          <Text type="supporting" xstyle={styles.note}>
+            {t('messages.thread.example.body')}
+          </Text>
+        </ThreadTop>
         <DemoThreadLazy
           conversationId={conversationId}
           role={viewedRole ?? 'member'}
           speechLanguage={speechLanguage}
           supportPhone={supportPhone}
         />
-        <Text type="supporting" xstyle={styles.note}>
-          {t('messages.thread.example.body')}
-        </Text>
-        <HelpBar label={t('nav.help')} variant="block" />
-      </Page>
+      </ThreadFrame>
     );
   }
 
   const title = state.status === 'ready' ? (state.otherName ?? t('messages.thread.someone')) : t('messages.title');
   // What the name alone cannot say (D-187): a member sees "Case manager" or
-  // the program's name under it; staff looking at a member see nothing.
+  // the program's name beside it; staff looking at a member see nothing.
   const context =
     state.status === 'ready' && trueRole === 'member'
       ? state.otherRole === 'provider'
         ? (state.otherProgramName ?? t('role.provider'))
         : state.otherRole === 'admin'
           ? t('role.admin')
-          : undefined
-      : undefined;
+          : null
+      : null;
+
+  if (state.status === 'ready') {
+    return (
+      <ThreadFrame>
+        <ThreadTop>
+          {header}
+          <ThreadHeader
+            name={title}
+            context={context}
+            backHref="/messages/"
+            backLabel={t('nav.back.messages')}
+          />
+        </ThreadTop>
+        <ThreadViewLazy
+          messages={state.messages}
+          otherName={state.otherName}
+          onSend={send}
+          sending={sending}
+          sendFailed={sendFailed}
+          onReport={report}
+          speechLanguage={speechLanguage}
+          supportPhone={supportPhone}
+        />
+      </ThreadFrame>
+    );
+  }
 
   return (
     <Page gap={4}>
       {header}
-      <PageTitle title={title} subtitle={context} backHref="/messages/" backLabel={t('nav.back.messages')} />
+      <PageTitle title={title} backHref="/messages/" backLabel={t('nav.back.messages')} />
 
       {state.status === 'loading' ? <Loading label={t('common.loading')} variant="inline" /> : null}
 
@@ -194,21 +227,6 @@ function ThreadScreen() {
           callLabel={t('help.callSupport')}
         />
       ) : null}
-
-      {state.status === 'ready' ? (
-        <ThreadViewLazy
-          messages={state.messages}
-          otherName={state.otherName}
-          onSend={send}
-          sending={sending}
-          sendFailed={sendFailed}
-          onReport={report}
-          speechLanguage={speechLanguage}
-          supportPhone={supportPhone}
-        />
-      ) : null}
-
-      <HelpBar label={t('nav.help')} variant="block" />
     </Page>
   );
 }

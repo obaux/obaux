@@ -188,10 +188,71 @@ test.describe('a conversation', () => {
     await expect(log).toBeVisible();
     await expect(log.getByText('Is the class still on Tuesday?')).toBeVisible();
     await expect(page.getByRole('button', { name: 'Report' })).toHaveCount(1);
-    await expect(page.getByRole('link', { name: /Messages/ }).first()).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Back to Messages' })).toBeVisible();
+    // No help link on this screen (A14): the way back carries it.
+    await expect(page.getByRole('link', { name: /Help/ })).toHaveCount(0);
+
+    // Every control on the thread clears the 48px floor — the send button,
+    // the mic and Report are 48px squares now, not a 64px block (A13).
+    const controls = page.locator('button:visible, a[href]:visible, input:visible');
+    const count = await controls.count();
+    for (let i = 0; i < count; i++) {
+      const box = await controls.nth(i).boundingBox();
+      if (!box) continue;
+      const label = (await controls.nth(i).getAttribute('aria-label')) ?? (await controls.nth(i).textContent()) ?? '';
+      expect(box.height, `${label.trim()} is ${box.height}px tall`).toBeGreaterThanOrEqual(48);
+    }
+    const send = await page.getByRole('button', { name: /send/i }).boundingBox();
+    expect(send?.width).toBe(48);
+    expect(send?.height).toBe(48);
+    // The input has no wrapper of its own (A13): what somebody aims at is the
+    // composer box, which focuses the editor on a tap anywhere inside it —
+    // that box, not the editor's line, is the target that has to clear 48px.
+    const composer = await page.locator('.astryx-chat-composer').boundingBox();
+    expect(composer?.height).toBeGreaterThanOrEqual(48);
 
     const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
     expect(results.violations).toEqual([]);
+  });
+
+  test('the header and the composer stay put while the messages scroll', async ({ page }) => {
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    // Enough messages to overflow an iPhone SE: the list has to scroll.
+    await page.route(MESSAGES, (route) =>
+      route.fulfill(
+        json(
+          Array.from({ length: 30 }, (_, i) => ({
+            id: `m-${i}`,
+            conversation_id: CONVO,
+            sender_id: i % 2 ? ME : OTHER,
+            body: `Message number ${i + 1} in a long conversation.`,
+            created_at: new Date(Date.now() - (30 - i) * 60_000).toISOString(),
+          })),
+        ),
+      ),
+    );
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+
+    const header = page.getByRole('heading', { name: 'Marcus', level: 1 });
+    const send = page.getByRole('button', { name: /send/i });
+    const before = await header.boundingBox();
+    const sendBefore = await send.boundingBox();
+    expect(before).not.toBeNull();
+    expect(sendBefore).not.toBeNull();
+
+    // The document itself does not scroll; the message area does.
+    const last = page.getByRole('log').getByText('Message number 30 in a long conversation.');
+    await last.scrollIntoViewIfNeeded();
+    await page.mouse.wheel(0, 400);
+    expect(await page.evaluate(() => window.scrollY)).toBe(0);
+    expect(await header.boundingBox()).toEqual(before);
+    expect(await send.boundingBox()).toEqual(sendBefore);
+
+    // The last message sits above the composer, never under it.
+    const lastBox = await last.boundingBox();
+    expect(lastBox!.y + lastBox!.height).toBeLessThanOrEqual(sendBefore!.y);
   });
 
   test('sending adds the message to the log', async ({ page }) => {
@@ -231,6 +292,10 @@ test.describe('a conversation', () => {
     await settled(page);
 
     await expect(page.getByRole('heading', { name: 'Teresa', level: 1 })).toBeVisible();
+    // Who they are to you sits beside the name, one row (D-193, D-187).
+    const heading = await page.getByRole('heading', { name: 'Teresa', level: 1 }).boundingBox();
+    const tag = await page.getByText('Case manager', { exact: true }).last().boundingBox();
+    expect(Math.abs(tag!.y + tag!.height / 2 - (heading!.y + heading!.height / 2))).toBeLessThan(12);
     await expect(page.getByRole('log')).toBeVisible();
     // The same thread Teresa's own preview reads, from Jordan's side (D-183).
     await expect(page.getByRole('log').getByText(/room 12/)).toBeVisible();

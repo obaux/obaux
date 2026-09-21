@@ -33,6 +33,8 @@ const OUT =
 const PORT = 3123;
 const BASE = `http://127.0.0.1:${PORT}`;
 const ADMIN_ID = 'de3b9c2e-ec2f-403b-93e5-86e6ee75349b';
+const OTHER_ID = '7c1f8c1e-1c7e-4a5c-9d6e-0f3a2b4c5d6e';
+const CONVO_ID = '2a9d5e1c-3b7f-4d8e-9a1b-6c5d4e3f2a1b';
 
 const json = (body) => ({
   status: 200,
@@ -95,6 +97,10 @@ const SCREENS = [
   { name: '5d-flag', path: '/flag/?place=s1' },
   { name: '5e-points', path: '/points/' },
   { name: '6-notifications', path: '/notifications/' },
+  // One conversation — the screen with two pinned bars and a scrolling
+  // middle (D-192). A member and their case manager see it from either side;
+  // a super admin meets the "not for your role" notice, which is correct.
+  { name: '6b-conversation', path: `/messages/thread/?id=${CONVO_ID}` },
   { name: '7-privacy', path: '/privacy/' },
   { name: '8-terms', path: '/terms/' },
   // Not a journey — the workbench. Photographed with the screens so a change to
@@ -264,6 +270,57 @@ async function stub(page, profile) {
   await page.route('**/rest/v1/rpc/served_cities*', (r) =>
     r.fulfill(json([{ city: 'Philadelphia' }])),
   );
+  // One conversation with Marcus, long enough to scroll (D-192).
+  await page.route('**/rest/v1/conversation_members*', (r) => {
+    if (r.request().method() === 'PATCH') return r.fulfill(json([]));
+    if (r.request().url().includes('conversation_id=eq.')) {
+      return r.fulfill(
+        json([
+          { profile_id: ADMIN_ID, conversations: { kind: 'direct' } },
+          { profile_id: OTHER_ID, conversations: { kind: 'direct' } },
+        ]),
+      );
+    }
+    return r.fulfill(json([{ conversation_id: CONVO_ID, last_read_at: null }]));
+  });
+  await page.route('**/rest/v1/rpc/conversation_partners*', (r) =>
+    r.fulfill(
+      json([
+        {
+          conversation_id: CONVO_ID,
+          profile_id: OTHER_ID,
+          first_name: profile?.role === 'member' ? 'Teresa' : 'Marcus',
+          role: profile?.role === 'member' ? 'admin' : 'member',
+          program_name: null,
+        },
+      ]),
+    ),
+  );
+  await page.route('**/rest/v1/messages*', (r) =>
+    r.fulfill(
+      json(
+        [
+          'Hi, it is Teresa. I put you down for the GED class. It starts Monday at 10.',
+          'Thank you. Which bus goes there?',
+          'The 47 stops right outside. It runs every 15 minutes in the morning.',
+          'Got it. I will be there.',
+          'How did Monday go?',
+          'Good. The room was easy to find and the teacher is patient.',
+          'Your ID appointment is Thursday at 2. Bring the letter I gave you.',
+          'Thursday at 2. I have the letter.',
+          'One more thing: the class moved to room 12 this week. Same time.',
+        ].map((body, i) => ({
+          id: `m-${i}`,
+          conversation_id: CONVO_ID,
+          sender_id: i % 2 === 0 ? (profile?.role === 'member' ? OTHER_ID : ADMIN_ID) : profile?.role === 'member' ? ADMIN_ID : OTHER_ID,
+          body,
+          created_at: new Date(Date.now() - (9 - i) * 3_600_000 * 6).toISOString(),
+        })),
+      ),
+    ),
+  );
+  await page.route('**/rest/v1/rpc/messageable_people*', (r) => r.fulfill(json([])));
+  await page.route('**/rest/v1/rpc/reports_for_review*', (r) => r.fulfill(json([])));
 }
 
 const server = spawn('npx', ['serve', 'apps/web/out', '-l', String(PORT), '--no-clipboard'], {

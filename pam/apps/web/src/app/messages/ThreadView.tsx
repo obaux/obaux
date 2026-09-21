@@ -6,6 +6,7 @@ import {
   ChatComposer,
   ChatComposerInput,
   ChatDictationButton,
+  ChatLayout,
   ChatMessage,
   ChatMessageBubble,
   ChatMessageList,
@@ -17,6 +18,7 @@ import {
 import { Avatar } from '@astryxdesign/core/Avatar';
 import { Button } from '@astryxdesign/core/Button';
 import { Card } from '@astryxdesign/core/Card';
+import { Icon } from '@astryxdesign/core/Icon';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { HStack } from '@astryxdesign/core/HStack';
@@ -40,11 +42,20 @@ import { whenHappened } from '@/lib/when';
  * `onReport` are whatever the caller wires — a real insert, or a
  * sessionStorage append — and this file never imports Supabase.
  *
- * PAM's rules, kept on top of Astryx's defaults: the send button is the one
- * primary action and is drawn at 64px; every other control clears 48px;
- * message text is 18px. The mic (`ChatDictationButton`) hides itself when
- * the browser has no speech recognition, which is the same §1 rule
- * `VoiceInput` follows — a dead button is worse than no button.
+ * PAM's rules, kept on top of Astryx's defaults: every control is a 48px
+ * square — the send button included, which is this screen's one primary
+ * action and, since A13 (D-192), the one primary action in PAM that is not
+ * 64px: a chat's primary action repeats dozens of times per screen, and a
+ * 64px block ate the message area on a phone. Message text is 18px. The
+ * mic (`ChatDictationButton`) hides itself when the browser has no speech
+ * recognition, which is the same §1 rule `VoiceInput` follows — a dead
+ * button is worse than no button. Report is an icon-only 48px button on the
+ * other person's messages, named for a screen reader and nothing more.
+ *
+ * `ChatLayout` (D-192) owns the scrolling: the messages scroll, the
+ * composer stays docked at the bottom as a sticky flex item, so the last
+ * message is never under it. The frame around this — the pinned headers —
+ * is `ThreadFrame`.
  *
  * Reporting (D-177) lives here too, on the other person's messages only:
  * `report_message()` already refuses a report of your own words, and a
@@ -76,10 +87,12 @@ const styles = stylex.create({
   list: { width: '100%' },
   body: { fontSize: '18px', lineHeight: 1.4, whiteSpace: 'pre-wrap' },
   time: { fontSize: '13px' },
-  // §2.5: 64px for the one primary action, 48px for everything else.
-  send: { minWidth: '64px', minHeight: '64px' },
-  mic: { minWidth: '48px', minHeight: '48px' },
-  report: { minHeight: '48px', fontSize: '15px' },
+  // §2.5's floor, as a square: send, mic and report alike (A13, D-192).
+  square: { width: '48px', height: '48px', minWidth: '48px', minHeight: '48px', flexShrink: 0 },
+  // The scroll region's inner column keeps the page's reading width.
+  messages: { width: '100%' },
+  // Reaching the end of the messages must not scroll the page under them.
+  layout: { overscrollBehavior: 'contain' },
   reportCard: { width: '100%' },
   reportAction: { minHeight: '48px', fontSize: '17px' },
   intro: { fontSize: '16px', lineHeight: 1.5 },
@@ -122,8 +135,38 @@ export function ThreadView({
     setReport(ok ? { step: 'done' } : { step: 'failed', messageId: report.messageId });
   };
 
+  const composer = (
+    <ChatComposer
+      value={draft}
+      onChange={setDraft}
+      onSubmit={(value) => void submit(value)}
+      placeholder={t('messages.thread.placeholder')}
+      isDisabled={sending}
+      density="compact"
+      input={
+        <ChatComposerInput
+          handleRef={inputRef}
+          label={t('messages.thread.placeholder')}
+          placeholder={t('messages.thread.placeholder')}
+          hasHistory={false}
+          maxRows={4}
+        />
+      }
+      sendActions={
+        <ChatDictationButton
+          dictation={dictation}
+          size="md"
+          label={dictation.isListening ? t('messages.thread.dictateStop') : t('messages.thread.dictate')}
+          xstyle={styles.square}
+        />
+      }
+      sendButton={<ChatSendButton size="md" xstyle={styles.square} />}
+    />
+  );
+
   return (
-    <VStack gap={4}>
+    <ChatLayout composer={composer} density="compact" xstyle={styles.layout}>
+    <VStack gap={4} xstyle={styles.messages}>
       <ChatMessageList
         density="spacious"
         align="top"
@@ -164,8 +207,10 @@ export function ThreadView({
                         <Button
                           label={t('messages.report.action')}
                           variant="ghost"
-                          size="sm"
-                          xstyle={styles.report}
+                          size="md"
+                          isIconOnly
+                          icon={<Icon icon="warning" size="sm" />}
+                          xstyle={styles.square}
                           onClick={() =>
                             setReport({
                               step: 'choosing',
@@ -245,32 +290,7 @@ export function ThreadView({
           callLabel={t('help.callSupport')}
         />
       ) : null}
-
-      <ChatComposer
-        value={draft}
-        onChange={setDraft}
-        onSubmit={(value) => void submit(value)}
-        placeholder={t('messages.thread.placeholder')}
-        isDisabled={sending}
-        density="spacious"
-        input={
-          <ChatComposerInput
-            handleRef={inputRef}
-            label={t('messages.thread.placeholder')}
-            placeholder={t('messages.thread.placeholder')}
-            hasHistory={false}
-            maxRows={4}
-          />
-        }
-        sendActions={
-          <ChatDictationButton
-            dictation={dictation}
-            label={dictation.isListening ? t('messages.thread.dictateStop') : t('messages.thread.dictate')}
-            xstyle={styles.mic}
-          />
-        }
-        sendButton={<ChatSendButton xstyle={styles.send} />}
-      />
     </VStack>
+    </ChatLayout>
   );
 }
