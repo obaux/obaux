@@ -8,6 +8,7 @@ import { List, ListItem } from '@astryxdesign/core/List';
 import { Avatar } from '@astryxdesign/core/Avatar';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
+import { spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { useI18n } from '@/lib/i18n';
 
 /**
@@ -37,7 +38,9 @@ export interface PickablePerson {
 }
 
 const styles = stylex.create({
-  body: { width: '100%', paddingBlock: '8px' },
+  // Clear of the sheet's grab handle: the first thing in the sheet used to sit
+  // under it (Will's screenshot, 21 September).
+  body: { width: '100%', paddingBlockStart: spacingVars['--spacing-6'], paddingBlockEnd: spacingVars['--spacing-2'] },
   item: { minHeight: '48px' },
   none: { fontSize: '17px', paddingBlock: '12px' },
 });
@@ -86,6 +89,7 @@ export function NewMessagePicker({
       <VStack gap={3} xstyle={styles.body}>
         <TextInput
           label={t('messages.new.search')}
+          isLabelHidden
           placeholder={t('messages.new.search')}
           value={query}
           onChange={setQuery}

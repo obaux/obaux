@@ -123,8 +123,33 @@ test.describe('the conversation list', () => {
     await expect(page.getByText('New', { exact: true })).toBeVisible();
     // A case manager looking at a member: nothing under the name (D-187).
     await expect(page.getByText('Member', { exact: true })).toHaveCount(0);
-    // Reported is a section of this screen for a case manager (D-184).
-    await expect(page.getByRole('radio', { name: 'Reported' })).toBeVisible();
+    // Reported is a section of this screen for a case manager, reached from
+    // the title (D-184, D-197): the heading is the switcher.
+    await expect(page.getByRole('heading', { level: 1 }).getByRole('button')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'New message' })).toBeVisible();
+  });
+
+  test('the title switches sections for a case manager, by tap and by keyboard', async ({ page }) => {
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    await page.route(REPORTS, (route) => route.fulfill(json([])));
+    await page.goto('/messages/');
+    await settled(page);
+
+    const title = page.getByRole('heading', { level: 1 }).getByRole('button');
+    const box = await title.boundingBox();
+    expect(box!.height).toBeGreaterThanOrEqual(48);
+    await title.click();
+    await page.getByRole('menuitem', { name: 'Reported' }).click();
+    await expect(page.getByRole('heading', { level: 1, name: /Reported/ })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'New message' })).toHaveCount(0);
+
+    // Back by keyboard alone.
+    await page.getByRole('heading', { level: 1 }).getByRole('button').focus();
+    await page.keyboard.press('Enter');
+    await page.getByRole('menuitem', { name: 'Conversations' }).focus();
+    await page.keyboard.press('Enter');
+    await expect(page.getByRole('heading', { level: 1, name: /Messages/ })).toBeVisible();
     await expect(page.getByRole('button', { name: 'New message' })).toBeVisible();
   });
 
@@ -165,8 +190,9 @@ test.describe('the conversation list', () => {
     await expect(page.getByRole('link', { name: /Teresa Case manager/ })).toBeVisible();
     await expect(page.getByRole('link', { name: /Sandra Example Learning Center/ })).toBeVisible();
     await expect(page.getByText(/Example people/)).toHaveCount(1);
-    // No Reported section for a member (D-184).
-    await expect(page.getByRole('radio', { name: 'Reported' })).toHaveCount(0);
+    // No Reported section for a member (D-184): a plain title, no switcher.
+    await expect(page.getByRole('heading', { level: 1, name: 'Messages' })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1 }).getByRole('button')).toHaveCount(0);
 
     // The picker lists the example cast and a pick opens the example thread.
     await page.getByRole('button', { name: 'New message' }).click();
@@ -255,6 +281,36 @@ test.describe('a conversation', () => {
     expect(lastBox!.y + lastBox!.height).toBeLessThanOrEqual(sendBefore!.y);
   });
 
+  test('tapping into the composer draws no ring; Tab into it does (D-195)', async ({ page }) => {
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+
+    const editor = page.locator('[contenteditable="true"]');
+    await editor.click();
+    await expect(editor).toBeFocused();
+    const ringOnTap = await editor.evaluate((el) => getComputedStyle(el).outlineStyle);
+    expect(ringOnTap).toBe('none');
+    const frameOnTap = await page.locator('.astryx-chat-composer').evaluate((el) => {
+      const body = el.querySelector('[contenteditable="true"]')!.closest('div[class*="astryx"]') as HTMLElement | null;
+      return getComputedStyle(body ?? el).outlineStyle;
+    });
+    expect(frameOnTap).toBe('none');
+
+    // Keyboard focus keeps a visible ring somewhere on the composer (WCAG 2.4.7).
+    await page.getByRole('link', { name: 'Back to Messages' }).focus();
+    await page.keyboard.press('Tab');
+    const focused = await page.evaluate(() => document.activeElement?.getAttribute('contenteditable'));
+    if (focused === 'true') {
+      const ringOnTab = await page.locator('.astryx-chat-composer').evaluate((el) => {
+        const all = [el, ...Array.from(el.querySelectorAll('*'))] as HTMLElement[];
+        return all.some((node) => getComputedStyle(node).outlineStyle !== 'none' && parseFloat(getComputedStyle(node).outlineWidth) > 0);
+      });
+      expect(ringOnTab).toBe(true);
+    }
+  });
+
   test('sending adds the message to the log', async ({ page }) => {
     await signedInAs(page, 'admin');
     await withOneConversation(page);
@@ -299,7 +355,9 @@ test.describe('a conversation', () => {
     await expect(page.getByRole('log')).toBeVisible();
     // The same thread Teresa's own preview reads, from Jordan's side (D-183).
     await expect(page.getByRole('log').getByText(/room 12/)).toBeVisible();
-    await expect(page.getByText(/example conversation/)).toBeVisible();
+    // No sentence about it being an example at the top (Will, 21 September);
+    // the example-only behaviour is what the rest of this test checks.
+    await expect(page.getByText(/example conversation/)).toHaveCount(0);
     // Nothing to report in an example: a report has real recipients.
     await expect(page.getByRole('button', { name: 'Report' })).toHaveCount(0);
 
@@ -367,8 +425,9 @@ test.describe('reported messages', () => {
     await page.goto('/messages/?show=reported');
     await settled(page);
 
-    // Reported lives inside Messages now (D-184), reached by the bell's row.
-    await expect(page.getByRole('radio', { name: 'Reported' })).toBeChecked();
+    // Reported lives inside Messages now (D-184), reached by the bell's row;
+    // the title says which section is open (D-197).
+    await expect(page.getByRole('heading', { level: 1, name: /Reported/ })).toBeVisible();
     await expect(page.getByText('Come alone or else.')).toBeVisible();
     await expect(page.getByText('Reported by Marcus')).toBeVisible();
     await expect(page.getByRole('heading', { name: /About Sandra/ })).toBeVisible();
@@ -388,7 +447,8 @@ test.describe('reported messages', () => {
     // D-171: no conversations, no "New message" — Reported only, with the
     // example reports while nothing real has been reported (D-184).
     await expect(page.getByRole('button', { name: 'New message' })).toHaveCount(0);
-    await expect(page.getByRole('radio', { name: 'Reported' })).toHaveCount(0);
+    await expect(page.getByRole('heading', { level: 1, name: 'Reported' })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1 }).getByRole('button')).toHaveCount(0);
     await expect(page.getByText('Can you just give me your home address so I can drop it off.')).toBeVisible();
     await expect(page.getByRole('heading', { name: /About Keisha/ })).toBeVisible();
     await expect(page.getByText(/Example people/)).toBeVisible();

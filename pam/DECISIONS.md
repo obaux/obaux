@@ -3914,6 +3914,60 @@ bar, and a third pinned bar would come out of the messages. The route's
 not-found, error and signed-out states keep their support-number notices.
 `messages.spec.ts` asserts the thread has no help link.
 
+### D-195 — The composer's ring is Astryx's keyboard-only one; the global focus ring stays off the editor
+
+Will's screenshot: a white rectangle around the editor's line every time
+he tapped to type. That was PAM's own `:focus-visible { outline: 3px
+solid currentColor }` in `globals.css` (§12: never hide the focus ring),
+landing on the composer's contenteditable — browsers treat an editable
+element as `:focus-visible` on *any* focus, a tap included, unlike a
+button. `globals.css` already exempts `input`/`textarea` for the same
+reason (the ring belongs on the frame, not the field inside it); the
+editor is the third such element, so the same rule now covers
+`[contenteditable="true"]`. What keeps WCAG 2.4.7: Astryx draws the
+composer's own ring on the frame, gated to keyboard focus by input
+modality (`hasKeyboardEditorFocus` + `:has(:focus-visible)`), which is
+untouched — Tab into the composer and the frame rings; tap and nothing
+does. `messages.spec.ts` checks both. Not an `xstyle`: `ChatComposerInput`
+has none, and the rule that drew the ring was ours, in the one file that
+owns it. The composer is back at the default density — D-192's `compact`
+had taken the text to the box's edge.
+
+### D-196 — The scroll-to-bottom button is PAM's own 48px `IconButton`, because Astryx's default overflows
+
+`ChatLayout`'s default `ChatLayoutScrollButton` puts a medium `Button`
+with a medium chevron inside a 32px pill; the chevron pokes out of the
+circle on a phone (screenshot 2). Passing nothing does not change it — it
+is the library's default. So `ThreadView` passes its own `scrollButton`:
+an `IconButton` (secondary, low elevation, `chevronDown` small) at the
+48px floor, wired to the same `useChatStreamScroll` the layout uses
+against the layout's own scroll container (`useChatLayoutContext`), shown
+only while scrolled up. The library bug is worth reporting upstream; this
+is the fallback the brief named.
+
+### D-197 — The Messages title is the section switcher
+
+The Conversations | Reported `SegmentedControl` (D-184) took a full row a
+phone could not spare. For a case manager the title itself is now the
+switcher: `PageTitle` gained `titleControl`, and Messages renders a
+`DropdownMenu` inside the `<h1>` whose trigger reads "Messages" or
+"Reported" at the title scale with a chevron, 48px to hit, keyboard
+operable (Enter opens, arrow/Enter picks). The `<h1>` therefore still names
+the open section. A member or a program gets the plain "Messages" title
+with no chevron; a super admin, who has only Reported (D-171), gets the
+plain word "Reported" — a menu whose other entry opens an empty screen is
+not a choice. `?show=reported` still lands on Reported. The heading is a
+button's parent, which HTML allows and screen readers read as "Messages,
+button, heading level 1".
+
+Also in this pass, no decision needed: the picker sheet's first control
+sat under the grab handle — the `TextInput`'s visible label duplicated its
+placeholder and is hidden now, and the sheet body starts a spacing token
+below the handle; the example-thread sentence is gone (behaviour
+unchanged); Home's saved-place cards have their gap back — `Carousel gap`
+never applied because the masked list is one React child and so one
+slide, so the card carries the same spacing token itself.
+
 ---
 
 ## Notes for whoever picks this up next

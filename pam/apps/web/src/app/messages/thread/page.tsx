@@ -2,8 +2,6 @@
 
 import { Suspense, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
-import * as stylex from '@stylexjs/stylex';
-import { Text } from '@astryxdesign/core/Text';
 import { AppHeader, Loading, Notice, Page, PageTitle } from '@pam/ui';
 import { NOTICES, type MessageReportReason } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
@@ -47,10 +45,6 @@ import { DemoThreadLazy } from '../DemoThreadLazy';
  * inserting a real row. Gated on the previewed role, the way `/messages/`
  * itself is (D-172); a real thread is gated on the real one.
  */
-
-const styles = stylex.create({
-  note: { fontSize: '15px', lineHeight: 1.5 },
-});
 
 function isDummyId(id: string | null): boolean {
   return id !== null && id.startsWith('dummy-conv-');
@@ -147,12 +141,7 @@ function ThreadScreen() {
     // (it knows the pair) and the same `ThreadView` as a real thread.
     return (
       <ThreadFrame>
-        <ThreadTop>
-          {header}
-          <Text type="supporting" xstyle={styles.note}>
-            {t('messages.thread.example.body')}
-          </Text>
-        </ThreadTop>
+        <ThreadTop>{header}</ThreadTop>
         <DemoThreadLazy
           conversationId={conversationId}
           role={viewedRole ?? 'member'}

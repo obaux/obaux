@@ -193,6 +193,19 @@
     outline: none;
   }
 
+  /*
+   * The chat composer's editor is a contenteditable, and browsers treat an
+   * editable element as focus-visible on ANY focus, a tap included — so the
+   * ring above lit the editor's line inside the composer every time somebody
+   * tapped to type (D-195). Astryx already draws the composer's own ring, on
+   * the frame, for keyboard focus only (it gates on input modality); this
+   * leaves that as the one ring and takes the global one off the editor.
+   * Tab into the composer and the frame still rings.
+   */
+  [contenteditable='true']:focus-visible {
+    outline: none;
+  }
+
   :has(> input:focus-visible),
   :has(> textarea:focus-visible) {
     outline: 3px solid currentColor;

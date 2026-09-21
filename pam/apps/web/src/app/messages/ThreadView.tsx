@@ -13,8 +13,11 @@ import {
   ChatMessageMetadata,
   ChatSendButton,
   useChatDictation,
+  useChatLayoutContext,
+  useChatStreamScroll,
   type ChatComposerInputHandle,
 } from '@astryxdesign/core/Chat';
+import { IconButton } from '@astryxdesign/core/IconButton';
 import { Avatar } from '@astryxdesign/core/Avatar';
 import { Button } from '@astryxdesign/core/Button';
 import { Card } from '@astryxdesign/core/Card';
@@ -93,10 +96,44 @@ const styles = stylex.create({
   messages: { width: '100%' },
   // Reaching the end of the messages must not scroll the page under them.
   layout: { overscrollBehavior: 'contain' },
+  scrollWrap: { width: '100%', paddingBlockEnd: '12px', pointerEvents: 'auto' },
   reportCard: { width: '100%' },
   reportAction: { minHeight: '48px', fontSize: '17px' },
   intro: { fontSize: '16px', lineHeight: 1.5 },
 });
+
+/**
+ * The scroll-to-bottom button, drawn at 48px (D-196).
+ *
+ * `ChatLayout`'s default is Astryx's `ChatLayoutScrollButton`, which puts a
+ * medium `Button` and a medium chevron inside a 32px pill — the chevron
+ * overflows the circle, visibly, on a phone (Will's screenshot, 21
+ * September). Passing nothing does not fix it; it is the library's own
+ * default. So this is the same behaviour on the library's own hooks —
+ * `useChatStreamScroll` against the layout's scroll container — drawn as an
+ * `IconButton` that clears the 48px floor and holds its chevron. Hidden,
+ * not removed, while the log is at the bottom.
+ */
+function ScrollToBottom() {
+  const { t } = useI18n();
+  const layout = useChatLayoutContext();
+  const fallback = useRef<HTMLElement | null>(null);
+  const scroll = useChatStreamScroll({ scrollRef: layout?.scrollContainerRef ?? fallback });
+  if (!scroll.isScrolledUp) return null;
+  return (
+    <HStack justify="center" xstyle={styles.scrollWrap}>
+      <IconButton
+        label={t('messages.thread.scrollToBottom')}
+        icon={<Icon icon="chevronDown" size="sm" />}
+        variant="secondary"
+        size="md"
+        elevation="low"
+        onClick={() => scroll.scrollToBottom()}
+        xstyle={styles.square}
+      />
+    </HStack>
+  );
+}
 
 type ReportPhase =
   | { step: 'idle' }
@@ -142,7 +179,6 @@ export function ThreadView({
       onSubmit={(value) => void submit(value)}
       placeholder={t('messages.thread.placeholder')}
       isDisabled={sending}
-      density="compact"
       input={
         <ChatComposerInput
           handleRef={inputRef}
@@ -165,7 +201,7 @@ export function ThreadView({
   );
 
   return (
-    <ChatLayout composer={composer} density="compact" xstyle={styles.layout}>
+    <ChatLayout composer={composer} density="compact" scrollButton={<ScrollToBottom />} xstyle={styles.layout}>
     <VStack gap={4} xstyle={styles.messages}>
       <ChatMessageList
         density="spacious"

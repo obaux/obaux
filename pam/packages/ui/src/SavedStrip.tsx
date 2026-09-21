@@ -83,6 +83,13 @@ const styles = stylex.create({
      */
     width: 'min(62cqw, 220px)',
     /*
+     * The gap between cards. `Carousel gap` cannot draw it: the masked list
+     * is one React child, so the carousel sees one slide holding every card
+     * flush against the next (Will's screenshot, 21 September). The same
+     * spacing token, on the card itself.
+     */
+    marginInlineEnd: spacingVars['--spacing-2'],
+    /*
      * Wide rather than square. At one and a half per view a card is ~230px
      * across, and a square that size is mostly empty — a name, a category and
      * a bookmark do not fill it, and the empty half reads as something that

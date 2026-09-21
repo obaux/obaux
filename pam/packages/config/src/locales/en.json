@@ -320,7 +320,6 @@
   "messages.thread.you": "You",
   "messages.thread.dictate": "Speak your message",
   "messages.thread.dictateStop": "Stop listening",
-  "messages.thread.example.body": "This is an example conversation. Nothing you type here is sent to anyone.",
   "nav.back.directory": "Back to Everyone",
   "nav.back.home": "Back to Home",
   "nav.back.messages": "Back to Messages",
@@ -615,9 +614,6 @@
   "reports.reason": "Reason: {reason}",
   "reports.status.open": "Waiting for review",
   "reports.status.resolved": "Looked at",
-  "messages.sections": "Show",
-  "messages.section.conversations": "Conversations",
-  "messages.section.reported": "Reported",
   "messages.new.action": "New message",
   "messages.new.title": "Who do you want to message?",
   "messages.new.search": "Search by name",
@@ -632,5 +628,9 @@
   "places.reported.keep": "Keep it",
   "places.reported.remove": "Take it off the list",
   "places.reported.failed.title": "That did not save",
-  "places.reported.failed.body": "Your connection dropped. Try again, or call PAM."
+  "places.reported.failed.body": "Your connection dropped. Try again, or call PAM.",
+  "messages.thread.scrollToBottom": "Jump to the newest message",
+  "messages.section.conversations": "Conversations",
+  "messages.section.reported": "Reported",
+  "messages.sections": "Show conversations or reported messages"
 }

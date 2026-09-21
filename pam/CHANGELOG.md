@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.34.2] — 2026-09-21 · Polish from the phone
+
+The composer has its padding back and no longer lights up when tapped
+(keyboard focus still rings the frame, D-195); the scroll-to-bottom button
+holds its chevron (D-196); example conversations lose the sentence at the
+top; the New message sheet starts below its handle; the Messages title is
+the section switcher for a case manager — "Messages ⌄" / "Reported ⌄" —
+instead of a control row (D-197); and Home's saved places have their gap
+back.
+
 ## [0.34.1] — 2026-09-21 · The conversation screen fits a phone
 
 The name you are talking to and the box you type in stay put; only the

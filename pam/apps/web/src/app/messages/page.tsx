@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import * as stylex from '@stylexjs/stylex';
 import { List } from '@astryxdesign/core/List';
 import { Text } from '@astryxdesign/core/Text';
-import { SegmentedControl, SegmentedControlItem } from '@astryxdesign/core/SegmentedControl';
+import { DropdownMenu } from '@astryxdesign/core/DropdownMenu';
 import { AppHeader, BigButton, HelpBar, Loading, Notice, Page, PageTitle } from '@pam/ui';
 import { NOTICES, type Role } from '@pam/config';
 import { USE_DUMMY_PEOPLE } from '@pam/config/dummy-flag';
@@ -57,7 +57,9 @@ import type { PickablePerson } from './NewMessagePicker';
 
 const styles = stylex.create({
   note: { fontSize: '15px', lineHeight: 1.5 },
-  control: { width: '100%' },
+  // The title as the switcher (D-197): the page-title scale, 48px to hit,
+  // and no button chrome until it is pressed — it reads as the title.
+  titleButton: { fontSize: '28px', lineHeight: 1.2, minHeight: '48px', paddingInline: 0, fontWeight: 700 },
 });
 
 type Section = 'conversations' | 'reported';
@@ -180,7 +182,36 @@ function MessagesScreen() {
         trailing={<HeaderBell enabled={signedIn} role={viewedRole} isDemo={isDemo} />}
       />
 
-      <PageTitle title={t('messages.title')} backHref="/" backLabel={t('nav.back.home')} />
+      {/*
+        The title is the section switcher for a case manager (D-197): it reads
+        "Messages" or "Reported" with a chevron, and tapping it offers the
+        other. A super admin has only Reported (D-171), so their title is the
+        plain word; a member or a program has only conversations and gets
+        "Messages" with no chevron.
+      */}
+      <PageTitle
+        title={section === 'reported' ? t('messages.section.reported') : t('messages.title')}
+        titleControl={
+          canMessage && canReview ? (
+            <DropdownMenu
+              button={{
+                label: section === 'reported' ? t('messages.section.reported') : t('messages.title'),
+                variant: 'ghost',
+                size: 'lg',
+                xstyle: styles.titleButton,
+              }}
+              items={[
+                { id: 'conversations', label: t('messages.section.conversations'), onClick: () => setSection('conversations') },
+                { id: 'reported', label: t('messages.section.reported'), onClick: () => setSection('reported') },
+              ]}
+              placement="below"
+              alignment="start"
+            />
+          ) : undefined
+        }
+        backHref="/"
+        backLabel={t('nav.back.home')}
+      />
 
       {!hasScreen ? (
         <Notice
@@ -190,20 +221,6 @@ function MessagesScreen() {
           supportPhone={supportPhone}
           callLabel={t('help.callSupport')}
         />
-      ) : null}
-
-      {canMessage && canReview ? (
-        <SegmentedControl
-          value={section}
-          onChange={(next) => setSection(next as Section)}
-          label={t('messages.sections')}
-          layout="fill"
-          size="lg"
-          xstyle={styles.control}
-        >
-          <SegmentedControlItem value="conversations" label={t('messages.section.conversations')} />
-          <SegmentedControlItem value="reported" label={t('messages.section.reported')} />
-        </SegmentedControl>
       ) : null}
 
       {/* ---- Conversations ---- */}

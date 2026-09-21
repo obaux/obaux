@@ -100,6 +100,9 @@ const SCREENS = [
   // One conversation — the screen with two pinned bars and a scrolling
   // middle (D-192). A member and their case manager see it from either side;
   // a super admin meets the "not for your role" notice, which is correct.
+  // The conversation list — rows, the title that switches sections for a
+  // case manager (D-197), and the one "New message" button.
+  { name: '6a-messages', path: '/messages/' },
   { name: '6b-conversation', path: `/messages/thread/?id=${CONVO_ID}` },
   { name: '7-privacy', path: '/privacy/' },
   { name: '8-terms', path: '/terms/' },

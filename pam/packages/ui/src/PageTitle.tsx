@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { HStack } from '@astryxdesign/core/HStack';
 import { VStack } from '@astryxdesign/core/VStack';
@@ -31,6 +32,12 @@ export interface PageTitleProps {
   readonly backHref?: string;
   /** The arrow's accessible name, e.g. "Back to Home". Required with `backHref`. */
   readonly backLabel?: string;
+  /**
+   * A control drawn in the title's place — Messages' section switcher
+   * (D-197), a `DropdownMenu` whose trigger reads as the title. Still inside
+   * the `<h1>`, so the screen keeps one heading and it names the section.
+   */
+  readonly titleControl?: ReactNode;
 }
 
 const styles = stylex.create({
@@ -46,7 +53,7 @@ const styles = stylex.create({
   },
 });
 
-export function PageTitle({ title, subtitle, backHref, backLabel }: PageTitleProps) {
+export function PageTitle({ title, subtitle, backHref, backLabel, titleControl }: PageTitleProps) {
   return (
     <VStack gap={1}>
       <HStack gap={1} align="center" wrap="nowrap">
@@ -60,7 +67,7 @@ export function PageTitle({ title, subtitle, backHref, backLabel }: PageTitlePro
           />
         ) : null}
         <Heading level={1} xstyle={styles.title}>
-          {title}
+          {titleControl ?? title}
         </Heading>
       </HStack>
       {subtitle ? (
