@@ -3833,6 +3833,24 @@ lands on `?filter=reported`. Previews and an empty real list show
 Example Food Pantry (closed), the same two places the example bell rows
 name; an example decision only clears the card.
 
+### D-190 — Case managers see reported places but do not decide; only a super admin takes a place off the list
+
+D-189 built the Reported chip on `/places/` for case managers and super
+admins, with Keep / Take it off the list wired to `resolve_service_flag()`
+— which 0036 already restricts to super admins — and flagged the question
+of whether case managers should decide too. **Will, 21 September: no, not
+for now — case managers can't take places off the list, only super
+admins.** So the screen stays as built: a case manager sees every open
+flag on the places they can see (`flagged_services()`, guarded inside for
+`is_admin()` or `is_super_admin()`), with the reason and count, and no
+decision buttons; a super admin sees the same list with the two buttons.
+No code change follows from this entry. It exists so a future session
+reading `resolve_service_flag()`'s super-admin guard next to a chip case
+managers can see doesn't "fix" the asymmetry — it is the intended shape.
+"For now" is Will's own phrase: if case managers are ever to decide, 0036's
+guard is the one place to change, and the buttons already render off the
+same role check.
+
 ---
 
 ## Notes for whoever picks this up next
