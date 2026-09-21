@@ -1,5 +1,6 @@
 /**
- * Enforces the §12 performance budget: "Web first load under 500 KB JS."
+ * Enforces the §12 performance budget: "Web first load under 500 KB JS" —
+ * raised to 600 kB on 21 September 2026 (Will; sop-amendments A12, D-191).
  *
  * A member on a prepaid plan pays for every kilobyte and waits on a throttled
  * 3G connection for it, so this is a product requirement rather than an
@@ -35,7 +36,7 @@ import { fileURLToPath } from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const outDir = join(root, 'apps/web/out');
-const BUDGET_KB = 500;
+const BUDGET_KB = 600;
 /**
  * §12 covers the app. This is animation's own ceiling — see the note above.
  *

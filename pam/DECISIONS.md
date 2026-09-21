@@ -3851,6 +3851,27 @@ managers can see doesn't "fix" the asymmetry — it is the intended shape.
 guard is the one place to change, and the buttons already render off the
 same role check.
 
+### D-191 — The §12 first-load ceiling is 600 kB
+
+`check-bundle-budget.mjs` enforced §12's 500 kB and the app crossed it on 17
+September (D-162) by less than a kilobyte — then every session after spent
+words disclosing 0.3 kB here and 1.0 kB there (D-170, D-174, D-181, D-182,
+the 0.2 kB of 21 September) while keeping real weight off Home: the Chat
+family, the picker, example threads, reported places, all route-only. The
+overage was locale strings and one `Badge`. Will, 21 September: raise the
+documented budget so the app can keep getting better. It is now 600 kB, in
+the script (the enforced number), `docs/sop-amendments.md` A12 (the rule),
+and STATUS.md's proven-checks row.
+
+Why 600 and not "remove it": the reasons for the budget (prepaid data, 3G)
+are as true as they were, and the check's value has been the disclosure it
+forces — nobody added weight silently. A ceiling with ~95 kB of headroom
+keeps that property without making every session write a paragraph about
+a kilobyte. Why not 550: it would be crossed by the next feature with copy
+in two languages, and the discipline of route-only loading is the thing to
+keep, not a number just above today's figure. The animation ceiling (40 kB)
+is untouched; nothing about how the measurement is taken changed.
+
 ---
 
 ## Notes for whoever picks this up next

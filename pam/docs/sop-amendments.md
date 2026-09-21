@@ -297,3 +297,24 @@ or a published source, never invented: `enrich-places` is not written yet and
 nothing here guesses. The `flag_unapproved_rewrite` trigger still flags any
 plain-language column a provider has edited, and 0050's approval step clears
 `needs_review` only for rows PAM itself wrote and no provider has touched.
+
+## A12 — The first-load budget is 600 kB, not 500 (21 September 2026, Will)
+
+§12 said "Web first load under 500 KB JS," and `scripts/check-bundle-budget.mjs`
+failed the build past it. The app has been over that line since 17
+September — by 0.7 kB at first, 4.8 kB by the 21st — and every session
+since has spent effort disclosing the overage rather than shipping the
+screen it was building. Will raised the ceiling to 600 kB.
+
+**Where this contradicts the original.** The number, not the reason. A
+member on a prepaid plan and a throttled connection still pays for every
+kilobyte, so the check still fails the build, the animation chunk still has
+its own 40 kB ceiling, and the measurement is unchanged: what the entry page
+actually loads, gzipped, polyfills excluded. What changed is that 500 was set
+before the app had a design system, a messenger or two languages, and holding
+it was costing more than it protected.
+
+**What did not change.** Route-only code stays route-only — the Chat family,
+the picker, example data and the reported-places list all load on their own
+routes, not Home, and that discipline is what keeps a bigger number from
+becoming a slope. 600 is a ceiling to build under, not a target to reach.
