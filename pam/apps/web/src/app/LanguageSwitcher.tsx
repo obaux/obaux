@@ -1,6 +1,5 @@
 'use client';
 
-import { useCallback } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { Text } from '@astryxdesign/core/Text';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
@@ -13,7 +12,7 @@ import {
 import { GlobeIcon } from '@pam/ui';
 import type { Locale } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
-import { useSession } from '@/lib/useSession';
+import { useChooseLanguage } from '@/lib/useChooseLanguage';
 
 /**
  * English or Spanish, wherever PAM offers the choice — the icon beside the
@@ -88,23 +87,8 @@ export function LanguageSwitcher({
   /** `'onPhoto'` swaps the icon trigger's usual transparent ghost for a scrim that stays legible over artwork — see the sign-in hero. */
   readonly tone?: 'onPhoto';
 }) {
-  const { locale, setLocale, t } = useI18n();
-  const { state: session } = useSession();
-
-  const choose = useCallback(
-    (next: Locale) => {
-      setLocale(next);
-      if (session.status !== 'signed-in') return;
-      void (async () => {
-        const { createClient } = await import('@/lib/supabase');
-        await createClient()
-          .from('profiles')
-          .update({ preferred_language: next })
-          .eq('id', session.session.userId);
-      })();
-    },
-    [session, setLocale],
-  );
+  const { locale, t } = useI18n();
+  const choose = useChooseLanguage();
 
   const items = (
     <DropdownMenuRadioGroup

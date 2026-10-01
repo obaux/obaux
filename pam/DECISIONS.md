@@ -4411,6 +4411,96 @@ kept — that one is about hands, not bytes.
 
 ---
 
+### D-213 — Two screen templates; every tab and nested screen on them; Profile, Get help, Legal, Messages, Saved, Trips and Connections rebuilt to Will's references
+
+Will, 1 October, across a run of Airbnb references: one template for every
+screen you tap into ("the top (back button, and header) should be a template
+we re-use for nested pages, only the content would change"), the large
+shrinking title for the tab screens ("the template for Saved, Messages,
+Profile"), and each screen reworked against its own reference.
+
+**The two templates.**
+
+- *Tab screens* — `LargeTitleHeader` (D-210): the title large, shrinking into
+  the bar on scroll; the bar holds the screen's actions (bell, Help, search,
+  Edit). Profile, Messages, Saved. Explore and Trips are their own shape
+  (search-first; map-first) but keep Help in reach.
+- *Nested screens* — `SubPage` / `SubPageHeader` (@pam/ui, new): a round back
+  button (a real link, named for where it goes), then the title large beneath
+  it; a `compact` form puts the title in the bar beside back (a conversation,
+  where the screen belongs to the messages — D-193 still holds). Applied to:
+  Legal, Language, Get help and its pages, What others can see and its two
+  pages, Connections and a connection's profile, Notifications, a place, the
+  terms and privacy policy, and a conversation and its ⋯ page. Nested screens
+  hide the bottom bar, as in the references; a super admin's role switch,
+  which rode in the old app header, sits in the template's action slot.
+
+**Profile.** The Account screen is gone from the redesign: its name/role card
+duplicated Profile's summary. Language becomes a Profile row (showing the
+current language) opening its own screen; Text reminders is a row once they
+are on (the offer card covers "off"); Terms, Privacy and "What others can
+see" collapse into one **Legal** row. `/account/` still exists in the app
+until the redesign is routed; `useChooseLanguage` (lib) now holds the save
+logic both use.
+
+**Get help** is a list of kinds of help (Will: "there are different types of
+help"): Call PAM is the first row and itself a `tel:` link with the hours;
+then What we can help with, a safety issue (911 first, then how to report a
+message, then a person to talk to), and reporting a wrong place. All static —
+the screen still works with no JavaScript (the e2e that proves it now follows
+the template's back link).
+
+**What others can see** (from Legal): the transparency list exactly as
+`TRANSPARENCY_SCREEN` words it (never re-worded), then "Your data": request a
+copy, delete my account. Neither is self-serve in PAM — the privacy policy
+already says "ask us" — so each opens a page that says so and puts the call
+one tap away, rather than a button that pretends.
+
+**Messages.** On the tab frame; search (top right) swaps the title for a
+field and Cancel, filtering by name or words; an empty state for nobody yet
+and for nothing found. Rows are the plain style Will picked: avatar, name,
+one quiet line (who they are to you; for staff, the last message), a subtle
+time; unread is the name in bold and said aloud. **A conversation** loses the
+warning button under each message: a ⋯ at the top right opens Options —
+Report suspicious activity (the same four reasons, the same
+`report_message()`, now for the other person's latest message) and View
+program details.
+
+**Saved**: two to a row, a square placeholder picture (the category) with the
+name under it; Edit / Done at the top right puts a × on each to unsave.
+
+**Trips**: a map with a pin per visit and a drawer over it (`MapDrawer`,
+@pam/ui): it opens halfway, drags or taps up to 90% (the search bar stays on
+top) and down to a dock so the map has the screen. Cards: square picture,
+place, day and time, who you are meeting. Search narrows pins and cards by
+place name. *Not Astryx's BottomSheet*: it is a dialog that covers the tab
+bar and always opens at its tallest stop; `MapDrawer` is built from Astryx
+primitives with a handle that is also a button. *The map* is Google Maps when
+`NEXT_PUBLIC_GOOGLE_MAPS_KEY` is set (unverified here — the sandbox cannot
+reach Google), and otherwise a drawn preview with the same pins, labelled
+"Map preview". Trips are the example set until something creates them.
+
+**Connections**: cards — photo, name, program, how they help, three facts
+(years helping, people helped, languages) — opening a profile with one
+action, Message. Photos are Unsplash placeholders, hotlinked, staff only, never
+members (`@pam/config/dummy-connections`); initials wherever they do not load.
+
+**Explore** (D-212 follow-ups): the chips start in line with the search bar
+and stop at the content edge; the list heading reads "All programs" while the
+chip says "All"; error states offer Try again only (Help is in the header).
+**Cards**: text cards get 24px inside (`padding={6}`) — place, connection,
+profile summary, the reminders offer — and the place card's type drops a
+step (name 18px, details 15px). That is below §2.5's 18px body floor for the
+card's secondary text, at Will's ask; the name and every screen's body copy
+stay at 18px.
+
+**Tests changed, on purpose**: three in `messages.spec.ts` (Report is on the
+⋯ page; the ⋯ button clears 48px; reporting goes ⋯ → Report → reason →
+thanks) and one in `a11y.spec.ts` (Get help's way back is "Back to Home";
+the safety page is a plain link).
+
+---
+
 ## Notes for whoever picks this up next
 
 - `pnpm --filter @pam/db test` is the highest-value check in the repo. It is the

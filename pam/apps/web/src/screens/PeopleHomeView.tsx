@@ -163,14 +163,9 @@ export function PeopleHomeView({
           icon={<OfflineIcon {...stylex.props(styles.stateIcon)} aria-hidden />}
           title={t(NOTICES[state.offline ? 'offline' : 'something_went_wrong'].titleKey)}
           description={t(NOTICES[state.offline ? 'offline' : 'something_went_wrong'].bodyKey)}
-          actions={
-            <>
-              <Button label={t('explore.error.retry')} variant="primary" onClick={onRetry} />
-              {supportPhone ? (
-                <Button label={t('help.callSupport')} variant="secondary" href={`tel:${supportPhone}`} />
-              ) : null}
-            </>
-          }
+          // Try again only (Will, 1 October): Help is in the header on every
+          // screen; an error state does not need a second way to call.
+          actions={<Button label={t('explore.error.retry')} variant="primary" onClick={onRetry} />}
         />
       ) : null}
 

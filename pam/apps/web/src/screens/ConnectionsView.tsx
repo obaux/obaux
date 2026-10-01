@@ -1,23 +1,26 @@
 'use client';
 
-import type { ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { Avatar } from '@astryxdesign/core/Avatar';
 import { Card } from '@astryxdesign/core/Card';
 import { EmptyState } from '@astryxdesign/core/EmptyState';
-import { Icon } from '@astryxdesign/core/Icon';
-import { List, ListItem } from '@astryxdesign/core/List';
+import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
-import { ConnectionsIcon, Page, PageTitle } from '@pam/ui';
+import { VStack } from '@astryxdesign/core/VStack';
+import { BigButton, ConnectionsIcon } from '@pam/ui';
+import { SubPage } from '@pam/ui/SubPage';
+import { ConnectionCard, ConnectionStats, type ConnectionStat } from '@pam/ui/ConnectionCard';
 import { useI18n } from '@/lib/i18n';
 
 /**
- * Connections — the case manager and programs on a member's side (D-210).
+ * Connections — the case manager and program people on a member's side
+ * (D-210, as cards since D-213).
  *
- * Reached from Profile's tile. Exactly the people `can_message()` (0063)
- * says this account has a real relationship with — a case manager on whose
- * caseload they are, a program they are enrolled in — so nobody appears here
- * who could not also be messaged. Each row leads to Messages.
+ * Exactly the people `can_message()` (0063) relates to the member — their
+ * case manager, and a person at each program they are enrolled in — so
+ * nobody appears here who could not also be messaged. Each card is a person
+ * (Will, 1 October: "focus on people first"), and opens their profile, where
+ * the one action is to message them.
  */
 export interface Connection {
   readonly id: string;
@@ -25,25 +28,43 @@ export interface Connection {
   readonly role: 'admin' | 'provider';
   /** A program admin's organisation, shown under their name. */
   readonly programName?: string | null;
+  readonly photoUrl?: string | null;
+  /** How they can help — one or two sentences, in the reader's language. */
+  readonly help?: string | null;
+  readonly yearsHelping?: number;
+  readonly peopleHelped?: number;
+  /** Written in themselves: "EN · ES". */
+  readonly languages?: string;
 }
 
 export interface ConnectionsViewProps {
   readonly connections: readonly Connection[];
-  /** The bell and Help, from the caller. */
-  readonly headerActions?: ReactNode;
 }
 
 const styles = stylex.create({
   intro: { fontSize: '18px', lineHeight: 1.5 },
-  row: { minHeight: '72px', fontSize: '18px' },
-  list: { width: '100%' },
+  subtitle: { fontSize: '18px', textAlign: 'center' },
+  help: { fontSize: '18px', lineHeight: 1.55 },
+  heading: { fontSize: '20px', lineHeight: 1.3 },
 });
 
+export function connectionSubtitle(person: Connection, t: (key: string) => string): string {
+  return person.role === 'provider' ? (person.programName ?? t('role.provider')) : t('role.admin');
+}
+
+export function connectionStats(person: Connection, t: (key: string) => string, locale: string): ConnectionStat[] {
+  const n = (v: number | undefined) => (v === undefined ? '—' : new Intl.NumberFormat(locale).format(v));
+  return [
+    { value: n(person.yearsHelping), label: t('connections.stat.years') },
+    { value: n(person.peopleHelped), label: t('connections.stat.helped') },
+    { value: person.languages ?? '—', label: t('connections.stat.languages') },
+  ];
+}
+
 export function ConnectionsView({ connections }: ConnectionsViewProps) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   return (
-    <Page gap={4}>
-      <PageTitle title={t('connections.title')} backHref="/profile/" backLabel={t('profile.title')} />
+    <SubPage title={t('connections.title')} backHref="/profile/" backLabel={t('nav.back.profile')}>
       {connections.length === 0 ? (
         <Card padding={5}>
           <EmptyState
@@ -58,25 +79,62 @@ export function ConnectionsView({ connections }: ConnectionsViewProps) {
           <Text type="supporting" xstyle={styles.intro}>
             {t('connections.intro')}
           </Text>
-          <Card padding={2}>
-            <List aria-label={t('connections.title')} xstyle={styles.list}>
-              {connections.map((person) => (
-                <ListItem
+          <VStack gap={4}>
+            {connections.map((person) => {
+              const subtitle = connectionSubtitle(person, t);
+              return (
+                <ConnectionCard
                   key={person.id}
-                  label={person.firstName}
-                  description={
-                    person.role === 'provider' ? (person.programName ?? t('role.provider')) : t('role.admin')
-                  }
-                  href="/messages/"
-                  startContent={<Avatar size="lg" name={person.firstName} tooltip={false} alt="" />}
-                  endContent={<Icon icon="chevronRight" size="md" />}
-                  xstyle={styles.row}
+                  name={person.firstName}
+                  subtitle={subtitle}
+                  photoUrl={person.photoUrl ?? null}
+                  help={person.help ?? ''}
+                  stats={connectionStats(person, t, locale)}
+                  href={`/connections/person/?id=${encodeURIComponent(person.id)}`}
+                  label={`${person.firstName}, ${subtitle}`}
                 />
-              ))}
-            </List>
-          </Card>
+              );
+            })}
+          </VStack>
         </>
       )}
-    </Page>
+    </SubPage>
+  );
+}
+
+/**
+ * One connection's profile (D-213): who they are, how they can help, the
+ * three facts, and one action — message them. On the nested-page template,
+ * back to Connections.
+ */
+export function ConnectionProfileView({
+  person,
+  messageHref,
+}: {
+  readonly person: Connection;
+  readonly messageHref: string;
+}) {
+  const { t, locale } = useI18n();
+  return (
+    <SubPage title={person.firstName} backHref="/connections/" backLabel={t('nav.back.connections')}>
+      <VStack gap={2} align="center">
+        <Avatar size="xl" name={person.firstName} src={person.photoUrl ?? undefined} tooltip={false} alt="" />
+        <Text type="supporting" xstyle={styles.subtitle}>
+          {connectionSubtitle(person, t)}
+        </Text>
+      </VStack>
+      <Card padding={4}>
+        <ConnectionStats stats={connectionStats(person, t, locale)} />
+      </Card>
+      {person.help ? (
+        <VStack gap={2}>
+          <Heading level={2} xstyle={styles.heading}>
+            {t('connections.about', { name: person.firstName })}
+          </Heading>
+          <Text xstyle={styles.help}>{person.help}</Text>
+        </VStack>
+      ) : null}
+      <BigButton label={t('connections.message', { name: person.firstName })} href={messageHref} />
+    </SubPage>
   );
 }

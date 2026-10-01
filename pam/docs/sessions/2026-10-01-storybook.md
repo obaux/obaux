@@ -237,3 +237,66 @@ explore to home"), and "ignore size limits for this redesign".
 
 - Saved and Messages references, then routing the redesign into the app.
 - The suggestion dropdown is as wide as the field; wider would read better.
+
+---
+
+## Addendum — two templates, and the rest of the member app (D-213)
+
+A run of references from Will, one after another, each folded in as it
+arrived: nested-page template (Legal, Get help), Profile without Account,
+Messages (frame, search, empty, plain rows), Trips (map + drawer, cards,
+dock), Connections (photo cards + profile), What others can see (your data),
+Saved (grid + Edit), the thread's ⋯ page, Explore fixes (chips aligned, "All
+programs", smaller place cards with more padding, no call button in error
+states).
+
+### What changed
+
+- **@pam/ui**: `SubPage`/`SubPageHeader`, `ConnectionCard`, `SavedGrid`,
+  `TripCard`, `MapDrawer`; icons `BackArrowIcon`, `BookIcon`; `MenuList` gains
+  `value`, `isSelected`, 18px labels; `PlaceCard` smaller type, 24px padding;
+  `CategoryChips` no longer bleeds.
+- **apps/web/src/screens**: `LegalView`, `LanguageView`, `HelpViews` (4),
+  `PrivacyViews` (3), `ConnectionsView` (cards + profile) + `ConnectionsScreen`,
+  `MessagesView`/`MessagesScreen`, `SavedView`, `TripsView` + `TripsMap`,
+  `ThreadOptionsViews` (options, report); `ProfileView` menu reworked.
+- **Real routes added**: `/legal/`, `/legal/privacy/` (+ `copy/`, `delete/`),
+  `/language/`, `/help/topics/`, `/help/safety/`, `/help/report-place/`,
+  `/connections/`, `/connections/person/`, `/messages/thread/options/`,
+  `/messages/thread/report/`. **Changed in the app**: `/help/`,
+  `/notifications/`, `/place/`, `/terms/`, `/privacy/`, `/messages/thread/`
+  (template header; Report moved to ⋯).
+- **@pam/config**: `dummy-connections`, `dummy-trips`; ~90 locale keys en/es.
+- `lib/useChooseLanguage` (from `LanguageSwitcher`).
+
+### What was wrong, and what missed it
+
+- **The e2e suite tested a stale build.** `playwright.config` serves `out/`
+  and reuses it; my first full run passed 507 against the 21:17 build, before
+  any of this. A fresh `next build` showed 12 failures (4 tests × 3 widths),
+  all the intended changes; tests updated (see D-213). Lesson: rebuild before
+  trusting a local e2e run.
+- `ListItem` draws its own (small) label size; `MenuList`'s row font size did
+  not reach it. Fixed by passing the label as 18px `Text`.
+- Trips pins: an `<a>` is inline, so the pin's column never formed; labels
+  sat side by side and the left pin ran off-screen.
+- Saved tiles: the rounded clip shaved the first letter of each subtitle.
+- Photos and Google Maps could not be fetched from this sandbox (proxy denies
+  both); neither is verified here.
+
+### Verified
+
+| Check | Result |
+|---|---|
+| `pnpm -r typecheck` | clean |
+| config / ui / web unit tests | 231 / 65 / 8 pass |
+| Playwright, full suite, **fresh build** | **507 pass** |
+| Storybook | 263 stories, 0 page errors, 0 unanswered calls |
+| Clicked through | Saved Edit → × unsaves; Trips handle up/down, search "food" → 1 card; Messages search; thread ⋯ → Options → Report |
+| Budget | 90.7 kB to spare |
+
+### Needs a human
+
+- A Google Maps **browser key** (Maps JavaScript API, restricted to PAM's
+  domains) as `NEXT_PUBLIC_GOOGLE_MAPS_KEY` in Vercel — then check Trips.
+- Real staff photos to replace the placeholders.

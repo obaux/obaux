@@ -36,6 +36,7 @@ export { AppHeader, type AppHeaderProps } from './AppHeader.js';
 export { AreaChip, type AreaChipProps } from './AreaChip.js';
 export { Page, type PageProps } from './Page.js';
 export { PageTitle, type PageTitleProps } from './PageTitle.js';
+export { SubPage, SubPageHeader, type SubPageHeaderProps } from './SubPage.js';
 export { RoleSwitch, type RoleSwitchProps } from './RoleSwitch.js';
 /*
  * `OnboardingSlides` is deliberately NOT re-exported here, the same call
@@ -84,6 +85,8 @@ export {
   FamilyServicesIcon,
   OfflineIcon,
   NoResultsIcon,
+  BackArrowIcon,
+  BookIcon,
 } from './icons.js';
 export { SavedStrip, type SavedStripProps, type SavedStripPlace } from './SavedStrip.js';
 export {

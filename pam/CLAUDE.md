@@ -132,6 +132,10 @@ by signing in on the live site. So:
   redesigned view. Leave a screen from script with `router.push` or
   `navigate()` (`src/lib/navigate.ts`), never `window.location` — the
   prototype can't follow that.
+- **Two screen templates (D-213).** A tab screen uses `LargeTitleHeader`; any
+  screen you tap into uses `SubPage`/`SubPageHeader` from `@pam/ui` (round
+  back, large title; `variant="compact"` for a conversation). Don't hand-roll a
+  new header. Text cards take `padding={6}`.
 - What ships is still the branch, merged the usual way. Nothing is exported
   from Storybook.
 

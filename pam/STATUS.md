@@ -235,6 +235,22 @@ them in `Prototype/Redesign — member / case manager / program`; each state
 is under `Redesign/Explore` and `Redesign/Staff home`. Still Storybook
 only: not routed in the app.
 
+**Then (D-213): the rest of the member app, on two templates.** Tab screens
+(Profile, Messages, Saved) share the large shrinking title; every screen you
+tap into shares the nested template (round back, large title) — Legal,
+Language, Get help, What others can see, Connections, Notifications, a
+place, the policies, a conversation and its ⋯ page. Profile lost Account
+(Language and Legal are rows now); Get help is a list of kinds of help; Saved
+is a 2×2 grid with Edit; Trips is a map with a three-height drawer; Messages
+has search and plain rows; Connections are photo cards with a profile.
+Notifications, a place, the policies, the conversation and Get help changed
+**in the app too** (they are real routes); Legal, Language, What others can
+see, the help pages, Connections and the thread's Options/Report are new real
+routes. 507 Playwright tests pass on a fresh build; 263 stories render clean.
+Needs a human: a Google Maps browser key for the real map
+(`NEXT_PUBLIC_GOOGLE_MAPS_KEY`), and real staff photos in place of the
+placeholders.
+
 This is the handover document: what exists, what is proven, what is live, and
 what the next person needs to know before touching anything.
 

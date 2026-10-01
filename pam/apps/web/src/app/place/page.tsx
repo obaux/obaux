@@ -3,21 +3,19 @@
 import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import {
-  AppHeader,
   BigButton,
   HelpBar,
   Notice,
   Page,
-  PageTitle,
   PlaceDetail,
   directionsHref,
   googlePlaceHref,
 } from '@pam/ui';
 import { PlaceDetailSkeleton } from '@pam/ui/Skeletons';
+import { SubPageHeader } from '@pam/ui/SubPage';
 import { categoryLabelKey, distanceLabel, NOTICES, type Category } from '@pam/config';
 import { DUMMY_PLACES_BY_ID, isDummyPlaceId } from '@pam/config/dummy-places';
 import { useI18n } from '@/lib/i18n';
-import { HeaderBell } from '../HeaderBell';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
 import { useSavedPlaces } from '@/lib/useSavedPlaces';
@@ -58,6 +56,7 @@ const BACK_TARGETS = {
   home: { href: '/', labelKey: 'nav.back.home' },
   // The redesign's Explore, which is the home screen there (D-212).
   explore: { href: '/', labelKey: 'nav.back.explore' },
+  trips: { href: '/trips/', labelKey: 'nav.back.trips' },
   places: { href: '/places/', labelKey: 'nav.back.places' },
   saved: { href: '/saved/', labelKey: 'nav.back.saved' },
 } as const;
@@ -192,28 +191,29 @@ function PlaceScreen() {
   const status = usePlaceStatus(place?.id ?? '', place?.hours ?? null, t, locale);
 
   /*
-   * The header is not bare here (Will, 16 September: "the top bar in Places
-   * profile should be consistent") — the session is already resolved by the
-   * time this screen is deciding whether the *place* loaded, so there is no
-   * reason for it to show less than every other screen does at this point:
-   * the role chip, the switcher for a super admin, and the bell.
+   * The nested-page template (D-213): a place is something you tap into, so
+   * it opens like every other screen you tap into — round back, then its
+   * name, large. The role switch a super admin had in the app header rides
+   * in the bar instead (it was put here on 16 September so this screen would
+   * not show less than its neighbours; that still holds).
    */
-  const header = (
-    <AppHeader
-      roleLabel={signedIn ? t(`role.${demoRole ?? session.session.role}`) : undefined}
-      roleControl={
+  const header = (title: string) => (
+    <SubPageHeader
+      title={title}
+      backHref={back.href}
+      backLabel={t(back.labelKey)}
+      actions={
         trueRole === 'super_admin' ? (
           <RoleSwitchControl trueRole={trueRole} viewedRole={demoRole ?? trueRole} onChange={setViewAs} />
         ) : undefined
       }
-      trailing={<HeaderBell enabled={signedIn} role={demoRole ?? trueRole} />}
     />
   );
 
   if (state.status === 'loading') {
     return (
       <Page gap={4}>
-        {header}
+        {header(t('common.loading'))}
         <PlaceDetailSkeleton label={t('common.loading')} />
       </Page>
     );
@@ -224,12 +224,7 @@ function PlaceScreen() {
       state.status === 'error' && state.offline ? 'offline' : 'something_went_wrong';
     return (
       <Page gap={4}>
-        {header}
-        <PageTitle
-          title={t('places.title')}
-          backHref={back.href}
-          backLabel={t(back.labelKey)}
-        />
+        {header(t('places.title'))}
         <Notice
           notice={state.status === 'missing' ? 'service_not_available' : key}
           title={state.status === 'missing' ? t('place.notFound.title') : t(NOTICES[key].titleKey)}
@@ -248,8 +243,7 @@ function PlaceScreen() {
 
   return (
     <Page gap={4}>
-      {header}
-      <PageTitle title={place!.name} backHref={back.href} backLabel={t(back.labelKey)} />
+      {header(place!.name)}
 
       <PlaceDetail
         category={place!.category}
@@ -326,7 +320,6 @@ export default function PlacePage() {
     <Suspense
       fallback={
         <Page gap={4}>
-          <AppHeader />
           <PlaceDetailSkeleton label="Loading" />
         </Page>
       }

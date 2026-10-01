@@ -1,23 +1,28 @@
 import type { Meta, StoryObj } from '@storybook/nextjs';
 import { ConnectionsView } from '../../screens/ConnectionsView';
+import { ConnectionProfileScreen, ConnectionsScreen } from '../../screens/ConnectionsScreen';
 import { asRedesign } from '../journeys/journey';
 
-/** Connections (D-210): the case manager and programs on a member's side. */
+/**
+ * Connections (D-210, cards since D-213): the case manager and program
+ * people on a member's side. Tap a card for their profile; Message opens the
+ * example conversation. Photos are hotlinked placeholders (initials where
+ * they cannot load).
+ */
 const meta = {
   title: 'Redesign/Connections',
   component: ConnectionsView,
-  args: {
-    connections: [
-      { id: 'c1', firstName: 'Teresa', role: 'admin' },
-      { id: 'c2', firstName: 'Alice', role: 'provider', programName: 'Riverside Learning Center' },
-      { id: 'c3', firstName: 'Darnell', role: 'provider', programName: 'Philadelphia Works — Center City' },
-    ],
-  },
+  args: { connections: [] },
 } satisfies Meta<typeof ConnectionsView>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const ThreePeople: Story = { ...asRedesign('member', '/connections/') };
-export const None: Story = { ...asRedesign('member', '/connections/'), args: { connections: [] } };
-export const Spanish: Story = { ...asRedesign('member', '/connections/'), globals: { locale: 'es' } };
+export const People: Story = { ...asRedesign('member', '/connections/'), render: () => <ConnectionsScreen /> };
+export const None: Story = { ...asRedesign('member', '/connections/') };
+export const Spanish: Story = { ...People, globals: { locale: 'es' } };
+export const Profile: Story = {
+  ...asRedesign('member', '/connections/person/', { id: 'dummy-p1' }),
+  name: 'Profile — Sandra',
+  render: () => <ConnectionProfileScreen />,
+};

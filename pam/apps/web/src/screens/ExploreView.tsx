@@ -35,7 +35,8 @@ import { useI18n } from '@/lib/i18n';
  * — ready, loading, nothing found, can't connect — without a database.
  * `ExploreScreen` is the same view wired to the app's data.
  *
- * **Never a dead end** (§0): the error state offers Try again and the phone;
+ * **Never a dead end** (§0): the error state offers Try again (Help is in
+ * the header — Will took the call button out of the error states, 1 October);
  * "nothing matches" offers Clear search; an empty category offers All. The
  * header's Help is on every state.
  */
@@ -137,7 +138,11 @@ export function ExploreView({
           </Heading>
         ) : (
           <Heading level={1} xstyle={styles.heading}>
-            {chips.find((chip) => chip.key === category)?.label ?? t('places.all')}
+            {/* "All programs" over the list though the chip says "All" — the
+                heading gives the context the short chip cannot (Will, 1 October). */}
+            {category === 'all'
+              ? t('explore.heading.all')
+              : (chips.find((chip) => chip.key === category)?.label ?? t('explore.heading.all'))}
           </Heading>
         )}
         {area}
@@ -152,14 +157,9 @@ export function ExploreView({
           icon={<OfflineIcon {...stylex.props(styles.stateIcon)} aria-hidden />}
           title={t(NOTICES[state.offline ? 'offline' : 'something_went_wrong'].titleKey)}
           description={t(NOTICES[state.offline ? 'offline' : 'something_went_wrong'].bodyKey)}
-          actions={
-            <>
-              <Button label={t('explore.error.retry')} variant="primary" onClick={onRetry} />
-              {supportPhone ? (
-                <Button label={t('help.callSupport')} variant="secondary" href={`tel:${supportPhone}`} />
-              ) : null}
-            </>
-          }
+          // Try again only (Will, 1 October): Help is in the header on every
+          // screen; an error state does not need a second way to call.
+          actions={<Button label={t('explore.error.retry')} variant="primary" onClick={onRetry} />}
         />
       ) : null}
 

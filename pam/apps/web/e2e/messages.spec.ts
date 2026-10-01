@@ -223,7 +223,12 @@ test.describe('a conversation', () => {
     const log = page.getByRole('log');
     await expect(log).toBeVisible();
     await expect(log.getByText('Is the class still on Tuesday?')).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Report' })).toHaveCount(1);
+    // Reporting is on the ⋯ page now, not under each message (D-213).
+    await expect(page.getByRole('button', { name: 'Report' })).toHaveCount(0);
+    await expect(page.getByRole('link', { name: 'More options' })).toHaveAttribute(
+      'href',
+      `/messages/thread/options/?id=${CONVO}`,
+    );
     await expect(page.getByRole('link', { name: 'Back to Messages' })).toBeVisible();
     // No help link on this screen (A14): the way back carries it.
     await expect(page.getByRole('link', { name: /Help/ })).toHaveCount(0);
@@ -377,12 +382,11 @@ test.describe('a conversation', () => {
     // Still a real, positive gap: two different senders' bubbles never touch.
     expect(secondBox!.y).toBeGreaterThan(firstBox!.y + firstBox!.height);
 
-    // Report — the one 48px control that sits inside a message row — still
-    // clears the floor after the tighten.
-    const report = page.getByRole('button', { name: 'Report' });
-    const reportBox = await report.boundingBox();
-    expect(reportBox!.height).toBeGreaterThanOrEqual(48);
-    expect(reportBox!.width).toBeGreaterThanOrEqual(48);
+    // The ⋯ button that replaced each message's Report (D-213) clears the floor.
+    const more = page.getByRole('link', { name: 'More options' });
+    const moreBox = await more.boundingBox();
+    expect(moreBox!.height).toBeGreaterThanOrEqual(48);
+    expect(moreBox!.width).toBeGreaterThanOrEqual(48);
   });
 
   test('tapping into the composer draws no ring; Tab into it does (D-195)', async ({ page }) => {
@@ -433,11 +437,17 @@ test.describe('a conversation', () => {
     await page.goto(`/messages/thread/?id=${CONVO}`);
     await settled(page);
 
-    await page.getByRole('button', { name: 'Report' }).click();
+    // ⋯ → Report suspicious activity → a reason → sent (D-213).
+    await page.getByRole('link', { name: 'More options' }).click();
+    await settled(page);
+    await page.getByRole('link', { name: 'Report suspicious activity' }).click();
+    await settled(page);
     await expect(page.getByRole('radiogroup', { name: 'Say this message is not safe' })).toBeVisible();
     await page.getByRole('radio', { name: /threatens me/ }).check();
     await page.getByRole('button', { name: 'Send report' }).click();
     await expect(page.getByText('Thank you. PAM will look at it.')).toBeVisible();
+    // Never a dead end: the way back to the conversation.
+    await expect(page.getByRole('link', { name: 'Back to the conversation' }).first()).toBeVisible();
   });
 
   test('an example conversation renders through the same chat log, and sends nowhere', async ({ page }) => {

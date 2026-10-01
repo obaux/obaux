@@ -5,7 +5,7 @@ import PlacesPage from '../../app/places/page';
 import SavedPage from '../../app/saved/page';
 import MessagesPage from '../../app/messages/page';
 import { ProfileView } from '../../screens/ProfileView';
-import { TripsView } from '../../screens/TripsView';
+import { TripsScreen } from '../../screens/TripsView';
 import { asRedesign } from '../journeys/journey';
 import { HeaderActions } from './HeaderActions';
 
@@ -52,7 +52,7 @@ export const Profile: Story = {
 export const Trips: Story = {
   ...asRedesign('member', '/trips/'),
   name: 'Trips',
-  args: { tab: 'trips', screen: () => <TripsView headerActions={<HeaderActions />} /> },
+  args: { tab: 'trips', screen: () => <TripsScreen headerActions={<HeaderActions />} /> },
 };
 export const Explore: Story = {
   ...asRedesign('member', '/places/'),

@@ -47,7 +47,7 @@ const summary = stylex.create({
 
 export function ProfileSummary({ name, roleLabel, photoUrl, stats }: ProfileSummaryProps) {
   return (
-    <Card padding={5} xstyle={summary.card}>
+    <Card padding={6} xstyle={summary.card}>
       <HStack gap={4} align="center" wrap="nowrap">
         <VStack gap={2} align="center" xstyle={summary.person}>
           <Avatar size="xl" name={name} src={photoUrl ?? undefined} tooltip={false} />
@@ -150,7 +150,7 @@ const promo = stylex.create({
 
 export function PromoCard({ title, body, href, art }: PromoCardProps) {
   return (
-    <ClickableCard label={title} href={href} padding={4} xstyle={promo.card}>
+    <ClickableCard label={title} href={href} padding={6} xstyle={promo.card}>
       <HStack gap={4} align="center" wrap="nowrap">
         <HStack align="center" justify="center" xstyle={promo.art}>
           {art}

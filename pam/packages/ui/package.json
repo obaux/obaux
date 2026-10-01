@@ -18,7 +18,12 @@
     "./ProfileCards": "./src/ProfileCards.tsx",
     "./MenuList": "./src/MenuList.tsx",
     "./SearchPill": "./src/SearchPill.tsx",
-    "./CategoryChips": "./src/CategoryChips.tsx"
+    "./CategoryChips": "./src/CategoryChips.tsx",
+    "./SubPage": "./src/SubPage.tsx",
+    "./ConnectionCard": "./src/ConnectionCard.tsx",
+    "./SavedGrid": "./src/SavedGrid.tsx",
+    "./TripCard": "./src/TripCard.tsx",
+    "./MapDrawer": "./src/MapDrawer.tsx"
   },
   "scripts": {
     "typecheck": "tsc -p tsconfig.json",

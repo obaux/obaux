@@ -371,3 +371,22 @@ export function NoResultsIcon(props: SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
+
+/** An arrow pointing back. The nested-page back button (D-213). */
+export function BackArrowIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <path d="M19.5 12h-15M10.5 6l-6 6 6 6" />
+    </svg>
+  );
+}
+
+/** An open book. A policy to read — the Legal list's rows. */
+export function BookIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <path d="M12 6.5c-1.8-1.4-4.5-2-8-2v13c3.5 0 6.2.6 8 2 1.8-1.4 4.5-2 8-2v-13c-3.5 0-6.2.6-8 2z" />
+      <path d="M12 6.5v13M14.75 9.5h2.5M14.75 12.5h2.5M14.75 15.5h2.5" />
+    </svg>
+  );
+}

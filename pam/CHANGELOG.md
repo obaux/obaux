@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.39.0-templates] — 2026-10-01 · One way in and out of every screen
+
+Every screen you tap into now starts the same way: a round back button and
+the screen's name, large. Get help is a short list — call PAM, what we help
+with, a safety issue, a place that's wrong. Profile is shorter: Language and
+Legal are rows, and the Account screen is gone. "What others can see" shows
+the list you agreed to and how to ask for a copy of your data or to delete
+your account. In a conversation, reporting moved from under every message to
+the ⋯ button at the top. In Storybook: Messages with search, Saved as a grid
+you can edit, Trips as a map with your visits on it, and your connections as
+cards with a profile you can message from.
+
 ## [0.38.0-explore] — 2026-10-01 · Explore, and Home for staff (in Storybook)
 
 In Storybook, not yet in the app. Explore is the member's new home: a big

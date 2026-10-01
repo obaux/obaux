@@ -21,9 +21,16 @@ import SavedPage from '../../app/saved/page';
 import SignInPage from '../../app/signin/page';
 import TermsPage from '../../app/terms/page';
 import { ProfileView } from '../../screens/ProfileView';
-import { ConnectionsView } from '../../screens/ConnectionsView';
-import { TripsView } from '../../screens/TripsView';
+import { TripsScreen } from '../../screens/TripsView';
 import { HomeScreen } from '../../screens/HomeScreen';
+import { LegalView } from '../../screens/LegalView';
+import { LanguageView } from '../../screens/LanguageView';
+import { DataCopyView, DeleteAccountView, PrivacyControlsView } from '../../screens/PrivacyViews';
+import { HelpReportPlaceView, HelpSafetyView, HelpTopicsView } from '../../screens/HelpViews';
+import { ConnectionProfileScreen, ConnectionsScreen } from '../../screens/ConnectionsScreen';
+import { SavedScreen } from '../../screens/SavedView';
+import { ThreadOptionsView, ThreadReportView } from '../../screens/ThreadOptionsViews';
+import { MessagesScreen } from '../../screens/MessagesScreen';
 import { HeaderActions } from '../shell/HeaderActions';
 import { LocalTabBar } from '../shell/LocalTabBar';
 import { ROLES, type JourneyRole } from '../journeys/fixtures';
@@ -54,6 +61,19 @@ export const TODAY_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   '/help/': screen(() => <HelpPage />),
   '/privacy/': screen(() => <PrivacyPage />),
   '/terms/': screen(() => <TermsPage />),
+  // Added with the nested-page template (D-213) — real routes in the app.
+  '/legal/': screen(() => <LegalView />),
+  '/language/': screen(() => <LanguageView />),
+  '/legal/privacy/': screen(() => <PrivacyControlsView />),
+  '/legal/privacy/copy/': screen(() => <DataCopyView />),
+  '/legal/privacy/delete/': screen(() => <DeleteAccountView />),
+  '/help/topics/': screen(() => <HelpTopicsView />),
+  '/help/safety/': screen(() => <HelpSafetyView />),
+  '/help/report-place/': screen(() => <HelpReportPlaceView />),
+  '/connections/': screen(() => <ConnectionsScreen />),
+  '/messages/thread/options/': screen(() => <ThreadOptionsView />),
+  '/messages/thread/report/': screen(() => <ThreadReportView />),
+  '/connections/person/': screen(() => <ConnectionProfileScreen />),
 };
 
 /**
@@ -65,7 +85,10 @@ export const REDESIGN_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   // The first tab (D-212): Explore for a member, the caseload for a case
   // manager, who wants in for a program — whoever the story signed in.
   '/': screen(() => <HomeScreen />),
-  '/trips/': screen(() => <TripsView headerActions={<HeaderActions />} />),
+  '/trips/': screen(() => <TripsScreen headerActions={<HeaderActions />} />),
+  // Saved and Messages on the tab-screen frame (D-213).
+  '/saved/': screen(() => <SavedScreen />),
+  '/messages/': screen(() => <MessagesScreen />),
   '/profile/': screen(() => (
     <ProfileView
       name="Marcus"
@@ -78,24 +101,31 @@ export const REDESIGN_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
       onSignOut={() => prototypeRouter.replace('/signin/')}
     />
   )),
-  '/connections/': screen(() => (
-    <ConnectionsView
-      connections={[
-        { id: 'c1', firstName: 'Teresa', role: 'admin' },
-        { id: 'c2', firstName: 'Alice', role: 'provider', programName: 'Riverside Learning Center' },
-        { id: 'c3', firstName: 'Darnell', role: 'provider', programName: 'Philadelphia Works — Center City' },
-      ]}
+  // The Account screen is gone from the redesign (D-213): Profile holds it.
+  '/account/': screen(() => (
+    <ProfileView
+      name="Marcus"
+      role="member"
+      points={400}
+      savedCount={3}
+      connectionsCount={3}
+      remindersOn={false}
+      headerActions={<HeaderActions />}
+      onSignOut={() => prototypeRouter.replace('/signin/')}
     />
   )),
 };
 
-/** Which bottom-bar tab a redesigned path belongs to; `null` hides the bar. */
+/**
+ * Which bottom-bar tab a redesigned path belongs to; `null` hides the bar.
+ * Only the five tab screens draw it (D-213): anything you tap into — a
+ * place, a person, a conversation, Legal, Get help — is a nested screen on
+ * the template, with its own way back and no bar, as in Will's references.
+ */
 export function tabFor(pathname: string) {
   switch (pathname) {
     case '/':
     case '/places/':
-    case '/place/':
-    case '/person/':
     case '/admin/':
     case '/interested/':
       return 'explore' as const;
@@ -106,12 +136,9 @@ export function tabFor(pathname: string) {
     case '/messages/':
       return 'messages' as const;
     case '/profile/':
-    case '/connections/':
     case '/account/':
       return 'profile' as const;
     default:
-      // The conversation pins its own composer to the bottom (D-192), and
-      // sign-in, sign-up, help and the legal pages stand alone.
       return null;
   }
 }

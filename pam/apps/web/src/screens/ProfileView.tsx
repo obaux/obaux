@@ -5,12 +5,12 @@ import { VStack } from '@astryxdesign/core/VStack';
 import { Divider } from '@astryxdesign/core/Divider';
 import type { Role } from '@pam/config';
 import {
+  BellIcon,
   ConnectionsIcon,
+  GlobeIcon,
   HelpIcon,
   LegalIcon,
   Page,
-  SettingsIcon,
-  ShieldIcon,
   SignOutIcon,
   StarIcon,
   TripsIcon,
@@ -25,7 +25,10 @@ import { useI18n } from '@/lib/i18n';
  *
  * Who you are and your numbers; two doors (past trips, and Connections — the
  * case manager and programs on your side); one offer (text reminders); then
- * a plain list: settings, help, what others can see, privacy, terms, sign out.
+ * a plain list. Since D-213 the list is shorter: Language (the one thing the
+ * old Account screen held that Profile did not), text reminders once they
+ * are on, Get help, Legal (terms, privacy and who can see what, behind one
+ * row), and sign out. The Account screen is gone from the redesign.
  *
  * A view, not a route yet: it takes what it shows as props, so Storybook can
  * draw every state and the data wiring lands when the redesign is agreed.
@@ -95,22 +98,24 @@ export function ProfileView({
         <MenuList
           label={t('profile.menu.label')}
           items={[
-            { id: 'account', label: t('profile.menu.account'), href: '/account/', icon: <SettingsIcon {...ICON} /> },
-            { id: 'help', label: t('profile.menu.help'), href: '/help/', icon: <HelpIcon {...ICON} /> },
             {
-              id: 'visibility',
-              label: t('profile.menu.visibility'),
-              href: '/privacy/#who-can-see',
-              icon: <ShieldIcon {...ICON} />,
+              id: 'language',
+              label: t('profile.menu.language'),
+              value: t(locale === 'es' ? 'language.es' : 'language.en'),
+              href: '/language/',
+              icon: <GlobeIcon {...ICON} />,
             },
+            ...(remindersOn
+              ? [{ id: 'reminders', label: t('profile.menu.reminders'), href: '/reminders/', icon: <BellIcon {...ICON} /> }]
+              : []),
+            { id: 'help', label: t('profile.menu.help'), href: '/help/', icon: <HelpIcon {...ICON} /> },
           ]}
         />
         <Divider />
         <MenuList
           label={t('profile.menu.label')}
           items={[
-            { id: 'privacy', label: t('profile.menu.privacy'), href: '/privacy/', icon: <LegalIcon {...ICON} /> },
-            { id: 'terms', label: t('profile.menu.terms'), href: '/terms/', icon: <LegalIcon {...ICON} /> },
+            { id: 'legal', label: t('profile.menu.legal'), href: '/legal/', icon: <LegalIcon {...ICON} /> },
             {
               id: 'sign-out',
               label: t('profile.menu.signOut'),

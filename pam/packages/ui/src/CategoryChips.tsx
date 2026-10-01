@@ -5,7 +5,6 @@ import * as stylex from '@stylexjs/stylex';
 import { Button } from '@astryxdesign/core/Button';
 import { HStack } from '@astryxdesign/core/HStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
-import { pam } from './tokens.stylex.js';
 
 /**
  * A row of rounded chips under the search bar, one per kind of place (D-212).
@@ -34,13 +33,14 @@ export interface CategoryChipsProps<K extends string> {
 }
 
 const styles = stylex.create({
-  // Bleeds to the screen edges so the chips scroll under them, then pads
-  // back in, with room above and below for the shadow.
+  // Starts in line with the search bar and stops at the same edge (Will,
+  // 1 October: the first version bled to the screen edges and crept off
+  // them). A few pixels of room each side and below for the shadow.
   row: {
     overflowX: 'auto',
     scrollbarWidth: 'none',
-    marginInline: `calc(-1 * ${pam.screenPadding})`,
-    paddingInline: pam.screenPadding,
+    marginInline: '-4px',
+    paddingInline: '4px',
     paddingBlock: '6px 10px',
     scrollSnapType: 'x proximity',
   },

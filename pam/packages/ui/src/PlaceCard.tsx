@@ -86,8 +86,11 @@ const styles = stylex.create({
     // The stretched link is positioned against this.
     position: 'relative',
   },
+  // Smaller type and more room around it (D-213, Will, 1 October): the
+  // redesign's cards read calmer with 24px inside and text a step down.
   name: {
-    fontSize: '20px',
+    fontSize: '18px',
+    fontWeight: 700,
     lineHeight: 1.3,
     minWidth: 0,
     // Two lines, then an ellipsis. Two, not one: a place is often "Mt. Airy
@@ -110,11 +113,11 @@ const styles = stylex.create({
       zIndex: 0,
     },
   },
-  meta: { fontSize: '16px' },
-  open: { fontSize: '16px', fontWeight: 600, color: colorVars['--color-text-accent'] },
-  shut: { fontSize: '16px', fontWeight: 600 },
+  meta: { fontSize: '15px' },
+  open: { fontSize: '15px', fontWeight: 600, color: colorVars['--color-text-accent'] },
+  shut: { fontSize: '15px', fontWeight: 600 },
   description: {
-    fontSize: '16px',
+    fontSize: '15px',
     lineHeight: 1.45,
     display: '-webkit-box',
     WebkitLineClamp: 2,
@@ -151,7 +154,7 @@ export function PlaceCard({
   labels,
 }: PlaceCardProps) {
   return (
-    <Card padding={4} xstyle={styles.card}>
+    <Card padding={6} xstyle={styles.card}>
       <VStack gap={2}>
         <HStack gap={2} align="start" justify="between" wrap="nowrap">
           <Heading level={3} xstyle={styles.name}>

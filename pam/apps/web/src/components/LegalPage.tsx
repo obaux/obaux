@@ -6,7 +6,8 @@ import { VStack } from '@astryxdesign/core/VStack';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { Button } from '@astryxdesign/core/Button';
-import { AppHeader, Page, TextLink } from '@pam/ui';
+import { Page, TextLink } from '@pam/ui';
+import { SubPageHeader } from '@pam/ui/SubPage';
 import type { LegalDocument } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 
@@ -27,7 +28,6 @@ import { useI18n } from '@/lib/i18n';
  */
 
 const styles = stylex.create({
-  title: { fontSize: '28px', lineHeight: 1.2 },
   intro: { fontSize: '18px', lineHeight: 1.5 },
   updated: { fontSize: '15px' },
   tocHeading: { fontSize: '15px', textTransform: 'uppercase', letterSpacing: '0.06em' },
@@ -131,11 +131,13 @@ export function LegalPage({ doc }: { doc: LegalDocument }) {
 
   return (
     <Page width="read">
-        <AppHeader />
-
-        <Heading level={1} id="top" xstyle={styles.title}>
-          {t(doc.titleKey)}
-        </Heading>
+        {/* The nested-page template (D-213): these open from Legal. */}
+        <SubPageHeader
+          title={t(doc.titleKey)}
+          titleId="top"
+          backHref="/legal/"
+          backLabel={t('nav.back.legal')}
+        />
         <Text xstyle={styles.intro}>{t(doc.introKey)}</Text>
         <Text type="supporting" xstyle={styles.updated}>
           {t(doc.updatedKey)}

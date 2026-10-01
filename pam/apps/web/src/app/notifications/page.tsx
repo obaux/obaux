@@ -4,7 +4,8 @@ import { useEffect } from 'react';
 import { VStack } from '@astryxdesign/core/VStack';
 import { Text } from '@astryxdesign/core/Text';
 import * as stylex from '@stylexjs/stylex';
-import { AppHeader, Loading, Notice, NotificationList, Page, PageTitle } from '@pam/ui';
+import { Loading, Notice, NotificationList, Page } from '@pam/ui';
+import { SubPageHeader } from '@pam/ui/SubPage';
 import { USE_DUMMY_PEOPLE } from '@pam/config/dummy-flag';
 import { DUMMY_NOTIFICATIONS } from '@pam/config/dummy-notifications';
 import { useI18n } from '@/lib/i18n';
@@ -112,27 +113,22 @@ export default function NotificationsPage() {
 
   return (
     <Page gap={3}>
-        <AppHeader
-          roleLabel={signedIn ? t(`role.${viewedRole}`) : undefined}
-          roleControl={
+        {/*
+          The nested-page template (D-213): round back, then the title large.
+          A super admin's role switch rides in the bar, where the app header
+          used to carry it.
+        */}
+        <SubPageHeader
+          title={t('notify.title')}
+          subtitle={shownUnread > 0 ? t('notify.unread', { count: shownUnread }) : undefined}
+          backHref="/"
+          backLabel={t('nav.back.home')}
+          actions={
             trueRole === 'super_admin' ? (
               <RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} />
             ) : undefined
           }
         />
-
-        {/*
-          The way back sits beside the title, the way it does on every other
-          screen now — it used to be a row of its own above the mark (D-103).
-        */}
-        <PageTitle
-          title={t('notify.title')}
-          subtitle={shownUnread > 0 ? t('notify.unread', { count: shownUnread }) : undefined}
-          backHref="/"
-          backLabel={t('nav.back.home')}
-        />
-        <VStack gap={1}>
-        </VStack>
 
         {session.status === 'signed-out' || session.status === 'no-profile' || session.status === 'suspended' ? (
           <>
