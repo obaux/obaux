@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.37.0-redesign] — 2026-10-01 · A white page, and Profile redesigned
+
+Every screen now sits on a white page, and cards lift off it with a soft
+shadow instead of a grey background. In Storybook, not yet in the app: a new
+bottom bar (Explore, Saved, Trips, Messages, Profile) and a redesigned Profile
+— who you are and your numbers, your connections (your case manager and your
+programs), and your settings, help and privacy in one list.
+
 ## [0.36.0-storybook] — 2026-10-01 · Storybook
 
 No change to the app anyone uses. Every component, every screen for every

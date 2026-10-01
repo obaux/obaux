@@ -1,66 +1,62 @@
+import type { ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
+import { Avatar } from '@astryxdesign/core/Avatar';
 import { HStack } from '@astryxdesign/core/HStack';
+import { StatusDot } from '@astryxdesign/core/StatusDot';
 import { Tab, TabList } from '@astryxdesign/core/TabList';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
-import { HelpBar } from './HelpBar.js';
-import type { ReactNode } from 'react';
-import { HomeIcon, MeIcon, MeIconFilled, PeopleIcon, PlacesIcon, PlanIcon } from './icons.js';
+import { BookmarkIcon, ExploreIcon, MessagesIcon, TripsIcon } from './icons.js';
 
 /**
- * The member app's bottom dock: §3.1's five tabs and Help, in one fixed bar.
+ * The app's bottom navigation: five places, always one tap away (D-210).
  *
- * D-029 settled that the tabs and Help share one container rather than two
- * fixed bars fighting over the bottom of a phone, and D-039 made Help a
- * compact item that takes one slot's room. This is that dock, built on
- * Astryx's `TabList` (`layout="fill"`, link tabs), and composing `HelpBar`
- * rather than duplicating it.
+ * Will's redesign of 1 October, modelled on the reference he gave: Explore
+ * (the new home), Saved, Trips (the visits somebody plans — empty until that
+ * exists), Messages, and Profile, drawn as the person's own avatar. Messages
+ * carries a dot when something is unread.
  *
- * Every tab is a real link, so the dock works with no JavaScript — the same
- * rule `HelpBar` keeps. Icon above label, both visible: an icon alone is a
- * guess for somebody who has not used a phone in years.
+ * **Help moved out of this bar**, superseding where D-029/D-039 put it. It
+ * is not gone: every screen built on the new frame carries a Help button in
+ * its header beside the bell (`LargeTitleHeader`), and Profile lists "Get
+ * help" — so §0's "a visible way to get help on every screen" still holds,
+ * one tap from anywhere, without spending a sixth of the bar on it.
  *
- * Not yet mounted in the app: it is being shaped in Storybook first
- * (Shell/TabBar, Shell/Member app). Where "People" and "My Plan" lead is
- * still open — see `hrefs`.
+ * Every tab is a real link, so the bar works with no JavaScript. Icon above
+ * label, both visible. Not yet mounted in the app — shaped in Storybook first.
  */
-export type TabKey = 'home' | 'places' | 'people' | 'plan' | 'me';
+export type TabKey = 'explore' | 'saved' | 'trips' | 'messages' | 'profile';
 
 export interface TabBarProps {
   /** The tab for the screen being shown, or `null` on a screen with none. */
   readonly current: TabKey | null;
-  /** Localised, one or two short words each (`tab.*`). */
+  /** Localised, one short word each (`nav.tab.*`). */
   readonly labels: Readonly<Record<TabKey, string>>;
-  /** Localised `nav.help`. */
-  readonly helpLabel: string;
   /** The landmark's name, e.g. "Main". */
   readonly label: string;
-  /** Where each tab leads. Defaults below; "plan" has no screen yet. */
+  /** The person's first name, for the Profile tab's initials. */
+  readonly name: string;
+  readonly photoUrl?: string | null;
+  /** Something unread in Messages: draws the dot, and is read out. */
+  readonly unreadLabel?: string | null;
   readonly hrefs?: Partial<Readonly<Record<TabKey, string>>>;
 }
 
 const DEFAULT_HREFS: Readonly<Record<TabKey, string>> = {
-  home: '/',
-  places: '/places/',
-  people: '/messages/',
-  plan: '/plan/',
-  me: '/account/',
+  explore: '/',
+  saved: '/saved/',
+  trips: '/trips/',
+  messages: '/messages/',
+  profile: '/profile/',
 };
 
-// 22px: the tab's own default icon slot is 16px, which reads as a speck on a
-// phone at arm's length.
-const ICON = { width: 22, height: 22, 'aria-hidden': true } as const;
-const ICONS: Readonly<Record<TabKey, { icon: ReactNode; selected?: ReactNode }>> = {
-  home: { icon: <HomeIcon {...ICON} /> },
-  places: { icon: <PlacesIcon {...ICON} /> },
-  people: { icon: <PeopleIcon {...ICON} /> },
-  plan: { icon: <PlanIcon {...ICON} /> },
-  me: { icon: <MeIcon {...ICON} />, selected: <MeIconFilled {...ICON} /> },
-};
+const ORDER: readonly TabKey[] = ['explore', 'saved', 'trips', 'messages', 'profile'];
 
-const ORDER: readonly TabKey[] = ['home', 'places', 'people', 'plan', 'me'];
+// 26px: a tab's own icon slot is 16px, a speck on a phone at arm's length.
+// Each icon sits in its own wrapper, or the slot shrinks the SVG back to 16px.
+const ICON = { width: 26, height: 26, 'aria-hidden': true } as const;
 
 const styles = stylex.create({
-  dock: {
+  bar: {
     position: 'fixed',
     insetInline: 0,
     bottom: 0,
@@ -71,26 +67,64 @@ const styles = stylex.create({
     borderTopColor: colorVars['--color-border'],
     paddingBottom: 'env(safe-area-inset-bottom, 0px)',
   },
-  row: { width: '100%', maxWidth: '560px', marginInline: 'auto' },
+  inner: { width: '100%', maxWidth: '560px', marginInline: 'auto' },
   tabs: { flexGrow: 1, minWidth: 0 },
-  // §2.5: every target clears 48px; the label sits under its icon so five fit
-  // at 320px without shrinking the words.
   tab: {
     flexDirection: 'column',
-    gap: '2px',
-    minHeight: '56px',
+    gap: '4px',
+    minHeight: '64px',
     paddingInline: '2px',
     fontSize: '13px',
   },
-  // Tighter than HelpBar's own 12px so five tabs still clear 48px at 320px.
-  help: { flexShrink: 0, minHeight: '48px', paddingInline: '4px' },
+  iconWrap: { position: 'relative' },
+  dot: { position: 'absolute', top: '-2px', insetInlineEnd: '-4px' },
+  // The selected Profile tab rings the avatar in the brand, as the reference
+  // rings it in its own colour.
+  avatarRing: {
+    borderRadius: '50%',
+    padding: '2px',
+    borderWidth: '2px',
+    borderStyle: 'solid',
+    borderColor: 'transparent',
+  },
+  avatarRingOn: { borderColor: colorVars['--color-accent'] },
 });
 
-export function TabBar({ current, labels, helpLabel, label, hrefs }: TabBarProps) {
+export function TabBar({ current, labels, label, name, photoUrl, unreadLabel, hrefs }: TabBarProps) {
   const to = { ...DEFAULT_HREFS, ...hrefs };
+
+  const icons: Readonly<Record<TabKey, ReactNode>> = {
+    explore: (
+      <HStack xstyle={styles.iconWrap}>
+        <ExploreIcon {...ICON} />
+      </HStack>
+    ),
+    saved: (
+      <HStack xstyle={styles.iconWrap}>
+        <BookmarkIcon {...ICON} isFilled={current === 'saved'} />
+      </HStack>
+    ),
+    trips: (
+      <HStack xstyle={styles.iconWrap}>
+        <TripsIcon {...ICON} />
+      </HStack>
+    ),
+    messages: (
+      <HStack xstyle={styles.iconWrap}>
+        <MessagesIcon {...ICON} />
+        {unreadLabel ? <StatusDot variant="error" label={unreadLabel} xstyle={styles.dot} /> : null}
+      </HStack>
+    ),
+    profile: (
+      <HStack xstyle={[styles.avatarRing, current === 'profile' && styles.avatarRingOn]}>
+        <Avatar size="sm" name={name} src={photoUrl ?? undefined} tooltip={false} alt="" />
+      </HStack>
+    ),
+  };
+
   return (
-    <footer {...stylex.props(styles.dock)}>
-      <HStack gap={0} align="center" wrap="nowrap" xstyle={styles.row}>
+    <footer {...stylex.props(styles.bar)}>
+      <HStack align="center" wrap="nowrap" xstyle={styles.inner}>
         <TabList
           value={current ?? ''}
           onChange={() => {}}
@@ -100,18 +134,9 @@ export function TabBar({ current, labels, helpLabel, label, hrefs }: TabBarProps
           xstyle={styles.tabs}
         >
           {ORDER.map((key) => (
-            <Tab
-              key={key}
-              value={key}
-              label={labels[key]}
-              href={to[key]}
-              icon={ICONS[key].icon}
-              selectedIcon={ICONS[key].selected}
-              xstyle={styles.tab}
-            />
+            <Tab key={key} value={key} label={labels[key]} href={to[key]} icon={icons[key]} xstyle={styles.tab} />
           ))}
         </TabList>
-        <HelpBar label={helpLabel} variant="compact" xstyle={styles.help} />
       </HStack>
     </footer>
   );

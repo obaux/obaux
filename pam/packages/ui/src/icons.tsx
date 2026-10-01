@@ -214,3 +214,87 @@ export function StarIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+
+/** A magnifying glass. Explore — the home tab since the 1 October redesign (D-210). */
+export function ExploreIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <circle cx="10.5" cy="10.5" r="6.5" />
+      <path d="m15.5 15.5 5 5" />
+    </svg>
+  );
+}
+
+/** A speech bubble. Messages. */
+export function MessagesIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <path d="M4 5.5A1.5 1.5 0 0 1 5.5 4h13A1.5 1.5 0 0 1 20 5.5v10a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17h0A1.5 1.5 0 0 1 4 15.5z" />
+    </svg>
+  );
+}
+
+/** A calendar with a pin on a day. Trips — a visit somebody planned. */
+export function TripsIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <rect x="3.5" y="5" width="17" height="15.5" rx="2" />
+      <path d="M8 3v4M16 3v4M3.5 10h17" />
+      <path d="M12 18.5s-2.75-2.3-2.75-4.1a2.75 2.75 0 0 1 5.5 0c0 1.8-2.75 4.1-2.75 4.1z" />
+    </svg>
+  );
+}
+
+/** Three sliders. Account settings — plainer than a gear at 26px. */
+export function SettingsIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <path d="M4 6.5h9M17 6.5h3M4 12h3M11 12h9M4 17.5h11M19 17.5h1" />
+      <circle cx="15" cy="6.5" r="2" />
+      <circle cx="9" cy="12" r="2" />
+      <circle cx="17" cy="17.5" r="2" />
+    </svg>
+  );
+}
+
+/** A question mark in a circle. Get help — leads to the help screen. */
+export function HelpIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M9.6 9.3a2.5 2.5 0 0 1 4.8.9c0 1.7-2.4 2.2-2.4 3.8" />
+      <path d="M12 17.25h.01" strokeWidth={2.25} />
+    </svg>
+  );
+}
+
+/** A page with lines. Legal — privacy and terms. */
+export function LegalIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <path d="M6 3.5h8.5L19 8v12.5H6z" />
+      <path d="M14.5 3.5V8H19M9 12h7M9 15.5h7M9 9h3" />
+    </svg>
+  );
+}
+
+/** A door with an arrow leaving. Sign out. */
+export function SignOutIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <path d="M13.5 4H6.5a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h7" />
+      <path d="M10.5 12h10M17.5 8.5 21 12l-3.5 3.5" />
+    </svg>
+  );
+}
+
+/** Two figures side by side. Connections — the people on a member's side. */
+export function ConnectionsIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <circle cx="8.5" cy="8.5" r="3" />
+      <circle cx="16" cy="9.5" r="2.5" />
+      <path d="M3 19.5a5.5 5.5 0 0 1 11 0M14.5 15a4.5 4.5 0 0 1 6.5 4.5" />
+    </svg>
+  );
+}

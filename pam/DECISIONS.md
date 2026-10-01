@@ -4255,6 +4255,55 @@ screens inside it). Three questions it makes visible, for Will:
 3. **Staff roles.** §3.1's tabs are the member app. Case managers and program
    admins have no dock design yet.
 
+
+### D-210 — The redesign: a white page, shadowed cards, five tabs at the bottom, Profile first
+Will, 1 October, with three screenshots of a reference app's Profile: "We want
+a bottom nav, instead of keeping things in top nav. I like the style, sizing,
+and spacing, and simplicity of these components." Explore is the new home,
+Saved replaces the reference's Wishlists, Trips is an empty page for visits
+somebody plans, Messages and Profile move onto the bar. "Page is white, cards
+have a realistic shadow (universal design rule)." "The top header is clear
+(larger on top of page, then shrinks)." "Notifications are visible." Built in
+Storybook (`Redesign/*`, `Shell/*`), not mounted in the app yet.
+
+**Universal, so in the theme.** `--color-background-body` is white in light
+mode (was `#f1f1f1`), and every `default` card gets 24px corners, no border
+and a diffuse two-layer shadow — set once in `pam.theme.ts`, not card by card.
+Dark mode keeps its colours; there the card's inset edge carries it, because
+a shadow cannot. `muted` and `transparent` cards stay flat. The Playwright
+suite (507, every screen, both themes, axe contrast) passed unchanged on the
+white page — text on white only gains contrast.
+
+**The bar supersedes D-209's tabs and moves Help** (D-029/D-039 put Help in
+the bottom dock). §0 still holds — a visible way to help on every screen —
+by a different route: every redesigned screen's header carries Help beside
+the bell (`LargeTitleHeader`), and Profile lists "Get help". The bar's five
+tabs are links (no JavaScript needed), 26px icons above their labels, 62×64
+at 320px; Profile is drawn as the person's avatar, ringed in the brand when
+selected; Messages carries a dot when something is unread.
+
+**The bell goes round in the redesign.** Will made the filled bell the news on
+16 September. The reference draws a light round button with a dot; the
+redesign does the same (`NotificationBell appearance="round"`), and the dot
+plus the accessible name ("Notifications, 2 new") carry the news. Today's
+headers keep the filled bell until each screen is redesigned.
+
+**Profile, for PAM:** who you are (avatar, name, role) with three numbers —
+points, places saved, connections; two tiles — Past trips and Connections;
+one offer — text reminders, shown only to someone who has not said yes; then
+rows: Account settings, Get help, What others can see (the privacy page's
+`#who-can-see`), Privacy, Terms, Sign out. **Connections** is its own screen:
+exactly the people `can_message()` (0063) relates to the member — their case
+manager and the programs they are enrolled in — each row leading to Messages.
+Nobody appears there who could not also be messaged.
+
+**Views now, wiring later.** `ProfileView`, `ConnectionsView`, `TripsView`
+(`apps/web/src/screens/`) take what they show as props, so Storybook draws
+every state; the routes (`/profile/`, `/connections/`, `/trips/`) and the
+data come when the redesign is agreed — Will's plan is to finish the front in
+Storybook, then merge. Spanish calls Trips "Visitas": a literal "viajes" means
+travel, not a visit to a program.
+
 ---
 
 ## Notes for whoever picks this up next

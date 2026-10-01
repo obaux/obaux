@@ -46,6 +46,12 @@ export interface NotificationBellProps {
   /** Already-filled, e.g. "2 new". Announced, never drawn. */
   readonly unreadLabel?: string;
   readonly unreadCount: number;
+  /**
+   * `filled` (today's headers): the fill is the news. `round` (the 1 October
+   * redesign, D-210): a light round button like the reference's, where the
+   * dot alone — and the accessible name — carries the news.
+   */
+  readonly appearance?: 'filled' | 'round';
 }
 
 const styles = stylex.create({
@@ -68,6 +74,7 @@ const styles = stylex.create({
     borderStyle: 'solid',
     borderColor: colorVars['--color-border'],
   },
+  round: { borderRadius: '50%' },
   dot: {
     position: 'absolute',
     top: '-2px',
@@ -84,17 +91,24 @@ const styles = stylex.create({
   },
 });
 
-export function NotificationBell({ href, label, unreadLabel, unreadCount }: NotificationBellProps) {
+export function NotificationBell({
+  href,
+  label,
+  unreadLabel,
+  unreadCount,
+  appearance = 'filled',
+}: NotificationBellProps) {
   const hasNew = unreadCount > 0;
+  const round = appearance === 'round';
 
   return (
     <span {...stylex.props(styles.root)}>
       <IconButton
         label={hasNew && unreadLabel ? `${label}, ${unreadLabel}` : label}
         icon={<BellIcon />}
-        variant={hasNew ? 'primary' : 'ghost'}
+        variant={round ? 'secondary' : hasNew ? 'primary' : 'ghost'}
         href={href}
-        xstyle={hasNew ? styles.bell : [styles.bell, styles.quiet]}
+        xstyle={round ? [styles.bell, styles.round] : hasNew ? styles.bell : [styles.bell, styles.quiet]}
       />
       {hasNew ? <span aria-hidden="true" {...stylex.props(styles.dot)} /> : null}
     </span>

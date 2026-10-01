@@ -14,6 +14,20 @@ import '@astryxdesign/core/astryx.css';
 import '../src/theme/pam.css';
 import '../src/app/globals.css';
 
+/**
+ * Follows the toolbar's light/dark switch for the whole page. `<Theme mode>`
+ * only re-themes its own subtree; the page behind a story — `<html>`, whose
+ * `color-scheme: light dark` follows the computer's setting (globals.css) —
+ * would stay light, and a light title on it vanishes. In the app the two
+ * always agree, because both follow the phone.
+ */
+function SchemeBridge({ mode }: { readonly mode: 'light' | 'dark' }) {
+  useEffect(() => {
+    document.documentElement.style.colorScheme = mode;
+  }, [mode]);
+  return null;
+}
+
 /** Follows the toolbar's language switch. */
 function LocaleBridge({ locale }: { readonly locale: Locale }) {
   const { setLocale } = useI18n();
@@ -33,6 +47,7 @@ const withPam: Decorator = (Story, context) => {
     <Theme theme={pamTheme} mode={mode}>
       <MotionProvider>
         <I18nProvider>
+          <SchemeBridge mode={mode} />
           <LocaleBridge locale={locale} />
           <AlertBannerProvider>
             <Story />

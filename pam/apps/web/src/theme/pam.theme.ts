@@ -101,9 +101,29 @@ export const pamTheme = defineTheme({
     // manager screen's "Messages off" badge. White clears 11.1:1 on #4b3900;
     // the dark-mode value is unchanged.
     '--color-on-warning': ['#FFFFFF', '#111111'],
+    // The page is white in light mode, and a card lifts off it by shadow, not
+    // by a grey ground (Will, 1 October — a universal rule, D-210). Dark mode
+    // is unchanged: a shadow cannot carry a card on a dark page, so the card's
+    // own inset edge does it there.
+    '--color-background-body': ['#FFFFFF', '#1B1B1B'],
   },
 
   components: {
+    /*
+     * Every default card: large soft corners and a diffuse shadow, no border —
+     * the reference Will gave (1 October). Set here, not per card, because it
+     * is a rule for the whole product. `muted` and `transparent` cards are
+     * left flat: a shadow under a card with no ground of its own reads as a
+     * smudge.
+     */
+    card: {
+      base: { borderRadius: '24px' },
+      'variant:default': {
+        borderWidth: '0px',
+        boxShadow:
+          '0 1px 2px light-dark(oklch(0 0 0 / 6%), oklch(0 0 0 / 30%)), 0 6px 20px light-dark(oklch(0 0 0 / 9%), oklch(0 0 0 / 40%)), inset 0 0 0 1px light-dark(transparent, oklch(1 0 0 / 9%))',
+      },
+    },
     button: {
       // Primary: the fill is the brand, and the press is the same colour
       // getting firmer. `light-dark()` because these differ by mode and a

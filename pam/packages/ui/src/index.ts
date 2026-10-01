@@ -70,6 +70,14 @@ export {
   PhoneIcon,
   PlacesIcon,
   PlanIcon,
+  ExploreIcon,
+  MessagesIcon,
+  TripsIcon,
+  SettingsIcon,
+  HelpIcon,
+  LegalIcon,
+  SignOutIcon,
+  ConnectionsIcon,
 } from './icons.js';
 export { SavedStrip, type SavedStripProps, type SavedStripPlace } from './SavedStrip.js';
 export {

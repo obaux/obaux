@@ -85,3 +85,54 @@ unmounted `TabBar` and one locale key) and Chromatic itself (no token yet).
   the project token as the repository secret `CHROMATIC_PROJECT_TOKEN`.
 - Will: where People and My Plan lead; whether per-screen Help comes off
   once the dock is in.
+
+---
+
+# Later the same day — the redesign starts with Profile (D-210)
+
+Will sent three screenshots of a reference app's Profile and asked for PAM's
+version: bottom navigation (Explore, Saved, Trips, Messages, Profile), a white
+page with shadowed cards as a universal rule, a large title that shrinks on
+scroll, notifications visible.
+
+## What changed
+
+- **Theme** (`apps/web/src/theme/pam.theme.ts`, rebuilt): white page in light
+  mode; every default card 24px corners, no border, a two-layer shadow.
+- **`@pam/ui`**: `LargeTitleHeader` (new), `ProfileCards` (`ProfileSummary`,
+  `FeatureTile`, `FeatureTileRow`, `PromoCard` — new), `MenuList` (new),
+  `TabBar` (rewritten to the five new tabs; Help out of the bar),
+  `NotificationBell` gains `appearance="round"`, eight new icons.
+- **`apps/web/src/screens/`**: `ProfileView`, `ConnectionsView`, `TripsView` —
+  views taking props, not routes.
+- **Stories**: `Redesign/Profile`, `Redesign/Connections`, `Redesign/Trips`;
+  `Shell/TabBar` and `Shell/Member app` moved to the new bar.
+- **Storybook preview**: the toolbar's dark switch now flips the whole page,
+  not just the story — before, a dark story sat on a white page and light
+  text on it vanished (every dark journey had this).
+- 27 new locale keys, en and es.
+
+## What was wrong, and what missed it
+
+- **Tab icons came out at 16px** although drawn at 26: Astryx's tab icon slot
+  sizes a bare SVG to its own box; only the Messages icon, already wrapped for
+  its dot, escaped. Seen in a screenshot, then measured (26px each).
+- **`Avatar` takes named sizes only**, despite its docs saying any number.
+  Typecheck caught it.
+- My first settings icon (a gear) read as a sun at 26px. Replaced with sliders.
+
+## Verified
+
+| Check | Result |
+|---|---|
+| `pnpm -r typecheck` | clean |
+| `@pam/config` / `@pam/ui` tests | 231 / 65 pass |
+| `pnpm --filter @pam/web build` + budget | OK, 94.0 kB to spare (was 94.7) |
+| Playwright, full suite, on the white-page theme | **507 pass** |
+| Every story opened in Chromium | **216, 0 errors** |
+| Profile measured at 320px | tabs 62×64, icons 26px, menu rows 64px |
+
+## Needs a human
+
+- Will: the next screens' references (Explore, Saved, Messages), and a yes on
+  the round bell replacing the filled one as screens move over (D-210).

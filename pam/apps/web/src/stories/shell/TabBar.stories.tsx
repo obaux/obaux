@@ -2,24 +2,24 @@ import type { Meta, StoryObj } from '@storybook/nextjs';
 import { LocalTabBar } from './LocalTabBar';
 
 /**
- * The member app's bottom dock (D-029, D-039): five tabs and Help in one
- * fixed bar. Not mounted in the app yet — this is where it is being shaped.
+ * The bottom navigation (D-210): Explore, Saved, Trips, Messages, Profile.
+ * Help is in each screen's header now, not in this bar.
  */
 const meta = {
   title: 'Shell/TabBar',
   component: LocalTabBar,
-  args: { current: 'home' },
+  args: { current: 'explore', unread: true },
   argTypes: {
-    current: { control: 'inline-radio', options: ['home', 'places', 'people', 'plan', 'me', null] },
+    current: { control: 'inline-radio', options: ['explore', 'saved', 'trips', 'messages', 'profile', null] },
   },
 } satisfies Meta<typeof LocalTabBar>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const OnHome: Story = {};
-export const OnPlaces: Story = { args: { current: 'places' } };
-export const OnPeople: Story = { args: { current: 'people' } };
-export const OnMyPlan: Story = { args: { current: 'plan' } };
-export const OnMe: Story = { args: { current: 'me' } };
-export const NoTabSelected: Story = { args: { current: null } };
+export const OnExplore: Story = {};
+export const OnSaved: Story = { args: { current: 'saved' } };
+export const OnTrips: Story = { args: { current: 'trips' } };
+export const OnMessages: Story = { args: { current: 'messages', unread: false } };
+export const OnProfile: Story = { args: { current: 'profile' } };
+export const NothingUnread: Story = { args: { unread: false } };
