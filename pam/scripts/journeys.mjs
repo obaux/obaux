@@ -286,6 +286,9 @@ async function stub(page, profile) {
     }
     return r.fulfill(json([{ conversation_id: CONVO_ID, last_read_at: null }]));
   });
+  await page.route('**/rest/v1/rpc/conversation_block_state*', (r) =>
+    r.fulfill(json([{ i_blocked: false, blocked_me: false }])),
+  );
   await page.route('**/rest/v1/rpc/conversation_partners*', (r) =>
     r.fulfill(
       json([

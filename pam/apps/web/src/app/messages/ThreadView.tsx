@@ -87,6 +87,12 @@ import { whenHappened } from '@/lib/when';
  * `report_message()` already refuses a report of your own words, and a
  * control that would always be refused should not be drawn. One fixed-list
  * reason, the same shape as flagging a place (0036).
+ *
+ * A block (0069, D-206) takes the composer's place rather than disabling it:
+ * a greyed-out box invites a tap that does nothing. Whoever blocked sees who
+ * and how to undo it; whoever was blocked sees that they cannot send, and the
+ * number to call — this screen has no help bar (A14), so the one state that
+ * stops somebody talking carries its own way to a person.
  */
 export interface ThreadViewMessage {
   readonly id: string;
@@ -107,6 +113,10 @@ export interface ThreadViewProps {
   /** BCP-47 tag for dictation, e.g. "en-US" or "es-US". */
   readonly speechLanguage: string;
   readonly supportPhone: string;
+  /** Whether either side has blocked the other (0069). Omitted means no block. */
+  readonly block?: 'none' | 'i_blocked' | 'blocked_me';
+  /** Lifts the caller's own block. Only drawn when `block` is `i_blocked`. */
+  readonly onUnblock?: () => Promise<boolean>;
 }
 
 const styles = stylex.create({
@@ -123,6 +133,7 @@ const styles = stylex.create({
   reportCard: { width: '100%' },
   reportAction: { minHeight: '48px', fontSize: '17px' },
   intro: { fontSize: '16px', lineHeight: 1.5 },
+  blocked: { width: '100%', paddingBlock: '12px' },
 });
 
 /**
@@ -173,11 +184,15 @@ export function ThreadView({
   onReport,
   speechLanguage,
   supportPhone,
+  block = 'none',
+  onUnblock,
 }: ThreadViewProps) {
   const { t, locale } = useI18n();
   const inputRef = useRef<ChatComposerInputHandle>(null);
   const [draft, setDraft] = useState('');
   const [report, setReport] = useState<ReportPhase>({ step: 'idle' });
+  const [unblocking, setUnblocking] = useState(false);
+  const [unblockFailed, setUnblockFailed] = useState(false);
   const dictation = useChatDictation({ inputRef, lang: speechLanguage });
 
   const name = otherName ?? t('messages.thread.someone');
@@ -225,8 +240,45 @@ export function ThreadView({
     />
   );
 
+  const lift = async () => {
+    if (!onUnblock || unblocking) return;
+    setUnblocking(true);
+    setUnblockFailed(false);
+    const ok = await onUnblock();
+    setUnblocking(false);
+    if (!ok) setUnblockFailed(true);
+  };
+
+  const stopped =
+    block === 'none' ? null : (
+      <VStack gap={2} xstyle={styles.blocked}>
+        <Text xstyle={styles.body}>
+          {block === 'i_blocked'
+            ? t('messages.block.youBlocked', { name })
+            : t('messages.block.theyBlocked')}
+        </Text>
+        {block === 'i_blocked' && onUnblock ? (
+          <Button
+            label={unblocking ? t('messages.block.unblocking') : t('messages.block.unblock', { name })}
+            variant="secondary"
+            isDisabled={unblocking}
+            xstyle={styles.reportAction}
+            onClick={() => void lift()}
+          />
+        ) : null}
+        {block === 'blocked_me' ? (
+          <TextLink label={t('help.callSupport')} href={`tel:${supportPhone}`} />
+        ) : null}
+        {unblockFailed ? (
+          <Text type="supporting" xstyle={styles.intro}>
+            {t('messages.block.failed')}
+          </Text>
+        ) : null}
+      </VStack>
+    );
+
   return (
-    <ChatLayout composer={composer} density="compact" scrollButton={<ScrollToBottom />} xstyle={styles.layout}>
+    <ChatLayout composer={stopped ?? composer} density="compact" scrollButton={<ScrollToBottom />} xstyle={styles.layout}>
     <VStack gap={4} xstyle={styles.messages}>
       <ChatMessageList
         density="compact"

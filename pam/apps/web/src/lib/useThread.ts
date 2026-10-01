@@ -23,6 +23,10 @@ import type { Role } from '@pam/config';
  * select. See `useConversations` for why: a row policy that hands back a
  * whole `profiles` row hands back `last_active_at` and `phone` along with the
  * name, and D-154 closed exactly that hole.
+ *
+ * `block` says whether either side has blocked the other (0069). A block
+ * leaves the history readable and stops new messages both ways; only the
+ * person who made it can lift it.
  */
 export interface ThreadMessage {
   readonly id: string;
@@ -43,9 +47,13 @@ export type ThreadState =
       otherProgramName: string | null;
       kind: 'direct' | 'mentor';
       messages: readonly ThreadMessage[];
+      block: ThreadBlock;
     }
   | { status: 'not_found' }
   | { status: 'error'; offline: boolean };
+
+/** `none`, or who stopped messages here: this account, or the other person. */
+export type ThreadBlock = 'none' | 'i_blocked' | 'blocked_me';
 
 interface MessageRow {
   id: string;
@@ -64,6 +72,8 @@ export function useThread(conversationId: string | null): {
   sending: boolean;
   sendFailed: boolean;
   refresh: () => void;
+  block: () => Promise<boolean>;
+  unblock: () => Promise<boolean>;
 } {
   const [state, setState] = useState<ThreadState>({ status: 'loading' });
   const [sending, setSending] = useState(false);
@@ -129,14 +139,21 @@ export function useThread(conversationId: string | null): {
           ).find((row) => row.conversation_id === conversationId) ?? null;
         const conv = one(mine.conversations);
 
-        const { data: rows, error: messagesError } = await supabase
-          .from('messages')
-          .select('id, sender_id, body, created_at')
-          .eq('conversation_id', conversationId)
-          .order('created_at', { ascending: true })
-          .limit(200);
+        const [{ data: rows, error: messagesError }, { data: blockRows, error: blockError }] =
+          await Promise.all([
+            supabase
+              .from('messages')
+              .select('id, sender_id, body, created_at')
+              .eq('conversation_id', conversationId)
+              .order('created_at', { ascending: true })
+              .limit(200),
+            supabase.rpc('conversation_block_state', { p_conversation: conversationId }),
+          ]);
 
         if (cancelled) return;
+        // A block state that cannot be read is shown as no block: the
+        // database still refuses a blocked send (0069), and a conversation
+        // should not disappear because one side question failed.
         if (messagesError) {
           setState({ status: 'error', offline: !navigator.onLine });
           return;
@@ -149,6 +166,7 @@ export function useThread(conversationId: string | null): {
           otherRole: partner?.role ?? null,
           otherProgramName: partner?.program_name ?? null,
           kind: conv?.kind ?? 'direct',
+          block: blockError ? 'none' : blockFrom(blockRows),
           messages: ((rows ?? []) as MessageRow[]).map((row) => ({
             id: row.id,
             senderId: row.sender_id,
@@ -223,5 +241,31 @@ export function useThread(conversationId: string | null): {
     [conversationId, state],
   );
 
-  return { state, send, sending, sendFailed, refresh };
+  const setBlock = useCallback(
+    async (fn: 'block_in_conversation' | 'unblock_in_conversation'): Promise<boolean> => {
+      if (!conversationId) return false;
+      try {
+        const { createClient } = await import('./supabase');
+        const { error } = await createClient().rpc(fn, { p_conversation: conversationId });
+        if (error) return false;
+        refresh();
+        return true;
+      } catch {
+        return false;
+      }
+    },
+    [conversationId, refresh],
+  );
+
+  const block = useCallback(() => setBlock('block_in_conversation'), [setBlock]);
+  const unblock = useCallback(() => setBlock('unblock_in_conversation'), [setBlock]);
+
+  return { state, send, sending, sendFailed, refresh, block, unblock };
+}
+
+function blockFrom(data: unknown): ThreadBlock {
+  const row = one((data ?? null) as { i_blocked: boolean; blocked_me: boolean } | { i_blocked: boolean; blocked_me: boolean }[] | null);
+  if (row?.i_blocked) return 'i_blocked';
+  if (row?.blocked_me) return 'blocked_me';
+  return 'none';
 }

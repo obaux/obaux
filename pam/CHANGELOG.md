@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.36.0] — 2026-10-01 · Blocking, and the front door fixed
+
+A conversation has a menu now: **block** the other person, after a
+confirmation that says what it does. Neither of you can send another message;
+what was already said stays, and can still be reported. Whoever blocked can
+undo it; whoever was blocked sees that they can't send, and PAM's number. This
+is what the privacy page has promised since September.
+
+Fixed before anyone tripped on them (none is deployed yet — see STATUS):
+redeeming an invite, or being approved as a case manager or program lead,
+would have failed on the real database; a member who signed up alone could
+never get a text; and a few things a signed-in account could do through the
+API, never the screens — read somebody's phone number, accept its own
+connection request, slip into another conversation, rewrite a reported
+message, or hide every place in the catalogue from one throwaway account.
+
+An account with the demo view now sees example saved places too.
+
 ## [0.35.1] — 2026-09-21 · More touchups from the phone
 
 Messages loses its help bar too — a fourth screen without one (A15); tap

@@ -1477,14 +1477,16 @@ begin
   end if;
   raise notice 'ok    approving records the decision, reviewer and time';
 
-  select * into p from public.profiles where id = '33333333-0000-0000-0000-0000000000c1';
+  -- Named columns: `phone` is not selectable by anybody signed in (0068).
+  -- The phone itself is checked below, as the server.
+  select role, region_id, first_name, last_name into p.role, p.region_id, p.first_name, p.last_name
+  from public.profiles where id = '33333333-0000-0000-0000-0000000000c1';
   if p.role <> 'admin' or p.region_id <> '11111111-0000-0000-0000-000000000001' then
     raise exception 'FAIL  the approved account came back as % in %', p.role, p.region_id;
   end if;
-  if p.phone <> '+15555550971' or p.first_name <> 'Priya' or p.last_name <> 'Nair' then
+  if p.first_name <> 'Priya' or p.last_name <> 'Nair' then
     raise exception 'FAIL  the approved profile is missing what the request carried';
   end if;
-  raise notice 'ok    approving creates the real account, phone pulled from auth.users';
 
   begin
     perform public.review_staff_request('33333333-0000-0000-0000-0000000000c1', 'approved',
@@ -1496,6 +1498,12 @@ begin
   end;
 end;
 $$;
+
+reset role;
+select test.check('approving creates the real account, phone pulled from auth.users',
+  (select count(*) from public.profiles
+   where id = '33333333-0000-0000-0000-0000000000c1' and phone = '+15555550971'), 1);
+set role authenticated;
 
 -- outbound_messages carries no admin carve-out (0035: "what a member is being
 -- texted is not on the §4.1 list") — checked with RLS bypassed, the same way

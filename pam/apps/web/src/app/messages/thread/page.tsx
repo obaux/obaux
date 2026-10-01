@@ -1,7 +1,10 @@
 'use client';
 
-import { Suspense, useCallback } from 'react';
+import { Suspense, useCallback, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
+import * as stylex from '@stylexjs/stylex';
+import { MoreMenu } from '@astryxdesign/core/MoreMenu';
+import { AlertDialog } from '@astryxdesign/core/AlertDialog';
 import { AppHeader, Loading, Notice, Page, PageTitle } from '@pam/ui';
 import { NOTICES, type MessageReportReason } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
@@ -36,7 +39,11 @@ import { DemoThreadLazy } from '../DemoThreadLazy';
  * at the top, the composer pinned at the bottom, only the messages
  * scrolling. No help link on this screen (A14, D-194): back leads to
  * Messages, which has one. One primary action: the 48px send button (A13). Reporting a message (D-177) is a secondary action
- * on the other person's messages, inside `ThreadView`.
+ * on the other person's messages, inside `ThreadView`. Blocking (0069,
+ * D-206) is the other: a 48px three-dot `MoreMenu` at the end of the thread
+ * header, confirmed in an `AlertDialog` because it stops the conversation
+ * both ways. Once there is a block the menu goes — `ThreadView` shows the
+ * state, and the undo, where the composer was.
  *
  * **An example conversation** (`?id=dummy-conv-…`, D-180) — what a super
  * admin's role preview opens from `/messages/`'s example rows — renders
@@ -45,6 +52,11 @@ import { DemoThreadLazy } from '../DemoThreadLazy';
  * inserting a real row. Gated on the previewed role, the way `/messages/`
  * itself is (D-172); a real thread is gated on the real one.
  */
+
+const styles = stylex.create({
+  // §2.5's floor, the same square as send, mic and report (A13).
+  menu: { width: '48px', height: '48px', minWidth: '48px', minHeight: '48px' },
+});
 
 function isDummyId(id: string | null): boolean {
   return id !== null && id.startsWith('dummy-conv-');
@@ -67,7 +79,21 @@ function ThreadScreen() {
   // drawn for whichever role is being previewed and touches nothing real.
   const canMessage = demo ? viewedCanMessage : realCanMessage;
 
-  const { state, send, sending, sendFailed } = useThread(signedIn && realCanMessage && !demo ? conversationId : null);
+  const { state, send, sending, sendFailed, block, unblock } = useThread(
+    signedIn && realCanMessage && !demo ? conversationId : null,
+  );
+  const [confirmingBlock, setConfirmingBlock] = useState(false);
+  const [blocking, setBlocking] = useState(false);
+  const [blockFailed, setBlockFailed] = useState(false);
+
+  const confirmBlock = useCallback(async () => {
+    setBlocking(true);
+    setBlockFailed(false);
+    const ok = await block();
+    setBlocking(false);
+    if (ok) setConfirmingBlock(false);
+    else setBlockFailed(true);
+  }, [block]);
 
   const report = useCallback(
     (messageId: string, reason: MessageReportReason) => reportMessage(messageId, reason),
@@ -165,6 +191,26 @@ function ThreadScreen() {
       : null;
 
   if (state.status === 'ready') {
+    const menu =
+      state.block === 'none' ? (
+        <MoreMenu
+          label={t('messages.block.menu')}
+          presentation="adaptive"
+          alignment="end"
+          xstyle={styles.menu}
+          items={[
+            {
+              id: 'block',
+              label: t('messages.block.action', { name: title }),
+              variant: 'destructive',
+              onClick: () => {
+                setBlockFailed(false);
+                setConfirmingBlock(true);
+              },
+            },
+          ]}
+        />
+      ) : undefined;
     return (
       <ThreadFrame>
         <ThreadTop>
@@ -174,8 +220,21 @@ function ThreadScreen() {
             context={context}
             backHref="/messages/"
             backLabel={t('nav.back.messages')}
+            trailing={menu}
           />
         </ThreadTop>
+        <AlertDialog
+          isOpen={confirmingBlock}
+          onOpenChange={(open) => {
+            if (!blocking) setConfirmingBlock(open);
+          }}
+          title={t('messages.block.confirm.title', { name: title })}
+          description={blockFailed ? t('messages.block.failed') : t('messages.block.confirm.body')}
+          actionLabel={t('messages.block.confirm.action')}
+          cancelLabel={t('messages.block.confirm.cancel')}
+          isActionLoading={blocking}
+          onAction={() => void confirmBlock()}
+        />
         <ThreadViewLazy
           messages={state.messages}
           otherName={state.otherName}
@@ -185,6 +244,8 @@ function ThreadScreen() {
           onReport={report}
           speechLanguage={speechLanguage}
           supportPhone={supportPhone}
+          block={state.block}
+          onUnblock={unblock}
         />
       </ThreadFrame>
     );

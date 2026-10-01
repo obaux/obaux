@@ -1,6 +1,6 @@
 # PAM — where the project stands
 
-Last updated 2026-09-21. The member-facing product is real now: signing up
+Last updated 2026-10-01. The member-facing product is real now: signing up
 and signing out, invite codes for all four kinds of account, saving, points,
 badges, reporting a place, and a screen for the person running PAM. Every place
 now says what it is and has a screen of its own. Notifications are readable —
@@ -198,6 +198,29 @@ the mic icon (Astryx has no separate weight prop — checked directly); and
 the message list runs `density="compact"`, which tightens the row gap and
 widens the bubbles at once. Playwright: 507.
 
+**30 September – 1 October (branch `claude/hopeful-thompson-07nj7n`,
+D-204–D-207): a production-readiness review, then its fixes.** Every suite
+re-run on `main` and the live project queried directly rather than trusting
+this file (D-204). The live database had one super admin and two demo members
+— no case manager, no program, no real message, one text ever sent — so most
+real paths had never run. Two migrations came out of it, **neither deployed**:
+`0068` (D-205) — phone numbers stored as E.164 whatever shape Supabase Auth
+hands over (Auth keeps bare digits, so **redeeming an invite or approving a
+staff request would have failed on the live project**, and a self-signed-up
+member had no phone at all); a connection can only be accepted by the person
+asked; a conversation membership can only be marked read; a sent message is
+final; one unvouched account can no longer empty the catalogue (D-071
+narrowed, not reversed); and nobody signed in can read `profiles.phone`.
+`0069` (D-206) — **blocking**, from a three-dot menu in the conversation:
+stops messages both ways, leaves the history readable and reportable,
+undone only by the blocker. The demo view also reaches saved places now
+(D-207, written 17 September on this branch and never merged until now).
+Will's calls: the placeholder hours stay (investors need to see a place
+card working) and the Supabase free plan stays. Playwright: 519.
+**The database suite was not run this session** — see "What needs a
+human" row 28. Session log:
+`docs/sessions/2026-10-01-readiness-review-and-blocking.md`.
+
 This is the handover document: what exists, what is proven, what is live, and
 what the next person needs to know before touching anything.
 
@@ -216,9 +239,12 @@ writing a new session log and updating this file. `CLAUDE.md` states the rule.
 PAM connects people to people at services and facilities — for mentorship,
 earning and learning. It serves returning citizens, the providers who run
 programs, and the case managers who invite them in and introduce them to each
-other. **Phase 0 (Foundation) is complete.** The data model, its access rules,
-the design system, the shared product rules, and CI all exist and are verified.
-No member-facing flow is built yet: that is Phase 1.
+other. **Phase 0 (Foundation) is complete, and most of Phase 1 is built**:
+sign-up and sign-in, places with search and a screen each, saving, points,
+reporting a place, notifications, a case manager screen, a people directory,
+staff requests, and a staff-to-member messenger with reporting and blocking.
+It is deployed, but has **not yet been used by a real case manager, program
+or member** (D-204) — the pilot is what proves it.
 
 Every decision was measured against one question, from the SOP: *can a person
 who hasn't used a phone in 8 years enroll in a program, get to it, and keep
@@ -231,8 +257,9 @@ going — without help?*
 **Supabase project `pam`** — `shobqzuhicoiymtumiaz`, us-east-1 (closest region to
 Philadelphia). The database is real and reachable. **The web app is deployed
 on Vercel** (project `web`, auto-deploys from `main`):
-https://web-will-3199s-projects.vercel.app — production is `main` at `c0a6334`
-as of 20 September.
+https://web-ten-umber-88.vercel.app — the project's own production domain
+(Vercel's domain list, checked 30 September; `web-will-3199s-projects` is a
+team alias). Production was `main` at `23cb190` on 30 September.
 
 **The "six unknown live migrations" this repo could not explain are now
 explained: they were the other concurrent PAM session's own committed
@@ -345,11 +372,11 @@ Numbers here are from the last run, not aspirations.
 | Typecheck | 5/5 packages | — |
 | `@pam/config` tests | 231 pass (21 September) | No SMS can send unreviewed, over 160 chars, with emoji, or with a term that reveals justice involvement. Locales are key-for-key. The transparency screen matches its contract, including the new `new_save_without_the_place` line (D-199). |
 | `@pam/ui` tests | 65 pass | Every component is axe-clean. `PlaceCard` offers exactly three actions in a fixed order. Reduced motion is respected. The mic hides when unsupported. |
-| Database suite | 302 checks pass (21 September, `0001`–`0067`) | See below. Grew from 286 with `07_people_activity_test.sql` (D-199): 16 checks that `people_activity()` returns a time and nothing else, only for `can_message()`'s own relationship, and that a case manager or a program admin still cannot read `saved_places` directly. `0067` is now live. |
+| Database suite | 302 checks pass (21 September, `0001`–`0067`; re-run 30 September, same). **Not run against `0068`/`0069`** — this session's sandbox refused the script (it `chmod`s every parent directory when run as root); `08_readiness_and_blocking_test.sql` is written and waiting | See below. Grew from 286 with `07_people_activity_test.sql` (D-199): 16 checks that `people_activity()` returns a time and nothing else, only for `can_message()`'s own relationship, and that a case manager or a program admin still cannot read `saved_places` directly. `0067` is now live. |
 | Live RLS fingerprint | **not re-verified since `0060`–`0062` deployed** | This row's last "identical to local" claim predates today. `0060`–`0062` (deployed under their original names, `0054`–`0056`) are now live and `get_advisors` came back clean, but the fingerprint comparison itself hasn't been re-run against the combined migration set — this repo and the other concurrent session's are now merged, but neither has been re-fingerprinted since (see D-169/D-170, and the drift note under "What is live") |
 | Live anonymous attack | 0 rows leaked | A signed-out caller reads no profiles, messages, invites or audit rows on the real database, while still reaching the support number and the public catalogue |
-| Browser a11y + theme (Playwright, full suite) | **507 pass** (21 September, `claude/pam-messenger-touchups`; `PLAYWRIGHT_CHROMIUM_PATH=/opt/pw-browsers/chromium-1194/chrome-linux/chrome`) | No WCAG AA violations at 320px or iPhone SE. Every control clears 48px. No horizontal scroll. The Astryx theme really resolves. Runs in dark mode as well as light. Includes the people strip (D-198) and the fourth round of phone touchups (A15, D-200–D-203): no help link on Messages, the thread frame fills the true viewport, the send icon matches the mic icon, and message rows measure the compact density directly rather than by on-screen distance. |
-| First-load JS | 505.3 kB of **600 kB** — within budget, 94.7 kB to spare (ceiling raised from 500 on 21 September: A12, D-191) | §12 budget, measured gzipped on what `index.html` actually loads; `/signin` and `/gallery` carry `OnboardingSlides`' `framer-motion` weight on their own subpath export (D-140), every other route unaffected. Grew from 500.7 kB across the messaging sessions alone (1.0 kB, D-162), entirely new locale strings — irreducible without lazy-loading translations per route, which is out of scope. Grew a further 2.3 kB when merged with the other concurrent session's own additions (D-170). Grew 0.3 kB on the 17th (D-174), **and 1.0 kB on 20 September** (the messenger's locale strings and `Badge` in `NavTile`; `useConversations` and the whole Chat family were kept out of Home's first load — D-181, D-182) — the messaging-preview/demo-send/program-badge session's other additions (D-172, D-173, D-175) all landed off Home's own bundle and did not move this number, though D-175's `Token` component does add real weight to `/admin/`, `/person/` and `/directory/` individually (~4 kB each), not tracked by this check |
+| Browser a11y + theme (Playwright, full suite) | **519 pass** (1 October, `claude/hopeful-thompson-07nj7n` — 507 plus four blocking tests × 3 projects); previously 507 (21 September, `claude/pam-messenger-touchups`; `PLAYWRIGHT_CHROMIUM_PATH=/opt/pw-browsers/chromium-1194/chrome-linux/chrome`) | No WCAG AA violations at 320px or iPhone SE. Every control clears 48px. No horizontal scroll. The Astryx theme really resolves. Runs in dark mode as well as light. Includes the people strip (D-198) and the fourth round of phone touchups (A15, D-200–D-203): no help link on Messages, the thread frame fills the true viewport, the send icon matches the mic icon, and message rows measure the compact density directly rather than by on-screen distance. |
+| First-load JS | 505.7 kB of **600 kB** on 1 October (+0.4 kB, the blocking strings) — within budget, 94.3 kB to spare; was 505.3 kB (ceiling raised from 500 on 21 September: A12, D-191) | §12 budget, measured gzipped on what `index.html` actually loads; `/signin` and `/gallery` carry `OnboardingSlides`' `framer-motion` weight on their own subpath export (D-140), every other route unaffected. Grew from 500.7 kB across the messaging sessions alone (1.0 kB, D-162), entirely new locale strings — irreducible without lazy-loading translations per route, which is out of scope. Grew a further 2.3 kB when merged with the other concurrent session's own additions (D-170). Grew 0.3 kB on the 17th (D-174), **and 1.0 kB on 20 September** (the messenger's locale strings and `Badge` in `NavTile`; `useConversations` and the whole Chat family were kept out of Home's first load — D-181, D-182) — the messaging-preview/demo-send/program-badge session's other additions (D-172, D-173, D-175) all landed off Home's own bundle and did not move this number, though D-175's `Token` component does add real weight to `/admin/`, `/person/` and `/directory/` individually (~4 kB each), not tracked by this check |
 
 ### The database suite is the one that matters
 
@@ -558,12 +585,12 @@ while the copy is unsigned, so it earned the first live test, not the last.*
 | 11 | ~~Sign off `staff_request_approved`'s wording~~ **Done** | — | Will, 17 September. `pnpm --filter @pam/config test` is green. |
 | 12 | ~~Migrations 0054 through 0057 are local only~~ **Done** | — | Applied to the live Supabase project 17 September, along with two follow-ups `get_advisors` surfaced: `notify_on_staff_request` (0058) was callable directly via PostgREST, unlike its two siblings in 0038 — its own migration run never got the schema-level default-privileges lockdown 0038's did; and `staff_requests` had two foreign keys with no covering index (0059). `/requests/`, `/join/`'s program step, and the demo view all work against the real database now. |
 | 13 | ~~Sign off `staff_request_denied`'s wording too~~ **Done** | — | Will, 17 September. Still sent with quiet-hours/STOP enforcement deliberately skipped, at Will's own instruction (D-152) — that was never what this row was about. |
-| 14 | **The demo view is not wired into every screen yet** | An account granted it still sees real data on `place`, `person`, `HomePeoplePreview`, and the saved-places dummy path | The mechanism (`useDemoView`) is built and proven on five screens (D-155); finishing the rest is the same pattern repeated, not new design. |
+| 14 | ~~The demo view is not wired into every screen yet~~ **Done (D-207)** | — | Saved places was the one real gap (Home, Places, Saved and the place screen now show example saved places to a demo account). `person` and `HomePeoplePreview` were never gaps — see D-207. |
 | 15 | ~~Confirm client-side caseload/enrollment scoping in `/messages/` is an acceptable interim state (D-163)~~ **Closed at the database layer (0063, D-176)** | Staff-to-member messaging | RLS lets a client create a conversation with any profile id; only `useMessageableMembers`'s own restraint (a case manager's real caseload, a program admin's real enrolled members) keeps this screen scoped to real relationships. A follow-up migration should enforce it at the database layer — see D-163 for exactly what to check. Shipped now, conservatively, rather than blocked on that migration; flagged for Will's word on whether that trade is right, given it now involves staff accounts with real caseload access rather than peers. |
 | 16 | ~~Wire `report_message()` (0034) to a UI action in the thread view~~ **Done (D-177), plus `/reports/` (D-178)** | Member safety | The RPC is complete and correct at the database layer; nothing in `/messages/thread/` calls it yet. D-074's whole premise is that a report is the *only* route a case manager who is **not** a participant ever has into message content — a chat surface with no way to file one is a real gap, not a nice-to-have. |
 | 17 | ~~Run `pnpm --filter @pam/db test` against migrations 0060, 0061 and 0062~~ **Done (D-168); now also deployed live (D-169)** | — | This sandbox turned out not to be permanently missing `postgis` — `apt-get install postgresql-16-postgis-3` closed the gap. `pnpm --filter @pam/db test` ran for real: **221 checks pass, 0 failures.** `0060` was superseded (locally) before deploy but is still recorded live under its deploy-time name; `0061` and `0062` are also applied to the live Supabase project, and `get_advisors` (security) came back clean. Deploying also surfaced live/repo drift unrelated to this work — see the "What is live" drift note and D-169 — left for Will to reconcile. Deployed and merged under different numbers than they were built with — see D-170. |
 | 18 | ~~`profiles_select_provider_linked` grants activity info~~ **Done — closed app-wide (0062, D-166)** | — | Was: a program admin could read `last_active_at`/`phone` for any enrolled member with no conversation required. Replaced with `provider_linked_members()` (id, first name only). Will confirmed this needed to be a blanket rule, not just a messaging-surface one, and the transparency screen now says so (D-167). Case managers unaffected. |
-| 19 | **Decide whether `profiles.phone` needs a column-level `REVOKE` more broadly still** | Staff/member privacy | The provider-role exposure is now closed everywhere it was found (D-165, D-166 — `conversation_partners()` and `provider_linked_members()` both return name/role only). `profiles_select_admin_caseload` (case managers) still exposes the whole row, including `phone`, for a caseload/region member — untouched, since every instruction so far has been explicitly provider-role-specific, not about case managers. The `bidder_contact`-style column grant pattern used elsewhere in this repo would close it if Will wants that too. |
+| 19 | ~~Decide whether `profiles.phone` needs a column-level `REVOKE` more broadly still~~ **Done in `0068`, not yet deployed (D-205)** | — | `select` on `profiles` is granted column by column without `phone`, to every signed-in role. No screen reads it. |
 | 20 | ~~Build `admin_visibility.test.ts`~~ **Done, as `04_transparency_contract_test.sql` (D-168)** | — | `transparency.ts`'s own file comment used to claim a test by that name enforces `ADMIN_CAN_SEE` against live RLS; it never existed (D-164, D-167). Built and run: `packages/db/test/04_transparency_contract_test.sql`, covering the four contract lines that changed today (case-manager participation, non-participation, program-admin activity via both read paths, and total visibility) against a real database, not just documentation. Passes, per row 17. |
 | 21 | ~~Can a super admin send messages?~~ **Confirmed: no (D-171)** | — | A super admin gets no "Messages" tile and `/messages/` reads "not for your role" for that account — this is correct, confirmed by Will, not a bug. Testing on the live deployment also found the live database has **zero `admin` and zero `provider` accounts** — only Will's `super_admin` and two plain members — so the caseload/enrollment messaging paths need a real case-manager or program-admin account (invite-created, with an actual caseload assignment or enrollment) before `/messages/`'s "Start a conversation" section will show anyone. |
 | 22 | ~~Messaging never appeared during a role preview~~ **Fixed (D-172)** | — | Was gating `canMessage`/`isStaff` and the Home tile on the real role only, so a preview never showed them for any role — a bug, not the restriction D-171 actually called for. Now gates visibility on `viewedRole`, matching `/admin/`/`/directory/`/`/interested/`; real data/writes still only ever follow `trueRole`. |
@@ -572,6 +599,11 @@ while the copy is unsigned, so it earned the first live test, not the last.*
 | 25 | **D-178's audience** | Who reads a reported message | The reporter's case manager is included alongside the sender's. Say if it should be the sender's only. |
 | 27 | ~~Approve the new transparency line, then deploy `0067`~~ **Done (Will, 21 September)** | — | Wording approved as proposed. `list_migrations` first: no drift since the 20th. `0067_people_activity.sql` applied; `get_advisors` (security) clean — `people_activity()` is `authenticated`-only. The ring for a new save now lights for real. Also fixed in the same push: `privacy.s.who-can-see.p1` (the long privacy page, not the short transparency screen) still carried "and that a chat exists" — a claim D-167 removed from the short screen on the 17th but missed here. Removed, en/es. |
 | 26 | ~~Deploy `0066`~~ **Done (Will, 21 September)** | — | `list_migrations` first: no drift since the 20th. Applied; `get_advisors` (security) clean — `flagged_services()` and the recreated `conversation_partners()` are `authenticated`-only, `services_search()` is security invoker and so not even listed. `pg_trgm` now lives in `extensions`. Case managers keep the Reported places list read-only — Will's call, recorded as D-190. |
+| 28 | **Run `pnpm --filter @pam/db test`, then deploy `0068` and `0069`** | Every fix in D-205, and blocking on the live app | Written and reviewed, not run: the sandbox refused the DB script on 1 October. Until both are live the blocking menu will fail on the real site (its RPCs do not exist there) — **deploy the migrations before merging this branch to `main`**, since Vercel deploys `main` straight away. Run `list_migrations` first (CLAUDE.md), then `get_advisors`. |
+| 29 | **The HELP auto-reply in the Twilio Console** | Anybody texting HELP gets Twilio's generic reply, not the filed one | Messaging → Services → PAM → Opt-Out Management → Advanced Opt-Out → Help: `PAM: Call +12673095265 and a person will help you.` Then text HELP from a verified phone. |
+| 30 | **Should a case manager see their whole city, or only their caseload?** | §4.1 wording | `admin_covers()` reads every member in the case manager's region, not only their caseload — the region arm is tested and `/admin/` is built on it. 0063 already decided "sharing a city is not a relationship" for messaging. Left for Will (D-205). |
+| 31 | **Free Supabase plan: no restorable backups** | Recovery from a bad migration or deletion | Will's call to keep it (30 September). Worth revisiting before real members' data is on it. |
+| 32 | **STOP is not recorded in PAM** | `sms_stopped_at` is never written | Twilio itself stops texts to anyone who replied STOP; PAM only sees failed sends. An inbound webhook or a nightly opt-out sync would close it. |
 
 ---
 
@@ -640,7 +672,7 @@ and wiring `report_message()` to a visible action in the thread view.
 migrations (`0060` onward through `0062`) are deployed and verified
 (D-169), and reconciled with the other concurrent session's own `0054`–`0059`
 by the merge that renumbered them (D-170). What is still genuinely
-undone: `0052_saved_places_say_what_they_are.sql` has never reached the
-live project, and the live RLS fingerprint has not been re-verified since
+undone: `0068` and `0069` (row 28) have not reached the live project
+(`0052` did, on 20 September), and the live RLS fingerprint has not been re-verified since
 either session's migrations deployed — see the drift note under "What is
 live" and the "Live RLS fingerprint" row under "What is proven."

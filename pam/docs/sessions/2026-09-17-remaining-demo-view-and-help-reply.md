@@ -30,7 +30,7 @@ of `demoRole` alone — the hook itself needed no change.
 
 Full reasoning for both, and the exact steps for the HELP auto-reply
 (Twilio Console, Advanced Opt-Out, matched against what was filed with the
-carrier), are in D-159.
+carrier), are in D-207.
 
 ## What was wrong, and what missed it
 
@@ -45,7 +45,7 @@ framing rather than trusting it a second time.
 
 ## Decisions
 
-- D-159 — the saved-places fix, why `person` and `HomePeoplePreview` were
+- D-207 — the saved-places fix, why `person` and `HomePeoplePreview` were
   left alone, and the Console steps for the HELP auto-reply.
 
 ## Verified
@@ -65,11 +65,11 @@ place screen next time someone is in the app.
 ## Left undone
 
 - The HELP auto-reply itself is not set — no tool here can write to Twilio.
-  D-159 has the exact Console steps; this needs five minutes from Will.
+  D-207 has the exact Console steps; this needs five minutes from Will.
 - No manual browser verification of the saved-places demo-view change (see
   above).
 
 ## Needs a human
 
-- Will: set the HELP auto-reply in the Twilio Console per D-159, then text
+- Will: set the HELP auto-reply in the Twilio Console per D-207, then text
   HELP to a PAM number from a verified test phone to confirm.

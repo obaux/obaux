@@ -25,6 +25,9 @@ const PARTNERS = '**/rest/v1/rpc/conversation_partners*';
 const PEOPLE = '**/rest/v1/rpc/messageable_people*';
 const REPORT = '**/rest/v1/rpc/report_message*';
 const REPORTS = '**/rest/v1/rpc/reports_for_review*';
+const BLOCK_STATE = '**/rest/v1/rpc/conversation_block_state*';
+const BLOCK = '**/rest/v1/rpc/block_in_conversation*';
+const UNBLOCK = '**/rest/v1/rpc/unblock_in_conversation*';
 
 const ME = 'de3b9c2e-ec2f-403b-93e5-86e6ee75349b';
 const OTHER = '7c1f8c1e-1c7e-4a5c-9d6e-0f3a2b4c5d6e';
@@ -70,8 +73,24 @@ async function signedInAs(page: import('@playwright/test').Page, role: 'admin' |
   );
 }
 
-/** One real conversation with Marcus, who spoke last. */
-async function withOneConversation(page: import('@playwright/test').Page) {
+/**
+ * One real conversation with Marcus, who spoke last. `block` is who has
+ * blocked whom (0069); the block and unblock calls flip it, the way the
+ * database would.
+ */
+async function withOneConversation(
+  page: import('@playwright/test').Page,
+  block: { i_blocked: boolean; blocked_me: boolean } = { i_blocked: false, blocked_me: false },
+) {
+  await page.route(BLOCK_STATE, (route) => route.fulfill(json([block])));
+  await page.route(BLOCK, (route) => {
+    block.i_blocked = true;
+    return route.fulfill(json(null));
+  });
+  await page.route(UNBLOCK, (route) => {
+    block.i_blocked = false;
+    return route.fulfill(json(null));
+  });
   await page.route(MEMBERS, (route) => {
     const url = route.request().url();
     if (route.request().method() === 'PATCH') return route.fulfill(json([]));
@@ -469,6 +488,90 @@ test.describe('a conversation', () => {
     await page.getByRole('button', { name: /send/i }).click();
     await expect(page.getByRole('log').getByText('Thanks, see you then.')).toBeVisible();
     expect(realWrites).toBe(0);
+
+    const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
+    expect(results.violations).toEqual([]);
+  });
+});
+
+/** The menu's Block row: a menu item on a pointer, a sheet button on touch ("adaptive"). */
+function blockRow(page: import('@playwright/test').Page) {
+  return page
+    .getByRole('menuitem', { name: 'Block Marcus' })
+    .or(page.getByRole('button', { name: 'Block Marcus', exact: true }));
+}
+
+test.describe('blocking (0069)', () => {
+  test('the menu blocks the other person after a confirmation, and the composer says so', async ({ page }) => {
+    await signedInAs(page, 'member');
+    await withOneConversation(page);
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+
+    const menu = page.getByRole('button', { name: 'More' });
+    const box = await menu.boundingBox();
+    expect(box?.width).toBeGreaterThanOrEqual(48);
+    expect(box?.height).toBeGreaterThanOrEqual(48);
+    await menu.click();
+    await blockRow(page).click();
+
+    const dialog = page.getByRole('alertdialog', { name: 'Block Marcus?' });
+    await expect(dialog).toBeVisible();
+    await expect(dialog.getByText(/What was already said stays/)).toBeVisible();
+    await dialog.getByRole('button', { name: 'Block', exact: true }).click();
+
+    await expect(page.getByText('You blocked Marcus. Neither of you can send messages here.')).toBeVisible();
+    await expect(page.getByRole('textbox')).toHaveCount(0);
+    await expect(page.getByRole('button', { name: /send/i })).toHaveCount(0);
+    // The history stays, and so does reporting it.
+    await expect(page.getByRole('log').getByText('Is the class still on Tuesday?')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Report' })).toHaveCount(1);
+    // One way to undo it, where the composer was; the menu has nothing left to offer.
+    await expect(page.getByRole('button', { name: 'Unblock Marcus' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'More' })).toHaveCount(0);
+
+    const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
+    expect(results.violations).toEqual([]);
+  });
+
+  test('Never mind closes the confirmation and blocks nobody', async ({ page }) => {
+    await signedInAs(page, 'member');
+    await withOneConversation(page);
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+
+    await page.getByRole('button', { name: 'More' }).click();
+    await blockRow(page).click();
+    await page.getByRole('alertdialog').getByRole('button', { name: 'Never mind' }).click();
+    await expect(page.getByRole('alertdialog')).toHaveCount(0);
+    await expect(page.getByRole('textbox')).toBeVisible();
+  });
+
+  test('unblocking brings the composer back', async ({ page }) => {
+    await signedInAs(page, 'member');
+    await withOneConversation(page, { i_blocked: true, blocked_me: false });
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+
+    const unblock = page.getByRole('button', { name: 'Unblock Marcus' });
+    expect((await unblock.boundingBox())?.height).toBeGreaterThanOrEqual(48);
+    await unblock.click();
+    await expect(page.getByRole('textbox')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'More' })).toBeVisible();
+  });
+
+  test('the person blocked cannot send, and is given a way to a person', async ({ page }) => {
+    await signedInAs(page, 'admin');
+    await withOneConversation(page, { i_blocked: false, blocked_me: true });
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+
+    await expect(page.getByText('You cannot send messages here any more.')).toBeVisible();
+    await expect(page.getByRole('textbox')).toHaveCount(0);
+    await expect(page.getByRole('link', { name: 'Call PAM for help' })).toHaveAttribute('href', /^tel:/);
+    // Only the blocker can lift it, and there is no second block to make.
+    await expect(page.getByRole('button', { name: /Unblock/ })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'More' })).toHaveCount(0);
 
     const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
     expect(results.violations).toEqual([]);

@@ -90,6 +90,8 @@ const styles = stylex.create({
   },
   // A long program name is cut, never wrapped: the row stays one row.
   tag: { maxWidth: '40%', flexShrink: 1 },
+  // The conversation's own menu (block, 0069) sits at the far end of the row.
+  trailing: { marginInlineStart: 'auto', flexShrink: 0 },
 });
 
 export function ThreadFrame({ children }: { readonly children: ReactNode }) {
@@ -110,12 +112,15 @@ export function ThreadHeader({
   context,
   backHref,
   backLabel,
+  trailing,
 }: {
   readonly name: string;
   /** "Case manager", or the program's name — `null` draws no tag (D-187). */
   readonly context: string | null;
   readonly backHref: string;
   readonly backLabel: string;
+  /** Drawn at the end of the row — the conversation's menu. */
+  readonly trailing?: ReactNode;
 }) {
   return (
     <HStack gap={1} align="center" wrap="nowrap" xstyle={styles.row}>
@@ -130,6 +135,7 @@ export function ThreadHeader({
         {name}
       </Heading>
       {context ? <Token label={context} size="sm" xstyle={styles.tag} /> : null}
+      {trailing ? <HStack xstyle={styles.trailing}>{trailing}</HStack> : null}
     </HStack>
   );
 }

@@ -4188,6 +4188,145 @@ prove nothing about the gap itself). Report — the one 48px control living
 inside a message row — is re-checked at its own floor in the same test;
 row spacing does not change a control's own size.
 
+
+### D-204 — Production readiness, 30 September: verified, not read off STATUS
+Will: "do an analysis to see how ready the product is for production." The
+answer was built from what could be checked rather than from STATUS.md, which
+by then contradicted itself in several places (its opening paragraph still said
+no member-facing flow existed; its "Next" section said `0052` never deployed
+while row 24 said it had). Every suite was re-run on `main` (all green: config
+231, ui 65, db 302, Playwright 507, bundle 505.3 of 600 kB); the live project
+was queried directly (advisors, migration ledger, accounts by role, the SMS
+queue, `cron.job_run_details`, the `profiles` grants); Vercel was read for the
+production deployment and its domain; and every serious claim from the
+code-audit subagent was re-checked against the live policies and grants before
+it was repeated to Will.
+
+What it found that mattered: the live database has one super admin and two
+members (both demo), no case manager or program account, no real message, and
+one text ever sent — so most of the product's real paths had never run for
+real. Five things would have hurt the first real member (D-205), the privacy
+page promised blocking that did not exist (D-206), and the Supabase
+organisation is on the free plan (no restorable backups). Will's calls on the
+findings: **keep the placeholder hours** (investors need to see how a place
+card works; the stand-in stays exactly as D-122 left it), **keep the free
+Supabase plan**, fix the security findings, and build blocking.
+
+`web-ten-umber-88.vercel.app` is the production domain (Vercel's own project
+domain list), not the `web-will-3199s-projects` alias STATUS.md had named. The
+carrier filing's privacy and terms URLs, and `app_settings.app_url`, were right
+all along.
+
+### D-205 — 0068: five holes closed, one of them a broken front door
+Built from D-204, one migration, each fix attacked in
+`08_readiness_and_blocking_test.sql`:
+
+1. **Phone numbers.** `start_membership()` (0046) never copied the verified
+   number, so a member who signed up alone could never be texted — both live
+   members had a null phone. Worse, found while fixing it: Supabase Auth stores
+   a verified number as bare digits (`12675551234`, confirmed on all five live
+   `auth.users` rows), while `profiles.phone` has carried an E.164 check since
+   0002. So `redeem_invite()` and `review_staff_request()`, which copy the raw
+   number, would have **failed outright on the live project** — nobody could
+   have redeemed an invite or been approved as staff — and a phone-prefilled
+   invite compared `+1…` with `1…` and refused the very person it was made for.
+   Every test fixture stores `auth.users.phone` with a "+", which is why 302
+   checks never saw it, and the live project has no invited account, which is
+   why nobody else did. Fixed once for every path: `to_e164()` and a `BEFORE`
+   trigger on `profiles` and `outbound_messages` (it runs before the check),
+   `start_membership()` copies the number, `redeem_invite()` compares the
+   formatted one, and existing rows are backfilled. The new tests store Auth
+   numbers the way Auth really does.
+2. **Connections.** The requester could set `status` on insert, or accept their
+   own request afterwards, and so read anybody's whole profile. A trigger now
+   makes every insert a request and lets only the receiver answer; the pair and
+   kind are no longer updatable columns. A block between two members stays
+   permanent (§6.2). The trigger keys on `current_user`, not `auth.uid()`, so
+   server code (security definer functions, migrations) is never mistaken for a
+   person answering.
+3. **Conversation membership and messages.** A member row can only be marked
+   read (`last_read_at` is its one updatable column), so nobody can repoint
+   their membership into another conversation; `messages` has no update at
+   all, and a sender inserts only the content columns — a reported message
+   cannot be rewritten or un-reported, and none can be sent pre-flagged.
+4. **Flags — a narrowing of D-071, not a reversal.** D-071's asymmetry (hiding
+   a live place for a day is the cheaper mistake) still holds for the people it
+   was written about: staff, and a member a case manager invited or has on
+   their caseload. A flag from an account nobody vouched for — open sign-up
+   alone — is recorded, goes on the reviewers' list as before
+   (`flagged_services()` lists pending flags whether or not the place is
+   hidden), and hides the place only when a second, different account agrees.
+   Ten flags a day per account; a repeat of an open flag is the same flag.
+   I proposed "every flag waits for review"; this is gentler than that, because
+   D-071 was Will's design and its reasoning is still right for vouched
+   accounts. The member's own copy never promised the place would vanish ("We
+   will check it"), so no wording changed.
+5. **Phone numbers off `profiles` for everyone signed in.** No screen reads
+   `profiles.phone` (checked: every `.from('profiles')` names its columns), so
+   rather than carve case managers out one policy at a time, `select` on
+   `profiles` is now granted column by column without `phone` — to every role,
+   the account itself included. Closes STATUS row 19. Server code is
+   unaffected. The two functions that return a whole `profiles` row
+   (`start_membership`, `redeem_invite`) only ever return the caller's own.
+   The next column added to `profiles` is unreadable until it is granted — the
+   same deliberate shape 0046 chose for updates.
+
+**Not changed, flagged instead:** `admin_covers()` still lets a case manager
+read every member *in their region*, not only their caseload. 0063 already
+said "sharing a city is not a relationship" for messaging, and the transparency
+contract's wording ("people who are not on their list") arguably says the same
+for everything — but the region arm is asserted by the RLS suite and `/admin/`
+is built on it, so narrowing it is Will's decision, not a side effect of a
+security pass.
+
+### D-206 — Blocking: its own table, stops messages both ways, undone only by the blocker
+The privacy page has said since 13 September that a member can "block someone
+… from inside the chat"; nothing did. `connections.status = 'blocked'` does not
+fit: it is member-to-member, one row per pair *per kind*, and PAM's
+conversations are between a member and their own case manager or program
+(0063), which is not a connection at all. So 0069 adds `blocks (blocker_id,
+blocked_id)`, written only by `block_in_conversation()` /
+`unblock_in_conversation()` (keyed by the conversation, so the screen never
+handles a profile id), read by the blocker alone.
+
+A block: refuses new messages both ways (the `messages_insert_sender` policy
+asks `conversation_has_block()`); makes `can_message()` say no, so neither can
+open a new conversation and each drops out of the other's "New message" list;
+and is honoured by `is_blocked_between()`, so every older policy that already
+asked about blocks (profiles, connections) respects this kind too. It leaves the
+history readable and reportable: a block is not a way to erase what was said
+before it.
+
+**Undoable, by the blocker only** — unlike a block between two members, which
+§6.2 makes permanent. The person on the other side is somebody's own case
+manager or program; a permanent block from a mistaken tap would cut a member
+off from the person meant to help them, with no way back but a phone call. The
+person blocked cannot lift it.
+
+On the screen: a 48px three-dot `MoreMenu` at the end of the thread header
+(Astryx's own overflow menu, `presentation="adaptive"` — a bottom sheet on a
+phone), "Block {name}" confirmed in an `AlertDialog` that says what happens and
+that it can be undone. Once there is a block, the menu goes and the composer is
+replaced — not disabled — by a sentence: the blocker sees who they blocked and
+an Unblock button; the person blocked sees that they cannot send, and "Call
+PAM for help", because this screen has no help bar (A14) and this is the one
+state on it that stops somebody talking. The person blocked is told they cannot
+send, not that they were blocked by name — the composer's absence says enough.
+
+### D-207 — The demo view reaches saved places (was D-159 on a branch that never merged)
+Written 17 September as "D-159" on `claude/hopeful-thompson-07nj7n`, which was
+pushed but never merged; `main` meanwhile used D-159 for something else, so it
+is renumbered here, unchanged in substance. STATUS row 14 named four screens
+the demo view (D-155) had not reached. Reading each before changing any: only
+saved places was a real gap — `useSavedPlaces` took its example branch only for
+a super admin's role preview (`demoRole`), never for an account with `is_demo`,
+so a demo member saw a real, empty list. Fixed at the four call sites (Home,
+Places, Saved, the place screen) with `demoRole ?? (isDemo ? trueRole : null)`;
+the hook itself already did the right thing once told. `person` and
+`HomePeoplePreview` were not gaps: `person` never resolves a real profile for
+anybody (the §4.1 limit in its own comment), and `HomePeoplePreview` is
+documented to appear only during a preview, never on an account's own Home.
+
 ---
 
 ## Notes for whoever picks this up next
