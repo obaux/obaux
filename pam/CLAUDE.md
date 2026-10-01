@@ -127,6 +127,11 @@ by signing in on the live site. So:
   story renders by serving `storybook-static` with `python3 -m http.server`
   (`npx serve` drops the query string Storybook needs) and opening
   `iframe.html?id=<story-id>`.
+- **A new screen joins the clickable prototype** (`src/stories/prototype/routes.tsx`,
+  D-211): add its route to `TODAY_ROUTES`, or to `REDESIGN_ROUTES` if it is a
+  redesigned view. Leave a screen from script with `router.push` or
+  `navigate()` (`src/lib/navigate.ts`), never `window.location` — the
+  prototype can't follow that.
 - What ships is still the branch, merged the usual way. Nothing is exported
   from Storybook.
 

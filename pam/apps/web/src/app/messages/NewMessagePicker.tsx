@@ -10,6 +10,7 @@ import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { useI18n } from '@/lib/i18n';
+import { navigate } from '@/lib/navigate';
 
 /**
  * Who to message — a sheet that slides up over the list (D-186).
@@ -81,7 +82,7 @@ export function NewMessagePicker({
       setFailed(true);
       return;
     }
-    window.location.assign(href);
+    navigate(href);
   };
 
   return (

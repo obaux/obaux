@@ -136,3 +136,45 @@ scroll, notifications visible.
 
 - Will: the next screens' references (Explore, Saved, Messages), and a yes on
   the round bell replacing the filled one as screens move over (D-210).
+
+---
+
+## Addendum, later the same day — the journeys become clickable (D-211)
+
+Will: "I can't click and preview the paths inside journeys … make it usable."
+
+### What changed
+
+- `apps/web/src/stories/prototype/`: `PrototypeApp` (in-story router — catches
+  same-site link taps, takes `router.*` via Storybook's Next navigation mock,
+  sets Next's pathname/search-param contexts per screen, Back stack, a
+  "not in the prototype yet" screen for unknown paths), `routes.tsx`
+  (`TODAY_ROUTES`, `REDESIGN_ROUTES`, `tabFor`), and six stories: Redesign —
+  member; Today — member, case manager, program, super admin, not signed in.
+- `apps/web/src/lib/navigate.ts`: leave-the-screen helper with a cancelable
+  `pam:navigate` event. `NewMessagePicker` uses it instead of
+  `window.location.assign`.
+
+### What was wrong, and what missed it
+
+- `asRole()` returns an untyped `StoryObj`; spreading it into a story typed
+  by the Prototype meta failed typecheck. The helper now takes only the loader.
+- My first click-through "failed" on Connections: the test clicked the
+  Profile summary's "Connections" stat label (not a link) rather than the
+  tile. The tile was fine — ClickableCard forwards a content tap to its own
+  link with `anchor.click()`, which the prototype catches.
+
+### Verified
+
+| Check | Result |
+|---|---|
+| `@pam/web` typecheck | clean |
+| `build-storybook` | OK |
+| Click-through in Chromium, Redesign — member | Profile → Connections → Back → Explore → place (`?id=s1`) → Trips → Messages → thread (no tab bar) → Back; iframe URL never changes; no page errors |
+| Today — member / not signed in | open on Home / Sign in; Saved reached by tap |
+| Playwright, messages + directory (touches `navigate()`) | 90 pass |
+
+### Left for next time
+
+- Redesigned Explore/Saved/Messages views, once Will sends references —
+  each joins `REDESIGN_ROUTES` with one line.

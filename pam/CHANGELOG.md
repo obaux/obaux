@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.37.1-prototype] — 2026-10-01 · Click through the app in Storybook
+
+Still nothing changes in the app anyone uses. In Storybook, the screens now
+link to each other: open Prototype, pick who you are, and tap through the
+app as it is today or as the redesign — cards, tabs and Back all go where
+they would on a phone.
+
 ## [0.37.0-redesign] — 2026-10-01 · A white page, and Profile redesigned
 
 Every screen now sits on a white page, and cards lift off it with a soft

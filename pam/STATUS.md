@@ -216,6 +216,14 @@ each screen's header; Profile, Connections and an empty Trips page built as
 views under `Redesign/*`. Not yet routes. 507 Playwright tests pass on the
 white page; 216 stories render clean.
 
+**Then (D-211): the app is clickable in Storybook.** `Prototype/*` runs the
+real screens for each kind of account behind an in-story router — tap a
+card, a tab, Back, and the next screen appears with the right `?id=`, on the
+pretend database. `Prototype/Redesign — member` walks the new bottom bar
+(Profile → Connections → Explore → a place → Trips → Messages → a
+conversation and back); `Prototype/Today — *` walks the app as it ships, for
+member, case manager, program and super admin, and signed out.
+
 This is the handover document: what exists, what is proven, what is live, and
 what the next person needs to know before touching anything.
 
@@ -592,7 +600,7 @@ while the copy is unsigned, so it earned the first live test, not the last.*
 | 27 | ~~Approve the new transparency line, then deploy `0067`~~ **Done (Will, 21 September)** | — | Wording approved as proposed. `list_migrations` first: no drift since the 20th. `0067_people_activity.sql` applied; `get_advisors` (security) clean — `people_activity()` is `authenticated`-only. The ring for a new save now lights for real. Also fixed in the same push: `privacy.s.who-can-see.p1` (the long privacy page, not the short transparency screen) still carried "and that a chat exists" — a claim D-167 removed from the short screen on the 17th but missed here. Removed, en/es. |
 | 26 | ~~Deploy `0066`~~ **Done (Will, 21 September)** | — | `list_migrations` first: no drift since the 20th. Applied; `get_advisors` (security) clean — `flagged_services()` and the recreated `conversation_partners()` are `authenticated`-only, `services_search()` is security invoker and so not even listed. `pg_trgm` now lives in `extensions`. Case managers keep the Reported places list read-only — Will's call, recorded as D-190. |
 | 28 | **A Chromatic project token** | Storybook updating on every push | chromatic.com → sign in with GitHub → link `obaux/obaux` → add the token as the repository secret `CHROMATIC_PROJECT_TOKEN`. The workflow (`pam-storybook.yml`) skips itself until then. |
-| 29 | ~~Where the dock's People and My Plan lead~~ **Answered by the redesign (D-210)** | — | Will, 1 October: the bar is Explore, Saved, Trips, Messages, Profile; Help moves to each screen's header and Profile. Next: his reference screenshots for the other screens, then wiring the redesigned views to routes and data. |
+| 29 | ~~Where the dock's People and My Plan lead~~ **Answered by the redesign (D-210)** | — | Will, 1 October: the bar is Explore, Saved, Trips, Messages, Profile; Help moves to each screen's header and Profile. Next: his reference screenshots for the other screens, then wiring the redesigned views to routes and data. Walk it in `Prototype/Redesign — member` (D-211). |
 
 ---
 

@@ -4306,6 +4306,45 @@ travel, not a visit to a program.
 
 ---
 
+### D-211 — The journeys are clickable: one Prototype story per person, running the real screens
+
+Will, 1 October: "I can't click and preview the paths inside journeys … we
+need to mirror the journey on Storybook, and make it usable." A journey was
+one screen, frozen; a tap tried to load a page the iframe does not have.
+
+**What was built.** `Prototype/*` (`apps/web/src/stories/prototype/`): one
+story per kind of account, each running the app's own page components — not
+copies — behind a small in-story router (`PrototypeApp`). A same-site link
+tap is caught before the iframe follows it and the matching screen is drawn;
+`router.push/replace/back` arrive through Storybook's Next.js navigation
+mock, wired to the same router; Next's own path and search-param contexts
+are set per screen, so `useSearchParams()` on the place screen reads the
+`?id=` the tap carried, exactly as in the app. Back pops a history stack.
+The pretend database is the journeys' (`mockSupabase.ts`); nothing reaches
+the live project. A path with no screen yet says so and offers Back — never
+a blank page.
+
+**Two route tables.** `TODAY_ROUTES` is every route the app has, as it is.
+`REDESIGN_ROUTES` is today's plus the redesign's: Explore as home, Trips,
+Profile, Connections, under the new bottom bar (D-210). So the redesign is
+walked end to end beside what ships, and a redesigned screen joins by
+changing one line of the table.
+
+**One change to the app, for this.** `NewMessagePicker` left a screen with
+`window.location.assign`, which no story can intercept. It now calls
+`navigate()` (`src/lib/navigate.ts`), which announces the move as a
+cancelable `pam:navigate` event first: in the app nobody cancels it and the
+page loads as before (messages and directory e2e, 90 pass); in the
+prototype it is cancelled and routed. New code that leaves a screen from
+script uses `navigate()` or `router.push`, never `location` directly.
+
+**Why not Storybook's own story-linking** (`addon-links`)? It jumps between
+stories, so every path needs a hand-written link, and a screen reached with
+a different `?id=` needs its own story. Running the real router contract
+means every link that works in the app works here, with no upkeep.
+
+---
+
 ## Notes for whoever picks this up next
 
 - `pnpm --filter @pam/db test` is the highest-value check in the repo. It is the
