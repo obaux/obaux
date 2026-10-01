@@ -1,6 +1,6 @@
 # PAM — where the project stands
 
-Last updated 2026-09-21. The member-facing product is real now: signing up
+Last updated 2026-10-01. The member-facing product is real now: signing up
 and signing out, invite codes for all four kinds of account, saving, points,
 badges, reporting a place, and a screen for the person running PAM. Every place
 now says what it is and has a screen of its own. Notifications are readable —
@@ -197,6 +197,16 @@ sized for a bar this screen never draws); the send icon is sized to match
 the mic icon (Astryx has no separate weight prop — checked directly); and
 the message list runs `density="compact"`, which tightens the row gap and
 widens the bubbles at once. Playwright: 507.
+
+**1 October (branch `claude/pam-storybook`, D-208, D-209): Storybook is the
+review surface now.** Every `@pam/ui` component (152 stories), every screen
+as each role that reaches it (43 journeys, real screens against a pretend
+Supabase that never touches the live project), and the member dock
+(`TabBar`, new — the five tabs and Help, shaped there and not yet mounted in
+the app). Published to Chromatic on every push once Will adds
+`CHROMATIC_PROJECT_TOKEN`. What ships is still the branch, merged as usual —
+nothing is exported from Storybook. 205 stories render with no page errors.
+Session log: `docs/sessions/2026-10-01-storybook.md`.
 
 This is the handover document: what exists, what is proven, what is live, and
 what the next person needs to know before touching anything.
@@ -442,7 +452,8 @@ oversight:
   back into the first load (D-125). Packages now declare subpath exports, and
   `@pam/config/hours` is deliberately absent from that package's barrel. The
   next component on a shared screen still breaches the budget.
-- **No five-tab member shell.** `AppShell` + `TabList` is the first UI task of
+- **The five-tab member shell exists but is not mounted** (`@pam/ui/TabBar`,
+  D-209 — see it in Storybook under Shell). Before that: `AppShell` + `TabList` was the first UI task of
   Phase 1. The layout is settled and the pieces are ready: Help is now a compact
   item sized to share the bottom bar rather than a full-width row (D-039), and
   the five navigation icons exist. Only the dock itself is unbuilt.
@@ -572,6 +583,8 @@ while the copy is unsigned, so it earned the first live test, not the last.*
 | 25 | **D-178's audience** | Who reads a reported message | The reporter's case manager is included alongside the sender's. Say if it should be the sender's only. |
 | 27 | ~~Approve the new transparency line, then deploy `0067`~~ **Done (Will, 21 September)** | — | Wording approved as proposed. `list_migrations` first: no drift since the 20th. `0067_people_activity.sql` applied; `get_advisors` (security) clean — `people_activity()` is `authenticated`-only. The ring for a new save now lights for real. Also fixed in the same push: `privacy.s.who-can-see.p1` (the long privacy page, not the short transparency screen) still carried "and that a chat exists" — a claim D-167 removed from the short screen on the 17th but missed here. Removed, en/es. |
 | 26 | ~~Deploy `0066`~~ **Done (Will, 21 September)** | — | `list_migrations` first: no drift since the 20th. Applied; `get_advisors` (security) clean — `flagged_services()` and the recreated `conversation_partners()` are `authenticated`-only, `services_search()` is security invoker and so not even listed. `pg_trgm` now lives in `extensions`. Case managers keep the Reported places list read-only — Will's call, recorded as D-190. |
+| 28 | **A Chromatic project token** | Storybook updating on every push | chromatic.com → sign in with GitHub → link `obaux/obaux` → add the token as the repository secret `CHROMATIC_PROJECT_TOKEN`. The workflow (`pam-storybook.yml`) skips itself until then. |
+| 29 | **Where the dock's People and My Plan lead, and whether screens drop their own Help once it is mounted** | Mounting `TabBar` | D-209. People defaults to `/messages/`; My Plan to `/plan/`, which has never been built. |
 
 ---
 

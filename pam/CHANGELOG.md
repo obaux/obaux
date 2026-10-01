@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.36.0-storybook] — 2026-10-01 · Storybook
+
+No change to the app anyone uses. Every component, every screen for every
+kind of account, and a first version of the bottom navigation bar are now
+browsable in Storybook, in English and Spanish, light and dark, at phone
+size — so design changes can be looked at without signing in to anything.
+
 ## [0.35.1] — 2026-09-21 · More touchups from the phone
 
 Messages loses its help bar too — a fourth screen without one (A15); tap
