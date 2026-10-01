@@ -1,0 +1,71 @@
+name: PAM Storybook
+
+# Publishes PAM's Storybook to Chromatic on every push that touches pam/**,
+# so a design change made in a session is viewable a couple of minutes after
+# it is pushed — every branch gets its own build and link.
+#
+# Needs one repository secret: CHROMATIC_PROJECT_TOKEN (from chromatic.com,
+# after linking this repository). Without it the job says so and stops,
+# rather than failing every push.
+on:
+  push:
+    paths: ['pam/**', '.github/workflows/pam-storybook.yml']
+  workflow_dispatch:
+
+concurrency:
+  group: pam-storybook-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  chromatic:
+    name: Publish Storybook
+    runs-on: ubuntu-latest
+    steps:
+      - name: Is Chromatic set up?
+        id: token
+        env:
+          TOKEN: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+        run: |
+          if [ -z "$TOKEN" ]; then
+            echo "CHROMATIC_PROJECT_TOKEN is not set; skipping the publish."
+            echo "present=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "present=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v4
+        if: steps.token.outputs.present == 'true'
+        with:
+          # Chromatic compares against earlier builds, so it needs history.
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+        if: steps.token.outputs.present == 'true'
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        if: steps.token.outputs.present == 'true'
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pam/pnpm-lock.yaml
+
+      - name: Install
+        if: steps.token.outputs.present == 'true'
+        working-directory: pam
+        run: pnpm install --frozen-lockfile
+
+      - name: Publish to Chromatic
+        if: steps.token.outputs.present == 'true'
+        working-directory: pam/apps/web
+        env:
+          CHROMATIC_PROJECT_TOKEN: ${{ secrets.CHROMATIC_PROJECT_TOKEN }}
+          STORYBOOK_DISABLE_TELEMETRY: '1'
+          # The screens build their Supabase client from these; stories stub
+          # every request, so a placeholder is all the client needs.
+          NEXT_PUBLIC_SUPABASE_URL: https://stub.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: stub-anon-key-for-storybook
+        # Visual changes are design iteration here, not failures: the build
+        # publishes and links either way, and Chromatic lists what changed.
+        run: pnpm exec chromatic --build-script-name build-storybook --exit-zero-on-changes --auto-accept-changes main

@@ -9,7 +9,9 @@
     "typecheck": "tsc -p tsconfig.json",
     "test": "vitest run --passWithNoTests",
     "test:a11y": "playwright test",
-    "lint": "next lint"
+    "lint": "next lint",
+    "storybook": "storybook dev -p 6006 --no-open",
+    "build-storybook": "storybook build -o storybook-static"
   },
   "dependencies": {
     "@astryxdesign/core": "^0.6.0",
@@ -30,14 +32,18 @@
     "@babel/preset-react": "^7.29.7",
     "@babel/preset-typescript": "^7.29.7",
     "@playwright/test": "^1.49.1",
+    "@storybook/addon-a11y": "10.6.1",
+    "@storybook/nextjs": "10.6.1",
     "@stylexjs/babel-plugin": "^0.19.0",
     "@stylexjs/postcss-plugin": "^0.19.0",
     "@types/node": "^22.10.2",
     "@types/react": "^19.0.2",
     "@types/react-dom": "^19.0.2",
     "autoprefixer": "^10.5.6",
+    "chromatic": "^18.10.1",
     "postcss": "^8.4.49",
     "serve": "^14.2.6",
+    "storybook": "10.6.1",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"
   }
