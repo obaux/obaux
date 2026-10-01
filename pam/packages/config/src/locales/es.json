@@ -548,6 +548,7 @@
   "signin.title": "Entrar",
   "signin.verifying": "Entrando...",
   "step.progress": "Paso {current} de {total}",
+  "tab.label": "Principal",
   "tab.home": "Inicio",
   "tab.me": "Yo",
   "tab.people": "Personas",

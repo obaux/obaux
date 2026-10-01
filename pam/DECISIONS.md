@@ -4188,6 +4188,73 @@ prove nothing about the gap itself). Report — the one 48px control living
 inside a message row — is re-checked at its own floor in the same test;
 row spacing does not change a control's own size.
 
+
+### D-208 — Storybook is where the front end is shaped; the code is still what ships
+Will, 1 October: "install storybook so front end components are transferred
+there, and get updated in real time … I'll also create journeys (screen views)
+there, and a full app shell … merge the journeys/app shell to production
+straight from storybook." Built on `claude/pam-storybook`, hosted on
+Chromatic (Will's choice over a second Vercel project).
+
+Two things it is not, said before building so nobody plans around them:
+
+- **Nothing merges from Storybook to production.** Stories render the real
+  components and the real screens (`src/app/**/page.tsx`, imported directly).
+  When a journey looks right in Storybook, what ships is the branch that made
+  it look right — merged the way every branch is. Controls in Storybook's own
+  panel change a preview, never the code.
+- **"Real time" is a push away, not a keystroke away.** Storybook runs in this
+  session's sandbox, which Will's browser cannot reach; Chromatic rebuilds it on
+  every push to any branch touching `pam/**` (`.github/workflows/pam-storybook.yml`)
+  and links each build. The workflow skips itself until `CHROMATIC_PROJECT_TOKEN`
+  is set.
+
+How it is built, and why each part is the way it is:
+
+- **`@storybook/nextjs`, with StyleX run as a Babel pre-step.** The framework
+  only uses Babel for a file named exactly `.babelrc` or `babel.config.js`;
+  this app's is `.babelrc.js`, so it compiled with SWC and every story died on
+  "`stylex.keyframes` must be compiled by `@stylexjs/babel-plugin`". Renaming
+  the app's config would change the production build; instead `main.ts` runs
+  the StyleX plugin alone, with the app's own options read from `.babelrc.js`,
+  ahead of SWC. Proven by measuring a rendered `BigButton`: 64px, PAM green,
+  Figtree, 18px — the unthemed-build failure (D-008) is the one this setup
+  most had to rule out.
+- **The same providers as the app** (`Theme`, motion, i18n, alert banner),
+  with English/Spanish and light/dark switches in the toolbar and phone
+  viewports by default (320, 375, 393).
+- **Journeys are real screens against a pretend database.** A loader seeds a
+  signed-in session for the chosen role and answers every Supabase request
+  from `src/stories/journeys/fixtures.ts` — the same people, places and
+  conversation `scripts/journeys.mjs` photographs, so the contact sheet and
+  Storybook show one product. A request with no fixture gets an empty answer
+  and a console note, **never the network**: the app's client points at the
+  live project by default, and a design tool must not read or write it.
+  19 screens × the roles that reach them: 43 journey stories at first count,
+  every one render-checked in a browser with no page errors.
+
+### D-209 — The member dock (`TabBar`) exists, in Storybook, not yet in the app
+The five-tab shell has been "the first UI task of Phase 1" since September
+(STATUS). Built now, from what D-029 and D-039 already settled: §3.1's five
+tabs (Home, Places, People, My Plan, Me — the `tab.*` keys and icons already
+existed) and Help in **one** fixed dock, on Astryx's `TabList`
+(`layout="fill"`, link tabs, so it works with no JavaScript), composing
+`HelpBar` rather than copying it. Icons 22px, each above its label. At 320px
+every tab measures 49×56 and Help 64×48 — it took tightening Help's own
+padding to get there; the first cut had tabs 42px wide.
+
+It is a subpath export (`@pam/ui/TabBar`), not mounted on any route: shaped
+in Storybook first (`Shell/TabBar`, and `Shell/Member app`, which puts real
+screens inside it). Three questions it makes visible, for Will:
+
+1. **Where People and My Plan lead.** People defaults to `/messages/` (a
+   member's people are their case manager and programs); My Plan to `/plan/`,
+   which does not exist — §3.1's plan has never been built.
+2. **Screens draw their own Help too.** With the dock, the block `HelpBar` on
+   Home and elsewhere doubles up; it comes off once the dock is mounted.
+3. **Staff roles.** §3.1's tabs are the member app. Case managers and program
+   admins have no dock design yet.
+
 ---
 
 ## Notes for whoever picks this up next

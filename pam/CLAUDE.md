@@ -110,6 +110,26 @@ assuming a clean base.
 - **`packages/db/migrations/0007_rls.sql`** — the whole access-control surface
   in one file, because a policy set is only reviewable as a set.
 
+## Storybook is where front-end work is shown
+
+Will reviews UI in Storybook (Chromatic, rebuilt on every push — D-208), not
+by signing in on the live site. So:
+
+- **A new or changed component gets a story** in
+  `apps/web/src/stories/components/`; a new or changed screen gets a journey in
+  `apps/web/src/stories/journeys/` (one story per role that reaches it), with
+  any new Supabase call given a fixture in `fixtures.ts` / `mockSupabase.ts`.
+  An unmatched call is answered empty and logged as `[journey] no fixture` —
+  fix that, don't ignore it.
+- **Journeys never touch the live project.** Keep it that way: no real keys,
+  no real requests from a story.
+- `pnpm --filter @pam/web build-storybook` must pass before pushing. Check a
+  story renders by serving `storybook-static` with `python3 -m http.server`
+  (`npx serve` drops the query string Storybook needs) and opening
+  `iframe.html?id=<story-id>`.
+- What ships is still the branch, merged the usual way. Nothing is exported
+  from Storybook.
+
 ## Rules that are not negotiable
 
 These come from the build SOP and are enforced by tests, not convention:
