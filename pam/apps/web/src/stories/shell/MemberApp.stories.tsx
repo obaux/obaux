@@ -6,9 +6,8 @@ import SavedPage from '../../app/saved/page';
 import MessagesPage from '../../app/messages/page';
 import { ProfileView } from '../../screens/ProfileView';
 import { TripsView } from '../../screens/TripsView';
-import { asRole } from '../journeys/journey';
+import { asRedesign } from '../journeys/journey';
 import { HeaderActions } from './HeaderActions';
-import { LocalTabBar } from './LocalTabBar';
 
 /**
  * The member app in the redesign's frame (D-210): a screen, signed in as a
@@ -18,13 +17,10 @@ import { LocalTabBar } from './LocalTabBar';
  * still show today's screens (their own header, their own Help) — the next
  * ones Will is sending references for.
  */
-function MemberApp({ screen, tab }: { readonly screen: () => ReactNode; readonly tab: TabKey }) {
-  return (
-    <>
-      {screen()}
-      <LocalTabBar current={tab} />
-    </>
-  );
+function MemberApp({ screen }: { readonly screen: () => ReactNode; readonly tab: TabKey }) {
+  // The bottom bar comes from the prototype frame (`asRedesign`), so it
+  // follows every tap; `tab` names which screen this story opens on.
+  return <>{screen()}</>;
 }
 
 const meta = {
@@ -36,7 +32,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 export const Profile: Story = {
-  ...asRole('member', '/profile/'),
+  ...asRedesign('member', '/profile/'),
   name: 'Profile',
   args: {
     tab: 'profile',
@@ -54,22 +50,22 @@ export const Profile: Story = {
   },
 };
 export const Trips: Story = {
-  ...asRole('member', '/trips/'),
+  ...asRedesign('member', '/trips/'),
   name: 'Trips',
   args: { tab: 'trips', screen: () => <TripsView headerActions={<HeaderActions />} /> },
 };
 export const Explore: Story = {
-  ...asRole('member', '/places/'),
+  ...asRedesign('member', '/places/'),
   name: 'Explore (today’s Places)',
   args: { tab: 'explore', screen: () => <PlacesPage /> },
 };
 export const Saved: Story = {
-  ...asRole('member', '/saved/'),
+  ...asRedesign('member', '/saved/'),
   name: 'Saved (today’s screen)',
   args: { tab: 'saved', screen: () => <SavedPage /> },
 };
 export const Messages: Story = {
-  ...asRole('member', '/messages/'),
+  ...asRedesign('member', '/messages/'),
   name: 'Messages (today’s screen)',
   args: { tab: 'messages', screen: () => <MessagesPage /> },
 };

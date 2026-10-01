@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.38.0-explore] — 2026-10-01 · Explore, and Home for staff (in Storybook)
+
+In Storybook, not yet in the app. Explore is the member's new home: a big
+search bar at the top that suggests programs as you type — by name, or by
+street — with a button to clear it, a row of chips for the kinds of places,
+and a clear message whenever there is nothing to show or no connection,
+with a way forward each time. Case managers and programs get Home instead:
+their people, with the same search bar. And every screen in Storybook can
+now be tapped through — no more "page not found".
+
 ## [0.37.1-prototype] — 2026-10-01 · Click through the app in Storybook
 
 Still nothing changes in the app anyone uses. In Storybook, the screens now

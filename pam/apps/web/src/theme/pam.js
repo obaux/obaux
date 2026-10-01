@@ -517,6 +517,30 @@ export const pamTheme = {
         "padding": "var(--spacing-3)"
       }
     },
+    "input-group": {
+      "size:lg": {
+        "borderRadius": "999px",
+        "minHeight": "60px",
+        "paddingInlineStart": "8px",
+        "paddingInlineEnd": "4px",
+        "borderWidth": "0px",
+        "backgroundColor": "light-dark(#FFFFFF, #262626)",
+        "boxShadow": "0 2px 4px light-dark(oklch(0 0 0 / 6%), oklch(0 0 0 / 30%)), 0 10px 28px light-dark(oklch(0 0 0 / 14%), oklch(0 0 0 / 45%)), inset 0 0 0 1px light-dark(oklch(0 0 0 / 5%), oklch(1 0 0 / 10%))"
+      }
+    },
+    "typeahead": {
+      "size:lg": {
+        "fontSize": "18px",
+        "borderWidth": "0px",
+        "backgroundColor": "transparent",
+        "boxShadow": "none"
+      }
+    },
+    "typeahead-dropdown": {
+      "base": {
+        "borderRadius": "20px"
+      }
+    },
     "spinner": {
       "size:xl": {
         "--spinner-diameter": "40px",

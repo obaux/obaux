@@ -1,8 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/nextjs';
 import { ProfileView } from '../../screens/ProfileView';
 import { HeaderActions } from '../shell/HeaderActions';
-import { LocalTabBar } from '../shell/LocalTabBar';
-import { asRole } from '../journeys/journey';
+import { asRedesign } from '../journeys/journey';
 
 /**
  * Profile, redesigned (D-210). Scroll it: the large title shrinks into the
@@ -11,14 +10,6 @@ import { asRole } from '../journeys/journey';
 const meta = {
   title: 'Redesign/Profile',
   component: ProfileView,
-  decorators: [
-    (Story) => (
-      <>
-        <Story />
-        <LocalTabBar current="profile" />
-      </>
-    ),
-  ],
   args: {
     name: 'Marcus',
     role: 'member',
@@ -33,14 +24,14 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Member: Story = { ...asRole('member', '/profile/') };
-export const RemindersAlreadyOn: Story = { ...asRole('member', '/profile/'), args: { remindersOn: true } };
+export const Member: Story = { ...asRedesign('member', '/profile/') };
+export const RemindersAlreadyOn: Story = { ...asRedesign('member', '/profile/'), args: { remindersOn: true } };
 export const NewMember: Story = {
-  ...asRole('member', '/profile/'),
+  ...asRedesign('member', '/profile/'),
   args: { points: 0, savedCount: 0, connectionsCount: 0 },
 };
 export const LongName: Story = {
-  ...asRole('member', '/profile/'),
+  ...asRedesign('member', '/profile/'),
   args: { name: 'Maria Guadalupe Hernandez-Washington' },
 };
-export const Spanish: Story = { ...asRole('member', '/profile/'), globals: { locale: 'es' } };
+export const Spanish: Story = { ...asRedesign('member', '/profile/'), globals: { locale: 'es' } };

@@ -124,6 +124,36 @@ export const pamTheme = defineTheme({
           '0 1px 2px light-dark(oklch(0 0 0 / 6%), oklch(0 0 0 / 30%)), 0 6px 20px light-dark(oklch(0 0 0 / 9%), oklch(0 0 0 / 40%)), inset 0 0 0 1px light-dark(transparent, oklch(1 0 0 / 9%))',
       },
     },
+    /*
+     * The search bar (D-212, `SearchPill`): the reference's big rounded bar,
+     * lifted by a stronger shadow than a card's because it is the one thing
+     * on the screen to reach for first. Only the large group is drawn this
+     * way; no other screen uses one.
+     */
+    'input-group': {
+      'size:lg': {
+        borderRadius: '999px',
+        minHeight: '60px',
+        paddingInlineStart: '8px',
+        paddingInlineEnd: '4px',
+        borderWidth: '0px',
+        backgroundColor: 'light-dark(#FFFFFF, #262626)',
+        boxShadow:
+          '0 2px 4px light-dark(oklch(0 0 0 / 6%), oklch(0 0 0 / 30%)), 0 10px 28px light-dark(oklch(0 0 0 / 14%), oklch(0 0 0 / 45%)), inset 0 0 0 1px light-dark(oklch(0 0 0 / 5%), oklch(1 0 0 / 10%))',
+      },
+    },
+    // Inside the pill, the field draws nothing of its own: the pill is the box.
+    typeahead: {
+      'size:lg': {
+        fontSize: '18px',
+        borderWidth: '0px',
+        backgroundColor: 'transparent',
+        boxShadow: 'none',
+      },
+    },
+    'typeahead-dropdown': {
+      base: { borderRadius: '20px' },
+    },
     button: {
       // Primary: the fill is the brand, and the press is the same colour
       // getting firmer. `light-dark()` because these differ by mode and a

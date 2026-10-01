@@ -23,7 +23,10 @@ import TermsPage from '../../app/terms/page';
 import { ProfileView } from '../../screens/ProfileView';
 import { ConnectionsView } from '../../screens/ConnectionsView';
 import { TripsView } from '../../screens/TripsView';
+import { HomeScreen } from '../../screens/HomeScreen';
 import { HeaderActions } from '../shell/HeaderActions';
+import { LocalTabBar } from '../shell/LocalTabBar';
+import { ROLES, type JourneyRole } from '../journeys/fixtures';
 import { prototypeRouter, type PrototypeRoute } from './PrototypeApp';
 
 const screen = (render: () => ReactNode): PrototypeRoute => ({ render });
@@ -59,8 +62,9 @@ export const TODAY_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
  */
 export const REDESIGN_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   ...TODAY_ROUTES,
-  // Explore is the new home. Until its own reference arrives, it is Places.
-  '/': screen(() => <PlacesPage />),
+  // The first tab (D-212): Explore for a member, the caseload for a case
+  // manager, who wants in for a program — whoever the story signed in.
+  '/': screen(() => <HomeScreen />),
   '/trips/': screen(() => <TripsView headerActions={<HeaderActions />} />),
   '/profile/': screen(() => (
     <ProfileView
@@ -91,6 +95,9 @@ export function tabFor(pathname: string) {
     case '/':
     case '/places/':
     case '/place/':
+    case '/person/':
+    case '/admin/':
+    case '/interested/':
       return 'explore' as const;
     case '/saved/':
       return 'saved' as const;
@@ -107,4 +114,18 @@ export function tabFor(pathname: string) {
       // sign-in, sign-up, help and the legal pages stand alone.
       return null;
   }
+}
+
+/**
+ * The redesign's bottom bar, for whoever is signed in (D-212): staff read
+ * Home on the first tab. Nothing on screens that stand alone (`tabFor`).
+ */
+export function redesignChrome(role: JourneyRole) {
+  const isHome = role === 'case-manager' || role === 'provider';
+  const name = ROLES[role].profile?.first_name ?? '';
+  return (pathname: string) => {
+    if (role === 'signed-out') return null;
+    const tab = tabFor(pathname);
+    return tab ? <LocalTabBar current={tab} isHome={isHome} name={name} /> : null;
+  };
 }

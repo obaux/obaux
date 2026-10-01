@@ -56,6 +56,8 @@ import { sharePlace } from '@/lib/sharePlace';
  */
 const BACK_TARGETS = {
   home: { href: '/', labelKey: 'nav.back.home' },
+  // The redesign's Explore, which is the home screen there (D-212).
+  explore: { href: '/', labelKey: 'nav.back.explore' },
   places: { href: '/places/', labelKey: 'nav.back.places' },
   saved: { href: '/saved/', labelKey: 'nav.back.saved' },
 } as const;

@@ -178,3 +178,62 @@ Will: "I can't click and preview the paths inside journeys … make it usable."
 
 - Redesigned Explore/Saved/Messages views, once Will sends references —
   each joins `REDESIGN_ROUTES` with one line.
+
+---
+
+## Addendum — Explore, Home for staff, and the 404s (D-212)
+
+Will: "I'm still getting 404 error, so I can't navigate on screens", then
+Explore from an Airbnb reference (search first, clear + dropdown by name or
+address, error and empty states, category chips), a caseload Home for case
+managers and an interested-members Home for programs ("rename bottom nav
+explore to home"), and "ignore size limits for this redesign".
+
+### What changed
+
+- **404s**: `journeys/journey.tsx` (was `.ts`) wraps every journey in
+  `PrototypeApp` (new `first` prop: the story's own render until the first
+  tap); `asRedesign` for redesign stories (redesign routes + bottom bar);
+  `preview.tsx` cancels any unhandled same-site link. Redesign and
+  `Shell/Member app` stories no longer draw their own fixed tab bar.
+- **@pam/ui**: `SearchPill`, `CategoryChips` (new, with stories); six icons
+  (all places, education, workforce, family services, offline, no results);
+  `TabBar` gains `isHome` and a spacer so lists scroll clear of it.
+- **apps/web/src/screens**: `ExploreView`, `ExploreScreen`, `PeopleHomeView`,
+  `HomeScreen` (`CaseloadHome`, `ProgramHome`), `HeaderActions` (moved from
+  stories, Help icon now 24px).
+- `lib/usePlaces`: `searchPlaces()` for suggestions, `reload` for Try again.
+  `lib/caseloadLabels` (moved out of `/admin/`). `/place/` accepts
+  `from=explore`.
+- Theme: the large `input-group` is the pill; `typeahead` lg draws nothing
+  inside it; `globals.css` moves the focus ring onto the pill.
+- Mock database: `services_near`/`services_search` honour category and the
+  typed words (name or address), so search and its empty state work.
+- 23 locale keys, en and es.
+
+### What was wrong, and what missed it
+
+- Edited `pam.theme.ts` without running `astryx theme build` — the pill had
+  no shape until the generated CSS was rebuilt. Caught in a screenshot.
+- The field sat in an `HStack` that would not stretch it; switched to a
+  `VStack` slot. The global "ring the frame" rule ringed the Typeahead's
+  inner box inside the pill; moved it to the pill.
+- Ran Prettier with no config on `TabBar.tsx`: it rewrote every quote.
+  Re-run with the repo's style; the diff is the change only.
+
+### Verified
+
+| Check | Result |
+|---|---|
+| `pnpm -r typecheck` | clean |
+| config / ui / web unit tests | 231 / 65 / 8 pass |
+| `build-storybook` | OK; **242 stories, 0 page errors, 0 unanswered calls** |
+| Click-through | Places journey → place → Back; Home journey → Places; component link stays put; case manager Home ↔ Profile; program → person; member Explore → place → Back to Explore |
+| Search | "main" suggests by address; "broad" too; × empties it; "zzz" → nothing-matches state → Clear search; Work chip filters |
+| Playwright: admin, place, places, a11y, area picker | **174 pass** |
+| `@pam/web build` + budget | OK, 93.2 kB to spare (screens not routed yet) |
+
+### Left for next time
+
+- Saved and Messages references, then routing the redesign into the app.
+- The suggestion dropdown is as wide as the field; wider would read better.

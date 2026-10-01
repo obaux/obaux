@@ -4345,6 +4345,72 @@ means every link that works in the app works here, with no upkeep.
 
 ---
 
+### D-212 — Explore, and a Home for staff: search first, category chips, every state drawn; no story ever 404s
+
+Will, 1 October, with an Airbnb Explore screenshot: "I'm still getting 404
+error, so I can't navigate on screens. Also let's do Explore (previously,
+home). Search bar is the most important … allowing clearing search and
+showing a dropdown of programs … address typing should show a dropdown with
+program name and matching address … create an empty state … use the chips
+for Place categories. … The case manager view features the list of members
+on their caseload (rename bottom nav explore to "home"). The program view
+features the list of members interested in program." Then: "Let's ignore
+size limits for this redesign."
+
+**The 404.** D-211 made `Prototype/*` clickable, but every other story —
+the 19 journeys, the redesign screens — still let a tap navigate the
+iframe to `/places/`, which Storybook answers with a 404. Two fixes, both
+needed: every journey now opens inside the prototype's router (`asRole`
+wraps it; the screen first, as the story draws it, then the route table),
+so a journey is walkable from wherever it starts; and `preview.tsx` cancels
+any same-site link nothing else handled, so a component story's link is
+inert rather than a 404. Redesign stories use `asRedesign`, which routes
+through the redesign and draws the new bottom bar on every screen it
+reaches.
+
+**Explore** (`screens/ExploreView` + `ExploreScreen`): the search bar first
+and largest, the chips under it, both pinned while the list scrolls.
+
+- **Search** is `SearchPill` (`@pam/ui`), an Astryx `Typeahead` in an
+  `InputGroup` drawn as a shadowed pill (theme: `input-group` `size:lg`).
+  Suggestions drop down from the first letter — name, and the address under
+  it, so a street finds a program and shows why. Picking one opens the place.
+  The list below follows the same words once they settle (`services_search`,
+  0066, as Places did — D-188). **Clear** is an × inside the bar whenever it
+  holds anything: Astryx's own appears only after a pick, and nothing is
+  ever kept picked here.
+- **Chips** (`CategoryChips`, `@pam/ui`): All and the three categories
+  (§2.5), each with a new line icon. 48px — the Places 40px exception
+  (D-104) is not carried over; these are now the screen's main filter.
+  They scroll sideways at 320px and in Spanish.
+- **States**: loading (skeletons); can't connect / something went wrong
+  (the existing notices' words, Try again, and the phone); nothing matches
+  "…" (Clear search); a category with nothing (Show all places). None is a
+  dead end. All are stories (`Redesign/Explore`).
+- **What Places did that Explore keeps**: the area chip and picker (D-054,
+  D-100), saving (D-102), placeholder hours (D-122). The super admin's
+  Reported chip (D-189) stays on `/places/` for now.
+
+**Home for staff** (`screens/PeopleHomeView`, `HomeScreen`): the same bar
+over the person's own people — a case manager's caseload (real rows, else
+the example set, as `/admin/`), a program's interested members (the example
+set, as `/interested/`, until something writes "interested"). The search
+filters the list as you type and drops down matching names; nothing is
+sent anywhere. The bottom bar's first tab reads **Home**, drawn as a house
+(`TabBar isHome`). Real caseload rows do not link to `/person/` — it only
+resolves example people (same rule as `/admin/`).
+
+**`HomeScreen` picks by role**: member → Explore, case manager → caseload,
+program → interested; a super admin previewing a role gets that role's; on
+their own account, Explore.
+
+**Size limits.** Will lifted them for the redesign. The Typeahead and its
+dropdown add weight; nothing here is mounted in the app yet (the budget
+check still passes, 93.2 kB to spare), and the touch-target floor (48px) is
+kept — that one is about hands, not bytes.
+
+---
+
 ## Notes for whoever picks this up next
 
 - `pnpm --filter @pam/db test` is the highest-value check in the repo. It is the

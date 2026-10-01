@@ -1,0 +1,202 @@
+'use client';
+
+import type { ReactNode } from 'react';
+import * as stylex from '@stylexjs/stylex';
+import { Button } from '@astryxdesign/core/Button';
+import { EmptyState } from '@astryxdesign/core/EmptyState';
+import { Heading } from '@astryxdesign/core/Heading';
+import { HStack } from '@astryxdesign/core/HStack';
+import { Text } from '@astryxdesign/core/Text';
+import { VStack } from '@astryxdesign/core/VStack';
+import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
+import {
+  AllPlacesIcon,
+  EducationIcon,
+  FamilyServicesIcon,
+  NoResultsIcon,
+  OfflineIcon,
+  Page,
+  WorkforceIcon,
+} from '@pam/ui';
+import { CategoryChips, type CategoryChip } from '@pam/ui/CategoryChips';
+import { PlaceCardSkeletonList } from '@pam/ui/Skeletons';
+import { CATEGORY_LIST, NOTICES, type Category } from '@pam/config';
+import type { NearbyPlace, PlacesState } from '@/lib/usePlaces';
+import { useI18n } from '@/lib/i18n';
+
+/**
+ * Explore — the member's home since the redesign (D-210, D-212).
+ *
+ * Modelled on the reference Will gave (1 October): the search bar first and
+ * largest, a row of category chips under it, then the places. The bar and
+ * chips stay pinned at the top while the list scrolls under them.
+ *
+ * A view: what it shows comes in as props, so Storybook can draw every state
+ * — ready, loading, nothing found, can't connect — without a database.
+ * `ExploreScreen` is the same view wired to the app's data.
+ *
+ * **Never a dead end** (§0): the error state offers Try again and the phone;
+ * "nothing matches" offers Clear search; an empty category offers All. The
+ * header's Help is on every state.
+ */
+export type ExploreCategory = Category | 'all';
+
+export interface ExploreViewProps {
+  /** The search bar — `SearchPill`, wired by the caller. */
+  readonly search: ReactNode;
+  /** The bell and Help, beside the bar. */
+  readonly actions?: ReactNode;
+  readonly category: ExploreCategory;
+  readonly onCategory: (category: ExploreCategory) => void;
+  /** "Near City Hall ▾" — where the list is measured from, and how to change it. */
+  readonly area?: ReactNode;
+  /** Drawn under the chips when open: the area picker. */
+  readonly areaPanel?: ReactNode;
+  /** A message that belongs above the list — "Couldn't save that". */
+  readonly notice?: ReactNode;
+  /** The words the list was searched for, once they settled; '' for none. */
+  readonly query: string;
+  readonly state: PlacesState;
+  readonly renderPlace: (place: NearbyPlace, index: number) => ReactNode;
+  readonly onRetry: () => void;
+  readonly onClearSearch: () => void;
+  /** E.164 support line, for the error state's call button. */
+  readonly supportPhone?: string | null;
+}
+
+const ICON = { width: 22, height: 22, 'aria-hidden': true } as const;
+
+export const CATEGORY_ICONS: Readonly<Record<ExploreCategory, ReactNode>> = {
+  all: <AllPlacesIcon {...ICON} />,
+  education: <EducationIcon {...ICON} />,
+  workforce: <WorkforceIcon {...ICON} />,
+  family_services: <FamilyServicesIcon {...ICON} />,
+};
+
+const styles = stylex.create({
+  // The bar and chips stay put while the list scrolls under them.
+  top: {
+    position: 'sticky',
+    top: 0,
+    zIndex: 5,
+    marginTop: '-12px',
+    paddingTop: '12px',
+    backgroundColor: colorVars['--color-background-body'],
+  },
+  search: { flexGrow: 1, minWidth: 0 },
+  heading: { fontSize: '22px', lineHeight: 1.25, fontWeight: 700 },
+  source: { fontSize: '15px', lineHeight: 1.5 },
+  state: { paddingBlock: '32px' },
+  stateIcon: { width: '72px', height: '72px', color: colorVars['--color-icon-accent'] },
+});
+
+export function ExploreView({
+  search,
+  actions,
+  category,
+  onCategory,
+  area,
+  areaPanel,
+  notice,
+  query,
+  state,
+  renderPlace,
+  onRetry,
+  onClearSearch,
+  supportPhone,
+}: ExploreViewProps) {
+  const { t } = useI18n();
+  const searching = query.trim() !== '';
+
+  const chips: readonly CategoryChip<ExploreCategory>[] = [
+    { key: 'all', label: t('places.all'), icon: CATEGORY_ICONS.all },
+    ...CATEGORY_LIST.map((definition) => ({
+      key: definition.key,
+      label: t(definition.labelKey),
+      icon: CATEGORY_ICONS[definition.key],
+    })),
+  ];
+
+  return (
+    <Page gap={4}>
+      <VStack gap={2} xstyle={styles.top}>
+        <HStack gap={2} align="center" wrap="nowrap">
+          <VStack xstyle={styles.search}>{search}</VStack>
+          {actions}
+        </HStack>
+        <CategoryChips chips={chips} value={category} onChange={onCategory} label={t('explore.categories')} />
+      </VStack>
+
+      {areaPanel}
+      {notice}
+
+      <HStack gap={2} align="center" justify="between" wrap="wrap">
+        {searching ? (
+          <Heading level={1} xstyle={styles.heading}>
+            {t('explore.results', { query: query.trim() })}
+          </Heading>
+        ) : (
+          <Heading level={1} xstyle={styles.heading}>
+            {chips.find((chip) => chip.key === category)?.label ?? t('places.all')}
+          </Heading>
+        )}
+        {area}
+      </HStack>
+
+      {state.status === 'loading' ? <PlaceCardSkeletonList label={t('common.loading')} count={4} /> : null}
+
+      {state.status === 'error' ? (
+        <EmptyState
+          headingLevel={2}
+          xstyle={styles.state}
+          icon={<OfflineIcon {...stylex.props(styles.stateIcon)} aria-hidden />}
+          title={t(NOTICES[state.offline ? 'offline' : 'something_went_wrong'].titleKey)}
+          description={t(NOTICES[state.offline ? 'offline' : 'something_went_wrong'].bodyKey)}
+          actions={
+            <>
+              <Button label={t('explore.error.retry')} variant="primary" onClick={onRetry} />
+              {supportPhone ? (
+                <Button label={t('help.callSupport')} variant="secondary" href={`tel:${supportPhone}`} />
+              ) : null}
+            </>
+          }
+        />
+      ) : null}
+
+      {state.status === 'empty' ? (
+        searching ? (
+          <EmptyState
+            headingLevel={2}
+            xstyle={styles.state}
+            icon={<NoResultsIcon {...stylex.props(styles.stateIcon)} aria-hidden />}
+            title={t('explore.empty.search.title', { query: query.trim() })}
+            description={t('explore.empty.search.body')}
+            actions={<Button label={t('explore.search.clear')} variant="primary" onClick={onClearSearch} />}
+          />
+        ) : (
+          <EmptyState
+            headingLevel={2}
+            xstyle={styles.state}
+            icon={<NoResultsIcon {...stylex.props(styles.stateIcon)} aria-hidden />}
+            title={t(NOTICES.no_places_found.titleKey)}
+            description={t('explore.empty.category.body')}
+            actions={
+              category !== 'all' ? (
+                <Button label={t('explore.empty.showAll')} variant="primary" onClick={() => onCategory('all')} />
+              ) : undefined
+            }
+          />
+        )
+      ) : null}
+
+      {state.status === 'ready' ? (
+        <>
+          <VStack gap={3}>{state.places.map((place, index) => renderPlace(place, index))}</VStack>
+          <Text type="supporting" xstyle={styles.source}>
+            {t('places.source')}
+          </Text>
+        </>
+      ) : null}
+    </Page>
+  );
+}

@@ -78,6 +78,12 @@ export {
   LegalIcon,
   SignOutIcon,
   ConnectionsIcon,
+  AllPlacesIcon,
+  EducationIcon,
+  WorkforceIcon,
+  FamilyServicesIcon,
+  OfflineIcon,
+  NoResultsIcon,
 } from './icons.js';
 export { SavedStrip, type SavedStripProps, type SavedStripPlace } from './SavedStrip.js';
 export {

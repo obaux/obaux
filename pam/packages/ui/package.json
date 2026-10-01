@@ -16,7 +16,9 @@
     "./OnboardingSlides": "./src/OnboardingSlides.tsx",
     "./LargeTitleHeader": "./src/LargeTitleHeader.tsx",
     "./ProfileCards": "./src/ProfileCards.tsx",
-    "./MenuList": "./src/MenuList.tsx"
+    "./MenuList": "./src/MenuList.tsx",
+    "./SearchPill": "./src/SearchPill.tsx",
+    "./CategoryChips": "./src/CategoryChips.tsx"
   },
   "scripts": {
     "typecheck": "tsc -p tsconfig.json",

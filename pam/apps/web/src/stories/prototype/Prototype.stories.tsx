@@ -1,9 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/nextjs';
 import type { JourneyRole } from '../journeys/fixtures';
 import { asRole } from '../journeys/journey';
-import { LocalTabBar } from '../shell/LocalTabBar';
 import { PrototypeApp, prototypeRouter } from './PrototypeApp';
-import { REDESIGN_ROUTES, TODAY_ROUTES, tabFor } from './routes';
+import { REDESIGN_ROUTES, TODAY_ROUTES, redesignChrome } from './routes';
 
 /**
  * The app, clickable (D-211). Tap anything — a card, a tab, Back, Help — and
@@ -30,16 +29,21 @@ function prototype(role: JourneyRole, start: string): Pick<Story, 'loaders' | 'p
 }
 
 export const RedesignMember: Story = {
-  ...prototype('member', '/profile/'),
+  ...prototype('member', '/'),
   name: 'Redesign — member',
-  args: {
-    routes: REDESIGN_ROUTES,
-    start: '/profile/',
-    chrome: (pathname) => {
-      const tab = tabFor(pathname);
-      return tab ? <LocalTabBar current={tab} /> : null;
-    },
-  },
+  args: { routes: REDESIGN_ROUTES, start: '/', chrome: redesignChrome('member') },
+};
+
+export const RedesignCaseManager: Story = {
+  ...prototype('case-manager', '/'),
+  name: 'Redesign — case manager',
+  args: { routes: REDESIGN_ROUTES, start: '/', chrome: redesignChrome('case-manager') },
+};
+
+export const RedesignProgram: Story = {
+  ...prototype('provider', '/'),
+  name: 'Redesign — program',
+  args: { routes: REDESIGN_ROUTES, start: '/', chrome: redesignChrome('provider') },
 };
 
 export const TodayMember: Story = {

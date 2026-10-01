@@ -8,10 +8,13 @@ export function LocalTabBar({
   current,
   unread = true,
   name = 'Marcus',
+  isHome = false,
 }: {
   readonly current: TabKey | null;
   readonly unread?: boolean;
   readonly name?: string;
+  /** Staff: the first tab reads Home (D-212). */
+  readonly isHome?: boolean;
 }) {
   const { t } = useI18n();
   return (
@@ -20,8 +23,9 @@ export function LocalTabBar({
       label={t('tab.label')}
       name={name}
       unreadLabel={unread ? t('tab.unread') : null}
+      isHome={isHome}
       labels={{
-        explore: t('tab.explore'),
+        explore: t(isHome ? 'tab.home' : 'tab.explore'),
         saved: t('tab.saved'),
         trips: t('tab.trips'),
         messages: t('tab.messages'),

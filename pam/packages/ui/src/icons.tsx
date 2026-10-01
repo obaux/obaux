@@ -298,3 +298,76 @@ export function ConnectionsIcon(props: SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
+
+/*
+ * Place categories (D-212), for Explore's chips — the reference's
+ * "Homes / Experiences / Services" row, carrying PAM's three fixed categories
+ * (§2.5) instead. Same line weight as the rest of the set, so a chip reads as
+ * part of the app rather than a sticker on it.
+ */
+
+/** Four squares. Every kind of place. */
+export function AllPlacesIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <rect x="4" y="4" width="7" height="7" rx="1.5" />
+      <rect x="13" y="4" width="7" height="7" rx="1.5" />
+      <rect x="4" y="13" width="7" height="7" rx="1.5" />
+      <rect x="13" y="13" width="7" height="7" rx="1.5" />
+    </svg>
+  );
+}
+
+/** A mortarboard. School and training. */
+export function EducationIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <path d="M2.5 9.5 12 5l9.5 4.5L12 14z" />
+      <path d="M6.5 11.5v4.25c0 1.5 2.5 3 5.5 3s5.5-1.5 5.5-3V11.5" />
+      <path d="M21.5 9.5v5" />
+    </svg>
+  );
+}
+
+/** A briefcase. Work. */
+export function WorkforceIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <rect x="3" y="7.5" width="18" height="12.5" rx="2" />
+      <path d="M8.5 7.5V5.5a1.5 1.5 0 0 1 1.5-1.5h4a1.5 1.5 0 0 1 1.5 1.5v2" />
+      <path d="M3 12.5h18M10.5 12.5v1.5h3v-1.5" />
+    </svg>
+  );
+}
+
+/** A house with a heart. Help for you and your family. */
+export function FamilyServicesIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <path d="M3 10.5 12 3l9 7.5" />
+      <path d="M5 9.5V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9.5" />
+      <path d="M12 17.5s-3-2.1-3-4a1.6 1.6 0 0 1 3-.8 1.6 1.6 0 0 1 3 .8c0 1.9-3 4-3 4z" />
+    </svg>
+  );
+}
+
+/** Signal waves, crossed out. No connection — the error a member meets most. */
+export function OfflineIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <path d="M2.5 9a14 14 0 0 1 19 0M5.5 12.5a9.5 9.5 0 0 1 13 0M8.75 16a5 5 0 0 1 6.5 0" />
+      <path d="M12 19.5h.01" strokeWidth={2.5} />
+      <path d="M3.5 3.5l17 17" />
+    </svg>
+  );
+}
+
+/** A magnifying glass over nothing. A search that found nothing. */
+export function NoResultsIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <circle cx="10.5" cy="10.5" r="6.5" />
+      <path d="m15.5 15.5 5 5M8.25 8.25l4.5 4.5M12.75 8.25l-4.5 4.5" />
+    </svg>
+  );
+}

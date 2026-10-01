@@ -58,6 +58,28 @@ const withPam: Decorator = (Story, context) => {
   );
 };
 
+/**
+ * No story ever navigates the iframe (D-212). A story is one page of
+ * Storybook, not the app; following a link to `/places/` loads a page that
+ * does not exist there, and Storybook shows a 404 in the frame. The clickable
+ * prototype (`PrototypeApp`, D-211) routes the links it can draw, in the
+ * capture phase; whatever is left by the time a same-site link click bubbles
+ * up to the window is cancelled here, and named in the console instead.
+ */
+if (typeof window !== 'undefined') {
+  window.addEventListener('click', (event) => {
+    if (event.defaultPrevented || event.button !== 0) return;
+    const anchor = (event.target as Element | null)?.closest?.('a[href]');
+    if (!anchor || anchor.getAttribute('target') === '_blank' || anchor.hasAttribute('download')) return;
+    const href = anchor.getAttribute('href') ?? '';
+    if (href.startsWith('#') || /^(tel:|mailto:|sms:)/i.test(href)) return;
+    if (new URL(href, window.location.href).origin !== window.location.origin) return;
+    event.preventDefault();
+    // eslint-disable-next-line no-console
+    console.info('[storybook] link not followed — open the Prototype stories to click through:', href);
+  });
+}
+
 const preview: Preview = {
   decorators: [withPam],
   globalTypes: {

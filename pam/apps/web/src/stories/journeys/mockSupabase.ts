@@ -26,7 +26,7 @@ import {
 } from './fixtures';
 
 type Answer = { status?: number; body: unknown };
-type Route = (url: string, method: string) => Answer | null;
+type Route = (url: string, method: string, body: unknown) => Answer | null;
 
 const PROJECT_REF = new URL(SUPABASE_URL).hostname.split('.')[0];
 
@@ -34,8 +34,8 @@ function routesFor(journeyRole: JourneyRole): Route[] {
   const profile = ROLES[journeyRole].profile;
   const role = profile?.role ?? null;
   const has = (part: string) => (url: string) => url.includes(part);
-  const on = (part: string, answer: (url: string, method: string) => Answer): Route => (url, method) =>
-    has(part)(url) ? answer(url, method) : null;
+  const on = (part: string, answer: (url: string, method: string, body: unknown) => Answer): Route => (url, method, body) =>
+    has(part)(url) ? answer(url, method, body) : null;
 
   return [
     profile
@@ -64,8 +64,28 @@ function routesFor(journeyRole: JourneyRole): Route[] {
     on('/rest/v1/notification_preferences', () => ({ body: null })),
     on('/rest/v1/access_controls', () => ({ body: [] })),
     on('/rpc/member_points', () => ({ body: 400 })),
-    on('/rpc/services_near', () => ({ body: PLACES.map((place, i) => ({ ...place, meters: 400 + i * 900, has_hours: false })) })),
-    on('/rpc/services_search', () => ({ body: PLACES.map((place, i) => ({ ...place, meters: 400 + i * 900, has_hours: false })) })),
+    on('/rpc/services_near', (_url, _method, body) => {
+      const category = ((body ?? {}) as { p_category?: string | null }).p_category;
+      return {
+        body: PLACES.map((place, i) => ({ ...place, meters: 400 + i * 900, has_hours: false })).filter(
+          (place) => !category || place.category === category,
+        ),
+      };
+    }),
+    // Like the real one (0066): words against the name and the address, and
+    // the category chip still applies — so search and its empty state can be
+    // tried here.
+    on('/rpc/services_search', (_url, _method, body) => {
+      const args = (body ?? {}) as { p_query?: string; p_category?: string | null };
+      const words = (args.p_query ?? '').toLowerCase().split(/\s+/).filter(Boolean);
+      return {
+        body: PLACES.map((place, i) => ({ ...place, meters: 400 + i * 900, has_hours: false })).filter(
+          (place) =>
+            (!args.p_category || place.category === args.p_category) &&
+            words.every((word) => `${place.name} ${place.address ?? ''}`.toLowerCase().includes(word)),
+        ),
+      };
+    }),
     on('/rpc/service_detail', () => ({ body: [PLACES[0]] })),
     on('/rpc/directory_people', () => ({ body: DIRECTORY_PEOPLE })),
     on('/rpc/saved_places_mine', () => ({ body: PLACES })),
@@ -143,9 +163,15 @@ export function installSupabaseMock(journeyRole: JourneyRole): void {
     const url = urlOf(input);
     if (!url.includes('.supabase.co')) return real(input, init);
     const method = (init?.method ?? (input instanceof Request ? input.method : 'GET')).toUpperCase();
+    let body: unknown = null;
+    try {
+      body = typeof init?.body === 'string' ? JSON.parse(init.body) : null;
+    } catch {
+      body = null;
+    }
     let answer: Answer | null = null;
     for (const route of routes) {
-      answer = route(url, method);
+      answer = route(url, method, body);
       if (answer) break;
     }
     if (!answer) {

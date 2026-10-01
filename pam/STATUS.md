@@ -224,6 +224,17 @@ pretend database. `Prototype/Redesign — member` walks the new bottom bar
 conversation and back); `Prototype/Today — *` walks the app as it ships, for
 member, case manager, program and super admin, and signed out.
 
+**Then (D-212): Explore, and Home for staff — and no more 404s.** Every
+journey now opens inside the prototype's router, and any other story's link
+is cancelled rather than followed, so nothing in Storybook 404s. Explore
+(the member's home) has the search bar first — suggestions by name or
+address, a clear button — category chips, and every state drawn (loading,
+can't connect, nothing matches, empty category). A case manager's and a
+program's first tab is Home: their people under the same search bar. Walk
+them in `Prototype/Redesign — member / case manager / program`; each state
+is under `Redesign/Explore` and `Redesign/Staff home`. Still Storybook
+only: not routed in the app.
+
 This is the handover document: what exists, what is proven, what is live, and
 what the next person needs to know before touching anything.
 

@@ -3,9 +3,10 @@ import * as stylex from '@stylexjs/stylex';
 import { Avatar } from '@astryxdesign/core/Avatar';
 import { HStack } from '@astryxdesign/core/HStack';
 import { StatusDot } from '@astryxdesign/core/StatusDot';
+import { VStack } from '@astryxdesign/core/VStack';
 import { Tab, TabList } from '@astryxdesign/core/TabList';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
-import { BookmarkIcon, ExploreIcon, MessagesIcon, TripsIcon } from './icons.js';
+import { BookmarkIcon, ExploreIcon, HomeIcon, MessagesIcon, TripsIcon } from './icons.js';
 
 /**
  * The app's bottom navigation: five places, always one tap away (D-210).
@@ -39,6 +40,12 @@ export interface TabBarProps {
   /** Something unread in Messages: draws the dot, and is read out. */
   readonly unreadLabel?: string | null;
   readonly hrefs?: Partial<Readonly<Record<TabKey, string>>>;
+  /**
+   * The first tab is Home, drawn as a house, not Explore (D-212): a case
+   * manager's or a program's first screen is their list of people, not a
+   * search for places. Its key stays `explore` — same slot, same route.
+   */
+  readonly isHome?: boolean;
 }
 
 const DEFAULT_HREFS: Readonly<Record<TabKey, string>> = {
@@ -68,6 +75,12 @@ const styles = stylex.create({
     paddingBottom: 'env(safe-area-inset-bottom, 0px)',
   },
   inner: { width: '100%', maxWidth: '560px', marginInline: 'auto' },
+  // Holds the bar's height in the page, so the end of a long list scrolls
+  // clear of it instead of sitting underneath.
+  spacer: {
+    height: 'calc(66px + env(safe-area-inset-bottom, 0px))',
+    flexShrink: 0,
+  },
   tabs: { flexGrow: 1, minWidth: 0 },
   tab: {
     flexDirection: 'column',
@@ -90,15 +103,11 @@ const styles = stylex.create({
   avatarRingOn: { borderColor: colorVars['--color-accent'] },
 });
 
-export function TabBar({ current, labels, label, name, photoUrl, unreadLabel, hrefs }: TabBarProps) {
+export function TabBar({ current, labels, label, name, photoUrl, unreadLabel, hrefs, isHome = false }: TabBarProps) {
   const to = { ...DEFAULT_HREFS, ...hrefs };
 
   const icons: Readonly<Record<TabKey, ReactNode>> = {
-    explore: (
-      <HStack xstyle={styles.iconWrap}>
-        <ExploreIcon {...ICON} />
-      </HStack>
-    ),
+    explore: <HStack xstyle={styles.iconWrap}>{isHome ? <HomeIcon {...ICON} /> : <ExploreIcon {...ICON} />}</HStack>,
     saved: (
       <HStack xstyle={styles.iconWrap}>
         <BookmarkIcon {...ICON} isFilled={current === 'saved'} />
@@ -123,21 +132,24 @@ export function TabBar({ current, labels, label, name, photoUrl, unreadLabel, hr
   };
 
   return (
-    <footer {...stylex.props(styles.bar)}>
-      <HStack align="center" wrap="nowrap" xstyle={styles.inner}>
-        <TabList
-          value={current ?? ''}
-          onChange={() => {}}
-          layout="fill"
-          overflow="visible"
-          aria-label={label}
-          xstyle={styles.tabs}
-        >
-          {ORDER.map((key) => (
-            <Tab key={key} value={key} label={labels[key]} href={to[key]} icon={icons[key]} xstyle={styles.tab} />
-          ))}
-        </TabList>
-      </HStack>
-    </footer>
+    <>
+      <VStack aria-hidden xstyle={styles.spacer} />
+      <footer {...stylex.props(styles.bar)}>
+        <HStack align="center" wrap="nowrap" xstyle={styles.inner}>
+          <TabList
+            value={current ?? ''}
+            onChange={() => {}}
+            layout="fill"
+            overflow="visible"
+            aria-label={label}
+            xstyle={styles.tabs}
+          >
+            {ORDER.map((key) => (
+              <Tab key={key} value={key} label={labels[key]} href={to[key]} icon={icons[key]} xstyle={styles.tab} />
+            ))}
+          </TabList>
+        </HStack>
+      </footer>
+    </>
   );
 }

@@ -35,6 +35,12 @@ export interface PrototypeAppProps {
   readonly start: string;
   /** Drawn under every screen with the current path — the bottom bar. */
   readonly chrome?: (pathname: string) => ReactNode;
+  /**
+   * The first screen, as the story already draws it — a journey's own
+   * render, with its args. Shown until the first tap; from then on, the
+   * route table. Back to the start shows it again.
+   */
+  readonly first?: ReactNode;
 }
 
 const ORIGIN = 'https://pam.prototype';
@@ -57,7 +63,7 @@ export const prototypeRouter = {
   prefetch: () => {},
 };
 
-export function PrototypeApp({ routes, start, chrome }: PrototypeAppProps) {
+export function PrototypeApp({ routes, start, chrome, first }: PrototypeAppProps) {
   const [stack, setStack] = useState<readonly string[]>([start]);
   const current = stack[stack.length - 1] ?? start;
   const url = useMemo(() => new URL(current, ORIGIN), [current]);
@@ -120,11 +126,15 @@ export function PrototypeApp({ routes, start, chrome }: PrototypeAppProps) {
   }, [current, url.hash]);
 
   const route = routes[pathname];
+  // Still on the opening screen: nothing pushed, nothing replaced it.
+  const atFirst = first !== undefined && stack.length === 1 && stack[0] === start;
 
   return (
     <PathnameContext.Provider value={pathname}>
       <SearchParamsContext.Provider value={url.searchParams}>
-        {route ? (
+        {atFirst ? (
+          <ScreenFrame key="first">{first}</ScreenFrame>
+        ) : route ? (
           <ScreenFrame key={current}>{route.render()}</ScreenFrame>
         ) : (
           <Page gap={4}>

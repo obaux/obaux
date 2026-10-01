@@ -213,6 +213,21 @@
     border-radius: 12px;
   }
 
+  /*
+   * The search bar (D-212) is one rounded shape with the field inside it; the
+   * rule above would ring the field's own inner box, a rectangle floating in
+   * a pill. Same ring, moved to the pill, following its round ends.
+   */
+  .astryx-input-group[data-size='lg'] :has(> input:focus-visible) {
+    outline: none;
+  }
+
+  .astryx-input-group[data-size='lg']:has(input:focus-visible) {
+    outline: 3px solid currentColor;
+    outline-offset: 2px;
+    border-radius: 999px;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     *,
     *::before,
