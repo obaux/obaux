@@ -12,6 +12,8 @@ import { Badge } from '@astryxdesign/core/Badge';
 import { Avatar } from '@astryxdesign/core/Avatar';
 import { BigButton, Loading, Notice, Page } from '@pam/ui';
 import { SubPageHeader } from '@pam/ui/SubPage';
+import { useStarredPeople } from '@/lib/useStarredPeople';
+import { StarToggle } from '../../screens/PeopleHomeView';
 import { HelpButton } from '../../screens/HelpButton';
 import { PersonDetailSkeleton } from '@pam/ui/Skeletons';
 import { NOTICES } from '@pam/config';
@@ -94,13 +96,22 @@ function PersonScreen() {
 
   // The nested-page template (D-213, D-217): back to Home, where every list
   // that links here lives; a super admin's role switch rides in the bar.
-  const header = (title: string) => (
+  const starred = useStarredPeople();
+  const header = (title: string, starId?: string) => (
     <SubPageHeader
       title={title}
       backHref="/"
       backLabel={t('nav.back.home')}
       actions={
         <>
+          {/* A case manager stars a member here as on Home (D-218). */}
+          {starId && viewedRole === 'admin' ? (
+            <StarToggle
+              isOn={starred.ids.has(starId)}
+              label={t(starred.ids.has(starId) ? 'people.unstar' : 'people.star', { name: title })}
+              onToggle={() => starred.toggle(starId)}
+            />
+          ) : null}
           {trueRole === 'super_admin' ? (
             <RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} />
           ) : null}
@@ -182,7 +193,7 @@ function PersonScreen() {
 
   return (
     <Page gap={4}>
-      {header(person.firstName)}
+      {header(person.firstName, person.role === 'member' ? person.id : undefined)}
 
       <VStack gap={4}>
         {/*

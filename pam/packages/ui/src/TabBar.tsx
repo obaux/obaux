@@ -6,7 +6,7 @@ import { StatusDot } from '@astryxdesign/core/StatusDot';
 import { VStack } from '@astryxdesign/core/VStack';
 import { Tab, TabList } from '@astryxdesign/core/TabList';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
-import { BookmarkIcon, ExploreIcon, HomeIcon, MessagesIcon, TripsIcon } from './icons.js';
+import { BookmarkIcon, ExploreIcon, HomeIcon, MessagesIcon, PlacesIcon, TripsIcon } from './icons.js';
 
 /**
  * The app's bottom navigation: five places, always one tap away (D-210).
@@ -25,13 +25,19 @@ import { BookmarkIcon, ExploreIcon, HomeIcon, MessagesIcon, TripsIcon } from './
  * Every tab is a real link, so the bar works with no JavaScript. Icon above
  * label, both visible. Not yet mounted in the app — shaped in Storybook first.
  */
-export type TabKey = 'explore' | 'saved' | 'trips' | 'messages' | 'profile';
+export type TabKey = 'explore' | 'saved' | 'trips' | 'program' | 'messages' | 'profile';
 
 export interface TabBarProps {
   /** The tab for the screen being shown, or `null` on a screen with none. */
   readonly current: TabKey | null;
-  /** Localised, one short word each (`nav.tab.*`). */
-  readonly labels: Readonly<Record<TabKey, string>>;
+  /** Localised, one short word each (`nav.tab.*`), for the tabs shown. */
+  readonly labels: Readonly<Partial<Record<TabKey, string>>>;
+  /**
+   * Which tabs, in order (D-218): a member has all five of theirs; a case
+   * manager has no Trips; a program lead has Program in place of Saved and
+   * no Trips. Defaults to the member's bar.
+   */
+  readonly tabs?: readonly TabKey[];
   /** The landmark's name, e.g. "Main". */
   readonly label: string;
   /** The person's first name, for the Profile tab's initials. */
@@ -52,11 +58,12 @@ const DEFAULT_HREFS: Readonly<Record<TabKey, string>> = {
   explore: '/',
   saved: '/saved/',
   trips: '/trips/',
+  program: '/program/',
   messages: '/messages/',
   profile: '/profile/',
 };
 
-const ORDER: readonly TabKey[] = ['explore', 'saved', 'trips', 'messages', 'profile'];
+export const MEMBER_TABS: readonly TabKey[] = ['explore', 'saved', 'trips', 'messages', 'profile'];
 
 // 26px: a tab's own icon slot is 16px, a speck on a phone at arm's length.
 // Each icon sits in its own wrapper, or the slot shrinks the SVG back to 16px.
@@ -113,7 +120,17 @@ const styles = stylex.create({
   avatarRingOn: { borderColor: 'light-dark(#E31C5F, #FF6B86)' },
 });
 
-export function TabBar({ current, labels, label, name, photoUrl, unreadLabel, hrefs, isHome = false }: TabBarProps) {
+export function TabBar({
+  current,
+  labels,
+  label,
+  name,
+  photoUrl,
+  unreadLabel,
+  hrefs,
+  isHome = false,
+  tabs = MEMBER_TABS,
+}: TabBarProps) {
   const to = { ...DEFAULT_HREFS, ...hrefs };
 
   const icons: Readonly<Record<TabKey, ReactNode>> = {
@@ -126,6 +143,11 @@ export function TabBar({ current, labels, label, name, photoUrl, unreadLabel, hr
     trips: (
       <HStack xstyle={styles.iconWrap}>
         <TripsIcon {...ICON} />
+      </HStack>
+    ),
+    program: (
+      <HStack xstyle={styles.iconWrap}>
+        <PlacesIcon {...ICON} />
       </HStack>
     ),
     messages: (
@@ -154,11 +176,11 @@ export function TabBar({ current, labels, label, name, photoUrl, unreadLabel, hr
             aria-label={label}
             xstyle={styles.tabs}
           >
-            {ORDER.map((key) => (
+            {tabs.map((key) => (
               <Tab
                 key={key}
                 value={key}
-                label={labels[key]}
+                label={labels[key] ?? key}
                 href={to[key]}
                 icon={icons[key]}
                 xstyle={[styles.tab, key === current && styles.tabOn]}

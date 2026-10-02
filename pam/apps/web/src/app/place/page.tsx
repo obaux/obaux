@@ -52,6 +52,8 @@ const BACK_TARGETS = {
   trips: { href: '/trips/', labelKey: 'nav.back.trips' },
   places: { href: '/places/', labelKey: 'nav.back.places' },
   saved: { href: '/saved/', labelKey: 'nav.back.saved' },
+  // All programs, a staff member's secondary path (D-218).
+  programs: { href: '/programs/', labelKey: 'nav.back.programs' },
 } as const;
 
 function resolveBack(from: string | null): { href: string; labelKey: string } {

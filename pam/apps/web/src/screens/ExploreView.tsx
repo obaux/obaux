@@ -45,6 +45,8 @@ export type ExploreCategory = Category | 'all';
 export interface ExploreViewProps {
   /** The search bar — `SearchPill`, wired by the caller. */
   readonly search: ReactNode;
+  /** Before the search bar — a round back on All programs (D-218). */
+  readonly leading?: ReactNode;
   /** The bell and Help, beside the bar. */
   readonly actions?: ReactNode;
   readonly category: ExploreCategory;
@@ -93,6 +95,7 @@ const styles = stylex.create({
 
 export function ExploreView({
   search,
+  leading,
   actions,
   category,
   onCategory,
@@ -122,6 +125,7 @@ export function ExploreView({
     <Page gap={4}>
       <VStack gap={2} xstyle={styles.top}>
         <HStack gap={2} align="center" wrap="nowrap">
+          {leading}
           <VStack xstyle={styles.search}>{search}</VStack>
           {actions}
         </HStack>

@@ -124,19 +124,7 @@ export function SubPageHeader({
     return () => window.removeEventListener('scroll', onScroll);
   }, [variant]);
 
-  const back = (
-    <IconButton
-      label={backLabel}
-      href={backHref}
-      variant="ghost"
-      icon={
-        <HStack>
-          <BackArrowIcon width={22} height={22} aria-hidden />
-        </HStack>
-      }
-      xstyle={styles.back}
-    />
-  );
+  const back = <BackButton href={backHref} label={backLabel} />;
 
   if (variant === 'compact') {
     return (
@@ -183,6 +171,26 @@ export function SubPageHeader({
         ) : null}
       </VStack>
     </>
+  );
+}
+
+/**
+ * The template's round back button on its own (D-218), for a nested screen
+ * whose top is a search bar rather than a title — All programs.
+ */
+export function BackButton({ href, label }: { readonly href: string; readonly label: string }) {
+  return (
+    <IconButton
+      label={label}
+      href={href}
+      variant="ghost"
+      icon={
+        <HStack>
+          <BackArrowIcon width={22} height={22} aria-hidden />
+        </HStack>
+      }
+      xstyle={styles.back}
+    />
   );
 }
 

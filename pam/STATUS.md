@@ -273,6 +273,18 @@ role preview, a new route `/view-as/`). In the prototype `/interested/`
 opens Home. The tab screens themselves (Explore, Saved, Trips, Messages,
 Profile) are still Storybook-only — not yet routed in the app.
 
+**2 October, later (D-218): an app per staff role.** Case managers: Home
+(caseload, a star per person, Invite someone floating above the bar), Saved
+(People | Programs), Messages, Profile. Program leads: Home (a Day / Week /
+Month schedule with search by name or time), Program (their listing, Edit),
+Messages, Profile. `/invite/` (two rows, a member or a program), `/programs/`
+(All programs, from Profile) and `/programs/new/` (Add a program) are new
+routes. Example data: starred people (session only), appointments, the
+example program; Add a program and Program edits store nothing yet (the RLS
+already allows both — wiring is a follow-up). Needs Will: whether program
+leads may create invites (0049 refuses them), and whether starred people
+get a table.
+
 This is the handover document: what exists, what is proven, what is live, and
 what the next person needs to know before touching anything.
 

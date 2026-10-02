@@ -20,7 +20,8 @@
     "./dummy-conversations": "./src/dummy-conversations.ts",
     "./people-activity": "./src/people-activity.ts",
     "./dummy-connections": "./src/dummy-connections.ts",
-    "./dummy-trips": "./src/dummy-trips.ts"
+    "./dummy-trips": "./src/dummy-trips.ts",
+    "./dummy-appointments": "./src/dummy-appointments.ts"
   },
   "scripts": {
     "typecheck": "tsc -p tsconfig.json",

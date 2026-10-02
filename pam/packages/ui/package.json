@@ -18,6 +18,7 @@
     "./ProfileCards": "./src/ProfileCards.tsx",
     "./MenuList": "./src/MenuList.tsx",
     "./SearchPill": "./src/SearchPill.tsx",
+    "./FloatingAction": "./src/FloatingAction.tsx",
     "./CategoryChips": "./src/CategoryChips.tsx",
     "./SubPage": "./src/SubPage.tsx",
     "./ConnectionCard": "./src/ConnectionCard.tsx",

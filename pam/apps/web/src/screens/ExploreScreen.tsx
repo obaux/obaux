@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Notice, PlaceCard, ScrollReveal } from '@pam/ui';
+import { Notice, PlaceCard, PlusIcon, ScrollReveal } from '@pam/ui';
 import { SearchPill, type SearchPillItem } from '@pam/ui/SearchPill';
 import { distanceLabel } from '@pam/config';
 import type { SearchSource } from '@astryxdesign/core/Typeahead';
@@ -17,6 +17,27 @@ import { CITY_HALL, loadOrigin, saveOrigin, type AreaOption } from '@/lib/useAre
 import { AreaSearch, AreaTrigger } from '../app/places/AreaPicker';
 import { CATEGORY_ICONS, ExploreView, type ExploreCategory } from './ExploreView';
 import { HeaderActions } from './HeaderActions';
+import { HelpButton } from './HelpButton';
+import * as stylex from '@stylexjs/stylex';
+import { HStack } from '@astryxdesign/core/HStack';
+import { IconButton } from '@astryxdesign/core/IconButton';
+import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
+import { BackButton } from '@pam/ui/SubPage';
+
+const styles = stylex.create({
+  // The same white disc with a grey edge as Help (D-216).
+  add: {
+    width: '48px',
+    height: '48px',
+    borderRadius: '50%',
+    flexShrink: 0,
+    backgroundColor: colorVars['--color-background-body'],
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    borderColor: colorVars['--color-border'],
+    color: colorVars['--color-text-primary'],
+  },
+});
 
 /**
  * Explore, wired (D-212): `ExploreView` with the catalogue behind it — the
@@ -37,7 +58,12 @@ function useDebounced(value: string, ms: number): string {
   return debounced;
 }
 
-export function ExploreScreen() {
+/**
+ * `programs` (D-218): the same catalogue as a staff member's secondary path —
+ * reached from Profile's "All programs", with a round back to Profile and,
+ * top right, Add a program (case managers and program leads both can).
+ */
+export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'programs' } = {}) {
   const { t, locale } = useI18n();
   const router = useRouter();
   const supportPhone = useSupportPhone();
@@ -45,6 +71,7 @@ export function ExploreScreen() {
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
   const { demoRole } = useRoleView(trueRole);
 
+  const from = mode === 'programs' ? 'programs' : 'explore';
   const [category, setCategory] = useState<ExploreCategory>('all');
   const [query, setQuery] = useState('');
   const settled = useDebounced(query, 300);
@@ -94,7 +121,7 @@ export function ExploreScreen() {
           label={t('explore.search.label')}
           placeholder={t('explore.search.placeholder')}
           searchSource={searchSource}
-          onPick={(item) => router.push(`/place/?id=${encodeURIComponent(item.id)}&from=explore`)}
+          onPick={(item) => router.push(`/place/?id=${encodeURIComponent(item.id)}&from=${from}`)}
           onQuery={setQuery}
           emptyText={t('explore.search.none')}
           clearLabel={t('explore.search.clear')}
@@ -102,15 +129,30 @@ export function ExploreScreen() {
           clearSignal={clearSignal}
         />
       }
-      actions={<HeaderActions role={demoRole ?? trueRole} enabled={session.status === 'signed-in'} />}
+      leading={mode === 'programs' ? <BackButton href="/profile/" label={t('nav.back.profile')} /> : undefined}
+      actions={
+        mode === 'programs' ? (
+          <>
+            <IconButton
+              label={t('programs.add')}
+              href="/programs/new/"
+              variant="ghost"
+              icon={
+                <HStack>
+                  <PlusIcon width={24} height={24} aria-hidden />
+                </HStack>
+              }
+              xstyle={styles.add}
+            />
+            <HelpButton />
+          </>
+        ) : (
+          <HeaderActions role={demoRole ?? trueRole} enabled={session.status === 'signed-in'} />
+        )
+      }
       category={category}
       onCategory={setCategory}
-      area={
-        <AreaTrigger
-          area={area}
-          onOpen={() => setIsPickingArea(true)}
-        />
-      }
+      area={<AreaTrigger area={area} onOpen={() => setIsPickingArea(true)} />}
       areaPanel={
         isPickingArea ? (
           <AreaSearch
@@ -145,7 +187,7 @@ export function ExploreScreen() {
           <ScrollReveal key={place.id} index={index}>
             <PlaceCard
               name={place.name}
-              href={`/place/?id=${encodeURIComponent(place.id)}&from=explore`}
+              href={`/place/?id=${encodeURIComponent(place.id)}&from=${from}`}
               description={place.description}
               {...(miles ? { distanceLabel: t(miles.key, miles.vars) } : {})}
               status={placeStatus(place.id, place.hours, now, t, locale)}

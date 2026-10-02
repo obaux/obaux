@@ -228,6 +228,16 @@
     border-radius: 999px;
   }
 
+  /*
+   * A list row that is an action, not a link — Sign out (D-218). Astryx draws
+   * it as a 48px button that stacks its label at the top, so the words sat
+   * above the icon beside them; a link row has no such box. Centred, it lines
+   * up with every other row.
+   */
+  .astryx-item > button {
+    justify-content: center;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     *,
     *::before,

@@ -22,6 +22,10 @@ import SignInPage from '../../app/signin/page';
 import TermsPage from '../../app/terms/page';
 import { ProfileScreen } from '../../screens/ProfileScreen';
 import { ViewAsView } from '../../screens/ViewAsView';
+import { InviteView } from '../../screens/InviteView';
+import { AddProgramView } from '../../screens/AddProgramView';
+import { ProgramScreen } from '../../screens/ProgramView';
+import { ExploreScreen } from '../../screens/ExploreScreen';
 import { TripsScreen } from '../../screens/TripsView';
 import { HomeScreen } from '../../screens/HomeScreen';
 import { LegalView } from '../../screens/LegalView';
@@ -34,6 +38,7 @@ import { ThreadOptionsView, ThreadReportView } from '../../screens/ThreadOptions
 import { MessagesScreen } from '../../screens/MessagesScreen';
 import { HeaderActions } from '../shell/HeaderActions';
 import { LocalTabBar } from '../shell/LocalTabBar';
+import type { Role } from '@pam/config';
 import { ROLES, type JourneyRole } from '../journeys/fixtures';
 import type { PrototypeRoute } from './PrototypeApp';
 
@@ -80,6 +85,12 @@ export const APP_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   '/messages/thread/report/': screen(() => <ThreadReportView />),
   '/connections/person/': screen(() => <ConnectionProfileScreen />),
   '/view-as/': screen(() => <ViewAsView />),
+  // D-218: Invite someone, All programs and Add a program, and a program
+  // lead's own Program tab.
+  '/invite/': screen(() => <InviteView />),
+  '/programs/': screen(() => <ExploreScreen mode="programs" />),
+  '/programs/new/': screen(() => <AddProgramView />),
+  '/program/': screen(() => <ProgramScreen />),
 };
 
 /**
@@ -104,6 +115,8 @@ export const REDESIGN_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   '/account/': screen(() => <ProfileScreen />),
   // A program's list is its Home now (D-212), so the old address opens it.
   '/interested/': screen(() => <HomeScreen />),
+  // The old caseload-and-invites page is Invite someone now (D-218).
+  '/admin/': screen(() => <InviteView />),
 };
 
 /**
@@ -122,6 +135,8 @@ export function tabFor(pathname: string) {
       return 'saved' as const;
     case '/trips/':
       return 'trips' as const;
+    case '/program/':
+      return 'program' as const;
     case '/messages/':
       return 'messages' as const;
     case '/profile/':
@@ -133,15 +148,28 @@ export function tabFor(pathname: string) {
 }
 
 /**
- * The redesign's bottom bar, for whoever is signed in (D-212): staff read
- * Home on the first tab. Nothing on screens that stand alone (`tabFor`).
+ * The redesign's bottom bar, for whoever is signed in (D-212, D-218): each
+ * role's own tabs (`tabsFor`), staff reading Home on the first. A super admin
+ * previewing a role (D-108) gets that role's bar from the next screen on.
+ * Nothing on screens that stand alone (`tabFor`).
  */
 export function redesignChrome(role: JourneyRole) {
-  const isHome = role === 'case-manager' || role === 'provider';
   const name = ROLES[role].profile?.first_name ?? '';
   return (pathname: string) => {
-    if (role === 'signed-out') return null;
+    const own = ROLES[role].profile?.role;
+    if (!own) return null;
     const tab = tabFor(pathname);
-    return tab ? <LocalTabBar current={tab} isHome={isHome} name={name} /> : null;
+    return tab ? <LocalTabBar current={tab} role={viewedRole(own)} name={name} /> : null;
   };
+}
+
+/** The role a super admin is previewing, if any — the same key `useViewAs` reads. */
+function viewedRole(own: Role): Role {
+  if (own !== 'super_admin') return own;
+  try {
+    const preview = sessionStorage.getItem('pam.view-as');
+    return preview === 'member' || preview === 'admin' || preview === 'provider' ? preview : own;
+  } catch {
+    return own;
+  }
 }

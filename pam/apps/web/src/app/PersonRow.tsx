@@ -48,15 +48,17 @@ export interface PersonRowProps {
   /**
    * A control that belongs to this specific row rather than the list — the
    * Everyone list's demo-view toggle (0057) is the one user of this today.
-   * Never paired with `href`: the two are different rows' jobs (a dummy row
-   * that opens something, a real row with a control on it), and `href`'s own
-   * full-card overlay link would sit on top of anything placed here.
+   * May be paired with `href` since D-218 (a case manager's star on a row
+   * that opens the person): it is lifted above the card's overlay link, so a
+   * tap on it is the control's, and a tap anywhere else opens the person.
    */
   readonly trailing?: ReactNode;
 }
 
 const styles = stylex.create({
   card: { width: '100%', position: 'relative' },
+  // Above the stretched link's ::after, so the control takes its own taps.
+  trailing: { position: 'relative', zIndex: 1, flexShrink: 0 },
   name: { fontSize: '20px', lineHeight: 1.3 },
   meta: { fontSize: '16px' },
   link: {
@@ -83,7 +85,7 @@ export function PersonRow({ firstName, href, chip, meta, programBadge, trailing 
               )}
             </Heading>
           </HStack>
-          {trailing}
+          {trailing ? <HStack xstyle={styles.trailing}>{trailing}</HStack> : null}
         </HStack>
         <HStack gap={2} wrap="wrap" align="center">
           {chip ? <Badge variant={chip.tone} label={chip.label} /> : null}

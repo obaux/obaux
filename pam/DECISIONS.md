@@ -4606,6 +4606,72 @@ screens are still Storybook-only; routing them in the app is its own step.
 
 ---
 
+### D-218 — Each staff role gets its own app: bars, Homes, Invite someone, starred people, a schedule, a Program tab, All programs
+
+Will, 2 October, in two messages: staff should not carry a member's tabs,
+"Invite someone" should float on Home, case managers star people, a program
+lead's Home is a schedule and their second tab is their program, and both
+staff roles need a way to see every program and add one.
+
+**Bottom bars, by role** (`lib/tabs.ts`, `TabBar`'s new `tabs` prop):
+member — Explore, Saved, Trips, Messages, Profile; case manager — Home,
+Saved, Messages, Profile (no Trips: they do not plan visits); program lead —
+Home, Program, Messages, Profile (no Saved, no Trips). A super admin has the
+member's bar on their own account and the previewed role's bar while
+previewing.
+
+**Invite someone** floats above the bar on both staff Homes — the same row
+Profile drew (icon, words, chevron) on a lifted card (`FloatingAction`),
+moved off Profile. It opens a new, simple screen (`/invite/`): two rows,
+Invite a member and Invite a program, which make the code at once and show
+it with its expiry and Copy. The member and program-lead lists `/admin/` drew
+under its buttons are gone (Home is the list); in the prototype `/admin/`
+opens the new screen, while the app's own `/admin/` page stays until the tab
+screens are routed. **A program lead cannot make codes**: `create_invite`
+(0049) refuses anyone but a case manager or super admin, and whether a
+program may bring people in is Will's call, not a side effect of a button —
+so for them the rows say PAM sends invites for now, with PAM one tap away.
+
+**Case managers star people** — a star on each caseload row (lifted above
+the row's link) and on a member's page; Saved gets a People | Programs
+switch, people first. **Stored in the browser session only** (seeded with
+two example people): a starred list is new information about members, so a
+table for it is a schema change and arguably a `transparency.ts` line, for
+Will to decide.
+
+**A program lead's Home is a schedule** (`ScheduleView`): Day (today, in
+time order — time and length, name, kind of visit), Week (Monday first,
+each day with its count, empty days said), Month (Astryx's Calendar to pick
+a day — it has no way to mark booked days, so the booked days are listed
+under it with counts). The search bar finds people *or* times — a name,
+weekday, date or time — across the whole schedule. Example appointments
+(`dummy-appointments.ts`), built relative to today, until something books.
+
+**Program tab** (`/program/`): the program's page as members see it
+(`PlaceDetail`) minus a member's save/share/report, and top right only Edit
+— Will: "only edit" — which turns the details into fields and becomes Save,
+with Cancel under the form. Help is not in its bar, by that instruction;
+it is a tab away in Profile. Example program, edits kept for the visit; the
+rules already let a program lead write their org's listing
+(`services_write_provider`, 0007), so saving for real is a follow-up, not a
+migration.
+
+**All programs and Add a program — Will was unsure where; placed as a
+secondary path.** Profile has an "All programs" row for case managers and
+program leads, opening the Explore catalogue as a nested screen (round back
+to Profile; `ExploreScreen mode="programs"`). Its top right is a + for **Add
+a program** (`/programs/new/`), the same fields as sign-up's program step,
+"Send to PAM". Front end only for now; `services_write_admin` /
+`services_write_provider` (0007) already allow the insert, so wiring it as a
+`needs_review` row is a follow-up. A case manager's Saved › Programs empty
+state points to All programs too.
+
+**Sign out** in Profile now lines up with the other rows: Astryx draws an
+action row as a 48px button that stacked its label at the top; one rule in
+`globals.css` centres it.
+
+---
+
 ## Notes for whoever picks this up next
 
 - `pnpm --filter @pam/db test` is the highest-value check in the repo. It is the

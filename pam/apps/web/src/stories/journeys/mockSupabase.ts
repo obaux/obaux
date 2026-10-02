@@ -91,6 +91,14 @@ function routesFor(journeyRole: JourneyRole): Route[] {
     on('/rpc/saved_places_mine', () => ({ body: PLACES })),
     on('/rest/v1/saved_places', () => ({ body: [] })),
     on('/rpc/flag_service', () => ({ body: { id: 'flag-1' } })),
+    // An example code (D-218's Invite someone); the real one is made by the database.
+    on('/rpc/create_invite', (_url, _method, body) => ({
+      body: {
+        code: 'PAM-7Q4K',
+        expires_at: new Date(Date.now() + 7 * 86_400_000).toISOString(),
+        role: (body as { p_role?: string } | null)?.p_role ?? 'member',
+      },
+    })),
     on('/rpc/flagged_services', () => ({ body: [] })),
     on('/rpc/served_cities', () => ({ body: [{ city: 'Philadelphia' }] })),
     on('/rest/v1/conversation_members', (url, method) => {

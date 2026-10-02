@@ -206,9 +206,15 @@ export function GlobeIcon(props: SVGProps<SVGSVGElement>) {
 }
 
 /** A star. Points — the only place in PAM that keeps a score. */
-export function StarIcon(props: SVGProps<SVGSVGElement>) {
+export function StarIcon({ isFilled = true, ...props }: SVGProps<SVGSVGElement> & { isFilled?: boolean }) {
+  // Outlined when not filled — a case manager's "not starred" (D-218).
   return (
-    <svg {...svgProps} fill="currentColor" stroke="none" {...props}>
+    <svg
+      {...svgProps}
+      fill={isFilled ? 'currentColor' : 'none'}
+      stroke={isFilled ? 'none' : 'currentColor'}
+      {...props}
+    >
       <path d="m12 3.6 2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8L3.5 9.8l5.9-.9z" />
     </svg>
   );
@@ -387,6 +393,15 @@ export function BookIcon(props: SVGProps<SVGSVGElement>) {
     <svg {...svgProps} {...props}>
       <path d="M12 6.5c-1.8-1.4-4.5-2-8-2v13c3.5 0 6.2.6 8 2 1.8-1.4 4.5-2 8-2v-13c-3.5 0-6.2.6-8 2z" />
       <path d="M12 6.5v13M14.75 9.5h2.5M14.75 12.5h2.5M14.75 15.5h2.5" />
+    </svg>
+  );
+}
+
+/** A plus. Add a program (D-218). */
+export function PlusIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <path d="M12 5v14M5 12h14" />
     </svg>
   );
 }

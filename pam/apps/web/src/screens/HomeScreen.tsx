@@ -1,16 +1,19 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { Loading, Notice, Page } from '@pam/ui';
+import { Loading, Notice, Page, PeopleIcon } from '@pam/ui';
+import { FloatingAction } from '@pam/ui/FloatingAction';
+import { useStarredPeople } from '@/lib/useStarredPeople';
 import { USE_DUMMY_PEOPLE } from '@pam/config/dummy-flag';
-import { DUMMY_INTERESTED, DUMMY_MEMBERS } from '@pam/config/dummy-people';
+import { DUMMY_MEMBERS } from '@pam/config/dummy-people';
+import { DUMMY_APPOINTMENTS } from '@pam/config/dummy-appointments';
+import { ScheduleView, type Appointment } from './ScheduleView';
 import { useI18n } from '@/lib/i18n';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
 import { useRoleView } from '@/lib/useViewedRole';
 import { useCaseload } from '@/lib/useCaseload';
 import { dummyChip, statusChip, whenLastActive } from '@/lib/caseloadLabels';
-import { whenHappened } from '@/lib/when';
 import { ExploreScreen } from './ExploreScreen';
 import { HeaderActions } from './HeaderActions';
 import { PeopleHomeView, type HomePerson, type PeopleState } from './PeopleHomeView';
@@ -44,6 +47,7 @@ export function CaseloadHome() {
   const router = useRouter();
   const supportPhone = useSupportPhone();
   const { state: caseload, refresh } = useCaseload(true);
+  const starred = useStarredPeople();
 
   // The real list when there is one; the example people otherwise, as on
   // `/admin/` (Will, 16 September — and kept for investor demos, 1 October).
@@ -103,6 +107,8 @@ export function CaseloadHome() {
       state={state}
       note={isExample ? t('example.people.note') : null}
       actions={<HeaderActions role="admin" />}
+      starred={{ ids: starred.ids, onToggle: (person) => starred.toggle(person.id) }}
+      floating={<InviteFloating />}
       onRetry={refresh}
       onPick={(person) => person.href && router.push(person.href)}
       supportPhone={supportPhone}
@@ -120,56 +126,41 @@ export function CaseloadHome() {
 }
 
 /**
- * A program's home: the members interested in it. No query writes
- * "interested" yet (see `/interested/`), so this is the example set until
- * one does — the same set, on the same flag.
+ * A program lead's Home (D-218): who is coming in, by day, week or month —
+ * the example appointments until something books one (D-172), on the same
+ * flag as every example set.
  */
 export function ProgramHome() {
-  const { t, locale } = useI18n();
-  const router = useRouter();
-  const supportPhone = useSupportPhone();
-
-  const state: PeopleState = {
-    status: 'ready',
-    people: USE_DUMMY_PEOPLE
-      ? DUMMY_INTERESTED.map(
-          (interest): HomePerson => ({
-            id: interest.person.id,
-            firstName: interest.person.firstName,
-            href: `/person/?id=${interest.person.id}`,
-            meta: [
-              interest.programLabel,
-              t('interested.since', { when: whenHappened(interest.interestedAt, locale, t) }),
-            ],
-          }),
-        )
-      : [],
-  };
-
+  const { t } = useI18n();
+  const appointments: Appointment[] = USE_DUMMY_PEOPLE
+    ? DUMMY_APPOINTMENTS.map((a) => ({
+        id: a.id,
+        personId: a.personId,
+        firstName: a.firstName,
+        startsAt: a.startsAt,
+        minutes: a.minutes,
+        kindLabel: t(`schedule.kind.${a.kind}`),
+        href: `/person/?id=${a.personId}`,
+      }))
+    : [];
   return (
-    <PeopleHomeView
-      title={t('home.interested.title')}
-      countLabel={(count) => t('home.interested.count', { count })}
-      search={{
-        label: t('home.interested.search.label'),
-        placeholder: t('home.interested.search.placeholder'),
-        none: t('home.interested.search.none'),
-      }}
-      state={state}
-      note={USE_DUMMY_PEOPLE ? t('example.people.note') : null}
+    <ScheduleView
+      appointments={appointments}
       actions={<HeaderActions role="provider" />}
-      onRetry={() => {}}
-      onPick={(person) => person.href && router.push(person.href)}
-      supportPhone={supportPhone}
-      empty={
-        <Notice
-          notice="no_caseload_members"
-          title={t('admin.caseload.empty.title')}
-          body={t('admin.caseload.empty.body')}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
-        />
-      }
+      floating={<InviteFloating />}
+      note={USE_DUMMY_PEOPLE ? t('example.people.note') : null}
+    />
+  );
+}
+
+/** "Invite someone", floating above the bar on a staff Home (D-218). */
+export function InviteFloating() {
+  const { t } = useI18n();
+  return (
+    <FloatingAction
+      label={t('profile.menu.invite')}
+      href="/invite/"
+      icon={<PeopleIcon width={26} height={26} aria-hidden />}
     />
   );
 }

@@ -363,3 +363,19 @@ Chromium.
 - Verified: Google serves the Maps script for the key (HTTP 200 with the
   preview's referrer). The sandbox browser cannot reach Google through the
   proxy, so the drawn map was what it showed — the fallback working.
+
+## Addendum — 2 October: staff apps (D-218)
+
+- Role bars (`lib/tabs.ts`), `FloatingAction`, `/invite/` (`InviteView`),
+  starred people (`useStarredPeople`, session only; star on rows and on a
+  member's page; Saved People | Programs), program lead schedule
+  (`ScheduleView`, `dummy-appointments`), Program tab (`ProgramView`), All
+  programs (`ExploreScreen mode="programs"`) and Add a program
+  (`AddProgramView`, reusing `ProgramDetailsStep` with `submitLabel`).
+- Sign out row centred (`globals.css`, `.astryx-item > button`).
+- A fixed element inside `Page` is pinned to the page's motion wrapper, not
+  the viewport — the floating row rendered mid-page until it was moved
+  outside `Page`. Worth remembering for any future floating control.
+- Checked: typecheck, UI/config tests, `build-storybook` (276 stories, 0
+  render errors), bundle budget (88 kB to spare), screenshots of each new
+  screen.

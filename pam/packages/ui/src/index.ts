@@ -87,6 +87,7 @@ export {
   NoResultsIcon,
   BackArrowIcon,
   BookIcon,
+  PlusIcon,
 } from './icons.js';
 export { SavedStrip, type SavedStripProps, type SavedStripPlace } from './SavedStrip.js';
 export {

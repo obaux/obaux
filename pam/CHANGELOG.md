@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.41.0-staff] — 2026-10-02 · An app for each kind of staff
+
+In Storybook. Case managers and program leads have their own bottom bars —
+no Trips, and a program lead has Program instead of Saved. "Invite someone"
+floats just above the bar on their Home and opens two simple choices: a
+member, or a program. Case managers can star people and find them under
+Saved, next to the programs they saved. A program lead's Home shows who is
+coming in — today, this week or this month — and searches by name or time;
+their Program tab shows their listing with an Edit button. Both can see
+every program and add a new one from Profile. Sign out lines up with the
+rest of the list.
+
 ## [0.40.0-roles] — 2026-10-02 · Every screen on the new design, a folder for each role
 
 In Storybook, the old design is gone: there is a folder for members, case
