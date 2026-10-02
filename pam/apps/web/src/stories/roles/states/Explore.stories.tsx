@@ -2,13 +2,13 @@ import type { Meta, StoryObj } from '@storybook/nextjs';
 import { fn } from 'storybook/test';
 import { PlaceCard } from '@pam/ui';
 import { SearchPill } from '@pam/ui/SearchPill';
-import { ExploreView } from '../../screens/ExploreView';
-import { ExploreScreen } from '../../screens/ExploreScreen';
+import { ExploreView } from '../../../screens/ExploreView';
+import { ExploreScreen } from '../../../screens/ExploreScreen';
 import type { Category } from '@pam/config';
-import type { NearbyPlace } from '../../lib/usePlaces';
-import { HeaderActions } from '../shell/HeaderActions';
-import { asRedesign } from '../journeys/journey';
-import { PLACES } from '../journeys/fixtures';
+import type { NearbyPlace } from '../../../lib/usePlaces';
+import { HeaderActions } from '../../shell/HeaderActions';
+import { asRedesign } from '../../journeys/journey';
+import { PLACES } from '../../journeys/fixtures';
 
 /**
  * Explore, the member's home (D-212). `Live` is the screen wired to the
@@ -49,7 +49,7 @@ const pill = (
 );
 
 const meta = {
-  title: 'Redesign/Explore',
+  title: 'Member app/States/Explore',
   component: ExploreView,
   args: {
     search: pill,

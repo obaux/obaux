@@ -4557,6 +4557,55 @@ Will, 2 October. Four small changes to the redesign, recorded together:
 
 ---
 
+### D-217 — Storybook shows only the redesign, one folder per role; the last old screens move onto the templates
+
+Will, 2 October: "Storybook still has outdated designs in Member app. Let's
+ensure only new design is used … redesign anything accordingly … Create
+other folders, for Super admin, Case manager, and Program Lead."
+
+**Storybook's tree.** `Member app`, `Case manager`, `Program lead`, `Super
+admin`, each with `Prototype` (the clickable app, signed in as that role),
+`Screens` (every screen that role reaches, one story each, in tab order and
+then the screens you tap into) and `States` (the per-screen variants that
+were under `Redesign/*`); then `Components` (TabBar moved there from
+`Shell`). Deleted: the 19 `Journeys/*` files, `Shell/Member app`,
+`Prototype/Today — *`. Every story opens in the redesign's router
+(`asRole` no longer has a "today" mode), so no tap from any story lands on
+an old screen. A `screen(role, name, path, query)` helper builds a story
+from the prototype's route table, so a screen story cannot drift from what
+the prototype draws.
+
+**The screens that were still on the old frame** (logo bar + small back
+chevron, or a Help bar at the foot) move to the nested template **in the
+app**, as Notifications and a place did at D-213: Report a place (back to
+the place), Points (back to Profile), a member's page (laid out like a
+connection's profile; Message is its one BigButton), Everyone (the filter,
+which rode in the old header, is a full-width selector on the page),
+Staff requests, Interested, `/admin/` (now titled **Invite someone**, back
+to Profile), Text reminders (back to Profile), Sign in's code step (back to
+the number; the language switch in the bar), and Sign up's step header (the
+template's large title; still no Back — the way out of an unfinished flow
+is the steps). A super admin's role switch rides in the template's action
+slot wherever the old header carried it.
+
+**Help on a nested screen is the round button in the bar** (`HelpButton`,
+shared with `HeaderActions`), replacing `HelpBar` on the screens touched
+here. §0's "a visible way to get help on every screen" holds — it is one
+tap, top right, the same place as on every tab.
+
+**Profile knows who is looking** (`ProfileScreen`). Points, Past trips and
+Connections are a member's; a staff Profile shows the person, their tools
+and the settings. The tools that lived on the old home's tiles are rows:
+a case manager's *Invite someone*; a super admin's *Everyone*, *Staff
+requests* and *See the app as* — D-108's preview as a page of its own
+(`/view-as/`, a real route) shaped like Language, kept on the super admin's
+own Profile while a preview is on so it can always be undone.
+
+**Not changed:** a super admin's Home stays Explore (D-212). The tab
+screens are still Storybook-only; routing them in the app is its own step.
+
+---
+
 ## Notes for whoever picks this up next
 
 - `pnpm --filter @pam/db test` is the highest-value check in the repo. It is the

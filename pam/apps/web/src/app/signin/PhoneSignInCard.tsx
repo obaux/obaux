@@ -34,6 +34,11 @@ export interface PhoneSignInCardProps {
   readonly onPhoneChange: (next: string) => void;
   readonly code: string;
   readonly onCodeChange: (next: string) => void;
+  /**
+   * Off on the code step of the sign-in screen, where the nested-page
+   * template above the card already says "Sign in" (D-217).
+   */
+  readonly hasTitle?: boolean;
   /** 1 on the sign-in screen, 2 inside a flow that already has a title. */
   readonly headingLevel?: 1 | 2;
 }
@@ -57,6 +62,7 @@ export function PhoneSignInCard({
   code,
   onCodeChange,
   headingLevel = 1,
+  hasTitle = true,
 }: PhoneSignInCardProps) {
   const { t } = useI18n();
   const { state, sendCode, verifyCode } = flow;
@@ -75,9 +81,11 @@ export function PhoneSignInCard({
     <Card padding={5} xstyle={styles.card}>
       {onCodeStep ? (
         <VStack gap={3}>
-          <Heading level={headingLevel} xstyle={titleStyle}>
-            {t('signin.title')}
-          </Heading>
+          {hasTitle ? (
+            <Heading level={headingLevel} xstyle={titleStyle}>
+              {t('signin.title')}
+            </Heading>
+          ) : null}
           <TextField
             id={codeId}
             purpose="code"
@@ -101,11 +109,7 @@ export function PhoneSignInCard({
             that stops delivering; a person who can see the count waits.
           */}
           <TextLink
-            label={
-              flow.resendIn > 0
-                ? t('signin.code.resendIn', { seconds: flow.resendIn })
-                : t('signin.code.resend')
-            }
+            label={flow.resendIn > 0 ? t('signin.code.resendIn', { seconds: flow.resendIn }) : t('signin.code.resend')}
             onClick={() => void sendCode(state.phone)}
             isDisabled={busy || flow.resendIn > 0}
           />

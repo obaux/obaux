@@ -1,5 +1,16 @@
 # Changelog
 
+## [0.40.0-roles] — 2026-10-02 · Every screen on the new design, a folder for each role
+
+In Storybook, the old design is gone: there is a folder for members, case
+managers, program leads and super admins, each one clickable from its
+first screen. In the app, the screens that still looked old now open like
+every other — a round back button and the screen's name, large — with Help
+as a round button at the top: reporting a place, points, a member's page,
+inviting someone, Everyone, staff requests, text reminders, and the code
+step of signing in. A staff Profile shows their own tools instead of points
+and trips, and a super admin chooses which role to preview from Profile.
+
 ## [0.39.1-polish] — 2026-10-02 · One search bar, quieter buttons
 
 Trips and Messages now have the same search bar as Explore. The round

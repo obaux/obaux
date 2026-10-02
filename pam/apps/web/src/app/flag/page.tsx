@@ -9,7 +9,9 @@ import { Card } from '@astryxdesign/core/Card';
 import { Text } from '@astryxdesign/core/Text';
 import { RadioList, RadioListItem } from '@astryxdesign/core/RadioList';
 import { TextArea } from '@astryxdesign/core/TextArea';
-import { AppHeader, BigButton, HelpBar, Notice, Page, PageTitle, TextLink } from '@pam/ui';
+import { BigButton, Notice, Page } from '@pam/ui';
+import { HelpButton } from '../../screens/HelpButton';
+import { SubPageHeader } from '@pam/ui/SubPage';
 import { SERVICE_FLAG_REASON_KEYS, type ServiceFlagReason } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { useSupportPhone } from '@/lib/useSupportPhone';
@@ -59,13 +61,25 @@ function FlagForm() {
   const [note, setNote] = useState('');
   const [status, setStatus] = useState<'idle' | 'sending' | 'done' | 'failed'>('idle');
 
+  // The nested-page template (D-213, D-217): back goes to the place the
+  // report is about, or to Explore when there is none.
+  const header = serviceId ? (
+    <SubPageHeader
+      title={t('flag.title')}
+      backHref={`/place/?id=${encodeURIComponent(serviceId)}`}
+      backLabel={t('nav.back.place')}
+      actions={<HelpButton />}
+    />
+  ) : (
+    <SubPageHeader title={t('flag.title')} backHref="/" backLabel={t('nav.back.explore')} actions={<HelpButton />} />
+  );
+
   if (!serviceId) {
     // Arrived without a place: a shared link, a stale bookmark, a typo. Say so
     // and point at the way in rather than showing a form that cannot send.
     return (
       <Page gap={4}>
-        <AppHeader />
-        <PageTitle title={t('flag.title')} backHref="/places/" backLabel={t('nav.back.places')} />
+        {header}
         <Notice
           notice="something_went_wrong"
           title={t('flag.missing.title')}
@@ -73,7 +87,7 @@ function FlagForm() {
           supportPhone={supportPhone}
           callLabel={t('help.callSupport')}
         />
-        <BigButton label={t('places.title')} href="/places/" />
+        <BigButton label={t('help.place.action')} href="/" />
       </Page>
     );
   }
@@ -96,8 +110,7 @@ function FlagForm() {
   if (status === 'done') {
     return (
       <Page gap={4}>
-        <AppHeader />
-        <PageTitle title={t('flag.title')} backHref="/places/" backLabel={t('nav.back.places')} />
+        {header}
         {/*
           No phone number and no help bar on this screen (Will, 14 September).
           Every other notice in PAM appears because something went wrong and
@@ -105,20 +118,15 @@ function FlagForm() {
           implies the member has a problem they have just created, which is the
           opposite of what they did.
         */}
-        <Notice
-          notice="service_not_available"
-          title={t('flag.done.title')}
-          body={t('flag.done.body')}
-        />
-        <BigButton label={t('action.goBack')} href="/places/" />
+        <Notice notice="service_not_available" title={t('flag.done.title')} body={t('flag.done.body')} />
+        <BigButton label={t('action.goBack')} href={`/place/?id=${encodeURIComponent(serviceId)}`} />
       </Page>
     );
   }
 
   return (
     <Page gap={4}>
-      <AppHeader />
-      <PageTitle title={t('flag.title')} backHref="/places/" backLabel={t('nav.back.places')} />
+      {header}
 
       <Text type="supporting" xstyle={styles.intro}>
         {t('flag.intro')}
@@ -158,13 +166,7 @@ function FlagForm() {
             the size of a paragraph asks for a paragraph, and the person filling
             this in is often standing outside a locked door.
           */}
-          <TextArea
-            label={t('flag.note')}
-            value={note}
-            onChange={(next) => setNote(next)}
-            rows={2}
-            width="100%"
-          />
+          <TextArea label={t('flag.note')} value={note} onChange={(next) => setNote(next)} rows={2} width="100%" />
 
           <BigButton
             label={status === 'sending' ? t('flag.sending') : t('flag.action')}
@@ -173,9 +175,6 @@ function FlagForm() {
           />
         </VStack>
       </Card>
-
-      <TextLink label={t('places.title')} href="/places/" />
-      <HelpBar label={t('nav.help')} variant="block" />
     </Page>
   );
 }
@@ -186,11 +185,12 @@ function FlagForm() {
  * are the two things that must never depend on a chunk arriving.
  */
 export default function FlagPage() {
+  const { t } = useI18n();
   return (
     <Suspense
       fallback={
         <Page gap={3}>
-          <AppHeader />
+          <SubPageHeader title={t('flag.title')} backHref="/" backLabel={t('nav.back.explore')} />
         </Page>
       }
     >

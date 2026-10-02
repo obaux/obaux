@@ -3,13 +3,14 @@
 import * as stylex from '@stylexjs/stylex';
 import { VStack } from '@astryxdesign/core/VStack';
 import { Text } from '@astryxdesign/core/Text';
-import { AppHeader, Loading, Notice, Page, PageTitle, TextLink } from '@pam/ui';
+import { Loading, Notice, Page } from '@pam/ui';
+import { SubPageHeader } from '@pam/ui/SubPage';
+import { HelpButton } from '../../screens/HelpButton';
 import { NOTICES } from '@pam/config';
 import { USE_DUMMY_PEOPLE } from '@pam/config/dummy-flag';
 import { DUMMY_INTERESTED } from '@pam/config/dummy-people';
 import { useI18n } from '@/lib/i18n';
 import { NotIn } from '../NotIn';
-import { HeaderBell } from '../HeaderBell';
 import { PersonRow } from '../PersonRow';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
@@ -46,7 +47,19 @@ export default function InterestedPage() {
   if (session.status === 'loading') {
     return (
       <Page gap={3}>
-        <AppHeader />
+        <SubPageHeader
+          title={t('interested.title')}
+          backHref="/"
+          backLabel={t('nav.back.home')}
+          actions={
+            <>
+              {trueRole === 'super_admin' ? (
+                <RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} />
+              ) : null}
+              <HelpButton />
+            </>
+          }
+        />
         <Loading label={t('common.loading')} variant="screen" />
       </Page>
     );
@@ -55,7 +68,19 @@ export default function InterestedPage() {
   if (session.status === 'signed-out' || session.status === 'no-profile' || session.status === 'suspended') {
     return (
       <Page gap={4}>
-        <AppHeader />
+        <SubPageHeader
+          title={t('interested.title')}
+          backHref="/"
+          backLabel={t('nav.back.home')}
+          actions={
+            <>
+              {trueRole === 'super_admin' ? (
+                <RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} />
+              ) : null}
+              <HelpButton />
+            </>
+          }
+        />
         <NotIn status={session.status} title={t('interested.signedOut.title')} body={t('interested.signedOut.body')} />
       </Page>
     );
@@ -65,7 +90,19 @@ export default function InterestedPage() {
     const key = session.offline ? 'offline' : 'something_went_wrong';
     return (
       <Page gap={4}>
-        <AppHeader />
+        <SubPageHeader
+          title={t('interested.title')}
+          backHref="/"
+          backLabel={t('nav.back.home')}
+          actions={
+            <>
+              {trueRole === 'super_admin' ? (
+                <RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} />
+              ) : null}
+              <HelpButton />
+            </>
+          }
+        />
         <Notice
           notice={key}
           title={t(NOTICES[key].titleKey)}
@@ -83,14 +120,18 @@ export default function InterestedPage() {
     // other role-gated screen already uses for the same case.
     return (
       <Page gap={4}>
-        <AppHeader
-          roleLabel={viewedRole ? t(`role.${viewedRole}`) : undefined}
-          roleControl={
-            trueRole === 'super_admin' ? (
-              <RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} />
-            ) : undefined
+        <SubPageHeader
+          title={t('interested.title')}
+          backHref="/"
+          backLabel={t('nav.back.home')}
+          actions={
+            <>
+              {trueRole === 'super_admin' ? (
+                <RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} />
+              ) : null}
+              <HelpButton />
+            </>
           }
-          trailing={<HeaderBell enabled={trueRole !== null} role={viewedRole} />}
         />
         <Notice
           notice="service_not_available"
@@ -99,32 +140,25 @@ export default function InterestedPage() {
           supportPhone={supportPhone}
           callLabel={t('help.callSupport')}
         />
-        <TextLink label={t('admin.back')} href="/" />
       </Page>
     );
   }
 
   return (
     <Page gap={4}>
-      <AppHeader
-        roleLabel={t('role.provider')}
-        roleControl={
-          trueRole === 'super_admin' ? (
-            <RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} />
-          ) : undefined
-        }
-        trailing={<HeaderBell enabled={isProvider} role={viewedRole} />}
-      />
-
-      <PageTitle
+      <SubPageHeader
         title={t('interested.title')}
-        subtitle={
-          USE_DUMMY_PEOPLE
-            ? t('interested.subtitle', { count: DUMMY_INTERESTED.length })
-            : undefined
-        }
+        subtitle={USE_DUMMY_PEOPLE ? t('interested.subtitle', { count: DUMMY_INTERESTED.length }) : undefined}
         backHref="/"
         backLabel={t('nav.back.home')}
+        actions={
+          <>
+            {trueRole === 'super_admin' ? (
+              <RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} />
+            ) : null}
+            <HelpButton />
+          </>
+        }
       />
 
       {!USE_DUMMY_PEOPLE ? (

@@ -38,6 +38,8 @@ export interface ProfileSummaryProps {
 const summary = stylex.create({
   card: { width: '100%' },
   person: { flexBasis: '55%', flexShrink: 0, minWidth: 0 },
+  // No numbers to show (a staff account, D-217): the person has the card.
+  personAlone: { flexBasis: '100%' },
   name: { fontSize: '26px', lineHeight: 1.2, fontWeight: 700, textAlign: 'center' },
   role: { fontSize: '15px', textAlign: 'center' },
   stats: { flexGrow: 1, minWidth: 0 },
@@ -49,7 +51,7 @@ export function ProfileSummary({ name, roleLabel, photoUrl, stats }: ProfileSumm
   return (
     <Card padding={6} xstyle={summary.card}>
       <HStack gap={4} align="center" wrap="nowrap">
-        <VStack gap={2} align="center" xstyle={summary.person}>
+        <VStack gap={2} align="center" xstyle={[summary.person, stats.length === 0 && summary.personAlone]}>
           <Avatar size="xl" name={name} src={photoUrl ?? undefined} tooltip={false} />
           <VStack gap={0.5} align="center">
             <Heading level={2} xstyle={summary.name} maxLines={2}>
@@ -60,19 +62,21 @@ export function ProfileSummary({ name, roleLabel, photoUrl, stats }: ProfileSumm
             </Text>
           </VStack>
         </VStack>
-        <VStack gap={3} xstyle={summary.stats}>
-          {stats.slice(0, 3).map((stat, index) => (
-            <VStack key={stat.label} gap={2}>
-              {index > 0 ? <Divider /> : null}
-              <VStack gap={0}>
-                <Text xstyle={summary.value}>{stat.value}</Text>
-                <Text type="supporting" xstyle={summary.label}>
-                  {stat.label}
-                </Text>
+        {stats.length > 0 ? (
+          <VStack gap={3} xstyle={summary.stats}>
+            {stats.slice(0, 3).map((stat, index) => (
+              <VStack key={stat.label} gap={2}>
+                {index > 0 ? <Divider /> : null}
+                <VStack gap={0}>
+                  <Text xstyle={summary.value}>{stat.value}</Text>
+                  <Text type="supporting" xstyle={summary.label}>
+                    {stat.label}
+                  </Text>
+                </VStack>
               </VStack>
-            </VStack>
-          ))}
-        </VStack>
+            ))}
+          </VStack>
+        ) : null}
       </HStack>
     </Card>
   );

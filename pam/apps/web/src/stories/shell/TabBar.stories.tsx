@@ -6,7 +6,7 @@ import { LocalTabBar } from './LocalTabBar';
  * Help is in each screen's header now, not in this bar.
  */
 const meta = {
-  title: 'Shell/TabBar',
+  title: 'Components/TabBar',
   component: LocalTabBar,
   args: { current: 'explore', unread: true },
   argTypes: {

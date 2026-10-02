@@ -10,23 +10,15 @@ import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { Badge } from '@astryxdesign/core/Badge';
 import { Avatar } from '@astryxdesign/core/Avatar';
-import { Button } from '@astryxdesign/core/Button';
-import {
-  AppHeader,
-  BigButton,
-  Loading,
-  Notice,
-  Page,
-  PageTitle,
-  TextLink,
-} from '@pam/ui';
+import { BigButton, Loading, Notice, Page } from '@pam/ui';
+import { SubPageHeader } from '@pam/ui/SubPage';
+import { HelpButton } from '../../screens/HelpButton';
 import { PersonDetailSkeleton } from '@pam/ui/Skeletons';
 import { NOTICES } from '@pam/config';
 import { DUMMY_EVERYONE, type DummyPerson } from '@pam/config/dummy-people';
 import { DUMMY_SAVED_BY_PERSON } from '@pam/config/dummy-places';
 import { useI18n } from '@/lib/i18n';
 import { NotIn } from '../NotIn';
-import { HeaderBell } from '../HeaderBell';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
 import { useRoleView } from '@/lib/useViewedRole';
@@ -63,9 +55,9 @@ import { ProgramBadge } from '../ProgramBadge';
  */
 
 const styles = stylex.create({
-  title: { fontSize: '26px', lineHeight: 1.2 },
+  subtitle: { fontSize: '17px', lineHeight: 1.4, textAlign: 'center' },
   card: { width: '100%', position: 'relative' },
-  section: { fontSize: '17px' },
+  section: { fontSize: '20px' },
   name: { fontSize: '18px' },
   meta: { fontSize: '16px' },
   note: { fontSize: '15px', lineHeight: 1.5 },
@@ -77,9 +69,6 @@ const styles = stylex.create({
     textDecoration: 'none',
     '::after': { content: '""', position: 'absolute', inset: 0 },
   },
-  // A secondary action: 48px, reads as a button, not the screen's one
-  // BigButton (which is the way home on the not-found branch).
-  action: { minHeight: '48px', fontSize: '17px' },
 });
 
 function lookup(id: string | null): DummyPerson | null {
@@ -103,10 +92,28 @@ function PersonScreen() {
   // The same audience the three lists that link here already gate on.
   const canView = viewedRole === 'admin' || viewedRole === 'provider' || viewedRole === 'super_admin';
 
+  // The nested-page template (D-213, D-217): back to Home, where every list
+  // that links here lives; a super admin's role switch rides in the bar.
+  const header = (title: string) => (
+    <SubPageHeader
+      title={title}
+      backHref="/"
+      backLabel={t('nav.back.home')}
+      actions={
+        <>
+          {trueRole === 'super_admin' ? (
+            <RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} />
+          ) : null}
+          <HelpButton />
+        </>
+      }
+    />
+  );
+
   if (session.status === 'loading') {
     return (
       <Page gap={3}>
-        <AppHeader />
+        {header(t('person.title'))}
         <Loading label={t('common.loading')} variant="screen" />
       </Page>
     );
@@ -115,7 +122,7 @@ function PersonScreen() {
   if (session.status === 'signed-out' || session.status === 'no-profile' || session.status === 'suspended') {
     return (
       <Page gap={4}>
-        <AppHeader />
+        {header(t('person.title'))}
         <NotIn status={session.status} title={t('person.signedOut.title')} body={t('person.signedOut.body')} />
       </Page>
     );
@@ -125,7 +132,7 @@ function PersonScreen() {
     const key = session.offline ? 'offline' : 'something_went_wrong';
     return (
       <Page gap={4}>
-        <AppHeader />
+        {header(t('person.title'))}
         <Notice
           notice={key}
           title={t(NOTICES[key].titleKey)}
@@ -140,15 +147,7 @@ function PersonScreen() {
   if (!canView) {
     return (
       <Page gap={4}>
-        <AppHeader
-          roleLabel={viewedRole ? t(`role.${viewedRole}`) : undefined}
-          roleControl={
-            trueRole === 'super_admin' ? (
-              <RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} />
-            ) : undefined
-          }
-          trailing={<HeaderBell enabled={trueRole !== null} role={viewedRole} />}
-        />
+        {header(t('person.notAllowed.title'))}
         <Notice
           notice="service_not_available"
           title={t('person.notAllowed.title')}
@@ -156,7 +155,6 @@ function PersonScreen() {
           supportPhone={supportPhone}
           callLabel={t('help.callSupport')}
         />
-        <TextLink label={t('admin.back')} href="/" />
       </Page>
     );
   }
@@ -166,16 +164,7 @@ function PersonScreen() {
   if (!person) {
     return (
       <Page gap={4}>
-        <AppHeader
-          roleLabel={t(`role.${viewedRole}`)}
-          roleControl={
-            trueRole === 'super_admin' ? (
-              <RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} />
-            ) : undefined
-          }
-          trailing={<HeaderBell enabled role={viewedRole} />}
-        />
-        <PageTitle title={t('person.notFound.title')} backHref="/" backLabel={t('nav.back.home')} />
+        {header(t('person.notFound.title'))}
         <Notice
           notice="service_not_available"
           title={t('person.notFound.title')}
@@ -193,16 +182,7 @@ function PersonScreen() {
 
   return (
     <Page gap={4}>
-      <AppHeader
-        roleLabel={t(`role.${viewedRole}`)}
-        roleControl={
-          trueRole === 'super_admin' ? (
-            <RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} />
-          ) : undefined
-        }
-        trailing={<HeaderBell enabled role={viewedRole} />}
-      />
-      <PageTitle title={person.firstName} backHref="/" backLabel={t('nav.back.home')} />
+      {header(person.firstName)}
 
       <VStack gap={4}>
         {/*
@@ -210,24 +190,19 @@ function PersonScreen() {
           already is it. What this row adds is what the title cannot say:
           where they are, and which language PAM answers them in.
         */}
-        <HStack gap={2} align="center" wrap="wrap">
-          <Avatar size="lg" name={person.firstName} />
-          <Text type="supporting" xstyle={styles.meta}>
+        {/* Laid out as a connection's profile is (D-213, D-217): the face first, then who they are. */}
+        <VStack gap={2} align="center">
+          <Avatar size="xl" name={person.firstName} tooltip={false} alt="" />
+          <Text type="supporting" xstyle={styles.subtitle}>
             {t(`role.${person.role}`)} · {person.regionName} · {t(`language.${person.language}`)}
           </Text>
-        </HStack>
+        </VStack>
 
-        <HStack gap={2} wrap="wrap" align="center">
-          {person.accessStatus === 'suspended' ? (
-            <Badge variant="error" label={t('admin.status.suspended')} />
-          ) : null}
-          {person.accessStatus === 'limited' ? (
-            <Badge variant="warning" label={t('admin.status.limited')} />
-          ) : null}
+        <HStack gap={2} wrap="wrap" align="center" justify="center">
+          {person.accessStatus === 'suspended' ? <Badge variant="error" label={t('admin.status.suspended')} /> : null}
+          {person.accessStatus === 'limited' ? <Badge variant="warning" label={t('admin.status.limited')} /> : null}
           {person.orgName ? <Badge variant="neutral" label={person.orgName} /> : null}
-          {person.program ? (
-            <ProgramBadge name={person.program.name} serviceId={person.program.serviceId} />
-          ) : null}
+          {person.program ? <ProgramBadge name={person.program.name} serviceId={person.program.serviceId} /> : null}
           {person.points !== undefined ? (
             <Text type="supporting" xstyle={styles.meta}>
               {t('admin.points', { count: person.points })}
@@ -250,7 +225,7 @@ function PersonScreen() {
             ) : (
               <VStack gap={2}>
                 {saved.map((place) => (
-                  <Card key={place.id} xstyle={styles.card}>
+                  <Card key={place.id} padding={6} xstyle={styles.card}>
                     <VStack gap={1}>
                       <Heading level={3} xstyle={styles.name}>
                         <a href={`/place/?id=${encodeURIComponent(place.id)}`} {...stylex.props(styles.link)}>
@@ -276,13 +251,11 @@ function PersonScreen() {
           previewing "as itself" (D-171).
         */}
         {person.role === 'member' && (viewedRole === 'admin' || viewedRole === 'provider') ? (
-          <Button
+          <BigButton
             label={t('person.message.action', { name: person.firstName })}
-            variant="secondary"
             href={`/messages/thread/?id=${encodeURIComponent(
               dummyConversationIdBetween(person.id, DUMMY_SELF_ID[viewedRole]),
             )}`}
-            xstyle={styles.action}
           />
         ) : null}
 
@@ -296,11 +269,12 @@ function PersonScreen() {
 
 /** `useSearchParams` needs a Suspense boundary in an exported app (see `/place/`). */
 export default function PersonPage() {
+  const { t } = useI18n();
   return (
     <Suspense
       fallback={
         <Page gap={4}>
-          <AppHeader />
+          <SubPageHeader title={t('person.title')} backHref="/" backLabel={t('nav.back.home')} />
           <PersonDetailSkeleton label="Loading" />
         </Page>
       }

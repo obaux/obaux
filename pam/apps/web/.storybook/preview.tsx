@@ -127,6 +127,23 @@ const preview: Preview = {
     nextjs: { appDirectory: true },
     a11y: { test: 'error' },
     controls: { expanded: true },
+    // One folder per kind of account, each opening on its clickable
+    // prototype (D-217); the components after them.
+    options: {
+      storySort: {
+        order: [
+          'Member app',
+          ['Prototype', 'Screens', 'States'],
+          'Case manager',
+          ['Prototype', 'Screens', 'States'],
+          'Program lead',
+          ['Prototype', 'Screens', 'States'],
+          'Super admin',
+          ['Prototype', 'Screens', 'States'],
+          'Components',
+        ],
+      },
+    },
   },
 };
 

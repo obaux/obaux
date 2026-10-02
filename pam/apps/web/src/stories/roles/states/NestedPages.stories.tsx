@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/nextjs';
-import { LegalView } from '../../screens/LegalView';
-import { LanguageView } from '../../screens/LanguageView';
-import { HelpReportPlaceView, HelpSafetyView, HelpTopicsView, HelpView } from '../../screens/HelpViews';
-import { DataCopyView, DeleteAccountView, PrivacyControlsView } from '../../screens/PrivacyViews';
-import { asRedesign } from '../journeys/journey';
+import { LegalView } from '../../../screens/LegalView';
+import { LanguageView } from '../../../screens/LanguageView';
+import { HelpReportPlaceView, HelpSafetyView, HelpTopicsView, HelpView } from '../../../screens/HelpViews';
+import { DataCopyView, DeleteAccountView, PrivacyControlsView } from '../../../screens/PrivacyViews';
+import { asRedesign } from '../../journeys/journey';
 
 /**
  * The nested-page template (D-213): a round back button, then the title,
@@ -12,7 +12,7 @@ import { asRedesign } from '../journeys/journey';
  * (compact) a conversation.
  */
 const meta = {
-  title: 'Redesign/Nested pages',
+  title: 'Member app/States/Nested pages',
   component: LegalView,
 } satisfies Meta<typeof LegalView>;
 

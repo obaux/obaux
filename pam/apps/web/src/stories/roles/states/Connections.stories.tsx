@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/nextjs';
-import { ConnectionsView } from '../../screens/ConnectionsView';
-import { ConnectionProfileScreen, ConnectionsScreen } from '../../screens/ConnectionsScreen';
-import { asRedesign } from '../journeys/journey';
+import { ConnectionsView } from '../../../screens/ConnectionsView';
+import { ConnectionProfileScreen, ConnectionsScreen } from '../../../screens/ConnectionsScreen';
+import { asRedesign } from '../../journeys/journey';
 
 /**
  * Connections (D-210, cards since D-213): the case manager and program
@@ -10,7 +10,7 @@ import { asRedesign } from '../journeys/journey';
  * they cannot load).
  */
 const meta = {
-  title: 'Redesign/Connections',
+  title: 'Member app/States/Connections',
   component: ConnectionsView,
   args: { connections: [] },
 } satisfies Meta<typeof ConnectionsView>;

@@ -6,7 +6,8 @@ import * as stylex from '@stylexjs/stylex';
 import { HStack } from '@astryxdesign/core/HStack';
 import { VStack } from '@astryxdesign/core/VStack';
 import { Text } from '@astryxdesign/core/Text';
-import { AppHeader, Notice, Page, TextLink } from '@pam/ui';
+import { Notice, Page, TextLink } from '@pam/ui';
+import { SubPageHeader } from '@pam/ui/SubPage';
 import { OnboardingSlides } from '@pam/ui/OnboardingSlides';
 import { useI18n } from '@/lib/i18n';
 import { useSupportPhone } from '@/lib/useSupportPhone';
@@ -192,19 +193,14 @@ export default function SignInPage() {
     };
   }, [state.step, router]);
 
-  const onFirstStep =
-    state.step !== 'code' && state.step !== 'verifying' && state.step !== 'done';
+  const onFirstStep = state.step !== 'code' && state.step !== 'verifying' && state.step !== 'done';
 
   const failedNotice =
     state.step === 'failed' ? (
       <Notice
         notice="something_went_wrong"
         title={t(`signin.failed.${state.reason}.title`)}
-        body={
-          state.phone === null
-            ? t('signin.phone.invalid')
-            : t(`signin.failed.${state.reason}.body`)
-        }
+        body={state.phone === null ? t('signin.phone.invalid') : t(`signin.failed.${state.reason}.body`)}
         supportPhone={supportPhone}
         callLabel={t('help.callSupport')}
       />
@@ -220,6 +216,7 @@ export default function SignInPage() {
         onPhoneChange={setPhone}
         code={code}
         onCodeChange={setCode}
+        hasTitle={onFirstStep}
       />
     );
 
@@ -266,11 +263,15 @@ export default function SignInPage() {
       ) : (
         <>
           {/*
-            The mark is identity here, not navigation: there is nowhere to go
-            until somebody is in, and the 48px tap target a link needs costs
-            22px of the height the consent sentence is fighting for.
+            The code step is a step in: the nested-page template (D-217), its
+            back returning to the number, the language switch in its bar.
           */}
-          <AppHeader align="center" isSticky homeHref={null} trailing={<LanguageSwitcher />} />
+          <SubPageHeader
+            title={t('signin.title')}
+            backHref="/signin/"
+            backLabel={t('nav.back.signin')}
+            actions={<LanguageSwitcher />}
+          />
           {failedNotice}
           {card}
           {resendLink}

@@ -116,9 +116,12 @@ Will reviews UI in Storybook (Chromatic, rebuilt on every push — D-208), not
 by signing in on the live site. So:
 
 - **A new or changed component gets a story** in
-  `apps/web/src/stories/components/`; a new or changed screen gets a journey in
-  `apps/web/src/stories/journeys/` (one story per role that reaches it), with
-  any new Supabase call given a fixture in `fixtures.ts` / `mockSupabase.ts`.
+  `apps/web/src/stories/components/`; a new or changed screen gets a line in
+  each role's `apps/web/src/stories/roles/<Role>.stories.tsx` that reaches it
+  (`screen(role, name, path)`, D-217), and its route in
+  `src/stories/prototype/routes.tsx`, with any new Supabase call given a
+  fixture in `journeys/fixtures.ts` / `mockSupabase.ts`. States worth seeing
+  on their own go in `roles/states/`. Storybook shows only the current design.
   An unmatched call is answered empty and logged as `[journey] no fixture` —
   fix that, don't ignore it.
 - **Journeys never touch the live project.** Keep it that way: no real keys,

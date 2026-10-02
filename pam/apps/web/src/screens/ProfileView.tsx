@@ -11,6 +11,8 @@ import {
   HelpIcon,
   LegalIcon,
   Page,
+  PeopleIcon,
+  ShieldIcon,
   SignOutIcon,
   StarIcon,
   TripsIcon,
@@ -44,6 +46,11 @@ export interface ProfileViewProps {
   /** The bell and Help, from the caller — they read live data. */
   readonly headerActions: ReactNode;
   readonly onSignOut?: () => void;
+  /**
+   * A super admin's own account, whatever role it is previewing — keeps the
+   * "See the app as" row, so a preview is never a one-way door (D-217).
+   */
+  readonly canViewAs?: boolean;
 }
 
 const ICON = { width: 26, height: 26, 'aria-hidden': true } as const;
@@ -58,9 +65,26 @@ export function ProfileView({
   remindersOn,
   headerActions,
   onSignOut,
+  canViewAs = false,
 }: ProfileViewProps) {
   const { t, locale } = useI18n();
   const number = (n: number) => new Intl.NumberFormat(locale).format(n);
+  const isMember = role === 'member';
+
+  const staffRows = [
+    ...(role === 'admin'
+      ? [{ id: 'invite', label: t('profile.menu.invite'), href: '/admin/', icon: <PeopleIcon {...ICON} /> }]
+      : []),
+    ...(role === 'super_admin'
+      ? [
+          { id: 'everyone', label: t('profile.menu.everyone'), href: '/directory/', icon: <PeopleIcon {...ICON} /> },
+          { id: 'requests', label: t('profile.menu.requests'), href: '/requests/', icon: <ShieldIcon {...ICON} /> },
+        ]
+      : []),
+    ...(canViewAs
+      ? [{ id: 'view-as', label: t('profile.menu.viewAs'), href: '/view-as/', icon: <GlobeIcon {...ICON} /> }]
+      : []),
+  ];
 
   return (
     <Page gap={4}>
@@ -69,21 +93,28 @@ export function ProfileView({
       <ProfileSummary
         name={name}
         roleLabel={t(`role.${role}`)}
-        stats={[
-          { value: number(points), label: t('profile.stat.points') },
-          { value: number(savedCount), label: t('profile.stat.saved') },
-          { value: number(connectionsCount), label: t('profile.stat.connections') },
-        ]}
+        stats={
+          isMember
+            ? [
+                { value: number(points), label: t('profile.stat.points') },
+                { value: number(savedCount), label: t('profile.stat.saved') },
+                { value: number(connectionsCount), label: t('profile.stat.connections') },
+              ]
+            : []
+        }
       />
 
-      <FeatureTileRow>
-        <FeatureTile label={t('profile.tile.trips')} href="/trips/" art={<TripsIcon {...ART} />} />
-        <FeatureTile
-          label={t('profile.tile.connections')}
-          href="/connections/"
-          art={<ConnectionsIcon {...ART} />}
-        />
-      </FeatureTileRow>
+      {/*
+        Points, trips and connections are a member's (D-217): staff are not
+        given points, do not plan visits, and are the connections. Their
+        Profile is who they are, their tools, and the same settings.
+      */}
+      {isMember ? (
+        <FeatureTileRow>
+          <FeatureTile label={t('profile.tile.trips')} href="/trips/" art={<TripsIcon {...ART} />} />
+          <FeatureTile label={t('profile.tile.connections')} href="/connections/" art={<ConnectionsIcon {...ART} />} />
+        </FeatureTileRow>
+      ) : null}
 
       {remindersOn ? null : (
         <PromoCard
@@ -95,6 +126,18 @@ export function ProfileView({
       )}
 
       <VStack gap={2}>
+        {/*
+          The staff screens that are not a tab (D-217): a case manager's
+          invites, a super admin's Everyone and staff requests, and the role
+          preview. They lived on the old home's tiles; Profile is where an
+          account's own tools are now.
+        */}
+        {staffRows.length > 0 ? (
+          <>
+            <MenuList label={t('profile.menu.label')} items={staffRows} />
+            <Divider />
+          </>
+        ) : null}
         <MenuList
           label={t('profile.menu.label')}
           items={[
@@ -106,7 +149,14 @@ export function ProfileView({
               icon: <GlobeIcon {...ICON} />,
             },
             ...(remindersOn
-              ? [{ id: 'reminders', label: t('profile.menu.reminders'), href: '/reminders/', icon: <BellIcon {...ICON} /> }]
+              ? [
+                  {
+                    id: 'reminders',
+                    label: t('profile.menu.reminders'),
+                    href: '/reminders/',
+                    icon: <BellIcon {...ICON} />,
+                  },
+                ]
               : []),
             { id: 'help', label: t('profile.menu.help'), href: '/help/', icon: <HelpIcon {...ICON} /> },
           ]}

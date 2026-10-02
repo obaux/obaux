@@ -1,15 +1,15 @@
 import type { Meta, StoryObj } from '@storybook/nextjs';
 import { fn } from 'storybook/test';
-import { SavedScreen, SavedView } from '../../screens/SavedView';
-import { HeaderActions } from '../shell/HeaderActions';
-import { asRedesign } from '../journeys/journey';
+import { SavedScreen, SavedView } from '../../../screens/SavedView';
+import { HeaderActions } from '../../shell/HeaderActions';
+import { asRedesign } from '../../journeys/journey';
 
 /**
  * Saved on the tab-screen frame (D-213): places two to a row, a placeholder
  * picture each. Edit (top right) puts a × on each to unsave; Done ends it.
  */
 const meta = {
-  title: 'Redesign/Saved',
+  title: 'Member app/States/Saved',
   component: SavedView,
   args: { state: { status: 'ready', places: [] }, onUnsave: fn(), headerActions: <HeaderActions /> },
 } satisfies Meta<typeof SavedView>;

@@ -16,7 +16,7 @@ export type JourneyRole = 'signed-out' | 'member' | 'provider' | 'case-manager' 
 export const ROLES: Record<JourneyRole, { title: string; profile: { role: Role; first_name: string } | null }> = {
   'signed-out': { title: 'Not signed in', profile: null },
   member: { title: 'Member', profile: { role: 'member', first_name: 'Marcus' } },
-  provider: { title: 'Program manager', profile: { role: 'provider', first_name: 'Alice' } },
+  provider: { title: 'Program lead', profile: { role: 'provider', first_name: 'Alice' } },
   'case-manager': { title: 'Case manager', profile: { role: 'admin', first_name: 'Dana' } },
   'super-admin': { title: 'Super admin', profile: { role: 'super_admin', first_name: 'Will' } },
 };

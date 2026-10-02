@@ -251,6 +251,24 @@ Needs a human: a Google Maps browser key for the real map
 (`NEXT_PUBLIC_GOOGLE_MAPS_KEY`), and real staff photos in place of the
 placeholders.
 
+**2 October (D-216, D-217): one design, one folder per role.** Storybook
+no longer shows the old design anywhere. The sidebar is four folders —
+`Member app`, `Case manager`, `Program lead`, `Super admin` — each with a
+clickable `Prototype`, `Screens` (one story per screen that role reaches)
+and, where a screen has states worth seeing, `States`; then `Components`.
+The old `Journeys/*`, `Redesign/*`, `Shell/Member app` and the "Today"
+prototypes are gone. Every screen left on the old frame moved onto the
+nested template **in the app too**: Report a place, Points, a member's page,
+Invite someone (`/admin/`), Everyone, Staff requests, Interested, Text
+reminders, Sign in's code step, and the sign-up step header. Help on those
+screens is the round button in the top bar (`HelpButton`), not the old Help
+bar. Profile is now a session-aware screen (`ProfileScreen`): staff see no
+points/trips/connections, and get their tools as rows (case manager: Invite
+someone; super admin: Everyone, Staff requests, and **See the app as** — the
+role preview, a new route `/view-as/`). In the prototype `/interested/`
+opens Home. The tab screens themselves (Explore, Saved, Trips, Messages,
+Profile) are still Storybook-only — not yet routed in the app.
+
 This is the handover document: what exists, what is proven, what is live, and
 what the next person needs to know before touching anything.
 

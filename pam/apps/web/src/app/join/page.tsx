@@ -11,18 +11,7 @@ import { Text } from '@astryxdesign/core/Text';
 import { CheckboxInput } from '@astryxdesign/core/CheckboxInput';
 import { RadioList, RadioListItem } from '@astryxdesign/core/RadioList';
 import { colorVars, spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
-import {
-  AppHeader,
-  BigButton,
-  Loading,
-  Notice,
-  Page,
-  PointsBadge,
-  StarIcon,
-  StepHeader,
-  TextField,
-  TextLink,
-} from '@pam/ui';
+import { BigButton, Loading, Notice, Page, PointsBadge, StarIcon, StepHeader, TextField, TextLink } from '@pam/ui';
 import { TRANSPARENCY_SCREEN, badgeForPoints, type Locale } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { useSupportPhone } from '@/lib/useSupportPhone';
@@ -375,7 +364,6 @@ export default function JoinPage() {
   if (phase === null) {
     return (
       <Page gap={3}>
-        <AppHeader homeHref={null} accountHref={null} />
         <Loading label={t('common.loading')} variant="screen" />
       </Page>
     );
@@ -397,9 +385,8 @@ export default function JoinPage() {
   return (
     <Page gap={4}>
       {/* No way home from a flow that has not finished: the way out is the
-          steps themselves, and the mark is identity here as it is on sign-in. */}
-      <AppHeader homeHref={null} accountHref={null} />
-
+          steps themselves. The old logo bar went with the redesign (D-217);
+          the step header carries the template's large title. */}
       <StepHeader
         current={step}
         total={total}
@@ -429,9 +416,7 @@ export default function JoinPage() {
               notice="something_went_wrong"
               title={t(`signin.failed.${flow.state.reason}.title`)}
               body={
-                flow.state.phone === null
-                  ? t('signin.phone.invalid')
-                  : t(`signin.failed.${flow.state.reason}.body`)
+                flow.state.phone === null ? t('signin.phone.invalid') : t(`signin.failed.${flow.state.reason}.body`)
               }
               supportPhone={supportPhone}
               callLabel={t('help.callSupport')}
@@ -652,10 +637,7 @@ export default function JoinPage() {
               {t(TRANSPARENCY_SCREEN.footerKey)}
             </Text>
 
-            <BigButton
-              label={t(TRANSPARENCY_SCREEN.confirmKey)}
-              onPress={() => setPhase('texts')}
-            />
+            <BigButton label={t(TRANSPARENCY_SCREEN.confirmKey)} onPress={() => setPhase('texts')} />
           </VStack>
         </Card>
       ) : null}
@@ -732,9 +714,7 @@ export default function JoinPage() {
       {phase === 'done' && isStaff ? (
         <Card padding={4} xstyle={styles.card}>
           <VStack gap={3} xstyle={styles.celebrate}>
-            <Text xstyle={styles.body}>
-              {t('join.done.staff', { name: firstName.trim() || t('app.name') })}
-            </Text>
+            <Text xstyle={styles.body}>{t('join.done.staff', { name: firstName.trim() || t('app.name') })}</Text>
             <BigButton label={t('join.done.action')} onPress={() => router.replace('/')} />
           </VStack>
         </Card>
@@ -746,18 +726,14 @@ export default function JoinPage() {
             <span aria-hidden="true" {...stylex.props(styles.medal)}>
               <StarIcon />
             </span>
-            <Text xstyle={styles.badgeName}>
-              {t(`badge.${badgeForPoints(points ?? 0).key}`)}
-            </Text>
+            <Text xstyle={styles.badgeName}>{t(`badge.${badgeForPoints(points ?? 0).key}`)}</Text>
             {/*
               The number counts up, which is the reward — PointsBadge handles
               the part that matters, which is that somebody who asked for less
               motion simply gets the number.
             */}
             <PointsBadge points={points ?? 0} label={t('points.title')} />
-            <Text xstyle={styles.body}>
-              {t('join.done.body', { name: firstName.trim() || t('app.name') })}
-            </Text>
+            <Text xstyle={styles.body}>{t('join.done.body', { name: firstName.trim() || t('app.name') })}</Text>
             <BigButton label={t('join.done.action')} onPress={() => router.replace('/')} />
           </VStack>
         </Card>

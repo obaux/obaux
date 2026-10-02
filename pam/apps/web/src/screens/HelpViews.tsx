@@ -79,7 +79,13 @@ export function HelpView({ backHref = '/', backLabel }: { readonly backHref?: st
 /** What PAM support helps with, and what to do when it is closed. */
 export function HelpTopicsView() {
   const { t } = useI18n();
-  const topics = ['help.what.signIn', 'help.what.findPlace', 'help.what.appointment', 'help.what.person', 'help.what.anything'];
+  const topics = [
+    'help.what.signIn',
+    'help.what.findPlace',
+    'help.what.appointment',
+    'help.what.person',
+    'help.what.anything',
+  ];
   return (
     <SubPage title={t('help.menu.topics')} backHref="/help/" backLabel={t('nav.back.help')}>
       <VStack gap={2}>

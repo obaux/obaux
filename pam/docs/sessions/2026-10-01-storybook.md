@@ -330,3 +330,18 @@ Chromium.
   redesign prototype.
 - Checked: `pnpm -r typecheck`, UI/config unit tests, `build-storybook`,
   a fresh `build`, then a11y + messages e2e (105 passed).
+
+## Addendum — 2 October: only the redesign, a folder per role (D-217)
+
+- Storybook: `Member app` / `Case manager` / `Program lead` / `Super admin`,
+  each `Prototype` + `Screens` + `States`; old journeys, `Shell/Member app`
+  and the "Today" prototypes deleted. `roles/screen.tsx` builds a story from
+  the route table. `asRole` always uses the redesign routes.
+- App: Report a place, Points, person, Everyone, Staff requests, Interested,
+  `/admin/` (Invite someone), Text reminders, Sign in (code step) and the
+  sign-up step header moved onto the templates; `HelpButton` replaces the
+  Help bar on them and on a place.
+- New: `ProfileScreen` (session-aware; staff rows), `ViewAsView` + `/view-as/`.
+- Left alone: the old `/`, `/places/`, `/saved/`, `/messages/`, `/account/`
+  pages still ship in the app until the tab screens are routed; Storybook
+  never shows them.

@@ -2,7 +2,8 @@
 
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { PathnameContext, SearchParamsContext } from 'next/dist/shared/lib/hooks-client-context.shared-runtime';
-import { Page, PageTitle, Notice } from '@pam/ui';
+import { Page, Notice } from '@pam/ui';
+import { SubPageHeader } from '@pam/ui/SubPage';
 
 /**
  * The app, clickable, inside one story (D-211).
@@ -138,7 +139,7 @@ export function PrototypeApp({ routes, start, chrome, first }: PrototypeAppProps
           <ScreenFrame key={current}>{route.render()}</ScreenFrame>
         ) : (
           <Page gap={4}>
-            <PageTitle title="Not in the prototype yet" backHref="/" backLabel="Back" />
+            <SubPageHeader title="Not in the prototype yet" backHref="/" backLabel="Back" />
             <Notice
               notice="service_not_available"
               title={pathname}

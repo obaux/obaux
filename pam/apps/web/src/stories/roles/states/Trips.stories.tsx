@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/nextjs';
-import { TripsScreen, TripsView } from '../../screens/TripsView';
-import { HeaderActions } from '../shell/HeaderActions';
-import { asRedesign } from '../journeys/journey';
+import { TripsScreen, TripsView } from '../../../screens/TripsView';
+import { HeaderActions } from '../../shell/HeaderActions';
+import { asRedesign } from '../../journeys/journey';
 
 /**
  * Trips (D-213): the map with a pin per visit, and the drawer over it — drag
@@ -10,7 +10,7 @@ import { asRedesign } from '../journeys/journey';
  * `NEXT_PUBLIC_GOOGLE_MAPS_KEY` set it is Google Maps.
  */
 const meta = {
-  title: 'Redesign/Trips',
+  title: 'Member app/States/Trips',
   component: TripsView,
   args: { trips: [], headerActions: <HeaderActions /> },
 } satisfies Meta<typeof TripsView>;

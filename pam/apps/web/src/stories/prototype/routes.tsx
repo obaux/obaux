@@ -20,7 +20,8 @@ import RequestsPage from '../../app/requests/page';
 import SavedPage from '../../app/saved/page';
 import SignInPage from '../../app/signin/page';
 import TermsPage from '../../app/terms/page';
-import { ProfileView } from '../../screens/ProfileView';
+import { ProfileScreen } from '../../screens/ProfileScreen';
+import { ViewAsView } from '../../screens/ViewAsView';
 import { TripsScreen } from '../../screens/TripsView';
 import { HomeScreen } from '../../screens/HomeScreen';
 import { LegalView } from '../../screens/LegalView';
@@ -34,12 +35,16 @@ import { MessagesScreen } from '../../screens/MessagesScreen';
 import { HeaderActions } from '../shell/HeaderActions';
 import { LocalTabBar } from '../shell/LocalTabBar';
 import { ROLES, type JourneyRole } from '../journeys/fixtures';
-import { prototypeRouter, type PrototypeRoute } from './PrototypeApp';
+import type { PrototypeRoute } from './PrototypeApp';
 
 const screen = (render: () => ReactNode): PrototypeRoute => ({ render });
 
-/** Every route the app has today, exactly as it ships. */
-export const TODAY_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
+/**
+ * Every route the app has, each drawn by the page that ships. Since D-217
+ * every one of them is on the redesign's templates; the redesign table below
+ * only swaps in the tab screens that are not routed in the app yet.
+ */
+export const APP_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   '/': screen(() => <HomePage />),
   '/signin/': screen(() => <SignInPage />),
   '/join/': screen(() => <JoinPage />),
@@ -74,6 +79,7 @@ export const TODAY_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   '/messages/thread/options/': screen(() => <ThreadOptionsView />),
   '/messages/thread/report/': screen(() => <ThreadReportView />),
   '/connections/person/': screen(() => <ConnectionProfileScreen />),
+  '/view-as/': screen(() => <ViewAsView />),
 };
 
 /**
@@ -81,7 +87,7 @@ export const TODAY_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
  * not reached yet, the new ones where it has, and Explore as home.
  */
 export const REDESIGN_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
-  ...TODAY_ROUTES,
+  ...APP_ROUTES,
   // The first tab (D-212): Explore for a member, the caseload for a case
   // manager, who wants in for a program — whoever the story signed in.
   '/': screen(() => <HomeScreen />),
@@ -92,31 +98,12 @@ export const REDESIGN_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   // Saved and Messages on the tab-screen frame (D-213).
   '/saved/': screen(() => <SavedScreen />),
   '/messages/': screen(() => <MessagesScreen />),
-  '/profile/': screen(() => (
-    <ProfileView
-      name="Marcus"
-      role="member"
-      points={400}
-      savedCount={3}
-      connectionsCount={3}
-      remindersOn={false}
-      headerActions={<HeaderActions />}
-      onSignOut={() => prototypeRouter.replace('/signin/')}
-    />
-  )),
-  // The Account screen is gone from the redesign (D-213): Profile holds it.
-  '/account/': screen(() => (
-    <ProfileView
-      name="Marcus"
-      role="member"
-      points={400}
-      savedCount={3}
-      connectionsCount={3}
-      remindersOn={false}
-      headerActions={<HeaderActions />}
-      onSignOut={() => prototypeRouter.replace('/signin/')}
-    />
-  )),
+  // Profile for whoever is signed in (D-217); the Account screen is gone
+  // from the redesign (D-213), so its old address opens Profile too.
+  '/profile/': screen(() => <ProfileScreen />),
+  '/account/': screen(() => <ProfileScreen />),
+  // A program's list is its Home now (D-212), so the old address opens it.
+  '/interested/': screen(() => <HomeScreen />),
 };
 
 /**
@@ -129,7 +116,6 @@ export function tabFor(pathname: string) {
   switch (pathname) {
     case '/':
     case '/places/':
-    case '/admin/':
     case '/interested/':
       return 'explore' as const;
     case '/saved/':

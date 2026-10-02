@@ -2,17 +2,10 @@
 
 import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import {
-  BigButton,
-  HelpBar,
-  Notice,
-  Page,
-  PlaceDetail,
-  directionsHref,
-  googlePlaceHref,
-} from '@pam/ui';
+import { BigButton, Notice, Page, PlaceDetail, directionsHref, googlePlaceHref } from '@pam/ui';
 import { PlaceDetailSkeleton } from '@pam/ui/Skeletons';
 import { SubPageHeader } from '@pam/ui/SubPage';
+import { HelpButton } from '../../screens/HelpButton';
 import { categoryLabelKey, distanceLabel, NOTICES, type Category } from '@pam/config';
 import { DUMMY_PLACES_BY_ID, isDummyPlaceId } from '@pam/config/dummy-places';
 import { useI18n } from '@/lib/i18n';
@@ -203,9 +196,13 @@ function PlaceScreen() {
       backHref={back.href}
       backLabel={t(back.labelKey)}
       actions={
-        trueRole === 'super_admin' ? (
-          <RoleSwitchControl trueRole={trueRole} viewedRole={demoRole ?? trueRole} onChange={setViewAs} />
-        ) : undefined
+        <>
+          {trueRole === 'super_admin' ? (
+            <RoleSwitchControl trueRole={trueRole} viewedRole={demoRole ?? trueRole} onChange={setViewAs} />
+          ) : null}
+          {/* Help in the bar, not a bar at the foot of the page (D-217). */}
+          <HelpButton />
+        </>
       }
     />
   );
@@ -220,8 +217,7 @@ function PlaceScreen() {
   }
 
   if (state.status === 'missing' || state.status === 'error') {
-    const key =
-      state.status === 'error' && state.offline ? 'offline' : 'something_went_wrong';
+    const key = state.status === 'error' && state.offline ? 'offline' : 'something_went_wrong';
     return (
       <Page gap={4}>
         {header(t('places.title'))}
@@ -232,8 +228,7 @@ function PlaceScreen() {
           supportPhone={supportPhone}
           callLabel={t('help.callSupport')}
         />
-        <BigButton label={t('places.title')} href="/places/" />
-        <HelpBar label={t('nav.help')} variant="block" />
+        <BigButton label={t('help.place.action')} href="/" />
       </Page>
     );
   }
@@ -254,17 +249,11 @@ function PlaceScreen() {
         weekLines={lines}
         hoursArePlaceholder={status ? !status.isReal : false}
         placeholderNote={t('place.hours.sample')}
-        audienceLabel={
-          place!.audience ? t(`place.audience.${place!.audience}`) : null
-        }
+        audienceLabel={place!.audience ? t(`place.audience.${place!.audience}`) : null}
         phone={place!.phone}
         website={place!.website}
         directionsHref={directionsHref(place!.address, place!.lat, place!.lon) ?? null}
-        hoursHref={googlePlaceHref(
-          place!.lookupName || place!.name,
-          place!.address,
-          place!.placeId,
-        )}
+        hoursHref={googlePlaceHref(place!.lookupName || place!.name, place!.address, place!.placeId)}
         isSaved={saved}
         onSave={
           signedIn
@@ -303,8 +292,6 @@ function PlaceScreen() {
           flag: t('place.flag'),
         }}
       />
-
-      <HelpBar label={t('nav.help')} variant="block" />
     </Page>
   );
 }

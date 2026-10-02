@@ -390,6 +390,7 @@
   "onboarding.zip.unsure": "Todavia no se",
   "people.new.message": "Mensaje nuevo",
   "people.new.save": "Guardó un lugar nuevo",
+  "person.title": "Persona",
   "person.back": "Atras",
   "person.message.action": "Escribirle a {name}",
   "person.notAllowed.title": "Esta pagina no es para usted",
@@ -768,5 +769,13 @@
   "nav.back.options": "Volver a Opciones",
   "messages.report.thread.intro": "Elige qué está mal. PAM y la persona que te invitó ven el último mensaje que esta persona te mandó, y nada más del chat.",
   "messages.report.example": "Esta es una conversación de ejemplo, así que no se envió nada.",
-  "messages.report.nothing": "Todavía no hay nada de esta persona que reportar."
+  "messages.report.nothing": "Todavía no hay nada de esta persona que reportar.",
+  "profile.menu.invite": "Invitar a alguien",
+  "profile.menu.everyone": "Todos",
+  "profile.menu.requests": "Solicitudes del personal",
+  "profile.menu.viewAs": "Ver la app como",
+  "viewAs.title": "Ver la app como",
+  "viewAs.intro": "Mira PAM como lo ve cada tipo de cuenta. Solo cambia lo que se muestra: cada lista sigue viniendo de tu propia cuenta.",
+  "nav.back.viewAs": "Volver a Ver la app como",
+  "nav.back.signin": "Volver a tu número de teléfono"
 }

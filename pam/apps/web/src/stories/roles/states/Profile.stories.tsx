@@ -1,14 +1,14 @@
 import type { Meta, StoryObj } from '@storybook/nextjs';
-import { ProfileView } from '../../screens/ProfileView';
-import { HeaderActions } from '../shell/HeaderActions';
-import { asRedesign } from '../journeys/journey';
+import { ProfileView } from '../../../screens/ProfileView';
+import { HeaderActions } from '../../shell/HeaderActions';
+import { asRedesign } from '../../journeys/journey';
 
 /**
  * Profile, redesigned (D-210). Scroll it: the large title shrinks into the
  * bar, which keeps the bell and Help in reach.
  */
 const meta = {
-  title: 'Redesign/Profile',
+  title: 'Member app/States/Profile',
   component: ProfileView,
   args: {
     name: 'Marcus',
