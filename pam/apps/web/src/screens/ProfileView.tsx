@@ -73,8 +73,13 @@ export function ProfileView({
   const isMember = role === 'member';
 
   const staffRows = [
+    // Invite someone, a second way in for a case manager beside the strip
+    // on Home (D-226).
+    ...(role === 'admin'
+      ? [{ id: 'invite', label: t('profile.menu.invite'), href: '/invite/', icon: <PeopleIcon {...ICON} /> }]
+      : []),
     // Every program, a secondary path for staff (D-218): where to look one
-    // up, save it, or add a new one. Invite someone floats on Home now.
+    // up, save it, or add a new one.
     ...(role === 'admin' || role === 'provider'
       ? [{ id: 'programs', label: t('profile.menu.programs'), href: '/programs/', icon: <PlacesIcon {...ICON} /> }]
       : []),

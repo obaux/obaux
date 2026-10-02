@@ -401,3 +401,4 @@ Chromium.
   link in the hours card; member Saved shows Edit only.
 - D-225: Trips + only; `NewTripView` (`/trips/new/`), `addedTrips` session
   store merged into Trips; preview map de-duplicates pins.
+- D-226: `FloatingAction` is a flat strip on the bar; CM Profile has Invite someone again.

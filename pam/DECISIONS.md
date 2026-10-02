@@ -4789,6 +4789,16 @@ longer draw one label over another.
 
 ---
 
+### D-226 — A case manager's Invite someone is a plain strip on the bar, and a Profile row again
+
+Will, 2 October. The floating card becomes a plain strip resting on the
+bottom bar — no shadow, no rounded card, the bar's own hairline above it —
+with its icon and words exactly where they were, which puts the icon over
+the Home icon below it. Invite someone is back in a case manager's Profile
+too, as a second way in (above All programs).
+
+---
+
 ## Notes for whoever picks this up next
 
 - `pnpm --filter @pam/db test` is the highest-value check in the repo. It is the
