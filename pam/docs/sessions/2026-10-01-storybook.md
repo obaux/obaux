@@ -351,3 +351,15 @@ Chromium.
   longer has the app header's account button; `/admin/` has no bell; the
   Everyone filter left the header; a closed door still names the screen;
   Report a place leads to Explore). Tests updated; those specs 129/129.
+
+## Addendum — 2 October: the Google Maps key
+
+- Will created a Maps JavaScript API browser key; it is set in Vercel as
+  `NEXT_PUBLIC_GOOGLE_MAPS_KEY` (all three environments) — not in the repo.
+- `/trips/` added as a real route so a deployment shows the map.
+- `TripsMap`: redraws only when the pins change (it rebuilt the map on every
+  render), and falls back to the drawn preview when Google fails or refuses
+  the key (`gm_authFailure`), instead of a blank area.
+- Verified: Google serves the Maps script for the key (HTTP 200 with the
+  preview's referrer). The sandbox browser cannot reach Google through the
+  proxy, so the drawn map was what it showed — the fallback working.

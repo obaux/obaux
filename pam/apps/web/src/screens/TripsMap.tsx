@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
@@ -17,7 +17,7 @@ import { navigate } from '@/lib/navigate';
  * the Maps JavaScript API and drops a marker per trip; tapping one opens the
  * place. No key, no request to Google.
  *
- * **Without one — Storybook, and today — a drawn preview**: a plain street
+ * **Without one — Storybook — or when Google refuses or cannot load, a drawn preview**: a plain street
  * grid with the same pins, placed by their real coordinates relative to each
  * other, labelled as a preview. It is never passed off as a real map.
  */
@@ -84,7 +84,14 @@ const styles = stylex.create({
 });
 
 export function TripsMap({ pins }: { readonly pins: readonly TripPin[] }) {
-  return KEY ? <GoogleTripsMap pins={pins} /> : <PreviewTripsMap pins={pins} />;
+  // If Google will not draw — the key refused, the script blocked, no
+  // connection — the drawn preview takes over rather than a blank map.
+  const [failed, setFailed] = useState(false);
+  return KEY && !failed ? (
+    <GoogleTripsMap pins={pins} onFail={() => setFailed(true)} />
+  ) : (
+    <PreviewTripsMap pins={pins} />
+  );
 }
 
 /** The drawn stand-in: pins placed by coordinate within the upper map area. */
@@ -141,6 +148,8 @@ declare global {
   interface Window {
     google?: GoogleMapsGlobal;
     __pamMapsLoading?: Promise<GoogleMapsGlobal>;
+    /** Google calls this when it refuses the key (wrong site, API off). */
+    gm_authFailure?: () => void;
   }
 }
 
@@ -157,11 +166,27 @@ function loadGoogleMaps(): Promise<GoogleMapsGlobal> {
   return window.__pamMapsLoading;
 }
 
-function GoogleTripsMap({ pins }: { readonly pins: readonly TripPin[] }) {
+function GoogleTripsMap({ pins, onFail }: { readonly pins: readonly TripPin[]; readonly onFail: () => void }) {
   const { t } = useI18n();
   const ref = useRef<HTMLElement | null>(null);
+  // The caller builds a new array on every render; redraw only when the pins
+  // themselves change (a search narrowing them), not on every keystroke.
+  const latest = useRef(pins);
+  latest.current = pins;
+  const signature = pins.map((pin) => `${pin.id}@${pin.lat},${pin.lon}`).join('|');
+
+  const fail = useRef(onFail);
+  fail.current = onFail;
 
   useEffect(() => {
+    window.gm_authFailure = () => fail.current();
+    return () => {
+      window.gm_authFailure = undefined;
+    };
+  }, []);
+
+  useEffect(() => {
+    const pins = latest.current;
     let cancelled = false;
     void loadGoogleMaps()
       .then((google) => {
@@ -182,12 +207,12 @@ function GoogleTripsMap({ pins }: { readonly pins: readonly TripPin[] }) {
         map.fitBounds(bounds, 80);
       })
       .catch(() => {
-        // The drawer's list still has every trip; the map simply stays blank.
+        if (!cancelled) fail.current();
       });
     return () => {
       cancelled = true;
     };
-  }, [pins]);
+  }, [signature]);
 
   return <VStack ref={ref as never} xstyle={styles.map} role="region" aria-label={t('trips.map.label')} />;
 }

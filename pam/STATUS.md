@@ -247,8 +247,12 @@ Notifications, a place, the policies, the conversation and Get help changed
 **in the app too** (they are real routes); Legal, Language, What others can
 see, the help pages, Connections and the thread's Options/Report are new real
 routes. 507 Playwright tests pass on a fresh build; 263 stories render clean.
-Needs a human: a Google Maps browser key for the real map
-(`NEXT_PUBLIC_GOOGLE_MAPS_KEY`), and real staff photos in place of the
+The Google Maps browser key is set in Vercel (`NEXT_PUBLIC_GOOGLE_MAPS_KEY`,
+Production/Preview/Development, 2 October) and Trips is a real route
+(`/trips/`) so the map can be seen on a deployment; if Google refuses the key
+the drawn preview shows instead. Storybook keeps the drawn preview. Needs a
+human: the key's website restriction must list each domain PAM is served
+from, and real staff photos in place of the
 placeholders.
 
 **2 October (D-216, D-217): one design, one folder per role.** Storybook
