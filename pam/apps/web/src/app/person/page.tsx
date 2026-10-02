@@ -11,6 +11,14 @@ import { Text } from '@astryxdesign/core/Text';
 import { Badge } from '@astryxdesign/core/Badge';
 import { Avatar } from '@astryxdesign/core/Avatar';
 import { BigButton, Loading, Notice, Page } from '@pam/ui';
+import { TripCard } from '@pam/ui/TripCard';
+import { useRouter } from 'next/navigation';
+import { dummyTripsFor } from '@pam/config/dummy-trips';
+import { useCaseload, type CaseloadMember } from '@/lib/useCaseload';
+import { openConversation } from '@/lib/openConversation';
+import { BigCategoryIcon } from '../../screens/SavedView';
+
+const TRIP_ART = { width: 40, height: 40, 'aria-hidden': true } as const;
 import { SubPageHeader } from '@pam/ui/SubPage';
 import { useStarredPeople } from '@/lib/useStarredPeople';
 import { StarToggle } from '../../screens/PeopleHomeView';
@@ -58,6 +66,9 @@ import { ProgramBadge } from '../ProgramBadge';
 
 const styles = stylex.create({
   subtitle: { fontSize: '17px', lineHeight: 1.4, textAlign: 'center' },
+  cardText: { flexGrow: 1, minWidth: 0 },
+  fact: { fontSize: '18px', fontWeight: 600 },
+  subsection: { fontSize: '16px', fontWeight: 600 },
   card: { width: '100%', position: 'relative' },
   section: { fontSize: '20px' },
   name: { fontSize: '18px' },
@@ -73,9 +84,59 @@ const styles = stylex.create({
   },
 });
 
-function lookup(id: string | null): DummyPerson | null {
+/**
+ * Who the page is about. An example person carries everything the example set
+ * has. A real member comes from the case manager's own caseload and carries
+ * only what that list already shows them — name, status, points, last active
+ * and program (§4.1, `transparency.ts`); nothing more is fetched.
+ */
+interface ProfilePerson {
+  readonly id: string;
+  readonly firstName: string;
+  readonly role: DummyPerson['role'];
+  readonly regionName: string | null;
+  readonly language: string | null;
+  readonly accessStatus: 'active' | 'limited' | 'suspended';
+  readonly points?: number;
+  readonly lastActiveAt: string | null;
+  readonly orgName?: string;
+  readonly program?: { readonly name: string; readonly serviceId: string } | null;
+  readonly isExample: boolean;
+}
+
+function lookup(id: string | null): ProfilePerson | null {
   if (!id) return null;
-  return DUMMY_EVERYONE.find((person) => person.id === id) ?? null;
+  const person = DUMMY_EVERYONE.find((p) => p.id === id);
+  if (!person) return null;
+  return {
+    id: person.id,
+    firstName: person.firstName,
+    role: person.role,
+    regionName: person.regionName,
+    language: person.language,
+    accessStatus: person.accessStatus,
+    ...(person.points !== undefined ? { points: person.points } : {}),
+    lastActiveAt: person.lastActiveAt,
+    ...(person.orgName ? { orgName: person.orgName } : {}),
+    program: person.program ?? null,
+    isExample: true,
+  };
+}
+
+function fromCaseload(member: CaseloadMember | null, regionName: string | null): ProfilePerson | null {
+  if (!member) return null;
+  return {
+    id: member.id,
+    firstName: member.firstName ?? '—',
+    role: 'member',
+    regionName,
+    language: null,
+    accessStatus: member.accessStatus,
+    ...(member.points !== null ? { points: member.points } : {}),
+    lastActiveAt: member.lastActiveAt,
+    program: member.program,
+    isExample: false,
+  };
 }
 
 function whenLastActive(iso: string | null, locale: string): string | null {
@@ -87,6 +148,7 @@ function PersonScreen() {
   const { t, locale } = useI18n();
   const supportPhone = useSupportPhone();
   const params = useSearchParams();
+  const router = useRouter();
   const { state: session } = useSession();
 
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
@@ -97,21 +159,16 @@ function PersonScreen() {
   // The nested-page template (D-213, D-217): back to Home, where every list
   // that links here lives; a super admin's role switch rides in the bar.
   const starred = useStarredPeople();
-  const header = (title: string, starId?: string) => (
+  // A real member on this case manager's own caseload opens too (D-227),
+  // shown only what the caseload list already shows them — see `fromCaseload`.
+  const { state: caseload } = useCaseload(viewedRole === 'admin');
+  const header = (title: string) => (
     <SubPageHeader
       title={title}
       backHref="/"
       backLabel={t('nav.back.home')}
       actions={
         <>
-          {/* A case manager stars a member here as on Home (D-218). */}
-          {starId && viewedRole === 'admin' ? (
-            <StarToggle
-              isOn={starred.ids.has(starId)}
-              label={t(starred.ids.has(starId) ? 'people.unstar' : 'people.star', { name: title })}
-              onToggle={() => starred.toggle(starId)}
-            />
-          ) : null}
           {trueRole === 'super_admin' ? (
             <RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} />
           ) : null}
@@ -170,7 +227,24 @@ function PersonScreen() {
     );
   }
 
-  const person = lookup(params.get('id'));
+  const id = params.get('id');
+  const person: ProfilePerson | null =
+    lookup(id) ??
+    (caseload.status === 'ready'
+      ? fromCaseload(
+          caseload.members.find((m) => m.id === id) ?? null,
+          session.status === 'signed-in' ? session.session.regionName : null,
+        )
+      : null);
+
+  if (!person && viewedRole === 'admin' && caseload.status === 'loading') {
+    return (
+      <Page gap={4}>
+        {header(t('person.title'))}
+        <PersonDetailSkeleton label={t('common.loading')} />
+      </Page>
+    );
+  }
 
   if (!person) {
     return (
@@ -189,91 +263,158 @@ function PersonScreen() {
   }
 
   const when = whenLastActive(person.lastActiveAt, locale);
-  const saved = DUMMY_SAVED_BY_PERSON[person.id] ?? [];
+  const saved = person.isExample ? (DUMMY_SAVED_BY_PERSON[person.id] ?? []) : [];
+  const isMember = person.role === 'member';
+  const canMessage = isMember && (viewedRole === 'admin' || viewedRole === 'provider');
+  // Trips (D-227): the visits they planned, coming up first, then the ones
+  // already made. Example trips until something books one (D-172).
+  const now = Date.now();
+  const trips = isMember ? dummyTripsFor(person.id) : [];
+  const upcoming = trips.filter((trip) => new Date(trip.startsAt).getTime() >= now);
+  const past = trips.filter((trip) => new Date(trip.startsAt).getTime() < now).reverse();
+  const tripWhen = (iso: string) =>
+    `${new Intl.DateTimeFormat(locale, { weekday: 'long', month: 'short', day: 'numeric' }).format(new Date(iso))} · ${new Intl.DateTimeFormat(locale, { hour: 'numeric', minute: '2-digit' }).format(new Date(iso))}`;
+  const tripCard = (trip: (typeof trips)[number]) => (
+    <TripCard
+      key={trip.id}
+      placeName={trip.placeName}
+      when={tripWhen(trip.startsAt)}
+      href={`/place/?id=${encodeURIComponent(trip.placeId)}`}
+      art={<BigCategoryIcon category={trip.category} size={TRIP_ART} />}
+      label={`${trip.placeName}, ${tripWhen(trip.startsAt)}`}
+    />
+  );
+  const message = () => {
+    if (person.isExample && (viewedRole === 'admin' || viewedRole === 'provider')) {
+      router.push(
+        `/messages/thread/?id=${encodeURIComponent(dummyConversationIdBetween(person.id, DUMMY_SELF_ID[viewedRole]))}`,
+      );
+      return;
+    }
+    void openConversation(person.id).then((conversation) =>
+      router.push(conversation ? `/messages/thread/?id=${encodeURIComponent(conversation)}` : '/messages/'),
+    );
+  };
 
   return (
     <Page gap={4}>
-      {header(person.firstName, person.role === 'member' ? person.id : undefined)}
+      {header(person.firstName)}
 
-      <VStack gap={4}>
-        {/*
-          The name is not repeated here (Will, 16 September) — the page title
-          already is it. What this row adds is what the title cannot say:
-          where they are, and which language PAM answers them in.
-        */}
-        {/* Laid out as a connection's profile is (D-213, D-217): the face first, then who they are. */}
-        <VStack gap={2} align="center">
-          <Avatar size="xl" name={person.firstName} tooltip={false} alt="" />
-          <Text type="supporting" xstyle={styles.subtitle}>
-            {t(`role.${person.role}`)} · {person.regionName} · {t(`language.${person.language}`)}
-          </Text>
-        </VStack>
-
-        <HStack gap={2} wrap="wrap" align="center" justify="center">
-          {person.accessStatus === 'suspended' ? <Badge variant="error" label={t('admin.status.suspended')} /> : null}
-          {person.accessStatus === 'limited' ? <Badge variant="warning" label={t('admin.status.limited')} /> : null}
-          {person.orgName ? <Badge variant="neutral" label={person.orgName} /> : null}
-          {person.program ? <ProgramBadge name={person.program.name} serviceId={person.program.serviceId} /> : null}
-          {person.points !== undefined ? (
+      {/*
+        The profile card (D-227): the face, who they are, the facts — and the
+        star, top right, for a case manager (Will, 2 October: the star moved
+        here from the Home card). When they last used PAM lives here too.
+      */}
+      <Card padding={6} xstyle={styles.card}>
+        <HStack gap={3} align="start" wrap="nowrap">
+          <Avatar size="lg" name={person.firstName} tooltip={false} alt="" />
+          <VStack gap={1} xstyle={styles.cardText}>
             <Text type="supporting" xstyle={styles.meta}>
-              {t('admin.points', { count: person.points })}
+              {[t(`role.${person.role}`), person.regionName, person.language ? t(`language.${person.language}`) : null]
+                .filter(Boolean)
+                .join(' · ')}
             </Text>
-          ) : null}
-          <Text type="supporting" xstyle={styles.meta}>
-            {when ? t('admin.lastActive', { when }) : t('admin.lastActive.never')}
-          </Text>
-        </HStack>
-
-        {person.role === 'member' ? (
-          <VStack gap={2}>
-            <Heading level={2} xstyle={styles.section}>
-              {t('person.savedPlaces.title')}
-            </Heading>
-            {saved.length === 0 ? (
-              <Text type="supporting" xstyle={styles.meta}>
-                {t('person.savedPlaces.empty')}
-              </Text>
-            ) : (
-              <VStack gap={2}>
-                {saved.map((place) => (
-                  <Card key={place.id} padding={6} xstyle={styles.card}>
-                    <VStack gap={1}>
-                      <Heading level={3} xstyle={styles.name}>
-                        <a href={`/place/?id=${encodeURIComponent(place.id)}`} {...stylex.props(styles.link)}>
-                          {place.name}
-                        </a>
-                      </Heading>
-                      <Text type="supporting" xstyle={styles.meta}>
-                        {place.address}
-                      </Text>
-                      <Text xstyle={styles.meta}>{place.description}</Text>
-                    </VStack>
-                  </Card>
-                ))}
-              </VStack>
-            )}
+            {person.points !== undefined ? (
+              <Text xstyle={styles.fact}>{t('admin.points', { count: person.points })}</Text>
+            ) : null}
+            <Text type="supporting" xstyle={styles.meta}>
+              {when ? t('admin.lastActive', { when }) : t('admin.lastActive.never')}
+            </Text>
+            <HStack gap={2} wrap="wrap" align="center">
+              {person.accessStatus === 'suspended' ? (
+                <Badge variant="error" label={t('admin.status.suspended')} />
+              ) : null}
+              {person.accessStatus === 'limited' ? <Badge variant="warning" label={t('admin.status.limited')} /> : null}
+              {person.orgName ? <Badge variant="neutral" label={person.orgName} /> : null}
+              {person.program ? <ProgramBadge name={person.program.name} serviceId={person.program.serviceId} /> : null}
+            </HStack>
           </VStack>
-        ) : null}
+          {isMember && viewedRole === 'admin' ? (
+            <StarToggle
+              isOn={starred.ids.has(person.id)}
+              label={t(starred.ids.has(person.id) ? 'people.unstar' : 'people.star', { name: person.firstName })}
+              onToggle={() => starred.toggle(person.id)}
+            />
+          ) : null}
+        </HStack>
+      </Card>
 
-        {/*
-          The way into this pair's example conversation (D-183) — only for a
-          case manager or program admin preview looking at a member, the two
-          relationships messaging exists for. Never for a super admin
-          previewing "as itself" (D-171).
-        */}
-        {person.role === 'member' && (viewedRole === 'admin' || viewedRole === 'provider') ? (
-          <BigButton
-            label={t('person.message.action', { name: person.firstName })}
-            href={`/messages/thread/?id=${encodeURIComponent(
-              dummyConversationIdBetween(person.id, DUMMY_SELF_ID[viewedRole]),
-            )}`}
-          />
-        ) : null}
+      {/*
+        A link for an example person (the example chat, D-183 — works with no
+        JavaScript); a button for a real member, whose conversation has to be
+        opened first.
+      */}
+      {canMessage && person.isExample && (viewedRole === 'admin' || viewedRole === 'provider') ? (
+        <BigButton
+          label={t('person.message.action', { name: person.firstName })}
+          href={`/messages/thread/?id=${encodeURIComponent(dummyConversationIdBetween(person.id, DUMMY_SELF_ID[viewedRole]))}`}
+        />
+      ) : canMessage ? (
+        <BigButton label={t('person.message.action', { name: person.firstName })} onPress={message} />
+      ) : null}
 
-        <Text type="supporting" xstyle={styles.note}>
-          {t('example.people.note')}
-        </Text>
-      </VStack>
+      {isMember ? (
+        <VStack gap={3}>
+          <Heading level={2} xstyle={styles.section}>
+            {t('person.trips.title')}
+          </Heading>
+          <Heading level={3} xstyle={styles.subsection}>
+            {t('person.trips.upcoming')}
+          </Heading>
+          {upcoming.length > 0 ? (
+            <VStack gap={3}>{upcoming.map(tripCard)}</VStack>
+          ) : (
+            <Text type="supporting" xstyle={styles.meta}>
+              {t('person.trips.none')}
+            </Text>
+          )}
+          <Heading level={3} xstyle={styles.subsection}>
+            {t('person.trips.past')}
+          </Heading>
+          {past.length > 0 ? (
+            <VStack gap={3}>{past.map(tripCard)}</VStack>
+          ) : (
+            <Text type="supporting" xstyle={styles.meta}>
+              {t('person.trips.none')}
+            </Text>
+          )}
+        </VStack>
+      ) : null}
+
+      {isMember && person.isExample ? (
+        <VStack gap={2}>
+          <Heading level={2} xstyle={styles.section}>
+            {t('person.savedPlaces.title')}
+          </Heading>
+          {saved.length === 0 ? (
+            <Text type="supporting" xstyle={styles.meta}>
+              {t('person.savedPlaces.empty')}
+            </Text>
+          ) : (
+            <VStack gap={2}>
+              {saved.map((place) => (
+                <Card key={place.id} padding={6} xstyle={styles.card}>
+                  <VStack gap={1}>
+                    <Heading level={3} xstyle={styles.name}>
+                      <a href={`/place/?id=${encodeURIComponent(place.id)}`} {...stylex.props(styles.link)}>
+                        {place.name}
+                      </a>
+                    </Heading>
+                    <Text type="supporting" xstyle={styles.meta}>
+                      {place.address}
+                    </Text>
+                    <Text xstyle={styles.meta}>{place.description}</Text>
+                  </VStack>
+                </Card>
+              ))}
+            </VStack>
+          )}
+        </VStack>
+      ) : null}
+
+      <Text type="supporting" xstyle={styles.note}>
+        {t(person.isExample ? 'example.people.note' : 'person.trips.example')}
+      </Text>
     </Page>
   );
 }

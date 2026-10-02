@@ -861,5 +861,10 @@
   "trips.new.done.see": "See your trips",
   "trips.new.saved": "Saved",
   "trips.new.all": "All programs",
-  "trips.new.example": "Example trips only for now — nothing is booked with the program yet."
+  "trips.new.example": "Example trips only for now — nothing is booked with the program yet.",
+  "person.trips.title": "Trips",
+  "person.trips.upcoming": "Coming up",
+  "person.trips.past": "Already went",
+  "person.trips.none": "None yet.",
+  "person.trips.example": "The trips shown are examples until PAM books visits."
 }

@@ -10,7 +10,7 @@ import { HStack } from '@astryxdesign/core/HStack';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
-import { NoResultsIcon, OfflineIcon, Page, StarIcon } from '@pam/ui';
+import { MessagesIcon, NoResultsIcon, OfflineIcon, Page, StarIcon } from '@pam/ui';
 import { IconButton } from '@astryxdesign/core/IconButton';
 import { PersonRowSkeletonList } from '@pam/ui/Skeletons';
 import { SearchPill, type SearchPillItem } from '@pam/ui/SearchPill';
@@ -63,12 +63,13 @@ export interface PeopleHomeViewProps {
   readonly onPick: (person: HomePerson) => void;
   readonly supportPhone?: string | null;
   /**
-   * A star on each row that opens a person (D-218): a case manager keeps the
-   * people they are working with closely under Saved.
+   * A message button on each row (D-227, Will, 2 October), in the star's
+   * place — the star moved to the person's own page. Tapping anywhere else on
+   * the card opens the person.
    */
-  readonly starred?: {
-    readonly ids: ReadonlySet<string>;
-    readonly onToggle: (person: HomePerson) => void;
+  readonly message?: {
+    readonly label: (person: HomePerson) => string;
+    readonly onMessage: (person: HomePerson) => void;
   };
   /** Floats above the bottom bar — "Invite someone" (D-218). */
   readonly floating?: ReactNode;
@@ -94,6 +95,7 @@ const styles = stylex.create({
   state: { paddingBlock: '32px' },
   stateIcon: { width: '72px', height: '72px', color: colorVars['--color-icon-accent'] },
   star: { width: '48px', height: '48px', color: colorVars['--color-text-secondary'] },
+  message: { width: '48px', height: '48px', color: colorVars['--color-icon-accent'] },
   starOn: { color: colorVars['--color-icon-accent'] },
 });
 
@@ -114,7 +116,7 @@ export function PeopleHomeView({
   onRetry,
   onPick,
   supportPhone,
-  starred,
+  message,
   floating,
 }: PeopleHomeViewProps) {
   const { t } = useI18n();
@@ -214,14 +216,19 @@ export function PeopleHomeView({
                 chip={person.chip ?? null}
                 programBadge={person.programBadge ?? null}
                 meta={person.meta}
+                isCompact
                 trailing={
-                  starred ? (
-                    <StarToggle
-                      isOn={starred.ids.has(person.id)}
-                      label={t(starred.ids.has(person.id) ? 'people.unstar' : 'people.star', {
-                        name: person.firstName ?? '',
-                      })}
-                      onToggle={() => starred.onToggle(person)}
+                  message ? (
+                    <IconButton
+                      label={message.label(person)}
+                      variant="ghost"
+                      onClick={() => message.onMessage(person)}
+                      icon={
+                        <HStack>
+                          <MessagesIcon width={24} height={24} aria-hidden />
+                        </HStack>
+                      }
+                      xstyle={styles.message}
                     />
                   ) : undefined
                 }

@@ -4799,6 +4799,32 @@ too, as a second way in (above All programs).
 
 ---
 
+### D-227 — A case manager's Home card: name, one small line, a message button; the member's page has the star and their trips
+
+Will, 2 October.
+
+**Home card** (`PersonRow isCompact`): the avatar, the name, and directly
+under it one small line — points (a status chip and their program if any).
+When they last used PAM, or that they have not yet, moved to the member's
+page. The star is gone from the card; in its place a **message** button, a
+shortcut straight into the conversation (the example one for an example
+person; `openConversation` for a real member). Anywhere else on the card
+opens the member's page — real caseload members included now.
+
+**The member's page, as a case manager sees it**: a profile card (face;
+role · city · language; points; last used PAM; status and program) with the
+**star at its top right**; Message; **Trips** — coming up, then already
+went (example trips per member, `dummyTripsFor`, until PAM books visits);
+and, for example people, the places they saved.
+
+**Privacy line kept**: a real member's page is built only from the case
+manager's own caseload list (`useCaseload`) — name, status, points, last
+active, program — exactly what that list already shows (§4.1,
+`transparency.ts`). Nothing new is fetched about them; their trips on the
+page are labelled as examples, and their saved places are not shown.
+
+---
+
 ## Notes for whoever picks this up next
 
 - `pnpm --filter @pam/db test` is the highest-value check in the repo. It is the

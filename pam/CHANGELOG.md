@@ -10,7 +10,9 @@ a new conversation. A program's Home has search, alerts and a + menu (invite
 someone, add a program) at the top. Explore's search bar steps aside while
 you scroll down. Your safety is shorter and easier to scan. A place shows
 Website, Message, Call and Google as round buttons, with save and a ⋯ menu at
-the top. Trips has a + to plan a new visit in three steps.
+the top. Trips has a + to plan a new visit in three steps. A case manager's
+Home cards are simpler, with a button to message each person, and a
+member's page shows their trips, with the star at the top of their card.
 
 ## [0.41.0-staff] — 2026-10-02 · An app for each kind of staff
 

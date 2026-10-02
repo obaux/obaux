@@ -861,5 +861,10 @@
   "trips.new.done.see": "Ver tus viajes",
   "trips.new.saved": "Guardados",
   "trips.new.all": "Todos los programas",
-  "trips.new.example": "Por ahora son viajes de ejemplo: todavía no se reserva nada con el programa."
+  "trips.new.example": "Por ahora son viajes de ejemplo: todavía no se reserva nada con el programa.",
+  "person.trips.title": "Viajes",
+  "person.trips.upcoming": "Próximos",
+  "person.trips.past": "Ya fue",
+  "person.trips.none": "Todavía ninguno.",
+  "person.trips.example": "Los viajes que se muestran son ejemplos hasta que PAM reserve visitas."
 }

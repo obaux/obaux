@@ -402,3 +402,4 @@ Chromium.
 - D-225: Trips + only; `NewTripView` (`/trips/new/`), `addedTrips` session
   store merged into Trips; preview map de-duplicates pins.
 - D-226: `FloatingAction` is a flat strip on the bar; CM Profile has Invite someone again.
+- D-227: compact `PersonRow` + message shortcut on CM Home; `/person/` profile card with star, trips (`dummyTripsFor`), real caseload members from `useCaseload` only.

@@ -3,7 +3,8 @@
 import { useRouter } from 'next/navigation';
 import { Loading, Notice, Page, PeopleIcon } from '@pam/ui';
 import { FloatingAction } from '@pam/ui/FloatingAction';
-import { useStarredPeople } from '@/lib/useStarredPeople';
+import { openConversation } from '@/lib/openConversation';
+import { DUMMY_SELF_ID, dummyConversationIdBetween } from '@pam/config/dummy-conversations';
 import { USE_DUMMY_PEOPLE } from '@pam/config/dummy-flag';
 import { DUMMY_MEMBERS } from '@pam/config/dummy-people';
 import { DUMMY_APPOINTMENTS } from '@pam/config/dummy-appointments';
@@ -14,7 +15,7 @@ import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
 import { useRoleView } from '@/lib/useViewedRole';
 import { useCaseload } from '@/lib/useCaseload';
-import { dummyChip, statusChip, whenLastActive } from '@/lib/caseloadLabels';
+import { dummyChip, statusChip } from '@/lib/caseloadLabels';
 import { ExploreScreen } from './ExploreScreen';
 import { HeaderActions } from './HeaderActions';
 import { PeopleHomeView, type HomePerson, type PeopleState } from './PeopleHomeView';
@@ -44,11 +45,10 @@ export function HomeScreen() {
 
 /** A case manager's home: the people on their caseload. */
 export function CaseloadHome() {
-  const { t, locale } = useI18n();
+  const { t } = useI18n();
   const router = useRouter();
   const supportPhone = useSupportPhone();
   const { state: caseload, refresh } = useCaseload(true);
-  const starred = useStarredPeople();
 
   // The real list when there is one; the example people otherwise, as on
   // `/admin/` (Will, 16 September — and kept for investor demos, 1 October).
@@ -60,38 +60,33 @@ export function CaseloadHome() {
         : caseload.status === 'ready'
           ? {
               status: 'ready',
-              people: caseload.members.map((member): HomePerson => {
-                const when = whenLastActive(member.lastActiveAt, locale);
-                // No link: `/person/` only resolves example people today,
-                // so a real row would open a dead end (as on `/admin/`).
-                return {
+              // Each opens the member's page (D-227), which shows a real
+              // member only what this list already does — see `/person/`.
+              // The line under the name is the points; when they last used
+              // PAM is on their page now (Will, 2 October).
+              people: caseload.members.map(
+                (member): HomePerson => ({
                   id: member.id,
                   firstName: member.firstName,
+                  href: `/person/?id=${encodeURIComponent(member.id)}`,
                   chip: statusChip(member, t),
                   programBadge: member.program,
-                  meta: [
-                    ...(member.points !== null ? [t('admin.points', { count: member.points })] : []),
-                    when ? t('admin.lastActive', { when }) : t('admin.lastActive.never'),
-                  ],
-                };
-              }),
+                  meta: member.points !== null ? [t('admin.points', { count: member.points })] : [],
+                }),
+              ),
             }
           : {
               status: 'ready',
               people: USE_DUMMY_PEOPLE
-                ? DUMMY_MEMBERS.map((member): HomePerson => {
-                    const when = whenLastActive(member.lastActiveAt, locale);
-                    return {
+                ? DUMMY_MEMBERS.map(
+                    (member): HomePerson => ({
                       id: member.id,
                       firstName: member.firstName,
                       href: `/person/?id=${member.id}`,
                       chip: dummyChip(member.accessStatus, t),
-                      meta: [
-                        ...(member.points !== undefined ? [t('admin.points', { count: member.points })] : []),
-                        when ? t('admin.lastActive', { when }) : t('admin.lastActive.never'),
-                      ],
-                    };
-                  })
+                      meta: member.points !== undefined ? [t('admin.points', { count: member.points })] : [],
+                    }),
+                  )
                 : [],
             };
   const isExample = caseload.status === 'empty' && USE_DUMMY_PEOPLE;
@@ -108,7 +103,22 @@ export function CaseloadHome() {
       state={state}
       note={isExample ? t('example.people.note') : null}
       actions={<HeaderActions role="admin" />}
-      starred={{ ids: starred.ids, onToggle: (person) => starred.toggle(person.id) }}
+      // Message, the shortcut on each card (D-227): the example conversation
+      // for an example person, a real one opened for a real member.
+      message={{
+        label: (person) => t('person.message.action', { name: person.firstName ?? '' }),
+        onMessage: (person) => {
+          if (person.id.startsWith('dummy-')) {
+            router.push(
+              `/messages/thread/?id=${encodeURIComponent(dummyConversationIdBetween(person.id, DUMMY_SELF_ID.admin))}`,
+            );
+            return;
+          }
+          void openConversation(person.id).then((id) => {
+            router.push(id ? `/messages/thread/?id=${encodeURIComponent(id)}` : '/messages/');
+          });
+        },
+      }}
       floating={<InviteFloating />}
       onRetry={refresh}
       onPick={(person) => person.href && router.push(person.href)}

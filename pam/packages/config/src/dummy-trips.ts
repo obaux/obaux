@@ -64,3 +64,22 @@ export const DUMMY_TRIPS: readonly DummyTrip[] = [
     withId: 'dummy-a1',
   },
 ];
+
+/**
+ * Example trips for any member, past and coming up (D-227) — what a case
+ * manager sees on a member's page. The same three example places, on dates
+ * that differ by person (from their id), so two members never look identical
+ * and a screenshot is the same twice.
+ */
+export function dummyTripsFor(personId: string): DummyTrip[] {
+  const seed = [...personId].reduce((n, ch) => (n * 31 + ch.charCodeAt(0)) % 997, 7);
+  const offsets = [-24, -12, -4, 3, 10].map((d, i) => d + ((seed + i * 5) % 3));
+  return offsets.map((offset, i) => {
+    const base = DUMMY_TRIPS[(seed + i) % DUMMY_TRIPS.length]!;
+    return {
+      ...base,
+      id: `${base.id}-${personId}-${i}`,
+      startsAt: daysFromNow(offset, [9, 10, 13, 15][(seed + i) % 4]!),
+    };
+  });
+}
