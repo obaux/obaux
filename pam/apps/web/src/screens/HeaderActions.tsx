@@ -3,13 +3,24 @@
 import * as stylex from '@stylexjs/stylex';
 import { HStack } from '@astryxdesign/core/HStack';
 import { IconButton } from '@astryxdesign/core/IconButton';
+import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { HelpIcon } from '@pam/ui';
 import type { Role } from '@pam/config';
 import { HeaderBell } from '../app/HeaderBell';
 import { useI18n } from '@/lib/i18n';
 
 const styles = stylex.create({
-  help: { width: '48px', height: '48px', borderRadius: '50%', flexShrink: 0 },
+  // White with a thin grey edge, like the bell (Will, 2 October).
+  help: {
+    width: '48px',
+    height: '48px',
+    borderRadius: '50%',
+    flexShrink: 0,
+    backgroundColor: colorVars['--color-background-body'],
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    borderColor: colorVars['--color-border'],
+  },
 });
 
 /**
@@ -29,7 +40,7 @@ export function HeaderActions({ role = 'member', enabled = true }: { readonly ro
             <HelpIcon width={24} height={24} aria-hidden />
           </HStack>
         }
-        variant="secondary"
+        variant="ghost"
         href="/help/"
         xstyle={styles.help}
       />

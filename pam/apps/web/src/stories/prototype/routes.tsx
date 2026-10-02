@@ -85,6 +85,9 @@ export const REDESIGN_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   // The first tab (D-212): Explore for a member, the caseload for a case
   // manager, who wants in for a program — whoever the story signed in.
   '/': screen(() => <HomeScreen />),
+  // The old Places list is Explore now (D-216): a link from a screen the
+  // redesign has not reached yet lands on Explore, not the old design.
+  '/places/': screen(() => <HomeScreen />),
   '/trips/': screen(() => <TripsScreen headerActions={<HeaderActions />} />),
   // Saved and Messages on the tab-screen frame (D-213).
   '/saved/': screen(() => <SavedScreen />),

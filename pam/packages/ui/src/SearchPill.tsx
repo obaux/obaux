@@ -5,6 +5,7 @@ import * as stylex from '@stylexjs/stylex';
 import { Icon } from '@astryxdesign/core/Icon';
 import { IconButton } from '@astryxdesign/core/IconButton';
 import { InputGroup, InputGroupText } from '@astryxdesign/core/InputGroup';
+import { TextInput } from '@astryxdesign/core/TextInput';
 import { Typeahead, TypeaheadItem } from '@astryxdesign/core/Typeahead';
 import type { SearchableItem, SearchSource } from '@astryxdesign/core/Typeahead';
 
@@ -55,7 +56,10 @@ export interface SearchPillProps<T extends SearchPillItem> {
 }
 
 const styles = stylex.create({
-  group: { width: '100%' },
+  // White under the pill whatever is behind it — a map, on Trips. The theme's
+  // own background for the large group loses to the component's (it rendered
+  // transparent); set here, it holds.
+  group: { width: '100%', backgroundColor: 'light-dark(#FFFFFF, #262626)' },
   clear: { backgroundColor: 'transparent', borderWidth: 0, paddingInline: 0 },
 });
 
@@ -130,6 +134,38 @@ export function SearchPill<T extends SearchPillItem>({
           />
         </InputGroupText>
       ) : null}
+    </InputGroup>
+  );
+}
+
+/**
+ * The same pill, for filtering a list that is already on screen — Trips'
+ * places, Messages' names (D-216). No suggestions to drop down: the list
+ * below is the answer. Its own clear button empties it.
+ */
+export interface SearchFieldProps {
+  readonly label: string;
+  readonly placeholder: string;
+  readonly value: string;
+  readonly onChange: (value: string) => void;
+  /** Focus it on arrival — Messages' search opens on a tap. */
+  readonly hasAutoFocus?: boolean;
+}
+
+export function SearchField({ label, placeholder, value, onChange, hasAutoFocus = false }: SearchFieldProps) {
+  return (
+    <InputGroup label={label} isLabelHidden size="lg" xstyle={styles.group}>
+      <TextInput
+        label={label}
+        isLabelHidden
+        placeholder={placeholder}
+        value={value}
+        onChange={onChange}
+        startIcon="search"
+        hasClear
+        hasAutoFocus={hasAutoFocus}
+        size="lg"
+      />
     </InputGroup>
   );
 }

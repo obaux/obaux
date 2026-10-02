@@ -4533,6 +4533,30 @@ the unread dot on Messages stays the error dot it was.
 
 ---
 
+### D-216 — One search bar, quiet header buttons, help pages brought up to date
+
+Will, 2 October. Four small changes to the redesign, recorded together:
+
+- **One search bar.** Trips and Messages now use the same pill as Explore
+  (`SearchField` beside `SearchPill` in `@pam/ui`): white, rounded, the large
+  shadow, the field drawing nothing of its own. Trips' bar had been
+  transparent over the map because the component's own rule beat the theme
+  override; the white ground is set with `xstyle` on the group.
+- **Round header buttons are white with a grey border**, not the brand's pale
+  green wash: the bell, Help, Messages' search and Saved's Edit. They are the
+  "way on" controls, not actions, and the green read as a second primary.
+- **Your safety describes how reporting works now**: the ⋯ in a conversation,
+  then "Report suspicious activity" (D-213). The per-message report icons it
+  described are gone. "What we can help with" and Your safety both end on the
+  Call PAM *row* from Get help, not a big button, so Help has one shape for
+  calling.
+- **"Find the place" opens Explore**, not the old Places list. In the
+  prototype's redesigned routes `/places/` now shows Explore too, so the
+  older links (a place that no longer exists, the flag page) land on the new
+  design.
+
+---
+
 ## Notes for whoever picks this up next
 
 - `pnpm --filter @pam/db test` is the highest-value check in the repo. It is the

@@ -679,6 +679,13 @@
     box-shadow: 0 2px 4px light-dark(oklch(0 0 0 / 6%), oklch(0 0 0 / 30%)), 0 10px 28px light-dark(oklch(0 0 0 / 14%), oklch(0 0 0 / 45%)), inset 0 0 0 1px light-dark(oklch(0 0 0 / 5%), oklch(1 0 0 / 10%));
   }
 
+  .astryx-text-input[data-size="lg"] {
+    font-size: 18px;
+    border-width: 0px;
+    background-color: transparent;
+    box-shadow: none;
+  }
+
   .astryx-typeahead[data-size="lg"] {
     font-size: 18px;
     border-width: 0px;

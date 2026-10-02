@@ -74,7 +74,15 @@ const styles = stylex.create({
     borderStyle: 'solid',
     borderColor: colorVars['--color-border'],
   },
-  round: { borderRadius: '50%' },
+  // White with a thin grey edge (Will, 2 October: the tinted round buttons
+  // read "too green") — the same as Help and the other header buttons.
+  round: {
+    borderRadius: '50%',
+    backgroundColor: colorVars['--color-background-body'],
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    borderColor: colorVars['--color-border'],
+  },
   dot: {
     position: 'absolute',
     top: '-2px',
@@ -106,7 +114,7 @@ export function NotificationBell({
       <IconButton
         label={hasNew && unreadLabel ? `${label}, ${unreadLabel}` : label}
         icon={<BellIcon />}
-        variant={round ? 'secondary' : hasNew ? 'primary' : 'ghost'}
+        variant={round ? 'ghost' : hasNew ? 'primary' : 'ghost'}
         href={href}
         xstyle={round ? [styles.bell, styles.round] : hasNew ? styles.bell : [styles.bell, styles.quiet]}
       />

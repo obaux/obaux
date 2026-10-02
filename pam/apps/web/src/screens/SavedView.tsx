@@ -4,6 +4,7 @@ import { useState, type ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { Button } from '@astryxdesign/core/Button';
 import { EmptyState } from '@astryxdesign/core/EmptyState';
+import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import {
   AllPlacesIcon,
   BookmarkIcon,
@@ -43,7 +44,16 @@ export interface SavedViewProps {
 const ART = { width: 52, height: 52, 'aria-hidden': true } as const;
 
 const styles = stylex.create({
-  edit: { minHeight: '48px', borderRadius: '999px', paddingInline: '20px', fontSize: '17px' },
+  edit: {
+    minHeight: '48px',
+    borderRadius: '999px',
+    paddingInline: '20px',
+    fontSize: '17px',
+    backgroundColor: colorVars['--color-background-body'],
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    borderColor: colorVars['--color-border'],
+  },
   state: { paddingBlock: '48px' },
   stateIcon: { width: '64px', height: '64px' },
 });
@@ -63,7 +73,7 @@ export function SavedView({ state, onUnsave, headerActions, failed, supportPhone
             {places.length > 0 ? (
               <Button
                 label={t(editing ? 'saved.done' : 'saved.edit')}
-                variant="secondary"
+                variant="ghost"
                 onClick={() => setIsEditing((on) => !on)}
                 xstyle={styles.edit}
               />

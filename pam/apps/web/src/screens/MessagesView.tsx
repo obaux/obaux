@@ -6,14 +6,13 @@ import { Button } from '@astryxdesign/core/Button';
 import { EmptyState } from '@astryxdesign/core/EmptyState';
 import { HStack } from '@astryxdesign/core/HStack';
 import { IconButton } from '@astryxdesign/core/IconButton';
-import { InputGroup } from '@astryxdesign/core/InputGroup';
 import { List } from '@astryxdesign/core/List';
 import { Text } from '@astryxdesign/core/Text';
-import { TextInput } from '@astryxdesign/core/TextInput';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { ExploreIcon, MessagesIcon, NoResultsIcon, Page } from '@pam/ui';
 import { LargeTitleHeader } from '@pam/ui/LargeTitleHeader';
+import { SearchField } from '@pam/ui/SearchPill';
 import { useI18n } from '@/lib/i18n';
 import { Avatar } from '@astryxdesign/core/Avatar';
 import { ListItem } from '@astryxdesign/core/List';
@@ -55,7 +54,16 @@ export interface MessagesViewProps {
 }
 
 const styles = stylex.create({
-  round: { width: '48px', height: '48px', borderRadius: '50%', flexShrink: 0 },
+  round: {
+    width: '48px',
+    height: '48px',
+    borderRadius: '50%',
+    flexShrink: 0,
+    backgroundColor: colorVars['--color-background-body'],
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    borderColor: colorVars['--color-border'],
+  },
   searchRow: {
     position: 'sticky',
     top: 0,
@@ -134,19 +142,13 @@ export function MessagesView({ rows, emptyBody, headerActions, note, initialSear
       {searching ? (
         <HStack gap={2} align="center" wrap="nowrap" xstyle={styles.searchRow}>
           <VStack xstyle={styles.field}>
-            <InputGroup label={t('messages.search.label')} isLabelHidden size="lg">
-              <TextInput
-                label={t('messages.search.label')}
-                isLabelHidden
-                placeholder={t('messages.search.placeholder')}
-                value={query ?? ''}
-                onChange={setQuery}
-                startIcon="search"
-                hasClear
-                hasAutoFocus
-                size="lg"
-              />
-            </InputGroup>
+            <SearchField
+              label={t('messages.search.label')}
+              placeholder={t('messages.search.placeholder')}
+              value={query ?? ''}
+              onChange={setQuery}
+              hasAutoFocus
+            />
           </VStack>
           <Button label={t('messages.search.cancel')} variant="ghost" onClick={() => setQuery(null)} xstyle={styles.cancel} />
         </HStack>
@@ -157,7 +159,7 @@ export function MessagesView({ rows, emptyBody, headerActions, note, initialSear
             <>
               <IconButton
                 label={t('messages.search.open')}
-                variant="secondary"
+                variant="ghost"
                 icon={
                   <HStack>
                     <ExploreIcon width={22} height={22} aria-hidden />

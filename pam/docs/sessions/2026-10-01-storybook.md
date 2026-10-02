@@ -317,3 +317,16 @@ selected underline hidden through the theme (`tab-indicator` sets
 `--color-accent: transparent`; an `opacity` override lost to the component's
 own rule — first attempt, caught in a screenshot). Checked light and dark in
 Chromium.
+
+
+## Addendum — 2 October: search, header buttons, help (D-216)
+
+- Trips and Messages search use `SearchField`, matching Explore's pill.
+- Round header buttons (bell, Help, search, Edit) are ghost buttons with a
+  white ground and a 1px grey border.
+- Your safety explains ⋯ → Report suspicious activity; Help's topic and
+  safety pages use the Call PAM row instead of a big button.
+- "Find the place" goes to Explore; `/places/` shows Explore in the
+  redesign prototype.
+- Checked: `pnpm -r typecheck`, UI/config unit tests, `build-storybook`,
+  a fresh `build`, then a11y + messages e2e (105 passed).

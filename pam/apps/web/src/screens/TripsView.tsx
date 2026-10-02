@@ -5,12 +5,11 @@ import * as stylex from '@stylexjs/stylex';
 import { EmptyState } from '@astryxdesign/core/EmptyState';
 import { Heading } from '@astryxdesign/core/Heading';
 import { HStack } from '@astryxdesign/core/HStack';
-import { InputGroup } from '@astryxdesign/core/InputGroup';
 import { Text } from '@astryxdesign/core/Text';
-import { TextInput } from '@astryxdesign/core/TextInput';
 import { VStack } from '@astryxdesign/core/VStack';
 import { NoResultsIcon, TripsIcon } from '@pam/ui';
 import { MapDrawer } from '@pam/ui/MapDrawer';
+import { SearchField } from '@pam/ui/SearchPill';
 import { TripCard } from '@pam/ui/TripCard';
 import { DUMMY_TRIPS } from '@pam/config/dummy-trips';
 import { dummyConnection } from '@pam/config/dummy-connections';
@@ -105,18 +104,12 @@ export function TripsView({ trips, headerActions }: TripsViewProps) {
       {trips.length > 0 ? (
         <HStack gap={2} align="center" wrap="nowrap" xstyle={styles.top}>
           <VStack xstyle={styles.search}>
-            <InputGroup label={t('trips.search.label')} isLabelHidden size="lg">
-              <TextInput
-                label={t('trips.search.label')}
-                isLabelHidden
-                placeholder={t('trips.search.placeholder')}
-                value={query}
-                onChange={setQuery}
-                startIcon="search"
-                hasClear
-                size="lg"
-              />
-            </InputGroup>
+            <SearchField
+              label={t('trips.search.label')}
+              placeholder={t('trips.search.placeholder')}
+              value={query}
+              onChange={setQuery}
+            />
           </VStack>
           {headerActions}
         </HStack>

@@ -143,6 +143,16 @@ export const pamTheme = defineTheme({
       },
     },
     // Inside the pill, the field draws nothing of its own: the pill is the box.
+    // The same for a plain text field in a pill — Trips' and Messages' search
+    // (Will, 2 October: "make them both match the style in Explore").
+    'text-input': {
+      'size:lg': {
+        fontSize: '18px',
+        borderWidth: '0px',
+        backgroundColor: 'transparent',
+        boxShadow: 'none',
+      },
+    },
     typeahead: {
       'size:lg': {
         fontSize: '18px',

@@ -712,7 +712,7 @@
   "help.safety.danger.body": "Call 911. You do not need to call PAM first.",
   "help.safety.danger.action": "Call 911",
   "help.safety.message.heading": "If a message makes you feel unsafe",
-  "help.safety.message.body": "Tap the warning sign under the message and choose what is wrong. PAM and the person who invited you see that one message — nothing else from the chat.",
+  "help.safety.message.body": "Open the conversation, tap the three dots (⋯) at the top right, then “Report suspicious activity” and choose what is wrong. PAM and the person who invited you see the last message this person sent you — nothing else from the chat.",
   "help.safety.call.heading": "If you want to talk to someone",
   "help.safety.call.body": "Call PAM and tell us what happened. You do not have to explain everything.",
   "help.place.title": "Report a place",

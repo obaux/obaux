@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.39.1-polish] — 2026-10-02 · One search bar, quieter buttons
+
+Trips and Messages now have the same search bar as Explore. The round
+buttons at the top of a screen are white with a thin grey edge instead of
+green. Your safety explains how to report a message today (the ⋯ in the
+conversation), and "Find the place" opens Explore.
+
 ## [0.39.0-templates] — 2026-10-01 · One way in and out of every screen
 
 Every screen you tap into now starts the same way: a round back button and

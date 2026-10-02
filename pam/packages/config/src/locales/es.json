@@ -712,7 +712,7 @@
   "help.safety.danger.body": "Llama al 911. No necesitas llamar a PAM primero.",
   "help.safety.danger.action": "Llamar al 911",
   "help.safety.message.heading": "Si un mensaje te hace sentir inseguro",
-  "help.safety.message.body": "Toca la señal de advertencia debajo del mensaje y elige qué está mal. PAM y la persona que te invitó ven ese único mensaje — nada más del chat.",
+  "help.safety.message.body": "Abre la conversación, toca los tres puntos (⋯) arriba a la derecha, luego “Reportar actividad sospechosa” y elige qué está mal. PAM y la persona que te invitó ven el último mensaje que esta persona te mandó — nada más del chat.",
   "help.safety.call.heading": "Si quieres hablar con alguien",
   "help.safety.call.body": "Llama a PAM y cuéntanos qué pasó. No tienes que explicarlo todo.",
   "help.place.title": "Reportar un lugar",
