@@ -4501,6 +4501,19 @@ the safety page is a plain link).
 
 ---
 
+### D-214 — The bottom bar's labels step back
+
+Will, 2 October: "make the text smaller and lower emphasis, and add a bit more
+gap between." Tab labels are 12px (were 13px) at regular weight in the
+secondary grey; the tab you are on keeps the primary colour at 600, so where
+you are still reads at a glance. The gap between icon and label doubles to
+8px. The icons carry the bar; the word confirms it. Contrast stays well above
+AA (grey on white ≈ 9:1), and each tab is still 64px tall and at least 62px
+wide at 320px. Below §2.5's 18px body floor, as the 13px labels already were:
+a label under an icon is not body text.
+
+---
+
 ## Notes for whoever picks this up next
 
 - `pnpm --filter @pam/db test` is the highest-value check in the repo. It is the

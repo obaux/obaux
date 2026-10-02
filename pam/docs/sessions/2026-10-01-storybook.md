@@ -300,3 +300,11 @@ states).
 - A Google Maps **browser key** (Maps JavaScript API, restricted to PAM's
   domains) as `NEXT_PUBLIC_GOOGLE_MAPS_KEY` in Vercel — then check Trips.
 - Real staff photos to replace the placeholders.
+
+---
+
+## Addendum, 2 October — quieter tab labels (D-214)
+
+`TabBar`: labels 12px, regular weight, secondary grey; the current tab
+primary at 600; icon-to-label gap 4px → 8px. Measured in Chromium at 375 and
+320px: 64px tall, 73 / 62px wide. `@pam/ui` tests pass; Storybook builds.

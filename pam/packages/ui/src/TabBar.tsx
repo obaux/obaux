@@ -82,13 +82,19 @@ const styles = stylex.create({
     flexShrink: 0,
   },
   tabs: { flexGrow: 1, minWidth: 0 },
+  // Quieter labels, a little more air (Will, 2 October): 12px at regular
+  // weight, a step further from the icon, and the secondary grey unless it is
+  // the tab you are on — the icon carries the bar, the word confirms it.
   tab: {
     flexDirection: 'column',
-    gap: '4px',
+    gap: '8px',
     minHeight: '64px',
     paddingInline: '2px',
-    fontSize: '13px',
+    fontSize: '12px',
+    fontWeight: 400,
+    color: colorVars['--color-text-secondary'],
   },
+  tabOn: { color: colorVars['--color-text-primary'], fontWeight: 600 },
   iconWrap: { position: 'relative' },
   dot: { position: 'absolute', top: '-2px', insetInlineEnd: '-4px' },
   // The selected Profile tab rings the avatar in the brand, as the reference
@@ -145,7 +151,14 @@ export function TabBar({ current, labels, label, name, photoUrl, unreadLabel, hr
             xstyle={styles.tabs}
           >
             {ORDER.map((key) => (
-              <Tab key={key} value={key} label={labels[key]} href={to[key]} icon={icons[key]} xstyle={styles.tab} />
+              <Tab
+                key={key}
+                value={key}
+                label={labels[key]}
+                href={to[key]}
+                icon={icons[key]}
+                xstyle={[styles.tab, key === current && styles.tabOn]}
+              />
             ))}
           </TabList>
         </HStack>
