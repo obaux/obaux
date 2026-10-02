@@ -114,25 +114,28 @@ test.describe("a place's own screen", () => {
     );
   });
 
-  test('the quieter actions are labelled rows, not icons behind a menu', async ({ page }) => {
+  test('the actions are round buttons with words, and the rest is in the bar', async ({ page }) => {
+    // D-224: Website, Message, Call and Open in Google under the name, each a
+    // labelled circle; Check hours on Google at the foot of the hours card;
+    // Save and the ⋯ menu (Flag something, Share, Message) in the bar.
     await signedIn(page);
     await page.route(DETAIL, (route) => route.fulfill(json([PLACE])));
     await page.goto(`/place/?id=${PLACE.id}`);
 
-    await expect(page.getByRole('link', { name: 'Call this place' })).toHaveAttribute(
+    await expect(page.getByRole('link', { name: 'Call', exact: true })).toHaveAttribute('href', 'tel:+12155550100');
+    await expect(page.getByRole('link', { name: 'Website', exact: true })).toHaveAttribute(
       'href',
-      'tel:+12155550100',
+      'https://example.org/kirkbride',
     );
+    await expect(page.getByRole('link', { name: 'Open in Google' })).toHaveAttribute('href', /google\.com\/maps\/search/);
     await expect(page.getByRole('link', { name: 'Check hours on Google' })).toHaveAttribute(
       'href',
       /google\.com\/maps\/search/,
     );
-    await expect(page.getByRole('link', { name: 'Their website' })).toHaveAttribute(
-      'href',
-      'https://example.org/kirkbride',
-    );
     await expect(page.getByRole('button', { name: 'Save this place' })).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Something is wrong here' })).toBeVisible();
+    await page.getByRole('button', { name: 'More options' }).click();
+    await expect(page.getByRole('menuitem', { name: 'Flag something' })).toBeVisible();
+    await expect(page.getByRole('menuitem', { name: 'Share this place' })).toBeVisible();
   });
 
   test('says out loud that the hours are samples', async ({ page }) => {

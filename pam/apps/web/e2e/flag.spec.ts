@@ -108,9 +108,9 @@ test.describe('reporting a place', () => {
   });
 
   test('reaches this screen from the place\'s own screen', async ({ page }) => {
-    // Reporting a place used to sit behind a "⋯" in the corner of the card,
-    // which guaranteed nobody would find it. It is now a labelled row on the
-    // place's screen — so that screen is the route that has to work.
+    // Reporting a place lives in the place's ⋯ menu since D-224 ("Flag
+    // something", with its icon, in the bar's own menu — Will, 2 October), so
+    // that menu is the route that has to work.
     await signedIn(page);
     await page.route('**/rest/v1/rpc/service_detail*', (route) =>
       route.fulfill(
@@ -137,7 +137,8 @@ test.describe('reporting a place', () => {
     await page.route('**/rest/v1/rpc/saved_places_mine*', (route) => route.fulfill(json([])));
 
     await page.goto(`/place/?id=${PLACE}`);
-    await page.getByRole('link', { name: 'Something is wrong here' }).click();
+    await page.getByRole('button', { name: 'More options' }).click();
+    await page.getByRole('menuitem', { name: 'Flag something' }).click();
 
     await expect(page).toHaveURL(new RegExp(`/flag/\\?place=${PLACE}$`));
   });
