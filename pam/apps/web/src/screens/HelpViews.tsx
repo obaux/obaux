@@ -1,6 +1,7 @@
 'use client';
 
 import * as stylex from '@stylexjs/stylex';
+import { Card } from '@astryxdesign/core/Card';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
@@ -27,6 +28,9 @@ const styles = stylex.create({
   intro: { fontSize: '18px', lineHeight: 1.5 },
   heading: { fontSize: '20px', lineHeight: 1.3 },
   body: { fontSize: '18px', lineHeight: 1.5 },
+  danger: { fontSize: '24px', lineHeight: 1.25, fontWeight: 700 },
+  section: { fontSize: '15px', fontWeight: 600, letterSpacing: '0.02em' },
+  note: { fontSize: '15px', lineHeight: 1.5 },
 });
 
 /** Call PAM as a row — the hours under it, one tap to dial (D-216). */
@@ -108,34 +112,60 @@ export function HelpTopicsView() {
 }
 
 /**
- * Safety: 911 first, then what to do about a message (⋯ → Report suspicious
- * activity, D-213), then a person to talk to. One primary action —
- * the call that matters most when this page is needed.
+ * Your safety (D-223, Will, 2 October: "more space and hierarchy… less
+ * reading"). One card first, for the one thing that cannot wait — in danger,
+ * call 911, the page's only big button. Under it, the two other situations as
+ * plain rows, each a short line and one tap: a message that feels unsafe
+ * (to Messages, where ⋯ › Report is), and someone to talk to (calls PAM). Then
+ * one quiet sentence on what reporting shares.
  */
 export function HelpSafetyView() {
   const { t } = useI18n();
+  const supportPhone = useSupportPhone();
   return (
     <SubPage title={t('help.safety.title')} backHref="/help/" backLabel={t('nav.back.help')} gap={4}>
-      <VStack gap={3}>
-        <Heading level={2} xstyle={styles.heading}>
-          {t('help.safety.danger.heading')}
+      <Card padding={6}>
+        <VStack gap={3}>
+          <VStack gap={1}>
+            <Heading level={2} xstyle={styles.danger}>
+              {t('help.safety.danger.heading')}
+            </Heading>
+            <Text type="supporting" xstyle={styles.body}>
+              {t('help.safety.danger.body')}
+            </Text>
+          </VStack>
+          <BigButton label={t('help.safety.danger.action')} href="tel:911" />
+        </VStack>
+      </Card>
+
+      <VStack gap={1}>
+        <Heading level={2} xstyle={styles.section}>
+          {t('help.safety.more')}
         </Heading>
-        <Text xstyle={styles.body}>{t('help.safety.danger.body')}</Text>
-        <BigButton label={t('help.safety.danger.action')} href="tel:911" />
+        <MenuList
+          label={t('help.safety.more')}
+          items={[
+            {
+              id: 'message',
+              label: t('help.safety.message.heading'),
+              description: t('help.safety.message.body'),
+              href: '/messages/',
+              icon: <FlagIcon {...ICON} />,
+            },
+            {
+              id: 'call',
+              label: t('help.safety.call.heading'),
+              description: t('help.safety.call.body'),
+              href: `tel:${supportPhone}`,
+              icon: <PhoneIcon {...ICON} />,
+            },
+          ]}
+        />
       </VStack>
-      <VStack gap={2}>
-        <Heading level={2} xstyle={styles.heading}>
-          {t('help.safety.message.heading')}
-        </Heading>
-        <Text xstyle={styles.body}>{t('help.safety.message.body')}</Text>
-      </VStack>
-      <VStack gap={2}>
-        <Heading level={2} xstyle={styles.heading}>
-          {t('help.safety.call.heading')}
-        </Heading>
-        <Text xstyle={styles.body}>{t('help.safety.call.body')}</Text>
-        <CallPamRow label={t('help.safety.call.heading')} />
-      </VStack>
+
+      <Text type="supporting" xstyle={styles.note}>
+        {t('help.safety.message.note')}
+      </Text>
     </SubPage>
   );
 }

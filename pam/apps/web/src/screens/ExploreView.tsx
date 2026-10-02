@@ -1,6 +1,7 @@
 'use client';
 
-import type { ReactNode } from 'react';
+import { useLayoutEffect, useRef, useState, type ReactNode } from 'react';
+import { useHideOnScroll } from '@/lib/useHideOnScroll';
 import * as stylex from '@stylexjs/stylex';
 import { Button } from '@astryxdesign/core/Button';
 import { EmptyState } from '@astryxdesign/core/EmptyState';
@@ -85,7 +86,16 @@ const styles = stylex.create({
     marginTop: '-12px',
     paddingTop: '12px',
     backgroundColor: colorVars['--color-background-body'],
+    transitionProperty: 'top',
+    transitionDuration: '220ms',
+    transitionTimingFunction: 'ease-out',
   },
+  // Scrolling down (D-222): the sticky block's top goes negative by the
+  // height of the search row, so only the chips stay on screen. Nothing below
+  // moves — the block keeps its place in the page, only where it sticks.
+  topAt: (px: number) => ({ top: `${px}px` }),
+  row: { transitionProperty: 'opacity', transitionDuration: '180ms' },
+  rowHidden: { opacity: 0, pointerEvents: 'none' },
   search: { flexGrow: 1, minWidth: 0 },
   heading: { fontSize: '22px', lineHeight: 1.25, fontWeight: 700 },
   source: { fontSize: '15px', lineHeight: 1.5 },
@@ -111,6 +121,21 @@ export function ExploreView({
 }: ExploreViewProps) {
   const { t } = useI18n();
   const searching = query.trim() !== '';
+  // The search row hides scrolling down and comes back scrolling up (D-222,
+  // Will, 2 October) — never while a search is typed or the area is open.
+  const hidden = useHideOnScroll({ isDisabled: searching || Boolean(areaPanel) });
+  const chipsRef = useRef<HTMLElement | null>(null);
+  const [hideBy, setHideBy] = useState(0);
+  useLayoutEffect(() => {
+    const el = chipsRef.current;
+    if (!el) return;
+    // How far the chips sit below the block's top, less a little air.
+    const measure = () => setHideBy(Math.max(0, el.offsetTop - 8));
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, []);
 
   const chips: readonly CategoryChip<ExploreCategory>[] = [
     { key: 'all', label: t('places.all'), icon: CATEGORY_ICONS.all },
@@ -123,13 +148,15 @@ export function ExploreView({
 
   return (
     <Page gap={4}>
-      <VStack gap={2} xstyle={styles.top}>
-        <HStack gap={2} align="center" wrap="nowrap">
+      <VStack gap={2} xstyle={[styles.top, hidden && styles.topAt(-hideBy)]}>
+        <HStack gap={2} align="center" wrap="nowrap" xstyle={[styles.row, hidden && styles.rowHidden]}>
           {leading}
           <VStack xstyle={styles.search}>{search}</VStack>
           {actions}
         </HStack>
-        <CategoryChips chips={chips} value={category} onChange={onCategory} label={t('explore.categories')} />
+        <VStack ref={chipsRef as never}>
+          <CategoryChips chips={chips} value={category} onChange={onCategory} label={t('explore.categories')} />
+        </VStack>
       </VStack>
 
       {areaPanel}

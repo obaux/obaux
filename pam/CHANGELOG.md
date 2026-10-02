@@ -6,7 +6,9 @@ Program leads can now make invite codes, for a member or another program,
 just like case managers. The month view of a program's schedule fills the
 screen, with the same header as Day and Week and a clearer way to pick a day.
 In Messages, long messages end in "…", and a green button at the top starts
-a new conversation.
+a new conversation. A program's Home has search, alerts and a + menu (invite
+someone, add a program) at the top. Explore's search bar steps aside while
+you scroll down. Your safety is shorter and easier to scan.
 
 ## [0.41.0-staff] — 2026-10-02 · An app for each kind of staff
 

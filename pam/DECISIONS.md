@@ -4729,6 +4729,38 @@ away (Profile → Get help), the same trade D-218 made on Program.
 
 ---
 
+### D-221 — A program lead's Home bar: search, bell, +
+
+Will, 2 October. The always-open search bar and Help gave way to three round
+buttons beside the large "Coming in" title (the tab template): **search**
+opens a field across the top with Cancel, as on Messages (the matches list
+under it; Cancel returns to the schedule); the **bell**; and a dark green
+**+** that opens a small menu — **Invite someone** and **Add a program**
+(`AddMenu`). Invite someone no longer floats on a program lead's Home; it
+lives in the +. (A case manager's Home keeps the floating row — Will asked
+this for the program Home.) Help is a tab away, as on Messages (D-220).
+
+### D-222 — Explore's search bar steps aside while scrolling down
+
+Will, 2 October. Scrolling down Explore, the search bar and its round
+buttons slide up out of view and only the category chips stay pinned;
+scrolling up brings them straight back (`useHideOnScroll`). Done by moving
+where the sticky block sticks (its `top` goes negative by the search row's
+measured height), so nothing below it shifts. Never while a search is typed
+or the area picker is open, and not within the first 120px of the page.
+
+### D-223 — Your safety: one card, two rows, one line
+
+Will, 2 October: "more space and hierarchy… less reading." The page is now a
+card for the one thing that cannot wait (in danger → Call 911, the page's
+only big button), then "Other ways we help" as two rows — a message that
+feels unsafe (a one-line how-to; opens Messages) and someone to talk to
+(calls PAM, with a one-line reassurance) — then one sentence on what a
+report shares. Every line was shortened; nothing the page promised was
+dropped.
+
+---
+
 ## Notes for whoever picks this up next
 
 - `pnpm --filter @pam/db test` is the highest-value check in the repo. It is the

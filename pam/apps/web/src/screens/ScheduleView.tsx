@@ -14,9 +14,9 @@ import { SegmentedControl, SegmentedControlItem } from '@astryxdesign/core/Segme
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
-import { NoResultsIcon, Page, TripsIcon } from '@pam/ui';
-import { SearchPill, type SearchPillItem } from '@pam/ui/SearchPill';
-import type { SearchSource } from '@astryxdesign/core/Typeahead';
+import { ExploreIcon, NoResultsIcon, Page, TripsIcon } from '@pam/ui';
+import { SearchField } from '@pam/ui/SearchPill';
+import { LargeTitleHeader } from '@pam/ui/LargeTitleHeader';
 import { useI18n } from '@/lib/i18n';
 
 /**
@@ -32,9 +32,9 @@ import { useI18n } from '@/lib/i18n';
  *   days that have people coming, with how many — the summary at a glance.
  *   Picking a day opens it in Day.
  *
- * The search bar finds people *or* times: a first name, a weekday, a date
- * ("Oct 6") or a time ("10:30") — across the whole schedule, not just the
- * page shown — and drops down the matches as you type.
+ * Search (the round button, D-221) finds people *or* times: a first name, a
+ * weekday, a date ("Oct 6") or a time ("10:30") — across the whole schedule,
+ * not just the page shown — and lists the matches as you type.
  */
 export interface Appointment {
   readonly id: string;
@@ -62,10 +62,6 @@ export interface ScheduleViewProps {
   readonly initialView?: View;
 }
 
-interface Suggestion extends SearchPillItem {
-  readonly auxiliaryData: Appointment;
-}
-
 const styles = stylex.create({
   top: {
     position: 'sticky',
@@ -76,6 +72,18 @@ const styles = stylex.create({
     backgroundColor: colorVars['--color-background-body'],
   },
   search: { flexGrow: 1, minWidth: 0 },
+  cancel: { flexShrink: 0, fontSize: '17px', fontWeight: 600 },
+  // White with a thin grey edge, like the bell (D-216).
+  round: {
+    width: '48px',
+    height: '48px',
+    borderRadius: '50%',
+    flexShrink: 0,
+    backgroundColor: colorVars['--color-background-body'],
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    borderColor: colorVars['--color-border'],
+  },
   heading: { fontSize: '26px', lineHeight: 1.2, fontWeight: 700 },
   nav: { width: '100%' },
   navLabel: { fontSize: '18px', fontWeight: 600, textAlign: 'center', flexGrow: 1 },
@@ -144,7 +152,7 @@ export function ScheduleView({
   const [view, setView] = useState<View>(initialView);
   const [anchor, setAnchor] = useState(() => startOfDay(today));
   const [query, setQuery] = useState('');
-  const [clearSignal, setClearSignal] = useState(0);
+  const [isSearching, setIsSearching] = useState(false);
 
   const fmt = useMemo(
     () => ({
@@ -179,26 +187,6 @@ export function ScheduleView({
   };
   const q = query.trim().toLowerCase();
   const found = q ? sorted.filter((a) => haystack(a).includes(q)) : [];
-
-  const searchSource = useMemo<SearchSource<Suggestion>>(
-    () => ({
-      search: (text) => {
-        const needle = text.trim().toLowerCase();
-        if (!needle) return [];
-        return sorted
-          .filter((a) => haystack(a).includes(needle))
-          .slice(0, 8)
-          .map((a) => ({
-            id: a.id,
-            label: a.firstName,
-            description: `${fmt.day.format(new Date(a.startsAt))} · ${fmt.time.format(new Date(a.startsAt))}`,
-            auxiliaryData: a,
-          }));
-      },
-      bootstrap: () => [],
-    }),
-    [sorted, fmt],
-  );
 
   const onDay = (d: Date) => sorted.filter((a) => sameDay(new Date(a.startsAt), d));
 
@@ -258,27 +246,54 @@ export function ScheduleView({
   return (
     <>
       <Page gap={4}>
-        <HStack gap={2} align="center" wrap="nowrap" xstyle={styles.top}>
-          <VStack xstyle={styles.search}>
-            <SearchPill<Suggestion>
-              label={t('schedule.search.label')}
-              placeholder={t('schedule.search.placeholder')}
-              searchSource={searchSource}
-              onPick={(item) => {
-                const d = startOfDay(new Date(item.auxiliaryData.startsAt));
-                setAnchor(d);
-                setView('day');
-                setClearSignal((n) => n + 1);
+        {/*
+          The bar (D-221, Will, 2 October): the title large, and three round
+          buttons — search, the bell, and + (Invite someone, Add a program).
+          Search opens a field across the top with Cancel, as on Messages,
+          instead of a search bar always taking the room.
+        */}
+        {isSearching ? (
+          <HStack gap={2} align="center" wrap="nowrap" xstyle={styles.top}>
+            <VStack xstyle={styles.search}>
+              <SearchField
+                label={t('schedule.search.label')}
+                placeholder={t('schedule.search.placeholder')}
+                value={query}
+                onChange={setQuery}
+                hasAutoFocus
+              />
+            </VStack>
+            <Button
+              label={t('messages.search.cancel')}
+              variant="ghost"
+              onClick={() => {
+                setIsSearching(false);
+                setQuery('');
               }}
-              onQuery={setQuery}
-              emptyText={t('schedule.search.none')}
-              clearLabel={t('explore.search.clear')}
-              itemIcon={(item) => <Avatar size="sm" name={item.label} tooltip={false} alt="" />}
-              clearSignal={clearSignal}
+              xstyle={styles.cancel}
             />
-          </VStack>
-          {actions}
-        </HStack>
+          </HStack>
+        ) : (
+          <LargeTitleHeader
+            title={t('schedule.title')}
+            actions={
+              <>
+                <IconButton
+                  label={t('schedule.search.label')}
+                  variant="ghost"
+                  icon={
+                    <HStack>
+                      <ExploreIcon width={22} height={22} aria-hidden />
+                    </HStack>
+                  }
+                  onClick={() => setIsSearching(true)}
+                  xstyle={styles.round}
+                />
+                {actions}
+              </>
+            }
+          />
+        )}
 
         {q ? (
           <VStack gap={2}>
@@ -294,22 +309,13 @@ export function ScheduleView({
                 icon={<NoResultsIcon {...stylex.props(styles.stateIcon)} aria-hidden />}
                 title={t('schedule.search.none')}
                 description={t('schedule.search.empty.body')}
-                actions={
-                  <Button
-                    label={t('explore.search.clear')}
-                    variant="primary"
-                    onClick={() => setClearSignal((n) => n + 1)}
-                  />
-                }
+                actions={<Button label={t('explore.search.clear')} variant="primary" onClick={() => setQuery('')} />}
               />
             )}
           </VStack>
         ) : (
           <>
             <VStack gap={3}>
-              <Heading level={1} xstyle={styles.heading}>
-                {t('schedule.title')}
-              </Heading>
               <SegmentedControl
                 label={t('schedule.view.label')}
                 value={view}

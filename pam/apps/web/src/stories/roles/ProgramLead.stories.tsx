@@ -3,7 +3,7 @@ import { screen } from './screen';
 
 /**
  * A program lead's app, screen by screen (D-217, D-218). Their bar is Home
- * (who is coming in — day, week or month — with Invite someone floating),
+ * (who is coming in — day, week or month — with Invite someone in its + menu),
  * Program (their listing, with Edit), Messages and Profile. All programs and
  * Add a program are a Profile row away.
  */

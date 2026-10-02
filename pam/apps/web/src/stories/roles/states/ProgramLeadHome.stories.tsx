@@ -2,12 +2,12 @@ import type { Meta, StoryObj } from '@storybook/nextjs';
 import { DUMMY_APPOINTMENTS } from '@pam/config/dummy-appointments';
 import { ScheduleView, type Appointment } from '../../../screens/ScheduleView';
 import { HeaderActions } from '../../../screens/HeaderActions';
-import { InviteFloating } from '../../../screens/HomeScreen';
+import { AddMenu } from '../../../screens/AddMenu';
 import { asRole } from '../../journeys/journey';
 
 /**
  * A program lead's Home (D-218): who is coming in — Day, Week or Month — with
- * search by name, day or time, and Invite someone floating above the bar.
+ * search behind the round search button, and Invite someone in the + menu (D-221).
  */
 const KIND: Record<string, string> = { intake: 'First visit', class: 'Class', checkin: 'Check-in', tour: 'Tour' };
 const appointments: Appointment[] = DUMMY_APPOINTMENTS.map((a) => ({
@@ -25,8 +25,12 @@ const meta = {
   component: ScheduleView,
   args: {
     appointments,
-    actions: <HeaderActions role="provider" />,
-    floating: <InviteFloating />,
+    actions: (
+      <>
+        <HeaderActions role="provider" hasHelp={false} />
+        <AddMenu />
+      </>
+    ),
   },
 } satisfies Meta<typeof ScheduleView>;
 

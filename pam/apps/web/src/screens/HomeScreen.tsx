@@ -8,6 +8,7 @@ import { USE_DUMMY_PEOPLE } from '@pam/config/dummy-flag';
 import { DUMMY_MEMBERS } from '@pam/config/dummy-people';
 import { DUMMY_APPOINTMENTS } from '@pam/config/dummy-appointments';
 import { ScheduleView, type Appointment } from './ScheduleView';
+import { AddMenu } from './AddMenu';
 import { useI18n } from '@/lib/i18n';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
@@ -146,8 +147,13 @@ export function ProgramHome() {
   return (
     <ScheduleView
       appointments={appointments}
-      actions={<HeaderActions role="provider" />}
-      floating={<InviteFloating />}
+      // Search, the bell and + (D-221): Invite someone lives in the + now.
+      actions={
+        <>
+          <HeaderActions role="provider" hasHelp={false} />
+          <AddMenu />
+        </>
+      }
       note={USE_DUMMY_PEOPLE ? t('example.people.note') : null}
     />
   );

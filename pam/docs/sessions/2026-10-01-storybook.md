@@ -394,3 +394,6 @@ Chromium.
   row for Day / Week / Month.
 - D-220: list rows shrink so previews truncate (`globals.css`); Messages has
   a green New message button (opens the D-186 picker) instead of Help.
+- D-221: ScheduleView on the tab template (search button → field + Cancel,
+  bell, `AddMenu` +). D-222: `useHideOnScroll` hides Explore's search row
+  (sticky `top` offset). D-223: Your safety redesigned (card + two rows).
