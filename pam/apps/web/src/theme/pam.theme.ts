@@ -151,6 +151,14 @@ export const pamTheme = defineTheme({
         boxShadow: 'none',
       },
     },
+    // The bottom bar marks the current tab by colour alone, as the mockups do
+    // (D-215) — no underline. TabBar is the only TabList in PAM.
+    // (Through its colour variable: the component's own opacity and colour
+    // rules outrank a theme override; a custom property set on the element
+    // does not — the same route the button overrides above take.)
+    'tab-indicator': {
+      base: { '--color-accent': 'transparent' },
+    },
     'typeahead-dropdown': {
       base: { borderRadius: '20px' },
     },

@@ -536,6 +536,11 @@ export const pamTheme = {
         "boxShadow": "none"
       }
     },
+    "tab-indicator": {
+      "base": {
+        "--color-accent": "transparent"
+      }
+    },
     "typeahead-dropdown": {
       "base": {
         "borderRadius": "20px"

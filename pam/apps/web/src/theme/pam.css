@@ -686,6 +686,10 @@
     box-shadow: none;
   }
 
+  .astryx-tab-indicator {
+    --color-accent: transparent;
+  }
+
   .astryx-typeahead-dropdown {
     border-radius: 20px;
   }

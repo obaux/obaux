@@ -4514,6 +4514,25 @@ a label under an icon is not body text.
 
 ---
 
+### D-215 — The current tab is red, and the underline goes
+
+Will, 2 October: "have the selected variant be red, like the mockup images."
+The tab you are on draws its icon and label in red at 600 weight, and the
+Profile avatar's ring follows; the brand-green underline Astryx draws under a
+selected tab is removed (`tab-indicator` → transparent in the theme), since
+the mockups mark it by colour alone.
+
+**Not the mockups' exact red.** #FF385C is 3.5:1 on white and fails WCAG AA
+for 12px text; #E31C5F, the same red a step deeper, is 4.6:1. Dark mode uses
+#FF6B86 (6.3:1 on the dark page). Written as `light-dark()` values in
+`TabBar.tsx`: PAM's theme has no red brand token, and an error token would
+mean the wrong thing.
+
+**Red is not an error here.** It is used only for "you are here" in the bar;
+the unread dot on Messages stays the error dot it was.
+
+---
+
 ## Notes for whoever picks this up next
 
 - `pnpm --filter @pam/db test` is the highest-value check in the repo. It is the

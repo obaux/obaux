@@ -308,3 +308,12 @@ states).
 `TabBar`: labels 12px, regular weight, secondary grey; the current tab
 primary at 600; icon-to-label gap 4px → 8px. Measured in Chromium at 375 and
 320px: 64px tall, 73 / 62px wide. `@pam/ui` tests pass; Storybook builds.
+
+## Addendum, 2 October — red current tab (D-215)
+
+`TabBar`: current tab icon, label and avatar ring red (#E31C5F light, 4.6:1;
+#FF6B86 dark, 6.3:1 — the mockups' #FF385C fails AA at 12px). Astryx's
+selected underline hidden through the theme (`tab-indicator` sets
+`--color-accent: transparent`; an `opacity` override lost to the component's
+own rule — first attempt, caught in a screenshot). Checked light and dark in
+Chromium.

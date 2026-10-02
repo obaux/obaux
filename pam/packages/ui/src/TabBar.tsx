@@ -94,7 +94,11 @@ const styles = stylex.create({
     fontWeight: 400,
     color: colorVars['--color-text-secondary'],
   },
-  tabOn: { color: colorVars['--color-text-primary'], fontWeight: 600 },
+  // The tab you are on is red, as in Will's mockups (2 October) — the icon
+  // follows, since PAM's icons draw in currentColor. A deeper red than the
+  // mockups' #FF385C, which is 3.5:1 on white and fails AA at 12px:
+  // #E31C5F is 4.6:1; #FF6B86 is 6.3:1 on the dark page.
+  tabOn: { color: 'light-dark(#E31C5F, #FF6B86)', fontWeight: 600 },
   iconWrap: { position: 'relative' },
   dot: { position: 'absolute', top: '-2px', insetInlineEnd: '-4px' },
   // The selected Profile tab rings the avatar in the brand, as the reference
@@ -106,7 +110,7 @@ const styles = stylex.create({
     borderStyle: 'solid',
     borderColor: 'transparent',
   },
-  avatarRingOn: { borderColor: colorVars['--color-accent'] },
+  avatarRingOn: { borderColor: 'light-dark(#E31C5F, #FF6B86)' },
 });
 
 export function TabBar({ current, labels, label, name, photoUrl, unreadLabel, hrefs, isHome = false }: TabBarProps) {
