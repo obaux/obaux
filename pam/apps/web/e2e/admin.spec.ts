@@ -313,7 +313,9 @@ test.describe('what has happened that a case manager has to act on', () => {
 
   test('the bell says how many are new, and leads to the list', async ({ page }) => {
     await signedInAs(page, 'admin', [], [], notifications);
-    await page.goto('/admin/');
+    // Home, where the bell is: `/admin/` is a nested screen since D-217
+    // (Invite someone), with Back and Help in its bar instead.
+    await page.goto('/');
 
     // The count is a dot beside the bell rather than a "1 new" chip (Will, 13
     // September), so the number lives in the link's accessible name — where a

@@ -75,7 +75,9 @@ async function signedIn(page: import('@playwright/test').Page, profile: Profile)
 test.describe('the way out', () => {
   test('every signed-in screen has the same button to your account', async ({ page }) => {
     await signedIn(page, { role: 'member' });
-    for (const path of ['/', '/places/', '/points/', '/saved/']) {
+    // Points left this list at D-217: it is a nested screen now (round back,
+    // Help in the bar), reached from Profile, not a screen with the app header.
+    for (const path of ['/', '/places/', '/saved/']) {
       await page.goto(path);
       const button = page.getByRole('link', { name: 'Your account' });
       await expect(button, `${path} has no account button`).toBeVisible();

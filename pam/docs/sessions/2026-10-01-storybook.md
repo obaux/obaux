@@ -345,3 +345,9 @@ Chromium.
 - Left alone: the old `/`, `/places/`, `/saved/`, `/messages/`, `/account/`
   pages still ship in the app until the tab screens are routed; Storybook
   never shows them.
+- Checked: typecheck, UI/config tests (296), `build-storybook` (264 stories,
+  0 render errors), bundle budget (90 kB to spare), full e2e on a fresh
+  build: 15 failures across 5 tests, all from intended changes (Points no
+  longer has the app header's account button; `/admin/` has no bell; the
+  Everyone filter left the header; a closed door still names the screen;
+  Report a place leads to Explore). Tests updated; those specs 129/129.

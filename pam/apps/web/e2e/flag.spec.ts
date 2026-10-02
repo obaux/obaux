@@ -101,10 +101,10 @@ test.describe('reporting a place', () => {
     await page.goto('/flag/');
 
     await expect(page.getByRole('heading', { name: 'We do not know which place' })).toBeVisible();
-    // Two ways to the list — the arrow beside the title and the button — which
-    // is one more than strictly needed and exactly what §0 asks for.
-    await expect(page.getByRole('link', { name: 'Places' }).first()).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Back to Places' })).toBeVisible();
+    // Two ways to Explore, where places are found now (D-217) — the round
+    // back and the button — one more than strictly needed, as §0 asks.
+    await expect(page.getByRole('link', { name: 'Find the place' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Back to Explore' })).toBeVisible();
   });
 
   test('reaches this screen from the place\'s own screen', async ({ page }) => {
