@@ -281,9 +281,9 @@ Messages, Profile. `/invite/` (two rows, a member or a program), `/programs/`
 (All programs, from Profile) and `/programs/new/` (Add a program) are new
 routes. Example data: starred people (session only), appointments, the
 example program; Add a program and Program edits store nothing yet (the RLS
-already allows both — wiring is a follow-up). Needs Will: whether program
-leads may create invites (0049 refuses them), and whether starred people
-get a table.
+already allows both — wiring is a follow-up). Will answered both (D-219): program
+leads may create invites — migration 0070, **live** — and starred people
+stay a session-only demo.
 
 This is the handover document: what exists, what is proven, what is live, and
 what the next person needs to know before touching anything.

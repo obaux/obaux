@@ -11,14 +11,17 @@ import { HelpButton } from './HelpButton';
 export function HeaderActions({
   role = 'member',
   enabled = true,
+  hasHelp = true,
 }: {
   readonly role?: Role | null;
   readonly enabled?: boolean;
+  /** Off on Messages, where New message takes Help's place (D-220). */
+  readonly hasHelp?: boolean;
 }) {
   return (
     <>
       <HeaderBell enabled={enabled} role={role} appearance="round" />
-      <HelpButton />
+      {hasHelp ? <HelpButton /> : null}
     </>
   );
 }

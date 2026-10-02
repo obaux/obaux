@@ -4,7 +4,6 @@ import { useMemo, useState, type ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { Avatar } from '@astryxdesign/core/Avatar';
 import { Button } from '@astryxdesign/core/Button';
-import { Calendar } from '@astryxdesign/core/Calendar';
 import { EmptyState } from '@astryxdesign/core/EmptyState';
 import { Heading } from '@astryxdesign/core/Heading';
 import { HStack } from '@astryxdesign/core/HStack';
@@ -101,7 +100,26 @@ const styles = stylex.create({
   quiet: { fontSize: '16px' },
   state: { paddingBlock: '32px' },
   stateIcon: { width: '64px', height: '64px', color: colorVars['--color-icon-accent'] },
-  calendar: { alignSelf: 'center' },
+  // The month grid: seven equal columns across the full width (Will,
+  // 2 October: "takes up more space on screen").
+  grid: { width: '100%' },
+  week: { width: '100%' },
+  cell: { flexGrow: 1, flexBasis: 0, minWidth: 0 },
+  weekday: { fontSize: '14px', textAlign: 'center', paddingBlock: '4px' },
+  day: {
+    width: '100%',
+    minHeight: '56px',
+    paddingInline: '0px',
+    paddingBlock: '6px',
+    borderRadius: '14px',
+  },
+  dayToday: {
+    borderWidth: '2px',
+    borderStyle: 'solid',
+    borderColor: colorVars['--color-icon-accent'],
+  },
+  dayNumber: { fontSize: '18px', fontWeight: 600, lineHeight: 1.1, color: 'inherit' },
+  dayCount: { fontSize: '12px', lineHeight: 1.2, minHeight: '15px', color: 'inherit' },
   note: { fontSize: '15px', lineHeight: 1.5 },
 });
 
@@ -135,6 +153,7 @@ export function ScheduleView({
       day: new Intl.DateTimeFormat(locale, { weekday: 'short', month: 'short', day: 'numeric' }),
       dayLong: new Intl.DateTimeFormat(locale, { weekday: 'long', month: 'long', day: 'numeric' }),
       monthDay: new Intl.DateTimeFormat(locale, { month: 'short', day: 'numeric' }),
+      weekdayNarrow: new Intl.DateTimeFormat(locale, { weekday: 'short' }),
       month: new Intl.DateTimeFormat(locale, { month: 'long', year: 'numeric' }),
     }),
     [locale],
@@ -302,28 +321,26 @@ export function ScheduleView({
                 <SegmentedControlItem value="week" label={t('schedule.view.week')} />
                 <SegmentedControlItem value="month" label={t('schedule.view.month')} />
               </SegmentedControl>
-              {/* Month has the calendar's own arrows; a second pair would be the same control twice. */}
-              {view === 'month' ? null : (
-                <HStack gap={2} align="center" wrap="nowrap" xstyle={styles.nav}>
-                  <IconButton
-                    label={t(`schedule.prev.${view}`)}
-                    variant="ghost"
-                    onClick={() => step(-1)}
-                    icon={<Icon icon="chevronLeft" size="md" />}
-                    xstyle={styles.navButton}
-                  />
-                  <Text xstyle={styles.navLabel} aria-live="polite">
-                    {navLabel}
-                  </Text>
-                  <IconButton
-                    label={t(`schedule.next.${view}`)}
-                    variant="ghost"
-                    onClick={() => step(1)}
-                    icon={<Icon icon="chevronRight" size="md" />}
-                    xstyle={styles.navButton}
-                  />
-                </HStack>
-              )}
+              {/* One header for Day, Week and Month alike (Will, 2 October). */}
+              <HStack gap={2} align="center" wrap="nowrap" xstyle={styles.nav}>
+                <IconButton
+                  label={t(`schedule.prev.${view}`)}
+                  variant="ghost"
+                  onClick={() => step(-1)}
+                  icon={<Icon icon="chevronLeft" size="md" />}
+                  xstyle={styles.navButton}
+                />
+                <Text xstyle={styles.navLabel} aria-live="polite">
+                  {navLabel}
+                </Text>
+                <IconButton
+                  label={t(`schedule.next.${view}`)}
+                  variant="ghost"
+                  onClick={() => step(1)}
+                  icon={<Icon icon="chevronRight" size="md" />}
+                  xstyle={styles.navButton}
+                />
+              </HStack>
             </VStack>
 
             {view === 'day' ? (
@@ -379,24 +396,20 @@ export function ScheduleView({
 
             {view === 'month' ? (
               <VStack gap={4}>
-                <VStack xstyle={styles.calendar}>
-                  <Calendar
-                    value={iso(anchor) as never}
-                    focusDate={iso(new Date(anchor.getFullYear(), anchor.getMonth(), 1)) as never}
-                    onFocusDateChange={(next: string) => {
-                      const [y, m] = next.split('-').map(Number);
-                      setAnchor(new Date(y!, (m ?? 1) - 1, 1));
-                    }}
-                    onChange={(next: unknown) => {
-                      if (typeof next !== 'string') return;
-                      const [y, m, d] = next.split('-').map(Number);
-                      setAnchor(new Date(y!, (m ?? 1) - 1, d ?? 1));
-                      setView('day');
-                    }}
-                    weekStartsOn="mon"
-                    hasVariableRowCount
-                  />
-                </VStack>
+                <MonthGrid
+                  month={anchor}
+                  today={today}
+                  selected={anchor}
+                  countOn={(d) => onDay(d).length}
+                  weekdayLabel={(d) => fmt.weekdayNarrow.format(d)}
+                  dayLabel={(d, count) =>
+                    count > 0 ? `${fmt.dayLong.format(d)}, ${t('schedule.count', { count })}` : fmt.dayLong.format(d)
+                  }
+                  onPick={(d) => {
+                    setAnchor(d);
+                    setView('day');
+                  }}
+                />
                 <VStack gap={1}>
                   <Heading level={2} xstyle={styles.dayHeading}>
                     {t('schedule.month.days')}
@@ -437,5 +450,77 @@ export function ScheduleView({
       {/* Outside the page: its motion wrapper would pin a fixed child to itself. */}
       {floating}
     </>
+  );
+}
+
+/**
+ * The month as seven equal columns, Monday first, filling the width (D-218).
+ * Each day is one button: its number, and under it how many are coming in.
+ * The day being looked at is filled; today has a ring — two separate marks
+ * that never overlap, unlike the stock calendar's (Will: "wonky").
+ */
+function MonthGrid({
+  month,
+  today,
+  selected,
+  countOn,
+  weekdayLabel,
+  dayLabel,
+  onPick,
+}: {
+  readonly month: Date;
+  readonly today: Date;
+  readonly selected: Date;
+  readonly countOn: (d: Date) => number;
+  readonly weekdayLabel: (d: Date) => string;
+  readonly dayLabel: (d: Date, count: number) => string;
+  readonly onPick: (d: Date) => void;
+}) {
+  const first = new Date(month.getFullYear(), month.getMonth(), 1);
+  const start = weekStart(first);
+  const weeks: Date[][] = [];
+  for (let w = start; w.getMonth() === first.getMonth() || w < first; w = addDays(w, 7)) {
+    weeks.push(Array.from({ length: 7 }, (_, i) => addDays(w, i)));
+  }
+  return (
+    <VStack gap={1} xstyle={styles.grid} role="grid">
+      <HStack gap={1} wrap="nowrap" xstyle={styles.week} role="row">
+        {weeks[0]!.map((d) => (
+          <VStack key={iso(d)} xstyle={styles.cell} role="columnheader">
+            <Text type="supporting" xstyle={styles.weekday}>
+              {weekdayLabel(d)}
+            </Text>
+          </VStack>
+        ))}
+      </HStack>
+      {weeks.map((week) => (
+        <HStack key={iso(week[0]!)} gap={1} wrap="nowrap" xstyle={styles.week} role="row">
+          {week.map((d) => {
+            const inMonth = d.getMonth() === first.getMonth();
+            const count = inMonth ? countOn(d) : 0;
+            const isSelected = sameDay(d, selected);
+            return (
+              <VStack key={iso(d)} xstyle={styles.cell} role="gridcell">
+                {inMonth ? (
+                  <Button
+                    label={dayLabel(d, count)}
+                    variant={isSelected ? 'primary' : 'ghost'}
+                    aria-current={sameDay(d, today) ? 'date' : undefined}
+                    aria-pressed={isSelected}
+                    onClick={() => onPick(d)}
+                    xstyle={[styles.day, sameDay(d, today) && !isSelected && styles.dayToday]}
+                  >
+                    <VStack gap={0.5} align="center">
+                      <Text xstyle={styles.dayNumber}>{d.getDate()}</Text>
+                      <Text xstyle={styles.dayCount}>{count > 0 ? String(count) : ''}</Text>
+                    </VStack>
+                  </Button>
+                ) : null}
+              </VStack>
+            );
+          })}
+        </HStack>
+      ))}
+    </VStack>
   );
 }

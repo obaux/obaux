@@ -8,7 +8,12 @@ import { useSession } from '@/lib/useSession';
 import { useRoleView } from '@/lib/useViewedRole';
 import { useConversations } from '@/lib/useConversations';
 import { whenHappened } from '@/lib/when';
-import { contextFor } from '../app/messages/DummyRows';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { contextFor, dummyPickerPeople } from '../app/messages/DummyRows';
+import { NewMessagePickerLazy } from '../app/messages/NewMessagePickerLazy';
+import type { PickablePerson } from '../app/messages/NewMessagePicker';
+import { useMessageableMembers } from '@/lib/useMessageableMembers';
+import { openConversation } from '@/lib/openConversation';
 import { HeaderActions } from './HeaderActions';
 import { MessagesView, type MessageRow } from './MessagesView';
 
@@ -26,6 +31,33 @@ export function MessagesScreen() {
   const canMessage = trueRole === 'member' || trueRole === 'admin' || trueRole === 'provider';
   const { state } = useConversations(session.status === 'signed-in' && canMessage);
   const role = viewedRole === 'admin' || viewedRole === 'provider' ? viewedRole : 'member';
+
+  // New message (D-220): everyone this person may message, in the same sheet
+  // with a search box the old screen used (D-186) — real people when there
+  // are any, the example cast otherwise, as the list above does.
+  const { state: messageable } = useMessageableMembers(session.status === 'signed-in' && canMessage);
+  const [picking, setPicking] = useState(false);
+  const realPeople = useMemo<readonly PickablePerson[]>(
+    () =>
+      messageable.status === 'ready'
+        ? messageable.people.map((p) => ({
+            id: p.profileId,
+            name: p.firstName ?? t('messages.thread.someone'),
+            context: contextFor(role, { role: p.role, programName: null }, t),
+          }))
+        : [],
+    [messageable, role, t],
+  );
+  const pickerExamples = useMemo(() => (USE_DUMMY_PEOPLE ? dummyPickerPeople(role, t) : null), [role, t]);
+  const useExamplePeople = realPeople.length === 0 && pickerExamples !== null;
+  const pick = useCallback(
+    async (id: string): Promise<string | null> => {
+      if (useExamplePeople) return pickerExamples?.hrefFor(id) ?? null;
+      const conversationId = await openConversation(id);
+      return conversationId ? `/messages/thread/?id=${encodeURIComponent(conversationId)}` : null;
+    },
+    [useExamplePeople, pickerExamples],
+  );
 
   const preview = (body: string | null, mine: boolean) =>
     body === null ? t('messages.preview.none') : mine ? t('messages.preview.you', { text: body }) : body;
@@ -60,11 +92,22 @@ export function MessagesScreen() {
     : [];
 
   return (
-    <MessagesView
-      rows={useExamples ? examples : real}
-      emptyBody={t(role === 'member' ? 'messages.empty.body.member' : 'messages.empty.body.staff')}
-      headerActions={<HeaderActions role={viewedRole} enabled={session.status === 'signed-in'} />}
-      note={useExamples ? t('example.people.note') : null}
-    />
+    <>
+      {picking ? (
+        <NewMessagePickerLazy
+          isOpen={picking}
+          onOpenChange={setPicking}
+          people={useExamplePeople ? (pickerExamples?.people ?? []) : realPeople}
+          onPick={pick}
+        />
+      ) : null}
+      <MessagesView
+        rows={useExamples ? examples : real}
+        emptyBody={t(role === 'member' ? 'messages.empty.body.member' : 'messages.empty.body.staff')}
+        headerActions={<HeaderActions role={viewedRole} enabled={session.status === 'signed-in'} hasHelp={false} />}
+        note={useExamples ? t('example.people.note') : null}
+        {...(canMessage ? { onNewMessage: () => setPicking(true) } : {})}
+      />
+    </>
   );
 }

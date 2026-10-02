@@ -379,3 +379,18 @@ Chromium.
 - Checked: typecheck, UI/config tests, `build-storybook` (276 stories, 0
   render errors), bundle budget (88 kB to spare), screenshots of each new
   screen.
+
+## Addendum — 2 October: program leads invite (D-219)
+
+- Migration 0070 (`create_invite` for program leads; member invites land on
+  no caseload) + `test/08_program_invites_test.sql`; full DB suite passes.
+- Live: `list_migrations` checked first (live at 0067, no unknown live
+  migrations; 0068/0069 held back on `claude/hopeful-thompson-07nj7n`, and
+  they do not touch `create_invite`). Applied 0070; `get_advisors` shows only
+  the standing notices.
+- InviteView makes real codes for program leads; the not-yet note and its
+  strings are gone. Starred people stay session-only (Will).
+- Month view: full-width `MonthGrid` replaces Astryx Calendar; shared header
+  row for Day / Week / Month.
+- D-220: list rows shrink so previews truncate (`globals.css`); Messages has
+  a green New message button (opens the D-186 picker) instead of Help.

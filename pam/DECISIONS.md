@@ -4672,6 +4672,63 @@ action row as a 48px button that stacked its label at the top; one rule in
 
 ---
 
+### D-219 — Program leads may invite; starred people stay a demo; the month is a full-width grid
+
+Will, 2 October, answering D-218's two questions and looking at the schedule.
+
+**Program leads can create invite codes** ("Yes, let's make sure this is
+allowed and documented"). Migration **0070** rewrites `create_invite` only:
+a program lead may invite a member or another program, into their own
+region; never a case manager or super admin; never another region. A member a
+program invites lands on **no caseload** (`assigned_admin_id` null), as one
+the super admin invites does — writing the program's id there would make it
+that member's case manager in every caseload policy, a widening of
+`transparency.ts` nobody asked for. Every invite is still audited, now with
+the inviter's role. No table, policy or grant changed; a program still reads
+no `invites` rows. Proven by `test/08_program_invites_test.sql` (the full
+suite passes). **Applied to the live project 2 October**, after
+`list_migrations` showed no drift beyond the held-back 0068/0069 — which
+touch `redeem_invite` and blocking, not `create_invite`, so 0070 is
+independent of them and they stay held for Will. Invite someone now makes
+real codes for program leads; the "PAM sends these for now" note is gone.
+
+Noted, not changed: a program lead a program invites skips the super admin's
+staff review (0054), exactly as one a case manager invites already does.
+
+**Starred people are not stored** ("no need to store yet, it's just a
+demo"): the session-only store from D-218 stays, and nothing about who a
+case manager stars is written anywhere.
+
+**The month view** (Will: "takes up more space… header match the weekly /
+daily header… the day selector is wonky"): Astryx's Calendar is replaced by
+a seven-column grid across the full width, Monday first, under the same
+round-arrow header row as Day and Week. Each day is one Astryx Button — the
+number, and under it how many are coming in; the day being looked at is
+filled, today has a ring, and the two never overlap (the stock calendar drew
+a today pill and a selected disc on top of each other). Tapping a day opens
+it in Day.
+
+---
+
+### D-220 — Messages: previews end in "…", and New message takes Help's place
+
+Will, 2 October. **A long preview ran off the screen**: the row's line
+already asked for an ellipsis, but the row's middle (Astryx's link or button
+holding the label) is a flex item that could grow past the row, so the line
+never met an edge. `globals.css` lets every list row's middle shrink
+(`.astryx-item > a, > button { min-width: 0 }`), and the line is a block —
+fixes it on every list, not only Messages.
+
+**New message** is a dark green round button at the end of the Messages bar
+(the brand's primary fill; a speech bubble with a plus, `NewMessageIcon`),
+**in Help's place** — Will's instruction ("instead of question mark icon").
+It opens the same "Who do you want to message?" sheet the old screen had
+(D-186): real people this person may message, the example cast when there
+are none. Not shown to a super admin (D-171). Help on Messages is one tab
+away (Profile → Get help), the same trade D-218 made on Program.
+
+---
+
 ## Notes for whoever picks this up next
 
 - `pnpm --filter @pam/db test` is the highest-value check in the repo. It is the

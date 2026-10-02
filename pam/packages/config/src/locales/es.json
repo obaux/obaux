@@ -792,8 +792,6 @@
   "invite.intro": "Cada invitación es un código para una persona. Léeselo o envíaselo por mensaje.",
   "invite.ready.member": "Un código para un miembro",
   "invite.ready.program": "Un código para un programa",
-  "invite.notYet.title": "Por ahora, PAM las envía",
-  "invite.notYet.body": "Un programa todavía no puede crear códigos de invitación. Llama a PAM y se lo enviaremos a la persona que tienes en mente.",
   "profile.menu.programs": "Todos los programas",
   "saved.pane.people": "Personas",
   "saved.pane.programs": "Programas",

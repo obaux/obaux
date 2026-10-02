@@ -238,6 +238,17 @@
     justify-content: center;
   }
 
+  /*
+   * A list row's middle (the link or button holding the label and the line
+   * under it) is a flex item that could grow past the row, so a long message
+   * preview ran off the screen instead of ending in "…" (Will, 2 October).
+   * Allowed to shrink, the line's own ellipsis has an edge to meet.
+   */
+  .astryx-item > a,
+  .astryx-item > button {
+    min-width: 0;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     *,
     *::before,

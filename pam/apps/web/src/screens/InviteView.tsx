@@ -8,12 +8,11 @@ import { Heading } from '@astryxdesign/core/Heading';
 import { HStack } from '@astryxdesign/core/HStack';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
-import { MeIcon, Notice, PhoneIcon, PlacesIcon, TextLink } from '@pam/ui';
+import { MeIcon, Notice, PlacesIcon, TextLink } from '@pam/ui';
 import { MenuList } from '@pam/ui/MenuList';
 import { SubPage } from '@pam/ui/SubPage';
 import { useI18n } from '@/lib/i18n';
 import { useSession } from '@/lib/useSession';
-import { useRoleView } from '@/lib/useViewedRole';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { createInvite, type CreatedInvite } from '@/lib/useCaseload';
 import { HelpButton } from './HelpButton';
@@ -23,12 +22,11 @@ import { HelpButton } from './HelpButton';
  * else — a member, or a program. The lists of members and program leads that
  * `/admin/` showed under the buttons are gone; Home is the list.
  *
- * Tapping a row makes the code at once (`create_invite`, 0049) and shows it
- * with the date it stops working and a way to copy it. A case manager or the
- * super admin can make codes; a program lead cannot yet — the database
- * refuses them (0049), and whether programs should bring people in is Will's
- * call — so for them the same two rows explain that PAM sends invites for
- * now, with PAM one tap away.
+ * Tapping a row makes the code at once (`create_invite`) and shows it with
+ * the date it stops working and a way to copy it. A case manager, a program
+ * lead (0070, D-219 — Will, 2 October) and the super admin can all make
+ * codes; a member a program invites lands on no caseload until a case
+ * manager picks them up.
  */
 const ICON = { width: 26, height: 26, 'aria-hidden': true } as const;
 
@@ -45,20 +43,15 @@ export function InviteView() {
   const supportPhone = useSupportPhone();
   const { state: session } = useSession();
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
-  const { viewedRole } = useRoleView(trueRole);
-  const canInvite = trueRole === 'admin' || trueRole === 'super_admin';
+  const canInvite = trueRole === 'admin' || trueRole === 'provider' || trueRole === 'super_admin';
 
   const [invite, setInvite] = useState<CreatedInvite | null>(null);
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState(false);
-  const [notYet, setNotYet] = useState(false);
   const [copied, setCopied] = useState(false);
 
   const make = async (role: 'member' | 'provider') => {
-    if (!canInvite || viewedRole === 'provider') {
-      setNotYet(true);
-      return;
-    }
+    if (!canInvite) return;
     setBusy(true);
     setFailed(false);
     const created = await createInvite(role);
@@ -138,26 +131,6 @@ export function InviteView() {
         />
       ) : null}
 
-      {notYet ? (
-        <VStack gap={2}>
-          <Heading level={2} xstyle={styles.heading}>
-            {t('invite.notYet.title')}
-          </Heading>
-          <Text xstyle={styles.note}>{t('invite.notYet.body')}</Text>
-          <MenuList
-            label={t('invite.notYet.title')}
-            items={[
-              {
-                id: 'call',
-                label: t('help.menu.call'),
-                description: t('help.call.body'),
-                href: `tel:${supportPhone}`,
-                icon: <PhoneIcon {...ICON} />,
-              },
-            ]}
-          />
-        </VStack>
-      ) : null}
     </SubPage>
   );
 }

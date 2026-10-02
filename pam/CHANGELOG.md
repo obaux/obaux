@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.41.1-invites] — 2026-10-02 · Programs can invite people
+
+Program leads can now make invite codes, for a member or another program,
+just like case managers. The month view of a program's schedule fills the
+screen, with the same header as Day and Week and a clearer way to pick a day.
+In Messages, long messages end in "…", and a green button at the top starts
+a new conversation.
+
 ## [0.41.0-staff] — 2026-10-02 · An app for each kind of staff
 
 In Storybook. Case managers and program leads have their own bottom bars —

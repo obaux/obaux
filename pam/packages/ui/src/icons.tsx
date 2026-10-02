@@ -405,3 +405,13 @@ export function PlusIcon(props: SVGProps<SVGSVGElement>) {
     </svg>
   );
 }
+
+/** A speech bubble with a plus. New message (D-220). */
+export function NewMessageIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <path d="M4.5 5.5h15a1 1 0 0 1 1 1v9.5a1 1 0 0 1-1 1H10l-4.5 3.5V17h-1a1 1 0 0 1-1-1V6.5a1 1 0 0 1 1-1z" />
+      <path d="M12 8.5v6M9 11.5h6" />
+    </svg>
+  );
+}

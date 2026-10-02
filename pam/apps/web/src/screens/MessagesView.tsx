@@ -10,7 +10,7 @@ import { List } from '@astryxdesign/core/List';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
-import { ExploreIcon, MessagesIcon, NoResultsIcon, Page } from '@pam/ui';
+import { ExploreIcon, MessagesIcon, NewMessageIcon, NoResultsIcon, Page } from '@pam/ui';
 import { LargeTitleHeader } from '@pam/ui/LargeTitleHeader';
 import { SearchField } from '@pam/ui/SearchPill';
 import { useI18n } from '@/lib/i18n';
@@ -47,6 +47,12 @@ export interface MessagesViewProps {
   readonly emptyBody: string;
   /** The bell and Help. */
   readonly headerActions?: ReactNode;
+  /**
+   * New message — the dark green round button at the end of the bar (D-220,
+   * Will, 2 October), in Help's place. Omitted for anyone who cannot start a
+   * conversation (a super admin, D-171).
+   */
+  readonly onNewMessage?: () => void;
   /** Under the list — "These are example people". */
   readonly note?: string | null;
   /** Open in search mode (for a story). */
@@ -64,6 +70,8 @@ const styles = stylex.create({
     borderStyle: 'solid',
     borderColor: colorVars['--color-border'],
   },
+  // The brand's own green, filled — the one action on this screen (D-220).
+  newMessage: { width: '48px', height: '48px', borderRadius: '50%', flexShrink: 0 },
   searchRow: {
     position: 'sticky',
     top: 0,
@@ -82,6 +90,9 @@ const styles = stylex.create({
   name: { fontSize: '18px', lineHeight: 1.3 },
   nameUnread: { fontWeight: 700 },
   line: {
+    // A block with a width, or the ellipsis below never has an edge to meet.
+    display: 'block',
+    maxWidth: '100%',
     fontSize: '16px',
     lineHeight: 1.35,
     overflow: 'hidden',
@@ -131,7 +142,14 @@ const matches = (row: MessageRow, text: string) => {
   return !q || `${row.name} ${row.context ?? ''} ${row.preview}`.toLowerCase().includes(q);
 };
 
-export function MessagesView({ rows, emptyBody, headerActions, note, initialSearch = null }: MessagesViewProps) {
+export function MessagesView({
+  rows,
+  emptyBody,
+  headerActions,
+  note,
+  initialSearch = null,
+  onNewMessage,
+}: MessagesViewProps) {
   const { t } = useI18n();
   const [query, setQuery] = useState<string | null>(initialSearch);
   const searching = query !== null;
@@ -150,7 +168,12 @@ export function MessagesView({ rows, emptyBody, headerActions, note, initialSear
               hasAutoFocus
             />
           </VStack>
-          <Button label={t('messages.search.cancel')} variant="ghost" onClick={() => setQuery(null)} xstyle={styles.cancel} />
+          <Button
+            label={t('messages.search.cancel')}
+            variant="ghost"
+            onClick={() => setQuery(null)}
+            xstyle={styles.cancel}
+          />
         </HStack>
       ) : (
         <LargeTitleHeader
@@ -169,6 +192,19 @@ export function MessagesView({ rows, emptyBody, headerActions, note, initialSear
                 xstyle={styles.round}
               />
               {headerActions}
+              {onNewMessage ? (
+                <IconButton
+                  label={t('messages.new.action')}
+                  variant="primary"
+                  icon={
+                    <HStack>
+                      <NewMessageIcon width={24} height={24} aria-hidden />
+                    </HStack>
+                  }
+                  onClick={onNewMessage}
+                  xstyle={styles.newMessage}
+                />
+              ) : null}
             </>
           }
         />
