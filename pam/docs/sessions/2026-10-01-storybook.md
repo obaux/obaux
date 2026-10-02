@@ -397,3 +397,7 @@ Chromium.
 - D-221: ScheduleView on the tab template (search button → field + Cancel,
   bell, `AddMenu` +). D-222: `useHideOnScroll` hides Explore's search row
   (sticky `top` offset). D-223: Your safety redesigned (card + two rows).
+- D-224: `PlaceBarActions` (Save + ⋯), `PlaceDetail` quick actions, hours
+  link in the hours card; member Saved shows Edit only.
+- D-225: Trips + only; `NewTripView` (`/trips/new/`), `addedTrips` session
+  store merged into Trips; preview map de-duplicates pins.

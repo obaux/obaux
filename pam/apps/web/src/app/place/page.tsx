@@ -2,7 +2,19 @@
 
 import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { BigButton, Notice, Page, PlaceDetail, directionsHref, googlePlaceHref } from '@pam/ui';
+import {
+  BigButton,
+  GlobeIcon,
+  MessagesIcon,
+  Notice,
+  Page,
+  PhoneIcon,
+  PlaceDetail,
+  PlacesIcon,
+  directionsHref,
+  googlePlaceHref,
+} from '@pam/ui';
+import { PlaceBarActions, messageHrefFor } from '../../screens/PlaceBarActions';
 import { PlaceDetailSkeleton } from '@pam/ui/Skeletons';
 import { SubPageHeader } from '@pam/ui/SubPage';
 import { HelpButton } from '../../screens/HelpButton';
@@ -45,6 +57,8 @@ import { sharePlace } from '@/lib/sharePlace';
  * an arbitrary URL. A bare `/place/?id=…` — a shared link, or an old one —
  * still falls back to Places, which was this screen's only behaviour before.
  */
+const QUICK = { width: 24, height: 24, 'aria-hidden': true } as const;
+
 const BACK_TARGETS = {
   home: { href: '/', labelKey: 'nav.back.home' },
   // The redesign's Explore, which is the home screen there (D-212).
@@ -192,7 +206,7 @@ function PlaceScreen() {
    * in the bar instead (it was put here on 16 September so this screen would
    * not show less than its neighbours; that still holds).
    */
-  const header = (title: string) => (
+  const header = (title: string, bar?: React.ReactNode) => (
     <SubPageHeader
       title={title}
       backHref={back.href}
@@ -202,8 +216,11 @@ function PlaceScreen() {
           {trueRole === 'super_admin' ? (
             <RoleSwitchControl trueRole={trueRole} viewedRole={demoRole ?? trueRole} onChange={setViewAs} />
           ) : null}
-          {/* Help in the bar, not a bar at the foot of the page (D-217). */}
-          <HelpButton />
+          {/*
+            A place's own bar once it has loaded (D-224): Save and the ⋯ menu.
+            Before that, Help (D-217).
+          */}
+          {bar ?? <HelpButton />}
         </>
       }
     />
@@ -236,11 +253,38 @@ function PlaceScreen() {
   }
 
   const saved = isSaved(place!.id);
+  const toggleSave = () => {
+    if (saved) {
+      void unsave(place!.id);
+      return;
+    }
+    void save({
+      id: place!.id,
+      name: place!.name,
+      lookupName: place!.lookupName,
+      category: place!.category,
+      address: place!.address,
+      phone: place!.phone,
+      placeId: place!.placeId,
+      lat: place!.lat,
+      lon: place!.lon,
+    });
+  };
+  const googleHref = googlePlaceHref(place!.lookupName || place!.name, place!.address, place!.placeId);
   const lines = status ? weekLines(status.hours, locale, t('place.hours.closed')) : undefined;
 
   return (
     <Page gap={4}>
-      {header(place!.name)}
+      {header(
+        place!.name,
+        <PlaceBarActions
+          isSaved={saved}
+          onSave={signedIn ? toggleSave : undefined}
+          onShare={() => void sharePlace(place!.name, place!.address)}
+          flagHref={`/flag/?place=${encodeURIComponent(place!.id)}`}
+          messageHref={messageHrefFor(place!.name)}
+        />,
+      )}
 
       <PlaceDetail
         category={place!.category}
@@ -255,31 +299,49 @@ function PlaceScreen() {
         phone={place!.phone}
         website={place!.website}
         directionsHref={directionsHref(place!.address, place!.lat, place!.lon) ?? null}
-        hoursHref={googlePlaceHref(place!.lookupName || place!.name, place!.address, place!.placeId)}
+        hoursHref={googleHref}
         isSaved={saved}
-        onSave={
-          signedIn
-            ? () => {
-                if (saved) {
-                  void unsave(place!.id);
-                  return;
-                }
-                void save({
-                  id: place!.id,
-                  name: place!.name,
-                  lookupName: place!.lookupName,
-                  category: place!.category,
-                  address: place!.address,
-                  phone: place!.phone,
-                  placeId: place!.placeId,
-                  lat: place!.lat,
-                  lon: place!.lon,
-                });
-              }
-            : undefined
-        }
-        onShare={() => void sharePlace(place!.name, place!.address)}
-        flagHref={`/flag/?place=${encodeURIComponent(place!.id)}`}
+        quickActionsLabel={t('place.quick.label')}
+        quickActions={[
+          ...(place!.website
+            ? [
+                {
+                  id: 'website',
+                  label: t('place.quick.website'),
+                  icon: <GlobeIcon {...QUICK} />,
+                  href: place!.website,
+                  isExternal: true,
+                },
+              ]
+            : []),
+          {
+            id: 'message',
+            label: t('place.quick.message'),
+            icon: <MessagesIcon {...QUICK} />,
+            href: messageHrefFor(place!.name),
+          },
+          ...(place!.phone
+            ? [
+                {
+                  id: 'call',
+                  label: t('place.quick.call'),
+                  icon: <PhoneIcon {...QUICK} />,
+                  href: `tel:${place!.phone}`,
+                },
+              ]
+            : []),
+          ...(googleHref
+            ? [
+                {
+                  id: 'google',
+                  label: t('place.quick.google'),
+                  icon: <PlacesIcon {...QUICK} />,
+                  href: googleHref,
+                  isExternal: true,
+                },
+              ]
+            : []),
+        ]}
         labels={{
           directions: t('place.directions'),
           call: t('place.call'),

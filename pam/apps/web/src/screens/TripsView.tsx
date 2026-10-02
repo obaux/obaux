@@ -1,15 +1,16 @@
 'use client';
 
-import { useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { EmptyState } from '@astryxdesign/core/EmptyState';
 import { Heading } from '@astryxdesign/core/Heading';
 import { HStack } from '@astryxdesign/core/HStack';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
-import { NoResultsIcon, TripsIcon } from '@pam/ui';
+import { PlusIcon, TripsIcon } from '@pam/ui';
+import { IconButton } from '@astryxdesign/core/IconButton';
+import { readAddedTrips } from '@/lib/addedTrips';
 import { MapDrawer } from '@pam/ui/MapDrawer';
-import { SearchField } from '@pam/ui/SearchPill';
 import { TripCard } from '@pam/ui/TripCard';
 import { DUMMY_TRIPS } from '@pam/config/dummy-trips';
 import { dummyConnection } from '@pam/config/dummy-connections';
@@ -26,7 +27,8 @@ import { TripsMap } from './TripsMap';
  * list (90% of the screen, the search bar still on top), or down to a dock so
  * the map has the screen and the pins can be followed around the city.
  *
- * Search, at the top, narrows the pins and the list by the place's name.
+ * Top right is the + that starts a new trip (D-225); nothing else sits over
+ * the map.
  *
  * Nothing creates a trip yet; the trips here are the example set
  * (`@pam/config/dummy-trips`) until something does, and with none at all the
@@ -46,7 +48,10 @@ export interface Trip {
 
 export interface TripsViewProps {
   readonly trips: readonly Trip[];
-  /** The bell and Help, beside the search bar. */
+  /**
+   * Top right, alone (D-225, Will, 2 October): the dark green + that starts a
+   * new trip. No search, no bell, no Help on this screen — the map has the room.
+   */
   readonly headerActions?: ReactNode;
 }
 
@@ -65,7 +70,13 @@ const styles = stylex.create({
     marginInline: 'auto',
     maxWidth: '560px',
   },
-  search: { flexGrow: 1, minWidth: 0 },
+  // Only the + sits here now, so it lets taps through to the map around it.
+  newTrip: {
+    width: '52px',
+    height: '52px',
+    borderRadius: '50%',
+    boxShadow: '0 4px 14px oklch(0 0 0 / 22%)',
+  },
   title: { fontSize: '26px', lineHeight: 1.2, fontWeight: 700, textAlign: 'center' },
   count: { fontSize: '15px', textAlign: 'center' },
   state: { paddingBlock: '24px' },
@@ -77,9 +88,7 @@ const PIN_ART = { width: 28, height: 28, 'aria-hidden': true } as const;
 
 export function TripsView({ trips, headerActions }: TripsViewProps) {
   const { t, locale } = useI18n();
-  const [query, setQuery] = useState('');
-  const q = query.trim().toLowerCase();
-  const shown = trips.filter((trip) => !q || trip.placeName.toLowerCase().includes(q));
+  const shown = trips;
 
   const day = (iso: string) =>
     new Intl.DateTimeFormat(locale, { weekday: 'short', month: 'short', day: 'numeric' }).format(new Date(iso));
@@ -101,16 +110,8 @@ export function TripsView({ trips, headerActions }: TripsViewProps) {
         }))}
       />
 
-      {trips.length > 0 ? (
-        <HStack gap={2} align="center" wrap="nowrap" xstyle={styles.top}>
-          <VStack xstyle={styles.search}>
-            <SearchField
-              label={t('trips.search.label')}
-              placeholder={t('trips.search.placeholder')}
-              value={query}
-              onChange={setQuery}
-            />
-          </VStack>
+      {headerActions ? (
+        <HStack gap={2} align="center" justify="end" wrap="nowrap" xstyle={styles.top}>
           {headerActions}
         </HStack>
       ) : null}
@@ -141,14 +142,6 @@ export function TripsView({ trips, headerActions }: TripsViewProps) {
             title={t('trips.empty.title')}
             description={t('trips.empty.body')}
           />
-        ) : shown.length === 0 ? (
-          <EmptyState
-            headingLevel={2}
-            xstyle={styles.state}
-            icon={<NoResultsIcon {...stylex.props(styles.stateIcon)} aria-hidden />}
-            title={t('trips.search.none.title', { query: query.trim() })}
-            description={t('trips.search.none.body')}
-          />
         ) : (
           <VStack gap={3}>
             {shown.map((trip) => (
@@ -176,23 +169,58 @@ export function TripsView({ trips, headerActions }: TripsViewProps) {
 
 /** Trips, wired to the example set (D-213) — nothing writes a trip yet. */
 export function TripsScreen({ headerActions }: { readonly headerActions?: ReactNode }) {
+  // Trips added in this visit (D-225), read after mount: storage is the
+  // browser's, and the first render has to match the server's.
+  const [added, setAdded] = useState<readonly Trip[]>([]);
+  useEffect(() => {
+    setAdded(
+      readAddedTrips().map((trip) => ({
+        id: trip.id,
+        placeId: trip.placeId,
+        placeName: trip.placeName,
+        category: trip.category,
+        lat: trip.lat,
+        lon: trip.lon,
+        startsAt: trip.startsAt,
+      })),
+    );
+  }, []);
+  const examples: Trip[] = DUMMY_TRIPS.map((trip) => {
+    const person = dummyConnection(trip.withId);
+    return {
+      id: trip.id,
+      placeId: trip.placeId,
+      placeName: trip.placeName,
+      category: trip.category,
+      lat: trip.lat,
+      lon: trip.lon,
+      startsAt: trip.startsAt,
+      withName: person?.firstName ?? null,
+      withPhotoUrl: person?.photoUrl ?? null,
+    };
+  });
   return (
     <TripsView
-      headerActions={headerActions}
-      trips={DUMMY_TRIPS.map((trip) => {
-        const person = dummyConnection(trip.withId);
-        return {
-          id: trip.id,
-          placeId: trip.placeId,
-          placeName: trip.placeName,
-          category: trip.category,
-          lat: trip.lat,
-          lon: trip.lon,
-          startsAt: trip.startsAt,
-          withName: person?.firstName ?? null,
-          withPhotoUrl: person?.photoUrl ?? null,
-        };
-      })}
+      headerActions={headerActions ?? <NewTripButton />}
+      trips={[...examples, ...added].sort((a, b) => a.startsAt.localeCompare(b.startsAt))}
+    />
+  );
+}
+
+/** The dark green + (D-225): a new trip, in the booking flow. */
+export function NewTripButton() {
+  const { t } = useI18n();
+  return (
+    <IconButton
+      label={t('trips.new')}
+      variant="primary"
+      href="/trips/new/"
+      icon={
+        <HStack>
+          <PlusIcon width={24} height={24} aria-hidden />
+        </HStack>
+      }
+      xstyle={styles.newTrip}
     />
   );
 }

@@ -10,7 +10,7 @@ import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { categoryLabelKey, type Category } from '@pam/config';
 import { DUMMY_SAVED_BY_ROLE } from '@pam/config/dummy-places';
-import { Page, PlaceDetail, TextField, TextLink } from '@pam/ui';
+import { GlobeIcon, Page, PhoneIcon, PlaceDetail, PlacesIcon, TextField, TextLink, googlePlaceHref } from '@pam/ui';
 import { LargeTitleHeader } from '@pam/ui/LargeTitleHeader';
 import { useI18n } from '@/lib/i18n';
 
@@ -37,6 +37,8 @@ export interface ProgramDetailsData {
   readonly phone: string;
   readonly website: string;
 }
+
+const QUICK = { width: 24, height: 24, 'aria-hidden': true } as const;
 
 const styles = stylex.create({
   edit: {
@@ -150,6 +152,42 @@ export function ProgramView({
           address={program.address}
           phone={program.phone || null}
           website={program.website || null}
+          // The same round actions a member sees under the name (D-224).
+          quickActionsLabel={t('place.quick.label')}
+          quickActions={[
+            ...(program.website
+              ? [
+                  {
+                    id: 'website',
+                    label: t('place.quick.website'),
+                    icon: <GlobeIcon {...QUICK} />,
+                    href: program.website,
+                    isExternal: true,
+                  },
+                ]
+              : []),
+            ...(program.phone
+              ? [
+                  {
+                    id: 'call',
+                    label: t('place.quick.call'),
+                    icon: <PhoneIcon {...QUICK} />,
+                    href: `tel:${program.phone}`,
+                  },
+                ]
+              : []),
+            ...(googlePlaceHref(program.name, program.address, null)
+              ? [
+                  {
+                    id: 'google',
+                    label: t('place.quick.google'),
+                    icon: <PlacesIcon {...QUICK} />,
+                    href: googlePlaceHref(program.name, program.address, null)!,
+                    isExternal: true,
+                  },
+                ]
+              : []),
+          ]}
           labels={{
             directions: t('place.directions'),
             call: t('place.call'),

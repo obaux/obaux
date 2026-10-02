@@ -8,7 +8,9 @@ screen, with the same header as Day and Week and a clearer way to pick a day.
 In Messages, long messages end in "…", and a green button at the top starts
 a new conversation. A program's Home has search, alerts and a + menu (invite
 someone, add a program) at the top. Explore's search bar steps aside while
-you scroll down. Your safety is shorter and easier to scan.
+you scroll down. Your safety is shorter and easier to scan. A place shows
+Website, Message, Call and Google as round buttons, with save and a ⋯ menu at
+the top. Trips has a + to plan a new visit in three steps.
 
 ## [0.41.0-staff] — 2026-10-02 · An app for each kind of staff
 

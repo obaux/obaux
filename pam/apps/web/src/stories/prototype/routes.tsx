@@ -25,6 +25,7 @@ import { ViewAsView } from '../../screens/ViewAsView';
 import { InviteView } from '../../screens/InviteView';
 import { AddProgramView } from '../../screens/AddProgramView';
 import { ProgramScreen } from '../../screens/ProgramView';
+import { NewTripView } from '../../screens/NewTripView';
 import { ExploreScreen } from '../../screens/ExploreScreen';
 import { TripsScreen } from '../../screens/TripsView';
 import { HomeScreen } from '../../screens/HomeScreen';
@@ -91,6 +92,8 @@ export const APP_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   '/programs/': screen(() => <ExploreScreen mode="programs" />),
   '/programs/new/': screen(() => <AddProgramView />),
   '/program/': screen(() => <ProgramScreen />),
+  // D-225: planning a visit, from the + on Trips.
+  '/trips/new/': screen(() => <NewTripView />),
 };
 
 /**
@@ -105,7 +108,7 @@ export const REDESIGN_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   // The old Places list is Explore now (D-216): a link from a screen the
   // redesign has not reached yet lands on Explore, not the old design.
   '/places/': screen(() => <HomeScreen />),
-  '/trips/': screen(() => <TripsScreen headerActions={<HeaderActions />} />),
+  '/trips/': screen(() => <TripsScreen />),
   // Saved and Messages on the tab-screen frame (D-213).
   '/saved/': screen(() => <SavedScreen />),
   '/messages/': screen(() => <MessagesScreen />),

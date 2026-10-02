@@ -1,6 +1,5 @@
 'use client';
 
-import { HeaderActions } from '../../screens/HeaderActions';
 import { TripsScreen } from '../../screens/TripsView';
 
 /**
@@ -10,5 +9,5 @@ import { TripsScreen } from '../../screens/TripsView';
  * preview.
  */
 export default function TripsPage() {
-  return <TripsScreen headerActions={<HeaderActions />} />;
+  return <TripsScreen />;
 }

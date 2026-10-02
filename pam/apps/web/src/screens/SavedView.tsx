@@ -201,7 +201,11 @@ export function SavedScreen() {
     <SavedView
       state={state}
       onUnsave={(id) => void unsave(id)}
-      headerActions={<HeaderActions role={viewedRole} enabled={session.status === 'signed-in'} />}
+      // A member's Saved has Edit alone at the top (Will, 2 October, D-224);
+      // a case manager's keeps the bell, beside the People / Programs switch.
+      headerActions={
+        isCaseManager ? <HeaderActions role={viewedRole} enabled={session.status === 'signed-in'} /> : undefined
+      }
       failed={failed}
       supportPhone={supportPhone}
       browseHref={isCaseManager ? '/programs/' : '/'}

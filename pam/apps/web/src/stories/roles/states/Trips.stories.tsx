@@ -1,6 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/nextjs';
-import { TripsScreen, TripsView } from '../../../screens/TripsView';
-import { HeaderActions } from '../../shell/HeaderActions';
+import { NewTripButton, TripsScreen, TripsView } from '../../../screens/TripsView';
 import { asRedesign } from '../../journeys/journey';
 
 /**
@@ -12,7 +11,7 @@ import { asRedesign } from '../../journeys/journey';
 const meta = {
   title: 'Member app/States/Trips',
   component: TripsView,
-  args: { trips: [], headerActions: <HeaderActions /> },
+  args: { trips: [], headerActions: <NewTripButton /> },
 } satisfies Meta<typeof TripsView>;
 
 export default meta;
@@ -20,7 +19,7 @@ type Story = StoryObj<typeof meta>;
 
 export const Upcoming: Story = {
   ...asRedesign('member', '/trips/'),
-  render: () => <TripsScreen headerActions={<HeaderActions />} />,
+  render: () => <TripsScreen />,
 };
 export const NoTrips: Story = { ...asRedesign('member', '/trips/') };
 export const Spanish: Story = { ...Upcoming, globals: { locale: 'es' } };

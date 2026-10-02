@@ -95,8 +95,13 @@ export function TripsMap({ pins }: { readonly pins: readonly TripPin[] }) {
 }
 
 /** The drawn stand-in: pins placed by coordinate within the upper map area. */
-function PreviewTripsMap({ pins }: { readonly pins: readonly TripPin[] }) {
+function PreviewTripsMap({ pins: all }: { readonly pins: readonly TripPin[] }) {
   const { t } = useI18n();
+  // One pin per place, labelled with its soonest visit (the list is in date
+  // order): two trips to the same place drew one label over the other (D-225).
+  const pins = all.filter(
+    (pin, index) => all.findIndex((other) => other.lat === pin.lat && other.lon === pin.lon) === index,
+  );
   const lats = pins.map((p) => p.lat);
   const lons = pins.map((p) => p.lon);
   const [minLat, maxLat] = [Math.min(...lats), Math.max(...lats)];
@@ -115,7 +120,12 @@ function PreviewTripsMap({ pins }: { readonly pins: readonly TripPin[] }) {
       {pins.map((pin) => {
         const at = place(pin);
         return (
-          <a key={pin.id} href={pin.href} aria-label={`${pin.name}, ${pin.when}`} {...stylex.props(styles.pin, styles.pinAt(at.left, at.top))}>
+          <a
+            key={pin.id}
+            href={pin.href}
+            aria-label={`${pin.name}, ${pin.when}`}
+            {...stylex.props(styles.pin, styles.pinAt(at.left, at.top))}
+          >
             <VStack xstyle={styles.pinTile} aria-hidden>
               {pin.art}
             </VStack>

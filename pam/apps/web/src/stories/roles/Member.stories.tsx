@@ -21,6 +21,7 @@ export const Messages: Story = screen('member', 'Messages', '/messages/');
 export const Profile: Story = screen('member', 'Profile', '/profile/');
 
 // Screens you tap into (the nested-page template, D-213).
+export const NewTrip: Story = screen('member', 'New trip', '/trips/new/');
 export const Place: Story = screen('member', 'A place', '/place/', { id: 's1', from: 'explore' });
 export const ReportPlace: Story = screen('member', 'Report a place', '/flag/', { place: 's1' });
 export const Conversation: Story = screen('member', 'A conversation', '/messages/thread/', { id: CONVO_ID });

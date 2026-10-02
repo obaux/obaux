@@ -9,6 +9,7 @@ import { Text } from '@astryxdesign/core/Text';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Badge, type BadgeVariant } from '@astryxdesign/core/Badge';
 import { Button } from '@astryxdesign/core/Button';
+import { IconButton } from '@astryxdesign/core/IconButton';
 import { colorVars, spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { BookmarkIcon, FlagIcon, PhoneIcon, PlacesIcon, ShareIcon } from './icons.js';
 import { BigButton } from './BigButton.js';
@@ -74,6 +75,15 @@ export interface PlaceDetailProps {
   readonly onCall?: () => void;
   readonly onShare?: () => void;
   readonly flagHref?: string;
+  /**
+   * Round buttons under the name (D-224, Will, 2 October): Website, Message,
+   * Call, Open in Google — each an icon in a circle with a word under it.
+   * Given, they replace the long column of action rows; save, share and
+   * report move to the screen's bar.
+   */
+  readonly quickActions?: readonly QuickAction[];
+  /** Shown at the foot of the hours card — "Check hours on Google" (D-224). */
+  readonly quickActionsLabel?: string;
   readonly labels: {
     readonly directions: string;
     readonly call: string;
@@ -87,6 +97,15 @@ export interface PlaceDetailProps {
     readonly share: string;
     readonly flag: string;
   };
+}
+
+export interface QuickAction {
+  readonly id: string;
+  readonly label: string;
+  readonly icon: ReactNode;
+  readonly href: string;
+  /** Opens in a new tab — a website, Google. */
+  readonly isExternal?: boolean;
 }
 
 function categoryBadgeVariant(category: Category): BadgeVariant {
@@ -116,6 +135,21 @@ const styles = stylex.create({
     fontSize: '17px',
   },
   rows: { rowGap: spacingVars['--spacing-2'] },
+  // The round quick actions: four across, each a circle with a word under it.
+  quick: { width: '100%', justifyContent: 'space-around' },
+  quickItem: { flexBasis: 0, flexGrow: 1, minWidth: 0 },
+  quickButton: {
+    width: '56px',
+    height: '56px',
+    borderRadius: '50%',
+    backgroundColor: colorVars['--color-background-body'],
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    borderColor: colorVars['--color-border'],
+    color: colorVars['--color-text-primary'],
+  },
+  quickLabel: { fontSize: '14px', textAlign: 'center', lineHeight: 1.25 },
+  hoursLink: { alignSelf: 'flex-start', minHeight: pam.touchTargetMin, fontSize: '16px', paddingInline: '0px' },
 });
 
 /** One labelled row in the "more" column, so the four of them cannot drift. */
@@ -168,6 +202,8 @@ export function PlaceDetail({
   onCall,
   onShare,
   flagHref,
+  quickActions,
+  quickActionsLabel,
   labels,
 }: PlaceDetailProps) {
   return (
@@ -194,15 +230,33 @@ export function PlaceDetail({
             </Text>
           ) : null}
           {status ? (
-            <Text
-              type={status.isOpen ? 'body' : 'supporting'}
-              xstyle={status.isOpen ? styles.open : styles.shut}
-            >
+            <Text type={status.isOpen ? 'body' : 'supporting'} xstyle={status.isOpen ? styles.open : styles.shut}>
               {status.label}
             </Text>
           ) : null}
         </HStack>
       </VStack>
+
+      {quickActions && quickActions.length > 0 ? (
+        <HStack gap={2} align="start" wrap="nowrap" xstyle={styles.quick} role="group" aria-label={quickActionsLabel}>
+          {quickActions.map((action) => (
+            <VStack key={action.id} gap={1} align="center" xstyle={styles.quickItem}>
+              <IconButton
+                label={action.label}
+                href={action.href}
+                variant="ghost"
+                target={action.isExternal ? '_blank' : undefined}
+                rel={action.isExternal ? 'noreferrer' : undefined}
+                icon={<HStack>{action.icon}</HStack>}
+                xstyle={styles.quickButton}
+              />
+              <Text xstyle={styles.quickLabel} aria-hidden>
+                {action.label}
+              </Text>
+            </VStack>
+          ))}
+        </HStack>
+      ) : null}
 
       {description ? (
         <Card padding={4} xstyle={styles.card}>
@@ -261,43 +315,46 @@ export function PlaceDetail({
                 {placeholderNote}
               </Text>
             ) : null}
+            {/* Where to check them, under the hours themselves (D-224). */}
+            {quickActions && hoursHref ? (
+              <Button
+                label={labels.hoursOnGoogle}
+                variant="ghost"
+                href={hoursHref}
+                target="_blank"
+                rel="noreferrer"
+                icon={<PlacesIcon />}
+                xstyle={styles.hoursLink}
+              />
+            ) : null}
           </VStack>
         </Card>
       ) : null}
 
-      <VStack gap={2} xstyle={styles.rows}>
-        {phone ? (
-          <ActionRow label={labels.call} icon={<PhoneIcon />} href={`tel:${phone}`} onClick={onCall} />
-        ) : null}
-        {hoursHref ? (
-          <ActionRow
-            label={labels.hoursOnGoogle}
-            icon={<PlacesIcon />}
-            href={hoursHref}
-            target="_blank"
-          />
-        ) : null}
-        {website ? (
-          <ActionRow label={labels.website} icon={<PlacesIcon />} href={website} target="_blank" />
-        ) : null}
-        {onSave ? (
-          <ActionRow
-            label={isSaved ? labels.saved : labels.save}
-            icon={<BookmarkIcon isFilled={isSaved} />}
-            onClick={onSave}
-          />
-        ) : null}
-        {onShare ? (
-          <ActionRow label={labels.share} icon={<ShareIcon />} onClick={onShare} />
-        ) : null}
-        {/*
+      {quickActions ? null : (
+        <VStack gap={2} xstyle={styles.rows}>
+          {phone ? <ActionRow label={labels.call} icon={<PhoneIcon />} href={`tel:${phone}`} onClick={onCall} /> : null}
+          {hoursHref ? (
+            <ActionRow label={labels.hoursOnGoogle} icon={<PlacesIcon />} href={hoursHref} target="_blank" />
+          ) : null}
+          {website ? <ActionRow label={labels.website} icon={<PlacesIcon />} href={website} target="_blank" /> : null}
+          {onSave ? (
+            <ActionRow
+              label={isSaved ? labels.saved : labels.save}
+              icon={<BookmarkIcon isFilled={isSaved} />}
+              onClick={onSave}
+            />
+          ) : null}
+          {onShare ? <ActionRow label={labels.share} icon={<ShareIcon />} onClick={onShare} /> : null}
+          {/*
           Reporting a place is how the catalogue stays true — a place that has
           closed or moved is the single most expensive error PAM can make, and
           the member standing outside it is the only one who knows. Behind a
           "⋯" it was never going to be used.
         */}
-        {flagHref ? <ActionRow label={labels.flag} icon={<FlagIcon />} href={flagHref} /> : null}
-      </VStack>
+          {flagHref ? <ActionRow label={labels.flag} icon={<FlagIcon />} href={flagHref} /> : null}
+        </VStack>
+      )}
     </VStack>
   );
 }

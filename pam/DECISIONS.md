@@ -4761,6 +4761,34 @@ dropped.
 
 ---
 
+### D-224 — A place: Save and ⋯ in the bar, four round actions under the name; Saved is Edit alone
+
+Will, 2 October. **A place** (member view): the bar's right side is Save
+(bookmark) and a ⋯ menu — Flag something, Share, Message the program, each
+with its icon — in place of Help. Under the name, a row of round buttons
+with a word under each: Website, Message, Call, Open in Google (`PlaceDetail`
+`quickActions`). "Check hours on Google" sits at the foot of the hours card.
+The long column of action rows under the place is gone (it stays only where
+no quick actions are given). Message goes to the program lead's
+conversation — the example one while messaging runs on example people, else
+Messages. The Program tab shows the same round actions (no Message to
+itself). **A member's Saved** has Edit alone at the top — no bell, no Help.
+
+### D-225 — Trips: the map and a + ; New trip is three steps
+
+Will, 2 October. Trips drops its search bar, bell and Help: only a dark green
+**+** sits over the map, top right. It opens **New trip** (`/trips/new/`),
+three steps on the nested template — Where (a program, one tap), When (a day
+from the next two weeks of weekdays and a time, as big buttons; Next),
+Check (the place and time, each with Change; an optional note; Add this
+trip) — then "Trip added" and back to the map. **Example only**: nothing
+books with a program yet; the trip is kept for the visit (`addedTrips`) so
+it shows on the map and in the drawer, and the screen says so. The drawn map
+shows one pin per place (its soonest visit), so two trips to one place no
+longer draw one label over another.
+
+---
+
 ## Notes for whoever picks this up next
 
 - `pnpm --filter @pam/db test` is the highest-value check in the repo. It is the
