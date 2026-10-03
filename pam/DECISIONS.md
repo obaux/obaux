@@ -5106,7 +5106,8 @@ manager's only (D-242).
 
 Will, 3 October. Under the date in the navigation row, Week and Month now
 show the total for that range, "N visits" (`schedule.total`), so a program
-lead can gauge how busy it will be. Day keeps "N coming in". The line keeps
+lead can gauge how busy it will be, including "0 visits" for an empty week or
+month (Will). Day keeps "N coming in". The line keeps
 its height in every view (D-236). In Month, the calendar and "Days with
 people coming in" sit 32px apart (`gap={8}`), and that list's rows are 56px
 (compact density), 20% tighter than the ~72px person rows. That is on the

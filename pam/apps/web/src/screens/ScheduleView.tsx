@@ -362,14 +362,12 @@ export function ScheduleView({
                     {navLabel}
                   </Text>
                   <Text type="supporting" xstyle={styles.navCount}>
-                    {/* Day: who is coming; Week and Month: the total, to gauge how busy (D-244). */}
+                    {/* Day: who is coming; Week and Month: the total, "0 visits" included (D-244). */}
                     {view === 'day'
                       ? dayList.length > 0
                         ? t('schedule.count', { count: dayList.length })
                         : ' '
-                      : rangeTotal > 0
-                        ? t('schedule.total', { count: rangeTotal })
-                        : ' '}
+                      : t('schedule.total', { count: rangeTotal })}
                   </Text>
                 </VStack>
                 <IconButton
