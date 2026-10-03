@@ -304,6 +304,9 @@ with "Step N of M", and Privacy and Terms are pinned to the foot of the way in
 Each role's Prototype now only signs in (number, code, Home); account
 creation is the separate Onboarding stories. Buttons are full pills
 everywhere, through Astryx's `--_button-radius` (D-253).
+Invites are links to Sign in (`/signin/?invite=&as=`, D-254); no migration.
+Telling someone their link has expired before they enter their phone would
+need one (a signed-out invite-state lookup) — Will's call.
 
 This is the handover document: what exists, what is proven, what is live, and
 what the next person needs to know before touching anything.

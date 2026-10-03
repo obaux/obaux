@@ -27,7 +27,9 @@ link beside the number. Signing up shows "Step 1 of 5" under each title
 instead of a bar, with a back button. Privacy and Terms always sit at the
 bottom of the screen. Every button is now a fully rounded pill. The
 language button is a white circle like the others, and the first sign-in
-picture is a little darker so the logo stands out.
+picture is a little darker so the logo stands out. Invites are now links: one tap sends
+it by text, and the person invited lands on Sign in with a line saying what
+they were invited to be, pictures about their own work, and a shorter form.
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 

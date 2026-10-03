@@ -209,6 +209,30 @@ test.describe('agreeing to reminders', () => {
  * keypad and their own number offered above it, and all four have to agree —
  * so `purpose` on TextField sets them together and this proves they arrive.
  */
+test.describe('arriving by an invite link (D-254)', () => {
+  test('says what they were invited to be, and the pictures speak to that work', async ({ page }) => {
+    await page.goto('/signin/?invite=PAM7Q4KX&as=case-manager');
+    await expect(page.getByRole('note')).toHaveText(en['signin.invited.admin']);
+    await expect(page.getByText(en['onboarding.admin.1'])).toBeVisible();
+    // Still the one sign in: the number, the consent line, the button.
+    await expect(page.getByText(en['signin.phone.consent'])).toBeVisible();
+    // The code is kept for joining, the next page a new person sees.
+    const kept = await page.evaluate(() => window.sessionStorage.getItem('pam.invite'));
+    expect(JSON.parse(kept ?? 'null')).toEqual({ code: 'PAM7Q4KX', role: 'admin' });
+  });
+
+  test('a program is told it is invited as a program partner', async ({ page }) => {
+    await page.goto('/signin/?invite=PAM7Q4KX&as=program');
+    await expect(page.getByRole('note')).toHaveText(en['signin.invited.provider']);
+    await expect(page.getByText(en['onboarding.provider.1'])).toBeVisible();
+  });
+
+  test('plain sign in has no invite line', async ({ page }) => {
+    await page.goto('/signin/');
+    await expect(page.getByText(en['signin.invited.member'])).toHaveCount(0);
+  });
+});
+
 test.describe('phone and code fields', () => {
   test('the code is six boxes over one field that takes a paste (D-251)', async ({ page }) => {
     await page.route('**/auth/v1/otp*', (route) =>

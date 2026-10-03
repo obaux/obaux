@@ -15,6 +15,7 @@ import { SubPageHeader } from '@pam/ui/SubPage';
 import { TRANSPARENCY_SCREEN, badgeForPoints, type Locale } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { navigate } from '@/lib/navigate';
+import { forgetInvite, recallInvite, type Invite } from '@/lib/appUrl';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { usePhoneSignIn } from '@/lib/usePhoneSignIn';
 import { usePreviewSignIn } from '@/lib/usePreviewSignIn';
@@ -147,6 +148,8 @@ export interface JoinPreview {
   readonly firstName: string;
   /** Arriving from Sign in: the number is given, so open on the code. */
   readonly phone?: string;
+  /** Arriving by an invite link (D-254): the phone is done, open on About you. */
+  readonly invite?: Invite;
 }
 
 export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview | null } = {}) {
@@ -174,9 +177,23 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
   const [inviteProblem, setInviteProblem] = useState<InviteProblem | null>(null);
   /** Whether step 2 made an account, as opposed to recording a request. */
   const [hasAccount, setHasAccount] = useState(false);
+  /**
+   * Invited by a link (D-254): Sign in kept the code and who it is for, so
+   * About you asks neither — no code to type, no "which one fits you best".
+   * It says what they were invited as instead. `?code=` still works too.
+   */
+  const [invitedAs, setInvitedAs] = useState<JoinKind | null>(null);
   useEffect(() => {
+    const invite = preview?.invite ?? recallInvite();
+    if (invite) {
+      setInviteCode(invite.code);
+      setKind(invite.role);
+      setInvitedAs(invite.role);
+      return;
+    }
     const fromLink = new URLSearchParams(window.location.search).get('code');
     if (fromLink) setInviteCode(fromLink.toUpperCase());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   const [wantsUpdates, setWantsUpdates] = useState(false);
   const [cities, setCities] = useState<readonly string[]>([]);
@@ -239,7 +256,8 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
       if (preview.kind === 'provider') {
         setProgram({ ...EMPTY_PROGRAM, name: 'Example Learning Center', address: '123 Main St' });
       }
-      setPhase('phone');
+      // By a link, the phone was done at Sign in (D-254).
+      setPhase(preview.invite ? 'details' : 'phone');
       return;
     }
     if (session.status === 'signed-out') setPhase('phone');
@@ -315,6 +333,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
       }
       setKind(redeemed.role === 'super_admin' ? 'admin' : redeemed.role);
       setHasAccount(true);
+      forgetInvite();
       setPhase('privacy');
       return;
     }
@@ -519,6 +538,8 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
         {phase === 'details' ? (
           <Card padding={4} xstyle={styles.card}>
             <VStack gap={3}>
+              {/* What they were invited as, first: the reason this form is short. */}
+              {invitedAs ? <Text xstyle={styles.intro}>{t(`join.invited.${invitedAs}`)}</Text> : null}
               <TextField
                 id={firstId}
                 purpose="name"
@@ -573,23 +594,27 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
                 <RadioListItem value="es" label={t('language.es')} />
               </RadioList>
 
-              {/*
-                The code, if there is one. It sits above the three sentences
-                because it replaces them: a person with a code was told what
-                they are by the person who gave it to them.
-              */}
-              <TextField
-                id={codeFieldId}
-                purpose="inviteCode"
-                label={t('join.code.label')}
-                value={inviteCode}
-                onChange={(next) => setInviteCode(next.toUpperCase())}
-                width="100%"
-                xstyle={styles.field}
-              />
-              <Text type="supporting" xstyle={styles.small}>
-                {t('join.code.hint')}
-              </Text>
+              {invitedAs ? null : (
+                <>
+                {/*
+                  The code, if there is one. It sits above the three sentences
+                  because it replaces them: a person with a code was told what
+                  they are by the person who gave it to them.
+                */}
+                <TextField
+                  id={codeFieldId}
+                  purpose="inviteCode"
+                  label={t('join.code.label')}
+                  value={inviteCode}
+                  onChange={(next) => setInviteCode(next.toUpperCase())}
+                  width="100%"
+                  xstyle={styles.field}
+                />
+                <Text type="supporting" xstyle={styles.small}>
+                  {t('join.code.hint')}
+                </Text>
+                </>
+              )}
 
               {inviteProblem ? (
                 <Notice
@@ -607,7 +632,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
                 are — asking somebody to declare themselves before they have seen
                 anything is hard enough without a blank set of buttons.
               */}
-              {inviteCode.trim() === '' ? (
+              {inviteCode.trim() === '' && !invitedAs ? (
                 <RadioList
                   label={t('join.details.fit')}
                   value={kind}

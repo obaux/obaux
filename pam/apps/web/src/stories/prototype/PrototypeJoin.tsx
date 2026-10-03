@@ -18,5 +18,11 @@ export function PrototypeJoin() {
   const params = useSearchParams();
   const raw = params?.get('kind');
   const kind: JoinKind = raw === 'provider' || raw === 'admin' ? raw : 'member';
-  return <JoinScreen preview={{ kind, firstName: NAMES[kind] }} />;
+  // From an invite link's Sign in (D-254): the phone is done, the code known.
+  const code = params?.get('invite');
+  return (
+    <JoinScreen
+      preview={{ kind, firstName: NAMES[kind], ...(code ? { invite: { code, role: kind } } : {}) }}
+    />
+  );
 }

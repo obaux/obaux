@@ -3,14 +3,13 @@
 import { useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { VStack } from '@astryxdesign/core/VStack';
-import { HStack } from '@astryxdesign/core/HStack';
 import { Card } from '@astryxdesign/core/Card';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
-import { Button } from '@astryxdesign/core/Button';
 import { BigButton, Loading, Notice, Page, TextLink } from '@pam/ui';
 import { SubPageHeader } from '@pam/ui/SubPage';
 import { HelpButton } from '../../screens/HelpButton';
+import { InviteReady } from '../../screens/InviteReady';
 import { PersonRowSkeletonList } from '@pam/ui/Skeletons';
 import { NOTICES } from '@pam/config';
 import { USE_DUMMY_PEOPLE } from '@pam/config/dummy-flag';
@@ -87,7 +86,6 @@ export default function AdminPage() {
   const [invite, setInvite] = useState<CreatedInvite | null>(null);
   const [inviteBusy, setInviteBusy] = useState(false);
   const [inviteFailed, setInviteFailed] = useState(false);
-  const [copied, setCopied] = useState(false);
 
   const makeInvite = async (role: 'member' | 'provider') => {
     setInviteBusy(true);
@@ -96,7 +94,6 @@ export default function AdminPage() {
     setInviteBusy(false);
     if (created) {
       setInvite(created);
-      setCopied(false);
       refresh();
     } else {
       setInviteFailed(true);
@@ -237,33 +234,7 @@ export default function AdminPage() {
       />
 
       {invite ? (
-        <Card xstyle={styles.card}>
-          <VStack gap={3}>
-            <Text type="supporting" xstyle={styles.note}>
-              {t('admin.invite.ready')}
-            </Text>
-            <Text xstyle={styles.code}>{invite.code}</Text>
-            <Text type="supporting" xstyle={styles.note}>
-              {t('admin.invite.expires', {
-                date: new Intl.DateTimeFormat(locale, {
-                  month: 'long',
-                  day: 'numeric',
-                }).format(new Date(invite.expiresAt)),
-              })}
-            </Text>
-            <HStack gap={2} wrap="wrap">
-              <Button
-                label={copied ? t('admin.invite.copied') : t('admin.invite.copy')}
-                variant="secondary"
-                onClick={() => {
-                  void navigator.clipboard?.writeText(invite.code).then(() => setCopied(true));
-                }}
-                xstyle={styles.secondary}
-              />
-              <TextLink label={t('admin.invite.another')} onClick={() => setInvite(null)} />
-            </HStack>
-          </VStack>
-        </Card>
+        <InviteReady invite={invite} onAnother={() => setInvite(null)} />
       ) : (
         <VStack gap={2}>
           <BigButton

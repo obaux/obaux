@@ -3,17 +3,16 @@
 import { useEffect, useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { VStack } from '@astryxdesign/core/VStack';
-import { HStack } from '@astryxdesign/core/HStack';
 import { Card } from '@astryxdesign/core/Card';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { Selector } from '@astryxdesign/core/Selector';
 import { Switch } from '@astryxdesign/core/Switch';
-import { Button } from '@astryxdesign/core/Button';
 import { RadioList, RadioListItem } from '@astryxdesign/core/RadioList';
 import { BigButton, Loading, Notice, Page, ScrollReveal, TextLink } from '@pam/ui';
 import { SubPageHeader } from '@pam/ui/SubPage';
 import { HelpButton } from '../../screens/HelpButton';
+import { InviteReady } from '../../screens/InviteReady';
 import { PersonRowSkeletonList } from '@pam/ui/Skeletons';
 import { NOTICES, ROLES, type Role } from '@pam/config';
 import { USE_DUMMY_PEOPLE } from '@pam/config/dummy-flag';
@@ -114,7 +113,6 @@ export default function DirectoryPage() {
   const [invite, setInvite] = useState<CreatedInvite | null>(null);
   const [inviteBusy, setInviteBusy] = useState(false);
   const [inviteFailed, setInviteFailed] = useState<'city' | 'failed' | null>(null);
-  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (!isSuperAdmin) return;
@@ -140,7 +138,6 @@ export default function DirectoryPage() {
     setInviteBusy(false);
     if (created) {
       setInvite(created);
-      setCopied(false);
     } else {
       setInviteFailed('failed');
     }
@@ -296,30 +293,7 @@ export default function DirectoryPage() {
             {t('directory.invite.title')}
           </Heading>
           {invite ? (
-            <>
-              <Text type="supporting" xstyle={styles.note}>
-                {t('admin.invite.ready')}
-              </Text>
-              <Text xstyle={styles.code}>{invite.code}</Text>
-              <Text type="supporting" xstyle={styles.note}>
-                {t('admin.invite.expires', {
-                  date: new Intl.DateTimeFormat(locale, { month: 'long', day: 'numeric' }).format(
-                    new Date(invite.expiresAt),
-                  ),
-                })}
-              </Text>
-              <HStack gap={2} wrap="wrap">
-                <Button
-                  label={copied ? t('admin.invite.copied') : t('admin.invite.copy')}
-                  variant="secondary"
-                  onClick={() => {
-                    void navigator.clipboard?.writeText(invite.code).then(() => setCopied(true));
-                  }}
-                  xstyle={styles.secondary}
-                />
-                <TextLink label={t('admin.invite.another')} onClick={() => setInvite(null)} />
-              </HStack>
-            </>
+            <InviteReady invite={invite} onAnother={() => setInvite(null)} isBare />
           ) : (
             <>
               {regions.length > 1 ? (

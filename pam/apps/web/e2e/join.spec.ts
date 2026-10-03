@@ -197,6 +197,19 @@ test.describe('signing up', () => {
     await expect(page.getByText('Step 3 of 4').first()).toBeVisible();
   });
 
+  test('invited by a link, nothing is asked that the link already said (D-254)', async ({ page }) => {
+    // Sign in kept the code and who it is for; joining picks them up.
+    await page.addInitScript(() => {
+      window.sessionStorage.setItem('pam.invite', JSON.stringify({ code: 'PAM7Q4KX', role: 'admin' }));
+    });
+    await newcomer(page);
+    await page.goto('/join/');
+
+    await expect(page.getByText('You were invited as a case manager.')).toBeVisible();
+    await expect(page.getByLabel('Code from the person who invited you')).toHaveCount(0);
+    await expect(page.getByRole('radio', { name: 'Parole Officer or Case Manager' })).toHaveCount(0);
+  });
+
   test('a city PAM does not serve is an offer, not an error', async ({ page }) => {
     const calls = await newcomer(page, { cityServed: false });
     await page.goto('/join/');

@@ -16,6 +16,7 @@ import { useAlertBanner } from '@/lib/alertBanner';
 import { LanguageSwitcher } from '../LanguageSwitcher';
 import { PhoneSignInCard } from './PhoneSignInCard';
 import { LegalFooter } from './LegalFooter';
+import { rememberInvite, type Invite } from '@/lib/appUrl';
 
 /**
  * The only way into PAM, and the same door for everybody: a member, a program
@@ -43,6 +44,19 @@ import { LegalFooter } from './LegalFooter';
 
 const styles = stylex.create({
   quiet: { fontSize: '17px' },
+  invited: {
+    display: 'block',
+    width: '100%',
+    paddingBlock: '10px',
+    paddingInline: '16px',
+    boxSizing: 'border-box',
+    textAlign: 'center',
+    fontSize: '15px',
+    lineHeight: 1.4,
+    fontWeight: 600,
+    color: '#FFFFFF',
+    backgroundColor: '#000000',
+  },
   // The hero and the card it overlaps are one visual unit, so they are one
   // child of the page's own VStack — the page's usual gap sits above this
   // block and below it, but nothing splits the block itself in two.
@@ -92,7 +106,18 @@ export interface SignInPreview {
   readonly code?: string;
 }
 
-export function SignInScreen({ preview = null }: { readonly preview?: SignInPreview | null } = {}) {
+export function SignInScreen({
+  preview = null,
+  invite = null,
+}: {
+  readonly preview?: SignInPreview | null;
+  /**
+   * Arrived by an invite link (D-254): `/signin/?invite=CODE&as=case-manager`.
+   * Says what they were invited to be, in a black line on top, tells the
+   * slides who is reading, and keeps the code for joining.
+   */
+  readonly invite?: Invite | null;
+} = {}) {
   const { t } = useI18n();
   const supportPhone = useSupportPhone();
   const live = usePhoneSignIn();
@@ -139,16 +164,28 @@ export function SignInScreen({ preview = null }: { readonly preview?: SignInPrev
    * What PAM is, in three sentences: a place to look, a person to ask, a
    * reminder so it does not get missed. That is the product, in the order
    * somebody meets it.
+   *
+   * Someone invited as staff reads three lines about their own work instead
+   * (D-254, Will: "focus on pain points this solves for each use case, but
+   * keep text short") — a case manager chasing calls to learn who showed up;
+   * a program that doesn't know who is coming, loses people to no-shows and
+   * waits on referrals. Same pictures; only the words change.
    */
+  const lines = invite?.role === 'admin' ? 'onboarding.admin.' : invite?.role === 'provider' ? 'onboarding.provider.' : 'onboarding.';
   const slides = useMemo(
     () => [
       // The first picture is the lightest behind the mark: 20% darker (D-253).
-      { id: 'places', image: '/onboarding/hero-city.webp', text: t('onboarding.1'), scrim: 0.2 },
-      { id: 'people', image: '/onboarding/hero-phone.webp', text: t('onboarding.2') },
-      { id: 'plan', image: '/onboarding/hero-sneakers.webp', text: t('onboarding.3') },
+      { id: 'places', image: '/onboarding/hero-city.webp', text: t(`${lines}1`), scrim: 0.2 },
+      { id: 'people', image: '/onboarding/hero-phone.webp', text: t(`${lines}2`) },
+      { id: 'plan', image: '/onboarding/hero-sneakers.webp', text: t(`${lines}3`) },
     ],
-    [t],
+    [t, lines],
   );
+
+  // Kept for joining, the page a new person goes to once the code works.
+  useEffect(() => {
+    if (invite) rememberInvite(invite);
+  }, [invite]);
 
   /**
    * Where somebody lands after the code works.
@@ -263,6 +300,16 @@ export function SignInScreen({ preview = null }: { readonly preview?: SignInPrev
 
   return (
     <>
+      {/*
+        Who invited them to be what (D-254): a thin black line across the top,
+        above the pictures, on both steps — the reason they are here should
+        not scroll away or vanish once they have typed their number.
+      */}
+      {invite ? (
+        <Text role="note" xstyle={styles.invited}>
+          {t(`signin.invited.${invite.role}`)}
+        </Text>
+      ) : null}
       {/* Centred under the hero; the code step is a nested page, left-aligned
           like every other (D-253), with only "Sent to" centred. */}
       <Page align={onFirstStep ? 'center' : 'start'} gap={3}>

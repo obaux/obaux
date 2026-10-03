@@ -165,7 +165,7 @@ test.describe('the case manager screen', () => {
     await expect(page.getByText('Example people, so you can see how this looks.').first()).toBeVisible();
   });
 
-  test('the invite code is the biggest thing on the screen once it exists', async ({ page }) => {
+  test('an invite is a link to send, with the code kept for a phone call (D-254)', async ({ page }) => {
     await signedInAs(page, 'admin', []);
     await page.route(INVITE, (route) =>
       route.fulfill(
@@ -175,11 +175,11 @@ test.describe('the case manager screen', () => {
     await page.goto('/admin/');
     await page.getByRole('button', { name: 'Someone coming home' }).click();
 
-    const code = page.getByText('9T3YTVMT');
-    await expect(code).toBeVisible();
-    // It gets read down a phone line, so it has to be legible across a room.
-    const size = await code.evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
-    expect(size).toBeGreaterThanOrEqual(32);
+    // The link opens Sign in with the code and who it is for; nobody types it.
+    await expect(page.getByText(/\/signin\/\?invite=9T3YTVMT&as=member/)).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Send the link' })).toBeVisible();
+    // Made during a call, the code can still be read out.
+    await expect(page.getByText('On the phone? Read them this code instead: 9T3YTVMT')).toBeVisible();
     await expect(page.getByText(/Works until/)).toBeVisible();
   });
 

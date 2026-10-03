@@ -12,8 +12,9 @@ const meta = { title: 'Program lead/Prototype' } satisfies Meta;
 export default meta;
 
 /**
- * Starts at Sign in (D-253): the number, then the code, then Home, signed in
- * as this role, where every tap goes where it would on a phone. Creating an
- * account is its own story, under Onboarding.
+ * Starts where a program arrives (D-254): Sign in opened from an invite
+ * link — the black line saying what they were invited to be, and slides
+ * about their own work. Then the code, then Home, signed in as this role.
+ * Creating the account is its own story, under Onboarding.
  */
-export const Prototype: StoryObj = screen('provider', 'Prototype', '/prototype/signin/');
+export const Prototype: StoryObj = screen('provider', 'Prototype', '/prototype/signin/', { invite: 'PAM-7Q4K', as: 'program' });

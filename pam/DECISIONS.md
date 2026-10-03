@@ -5299,6 +5299,73 @@ Will, 3 October, in a run of notes on the code step and Sign in:
   so an Astryx upgrade could rename it. If buttons go square after one,
   look here first.
 
+### D-254 — An invite is a link to Sign in, which says what they were invited to be
+
+Will, 3 October: "instead of a special code, generate a unique url to a sign
+in page for invited case managers, or an invited program… a black banner on
+top: 'You were invited to be a {role} in the PAM network. Sign in to get
+started.' Use these as the default sign in screens for case managers and
+programs. The slideshow text should adapt to focus on pain points this
+solves for each use case, but keep text short. Then analyze this process to
+see if it's intuitive, and improve on it."
+
+**The link.** It is `{APP_URL}/signin/?invite={code}&as=case-manager|program|member`
+(`inviteLink` in `lib/appUrl.ts`). It is the same one-person, seven-day code
+`create_invite` already makes, so **no migration**. The role in the link
+only chooses the words on screen: `redeem_invite` still decides the real
+role from the code, so editing the link changes a sentence and nothing
+else. It replaces the old `/j/{code}` link format, which no page ever
+served (a static export cannot answer a path per code).
+
+**Sign in from a link** shows:
+- A thin black line across the top on both steps: "You were invited to be a
+  case manager in the PAM network. Sign in to get started." Programs read
+  "program partner", because "to be a program" does not read.
+- Three short slides about their own work:
+  - Case manager: knowing who showed up without chasing calls; sending
+    someone to a program in one tap; everything in one place.
+  - Program: seeing who is coming; fewer no-shows; case managers sending
+    people your way.
+- The code is kept in session storage (`pam.invite`, this visit only, so a
+  shared phone does not hand the invite on). After the phone is verified,
+  Sign in hands a new person to `/join/`. About you then says "You were
+  invited as a case manager." at the top, and asks neither for the code nor
+  "Which one fits you best?". That is one field and one decision fewer, and
+  the step count drops to 4. The code is forgotten once redeemed.
+
+**Making one.** Invite someone, the case-manager admin screen and the
+directory each had their own copy of the old code card. They now share
+`InviteReady`:
+- The link, shown, so somebody can see what they are sending.
+- One button, **Send the link**: the phone's share sheet with a short
+  sentence and the link written, or a copy where there is no share sheet.
+- The code underneath for an invite made during a phone call ("On the
+  phone? Read them this code instead"). Typing it into joining still works
+  as it always did.
+
+**Prototype.** The case-manager and program-lead Prototypes now open on
+that invite Sign in (D-253's "only sign in" kept: the code, then Home).
+Their Onboarding stories start there too and run through the shorter About
+you to Home.
+
+**Intuitiveness, walked through as each person** (the improvements above
+came out of this):
+- *The person inviting* used to be asked to read an 8-character code out or
+  copy it into a text by hand. Now it is one tap into Messages.
+- *The person invited* used to land on a generic Sign in, then be asked for
+  the code again and to pick what they are. Now the first screen names the
+  invitation, the pictures speak to their job, and the form has nothing to
+  choose.
+- **Left open:** an expired or used link is only found out at About you,
+  after the phone step, when `redeem_invite` says so. Saying it on the
+  first screen needs a signed-out lookup of an invite's state (a small
+  `security definer` function returning only valid/expired/used). That is a
+  migration, so it waits for Will's go-ahead.
+- **Also open:** an invited member's link works the same way (with a
+  "join the PAM network" line), but members still mostly join from a case
+  manager reading a code. Whether to push links to members too is a call
+  for Will.
+
 ---
 
 ## Notes for whoever picks this up next
