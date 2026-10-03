@@ -5261,6 +5261,44 @@ out of the title's subtitle on this one screen only (`PhoneSignInCard`
 `stepLabel`). Every other joining step keeps it as the subtitle (D-251).
 `/signin/`'s code step has the same order without a step line.
 
+### D-253 — Prototype signs in only; Onboarding is its own story; pills everywhere; a white globe; a darker first slide
+
+Will, 3 October, in a run of notes on the code step and Sign in:
+
+- **"Keep the step where it was."** D-252's move of "Step 1 of 5" under the
+  button is undone. The step is the title's subtitle again. The boxes and
+  button still come straight after it, and "Sent to …" after them.
+- **"No need to show step here. Since this is only sign in. Not onboarding.
+  Leave onboarding (account creation) for a different flow (not inside
+  Prototype)."** Supersedes D-249's chaining. Each role's **Prototype** is
+  now Sign in → the code → Home, on the real `/signin/` screen with a
+  stand-in flow (`PrototypeSignIn`; the code is pre-filled and any code
+  works). Creating an account is a separate **Onboarding** folder in
+  Storybook, with stories Member, Case manager and Program lead
+  (`/prototype/join/?kind=`). Each starts at the phone, then the code with
+  "Step 1 of 5", and ends at Home. Back from its first step goes to the
+  stand-in Sign in.
+- **"Center align sent to #, and move send again under it (center aligned)."**
+  Both are centred on the code step, Send again on its own line. Sign in's
+  code step is now left-aligned like every nested page; before, the whole
+  page was centred, so the back and globe buttons sat pinched toward the
+  middle.
+- **"A 20% black overlay over image 1 of the carousel… only that one."**
+  `OnboardingSlide.scrim` (0 to 1) adds a flat black wash under the existing
+  gradient. The first slide sets 0.2.
+- **"The locale icon should match the white circle buttons."** The language
+  switcher is the white 48px disc with a grey edge used by the bell, Help and
+  search, both on the page and over the hero photo. The dark scrim it had on
+  the photo, and its `tone` prop, are gone.
+- **"Buttons fully rounded pills across the DS."** Astryx's Button reads its
+  corner from `--_button-radius` before the theme's element radius, so
+  globals.css sets that to 999px once on `:root`. That covers every Button
+  and IconButton. Anything that sets its own corner in xstyle (list rows,
+  tiles, the code boxes) keeps it. `BigButton` and Connect's "Return home"
+  set 999px themselves. The variable is Astryx-internal (underscore-prefixed),
+  so an Astryx upgrade could rename it. If buttons go square after one,
+  look here first.
+
 ---
 
 ## Notes for whoever picks this up next

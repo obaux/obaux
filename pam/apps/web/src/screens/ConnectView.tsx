@@ -126,7 +126,7 @@ const styles = stylex.create({
   note: { fontSize: '15px', lineHeight: 1.5 },
   none: { fontSize: '17px' },
   // Secondary and sized to its words, at the shared button height (D-239).
-  home: { minHeight: '56px', fontSize: '17px', paddingInline: '28px', borderRadius: '12px' },
+  home: { minHeight: '56px', fontSize: '17px', paddingInline: '28px', borderRadius: '999px' },
   dialogTitle: { fontSize: '22px', lineHeight: 1.3 },
   dialogBody: { fontSize: '17px', lineHeight: 1.45 },
 });

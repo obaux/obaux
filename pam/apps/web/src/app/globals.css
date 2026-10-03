@@ -171,6 +171,16 @@
     padding-block: 12px;
   }
 
+  /*
+   * Every button a full pill (Will, 3 October, D-253). Astryx's Button reads
+   * its corner from this variable before falling back to the theme's element
+   * radius, so one line here covers every Button and IconButton; a component
+   * that sets its own corner in xstyle (a list row, a tile) keeps it.
+   */
+  :root {
+    --_button-radius: 999px;
+  }
+
   /* §12: every flow completable with tap only — never hide the focus ring. */
   :focus-visible {
     outline: 3px solid currentColor;

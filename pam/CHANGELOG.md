@@ -25,7 +25,9 @@ joining, if that is where you opened it). The code you are texted goes into six 
 boxes, and pasting the whole text message works. "Send again" is a small
 link beside the number. Signing up shows "Step 1 of 5" under each title
 instead of a bar, with a back button. Privacy and Terms always sit at the
-bottom of the screen.
+bottom of the screen. Every button is now a fully rounded pill. The
+language button is a white circle like the others, and the first sign-in
+picture is a little darker so the logo stands out.
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 

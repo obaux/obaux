@@ -81,14 +81,15 @@ const styles = stylex.create({
 });
 
 /**
- * For the Storybook prototype only (D-248): a stand-in flow (its "Send me a
- * code" goes straight Home as the story's role), a phone already filled in,
- * and no redirect for an already-signed-in session. The real route passes
- * none of these.
+ * For the Storybook prototype only (D-248, D-253): a stand-in flow (the
+ * number, then the code, then Home as the story's role), a phone and code
+ * already filled in, and no redirect for an already-signed-in session. The
+ * real route passes none of these.
  */
 export interface SignInPreview {
   readonly flow: PhoneSignIn;
   readonly phone: string;
+  readonly code?: string;
 }
 
 export function SignInScreen({ preview = null }: { readonly preview?: SignInPreview | null } = {}) {
@@ -100,7 +101,7 @@ export function SignInScreen({ preview = null }: { readonly preview?: SignInPrev
   const router = useRouter();
   const { state: session } = useSession();
   const [phone, setPhone] = useState(preview?.phone ?? '');
-  const [code, setCode] = useState('');
+  const [code, setCode] = useState(preview?.code ?? '');
   const { show: showAlert } = useAlertBanner();
 
   /**
@@ -141,7 +142,8 @@ export function SignInScreen({ preview = null }: { readonly preview?: SignInPrev
    */
   const slides = useMemo(
     () => [
-      { id: 'places', image: '/onboarding/hero-city.webp', text: t('onboarding.1') },
+      // The first picture is the lightest behind the mark: 20% darker (D-253).
+      { id: 'places', image: '/onboarding/hero-city.webp', text: t('onboarding.1'), scrim: 0.2 },
       { id: 'people', image: '/onboarding/hero-phone.webp', text: t('onboarding.2') },
       { id: 'plan', image: '/onboarding/hero-sneakers.webp', text: t('onboarding.3') },
     ],
@@ -254,14 +256,16 @@ export function SignInScreen({ preview = null }: { readonly preview?: SignInPrev
         <Text xstyle={styles.heroCity}>{t('signin.city')}</Text>
       </VStack>
       <div {...stylex.props(styles.heroGlobe)}>
-        <LanguageSwitcher tone="onPhoto" />
+        <LanguageSwitcher />
       </div>
     </div>
   );
 
   return (
     <>
-      <Page align="center" gap={3}>
+      {/* Centred under the hero; the code step is a nested page, left-aligned
+          like every other (D-253), with only "Sent to" centred. */}
+      <Page align={onFirstStep ? 'center' : 'start'} gap={3}>
         {onFirstStep ? (
           // Somebody waiting on a code has already decided what PAM is: the
           // hero belongs to the first step only, and the card rides up over

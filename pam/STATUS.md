@@ -301,6 +301,9 @@ role's whole onboarding to Home (D-249; the join screen has a Storybook-only
 The code step is six paste-friendly boxes, joining uses the nested template
 with "Step N of M", and Privacy and Terms are pinned to the foot of the way in
 (D-251).
+Each role's Prototype now only signs in (number, code, Home); account
+creation is the separate Onboarding stories. Buttons are full pills
+everywhere, through Astryx's `--_button-radius` (D-253).
 
 This is the handover document: what exists, what is proven, what is live, and
 what the next person needs to know before touching anything.

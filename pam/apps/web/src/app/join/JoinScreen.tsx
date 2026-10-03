@@ -14,7 +14,7 @@ import { BigButton, Loading, Notice, Page, PointsBadge, StarIcon, TextField, Tex
 import { SubPageHeader } from '@pam/ui/SubPage';
 import { TRANSPARENCY_SCREEN, badgeForPoints, type Locale } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
-import { goBack, navigate } from '@/lib/navigate';
+import { navigate } from '@/lib/navigate';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { usePhoneSignIn } from '@/lib/usePhoneSignIn';
 import { usePreviewSignIn } from '@/lib/usePreviewSignIn';
@@ -443,8 +443,8 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
     phase === 'phone'
       ? {
           backLabel: t('nav.back.signInScreen'),
-          // In the prototype, back to the Sign in it came from (D-249).
-          ...(preview ? { onBack: () => goBack('/signin/') } : { backHref: '/signin/' }),
+          // In the prototype, to the stand-in Sign in (D-253).
+          ...(preview ? { onBack: () => navigate('/prototype/signin/') } : { backHref: '/signin/' }),
         }
       : phase === 'details'
         ? { backLabel: t('nav.back.signin'), onBack: toPhone }
@@ -477,8 +477,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
                 ? t(`join.privacy.title.${kind}`)
                 : t(`join.${phase}.title`)
           }
-          // On the code step the step sits under the button instead (D-252).
-          {...(phase === 'phone' && onCode ? {} : { subtitle: t('join.step', { current: step, total }) })}
+          subtitle={t('join.step', { current: step, total })}
           {...back}
         />
 
@@ -513,7 +512,6 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
               onCodeChange={setCode}
               headingLevel={2}
               codeAction={t('action.next')}
-              stepLabel={t('join.step', { current: step, total })}
             />
           </>
         ) : null}

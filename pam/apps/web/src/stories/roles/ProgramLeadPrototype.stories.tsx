@@ -12,8 +12,8 @@ const meta = { title: 'Program lead/Prototype' } satisfies Meta;
 export default meta;
 
 /**
- * Starts at Sign in (D-249): "Send me a code" carries on into the whole of
- * joining as this kind of person — any code works, nothing is written — and
- * ends at Home, signed in, where every tap goes where it would on a phone.
+ * Starts at Sign in (D-253): the number, then the code, then Home, signed in
+ * as this role, where every tap goes where it would on a phone. Creating an
+ * account is its own story, under Onboarding.
  */
-export const Prototype: StoryObj = screen('provider', 'Prototype', '/prototype/signin/', { kind: 'provider' });
+export const Prototype: StoryObj = screen('provider', 'Prototype', '/prototype/signin/');

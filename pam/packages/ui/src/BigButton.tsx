@@ -41,7 +41,8 @@ const styles = stylex.create({
     minHeight: '56px',
     fontSize: '17px',
     fontWeight: 600,
-    borderRadius: '12px',
+    // A full pill, like every button in PAM (Will, 3 October, D-253).
+    borderRadius: '999px',
   },
 });
 

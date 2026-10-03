@@ -12,7 +12,8 @@ const meta = { title: 'Super admin/Prototype' } satisfies Meta;
 export default meta;
 
 /**
- * Starts at Sign in (D-249). A super admin is never onboarded through the app
- * (the seeding script makes them), so "Send me a code" goes straight Home.
+ * Starts at Sign in (D-253): the number, then the code, then Home, signed in
+ * as this role, where every tap goes where it would on a phone. Creating an
+ * account is its own story, under Onboarding.
  */
 export const Prototype: StoryObj = screen('super-admin', 'Prototype', '/prototype/signin/');

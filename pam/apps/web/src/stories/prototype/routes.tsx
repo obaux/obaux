@@ -58,8 +58,8 @@ const screen = (render: () => ReactNode): PrototypeRoute => ({ render });
 export const APP_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   '/': screen(() => <HomePage />),
   '/signin/': screen(() => <SignInPage />),
-  // Where each role's prototype starts (D-248, D-249): Sign in, then that
-  // role's onboarding, then Home.
+  // Where each role's prototype starts (D-253): Sign in, the code, Home.
+  // Joining is the Onboarding stories' own route.
   '/prototype/signin/': screen(() => <PrototypeSignIn />),
   '/prototype/join/': screen(() => <PrototypeJoin />),
   '/join/': screen(() => <JoinPage />),
