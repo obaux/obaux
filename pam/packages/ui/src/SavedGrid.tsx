@@ -51,8 +51,10 @@ const styles = stylex.create({
     overflow: 'hidden',
   },
   subtitle: { fontSize: '15px' },
-  // A hair of room, or the card's rounded clip shaves the first letter.
   words: { paddingInline: '2px' },
+  // The link around a tile clips by default, which cut the picture's shadow
+  // off where the name begins (Will, 3 October). Nothing in it needs clipping.
+  link: { overflow: 'visible' },
   frame: { position: 'relative' },
   remove: {
     position: 'absolute',
@@ -112,7 +114,7 @@ export function SavedGrid({ tiles, label, isEditing = false, onRemove, removeLab
                 {body}
               </>
             ) : (
-              <ClickableCard label={tile.name} href={tile.href} variant="transparent" padding={0}>
+              <ClickableCard label={tile.name} href={tile.href} variant="transparent" padding={0} xstyle={styles.link}>
                 {body}
               </ClickableCard>
             )}

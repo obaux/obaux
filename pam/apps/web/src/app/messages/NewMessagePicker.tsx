@@ -3,12 +3,12 @@
 import { useMemo, useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { BottomSheet } from '@astryxdesign/core/BottomSheet';
-import { TextInput } from '@astryxdesign/core/TextInput';
 import { List, ListItem } from '@astryxdesign/core/List';
 import { Avatar } from '@astryxdesign/core/Avatar';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
+import { SearchField } from '@pam/ui/SearchPill';
 import { useI18n } from '@/lib/i18n';
 import { navigate } from '@/lib/navigate';
 
@@ -16,7 +16,7 @@ import { navigate } from '@/lib/navigate';
  * Who to message — a sheet that slides up over the list (D-186).
  *
  * Everyone `messageable_people()` returns (or, for a preview, the example
- * cast), with a search box on top that narrows the rows as you type. On a
+ * cast), with the same search pill as Home and Messages on top (D-228) that narrows the rows as you type. On a
  * phone this is a `BottomSheet` rather than a dropdown: a dropdown under a
  * field is a desktop shape, and a sheet gives the list the whole screen and
  * the keyboard room (`height="tall"`). Astryx's `Typeahead` was the other
@@ -42,6 +42,8 @@ const styles = stylex.create({
   // Clear of the sheet's grab handle: the first thing in the sheet used to sit
   // under it (Will's screenshot, 21 September).
   body: { width: '100%', paddingBlockStart: spacingVars['--spacing-6'], paddingBlockEnd: spacingVars['--spacing-2'] },
+  // The pill sits in from the sheet's edges, as it does on Home.
+  search: { width: '100%', paddingInline: spacingVars['--spacing-4'] },
   item: { minHeight: '48px' },
   none: { fontSize: '17px', paddingBlock: '12px' },
 });
@@ -88,17 +90,15 @@ export function NewMessagePicker({
   return (
     <BottomSheet isOpen={isOpen} onOpenChange={onOpenChange} label={t('messages.new.title')} height="tall">
       <VStack gap={3} xstyle={styles.body}>
-        <TextInput
-          label={t('messages.new.search')}
-          isLabelHidden
-          placeholder={t('messages.new.search')}
-          value={query}
-          onChange={setQuery}
-          hasClear
-          hasAutoFocus
-          startIcon="search"
-          width="100%"
-        />
+        <VStack xstyle={styles.search}>
+          <SearchField
+            label={t('messages.new.search')}
+            placeholder={t('messages.new.search')}
+            value={query}
+            onChange={setQuery}
+            hasAutoFocus
+          />
+        </VStack>
         {failed ? (
           <Text type="supporting" xstyle={styles.none}>
             {t('messages.start.failed.body')}

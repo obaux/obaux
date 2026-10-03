@@ -4823,6 +4823,27 @@ active, program — exactly what that list already shows (§4.1,
 `transparency.ts`). Nothing new is fetched about them; their trips on the
 page are labelled as examples, and their saved places are not shown.
 
+### D-228 — One search pill in the new-message sheet; quieter quick-action labels; saved tiles keep their shadow
+
+Three small fixes from Will's screenshots (3 October).
+
+**New message** (D-186's sheet) used a plain bordered `TextInput`, so it
+looked different from every other search in the app. It now uses
+`SearchField`, the same large pill as Home, Messages and Trips (D-212, D-216),
+inset from the sheet's edges as it is on Home. It still filters the list in
+place; there is nothing to suggest, so it is not the typeahead.
+
+**Quick-action labels** on a place (Website, Message, Call, Open in Google,
+D-224) drop from 14px to 12px. They name the button above them, and that
+button is already labelled for screen readers, so the text under it can be
+small. The 18px body floor (§2.5) applies to reading text, not to these
+labels; each tap target is still the 48px round button.
+
+**Saved tiles**: Astryx's `ClickableCard` clips what is inside it, so the
+picture's shadow stopped dead where the name began. The link now sets
+`overflow: visible`. Nothing inside a tile needs clipping: the picture's
+rounded corners come from its own card.
+
 ---
 
 ## Notes for whoever picks this up next

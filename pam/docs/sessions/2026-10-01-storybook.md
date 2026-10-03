@@ -403,3 +403,10 @@ Chromium.
   store merged into Trips; preview map de-duplicates pins.
 - D-226: `FloatingAction` is a flat strip on the bar; CM Profile has Invite someone again.
 - D-227: compact `PersonRow` + message shortcut on CM Home; `/person/` profile card with star, trips (`dummyTripsFor`), real caseload members from `useCaseload` only.
+
+## Addendum — 3 October: polish (D-228)
+
+- `NewMessagePicker` uses `SearchField` (the Home pill), inset from the sheet edges.
+- `PlaceDetail` quick-action labels 14px → 12px.
+- `SavedGrid`: tile link `overflow: visible`, so the picture's shadow is no longer clipped.
+- Checked: typecheck, `build-storybook`, screenshots of Saved, Place and the picker.

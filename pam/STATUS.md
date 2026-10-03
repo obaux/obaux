@@ -285,6 +285,11 @@ already allows both — wiring is a follow-up). Will answered both (D-219): prog
 leads may create invites — migration 0070, **live** — and starred people
 stay a session-only demo.
 
+**2 to 3 October (D-220 to D-228): polish from Will's screenshots.** Every
+search, including the new-message sheet, is the same pill. A place has round
+quick actions with small labels. Saved tiles show their full shadow. Each
+change is in DECISIONS.
+
 This is the handover document: what exists, what is proven, what is live, and
 what the next person needs to know before touching anything.
 

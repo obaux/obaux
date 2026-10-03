@@ -148,7 +148,7 @@ const styles = stylex.create({
     borderColor: colorVars['--color-border'],
     color: colorVars['--color-text-primary'],
   },
-  quickLabel: { fontSize: '14px', textAlign: 'center', lineHeight: 1.25 },
+  quickLabel: { fontSize: '12px', textAlign: 'center', lineHeight: 1.2 },
   hoursLink: { alignSelf: 'flex-start', minHeight: pam.touchTargetMin, fontSize: '16px', paddingInline: '0px' },
 });
 

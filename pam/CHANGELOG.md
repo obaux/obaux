@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.41.2-polish] — 2026-10-03 · Small fixes
+
+The search box for a new message looks the same as every other search in
+the app. The labels under a place's round buttons are smaller. Saved places
+show their full shadow again.
+
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 
 Program leads can now make invite codes, for a member or another program,
