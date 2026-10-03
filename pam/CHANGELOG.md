@@ -6,7 +6,10 @@ The search box for a new message looks the same as every other search in
 the app. The labels under a place's round buttons are smaller. Saved places
 show their full shadow again. The new-message sheet has a title and says
 who each person is (member, case manager or program). Explore's category
-chips show their icons in colour.
+chips show their icons in colour. On Trips the drawer's top is slimmer,
+cards fade under its title as you scroll, and long place names stay on one
+line. Notifications are grouped into New and Earlier, each with an icon and
+a short title.
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 

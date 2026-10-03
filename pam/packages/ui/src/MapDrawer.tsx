@@ -62,10 +62,19 @@ const styles = stylex.create({
   // Height and offset follow the finger and the screen, so they are values,
   // not classes known ahead of time.
   place: (height: number, bottom: number) => ({ height: `${height}px`, bottom: `${bottom}px` }),
+  // The handle lies over the top of the header rather than above it: the
+  // tap target stays the 48px floor (§2.5) but takes no room of its own, so
+  // the bar above the title is small (Will, 3 October). The title under it
+  // is not interactive, so a tap there steps the drawer too.
   handleButton: {
+    position: 'absolute',
+    top: 0,
+    insetInline: 0,
+    zIndex: 2,
     width: '100%',
-    minHeight: '32px',
-    paddingBlock: '10px 6px',
+    minHeight: '48px',
+    alignItems: 'flex-start',
+    paddingBlock: '8px 0px',
     borderRadius: 0,
     backgroundColor: 'transparent',
     touchAction: 'none',
@@ -77,8 +86,22 @@ const styles = stylex.create({
     borderRadius: '3px',
     backgroundColor: colorVars['--color-border'],
   },
-  header: { paddingInline: '16px', paddingBlockEnd: '8px' },
+  header: { paddingInline: '16px', paddingBlockStart: '22px', paddingBlockEnd: '4px' },
   body: { flexGrow: 1, minHeight: 0, overflowY: 'auto', paddingInline: '16px', paddingBlockEnd: '24px' },
+  // A fade at the top of the list, so cards scrolling up dissolve under the
+  // header instead of being cut by a hard edge (Will, 3 October). Sticky, so
+  // it stays put while the list moves; it takes no room (the negative
+  // margin) and no taps.
+  fade: {
+    position: 'sticky',
+    top: 0,
+    zIndex: 1,
+    flexShrink: 0,
+    height: '20px',
+    marginBlockEnd: '-20px',
+    pointerEvents: 'none',
+    backgroundImage: `linear-gradient(to bottom, ${colorVars['--color-background-body']}, transparent)`,
+  },
 });
 
 export function MapDrawer({
@@ -156,6 +179,7 @@ export function MapDrawer({
       />
       <VStack xstyle={styles.header}>{header}</VStack>
       <VStack xstyle={styles.body} aria-hidden={stop === 'dock' && dragHeight === null ? true : undefined}>
+        <VStack aria-hidden xstyle={styles.fade} />
         {children}
       </VStack>
     </VStack>

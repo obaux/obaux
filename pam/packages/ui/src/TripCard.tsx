@@ -32,12 +32,23 @@ const styles = stylex.create({
     width: '96px',
     height: '96px',
     flexShrink: 0,
-    borderRadius: '18px',
+    // 10 less than the card's own 24px corner, so the two curves sit
+    // parallel (Will, 3 October).
+    borderRadius: '14px',
     color: colorVars['--color-icon-accent'],
     backgroundColor: colorVars['--color-background-muted'],
   },
   body: { minWidth: 0, flexGrow: 1 },
-  name: { fontSize: '20px', lineHeight: 1.25, fontWeight: 700 },
+  // One line, ending in "…" — a long program name no longer pushes the
+  // date down (Will, 3 October). The full name is in the card's label.
+  name: {
+    fontSize: '17px',
+    lineHeight: 1.3,
+    fontWeight: 700,
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+  },
   when: { fontSize: '16px', lineHeight: 1.35 },
 });
 

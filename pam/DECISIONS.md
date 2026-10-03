@@ -4870,6 +4870,31 @@ rule (context only for a member viewer).
 tokens), so the chips stand out a little. The words stay in text colour,
 and All has no colour.
 
+### D-230 — Trips drawer: a smaller handle and a fade under the header; trip cards on one line; Notifications easier to scan
+
+From Will's screenshots (3 October).
+
+**Trips drawer (`MapDrawer`).** The handle now lies over the top of the
+header instead of taking its own band. The tap target is still the 48px
+floor (§2.5) but no longer pushes the title down. The title under it is not
+interactive, so a tap there steps the drawer too. A 20px fade at the top of
+the scrolling list (sticky, no height, no taps) lets cards dissolve under
+the header instead of being cut by a hard edge.
+
+**Trip card.** The place name is 17px on one line, ending in "…" (the full
+name is in the card's label for screen readers). The picture's corner is
+14px: 10 less than the card's 24px, so the curves sit parallel.
+
+**Notifications.** The list is split into New and Earlier. Each row has a
+round icon for its kind (flag, shield, message, people, star, bookmark), a
+short bold title (`notify.kind.*`: "Place reported", "Message reported"…),
+the existing sentence in grey under it (two lines at most), and the time on
+the right. A new row also has a dot. The title is set to 17px semibold by
+a rule scoped to `data-pam-list="notifications"` in `globals.css`, because
+Astryx draws a row label at 14px. An unknown kind falls back to the bell
+and its sentence alone. The sentences are unchanged, so tests and
+translations that quote them still hold.
+
 ---
 
 ## Notes for whoever picks this up next

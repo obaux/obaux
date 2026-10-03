@@ -1,8 +1,10 @@
+import type { ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { VStack } from '@astryxdesign/core/VStack';
 import { HStack } from '@astryxdesign/core/HStack';
 import { Text } from '@astryxdesign/core/Text';
-import { Badge } from '@astryxdesign/core/Badge';
+import { List, ListItem } from '@astryxdesign/core/List';
+import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 
 /**
  * What has happened that somebody has to act on — a log, not a to-do list.
@@ -32,12 +34,25 @@ import { Badge } from '@astryxdesign/core/Badge';
  * Reported places. `href` is optional — a row with nowhere to go (a place
  * taken off the list) stays a line of text. The whole row is the target,
  * the same stretched-link shape as every other row in PAM.
+ *
+ * **Layout (Will, 3 October: "cleaner, better hierarchy, easier to scan").**
+ * The list is split into New and Earlier, so what arrived since last time
+ * comes first. Each row has a round icon saying what kind of thing it is, a
+ * short bold title ("Place reported"), the full sentence under it in grey
+ * (two lines at most), and the time on the right. A new row also has a
+ * small dot. The eye can run down the icons and titles and stop only where
+ * it needs to read. Without a `title` a row falls back to its sentence
+ * alone, as before.
  */
 
 export interface NotificationItem {
   readonly id: string;
   /** Already-translated line. Built from a key by the caller — never raw text. */
   readonly text: string;
+  /** Short, scannable name for the kind of event — "Place reported". */
+  readonly title?: string;
+  /** Drawn in the round tile at the start of the row. */
+  readonly icon?: ReactNode;
   /** Human-readable, already formatted for the locale. */
   readonly when: string;
   /** Arrived since this list was last opened. Shown, never acted on. */
@@ -51,29 +66,85 @@ export interface NotificationListProps {
   readonly labels: {
     /** "Nothing needs you right now." */
     readonly empty: string;
-    /** "New" */
+    /** "New" — the first section's heading. */
     readonly new: string;
+    /** "Earlier" — the second section's heading. */
+    readonly earlier?: string;
   };
 }
 
 const styles = stylex.create({
   list: { width: '100%' },
-  row: { width: '100%', paddingBlock: '10px', position: 'relative', minHeight: '48px' },
-  link: {
-    color: 'inherit',
-    textDecoration: 'none',
-    '::after': { content: '""', position: 'absolute', inset: 0 },
+  section: { width: '100%' },
+  heading: { fontSize: '15px', fontWeight: 600, paddingBlockStart: '8px' },
+  tile: {
+    width: '44px',
+    height: '44px',
+    flexShrink: 0,
+    borderRadius: '50%',
+    color: colorVars['--color-icon-primary'],
+    backgroundColor: colorVars['--color-background-muted'],
   },
-  text: {
-    fontSize: '17px',
+  icon: { width: '22px', height: '22px' },
+  // The sentence, clamped to two lines: enough to know what happened.
+  detail: {
+    fontSize: '15px',
     lineHeight: 1.35,
+    display: '-webkit-box',
+    WebkitLineClamp: 2,
+    WebkitBoxOrient: 'vertical',
+    overflow: 'hidden',
   },
-  // The ones that arrived since somebody last looked read slightly heavier —
-  // an orientation cue, not a status to clear.
-  textNew: { fontWeight: 700 },
-  when: { fontSize: '15px' },
+  end: { alignSelf: 'flex-start', paddingBlockStart: '2px' },
+  when: { fontSize: '13px', whiteSpace: 'nowrap' },
+  dot: {
+    width: '10px',
+    height: '10px',
+    borderRadius: '50%',
+    backgroundColor: colorVars['--color-icon-accent'],
+  },
   empty: { fontSize: '17px' },
 });
+
+function Rows({ items, newLabel }: { readonly items: readonly NotificationItem[]; readonly newLabel: string }) {
+  return (
+    // `data-pam-list` lets globals.css set the titles at reading size:
+    // Astryx draws a row's label at 14px regular, too quiet to lead a row.
+    <List hasDividers density="spacious" data-pam-list="notifications">
+      {items.map((item) => (
+        <ListItem
+          key={item.id}
+          label={item.title ?? item.text}
+          description={
+            item.title ? (
+              <Text type="supporting" xstyle={styles.detail}>
+                {item.text}
+              </Text>
+            ) : undefined
+          }
+          {...(item.href ? { href: item.href } : {})}
+          startContent={
+            item.icon ? (
+              <HStack align="center" justify="center" xstyle={styles.tile}>
+                <HStack align="center" justify="center" xstyle={styles.icon}>
+                  {item.icon}
+                </HStack>
+              </HStack>
+            ) : undefined
+          }
+          endContent={
+            <VStack gap={2} align="end" xstyle={styles.end}>
+              <Text type="supporting" xstyle={styles.when}>
+                {item.when}
+              </Text>
+              {item.isNew ? <HStack xstyle={styles.dot} role="img" aria-label={newLabel} /> : null}
+            </VStack>
+          }
+        />
+      ))}
+    </List>
+  );
+}
 
 export function NotificationList({ items, labels }: NotificationListProps) {
   if (items.length === 0) {
@@ -84,30 +155,33 @@ export function NotificationList({ items, labels }: NotificationListProps) {
     );
   }
 
+  const fresh = items.filter((i) => i.isNew);
+  const older = items.filter((i) => !i.isNew);
+  // One section needs no heading; two say which is which.
+  const split = fresh.length > 0 && older.length > 0 && labels.earlier !== undefined;
+
+  if (!split) {
+    return (
+      <VStack gap={0} xstyle={styles.list}>
+        <Rows items={items} newLabel={labels.new} />
+      </VStack>
+    );
+  }
+
   return (
-    <VStack gap={0} xstyle={styles.list}>
-      {items.map((item) => (
-        // One row, one line: what happened, then when and — for the ones that
-        // are new — a label saying so. Plain text throughout; nothing here
-        // responds to a tap.
-        <VStack key={item.id} gap={1} xstyle={styles.row}>
-          <Text xstyle={item.isNew ? [styles.text, styles.textNew] : styles.text}>
-            {item.href ? (
-              <a href={item.href} {...stylex.props(styles.link)}>
-                {item.text}
-              </a>
-            ) : (
-              item.text
-            )}
-          </Text>
-          <HStack gap={2} align="center" wrap="wrap">
-            <Text type="supporting" xstyle={styles.when}>
-              {item.when}
-            </Text>
-            {item.isNew ? <Badge variant="neutral" label={labels.new} /> : null}
-          </HStack>
-        </VStack>
-      ))}
+    <VStack gap={4} xstyle={styles.list}>
+      <VStack gap={1} xstyle={styles.section}>
+        <Text type="supporting" xstyle={styles.heading}>
+          {labels.new}
+        </Text>
+        <Rows items={fresh} newLabel={labels.new} />
+      </VStack>
+      <VStack gap={1} xstyle={styles.section}>
+        <Text type="supporting" xstyle={styles.heading}>
+          {labels.earlier}
+        </Text>
+        <Rows items={older} newLabel={labels.new} />
+      </VStack>
     </VStack>
   );
 }

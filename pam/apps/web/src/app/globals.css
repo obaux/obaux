@@ -261,6 +261,16 @@
     background-color: var(--color-border);
   }
 
+  /*
+   * Notifications (D-230): each row leads with a short title — "Place
+   * reported" — at reading size and weight, above the grey sentence.
+   */
+  [data-pam-list='notifications'] .astryx-item > a > span:first-child,
+  [data-pam-list='notifications'] .astryx-item > span:first-child {
+    font-size: 17px;
+    font-weight: 600;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     *,
     *::before,

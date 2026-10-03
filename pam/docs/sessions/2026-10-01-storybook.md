@@ -411,3 +411,4 @@ Chromium.
 - `SavedGrid`: tile link `overflow: visible`, so the picture's shadow is no longer clipped.
 - Checked: typecheck, `build-storybook`, screenshots of Saved, Place and the picker.
 - D-229: picker title and role labels (`pickerContextFor`); avatars aligned with the search icon; `SearchField isSubtle`; sheet handle styled like MapDrawer's (`globals.css`); `CategoryChips` `tone`. The Messages e2e now finds the sheet by its new name, "New message" (60/60).
+- D-230: `MapDrawer` handle overlays the header plus a sticky fade; `TripCard` one-line 17px name and 14px art radius; `NotificationList` New/Earlier sections with icon, title (`notify.kind.*`) and dot. e2e admin, messages and people-strip: 129/129.
