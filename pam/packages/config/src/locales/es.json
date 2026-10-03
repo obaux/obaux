@@ -849,6 +849,7 @@
   "schedule.prev.month": "Mes anterior",
   "schedule.next.month": "Mes siguiente",
   "schedule.today": "Hoy",
+  "schedule.total": "{count} visitas",
   "schedule.count": "{count} vienen",
   "schedule.none.title": "Nadie tiene cita",
   "schedule.none.body": "Nadie tiene una hora contigo este día.",

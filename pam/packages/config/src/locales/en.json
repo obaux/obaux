@@ -849,6 +849,7 @@
   "schedule.prev.month": "Previous month",
   "schedule.next.month": "Next month",
   "schedule.today": "Today",
+  "schedule.total": "{count} visits",
   "schedule.count": "{count} coming in",
   "schedule.none.title": "Nobody is booked",
   "schedule.none.body": "No one has a time with you on this day.",

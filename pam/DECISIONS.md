@@ -5102,6 +5102,16 @@ places inline. A row, **Programs saved by {name}** (with a count), opens
 are now **Programs attended in the past**. Both pages are the case
 manager's only (D-242).
 
+### D-244 — The schedule's Week and Month show their total; the month list is tighter and further from the calendar
+
+Will, 3 October. Under the date in the navigation row, Week and Month now
+show the total for that range, "N visits" (`schedule.total`), so a program
+lead can gauge how busy it will be. Day keeps "N coming in". The line keeps
+its height in every view (D-236). In Month, the calendar and "Days with
+people coming in" sit 32px apart (`gap={8}`), and that list's rows are 56px
+(compact density), 20% tighter than the ~72px person rows. That is on the
+4px grid and above the 48px floor.
+
 ---
 
 ## Notes for whoever picks this up next

@@ -104,6 +104,9 @@ const styles = stylex.create({
   timeText: { fontSize: '17px', fontWeight: 700 },
   length: { fontSize: '14px' },
   row: { minHeight: '72px' },
+  // The month's day list, 20% tighter than a person row (72 → 56, on the
+  // 4px grid and above the 48px floor) — Will, 3 October (D-244).
+  monthRow: { minHeight: '56px' },
   label: { fontSize: '18px', lineHeight: 1.35 },
   description: { fontSize: '15px', lineHeight: 1.4 },
   quiet: { fontSize: '16px' },
@@ -234,6 +237,17 @@ export function ScheduleView({
         : fmt.month.format(anchor);
 
   const dayList = onDay(anchor);
+  const rangeTotal =
+    view === 'week'
+      ? Array.from({ length: 7 }, (_, i) => onDay(addDays(weekFrom, i)).length).reduce((a, b) => a + b, 0)
+      : view === 'month'
+        ? (() => {
+            let n = 0;
+            const first = new Date(anchor.getFullYear(), anchor.getMonth(), 1);
+            for (let d = first; d.getMonth() === first.getMonth(); d = addDays(d, 1)) n += onDay(d).length;
+            return n;
+          })()
+        : 0;
   const monthDays = (() => {
     const first = new Date(anchor.getFullYear(), anchor.getMonth(), 1);
     const days: { date: Date; count: number }[] = [];
@@ -348,7 +362,14 @@ export function ScheduleView({
                     {navLabel}
                   </Text>
                   <Text type="supporting" xstyle={styles.navCount}>
-                    {view === 'day' && dayList.length > 0 ? t('schedule.count', { count: dayList.length }) : ' '}
+                    {/* Day: who is coming; Week and Month: the total, to gauge how busy (D-244). */}
+                    {view === 'day'
+                      ? dayList.length > 0
+                        ? t('schedule.count', { count: dayList.length })
+                        : ' '
+                      : rangeTotal > 0
+                        ? t('schedule.total', { count: rangeTotal })
+                        : ' '}
                   </Text>
                 </VStack>
                 <IconButton
@@ -408,7 +429,8 @@ export function ScheduleView({
             ) : null}
 
             {view === 'month' ? (
-              <VStack gap={4}>
+              // More room between the calendar and the list under it (D-244).
+              <VStack gap={8}>
                 <MonthGrid
                   month={anchor}
                   today={today}
@@ -427,7 +449,7 @@ export function ScheduleView({
                   <Heading level={2} xstyle={styles.dayHeading}>
                     {t('schedule.month.days')}
                   </Heading>
-                  <List aria-label={t('schedule.month.days')}>
+                  <List aria-label={t('schedule.month.days')} density="compact">
                     {monthDays.map(({ date, count }) => (
                       <ListItem
                         key={iso(date)}
@@ -444,7 +466,7 @@ export function ScheduleView({
                             <Icon icon="chevronRight" size="md" />
                           </HStack>
                         }
-                        xstyle={styles.row}
+                        xstyle={styles.monthRow}
                       />
                     ))}
                   </List>
