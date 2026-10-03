@@ -11,6 +11,7 @@ import MessagesPage from '../../app/messages/page';
 import MessageThreadPage from '../../app/messages/thread/page';
 import NotificationsPage from '../../app/notifications/page';
 import PersonPage from '../../app/person/page';
+import ConnectPage from '../../app/person/connect/page';
 import PlacePage from '../../app/place/page';
 import PlacesPage from '../../app/places/page';
 import PointsPage from '../../app/points/page';
@@ -68,6 +69,7 @@ export const APP_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   '/requests/': screen(() => <RequestsPage />),
   '/interested/': screen(() => <InterestedPage />),
   '/person/': screen(() => <PersonPage />),
+  '/person/connect/': screen(() => <ConnectPage />),
   '/account/': screen(() => <AccountPage />),
   '/help/': screen(() => <HelpPage />),
   '/privacy/': screen(() => <PrivacyPage />),

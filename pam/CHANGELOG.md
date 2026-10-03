@@ -9,7 +9,9 @@ who each person is (member, case manager or program). Explore's category
 chips show their icons in colour. On Trips the drawer's top is slimmer,
 cards fade under its title as you scroll, and long place names stay on one
 line. Notifications are grouped into New and Earlier, each with an icon and
-a short title.
+a short title. A case manager's view of a member uses the same profile
+card as a member's own, with two clear actions: message them (with a count
+of new messages) and connect them to a program.
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 

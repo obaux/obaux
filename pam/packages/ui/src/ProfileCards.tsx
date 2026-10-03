@@ -33,23 +33,32 @@ export interface ProfileSummaryProps {
   readonly photoUrl?: string | null;
   /** Up to three, shown down the right-hand side. */
   readonly stats: readonly ProfileStat[];
+  /**
+   * One control in the card's top-right corner — the case manager's star on
+   * a member's page (D-227, D-231).
+   */
+  readonly corner?: ReactNode;
 }
 
 const summary = stylex.create({
-  card: { width: '100%' },
+  card: { width: '100%', position: 'relative' },
+  corner: { position: 'absolute', top: '12px', insetInlineEnd: '12px' },
   person: { flexBasis: '55%', flexShrink: 0, minWidth: 0 },
   // No numbers to show (a staff account, D-217): the person has the card.
   personAlone: { flexBasis: '100%' },
   name: { fontSize: '26px', lineHeight: 1.2, fontWeight: 700, textAlign: 'center' },
   role: { fontSize: '15px', textAlign: 'center' },
   stats: { flexGrow: 1, minWidth: 0 },
+  // Clear of the corner control, which sits over the column's top.
+  statsUnderCorner: { paddingBlockStart: '28px' },
   value: { fontSize: '20px', lineHeight: 1.2, fontWeight: 700 },
   label: { fontSize: '13px', lineHeight: 1.3 },
 });
 
-export function ProfileSummary({ name, roleLabel, photoUrl, stats }: ProfileSummaryProps) {
+export function ProfileSummary({ name, roleLabel, photoUrl, stats, corner }: ProfileSummaryProps) {
   return (
     <Card padding={6} xstyle={summary.card}>
+      {corner ? <HStack xstyle={summary.corner}>{corner}</HStack> : null}
       <HStack gap={4} align="center" wrap="nowrap">
         <VStack gap={2} align="center" xstyle={[summary.person, stats.length === 0 && summary.personAlone]}>
           <Avatar size="xl" name={name} src={photoUrl ?? undefined} tooltip={false} />
@@ -63,7 +72,7 @@ export function ProfileSummary({ name, roleLabel, photoUrl, stats }: ProfileSumm
           </VStack>
         </VStack>
         {stats.length > 0 ? (
-          <VStack gap={3} xstyle={summary.stats}>
+          <VStack gap={3} xstyle={[summary.stats, corner ? summary.statsUnderCorner : null]}>
             {stats.slice(0, 3).map((stat, index) => (
               <VStack key={stat.label} gap={2}>
                 {index > 0 ? <Divider /> : null}

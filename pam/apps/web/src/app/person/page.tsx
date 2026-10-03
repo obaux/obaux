@@ -10,7 +10,9 @@ import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { Badge } from '@astryxdesign/core/Badge';
 import { Avatar } from '@astryxdesign/core/Avatar';
-import { BigButton, Loading, Notice, Page } from '@pam/ui';
+import { BigButton, ConnectionsIcon, Loading, MessagesIcon, Notice, Page } from '@pam/ui';
+import { MenuList } from '@pam/ui/MenuList';
+import { ProfileSummary } from '@pam/ui/ProfileCards';
 import { TripCard } from '@pam/ui/TripCard';
 import { useRouter } from 'next/navigation';
 import { dummyTripsFor } from '@pam/config/dummy-trips';
@@ -22,7 +24,8 @@ const TRIP_ART = { width: 40, height: 40, 'aria-hidden': true } as const;
 import { SubPageHeader } from '@pam/ui/SubPage';
 import { useStarredPeople } from '@/lib/useStarredPeople';
 import { StarToggle } from '../../screens/PeopleHomeView';
-import { HelpButton } from '../../screens/HelpButton';
+import { HeaderActions } from '../../screens/HeaderActions';
+import { useConversations } from '@/lib/useConversations';
 import { PersonDetailSkeleton } from '@pam/ui/Skeletons';
 import { NOTICES } from '@pam/config';
 import { DUMMY_EVERYONE, type DummyPerson } from '@pam/config/dummy-people';
@@ -33,7 +36,7 @@ import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
 import { useRoleView } from '@/lib/useViewedRole';
 import { RoleSwitchControl } from '../RoleSwitchControl';
-import { DUMMY_SELF_ID, dummyConversationIdBetween } from '@pam/config/dummy-conversations';
+import { DUMMY_SELF_ID, dummyConversationIdBetween, dummyConversationsFor } from '@pam/config/dummy-conversations';
 import { ProgramBadge } from '../ProgramBadge';
 
 /**
@@ -162,6 +165,8 @@ function PersonScreen() {
   // A real member on this case manager's own caseload opens too (D-227),
   // shown only what the caseload list already shows them — see `fromCaseload`.
   const { state: caseload } = useCaseload(viewedRole === 'admin');
+  // Unread from this person, for the count on "Message {name}" (D-231).
+  const { state: conversations } = useConversations(viewedRole === 'admin' || viewedRole === 'provider');
   const header = (title: string) => (
     <SubPageHeader
       title={title}
@@ -172,7 +177,8 @@ function PersonScreen() {
           {trueRole === 'super_admin' ? (
             <RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} />
           ) : null}
-          <HelpButton />
+          {/* Only the bell here (Will, 3 October): no Help on a member's page. */}
+          <HeaderActions role={viewedRole} hasHelp={false} />
         </>
       }
     />
@@ -284,6 +290,22 @@ function PersonScreen() {
       label={`${trip.placeName}, ${tripWhen(trip.startsAt)}`}
     />
   );
+  const exampleThread =
+    person.isExample && (viewedRole === 'admin' || viewedRole === 'provider')
+      ? `/messages/thread/?id=${encodeURIComponent(dummyConversationIdBetween(person.id, DUMMY_SELF_ID[viewedRole]))}`
+      : null;
+  // An example thread knows its count; a real one knows only that something
+  // is waiting (`useConversations` reads the latest message), so it says
+  // "New" rather than a number it does not have.
+  const unreadCount =
+    person.isExample && (viewedRole === 'admin' || viewedRole === 'provider')
+      ? (dummyConversationsFor(viewedRole).find((c) => c.otherId === person.id)?.unreadCount ?? 0)
+      : conversations.status === 'ready' &&
+          conversations.conversations.some((c) => c.otherProfileId === person.id && c.unread)
+        ? 1
+        : 0;
+  const unread =
+    unreadCount === 0 ? null : person.isExample ? String(unreadCount) : t('notify.new');
   const message = () => {
     if (person.isExample && (viewedRole === 'admin' || viewedRole === 'provider')) {
       router.push(
@@ -298,59 +320,73 @@ function PersonScreen() {
 
   return (
     <Page gap={4}>
-      {header(person.firstName)}
+      {header(t('person.profile'))}
 
       {/*
-        The profile card (D-227): the face, who they are, the facts — and the
-        star, top right, for a case manager (Will, 2 October: the star moved
-        here from the Home card). When they last used PAM lives here too.
+        The profile card (D-231): the member profile's own card — face, name,
+        who they are, and three facts down the side — with the case
+        manager's star in its top-right corner (D-227).
       */}
-      <Card padding={6} xstyle={styles.card}>
-        <HStack gap={3} align="start" wrap="nowrap">
-          <Avatar size="lg" name={person.firstName} tooltip={false} alt="" />
-          <VStack gap={1} xstyle={styles.cardText}>
-            <Text type="supporting" xstyle={styles.meta}>
-              {[t(`role.${person.role}`), person.regionName, person.language ? t(`language.${person.language}`) : null]
-                .filter(Boolean)
-                .join(' · ')}
-            </Text>
-            {person.points !== undefined ? (
-              <Text xstyle={styles.fact}>{t('admin.points', { count: person.points })}</Text>
-            ) : null}
-            <Text type="supporting" xstyle={styles.meta}>
-              {when ? t('admin.lastActive', { when }) : t('admin.lastActive.never')}
-            </Text>
-            <HStack gap={2} wrap="wrap" align="center">
-              {person.accessStatus === 'suspended' ? (
-                <Badge variant="error" label={t('admin.status.suspended')} />
-              ) : null}
-              {person.accessStatus === 'limited' ? <Badge variant="warning" label={t('admin.status.limited')} /> : null}
-              {person.orgName ? <Badge variant="neutral" label={person.orgName} /> : null}
-              {person.program ? <ProgramBadge name={person.program.name} serviceId={person.program.serviceId} /> : null}
-            </HStack>
-          </VStack>
-          {isMember && viewedRole === 'admin' ? (
+      <ProfileSummary
+        name={person.firstName}
+        roleLabel={[t(`role.${person.role}`), person.regionName].filter(Boolean).join(' · ')}
+        stats={[
+          ...(person.points !== undefined
+            ? [{ value: String(person.points), label: t('person.stat.points') }]
+            : []),
+          ...(isMember ? [{ value: String(upcoming.length), label: t('person.stat.trips') }] : []),
+          { value: when ?? t('person.stat.never'), label: t('person.stat.lastUsed') },
+        ]}
+        corner={
+          isMember && viewedRole === 'admin' ? (
             <StarToggle
               isOn={starred.ids.has(person.id)}
               label={t(starred.ids.has(person.id) ? 'people.unstar' : 'people.star', { name: person.firstName })}
               onToggle={() => starred.toggle(person.id)}
             />
-          ) : null}
+          ) : undefined
+        }
+      />
+
+      {person.accessStatus !== 'active' || person.orgName || person.program ? (
+        <HStack gap={2} wrap="wrap" align="center">
+          {person.accessStatus === 'suspended' ? <Badge variant="error" label={t('admin.status.suspended')} /> : null}
+          {person.accessStatus === 'limited' ? <Badge variant="warning" label={t('admin.status.limited')} /> : null}
+          {person.orgName ? <Badge variant="neutral" label={person.orgName} /> : null}
+          {person.program ? <ProgramBadge name={person.program.name} serviceId={person.program.serviceId} /> : null}
         </HStack>
-      </Card>
+      ) : null}
 
       {/*
-        A link for an example person (the example chat, D-183 — works with no
-        JavaScript); a button for a real member, whose conversation has to be
-        opened first.
+        The two things a case manager does from here (D-231), as rows like
+        Profile's: message them — with how many messages from them are
+        waiting — and connect them to a program. A link for an example
+        person (the example chat, D-183); a button for a real member, whose
+        conversation has to be opened first.
       */}
-      {canMessage && person.isExample && (viewedRole === 'admin' || viewedRole === 'provider') ? (
-        <BigButton
-          label={t('person.message.action', { name: person.firstName })}
-          href={`/messages/thread/?id=${encodeURIComponent(dummyConversationIdBetween(person.id, DUMMY_SELF_ID[viewedRole]))}`}
+      {canMessage ? (
+        <MenuList
+          label={t('person.actions.label', { name: person.firstName })}
+          items={[
+            {
+              id: 'message',
+              label: t('person.message.action', { name: person.firstName }),
+              icon: <MessagesIcon width={26} height={26} />,
+              ...(exampleThread ? { href: exampleThread } : { onSelect: message }),
+              ...(unread ? { badge: unread, badgeLabel: t('person.message.unread', { count: unreadCount }) } : {}),
+            },
+            ...(viewedRole === 'admin'
+              ? [
+                  {
+                    id: 'connect',
+                    label: t('person.connect.action', { name: person.firstName }),
+                    icon: <ConnectionsIcon width={26} height={26} />,
+                    href: `/person/connect/?id=${encodeURIComponent(person.id)}`,
+                  },
+                ]
+              : []),
+          ]}
         />
-      ) : canMessage ? (
-        <BigButton label={t('person.message.action', { name: person.firstName })} onPress={message} />
       ) : null}
 
       {isMember ? (

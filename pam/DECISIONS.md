@@ -4895,6 +4895,39 @@ Astryx draws a row label at 14px. An unknown kind falls back to the bell
 and its sentence alone. The sentences are unchanged, so tests and
 translations that quote them still hold.
 
+### D-231 — A member's page, as a case manager sees it: the profile card, two actions as rows, only the bell
+
+From Will's references (3 October), for `/person/`.
+
+**The card is the member profile's card** (`ProfileSummary`): a large face,
+the name, "Member · Philadelphia", and three facts down the side: Points,
+Trips coming up, Last used PAM. The case manager's star sits in its
+top-right corner (`ProfileSummary` gained a `corner` slot, and the facts
+move down to clear it). The page title is "Profile", because the name is
+now on the card. Status and program badges stay, in a row under the card,
+when there are any.
+
+**Two actions, as rows like Profile's (`MenuList`)**, replacing the one big
+button:
+- **Message {name}.** It carries a count of the messages from them since the
+  case manager last wrote (`MenuItem.badge`, an Astryx Badge, which is for
+  counts) and opens their thread. An example thread knows its count
+  (`DummyConversation.unreadCount`). A real one knows only that something
+  is waiting, because `useConversations` reads just the latest message, so
+  it says "New" rather than invent a number. A true count needs a per-thread
+  count query; that is a follow-up.
+- **Connect {name} to…** (case managers only) opens `/person/connect/`: the
+  programs as rows. Picking one says "{name} is connected to {program}" and
+  that they will see it on their Home. It is an example only, like Add a
+  program (D-218): nothing is stored or sent. When referrals are built it
+  becomes one, and the member still says yes themselves; a case manager
+  never enrols anybody. A real member's name there comes only from the
+  caseload list (§4.1).
+
+**Header: the bell only.** No Help on this page (Will). Every screen still
+has a way back and a way to help: the back arrow, and Help on the tabs it
+returns to.
+
 ---
 
 ## Notes for whoever picks this up next

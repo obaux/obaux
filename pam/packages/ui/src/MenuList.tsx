@@ -4,6 +4,7 @@ import { Icon } from '@astryxdesign/core/Icon';
 import { HStack } from '@astryxdesign/core/HStack';
 import { List, ListItem } from '@astryxdesign/core/List';
 import { Text } from '@astryxdesign/core/Text';
+import { Badge } from '@astryxdesign/core/Badge';
 
 /**
  * A plain list of places to go, one per row: icon, words, chevron (D-210).
@@ -30,6 +31,13 @@ export interface MenuItem {
    * chevron, and `aria-current` so a screen reader hears which is chosen.
    */
   readonly isSelected?: boolean;
+  /**
+   * A count before the chevron — "2" new messages on "Message Marcus"
+   * (D-231). Only a count: a Badge says how many, never a status.
+   */
+  readonly badge?: string;
+  /** The badge's spoken meaning — "2 new messages". */
+  readonly badgeLabel?: string;
 }
 
 export interface MenuListProps {
@@ -70,8 +78,9 @@ export function MenuList({ label, items }: MenuListProps) {
               item.isSelected ? (
                 <Icon icon="check" size="md" />
               ) : undefined
-            ) : item.href ? (
+            ) : item.href || item.onSelect ? (
               <HStack gap={2} align="center" wrap="nowrap">
+                {item.badge ? <Badge variant="error" label={item.badge} aria-label={item.badgeLabel} /> : null}
                 {item.value ? (
                   <Text type="supporting" xstyle={styles.value}>
                     {item.value}

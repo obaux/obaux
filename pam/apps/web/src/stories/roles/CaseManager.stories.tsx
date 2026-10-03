@@ -18,6 +18,12 @@ export const Saved: Story = screen('case-manager', 'Saved — starred people', '
 export const Messages: Story = screen('case-manager', 'Messages', '/messages/');
 export const Profile: Story = screen('case-manager', 'Profile', '/profile/');
 export const Member: Story = screen('case-manager', 'A member', '/person/', { id: 'dummy-m1' });
+export const MemberWithNewMessages: Story = screen('case-manager', 'A member with new messages', '/person/', {
+  id: 'dummy-m2',
+});
+export const ConnectMember: Story = screen('case-manager', 'Connect a member to a program', '/person/connect/', {
+  id: 'dummy-m1',
+});
 export const Invite: Story = screen('case-manager', 'Invite someone', '/invite/');
 export const AllPrograms: Story = screen('case-manager', 'All programs', '/programs/');
 export const AddProgram: Story = screen('case-manager', 'Add a program', '/programs/new/');
