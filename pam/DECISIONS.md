@@ -5018,6 +5018,14 @@ Will, 3 October. A program lead's Profile row reads **Programs in PAM**
 lead has no Saved (D-218), so there is no Save on the place cards there
 (`ExploreScreen canSave`) and none in a place's top bar either.
 
+### D-238 — Programs in PAM: search is a round button that opens the pill
+
+Will, 3 October. On the staff programs screen (`ExploreScreen mode="programs"`)
+the top row is back, a round search button, + and Help; the full-width pill
+made it busy. Tapping search swaps the row for the pill and Cancel, the same
+pattern as a program's Home and Connect (D-221, D-236); Cancel clears the
+words and closes it. A member's Explore keeps its always-open bar.
+
 ---
 
 ## Notes for whoever picks this up next

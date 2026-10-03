@@ -21,11 +21,14 @@ import { HelpButton } from './HelpButton';
 import * as stylex from '@stylexjs/stylex';
 import { HStack } from '@astryxdesign/core/HStack';
 import { IconButton } from '@astryxdesign/core/IconButton';
+import { Button } from '@astryxdesign/core/Button';
+import { Icon } from '@astryxdesign/core/Icon';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { BackButton } from '@pam/ui/SubPage';
 
 const styles = stylex.create({
   // The same white disc with a grey edge as Help (D-216).
+  cancel: { flexShrink: 0, fontSize: '17px', fontWeight: 600 },
   add: {
     width: '48px',
     height: '48px',
@@ -78,6 +81,7 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
   const [query, setQuery] = useState('');
   const settled = useDebounced(query, 300);
   const [clearSignal, setClearSignal] = useState(0);
+  const [isSearching, setIsSearching] = useState(false);
   const [reload, setReload] = useState(0);
 
   const [area, setArea] = useState<AreaOption>(CITY_HALL);
@@ -116,9 +120,9 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
     [area.lat, area.lon, category],
   );
 
-  return (
-    <ExploreView
-      search={
+  // Programs in PAM (D-238): search is a round button there, like a
+  // program's Home; tapping it swaps the top row for the pill and Cancel.
+  const pill = (
         <SearchPill<PlaceSuggestion>
           label={t('explore.search.label')}
           placeholder={t('explore.search.placeholder')}
@@ -130,11 +134,37 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
           itemIcon={(item) => CATEGORY_ICONS[item.auxiliaryData.category]}
           clearSignal={clearSignal}
         />
+  );
+  const programsSearching = mode === 'programs' && isSearching;
+
+  return (
+    <ExploreView
+      search={mode === 'programs' && !isSearching ? null : pill}
+      leading={
+        mode === 'programs' && !isSearching ? (
+          <BackButton href="/profile/" label={t('nav.back.profile')} />
+        ) : undefined
       }
-      leading={mode === 'programs' ? <BackButton href="/profile/" label={t('nav.back.profile')} /> : undefined}
       actions={
-        mode === 'programs' ? (
+        programsSearching ? (
+          <Button
+            label={t('messages.search.cancel')}
+            variant="ghost"
+            onClick={() => {
+              setIsSearching(false);
+              setClearSignal((n) => n + 1);
+            }}
+            xstyle={styles.cancel}
+          />
+        ) : mode === 'programs' ? (
           <>
+            <IconButton
+              label={t('explore.search.label')}
+              variant="ghost"
+              icon={<Icon icon="search" size="md" />}
+              onClick={() => setIsSearching(true)}
+              xstyle={styles.add}
+            />
             <IconButton
               label={t('programs.add')}
               href="/programs/new/"
