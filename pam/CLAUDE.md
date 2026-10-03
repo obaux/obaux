@@ -155,9 +155,9 @@ These come from the build SOP and are enforced by tests, not convention:
   or send without a human recorded in `reviewedBy`.
 - **Never dead-end.** Every screen has a visible way back and a visible way to
   get help.
-- **One primary action per screen.** Two `BigButton`s means the screen is doing
-  two things.
-- **48px minimum touch target, 64px primary buttons, 18px body text on mobile.**
+- **One primary action per screen.** Two primary `BigButton`s means the screen
+  is doing two things (a `variant="secondary"` one beside it is fine — D-239).
+- **48px minimum touch target, 56px primary buttons (secondary the same — D-239), 18px body text on mobile.**
 - Every `security definer` function sets `search_path = public, extensions`.
 - Strings go through i18n from day one. English and Spanish stay key-for-key.
 

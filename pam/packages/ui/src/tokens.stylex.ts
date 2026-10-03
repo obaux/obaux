@@ -21,7 +21,7 @@ export const pam = stylex.defineVars({
   // box you could hit was bigger than the box you could see, and on a phone a
   // person aims at the drawing.
   fieldHeight: '56px',
-  bigButtonHeight: '64px',
+  bigButtonHeight: '56px',
   bodyTextMobile: '18px',
   bodyTextDesktop: '16px',
   cardGap: '12px',

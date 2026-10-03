@@ -74,7 +74,7 @@
      */
     --pam-body-size: 18px;
     --pam-touch-target-min: 48px;
-    --pam-big-button-height: 64px;
+    --pam-big-button-height: 56px;
   }
 
   @media (min-width: 768px) {

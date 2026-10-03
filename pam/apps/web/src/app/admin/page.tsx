@@ -271,12 +271,12 @@ export default function AdminPage() {
             onPress={() => void makeInvite('member')}
             isDisabled={inviteBusy}
           />
-          <Button
+          {/* The same size and type as the button above it (D-239). */}
+          <BigButton
             label={t('admin.invite.provider')}
             variant="secondary"
-            onClick={() => void makeInvite('provider')}
+            onPress={() => void makeInvite('provider')}
             isDisabled={inviteBusy}
-            xstyle={styles.secondary}
           />
         </VStack>
       )}

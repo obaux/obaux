@@ -420,3 +420,4 @@ Chromium.
 - D-236: `ConnectView` laid out like Explore (search button that swaps the top, sticky `CategoryChips` with a fade, `PlaceCard action` checks at 48x48); `ScheduleView` count under the date, fixed height. Checked: typecheck, Storybook screenshots (top, scrolled, search), nav position measured in all views; ui and config unit tests.
 - D-237: "Programs in PAM" row for program leads; no Save for program leads (cards and place bar). e2e place, places, saved and account: 102/102.
 - D-238: programs screen search as a round button that swaps in the pill and Cancel. e2e places: 57/57.
+- D-239: BigButton 56px / 17px; invite lists use `BigButton variant="secondary"`; tokens, a11y test, CLAUDE.md rule, SOP amendment A16.

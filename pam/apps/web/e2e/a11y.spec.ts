@@ -55,7 +55,7 @@ test.describe('accessibility', () => {
       .toEqual([]);
   });
 
-  test('the primary button is 64px tall (§2.5)', async ({ page }) => {
+  test('the primary button is 56px tall (§2.5, D-239)', async ({ page }) => {
     // Signed out, /account/ has exactly one primary action and it is the
     // door in (Home itself redirects a signed-out visitor straight to
     // /signin/ rather than showing one — see page.tsx). It is a real link

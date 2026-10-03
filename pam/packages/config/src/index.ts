@@ -97,7 +97,7 @@ export const A11Y = {
   /** §0 / §2.5 — minimum tap target in px. */
   minTouchTargetPx: 48,
   /** §2.4 — the primary CTA everywhere. */
-  primaryButtonHeightPx: 64,
+  primaryButtonHeightPx: 56,
   bodyTextMobilePx: 18,
   bodyTextDesktopPx: 16,
   /** §2.5 — AAA for body text. */

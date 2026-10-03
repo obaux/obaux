@@ -5026,6 +5026,18 @@ made it busy. Tapping search swaps the row for the pill and Cancel, the same
 pattern as a program's Home and Connect (D-221, D-236); Cancel clears the
 words and closes it. A member's Explore keeps its always-open bar.
 
+### D-239 — Primary and secondary buttons are the same: 56px, 17px
+
+Will, 3 October: primary and secondary buttons differed in height and text
+size (64px / 18px against 48px / 16-17px). He chose to meet in the middle:
+both 56px with 17px text. `BigButton` changed, and the full-width secondary
+buttons on the invite lists (Admin, Directory) are now `BigButton
+variant="secondary"`, so one component draws both. The tokens follow
+(`bigButtonHeight`, `--pam-big-button-height`, `A11Y.primaryButtonHeightPx`),
+and so does the a11y test. This amends §2.5 (SOP amendment A16; the CLAUDE.md
+rule updated). Small inline buttons, such as Copy beside an invite code, keep
+their own size.
+
 ---
 
 ## Notes for whoever picks this up next

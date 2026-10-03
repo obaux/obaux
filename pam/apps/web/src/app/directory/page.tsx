@@ -344,19 +344,17 @@ export default function DirectoryPage() {
                   onPress={() => void makeInvite('admin')}
                   isDisabled={inviteBusy}
                 />
-                <Button
+                <BigButton
                   label={t('directory.invite.provider')}
                   variant="secondary"
-                  onClick={() => void makeInvite('provider')}
+                  onPress={() => void makeInvite('provider')}
                   isDisabled={inviteBusy}
-                  xstyle={styles.secondary}
                 />
-                <Button
+                <BigButton
                   label={t('directory.invite.member')}
                   variant="secondary"
-                  onClick={() => void makeInvite('member')}
+                  onPress={() => void makeInvite('member')}
                   isDisabled={inviteBusy}
-                  xstyle={styles.secondary}
                 />
               </VStack>
             </>
