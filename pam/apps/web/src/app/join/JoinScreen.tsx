@@ -477,7 +477,8 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
                 ? t(`join.privacy.title.${kind}`)
                 : t(`join.${phase}.title`)
           }
-          subtitle={t('join.step', { current: step, total })}
+          // On the code step the step sits under the button instead (D-252).
+          {...(phase === 'phone' && onCode ? {} : { subtitle: t('join.step', { current: step, total }) })}
           {...back}
         />
 
@@ -512,6 +513,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
               onCodeChange={setCode}
               headingLevel={2}
               codeAction={t('action.next')}
+              stepLabel={t('join.step', { current: step, total })}
             />
           </>
         ) : null}

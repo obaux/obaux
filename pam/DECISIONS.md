@@ -5251,6 +5251,16 @@ new consent test reaches the code step and checks one field,
 `one-time-code`, a paste of a whole message, the inline Send again, and the
 footer at the foot of the screen.
 
+### D-252 — On the code step, the boxes and button come first; the step and "Sent to" sit under them
+
+Will, 3 October: "move the code and button above step 1 of 5, and the details
+below it." The code step now reads: "Enter your code", the boxes, Next; then,
+quieter, "Step 1 of 5" and "Sent to {number}. Send again". The thing to do
+sits straight under the title, and the context sits after it. The step moves
+out of the title's subtitle on this one screen only (`PhoneSignInCard`
+`stepLabel`). Every other joining step keeps it as the subtitle (D-251).
+`/signin/`'s code step has the same order without a step line.
+
 ---
 
 ## Notes for whoever picks this up next

@@ -45,6 +45,8 @@ export interface PhoneSignInCardProps {
   readonly headingLevel?: 1 | 2;
   /** The code step's button — "Sign in", or "Next" inside joining. */
   readonly codeAction?: string;
+  /** "Step 1 of 5" while joining, under the button on the code step (D-252). */
+  readonly stepLabel?: string;
 }
 
 const styles = stylex.create({
@@ -68,6 +70,7 @@ export function PhoneSignInCard({
   headingLevel = 1,
   hasTitle = true,
   codeAction,
+  stepLabel,
 }: PhoneSignInCardProps) {
   const { t } = useI18n();
   const { state, sendCode, verifyCode } = flow;
@@ -80,26 +83,12 @@ export function PhoneSignInCard({
 
   if (onCodeStep) {
     return (
-      // The code step (Will, 3 October, D-251): no card and no heading of its
-      // own — the screen's title says "Enter your code". Where it went and a
-      // small "Send again" on one line, the boxes, the button.
+      // The code step (Will, 3 October, D-251, D-252): no card and no
+      // heading of its own — the screen's title says "Enter your code".
+      // Straight under it the boxes and the button, the thing to do; then,
+      // quieter, the step ("Step 1 of 5", while joining) and where the code
+      // went, with a small "Send again".
       <VStack gap={4} xstyle={styles.card}>
-        <HStack gap={1} align="center" wrap="wrap">
-          <Text type="supporting" xstyle={styles.hint}>
-            {t('signin.code.sent', { phone: state.phone })}
-          </Text>
-          {/*
-            Thirty seconds between codes, said on the link itself. A person
-            who taps "send again" three times gets three codes and a carrier
-            that stops delivering; a person who can see the count waits.
-          */}
-          <TextLink
-            label={flow.resendIn > 0 ? t('signin.code.againIn', { seconds: flow.resendIn }) : t('signin.code.again')}
-            onClick={() => void sendCode(state.phone)}
-            isDisabled={busy || flow.resendIn > 0}
-            size="quiet"
-          />
-        </HStack>
         <CodeBoxes
           id={codeId}
           label={t('signin.code.label')}
@@ -115,6 +104,29 @@ export function PhoneSignInCard({
           onPress={() => void verifyCode(code)}
           isDisabled={busy || code.trim().length === 0}
         />
+        <VStack gap={0}>
+          {stepLabel ? (
+            <Text type="supporting" xstyle={styles.hint}>
+              {stepLabel}
+            </Text>
+          ) : null}
+          <HStack gap={1} align="center" wrap="wrap">
+            <Text type="supporting" xstyle={styles.hint}>
+              {t('signin.code.sent', { phone: state.phone })}
+            </Text>
+            {/*
+              Thirty seconds between codes, said on the link itself. A person
+              who taps "send again" three times gets three codes and a carrier
+              that stops delivering; a person who can see the count waits.
+            */}
+            <TextLink
+              label={flow.resendIn > 0 ? t('signin.code.againIn', { seconds: flow.resendIn }) : t('signin.code.again')}
+              onClick={() => void sendCode(state.phone)}
+              isDisabled={busy || flow.resendIn > 0}
+              size="quiet"
+            />
+          </HStack>
+        </VStack>
       </VStack>
     );
   }
