@@ -280,7 +280,8 @@ function PlaceScreen() {
         place!.name,
         <PlaceBarActions
           isSaved={saved}
-          onSave={signedIn ? toggleSave : undefined}
+          // No Save for a program lead, who has no Saved (D-237).
+          onSave={signedIn && (demoRole ?? trueRole) !== 'provider' ? toggleSave : undefined}
           onShare={() => void sharePlace(place!.name, place!.address)}
           flagHref={`/flag/?place=${encodeURIComponent(place!.id)}`}
           messageHref={messageHrefFor(place!.name)}

@@ -81,7 +81,15 @@ export function ProfileView({
     // Every program, a secondary path for staff (D-218): where to look one
     // up, save it, or add a new one.
     ...(role === 'admin' || role === 'provider'
-      ? [{ id: 'programs', label: t('profile.menu.programs'), href: '/programs/', icon: <PlacesIcon {...ICON} /> }]
+      ? [
+          {
+            id: 'programs',
+            // A program lead browses the others: "Programs in PAM" (D-237).
+            label: t(role === 'provider' ? 'profile.menu.programsInPam' : 'profile.menu.programs'),
+            href: '/programs/',
+            icon: <PlacesIcon {...ICON} />,
+          },
+        ]
       : []),
     ...(role === 'super_admin'
       ? [

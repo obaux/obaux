@@ -5011,6 +5011,13 @@ height in Day, Week and Month (blank when there is no count), so the date
 and the arrows stay in the same place when the view changes (measured: the
 arrows sit at the same height in all three).
 
+### D-237 — Program leads browse "Programs in PAM", with no Save anywhere
+
+Will, 3 October. A program lead's Profile row reads **Programs in PAM**
+(`profile.menu.programsInPam`); case managers keep "All programs". A program
+lead has no Saved (D-218), so there is no Save on the place cards there
+(`ExploreScreen canSave`) and none in a place's top bar either.
+
 ---
 
 ## Notes for whoever picks this up next

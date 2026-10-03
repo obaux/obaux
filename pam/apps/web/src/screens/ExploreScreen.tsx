@@ -72,6 +72,8 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
   const { demoRole } = useRoleView(trueRole);
 
   const from = mode === 'programs' ? 'programs' : 'explore';
+  // A program lead has no Saved (D-218), so no Save on a card (Will, 3 October, D-237).
+  const canSave = (demoRole ?? trueRole) !== 'provider';
   const [category, setCategory] = useState<ExploreCategory>('all');
   const [query, setQuery] = useState('');
   const settled = useDebounced(query, 300);
@@ -193,7 +195,7 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
               status={placeStatus(place.id, place.hours, now, t, locale)}
               audienceLabel={place.audience ? t(`place.audience.${place.audience}`) : null}
               isSaved={saved}
-              onSave={() => {
+              onSave={canSave ? () => {
                 if (saved) {
                   void unsave(place.id);
                   return;
@@ -209,7 +211,7 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
                   lat: place.lat ?? null,
                   lon: place.lon ?? null,
                 });
-              }}
+              } : undefined}
               labels={{ save: t('action.save'), saved: t('places.saved') }}
             />
           </ScrollReveal>

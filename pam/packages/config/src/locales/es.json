@@ -821,6 +821,7 @@
   "invite.intro": "Cada invitación es un código para una persona. Léeselo o envíaselo por mensaje.",
   "invite.ready.member": "Un código para un miembro",
   "invite.ready.program": "Un código para un programa",
+  "profile.menu.programsInPam": "Programas en PAM",
   "profile.menu.programs": "Todos los programas",
   "saved.pane.people": "Personas",
   "saved.pane.programs": "Programas",
