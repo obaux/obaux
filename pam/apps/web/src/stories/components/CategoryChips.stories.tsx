@@ -1,14 +1,15 @@
 import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/nextjs';
 import { Page } from '@pam/ui';
-import { CategoryChips } from '@pam/ui/CategoryChips';
+import { CategoryChips, type ChipTone } from '@pam/ui/CategoryChips';
 import { CATEGORY_LIST } from '@pam/config';
 import { CATEGORY_ICONS, type ExploreCategory } from '../../screens/ExploreView';
 import { useStoryText } from '../support/useStoryText';
 
 /**
  * Explore's chips (D-212): All and PAM's three categories, one always
- * chosen. They scroll sideways at 320px and in Spanish.
+ * chosen, each icon in its category's colour. They scroll sideways at
+ * 320px and in Spanish.
  */
 function LocalisedChips({ initial }: { readonly initial: ExploreCategory }) {
   const tr = useStoryText();
@@ -20,7 +21,12 @@ function LocalisedChips({ initial }: { readonly initial: ExploreCategory }) {
       onChange={setValue}
       chips={[
         { key: 'all', label: tr('places.all'), icon: CATEGORY_ICONS.all },
-        ...CATEGORY_LIST.map((d) => ({ key: d.key, label: tr(d.labelKey), icon: CATEGORY_ICONS[d.key] })),
+        ...CATEGORY_LIST.map((d) => ({
+          key: d.key,
+          label: tr(d.labelKey),
+          icon: CATEGORY_ICONS[d.key],
+          tone: d.colorToken as ChipTone,
+        })),
       ]}
     />
   );

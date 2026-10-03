@@ -249,6 +249,18 @@
     min-width: 0;
   }
 
+  /*
+   * A sheet's grab handle, drawn like the Trips drawer's (MapDrawer's grip):
+   * 40 by 5, the border colour, so every drawer in PAM has the same handle
+   * (Will, 3 October). Astryx's own is a thinner 36 by 4.
+   */
+  .astryx-bottom-sheet > [aria-hidden='true'] > div {
+    width: 40px;
+    height: 5px;
+    border-radius: 3px;
+    background-color: var(--color-border);
+  }
+
   @media (prefers-reduced-motion: reduce) {
     *,
     *::before,

@@ -179,7 +179,7 @@ test.describe('the conversation list', () => {
     await settled(page);
 
     await page.getByRole('button', { name: 'New message' }).click();
-    const sheet = page.getByRole('dialog', { name: 'Who do you want to message?' });
+    const sheet = page.getByRole('dialog', { name: 'New message' });
     await expect(sheet).toBeVisible();
     await expect(sheet.getByRole('button', { name: /Tanya/ })).toBeVisible();
     await sheet.getByRole('textbox').fill('mar');
@@ -206,7 +206,7 @@ test.describe('the conversation list', () => {
 
     // The picker lists the example cast and a pick opens the example thread.
     await page.getByRole('button', { name: 'New message' }).click();
-    const sheet = page.getByRole('dialog', { name: 'Who do you want to message?' });
+    const sheet = page.getByRole('dialog', { name: 'New message' });
     await sheet.getByRole('button', { name: /Sandra/ }).click();
     await expect(page).toHaveURL(/dummy-conv-dummy-m1-dummy-p1/);
   });

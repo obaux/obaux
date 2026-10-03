@@ -22,7 +22,16 @@ export interface CategoryChip<K extends string> {
   readonly key: K;
   readonly label: string;
   readonly icon: ReactNode;
+  /**
+   * The category's colour — the same one as its badge on a place
+   * (`CATEGORY_DEFINITIONS[…].colorToken`). The icon takes it so each chip
+   * stands out a little (Will, 3 October); the words stay in text colour.
+   * "All" has none.
+   */
+  readonly tone?: ChipTone;
 }
+
+export type ChipTone = 'blue' | 'green' | 'purple' | 'orange' | 'red' | 'teal' | 'pink' | 'cyan' | 'gray';
 
 export interface CategoryChipsProps<K extends string> {
   readonly chips: readonly CategoryChip<K>[];
@@ -67,6 +76,18 @@ const styles = stylex.create({
   icon: { width: '22px', height: '22px', flexShrink: 0 },
 });
 
+const tones = stylex.create({
+  blue: { color: colorVars['--color-icon-blue'] },
+  green: { color: colorVars['--color-icon-green'] },
+  purple: { color: colorVars['--color-icon-purple'] },
+  orange: { color: colorVars['--color-icon-orange'] },
+  red: { color: colorVars['--color-icon-red'] },
+  teal: { color: colorVars['--color-icon-teal'] },
+  pink: { color: colorVars['--color-icon-pink'] },
+  cyan: { color: colorVars['--color-icon-cyan'] },
+  gray: { color: colorVars['--color-icon-gray'] },
+});
+
 export function CategoryChips<K extends string>({ chips, value, onChange, label }: CategoryChipsProps<K>) {
   return (
     <HStack gap={2} wrap="nowrap" role="group" aria-label={label} xstyle={styles.row}>
@@ -78,7 +99,7 @@ export function CategoryChips<K extends string>({ chips, value, onChange, label 
             label={chip.label}
             variant="secondary"
             aria-pressed={on}
-            icon={<HStack xstyle={styles.icon}>{chip.icon}</HStack>}
+            icon={<HStack xstyle={[styles.icon, chip.tone && tones[chip.tone]]}>{chip.icon}</HStack>}
             onClick={() => onChange(chip.key)}
             xstyle={[styles.chip, on && styles.chipOn]}
           />

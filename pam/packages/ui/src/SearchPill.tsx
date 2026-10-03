@@ -60,6 +60,13 @@ const styles = stylex.create({
   // own background for the large group loses to the component's (it rendered
   // transparent); set here, it holds.
   group: { width: '100%', backgroundColor: 'light-dark(#FFFFFF, #262626)' },
+  // A lighter lift, for a pill that sits inside a sheet rather than on the
+  // page: the full shadow there read as a second layer floating over the
+  // first (Will, 3 October).
+  subtle: {
+    boxShadow:
+      '0 1px 2px light-dark(oklch(0 0 0 / 5%), oklch(0 0 0 / 30%)), 0 2px 8px light-dark(oklch(0 0 0 / 6%), oklch(0 0 0 / 35%)), inset 0 0 0 1px light-dark(oklch(0 0 0 / 6%), oklch(1 0 0 / 9%))',
+  },
   clear: { backgroundColor: 'transparent', borderWidth: 0, paddingInline: 0 },
 });
 
@@ -150,11 +157,20 @@ export interface SearchFieldProps {
   readonly onChange: (value: string) => void;
   /** Focus it on arrival — Messages' search opens on a tap. */
   readonly hasAutoFocus?: boolean;
+  /** A softer shadow — for a pill inside a sheet (the new-message picker). */
+  readonly isSubtle?: boolean;
 }
 
-export function SearchField({ label, placeholder, value, onChange, hasAutoFocus = false }: SearchFieldProps) {
+export function SearchField({
+  label,
+  placeholder,
+  value,
+  onChange,
+  hasAutoFocus = false,
+  isSubtle = false,
+}: SearchFieldProps) {
   return (
-    <InputGroup label={label} isLabelHidden size="lg" xstyle={styles.group}>
+    <InputGroup label={label} isLabelHidden size="lg" xstyle={[styles.group, isSubtle && styles.subtle]}>
       <TextInput
         label={label}
         isLabelHidden

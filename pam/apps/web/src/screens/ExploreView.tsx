@@ -19,7 +19,7 @@ import {
   Page,
   WorkforceIcon,
 } from '@pam/ui';
-import { CategoryChips, type CategoryChip } from '@pam/ui/CategoryChips';
+import { CategoryChips, type CategoryChip, type ChipTone } from '@pam/ui/CategoryChips';
 import { PlaceCardSkeletonList } from '@pam/ui/Skeletons';
 import { CATEGORY_LIST, NOTICES, type Category } from '@pam/config';
 import type { NearbyPlace, PlacesState } from '@/lib/usePlaces';
@@ -143,6 +143,7 @@ export function ExploreView({
       key: definition.key,
       label: t(definition.labelKey),
       icon: CATEGORY_ICONS[definition.key],
+      tone: definition.colorToken as ChipTone,
     })),
   ];
 

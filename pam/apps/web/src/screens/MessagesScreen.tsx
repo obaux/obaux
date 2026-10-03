@@ -9,7 +9,7 @@ import { useRoleView } from '@/lib/useViewedRole';
 import { useConversations } from '@/lib/useConversations';
 import { whenHappened } from '@/lib/when';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { contextFor, dummyPickerPeople } from '../app/messages/DummyRows';
+import { contextFor, dummyPickerPeople, pickerContextFor } from '../app/messages/DummyRows';
 import { NewMessagePickerLazy } from '../app/messages/NewMessagePickerLazy';
 import type { PickablePerson } from '../app/messages/NewMessagePicker';
 import { useMessageableMembers } from '@/lib/useMessageableMembers';
@@ -43,7 +43,7 @@ export function MessagesScreen() {
         ? messageable.people.map((p) => ({
             id: p.profileId,
             name: p.firstName ?? t('messages.thread.someone'),
-            context: contextFor(role, { role: p.role, programName: null }, t),
+            context: pickerContextFor({ role: p.role, programName: null }, t),
           }))
         : [],
     [messageable, role, t],

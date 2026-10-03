@@ -5,6 +5,7 @@ import * as stylex from '@stylexjs/stylex';
 import { BottomSheet } from '@astryxdesign/core/BottomSheet';
 import { List, ListItem } from '@astryxdesign/core/List';
 import { Avatar } from '@astryxdesign/core/Avatar';
+import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
@@ -16,7 +17,8 @@ import { navigate } from '@/lib/navigate';
  * Who to message — a sheet that slides up over the list (D-186).
  *
  * Everyone `messageable_people()` returns (or, for a preview, the example
- * cast), with the same search pill as Home and Messages on top (D-228) that narrows the rows as you type. On a
+ * cast), under a "New message" title, with the same search pill as Home
+ * and Messages (D-228, a softer shadow inside the sheet) that narrows the rows as you type. On a
  * phone this is a `BottomSheet` rather than a dropdown: a dropdown under a
  * field is a desktop shape, and a sheet gives the list the whole screen and
  * the keyboard room (`height="tall"`). Astryx's `Typeahead` was the other
@@ -42,8 +44,14 @@ const styles = stylex.create({
   // Clear of the sheet's grab handle: the first thing in the sheet used to sit
   // under it (Will's screenshot, 21 September).
   body: { width: '100%', paddingBlockStart: spacingVars['--spacing-6'], paddingBlockEnd: spacingVars['--spacing-2'] },
+  // "New message", left-aligned and drawer-sized: the Trips drawer's title
+  // size, smaller than a screen's large title (Will, 3 October).
+  title: { fontSize: '26px', lineHeight: 1.2, fontWeight: 700, paddingInline: spacingVars['--spacing-4'] },
   // The pill sits in from the sheet's edges, as it does on Home.
   search: { width: '100%', paddingInline: spacingVars['--spacing-4'] },
+  // Rows in from the edge so each avatar lines up under the pill's search
+  // icon (Will, 3 October).
+  list: { width: '100%', paddingInline: spacingVars['--spacing-5'] },
   item: { minHeight: '48px' },
   none: { fontSize: '17px', paddingBlock: '12px' },
 });
@@ -88,8 +96,11 @@ export function NewMessagePicker({
   };
 
   return (
-    <BottomSheet isOpen={isOpen} onOpenChange={onOpenChange} label={t('messages.new.title')} height="tall">
+    <BottomSheet isOpen={isOpen} onOpenChange={onOpenChange} label={t('messages.new.action')} height="tall">
       <VStack gap={3} xstyle={styles.body}>
+        <Heading level={2} xstyle={styles.title}>
+          {t('messages.new.action')}
+        </Heading>
         <VStack xstyle={styles.search}>
           <SearchField
             label={t('messages.new.search')}
@@ -97,6 +108,7 @@ export function NewMessagePicker({
             value={query}
             onChange={setQuery}
             hasAutoFocus
+            isSubtle
           />
         </VStack>
         {failed ? (
@@ -109,18 +121,20 @@ export function NewMessagePicker({
             {people.length === 0 ? t('messages.start.empty.body') : t('messages.new.none')}
           </Text>
         ) : (
-          <List hasDividers density="spacious">
-            {shown.map((p) => (
-              <ListItem
-                key={p.id}
-                label={p.name}
-                description={p.context ?? undefined}
-                startContent={<Avatar size="md" name={p.name} />}
-                isDisabled={busyId !== null && busyId !== p.id}
-                onClick={() => void pick(p.id)}
-              />
-            ))}
-          </List>
+          <VStack xstyle={styles.list}>
+            <List hasDividers density="spacious">
+              {shown.map((p) => (
+                <ListItem
+                  key={p.id}
+                  label={p.name}
+                  description={p.context ?? undefined}
+                  startContent={<Avatar size="md" name={p.name} />}
+                  isDisabled={busyId !== null && busyId !== p.id}
+                  onClick={() => void pick(p.id)}
+                />
+              ))}
+            </List>
+          </VStack>
         )}
       </VStack>
     </BottomSheet>

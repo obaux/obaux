@@ -4844,6 +4844,32 @@ picture's shadow stopped dead where the name began. The link now sets
 `overflow: visible`. Nothing inside a tile needs clipping: the picture's
 rounded corners come from its own card.
 
+### D-229 — The new-message sheet: a title, who each person is, avatars under the search icon; category chips in colour
+
+From Will's screenshots (3 October).
+
+**New message sheet.** It has a left-aligned "New message" title at the
+Trips drawer's title size (26px, smaller than a screen's large title), and
+the sheet now uses the same name for screen readers. The grab handle is
+drawn like the Trips drawer's: 40 by 5 in the border colour, set in
+`globals.css` on the BottomSheet handle. The pill has a softer shadow
+(`SearchField isSubtle`), because the full lift read as a second layer
+inside a sheet. The rows sit 20px in, so each avatar lines up under the
+pill's search icon (both at 33px, measured).
+
+**Who each person is.** Every name has a line under it: *Member*, *Case
+manager*, or *Program · <program name>* (`pickerContextFor`). Who appears
+follows `messageable_people()`, so each role meets only the labels that
+apply. A case manager and a program see members; a member sees their case
+manager and programs (Will: "For programs, only members. For members, only
+programs and case managers."). The rows in the Messages list keep D-187's
+rule (context only for a member viewer).
+
+**Category chips.** Each chip's icon takes its category's badge colour
+(`CATEGORY_DEFINITIONS[…].colorToken`, through the theme's `--color-icon-*`
+tokens), so the chips stand out a little. The words stay in text colour,
+and All has no colour.
+
 ---
 
 ## Notes for whoever picks this up next
