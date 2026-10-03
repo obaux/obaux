@@ -11,4 +11,10 @@ const meta = { title: 'Program lead/Prototype' } satisfies Meta;
 
 export default meta;
 
+/**
+ * Starts at Sign in (D-248): pressing "Send me a code" goes straight to this
+ * role's Home, signed in — so the whole app can be previewed from the door.
+ */
+export const SignIn: StoryObj = screen('provider', 'Sign in', '/prototype/signin/');
+
 export const Prototype: StoryObj = screen('provider', 'Prototype', '/');

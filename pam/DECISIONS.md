@@ -5143,6 +5143,21 @@ second, smaller search over the example list (D-235's in-place search is
 removed). A member's main button on a place now reads **Plan a trip**
 (`place.schedule`), matching the flow it opens; it was "Schedule a visit".
 
+### D-248 — Each role's prototype starts at Sign in, and "Send me a code" goes straight Home
+
+Will, 3 October: "add the login screen to each prototype view per user
+type… pressing Sign in will continue to home pages, so it's easy to
+preview." Each role's Prototype folder (Member, Case manager, Program lead,
+Super admin) has a **Sign in** story first. It is the real sign-in screen,
+with a phone already filled in and a stand-in flow (`PrototypeSignIn`,
+route `/prototype/signin/`): pressing "Send me a code" navigates Home, where
+the story is already signed in as that role. To make that possible the
+screen moved into `app/signin/SignInScreen.tsx`, which takes an optional
+`preview` (flow, phone; it also skips the already-signed-in redirect).
+`page.tsx` renders it with none, because Next pages cannot take props, so the
+live sign-in is unchanged. The member's "Not signed in" story, the real
+two-step flow against the pretend database, stays.
+
 ---
 
 ## Notes for whoever picks this up next
