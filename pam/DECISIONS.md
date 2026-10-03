@@ -4928,6 +4928,13 @@ button:
 has a way back and a way to help: the back arrow, and Help on the tabs it
 returns to.
 
+### D-232 — Every sheet has the Trips drawer's 28px top corners
+
+Will, 3 October, on the New message sheet. The corners are set once in
+`globals.css` on `.astryx-bottom-sheet`, next to the handle rule from
+D-229, so every BottomSheet in PAM matches `MapDrawer`. Astryx's own radius
+was tighter, and the two drawers looked like different things.
+
 ---
 
 ## Notes for whoever picks this up next
