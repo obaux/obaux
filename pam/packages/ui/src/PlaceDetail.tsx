@@ -142,8 +142,11 @@ const styles = stylex.create({
   },
   rows: { rowGap: spacingVars['--spacing-2'] },
   // The round quick actions: four across, each a circle with a word under it.
-  quick: { width: '100%', justifyContent: 'space-around' },
-  quickItem: { flexBasis: 0, flexGrow: 1, minWidth: 0 },
+  // Four even slots (D-245): with four actions nothing changes; with fewer,
+  // they sit from the left at the same spacing instead of spreading out
+  // across the row (Will, 3 October: a program's two looked lost).
+  quick: { width: '100%', justifyContent: 'flex-start' },
+  quickItem: { flexBasis: '25%', flexGrow: 0, flexShrink: 0, maxWidth: '25%', minWidth: 0 },
   quickButton: {
     width: '56px',
     height: '56px',

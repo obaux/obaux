@@ -5069,7 +5069,7 @@ The Trips page reads the query, so it sits in a Suspense boundary.
 
 Will, 3 October, for privacy. On `/person/`, a program lead
 (`viewedRole === 'provider'`) sees:
-- **Stats:** Next visit (with them), Visits with you (past, with them), and
+- **Stats:** Next visit (with them, day and time: "Oct 6, 9:00 AM"), Visits with you (past, with them), and
   Last used PAM. No points and no trip totals.
 - **Visits with you:** that member's upcoming times with this program (day,
   time, length, kind), from the program's schedule.
@@ -5112,6 +5112,20 @@ its height in every view (D-236). In Month, the calendar and "Days with
 people coming in" sit 32px apart (`gap={8}`), and that list's rows are 56px
 (compact density), 20% tighter than the ~72px person rows. That is on the
 4px grid and above the 48px floor.
+
+### D-245 — Home's tab icon says what Home is; a place's round buttons line up from the left
+
+Will, 3 October. The first tab is Home for staff (D-212); its icon now says
+what that Home holds. For a case manager it is **people** (their caseload;
+the icon "Invite someone" uses). For a program lead it is a **calendar**
+(their schedule). `TabBar homeIcon`, with the house as the fallback.
+
+A place's round quick actions sit in four even slots (`flexBasis: 25%`). With
+four (a member's Website, Message, Call, Directions) nothing changes. With
+fewer (a program's own page has Call and Open in Google) they line up from
+the left at the same spacing instead of spreading across the row. A
+program lead's Next visit stat now shows the time too ("Oct 6," then
+"9:00 AM", kept together with no-break spaces).
 
 ---
 

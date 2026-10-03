@@ -349,7 +349,12 @@ function PersonScreen() {
             ? [
                 // Only what concerns this program, plus when they last used PAM (D-242).
                 {
-                  value: nextVisits[0] ? shortDay(nextVisits[0].startsAt) : t('person.stat.never'),
+                  // The day and the time (Will, 3 October): "Oct 6, 9:00 AM".
+                  value: nextVisits[0]
+                    ? // No-break spaces inside each part, so a narrow card breaks
+                      // after the comma: "Oct 6," then "9:00 AM".
+                      `${shortDay(nextVisits[0].startsAt).replace(/\s/g, '\u00a0')}, ${new Intl.DateTimeFormat(locale, { hour: 'numeric', minute: '2-digit' }).format(new Date(nextVisits[0].startsAt)).replace(/\s/g, '\u00a0')}`
+                    : t('person.stat.never'),
                   label: t('person.stat.nextVisit'),
                 },
                 { value: String(pastVisits.length), label: t('person.stat.visits') },

@@ -6,7 +6,7 @@ import { StatusDot } from '@astryxdesign/core/StatusDot';
 import { VStack } from '@astryxdesign/core/VStack';
 import { Tab, TabList } from '@astryxdesign/core/TabList';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
-import { BookmarkIcon, ExploreIcon, HomeIcon, MessagesIcon, PlacesIcon, TripsIcon } from './icons.js';
+import { BookmarkIcon, ExploreIcon, HomeIcon, MessagesIcon, PeopleIcon, PlacesIcon, TripsIcon } from './icons.js';
 
 /**
  * The app's bottom navigation: five places, always one tap away (D-210).
@@ -52,6 +52,12 @@ export interface TabBarProps {
    * search for places. Its key stays `explore` — same slot, same route.
    */
   readonly isHome?: boolean;
+  /**
+   * How Home is drawn when `isHome` (Will, 3 October, D-245): people for a
+   * case manager (their caseload — the icon Invite someone uses), a calendar
+   * for a program lead (their schedule). The house is the fallback.
+   */
+  readonly homeIcon?: 'house' | 'people' | 'calendar';
 }
 
 const DEFAULT_HREFS: Readonly<Record<TabKey, string>> = {
@@ -129,12 +135,25 @@ export function TabBar({
   unreadLabel,
   hrefs,
   isHome = false,
+  homeIcon = 'house',
   tabs = MEMBER_TABS,
 }: TabBarProps) {
   const to = { ...DEFAULT_HREFS, ...hrefs };
 
   const icons: Readonly<Record<TabKey, ReactNode>> = {
-    explore: <HStack xstyle={styles.iconWrap}>{isHome ? <HomeIcon {...ICON} /> : <ExploreIcon {...ICON} />}</HStack>,
+    explore: (
+      <HStack xstyle={styles.iconWrap}>
+        {!isHome ? (
+          <ExploreIcon {...ICON} />
+        ) : homeIcon === 'calendar' ? (
+          <TripsIcon {...ICON} />
+        ) : homeIcon === 'people' ? (
+          <PeopleIcon {...ICON} />
+        ) : (
+          <HomeIcon {...ICON} />
+        )}
+      </HStack>
+    ),
     saved: (
       <HStack xstyle={styles.iconWrap}>
         <BookmarkIcon {...ICON} isFilled={current === 'saved'} />

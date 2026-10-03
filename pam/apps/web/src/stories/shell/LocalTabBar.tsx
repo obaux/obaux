@@ -26,6 +26,7 @@ export function LocalTabBar({
       name={name}
       unreadLabel={unread ? t('tab.unread') : null}
       isHome={isHome}
+      homeIcon={role === 'provider' ? 'calendar' : role === 'admin' ? 'people' : 'house'}
       tabs={tabsFor(role)}
       labels={{
         explore: t(isHome ? 'tab.home' : 'tab.explore'),
