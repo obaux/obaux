@@ -15,6 +15,8 @@ import type { PickablePerson } from '../app/messages/NewMessagePicker';
 import { useMessageableMembers } from '@/lib/useMessageableMembers';
 import { openConversation } from '@/lib/openConversation';
 import { HeaderActions } from './HeaderActions';
+import { FloatingAction } from '@pam/ui/FloatingAction';
+import { ConnectionsIcon } from '@pam/ui';
 import { MessagesView, type MessageRow } from './MessagesView';
 
 /**
@@ -107,6 +109,17 @@ export function MessagesScreen() {
         headerActions={<HeaderActions role={viewedRole} enabled={session.status === 'signed-in'} hasHelp={false} />}
         note={useExamples ? t('example.people.note') : null}
         {...(canMessage ? { onNewMessage: () => setPicking(true) } : {})}
+        // A member's people, one tap away (Will, 3 October, D-246): the same
+        // strip a case manager's Home floats for Invite someone.
+        floating={
+          role === 'member' ? (
+            <FloatingAction
+              label={t('messages.connections')}
+              href="/connections/"
+              icon={<ConnectionsIcon width={26} height={26} aria-hidden />}
+            />
+          ) : undefined
+        }
       />
     </>
   );

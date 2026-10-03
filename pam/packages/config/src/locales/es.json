@@ -658,6 +658,7 @@
   "reports.reason": "Motivo: {reason}",
   "reports.status.open": "Esperando revision",
   "reports.status.resolved": "Revisado",
+  "messages.connections": "Mis conexiones",
   "messages.new.action": "Mensaje nuevo",
   "messages.new.title": "A quien quiere escribirle?",
   "messages.new.search": "Buscar por nombre",

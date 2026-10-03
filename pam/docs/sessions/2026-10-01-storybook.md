@@ -427,3 +427,4 @@ Chromium.
 - D-243: `/person/saved/` (`SavedByView`) plus a row; "Programs attended in the past". Checked: build, config tests, e2e consent, join, directory, people-strip, admin and account: 204/204; screenshots.
 - D-244: week/month totals under the date; month list 32px from the grid, 56px rows (measured).
 - D-245: `TabBar homeIcon` (people / calendar); quick actions in 25% slots, left-aligned; Next visit stat with time. Screenshots checked.
+- D-246: `MessagesView floating`; member's "My connections" → `/connections/`. e2e messages re-run.

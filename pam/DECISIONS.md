@@ -5127,6 +5127,14 @@ the left at the same spacing instead of spreading across the row. A
 program lead's Next visit stat now shows the time too ("Oct 6," then
 "9:00 AM", kept together with no-break spaces).
 
+### D-246 — A member's Messages floats "My connections" above the tab bar
+
+Will, 3 October. On a member's Messages, a strip rests on the tab bar,
+**My connections**, which opens `/connections/`. It is the same
+`FloatingAction` a case manager's Home uses for "Invite someone" (D-226),
+rendered outside the page for the same reason. Staff don't get it; their
+people are on Home.
+
 ---
 
 ## Notes for whoever picks this up next

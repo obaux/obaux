@@ -658,6 +658,7 @@
   "reports.reason": "Reason: {reason}",
   "reports.status.open": "Waiting for review",
   "reports.status.resolved": "Looked at",
+  "messages.connections": "My connections",
   "messages.new.action": "New message",
   "messages.new.title": "Who do you want to message?",
   "messages.new.search": "Search by name",

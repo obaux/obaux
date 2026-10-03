@@ -57,6 +57,12 @@ export interface MessagesViewProps {
   readonly note?: string | null;
   /** Open in search mode (for a story). */
   readonly initialSearch?: string | null;
+  /**
+   * A row floating above the tab bar — a member's "My connections" (D-246),
+   * the way a case manager's Home floats "Invite someone". Rendered outside
+   * the page: its motion wrapper would pin a fixed child to itself.
+   */
+  readonly floating?: ReactNode;
 }
 
 const styles = stylex.create({
@@ -149,6 +155,7 @@ export function MessagesView({
   note,
   initialSearch = null,
   onNewMessage,
+  floating,
 }: MessagesViewProps) {
   const { t } = useI18n();
   const [query, setQuery] = useState<string | null>(initialSearch);
@@ -156,6 +163,7 @@ export function MessagesView({
   const shown = rows.filter((row) => matches(row, query ?? ''));
 
   return (
+    <>
     <Page gap={4}>
       {searching ? (
         <HStack gap={2} align="center" wrap="nowrap" xstyle={styles.searchRow}>
@@ -246,5 +254,7 @@ export function MessagesView({
         </VStack>
       ) : null}
     </Page>
+    {floating}
+    </>
   );
 }
