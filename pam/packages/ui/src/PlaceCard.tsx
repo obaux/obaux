@@ -74,6 +74,11 @@ export interface PlaceCardProps {
    * the stretched link so they take the tap. Only a super admin gets these.
    */
   readonly flagActions?: ReactNode;
+  /**
+   * A control in Save's place, top right — a case manager's round check on
+   * Connect (D-236). Sits above the card's stretched link, like Save.
+   */
+  readonly action?: ReactNode;
   readonly labels: {
     readonly save: string;
     readonly saved: string;
@@ -129,6 +134,7 @@ const styles = stylex.create({
    * stacking context so the shadow of a pressed card does not cover it.
    */
   actions: { position: 'relative', zIndex: 1, width: '100%' },
+  action: { position: 'relative', zIndex: 1, flexShrink: 0 },
   save: {
     position: 'relative',
     zIndex: 1,
@@ -151,6 +157,7 @@ export function PlaceCard({
   onSave,
   flagLabel,
   flagActions,
+  action,
   labels,
 }: PlaceCardProps) {
   return (
@@ -170,7 +177,9 @@ export function PlaceCard({
             then qualifies. An icon-only control with no name is the classic
             way to make a button invisible to somebody who cannot see it.
           */}
-          {onSave ? (
+          {action ? (
+            <HStack xstyle={styles.action}>{action}</HStack>
+          ) : onSave ? (
             <IconButton
               label={isSaved ? labels.saved : labels.save}
               icon={<BookmarkIcon isFilled={isSaved} />}

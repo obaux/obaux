@@ -86,7 +86,9 @@ const styles = stylex.create({
   },
   heading: { fontSize: '26px', lineHeight: 1.2, fontWeight: 700 },
   nav: { width: '100%' },
-  navLabel: { fontSize: '18px', fontWeight: 600, textAlign: 'center', flexGrow: 1 },
+  navMiddle: { flexGrow: 1, minWidth: 0 },
+  navLabel: { fontSize: '18px', fontWeight: 600, textAlign: 'center' },
+  navCount: { fontSize: '14px', lineHeight: '20px', minHeight: '20px', textAlign: 'center' },
   navButton: {
     width: '48px',
     height: '48px',
@@ -97,7 +99,6 @@ const styles = stylex.create({
     borderColor: colorVars['--color-border'],
     backgroundColor: colorVars['--color-background-body'],
   },
-  count: { fontSize: '16px' },
   dayHeading: { fontSize: '18px', lineHeight: 1.3 },
   time: { width: '76px', flexShrink: 0 },
   timeText: { fontSize: '17px', fontWeight: 700 },
@@ -336,9 +337,20 @@ export function ScheduleView({
                   icon={<Icon icon="chevronLeft" size="md" />}
                   xstyle={styles.navButton}
                 />
-                <Text xstyle={styles.navLabel} aria-live="polite">
-                  {navLabel}
-                </Text>
+                {/*
+                  The date, and under it how many are coming in, small (Will,
+                  3 October, D-236). The second line keeps its height in every
+                  view, so the date and the arrows never move when Day, Week
+                  and Month change places.
+                */}
+                <VStack gap={0} align="center" xstyle={styles.navMiddle}>
+                  <Text xstyle={styles.navLabel} aria-live="polite">
+                    {navLabel}
+                  </Text>
+                  <Text type="supporting" xstyle={styles.navCount}>
+                    {view === 'day' && dayList.length > 0 ? t('schedule.count', { count: dayList.length }) : ' '}
+                  </Text>
+                </VStack>
                 <IconButton
                   label={t(`schedule.next.${view}`)}
                   variant="ghost"
@@ -351,12 +363,7 @@ export function ScheduleView({
 
             {view === 'day' ? (
               dayList.length > 0 ? (
-                <VStack gap={1}>
-                  <Text type="supporting" xstyle={styles.count}>
-                    {t('schedule.count', { count: dayList.length })}
-                  </Text>
-                  <List aria-label={navLabel}>{dayList.map((a) => row(a))}</List>
-                </VStack>
+                <List aria-label={navLabel}>{dayList.map((a) => row(a))}</List>
               ) : (
                 <EmptyState
                   headingLevel={2}

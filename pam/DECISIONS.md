@@ -4990,6 +4990,27 @@ From Will, 3 October.
 - The prototype route for `/trips/new/` now renders the page rather than the
   view, so the link's query reaches it.
 
+### D-236 — Connect to… laid out like Explore; the schedule's count sits under its date
+
+From Will, 3 October.
+
+**Connect {name} to…** keeps the nested-page template, but search moves to
+a round button beside the bell. Tapping it replaces the top with the search
+pill and Cancel (by name or address), the same swap as a program's Home, so
+no bar takes the room otherwise. Under the title are Explore's category
+chips (All, School and training, …), in colour, then the place cards a member
+sees on Explore. Each card has a round check where Save would be
+(`PlaceCard action`). The chips row is sticky under the bar with a white
+fade beneath it, so the cards scroll under "Connect {name}". The check is
+exactly 48 by 48: the global touch floor had stretched a 40px circle into
+an oval. Checking still asks first (D-234).
+
+**The program lead's schedule.** "N coming in" sits under the date in the
+navigation row, at 14px, rather than above the list. That line keeps its
+height in Day, Week and Month (blank when there is no count), so the date
+and the arrows stay in the same place when the view changes (measured: the
+arrows sit at the same height in all three).
+
 ---
 
 ## Notes for whoever picks this up next
