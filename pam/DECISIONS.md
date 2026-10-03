@@ -5135,6 +5135,14 @@ Will, 3 October. On a member's Messages, a strip rests on the tab bar,
 rendered outside the page for the same reason. Staff don't get it; their
 people are on Home.
 
+### D-247 — Plan a trip's search opens Explore; a place's main button says "Plan a trip"
+
+Will, 3 October. The round search button on Plan a trip's first step goes
+to Explore (`/`), where every place can be searched, rather than opening a
+second, smaller search over the example list (D-235's in-place search is
+removed). A member's main button on a place now reads **Plan a trip**
+(`place.schedule`), matching the flow it opens; it was "Schedule a visit".
+
 ---
 
 ## Notes for whoever picks this up next

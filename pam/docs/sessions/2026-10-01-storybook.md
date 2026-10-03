@@ -428,3 +428,4 @@ Chromium.
 - D-244: week/month totals under the date; month list 32px from the grid, 56px rows (measured).
 - D-245: `TabBar homeIcon` (people / calendar); quick actions in 25% slots, left-aligned; Next visit stat with time. Screenshots checked.
 - D-246: `MessagesView floating`; member's "My connections" → `/connections/`. e2e messages re-run.
+- D-247: Plan a trip search → Explore; "Plan a trip" on a place. e2e place re-run.

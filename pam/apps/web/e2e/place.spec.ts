@@ -89,9 +89,9 @@ test.describe("a place's own screen", () => {
     await expect(page.getByRole('heading', { name: 'Kirkbride Center', level: 1 })).toHaveCount(1);
     await expect(page.getByText(/free or low cost for most people/)).toBeVisible();
 
-    // D-235: a member's one primary action is Schedule a visit, straight into
+    // D-235, D-247: a member's one primary action is Plan a trip, straight into
     // the New trip steps with this place chosen; Directions is the fourth circle.
-    await expect(page.getByRole('link', { name: 'Schedule a visit' })).toHaveAttribute(
+    await expect(page.getByRole('link', { name: 'Plan a trip' })).toHaveAttribute(
       'href',
       new RegExp(`/trips/new/\\?place=${PLACE.id}`),
     );

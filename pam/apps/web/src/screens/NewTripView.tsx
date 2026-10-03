@@ -13,7 +13,6 @@ import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { CATEGORY_DEFINITIONS, categoryLabelKey, type Category } from '@pam/config';
 import { DUMMY_PLACES_BY_ID, type DummySavedPlace } from '@pam/config/dummy-places';
 import { BigButton, ExploreIcon } from '@pam/ui';
-import { SearchField } from '@pam/ui/SearchPill';
 import { Icon } from '@astryxdesign/core/Icon';
 import { IconButton } from '@astryxdesign/core/IconButton';
 import { MenuList } from '@pam/ui/MenuList';
@@ -139,12 +138,6 @@ export function NewTripView({ initialPlace = null }: { readonly initialPlace?: T
   const [day, setDay] = useState<Date | null>(null);
   const [time, setTime] = useState<readonly [number, number] | null>(null);
   const [note, setNote] = useState('');
-  const [searching, setSearching] = useState(false);
-  const [query, setQuery] = useState('');
-  const shown = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    return q ? places.filter((p) => p.name.toLowerCase().includes(q)) : places;
-  }, [places, query]);
 
   const days = useMemo(() => nextWeekdays(10), []);
   const dayFmt = new Intl.DateTimeFormat(locale, { weekday: 'short', month: 'short', day: 'numeric' });
@@ -181,14 +174,13 @@ export function NewTripView({ initialPlace = null }: { readonly initialPlace?: T
       // Help on When either (Will). Check and Done keep Help.
       actions={
         step === 'where' ? (
+          // Search opens Explore, where every place can be searched (Will,
+          // 3 October, D-247) — rather than a second, smaller search here.
           <IconButton
-            label={t(searching ? 'trips.new.searchClose' : 'trips.new.search')}
-            icon={<Icon icon={searching ? 'close' : 'search'} size="md" />}
+            label={t('trips.new.search')}
+            icon={<Icon icon="search" size="md" />}
             variant="ghost"
-            onClick={() => {
-              setSearching((on) => !on);
-              setQuery('');
-            }}
+            href="/"
             xstyle={styles.round}
           />
         ) : step === 'when' ? undefined : (
@@ -201,25 +193,11 @@ export function NewTripView({ initialPlace = null }: { readonly initialPlace?: T
           <Text type="supporting" xstyle={styles.hint}>
             {t('trips.new.whereHint')}
           </Text>
-          {searching ? (
-            <SearchField
-              label={t('trips.new.search')}
-              placeholder={t('trips.new.searchPlaceholder')}
-              value={query}
-              onChange={setQuery}
-              hasAutoFocus
-            />
-          ) : null}
-          {shown.length === 0 ? (
-            <Text type="supporting" xstyle={styles.hint}>
-              {t('trips.new.none')}
-            </Text>
-          ) : null}
           <MenuList
             label={t('trips.new.where')}
             hasDividers
             items={[
-              ...shown.map((p) => ({
+              ...places.map((p) => ({
               id: p.id,
               label: p.name,
               description: t(categoryLabelKey(p.category)),
