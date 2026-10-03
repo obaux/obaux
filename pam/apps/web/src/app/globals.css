@@ -281,6 +281,17 @@
     font-weight: 600;
   }
 
+  /*
+   * Segmented controls are pills, inside and out (Will, 3 October, D-233):
+   * the segments and the sliding highlight match the round search bar, chips
+   * and buttons. Astryx has no prop for the segment's radius.
+   */
+  .astryx-segmented-control,
+  .astryx-segmented-control > .astryx-segmented-control-item,
+  .astryx-segmented-control > div {
+    border-radius: 999px;
+  }
+
   @media (prefers-reduced-motion: reduce) {
     *,
     *::before,

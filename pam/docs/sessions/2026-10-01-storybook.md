@@ -414,3 +414,4 @@ Chromium.
 - D-230: `MapDrawer` handle overlays the header plus a sticky fade; `TripCard` one-line 17px name and 14px art radius; `NotificationList` New/Earlier sections with icon, title (`notify.kind.*`) and dot. e2e admin, messages and people-strip: 129/129.
 - D-231: `/person/` uses `ProfileSummary` (new `corner`) and `MenuList` rows (new `badge`); `DummyConversation.unreadCount`; new `/person/connect/` (`ConnectView`) plus stories (CM "A member with new messages", "Connect a member to a program"); bell only in the header. The UI unit test for new notifications now looks for the dot (D-230 broke it on a05ffa3; fixed here). Full e2e 507/507; config 231, ui 66, web 8.
 - D-232: `.astryx-bottom-sheet` top corners 28px (measured in Storybook).
+- D-233: `LargeTitleHeader titleAccessory`; Saved switch on the title line; segmented controls are pills (`globals.css`). e2e saved, admin and people-strip: 93/93.

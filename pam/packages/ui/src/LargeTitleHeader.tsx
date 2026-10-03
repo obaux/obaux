@@ -25,6 +25,11 @@ export interface LargeTitleHeaderProps {
   readonly title: string;
   /** Right-hand actions — the notifications bell and Help. Each 48px. */
   readonly actions?: ReactNode;
+  /**
+   * Sits on the large title's line, at its end — a case manager's People /
+   * Programs switch on Saved (Will, 3 October, D-233).
+   */
+  readonly titleAccessory?: ReactNode;
 }
 
 const COLLAPSE_AT = 40;
@@ -56,9 +61,11 @@ const styles = stylex.create({
   // Large and bold, like the reference: the screen says where you are before
   // anything else on it does.
   large: { fontSize: '34px', lineHeight: 1.15, fontWeight: 700, paddingBlockEnd: '8px' },
+  titleRow: { width: '100%', paddingBlockEnd: '8px' },
+  largeInRow: { paddingBlockEnd: '0px', minWidth: 0 },
 });
 
-export function LargeTitleHeader({ title, actions }: LargeTitleHeaderProps) {
+export function LargeTitleHeader({ title, actions, titleAccessory }: LargeTitleHeaderProps) {
   const [collapsed, setCollapsed] = useState(false);
 
   useEffect(() => {
@@ -84,9 +91,18 @@ export function LargeTitleHeader({ title, actions }: LargeTitleHeaderProps) {
           {actions}
         </HStack>
       </HStack>
-      <Heading level={1} xstyle={styles.large}>
-        {title}
-      </Heading>
+      {titleAccessory ? (
+        <HStack align="center" justify="between" wrap="nowrap" gap={4} xstyle={styles.titleRow}>
+          <Heading level={1} xstyle={[styles.large, styles.largeInRow]}>
+            {title}
+          </Heading>
+          {titleAccessory}
+        </HStack>
+      ) : (
+        <Heading level={1} xstyle={styles.large}>
+          {title}
+        </Heading>
+      )}
     </>
   );
 }

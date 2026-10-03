@@ -49,7 +49,7 @@ export interface SavedViewProps {
   readonly headerActions?: ReactNode;
   readonly failed?: boolean;
   readonly supportPhone?: string | null;
-  /** Under the title — a case manager's People / Programs switch (D-218). */
+  /** On the title's line — a case manager's People / Programs switch (D-218, D-233). */
   readonly switcher?: ReactNode;
   /** Drawn instead of the saved places — a case manager's starred people. */
   readonly replace?: ReactNode;
@@ -60,6 +60,10 @@ export interface SavedViewProps {
 const ART = { width: 52, height: 52, 'aria-hidden': true } as const;
 
 const styles = stylex.create({
+  // The People / Programs switch as one round pill, like the search bar and
+  // the chips (Will, 3 October, D-233); its two segments are rounded in
+  // globals.css, which Astryx's segment has no prop for.
+  pills: { borderRadius: '999px', flexShrink: 0 },
   edit: {
     minHeight: '48px',
     borderRadius: '999px',
@@ -94,6 +98,7 @@ export function SavedView({
     <Page gap={4}>
       <LargeTitleHeader
         title={t('saved.tab.title')}
+        titleAccessory={switcher}
         actions={
           <>
             {places.length > 0 ? (
@@ -108,8 +113,6 @@ export function SavedView({
           </>
         }
       />
-
-      {switcher}
 
       {replace}
 
@@ -215,8 +218,8 @@ export function SavedScreen() {
             label={t('saved.tab.title')}
             value={pane}
             onChange={(next) => setPane(next as 'people' | 'programs')}
-            layout="fill"
-            size="lg"
+            size="md"
+            xstyle={styles.pills}
           >
             <SegmentedControlItem value="people" label={t('saved.pane.people')} />
             <SegmentedControlItem value="programs" label={t('saved.pane.programs')} />

@@ -4935,6 +4935,16 @@ Will, 3 October, on the New message sheet. The corners are set once in
 D-229, so every BottomSheet in PAM matches `MapDrawer`. Astryx's own radius
 was tighter, and the two drawers looked like different things.
 
+### D-233 — The case manager's People / Programs switch sits on the title's line, as a pill
+
+Will, 3 October, on Saved. The switch now sits at the end of the "Saved"
+line, only as wide as its two words, 16px clear of the title
+(`LargeTitleHeader` gained `titleAccessory`). It no longer fills a full-width
+row under the title. Every segmented control is now a pill inside and out:
+the frame, both segments and the sliding highlight. That is set once in
+`globals.css`, because Astryx has no radius prop for a segment, so the
+program lead's Day / Week / Month switch matches too.
+
 ---
 
 ## Notes for whoever picks this up next
