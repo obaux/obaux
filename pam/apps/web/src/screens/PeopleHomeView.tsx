@@ -18,6 +18,7 @@ import type { SearchSource } from '@astryxdesign/core/Typeahead';
 import { NOTICES } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { PersonRow } from '../app/PersonRow';
+import { ConfirmDialog } from './ConfirmDialog';
 
 /**
  * A staff member's home since the redesign (D-212): their people, under the
@@ -97,6 +98,14 @@ const styles = stylex.create({
   star: { width: '48px', height: '48px', color: colorVars['--color-text-secondary'] },
   message: { width: '48px', height: '48px', color: colorVars['--color-icon-accent'] },
   starOn: { color: colorVars['--color-icon-accent'] },
+  // Edit mode on Saved (D-255): a ring in the accent colour, so the stars
+  // read as the thing to tap.
+  starRinged: {
+    borderRadius: '50%',
+    borderWidth: '2px',
+    borderStyle: 'solid',
+    borderColor: colorVars['--color-icon-accent'],
+  },
 });
 
 const matches = (person: HomePerson, text: string) => {
@@ -248,28 +257,58 @@ export function PeopleHomeView({
   );
 }
 
-/** A star that is a button, said as one (`aria-pressed`). */
+/**
+ * A star that is a button, said as one (`aria-pressed`).
+ *
+ * Taking a star off always asks first (Will, 3 October, D-255: "show modal
+ * for any unstar action") when `name` is given — starring never does; it is
+ * the undo that loses something. `isRinged` draws a ring round it, Saved's
+ * Edit mode saying "these are what you tap".
+ */
 export function StarToggle({
   isOn,
   label,
   onToggle,
+  name,
+  isRinged = false,
 }: {
   readonly isOn: boolean;
   readonly label: string;
   readonly onToggle: () => void;
+  /** Whose star: set, and taking it off asks first. */
+  readonly name?: string;
+  readonly isRinged?: boolean;
 }) {
+  const { t } = useI18n();
+  const [asking, setAsking] = useState(false);
   return (
-    <IconButton
-      label={label}
-      variant="ghost"
-      aria-pressed={isOn}
-      onClick={onToggle}
-      icon={
-        <HStack>
-          <StarIcon width={26} height={26} isFilled={isOn} aria-hidden />
-        </HStack>
-      }
-      xstyle={[styles.star, isOn && styles.starOn]}
-    />
+    <>
+      <IconButton
+        label={label}
+        variant="ghost"
+        aria-pressed={isOn}
+        onClick={() => (isOn && name ? setAsking(true) : onToggle())}
+        icon={
+          <HStack>
+            <StarIcon width={26} height={26} isFilled={isOn} aria-hidden />
+          </HStack>
+        }
+        xstyle={[styles.star, isOn && styles.starOn, isRinged && styles.starRinged]}
+      />
+      {name ? (
+        <ConfirmDialog
+          isOpen={asking}
+          title={t('people.unstar.title', { name })}
+          body={t('people.unstar.body')}
+          confirmLabel={t('people.unstar.yes')}
+          onConfirm={() => {
+            setAsking(false);
+            onToggle();
+          }}
+          cancelLabel={t('people.unstar.no')}
+          onCancel={() => setAsking(false)}
+        />
+      ) : null}
+    </>
   );
 }

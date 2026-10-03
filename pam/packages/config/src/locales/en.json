@@ -943,5 +943,15 @@
   "invite.link.copied": "Link copied",
   "invite.link.code": "On the phone? Read them this code instead: {code}",
   "invite.link.message": "You're invited to PAM. Sign in here: {url}",
-  "invite.link.label": "The invite link"
+  "invite.link.label": "The invite link",
+  "people.unstar.title": "Take the star off {name}?",
+  "people.unstar.body": "They stay on your list on Home. You can star them again any time.",
+  "people.unstar.yes": "Take the star off",
+  "people.unstar.no": "Keep the star",
+  "saved.leave.people.title": "Take the star off {names}?",
+  "saved.leave.programs.title": "Remove {names} from Saved?",
+  "saved.leave.body": "You marked these while editing. Remove them, or put them back.",
+  "saved.leave.remove": "Remove",
+  "saved.leave.putBack": "Put them back",
+  "saved.leave.stay": "Keep editing"
 }

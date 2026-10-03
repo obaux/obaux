@@ -170,7 +170,8 @@ test.describe('the way out', () => {
     await page.getByRole('radio', { name: 'Pittsburgh' }).click();
     await page.getByRole('button', { name: 'A case manager' }).click();
 
-    await expect(page.getByText('P3TWVWTW')).toBeVisible();
+    // A link to the invite Sign in, for a case manager (D-254).
+    await expect(page.getByText(/\/signin\/\?invite=P3TWVWTW&as=case-manager/)).toBeVisible();
     expect(asked[0]).toMatchObject({ p_role: 'admin', p_region_id: 'r-pit' });
   });
 

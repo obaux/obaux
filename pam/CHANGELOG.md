@@ -29,7 +29,9 @@ bottom of the screen. Every button is now a fully rounded pill. The
 language button is a white circle like the others, and the first sign-in
 picture is a little darker so the logo stands out. Invites are now links: one tap sends
 it by text, and the person invited lands on Sign in with a line saying what
-they were invited to be, pictures about their own work, and a shorter form.
+they were invited to be, pictures about their own work, and a shorter form. On
+Saved, removing things waits until you press Done, and PAM asks before you
+leave with changes waiting or take a star off someone.
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 

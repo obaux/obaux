@@ -374,6 +374,7 @@ function PersonScreen() {
               isOn={starred.ids.has(person.id)}
               label={t(starred.ids.has(person.id) ? 'people.unstar' : 'people.star', { name: person.firstName })}
               onToggle={() => starred.toggle(person.id)}
+              name={person.firstName ?? ''}
             />
           ) : undefined
         }

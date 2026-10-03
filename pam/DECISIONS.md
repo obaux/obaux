@@ -5366,6 +5366,42 @@ came out of this):
   manager reading a code. Whether to push links to members too is a call
   for Will.
 
+### D-255 — Saved: Edit alone at the top; removals wait for Done; taking a star off always asks
+
+Will, 3 October, on a case manager's Saved: "only Edit is needed in top
+right. If edit on Saved people, highlight ring around the star buttons… If
+edit on programs, after they delete something, make the Done button
+primary, and only let them leave the page once Done is pressed. If they
+switch tabs, show a modal confirming action. If a case manager unstars
+someone, also confirm with a modal — for any unstar action, whether from
+Edit or not. Use the same pattern on People."
+
+- **Top right is Edit alone.** A case manager's bell and Help are gone from
+  Saved, as a member's went in D-224.
+- **Edit holds removals until Done.**
+  - Programs: a × hides the program.
+  - People: the stars get an accent ring, and a star tapped off dims the row
+    and outlines the star. Tapping it again keeps the person.
+  - Done turns **primary** the moment anything is waiting.
+  - In Programs, Done removes them.
+  - In People, Done asks first, because taking a star off always asks.
+- **Leaving with removals waiting asks: Remove, Put them back, or Keep
+  editing.** "Leaving" means the People / Programs switch, the tab bar, or
+  any link (`useLeaveGuard`: a `window` capture-phase click handler, so it
+  runs before Next's `<Link>` and the prototype's own handler). Edit with
+  nothing waiting leaves quietly.
+- **Taking a star off asks, everywhere.** `StarToggle` takes the person's
+  `name` and then confirms "Take the star off {name}?" (on Saved, and in the
+  corner of a member's page). Starring never asks.
+- One dialog for all of these, `ConfirmDialog` (`data-pam-dialog="confirm"`,
+  the 32px corners and 80% white wash from D-234).
+- A member's Saved runs on the same screen, so it gets the same Edit: Done
+  goes primary after a removal, and leaving asks. That consistency is
+  deliberate, not a side effect.
+
+Also in this commit: `account.spec.ts`'s directory invite test now looks for
+the link (D-254). It still matched the old code-only card.
+
 ---
 
 ## Notes for whoever picks this up next

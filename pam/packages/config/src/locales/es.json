@@ -943,5 +943,15 @@
   "invite.link.copied": "Enlace copiado",
   "invite.link.code": "¿Por teléfono? Léale este código: {code}",
   "invite.link.message": "Le invitaron a PAM. Entre aquí: {url}",
-  "invite.link.label": "El enlace de la invitación"
+  "invite.link.label": "El enlace de la invitación",
+  "people.unstar.title": "¿Quitarle la estrella a {name}?",
+  "people.unstar.body": "Sigue en su lista de Inicio. Puede volver a marcarle con estrella cuando quiera.",
+  "people.unstar.yes": "Quitar la estrella",
+  "people.unstar.no": "Dejar la estrella",
+  "saved.leave.people.title": "¿Quitarle la estrella a {names}?",
+  "saved.leave.programs.title": "¿Quitar {names} de Guardados?",
+  "saved.leave.body": "Los marcó mientras editaba. Quítelos, o déjelos como estaban.",
+  "saved.leave.remove": "Quitar",
+  "saved.leave.putBack": "Dejarlos como estaban",
+  "saved.leave.stay": "Seguir editando"
 }

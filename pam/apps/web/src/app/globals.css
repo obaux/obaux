@@ -315,13 +315,13 @@
    * The recommend dialog on Connect (D-234): 32px corners, and the page
    * behind washed to 80% white instead of darkened (Will, 3 October).
    */
-  dialog[data-pam-dialog='recommend'],
-  [data-pam-dialog='recommend'] .astryx-dialog,
-  .astryx-dialog[data-pam-dialog='recommend'] {
+  dialog:is([data-pam-dialog='recommend'], [data-pam-dialog='confirm']),
+  :is([data-pam-dialog='recommend'], [data-pam-dialog='confirm']) .astryx-dialog,
+  .astryx-dialog:is([data-pam-dialog='recommend'], [data-pam-dialog='confirm']) {
     border-radius: 32px;
   }
 
-  dialog[data-pam-dialog='recommend']::backdrop {
+  dialog:is([data-pam-dialog='recommend'], [data-pam-dialog='confirm'])::backdrop {
     background-color: rgb(255 255 255 / 80%);
   }
 

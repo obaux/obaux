@@ -6,12 +6,18 @@ import { asRedesign } from '../../journeys/journey';
 
 /**
  * Saved on the tab-screen frame (D-213): places two to a row, a placeholder
- * picture each. Edit (top right) puts a × on each to unsave; Done ends it.
+ * picture each. Edit (top right) puts a × on each; removals wait for Done,
+ * and leaving with any waiting asks first (D-255).
  */
 const meta = {
   title: 'Member app/States/Saved',
   component: SavedView,
-  args: { state: { status: 'ready', places: [] }, onUnsave: fn(), headerActions: <HeaderActions /> },
+  args: {
+    state: { status: 'ready', places: [] },
+    onUnsave: fn(),
+    headerActions: <HeaderActions />,
+    edit: { isOn: false, isDirty: false, isAvailable: false, onEdit: fn(), onDone: fn() },
+  },
 } satisfies Meta<typeof SavedView>;
 
 export default meta;
