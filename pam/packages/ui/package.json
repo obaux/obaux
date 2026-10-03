@@ -20,6 +20,7 @@
     "./SearchPill": "./src/SearchPill.tsx",
     "./FloatingAction": "./src/FloatingAction.tsx",
     "./CategoryChips": "./src/CategoryChips.tsx",
+    "./SuccessScreen": "./src/SuccessScreen.tsx",
     "./SubPage": "./src/SubPage.tsx",
     "./ConnectionCard": "./src/ConnectionCard.tsx",
     "./SavedGrid": "./src/SavedGrid.tsx",

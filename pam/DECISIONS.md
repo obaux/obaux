@@ -5038,6 +5038,24 @@ and so does the a11y test. This amends §2.5 (SOP amendment A16; the CLAUDE.md
 rule updated). Small inline buttons, such as Copy beside an invite code, keep
 their own size.
 
+### D-240 — A success template: centred, no bar, confetti once, a quiet way on
+
+Will, 3 October, on Connect's done screen. `SuccessScreen` (`@pam/ui`) is a
+moment, not a page to work on. It has no back, no bell and no Help: the
+title and a sentence sit centred in the middle of the screen, then one
+secondary button sized to its words ("Return home", at the shared 56px
+height from D-239), then an optional quiet note. Confetti falls once from
+the top to the bottom, about 2.5 to 4 seconds, in the theme's bright data
+palette (`--color-data-*-3`), because the icon colours are deliberately
+dark. It is hidden from screen readers, never takes a tap, and stops for
+anyone who asked for reduced motion (the global rule). The words are a
+`status`, so the news is announced.
+
+Connect's copy: "You're helping {name} on their way!", then "{program} is
+recommended to {name}. They will see it on their Home and can say yes when
+they are ready." No Help on this screen is deliberate (Will): its only way
+on leads Home, where Help is.
+
 ---
 
 ## Notes for whoever picks this up next

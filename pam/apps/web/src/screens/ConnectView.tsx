@@ -15,6 +15,7 @@ import { BigButton, Loading, Page, PlaceCard } from '@pam/ui';
 import { CategoryChips, type CategoryChip, type ChipTone } from '@pam/ui/CategoryChips';
 import { SearchField } from '@pam/ui/SearchPill';
 import { SubPageHeader } from '@pam/ui/SubPage';
+import { SuccessScreen } from '@pam/ui/SuccessScreen';
 import { CATEGORY_LIST, distanceLabel, type Category } from '@pam/config';
 import { DUMMY_PLACES_BY_ID } from '@pam/config/dummy-places';
 import { useI18n } from '@/lib/i18n';
@@ -124,8 +125,8 @@ const styles = stylex.create({
   },
   note: { fontSize: '15px', lineHeight: 1.5 },
   none: { fontSize: '17px' },
-  doneTitle: { fontSize: '22px', lineHeight: 1.3, fontWeight: 700 },
-  intro: { fontSize: '17px', lineHeight: 1.45 },
+  // Secondary and sized to its words, at the shared button height (D-239).
+  home: { minHeight: '56px', fontSize: '17px', paddingInline: '28px', borderRadius: '12px' },
   dialogTitle: { fontSize: '22px', lineHeight: 1.3 },
   dialogBody: { fontSize: '17px', lineHeight: 1.45 },
 });
@@ -202,23 +203,18 @@ export function ConnectView({ personId, name }: { readonly personId: string; rea
     />
   );
 
+  // Done (D-240): the success template — no bar, centred, confetti — and
+  // one quiet way on, home.
   if (recommended) {
     return (
-      <Page gap={4}>
-        {header(false)}
-        <VStack gap={3}>
-          <Text xstyle={styles.doneTitle} role="status">
-            {t('person.connect.done.title', { name, program: recommended.name })}
-          </Text>
-          <Text type="supporting" xstyle={styles.intro}>
-            {t('person.connect.done.body', { name })}
-          </Text>
-          <BigButton label={t('person.connect.back', { name })} href={back} />
-        </VStack>
-        <Text type="supporting" xstyle={styles.note}>
-          {t('person.connect.example')}
-        </Text>
-      </Page>
+      <SuccessScreen
+        title={t('person.connect.done.title', { name })}
+        body={t('person.connect.done.body', { name, program: recommended.name })}
+        action={
+          <Button label={t('person.connect.done.home')} variant="secondary" href="/" xstyle={styles.home} />
+        }
+        note={t('person.connect.example')}
+      />
     );
   }
 

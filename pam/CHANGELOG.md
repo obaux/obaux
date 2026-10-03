@@ -15,7 +15,8 @@ of new messages) and connect them to a program. Connecting now starts with a sea
 before recommending. A place's main button is "Schedule a visit", which goes
 straight into planning a trip, and Back in that flow goes back one step. Connecting a member to a program now looks like
 Explore, with category chips and the same place cards, and search tucked
-behind a button.
+behind a button. Recommending a program ends on a short celebration, with
+confetti and a way home.
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 
