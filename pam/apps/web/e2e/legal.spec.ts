@@ -79,4 +79,22 @@ test.describe('the way in points at them', () => {
     await expect(page.getByRole('link', { name: en['legal.privacy'] })).toBeVisible();
     await expect(page.getByRole('link', { name: en['legal.terms'] })).toBeVisible();
   });
+
+  test('Back from a document opened at Sign in returns to Sign in, not Legal (D-250)', async ({ page }) => {
+    await page.goto('/signin/');
+    await page.getByRole('link', { name: en['legal.privacy'] }).click();
+    await expect(page).toHaveURL(/\/privacy\/\?from=signin/);
+    // Hopping to the other document keeps where it all started.
+    await page.getByRole('link', { name: en['legal.terms'] }).last().click();
+    await expect(page).toHaveURL(/\/terms\/\?from=signin/);
+    await page.getByRole('button', { name: en['nav.back.signInScreen'] }).click();
+    await expect(page).toHaveURL(/\/privacy\/\?from=signin/);
+    await page.getByRole('button', { name: en['nav.back.signInScreen'] }).click();
+    await expect(page).toHaveURL(/\/signin\/$/);
+  });
+
+  test('opened on its own, a document still goes back to Legal', async ({ page }) => {
+    await page.goto('/privacy/');
+    await expect(page.getByRole('link', { name: en['nav.back.legal'] })).toHaveAttribute('href', '/legal/');
+  });
 });

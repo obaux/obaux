@@ -12,9 +12,8 @@ const meta = { title: 'Program lead/Prototype' } satisfies Meta;
 export default meta;
 
 /**
- * Starts at Sign in (D-248): pressing "Send me a code" goes straight to this
- * role's Home, signed in — so the whole app can be previewed from the door.
+ * Starts at Sign in (D-249): "Send me a code" carries on into the whole of
+ * joining as this kind of person — any code works, nothing is written — and
+ * ends at Home, signed in, where every tap goes where it would on a phone.
  */
-export const SignIn: StoryObj = screen('provider', 'Sign in', '/prototype/signin/');
-
-export const Prototype: StoryObj = screen('provider', 'Prototype', '/');
+export const Prototype: StoryObj = screen('provider', 'Prototype', '/prototype/signin/', { kind: 'provider' });

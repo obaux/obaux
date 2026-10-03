@@ -294,6 +294,10 @@ only, nothing stored). **Transparency changed (D-242):** members are now told
 a program they joined sees the last day they used PAM; the database does not
 expose it to programs yet (a follow-up migration needs Will's go-ahead), so it
 shows for example people only. Members should be told before it is real.
+Each role's Storybook Prototype now starts at Sign in and walks through that
+role's whole onboarding to Home (D-249; the join screen has a Storybook-only
+`preview`). Privacy and Terms opened from Sign in or joining go Back there
+(D-250).
 
 This is the handover document: what exists, what is proven, what is live, and
 what the next person needs to know before touching anything.

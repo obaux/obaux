@@ -18,7 +18,8 @@ import { SubPageHeader } from '@pam/ui/SubPage';
  *     last step) arrive through `parameters.nextjs.navigation`, wired to
  *     `prototypeRouter` below.
  *   - **`navigate()`** (`src/lib/navigate.ts`) announces `pam:navigate`
- *     first; this cancels it.
+ *     first; this cancels it. **`goBack()`** likewise announces `pam:back`
+ *     (D-250) — the Storybook router mock never forwards `router.back`.
  *
  * Which screen a path shows comes from Next's own path and search-param
  * contexts, set here — so `useSearchParams()` on the place screen reads the
@@ -108,11 +109,17 @@ export function PrototypeApp({ routes, start, chrome, first }: PrototypeAppProps
       event.preventDefault();
       go(String((event as CustomEvent<string>).detail), 'push');
     };
+    const onBack = (event: Event) => {
+      event.preventDefault();
+      go('', 'back');
+    };
     document.addEventListener('click', onClick, true);
     window.addEventListener('pam:navigate', onNavigate);
+    window.addEventListener('pam:back', onBack);
     return () => {
       document.removeEventListener('click', onClick, true);
       window.removeEventListener('pam:navigate', onNavigate);
+      window.removeEventListener('pam:back', onBack);
     };
   }, [go]);
 

@@ -298,8 +298,8 @@ export function SignInScreen({ preview = null }: { readonly preview?: SignInPrev
         reads.
       */}
       <HStack gap={2} justify="center" wrap="wrap">
-        <TextLink label={t('legal.privacy')} href="/privacy/" size="quiet" />
-        <TextLink label={t('legal.terms')} href="/terms/" size="quiet" />
+        <TextLink label={t('legal.privacy')} href="/privacy/?from=signin" size="quiet" />
+        <TextLink label={t('legal.terms')} href="/terms/?from=signin" size="quiet" />
       </HStack>
     </Page>
   );

@@ -5158,6 +5158,54 @@ screen moved into `app/signin/SignInScreen.tsx`, which takes an optional
 live sign-in is unchanged. The member's "Not signed in" story, the real
 two-step flow against the pretend database, stays.
 
+### D-249 — A role's prototype starts at Sign in and walks through that role's whole onboarding
+
+Will, 3 October: "Let's have the prototype start with Sign in, and instead of
+sign in as an item above prototype, we can have sign in show the full
+onboarding experience for that user type." Supersedes the separate Sign in
+story of D-248. Each role's **Prototype** story now opens on
+`/prototype/signin/?kind=…`; "Send me a code" carries on to
+`/prototype/join/?kind=…` (`PrototypeJoin`), the real join screen in a
+preview mode, and its last step goes Home as the story's role:
+
+- **Member:** code → About you → What others can see → Text messages → You are in → Home.
+- **Program lead:** code → About you → Your program (pre-filled with an
+  example) → What to expect → You are in → Home.
+- **Case manager:** code → About you → What you will see → You are in → Home.
+- **Super admin:** Sign in → Home. A super admin is never onboarded through
+  the app (the seeding script makes them), so there is nothing to show.
+
+The join screen moved into `app/join/JoinScreen.tsx` (Next pages cannot take
+props; `page.tsx` renders it with none, so the live join is unchanged). Its
+`preview` (`kind`, `firstName`, `phone`) swaps the phone flow for
+`usePreviewSignIn` (any code works, nothing sent), moves each step on as if
+the database had said yes, and treats staff as **approved, as if invited** —
+so they finish on "I understand" and reach Home, not on the
+waiting-for-review notice a self-claimed staff sign-up really sees. The
+review path is still in the real flow and its e2e; the prototype shows the
+happy path. Because the number was given on Sign in, onboarding opens on the
+code. The member's separate "Not signed in" story is gone; the prototype's
+first screen is that.
+
+Found on the way: Storybook's router mock never forwards `router.replace`/
+`back` to the prototype, so the preview's last step uses `navigate('/')`.
+
+### D-250 — A policy page opened from Sign in or joining goes Back there
+
+Will, 3 October: from the sign-in screen, the Privacy and Terms links show
+the right page, "but if they go back, it should return to sign in screen".
+Back on those pages always went to Legal — which somebody not yet signed in
+has never seen. Now the links on Sign in and on joining carry `?from=signin`
+/ `?from=join`; the page reads it (inside a `Suspense`, so the page stays
+static and renders the Legal back until hydrated), labels Back "Back to Sign
+in" / "Back to joining", and goes back one screen — to the screen as it was
+left, a typed number still there — through `goBack()` in `lib/navigate.ts`.
+`goBack` announces `pam:back` first, which the Storybook prototype answers
+(the router mock does not forward `back`), then uses `history.back()`, or
+the `from` screen if the page was opened directly. Hopping from Privacy to
+Terms keeps `from`, so two Backs reach Sign in. Opened any other way, Back
+still goes to Legal. e2e: `legal.spec.ts` covers both.
+
 ---
 
 ## Notes for whoever picks this up next

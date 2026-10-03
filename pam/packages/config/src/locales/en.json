@@ -812,6 +812,8 @@
   "viewAs.intro": "Look at PAM the way each kind of account sees it. Only what is drawn changes — every list still comes from your own account.",
   "nav.back.viewAs": "Back to See the app as",
   "nav.back.signin": "Back to your phone number",
+  "nav.back.signInScreen": "Back to Sign in",
+  "nav.back.joinScreen": "Back to joining",
   "tab.program": "Program",
   "people.star": "Star {name}",
   "people.unstar": "Unstar {name}",

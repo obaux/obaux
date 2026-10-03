@@ -23,6 +23,7 @@ import RequestsPage from '../../app/requests/page';
 import SavedPage from '../../app/saved/page';
 import SignInPage from '../../app/signin/page';
 import { PrototypeSignIn } from './PrototypeSignIn';
+import { PrototypeJoin } from './PrototypeJoin';
 import TermsPage from '../../app/terms/page';
 import { ProfileScreen } from '../../screens/ProfileScreen';
 import { ViewAsView } from '../../screens/ViewAsView';
@@ -57,8 +58,10 @@ const screen = (render: () => ReactNode): PrototypeRoute => ({ render });
 export const APP_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   '/': screen(() => <HomePage />),
   '/signin/': screen(() => <SignInPage />),
-  // Sign in that goes straight Home as the story's role (D-248).
+  // Where each role's prototype starts (D-248, D-249): Sign in, then that
+  // role's onboarding, then Home.
   '/prototype/signin/': screen(() => <PrototypeSignIn />),
+  '/prototype/join/': screen(() => <PrototypeJoin />),
   '/join/': screen(() => <JoinPage />),
   '/reminders/': screen(() => <RemindersPage />),
   '/places/': screen(() => <PlacesPage />),

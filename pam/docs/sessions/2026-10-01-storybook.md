@@ -430,3 +430,5 @@ Chromium.
 - D-246: `MessagesView floating`; member's "My connections" → `/connections/`. e2e messages re-run.
 - D-247: Plan a trip search → Explore; "Plan a trip" on a place. e2e place re-run.
 - D-248: `SignInScreen` (+ `preview`), `PrototypeSignIn`, Sign in story per role prototype; verified each lands on its Home. e2e consent and join: 123/123.
+- D-249: each role's Prototype starts at Sign in and runs that role's onboarding (`JoinScreen` + `preview`, `usePreviewSignIn`, `PrototypeJoin`, route `/prototype/join/`); Sign in and member "Not signed in" stories removed; super admin goes Sign in → Home. Verified by a scripted walk-through to Home for member, program lead and case manager.
+- D-250: Privacy/Terms opened from Sign in or joining go Back there (`?from=`, `goBack()` + `pam:back` in the prototype). Checked: typecheck, web build, Storybook walk-through, config tests, e2e join, consent, legal and a11y: 156/156, plus 2 new legal tests.

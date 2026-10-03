@@ -812,6 +812,8 @@
   "viewAs.intro": "Mira PAM como lo ve cada tipo de cuenta. Solo cambia lo que se muestra: cada lista sigue viniendo de tu propia cuenta.",
   "nav.back.viewAs": "Volver a Ver la app como",
   "nav.back.signin": "Volver a tu número de teléfono",
+  "nav.back.signInScreen": "Volver a Entrar",
+  "nav.back.joinScreen": "Volver a registrarte",
   "tab.program": "Programa",
   "people.star": "Marcar a {name} con estrella",
   "people.unstar": "Quitar la estrella a {name}",

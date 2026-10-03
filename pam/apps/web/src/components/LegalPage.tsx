@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { VStack } from '@astryxdesign/core/VStack';
 import { Heading } from '@astryxdesign/core/Heading';
@@ -9,7 +9,9 @@ import { Button } from '@astryxdesign/core/Button';
 import { Page, TextLink } from '@pam/ui';
 import { SubPageHeader } from '@pam/ui/SubPage';
 import type { LegalDocument } from '@pam/config';
+import { useSearchParams } from 'next/navigation';
 import { useI18n } from '@/lib/i18n';
+import { goBack } from '@/lib/navigate';
 
 /**
  * A long page somebody can actually find their way around.
@@ -132,12 +134,9 @@ export function LegalPage({ doc }: { doc: LegalDocument }) {
   return (
     <Page width="read">
         {/* The nested-page template (D-213): these open from Legal. */}
-        <SubPageHeader
-          title={t(doc.titleKey)}
-          titleId="top"
-          backHref="/legal/"
-          backLabel={t('nav.back.legal')}
-        />
+        <Suspense fallback={<LegalHeader doc={doc} door={null} />}>
+          <LegalHeaderFromUrl doc={doc} />
+        </Suspense>
         <Text xstyle={styles.intro}>{t(doc.introKey)}</Text>
         <Text type="supporting" xstyle={styles.updated}>
           {t(doc.updatedKey)}
@@ -189,12 +188,65 @@ export function LegalPage({ doc }: { doc: LegalDocument }) {
         {/* Never dead-end (§0): back up the page, a way on, and a way to a person. */}
         <VStack gap={1}>
           <TextLink label={t('legal.backToTop')} href="#top" />
-          <TextLink
-            label={doc.id === 'privacy' ? t('legal.terms') : t('legal.privacy')}
-            href={doc.id === 'privacy' ? '/terms/' : '/privacy/'}
-          />
+          <Suspense fallback={<OtherDocument doc={doc} door={null} />}>
+            <OtherDocumentFromUrl doc={doc} />
+          </Suspense>
           <TextLink label={t('help.title')} href="/help/" />
         </VStack>
     </Page>
   );
+}
+
+/**
+ * Where a legal page was opened from (Will, 3 October, D-250). From Sign in
+ * or from joining, Back returns there — to the screen as it was left, the
+ * number still typed — not to Legal: somebody who is not in yet has no Legal
+ * to go back to. Read from `?from=`, so the page itself stays static.
+ */
+type Door = 'signin' | 'join' | null;
+
+function useDoor(): Door {
+  const from = useSearchParams()?.get('from');
+  return from === 'signin' || from === 'join' ? from : null;
+}
+
+function LegalHeader({ doc, door }: { doc: LegalDocument; door: Door }) {
+  const { t } = useI18n();
+  const fallback = door === 'signin' ? '/signin/' : door === 'join' ? '/join/' : '/legal/';
+  return (
+    // The nested-page template (D-213).
+    <SubPageHeader
+      title={t(doc.titleKey)}
+      titleId="top"
+      backHref={fallback}
+      backLabel={
+        door === 'signin'
+          ? t('nav.back.signInScreen')
+          : door === 'join'
+            ? t('nav.back.joinScreen')
+            : t('nav.back.legal')
+      }
+      {...(door ? { onBack: () => goBack(fallback) } : {})}
+    />
+  );
+}
+
+function LegalHeaderFromUrl({ doc }: { doc: LegalDocument }) {
+  return <LegalHeader doc={doc} door={useDoor()} />;
+}
+
+/** The other document, keeping where this one was opened from. */
+function OtherDocument({ doc, door }: { doc: LegalDocument; door: Door }) {
+  const { t } = useI18n();
+  const href = doc.id === 'privacy' ? '/terms/' : '/privacy/';
+  return (
+    <TextLink
+      label={doc.id === 'privacy' ? t('legal.terms') : t('legal.privacy')}
+      href={door ? `${href}?from=${door}` : href}
+    />
+  );
+}
+
+function OtherDocumentFromUrl({ doc }: { doc: LegalDocument }) {
+  return <OtherDocument doc={doc} door={useDoor()} />;
 }

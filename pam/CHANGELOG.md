@@ -19,7 +19,9 @@ behind a button. Recommending a program ends on a short celebration, with
 confetti and a way home. Adding a trip goes straight to Trips, with confetti and
 the new trip sliding in. A program sees only a member's visits with that
 program and when they last used PAM (the transparency screen now says so). A
-case manager sees a member's past and saved programs on their own pages.
+case manager sees a member's past and saved programs on their own pages. On
+Sign in, Back from the Privacy or Terms page returns to Sign in (or to
+joining, if that is where you opened it).
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 
