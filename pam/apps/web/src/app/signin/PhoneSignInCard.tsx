@@ -2,11 +2,13 @@
 
 import { useId } from 'react';
 import * as stylex from '@stylexjs/stylex';
+import { HStack } from '@astryxdesign/core/HStack';
 import { VStack } from '@astryxdesign/core/VStack';
 import { Card } from '@astryxdesign/core/Card';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { BigButton, TextField, TextLink } from '@pam/ui';
+import { CodeBoxes } from '@pam/ui/CodeBoxes';
 import { useI18n } from '@/lib/i18n';
 import type { PhoneSignIn } from '@/lib/usePhoneSignIn';
 
@@ -41,6 +43,8 @@ export interface PhoneSignInCardProps {
   readonly hasTitle?: boolean;
   /** 1 on the sign-in screen, 2 inside a flow that already has a title. */
   readonly headingLevel?: 1 | 2;
+  /** The code step's button — "Sign in", or "Next" inside joining. */
+  readonly codeAction?: string;
 }
 
 const styles = stylex.create({
@@ -63,6 +67,7 @@ export function PhoneSignInCard({
   onCodeChange,
   headingLevel = 1,
   hasTitle = true,
+  codeAction,
 }: PhoneSignInCardProps) {
   const { t } = useI18n();
   const { state, sendCode, verifyCode } = flow;
@@ -73,89 +78,93 @@ export function PhoneSignInCard({
   const onCodeStep = state.step === 'code' || state.step === 'verifying';
   const titleStyle = headingLevel === 1 ? styles.title : styles.stepTitle;
 
+  if (onCodeStep) {
+    return (
+      // The code step (Will, 3 October, D-251): no card and no heading of its
+      // own — the screen's title says "Enter your code". Where it went and a
+      // small "Send again" on one line, the boxes, the button.
+      <VStack gap={4} xstyle={styles.card}>
+        <HStack gap={1} align="center" wrap="wrap">
+          <Text type="supporting" xstyle={styles.hint}>
+            {t('signin.code.sent', { phone: state.phone })}
+          </Text>
+          {/*
+            Thirty seconds between codes, said on the link itself. A person
+            who taps "send again" three times gets three codes and a carrier
+            that stops delivering; a person who can see the count waits.
+          */}
+          <TextLink
+            label={flow.resendIn > 0 ? t('signin.code.againIn', { seconds: flow.resendIn }) : t('signin.code.again')}
+            onClick={() => void sendCode(state.phone)}
+            isDisabled={busy || flow.resendIn > 0}
+            size="quiet"
+          />
+        </HStack>
+        <CodeBoxes
+          id={codeId}
+          label={t('signin.code.label')}
+          value={code}
+          onChange={onCodeChange}
+          onComplete={(full) => {
+            if (!busy) void verifyCode(full);
+          }}
+          isDisabled={busy}
+        />
+        <BigButton
+          label={busy ? t('signin.verifying') : codeAction ?? t('signin.code.action')}
+          onPress={() => void verifyCode(code)}
+          isDisabled={busy || code.trim().length === 0}
+        />
+      </VStack>
+    );
+  }
+
   return (
     // More breathing room around the card's own content (Will, 16 September,
     // matching the Figma redesign's roomier card) — one spacing step up from
     // the rest of the app's cards, since this is the one screen where the
     // card is the entire job rather than one of several things on the page.
     <Card padding={5} xstyle={styles.card}>
-      {onCodeStep ? (
-        <VStack gap={3}>
-          {hasTitle ? (
-            <Heading level={headingLevel} xstyle={titleStyle}>
-              {t('signin.title')}
-            </Heading>
-          ) : null}
-          <TextField
-            id={codeId}
-            purpose="code"
-            label={t('signin.code.label')}
-            value={code}
-            onChange={onCodeChange}
-            width="100%"
-            xstyle={styles.field}
-          />
-          <Text type="supporting" xstyle={styles.hint}>
-            {t('signin.code.hint', { phone: state.phone })}
-          </Text>
-          <BigButton
-            label={busy ? t('signin.verifying') : t('signin.code.action')}
-            onPress={() => void verifyCode(code)}
-            isDisabled={busy || code.trim().length === 0}
-          />
-          {/*
-            Thirty seconds between codes, said on the link itself. A person
-            who taps "send it again" three times gets three codes and a carrier
-            that stops delivering; a person who can see the count waits.
-          */}
-          <TextLink
-            label={flow.resendIn > 0 ? t('signin.code.resendIn', { seconds: flow.resendIn }) : t('signin.code.resend')}
-            onClick={() => void sendCode(state.phone)}
-            isDisabled={busy || flow.resendIn > 0}
-          />
-        </VStack>
-      ) : (
-        <VStack gap={3}>
-          {/*
-            The heading sits inside the card with the field it names, so the
-            task is one block rather than a title floating above a box.
-          */}
-          <Heading level={headingLevel} xstyle={titleStyle}>
-            {t('signin.title')}
-          </Heading>
-          <TextField
-            id={phoneId}
-            purpose="phone"
-            label={t('signin.phone.label')}
-            value={phone}
-            onChange={onPhoneChange}
-            width="100%"
-            xstyle={styles.field}
-          />
-          <BigButton
-            label={state.step === 'sending' ? t('signin.sending') : t('signin.phone.action')}
-            onPress={() => void sendCode(phone)}
-            isDisabled={state.step === 'sending' || phone.trim().length === 0}
-          />
-          {/*
-            What PAM will send, directly under the button that hands over the
-            number, inside the same card, so it is part of the act rather
-            than small print further down the page.
+      <VStack gap={3}>
+        {/*
+          The heading sits inside the card with the field it names, so the
+          task is one block rather than a title floating above a box.
+        */}
+        <Heading level={headingLevel} xstyle={titleStyle}>
+          {t('signin.title')}
+        </Heading>
+        <TextField
+          id={phoneId}
+          purpose="phone"
+          label={t('signin.phone.label')}
+          value={phone}
+          onChange={onPhoneChange}
+          width="100%"
+          xstyle={styles.field}
+        />
+        <BigButton
+          label={state.step === 'sending' ? t('signin.sending') : t('signin.phone.action')}
+          onPress={() => void sendCode(phone)}
+          isDisabled={state.step === 'sending' || phone.trim().length === 0}
+        />
+        {/*
+          What PAM will send, directly under the button that hands over the
+          number, inside the same card, so it is part of the act rather
+          than small print further down the page.
 
-            The STOP/rates line used to sit here too, and was removed
-            (D-139, Will, 17 September): it is the reminders question at
-            /reminders/, not this screen, that a member has to actually
-            weigh — STOP, HELP and rates all live there, in the room a
-            checkbox-free consent screen actually needs. The carrier
-            registration's own screenshot was always the reminders screen
-            (docs/sms-campaign-samples.md), not this one, so nothing filed
-            changes.
-          */}
-          <Text type="supporting" xstyle={styles.consent}>
-            {t('signin.phone.consent')}
-          </Text>
-        </VStack>
-      )}
+          The STOP/rates line used to sit here too, and was removed
+          (D-139, Will, 17 September): it is the reminders question at
+          /reminders/, not this screen, that a member has to actually
+          weigh — STOP, HELP and rates all live there, in the room a
+          checkbox-free consent screen actually needs. The carrier
+          registration's own screenshot was always the reminders screen
+          (docs/sms-campaign-samples.md), not this one, so nothing filed
+          changes.
+        */}
+        <Text type="supporting" xstyle={styles.consent}>
+          {t('signin.phone.consent')}
+        </Text>
+      </VStack>
     </Card>
   );
 }

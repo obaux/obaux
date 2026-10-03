@@ -5206,6 +5206,51 @@ the `from` screen if the page was opened directly. Hopping from Privacy to
 Terms keeps `from`, so two Backs reach Sign in. Opened any other way, Back
 still goes to Legal. e2e: `legal.spec.ts` covers both.
 
+### D-251 — The code step is six boxes; joining uses the nested template; Privacy and Terms are pinned to the foot
+
+Will, 3 October, on the screen after Sign in: use the template with the back
+button; step text instead of a progress bar, as in booking a trip; simpler;
+the code as small boxes someone can paste into; "send again" as a small
+link beside "Sent to …", not a button; Privacy and Terms stuck to the bottom,
+always visible; back goes to the login page.
+
+- **The code step has no card and no heading of its own.** The screen's
+  title is "Enter your code". Under it, on one line, "Sent to {number}." and
+  a small "Send again" (still counting down when a code was just sent).
+  Then the boxes, then the button: "Next" while joining, "Sign in" on
+  `/signin/`. The code step on `/signin/` is the same component, so it changed
+  too, and its Back now returns to the number on the same screen
+  (`startOver`).
+- **`CodeBoxes` (`@pam/ui`)** is six boxes drawn over **one** real field,
+  not six inputs. Six would break paste, break the phone's one-time-code
+  suggestion (it fills one field), and read out as six unlabelled boxes. The
+  field is transparent over the row. It keeps only the digits, so a pasted
+  "Your code is 123 456" works, and it has no `maxLength`, which would cut a
+  paste short before the digits are picked out. The next box is outlined
+  while it has focus, and the global frame ring is turned off for it in
+  globals.css (`data-pam-code`). The sixth digit submits by itself.
+- **Joining uses `SubPageHeader`** with "Step N of M" as the subtitle; the
+  `StepHeader` bar is gone from the app, and its story is removed. Back goes
+  one step back while there is one:
+  - Phone or code → Sign in.
+  - About you → the phone (starts the number over).
+  - A program's details or the waiting list → About you.
+  - Text messages → What others can see.
+  - What others can see, and the end: no back. The account exists by then,
+    and going back would submit About you a second time.
+
+  So `SubPageHeader`'s `backHref` is now optional.
+- **`LegalFooter`** pins Privacy and Terms to the bottom of Sign in and of
+  every joining step, with a spacer so content is never hidden behind it. It
+  is rendered after `Page`, not inside it, because the page's entrance
+  animation sets a transform, and a fixed element inside a transformed one
+  does not stick to the screen.
+
+e2e: join's step test now checks the subtitle and that there is no bar. A
+new consent test reaches the code step and checks one field,
+`one-time-code`, a paste of a whole message, the inline Send again, and the
+footer at the foot of the screen.
+
 ---
 
 ## Notes for whoever picks this up next

@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import * as stylex from '@stylexjs/stylex';
-import { HStack } from '@astryxdesign/core/HStack';
 import { VStack } from '@astryxdesign/core/VStack';
 import { Text } from '@astryxdesign/core/Text';
 import { Notice, Page, TextLink } from '@pam/ui';
@@ -16,6 +15,7 @@ import { useSession } from '@/lib/useSession';
 import { useAlertBanner } from '@/lib/alertBanner';
 import { LanguageSwitcher } from '../LanguageSwitcher';
 import { PhoneSignInCard } from './PhoneSignInCard';
+import { LegalFooter } from './LegalFooter';
 
 /**
  * The only way into PAM, and the same door for everybody: a member, a program
@@ -260,47 +260,42 @@ export function SignInScreen({ preview = null }: { readonly preview?: SignInPrev
   );
 
   return (
-    <Page align="center" gap={3}>
-      {onFirstStep ? (
-        // Somebody waiting on a code has already decided what PAM is: the
-        // hero belongs to the first step only, and the card rides up over
-        // its bottom edge instead of sitting in a header-then-card stack.
-        <VStack gap={0} align="center" xstyle={styles.heroGroup}>
-          <OnboardingSlides slides={slides} label={t('onboarding.label')} header={heroHeader} />
-          <VStack gap={3} align="center" xstyle={styles.overlapCard}>
+    <>
+      <Page align="center" gap={3}>
+        {onFirstStep ? (
+          // Somebody waiting on a code has already decided what PAM is: the
+          // hero belongs to the first step only, and the card rides up over
+          // its bottom edge instead of sitting in a header-then-card stack.
+          <VStack gap={0} align="center" xstyle={styles.heroGroup}>
+            <OnboardingSlides slides={slides} label={t('onboarding.label')} header={heroHeader} />
+            <VStack gap={3} align="center" xstyle={styles.overlapCard}>
+              {failedNotice}
+              {card}
+              {resendLink}
+            </VStack>
+          </VStack>
+        ) : (
+          <>
+            {/*
+              The code step is a step in: the nested-page template (D-217), its
+              back returning to the number, the language switch in its bar.
+            */}
+            <SubPageHeader
+              title={t('signin.code.title')}
+              backHref="/signin/"
+              backLabel={t('nav.back.signin')}
+              // Back is the number again, on this same screen.
+              onBack={startOver}
+              actions={<LanguageSwitcher />}
+            />
             {failedNotice}
             {card}
             {resendLink}
-          </VStack>
-        </VStack>
-      ) : (
-        <>
-          {/*
-            The code step is a step in: the nested-page template (D-217), its
-            back returning to the number, the language switch in its bar.
-          */}
-          <SubPageHeader
-            title={t('signin.title')}
-            backHref="/signin/"
-            backLabel={t('nav.back.signin')}
-            actions={<LanguageSwitcher />}
-          />
-          {failedNotice}
-          {card}
-          {resendLink}
-        </>
-      )}
-
-      {/*
-        The two pages somebody is entitled to read before they hand over a
-        number. Ghost buttons rather than small print: they are 48px targets
-        like everything else, because a rule nobody can tap is a rule nobody
-        reads.
-      */}
-      <HStack gap={2} justify="center" wrap="wrap">
-        <TextLink label={t('legal.privacy')} href="/privacy/?from=signin" size="quiet" />
-        <TextLink label={t('legal.terms')} href="/terms/?from=signin" size="quiet" />
-      </HStack>
-    </Page>
+          </>
+        )}
+      </Page>
+      {/* Privacy and Terms, pinned to the foot of the screen (D-251). */}
+      <LegalFooter from="signin" />
+    </>
   );
 }

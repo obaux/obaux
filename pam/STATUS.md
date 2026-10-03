@@ -298,6 +298,9 @@ Each role's Storybook Prototype now starts at Sign in and walks through that
 role's whole onboarding to Home (D-249; the join screen has a Storybook-only
 `preview`). Privacy and Terms opened from Sign in or joining go Back there
 (D-250).
+The code step is six paste-friendly boxes, joining uses the nested template
+with "Step N of M", and Privacy and Terms are pinned to the foot of the way in
+(D-251).
 
 This is the handover document: what exists, what is proven, what is live, and
 what the next person needs to know before touching anything.

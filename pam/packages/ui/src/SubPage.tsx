@@ -33,7 +33,11 @@ import { Page } from './Page.js';
  */
 export interface SubPageHeaderProps {
   readonly title: string;
-  readonly backHref: string;
+  /**
+   * Where back goes. Leave out both this and `onBack` only on a step that
+   * cannot be undone — the end of joining, once the account exists (D-251).
+   */
+  readonly backHref?: string;
   /** Where back goes, said — "Back to Profile". */
   readonly backLabel: string;
   /**
@@ -132,9 +136,9 @@ export function SubPageHeader({
 
   const back = onBack ? (
     <BackButton label={backLabel} onPress={onBack} />
-  ) : (
+  ) : backHref ? (
     <BackButton href={backHref} label={backLabel} />
-  );
+  ) : null;
 
   if (variant === 'compact') {
     return (

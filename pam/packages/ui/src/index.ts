@@ -55,6 +55,7 @@ export {
 } from './NotificationList.js';
 export { VoiceInput, type VoiceInputProps, type SpeechRecognizer } from './VoiceInput.js';
 export { TextField, type TextFieldProps } from './TextField.js';
+export { CodeBoxes, type CodeBoxesProps } from './CodeBoxes.js';
 export {
   BellIcon,
   BookmarkIcon,

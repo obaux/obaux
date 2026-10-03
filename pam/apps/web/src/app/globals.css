@@ -214,6 +214,15 @@
   }
 
   /*
+   * The sign-in code's boxes (D-251): the field is invisible over the row,
+   * and focus shows on the box the next digit goes in — a 2px accent edge —
+   * so the frame ring above would be a second indicator round all six.
+   */
+  [data-pam-code]:has(> input:focus-visible) {
+    outline: none;
+  }
+
+  /*
    * The search bar (D-212) is one rounded shape with the field inside it; the
    * rule above would ring the field's own inner box, a rectangle floating in
    * a pill. Same ring, moved to the pill, following its round ends.

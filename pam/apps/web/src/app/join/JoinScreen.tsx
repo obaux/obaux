@@ -4,17 +4,17 @@ import { useEffect, useId, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import * as stylex from '@stylexjs/stylex';
 import { VStack } from '@astryxdesign/core/VStack';
-import { HStack } from '@astryxdesign/core/HStack';
 import { Card } from '@astryxdesign/core/Card';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { CheckboxInput } from '@astryxdesign/core/CheckboxInput';
 import { RadioList, RadioListItem } from '@astryxdesign/core/RadioList';
 import { colorVars, spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
-import { BigButton, Loading, Notice, Page, PointsBadge, StarIcon, StepHeader, TextField, TextLink } from '@pam/ui';
+import { BigButton, Loading, Notice, Page, PointsBadge, StarIcon, TextField, TextLink } from '@pam/ui';
+import { SubPageHeader } from '@pam/ui/SubPage';
 import { TRANSPARENCY_SCREEN, badgeForPoints, type Locale } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
-import { navigate } from '@/lib/navigate';
+import { goBack, navigate } from '@/lib/navigate';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { usePhoneSignIn } from '@/lib/usePhoneSignIn';
 import { usePreviewSignIn } from '@/lib/usePreviewSignIn';
@@ -33,6 +33,7 @@ import {
 } from '@/lib/useJoin';
 import { NOTICES } from '@pam/config';
 import { PhoneSignInCard } from '../signin/PhoneSignInCard';
+import { LegalFooter } from '../signin/LegalFooter';
 import { ProgramDetailsStep } from './ProgramDetailsStep';
 
 /**
@@ -433,367 +434,396 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
         ? 4
         : STEP[phase];
 
-  return (
-    <Page gap={4}>
-      {/* No way home from a flow that has not finished: the way out is the
-          steps themselves. The old logo bar went with the redesign (D-217);
-          the step header carries the template's large title. */}
-      <StepHeader
-        current={step}
-        total={total}
-        title={
-          // The privacy step is three different screens, so it is three
-          // different titles: what a member is promised is not what a case
-          // manager is told they will see.
-          phase === 'privacy' ? t(`join.privacy.title.${kind}`) : t(`join.${phase}.title`)
+  const onCode = flow.state.step === 'code' || flow.state.step === 'verifying';
+  const toPhone = () => {
+    flow.startOver();
+    setPhase('phone');
+  };
+  const back: { readonly backLabel: string; readonly backHref?: string; readonly onBack?: () => void } =
+    phase === 'phone'
+      ? {
+          backLabel: t('nav.back.signInScreen'),
+          // In the prototype, back to the Sign in it came from (D-249).
+          ...(preview ? { onBack: () => goBack('/signin/') } : { backHref: '/signin/' }),
         }
-        progressLabel={t('join.step', { current: step, total })}
-      />
+      : phase === 'details'
+        ? { backLabel: t('nav.back.signin'), onBack: toPhone }
+        : phase === 'program' || phase === 'waiting'
+          ? { backLabel: t('trips.new.back'), onBack: () => setPhase('details') }
+          : phase === 'texts'
+            ? { backLabel: t('trips.new.back'), onBack: () => setPhase('privacy') }
+            : { backLabel: t('trips.new.back') };
 
-      {failed ? (
-        <Notice
-          notice="something_went_wrong"
-          title={t('join.failed.title')}
-          body={t('join.failed.body')}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+  return (
+    <>
+      <Page gap={4}>
+        {/*
+          The nested-page template with the step said under the title, as in
+          Plan a trip (Will, 3 October, D-251) — no progress bar. Back goes one
+          step back while there is one: from the phone or the code, to Sign in;
+          from About you, to the phone; from a program's details or the
+          waiting list, to About you; from Text messages, to the screen before.
+          Once the account exists (What others can see, and the end) there is
+          nothing to go back to, so there is no back: the way out is the step.
+        */}
+        <SubPageHeader
+          title={
+            phase === 'phone' && onCode
+              ? t('signin.code.title')
+              : // The privacy step is three different screens, so it is three
+                // different titles: what a member is promised is not what a case
+                // manager is told they will see.
+                phase === 'privacy'
+                ? t(`join.privacy.title.${kind}`)
+                : t(`join.${phase}.title`)
+          }
+          subtitle={t('join.step', { current: step, total })}
+          {...back}
         />
-      ) : null}
 
-      {phase === 'phone' ? (
-        <>
-          {flow.state.step === 'failed' ? (
-            <Notice
-              notice="something_went_wrong"
-              title={t(`signin.failed.${flow.state.reason}.title`)}
-              body={
-                flow.state.phone === null ? t('signin.phone.invalid') : t(`signin.failed.${flow.state.reason}.body`)
-              }
-              supportPhone={supportPhone}
-              callLabel={t('help.callSupport')}
-            />
-          ) : null}
-          <PhoneSignInCard
-            flow={flow}
-            phone={phone}
-            onPhoneChange={setPhone}
-            code={code}
-            onCodeChange={setCode}
-            headingLevel={2}
+        {failed ? (
+          <Notice
+            notice="something_went_wrong"
+            title={t('join.failed.title')}
+            body={t('join.failed.body')}
+            supportPhone={supportPhone}
+            callLabel={t('help.callSupport')}
           />
-        </>
-      ) : null}
+        ) : null}
 
-      {phase === 'details' ? (
-        <Card padding={4} xstyle={styles.card}>
-          <VStack gap={3}>
-            <TextField
-              id={firstId}
-              purpose="name"
-              label={t('join.details.first')}
-              value={firstName}
-              onChange={setFirstName}
-              width="100%"
-              xstyle={styles.field}
-            />
-            <TextField
-              id={lastId}
-              purpose="lastName"
-              label={t('join.details.last')}
-              value={lastName}
-              onChange={setLastName}
-              width="100%"
-              xstyle={styles.field}
-            />
-            <TextField
-              id={cityId}
-              purpose="city"
-              label={t('join.details.city')}
-              value={city}
-              onChange={setCity}
-              width="100%"
-              xstyle={styles.field}
-            />
-
-            {invalid ? (
-              <Text type="supporting" xstyle={styles.body}>
-                {t(`join.details.need.${invalid}`)}
-              </Text>
-            ) : null}
-
-            {/*
-              Defaults to whatever is already active — a language switched on
-              the way in, before this screen, or English otherwise — and
-              switching it here changes the whole screen's own copy live, not
-              just what gets submitted (Will, 16 September: "ask them to
-              select their default language... what is set in the form
-              becomes their default language"). `submitDetails`/`redeemInvite`
-              already send this locale as `language` — that part was here
-              before this control was; only the way to change it is new.
-            */}
-            <RadioList
-              label={t('onboarding.language.title')}
-              value={locale}
-              onChange={(next) => setLocale(next as Locale)}
-              xstyle={styles.choices}
-            >
-              <RadioListItem value="en" label={t('language.en')} />
-              <RadioListItem value="es" label={t('language.es')} />
-            </RadioList>
-
-            {/*
-              The code, if there is one. It sits above the three sentences
-              because it replaces them: a person with a code was told what
-              they are by the person who gave it to them.
-            */}
-            <TextField
-              id={codeFieldId}
-              purpose="inviteCode"
-              label={t('join.code.label')}
-              value={inviteCode}
-              onChange={(next) => setInviteCode(next.toUpperCase())}
-              width="100%"
-              xstyle={styles.field}
-            />
-            <Text type="supporting" xstyle={styles.small}>
-              {t('join.code.hint')}
-            </Text>
-
-            {inviteProblem ? (
+        {phase === 'phone' ? (
+          <>
+            {flow.state.step === 'failed' ? (
               <Notice
-                notice={inviteProblem}
-                title={t(NOTICES[inviteProblem].titleKey)}
-                body={t(NOTICES[inviteProblem].bodyKey)}
+                notice="something_went_wrong"
+                title={t(`signin.failed.${flow.state.reason}.title`)}
+                body={
+                  flow.state.phone === null ? t('signin.phone.invalid') : t(`signin.failed.${flow.state.reason}.body`)
+                }
                 supportPhone={supportPhone}
                 callLabel={t('help.callSupport')}
               />
             ) : null}
-
-            {/*
-              Three sentences about the person, not three roles. Always one
-              selected, and the first one is the one most people arriving here
-              are — asking somebody to declare themselves before they have seen
-              anything is hard enough without a blank set of buttons.
-            */}
-            {inviteCode.trim() === '' ? (
-              <RadioList
-                label={t('join.details.fit')}
-                value={kind}
-                onChange={(next) => setKind(next as JoinKind)}
-                xstyle={styles.choices}
-              >
-                {KINDS.map((option) => (
-                  <RadioListItem key={option.kind} value={option.kind} label={t(option.key)} />
-                ))}
-              </RadioList>
-            ) : null}
-
-            <BigButton
-              label={busy ? t('join.saving') : t('action.next')}
-              onPress={() => void submit()}
-              isDisabled={busy}
+            <PhoneSignInCard
+              flow={flow}
+              phone={phone}
+              onPhoneChange={setPhone}
+              code={code}
+              onCodeChange={setCode}
+              headingLevel={2}
+              codeAction={t('action.next')}
             />
-          </VStack>
-        </Card>
-      ) : null}
+          </>
+        ) : null}
 
-      {phase === 'program' ? (
-        <Card padding={4} xstyle={styles.card}>
-          <ProgramDetailsStep
-            value={program}
-            onChange={setProgram}
-            onSubmit={() => void submitProgram()}
-            busy={busy}
-            invalid={programInvalid}
-          />
-        </Card>
-      ) : null}
-
-      {phase === 'waiting' ? (
-        <Card padding={4} xstyle={styles.card}>
-          <VStack gap={3}>
-            <Text xstyle={styles.intro}>{t('join.waiting.body', { city: city.trim() })}</Text>
-            {cities.length > 0 ? (
-              <Text type="supporting" xstyle={styles.body}>
-                {t('join.waiting.where', { cities: cities.join(', ') })}
-              </Text>
-            ) : null}
-            {/*
-              Unticked, and it stays unticked unless somebody ticks it. Consent
-              that arrives pre-selected is not consent, and this is the exact
-              thing a carrier audit looks for.
-            */}
-            <CheckboxInput
-              label={t('join.waiting.optIn', { city: city.trim() })}
-              value={wantsUpdates}
-              onChange={(next) => setWantsUpdates(next)}
-            />
-            <Text type="supporting" xstyle={styles.small}>
-              {t('reminders.how')}
-            </Text>
-            <BigButton
-              label={busy ? t('join.saving') : t('join.waiting.action')}
-              onPress={() => void leaveName()}
-              isDisabled={busy}
-            />
-            <TextLink label={t('join.waiting.skip')} href="/" />
-          </VStack>
-        </Card>
-      ) : null}
-
-      {phase === 'waitingDone' ? (
-        <>
-          <Notice
-            notice="service_not_available"
-            title={t('join.waitingDone.heading')}
-            body={t(wantsUpdates ? 'join.waitingDone.yes' : 'join.waitingDone.no')}
-          />
-          <BigButton label={t('action.done')} href="/" />
-        </>
-      ) : null}
-
-      {/*
-        What is visible, before anything is. Three different screens, because
-        three different people are reading it and only one of them is being
-        asked to trust us with their life (Will, 14 September).
-      */}
-      {phase === 'privacy' && !isStaff ? (
-        <Card padding={4} xstyle={styles.card}>
-          <VStack gap={3}>
-            <Text xstyle={styles.intro}>{t('join.privacy.member.intro')}</Text>
-
-            <VStack gap={2}>
-              <Heading level={2} xstyle={styles.heading}>
-                {t(TRANSPARENCY_SCREEN.canSeeHeadingKey)}
-              </Heading>
-              {TRANSPARENCY_SCREEN.canSee.map((line) => (
-                <Text key={line.key} xstyle={styles.item}>
-                  {t(line.key)}
-                </Text>
-              ))}
-            </VStack>
-
-            <VStack gap={2}>
-              <Heading level={2} xstyle={styles.heading}>
-                {t(TRANSPARENCY_SCREEN.cannotSeeHeadingKey)}
-              </Heading>
-              {TRANSPARENCY_SCREEN.cannotSee.map((line) => (
-                <Text key={line.key} xstyle={styles.item}>
-                  {t(line.key)}
-                </Text>
-              ))}
-            </VStack>
-
-            <Text type="supporting" xstyle={styles.small}>
-              {t(TRANSPARENCY_SCREEN.footerKey)}
-            </Text>
-
-            <BigButton label={t(TRANSPARENCY_SCREEN.confirmKey)} onPress={() => setPhase('texts')} />
-          </VStack>
-        </Card>
-      ) : null}
-
-      {phase === 'privacy' && isStaff ? (
-        <>
+        {phase === 'details' ? (
           <Card padding={4} xstyle={styles.card}>
             <VStack gap={3}>
-              <Text xstyle={styles.intro}>{t(`join.privacy.${kind}.intro`)}</Text>
-              {[1, 2, 3, 4].map((n) => (
-                <Text key={n} xstyle={styles.item}>
-                  {t(`join.privacy.${kind}.${n}`)}
+              <TextField
+                id={firstId}
+                purpose="name"
+                label={t('join.details.first')}
+                value={firstName}
+                onChange={setFirstName}
+                width="100%"
+                xstyle={styles.field}
+              />
+              <TextField
+                id={lastId}
+                purpose="lastName"
+                label={t('join.details.last')}
+                value={lastName}
+                onChange={setLastName}
+                width="100%"
+                xstyle={styles.field}
+              />
+              <TextField
+                id={cityId}
+                purpose="city"
+                label={t('join.details.city')}
+                value={city}
+                onChange={setCity}
+                width="100%"
+                xstyle={styles.field}
+              />
+
+              {invalid ? (
+                <Text type="supporting" xstyle={styles.body}>
+                  {t(`join.details.need.${invalid}`)}
                 </Text>
-              ))}
+              ) : null}
+
+              {/*
+                Defaults to whatever is already active — a language switched on
+                the way in, before this screen, or English otherwise — and
+                switching it here changes the whole screen's own copy live, not
+                just what gets submitted (Will, 16 September: "ask them to
+                select their default language... what is set in the form
+                becomes their default language"). `submitDetails`/`redeemInvite`
+                already send this locale as `language` — that part was here
+                before this control was; only the way to change it is new.
+              */}
+              <RadioList
+                label={t('onboarding.language.title')}
+                value={locale}
+                onChange={(next) => setLocale(next as Locale)}
+                xstyle={styles.choices}
+              >
+                <RadioListItem value="en" label={t('language.en')} />
+                <RadioListItem value="es" label={t('language.es')} />
+              </RadioList>
+
+              {/*
+                The code, if there is one. It sits above the three sentences
+                because it replaces them: a person with a code was told what
+                they are by the person who gave it to them.
+              */}
+              <TextField
+                id={codeFieldId}
+                purpose="inviteCode"
+                label={t('join.code.label')}
+                value={inviteCode}
+                onChange={(next) => setInviteCode(next.toUpperCase())}
+                width="100%"
+                xstyle={styles.field}
+              />
+              <Text type="supporting" xstyle={styles.small}>
+                {t('join.code.hint')}
+              </Text>
+
+              {inviteProblem ? (
+                <Notice
+                  notice={inviteProblem}
+                  title={t(NOTICES[inviteProblem].titleKey)}
+                  body={t(NOTICES[inviteProblem].bodyKey)}
+                  supportPhone={supportPhone}
+                  callLabel={t('help.callSupport')}
+                />
+              ) : null}
+
+              {/*
+                Three sentences about the person, not three roles. Always one
+                selected, and the first one is the one most people arriving here
+                are — asking somebody to declare themselves before they have seen
+                anything is hard enough without a blank set of buttons.
+              */}
+              {inviteCode.trim() === '' ? (
+                <RadioList
+                  label={t('join.details.fit')}
+                  value={kind}
+                  onChange={(next) => setKind(next as JoinKind)}
+                  xstyle={styles.choices}
+                >
+                  {KINDS.map((option) => (
+                    <RadioListItem key={option.kind} value={option.kind} label={t(option.key)} />
+                  ))}
+                </RadioList>
+              ) : null}
+
+              <BigButton
+                label={busy ? t('join.saving') : t('action.next')}
+                onPress={() => void submit()}
+                isDisabled={busy}
+              />
             </VStack>
           </Card>
-          {hasAccount ? (
-            // Came in by code: the account exists, and this is the last step.
-            <BigButton
-              label={busy ? t('join.saving') : t(TRANSPARENCY_SCREEN.confirmKey)}
-              onPress={() => void finishStaff()}
-              isDisabled={busy}
+        ) : null}
+
+        {phase === 'program' ? (
+          <Card padding={4} xstyle={styles.card}>
+            <ProgramDetailsStep
+              value={program}
+              onChange={setProgram}
+              onSubmit={() => void submitProgram()}
+              busy={busy}
+              invalid={programInvalid}
             />
-          ) : (
-            <>
+          </Card>
+        ) : null}
+
+        {phase === 'waiting' ? (
+          <Card padding={4} xstyle={styles.card}>
+            <VStack gap={3}>
+              <Text xstyle={styles.intro}>{t('join.waiting.body', { city: city.trim() })}</Text>
+              {cities.length > 0 ? (
+                <Text type="supporting" xstyle={styles.body}>
+                  {t('join.waiting.where', { cities: cities.join(', ') })}
+                </Text>
+              ) : null}
               {/*
-                Nothing was created, and saying so is the whole screen. Somebody
-                who believes they have an account and does not will try to sign
-                in, fail silently, and never come back.
+                Unticked, and it stays unticked unless somebody ticks it. Consent
+                that arrives pre-selected is not consent, and this is the exact
+                thing a carrier audit looks for.
               */}
-              <Notice
-                notice="service_not_available"
-                title={t('join.staff.title')}
-                body={t('join.staff.body')}
-                supportPhone={supportPhone}
-                callLabel={t('help.callSupport')}
+              <CheckboxInput
+                label={t('join.waiting.optIn', { city: city.trim() })}
+                value={wantsUpdates}
+                onChange={(next) => setWantsUpdates(next)}
               />
-              <BigButton label={t('action.done')} href="/" />
-            </>
-          )}
-        </>
-      ) : null}
-
-      {phase === 'texts' ? (
-        <Card padding={4} xstyle={styles.card}>
-          <VStack gap={3}>
-            <Text xstyle={styles.intro}>{t('reminders.intro')}</Text>
-            <VStack gap={2}>
-              <Heading level={2} xstyle={styles.heading}>
-                {t('reminders.what')}
-              </Heading>
-              <Text xstyle={styles.item}>{t('reminders.what.1')}</Text>
-              <Text xstyle={styles.item}>{t('reminders.what.2')}</Text>
-              <Text xstyle={styles.item}>{t('reminders.what.3')}</Text>
+              <Text type="supporting" xstyle={styles.small}>
+                {t('reminders.how')}
+              </Text>
+              <BigButton
+                label={busy ? t('join.saving') : t('join.waiting.action')}
+                onPress={() => void leaveName()}
+                isDisabled={busy}
+              />
+              <TextLink label={t('join.waiting.skip')} href="/" />
             </VStack>
-            <Text type="supporting" xstyle={styles.small}>
-              {t('reminders.how')}
-            </Text>
-            {/*
-              Either button is an answer, and the agreement is the button's own
-              words — nothing here is pre-selected, because there is nothing to
-              select.
-            */}
-            <BigButton
-              label={busy ? t('join.saving') : t('reminders.optIn')}
-              onPress={() => void answerTexts(true)}
-              isDisabled={busy}
+          </Card>
+        ) : null}
+
+        {phase === 'waitingDone' ? (
+          <>
+            <Notice
+              notice="service_not_available"
+              title={t('join.waitingDone.heading')}
+              body={t(wantsUpdates ? 'join.waitingDone.yes' : 'join.waitingDone.no')}
             />
-            <TextLink label={t('reminders.skip')} onClick={() => void answerTexts(false)} />
-          </VStack>
-        </Card>
-      ) : null}
+            <BigButton label={t('action.done')} href="/" />
+          </>
+        ) : null}
 
-      {phase === 'done' && isStaff ? (
-        <Card padding={4} xstyle={styles.card}>
-          <VStack gap={3} xstyle={styles.celebrate}>
-            <Text xstyle={styles.body}>{t('join.done.staff', { name: firstName.trim() || t('app.name') })}</Text>
-            <BigButton label={t('join.done.action')} onPress={() => (preview ? navigate('/') : router.replace('/'))} />
-          </VStack>
-        </Card>
-      ) : null}
+        {/*
+          What is visible, before anything is. Three different screens, because
+          three different people are reading it and only one of them is being
+          asked to trust us with their life (Will, 14 September).
+        */}
+        {phase === 'privacy' && !isStaff ? (
+          <Card padding={4} xstyle={styles.card}>
+            <VStack gap={3}>
+              <Text xstyle={styles.intro}>{t('join.privacy.member.intro')}</Text>
 
-      {phase === 'done' && !isStaff ? (
-        <Card padding={4} xstyle={styles.card}>
-          <VStack gap={3} xstyle={styles.celebrate}>
-            <span aria-hidden="true" {...stylex.props(styles.medal)}>
-              <StarIcon />
-            </span>
-            <Text xstyle={styles.badgeName}>{t(`badge.${badgeForPoints(points ?? 0).key}`)}</Text>
-            {/*
-              The number counts up, which is the reward — PointsBadge handles
-              the part that matters, which is that somebody who asked for less
-              motion simply gets the number.
-            */}
-            <PointsBadge points={points ?? 0} label={t('points.title')} />
-            <Text xstyle={styles.body}>{t('join.done.body', { name: firstName.trim() || t('app.name') })}</Text>
-            <BigButton label={t('join.done.action')} onPress={() => (preview ? navigate('/') : router.replace('/'))} />
-          </VStack>
-        </Card>
-      ) : null}
+              <VStack gap={2}>
+                <Heading level={2} xstyle={styles.heading}>
+                  {t(TRANSPARENCY_SCREEN.canSeeHeadingKey)}
+                </Heading>
+                {TRANSPARENCY_SCREEN.canSee.map((line) => (
+                  <Text key={line.key} xstyle={styles.item}>
+                    {t(line.key)}
+                  </Text>
+                ))}
+              </VStack>
 
-      <HStack gap={2} justify="center" wrap="wrap">
-        <TextLink label={t('legal.privacy')} href="/privacy/?from=join" size="quiet" />
-        <TextLink label={t('legal.terms')} href="/terms/?from=join" size="quiet" />
-      </HStack>
-    </Page>
+              <VStack gap={2}>
+                <Heading level={2} xstyle={styles.heading}>
+                  {t(TRANSPARENCY_SCREEN.cannotSeeHeadingKey)}
+                </Heading>
+                {TRANSPARENCY_SCREEN.cannotSee.map((line) => (
+                  <Text key={line.key} xstyle={styles.item}>
+                    {t(line.key)}
+                  </Text>
+                ))}
+              </VStack>
+
+              <Text type="supporting" xstyle={styles.small}>
+                {t(TRANSPARENCY_SCREEN.footerKey)}
+              </Text>
+
+              <BigButton label={t(TRANSPARENCY_SCREEN.confirmKey)} onPress={() => setPhase('texts')} />
+            </VStack>
+          </Card>
+        ) : null}
+
+        {phase === 'privacy' && isStaff ? (
+          <>
+            <Card padding={4} xstyle={styles.card}>
+              <VStack gap={3}>
+                <Text xstyle={styles.intro}>{t(`join.privacy.${kind}.intro`)}</Text>
+                {[1, 2, 3, 4].map((n) => (
+                  <Text key={n} xstyle={styles.item}>
+                    {t(`join.privacy.${kind}.${n}`)}
+                  </Text>
+                ))}
+              </VStack>
+            </Card>
+            {hasAccount ? (
+              // Came in by code: the account exists, and this is the last step.
+              <BigButton
+                label={busy ? t('join.saving') : t(TRANSPARENCY_SCREEN.confirmKey)}
+                onPress={() => void finishStaff()}
+                isDisabled={busy}
+              />
+            ) : (
+              <>
+                {/*
+                  Nothing was created, and saying so is the whole screen. Somebody
+                  who believes they have an account and does not will try to sign
+                  in, fail silently, and never come back.
+                */}
+                <Notice
+                  notice="service_not_available"
+                  title={t('join.staff.title')}
+                  body={t('join.staff.body')}
+                  supportPhone={supportPhone}
+                  callLabel={t('help.callSupport')}
+                />
+                <BigButton label={t('action.done')} href="/" />
+              </>
+            )}
+          </>
+        ) : null}
+
+        {phase === 'texts' ? (
+          <Card padding={4} xstyle={styles.card}>
+            <VStack gap={3}>
+              <Text xstyle={styles.intro}>{t('reminders.intro')}</Text>
+              <VStack gap={2}>
+                <Heading level={2} xstyle={styles.heading}>
+                  {t('reminders.what')}
+                </Heading>
+                <Text xstyle={styles.item}>{t('reminders.what.1')}</Text>
+                <Text xstyle={styles.item}>{t('reminders.what.2')}</Text>
+                <Text xstyle={styles.item}>{t('reminders.what.3')}</Text>
+              </VStack>
+              <Text type="supporting" xstyle={styles.small}>
+                {t('reminders.how')}
+              </Text>
+              {/*
+                Either button is an answer, and the agreement is the button's own
+                words — nothing here is pre-selected, because there is nothing to
+                select.
+              */}
+              <BigButton
+                label={busy ? t('join.saving') : t('reminders.optIn')}
+                onPress={() => void answerTexts(true)}
+                isDisabled={busy}
+              />
+              <TextLink label={t('reminders.skip')} onClick={() => void answerTexts(false)} />
+            </VStack>
+          </Card>
+        ) : null}
+
+        {phase === 'done' && isStaff ? (
+          <Card padding={4} xstyle={styles.card}>
+            <VStack gap={3} xstyle={styles.celebrate}>
+              <Text xstyle={styles.body}>{t('join.done.staff', { name: firstName.trim() || t('app.name') })}</Text>
+              <BigButton label={t('join.done.action')} onPress={() => (preview ? navigate('/') : router.replace('/'))} />
+            </VStack>
+          </Card>
+        ) : null}
+
+        {phase === 'done' && !isStaff ? (
+          <Card padding={4} xstyle={styles.card}>
+            <VStack gap={3} xstyle={styles.celebrate}>
+              <span aria-hidden="true" {...stylex.props(styles.medal)}>
+                <StarIcon />
+              </span>
+              <Text xstyle={styles.badgeName}>{t(`badge.${badgeForPoints(points ?? 0).key}`)}</Text>
+              {/*
+                The number counts up, which is the reward — PointsBadge handles
+                the part that matters, which is that somebody who asked for less
+                motion simply gets the number.
+              */}
+              <PointsBadge points={points ?? 0} label={t('points.title')} />
+              <Text xstyle={styles.body}>{t('join.done.body', { name: firstName.trim() || t('app.name') })}</Text>
+              <BigButton label={t('join.done.action')} onPress={() => (preview ? navigate('/') : router.replace('/'))} />
+            </VStack>
+          </Card>
+        ) : null}
+
+      </Page>
+      <LegalFooter from="join" />
+    </>
   );
 }

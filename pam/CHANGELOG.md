@@ -21,7 +21,11 @@ the new trip sliding in. A program sees only a member's visits with that
 program and when they last used PAM (the transparency screen now says so). A
 case manager sees a member's past and saved programs on their own pages. On
 Sign in, Back from the Privacy or Terms page returns to Sign in (or to
-joining, if that is where you opened it).
+joining, if that is where you opened it). The code you are texted goes into six small
+boxes, and pasting the whole text message works. "Send again" is a small
+link beside the number. Signing up shows "Step 1 of 5" under each title
+instead of a bar, with a back button. Privacy and Terms always sit at the
+bottom of the screen.
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 
