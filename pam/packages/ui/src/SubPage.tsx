@@ -36,6 +36,11 @@ export interface SubPageHeaderProps {
   readonly backHref: string;
   /** Where back goes, said — "Back to Profile". */
   readonly backLabel: string;
+  /**
+   * Back as a step, not a link — a multi-step screen goes to its previous
+   * step (Plan a trip, D-235). `backHref` is ignored when this is set.
+   */
+  readonly onBack?: () => void;
   /** A line under the large title. */
   readonly subtitle?: string;
   readonly actions?: ReactNode;
@@ -113,6 +118,7 @@ export function SubPageHeader({
   variant = 'large',
   titleAddon,
   titleId,
+  onBack,
 }: SubPageHeaderProps) {
   const [collapsed, setCollapsed] = useState(false);
 
@@ -124,7 +130,11 @@ export function SubPageHeader({
     return () => window.removeEventListener('scroll', onScroll);
   }, [variant]);
 
-  const back = <BackButton href={backHref} label={backLabel} />;
+  const back = onBack ? (
+    <BackButton label={backLabel} onPress={onBack} />
+  ) : (
+    <BackButton href={backHref} label={backLabel} />
+  );
 
   if (variant === 'compact') {
     return (
@@ -178,11 +188,20 @@ export function SubPageHeader({
  * The template's round back button on its own (D-218), for a nested screen
  * whose top is a search bar rather than a title — All programs.
  */
-export function BackButton({ href, label }: { readonly href: string; readonly label: string }) {
+export function BackButton({
+  href,
+  label,
+  onPress,
+}: {
+  readonly href?: string;
+  readonly label: string;
+  /** Instead of `href`: back one step on the same screen (D-235). */
+  readonly onPress?: () => void;
+}) {
   return (
     <IconButton
       label={label}
-      href={href}
+      {...(onPress ? { onClick: onPress } : { href })}
       variant="ghost"
       icon={
         <HStack>

@@ -11,7 +11,9 @@ cards fade under its title as you scroll, and long place names stay on one
 line. Notifications are grouped into New and Earlier, each with an icon and
 a short title. A case manager's view of a member uses the same profile
 card as a member's own, with two clear actions: message them (with a count
-of new messages) and connect them to a program.
+of new messages) and connect them to a program. Connecting now starts with a search and asks
+before recommending. A place's main button is "Schedule a visit", which goes
+straight into planning a trip, and Back in that flow goes back one step.
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 

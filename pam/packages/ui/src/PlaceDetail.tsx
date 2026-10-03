@@ -69,6 +69,12 @@ export interface PlaceDetailProps {
   readonly phone?: string | null;
   readonly website?: string | null;
   readonly directionsHref?: string | null;
+  /**
+   * The screen's one primary action, in place of "How to get there" — a
+   * member's "Schedule a visit" (D-235). Directions then lives in the round
+   * quick actions.
+   */
+  readonly primaryAction?: { readonly label: string; readonly href: string } | null;
   readonly hoursHref?: string | null;
   readonly isSaved?: boolean;
   readonly onSave?: () => void;
@@ -196,6 +202,7 @@ export function PlaceDetail({
   phone,
   website,
   directionsHref,
+  primaryAction = null,
   hoursHref,
   isSaved = false,
   onSave,
@@ -273,7 +280,11 @@ export function PlaceDetail({
         The one primary action on the screen (§2.5). Getting there is why
         somebody opened a place rather than reading the card.
       */}
-      {directionsHref ? <BigButton label={labels.directions} href={directionsHref} /> : null}
+      {primaryAction ? (
+        <BigButton label={primaryAction.label} href={primaryAction.href} />
+      ) : directionsHref ? (
+        <BigButton label={labels.directions} href={directionsHref} />
+      ) : null}
 
       {address ? (
         <Card padding={4} xstyle={styles.card}>

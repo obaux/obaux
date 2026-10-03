@@ -4945,6 +4945,51 @@ the frame, both segments and the sliding highlight. That is set once in
 `globals.css`, because Astryx has no radius prop for a segment, so the
 program lead's Day / Week / Month switch matches too.
 
+### D-234 — A member's page: Connect first, coming-up trips with a row to the past ones; Connect has search and asks before recommending
+
+From Will, 3 October.
+
+- **Order.** "Connect {name} to…" sits above "Message {name}".
+- **Trips.** One heading, "Coming up trips", then the upcoming cards, then a
+  "Places already went" row (with a count) that opens `/person/past/`
+  (`PastTripsView`). The past visits are no longer on the profile itself.
+- **Message {name} opens the thread in Storybook.** It was falling back to
+  the Messages list, because `open_direct_conversation` had no fixture. The
+  mock now answers it with the example conversation.
+- **Connect to…** has the Explore search pill on top, over every program
+  (`usePlaces` / `services_search`, falling back to the example programs if
+  the database cannot be reached). Each row has a round check. Tapping it
+  opens a dialog, "Recommend {program} to {name}?", with 32px corners and the
+  page washed to 80% white (`data-pam-dialog="recommend"` in `globals.css`).
+  Confirming shows "{program} is recommended to {name}". It is an example
+  only: nothing is stored or sent, and the member still says yes themselves.
+- `usePersonName` gives Connect and Already went a member's name from the
+  example cast or the caseload list only (§4.1).
+
+### D-235 — A place's primary action for a member is Schedule a visit; Plan a trip steps back one at a time
+
+From Will, 3 October.
+
+- **Place page (member).** The fourth round button is **Directions** and
+  routes there (the Google listing stays in the hours card). The one big
+  button is **Schedule a visit** (`PlaceDetail primaryAction`). It opens
+  `/trips/new/` with the place in the link, starting at When. Staff keep
+  "How to get there".
+- **Plan a trip** (was "Where are you going?"). A round search button
+  replaces Help on step 1 and opens a search field over the list. The rows
+  have subtle dividers (`MenuList hasDividers`), and a fourth row, "View all
+  places to visit", opens Explore. Step 2 has no Help.
+- **Day and time choices** are smaller white pills with a grey outline, at
+  the 48px floor. The chosen one is the green primary button. On step 2 the
+  place name uses the trip card's name style (17px bold).
+- **Back is a step.** Check → When → Plan a trip → Trips (`SubPageHeader
+  onBack`). That replaces the "Change" links, which are gone.
+- **Conversation Options.** "View program details" shows only when the other
+  side is a program. That is a member or a case manager talking to a program
+  lead; a program lead talking to a member has no program there.
+- The prototype route for `/trips/new/` now renders the page rather than the
+  view, so the link's query reaches it.
+
 ---
 
 ## Notes for whoever picks this up next

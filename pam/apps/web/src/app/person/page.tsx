@@ -10,7 +10,7 @@ import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { Badge } from '@astryxdesign/core/Badge';
 import { Avatar } from '@astryxdesign/core/Avatar';
-import { BigButton, ConnectionsIcon, Loading, MessagesIcon, Notice, Page } from '@pam/ui';
+import { BigButton, ConnectionsIcon, Loading, MessagesIcon, Notice, Page, TripsIcon } from '@pam/ui';
 import { MenuList } from '@pam/ui/MenuList';
 import { ProfileSummary } from '@pam/ui/ProfileCards';
 import { TripCard } from '@pam/ui/TripCard';
@@ -368,13 +368,6 @@ function PersonScreen() {
         <MenuList
           label={t('person.actions.label', { name: person.firstName })}
           items={[
-            {
-              id: 'message',
-              label: t('person.message.action', { name: person.firstName }),
-              icon: <MessagesIcon width={26} height={26} />,
-              ...(exampleThread ? { href: exampleThread } : { onSelect: message }),
-              ...(unread ? { badge: unread, badgeLabel: t('person.message.unread', { count: unreadCount }) } : {}),
-            },
             ...(viewedRole === 'admin'
               ? [
                   {
@@ -385,17 +378,25 @@ function PersonScreen() {
                   },
                 ]
               : []),
+            {
+              id: 'message',
+              label: t('person.message.action', { name: person.firstName }),
+              icon: <MessagesIcon width={26} height={26} />,
+              ...(exampleThread ? { href: exampleThread } : { onSelect: message }),
+              ...(unread ? { badge: unread, badgeLabel: t('person.message.unread', { count: unreadCount }) } : {}),
+            },
           ]}
         />
       ) : null}
 
+      {/*
+        Coming up trips (Will, 3 October, D-234): one heading, the visits
+        ahead, then a row to the ones already made on their own page.
+      */}
       {isMember ? (
         <VStack gap={3}>
           <Heading level={2} xstyle={styles.section}>
             {t('person.trips.title')}
-          </Heading>
-          <Heading level={3} xstyle={styles.subsection}>
-            {t('person.trips.upcoming')}
           </Heading>
           {upcoming.length > 0 ? (
             <VStack gap={3}>{upcoming.map(tripCard)}</VStack>
@@ -404,16 +405,18 @@ function PersonScreen() {
               {t('person.trips.none')}
             </Text>
           )}
-          <Heading level={3} xstyle={styles.subsection}>
-            {t('person.trips.past')}
-          </Heading>
-          {past.length > 0 ? (
-            <VStack gap={3}>{past.map(tripCard)}</VStack>
-          ) : (
-            <Text type="supporting" xstyle={styles.meta}>
-              {t('person.trips.none')}
-            </Text>
-          )}
+          <MenuList
+            label={t('person.trips.past')}
+            items={[
+              {
+                id: 'past',
+                label: t('person.trips.pastLink'),
+                icon: <TripsIcon width={26} height={26} />,
+                href: `/person/past/?id=${encodeURIComponent(person.id)}`,
+                ...(past.length > 0 ? { value: String(past.length) } : {}),
+              },
+            ]}
+          />
         </VStack>
       ) : null}
 

@@ -113,6 +113,9 @@ function routesFor(journeyRole: JourneyRole): Route[] {
       }
       return { body: [{ conversation_id: CONVO_ID, last_read_at: null }] };
     }),
+    // Message {name} on a caseload member's page (D-231, D-234) opens the one
+    // example conversation, so the tap lands in a thread instead of the list.
+    on('/rpc/open_direct_conversation', () => ({ body: CONVO_ID })),
     on('/rpc/conversation_partners', () => ({ body: [partnerFor(role)] })),
     on('/rpc/conversation_block_state', () => ({ body: [{ i_blocked: false, blocked_me: false }] })),
     on('/rest/v1/messages', (_url, method) =>

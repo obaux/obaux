@@ -44,6 +44,8 @@ export interface MenuListProps {
   /** The list's name for a screen reader, e.g. "Settings". */
   readonly label: string;
   readonly items: readonly MenuItem[];
+  /** Subtle lines between rows — a list of places to pick from (D-235). */
+  readonly hasDividers?: boolean;
 }
 
 const styles = stylex.create({
@@ -55,9 +57,9 @@ const styles = stylex.create({
   description: { fontSize: '15px', lineHeight: 1.4 },
 });
 
-export function MenuList({ label, items }: MenuListProps) {
+export function MenuList({ label, items, hasDividers = false }: MenuListProps) {
   return (
-    <List aria-label={label} xstyle={styles.list}>
+    <List aria-label={label} hasDividers={hasDividers} xstyle={styles.list}>
       {items.map((item) => (
         <ListItem
           key={item.id}

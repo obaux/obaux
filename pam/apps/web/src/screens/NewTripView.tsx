@@ -11,9 +11,12 @@ import { Text } from '@astryxdesign/core/Text';
 import { TextArea } from '@astryxdesign/core/TextArea';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
-import { categoryLabelKey } from '@pam/config';
+import { CATEGORY_DEFINITIONS, categoryLabelKey, type Category } from '@pam/config';
 import { DUMMY_PLACES_BY_ID, type DummySavedPlace } from '@pam/config/dummy-places';
-import { BigButton, TextLink, TripsIcon } from '@pam/ui';
+import { BigButton, ExploreIcon, TripsIcon } from '@pam/ui';
+import { SearchField } from '@pam/ui/SearchPill';
+import { Icon } from '@astryxdesign/core/Icon';
+import { IconButton } from '@astryxdesign/core/IconButton';
 import { MenuList } from '@pam/ui/MenuList';
 import { SubPage } from '@pam/ui/SubPage';
 import { useI18n } from '@/lib/i18n';
@@ -51,9 +54,36 @@ const ICON = { width: 26, height: 26, 'aria-hidden': true } as const;
 
 const styles = stylex.create({
   hint: { fontSize: '18px', lineHeight: 1.5 },
+  // The chosen place on When, in the trip card's name style (Will, D-235).
+  placeName: { fontSize: '17px', lineHeight: 1.3, fontWeight: 700 },
   label: { fontSize: '18px', fontWeight: 600 },
   choices: { width: '100%' },
-  choice: { minHeight: '56px', minWidth: '96px', fontSize: '17px', borderRadius: '14px' },
+  // Day and time choices (Will, 3 October, D-235): smaller, white pills
+  // with a grey outline like the round header buttons; the chosen one fills
+  // green. Still the 48px touch floor (§2.5).
+  choice: {
+    minHeight: '48px',
+    paddingInline: '16px',
+    fontSize: '15px',
+    borderRadius: '999px',
+  },
+  choiceOff: {
+    backgroundColor: colorVars['--color-background-body'],
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    borderColor: colorVars['--color-border'],
+  },
+  choiceOn: { fontWeight: 600 },
+  round: {
+    width: '48px',
+    height: '48px',
+    borderRadius: '50%',
+    flexShrink: 0,
+    backgroundColor: colorVars['--color-background-body'],
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    borderColor: colorVars['--color-border'],
+  },
   summaryName: { fontSize: '22px', lineHeight: 1.25, fontWeight: 700 },
   summaryLine: { fontSize: '18px', lineHeight: 1.4 },
   note: { fontSize: '15px', lineHeight: 1.5 },
@@ -73,15 +103,50 @@ function nextWeekdays(count: number): Date[] {
   return out;
 }
 
-export function NewTripView({ initialPlaceId }: { readonly initialPlaceId?: string | null }) {
+/**
+ * A place handed over by "Schedule a visit" on a place's page (D-235): the
+ * steps start at When, with this place already chosen. An example place is
+ * looked up by id; any other arrives with its name and kind in the link.
+ */
+export interface TripPlaceSeed {
+  readonly id: string;
+  readonly name?: string | null;
+  readonly category?: string | null;
+  readonly address?: string | null;
+}
+
+function seedToPlace(seed: TripPlaceSeed | null | undefined): DummySavedPlace | null {
+  if (!seed) return null;
+  const known = DUMMY_PLACES_BY_ID[seed.id];
+  if (known) return known;
+  if (!seed.name || !seed.category || !(seed.category in CATEGORY_DEFINITIONS)) return null;
+  return {
+    id: seed.id,
+    name: seed.name,
+    category: seed.category as Category,
+    address: seed.address ?? '',
+    phone: null,
+    lat: 0,
+    lon: 0,
+    description: '',
+  };
+}
+
+export function NewTripView({ initialPlace = null }: { readonly initialPlace?: TripPlaceSeed | null }) {
   const { t, locale } = useI18n();
   const places = useMemo(() => Object.values(DUMMY_PLACES_BY_ID), []);
-  const initial = initialPlaceId ? (DUMMY_PLACES_BY_ID[initialPlaceId] ?? null) : null;
+  const initial = useMemo(() => seedToPlace(initialPlace), [initialPlace]);
   const [step, setStep] = useState<Step>(initial ? 'when' : 'where');
   const [place, setPlace] = useState<DummySavedPlace | null>(initial);
   const [day, setDay] = useState<Date | null>(null);
   const [time, setTime] = useState<readonly [number, number] | null>(null);
   const [note, setNote] = useState('');
+  const [searching, setSearching] = useState(false);
+  const [query, setQuery] = useState('');
+  const shown = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    return q ? places.filter((p) => p.name.toLowerCase().includes(q)) : places;
+  }, [places, query]);
 
   const days = useMemo(() => nextWeekdays(10), []);
   const dayFmt = new Intl.DateTimeFormat(locale, { weekday: 'short', month: 'short', day: 'numeric' });
@@ -108,17 +173,57 @@ export function NewTripView({ initialPlaceId }: { readonly initialPlaceId?: stri
       title={step === 'done' ? t('trips.new') : title}
       {...(step === 'done' ? {} : { subtitle: t('trips.new.step', { current: stepNumber, total: 3 }) })}
       backHref="/trips/"
-      backLabel={t('nav.back.trips')}
-      actions={<HelpButton />}
+      backLabel={step === 'where' || step === 'done' ? t('nav.back.trips') : t('trips.new.back')}
+      // Back is a step (Will, 3 October, D-235): Check → When → Where →
+      // Trips. That is the way to change an answer, so no "Change" links.
+      {...(step === 'when'
+        ? { onBack: () => setStep('where') }
+        : step === 'check'
+          ? { onBack: () => setStep('when') }
+          : {})}
+      // Plan a trip (D-235): search where Help was on the first step; no
+      // Help on When either (Will). Check and Done keep Help.
+      actions={
+        step === 'where' ? (
+          <IconButton
+            label={t(searching ? 'trips.new.searchClose' : 'trips.new.search')}
+            icon={<Icon icon={searching ? 'close' : 'search'} size="md" />}
+            variant="ghost"
+            onClick={() => {
+              setSearching((on) => !on);
+              setQuery('');
+            }}
+            xstyle={styles.round}
+          />
+        ) : step === 'when' ? undefined : (
+          <HelpButton />
+        )
+      }
     >
       {step === 'where' ? (
         <>
           <Text type="supporting" xstyle={styles.hint}>
             {t('trips.new.whereHint')}
           </Text>
+          {searching ? (
+            <SearchField
+              label={t('trips.new.search')}
+              placeholder={t('trips.new.searchPlaceholder')}
+              value={query}
+              onChange={setQuery}
+              hasAutoFocus
+            />
+          ) : null}
+          {shown.length === 0 ? (
+            <Text type="supporting" xstyle={styles.hint}>
+              {t('trips.new.none')}
+            </Text>
+          ) : null}
           <MenuList
             label={t('trips.new.where')}
-            items={places.map((p) => ({
+            hasDividers
+            items={[
+              ...shown.map((p) => ({
               id: p.id,
               label: p.name,
               description: t(categoryLabelKey(p.category)),
@@ -127,17 +232,22 @@ export function NewTripView({ initialPlaceId }: { readonly initialPlaceId?: stri
                 setPlace(p);
                 setStep('when');
               },
-            }))}
+            })),
+              // A fourth way on (Will, 3 October): every place, on Explore.
+              {
+                id: 'all',
+                label: t('trips.new.viewAll'),
+                icon: <ExploreIcon {...ICON} />,
+                href: '/',
+              },
+            ]}
           />
         </>
       ) : null}
 
       {step === 'when' && place ? (
         <>
-          <HStack gap={2} align="center" justify="between" wrap="nowrap">
-            <Text xstyle={styles.hint}>{place.name}</Text>
-            <TextLink label={t('trips.new.change')} onClick={() => setStep('where')} />
-          </HStack>
+          <Text xstyle={styles.placeName}>{place.name}</Text>
           <VStack gap={2}>
             <Heading level={2} xstyle={styles.label}>
               {t('trips.new.day')}
@@ -150,7 +260,7 @@ export function NewTripView({ initialPlaceId }: { readonly initialPlaceId?: stri
                   variant={day?.getTime() === d.getTime() ? 'primary' : 'secondary'}
                   aria-pressed={day?.getTime() === d.getTime()}
                   onClick={() => setDay(d)}
-                  xstyle={styles.choice}
+                  xstyle={[styles.choice, day?.getTime() === d.getTime() ? styles.choiceOn : styles.choiceOff]}
                 />
               ))}
             </HStack>
@@ -169,7 +279,7 @@ export function NewTripView({ initialPlaceId }: { readonly initialPlaceId?: stri
                     variant={isOn ? 'primary' : 'secondary'}
                     aria-pressed={isOn}
                     onClick={() => setTime(slot)}
-                    xstyle={styles.choice}
+                    xstyle={[styles.choice, isOn ? styles.choiceOn : styles.choiceOff]}
                   />
                 );
               })}
@@ -183,19 +293,13 @@ export function NewTripView({ initialPlaceId }: { readonly initialPlaceId?: stri
         <>
           <Card padding={6}>
             <VStack gap={4}>
-              <HStack gap={3} align="center" justify="between" wrap="nowrap">
-                <HStack gap={3} align="center" wrap="nowrap">
-                  <BigCategoryIcon category={place.category} size={{ width: 40, height: 40, 'aria-hidden': true }} />
-                  <Text xstyle={styles.summaryName}>{place.name}</Text>
-                </HStack>
-                <TextLink label={t('trips.new.change')} onClick={() => setStep('where')} />
+              <HStack gap={3} align="center" wrap="nowrap">
+                <BigCategoryIcon category={place.category} size={{ width: 40, height: 40, 'aria-hidden': true }} />
+                <Text xstyle={styles.summaryName}>{place.name}</Text>
               </HStack>
-              <HStack gap={3} align="center" justify="between" wrap="nowrap">
-                <Text xstyle={styles.summaryLine}>
-                  {dayLong.format(day)} · {timeFmt.format(at(day, time))}
-                </Text>
-                <TextLink label={t('trips.new.change')} onClick={() => setStep('when')} />
-              </HStack>
+              <Text xstyle={styles.summaryLine}>
+                {dayLong.format(day)} · {timeFmt.format(at(day, time))}
+              </Text>
             </VStack>
           </Card>
           <TextArea label={t('trips.new.note')} value={note} onChange={setNote} rows={2} width="100%" />

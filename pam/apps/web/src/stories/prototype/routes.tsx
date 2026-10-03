@@ -12,6 +12,7 @@ import MessageThreadPage from '../../app/messages/thread/page';
 import NotificationsPage from '../../app/notifications/page';
 import PersonPage from '../../app/person/page';
 import ConnectPage from '../../app/person/connect/page';
+import PastTripsPage from '../../app/person/past/page';
 import PlacePage from '../../app/place/page';
 import PlacesPage from '../../app/places/page';
 import PointsPage from '../../app/points/page';
@@ -26,7 +27,7 @@ import { ViewAsView } from '../../screens/ViewAsView';
 import { InviteView } from '../../screens/InviteView';
 import { AddProgramView } from '../../screens/AddProgramView';
 import { ProgramScreen } from '../../screens/ProgramView';
-import { NewTripView } from '../../screens/NewTripView';
+import NewTripPage from '../../app/trips/new/page';
 import { ExploreScreen } from '../../screens/ExploreScreen';
 import { TripsScreen } from '../../screens/TripsView';
 import { HomeScreen } from '../../screens/HomeScreen';
@@ -70,6 +71,7 @@ export const APP_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   '/interested/': screen(() => <InterestedPage />),
   '/person/': screen(() => <PersonPage />),
   '/person/connect/': screen(() => <ConnectPage />),
+  '/person/past/': screen(() => <PastTripsPage />),
   '/account/': screen(() => <AccountPage />),
   '/help/': screen(() => <HelpPage />),
   '/privacy/': screen(() => <PrivacyPage />),
@@ -95,7 +97,7 @@ export const APP_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   '/programs/new/': screen(() => <AddProgramView />),
   '/program/': screen(() => <ProgramScreen />),
   // D-225: planning a visit, from the + on Trips.
-  '/trips/new/': screen(() => <NewTripView />),
+  '/trips/new/': screen(() => <NewTripPage />),
 };
 
 /**

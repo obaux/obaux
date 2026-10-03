@@ -79,7 +79,7 @@ async function signedIn(page: import('@playwright/test').Page) {
 }
 
 test.describe("a place's own screen", () => {
-  test('says what it is, once, and offers the way there as the one big button', async ({ page }) => {
+  test('says what it is, once; booking a visit is the one big button, the way there a circle', async ({ page }) => {
     await signedIn(page);
     await page.route(DETAIL, (route) => route.fulfill(json([PLACE])));
     await page.goto(`/place/?id=${PLACE.id}`);
@@ -89,11 +89,17 @@ test.describe("a place's own screen", () => {
     await expect(page.getByRole('heading', { name: 'Kirkbride Center', level: 1 })).toHaveCount(1);
     await expect(page.getByText(/free or low cost for most people/)).toBeVisible();
 
-    await expect(page.getByRole('link', { name: 'How to get there' })).toHaveAttribute(
+    // D-235: a member's one primary action is Schedule a visit, straight into
+    // the New trip steps with this place chosen; Directions is the fourth circle.
+    await expect(page.getByRole('link', { name: 'Schedule a visit' })).toHaveAttribute(
+      'href',
+      new RegExp(`/trips/new/\\?place=${PLACE.id}`),
+    );
+    await expect(page.getByRole('link', { name: 'Directions', exact: true })).toHaveAttribute(
       'href',
       /destination=39\.9612%2C-75\.2172/,
     );
-    await expect(page.getByRole('link', { name: 'How to get there' })).toHaveAttribute(
+    await expect(page.getByRole('link', { name: 'Directions', exact: true })).toHaveAttribute(
       'href',
       /travelmode=walking/,
     );
@@ -108,14 +114,14 @@ test.describe("a place's own screen", () => {
     );
     await page.goto(`/place/?id=${PLACE.id}`);
 
-    await expect(page.getByRole('link', { name: 'How to get there' })).toHaveAttribute(
+    await expect(page.getByRole('link', { name: 'Directions', exact: true })).toHaveAttribute(
       'href',
       /destination=111%20N%2049th%20St/,
     );
   });
 
   test('the actions are round buttons with words, and the rest is in the bar', async ({ page }) => {
-    // D-224: Website, Message, Call and Open in Google under the name, each a
+    // D-224: Website, Message, Call and Directions under the name, each a
     // labelled circle; Check hours on Google at the foot of the hours card;
     // Save and the ⋯ menu (Flag something, Share, Message) in the bar.
     await signedIn(page);
@@ -127,7 +133,11 @@ test.describe("a place's own screen", () => {
       'href',
       'https://example.org/kirkbride',
     );
-    await expect(page.getByRole('link', { name: 'Open in Google' })).toHaveAttribute('href', /google\.com\/maps\/search/);
+    // D-235: the fourth circle is Directions, and routes there.
+    await expect(page.getByRole('link', { name: 'Directions', exact: true })).toHaveAttribute(
+      'href',
+      /google\.com\/maps\/dir/,
+    );
     await expect(page.getByRole('link', { name: 'Check hours on Google' })).toHaveAttribute(
       'href',
       /google\.com\/maps\/search/,

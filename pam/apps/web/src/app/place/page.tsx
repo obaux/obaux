@@ -270,6 +270,7 @@ function PlaceScreen() {
       lon: place!.lon,
     });
   };
+  const directions = directionsHref(place!.address, place!.lat, place!.lon) ?? null;
   const googleHref = googlePlaceHref(place!.lookupName || place!.name, place!.address, place!.placeId);
   const lines = status ? weekLines(status.hours, locale, t('place.hours.closed')) : undefined;
 
@@ -298,7 +299,22 @@ function PlaceScreen() {
         audienceLabel={place!.audience ? t(`place.audience.${place!.audience}`) : null}
         phone={place!.phone}
         website={place!.website}
-        directionsHref={directionsHref(place!.address, place!.lat, place!.lon) ?? null}
+        directionsHref={directions}
+        // A member's one primary action is booking a visit (D-235), straight
+        // into the New trip steps with this place already chosen.
+        primaryAction={
+          (demoRole ?? trueRole) === 'member'
+            ? {
+                label: t('place.schedule'),
+                href: `/trips/new/?${new URLSearchParams({
+                  place: place!.id,
+                  name: place!.name,
+                  category: place!.category,
+                  ...(place!.address ? { address: place!.address } : {}),
+                }).toString()}`,
+              }
+            : null
+        }
         hoursHref={googleHref}
         isSaved={saved}
         quickActionsLabel={t('place.quick.label')}
@@ -330,13 +346,15 @@ function PlaceScreen() {
                 },
               ]
             : []),
-          ...(googleHref
+          // Directions (Will, 3 October, D-235): the round button routes there;
+          // the place on Google stays a link in the hours card.
+          ...(directions || googleHref
             ? [
                 {
-                  id: 'google',
-                  label: t('place.quick.google'),
+                  id: 'directions',
+                  label: t('place.quick.directions'),
                   icon: <PlacesIcon {...QUICK} />,
-                  href: googleHref,
+                  href: (directions ?? googleHref)!,
                   isExternal: true,
                 },
               ]

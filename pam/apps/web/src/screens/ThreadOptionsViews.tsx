@@ -11,7 +11,10 @@ import { MenuList } from '@pam/ui/MenuList';
 import { MESSAGE_REPORT_REASONS, type MessageReportReason } from '@pam/config';
 import { dummyConversationPair } from '@pam/config/dummy-conversations';
 import { dummyConnection } from '@pam/config/dummy-connections';
+import { DUMMY_EVERYONE } from '@pam/config/dummy-people';
 import { useI18n } from '@/lib/i18n';
+import { useConversations } from '@/lib/useConversations';
+import { useRoleView } from '@/lib/useViewedRole';
 import { useSession } from '@/lib/useSession';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useThread } from '@/lib/useThread';
@@ -42,6 +45,19 @@ function ThreadOptions() {
   const person = pair ? dummyConnection(pair.staffId) : null;
   const programHref = person ? `/connections/person/?id=${encodeURIComponent(person.id)}` : '/connections/';
 
+  // "View program details" only when the other side is a program (Will,
+  // 3 October, D-235): a member or a case manager talking to a program lead.
+  // A program lead talking to a member has no program to show there.
+  const { state: session } = useSession();
+  const trueRole = session.status === 'signed-in' ? session.session.role : null;
+  const { viewedRole } = useRoleView(trueRole);
+  const { state: conversations } = useConversations(!pair && session.status === 'signed-in');
+  const otherIsProgram = pair
+    ? DUMMY_EVERYONE.find((p) => p.id === (viewedRole === 'member' ? pair.staffId : pair.memberId))?.role ===
+      'provider'
+    : conversations.status === 'ready' &&
+      conversations.conversations.find((c) => c.id === id)?.otherRole === 'provider';
+
   return (
     <SubPage title={t('messages.options.title')} backHref={threadHref} backLabel={t('messages.options.back')}>
       <MenuList
@@ -53,7 +69,9 @@ function ThreadOptions() {
             href: `/messages/thread/report/?id=${encodeURIComponent(id)}`,
             icon: <FlagIcon {...ICON} />,
           },
-          { id: 'program', label: t('messages.options.program'), href: programHref, icon: <PlacesIcon {...ICON} /> },
+          ...(otherIsProgram
+            ? [{ id: 'program', label: t('messages.options.program'), href: programHref, icon: <PlacesIcon {...ICON} /> }]
+            : []),
         ]}
       />
     </SubPage>

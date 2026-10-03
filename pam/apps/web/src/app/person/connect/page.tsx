@@ -2,9 +2,7 @@
 
 import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { DUMMY_EVERYONE } from '@pam/config/dummy-people';
-import { useCaseload } from '@/lib/useCaseload';
-import { useI18n } from '@/lib/i18n';
+import { usePersonName } from '@/lib/usePersonName';
 import { ConnectView } from '../../../screens/ConnectView';
 
 /**
@@ -13,13 +11,8 @@ import { ConnectView } from '../../../screens/ConnectView';
  * nothing about a real member is fetched that the caseload does not show.
  */
 function Connect() {
-  const { t } = useI18n();
   const id = useSearchParams().get('id') ?? '';
-  const { state: caseload } = useCaseload(!DUMMY_EVERYONE.some((p) => p.id === id));
-  const name =
-    DUMMY_EVERYONE.find((p) => p.id === id)?.firstName ??
-    (caseload.status === 'ready' ? caseload.members.find((m) => m.id === id)?.firstName : undefined) ??
-    t('messages.thread.someone');
+  const name = usePersonName(id);
   return <ConnectView personId={id} name={name} />;
 }
 
