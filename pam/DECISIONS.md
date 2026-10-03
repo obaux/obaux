@@ -5065,6 +5065,43 @@ split out of `SuccessScreen`, D-240), and the new trip's card rises into
 place and scrolls into view. The old done step and its screen are removed.
 The Trips page reads the query, so it sits in a Suspense boundary.
 
+### D-242 — A program lead sees a member's visits with their program, and when they last used PAM — nothing else
+
+Will, 3 October, for privacy. On `/person/`, a program lead
+(`viewedRole === 'provider'`) sees:
+- **Stats:** Next visit (with them), Visits with you (past, with them), and
+  Last used PAM. No points and no trip totals.
+- **Visits with you:** that member's upcoming times with this program (day,
+  time, length, kind), from the program's schedule.
+- **Not shown:** coming-up trips to other programs, programs attended in the
+  past, and saved programs. Those stay the case manager's (§4.1). The
+  `/person/past/` and `/person/saved/` pages show nothing to a program lead
+  who reaches them by address.
+
+**The transparency promise changed first, as CLAUDE.md requires.** Will chose
+to let programs see the last day a member used PAM (asked: keep the promise,
+or change it). `transparency.ts`: `last_active_date` is now documented as
+true of a program the member joined; `cannotSee.programActivity` ("A program
+never sees the last day you used PAM") is removed; `canSee.lastActive` now
+reads "The last day you used PAM. A program you joined sees this too." (en
+and es). The members' screen says it plainly. **Members should be told
+before this reaches real people.**
+
+**The database is still stricter than the new promise.** `conversation_partners()`
+and `provider_linked_members()` do not return `last_active_at` to a program,
+and `04_transparency_contract_test.sql` part 3 still checks that (its
+comments updated). So today the line shows for example people only. Letting a
+program read it for real is a migration plus a test change, and it needs
+Will's go-ahead before it touches the live project.
+
+### D-243 — A member's saved programs get their own page; the past ones are "Programs attended in the past"
+
+Will, 3 October. A case manager's view of a member no longer lists saved
+places inline. A row, **Programs saved by {name}** (with a count), opens
+`/person/saved/` (`SavedByView`, place cards). The past-trips row and page
+are now **Programs attended in the past**. Both pages are the case
+manager's only (D-242).
+
 ---
 
 ## Notes for whoever picks this up next

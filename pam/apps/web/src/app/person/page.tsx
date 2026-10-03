@@ -5,12 +5,11 @@ import { useSearchParams } from 'next/navigation';
 import * as stylex from '@stylexjs/stylex';
 import { VStack } from '@astryxdesign/core/VStack';
 import { HStack } from '@astryxdesign/core/HStack';
-import { Card } from '@astryxdesign/core/Card';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { Badge } from '@astryxdesign/core/Badge';
 import { Avatar } from '@astryxdesign/core/Avatar';
-import { BigButton, ConnectionsIcon, Loading, MessagesIcon, Notice, Page, TripsIcon } from '@pam/ui';
+import { BigButton, BookmarkIcon, ConnectionsIcon, Loading, MessagesIcon, Notice, Page, TripsIcon } from '@pam/ui';
 import { MenuList } from '@pam/ui/MenuList';
 import { ProfileSummary } from '@pam/ui/ProfileCards';
 import { TripCard } from '@pam/ui/TripCard';
@@ -30,6 +29,8 @@ import { PersonDetailSkeleton } from '@pam/ui/Skeletons';
 import { NOTICES } from '@pam/config';
 import { DUMMY_EVERYONE, type DummyPerson } from '@pam/config/dummy-people';
 import { DUMMY_SAVED_BY_PERSON } from '@pam/config/dummy-places';
+import { DUMMY_APPOINTMENTS } from '@pam/config/dummy-appointments';
+import { List, ListItem } from '@astryxdesign/core/List';
 import { useI18n } from '@/lib/i18n';
 import { NotIn } from '../NotIn';
 import { useSupportPhone } from '@/lib/useSupportPhone';
@@ -278,6 +279,19 @@ function PersonScreen() {
   const trips = isMember ? dummyTripsFor(person.id) : [];
   const upcoming = trips.filter((trip) => new Date(trip.startsAt).getTime() >= now);
   const past = trips.filter((trip) => new Date(trip.startsAt).getTime() < now).reverse();
+  // A program lead sees only their own program's visits with this person
+  // (Will, 3 October, D-242): never trips to other programs, places already
+  // gone, saved places or points — those are the case manager's (§4.1).
+  const isProgramView = viewedRole === 'provider';
+  const visits = isProgramView && person.isExample
+    ? DUMMY_APPOINTMENTS.filter((a) => a.personId === person.id).sort((a, b) => a.startsAt.localeCompare(b.startsAt))
+    : [];
+  const nextVisits = visits.filter((a) => new Date(a.startsAt).getTime() >= now);
+  const pastVisits = visits.filter((a) => new Date(a.startsAt).getTime() < now);
+  const shortDay = (iso: string) =>
+    new Intl.DateTimeFormat(locale, { month: 'short', day: 'numeric' }).format(new Date(iso));
+  const visitWhen = (iso: string) =>
+    `${new Intl.DateTimeFormat(locale, { weekday: 'short', month: 'short', day: 'numeric' }).format(new Date(iso))} · ${new Intl.DateTimeFormat(locale, { hour: 'numeric', minute: '2-digit' }).format(new Date(iso))}`;
   const tripWhen = (iso: string) =>
     `${new Intl.DateTimeFormat(locale, { weekday: 'long', month: 'short', day: 'numeric' }).format(new Date(iso))} · ${new Intl.DateTimeFormat(locale, { hour: 'numeric', minute: '2-digit' }).format(new Date(iso))}`;
   const tripCard = (trip: (typeof trips)[number]) => (
@@ -330,13 +344,25 @@ function PersonScreen() {
       <ProfileSummary
         name={person.firstName}
         roleLabel={[t(`role.${person.role}`), person.regionName].filter(Boolean).join(' · ')}
-        stats={[
-          ...(person.points !== undefined
-            ? [{ value: String(person.points), label: t('person.stat.points') }]
-            : []),
-          ...(isMember ? [{ value: String(upcoming.length), label: t('person.stat.trips') }] : []),
-          { value: when ?? t('person.stat.never'), label: t('person.stat.lastUsed') },
-        ]}
+        stats={
+          isProgramView
+            ? [
+                // Only what concerns this program, plus when they last used PAM (D-242).
+                {
+                  value: nextVisits[0] ? shortDay(nextVisits[0].startsAt) : t('person.stat.never'),
+                  label: t('person.stat.nextVisit'),
+                },
+                { value: String(pastVisits.length), label: t('person.stat.visits') },
+                { value: when ?? t('person.stat.never'), label: t('person.stat.lastUsed') },
+              ]
+            : [
+                ...(person.points !== undefined
+                  ? [{ value: String(person.points), label: t('person.stat.points') }]
+                  : []),
+                ...(isMember ? [{ value: String(upcoming.length), label: t('person.stat.trips') }] : []),
+                { value: when ?? t('person.stat.never'), label: t('person.stat.lastUsed') },
+              ]
+        }
         corner={
           isMember && viewedRole === 'admin' ? (
             <StarToggle
@@ -393,7 +419,30 @@ function PersonScreen() {
         Coming up trips (Will, 3 October, D-234): one heading, the visits
         ahead, then a row to the ones already made on their own page.
       */}
-      {isMember ? (
+      {isMember && isProgramView ? (
+        <VStack gap={3}>
+          <Heading level={2} xstyle={styles.section}>
+            {t('person.visits.title')}
+          </Heading>
+          {nextVisits.length > 0 ? (
+            <List hasDividers density="spacious" aria-label={t('person.visits.title')}>
+              {nextVisits.map((a) => (
+                <ListItem
+                  key={a.id}
+                  label={visitWhen(a.startsAt)}
+                  description={`${t('schedule.minutes', { minutes: a.minutes })} · ${t(`schedule.kind.${a.kind}`)}`}
+                />
+              ))}
+            </List>
+          ) : (
+            <Text type="supporting" xstyle={styles.meta}>
+              {t('person.visits.none')}
+            </Text>
+          )}
+        </VStack>
+      ) : null}
+
+      {isMember && !isProgramView ? (
         <VStack gap={3}>
           <Heading level={2} xstyle={styles.section}>
             {t('person.trips.title')}
@@ -415,39 +464,21 @@ function PersonScreen() {
                 href: `/person/past/?id=${encodeURIComponent(person.id)}`,
                 ...(past.length > 0 ? { value: String(past.length) } : {}),
               },
+              // Their saved programs, on their own page like the past ones
+              // (Will, 3 October, D-243). A case manager's to see only.
+              ...(person.isExample
+                ? [
+                    {
+                      id: 'saved',
+                      label: t('person.savedPlaces.link', { name: person.firstName }),
+                      icon: <BookmarkIcon width={26} height={26} />,
+                      href: `/person/saved/?id=${encodeURIComponent(person.id)}`,
+                      ...(saved.length > 0 ? { value: String(saved.length) } : {}),
+                    },
+                  ]
+                : []),
             ]}
           />
-        </VStack>
-      ) : null}
-
-      {isMember && person.isExample ? (
-        <VStack gap={2}>
-          <Heading level={2} xstyle={styles.section}>
-            {t('person.savedPlaces.title')}
-          </Heading>
-          {saved.length === 0 ? (
-            <Text type="supporting" xstyle={styles.meta}>
-              {t('person.savedPlaces.empty')}
-            </Text>
-          ) : (
-            <VStack gap={2}>
-              {saved.map((place) => (
-                <Card key={place.id} padding={6} xstyle={styles.card}>
-                  <VStack gap={1}>
-                    <Heading level={3} xstyle={styles.name}>
-                      <a href={`/place/?id=${encodeURIComponent(place.id)}`} {...stylex.props(styles.link)}>
-                        {place.name}
-                      </a>
-                    </Heading>
-                    <Text type="supporting" xstyle={styles.meta}>
-                      {place.address}
-                    </Text>
-                    <Text xstyle={styles.meta}>{place.description}</Text>
-                  </VStack>
-                </Card>
-              ))}
-            </VStack>
-          )}
         </VStack>
       ) : null}
 

@@ -24,6 +24,9 @@ export const MemberWithNewMessages: Story = screen('case-manager', 'A member wit
 export const MemberPastTrips: Story = screen('case-manager', 'A member’s past trips', '/person/past/', {
   id: 'dummy-m1',
 });
+export const MemberSaved: Story = screen('case-manager', 'Programs a member saved', '/person/saved/', {
+  id: 'dummy-m1',
+});
 export const ConnectMember: Story = screen('case-manager', 'Connect a member to a program', '/person/connect/', {
   id: 'dummy-m1',
 });

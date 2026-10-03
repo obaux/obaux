@@ -16,7 +16,10 @@ before recommending. A place's main button is "Schedule a visit", which goes
 straight into planning a trip, and Back in that flow goes back one step. Connecting a member to a program now looks like
 Explore, with category chips and the same place cards, and search tucked
 behind a button. Recommending a program ends on a short celebration, with
-confetti and a way home.
+confetti and a way home. Adding a trip goes straight to Trips, with confetti and
+the new trip sliding in. A program sees only a member's visits with that
+program and when they last used PAM (the transparency screen now says so). A
+case manager sees a member's past and saved programs on their own pages.
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 

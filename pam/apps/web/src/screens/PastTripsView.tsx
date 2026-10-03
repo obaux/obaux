@@ -8,6 +8,8 @@ import { SubPageHeader } from '@pam/ui/SubPage';
 import { TripCard } from '@pam/ui/TripCard';
 import { dummyTripsFor } from '@pam/config/dummy-trips';
 import { useI18n } from '@/lib/i18n';
+import { useSession } from '@/lib/useSession';
+import { useRoleView } from '@/lib/useViewedRole';
 import { BigCategoryIcon } from './SavedView';
 import { HeaderActions } from './HeaderActions';
 
@@ -26,8 +28,13 @@ const styles = stylex.create({
 
 export function PastTripsView({ personId, name }: { readonly personId: string; readonly name: string }) {
   const { t, locale } = useI18n();
+  const { state: session } = useSession();
+  const { viewedRole } = useRoleView(session.status === 'signed-in' ? session.session.role : null);
+  // A member's past trips are the case manager's to see, not a program's
+  // (D-242): a program lead who reaches this page by its address sees none.
+  const isProgramView = viewedRole === 'provider';
   const now = Date.now();
-  const past = dummyTripsFor(personId)
+  const past = (isProgramView ? [] : dummyTripsFor(personId))
     .filter((trip) => new Date(trip.startsAt).getTime() < now)
     .reverse();
   const when = (iso: string) =>

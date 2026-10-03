@@ -290,7 +290,10 @@ search, including the new-message sheet, is the same pill. A place has round
 quick actions with small labels. Saved tiles show their full shadow. Each
 change is in DECISIONS. A case manager's member page (D-231) has the profile
 card, Message (with a count) and Connect to… (`/person/connect/`, an example
-only, nothing stored).
+only, nothing stored). **Transparency changed (D-242):** members are now told
+a program they joined sees the last day they used PAM; the database does not
+expose it to programs yet (a follow-up migration needs Will's go-ahead), so it
+shows for example people only. Members should be told before it is real.
 
 This is the handover document: what exists, what is proven, what is live, and
 what the next person needs to know before touching anything.

@@ -13,6 +13,7 @@ import NotificationsPage from '../../app/notifications/page';
 import PersonPage from '../../app/person/page';
 import ConnectPage from '../../app/person/connect/page';
 import PastTripsPage from '../../app/person/past/page';
+import SavedByPage from '../../app/person/saved/page';
 import PlacePage from '../../app/place/page';
 import PlacesPage from '../../app/places/page';
 import PointsPage from '../../app/points/page';
@@ -72,6 +73,7 @@ export const APP_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   '/person/': screen(() => <PersonPage />),
   '/person/connect/': screen(() => <ConnectPage />),
   '/person/past/': screen(() => <PastTripsPage />),
+  '/person/saved/': screen(() => <SavedByPage />),
   '/account/': screen(() => <AccountPage />),
   '/help/': screen(() => <HelpPage />),
   '/privacy/': screen(() => <PrivacyPage />),
