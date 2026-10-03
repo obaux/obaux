@@ -16,8 +16,8 @@ import { ThreadHeader } from './ThreadFrame';
  * real thread uses. A pair with no written thread (a "Start a conversation"
  * row, `/person/`'s "Message Aaliyah") is an empty log with a composer.
  * Sending appends to sessionStorage (`demoMessages.ts`) and nothing else;
- * there is no `onReport`, because a report is a real safety action with real
- * recipients and an example conversation has neither.
+ * its ⋯ page's Report sends nothing, because a report is a real safety action
+ * with real recipients and an example conversation has neither.
  */
 export function DemoThread({
   conversationId,
@@ -73,6 +73,7 @@ export function DemoThread({
         context={context}
         backHref="/messages/"
         backLabel={t('nav.back.messages')}
+        menuHref={`/messages/thread/options/?id=${encodeURIComponent(conversationId)}`}
       />
       <ThreadView
         messages={messages}

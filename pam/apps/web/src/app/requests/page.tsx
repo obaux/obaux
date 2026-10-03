@@ -9,11 +9,12 @@ import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { Button } from '@astryxdesign/core/Button';
 import { RadioList, RadioListItem } from '@astryxdesign/core/RadioList';
-import { AppHeader, Loading, Notice, Page, PageTitle, TextLink } from '@pam/ui';
+import { Loading, Notice, Page } from '@pam/ui';
+import { SubPageHeader } from '@pam/ui/SubPage';
+import { HelpButton } from '../../screens/HelpButton';
 import { NOTICES } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { NotIn } from '../NotIn';
-import { HeaderBell } from '../HeaderBell';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
 import { useStaffRequests, reviewStaffRequest, type StaffRequestRow } from '@/lib/useStaffRequests';
@@ -104,7 +105,19 @@ export default function RequestsPage() {
   if (session.status === 'loading') {
     return (
       <Page gap={3}>
-        <AppHeader />
+        <SubPageHeader
+          title={t('requests.title')}
+          backHref="/directory/"
+          backLabel={t('nav.back.directory')}
+          actions={
+            <>
+              {trueRole === 'super_admin' ? (
+                <RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} />
+              ) : null}
+              <HelpButton />
+            </>
+          }
+        />
         <Loading label={t('common.loading')} variant="screen" />
       </Page>
     );
@@ -113,7 +126,19 @@ export default function RequestsPage() {
   if (session.status === 'signed-out' || session.status === 'no-profile' || session.status === 'suspended') {
     return (
       <Page gap={4}>
-        <AppHeader />
+        <SubPageHeader
+          title={t('requests.title')}
+          backHref="/directory/"
+          backLabel={t('nav.back.directory')}
+          actions={
+            <>
+              {trueRole === 'super_admin' ? (
+                <RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} />
+              ) : null}
+              <HelpButton />
+            </>
+          }
+        />
         <NotIn status={session.status} title={t('directory.signedOut.title')} body={t('directory.signedOut.body')} />
       </Page>
     );
@@ -122,14 +147,18 @@ export default function RequestsPage() {
   if (!isSuperAdmin) {
     return (
       <Page gap={4}>
-        <AppHeader
-          roleLabel={viewedRole ? t(`role.${viewedRole}`) : undefined}
-          roleControl={
-            trueRole === 'super_admin' ? (
-              <RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} />
-            ) : undefined
+        <SubPageHeader
+          title={t('requests.title')}
+          backHref="/directory/"
+          backLabel={t('nav.back.directory')}
+          actions={
+            <>
+              {trueRole === 'super_admin' ? (
+                <RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} />
+              ) : null}
+              <HelpButton />
+            </>
           }
-          trailing={<HeaderBell enabled={trueRole !== null} role={viewedRole} />}
         />
         <Notice
           notice="service_not_available"
@@ -138,26 +167,25 @@ export default function RequestsPage() {
           supportPhone={supportPhone}
           callLabel={t('help.callSupport')}
         />
-        <TextLink label={t('admin.back')} href="/directory/" />
       </Page>
     );
   }
 
   return (
     <Page gap={4}>
-      <AppHeader
-        roleLabel={t('role.super_admin')}
-        roleControl={<RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} />}
-        trailing={<HeaderBell enabled={isSuperAdmin} role={viewedRole} />}
-      />
-
-      <PageTitle
+      <SubPageHeader
         title={t('requests.title')}
-        subtitle={
-          requests.status === 'ready' ? t('requests.count', { count: requests.requests.length }) : undefined
-        }
+        subtitle={requests.status === 'ready' ? t('requests.count', { count: requests.requests.length }) : undefined}
         backHref="/directory/"
         backLabel={t('nav.back.directory')}
+        actions={
+          <>
+            {trueRole === 'super_admin' ? (
+              <RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} />
+            ) : null}
+            <HelpButton />
+          </>
+        }
       />
 
       {regions.length > 1 ? (

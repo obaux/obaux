@@ -98,7 +98,7 @@ export const pamTheme = {
     "--color-syntax-punctuation": "light-dark(#6a6a6a, #9e9e9e)",
     "--color-syntax-background": "light-dark(#ffffff, #111111)",
     "--color-background-surface": "light-dark(#ffffff, #262626)",
-    "--color-background-body": "light-dark(#f1f1f1, #1b1b1b)",
+    "--color-background-body": "light-dark(#FFFFFF, #1B1B1B)",
     "--color-background-card": "light-dark(#ffffff, #1b1b1b)",
     "--color-background-popover": "light-dark(#ffffff, #1b1b1b)",
     "--color-background-muted": "light-dark(#f1f1f1, #1b1b1b)",
@@ -504,12 +504,54 @@ export const pamTheme = {
     },
     "card": {
       "base": {
-        "padding": "var(--spacing-3)"
+        "padding": "var(--spacing-3)",
+        "borderRadius": "24px"
+      },
+      "variant:default": {
+        "borderWidth": "0px",
+        "boxShadow": "0 1px 2px light-dark(oklch(0 0 0 / 6%), oklch(0 0 0 / 30%)), 0 6px 20px light-dark(oklch(0 0 0 / 9%), oklch(0 0 0 / 40%)), inset 0 0 0 1px light-dark(transparent, oklch(1 0 0 / 9%))"
       }
     },
     "section": {
       "base": {
         "padding": "var(--spacing-3)"
+      }
+    },
+    "input-group": {
+      "size:lg": {
+        "borderRadius": "999px",
+        "minHeight": "60px",
+        "paddingInlineStart": "8px",
+        "paddingInlineEnd": "4px",
+        "borderWidth": "0px",
+        "backgroundColor": "light-dark(#FFFFFF, #262626)",
+        "boxShadow": "0 2px 4px light-dark(oklch(0 0 0 / 6%), oklch(0 0 0 / 30%)), 0 10px 28px light-dark(oklch(0 0 0 / 14%), oklch(0 0 0 / 45%)), inset 0 0 0 1px light-dark(oklch(0 0 0 / 5%), oklch(1 0 0 / 10%))"
+      }
+    },
+    "text-input": {
+      "size:lg": {
+        "fontSize": "18px",
+        "borderWidth": "0px",
+        "backgroundColor": "transparent",
+        "boxShadow": "none"
+      }
+    },
+    "typeahead": {
+      "size:lg": {
+        "fontSize": "18px",
+        "borderWidth": "0px",
+        "backgroundColor": "transparent",
+        "boxShadow": "none"
+      }
+    },
+    "tab-indicator": {
+      "base": {
+        "--color-accent": "transparent"
+      }
+    },
+    "typeahead-dropdown": {
+      "base": {
+        "borderRadius": "20px"
       }
     },
     "spinner": {

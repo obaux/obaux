@@ -1,0 +1,196 @@
+'use client';
+
+import type { ReactNode } from 'react';
+import { VStack } from '@astryxdesign/core/VStack';
+import { Divider } from '@astryxdesign/core/Divider';
+import type { Role } from '@pam/config';
+import {
+  BellIcon,
+  ConnectionsIcon,
+  GlobeIcon,
+  HelpIcon,
+  LegalIcon,
+  Page,
+  PeopleIcon,
+  PlacesIcon,
+  ShieldIcon,
+  SignOutIcon,
+  StarIcon,
+  TripsIcon,
+} from '@pam/ui';
+import { LargeTitleHeader } from '@pam/ui/LargeTitleHeader';
+import { FeatureTile, FeatureTileRow, ProfileSummary, PromoCard } from '@pam/ui/ProfileCards';
+import { MenuList } from '@pam/ui/MenuList';
+import { useI18n } from '@/lib/i18n';
+
+/**
+ * Profile — the redesign's first screen (D-210, Will, 1 October).
+ *
+ * Who you are and your numbers; two doors (past trips, and Connections — the
+ * case manager and programs on your side); one offer (text reminders); then
+ * a plain list. Since D-213 the list is shorter: Language (the one thing the
+ * old Account screen held that Profile did not), text reminders once they
+ * are on, Get help, Legal (terms, privacy and who can see what, behind one
+ * row), and sign out. The Account screen is gone from the redesign.
+ *
+ * A view, not a route yet: it takes what it shows as props, so Storybook can
+ * draw every state and the data wiring lands when the redesign is agreed.
+ */
+export interface ProfileViewProps {
+  readonly name: string;
+  readonly role: Role;
+  readonly points: number;
+  readonly savedCount: number;
+  readonly connectionsCount: number;
+  /** Whether this account has said yes to text reminders. */
+  readonly remindersOn: boolean;
+  /** The bell and Help, from the caller — they read live data. */
+  readonly headerActions: ReactNode;
+  readonly onSignOut?: () => void;
+  /**
+   * A super admin's own account, whatever role it is previewing — keeps the
+   * "See the app as" row, so a preview is never a one-way door (D-217).
+   */
+  readonly canViewAs?: boolean;
+}
+
+const ICON = { width: 26, height: 26, 'aria-hidden': true } as const;
+const ART = { width: 44, height: 44, 'aria-hidden': true } as const;
+
+export function ProfileView({
+  name,
+  role,
+  points,
+  savedCount,
+  connectionsCount,
+  remindersOn,
+  headerActions,
+  onSignOut,
+  canViewAs = false,
+}: ProfileViewProps) {
+  const { t, locale } = useI18n();
+  const number = (n: number) => new Intl.NumberFormat(locale).format(n);
+  const isMember = role === 'member';
+
+  const staffRows = [
+    // Invite someone, a second way in for a case manager beside the strip
+    // on Home (D-226).
+    ...(role === 'admin'
+      ? [{ id: 'invite', label: t('profile.menu.invite'), href: '/invite/', icon: <PeopleIcon {...ICON} /> }]
+      : []),
+    // Every program, a secondary path for staff (D-218): where to look one
+    // up, save it, or add a new one.
+    ...(role === 'admin' || role === 'provider'
+      ? [
+          {
+            id: 'programs',
+            // A program lead browses the others: "Programs in PAM" (D-237).
+            label: t(role === 'provider' ? 'profile.menu.programsInPam' : 'profile.menu.programs'),
+            href: '/programs/',
+            icon: <PlacesIcon {...ICON} />,
+          },
+        ]
+      : []),
+    ...(role === 'super_admin'
+      ? [
+          { id: 'everyone', label: t('profile.menu.everyone'), href: '/directory/', icon: <PeopleIcon {...ICON} /> },
+          { id: 'requests', label: t('profile.menu.requests'), href: '/requests/', icon: <ShieldIcon {...ICON} /> },
+        ]
+      : []),
+    ...(canViewAs
+      ? [{ id: 'view-as', label: t('profile.menu.viewAs'), href: '/view-as/', icon: <GlobeIcon {...ICON} /> }]
+      : []),
+  ];
+
+  return (
+    <Page gap={4}>
+      <LargeTitleHeader title={t('profile.title')} actions={headerActions} />
+
+      <ProfileSummary
+        name={name}
+        roleLabel={t(`role.${role}`)}
+        stats={
+          isMember
+            ? [
+                { value: number(points), label: t('profile.stat.points') },
+                { value: number(savedCount), label: t('profile.stat.saved') },
+                { value: number(connectionsCount), label: t('profile.stat.connections') },
+              ]
+            : []
+        }
+      />
+
+      {/*
+        Points, trips and connections are a member's (D-217): staff are not
+        given points, do not plan visits, and are the connections. Their
+        Profile is who they are, their tools, and the same settings.
+      */}
+      {isMember ? (
+        <FeatureTileRow>
+          <FeatureTile label={t('profile.tile.trips')} href="/trips/" art={<TripsIcon {...ART} />} />
+          <FeatureTile label={t('profile.tile.connections')} href="/connections/" art={<ConnectionsIcon {...ART} />} />
+        </FeatureTileRow>
+      ) : null}
+
+      {remindersOn ? null : (
+        <PromoCard
+          title={t('profile.promo.reminders.title')}
+          body={t('profile.promo.reminders.body')}
+          href="/reminders/"
+          art={<StarIcon {...ART} />}
+        />
+      )}
+
+      <VStack gap={2}>
+        {/*
+          The staff screens that are not a tab (D-217): a case manager's
+          invites, a super admin's Everyone and staff requests, and the role
+          preview. They lived on the old home's tiles; Profile is where an
+          account's own tools are now.
+        */}
+        {staffRows.length > 0 ? (
+          <>
+            <MenuList label={t('profile.menu.label')} items={staffRows} />
+            <Divider />
+          </>
+        ) : null}
+        <MenuList
+          label={t('profile.menu.label')}
+          items={[
+            {
+              id: 'language',
+              label: t('profile.menu.language'),
+              value: t(locale === 'es' ? 'language.es' : 'language.en'),
+              href: '/language/',
+              icon: <GlobeIcon {...ICON} />,
+            },
+            ...(remindersOn
+              ? [
+                  {
+                    id: 'reminders',
+                    label: t('profile.menu.reminders'),
+                    href: '/reminders/',
+                    icon: <BellIcon {...ICON} />,
+                  },
+                ]
+              : []),
+            { id: 'help', label: t('profile.menu.help'), href: '/help/', icon: <HelpIcon {...ICON} /> },
+          ]}
+        />
+        <Divider />
+        <MenuList
+          label={t('profile.menu.label')}
+          items={[
+            { id: 'legal', label: t('profile.menu.legal'), href: '/legal/', icon: <LegalIcon {...ICON} /> },
+            {
+              id: 'sign-out',
+              label: t('profile.menu.signOut'),
+              onSelect: onSignOut,
+              icon: <SignOutIcon {...ICON} />,
+            },
+          ]}
+        />
+      </VStack>
+    </Page>
+  );
+}

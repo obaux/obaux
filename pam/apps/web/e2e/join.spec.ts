@@ -124,10 +124,9 @@ test.describe('signing up', () => {
     await newcomer(page);
     await page.goto('/join/');
 
+    // D-251: the count is the step's subtitle, as in Plan a trip — no bar.
     await expect(page.getByText('Step 2 of 5').first()).toBeVisible();
-    const bar = page.getByRole('progressbar');
-    await expect(bar).toHaveAttribute('aria-valuenow', '2');
-    await expect(bar).toHaveAttribute('aria-valuemax', '5');
+    await expect(page.getByRole('progressbar')).toHaveCount(0);
   });
 
   test('never says "role" to the person filling it in', async ({ page }) => {

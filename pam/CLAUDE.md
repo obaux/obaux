@@ -110,6 +110,38 @@ assuming a clean base.
 - **`packages/db/migrations/0007_rls.sql`** — the whole access-control surface
   in one file, because a policy set is only reviewable as a set.
 
+## Storybook is where front-end work is shown
+
+Will reviews UI in Storybook (Chromatic, rebuilt on every push — D-208), not
+by signing in on the live site. So:
+
+- **A new or changed component gets a story** in
+  `apps/web/src/stories/components/`; a new or changed screen gets a line in
+  each role's `apps/web/src/stories/roles/<Role>.stories.tsx` that reaches it
+  (`screen(role, name, path)`, D-217), and its route in
+  `src/stories/prototype/routes.tsx`, with any new Supabase call given a
+  fixture in `journeys/fixtures.ts` / `mockSupabase.ts`. States worth seeing
+  on their own go in `roles/states/`. Storybook shows only the current design.
+  An unmatched call is answered empty and logged as `[journey] no fixture` —
+  fix that, don't ignore it.
+- **Journeys never touch the live project.** Keep it that way: no real keys,
+  no real requests from a story.
+- `pnpm --filter @pam/web build-storybook` must pass before pushing. Check a
+  story renders by serving `storybook-static` with `python3 -m http.server`
+  (`npx serve` drops the query string Storybook needs) and opening
+  `iframe.html?id=<story-id>`.
+- **A new screen joins the clickable prototype** (`src/stories/prototype/routes.tsx`,
+  D-211): add its route to `TODAY_ROUTES`, or to `REDESIGN_ROUTES` if it is a
+  redesigned view. Leave a screen from script with `router.push` or
+  `navigate()` (`src/lib/navigate.ts`), never `window.location` — the
+  prototype can't follow that.
+- **Two screen templates (D-213).** A tab screen uses `LargeTitleHeader`; any
+  screen you tap into uses `SubPage`/`SubPageHeader` from `@pam/ui` (round
+  back, large title; `variant="compact"` for a conversation). Don't hand-roll a
+  new header. Text cards take `padding={6}`.
+- What ships is still the branch, merged the usual way. Nothing is exported
+  from Storybook.
+
 ## Rules that are not negotiable
 
 These come from the build SOP and are enforced by tests, not convention:
@@ -123,9 +155,9 @@ These come from the build SOP and are enforced by tests, not convention:
   or send without a human recorded in `reviewedBy`.
 - **Never dead-end.** Every screen has a visible way back and a visible way to
   get help.
-- **One primary action per screen.** Two `BigButton`s means the screen is doing
-  two things.
-- **48px minimum touch target, 64px primary buttons, 18px body text on mobile.**
+- **One primary action per screen.** Two primary `BigButton`s means the screen
+  is doing two things (a `variant="secondary"` one beside it is fine — D-239).
+- **48px minimum touch target, 56px primary buttons (secondary the same — D-239), 18px body text on mobile.**
 - Every `security definer` function sets `search_path = public, extensions`.
 - Strings go through i18n from day one. English and Spanish stay key-for-key.
 

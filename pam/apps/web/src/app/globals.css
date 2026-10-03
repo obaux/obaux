@@ -74,7 +74,7 @@
      */
     --pam-body-size: 18px;
     --pam-touch-target-min: 48px;
-    --pam-big-button-height: 64px;
+    --pam-big-button-height: 56px;
   }
 
   @media (min-width: 768px) {
@@ -171,6 +171,16 @@
     padding-block: 12px;
   }
 
+  /*
+   * Every button a full pill (Will, 3 October, D-253). Astryx's Button reads
+   * its corner from this variable before falling back to the theme's element
+   * radius, so one line here covers every Button and IconButton; a component
+   * that sets its own corner in xstyle (a list row, a tile) keeps it.
+   */
+  :root {
+    --_button-radius: 999px;
+  }
+
   /* §12: every flow completable with tap only — never hide the focus ring. */
   :focus-visible {
     outline: 3px solid currentColor;
@@ -211,6 +221,108 @@
     outline: 3px solid currentColor;
     outline-offset: 2px;
     border-radius: 12px;
+  }
+
+  /*
+   * The sign-in code's boxes (D-251): the field is invisible over the row,
+   * and focus shows on the box the next digit goes in — a 2px accent edge —
+   * so the frame ring above would be a second indicator round all six.
+   */
+  [data-pam-code]:has(> input:focus-visible) {
+    outline: none;
+  }
+
+  /*
+   * The search bar (D-212) is one rounded shape with the field inside it; the
+   * rule above would ring the field's own inner box, a rectangle floating in
+   * a pill. Same ring, moved to the pill, following its round ends.
+   */
+  .astryx-input-group[data-size='lg'] :has(> input:focus-visible) {
+    outline: none;
+  }
+
+  .astryx-input-group[data-size='lg']:has(input:focus-visible) {
+    outline: 3px solid currentColor;
+    outline-offset: 2px;
+    border-radius: 999px;
+  }
+
+  /*
+   * A list row that is an action, not a link — Sign out (D-218). Astryx draws
+   * it as a 48px button that stacks its label at the top, so the words sat
+   * above the icon beside them; a link row has no such box. Centred, it lines
+   * up with every other row.
+   */
+  .astryx-item > button {
+    justify-content: center;
+  }
+
+  /*
+   * A list row's middle (the link or button holding the label and the line
+   * under it) is a flex item that could grow past the row, so a long message
+   * preview ran off the screen instead of ending in "…" (Will, 2 October).
+   * Allowed to shrink, the line's own ellipsis has an edge to meet.
+   */
+  .astryx-item > a,
+  .astryx-item > button {
+    min-width: 0;
+  }
+
+  /*
+   * A sheet's grab handle, drawn like the Trips drawer's (MapDrawer's grip):
+   * 40 by 5, the border colour, so every drawer in PAM has the same handle
+   * (Will, 3 October). Astryx's own is a thinner 36 by 4.
+   */
+  /*
+   * And its top corners match the Trips drawer's 28px (Will, 3 October):
+   * Astryx's own were tighter, so the two drawers looked like different
+   * things.
+   */
+  .astryx-bottom-sheet {
+    border-top-left-radius: 28px;
+    border-top-right-radius: 28px;
+  }
+
+  .astryx-bottom-sheet > [aria-hidden='true'] > div {
+    width: 40px;
+    height: 5px;
+    border-radius: 3px;
+    background-color: var(--color-border);
+  }
+
+  /*
+   * Notifications (D-230): each row leads with a short title — "Place
+   * reported" — at reading size and weight, above the grey sentence.
+   */
+  [data-pam-list='notifications'] .astryx-item > a > span:first-child,
+  [data-pam-list='notifications'] .astryx-item > span:first-child {
+    font-size: 17px;
+    font-weight: 600;
+  }
+
+  /*
+   * Segmented controls are pills, inside and out (Will, 3 October, D-233):
+   * the segments and the sliding highlight match the round search bar, chips
+   * and buttons. Astryx has no prop for the segment's radius.
+   */
+  .astryx-segmented-control,
+  .astryx-segmented-control > .astryx-segmented-control-item,
+  .astryx-segmented-control > div {
+    border-radius: 999px;
+  }
+
+  /*
+   * The recommend dialog on Connect (D-234): 32px corners, and the page
+   * behind washed to 80% white instead of darkened (Will, 3 October).
+   */
+  dialog[data-pam-dialog='recommend'],
+  [data-pam-dialog='recommend'] .astryx-dialog,
+  .astryx-dialog[data-pam-dialog='recommend'] {
+    border-radius: 32px;
+  }
+
+  dialog[data-pam-dialog='recommend']::backdrop {
+    background-color: rgb(255 255 255 / 80%);
   }
 
   @media (prefers-reduced-motion: reduce) {

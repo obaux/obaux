@@ -2,11 +2,11 @@
 
 import type { ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
-import { HStack } from '@astryxdesign/core/HStack';
 import { VStack } from '@astryxdesign/core/VStack';
-import { Heading } from '@astryxdesign/core/Heading';
-import { IconButton } from '@astryxdesign/core/IconButton';
 import { Icon } from '@astryxdesign/core/Icon';
+import { IconButton } from '@astryxdesign/core/IconButton';
+import { SubPageHeader } from '@pam/ui/SubPage';
+import { useI18n } from '@/lib/i18n';
 import { Token } from '@astryxdesign/core/Token';
 import { spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
 
@@ -90,6 +90,7 @@ const styles = stylex.create({
   },
   // A long program name is cut, never wrapped: the row stays one row.
   tag: { maxWidth: '40%', flexShrink: 1 },
+  more: { width: '48px', height: '48px', borderRadius: '50%', flexShrink: 0 },
 });
 
 export function ThreadFrame({ children }: { readonly children: ReactNode }) {
@@ -105,31 +106,45 @@ export function ThreadTop({ children }: { readonly children: ReactNode }) {
   );
 }
 
+/**
+ * The nested-page template in its compact form (D-213): the round back
+ * button, then the name in the same bar, with who they are beside it — one
+ * row, as D-193 asked, now drawn the way every nested screen starts.
+ */
 export function ThreadHeader({
   name,
   context,
   backHref,
   backLabel,
+  menuHref,
 }: {
   readonly name: string;
   /** "Case manager", or the program's name — `null` draws no tag (D-187). */
   readonly context: string | null;
   readonly backHref: string;
   readonly backLabel: string;
+  /** The ⋯ page — report, the program's details (D-213). */
+  readonly menuHref?: string;
 }) {
+  const { t } = useI18n();
   return (
-    <HStack gap={1} align="center" wrap="nowrap" xstyle={styles.row}>
-      <IconButton
-        label={backLabel}
-        icon={<Icon icon="chevronLeft" />}
-        variant="ghost"
-        href={backHref}
-        xstyle={styles.back}
-      />
-      <Heading level={1} xstyle={styles.name}>
-        {name}
-      </Heading>
-      {context ? <Token label={context} size="sm" xstyle={styles.tag} /> : null}
-    </HStack>
+    <SubPageHeader
+      variant="compact"
+      title={name}
+      backHref={backHref}
+      backLabel={backLabel}
+      titleAddon={context ? <Token label={context} size="sm" xstyle={styles.tag} /> : null}
+      actions={
+        menuHref ? (
+          <IconButton
+            label={t('messages.thread.more')}
+            href={menuHref}
+            variant="ghost"
+            icon={<Icon icon="moreHorizontal" size="md" />}
+            xstyle={styles.more}
+          />
+        ) : undefined
+      }
+    />
   );
 }

@@ -1,5 +1,122 @@
 # Changelog
 
+## [0.41.2-polish] — 2026-10-03 · Small fixes
+
+The search box for a new message looks the same as every other search in
+the app. The labels under a place's round buttons are smaller. Saved places
+show their full shadow again. The new-message sheet has a title and says
+who each person is (member, case manager or program). Explore's category
+chips show their icons in colour. On Trips the drawer's top is slimmer,
+cards fade under its title as you scroll, and long place names stay on one
+line. Notifications are grouped into New and Earlier, each with an icon and
+a short title. A case manager's view of a member uses the same profile
+card as a member's own, with two clear actions: message them (with a count
+of new messages) and connect them to a program. Connecting now starts with a search and asks
+before recommending. A place's main button is "Schedule a visit", which goes
+straight into planning a trip, and Back in that flow goes back one step. Connecting a member to a program now looks like
+Explore, with category chips and the same place cards, and search tucked
+behind a button. Recommending a program ends on a short celebration, with
+confetti and a way home. Adding a trip goes straight to Trips, with confetti and
+the new trip sliding in. A program sees only a member's visits with that
+program and when they last used PAM (the transparency screen now says so). A
+case manager sees a member's past and saved programs on their own pages. On
+Sign in, Back from the Privacy or Terms page returns to Sign in (or to
+joining, if that is where you opened it). The code you are texted goes into six small
+boxes, and pasting the whole text message works. "Send again" is a small
+link beside the number. Signing up shows "Step 1 of 5" under each title
+instead of a bar, with a back button. Privacy and Terms always sit at the
+bottom of the screen. Every button is now a fully rounded pill. The
+language button is a white circle like the others, and the first sign-in
+picture is a little darker so the logo stands out.
+
+## [0.41.1-invites] — 2026-10-02 · Programs can invite people
+
+Program leads can now make invite codes, for a member or another program,
+just like case managers. The month view of a program's schedule fills the
+screen, with the same header as Day and Week and a clearer way to pick a day.
+In Messages, long messages end in "…", and a green button at the top starts
+a new conversation. A program's Home has search, alerts and a + menu (invite
+someone, add a program) at the top. Explore's search bar steps aside while
+you scroll down. Your safety is shorter and easier to scan. A place shows
+Website, Message, Call and Google as round buttons, with save and a ⋯ menu at
+the top. Trips has a + to plan a new visit in three steps. A case manager's
+Home cards are simpler, with a button to message each person, and a
+member's page shows their trips, with the star at the top of their card.
+
+## [0.41.0-staff] — 2026-10-02 · An app for each kind of staff
+
+In Storybook. Case managers and program leads have their own bottom bars —
+no Trips, and a program lead has Program instead of Saved. "Invite someone"
+floats just above the bar on their Home and opens two simple choices: a
+member, or a program. Case managers can star people and find them under
+Saved, next to the programs they saved. A program lead's Home shows who is
+coming in — today, this week or this month — and searches by name or time;
+their Program tab shows their listing with an Edit button. Both can see
+every program and add a new one from Profile. Sign out lines up with the
+rest of the list.
+
+## [0.40.0-roles] — 2026-10-02 · Every screen on the new design, a folder for each role
+
+In Storybook, the old design is gone: there is a folder for members, case
+managers, program leads and super admins, each one clickable from its
+first screen. In the app, the screens that still looked old now open like
+every other — a round back button and the screen's name, large — with Help
+as a round button at the top: reporting a place, points, a member's page,
+inviting someone, Everyone, staff requests, text reminders, and the code
+step of signing in. A staff Profile shows their own tools instead of points
+and trips, and a super admin chooses which role to preview from Profile.
+
+## [0.39.1-polish] — 2026-10-02 · One search bar, quieter buttons
+
+Trips and Messages now have the same search bar as Explore. The round
+buttons at the top of a screen are white with a thin grey edge instead of
+green. Your safety explains how to report a message today (the ⋯ in the
+conversation), and "Find the place" opens Explore.
+
+## [0.39.0-templates] — 2026-10-01 · One way in and out of every screen
+
+Every screen you tap into now starts the same way: a round back button and
+the screen's name, large. Get help is a short list — call PAM, what we help
+with, a safety issue, a place that's wrong. Profile is shorter: Language and
+Legal are rows, and the Account screen is gone. "What others can see" shows
+the list you agreed to and how to ask for a copy of your data or to delete
+your account. In a conversation, reporting moved from under every message to
+the ⋯ button at the top. In Storybook: Messages with search, Saved as a grid
+you can edit, Trips as a map with your visits on it, and your connections as
+cards with a profile you can message from.
+
+## [0.38.0-explore] — 2026-10-01 · Explore, and Home for staff (in Storybook)
+
+In Storybook, not yet in the app. Explore is the member's new home: a big
+search bar at the top that suggests programs as you type — by name, or by
+street — with a button to clear it, a row of chips for the kinds of places,
+and a clear message whenever there is nothing to show or no connection,
+with a way forward each time. Case managers and programs get Home instead:
+their people, with the same search bar. And every screen in Storybook can
+now be tapped through — no more "page not found".
+
+## [0.37.1-prototype] — 2026-10-01 · Click through the app in Storybook
+
+Still nothing changes in the app anyone uses. In Storybook, the screens now
+link to each other: open Prototype, pick who you are, and tap through the
+app as it is today or as the redesign — cards, tabs and Back all go where
+they would on a phone.
+
+## [0.37.0-redesign] — 2026-10-01 · A white page, and Profile redesigned
+
+Every screen now sits on a white page, and cards lift off it with a soft
+shadow instead of a grey background. In Storybook, not yet in the app: a new
+bottom bar (Explore, Saved, Trips, Messages, Profile) and a redesigned Profile
+— who you are and your numbers, your connections (your case manager and your
+programs), and your settings, help and privacy in one list.
+
+## [0.36.0-storybook] — 2026-10-01 · Storybook
+
+No change to the app anyone uses. Every component, every screen for every
+kind of account, and a first version of the bottom navigation bar are now
+browsable in Storybook, in English and Spanish, light and dark, at phone
+size — so design changes can be looked at without signing in to anything.
+
 ## [0.35.1] — 2026-09-21 · More touchups from the phone
 
 Messages loses its help bar too — a fourth screen without one (A15); tap

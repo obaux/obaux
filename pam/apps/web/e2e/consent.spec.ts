@@ -210,6 +210,31 @@ test.describe('agreeing to reminders', () => {
  * so `purpose` on TextField sets them together and this proves they arrive.
  */
 test.describe('phone and code fields', () => {
+  test('the code is six boxes over one field that takes a paste (D-251)', async ({ page }) => {
+    await page.route('**/auth/v1/otp*', (route) =>
+      route.fulfill({ status: 200, contentType: 'application/json', body: '{}' }),
+    );
+    await page.goto('/signin/');
+    await page.getByLabel('Your phone number').fill('215 555 0100');
+    await page.getByRole('button', { name: en['signin.phone.action'] }).click();
+
+    await expect(page.getByRole('heading', { name: en['signin.code.title'], level: 1 })).toBeVisible();
+    // One field, so the phone's "from Messages" suggestion and a paste both work.
+    const code = page.getByLabel(en['signin.code.label']);
+    await expect(code).toHaveCount(1);
+    await expect(code).toHaveAttribute('autocomplete', 'one-time-code');
+    await expect(code).toHaveAttribute('inputmode', 'numeric');
+    // A pasted message lands as its digits.
+    await code.fill('Your code is 12 34');
+    await expect(code).toHaveValue('1234');
+    // Send again is a small link beside where the code went, not a button row.
+    await expect(page.getByRole('button', { name: en['signin.code.again'] })).toBeVisible();
+    // Privacy and Terms stay at the foot of the screen.
+    const terms = await page.getByRole('link', { name: en['legal.terms'] }).boundingBox();
+    const viewport = page.viewportSize();
+    expect(terms!.y + terms!.height).toBeGreaterThan(viewport!.height - 64);
+  });
+
   test('the phone field asks for a keypad and offers the person their number', async ({ page }) => {
     await page.goto('/signin/');
     const phone = page.getByLabel('Your phone number');

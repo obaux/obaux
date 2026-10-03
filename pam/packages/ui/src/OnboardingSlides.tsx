@@ -98,6 +98,11 @@ export interface OnboardingSlide {
   readonly image: string;
   /** One sentence, plain language. */
   readonly text: string;
+  /**
+   * A flat black wash over the whole picture, 0 to 1, for artwork too light
+   * behind the white mark (Will, 3 October, D-253: 0.2 on the first slide).
+   */
+  readonly scrim?: number;
 }
 
 export interface OnboardingSlidesProps {
@@ -230,12 +235,13 @@ const styles = stylex.create({
  * this still matches what was asked for than to prove two or three separate
  * declarations still compose to it.
  */
-function heroBackground(image: string): string {
+function heroBackground(image: string, scrim = 0): string {
   // Darker than the stop set first specified (0.50 at 66.12%) — Will, 17
   // September, after the taller hero and some of the brighter photos left
   // the white text and mark reading thin in places. Same two stops, same
   // shape, just a deeper floor.
-  return `linear-gradient(180deg, rgba(0, 0, 0, 0.00) 40.88%, rgba(0, 0, 0, 0.70) 66.12%), url(${image}) lightgray 50% / cover no-repeat`;
+  const wash = scrim > 0 ? `linear-gradient(rgba(0, 0, 0, ${scrim}), rgba(0, 0, 0, ${scrim})), ` : '';
+  return `${wash}linear-gradient(180deg, rgba(0, 0, 0, 0.00) 40.88%, rgba(0, 0, 0, 0.70) 66.12%), url(${image}) lightgray 50% / cover no-repeat`;
 }
 
 /** Mirrors `PointsBadge`'s own hook — see that file for why it starts `true`. */
@@ -392,7 +398,7 @@ export function OnboardingSlides({ slides, label, header }: OnboardingSlidesProp
               <div
                 aria-hidden="true"
                 {...stylex.props(styles.art)}
-                style={{ background: heroBackground(slide.image) }}
+                style={{ background: heroBackground(slide.image, slide.scrim) }}
               />
             ) : (
               <Skeleton width="100%" height="100%" radius="none" xstyle={styles.skeleton} />

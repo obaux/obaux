@@ -110,16 +110,16 @@ test.describe('everyone, for the person running PAM', () => {
     await expect(page.getByRole('heading', { name: 'Dana' })).toBeVisible();
   });
 
-  test('the filter is in the header, and asks the database a new question', async ({ page }) => {
+  test('the filter asks the database a new question', async ({ page }) => {
     // The filter changing the list locally would be a lie the first time the
     // list is longer than one page. It has to reach the query.
     const asked = await signedInAs(page, 'super_admin');
     await page.goto('/directory/');
     await expect(page.getByRole('heading', { name: 'Marcus' })).toBeVisible();
 
+    // On the page under the title since D-217 — the app header it rode in
+    // is gone from nested screens.
     const filter = page.getByRole('combobox', { name: 'Show' });
-    const inHeader = await filter.evaluate((el) => Boolean(el.closest('header')));
-    expect(inHeader, 'the filter is not in the header').toBe(true);
 
     await filter.click();
     await page.getByRole('option', { name: 'Programs' }).click();
@@ -160,7 +160,9 @@ test.describe('everyone, for the person running PAM', () => {
     await expect(
       page.getByRole('heading', { name: 'This screen is for the PAM team' }),
     ).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Everyone', exact: true })).toHaveCount(0);
+    // The template still names the screen (D-217); what must not appear is
+    // the list itself.
+    await expect(page.getByRole('heading', { name: 'Marcus' })).toHaveCount(0);
   });
 
   test('a signed-out visitor is told what this is, and how to get in', async ({ page }) => {

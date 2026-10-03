@@ -43,6 +43,15 @@ export const ADMIN_CAN_SEE = [
   'enrollments_and_statuses',
   'appointments_and_attendance',
   'points_and_level',
+  /**
+   * Since D-242 (Will, 3 October) this is true of a program the member joined
+   * as well as of their case manager: a program lead sees the last day a
+   * member used PAM, on the member's page, beside their visits with that
+   * program. Stated on the screen (`canSee.lastActive`), which no longer
+   * promises the opposite. The database does not hand it to a program yet
+   * (`04_transparency_contract_test.sql` part 3 still holds); that is a
+   * follow-up migration, so today the line is true only of example people.
+   */
   'last_active_date',
   'active_connections_names_and_kind',
   'flagged_messages_routed_through_reports',
@@ -92,8 +101,10 @@ export const ADMIN_CANNOT_SEE = [
    *
    * Narrowed by exactly one fact on 21 September (D-199): a program now
    * learns *that* a member saved a new place, and when — see
-   * `new_save_without_the_place` above. Everything else this entry covers
-   * (the last day used, and the place itself) is still never shown.
+   * `new_save_without_the_place` above. Narrowed again on 3 October
+   * (D-242): a program now sees the last day a member used PAM. What this
+   * entry still covers: which places a member saved, their trips to other
+   * programs, and their points — none of it shown to a program.
    */
   'member_activity_for_a_program',
 ] as const;
@@ -151,7 +162,11 @@ export const TRANSPARENCY_SCREEN: {
       en: 'Your visits, and if you went or missed one',
     },
     { key: 'transparency.canSee.points', en: 'Your points and your level' },
-    { key: 'transparency.canSee.lastActive', en: 'The last day you used PAM' },
+    // D-242 — a program you joined sees this too; said here, not implied.
+    {
+      key: 'transparency.canSee.lastActive',
+      en: 'The last day you used PAM. A program you joined sees this too.',
+    },
     {
       key: 'transparency.canSee.connections',
       en: 'The names of people you connect with, and if they are a mentor or buddy',
@@ -166,9 +181,8 @@ export const TRANSPARENCY_SCREEN: {
     },
     /**
      * D-199 — the one activity fact a program is also allowed. "A program"
-     * is the same ordinary member-facing word `cannotSee.programActivity`
-     * below already uses, and the two lines are meant to be read together:
-     * a program sees this, and never the last day you used PAM.
+     * is ordinary member-facing wording, as on `canSee.lastActive` above
+     * (D-242): what a program you joined sees is said on the line itself.
      */
     {
       key: 'transparency.canSee.saves',
@@ -182,16 +196,6 @@ export const TRANSPARENCY_SCREEN: {
     { key: 'transparency.cannotSee.messages', en: 'What you say to someone else' },
     { key: 'transparency.cannotSee.buddyFeed', en: 'What you share with your buddies' },
     { key: 'transparency.cannotSee.otherPeople', en: 'Anyone who is not on their list' },
-    /**
-     * D-155 — stated plainly and positively, not left as a silent absence
-     * from `canSee` above. "A program" is ordinary member-facing wording
-     * already used elsewhere on this same screen and on Home (`role.provider`
-     * reads "Program"), not a staff title §9 would forbid naming.
-     */
-    {
-      key: 'transparency.cannotSee.programActivity',
-      en: 'A program never sees the last day you used PAM',
-    },
   ],
 
   footerKey: 'transparency.footer',

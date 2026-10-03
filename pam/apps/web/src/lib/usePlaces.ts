@@ -73,6 +73,8 @@ interface PlacesQuery {
    * is only ever the nearest 20, so the database has to answer a name.
    */
   query?: string;
+  /** Bump to ask again — the error state's "Try again" (D-212). */
+  reload?: number;
 }
 
 interface ServicesNearRow {
@@ -93,7 +95,7 @@ interface ServicesNearRow {
   hours: unknown;
 }
 
-export function usePlaces({ lat, lon, category, limit = 20, query = '' }: PlacesQuery): PlacesState {
+export function usePlaces({ lat, lon, category, limit = 20, query = '', reload = 0 }: PlacesQuery): PlacesState {
   const [state, setState] = useState<PlacesState>({ status: 'loading' });
 
   useEffect(() => {
@@ -135,23 +137,7 @@ export function usePlaces({ lat, lon, category, limit = 20, query = '' }: Places
 
         setState({
           status: 'ready',
-          places: rows.map((row) => ({
-            id: row.id,
-            name: row.name,
-            lookupName: row.lookup_name,
-            category: row.category,
-            address: row.address,
-            phone: row.phone,
-            placeId: row.place_id,
-            lat: row.lat,
-            lon: row.lon,
-            meters: row.meters,
-            hasHours: row.has_hours,
-            hours: row.hours ?? null,
-            description: row.description_plain,
-            website: row.website,
-            audience: row.audience,
-          })),
+          places: rows.map(toPlace),
         });
       } catch {
         if (!cancelled) setState({ status: 'error', offline: !navigator.onLine });
@@ -163,9 +149,58 @@ export function usePlaces({ lat, lon, category, limit = 20, query = '' }: Places
     return () => {
       cancelled = true;
     };
-  }, [lat, lon, category, limit, query]);
+  }, [lat, lon, category, limit, query, reload]);
 
   return state;
+}
+
+function toPlace(row: ServicesNearRow): NearbyPlace {
+  return {
+    id: row.id,
+    name: row.name,
+    lookupName: row.lookup_name,
+    category: row.category,
+    address: row.address,
+    phone: row.phone,
+    placeId: row.place_id,
+    lat: row.lat,
+    lon: row.lon,
+    meters: row.meters,
+    hasHours: row.has_hours,
+    hours: row.hours ?? null,
+    description: row.description_plain,
+    website: row.website,
+    audience: row.audience,
+  };
+}
+
+/**
+ * Places matching what is typed so far, by name or address — the search
+ * bar's suggestions (D-212). The same RPC as the list (`services_search`,
+ * 0066), asked directly: suggestions keep up with each letter, the list
+ * waits for the words to settle. A failure is an empty list here; the list
+ * below says what went wrong.
+ */
+export async function searchPlaces(
+  query: string,
+  { lat, lon, category, limit = 6 }: { lat: number; lon: number; category?: Category; limit?: number },
+): Promise<NearbyPlace[]> {
+  const q = query.trim();
+  if (!q) return [];
+  try {
+    const { createClient } = await import('./supabase');
+    const { data, error } = await createClient().rpc('services_search', {
+      p_query: q,
+      p_lat: lat,
+      p_lon: lon,
+      p_category: category ?? null,
+      p_limit: limit,
+    });
+    if (error) return [];
+    return ((data ?? []) as ServicesNearRow[]).map(toPlace);
+  } catch {
+    return [];
+  }
 }
 
 /** Metres to miles, for `distanceLabel`. */

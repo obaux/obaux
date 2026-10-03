@@ -1,6 +1,5 @@
 'use client';
 
-import { useCallback } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { Text } from '@astryxdesign/core/Text';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
@@ -13,7 +12,7 @@ import {
 import { GlobeIcon } from '@pam/ui';
 import type { Locale } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
-import { useSession } from '@/lib/useSession';
+import { useChooseLanguage } from '@/lib/useChooseLanguage';
 
 /**
  * English or Spanish, wherever PAM offers the choice — the icon beside the
@@ -53,58 +52,33 @@ const styles = stylex.create({
     paddingBlock: '4px',
     marginInlineStart: '8px',
   },
-  /*
-   * A ghost icon button is transparent by design, which disappears on a
-   * photo the way it never does on a plain page. Over the sign-in hero the
-   * trigger needs a scrim of its own to read as a control rather than a
-   * loose icon floating on the art (Will, 16 September, working from a Figma
-   * redesign showing exactly this treatment) — a translucent dark circle,
-   * regardless of light/dark theme, since it sits on art, not on the page.
-   */
-  onPhoto: {
-    // Darker still (Will, 17 September) — a lighter scrim read as barely
-    // there against some of the brighter photos.
-    backgroundColor: 'rgba(15, 15, 15, 0.6)',
-    color: '#FFFFFF',
-    borderRadius: '17px',
+  // The white disc with a thin grey edge every round header button uses —
+  // bell, Help, search (D-216) — on the page and over the sign-in photo
+  // alike (Will, 3 October, D-253). Exactly 48px round.
+  round: {
+    width: '48px',
+    height: '48px',
+    minHeight: '48px',
+    borderRadius: '50%',
+    flexShrink: 0,
+    color: colorVars['--color-text-primary'],
+    backgroundColor: colorVars['--color-background-body'],
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    borderColor: colorVars['--color-border'],
   },
-  // 2x the glyph Astryx's own icon set draws at, and a heavier stroke to
-  // match (Will, 17 September) — a barely-there hairline globe read as an
-  // afterthought floating on the art, next to a mark and a pill both drawn
-  // with real weight. CSS `width`/`stroke-width` on the `<svg>` beat the
-  // element's own presentation attributes, so this overrides `icons.tsx`'s
-  // shared `1em`/`1.5` defaults without needing a variant on the icon itself.
-  onPhotoGlyph: { width: '2em', height: '2em', strokeWidth: 2.5 },
 });
 
 export function LanguageSwitcher({
   variant = 'icon',
   rowStyle,
-  tone,
 }: {
   readonly variant?: 'icon' | 'row';
   /** The same row style every other Settings item uses, for the trigger button. */
   readonly rowStyle?: StyleXStyles;
-  /** `'onPhoto'` swaps the icon trigger's usual transparent ghost for a scrim that stays legible over artwork — see the sign-in hero. */
-  readonly tone?: 'onPhoto';
 }) {
-  const { locale, setLocale, t } = useI18n();
-  const { state: session } = useSession();
-
-  const choose = useCallback(
-    (next: Locale) => {
-      setLocale(next);
-      if (session.status !== 'signed-in') return;
-      void (async () => {
-        const { createClient } = await import('@/lib/supabase');
-        await createClient()
-          .from('profiles')
-          .update({ preferred_language: next })
-          .eq('id', session.session.userId);
-      })();
-    },
-    [session, setLocale],
-  );
+  const { locale, t } = useI18n();
+  const choose = useChooseLanguage();
 
   const items = (
     <DropdownMenuRadioGroup
@@ -123,15 +97,10 @@ export function LanguageSwitcher({
       <DropdownMenu
         button={{
           label: t('language.title'),
-          icon:
-            tone === 'onPhoto' ? (
-              <GlobeIcon {...stylex.props(styles.onPhotoGlyph)} />
-            ) : (
-              <GlobeIcon />
-            ),
+          icon: <GlobeIcon />,
           isIconOnly: true,
           variant: 'ghost',
-          xstyle: tone === 'onPhoto' ? styles.onPhoto : undefined,
+          xstyle: styles.round,
         }}
         hasChevron={false}
         placement="below"

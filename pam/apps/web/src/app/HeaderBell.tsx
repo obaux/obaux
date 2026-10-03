@@ -44,10 +44,13 @@ export function HeaderBell({
   enabled,
   role,
   isDemo = false,
+  appearance,
 }: {
   readonly enabled: boolean;
   readonly role?: Role | null;
   readonly isDemo?: boolean;
+  /** `round` for the redesigned headers (D-210). */
+  readonly appearance?: 'filled' | 'round';
 }) {
   const { t } = useI18n();
   const { state } = useNotifications(enabled);
@@ -77,6 +80,7 @@ export function HeaderBell({
 
   return (
     <NotificationBell
+      appearance={appearance}
       href="/notifications/"
       label={t('notify.title')}
       unreadCount={unread}

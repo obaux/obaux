@@ -79,7 +79,7 @@ async function signedIn(page: import('@playwright/test').Page) {
 }
 
 test.describe("a place's own screen", () => {
-  test('says what it is, once, and offers the way there as the one big button', async ({ page }) => {
+  test('says what it is, once; booking a visit is the one big button, the way there a circle', async ({ page }) => {
     await signedIn(page);
     await page.route(DETAIL, (route) => route.fulfill(json([PLACE])));
     await page.goto(`/place/?id=${PLACE.id}`);
@@ -89,11 +89,17 @@ test.describe("a place's own screen", () => {
     await expect(page.getByRole('heading', { name: 'Kirkbride Center', level: 1 })).toHaveCount(1);
     await expect(page.getByText(/free or low cost for most people/)).toBeVisible();
 
-    await expect(page.getByRole('link', { name: 'How to get there' })).toHaveAttribute(
+    // D-235, D-247: a member's one primary action is Plan a trip, straight into
+    // the New trip steps with this place chosen; Directions is the fourth circle.
+    await expect(page.getByRole('link', { name: 'Plan a trip' })).toHaveAttribute(
+      'href',
+      new RegExp(`/trips/new/\\?place=${PLACE.id}`),
+    );
+    await expect(page.getByRole('link', { name: 'Directions', exact: true })).toHaveAttribute(
       'href',
       /destination=39\.9612%2C-75\.2172/,
     );
-    await expect(page.getByRole('link', { name: 'How to get there' })).toHaveAttribute(
+    await expect(page.getByRole('link', { name: 'Directions', exact: true })).toHaveAttribute(
       'href',
       /travelmode=walking/,
     );
@@ -108,31 +114,38 @@ test.describe("a place's own screen", () => {
     );
     await page.goto(`/place/?id=${PLACE.id}`);
 
-    await expect(page.getByRole('link', { name: 'How to get there' })).toHaveAttribute(
+    await expect(page.getByRole('link', { name: 'Directions', exact: true })).toHaveAttribute(
       'href',
       /destination=111%20N%2049th%20St/,
     );
   });
 
-  test('the quieter actions are labelled rows, not icons behind a menu', async ({ page }) => {
+  test('the actions are round buttons with words, and the rest is in the bar', async ({ page }) => {
+    // D-224: Website, Message, Call and Directions under the name, each a
+    // labelled circle; Check hours on Google at the foot of the hours card;
+    // Save and the ⋯ menu (Flag something, Share, Message) in the bar.
     await signedIn(page);
     await page.route(DETAIL, (route) => route.fulfill(json([PLACE])));
     await page.goto(`/place/?id=${PLACE.id}`);
 
-    await expect(page.getByRole('link', { name: 'Call this place' })).toHaveAttribute(
+    await expect(page.getByRole('link', { name: 'Call', exact: true })).toHaveAttribute('href', 'tel:+12155550100');
+    await expect(page.getByRole('link', { name: 'Website', exact: true })).toHaveAttribute(
       'href',
-      'tel:+12155550100',
+      'https://example.org/kirkbride',
+    );
+    // D-235: the fourth circle is Directions, and routes there.
+    await expect(page.getByRole('link', { name: 'Directions', exact: true })).toHaveAttribute(
+      'href',
+      /google\.com\/maps\/dir/,
     );
     await expect(page.getByRole('link', { name: 'Check hours on Google' })).toHaveAttribute(
       'href',
       /google\.com\/maps\/search/,
     );
-    await expect(page.getByRole('link', { name: 'Their website' })).toHaveAttribute(
-      'href',
-      'https://example.org/kirkbride',
-    );
     await expect(page.getByRole('button', { name: 'Save this place' })).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Something is wrong here' })).toBeVisible();
+    await page.getByRole('button', { name: 'More options' }).click();
+    await expect(page.getByRole('menuitem', { name: 'Flag something' })).toBeVisible();
+    await expect(page.getByRole('menuitem', { name: 'Share this place' })).toBeVisible();
   });
 
   test('says out loud that the hours are samples', async ({ page }) => {

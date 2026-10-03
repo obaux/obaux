@@ -74,6 +74,11 @@ export interface PlaceCardProps {
    * the stretched link so they take the tap. Only a super admin gets these.
    */
   readonly flagActions?: ReactNode;
+  /**
+   * A control in Save's place, top right — a case manager's round check on
+   * Connect (D-236). Sits above the card's stretched link, like Save.
+   */
+  readonly action?: ReactNode;
   readonly labels: {
     readonly save: string;
     readonly saved: string;
@@ -86,8 +91,11 @@ const styles = stylex.create({
     // The stretched link is positioned against this.
     position: 'relative',
   },
+  // Smaller type and more room around it (D-213, Will, 1 October): the
+  // redesign's cards read calmer with 24px inside and text a step down.
   name: {
-    fontSize: '20px',
+    fontSize: '18px',
+    fontWeight: 700,
     lineHeight: 1.3,
     minWidth: 0,
     // Two lines, then an ellipsis. Two, not one: a place is often "Mt. Airy
@@ -110,11 +118,11 @@ const styles = stylex.create({
       zIndex: 0,
     },
   },
-  meta: { fontSize: '16px' },
-  open: { fontSize: '16px', fontWeight: 600, color: colorVars['--color-text-accent'] },
-  shut: { fontSize: '16px', fontWeight: 600 },
+  meta: { fontSize: '15px' },
+  open: { fontSize: '15px', fontWeight: 600, color: colorVars['--color-text-accent'] },
+  shut: { fontSize: '15px', fontWeight: 600 },
   description: {
-    fontSize: '16px',
+    fontSize: '15px',
     lineHeight: 1.45,
     display: '-webkit-box',
     WebkitLineClamp: 2,
@@ -126,6 +134,7 @@ const styles = stylex.create({
    * stacking context so the shadow of a pressed card does not cover it.
    */
   actions: { position: 'relative', zIndex: 1, width: '100%' },
+  action: { position: 'relative', zIndex: 1, flexShrink: 0 },
   save: {
     position: 'relative',
     zIndex: 1,
@@ -148,10 +157,11 @@ export function PlaceCard({
   onSave,
   flagLabel,
   flagActions,
+  action,
   labels,
 }: PlaceCardProps) {
   return (
-    <Card padding={4} xstyle={styles.card}>
+    <Card padding={6} xstyle={styles.card}>
       <VStack gap={2}>
         <HStack gap={2} align="start" justify="between" wrap="nowrap">
           <Heading level={3} xstyle={styles.name}>
@@ -167,7 +177,9 @@ export function PlaceCard({
             then qualifies. An icon-only control with no name is the classic
             way to make a button invisible to somebody who cannot see it.
           */}
-          {onSave ? (
+          {action ? (
+            <HStack xstyle={styles.action}>{action}</HStack>
+          ) : onSave ? (
             <IconButton
               label={isSaved ? labels.saved : labels.save}
               icon={<BookmarkIcon isFilled={isSaved} />}

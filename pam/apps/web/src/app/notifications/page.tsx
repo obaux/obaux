@@ -1,10 +1,23 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, type ReactNode } from 'react';
 import { VStack } from '@astryxdesign/core/VStack';
 import { Text } from '@astryxdesign/core/Text';
 import * as stylex from '@stylexjs/stylex';
-import { AppHeader, Loading, Notice, NotificationList, Page, PageTitle } from '@pam/ui';
+import {
+  BellIcon,
+  BookmarkIcon,
+  FlagIcon,
+  Loading,
+  MessagesIcon,
+  Notice,
+  NotificationList,
+  Page,
+  PeopleIcon,
+  ShieldIcon,
+  StarIcon,
+} from '@pam/ui';
+import { SubPageHeader } from '@pam/ui/SubPage';
 import { USE_DUMMY_PEOPLE } from '@pam/config/dummy-flag';
 import { DUMMY_NOTIFICATIONS } from '@pam/config/dummy-notifications';
 import { useI18n } from '@/lib/i18n';
@@ -81,6 +94,28 @@ function hrefFor(kind: string, subjectId: string | null): string | undefined {
   return undefined;
 }
 
+/**
+ * What kind of thing a row is, for the scannable half of it (D-230): a
+ * short title and an icon. `kind` is the row's `kind`, or the dummy row's key
+ * without `notify.`. Anything unknown gets the bell and no title, so a new
+ * kind still shows as its sentence.
+ */
+const KIND_ICONS: Record<string, ReactNode> = {
+  service_flagged: <FlagIcon />,
+  service_removed: <FlagIcon />,
+  message_reported: <ShieldIcon />,
+  message_received: <MessagesIcon />,
+  staff_request_pending: <PeopleIcon />,
+  'demo.newInterest': <PeopleIcon />,
+  'demo.pointsEarned': <StarIcon />,
+  'demo.savedPlaceUpdated': <BookmarkIcon />,
+};
+
+function kindOf(kind: string, t: (key: string) => string): { title?: string; icon: ReactNode } {
+  const icon = KIND_ICONS[kind] ?? <BellIcon />;
+  return kind in KIND_ICONS ? { title: t(`notify.kind.${kind}`), icon } : { icon };
+}
+
 export default function NotificationsPage() {
   const { t, locale } = useI18n();
   const supportPhone = useSupportPhone();
@@ -112,27 +147,22 @@ export default function NotificationsPage() {
 
   return (
     <Page gap={3}>
-        <AppHeader
-          roleLabel={signedIn ? t(`role.${viewedRole}`) : undefined}
-          roleControl={
+        {/*
+          The nested-page template (D-213): round back, then the title large.
+          A super admin's role switch rides in the bar, where the app header
+          used to carry it.
+        */}
+        <SubPageHeader
+          title={t('notify.title')}
+          subtitle={shownUnread > 0 ? t('notify.unread', { count: shownUnread }) : undefined}
+          backHref="/"
+          backLabel={t('nav.back.home')}
+          actions={
             trueRole === 'super_admin' ? (
               <RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} />
             ) : undefined
           }
         />
-
-        {/*
-          The way back sits beside the title, the way it does on every other
-          screen now — it used to be a row of its own above the mark (D-103).
-        */}
-        <PageTitle
-          title={t('notify.title')}
-          subtitle={shownUnread > 0 ? t('notify.unread', { count: shownUnread }) : undefined}
-          backHref="/"
-          backLabel={t('nav.back.home')}
-        />
-        <VStack gap={1}>
-        </VStack>
 
         {session.status === 'signed-out' || session.status === 'no-profile' || session.status === 'suspended' ? (
           <>
@@ -159,11 +189,12 @@ export default function NotificationsPage() {
             items={state.items.map((item) => ({
               id: item.id,
               text: describe(item.bodyKey, item.bodyVars, t),
+              ...kindOf(item.kind, t),
               when: whenHappened(item.createdAt, locale, t),
               isNew: !item.isRead,
               href: hrefFor(item.kind, item.subjectId),
             }))}
-            labels={{ empty: t('notify.none'), new: t('notify.new') }}
+            labels={{ empty: t('notify.none'), new: t('notify.new'), earlier: t('notify.earlier') }}
           />
         ) : null}
 
@@ -173,11 +204,12 @@ export default function NotificationsPage() {
               items={dummyItems.map((item) => ({
                 id: item.id,
                 text: describe(item.bodyKey, item.bodyVars, t),
+                ...kindOf(item.bodyKey.replace('notify.', ''), t),
                 when: whenHappened(item.createdAt, locale, t),
                 isNew: item.isNew,
                 href: hrefFor(item.bodyKey.replace('notify.', ''), null),
               }))}
-              labels={{ empty: t('notify.none'), new: t('notify.new') }}
+              labels={{ empty: t('notify.none'), new: t('notify.new'), earlier: t('notify.earlier') }}
             />
             <Text type="supporting" xstyle={styles.note}>
               {t('notify.example.note')}

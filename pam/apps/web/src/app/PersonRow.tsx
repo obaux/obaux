@@ -48,17 +48,28 @@ export interface PersonRowProps {
   /**
    * A control that belongs to this specific row rather than the list — the
    * Everyone list's demo-view toggle (0057) is the one user of this today.
-   * Never paired with `href`: the two are different rows' jobs (a dummy row
-   * that opens something, a real row with a control on it), and `href`'s own
-   * full-card overlay link would sit on top of anything placed here.
+   * May be paired with `href` since D-218 (a case manager's star on a row
+   * that opens the person): it is lifted above the card's overlay link, so a
+   * tap on it is the control's, and a tap anywhere else opens the person.
    */
   readonly trailing?: ReactNode;
+  /**
+   * The redesigned Home's card (D-227, Will, 2 October): the name, and right
+   * under it one small line — the facts joined with " · " — instead of a
+   * second row of separate words under the avatar.
+   */
+  readonly isCompact?: boolean;
 }
 
 const styles = stylex.create({
   card: { width: '100%', position: 'relative' },
+  // Above the stretched link's ::after, so the control takes its own taps.
+  trailing: { position: 'relative', zIndex: 1, flexShrink: 0 },
   name: { fontSize: '20px', lineHeight: 1.3 },
   meta: { fontSize: '16px' },
+  compactName: { fontSize: '18px', lineHeight: 1.3 },
+  compactMeta: { fontSize: '14px', lineHeight: 1.35 },
+  compactText: { flexGrow: 1, minWidth: 0 },
   link: {
     color: 'inherit',
     textDecoration: 'none',
@@ -66,7 +77,39 @@ const styles = stylex.create({
   },
 });
 
-export function PersonRow({ firstName, href, chip, meta, programBadge, trailing }: PersonRowProps) {
+export function PersonRow({ firstName, href, chip, meta, programBadge, trailing, isCompact = false }: PersonRowProps) {
+  if (isCompact) {
+    return (
+      <Card xstyle={styles.card}>
+        <HStack gap={3} align="center" wrap="nowrap">
+          <Avatar size="md" name={firstName ?? '?'} />
+          <VStack gap={0.5} xstyle={styles.compactText}>
+            <Heading level={3} xstyle={styles.compactName}>
+              {href ? (
+                <a href={href} {...stylex.props(styles.link)}>
+                  {firstName ?? '—'}
+                </a>
+              ) : (
+                (firstName ?? '—')
+              )}
+            </Heading>
+            {meta.length > 0 ? (
+              <Text type="supporting" xstyle={styles.compactMeta}>
+                {meta.join(' · ')}
+              </Text>
+            ) : null}
+            {chip || programBadge ? (
+              <HStack gap={2} wrap="wrap" align="center">
+                {chip ? <Badge variant={chip.tone} label={chip.label} /> : null}
+                {programBadge ? <ProgramBadge name={programBadge.name} serviceId={programBadge.serviceId} /> : null}
+              </HStack>
+            ) : null}
+          </VStack>
+          {trailing ? <HStack xstyle={styles.trailing}>{trailing}</HStack> : null}
+        </HStack>
+      </Card>
+    );
+  }
   return (
     <Card xstyle={styles.card}>
       <VStack gap={2}>
@@ -83,7 +126,7 @@ export function PersonRow({ firstName, href, chip, meta, programBadge, trailing 
               )}
             </Heading>
           </HStack>
-          {trailing}
+          {trailing ? <HStack xstyle={styles.trailing}>{trailing}</HStack> : null}
         </HStack>
         <HStack gap={2} wrap="wrap" align="center">
           {chip ? <Badge variant={chip.tone} label={chip.label} /> : null}

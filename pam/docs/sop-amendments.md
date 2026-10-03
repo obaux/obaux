@@ -403,3 +403,20 @@ support number, same as every other screen — only the loaded, ordinary
 list is without the bar. `messages.spec.ts` asserts no help link renders
 on the loaded screen, the same way `admin.spec.ts` and `consent.spec.ts`
 already assert it for their own exceptions.
+
+## A16 — Primary buttons are 56px, and secondary ones match (3 October 2026, Will)
+
+CLAUDE.md's rule was "48px minimum touch target, 64px primary buttons". Will
+saw the primary and secondary buttons side by side ("A case manager" over
+"Someone who runs a program") at different heights and text sizes, and asked
+for one size. Asked which way to meet, he chose 56px with 17px text for both.
+
+**Where this contradicts the original.** The 64px number, everywhere.
+`BigButton` is now 56px tall with 17px text, and full-width secondary actions
+use `BigButton variant="secondary"`, so the two can no longer drift apart.
+The browser suite's §2.5 check asserts 56 (`A11Y.primaryButtonHeightPx`).
+
+**What did not change.** The 48px floor; one primary action per screen (a
+secondary BigButton beside it is not a second primary); the chat's 48px Send
+(A13). DECISIONS D-239.
+

@@ -46,6 +46,22 @@ export function contextFor(
   return null;
 }
 
+/**
+ * The line under a name in the new-message picker (Will, 3 October): who
+ * this is — Member, Case manager, or Program with its name when known.
+ * Unlike `contextFor` it is never empty, because first names alone do not
+ * say who is who. Who appears is `messageable_people()`'s rule: a case
+ * manager or a program sees members; a member sees their case manager and
+ * programs — so each viewer only ever meets the labels that apply.
+ */
+export function pickerContextFor(
+  other: { readonly role: Role; readonly programName: string | null },
+  t: (key: string) => string,
+): string {
+  if (other.role === 'provider' && other.programName) return `${t('role.provider')} · ${other.programName}`;
+  return t(`role.${other.role}`);
+}
+
 function dummyContext(viewer: Role, other: DummyPerson | null, t: (key: string) => string): string | null {
   return contextFor(viewer, other ? { role: other.role, programName: other.orgName ?? null } : null, t);
 }
@@ -122,9 +138,15 @@ export function dummyPickerPeople(
 ): { readonly people: readonly PickablePerson[]; readonly hrefFor: (id: string) => string } {
   const entries = dummyPickerFor(role);
   const people = entries
-    .map((e) => {
+    .map((e): PickablePerson | null => {
       const p = person(e.personId);
-      return p ? { id: e.personId, name: p.firstName, context: dummyContext(role, p, t) } : null;
+      return p
+        ? {
+            id: e.personId,
+            name: p.firstName,
+            context: pickerContextFor({ role: p.role, programName: p.orgName ?? null }, t),
+          }
+        : null;
     })
     .filter((p): p is PickablePerson => p !== null);
   const byId = new Map(entries.map((e) => [e.personId, e.conversationId]));

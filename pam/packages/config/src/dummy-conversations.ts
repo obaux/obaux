@@ -164,6 +164,12 @@ export interface DummyConversation {
   readonly lastMessageAt: string | null;
   /** The newest message is from the other side, unread for this viewer. */
   readonly unread: boolean;
+  /**
+   * How many messages from the other side came after this viewer's last
+   * one — the count on "Message {name}" (D-231). 0 when the last word is
+   * theirs.
+   */
+  readonly unreadCount: number;
   readonly preview: { readonly body: string; readonly mine: boolean } | null;
 }
 
@@ -179,11 +185,14 @@ export function dummyConversationsFor(role: 'member' | 'admin' | 'provider'): re
       const selfId = side === 'member' ? pair.memberId : pair.staffId;
       if (selfId !== self) return null;
       const last = messages[messages.length - 1] ?? null;
+      let unreadCount = 0;
+      for (let i = messages.length - 1; i >= 0 && messages[i]!.from !== side; i -= 1) unreadCount += 1;
       return {
         id,
         otherId,
         lastMessageAt: last?.at ?? null,
         unread: last !== null && last.from !== side,
+        unreadCount,
         preview: last ? { body: last.body, mine: last.from === side } : null,
       };
     })
