@@ -11,6 +11,8 @@ import { PlusIcon, TripsIcon } from '@pam/ui';
 import { IconButton } from '@astryxdesign/core/IconButton';
 import { readAddedTrips } from '@/lib/addedTrips';
 import { MapDrawer } from '@pam/ui/MapDrawer';
+import { Confetti } from '@pam/ui/SuccessScreen';
+import { useSearchParams } from 'next/navigation';
 import { TripCard } from '@pam/ui/TripCard';
 import { DUMMY_TRIPS } from '@pam/config/dummy-trips';
 import { dummyConnection } from '@pam/config/dummy-connections';
@@ -53,10 +55,17 @@ export interface TripsViewProps {
    * new trip. No search, no bell, no Help on this screen — the map has the room.
    */
   readonly headerActions?: ReactNode;
+  /** The id of a trip just added — opens tall, confetti, the card arrives (D-241). */
+  readonly justAdded?: string | null;
 }
 
 /** The bottom tab bar's height, kept clear under the drawer. */
 const TAB_BAR = 66;
+
+const arriveIn = stylex.keyframes({
+  from: { opacity: 0, transform: 'translateY(32px) scale(0.96)' },
+  to: { opacity: 1, transform: 'translateY(0) scale(1)' },
+});
 
 const styles = stylex.create({
   screen: { position: 'fixed', insetInline: 0, top: 0, bottom: `${TAB_BAR}px` },
@@ -81,14 +90,26 @@ const styles = stylex.create({
   count: { fontSize: '15px', textAlign: 'center' },
   state: { paddingBlock: '24px' },
   stateIcon: { width: '56px', height: '56px' },
+  // The new trip's card rises into place after the drawer opens (D-241).
+  arrive: {
+    animationName: arriveIn,
+    animationDuration: '700ms',
+    animationDelay: '350ms',
+    animationFillMode: 'both',
+    animationTimingFunction: 'cubic-bezier(0.2, 0.8, 0.2, 1)',
+  },
 });
 
 const ART = { width: 40, height: 40, 'aria-hidden': true } as const;
 const PIN_ART = { width: 28, height: 28, 'aria-hidden': true } as const;
 
-export function TripsView({ trips, headerActions }: TripsViewProps) {
+export function TripsView({ trips, headerActions, justAdded = null }: TripsViewProps) {
   const { t, locale } = useI18n();
   const shown = trips;
+  // Bring the new trip into view once the drawer has opened.
+  const arrive = (el: HTMLElement | null) => {
+    if (el) setTimeout(() => el.scrollIntoView({ block: 'center', behavior: 'smooth' }), 250);
+  };
 
   const day = (iso: string) =>
     new Intl.DateTimeFormat(locale, { weekday: 'short', month: 'short', day: 'numeric' }).format(new Date(iso));
@@ -116,7 +137,13 @@ export function TripsView({ trips, headerActions }: TripsViewProps) {
         </HStack>
       ) : null}
 
+      {/*
+        A trip just added (D-241): the drawer opens tall, confetti falls over
+        the whole screen, and the new trip's card arrives in the list.
+      */}
+      {justAdded ? <Confetti /> : null}
       <MapDrawer
+        initialStop={justAdded ? 'full' : 'half'}
         bottomOffset={TAB_BAR}
         topOffset={84}
         expandLabel={t('trips.drawer.expand')}
@@ -144,7 +171,8 @@ export function TripsView({ trips, headerActions }: TripsViewProps) {
           />
         ) : (
           <VStack gap={3}>
-            {shown.map((trip) => (
+            {shown.map((trip) => {
+              const card = (
               <TripCard
                 key={trip.id}
                 placeName={trip.placeName}
@@ -159,7 +187,15 @@ export function TripsView({ trips, headerActions }: TripsViewProps) {
                   name: trip.withName ?? '',
                 })}
               />
-            ))}
+              );
+              return trip.id === justAdded ? (
+                <VStack key={trip.id} ref={arrive as never} xstyle={styles.arrive}>
+                  {card}
+                </VStack>
+              ) : (
+                card
+              );
+            })}
           </VStack>
         )}
       </MapDrawer>
@@ -169,6 +205,8 @@ export function TripsView({ trips, headerActions }: TripsViewProps) {
 
 /** Trips, wired to the example set (D-213) — nothing writes a trip yet. */
 export function TripsScreen({ headerActions }: { readonly headerActions?: ReactNode }) {
+  // `?added=<id>` — the trip New trip just made (D-241).
+  const justAdded = useSearchParams().get('added');
   // Trips added in this visit (D-225), read after mount: storage is the
   // browser's, and the first render has to match the server's.
   const [added, setAdded] = useState<readonly Trip[]>([]);
@@ -201,6 +239,7 @@ export function TripsScreen({ headerActions }: { readonly headerActions?: ReactN
   });
   return (
     <TripsView
+      justAdded={justAdded}
       headerActions={headerActions ?? <NewTripButton />}
       trips={[...examples, ...added].sort((a, b) => a.startsAt.localeCompare(b.startsAt))}
     />

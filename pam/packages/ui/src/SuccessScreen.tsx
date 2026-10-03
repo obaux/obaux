@@ -84,7 +84,7 @@ const styles = stylex.create({
     inset: 0,
     overflow: 'hidden',
     pointerEvents: 'none',
-    zIndex: 10,
+    zIndex: 20,
   },
   piece: {
     position: 'absolute',
@@ -106,17 +106,28 @@ const styles = stylex.create({
   }),
 });
 
+/**
+ * Confetti on its own (D-240, D-241): falls once over the whole screen, top to
+ * bottom, above everything and in the way of nothing. Decoration only —
+ * hidden from screen readers and stilled by reduced motion.
+ */
+export function Confetti() {
+  return (
+    <VStack aria-hidden xstyle={styles.sky}>
+      {PIECES.map((p, i) => (
+        <HStack
+          key={i}
+          xstyle={[styles.piece, styles.place(p.left, p.delay, p.duration, p.drift, p.width, p.tall, p.tone)]}
+        />
+      ))}
+    </VStack>
+  );
+}
+
 export function SuccessScreen({ title, body, action, note }: SuccessScreenProps) {
   return (
     <VStack align="center" justify="center" gap={6} xstyle={styles.screen}>
-      <VStack aria-hidden xstyle={styles.sky}>
-        {PIECES.map((p, i) => (
-          <HStack
-            key={i}
-            xstyle={[styles.piece, styles.place(p.left, p.delay, p.duration, p.drift, p.width, p.tall, p.tone)]}
-          />
-        ))}
-      </VStack>
+      <Confetti />
       <VStack align="center" gap={3} xstyle={styles.words}>
         <Heading level={1} xstyle={styles.title}>
           {title}

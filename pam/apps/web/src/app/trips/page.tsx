@@ -1,5 +1,6 @@
 'use client';
 
+import { Suspense } from 'react';
 import { TripsScreen } from '../../screens/TripsView';
 
 /**
@@ -9,5 +10,10 @@ import { TripsScreen } from '../../screens/TripsView';
  * preview.
  */
 export default function TripsPage() {
-  return <TripsScreen />;
+  // Suspense: TripsScreen reads `?added=` (D-241).
+  return (
+    <Suspense fallback={null}>
+      <TripsScreen />
+    </Suspense>
+  );
 }

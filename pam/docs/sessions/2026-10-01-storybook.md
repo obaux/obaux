@@ -422,3 +422,4 @@ Chromium.
 - D-238: programs screen search as a round button that swaps in the pill and Cancel. e2e places: 57/57.
 - D-239: BigButton 56px / 17px; invite lists use `BigButton variant="secondary"`; tokens, a11y test, CLAUDE.md rule, SOP amendment A16.
 - D-240: `SuccessScreen` (centred, confetti from the data palette, reduced-motion safe) used for Connect's done state; story `Components/SuccessScreen`. Checked: typecheck, ui and config tests, screenshots during and after the confetti.
+- D-241: New trip → `/trips/?added=` (drawer full, `Confetti`, arriving card); done step removed. Checked: build, Storybook walk-through screenshots, ui tests, e2e place and a11y: 69/69.

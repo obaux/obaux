@@ -5056,6 +5056,15 @@ recommended to {name}. They will see it on their Home and can say yes when
 they are ready." No Help on this screen is deliberate (Will): its only way
 on leads Home, where Help is.
 
+### D-241 — Adding a trip lands on Trips: drawer tall, confetti, the new trip arriving
+
+Will, 3 October. "Add this trip" no longer shows a "Trip added" page. It
+goes to `/trips/?added=<id>`: the drawer opens tall (`MapDrawer
+initialStop="full"`), confetti falls over the whole screen (`Confetti`,
+split out of `SuccessScreen`, D-240), and the new trip's card rises into
+place and scrolls into view. The old done step and its screen are removed.
+The Trips page reads the query, so it sits in a Suspense boundary.
+
 ---
 
 ## Notes for whoever picks this up next

@@ -4,7 +4,6 @@ import { useMemo, useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { Button } from '@astryxdesign/core/Button';
 import { Card } from '@astryxdesign/core/Card';
-import { EmptyState } from '@astryxdesign/core/EmptyState';
 import { Heading } from '@astryxdesign/core/Heading';
 import { HStack } from '@astryxdesign/core/HStack';
 import { Text } from '@astryxdesign/core/Text';
@@ -13,7 +12,7 @@ import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { CATEGORY_DEFINITIONS, categoryLabelKey, type Category } from '@pam/config';
 import { DUMMY_PLACES_BY_ID, type DummySavedPlace } from '@pam/config/dummy-places';
-import { BigButton, ExploreIcon, TripsIcon } from '@pam/ui';
+import { BigButton, ExploreIcon } from '@pam/ui';
 import { SearchField } from '@pam/ui/SearchPill';
 import { Icon } from '@astryxdesign/core/Icon';
 import { IconButton } from '@astryxdesign/core/IconButton';
@@ -21,6 +20,7 @@ import { MenuList } from '@pam/ui/MenuList';
 import { SubPage } from '@pam/ui/SubPage';
 import { useI18n } from '@/lib/i18n';
 import { addTrip } from '@/lib/addedTrips';
+import { navigate } from '@/lib/navigate';
 import { HelpButton } from './HelpButton';
 import { BigCategoryIcon } from './SavedView';
 
@@ -41,7 +41,7 @@ import { BigCategoryIcon } from './SavedView';
  * The trip is kept for the visit (`addedTrips`) so it appears on the map and
  * in the drawer as the real one will; the screen says so under the button.
  */
-type Step = 'where' | 'when' | 'check' | 'done';
+type Step = 'where' | 'when' | 'check';
 
 const TIMES: readonly (readonly [number, number])[] = [
   [9, 0],
@@ -87,8 +87,6 @@ const styles = stylex.create({
   summaryName: { fontSize: '22px', lineHeight: 1.25, fontWeight: 700 },
   summaryLine: { fontSize: '18px', lineHeight: 1.4 },
   note: { fontSize: '15px', lineHeight: 1.5 },
-  state: { paddingBlock: '40px' },
-  stateIcon: { width: '64px', height: '64px', color: colorVars['--color-icon-accent'] },
 });
 
 /** The next `count` weekdays, from tomorrow. */
@@ -164,16 +162,14 @@ export function NewTripView({ initialPlace = null }: { readonly initialPlace?: T
       ? t('trips.new.where')
       : step === 'when'
         ? t('trips.new.when')
-        : step === 'check'
-          ? t('trips.new.check')
-          : t('trips.new.done.title');
+        : t('trips.new.check');
 
   return (
     <SubPage
-      title={step === 'done' ? t('trips.new') : title}
-      {...(step === 'done' ? {} : { subtitle: t('trips.new.step', { current: stepNumber, total: 3 }) })}
+      title={title}
+      subtitle={t('trips.new.step', { current: stepNumber, total: 3 })}
       backHref="/trips/"
-      backLabel={step === 'where' || step === 'done' ? t('nav.back.trips') : t('trips.new.back')}
+      backLabel={step === 'where' ? t('nav.back.trips') : t('trips.new.back')}
       // Back is a step (Will, 3 October, D-235): Check → When → Where →
       // Trips. That is the way to change an answer, so no "Change" links.
       {...(step === 'when'
@@ -306,8 +302,9 @@ export function NewTripView({ initialPlace = null }: { readonly initialPlace?: T
           <BigButton
             label={t('trips.new.add')}
             onPress={() => {
+              const id = `added-${Date.now()}`;
               addTrip({
-                id: `added-${Date.now()}`,
+                id,
                 placeId: place.id,
                 placeName: place.name,
                 category: place.category,
@@ -316,7 +313,9 @@ export function NewTripView({ initialPlace = null }: { readonly initialPlace?: T
                 startsAt: at(day, time).toISOString(),
                 note: note.trim(),
               });
-              setStep('done');
+              // Straight to Trips (Will, 3 October, D-241): the drawer tall,
+              // confetti, and the new trip arriving in the list.
+              navigate(`/trips/?added=${encodeURIComponent(id)}`);
             }}
           />
           <Text type="supporting" xstyle={styles.note}>
@@ -325,16 +324,6 @@ export function NewTripView({ initialPlace = null }: { readonly initialPlace?: T
         </>
       ) : null}
 
-      {step === 'done' ? (
-        <EmptyState
-          headingLevel={2}
-          xstyle={styles.state}
-          icon={<TripsIcon {...stylex.props(styles.stateIcon)} aria-hidden />}
-          title={t('trips.new.done.title')}
-          description={t('trips.new.done.body')}
-          actions={<Button label={t('trips.new.done.see')} variant="primary" href="/trips/" />}
-        />
-      ) : null}
     </SubPage>
   );
 }
