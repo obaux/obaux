@@ -23,6 +23,7 @@ const TRIP_ART = { width: 40, height: 40, 'aria-hidden': true } as const;
 import { SubPageHeader } from '@pam/ui/SubPage';
 import { useStarredPeople } from '@/lib/useStarredPeople';
 import { StarToggle } from '../../screens/PeopleHomeView';
+import { VerifiedBadge } from '../../screens/VerifiedBadge';
 import { HeaderActions } from '../../screens/HeaderActions';
 import { useConversations } from '@/lib/useConversations';
 import { PersonDetailSkeleton } from '@pam/ui/Skeletons';
@@ -343,6 +344,10 @@ function PersonScreen() {
       */}
       <ProfileSummary
         name={person.firstName}
+        // A program sees whether a member has signed all its policies (D-261).
+        {...(isProgramView && isMember
+          ? { nameAddon: <VerifiedBadge personId={person.id} name={person.firstName ?? ''} /> }
+          : {})}
         roleLabel={[t(`role.${person.role}`), person.regionName].filter(Boolean).join(' · ')}
         stats={
           isProgramView

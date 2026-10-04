@@ -26,6 +26,8 @@ import { PrototypeSignIn } from './PrototypeSignIn';
 import { PrototypeJoin } from './PrototypeJoin';
 import { PrototypeInviteExpired } from './PrototypeInviteExpired';
 import AboutPage from '../../app/about/page';
+import PoliciesPage from '../../app/program/policies/page';
+import { PrototypePolicy } from './PrototypePolicy';
 import TermsPage from '../../app/terms/page';
 import { ProfileScreen } from '../../screens/ProfileScreen';
 import { ViewAsView } from '../../screens/ViewAsView';
@@ -72,6 +74,9 @@ export const APP_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   '/invite/expired/': screen(() => <PrototypeInviteExpired />),
   // About PAM, from the foot of Sign in (D-259).
   '/about/': screen(() => <AboutPage />),
+  // A program's policies for participants (D-261).
+  '/program/policies/': screen(() => <PoliciesPage />),
+  '/program/policies/view/': screen(() => <PrototypePolicy />),
   '/join/': screen(() => <JoinPage />),
   '/reminders/': screen(() => <RemindersPage />),
   '/alerts/': screen(() => <AlertsPage />),

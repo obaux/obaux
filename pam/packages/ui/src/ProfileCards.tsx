@@ -38,6 +38,8 @@ export interface ProfileSummaryProps {
    * a member's page (D-227, D-231).
    */
   readonly corner?: ReactNode;
+  /** Beside the name — a program's verified tick on a member (D-261). */
+  readonly nameAddon?: ReactNode;
 }
 
 const summary = stylex.create({
@@ -55,7 +57,7 @@ const summary = stylex.create({
   label: { fontSize: '13px', lineHeight: 1.3 },
 });
 
-export function ProfileSummary({ name, roleLabel, photoUrl, stats, corner }: ProfileSummaryProps) {
+export function ProfileSummary({ name, roleLabel, photoUrl, stats, corner, nameAddon }: ProfileSummaryProps) {
   return (
     <Card padding={6} xstyle={summary.card}>
       {corner ? <HStack xstyle={summary.corner}>{corner}</HStack> : null}
@@ -63,9 +65,12 @@ export function ProfileSummary({ name, roleLabel, photoUrl, stats, corner }: Pro
         <VStack gap={2} align="center" xstyle={[summary.person, stats.length === 0 && summary.personAlone]}>
           <Avatar size="xl" name={name} src={photoUrl ?? undefined} tooltip={false} />
           <VStack gap={0.5} align="center">
-            <Heading level={2} xstyle={summary.name} maxLines={2}>
-              {name}
-            </Heading>
+            <HStack gap={0} align="center" justify="center" wrap="nowrap">
+              <Heading level={2} xstyle={summary.name} maxLines={2}>
+                {name}
+              </Heading>
+              {nameAddon}
+            </HStack>
             <Text type="supporting" xstyle={summary.role}>
               {roleLabel}
             </Text>

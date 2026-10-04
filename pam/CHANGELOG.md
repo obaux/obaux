@@ -41,7 +41,9 @@ person ask for it to be renewed. Sign in has an About PAM page: what PAM is,
 how it helps members, case managers and programs, each with its own short
 slideshow, and a way to sign in as each. Case managers and members can now switch
 each kind of text on or off too, and "trip" has a small info button that says
-what a trip is.
+what a trip is. Programs have a Policies for participants
+page to add, view and remove the documents people sign, with who signed each.
+People who have signed them all get a small tick.
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 

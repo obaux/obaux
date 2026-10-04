@@ -5596,6 +5596,60 @@ uses it with the term's id, so the word is defined once.
 Nothing sends these texts yet: each kind still needs a reviewed SMS
 template (D-256).
 
+### D-261 — A program's policies for participants, and a verified tick for who signed them all
+
+Will, 4 October:
+- "On the program profile screen: an item for Policies for participants,
+  which opens a page similar to Legal, with the list of uploaded documents,
+  and at the top allows new uploads."
+- "Edit top right to remove any policies. Use fake social program policies
+  like disclosure or disclaimer."
+- "If they open a policy, the top of the page is tabs (preview/signed);
+  signed shows a list of all who signed."
+- "A verified badge next to member profiles (on program view) to signal
+  they've signed all policies. Tapping the icon (keep it small) shows which
+  policies they signed."
+
+**Program profile.** A "Policies for participants" row ("4 to sign"), shown
+out of edit mode.
+
+**`/program/policies/`** (`PoliciesScreen`):
+- The intro, then an upload card at the top (Astryx `FileInput`; a PDF or a
+  photo of each page, several at once).
+- "Your policies", each row with "Signed by N", opening the policy.
+- Edit, top right, swaps the rows for ones with a remove button. Removing
+  asks first (`ConfirmDialog`): "People who signed it keep their copy. New
+  people will not be asked to sign it."
+
+**`/program/policies/view/?id=`** (`PolicyScreen`): a pill switch at the top,
+Preview / Signed · N.
+- Preview shows the policy's words, or the file name for an upload.
+- Signed lists who signed, and when.
+
+**Verified** (`VerifiedBadge`). On a member's page as a program sees it, a
+small accent tick sits beside the name when they have signed **every**
+current policy. There is no half mark for someone halfway. Tapping it lists
+which policies they signed.
+
+In the schedule rows the tick is a plain icon, labelled for screen readers.
+The row is already a link, and a button inside a link is invalid; the list
+of policies is one tap away on their page. `ProfileSummary` gained a
+`nameAddon` slot for the tick.
+
+**Example data only** (`@pam/config/dummy-policies`, `usePolicies`):
+- Four policies: confidentiality and disclosure, liability disclaimer,
+  photo and media release, code of conduct.
+- Jordan and Miguel have signed all four, Keisha two, Aaliyah one, Devon
+  and Priya none.
+- Uploads and removals last for the browser session. Uploaded files are
+  not stored; only their names are shown.
+
+**Needs Will:**
+- Real storage means tables for policies and signatures plus file storage.
+- Members signing in PAM needs a screen of its own, on the member's side.
+- A program keeping a record of what someone signed is a new line in
+  `transparency.ts`, and members must be told before it is real.
+
 ---
 
 ## Notes for whoever picks this up next

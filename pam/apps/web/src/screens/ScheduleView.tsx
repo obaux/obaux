@@ -18,6 +18,7 @@ import { ExploreIcon, NoResultsIcon, Page, TripsIcon } from '@pam/ui';
 import { SearchField } from '@pam/ui/SearchPill';
 import { LargeTitleHeader } from '@pam/ui/LargeTitleHeader';
 import { useI18n } from '@/lib/i18n';
+import { isVerified, usePolicies } from '@/lib/usePolicies';
 
 /**
  * A program lead's Home (D-218, Will, 2 October): "a daily calendar view,
@@ -171,6 +172,7 @@ export function ScheduleView({
     [locale],
   );
 
+  const { policies } = usePolicies();
   const sorted = useMemo(() => [...appointments].sort((a, b) => a.startsAt.localeCompare(b.startsAt)), [appointments]);
 
   /** Everything a person might type to find this visit. */
@@ -200,7 +202,16 @@ export function ScheduleView({
       <ListItem
         key={a.id}
         href={a.href}
-        label={<Text xstyle={styles.label}>{a.firstName}</Text>}
+        label={
+          // A small tick for someone who has signed every policy (D-261);
+          // which ones is on their page — a row is one link, not two.
+          <HStack gap={1} align="center" wrap="nowrap">
+            <Text xstyle={styles.label}>{a.firstName}</Text>
+            {isVerified(a.personId, policies) ? (
+              <Icon icon="success" size="sm" color="accent" label={t('verified.short')} />
+            ) : null}
+          </HStack>
+        }
         description={
           <Text type="supporting" xstyle={styles.description}>
             {withDay ? `${fmt.day.format(d)} · ${a.kindLabel}` : a.kindLabel}

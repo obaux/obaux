@@ -315,6 +315,8 @@ A super admin's Home is the staff requests (D-257).
 Invites ask for the invitee's phone first; migration **0071** (14-day links,
 expired-link preview and renewal requests) is written and tested but **not
 deployed** — it waits with 0068/0069 for Will (D-258).
+Programs have policies for participants with a verified tick (D-261), on
+example data until tables, file storage and a transparency line are agreed.
 
 This is the handover document: what exists, what is proven, what is live, and
 what the next person needs to know before touching anything.

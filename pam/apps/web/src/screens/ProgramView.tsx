@@ -10,9 +10,11 @@ import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { categoryLabelKey, type Category } from '@pam/config';
 import { DUMMY_SAVED_BY_ROLE } from '@pam/config/dummy-places';
-import { GlobeIcon, Page, PhoneIcon, PlaceDetail, PlacesIcon, TextField, TextLink, googlePlaceHref } from '@pam/ui';
+import { BookIcon, GlobeIcon, Page, PhoneIcon, PlaceDetail, PlacesIcon, TextField, TextLink, googlePlaceHref } from '@pam/ui';
 import { LargeTitleHeader } from '@pam/ui/LargeTitleHeader';
 import { useI18n } from '@/lib/i18n';
+import { usePolicies } from '@/lib/usePolicies';
+import { MenuList } from '@pam/ui/MenuList';
 
 /**
  * Program — a program lead's own listing, their second tab (D-218, Will,
@@ -69,6 +71,7 @@ export function ProgramView({
   const [editing, setEditing] = useState(false);
   const [saved, setSaved] = useState(false);
   const set = (patch: Partial<ProgramDetailsData>) => setDraft((d) => ({ ...d, ...patch }));
+  const { policies } = usePolicies();
 
   const save = () => {
     if (draft.name.trim() === '') return;
@@ -201,6 +204,22 @@ export function ProgramView({
             share: t('place.share'),
             flag: t('place.flag'),
           }}
+        />
+      )}
+
+      {editing ? null : (
+        // What people sign before taking part (Will, 4 October, D-261).
+        <MenuList
+          label={t('program.policies.row')}
+          items={[
+            {
+              id: 'policies',
+              label: t('program.policies.row'),
+              description: t('program.policies.rowBody', { count: policies.length }),
+              href: '/program/policies/',
+              icon: <BookIcon {...QUICK} />,
+            },
+          ]}
         />
       )}
 
