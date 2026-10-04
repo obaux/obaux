@@ -2,7 +2,7 @@
 
 import { useSearchParams } from 'next/navigation';
 import { SignInScreen } from '../../app/signin/SignInScreen';
-import { readInvite } from '../../lib/appUrl';
+import { readAudience, readInvite } from '../../lib/appUrl';
 import { usePreviewSignIn } from '../../lib/usePreviewSignIn';
 import { navigate } from '../../lib/navigate';
 
@@ -31,5 +31,11 @@ export function PrototypeSignIn() {
       );
     },
   };
-  return <SignInScreen preview={{ flow, phone: '(215) 555-0100', code: '123456' }} invite={invite} />;
+  return (
+    <SignInScreen
+      preview={{ flow, phone: '(215) 555-0100', code: '123456' }}
+      invite={invite}
+      audience={readAudience(params)}
+    />
+  );
 }

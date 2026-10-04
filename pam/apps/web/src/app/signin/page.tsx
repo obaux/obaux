@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { readInvite, type Invite } from '@/lib/appUrl';
+import { readAudience, readInvite, type Invite, type InviteRole } from '@/lib/appUrl';
 import { SignInScreen } from './SignInScreen';
 
 /**
@@ -13,8 +13,11 @@ import { SignInScreen } from './SignInScreen';
  */
 export default function SignInPage() {
   const [invite, setInvite] = useState<Invite | null>(null);
+  const [audience, setAudience] = useState<InviteRole | null>(null);
   useEffect(() => {
-    setInvite(readInvite(new URLSearchParams(window.location.search)));
+    const params = new URLSearchParams(window.location.search);
+    setInvite(readInvite(params));
+    setAudience(readAudience(params));
   }, []);
-  return <SignInScreen invite={invite} />;
+  return <SignInScreen invite={invite} audience={audience} />;
 }

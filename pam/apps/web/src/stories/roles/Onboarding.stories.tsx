@@ -40,3 +40,6 @@ export const ExpiredLink: StoryObj = screen('provider', 'Expired link', '/protot
   invite: 'PAM-OLD1',
   as: 'program',
 });
+
+/** About PAM (D-259): what PAM is and how it helps each kind of person, from Sign in's footer. */
+export const About: StoryObj = screen('member', 'About PAM', '/about/');

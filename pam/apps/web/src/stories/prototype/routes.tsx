@@ -22,10 +22,10 @@ import RemindersPage from '../../app/reminders/page';
 import AlertsPage from '../../app/alerts/page';
 import RequestsPage from '../../app/requests/page';
 import SavedPage from '../../app/saved/page';
-import SignInPage from '../../app/signin/page';
 import { PrototypeSignIn } from './PrototypeSignIn';
 import { PrototypeJoin } from './PrototypeJoin';
 import { PrototypeInviteExpired } from './PrototypeInviteExpired';
+import AboutPage from '../../app/about/page';
 import TermsPage from '../../app/terms/page';
 import { ProfileScreen } from '../../screens/ProfileScreen';
 import { ViewAsView } from '../../screens/ViewAsView';
@@ -59,13 +59,19 @@ const screen = (render: () => ReactNode): PrototypeRoute => ({ render });
  */
 export const APP_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   '/': screen(() => <HomePage />),
-  '/signin/': screen(() => <SignInPage />),
+  // Sign in, in the prototype, is the stand-in (D-248): the real page reads
+  // the iframe's own address and sends a signed-in story Home. Every link to
+  // /signin/ — About PAM's "Sign in as…", Back from a policy, an expired
+  // link's "Sign in" — lands on a Sign in that works here (D-259).
+  '/signin/': screen(() => <PrototypeSignIn />),
   // Where each role's prototype starts (D-253): Sign in, the code, Home.
   // Joining is the Onboarding stories' own route.
   '/prototype/signin/': screen(() => <PrototypeSignIn />),
   '/prototype/join/': screen(() => <PrototypeJoin />),
   // An invite link that has run out (D-258).
   '/invite/expired/': screen(() => <PrototypeInviteExpired />),
+  // About PAM, from the foot of Sign in (D-259).
+  '/about/': screen(() => <AboutPage />),
   '/join/': screen(() => <JoinPage />),
   '/reminders/': screen(() => <RemindersPage />),
   '/alerts/': screen(() => <AlertsPage />),

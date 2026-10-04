@@ -5523,6 +5523,40 @@ only place an invite link is built, and nothing in the database stores a
 domain. `docs/changing-the-domain.md` has the steps, including keeping the
 old domain redirecting so links already sent still work.
 
+### D-259 — About PAM, from the foot of Sign in
+
+Will, 4 October:
+- "Sign in: bottom links, add About PAM. Opens a page with a back button.
+  Page contents: what PAM is, and how it helps (tabs for each user type).
+  Don't include super admin."
+- "A slideshow for each. Similar to the sign-in carousel, but text in the
+  centre, and the frame not full width or touching the top of the screen:
+  in line, with rounded corners."
+- "CTA to sign in, for each, in a list item."
+- "Add PAM's logo on the top right, where round icon buttons would sit."
+
+`/about/` (`AboutScreen`):
+- The nested template, with Back to where it was opened (`goBack`) and the
+  green wordmark top right.
+- One sentence on what PAM is.
+- A pill switch: Members / Case managers / Programs. Under it, a line on how
+  PAM helps that person, and their three slides.
+- Then "Sign in as a member / a case manager / a program lead", as list rows.
+
+The slides reuse the lines Sign in shows each person (`onboarding.*`, D-254).
+`OnboardingSlides` gained `variant="inline"`: page width, 28px corners,
+shorter, an even wash, and the words centred.
+
+"Sign in as…" opens `/signin/?as=…`. Sign in's new `audience`
+(`readAudience`) changes only the slides; there is no banner and no invite.
+The footer reads About PAM · Privacy · Terms of service on Sign in and on
+joining.
+
+In the prototype, `/signin/` is now the stand-in Sign in. The real page
+reads the iframe's own address and sends a signed-in story Home, so every
+link to Sign in from inside the prototype (About PAM, Back from a policy,
+an expired link) works there.
+
 ---
 
 ## Notes for whoever picks this up next

@@ -16,7 +16,7 @@ import { useAlertBanner } from '@/lib/alertBanner';
 import { LanguageSwitcher } from '../LanguageSwitcher';
 import { PhoneSignInCard } from './PhoneSignInCard';
 import { LegalFooter } from './LegalFooter';
-import { rememberInvite, type Invite } from '@/lib/appUrl';
+import { rememberInvite, type Invite, type InviteRole } from '@/lib/appUrl';
 import { previewInvite } from '@/lib/useInviteRenewals';
 import { navigate } from '@/lib/navigate';
 
@@ -111,6 +111,7 @@ export interface SignInPreview {
 export function SignInScreen({
   preview = null,
   invite = null,
+  audience = null,
 }: {
   readonly preview?: SignInPreview | null;
   /**
@@ -119,6 +120,11 @@ export function SignInScreen({
    * slides who is reading, and keeps the code for joining.
    */
   readonly invite?: Invite | null;
+  /**
+   * Who is reading, without an invite — `/signin/?as=case-manager` from
+   * About PAM's "Sign in as…" (D-259). Only the slides change.
+   */
+  readonly audience?: InviteRole | null;
 } = {}) {
   const { t } = useI18n();
   const supportPhone = useSupportPhone();
@@ -173,7 +179,8 @@ export function SignInScreen({
    * a program that doesn't know who is coming, loses people to no-shows and
    * waits on referrals. Same pictures; only the words change.
    */
-  const lines = invite?.role === 'admin' ? 'onboarding.admin.' : invite?.role === 'provider' ? 'onboarding.provider.' : 'onboarding.';
+  const reader = invite?.role ?? audience;
+  const lines = reader === 'admin' ? 'onboarding.admin.' : reader === 'provider' ? 'onboarding.provider.' : 'onboarding.';
   const slides = useMemo(
     () => [
       // The first picture is the lightest behind the mark: 20% darker (D-253).

@@ -999,5 +999,21 @@
   "requests.renewals.someone": "someone",
   "requests.renewals.when": "Expired {expired} · Asked {asked}",
   "requests.renewals.approve": "Renew the link",
-  "requests.renewals.deny": "Deny"
+  "requests.renewals.deny": "Deny",
+  "about.title": "About PAM",
+  "about.intro": "PAM connects people coming home with the programs, mentors and case managers who can help: learning, earning and family support, in one app.",
+  "about.tabs": "Who PAM is for",
+  "about.tab.member": "Members",
+  "about.tab.admin": "Case managers",
+  "about.tab.provider": "Programs",
+  "about.how.member": "For someone coming home: find a place, plan a visit, and keep going with a person in your corner.",
+  "about.how.admin": "For a case manager: know where your people are going, and connect them in a tap.",
+  "about.how.provider": "For a program: see who is coming, keep them coming, and get people sent your way.",
+  "about.signin.title": "Sign in",
+  "about.signin.member": "Sign in as a member",
+  "about.signin.admin": "Sign in as a case manager",
+  "about.signin.provider": "Sign in as a program lead",
+  "about.logo": "PAM",
+  "legal.about": "About PAM",
+  "nav.back.about": "Back to About PAM"
 }

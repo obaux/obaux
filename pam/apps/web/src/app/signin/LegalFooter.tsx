@@ -38,7 +38,9 @@ export function LegalFooter({ from }: { readonly from: 'signin' | 'join' }) {
   return (
     <>
       <VStack aria-hidden xstyle={styles.spacer} />
-      <HStack gap={4} justify="center" wrap="nowrap" xstyle={styles.bar}>
+      <HStack gap={2} justify="center" wrap="nowrap" xstyle={styles.bar}>
+        {/* What PAM is, for somebody deciding whether to sign in (D-259). */}
+        <TextLink label={t('legal.about')} href="/about/" size="quiet" />
         <TextLink label={t('legal.privacy')} href={`/privacy/?from=${from}`} size="quiet" />
         <TextLink label={t('legal.terms')} href={`/terms/?from=${from}`} size="quiet" />
       </HStack>

@@ -999,5 +999,21 @@
   "requests.renewals.someone": "alguien",
   "requests.renewals.when": "Venció el {expired} · Pedido el {asked}",
   "requests.renewals.approve": "Renovar el enlace",
-  "requests.renewals.deny": "Negar"
+  "requests.renewals.deny": "Negar",
+  "about.title": "Sobre PAM",
+  "about.intro": "PAM conecta a personas que regresan a casa con los programas, mentores y gestores de casos que pueden ayudar: aprendizaje, empleo y apoyo familiar, en una sola app.",
+  "about.tabs": "Para quién es PAM",
+  "about.tab.member": "Miembros",
+  "about.tab.admin": "Gestores de casos",
+  "about.tab.provider": "Programas",
+  "about.how.member": "Para quien regresa a casa: encuentre un lugar, planee una visita y siga adelante con alguien de su lado.",
+  "about.how.admin": "Para un gestor de casos: sepa a dónde van sus personas y conéctelas con un toque.",
+  "about.how.provider": "Para un programa: vea quién viene, ayúdelos a seguir viniendo y reciba personas enviadas a usted.",
+  "about.signin.title": "Entrar",
+  "about.signin.member": "Entrar como miembro",
+  "about.signin.admin": "Entrar como gestor de casos",
+  "about.signin.provider": "Entrar como líder de programa",
+  "about.logo": "PAM",
+  "legal.about": "Sobre PAM",
+  "nav.back.about": "Volver a Sobre PAM"
 }

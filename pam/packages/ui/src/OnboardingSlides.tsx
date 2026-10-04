@@ -115,6 +115,12 @@ export interface OnboardingSlidesProps {
    * of each one, since it names the app, not the idea currently on screen.
    */
   readonly header?: ReactNode;
+  /**
+   * `hero` (default): full width, flush to the top, words at the foot — Sign
+   * in. `inline` (D-259, About PAM): inside the page's margins, rounded
+   * corners, shorter, and the words in the middle of the picture.
+   */
+  readonly variant?: 'hero' | 'inline';
 }
 
 const styles = stylex.create({
@@ -225,6 +231,16 @@ const styles = stylex.create({
     transitionDuration: '150ms',
   },
   here: { opacity: 1, width: '20px', borderRadius: '4px' },
+  // The inline frame (D-259): in line with the page, rounded, words centred.
+  regionInline: { width: '100%', marginInline: 0 },
+  trackInline: { borderRadius: '28px' },
+  slideInline: {
+    height: 'clamp(240px, 40vh, 360px)',
+    justifyContent: 'center',
+    paddingBlockEnd: 0,
+  },
+  lineInline: { fontSize: '21px', fontWeight: 600, lineHeight: 1.35, paddingBlockEnd: 0 },
+  dotsInline: { bottom: '20px' },
 });
 
 /**
@@ -235,7 +251,12 @@ const styles = stylex.create({
  * this still matches what was asked for than to prove two or three separate
  * declarations still compose to it.
  */
-function heroBackground(image: string, scrim = 0): string {
+function heroBackground(image: string, scrim = 0, isInline = false): string {
+  // Inline, the words sit in the middle, so the wash is even rather than a
+  // gradient to the foot (D-259).
+  if (isInline) {
+    return `linear-gradient(rgba(0, 0, 0, 0.45), rgba(0, 0, 0, 0.45)), url(${image}) lightgray 50% / cover no-repeat`;
+  }
   // Darker than the stop set first specified (0.50 at 66.12%) — Will, 17
   // September, after the taller hero and some of the brighter photos left
   // the white text and mark reading thin in places. Same two stops, same
@@ -268,7 +289,8 @@ const AUTOPLAY_MS = 6000;
 // smoothly-eased scroll rather than a hard jump.
 const SCROLL_EASE_MS = 600;
 
-export function OnboardingSlides({ slides, label, header }: OnboardingSlidesProps) {
+export function OnboardingSlides({ slides, label, header, variant = 'hero' }: OnboardingSlidesProps) {
+  const isInline = variant === 'inline';
   const region = useRef<HTMLElement>(null);
   const carousel = useRef<CarouselHandle>(null);
   const [here, setHere] = useState(0);
@@ -371,7 +393,7 @@ export function OnboardingSlides({ slides, label, header }: OnboardingSlidesProp
   }, [here, reducedMotion, slides.length]);
 
   return (
-    <section ref={region} aria-label={label} {...stylex.props(styles.region)}>
+    <section ref={region} aria-label={label} {...stylex.props(styles.region, isInline && styles.regionInline)}>
       {/*
         The name lives on the section, not on the carousel inside it. Both
         carrying it made two regions with the same name, which a screen reader
@@ -383,10 +405,10 @@ export function OnboardingSlides({ slides, label, header }: OnboardingSlidesProp
         hasButtons={false}
         hasEdgeFade={false}
         handleRef={carousel}
-        xstyle={styles.track}
+        xstyle={[styles.track, isInline && styles.trackInline]}
       >
         {slides.map((slide, index) => (
-          <div key={slide.id} data-slide={index} {...stylex.props(styles.slide)}>
+          <div key={slide.id} data-slide={index} {...stylex.props(styles.slide, isInline && styles.slideInline)}>
             {/*
               `aria-hidden` here, not `alt=""` on an `<img>`: the artwork is a
               CSS background precisely so the dynamic per-slide URL never has
@@ -398,19 +420,19 @@ export function OnboardingSlides({ slides, label, header }: OnboardingSlidesProp
               <div
                 aria-hidden="true"
                 {...stylex.props(styles.art)}
-                style={{ background: heroBackground(slide.image, slide.scrim) }}
+                style={{ background: heroBackground(slide.image, slide.scrim, isInline) }}
               />
             ) : (
               <Skeleton width="100%" height="100%" radius="none" xstyle={styles.skeleton} />
             )}
-            <Text xstyle={styles.line}>{slide.text}</Text>
+            <Text xstyle={[styles.line, isInline && styles.lineInline]}>{slide.text}</Text>
           </div>
         ))}
       </Carousel>
 
       {header ? <div {...stylex.props(styles.header)}>{header}</div> : null}
 
-      <HStack gap={1} justify="center" align="center" aria-hidden="true" xstyle={styles.dots}>
+      <HStack gap={1} justify="center" align="center" aria-hidden="true" xstyle={[styles.dots, isInline && styles.dotsInline]}>
         {slides.map((slide, index) => (
           <span key={slide.id} {...stylex.props(styles.dot, index === here && styles.here)} />
         ))}

@@ -61,6 +61,12 @@ export function readInvite(params: { get(name: string): string | null } | null |
   return { code, role };
 }
 
+/** Who a page is for, from `?as=` alone — no invite needed (D-259). */
+export function readAudience(params: { get(name: string): string | null } | null | undefined): InviteRole | null {
+  const as = params?.get('as');
+  return as === 'program' ? 'provider' : as === 'case-manager' ? 'admin' : as === 'member' ? 'member' : null;
+}
+
 /*
  * Kept for the step after the phone is verified. Sign in hands a person with
  * no account to /join/, a different page, and the code has to arrive with
