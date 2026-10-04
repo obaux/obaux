@@ -39,7 +39,9 @@ invite now asks for the person's phone number first, so the link only works
 for them. Links last 14 days, and an expired one shows who sent it and lets the
 person ask for it to be renewed. Sign in has an About PAM page: what PAM is,
 how it helps members, case managers and programs, each with its own short
-slideshow, and a way to sign in as each.
+slideshow, and a way to sign in as each. Case managers and members can now switch
+each kind of text on or off too, and "trip" has a small info button that says
+what a trip is.
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 

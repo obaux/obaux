@@ -140,13 +140,15 @@ export function ProfileView({
           title={t(role === 'admin' || role === 'provider' ? 'profile.promo.alerts.title' : 'profile.promo.reminders.title')}
           body={t(
             role === 'admin'
-              ? 'profile.promo.alerts.body.admin'
+              ? 'profile.promo.alerts.body.adminList'
               : role === 'provider'
                 ? 'profile.promo.alerts.body.providerList'
                 : 'profile.promo.reminders.body',
           )}
-          // A program chooses per kind, on its own screen (D-256).
-          href={role === 'provider' ? '/alerts/' : '/reminders/'}
+          // Staff choose per kind on Text alerts (D-256, D-260). A member's
+          // first yes is still the reminders screen — the one the SMS carrier
+          // reviewed — and their switches are a row in settings after that.
+          href={role === 'member' ? '/reminders/' : '/alerts/'}
           art={<StarIcon {...ART} />}
         />
       )}
@@ -179,7 +181,8 @@ export function ProfileView({
                   {
                     id: 'reminders',
                     label: t('profile.menu.reminders'),
-                    href: '/reminders/',
+                    // One switch per kind, for everyone (D-260).
+                    href: '/alerts/',
                     icon: <BellIcon {...ICON} />,
                   },
                 ]

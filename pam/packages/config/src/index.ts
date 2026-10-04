@@ -21,6 +21,7 @@ export * from './distance.js';
  * had 0.2 kB of headroom and this cost 0.6 (16 September).
  */
 export * from './legal.js';
+export * from './glossary.js';
 
 /** Languages at launch (§2.3). [ASK WILL] on any additional language. */
 export const SUPPORTED_LOCALES = ['en', 'es'] as const;

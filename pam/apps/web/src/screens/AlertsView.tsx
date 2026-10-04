@@ -14,11 +14,12 @@ import { useSession } from '@/lib/useSession';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { setReminderConsent } from '@/lib/useReminderConsent';
 import { HelpButton } from './HelpButton';
+import { TermInfo } from './TermInfo';
+import type { GlossaryTerm } from '@pam/config';
 
 /**
- * Text alerts, for a program (Will, 3 October, D-256): programs hear from
- * people more than anyone, so what PAM texts them about is three switches,
- * one each, rather than one yes to everything:
+ * Text alerts, one switch per kind (D-256 for programs; D-260, Will, 4
+ * October, for case managers and members too). For a program, three:
  *
  *   - someone books a visit,
  *   - someone changes a booking (moved or cancelled),
@@ -36,22 +37,37 @@ import { HelpButton } from './HelpButton';
  * the consent itself is the real, stored one. Nothing sends these yet either:
  * each needs an SMS template a person has reviewed (`sms-templates.ts`).
  */
-type Kind = 'booked' | 'changed' | 'message';
-const KINDS: readonly Kind[] = ['booked', 'changed', 'message'];
-const KEY = 'pam.alerts';
+type Kind = 'booked' | 'changed' | 'message' | 'trip' | 'visit' | 'closed' | 'connect';
 
-function readChoices(): Partial<Record<Kind, boolean>> | null {
+/**
+ * What each kind of person can be texted about (D-256, D-260), most wanted
+ * first. A program hears from people most; a case manager, about messages
+ * and the trips their people plan ("trip" explained from the glossary); a
+ * member, about their own visits, saved places, people and messages.
+ */
+const KINDS_FOR: Record<'member' | 'admin' | 'provider', readonly Kind[]> = {
+  provider: ['booked', 'changed', 'message'],
+  admin: ['message', 'trip'],
+  member: ['visit', 'message', 'connect', 'closed'],
+};
+
+/** A word in a switch's label that the glossary explains (D-260). */
+const TERM_FOR: Partial<Record<Kind, GlossaryTerm>> = { trip: 'trip' };
+
+const keyFor = (who: string) => `pam.alerts.${who}`;
+
+function readChoices(who: string): Partial<Record<Kind, boolean>> | null {
   try {
-    const raw = window.localStorage.getItem(KEY);
+    const raw = window.localStorage.getItem(keyFor(who));
     return raw ? (JSON.parse(raw) as Partial<Record<Kind, boolean>>) : null;
   } catch {
     return null;
   }
 }
 
-function writeChoices(choices: Record<Kind, boolean>): void {
+function writeChoices(who: string, choices: Partial<Record<Kind, boolean>>): void {
   try {
-    window.localStorage.setItem(KEY, JSON.stringify(choices));
+    window.localStorage.setItem(keyFor(who), JSON.stringify(choices));
   } catch {
     // Not kept between visits; the consent itself still is.
   }
@@ -69,7 +85,10 @@ export function AlertsView() {
   const supportPhone = useSupportPhone();
   const { state: session } = useSession();
   const userId = session.status === 'signed-in' ? session.session.userId : null;
-  const [choices, setChoices] = useState<Record<Kind, boolean>>({ booked: false, changed: false, message: false });
+  const role = session.status === 'signed-in' ? session.session.role : null;
+  const who = role === 'provider' ? 'provider' : role === 'admin' ? 'admin' : 'member';
+  const KINDS = KINDS_FOR[who];
+  const [choices, setChoices] = useState<Partial<Record<Kind, boolean>>>({});
   const [failed, setFailed] = useState(false);
 
   // Last time's choices; or, with texts already agreed to and nothing kept
@@ -78,26 +97,26 @@ export function AlertsView() {
     if (!userId) return;
     let cancelled = false;
     void (async () => {
-      const kept = readChoices();
+      const kept = readChoices(who);
       if (kept) {
-        if (!cancelled) setChoices({ booked: !!kept.booked, changed: !!kept.changed, message: !!kept.message });
+        if (!cancelled) setChoices(kept);
         return;
       }
       const { getReminderConsent } = await import('@/lib/useReminderConsent');
       const agreed = await getReminderConsent(userId);
-      if (!cancelled && agreed) setChoices({ booked: true, changed: true, message: true });
+      if (!cancelled && agreed) setChoices(Object.fromEntries(KINDS_FOR[who].map((k) => [k, true])));
     })();
     return () => {
       cancelled = true;
     };
-  }, [userId]);
+  }, [userId, who]);
 
   const change = async (kind: Kind, on: boolean) => {
     const next = { ...choices, [kind]: on };
     const wasAny = KINDS.some((k) => choices[k]);
     const isAny = KINDS.some((k) => next[k]);
     setChoices(next);
-    writeChoices(next);
+    writeChoices(who, next);
     if (userId && wasAny !== isAny) {
       const saved = await setReminderConsent(userId, isAny);
       setFailed(!saved);
@@ -115,7 +134,10 @@ export function AlertsView() {
             // switch keeps its label, hidden, so it is still named.
             <HStack key={kind} gap={3} align="center" wrap="nowrap">
               <VStack gap={1} xstyle={styles.words}>
-                <Text xstyle={styles.label}>{t(`alerts.${kind}`)}</Text>
+                <HStack gap={0} align="center" wrap="nowrap">
+                  <Text xstyle={styles.label}>{t(`alerts.${kind}`)}</Text>
+                  {TERM_FOR[kind] ? <TermInfo term={TERM_FOR[kind]} /> : null}
+                </HStack>
                 <Text type="supporting" xstyle={styles.small}>
                   {t(`alerts.${kind}.body`)}
                 </Text>
@@ -123,7 +145,7 @@ export function AlertsView() {
               <Switch
                 label={t(`alerts.${kind}`)}
                 isLabelHidden
-                value={choices[kind]}
+                value={!!choices[kind]}
                 changeAction={(on) => change(kind, on)}
                 isDisabled={!userId}
               />

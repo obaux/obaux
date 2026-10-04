@@ -5557,6 +5557,45 @@ reads the iframe's own address and sends a signed-in story Home, so every
 link to Sign in from inside the prototype (About PAM, Back from a policy,
 an expired link) works there.
 
+### D-260 — Text alerts are switches for everyone; PAM's own words are defined once
+
+Will, 4 October:
+- "Let's use a similar text permission switch for case managers: they may
+  want to receive texts when someone schedules a trip (info icon explaining
+  what a trip is; this tooltip info should be stored somewhere, since we're
+  using unique terms which may need to be defined across various places in
+  the app, but only here for now)."
+- "I also like the breakdown for members, giving them the option to switch
+  on/off different types of alert pertinent to them."
+
+`/alerts/` (`AlertsView`) now serves every role, each with its own kinds:
+- **Program:** someone books a visit, changes a booking, messages you
+  (D-256).
+- **Case manager:** someone messages you; someone plans a trip, with a
+  small ⓘ that explains "trip".
+- **Member:** before your trip; someone messages you; someone wants to
+  connect; a saved place closes or moves.
+
+Choices are kept per role on the phone (`pam.alerts.{role}`) until a column
+exists. Consent works as in D-256: switches start off, the first one on
+records consent, and the last one off withdraws it.
+
+Where it opens from:
+- Staff: the Profile card opens `/alerts/`.
+- A member: the card still opens `/reminders/`, because their first yes is
+  the screen the SMS carrier registration was filed with. Changing that
+  screen could mean refiling.
+- Everyone: the "Text reminders" settings row on Profile opens `/alerts/`.
+
+**Glossary.** `GLOSSARY` in `@pam/config` (`glossary.ts`) maps each term to
+an i18n name and definition. It holds one term so far: trip. `TermInfo` is
+the ⓘ. It uses a popover rather than a hover tooltip, because phones don't
+hover, and it is a 48px target. Any screen that wants to explain a PAM word
+uses it with the term's id, so the word is defined once.
+
+Nothing sends these texts yet: each kind still needs a reviewed SMS
+template (D-256).
+
 ---
 
 ## Notes for whoever picks this up next

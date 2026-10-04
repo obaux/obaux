@@ -955,7 +955,6 @@
   "saved.leave.putBack": "Put them back",
   "saved.leave.stay": "Keep editing",
   "profile.promo.alerts.title": "Get text alerts",
-  "profile.promo.alerts.body.admin": "Receive a text when someone messages you in the app.",
   "reminders.what.messages": "A text when someone messages you in PAM.",
   "reminders.what.visits": "A text when someone plans a visit to your program.",
   "alerts.title": "Text alerts",
@@ -1015,5 +1014,17 @@
   "about.signin.provider": "Sign in as a program lead",
   "about.logo": "PAM",
   "legal.about": "About PAM",
-  "nav.back.about": "Back to About PAM"
+  "nav.back.about": "Back to About PAM",
+  "glossary.trip.term": "Trip",
+  "glossary.trip.definition": "A trip is a visit a member plans to a program: the place, the day and the time. It shows on their Trips map, and the program sees it too.",
+  "glossary.whatIs": "What is a {term}?",
+  "alerts.trip": "Someone plans a trip",
+  "alerts.trip.body": "A member on your list plans a visit to a program.",
+  "alerts.visit": "Before your trip",
+  "alerts.visit.body": "The day before, with the address.",
+  "alerts.closed": "A saved place closes or moves",
+  "alerts.closed.body": "So you do not go to the wrong door.",
+  "alerts.connect": "Someone wants to connect",
+  "alerts.connect.body": "Only that someone asked. Never who, in the text.",
+  "profile.promo.alerts.body.adminList": "Messages and trips. Choose which."
 }

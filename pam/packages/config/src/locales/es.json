@@ -955,7 +955,6 @@
   "saved.leave.putBack": "Dejarlos como estaban",
   "saved.leave.stay": "Seguir editando",
   "profile.promo.alerts.title": "Reciba avisos por mensaje",
-  "profile.promo.alerts.body.admin": "Reciba un mensaje de texto cuando alguien le escriba en la app.",
   "reminders.what.messages": "Un mensaje de texto cuando alguien le escriba en PAM.",
   "reminders.what.visits": "Un mensaje de texto cuando alguien planee una visita a su programa.",
   "alerts.title": "Avisos por mensaje",
@@ -1015,5 +1014,17 @@
   "about.signin.provider": "Entrar como líder de programa",
   "about.logo": "PAM",
   "legal.about": "Sobre PAM",
-  "nav.back.about": "Volver a Sobre PAM"
+  "nav.back.about": "Volver a Sobre PAM",
+  "glossary.trip.term": "Viaje",
+  "glossary.trip.definition": "Un viaje es una visita que un miembro planea a un programa: el lugar, el día y la hora. Aparece en su mapa de Viajes, y el programa también lo ve.",
+  "glossary.whatIs": "¿Qué es un {term}?",
+  "alerts.trip": "Alguien planea un viaje",
+  "alerts.trip.body": "Un miembro de su lista planea una visita a un programa.",
+  "alerts.visit": "Antes de su viaje",
+  "alerts.visit.body": "El día antes, con la dirección.",
+  "alerts.closed": "Un lugar guardado cierra o se muda",
+  "alerts.closed.body": "Para que no vaya a la puerta equivocada.",
+  "alerts.connect": "Alguien quiere conectar",
+  "alerts.connect.body": "Solo que alguien lo pidió. Nunca quién, en el mensaje.",
+  "profile.promo.alerts.body.adminList": "Mensajes y viajes. Usted escoge cuáles."
 }

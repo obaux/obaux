@@ -33,6 +33,7 @@ export const Connections: Story = screen('member', 'Connections', '/connections/
 export const ConnectionProfile: Story = screen('member', 'A connection', '/connections/person/', { id: 'dummy-p1' });
 export const Points: Story = screen('member', 'Points', '/points/');
 export const Reminders: Story = screen('member', 'Text reminders', '/reminders/');
+export const TextAlerts: Story = screen('member', 'Text alerts', '/alerts/');
 export const Language: Story = screen('member', 'Language', '/language/');
 export const GetHelp: Story = screen('member', 'Get help', '/help/');
 export const HelpTopics: Story = screen('member', 'What we can help with', '/help/topics/');
