@@ -12,6 +12,7 @@ import { useSupportPhone } from '@/lib/useSupportPhone';
 import { createInvite, type CreatedInvite } from '@/lib/useCaseload';
 import { HelpButton } from './HelpButton';
 import { InviteReady } from './InviteReady';
+import { InvitePhoneStep } from './InvitePhoneStep';
 
 /**
  * Invite someone (D-218, Will, 2 October): two kinds of invite and nothing
@@ -45,13 +46,17 @@ export function InviteView() {
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState(false);
 
-  const make = async (role: 'member' | 'provider') => {
+  /** Who is being invited, while their number is asked for (D-258). */
+  const [asking, setAsking] = useState<'member' | 'provider' | null>(null);
+
+  const make = async (role: 'member' | 'provider', phone: string) => {
     if (!canInvite) return;
     setBusy(true);
     setFailed(false);
-    const created = await createInvite(role);
+    const created = await createInvite(role, undefined, phone);
     setBusy(false);
     if (created) {
+      setAsking(null);
       setInvite(created);
     } else {
       setFailed(true);
@@ -62,6 +67,13 @@ export function InviteView() {
     <SubPage title={t('profile.menu.invite')} backHref="/" backLabel={t('nav.back.home')} actions={<HelpButton />}>
       {invite ? (
         <InviteReady invite={invite} onAnother={() => setInvite(null)} />
+      ) : asking ? (
+        <InvitePhoneStep
+          role={asking}
+          isBusy={busy}
+          onMake={(phone) => void make(asking, phone)}
+          onBack={() => setAsking(null)}
+        />
       ) : (
         <>
           <Text type="supporting" xstyle={styles.intro}>
@@ -72,16 +84,16 @@ export function InviteView() {
             items={[
               {
                 id: 'member',
-                label: busy ? t('admin.invite.creating') : t('invite.member'),
+                label: t('invite.member'),
                 description: t('invite.member.body'),
-                onSelect: () => void make('member'),
+                onSelect: () => setAsking('member'),
                 icon: <MeIcon {...ICON} />,
               },
               {
                 id: 'program',
                 label: t('invite.program'),
                 description: t('invite.program.body'),
-                onSelect: () => void make('provider'),
+                onSelect: () => setAsking('provider'),
                 icon: <PlacesIcon {...ICON} />,
               },
             ]}

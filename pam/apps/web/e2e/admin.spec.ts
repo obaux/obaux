@@ -174,6 +174,11 @@ test.describe('the case manager screen', () => {
     );
     await page.goto('/admin/');
     await page.getByRole('button', { name: 'Someone coming home' }).click();
+    // Who it is for first (D-258): the link will only work for this number.
+    await page.getByLabel('Their phone number').fill('215 555 0142');
+    const made = page.waitForRequest(INVITE);
+    await page.getByRole('button', { name: 'Make the link' }).click();
+    expect((await made).postDataJSON()).toMatchObject({ p_role: 'member', p_phone: '+12155550142' });
 
     // The link opens Sign in with the code and who it is for; nobody types it.
     await expect(page.getByText(/\/signin\/\?invite=9T3YTVMT&as=member/)).toBeVisible();
@@ -183,11 +188,28 @@ test.describe('the case manager screen', () => {
     await expect(page.getByText(/Works until/)).toBeVisible();
   });
 
+  test('a number that is not a phone number is said so, and nothing is made (D-258)', async ({ page }) => {
+    await signedInAs(page, 'admin', []);
+    let made = 0;
+    await page.route(INVITE, (route) => {
+      made += 1;
+      return route.fulfill({ status: 500, body: '{}' });
+    });
+    await page.goto('/admin/');
+    await page.getByRole('button', { name: 'Someone coming home' }).click();
+    await page.getByLabel('Their phone number').fill('12');
+    await page.getByRole('button', { name: 'Make the link' }).click();
+    await expect(page.getByText(/does not look like a phone number/)).toBeVisible();
+    expect(made).toBe(0);
+  });
+
   test('a failed invite is explained, not swallowed', async ({ page }) => {
     await signedInAs(page, 'admin', []);
     await page.route(INVITE, (route) => route.fulfill({ status: 500, body: '{}' }));
     await page.goto('/admin/');
     await page.getByRole('button', { name: 'Someone coming home' }).click();
+    await page.getByLabel('Their phone number').fill('215 555 0142');
+    await page.getByRole('button', { name: 'Make the link' }).click();
 
     await expect(page.getByRole('heading', { name: 'We could not make a code' })).toBeVisible();
   });

@@ -312,6 +312,9 @@ Saved's Edit holds removals until Done and asks before leaving or unstarring
 per kind at `/alerts/`, kept on the phone until a column exists, and no SMS
 template for them is written or reviewed yet (D-256).
 A super admin's Home is the staff requests (D-257).
+Invites ask for the invitee's phone first; migration **0071** (14-day links,
+expired-link preview and renewal requests) is written and tested but **not
+deployed** — it waits with 0068/0069 for Will (D-258).
 
 This is the handover document: what exists, what is proven, what is live, and
 what the next person needs to know before touching anything.

@@ -17,6 +17,8 @@ import { LanguageSwitcher } from '../LanguageSwitcher';
 import { PhoneSignInCard } from './PhoneSignInCard';
 import { LegalFooter } from './LegalFooter';
 import { rememberInvite, type Invite } from '@/lib/appUrl';
+import { previewInvite } from '@/lib/useInviteRenewals';
+import { navigate } from '@/lib/navigate';
 
 /**
  * The only way into PAM, and the same door for everybody: a member, a program
@@ -183,8 +185,20 @@ export function SignInScreen({
   );
 
   // Kept for joining, the page a new person goes to once the code works.
+  // A link that has run out goes to its own page instead, which keeps who
+  // sent it and lets them ask for it to be renewed (D-258).
   useEffect(() => {
-    if (invite) rememberInvite(invite);
+    if (!invite) return;
+    rememberInvite(invite);
+    let cancelled = false;
+    void previewInvite(invite.code).then((preview) => {
+      if (cancelled || preview?.state !== 'expired') return;
+      const as = invite.role === 'admin' ? 'case-manager' : invite.role === 'provider' ? 'program' : 'member';
+      navigate(`/invite/expired/?invite=${encodeURIComponent(invite.code)}&as=${as}`);
+    });
+    return () => {
+      cancelled = true;
+    };
   }, [invite]);
 
   /**

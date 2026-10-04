@@ -25,6 +25,7 @@ import SavedPage from '../../app/saved/page';
 import SignInPage from '../../app/signin/page';
 import { PrototypeSignIn } from './PrototypeSignIn';
 import { PrototypeJoin } from './PrototypeJoin';
+import { PrototypeInviteExpired } from './PrototypeInviteExpired';
 import TermsPage from '../../app/terms/page';
 import { ProfileScreen } from '../../screens/ProfileScreen';
 import { ViewAsView } from '../../screens/ViewAsView';
@@ -63,6 +64,8 @@ export const APP_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   // Joining is the Onboarding stories' own route.
   '/prototype/signin/': screen(() => <PrototypeSignIn />),
   '/prototype/join/': screen(() => <PrototypeJoin />),
+  // An invite link that has run out (D-258).
+  '/invite/expired/': screen(() => <PrototypeInviteExpired />),
   '/join/': screen(() => <JoinPage />),
   '/reminders/': screen(() => <RemindersPage />),
   '/alerts/': screen(() => <AlertsPage />),

@@ -20,6 +20,7 @@ import {
   REGION_ID,
   ROLES,
   STAFF_REQUESTS,
+  INVITE_RENEWALS,
   partnerFor,
   threadFor,
   type JourneyRole,
@@ -126,6 +127,23 @@ function routesFor(journeyRole: JourneyRole): Route[] {
     on('/rest/v1/app_settings', () => ({ body: { value: '+12673095265' } })),
     on('/rest/v1/regions', () => ({ body: [{ id: REGION_ID, name: 'Philadelphia' }] })),
     on('/rest/v1/staff_requests', () => ({ body: STAFF_REQUESTS })),
+    // Invite links (0071, D-258): PAM-OLD1 is the example expired link; any
+    // other code is still good. One renewal request waits for the super admin.
+    on('/rpc/invite_preview', (_url, _method, body) => {
+      const code = String((body as { p_code?: string } | null)?.p_code ?? '').toUpperCase();
+      return {
+        body: [
+          {
+            inviter_first_name: 'Dana',
+            invited_role: 'provider',
+            state: code === 'PAM-OLD1' ? 'expired' : 'valid',
+          },
+        ],
+      };
+    }),
+    on('/rpc/request_invite_renewal', () => ({ body: true })),
+    on('/rpc/invite_renewals_pending', () => ({ body: INVITE_RENEWALS })),
+    on('/rpc/decide_invite_renewal', () => ({ body: null })),
     on('/rest/v1/enrollments', () => ({ body: [] })),
     on('/rpc/messageable_people', () => ({ body: [] })),
     on('/rpc/reports_for_review', () => ({ body: [] })),

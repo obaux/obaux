@@ -30,3 +30,13 @@ export const ProgramLead: StoryObj = screen('provider', 'Program lead', '/protot
   as: 'program',
   next: 'join',
 });
+
+/**
+ * An invite link that has run out (D-258): Sign in sees it has expired and
+ * opens its own page — who sent it, and a way to ask for it to be renewed,
+ * which reaches the super admin's Requests.
+ */
+export const ExpiredLink: StoryObj = screen('provider', 'Expired link', '/prototype/signin/', {
+  invite: 'PAM-OLD1',
+  as: 'program',
+});

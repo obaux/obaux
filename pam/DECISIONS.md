@@ -5463,6 +5463,66 @@ own account landed on Explore, a member's screen.
 - The role switch is the white 48px disc of the other header buttons
   (D-216, D-253). It was a bare icon.
 
+### D-258 — Invites ask for the phone first, last 14 days, and an expired one can ask to be renewed
+
+Will, 4 October:
+- "Gather phone number before generating links, so we can verify which
+  person invited who."
+- "Extend to 14 days."
+- "A page for expired links, keeping the context about who invited them,
+  prompting them to request a new link, which sends a notice to super admin
+  requests, showing who invited who (approve/deny)."
+- "How easy will it be to update this when we plug in a new domain?"
+
+**The phone first.** Choosing who to invite now asks for their number
+(`InvitePhoneStep`) before anything is made. All three ways to invite use
+it: Invite someone, a case manager's admin screen, and the directory. The
+number goes into `create_invite`'s `p_phone`, which has existed since 0002.
+`redeem_invite` already refuses any other verified phone, so a forwarded
+link is no use to anyone else. A number that doesn't read as one says so,
+and nothing is made.
+
+**Migration 0071 (`invite_renewals`). Written and tested, not deployed.**
+- **14 days.** `invites.expires_at` defaults to 14 days. It was 30 in 0002;
+  the prototype's fixture said 7.
+- **`invite_preview(code)`**, callable signed out. It returns the inviter's
+  first name, the invited role, and valid / expired / used / not_found.
+  Nothing else: no phone, last name, region or ids.
+- **`request_invite_renewal(code, first_name)`**, callable signed out. It
+  keeps one pending request per expired, unused invite (a unique partial
+  index), so the button can't flood the queue. A link that still works
+  can't ask.
+- **`invite_renewals_pending()` and `decide_invite_renewal()`**, super
+  admin only. They show who invited whom, as what, and when it lapsed.
+  Approving gives the **same** link 14 more days, so nothing new has to be
+  sent. Both are audited.
+- `invite_renewals` has forced RLS, a super-admin-only policy and no client
+  grants.
+- `09_invite_renewals_test.sql` covers all of this. The full DB suite
+  passes.
+- **Not deployed:** 0068/0069 are held for Will's go-ahead (STATUS), and
+  CLAUDE.md says to stop at that drift. Until 0071 is live, the real app
+  falls back quietly: a link's preview fails, so Sign in carries on as
+  before.
+
+**Expired-link page** (`/invite/expired/`):
+- Sign in previews an invite link and opens this page if it has expired.
+- The page keeps the black invite line and says "Dana invited you to be a
+  program partner… Links work for 14 days, and this one ran out."
+- Then one action: ask for it to be renewed, with an optional first name so
+  the request reads as a person.
+- A used or unknown link says so plainly, with the way to sign in.
+
+**Requests.** The super admin's Requests (their Home since D-257) gains
+"Expired invite links": "Dana Reyes (Case manager) invited Andre ·
+(215) 555-0199 to be a program", with Renew the link / Deny.
+
+**Domain.** Every link comes from one value, `APP_URL`
+(`NEXT_PUBLIC_APP_URL` with a checked-in fallback). `inviteLink()` is the
+only place an invite link is built, and nothing in the database stores a
+domain. `docs/changing-the-domain.md` has the steps, including keeping the
+old domain redirecting so links already sent still work.
+
 ---
 
 ## Notes for whoever picks this up next

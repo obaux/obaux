@@ -13,6 +13,7 @@ import { BigButton, Loading, Notice, Page, ScrollReveal, TextLink } from '@pam/u
 import { SubPageHeader } from '@pam/ui/SubPage';
 import { HelpButton } from '../../screens/HelpButton';
 import { InviteReady } from '../../screens/InviteReady';
+import { InvitePhoneStep } from '../../screens/InvitePhoneStep';
 import { PersonRowSkeletonList } from '@pam/ui/Skeletons';
 import { NOTICES, ROLES, type Role } from '@pam/config';
 import { USE_DUMMY_PEOPLE } from '@pam/config/dummy-flag';
@@ -127,16 +128,26 @@ export default function DirectoryPage() {
     };
   }, [isSuperAdmin]);
 
-  const makeInvite = async (role: 'member' | 'provider' | 'admin') => {
+  /** Who is being invited, while their number is asked for (D-258). */
+  const [inviting, setInviting] = useState<'member' | 'provider' | 'admin' | null>(null);
+
+  /** The city first; then who; then their number. */
+  const choose = (role: 'member' | 'provider' | 'admin') => {
     if (!regionId) {
       setInviteFailed('city');
       return;
     }
+    setInviteFailed(null);
+    setInviting(role);
+  };
+
+  const makeInvite = async (role: 'member' | 'provider' | 'admin', phone: string) => {
     setInviteBusy(true);
     setInviteFailed(null);
-    const created = await createInvite(role, regionId);
+    const created = await createInvite(role, regionId, phone);
     setInviteBusy(false);
     if (created) {
+      setInviting(null);
       setInvite(created);
     } else {
       setInviteFailed('failed');
@@ -294,6 +305,14 @@ export default function DirectoryPage() {
           </Heading>
           {invite ? (
             <InviteReady invite={invite} onAnother={() => setInvite(null)} isBare />
+          ) : inviting ? (
+            <InvitePhoneStep
+              role={inviting}
+              isBusy={inviteBusy}
+              onMake={(phone) => void makeInvite(inviting, phone)}
+              onBack={() => setInviting(null)}
+              isBare
+            />
           ) : (
             <>
               {regions.length > 1 ? (
@@ -314,20 +333,20 @@ export default function DirectoryPage() {
               ) : null}
               <VStack gap={2}>
                 <BigButton
-                  label={inviteBusy ? t('admin.invite.creating') : t('directory.invite.admin')}
-                  onPress={() => void makeInvite('admin')}
+                  label={t('directory.invite.admin')}
+                  onPress={() => choose('admin')}
                   isDisabled={inviteBusy}
                 />
                 <BigButton
                   label={t('directory.invite.provider')}
                   variant="secondary"
-                  onPress={() => void makeInvite('provider')}
+                  onPress={() => choose('provider')}
                   isDisabled={inviteBusy}
                 />
                 <BigButton
                   label={t('directory.invite.member')}
                   variant="secondary"
-                  onPress={() => void makeInvite('member')}
+                  onPress={() => choose('member')}
                   isDisabled={inviteBusy}
                 />
               </VStack>

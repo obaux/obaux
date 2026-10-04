@@ -10,6 +10,7 @@ import { BigButton, Loading, Notice, Page, TextLink } from '@pam/ui';
 import { SubPageHeader } from '@pam/ui/SubPage';
 import { HelpButton } from '../../screens/HelpButton';
 import { InviteReady } from '../../screens/InviteReady';
+import { InvitePhoneStep } from '../../screens/InvitePhoneStep';
 import { PersonRowSkeletonList } from '@pam/ui/Skeletons';
 import { NOTICES } from '@pam/config';
 import { USE_DUMMY_PEOPLE } from '@pam/config/dummy-flag';
@@ -87,12 +88,16 @@ export default function AdminPage() {
   const [inviteBusy, setInviteBusy] = useState(false);
   const [inviteFailed, setInviteFailed] = useState(false);
 
-  const makeInvite = async (role: 'member' | 'provider') => {
+  /** Who is being invited, while their number is asked for (D-258). */
+  const [inviting, setInviting] = useState<'member' | 'provider' | null>(null);
+
+  const makeInvite = async (role: 'member' | 'provider', phone: string) => {
     setInviteBusy(true);
     setInviteFailed(false);
-    const created = await createInvite(role);
+    const created = await createInvite(role, undefined, phone);
     setInviteBusy(false);
     if (created) {
+      setInviting(null);
       setInvite(created);
       refresh();
     } else {
@@ -235,18 +240,25 @@ export default function AdminPage() {
 
       {invite ? (
         <InviteReady invite={invite} onAnother={() => setInvite(null)} />
+      ) : inviting ? (
+        <InvitePhoneStep
+          role={inviting}
+          isBusy={inviteBusy}
+          onMake={(phone) => void makeInvite(inviting, phone)}
+          onBack={() => setInviting(null)}
+        />
       ) : (
         <VStack gap={2}>
           <BigButton
-            label={inviteBusy ? t('admin.invite.creating') : t('admin.invite.member')}
-            onPress={() => void makeInvite('member')}
+            label={t('admin.invite.member')}
+            onPress={() => setInviting('member')}
             isDisabled={inviteBusy}
           />
           {/* The same size and type as the button above it (D-239). */}
           <BigButton
             label={t('admin.invite.provider')}
             variant="secondary"
-            onPress={() => void makeInvite('provider')}
+            onPress={() => setInviting('provider')}
             isDisabled={inviteBusy}
           />
         </VStack>

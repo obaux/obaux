@@ -21,6 +21,7 @@ import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
 import { useStaffRequests, reviewStaffRequest, type StaffRequestRow } from '@/lib/useStaffRequests';
 import { listRegions } from '@/lib/useCaseload';
+import { decideInviteRenewal, useInviteRenewals } from '@/lib/useInviteRenewals';
 import { useRoleView } from '@/lib/useViewedRole';
 import { RoleSwitchControl } from '../app/RoleSwitchControl';
 
@@ -51,6 +52,8 @@ const styles = stylex.create({
   meta: { fontSize: '16px' },
   note: { fontSize: '15px', lineHeight: 1.5 },
   action: { minHeight: '48px' },
+  section: { fontSize: '20px', lineHeight: 1.3, marginTop: '8px' },
+  line: { fontSize: '17px', lineHeight: 1.45 },
 });
 
 function requestedWhen(iso: string, locale: string): string {
@@ -250,6 +253,84 @@ export function RequestsScreen({ isHome = false }: { readonly isHome?: boolean }
           ))}
         </VStack>
       ) : null}
+
+      <RenewalRequests enabled={isSuperAdmin} />
     </Page>
+  );
+}
+
+/**
+ * Expired invite links that asked to be renewed (0071, D-258): who invited
+ * whom, as what, and when it ran out. Renew gives the same link 14 more days
+ * — the person already holds it — or Deny.
+ */
+function RenewalRequests({ enabled }: { readonly enabled: boolean }) {
+  const { t, locale } = useI18n();
+  const { state, refresh } = useInviteRenewals(enabled);
+  const [busyId, setBusyId] = useState<string | null>(null);
+  const [failedId, setFailedId] = useState<string | null>(null);
+  if (state.status !== 'ready' || state.renewals.length === 0) return null;
+  const day = new Intl.DateTimeFormat(locale, { month: 'short', day: 'numeric' });
+
+  const decide = async (id: string, decision: 'approved' | 'denied') => {
+    setBusyId(id);
+    setFailedId(null);
+    const ok = await decideInviteRenewal(id, decision);
+    setBusyId(null);
+    if (ok) refresh();
+    else setFailedId(id);
+  };
+
+  return (
+    <VStack gap={3}>
+      <Heading level={2} xstyle={styles.section}>
+        {t('requests.renewals.title')}
+      </Heading>
+      {state.renewals.map((row) => {
+        const phone = row.phone?.replace(/^\+1(\d{3})(\d{3})(\d{4})$/, '($1) $2-$3') ?? null;
+        const who = [row.name, phone].filter(Boolean).join(' · ') || t('requests.renewals.someone');
+        return (
+          <Card key={row.id} xstyle={styles.card}>
+            <VStack gap={2}>
+              <Text xstyle={styles.line}>
+                {t('requests.renewals.line', {
+                  inviter: [row.inviterFirst, row.inviterLast].filter(Boolean).join(' ') || '—',
+                  inviterRole: t(`role.${row.inviterRole}`),
+                  who,
+                  role: t(`role.${row.role}`).toLowerCase(),
+                })}
+              </Text>
+              <Text type="supporting" xstyle={styles.meta}>
+                {t('requests.renewals.when', {
+                  expired: day.format(new Date(row.expiredAt)),
+                  asked: day.format(new Date(row.requestedAt)),
+                })}
+              </Text>
+              {failedId === row.id ? (
+                <Text type="supporting" xstyle={styles.note}>
+                  {t('requests.failed.title')}
+                </Text>
+              ) : null}
+              <HStack gap={2} wrap="wrap">
+                <Button
+                  label={busyId === row.id ? t('requests.saving') : t('requests.renewals.approve')}
+                  variant="primary"
+                  onClick={() => void decide(row.id, 'approved')}
+                  isDisabled={busyId !== null}
+                  xstyle={styles.action}
+                />
+                <Button
+                  label={t('requests.renewals.deny')}
+                  variant="secondary"
+                  onClick={() => void decide(row.id, 'denied')}
+                  isDisabled={busyId !== null}
+                  xstyle={styles.action}
+                />
+              </HStack>
+            </VStack>
+          </Card>
+        );
+      })}
+    </VStack>
   );
 }

@@ -150,3 +150,18 @@ export function partnerFor(role: Role | null) {
     program_name: null,
   };
 }
+
+/** An expired invite link that asked to be renewed (0071, D-258). */
+export const INVITE_RENEWALS = [
+  {
+    id: 'renew-1',
+    invited_role: 'provider',
+    invited_phone: '+12155550199',
+    invited_name: 'Andre',
+    inviter_first: 'Dana',
+    inviter_last: 'Reyes',
+    inviter_role: 'admin',
+    expired_at: hoursAgo(30),
+    requested_at: hoursAgo(2),
+  },
+];

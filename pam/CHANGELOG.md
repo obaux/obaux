@@ -34,7 +34,10 @@ Saved, removing things waits until you press Done, and PAM asks before you
 leave with changes waiting or take a star off someone. Case
 managers are offered a text when someone messages them, and programs get a
 Text alerts screen to switch bookings, changes and messages on or off. The
-person running PAM now lands on staff requests to approve or deny.
+person running PAM now lands on staff requests to approve or deny. Making an
+invite now asks for the person's phone number first, so the link only works
+for them. Links last 14 days, and an expired one shows who sent it and lets the
+person ask for it to be renewed.
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 

@@ -227,6 +227,31 @@ test.describe('arriving by an invite link (D-254)', () => {
     await expect(page.getByText(en['onboarding.provider.1'])).toBeVisible();
   });
 
+  test('an expired link opens its own page, says who sent it, and asks for a renewal (D-258)', async ({ page }) => {
+    await page.route('**/rest/v1/rpc/invite_preview*', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify([{ inviter_first_name: 'Dana', invited_role: 'provider', state: 'expired' }]),
+      }),
+    );
+    const asked: Record<string, unknown>[] = [];
+    await page.route('**/rest/v1/rpc/request_invite_renewal*', async (route) => {
+      asked.push(route.request().postDataJSON() as Record<string, unknown>);
+      await route.fulfill({ status: 200, contentType: 'application/json', body: 'true' });
+    });
+
+    await page.goto('/signin/?invite=PAM7Q4KX&as=program');
+    await expect(page).toHaveURL(/\/invite\/expired\/\?invite=PAM7Q4KX&as=program/);
+    await expect(page.getByRole('heading', { name: en['invite.expired.title'], level: 1 })).toBeVisible();
+    await expect(page.getByText('Dana invited you to be a program partner in the PAM network.', { exact: false })).toBeVisible();
+
+    await page.getByLabel(en['invite.expired.name']).fill('Andre');
+    await page.getByRole('button', { name: en['invite.expired.action'] }).click();
+    await expect(page.getByRole('heading', { name: en['invite.expired.sent.title'], level: 1 })).toBeVisible();
+    expect(asked[0]).toMatchObject({ p_code: 'PAM7Q4KX', p_first_name: 'Andre' });
+  });
+
   test('plain sign in has no invite line', async ({ page }) => {
     await page.goto('/signin/');
     await expect(page.getByText(en['signin.invited.member'])).toHaveCount(0);
