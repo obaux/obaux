@@ -19,6 +19,7 @@ import PlacesPage from '../../app/places/page';
 import PointsPage from '../../app/points/page';
 import PrivacyPage from '../../app/privacy/page';
 import RemindersPage from '../../app/reminders/page';
+import AlertsPage from '../../app/alerts/page';
 import RequestsPage from '../../app/requests/page';
 import SavedPage from '../../app/saved/page';
 import SignInPage from '../../app/signin/page';
@@ -64,6 +65,7 @@ export const APP_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   '/prototype/join/': screen(() => <PrototypeJoin />),
   '/join/': screen(() => <JoinPage />),
   '/reminders/': screen(() => <RemindersPage />),
+  '/alerts/': screen(() => <AlertsPage />),
   '/places/': screen(() => <PlacesPage />),
   '/place/': screen(() => <PlacePage />),
   '/saved/': screen(() => <SavedPage />),

@@ -133,10 +133,19 @@ export function ProfileView({
       ) : null}
 
       {remindersOn ? null : (
+        // A member is reminded about visits they plan; staff plan none, so
+        // theirs is an alert when somebody needs them (Will, 3 October, D-256).
         <PromoCard
-          title={t('profile.promo.reminders.title')}
-          body={t('profile.promo.reminders.body')}
-          href="/reminders/"
+          title={t(role === 'admin' || role === 'provider' ? 'profile.promo.alerts.title' : 'profile.promo.reminders.title')}
+          body={t(
+            role === 'admin'
+              ? 'profile.promo.alerts.body.admin'
+              : role === 'provider'
+                ? 'profile.promo.alerts.body.providerList'
+                : 'profile.promo.reminders.body',
+          )}
+          // A program chooses per kind, on its own screen (D-256).
+          href={role === 'provider' ? '/alerts/' : '/reminders/'}
           art={<StarIcon {...ART} />}
         />
       )}

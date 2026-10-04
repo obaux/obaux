@@ -71,6 +71,7 @@ export default function RemindersPage() {
    * which is the fastest way to teach somebody that a consent screen is noise.
    */
   const isStaff = session.status === 'signed-in' && session.session.role !== 'member';
+  const role = session.status === 'signed-in' ? session.session.role : null;
 
   /** What was chosen last time, when there is a last time. */
   const [already, setAlready] = useState<boolean | null>(null);
@@ -137,7 +138,14 @@ export default function RemindersPage() {
           <Text xstyle={styles.heading}>{t('reminders.what')}</Text>
           {isStaff ? (
             <>
-              <Text xstyle={styles.item}>{t('reminders.what.staff1')}</Text>
+              {/* Staff: a message first — what a case manager waits on (D-256). */}
+              <Text xstyle={styles.item}>{t('reminders.what.messages')}</Text>
+              {role === 'provider' ? (
+                <>
+                  <Text xstyle={styles.item}>{t('reminders.what.visits')}</Text>
+                  <Text xstyle={styles.item}>{t('reminders.what.staff1')}</Text>
+                </>
+              ) : null}
               <Text xstyle={styles.item}>{t('reminders.what.staff2')}</Text>
             </>
           ) : (

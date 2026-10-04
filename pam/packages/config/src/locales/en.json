@@ -953,5 +953,20 @@
   "saved.leave.body": "You marked these while editing. Remove them, or put them back.",
   "saved.leave.remove": "Remove",
   "saved.leave.putBack": "Put them back",
-  "saved.leave.stay": "Keep editing"
+  "saved.leave.stay": "Keep editing",
+  "profile.promo.alerts.title": "Get text alerts",
+  "profile.promo.alerts.body.admin": "Receive a text when someone messages you in the app.",
+  "reminders.what.messages": "A text when someone messages you in PAM.",
+  "reminders.what.visits": "A text when someone plans a visit to your program.",
+  "alerts.title": "Text alerts",
+  "alerts.intro": "Choose what PAM texts you about. Each one is its own switch, so you only hear about what matters to you.",
+  "alerts.booked": "Someone books a visit",
+  "alerts.booked.body": "Their first name and the day they are coming.",
+  "alerts.changed": "Someone changes a booking",
+  "alerts.changed.body": "A visit moved to another day, or cancelled.",
+  "alerts.message": "Someone messages you",
+  "alerts.message.body": "Only that a message is waiting. Never what it says.",
+  "alerts.saved": "Saved.",
+  "profile.promo.alerts.body.providerList": "Bookings, changes and messages. Choose which.",
+  "alerts.how": "One text each time, only for what is switched on. Reply STOP any time and they stop for good. Reply HELP to reach a person. Text and data rates may apply."
 }

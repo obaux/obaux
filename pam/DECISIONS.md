@@ -5402,6 +5402,48 @@ Edit or not. Use the same pattern on People."
 Also in this commit: `account.spec.ts`'s directory invite test now looks for
 the link (D-254). It still matched the old code-only card.
 
+### D-256 — Staff are texted about what needs them, not visits; programs choose per kind
+
+Will, 3 October: "Case managers don't need text reminders before a visit.
+Theirs may look like 'Receive a text when someone messages you in the app.'"
+Then: "For a program lead, text reminders are mainly for when someone books a
+trip to their program, changes a booking, or sends them a message.
+Summarize this in a new screen where they can edit notifications with
+switches per item, since programs would be the ones receiving the most
+messages."
+
+- **Profile card.** Staff see "Get text alerts" instead of a visit
+  reminder.
+  - A case manager's card reads "Receive a text when someone messages you
+    in the app" and opens `/reminders/`. That screen lists a message first,
+    then account changes.
+  - A program's card reads "Bookings, changes and messages. Choose which."
+    and opens the new **`/alerts/`** (`AlertsView`).
+- **`/alerts/`** has three switches: someone books a visit, someone changes
+  a booking, someone messages you. The message alert says only that a
+  message is waiting, never what it says. Under them is a STOP / HELP /
+  rates line of its own. It drops "a few a week at most", which a busy
+  program would outgrow.
+- **Consent is still an act.**
+  - Every switch starts off; carrier rule 30925 forbids a pre-selected
+    opt-in.
+  - The first switch turned on records consent (`setReminderConsent(true)`);
+    turning the last one off withdraws it.
+  - Somebody who had already agreed, with nothing kept on this phone, starts
+    with all three on, because their yes covered everything before there
+    were switches.
+- **Which switches are on is kept on the phone, for now.** The database
+  stores one yes/no for texts. A yes per kind needs a new column, which is
+  a migration for Will.
+- **Nothing sends these yet.** There is no reviewed SMS template for a
+  booking, a changed booking or a new message (`sms-templates.ts`). Each
+  needs one written, and a person in `reviewedBy`, before it can go out.
+
+Also here: Sign in reads an invite link in an effect rather than inside a
+Suspense boundary (D-254). The boundary swapped the whole screen at
+hydration. That made `a11y.spec`'s field measurement flaky on one viewport,
+and could drop a number somebody had started typing.
+
 ---
 
 ## Notes for whoever picks this up next
