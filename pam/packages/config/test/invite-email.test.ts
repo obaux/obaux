@@ -10,9 +10,9 @@ const input = {
 };
 
 describe('the invite email (D-263)', () => {
-  it('is not sent until a person has reviewed it', () => {
-    if (INVITE_EMAIL.reviewedBy) return;
-    expect(() => renderInviteEmail(input)).toThrow(/reviewed/);
+  it('has been reviewed by a person, so it may be sent', () => {
+    expect(INVITE_EMAIL.reviewedBy).not.toBe('');
+    expect(() => renderInviteEmail(input)).not.toThrow();
   });
 
   it('says who invited them and as what, with the link twice and the logo from the app', () => {

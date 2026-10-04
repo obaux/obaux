@@ -4,7 +4,7 @@ import { renderInviteEmail, type InviteEmailInput } from '@pam/config/invite-ema
 
 /**
  * The email with a fresh invite link (D-263), as a mail app would show it.
- * A draft: `INVITE_EMAIL.reviewedBy` is empty, so nothing sends it yet.
+ * Approved by Will (4 October); nothing sends it until an email provider is set up.
  */
 const styles = stylex.create({
   frame: { width: '100%', height: '820px', borderWidth: 0 },

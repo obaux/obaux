@@ -5791,6 +5791,75 @@ tags for Sign in, where every invite link lands (D-254):
 - The picture is English only, because a preview is fetched before PAM knows
   anyone's language.
 
+### D-264 — 0071 and 0072 deployed; the invite email approved; a before-launch list; the user-flow map
+
+Will, 4 October:
+
+> "Deploy migration. And add the email provider set up to our 'todo before
+> launching list', remember this for later. Email text approved. Please
+> create a user flow for the entire app inside Figma including these latest
+> changes … document app changes by also updating user flows. This is a skill
+> I want you to learn as we develop."
+
+**Deployed: 0071 and 0072, and only those.**
+- Before deploying, `list_migrations` showed live ran to 0070, with no
+  live-only migrations.
+- `can_message`, `messageable_people` and `open_direct_conversation` live
+  were exactly 0063's, which is what 0072 was written against.
+- After deploying, `get_advisors` showed no new kind of finding.
+- A spot check confirmed the new table and functions are closed to
+  signed-out callers, except `invite_preview` and `request_invite_link`,
+  which are meant to be open.
+
+**Not deployed: 0068 and 0069.** They live on branch
+`claude/hopeful-thompson-07nj7n`, not this one. **0069 rewrites
+`can_message` too**, so deploying it as written would silently remove 0072's
+super admin ↔ staff arm. It must be merged and reconciled first. It is on the
+before-launch list.
+
+**Email approved.** `INVITE_EMAIL.reviewedBy` = "Will (Oba), 4 October
+2026". The config test now asserts it renders for sending. Change a word and
+clear it.
+
+**`docs/before-launch.md`** is new: Will's list of what must be done before
+real people use PAM. Seeded with:
+- the email provider and sender (Will's item);
+- the 0068/0069 merge;
+- two long-open STATUS rows that also block launch: the PAM-team
+  transparency line, and the SMS copy review.
+
+CLAUDE.md points at it.
+
+**The user-flow map: Figma, generated from code.**
+"PAM — User flows" is in the Oba Studio team (Will's choice):
+https://www.figma.com/design/DtlJg9Klx5BRfHbXBhkg98.
+- **Pages:** an overview, then one page per person — Sign in & joining,
+  Member, Case manager, Program lead, Super admin.
+- **Screens:** each is a screenshot of its real Storybook story.
+- **Arrows:** labelled with what the person taps. Dashed arrows leave the
+  app (a text, an email) or go back.
+- **Change marks:** the screens changed in the latest round carry an orange
+  D-number.
+
+The source is `docs/user-flows/flows.mjs`, not the Figma file.
+`scripts/user-flows.mjs` photographs the stories and lays the flows out.
+`scripts/user-flows-figma.mjs` turns that into Figma scripts. Hand edits in
+Figma would be overwritten, which is the point: the map cannot drift from the
+screens. The routine — when to update, how, and how to check — is the
+`pam-user-flows` skill (`.claude/skills/pam-user-flows/SKILL.md`), and
+CLAUDE.md makes it part of every change that touches screens.
+
+**Why two ways to publish.** The intended route is Figma's HTML import: one
+sharp page per call. It needs `mcp.figma.com`, which this environment's
+network policy blocks, and so does Figma's asset upload. So the map was drawn
+with the Plugin API instead:
+- shapes and text drawn natively;
+- screenshots at half size, sent inline in batches under the tool's size
+  limit.
+
+It works anywhere. If Will allows `mcp.figma.com` in the environment's
+network settings, later updates can use the sharper, cheaper import.
+
 ---
 
 ## Notes for whoever picks this up next

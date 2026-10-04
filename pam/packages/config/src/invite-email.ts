@@ -15,9 +15,10 @@
  * drop SVG). The logo and the link both come from `appUrl`, so a new domain
  * changes them with everything else (docs/changing-the-domain.md).
  *
- * **A draft.** `reviewedBy` is empty, so `renderInviteEmail` refuses to render
- * it for sending until a person has read it — the same rule SMS templates
- * keep. Storybook previews it with `draft: true`.
+ * **Approved by Will, 4 October 2026** (`reviewedBy`). Change a word and
+ * clear `reviewedBy`: `renderInviteEmail` then refuses to render it for
+ * sending until a person has read it again — the same rule SMS templates
+ * keep. Storybook previews it with `draft: true` either way.
  */
 
 export type InviteEmailRole = 'member' | 'provider' | 'admin';
@@ -65,7 +66,7 @@ export const INVITE_EMAIL: {
     fallback: 'Si el botón no funciona, copie este enlace en su navegador:',
     footer: 'Usted pidió este enlace en PAM. Si no fue usted, puede ignorar este correo.',
   },
-  reviewedBy: '',
+  reviewedBy: 'Will (Oba), 4 October 2026',
 };
 
 export interface InviteEmailInput {

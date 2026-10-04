@@ -314,19 +314,20 @@ template for them is written or reviewed yet (D-256).
 A super admin's Home is the staff requests (D-257).
 Invites are a link again, with no phone asked for, and a "You're invited"
 preview picture when pasted into a text. Links last 30 days. An expired link
-asks for an email address and a fresh link is emailed, with no approval. The
-super admin has an Invited people log (Active / Link open / Link expired).
-Migration **0071** backs this and is written and tested but **not deployed**;
-it waits with 0068/0069/0072 for Will. **Nothing sends the email yet**: it
-queues in `invite_emails` until an email provider and sender are chosen, and
-the email's words (`@pam/config/invite-email`) wait for a person's review
-(D-258, D-263).
+asks for an email address and a fresh link is queued for it, with no approval.
+The super admin has an Invited people log (Active / Link open / Link expired).
+Migrations **0071 and 0072 are live** (Will, 4 October; D-264). The invite
+email's words are approved, but **nothing sends it yet**: it waits in
+`invite_emails` for an email provider, which is on the before-launch list
+(`docs/before-launch.md`).
+The whole app is mapped in Figma, "PAM — User flows"
+(https://www.figma.com/design/DtlJg9Klx5BRfHbXBhkg98), generated from
+`docs/user-flows/flows.mjs` and kept current with every screen change (D-264).
 Programs have policies for participants with a verified tick (D-261), on
 example data until tables, file storage and a transparency line are agreed.
 From a request the super admin can open the requested program and text the
-requester. In the redesign they can also message staff (never members).
-Migration **0072** backs this and is written and tested but **not deployed**
-(D-262).
+requester. In the redesign they can also message staff (never members),
+backed by 0072, now live (D-262).
 
 This is the handover document: what exists, what is proven, what is live, and
 what the next person needs to know before touching anything.
@@ -705,6 +706,8 @@ while the copy is unsigned, so it earned the first live test, not the last.*
 | 26 | ~~Deploy `0066`~~ **Done (Will, 21 September)** | — | `list_migrations` first: no drift since the 20th. Applied; `get_advisors` (security) clean — `flagged_services()` and the recreated `conversation_partners()` are `authenticated`-only, `services_search()` is security invoker and so not even listed. `pg_trgm` now lives in `extensions`. Case managers keep the Reported places list read-only — Will's call, recorded as D-190. |
 | 28 | **A Chromatic project token** | Storybook updating on every push | chromatic.com → sign in with GitHub → link `obaux/obaux` → add the token as the repository secret `CHROMATIC_PROJECT_TOKEN`. The workflow (`pam-storybook.yml`) skips itself until then. |
 | 29 | ~~Where the dock's People and My Plan lead~~ **Answered by the redesign (D-210)** | — | Will, 1 October: the bar is Explore, Saved, Trips, Messages, Profile; Help moves to each screen's header and Profile. Next: his reference screenshots for the other screens, then wiring the redesigned views to routes and data. Walk it in `Prototype/Redesign — member` (D-211). |
+| 30 | ~~Deploy `0071` and `0072`~~ **Done (Will, 4 October)** | — | `list_migrations` first: live ran to `0070`, no live-only drift; `can_message`, `messageable_people` and `open_direct_conversation` matched 0063 exactly, which 0072 was written against. Both applied; `get_advisors` (security) shows no new kind of finding (the definer functions are guarded inside, as every other one is; `invite_preview` and `request_invite_link` are anon on purpose). Spot-checked: `invite_emails` forced RLS with one policy and no anon access; `invites_log` and `staff_request_phone` not callable signed out. See D-264. |
+| 31 | **The before-launch list** | Launch | `docs/before-launch.md` — Will's list of what must be done before real people use PAM. First entry: the email provider for invite links. **0068/0069 vs 0072**: both rewrite `can_message`; 0069 must keep 0072's arm when it is merged and deployed. |
 
 ---
 
