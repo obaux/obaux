@@ -227,7 +227,7 @@ test.describe('arriving by an invite link (D-254)', () => {
     await expect(page.getByText(en['onboarding.provider.1'])).toBeVisible();
   });
 
-  test('an expired link opens its own page, says who sent it, and asks for a renewal (D-258)', async ({ page }) => {
+  test('an expired link opens its own page, says who sent it, and emails a new link (D-258, D-263)', async ({ page }) => {
     await page.route('**/rest/v1/rpc/invite_preview*', (route) =>
       route.fulfill({
         status: 200,
@@ -236,7 +236,7 @@ test.describe('arriving by an invite link (D-254)', () => {
       }),
     );
     const asked: Record<string, unknown>[] = [];
-    await page.route('**/rest/v1/rpc/request_invite_renewal*', async (route) => {
+    await page.route('**/rest/v1/rpc/request_invite_link*', async (route) => {
       asked.push(route.request().postDataJSON() as Record<string, unknown>);
       await route.fulfill({ status: 200, contentType: 'application/json', body: 'true' });
     });
@@ -246,10 +246,17 @@ test.describe('arriving by an invite link (D-254)', () => {
     await expect(page.getByRole('heading', { name: en['invite.expired.title'], level: 1 })).toBeVisible();
     await expect(page.getByText('Dana invited you to be a program partner in the PAM network.', { exact: false })).toBeVisible();
 
-    await page.getByLabel(en['invite.expired.name']).fill('Andre');
+    // Not an address: said so, and nothing is asked for.
+    await page.getByLabel(en['invite.expired.email']).fill('andre');
+    await page.getByRole('button', { name: en['invite.expired.action'] }).click();
+    await expect(page.getByText(en['invite.expired.emailInvalid'])).toBeVisible();
+    expect(asked).toHaveLength(0);
+
+    await page.getByLabel(en['invite.expired.email']).fill('andre@example.org');
     await page.getByRole('button', { name: en['invite.expired.action'] }).click();
     await expect(page.getByRole('heading', { name: en['invite.expired.sent.title'], level: 1 })).toBeVisible();
-    expect(asked[0]).toMatchObject({ p_code: 'PAM7Q4KX', p_first_name: 'Andre' });
+    await expect(page.getByText(/andre@example\.org/)).toBeVisible();
+    expect(asked[0]).toMatchObject({ p_code: 'PAM7Q4KX', p_email: 'andre@example.org' });
   });
 
   test('plain sign in has no invite line', async ({ page }) => {

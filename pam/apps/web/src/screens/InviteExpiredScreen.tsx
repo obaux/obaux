@@ -10,22 +10,19 @@ import { BigButton, Loading, Page, TextField, TextLink } from '@pam/ui';
 import { SubPageHeader } from '@pam/ui/SubPage';
 import { useI18n } from '@/lib/i18n';
 import type { Invite } from '@/lib/appUrl';
-import { previewInvite, requestInviteRenewal, type InvitePreview } from '@/lib/useInviteRenewals';
+import { isEmailAddress, previewInvite, requestInviteLink, type InvitePreview } from '@/lib/useInviteLinks';
 import { LegalFooter } from '../app/signin/LegalFooter';
 
 /**
- * An expired invite link (Will, 4 October, D-258): "a page for expired
- * links, keeping the context about who invited them, prompting them to
- * request a new link, which sends a notice to super admin requests."
+ * An expired invite link (Will, 4 October, D-258; reworked by D-263).
  *
  * Opened by Sign in when an invite link has run out (`invite_preview`). It
  * keeps the invitation in view — the same black line, and "Dana invited you
- * to be a case manager" — then one thing to do: ask for the link to be
- * renewed (a first name, optional, so the request reads as a person). That
- * lands in the super admin's Requests as "Dana (case manager) invited Andre
- * to be a program", Renew or Deny; renewing gives this same link 14 more
- * days, so there is nothing new to send. A used or unknown link says so
- * plainly, with the way to sign in.
+ * to be a case manager" — then one thing to do: give an email address, and a
+ * fresh link for the same role goes there (`request_invite_link`). Nobody
+ * approves it (Will: "remove the need for super admin to approve"), and the
+ * new link is never shown here — only the inbox gets it. A used or unknown
+ * link says so plainly, with the way to sign in.
  */
 const styles = stylex.create({
   invited: {
@@ -49,7 +46,8 @@ const styles = stylex.create({
 export function InviteExpiredScreen({ invite }: { readonly invite: Invite | null }) {
   const { t } = useI18n();
   const [preview, setPreview] = useState<InvitePreview | null | 'loading'>('loading');
-  const [firstName, setFirstName] = useState('');
+  const [email, setEmail] = useState('');
+  const [isInvalid, setIsInvalid] = useState(false);
   const [busy, setBusy] = useState(false);
   const [sent, setSent] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -74,9 +72,14 @@ export function InviteExpiredScreen({ invite }: { readonly invite: Invite | null
 
   const ask = async () => {
     if (!invite) return;
+    if (!isEmailAddress(email)) {
+      setIsInvalid(true);
+      return;
+    }
+    setIsInvalid(false);
     setBusy(true);
     setFailed(false);
-    const ok = await requestInviteRenewal(invite.code, firstName);
+    const ok = await requestInviteLink(invite.code, email);
     setBusy(false);
     if (ok) setSent(true);
     else setFailed(true);
@@ -98,7 +101,7 @@ export function InviteExpiredScreen({ invite }: { readonly invite: Invite | null
 
         {state === 'expired' || state === 'valid' ? (
           sent ? (
-            <Text xstyle={styles.body}>{t('invite.expired.sent.body', { name })}</Text>
+            <Text xstyle={styles.body}>{t('invite.expired.sent.body', { email: email.trim() })}</Text>
           ) : (
             <>
               <Text xstyle={styles.body}>{t(`invite.expired.body.${role}`, { name })}</Text>
@@ -106,15 +109,21 @@ export function InviteExpiredScreen({ invite }: { readonly invite: Invite | null
                 <VStack gap={3}>
                   <Text xstyle={styles.body}>{t('invite.expired.ask')}</Text>
                   <TextField
-                    purpose="name"
-                    label={t('invite.expired.name')}
-                    value={firstName}
-                    onChange={setFirstName}
+                    purpose="email"
+                    label={t('invite.expired.email')}
+                    value={email}
+                    onChange={setEmail}
                     width="100%"
                   />
-                  <Text type="supporting" xstyle={styles.small}>
-                    {t('invite.expired.nameHint')}
-                  </Text>
+                  {isInvalid ? (
+                    <Text role="alert" xstyle={styles.error}>
+                      {t('invite.expired.emailInvalid')}
+                    </Text>
+                  ) : (
+                    <Text type="supporting" xstyle={styles.small}>
+                      {t('invite.expired.emailHint')}
+                    </Text>
+                  )}
                   {failed ? (
                     <Text role="alert" xstyle={styles.error}>
                       {t('invite.expired.failed')}
@@ -123,7 +132,7 @@ export function InviteExpiredScreen({ invite }: { readonly invite: Invite | null
                   <BigButton
                     label={busy ? t('join.saving') : t('invite.expired.action')}
                     onPress={() => void ask()}
-                    isDisabled={busy}
+                    isDisabled={busy || email.trim() === ''}
                   />
                 </VStack>
               </Card>

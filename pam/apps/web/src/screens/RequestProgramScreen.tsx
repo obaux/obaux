@@ -55,7 +55,7 @@ export function RequestProgramScreen({ userId }: { readonly userId: string | nul
     );
   }
 
-  const requester = [row.firstName, row.lastName].filter(Boolean).join(' ') || t('requests.renewals.someone');
+  const requester = [row.firstName, row.lastName].filter(Boolean).join(' ') || t('invite.expired.someone');
 
   return (
     <SubPage title={program.name} subtitle={t('requests.program.subtitle')} {...back} actions={<HelpButton />}>

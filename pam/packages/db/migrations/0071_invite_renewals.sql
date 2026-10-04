@@ -1,17 +1,19 @@
--- 0071 — Invite links last 14 days, and an expired one can ask to be renewed
--- (D-258, Will, 4 October 2026).
+-- 0071 — An expired invite link can ask for a fresh one by email, and the
+-- super admin sees every invite and where it stands (D-258, reworked by D-263,
+-- Will, 4 October 2026).
 --
--- Will: "Expired links; let's extend to 14 days. Let's create a page for
--- expired links, keeping the context about who invited them, prompting them
--- to request a new link, which sends a notice to super admin requests,
--- showing who invited who (approve/deny)."
+-- Will, first: "Expired links … a page for expired links, keeping the context
+-- about who invited them, prompting them to request a new link."
+-- Will, second (D-263): "set 30 days expiry. No need to ask for their name,
+-- only ask for email and email them the new invite link for their role …
+-- remove the need for super admin to approve. Instead just keep a log of
+-- invited people … all invitees by date, and show status."
 --
--- Four things, and nothing else:
+-- Links keep the 30 days `invites.expires_at` has defaulted to since 0002.
 --
---   1. `invites.expires_at` defaults to 14 days (it was 30 in 0002; the
---      prototype has said 7). Existing invites keep the date they were given.
+-- Three things, and nothing else:
 --
---   2. `invite_preview(code)` — callable signed out, because the person
+--   1. `invite_preview(code)` — callable signed out, because the person
 --      holding an expired link has no account yet. It answers exactly what the
 --      expired-link page shows and no more: the inviter's FIRST name, the role
 --      the link was for, and whether the link is valid, expired or used. No
@@ -19,52 +21,54 @@
 --      'not_found' — the same eight random characters that already guard
 --      `redeem_invite` guard this.
 --
---   3. `request_invite_renewal(code, first_name)` — also signed out. Records
---      one pending request per expired, unused invite (a second tap is a
---      no-op, not a second row), so the button cannot be used to flood the
---      super admin's list. A valid or used link cannot be "renewed".
+--   2. `request_invite_link(code, email)` — also signed out. For an expired,
+--      unused link only: makes a NEW invite for the same role, city and
+--      inviter (30 days), and queues an email with it in `invite_emails`.
+--      Nobody approves it. The new code is never returned to the caller — it
+--      goes only to the inbox — so this cannot be used to mint working links
+--      in the browser. One request per expired link: a second ask is a no-op,
+--      so the button cannot flood anybody's inbox.
 --
---   4. `invite_renewals_pending()` and `decide_invite_renewal(id, decision)`
---      — super admin only. Approving gives the SAME invite 14 more days, so
---      the link the person already holds works again; nothing new to send.
---      Both are audited.
+--   3. `invites_log()` — super admin only: every invite, newest first, who
+--      made it, for what role, and its state now — joined (with the first
+--      name of who joined), open, or expired — and, for a link that was sent
+--      again, the address it went to.
 --
--- `invite_renewals` has forced RLS, a super-admin-only policy and no grants
--- to any client role: nobody reads it directly; the four functions are the
--- whole surface.
+-- `invite_emails` is an outbox: forced RLS, a super-admin-only policy and no
+-- grants to any client role. Sending it needs an email provider and a sender
+-- (an Edge Function with the provider's key); that is Will's call and is not
+-- built here. Until it is, rows wait with `sent_at` empty and the log says
+-- the link was asked for.
 
-alter table public.invites
-  alter column expires_at set default (now() + interval '14 days');
-
-create table public.invite_renewals (
-  id            uuid primary key default gen_random_uuid(),
-  invite_id     uuid not null references public.invites (id) on delete cascade,
-  -- What the person typed on the expired-link page, so the request reads as
-  -- somebody rather than a code. Optional; never shown to anyone but the
-  -- super admin.
-  first_name    text check (first_name is null or char_length(first_name) between 1 and 60),
-  status        text not null default 'pending' check (status in ('pending', 'approved', 'denied')),
-  requested_at  timestamptz not null default now(),
-  decided_by    uuid references public.profiles (id) on delete set null,
-  decided_at    timestamptz
+create table public.invite_emails (
+  id              uuid primary key default gen_random_uuid(),
+  -- The expired link somebody held, and the fresh one made for them.
+  expired_invite  uuid not null references public.invites (id) on delete cascade,
+  new_invite      uuid not null references public.invites (id) on delete cascade,
+  email           text not null check (
+                    char_length(email) between 3 and 254
+                    and email ~ '^[^@\s]+@[^@\s]+\.[^@\s]+$'
+                  ),
+  requested_at    timestamptz not null default now(),
+  -- Set by whatever sends it. Empty means still waiting.
+  sent_at         timestamptz
 );
 
--- One open request per invite: the second tap finds the first.
-create unique index invite_renewals_one_pending
-  on public.invite_renewals (invite_id) where status = 'pending';
+-- One fresh link per expired one: the second tap finds the first.
+create unique index invite_emails_one_per_link on public.invite_emails (expired_invite);
 
-alter table public.invite_renewals enable row level security;
-alter table public.invite_renewals force row level security;
-revoke all on public.invite_renewals from public, anon, authenticated;
+alter table public.invite_emails enable row level security;
+alter table public.invite_emails force row level security;
+revoke all on public.invite_emails from public, anon, authenticated;
 
 -- The super admin only, as the other review queues are (0049, 0054). Nothing
--- is granted to a client role, so in practice the four functions below are
--- the whole way in; the policy is what makes that true even if a grant is
--- ever added by mistake.
-create policy invite_renewals_super_admin on public.invite_renewals
+-- is granted to a client role, so in practice the functions below are the
+-- whole way in; the policy is what makes that true even if a grant is ever
+-- added by mistake.
+create policy invite_emails_super_admin on public.invite_emails
   for all using (public.is_super_admin()) with check (public.is_super_admin());
 
--- 2. What an expired-link page may know.
+-- 1. What an expired-link page may know.
 create or replace function public.invite_preview(p_code text)
 returns table (inviter_first_name text, invited_role public.user_role, state text)
 language plpgsql
@@ -101,18 +105,23 @@ comment on function public.invite_preview is
 revoke all on function public.invite_preview(text) from public;
 grant execute on function public.invite_preview(text) to anon, authenticated;
 
--- 3. Ask for the same link to be renewed.
-create or replace function public.request_invite_renewal(p_code text, p_first_name text default null)
+-- 2. A fresh link, by email, for an expired one.
+create or replace function public.request_invite_link(p_code text, p_email text)
 returns boolean
 language plpgsql
 security definer
 set search_path = public, extensions
 as $$
 declare
-  inv public.invites;
-  name text := nullif(trim(coalesce(p_first_name, '')), '');
+  inv     public.invites;
+  fresh   public.invites;
+  address text := lower(trim(coalesce(p_email, '')));
 begin
-  select * into inv from public.invites where code = upper(trim(p_code));
+  if address !~ '^[^@\s]+@[^@\s]+\.[^@\s]+$' or char_length(address) > 254 then
+    raise exception 'INVALID_EMAIL';
+  end if;
+
+  select * into inv from public.invites where code = upper(trim(p_code)) for update;
   if not found then
     raise exception 'INVITE_NOT_FOUND';
   end if;
@@ -122,37 +131,51 @@ begin
   if inv.expires_at >= now() and inv.status = 'pending' then
     raise exception 'INVITE_STILL_VALID';
   end if;
-  if name is not null and char_length(name) > 60 then
-    name := left(name, 60);
+
+  -- Asked already: the same answer, and no second email.
+  if exists (select 1 from public.invite_emails where expired_invite = inv.id) then
+    return true;
   end if;
 
-  insert into public.invite_renewals (invite_id, first_name)
-  values (inv.id, name)
-  on conflict (invite_id) where status = 'pending' do nothing;
+  update public.invites set status = 'expired' where id = inv.id and status = 'pending';
+
+  insert into public.invites (code, created_by, role, region_id, assigned_admin_id)
+  values (public.generate_invite_code(), inv.created_by, inv.role, inv.region_id, inv.assigned_admin_id)
+  returning * into fresh;
+
+  insert into public.invite_emails (expired_invite, new_invite, email)
+  values (inv.id, fresh.id, address);
+
+  insert into public.audit_log (actor_id, action, target_type, target_id, meta)
+  values (null, 'invite.reissue', 'invite', fresh.id,
+          jsonb_build_object('expired_invite', inv.id));
 
   return true;
 end;
 $$;
 
-comment on function public.request_invite_renewal is
-  'From the expired-link page (D-258): one pending renewal request per '
-  'expired, unused invite. Callable signed out; repeat calls do nothing.';
+comment on function public.request_invite_link is
+  'From the expired-link page (D-263): makes a new invite for the same role, '
+  'city and inviter and queues it to an email address. Callable signed out; '
+  'never returns the new code; one per expired link.';
 
-revoke all on function public.request_invite_renewal(text, text) from public;
-grant execute on function public.request_invite_renewal(text, text) to anon, authenticated;
+revoke all on function public.request_invite_link(text, text) from public;
+grant execute on function public.request_invite_link(text, text) to anon, authenticated;
 
--- 4a. The super admin's list: who invited whom, as what, and when it lapsed.
-create or replace function public.invite_renewals_pending()
+-- 3. The super admin's log of invites.
+create or replace function public.invites_log()
 returns table (
-  id                uuid,
-  invited_role      public.user_role,
-  invited_phone     text,
-  invited_name      text,
-  inviter_first     text,
-  inviter_last      text,
-  inviter_role      public.user_role,
-  expired_at        timestamptz,
-  requested_at      timestamptz
+  id             uuid,
+  created_at     timestamptz,
+  expires_at     timestamptz,
+  invited_role   public.user_role,
+  inviter_first  text,
+  inviter_last   text,
+  inviter_role   public.user_role,
+  state          text,
+  joined_first   text,
+  emailed_to     text,
+  reissued       boolean
 )
 language plpgsql
 stable
@@ -161,63 +184,31 @@ set search_path = public, extensions
 as $$
 begin
   if not public.is_super_admin() then
-    raise exception 'Only the person running PAM sees renewal requests';
+    raise exception 'Only the person running PAM sees every invite';
   end if;
   return query
-    select r.id, i.role, i.phone, r.first_name,
+    select i.id, i.created_at, i.expires_at, i.role,
            p.first_name, p.last_name, p.role,
-           i.expires_at, r.requested_at
-    from public.invite_renewals r
-    join public.invites i on i.id = r.invite_id
+           case
+             when i.status = 'redeemed' then 'joined'
+             when i.status = 'revoked' then 'expired'
+             when i.expires_at < now() or i.status = 'expired' then 'expired'
+             else 'open'
+           end,
+           j.first_name,
+           e.email,
+           e.id is not null
+    from public.invites i
     join public.profiles p on p.id = i.created_by
-    where r.status = 'pending'
-    order by r.requested_at;
+    left join public.profiles j on j.id = i.redeemed_by
+    left join public.invite_emails e on e.new_invite = i.id
+    order by i.created_at desc;
 end;
 $$;
 
-revoke all on function public.invite_renewals_pending() from public, anon;
-grant execute on function public.invite_renewals_pending() to authenticated;
+comment on function public.invites_log is
+  'Every invite for the super admin (D-263): who made it, the role, joined / '
+  'open / expired, who joined, and the address a re-sent link went to.';
 
--- 4b. Yes (the same link works for 14 more days) or no.
-create or replace function public.decide_invite_renewal(p_id uuid, p_decision text)
-returns void
-language plpgsql
-security definer
-set search_path = public, extensions
-as $$
-declare
-  caller uuid := auth.uid();
-  req public.invite_renewals;
-begin
-  if not public.is_super_admin() then
-    raise exception 'Only the person running PAM decides renewal requests';
-  end if;
-  if p_decision not in ('approved', 'denied') then
-    raise exception 'A decision is approved or denied';
-  end if;
-
-  select * into req from public.invite_renewals where id = p_id and status = 'pending' for update;
-  if not found then
-    raise exception 'No open request with that id';
-  end if;
-
-  update public.invite_renewals
-     set status = p_decision, decided_by = caller, decided_at = now()
-   where id = p_id;
-
-  if p_decision = 'approved' then
-    update public.invites
-       set expires_at = now() + interval '14 days',
-           status = 'pending'
-     where id = req.invite_id
-       and status in ('pending', 'expired');
-  end if;
-
-  insert into public.audit_log (actor_id, action, target_type, target_id, meta)
-  values (caller, 'invite.renewal.' || p_decision, 'invite', req.invite_id,
-          jsonb_build_object('renewal_id', p_id));
-end;
-$$;
-
-revoke all on function public.decide_invite_renewal(uuid, text) from public, anon;
-grant execute on function public.decide_invite_renewal(uuid, text) to authenticated;
+revoke all on function public.invites_log() from public, anon;
+grant execute on function public.invites_log() to authenticated;

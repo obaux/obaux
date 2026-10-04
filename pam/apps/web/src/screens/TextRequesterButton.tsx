@@ -42,7 +42,7 @@ export function TextRequesterButton({ userId, firstName }: { readonly userId: st
   return (
     <VStack gap={1}>
       <Button
-        label={t('requests.text', { name: firstName ?? t('requests.renewals.someone') })}
+        label={t('requests.text', { name: firstName ?? t('invite.expired.someone') })}
         variant="secondary"
         onClick={() => void open()}
         isDisabled={busy}

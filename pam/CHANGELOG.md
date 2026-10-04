@@ -45,7 +45,12 @@ what a trip is. Programs have a Policies for participants
 page to add, view and remove the documents people sign, with who signed each.
 People who have signed them all get a small tick. On a request to run a program, the person running PAM can
 open the program's page before approving, text the person who asked, and
-message case managers and program leads in PAM to help them get started.
+message case managers and program leads in PAM to help them get started. Invites
+no longer ask for a phone number: pick who, and share the link however you
+like. A shared invite link shows a "You're invited" picture. Links last 30
+days; an expired one asks for an email address and sends a new link there,
+with nobody needing to approve it. The person running PAM has an Invited
+people list showing who joined, which links are still open, and which ran out.
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 

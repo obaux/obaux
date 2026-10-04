@@ -4,12 +4,12 @@ import { useCallback, useEffect, useState } from 'react';
 import type { InviteRole } from './appUrl';
 
 /**
- * Expired invite links (0071, D-258).
+ * Invite links after they are made (0071; D-258, reworked by D-263).
  *
  * Signed out: `previewInvite` says who sent a link, what for, and whether it
- * still works; `requestInviteRenewal` asks for it to be renewed. Super admin:
- * the open requests, and Renew or Deny. Renewing gives the same link 14 more
- * days, so nothing new has to be sent.
+ * still works; `requestInviteLink` asks for a fresh one by email — no
+ * approval, and the new code goes only to the inbox. Super admin:
+ * `useInvitesLog`, every invite and where it stands.
  */
 export type InviteState = 'valid' | 'expired' | 'used' | 'not_found';
 
@@ -38,38 +38,46 @@ export async function previewInvite(code: string): Promise<InvitePreview | null>
   }
 }
 
-export async function requestInviteRenewal(code: string, firstName: string): Promise<boolean> {
+/** Looks like an email address — the database checks the same shape. */
+export function isEmailAddress(value: string): boolean {
+  return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(value.trim());
+}
+
+export async function requestInviteLink(code: string, email: string): Promise<boolean> {
   try {
     const { createClient } = await import('./supabase');
-    const { error } = await createClient().rpc('request_invite_renewal', {
-      p_code: code,
-      ...(firstName.trim() ? { p_first_name: firstName.trim() } : {}),
-    });
+    const { error } = await createClient().rpc('request_invite_link', { p_code: code, p_email: email.trim() });
     return !error;
   } catch {
     return false;
   }
 }
 
-export interface InviteRenewal {
+/** Where an invite stands: somebody joined with it, it is still open, or it ran out. */
+export type InviteLogState = 'joined' | 'open' | 'expired';
+
+export interface InviteLogRow {
   readonly id: string;
+  readonly createdAt: string;
+  readonly expiresAt: string;
   readonly role: InviteRole;
-  readonly phone: string | null;
-  readonly name: string | null;
   readonly inviterFirst: string | null;
   readonly inviterLast: string | null;
   readonly inviterRole: string;
-  readonly expiredAt: string;
-  readonly requestedAt: string;
+  readonly state: InviteLogState;
+  readonly joinedFirst: string | null;
+  /** A fresh link sent after an expired one, and the address it went to. */
+  readonly emailedTo: string | null;
+  readonly reissued: boolean;
 }
 
-export type InviteRenewalsState =
+export type InvitesLogState =
   | { status: 'loading' }
   | { status: 'error' }
-  | { status: 'ready'; renewals: readonly InviteRenewal[] };
+  | { status: 'ready'; invites: readonly InviteLogRow[] };
 
-export function useInviteRenewals(enabled: boolean): { state: InviteRenewalsState; refresh: () => void } {
-  const [state, setState] = useState<InviteRenewalsState>({ status: 'loading' });
+export function useInvitesLog(enabled: boolean): { state: InvitesLogState; refresh: () => void } {
+  const [state, setState] = useState<InvitesLogState>({ status: 'loading' });
   const [nonce, setNonce] = useState(0);
   const refresh = useCallback(() => setNonce((n) => n + 1), []);
 
@@ -79,7 +87,7 @@ export function useInviteRenewals(enabled: boolean): { state: InviteRenewalsStat
     void (async () => {
       try {
         const { createClient } = await import('./supabase');
-        const { data, error } = await createClient().rpc('invite_renewals_pending');
+        const { data, error } = await createClient().rpc('invites_log');
         if (cancelled) return;
         if (error) {
           setState({ status: 'error' });
@@ -87,27 +95,31 @@ export function useInviteRenewals(enabled: boolean): { state: InviteRenewalsStat
         }
         const rows = (data ?? []) as {
           id: string;
+          created_at: string;
+          expires_at: string;
           invited_role: InviteRole;
-          invited_phone: string | null;
-          invited_name: string | null;
           inviter_first: string | null;
           inviter_last: string | null;
           inviter_role: string;
-          expired_at: string;
-          requested_at: string;
+          state: InviteLogState;
+          joined_first: string | null;
+          emailed_to: string | null;
+          reissued: boolean;
         }[];
         setState({
           status: 'ready',
-          renewals: rows.map((r) => ({
+          invites: rows.map((r) => ({
             id: r.id,
+            createdAt: r.created_at,
+            expiresAt: r.expires_at,
             role: r.invited_role,
-            phone: r.invited_phone,
-            name: r.invited_name,
             inviterFirst: r.inviter_first,
             inviterLast: r.inviter_last,
             inviterRole: r.inviter_role,
-            expiredAt: r.expired_at,
-            requestedAt: r.requested_at,
+            state: r.state,
+            joinedFirst: r.joined_first,
+            emailedTo: r.emailed_to,
+            reissued: r.reissued,
           })),
         });
       } catch {
@@ -120,14 +132,4 @@ export function useInviteRenewals(enabled: boolean): { state: InviteRenewalsStat
   }, [enabled, nonce]);
 
   return { state, refresh };
-}
-
-export async function decideInviteRenewal(id: string, decision: 'approved' | 'denied'): Promise<boolean> {
-  try {
-    const { createClient } = await import('./supabase');
-    const { error } = await createClient().rpc('decide_invite_renewal', { p_id: id, p_decision: decision });
-    return !error;
-  } catch {
-    return false;
-  }
 }

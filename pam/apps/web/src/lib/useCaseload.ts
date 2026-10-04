@@ -184,18 +184,11 @@ export async function createInvite(
   role: 'member' | 'provider' | 'admin',
   /** Which city, when the caller has none of their own — a super admin (0049). */
   regionId?: string,
-  /**
-   * The invited person's number, E.164 (D-258). The invite then only works
-   * for that phone (`redeem_invite` checks it), so a link passed on is no use
-   * to anyone else, and a renewal request says exactly who was invited.
-   */
-  phone?: string,
 ): Promise<CreatedInvite | null> {
   try {
     const { createClient } = await import('./supabase');
     const { data, error } = await createClient().rpc('create_invite', {
       p_role: role,
-      ...(phone ? { p_phone: phone } : {}),
       ...(regionId ? { p_region_id: regionId } : {}),
     });
     if (error || !data) return null;

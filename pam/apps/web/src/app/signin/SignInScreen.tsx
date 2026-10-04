@@ -17,7 +17,7 @@ import { LanguageSwitcher } from '../LanguageSwitcher';
 import { PhoneSignInCard } from './PhoneSignInCard';
 import { LegalFooter } from './LegalFooter';
 import { rememberInvite, type Invite, type InviteRole } from '@/lib/appUrl';
-import { previewInvite } from '@/lib/useInviteRenewals';
+import { previewInvite } from '@/lib/useInviteLinks';
 import { navigate } from '@/lib/navigate';
 
 /**

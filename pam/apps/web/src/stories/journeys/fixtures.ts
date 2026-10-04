@@ -166,17 +166,12 @@ export function partnerFor(role: Role | null) {
   };
 }
 
-/** An expired invite link that asked to be renewed (0071, D-258). */
-export const INVITE_RENEWALS = [
-  {
-    id: 'renew-1',
-    invited_role: 'provider',
-    invited_phone: '+12155550199',
-    invited_name: 'Andre',
-    inviter_first: 'Dana',
-    inviter_last: 'Reyes',
-    inviter_role: 'admin',
-    expired_at: hoursAgo(30),
-    requested_at: hoursAgo(2),
-  },
+/** The super admin's log of invites (0071, D-263): newest first, every state. */
+export const INVITES_LOG = [
+  { id: 'inv-1', created_at: hoursAgo(2), expires_at: hoursAgo(-718), invited_role: 'provider', inviter_first: 'Dana', inviter_last: 'Reyes', inviter_role: 'admin', state: 'open', joined_first: null, emailed_to: 'andre@example.org', reissued: true },
+  { id: 'inv-2', created_at: hoursAgo(5), expires_at: hoursAgo(-715), invited_role: 'member', inviter_first: 'Dana', inviter_last: 'Reyes', inviter_role: 'admin', state: 'joined', joined_first: 'Marcus', emailed_to: null, reissued: false },
+  { id: 'inv-3', created_at: hoursAgo(28), expires_at: hoursAgo(-692), invited_role: 'member', inviter_first: 'Alice', inviter_last: 'Moreno', inviter_role: 'provider', state: 'open', joined_first: null, emailed_to: null, reissued: false },
+  { id: 'inv-4', created_at: hoursAgo(30), expires_at: hoursAgo(-690), invited_role: 'admin', inviter_first: 'Will', inviter_last: null, inviter_role: 'super_admin', state: 'joined', joined_first: 'Priya', emailed_to: null, reissued: false },
+  { id: 'inv-5', created_at: hoursAgo(24 * 33), expires_at: hoursAgo(24 * 3), invited_role: 'provider', inviter_first: 'Dana', inviter_last: 'Reyes', inviter_role: 'admin', state: 'expired', joined_first: null, emailed_to: null, reissued: false },
+  { id: 'inv-6', created_at: hoursAgo(24 * 40), expires_at: hoursAgo(24 * 10), invited_role: 'member', inviter_first: 'Dana', inviter_last: 'Reyes', inviter_role: 'admin', state: 'expired', joined_first: null, emailed_to: null, reissued: false },
 ];

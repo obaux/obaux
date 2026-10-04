@@ -5704,6 +5704,93 @@ Reported-only view for a super admin until the redesign replaces it.
 and 0071 for Will. Until it is deployed, Text and super-admin messaging only
 work in Storybook.
 
+### D-263 — Invites go back to plain links; an expired one emails a fresh link; the super admin keeps a log, not a queue (reworks D-258)
+
+Will, 4 October:
+
+> "On link expiry: set 30 days expiry. No need to ask for their name, only ask
+> for email and email them the new invite link for their role. Let's draft an
+> email message. Format email with PAM logo on top center. Center aligned
+> email format. Simple.
+> For super admin, let's remove the need for super admin to approve. Instead
+> just keep a log of invited people in an item above bottom bar, and opens a
+> new page with back button. Page lists all invitees by date, and show
+> status: active vs link expired.
+> For invite someone screen, kill it. Let's just return to not collecting
+> phone number yet and generating the link for user to share with whoever
+> they want.
+> Let's have the invite link have a cover image like image 2 of carousel and
+> the PAM logo in center. With text saying: you're invited."
+
+**No phone step.** The phone step (`InvitePhoneStep`) is gone from Invite
+someone, the case manager's screen and the directory. They are back to their
+pre-D-258 code exactly: tap who, get the link (`InviteReady`), and send it to
+whoever. "Kill it" was read as the phone screen, not Invite someone itself.
+The choice of member or program is still needed to make the link.
+
+**30 days.** `invites.expires_at` has defaulted to 30 days since 0002. 0071
+no longer changes it. 0071 was never deployed, so it has been rewritten in
+place rather than followed by a new migration.
+
+**Expired link: email, no approval.** The expired-link page now asks only for
+an email address. `request_invite_link(code, email)` is signed out and works
+only on an expired, unused link. It does three things:
+- makes a **new** invite for the same role, city and inviter, lasting 30 days;
+- marks the old one expired;
+- queues an email in `invite_emails`.
+
+Security choices:
+- The new code is never returned to the browser, only to the inbox.
+  Otherwise anyone holding an old link could mint working links without the
+  email meaning anything.
+- One request per expired link. A second ask does nothing, so the button
+  cannot flood an inbox.
+  - The cost: a typo in the address means asking the inviter again.
+- With no phone on the invite, a link works for whoever holds it. That was
+  true before D-258 and is true again. Emailing a fresh one to whoever holds
+  the old one widens nothing.
+
+The renewal queue, Renew/Deny and the `first_name` field are gone.
+
+**The email** (`@pam/config/invite-email`, story *Onboarding/Invite email*):
+- Layout: PAM logo top centre (a PNG at `public/email/pam-logo.png`, because
+  clients drop SVG), centred single column, one green pill button, the link
+  as text, and a one-line footer.
+- Copy: says who invited them and as what, in English and Spanish, with no
+  justice-related words (a test checks).
+- It holds `reviewedBy: ''` like the SMS templates, so it refuses to render
+  for sending until a person has read it.
+
+**Nothing sends it yet.** Sending needs an email provider and a sender (an
+Edge Function holding the provider's key, reading `invite_emails` and setting
+`sent_at`). That is Will's call: which provider, and from which address.
+
+**The log.** A super admin's Home has **Invited people** floating above the
+tab bar, the same strip as Invite someone on a case manager's Home (D-226).
+It opens `/invites/` (`InvitesLogScreen`), fed by `invites_log()`, which is
+super admin only.
+- Every invite, grouped by day, newest first.
+- Each row says who: their first name once joined, otherwise "A member" /
+  "A program" / "A case manager". It also says who invited them.
+- One status per row. Will asked for active vs expired. A third state, **Link
+  open**, was needed for a link nobody has used yet that still works, so that
+  "expired" never falsely describes it.
+- A link re-sent by email says where it went.
+
+Staff role requests (Approve/Deny on Requests) are unchanged. "Remove the need
+for super admin to approve" was read as the expired-link renewals it followed.
+
+**The link preview.** `app/signin/layout.tsx` sets Open Graph and Twitter
+tags for Sign in, where every invite link lands (D-254):
+- The picture, `public/og/invite.jpg` (1200×630, 72 KB), is the second
+  carousel picture darkened, with the white wordmark and "You're invited".
+  It was made once and checked in.
+- Its address is absolute from `APP_URL`, so a domain change moves it too
+  (`docs/changing-the-domain.md` updated).
+- Side effect: Sign in's browser title reads "You're invited to PAM".
+- The picture is English only, because a preview is fetched before PAM knows
+  anyone's language.
+
 ---
 
 ## Notes for whoever picks this up next

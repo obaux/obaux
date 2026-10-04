@@ -312,9 +312,15 @@ Saved's Edit holds removals until Done and asks before leaving or unstarring
 per kind at `/alerts/`, kept on the phone until a column exists, and no SMS
 template for them is written or reviewed yet (D-256).
 A super admin's Home is the staff requests (D-257).
-Invites ask for the invitee's phone first; migration **0071** (14-day links,
-expired-link preview and renewal requests) is written and tested but **not
-deployed** — it waits with 0068/0069 for Will (D-258).
+Invites are a link again, with no phone asked for, and a "You're invited"
+preview picture when pasted into a text. Links last 30 days. An expired link
+asks for an email address and a fresh link is emailed, with no approval. The
+super admin has an Invited people log (Active / Link open / Link expired).
+Migration **0071** backs this and is written and tested but **not deployed**;
+it waits with 0068/0069/0072 for Will. **Nothing sends the email yet**: it
+queues in `invite_emails` until an email provider and sender are chosen, and
+the email's words (`@pam/config/invite-email`) wait for a person's review
+(D-258, D-263).
 Programs have policies for participants with a verified tick (D-261), on
 example data until tables, file storage and a transparency line are agreed.
 From a request the super admin can open the requested program and text the

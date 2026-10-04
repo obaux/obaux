@@ -21,6 +21,7 @@ export const RequestProgram: Story = screen('super-admin', 'A requested program'
 export const Thread: Story = screen('super-admin', 'A conversation with a case manager', '/messages/thread/', {
   id: 'dummy-conv-dummy-a1-dummy-s1',
 });
+export const InvitesLog: Story = screen('super-admin', 'Invited people', '/invites/');
 export const ViewAs: Story = screen('super-admin', 'See the app as', '/view-as/');
 export const Person: Story = screen('super-admin', 'A person', '/person/', { id: 'dummy-m1' });
 export const Notifications: Story = screen('super-admin', 'Notifications', '/notifications/');

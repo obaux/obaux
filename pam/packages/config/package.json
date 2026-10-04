@@ -22,7 +22,8 @@
     "./dummy-connections": "./src/dummy-connections.ts",
     "./dummy-trips": "./src/dummy-trips.ts",
     "./dummy-appointments": "./src/dummy-appointments.ts",
-    "./dummy-policies": "./src/dummy-policies.ts"
+    "./dummy-policies": "./src/dummy-policies.ts",
+    "./invite-email": "./src/invite-email.ts"
   },
   "scripts": {
     "typecheck": "tsc -p tsconfig.json",

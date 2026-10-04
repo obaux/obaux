@@ -29,6 +29,7 @@ import AboutPage from '../../app/about/page';
 import PoliciesPage from '../../app/program/policies/page';
 import { PrototypePolicy } from './PrototypePolicy';
 import { PrototypeRequestProgram } from './PrototypeRequestProgram';
+import { InvitesLogScreen } from '../../screens/InvitesLogScreen';
 import TermsPage from '../../app/terms/page';
 import { ProfileScreen } from '../../screens/ProfileScreen';
 import { ViewAsView } from '../../screens/ViewAsView';
@@ -93,6 +94,7 @@ export const APP_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   '/directory/': screen(() => <DirectoryPage />),
   '/requests/': screen(() => <RequestsPage />),
   '/requests/program/': screen(() => <PrototypeRequestProgram />),
+  '/invites/': screen(() => <InvitesLogScreen />),
   '/interested/': screen(() => <InterestedPage />),
   '/person/': screen(() => <PersonPage />),
   '/person/connect/': screen(() => <ConnectPage />),
