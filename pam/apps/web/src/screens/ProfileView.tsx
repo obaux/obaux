@@ -80,7 +80,8 @@ export function ProfileView({
       : []),
     // Every program, a secondary path for staff (D-218): where to look one
     // up, save it, or add a new one.
-    ...(role === 'admin' || role === 'provider'
+    // A super admin too, now that Home is their requests (D-257).
+    ...(role === 'admin' || role === 'provider' || role === 'super_admin'
       ? [
           {
             id: 'programs',

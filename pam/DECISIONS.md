@@ -5444,6 +5444,25 @@ Suspense boundary (D-254). The boundary swapped the whole screen at
 hydration. That made `a11y.spec`'s field measurement flaky on one viewport,
 and could drop a number somebody had started typing.
 
+### D-257 — A super admin's Home is the staff requests
+
+Will, 4 October: "Homepage for Admin should not be Explore, rather it should
+be requests to be approved or denied." Since D-212 a super admin on their
+own account landed on Explore, a member's screen.
+
+- `HomeScreen` now renders `RequestsScreen isHome` for a super admin who
+  isn't previewing a role. A preview still shows that role's own Home.
+- `RequestsScreen` is the old `/requests/` page made shareable:
+  - As Home it uses the tab-screen header (large title, the role switch and
+    the bell) and has no back.
+  - At `/requests/` it is the nested page it was, back to Everyone.
+- The super admin's tabs are **Home, Messages, Profile** (`tabsFor`). The
+  member tabs (Explore, Saved, Trips) are gone.
+- Explore is one row away: a super admin's Profile now has **All programs**,
+  as a case manager's does.
+- The role switch is the white 48px disc of the other header buttons
+  (D-216, D-253). It was a bare icon.
+
 ---
 
 ## Notes for whoever picks this up next

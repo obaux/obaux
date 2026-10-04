@@ -15,10 +15,13 @@ import { MEMBER_TABS, type TabKey } from '@pam/ui/TabBar';
 export function tabsFor(role: Role | null | undefined): readonly TabKey[] {
   if (role === 'admin') return ['explore', 'saved', 'messages', 'profile'];
   if (role === 'provider') return ['explore', 'program', 'messages', 'profile'];
+  // A super admin's first tab is Home — the staff requests (D-257) — and
+  // nothing a member keeps: no Saved, no Trips.
+  if (role === 'super_admin') return ['explore', 'messages', 'profile'];
   return MEMBER_TABS;
 }
 
 /** Staff read Home on the first tab, not Explore (D-212). */
 export function firstTabIsHome(role: Role | null | undefined): boolean {
-  return role === 'admin' || role === 'provider';
+  return role === 'admin' || role === 'provider' || role === 'super_admin';
 }

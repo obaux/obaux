@@ -311,6 +311,7 @@ Saved's Edit holds removals until Done and asks before leaving or unstarring
 (D-255). Staff get text alerts rather than visit reminders; programs choose
 per kind at `/alerts/`, kept on the phone until a column exists, and no SMS
 template for them is written or reviewed yet (D-256).
+A super admin's Home is the staff requests (D-257).
 
 This is the handover document: what exists, what is proven, what is live, and
 what the next person needs to know before touching anything.

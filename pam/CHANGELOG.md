@@ -33,7 +33,8 @@ they were invited to be, pictures about their own work, and a shorter form. On
 Saved, removing things waits until you press Done, and PAM asks before you
 leave with changes waiting or take a star off someone. Case
 managers are offered a text when someone messages them, and programs get a
-Text alerts screen to switch bookings, changes and messages on or off.
+Text alerts screen to switch bookings, changes and messages on or off. The
+person running PAM now lands on staff requests to approve or deny.
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 

@@ -17,6 +17,7 @@ import { useRoleView } from '@/lib/useViewedRole';
 import { useCaseload } from '@/lib/useCaseload';
 import { dummyChip, statusChip } from '@/lib/caseloadLabels';
 import { ExploreScreen } from './ExploreScreen';
+import { RequestsScreen } from './RequestsScreen';
 import { HeaderActions } from './HeaderActions';
 import { PeopleHomeView, type HomePerson, type PeopleState } from './PeopleHomeView';
 
@@ -24,7 +25,8 @@ import { PeopleHomeView, type HomePerson, type PeopleState } from './PeopleHomeV
  * The first tab, for whoever is signed in (D-212): a member explores places;
  * a case manager sees their caseload; a program sees who wants in. A super
  * admin previewing a role sees that role's home (D-108); on their own
- * account they get Explore — the catalogue is theirs to look after.
+ * account, the staff requests waiting for a yes or no (D-257) — Explore is
+ * a member's, and the catalogue is a row away on Profile (All programs).
  */
 export function HomeScreen() {
   const { state: session } = useSession();
@@ -40,6 +42,7 @@ export function HomeScreen() {
   }
   if (viewedRole === 'admin') return <CaseloadHome />;
   if (viewedRole === 'provider') return <ProgramHome />;
+  if (viewedRole === 'super_admin') return <RequestsScreen isHome />;
   return <ExploreScreen />;
 }
 
