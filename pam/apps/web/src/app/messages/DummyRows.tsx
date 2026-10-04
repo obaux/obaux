@@ -4,8 +4,13 @@ import * as stylex from '@stylexjs/stylex';
 import { List } from '@astryxdesign/core/List';
 import { VStack } from '@astryxdesign/core/VStack';
 import { Text } from '@astryxdesign/core/Text';
-import { DUMMY_REPORTS, dummyConversationsFor, dummyPickerFor } from '@pam/config/dummy-conversations';
-import { DUMMY_EVERYONE, type DummyPerson } from '@pam/config/dummy-people';
+import {
+  DUMMY_REPORTS,
+  dummyConversationsFor,
+  dummyPickerFor,
+  type DummyMessagingRole,
+} from '@pam/config/dummy-conversations';
+import { DUMMY_ANYONE, type DummyPerson } from '@pam/config/dummy-people';
 import type { Role } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { whenHappened } from '@/lib/when';
@@ -31,7 +36,7 @@ const styles = stylex.create({
 });
 
 function person(id: string): DummyPerson | null {
-  return DUMMY_EVERYONE.find((p) => p.id === id) ?? null;
+  return DUMMY_ANYONE.find((p) => p.id === id) ?? null;
 }
 
 /** The context line under a name (D-187): the other person's role, said the way this viewer needs it. */
@@ -40,7 +45,12 @@ export function contextFor(
   other: { readonly role: Role; readonly programName: string | null } | null,
   t: (key: string) => string,
 ): string | null {
-  if (!other || viewer !== 'member') return null;
+  if (!other) return null;
+  // The person running PAM, to the staff they help (D-262).
+  if (other.role === 'super_admin') return t('role.pamTeam');
+  // The super admin talks only to staff, and needs to know which kind.
+  if (viewer === 'super_admin') return pickerContextFor(other, t);
+  if (viewer !== 'member') return null;
   if (other.role === 'provider') return other.programName ?? t('role.provider');
   if (other.role === 'admin') return t('role.admin');
   return null;
@@ -66,7 +76,7 @@ function dummyContext(viewer: Role, other: DummyPerson | null, t: (key: string) 
   return contextFor(viewer, other ? { role: other.role, programName: other.orgName ?? null } : null, t);
 }
 
-export function DummyConversations({ role }: { readonly role: 'member' | 'admin' | 'provider' }) {
+export function DummyConversations({ role }: { readonly role: DummyMessagingRole }) {
   const { t, locale } = useI18n();
   const rows = dummyConversationsFor(role);
 
@@ -133,7 +143,7 @@ export function DummyReports() {
 
 /** Who a preview can pick in "New message", and where each pick goes (D-186). */
 export function dummyPickerPeople(
-  role: 'member' | 'admin' | 'provider',
+  role: DummyMessagingRole,
   t: (key: string) => string,
 ): { readonly people: readonly PickablePerson[]; readonly hrefFor: (id: string) => string } {
   const entries = dummyPickerFor(role);

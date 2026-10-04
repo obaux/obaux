@@ -1052,5 +1052,14 @@
   "verified.title": "{name} firmó",
   "nav.back.policies": "Volver a Políticas",
   "nav.back.program": "Volver a Programa",
-  "verified.short": "Firmó todas las políticas"
+  "verified.short": "Firmó todas las políticas",
+  "nav.back.requests": "Volver a Solicitudes",
+  "requests.text": "Mandar texto a {name}",
+  "requests.text.none": "Todavía no hay un número para esta persona.",
+  "requests.program.title": "Programa",
+  "requests.program.subtitle": "Esperando aprobación",
+  "requests.program.askedBy": "{name} pidió manejar este programa en PAM.",
+  "requests.program.gone": "Esta solicitud ya se decidió, o ya no está aquí.",
+  "role.pamTeam": "Equipo de PAM",
+  "requests.viewProgram.hint": "Mira lo que nos contaron del programa"
 }

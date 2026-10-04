@@ -28,6 +28,7 @@ import { PrototypeInviteExpired } from './PrototypeInviteExpired';
 import AboutPage from '../../app/about/page';
 import PoliciesPage from '../../app/program/policies/page';
 import { PrototypePolicy } from './PrototypePolicy';
+import { PrototypeRequestProgram } from './PrototypeRequestProgram';
 import TermsPage from '../../app/terms/page';
 import { ProfileScreen } from '../../screens/ProfileScreen';
 import { ViewAsView } from '../../screens/ViewAsView';
@@ -91,6 +92,7 @@ export const APP_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   '/admin/': screen(() => <AdminPage />),
   '/directory/': screen(() => <DirectoryPage />),
   '/requests/': screen(() => <RequestsPage />),
+  '/requests/program/': screen(() => <PrototypeRequestProgram />),
   '/interested/': screen(() => <InterestedPage />),
   '/person/': screen(() => <PersonPage />),
   '/person/connect/': screen(() => <ConnectPage />),

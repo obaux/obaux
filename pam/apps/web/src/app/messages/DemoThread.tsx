@@ -2,8 +2,9 @@
 
 import { useMemo, useState } from 'react';
 import type { Role } from '@pam/config';
-import { dummyConversationPair, dummySideFor, dummyThreadFor } from '@pam/config/dummy-conversations';
-import { DUMMY_EVERYONE } from '@pam/config/dummy-people';
+import { dummyOtherIdFor, dummyThreadFor } from '@pam/config/dummy-conversations';
+import { DUMMY_ANYONE } from '@pam/config/dummy-people';
+import { contextFor } from './DummyRows';
 import { useI18n } from '@/lib/i18n';
 import { sendDemoThreadMessage, useDemoThread } from '@/lib/demoMessages';
 import { ThreadView } from './ThreadView';
@@ -34,9 +35,8 @@ export function DemoThread({
   const typed = useDemoThread(conversationId);
   const [added, setAdded] = useState<{ id: string; body: string; at: string }[]>([]);
 
-  const pair = dummyConversationPair(conversationId);
-  const otherId = pair ? (dummySideFor(role) === 'member' ? pair.staffId : pair.memberId) : null;
-  const other = DUMMY_EVERYONE.find((p) => p.id === otherId) ?? null;
+  const otherId = dummyOtherIdFor(conversationId, role);
+  const other = DUMMY_ANYONE.find((p) => p.id === otherId) ?? null;
 
   const messages = useMemo(
     () => [
@@ -58,13 +58,9 @@ export function DemoThread({
     return true;
   };
 
-  const context =
-    // D-187: a member sees who this is to them; staff see nothing beside a member's name.
-    role === 'member' && other?.role === 'provider'
-      ? (other.orgName ?? t('role.provider'))
-      : role === 'member' && other?.role === 'admin'
-        ? t('role.admin')
-        : null;
+  // D-187: a member sees who this is to them; staff see nothing beside a
+  // member's name; the PAM team is named as such (D-262).
+  const context = contextFor(role, other ? { role: other.role, programName: other.orgName ?? null } : null, t);
 
   return (
     <>

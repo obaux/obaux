@@ -2,20 +2,25 @@ import type { Meta, StoryObj } from '@storybook/nextjs';
 import { screen } from './screen';
 
 /**
- * The super admin's app, screen by screen (D-217). Home is Explore — the
- * catalogue is theirs to look after (D-212). Everyone, staff requests and
- * "See the app as" (the role preview, D-108) are Profile rows.
+ * The super admin's app, screen by screen (D-217). Home is the requests
+ * waiting on them (D-257); from a request they can look at the program it
+ * describes and text the person, and in Messages they talk with staff
+ * (D-262). Everyone, Programs and "See the app as" are Profile rows.
  */
 const meta = { title: 'Super admin/Screens' } satisfies Meta;
 
 export default meta;
 type Story = StoryObj;
 
-export const Home: Story = screen('super-admin', 'Home — Explore', '/');
+export const Home: Story = screen('super-admin', 'Home — Requests', '/');
 export const Messages: Story = screen('super-admin', 'Messages', '/messages/');
 export const Profile: Story = screen('super-admin', 'Profile', '/profile/');
 export const Everyone: Story = screen('super-admin', 'Everyone', '/directory/');
 export const Requests: Story = screen('super-admin', 'Staff requests', '/requests/');
+export const RequestProgram: Story = screen('super-admin', 'A requested program', '/requests/program/', { id: 'r-2' });
+export const Thread: Story = screen('super-admin', 'A conversation with a case manager', '/messages/thread/', {
+  id: 'dummy-conv-dummy-a1-dummy-s1',
+});
 export const ViewAs: Story = screen('super-admin', 'See the app as', '/view-as/');
 export const Person: Story = screen('super-admin', 'A person', '/person/', { id: 'dummy-m1' });
 export const Notifications: Story = screen('super-admin', 'Notifications', '/notifications/');

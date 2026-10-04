@@ -112,6 +112,10 @@ function routesFor(journeyRole: JourneyRole): Route[] {
           ],
         };
       }
+      // The one example conversation is a member's with their case manager;
+      // the super admin is never in one with a member (D-262), so their list
+      // falls to the example set, where Teresa is.
+      if (role === 'super_admin') return { body: [] };
       return { body: [{ conversation_id: CONVO_ID, last_read_at: null }] };
     }),
     // Message {name} on a caseload member's page (D-231, D-234) opens the one
@@ -144,6 +148,8 @@ function routesFor(journeyRole: JourneyRole): Route[] {
     on('/rpc/request_invite_renewal', () => ({ body: true })),
     on('/rpc/invite_renewals_pending', () => ({ body: INVITE_RENEWALS })),
     on('/rpc/decide_invite_renewal', () => ({ body: null })),
+    // A fictional 555 number: a requester's phone, read on "Text Andre" (D-262).
+    on('/rpc/staff_request_phone', () => ({ body: '+12155550177' })),
     on('/rest/v1/enrollments', () => ({ body: [] })),
     on('/rpc/messageable_people', () => ({ body: [] })),
     on('/rpc/reports_for_review', () => ({ body: [] })),

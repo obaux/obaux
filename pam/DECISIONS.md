@@ -5650,6 +5650,60 @@ of policies is one tap away on their page. `ProfileSummary` gained a
 - A program keeping a record of what someone signed is a new line in
   `transparency.ts`, and members must be told before it is real.
 
+### D-262 — The super admin can look at a requested program, text the requester, and message staff (narrows D-171)
+
+Will, 4 October: "Super admin home; there needs to be a way to view program
+profile if asking to approve/deny. Also a way to message the program lead or
+case manager from the app. To make sure they coordinate how to use app."
+
+**Looking before deciding.** A program-lead request carries what the person
+typed about their program at sign-up (0056). The request card now shows that
+program as a row ("Example Reentry Kitchen — See what they told us about
+it"), opening `/requests/program/?id=` (`RequestProgramScreen`). The page is
+the same `PlaceDetail` a member would see once the program is listed, plus who
+asked and a Text button. Approve and Deny stay on the card, where the city is
+picked. One place decides, and this page is only for looking.
+`useStaffRequests` now reads the program columns. They are on the same row
+the super admin could already read in full (0046 policy).
+
+**Talking to someone still waiting: a text, not a PAM message.** A requester
+has no staff role until they are approved. They cannot be reached in PAM's
+Messages without opening messaging to anyone who asks to be staff. So each
+request card has **Text {name}**, which opens the super admin's own texting
+app with the number filled in. The number comes from
+`staff_request_phone(user_id)` (0072):
+- super admin only;
+- only while the request is open;
+- read when tapped, not when the list loads;
+- audited as `staff_request.phone_read`.
+
+**Talking to staff once they are in: PAM's Messages.** Migration 0072 adds
+one arm to `can_message`: super admin ↔ case manager or program lead. It also
+lets `messageable_people` and `open_direct_conversation` serve a super admin.
+- **A super admin and a member can never message each other, either way.**
+  That part of D-171 stands, and DB test 10 checks it from both sides.
+- What changes is D-171's "a super admin cannot send or start any message".
+  It is now "…to a member".
+- Staff can answer and start conversations with the super admin.
+  `messageable_people` therefore lists the super admin to staff, and
+  `05_messenger_test` now counts by role.
+
+In the redesign (`MessagesScreen`) a super admin has New message and the
+example set. That is a thread with Teresa (`dummy-conv-dummy-a1-dummy-s1`) and
+Sandra and Chris to start one with. The example cast gains Robin
+(`DUMMY_PAM_TEAM`, not in the Everyone list), and staff see the super admin
+labelled "PAM team". The example data adjusts in two ways:
+- A thread's two slots are now matched by who "you" are, not only by role.
+  A case manager sits in the first slot of her thread with the PAM team.
+- `dummyOtherIdFor` replaces the role-only lookup in `DemoThread`.
+
+The live `/messages/` page is still the pre-redesign screen. It keeps D-171's
+Reported-only view for a super admin until the redesign replaces it.
+
+**0072 is written and tested but not deployed.** It waits with 0068, 0069
+and 0071 for Will. Until it is deployed, Text and super-admin messaging only
+work in Storybook.
+
 ---
 
 ## Notes for whoever picks this up next

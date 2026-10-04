@@ -224,12 +224,32 @@ export const DUMMY_CASE_MANAGERS: readonly DummyPerson[] = [
   },
 ];
 
+/**
+ * The person running PAM, as staff meet them in Messages (D-262). Not in
+ * `DUMMY_EVERYONE` — that is the super admin's own directory, and they are
+ * not somebody they look up.
+ */
+export const DUMMY_PAM_TEAM: readonly DummyPerson[] = [
+  {
+    id: 'dummy-s1',
+    firstName: 'Robin',
+    role: 'super_admin',
+    regionName: 'Philadelphia',
+    accessStatus: 'active',
+    lastActiveAt: hoursAgo(1),
+    language: 'en',
+  },
+];
+
 /** Everyone in this file, for the super admin's filterable directory. */
 export const DUMMY_EVERYONE: readonly DummyPerson[] = [
   ...DUMMY_MEMBERS,
   ...DUMMY_PROGRAM_LEADS,
   ...DUMMY_CASE_MANAGERS,
 ];
+
+/** Anybody an example conversation can name, the PAM team included (D-262). */
+export const DUMMY_ANYONE: readonly DummyPerson[] = [...DUMMY_EVERYONE, ...DUMMY_PAM_TEAM];
 
 export interface DummyInterest {
   readonly person: DummyPerson;

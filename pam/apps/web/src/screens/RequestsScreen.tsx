@@ -9,7 +9,8 @@ import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { Button } from '@astryxdesign/core/Button';
 import { RadioList, RadioListItem } from '@astryxdesign/core/RadioList';
-import { Loading, Notice, Page } from '@pam/ui';
+import { Loading, Notice, Page, PlacesIcon } from '@pam/ui';
+import { MenuList } from '@pam/ui/MenuList';
 import { SubPageHeader } from '@pam/ui/SubPage';
 import { HelpButton } from './HelpButton';
 import { HeaderActions } from './HeaderActions';
@@ -24,6 +25,7 @@ import { listRegions } from '@/lib/useCaseload';
 import { decideInviteRenewal, useInviteRenewals } from '@/lib/useInviteRenewals';
 import { useRoleView } from '@/lib/useViewedRole';
 import { RoleSwitchControl } from '../app/RoleSwitchControl';
+import { TextRequesterButton } from './TextRequesterButton';
 
 /**
  * Deciding who becomes a case manager or a program lead, for real (0054).
@@ -218,6 +220,24 @@ export function RequestsScreen({ isHome = false }: { readonly isHome?: boolean }
                   {' · '}
                   {t('requests.requestedOn', { when: requestedWhen(row.createdAt, locale) })}
                 </Text>
+                {/*
+                  Look before deciding (Will, 4 October, D-262): the program
+                  a would-be program lead described at sign-up.
+                */}
+                {row.program ? (
+                  <MenuList
+                    label={t('requests.program.title')}
+                    items={[
+                      {
+                        id: 'program',
+                        label: row.program.name,
+                        description: t('requests.viewProgram.hint'),
+                        href: `/requests/program/?id=${encodeURIComponent(row.userId)}`,
+                        icon: <PlacesIcon width={26} height={26} aria-hidden />,
+                      },
+                    ]}
+                  />
+                ) : null}
                 {needsCity && busyId === null ? (
                   <Text type="supporting" xstyle={styles.note}>
                     {t('directory.invite.pickCity')}
@@ -247,6 +267,8 @@ export function RequestsScreen({ isHome = false }: { readonly isHome?: boolean }
                     isDisabled={busyId !== null}
                     xstyle={styles.action}
                   />
+                  {/* Talk before they start, from the super admin's own phone (D-262). */}
+                  <TextRequesterButton userId={row.userId} firstName={row.firstName} />
                 </HStack>
               </VStack>
             </Card>

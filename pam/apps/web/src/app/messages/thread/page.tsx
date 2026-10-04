@@ -60,8 +60,12 @@ function ThreadScreen() {
   const signedIn = session.status === 'signed-in';
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
   const { viewedRole } = useRoleView(trueRole);
-  const realCanMessage = trueRole === 'member' || trueRole === 'admin' || trueRole === 'provider';
-  const viewedCanMessage = viewedRole === 'member' || viewedRole === 'admin' || viewedRole === 'provider';
+  // The super admin messages staff too (0072, D-262) — never a member; the
+  // database holds that line, not this screen.
+  const realCanMessage =
+    trueRole === 'member' || trueRole === 'admin' || trueRole === 'provider' || trueRole === 'super_admin';
+  const viewedCanMessage =
+    viewedRole === 'member' || viewedRole === 'admin' || viewedRole === 'provider' || viewedRole === 'super_admin';
   // A real thread runs as the real account (D-171); an example thread is
   // drawn for whichever role is being previewed and touches nothing real.
   const canMessage = demo ? viewedCanMessage : realCanMessage;

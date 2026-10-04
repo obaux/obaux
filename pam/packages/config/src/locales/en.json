@@ -1052,5 +1052,14 @@
   "verified.title": "{name} signed",
   "nav.back.policies": "Back to Policies",
   "nav.back.program": "Back to Program",
-  "verified.short": "Signed every policy"
+  "verified.short": "Signed every policy",
+  "nav.back.requests": "Back to Requests",
+  "requests.text": "Text {name}",
+  "requests.text.none": "There is no number for this person yet.",
+  "requests.program.title": "Program",
+  "requests.program.subtitle": "Waiting for approval",
+  "requests.program.askedBy": "{name} asked to run this program in PAM.",
+  "requests.program.gone": "This request has already been decided, or it is no longer here.",
+  "role.pamTeam": "PAM team",
+  "requests.viewProgram.hint": "See what they told us about it"
 }

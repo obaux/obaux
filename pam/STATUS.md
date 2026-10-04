@@ -317,6 +317,10 @@ expired-link preview and renewal requests) is written and tested but **not
 deployed** — it waits with 0068/0069 for Will (D-258).
 Programs have policies for participants with a verified tick (D-261), on
 example data until tables, file storage and a transparency line are agreed.
+From a request the super admin can open the requested program and text the
+requester. In the redesign they can also message staff (never members).
+Migration **0072** backs this and is written and tested but **not deployed**
+(D-262).
 
 This is the handover document: what exists, what is proven, what is live, and
 what the next person needs to know before touching anything.

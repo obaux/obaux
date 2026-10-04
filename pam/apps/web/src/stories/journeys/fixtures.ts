@@ -110,10 +110,25 @@ export const DIRECTORY_PEOPLE = [
   { id: 'd3', first_name: 'Dana', role: 'admin', region_name: 'Philadelphia', access_status: 'limited', last_active_at: hoursAgo(24), is_demo: false },
 ];
 
-/** Two people waiting for a super admin's decision on /requests/. */
+/** Two people waiting for a super admin's decision on /requests/; Andre described his program. */
 export const STAFF_REQUESTS = [
   { user_id: 'r-1', wants_role: 'admin', first_name: 'Priya', last_name: 'Nair', city: 'Philadelphia', created_at: hoursAgo(5) },
-  { user_id: 'r-2', wants_role: 'provider', first_name: 'Andre', last_name: 'Wells', city: 'Philadelphia', created_at: hoursAgo(30) },
+  {
+    user_id: 'r-2',
+    wants_role: 'provider',
+    first_name: 'Andre',
+    last_name: 'Wells',
+    city: 'Philadelphia',
+    created_at: hoursAgo(30),
+    // What he typed about his program at sign-up (0056), for "View program" (D-262).
+    program_name: 'Example Reentry Kitchen',
+    program_category: 'workforce',
+    program_subcategory: null,
+    program_description: 'Paid kitchen training, twelve weeks, with a job fair at the end.',
+    program_address: '1200 Example Street, Philadelphia, PA',
+    program_phone: '+12155550123',
+    program_website: 'https://example.org',
+  },
 ];
 
 const THREAD = [

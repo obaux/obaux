@@ -75,20 +75,22 @@ select test.check('a case manager lists their assigned member',
   (select count(*) from public.messageable_people() where profile_id = :'marcus'), 1);
 select test.check('...not a member who merely shares the region',
   (select count(*) from public.messageable_people() where profile_id = :'tanya'), 0);
-select test.check('...and nobody who is not a member',
-  (select count(*) from public.messageable_people() where role <> 'member'), 0);
+select test.check('...and nobody who is not a member, except the person running PAM (0072)',
+  (select count(*) from public.messageable_people() where role not in ('member', 'super_admin')), 0);
 
 select test.as_user(:'alice');
 select test.check('a program admin lists members enrolled in their org''s services',
-  (select count(*) from public.messageable_people()), 1);
+  (select count(*) from public.messageable_people() where role = 'member'), 1);
 
 select test.as_user(:'bob');
-select test.check('a program admin with no enrolled members lists nobody',
-  (select count(*) from public.messageable_people()), 0);
+select test.check('a program admin with no enrolled members lists no members',
+  (select count(*) from public.messageable_people() where role = 'member'), 0);
 
 select test.as_user(:'root');
-select test.check('a super admin lists nobody (D-171)',
-  (select count(*) from public.messageable_people()), 0);
+select test.check('a super admin lists no members (D-171, narrowed by 0072)',
+  (select count(*) from public.messageable_people() where role = 'member'), 0);
+select test.check('...but does list staff (0072, D-262)',
+  (select count(*) > 0 from public.messageable_people() where role in ('admin', 'provider'))::int, 1);
 
 -- ===========================================================================
 \echo ''

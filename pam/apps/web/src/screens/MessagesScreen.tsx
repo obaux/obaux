@@ -2,7 +2,7 @@
 
 import { USE_DUMMY_PEOPLE } from '@pam/config/dummy-flag';
 import { dummyConversationsFor } from '@pam/config/dummy-conversations';
-import { DUMMY_EVERYONE } from '@pam/config/dummy-people';
+import { DUMMY_ANYONE } from '@pam/config/dummy-people';
 import { useI18n } from '@/lib/i18n';
 import { useSession } from '@/lib/useSession';
 import { useRoleView } from '@/lib/useViewedRole';
@@ -30,9 +30,12 @@ export function MessagesScreen() {
   const { state: session } = useSession();
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
   const { viewedRole } = useRoleView(trueRole);
-  const canMessage = trueRole === 'member' || trueRole === 'admin' || trueRole === 'provider';
+  // The super admin may message staff, to help them start (0072, D-262).
+  const canMessage =
+    trueRole === 'member' || trueRole === 'admin' || trueRole === 'provider' || trueRole === 'super_admin';
   const { state } = useConversations(session.status === 'signed-in' && canMessage);
-  const role = viewedRole === 'admin' || viewedRole === 'provider' ? viewedRole : 'member';
+  const role =
+    viewedRole === 'admin' || viewedRole === 'provider' || viewedRole === 'super_admin' ? viewedRole : 'member';
 
   // New message (D-220): everyone this person may message, in the same sheet
   // with a search box the old screen used (D-186) — real people when there
@@ -80,7 +83,7 @@ export function MessagesScreen() {
   const useExamples = real.length === 0 && USE_DUMMY_PEOPLE && state.status !== 'loading';
   const examples: MessageRow[] = useExamples
     ? dummyConversationsFor(role).map((c) => {
-        const other = DUMMY_EVERYONE.find((p) => p.id === c.otherId) ?? null;
+        const other = DUMMY_ANYONE.find((p) => p.id === c.otherId) ?? null;
         return {
           id: c.id,
           name: other?.firstName ?? t('messages.thread.someone'),
