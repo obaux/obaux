@@ -5782,8 +5782,11 @@ for super admin to approve" was read as the expired-link renewals it followed.
 
 **The link preview.** `app/signin/layout.tsx` sets Open Graph and Twitter
 tags for Sign in, where every invite link lands (D-254):
-- The picture, `public/og/invite.jpg` (1200×630, 72 KB), is the second
-  carousel picture darkened, with the white wordmark and "You're invited".
+- The picture, `public/og/invite.jpg` (1200×630, about 85 KB), is the second
+  carousel picture with the white wordmark and "You're invited". Will,
+  4 October: "less dark, so the colors shine through". It now has only a
+  light veil (8%) and a soft shade behind the words, with a drop shadow on
+  them, instead of a 45% black overlay.
   It was made once and checked in.
 - Its address is absolute from `APP_URL`, so a domain change moves it too
   (`docs/changing-the-domain.md` updated).

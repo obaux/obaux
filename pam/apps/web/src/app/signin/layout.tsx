@@ -7,9 +7,9 @@ import { APP_URL } from '@/lib/project';
  * in center. With text saying: you're invited."
  *
  * Every invite is a link to Sign in (D-254), so the preview is Sign in's.
- * The picture is `public/og/invite.jpg` — the second carousel picture,
- * darkened, the white wordmark and "You're invited" — made once and checked
- * in. Its address is absolute, from APP_URL, because a phone fetching the
+ * The picture is `public/og/invite.jpg` — the second carousel picture in
+ * its own colours (a light veil, a soft shade only behind the words), the
+ * white wordmark and "You're invited" — made once and checked in. Its address is absolute, from APP_URL, because a phone fetching the
  * preview has no page to resolve a relative one against; changing the domain
  * changes this with everything else (docs/changing-the-domain.md).
  */
