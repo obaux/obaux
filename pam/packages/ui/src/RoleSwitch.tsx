@@ -1,6 +1,8 @@
 'use client';
 
+import * as stylex from '@stylexjs/stylex';
 import { DropdownMenu } from '@astryxdesign/core/DropdownMenu';
+import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { PeopleIcon } from './icons.js';
 
 /**
@@ -57,6 +59,22 @@ export interface RoleSwitchProps {
   readonly onChange: (value: string) => void;
 }
 
+const styles = stylex.create({
+  // The white disc with a grey edge every round header button uses (D-216,
+  // D-253), so the role switch sits beside the bell as one of a set (D-257).
+  round: {
+    width: '48px',
+    height: '48px',
+    minHeight: '48px',
+    borderRadius: '50%',
+    flexShrink: 0,
+    backgroundColor: colorVars['--color-background-body'],
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    borderColor: colorVars['--color-border'],
+  },
+});
+
 export function RoleSwitch({
   value,
   options,
@@ -73,7 +91,7 @@ export function RoleSwitch({
 
   return (
     <DropdownMenu
-      button={{ label: accessibleName, icon: <PeopleIcon />, isIconOnly: true, variant: 'ghost' }}
+      button={{ label: accessibleName, icon: <PeopleIcon />, isIconOnly: true, variant: 'ghost', xstyle: styles.round }}
       hasChevron={false}
       placement="below"
       alignment="start"

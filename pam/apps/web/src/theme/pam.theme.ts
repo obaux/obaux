@@ -101,9 +101,77 @@ export const pamTheme = defineTheme({
     // manager screen's "Messages off" badge. White clears 11.1:1 on #4b3900;
     // the dark-mode value is unchanged.
     '--color-on-warning': ['#FFFFFF', '#111111'],
+    // The page is white in light mode, and a card lifts off it by shadow, not
+    // by a grey ground (Will, 1 October — a universal rule, D-210). Dark mode
+    // is unchanged: a shadow cannot carry a card on a dark page, so the card's
+    // own inset edge does it there.
+    '--color-background-body': ['#FFFFFF', '#1B1B1B'],
   },
 
   components: {
+    /*
+     * Every default card: large soft corners and a diffuse shadow, no border —
+     * the reference Will gave (1 October). Set here, not per card, because it
+     * is a rule for the whole product. `muted` and `transparent` cards are
+     * left flat: a shadow under a card with no ground of its own reads as a
+     * smudge.
+     */
+    card: {
+      base: { borderRadius: '24px' },
+      'variant:default': {
+        borderWidth: '0px',
+        boxShadow:
+          '0 1px 2px light-dark(oklch(0 0 0 / 6%), oklch(0 0 0 / 30%)), 0 6px 20px light-dark(oklch(0 0 0 / 9%), oklch(0 0 0 / 40%)), inset 0 0 0 1px light-dark(transparent, oklch(1 0 0 / 9%))',
+      },
+    },
+    /*
+     * The search bar (D-212, `SearchPill`): the reference's big rounded bar,
+     * lifted by a stronger shadow than a card's because it is the one thing
+     * on the screen to reach for first. Only the large group is drawn this
+     * way; no other screen uses one.
+     */
+    'input-group': {
+      'size:lg': {
+        borderRadius: '999px',
+        minHeight: '60px',
+        paddingInlineStart: '8px',
+        paddingInlineEnd: '4px',
+        borderWidth: '0px',
+        backgroundColor: 'light-dark(#FFFFFF, #262626)',
+        boxShadow:
+          '0 2px 4px light-dark(oklch(0 0 0 / 6%), oklch(0 0 0 / 30%)), 0 10px 28px light-dark(oklch(0 0 0 / 14%), oklch(0 0 0 / 45%)), inset 0 0 0 1px light-dark(oklch(0 0 0 / 5%), oklch(1 0 0 / 10%))',
+      },
+    },
+    // Inside the pill, the field draws nothing of its own: the pill is the box.
+    // The same for a plain text field in a pill — Trips' and Messages' search
+    // (Will, 2 October: "make them both match the style in Explore").
+    'text-input': {
+      'size:lg': {
+        fontSize: '18px',
+        borderWidth: '0px',
+        backgroundColor: 'transparent',
+        boxShadow: 'none',
+      },
+    },
+    typeahead: {
+      'size:lg': {
+        fontSize: '18px',
+        borderWidth: '0px',
+        backgroundColor: 'transparent',
+        boxShadow: 'none',
+      },
+    },
+    // The bottom bar marks the current tab by colour alone, as the mockups do
+    // (D-215) — no underline. TabBar is the only TabList in PAM.
+    // (Through its colour variable: the component's own opacity and colour
+    // rules outrank a theme override; a custom property set on the element
+    // does not — the same route the button overrides above take.)
+    'tab-indicator': {
+      base: { '--color-accent': 'transparent' },
+    },
+    'typeahead-dropdown': {
+      base: { borderRadius: '20px' },
+    },
     button: {
       // Primary: the fill is the brand, and the press is the same colour
       // getting firmer. `light-dark()` because these differ by mode and a

@@ -124,10 +124,9 @@ test.describe('signing up', () => {
     await newcomer(page);
     await page.goto('/join/');
 
+    // D-251: the count is the step's subtitle, as in Plan a trip — no bar.
     await expect(page.getByText('Step 2 of 5').first()).toBeVisible();
-    const bar = page.getByRole('progressbar');
-    await expect(bar).toHaveAttribute('aria-valuenow', '2');
-    await expect(bar).toHaveAttribute('aria-valuemax', '5');
+    await expect(page.getByRole('progressbar')).toHaveCount(0);
   });
 
   test('never says "role" to the person filling it in', async ({ page }) => {
@@ -196,6 +195,19 @@ test.describe('signing up', () => {
 
     // Four steps, not five: there is no account to attach text consent to.
     await expect(page.getByText('Step 3 of 4').first()).toBeVisible();
+  });
+
+  test('invited by a link, nothing is asked that the link already said (D-254)', async ({ page }) => {
+    // Sign in kept the code and who it is for; joining picks them up.
+    await page.addInitScript(() => {
+      window.sessionStorage.setItem('pam.invite', JSON.stringify({ code: 'PAM7Q4KX', role: 'admin' }));
+    });
+    await newcomer(page);
+    await page.goto('/join/');
+
+    await expect(page.getByText('You were invited as a case manager.')).toBeVisible();
+    await expect(page.getByLabel('Code from the person who invited you')).toHaveCount(0);
+    await expect(page.getByRole('radio', { name: 'Parole Officer or Case Manager' })).toHaveCount(0);
   });
 
   test('a city PAM does not serve is an offer, not an error', async ({ page }) => {

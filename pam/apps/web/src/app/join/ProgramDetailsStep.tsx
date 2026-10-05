@@ -34,6 +34,8 @@ export interface ProgramDetailsStepProps {
   readonly onSubmit: () => void;
   readonly busy: boolean;
   readonly invalid: boolean;
+  /** The button's words — "Next" at sign-up, "Send to PAM" on Add a program (D-218). */
+  readonly submitLabel?: string;
 }
 
 const styles = stylex.create({
@@ -45,7 +47,7 @@ const styles = stylex.create({
 
 const DESCRIPTION_MAX = 200;
 
-export function ProgramDetailsStep({ value, onChange, onSubmit, busy, invalid }: ProgramDetailsStepProps) {
+export function ProgramDetailsStep({ value, onChange, onSubmit, busy, invalid, submitLabel }: ProgramDetailsStepProps) {
   const { t } = useI18n();
   const category = (value.category || 'education') as Category;
   const set = (patch: Partial<ProgramDetails>) => onChange({ ...value, ...patch });
@@ -131,7 +133,7 @@ export function ProgramDetailsStep({ value, onChange, onSubmit, busy, invalid }:
         </Text>
       ) : null}
 
-      <BigButton label={busy ? t('join.saving') : t('action.next')} onPress={onSubmit} isDisabled={busy} />
+      <BigButton label={busy ? t('join.saving') : (submitLabel ?? t('action.next'))} onPress={onSubmit} isDisabled={busy} />
     </VStack>
   );
 }

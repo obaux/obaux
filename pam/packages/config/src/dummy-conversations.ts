@@ -125,17 +125,31 @@ export const DUMMY_THREADS: Readonly<Record<string, readonly DummyThreadMessage[
     ['member', 'Can we start at 10:30 next time? My bus gets in late.', hoursAgo(26)],
     ['staff', 'Yes, 10:30 works. I will save you a seat.', hoursAgo(25)],
   ]),
+  // Teresa (case manager) and Robin (super admin, running PAM) — D-262.
+  // Staff sit in the first slot here, the PAM team in the second: the slots
+  // are "the person being helped to use PAM" and "the person helping".
+  thread(dummyConversationIdBetween('dummy-a1', 'dummy-s1'), [
+    ['staff', 'Hi Teresa, it is Robin from the PAM team. Welcome. Can I help you set up your first invites?', daysAgo(2, 10)],
+    ['member', 'Yes please. Do I send the link, or do you?', daysAgo(2, 11)],
+    ['staff', 'You do. Tap Invite someone, put in their phone number, and send the link from your phone.', daysAgo(2, 11)],
+    ['member', 'Done for two people. One said the link did not work.', hoursAgo(8)],
+    ['staff', 'Links last 14 days. If it ran out, they can ask for a new one and I will renew it.', hoursAgo(7)],
+  ]),
 ]);
 
 /**
  * What a preview of `role` is looking at: the example conversations that
  * belong to "you" — `DUMMY_SELF` in `dummy-people.ts`: Jordan for a member,
- * Teresa for a case manager, Sandra for a program (D-183).
+ * Teresa for a case manager, Sandra for a program (D-183); Robin for the
+ * super admin, who may message staff (D-262).
  */
-export const DUMMY_SELF_ID: Readonly<Record<'member' | 'admin' | 'provider', string>> = {
+export type DummyMessagingRole = 'member' | 'admin' | 'provider' | 'super_admin';
+
+export const DUMMY_SELF_ID: Readonly<Record<DummyMessagingRole, string>> = {
   member: 'dummy-m1',
   admin: 'dummy-a1',
   provider: 'dummy-p1',
+  super_admin: 'dummy-s1',
 };
 
 /** Which side of a conversation `role` sits on. */
@@ -143,12 +157,31 @@ export function dummySideFor(role: Role): DummySide {
   return role === 'member' ? 'member' : 'staff';
 }
 
+/**
+ * Which slot of a pair "you" are in. Usually your role says (a member is the
+ * first slot, staff the second), but a case manager talking to the PAM team
+ * sits in the first (D-262) — so the pair is asked first, the role after.
+ */
+function sideIn(pair: { memberId: string; staffId: string } | null, role: Role): DummySide {
+  const self = (DUMMY_SELF_ID as Partial<Record<Role, string>>)[role];
+  if (pair && self === pair.memberId) return 'member';
+  if (pair && self === pair.staffId) return 'staff';
+  return dummySideFor(role);
+}
+
+/** The other person in an example conversation, as `role` sees it. */
+export function dummyOtherIdFor(conversationId: string, role: Role): string | null {
+  const pair = dummyConversationPair(conversationId);
+  if (!pair) return null;
+  return sideIn(pair, role) === 'member' ? pair.staffId : pair.memberId;
+}
+
 /** An example thread as `role` would read it — the written messages with `mine` flipped for their side. */
 export function dummyThreadFor(
   conversationId: string,
   role: Role,
 ): readonly { id: string; body: string; at: string; mine: boolean }[] {
-  const side = dummySideFor(role);
+  const side = sideIn(dummyConversationPair(conversationId), role);
   return (DUMMY_THREADS[conversationId] ?? []).map((m) => ({
     id: m.id,
     body: m.body,
@@ -164,26 +197,33 @@ export interface DummyConversation {
   readonly lastMessageAt: string | null;
   /** The newest message is from the other side, unread for this viewer. */
   readonly unread: boolean;
+  /**
+   * How many messages from the other side came after this viewer's last
+   * one — the count on "Message {name}" (D-231). 0 when the last word is
+   * theirs.
+   */
+  readonly unreadCount: number;
   readonly preview: { readonly body: string; readonly mine: boolean } | null;
 }
 
 /** The example conversation list for a preview of `role`, newest first (D-183). */
-export function dummyConversationsFor(role: 'member' | 'admin' | 'provider'): readonly DummyConversation[] {
+export function dummyConversationsFor(role: DummyMessagingRole): readonly DummyConversation[] {
   const self = DUMMY_SELF_ID[role];
-  const side = dummySideFor(role);
   return Object.entries(DUMMY_THREADS)
     .map(([id, messages]) => {
       const pair = dummyConversationPair(id);
-      if (!pair) return null;
+      if (!pair || (pair.memberId !== self && pair.staffId !== self)) return null;
+      const side: DummySide = pair.memberId === self ? 'member' : 'staff';
       const otherId = side === 'member' ? pair.staffId : pair.memberId;
-      const selfId = side === 'member' ? pair.memberId : pair.staffId;
-      if (selfId !== self) return null;
       const last = messages[messages.length - 1] ?? null;
+      let unreadCount = 0;
+      for (let i = messages.length - 1; i >= 0 && messages[i]!.from !== side; i -= 1) unreadCount += 1;
       return {
         id,
         otherId,
         lastMessageAt: last?.at ?? null,
         unread: last !== null && last.from !== side,
+        unreadCount,
         preview: last ? { body: last.body, mine: last.from === side } : null,
       };
     })
@@ -199,10 +239,12 @@ export function dummyConversationsFor(role: 'member' | 'admin' | 'provider'): re
  * above, so his is empty — which is also the real rule: a member's staff
  * are exactly the people already in their conversations.
  */
-export const DUMMY_STARTABLE: Readonly<Record<'member' | 'admin' | 'provider', readonly string[]>> = {
+export const DUMMY_STARTABLE: Readonly<Record<DummyMessagingRole, readonly string[]>> = {
   member: [],
   admin: ['dummy-m4', 'dummy-m5'],
   provider: ['dummy-m6'],
+  // The PAM team reaches staff, never members (D-262).
+  super_admin: ['dummy-p1', 'dummy-a2'],
 };
 
 /**
@@ -213,7 +255,7 @@ export const DUMMY_STARTABLE: Readonly<Record<'member' | 'admin' | 'provider', r
  * carries the example conversation a pick opens.
  */
 export function dummyPickerFor(
-  role: 'member' | 'admin' | 'provider',
+  role: DummyMessagingRole,
 ): readonly { readonly personId: string; readonly conversationId: string }[] {
   const self = DUMMY_SELF_ID[role];
   const inConversations = dummyConversationsFor(role).map((c) => ({ personId: c.otherId, conversationId: c.id }));

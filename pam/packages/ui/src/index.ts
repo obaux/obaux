@@ -36,6 +36,7 @@ export { AppHeader, type AppHeaderProps } from './AppHeader.js';
 export { AreaChip, type AreaChipProps } from './AreaChip.js';
 export { Page, type PageProps } from './Page.js';
 export { PageTitle, type PageTitleProps } from './PageTitle.js';
+export { SubPage, SubPageHeader, type SubPageHeaderProps } from './SubPage.js';
 export { RoleSwitch, type RoleSwitchProps } from './RoleSwitch.js';
 /*
  * `OnboardingSlides` is deliberately NOT re-exported here, the same call
@@ -54,6 +55,7 @@ export {
 } from './NotificationList.js';
 export { VoiceInput, type VoiceInputProps, type SpeechRecognizer } from './VoiceInput.js';
 export { TextField, type TextFieldProps } from './TextField.js';
+export { CodeBoxes, type CodeBoxesProps } from './CodeBoxes.js';
 export {
   BellIcon,
   BookmarkIcon,
@@ -70,6 +72,26 @@ export {
   PhoneIcon,
   PlacesIcon,
   PlanIcon,
+  ExploreIcon,
+  MessagesIcon,
+  TripsIcon,
+  SettingsIcon,
+  HelpIcon,
+  LegalIcon,
+  SignOutIcon,
+  ConnectionsIcon,
+  AllPlacesIcon,
+  EducationIcon,
+  WorkforceIcon,
+  FamilyServicesIcon,
+  OfflineIcon,
+  NoResultsIcon,
+  BackArrowIcon,
+  BookIcon,
+  SignIcon,
+  SignedIcon,
+  PlusIcon,
+  NewMessageIcon,
 } from './icons.js';
 export { SavedStrip, type SavedStripProps, type SavedStripPlace } from './SavedStrip.js';
 export {

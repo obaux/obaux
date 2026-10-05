@@ -4188,6 +4188,1916 @@ prove nothing about the gap itself). Report — the one 48px control living
 inside a message row — is re-checked at its own floor in the same test;
 row spacing does not change a control's own size.
 
+
+### D-208 — Storybook is where the front end is shaped; the code is still what ships
+Will, 1 October: "install storybook so front end components are transferred
+there, and get updated in real time … I'll also create journeys (screen views)
+there, and a full app shell … merge the journeys/app shell to production
+straight from storybook." Built on `claude/pam-storybook`, hosted on
+Chromatic (Will's choice over a second Vercel project).
+
+Two things it is not, said before building so nobody plans around them:
+
+- **Nothing merges from Storybook to production.** Stories render the real
+  components and the real screens (`src/app/**/page.tsx`, imported directly).
+  When a journey looks right in Storybook, what ships is the branch that made
+  it look right — merged the way every branch is. Controls in Storybook's own
+  panel change a preview, never the code.
+- **"Real time" is a push away, not a keystroke away.** Storybook runs in this
+  session's sandbox, which Will's browser cannot reach; Chromatic rebuilds it on
+  every push to any branch touching `pam/**` (`.github/workflows/pam-storybook.yml`)
+  and links each build. The workflow skips itself until `CHROMATIC_PROJECT_TOKEN`
+  is set.
+
+How it is built, and why each part is the way it is:
+
+- **`@storybook/nextjs`, with StyleX run as a Babel pre-step.** The framework
+  only uses Babel for a file named exactly `.babelrc` or `babel.config.js`;
+  this app's is `.babelrc.js`, so it compiled with SWC and every story died on
+  "`stylex.keyframes` must be compiled by `@stylexjs/babel-plugin`". Renaming
+  the app's config would change the production build; instead `main.ts` runs
+  the StyleX plugin alone, with the app's own options read from `.babelrc.js`,
+  ahead of SWC. Proven by measuring a rendered `BigButton`: 64px, PAM green,
+  Figtree, 18px — the unthemed-build failure (D-008) is the one this setup
+  most had to rule out.
+- **The same providers as the app** (`Theme`, motion, i18n, alert banner),
+  with English/Spanish and light/dark switches in the toolbar and phone
+  viewports by default (320, 375, 393).
+- **Journeys are real screens against a pretend database.** A loader seeds a
+  signed-in session for the chosen role and answers every Supabase request
+  from `src/stories/journeys/fixtures.ts` — the same people, places and
+  conversation `scripts/journeys.mjs` photographs, so the contact sheet and
+  Storybook show one product. A request with no fixture gets an empty answer
+  and a console note, **never the network**: the app's client points at the
+  live project by default, and a design tool must not read or write it.
+  19 screens × the roles that reach them: 43 journey stories at first count,
+  every one render-checked in a browser with no page errors.
+
+### D-209 — The member dock (`TabBar`) exists, in Storybook, not yet in the app
+The five-tab shell has been "the first UI task of Phase 1" since September
+(STATUS). Built now, from what D-029 and D-039 already settled: §3.1's five
+tabs (Home, Places, People, My Plan, Me — the `tab.*` keys and icons already
+existed) and Help in **one** fixed dock, on Astryx's `TabList`
+(`layout="fill"`, link tabs, so it works with no JavaScript), composing
+`HelpBar` rather than copying it. Icons 22px, each above its label. At 320px
+every tab measures 49×56 and Help 64×48 — it took tightening Help's own
+padding to get there; the first cut had tabs 42px wide.
+
+It is a subpath export (`@pam/ui/TabBar`), not mounted on any route: shaped
+in Storybook first (`Shell/TabBar`, and `Shell/Member app`, which puts real
+screens inside it). Three questions it makes visible, for Will:
+
+1. **Where People and My Plan lead.** People defaults to `/messages/` (a
+   member's people are their case manager and programs); My Plan to `/plan/`,
+   which does not exist — §3.1's plan has never been built.
+2. **Screens draw their own Help too.** With the dock, the block `HelpBar` on
+   Home and elsewhere doubles up; it comes off once the dock is mounted.
+3. **Staff roles.** §3.1's tabs are the member app. Case managers and program
+   admins have no dock design yet.
+
+
+### D-210 — The redesign: a white page, shadowed cards, five tabs at the bottom, Profile first
+Will, 1 October, with three screenshots of a reference app's Profile: "We want
+a bottom nav, instead of keeping things in top nav. I like the style, sizing,
+and spacing, and simplicity of these components." Explore is the new home,
+Saved replaces the reference's Wishlists, Trips is an empty page for visits
+somebody plans, Messages and Profile move onto the bar. "Page is white, cards
+have a realistic shadow (universal design rule)." "The top header is clear
+(larger on top of page, then shrinks)." "Notifications are visible." Built in
+Storybook (`Redesign/*`, `Shell/*`), not mounted in the app yet.
+
+**Universal, so in the theme.** `--color-background-body` is white in light
+mode (was `#f1f1f1`), and every `default` card gets 24px corners, no border
+and a diffuse two-layer shadow — set once in `pam.theme.ts`, not card by card.
+Dark mode keeps its colours; there the card's inset edge carries it, because
+a shadow cannot. `muted` and `transparent` cards stay flat. The Playwright
+suite (507, every screen, both themes, axe contrast) passed unchanged on the
+white page — text on white only gains contrast.
+
+**The bar supersedes D-209's tabs and moves Help** (D-029/D-039 put Help in
+the bottom dock). §0 still holds — a visible way to help on every screen —
+by a different route: every redesigned screen's header carries Help beside
+the bell (`LargeTitleHeader`), and Profile lists "Get help". The bar's five
+tabs are links (no JavaScript needed), 26px icons above their labels, 62×64
+at 320px; Profile is drawn as the person's avatar, ringed in the brand when
+selected; Messages carries a dot when something is unread.
+
+**The bell goes round in the redesign.** Will made the filled bell the news on
+16 September. The reference draws a light round button with a dot; the
+redesign does the same (`NotificationBell appearance="round"`), and the dot
+plus the accessible name ("Notifications, 2 new") carry the news. Today's
+headers keep the filled bell until each screen is redesigned.
+
+**Profile, for PAM:** who you are (avatar, name, role) with three numbers —
+points, places saved, connections; two tiles — Past trips and Connections;
+one offer — text reminders, shown only to someone who has not said yes; then
+rows: Account settings, Get help, What others can see (the privacy page's
+`#who-can-see`), Privacy, Terms, Sign out. **Connections** is its own screen:
+exactly the people `can_message()` (0063) relates to the member — their case
+manager and the programs they are enrolled in — each row leading to Messages.
+Nobody appears there who could not also be messaged.
+
+**Views now, wiring later.** `ProfileView`, `ConnectionsView`, `TripsView`
+(`apps/web/src/screens/`) take what they show as props, so Storybook draws
+every state; the routes (`/profile/`, `/connections/`, `/trips/`) and the
+data come when the redesign is agreed — Will's plan is to finish the front in
+Storybook, then merge. Spanish calls Trips "Visitas": a literal "viajes" means
+travel, not a visit to a program.
+
+---
+
+### D-211 — The journeys are clickable: one Prototype story per person, running the real screens
+
+Will, 1 October: "I can't click and preview the paths inside journeys … we
+need to mirror the journey on Storybook, and make it usable." A journey was
+one screen, frozen; a tap tried to load a page the iframe does not have.
+
+**What was built.** `Prototype/*` (`apps/web/src/stories/prototype/`): one
+story per kind of account, each running the app's own page components — not
+copies — behind a small in-story router (`PrototypeApp`). A same-site link
+tap is caught before the iframe follows it and the matching screen is drawn;
+`router.push/replace/back` arrive through Storybook's Next.js navigation
+mock, wired to the same router; Next's own path and search-param contexts
+are set per screen, so `useSearchParams()` on the place screen reads the
+`?id=` the tap carried, exactly as in the app. Back pops a history stack.
+The pretend database is the journeys' (`mockSupabase.ts`); nothing reaches
+the live project. A path with no screen yet says so and offers Back — never
+a blank page.
+
+**Two route tables.** `TODAY_ROUTES` is every route the app has, as it is.
+`REDESIGN_ROUTES` is today's plus the redesign's: Explore as home, Trips,
+Profile, Connections, under the new bottom bar (D-210). So the redesign is
+walked end to end beside what ships, and a redesigned screen joins by
+changing one line of the table.
+
+**One change to the app, for this.** `NewMessagePicker` left a screen with
+`window.location.assign`, which no story can intercept. It now calls
+`navigate()` (`src/lib/navigate.ts`), which announces the move as a
+cancelable `pam:navigate` event first: in the app nobody cancels it and the
+page loads as before (messages and directory e2e, 90 pass); in the
+prototype it is cancelled and routed. New code that leaves a screen from
+script uses `navigate()` or `router.push`, never `location` directly.
+
+**Why not Storybook's own story-linking** (`addon-links`)? It jumps between
+stories, so every path needs a hand-written link, and a screen reached with
+a different `?id=` needs its own story. Running the real router contract
+means every link that works in the app works here, with no upkeep.
+
+---
+
+### D-212 — Explore, and a Home for staff: search first, category chips, every state drawn; no story ever 404s
+
+Will, 1 October, with an Airbnb Explore screenshot: "I'm still getting 404
+error, so I can't navigate on screens. Also let's do Explore (previously,
+home). Search bar is the most important … allowing clearing search and
+showing a dropdown of programs … address typing should show a dropdown with
+program name and matching address … create an empty state … use the chips
+for Place categories. … The case manager view features the list of members
+on their caseload (rename bottom nav explore to "home"). The program view
+features the list of members interested in program." Then: "Let's ignore
+size limits for this redesign."
+
+**The 404.** D-211 made `Prototype/*` clickable, but every other story —
+the 19 journeys, the redesign screens — still let a tap navigate the
+iframe to `/places/`, which Storybook answers with a 404. Two fixes, both
+needed: every journey now opens inside the prototype's router (`asRole`
+wraps it; the screen first, as the story draws it, then the route table),
+so a journey is walkable from wherever it starts; and `preview.tsx` cancels
+any same-site link nothing else handled, so a component story's link is
+inert rather than a 404. Redesign stories use `asRedesign`, which routes
+through the redesign and draws the new bottom bar on every screen it
+reaches.
+
+**Explore** (`screens/ExploreView` + `ExploreScreen`): the search bar first
+and largest, the chips under it, both pinned while the list scrolls.
+
+- **Search** is `SearchPill` (`@pam/ui`), an Astryx `Typeahead` in an
+  `InputGroup` drawn as a shadowed pill (theme: `input-group` `size:lg`).
+  Suggestions drop down from the first letter — name, and the address under
+  it, so a street finds a program and shows why. Picking one opens the place.
+  The list below follows the same words once they settle (`services_search`,
+  0066, as Places did — D-188). **Clear** is an × inside the bar whenever it
+  holds anything: Astryx's own appears only after a pick, and nothing is
+  ever kept picked here.
+- **Chips** (`CategoryChips`, `@pam/ui`): All and the three categories
+  (§2.5), each with a new line icon. 48px — the Places 40px exception
+  (D-104) is not carried over; these are now the screen's main filter.
+  They scroll sideways at 320px and in Spanish.
+- **States**: loading (skeletons); can't connect / something went wrong
+  (the existing notices' words, Try again, and the phone); nothing matches
+  "…" (Clear search); a category with nothing (Show all places). None is a
+  dead end. All are stories (`Redesign/Explore`).
+- **What Places did that Explore keeps**: the area chip and picker (D-054,
+  D-100), saving (D-102), placeholder hours (D-122). The super admin's
+  Reported chip (D-189) stays on `/places/` for now.
+
+**Home for staff** (`screens/PeopleHomeView`, `HomeScreen`): the same bar
+over the person's own people — a case manager's caseload (real rows, else
+the example set, as `/admin/`), a program's interested members (the example
+set, as `/interested/`, until something writes "interested"). The search
+filters the list as you type and drops down matching names; nothing is
+sent anywhere. The bottom bar's first tab reads **Home**, drawn as a house
+(`TabBar isHome`). Real caseload rows do not link to `/person/` — it only
+resolves example people (same rule as `/admin/`).
+
+**`HomeScreen` picks by role**: member → Explore, case manager → caseload,
+program → interested; a super admin previewing a role gets that role's; on
+their own account, Explore.
+
+**Size limits.** Will lifted them for the redesign. The Typeahead and its
+dropdown add weight; nothing here is mounted in the app yet (the budget
+check still passes, 93.2 kB to spare), and the touch-target floor (48px) is
+kept — that one is about hands, not bytes.
+
+---
+
+### D-213 — Two screen templates; every tab and nested screen on them; Profile, Get help, Legal, Messages, Saved, Trips and Connections rebuilt to Will's references
+
+Will, 1 October, across a run of Airbnb references: one template for every
+screen you tap into ("the top (back button, and header) should be a template
+we re-use for nested pages, only the content would change"), the large
+shrinking title for the tab screens ("the template for Saved, Messages,
+Profile"), and each screen reworked against its own reference.
+
+**The two templates.**
+
+- *Tab screens* — `LargeTitleHeader` (D-210): the title large, shrinking into
+  the bar on scroll; the bar holds the screen's actions (bell, Help, search,
+  Edit). Profile, Messages, Saved. Explore and Trips are their own shape
+  (search-first; map-first) but keep Help in reach.
+- *Nested screens* — `SubPage` / `SubPageHeader` (@pam/ui, new): a round back
+  button (a real link, named for where it goes), then the title large beneath
+  it; a `compact` form puts the title in the bar beside back (a conversation,
+  where the screen belongs to the messages — D-193 still holds). Applied to:
+  Legal, Language, Get help and its pages, What others can see and its two
+  pages, Connections and a connection's profile, Notifications, a place, the
+  terms and privacy policy, and a conversation and its ⋯ page. Nested screens
+  hide the bottom bar, as in the references; a super admin's role switch,
+  which rode in the old app header, sits in the template's action slot.
+
+**Profile.** The Account screen is gone from the redesign: its name/role card
+duplicated Profile's summary. Language becomes a Profile row (showing the
+current language) opening its own screen; Text reminders is a row once they
+are on (the offer card covers "off"); Terms, Privacy and "What others can
+see" collapse into one **Legal** row. `/account/` still exists in the app
+until the redesign is routed; `useChooseLanguage` (lib) now holds the save
+logic both use.
+
+**Get help** is a list of kinds of help (Will: "there are different types of
+help"): Call PAM is the first row and itself a `tel:` link with the hours;
+then What we can help with, a safety issue (911 first, then how to report a
+message, then a person to talk to), and reporting a wrong place. All static —
+the screen still works with no JavaScript (the e2e that proves it now follows
+the template's back link).
+
+**What others can see** (from Legal): the transparency list exactly as
+`TRANSPARENCY_SCREEN` words it (never re-worded), then "Your data": request a
+copy, delete my account. Neither is self-serve in PAM — the privacy policy
+already says "ask us" — so each opens a page that says so and puts the call
+one tap away, rather than a button that pretends.
+
+**Messages.** On the tab frame; search (top right) swaps the title for a
+field and Cancel, filtering by name or words; an empty state for nobody yet
+and for nothing found. Rows are the plain style Will picked: avatar, name,
+one quiet line (who they are to you; for staff, the last message), a subtle
+time; unread is the name in bold and said aloud. **A conversation** loses the
+warning button under each message: a ⋯ at the top right opens Options —
+Report suspicious activity (the same four reasons, the same
+`report_message()`, now for the other person's latest message) and View
+program details.
+
+**Saved**: two to a row, a square placeholder picture (the category) with the
+name under it; Edit / Done at the top right puts a × on each to unsave.
+
+**Trips**: a map with a pin per visit and a drawer over it (`MapDrawer`,
+@pam/ui): it opens halfway, drags or taps up to 90% (the search bar stays on
+top) and down to a dock so the map has the screen. Cards: square picture,
+place, day and time, who you are meeting. Search narrows pins and cards by
+place name. *Not Astryx's BottomSheet*: it is a dialog that covers the tab
+bar and always opens at its tallest stop; `MapDrawer` is built from Astryx
+primitives with a handle that is also a button. *The map* is Google Maps when
+`NEXT_PUBLIC_GOOGLE_MAPS_KEY` is set (unverified here — the sandbox cannot
+reach Google), and otherwise a drawn preview with the same pins, labelled
+"Map preview". Trips are the example set until something creates them.
+
+**Connections**: cards — photo, name, program, how they help, three facts
+(years helping, people helped, languages) — opening a profile with one
+action, Message. Photos are Unsplash placeholders, hotlinked, staff only, never
+members (`@pam/config/dummy-connections`); initials wherever they do not load.
+
+**Explore** (D-212 follow-ups): the chips start in line with the search bar
+and stop at the content edge; the list heading reads "All programs" while the
+chip says "All"; error states offer Try again only (Help is in the header).
+**Cards**: text cards get 24px inside (`padding={6}`) — place, connection,
+profile summary, the reminders offer — and the place card's type drops a
+step (name 18px, details 15px). That is below §2.5's 18px body floor for the
+card's secondary text, at Will's ask; the name and every screen's body copy
+stay at 18px.
+
+**Tests changed, on purpose**: three in `messages.spec.ts` (Report is on the
+⋯ page; the ⋯ button clears 48px; reporting goes ⋯ → Report → reason →
+thanks) and one in `a11y.spec.ts` (Get help's way back is "Back to Home";
+the safety page is a plain link).
+
+---
+
+### D-214 — The bottom bar's labels step back
+
+Will, 2 October: "make the text smaller and lower emphasis, and add a bit more
+gap between." Tab labels are 12px (were 13px) at regular weight in the
+secondary grey; the tab you are on keeps the primary colour at 600, so where
+you are still reads at a glance. The gap between icon and label doubles to
+8px. The icons carry the bar; the word confirms it. Contrast stays well above
+AA (grey on white ≈ 9:1), and each tab is still 64px tall and at least 62px
+wide at 320px. Below §2.5's 18px body floor, as the 13px labels already were:
+a label under an icon is not body text.
+
+---
+
+### D-215 — The current tab is red, and the underline goes
+
+Will, 2 October: "have the selected variant be red, like the mockup images."
+The tab you are on draws its icon and label in red at 600 weight, and the
+Profile avatar's ring follows; the brand-green underline Astryx draws under a
+selected tab is removed (`tab-indicator` → transparent in the theme), since
+the mockups mark it by colour alone.
+
+**Not the mockups' exact red.** #FF385C is 3.5:1 on white and fails WCAG AA
+for 12px text; #E31C5F, the same red a step deeper, is 4.6:1. Dark mode uses
+#FF6B86 (6.3:1 on the dark page). Written as `light-dark()` values in
+`TabBar.tsx`: PAM's theme has no red brand token, and an error token would
+mean the wrong thing.
+
+**Red is not an error here.** It is used only for "you are here" in the bar;
+the unread dot on Messages stays the error dot it was.
+
+---
+
+### D-216 — One search bar, quiet header buttons, help pages brought up to date
+
+Will, 2 October. Four small changes to the redesign, recorded together:
+
+- **One search bar.** Trips and Messages now use the same pill as Explore
+  (`SearchField` beside `SearchPill` in `@pam/ui`): white, rounded, the large
+  shadow, the field drawing nothing of its own. Trips' bar had been
+  transparent over the map because the component's own rule beat the theme
+  override; the white ground is set with `xstyle` on the group.
+- **Round header buttons are white with a grey border**, not the brand's pale
+  green wash: the bell, Help, Messages' search and Saved's Edit. They are the
+  "way on" controls, not actions, and the green read as a second primary.
+- **Your safety describes how reporting works now**: the ⋯ in a conversation,
+  then "Report suspicious activity" (D-213). The per-message report icons it
+  described are gone. "What we can help with" and Your safety both end on the
+  Call PAM *row* from Get help, not a big button, so Help has one shape for
+  calling.
+- **"Find the place" opens Explore**, not the old Places list. In the
+  prototype's redesigned routes `/places/` now shows Explore too, so the
+  older links (a place that no longer exists, the flag page) land on the new
+  design.
+
+---
+
+### D-217 — Storybook shows only the redesign, one folder per role; the last old screens move onto the templates
+
+Will, 2 October: "Storybook still has outdated designs in Member app. Let's
+ensure only new design is used … redesign anything accordingly … Create
+other folders, for Super admin, Case manager, and Program Lead."
+
+**Storybook's tree.** `Member app`, `Case manager`, `Program lead`, `Super
+admin`, each with `Prototype` (the clickable app, signed in as that role),
+`Screens` (every screen that role reaches, one story each, in tab order and
+then the screens you tap into) and `States` (the per-screen variants that
+were under `Redesign/*`); then `Components` (TabBar moved there from
+`Shell`). Deleted: the 19 `Journeys/*` files, `Shell/Member app`,
+`Prototype/Today — *`. Every story opens in the redesign's router
+(`asRole` no longer has a "today" mode), so no tap from any story lands on
+an old screen. A `screen(role, name, path, query)` helper builds a story
+from the prototype's route table, so a screen story cannot drift from what
+the prototype draws.
+
+**The screens that were still on the old frame** (logo bar + small back
+chevron, or a Help bar at the foot) move to the nested template **in the
+app**, as Notifications and a place did at D-213: Report a place (back to
+the place), Points (back to Profile), a member's page (laid out like a
+connection's profile; Message is its one BigButton), Everyone (the filter,
+which rode in the old header, is a full-width selector on the page),
+Staff requests, Interested, `/admin/` (now titled **Invite someone**, back
+to Profile), Text reminders (back to Profile), Sign in's code step (back to
+the number; the language switch in the bar), and Sign up's step header (the
+template's large title; still no Back — the way out of an unfinished flow
+is the steps). A super admin's role switch rides in the template's action
+slot wherever the old header carried it.
+
+**Help on a nested screen is the round button in the bar** (`HelpButton`,
+shared with `HeaderActions`), replacing `HelpBar` on the screens touched
+here. §0's "a visible way to get help on every screen" holds — it is one
+tap, top right, the same place as on every tab.
+
+**Profile knows who is looking** (`ProfileScreen`). Points, Past trips and
+Connections are a member's; a staff Profile shows the person, their tools
+and the settings. The tools that lived on the old home's tiles are rows:
+a case manager's *Invite someone*; a super admin's *Everyone*, *Staff
+requests* and *See the app as* — D-108's preview as a page of its own
+(`/view-as/`, a real route) shaped like Language, kept on the super admin's
+own Profile while a preview is on so it can always be undone.
+
+**Not changed:** a super admin's Home stays Explore (D-212). The tab
+screens are still Storybook-only; routing them in the app is its own step.
+
+---
+
+### D-218 — Each staff role gets its own app: bars, Homes, Invite someone, starred people, a schedule, a Program tab, All programs
+
+Will, 2 October, in two messages: staff should not carry a member's tabs,
+"Invite someone" should float on Home, case managers star people, a program
+lead's Home is a schedule and their second tab is their program, and both
+staff roles need a way to see every program and add one.
+
+**Bottom bars, by role** (`lib/tabs.ts`, `TabBar`'s new `tabs` prop):
+member — Explore, Saved, Trips, Messages, Profile; case manager — Home,
+Saved, Messages, Profile (no Trips: they do not plan visits); program lead —
+Home, Program, Messages, Profile (no Saved, no Trips). A super admin has the
+member's bar on their own account and the previewed role's bar while
+previewing.
+
+**Invite someone** floats above the bar on both staff Homes — the same row
+Profile drew (icon, words, chevron) on a lifted card (`FloatingAction`),
+moved off Profile. It opens a new, simple screen (`/invite/`): two rows,
+Invite a member and Invite a program, which make the code at once and show
+it with its expiry and Copy. The member and program-lead lists `/admin/` drew
+under its buttons are gone (Home is the list); in the prototype `/admin/`
+opens the new screen, while the app's own `/admin/` page stays until the tab
+screens are routed. **A program lead cannot make codes**: `create_invite`
+(0049) refuses anyone but a case manager or super admin, and whether a
+program may bring people in is Will's call, not a side effect of a button —
+so for them the rows say PAM sends invites for now, with PAM one tap away.
+
+**Case managers star people** — a star on each caseload row (lifted above
+the row's link) and on a member's page; Saved gets a People | Programs
+switch, people first. **Stored in the browser session only** (seeded with
+two example people): a starred list is new information about members, so a
+table for it is a schema change and arguably a `transparency.ts` line, for
+Will to decide.
+
+**A program lead's Home is a schedule** (`ScheduleView`): Day (today, in
+time order — time and length, name, kind of visit), Week (Monday first,
+each day with its count, empty days said), Month (Astryx's Calendar to pick
+a day — it has no way to mark booked days, so the booked days are listed
+under it with counts). The search bar finds people *or* times — a name,
+weekday, date or time — across the whole schedule. Example appointments
+(`dummy-appointments.ts`), built relative to today, until something books.
+
+**Program tab** (`/program/`): the program's page as members see it
+(`PlaceDetail`) minus a member's save/share/report, and top right only Edit
+— Will: "only edit" — which turns the details into fields and becomes Save,
+with Cancel under the form. Help is not in its bar, by that instruction;
+it is a tab away in Profile. Example program, edits kept for the visit; the
+rules already let a program lead write their org's listing
+(`services_write_provider`, 0007), so saving for real is a follow-up, not a
+migration.
+
+**All programs and Add a program — Will was unsure where; placed as a
+secondary path.** Profile has an "All programs" row for case managers and
+program leads, opening the Explore catalogue as a nested screen (round back
+to Profile; `ExploreScreen mode="programs"`). Its top right is a + for **Add
+a program** (`/programs/new/`), the same fields as sign-up's program step,
+"Send to PAM". Front end only for now; `services_write_admin` /
+`services_write_provider` (0007) already allow the insert, so wiring it as a
+`needs_review` row is a follow-up. A case manager's Saved › Programs empty
+state points to All programs too.
+
+**Sign out** in Profile now lines up with the other rows: Astryx draws an
+action row as a 48px button that stacked its label at the top; one rule in
+`globals.css` centres it.
+
+---
+
+### D-219 — Program leads may invite; starred people stay a demo; the month is a full-width grid
+
+Will, 2 October, answering D-218's two questions and looking at the schedule.
+
+**Program leads can create invite codes** ("Yes, let's make sure this is
+allowed and documented"). Migration **0070** rewrites `create_invite` only:
+a program lead may invite a member or another program, into their own
+region; never a case manager or super admin; never another region. A member a
+program invites lands on **no caseload** (`assigned_admin_id` null), as one
+the super admin invites does — writing the program's id there would make it
+that member's case manager in every caseload policy, a widening of
+`transparency.ts` nobody asked for. Every invite is still audited, now with
+the inviter's role. No table, policy or grant changed; a program still reads
+no `invites` rows. Proven by `test/08_program_invites_test.sql` (the full
+suite passes). **Applied to the live project 2 October**, after
+`list_migrations` showed no drift beyond the held-back 0068/0069 — which
+touch `redeem_invite` and blocking, not `create_invite`, so 0070 is
+independent of them and they stay held for Will. Invite someone now makes
+real codes for program leads; the "PAM sends these for now" note is gone.
+
+Noted, not changed: a program lead a program invites skips the super admin's
+staff review (0054), exactly as one a case manager invites already does.
+
+**Starred people are not stored** ("no need to store yet, it's just a
+demo"): the session-only store from D-218 stays, and nothing about who a
+case manager stars is written anywhere.
+
+**The month view** (Will: "takes up more space… header match the weekly /
+daily header… the day selector is wonky"): Astryx's Calendar is replaced by
+a seven-column grid across the full width, Monday first, under the same
+round-arrow header row as Day and Week. Each day is one Astryx Button — the
+number, and under it how many are coming in; the day being looked at is
+filled, today has a ring, and the two never overlap (the stock calendar drew
+a today pill and a selected disc on top of each other). Tapping a day opens
+it in Day.
+
+---
+
+### D-220 — Messages: previews end in "…", and New message takes Help's place
+
+Will, 2 October. **A long preview ran off the screen**: the row's line
+already asked for an ellipsis, but the row's middle (Astryx's link or button
+holding the label) is a flex item that could grow past the row, so the line
+never met an edge. `globals.css` lets every list row's middle shrink
+(`.astryx-item > a, > button { min-width: 0 }`), and the line is a block —
+fixes it on every list, not only Messages.
+
+**New message** is a dark green round button at the end of the Messages bar
+(the brand's primary fill; a speech bubble with a plus, `NewMessageIcon`),
+**in Help's place** — Will's instruction ("instead of question mark icon").
+It opens the same "Who do you want to message?" sheet the old screen had
+(D-186): real people this person may message, the example cast when there
+are none. Not shown to a super admin (D-171). Help on Messages is one tab
+away (Profile → Get help), the same trade D-218 made on Program.
+
+---
+
+### D-221 — A program lead's Home bar: search, bell, +
+
+Will, 2 October. The always-open search bar and Help gave way to three round
+buttons beside the large "Coming in" title (the tab template): **search**
+opens a field across the top with Cancel, as on Messages (the matches list
+under it; Cancel returns to the schedule); the **bell**; and a dark green
+**+** that opens a small menu — **Invite someone** and **Add a program**
+(`AddMenu`). Invite someone no longer floats on a program lead's Home; it
+lives in the +. (A case manager's Home keeps the floating row — Will asked
+this for the program Home.) Help is a tab away, as on Messages (D-220).
+
+### D-222 — Explore's search bar steps aside while scrolling down
+
+Will, 2 October. Scrolling down Explore, the search bar and its round
+buttons slide up out of view and only the category chips stay pinned;
+scrolling up brings them straight back (`useHideOnScroll`). Done by moving
+where the sticky block sticks (its `top` goes negative by the search row's
+measured height), so nothing below it shifts. Never while a search is typed
+or the area picker is open, and not within the first 120px of the page.
+
+### D-223 — Your safety: one card, two rows, one line
+
+Will, 2 October: "more space and hierarchy… less reading." The page is now a
+card for the one thing that cannot wait (in danger → Call 911, the page's
+only big button), then "Other ways we help" as two rows — a message that
+feels unsafe (a one-line how-to; opens Messages) and someone to talk to
+(calls PAM, with a one-line reassurance) — then one sentence on what a
+report shares. Every line was shortened; nothing the page promised was
+dropped.
+
+---
+
+### D-224 — A place: Save and ⋯ in the bar, four round actions under the name; Saved is Edit alone
+
+Will, 2 October. **A place** (member view): the bar's right side is Save
+(bookmark) and a ⋯ menu — Flag something, Share, Message the program, each
+with its icon — in place of Help. Under the name, a row of round buttons
+with a word under each: Website, Message, Call, Open in Google (`PlaceDetail`
+`quickActions`). "Check hours on Google" sits at the foot of the hours card.
+The long column of action rows under the place is gone (it stays only where
+no quick actions are given). Message goes to the program lead's
+conversation — the example one while messaging runs on example people, else
+Messages. The Program tab shows the same round actions (no Message to
+itself). **A member's Saved** has Edit alone at the top — no bell, no Help.
+
+### D-225 — Trips: the map and a + ; New trip is three steps
+
+Will, 2 October. Trips drops its search bar, bell and Help: only a dark green
+**+** sits over the map, top right. It opens **New trip** (`/trips/new/`),
+three steps on the nested template — Where (a program, one tap), When (a day
+from the next two weeks of weekdays and a time, as big buttons; Next),
+Check (the place and time, each with Change; an optional note; Add this
+trip) — then "Trip added" and back to the map. **Example only**: nothing
+books with a program yet; the trip is kept for the visit (`addedTrips`) so
+it shows on the map and in the drawer, and the screen says so. The drawn map
+shows one pin per place (its soonest visit), so two trips to one place no
+longer draw one label over another.
+
+---
+
+### D-226 — A case manager's Invite someone is a plain strip on the bar, and a Profile row again
+
+Will, 2 October. The floating card becomes a plain strip resting on the
+bottom bar — no shadow, no rounded card, the bar's own hairline above it —
+with its icon and words exactly where they were, which puts the icon over
+the Home icon below it. Invite someone is back in a case manager's Profile
+too, as a second way in (above All programs).
+
+---
+
+### D-227 — A case manager's Home card: name, one small line, a message button; the member's page has the star and their trips
+
+Will, 2 October.
+
+**Home card** (`PersonRow isCompact`): the avatar, the name, and directly
+under it one small line — points (a status chip and their program if any).
+When they last used PAM, or that they have not yet, moved to the member's
+page. The star is gone from the card; in its place a **message** button, a
+shortcut straight into the conversation (the example one for an example
+person; `openConversation` for a real member). Anywhere else on the card
+opens the member's page — real caseload members included now.
+
+**The member's page, as a case manager sees it**: a profile card (face;
+role · city · language; points; last used PAM; status and program) with the
+**star at its top right**; Message; **Trips** — coming up, then already
+went (example trips per member, `dummyTripsFor`, until PAM books visits);
+and, for example people, the places they saved.
+
+**Privacy line kept**: a real member's page is built only from the case
+manager's own caseload list (`useCaseload`) — name, status, points, last
+active, program — exactly what that list already shows (§4.1,
+`transparency.ts`). Nothing new is fetched about them; their trips on the
+page are labelled as examples, and their saved places are not shown.
+
+### D-228 — One search pill in the new-message sheet; quieter quick-action labels; saved tiles keep their shadow
+
+Three small fixes from Will's screenshots (3 October).
+
+**New message** (D-186's sheet) used a plain bordered `TextInput`, so it
+looked different from every other search in the app. It now uses
+`SearchField`, the same large pill as Home, Messages and Trips (D-212, D-216),
+inset from the sheet's edges as it is on Home. It still filters the list in
+place; there is nothing to suggest, so it is not the typeahead.
+
+**Quick-action labels** on a place (Website, Message, Call, Open in Google,
+D-224) drop from 14px to 12px. They name the button above them, and that
+button is already labelled for screen readers, so the text under it can be
+small. The 18px body floor (§2.5) applies to reading text, not to these
+labels; each tap target is still the 48px round button.
+
+**Saved tiles**: Astryx's `ClickableCard` clips what is inside it, so the
+picture's shadow stopped dead where the name began. The link now sets
+`overflow: visible`. Nothing inside a tile needs clipping: the picture's
+rounded corners come from its own card.
+
+### D-229 — The new-message sheet: a title, who each person is, avatars under the search icon; category chips in colour
+
+From Will's screenshots (3 October).
+
+**New message sheet.** It has a left-aligned "New message" title at the
+Trips drawer's title size (26px, smaller than a screen's large title), and
+the sheet now uses the same name for screen readers. The grab handle is
+drawn like the Trips drawer's: 40 by 5 in the border colour, set in
+`globals.css` on the BottomSheet handle. The pill has a softer shadow
+(`SearchField isSubtle`), because the full lift read as a second layer
+inside a sheet. The rows sit 20px in, so each avatar lines up under the
+pill's search icon (both at 33px, measured).
+
+**Who each person is.** Every name has a line under it: *Member*, *Case
+manager*, or *Program · <program name>* (`pickerContextFor`). Who appears
+follows `messageable_people()`, so each role meets only the labels that
+apply. A case manager and a program see members; a member sees their case
+manager and programs (Will: "For programs, only members. For members, only
+programs and case managers."). The rows in the Messages list keep D-187's
+rule (context only for a member viewer).
+
+**Category chips.** Each chip's icon takes its category's badge colour
+(`CATEGORY_DEFINITIONS[…].colorToken`, through the theme's `--color-icon-*`
+tokens), so the chips stand out a little. The words stay in text colour,
+and All has no colour.
+
+### D-230 — Trips drawer: a smaller handle and a fade under the header; trip cards on one line; Notifications easier to scan
+
+From Will's screenshots (3 October).
+
+**Trips drawer (`MapDrawer`).** The handle now lies over the top of the
+header instead of taking its own band. The tap target is still the 48px
+floor (§2.5) but no longer pushes the title down. The title under it is not
+interactive, so a tap there steps the drawer too. A 20px fade at the top of
+the scrolling list (sticky, no height, no taps) lets cards dissolve under
+the header instead of being cut by a hard edge.
+
+**Trip card.** The place name is 17px on one line, ending in "…" (the full
+name is in the card's label for screen readers). The picture's corner is
+14px: 10 less than the card's 24px, so the curves sit parallel.
+
+**Notifications.** The list is split into New and Earlier. Each row has a
+round icon for its kind (flag, shield, message, people, star, bookmark), a
+short bold title (`notify.kind.*`: "Place reported", "Message reported"…),
+the existing sentence in grey under it (two lines at most), and the time on
+the right. A new row also has a dot. The title is set to 17px semibold by
+a rule scoped to `data-pam-list="notifications"` in `globals.css`, because
+Astryx draws a row label at 14px. An unknown kind falls back to the bell
+and its sentence alone. The sentences are unchanged, so tests and
+translations that quote them still hold.
+
+### D-231 — A member's page, as a case manager sees it: the profile card, two actions as rows, only the bell
+
+From Will's references (3 October), for `/person/`.
+
+**The card is the member profile's card** (`ProfileSummary`): a large face,
+the name, "Member · Philadelphia", and three facts down the side: Points,
+Trips coming up, Last used PAM. The case manager's star sits in its
+top-right corner (`ProfileSummary` gained a `corner` slot, and the facts
+move down to clear it). The page title is "Profile", because the name is
+now on the card. Status and program badges stay, in a row under the card,
+when there are any.
+
+**Two actions, as rows like Profile's (`MenuList`)**, replacing the one big
+button:
+- **Message {name}.** It carries a count of the messages from them since the
+  case manager last wrote (`MenuItem.badge`, an Astryx Badge, which is for
+  counts) and opens their thread. An example thread knows its count
+  (`DummyConversation.unreadCount`). A real one knows only that something
+  is waiting, because `useConversations` reads just the latest message, so
+  it says "New" rather than invent a number. A true count needs a per-thread
+  count query; that is a follow-up.
+- **Connect {name} to…** (case managers only) opens `/person/connect/`: the
+  programs as rows. Picking one says "{name} is connected to {program}" and
+  that they will see it on their Home. It is an example only, like Add a
+  program (D-218): nothing is stored or sent. When referrals are built it
+  becomes one, and the member still says yes themselves; a case manager
+  never enrols anybody. A real member's name there comes only from the
+  caseload list (§4.1).
+
+**Header: the bell only.** No Help on this page (Will). Every screen still
+has a way back and a way to help: the back arrow, and Help on the tabs it
+returns to.
+
+### D-232 — Every sheet has the Trips drawer's 28px top corners
+
+Will, 3 October, on the New message sheet. The corners are set once in
+`globals.css` on `.astryx-bottom-sheet`, next to the handle rule from
+D-229, so every BottomSheet in PAM matches `MapDrawer`. Astryx's own radius
+was tighter, and the two drawers looked like different things.
+
+### D-233 — The case manager's People / Programs switch sits on the title's line, as a pill
+
+Will, 3 October, on Saved. The switch now sits at the end of the "Saved"
+line, only as wide as its two words, 16px clear of the title
+(`LargeTitleHeader` gained `titleAccessory`). It no longer fills a full-width
+row under the title. Every segmented control is now a pill inside and out:
+the frame, both segments and the sliding highlight. That is set once in
+`globals.css`, because Astryx has no radius prop for a segment, so the
+program lead's Day / Week / Month switch matches too.
+
+### D-234 — A member's page: Connect first, coming-up trips with a row to the past ones; Connect has search and asks before recommending
+
+From Will, 3 October.
+
+- **Order.** "Connect {name} to…" sits above "Message {name}".
+- **Trips.** One heading, "Coming up trips", then the upcoming cards, then a
+  "Places already went" row (with a count) that opens `/person/past/`
+  (`PastTripsView`). The past visits are no longer on the profile itself.
+- **Message {name} opens the thread in Storybook.** It was falling back to
+  the Messages list, because `open_direct_conversation` had no fixture. The
+  mock now answers it with the example conversation.
+- **Connect to…** has the Explore search pill on top, over every program
+  (`usePlaces` / `services_search`, falling back to the example programs if
+  the database cannot be reached). Each row has a round check. Tapping it
+  opens a dialog, "Recommend {program} to {name}?", with 32px corners and the
+  page washed to 80% white (`data-pam-dialog="recommend"` in `globals.css`).
+  Confirming shows "{program} is recommended to {name}". It is an example
+  only: nothing is stored or sent, and the member still says yes themselves.
+- `usePersonName` gives Connect and Already went a member's name from the
+  example cast or the caseload list only (§4.1).
+
+### D-235 — A place's primary action for a member is Schedule a visit; Plan a trip steps back one at a time
+
+From Will, 3 October.
+
+- **Place page (member).** The fourth round button is **Directions** and
+  routes there (the Google listing stays in the hours card). The one big
+  button is **Schedule a visit** (`PlaceDetail primaryAction`). It opens
+  `/trips/new/` with the place in the link, starting at When. Staff keep
+  "How to get there".
+- **Plan a trip** (was "Where are you going?"). A round search button
+  replaces Help on step 1 and opens a search field over the list. The rows
+  have subtle dividers (`MenuList hasDividers`), and a fourth row, "View all
+  places to visit", opens Explore. Step 2 has no Help.
+- **Day and time choices** are smaller white pills with a grey outline, at
+  the 48px floor. The chosen one is the green primary button. On step 2 the
+  place name uses the trip card's name style (17px bold).
+- **Back is a step.** Check → When → Plan a trip → Trips (`SubPageHeader
+  onBack`). That replaces the "Change" links, which are gone.
+- **Conversation Options.** "View program details" shows only when the other
+  side is a program. That is a member or a case manager talking to a program
+  lead; a program lead talking to a member has no program there.
+- The prototype route for `/trips/new/` now renders the page rather than the
+  view, so the link's query reaches it.
+
+### D-236 — Connect to… laid out like Explore; the schedule's count sits under its date
+
+From Will, 3 October.
+
+**Connect {name} to…** keeps the nested-page template, but search moves to
+a round button beside the bell. Tapping it replaces the top with the search
+pill and Cancel (by name or address), the same swap as a program's Home, so
+no bar takes the room otherwise. Under the title are Explore's category
+chips (All, School and training, …), in colour, then the place cards a member
+sees on Explore. Each card has a round check where Save would be
+(`PlaceCard action`). The chips row is sticky under the bar with a white
+fade beneath it, so the cards scroll under "Connect {name}". The check is
+exactly 48 by 48: the global touch floor had stretched a 40px circle into
+an oval. Checking still asks first (D-234).
+
+**The program lead's schedule.** "N coming in" sits under the date in the
+navigation row, at 14px, rather than above the list. That line keeps its
+height in Day, Week and Month (blank when there is no count), so the date
+and the arrows stay in the same place when the view changes (measured: the
+arrows sit at the same height in all three).
+
+### D-237 — Program leads browse "Programs in PAM", with no Save anywhere
+
+Will, 3 October. A program lead's Profile row reads **Programs in PAM**
+(`profile.menu.programsInPam`); case managers keep "All programs". A program
+lead has no Saved (D-218), so there is no Save on the place cards there
+(`ExploreScreen canSave`) and none in a place's top bar either.
+
+### D-238 — Programs in PAM: search is a round button that opens the pill
+
+Will, 3 October. On the staff programs screen (`ExploreScreen mode="programs"`)
+the top row is back, a round search button, + and Help; the full-width pill
+made it busy. Tapping search swaps the row for the pill and Cancel, the same
+pattern as a program's Home and Connect (D-221, D-236); Cancel clears the
+words and closes it. A member's Explore keeps its always-open bar.
+
+### D-239 — Primary and secondary buttons are the same: 56px, 17px
+
+Will, 3 October: primary and secondary buttons differed in height and text
+size (64px / 18px against 48px / 16-17px). He chose to meet in the middle:
+both 56px with 17px text. `BigButton` changed, and the full-width secondary
+buttons on the invite lists (Admin, Directory) are now `BigButton
+variant="secondary"`, so one component draws both. The tokens follow
+(`bigButtonHeight`, `--pam-big-button-height`, `A11Y.primaryButtonHeightPx`),
+and so does the a11y test. This amends §2.5 (SOP amendment A16; the CLAUDE.md
+rule updated). Small inline buttons, such as Copy beside an invite code, keep
+their own size.
+
+### D-240 — A success template: centred, no bar, confetti once, a quiet way on
+
+Will, 3 October, on Connect's done screen. `SuccessScreen` (`@pam/ui`) is a
+moment, not a page to work on. It has no back, no bell and no Help: the
+title and a sentence sit centred in the middle of the screen, then one
+secondary button sized to its words ("Return home", at the shared 56px
+height from D-239), then an optional quiet note. Confetti falls once from
+the top to the bottom, about 2.5 to 4 seconds, in the theme's bright data
+palette (`--color-data-*-3`), because the icon colours are deliberately
+dark. It is hidden from screen readers, never takes a tap, and stops for
+anyone who asked for reduced motion (the global rule). The words are a
+`status`, so the news is announced.
+
+Connect's copy: "You're helping {name} on their way!", then "{program} is
+recommended to {name}. They will see it on their Home and can say yes when
+they are ready." No Help on this screen is deliberate (Will): its only way
+on leads Home, where Help is.
+
+### D-241 — Adding a trip lands on Trips: drawer tall, confetti, the new trip arriving
+
+Will, 3 October. "Add this trip" no longer shows a "Trip added" page. It
+goes to `/trips/?added=<id>`: the drawer opens tall (`MapDrawer
+initialStop="full"`), confetti falls over the whole screen (`Confetti`,
+split out of `SuccessScreen`, D-240), and the new trip's card rises into
+place and scrolls into view. The old done step and its screen are removed.
+The Trips page reads the query, so it sits in a Suspense boundary.
+
+### D-242 — A program lead sees a member's visits with their program, and when they last used PAM — nothing else
+
+Will, 3 October, for privacy. On `/person/`, a program lead
+(`viewedRole === 'provider'`) sees:
+- **Stats:** Next visit (with them, day and time: "Oct 6, 9:00 AM"), Visits with you (past, with them), and
+  Last used PAM. No points and no trip totals.
+- **Visits with you:** that member's upcoming times with this program (day,
+  time, length, kind), from the program's schedule.
+- **Not shown:** coming-up trips to other programs, programs attended in the
+  past, and saved programs. Those stay the case manager's (§4.1). The
+  `/person/past/` and `/person/saved/` pages show nothing to a program lead
+  who reaches them by address.
+
+**The transparency promise changed first, as CLAUDE.md requires.** Will chose
+to let programs see the last day a member used PAM (asked: keep the promise,
+or change it). `transparency.ts`: `last_active_date` is now documented as
+true of a program the member joined; `cannotSee.programActivity` ("A program
+never sees the last day you used PAM") is removed; `canSee.lastActive` now
+reads "The last day you used PAM. A program you joined sees this too." (en
+and es). The members' screen says it plainly. **Members should be told
+before this reaches real people.**
+
+**The database is still stricter than the new promise.** `conversation_partners()`
+and `provider_linked_members()` do not return `last_active_at` to a program,
+and `04_transparency_contract_test.sql` part 3 still checks that (its
+comments updated). So today the line shows for example people only. Letting a
+program read it for real is a migration plus a test change, and it needs
+Will's go-ahead before it touches the live project.
+
+### D-243 — A member's saved programs get their own page; the past ones are "Programs attended in the past"
+
+Will, 3 October. A case manager's view of a member no longer lists saved
+places inline. A row, **Programs saved by {name}** (with a count), opens
+`/person/saved/` (`SavedByView`, place cards). The past-trips row and page
+are now **Programs attended in the past**. Both pages are the case
+manager's only (D-242).
+
+### D-244 — The schedule's Week and Month show their total; the month list is tighter and further from the calendar
+
+Will, 3 October. Under the date in the navigation row, Week and Month now
+show the total for that range, "N visits" (`schedule.total`), so a program
+lead can gauge how busy it will be, including "0 visits" for an empty week or
+month (Will). Day keeps "N coming in". The line keeps
+its height in every view (D-236). In Month, the calendar and "Days with
+people coming in" sit 32px apart (`gap={8}`), and that list's rows are 56px
+(compact density), 20% tighter than the ~72px person rows. That is on the
+4px grid and above the 48px floor.
+
+### D-245 — Home's tab icon says what Home is; a place's round buttons line up from the left
+
+Will, 3 October. The first tab is Home for staff (D-212); its icon now says
+what that Home holds. For a case manager it is **people** (their caseload;
+the icon "Invite someone" uses). For a program lead it is a **calendar**
+(their schedule). `TabBar homeIcon`, with the house as the fallback.
+
+A place's round quick actions sit in four even slots (`flexBasis: 25%`). With
+four (a member's Website, Message, Call, Directions) nothing changes. With
+fewer (a program's own page has Call and Open in Google) they line up from
+the left at the same spacing instead of spreading across the row. A
+program lead's Next visit stat now shows the time too ("Oct 6," then
+"9:00 AM", kept together with no-break spaces).
+
+### D-246 — A member's Messages floats "My connections" above the tab bar
+
+Will, 3 October. On a member's Messages, a strip rests on the tab bar,
+**My connections**, which opens `/connections/`. It is the same
+`FloatingAction` a case manager's Home uses for "Invite someone" (D-226),
+rendered outside the page for the same reason. Staff don't get it; their
+people are on Home.
+
+### D-247 — Plan a trip's search opens Explore; a place's main button says "Plan a trip"
+
+Will, 3 October. The round search button on Plan a trip's first step goes
+to Explore (`/`), where every place can be searched, rather than opening a
+second, smaller search over the example list (D-235's in-place search is
+removed). A member's main button on a place now reads **Plan a trip**
+(`place.schedule`), matching the flow it opens; it was "Schedule a visit".
+
+### D-248 — Each role's prototype starts at Sign in, and "Send me a code" goes straight Home
+
+Will, 3 October: "add the login screen to each prototype view per user
+type… pressing Sign in will continue to home pages, so it's easy to
+preview." Each role's Prototype folder (Member, Case manager, Program lead,
+Super admin) has a **Sign in** story first. It is the real sign-in screen,
+with a phone already filled in and a stand-in flow (`PrototypeSignIn`,
+route `/prototype/signin/`): pressing "Send me a code" navigates Home, where
+the story is already signed in as that role. To make that possible the
+screen moved into `app/signin/SignInScreen.tsx`, which takes an optional
+`preview` (flow, phone; it also skips the already-signed-in redirect).
+`page.tsx` renders it with none, because Next pages cannot take props, so the
+live sign-in is unchanged. The member's "Not signed in" story, the real
+two-step flow against the pretend database, stays.
+
+### D-249 — A role's prototype starts at Sign in and walks through that role's whole onboarding
+
+Will, 3 October: "Let's have the prototype start with Sign in, and instead of
+sign in as an item above prototype, we can have sign in show the full
+onboarding experience for that user type." Supersedes the separate Sign in
+story of D-248. Each role's **Prototype** story now opens on
+`/prototype/signin/?kind=…`; "Send me a code" carries on to
+`/prototype/join/?kind=…` (`PrototypeJoin`), the real join screen in a
+preview mode, and its last step goes Home as the story's role:
+
+- **Member:** code → About you → What others can see → Text messages → You are in → Home.
+- **Program lead:** code → About you → Your program (pre-filled with an
+  example) → What to expect → You are in → Home.
+- **Case manager:** code → About you → What you will see → You are in → Home.
+- **Super admin:** Sign in → Home. A super admin is never onboarded through
+  the app (the seeding script makes them), so there is nothing to show.
+
+The join screen moved into `app/join/JoinScreen.tsx` (Next pages cannot take
+props; `page.tsx` renders it with none, so the live join is unchanged). Its
+`preview` (`kind`, `firstName`, `phone`) swaps the phone flow for
+`usePreviewSignIn` (any code works, nothing sent), moves each step on as if
+the database had said yes, and treats staff as **approved, as if invited** —
+so they finish on "I understand" and reach Home, not on the
+waiting-for-review notice a self-claimed staff sign-up really sees. The
+review path is still in the real flow and its e2e; the prototype shows the
+happy path. Because the number was given on Sign in, onboarding opens on the
+code. The member's separate "Not signed in" story is gone; the prototype's
+first screen is that.
+
+Found on the way: Storybook's router mock never forwards `router.replace`/
+`back` to the prototype, so the preview's last step uses `navigate('/')`.
+
+### D-250 — A policy page opened from Sign in or joining goes Back there
+
+Will, 3 October: from the sign-in screen, the Privacy and Terms links show
+the right page, "but if they go back, it should return to sign in screen".
+Back on those pages always went to Legal — which somebody not yet signed in
+has never seen. Now the links on Sign in and on joining carry `?from=signin`
+/ `?from=join`; the page reads it (inside a `Suspense`, so the page stays
+static and renders the Legal back until hydrated), labels Back "Back to Sign
+in" / "Back to joining", and goes back one screen — to the screen as it was
+left, a typed number still there — through `goBack()` in `lib/navigate.ts`.
+`goBack` announces `pam:back` first, which the Storybook prototype answers
+(the router mock does not forward `back`), then uses `history.back()`, or
+the `from` screen if the page was opened directly. Hopping from Privacy to
+Terms keeps `from`, so two Backs reach Sign in. Opened any other way, Back
+still goes to Legal. e2e: `legal.spec.ts` covers both.
+
+### D-251 — The code step is six boxes; joining uses the nested template; Privacy and Terms are pinned to the foot
+
+Will, 3 October, on the screen after Sign in: use the template with the back
+button; step text instead of a progress bar, as in booking a trip; simpler;
+the code as small boxes someone can paste into; "send again" as a small
+link beside "Sent to …", not a button; Privacy and Terms stuck to the bottom,
+always visible; back goes to the login page.
+
+- **The code step has no card and no heading of its own.** The screen's
+  title is "Enter your code". Under it, on one line, "Sent to {number}." and
+  a small "Send again" (still counting down when a code was just sent).
+  Then the boxes, then the button: "Next" while joining, "Sign in" on
+  `/signin/`. The code step on `/signin/` is the same component, so it changed
+  too, and its Back now returns to the number on the same screen
+  (`startOver`).
+- **`CodeBoxes` (`@pam/ui`)** is six boxes drawn over **one** real field,
+  not six inputs. Six would break paste, break the phone's one-time-code
+  suggestion (it fills one field), and read out as six unlabelled boxes. The
+  field is transparent over the row. It keeps only the digits, so a pasted
+  "Your code is 123 456" works, and it has no `maxLength`, which would cut a
+  paste short before the digits are picked out. The next box is outlined
+  while it has focus, and the global frame ring is turned off for it in
+  globals.css (`data-pam-code`). The sixth digit submits by itself.
+- **Joining uses `SubPageHeader`** with "Step N of M" as the subtitle; the
+  `StepHeader` bar is gone from the app, and its story is removed. Back goes
+  one step back while there is one:
+  - Phone or code → Sign in.
+  - About you → the phone (starts the number over).
+  - A program's details or the waiting list → About you.
+  - Text messages → What others can see.
+  - What others can see, and the end: no back. The account exists by then,
+    and going back would submit About you a second time.
+
+  So `SubPageHeader`'s `backHref` is now optional.
+- **`LegalFooter`** pins Privacy and Terms to the bottom of Sign in and of
+  every joining step, with a spacer so content is never hidden behind it. It
+  is rendered after `Page`, not inside it, because the page's entrance
+  animation sets a transform, and a fixed element inside a transformed one
+  does not stick to the screen.
+
+e2e: join's step test now checks the subtitle and that there is no bar. A
+new consent test reaches the code step and checks one field,
+`one-time-code`, a paste of a whole message, the inline Send again, and the
+footer at the foot of the screen.
+
+### D-252 — On the code step, the boxes and button come first; the step and "Sent to" sit under them
+
+Will, 3 October: "move the code and button above step 1 of 5, and the details
+below it." The code step now reads: "Enter your code", the boxes, Next; then,
+quieter, "Step 1 of 5" and "Sent to {number}. Send again". The thing to do
+sits straight under the title, and the context sits after it. The step moves
+out of the title's subtitle on this one screen only (`PhoneSignInCard`
+`stepLabel`). Every other joining step keeps it as the subtitle (D-251).
+`/signin/`'s code step has the same order without a step line.
+
+### D-253 — Prototype signs in only; Onboarding is its own story; pills everywhere; a white globe; a darker first slide
+
+Will, 3 October, in a run of notes on the code step and Sign in:
+
+- **"Keep the step where it was."** D-252's move of "Step 1 of 5" under the
+  button is undone. The step is the title's subtitle again. The boxes and
+  button still come straight after it, and "Sent to …" after them.
+- **"No need to show step here. Since this is only sign in. Not onboarding.
+  Leave onboarding (account creation) for a different flow (not inside
+  Prototype)."** Supersedes D-249's chaining. Each role's **Prototype** is
+  now Sign in → the code → Home, on the real `/signin/` screen with a
+  stand-in flow (`PrototypeSignIn`; the code is pre-filled and any code
+  works). Creating an account is a separate **Onboarding** folder in
+  Storybook, with stories Member, Case manager and Program lead
+  (`/prototype/join/?kind=`). Each starts at the phone, then the code with
+  "Step 1 of 5", and ends at Home. Back from its first step goes to the
+  stand-in Sign in.
+- **"Center align sent to #, and move send again under it (center aligned)."**
+  Both are centred on the code step, Send again on its own line. Sign in's
+  code step is now left-aligned like every nested page; before, the whole
+  page was centred, so the back and globe buttons sat pinched toward the
+  middle.
+- **"A 20% black overlay over image 1 of the carousel… only that one."**
+  `OnboardingSlide.scrim` (0 to 1) adds a flat black wash under the existing
+  gradient. The first slide sets 0.2.
+- **"The locale icon should match the white circle buttons."** The language
+  switcher is the white 48px disc with a grey edge used by the bell, Help and
+  search, both on the page and over the hero photo. The dark scrim it had on
+  the photo, and its `tone` prop, are gone.
+- **"Buttons fully rounded pills across the DS."** Astryx's Button reads its
+  corner from `--_button-radius` before the theme's element radius, so
+  globals.css sets that to 999px once on `:root`. That covers every Button
+  and IconButton. Anything that sets its own corner in xstyle (list rows,
+  tiles, the code boxes) keeps it. `BigButton` and Connect's "Return home"
+  set 999px themselves. The variable is Astryx-internal (underscore-prefixed),
+  so an Astryx upgrade could rename it. If buttons go square after one,
+  look here first.
+
+### D-254 — An invite is a link to Sign in, which says what they were invited to be
+
+Will, 3 October: "instead of a special code, generate a unique url to a sign
+in page for invited case managers, or an invited program… a black banner on
+top: 'You were invited to be a {role} in the PAM network. Sign in to get
+started.' Use these as the default sign in screens for case managers and
+programs. The slideshow text should adapt to focus on pain points this
+solves for each use case, but keep text short. Then analyze this process to
+see if it's intuitive, and improve on it."
+
+**The link.** It is `{APP_URL}/signin/?invite={code}&as=case-manager|program|member`
+(`inviteLink` in `lib/appUrl.ts`). It is the same one-person, seven-day code
+`create_invite` already makes, so **no migration**. The role in the link
+only chooses the words on screen: `redeem_invite` still decides the real
+role from the code, so editing the link changes a sentence and nothing
+else. It replaces the old `/j/{code}` link format, which no page ever
+served (a static export cannot answer a path per code).
+
+**Sign in from a link** shows:
+- A thin black line across the top on both steps: "You were invited to be a
+  case manager in the PAM network. Sign in to get started." Programs read
+  "program partner", because "to be a program" does not read.
+- Three short slides about their own work:
+  - Case manager: knowing who showed up without chasing calls; sending
+    someone to a program in one tap; everything in one place.
+  - Program: seeing who is coming; fewer no-shows; case managers sending
+    people your way.
+- The code is kept in session storage (`pam.invite`, this visit only, so a
+  shared phone does not hand the invite on). After the phone is verified,
+  Sign in hands a new person to `/join/`. About you then says "You were
+  invited as a case manager." at the top, and asks neither for the code nor
+  "Which one fits you best?". That is one field and one decision fewer, and
+  the step count drops to 4. The code is forgotten once redeemed.
+
+**Making one.** Invite someone, the case-manager admin screen and the
+directory each had their own copy of the old code card. They now share
+`InviteReady`:
+- The link, shown, so somebody can see what they are sending.
+- One button, **Send the link**: the phone's share sheet with a short
+  sentence and the link written, or a copy where there is no share sheet.
+- The code underneath for an invite made during a phone call ("On the
+  phone? Read them this code instead"). Typing it into joining still works
+  as it always did.
+
+**Prototype.** The case-manager and program-lead Prototypes now open on
+that invite Sign in (D-253's "only sign in" kept: the code, then Home).
+Their Onboarding stories start there too and run through the shorter About
+you to Home.
+
+**Intuitiveness, walked through as each person** (the improvements above
+came out of this):
+- *The person inviting* used to be asked to read an 8-character code out or
+  copy it into a text by hand. Now it is one tap into Messages.
+- *The person invited* used to land on a generic Sign in, then be asked for
+  the code again and to pick what they are. Now the first screen names the
+  invitation, the pictures speak to their job, and the form has nothing to
+  choose.
+- **Left open:** an expired or used link is only found out at About you,
+  after the phone step, when `redeem_invite` says so. Saying it on the
+  first screen needs a signed-out lookup of an invite's state (a small
+  `security definer` function returning only valid/expired/used). That is a
+  migration, so it waits for Will's go-ahead.
+- **Also open:** an invited member's link works the same way (with a
+  "join the PAM network" line), but members still mostly join from a case
+  manager reading a code. Whether to push links to members too is a call
+  for Will.
+
+### D-255 — Saved: Edit alone at the top; removals wait for Done; taking a star off always asks
+
+Will, 3 October, on a case manager's Saved: "only Edit is needed in top
+right. If edit on Saved people, highlight ring around the star buttons… If
+edit on programs, after they delete something, make the Done button
+primary, and only let them leave the page once Done is pressed. If they
+switch tabs, show a modal confirming action. If a case manager unstars
+someone, also confirm with a modal — for any unstar action, whether from
+Edit or not. Use the same pattern on People."
+
+- **Top right is Edit alone.** A case manager's bell and Help are gone from
+  Saved, as a member's went in D-224.
+- **Edit holds removals until Done.**
+  - Programs: a × hides the program.
+  - People: the stars get an accent ring, and a star tapped off dims the row
+    and outlines the star. Tapping it again keeps the person.
+  - Done turns **primary** the moment anything is waiting.
+  - In Programs, Done removes them.
+  - In People, Done asks first, because taking a star off always asks.
+- **Leaving with removals waiting asks: Remove, Put them back, or Keep
+  editing.** "Leaving" means the People / Programs switch, the tab bar, or
+  any link (`useLeaveGuard`: a `window` capture-phase click handler, so it
+  runs before Next's `<Link>` and the prototype's own handler). Edit with
+  nothing waiting leaves quietly.
+- **Taking a star off asks, everywhere.** `StarToggle` takes the person's
+  `name` and then confirms "Take the star off {name}?" (on Saved, and in the
+  corner of a member's page). Starring never asks.
+- One dialog for all of these, `ConfirmDialog` (`data-pam-dialog="confirm"`,
+  the 32px corners and 80% white wash from D-234).
+- A member's Saved runs on the same screen, so it gets the same Edit: Done
+  goes primary after a removal, and leaving asks. That consistency is
+  deliberate, not a side effect.
+
+Also in this commit: `account.spec.ts`'s directory invite test now looks for
+the link (D-254). It still matched the old code-only card.
+
+### D-256 — Staff are texted about what needs them, not visits; programs choose per kind
+
+Will, 3 October: "Case managers don't need text reminders before a visit.
+Theirs may look like 'Receive a text when someone messages you in the app.'"
+Then: "For a program lead, text reminders are mainly for when someone books a
+trip to their program, changes a booking, or sends them a message.
+Summarize this in a new screen where they can edit notifications with
+switches per item, since programs would be the ones receiving the most
+messages."
+
+- **Profile card.** Staff see "Get text alerts" instead of a visit
+  reminder.
+  - A case manager's card reads "Receive a text when someone messages you
+    in the app" and opens `/reminders/`. That screen lists a message first,
+    then account changes.
+  - A program's card reads "Bookings, changes and messages. Choose which."
+    and opens the new **`/alerts/`** (`AlertsView`).
+- **`/alerts/`** has three switches: someone books a visit, someone changes
+  a booking, someone messages you. The message alert says only that a
+  message is waiting, never what it says. Under them is a STOP / HELP /
+  rates line of its own. It drops "a few a week at most", which a busy
+  program would outgrow.
+- **Consent is still an act.**
+  - Every switch starts off; carrier rule 30925 forbids a pre-selected
+    opt-in.
+  - The first switch turned on records consent (`setReminderConsent(true)`);
+    turning the last one off withdraws it.
+  - Somebody who had already agreed, with nothing kept on this phone, starts
+    with all three on, because their yes covered everything before there
+    were switches.
+- **Which switches are on is kept on the phone, for now.** The database
+  stores one yes/no for texts. A yes per kind needs a new column, which is
+  a migration for Will.
+- **Nothing sends these yet.** There is no reviewed SMS template for a
+  booking, a changed booking or a new message (`sms-templates.ts`). Each
+  needs one written, and a person in `reviewedBy`, before it can go out.
+
+Also here: Sign in reads an invite link in an effect rather than inside a
+Suspense boundary (D-254). The boundary swapped the whole screen at
+hydration. That made `a11y.spec`'s field measurement flaky on one viewport,
+and could drop a number somebody had started typing.
+
+### D-257 — A super admin's Home is the staff requests
+
+Will, 4 October: "Homepage for Admin should not be Explore, rather it should
+be requests to be approved or denied." Since D-212 a super admin on their
+own account landed on Explore, a member's screen.
+
+- `HomeScreen` now renders `RequestsScreen isHome` for a super admin who
+  isn't previewing a role. A preview still shows that role's own Home.
+- `RequestsScreen` is the old `/requests/` page made shareable:
+  - As Home it uses the tab-screen header (large title, the role switch and
+    the bell) and has no back.
+  - At `/requests/` it is the nested page it was, back to Everyone.
+- The super admin's tabs are **Home, Messages, Profile** (`tabsFor`). The
+  member tabs (Explore, Saved, Trips) are gone.
+- Explore is one row away: a super admin's Profile now has **All programs**,
+  as a case manager's does.
+- The role switch is the white 48px disc of the other header buttons
+  (D-216, D-253). It was a bare icon.
+
+### D-258 — Invites ask for the phone first, last 14 days, and an expired one can ask to be renewed
+
+Will, 4 October:
+- "Gather phone number before generating links, so we can verify which
+  person invited who."
+- "Extend to 14 days."
+- "A page for expired links, keeping the context about who invited them,
+  prompting them to request a new link, which sends a notice to super admin
+  requests, showing who invited who (approve/deny)."
+- "How easy will it be to update this when we plug in a new domain?"
+
+**The phone first.** Choosing who to invite now asks for their number
+(`InvitePhoneStep`) before anything is made. All three ways to invite use
+it: Invite someone, a case manager's admin screen, and the directory. The
+number goes into `create_invite`'s `p_phone`, which has existed since 0002.
+`redeem_invite` already refuses any other verified phone, so a forwarded
+link is no use to anyone else. A number that doesn't read as one says so,
+and nothing is made.
+
+**Migration 0071 (`invite_renewals`). Written and tested, not deployed.**
+- **14 days.** `invites.expires_at` defaults to 14 days. It was 30 in 0002;
+  the prototype's fixture said 7.
+- **`invite_preview(code)`**, callable signed out. It returns the inviter's
+  first name, the invited role, and valid / expired / used / not_found.
+  Nothing else: no phone, last name, region or ids.
+- **`request_invite_renewal(code, first_name)`**, callable signed out. It
+  keeps one pending request per expired, unused invite (a unique partial
+  index), so the button can't flood the queue. A link that still works
+  can't ask.
+- **`invite_renewals_pending()` and `decide_invite_renewal()`**, super
+  admin only. They show who invited whom, as what, and when it lapsed.
+  Approving gives the **same** link 14 more days, so nothing new has to be
+  sent. Both are audited.
+- `invite_renewals` has forced RLS, a super-admin-only policy and no client
+  grants.
+- `09_invite_renewals_test.sql` covers all of this. The full DB suite
+  passes.
+- **Not deployed:** 0068/0069 are held for Will's go-ahead (STATUS), and
+  CLAUDE.md says to stop at that drift. Until 0071 is live, the real app
+  falls back quietly: a link's preview fails, so Sign in carries on as
+  before.
+
+**Expired-link page** (`/invite/expired/`):
+- Sign in previews an invite link and opens this page if it has expired.
+- The page keeps the black invite line and says "Dana invited you to be a
+  program partner… Links work for 14 days, and this one ran out."
+- Then one action: ask for it to be renewed, with an optional first name so
+  the request reads as a person.
+- A used or unknown link says so plainly, with the way to sign in.
+
+**Requests.** The super admin's Requests (their Home since D-257) gains
+"Expired invite links": "Dana Reyes (Case manager) invited Andre ·
+(215) 555-0199 to be a program", with Renew the link / Deny.
+
+**Domain.** Every link comes from one value, `APP_URL`
+(`NEXT_PUBLIC_APP_URL` with a checked-in fallback). `inviteLink()` is the
+only place an invite link is built, and nothing in the database stores a
+domain. `docs/changing-the-domain.md` has the steps, including keeping the
+old domain redirecting so links already sent still work.
+
+### D-259 — About PAM, from the foot of Sign in
+
+Will, 4 October:
+- "Sign in: bottom links, add About PAM. Opens a page with a back button.
+  Page contents: what PAM is, and how it helps (tabs for each user type).
+  Don't include super admin."
+- "A slideshow for each. Similar to the sign-in carousel, but text in the
+  centre, and the frame not full width or touching the top of the screen:
+  in line, with rounded corners."
+- "CTA to sign in, for each, in a list item."
+- "Add PAM's logo on the top right, where round icon buttons would sit."
+
+`/about/` (`AboutScreen`):
+- The nested template, with Back to where it was opened (`goBack`) and the
+  green wordmark top right.
+- One sentence on what PAM is.
+- A pill switch: Members / Case managers / Programs. Under it, a line on how
+  PAM helps that person, and their three slides.
+- Then "Sign in as a member / a case manager / a program lead", as list rows.
+
+The slides reuse the lines Sign in shows each person (`onboarding.*`, D-254).
+`OnboardingSlides` gained `variant="inline"`: page width, 28px corners,
+shorter, an even wash, and the words centred.
+
+"Sign in as…" opens `/signin/?as=…`. Sign in's new `audience`
+(`readAudience`) changes only the slides; there is no banner and no invite.
+The footer reads About PAM · Privacy · Terms of service on Sign in and on
+joining.
+
+In the prototype, `/signin/` is now the stand-in Sign in. The real page
+reads the iframe's own address and sends a signed-in story Home, so every
+link to Sign in from inside the prototype (About PAM, Back from a policy,
+an expired link) works there.
+
+### D-260 — Text alerts are switches for everyone; PAM's own words are defined once
+
+Will, 4 October:
+- "Let's use a similar text permission switch for case managers: they may
+  want to receive texts when someone schedules a trip (info icon explaining
+  what a trip is; this tooltip info should be stored somewhere, since we're
+  using unique terms which may need to be defined across various places in
+  the app, but only here for now)."
+- "I also like the breakdown for members, giving them the option to switch
+  on/off different types of alert pertinent to them."
+
+`/alerts/` (`AlertsView`) now serves every role, each with its own kinds:
+- **Program:** someone books a visit, changes a booking, messages you
+  (D-256).
+- **Case manager:** someone messages you; someone plans a trip, with a
+  small ⓘ that explains "trip".
+- **Member:** before your trip; someone messages you; someone wants to
+  connect; a saved place closes or moves.
+
+Choices are kept per role on the phone (`pam.alerts.{role}`) until a column
+exists. Consent works as in D-256: switches start off, the first one on
+records consent, and the last one off withdraws it.
+
+Where it opens from:
+- Staff: the Profile card opens `/alerts/`.
+- A member: the card still opens `/reminders/`, because their first yes is
+  the screen the SMS carrier registration was filed with. Changing that
+  screen could mean refiling.
+- Everyone: the "Text reminders" settings row on Profile opens `/alerts/`.
+
+**Glossary.** `GLOSSARY` in `@pam/config` (`glossary.ts`) maps each term to
+an i18n name and definition. It holds one term so far: trip. `TermInfo` is
+the ⓘ. It uses a popover rather than a hover tooltip, because phones don't
+hover, and it is a 48px target. Any screen that wants to explain a PAM word
+uses it with the term's id, so the word is defined once.
+
+Nothing sends these texts yet: each kind still needs a reviewed SMS
+template (D-256).
+
+### D-261 — A program's policies for participants, and a verified tick for who signed them all
+
+Will, 4 October:
+- "On the program profile screen: an item for Policies for participants,
+  which opens a page similar to Legal, with the list of uploaded documents,
+  and at the top allows new uploads."
+- "Edit top right to remove any policies. Use fake social program policies
+  like disclosure or disclaimer."
+- "If they open a policy, the top of the page is tabs (preview/signed);
+  signed shows a list of all who signed."
+- "A verified badge next to member profiles (on program view) to signal
+  they've signed all policies. Tapping the icon (keep it small) shows which
+  policies they signed."
+
+**Program profile.** A "Policies for participants" row ("4 to sign"), shown
+out of edit mode.
+
+**`/program/policies/`** (`PoliciesScreen`):
+- The intro, then an upload card at the top (Astryx `FileInput`; a PDF or a
+  photo of each page, several at once).
+- "Your policies", each row with "Signed by N", opening the policy.
+- Edit, top right, swaps the rows for ones with a remove button. Removing
+  asks first (`ConfirmDialog`): "People who signed it keep their copy. New
+  people will not be asked to sign it."
+
+**`/program/policies/view/?id=`** (`PolicyScreen`): a pill switch at the top,
+Preview / Signed · N.
+- Preview shows the policy's words, or the file name for an upload.
+- Signed lists who signed, and when.
+
+**Verified** (`VerifiedBadge`). On a member's page as a program sees it, a
+small accent tick sits beside the name when they have signed **every**
+current policy. There is no half mark for someone halfway. Tapping it lists
+which policies they signed.
+
+In the schedule rows the tick is a plain icon, labelled for screen readers.
+The row is already a link, and a button inside a link is invalid; the list
+of policies is one tap away on their page. `ProfileSummary` gained a
+`nameAddon` slot for the tick.
+
+**Example data only** (`@pam/config/dummy-policies`, `usePolicies`):
+- Four policies: confidentiality and disclosure, liability disclaimer,
+  photo and media release, code of conduct.
+- Jordan and Miguel have signed all four, Keisha two, Aaliyah one, Devon
+  and Priya none.
+- Uploads and removals last for the browser session. Uploaded files are
+  not stored; only their names are shown.
+
+**Needs Will:**
+- Real storage means tables for policies and signatures plus file storage.
+- Members signing in PAM needs a screen of its own, on the member's side.
+- A program keeping a record of what someone signed is a new line in
+  `transparency.ts`, and members must be told before it is real.
+
+### D-262 — The super admin can look at a requested program, text the requester, and message staff (narrows D-171)
+
+Will, 4 October: "Super admin home; there needs to be a way to view program
+profile if asking to approve/deny. Also a way to message the program lead or
+case manager from the app. To make sure they coordinate how to use app."
+
+**Looking before deciding.** A program-lead request carries what the person
+typed about their program at sign-up (0056). The request card now shows that
+program as a row ("Example Reentry Kitchen — See what they told us about
+it"), opening `/requests/program/?id=` (`RequestProgramScreen`). The page is
+the same `PlaceDetail` a member would see once the program is listed, plus who
+asked and a Text button. Approve and Deny stay on the card, where the city is
+picked. One place decides, and this page is only for looking.
+`useStaffRequests` now reads the program columns. They are on the same row
+the super admin could already read in full (0046 policy).
+
+**Talking to someone still waiting: a text, not a PAM message.** A requester
+has no staff role until they are approved. They cannot be reached in PAM's
+Messages without opening messaging to anyone who asks to be staff. So each
+request card has **Text {name}**, which opens the super admin's own texting
+app with the number filled in. The number comes from
+`staff_request_phone(user_id)` (0072):
+- super admin only;
+- only while the request is open;
+- read when tapped, not when the list loads;
+- audited as `staff_request.phone_read`.
+
+**Talking to staff once they are in: PAM's Messages.** Migration 0072 adds
+one arm to `can_message`: super admin ↔ case manager or program lead. It also
+lets `messageable_people` and `open_direct_conversation` serve a super admin.
+- **A super admin and a member can never message each other, either way.**
+  That part of D-171 stands, and DB test 10 checks it from both sides.
+- What changes is D-171's "a super admin cannot send or start any message".
+  It is now "…to a member".
+- Staff can answer and start conversations with the super admin.
+  `messageable_people` therefore lists the super admin to staff, and
+  `05_messenger_test` now counts by role.
+
+In the redesign (`MessagesScreen`) a super admin has New message and the
+example set. That is a thread with Teresa (`dummy-conv-dummy-a1-dummy-s1`) and
+Sandra and Chris to start one with. The example cast gains Robin
+(`DUMMY_PAM_TEAM`, not in the Everyone list), and staff see the super admin
+labelled "PAM team". The example data adjusts in two ways:
+- A thread's two slots are now matched by who "you" are, not only by role.
+  A case manager sits in the first slot of her thread with the PAM team.
+- `dummyOtherIdFor` replaces the role-only lookup in `DemoThread`.
+
+The live `/messages/` page is still the pre-redesign screen. It keeps D-171's
+Reported-only view for a super admin until the redesign replaces it.
+
+**0072 is written and tested but not deployed.** It waits with 0068, 0069
+and 0071 for Will. Until it is deployed, Text and super-admin messaging only
+work in Storybook.
+
+### D-263 — Invites go back to plain links; an expired one emails a fresh link; the super admin keeps a log, not a queue (reworks D-258)
+
+Will, 4 October:
+
+> "On link expiry: set 30 days expiry. No need to ask for their name, only ask
+> for email and email them the new invite link for their role. Let's draft an
+> email message. Format email with PAM logo on top center. Center aligned
+> email format. Simple.
+> For super admin, let's remove the need for super admin to approve. Instead
+> just keep a log of invited people in an item above bottom bar, and opens a
+> new page with back button. Page lists all invitees by date, and show
+> status: active vs link expired.
+> For invite someone screen, kill it. Let's just return to not collecting
+> phone number yet and generating the link for user to share with whoever
+> they want.
+> Let's have the invite link have a cover image like image 2 of carousel and
+> the PAM logo in center. With text saying: you're invited."
+
+**No phone step.** The phone step (`InvitePhoneStep`) is gone from Invite
+someone, the case manager's screen and the directory. They are back to their
+pre-D-258 code exactly: tap who, get the link (`InviteReady`), and send it to
+whoever. "Kill it" was read as the phone screen, not Invite someone itself.
+The choice of member or program is still needed to make the link.
+
+**30 days.** `invites.expires_at` has defaulted to 30 days since 0002. 0071
+no longer changes it. 0071 was never deployed, so it has been rewritten in
+place rather than followed by a new migration.
+
+**Expired link: email, no approval.** The expired-link page now asks only for
+an email address. `request_invite_link(code, email)` is signed out and works
+only on an expired, unused link. It does three things:
+- makes a **new** invite for the same role, city and inviter, lasting 30 days;
+- marks the old one expired;
+- queues an email in `invite_emails`.
+
+Security choices:
+- The new code is never returned to the browser, only to the inbox.
+  Otherwise anyone holding an old link could mint working links without the
+  email meaning anything.
+- One request per expired link. A second ask does nothing, so the button
+  cannot flood an inbox.
+  - The cost: a typo in the address means asking the inviter again.
+- With no phone on the invite, a link works for whoever holds it. That was
+  true before D-258 and is true again. Emailing a fresh one to whoever holds
+  the old one widens nothing.
+
+The renewal queue, Renew/Deny and the `first_name` field are gone.
+
+**The email** (`@pam/config/invite-email`, story *Onboarding/Invite email*):
+- Layout: PAM logo top centre (a PNG at `public/email/pam-logo.png`, because
+  clients drop SVG), centred single column, one green pill button, the link
+  as text, and a one-line footer.
+- Copy: says who invited them and as what, in English and Spanish, with no
+  justice-related words (a test checks).
+- It holds `reviewedBy: ''` like the SMS templates, so it refuses to render
+  for sending until a person has read it.
+
+**Nothing sends it yet.** Sending needs an email provider and a sender (an
+Edge Function holding the provider's key, reading `invite_emails` and setting
+`sent_at`). That is Will's call: which provider, and from which address.
+
+**The log.** A super admin's Home has **Invited people** floating above the
+tab bar, the same strip as Invite someone on a case manager's Home (D-226).
+It opens `/invites/` (`InvitesLogScreen`), fed by `invites_log()`, which is
+super admin only.
+- Every invite, grouped by day, newest first.
+- Each row says who: their first name once joined, otherwise "A member" /
+  "A program" / "A case manager". It also says who invited them.
+- One status per row. Will asked for active vs expired. A third state, **Link
+  open**, was needed for a link nobody has used yet that still works, so that
+  "expired" never falsely describes it.
+- A link re-sent by email says where it went.
+
+Staff role requests (Approve/Deny on Requests) are unchanged. "Remove the need
+for super admin to approve" was read as the expired-link renewals it followed.
+
+**The link preview.** `app/signin/layout.tsx` sets Open Graph and Twitter
+tags for Sign in, where every invite link lands (D-254):
+- The picture, `public/og/invite.jpg` (1200×630, about 85 KB), is the second
+  carousel picture with the white wordmark and "You're invited". Will,
+  4 October: "less dark, so the colors shine through". It now has only a
+  light veil (8%) and a soft shade behind the words, with a drop shadow on
+  them, instead of a 45% black overlay.
+  It was made once and checked in.
+- Its address is absolute from `APP_URL`, so a domain change moves it too
+  (`docs/changing-the-domain.md` updated).
+- Side effect: Sign in's browser title reads "You're invited to PAM".
+- The picture is English only, because a preview is fetched before PAM knows
+  anyone's language.
+
+### D-264 — 0071 and 0072 deployed; the invite email approved; a before-launch list; the user-flow map
+
+Will, 4 October:
+
+> "Deploy migration. And add the email provider set up to our 'todo before
+> launching list', remember this for later. Email text approved. Please
+> create a user flow for the entire app inside Figma including these latest
+> changes … document app changes by also updating user flows. This is a skill
+> I want you to learn as we develop."
+
+**Deployed: 0071 and 0072, and only those.**
+- Before deploying, `list_migrations` showed live ran to 0070, with no
+  live-only migrations.
+- `can_message`, `messageable_people` and `open_direct_conversation` live
+  were exactly 0063's, which is what 0072 was written against.
+- After deploying, `get_advisors` showed no new kind of finding.
+- A spot check confirmed the new table and functions are closed to
+  signed-out callers, except `invite_preview` and `request_invite_link`,
+  which are meant to be open.
+
+**Not deployed: 0068 and 0069.** They live on branch
+`claude/hopeful-thompson-07nj7n`, not this one. **0069 rewrites
+`can_message` too**, so deploying it as written would silently remove 0072's
+super admin ↔ staff arm. It must be merged and reconciled first. It is on the
+before-launch list.
+
+**Email approved.** `INVITE_EMAIL.reviewedBy` = "Will (Oba), 4 October
+2026". The config test now asserts it renders for sending. Change a word and
+clear it.
+
+**`docs/before-launch.md`** is new: Will's list of what must be done before
+real people use PAM. Seeded with:
+- the email provider and sender (Will's item);
+- the 0068/0069 merge;
+- two long-open STATUS rows that also block launch: the PAM-team
+  transparency line, and the SMS copy review.
+
+CLAUDE.md points at it.
+
+**The user-flow map: Figma, generated from code.**
+"PAM — User flows" is in the Oba Studio team (Will's choice):
+https://www.figma.com/design/DtlJg9Klx5BRfHbXBhkg98.
+- **Pages:** an overview, then one page per person — Sign in & joining,
+  Member, Case manager, Program lead, Super admin.
+- **Screens:** each is a screenshot of its real Storybook story.
+- **Arrows:** labelled with what the person taps. Dashed arrows leave the
+  app (a text, an email) or go back.
+- **Change marks:** the screens changed in the latest round carry an orange
+  D-number.
+
+The source is `docs/user-flows/flows.mjs`, not the Figma file.
+`scripts/user-flows.mjs` photographs the stories and lays the flows out.
+`scripts/user-flows-figma.mjs` turns that into Figma scripts. Hand edits in
+Figma would be overwritten, which is the point: the map cannot drift from the
+screens. The routine — when to update, how, and how to check — is the
+`pam-user-flows` skill (`.claude/skills/pam-user-flows/SKILL.md`), and
+CLAUDE.md makes it part of every change that touches screens.
+
+**Why two ways to publish.** The intended route is Figma's HTML import: one
+sharp page per call. It needs `mcp.figma.com`, which this environment's
+network policy blocks, and so does Figma's asset upload. So the map was drawn
+with the Plugin API instead:
+- shapes and text drawn natively;
+- screenshots at half size, sent inline in batches under the tool's size
+  limit.
+
+Addendum, same day. Sending the screenshots inline did not work: a model
+cannot copy 40 KB of base64 exactly through a tool call, and Figma rejected
+it as "Invalid base64 string". Will chose to leave `mcp.figma.com` blocked
+for now. So the map is drawn without pictures:
+- every screen is a slot with its name and an **Open in Storybook ↗** link
+  to the live story on Chromatic;
+- the overview's slots open each person's clickable prototype.
+
+The slots keep their `shot:*` names, so when the host is allowed,
+`upload_assets` can fill them from disk by node id. The skill describes this
+route and forbids the base64 one.
+
+### D-265 — A member's Explore: a centred search, smaller chips, the next visit; no bell or Help up top
+
+Will, 5 October, with an Airbnb reference: "add a horizontal card to member
+home page with trip details … only one card … upcoming trip, date & time,
+and program category, no need for program name. Remove help and alert
+buttons from homepage top. … match that [search] style, bolder text center
+aligned. This applies to member homepage only, but keep the bolder text and
+icon across all search bars. … reduce the size of category chips."
+
+**The search bar at rest is a launcher** (`SearchLauncher` in
+`@pam/ui/SearchPill`). It is the pill itself, drawn as one button, with the
+magnifier and "Search programs" centred and bold. A tap swaps in the real
+`SearchPill`, focused (new `hasAutoFocus`), with Cancel beside it — the same
+pattern as All programs' search (D-238). A text field's placeholder cannot
+be centred together with its icon, so the at-rest state is a button.
+
+Addendum (Will, 5 October): the launcher measured 48px against the open
+pill's 60px — the button's own fixed height beat its `minHeight`. Both are
+now 60px, so nothing jumps when search opens.
+
+**Bolder search everywhere.** In `globals.css`, the large input group, which
+is only ever a search pill, now gives its typed text and placeholder weight
+600 in the primary ink, and draws its magnifier darker and thicker. This
+covers every search bar: Explore, the staff homes, Messages, Trips and the
+pickers.
+
+**No bell or Help on a member's Explore.** Both stay on Profile's header. Staff
+reaching this screen as All programs keep their buttons.
+
+**"Your next visit"** (`NextTripCard`) sits above the list when nothing is
+being searched:
+- the category's icon and name;
+- a bold title;
+- the day and time with a chevron;
+- at the right, the category icon on two stacked, tilted tiles, standing in
+  for the reference's photos.
+
+There is no program name. The card opens Trips. It uses the soonest example
+trip (`DUMMY_TRIPS`) until trips are real, as Trips does.
+
+**Chips are smaller to the eye:** 40px tall, 15px text, 18px icons and a
+lighter shadow. A tap area of at least 48px is a non-negotiable rule, so each
+chip keeps 48px through an invisible `::before` margin, not through its
+outline.
+
+### D-266 — Sign in: the card sits flat under the pictures; the code step is drawn in
+
+Will, 5 October: "Instead of having the card over the top edge of carousel,
+… move it all on the part below … Remove card shadow, so it looks like it's
+part of the white bg. Then for the next code screen … more left and right
+padding, so the buttons are same width."
+
+- The Sign in card no longer rides up over the slides. It starts just below
+  them and is flat (`PhoneSignInCard isFlat`: no shadow, no outline), so the
+  phone field and button read as part of the white page. Card, footer and
+  slides fit on an 844px screen.
+- The code step's boxes, button and "Sent to …" now sit inside the same 20px
+  inner margin the card gives its own content. "Sign in" is therefore the
+  same width as "Send me a code" a step earlier (318 and 320px measured).
+  This applies wherever the code step appears, joining included.
+
+### D-267 — Small copy and default changes: connections subtitle, invite wording, week first, chips to the edge
+
+Will, 5 October:
+- **Messages' "My connections"** row now has a second line, "People willing
+  to help". `FloatingAction` gained an optional `description`, and its spacer
+  grows to match.
+- **Invite someone, "Invite a member":** the subtitle reads "People looking
+  for resources", replacing "Someone coming home". The case manager's older
+  `/admin/` button keeps its own label.
+- **A program lead's Home opens on Week**, not Day (`ScheduleView`'s
+  `initialView` default). The states story now lists Week first.
+- **Chips no longer clip short of the screen** ("set the chip overflow to
+  visible"). A sideways-scrolling row has to clip somewhere, so it now clips
+  at the screen edge: the row runs through the page's right-hand 16px margin,
+  and its start stays in line with the search bar. The page itself still
+  never scrolls sideways (scrollWidth = 390 at 390px).
+
+### D-268 — Trips: small black pins with a tip; "+ New trip" as a light pill
+
+Will, 5 October, with the Airbnb "Your stay" reference: "For the map pins …
+circle with tip, and icon. Make [them] black with icon. And smaller. Also
+instead of plus button on top right, copy the search the map [pill] … say
+'+ new trip' with a similar subtle light format."
+
+- **Pins.** A 40px black disc with a white ring, the category's icon in white
+  at 20px, and a small rotated-square tip. The labels under them shrink from
+  14px to 12px. Google's markers, when a key is set, use the same shape as an
+  SVG (`PIN_SVG`), without the category icon.
+- **Addendum, same day:** "the arrow edges more fluid with the circle … no
+  need for white border". The pin is now one SVG teardrop (`PIN_PATH`): a
+  19px circle whose sides leave along the circle's own tangent and curve into
+  a rounded tip. It has no ring; a soft drop shadow lifts it off the map.
+  Google's markers use the same path.
+- **"+ New trip"** (`NewTripButton`) is a white pill at the top centre of the
+  map, 44px tall, with a semibold label and a soft shadow, in place of the
+  dark green round +. It still opens `/trips/new/`.
+
+### D-269 — Moving between screens: no reloads, a direction, and a card that grows
+
+Will, 5 October: "How can we make transitions smoother across the entire
+app, like when switching tabs, or going from one page to the next? right now
+the whole app feels very stiff, things appear all at once." Then, on the
+plan: "go ahead with transitions, include the card effect".
+
+Why it felt stiff: every tap was a **full page load** (Astryx and our cards
+draw plain `<a href>`, and nothing routed them; D-134 deferred client-side
+routing), and every screen arrived as one block on the same 240ms fade.
+
+- **No reloads.** `ClientNav` (`apps/web/src/lib/ClientNav.tsx`, mounted in
+  `Providers`) catches a same-site link tap after the page has had its say
+  (leave guards, the prototype) and hands it to Next's router. `navigate()`
+  and `goBack()` use it too. This closes the routing half of D-134.
+  - Not `next/link`, and not Astryx's `LinkProvider`: `next/link` prefetches
+    every link in view, and a list of thirty places would spend a 3G
+    member's data on thirty screens (§12). One document listener also covers
+    the plain `<a>` in `PlaceCard`, which `LinkProvider` would not.
+  - Still a full load: other sites, `tel:`/`sms:`/`mailto:`, new tabs,
+    downloads, files, and **the same screen with a different query**
+    (`/place/?id=a` to `/place/?id=b`), because those screens read their
+    query once, on load.
+- **A direction** (`@pam/ui/navTransition`, the browser's View Transitions;
+  CSS in `globals.css` keyed on `html[data-pam-nav]`):
+  - forward: in from the right, 24px and a fade, 280ms; the old screen eases
+    12px left and goes in 200ms;
+  - back: the mirror;
+  - tab to tab: a 180ms cross-fade, since neither is deeper;
+  - the bottom bar has its own layer (`data-pam-tabbar`) and stays still.
+  Direction is judged from the two paths: into a tab path or a shallower
+  path is back.
+- **The card effect.** A tapped card (`ClickableCard`, anything marked
+  `data-pam-morph`, or a card with exactly one link, like a place card)
+  grows into the screen it opens: the card and the new screen's page body
+  share the name `pam-morph`, never at the same moment. A card tap is always
+  forward, even into a tab (the next-trip card opens Trips). Trips has no
+  `Page`, so its body is marked `data-pam-morph-target`. A card holding
+  several links is a list, not a door, and does not grow.
+- **A screen arrives in its turn.** `PageEnter` no longer fades the page as
+  one block. Each section of the page body rises 8px and fades in, 30ms
+  after the one above, capped at the sixth (150ms). The wrapper itself no
+  longer moves, so it can no longer pin a fixed child to the page (the
+  D-263 floating-row bug).
+- **Dialogs settle** on a decelerating curve. Sheets already slid up with
+  Astryx's own motion and are unchanged.
+- **Who gets none of it.** No View Transitions in the browser, reduced
+  motion, Data Saver or 2G (D-104): the screen simply changes, still
+  without a reload. It is all browser-native and CSS; nothing joins the
+  animation chunk. First-load JS stays inside budget (79 kB to spare).
+- Opacity and transform only; nothing animates layout.
+- **Proven by:** `e2e/motion.spec.ts` checks every section settles at
+  opacity 1 with no transform, and that tapping a link changes screen
+  without reloading. The full e2e suite passed (534/534).
+- **Not covered:** the browser's own Back button and swipe gestures change
+  screen without our transition, because the change has already happened
+  by the time the page hears of it.
+
+### D-270 — Members read and sign a program's policies; round buttons spread when there are three or more
+
+Will, 5 October, with a screenshot of a place's round buttons: "when 3 or
+more icons exist in place profile, just set them for space in between,
+otherwise the last one gets off wonky." Then: "add an item on bottom for
+policies needed to sign, so users can preview them ahead of time … once the
+user finished booking … a CTA to sign policies … [on] trips, members can see
+next to trip card if 'Signatures needed' or 'Policies Signed'. The policy
+screen should allow users to preview and tap to sign, then a half screen
+drawer opens and they can draw their name using their finger, and once a
+signature is drawn once, they should be able to re-use it as easy as tapping
+the sign button."
+
+- **Round buttons.** With three or more, the row spreads them
+  (`space-between`): the first circle at the left edge, the last at the
+  right, each item as wide as its circle or its word. Fewer than three keep
+  D-245's even slots from the left. Four 25% slots plus gaps were wider than
+  the row, which is what pushed Directions out.
+- **Policies to sign** is a row at the foot of a place's page (members
+  only): "Read before your visit · 0 of 4 signed", or "All 4 signed". It
+  opens `/place/policies/?id=`: each policy with "Needs your signature" or
+  "Signed October 5", and one button, Start signing or Keep signing, to the
+  first unsigned one.
+- **One policy** (`/place/policies/view/`): its words, then Sign.
+  - **First time:** Sign opens a half-height sheet (`BottomSheet
+    height="hug"`, about 60% of the screen) with a box to draw in
+    (`SignaturePad`).
+  - **The sheet is `purpose="form"`:** a swipe down while drawing would
+    otherwise close it and lose the signature, so a round × closes it.
+  - **Sign in the sheet waits for ink.**
+  - **After that, Sign is one tap.** The saved signature is shown beside
+    the button ("Sign uses your signature:"), so nobody signs with something
+    they cannot see, and "Sign a new way" reopens the sheet. This is how
+    signing apps work once you have adopted a signature.
+  - **After signing**, the button moves on ("Next: Liability disclaimer",
+    then Done), so nobody has to go back to the list to find the next one.
+    The next policy is changed in place, not by a link, because the same
+    screen with a new `?id=` is a full load (D-269).
+- **Recommended and done: typing counts too.** "Type my name instead"
+  writes the typed name into the box in an italic hand. This is for anyone
+  who cannot draw a signature: a tremor, a screen reader, a cracked screen.
+  Without it the flow would dead-end for them.
+- **Trips.** Each trip card carries a small token: orange "Signatures
+  needed" or green "Policies signed". Programs that ask for nothing (the
+  example food pantry) show none.
+  - The "complete screen" after booking is Trips itself (D-241: the drawer
+    tall, confetti). While a just-booked trip's program still wants
+    signatures, a card at the top of the list says "One more thing before
+    you go" with Sign policies.
+- **`SignaturePad` (`@pam/ui`)** is the one control PAM draws itself, since
+  Astryx has no signature field and only a `<canvas>` takes a drawing.
+  - It is white paper with dark ink in both themes, because the saved
+    picture is shown again elsewhere.
+  - It uses `touch-action: none` so the page does not scroll under the pen.
+  - It is sized in device pixels and curved through midpoints so a quick
+    stroke stays smooth.
+- **Where the signature lives.** Session storage only (`useMySignatures`),
+  never local storage. PAM is often used on a shared or borrowed phone, and
+  a signature is not something to leave on one. Signed is per program and
+  per policy.
+- **Example data.** Every example place uses the one example set of
+  policies except the food pantry (`placeAsksForPolicies`). Storing real
+  policies and signatures is a schema and transparency change waiting on
+  Will (STATUS, needs a human, row 14).
+- **Proven by:** `e2e/policies.spec.ts`:
+  - the list passes axe;
+  - drawing once makes the second policy one tap, with no sheet;
+  - a typed name signs.
+  The full e2e suite passed.
+
 ---
 
 ## Notes for whoever picks this up next

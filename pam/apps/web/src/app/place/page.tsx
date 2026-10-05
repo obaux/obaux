@@ -3,21 +3,26 @@
 import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import {
-  AppHeader,
   BigButton,
-  HelpBar,
+  BookIcon,
+  GlobeIcon,
+  MessagesIcon,
   Notice,
   Page,
-  PageTitle,
+  PhoneIcon,
   PlaceDetail,
+  PlacesIcon,
+  SignedIcon,
   directionsHref,
   googlePlaceHref,
 } from '@pam/ui';
+import { PlaceBarActions, messageHrefFor } from '../../screens/PlaceBarActions';
 import { PlaceDetailSkeleton } from '@pam/ui/Skeletons';
+import { SubPageHeader } from '@pam/ui/SubPage';
+import { HelpButton } from '../../screens/HelpButton';
 import { categoryLabelKey, distanceLabel, NOTICES, type Category } from '@pam/config';
 import { DUMMY_PLACES_BY_ID, isDummyPlaceId } from '@pam/config/dummy-places';
 import { useI18n } from '@/lib/i18n';
-import { HeaderBell } from '../HeaderBell';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
 import { useSavedPlaces } from '@/lib/useSavedPlaces';
@@ -25,6 +30,11 @@ import { usePlaceStatus, weekLines } from '@/lib/usePlaceStatus';
 import { useRoleView } from '@/lib/useViewedRole';
 import { RoleSwitchControl } from '../RoleSwitchControl';
 import { sharePlace } from '@/lib/sharePlace';
+import { usePolicies } from '@/lib/usePolicies';
+import { useMySignatures } from '@/lib/useMySignatures';
+import { MenuList } from '@pam/ui/MenuList';
+import { placeAsksForPolicies } from '@pam/config/dummy-policies';
+import { policiesHref } from '../../screens/MemberPoliciesView';
 
 /**
  * One place, on its own screen.
@@ -54,10 +64,17 @@ import { sharePlace } from '@/lib/sharePlace';
  * an arbitrary URL. A bare `/place/?id=…` — a shared link, or an old one —
  * still falls back to Places, which was this screen's only behaviour before.
  */
+const QUICK = { width: 24, height: 24, 'aria-hidden': true } as const;
+
 const BACK_TARGETS = {
   home: { href: '/', labelKey: 'nav.back.home' },
+  // The redesign's Explore, which is the home screen there (D-212).
+  explore: { href: '/', labelKey: 'nav.back.explore' },
+  trips: { href: '/trips/', labelKey: 'nav.back.trips' },
   places: { href: '/places/', labelKey: 'nav.back.places' },
   saved: { href: '/saved/', labelKey: 'nav.back.saved' },
+  // All programs, a staff member's secondary path (D-218).
+  programs: { href: '/programs/', labelKey: 'nav.back.programs' },
 } as const;
 
 function resolveBack(from: string | null): { href: string; labelKey: string } {
@@ -187,47 +204,51 @@ function PlaceScreen() {
   const { isSaved, save, unsave } = useSavedPlaces(signedIn, demoRole);
 
   const place = state.status === 'ready' ? state.place : null;
+  const { policies } = usePolicies();
+  const { progress } = useMySignatures();
   const status = usePlaceStatus(place?.id ?? '', place?.hours ?? null, t, locale);
 
   /*
-   * The header is not bare here (Will, 16 September: "the top bar in Places
-   * profile should be consistent") — the session is already resolved by the
-   * time this screen is deciding whether the *place* loaded, so there is no
-   * reason for it to show less than every other screen does at this point:
-   * the role chip, the switcher for a super admin, and the bell.
+   * The nested-page template (D-213): a place is something you tap into, so
+   * it opens like every other screen you tap into — round back, then its
+   * name, large. The role switch a super admin had in the app header rides
+   * in the bar instead (it was put here on 16 September so this screen would
+   * not show less than its neighbours; that still holds).
    */
-  const header = (
-    <AppHeader
-      roleLabel={signedIn ? t(`role.${demoRole ?? session.session.role}`) : undefined}
-      roleControl={
-        trueRole === 'super_admin' ? (
-          <RoleSwitchControl trueRole={trueRole} viewedRole={demoRole ?? trueRole} onChange={setViewAs} />
-        ) : undefined
+  const header = (title: string, bar?: React.ReactNode) => (
+    <SubPageHeader
+      title={title}
+      backHref={back.href}
+      backLabel={t(back.labelKey)}
+      actions={
+        <>
+          {trueRole === 'super_admin' ? (
+            <RoleSwitchControl trueRole={trueRole} viewedRole={demoRole ?? trueRole} onChange={setViewAs} />
+          ) : null}
+          {/*
+            A place's own bar once it has loaded (D-224): Save and the ⋯ menu.
+            Before that, Help (D-217).
+          */}
+          {bar ?? <HelpButton />}
+        </>
       }
-      trailing={<HeaderBell enabled={signedIn} role={demoRole ?? trueRole} />}
     />
   );
 
   if (state.status === 'loading') {
     return (
       <Page gap={4}>
-        {header}
+        {header(t('common.loading'))}
         <PlaceDetailSkeleton label={t('common.loading')} />
       </Page>
     );
   }
 
   if (state.status === 'missing' || state.status === 'error') {
-    const key =
-      state.status === 'error' && state.offline ? 'offline' : 'something_went_wrong';
+    const key = state.status === 'error' && state.offline ? 'offline' : 'something_went_wrong';
     return (
       <Page gap={4}>
-        {header}
-        <PageTitle
-          title={t('places.title')}
-          backHref={back.href}
-          backLabel={t(back.labelKey)}
-        />
+        {header(t('places.title'))}
         <Notice
           notice={state.status === 'missing' ? 'service_not_available' : key}
           title={state.status === 'missing' ? t('place.notFound.title') : t(NOTICES[key].titleKey)}
@@ -235,19 +256,46 @@ function PlaceScreen() {
           supportPhone={supportPhone}
           callLabel={t('help.callSupport')}
         />
-        <BigButton label={t('places.title')} href="/places/" />
-        <HelpBar label={t('nav.help')} variant="block" />
+        <BigButton label={t('help.place.action')} href="/" />
       </Page>
     );
   }
 
   const saved = isSaved(place!.id);
+  const toggleSave = () => {
+    if (saved) {
+      void unsave(place!.id);
+      return;
+    }
+    void save({
+      id: place!.id,
+      name: place!.name,
+      lookupName: place!.lookupName,
+      category: place!.category,
+      address: place!.address,
+      phone: place!.phone,
+      placeId: place!.placeId,
+      lat: place!.lat,
+      lon: place!.lon,
+    });
+  };
+  const directions = directionsHref(place!.address, place!.lat, place!.lon) ?? null;
+  const googleHref = googlePlaceHref(place!.lookupName || place!.name, place!.address, place!.placeId);
   const lines = status ? weekLines(status.hours, locale, t('place.hours.closed')) : undefined;
 
   return (
     <Page gap={4}>
-      {header}
-      <PageTitle title={place!.name} backHref={back.href} backLabel={t(back.labelKey)} />
+      {header(
+        place!.name,
+        <PlaceBarActions
+          isSaved={saved}
+          // No Save for a program lead, who has no Saved (D-237).
+          onSave={signedIn && (demoRole ?? trueRole) !== 'provider' ? toggleSave : undefined}
+          onShare={() => void sharePlace(place!.name, place!.address)}
+          flagHref={`/flag/?place=${encodeURIComponent(place!.id)}`}
+          messageHref={messageHrefFor(place!.name)}
+        />,
+      )}
 
       <PlaceDetail
         category={place!.category}
@@ -258,41 +306,70 @@ function PlaceScreen() {
         weekLines={lines}
         hoursArePlaceholder={status ? !status.isReal : false}
         placeholderNote={t('place.hours.sample')}
-        audienceLabel={
-          place!.audience ? t(`place.audience.${place!.audience}`) : null
-        }
+        audienceLabel={place!.audience ? t(`place.audience.${place!.audience}`) : null}
         phone={place!.phone}
         website={place!.website}
-        directionsHref={directionsHref(place!.address, place!.lat, place!.lon) ?? null}
-        hoursHref={googlePlaceHref(
-          place!.lookupName || place!.name,
-          place!.address,
-          place!.placeId,
-        )}
-        isSaved={saved}
-        onSave={
-          signedIn
-            ? () => {
-                if (saved) {
-                  void unsave(place!.id);
-                  return;
-                }
-                void save({
-                  id: place!.id,
+        directionsHref={directions}
+        // A member's one primary action is booking a visit (D-235), straight
+        // into the New trip steps with this place already chosen.
+        primaryAction={
+          (demoRole ?? trueRole) === 'member'
+            ? {
+                label: t('place.schedule'),
+                href: `/trips/new/?${new URLSearchParams({
+                  place: place!.id,
                   name: place!.name,
-                  lookupName: place!.lookupName,
                   category: place!.category,
-                  address: place!.address,
-                  phone: place!.phone,
-                  placeId: place!.placeId,
-                  lat: place!.lat,
-                  lon: place!.lon,
-                });
+                  ...(place!.address ? { address: place!.address } : {}),
+                }).toString()}`,
               }
-            : undefined
+            : null
         }
-        onShare={() => void sharePlace(place!.name, place!.address)}
-        flagHref={`/flag/?place=${encodeURIComponent(place!.id)}`}
+        hoursHref={googleHref}
+        isSaved={saved}
+        quickActionsLabel={t('place.quick.label')}
+        quickActions={[
+          ...(place!.website
+            ? [
+                {
+                  id: 'website',
+                  label: t('place.quick.website'),
+                  icon: <GlobeIcon {...QUICK} />,
+                  href: place!.website,
+                  isExternal: true,
+                },
+              ]
+            : []),
+          {
+            id: 'message',
+            label: t('place.quick.message'),
+            icon: <MessagesIcon {...QUICK} />,
+            href: messageHrefFor(place!.name),
+          },
+          ...(place!.phone
+            ? [
+                {
+                  id: 'call',
+                  label: t('place.quick.call'),
+                  icon: <PhoneIcon {...QUICK} />,
+                  href: `tel:${place!.phone}`,
+                },
+              ]
+            : []),
+          // Directions (Will, 3 October, D-235): the round button routes there;
+          // the place on Google stays a link in the hours card.
+          ...(directions || googleHref
+            ? [
+                {
+                  id: 'directions',
+                  label: t('place.quick.directions'),
+                  icon: <PlacesIcon {...QUICK} />,
+                  href: (directions ?? googleHref)!,
+                  isExternal: true,
+                },
+              ]
+            : []),
+        ]}
         labels={{
           directions: t('place.directions'),
           call: t('place.call'),
@@ -308,7 +385,35 @@ function PlaceScreen() {
         }}
       />
 
-      <HelpBar label={t('nav.help')} variant="block" />
+      {/*
+        The program's policies, at the foot of the page (Will, 5 October,
+        D-270): a member can read them before booking, and see how many are
+        signed. Members only — staff do not sign a program's policies.
+      */}
+      {(demoRole ?? trueRole) === 'member' && placeAsksForPolicies(place!.id) && policies.length > 0 ? (
+        <MenuList
+          label={t('place.policies')}
+          items={[
+            {
+              id: 'policies',
+              label: t('place.policies'),
+              description: (() => {
+                const p = progress(place!.id, policies);
+                return p.signed === p.total
+                  ? t('place.policies.allSigned', { total: p.total })
+                  : t('place.policies.hint', { signed: p.signed, total: p.total });
+              })(),
+              href: policiesHref(place!.id, place!.name),
+              icon:
+                progress(place!.id, policies).signed === policies.length ? (
+                  <SignedIcon {...QUICK} />
+                ) : (
+                  <BookIcon {...QUICK} />
+                ),
+            },
+          ]}
+        />
+      ) : null}
     </Page>
   );
 }
@@ -324,7 +429,6 @@ export default function PlacePage() {
     <Suspense
       fallback={
         <Page gap={4}>
-          <AppHeader />
           <PlaceDetailSkeleton label="Loading" />
         </Page>
       }

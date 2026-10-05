@@ -333,8 +333,15 @@ describe('the notification list (A7)', () => {
   });
 
   it('labels the ones that are new, and only those', () => {
+    // A dot named "New" since D-230, rather than the word on every row.
     render(<NotificationList items={items} labels={labels} />);
-    expect(screen.getAllByText('New')).toHaveLength(2);
+    expect(screen.getAllByRole('img', { name: 'New' })).toHaveLength(2);
+  });
+
+  it('puts the new ones first under New, the rest under Earlier (D-230)', () => {
+    render(<NotificationList items={items} labels={{ ...labels, earlier: 'Earlier' }} />);
+    expect(screen.getByText('New')).toBeInTheDocument();
+    expect(screen.getByText('Earlier')).toBeInTheDocument();
   });
 
   it('is a log, not a form: nothing here is a button', () => {

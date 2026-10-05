@@ -3,31 +3,22 @@
 import { useEffect, useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { VStack } from '@astryxdesign/core/VStack';
-import { HStack } from '@astryxdesign/core/HStack';
 import { Card } from '@astryxdesign/core/Card';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { Selector } from '@astryxdesign/core/Selector';
 import { Switch } from '@astryxdesign/core/Switch';
-import { Button } from '@astryxdesign/core/Button';
 import { RadioList, RadioListItem } from '@astryxdesign/core/RadioList';
-import {
-  AppHeader,
-  BigButton,
-  Loading,
-  Notice,
-  Page,
-  PageTitle,
-  ScrollReveal,
-  TextLink,
-} from '@pam/ui';
+import { BigButton, Loading, Notice, Page, ScrollReveal, TextLink } from '@pam/ui';
+import { SubPageHeader } from '@pam/ui/SubPage';
+import { HelpButton } from '../../screens/HelpButton';
+import { InviteReady } from '../../screens/InviteReady';
 import { PersonRowSkeletonList } from '@pam/ui/Skeletons';
 import { NOTICES, ROLES, type Role } from '@pam/config';
 import { USE_DUMMY_PEOPLE } from '@pam/config/dummy-flag';
 import { DUMMY_EVERYONE } from '@pam/config/dummy-people';
 import { useI18n } from '@/lib/i18n';
 import { NotIn } from '../NotIn';
-import { HeaderBell } from '../HeaderBell';
 import { PersonRow } from '../PersonRow';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
@@ -67,7 +58,6 @@ const styles = stylex.create({
   name: { fontSize: '18px' },
   card: { width: '100%' },
   // The header is a tight row: the filter gives way before the mark does.
-  filter: { maxWidth: '48vw' },
   code: { fontSize: '32px', fontWeight: 700, letterSpacing: '0.12em', fontVariantNumeric: 'tabular-nums' },
   note: { fontSize: '15px', lineHeight: 1.5 },
   secondary: { minHeight: '48px' },
@@ -100,8 +90,7 @@ export default function DirectoryPage() {
   // The filter is real: it asks the same question of the example set that it
   // asks the database, so switching it while the real directory is empty
   // still demonstrates what it does.
-  const dummyPeople =
-    filter === 'all' ? DUMMY_EVERYONE : DUMMY_EVERYONE.filter((p) => p.role === filter);
+  const dummyPeople = filter === 'all' ? DUMMY_EVERYONE : DUMMY_EVERYONE.filter((p) => p.role === filter);
 
   /**
    * Bringing somebody in.
@@ -124,7 +113,6 @@ export default function DirectoryPage() {
   const [invite, setInvite] = useState<CreatedInvite | null>(null);
   const [inviteBusy, setInviteBusy] = useState(false);
   const [inviteFailed, setInviteFailed] = useState<'city' | 'failed' | null>(null);
-  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (!isSuperAdmin) return;
@@ -150,7 +138,6 @@ export default function DirectoryPage() {
     setInviteBusy(false);
     if (created) {
       setInvite(created);
-      setCopied(false);
     } else {
       setInviteFailed('failed');
     }
@@ -159,7 +146,19 @@ export default function DirectoryPage() {
   if (session.status === 'loading') {
     return (
       <Page gap={3}>
-        <AppHeader />
+        <SubPageHeader
+          title={t('directory.title')}
+          backHref="/profile/"
+          backLabel={t('nav.back.profile')}
+          actions={
+            <>
+              {trueRole === 'super_admin' ? (
+                <RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} />
+              ) : null}
+              <HelpButton />
+            </>
+          }
+        />
         <Loading label={t('common.loading')} variant="screen" />
       </Page>
     );
@@ -168,7 +167,19 @@ export default function DirectoryPage() {
   if (session.status === 'signed-out' || session.status === 'no-profile' || session.status === 'suspended') {
     return (
       <Page gap={4}>
-        <AppHeader />
+        <SubPageHeader
+          title={t('directory.title')}
+          backHref="/profile/"
+          backLabel={t('nav.back.profile')}
+          actions={
+            <>
+              {trueRole === 'super_admin' ? (
+                <RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} />
+              ) : null}
+              <HelpButton />
+            </>
+          }
+        />
         <NotIn status={session.status} title={t('directory.signedOut.title')} body={t('directory.signedOut.body')} />
       </Page>
     );
@@ -178,7 +189,19 @@ export default function DirectoryPage() {
     const key = session.offline ? 'offline' : 'something_went_wrong';
     return (
       <Page gap={4}>
-        <AppHeader />
+        <SubPageHeader
+          title={t('directory.title')}
+          backHref="/profile/"
+          backLabel={t('nav.back.profile')}
+          actions={
+            <>
+              {trueRole === 'super_admin' ? (
+                <RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} />
+              ) : null}
+              <HelpButton />
+            </>
+          }
+        />
         <Notice
           notice={key}
           title={t(NOTICES[key].titleKey)}
@@ -195,14 +218,18 @@ export default function DirectoryPage() {
     // and not a blank page (§0).
     return (
       <Page gap={4}>
-        <AppHeader
-          roleLabel={viewedRole ? t(`role.${viewedRole}`) : undefined}
-          roleControl={
-            trueRole === 'super_admin' ? (
-              <RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} />
-            ) : undefined
+        <SubPageHeader
+          title={t('directory.title')}
+          backHref="/profile/"
+          backLabel={t('nav.back.profile')}
+          actions={
+            <>
+              {trueRole === 'super_admin' ? (
+                <RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} />
+              ) : null}
+              <HelpButton />
+            </>
           }
-          trailing={<HeaderBell enabled={trueRole !== null} role={viewedRole} isDemo={isDemo} />}
         />
         <Notice
           notice="service_not_available"
@@ -211,41 +238,13 @@ export default function DirectoryPage() {
           supportPhone={supportPhone}
           callLabel={t('help.callSupport')}
         />
-        <TextLink label={t('admin.back')} href="/" />
       </Page>
     );
   }
 
   return (
     <Page gap={4}>
-      <AppHeader
-        roleLabel={t('role.super_admin')}
-        roleControl={<RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} />}
-        trailing={
-          <HStack gap={1} align="center" wrap="nowrap">
-            {/*
-              The filter, in the header, where the fact it changes belongs: what
-              kind of person this whole list is about.
-            */}
-            <Selector
-              label={t('directory.filter')}
-              isLabelHidden
-              variant="ghost"
-              size="lg"
-              value={filter}
-              options={FILTERS.map((option) => ({
-                value: option,
-                label: t(`directory.filter.${option}`),
-              }))}
-              onChange={(next) => setFilter(next as Filter)}
-              xstyle={styles.filter}
-            />
-            <HeaderBell enabled={isSuperAdmin} role={viewedRole} isDemo={isDemo} />
-          </HStack>
-        }
-      />
-
-      <PageTitle
+      <SubPageHeader
         title={t('directory.title')}
         subtitle={
           directory.status === 'ready' && !isDemo
@@ -254,8 +253,31 @@ export default function DirectoryPage() {
               ? t('directory.count', { count: dummyPeople.length })
               : undefined
         }
-        backHref="/"
-        backLabel={t('nav.back.home')}
+        backHref="/profile/"
+        backLabel={t('nav.back.profile')}
+        actions={
+          <>
+            {trueRole === 'super_admin' ? (
+              <RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} />
+            ) : null}
+            <HelpButton />
+          </>
+        }
+      />
+
+      {/*
+        Who the list is about — moved out of the old app header into the page
+        when the screen joined the nested template (D-217).
+      */}
+      <Selector
+        label={t('directory.filter')}
+        size="lg"
+        value={filter}
+        options={FILTERS.map((option) => ({
+          value: option,
+          label: t(`directory.filter.${option}`),
+        }))}
+        onChange={(next) => setFilter(next as Filter)}
       />
 
       {/*
@@ -271,30 +293,7 @@ export default function DirectoryPage() {
             {t('directory.invite.title')}
           </Heading>
           {invite ? (
-            <>
-              <Text type="supporting" xstyle={styles.note}>
-                {t('admin.invite.ready')}
-              </Text>
-              <Text xstyle={styles.code}>{invite.code}</Text>
-              <Text type="supporting" xstyle={styles.note}>
-                {t('admin.invite.expires', {
-                  date: new Intl.DateTimeFormat(locale, { month: 'long', day: 'numeric' }).format(
-                    new Date(invite.expiresAt),
-                  ),
-                })}
-              </Text>
-              <HStack gap={2} wrap="wrap">
-                <Button
-                  label={copied ? t('admin.invite.copied') : t('admin.invite.copy')}
-                  variant="secondary"
-                  onClick={() => {
-                    void navigator.clipboard?.writeText(invite.code).then(() => setCopied(true));
-                  }}
-                  xstyle={styles.secondary}
-                />
-                <TextLink label={t('admin.invite.another')} onClick={() => setInvite(null)} />
-              </HStack>
-            </>
+            <InviteReady invite={invite} onAnother={() => setInvite(null)} isBare />
           ) : (
             <>
               {regions.length > 1 ? (
@@ -319,19 +318,17 @@ export default function DirectoryPage() {
                   onPress={() => void makeInvite('admin')}
                   isDisabled={inviteBusy}
                 />
-                <Button
+                <BigButton
                   label={t('directory.invite.provider')}
                   variant="secondary"
-                  onClick={() => void makeInvite('provider')}
+                  onPress={() => void makeInvite('provider')}
                   isDisabled={inviteBusy}
-                  xstyle={styles.secondary}
                 />
-                <Button
+                <BigButton
                   label={t('directory.invite.member')}
                   variant="secondary"
-                  onClick={() => void makeInvite('member')}
+                  onPress={() => void makeInvite('member')}
                   isDisabled={inviteBusy}
-                  xstyle={styles.secondary}
                 />
               </VStack>
             </>
@@ -348,9 +345,7 @@ export default function DirectoryPage() {
         </VStack>
       </Card>
 
-      {directory.status === 'loading' ? (
-        <PersonRowSkeletonList label={t('common.loading')} />
-      ) : null}
+      {directory.status === 'loading' ? <PersonRowSkeletonList label={t('common.loading')} /> : null}
 
       {directory.status === 'empty' && !USE_DUMMY_PEOPLE ? (
         <Notice
@@ -442,7 +437,6 @@ export default function DirectoryPage() {
           </Text>
         </VStack>
       ) : null}
-
     </Page>
   );
 }

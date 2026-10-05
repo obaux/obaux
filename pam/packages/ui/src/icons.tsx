@@ -206,11 +206,232 @@ export function GlobeIcon(props: SVGProps<SVGSVGElement>) {
 }
 
 /** A star. Points — the only place in PAM that keeps a score. */
-export function StarIcon(props: SVGProps<SVGSVGElement>) {
+export function StarIcon({ isFilled = true, ...props }: SVGProps<SVGSVGElement> & { isFilled?: boolean }) {
+  // Outlined when not filled — a case manager's "not starred" (D-218).
   return (
-    <svg {...svgProps} fill="currentColor" stroke="none" {...props}>
+    <svg
+      {...svgProps}
+      fill={isFilled ? 'currentColor' : 'none'}
+      stroke={isFilled ? 'none' : 'currentColor'}
+      {...props}
+    >
       <path d="m12 3.6 2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8L3.5 9.8l5.9-.9z" />
     </svg>
   );
 }
 
+
+/** A magnifying glass. Explore — the home tab since the 1 October redesign (D-210). */
+export function ExploreIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <circle cx="10.5" cy="10.5" r="6.5" />
+      <path d="m15.5 15.5 5 5" />
+    </svg>
+  );
+}
+
+/** A speech bubble. Messages. */
+export function MessagesIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <path d="M4 5.5A1.5 1.5 0 0 1 5.5 4h13A1.5 1.5 0 0 1 20 5.5v10a1.5 1.5 0 0 1-1.5 1.5H10l-4.5 3.5V17h0A1.5 1.5 0 0 1 4 15.5z" />
+    </svg>
+  );
+}
+
+/** A calendar with a pin on a day. Trips — a visit somebody planned. */
+export function TripsIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <rect x="3.5" y="5" width="17" height="15.5" rx="2" />
+      <path d="M8 3v4M16 3v4M3.5 10h17" />
+      <path d="M12 18.5s-2.75-2.3-2.75-4.1a2.75 2.75 0 0 1 5.5 0c0 1.8-2.75 4.1-2.75 4.1z" />
+    </svg>
+  );
+}
+
+/** Three sliders. Account settings — plainer than a gear at 26px. */
+export function SettingsIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <path d="M4 6.5h9M17 6.5h3M4 12h3M11 12h9M4 17.5h11M19 17.5h1" />
+      <circle cx="15" cy="6.5" r="2" />
+      <circle cx="9" cy="12" r="2" />
+      <circle cx="17" cy="17.5" r="2" />
+    </svg>
+  );
+}
+
+/** A question mark in a circle. Get help — leads to the help screen. */
+export function HelpIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M9.6 9.3a2.5 2.5 0 0 1 4.8.9c0 1.7-2.4 2.2-2.4 3.8" />
+      <path d="M12 17.25h.01" strokeWidth={2.25} />
+    </svg>
+  );
+}
+
+/** A page with lines. Legal — privacy and terms. */
+export function LegalIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <path d="M6 3.5h8.5L19 8v12.5H6z" />
+      <path d="M14.5 3.5V8H19M9 12h7M9 15.5h7M9 9h3" />
+    </svg>
+  );
+}
+
+/** A door with an arrow leaving. Sign out. */
+export function SignOutIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <path d="M13.5 4H6.5a1 1 0 0 0-1 1v14a1 1 0 0 0 1 1h7" />
+      <path d="M10.5 12h10M17.5 8.5 21 12l-3.5 3.5" />
+    </svg>
+  );
+}
+
+/** Two figures side by side. Connections — the people on a member's side. */
+export function ConnectionsIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <circle cx="8.5" cy="8.5" r="3" />
+      <circle cx="16" cy="9.5" r="2.5" />
+      <path d="M3 19.5a5.5 5.5 0 0 1 11 0M14.5 15a4.5 4.5 0 0 1 6.5 4.5" />
+    </svg>
+  );
+}
+
+/*
+ * Place categories (D-212), for Explore's chips — the reference's
+ * "Homes / Experiences / Services" row, carrying PAM's three fixed categories
+ * (§2.5) instead. Same line weight as the rest of the set, so a chip reads as
+ * part of the app rather than a sticker on it.
+ */
+
+/** Four squares. Every kind of place. */
+export function AllPlacesIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <rect x="4" y="4" width="7" height="7" rx="1.5" />
+      <rect x="13" y="4" width="7" height="7" rx="1.5" />
+      <rect x="4" y="13" width="7" height="7" rx="1.5" />
+      <rect x="13" y="13" width="7" height="7" rx="1.5" />
+    </svg>
+  );
+}
+
+/** A mortarboard. School and training. */
+export function EducationIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <path d="M2.5 9.5 12 5l9.5 4.5L12 14z" />
+      <path d="M6.5 11.5v4.25c0 1.5 2.5 3 5.5 3s5.5-1.5 5.5-3V11.5" />
+      <path d="M21.5 9.5v5" />
+    </svg>
+  );
+}
+
+/** A briefcase. Work. */
+export function WorkforceIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <rect x="3" y="7.5" width="18" height="12.5" rx="2" />
+      <path d="M8.5 7.5V5.5a1.5 1.5 0 0 1 1.5-1.5h4a1.5 1.5 0 0 1 1.5 1.5v2" />
+      <path d="M3 12.5h18M10.5 12.5v1.5h3v-1.5" />
+    </svg>
+  );
+}
+
+/** A house with a heart. Help for you and your family. */
+export function FamilyServicesIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <path d="M3 10.5 12 3l9 7.5" />
+      <path d="M5 9.5V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9.5" />
+      <path d="M12 17.5s-3-2.1-3-4a1.6 1.6 0 0 1 3-.8 1.6 1.6 0 0 1 3 .8c0 1.9-3 4-3 4z" />
+    </svg>
+  );
+}
+
+/** Signal waves, crossed out. No connection — the error a member meets most. */
+export function OfflineIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <path d="M2.5 9a14 14 0 0 1 19 0M5.5 12.5a9.5 9.5 0 0 1 13 0M8.75 16a5 5 0 0 1 6.5 0" />
+      <path d="M12 19.5h.01" strokeWidth={2.5} />
+      <path d="M3.5 3.5l17 17" />
+    </svg>
+  );
+}
+
+/** A magnifying glass over nothing. A search that found nothing. */
+export function NoResultsIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <circle cx="10.5" cy="10.5" r="6.5" />
+      <path d="m15.5 15.5 5 5M8.25 8.25l4.5 4.5M12.75 8.25l-4.5 4.5" />
+    </svg>
+  );
+}
+
+/** An arrow pointing back. The nested-page back button (D-213). */
+export function BackArrowIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <path d="M19.5 12h-15M10.5 6l-6 6 6 6" />
+    </svg>
+  );
+}
+
+/** An open book. A policy to read — the Legal list's rows. */
+export function BookIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <path d="M12 6.5c-1.8-1.4-4.5-2-8-2v13c3.5 0 6.2.6 8 2 1.8-1.4 4.5-2 8-2v-13c-3.5 0-6.2.6-8 2z" />
+      <path d="M12 6.5v13M14.75 9.5h2.5M14.75 12.5h2.5M14.75 15.5h2.5" />
+    </svg>
+  );
+}
+
+/** A pen on a line. A policy still to sign (D-270). */
+export function SignIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <path d="M15.5 4.5l4 4L9 19l-5 1 1-5z" />
+      <path d="M13 7l4 4M14 20h6" />
+    </svg>
+  );
+}
+
+/** A tick in a circle. A policy signed (D-270). */
+export function SignedIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="M8.25 12.25l2.5 2.5 5-5.25" />
+    </svg>
+  );
+}
+
+/** A plus. Add a program (D-218). */
+export function PlusIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <path d="M12 5v14M5 12h14" />
+    </svg>
+  );
+}
+
+/** A speech bubble with a plus. New message (D-220). */
+export function NewMessageIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <path d="M4.5 5.5h15a1 1 0 0 1 1 1v9.5a1 1 0 0 1-1 1H10l-4.5 3.5V17h-1a1 1 0 0 1-1-1V6.5a1 1 0 0 1 1-1z" />
+      <path d="M12 8.5v6M9 11.5h6" />
+    </svg>
+  );
+}

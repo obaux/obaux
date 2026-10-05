@@ -74,7 +74,7 @@
      */
     --pam-body-size: 18px;
     --pam-touch-target-min: 48px;
-    --pam-big-button-height: 64px;
+    --pam-big-button-height: 56px;
   }
 
   @media (min-width: 768px) {
@@ -171,6 +171,16 @@
     padding-block: 12px;
   }
 
+  /*
+   * Every button a full pill (Will, 3 October, D-253). Astryx's Button reads
+   * its corner from this variable before falling back to the theme's element
+   * radius, so one line here covers every Button and IconButton; a component
+   * that sets its own corner in xstyle (a list row, a tile) keeps it.
+   */
+  :root {
+    --_button-radius: 999px;
+  }
+
   /* §12: every flow completable with tap only — never hide the focus ring. */
   :focus-visible {
     outline: 3px solid currentColor;
@@ -213,6 +223,232 @@
     border-radius: 12px;
   }
 
+  /*
+   * The sign-in code's boxes (D-251): the field is invisible over the row,
+   * and focus shows on the box the next digit goes in — a 2px accent edge —
+   * so the frame ring above would be a second indicator round all six.
+   */
+  [data-pam-code]:has(> input:focus-visible) {
+    outline: none;
+  }
+
+  /*
+   * The search bar (D-212) is one rounded shape with the field inside it; the
+   * rule above would ring the field's own inner box, a rectangle floating in
+   * a pill. Same ring, moved to the pill, following its round ends.
+   */
+  .astryx-input-group[data-size='lg'] :has(> input:focus-visible) {
+    outline: none;
+  }
+
+  .astryx-input-group[data-size='lg']:has(input:focus-visible) {
+    outline: 3px solid currentColor;
+    outline-offset: 2px;
+    border-radius: 999px;
+  }
+
+  /*
+   * A list row that is an action, not a link — Sign out (D-218). Astryx draws
+   * it as a 48px button that stacks its label at the top, so the words sat
+   * above the icon beside them; a link row has no such box. Centred, it lines
+   * up with every other row.
+   */
+  /*
+   * Every search bar's words and magnifier read bolder and darker (Will,
+   * 5 October, D-265, after the reference: "keep the bolder text and icon
+   * across all search bars"). The large input group is only ever a search
+   * pill (SearchPill, SearchField), so this reaches all of them and nothing
+   * else.
+   */
+  .astryx-input-group[data-size='lg'] input {
+    font-weight: 600;
+  }
+  .astryx-input-group[data-size='lg'] input::placeholder {
+    font-weight: 600;
+    color: var(--color-text-primary);
+    opacity: 1;
+  }
+  .astryx-input-group[data-size='lg'] svg {
+    color: var(--color-text-primary);
+    stroke-width: 2.25;
+  }
+
+  .astryx-item > button {
+    justify-content: center;
+  }
+
+  /*
+   * A list row's middle (the link or button holding the label and the line
+   * under it) is a flex item that could grow past the row, so a long message
+   * preview ran off the screen instead of ending in "…" (Will, 2 October).
+   * Allowed to shrink, the line's own ellipsis has an edge to meet.
+   */
+  .astryx-item > a,
+  .astryx-item > button {
+    min-width: 0;
+  }
+
+  /*
+   * A sheet's grab handle, drawn like the Trips drawer's (MapDrawer's grip):
+   * 40 by 5, the border colour, so every drawer in PAM has the same handle
+   * (Will, 3 October). Astryx's own is a thinner 36 by 4.
+   */
+  /*
+   * And its top corners match the Trips drawer's 28px (Will, 3 October):
+   * Astryx's own were tighter, so the two drawers looked like different
+   * things.
+   */
+  .astryx-bottom-sheet {
+    border-top-left-radius: 28px;
+    border-top-right-radius: 28px;
+  }
+
+  .astryx-bottom-sheet > [aria-hidden='true'] > div {
+    width: 40px;
+    height: 5px;
+    border-radius: 3px;
+    background-color: var(--color-border);
+  }
+
+  /*
+   * Notifications (D-230): each row leads with a short title — "Place
+   * reported" — at reading size and weight, above the grey sentence.
+   */
+  [data-pam-list='notifications'] .astryx-item > a > span:first-child,
+  [data-pam-list='notifications'] .astryx-item > span:first-child {
+    font-size: 17px;
+    font-weight: 600;
+  }
+
+  /*
+   * Segmented controls are pills, inside and out (Will, 3 October, D-233):
+   * the segments and the sliding highlight match the round search bar, chips
+   * and buttons. Astryx has no prop for the segment's radius.
+   */
+  .astryx-segmented-control,
+  .astryx-segmented-control > .astryx-segmented-control-item,
+  .astryx-segmented-control > div {
+    border-radius: 999px;
+  }
+
+  /*
+   * The recommend dialog on Connect (D-234): 32px corners, and the page
+   * behind washed to 80% white instead of darkened (Will, 3 October).
+   */
+  dialog:is([data-pam-dialog='recommend'], [data-pam-dialog='confirm']),
+  :is([data-pam-dialog='recommend'], [data-pam-dialog='confirm']) .astryx-dialog,
+  .astryx-dialog:is([data-pam-dialog='recommend'], [data-pam-dialog='confirm']) {
+    border-radius: 32px;
+  }
+
+  dialog:is([data-pam-dialog='recommend'], [data-pam-dialog='confirm'])::backdrop {
+    background-color: rgb(255 255 255 / 80%);
+  }
+
+  /*
+   * Moving between screens (D-269, Will, 5 October: "the whole app feels
+   * very stiff"). `navTransition` in @pam/ui wraps each change of screen in
+   * the browser's View Transitions and sets `data-pam-nav` on <html> for its
+   * length; these say what each kind looks like. Opacity and transform only.
+   *
+   * Forward: the new screen comes in from the right, 24px and a fade, while
+   * the old one eases a little to the left and goes. Back is the mirror.
+   * Between two tabs nothing is deeper than anything else, so a quick
+   * cross-fade. The bottom bar is its own layer and stays where it is.
+   */
+  [data-pam-tabbar] {
+    view-transition-name: pam-tabbar;
+  }
+
+  ::view-transition-group(pam-tabbar) {
+    animation: none;
+  }
+
+  html[data-pam-nav='forward']::view-transition-old(root) {
+    animation: 200ms cubic-bezier(0.4, 0, 1, 1) both pam-nav-out-left;
+  }
+  html[data-pam-nav='forward']::view-transition-new(root) {
+    animation: 280ms cubic-bezier(0.2, 0, 0, 1) both pam-nav-in-right;
+  }
+  html[data-pam-nav='back']::view-transition-old(root) {
+    animation: 200ms cubic-bezier(0.4, 0, 1, 1) both pam-nav-out-right;
+  }
+  html[data-pam-nav='back']::view-transition-new(root) {
+    animation: 280ms cubic-bezier(0.2, 0, 0, 1) both pam-nav-in-left;
+  }
+  html[data-pam-nav='tab']::view-transition-old(root) {
+    animation: 120ms linear both pam-nav-fade-out;
+  }
+  html[data-pam-nav='tab']::view-transition-new(root) {
+    animation: 180ms cubic-bezier(0.2, 0, 0, 1) both pam-nav-fade-in;
+  }
+
+  /*
+   * The card effect: the tapped card and the new screen's page body share
+   * the name `pam-morph`, so the browser grows one into the other — the
+   * card's box widens and lengthens into the screen while the card's picture
+   * gives way to the screen's. Everything else on the old screen fades.
+   */
+  html[data-pam-nav='morph']::view-transition-old(root) {
+    animation: 160ms linear both pam-nav-fade-out;
+  }
+  html[data-pam-nav='morph']::view-transition-new(root) {
+    animation: 320ms cubic-bezier(0.2, 0, 0, 1) both pam-nav-fade-in;
+  }
+  html[data-pam-nav='morph']::view-transition-group(pam-morph) {
+    animation-duration: 360ms;
+    animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
+    overflow: clip;
+    border-radius: 28px;
+  }
+  html[data-pam-nav='morph']::view-transition-image-pair(pam-morph) {
+    isolation: auto;
+  }
+  html[data-pam-nav='morph']::view-transition-old(pam-morph),
+  html[data-pam-nav='morph']::view-transition-new(pam-morph) {
+    width: 100%;
+    height: auto;
+    mix-blend-mode: normal;
+  }
+  html[data-pam-nav='morph']::view-transition-old(pam-morph) {
+    animation: 140ms linear both pam-nav-fade-out;
+  }
+  html[data-pam-nav='morph']::view-transition-new(pam-morph) {
+    animation: 260ms cubic-bezier(0.2, 0, 0, 1) 60ms both pam-nav-fade-in;
+  }
+
+  /*
+   * A screen arrives in its turn, not in one block: each section of the page
+   * body rises 8px and fades in, 30ms after the one above it, capped at the
+   * sixth (D-269). Replaces the whole-page fade `PageEnter` used to carry.
+   */
+  [data-pam-page] > * > * {
+    animation: 260ms cubic-bezier(0.2, 0, 0, 1) both pam-rise;
+  }
+  [data-pam-page] > * > :nth-child(2) {
+    animation-delay: 30ms;
+  }
+  [data-pam-page] > * > :nth-child(3) {
+    animation-delay: 60ms;
+  }
+  [data-pam-page] > * > :nth-child(4) {
+    animation-delay: 90ms;
+  }
+  [data-pam-page] > * > :nth-child(5) {
+    animation-delay: 120ms;
+  }
+  [data-pam-page] > * > :nth-child(n + 6) {
+    animation-delay: 150ms;
+  }
+
+  /*
+   * Dialogs settle rather than stop: the same enter as Astryx's, on a curve
+   * that spends its last stretch slowing down.
+   */
+  .astryx-dialog {
+    animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
   @media (prefers-reduced-motion: reduce) {
     *,
     *::before,
@@ -223,4 +459,27 @@
       scroll-behavior: auto !important;
     }
   }
+}
+
+/* Keyframes for D-269's moves between screens and the page body's rise. */
+@keyframes pam-nav-in-right {
+  from { opacity: 0; transform: translateX(24px); }
+}
+@keyframes pam-nav-out-left {
+  to { opacity: 0; transform: translateX(-12px); }
+}
+@keyframes pam-nav-in-left {
+  from { opacity: 0; transform: translateX(-24px); }
+}
+@keyframes pam-nav-out-right {
+  to { opacity: 0; transform: translateX(12px); }
+}
+@keyframes pam-nav-fade-in {
+  from { opacity: 0; }
+}
+@keyframes pam-nav-fade-out {
+  to { opacity: 0; }
+}
+@keyframes pam-rise {
+  from { opacity: 0; transform: translateY(8px); }
 }

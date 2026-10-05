@@ -75,7 +75,9 @@ async function signedIn(page: import('@playwright/test').Page, profile: Profile)
 test.describe('the way out', () => {
   test('every signed-in screen has the same button to your account', async ({ page }) => {
     await signedIn(page, { role: 'member' });
-    for (const path of ['/', '/places/', '/points/', '/saved/']) {
+    // Points left this list at D-217: it is a nested screen now (round back,
+    // Help in the bar), reached from Profile, not a screen with the app header.
+    for (const path of ['/', '/places/', '/saved/']) {
       await page.goto(path);
       const button = page.getByRole('link', { name: 'Your account' });
       await expect(button, `${path} has no account button`).toBeVisible();
@@ -168,7 +170,8 @@ test.describe('the way out', () => {
     await page.getByRole('radio', { name: 'Pittsburgh' }).click();
     await page.getByRole('button', { name: 'A case manager' }).click();
 
-    await expect(page.getByText('P3TWVWTW')).toBeVisible();
+    // A link to the invite Sign in, for a case manager (D-254).
+    await expect(page.getByText(/\/signin\/\?invite=P3TWVWTW&as=case-manager/)).toBeVisible();
     expect(asked[0]).toMatchObject({ p_role: 'admin', p_region_id: 'r-pit' });
   });
 

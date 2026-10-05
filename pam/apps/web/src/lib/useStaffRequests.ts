@@ -19,6 +19,18 @@ export interface StaffRequestRow {
   readonly lastName: string | null;
   readonly city: string | null;
   readonly createdAt: string;
+  /** What a program lead said about their program at sign-up (0056), if anything. */
+  readonly program: RequestedProgram | null;
+}
+
+export interface RequestedProgram {
+  readonly name: string;
+  readonly category: string | null;
+  readonly subcategory: string | null;
+  readonly description: string | null;
+  readonly address: string | null;
+  readonly phone: string | null;
+  readonly website: string | null;
 }
 
 export type StaffRequestsState =
@@ -43,7 +55,9 @@ export function useStaffRequests(enabled: boolean): {
         const { createClient } = await import('./supabase');
         const { data, error } = await createClient()
           .from('staff_requests')
-          .select('user_id, wants_role, first_name, last_name, city, created_at')
+          .select(
+            'user_id, wants_role, first_name, last_name, city, created_at, program_name, program_category, program_subcategory, program_description, program_address, program_phone, program_website',
+          )
           .is('decision', null)
           .order('created_at', { ascending: true });
 
@@ -60,6 +74,13 @@ export function useStaffRequests(enabled: boolean): {
           last_name: string | null;
           city: string | null;
           created_at: string;
+          program_name?: string | null;
+          program_category?: string | null;
+          program_subcategory?: string | null;
+          program_description?: string | null;
+          program_address?: string | null;
+          program_phone?: string | null;
+          program_website?: string | null;
         }[];
 
         setState({
@@ -71,6 +92,17 @@ export function useStaffRequests(enabled: boolean): {
             lastName: row.last_name,
             city: row.city,
             createdAt: row.created_at,
+            program: row.program_name
+              ? {
+                  name: row.program_name,
+                  category: row.program_category ?? null,
+                  subcategory: row.program_subcategory ?? null,
+                  description: row.program_description ?? null,
+                  address: row.program_address ?? null,
+                  phone: row.program_phone ?? null,
+                  website: row.program_website ?? null,
+                }
+              : null,
           })),
         });
       } catch {
@@ -105,5 +137,21 @@ export async function reviewStaffRequest(
     return !error;
   } catch {
     return false;
+  }
+}
+
+/**
+ * The number a requester signed up with, so the super admin can text them
+ * from their own phone about how PAM will work (0072, D-262). Only while the
+ * request is open, and every read is audited; null if there is none.
+ */
+export async function staffRequestPhone(userId: string): Promise<string | null> {
+  try {
+    const { createClient } = await import('./supabase');
+    const { data, error } = await createClient().rpc('staff_request_phone', { p_user_id: userId });
+    if (error || typeof data !== 'string' || !data) return null;
+    return data;
+  } catch {
+    return null;
   }
 }

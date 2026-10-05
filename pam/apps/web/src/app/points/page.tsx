@@ -7,11 +7,12 @@ import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { Badge } from '@astryxdesign/core/Badge';
 import { colorVars, spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
-import { AppHeader, BigButton, Notice, Page, PageTitle, StarIcon } from '@pam/ui';
+import { BigButton, Notice, Page, StarIcon } from '@pam/ui';
+import { SubPageHeader } from '@pam/ui/SubPage';
+import { HelpButton } from '../../screens/HelpButton';
 import { BADGES, badgeForPoints, nextBadge, type BadgeDefinition } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { NotIn } from '../NotIn';
-import { HeaderBell } from '../HeaderBell';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
 import { usePoints } from '@/lib/usePoints';
@@ -113,15 +114,11 @@ function Step({
 }) {
   const threshold = badge.minPoints ?? null;
   const isEarned = threshold !== null && points !== null && points >= threshold;
-  const isHere =
-    threshold !== null && points !== null && badgeForPoints(points).key === badge.key;
+  const isHere = threshold !== null && points !== null && badgeForPoints(points).key === badge.key;
 
   return (
     <HStack gap={3} align="start" wrap="nowrap" xstyle={[styles.step, isLast && styles.lastStep]}>
-      <span
-        aria-hidden="true"
-        {...stylex.props(styles.mark, isEarned && styles.earned, isHere && styles.here)}
-      >
+      <span aria-hidden="true" {...stylex.props(styles.mark, isEarned && styles.earned, isHere && styles.here)}>
         <StarIcon />
       </span>
       <VStack gap={1}>
@@ -158,8 +155,7 @@ export default function PointsPage() {
   if (session.status === 'signed-out' || session.status === 'no-profile' || session.status === 'suspended') {
     return (
       <Page gap={4}>
-        <AppHeader />
-        <PageTitle title={t('points.title')} backHref="/" backLabel={t('nav.back.home')} />
+        <SubPageHeader title={t('points.title')} backHref="/profile/" backLabel={t('nav.back.profile')} />
         <NotIn status={session.status} title={t('directory.signedOut.title')} body={t('reminders.signedOut')} />
       </Page>
     );
@@ -172,19 +168,8 @@ export default function PointsPage() {
 
   return (
     <Page gap={4}>
-      <AppHeader
-        roleLabel={
-          session.status === 'signed-in' ? t(`role.${demoRole ?? session.session.role}`) : undefined
-        }
-        roleControl={
-          trueRole === 'super_admin' ? (
-            <RoleSwitchControl trueRole={trueRole} viewedRole={demoRole ?? trueRole} onChange={setViewAs} />
-          ) : undefined
-        }
-        trailing={<HeaderBell enabled={session.status === 'signed-in'} role={demoRole ?? trueRole} />}
-      />
-
-      <PageTitle
+      {/* The nested-page template (D-213, D-217); a super admin's role switch rides in its bar. */}
+      <SubPageHeader
         title={t('points.title')}
         subtitle={
           points !== null
@@ -195,8 +180,16 @@ export default function PointsPage() {
               : t('points.subtitle', { count: points })
             : undefined
         }
-        backHref="/"
-        backLabel={t('nav.back.home')}
+        backHref="/profile/"
+        backLabel={t('nav.back.profile')}
+        actions={
+          <>
+            {trueRole === 'super_admin' ? (
+              <RoleSwitchControl trueRole={trueRole} viewedRole={demoRole ?? trueRole} onChange={setViewAs} />
+            ) : null}
+            <HelpButton />
+          </>
+        }
       />
 
       <Text type="supporting" xstyle={styles.intro}>
@@ -220,13 +213,7 @@ export default function PointsPage() {
           </Heading>
           <VStack gap={0}>
             {badges.map((badge, index) => (
-              <Step
-                key={badge.key}
-                badge={badge}
-                points={points}
-                isLast={index === badges.length - 1}
-                t={t}
-              />
+              <Step key={badge.key} badge={badge} points={points} isLast={index === badges.length - 1} t={t} />
             ))}
           </VStack>
         </VStack>

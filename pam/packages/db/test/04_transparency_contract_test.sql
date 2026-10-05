@@ -21,7 +21,9 @@
 --   3. A program admin never receives `last_active_at` or `phone` for a
 --      member through either read path that reaches one —
 --      `conversation_partners()` (0061) or `provider_linked_members()`
---      (0062) — matching `transparency.cannotSee.programActivity`.
+--      (0062). The member-facing promise was relaxed by D-242 (a program may
+--      see the last day used); until a migration exposes it, the database
+--      stays stricter than the promise, which this part still checks.
 --   4. A case manager never receives a member's message content except
 --      through participation (point 1) or a report (point 2's boundary) —
 --      restated here as the single positive claim the other two points
@@ -112,7 +114,7 @@ select test.check('a case manager''s total message visibility is exactly the con
 
 -- ===========================================================================
 \echo ''
-\echo '--- 3. A program admin never receives activity info through either read path (transparency.cannotSee.programActivity) ---'
+\echo '--- 3. A program admin never receives activity info through either read path (stricter than the D-242 promise until its migration) ---'
 -- ===========================================================================
 -- Alice is genuinely both: provider_linked_to Marcus (enrollment, 01_seed.sql)
 -- AND a conversation_members row in convo1 (also 01_seed.sql) — the two read

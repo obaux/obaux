@@ -18,7 +18,12 @@
     "./dummy-notifications": "./src/dummy-notifications.ts",
     "./dummy-places": "./src/dummy-places.ts",
     "./dummy-conversations": "./src/dummy-conversations.ts",
-    "./people-activity": "./src/people-activity.ts"
+    "./people-activity": "./src/people-activity.ts",
+    "./dummy-connections": "./src/dummy-connections.ts",
+    "./dummy-trips": "./src/dummy-trips.ts",
+    "./dummy-appointments": "./src/dummy-appointments.ts",
+    "./dummy-policies": "./src/dummy-policies.ts",
+    "./invite-email": "./src/invite-email.ts"
   },
   "scripts": {
     "typecheck": "tsc -p tsconfig.json",

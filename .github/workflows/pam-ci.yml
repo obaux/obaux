@@ -88,11 +88,20 @@ jobs:
       - name: Install psql
         run: sudo apt-get update -qq && sudo apt-get install -y -qq postgresql-client
 
+      # The image installs PostGIS into POSTGRES_DB (pam_test) in `public`
+      # before any step runs, so 0001's `create extension ... with schema
+      # extensions` skipped as "already exists" and 0002 failed on
+      # `extensions.geography` — red on every branch from at least 21
+      # September. A database made from template0 is one the image never
+      # touched, the same blank slate the local throwaway cluster gives.
+      - name: Create a clean database
+        run: psql postgresql://postgres:postgres@localhost:5432/postgres -c 'create database pam_ci template template0'
+
       # This is the job that proves the §4.1 privacy promises hold: one test
       # user per role attempting cross-role reads (§13 Phase 7).
       - name: Apply migrations and run the RLS penetration suite
         env:
-          PAM_TEST_DSN: postgresql://postgres:postgres@localhost:5432/pam_test
+          PAM_TEST_DSN: postgresql://postgres:postgres@localhost:5432/pam_ci
         run: bash packages/db/scripts/test-db.sh
 
   a11y:

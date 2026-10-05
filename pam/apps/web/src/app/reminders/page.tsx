@@ -5,10 +5,11 @@ import { useRouter } from 'next/navigation';
 import * as stylex from '@stylexjs/stylex';
 import { VStack } from '@astryxdesign/core/VStack';
 import { Card } from '@astryxdesign/core/Card';
-import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { Button } from '@astryxdesign/core/Button';
-import { AppHeader, BigButton, Notice, Page, TextLink } from '@pam/ui';
+import { BigButton, Notice, Page, TextLink } from '@pam/ui';
+import { SubPageHeader } from '@pam/ui/SubPage';
+import { HelpButton } from '../../screens/HelpButton';
 import { useI18n } from '@/lib/i18n';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
@@ -47,7 +48,6 @@ import { setReminderConsent } from '@/lib/useReminderConsent';
  */
 
 const styles = stylex.create({
-  title: { fontSize: '28px', lineHeight: 1.2 },
   intro: { fontSize: '18px', lineHeight: 1.5 },
   card: { width: '100%' },
   heading: { fontSize: '17px' },
@@ -62,7 +62,6 @@ export default function RemindersPage() {
   const supportPhone = useSupportPhone();
   const { state: session } = useSession();
 
-  const signedIn = session.status === 'signed-in';
   /**
    * Staff get different messages, so they are shown a different list.
    *
@@ -72,6 +71,7 @@ export default function RemindersPage() {
    * which is the fastest way to teach somebody that a consent screen is noise.
    */
   const isStaff = session.status === 'signed-in' && session.session.role !== 'member';
+  const role = session.status === 'signed-in' ? session.session.role : null;
 
   /** What was chosen last time, when there is a last time. */
   const [already, setAlready] = useState<boolean | null>(null);
@@ -119,67 +119,72 @@ export default function RemindersPage() {
     }
 
     setDone(true);
-    router.replace(isStaff ? '/admin/' : '/places/');
+    router.replace(isStaff ? '/' : '/places/');
   };
 
   return (
     <Page>
-        <AppHeader roleLabel={signedIn ? t(`role.${session.session.role}`) : undefined} />
+      {/* The nested-page template (D-213, D-217) — reached from Profile. */}
+      <SubPageHeader
+        title={t('reminders.title')}
+        backHref="/profile/"
+        backLabel={t('nav.back.profile')}
+        actions={<HelpButton />}
+      />
+      <Text xstyle={styles.intro}>{t(isStaff ? 'reminders.introStaff' : 'reminders.intro')}</Text>
 
+      <Card padding={6} xstyle={styles.card}>
         <VStack gap={2}>
-          <Heading level={1} xstyle={styles.title}>
-            {t('reminders.title')}
-          </Heading>
-          <Text xstyle={styles.intro}>
-            {t(isStaff ? 'reminders.introStaff' : 'reminders.intro')}
+          <Text xstyle={styles.heading}>{t('reminders.what')}</Text>
+          {isStaff ? (
+            <>
+              {/* Staff: a message first — what a case manager waits on (D-256). */}
+              <Text xstyle={styles.item}>{t('reminders.what.messages')}</Text>
+              {role === 'provider' ? (
+                <>
+                  <Text xstyle={styles.item}>{t('reminders.what.visits')}</Text>
+                  <Text xstyle={styles.item}>{t('reminders.what.staff1')}</Text>
+                </>
+              ) : null}
+              <Text xstyle={styles.item}>{t('reminders.what.staff2')}</Text>
+            </>
+          ) : (
+            <>
+              <Text xstyle={styles.item}>{t('reminders.what.1')}</Text>
+              <Text xstyle={styles.item}>{t('reminders.what.2')}</Text>
+              <Text xstyle={styles.item}>{t('reminders.what.3')}</Text>
+            </>
+          )}
+          <Text type="supporting" xstyle={styles.small}>
+            {t('reminders.how')}
           </Text>
         </VStack>
+      </Card>
 
-        <Card padding={4} xstyle={styles.card}>
-          <VStack gap={2}>
-            <Text xstyle={styles.heading}>{t('reminders.what')}</Text>
-            {isStaff ? (
-              <>
-                <Text xstyle={styles.item}>{t('reminders.what.staff1')}</Text>
-                <Text xstyle={styles.item}>{t('reminders.what.staff2')}</Text>
-              </>
-            ) : (
-              <>
-                <Text xstyle={styles.item}>{t('reminders.what.1')}</Text>
-                <Text xstyle={styles.item}>{t('reminders.what.2')}</Text>
-                <Text xstyle={styles.item}>{t('reminders.what.3')}</Text>
-              </>
-            )}
-            <Text type="supporting" xstyle={styles.small}>
-              {t('reminders.how')}
-            </Text>
-          </VStack>
-        </Card>
+      {done || already === true ? (
+        <Text type="supporting" xstyle={styles.small}>
+          {t('reminders.saved')}
+        </Text>
+      ) : null}
 
-        {done || already === true ? (
-          <Text type="supporting" xstyle={styles.small}>
-            {t('reminders.saved')}
-          </Text>
-        ) : null}
+      {failed ? (
+        <Notice
+          notice="something_went_wrong"
+          title={t('notice.something_went_wrong.title')}
+          body={t('notice.something_went_wrong.body')}
+          supportPhone={supportPhone}
+          callLabel={t('help.callSupport')}
+        />
+      ) : null}
 
-        {failed ? (
-          <Notice
-            notice="something_went_wrong"
-            title={t('notice.something_went_wrong.title')}
-            body={t('notice.something_went_wrong.body')}
-            supportPhone={supportPhone}
-            callLabel={t('help.callSupport')}
-          />
-        ) : null}
-
-        {/*
+      {/*
           Signed out, the choice is still shown — it is what somebody is being
           asked, and hiding it behind a sign-in explains nothing — but the thing
           to do next is sign in, so that is the button.
         */}
-        {session.status === 'signed-in' ? (
-          <>
-            {/*
+      {session.status === 'signed-in' ? (
+        <>
+          {/*
               The button is the consent, and it says so.
 
               There was a tick box here as well and it earned nothing: people
@@ -194,27 +199,18 @@ export default function RemindersPage() {
               and nothing here can be pre-selected, because there is nothing to
               select.
             */}
-            <BigButton
-              label={t('reminders.agree')}
-              onPress={() => void answer(true)}
-              isDisabled={busy}
-            />
-            {/* Saying no is one tap, and it is recorded like any other answer. */}
-            <TextLink
-              label={t('reminders.skip')}
-              onClick={() => void answer(false)}
-              isDisabled={busy}
-            />
-          </>
-        ) : session.status === 'loading' ? null : (
-          <>
-            <Text type="supporting" xstyle={styles.small}>
-              {t('reminders.signedOut')}
-            </Text>
-            <BigButton label={t('signin.title')} href="/signin/" />
-          </>
-        )}
-
+          <BigButton label={t('reminders.agree')} onPress={() => void answer(true)} isDisabled={busy} />
+          {/* Saying no is one tap, and it is recorded like any other answer. */}
+          <TextLink label={t('reminders.skip')} onClick={() => void answer(false)} isDisabled={busy} />
+        </>
+      ) : session.status === 'loading' ? null : (
+        <>
+          <Text type="supporting" xstyle={styles.small}>
+            {t('reminders.signedOut')}
+          </Text>
+          <BigButton label={t('signin.title')} href="/signin/" />
+        </>
+      )}
     </Page>
   );
 }

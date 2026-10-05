@@ -209,7 +209,88 @@ test.describe('agreeing to reminders', () => {
  * keypad and their own number offered above it, and all four have to agree —
  * so `purpose` on TextField sets them together and this proves they arrive.
  */
+test.describe('arriving by an invite link (D-254)', () => {
+  test('says what they were invited to be, and the pictures speak to that work', async ({ page }) => {
+    await page.goto('/signin/?invite=PAM7Q4KX&as=case-manager');
+    await expect(page.getByRole('note')).toHaveText(en['signin.invited.admin']);
+    await expect(page.getByText(en['onboarding.admin.1'])).toBeVisible();
+    // Still the one sign in: the number, the consent line, the button.
+    await expect(page.getByText(en['signin.phone.consent'])).toBeVisible();
+    // The code is kept for joining, the next page a new person sees.
+    const kept = await page.evaluate(() => window.sessionStorage.getItem('pam.invite'));
+    expect(JSON.parse(kept ?? 'null')).toEqual({ code: 'PAM7Q4KX', role: 'admin' });
+  });
+
+  test('a program is told it is invited as a program partner', async ({ page }) => {
+    await page.goto('/signin/?invite=PAM7Q4KX&as=program');
+    await expect(page.getByRole('note')).toHaveText(en['signin.invited.provider']);
+    await expect(page.getByText(en['onboarding.provider.1'])).toBeVisible();
+  });
+
+  test('an expired link opens its own page, says who sent it, and emails a new link (D-258, D-263)', async ({ page }) => {
+    await page.route('**/rest/v1/rpc/invite_preview*', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify([{ inviter_first_name: 'Dana', invited_role: 'provider', state: 'expired' }]),
+      }),
+    );
+    const asked: Record<string, unknown>[] = [];
+    await page.route('**/rest/v1/rpc/request_invite_link*', async (route) => {
+      asked.push(route.request().postDataJSON() as Record<string, unknown>);
+      await route.fulfill({ status: 200, contentType: 'application/json', body: 'true' });
+    });
+
+    await page.goto('/signin/?invite=PAM7Q4KX&as=program');
+    await expect(page).toHaveURL(/\/invite\/expired\/\?invite=PAM7Q4KX&as=program/);
+    await expect(page.getByRole('heading', { name: en['invite.expired.title'], level: 1 })).toBeVisible();
+    await expect(page.getByText('Dana invited you to be a program partner in the PAM network.', { exact: false })).toBeVisible();
+
+    // Not an address: said so, and nothing is asked for.
+    await page.getByLabel(en['invite.expired.email']).fill('andre');
+    await page.getByRole('button', { name: en['invite.expired.action'] }).click();
+    await expect(page.getByText(en['invite.expired.emailInvalid'])).toBeVisible();
+    expect(asked).toHaveLength(0);
+
+    await page.getByLabel(en['invite.expired.email']).fill('andre@example.org');
+    await page.getByRole('button', { name: en['invite.expired.action'] }).click();
+    await expect(page.getByRole('heading', { name: en['invite.expired.sent.title'], level: 1 })).toBeVisible();
+    await expect(page.getByText(/andre@example\.org/)).toBeVisible();
+    expect(asked[0]).toMatchObject({ p_code: 'PAM7Q4KX', p_email: 'andre@example.org' });
+  });
+
+  test('plain sign in has no invite line', async ({ page }) => {
+    await page.goto('/signin/');
+    await expect(page.getByText(en['signin.invited.member'])).toHaveCount(0);
+  });
+});
+
 test.describe('phone and code fields', () => {
+  test('the code is six boxes over one field that takes a paste (D-251)', async ({ page }) => {
+    await page.route('**/auth/v1/otp*', (route) =>
+      route.fulfill({ status: 200, contentType: 'application/json', body: '{}' }),
+    );
+    await page.goto('/signin/');
+    await page.getByLabel('Your phone number').fill('215 555 0100');
+    await page.getByRole('button', { name: en['signin.phone.action'] }).click();
+
+    await expect(page.getByRole('heading', { name: en['signin.code.title'], level: 1 })).toBeVisible();
+    // One field, so the phone's "from Messages" suggestion and a paste both work.
+    const code = page.getByLabel(en['signin.code.label']);
+    await expect(code).toHaveCount(1);
+    await expect(code).toHaveAttribute('autocomplete', 'one-time-code');
+    await expect(code).toHaveAttribute('inputmode', 'numeric');
+    // A pasted message lands as its digits.
+    await code.fill('Your code is 12 34');
+    await expect(code).toHaveValue('1234');
+    // Send again is a small link beside where the code went, not a button row.
+    await expect(page.getByRole('button', { name: en['signin.code.again'] })).toBeVisible();
+    // Privacy and Terms stay at the foot of the screen.
+    const terms = await page.getByRole('link', { name: en['legal.terms'] }).boundingBox();
+    const viewport = page.viewportSize();
+    expect(terms!.y + terms!.height).toBeGreaterThan(viewport!.height - 64);
+  });
+
   test('the phone field asks for a keypad and offers the person their number', async ({ page }) => {
     await page.goto('/signin/');
     const phone = page.getByLabel('Your phone number');

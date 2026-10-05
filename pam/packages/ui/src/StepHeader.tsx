@@ -31,14 +31,18 @@ export interface StepHeaderProps {
 }
 
 const styles = stylex.create({
+  // The step count, quiet, above the bar (D-217): the template's subtitle
+  // size, sentence case, rather than the old shouted label.
   progress: {
-    fontSize: '16px',
-    textTransform: 'uppercase',
-    letterSpacing: '0.06em',
+    fontSize: '15px',
+    fontWeight: 600,
   },
+  // The nested-page template's large title (D-213), so a sign-up step reads
+  // as every other screen does.
   title: {
-    fontSize: '26px',
-    lineHeight: 1.25,
+    fontSize: '34px',
+    lineHeight: 1.15,
+    fontWeight: 700,
   },
   bar: { width: '100%' },
 });

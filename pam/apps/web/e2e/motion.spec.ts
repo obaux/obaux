@@ -28,10 +28,17 @@ test.describe('with motion on', () => {
     await expect
       .poll(async () =>
         card.evaluate((el) => {
-          const wrapper = el.closest('main')?.firstElementChild as HTMLElement | null;
-          if (!wrapper) return null;
-          const style = getComputedStyle(wrapper);
-          return `${style.opacity}|${style.transform}`;
+          // Each section of the page body rises in its turn (D-269); every
+          // one of them has to finish.
+          const sections = el.closest('main')?.querySelectorAll<HTMLElement>('[data-pam-page] > * > *');
+          if (!sections?.length) return null;
+          const states = new Set(
+            [...sections].map((section) => {
+              const style = getComputedStyle(section);
+              return `${style.opacity}|${style.transform}`;
+            }),
+          );
+          return [...states].join(',');
         }),
       )
       .toMatch(/^1\|(none|matrix\(1, 0, 0, 1, 0, 0\))$/);
@@ -79,5 +86,22 @@ test.describe('with motion on', () => {
       )
       .toMatch(/^(none|matrix\(1, 0, 0, 1, 0, 0\))$/);
     await context.close();
+  });
+
+  test('a tapped link changes screen without reloading the app', async ({ page }) => {
+    // D-269: a same-site link is a client-side move inside a view transition,
+    // not a full page load. A mark left on `window` survives only if the page
+    // never reloaded.
+    await page.goto('/signin/');
+    await expect(page.getByRole('heading', { name: 'Sign in' })).toBeVisible();
+    await page.evaluate(() => {
+      (window as unknown as { __pamStayed?: boolean }).__pamStayed = true;
+    });
+    await page.getByRole('link', { name: 'About PAM' }).click();
+    await expect(page).toHaveURL(/\/about\/$/);
+    await expect(page.locator('main')).toBeVisible();
+    expect(await page.evaluate(() => (window as unknown as { __pamStayed?: boolean }).__pamStayed)).toBe(true);
+    // And nothing is left mid-transition.
+    await expect.poll(() => page.evaluate(() => document.documentElement.dataset.pamNav ?? null)).toBeNull();
   });
 });

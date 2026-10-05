@@ -19,15 +19,11 @@ import {
 } from '@astryxdesign/core/Chat';
 import { IconButton } from '@astryxdesign/core/IconButton';
 import { Avatar } from '@astryxdesign/core/Avatar';
-import { Button } from '@astryxdesign/core/Button';
-import { Card } from '@astryxdesign/core/Card';
 import { Icon } from '@astryxdesign/core/Icon';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { HStack } from '@astryxdesign/core/HStack';
-import { RadioList, RadioListItem } from '@astryxdesign/core/RadioList';
-import { Notice, TextLink } from '@pam/ui';
-import { MESSAGE_REPORT_REASONS, type MessageReportReason } from '@pam/config';
+import { Notice } from '@pam/ui';
 import { useI18n } from '@/lib/i18n';
 import { whenHappened } from '@/lib/when';
 
@@ -41,8 +37,8 @@ import { whenHappened } from '@/lib/when';
  *
  * Shared by the real thread (`useThread`) and the example thread a preview
  * opens (`DUMMY_THREADS` + `demoMessages`, D-180): both hand this the same
- * shape, so the demo cannot drift from the real thing. `onSend` and
- * `onReport` are whatever the caller wires — a real insert, or a
+ * shape, so the demo cannot drift from the real thing. `onSend` is
+ * whatever the caller wires — a real insert, or a
  * sessionStorage append — and this file never imports Supabase.
  *
  * PAM's rules, kept on top of Astryx's defaults: every control is a 48px
@@ -52,8 +48,7 @@ import { whenHappened } from '@/lib/when';
  * 64px block ate the message area on a phone. Message text is 18px. The
  * mic (`ChatDictationButton`) hides itself when the browser has no speech
  * recognition, which is the same §1 rule `VoiceInput` follows — a dead
- * button is worse than no button. Report is an icon-only 48px button on the
- * other person's messages, named for a screen reader and nothing more.
+ * button is worse than no button.
  *
  * The send button's icon is `<Icon icon="arrowUp" size="md" />`, not
  * `ChatSendButton`'s own default (Will's screenshot, 21 September: the
@@ -75,18 +70,17 @@ import { whenHappened } from '@/lib/when';
  * prop both tightens the row gap and, incidentally, gives bubbles more of
  * the phone's width — nothing here is hand-overridden. Every message still
  * carries its own name/timestamp row, so a tighter gap does not run two
- * bubbles from the same sender together without a visible break, and
- * Report stays its own 48px control regardless of row spacing.
+ * bubbles from the same sender together without a visible break.
  *
  * `ChatLayout` (D-192) owns the scrolling: the messages scroll, the
  * composer stays docked at the bottom as a sticky flex item, so the last
  * message is never under it. The frame around this — the pinned headers —
  * is `ThreadFrame`, which also owns the composer's true bottom inset.
  *
- * Reporting (D-177) lives here too, on the other person's messages only:
- * `report_message()` already refuses a report of your own words, and a
- * control that would always be refused should not be drawn. One fixed-list
- * reason, the same shape as flagging a place (0036).
+ * Reporting (D-177) no longer lives here (D-213, Will, 1 October): a warning
+ * button under every message crowded the conversation. It is one row on the
+ * thread's ⋯ page now (`/messages/thread/report/`), on the nested-page
+ * template.
  */
 export interface ThreadViewMessage {
   readonly id: string;
@@ -102,8 +96,6 @@ export interface ThreadViewProps {
   readonly onSend: (body: string) => Promise<boolean>;
   readonly sending: boolean;
   readonly sendFailed: boolean;
-  /** When set, the other person's messages get a "Report" action. */
-  readonly onReport?: (messageId: string, reason: MessageReportReason) => Promise<boolean>;
   /** BCP-47 tag for dictation, e.g. "en-US" or "es-US". */
   readonly speechLanguage: string;
   readonly supportPhone: string;
@@ -113,16 +105,13 @@ const styles = stylex.create({
   list: { width: '100%' },
   body: { fontSize: '18px', lineHeight: 1.4, whiteSpace: 'pre-wrap' },
   time: { fontSize: '13px' },
-  // §2.5's floor, as a square: send, mic and report alike (A13, D-192).
+  // §2.5's floor, as a square: send and mic alike (A13, D-192).
   square: { width: '48px', height: '48px', minWidth: '48px', minHeight: '48px', flexShrink: 0 },
   // The scroll region's inner column keeps the page's reading width.
   messages: { width: '100%' },
   // Reaching the end of the messages must not scroll the page under them.
   layout: { overscrollBehavior: 'contain' },
   scrollWrap: { width: '100%', paddingBlockEnd: '12px', pointerEvents: 'auto' },
-  reportCard: { width: '100%' },
-  reportAction: { minHeight: '48px', fontSize: '17px' },
-  intro: { fontSize: '16px', lineHeight: 1.5 },
 });
 
 /**
@@ -158,26 +147,18 @@ function ScrollToBottom() {
   );
 }
 
-type ReportPhase =
-  | { step: 'idle' }
-  | { step: 'choosing'; messageId: string; reason: MessageReportReason; busy: boolean }
-  | { step: 'done' }
-  | { step: 'failed'; messageId: string };
-
 export function ThreadView({
   messages,
   otherName,
   onSend,
   sending,
   sendFailed,
-  onReport,
   speechLanguage,
   supportPhone,
 }: ThreadViewProps) {
   const { t, locale } = useI18n();
   const inputRef = useRef<ChatComposerInputHandle>(null);
   const [draft, setDraft] = useState('');
-  const [report, setReport] = useState<ReportPhase>({ step: 'idle' });
   const dictation = useChatDictation({ inputRef, lang: speechLanguage });
 
   const name = otherName ?? t('messages.thread.someone');
@@ -186,13 +167,6 @@ export function ThreadView({
     if (sending || value.trim() === '') return;
     const ok = await onSend(value);
     if (ok) setDraft('');
-  };
-
-  const sendReport = async () => {
-    if (report.step !== 'choosing' || !onReport) return;
-    setReport({ ...report, busy: true });
-    const ok = await onReport(report.messageId, report.reason);
-    setReport(ok ? { step: 'done' } : { step: 'failed', messageId: report.messageId });
   };
 
   const composer = (
@@ -243,7 +217,6 @@ export function ThreadView({
           const time = new Intl.DateTimeFormat(locale, { hour: 'numeric', minute: '2-digit' }).format(
             new Date(message.createdAt),
           );
-          const canReport = Boolean(onReport) && !message.mine && report.step !== 'done';
           return (
             <ChatMessage
               key={message.id}
@@ -263,26 +236,6 @@ export function ThreadView({
                         {when} · {time}
                       </Text>
                     }
-                    footer={
-                      canReport ? (
-                        <Button
-                          label={t('messages.report.action')}
-                          variant="ghost"
-                          size="md"
-                          isIconOnly
-                          icon={<Icon icon="warning" size="sm" />}
-                          xstyle={styles.square}
-                          onClick={() =>
-                            setReport({
-                              step: 'choosing',
-                              messageId: message.id,
-                              reason: MESSAGE_REPORT_REASONS[0],
-                              busy: false,
-                            })
-                          }
-                        />
-                      ) : undefined
-                    }
                   />
                 }
               >
@@ -292,55 +245,6 @@ export function ThreadView({
           );
         })}
       </ChatMessageList>
-
-      {report.step === 'choosing' ? (
-        <Card padding={4} xstyle={styles.reportCard}>
-          <VStack gap={3}>
-            <Text xstyle={styles.body}>{t('messages.report.title')}</Text>
-            <Text type="supporting" xstyle={styles.intro}>
-              {t('messages.report.intro')}
-            </Text>
-            <RadioList
-              label={t('messages.report.title')}
-              isLabelHidden
-              value={report.reason}
-              onChange={(next) => setReport({ ...report, reason: next as MessageReportReason })}
-            >
-              {MESSAGE_REPORT_REASONS.map((key) => (
-                <RadioListItem key={key} value={key} label={t(`messages.report.reason.${key}`)} />
-              ))}
-            </RadioList>
-            <HStack gap={3} align="center" wrap="wrap">
-              <Button
-                label={report.busy ? t('messages.report.sending') : t('messages.report.send')}
-                variant="secondary"
-                isDisabled={report.busy}
-                xstyle={styles.reportAction}
-                onClick={() => void sendReport()}
-              />
-              <TextLink label={t('messages.report.cancel')} onClick={() => setReport({ step: 'idle' })} />
-            </HStack>
-          </VStack>
-        </Card>
-      ) : null}
-
-      {report.step === 'done' ? (
-        <Notice
-          notice="service_not_available"
-          title={t('messages.report.done.title')}
-          body={t('messages.report.done.body')}
-        />
-      ) : null}
-
-      {report.step === 'failed' ? (
-        <Notice
-          notice="something_went_wrong"
-          title={t('messages.report.failed.title')}
-          body={t('messages.report.failed.body')}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
-        />
-      ) : null}
 
       {sendFailed ? (
         <Notice

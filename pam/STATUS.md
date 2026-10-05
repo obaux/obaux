@@ -1,6 +1,6 @@
 # PAM — where the project stands
 
-Last updated 2026-09-21. The member-facing product is real now: signing up
+Last updated 2026-10-01. The member-facing product is real now: signing up
 and signing out, invite codes for all four kinds of account, saving, points,
 badges, reporting a place, and a screen for the person running PAM. Every place
 now says what it is and has a screen of its own. Notifications are readable —
@@ -13,7 +13,7 @@ icon on sign-in, an onboarding step, and account settings all read and write
 was opened from (Home, Places, or Saved) instead of always to Places. The
 header is now content-consistent across every signed-in screen — the same
 compact role-preview icon, the same merged area/edit control, the same bell —
-though it still reloads on navigation (D-134); Home's people preview for Case
+and since D-269 it no longer reloads on navigation; Home's people preview for Case
 manager/Program/Super admin previews is now a scrollable stories-style strip
 rather than a stacked list. Sign-in is a full-bleed photo hero — real
 commissioned illustrations, sourced via Google Drive after Figma's own asset
@@ -197,6 +197,150 @@ sized for a bar this screen never draws); the send icon is sized to match
 the mic icon (Astryx has no separate weight prop — checked directly); and
 the message list runs `density="compact"`, which tightens the row gap and
 widens the bubbles at once. Playwright: 507.
+
+**1 October (branch `claude/pam-storybook`, D-208, D-209): Storybook is the
+review surface now.** Every `@pam/ui` component (152 stories), every screen
+as each role that reaches it (43 journeys, real screens against a pretend
+Supabase that never touches the live project), and the member dock
+(`TabBar`, new — the five tabs and Help, shaped there and not yet mounted in
+the app). Published to Chromatic on every push once Will adds
+`CHROMATIC_PROJECT_TOKEN`. What ships is still the branch, merged as usual —
+nothing is exported from Storybook. 205 stories render with no page errors.
+Session log: `docs/sessions/2026-10-01-storybook.md`.
+
+**Later the same day (D-210): the redesign starts, in Storybook.** From
+Will's reference screenshots: the page is white and every card has a soft
+shadow (in the theme, so it is already true of every screen); five tabs at
+the bottom — Explore, Saved, Trips, Messages, Profile — with Help moving to
+each screen's header; Profile, Connections and an empty Trips page built as
+views under `Redesign/*`. Not yet routes. 507 Playwright tests pass on the
+white page; 216 stories render clean.
+
+**Then (D-211): the app is clickable in Storybook.** `Prototype/*` runs the
+real screens for each kind of account behind an in-story router — tap a
+card, a tab, Back, and the next screen appears with the right `?id=`, on the
+pretend database. `Prototype/Redesign — member` walks the new bottom bar
+(Profile → Connections → Explore → a place → Trips → Messages → a
+conversation and back); `Prototype/Today — *` walks the app as it ships, for
+member, case manager, program and super admin, and signed out.
+
+**Then (D-212): Explore, and Home for staff — and no more 404s.** Every
+journey now opens inside the prototype's router, and any other story's link
+is cancelled rather than followed, so nothing in Storybook 404s. Explore
+(the member's home) has the search bar first — suggestions by name or
+address, a clear button — category chips, and every state drawn (loading,
+can't connect, nothing matches, empty category). A case manager's and a
+program's first tab is Home: their people under the same search bar. Walk
+them in `Prototype/Redesign — member / case manager / program`; each state
+is under `Redesign/Explore` and `Redesign/Staff home`. Still Storybook
+only: not routed in the app.
+
+**Then (D-213): the rest of the member app, on two templates.** Tab screens
+(Profile, Messages, Saved) share the large shrinking title; every screen you
+tap into shares the nested template (round back, large title) — Legal,
+Language, Get help, What others can see, Connections, Notifications, a
+place, the policies, a conversation and its ⋯ page. Profile lost Account
+(Language and Legal are rows now); Get help is a list of kinds of help; Saved
+is a 2×2 grid with Edit; Trips is a map with a three-height drawer; Messages
+has search and plain rows; Connections are photo cards with a profile.
+Notifications, a place, the policies, the conversation and Get help changed
+**in the app too** (they are real routes); Legal, Language, What others can
+see, the help pages, Connections and the thread's Options/Report are new real
+routes. 507 Playwright tests pass on a fresh build; 263 stories render clean.
+The Google Maps browser key is set in Vercel (`NEXT_PUBLIC_GOOGLE_MAPS_KEY`,
+Production/Preview/Development, 2 October) and Trips is a real route
+(`/trips/`) so the map can be seen on a deployment; if Google refuses the key
+the drawn preview shows instead. Storybook keeps the drawn preview. Needs a
+human: the key's website restriction must list each domain PAM is served
+from, and real staff photos in place of the
+placeholders.
+
+**2 October (D-216, D-217): one design, one folder per role.** Storybook
+no longer shows the old design anywhere. The sidebar is four folders —
+`Member app`, `Case manager`, `Program lead`, `Super admin` — each with a
+clickable `Prototype`, `Screens` (one story per screen that role reaches)
+and, where a screen has states worth seeing, `States`; then `Components`.
+The old `Journeys/*`, `Redesign/*`, `Shell/Member app` and the "Today"
+prototypes are gone. Every screen left on the old frame moved onto the
+nested template **in the app too**: Report a place, Points, a member's page,
+Invite someone (`/admin/`), Everyone, Staff requests, Interested, Text
+reminders, Sign in's code step, and the sign-up step header. Help on those
+screens is the round button in the top bar (`HelpButton`), not the old Help
+bar. Profile is now a session-aware screen (`ProfileScreen`): staff see no
+points/trips/connections, and get their tools as rows (case manager: Invite
+someone; super admin: Everyone, Staff requests, and **See the app as** — the
+role preview, a new route `/view-as/`). In the prototype `/interested/`
+opens Home. The tab screens themselves (Explore, Saved, Trips, Messages,
+Profile) are still Storybook-only — not yet routed in the app.
+
+**2 October, later (D-218): an app per staff role.** Case managers: Home
+(caseload, a star per person, Invite someone floating above the bar), Saved
+(People | Programs), Messages, Profile. Program leads: Home (a Day / Week /
+Month schedule with search by name or time), Program (their listing, Edit),
+Messages, Profile. `/invite/` (two rows, a member or a program), `/programs/`
+(All programs, from Profile) and `/programs/new/` (Add a program) are new
+routes. Example data: starred people (session only), appointments, the
+example program; Add a program and Program edits store nothing yet (the RLS
+already allows both — wiring is a follow-up). Will answered both (D-219): program
+leads may create invites — migration 0070, **live** — and starred people
+stay a session-only demo.
+
+**2 to 3 October (D-220 to D-228): polish from Will's screenshots.** Every
+search, including the new-message sheet, is the same pill. A place has round
+quick actions with small labels. Saved tiles show their full shadow. Each
+change is in DECISIONS. A case manager's member page (D-231) has the profile
+card, Message (with a count) and Connect to… (`/person/connect/`, an example
+only, nothing stored). **Transparency changed (D-242):** members are now told
+a program they joined sees the last day they used PAM; the database does not
+expose it to programs yet (a follow-up migration needs Will's go-ahead), so it
+shows for example people only. Members should be told before it is real.
+Each role's Storybook Prototype now starts at Sign in and walks through that
+role's whole onboarding to Home (D-249; the join screen has a Storybook-only
+`preview`). Privacy and Terms opened from Sign in or joining go Back there
+(D-250).
+The code step is six paste-friendly boxes, joining uses the nested template
+with "Step N of M", and Privacy and Terms are pinned to the foot of the way in
+(D-251).
+Each role's Prototype now only signs in (number, code, Home); account
+creation is the separate Onboarding stories. Buttons are full pills
+everywhere, through Astryx's `--_button-radius` (D-253).
+Invites are links to Sign in (`/signin/?invite=&as=`, D-254); no migration.
+Telling someone their link has expired before they enter their phone would
+need one (a signed-out invite-state lookup) — Will's call.
+Saved's Edit holds removals until Done and asks before leaving or unstarring
+(D-255). Staff get text alerts rather than visit reminders; programs choose
+per kind at `/alerts/`, kept on the phone until a column exists, and no SMS
+template for them is written or reviewed yet (D-256).
+A super admin's Home is the staff requests (D-257).
+Invites are a link again, with no phone asked for, and a "You're invited"
+preview picture when pasted into a text. Links last 30 days. An expired link
+asks for an email address and a fresh link is queued for it, with no approval.
+The super admin has an Invited people log (Active / Link open / Link expired).
+Migrations **0071 and 0072 are live** (Will, 4 October; D-264). The invite
+email's words are approved, but **nothing sends it yet**: it waits in
+`invite_emails` for an email provider, which is on the before-launch list
+(`docs/before-launch.md`).
+The whole app is mapped in Figma, "PAM — User flows"
+(https://www.figma.com/design/DtlJg9Klx5BRfHbXBhkg98), generated from
+`docs/user-flows/flows.mjs` and kept current with every screen change (D-264).
+A member's Explore has a centred search launcher, smaller chips and a "Your
+next visit" card, and no bell or Help (D-265). Sign in's card sits flat under
+the slides, and the code step is drawn in to match (D-266).
+Moving between screens no longer reloads the app (`ClientNav`). Each move
+has a direction: forward slides in, back slides out, tabs cross-fade, and a
+tapped card grows into its screen. Sections of a screen arrive 30ms apart.
+All of it uses View Transitions and CSS, and none of it runs under reduced
+motion, Data Saver or 2G (D-269).
+Programs have policies for participants with a verified tick (D-261), on
+example data until tables, file storage and a transparency line are agreed.
+Members can now read a program's policies from the foot of its page, and sign
+them: the first Sign opens a half sheet to draw (or type) a signature, and
+each policy after that is one tap. Trips show "Signatures needed" or
+"Policies signed", and a just-booked trip offers Sign policies (D-270). The
+signatures are example data too, kept only for the visit (session storage).
+From a request the super admin can open the requested program and text the
+requester. In the redesign they can also message staff (never members),
+backed by 0072, now live (D-262).
 
 This is the handover document: what exists, what is proven, what is live, and
 what the next person needs to know before touching anything.
@@ -442,7 +586,8 @@ oversight:
   back into the first load (D-125). Packages now declare subpath exports, and
   `@pam/config/hours` is deliberately absent from that package's barrel. The
   next component on a shared screen still breaches the budget.
-- **No five-tab member shell.** `AppShell` + `TabList` is the first UI task of
+- **The five-tab member shell exists but is not mounted** (`@pam/ui/TabBar`,
+  D-209 — see it in Storybook under Shell). Before that: `AppShell` + `TabList` was the first UI task of
   Phase 1. The layout is settled and the pieces are ready: Help is now a compact
   item sized to share the bottom bar rather than a full-width row (D-039), and
   the five navigation icons exist. Only the dock itself is unbuilt.
@@ -554,6 +699,7 @@ while the copy is unsigned, so it earned the first live test, not the last.*
 | 9b | ~~754 places, and not one of them says what it is~~ **Done** | — | 0050, 16 September: all 754 carry a description of at most 200 characters, written from the city's own `service_type` / `park_name` / `asset_name` fields or, for the twelve hand-added places, from published sources. 230 have a website and 361 are marked `audience`. Verified live: 754 active, 754 described, 0 hidden for review, longest 152 characters. This reversed the screen half of 0017 and needed Will's word — see A11 and D-121. The words are sourced, not invented, but **no provider has read their own entry yet.** |
 | 10c | **Confirm the Twilio account's state** | Anybody whose number is not verified | This row said the account was in trial. Will, 16 September: the Twilio console says it is active. That earlier claim came from a 13–14 September finding and was repeated afterwards without re-checking; this session did not verify it either way, so it stands as Will's word and unverified here. If it is active the trial concern is gone; if not, a code to an unverified number is not sent and nothing says so — the live logs on the 14th show one phone asking three times. Carrier registration is a separate question (row 10). |
 | 10b | **A line about the PAM team on the transparency screen** | A promise already made | Members were told they would hear first if what is visible changes, and the directory now shows a super admin every account (name, role, region, status, last active; never messages or contact details). Proposed, for `packages/config/transparency.ts`: *"The PAM team can see your name, your city and the last day you used PAM. Never your messages."* It is a change to the contract, so it wants Will's word. |
+| 14 | **Storing members' policy signatures** | Policies being real (D-261, D-270) | Signing works on example data, kept in the browser tab only. Making it real needs a table for each program's policies and one for signatures (who, which policy and which version, when, the drawn image or typed name), file storage for the documents, and a transparency line telling a member the program keeps a record of what they signed. Schema and contract changes, so Will's word first. |
 | 10 | ~~Twilio credentials into the dispatcher's secrets~~ **Done** | — | Will, 17 September. Confirmed with a real end-to-end test: a `staff_request_denied` text queued to Will's own number was picked up by the 5-minute dispatcher cycle and sent successfully (`status: sent`, no failure reason). PAM can now text for real. |
 | 11 | ~~Sign off `staff_request_approved`'s wording~~ **Done** | — | Will, 17 September. `pnpm --filter @pam/config test` is green. |
 | 12 | ~~Migrations 0054 through 0057 are local only~~ **Done** | — | Applied to the live Supabase project 17 September, along with two follow-ups `get_advisors` surfaced: `notify_on_staff_request` (0058) was callable directly via PostgREST, unlike its two siblings in 0038 — its own migration run never got the schema-level default-privileges lockdown 0038's did; and `staff_requests` had two foreign keys with no covering index (0059). `/requests/`, `/join/`'s program step, and the demo view all work against the real database now. |
@@ -572,6 +718,10 @@ while the copy is unsigned, so it earned the first live test, not the last.*
 | 25 | **D-178's audience** | Who reads a reported message | The reporter's case manager is included alongside the sender's. Say if it should be the sender's only. |
 | 27 | ~~Approve the new transparency line, then deploy `0067`~~ **Done (Will, 21 September)** | — | Wording approved as proposed. `list_migrations` first: no drift since the 20th. `0067_people_activity.sql` applied; `get_advisors` (security) clean — `people_activity()` is `authenticated`-only. The ring for a new save now lights for real. Also fixed in the same push: `privacy.s.who-can-see.p1` (the long privacy page, not the short transparency screen) still carried "and that a chat exists" — a claim D-167 removed from the short screen on the 17th but missed here. Removed, en/es. |
 | 26 | ~~Deploy `0066`~~ **Done (Will, 21 September)** | — | `list_migrations` first: no drift since the 20th. Applied; `get_advisors` (security) clean — `flagged_services()` and the recreated `conversation_partners()` are `authenticated`-only, `services_search()` is security invoker and so not even listed. `pg_trgm` now lives in `extensions`. Case managers keep the Reported places list read-only — Will's call, recorded as D-190. |
+| 28 | **A Chromatic project token** | Storybook updating on every push | chromatic.com → sign in with GitHub → link `obaux/obaux` → add the token as the repository secret `CHROMATIC_PROJECT_TOKEN`. The workflow (`pam-storybook.yml`) skips itself until then. |
+| 29 | ~~Where the dock's People and My Plan lead~~ **Answered by the redesign (D-210)** | — | Will, 1 October: the bar is Explore, Saved, Trips, Messages, Profile; Help moves to each screen's header and Profile. Next: his reference screenshots for the other screens, then wiring the redesigned views to routes and data. Walk it in `Prototype/Redesign — member` (D-211). |
+| 30 | ~~Deploy `0071` and `0072`~~ **Done (Will, 4 October)** | — | `list_migrations` first: live ran to `0070`, no live-only drift; `can_message`, `messageable_people` and `open_direct_conversation` matched 0063 exactly, which 0072 was written against. Both applied; `get_advisors` (security) shows no new kind of finding (the definer functions are guarded inside, as every other one is; `invite_preview` and `request_invite_link` are anon on purpose). Spot-checked: `invite_emails` forced RLS with one policy and no anon access; `invites_log` and `staff_request_phone` not callable signed out. See D-264. |
+| 31 | **The before-launch list** | Launch | `docs/before-launch.md` — Will's list of what must be done before real people use PAM. First entry: the email provider for invite links. **0068/0069 vs 0072**: both rewrite `can_message`; 0069 must keep 0072's arm when it is merged and deployed. |
 
 ---
 

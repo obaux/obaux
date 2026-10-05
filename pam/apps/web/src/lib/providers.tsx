@@ -6,6 +6,7 @@ import { pamTheme } from '../theme/pam.js';
 import { MotionProvider } from '@pam/ui';
 import { I18nProvider } from './i18n';
 import { AlertBannerProvider } from './alertBanner';
+import { ClientNav } from './ClientNav';
 
 /**
  * Astryx is applied by a provider, not by a stylesheet.
@@ -53,6 +54,8 @@ export function Providers({ children }: { children: ReactNode }) {
       <MotionProvider>
         <I18nProvider>
           {LocaleSync ? <LocaleSync /> : null}
+          {/* Screen to screen without a reload, inside a transition (D-269). */}
+          <ClientNav />
           <AlertBannerProvider>{children}</AlertBannerProvider>
         </I18nProvider>
       </MotionProvider>

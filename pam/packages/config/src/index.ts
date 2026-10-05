@@ -21,6 +21,7 @@ export * from './distance.js';
  * had 0.2 kB of headroom and this cost 0.6 (16 September).
  */
 export * from './legal.js';
+export * from './glossary.js';
 
 /** Languages at launch (§2.3). [ASK WILL] on any additional language. */
 export const SUPPORTED_LOCALES = ['en', 'es'] as const;
@@ -97,7 +98,7 @@ export const A11Y = {
   /** §0 / §2.5 — minimum tap target in px. */
   minTouchTargetPx: 48,
   /** §2.4 — the primary CTA everywhere. */
-  primaryButtonHeightPx: 64,
+  primaryButtonHeightPx: 56,
   bodyTextMobilePx: 18,
   bodyTextDesktopPx: 16,
   /** §2.5 — AAA for body text. */

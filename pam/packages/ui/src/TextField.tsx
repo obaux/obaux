@@ -39,7 +39,8 @@ export type FieldPurpose =
   | 'address'
   | 'name'
   | 'lastName'
-  | 'city';
+  | 'city'
+  | 'email';
 
 /**
  * The attributes each purpose sets, as plain HTML.
@@ -88,6 +89,16 @@ const PURPOSES: Record<FieldPurpose, Record<string, string>> = {
    * suggestion and spelling "Philadelphia" on a cracked keyboard.
    */
   city: { autoComplete: 'address-level2', htmlName: 'city', name: 'city' },
+  /** An email address: the @ keyboard, no capital first letter, no spellcheck. */
+  email: {
+    type: 'email',
+    autoComplete: 'email',
+    inputMode: 'email',
+    autoCapitalize: 'none',
+    spellCheck: 'false',
+    htmlName: 'email',
+    name: 'email',
+  },
 };
 
 export interface TextFieldProps extends TextInputProps {
