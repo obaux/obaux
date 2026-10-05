@@ -69,7 +69,16 @@ import { policiesHref } from '../../screens/MemberPoliciesView';
  * an arbitrary URL. A bare `/place/?id=…` — a shared link, or an old one —
  * still falls back to Places, which was this screen's only behaviour before.
  */
-const QUICK = { width: 24, height: 24, 'aria-hidden': true } as const;
+const QUICK = { width: 26, height: 26, 'aria-hidden': true } as const;
+
+/** "example.org" from "https://www.example.org/learning" — the row's second line. */
+function siteName(url: string): string {
+  try {
+    return new URL(url).hostname.replace(/^www\./, '');
+  } catch {
+    return url;
+  }
+}
 
 const BACK_TARGETS = {
   home: { href: '/', labelKey: 'nav.back.home' },
@@ -343,7 +352,8 @@ function PlaceScreen() {
         change: visit.id,
       }).toString()}`
     : null;
-  const directions = directionsHref(place!.address, place!.lat, place!.lon) ?? null;
+  // With the place's Google ID when PAM has one (D-291): Maps opens on the place itself.
+  const directions = directionsHref(place!.address, place!.lat, place!.lon, place!.placeId) ?? null;
   const googleHref = googlePlaceHref(place!.lookupName || place!.name, place!.address, place!.placeId);
   const lines = status ? weekLines(status.hours, locale, t('place.hours.closed')) : undefined;
 
@@ -422,14 +432,17 @@ function PlaceScreen() {
           ) : null
         }
         quickActionsLabel={t('place.quick.label')}
+        // Rows, most important first (Will, 5 October, D-291): getting
+        // there, then asking a question, then calling, then the website.
         quickActions={[
-          ...(place!.website
+          ...(directions || googleHref
             ? [
                 {
-                  id: 'website',
-                  label: t('place.quick.website'),
-                  icon: <GlobeIcon {...QUICK} />,
-                  href: place!.website,
+                  id: 'directions',
+                  label: t('place.quick.directions'),
+                  description: t('place.quick.directions.body'),
+                  icon: <PlacesIcon {...QUICK} />,
+                  href: (directions ?? googleHref)!,
                   isExternal: true,
                 },
               ]
@@ -437,6 +450,7 @@ function PlaceScreen() {
           {
             id: 'message',
             label: t('place.quick.message'),
+            description: t('place.quick.message.body'),
             icon: <MessagesIcon {...QUICK} />,
             href: messageHrefFor(place!.name),
           },
@@ -445,20 +459,20 @@ function PlaceScreen() {
                 {
                   id: 'call',
                   label: t('place.quick.call'),
+                  description: t('place.quick.call.body'),
                   icon: <PhoneIcon {...QUICK} />,
                   href: `tel:${place!.phone}`,
                 },
               ]
             : []),
-          // Directions (Will, 3 October, D-235): the round button routes there;
-          // the place on Google stays a link in the hours card.
-          ...(directions || googleHref
+          ...(place!.website
             ? [
                 {
-                  id: 'directions',
-                  label: t('place.quick.directions'),
-                  icon: <PlacesIcon {...QUICK} />,
-                  href: (directions ?? googleHref)!,
+                  id: 'website',
+                  label: t('place.quick.website'),
+                  description: siteName(place!.website),
+                  icon: <GlobeIcon {...QUICK} />,
+                  href: place!.website,
                   isExternal: true,
                 },
               ]

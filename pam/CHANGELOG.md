@@ -104,6 +104,9 @@ Category chips have a soft glow of their colour behind each icon.
 Closed, the Trips drawer shows only its title, with no card peeking out. The
 "something new" dots on the bottom menu and the bell are the same bright pink
 as the selected tab. Half open, the Trips drawer shows more of the third trip.
+A place's actions are now a list — Get directions first, then Send a message,
+Call and Website — each with a line saying what it does; directions open
+Google Maps on the place itself when PAM knows it.
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 

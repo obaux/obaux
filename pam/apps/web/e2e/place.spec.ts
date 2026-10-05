@@ -90,16 +90,16 @@ test.describe("a place's own screen", () => {
     await expect(page.getByText(/free or low cost for most people/)).toBeVisible();
 
     // D-235, D-247: a member's one primary action is Plan a trip, straight into
-    // the New trip steps with this place chosen; Directions is the fourth circle.
+    // the New trip steps with this place chosen; Get directions is the first row (D-291).
     await expect(page.getByRole('link', { name: 'Plan a trip' })).toHaveAttribute(
       'href',
       new RegExp(`/trips/new/\\?place=${PLACE.id}`),
     );
-    await expect(page.getByRole('link', { name: 'Directions', exact: true })).toHaveAttribute(
+    await expect(page.getByRole('link', { name: /^Get directions/ })).toHaveAttribute(
       'href',
       /destination=39\.9612%2C-75\.2172/,
     );
-    await expect(page.getByRole('link', { name: 'Directions', exact: true })).toHaveAttribute(
+    await expect(page.getByRole('link', { name: /^Get directions/ })).toHaveAttribute(
       'href',
       /travelmode=walking/,
     );
@@ -114,27 +114,42 @@ test.describe("a place's own screen", () => {
     );
     await page.goto(`/place/?id=${PLACE.id}`);
 
-    await expect(page.getByRole('link', { name: 'Directions', exact: true })).toHaveAttribute(
+    await expect(page.getByRole('link', { name: /^Get directions/ })).toHaveAttribute(
       'href',
       /destination=111%20N%2049th%20St/,
     );
   });
 
-  test('the actions are round buttons with words, and the rest is in the bar', async ({ page }) => {
-    // D-224: Website, Message, Call and Directions under the name, each a
-    // labelled circle; Check hours on Google at the foot of the hours card;
+  test('directions open on the place itself when PAM has its Google ID', async ({ page }) => {
+    // D-291: the place ID rides along, so Maps opens on the place, not a pin.
+    await signedIn(page);
+    await page.route(DETAIL, (route) => route.fulfill(json([{ ...PLACE, place_id: 'ChIJexample123' }])));
+    await page.goto(`/place/?id=${PLACE.id}`);
+
+    const directions = page.getByRole('link', { name: /^Get directions/ });
+    await expect(directions).toHaveAttribute('href', /destination_place_id=ChIJexample123/);
+    await expect(directions).toHaveAttribute('target', '_blank');
+    // Directions, then message, then call, then the website.
+    const rows = page.getByRole('list', { name: 'Ways to reach this place' }).getByRole('link');
+    await expect(rows.nth(0)).toHaveAccessibleName(/^Get directions/);
+    await expect(rows.nth(1)).toHaveAccessibleName(/^Send a message/);
+  });
+
+  test('the actions are rows, directions first, and the rest is in the bar', async ({ page }) => {
+    // D-291: Get directions, Send a message, Call and Website under the name,
+    // as rows with a line each (they were labelled circles, D-224); Check hours on Google at the foot of the hours card;
     // Save and the ⋯ menu (Flag something, Share, Message) in the bar.
     await signedIn(page);
     await page.route(DETAIL, (route) => route.fulfill(json([PLACE])));
     await page.goto(`/place/?id=${PLACE.id}`);
 
-    await expect(page.getByRole('link', { name: 'Call', exact: true })).toHaveAttribute('href', 'tel:+12155550100');
-    await expect(page.getByRole('link', { name: 'Website', exact: true })).toHaveAttribute(
+    await expect(page.getByRole('link', { name: /^Call/ })).toHaveAttribute('href', 'tel:+12155550100');
+    await expect(page.getByRole('link', { name: /^Website/ })).toHaveAttribute(
       'href',
       'https://example.org/kirkbride',
     );
-    // D-235: the fourth circle is Directions, and routes there.
-    await expect(page.getByRole('link', { name: 'Directions', exact: true })).toHaveAttribute(
+    // D-235, D-291: Get directions comes first, and routes there.
+    await expect(page.getByRole('link', { name: /^Get directions/ })).toHaveAttribute(
       'href',
       /google\.com\/maps\/dir/,
     );

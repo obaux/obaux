@@ -6726,6 +6726,43 @@ of the third card from list."
 - **Proven by:** typecheck, and a Storybook screenshot at 390×844 showing the
   third trip's name, date and companion.
 
+### D-291 — A place's actions are rows, directions first, with Google's place ID
+
+Will, 5 October, on a place opened from a trip: "An important action here
+… is to get directions, and secondly message them. Let's use the inline
+item component instead of these circle buttons (similar to … 'my
+connections' at root of messages screen)… clicking get directions will
+open google map with location ID pre loaded."
+
+- **Rows instead of circles:** `PlaceDetail`'s quick actions are a
+  `MenuList` in a card. Each row has an icon, a label, a line under it and
+  a chevron; this is the same row as "My connections" on Messages.
+- **Order:**
+  - Get directions ("Walking route in Google Maps");
+  - Send a message ("Ask a question before you go");
+  - Call ("Talk to someone there");
+  - Website (its site name).
+
+  This replaces D-224's Website, Message, Call, Directions. A row says what
+  it does; a circle with a word under it only named it.
+- **Google's place ID:** `directionsHref` takes the place's Google ID and
+  adds `destination_place_id`, so Maps opens on the place itself rather
+  than a dropped pin. The walking route and `destination` (coordinates
+  first) are kept, because Google requires both.
+  - The example places have no ID, so their links route to the point, as
+    before.
+  - External rows open in a new tab: `MenuItem` takes `isExternal`.
+- **Also changes:** a program's own profile (`ProgramView`) uses the same
+  quick actions, so its Website, Call and "Open in Google" are rows too.
+- **Fixed along the way:** a list's last row drew a stray line at the foot
+  of its card. Astryx's `:last-child` rule is a shorthand that loses to its
+  own longhand width. `MenuList` now drops the line on the last row itself;
+  computed widths are 1px, 1px, 0px.
+- **Proven by:** `place.spec.ts`. It checks the new names, a new test for
+  `destination_place_id` and `target=_blank`, and that the rows run
+  directions then message. The full e2e suite passes (570), with Storybook
+  screenshots.
+
 ---
 
 ## Notes for whoever picks this up next

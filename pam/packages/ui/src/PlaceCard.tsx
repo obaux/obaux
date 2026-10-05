@@ -276,12 +276,17 @@ export function directionsHref(
   address?: string | null,
   lat?: number | null,
   lon?: number | null,
+  placeId?: string | null,
 ): string | undefined {
   const hasPoint = Number.isFinite(lat) && Number.isFinite(lon);
   const destination = hasPoint ? `${lat},${lon}` : (address ?? null);
   if (!destination) return undefined;
   const q = encodeURIComponent(destination);
-  return `https://www.google.com/maps/dir/?api=1&destination=${q}&travelmode=walking`;
+  const base = `https://www.google.com/maps/dir/?api=1&destination=${q}&travelmode=walking`;
+  // With Google's place ID too (Will, 5 October, D-291), Maps opens on the
+  // place itself — its name, its door — rather than a dropped pin.
+  // Google still requires `destination` beside it.
+  return placeId ? `${base}&destination_place_id=${encodeURIComponent(placeId)}` : base;
 }
 
 /**

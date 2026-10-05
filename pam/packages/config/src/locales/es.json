@@ -882,7 +882,7 @@
   "place.flagSomething": "Reportar algo",
   "place.messageProgram": "Escribir al programa",
   "place.quick.website": "Sitio web",
-  "place.quick.message": "Mensaje",
+  "place.quick.message": "Enviar un mensaje",
   "place.quick.call": "Llamar",
   "place.quick.directions": "Cómo llegar",
   "place.quick.google": "Abrir en Google",
@@ -1138,5 +1138,8 @@
   "trips.moved.body": "{place}, {day} a las {time}. Nos vemos allí.",
   "trips.moved.home": "Ir al inicio",
   "trips.moved.note": "Te llevamos al inicio en unos segundos.",
-  "profile.tile.badgeHint": "Tu insignia"
+  "profile.tile.badgeHint": "Tu insignia",
+  "place.quick.directions.body": "Ruta a pie en Google Maps",
+  "place.quick.message.body": "Haz una pregunta antes de ir",
+  "place.quick.call.body": "Habla con alguien allí"
 }

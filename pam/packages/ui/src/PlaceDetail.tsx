@@ -9,13 +9,13 @@ import { Text } from '@astryxdesign/core/Text';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Badge, type BadgeVariant } from '@astryxdesign/core/Badge';
 import { Button } from '@astryxdesign/core/Button';
-import { IconButton } from '@astryxdesign/core/IconButton';
 import { colorVars, spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { BookmarkIcon, FlagIcon, PhoneIcon, PlacesIcon, ShareIcon } from './icons.js';
 import { BigButton } from './BigButton.js';
 import { CATEGORY_DEFINITIONS, type Category } from '@pam/config';
 import { pam } from './tokens.stylex.js';
 import { textLinkLook } from './TextLink.js';
+import { MenuList } from './MenuList.js';
 
 /**
  * One place, on its own screen.
@@ -123,6 +123,8 @@ export interface QuickAction {
   readonly href: string;
   /** Opens in a new tab — a website, Google. */
   readonly isExternal?: boolean;
+  /** A line under the label — what the row does (D-291). */
+  readonly description?: string;
 }
 
 function categoryBadgeVariant(category: Category): BadgeVariant {
@@ -152,29 +154,6 @@ const styles = stylex.create({
     fontSize: '17px',
   },
   rows: { rowGap: spacingVars['--spacing-2'] },
-  // The round quick actions, each a circle with a word under it. Four even
-  // slots (D-245): with four actions nothing changes; with fewer,
-  // they sit from the left at the same spacing instead of spreading out
-  // across the row (Will, 3 October: a program's two looked lost).
-  quick: { width: '100%', justifyContent: 'flex-start' },
-  quickItem: { flexBasis: '25%', flexGrow: 0, flexShrink: 0, maxWidth: '25%', minWidth: 0 },
-  // Three or more (Will, 5 October, D-270): the first circle at the left
-  // edge, the last at the right, the space shared between — four 25% slots
-  // left the last circle hanging past the cards below. Each item is only as
-  // wide as its circle or its word, whichever is wider.
-  quickSpread: { justifyContent: 'space-between' },
-  quickItemSpread: { flexBasis: 'auto', maxWidth: 'none' },
-  quickButton: {
-    width: '56px',
-    height: '56px',
-    borderRadius: '50%',
-    backgroundColor: colorVars['--color-background-body'],
-    borderWidth: '1px',
-    borderStyle: 'solid',
-    borderColor: colorVars['--color-border'],
-    color: colorVars['--color-text-primary'],
-  },
-  quickLabel: { fontSize: '12px', textAlign: 'center', lineHeight: 1.2 },
   hoursLink: { alignSelf: 'flex-start', minHeight: pam.touchTargetMin, fontSize: '16px', paddingInline: '0px' },
 });
 
@@ -336,37 +315,27 @@ export function PlaceDetail({
 
       {notice ?? null}
 
+      {/*
+        What to do about this place, as rows (Will, 5 October, D-291): "Get
+        directions" first, then message — the same row as "My connections"
+        on Messages, icon, words, a line under them, a chevron. A row says
+        what it does; a circle with a word under it only names it.
+      */}
       {quickActions && quickActions.length > 0 ? (
-        <HStack
-          gap={2}
-          align="start"
-          wrap="nowrap"
-          xstyle={[styles.quick, quickActions.length >= 3 && styles.quickSpread]}
-          role="group"
-          aria-label={quickActionsLabel}
-        >
-          {quickActions.map((action) => (
-            <VStack
-              key={action.id}
-              gap={1}
-              align="center"
-              xstyle={[styles.quickItem, quickActions.length >= 3 && styles.quickItemSpread]}
-            >
-              <IconButton
-                label={action.label}
-                href={action.href}
-                variant="ghost"
-                target={action.isExternal ? '_blank' : undefined}
-                rel={action.isExternal ? 'noreferrer' : undefined}
-                icon={<HStack>{action.icon}</HStack>}
-                xstyle={styles.quickButton}
-              />
-              <Text xstyle={styles.quickLabel} aria-hidden>
-                {action.label}
-              </Text>
-            </VStack>
-          ))}
-        </HStack>
+        <Card padding={1} xstyle={styles.card}>
+          <MenuList
+            label={quickActionsLabel ?? ''}
+            hasDividers
+            items={quickActions.map((action) => ({
+              id: action.id,
+              label: action.label,
+              icon: action.icon,
+              href: action.href,
+              ...(action.description ? { description: action.description } : {}),
+              ...(action.isExternal ? { isExternal: true } : {}),
+            }))}
+          />
+        </Card>
       ) : null}
 
       {/* With a visit booked, where and when come before what it is (D-273, D-281). */}

@@ -40,6 +40,8 @@ export interface MenuItem {
   readonly badge?: string;
   /** The badge's spoken meaning — "2 new messages". */
   readonly badgeLabel?: string;
+  /** Opens in a new tab: Google Maps, a program's website (D-291). */
+  readonly isExternal?: boolean;
 }
 
 export interface MenuListProps {
@@ -53,6 +55,10 @@ export interface MenuListProps {
 const styles = stylex.create({
   list: { width: '100%' },
   row: { minHeight: '64px', fontSize: '18px' },
+  // No line under the last row (D-291). Astryx's own `:last-child` rule
+  // is a shorthand, which loses to its longhand width, so the line stayed —
+  // a stray rule at the foot of every card that holds a list.
+  lastRow: { borderBlockEndWidth: '0px' },
   value: { fontSize: '16px' },
   // The label at 18px (§2.5): ListItem's own label size is smaller.
   label: { fontSize: '18px', lineHeight: 1.35 },
@@ -67,7 +73,7 @@ const styles = stylex.create({
 export function MenuList({ label, items, hasDividers = false }: MenuListProps) {
   return (
     <List aria-label={label} hasDividers={hasDividers} xstyle={styles.list}>
-      {items.map((item) => (
+      {items.map((item, index) => (
         <ListItem
           key={item.id}
           label={<Text xstyle={[styles.label, item.isSelected === true && styles.labelSelected]}>{item.label}</Text>}
@@ -79,6 +85,7 @@ export function MenuList({ label, items, hasDividers = false }: MenuListProps) {
             ) : undefined
           }
           href={item.href}
+          {...(item.href && item.isExternal ? { target: '_blank', rel: 'noreferrer' } : {})}
           onClick={item.onSelect ? () => item.onSelect?.() : undefined}
           startContent={item.icon}
           {...(item.isSelected !== undefined ? { 'aria-current': item.isSelected ? ('true' as const) : undefined } : {})}
@@ -99,7 +106,7 @@ export function MenuList({ label, items, hasDividers = false }: MenuListProps) {
               </HStack>
             ) : undefined
           }
-          xstyle={styles.row}
+          xstyle={[styles.row, index === items.length - 1 && styles.lastRow]}
         />
       ))}
     </List>
