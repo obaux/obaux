@@ -88,6 +88,8 @@ export {
   NoResultsIcon,
   BackArrowIcon,
   BookIcon,
+  SignIcon,
+  SignedIcon,
   PlusIcon,
   NewMessageIcon,
 } from './icons.js';

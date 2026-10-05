@@ -80,7 +80,7 @@ function edgeGeometry(L, e, index) {
   const a = L.nodes[e.from];
   const b = L.nodes[e.to];
   const H = L.card.head;
-  if (b.x > a.x) {
+  if (b.x > a.x && !e.over) {
     const sx = a.x + a.w;
     const sy = a.y + H + 40 + index * 22;
     const tx = b.x - 4;

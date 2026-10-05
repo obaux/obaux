@@ -64,7 +64,12 @@ screens change without reloading, a new screen slides in from the right and
 Back slides it away, tabs cross-fade, a tapped card grows into the screen it
 opens, and each screen's parts arrive one after another, not all at once.
 None of this happens for anyone who has asked their phone for less motion,
-or on a very slow connection.
+or on a very slow connection. A place's round buttons spread evenly
+when there are three or four. At the foot of a place's page, members can read
+the program's policies before a visit and sign them: draw your name with your
+finger (or type it) the first time, and every policy after that is one tap.
+Trips show "Signatures needed" or "Policies signed", and booking a visit ends
+with a button to sign.
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 

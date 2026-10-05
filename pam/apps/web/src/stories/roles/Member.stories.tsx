@@ -23,6 +23,14 @@ export const Profile: Story = screen('member', 'Profile', '/profile/');
 // Screens you tap into (the nested-page template, D-213).
 export const NewTrip: Story = screen('member', 'New trip', '/trips/new/');
 export const Place: Story = screen('member', 'A place', '/place/', { id: 's1', from: 'explore' });
+// A program's policies, read and signed by a member (D-270).
+export const PlacePolicies: Story = screen('member', 'Policies to sign', '/place/policies/', {
+  id: 'dummy-place-learning',
+});
+export const PlacePolicy: Story = screen('member', 'A policy to sign', '/place/policies/view/', {
+  place: 'dummy-place-learning',
+  id: 'policy-confidentiality',
+});
 export const ReportPlace: Story = screen('member', 'Report a place', '/flag/', { place: 's1' });
 export const Conversation: Story = screen('member', 'A conversation', '/messages/thread/', { id: CONVO_ID });
 export const ConversationOptions: Story = screen('member', 'Conversation options', '/messages/thread/options/', {

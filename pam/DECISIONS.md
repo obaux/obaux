@@ -6028,6 +6028,76 @@ routing), and every screen arrived as one block on the same 240ms fade.
   screen without our transition, because the change has already happened
   by the time the page hears of it.
 
+### D-270 — Members read and sign a program's policies; round buttons spread when there are three or more
+
+Will, 5 October, with a screenshot of a place's round buttons: "when 3 or
+more icons exist in place profile, just set them for space in between,
+otherwise the last one gets off wonky." Then: "add an item on bottom for
+policies needed to sign, so users can preview them ahead of time … once the
+user finished booking … a CTA to sign policies … [on] trips, members can see
+next to trip card if 'Signatures needed' or 'Policies Signed'. The policy
+screen should allow users to preview and tap to sign, then a half screen
+drawer opens and they can draw their name using their finger, and once a
+signature is drawn once, they should be able to re-use it as easy as tapping
+the sign button."
+
+- **Round buttons.** With three or more, the row spreads them
+  (`space-between`): the first circle at the left edge, the last at the
+  right, each item as wide as its circle or its word. Fewer than three keep
+  D-245's even slots from the left. Four 25% slots plus gaps were wider than
+  the row, which is what pushed Directions out.
+- **Policies to sign** is a row at the foot of a place's page (members
+  only): "Read before your visit · 0 of 4 signed", or "All 4 signed". It
+  opens `/place/policies/?id=`: each policy with "Needs your signature" or
+  "Signed October 5", and one button, Start signing or Keep signing, to the
+  first unsigned one.
+- **One policy** (`/place/policies/view/`): its words, then Sign.
+  - **First time:** Sign opens a half-height sheet (`BottomSheet
+    height="hug"`, about 60% of the screen) with a box to draw in
+    (`SignaturePad`).
+  - **The sheet is `purpose="form"`:** a swipe down while drawing would
+    otherwise close it and lose the signature, so a round × closes it.
+  - **Sign in the sheet waits for ink.**
+  - **After that, Sign is one tap.** The saved signature is shown beside
+    the button ("Sign uses your signature:"), so nobody signs with something
+    they cannot see, and "Sign a new way" reopens the sheet. This is how
+    signing apps work once you have adopted a signature.
+  - **After signing**, the button moves on ("Next: Liability disclaimer",
+    then Done), so nobody has to go back to the list to find the next one.
+    The next policy is changed in place, not by a link, because the same
+    screen with a new `?id=` is a full load (D-269).
+- **Recommended and done: typing counts too.** "Type my name instead"
+  writes the typed name into the box in an italic hand. This is for anyone
+  who cannot draw a signature: a tremor, a screen reader, a cracked screen.
+  Without it the flow would dead-end for them.
+- **Trips.** Each trip card carries a small token: orange "Signatures
+  needed" or green "Policies signed". Programs that ask for nothing (the
+  example food pantry) show none.
+  - The "complete screen" after booking is Trips itself (D-241: the drawer
+    tall, confetti). While a just-booked trip's program still wants
+    signatures, a card at the top of the list says "One more thing before
+    you go" with Sign policies.
+- **`SignaturePad` (`@pam/ui`)** is the one control PAM draws itself, since
+  Astryx has no signature field and only a `<canvas>` takes a drawing.
+  - It is white paper with dark ink in both themes, because the saved
+    picture is shown again elsewhere.
+  - It uses `touch-action: none` so the page does not scroll under the pen.
+  - It is sized in device pixels and curved through midpoints so a quick
+    stroke stays smooth.
+- **Where the signature lives.** Session storage only (`useMySignatures`),
+  never local storage. PAM is often used on a shared or borrowed phone, and
+  a signature is not something to leave on one. Signed is per program and
+  per policy.
+- **Example data.** Every example place uses the one example set of
+  policies except the food pantry (`placeAsksForPolicies`). Storing real
+  policies and signatures is a schema and transparency change waiting on
+  Will (STATUS, needs a human, row 14).
+- **Proven by:** `e2e/policies.spec.ts`:
+  - the list passes axe;
+  - drawing once makes the second policy one tap, with no sheet;
+  - a typed name signs.
+  The full e2e suite passed.
+
 ---
 
 ## Notes for whoever picks this up next

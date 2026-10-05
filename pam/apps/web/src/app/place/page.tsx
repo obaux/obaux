@@ -4,6 +4,7 @@ import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import {
   BigButton,
+  BookIcon,
   GlobeIcon,
   MessagesIcon,
   Notice,
@@ -11,6 +12,7 @@ import {
   PhoneIcon,
   PlaceDetail,
   PlacesIcon,
+  SignedIcon,
   directionsHref,
   googlePlaceHref,
 } from '@pam/ui';
@@ -28,6 +30,11 @@ import { usePlaceStatus, weekLines } from '@/lib/usePlaceStatus';
 import { useRoleView } from '@/lib/useViewedRole';
 import { RoleSwitchControl } from '../RoleSwitchControl';
 import { sharePlace } from '@/lib/sharePlace';
+import { usePolicies } from '@/lib/usePolicies';
+import { useMySignatures } from '@/lib/useMySignatures';
+import { MenuList } from '@pam/ui/MenuList';
+import { placeAsksForPolicies } from '@pam/config/dummy-policies';
+import { policiesHref } from '../../screens/MemberPoliciesView';
 
 /**
  * One place, on its own screen.
@@ -197,6 +204,8 @@ function PlaceScreen() {
   const { isSaved, save, unsave } = useSavedPlaces(signedIn, demoRole);
 
   const place = state.status === 'ready' ? state.place : null;
+  const { policies } = usePolicies();
+  const { progress } = useMySignatures();
   const status = usePlaceStatus(place?.id ?? '', place?.hours ?? null, t, locale);
 
   /*
@@ -375,6 +384,36 @@ function PlaceScreen() {
           flag: t('place.flag'),
         }}
       />
+
+      {/*
+        The program's policies, at the foot of the page (Will, 5 October,
+        D-270): a member can read them before booking, and see how many are
+        signed. Members only — staff do not sign a program's policies.
+      */}
+      {(demoRole ?? trueRole) === 'member' && placeAsksForPolicies(place!.id) && policies.length > 0 ? (
+        <MenuList
+          label={t('place.policies')}
+          items={[
+            {
+              id: 'policies',
+              label: t('place.policies'),
+              description: (() => {
+                const p = progress(place!.id, policies);
+                return p.signed === p.total
+                  ? t('place.policies.allSigned', { total: p.total })
+                  : t('place.policies.hint', { signed: p.signed, total: p.total });
+              })(),
+              href: policiesHref(place!.id, place!.name),
+              icon:
+                progress(place!.id, policies).signed === policies.length ? (
+                  <SignedIcon {...QUICK} />
+                ) : (
+                  <BookIcon {...QUICK} />
+                ),
+            },
+          ]}
+        />
+      ) : null}
     </Page>
   );
 }

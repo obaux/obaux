@@ -141,12 +141,18 @@ const styles = stylex.create({
     fontSize: '17px',
   },
   rows: { rowGap: spacingVars['--spacing-2'] },
-  // The round quick actions: four across, each a circle with a word under it.
-  // Four even slots (D-245): with four actions nothing changes; with fewer,
+  // The round quick actions, each a circle with a word under it. Four even
+  // slots (D-245): with four actions nothing changes; with fewer,
   // they sit from the left at the same spacing instead of spreading out
   // across the row (Will, 3 October: a program's two looked lost).
   quick: { width: '100%', justifyContent: 'flex-start' },
   quickItem: { flexBasis: '25%', flexGrow: 0, flexShrink: 0, maxWidth: '25%', minWidth: 0 },
+  // Three or more (Will, 5 October, D-270): the first circle at the left
+  // edge, the last at the right, the space shared between — four 25% slots
+  // left the last circle hanging past the cards below. Each item is only as
+  // wide as its circle or its word, whichever is wider.
+  quickSpread: { justifyContent: 'space-between' },
+  quickItemSpread: { flexBasis: 'auto', maxWidth: 'none' },
   quickButton: {
     width: '56px',
     height: '56px',
@@ -248,9 +254,21 @@ export function PlaceDetail({
       </VStack>
 
       {quickActions && quickActions.length > 0 ? (
-        <HStack gap={2} align="start" wrap="nowrap" xstyle={styles.quick} role="group" aria-label={quickActionsLabel}>
+        <HStack
+          gap={2}
+          align="start"
+          wrap="nowrap"
+          xstyle={[styles.quick, quickActions.length >= 3 && styles.quickSpread]}
+          role="group"
+          aria-label={quickActionsLabel}
+        >
           {quickActions.map((action) => (
-            <VStack key={action.id} gap={1} align="center" xstyle={styles.quickItem}>
+            <VStack
+              key={action.id}
+              gap={1}
+              align="center"
+              xstyle={[styles.quickItem, quickActions.length >= 3 && styles.quickItemSpread]}
+            >
               <IconButton
                 label={action.label}
                 href={action.href}

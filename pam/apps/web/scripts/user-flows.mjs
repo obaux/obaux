@@ -173,7 +173,9 @@ function edge(flow, [from, to, label, opts], pos, index) {
   let d;
   let lx;
   let ly;
-  if (pb.x > pa.x) {
+  // `over`: a forward link that would cross other cards in its row goes
+  // over the top instead (D-270: A place → Policies to sign, past Trips).
+  if (pb.x > pa.x && !opts?.over) {
     const sx = pa.x + cardW(a);
     const sy = pa.y + HEAD + 40 + index * 22;
     const tx = pb.x - 6;
@@ -280,7 +282,7 @@ for (const flow of flows) {
           { ...pos[id], w: cardW(n), shotH: shotH(n), title: n.title, path: n.path ?? '', note: n.note ?? '', changed: n.changed ?? null, story: n.story ?? null, wide: !!n.wide },
         ]),
       ),
-      edges: flow.edges.map(([a, b, label, o]) => ({ from: a, to: b, label: label ?? '', dashed: !!o?.dashed })),
+      edges: flow.edges.map(([a, b, label, o]) => ({ from: a, to: b, label: label ?? '', dashed: !!o?.dashed, over: !!o?.over })),
     }),
   );
   writeFileSync(join(out, `${flow.key}.html`), page(`PAM — ${flow.title}`, width, height, body, drawn.map((d) => d.path).join('\n')));

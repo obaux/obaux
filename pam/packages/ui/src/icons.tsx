@@ -397,6 +397,26 @@ export function BookIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+/** A pen on a line. A policy still to sign (D-270). */
+export function SignIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <path d="M15.5 4.5l4 4L9 19l-5 1 1-5z" />
+      <path d="M13 7l4 4M14 20h6" />
+    </svg>
+  );
+}
+
+/** A tick in a circle. A policy signed (D-270). */
+export function SignedIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="M8.25 12.25l2.5 2.5 5-5.25" />
+    </svg>
+  );
+}
+
 /** A plus. Add a program (D-218). */
 export function PlusIcon(props: SVGProps<SVGSVGElement>) {
   return (

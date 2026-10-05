@@ -28,6 +28,7 @@
     "./TripCard": "./src/TripCard.tsx",
     "./NextTripCard": "./src/NextTripCard.tsx",
     "./navTransition": "./src/navTransition.ts",
+    "./SignaturePad": "./src/SignaturePad.tsx",
     "./MapDrawer": "./src/MapDrawer.tsx"
   },
   "scripts": {

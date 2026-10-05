@@ -5,8 +5,10 @@ import { ClickableCard } from '@astryxdesign/core/ClickableCard';
 import { Heading } from '@astryxdesign/core/Heading';
 import { HStack } from '@astryxdesign/core/HStack';
 import { Text } from '@astryxdesign/core/Text';
+import { Token } from '@astryxdesign/core/Token';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
+import { SignIcon, SignedIcon } from './icons.js';
 
 /**
  * One visit somebody has agreed to make (D-213, from the reference Will gave
@@ -24,6 +26,12 @@ export interface TripCardProps {
   readonly withPhotoUrl?: string | null;
   /** The card's accessible name — "Example Learning Center, Thursday … with Sandra". */
   readonly label: string;
+  /**
+   * Where the program's policies stand (D-270): "Signatures needed" or
+   * "Policies signed", beside who they are meeting. Omitted when the
+   * program asks for none.
+   */
+  readonly policies?: { readonly label: string; readonly isDone: boolean } | null;
 }
 
 const styles = stylex.create({
@@ -50,9 +58,12 @@ const styles = stylex.create({
     textOverflow: 'ellipsis',
   },
   when: { fontSize: '16px', lineHeight: 1.35 },
+  token: { maxWidth: '100%' },
 });
 
-export function TripCard({ placeName, when, href, art, withName, withPhotoUrl, label }: TripCardProps) {
+const TOKEN_ICON = { width: 14, height: 14, 'aria-hidden': true } as const;
+
+export function TripCard({ placeName, when, href, art, withName, withPhotoUrl, label, policies = null }: TripCardProps) {
   return (
     <ClickableCard label={label} href={href} padding={3} xstyle={styles.card}>
       <HStack gap={4} align="center" wrap="nowrap">
@@ -68,8 +79,21 @@ export function TripCard({ placeName, when, href, art, withName, withPhotoUrl, l
               {when}
             </Text>
           </VStack>
-          {withName ? (
-            <Avatar size="sm" name={withName} src={withPhotoUrl ?? undefined} tooltip={false} alt="" />
+          {withName || policies ? (
+            <HStack gap={2} align="center" wrap="nowrap">
+              {withName ? (
+                <Avatar size="sm" name={withName} src={withPhotoUrl ?? undefined} tooltip={false} alt="" />
+              ) : null}
+              {policies ? (
+                <Token
+                  size="sm"
+                  color={policies.isDone ? 'green' : 'orange'}
+                  label={policies.label}
+                  icon={policies.isDone ? <SignedIcon {...TOKEN_ICON} /> : <SignIcon {...TOKEN_ICON} />}
+                  xstyle={styles.token}
+                />
+              ) : null}
+            </HStack>
           ) : null}
         </VStack>
       </HStack>

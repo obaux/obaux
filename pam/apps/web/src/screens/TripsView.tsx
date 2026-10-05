@@ -20,6 +20,11 @@ import { dummyConnection } from '@pam/config/dummy-connections';
 import { useI18n } from '@/lib/i18n';
 import { BigCategoryIcon } from './SavedView';
 import { TripsMap } from './TripsMap';
+import { BigButton } from '@pam/ui';
+import { Card } from '@astryxdesign/core/Card';
+import { usePolicies } from '@/lib/usePolicies';
+import { useMySignatures } from '@/lib/useMySignatures';
+import { policiesHref } from './MemberPoliciesView';
 
 /**
  * Trips — the visits somebody has agreed to make (D-210, D-213).
@@ -47,6 +52,8 @@ export interface Trip {
   readonly startsAt: string;
   readonly withName?: string | null;
   readonly withPhotoUrl?: string | null;
+  /** The program's policies, signed of total (D-270); null when it asks for none. */
+  readonly policies?: { readonly signed: number; readonly total: number } | null;
 }
 
 export interface TripsViewProps {
@@ -98,6 +105,9 @@ const styles = stylex.create({
   count: { fontSize: '15px', textAlign: 'center' },
   state: { paddingBlock: '24px' },
   stateIcon: { width: '56px', height: '56px' },
+  toSign: { width: '100%' },
+  toSignTitle: { fontSize: '20px', lineHeight: 1.3 },
+  toSignBody: { fontSize: '17px', lineHeight: 1.5 },
   // The new trip's card rises into place after the drawer opens (D-241).
   arrive: {
     animationName: arriveIn,
@@ -124,6 +134,9 @@ export function TripsView({ trips, headerActions, justAdded = null }: TripsViewP
   const when = (iso: string) =>
     `${new Intl.DateTimeFormat(locale, { weekday: 'long', month: 'short', day: 'numeric' }).format(new Date(iso))} · ${new Intl.DateTimeFormat(locale, { hour: 'numeric', minute: '2-digit' }).format(new Date(iso))}`;
   const href = (trip: Trip) => `/place/?id=${encodeURIComponent(trip.placeId)}&from=trips`;
+  // The trip just booked, if its program still wants signatures (D-270).
+  const added = justAdded ? trips.find((trip) => trip.id === justAdded) : undefined;
+  const toSign = added?.policies && added.policies.signed < added.policies.total ? added : null;
 
   return (
     // What a tapped next-trip card grows into (D-269): Trips has no `Page`.
@@ -180,6 +193,31 @@ export function TripsView({ trips, headerActions, justAdded = null }: TripsViewP
           />
         ) : (
           <VStack gap={3}>
+            {/*
+              Booked (D-270): the one thing left to do before the visit, at
+              the top of the list, while the confetti is still falling.
+            */}
+            {toSign ? (
+              <Card padding={6} xstyle={styles.toSign}>
+                <VStack gap={3}>
+                  <VStack gap={1}>
+                    <Heading level={2} xstyle={styles.toSignTitle}>
+                      {t('trips.added.policies.title')}
+                    </Heading>
+                    <Text type="supporting" xstyle={styles.toSignBody}>
+                      {t('trips.added.policies.body', {
+                        place: toSign.placeName,
+                        count: toSign.policies!.total - toSign.policies!.signed,
+                      })}
+                    </Text>
+                  </VStack>
+                  <BigButton
+                    label={t('trips.added.policies.action')}
+                    href={policiesHref(toSign.placeId, toSign.placeName)}
+                  />
+                </VStack>
+              </Card>
+            ) : null}
             {shown.map((trip) => {
               const card = (
               <TripCard
@@ -190,6 +228,13 @@ export function TripsView({ trips, headerActions, justAdded = null }: TripsViewP
                 art={<BigCategoryIcon category={trip.category} size={ART} />}
                 withName={trip.withName ?? null}
                 withPhotoUrl={trip.withPhotoUrl ?? null}
+                policies={
+                  trip.policies && trip.policies.total > 0
+                    ? trip.policies.signed === trip.policies.total
+                      ? { label: t('trips.policies.signed'), isDone: true }
+                      : { label: t('trips.policies.needed'), isDone: false }
+                    : null
+                }
                 label={t('trips.card.label', {
                   place: trip.placeName,
                   when: when(trip.startsAt),
@@ -246,11 +291,18 @@ export function TripsScreen({ headerActions }: { readonly headerActions?: ReactN
       withPhotoUrl: person?.photoUrl ?? null,
     };
   });
+  // Where each program's policies stand for this member (D-270).
+  const { policies } = usePolicies();
+  const { progress } = useMySignatures();
+  const withPolicies = (trip: Trip): Trip => {
+    const p = progress(trip.placeId, policies);
+    return { ...trip, policies: p.total > 0 ? p : null };
+  };
   return (
     <TripsView
       justAdded={justAdded}
       headerActions={headerActions ?? <NewTripButton />}
-      trips={[...examples, ...added].sort((a, b) => a.startsAt.localeCompare(b.startsAt))}
+      trips={[...examples, ...added].map(withPolicies).sort((a, b) => a.startsAt.localeCompare(b.startsAt))}
     />
   );
 }

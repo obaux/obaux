@@ -96,3 +96,15 @@ export const DUMMY_POLICIES: readonly DummyPolicy[] = [
     ],
   },
 ];
+
+/**
+ * Whether a place asks a member to sign its policies before a visit (D-270).
+ *
+ * Example data has one program's set (`DUMMY_POLICIES`), so every place
+ * borrows it — except the example food pantry, which asks for nothing, so
+ * the screens can show a place with no policies too. The real rule is
+ * simply "the program has added some", once policies are stored per program.
+ */
+export function placeAsksForPolicies(placeId: string): boolean {
+  return placeId !== 'dummy-place-food';
+}
