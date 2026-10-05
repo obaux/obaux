@@ -100,6 +100,7 @@ Cards scrolling under the bottom menu fade out over a taller band, and the end o
 member's award on Profile carries a small "Your badge" ribbon. Place cards
 have a small illustration for their kind of place at the top left, the
 save mark lines up with the name, and the open line is smaller and quieter.
+Category chips have a soft glow of their colour behind each icon.
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 

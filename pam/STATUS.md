@@ -357,7 +357,8 @@ one shows saved from a trip too (D-281). Saving the new time celebrates it
 draws its own fade above it, and Trips has none (D-285). The tab bar exists only in
 Storybook's prototype: the live app has no bottom bar until the member shell is built.
 The award tile has a "Your badge" ribbon (D-286). Place cards lead with an illustrated
-category tile (`CategoryArt`), a top-aligned save, and a quieter open line (D-287). How points should be awarded — two rules live
+category tile (`CategoryArt`), a top-aligned save, and a quieter open line (D-287). Category chips glow behind
+their icons (D-288). How points should be awarded — two rules live
 (save a place, finish setup), the rest to build, with order and open
 questions — is specified in `docs/points-awarding.md`. The
 signatures are example data too, kept only for the visit (session storage).

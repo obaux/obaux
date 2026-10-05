@@ -85,6 +85,38 @@ const styles = stylex.create({
     fontWeight: 600,
   },
   icon: { width: '18px', height: '18px', flexShrink: 0 },
+  // A soft pop of the category's colour behind its icon (Will, 5 October,
+  // D-288: "a circle with blur so it looks like icons pop a bit more").
+  // Its own stacking context, so the glow sits behind the icon and never
+  // behind the chip's white face.
+  iconWrap: { position: 'relative', isolation: 'isolate' },
+  glow: {
+    position: 'absolute',
+    width: '24px',
+    height: '24px',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    borderRadius: '50%',
+    filter: 'blur(5px)',
+    opacity: 0.6,
+    zIndex: -1,
+    pointerEvents: 'none',
+  },
+});
+
+// The bright data shade of each tone — the icon itself stays the deep one,
+// so it still reads on the glow.
+const glows = stylex.create({
+  blue: { backgroundColor: 'var(--color-data-blue-3)' },
+  green: { backgroundColor: 'var(--color-data-shamrock-3)' },
+  purple: { backgroundColor: 'var(--color-data-purple-3)' },
+  orange: { backgroundColor: 'var(--color-data-orange-3)' },
+  red: { backgroundColor: 'var(--color-data-red-3)' },
+  teal: { backgroundColor: 'var(--color-data-teal-3)' },
+  pink: { backgroundColor: 'var(--color-data-pink-3)' },
+  cyan: { backgroundColor: 'var(--color-data-teal-3)' },
+  gray: { backgroundColor: 'var(--color-data-gray-3)' },
 });
 
 const tones = stylex.create({
@@ -110,7 +142,12 @@ export function CategoryChips<K extends string>({ chips, value, onChange, label 
             label={chip.label}
             variant="secondary"
             aria-pressed={on}
-            icon={<HStack xstyle={[styles.icon, chip.tone && tones[chip.tone]]}>{chip.icon}</HStack>}
+            icon={
+              <HStack xstyle={[styles.icon, styles.iconWrap, chip.tone && tones[chip.tone]]}>
+                {chip.tone ? <HStack aria-hidden xstyle={[styles.glow, glows[chip.tone]]} /> : null}
+                {chip.icon}
+              </HStack>
+            }
             onClick={() => onChange(chip.key)}
             xstyle={[styles.chip, on && styles.chipOn]}
           />

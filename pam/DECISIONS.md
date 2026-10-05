@@ -6665,6 +6665,22 @@ carousel".
 - **Proven by:** typecheck, the web build, Storybook screenshots (Explore,
   Profile, a case manager's Home, Trips), and the full e2e suite.
 
+### D-288 — A glow behind each category chip's icon
+
+Will, 5 October, on Explore's category chips: "can we add a tinge of color
+pop behind icon? Like a circle with blur so it looks like icons pop a bit
+more? They're not standing out enough."
+
+- **The glow:** a 24px circle in the bright data shade of the chip's tone
+  (`--color-data-*-3`), blurred 5px at 60% opacity, centred behind the icon.
+- **The icon** keeps its deep tone colour, so it still reads on the glow.
+- **Stacking:** the icon wrapper is its own stacking context (`isolation`),
+  so the glow sits behind the icon but in front of the chip's white face.
+- **"All"** has no tone, so it has no glow.
+- **Where:** `CategoryChips`, so it shows on both Explore and Connect.
+- **Proven by:** the web build, and a Storybook screenshot of Explore's
+  chips.
+
 ---
 
 ## Notes for whoever picks this up next
