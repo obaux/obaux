@@ -44,6 +44,8 @@ export interface PhoneSignInCardProps {
   readonly headingLevel?: 1 | 2;
   /** The code step's button — "Sign in", or "Next" inside joining. */
   readonly codeAction?: string;
+  /** No shadow or outline — Sign in, where it sits on the page (D-266). */
+  readonly isFlat?: boolean;
 }
 
 const styles = stylex.create({
@@ -52,6 +54,12 @@ const styles = stylex.create({
   hint: { fontSize: '17px', lineHeight: 1.5 },
   consent: { fontSize: '14px', lineHeight: 1.35 },
   card: { width: '100%' },
+  // Sign in's card sits on the white under the pictures and reads as part of
+  // it (Will, 5 October, D-266): no lift, no outline.
+  flat: { boxShadow: 'none', borderWidth: 0 },
+  // The code step drawn in by the card's own inner margin, so its button is
+  // the same width as "Send me a code" a step earlier (D-266).
+  codeInset: { paddingInline: '20px', boxSizing: 'border-box' },
   centred: { textAlign: 'center' },
   // The field's own label reads left-to-right even on a centred page: a label
   // sitting over the left edge of the box it names is easier to tie to it, and
@@ -68,6 +76,7 @@ export function PhoneSignInCard({
   headingLevel = 1,
   hasTitle = true,
   codeAction,
+  isFlat = false,
 }: PhoneSignInCardProps) {
   const { t } = useI18n();
   const { state, sendCode, verifyCode } = flow;
@@ -85,7 +94,7 @@ export function PhoneSignInCard({
       // of 5" under it) says what this is. Then the boxes and the button, the
       // thing to do; then, quieter, where the code went, with a small
       // "Send again".
-      <VStack gap={4} xstyle={styles.card}>
+      <VStack gap={4} xstyle={[styles.card, styles.codeInset]}>
         <CodeBoxes
           id={codeId}
           label={t('signin.code.label')}
@@ -127,7 +136,7 @@ export function PhoneSignInCard({
     // matching the Figma redesign's roomier card) — one spacing step up from
     // the rest of the app's cards, since this is the one screen where the
     // card is the entire job rather than one of several things on the page.
-    <Card padding={5} xstyle={styles.card}>
+    <Card padding={5} xstyle={[styles.card, isFlat && styles.flat]}>
       <VStack gap={3}>
         {/*
           The heading sits inside the card with the field it names, so the

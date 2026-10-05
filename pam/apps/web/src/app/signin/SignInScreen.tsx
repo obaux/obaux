@@ -84,15 +84,14 @@ const styles = stylex.create({
     paddingBlock: '4px',
   },
   heroGlobe: { position: 'absolute', top: 0, right: 0 },
-  // Rides up over the hero's bottom edge rather than sitting flush under it —
-  // the floating-card treatment the Figma redesign shows.
+  // Under the pictures, not over their edge (Will, 5 October, D-266: "move
+  // it all on the part below … remove card shadow, so it looks like it's
+  // part of the white bg"). The card is flat; this only centres it.
   overlapCard: {
     width: '100%',
     maxWidth: '440px',
     marginInline: 'auto',
-    marginBlockStart: '-32px',
-    position: 'relative',
-    zIndex: 1,
+    marginBlockStart: '4px',
   },
 });
 
@@ -290,6 +289,7 @@ export function SignInScreen({
         code={code}
         onCodeChange={setCode}
         hasTitle={onFirstStep}
+        isFlat
       />
     );
 

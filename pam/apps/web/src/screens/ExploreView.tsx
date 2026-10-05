@@ -56,6 +56,8 @@ export interface ExploreViewProps {
   readonly area?: ReactNode;
   /** Drawn under the chips when open: the area picker. */
   readonly areaPanel?: ReactNode;
+  /** A member's next visit, above the list when nothing is searched (D-265). */
+  readonly nextTrip?: ReactNode;
   /** A message that belongs above the list — "Couldn't save that". */
   readonly notice?: ReactNode;
   /** The words the list was searched for, once they settled; '' for none. */
@@ -69,6 +71,14 @@ export interface ExploreViewProps {
 }
 
 const ICON = { width: 22, height: 22, 'aria-hidden': true } as const;
+// The chips' own, smaller (D-265).
+const CHIP_ICON = { width: 18, height: 18, 'aria-hidden': true } as const;
+const CHIP_ICONS: Readonly<Record<ExploreCategory, ReactNode>> = {
+  all: <AllPlacesIcon {...CHIP_ICON} />,
+  education: <EducationIcon {...CHIP_ICON} />,
+  workforce: <WorkforceIcon {...CHIP_ICON} />,
+  family_services: <FamilyServicesIcon {...CHIP_ICON} />,
+};
 
 export const CATEGORY_ICONS: Readonly<Record<ExploreCategory, ReactNode>> = {
   all: <AllPlacesIcon {...ICON} />,
@@ -111,6 +121,7 @@ export function ExploreView({
   onCategory,
   area,
   areaPanel,
+  nextTrip,
   notice,
   query,
   state,
@@ -138,11 +149,11 @@ export function ExploreView({
   }, []);
 
   const chips: readonly CategoryChip<ExploreCategory>[] = [
-    { key: 'all', label: t('places.all'), icon: CATEGORY_ICONS.all },
+    { key: 'all', label: t('places.all'), icon: CHIP_ICONS.all },
     ...CATEGORY_LIST.map((definition) => ({
       key: definition.key,
       label: t(definition.labelKey),
-      icon: CATEGORY_ICONS[definition.key],
+      icon: CHIP_ICONS[definition.key],
       tone: definition.colorToken as ChipTone,
     })),
   ];
@@ -162,6 +173,7 @@ export function ExploreView({
 
       {areaPanel}
       {notice}
+      {searching ? null : nextTrip}
 
       <HStack gap={2} align="center" justify="between" wrap="wrap">
         {searching ? (

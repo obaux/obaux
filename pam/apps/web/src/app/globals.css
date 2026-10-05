@@ -253,6 +253,26 @@
    * above the icon beside them; a link row has no such box. Centred, it lines
    * up with every other row.
    */
+  /*
+   * Every search bar's words and magnifier read bolder and darker (Will,
+   * 5 October, D-265, after the reference: "keep the bolder text and icon
+   * across all search bars"). The large input group is only ever a search
+   * pill (SearchPill, SearchField), so this reaches all of them and nothing
+   * else.
+   */
+  .astryx-input-group[data-size='lg'] input {
+    font-weight: 600;
+  }
+  .astryx-input-group[data-size='lg'] input::placeholder {
+    font-weight: 600;
+    color: var(--color-text-primary);
+    opacity: 1;
+  }
+  .astryx-input-group[data-size='lg'] svg {
+    color: var(--color-text-primary);
+    stroke-width: 2.25;
+  }
+
   .astryx-item > button {
     justify-content: center;
   }

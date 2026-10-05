@@ -3,6 +3,7 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { Icon } from '@astryxdesign/core/Icon';
+import { Button } from '@astryxdesign/core/Button';
 import { IconButton } from '@astryxdesign/core/IconButton';
 import { InputGroup, InputGroupText } from '@astryxdesign/core/InputGroup';
 import { TextInput } from '@astryxdesign/core/TextInput';
@@ -53,6 +54,8 @@ export interface SearchPillProps<T extends SearchPillItem> {
    * the screen's empty state. The bar then reports `onQuery('')` itself.
    */
   readonly clearSignal?: number;
+  /** Focus it on arrival — after the centred launcher was tapped (D-265). */
+  readonly hasAutoFocus?: boolean;
 }
 
 const styles = stylex.create({
@@ -68,7 +71,40 @@ const styles = stylex.create({
       '0 1px 2px light-dark(oklch(0 0 0 / 5%), oklch(0 0 0 / 30%)), 0 2px 8px light-dark(oklch(0 0 0 / 6%), oklch(0 0 0 / 35%)), inset 0 0 0 1px light-dark(oklch(0 0 0 / 6%), oklch(1 0 0 / 9%))',
   },
   clear: { backgroundColor: 'transparent', borderWidth: 0, paddingInline: 0 },
+  // The launcher (D-265): the pill itself, as one button — the same white,
+  // the same lift, the icon and words centred and bold.
+  launcher: {
+    width: '100%',
+    minHeight: '60px',
+    borderRadius: '999px',
+    borderWidth: 0,
+    gap: '10px',
+    fontSize: '18px',
+    fontWeight: 600,
+    color: 'light-dark(#111111, #F2F2F2)',
+    backgroundColor: 'light-dark(#FFFFFF, #262626)',
+    boxShadow:
+      '0 2px 4px light-dark(oklch(0 0 0 / 6%), oklch(0 0 0 / 30%)), 0 10px 28px light-dark(oklch(0 0 0 / 14%), oklch(0 0 0 / 45%)), inset 0 0 0 1px light-dark(oklch(0 0 0 / 5%), oklch(1 0 0 / 10%))',
+  },
 });
+
+/**
+ * The search bar at rest, on a member's Explore (Will, 5 October, D-265:
+ * "notice how the search in the reference is … bolder text, center
+ * aligned"): one big pill-shaped button, magnifier and words centred. A tap
+ * opens the real `SearchPill` in its place, focused, with Cancel beside it.
+ */
+export function SearchLauncher({ label, onOpen }: { readonly label: string; readonly onOpen: () => void }) {
+  return (
+    <Button
+      label={label}
+      variant="secondary"
+      icon={<Icon icon="search" size="md" />}
+      onClick={onOpen}
+      xstyle={styles.launcher}
+    />
+  );
+}
 
 export function SearchPill<T extends SearchPillItem>({
   label,
@@ -80,6 +116,7 @@ export function SearchPill<T extends SearchPillItem>({
   clearLabel,
   itemIcon,
   clearSignal = 0,
+  hasAutoFocus = false,
 }: SearchPillProps<T>) {
   const [query, setQuery] = useState('');
   // The Typeahead keeps its own text; a fresh one is the only clean way to
@@ -122,7 +159,7 @@ export function SearchPill<T extends SearchPillItem>({
         )}
         startIcon="search"
         hasClear={false}
-        hasAutoFocus={round > 0}
+        hasAutoFocus={hasAutoFocus || round > 0}
         maxMenuItems={6}
         debounceMs={120}
         emptySearchResultsText={emptyText}

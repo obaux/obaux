@@ -323,6 +323,9 @@ email's words are approved, but **nothing sends it yet**: it waits in
 The whole app is mapped in Figma, "PAM — User flows"
 (https://www.figma.com/design/DtlJg9Klx5BRfHbXBhkg98), generated from
 `docs/user-flows/flows.mjs` and kept current with every screen change (D-264).
+A member's Explore has a centred search launcher, smaller chips and a "Your
+next visit" card, and no bell or Help (D-265). Sign in's card sits flat under
+the slides, and the code step is drawn in to match (D-266).
 Programs have policies for participants with a verified tick (D-261), on
 example data until tables, file storage and a transparency line are agreed.
 From a request the super admin can open the requested program and text the

@@ -27,7 +27,7 @@
  *   changes  — the newest decisions this flow shows, newest first
  */
 
-export const UPDATED = '4 October 2026';
+export const UPDATED = '5 October 2026';
 
 /** Where each screen opens live — the branch's Storybook on Chromatic. */
 export const STORYBOOK_URL = 'https://claude-pam-storybook--6abea9193da46b88ce90890f.chromatic.com';
@@ -59,7 +59,8 @@ export const flows = [
         title: 'The code we texted',
         story: 'onboarding--case-manager',
         path: '/signin/ (code step)',
-        changed: 'D-251',
+        changed: 'D-266',
+        note: 'Drawn in: the button matches Send me a code',
         actions: [
           { fill: 'Your phone number', value: '215 555 0100' },
           { click: 'Send me a code' },
@@ -81,7 +82,13 @@ export const flows = [
         ],
       },
       cmHome: { title: 'Case manager Home', story: 'case-manager-screens--home', path: '/' },
-      signin: { title: 'Sign in', story: 'member-app-screens--sign-in', path: '/signin/' },
+      signin: {
+        title: 'Sign in',
+        story: 'member-app-screens--sign-in',
+        path: '/signin/',
+        changed: 'D-266',
+        note: 'The card sits flat under the pictures',
+      },
       about: {
         title: 'About PAM',
         story: 'onboarding--about',
@@ -127,6 +134,7 @@ export const flows = [
       ['sent', 'email', 'Arrives by email', { dashed: true }],
     ],
     changes: [
+      'D-266 — Sign in: the card sits flat under the pictures; the code step is drawn in to match',
       'D-263 — no phone needed to invite; 30-day links; expired links email a new one; "You\'re invited" preview',
       'D-259 — About PAM from the foot of Sign in',
       'D-254 — invites are links to Sign in',
@@ -139,7 +147,13 @@ export const flows = [
       'Five tabs: Explore, Saved, Trips, Messages, Profile. A member finds a place, plans a visit, and talks to their case manager and programs.',
     roots: ['explore', 'saved', 'trips', 'messages', 'profile'],
     nodes: {
-      explore: { title: 'Explore', story: 'member-app-screens--explore', path: '/' },
+      explore: {
+        title: 'Explore',
+        story: 'member-app-screens--explore',
+        path: '/',
+        changed: 'D-265',
+        note: 'Centred search, next visit card, no bell or Help',
+      },
       place: { title: 'A place', story: 'member-app-screens--place', path: '/place/' },
       newTrip: { title: 'Plan a visit', story: 'member-app-screens--new-trip', path: '/trips/new/' },
       report: { title: 'Report a place', story: 'member-app-screens--report-place', path: '/flag/' },
@@ -185,7 +199,10 @@ export const flows = [
       ['legal', 'whoSees', 'Who can see what'],
       ['profile', 'points', 'Points'],
     ],
-    changes: ['D-260 — a switch for each kind of text alert'],
+    changes: [
+      'D-265 — Explore: a centred, bolder search, smaller chips and a "Your next visit" card; bell and Help live on Profile',
+      'D-260 — a switch for each kind of text alert',
+    ],
   },
   {
     key: 'case-manager',

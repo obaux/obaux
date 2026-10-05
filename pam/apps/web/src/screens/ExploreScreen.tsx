@@ -2,9 +2,12 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Notice, PlaceCard, PlusIcon, ScrollReveal } from '@pam/ui';
-import { SearchPill, type SearchPillItem } from '@pam/ui/SearchPill';
-import { distanceLabel } from '@pam/config';
+import { EducationIcon, FamilyServicesIcon, Notice, PlaceCard, PlusIcon, ScrollReveal, WorkforceIcon } from '@pam/ui';
+import { SearchLauncher, SearchPill, type SearchPillItem } from '@pam/ui/SearchPill';
+import { NextTripCard } from '@pam/ui/NextTripCard';
+import { DUMMY_TRIPS } from '@pam/config/dummy-trips';
+import { USE_DUMMY_PEOPLE } from '@pam/config/dummy-flag';
+import { categoryLabelKey, distanceLabel } from '@pam/config';
 import type { SearchSource } from '@astryxdesign/core/Typeahead';
 import { useI18n } from '@/lib/i18n';
 import { useSupportPhone } from '@/lib/useSupportPhone';
@@ -60,6 +63,35 @@ function useDebounced(value: string, ms: number): string {
   }, [value, ms]);
   return debounced;
 }
+
+/** The soonest example visit still ahead — what a member's Explore shows (D-265). */
+function upcomingTrip() {
+  const now = Date.now();
+  return [...DUMMY_TRIPS]
+    .filter((trip) => new Date(trip.startsAt).getTime() > now)
+    .sort((a, b) => a.startsAt.localeCompare(b.startsAt))[0] ?? null;
+}
+
+/** "Tue, Oct 7 · 10:00 AM". */
+function tripWhen(iso: string, locale: string): string {
+  const d = new Date(iso);
+  const day = new Intl.DateTimeFormat(locale, { weekday: 'short', month: 'short', day: 'numeric' }).format(d);
+  const time = new Intl.DateTimeFormat(locale, { hour: 'numeric', minute: '2-digit' }).format(d);
+  return `${day} · ${time}`;
+}
+
+const TRIP_ICON = { width: 20, height: 20, 'aria-hidden': true } as const;
+const TRIP_BIG = { width: 44, height: 44, 'aria-hidden': true } as const;
+const TRIP_ICONS = {
+  education: <EducationIcon {...TRIP_ICON} />,
+  workforce: <WorkforceIcon {...TRIP_ICON} />,
+  family_services: <FamilyServicesIcon {...TRIP_ICON} />,
+} as const;
+const TRIP_ART = {
+  education: <EducationIcon {...TRIP_BIG} />,
+  workforce: <WorkforceIcon {...TRIP_BIG} />,
+  family_services: <FamilyServicesIcon {...TRIP_BIG} />,
+} as const;
 
 /**
  * `programs` (D-218): the same catalogue as a staff member's secondary path —
@@ -133,20 +165,32 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
           clearLabel={t('explore.search.clear')}
           itemIcon={(item) => CATEGORY_ICONS[item.auxiliaryData.category]}
           clearSignal={clearSignal}
+          hasAutoFocus={isSearching}
         />
   );
   const programsSearching = mode === 'programs' && isSearching;
+  // A member's Explore (Will, 5 October, D-265): no bell or Help up top (both
+  // are on Profile), the search bar at rest is a centred launcher, and the
+  // next visit sits above the list. Staff reach this screen as All programs.
+  const isMember = mode === 'tab' && (demoRole ?? trueRole) === 'member';
+  const nextTrip = isMember && USE_DUMMY_PEOPLE ? upcomingTrip() : null;
 
   return (
     <ExploreView
-      search={mode === 'programs' && !isSearching ? null : pill}
+      search={
+        mode === 'programs' && !isSearching
+          ? null
+          : isMember && !isSearching
+            ? <SearchLauncher label={t('explore.search.placeholder')} onOpen={() => setIsSearching(true)} />
+            : pill
+      }
       leading={
         mode === 'programs' && !isSearching ? (
           <BackButton href="/profile/" label={t('nav.back.profile')} />
         ) : undefined
       }
       actions={
-        programsSearching ? (
+        programsSearching || (isMember && isSearching) ? (
           <Button
             label={t('messages.search.cancel')}
             variant="ghost"
@@ -178,9 +222,25 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
             />
             <HelpButton />
           </>
-        ) : (
+        ) : isMember ? undefined : (
           <HeaderActions role={demoRole ?? trueRole} enabled={session.status === 'signed-in'} />
         )
+      }
+      nextTrip={
+        nextTrip ? (
+          <NextTripCard
+            categoryLabel={t(categoryLabelKey(nextTrip.category))}
+            categoryIcon={TRIP_ICONS[nextTrip.category]}
+            art={TRIP_ART[nextTrip.category]}
+            title={t('explore.nextTrip.title')}
+            when={tripWhen(nextTrip.startsAt, locale)}
+            href="/trips/"
+            label={t('explore.nextTrip.label', {
+              kind: t(categoryLabelKey(nextTrip.category)),
+              when: tripWhen(nextTrip.startsAt, locale),
+            })}
+          />
+        ) : null
       }
       category={category}
       onCategory={setCategory}

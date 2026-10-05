@@ -1059,5 +1059,7 @@
   "invites.log.who.provider": "A program",
   "invites.log.who.admin": "A case manager",
   "invites.log.by": "Invited by {name} ({role})",
-  "invites.log.emailed": "new link sent to {email}"
+  "invites.log.emailed": "new link sent to {email}",
+  "explore.nextTrip.title": "Your next visit",
+  "explore.nextTrip.label": "Your next visit: {kind}, {when}. See your trips."
 }

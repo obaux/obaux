@@ -15,7 +15,7 @@ import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
  * the words are longer — with the edge of the next chip showing, so it is
  * plain there is more.
  *
- * Each chip is a 48px toggle (the §2.5 floor; Places' 40px exception,
+ * Each chip is a 40px pill with a 48px tap area (D-265; the §2.5 floor; Places' 40px exception,
  * D-104, is not carried over — these are the screen's main filter now).
  */
 export interface CategoryChip<K extends string> {
@@ -53,27 +53,32 @@ const styles = stylex.create({
     paddingBlock: '6px 10px',
     scrollSnapType: 'x proximity',
   },
+  // Smaller to the eye, after the reference (Will, 5 October, D-265): 40px
+  // tall, 15px words, a lighter lift. The 48px a finger needs (§2.5) is kept
+  // by an invisible margin around each chip (::before), not by its outline.
   chip: {
+    position: 'relative',
     flexShrink: 0,
-    minHeight: '48px',
+    minHeight: '40px',
     borderRadius: '999px',
-    paddingInline: '18px',
-    fontSize: '16px',
-    gap: '8px',
+    paddingInline: '14px',
+    fontSize: '15px',
+    gap: '6px',
     scrollSnapAlign: 'start',
     backgroundColor: colorVars['--color-background-body'],
     color: colorVars['--color-text-primary'],
     borderWidth: '1px',
     borderStyle: 'solid',
     borderColor: colorVars['--color-border'],
-    boxShadow: '0 2px 8px light-dark(oklch(0 0 0 / 8%), oklch(0 0 0 / 40%))',
+    boxShadow: '0 1px 4px light-dark(oklch(0 0 0 / 7%), oklch(0 0 0 / 35%))',
+    '::before': { content: "''", position: 'absolute', insetBlock: '-4px', insetInline: '-2px' },
   },
   chipOn: {
     borderWidth: '2px',
     borderColor: colorVars['--color-text-primary'],
     fontWeight: 600,
   },
-  icon: { width: '22px', height: '22px', flexShrink: 0 },
+  icon: { width: '18px', height: '18px', flexShrink: 0 },
 });
 
 const tones = stylex.create({

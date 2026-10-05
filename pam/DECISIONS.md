@@ -5872,6 +5872,63 @@ The slots keep their `shot:*` names, so when the host is allowed,
 `upload_assets` can fill them from disk by node id. The skill describes this
 route and forbids the base64 one.
 
+### D-265 — A member's Explore: a centred search, smaller chips, the next visit; no bell or Help up top
+
+Will, 5 October, with an Airbnb reference: "add a horizontal card to member
+home page with trip details … only one card … upcoming trip, date & time,
+and program category, no need for program name. Remove help and alert
+buttons from homepage top. … match that [search] style, bolder text center
+aligned. This applies to member homepage only, but keep the bolder text and
+icon across all search bars. … reduce the size of category chips."
+
+**The search bar at rest is a launcher** (`SearchLauncher` in
+`@pam/ui/SearchPill`). It is the pill itself, drawn as one button, with the
+magnifier and "Search programs" centred and bold. A tap swaps in the real
+`SearchPill`, focused (new `hasAutoFocus`), with Cancel beside it — the same
+pattern as All programs' search (D-238). A text field's placeholder cannot
+be centred together with its icon, so the at-rest state is a button.
+
+**Bolder search everywhere.** In `globals.css`, the large input group, which
+is only ever a search pill, now gives its typed text and placeholder weight
+600 in the primary ink, and draws its magnifier darker and thicker. This
+covers every search bar: Explore, the staff homes, Messages, Trips and the
+pickers.
+
+**No bell or Help on a member's Explore.** Both stay on Profile's header. Staff
+reaching this screen as All programs keep their buttons.
+
+**"Your next visit"** (`NextTripCard`) sits above the list when nothing is
+being searched:
+- the category's icon and name;
+- a bold title;
+- the day and time with a chevron;
+- at the right, the category icon on two stacked, tilted tiles, standing in
+  for the reference's photos.
+
+There is no program name. The card opens Trips. It uses the soonest example
+trip (`DUMMY_TRIPS`) until trips are real, as Trips does.
+
+**Chips are smaller to the eye:** 40px tall, 15px text, 18px icons and a
+lighter shadow. A tap area of at least 48px is a non-negotiable rule, so each
+chip keeps 48px through an invisible `::before` margin, not through its
+outline.
+
+### D-266 — Sign in: the card sits flat under the pictures; the code step is drawn in
+
+Will, 5 October: "Instead of having the card over the top edge of carousel,
+… move it all on the part below … Remove card shadow, so it looks like it's
+part of the white bg. Then for the next code screen … more left and right
+padding, so the buttons are same width."
+
+- The Sign in card no longer rides up over the slides. It starts just below
+  them and is flat (`PhoneSignInCard isFlat`: no shadow, no outline), so the
+  phone field and button read as part of the white page. Card, footer and
+  slides fit on an 844px screen.
+- The code step's boxes, button and "Sent to …" now sit inside the same 20px
+  inner margin the card gives its own content. "Sign in" is therefore the
+  same width as "Send me a code" a step earlier (318 and 320px measured).
+  This applies wherever the code step appears, joining included.
+
 ---
 
 ## Notes for whoever picks this up next
