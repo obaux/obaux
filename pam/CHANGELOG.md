@@ -95,7 +95,7 @@ visit", the day and time, and "Change appointment", which moves the visit
 and comes back to the place. Its address and hours now come before what the
 place is. A place you saved shows as saved when you open it from a trip. Saving a new
 time shows a short celebration with the new day and time, then goes home.
-Cards scrolling under the bottom menu fade out instead of stopping at a hard edge.
+Cards scrolling under the bottom menu fade out over a taller band, and the end of a list scrolls clear of it.
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 

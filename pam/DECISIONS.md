@@ -6564,6 +6564,20 @@ menu."
 - **Proven by:** typecheck, and Storybook screenshots of Explore scrolled
   under the bar.
 
+### D-284 — A taller, stronger fade, and room at the end of a list
+
+Will, 5 October: "Let's make the fade stronger so it takes up more height."
+
+- **Height:** 96px instead of 40px.
+- **Shape:** eased rather than linear. It reaches 55% page colour by 40% of
+  the way down, 90% by 75%, then solid at the bar. A card going under it
+  washes out instead of showing a thin grey band.
+- **More room at the end of a list:** the bar's spacer grows by 56px. With
+  a fade this tall, the last card of a list would otherwise stay half
+  washed out even when scrolled all the way down. Now it scrolls clear.
+- **Proven by:** typecheck, and Storybook screenshots of Explore at the top
+  and scrolled to the end.
+
 ---
 
 ## Notes for whoever picks this up next

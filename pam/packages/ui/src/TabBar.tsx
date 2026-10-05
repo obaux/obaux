@@ -88,21 +88,25 @@ const styles = stylex.create({
     paddingBottom: 'env(safe-area-inset-bottom, 0px)',
   },
   inner: { width: '100%', maxWidth: '560px', marginInline: 'auto' },
-  // A white fade above the bar (Will, 5 October, D-283), so a card scrolling
+  // A white fade above the bar (Will, 5 October, D-283, D-284), so a card scrolling
   // under it softens away instead of being cut off hard at the line.
   // Decoration only: hidden, and never in the way of a tap on the card.
   fade: {
     position: 'absolute',
     insetInline: 0,
     bottom: '100%',
-    height: '40px',
+    // Taller and stronger (Will, 5 October, D-284): eased, so it is already
+    // mostly page colour well before the bar rather than a thin grey band.
+    height: '96px',
     pointerEvents: 'none',
-    backgroundImage: `linear-gradient(to bottom, transparent, ${colorVars['--color-background-body']})`,
+    backgroundImage: `linear-gradient(to bottom, transparent 0%, color-mix(in srgb, ${colorVars['--color-background-body']} 55%, transparent) 40%, color-mix(in srgb, ${colorVars['--color-background-body']} 90%, transparent) 75%, ${colorVars['--color-background-body']} 100%)`,
   },
   // Holds the bar's height in the page, so the end of a long list scrolls
   // clear of it instead of sitting underneath.
   spacer: {
-    height: 'calc(66px + env(safe-area-inset-bottom, 0px))',
+    // The bar, plus most of the fade (D-284): at the very end of a list the
+    // last card scrolls clear of it instead of staying half washed out.
+    height: 'calc(66px + 56px + env(safe-area-inset-bottom, 0px))',
     flexShrink: 0,
   },
   tabs: { flexGrow: 1, minWidth: 0 },
