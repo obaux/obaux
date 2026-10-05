@@ -29,6 +29,14 @@ export interface SavedTile {
   readonly href: string;
   /** The placeholder picture's icon. */
   readonly art: ReactNode;
+  /**
+   * A booked visit, "Wed, Oct 7 · 10:00 AM" (Will, 5 October, D-292): a
+   * small green tag inside the picture, so the saved place says when you
+   * are going. Left out when there is no visit.
+   */
+  readonly tag?: { readonly day: string; readonly time: string } | null;
+  /** The tile's spoken name when it has a tag — "Example Learning Center. Your visit: …". */
+  readonly label?: string;
 }
 
 const styles = stylex.create({
@@ -38,9 +46,41 @@ const styles = stylex.create({
     aspectRatio: '1 / 1',
     width: '100%',
     color: colorVars['--color-icon-accent'],
-    backgroundColor: colorVars['--color-background-muted'],
+    // White, so the category's coloured icon and its glow carry the
+    // picture (Will, D-292) — grey made every tile look like a placeholder.
+    backgroundColor: colorVars['--color-background-card'],
     fontSize: '48px',
+    position: 'relative',
+    // The picture is decoration over the card's own link: taps go through
+    // to the link (positioning it for the tag had put it on top).
+    pointerEvents: 'none',
   },
+  // Inside the picture, at the foot, in the confirmed-visit green (D-273).
+  tag: {
+    position: 'absolute',
+    insetInline: '10px',
+    bottom: '10px',
+    paddingInline: '10px',
+    paddingBlock: '6px',
+    borderRadius: '14px',
+    backgroundColor: colorVars['--color-background-green'],
+    color: colorVars['--color-icon-green'],
+  },
+  tagText: {
+    fontSize: '13px',
+    lineHeight: 1.25,
+    fontWeight: 600,
+    color: colorVars['--color-text-green'],
+    whiteSpace: 'nowrap',
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    minWidth: 0,
+  },
+  tagTime: { fontWeight: 500 },
+  // With a tag, the icon centres in the space above it, so a narrow phone
+  // never draws the tag over the icon.
+  squareTagged: { paddingBlockEnd: '56px', boxSizing: 'border-box' },
+  tagWords: { minWidth: 0 },
   name: {
     fontSize: '17px',
     lineHeight: 1.3,
@@ -86,8 +126,19 @@ export function SavedGrid({ tiles, label, isEditing = false, onRemove, removeLab
         const body = (
           <VStack gap={2}>
             <Card padding={0} xstyle={styles.square}>
-              <HStack align="center" justify="center" xstyle={styles.square}>
+              <HStack align="center" justify="center" xstyle={[styles.square, tile.tag ? styles.squareTagged : null]}>
                 {tile.art}
+                {tile.tag ? (
+                  // Two short lines — the day, then the time — so neither is
+                  // cut off on a narrow phone.
+                  <HStack gap={2} align="center" wrap="nowrap" xstyle={styles.tag}>
+                    <Icon icon="calendar" size="sm" />
+                    <VStack gap={0} xstyle={styles.tagWords}>
+                      <Text xstyle={styles.tagText}>{tile.tag.day}</Text>
+                      <Text xstyle={[styles.tagText, styles.tagTime]}>{tile.tag.time}</Text>
+                    </VStack>
+                  </HStack>
+                ) : null}
               </HStack>
             </Card>
             <VStack gap={0.5} xstyle={styles.words}>
@@ -114,7 +165,7 @@ export function SavedGrid({ tiles, label, isEditing = false, onRemove, removeLab
                 {body}
               </>
             ) : (
-              <ClickableCard label={tile.name} href={tile.href} variant="transparent" padding={0} xstyle={styles.link}>
+              <ClickableCard label={tile.label ?? tile.name} href={tile.href} variant="transparent" padding={0} xstyle={styles.link}>
                 {body}
               </ClickableCard>
             )}

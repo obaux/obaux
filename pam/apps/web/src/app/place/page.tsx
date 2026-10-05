@@ -236,8 +236,10 @@ function PlaceScreen() {
   const [visit, setVisit] = useState<{ id: string; startsAt: string } | null>(null);
   // A visit card on Trips or in a conversation opens the place about that
   // visit (D-273, D-276).
-  const fromTrips = params.get('from') === 'trips' || params.get('from') === 'thread';
   const tripId = params.get('trip');
+  // Or any link that names the trip — Saved's visit tag (D-292) — while Back
+  // still follows `from`.
+  const fromTrips = params.get('from') === 'trips' || params.get('from') === 'thread' || tripId !== null;
   useEffect(() => {
     if (!place) return;
     const read = () => {

@@ -1141,5 +1141,6 @@
   "profile.tile.badgeHint": "Tu insignia",
   "place.quick.directions.body": "Ruta a pie en Google Maps",
   "place.quick.message.body": "Haz una pregunta antes de ir",
-  "place.quick.call.body": "Habla con alguien allí"
+  "place.quick.call.body": "Habla con alguien allí",
+  "saved.visitLabel": "{name}. Tu visita: {when}"
 }

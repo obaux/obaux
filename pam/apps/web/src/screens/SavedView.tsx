@@ -28,7 +28,9 @@ import { StarToggle } from './PeopleHomeView';
 import { LargeTitleHeader } from '@pam/ui/LargeTitleHeader';
 import { SavedGrid } from '@pam/ui/SavedGrid';
 import { PlaceCardSkeletonList } from '@pam/ui/Skeletons';
-import { categoryLabelKey, NOTICES } from '@pam/config';
+import { CATEGORY_DEFINITIONS, categoryLabelKey, NOTICES, type Category } from '@pam/config';
+import { GlowIcon, type GlowTone } from '@pam/ui/GlowIcon';
+import { useNextVisits, type NextVisit } from '@/lib/useNextVisits';
 import { useI18n } from '@/lib/i18n';
 import { useSession } from '@/lib/useSession';
 import { useRoleView } from '@/lib/useViewedRole';
@@ -70,9 +72,16 @@ export interface SavedViewProps {
   };
   /** Removed in Edit and not yet confirmed: hidden until Done, or put back. */
   readonly hidden?: ReadonlySet<string>;
+  /** A member's next visit at each place, by place id (D-292). */
+  readonly visits?: Readonly<Record<string, NextVisit>>;
 }
 
 const ART = { width: 52, height: 52, 'aria-hidden': true } as const;
+
+/** A category's colour, as the chips use it (D-288). */
+function categoryTone(category: string): GlowTone | null {
+  return (CATEGORY_DEFINITIONS[category as Category]?.colorToken as GlowTone | undefined) ?? null;
+}
 
 const styles = stylex.create({
   // The People / Programs switch as one round pill, like the search bar and
@@ -111,8 +120,12 @@ export function SavedView({
   browseHref = '/',
   edit,
   hidden,
+  visits = {},
 }: SavedViewProps) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
+  // "Wed, Oct 7 · 10:00 AM", the trip card's own form.
+  const dayFmt = new Intl.DateTimeFormat(locale, { weekday: 'short', month: 'short', day: 'numeric' });
+  const timeFmt = new Intl.DateTimeFormat(locale, { hour: 'numeric', minute: '2-digit' });
   const all = state.status === 'ready' && !replace ? state.places : [];
   const places = hidden ? all.filter((place) => !hidden.has(place.id)) : all;
   const editing = edit.isOn;
@@ -180,13 +193,32 @@ export function SavedView({
           isEditing={editing}
           onRemove={onUnsave}
           removeLabel={(name) => t('saved.unsave', { name })}
-          tiles={places.map((place) => ({
-            id: place.id,
-            name: place.name,
-            subtitle: t(categoryLabelKey(place.category)),
-            href: `/place/?id=${encodeURIComponent(place.id)}&from=saved`,
-            art: <BigCategoryIcon category={place.category} />,
-          }))}
+          tiles={places.map((place) => {
+            // A visit booked here (Will, 5 October, D-292): its day and time
+            // on the picture, and the place opens about that visit — Back
+            // still comes to Saved.
+            const visit = visits[place.id];
+            const at = visit ? new Date(visit.startsAt) : null;
+            const tag = at ? { day: dayFmt.format(at), time: timeFmt.format(at) } : null;
+            return {
+              id: place.id,
+              name: place.name,
+              subtitle: t(categoryLabelKey(place.category)),
+              href: `/place/?${new URLSearchParams({
+                id: place.id,
+                from: 'saved',
+                ...(visit ? { trip: visit.id } : {}),
+              }).toString()}`,
+              // The category's own colour, glowing, on white (D-292).
+              art: (
+                <GlowIcon tone={categoryTone(place.category)} size="lg">
+                  <BigCategoryIcon category={place.category} />
+                </GlowIcon>
+              ),
+              tag,
+              ...(tag ? { label: t('saved.visitLabel', { name: place.name, when: `${tag.day} · ${tag.time}` }) } : {}),
+            };
+          })}
         />
       ) : null}
     </Page>
@@ -233,6 +265,8 @@ export function SavedScreen() {
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
   const { demoRole, viewedRole } = useRoleView(trueRole);
   const { state, unsave, failed } = useSavedPlaces(session.status === 'signed-in', demoRole);
+  // A member's next visits, for the tags on Saved (D-292).
+  const visits = useNextVisits(viewedRole === 'member');
   const supportPhone = useSupportPhone();
   const starred = useStarredPeople();
   const [pane, setPane] = useState<Pane>('people');
@@ -289,6 +323,7 @@ export function SavedScreen() {
         state={state}
         onUnsave={stage}
         hidden={onPeople ? undefined : pending}
+        visits={visits}
         // Edit alone at the top: a member's Saved since D-224, and a case
         // manager's too now (Will, 3 October, D-255) — no bell, no Help.
         headerActions={undefined}

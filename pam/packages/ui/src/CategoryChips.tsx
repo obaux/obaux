@@ -5,6 +5,7 @@ import * as stylex from '@stylexjs/stylex';
 import { Button } from '@astryxdesign/core/Button';
 import { HStack } from '@astryxdesign/core/HStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
+import { GlowIcon, type GlowTone } from './GlowIcon.js';
 
 /**
  * A row of rounded chips under the search bar, one per kind of place (D-212).
@@ -31,7 +32,7 @@ export interface CategoryChip<K extends string> {
   readonly tone?: ChipTone;
 }
 
-export type ChipTone = 'blue' | 'green' | 'purple' | 'orange' | 'red' | 'teal' | 'pink' | 'cyan' | 'gray';
+export type ChipTone = GlowTone;
 
 export interface CategoryChipsProps<K extends string> {
   readonly chips: readonly CategoryChip<K>[];
@@ -85,51 +86,9 @@ const styles = stylex.create({
     fontWeight: 600,
   },
   icon: { width: '18px', height: '18px', flexShrink: 0 },
-  // A soft pop of the category's colour behind its icon (Will, 5 October,
-  // D-288: "a circle with blur so it looks like icons pop a bit more").
-  // Its own stacking context, so the glow sits behind the icon and never
-  // behind the chip's white face.
-  iconWrap: { position: 'relative', isolation: 'isolate' },
-  glow: {
-    position: 'absolute',
-    width: '24px',
-    height: '24px',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    borderRadius: '50%',
-    filter: 'blur(5px)',
-    opacity: 0.6,
-    zIndex: -1,
-    pointerEvents: 'none',
-  },
 });
 
-// The bright data shade of each tone — the icon itself stays the deep one,
-// so it still reads on the glow.
-const glows = stylex.create({
-  blue: { backgroundColor: 'var(--color-data-blue-3)' },
-  green: { backgroundColor: 'var(--color-data-shamrock-3)' },
-  purple: { backgroundColor: 'var(--color-data-purple-3)' },
-  orange: { backgroundColor: 'var(--color-data-orange-3)' },
-  red: { backgroundColor: 'var(--color-data-red-3)' },
-  teal: { backgroundColor: 'var(--color-data-teal-3)' },
-  pink: { backgroundColor: 'var(--color-data-pink-3)' },
-  cyan: { backgroundColor: 'var(--color-data-teal-3)' },
-  gray: { backgroundColor: 'var(--color-data-gray-3)' },
-});
 
-const tones = stylex.create({
-  blue: { color: colorVars['--color-icon-blue'] },
-  green: { color: colorVars['--color-icon-green'] },
-  purple: { color: colorVars['--color-icon-purple'] },
-  orange: { color: colorVars['--color-icon-orange'] },
-  red: { color: colorVars['--color-icon-red'] },
-  teal: { color: colorVars['--color-icon-teal'] },
-  pink: { color: colorVars['--color-icon-pink'] },
-  cyan: { color: colorVars['--color-icon-cyan'] },
-  gray: { color: colorVars['--color-icon-gray'] },
-});
 
 export function CategoryChips<K extends string>({ chips, value, onChange, label }: CategoryChipsProps<K>) {
   return (
@@ -143,9 +102,9 @@ export function CategoryChips<K extends string>({ chips, value, onChange, label 
             variant="secondary"
             aria-pressed={on}
             icon={
-              <HStack xstyle={[styles.icon, styles.iconWrap, chip.tone && tones[chip.tone]]}>
-                {chip.tone ? <HStack aria-hidden xstyle={[styles.glow, glows[chip.tone]]} /> : null}
-                {chip.icon}
+              // The category's colour, with a soft glow behind (D-288).
+              <HStack xstyle={styles.icon}>
+                <GlowIcon tone={chip.tone ?? null}>{chip.icon}</GlowIcon>
               </HStack>
             }
             onClick={() => onChange(chip.key)}

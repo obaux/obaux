@@ -107,6 +107,10 @@ as the selected tab. Half open, the Trips drawer shows more of the third trip.
 A place's actions are now a list — Get directions first, then Send a message,
 Call and Website — each with a line saying what it does; directions open
 Google Maps on the place itself when PAM knows it.
+On Saved, a place you have a visit at shows the day and time on its picture,
+and opening it shows that visit (Back returns to Saved); a changed time
+changes the tag. Each picture is white, with its category's icon in colour
+and a soft glow.
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 

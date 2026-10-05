@@ -6763,6 +6763,52 @@ open google map with location ID pre loaded."
   directions then message. The full e2e suite passes (570), with Storybook
   screenshots.
 
+### D-292 — Saved shows your visits, and its pictures take the category's colour
+
+Will, 5 October, on a member's Saved: "This screen needs to be more
+dynamic… if an appointment is booked on their saved list, a small tag
+inside square image should state date and time, and opening profile from
+there… should open the trip profile with appointment info. If appointment
+date changed this should also update here. If no appointment is made…
+show regular place profile. Also… use the color coded icons per category
+with glow behind icon. White image bg."
+
+- **The visit tag:** a saved place with a visit still ahead shows a small
+  green tag at the foot of its picture. It has a calendar icon and two
+  short lines, the day ("Wed, Oct 7") and the time ("10:00 AM"), so
+  neither is cut off on a 320px phone. The green is the confirmed-visit
+  green (D-273).
+  - The tile's spoken name becomes "Example Learning Center. Your visit:
+    Wed, Oct 7 · 10:00 AM".
+  - With a tag, the icon centres in the space above it.
+- **Opening it:** the tile links to `/place/?id=…&from=saved&trip=<id>`.
+  - The place page now treats any `trip` in the link as the visit view:
+    "Your next visit", Change appointment, and hours before About.
+  - Back still follows `from`, so it returns to Saved ("Back to Saved").
+  - Without a visit, the link and page are the place as before.
+- **Staying current:** `useNextVisits` returns the soonest upcoming visit
+  per place. It reads the example and added trips through `withMoves`
+  (D-281) and listens for `pam:trips-changed`, so a changed appointment
+  changes the tag. It is on for members only; staff have no trips.
+- **The pictures:** the tiles are white. Each category's icon is drawn in
+  that category's colour (the chips' tone: blue, green, purple), with a
+  large soft glow behind it.
+  - That glow is the chips' (D-288), moved into a shared `GlowIcon` with
+    `sm` (chips) and `lg` (tiles) sizes; `CategoryChips` now uses it too.
+  - The picture no longer takes taps, so positioning it for the tag can't
+    cover the card's link.
+- **Proven by:**
+  - typecheck and the web build;
+  - Storybook screenshots at 390px and 320px;
+  - a clicked-through check in the Storybook prototype: tap a tile, see
+    "Your next visit" and "Back to Saved", change the time, go home, open
+    Saved, and the tag reads "Thu, Oct 15 · 3:30 PM";
+  - the full e2e suite (570).
+
+  The live `/saved/` page is still the older list. This tiled screen is the
+  redesign (Storybook), so the e2e suite does not reach it. The new
+  `SavedGrid` story shows a tile with a visit next to one without.
+
 ---
 
 ## Notes for whoever picks this up next
