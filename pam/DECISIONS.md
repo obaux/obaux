@@ -6144,6 +6144,48 @@ Will, 5 October, from the phone, with four screenshots:
   clears a signed policy and the saved signature. The full suite passed
   (546/546).
 
+### D-272 — A Connections card is the whole profile: message button, program link, "Connected by"
+
+Will, 5 October, with a screenshot of Sandra's card:
+- "for program leads, there should be a badge under card saying who
+  connected them for context";
+- "On top right of cards, add message icon buttons";
+- "the program name should be a link with a chevron next to it (max 1
+  line) … making sure the back button goes back to connections";
+- "No need to have a new page for clicking connections card. We can remove
+  that page."
+
+- **The card no longer opens anything.** `ConnectionCard` is a plain `Card`
+  now, not a `ClickableCard`. Its controls are the ways on, and a card that
+  is itself a link cannot hold other links.
+- **Message, top right:** a round 48px button with the messages icon, to
+  the example conversation with that person.
+- **The program's name** is a one-line link (ellipsis, then a chevron) to
+  `/place/?id=…&from=connections`. The place page has a new `connections`
+  back target, so Back says "Back to Connections".
+  - A case manager has no program, so "Case manager" stays plain text.
+- **"Connected by Teresa"** sits at the foot of a program person's card,
+  with Teresa's face, as a `Token`. Text is 15px: Astryx's largest token is
+  12px, too small at arm's length for this audience.
+  - Example data: `connectedById` on `DummyConnection`, the case manager.
+  - Real data will need who made the referral, which `recommendations`
+    already records.
+- **Removed:**
+  - `/connections/person/` (the page, its route, its role and state
+    stories);
+  - `ConnectionProfileView`;
+  - the `connections.about` string.
+  - "View program details" in a conversation's options now opens the
+    program's place page (`from=messages`, back to Messages) instead of the
+    removed profile.
+- **Map:** the Member page loses "A connection". Connections → A
+  conversation is now the round button. The program link has no arrow: it
+  would cross every card on the page, so the Connections note says it
+  instead.
+- **Proven by:** typecheck, config 236/236, ui 66/66, the full e2e suite
+  546/546, and Storybook screenshots of the cards and of the place opened
+  from one ("Back to Connections").
+
 ---
 
 ## Notes for whoever picks this up next

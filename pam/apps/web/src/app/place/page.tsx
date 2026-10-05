@@ -78,6 +78,10 @@ const BACK_TARGETS = {
   saved: { href: '/saved/', labelKey: 'nav.back.saved' },
   // All programs, a staff member's secondary path (D-218).
   programs: { href: '/programs/', labelKey: 'nav.back.programs' },
+  // A program's name on a Connections card (D-272).
+  connections: { href: '/connections/', labelKey: 'nav.back.connections' },
+  // "View program details" in a conversation's options (D-272).
+  messages: { href: '/messages/', labelKey: 'nav.back.messages' },
 } as const;
 
 function resolveBack(from: string | null): { href: string; labelKey: string } {

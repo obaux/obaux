@@ -39,11 +39,14 @@ function ThreadOptions() {
   const { t } = useI18n();
   const id = useSearchParams().get('id') ?? '';
   const threadHref = `/messages/thread/?id=${encodeURIComponent(id)}`;
-  // The staff side of an example pair has a profile among the connections;
-  // a real thread's program has one on Connections.
+  // The staff side of an example pair runs a program with a page of its
+  // own (D-272: the connection profile page is gone); a real thread's
+  // program is on Connections.
   const pair = isExample(id) ? dummyConversationPair(id) : null;
   const person = pair ? dummyConnection(pair.staffId) : null;
-  const programHref = person ? `/connections/person/?id=${encodeURIComponent(person.id)}` : '/connections/';
+  const programHref = person?.placeId
+    ? `/place/?id=${encodeURIComponent(person.placeId)}&from=messages`
+    : '/connections/';
 
   // "View program details" only when the other side is a program (Will,
   // 3 October, D-235): a member or a case manager talking to a program lead.

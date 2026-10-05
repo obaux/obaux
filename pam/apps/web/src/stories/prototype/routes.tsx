@@ -46,7 +46,7 @@ import { LegalView } from '../../screens/LegalView';
 import { LanguageView } from '../../screens/LanguageView';
 import { DataCopyView, DeleteAccountView, PrivacyControlsView } from '../../screens/PrivacyViews';
 import { HelpReportPlaceView, HelpSafetyView, HelpTopicsView } from '../../screens/HelpViews';
-import { ConnectionProfileScreen, ConnectionsScreen } from '../../screens/ConnectionsScreen';
+import { ConnectionsScreen } from '../../screens/ConnectionsScreen';
 import { SavedScreen } from '../../screens/SavedView';
 import { ThreadOptionsView, ThreadReportView } from '../../screens/ThreadOptionsViews';
 import { MessagesScreen } from '../../screens/MessagesScreen';
@@ -121,7 +121,6 @@ export const APP_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   '/connections/': screen(() => <ConnectionsScreen />),
   '/messages/thread/options/': screen(() => <ThreadOptionsView />),
   '/messages/thread/report/': screen(() => <ThreadReportView />),
-  '/connections/person/': screen(() => <ConnectionProfileScreen />),
   '/view-as/': screen(() => <ViewAsView />),
   // D-218: Invite someone, All programs and Add a program, and a program
   // lead's own Program tab.

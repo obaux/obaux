@@ -772,7 +772,6 @@
   "connections.stat.years": "Años ayudando",
   "connections.stat.helped": "Personas ayudadas",
   "connections.stat.languages": "Idiomas",
-  "connections.about": "Cómo te puede ayudar {name}",
   "nav.back.connections": "Volver a Conexiones",
   "messages.search.cancel": "Cancelar",
   "privacy.controls.title": "Lo que otros pueden ver",
@@ -1105,5 +1104,6 @@
   "place.policies.toSign.title": "Políticas para firmar",
   "place.policies.toSign.body": "Fírmalas antes de tu visita",
   "place.policies.done.title": "Políticas firmadas",
-  "place.policies.done.body": "Todas las firmas completas"
+  "place.policies.done.body": "Todas las firmas completas",
+  "connections.connectedBy": "Te conectó {name}"
 }

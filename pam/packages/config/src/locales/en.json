@@ -772,7 +772,6 @@
   "connections.stat.years": "Years helping",
   "connections.stat.helped": "People helped",
   "connections.stat.languages": "Languages",
-  "connections.about": "How {name} can help",
   "nav.back.connections": "Back to Connections",
   "messages.search.cancel": "Cancel",
   "privacy.controls.title": "What others can see",
@@ -1105,5 +1104,6 @@
   "place.policies.toSign.title": "Policies to sign",
   "place.policies.toSign.body": "Sign before your visit",
   "place.policies.done.title": "Policies signed",
-  "place.policies.done.body": "All signatures complete"
+  "place.policies.done.body": "All signatures complete",
+  "connections.connectedBy": "Connected by {name}"
 }

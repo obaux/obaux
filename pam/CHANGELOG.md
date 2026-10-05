@@ -73,7 +73,9 @@ with a button to sign. A place you have a visit at shows its policies near
 the top: orange "Sign before your visit", or green once everything is signed.
 A small × on a signature clears it so you can sign again, the Sign button sits
 right under your saved signature, and text links no longer show a grey pill
-when pressed.
+when pressed. Each card on Connections now has a message button in its corner;
+a program person's card links to the program's page and says who connected
+you, and there is no separate profile page any more.
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 

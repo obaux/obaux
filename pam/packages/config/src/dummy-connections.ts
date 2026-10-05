@@ -20,6 +20,13 @@ export interface DummyConnection {
   readonly role: 'admin' | 'provider';
   /** The program a provider runs; null for a case manager. */
   readonly programName: string | null;
+  /** That program's place, for the link on the card (D-272); null for a case manager. */
+  readonly placeId: string | null;
+  /**
+   * Who connected the member to this person (D-272) — a connection id,
+   * the case manager. Null for the case manager themself.
+   */
+  readonly connectedById: string | null;
   readonly photoUrl: string;
   /** How they can help — a sentence, in both languages. */
   readonly help: { readonly en: string; readonly es: string };
@@ -37,6 +44,8 @@ export const DUMMY_CONNECTIONS: readonly DummyConnection[] = [
     firstName: 'Teresa',
     role: 'admin',
     programName: null,
+    placeId: null,
+    connectedById: null,
     photoUrl: photo('1531123897727-8f129e1688ce'),
     help: {
       en: 'Your case manager. Teresa helps you find programs, sort out ID and benefits, and plan your week.',
@@ -51,6 +60,8 @@ export const DUMMY_CONNECTIONS: readonly DummyConnection[] = [
     firstName: 'Sandra',
     role: 'provider',
     programName: 'Example Learning Center',
+    placeId: 'dummy-place-learning',
+    connectedById: 'dummy-a1',
     photoUrl: photo('1494790108377-be9c29b29330'),
     help: {
       en: 'Runs the GED class. Ask Sandra about class times, getting caught up, or the computer room.',
@@ -65,6 +76,8 @@ export const DUMMY_CONNECTIONS: readonly DummyConnection[] = [
     firstName: 'Marcus',
     role: 'provider',
     programName: 'Example Workforce Center',
+    placeId: 'dummy-place-workforce',
+    connectedById: 'dummy-a1',
     photoUrl: photo('1507003211169-0a1dd7228f2d'),
     help: {
       en: 'Helps with résumés, interviews and job openings posted each week. Walk-ins welcome.',
