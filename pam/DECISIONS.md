@@ -6681,6 +6681,38 @@ more? They're not standing out enough."
 - **Proven by:** the web build, and a Storybook screenshot of Explore's
   chips.
 
+### D-289 — A closed Trips drawer shows no card; "new" dots are the tab pink
+
+Will, 5 October, with a phone screenshot: "The closed drawer view needs to
+drop lower so no trip cards are visible", and "the alert red dot should
+match the bright pink on menu selected items. Do this for alert icon
+buttons on top pages also."
+
+- **Drawer:** the docked height drops from 112px to 100px. Docked, the list
+  is hidden outright (`opacity: 0`, `visibility: hidden`), not just cut off.
+  - A fixed height alone can't promise "no card": how tall the title and its
+    count draw depends on the phone's fonts. On Will's phone, 112px left the
+    top of the first card showing.
+  - The list was already `aria-hidden` when docked. It now matches what is
+    on screen.
+  - It shows again the moment a drag starts or the drawer steps up.
+- **Dots:** the pink became a token, `pam.brandPink`
+  (`light-dark(#E31C5F, #FF6B86)`, which is 4.6:1 on white and 6.3:1 on
+  dark). It is used by:
+  - the selected tab (it was already that pink, as a raw value);
+  - the Profile tab's ring;
+  - the tab bar's unread dot (a `StatusDot` overridden from the error
+    variant);
+  - the bell's dot on every top header (`NotificationBell`).
+
+  The point is that something new isn't something wrong; the theme's error
+  red stays for errors.
+- **Not changed:** dots that mean "unread" inside lists (the notification
+  list, `NavTile`) use the accent green as part of the row. Will asked
+  about the menu and the top buttons.
+- **Proven by:** typecheck, and Storybook screenshots of the docked drawer at
+  390px and 320px and of a case manager's header bell.
+
 ---
 
 ## Notes for whoever picks this up next

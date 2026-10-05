@@ -39,7 +39,8 @@ export interface MapDrawerProps {
   readonly initialStop?: DrawerStop;
 }
 
-const DOCK = 112;
+// Just the title and its count (Will, 5 October, D-289): no card may show.
+const DOCK = 100;
 
 const styles = stylex.create({
   drawer: {
@@ -59,6 +60,9 @@ const styles = stylex.create({
     transitionTimingFunction: 'cubic-bezier(0.2, 0.8, 0.2, 1)',
   },
   dragging: { transitionDuration: '0ms' },
+  // Docked, the list is hidden outright rather than merely cut off, so no
+  // sliver of the first card shows whatever the phone's text size (D-289).
+  bodyDocked: { opacity: 0, visibility: 'hidden' },
   // Height and offset follow the finger and the screen, so they are values,
   // not classes known ahead of time.
   place: (height: number, bottom: number) => ({ height: `${height}px`, bottom: `${bottom}px` }),
@@ -178,7 +182,10 @@ export function MapDrawer({
         }}
       />
       <VStack xstyle={styles.header}>{header}</VStack>
-      <VStack xstyle={styles.body} aria-hidden={stop === 'dock' && dragHeight === null ? true : undefined}>
+      <VStack
+        xstyle={[styles.body, stop === 'dock' && dragHeight === null && styles.bodyDocked]}
+        aria-hidden={stop === 'dock' && dragHeight === null ? true : undefined}
+      >
         <VStack aria-hidden xstyle={styles.fade} />
         {children}
       </VStack>

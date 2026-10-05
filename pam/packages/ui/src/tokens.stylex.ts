@@ -36,4 +36,11 @@ export const pam = stylex.defineVars({
   titleSize: '28px',
   /** A link that is not the primary action: readable, and still 48px to hit. */
   linkSize: '17px',
+  /**
+   * The bright pink of the tab you are on, and of every "something new" dot
+   * (Will, 5 October, D-289: the alert dot "should match the bright pink on
+   * menu selected items"). #E31C5F is 4.6:1 on white; #FF6B86 is 6.3:1 on
+   * the dark page.
+   */
+  brandPink: 'light-dark(#E31C5F, #FF6B86)',
 });

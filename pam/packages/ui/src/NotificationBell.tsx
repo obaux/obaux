@@ -92,7 +92,8 @@ const styles = stylex.create({
     borderRadius: '50%',
     // On a filled button the dot has to differ from the fill, so it takes the
     // button's own label colour and a ring of the page behind it.
-    backgroundColor: colorVars['--color-error'],
+    // The tab pink (D-289), so every "something new" dot is the same colour.
+    backgroundColor: pam.brandPink,
     borderWidth: '2px',
     borderStyle: 'solid',
     borderColor: colorVars['--color-background-body'],

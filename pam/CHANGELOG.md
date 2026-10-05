@@ -101,6 +101,9 @@ member's award on Profile carries a small "Your badge" ribbon. Place cards
 have a small illustration for their kind of place at the top left, the
 save mark lines up with the name, and the open line is smaller and quieter.
 Category chips have a soft glow of their colour behind each icon.
+Closed, the Trips drawer shows only its title, with no card peeking out. The
+"something new" dots on the bottom menu and the bell are the same bright pink
+as the selected tab.
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 
