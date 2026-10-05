@@ -81,7 +81,11 @@ export function PrototypeApp({ routes, start, chrome, first }: PrototypeAppProps
 
   const change = useCallback((href: string, mode: 'push' | 'replace' | 'back') => {
     setStack((prev) => {
-      if (mode === 'back') return prev.length > 1 ? prev.slice(0, -1) : prev;
+      // `href` carries how many screens to go back (D-279's leaveFlow).
+      if (mode === 'back') {
+        const steps = Number(href) || 1;
+        return prev.length > steps ? prev.slice(0, -steps) : prev;
+      }
       const base = new URL(prev[prev.length - 1] ?? '/', ORIGIN);
       const next = new URL(href, base);
       const target = `${normalise(next.pathname)}${next.search}${next.hash}`;
@@ -144,6 +148,14 @@ export function PrototypeApp({ routes, start, chrome, first }: PrototypeAppProps
     };
     const onBack = (event: Event) => {
       event.preventDefault();
+      // Out of a flow (D-279): that many screens back, or — when the stack
+      // does not reach so far — on to the flow's own fallback.
+      const detail = (event as CustomEvent<{ steps: number; fallback: string } | null>).detail;
+      if (detail && detail.steps > 1) {
+        if (stackRef.current.length > detail.steps) go(String(detail.steps), 'back');
+        else go(detail.fallback, 'push');
+        return;
+      }
       go('', 'back');
     };
     document.addEventListener('click', onClick, true);

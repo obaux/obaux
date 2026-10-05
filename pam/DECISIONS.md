@@ -6337,6 +6337,51 @@ problem across various places in app."
   cold. The prototype was checked by hand (Profile → Text reminders → Back
   lands on Profile).
 
+### D-279 — Signing: the button stays put, and Done leaves the whole flow
+
+Will, 5 October:
+- "During sign mode, let's keep the primary button floating on bottom so
+  it's easy to sign all on the same place by tapping."
+- Then, of the list after everything was signed: "it's unclear what to do
+  next, if I go back it takes me back to policy … We could also add a done
+  button on top right instead of help. Like we do on zipcode drawer (I like
+  this better)."
+
+(D-278 is the Points redesign, which Will numbered first.)
+
+- **The sign area is pinned to the bottom** of a policy screen: white, a
+  hairline above, over the safe area.
+  - It holds "Your signature:" with its ×, and Sign; or Next / Done once
+    the policy is signed.
+  - Measured, the button sits at the same height (y = 632 at 390×700) on
+    Sign, Next, Sign, Next. Signing four policies is four taps on one spot.
+  - It is drawn outside the page, so the page's own arrival cannot carry it
+    off. A spacer keeps the last line of the policy clear of it.
+- **Done, top right, in place of Help**, on the list and on each policy, as
+  on the Location drawer: the accent word.
+  - It leaves the whole signing flow: one screen back from the list, two
+    from a policy opened from the list (`via=list`). That is wherever it
+    was started, usually the program's page.
+  - Back still steps through one screen at a time.
+  - `leaveFlow(steps, fallback)` in `navigate.ts` goes back only as far as
+    PAM's own history reaches (`ClientNav`'s count, D-277). A flow opened
+    cold goes to the program's page instead, never to a blank tab — that
+    was the first version's bug, caught by its test.
+  - The prototype pops that many screens off its stack.
+- **The last policy's pinned button is Done**, doing the same. On the list,
+  "You have signed them all" now has a Done button under it, the screen's
+  one primary action.
+- **Help moves off these two screens.** That is Will's call. The SOP wants
+  a visible way to help on every screen. It is one tap away here: Done or
+  Back lands on the program's page, whose header has it. Recorded so it is
+  a decision, not a slip; easy to put back beside Done.
+- **Proven by:** `e2e/policies.spec.ts`:
+  - Done from a policy opened via the list returns two screens, to where
+    the flow started;
+  - Done on a list opened cold goes to the program.
+  Also checked in the prototype: a place → policies → sign all four →
+  Done lands on the place with the green "Policies signed" card.
+
 ---
 
 ## Notes for whoever picks this up next

@@ -1,4 +1,4 @@
-type ClientNavigate = (href: string, mode: 'push' | 'back') => boolean;
+type ClientNavigate = (href: string, mode: 'push' | 'back', steps?: number) => boolean;
 let clientNav: ClientNavigate | null = null;
 
 /**
@@ -39,4 +39,18 @@ export function goBack(fallback: string): void {
   if (!proceed) return;
   if (window.history.length <= 1) window.location.assign(fallback);
   else if (!clientNav?.('', 'back')) window.history.back();
+}
+
+/**
+ * Out of a flow of several screens at once (D-279): `steps` screens back,
+ * to wherever the member was before they started — the program's page,
+ * Trips — when the app's own history reaches that far; to `fallback` when it
+ * does not (the flow was opened from a link). Announces `pam:back` with the
+ * number of steps first, cancelable, for the Storybook prototype.
+ */
+export function leaveFlow(steps: number, fallback: string): void {
+  const proceed = window.dispatchEvent(new CustomEvent('pam:back', { detail: { steps, fallback }, cancelable: true }));
+  if (!proceed) return;
+  if (clientNav?.('', 'back', steps)) return;
+  navigate(fallback);
 }

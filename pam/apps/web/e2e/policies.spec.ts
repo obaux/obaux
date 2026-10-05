@@ -79,3 +79,27 @@ test('the corner × clears a signature to sign again (D-271)', async ({ page }) 
   // No saved signature any more: Sign opens the sheet again.
   await expect(page.getByText('Your signature:')).toHaveCount(0);
 });
+
+test('Done leaves the whole signing flow, back to where it started (D-279)', async ({ page }) => {
+  await page.goto('/help/');
+  // Into the list from another screen, inside the app (no reload).
+  await page.evaluate((href) => {
+    const a = document.createElement('a');
+    a.href = href;
+    a.textContent = 'Policies';
+    document.body.append(a);
+  }, LIST);
+  await page.getByRole('link', { name: 'Policies', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Policies to sign' })).toBeVisible();
+  // ... into a policy, then Done: two screens back in one go.
+  await page.getByRole('link', { name: /Confidentiality and disclosure/ }).click();
+  await expect(page.getByRole('heading', { name: 'Confidentiality and disclosure' })).toBeVisible();
+  await page.getByRole('button', { name: 'Done' }).click();
+  await expect(page).toHaveURL(/\/help\/$/);
+});
+
+test('Done on a list opened cold goes to the program (D-279)', async ({ page }) => {
+  await page.goto(LIST);
+  await page.getByRole('button', { name: 'Done' }).click();
+  await expect(page).toHaveURL(/\/place\/\?id=dummy-place-learning/);
+});

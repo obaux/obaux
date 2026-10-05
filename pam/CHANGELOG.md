@@ -83,7 +83,9 @@ with a heavier tick, and Explore's area is a link that fits on one line. Changin
 drawer: search with the usual search bar, use your current location, pick a
 result, and press Done. A conversation with a program shows your booked
 visit at the top; tapping it opens the place, and Back returns to the
-conversation. Back now returns to the screen you came from, everywhere.
+conversation. Back now returns to the screen you came from, everywhere. When signing
+policies, the Sign button stays at the bottom of the screen, and Done at the
+top right takes you straight back to the program.
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 

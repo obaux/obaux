@@ -4,6 +4,7 @@ import { useRef, useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { BottomSheet } from '@astryxdesign/core/BottomSheet';
 import { Card } from '@astryxdesign/core/Card';
+import { Button } from '@astryxdesign/core/Button';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Icon } from '@astryxdesign/core/Icon';
 import { IconButton } from '@astryxdesign/core/IconButton';
@@ -20,7 +21,7 @@ import { DUMMY_PLACES_BY_ID } from '@pam/config/dummy-places';
 import { useI18n } from '@/lib/i18n';
 import { usePolicies } from '@/lib/usePolicies';
 import { useMySignatures } from '@/lib/useMySignatures';
-import { HelpButton } from './HelpButton';
+import { leaveFlow } from '@/lib/navigate';
 
 /**
  * A program's policies, from the member's side (D-270, Will, 5 October:
@@ -67,7 +68,23 @@ const styles = stylex.create({
   savedImage: { height: '48px', width: 'auto', maxWidth: '60%', objectFit: 'contain', backgroundColor: 'white', borderRadius: '8px' },
   signedImage: { height: '72px', width: 'auto', maxWidth: '100%', objectFit: 'contain', backgroundColor: 'white', borderRadius: '12px', alignSelf: 'flex-start' },
   // Sign sits right under the signature it will use (Will, D-271).
-  signGroup: { width: '100%' },
+  // The pinned sign area (D-279): white, a hairline above, over the bottom
+  // of the screen and its safe area; as wide as the page's column.
+  dock: {
+    position: 'fixed',
+    insetInline: 0,
+    bottom: 0,
+    zIndex: 9,
+    backgroundColor: colorVars['--color-background-body'],
+    borderTopWidth: '1px',
+    borderTopStyle: 'solid',
+    borderTopColor: colorVars['--color-border'],
+    paddingTop: '12px',
+    paddingBottom: 'calc(12px + env(safe-area-inset-bottom, 0px))',
+  },
+  dockInner: { width: '100%', maxWidth: '560px', marginInline: 'auto', paddingInline: '16px' },
+  dockSpacer: { height: '88px', flexShrink: 0 },
+  dockSpacerTall: { height: '196px' },
   // The tiny white × on the box's corner: clear this signature and sign
   // again. 28px to look at, a 48px square to tap (§2.5) — every button keeps
   // the 48px floor, so the circle is drawn inside it.
@@ -113,6 +130,15 @@ const styles = stylex.create({
   // The "Your signature:" box keeps its picture clear of the ×.
   savedRow: { paddingRight: '56px' },
   sheetLinks: { width: '100%' },
+  // "Done" in the header, as on the Location drawer (D-275, D-279).
+  doneButton: {
+    minHeight: '48px',
+    paddingInline: '4px',
+    fontSize: '17px',
+    fontWeight: 700,
+    color: colorVars['--color-text-accent'],
+    backgroundImage: { default: 'none', ':hover': 'none', ':active': 'none' },
+  },
   // Clear of the grab handle, as the New message sheet is.
   sheet: { width: '100%', paddingInline: '20px', paddingBlockStart: spacingVars['--spacing-6'], paddingBottom: '24px' },
   sheetTitle: { fontSize: '26px', lineHeight: 1.2, fontWeight: 700 },
@@ -139,7 +165,32 @@ function policiesHref(placeId: string, placeName: string): string {
 }
 
 function policyHref(placeId: string, placeName: string, policyId: string): string {
-  return `/place/policies/view/?${new URLSearchParams({ place: placeId, name: placeName, id: policyId }).toString()}`;
+  // `via=list`: Done on the policy then leaves two screens, not one (D-279).
+  return `/place/policies/view/?${new URLSearchParams({ place: placeId, name: placeName, id: policyId, via: 'list' }).toString()}`;
+}
+
+/** The program's own page — where Done lands when history cannot reach it. */
+function placeHref(placeId: string): string {
+  return `/place/?id=${encodeURIComponent(placeId)}`;
+}
+
+/**
+ * Done, top right, where Help was (Will, 5 October, D-279: "a done button on
+ * top right instead of help. Like we do on zipcode drawer"). It leaves the
+ * whole signing flow — back to wherever it was started, usually the
+ * program's page — where Back would only step through it one screen at a
+ * time. Help is one screen away, on that page.
+ */
+function DoneButton({ steps, placeId }: { readonly steps: number; readonly placeId: string }) {
+  const { t } = useI18n();
+  return (
+    <Button
+      label={t('places.area.done')}
+      variant="ghost"
+      onClick={() => leaveFlow(steps, placeHref(placeId))}
+      xstyle={styles.doneButton}
+    />
+  );
 }
 
 export { policiesHref };
@@ -159,7 +210,7 @@ export function MemberPoliciesScreen({ placeId, placeName }: { readonly placeId:
       subtitle={placeName || undefined}
       backHref={`/place/?id=${encodeURIComponent(placeId)}`}
       backLabel={t('nav.back.place')}
-      actions={<HelpButton />}
+      actions={<DoneButton steps={1} placeId={placeId} />}
     >
       {shown.length === 0 ? (
         <Text type="supporting" xstyle={styles.intro}>
@@ -193,10 +244,14 @@ export function MemberPoliciesScreen({ placeId, placeName }: { readonly placeId:
               href={policyHref(placeId, placeName, firstUnsigned.id)}
             />
           ) : (
-            <HStack gap={2} align="center" wrap="nowrap">
-              <SignedIcon {...ICON} {...stylex.props(styles.signedIcon)} />
-              <Text xstyle={styles.done}>{t('memberPolicies.done')}</Text>
-            </HStack>
+            <>
+              <HStack gap={2} align="center" wrap="nowrap">
+                <SignedIcon {...ICON} {...stylex.props(styles.signedIcon)} />
+                <Text xstyle={styles.done}>{t('memberPolicies.done')}</Text>
+              </HStack>
+              {/* All signed: the way out is the screen's one button (D-279). */}
+              <BigButton label={t('memberPolicy.finish')} onPress={() => leaveFlow(1, placeHref(placeId))} />
+            </>
           )}
         </>
       )}
@@ -208,10 +263,13 @@ export function MemberPolicyScreen({
   placeId,
   placeName,
   policyId,
+  via = null,
 }: {
   readonly placeId: string;
   readonly placeName: string;
   readonly policyId: string | null;
+  /** `list` when opened from the list, so Done leaves both (D-279). */
+  readonly via?: string | null;
 }) {
   const { t, locale } = useI18n();
   const { policies } = usePolicies();
@@ -236,55 +294,81 @@ export function MemberPolicyScreen({
   };
 
   return (
-    <SubPage
-      title={policy?.title ?? t('memberPolicies.title')}
-      subtitle={policy ? t('memberPolicy.count', { current: index + 1, total: shown.length }) : undefined}
-      backHref={policiesHref(placeId, placeName)}
-      backLabel={t('nav.back.policiesToSign')}
-      actions={<HelpButton />}
-    >
-      {policy ? (
-        <>
-          <Card padding={6}>
-            <VStack gap={3}>
-              {policy.body.length > 0 ? (
-                policy.body.map((para, i) => (
-                  <Text key={i} xstyle={styles.body}>
-                    {para}
+    <>
+      <SubPage
+        title={policy?.title ?? t('memberPolicies.title')}
+        subtitle={policy ? t('memberPolicy.count', { current: index + 1, total: shown.length }) : undefined}
+        backHref={policiesHref(placeId, placeName)}
+        backLabel={t('nav.back.policiesToSign')}
+        actions={<DoneButton steps={via === 'list' ? 2 : 1} placeId={placeId} />}
+      >
+        {policy ? (
+          <>
+            <Card padding={6}>
+              <VStack gap={3}>
+                {policy.body.length > 0 ? (
+                  policy.body.map((para, i) => (
+                    <Text key={i} xstyle={styles.body}>
+                      {para}
+                    </Text>
+                  ))
+                ) : (
+                  <Text type="supporting" xstyle={styles.body}>
+                    {t('policy.preview.file', { file: policy.fileName })}
                   </Text>
-                ))
-              ) : (
-                <Text type="supporting" xstyle={styles.body}>
-                  {t('policy.preview.file', { file: policy.fileName })}
-                </Text>
-              )}
-            </VStack>
-          </Card>
-
-          {when ? (
-            <>
-              {/* Signed: the signature on the page, and the way on. */}
-              <VStack gap={2} xstyle={styles.saved}>
-                <HStack gap={2} align="center" wrap="nowrap">
-                  <SignedIcon {...ICON} {...stylex.props(styles.signedIcon)} />
-                  <Text xstyle={styles.signedWords}>
-                    {t('memberPolicy.signed', { date: day.format(new Date(when)) })}
-                  </Text>
-                </HStack>
-                {signedImage ? (
-                  <img src={signedImage} alt={t('memberPolicy.yourSignature')} {...stylex.props(styles.signedImage)} />
-                ) : null}
-                <ClearSignature
-                  label={t('memberPolicy.clear')}
-                  onPress={() => {
-                    // Off this policy, and a fresh signature to sign it with.
-                    unsign(placeId, policy.id);
-                    forgetSignature();
-                    setSheetOpen(true);
-                  }}
-                />
+                )}
               </VStack>
-              {next ? (
+            </Card>
+
+            {when ? (
+              <>
+                {/* Signed: the signature on the page, and the way on. */}
+                <VStack gap={2} xstyle={styles.saved}>
+                  <HStack gap={2} align="center" wrap="nowrap">
+                    <SignedIcon {...ICON} {...stylex.props(styles.signedIcon)} />
+                    <Text xstyle={styles.signedWords}>
+                      {t('memberPolicy.signed', { date: day.format(new Date(when)) })}
+                    </Text>
+                  </HStack>
+                  {signedImage ? (
+                    <img src={signedImage} alt={t('memberPolicy.yourSignature')} {...stylex.props(styles.signedImage)} />
+                  ) : null}
+                  <ClearSignature
+                    label={t('memberPolicy.clear')}
+                    onPress={() => {
+                      // Off this policy, and a fresh signature to sign it with.
+                      unsign(placeId, policy.id);
+                      forgetSignature();
+                      setSheetOpen(true);
+                    }}
+                  />
+                </VStack>
+              </>
+            ) : null}
+            {/* Room under the last line for the pinned sign area (D-279). */}
+            <VStack aria-hidden xstyle={[styles.dockSpacer, !when && signature ? styles.dockSpacerTall : null]} />
+
+            <SignSheet
+              isOpen={isSheetOpen}
+              title={policy.title}
+              onClose={() => setSheetOpen(false)}
+              onSign={(drawn) => signNow(drawn)}
+            />
+          </>
+        ) : (
+          <Text type="supporting" xstyle={styles.intro}>
+            {t('memberPolicies.none')}
+          </Text>
+        )}
+      </SubPage>
+      {policy ? (
+        // Pinned to the bottom (Will, 5 October, D-279): Sign, Next and Done
+        // stay under the same thumb from the first policy to the last. Outside
+        // the page, so nothing on the page can carry it off.
+        <VStack xstyle={styles.dock}>
+          <VStack gap={3} xstyle={styles.dockInner}>
+            {when ? (
+              next ? (
                 <BigButton
                   label={t('memberPolicy.next', { title: next.title })}
                   onPress={() => {
@@ -293,54 +377,48 @@ export function MemberPolicyScreen({
                   }}
                 />
               ) : (
-                <BigButton label={t('memberPolicy.finish')} href={policiesHref(placeId, placeName)} />
-              )}
-            </>
-          ) : (
-            <VStack gap={3} xstyle={styles.signGroup}>
-              {signature ? (
-                // Signed once already: Sign is one tap, right under the
-                // signature it will use; the corner × draws a new one.
-                <HStack
-                  gap={3}
-                  align="center"
-                  justify="between"
-                  wrap="nowrap"
-                  xstyle={[styles.saved, styles.savedRow]}
-                >
-                  <Text type="supporting" xstyle={styles.yourSignature}>
-                    {t('memberPolicy.withSaved')}
-                  </Text>
-                  <img src={signature} alt={t('memberPolicy.yourSignature')} {...stylex.props(styles.savedImage)} />
-                  <ClearSignature
-                    label={t('memberPolicy.clear')}
-                    onPress={() => {
-                      forgetSignature();
-                      setSheetOpen(true);
-                    }}
-                  />
-                </HStack>
-              ) : null}
-              <BigButton
-                label={t('memberPolicy.sign')}
-                onPress={() => (signature ? signNow() : setSheetOpen(true))}
-              />
-            </VStack>
-          )}
-
-          <SignSheet
-            isOpen={isSheetOpen}
-            title={policy.title}
-            onClose={() => setSheetOpen(false)}
-            onSign={(drawn) => signNow(drawn)}
-          />
-        </>
-      ) : (
-        <Text type="supporting" xstyle={styles.intro}>
-          {t('memberPolicies.none')}
-        </Text>
-      )}
-    </SubPage>
+                // The last one signed: Done leaves the flow, as the header's
+                // Done does (D-279).
+                <BigButton
+                  label={t('memberPolicy.finish')}
+                  onPress={() => leaveFlow(via === 'list' ? 2 : 1, placeHref(placeId))}
+                />
+              )
+            ) : (
+              <>
+                {signature ? (
+                  // Signed once already: Sign is one tap, right under the
+                  // signature it will use; the corner × draws a new one.
+                  <HStack
+                    gap={3}
+                    align="center"
+                    justify="between"
+                    wrap="nowrap"
+                    xstyle={[styles.saved, styles.savedRow]}
+                  >
+                    <Text type="supporting" xstyle={styles.yourSignature}>
+                      {t('memberPolicy.withSaved')}
+                    </Text>
+                    <img src={signature} alt={t('memberPolicy.yourSignature')} {...stylex.props(styles.savedImage)} />
+                    <ClearSignature
+                      label={t('memberPolicy.clear')}
+                      onPress={() => {
+                        forgetSignature();
+                        setSheetOpen(true);
+                      }}
+                    />
+                  </HStack>
+                ) : null}
+                <BigButton
+                  label={t('memberPolicy.sign')}
+                  onPress={() => (signature ? signNow() : setSheetOpen(true))}
+                />
+              </>
+            )}
+          </VStack>
+        </VStack>
+      ) : null}
+    </>
   );
 }
 

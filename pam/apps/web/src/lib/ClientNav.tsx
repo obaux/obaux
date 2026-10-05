@@ -118,9 +118,20 @@ export function ClientNav(): null {
       if (push(anchor.href, morphSourceFor(anchor))) event.preventDefault();
     };
 
-    setClientNav((href, mode) => {
+    setClientNav((href, mode, steps) => {
       if (mode === 'push') return push(href);
-      runNavTransition('back', arrive(() => window.history.back()));
+      // `goBack()`: one screen, the browser's own way (D-250).
+      if (steps === undefined) {
+        runNavTransition('back', arrive(() => window.history.back()));
+        return true;
+      }
+      // Out of a flow (D-279): only as far as PAM's own history goes — a
+      // flow opened cold answers false and goes to its fallback. One
+      // popstate arrives for the whole jump, so the count is brought down by
+      // all but that one here.
+      if (depth() < steps) return false;
+      setDepth(depth() - steps + 1);
+      runNavTransition('back', arrive(() => window.history.go(-steps)));
       return true;
     });
     document.addEventListener('click', onClick);
