@@ -75,6 +75,10 @@ const styles = stylex.create({
   // the same lift, the icon and words centred and bold.
   launcher: {
     width: '100%',
+    // The open pill's own height (the large input group, 60px) — the
+    // button's default 48px otherwise wins over a min-height (Will,
+    // 5 October: "these two should match in height").
+    height: '60px',
     minHeight: '60px',
     borderRadius: '999px',
     borderWidth: 0,

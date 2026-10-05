@@ -5888,6 +5888,10 @@ magnifier and "Search programs" centred and bold. A tap swaps in the real
 pattern as All programs' search (D-238). A text field's placeholder cannot
 be centred together with its icon, so the at-rest state is a button.
 
+Addendum (Will, 5 October): the launcher measured 48px against the open
+pill's 60px — the button's own fixed height beat its `minHeight`. Both are
+now 60px, so nothing jumps when search opens.
+
 **Bolder search everywhere.** In `globals.css`, the large input group, which
 is only ever a search pill, now gives its typed text and placeholder weight
 600 in the primary ink, and draws its magnifier darker and thicker. This
