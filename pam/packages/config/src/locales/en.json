@@ -459,8 +459,6 @@
   "place.shared": "Copied. Paste it into a message.",
   "place.website": "Their website",
   "places.all": "All",
-  "places.areaCancel": "Cancel",
-  "places.areaHint": "Like 19107, or 1231 N Broad St.",
   "places.areaLabel": "ZIP code or address",
   "places.areaNone": "Nothing matched that. Try a ZIP code.",
   "places.areaPrivacy": "Addresses are looked up in the City of Philadelphia's public list. PAM does not save where you look.",
@@ -1105,5 +1103,18 @@
   "place.policies.done.title": "Policies signed",
   "place.policies.done.body": "All signatures complete",
   "connections.connectedBy": "Connected by {name}",
-  "place.visit.body": "{time} · Visit booked"
+  "place.visit.body": "{time} · Visit booked",
+  "places.area.title": "Location",
+  "places.area.done": "Done",
+  "places.area.useHere": "Use my current location",
+  "places.area.hereNote": "Stays on this phone",
+  "places.area.finding": "Finding you…",
+  "places.area.hereFailed": "Could not find you. Search instead.",
+  "places.area.here": "your location",
+  "places.area.hereRow": "Your current location",
+  "places.kind.zip": "ZIP code",
+  "places.kind.neighborhood": "Neighborhood",
+  "places.kind.landmark": "Landmark",
+  "places.kind.address": "Address",
+  "places.areaHint": "Like 19107, or 1231 N Broad St."
 }

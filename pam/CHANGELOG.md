@@ -79,7 +79,9 @@ you, and there is no separate profile page any more. Opening a place from a trip
 shows that visit's day and time instead of "Plan a trip", with the address
 first. On Profile a member sees their award level instead of past trips, and
 the text reminders card has a bell. The chosen language is bold and green
-with a heavier tick, and Explore's area is a link that fits on one line.
+with a heavier tick, and Explore's area is a link that fits on one line. Changing the area opens a
+drawer: search with the usual search bar, use your current location, pick a
+result, and press Done.
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 

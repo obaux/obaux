@@ -246,15 +246,16 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
       onCategory={setCategory}
       area={<AreaTrigger area={area} onOpen={() => setIsPickingArea(true)} />}
       areaPanel={
-        isPickingArea ? (
-          <AreaSearch
-            onChange={(next) => {
-              setArea(next);
-              saveOrigin(next);
-            }}
-            onClose={() => setIsPickingArea(false)}
-          />
-        ) : null
+        // A drawer now (D-275), kept mounted so it slides away as it came.
+        <AreaSearch
+          isOpen={isPickingArea}
+          current={area}
+          onChange={(next) => {
+            setArea(next);
+            saveOrigin(next);
+          }}
+          onClose={() => setIsPickingArea(false)}
+        />
       }
       notice={
         saveFailed ? (

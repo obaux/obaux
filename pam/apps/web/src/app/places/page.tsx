@@ -222,9 +222,7 @@ function PlacesScreen() {
         }
       />
 
-      {isPickingArea ? (
-        <AreaSearch onChange={chooseArea} onClose={() => setIsPickingArea(false)} />
-      ) : null}
+      <AreaSearch isOpen={isPickingArea} current={area} onChange={chooseArea} onClose={() => setIsPickingArea(false)} />
 
       <PageTitle title={t('places.title')} backHref="/" backLabel={t('nav.back.home')} />
 

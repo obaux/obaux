@@ -6247,6 +6247,45 @@ Will, 5 October, five messages while D-273 was being built.
   546/546, and Storybook screenshots: the place from a trip, Profile, the
   Language list, Connections, and Explore in English and Spanish.
 
+### D-275 — Choosing the area is a drawer, like every location lookup people know
+
+Will, 5 October, on the old panel (a bare text field, a hint, an error
+line, a privacy note and Cancel, all inline): "This whole UI is wack, let's
+create an open drawer for this, and allow them to search using our new
+search bar component, but placing it in context, and press done on top
+right … This screen doesn't look like industry standard behavior for
+looking up a location."
+
+- **A tall `BottomSheet`** (keyboard-safe), from the area link on Explore
+  and on the older Places screen alike. It is kept mounted, so it slides
+  away as it came.
+- **Top:** "Location" and **Done** at the right, as a word in the accent.
+  Done keeps the choice. A swipe down, the scrim or Escape leaves the area
+  as it was: the choice is held inside the drawer until Done, so looking
+  around never moves the list behind it.
+- **Our search bar** (`SearchField`, the subtle in-sheet version), with the
+  cursor already in it. The sheet would otherwise focus its first button,
+  Done.
+- **"Use my current location"** first, as every location lookup has it. The
+  phone's own position becomes the origin. It is kept on this device with
+  every other choice and never sent to PAM; the row says "Stays on this
+  phone". If the phone will not say, the row says so and the search is
+  still there.
+- **Results as rows** (`MenuList`), each with a pin, the place, and what it
+  is: ZIP code, neighborhood, landmark or address.
+  - The chosen one is bold and green with the D-274 tick.
+  - It stays at the top of the results while you search past it, so the
+    tick never disappears.
+  - Suggestions still arrive before anything is typed.
+- **Removed:** the inline panel, its hint line and the Cancel button
+  (`places.areaCancel`). The Spanish privacy and no-results lines gained
+  their accents and the "tú" the rest of the app uses.
+- **Storybook:** `search_areas` has a fixture (four ZIPs, two
+  neighbourhoods, a landmark), so the drawer has something to show.
+- **Proven by:** `e2e/area-picker.spec.ts`, updated (rows, Done) plus a new
+  test that closing without Done changes nothing. axe passes with the
+  drawer open, and the full suite passed (549/549).
+
 ---
 
 ## Notes for whoever picks this up next

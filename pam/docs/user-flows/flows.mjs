@@ -151,8 +151,8 @@ export const flows = [
         title: 'Explore',
         story: 'member-app-screens--explore',
         path: '/',
-        changed: 'D-265',
-        note: 'Centred search, next visit card, no bell or Help',
+        changed: 'D-275',
+        note: 'Area link opens a Location drawer: search, current location, Done',
       },
       place: {
         title: 'A place',
@@ -239,6 +239,7 @@ export const flows = [
       ['profile', 'points', 'Points'],
     ],
     changes: [
+      'D-275 — Explore: the area opens a Location drawer (search, current location, Done)',
       'D-274 — Profile: award tile; bell for texts. D-273 — a place from a trip shows the visit',
       'D-272 — Connections cards: message button, program link, "Connected by"; no profile page',
       'D-271 — a place with a visit shows its policies on top: orange to sign, green when signed',

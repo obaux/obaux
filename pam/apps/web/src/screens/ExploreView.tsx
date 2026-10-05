@@ -135,7 +135,8 @@ export function ExploreView({
   const searching = query.trim() !== '';
   // The search row hides scrolling down and comes back scrolling up (D-222,
   // Will, 2 October) — never while a search is typed or the area is open.
-  const hidden = useHideOnScroll({ isDisabled: searching || Boolean(areaPanel) });
+  // The area drawer is modal (D-275), so it no longer holds the header open.
+  const hidden = useHideOnScroll({ isDisabled: searching });
   const chipsRef = useRef<HTMLElement | null>(null);
   const [hideBy, setHideBy] = useState(0);
   useLayoutEffect(() => {
