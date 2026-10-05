@@ -59,7 +59,12 @@ is the same width as the one before it. "My connections" says "People willing to
 help". Inviting a member is described as "People looking for resources". A
 program lead's Home opens on the week. Category chips scroll all the way to
 the screen edge. On Trips the map pins are small black
-circles with a point, and "+ New trip" is a light button at the top of the map.
+circles with a point, and "+ New trip" is a light button at the top of the map. Moving around the app is smoother:
+screens change without reloading, a new screen slides in from the right and
+Back slides it away, tabs cross-fade, a tapped card grows into the screen it
+opens, and each screen's parts arrive one after another, not all at once.
+None of this happens for anyone who has asked their phone for less motion,
+or on a very slow connection.
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 

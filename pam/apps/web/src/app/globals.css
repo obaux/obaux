@@ -345,6 +345,110 @@
     background-color: rgb(255 255 255 / 80%);
   }
 
+  /*
+   * Moving between screens (D-269, Will, 5 October: "the whole app feels
+   * very stiff"). `navTransition` in @pam/ui wraps each change of screen in
+   * the browser's View Transitions and sets `data-pam-nav` on <html> for its
+   * length; these say what each kind looks like. Opacity and transform only.
+   *
+   * Forward: the new screen comes in from the right, 24px and a fade, while
+   * the old one eases a little to the left and goes. Back is the mirror.
+   * Between two tabs nothing is deeper than anything else, so a quick
+   * cross-fade. The bottom bar is its own layer and stays where it is.
+   */
+  [data-pam-tabbar] {
+    view-transition-name: pam-tabbar;
+  }
+
+  ::view-transition-group(pam-tabbar) {
+    animation: none;
+  }
+
+  html[data-pam-nav='forward']::view-transition-old(root) {
+    animation: 200ms cubic-bezier(0.4, 0, 1, 1) both pam-nav-out-left;
+  }
+  html[data-pam-nav='forward']::view-transition-new(root) {
+    animation: 280ms cubic-bezier(0.2, 0, 0, 1) both pam-nav-in-right;
+  }
+  html[data-pam-nav='back']::view-transition-old(root) {
+    animation: 200ms cubic-bezier(0.4, 0, 1, 1) both pam-nav-out-right;
+  }
+  html[data-pam-nav='back']::view-transition-new(root) {
+    animation: 280ms cubic-bezier(0.2, 0, 0, 1) both pam-nav-in-left;
+  }
+  html[data-pam-nav='tab']::view-transition-old(root) {
+    animation: 120ms linear both pam-nav-fade-out;
+  }
+  html[data-pam-nav='tab']::view-transition-new(root) {
+    animation: 180ms cubic-bezier(0.2, 0, 0, 1) both pam-nav-fade-in;
+  }
+
+  /*
+   * The card effect: the tapped card and the new screen's page body share
+   * the name `pam-morph`, so the browser grows one into the other — the
+   * card's box widens and lengthens into the screen while the card's picture
+   * gives way to the screen's. Everything else on the old screen fades.
+   */
+  html[data-pam-nav='morph']::view-transition-old(root) {
+    animation: 160ms linear both pam-nav-fade-out;
+  }
+  html[data-pam-nav='morph']::view-transition-new(root) {
+    animation: 320ms cubic-bezier(0.2, 0, 0, 1) both pam-nav-fade-in;
+  }
+  html[data-pam-nav='morph']::view-transition-group(pam-morph) {
+    animation-duration: 360ms;
+    animation-timing-function: cubic-bezier(0.2, 0, 0, 1);
+    overflow: clip;
+    border-radius: 28px;
+  }
+  html[data-pam-nav='morph']::view-transition-image-pair(pam-morph) {
+    isolation: auto;
+  }
+  html[data-pam-nav='morph']::view-transition-old(pam-morph),
+  html[data-pam-nav='morph']::view-transition-new(pam-morph) {
+    width: 100%;
+    height: auto;
+    mix-blend-mode: normal;
+  }
+  html[data-pam-nav='morph']::view-transition-old(pam-morph) {
+    animation: 140ms linear both pam-nav-fade-out;
+  }
+  html[data-pam-nav='morph']::view-transition-new(pam-morph) {
+    animation: 260ms cubic-bezier(0.2, 0, 0, 1) 60ms both pam-nav-fade-in;
+  }
+
+  /*
+   * A screen arrives in its turn, not in one block: each section of the page
+   * body rises 8px and fades in, 30ms after the one above it, capped at the
+   * sixth (D-269). Replaces the whole-page fade `PageEnter` used to carry.
+   */
+  [data-pam-page] > * > * {
+    animation: 260ms cubic-bezier(0.2, 0, 0, 1) both pam-rise;
+  }
+  [data-pam-page] > * > :nth-child(2) {
+    animation-delay: 30ms;
+  }
+  [data-pam-page] > * > :nth-child(3) {
+    animation-delay: 60ms;
+  }
+  [data-pam-page] > * > :nth-child(4) {
+    animation-delay: 90ms;
+  }
+  [data-pam-page] > * > :nth-child(5) {
+    animation-delay: 120ms;
+  }
+  [data-pam-page] > * > :nth-child(n + 6) {
+    animation-delay: 150ms;
+  }
+
+  /*
+   * Dialogs settle rather than stop: the same enter as Astryx's, on a curve
+   * that spends its last stretch slowing down.
+   */
+  .astryx-dialog {
+    animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
   @media (prefers-reduced-motion: reduce) {
     *,
     *::before,
@@ -355,4 +459,27 @@
       scroll-behavior: auto !important;
     }
   }
+}
+
+/* Keyframes for D-269's moves between screens and the page body's rise. */
+@keyframes pam-nav-in-right {
+  from { opacity: 0; transform: translateX(24px); }
+}
+@keyframes pam-nav-out-left {
+  to { opacity: 0; transform: translateX(-12px); }
+}
+@keyframes pam-nav-in-left {
+  from { opacity: 0; transform: translateX(-24px); }
+}
+@keyframes pam-nav-out-right {
+  to { opacity: 0; transform: translateX(12px); }
+}
+@keyframes pam-nav-fade-in {
+  from { opacity: 0; }
+}
+@keyframes pam-nav-fade-out {
+  to { opacity: 0; }
+}
+@keyframes pam-rise {
+  from { opacity: 0; transform: translateY(8px); }
 }

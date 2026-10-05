@@ -126,7 +126,8 @@ export function TripsView({ trips, headerActions, justAdded = null }: TripsViewP
   const href = (trip: Trip) => `/place/?id=${encodeURIComponent(trip.placeId)}&from=trips`;
 
   return (
-    <VStack xstyle={styles.screen}>
+    // What a tapped next-trip card grows into (D-269): Trips has no `Page`.
+    <VStack data-pam-morph-target="" xstyle={styles.screen}>
       <TripsMap
         pins={shown.map((trip) => ({
           id: trip.id,

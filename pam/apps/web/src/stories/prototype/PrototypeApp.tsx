@@ -1,9 +1,11 @@
 'use client';
 
-import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { flushSync } from 'react-dom';
 import { PathnameContext, SearchParamsContext } from 'next/dist/shared/lib/hooks-client-context.shared-runtime';
 import { Page, Notice } from '@pam/ui';
 import { SubPageHeader } from '@pam/ui/SubPage';
+import { morphSourceFor, navKindFor, runNavTransition } from '@pam/ui/navTransition';
 
 /**
  * The app, clickable, inside one story (D-211).
@@ -20,6 +22,9 @@ import { SubPageHeader } from '@pam/ui/SubPage';
  *   - **`navigate()`** (`src/lib/navigate.ts`) announces `pam:navigate`
  *     first; this cancels it. **`goBack()`** likewise announces `pam:back`
  *     (D-250) — the Storybook router mock never forwards `router.back`.
+ *   - **Every move animates** as the app's do (D-269): forward slides in,
+ *     back slides out, tab to tab cross-fades, and a tapped card grows into
+ *     the screen it opens (`@pam/ui/navTransition`).
  *
  * Which screen a path shows comes from Next's own path and search-param
  * contexts, set here — so `useSearchParams()` on the place screen reads the
@@ -71,7 +76,10 @@ export function PrototypeApp({ routes, start, chrome, first }: PrototypeAppProps
   const url = useMemo(() => new URL(current, ORIGIN), [current]);
   const pathname = normalise(url.pathname);
 
-  const go = useCallback<Go>((href, mode) => {
+  const stackRef = useRef(stack);
+  stackRef.current = stack;
+
+  const change = useCallback((href: string, mode: 'push' | 'replace' | 'back') => {
     setStack((prev) => {
       if (mode === 'back') return prev.length > 1 ? prev.slice(0, -1) : prev;
       const base = new URL(prev[prev.length - 1] ?? '/', ORIGIN);
@@ -80,6 +88,26 @@ export function PrototypeApp({ routes, start, chrome, first }: PrototypeAppProps
       return mode === 'replace' ? [...prev.slice(0, -1), target] : [...prev, target];
     });
   }, []);
+
+  /** A change of screen, inside the move it is (D-269); `source` is a tapped card. */
+  const go = useCallback(
+    (href: string, mode: 'push' | 'replace' | 'back', source?: HTMLElement | null) => {
+      const prev = stackRef.current;
+      const from = prev[prev.length - 1] ?? '/';
+      const to = mode === 'back' ? (prev[prev.length - 2] ?? from) : new URL(href, new URL(from, ORIGIN)).pathname;
+      // A tapped card always opens into its screen, even when that screen is a tab.
+      const kind = mode === 'back' ? 'back' : source ? 'forward' : navKindFor(new URL(from, ORIGIN).pathname, to);
+      runNavTransition(
+        kind,
+        () => {
+          flushSync(() => change(href, mode));
+          window.scrollTo(0, 0);
+        },
+        source,
+      );
+    },
+    [change],
+  );
 
   // `router.*` from the screens.
   useEffect(() => {
@@ -103,7 +131,7 @@ export function PrototypeApp({ routes, start, chrome, first }: PrototypeAppProps
       // A bare in-page anchor (`#top`) scrolls as it would anyway.
       if (href.startsWith('#')) return;
       event.preventDefault();
-      go(`${resolved.pathname}${resolved.search}${resolved.hash}`, 'push');
+      go(`${resolved.pathname}${resolved.search}${resolved.hash}`, 'push', morphSourceFor(anchor));
     };
     const onNavigate = (event: Event) => {
       event.preventDefault();

@@ -13,7 +13,7 @@ icon on sign-in, an onboarding step, and account settings all read and write
 was opened from (Home, Places, or Saved) instead of always to Places. The
 header is now content-consistent across every signed-in screen — the same
 compact role-preview icon, the same merged area/edit control, the same bell —
-though it still reloads on navigation (D-134); Home's people preview for Case
+and since D-269 it no longer reloads on navigation; Home's people preview for Case
 manager/Program/Super admin previews is now a scrollable stories-style strip
 rather than a stacked list. Sign-in is a full-bleed photo hero — real
 commissioned illustrations, sourced via Google Drive after Figma's own asset
@@ -326,6 +326,11 @@ The whole app is mapped in Figma, "PAM — User flows"
 A member's Explore has a centred search launcher, smaller chips and a "Your
 next visit" card, and no bell or Help (D-265). Sign in's card sits flat under
 the slides, and the code step is drawn in to match (D-266).
+Moving between screens no longer reloads the app (`ClientNav`). Each move
+has a direction: forward slides in, back slides out, tabs cross-fade, and a
+tapped card grows into its screen. Sections of a screen arrive 30ms apart.
+All of it uses View Transitions and CSS, and none of it runs under reduced
+motion, Data Saver or 2G (D-269).
 Programs have policies for participants with a verified tick (D-261), on
 example data until tables, file storage and a transparency line are agreed.
 From a request the super admin can open the requested program and text the

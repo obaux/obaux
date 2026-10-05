@@ -125,30 +125,27 @@ const styles = stylex.create({
     },
   },
   /**
-   * The page's arrival, in CSS.
-   *
-   * Eight pixels and a fade, not a slide: a page that travels across the screen
-   * on every navigation is a page somebody waits for. Suppressed for anybody
-   * who asked their phone for less motion — the one animation in PAM that has
-   * to make that check itself, because it is not inside the runtime that makes
-   * it for everything else.
+   * The page body. Its arrival is no longer one block fading in (D-269): each
+   * section rises in its turn, 30ms apart and capped at six, from CSS in the
+   * app's `globals.css` keyed on `data-pam-page` — StyleX cannot reach a
+   * page's children. Nothing here moves, so nothing here pins a fixed child
+   * to the page the way a transform would.
    */
   page: {
     width: '100%',
-    animationName: stylex.keyframes({
-      from: { opacity: 0, transform: 'translateY(8px)' },
-      to: { opacity: 1, transform: 'none' },
-    }),
-    animationDuration: '240ms',
-    animationTimingFunction: 'cubic-bezier(0.2, 0, 0, 1)',
-    animationFillMode: 'both',
-    '@media (prefers-reduced-motion: reduce)': { animationName: 'none' },
   },
 });
 
-/** A screen arriving. CSS, so it costs nothing and never remounts anything. */
+/**
+ * A screen arriving. CSS, so it costs nothing and never remounts anything;
+ * `data-pam-page` is also what a tapped card grows into (`navTransition`).
+ */
 export function PageEnter({ children }: { children: ReactNode }) {
-  return <div {...stylex.props(styles.page)}>{children}</div>;
+  return (
+    <div data-pam-page="" {...stylex.props(styles.page)}>
+      {children}
+    </div>
+  );
 }
 
 /** A card arriving in its turn, staggered 40ms a row and capped at six. */

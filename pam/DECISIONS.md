@@ -5970,6 +5970,64 @@ instead of plus button on top right, copy the search the map [pill] … say
   map, 44px tall, with a semibold label and a soft shadow, in place of the
   dark green round +. It still opens `/trips/new/`.
 
+### D-269 — Moving between screens: no reloads, a direction, and a card that grows
+
+Will, 5 October: "How can we make transitions smoother across the entire
+app, like when switching tabs, or going from one page to the next? right now
+the whole app feels very stiff, things appear all at once." Then, on the
+plan: "go ahead with transitions, include the card effect".
+
+Why it felt stiff: every tap was a **full page load** (Astryx and our cards
+draw plain `<a href>`, and nothing routed them; D-134 deferred client-side
+routing), and every screen arrived as one block on the same 240ms fade.
+
+- **No reloads.** `ClientNav` (`apps/web/src/lib/ClientNav.tsx`, mounted in
+  `Providers`) catches a same-site link tap after the page has had its say
+  (leave guards, the prototype) and hands it to Next's router. `navigate()`
+  and `goBack()` use it too. This closes the routing half of D-134.
+  - Not `next/link`, and not Astryx's `LinkProvider`: `next/link` prefetches
+    every link in view, and a list of thirty places would spend a 3G
+    member's data on thirty screens (§12). One document listener also covers
+    the plain `<a>` in `PlaceCard`, which `LinkProvider` would not.
+  - Still a full load: other sites, `tel:`/`sms:`/`mailto:`, new tabs,
+    downloads, files, and **the same screen with a different query**
+    (`/place/?id=a` to `/place/?id=b`), because those screens read their
+    query once, on load.
+- **A direction** (`@pam/ui/navTransition`, the browser's View Transitions;
+  CSS in `globals.css` keyed on `html[data-pam-nav]`):
+  - forward: in from the right, 24px and a fade, 280ms; the old screen eases
+    12px left and goes in 200ms;
+  - back: the mirror;
+  - tab to tab: a 180ms cross-fade, since neither is deeper;
+  - the bottom bar has its own layer (`data-pam-tabbar`) and stays still.
+  Direction is judged from the two paths: into a tab path or a shallower
+  path is back.
+- **The card effect.** A tapped card (`ClickableCard`, anything marked
+  `data-pam-morph`, or a card with exactly one link, like a place card)
+  grows into the screen it opens: the card and the new screen's page body
+  share the name `pam-morph`, never at the same moment. A card tap is always
+  forward, even into a tab (the next-trip card opens Trips). Trips has no
+  `Page`, so its body is marked `data-pam-morph-target`. A card holding
+  several links is a list, not a door, and does not grow.
+- **A screen arrives in its turn.** `PageEnter` no longer fades the page as
+  one block. Each section of the page body rises 8px and fades in, 30ms
+  after the one above, capped at the sixth (150ms). The wrapper itself no
+  longer moves, so it can no longer pin a fixed child to the page (the
+  D-263 floating-row bug).
+- **Dialogs settle** on a decelerating curve. Sheets already slid up with
+  Astryx's own motion and are unchanged.
+- **Who gets none of it.** No View Transitions in the browser, reduced
+  motion, Data Saver or 2G (D-104): the screen simply changes, still
+  without a reload. It is all browser-native and CSS; nothing joins the
+  animation chunk. First-load JS stays inside budget (79 kB to spare).
+- Opacity and transform only; nothing animates layout.
+- **Proven by:** `e2e/motion.spec.ts` checks every section settles at
+  opacity 1 with no transform, and that tapping a link changes screen
+  without reloading. The full e2e suite passed (534/534).
+- **Not covered:** the browser's own Back button and swipe gestures change
+  screen without our transition, because the change has already happened
+  by the time the page hears of it.
+
 ---
 
 ## Notes for whoever picks this up next

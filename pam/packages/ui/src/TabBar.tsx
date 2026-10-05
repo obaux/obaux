@@ -185,7 +185,7 @@ export function TabBar({
   return (
     <>
       <VStack aria-hidden xstyle={styles.spacer} />
-      <footer {...stylex.props(styles.bar)}>
+      <footer data-pam-tabbar="" {...stylex.props(styles.bar)}>
         <HStack align="center" wrap="nowrap" xstyle={styles.inner}>
           <TabList
             value={current ?? ''}

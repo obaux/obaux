@@ -27,6 +27,7 @@
     "./SavedGrid": "./src/SavedGrid.tsx",
     "./TripCard": "./src/TripCard.tsx",
     "./NextTripCard": "./src/NextTripCard.tsx",
+    "./navTransition": "./src/navTransition.ts",
     "./MapDrawer": "./src/MapDrawer.tsx"
   },
   "scripts": {
