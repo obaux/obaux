@@ -130,7 +130,9 @@ Saved's date chip sits a little further in from the corner. The example food
 pantry no longer has a visit, so Saved and its page show a place without one.
 Pins on the Trips map no longer cover the "Map preview" note or fall under the
 drawer. Explore's examples are nine programs, three of each kind, and most have
-no visit and are not saved.
+no visit and are not saved. A place with a visit shows the same date chip on
+Explore as on Saved and opens to its visit. When a program has written to
+you, its page says "New message" with a pink dot and opens the conversation.
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 

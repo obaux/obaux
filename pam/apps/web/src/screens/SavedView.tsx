@@ -30,7 +30,7 @@ import { SavedGrid } from '@pam/ui/SavedGrid';
 import { PlaceCardSkeletonList } from '@pam/ui/Skeletons';
 import { CATEGORY_DEFINITIONS, categoryLabelKey, NOTICES, type Category } from '@pam/config';
 import { ToneBakedIcon, ToneIcon, type Tone } from '@pam/ui/Tone';
-import { useNextVisits, type NextVisit } from '@/lib/useNextVisits';
+import { useNextVisits, visitTagLabel, type NextVisit } from '@/lib/useNextVisits';
 import { useI18n } from '@/lib/i18n';
 import { useSession } from '@/lib/useSession';
 import { useRoleView } from '@/lib/useViewedRole';
@@ -124,9 +124,6 @@ export function SavedView({
 }: SavedViewProps) {
   const { t, locale } = useI18n();
   // "Wed, Oct 7 · 10:00 AM", the trip card's own form.
-  // "Oct 7 · 10:00 AM" — one short line for the chip (D-296).
-  const dayFmt = new Intl.DateTimeFormat(locale, { month: 'short', day: 'numeric' });
-  const timeFmt = new Intl.DateTimeFormat(locale, { hour: 'numeric', minute: '2-digit' });
   const all = state.status === 'ready' && !replace ? state.places : [];
   const places = hidden ? all.filter((place) => !hidden.has(place.id)) : all;
   const editing = edit.isOn;
@@ -199,8 +196,7 @@ export function SavedView({
             // on the picture, and the place opens about that visit — Back
             // still comes to Saved.
             const visit = visits[place.id];
-            const at = visit ? new Date(visit.startsAt) : null;
-            const tag = at ? `${dayFmt.format(at)} · ${timeFmt.format(at)}` : null;
+            const tag = visit ? visitTagLabel(visit.startsAt, locale) : null;
             return {
               id: place.id,
               name: place.name,

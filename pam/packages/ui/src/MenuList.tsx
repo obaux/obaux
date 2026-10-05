@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
+import { pam } from './tokens.stylex.js';
 import { Icon } from '@astryxdesign/core/Icon';
 import { HStack } from '@astryxdesign/core/HStack';
 import { List, ListItem } from '@astryxdesign/core/List';
@@ -42,6 +43,12 @@ export interface MenuItem {
   readonly badgeLabel?: string;
   /** Opens in a new tab: Google Maps, a program's website (D-291). */
   readonly isExternal?: boolean;
+  /**
+   * Something new behind this row — a pink dot before the chevron, the same
+   * pink as every other "new" dot (D-289, D-305). Decoration: the row's own
+   * words say it ("New message").
+   */
+  readonly hasDot?: boolean;
 }
 
 export interface MenuListProps {
@@ -55,6 +62,7 @@ export interface MenuListProps {
 const styles = stylex.create({
   list: { width: '100%' },
   row: { minHeight: '64px', fontSize: '18px' },
+  dot: { width: '10px', height: '10px', borderRadius: '50%', flexShrink: 0, backgroundColor: pam.brandPink },
   // No line under the last row (D-291). Astryx's own `:last-child` rule
   // is a shorthand, which loses to its longhand width, so the line stayed —
   // a stray rule at the foot of every card that holds a list.
@@ -98,6 +106,7 @@ export function MenuList({ label, items, hasDividers = false }: MenuListProps) {
               ) : undefined
             ) : item.href || item.onSelect ? (
               <HStack gap={2} align="center" wrap="nowrap">
+                {item.hasDot ? <HStack aria-hidden xstyle={styles.dot} /> : null}
                 {item.badge ? <Badge variant="error" label={item.badge} aria-label={item.badgeLabel} /> : null}
                 {item.value ? (
                   <Text type="supporting" xstyle={styles.value}>

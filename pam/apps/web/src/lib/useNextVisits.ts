@@ -41,3 +41,11 @@ export function useNextVisits(isOn: boolean): Readonly<Record<string, NextVisit>
   }, [isOn]);
   return visits;
 }
+
+/** The chip's words, "Oct 7 · 10:00 AM" — one function, so Saved and Explore cannot drift (D-305). */
+export function visitTagLabel(iso: string, locale: string): string {
+  const at = new Date(iso);
+  const day = new Intl.DateTimeFormat(locale, { month: 'short', day: 'numeric' }).format(at);
+  const time = new Intl.DateTimeFormat(locale, { hour: 'numeric', minute: '2-digit' }).format(at);
+  return `${day} · ${time}`;
+}

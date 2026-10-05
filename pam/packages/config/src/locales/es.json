@@ -1142,5 +1142,6 @@
   "place.quick.directions.body": "Abrir en Google Maps",
   "place.quick.message.body": "Haz una pregunta antes de ir",
   "place.quick.call.body": "Habla con alguien allí",
-  "saved.visitLabel": "{name}. Tu visita: {when}"
+  "saved.visitLabel": "{name}. Tu visita: {when}",
+  "place.quick.newMessage": "Mensaje nuevo"
 }

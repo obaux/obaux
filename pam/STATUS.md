@@ -374,7 +374,10 @@ ToneGround; ToneDot is darker on the left (D-298) and sits 11px from the chip's 
 its door (D-301, D-302); trip icons are baked in with a doubled overlay (`ToneBakedIcon`, D-302). Saved's chip is
 12px in from the corner; a member's example trips are two (no pantry visit); Trips map pins
 are placed in pixels between the note and the half drawer (D-303). Nine example places,
-three per category; three saved, two with visits (D-304). How points should be awarded — two rules live
+three per category; three saved, two with visits (D-304). Place profile vs Visit profile
+is one story with controls; `VisitTag` is the one visit chip (Saved, Explore); a place's
+message row becomes "New message" with a pink dot when its program wrote (D-305). Note:
+the web app's vitest tests are not run in CI. How points should be awarded — two rules live
 (save a place, finish setup), the rest to build, with order and open
 questions — is specified in `docs/points-awarding.md`. The
 signatures are example data too, kept only for the visit (session storage).

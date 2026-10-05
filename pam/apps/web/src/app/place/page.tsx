@@ -16,7 +16,7 @@ import {
   directionsHref,
   googlePlaceHref,
 } from '@pam/ui';
-import { PlaceBarActions, messageHrefFor } from '../../screens/PlaceBarActions';
+import { PlaceBarActions, messageHrefFor, newMessageFrom } from '../../screens/PlaceBarActions';
 import { PlaceDetailSkeleton } from '@pam/ui/Skeletons';
 import { SubPageHeader } from '@pam/ui/SubPage';
 import { HelpButton } from '../../screens/HelpButton';
@@ -355,6 +355,8 @@ function PlaceScreen() {
       }).toString()}`
     : null;
   // With the place's Google ID when PAM has one (D-291): Maps opens on the place itself.
+  // Only a member is written to by a program here (D-305).
+  const unread = (demoRole ?? trueRole) === 'member' ? newMessageFrom(place!.name) : null;
   const directions = directionsHref(place!.address, place!.lat, place!.lon, place!.placeId) ?? null;
   const googleHref = googlePlaceHref(place!.lookupName || place!.name, place!.address, place!.placeId);
   const lines = status ? weekLines(status.hours, locale, t('place.hours.closed')) : undefined;
@@ -449,13 +451,24 @@ function PlaceScreen() {
                 },
               ]
             : []),
-          {
-            id: 'message',
-            label: t('place.quick.message'),
-            description: t('place.quick.message.body'),
-            icon: <MessagesIcon {...QUICK} />,
-            href: messageHrefFor(place!.name),
-          },
+          // A message from the program waiting (D-305): the row says so, with a
+          // pink dot and their newest words, and opens that conversation.
+          unread
+            ? {
+                id: 'message',
+                label: t('place.quick.newMessage'),
+                description: unread.preview,
+                icon: <MessagesIcon {...QUICK} />,
+                href: unread.href,
+                hasDot: true,
+              }
+            : {
+                id: 'message',
+                label: t('place.quick.message'),
+                description: t('place.quick.message.body'),
+                icon: <MessagesIcon {...QUICK} />,
+                href: messageHrefFor(place!.name),
+              },
           ...(place!.phone
             ? [
                 {

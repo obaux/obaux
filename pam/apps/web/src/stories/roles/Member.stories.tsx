@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/nextjs';
 import { CONVO_ID } from '../journeys/fixtures';
-import { screen } from './screen';
+import { screen, screenWithControls } from './screen';
 
 /**
  * The member app, screen by screen (D-217) — every one on the redesign's two
@@ -22,13 +22,36 @@ export const Profile: Story = screen('member', 'Profile', '/profile/');
 
 // Screens you tap into (the nested-page template, D-213).
 export const NewTrip: Story = screen('member', 'New trip', '/trips/new/');
-export const Place: Story = screen('member', 'A place', '/place/', { id: 'dummy-place-learning', from: 'explore' });
-// A place with a visit booked, opened from Trips: policies on top (D-271).
-export const PlaceFromTrip: Story = screen('member', 'A place, from a trip', '/place/', {
-  id: 'dummy-place-learning',
-  from: 'trips',
-  trip: 'dummy-trip-1',
-});
+/*
+ * A place, as a member sees it (Will, 5 October, D-305: "one storybook story
+ * with parameters to switch"). Two kinds:
+ *   - Place profile: no visit booked — "Plan a trip", the hours, the rest.
+ *   - Visit profile: a visit booked — "Your next visit" and Change
+ *     appointment on top, then address and hours.
+ * And either can have a new message from the program waiting, shown as the
+ * "New message" row with a pink dot. Each combination is a real example
+ * place, so what is on screen is what the app would show for it.
+ */
+type PlaceProfileArgs = { profile: 'Place profile' | 'Visit profile'; newMessage: boolean };
+const PLACE_FOR: Record<string, Record<string, string>> = {
+  'Place profile|false': { id: 'dummy-place-library', from: 'explore' },
+  'Place profile|true': { id: 'dummy-place-food', from: 'explore' },
+  'Visit profile|true': { id: 'dummy-place-learning', from: 'explore', trip: 'dummy-trip-1' },
+  'Visit profile|false': { id: 'dummy-place-workforce', from: 'explore', trip: 'dummy-trip-2' },
+};
+export const PlaceProfile: Story = screenWithControls<PlaceProfileArgs>(
+  'member',
+  'Place profile',
+  '/place/',
+  {
+    args: { profile: 'Place profile', newMessage: false },
+    argTypes: {
+      profile: { control: 'inline-radio', options: ['Place profile', 'Visit profile'] },
+      newMessage: { control: 'boolean', name: 'New message from the program' },
+    },
+  },
+  (args) => PLACE_FOR[`${args.profile}|${args.newMessage}`]!,
+);
 // A program's policies, read and signed by a member (D-270).
 export const PlacePolicies: Story = screen('member', 'Policies to sign', '/place/policies/', {
   id: 'dummy-place-learning',

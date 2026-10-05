@@ -125,6 +125,8 @@ export interface QuickAction {
   readonly isExternal?: boolean;
   /** A line under the label — what the row does (D-291). */
   readonly description?: string;
+  /** Something new behind it — "New message" (D-305). */
+  readonly hasDot?: boolean;
 }
 
 function categoryBadgeVariant(category: Category): BadgeVariant {
@@ -333,6 +335,7 @@ export function PlaceDetail({
               href: action.href,
               ...(action.description ? { description: action.description } : {}),
               ...(action.isExternal ? { isExternal: true } : {}),
+              ...(action.hasDot ? { hasDot: true } : {}),
             }))}
           />
         </Card>

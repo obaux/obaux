@@ -7169,6 +7169,77 @@ Explore already has an appointment created."
   filter (3 places); a new place opened (its own page, no visit); the UI
   and config unit tests; typecheck; the web build; and e2e 570/570.
 
+### D-305 — One visit tag everywhere; Place profile and Visit profile; "New message" on a place
+
+Will, 5 October: "unify what is inside chips and how that tags all of the
+saved places and places from Explore… so there's no disconnect around
+places that have been set up with appointments versus those that have
+not… What do we call profiles that have been scheduled vs those that
+haven't? That should be one storybook story with parameters to switch…
+also show an alert dot next to profiles (messages item), a variant that
+says new message, so they can view messages straight from profile view."
+
+- **Names:**
+  - A **Place profile** is a place's page with no visit booked: "Plan a
+    trip", then what the place is, then address and hours.
+  - A **Visit profile** is the same page when the member has a visit there:
+    "Your next visit" and Change appointment on top, then address, hours,
+    and the rest (D-273, D-281).
+
+  These are the words in Storybook, in this log, and in conversation. A
+  member never sees them; they see the page.
+- **One tag:** `VisitTag` (`@pam/ui/VisitTag`) is the visit chip, used
+  wherever a place appears with a visit. It reads "Oct 7 · 10:00 AM", is
+  white with a soft shadow, and is one line at 12px.
+  - On Saved, it is pinned in the picture's corner, as before (D-296,
+    D-303).
+  - On Explore's place cards (`PlaceCard visitTag`), it sits under the
+    open line.
+  - Both get their words from one function, `visitTagLabel`.
+  - Both open a place with a visit as its Visit profile (`trip` in the
+    link), and Back follows `from`.
+  - Explore reads the same `useNextVisits` as Saved, for members only, so
+    moving an appointment moves both tags.
+- **One story:** `Member app › Screens › Place profile` replaces "A place"
+  and "A place, from a trip". It has two controls, `profile` (Place profile
+  or Visit profile) and `New message from the program`. Each combination is
+  a real example place, so the page shown is what the app would show:
+
+  | Profile | New message | Place |
+  |---|---|---|
+  | Place profile | no | Library Tech Lab |
+  | Place profile | yes | Food Pantry |
+  | Visit profile | yes | Learning Center |
+  | Visit profile | no | Workforce Center |
+
+  `screenWithControls` (beside `screen()`) builds the prototype's start
+  address from the controls. The flow map's place node points at the new
+  story.
+- **"New message":** when the place's program has written to the member and
+  they have not answered, the profile's message row says "New message" with
+  their newest words under it and a pink dot (`MenuItem.hasDot`, the D-289
+  pink), and opens that conversation. Otherwise it is "Send a message" as
+  before.
+  - It is driven by the example conversations
+    (`src/lib/placeMessages.ts`, `newMessageFrom`).
+  - A new example conversation, Renee at Example Food Pantry writing to
+    Jordan, gives a Place profile with a new message. The member's Messages
+    list now has three conversations.
+- **Not changed:** the old live `/places/` and `/saved/` pages; visits there
+  would be example data shown to real members. Staff never see the tag or
+  the row; both are a member's.
+- **Proven by:**
+  - all four combinations of the story (the right place, the "New message"
+    row and "Your next visit" each present or not);
+  - Explore's tags in a screenshot;
+  - `placeMessages.test.ts` (2 tests);
+  - the UI and config unit tests, typecheck and the web build;
+  - e2e 570/570, then 117/117 for the place, visit, messages and saved specs
+    after the last refactor.
+
+  The web app's own unit tests (`apps/web`, vitest) are not in CI, which
+  runs only config and UI. That is worth adding; it is not done here.
+
 ---
 
 ## Notes for whoever picks this up next

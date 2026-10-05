@@ -9,6 +9,7 @@ import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { ToneGround, type Tone } from './Tone.js';
+import { VisitTag } from './VisitTag.js';
 
 /**
  * Saved places as a two-by-two grid (D-213, from the reference Will gave on
@@ -59,31 +60,6 @@ const styles = stylex.create({
     // to the link (positioning it for the tag had put it on top).
     pointerEvents: 'none',
   },
-  // A small white chip in the top corner (D-296): quiet, one line, never
-  // over the icon.
-  tag: {
-    position: 'absolute',
-    // In from the corner by half the tile's 24px radius, so the chip's
-    // round end sits inside the curve rather than against it (Will, D-303).
-    top: '12px',
-    insetInlineStart: '12px',
-    maxWidth: 'calc(100% - 24px)',
-    paddingInline: '8px',
-    paddingBlock: '4px',
-    borderRadius: '999px',
-    backgroundColor: colorVars['--color-background-card'],
-    boxShadow: '0 1px 4px light-dark(oklch(0 0 0 / 14%), oklch(0 0 0 / 50%))',
-  },
-  tagText: {
-    fontSize: '12px',
-    lineHeight: 1.3,
-    fontWeight: 600,
-    color: colorVars['--color-text-primary'],
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    minWidth: 0,
-  },
   name: {
     fontSize: '17px',
     lineHeight: 1.3,
@@ -132,11 +108,7 @@ export function SavedGrid({ tiles, label, isEditing = false, onRemove, removeLab
               <HStack align="center" justify="center" xstyle={styles.square}>
                 <ToneGround tone={tile.tone ?? null} />
                 {tile.art}
-                {tile.tag ? (
-                  <HStack xstyle={styles.tag}>
-                    <Text xstyle={styles.tagText}>{tile.tag}</Text>
-                  </HStack>
-                ) : null}
+                {tile.tag ? <VisitTag label={tile.tag} isOverlay /> : null}
               </HStack>
             </Card>
             <VStack gap={0.5} xstyle={styles.words}>

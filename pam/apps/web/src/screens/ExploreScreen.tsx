@@ -7,6 +7,7 @@ import { SearchLauncher, SearchPill, type SearchPillItem } from '@pam/ui/SearchP
 import { NextTripCard } from '@pam/ui/NextTripCard';
 import { DUMMY_TRIPS } from '@pam/config/dummy-trips';
 import { readMoves } from '@/lib/addedTrips';
+import { useNextVisits, visitTagLabel } from '@/lib/useNextVisits';
 import { CategoryIcon, categoryTone } from './SavedView';
 import { USE_DUMMY_PEOPLE } from '@pam/config/dummy-flag';
 import { categoryLabelKey, distanceLabel } from '@pam/config';
@@ -174,6 +175,9 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
   const [moves, setMoves] = useState<Readonly<Record<string, string>>>({});
   useEffect(() => setMoves(readMoves()), []);
   const nextTrip = isMember && USE_DUMMY_PEOPLE ? upcomingTrip(moves) : null;
+  // A member's visits, so a place with one carries Saved's chip and opens as
+  // the Visit profile (D-305) — the same wherever the place appears.
+  const visits = useNextVisits(isMember && USE_DUMMY_PEOPLE);
 
   return (
     <ExploreView
@@ -283,7 +287,12 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
               name={place.name}
               category={place.category}
               artSeed={place.id}
-              href={`/place/?id=${encodeURIComponent(place.id)}&from=${from}`}
+              href={`/place/?${new URLSearchParams({
+                id: place.id,
+                from,
+                ...(visits[place.id] ? { trip: visits[place.id]!.id } : {}),
+              }).toString()}`}
+              visitTag={visits[place.id] ? visitTagLabel(visits[place.id]!.startsAt, locale) : null}
               description={place.description}
               {...(miles ? { distanceLabel: t(miles.key, miles.vars) } : {})}
               status={placeStatus(place.id, place.hours, now, t, locale)}

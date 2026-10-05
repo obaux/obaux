@@ -107,6 +107,13 @@ export const DUMMY_THREADS: Readonly<Record<string, readonly DummyThreadMessage[
     ['member', 'Sorry. My shift ran over. Can I still come Friday?', hoursAgo(20)],
     ['staff', 'Of course. Friday at 10. See you then.', hoursAgo(19)],
   ]),
+  // Jordan (member) and Renee (program: Example Food Pantry) — D-305: a
+  // program that has written to a member who has no visit with them, so a
+  // place without a visit can show "New message" too.
+  thread(dummyConversationIdBetween('dummy-m1', 'dummy-p3'), [
+    ['staff', 'Hi Jordan, this is Renee at Example Food Pantry. Teresa said you might stop by.', daysAgo(1, 10)],
+    ['staff', 'We have fresh fruit and vegetables this Saturday, 9 to 1. No sign-up needed.', hoursAgo(2)],
+  ]),
   // Keisha (member) and Teresa (case manager)
   thread(dummyConversationIdBetween('dummy-m2', 'dummy-a1'), [
     ['staff', 'Hi Keisha, it is Teresa. The food pantry on Broad Street is open Saturdays now, 9 to 1.', daysAgo(4, 10)],

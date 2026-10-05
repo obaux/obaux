@@ -31,6 +31,7 @@
     "./SignaturePad": "./src/SignaturePad.tsx",
     "./PolicyStatusCard": "./src/PolicyStatusCard.tsx",
     "./VisitCard": "./src/VisitCard.tsx",
+    "./VisitTag": "./src/VisitTag.tsx",
     "./CategoryArt": "./src/CategoryArt.tsx",
     "./BadgeArt": "./src/BadgeArt.tsx",
     "./Tone": "./src/Tone.tsx",

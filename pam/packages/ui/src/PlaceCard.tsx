@@ -11,6 +11,7 @@ import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import type { Category } from '@pam/config';
 import { BookmarkIcon } from './icons.js';
 import { CategoryArt } from './CategoryArt.js';
+import { VisitTag } from './VisitTag.js';
 import { pam } from './tokens.stylex.js';
 
 /**
@@ -51,6 +52,8 @@ export interface PlaceCardProps {
   readonly category?: Category | null;
   /** The place's id, so its picture is chosen the same way every time (D-301). */
   readonly artSeed?: string;
+  /** A booked visit, "Oct 7 · 10:00 AM" — the same chip as Saved's (D-305). */
+  readonly visitTag?: string | null;
   /** One sentence, from the catalogue. Clipped to two lines. */
   readonly description?: string | null;
   /**
@@ -140,6 +143,7 @@ const styles = stylex.create({
     backgroundColor: colorVars['--color-text-accent'],
   },
   words: { flexGrow: 1, minWidth: 0 },
+  visitRow: { paddingBlockStart: '6px' },
   // The tile sits at the very top left, so the space above it and beside
   // it are the card's one padding (Will, D-287).
   art: { flexShrink: 0, borderRadius: '16px', overflow: 'hidden' },
@@ -179,6 +183,7 @@ export function PlaceCard({
   href,
   category = null,
   artSeed,
+  visitTag = null,
   description,
   distanceLabel,
   status,
@@ -253,6 +258,11 @@ export function PlaceCard({
               {audienceLabel ? <Badge variant="warning" label={audienceLabel} /> : null}
               {flagLabel ? <Badge variant="error" label={flagLabel} /> : null}
             </HStack>
+            {visitTag ? (
+              <HStack xstyle={styles.visitRow}>
+                <VisitTag label={visitTag} />
+              </HStack>
+            ) : null}
           </VStack>
         </HStack>
 

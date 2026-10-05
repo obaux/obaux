@@ -37,6 +37,8 @@ const ICON = { width: 22, height: 22, 'aria-hidden': true } as const;
  * example conversation between them and the example member, while messaging
  * runs on example people; otherwise Messages, where New message is.
  */
+export { newMessageFrom } from '@/lib/placeMessages';
+
 export function messageHrefFor(placeName: string): string {
   const lead = DUMMY_PROGRAM_LEADS.find((person) => person.orgName === placeName);
   return lead
