@@ -5946,6 +5946,21 @@ Will, 5 October:
   and its start stays in line with the search bar. The page itself still
   never scrolls sideways (scrollWidth = 390 at 390px).
 
+### D-268 — Trips: small black pins with a tip; "+ New trip" as a light pill
+
+Will, 5 October, with the Airbnb "Your stay" reference: "For the map pins …
+circle with tip, and icon. Make [them] black with icon. And smaller. Also
+instead of plus button on top right, copy the search the map [pill] … say
+'+ new trip' with a similar subtle light format."
+
+- **Pins.** A 40px black disc with a white ring, the category's icon in white
+  at 20px, and a small rotated-square tip. The labels under them shrink from
+  14px to 12px. Google's markers, when a key is set, use the same shape as an
+  SVG (`PIN_SVG`), without the category icon.
+- **"+ New trip"** (`NewTripButton`) is a white pill at the top centre of the
+  map, 44px tall, with a semibold label and a soft shadow, in place of the
+  dark green round +. It still opens `/trips/new/`.
+
 ---
 
 ## Notes for whoever picks this up next

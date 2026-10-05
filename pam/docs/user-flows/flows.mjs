@@ -158,7 +158,13 @@ export const flows = [
       newTrip: { title: 'Plan a visit', story: 'member-app-screens--new-trip', path: '/trips/new/' },
       report: { title: 'Report a place', story: 'member-app-screens--report-place', path: '/flag/' },
       saved: { title: 'Saved', story: 'member-app-screens--saved', path: '/saved/' },
-      trips: { title: 'Trips', story: 'member-app-screens--trips', path: '/trips/' },
+      trips: {
+        title: 'Trips',
+        story: 'member-app-screens--trips',
+        path: '/trips/',
+        changed: 'D-268',
+        note: 'Black pins; + New trip pill on the map',
+      },
       messages: { title: 'Messages', story: 'member-app-screens--messages', path: '/messages/' },
       thread: { title: 'A conversation', story: 'member-app-screens--conversation', path: '/messages/thread/' },
       options: { title: 'Conversation options', story: 'member-app-screens--conversation-options', path: '/messages/thread/options/' },
@@ -200,6 +206,7 @@ export const flows = [
       ['profile', 'points', 'Points'],
     ],
     changes: [
+      'D-268 — Trips: small black pins with a tip; a light + New trip pill',
       'D-265 — Explore: a centred, bolder search, smaller chips and a "Your next visit" card; bell and Help live on Profile',
       'D-260 — a switch for each kind of text alert',
     ],

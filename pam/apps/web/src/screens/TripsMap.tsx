@@ -66,21 +66,36 @@ const styles = stylex.create({
     minHeight: '48px',
   },
   pinAt: (left: number, top: number) => ({ left: `${left}%`, top: `${top}%` }),
+  // A black disc with a tip, the icon white inside it, smaller (Will,
+  // 5 October, D-268, after the reference's "Your stay" pin).
   pinTile: {
-    width: '56px',
-    height: '56px',
-    borderRadius: '14px',
-    borderWidth: '3px',
+    position: 'relative',
+    width: '40px',
+    height: '40px',
+    borderRadius: '50%',
+    borderWidth: '2px',
     borderStyle: 'solid',
-    borderColor: colorVars['--color-background-body'],
-    backgroundColor: colorVars['--color-background-muted'],
-    color: colorVars['--color-icon-accent'],
-    boxShadow: '0 4px 14px oklch(0 0 0 / 22%)',
+    borderColor: '#FFFFFF',
+    backgroundColor: '#111111',
+    color: '#FFFFFF',
+    boxShadow: '0 3px 10px oklch(0 0 0 / 28%)',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  pinName: { fontSize: '14px', fontWeight: 700, textAlign: 'center', maxWidth: '130px', lineHeight: 1.2 },
-  pinWhen: { fontSize: '13px', textAlign: 'center', whiteSpace: 'nowrap' },
+  // The tip: a small black square turned 45°, tucked under the disc.
+  pinTip: {
+    position: 'absolute',
+    bottom: '-6px',
+    left: '50%',
+    width: '10px',
+    height: '10px',
+    marginInlineStart: '-5px',
+    transform: 'rotate(45deg)',
+    backgroundColor: '#111111',
+    borderRadius: '2px',
+  },
+  pinName: { fontSize: '12px', fontWeight: 700, textAlign: 'center', maxWidth: '120px', lineHeight: 1.2, marginTop: '8px' },
+  pinWhen: { fontSize: '12px', textAlign: 'center', whiteSpace: 'nowrap' },
 });
 
 export function TripsMap({ pins }: { readonly pins: readonly TripPin[] }) {
@@ -127,6 +142,7 @@ function PreviewTripsMap({ pins: all }: { readonly pins: readonly TripPin[] }) {
             {...stylex.props(styles.pin, styles.pinAt(at.left, at.top))}
           >
             <VStack xstyle={styles.pinTile} aria-hidden>
+              <VStack xstyle={styles.pinTip} />
               {pin.art}
             </VStack>
             <Text xstyle={styles.pinName} aria-hidden>
@@ -162,6 +178,15 @@ declare global {
     gm_authFailure?: () => void;
   }
 }
+
+/** A black disc with a white ring and a tip, for Google's markers (D-268). */
+const PIN_SVG =
+  'data:image/svg+xml;charset=utf-8,' +
+  encodeURIComponent(
+    '<svg xmlns="http://www.w3.org/2000/svg" width="36" height="46" viewBox="0 0 36 46">' +
+      '<path d="M18 45 L12 32 A17 17 0 1 1 24 32 Z" fill="#111" stroke="#fff" stroke-width="2"/>' +
+      '<circle cx="18" cy="17" r="5" fill="#fff"/></svg>',
+  );
 
 function loadGoogleMaps(): Promise<GoogleMapsGlobal> {
   if (window.google?.maps) return Promise.resolve(window.google);
@@ -210,7 +235,13 @@ function GoogleTripsMap({ pins, onFail }: { readonly pins: readonly TripPin[]; r
         for (const pin of pins) {
           const position = { lat: pin.lat, lng: pin.lon };
           bounds.extend(position);
-          const marker = new google.maps.Marker({ map, position, title: `${pin.name}, ${pin.when}` });
+          const marker = new google.maps.Marker({
+            map,
+            position,
+            title: `${pin.name}, ${pin.when}`,
+            // The same black pin as the drawn preview (D-268).
+            icon: { url: PIN_SVG, anchor: { x: 18, y: 44 } },
+          });
           marker.addListener('click', () => navigate(pin.href));
         }
         // Room at the bottom for the half-open drawer.

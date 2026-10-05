@@ -58,7 +58,8 @@ card sits under the pictures, flat on the white, and the code step's button
 is the same width as the one before it. "My connections" says "People willing to
 help". Inviting a member is described as "People looking for resources". A
 program lead's Home opens on the week. Category chips scroll all the way to
-the screen edge.
+the screen edge. On Trips the map pins are small black
+circles with a point, and "+ New trip" is a light button at the top of the map.
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 

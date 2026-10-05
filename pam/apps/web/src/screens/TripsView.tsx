@@ -8,7 +8,8 @@ import { HStack } from '@astryxdesign/core/HStack';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { PlusIcon, TripsIcon } from '@pam/ui';
-import { IconButton } from '@astryxdesign/core/IconButton';
+import { Button } from '@astryxdesign/core/Button';
+import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { readAddedTrips } from '@/lib/addedTrips';
 import { MapDrawer } from '@pam/ui/MapDrawer';
 import { Confetti } from '@pam/ui/SuccessScreen';
@@ -79,12 +80,19 @@ const styles = stylex.create({
     marginInline: 'auto',
     maxWidth: '560px',
   },
-  // Only the + sits here now, so it lets taps through to the map around it.
+  // "+ New trip", a light pill at the top centre — the reference's "Search
+  // the map" (Will, 5 October, D-268), in place of the dark green +.
   newTrip: {
-    width: '52px',
-    height: '52px',
-    borderRadius: '50%',
-    boxShadow: '0 4px 14px oklch(0 0 0 / 22%)',
+    minHeight: '44px',
+    paddingInline: '18px',
+    borderRadius: '999px',
+    borderWidth: 0,
+    fontSize: '15px',
+    fontWeight: 600,
+    gap: '6px',
+    backgroundColor: colorVars['--color-background-body'],
+    color: colorVars['--color-text-primary'],
+    boxShadow: '0 2px 10px light-dark(oklch(0 0 0 / 14%), oklch(0 0 0 / 45%))',
   },
   title: { fontSize: '26px', lineHeight: 1.2, fontWeight: 700, textAlign: 'center' },
   count: { fontSize: '15px', textAlign: 'center' },
@@ -101,7 +109,7 @@ const styles = stylex.create({
 });
 
 const ART = { width: 40, height: 40, 'aria-hidden': true } as const;
-const PIN_ART = { width: 28, height: 28, 'aria-hidden': true } as const;
+const PIN_ART = { width: 20, height: 20, 'aria-hidden': true } as const;
 
 export function TripsView({ trips, headerActions, justAdded = null }: TripsViewProps) {
   const { t, locale } = useI18n();
@@ -132,7 +140,7 @@ export function TripsView({ trips, headerActions, justAdded = null }: TripsViewP
       />
 
       {headerActions ? (
-        <HStack gap={2} align="center" justify="end" wrap="nowrap" xstyle={styles.top}>
+        <HStack gap={2} align="center" justify="center" wrap="nowrap" xstyle={styles.top}>
           {headerActions}
         </HStack>
       ) : null}
@@ -246,17 +254,17 @@ export function TripsScreen({ headerActions }: { readonly headerActions?: ReactN
   );
 }
 
-/** The dark green + (D-225): a new trip, in the booking flow. */
+/** "+ New trip" (D-225, restyled by D-268): a new trip, in the booking flow. */
 export function NewTripButton() {
   const { t } = useI18n();
   return (
-    <IconButton
+    <Button
       label={t('trips.new')}
-      variant="primary"
+      variant="secondary"
       href="/trips/new/"
       icon={
         <HStack>
-          <PlusIcon width={24} height={24} aria-hidden />
+          <PlusIcon width={18} height={18} aria-hidden />
         </HStack>
       }
       xstyle={styles.newTrip}
