@@ -6444,6 +6444,29 @@ there, what you have. The screen now follows that order.
 - **Proven by:** typecheck, config 236/236, the full e2e suite 561/561,
   and Storybook screenshots in English and Spanish.
 
+### D-280 — Every text action is a link, not a pill
+
+Will, 5 October, on "Check hours on Google": "should not have this weird
+hover, let's make this a link instead". The same complaint as D-271's,
+about a button that rule had not reached.
+
+- **`textLinkLook`** (`@pam/ui/TextLink`) is the D-271 look on its own: no
+  padding, no background image on hover or press, the accent colour and an
+  underline on hover. A text button that is not a `TextLink` adds it after
+  its own size styles.
+- **Applied to:**
+  - "Check hours on Google" on a place;
+  - the Cancel beside the search bar on Explore, Messages, the program
+    lead's schedule and Connect.
+- **Not applied, on purpose:**
+  - outlined buttons (Program's and Policies' Edit), which look like
+    buttons at rest;
+  - buttons in dialogs;
+  - the drawer's grab handle;
+  - the alert banner's action, which sits on a coloured strip.
+- **Proven by:** typecheck, and Storybook hover measured on "Check hours on
+  Google" (`background-image: none`, underline, accent colour).
+
 ---
 
 ## Notes for whoever picks this up next

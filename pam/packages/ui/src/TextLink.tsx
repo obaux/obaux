@@ -43,6 +43,14 @@ const styles = stylex.create({
   quiet: { minHeight: pam.touchTargetMin, fontSize: '15px', ...linkLook },
 });
 
+/**
+ * The same look for a text button that is not a `TextLink` — Cancel beside
+ * a search, Edit in a header, "Check hours on Google" (Will, 5 October,
+ * D-280: "should not have this weird hover, let's make this a link"). Pass
+ * it after the button's own size styles.
+ */
+export const textLinkLook = stylex.create({ link: linkLook });
+
 export function TextLink({ label, href, onClick, isDisabled, size = 'default' }: TextLinkProps) {
   return (
     <Button

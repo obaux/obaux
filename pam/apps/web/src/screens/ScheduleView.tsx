@@ -14,7 +14,7 @@ import { SegmentedControl, SegmentedControlItem } from '@astryxdesign/core/Segme
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
-import { ExploreIcon, NoResultsIcon, Page, TripsIcon } from '@pam/ui';
+import { ExploreIcon, NoResultsIcon, Page, TripsIcon, textLinkLook } from '@pam/ui';
 import { SearchField } from '@pam/ui/SearchPill';
 import { LargeTitleHeader } from '@pam/ui/LargeTitleHeader';
 import { useI18n } from '@/lib/i18n';
@@ -297,7 +297,7 @@ export function ScheduleView({
                 setIsSearching(false);
                 setQuery('');
               }}
-              xstyle={styles.cancel}
+              xstyle={[styles.cancel, textLinkLook.link]}
             />
           </HStack>
         ) : (

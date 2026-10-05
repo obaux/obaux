@@ -15,6 +15,7 @@ import { BookmarkIcon, FlagIcon, PhoneIcon, PlacesIcon, ShareIcon } from './icon
 import { BigButton } from './BigButton.js';
 import { CATEGORY_DEFINITIONS, type Category } from '@pam/config';
 import { pam } from './tokens.stylex.js';
+import { textLinkLook } from './TextLink.js';
 
 /**
  * One place, on its own screen.
@@ -374,7 +375,8 @@ export function PlaceDetail({
                 target="_blank"
                 rel="noreferrer"
                 icon={<PlacesIcon />}
-                xstyle={styles.hoursLink}
+                // A link, not a pill (Will, 5 October, D-280).
+                xstyle={[styles.hoursLink, textLinkLook.link]}
               />
             ) : null}
           </VStack>

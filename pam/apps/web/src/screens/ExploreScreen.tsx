@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { EducationIcon, FamilyServicesIcon, Notice, PlaceCard, PlusIcon, ScrollReveal, WorkforceIcon } from '@pam/ui';
+import { EducationIcon, FamilyServicesIcon, Notice, PlaceCard, PlusIcon, ScrollReveal, WorkforceIcon, textLinkLook } from '@pam/ui';
 import { SearchLauncher, SearchPill, type SearchPillItem } from '@pam/ui/SearchPill';
 import { NextTripCard } from '@pam/ui/NextTripCard';
 import { DUMMY_TRIPS } from '@pam/config/dummy-trips';
@@ -198,7 +198,7 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
               setIsSearching(false);
               setClearSignal((n) => n + 1);
             }}
-            xstyle={styles.cancel}
+            xstyle={[styles.cancel, textLinkLook.link]}
           />
         ) : mode === 'programs' ? (
           <>

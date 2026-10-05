@@ -46,7 +46,7 @@ export { RoleSwitch, type RoleSwitchProps } from './RoleSwitch.js';
  * (17 September). Import it as `@pam/ui/OnboardingSlides`.
  */
 export { NavTile, type NavTileProps } from './NavTile.js';
-export { TextLink, type TextLinkProps } from './TextLink.js';
+export { TextLink, textLinkLook, type TextLinkProps } from './TextLink.js';
 export { NotificationBell, type NotificationBellProps } from './NotificationBell.js';
 export {
   NotificationList,

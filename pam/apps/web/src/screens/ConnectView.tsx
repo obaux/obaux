@@ -11,7 +11,7 @@ import { IconButton } from '@astryxdesign/core/IconButton';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
-import { BigButton, Loading, Page, PlaceCard } from '@pam/ui';
+import { BigButton, Loading, Page, PlaceCard, textLinkLook } from '@pam/ui';
 import { CategoryChips, type CategoryChip, type ChipTone } from '@pam/ui/CategoryChips';
 import { SearchField } from '@pam/ui/SearchPill';
 import { SubPageHeader } from '@pam/ui/SubPage';
@@ -238,7 +238,7 @@ export function ConnectView({ personId, name }: { readonly personId: string; rea
               setIsSearching(false);
               setQuery('');
             }}
-            xstyle={styles.cancel}
+            xstyle={[styles.cancel, textLinkLook.link]}
           />
         </HStack>
       ) : (

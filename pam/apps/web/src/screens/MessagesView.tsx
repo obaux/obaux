@@ -10,7 +10,7 @@ import { List } from '@astryxdesign/core/List';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
-import { ExploreIcon, MessagesIcon, NewMessageIcon, NoResultsIcon, Page } from '@pam/ui';
+import { ExploreIcon, MessagesIcon, NewMessageIcon, NoResultsIcon, Page, textLinkLook } from '@pam/ui';
 import { LargeTitleHeader } from '@pam/ui/LargeTitleHeader';
 import { SearchField } from '@pam/ui/SearchPill';
 import { useI18n } from '@/lib/i18n';
@@ -180,7 +180,7 @@ export function MessagesView({
             label={t('messages.search.cancel')}
             variant="ghost"
             onClick={() => setQuery(null)}
-            xstyle={styles.cancel}
+            xstyle={[styles.cancel, textLinkLook.link]}
           />
         </HStack>
       ) : (
