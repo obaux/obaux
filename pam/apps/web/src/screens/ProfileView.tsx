@@ -133,7 +133,12 @@ export function ProfileView({
             (D-278: it said "Getting Going" while Points said "Rooted") —
             opening Points. Past visits are still on Trips.
           */}
-          <FeatureTile label={t(badgeForPoints(points).labelKey)} href="/points/" art={<AwardIcon {...ART} />} />
+          <FeatureTile
+            label={t(badgeForPoints(points).labelKey)}
+            hint={t('profile.tile.badgeHint')}
+            href="/points/"
+            art={<AwardIcon {...ART} />}
+          />
           <FeatureTile label={t('profile.tile.connections')} href="/connections/" art={<ConnectionsIcon {...ART} />} />
         </FeatureTileRow>
       ) : null}

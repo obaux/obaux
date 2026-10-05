@@ -8,7 +8,9 @@ import { Heading } from '@astryxdesign/core/Heading';
 import { Badge } from '@astryxdesign/core/Badge';
 import { IconButton } from '@astryxdesign/core/IconButton';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
+import type { Category } from '@pam/config';
 import { BookmarkIcon } from './icons.js';
+import { CategoryArt } from './CategoryArt.js';
 import { pam } from './tokens.stylex.js';
 
 /**
@@ -42,6 +44,11 @@ export interface PlaceCardProps {
   readonly name: string;
   /** Where the place's own screen is. The whole card goes here. */
   readonly href: string;
+  /**
+   * Its kind, drawn as a small illustration at the top left (D-287). Left
+   * out, the card is text only — the layout still holds.
+   */
+  readonly category?: Category | null;
   /** One sentence, from the catalogue. Clipped to two lines. */
   readonly description?: string | null;
   /**
@@ -118,9 +125,22 @@ const styles = stylex.create({
       zIndex: 0,
     },
   },
-  meta: { fontSize: '15px' },
-  open: { fontSize: '15px', fontWeight: 600, color: colorVars['--color-text-accent'] },
-  shut: { fontSize: '15px', fontWeight: 600 },
+  // Quieter and smaller (Will, 5 October, D-287): open first, in the brand
+  // colour with a small dot; the distance after it, grey. The name leads.
+  meta: { fontSize: '14px', lineHeight: 1.35, color: colorVars['--color-text-secondary'] },
+  open: { fontSize: '14px', lineHeight: 1.35, fontWeight: 500, color: colorVars['--color-text-accent'] },
+  shut: { fontSize: '14px', lineHeight: 1.35, fontWeight: 500 },
+  dot: {
+    width: '6px',
+    height: '6px',
+    borderRadius: '50%',
+    flexShrink: 0,
+    backgroundColor: colorVars['--color-text-accent'],
+  },
+  words: { flexGrow: 1, minWidth: 0 },
+  // The tile sits at the very top left, so the space above it and beside
+  // it are the card's one padding (Will, D-287).
+  art: { flexShrink: 0, borderRadius: '16px', overflow: 'hidden' },
   description: {
     fontSize: '15px',
     lineHeight: 1.45,
@@ -143,12 +163,19 @@ const styles = stylex.create({
     minWidth: pam.touchTargetMin,
     fontSize: '22px',
     color: colorVars['--color-icon-accent'],
+    // The whole 48px stays tappable, but it no longer sets the row's height
+    // or pushes the mark below the name (Will, D-287): pulled up and out so
+    // the bookmark's middle sits on the name's first line, and its right
+    // edge is about as far in as the art's left.
+    marginBlock: '-12px',
+    marginInlineEnd: '-12px',
   },
 });
 
 export function PlaceCard({
   name,
   href,
+  category = null,
   description,
   distanceLabel,
   status,
@@ -161,58 +188,63 @@ export function PlaceCard({
   labels,
 }: PlaceCardProps) {
   return (
-    <Card padding={6} xstyle={styles.card}>
-      <VStack gap={2}>
-        <HStack gap={2} align="start" justify="between" wrap="nowrap">
-          <Heading level={3} xstyle={styles.name}>
-            <a href={href} {...stylex.props(styles.link)}>
-              {name}
-            </a>
-          </Heading>
-          {/*
-            Save is the only control on the card, because it is the only
-            answer to the question the card asks. Once saved it is the filled
-            mark alone — the state, the way it is on every other phone app —
-            and the word moves to the accessible name, which `aria-pressed`
-            then qualifies. An icon-only control with no name is the classic
-            way to make a button invisible to somebody who cannot see it.
-          */}
-          {action ? (
-            <HStack xstyle={styles.action}>{action}</HStack>
-          ) : onSave ? (
-            <IconButton
-              label={isSaved ? labels.saved : labels.save}
-              icon={<BookmarkIcon isFilled={isSaved} />}
-              variant="ghost"
-              onClick={onSave}
-              aria-pressed={isSaved}
-              xstyle={styles.save}
-            />
+    <Card padding={4} xstyle={styles.card}>
+      <VStack gap={3}>
+        <HStack gap={3} align="start" wrap="nowrap">
+          {category ? (
+            <HStack xstyle={styles.art}>
+              <CategoryArt category={category} />
+            </HStack>
           ) : null}
-        </HStack>
+          <VStack gap={0.5} xstyle={styles.words}>
+            <HStack gap={2} align="start" justify="between" wrap="nowrap">
+              <Heading level={3} xstyle={styles.name}>
+                <a href={href} {...stylex.props(styles.link)}>
+                  {name}
+                </a>
+              </Heading>
+              {/*
+                Save is the only control on the card, because it is the only
+                answer to the question the card asks. Once saved it is the
+                filled mark alone, and the word moves to the accessible name,
+                which `aria-pressed` then qualifies.
+              */}
+              {action ? (
+                <HStack xstyle={styles.action}>{action}</HStack>
+              ) : onSave ? (
+                <IconButton
+                  label={isSaved ? labels.saved : labels.save}
+                  icon={<BookmarkIcon isFilled={isSaved} />}
+                  variant="ghost"
+                  onClick={onSave}
+                  aria-pressed={isSaved}
+                  xstyle={styles.save}
+                />
+              ) : null}
+            </HStack>
 
-        {/*
-          How far, and whether it is open — the two facts that decide whether
-          somebody sets off. Open is in the brand colour; shut is not coloured
-          at all, because a red chip on two thirds of a list at eight in the
-          evening reads as a screen full of errors.
-        */}
-        <HStack gap={2} align="center" wrap="wrap">
-          {distanceLabel ? (
-            <Text type="supporting" xstyle={styles.meta}>
-              {distanceLabel}
-            </Text>
-          ) : null}
-          {status ? (
-            <Text
-              type={status.isOpen ? 'body' : 'supporting'}
-              xstyle={status.isOpen ? styles.open : styles.shut}
-            >
-              {status.label}
-            </Text>
-          ) : null}
-          {audienceLabel ? <Badge variant="warning" label={audienceLabel} /> : null}
-          {flagLabel ? <Badge variant="error" label={flagLabel} /> : null}
+            {/*
+              Whether it is open, then how far — the two facts that decide
+              whether somebody sets off. Open is in the brand colour; shut is
+              not coloured at all, because a red chip on two thirds of a list
+              at eight in the evening reads as a screen full of errors.
+            */}
+            <HStack gap={1.5} align="center" wrap="wrap">
+              {status?.isOpen ? <HStack aria-hidden xstyle={styles.dot} /> : null}
+              {status ? (
+                <Text type={status.isOpen ? 'body' : 'supporting'} xstyle={status.isOpen ? styles.open : styles.shut}>
+                  {status.label}
+                </Text>
+              ) : null}
+              {distanceLabel ? (
+                <Text type="supporting" xstyle={styles.meta}>
+                  {status ? `· ${distanceLabel}` : distanceLabel}
+                </Text>
+              ) : null}
+              {audienceLabel ? <Badge variant="warning" label={audienceLabel} /> : null}
+              {flagLabel ? <Badge variant="error" label={flagLabel} /> : null}
+            </HStack>
+          </VStack>
         </HStack>
 
         {description ? (

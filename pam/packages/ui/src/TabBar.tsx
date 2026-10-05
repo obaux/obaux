@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
+import { edgeFade } from './edgeFade.js';
 import { Avatar } from '@astryxdesign/core/Avatar';
 import { HStack } from '@astryxdesign/core/HStack';
 import { StatusDot } from '@astryxdesign/core/StatusDot';
@@ -38,6 +39,12 @@ export interface TabBarProps {
    * no Trips. Defaults to the member's bar.
    */
   readonly tabs?: readonly TabKey[];
+  /**
+   * The fade above the bar (D-283). Off where something opaque already
+   * rests on the bar — Trips' drawer, which a 96px fade would wash out
+   * almost entirely when docked (D-285).
+   */
+  readonly hasFade?: boolean;
   /** The landmark's name, e.g. "Main". */
   readonly label: string;
   /** The person's first name, for the Profile tab's initials. */
@@ -88,19 +95,6 @@ const styles = stylex.create({
     paddingBottom: 'env(safe-area-inset-bottom, 0px)',
   },
   inner: { width: '100%', maxWidth: '560px', marginInline: 'auto' },
-  // A white fade above the bar (Will, 5 October, D-283, D-284), so a card scrolling
-  // under it softens away instead of being cut off hard at the line.
-  // Decoration only: hidden, and never in the way of a tap on the card.
-  fade: {
-    position: 'absolute',
-    insetInline: 0,
-    bottom: '100%',
-    // Taller and stronger (Will, 5 October, D-284): eased, so it is already
-    // mostly page colour well before the bar rather than a thin grey band.
-    height: '96px',
-    pointerEvents: 'none',
-    backgroundImage: `linear-gradient(to bottom, transparent 0%, color-mix(in srgb, ${colorVars['--color-background-body']} 55%, transparent) 40%, color-mix(in srgb, ${colorVars['--color-background-body']} 90%, transparent) 75%, ${colorVars['--color-background-body']} 100%)`,
-  },
   // Holds the bar's height in the page, so the end of a long list scrolls
   // clear of it instead of sitting underneath.
   spacer: {
@@ -152,6 +146,7 @@ export function TabBar({
   isHome = false,
   homeIcon = 'house',
   tabs = MEMBER_TABS,
+  hasFade = true,
 }: TabBarProps) {
   const to = { ...DEFAULT_HREFS, ...hrefs };
 
@@ -201,7 +196,7 @@ export function TabBar({
     <>
       <VStack aria-hidden xstyle={styles.spacer} />
       <footer data-pam-tabbar="" {...stylex.props(styles.bar)}>
-        <VStack aria-hidden xstyle={styles.fade} />
+        {hasFade ? <VStack aria-hidden xstyle={edgeFade.above} /> : null}
         <HStack align="center" wrap="nowrap" xstyle={styles.inner}>
           <TabList
             value={current ?? ''}

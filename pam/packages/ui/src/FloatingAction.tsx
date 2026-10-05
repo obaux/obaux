@@ -4,6 +4,7 @@ import { HStack } from '@astryxdesign/core/HStack';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { MenuList } from './MenuList.js';
+import { edgeFade } from './edgeFade.js';
 
 /**
  * One row floating just above the bottom bar (D-218, Will, 2 October):
@@ -32,7 +33,9 @@ const styles = stylex.create({
     position: 'fixed',
     insetInline: 0,
     bottom: `calc(${BAR}px + env(safe-area-inset-bottom, 0px))`,
-    zIndex: 9,
+    // Above the tab bar's own fade (D-285), which would otherwise wash over
+    // this strip; it draws the same fade above itself instead.
+    zIndex: 11,
     backgroundColor: colorVars['--color-background-body'],
     borderTopWidth: '1px',
     borderTopStyle: 'solid',
@@ -48,6 +51,7 @@ export function FloatingAction({ label, href, icon, description }: FloatingActio
     <>
       <VStack aria-hidden xstyle={[styles.spacer, description ? styles.spacerTall : null]} />
       <HStack xstyle={styles.dock}>
+        <VStack aria-hidden xstyle={edgeFade.above} />
         <VStack xstyle={styles.inner}>
           <MenuList label={label} items={[{ id: 'action', label, href, icon, ...(description ? { description } : {}) }]} />
         </VStack>

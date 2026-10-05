@@ -266,6 +266,7 @@ export function ConnectView({ personId, name }: { readonly personId: string; rea
               <PlaceCard
                 key={program.id}
                 name={program.name}
+                category={program.category}
                 href={`/place/?id=${encodeURIComponent(program.id)}`}
                 description={program.description}
                 {...(miles ? { distanceLabel: t(miles.key, miles.vars) } : {})}

@@ -32,19 +32,27 @@ import { VisuallyHidden } from '@astryxdesign/core/VisuallyHidden';
 
 const styles = stylex.create({
   card: { width: '100%' },
+  grow: { flexGrow: 1, minWidth: 0 },
 });
 
 function PlaceCardSkeleton({ index }: { readonly index: number }) {
-  const base = index * 4;
+  const base = index * 5;
+  // The card's shape (D-287): the art at the top left, the name and the
+  // open line beside it, the description under both.
   return (
     <Card padding={4} xstyle={styles.card}>
-      <VStack gap={2}>
-        <Skeleton width="60%" height={20} index={base} />
-        <HStack gap={2} align="center">
-          <Skeleton width={56} height={14} index={base + 1} />
-          <Skeleton width={96} height={14} index={base + 2} />
+      <VStack gap={3}>
+        <HStack gap={3} align="start" wrap="nowrap">
+          <Skeleton width={56} height={56} radius="rounded" index={base} />
+          <VStack gap={2} xstyle={styles.grow}>
+            <Skeleton width="70%" height={20} index={base + 1} />
+            <HStack gap={2} align="center">
+              <Skeleton width={96} height={12} index={base + 2} />
+              <Skeleton width={48} height={12} index={base + 3} />
+            </HStack>
+          </VStack>
         </HStack>
-        <Skeleton width="100%" height={14} index={base + 3} />
+        <Skeleton width="100%" height={14} index={base + 4} />
       </VStack>
     </Card>
   );

@@ -1137,5 +1137,6 @@
   "trips.moved.title": "¡Tu visita cambió!",
   "trips.moved.body": "{place}, {day} a las {time}. Nos vemos allí.",
   "trips.moved.home": "Ir al inicio",
-  "trips.moved.note": "Te llevamos al inicio en unos segundos."
+  "trips.moved.note": "Te llevamos al inicio en unos segundos.",
+  "profile.tile.badgeHint": "Tu insignia"
 }

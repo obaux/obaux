@@ -284,6 +284,7 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
           <ScrollReveal key={place.id} index={index}>
             <PlaceCard
               name={place.name}
+              category={place.category}
               href={`/place/?id=${encodeURIComponent(place.id)}&from=${from}`}
               description={place.description}
               {...(miles ? { distanceLabel: t(miles.key, miles.vars) } : {})}

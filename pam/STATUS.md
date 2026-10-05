@@ -353,7 +353,11 @@ new level (D-278). A place opened from a trip leads with a green "Your next visi
 card whose "Change appointment" moves the visit and returns, with address and hours
 before About; Storybook's example places now share the example set's ids, so a saved
 one shows saved from a trip too (D-281). Saving the new time celebrates it
-(confetti, the new day and time) and goes home after 5 seconds or on Go home (D-282). A 96px eased fade sits above the tab bar so lists soften into it, with room for the last card to scroll clear (D-283, D-284). How points should be awarded — two rules live
+(confetti, the new day and time) and goes home after 5 seconds or on Go home (D-282). A 96px eased fade sits above the tab bar so lists soften into it, with room for the last card to scroll clear (D-283, D-284); a strip resting on the bar
+draws its own fade above it, and Trips has none (D-285). The tab bar exists only in
+Storybook's prototype: the live app has no bottom bar until the member shell is built.
+The award tile has a "Your badge" ribbon (D-286). Place cards lead with an illustrated
+category tile (`CategoryArt`), a top-aligned save, and a quieter open line (D-287). How points should be awarded — two rules live
 (save a place, finish setup), the rest to build, with order and open
 questions — is specified in `docs/points-awarding.md`. The
 signatures are example data too, kept only for the visit (session storage).

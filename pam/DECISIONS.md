@@ -6578,6 +6578,93 @@ Will, 5 October: "Let's make the fade stronger so it takes up more height."
 - **Proven by:** typecheck, and Storybook screenshots of Explore at the top
   and scrolled to the end.
 
+### D-285 — Nothing that rests on the bar sits under its fade
+
+Will, 5 October: "this could create conflicts for users with item stuck
+above the fade, so we should prob check z index of those to ensure items
+are visible through the fade."
+
+The fade is inside the tab bar (z-index 10). An audit of everything fixed
+to the bottom on a tab screen found two conflicts:
+
+- **"Invite someone" (`FloatingAction`):** it was at z-index 9, directly on
+  the bar, so the fade washed over it. It is now at z-index 11 and draws
+  the same fade above itself.
+- **Trips' drawer:** it ends at the bar. Docked, it is 112px tall, so a 96px
+  fade would wash out nearly all of it. `TabBar` takes `hasFade`, and the
+  prototype turns it off on Trips. Raising the drawer instead would have
+  put it over Trips' own top controls (z-index 7) when it is pulled up.
+
+Not affected:
+- the signing dock and the conversation composer, which are on screens
+  with no tab bar;
+- `SuccessScreen` (z-index 20), which has no bar.
+
+The style itself moved to `@pam/ui`'s `edgeFade`, so the bar and the strip
+draw an identical fade.
+
+One finding for STATUS: the tab bar exists only in Storybook's prototype.
+The live app has no bottom bar yet (the member shell is still to build), so
+none of this reaches the deployed site until it does.
+
+### D-286 — "Your badge" on the award tile
+
+Will, 5 October: on a member's Profile, "Rooted" needs "a hint that the
+item … is a reward… very subtly so it doesn't deviate from the symmetry
+against the connections item."
+
+- **What:** a small white pill, "Your badge", across the foot of the medal's
+  art (11px, bold, accent colour, a soft shadow), like a ribbon on a medal.
+- **Symmetry:** the pill is laid over the art, not added under it, so the
+  tile keeps exactly the size and the label position of Connections beside
+  it.
+- **Screen readers:** the tile's accessible name becomes "Your badge:
+  Rooted".
+- **Built as:** `FeatureTile` takes `hint`.
+
+### D-287 — Place cards: illustrated art at the top left, a quieter open line
+
+Will, 5 October, choosing option B from the mock: "ensure icon sits at top
+so padding on top and left match. Make open text and distance text more
+subtle and smaller", and "instead of bold icons on colored bg, can we
+create 2D illustration style icons… that matches style of sign in page
+carousel".
+
+- **`CategoryArt`** (`@pam/ui/CategoryArt`): one 56px illustration per
+  category, in the carousel's language:
+  - a ground cut by two diagonal shards;
+  - one object, lit from the left, with a darker right half for shadow;
+  - no outlines;
+  - the carousel's palette of orange, green, purple, pink and yellow.
+
+  The three pictures:
+  - **School and training:** a mortarboard on two books, on pink and purple.
+  - **Work and money:** a briefcase, on greens.
+  - **Family and food:** a grocery bag with greens and an apple, on purple.
+
+  Every colour is a theme data token (`--color-data-*-N`), never a raw hex,
+  written as literal strings because StyleX compiles them at build time.
+  The art is hidden from screen readers.
+- **`PlaceCard`, layout B:**
+  - The padding is 16px, and the art sits at the very top left, so the
+    space above it and beside it match.
+  - The name and the open line sit beside the art. The description runs
+    full width under both.
+  - The 48px Save button is pulled up and out with negative margins. The
+    bookmark's middle sits on the name's first line, and the button no
+    longer sets the row's height. That height was the 30px gap Will
+    disliked.
+- **The open line is quieter:** 14px instead of 15, at weight 500 instead of
+  600.
+  - Open comes first, with a 6px dot.
+  - The distance follows in grey, after a "·".
+  - A closed place keeps its uncoloured label.
+- **Where:** `PlaceCard` takes `category`, and every list passes it:
+  Explore, All programs, Saved, a member's saved list, Connect and Reported.
+  The loading skeleton has the same shape.
+- **Proven by:** typecheck, the web build, Storybook screenshots (Explore,
+  Profile, a case manager's Home, Trips), and the full e2e suite.
+
 ---
 
 ## Notes for whoever picks this up next

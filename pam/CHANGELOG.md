@@ -96,6 +96,10 @@ and comes back to the place. Its address and hours now come before what the
 place is. A place you saved shows as saved when you open it from a trip. Saving a new
 time shows a short celebration with the new day and time, then goes home.
 Cards scrolling under the bottom menu fade out over a taller band, and the end of a list scrolls clear of it.
+"Invite someone" stays clear above the fade, and Trips' drawer has none. A
+member's award on Profile carries a small "Your badge" ribbon. Place cards
+have a small illustration for their kind of place at the top left, the
+save mark lines up with the name, and the open line is smaller and quieter.
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 

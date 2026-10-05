@@ -63,6 +63,7 @@ const meta = {
   render: (args) => <LocalisedPlaceCard {...args} />,
   args: {
     name: learning.name,
+    category: learning.category,
     href: `/place/?id=${learning.id}&from=places`,
     description: learning.description,
     distanceLabel: 'places.miles?count=1.2',
@@ -84,6 +85,7 @@ export const Open: Story = {};
 export const Closed: Story = {
   args: {
     name: food.name,
+    category: food.category,
     description: food.description,
     distanceLabel: 'places.miles?count=0.4',
     status: { isOpen: false, label: 'place.closedUntil?time=09:00' },
