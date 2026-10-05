@@ -1122,12 +1122,11 @@
   "points.hero.top": "Llegaste a lo más alto de la escalera.",
   "points.waysTitle": "Cómo ganar puntos",
   "points.way.attend": "Ir a una visita",
-  "points.way.signup": "Inscribirte en un programa",
-  "points.way.streak": "Volver cada semana",
   "points.way.call": "Llamar a un lugar",
   "points.way.save": "Guardar un lugar",
   "points.way.plus": "+{count}",
-  "points.way.weekly": "+{count} por semana",
   "points.badgesTitle": "Insignias",
-  "points.levelUp": "Nuevo nivel: {level}"
+  "points.levelUp": "Nuevo nivel: {level}",
+  "points.way.plan": "Planear una visita a un programa",
+  "points.way.return": "Volver a un programa otra vez"
 }

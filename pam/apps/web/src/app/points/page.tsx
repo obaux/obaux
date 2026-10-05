@@ -16,6 +16,7 @@ import {
   FamilyServicesIcon,
   Page,
   PhoneIcon,
+  PlusIcon,
   StarIcon,
   TripsIcon,
   WorkforceIcon,
@@ -246,16 +247,19 @@ export default function PointsPage() {
       worth: t('points.way.plus', { count: POINTS_RULES.attend_appointment_verified.points }),
     },
     {
-      id: 'signup',
-      icon: <EducationIcon {...WAY_ICON} />,
-      label: t('points.way.signup'),
+      // In the app's own words (Will): a trip is how a member signs up.
+      id: 'plan',
+      icon: <PlusIcon {...WAY_ICON} />,
+      label: t('points.way.plan'),
       worth: t('points.way.plus', { count: POINTS_RULES.self_reported_signup.points }),
     },
     {
-      id: 'streak',
+      // A return, not a weekly streak (Will, 5 October): PAM cannot know how
+      // each program runs its weeks, only that somebody went back.
+      id: 'return',
       icon: <StarIcon {...WAY_ICON} />,
-      label: t('points.way.streak'),
-      worth: t('points.way.weekly', { count: STREAK_POINTS_PER_WEEK }),
+      label: t('points.way.return'),
+      worth: t('points.way.plus', { count: STREAK_POINTS_PER_WEEK }),
     },
     {
       id: 'call',

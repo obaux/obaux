@@ -6405,10 +6405,19 @@ there, what you have. The screen now follows that order.
 - **Ways to earn**: five one-line rows from the real rules
   (`POINTS_RULES`, `STREAK_POINTS_PER_WEEK`), each with what it is worth:
   - show up to a visit, +100;
-  - sign up for a program, +25;
-  - come back each week, +50 a week;
+  - plan a trip to a program, +25;
+  - go back to a program again, +50;
   - call a place, +10;
   - save a place, +5.
+- **Addendum, same day (Will):** the first version said "Come back each
+  week, +50 a week" and "Sign up for a program". Neither fits:
+  - PAM cannot know how each program runs its weeks, only that somebody
+    went back, so the row is "Go back to a program again, +50", with no
+    "a week".
+  - Signing up is planning a trip, in the app's own words, so the row is
+    "Plan a trip to a program", with a + mark.
+  - The weekly-streak rule in config is unchanged; whoever implements
+    awarding should make it a return bonus to match.
 - **The ladder, compact.**
   - One 44px row a rung: a 32px mark, the name, and the status on the
     right (Earned / 350 more to go / Coming later).
