@@ -359,7 +359,7 @@ Storybook's prototype: the live app has no bottom bar until the member shell is 
 The award tile has a "Your badge" ribbon (D-286). Place cards lead with an illustrated
 category tile (`CategoryArt`), a top-aligned save, and a quieter open line (D-287). Category chips glow behind
 their icons (D-288). The docked Trips drawer is 100px with its list hidden; unread dots on
-the tab bar and the bell use `pam.brandPink`, the selected tab's pink (D-289). How points should be awarded — two rules live
+the tab bar and the bell use `pam.brandPink`, the selected tab's pink (D-289). The half stop is 50% of the height + 48px (D-290). How points should be awarded — two rules live
 (save a place, finish setup), the rest to build, with order and open
 questions — is specified in `docs/points-awarding.md`. The
 signatures are example data too, kept only for the visit (session storage).

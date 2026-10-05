@@ -6713,6 +6713,19 @@ buttons on top pages also."
 - **Proven by:** typecheck, and Storybook screenshots of the docked drawer at
   390px and 320px and of a case manager's header bell.
 
+### D-290 — The half-open drawer is 48px taller
+
+Will, 5 October: "let's make the middle drawer 48px taller so it shows more
+of the third card from list."
+
+- **Half:** now half the available height plus 48px, capped at the full
+  height so a short screen never gets a "half" taller than "full".
+- **Why:** a member sees well into the third trip, so it is clear the list
+  goes on without having to pull the drawer up.
+- **Not changed:** dock (D-289) and full.
+- **Proven by:** typecheck, and a Storybook screenshot at 390×844 showing the
+  third trip's name, date and companion.
+
 ---
 
 ## Notes for whoever picks this up next

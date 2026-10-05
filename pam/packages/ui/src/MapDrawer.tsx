@@ -128,7 +128,9 @@ export function MapDrawer({
   const available = Math.max(viewport - bottomOffset, DOCK + 40);
   const heights: Record<DrawerStop, number> = {
     dock: DOCK,
-    half: Math.round(available * 0.5),
+    // Half, plus 48px (Will, 5 October, D-290): enough to see into the
+    // third trip, so it is clear the list goes on. Never past full.
+    half: Math.min(Math.round(available * 0.5) + 48, Math.max(available - topOffset, DOCK + 40)),
     full: Math.max(available - topOffset, DOCK + 40),
   };
 

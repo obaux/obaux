@@ -103,7 +103,7 @@ save mark lines up with the name, and the open line is smaller and quieter.
 Category chips have a soft glow of their colour behind each icon.
 Closed, the Trips drawer shows only its title, with no card peeking out. The
 "something new" dots on the bottom menu and the bell are the same bright pink
-as the selected tab.
+as the selected tab. Half open, the Trips drawer shows more of the third trip.
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 
