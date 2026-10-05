@@ -363,7 +363,11 @@ the tab bar and the bell use `pam.brandPink`, the selected tab's pink (D-289). T
 `MenuList` rows (directions, message, call, website), and directions carry Google's
 place ID when known (D-291). Saved's tiles are white with a glowing category icon, and
 show a visit's day and time when one is booked, opening the visit view (D-292). `GlowIcon` (sm/md/lg) is the single, softer glow; trip
-cards and the next-visit card use `CategoryGlow` on white tiles (D-293). How points should be awarded — two rules live
+cards and the next-visit card use `CategoryGlow` on white tiles (D-293). Directions set no
+travel mode (D-294, SOP A17); MenuList descriptions are 14px. Every badge, every rung and
+Profile's two tiles have pictures from one art kit (`art/kit.tsx`, `BadgeArt`,
+`ConnectionsArt`), and a unit test keeps badges and pictures in step (D-295). CI's unit-test
+job was red from D-287 to D-293 (a PlaceCard test) and is fixed with D-295. How points should be awarded — two rules live
 (save a place, finish setup), the rest to build, with order and open
 questions — is specified in `docs/points-awarding.md`. The
 signatures are example data too, kept only for the visit (session storage).

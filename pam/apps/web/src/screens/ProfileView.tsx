@@ -5,9 +5,7 @@ import { VStack } from '@astryxdesign/core/VStack';
 import { Divider } from '@astryxdesign/core/Divider';
 import { badgeForPoints, type Role } from '@pam/config';
 import {
-  AwardIcon,
   BellIcon,
-  ConnectionsIcon,
   GlobeIcon,
   HelpIcon,
   LegalIcon,
@@ -19,6 +17,7 @@ import {
 } from '@pam/ui';
 import { LargeTitleHeader } from '@pam/ui/LargeTitleHeader';
 import { FeatureTile, FeatureTileRow, ProfileSummary, PromoCard } from '@pam/ui/ProfileCards';
+import { BadgeArt, ConnectionsArt } from '@pam/ui/BadgeArt';
 import { MenuList } from '@pam/ui/MenuList';
 import { useI18n } from '@/lib/i18n';
 
@@ -137,9 +136,10 @@ export function ProfileView({
             label={t(badgeForPoints(points).labelKey)}
             hint={t('profile.tile.badgeHint')}
             href="/points/"
-            art={<AwardIcon {...ART} />}
+            // The level's own picture (D-295) — Rooted is a seedling.
+            art={<BadgeArt badgeKey={badgeForPoints(points).key} size={88} shape="square" />}
           />
-          <FeatureTile label={t('profile.tile.connections')} href="/connections/" art={<ConnectionsIcon {...ART} />} />
+          <FeatureTile label={t('profile.tile.connections')} href="/connections/" art={<ConnectionsArt size={88} />} />
         </FeatureTileRow>
       ) : null}
 

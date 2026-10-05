@@ -289,7 +289,7 @@ export default function GalleryPage() {
           placeholderNote="These are sample hours while PAM checks the real ones. Call before you go."
           phone="+12155550100"
           website="https://example.org"
-          directionsHref="https://www.google.com/maps/dir/?api=1&destination=1234%20Market%20St&travelmode=walking"
+          directionsHref="https://www.google.com/maps/dir/?api=1&destination=1234%20Market%20St"
           hoursHref="https://www.google.com/maps/search/?api=1&query=Riverside"
           onSave={() => {}}
           onShare={() => {}}

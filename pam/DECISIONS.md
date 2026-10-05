@@ -6841,6 +6841,94 @@ consistent everywhere the glow is used."
 - **Proven by:** typecheck, the web build, Storybook screenshots (Trips,
   Explore's chips and next visit, Saved), and the full e2e suite (570).
 
+### D-294 — Directions pick no travel mode; a row's second line is smaller
+
+Will, 5 October: "For get direction, let's not set a walking route, just
+general. Replace any text saying walking route with something more
+general, and update this component so the subtext is smaller size, update
+across entire app."
+
+- **Directions:** `directionsHref` no longer sends `travelmode=walking`.
+  Google Maps chooses the mode, which is usually whatever the member used
+  last. This reverses §5.1, so it is recorded as A17 in
+  `docs/sop-amendments.md`. Coordinates still win, and the place ID still
+  rides along (D-291).
+- **Wording:** the row's line reads "Open in Google Maps" ("Abrir en Google
+  Maps"). Nothing else in the app said "walking".
+- **Smaller second line:** `MenuList`'s description is 14px, down from
+  15px, everywhere a `MenuList` row is used. Labels stay at 18px.
+- **Proven by:** `place.spec.ts`, which now asserts there is no travel
+  mode, and the UI unit test for `directionsHref`.
+
+### D-295 — Pictures for Profile's tiles, every badge and every rung
+
+Will, 5 October: "I want illustrations for the profile screen:
+connections icon and reward/award icon. Then next create illustrations for
+each badge, and ladder award using that same style."
+
+- **One kit:** `art/kit.tsx` holds the whole palette as classes (every
+  `--color-data-<hue>-<1..5>`), the shapes (`P`, `C`, `R`, `L`), `Ground`
+  and `ArtFrame`. The frame is a 56-grid clipped to a rounded square or a
+  circle. `CategoryArt` was rewritten on the kit; its pictures are
+  unchanged.
+- **`BadgeArt`:** twenty pictures, one for each badge in config, each the
+  object it is named for, on cut colour.
+
+  | Group | Badge and picture |
+  |---|---|
+  | Ladder | Returned: an open, lit door |
+  | | Rooted: a seedling with roots |
+  | | Builder: a hammer |
+  | | Provider: a full basket |
+  | | Pillar: a column |
+  | | Elder: a carved staff |
+  | | Chief: a crown |
+  | Category | Scholar: an open book |
+  | | Griot: a scroll |
+  | | Craftsman: a wrench and bolt |
+  | | Cornerstone: a brick wall and its stone |
+  | | Anchor: an anchor |
+  | | Steward: a hearth |
+  | Milestone | Firstborn: a sunrise |
+  | | Torchbearer: a torch |
+  | | Drum: a djembe |
+  | | Rainmaker: a rain cloud |
+  | | Homecoming: a house and its path |
+  | | Sankofa: a bird looking back to its egg |
+  | | Kinkeeper: a family of three |
+
+  - A badge is a medal, so it is round by default.
+  - Not earned yet, it is drawn grey at 60%.
+  - A unit test (`badge-art.test.tsx`) fails if a badge in config has no
+    picture.
+- **Profile:**
+  - The award tile shows the member's current level's own picture (Rooted
+    is the seedling), square to match.
+  - Connections is a new `ConnectionsArt`: two people and a speech bubble.
+  - Both fill the 88px art box. The "Your badge" ribbon (D-286) still sits
+    across the foot.
+- **Points:**
+  - The hero's medal is the current level's picture, at 72px.
+  - Each ladder rung is its badge's picture at 36px: coloured when earned,
+    grey when not. The breathing ring stays on the current rung.
+  - The badge grid shows each badge's picture at 52px, grey until earned.
+    It replaced the category-icon and star placeholder.
+
+### Found while doing D-295: CI had been red since D-287
+
+`pnpm --filter @pam/ui test` is part of CI's "Types, unit tests, build".
+The D-287 place card added "· " to the distance's own text, so the unit
+test that finds "0.4 miles" failed. That job was red on every push from
+`79263b5` to `673cf9e`, and I did not notice: those sessions ran
+typecheck, the web build and e2e, but not the UI package's unit tests.
+
+The fix draws the dot as its own `aria-hidden` mark, which also reads
+better to a screen reader ("Open until 9 PM, 0.2 miles"). The local check
+now runs `pnpm --filter @pam/ui --filter @pam/config test` every time.
+
+The Publish Storybook job on several of those pushes was cancelled by the
+next push, so Chromatic lagged behind the branch at times.
+
 ---
 
 ## Notes for whoever picks this up next

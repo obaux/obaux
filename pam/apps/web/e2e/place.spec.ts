@@ -99,9 +99,10 @@ test.describe("a place's own screen", () => {
       'href',
       /destination=39\.9612%2C-75\.2172/,
     );
-    await expect(page.getByRole('link', { name: /^Get directions/ })).toHaveAttribute(
+    // D-294: no travel mode — Maps chooses, not PAM.
+    await expect(page.getByRole('link', { name: /^Get directions/ })).not.toHaveAttribute(
       'href',
-      /travelmode=walking/,
+      /travelmode/,
     );
   });
 

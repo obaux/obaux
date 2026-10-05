@@ -210,7 +210,8 @@ describe('directions go to the point, not to a string', () => {
     const href = directionsHref('3001 E Allegheny Ave, Philadelphia, PA', 39.94738, -75.175);
     expect(href).toContain('destination=39.94738%2C-75.175');
     expect(href).not.toContain('Allegheny');
-    expect(href).toContain('travelmode=walking');
+    // D-294: no travel mode — Maps chooses, not PAM.
+    expect(href).not.toContain('travelmode');
   });
 
   it('falls back to the address when there is no point', () => {

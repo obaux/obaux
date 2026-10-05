@@ -62,7 +62,9 @@ const styles = stylex.create({
   value: { fontSize: '16px' },
   // The label at 18px (§2.5): ListItem's own label size is smaller.
   label: { fontSize: '18px', lineHeight: 1.35 },
-  description: { fontSize: '15px', lineHeight: 1.4 },
+  // Smaller than the label, so the row reads as a name and a note
+  // (Will, 5 October, D-294).
+  description: { fontSize: '14px', lineHeight: 1.35 },
   // The chosen option (Will, 5 October, D-274): bold and in the accent
   // green, words and tick alike, with a heavier tick — a thin black tick at
   // the far edge was easy to miss.

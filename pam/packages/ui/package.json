@@ -32,6 +32,7 @@
     "./PolicyStatusCard": "./src/PolicyStatusCard.tsx",
     "./VisitCard": "./src/VisitCard.tsx",
     "./CategoryArt": "./src/CategoryArt.tsx",
+    "./BadgeArt": "./src/BadgeArt.tsx",
     "./GlowIcon": "./src/GlowIcon.tsx",
     "./MapDrawer": "./src/MapDrawer.tsx"
   },

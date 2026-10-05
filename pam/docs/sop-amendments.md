@@ -420,3 +420,20 @@ The browser suite's §2.5 check asserts 56 (`A11Y.primaryButtonHeightPx`).
 secondary BigButton beside it is not a second primary); the chat's 48px Send
 (A13). DECISIONS D-239.
 
+
+## A17 — Directions do not pick a travel mode (5 October 2026, Will)
+
+§5.1 asked for walking directions: many members have no car, and a driving
+route to a place four blocks away is the wrong answer given confidently.
+Will asked for "general" directions instead: "let's not set a walking
+route, just general."
+
+**Where this contradicts the original.** The walking route. `directionsHref`
+no longer sends `travelmode=walking`. Google Maps chooses the mode, which is
+usually the one the member last used, whether that is the bus, a ride or
+walking. The row's second line says "Open in Google Maps", not "Walking
+route". DECISIONS D-294.
+
+**What did not change.** Coordinates still beat the address, and Google's
+place ID rides along when PAM has one (D-291). A place with nothing to
+route to still has no Get directions row.

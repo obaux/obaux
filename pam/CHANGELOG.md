@@ -113,6 +113,11 @@ changes the tag. Each picture is white, with its category's icon in colour
 and a soft glow.
 Trip cards and Explore's next-visit card show each category's icon in its own
 colour on white, and the glow behind icons is softer and the same everywhere.
+Get directions opens Google Maps without forcing a walking route, and the
+smaller second line on list rows says "Open in Google Maps". Profile's award
+and Connections tiles, every badge and every rung of the ladder now have
+their own pictures, in the same style as the place cards; badges you have
+not earned yet are shown in grey.
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 

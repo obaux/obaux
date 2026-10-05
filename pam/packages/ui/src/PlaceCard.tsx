@@ -236,9 +236,15 @@ export function PlaceCard({
                   {status.label}
                 </Text>
               ) : null}
+              {/* The dot is drawn, not read: "Open until 9 PM, 0.2 miles". */}
+              {status && distanceLabel ? (
+                <Text type="supporting" aria-hidden xstyle={styles.meta}>
+                  ·
+                </Text>
+              ) : null}
               {distanceLabel ? (
                 <Text type="supporting" xstyle={styles.meta}>
-                  {status ? `· ${distanceLabel}` : distanceLabel}
+                  {distanceLabel}
                 </Text>
               ) : null}
               {audienceLabel ? <Badge variant="warning" label={audienceLabel} /> : null}
@@ -264,8 +270,11 @@ export function PlaceCard({
 }
 
 /**
- * Walking directions (§5.1). Many members do not have a car, and a driving
- * route to a place four blocks away is the wrong answer given confidently.
+ * Directions to a place, in Google Maps.
+ *
+ * No travel mode (Will, 5 October, D-294; it was walking, per §5.1): Maps
+ * picks the mode the member last used — the bus, a ride, on foot — instead
+ * of PAM deciding for them.
  *
  * Coordinates beat the address when PAM has them: the city's feeds keep
  * geometry current and let address text rot, and a stale address routes
@@ -282,7 +291,7 @@ export function directionsHref(
   const destination = hasPoint ? `${lat},${lon}` : (address ?? null);
   if (!destination) return undefined;
   const q = encodeURIComponent(destination);
-  const base = `https://www.google.com/maps/dir/?api=1&destination=${q}&travelmode=walking`;
+  const base = `https://www.google.com/maps/dir/?api=1&destination=${q}`;
   // With Google's place ID too (Will, 5 October, D-291), Maps opens on the
   // place itself — its name, its door — rather than a dropped pin.
   // Google still requires `destination` beside it.

@@ -1139,7 +1139,7 @@
   "trips.moved.home": "Ir al inicio",
   "trips.moved.note": "Te llevamos al inicio en unos segundos.",
   "profile.tile.badgeHint": "Tu insignia",
-  "place.quick.directions.body": "Ruta a pie en Google Maps",
+  "place.quick.directions.body": "Abrir en Google Maps",
   "place.quick.message.body": "Haz una pregunta antes de ir",
   "place.quick.call.body": "Habla con alguien allí",
   "saved.visitLabel": "{name}. Tu visita: {when}"

@@ -10,18 +10,15 @@ import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import {
-  AwardIcon,
   BookmarkIcon,
-  EducationIcon,
-  FamilyServicesIcon,
   Page,
   PhoneIcon,
   PlusIcon,
   StarIcon,
   TripsIcon,
-  WorkforceIcon,
 } from '@pam/ui';
 import { Confetti } from '@pam/ui/SuccessScreen';
+import { BadgeArt } from '@pam/ui/BadgeArt';
 import { SubPageHeader } from '@pam/ui/SubPage';
 import { HelpButton } from '../../screens/HelpButton';
 import {
@@ -80,14 +77,8 @@ const breathe = stylex.keyframes({
 const styles = stylex.create({
   // 1. Where you stand.
   hero: { width: '100%' },
-  medal: {
-    width: '72px',
-    height: '72px',
-    flexShrink: 0,
-    borderRadius: '50%',
-    backgroundColor: colorVars['--color-accent'],
-    color: colorVars['--color-on-accent'],
-  },
+  // The level's own picture, as a medal (D-295).
+  medal: { flexShrink: 0 },
   level: { fontSize: '28px', lineHeight: 1.15, fontWeight: 800 },
   heroPoints: { fontSize: '17px', fontWeight: 600 },
   heroNext: { fontSize: '15px', lineHeight: 1.4 },
@@ -107,22 +98,9 @@ const styles = stylex.create({
   wayPoints: { fontSize: '16px', fontWeight: 700, color: colorVars['--color-text-accent'], whiteSpace: 'nowrap' },
   // 3. The ladder, compact.
   rung: { width: '100%', minHeight: '44px', position: 'relative' },
-  mark: {
-    width: '32px',
-    height: '32px',
-    flexShrink: 0,
-    borderRadius: '50%',
-    borderWidth: '2px',
-    borderStyle: 'solid',
-    borderColor: colorVars['--color-border'],
-    color: colorVars['--color-text-secondary'],
-    backgroundColor: colorVars['--color-background-body'],
-  },
-  markEarned: {
-    backgroundColor: colorVars['--color-accent'],
-    borderColor: colorVars['--color-accent'],
-    color: colorVars['--color-on-accent'],
-  },
+  // Each rung is its badge's picture (Will, 5 October, D-295), grey until
+  // earned; the breathing ring still says which one is yours.
+  mark: { width: '36px', height: '36px', flexShrink: 0, borderRadius: '50%' },
   markHere: {
     animationName: breathe,
     animationDuration: '2.4s',
@@ -138,14 +116,7 @@ const styles = stylex.create({
   // 4. Badges, four across — shorter to scroll past (Will, D-278).
   grid: { width: '100%', display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', columnGap: '8px', rowGap: '4px' },
   badge: { minWidth: 0, paddingBlock: '8px' },
-  badgeMark: {
-    width: '48px',
-    height: '48px',
-    borderRadius: '50%',
-    backgroundColor: colorVars['--color-background-muted'],
-    color: colorVars['--color-text-secondary'],
-    opacity: 0.75,
-  },
+  badgeMark: { width: '52px', height: '52px' },
   badgeName: { fontSize: '13px', lineHeight: 1.25, fontWeight: 600, textAlign: 'center', maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
   badgeNote: { fontSize: '12px', lineHeight: 1.25, textAlign: 'center' },
   live: { position: 'absolute', width: '1px', height: '1px', overflow: 'hidden', clipPath: 'inset(50%)' },
@@ -153,14 +124,6 @@ const styles = stylex.create({
 
 type T = (key: string, vars?: Record<string, string | number>) => string;
 
-/** The picture on a badge: its track for a category badge, a star for a one-off. */
-function badgeArt(badge: BadgeDefinition): ReactNode {
-  const props = { width: 22, height: 22, 'aria-hidden': true } as const;
-  if (badge.category === 'education') return <EducationIcon {...props} />;
-  if (badge.category === 'workforce') return <WorkforceIcon {...props} />;
-  if (badge.category === 'family_services') return <FamilyServicesIcon {...props} />;
-  return <StarIcon {...props} />;
-}
 
 function Rung({ badge, points, t }: { badge: BadgeDefinition; points: number | null; t: T }) {
   const min = badge.minPoints ?? 0;
@@ -180,9 +143,9 @@ function Rung({ badge, points, t }: { badge: BadgeDefinition; points: number | n
         aria-hidden
         align="center"
         justify="center"
-        xstyle={[styles.mark, isEarned && styles.markEarned, isHere && styles.markHere]}
+        xstyle={[styles.mark, isHere && styles.markHere]}
       >
-        <AwardIcon width={18} height={18} aria-hidden />
+        <BadgeArt badgeKey={badge.key} size={36} isLocked={!isEarned} />
       </HStack>
       <VStack gap={0} xstyle={styles.rungWords}>
         <Text xstyle={[styles.rungName, isHere && styles.rungNameHere]}>
@@ -299,7 +262,7 @@ export default function PointsPage() {
             <VStack gap={4}>
               <HStack gap={4} align="center" wrap="nowrap">
                 <HStack align="center" justify="center" xstyle={styles.medal}>
-                  <AwardIcon width={40} height={40} aria-hidden />
+                  <BadgeArt badgeKey={current.key} size={72} />
                 </HStack>
                 <VStack gap={0.5}>
                   <Text xstyle={styles.level}>{t(current.labelKey)}</Text>
@@ -373,7 +336,8 @@ export default function PointsPage() {
             {others.map((badge) => (
               <VStack key={badge.key} gap={1} align="center" xstyle={styles.badge}>
                 <HStack align="center" justify="center" xstyle={styles.badgeMark}>
-                  {badgeArt(badge)}
+                  {/* Not earned yet, so in grey (D-295). */}
+                  <BadgeArt badgeKey={badge.key} size={52} isLocked />
                 </HStack>
                 <Text xstyle={styles.badgeName}>{t(badge.labelKey)}</Text>
                 <Text type="supporting" xstyle={styles.badgeNote}>
