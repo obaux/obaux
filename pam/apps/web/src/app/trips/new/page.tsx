@@ -14,8 +14,10 @@ function NewTrip() {
   const name = params.get('name');
   const category = params.get('category');
   const address = params.get('address');
+  // From a place's "Change appointment" (D-281).
+  const change = params.get('change');
   const seed = useMemo(() => (id ? { id, name, category, address } : null), [id, name, category, address]);
-  return <NewTripView initialPlace={seed} />;
+  return <NewTripView initialPlace={seed} changing={change} />;
 }
 
 export default function NewTripPage() {

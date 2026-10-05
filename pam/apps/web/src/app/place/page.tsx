@@ -33,11 +33,11 @@ import { sharePlace } from '@/lib/sharePlace';
 import { usePolicies } from '@/lib/usePolicies';
 import { useMySignatures } from '@/lib/useMySignatures';
 import { MenuList } from '@pam/ui/MenuList';
-import { PolicyStatusCard, StatusCard } from '@pam/ui/PolicyStatusCard';
-import { Icon } from '@astryxdesign/core/Icon';
+import { PolicyStatusCard } from '@pam/ui/PolicyStatusCard';
+import { VisitCard } from '@pam/ui/VisitCard';
 import { VStack } from '@astryxdesign/core/VStack';
 import { DUMMY_TRIPS } from '@pam/config/dummy-trips';
-import { readAddedTrips } from '@/lib/addedTrips';
+import { readAddedTrips, TRIPS_CHANGED, withMoves } from '@/lib/addedTrips';
 import { placeAsksForPolicies } from '@pam/config/dummy-policies';
 import { policiesHref } from '../../screens/MemberPoliciesView';
 
@@ -224,19 +224,25 @@ function PlaceScreen() {
   // to the top of the page (D-271). Opened from a trip card, the page is
   // about that visit (D-273): its day and time instead of "Plan a trip".
   const [hasTrip, setHasTrip] = useState(false);
-  const [visitAt, setVisitAt] = useState<string | null>(null);
+  const [visit, setVisit] = useState<{ id: string; startsAt: string } | null>(null);
   // A visit card on Trips or in a conversation opens the place about that
   // visit (D-273, D-276).
   const fromTrips = params.get('from') === 'trips' || params.get('from') === 'thread';
   const tripId = params.get('trip');
   useEffect(() => {
     if (!place) return;
-    const here = [...DUMMY_TRIPS, ...readAddedTrips()]
-      .filter((trip) => trip.placeId === place.id)
-      .sort((a, b) => a.startsAt.localeCompare(b.startsAt));
-    setHasTrip(here.length > 0);
-    const visit = here.find((trip) => trip.id === tripId) ?? (fromTrips ? here[0] : undefined);
-    setVisitAt(fromTrips && visit ? visit.startsAt : null);
+    const read = () => {
+      const here = withMoves([...DUMMY_TRIPS, ...readAddedTrips()])
+        .filter((trip) => trip.placeId === place.id)
+        .sort((a, b) => a.startsAt.localeCompare(b.startsAt));
+      setHasTrip(here.length > 0);
+      const found = here.find((trip) => trip.id === tripId) ?? (fromTrips ? here[0] : undefined);
+      setVisit(fromTrips && found ? { id: found.id, startsAt: found.startsAt } : null);
+    };
+    read();
+    // A visit moved from here (D-281) shows its new time on the way back.
+    window.addEventListener(TRIPS_CHANGED, read);
+    return () => window.removeEventListener(TRIPS_CHANGED, read);
   }, [place, tripId, fromTrips]);
   const status = usePlaceStatus(place?.id ?? '', place?.hours ?? null, t, locale);
 
@@ -319,12 +325,24 @@ function PlaceScreen() {
   // With a visit booked here (or arriving from Trips), the policies come up
   // under the name — orange to sign, green once signed — instead of at the foot.
   const policiesOnTop = asksMember && (hasTrip || fromTrips);
-  // The booked visit (D-273): the day as the title, the time under it —
-  // "Wednesday, October 7" / "10:00 AM · Visit booked" — so neither wraps.
+  // The booked visit (D-273, D-281): "Your next visit", the day large, the
+  // time under it, and a way to move it.
   const visitDay = new Intl.DateTimeFormat(locale, { weekday: 'long', month: 'long', day: 'numeric' });
   const visitTime = new Intl.DateTimeFormat(locale, { hour: 'numeric', minute: '2-digit' });
-  const visitWhen = visitAt ? visitDay.format(new Date(visitAt)) : null;
-  const visitHour = visitAt ? visitTime.format(new Date(visitAt)) : '';
+  const visitWhen = visit ? visitDay.format(new Date(visit.startsAt)) : null;
+  const visitHour = visit ? visitTime.format(new Date(visit.startsAt)) : '';
+  const visitAhead = visit ? new Date(visit.startsAt).getTime() > Date.now() : false;
+  // Change appointment (D-281): the Plan a visit steps, at When, for this
+  // trip — saving moves it rather than adding a second one.
+  const changeHref = visit
+    ? `/trips/new/?${new URLSearchParams({
+        place: place!.id,
+        name: place!.name,
+        category: place!.category,
+        ...(place!.address ? { address: place!.address } : {}),
+        change: visit.id,
+      }).toString()}`
+    : null;
   const directions = directionsHref(place!.address, place!.lat, place!.lon) ?? null;
   const googleHref = googlePlaceHref(place!.lookupName || place!.name, place!.address, place!.placeId);
   const lines = status ? weekLines(status.hours, locale, t('place.hours.closed')) : undefined;
@@ -379,13 +397,14 @@ function PlaceScreen() {
           visitWhen || policiesOnTop ? (
             <VStack gap={3}>
               {visitWhen ? (
-                // The visit, confirmed: green, a calendar, and no chevron —
-                // it says something, it does not go anywhere (D-273).
-                <StatusCard
-                  tone="green"
-                  icon={<Icon icon="calendar" size="md" />}
-                  title={visitWhen}
-                  body={t('place.visit.body', { time: visitHour })}
+                // The visit, confirmed (D-273), as a small hero (D-281): only
+                // "Change appointment" is a link, the card itself is not.
+                <VisitCard
+                  eyebrow={t(visitAhead ? 'place.visit.next' : 'place.visit.last')}
+                  day={visitWhen}
+                  time={visitHour}
+                  changeLabel={visitAhead ? t('place.visit.change') : undefined}
+                  changeHref={visitAhead ? changeHref : null}
                 />
               ) : null}
               {policiesOnTop ? (

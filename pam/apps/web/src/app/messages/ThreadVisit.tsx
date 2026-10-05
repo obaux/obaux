@@ -8,7 +8,7 @@ import { StatusCard } from '@pam/ui/PolicyStatusCard';
 import { DUMMY_PLACES_BY_ID } from '@pam/config/dummy-places';
 import { DUMMY_TRIPS } from '@pam/config/dummy-trips';
 import { useI18n } from '@/lib/i18n';
-import { readAddedTrips } from '@/lib/addedTrips';
+import { readAddedTrips, withMoves } from '@/lib/addedTrips';
 
 /**
  * A booked visit, at the top of a conversation with the program it is at
@@ -48,7 +48,7 @@ export function ThreadVisit({
       return;
     }
     const now = Date.now();
-    const next = [...DUMMY_TRIPS, ...readAddedTrips()]
+    const next = withMoves([...DUMMY_TRIPS, ...readAddedTrips()])
       .filter((trip) => trip.placeId === place.id && new Date(trip.startsAt).getTime() >= now)
       .sort((a, b) => a.startsAt.localeCompare(b.startsAt))[0];
     setVisit(next ? { id: next.id, placeId: next.placeId, startsAt: next.startsAt } : null);

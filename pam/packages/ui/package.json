@@ -30,6 +30,7 @@
     "./navTransition": "./src/navTransition.ts",
     "./SignaturePad": "./src/SignaturePad.tsx",
     "./PolicyStatusCard": "./src/PolicyStatusCard.tsx",
+    "./VisitCard": "./src/VisitCard.tsx",
     "./MapDrawer": "./src/MapDrawer.tsx"
   },
   "scripts": {

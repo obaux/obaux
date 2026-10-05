@@ -25,7 +25,7 @@ const hoursAgo = (h: number) => new Date(Date.now() - h * 3_600_000).toISOString
 
 export const PLACES = [
   {
-    id: 's1',
+    id: 'dummy-place-learning',
     name: 'Example Learning Center',
     lookup_name: 'Example Learning Center',
     category: 'education',
@@ -42,7 +42,7 @@ export const PLACES = [
     hours: null,
   },
   {
-    id: 's2',
+    id: 'dummy-place-workforce',
     name: 'Example Workforce Center',
     lookup_name: 'Example Workforce Center',
     category: 'workforce',
@@ -59,7 +59,7 @@ export const PLACES = [
     hours: null,
   },
   {
-    id: 's3',
+    id: 'dummy-place-food',
     name: 'Example Food Pantry',
     lookup_name: 'Example Food Pantry',
     category: 'family_services',
@@ -83,7 +83,7 @@ export const NOTIFICATIONS = [
     body_key: 'notify.service_flagged',
     body_vars: { reason: 'closed', place: 'Example Learning Center' },
     subject_type: 'service',
-    subject_id: 's1',
+    subject_id: 'dummy-place-learning',
     created_at: hoursAgo(0),
     read_at: null,
   },

@@ -258,6 +258,51 @@ export function PlaceDetail({
     </Card>
   ) : null;
 
+  const hoursCard =
+    weekLines && weekLines.length > 0 ? (
+    <Card padding={4} xstyle={styles.card}>
+      <VStack gap={2}>
+        <Heading level={2} xstyle={styles.section}>
+          {labels.hours}
+        </Heading>
+        <VStack gap={1}>
+          {weekLines.map((line) => (
+            <HStack key={line.day} gap={3} justify="between" wrap="nowrap">
+              <Text xstyle={styles.dayRow}>{line.day}</Text>
+              <Text type="supporting" xstyle={styles.dayRow}>
+                {line.hours}
+              </Text>
+            </HStack>
+          ))}
+        </VStack>
+        {/*
+          Said out loud, on the screen, whenever the hours are a stand-in.
+          A demo that looks exactly like the real thing is how a partner
+          ends up reading their own opening times off a screen that made
+          them up.
+        */}
+        {hoursArePlaceholder && placeholderNote ? (
+          <Text type="supporting" xstyle={styles.note}>
+            {placeholderNote}
+          </Text>
+        ) : null}
+        {/* Where to check them, under the hours themselves (D-224). */}
+        {quickActions && hoursHref ? (
+          <Button
+            label={labels.hoursOnGoogle}
+            variant="ghost"
+            href={hoursHref}
+            target="_blank"
+            rel="noreferrer"
+            icon={<PlacesIcon />}
+            // A link, not a pill (Will, 5 October, D-280).
+            xstyle={[styles.hoursLink, textLinkLook.link]}
+          />
+        ) : null}
+      </VStack>
+    </Card>
+  ) : null;
+
   return (
     <VStack gap={4}>
       <VStack gap={2}>
@@ -324,7 +369,9 @@ export function PlaceDetail({
         </HStack>
       ) : null}
 
+      {/* With a visit booked, where and when come before what it is (D-273, D-281). */}
       {addressFirst ? addressCard : null}
+      {addressFirst ? hoursCard : null}
       {aboutCard}
 
       {/*
@@ -339,49 +386,7 @@ export function PlaceDetail({
 
       {addressFirst ? null : addressCard}
 
-      {weekLines && weekLines.length > 0 ? (
-        <Card padding={4} xstyle={styles.card}>
-          <VStack gap={2}>
-            <Heading level={2} xstyle={styles.section}>
-              {labels.hours}
-            </Heading>
-            <VStack gap={1}>
-              {weekLines.map((line) => (
-                <HStack key={line.day} gap={3} justify="between" wrap="nowrap">
-                  <Text xstyle={styles.dayRow}>{line.day}</Text>
-                  <Text type="supporting" xstyle={styles.dayRow}>
-                    {line.hours}
-                  </Text>
-                </HStack>
-              ))}
-            </VStack>
-            {/*
-              Said out loud, on the screen, whenever the hours are a stand-in.
-              A demo that looks exactly like the real thing is how a partner
-              ends up reading their own opening times off a screen that made
-              them up.
-            */}
-            {hoursArePlaceholder && placeholderNote ? (
-              <Text type="supporting" xstyle={styles.note}>
-                {placeholderNote}
-              </Text>
-            ) : null}
-            {/* Where to check them, under the hours themselves (D-224). */}
-            {quickActions && hoursHref ? (
-              <Button
-                label={labels.hoursOnGoogle}
-                variant="ghost"
-                href={hoursHref}
-                target="_blank"
-                rel="noreferrer"
-                icon={<PlacesIcon />}
-                // A link, not a pill (Will, 5 October, D-280).
-                xstyle={[styles.hoursLink, textLinkLook.link]}
-              />
-            ) : null}
-          </VStack>
-        </Card>
-      ) : null}
+      {addressFirst ? null : hoursCard}
 
       {quickActions ? null : (
         <VStack gap={2} xstyle={styles.rows}>

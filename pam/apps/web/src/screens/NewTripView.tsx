@@ -18,8 +18,8 @@ import { IconButton } from '@astryxdesign/core/IconButton';
 import { MenuList } from '@pam/ui/MenuList';
 import { SubPage } from '@pam/ui/SubPage';
 import { useI18n } from '@/lib/i18n';
-import { addTrip } from '@/lib/addedTrips';
-import { navigate } from '@/lib/navigate';
+import { addTrip, moveTrip } from '@/lib/addedTrips';
+import { leaveFlow, navigate } from '@/lib/navigate';
 import { HelpButton } from './HelpButton';
 import { BigCategoryIcon } from './SavedView';
 
@@ -129,7 +129,18 @@ function seedToPlace(seed: TripPlaceSeed | null | undefined): DummySavedPlace | 
   };
 }
 
-export function NewTripView({ initialPlace = null }: { readonly initialPlace?: TripPlaceSeed | null }) {
+export function NewTripView({
+  initialPlace = null,
+  changing = null,
+}: {
+  readonly initialPlace?: TripPlaceSeed | null;
+  /**
+   * The trip being moved, from a place's "Change appointment" (D-281): the
+   * same When and Check, then saving moves that trip instead of adding one,
+   * and returns to the place it began on.
+   */
+  readonly changing?: string | null;
+}) {
   const { t, locale } = useI18n();
   const places = useMemo(() => Object.values(DUMMY_PLACES_BY_ID), []);
   const initial = useMemo(() => seedToPlace(initialPlace), [initialPlace]);
@@ -151,7 +162,9 @@ export function NewTripView({ initialPlace = null }: { readonly initialPlace?: T
 
   const stepNumber = step === 'where' ? 1 : step === 'when' ? 2 : 3;
   const title =
-    step === 'where'
+    changing && step === 'when'
+      ? t('trips.new.changeTitle')
+      : step === 'where'
       ? t('trips.new.where')
       : step === 'when'
         ? t('trips.new.when')
@@ -160,12 +173,13 @@ export function NewTripView({ initialPlace = null }: { readonly initialPlace?: T
   return (
     <SubPage
       title={title}
-      subtitle={t('trips.new.step', { current: stepNumber, total: 3 })}
+      subtitle={changing ? undefined : t('trips.new.step', { current: stepNumber, total: 3 })}
       backHref="/trips/"
       backLabel={step === 'where' ? t('nav.back.trips') : t('trips.new.back')}
       // Back is a step (Will, 3 October, D-235): Check → When → Where →
       // Trips. That is the way to change an answer, so no "Change" links.
-      {...(step === 'when'
+      // Moving a visit has no Where: back from When is back to the place.
+      {...(step === 'when' && !changing
         ? { onBack: () => setStep('where') }
         : step === 'check'
           ? { onBack: () => setStep('when') }
@@ -278,8 +292,15 @@ export function NewTripView({ initialPlace = null }: { readonly initialPlace?: T
           </Card>
           <TextArea label={t('trips.new.note')} value={note} onChange={setNote} rows={2} width="100%" />
           <BigButton
-            label={t('trips.new.add')}
+            label={t(changing ? 'trips.new.saveChange' : 'trips.new.add')}
             onPress={() => {
+              if (changing) {
+                moveTrip(changing, at(day, time).toISOString());
+                // When, Check — two steps back to the place, now showing
+                // the new time.
+                leaveFlow(2, `/place/?${new URLSearchParams({ id: place.id, from: 'trips', trip: changing }).toString()}`);
+                return;
+              }
               const id = `added-${Date.now()}`;
               addTrip({
                 id,

@@ -23,6 +23,6 @@ export const Invite: Story = screen('provider', 'Invite someone', '/invite/');
 export const AllPrograms: Story = screen('provider', 'All programs', '/programs/');
 export const AddProgram: Story = screen('provider', 'Add a program', '/programs/new/');
 export const Notifications: Story = screen('provider', 'Notifications', '/notifications/');
-export const Place: Story = screen('provider', 'A place', '/place/', { id: 's1', from: 'explore' });
+export const Place: Story = screen('provider', 'A place', '/place/', { id: 'dummy-place-learning', from: 'explore' });
 export const TextAlerts: Story = screen('provider', 'Text alerts', '/alerts/');
 export const GetHelp: Story = screen('provider', 'Get help', '/help/');

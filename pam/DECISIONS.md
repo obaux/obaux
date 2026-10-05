@@ -6467,6 +6467,58 @@ about a button that rule had not reached.
 - **Proven by:** typecheck, and Storybook hover measured on "Check hours on
   Google" (`background-image: none`, underline, accent colour).
 
+### D-281 — A place opened from a trip leads with the visit, and the visit can move
+
+Will, 5 October: "For Trip view of place profile, let's bring in hours above
+the about. Also the green item will need to be more complex. As it needs to
+clearly label: Your next visit, and allow for them to "change appointment"
+maybe with a link below. So I'm thinking we use more of a hero card instead
+of the item, so we have more space. Also this place is saved for member, but
+not showing up as saved on trip profile, why is that?"
+
+- **`VisitCard`** (`@pam/ui/VisitCard`) replaces D-273's green row. It is a
+  green-tinted card with:
+  - "Your next visit" beside a calendar in a white disc;
+  - the day, large;
+  - the time, in green;
+  - under a hairline, a "Change appointment" text link (D-280's look, in green).
+
+  The card itself is not a link; only "Change appointment" is. A visit that
+  has already happened says "Your visit" and has no link.
+- **Order with a visit:** address, then opening hours, then "What this place
+  is". `PlaceDetail`'s `addressFirst` now moves the hours card up too.
+- **Change appointment** opens Plan a visit with `change=<trip id>`:
+  - it starts at When, titled "Change your visit", with no step count;
+  - Back from When returns to the place, because there is no Where to go
+    back to;
+  - Check's button says "Save the new time".
+
+  Saving does not add a second trip. It records the new time under that
+  trip's id in `pam.trips.moved` (session storage), then `leaveFlow(2)`
+  returns to the place. Every screen that lists trips reads through the move
+  map: the place, Trips, a conversation's visit card and Explore's next visit.
+  The place listens for a `pam:trips-changed` event, so a copy still mounted
+  underneath (the prototype keeps one) shows the new time when it comes back.
+  It is a map rather than an edit because example trips are constants. This
+  is example data like the rest of Trips (D-225); a real move waits for
+  appointments in the database.
+- **Why the saved place didn't show as saved:** one example place had two
+  ids. Storybook's fixtures named the three example places `s1`/`s2`/`s3`,
+  and Explore, Saved and `saved_places_mine` used those ids. Trips, and the
+  place a trip opens, use the example set's own ids (`dummy-place-learning`
+  and so on). `isSaved('dummy-place-learning')` was therefore false, even
+  though "Example Learning Center" was on Saved as `s1`.
+
+  The fixtures now use the example set's ids, so one place has one id
+  everywhere. The real app was never affected: real places have one id in
+  `services`.
+- **Proven by:** `e2e/visit-change.spec.ts`. It checks:
+  - the label and the link;
+  - that the address, hours and About headings come in that order;
+  - axe;
+  - picking a new day and time, saving, and landing back on the place
+    showing them.
+
 ---
 
 ## Notes for whoever picks this up next

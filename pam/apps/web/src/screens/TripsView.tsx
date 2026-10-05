@@ -10,7 +10,7 @@ import { VStack } from '@astryxdesign/core/VStack';
 import { PlusIcon, TripsIcon } from '@pam/ui';
 import { Button } from '@astryxdesign/core/Button';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
-import { readAddedTrips } from '@/lib/addedTrips';
+import { readAddedTrips, readMoves, withMoves } from '@/lib/addedTrips';
 import { MapDrawer } from '@pam/ui/MapDrawer';
 import { Confetti } from '@pam/ui/SuccessScreen';
 import { useSearchParams } from 'next/navigation';
@@ -266,9 +266,12 @@ export function TripsScreen({ headerActions }: { readonly headerActions?: ReactN
   // Trips added in this visit (D-225), read after mount: storage is the
   // browser's, and the first render has to match the server's.
   const [added, setAdded] = useState<readonly Trip[]>([]);
+  // Visits moved with "Change appointment" (D-281), read with them.
+  const [moves, setMoves] = useState<Readonly<Record<string, string>>>({});
   useEffect(() => {
+    setMoves(readMoves());
     setAdded(
-      readAddedTrips().map((trip) => ({
+      withMoves(readAddedTrips()).map((trip) => ({
         id: trip.id,
         placeId: trip.placeId,
         placeName: trip.placeName,
@@ -288,7 +291,7 @@ export function TripsScreen({ headerActions }: { readonly headerActions?: ReactN
       category: trip.category,
       lat: trip.lat,
       lon: trip.lon,
-      startsAt: trip.startsAt,
+      startsAt: moves[trip.id] ?? trip.startsAt,
       withName: person?.firstName ?? null,
       withPhotoUrl: person?.photoUrl ?? null,
     };

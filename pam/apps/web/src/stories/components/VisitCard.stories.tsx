@@ -1,0 +1,22 @@
+import type { Meta, StoryObj } from '@storybook/nextjs';
+import { VisitCard } from '@pam/ui/VisitCard';
+
+/** A place opened from a trip: the booked visit as a small hero, with a way to move it (D-281). */
+const meta = {
+  title: 'Components/VisitCard',
+  component: VisitCard,
+  args: {
+    eyebrow: 'Your next visit',
+    day: 'Wednesday, October 7',
+    time: '10:00 AM',
+    changeLabel: 'Change appointment',
+    changeHref: '/trips/new/?place=dummy-place-learning&change=dummy-trip-1',
+  },
+} satisfies Meta<typeof VisitCard>;
+
+export default meta;
+type Story = StoryObj<typeof meta>;
+
+export const Upcoming: Story = {};
+/** A visit already past: no link to change it. */
+export const Past: Story = { args: { eyebrow: 'Your visit', changeLabel: undefined, changeHref: null } };

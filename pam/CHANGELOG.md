@@ -89,6 +89,11 @@ top right takes you straight back to the program.
 Your points screen is a journey now: your level with a progress bar to the
 next one, the ways to earn points and what each is worth, a shorter ladder,
 and badges as medals. Reaching a new level brings confetti.
+"Check hours on Google" and the Cancel beside each search are plain links.
+A place opened from a trip leads with a larger green card: "Your next
+visit", the day and time, and "Change appointment", which moves the visit
+and comes back to the place. Its address and hours now come before what the
+place is. A place you saved shows as saved when you open it from a trip.
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 

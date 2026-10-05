@@ -158,8 +158,8 @@ export const flows = [
         title: 'A place',
         story: 'member-app-screens--place',
         path: '/place/',
-        changed: 'D-273',
-        note: 'From a trip: the visit (green, day and time) instead of Plan a trip; policies card under it',
+        changed: 'D-281',
+        note: 'From a trip: "Your next visit" card with Change appointment; address and hours before About',
       },
       policies: {
         title: 'Policies to sign',
@@ -231,7 +231,7 @@ export const flows = [
     },
     edges: [
       ['explore', 'place', 'Tap a place'],
-      ['place', 'newTrip', 'Schedule a visit'],
+      ['place', 'newTrip', 'Schedule a visit · Change appointment'],
       ['place', 'report', 'Report'],
       ['place', 'policies', 'Policies to sign', { over: true }],
       ['policies', 'policy', 'A policy'],
@@ -251,6 +251,7 @@ export const flows = [
       ['profile', 'points', 'Points'],
     ],
     changes: [
+      'D-281 — a place from a trip: "Your next visit" card, Change appointment, hours before About',
       'D-278 — Points as a journey: level and progress, ways to earn, badge medals. D-279 — signing: pinned button, Done',
       'D-277 — Back returns to the screen you came from, everywhere. D-276 — a conversation shows the booked visit',
       'D-275 — Explore: the area opens a Location drawer (search, current location, Done)',

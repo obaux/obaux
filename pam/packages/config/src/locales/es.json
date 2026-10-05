@@ -1128,5 +1128,10 @@
   "points.badgesTitle": "Insignias",
   "points.levelUp": "Nuevo nivel: {level}",
   "points.way.plan": "Planear una visita a un programa",
-  "points.way.return": "Volver a un programa otra vez"
+  "points.way.return": "Volver a un programa otra vez",
+  "place.visit.next": "Tu próxima visita",
+  "place.visit.last": "Tu visita",
+  "place.visit.change": "Cambiar cita",
+  "trips.new.saveChange": "Guardar la nueva hora",
+  "trips.new.changeTitle": "Cambia tu visita"
 }

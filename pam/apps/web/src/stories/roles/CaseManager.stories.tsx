@@ -35,6 +35,6 @@ export const AllPrograms: Story = screen('case-manager', 'All programs', '/progr
 export const AddProgram: Story = screen('case-manager', 'Add a program', '/programs/new/');
 export const Conversation: Story = screen('case-manager', 'A conversation', '/messages/thread/', { id: CONVO_ID });
 export const Notifications: Story = screen('case-manager', 'Notifications', '/notifications/');
-export const Place: Story = screen('case-manager', 'A place', '/place/', { id: 's1', from: 'explore' });
+export const Place: Story = screen('case-manager', 'A place', '/place/', { id: 'dummy-place-learning', from: 'explore' });
 export const TextAlerts: Story = screen('case-manager', 'Text alerts', '/alerts/');
 export const GetHelp: Story = screen('case-manager', 'Get help', '/help/');

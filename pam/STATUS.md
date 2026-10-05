@@ -349,7 +349,10 @@ wherever the member came from, with the fixed target only for a cold link
 (D-277). Signing keeps its button pinned at the bottom, and Done (top
 right) leaves the whole flow (D-279). Points is a journey screen: hero with progress
 to the next rung, ways to earn, compact ladder, badge medals, confetti on a
-new level (D-278). How points should be awarded — two rules live
+new level (D-278). A place opened from a trip leads with a green "Your next visit"
+card whose "Change appointment" moves the visit and returns, with address and hours
+before About; Storybook's example places now share the example set's ids, so a saved
+one shows saved from a trip too (D-281). How points should be awarded — two rules live
 (save a place, finish setup), the rest to build, with order and open
 questions — is specified in `docs/points-awarding.md`. The
 signatures are example data too, kept only for the visit (session storage).

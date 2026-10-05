@@ -473,3 +473,9 @@ Chromium.
 - docs/points-awarding.md: the awarding spec Will asked for. It covers the principles (database-only, append-only, members only, idempotent, honest proof, no comparison); each rule with points, trigger, proof, once-per and status (live: save, finish setup); plan-a-trip once per program; attendance 100/60 with no double pay; the return bonus at most once per program per week; the ladder trigger and the badge evaluation; anti-gaming; prerequisites; build order; and open questions. Found while writing it: the database `badges` table is seeded with an older badge set than config's `BADGES`, and `LEVELS` duplicates the ladder; both are noted for the build.
 - Points spec: the open questions and the two found problems moved to a "Decide before building" checklist at the top of docs/points-awarding.md (Will: "include those questions for us to work through later when building"), and STATUS "What needs a human" row 15 points to it.
 - D-280: `textLinkLook` exported from TextLink; applied to Check hours on Google and the four search Cancels. Checked: typecheck, Storybook hover computed style.
+- D-281: the trip view of a place.
+  - `VisitCard` hero: "Your next visit", the day, the time, and a "Change appointment" link.
+  - Order: address, hours, then About.
+  - Change appointment uses Plan a visit with `change=<id>`. Saving records the new time in `pam.trips.moved` and returns with `leaveFlow(2)`. The place, Trips, ThreadVisit and Explore read moves through `withMoves`/`readMoves`.
+  - Saved bug: Storybook fixture ids `s1`–`s3` didn't match the example set's `dummy-place-*` ids used by trips. Renamed the fixtures and the stories that used `s1`.
+  - Checked: typecheck, web build, Storybook screenshots, `e2e/visit-change.spec.ts` (with axe), full e2e.

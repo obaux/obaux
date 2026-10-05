@@ -1128,5 +1128,10 @@
   "points.badgesTitle": "Badges",
   "points.levelUp": "New level: {level}",
   "points.way.plan": "Plan a trip to a program",
-  "points.way.return": "Go back to a program again"
+  "points.way.return": "Go back to a program again",
+  "place.visit.next": "Your next visit",
+  "place.visit.last": "Your visit",
+  "place.visit.change": "Change appointment",
+  "trips.new.saveChange": "Save the new time",
+  "trips.new.changeTitle": "Change your visit"
 }

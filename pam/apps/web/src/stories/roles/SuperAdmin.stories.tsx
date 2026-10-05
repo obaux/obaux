@@ -25,4 +25,4 @@ export const InvitesLog: Story = screen('super-admin', 'Invited people', '/invit
 export const ViewAs: Story = screen('super-admin', 'See the app as', '/view-as/');
 export const Person: Story = screen('super-admin', 'A person', '/person/', { id: 'dummy-m1' });
 export const Notifications: Story = screen('super-admin', 'Notifications', '/notifications/');
-export const Place: Story = screen('super-admin', 'A place', '/place/', { id: 's1', from: 'explore' });
+export const Place: Story = screen('super-admin', 'A place', '/place/', { id: 'dummy-place-learning', from: 'explore' });
