@@ -33,6 +33,9 @@ import { sharePlace } from '@/lib/sharePlace';
 import { usePolicies } from '@/lib/usePolicies';
 import { useMySignatures } from '@/lib/useMySignatures';
 import { MenuList } from '@pam/ui/MenuList';
+import { PolicyStatusCard } from '@pam/ui/PolicyStatusCard';
+import { DUMMY_TRIPS } from '@pam/config/dummy-trips';
+import { readAddedTrips } from '@/lib/addedTrips';
 import { placeAsksForPolicies } from '@pam/config/dummy-policies';
 import { policiesHref } from '../../screens/MemberPoliciesView';
 
@@ -206,6 +209,16 @@ function PlaceScreen() {
   const place = state.status === 'ready' ? state.place : null;
   const { policies } = usePolicies();
   const { progress } = useMySignatures();
+  // A visit booked here — from Trips, or anywhere — brings the policies up
+  // to the top of the page (D-271).
+  const [hasTrip, setHasTrip] = useState(false);
+  useEffect(() => {
+    if (!place) return;
+    setHasTrip(
+      DUMMY_TRIPS.some((trip) => trip.placeId === place.id) ||
+        readAddedTrips().some((trip) => trip.placeId === place.id),
+    );
+  }, [place]);
   const status = usePlaceStatus(place?.id ?? '', place?.hours ?? null, t, locale);
 
   /*
@@ -279,6 +292,14 @@ function PlaceScreen() {
       lon: place!.lon,
     });
   };
+  // The program's policies, for a member (D-270, D-271).
+  const asksMember =
+    (demoRole ?? trueRole) === 'member' && placeAsksForPolicies(place!.id) && policies.length > 0;
+  const signedSoFar = progress(place!.id, policies);
+  const allSigned = signedSoFar.signed === signedSoFar.total;
+  // With a visit booked here (or arriving from Trips), the policies come up
+  // under the name — orange to sign, green once signed — instead of at the foot.
+  const policiesOnTop = asksMember && (hasTrip || params.get('from') === 'trips');
   const directions = directionsHref(place!.address, place!.lat, place!.lon) ?? null;
   const googleHref = googlePlaceHref(place!.lookupName || place!.name, place!.address, place!.placeId);
   const lines = status ? weekLines(status.hours, locale, t('place.hours.closed')) : undefined;
@@ -327,6 +348,19 @@ function PlaceScreen() {
         }
         hoursHref={googleHref}
         isSaved={saved}
+        notice={
+          policiesOnTop ? (
+            <PolicyStatusCard
+              isDone={allSigned}
+              title={t(allSigned ? 'place.policies.done.title' : 'place.policies.toSign.title')}
+              body={t(allSigned ? 'place.policies.done.body' : 'place.policies.toSign.body')}
+              label={`${t(allSigned ? 'place.policies.done.title' : 'place.policies.toSign.title')}. ${t(
+                allSigned ? 'place.policies.done.body' : 'place.policies.toSign.body',
+              )}`}
+              href={policiesHref(place!.id, place!.name)}
+            />
+          ) : null
+        }
         quickActionsLabel={t('place.quick.label')}
         quickActions={[
           ...(place!.website
@@ -390,26 +424,18 @@ function PlaceScreen() {
         D-270): a member can read them before booking, and see how many are
         signed. Members only — staff do not sign a program's policies.
       */}
-      {(demoRole ?? trueRole) === 'member' && placeAsksForPolicies(place!.id) && policies.length > 0 ? (
+      {asksMember && !policiesOnTop ? (
         <MenuList
           label={t('place.policies')}
           items={[
             {
               id: 'policies',
               label: t('place.policies'),
-              description: (() => {
-                const p = progress(place!.id, policies);
-                return p.signed === p.total
-                  ? t('place.policies.allSigned', { total: p.total })
-                  : t('place.policies.hint', { signed: p.signed, total: p.total });
-              })(),
+              description: allSigned
+                ? t('place.policies.allSigned', { total: signedSoFar.total })
+                : t('place.policies.hint', { signed: signedSoFar.signed, total: signedSoFar.total }),
               href: policiesHref(place!.id, place!.name),
-              icon:
-                progress(place!.id, policies).signed === policies.length ? (
-                  <SignedIcon {...QUICK} />
-                ) : (
-                  <BookIcon {...QUICK} />
-                ),
+              icon: allSigned ? <SignedIcon {...QUICK} /> : <BookIcon {...QUICK} />,
             },
           ]}
         />

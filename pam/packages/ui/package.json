@@ -29,6 +29,7 @@
     "./NextTripCard": "./src/NextTripCard.tsx",
     "./navTransition": "./src/navTransition.ts",
     "./SignaturePad": "./src/SignaturePad.tsx",
+    "./PolicyStatusCard": "./src/PolicyStatusCard.tsx",
     "./MapDrawer": "./src/MapDrawer.tsx"
   },
   "scripts": {

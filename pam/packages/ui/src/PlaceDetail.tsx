@@ -90,6 +90,11 @@ export interface PlaceDetailProps {
   readonly quickActions?: readonly QuickAction[];
   /** Shown at the foot of the hours card — "Check hours on Google" (D-224). */
   readonly quickActionsLabel?: string;
+  /**
+   * Under the name and the open/closed line, above the round buttons: what
+   * a member still has to do before a visit (D-271, `PolicyStatusCard`).
+   */
+  readonly notice?: ReactNode;
   readonly labels: {
     readonly directions: string;
     readonly call: string;
@@ -220,6 +225,7 @@ export function PlaceDetail({
   flagHref,
   quickActions,
   quickActionsLabel,
+  notice,
   labels,
 }: PlaceDetailProps) {
   return (
@@ -252,6 +258,8 @@ export function PlaceDetail({
           ) : null}
         </HStack>
       </VStack>
+
+      {notice ?? null}
 
       {quickActions && quickActions.length > 0 ? (
         <HStack

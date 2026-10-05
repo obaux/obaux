@@ -1,5 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 import { Button } from '@astryxdesign/core/Button';
+import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { pam } from './tokens.stylex.js';
 
 /**
@@ -23,9 +24,23 @@ export interface TextLinkProps {
   readonly size?: 'default' | 'quiet';
 }
 
+/*
+ * A link looks like a link (Will, 5 October, D-271): no pill behind it on
+ * hover or press — Astryx's ghost button paints one as a background image —
+ * only the colour changes and an underline appears. Still a 48px target.
+ */
+const linkLook = {
+  paddingInline: '0px',
+  backgroundImage: { default: 'none', ':hover': 'none', ':active': 'none' },
+  color: { default: colorVars['--color-text-primary'], ':hover': colorVars['--color-text-accent'] },
+  textDecorationLine: { default: 'none', ':hover': 'underline' },
+  textUnderlineOffset: '4px',
+  textDecorationThickness: '1.5px',
+} as const;
+
 const styles = stylex.create({
-  link: { minHeight: pam.touchTargetMin, fontSize: pam.linkSize },
-  quiet: { minHeight: pam.touchTargetMin, fontSize: '15px' },
+  link: { minHeight: pam.touchTargetMin, fontSize: pam.linkSize, ...linkLook },
+  quiet: { minHeight: pam.touchTargetMin, fontSize: '15px', ...linkLook },
 });
 
 export function TextLink({ label, href, onClick, isDisabled, size = 'default' }: TextLinkProps) {

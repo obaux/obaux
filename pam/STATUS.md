@@ -336,7 +336,9 @@ example data until tables, file storage and a transparency line are agreed.
 Members can now read a program's policies from the foot of its page, and sign
 them: the first Sign opens a half sheet to draw (or type) a signature, and
 each policy after that is one tap. Trips show "Signatures needed" or
-"Policies signed", and a just-booked trip offers Sign policies (D-270). The
+"Policies signed", and a just-booked trip offers Sign policies (D-270). A place with a visit
+booked shows the policies under its name, orange to sign or green when done,
+and a corner × clears a signature to sign again (D-271). The
 signatures are example data too, kept only for the visit (session storage).
 From a request the super admin can open the requested program and text the
 requester. In the redesign they can also message staff (never members),

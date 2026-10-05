@@ -1077,8 +1077,7 @@
   "memberPolicies.none": "Este programa no tiene políticas para firmar.",
   "memberPolicy.count": "Política {current} de {total}",
   "memberPolicy.sign": "Firmar",
-  "memberPolicy.withSaved": "Firmar usa tu firma:",
-  "memberPolicy.redraw": "Firmar de otra forma",
+  "memberPolicy.withSaved": "Tu firma:",
   "memberPolicy.signed": "Firmada el {date}",
   "memberPolicy.yourSignature": "Tu firma",
   "memberPolicy.next": "Siguiente: {title}",
@@ -1101,5 +1100,10 @@
   "trips.added.policies.body": "{place} te pide firmar {count} políticas. Toma como un minuto.",
   "trips.added.policies.action": "Firmar políticas",
   "nav.back.policiesToSign": "Volver a las políticas",
-  "sign.heading": "Tu firma"
+  "sign.heading": "Tu firma",
+  "memberPolicy.clear": "Borrar la firma y firmar de nuevo",
+  "place.policies.toSign.title": "Políticas para firmar",
+  "place.policies.toSign.body": "Fírmalas antes de tu visita",
+  "place.policies.done.title": "Políticas firmadas",
+  "place.policies.done.body": "Todas las firmas completas"
 }

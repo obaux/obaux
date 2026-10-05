@@ -1077,8 +1077,7 @@
   "memberPolicies.none": "This program has no policies to sign.",
   "memberPolicy.count": "Policy {current} of {total}",
   "memberPolicy.sign": "Sign",
-  "memberPolicy.withSaved": "Sign uses your signature:",
-  "memberPolicy.redraw": "Sign a new way",
+  "memberPolicy.withSaved": "Your signature:",
   "memberPolicy.signed": "Signed {date}",
   "memberPolicy.yourSignature": "Your signature",
   "memberPolicy.next": "Next: {title}",
@@ -1101,5 +1100,10 @@
   "trips.added.policies.body": "{place} asks you to sign {count} policies. It takes about a minute.",
   "trips.added.policies.action": "Sign policies",
   "nav.back.policiesToSign": "Back to policies",
-  "sign.heading": "Your signature"
+  "sign.heading": "Your signature",
+  "memberPolicy.clear": "Clear signature and sign again",
+  "place.policies.toSign.title": "Policies to sign",
+  "place.policies.toSign.body": "Sign before your visit",
+  "place.policies.done.title": "Policies signed",
+  "place.policies.done.body": "All signatures complete"
 }

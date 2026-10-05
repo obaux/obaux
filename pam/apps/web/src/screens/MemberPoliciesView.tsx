@@ -3,7 +3,6 @@
 import { useRef, useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { BottomSheet } from '@astryxdesign/core/BottomSheet';
-import { Button } from '@astryxdesign/core/Button';
 import { Card } from '@astryxdesign/core/Card';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Icon } from '@astryxdesign/core/Icon';
@@ -12,7 +11,7 @@ import { HStack } from '@astryxdesign/core/HStack';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars, spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
-import { BigButton, BookIcon, SignedIcon, TextField } from '@pam/ui';
+import { BigButton, BookIcon, SignedIcon, TextField, TextLink } from '@pam/ui';
 import { MenuList } from '@pam/ui/MenuList';
 import { SignaturePad, type SignaturePadHandle } from '@pam/ui/SignaturePad';
 import { SubPage } from '@pam/ui/SubPage';
@@ -53,19 +52,50 @@ const styles = stylex.create({
   done: { fontSize: '17px', lineHeight: 1.5 },
   signedIcon: { color: colorVars['--color-icon-accent'], flexShrink: 0 },
   signedWords: { fontSize: '17px', fontWeight: 600, color: colorVars['--color-text-accent'] },
-  // The saved signature, small, beside "Sign uses your signature".
+  // A signature on the page (D-271): even padding all round, so the tick
+  // sits as far from the top edge as from the left; room for the corner ×.
   saved: {
+    position: 'relative',
     width: '100%',
-    paddingBlock: '12px',
-    paddingInline: '16px',
+    padding: '16px',
     borderRadius: '16px',
     borderWidth: '1px',
     borderStyle: 'solid',
     borderColor: colorVars['--color-border'],
   },
+  yourSignature: { fontSize: '16px', lineHeight: 1.4 },
   savedImage: { height: '48px', width: 'auto', maxWidth: '60%', objectFit: 'contain', backgroundColor: 'white', borderRadius: '8px' },
   signedImage: { height: '72px', width: 'auto', maxWidth: '100%', objectFit: 'contain', backgroundColor: 'white', borderRadius: '12px', alignSelf: 'flex-start' },
-  link: { minHeight: '48px', paddingInline: '0px', fontSize: '16px', alignSelf: 'flex-start' },
+  // Sign sits right under the signature it will use (Will, D-271).
+  signGroup: { width: '100%' },
+  // The tiny white × on the box's corner: clear this signature and sign
+  // again. 28px to look at, a 48px square to tap (§2.5) — every button keeps
+  // the 48px floor, so the circle is drawn inside it.
+  clear: {
+    position: 'absolute',
+    // The circle straddles the corner; the tap square stays on screen.
+    top: '-18px',
+    right: '-16px',
+    width: '48px',
+    height: '48px',
+    padding: '0px',
+    borderRadius: '50%',
+    backgroundColor: 'transparent',
+    backgroundImage: { default: 'none', ':hover': 'none', ':active': 'none' },
+    color: colorVars['--color-text-primary'],
+  },
+  // The circle you see, inside the 48px square you tap.
+  clearDot: {
+    width: '28px',
+    height: '28px',
+    borderRadius: '50%',
+    backgroundColor: colorVars['--color-background-body'],
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    borderColor: colorVars['--color-border'],
+    boxShadow: '0 1px 4px light-dark(oklch(0 0 0 / 12%), oklch(0 0 0 / 40%))',
+  },
+  sheetLinks: { width: '100%' },
   // Clear of the grab handle, as the New message sheet is.
   sheet: { width: '100%', paddingInline: '20px', paddingBlockStart: spacingVars['--spacing-6'], paddingBottom: '24px' },
   sheetTitle: { fontSize: '26px', lineHeight: 1.2, fontWeight: 700 },
@@ -168,7 +198,7 @@ export function MemberPolicyScreen({
 }) {
   const { t, locale } = useI18n();
   const { policies } = usePolicies();
-  const { signature, signedAt, sign } = useMySignatures();
+  const { signature, signedAt, signedWith, sign, unsign, forgetSignature } = useMySignatures();
   // Moving to the next policy happens here, not by a new link: the same
   // screen with a different `?id=` would reload the app (D-269).
   const [currentId, setCurrentId] = useState<string | null>(policyId);
@@ -179,6 +209,7 @@ export function MemberPolicyScreen({
   const index = shown.findIndex((p) => p.id === (currentId ?? policyId));
   const policy: DummyPolicy | null = index >= 0 ? shown[index]! : null;
   const when = policy ? signedAt(placeId, policy.id) : null;
+  const signedImage = policy ? signedWith(placeId, policy.id) : null;
   const next = policy ? shown.find((p, i) => i !== index && !signedAt(placeId, p.id)) : undefined;
 
   const signNow = (drawn?: string) => {
@@ -223,9 +254,18 @@ export function MemberPolicyScreen({
                     {t('memberPolicy.signed', { date: day.format(new Date(when)) })}
                   </Text>
                 </HStack>
-                {signature ? (
-                  <img src={signature} alt={t('memberPolicy.yourSignature')} {...stylex.props(styles.signedImage)} />
+                {signedImage ? (
+                  <img src={signedImage} alt={t('memberPolicy.yourSignature')} {...stylex.props(styles.signedImage)} />
                 ) : null}
+                <ClearSignature
+                  label={t('memberPolicy.clear')}
+                  onPress={() => {
+                    // Off this policy, and a fresh signature to sign it with.
+                    unsign(placeId, policy.id);
+                    forgetSignature();
+                    setSheetOpen(true);
+                  }}
+                />
               </VStack>
               {next ? (
                 <BigButton
@@ -240,29 +280,29 @@ export function MemberPolicyScreen({
               )}
             </>
           ) : (
-            <>
+            <VStack gap={3} xstyle={styles.signGroup}>
               {signature ? (
-                // Signed once already: Sign is one tap, and says with what.
-                <VStack gap={1}>
-                  <HStack gap={3} align="center" justify="between" wrap="nowrap" xstyle={styles.saved}>
-                    <Text type="supporting" xstyle={styles.note}>
-                      {t('memberPolicy.withSaved')}
-                    </Text>
-                    <img src={signature} alt={t('memberPolicy.yourSignature')} {...stylex.props(styles.savedImage)} />
-                  </HStack>
-                  <Button
-                    label={t('memberPolicy.redraw')}
-                    variant="ghost"
-                    onClick={() => setSheetOpen(true)}
-                    xstyle={styles.link}
+                // Signed once already: Sign is one tap, right under the
+                // signature it will use; the corner × draws a new one.
+                <HStack gap={3} align="center" justify="between" wrap="nowrap" xstyle={styles.saved}>
+                  <Text type="supporting" xstyle={styles.yourSignature}>
+                    {t('memberPolicy.withSaved')}
+                  </Text>
+                  <img src={signature} alt={t('memberPolicy.yourSignature')} {...stylex.props(styles.savedImage)} />
+                  <ClearSignature
+                    label={t('memberPolicy.clear')}
+                    onPress={() => {
+                      forgetSignature();
+                      setSheetOpen(true);
+                    }}
                   />
-                </VStack>
+                </HStack>
               ) : null}
               <BigButton
                 label={t('memberPolicy.sign')}
                 onPress={() => (signature ? signNow() : setSheetOpen(true))}
               />
-            </>
+            </VStack>
           )}
 
           <SignSheet
@@ -346,26 +386,22 @@ function SignSheet({
             placeholder={t('sign.placeholder')}
             onInkChange={setHasInk}
           />
-          <HStack gap={2} align="center" justify="between" wrap="nowrap" xstyle={styles.sheetRow}>
-            <Button
+          <HStack gap={2} align="center" justify="between" wrap="nowrap" xstyle={styles.sheetLinks}>
+            <TextLink
               label={t(isTyping ? 'sign.drawInstead' : 'sign.type')}
-              variant="ghost"
               onClick={() => {
                 pad.current?.clear();
                 setName('');
                 setTyping((on) => !on);
               }}
-              xstyle={styles.link}
             />
-            <Button
+            <TextLink
               label={t('sign.clear')}
-              variant="ghost"
               isDisabled={!hasInk}
               onClick={() => {
                 pad.current?.clear();
                 setName('');
               }}
-              xstyle={styles.link}
             />
           </HStack>
           <BigButton
@@ -382,5 +418,22 @@ function SignSheet({
         </VStack>
       ) : null}
     </BottomSheet>
+  );
+}
+
+/** The tiny white × on a signature's corner (D-271): clear it and sign again. */
+function ClearSignature({ label, onPress }: { readonly label: string; readonly onPress: () => void }) {
+  return (
+    <IconButton
+      label={label}
+      variant="ghost"
+      icon={
+        <HStack align="center" justify="center" xstyle={styles.clearDot}>
+          <Icon icon="close" size="sm" />
+        </HStack>
+      }
+      onClick={onPress}
+      xstyle={styles.clear}
+    />
   );
 }

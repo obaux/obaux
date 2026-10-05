@@ -6098,6 +6098,52 @@ the sign button."
   - a typed name signs.
   The full e2e suite passed.
 
+### D-271 — Policies on top of a place with a visit booked; a corner × to sign again; links look like links
+
+Will, 5 October, from the phone, with four screenshots:
+- the place page needs "a way to show more prominently on top … that
+  signatures are needed", with "a version … that's green and verifies that
+  Signatures are completed";
+- the signed box needs even padding and "a tiny white circle X on top
+  corner to clear signature, and sign again";
+- "link buttons should not have this round pill shape, only text color
+  change with underline on hover";
+- Sign should sit "right under the pre-filled signature", "Sign a new way"
+  should go, and the box should say "Your signature:".
+
+- **`PolicyStatusCard` (`@pam/ui`).** A white card under the place's name
+  and open/closed line, above the round buttons (`PlaceDetail` `notice`).
+  - To sign: a pen in the trip token's orange circle, "Policies to sign",
+    "Sign before your visit", in the token's orange text colour.
+  - All signed: the green version, "Policies signed", "All signatures
+    complete".
+  - It shows when the member has a visit booked at this place (example or
+    added trips) or arrived from Trips. Otherwise the policies stay a row at
+    the foot of the page, as in D-270, and never both.
+  - The title is the token's text colour rather than a brighter orange: on
+    white, `--color-icon-orange` and `--color-text-orange` are the same dark
+    orange, and a lighter one would fail contrast.
+- **The signature box** has 16px padding all round, so the tick sits as far
+  from the top as from the left.
+  - The corner × is a 28px white circle drawn inside a 48px tap square,
+    because every button keeps PAM's 48px floor (a global rule).
+  - On a signed policy, × takes the signature off that policy, forgets the
+    saved one, and opens the sheet to sign again.
+  - On the "Your signature:" box, × forgets the saved signature and opens
+    the sheet.
+  - Each signed policy now keeps the picture it was signed with
+    (`useMySignatures` stores `{ at, image }`; old string entries still
+    read), so a new signature never changes an earlier one.
+- **Sign right under the signature.** The two sit together with 12px
+  between them; "Sign a new way" is gone.
+- **`TextLink` looks like a link, everywhere.** No padding, no pill on hover
+  or press (Astryx's ghost button paints one as a background image). The
+  colour turns accent and an underline appears on hover. It stays a 48px
+  target. The signing sheet's "Type my name instead" and "Clear" use it.
+- **Proven by:** `e2e/policies.spec.ts`, which adds a test that the corner ×
+  clears a signed policy and the saved signature. The full suite passed
+  (546/546).
+
 ---
 
 ## Notes for whoever picks this up next

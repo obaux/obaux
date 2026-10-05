@@ -158,8 +158,8 @@ export const flows = [
         title: 'A place',
         story: 'member-app-screens--place',
         path: '/place/',
-        changed: 'D-270',
-        note: 'Round buttons spread edge to edge; Policies to sign at the foot',
+        changed: 'D-271',
+        note: 'With a visit booked: orange "Sign before your visit" card on top, green once signed',
       },
       policies: {
         title: 'Policies to sign',
@@ -229,6 +229,7 @@ export const flows = [
       ['profile', 'points', 'Points'],
     ],
     changes: [
+      'D-271 — a place with a visit shows its policies on top: orange to sign, green when signed',
       'D-270 — read and sign a program\'s policies: draw once, then one tap; trips show what is signed',
       'D-268 — Trips: small black pins with a tip; a light + New trip pill',
       'D-265 — Explore: a centred, bolder search, smaller chips and a "Your next visit" card; bell and Help live on Profile',

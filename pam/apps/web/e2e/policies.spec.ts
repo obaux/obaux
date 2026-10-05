@@ -63,3 +63,19 @@ test('a name can be typed instead of drawn', async ({ page }) => {
   await page.getByRole('dialog').getByRole('button', { name: 'Sign', exact: true }).click();
   await expect(page.getByText(/^Signed /)).toBeVisible();
 });
+
+test('the corner × clears a signature to sign again (D-271)', async ({ page }) => {
+  await page.goto(FIRST);
+  await page.getByRole('button', { name: 'Sign', exact: true }).click();
+  await draw(page);
+  await page.getByRole('dialog').getByRole('button', { name: 'Sign', exact: true }).click();
+  await expect(page.getByText(/^Signed /)).toBeVisible();
+
+  // Signed: × takes the signature off this policy and opens the sheet.
+  await page.getByRole('button', { name: 'Clear signature and sign again' }).click();
+  await expect(page.getByRole('dialog').getByRole('heading', { name: 'Your signature' })).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.getByText(/^Signed /)).toHaveCount(0);
+  // No saved signature any more: Sign opens the sheet again.
+  await expect(page.getByText('Your signature:')).toHaveCount(0);
+});

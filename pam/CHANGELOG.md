@@ -69,7 +69,11 @@ when there are three or four. At the foot of a place's page, members can read
 the program's policies before a visit and sign them: draw your name with your
 finger (or type it) the first time, and every policy after that is one tap.
 Trips show "Signatures needed" or "Policies signed", and booking a visit ends
-with a button to sign.
+with a button to sign. A place you have a visit at shows its policies near
+the top: orange "Sign before your visit", or green once everything is signed.
+A small × on a signature clears it so you can sign again, the Sign button sits
+right under your saved signature, and text links no longer show a grey pill
+when pressed.
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 
