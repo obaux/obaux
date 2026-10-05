@@ -454,3 +454,4 @@ Chromium.
 - D-267: connections subtitle (`FloatingAction description`), invite member subtitle, `ScheduleView` week default, chip row runs to the screen edge. Checked: typecheck, Storybook screenshots (Explore chips, Messages, Invite someone, program lead Home), web build, e2e a11y, places, messages, admin, people-strip: 201/201. Map: program lead Home marked D-267.
 - D-268: Trips pins (black disc with a tip and a white icon, 40px; Google `PIN_SVG`), `NewTripButton` as a light top-centre pill. Checked: typecheck, Storybook screenshot, web build, e2e place and a11y: 69/69. Map: member Trips marked D-268.
 - D-265 follow-up: the launcher was 48px and the open pill 60px; set `height: 60px` on the launcher (measured 60/60).
+- D-268 follow-up: pin as one SVG teardrop (`PIN_PATH`), no white ring, drop shadow; Google marker uses the same path. Checked: typecheck, Storybook build, a 3x screenshot of a pin.

@@ -5961,6 +5961,11 @@ instead of plus button on top right, copy the search the map [pill] … say
   at 20px, and a small rotated-square tip. The labels under them shrink from
   14px to 12px. Google's markers, when a key is set, use the same shape as an
   SVG (`PIN_SVG`), without the category icon.
+- **Addendum, same day:** "the arrow edges more fluid with the circle … no
+  need for white border". The pin is now one SVG teardrop (`PIN_PATH`): a
+  19px circle whose sides leave along the circle's own tangent and curve into
+  a rounded tip. It has no ring; a soft drop shadow lifts it off the map.
+  Google's markers use the same path.
 - **"+ New trip"** (`NewTripButton`) is a white pill at the top centre of the
   map, 44px tall, with a semibold label and a soft shadow, in place of the
   dark green round +. It still opens `/trips/new/`.
