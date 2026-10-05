@@ -370,7 +370,8 @@ Profile's two tiles have pictures from one art kit (`art/kit.tsx`, `BadgeArt`,
 job was red from D-287 to D-293 (a PlaceCard test) and is fixed with D-295. Saved's visit tag is a small white chip in the corner (D-296). Category colour is flat
 everywhere: `ToneDot` (half-circle pair) on chips, `ToneGround` (pale fill + shards) on
 Saved, trip cards and the next-visit tile; `GlowIcon` is deleted (D-297). A print grain (`Grain`, 30%, D-299) sits on every ArtFrame and
-ToneGround; ToneDot is darker on the left (D-298) and sits 11px from the chip's top and left (D-300). How points should be awarded — two rules live
+ToneGround; ToneDot is darker on the left (D-298) and sits 11px from the chip's top and left (D-300). Home and family has two pictures
+(home, family), chosen per place by id (D-301). How points should be awarded — two rules live
 (save a place, finish setup), the rest to build, with order and open
 questions — is specified in `docs/points-awarding.md`. The
 signatures are example data too, kept only for the visit (session storage).

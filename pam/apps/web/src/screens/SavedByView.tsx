@@ -44,6 +44,7 @@ export function SavedByView({ personId, name }: { readonly personId: string; rea
               key={place.id}
               name={place.name}
               category={place.category}
+              artSeed={place.id}
               href={`/place/?id=${encodeURIComponent(place.id)}`}
               description={place.description}
               labels={{ save: t('action.save'), saved: t('places.saved') }}

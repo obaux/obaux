@@ -49,6 +49,8 @@ export interface PlaceCardProps {
    * out, the card is text only — the layout still holds.
    */
   readonly category?: Category | null;
+  /** The place's id, so its picture is chosen the same way every time (D-301). */
+  readonly artSeed?: string;
   /** One sentence, from the catalogue. Clipped to two lines. */
   readonly description?: string | null;
   /**
@@ -176,6 +178,7 @@ export function PlaceCard({
   name,
   href,
   category = null,
+  artSeed,
   description,
   distanceLabel,
   status,
@@ -193,7 +196,7 @@ export function PlaceCard({
         <HStack gap={3} align="start" wrap="nowrap">
           {category ? (
             <HStack xstyle={styles.art}>
-              <CategoryArt category={category} />
+              <CategoryArt category={category} {...(artSeed ? { seed: artSeed } : {})} />
             </HStack>
           ) : null}
           <VStack gap={0.5} xstyle={styles.words}>

@@ -349,6 +349,7 @@ function PlacesScreen() {
                 <PlaceCard
                   name={place.name}
                   category={place.category}
+                  artSeed={place.id}
                   href={`/place/?id=${encodeURIComponent(place.id)}&from=places`}
                   description={place.description}
                   {...(miles ? { distanceLabel: t(miles.key, miles.vars) } : {})}

@@ -150,6 +150,7 @@ export function ReportedPlaces({
             key={row.flagId}
             name={row.name}
             category={row.category}
+            artSeed={row.id}
             href={row.href}
             description={row.description}
             status={placeStatus(row.id, row.hours, now, t, locale)}

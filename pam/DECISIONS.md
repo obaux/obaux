@@ -7051,6 +7051,34 @@ matches the left space."
 - **Proven by:** those measurements; the UI and config unit tests;
   typecheck; the web build; and e2e 570/570.
 
+### D-301 — Home and family get their own pictures, in the grocery bag's colours
+
+Will, 5 October: "For place cards, I love those illustrations. We need
+variants that also include family and home, right now the grocery store
+one is not a fit, but I love its colors."
+
+- **Two pictures replace the grocery bag** for Home and family. Both keep
+  its palette: a purple ground and shard, a pink corner, yellow, red and
+  greens.
+  - `FamilyHome`: a house with a heart on its door, a lit window, a bush and
+    the path in.
+  - `FamilyPeople`: a parent and a child in front of a home's outline, a
+    heart above them.
+- **Variants by place:** `CategoryArt` takes a category's list of
+  pictures, and `seed` (the place's id) picks one with a small stable hash.
+  A list of several family places shows both, and one place always shows
+  the same picture. `PlaceCard` takes `artSeed`, and every list passes the
+  place's id. `variant` picks one directly, for the stories. Education and
+  Work still have one picture each.
+- **Asked at the same time, not built:** an overlay blend for the icons on
+  trip cards and the next visit. A mock compared normal, overlay, multiply,
+  and multiply with a mid-shade icon. Overlay made the dark icon a faint
+  ghost on the pale ground, and multiply alone looked like today. Waiting
+  on Will.
+- **Proven by:** a Storybook screenshot of the four pictures and Explore's
+  cards; the UI and config unit tests; typecheck; the web build; and e2e
+  570/570.
+
 ---
 
 ## Notes for whoever picks this up next

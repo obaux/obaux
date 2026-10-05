@@ -161,6 +161,7 @@ export default function SavedPage() {
               <PlaceCard
                 name={place.name}
                 category={place.category}
+                artSeed={place.id}
                 href={`/place/?id=${encodeURIComponent(place.id)}&from=saved`}
                 description={place.description}
                 status={placeStatus(place.id, place.hours, now, t, locale)}

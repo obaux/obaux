@@ -282,6 +282,7 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
             <PlaceCard
               name={place.name}
               category={place.category}
+              artSeed={place.id}
               href={`/place/?id=${encodeURIComponent(place.id)}&from=${from}`}
               description={place.description}
               {...(miles ? { distanceLabel: t(miles.key, miles.vars) } : {})}
