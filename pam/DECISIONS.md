@@ -6929,6 +6929,30 @@ now runs `pnpm --filter @pam/ui --filter @pam/config test` every time.
 The Publish Storybook job on several of those pushes was cancelled by the
 next push, so Chromatic lagged behind the branch at times.
 
+### D-296 — Saved: a white visit chip, and no glow
+
+Will, 5 October, with a screenshot of Saved: "This is too much. Chips
+should be white and subtle. The glow is not working here, let's remove
+them."
+
+- **The visit tag (D-292)** is now a small white chip in the picture's top
+  corner:
+  - one line, "Oct 7 · 10:00 AM", at 12px semibold in the primary text
+    colour;
+  - a soft shadow; no calendar icon, no green;
+  - an ellipsis if it is ever too long.
+
+  It no longer sits over the icon, so the icon stays centred, and the
+  "move the icon up" padding is gone.
+- **No glow on Saved:** the icon keeps its category colour on white.
+  `GlowIcon` takes `hasGlow`, and `CategoryGlow` passes it through. The
+  chips and trip cards keep their glow (D-293); Will's note was about this
+  screen.
+- **Unchanged:** a tile with a visit still opens the visit view, and the
+  spoken name still includes the time.
+- **Proven by:** Storybook screenshots at 390px and 320px; the UI (67) and
+  config (236) unit tests; typecheck; the web build; and e2e 570.
+
 ---
 
 ## Notes for whoever picks this up next

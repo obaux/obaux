@@ -117,7 +117,8 @@ Get directions opens Google Maps without forcing a walking route, and the
 smaller second line on list rows says "Open in Google Maps". Profile's award
 and Connections tiles, every badge and every rung of the ladder now have
 their own pictures, in the same style as the place cards; badges you have
-not earned yet are shown in grey.
+not earned yet are shown in grey. On Saved, a visit shows as a small white
+chip in the picture's corner, and the icons have no glow.
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 

@@ -367,7 +367,8 @@ cards and the next-visit card use `CategoryGlow` on white tiles (D-293). Directi
 travel mode (D-294, SOP A17); MenuList descriptions are 14px. Every badge, every rung and
 Profile's two tiles have pictures from one art kit (`art/kit.tsx`, `BadgeArt`,
 `ConnectionsArt`), and a unit test keeps badges and pictures in step (D-295). CI's unit-test
-job was red from D-287 to D-293 (a PlaceCard test) and is fixed with D-295. How points should be awarded — two rules live
+job was red from D-287 to D-293 (a PlaceCard test) and is fixed with D-295. Saved's visit tag is a small white chip in the corner and its
+icons have no glow (D-296). How points should be awarded — two rules live
 (save a place, finish setup), the rest to build, with order and open
 questions — is specified in `docs/points-awarding.md`. The
 signatures are example data too, kept only for the visit (session storage).

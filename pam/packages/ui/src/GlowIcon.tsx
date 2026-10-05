@@ -19,6 +19,8 @@ export interface GlowIconProps {
   readonly tone?: GlowTone | null;
   /** `sm` behind an 18px chip icon; `md` behind a trip card's 40px; `lg` behind a 52px tile icon. */
   readonly size?: 'sm' | 'md' | 'lg';
+  /** False: the colour alone, no glow — Saved's tiles (Will, D-296). */
+  readonly hasGlow?: boolean;
   readonly children: ReactNode;
 }
 
@@ -66,10 +68,10 @@ const glows = stylex.create({
   gray: { backgroundColor: 'var(--color-data-gray-3)' },
 });
 
-export function GlowIcon({ tone = null, size = 'sm', children }: GlowIconProps) {
+export function GlowIcon({ tone = null, size = 'sm', hasGlow = true, children }: GlowIconProps) {
   return (
     <HStack align="center" justify="center" xstyle={[styles.wrap, tone && tones[tone]]}>
-      {tone ? <HStack aria-hidden xstyle={[styles.glow, styles[size], glows[tone]]} /> : null}
+      {tone && hasGlow ? <HStack aria-hidden xstyle={[styles.glow, styles[size], glows[tone]]} /> : null}
       {children}
     </HStack>
   );

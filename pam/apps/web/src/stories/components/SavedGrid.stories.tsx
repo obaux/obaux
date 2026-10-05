@@ -16,12 +16,12 @@ const meta = {
         subtitle: 'School and training',
         href: '/place/?id=dummy-place-learning&from=saved&trip=dummy-trip-1',
         art: (
-          <GlowIcon tone="blue" size="lg">
+          <GlowIcon tone="blue" size="lg" hasGlow={false}>
             <BigCategoryIcon category="education" />
           </GlowIcon>
         ),
-        tag: { day: 'Wed, Oct 7', time: '10:00 AM' },
-        label: 'Example Learning Center. Your visit: Wed, Oct 7 · 10:00 AM',
+        tag: 'Oct 7 · 10:00 AM',
+        label: 'Example Learning Center. Your visit: Oct 7 · 10:00 AM',
       },
       {
         id: 'b',
@@ -29,7 +29,7 @@ const meta = {
         subtitle: 'Home and family',
         href: '/place/?id=dummy-place-food&from=saved',
         art: (
-          <GlowIcon tone="purple" size="lg">
+          <GlowIcon tone="purple" size="lg" hasGlow={false}>
             <BigCategoryIcon category="family_services" />
           </GlowIcon>
         ),

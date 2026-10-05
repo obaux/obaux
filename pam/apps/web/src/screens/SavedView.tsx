@@ -124,7 +124,8 @@ export function SavedView({
 }: SavedViewProps) {
   const { t, locale } = useI18n();
   // "Wed, Oct 7 · 10:00 AM", the trip card's own form.
-  const dayFmt = new Intl.DateTimeFormat(locale, { weekday: 'short', month: 'short', day: 'numeric' });
+  // "Oct 7 · 10:00 AM" — one short line for the chip (D-296).
+  const dayFmt = new Intl.DateTimeFormat(locale, { month: 'short', day: 'numeric' });
   const timeFmt = new Intl.DateTimeFormat(locale, { hour: 'numeric', minute: '2-digit' });
   const all = state.status === 'ready' && !replace ? state.places : [];
   const places = hidden ? all.filter((place) => !hidden.has(place.id)) : all;
@@ -199,7 +200,7 @@ export function SavedView({
             // still comes to Saved.
             const visit = visits[place.id];
             const at = visit ? new Date(visit.startsAt) : null;
-            const tag = at ? { day: dayFmt.format(at), time: timeFmt.format(at) } : null;
+            const tag = at ? `${dayFmt.format(at)} · ${timeFmt.format(at)}` : null;
             return {
               id: place.id,
               name: place.name,
@@ -210,9 +211,11 @@ export function SavedView({
                 ...(visit ? { trip: visit.id } : {}),
               }).toString()}`,
               // The category's own colour, glowing, on white (D-292).
-              art: <CategoryGlow category={place.category} size="lg" />,
+              // The category's colour on white, no glow (Will, D-296: "the glow
+              // is not working here").
+              art: <CategoryGlow category={place.category} size="lg" hasGlow={false} />,
               tag,
-              ...(tag ? { label: t('saved.visitLabel', { name: place.name, when: `${tag.day} · ${tag.time}` }) } : {}),
+              ...(tag ? { label: t('saved.visitLabel', { name: place.name, when: tag }) } : {}),
             };
           })}
         />
@@ -229,14 +232,16 @@ export function SavedView({
 export function CategoryGlow({
   category,
   size = 'md',
+  hasGlow = true,
   iconSize = ART,
 }: {
   readonly category: string;
   readonly size?: 'sm' | 'md' | 'lg';
+  readonly hasGlow?: boolean;
   readonly iconSize?: { readonly width: number; readonly height: number; readonly 'aria-hidden': true };
 }) {
   return (
-    <GlowIcon tone={categoryTone(category)} size={size}>
+    <GlowIcon tone={categoryTone(category)} size={size} hasGlow={hasGlow}>
       <BigCategoryIcon category={category} size={iconSize} />
     </GlowIcon>
   );
