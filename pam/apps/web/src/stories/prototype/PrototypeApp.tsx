@@ -131,6 +131,11 @@ export function PrototypeApp({ routes, start, chrome, first }: PrototypeAppProps
       // A bare in-page anchor (`#top`) scrolls as it would anyway.
       if (href.startsWith('#')) return;
       event.preventDefault();
+      // A back button goes back up the stack when there is one (D-277).
+      if (anchor.hasAttribute('data-pam-back') && stackRef.current.length > 1) {
+        go('', 'back');
+        return;
+      }
       go(`${resolved.pathname}${resolved.search}${resolved.hash}`, 'push', morphSourceFor(anchor));
     };
     const onNavigate = (event: Event) => {

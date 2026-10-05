@@ -9,6 +9,7 @@ import { useI18n } from '@/lib/i18n';
 import { sendDemoThreadMessage, useDemoThread } from '@/lib/demoMessages';
 import { ThreadView } from './ThreadView';
 import { ThreadHeader } from './ThreadFrame';
+import { ThreadVisit } from './ThreadVisit';
 
 /**
  * An example conversation, for a role preview (D-180, D-183): the written
@@ -71,6 +72,10 @@ export function DemoThread({
         backLabel={t('nav.back.messages')}
         menuHref={`/messages/thread/options/?id=${encodeURIComponent(conversationId)}`}
       />
+      {/* A member's visit with this program, under the name (D-276). */}
+      {role === 'member' && other?.role === 'provider' ? (
+        <ThreadVisit programName={other.orgName ?? null} threadId={conversationId} />
+      ) : null}
       <ThreadView
         messages={messages}
         otherName={other?.firstName ?? null}

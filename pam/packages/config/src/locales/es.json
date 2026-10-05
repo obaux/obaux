@@ -1116,5 +1116,6 @@
   "places.kind.neighborhood": "Barrio",
   "places.kind.landmark": "Lugar conocido",
   "places.kind.address": "Dirección",
-  "places.areaHint": "Como 19107, o 1231 N Broad St."
+  "places.areaHint": "Como 19107, o 1231 N Broad St.",
+  "messages.visit.label": "Tu visita, {day} a las {time}. Ver el lugar."
 }

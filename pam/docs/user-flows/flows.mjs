@@ -186,7 +186,13 @@ export const flows = [
         note: 'Signatures needed / Policies signed on each trip; Sign policies after booking',
       },
       messages: { title: 'Messages', story: 'member-app-screens--messages', path: '/messages/' },
-      thread: { title: 'A conversation', story: 'member-app-screens--conversation', path: '/messages/thread/' },
+      thread: {
+        title: 'A conversation',
+        story: 'member-app-screens--conversation',
+        path: '/messages/thread/',
+        changed: 'D-276',
+        note: 'With a program: the booked visit on top, opening the place; Back returns here',
+      },
       options: { title: 'Conversation options', story: 'member-app-screens--conversation-options', path: '/messages/thread/options/' },
       profile: {
         title: 'Profile',
@@ -239,6 +245,7 @@ export const flows = [
       ['profile', 'points', 'Points'],
     ],
     changes: [
+      'D-277 — Back returns to the screen you came from, everywhere. D-276 — a conversation shows the booked visit',
       'D-275 — Explore: the area opens a Location drawer (search, current location, Done)',
       'D-274 — Profile: award tile; bell for texts. D-273 — a place from a trip shows the visit',
       'D-272 — Connections cards: message button, program link, "Connected by"; no profile page',

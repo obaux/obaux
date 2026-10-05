@@ -188,6 +188,8 @@ export function SubPageHeader({
   );
 }
 
+const BACK_MARK = { 'data-pam-back': '' } as Record<string, string>;
+
 /**
  * The template's round back button on its own (D-218), for a nested screen
  * whose top is a search bar rather than a title — All programs.
@@ -202,10 +204,13 @@ export function BackButton({
   /** Instead of `href`: back one step on the same screen (D-235). */
   readonly onPress?: () => void;
 }) {
+  // `data-pam-back` (D-277): with a link, the app's own navigation takes the
+  // member back through history to wherever they came from, and uses `href`
+  // only when there is nowhere in PAM to go back to.
   return (
     <IconButton
       label={label}
-      {...(onPress ? { onClick: onPress } : { href })}
+      {...(onPress ? { onClick: onPress } : { href, ...BACK_MARK })}
       variant="ghost"
       icon={
         <HStack>

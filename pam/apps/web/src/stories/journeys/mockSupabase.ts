@@ -130,7 +130,10 @@ function routesFor(journeyRole: JourneyRole): Route[] {
       // The one example conversation is a member's with their case manager;
       // the super admin is never in one with a member (D-262), so their list
       // falls to the example set, where Teresa is.
-      if (role === 'super_admin') return { body: [] };
+      // ... and a member's list falls to the example set too (D-276), where
+      // both Teresa and Sandra are; the one real thread (CONVO_ID) is still
+      // reachable by its own address, as the conversation stories use it.
+      if (role === 'super_admin' || role === 'member') return { body: [] };
       return { body: [{ conversation_id: CONVO_ID, last_read_at: null }] };
     }),
     // Message {name} on a caseload member's page (D-231, D-234) opens the one

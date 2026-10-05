@@ -6286,6 +6286,57 @@ looking up a location."
   test that closing without Done changes nothing. axe passes with the
   drawer open, and the full suite passed (549/549).
 
+### D-276 — A booked visit sits at the top of the conversation with its program
+
+Will, 5 October: "show another message in member's storybook view, so users
+can see the message from Sandra's learning center. Also if an appointment
+was made, please show the appointment item used in place profile from trip,
+but this time it has a chevron and it opens the profile when clicked, and
+if going back it should return to message."
+
+- **`ThreadVisit`** (`apps/web/src/app/messages/ThreadVisit.tsx`): the
+  D-273 green visit card, pinned under the conversation's header, in a
+  member's conversation with a program. Here it has a chevron and opens
+  the place (`/place/?…&from=thread&thread=<id>&trip=<id>`), which shows
+  the same visit; the place's Back is "Back to the conversation", by id.
+  - The program is matched to an example place by name, and the soonest
+    upcoming example or added trip there is shown. Nothing when there is
+    none. Real data: a trip's program id, once trips are stored.
+- **Sandra's thread in Storybook.** The example set already had Jordan ↔
+  Sandra; the stand-in database gave a member one "real" conversation
+  (Teresa), which hid the example list. A member's list now falls to the
+  example set, as the super admin's does, so both Teresa and Sandra show.
+  The one real thread is still reachable by its own address for the
+  conversation stories.
+
+### D-277 — Back goes to where you came from
+
+Will, 5 October: "When I click on alerts from profile then hit back, it
+returns to home. Is there a way to keep the previous page … This is a
+problem across various places in app."
+
+- Every nested screen names a fixed screen for Back, which is right for a
+  link opened cold and wrong inside the app: Text alerts says Home, and a
+  member who opened it from Profile went Home.
+- Since D-269 the app no longer reloads between screens, so the browser's
+  history is PAM's own. Back buttons (`SubPage`'s `BackButton`, which the
+  conversation header uses too, and `PageTitle`'s) carry `data-pam-back`.
+  `ClientNav` keeps a count of how deep inside PAM the tab is — up on every
+  move it makes, down when the browser goes back — and a marked back button
+  goes back through history while the count is above zero, with the 'back'
+  transition. At zero (a shared link, a reload with no history) it uses its
+  `href` as before.
+  - The count lives in session storage, so a reload keeps it in step with
+    the history the tab still has. The browser's forward button is not
+    counted; a wrong count only means a back button uses its fixed target.
+  - The prototype does the same with its own stack.
+- `onBack` steps (New trip's Where → When → Check) are untouched: they
+  are steps on one screen, not history.
+- **Proven by:** `e2e/back.spec.ts`: Places, whose fixed target is Home,
+  returns to Help when opened from Help, and still goes Home when opened
+  cold. The prototype was checked by hand (Profile → Text reminders → Back
+  lands on Profile).
+
 ---
 
 ## Notes for whoever picks this up next

@@ -86,7 +86,12 @@ const BACK_TARGETS = {
   messages: { href: '/messages/', labelKey: 'nav.back.messages' },
 } as const;
 
-function resolveBack(from: string | null): { href: string; labelKey: string } {
+function resolveBack(from: string | null, thread: string | null = null): { href: string; labelKey: string } {
+  // From the visit card at the top of a conversation (D-276): back to that
+  // conversation, by its id — the one target that is not a fixed screen.
+  if (from === 'thread' && thread) {
+    return { href: `/messages/thread/?id=${encodeURIComponent(thread)}`, labelKey: 'messages.options.back' };
+  }
   return BACK_TARGETS[from as keyof typeof BACK_TARGETS] ?? BACK_TARGETS.places;
 }
 
@@ -204,7 +209,7 @@ function PlaceScreen() {
   const params = useSearchParams();
   const id = params.get('id');
   const state = useServiceDetail(id);
-  const back = resolveBack(params.get('from'));
+  const back = resolveBack(params.get('from'), params.get('thread'));
 
   const { state: session } = useSession();
   const signedIn = session.status === 'signed-in';
@@ -220,7 +225,9 @@ function PlaceScreen() {
   // about that visit (D-273): its day and time instead of "Plan a trip".
   const [hasTrip, setHasTrip] = useState(false);
   const [visitAt, setVisitAt] = useState<string | null>(null);
-  const fromTrips = params.get('from') === 'trips';
+  // A visit card on Trips or in a conversation opens the place about that
+  // visit (D-273, D-276).
+  const fromTrips = params.get('from') === 'trips' || params.get('from') === 'thread';
   const tripId = params.get('trip');
   useEffect(() => {
     if (!place) return;

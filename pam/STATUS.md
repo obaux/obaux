@@ -343,7 +343,10 @@ the whole profile: a message button, the program as a link, and who connected
 the member; the separate profile page is gone (D-272). A place opened from a trip shows the visit
 (green, day and time) instead of "Plan a trip" (D-273). Profile's member
 tile is the award level (D-274). Choosing the area is a drawer with search,
-current location and Done (D-275). The
+current location and Done (D-275). A conversation with a program shows the booked
+visit, opening the place and back (D-276). Back goes through history to
+wherever the member came from, with the fixed target only for a cold link
+(D-277). The
 signatures are example data too, kept only for the visit (session storage).
 From a request the super admin can open the requested program and text the
 requester. In the redesign they can also message staff (never members),

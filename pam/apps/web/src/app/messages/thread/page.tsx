@@ -14,6 +14,7 @@ import { useThread } from '@/lib/useThread';
 import { ThreadViewLazy } from '../ThreadViewLazy';
 import { ThreadFrame, ThreadHeader, ThreadTop } from '../ThreadFrame';
 import { DemoThreadLazy } from '../DemoThreadLazy';
+import { ThreadVisit } from '../ThreadVisit';
 
 /**
  * One conversation — read what has been said, and send the next thing.
@@ -160,6 +161,10 @@ function ThreadScreen() {
             backLabel={t('nav.back.messages')}
             menuHref={`/messages/thread/options/?id=${encodeURIComponent(conversationId ?? '')}`}
           />
+          {/* A member's visit with this program, under the name (D-276). */}
+          {trueRole === 'member' && state.otherRole === 'provider' ? (
+            <ThreadVisit programName={state.otherProgramName ?? null} threadId={conversationId ?? ''} />
+          ) : null}
         </ThreadTop>
         <ThreadViewLazy
           messages={state.messages}

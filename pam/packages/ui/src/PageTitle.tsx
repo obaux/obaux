@@ -63,6 +63,8 @@ export function PageTitle({ title, subtitle, backHref, backLabel, titleControl }
             icon={<Icon icon="chevronLeft" />}
             variant="ghost"
             href={backHref}
+            // Back through history when there is some (D-277).
+            {...({ 'data-pam-back': '' } as Record<string, string>)}
             xstyle={styles.back}
           />
         ) : null}

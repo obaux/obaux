@@ -81,7 +81,9 @@ first. On Profile a member sees their award level instead of past trips, and
 the text reminders card has a bell. The chosen language is bold and green
 with a heavier tick, and Explore's area is a link that fits on one line. Changing the area opens a
 drawer: search with the usual search bar, use your current location, pick a
-result, and press Done.
+result, and press Done. A conversation with a program shows your booked
+visit at the top; tapping it opens the place, and Back returns to the
+conversation. Back now returns to the screen you came from, everywhere.
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 

@@ -1116,5 +1116,6 @@
   "places.kind.neighborhood": "Neighborhood",
   "places.kind.landmark": "Landmark",
   "places.kind.address": "Address",
-  "places.areaHint": "Like 19107, or 1231 N Broad St."
+  "places.areaHint": "Like 19107, or 1231 N Broad St.",
+  "messages.visit.label": "Your visit, {day} at {time}. See the place."
 }
