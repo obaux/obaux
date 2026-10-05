@@ -168,6 +168,32 @@ export function Ground({ base, shards = [] }: { readonly base: Fill; readonly sh
 
 const frame = stylex.create({ svg: { display: 'block', flexShrink: 0 } });
 
+const grain = stylex.create({
+  // Printed, not glossy (Will, 5 October, D-298: "add a texture similar to
+  // what we see in illustrations"). Faint: it darkens by a few percent.
+  rect: { mixBlendMode: 'multiply', opacity: 0.16, pointerEvents: 'none' },
+});
+
+/**
+ * The carousel's print grain, laid over a 56-grid picture (D-298): fractal
+ * noise, made grey, multiplied in at low strength. Draw it last, inside the
+ * picture's own clip. Decoration only.
+ */
+export function Grain() {
+  const id = useId();
+  return (
+    <>
+      <defs>
+        <filter id={id} x="0" y="0" width="100%" height="100%">
+          <feTurbulence type="fractalNoise" baseFrequency="1.15" numOctaves="2" stitchTiles="stitch" />
+          <feColorMatrix type="saturate" values="0" />
+        </filter>
+      </defs>
+      <rect width="56" height="56" filter={`url(#${id})`} {...stylex.props(grain.rect)} />
+    </>
+  );
+}
+
 /**
  * The frame every picture is drawn in: a 56-grid scaled to `size`, clipped
  * to a rounded square (place cards, Profile) or a circle (badges, the
@@ -190,7 +216,10 @@ export function ArtFrame({
           {shape === 'circle' ? <circle cx="28" cy="28" r="28" /> : <rect width="56" height="56" rx="16" />}
         </clipPath>
       </defs>
-      <g clipPath={`url(#${clip})`}>{children}</g>
+      <g clipPath={`url(#${clip})`}>
+        {children}
+        <Grain />
+      </g>
     </svg>
   );
 }

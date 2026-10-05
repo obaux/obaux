@@ -1,7 +1,10 @@
+'use client';
+
 import type { ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { HStack } from '@astryxdesign/core/HStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
+import { Grain } from './art/kit.js';
 
 /**
  * A category's colour, in the illustrations' language (Will, 5 October,
@@ -11,7 +14,8 @@ import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
  * Two pieces, both in the palest shade and a facet half a step darker,
  * so they stay faint:
  *   - `ToneDot`, behind a small icon (the category chips): a circle made
- *     of two half circles, the lit half and the shaded half;
+ *     of two half circles, the shaded half on the left, going strong to
+ *     soft (D-298);
  *   - `ToneGround`, filling a square picture (Saved, trip cards, the next
  *     visit): the colour edge to edge, cut by two diagonal shards — the
  *     same ground the illustrations stand on.
@@ -81,8 +85,9 @@ export function ToneDot({ tone, children }: { readonly tone?: Tone | null; reado
   return (
     <HStack align="center" justify="center" xstyle={[styles.dot, styles.dotSize, icons[tone]]}>
       <svg viewBox="0 0 26 26" aria-hidden focusable="false" {...stylex.props(styles.dotArt)}>
-        <path d="M13 0a13 13 0 0 0 0 26z" {...stylex.props(pale[tone])} />
-        <path d="M13 0a13 13 0 0 1 0 26z" {...stylex.props(facet[tone])} />
+        {/* Strong to soft (Will, D-298): the darker half on the left. */}
+        <path d="M13 0a13 13 0 0 0 0 26z" {...stylex.props(facet[tone])} />
+        <path d="M13 0a13 13 0 0 1 0 26z" {...stylex.props(pale[tone])} />
       </svg>
       {children}
     </HStack>
@@ -100,6 +105,7 @@ export function ToneGround({ tone }: { readonly tone?: Tone | null }) {
       <rect width="56" height="56" {...stylex.props(pale[tone])} />
       <path d="M0 40 56 26v30H0z" {...stylex.props(facet[tone])} />
       <path d="M40 0h16v12z" {...stylex.props(facet[tone])} />
+      <Grain />
     </svg>
   );
 }

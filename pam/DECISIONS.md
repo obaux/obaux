@@ -6993,6 +6993,29 @@ opacity increase."
     viewport, a place card this change does not touch, and it did not
     come back.
 
+### D-298 — A print grain on every picture; half circles go strong to soft
+
+Will, 5 October: "any way to add a texture similar to what we see in
+illustrations? Also for half circles let's make the darker half circle be
+on left side… so it goes strong to soft."
+
+- **Grain:** `Grain` in `art/kit.tsx` is the carousel's printed texture,
+  made as fractal noise (`feTurbulence`, base frequency 1.15, two octaves),
+  turned grey and multiplied in at 16%.
+  - Every `ArtFrame` draws it last, inside its clip: place cards, every
+    badge and rung, and Profile's tiles.
+  - `ToneGround` draws it too: Saved, trip cards, and the next visit.
+  - So the flat colour and the illustrations share one surface.
+  - It is SVG, so there is no image to load, and the bundle is still
+    within budget.
+- **Half circles:** `ToneDot`'s darker facet is now the left half, the
+  pale one the right, going strong to soft.
+- **Not grained:** the 26px chip circle. At that size, noise reads as dirt
+  rather than texture.
+- **Proven by:** Storybook screenshots at 3× (Saved, Explore's chips and
+  next visit, the badges); the UI and config unit tests; typecheck; the web
+  build and budget; and e2e 570/570.
+
 ---
 
 ## Notes for whoever picks this up next
