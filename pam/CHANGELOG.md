@@ -111,6 +111,8 @@ On Saved, a place you have a visit at shows the day and time on its picture,
 and opening it shows that visit (Back returns to Saved); a changed time
 changes the tag. Each picture is white, with its category's icon in colour
 and a soft glow.
+Trip cards and Explore's next-visit card show each category's icon in its own
+colour on white, and the glow behind icons is softer and the same everywhere.
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 

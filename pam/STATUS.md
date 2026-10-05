@@ -362,7 +362,8 @@ their icons (D-288). The docked Trips drawer is 100px with its list hidden; unre
 the tab bar and the bell use `pam.brandPink`, the selected tab's pink (D-289). The half stop is 50% of the height + 48px (D-290). A place's quick actions are
 `MenuList` rows (directions, message, call, website), and directions carry Google's
 place ID when known (D-291). Saved's tiles are white with a glowing category icon, and
-show a visit's day and time when one is booked, opening the visit view (D-292). How points should be awarded — two rules live
+show a visit's day and time when one is booked, opening the visit view (D-292). `GlowIcon` (sm/md/lg) is the single, softer glow; trip
+cards and the next-visit card use `CategoryGlow` on white tiles (D-293). How points should be awarded — two rules live
 (save a place, finish setup), the rest to build, with order and open
 questions — is specified in `docs/points-awarding.md`. The
 signatures are example data too, kept only for the visit (session storage).

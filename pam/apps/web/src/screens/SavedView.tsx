@@ -210,11 +210,7 @@ export function SavedView({
                 ...(visit ? { trip: visit.id } : {}),
               }).toString()}`,
               // The category's own colour, glowing, on white (D-292).
-              art: (
-                <GlowIcon tone={categoryTone(place.category)} size="lg">
-                  <BigCategoryIcon category={place.category} />
-                </GlowIcon>
-              ),
+              art: <CategoryGlow category={place.category} size="lg" />,
               tag,
               ...(tag ? { label: t('saved.visitLabel', { name: place.name, when: `${tag.day} · ${tag.time}` }) } : {}),
             };
@@ -222,6 +218,27 @@ export function SavedView({
         />
       ) : null}
     </Page>
+  );
+}
+
+/**
+ * A category's icon in that category's colour, with the soft glow behind it
+ * (D-288, D-292, D-293) — Saved's tiles, every trip card, Explore's next
+ * visit. One helper, so the colour and the glow are the same everywhere.
+ */
+export function CategoryGlow({
+  category,
+  size = 'md',
+  iconSize = ART,
+}: {
+  readonly category: string;
+  readonly size?: 'sm' | 'md' | 'lg';
+  readonly iconSize?: { readonly width: number; readonly height: number; readonly 'aria-hidden': true };
+}) {
+  return (
+    <GlowIcon tone={categoryTone(category)} size={size}>
+      <BigCategoryIcon category={category} size={iconSize} />
+    </GlowIcon>
   );
 }
 

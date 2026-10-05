@@ -6809,6 +6809,38 @@ with glow behind icon. White image bg."
   redesign (Storybook), so the e2e suite does not reach it. The new
   `SavedGrid` story shows a tile with a visit next to one without.
 
+### D-293 — One softer glow everywhere; trip cards are colour-coded
+
+Will, 5 October: "No need for new illustration on trip cards, let's just
+make sure they're color coded… Make glow even softer and make this
+consistent everywhere the glow is used."
+
+- **One glow:** `GlowIcon` is the only place the glow is drawn. The chips,
+  Saved and every trip card use it. It is softer: a wider blur at about a
+  third of the opacity, in the same proportions at three sizes:
+  - `sm` (chips): 26px circle, 8px blur, 38%;
+  - `md` (trip cards): 64px circle, 18px blur, 32%;
+  - `lg` (Saved tiles): 80px circle, 22px blur, 32%.
+- **`CategoryGlow`** (in `SavedView`): a category's icon in its tone with
+  the glow. It is used by:
+  - Saved;
+  - Trips' cards;
+  - Explore's "Your next visit";
+  - past trips;
+  - a member's page for a case manager.
+
+  The map pins stay black, with a white icon.
+- **Tiles are white:**
+  - `TripCard`'s art box is white with a hairline, and was grey.
+  - `NextTripCard`'s front tile is white, and was accent green.
+
+  The grey dulled the category colour, and a green tile under a blue icon
+  read as a mistake.
+- **No new illustrations on trip cards**, as Will asked. `CategoryArt`
+  (D-287) stays on place cards only.
+- **Proven by:** typecheck, the web build, Storybook screenshots (Trips,
+  Explore's chips and next visit, Saved), and the full e2e suite (570).
+
 ---
 
 ## Notes for whoever picks this up next

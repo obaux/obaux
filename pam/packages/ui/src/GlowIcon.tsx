@@ -17,8 +17,8 @@ export type GlowTone = 'blue' | 'green' | 'purple' | 'orange' | 'red' | 'teal' |
 
 export interface GlowIconProps {
   readonly tone?: GlowTone | null;
-  /** `sm` behind an 18px chip icon; `lg` behind a 52px tile icon. */
-  readonly size?: 'sm' | 'lg';
+  /** `sm` behind an 18px chip icon; `md` behind a trip card's 40px; `lg` behind a 52px tile icon. */
+  readonly size?: 'sm' | 'md' | 'lg';
   readonly children: ReactNode;
 }
 
@@ -33,8 +33,12 @@ const styles = stylex.create({
     zIndex: -1,
     pointerEvents: 'none',
   },
-  sm: { width: '24px', height: '24px', filter: 'blur(5px)', opacity: 0.6 },
-  lg: { width: '76px', height: '76px', filter: 'blur(16px)', opacity: 0.55 },
+  // Softer (Will, 5 October, D-293): wider blur, lower opacity, the same
+  // proportions at every size, so the glow is one thing everywhere — a tint
+  // behind the icon, never a coloured disc.
+  sm: { width: '26px', height: '26px', filter: 'blur(8px)', opacity: 0.38 },
+  md: { width: '64px', height: '64px', filter: 'blur(18px)', opacity: 0.32 },
+  lg: { width: '80px', height: '80px', filter: 'blur(22px)', opacity: 0.32 },
 });
 
 const tones = stylex.create({

@@ -52,7 +52,9 @@ const styles = stylex.create({
   back: { transform: 'rotate(-7deg)', backgroundColor: colorVars['--color-background-muted'] },
   front: {
     transform: 'rotate(3deg)',
-    backgroundColor: colorVars['--color-accent-muted'],
+    // White, so the category's own colour and glow carry it (D-293); the
+    // white rim and shadow still lift it off the card.
+    backgroundColor: colorVars['--color-background-card'],
     color: colorVars['--color-icon-accent'],
   },
 });

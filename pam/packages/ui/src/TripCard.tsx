@@ -44,7 +44,12 @@ const styles = stylex.create({
     // parallel (Will, 3 October).
     borderRadius: '14px',
     color: colorVars['--color-icon-accent'],
-    backgroundColor: colorVars['--color-background-muted'],
+    // White with a hairline (D-293), like Saved's tiles: grey dulled the
+    // category's colour and its glow.
+    backgroundColor: colorVars['--color-background-card'],
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    borderColor: colorVars['--color-border'],
   },
   body: { minWidth: 0, flexGrow: 1 },
   // One line, ending in "…" — a long program name no longer pushes the
