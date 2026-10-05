@@ -6134,6 +6134,15 @@ Will, 5 October, from the phone, with four screenshots:
   - Each signed policy now keeps the picture it was signed with
     (`useMySignatures` stores `{ at, image }`; old string entries still
     read), so a new signature never changes an earlier one.
+- **Addendum, same day:** "The X button on top right is off." On Will's
+  phone the circle hung off the box's edge and Safari stretched it into a
+  pill: the flex container inside the button stretched the circle to the
+  button's 48px height.
+  - The × now sits inside the box's top-right corner, 14px in from both
+    edges and level with the "Signed" line.
+  - The circle is absolutely placed at a fixed 28×28 in the middle of the
+    48px tap square, so no flex rule can resize it.
+  - The "Your signature:" box keeps 56px clear on its right for it.
 - **Sign right under the signature.** The two sit together with 12px
   between them; "Sign a new way" is gone.
 - **`TextLink` looks like a link, everywhere.** No padding, no pill on hover

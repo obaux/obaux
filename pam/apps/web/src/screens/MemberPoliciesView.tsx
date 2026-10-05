@@ -71,23 +71,38 @@ const styles = stylex.create({
   // The tiny white × on the box's corner: clear this signature and sign
   // again. 28px to look at, a 48px square to tap (§2.5) — every button keeps
   // the 48px floor, so the circle is drawn inside it.
+  // Inside the box's top-right corner, level with the "Signed" line (Will,
+  // 5 October: on a phone the old one hung off the edge as an oval).
   clear: {
     position: 'absolute',
-    // The circle straddles the corner; the tap square stays on screen.
-    top: '-18px',
-    right: '-16px',
+    top: '4px',
+    right: '4px',
     width: '48px',
     height: '48px',
+    minWidth: '48px',
     padding: '0px',
+    borderWidth: '0px',
     borderRadius: '50%',
     backgroundColor: 'transparent',
     backgroundImage: { default: 'none', ':hover': 'none', ':active': 'none' },
     color: colorVars['--color-text-primary'],
   },
-  // The circle you see, inside the 48px square you tap.
+  // The circle you see, pinned in the middle of the 48px square you tap —
+  // absolutely placed and fixed in size, so no browser's flex rules can
+  // stretch it (Safari stretched the old one into a pill).
   clearDot: {
+    position: 'absolute',
+    top: '10px',
+    left: '10px',
     width: '28px',
     height: '28px',
+    minWidth: '28px',
+    minHeight: '28px',
+    maxWidth: '28px',
+    maxHeight: '28px',
+    flexGrow: 0,
+    flexShrink: 0,
+    boxSizing: 'border-box',
     borderRadius: '50%',
     backgroundColor: colorVars['--color-background-body'],
     borderWidth: '1px',
@@ -95,6 +110,8 @@ const styles = stylex.create({
     borderColor: colorVars['--color-border'],
     boxShadow: '0 1px 4px light-dark(oklch(0 0 0 / 12%), oklch(0 0 0 / 40%))',
   },
+  // The "Your signature:" box keeps its picture clear of the ×.
+  savedRow: { paddingRight: '56px' },
   sheetLinks: { width: '100%' },
   // Clear of the grab handle, as the New message sheet is.
   sheet: { width: '100%', paddingInline: '20px', paddingBlockStart: spacingVars['--spacing-6'], paddingBottom: '24px' },
@@ -284,7 +301,13 @@ export function MemberPolicyScreen({
               {signature ? (
                 // Signed once already: Sign is one tap, right under the
                 // signature it will use; the corner × draws a new one.
-                <HStack gap={3} align="center" justify="between" wrap="nowrap" xstyle={styles.saved}>
+                <HStack
+                  gap={3}
+                  align="center"
+                  justify="between"
+                  wrap="nowrap"
+                  xstyle={[styles.saved, styles.savedRow]}
+                >
                   <Text type="supporting" xstyle={styles.yourSignature}>
                     {t('memberPolicy.withSaved')}
                   </Text>
