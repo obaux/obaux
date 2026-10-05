@@ -371,7 +371,9 @@ job was red from D-287 to D-293 (a PlaceCard test) and is fixed with D-295. Save
 everywhere: `ToneDot` (half-circle pair) on chips, `ToneGround` (pale fill + shards) on
 Saved, trip cards and the next-visit tile; `GlowIcon` is deleted (D-297). A print grain (`Grain`, 30%, D-299) sits on every ArtFrame and
 ToneGround; ToneDot is darker on the left (D-298) and sits 11px from the chip's top and left (D-300). Home and family's picture is the home with a heart on
-its door (D-301, D-302); trip icons are baked in with a doubled overlay (`ToneBakedIcon`, D-302). How points should be awarded — two rules live
+its door (D-301, D-302); trip icons are baked in with a doubled overlay (`ToneBakedIcon`, D-302). Saved's chip is
+12px in from the corner; a member's example trips are two (no pantry visit); Trips map pins
+are placed in pixels between the note and the half drawer (D-303). How points should be awarded — two rules live
 (save a place, finish setup), the rest to build, with order and open
 questions — is specified in `docs/points-awarding.md`. The
 signatures are example data too, kept only for the visit (session storage).

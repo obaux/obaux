@@ -7104,6 +7104,40 @@ stronger. Let's go with home with heart on door."
   food pantry's card; the UI and config unit tests; typecheck; the web
   build; and e2e 570/570.
 
+### D-303 — Saved's date chip sits in from the corner; the pantry has no visit
+
+Will, 5 October: "position it a bit lower and a bit more to right so the
+card's corner radius feels proportional to the chip. Also let's not make
+the food pantry look like appointments were set so we can see the
+difference between them and how the profiles look different when opening."
+
+- **The chip** sits 12px from the top and left, up from 8px. That is half
+  the tile's 24px corner radius (measured, not assumed), so the chip's
+  round end sits inside the curve. Its max width follows.
+- **The pantry's visit is gone** from a member's example trips:
+  - `DUMMY_TRIPS` holds two visits.
+  - Saved shows two tiles with a date chip and one without.
+  - The pantry opens as an ordinary place, with "Plan a trip" and no "Your
+    next visit".
+  - Trips says "2 coming up".
+
+  The pantry trip is still in the pool for other people's example
+  histories (`dummyTripsFor`, a case manager's view of a member), so those
+  keep three places.
+- **Found from it: the Trips map placed pins by percentage.** With two
+  trips, the westernmost pin sat on the "Map preview" note. A first fix,
+  moving the band down, pushed a pin's name under the drawer at 390px and
+  still hit the note at 320×640.
+  - Pins are now placed in pixels from the screen's height. Each pin's foot
+    falls between one pin's height below the note and the half-open
+    drawer's edge, and horizontally from 44% to 80%, clear of the note.
+  - On a phone too short for both, the note wins and the drawer, which sits
+    on top, covers the date.
+  - Checked at 390×844, 320×640 and 430×932.
+- **Proven by:** measurements in Storybook; screenshots of Saved, the
+  pantry's profile and Trips at three sizes; the UI and config unit tests;
+  typecheck; the web build; and e2e 570/570.
+
 ---
 
 ## Notes for whoever picks this up next

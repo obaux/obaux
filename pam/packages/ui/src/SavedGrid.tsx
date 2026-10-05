@@ -63,9 +63,11 @@ const styles = stylex.create({
   // over the icon.
   tag: {
     position: 'absolute',
-    top: '8px',
-    insetInlineStart: '8px',
-    maxWidth: 'calc(100% - 16px)',
+    // In from the corner by half the tile's 24px radius, so the chip's
+    // round end sits inside the curve rather than against it (Will, D-303).
+    top: '12px',
+    insetInlineStart: '12px',
+    maxWidth: 'calc(100% - 24px)',
     paddingInline: '8px',
     paddingBlock: '4px',
     borderRadius: '999px',

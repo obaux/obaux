@@ -34,6 +34,24 @@ export interface TripPin {
 
 const KEY = process.env['NEXT_PUBLIC_GOOGLE_MAPS_KEY'] ?? '';
 
+// The preview's layout, for placing pins (D-303): the tab bar under the map,
+// the foot of the "Map preview" note, and a pin's height with a two-line
+// name and its date. The drawer's half stop is MapDrawer's (D-290).
+const TAB_BAR_HEIGHT = 66;
+const NOTE_BOTTOM = 128;
+const PIN_BLOCK = 112;
+
+function useViewportHeight(): number {
+  const [height, setHeight] = useState(800);
+  useEffect(() => {
+    const read = () => setHeight(window.innerHeight);
+    read();
+    window.addEventListener('resize', read);
+    return () => window.removeEventListener('resize', read);
+  }, []);
+  return height;
+}
+
 const styles = stylex.create({
   map: { position: 'absolute', inset: 0, overflow: 'hidden' },
   preview: {
@@ -65,7 +83,7 @@ const styles = stylex.create({
     minWidth: '48px',
     minHeight: '48px',
   },
-  pinAt: (left: number, top: number) => ({ left: `${left}%`, top: `${top}%` }),
+  pinAt: (left: number, top: number) => ({ left: `${left}%`, top: `${top}px` }),
   // One teardrop, the tip flowing out of the circle (Will, 5 October, D-268:
   // "the arrow edges more fluid with the circle … no need for white border").
   // The shape is an SVG path; the icon sits in the circle's centre.
@@ -108,10 +126,25 @@ function PreviewTripsMap({ pins: all }: { readonly pins: readonly TripPin[] }) {
   const lons = pins.map((p) => p.lon);
   const [minLat, maxLat] = [Math.min(...lats), Math.max(...lats)];
   const [minLon, maxLon] = [Math.min(...lons), Math.max(...lons)];
-  // Pins sit in the band the half-open drawer leaves visible.
+  // Pins sit in the band between the "Map preview" note and the half-open
+  // drawer, in pixels from the screen's height (D-303): percentages put a
+  // pin on the note on one phone and under the drawer on another. A pin is
+  // anchored at its foot (circle, name, date above it), so its foot must be
+  // a pin's height below the note and no lower than the drawer's edge. On a
+  // phone too short for both, the note wins and the drawer, which sits on
+  // top, covers the date.
+  const viewport = useViewportHeight();
+  const mapHeight = viewport - TAB_BAR_HEIGHT;
+  const drawerTop = mapHeight - (Math.round(mapHeight * 0.5) + 48);
+  const highest = NOTE_BOTTOM + PIN_BLOCK;
+  const lowest = Math.max(highest, drawerTop - 8);
   const place = (p: TripPin) => ({
-    left: pins.length < 2 || maxLon === minLon ? 50 : 24 + ((p.lon - minLon) / (maxLon - minLon)) * 52,
-    top: pins.length < 2 || maxLat === minLat ? 36 : 26 + ((maxLat - p.lat) / (maxLat - minLat)) * 18,
+    // From 44% across: the note is at the top left.
+    left: pins.length < 2 || maxLon === minLon ? 56 : 44 + ((p.lon - minLon) / (maxLon - minLon)) * 36,
+    top:
+      pins.length < 2 || maxLat === minLat
+        ? Math.round((highest + lowest) / 2)
+        : Math.round(highest + ((maxLat - p.lat) / (maxLat - minLat)) * (lowest - highest)),
   });
 
   return (

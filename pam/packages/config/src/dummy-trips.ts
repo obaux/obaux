@@ -29,6 +29,11 @@ const daysFromNow = (n: number, hour: number) => {
   return d.toISOString();
 };
 
+/*
+ * A member's upcoming example visits: two, not three (Will, 5 October,
+ * D-303). The food pantry has no visit, so Saved and the place show what a
+ * place without an appointment looks like beside two that have one.
+ */
 export const DUMMY_TRIPS: readonly DummyTrip[] = [
   {
     id: 'dummy-trip-1',
@@ -52,18 +57,22 @@ export const DUMMY_TRIPS: readonly DummyTrip[] = [
     startsAt: daysFromNow(5, 13),
     withId: 'dummy-p2',
   },
-  {
-    id: 'dummy-trip-3',
-    placeId: 'dummy-place-food',
-    placeName: 'Example Food Pantry',
-    category: 'family_services',
-    address: '789 Broad St',
-    lat: 39.9612,
-    lon: -75.1583,
-    startsAt: daysFromNow(9, 11),
-    withId: 'dummy-a1',
-  },
 ];
+
+// Still in the pool for other people's example histories (a case manager's
+// view of a member), so those keep three places to vary across.
+const PANTRY_TRIP: DummyTrip = {
+  id: 'dummy-trip-3',
+  placeId: 'dummy-place-food',
+  placeName: 'Example Food Pantry',
+  category: 'family_services',
+  address: '789 Broad St',
+  lat: 39.9612,
+  lon: -75.1583,
+  startsAt: daysFromNow(9, 11),
+  withId: 'dummy-a1',
+};
+const HISTORY_POOL: readonly DummyTrip[] = [...DUMMY_TRIPS, PANTRY_TRIP];
 
 /**
  * Example trips for any member, past and coming up (D-227) — what a case
@@ -75,7 +84,7 @@ export function dummyTripsFor(personId: string): DummyTrip[] {
   const seed = [...personId].reduce((n, ch) => (n * 31 + ch.charCodeAt(0)) % 997, 7);
   const offsets = [-24, -12, -4, 3, 10].map((d, i) => d + ((seed + i * 5) % 3));
   return offsets.map((offset, i) => {
-    const base = DUMMY_TRIPS[(seed + i) % DUMMY_TRIPS.length]!;
+    const base = HISTORY_POOL[(seed + i) % HISTORY_POOL.length]!;
     return {
       ...base,
       id: `${base.id}-${personId}-${i}`,

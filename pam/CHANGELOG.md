@@ -126,6 +126,10 @@ printed grain, and the chips' circles are darker on the left.
 Home and family places show a home with a heart on its door instead of a
 grocery bag, in the same colours. On trip cards and the next-visit card the
 icon is printed into the picture's colour rather than drawn on top.
+Saved's date chip sits a little further in from the corner. The example food
+pantry no longer has a visit, so Saved and its page show a place without one.
+Pins on the Trips map no longer cover the "Map preview" note or fall under the
+drawer.
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 
