@@ -17,7 +17,7 @@ import { useRouter } from 'next/navigation';
 import { dummyTripsFor } from '@pam/config/dummy-trips';
 import { useCaseload, type CaseloadMember } from '@/lib/useCaseload';
 import { openConversation } from '@/lib/openConversation';
-import { CategoryGlow } from '../../screens/SavedView';
+import { CategoryIcon, categoryTone } from '../../screens/SavedView';
 
 const TRIP_ART = { width: 40, height: 40, 'aria-hidden': true } as const;
 import { SubPageHeader } from '@pam/ui/SubPage';
@@ -301,7 +301,8 @@ function PersonScreen() {
       placeName={trip.placeName}
       when={tripWhen(trip.startsAt)}
       href={`/place/?id=${encodeURIComponent(trip.placeId)}`}
-      art={<CategoryGlow category={trip.category} iconSize={TRIP_ART} />}
+      art={<CategoryIcon category={trip.category} iconSize={TRIP_ART} />}
+      tone={categoryTone(trip.category)}
       label={`${trip.placeName}, ${tripWhen(trip.startsAt)}`}
     />
   );

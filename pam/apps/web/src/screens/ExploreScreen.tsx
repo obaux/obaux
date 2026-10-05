@@ -7,7 +7,7 @@ import { SearchLauncher, SearchPill, type SearchPillItem } from '@pam/ui/SearchP
 import { NextTripCard } from '@pam/ui/NextTripCard';
 import { DUMMY_TRIPS } from '@pam/config/dummy-trips';
 import { readMoves } from '@/lib/addedTrips';
-import { CategoryGlow } from './SavedView';
+import { CategoryIcon, categoryTone } from './SavedView';
 import { USE_DUMMY_PEOPLE } from '@pam/config/dummy-flag';
 import { categoryLabelKey, distanceLabel } from '@pam/config';
 import type { SearchSource } from '@astryxdesign/core/Typeahead';
@@ -231,7 +231,8 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
           <NextTripCard
             categoryLabel={t(categoryLabelKey(nextTrip.category))}
             categoryIcon={TRIP_ICONS[nextTrip.category]}
-            art={<CategoryGlow category={nextTrip.category} iconSize={TRIP_BIG} />}
+            art={<CategoryIcon category={nextTrip.category} iconSize={TRIP_BIG} />}
+            tone={categoryTone(nextTrip.category)}
             title={t('explore.nextTrip.title')}
             when={tripWhen(nextTrip.startsAt, locale)}
             href="/trips/"

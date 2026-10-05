@@ -18,7 +18,7 @@ import { TripCard } from '@pam/ui/TripCard';
 import { DUMMY_TRIPS } from '@pam/config/dummy-trips';
 import { dummyConnection } from '@pam/config/dummy-connections';
 import { useI18n } from '@/lib/i18n';
-import { BigCategoryIcon, CategoryGlow } from './SavedView';
+import { BigCategoryIcon, CategoryIcon, categoryTone } from './SavedView';
 import { TripsMap } from './TripsMap';
 import { BigButton } from '@pam/ui';
 import { Card } from '@astryxdesign/core/Card';
@@ -228,7 +228,8 @@ export function TripsView({ trips, headerActions, justAdded = null }: TripsViewP
                 when={when(trip.startsAt)}
                 href={href(trip)}
                 // Colour-coded by category, with the soft glow (D-293).
-                art={<CategoryGlow category={trip.category} iconSize={ART} />}
+                art={<CategoryIcon category={trip.category} iconSize={ART} />}
+                tone={categoryTone(trip.category)}
                 withName={trip.withName ?? null}
                 withPhotoUrl={trip.withPhotoUrl ?? null}
                 policies={

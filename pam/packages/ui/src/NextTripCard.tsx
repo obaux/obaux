@@ -7,6 +7,7 @@ import { Icon } from '@astryxdesign/core/Icon';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
+import { ToneGround, type Tone } from './Tone.js';
 
 /**
  * A member's next visit, on Explore (Will, 5 October, D-265): one wide card
@@ -29,6 +30,8 @@ export interface NextTripCardProps {
   readonly href: string;
   /** The whole card read out — "Your next visit: School and training, Tue …". */
   readonly label: string;
+  /** The category's colour, filling the front tile with flat shards (D-297). */
+  readonly tone?: Tone | null;
 }
 
 const styles = stylex.create({
@@ -52,14 +55,16 @@ const styles = stylex.create({
   back: { transform: 'rotate(-7deg)', backgroundColor: colorVars['--color-background-muted'] },
   front: {
     transform: 'rotate(3deg)',
-    // White, so the category's own colour and glow carry it (D-293); the
-    // white rim and shadow still lift it off the card.
+    // The category's colour fills it (D-297); the white rim and shadow
+    // still lift it off the card.
     backgroundColor: colorVars['--color-background-card'],
+    isolation: 'isolate',
+    overflow: 'hidden',
     color: colorVars['--color-icon-accent'],
   },
 });
 
-export function NextTripCard({ categoryLabel, categoryIcon, art, title, when, href, label }: NextTripCardProps) {
+export function NextTripCard({ categoryLabel, categoryIcon, art, title, when, href, label, tone = null }: NextTripCardProps) {
   return (
     <ClickableCard label={label} href={href} padding={5} xstyle={styles.card}>
       <HStack gap={3} align="center" wrap="nowrap">
@@ -83,6 +88,7 @@ export function NextTripCard({ categoryLabel, categoryIcon, art, title, when, hr
         <HStack xstyle={styles.stack} aria-hidden>
           <HStack xstyle={[styles.tile, styles.back]} />
           <HStack align="center" justify="center" xstyle={[styles.tile, styles.front]}>
+            <ToneGround tone={tone} />
             {art}
           </HStack>
         </HStack>

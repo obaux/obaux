@@ -6953,6 +6953,46 @@ them."
 - **Proven by:** Storybook screenshots at 390px and 320px; the UI (67) and
   config (236) unit tests; typecheck; the web build; and e2e 570.
 
+### D-297 — Flat colour, not glow: half-circle chips, full-colour pictures
+
+Will, 5 October: "We need to rethink the glow style, it doesn't suit the
+other flat illustration aesthetic… small pops of color that feel unified
+to illustration cubic colorful feel, but subtle without being overbearing.
+More flat than blurry for sure." He saw a mock of flat facets and chose:
+"inside chip lets make them half circles halves that create a full color
+circle. Also on square images… use a shade of color instead of white bg,
+for a full color coverage." Also: "Keep the faint style no need for
+opacity increase."
+
+- **The glow is gone.** `GlowIcon` (D-288, D-293) is deleted. In its place
+  is `@pam/ui/Tone`:
+  - `ToneDot`: a 26px circle of two half circles, the lit half and the
+    shaded half. It sits behind a chip's icon. "All" has no tone and no
+    circle. A chip with a circle starts 8px from its edge, with an 8px gap
+    before its words.
+  - `ToneGround`: fills a square picture edge to edge with the category's
+    palest shade, cut by two diagonal shards (the low ground and a top
+    corner), the same ground the illustrations stand on. It is used by
+    Saved's tiles (`SavedTile.tone`), trip cards (`TripCard.tone`) and the
+    front tile of Explore's next visit (`NextTripCard.tone`). The trip
+    card's hairline is gone, because the colour edges it.
+  - `ToneIcon`: the icon in its category's deep colour, so it reads on
+    both. `CategoryIcon` in `SavedView` replaces `CategoryGlow`.
+- **Faint, on purpose:** only the palest shade (`--color-data-*-1`) and a
+  facet half a step darker. The facet is a `color-mix` of shades 1 and 2,
+  because shade 2 on its own was too strong when tried. There is no blur
+  and no opacity.
+- **One style:** the shapes and tokens are the illustrations' own (D-287,
+  D-295), so a chip, a saved place, a trip and a badge read as one set.
+- **Proven by:**
+  - Storybook screenshots of Explore's chips and next visit, Saved and
+    Trips;
+  - the UI and config unit tests, typecheck and the web build;
+  - e2e: 569 of 570 on the full run, plus `saved.spec.ts` at 72/72 over
+    three repeats. The one failure was the Save button on the iPhone SE
+    viewport, a place card this change does not touch, and it did not
+    come back.
+
 ---
 
 ## Notes for whoever picks this up next

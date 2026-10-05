@@ -9,6 +9,7 @@ import { Token } from '@astryxdesign/core/Token';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { SignIcon, SignedIcon } from './icons.js';
+import { ToneGround, type Tone } from './Tone.js';
 
 /**
  * One visit somebody has agreed to make (D-213, from the reference Will gave
@@ -32,6 +33,8 @@ export interface TripCardProps {
    * program asks for none.
    */
   readonly policies?: { readonly label: string; readonly isDone: boolean } | null;
+  /** The category's colour, filling the art box with flat shards (D-297). */
+  readonly tone?: Tone | null;
 }
 
 const styles = stylex.create({
@@ -44,12 +47,11 @@ const styles = stylex.create({
     // parallel (Will, 3 October).
     borderRadius: '14px',
     color: colorVars['--color-icon-accent'],
-    // White with a hairline (D-293), like Saved's tiles: grey dulled the
-    // category's colour and its glow.
+    // The category's colour fills it (D-297); white is only the fallback.
     backgroundColor: colorVars['--color-background-card'],
-    borderWidth: '1px',
-    borderStyle: 'solid',
-    borderColor: colorVars['--color-border'],
+    position: 'relative',
+    isolation: 'isolate',
+    overflow: 'hidden',
   },
   body: { minWidth: 0, flexGrow: 1 },
   // One line, ending in "…" — a long program name no longer pushes the
@@ -68,11 +70,22 @@ const styles = stylex.create({
 
 const TOKEN_ICON = { width: 14, height: 14, 'aria-hidden': true } as const;
 
-export function TripCard({ placeName, when, href, art, withName, withPhotoUrl, label, policies = null }: TripCardProps) {
+export function TripCard({
+  placeName,
+  when,
+  href,
+  art,
+  withName,
+  withPhotoUrl,
+  label,
+  policies = null,
+  tone = null,
+}: TripCardProps) {
   return (
     <ClickableCard label={label} href={href} padding={3} xstyle={styles.card}>
       <HStack gap={4} align="center" wrap="nowrap">
         <HStack align="center" justify="center" xstyle={styles.art}>
+          <ToneGround tone={tone} />
           {art}
         </HStack>
         <VStack gap={2} xstyle={styles.body}>

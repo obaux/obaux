@@ -5,7 +5,7 @@ import * as stylex from '@stylexjs/stylex';
 import { Button } from '@astryxdesign/core/Button';
 import { HStack } from '@astryxdesign/core/HStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
-import { GlowIcon, type GlowTone } from './GlowIcon.js';
+import { ToneDot, type Tone } from './Tone.js';
 
 /**
  * A row of rounded chips under the search bar, one per kind of place (D-212).
@@ -32,7 +32,7 @@ export interface CategoryChip<K extends string> {
   readonly tone?: ChipTone;
 }
 
-export type ChipTone = GlowTone;
+export type ChipTone = Tone;
 
 export interface CategoryChipsProps<K extends string> {
   readonly chips: readonly CategoryChip<K>[];
@@ -80,6 +80,9 @@ const styles = stylex.create({
     boxShadow: '0 1px 4px light-dark(oklch(0 0 0 / 7%), oklch(0 0 0 / 35%))',
     '::before': { content: "''", position: 'absolute', insetBlock: '-4px', insetInline: '-2px' },
   },
+  // A chip with a colour circle starts closer to its edge and keeps a gap
+  // before its words (D-297).
+  chipWithDot: { paddingInlineStart: '8px', gap: '8px' },
   chipOn: {
     borderWidth: '2px',
     borderColor: colorVars['--color-text-primary'],
@@ -102,13 +105,13 @@ export function CategoryChips<K extends string>({ chips, value, onChange, label 
             variant="secondary"
             aria-pressed={on}
             icon={
-              // The category's colour, with a soft glow behind (D-288).
-              <HStack xstyle={styles.icon}>
-                <GlowIcon tone={chip.tone ?? null}>{chip.icon}</GlowIcon>
-              </HStack>
+              // The category's colour on a circle of two half circles (D-297).
+              <ToneDot tone={chip.tone ?? null}>
+                <HStack xstyle={styles.icon}>{chip.icon}</HStack>
+              </ToneDot>
             }
             onClick={() => onChange(chip.key)}
-            xstyle={[styles.chip, on && styles.chipOn]}
+            xstyle={[styles.chip, chip.tone ? styles.chipWithDot : null, on && styles.chipOn]}
           />
         );
       })}

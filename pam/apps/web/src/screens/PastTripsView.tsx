@@ -10,7 +10,7 @@ import { dummyTripsFor } from '@pam/config/dummy-trips';
 import { useI18n } from '@/lib/i18n';
 import { useSession } from '@/lib/useSession';
 import { useRoleView } from '@/lib/useViewedRole';
-import { CategoryGlow } from './SavedView';
+import { CategoryIcon, categoryTone } from './SavedView';
 import { HeaderActions } from './HeaderActions';
 
 /**
@@ -56,7 +56,8 @@ export function PastTripsView({ personId, name }: { readonly personId: string; r
               placeName={trip.placeName}
               when={when(trip.startsAt)}
               href={`/place/?id=${encodeURIComponent(trip.placeId)}`}
-              art={<CategoryGlow category={trip.category} iconSize={TRIP_ART} />}
+              art={<CategoryIcon category={trip.category} iconSize={TRIP_ART} />}
+              tone={categoryTone(trip.category)}
               label={`${trip.placeName}, ${when(trip.startsAt)}`}
             />
           ))}

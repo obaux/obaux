@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/nextjs';
 import { SavedGrid } from '@pam/ui/SavedGrid';
-import { GlowIcon } from '@pam/ui/GlowIcon';
-import { BigCategoryIcon } from '../../screens/SavedView';
+import { CategoryIcon } from '../../screens/SavedView';
 
 /** Saved's tiles (D-292): category colour with a glow on white; a booked visit shows as a green tag. */
 const meta = {
@@ -16,10 +15,9 @@ const meta = {
         subtitle: 'School and training',
         href: '/place/?id=dummy-place-learning&from=saved&trip=dummy-trip-1',
         art: (
-          <GlowIcon tone="blue" size="lg" hasGlow={false}>
-            <BigCategoryIcon category="education" />
-          </GlowIcon>
+          <CategoryIcon category="education" />
         ),
+        tone: 'blue',
         tag: 'Oct 7 · 10:00 AM',
         label: 'Example Learning Center. Your visit: Oct 7 · 10:00 AM',
       },
@@ -28,10 +26,9 @@ const meta = {
         name: 'Example Food Pantry',
         subtitle: 'Home and family',
         href: '/place/?id=dummy-place-food&from=saved',
+        tone: 'purple',
         art: (
-          <GlowIcon tone="purple" size="lg" hasGlow={false}>
-            <BigCategoryIcon category="family_services" />
-          </GlowIcon>
+          <CategoryIcon category="family_services" />
         ),
       },
     ],

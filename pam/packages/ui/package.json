@@ -33,7 +33,7 @@
     "./VisitCard": "./src/VisitCard.tsx",
     "./CategoryArt": "./src/CategoryArt.tsx",
     "./BadgeArt": "./src/BadgeArt.tsx",
-    "./GlowIcon": "./src/GlowIcon.tsx",
+    "./Tone": "./src/Tone.tsx",
     "./MapDrawer": "./src/MapDrawer.tsx"
   },
   "scripts": {

@@ -29,7 +29,7 @@ import { LargeTitleHeader } from '@pam/ui/LargeTitleHeader';
 import { SavedGrid } from '@pam/ui/SavedGrid';
 import { PlaceCardSkeletonList } from '@pam/ui/Skeletons';
 import { CATEGORY_DEFINITIONS, categoryLabelKey, NOTICES, type Category } from '@pam/config';
-import { GlowIcon, type GlowTone } from '@pam/ui/GlowIcon';
+import { ToneIcon, type Tone } from '@pam/ui/Tone';
 import { useNextVisits, type NextVisit } from '@/lib/useNextVisits';
 import { useI18n } from '@/lib/i18n';
 import { useSession } from '@/lib/useSession';
@@ -78,9 +78,9 @@ export interface SavedViewProps {
 
 const ART = { width: 52, height: 52, 'aria-hidden': true } as const;
 
-/** A category's colour, as the chips use it (D-288). */
-function categoryTone(category: string): GlowTone | null {
-  return (CATEGORY_DEFINITIONS[category as Category]?.colorToken as GlowTone | undefined) ?? null;
+/** A category's colour, as the chips use it (D-288, D-297). */
+export function categoryTone(category: string): Tone | null {
+  return (CATEGORY_DEFINITIONS[category as Category]?.colorToken as Tone | undefined) ?? null;
 }
 
 const styles = stylex.create({
@@ -211,9 +211,9 @@ export function SavedView({
                 ...(visit ? { trip: visit.id } : {}),
               }).toString()}`,
               // The category's own colour, glowing, on white (D-292).
-              // The category's colour on white, no glow (Will, D-296: "the glow
-              // is not working here").
-              art: <CategoryGlow category={place.category} size="lg" hasGlow={false} />,
+              // The category's colour fills the picture, cut flat (D-297).
+              art: <CategoryIcon category={place.category} />,
+              tone: categoryTone(place.category),
               tag,
               ...(tag ? { label: t('saved.visitLabel', { name: place.name, when: tag }) } : {}),
             };
@@ -225,25 +225,21 @@ export function SavedView({
 }
 
 /**
- * A category's icon in that category's colour, with the soft glow behind it
- * (D-288, D-292, D-293) — Saved's tiles, every trip card, Explore's next
- * visit. One helper, so the colour and the glow are the same everywhere.
+ * A category's icon in that category's deep colour (D-297) — on Saved's
+ * tiles, every trip card and Explore's next visit, where `ToneGround` fills
+ * the picture behind it with the same colour, cut flat.
  */
-export function CategoryGlow({
+export function CategoryIcon({
   category,
-  size = 'md',
-  hasGlow = true,
   iconSize = ART,
 }: {
   readonly category: string;
-  readonly size?: 'sm' | 'md' | 'lg';
-  readonly hasGlow?: boolean;
   readonly iconSize?: { readonly width: number; readonly height: number; readonly 'aria-hidden': true };
 }) {
   return (
-    <GlowIcon tone={categoryTone(category)} size={size} hasGlow={hasGlow}>
+    <ToneIcon tone={categoryTone(category)}>
       <BigCategoryIcon category={category} size={iconSize} />
-    </GlowIcon>
+    </ToneIcon>
   );
 }
 
