@@ -6417,7 +6417,9 @@ there, what you have. The screen now follows that order.
   - Signing up is planning a trip, in the app's own words, so the row is
     "Plan a trip to a program", with a + mark.
   - The weekly-streak rule in config is unchanged; whoever implements
-    awarding should make it a return bonus to match.
+    awarding should make it a return bonus to match. The full awarding
+    logic, rule by rule, is in `docs/points-awarding.md` (Will asked for
+    it, to build later).
 - **The ladder, compact.**
   - One 44px row a rung: a 32px mark, the name, and the status on the
     right (Earned / 350 more to go / Coming later).
