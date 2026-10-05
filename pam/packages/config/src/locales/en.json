@@ -1133,5 +1133,9 @@
   "place.visit.last": "Your visit",
   "place.visit.change": "Change appointment",
   "trips.new.saveChange": "Save the new time",
-  "trips.new.changeTitle": "Change your visit"
+  "trips.new.changeTitle": "Change your visit",
+  "trips.moved.title": "Your visit is moved!",
+  "trips.moved.body": "{place}, {day} at {time}. See you there.",
+  "trips.moved.home": "Go home",
+  "trips.moved.note": "Taking you home in a few seconds."
 }

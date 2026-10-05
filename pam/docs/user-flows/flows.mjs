@@ -237,6 +237,7 @@ export const flows = [
       ['policies', 'policy', 'A policy'],
       ['trips', 'policies', 'Sign policies (just booked)', { dashed: true }],
       ['newTrip', 'trips', 'Trip added', { dashed: true }],
+      ['newTrip', 'explore', 'Visit moved: confetti, then home', { dashed: true }],
       ['messages', 'thread', 'Open'],
       ['thread', 'options', '⋯'],
       ['profile', 'connections', 'Connections'],
@@ -251,7 +252,7 @@ export const flows = [
       ['profile', 'points', 'Points'],
     ],
     changes: [
-      'D-281 — a place from a trip: "Your next visit" card, Change appointment, hours before About',
+      'D-282 — a moved visit: confetti with the new time, then home. D-281 — a place from a trip: "Your next visit" card, Change appointment, hours before About',
       'D-278 — Points as a journey: level and progress, ways to earn, badge medals. D-279 — signing: pinned button, Done',
       'D-277 — Back returns to the screen you came from, everywhere. D-276 — a conversation shows the booked visit',
       'D-275 — Explore: the area opens a Location drawer (search, current location, Done)',

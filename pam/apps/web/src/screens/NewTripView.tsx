@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { Button } from '@astryxdesign/core/Button';
 import { Card } from '@astryxdesign/core/Card';
@@ -17,9 +17,10 @@ import { Icon } from '@astryxdesign/core/Icon';
 import { IconButton } from '@astryxdesign/core/IconButton';
 import { MenuList } from '@pam/ui/MenuList';
 import { SubPage } from '@pam/ui/SubPage';
+import { SuccessScreen } from '@pam/ui/SuccessScreen';
 import { useI18n } from '@/lib/i18n';
 import { addTrip, moveTrip } from '@/lib/addedTrips';
-import { leaveFlow, navigate } from '@/lib/navigate';
+import { navigate } from '@/lib/navigate';
 import { HelpButton } from './HelpButton';
 import { BigCategoryIcon } from './SavedView';
 
@@ -51,7 +52,11 @@ const TIMES: readonly (readonly [number, number])[] = [
 
 const ICON = { width: 26, height: 26, 'aria-hidden': true } as const;
 
+/** How long the "Visit moved" celebration stays before going home (D-282). */
+const MOVED_HOLD_MS = 5000;
+
 const styles = stylex.create({
+  home: { minHeight: '56px', fontSize: '17px', paddingInline: '28px', borderRadius: '999px' },
   hint: { fontSize: '18px', lineHeight: 1.5 },
   // The chosen place on When, in the trip card's name style (Will, D-235).
   placeName: { fontSize: '17px', lineHeight: 1.3, fontWeight: 700 },
@@ -136,8 +141,8 @@ export function NewTripView({
   readonly initialPlace?: TripPlaceSeed | null;
   /**
    * The trip being moved, from a place's "Change appointment" (D-281): the
-   * same When and Check, then saving moves that trip instead of adding one,
-   * and returns to the place it began on.
+   * same When and Check, then saving moves that trip instead of adding one
+   * and celebrates the new time before going home (D-282).
    */
   readonly changing?: string | null;
 }) {
@@ -149,6 +154,15 @@ export function NewTripView({
   const [day, setDay] = useState<Date | null>(null);
   const [time, setTime] = useState<readonly [number, number] | null>(null);
   const [note, setNote] = useState('');
+  // The visit's new time, once saved (D-282): the celebration shows it.
+  const [movedTo, setMovedTo] = useState<Date | null>(null);
+  // A moment, not a stop (Will, 5 October): home on its own after a few
+  // seconds, or straight away with the button.
+  useEffect(() => {
+    if (!movedTo) return;
+    const timer = setTimeout(() => navigate('/'), MOVED_HOLD_MS);
+    return () => clearTimeout(timer);
+  }, [movedTo]);
 
   const days = useMemo(() => nextWeekdays(10), []);
   const dayFmt = new Intl.DateTimeFormat(locale, { weekday: 'short', month: 'short', day: 'numeric' });
@@ -159,6 +173,17 @@ export function NewTripView({
     x.setHours(h, m, 0, 0);
     return x;
   };
+
+  if (movedTo && place) {
+    return (
+      <SuccessScreen
+        title={t('trips.moved.title')}
+        body={t('trips.moved.body', { place: place.name, day: dayLong.format(movedTo), time: timeFmt.format(movedTo) })}
+        action={<Button label={t('trips.moved.home')} variant="secondary" href="/" xstyle={styles.home} />}
+        note={t('trips.moved.note')}
+      />
+    );
+  }
 
   const stepNumber = step === 'where' ? 1 : step === 'when' ? 2 : 3;
   const title =
@@ -295,10 +320,9 @@ export function NewTripView({
             label={t(changing ? 'trips.new.saveChange' : 'trips.new.add')}
             onPress={() => {
               if (changing) {
-                moveTrip(changing, at(day, time).toISOString());
-                // When, Check — two steps back to the place, now showing
-                // the new time.
-                leaveFlow(2, `/place/?${new URLSearchParams({ id: place.id, from: 'trips', trip: changing }).toString()}`);
+                const when = at(day, time);
+                moveTrip(changing, when.toISOString());
+                setMovedTo(when);
                 return;
               }
               const id = `added-${Date.now()}`;

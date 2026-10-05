@@ -6519,6 +6519,31 @@ not showing up as saved on trip profile, why is that?"
   - picking a new day and time, saving, and landing back on the place
     showing them.
 
+### D-282 — A moved visit gets a moment, then goes home
+
+Will, 5 October: "We need a temporary fun screen to confirm the appointment
+was changed at new time, then redirect to home page."
+
+- Saving a change (D-281) no longer goes straight back to the place. It
+  shows the `SuccessScreen` template (D-240), which has:
+  - confetti;
+  - the title "Your visit is moved!";
+  - the line "{place}, {day} at {time}. See you there.", which is a live
+    status, so a screen reader reads it out;
+  - a "Go home" button;
+  - the note "Taking you home in a few seconds."
+- **Home on its own after 5 seconds** (`MOVED_HOLD_MS` in `NewTripView`),
+  or straight away with the button. That is why the screen is a moment and
+  not a stop. The button means nobody has to wait, and the note means
+  nobody is surprised when the screen changes. Reduced motion stills the
+  confetti but keeps the redirect.
+- **Temporary, as Will said.** When moving a visit becomes a real request to
+  the program, this screen is where "sent, waiting for the program to
+  confirm" goes instead of "moved".
+- **Proven by:** `e2e/visit-change.spec.ts`. It checks the celebration, its
+  line with the new day and time, Go home, the redirect to `/`, and the
+  place showing the new time afterwards.
+
 ---
 
 ## Notes for whoever picks this up next

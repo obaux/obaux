@@ -22,24 +22,28 @@ test('the visit card says it is the next visit, where comes before what, and no 
   expect(results.violations).toEqual([]);
 });
 
-test('Change appointment moves the visit and returns to the place', async ({ page }) => {
-  await page.goto('/trips/');
-  await settled(page);
+test('Change appointment moves the visit, celebrates, then goes home', async ({ page }) => {
   await page.goto(FROM_TRIP);
   await settled(page);
   await page.getByRole('link', { name: 'Change appointment' }).click();
   await expect(page.getByRole('heading', { name: 'Change your visit' })).toBeVisible();
 
   const day = page.getByRole('button', { name: /^Mon, / }).last();
-  const picked = (await day.textContent())!.trim();
+  const date = (await day.textContent())!.trim().split(' ').pop()!;
   await day.click();
   await page.getByRole('button', { name: '3:30 PM' }).click();
   await page.getByRole('button', { name: 'Next' }).click();
   await page.getByRole('button', { name: 'Save the new time' }).click();
 
-  await expect(page).toHaveURL(/\/place\/\?.*id=dummy-place-learning/);
-  await expect(page.getByText('Your next visit')).toBeVisible();
+  // The moment (D-282): the new time, said out loud, and a way home.
+  await expect(page.getByRole('heading', { name: 'Your visit is moved!' })).toBeVisible();
+  await expect(page.getByText(new RegExp(`Example Learning Center, Monday, \\w+ ${date} at 3:30 PM`))).toBeVisible();
+  await expect(page.getByRole('link', { name: 'Go home' })).toBeVisible();
+  // …then home on its own.
+  await expect(page).toHaveURL(/\/$/, { timeout: 10_000 });
+
+  // The place shows the new time.
+  await page.goto(FROM_TRIP);
   await expect(page.getByText('3:30 PM')).toBeVisible();
-  // "Mon, Oct 19" on the chip, "Monday, October 19" on the card.
-  await expect(page.getByText(new RegExp(`Monday, \\w+ ${picked.split(' ').pop()}$`))).toBeVisible();
+  await expect(page.getByText(new RegExp(`Monday, \\w+ ${date}$`))).toBeVisible();
 });

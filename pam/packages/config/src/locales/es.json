@@ -1133,5 +1133,9 @@
   "place.visit.last": "Tu visita",
   "place.visit.change": "Cambiar cita",
   "trips.new.saveChange": "Guardar la nueva hora",
-  "trips.new.changeTitle": "Cambia tu visita"
+  "trips.new.changeTitle": "Cambia tu visita",
+  "trips.moved.title": "¡Tu visita cambió!",
+  "trips.moved.body": "{place}, {day} a las {time}. Nos vemos allí.",
+  "trips.moved.home": "Ir al inicio",
+  "trips.moved.note": "Te llevamos al inicio en unos segundos."
 }
