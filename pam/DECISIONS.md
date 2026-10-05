@@ -7138,6 +7138,37 @@ difference between them and how the profiles look different when opening."
   pantry's profile and Trips at three sizes; the UI and config unit tests;
   typecheck; the web build; and e2e 570/570.
 
+### D-304 — Nine example programs, not three
+
+Will, 5 October: "use more example programs in the Explore page so we don't
+only have one program per category, and also so not every program in
+Explore already has an appointment created."
+
+- **Six more example places**, two per category, in config's
+  `dummy-places.ts` (so `/place/?id=dummy-place-…` and Plan a visit know
+  them) and in Storybook's `PLACES`:
+  - School and training: Example Library Tech Lab, Example Adult Learning
+    Program.
+  - Work and money: Example Trade Skills Workshop, Example Money Help Desk.
+  - Home and family: Example Family Resource Center, Example Housing Help
+    Office.
+
+  Each has an ordinary description; none touches anything that hints at
+  justice involvement. The phone numbers are 555 example numbers, like the
+  rest.
+- **Most are plain:** of nine, three are saved (the member's own three),
+  and two have visits (D-303). The Storybook mock's `saved_places_mine`
+  returns the first three only, so Explore shows both filled and empty
+  bookmarks.
+- **Opening a place shows that place.** The mock's `service_detail` answered
+  every id with the first place. It now looks the id up; the example ids
+  never reach it anyway.
+- **Distances:** spaced 0.45 miles apart instead of 0.9, so nine places run
+  from 0.2 to 2.5 miles.
+- **Proven by:** Explore in Storybook (9 cards, 3 saved); the Home and family
+  filter (3 places); a new place opened (its own page, no visit); the UI
+  and config unit tests; typecheck; the web build; and e2e 570/570.
+
 ---
 
 ## Notes for whoever picks this up next

@@ -373,7 +373,8 @@ Saved, trip cards and the next-visit tile; `GlowIcon` is deleted (D-297). A prin
 ToneGround; ToneDot is darker on the left (D-298) and sits 11px from the chip's top and left (D-300). Home and family's picture is the home with a heart on
 its door (D-301, D-302); trip icons are baked in with a doubled overlay (`ToneBakedIcon`, D-302). Saved's chip is
 12px in from the corner; a member's example trips are two (no pantry visit); Trips map pins
-are placed in pixels between the note and the half drawer (D-303). How points should be awarded — two rules live
+are placed in pixels between the note and the half drawer (D-303). Nine example places,
+three per category; three saved, two with visits (D-304). How points should be awarded — two rules live
 (save a place, finish setup), the rest to build, with order and open
 questions — is specified in `docs/points-awarding.md`. The
 signatures are example data too, kept only for the visit (session storage).

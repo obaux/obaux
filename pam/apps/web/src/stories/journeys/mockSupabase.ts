@@ -83,7 +83,7 @@ function routesFor(journeyRole: JourneyRole): Route[] {
     on('/rpc/services_near', (_url, _method, body) => {
       const category = ((body ?? {}) as { p_category?: string | null }).p_category;
       return {
-        body: PLACES.map((place, i) => ({ ...place, meters: 400 + i * 900, has_hours: false })).filter(
+        body: PLACES.map((place, i) => ({ ...place, meters: 400 + i * 450, has_hours: false })).filter(
           (place) => !category || place.category === category,
         ),
       };
@@ -95,16 +95,20 @@ function routesFor(journeyRole: JourneyRole): Route[] {
       const args = (body ?? {}) as { p_query?: string; p_category?: string | null };
       const words = (args.p_query ?? '').toLowerCase().split(/\s+/).filter(Boolean);
       return {
-        body: PLACES.map((place, i) => ({ ...place, meters: 400 + i * 900, has_hours: false })).filter(
+        body: PLACES.map((place, i) => ({ ...place, meters: 400 + i * 450, has_hours: false })).filter(
           (place) =>
             (!args.p_category || place.category === args.p_category) &&
             words.every((word) => `${place.name} ${place.address ?? ''}`.toLowerCase().includes(word)),
         ),
       };
     }),
-    on('/rpc/service_detail', () => ({ body: [PLACES[0]] })),
+    on('/rpc/service_detail', (_url, _method, body) => {
+      const id = ((body ?? {}) as { p_id?: string }).p_id;
+      return { body: [PLACES.find((place) => place.id === id) ?? PLACES[0]] };
+    }),
     on('/rpc/directory_people', () => ({ body: DIRECTORY_PEOPLE })),
-    on('/rpc/saved_places_mine', () => ({ body: PLACES })),
+    // The member's three (D-304): the rest of Explore is not saved.
+    on('/rpc/saved_places_mine', () => ({ body: PLACES.slice(0, 3) })),
     on('/rest/v1/saved_places', () => ({ body: [] })),
     on('/rpc/flag_service', () => ({ body: { id: 'flag-1' } })),
     // An example code (D-218's Invite someone); the real one is made by the database.
