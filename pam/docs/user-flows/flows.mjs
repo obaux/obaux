@@ -158,8 +158,8 @@ export const flows = [
         title: 'A place',
         story: 'member-app-screens--place',
         path: '/place/',
-        changed: 'D-271',
-        note: 'With a visit booked: orange "Sign before your visit" card on top, green once signed',
+        changed: 'D-273',
+        note: 'From a trip: the visit (green, day and time) instead of Plan a trip; policies card under it',
       },
       policies: {
         title: 'Policies to sign',
@@ -188,7 +188,13 @@ export const flows = [
       messages: { title: 'Messages', story: 'member-app-screens--messages', path: '/messages/' },
       thread: { title: 'A conversation', story: 'member-app-screens--conversation', path: '/messages/thread/' },
       options: { title: 'Conversation options', story: 'member-app-screens--conversation-options', path: '/messages/thread/options/' },
-      profile: { title: 'Profile', story: 'member-app-screens--profile', path: '/profile/' },
+      profile: {
+        title: 'Profile',
+        story: 'member-app-screens--profile',
+        path: '/profile/',
+        changed: 'D-274',
+        note: 'Award level tile (to Points) instead of Past trips; bell for text reminders',
+      },
       connections: {
         title: 'Connections',
         story: 'member-app-screens--connections',
@@ -233,6 +239,7 @@ export const flows = [
       ['profile', 'points', 'Points'],
     ],
     changes: [
+      'D-274 — Profile: award tile; bell for texts. D-273 — a place from a trip shows the visit',
       'D-272 — Connections cards: message button, program link, "Connected by"; no profile page',
       'D-271 — a place with a visit shows its policies on top: orange to sign, green when signed',
       'D-270 — read and sign a program\'s policies: draw once, then one tap; trips show what is signed',

@@ -340,7 +340,9 @@ each policy after that is one tap. Trips show "Signatures needed" or
 booked shows the policies under its name, orange to sign or green when done,
 and a corner × clears a signature to sign again (D-271). Connections cards are
 the whole profile: a message button, the program as a link, and who connected
-the member; the separate profile page is gone (D-272). The
+the member; the separate profile page is gone (D-272). A place opened from a trip shows the visit
+(green, day and time) instead of "Plan a trip" (D-273). Profile's member
+tile is the award level (D-274). The
 signatures are example data too, kept only for the visit (session storage).
 From a request the super admin can open the requested program and text the
 requester. In the redesign they can also message staff (never members),

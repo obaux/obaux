@@ -3,8 +3,9 @@
 import type { ReactNode } from 'react';
 import { VStack } from '@astryxdesign/core/VStack';
 import { Divider } from '@astryxdesign/core/Divider';
-import type { Role } from '@pam/config';
+import { levelForPoints, type Role } from '@pam/config';
 import {
+  AwardIcon,
   BellIcon,
   ConnectionsIcon,
   GlobeIcon,
@@ -15,8 +16,6 @@ import {
   PlacesIcon,
   ShieldIcon,
   SignOutIcon,
-  StarIcon,
-  TripsIcon,
 } from '@pam/ui';
 import { LargeTitleHeader } from '@pam/ui/LargeTitleHeader';
 import { FeatureTile, FeatureTileRow, ProfileSummary, PromoCard } from '@pam/ui/ProfileCards';
@@ -26,7 +25,7 @@ import { useI18n } from '@/lib/i18n';
 /**
  * Profile — the redesign's first screen (D-210, Will, 1 October).
  *
- * Who you are and your numbers; two doors (past trips, and Connections — the
+ * Who you are and your numbers; two doors (your award level since D-274, and Connections — the
  * case manager and programs on your side); one offer (text reminders); then
  * a plain list. Since D-213 the list is shorter: Language (the one thing the
  * old Account screen held that Profile did not), text reminders once they
@@ -128,7 +127,12 @@ export function ProfileView({
       */}
       {isMember ? (
         <FeatureTileRow>
-          <FeatureTile label={t('profile.tile.trips')} href="/trips/" art={<TripsIcon {...ART} />} />
+          {/*
+            Their award, not past trips (Will, 5 October, D-274): the level
+            their points have reached, in its own plain words (§8), opening
+            Points. Past visits are still on Trips.
+          */}
+          <FeatureTile label={t(levelForPoints(points).labelKey)} href="/points/" art={<AwardIcon {...ART} />} />
           <FeatureTile label={t('profile.tile.connections')} href="/connections/" art={<ConnectionsIcon {...ART} />} />
         </FeatureTileRow>
       ) : null}
@@ -149,7 +153,9 @@ export function ProfileView({
           // first yes is still the reminders screen — the one the SMS carrier
           // reviewed — and their switches are a row in settings after that.
           href={role === 'member' ? '/reminders/' : '/alerts/'}
-          art={<StarIcon {...ART} />}
+          // A bell, for texts, for everyone (Will, 5 October, D-274) — the star
+          // read as points.
+          art={<BellIcon {...ART} />}
         />
       )}
 

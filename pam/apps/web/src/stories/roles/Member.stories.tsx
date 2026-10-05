@@ -27,6 +27,7 @@ export const Place: Story = screen('member', 'A place', '/place/', { id: 's1', f
 export const PlaceFromTrip: Story = screen('member', 'A place, from a trip', '/place/', {
   id: 'dummy-place-learning',
   from: 'trips',
+  trip: 'dummy-trip-1',
 });
 // A program's policies, read and signed by a member (D-270).
 export const PlacePolicies: Story = screen('member', 'Policies to sign', '/place/policies/', {

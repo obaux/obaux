@@ -692,7 +692,6 @@
   "profile.stat.points": "Points",
   "profile.stat.saved": "Places saved",
   "profile.stat.connections": "Connections",
-  "profile.tile.trips": "Past trips",
   "profile.tile.connections": "Connections",
   "profile.promo.reminders.title": "Get text reminders",
   "profile.promo.reminders.body": "We can text you the day before a visit.",
@@ -1105,5 +1104,6 @@
   "place.policies.toSign.body": "Sign before your visit",
   "place.policies.done.title": "Policies signed",
   "place.policies.done.body": "All signatures complete",
-  "connections.connectedBy": "Connected by {name}"
+  "connections.connectedBy": "Connected by {name}",
+  "place.visit.body": "{time} · Visit booked"
 }

@@ -95,6 +95,11 @@ export interface PlaceDetailProps {
    * a member still has to do before a visit (D-271, `PolicyStatusCard`).
    */
   readonly notice?: ReactNode;
+  /**
+   * The address before "What this place is" (D-273): with a visit booked,
+   * where it is matters more than what it is — the member already decided.
+   */
+  readonly addressFirst?: boolean;
   readonly labels: {
     readonly directions: string;
     readonly call: string;
@@ -226,8 +231,32 @@ export function PlaceDetail({
   quickActions,
   quickActionsLabel,
   notice,
+  addressFirst = false,
   labels,
 }: PlaceDetailProps) {
+  const aboutCard = description ? (
+    <Card padding={4} xstyle={styles.card}>
+      <VStack gap={2}>
+        <Heading level={2} xstyle={styles.section}>
+          {labels.about}
+        </Heading>
+        <Text xstyle={styles.body}>{description}</Text>
+      </VStack>
+    </Card>
+  ) : null;
+  const addressCard = address ? (
+    <Card padding={4} xstyle={styles.card}>
+      <VStack gap={1}>
+        <Heading level={2} xstyle={styles.section}>
+          {labels.address}
+        </Heading>
+        <Text type="supporting" xstyle={styles.body}>
+          {address}
+        </Text>
+      </VStack>
+    </Card>
+  ) : null;
+
   return (
     <VStack gap={4}>
       <VStack gap={2}>
@@ -294,16 +323,8 @@ export function PlaceDetail({
         </HStack>
       ) : null}
 
-      {description ? (
-        <Card padding={4} xstyle={styles.card}>
-          <VStack gap={2}>
-            <Heading level={2} xstyle={styles.section}>
-              {labels.about}
-            </Heading>
-            <Text xstyle={styles.body}>{description}</Text>
-          </VStack>
-        </Card>
-      ) : null}
+      {addressFirst ? addressCard : null}
+      {aboutCard}
 
       {/*
         The one primary action on the screen (§2.5). Getting there is why
@@ -315,18 +336,7 @@ export function PlaceDetail({
         <BigButton label={labels.directions} href={directionsHref} />
       ) : null}
 
-      {address ? (
-        <Card padding={4} xstyle={styles.card}>
-          <VStack gap={1}>
-            <Heading level={2} xstyle={styles.section}>
-              {labels.address}
-            </Heading>
-            <Text type="supporting" xstyle={styles.body}>
-              {address}
-            </Text>
-          </VStack>
-        </Card>
-      ) : null}
+      {addressFirst ? null : addressCard}
 
       {weekLines && weekLines.length > 0 ? (
         <Card padding={4} xstyle={styles.card}>

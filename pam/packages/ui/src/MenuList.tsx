@@ -5,6 +5,8 @@ import { HStack } from '@astryxdesign/core/HStack';
 import { List, ListItem } from '@astryxdesign/core/List';
 import { Text } from '@astryxdesign/core/Text';
 import { Badge } from '@astryxdesign/core/Badge';
+import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
+import { CheckIcon } from './icons.js';
 
 /**
  * A plain list of places to go, one per row: icon, words, chevron (D-210).
@@ -55,6 +57,11 @@ const styles = stylex.create({
   // The label at 18px (§2.5): ListItem's own label size is smaller.
   label: { fontSize: '18px', lineHeight: 1.35 },
   description: { fontSize: '15px', lineHeight: 1.4 },
+  // The chosen option (Will, 5 October, D-274): bold and in the accent
+  // green, words and tick alike, with a heavier tick — a thin black tick at
+  // the far edge was easy to miss.
+  labelSelected: { fontWeight: 700, color: colorVars['--color-text-accent'] },
+  check: { width: '24px', height: '24px', color: colorVars['--color-icon-accent'], flexShrink: 0 },
 });
 
 export function MenuList({ label, items, hasDividers = false }: MenuListProps) {
@@ -63,7 +70,7 @@ export function MenuList({ label, items, hasDividers = false }: MenuListProps) {
       {items.map((item) => (
         <ListItem
           key={item.id}
-          label={<Text xstyle={styles.label}>{item.label}</Text>}
+          label={<Text xstyle={[styles.label, item.isSelected === true && styles.labelSelected]}>{item.label}</Text>}
           description={
             item.description ? (
               <Text type="supporting" xstyle={styles.description}>
@@ -78,7 +85,7 @@ export function MenuList({ label, items, hasDividers = false }: MenuListProps) {
           endContent={
             item.isSelected !== undefined ? (
               item.isSelected ? (
-                <Icon icon="check" size="md" />
+                <CheckIcon {...stylex.props(styles.check)} aria-hidden />
               ) : undefined
             ) : item.href || item.onSelect ? (
               <HStack gap={2} align="center" wrap="nowrap">

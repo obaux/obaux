@@ -33,7 +33,9 @@ import { sharePlace } from '@/lib/sharePlace';
 import { usePolicies } from '@/lib/usePolicies';
 import { useMySignatures } from '@/lib/useMySignatures';
 import { MenuList } from '@pam/ui/MenuList';
-import { PolicyStatusCard } from '@pam/ui/PolicyStatusCard';
+import { PolicyStatusCard, StatusCard } from '@pam/ui/PolicyStatusCard';
+import { Icon } from '@astryxdesign/core/Icon';
+import { VStack } from '@astryxdesign/core/VStack';
 import { DUMMY_TRIPS } from '@pam/config/dummy-trips';
 import { readAddedTrips } from '@/lib/addedTrips';
 import { placeAsksForPolicies } from '@pam/config/dummy-policies';
@@ -214,15 +216,21 @@ function PlaceScreen() {
   const { policies } = usePolicies();
   const { progress } = useMySignatures();
   // A visit booked here — from Trips, or anywhere — brings the policies up
-  // to the top of the page (D-271).
+  // to the top of the page (D-271). Opened from a trip card, the page is
+  // about that visit (D-273): its day and time instead of "Plan a trip".
   const [hasTrip, setHasTrip] = useState(false);
+  const [visitAt, setVisitAt] = useState<string | null>(null);
+  const fromTrips = params.get('from') === 'trips';
+  const tripId = params.get('trip');
   useEffect(() => {
     if (!place) return;
-    setHasTrip(
-      DUMMY_TRIPS.some((trip) => trip.placeId === place.id) ||
-        readAddedTrips().some((trip) => trip.placeId === place.id),
-    );
-  }, [place]);
+    const here = [...DUMMY_TRIPS, ...readAddedTrips()]
+      .filter((trip) => trip.placeId === place.id)
+      .sort((a, b) => a.startsAt.localeCompare(b.startsAt));
+    setHasTrip(here.length > 0);
+    const visit = here.find((trip) => trip.id === tripId) ?? (fromTrips ? here[0] : undefined);
+    setVisitAt(fromTrips && visit ? visit.startsAt : null);
+  }, [place, tripId, fromTrips]);
   const status = usePlaceStatus(place?.id ?? '', place?.hours ?? null, t, locale);
 
   /*
@@ -303,7 +311,13 @@ function PlaceScreen() {
   const allSigned = signedSoFar.signed === signedSoFar.total;
   // With a visit booked here (or arriving from Trips), the policies come up
   // under the name — orange to sign, green once signed — instead of at the foot.
-  const policiesOnTop = asksMember && (hasTrip || params.get('from') === 'trips');
+  const policiesOnTop = asksMember && (hasTrip || fromTrips);
+  // The booked visit (D-273): the day as the title, the time under it —
+  // "Wednesday, October 7" / "10:00 AM · Visit booked" — so neither wraps.
+  const visitDay = new Intl.DateTimeFormat(locale, { weekday: 'long', month: 'long', day: 'numeric' });
+  const visitTime = new Intl.DateTimeFormat(locale, { hour: 'numeric', minute: '2-digit' });
+  const visitWhen = visitAt ? visitDay.format(new Date(visitAt)) : null;
+  const visitHour = visitAt ? visitTime.format(new Date(visitAt)) : '';
   const directions = directionsHref(place!.address, place!.lat, place!.lon) ?? null;
   const googleHref = googlePlaceHref(place!.lookupName || place!.name, place!.address, place!.placeId);
   const lines = status ? weekLines(status.hours, locale, t('place.hours.closed')) : undefined;
@@ -334,11 +348,13 @@ function PlaceScreen() {
         audienceLabel={place!.audience ? t(`place.audience.${place!.audience}`) : null}
         phone={place!.phone}
         website={place!.website}
-        directionsHref={directions}
+        directionsHref={visitWhen ? null : directions}
+        addressFirst={visitWhen !== null}
         // A member's one primary action is booking a visit (D-235), straight
         // into the New trip steps with this place already chosen.
+        // With a visit booked, nothing asks to plan one (D-273).
         primaryAction={
-          (demoRole ?? trueRole) === 'member'
+          (demoRole ?? trueRole) === 'member' && !visitWhen
             ? {
                 label: t('place.schedule'),
                 href: `/trips/new/?${new URLSearchParams({
@@ -353,16 +369,30 @@ function PlaceScreen() {
         hoursHref={googleHref}
         isSaved={saved}
         notice={
-          policiesOnTop ? (
-            <PolicyStatusCard
-              isDone={allSigned}
-              title={t(allSigned ? 'place.policies.done.title' : 'place.policies.toSign.title')}
-              body={t(allSigned ? 'place.policies.done.body' : 'place.policies.toSign.body')}
-              label={`${t(allSigned ? 'place.policies.done.title' : 'place.policies.toSign.title')}. ${t(
-                allSigned ? 'place.policies.done.body' : 'place.policies.toSign.body',
-              )}`}
-              href={policiesHref(place!.id, place!.name)}
-            />
+          visitWhen || policiesOnTop ? (
+            <VStack gap={3}>
+              {visitWhen ? (
+                // The visit, confirmed: green, a calendar, and no chevron —
+                // it says something, it does not go anywhere (D-273).
+                <StatusCard
+                  tone="green"
+                  icon={<Icon icon="calendar" size="md" />}
+                  title={visitWhen}
+                  body={t('place.visit.body', { time: visitHour })}
+                />
+              ) : null}
+              {policiesOnTop ? (
+                <PolicyStatusCard
+                  isDone={allSigned}
+                  title={t(allSigned ? 'place.policies.done.title' : 'place.policies.toSign.title')}
+                  body={t(allSigned ? 'place.policies.done.body' : 'place.policies.toSign.body')}
+                  label={`${t(allSigned ? 'place.policies.done.title' : 'place.policies.toSign.title')}. ${t(
+                    allSigned ? 'place.policies.done.body' : 'place.policies.toSign.body',
+                  )}`}
+                  href={policiesHref(place!.id, place!.name)}
+                />
+              ) : null}
+            </VStack>
           ) : null
         }
         quickActionsLabel={t('place.quick.label')}

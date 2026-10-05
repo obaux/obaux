@@ -87,6 +87,8 @@ export {
   OfflineIcon,
   NoResultsIcon,
   BackArrowIcon,
+  AwardIcon,
+  CheckIcon,
   BookIcon,
   SignIcon,
   SignedIcon,

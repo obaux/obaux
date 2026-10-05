@@ -54,7 +54,9 @@ export interface ConnectionCardProps {
 
 const styles = stylex.create({
   card: { width: '100%', position: 'relative' },
-  // Top right, round, like the place page's header buttons (D-272).
+  // Top right, round (D-272), lifted off the card with the search pill's
+  // layered shadow — a tight one where it touches, a soft one around it —
+  // in place of a grey outline (Will, 5 October: "the realistic shadow").
   message: {
     position: 'absolute',
     top: '16px',
@@ -62,10 +64,10 @@ const styles = stylex.create({
     width: '48px',
     height: '48px',
     borderRadius: '50%',
-    backgroundColor: colorVars['--color-background-body'],
-    borderWidth: '1px',
-    borderStyle: 'solid',
-    borderColor: colorVars['--color-border'],
+    borderWidth: 0,
+    backgroundColor: 'light-dark(#FFFFFF, #262626)',
+    boxShadow:
+      '0 1px 2px light-dark(oklch(0 0 0 / 8%), oklch(0 0 0 / 30%)), 0 4px 14px light-dark(oklch(0 0 0 / 14%), oklch(0 0 0 / 45%)), inset 0 0 0 1px light-dark(oklch(0 0 0 / 4%), oklch(1 0 0 / 10%))',
   },
   // The program, as a link: one line, ending in "…", with a chevron.
   programLink: {

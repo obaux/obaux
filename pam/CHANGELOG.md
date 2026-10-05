@@ -75,7 +75,11 @@ A small × on a signature clears it so you can sign again, the Sign button sits
 right under your saved signature, and text links no longer show a grey pill
 when pressed. Each card on Connections now has a message button in its corner;
 a program person's card links to the program's page and says who connected
-you, and there is no separate profile page any more.
+you, and there is no separate profile page any more. Opening a place from a trip
+shows that visit's day and time instead of "Plan a trip", with the address
+first. On Profile a member sees their award level instead of past trips, and
+the text reminders card has a bell. The chosen language is bold and green
+with a heavier tick, and Explore's area is a link that fits on one line.
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 

@@ -108,6 +108,7 @@ const styles = stylex.create({
   rowHidden: { opacity: 0, pointerEvents: 'none' },
   search: { flexGrow: 1, minWidth: 0 },
   heading: { fontSize: '22px', lineHeight: 1.25, fontWeight: 700 },
+  oneLine: { flexGrow: 1, flexShrink: 1, minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
   source: { fontSize: '15px', lineHeight: 1.5 },
   state: { paddingBlock: '32px' },
   stateIcon: { width: '72px', height: '72px', color: colorVars['--color-icon-accent'] },
@@ -175,13 +176,16 @@ export function ExploreView({
       {notice}
       {searching ? null : nextTrip}
 
-      <HStack gap={2} align="center" justify="between" wrap="wrap">
+      {/* One row, always (D-274): the heading takes one line and ends in
+          "…" before it pushes the area link underneath — "Todos los
+          programas" did. */}
+      <HStack gap={3} align="center" justify="between" wrap="nowrap">
         {searching ? (
-          <Heading level={1} xstyle={styles.heading}>
+          <Heading level={1} xstyle={[styles.heading, styles.oneLine]}>
             {t('explore.results', { query: query.trim() })}
           </Heading>
         ) : (
-          <Heading level={1} xstyle={styles.heading}>
+          <Heading level={1} xstyle={[styles.heading, styles.oneLine]}>
             {/* "All programs" over the list though the chip says "All" — the
                 heading gives the context the short chip cannot (Will, 1 October). */}
             {category === 'all'

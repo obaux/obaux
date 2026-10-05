@@ -133,7 +133,9 @@ export function TripsView({ trips, headerActions, justAdded = null }: TripsViewP
     new Intl.DateTimeFormat(locale, { weekday: 'short', month: 'short', day: 'numeric' }).format(new Date(iso));
   const when = (iso: string) =>
     `${new Intl.DateTimeFormat(locale, { weekday: 'long', month: 'short', day: 'numeric' }).format(new Date(iso))} · ${new Intl.DateTimeFormat(locale, { hour: 'numeric', minute: '2-digit' }).format(new Date(iso))}`;
-  const href = (trip: Trip) => `/place/?id=${encodeURIComponent(trip.placeId)}&from=trips`;
+  // The trip goes along, so the place can show this visit (D-273).
+  const href = (trip: Trip) =>
+    `/place/?id=${encodeURIComponent(trip.placeId)}&from=trips&trip=${encodeURIComponent(trip.id)}`;
   // The trip just booked, if its program still wants signatures (D-270).
   const added = justAdded ? trips.find((trip) => trip.id === justAdded) : undefined;
   const toSign = added?.policies && added.policies.signed < added.policies.total ? added : null;

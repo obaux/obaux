@@ -397,6 +397,26 @@ export function BookIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+/** A heavy tick. The chosen row in a list of options (D-274). */
+export function CheckIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} strokeWidth={3} {...props}>
+      <path d="m5 12.5 4.5 4.5L19 7.5" />
+    </svg>
+  );
+}
+
+/** A medal on a ribbon. A member's award level, on Profile (D-274). */
+export function AwardIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <circle cx="12" cy="14.5" r="5.5" />
+      <path d="M8.5 10.25 5.5 3.5h4l2.5 5M15.5 10.25l3-6.75h-4L12 8.5" />
+      <path d="m12 12 .9 1.6 1.8.3-1.3 1.2.3 1.8-1.7-.9-1.7.9.3-1.8-1.3-1.2 1.8-.3z" />
+    </svg>
+  );
+}
+
 /** A pen on a line. A policy still to sign (D-270). */
 export function SignIcon(props: SVGProps<SVGSVGElement>) {
   return (

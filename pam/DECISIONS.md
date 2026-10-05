@@ -6195,6 +6195,58 @@ Will, 5 October, with a screenshot of Sandra's card:
   546/546, and Storybook screenshots of the cards and of the place opened
   from one ("Back to Connections").
 
+### D-273 — A place opened from a trip is about that visit
+
+Will, 5 October: "When users open places from Trip cards, the place profile
+needs to reflect their visit details, not ask them to plan a trip. Use the
+item box component with calendar icon, and use green for a confirmed feel
+… Date and time, but not have a chevron since it's not clickable. Address
+should move up, and about this place should move down."
+
+- **`StatusCard` (`@pam/ui/PolicyStatusCard`).** The D-271 card,
+  generalised: a tone (orange or green), an icon, two lines, and an
+  optional `href`. With no `href` it is a plain `Card` with no chevron,
+  because it is a statement and nothing about it should look tappable.
+  `PolicyStatusCard` is now a thin use of it.
+- **The visit card.** Green, a calendar, the day as the title ("Wednesday,
+  October 7") and "10:00 AM · Visit booked" under it. The day and time on
+  one line wrapped "AM" onto a line of its own.
+  - It sits above the policies card.
+  - Trip cards now pass `&trip=<id>` so the page knows which visit; without
+    it, the soonest trip at that place is shown.
+- **No "Plan a trip"** when a visit is shown, and no fallback Directions
+  button either (Directions is already a round button).
+- **Address above "What this place is"** (`PlaceDetail addressFirst`).
+  With a visit booked, where it is matters more than what it is.
+
+### D-274 — Small round: message-button shadow, Profile award tile, bell for texts, chosen rows, Explore's area link
+
+Will, 5 October, five messages while D-273 was being built.
+
+- **Connections' message button** has the search pill's layered shadow
+  instead of a grey outline: a tight shadow where it touches and a soft one
+  around it ("the realistic shadow").
+- **Profile, members:** the "Past trips" tile becomes their award. It shows
+  the level their points have reached, in its own words ("Getting Going",
+  `levelForPoints`), with a new `AwardIcon` (a medal), and opens Points.
+  Past visits are still on Trips. The `profile.tile.trips` string is
+  removed.
+- **Profile, everyone:** the text-reminders and text-alerts card shows a
+  bell, not a star. The star read as points.
+- **A chosen row (`MenuList isSelected`)** — Language, See the app as:
+  - the label is bold and in the accent green;
+  - the tick is the same green, heavier (`CheckIcon`, stroke 3) and 24px.
+    The thin black tick at the far edge was easy to miss.
+- **Explore's area** (`AreaChip`) is a link, not a pill:
+  - no background, an underline and the accent colour on hover;
+  - narrower, so "Todos los programas" and "Cerca de City Hall" fit on one
+    row;
+  - the heading keeps to one line and ends in "…" before it would push the
+    link underneath.
+- **Proven by:** typecheck, config 236/236, ui 66/66, the full e2e suite
+  546/546, and Storybook screenshots: the place from a trip, Profile, the
+  Language list, Connections, and Explore in English and Spanish.
+
 ---
 
 ## Notes for whoever picks this up next

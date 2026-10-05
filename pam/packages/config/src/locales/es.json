@@ -692,7 +692,6 @@
   "profile.stat.points": "Puntos",
   "profile.stat.saved": "Lugares guardados",
   "profile.stat.connections": "Conexiones",
-  "profile.tile.trips": "Visitas pasadas",
   "profile.tile.connections": "Conexiones",
   "profile.promo.reminders.title": "Reciba recordatorios por texto",
   "profile.promo.reminders.body": "Le podemos mandar un texto el dia antes de una visita.",
@@ -1105,5 +1104,6 @@
   "place.policies.toSign.body": "Fírmalas antes de tu visita",
   "place.policies.done.title": "Políticas firmadas",
   "place.policies.done.body": "Todas las firmas completas",
-  "connections.connectedBy": "Te conectó {name}"
+  "connections.connectedBy": "Te conectó {name}",
+  "place.visit.body": "{time} · Visita reservada"
 }
