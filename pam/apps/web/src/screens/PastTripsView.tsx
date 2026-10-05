@@ -56,7 +56,7 @@ export function PastTripsView({ personId, name }: { readonly personId: string; r
               placeName={trip.placeName}
               when={when(trip.startsAt)}
               href={`/place/?id=${encodeURIComponent(trip.placeId)}`}
-              art={<CategoryIcon category={trip.category} iconSize={TRIP_ART} />}
+              art={<CategoryIcon category={trip.category} iconSize={TRIP_ART} isBaked />}
               tone={categoryTone(trip.category)}
               label={`${trip.placeName}, ${when(trip.startsAt)}`}
             />

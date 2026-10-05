@@ -231,7 +231,7 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
           <NextTripCard
             categoryLabel={t(categoryLabelKey(nextTrip.category))}
             categoryIcon={TRIP_ICONS[nextTrip.category]}
-            art={<CategoryIcon category={nextTrip.category} iconSize={TRIP_BIG} />}
+            art={<CategoryIcon category={nextTrip.category} iconSize={TRIP_BIG} isBaked />}
             tone={categoryTone(nextTrip.category)}
             title={t('explore.nextTrip.title')}
             when={tripWhen(nextTrip.startsAt, locale)}

@@ -53,11 +53,11 @@ function Workforce() {
 
 /*
  * Home and family (Will, 5 October, D-301): the grocery bag was "not a fit"
- * for the category, but its colours were loved — so both pictures keep its
+ * for the category, but its colours were loved — so its picture keeps that
  * palette (purple ground, pink corner, yellow, red, greens).
  */
 
-/** Home and family, one: a home, with a heart on the door. */
+/** Home and family: a home, with a heart on the door. */
 function FamilyHome() {
   return (
     <>
@@ -77,32 +77,12 @@ function FamilyHome() {
   );
 }
 
-/** Home and family, two: a parent and a child, in front of home. */
-function FamilyPeople() {
-  return (
-    <>
-      <Ground base="purple2" shards={[{ d: 'M0 44 56 30v26H0z', f: 'purple4' }, { d: 'M40 0h16v11z', f: 'pink3' }]} />
-      <P d="M10 30 28 14l18 16v18H10z" f="purple3" />
-      <P d="M28 9c-2.6-2-4.4-3.4-4.4-5.1a2.2 2.2 0 0 1 4.4-.9 2.2 2.2 0 0 1 4.4.9c0 1.7-1.8 3.1-4.4 5.1z" f="pink3" />
-      <C cx={22} cy={25} r={4.5} f="orange4" />
-      <P d="M14 50V39a8 8 0 0 1 16 0v11z" f="yellow3" />
-      <P d="M22 31a8 8 0 0 1 8 8v11h-8z" f="yellow4" />
-      <C cx={36} cy={33} r={3.5} f="orange3" />
-      <P d="M30 50v-6a6 6 0 0 1 12 0v6z" f="red3" />
-      <P d="M36 38a6 6 0 0 1 6 6v6h-6z" f="red4" />
-      <P d="M6 50l4-10 2 10z" f="shamrock3" />
-      <P d="M46 50l3-8 2 8z" f="shamrock4" />
-    </>
-  );
-}
-
-// Each category's pictures. More than one: a place picks by its id
-// (`seed`), so a list of several places of one kind is not one picture
-// repeated, and a given place always shows the same one.
 const ART: Readonly<Record<Category, readonly (() => ReactElement)[]>> = {
   education: [Education],
   workforce: [Workforce],
-  family_services: [FamilyHome, FamilyPeople],
+  // The home with a heart on its door (Will, D-302: "let's go with home
+  // with heart on door"); the family picture was tried and set aside.
+  family_services: [FamilyHome],
 };
 
 /** A stable small number from a place's id — the same id, the same picture. */

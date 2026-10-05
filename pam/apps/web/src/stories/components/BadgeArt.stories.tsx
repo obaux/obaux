@@ -38,8 +38,7 @@ export const Everything: Story = {
         <BadgeArt badgeKey="rooted" size={88} shape="square" />
         <CategoryArt category="education" size={88} />
         <CategoryArt category="workforce" size={88} />
-        <CategoryArt category="family_services" size={88} variant={0} />
-        <CategoryArt category="family_services" size={88} variant={1} />
+        <CategoryArt category="family_services" size={88} />
       </HStack>
     </VStack>
   ),

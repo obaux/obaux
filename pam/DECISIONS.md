@@ -7079,6 +7079,31 @@ one is not a fit, but I love its colors."
   cards; the UI and config unit tests; typecheck; the web build; and e2e
   570/570.
 
+### D-302 — Trip icons baked in with a doubled overlay; Home and family is the home
+
+Will, 5 October: "Let's do overlay icon but double up icons so it shows up
+stronger. Let's go with home with heart on door."
+
+- **Baked icons:** `ToneBakedIcon` draws the icon twice, both in
+  `mix-blend-mode: overlay`, stacked in one grid cell. The icon takes the
+  ground's own colour and grain, so it looks pressed into the picture
+  rather than set on it. The second pass gives it the strength one pass
+  lacked; a single overlay was a faint ghost.
+  - Used through `CategoryIcon isBaked` on Trips' cards, Explore's next
+    visit, past trips and a member's page.
+  - Saved keeps the plain, deep-colour icon, because Will did not ask for
+    it there.
+  - The art box sets `isolation`, so the blend is with the ground and
+    nothing behind the card.
+  - The icon is decoration (`aria-hidden`); the card's words carry its
+    meaning.
+- **Home and family:** `FamilyHome` (the house with a heart on its door) is
+  the category's one picture, and `FamilyPeople` is removed. The per-place
+  picture list (D-301) stays, for when a category gets more than one.
+- **Proven by:** 3× Storybook screenshots of Trips, the next visit and the
+  food pantry's card; the UI and config unit tests; typecheck; the web
+  build; and e2e 570/570.
+
 ---
 
 ## Notes for whoever picks this up next

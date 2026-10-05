@@ -228,7 +228,7 @@ export function TripsView({ trips, headerActions, justAdded = null }: TripsViewP
                 when={when(trip.startsAt)}
                 href={href(trip)}
                 // Colour-coded by category, with the soft glow (D-293).
-                art={<CategoryIcon category={trip.category} iconSize={ART} />}
+                art={<CategoryIcon category={trip.category} iconSize={ART} isBaked />}
                 tone={categoryTone(trip.category)}
                 withName={trip.withName ?? null}
                 withPhotoUrl={trip.withPhotoUrl ?? null}

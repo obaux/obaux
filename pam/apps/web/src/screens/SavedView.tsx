@@ -29,7 +29,7 @@ import { LargeTitleHeader } from '@pam/ui/LargeTitleHeader';
 import { SavedGrid } from '@pam/ui/SavedGrid';
 import { PlaceCardSkeletonList } from '@pam/ui/Skeletons';
 import { CATEGORY_DEFINITIONS, categoryLabelKey, NOTICES, type Category } from '@pam/config';
-import { ToneIcon, type Tone } from '@pam/ui/Tone';
+import { ToneBakedIcon, ToneIcon, type Tone } from '@pam/ui/Tone';
 import { useNextVisits, type NextVisit } from '@/lib/useNextVisits';
 import { useI18n } from '@/lib/i18n';
 import { useSession } from '@/lib/useSession';
@@ -232,14 +232,18 @@ export function SavedView({
 export function CategoryIcon({
   category,
   iconSize = ART,
+  isBaked = false,
 }: {
   readonly category: string;
+  /** Pressed into the picture (overlay, twice) — trip cards and the next visit (D-302). */
+  readonly isBaked?: boolean;
   readonly iconSize?: { readonly width: number; readonly height: number; readonly 'aria-hidden': true };
 }) {
-  return (
-    <ToneIcon tone={categoryTone(category)}>
-      <BigCategoryIcon category={category} size={iconSize} />
-    </ToneIcon>
+  const icon = <BigCategoryIcon category={category} size={iconSize} />;
+  return isBaked ? (
+    <ToneBakedIcon tone={categoryTone(category)}>{icon}</ToneBakedIcon>
+  ) : (
+    <ToneIcon tone={categoryTone(category)}>{icon}</ToneIcon>
   );
 }
 

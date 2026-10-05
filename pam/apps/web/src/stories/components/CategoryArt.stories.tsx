@@ -14,16 +14,14 @@ type Story = StoryObj<typeof meta>;
 
 export const SchoolAndTraining: Story = {};
 export const WorkAndMoney: Story = { args: { category: 'workforce' } };
-export const HomeAndFamily: Story = { args: { category: 'family_services', variant: 0 } };
-export const HomeAndFamilyPeople: Story = { args: { category: 'family_services', variant: 1 } };
+export const HomeAndFamily: Story = { args: { category: 'family_services' } };
 /** All three, large, to check the drawing. */
 export const AllLarge: Story = {
   render: () => (
     <HStack gap={4}>
       <CategoryArt category="education" size={160} />
       <CategoryArt category="workforce" size={160} />
-      <CategoryArt category="family_services" size={160} variant={0} />
-      <CategoryArt category="family_services" size={160} variant={1} />
+      <CategoryArt category="family_services" size={160} />
     </HStack>
   ),
 };

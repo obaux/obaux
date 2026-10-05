@@ -67,6 +67,12 @@ const styles = stylex.create({
   dotSize: { width: '26px', height: '26px' },
   dotArt: { position: 'absolute', inset: 0, zIndex: -1, pointerEvents: 'none' },
   // Behind the picture's own content: the box it sits in sets `isolation`.
+  // Baked into the picture (Will, D-302): overlay, so the icon takes the
+  // ground's own colour and grain; drawn twice, because one overlay pass
+  // on a pale ground is a ghost. The box it sits in sets `isolation`, so
+  // it blends with the ground and nothing beyond.
+  baked: { position: 'relative', display: 'grid' },
+  bakedLayer: { gridArea: '1 / 1', mixBlendMode: 'overlay' },
   ground: { position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: -1 },
 });
 
@@ -75,6 +81,21 @@ export function ToneIcon({ tone, children }: { readonly tone?: Tone | null; read
   return (
     <HStack align="center" justify="center" xstyle={tone ? icons[tone] : null}>
       {children}
+    </HStack>
+  );
+}
+
+/**
+ * The icon pressed into a `ToneGround` rather than set on it (D-302): the
+ * same icon twice, both in overlay, stacked in one grid cell. For trip cards
+ * and the next visit; elsewhere the plain `ToneIcon` reads better.
+ */
+export function ToneBakedIcon({ tone, children }: { readonly tone?: Tone | null; readonly children: ReactNode }) {
+  if (!tone) return <>{children}</>;
+  return (
+    <HStack aria-hidden xstyle={[styles.baked, icons[tone]]}>
+      <HStack xstyle={styles.bakedLayer}>{children}</HStack>
+      <HStack xstyle={styles.bakedLayer}>{children}</HStack>
     </HStack>
   );
 }

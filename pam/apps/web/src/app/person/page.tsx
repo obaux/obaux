@@ -301,7 +301,7 @@ function PersonScreen() {
       placeName={trip.placeName}
       when={tripWhen(trip.startsAt)}
       href={`/place/?id=${encodeURIComponent(trip.placeId)}`}
-      art={<CategoryIcon category={trip.category} iconSize={TRIP_ART} />}
+      art={<CategoryIcon category={trip.category} iconSize={TRIP_ART} isBaked />}
       tone={categoryTone(trip.category)}
       label={`${trip.placeName}, ${tripWhen(trip.startsAt)}`}
     />
