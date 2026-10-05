@@ -80,9 +80,11 @@ const styles = stylex.create({
     boxShadow: '0 1px 4px light-dark(oklch(0 0 0 / 7%), oklch(0 0 0 / 35%))',
     '::before': { content: "''", position: 'absolute', insetBlock: '-4px', insetInline: '-2px' },
   },
-  // A chip with a colour circle starts closer to its edge and keeps a gap
-  // before its words (D-297).
-  chipWithDot: { paddingInlineStart: '8px', gap: '8px' },
+  // A chip with a colour circle keeps a gap before its words (D-297), and
+  // the circle sits as far from the left edge as from the top (Will, D-300):
+  // the chip is 48px and the circle 26px, so 11px each way. Astryx pulls a
+  // button's icon in by 4px, hence 15px here — measured, not guessed.
+  chipWithDot: { paddingInlineStart: '15px', gap: '8px' },
   chipOn: {
     borderWidth: '2px',
     borderColor: colorVars['--color-text-primary'],

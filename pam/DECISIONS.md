@@ -7036,6 +7036,21 @@ Will, 5 October: "Let's make grain stronger."
   but a lost first tap on a button that visibly does not change is
   recoverable. It is noted here rather than fixed in the app.
 
+### D-300 — The chip's circle sits as far from the left as from the top
+
+Will, 5 October, on a category chip: "ensure the top space on circle
+matches the left space."
+
+- **Measured first:** in Storybook the chip is 48px tall (the touch
+  floor), and the 26px circle sat 11px from the top and bottom but only 4px
+  from the left. Astryx pulls a button's icon in by 4px, so the 8px padding
+  from D-297 gave 4px.
+- **Fix:** `chipWithDot` is `paddingInlineStart: 15px`. Measured after the
+  change: 11 / 11 / 11 (top, bottom, left) on both category chips, at
+  390px and 320px.
+- **Proven by:** those measurements; the UI and config unit tests;
+  typecheck; the web build; and e2e 570/570.
+
 ---
 
 ## Notes for whoever picks this up next
