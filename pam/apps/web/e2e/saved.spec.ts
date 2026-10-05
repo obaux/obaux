@@ -84,6 +84,9 @@ test.describe('keeping a place', () => {
   test('saving writes it down, and the card says so without saying it', async ({ page }) => {
     const writes = await signedIn(page, []);
     await page.goto('/places/');
+    // Hydrated and the saved list loaded before tapping: a tap on the
+    // pre-rendered button before then was lost, a flake seen twice (D-299).
+    await settled(page);
 
     const save = page.getByRole('button', { name: 'Save' });
     await expect(save).toBeVisible();
@@ -116,6 +119,9 @@ test.describe('keeping a place', () => {
   test('the bookmark takes it out, and says whose place it is taking out', async ({ page }) => {
     const writes = await signedIn(page, [PLACE]);
     await page.goto('/');
+    // Hydrated and the saved list loaded before tapping: a tap on the
+    // pre-rendered button before then was lost, a flake seen twice (D-299).
+    await settled(page);
 
     // Named per card, because "Remove" three times in a row tells a screen
     // reader user nothing about which one they are on.

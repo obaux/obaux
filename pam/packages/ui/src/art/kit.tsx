@@ -170,8 +170,8 @@ const frame = stylex.create({ svg: { display: 'block', flexShrink: 0 } });
 
 const grain = stylex.create({
   // Printed, not glossy (Will, 5 October, D-298: "add a texture similar to
-  // what we see in illustrations"). Faint: it darkens by a few percent.
-  rect: { mixBlendMode: 'multiply', opacity: 0.16, pointerEvents: 'none' },
+  // what we see in illustrations"; stronger, D-299: "let's make grain stronger").
+  rect: { mixBlendMode: 'multiply', opacity: 0.3, pointerEvents: 'none' },
 });
 
 /**

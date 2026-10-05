@@ -122,7 +122,7 @@ chip in the picture's corner. The soft glows are gone: category chips show a
 small two-tone circle behind their icon, and the pictures on Saved, trip
 cards and the next-visit card are filled with the category's palest colour,
 cut by flat shards like the illustrations. Pictures and illustrations share a
-faint printed grain, and the chips' circles are darker on the left.
+printed grain, and the chips' circles are darker on the left.
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 

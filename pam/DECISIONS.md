@@ -7016,6 +7016,26 @@ on left side… so it goes strong to soft."
   next visit, the badges); the UI and config unit tests; typecheck; the web
   build and budget; and e2e 570/570.
 
+### D-299 — Stronger grain; a flaky Save test fixed rather than re-run
+
+Will, 5 October: "Let's make grain stronger."
+
+- **Grain:** `Grain` multiplies in at 30%, up from 16%. The frequency is
+  unchanged. At 2× and 3× it reads as print: visible on the pale grounds
+  and the badges, and still behind the icons and words.
+- **The flake:** `saved.spec.ts` "saving writes it down…" failed once in
+  each of two full runs, on iPhone SE and then dark-320, and passed alone.
+  The page is pre-rendered, so the Save button is on screen before the app
+  has hydrated and loaded the saved list. A tap in that gap is lost, and
+  the button stays "Save". The two tests in the file that tap right after
+  loading now wait with `settled()` (network idle and fonts ready), as the
+  file's axe test already did.
+
+  Proven by `saved.spec.ts` at 120/120 (five repeats, four workers) and a
+  full run of 570/570. A real member could hit the same gap on a slow phone,
+  but a lost first tap on a button that visibly does not change is
+  recoverable. It is noted here rather than fixed in the app.
+
 ---
 
 ## Notes for whoever picks this up next
