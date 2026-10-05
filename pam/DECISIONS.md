@@ -6382,6 +6382,57 @@ Will, 5 October:
   Also checked in the prototype: a place → policies → sign all four →
   Done lands on the place with the green "Policies signed" card.
 
+### D-278 — Points, as a journey: where you stand, how to get there, what you have
+
+Will, 5 October: "This page doesn't feel gamified enough, it doesn't feel
+exciting at all. How can we improve this UI, and make it fit industry
+standard for gamified journeys?" On the proposal: "build it as D-278, but
+let's make the coming next and list of steps smaller, so it's less
+scrolling."
+
+The old screen was the ladder as a tall stepper with a sentence per rung,
+then two more of the same. It never said how points are earned, and the one
+number that matters — how far to the next level — sat in a grey subtitle.
+The gamified journeys people know (Duolingo, Nike Run Club, Headspace)
+share an order: where you stand, how close the next step is, how to get
+there, what you have. The screen now follows that order.
+
+- **Where you stand**, in a card:
+  - the medal of the rung reached (`AwardIcon`, accent);
+  - its name at 28px, and the points;
+  - a progress bar (Astryx `ProgressBar`) from this rung to the next;
+  - "350 more to Builder" under it.
+- **Ways to earn**: five one-line rows from the real rules
+  (`POINTS_RULES`, `STREAK_POINTS_PER_WEEK`), each with what it is worth:
+  - show up to a visit, +100;
+  - sign up for a program, +25;
+  - come back each week, +50 a week;
+  - call a place, +10;
+  - save a place, +5.
+- **The ladder, compact.**
+  - One 44px row a rung: a 32px mark, the name, and the status on the
+    right (Earned / 350 more to go / Coming later).
+  - The current rung is in the accent with a ring that breathes; reduced
+    motion keeps it still.
+  - Only the next rung keeps its meaning line, since it is the one
+    somebody is reaching for.
+- **Badges as medals**, four across (48px). They are greyed with "Not yet"
+  or "Coming later": nothing records earned category or one-off badges
+  yet, so none is shown earned.
+- **A new level is celebrated once.** The first time the screen sees a
+  higher rung than it saw last (`pam.points.seenLevel`, this device), there
+  is confetti and "New level: Builder" is read out.
+- **Profile's award tile uses the same ladder.** D-274 used `LEVELS`
+  ("Getting Going") while Points used `BADGES` ("Rooted"), two names for
+  one balance. It is `badgeForPoints` now. `LEVELS` is unused by screens
+  and left for whoever reconciles the two lists in config.
+- Kept: Will's names, no comparison between members (§8), and "Coming
+  later" rather than hiding what cannot be earned yet. The older Spanish
+  strings on this screen still say "usted" ("Sus puntos"); the new ones say
+  "tú", like the rest of the app — left for a copy pass.
+- **Proven by:** typecheck, config 236/236, the full e2e suite 561/561,
+  and Storybook screenshots in English and Spanish.
+
 ---
 
 ## Notes for whoever picks this up next

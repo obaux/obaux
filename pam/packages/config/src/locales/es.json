@@ -1117,5 +1117,17 @@
   "places.kind.landmark": "Lugar conocido",
   "places.kind.address": "Dirección",
   "places.areaHint": "Como 19107, o 1231 N Broad St.",
-  "messages.visit.label": "Tu visita, {day} a las {time}. Ver el lugar."
+  "messages.visit.label": "Tu visita, {day} a las {time}. Ver el lugar.",
+  "points.hero.toNext": "{count} más para {next}",
+  "points.hero.top": "Llegaste a lo más alto de la escalera.",
+  "points.waysTitle": "Cómo ganar puntos",
+  "points.way.attend": "Ir a una visita",
+  "points.way.signup": "Inscribirte en un programa",
+  "points.way.streak": "Volver cada semana",
+  "points.way.call": "Llamar a un lugar",
+  "points.way.save": "Guardar un lugar",
+  "points.way.plus": "+{count}",
+  "points.way.weekly": "+{count} por semana",
+  "points.badgesTitle": "Insignias",
+  "points.levelUp": "Nuevo nivel: {level}"
 }

@@ -221,7 +221,13 @@ export const flows = [
       helpSafety: { title: 'Your safety', story: 'member-app-screens--help-safety', path: '/help/safety/' },
       legal: { title: 'Legal', story: 'member-app-screens--legal', path: '/legal/' },
       whoSees: { title: 'What others can see', story: 'member-app-screens--what-others-can-see', path: '/legal/privacy/' },
-      points: { title: 'Points', story: 'member-app-screens--points', path: '/points/' },
+      points: {
+        title: 'Points',
+        story: 'member-app-screens--points',
+        path: '/points/',
+        changed: 'D-278',
+        note: 'Your level with progress to the next, ways to earn, compact ladder, badge medals',
+      },
     },
     edges: [
       ['explore', 'place', 'Tap a place'],
@@ -245,6 +251,7 @@ export const flows = [
       ['profile', 'points', 'Points'],
     ],
     changes: [
+      'D-278 — Points as a journey: level and progress, ways to earn, badge medals. D-279 — signing: pinned button, Done',
       'D-277 — Back returns to the screen you came from, everywhere. D-276 — a conversation shows the booked visit',
       'D-275 — Explore: the area opens a Location drawer (search, current location, Done)',
       'D-274 — Profile: award tile; bell for texts. D-273 — a place from a trip shows the visit',

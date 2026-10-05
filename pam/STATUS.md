@@ -347,7 +347,9 @@ current location and Done (D-275). A conversation with a program shows the booke
 visit, opening the place and back (D-276). Back goes through history to
 wherever the member came from, with the fixed target only for a cold link
 (D-277). Signing keeps its button pinned at the bottom, and Done (top
-right) leaves the whole flow (D-279). The
+right) leaves the whole flow (D-279). Points is a journey screen: hero with progress
+to the next rung, ways to earn, compact ladder, badge medals, confetti on a
+new level (D-278). The
 signatures are example data too, kept only for the visit (session storage).
 From a request the super admin can open the requested program and text the
 requester. In the redesign they can also message staff (never members),

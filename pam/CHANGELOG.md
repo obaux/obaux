@@ -86,6 +86,9 @@ visit at the top; tapping it opens the place, and Back returns to the
 conversation. Back now returns to the screen you came from, everywhere. When signing
 policies, the Sign button stays at the bottom of the screen, and Done at the
 top right takes you straight back to the program.
+Your points screen is a journey now: your level with a progress bar to the
+next one, the ways to earn points and what each is worth, a shorter ladder,
+and badges as medals. Reaching a new level brings confetti.
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 

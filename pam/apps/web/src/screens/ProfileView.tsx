@@ -3,7 +3,7 @@
 import type { ReactNode } from 'react';
 import { VStack } from '@astryxdesign/core/VStack';
 import { Divider } from '@astryxdesign/core/Divider';
-import { levelForPoints, type Role } from '@pam/config';
+import { badgeForPoints, type Role } from '@pam/config';
 import {
   AwardIcon,
   BellIcon,
@@ -128,11 +128,12 @@ export function ProfileView({
       {isMember ? (
         <FeatureTileRow>
           {/*
-            Their award, not past trips (Will, 5 October, D-274): the level
-            their points have reached, in its own plain words (§8), opening
-            Points. Past visits are still on Trips.
+            Their award, not past trips (Will, 5 October, D-274): the rung of
+            the ladder their points have reached — the same names as Points
+            (D-278: it said "Getting Going" while Points said "Rooted") —
+            opening Points. Past visits are still on Trips.
           */}
-          <FeatureTile label={t(levelForPoints(points).labelKey)} href="/points/" art={<AwardIcon {...ART} />} />
+          <FeatureTile label={t(badgeForPoints(points).labelKey)} href="/points/" art={<AwardIcon {...ART} />} />
           <FeatureTile label={t('profile.tile.connections')} href="/connections/" art={<ConnectionsIcon {...ART} />} />
         </FeatureTileRow>
       ) : null}
