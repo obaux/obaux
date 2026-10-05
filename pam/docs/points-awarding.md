@@ -8,6 +8,30 @@ them. When the two disagree, fix one of them in the same change.
 Status, as of writing: two rules are live (save a place, finish setup).
 Everything else here is to build.
 
+## Decide before building (Will and whoever builds it)
+
+Work through these first; each changes what gets built. Record each answer
+here (and in DECISIONS.md) and tick it.
+
+- [ ] **Policies:** should signing all of a program's policies earn points?
+  Proposed: +10, once per program. Not on the Points screen until agreed.
+- [ ] **Return bonus window:** "once per program per week", or should a daily
+  class pay the return bonus every day it is attended?
+- [ ] **Location at visit time:** are we comfortable asking members for
+  location only while a visit is on, to award the checked-in 100? The phone
+  would report "was within 150 m" and nothing else.
+- [ ] **Rewards:** will points ever be exchangeable for anything (transit
+  passes, phone minutes)? `REWARDS_ENABLED` is off; the screen promises
+  nothing either way.
+
+And two things found while writing this, to fix as part of the build:
+
+- [ ] **The database's `badges` table** is seeded with an older set
+  (`first_visit`, `four_week_streak`, …) than the names the app shows
+  (`BADGES` in config). Reseed it before any badge is awarded.
+- [ ] **`LEVELS` in config** is a second, unused ladder ("Getting Going", …).
+  Delete it, or make it an alias of the core `BADGES`.
+
 ---
 
 ## Principles (do not trade these away)
@@ -275,13 +299,6 @@ Each step gets a DB test in `packages/db/test/` with one user per role:
 
 Run `pnpm --filter @pam/db test` after each.
 
-## Open questions for Will
+## Open questions
 
-- Policies: points for signing all of a program's policies (10, once per
-  program)? Not on screen until agreed.
-- Return bonus window: is "once per program per week" right, or should a
-  daily class earn the return bonus each day it is attended?
-- Geofence: are we comfortable asking members for location at visit time
-  only? (Location never leaves the phone except "was within 150 m".)
-- Do points ever redeem for anything? `REWARDS_ENABLED` is off; the
-  screen promises nothing either way.
+Listed at the top, under "Decide before building", so they are seen first.
