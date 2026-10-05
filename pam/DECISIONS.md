@@ -7240,6 +7240,32 @@ says new message, so they can view messages straight from profile view."
   The web app's own unit tests (`apps/web`, vitest) are not in CI, which
   runs only config and UI. That is worth adding; it is not done here.
 
+### D-306 — A place's message preview is one line; Call shows the number
+
+Will, 5 October: "For new message item, keep message preview subtitle max 1
+line then truncate. Also list the phone number under the call item subtitle,
+this applies to all places profiles. No need to hide info."
+
+- **The preview:** `MenuItem.isDescriptionOneLine` clips a row's subtitle to
+  one line with "…". Only the "New message" row sets it. The row's job is to
+  say a message is there; the conversation holds the rest. Other rows keep
+  wrapping, because their subtitles are short and fixed.
+- **Call:** the subtitle is the place's number, "(215) 555-0100", in place
+  of "Talk to someone there". `displayPhone()` in `@pam/config` formats a
+  10-digit US number, or 11 digits starting with 1. Anything else (an
+  extension, letters, a foreign number) is shown as stored, not guessed at.
+- **Where:** every place profile (Place profile and Visit profile, every
+  role) and a program's own profile (`ProgramView`). A number is public
+  catalogue data, so there is nothing to hide. The unused
+  `place.quick.call.body` key is removed from en and es.
+- **Proven by:**
+  - `phone.test.ts`;
+  - screenshots of the story (a long preview ending in "…", the number
+    under Call);
+  - ui 67, config 238 and web 11 unit tests, typecheck, web build and
+    Storybook build;
+  - e2e 570/570.
+
 ---
 
 ## Notes for whoever picks this up next

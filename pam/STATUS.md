@@ -376,7 +376,8 @@ its door (D-301, D-302); trip icons are baked in with a doubled overlay (`ToneBa
 are placed in pixels between the note and the half drawer (D-303). Nine example places,
 three per category; three saved, two with visits (D-304). Place profile vs Visit profile
 is one story with controls; `VisitTag` is the one visit chip (Saved, Explore); a place's
-message row becomes "New message" with a pink dot when its program wrote (D-305). Note:
+message row becomes "New message" with a pink dot when its program wrote (D-305); its
+preview is one line, and Call shows the number (D-306). Note:
 the web app's vitest tests are not run in CI. How points should be awarded — two rules live
 (save a place, finish setup), the rest to build, with order and open
 questions — is specified in `docs/points-awarding.md`. The

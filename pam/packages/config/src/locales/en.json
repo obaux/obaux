@@ -1141,7 +1141,6 @@
   "profile.tile.badgeHint": "Your badge",
   "place.quick.directions.body": "Open in Google Maps",
   "place.quick.message.body": "Ask a question before you go",
-  "place.quick.call.body": "Talk to someone there",
   "saved.visitLabel": "{name}. Your visit: {when}",
   "place.quick.newMessage": "New message"
 }

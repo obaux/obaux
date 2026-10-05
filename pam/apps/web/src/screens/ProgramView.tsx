@@ -8,7 +8,7 @@ import { Text } from '@astryxdesign/core/Text';
 import { TextArea } from '@astryxdesign/core/TextArea';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
-import { categoryLabelKey, type Category } from '@pam/config';
+import { categoryLabelKey, type Category, displayPhone } from '@pam/config';
 import { DUMMY_SAVED_BY_ROLE } from '@pam/config/dummy-places';
 import { BookIcon, GlobeIcon, Page, PhoneIcon, PlaceDetail, PlacesIcon, TextField, TextLink, googlePlaceHref } from '@pam/ui';
 import { LargeTitleHeader } from '@pam/ui/LargeTitleHeader';
@@ -174,6 +174,8 @@ export function ProgramView({
                   {
                     id: 'call',
                     label: t('place.quick.call'),
+                    // The number itself, as on a member's place (D-306).
+                    description: displayPhone(program.phone),
                     icon: <PhoneIcon {...QUICK} />,
                     href: `tel:${program.phone}`,
                   },

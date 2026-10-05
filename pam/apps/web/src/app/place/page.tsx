@@ -20,7 +20,7 @@ import { PlaceBarActions, messageHrefFor, newMessageFrom } from '../../screens/P
 import { PlaceDetailSkeleton } from '@pam/ui/Skeletons';
 import { SubPageHeader } from '@pam/ui/SubPage';
 import { HelpButton } from '../../screens/HelpButton';
-import { categoryLabelKey, distanceLabel, NOTICES, type Category } from '@pam/config';
+import { categoryLabelKey, displayPhone, distanceLabel, NOTICES, type Category } from '@pam/config';
 import { DUMMY_PLACES_BY_ID, isDummyPlaceId } from '@pam/config/dummy-places';
 import { useI18n } from '@/lib/i18n';
 import { useSupportPhone } from '@/lib/useSupportPhone';
@@ -461,6 +461,9 @@ function PlaceScreen() {
                 icon: <MessagesIcon {...QUICK} />,
                 href: unread.href,
                 hasDot: true,
+                // One line, then "…" (Will, D-306): the row says there is a
+                // message, the conversation says the rest.
+                isDescriptionOneLine: true,
               }
             : {
                 id: 'message',
@@ -474,7 +477,8 @@ function PlaceScreen() {
                 {
                   id: 'call',
                   label: t('place.quick.call'),
-                  description: t('place.quick.call.body'),
+                  // The number itself (Will, D-306: "no need to hide info").
+                  description: displayPhone(place!.phone!),
                   icon: <PhoneIcon {...QUICK} />,
                   href: `tel:${place!.phone}`,
                 },

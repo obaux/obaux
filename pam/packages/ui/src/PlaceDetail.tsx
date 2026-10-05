@@ -127,6 +127,8 @@ export interface QuickAction {
   readonly description?: string;
   /** Something new behind it — "New message" (D-305). */
   readonly hasDot?: boolean;
+  /** Its second line kept to one line — a message preview (D-306). */
+  readonly isDescriptionOneLine?: boolean;
 }
 
 function categoryBadgeVariant(category: Category): BadgeVariant {
@@ -336,6 +338,7 @@ export function PlaceDetail({
               ...(action.description ? { description: action.description } : {}),
               ...(action.isExternal ? { isExternal: true } : {}),
               ...(action.hasDot ? { hasDot: true } : {}),
+              ...(action.isDescriptionOneLine ? { isDescriptionOneLine: true } : {}),
             }))}
           />
         </Card>

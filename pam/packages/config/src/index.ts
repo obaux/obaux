@@ -14,6 +14,7 @@ export * from './points.js';
 export * from './language.js';
 export * from './notices.js';
 export * from './distance.js';
+export * from './phone.js';
 /*
  * `hours` is deliberately NOT re-exported here. It is a places concern, and a
  * barrel export puts it in the first load of every screen — including home,
