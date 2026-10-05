@@ -88,6 +88,17 @@ const styles = stylex.create({
     paddingBottom: 'env(safe-area-inset-bottom, 0px)',
   },
   inner: { width: '100%', maxWidth: '560px', marginInline: 'auto' },
+  // A white fade above the bar (Will, 5 October, D-283), so a card scrolling
+  // under it softens away instead of being cut off hard at the line.
+  // Decoration only: hidden, and never in the way of a tap on the card.
+  fade: {
+    position: 'absolute',
+    insetInline: 0,
+    bottom: '100%',
+    height: '40px',
+    pointerEvents: 'none',
+    backgroundImage: `linear-gradient(to bottom, transparent, ${colorVars['--color-background-body']})`,
+  },
   // Holds the bar's height in the page, so the end of a long list scrolls
   // clear of it instead of sitting underneath.
   spacer: {
@@ -186,6 +197,7 @@ export function TabBar({
     <>
       <VStack aria-hidden xstyle={styles.spacer} />
       <footer data-pam-tabbar="" {...stylex.props(styles.bar)}>
+        <VStack aria-hidden xstyle={styles.fade} />
         <HStack align="center" wrap="nowrap" xstyle={styles.inner}>
           <TabList
             value={current ?? ''}

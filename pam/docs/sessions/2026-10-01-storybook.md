@@ -480,3 +480,4 @@ Chromium.
   - Saved bug: Storybook fixture ids `s1`–`s3` didn't match the example set's `dummy-place-*` ids used by trips. Renamed the fixtures and the stories that used `s1`.
   - Checked: typecheck, web build, Storybook screenshots, `e2e/visit-change.spec.ts` (with axe), full e2e.
 - D-282: saving a changed visit now shows `SuccessScreen`: "Your visit is moved!", the new day and time, Go home, and an automatic redirect to `/` after 5s. This replaces D-281's `leaveFlow(2)` back to the place. Checked: typecheck, web build, `visit-change.spec.ts` (6/6), and the Storybook prototype (celebration, then Explore).
+- D-283: TabBar gets a 40px fade above it (transparent to the page colour; aria-hidden; pointer-events none), for every role. Checked: typecheck, Storybook build, a screenshot of Explore scrolled under the bar.

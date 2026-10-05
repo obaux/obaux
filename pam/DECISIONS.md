@@ -6544,6 +6544,26 @@ was changed at new time, then redirect to home page."
   line with the new day and time, Go home, the redirect to `/`, and the
   place showing the new time afterwards.
 
+### D-283 — The tab bar has a fade above it
+
+Will, 5 October, with a screenshot of Explore: "let's add a white fade on
+bottom of member screen so the place cards don't shock against the bottom
+menu."
+
+- **What it is:** a 40px gradient from transparent to the page colour
+  (`--color-background-body`, so it is dark on the dark theme), sitting
+  directly on top of the bar.
+  - It is part of `TabBar`, so it moves with the bar and needs nothing from
+    each screen.
+  - It is hidden from screen readers, and `pointer-events: none` means a tap
+    on the card under it still lands on the card.
+  - The bar's hairline stays.
+- **Every role gets it, not only members:** every role's tab screens have
+  the same bar, and the same hard edge under a scrolling list. Doing it once
+  in `TabBar` is simpler than a member-only exception.
+- **Proven by:** typecheck, and Storybook screenshots of Explore scrolled
+  under the bar.
+
 ---
 
 ## Notes for whoever picks this up next
