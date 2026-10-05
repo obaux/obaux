@@ -5860,8 +5860,17 @@ with the Plugin API instead:
 - screenshots at half size, sent inline in batches under the tool's size
   limit.
 
-It works anywhere. If Will allows `mcp.figma.com` in the environment's
-network settings, later updates can use the sharper, cheaper import.
+Addendum, same day. Sending the screenshots inline did not work: a model
+cannot copy 40 KB of base64 exactly through a tool call, and Figma rejected
+it as "Invalid base64 string". Will chose to leave `mcp.figma.com` blocked
+for now. So the map is drawn without pictures:
+- every screen is a slot with its name and an **Open in Storybook ↗** link
+  to the live story on Chromatic;
+- the overview's slots open each person's clickable prototype.
+
+The slots keep their `shot:*` names, so when the host is allowed,
+`upload_assets` can fill them from disk by node id. The skill describes this
+route and forbids the base64 one.
 
 ---
 

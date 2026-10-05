@@ -54,20 +54,31 @@ Check the HTML pages first (open `user-flows-out/<flow>.html`, or screenshot
 them with Playwright): nothing overlapping, every screen showing the state the
 title says.
 
-Then publish, by whichever route the environment allows:
+Then publish. Load `skill://figma/figma-use/SKILL.md` first; pass
+`skillNames: "resource:figma-use"` on every `use_figma` call.
 
-- **Preferred — HTML import (sharp, one call per page):** if
-  `mcp.figma.com` is reachable (`curl -sI https://mcp.figma.com` is not a
-  proxy 403), delete the old page with `use_figma`, call `html_to_figma`
-  (fileKey above, `cssSelector: "#canvas"`), POST `user-flows-out/<flow>.html`
-  to the returned URL, then rename the new page to its `N · Title` name.
-- **Fallback — draw with the Plugin API (works behind the proxy):** run the
-  scripts in `user-flows-out/figma/order.txt`, in order, with `use_figma`
-  (load `skill://figma/figma-use/SKILL.md` first; `skillNames:
-  "resource:figma-use"`). Each drawing script replaces its page; each
-  `.img-N.js` fills that page's screenshot slots. **Only re-run the pages that
-  changed** — the image scripts are large, so delegate them to a subagent that
-  pastes each file verbatim and reports the returned JSON.
+1. **Draw the pages that changed** with `use_figma`, one call per page,
+   running `user-flows-out/figma/<n>-<key>.js`. Each script replaces its page
+   and draws the title, the latest-changes panel, the arrows and labels, and
+   one card per screen. Every card has an empty `shot:<key>--<node>` slot with
+   the screen's name and an **Open in Storybook ↗** link to the live story.
+   They are 7–15 KB of plain code, which is safe to pass through a tool call.
+2. **Screenshots — only when `mcp.figma.com` is reachable.** Will chose on
+   4 October to keep it blocked for now (`curl -sI https://mcp.figma.com`
+   gives a proxy 403). When it is allowed:
+   - run `<n>-<key>.slots.js` to get the slot ids;
+   - call `upload_assets` with `nodeIds` = those ids;
+   - `curl -X POST` each `user-flows-out/thumbs/<key>--<node>.jpg` (or the
+     full-size HTML shot) to its URL.
+
+   The bytes go from disk, never through a tool parameter.
+   **Never paste base64 into a `use_figma` script.** A model cannot copy
+   40 KB of base64 exactly; that was tried on 4 October and failed with
+   "Invalid base64 string" (D-264).
+3. With the host open, the one-call alternative per page is `html_to_figma`
+   (fileKey above, `cssSelector: "#canvas"`): POST
+   `user-flows-out/<flow>.html`, delete the old page, and rename the new one
+   to `N · Title`.
 
 Finish with `get_screenshot` of each page you changed (page node ids come back
 from the drawing script) and look at it.

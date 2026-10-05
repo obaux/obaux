@@ -29,6 +29,9 @@
 
 export const UPDATED = '4 October 2026';
 
+/** Where each screen opens live — the branch's Storybook on Chromatic. */
+export const STORYBOOK_URL = 'https://claude-pam-storybook--6abea9193da46b88ce90890f.chromatic.com';
+
 export const flows = [
   {
     key: 'signin',
