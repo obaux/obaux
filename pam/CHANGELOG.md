@@ -55,7 +55,10 @@ Explore has a centred, bolder search bar, smaller category chips and a card
 for their next visit, with the bell and Help moved off the top (they are on
 Profile). Every search bar's words and magnifier are bolder. On Sign in the
 card sits under the pictures, flat on the white, and the code step's button
-is the same width as the one before it.
+is the same width as the one before it. "My connections" says "People willing to
+help". Inviting a member is described as "People looking for resources". A
+program lead's Home opens on the week. Category chips scroll all the way to
+the screen edge.
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 

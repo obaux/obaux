@@ -17,6 +17,8 @@ export interface FloatingActionProps {
   readonly href: string;
   /** A PAM icon at 26px, as in a `MenuList` row. */
   readonly icon: ReactNode;
+  /** A second line under the label — "People willing to help" (D-267). */
+  readonly description?: string;
 }
 
 // The bottom bar's height (TabBar).
@@ -38,15 +40,16 @@ const styles = stylex.create({
   },
   inner: { width: '100%', maxWidth: '560px', marginInline: 'auto', paddingInline: '24px' },
   spacer: { height: '72px', flexShrink: 0 },
+  spacerTall: { height: '88px' },
 });
 
-export function FloatingAction({ label, href, icon }: FloatingActionProps) {
+export function FloatingAction({ label, href, icon, description }: FloatingActionProps) {
   return (
     <>
-      <VStack aria-hidden xstyle={styles.spacer} />
+      <VStack aria-hidden xstyle={[styles.spacer, description ? styles.spacerTall : null]} />
       <HStack xstyle={styles.dock}>
         <VStack xstyle={styles.inner}>
-          <MenuList label={label} items={[{ id: 'action', label, href, icon }]} />
+          <MenuList label={label} items={[{ id: 'action', label, href, icon, ...(description ? { description } : {}) }]} />
         </VStack>
       </HStack>
     </>

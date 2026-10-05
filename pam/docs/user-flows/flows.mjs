@@ -265,7 +265,7 @@ export const flows = [
       'Four tabs: Home (who is coming in), Program, Messages, Profile. A program lead looks after their listing, the policies participants sign, and the people booked in.',
     roots: ['home', 'program', 'messages', 'profile'],
     nodes: {
-      home: { title: 'Home — coming in', story: 'program-lead-screens--home', path: '/' },
+      home: { title: 'Home — coming in', story: 'program-lead-screens--home', path: '/', changed: 'D-267', note: 'Opens on the week' },
       member: { title: 'A member', story: 'program-lead-screens--member', path: '/person/' },
       invite: { title: 'Invite someone', story: 'program-lead-screens--invite', path: '/invite/', changed: 'D-263' },
       program: { title: 'Program', story: 'program-lead-screens--program', path: '/program/' },
@@ -294,7 +294,11 @@ export const flows = [
       ['profile', 'programs', 'Programs in PAM'],
       ['profile', 'alerts', 'Text alerts'],
     ],
-    changes: ['D-263 — Invite someone makes the link straight away', 'D-261 — policies and the verified tick'],
+    changes: [
+      'D-267 — Home opens on the week',
+      'D-263 — Invite someone makes the link straight away',
+      'D-261 — policies and the verified tick',
+    ],
   },
   {
     key: 'super-admin',

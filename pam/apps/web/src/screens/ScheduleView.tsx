@@ -151,7 +151,8 @@ export function ScheduleView({
   floating,
   today = new Date(),
   note,
-  initialView = 'day',
+  // A program lead opens on the week (Will, 5 October, D-267).
+  initialView = 'week',
 }: ScheduleViewProps) {
   const { t, locale } = useI18n();
   const [view, setView] = useState<View>(initialView);

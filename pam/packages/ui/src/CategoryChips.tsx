@@ -45,11 +45,17 @@ const styles = stylex.create({
   // Starts in line with the search bar and stops at the same edge (Will,
   // 1 October: the first version bled to the screen edges and crept off
   // them). A few pixels of room each side and below for the shadow.
+  // Will, 5 October (D-267): "set the chip overflow to visible, so they
+  // don't get clipped". A scrolling row has to clip somewhere, so it now
+  // clips at the screen's own right edge: the row runs past the page's 16px
+  // gutter on that side, and its start stays in line with the search bar.
   row: {
     overflowX: 'auto',
     scrollbarWidth: 'none',
-    marginInline: '-4px',
-    paddingInline: '4px',
+    marginInlineStart: '-4px',
+    marginInlineEnd: '-16px',
+    paddingInlineStart: '4px',
+    paddingInlineEnd: '16px',
     paddingBlock: '6px 10px',
     scrollSnapType: 'x proximity',
   },

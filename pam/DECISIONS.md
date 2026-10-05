@@ -5929,6 +5929,23 @@ padding, so the buttons are same width."
   same width as "Send me a code" a step earlier (318 and 320px measured).
   This applies wherever the code step appears, joining included.
 
+### D-267 — Small copy and default changes: connections subtitle, invite wording, week first, chips to the edge
+
+Will, 5 October:
+- **Messages' "My connections"** row now has a second line, "People willing
+  to help". `FloatingAction` gained an optional `description`, and its spacer
+  grows to match.
+- **Invite someone, "Invite a member":** the subtitle reads "People looking
+  for resources", replacing "Someone coming home". The case manager's older
+  `/admin/` button keeps its own label.
+- **A program lead's Home opens on Week**, not Day (`ScheduleView`'s
+  `initialView` default). The states story now lists Week first.
+- **Chips no longer clip short of the screen** ("set the chip overflow to
+  visible"). A sideways-scrolling row has to clip somewhere, so it now clips
+  at the screen edge: the row runs through the page's right-hand 16px margin,
+  and its start stays in line with the search bar. The page itself still
+  never scrolls sideways (scrollWidth = 390 at 390px).
+
 ---
 
 ## Notes for whoever picks this up next

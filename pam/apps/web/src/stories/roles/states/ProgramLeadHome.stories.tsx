@@ -37,8 +37,8 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Day: Story = { ...asRole('provider', '/'), name: 'Day' };
-export const Week: Story = { ...asRole('provider', '/'), name: 'Week', args: { initialView: 'week' } };
+export const Week: Story = { ...asRole('provider', '/'), name: 'Week' };
+export const Day: Story = { ...asRole('provider', '/'), name: 'Day', args: { initialView: 'day' } };
 export const Month: Story = { ...asRole('provider', '/'), name: 'Month', args: { initialView: 'month' } };
 export const NobodyBooked: Story = {
   ...asRole('provider', '/'),
