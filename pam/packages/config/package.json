@@ -21,6 +21,7 @@
     "./people-activity": "./src/people-activity.ts",
     "./dummy-connections": "./src/dummy-connections.ts",
     "./dummy-trips": "./src/dummy-trips.ts",
+    "./dummy-badges": "./src/dummy-badges.ts",
     "./dummy-appointments": "./src/dummy-appointments.ts",
     "./dummy-policies": "./src/dummy-policies.ts",
     "./invite-email": "./src/invite-email.ts"

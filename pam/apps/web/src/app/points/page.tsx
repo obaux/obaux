@@ -3,6 +3,7 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { Card } from '@astryxdesign/core/Card';
+import { Divider } from '@astryxdesign/core/Divider';
 import { Heading } from '@astryxdesign/core/Heading';
 import { HStack } from '@astryxdesign/core/HStack';
 import { ProgressBar } from '@astryxdesign/core/ProgressBar';
@@ -30,6 +31,8 @@ import {
   nextBadge,
   type BadgeDefinition,
 } from '@pam/config';
+import { USE_DUMMY_PEOPLE } from '@pam/config/dummy-flag';
+import { DUMMY_EARNED_BADGES } from '@pam/config/dummy-badges';
 import { useI18n } from '@/lib/i18n';
 import { NotIn } from '../NotIn';
 import { useSession } from '@/lib/useSession';
@@ -55,7 +58,8 @@ import { RoleSwitchControl } from '../RoleSwitchControl';
  *   3. **The ladder**, one short row a rung: earned, here (a ring that
  *      breathes), or how far. Only the next rung says what it means — the
  *      one somebody is reaching for.
- *   4. **Badges**, as a grid of medals, greyed until earned.
+ *   4. **Badges**, as a grid of medals in their own card, greyed until
+ *      earned. The newest one earned also sits on the hero card (D-307).
  *
  * A new level is celebrated once: the first time this screen sees it,
  * confetti, and the level read out.
@@ -84,6 +88,10 @@ const styles = stylex.create({
   heroNext: { fontSize: '15px', lineHeight: 1.4 },
   bar: { width: '100%' },
   section: { fontSize: '20px', lineHeight: 1.3 },
+  // The newest badge, under the bar (D-307).
+  newest: { minWidth: 0 },
+  newestName: { fontSize: '17px', lineHeight: 1.3, fontWeight: 700 },
+  newestNote: { fontSize: '14px', lineHeight: 1.35 },
   // 2. Ways to earn: one line each.
   way: { width: '100%', minHeight: '48px' },
   wayIcon: {
@@ -113,12 +121,19 @@ const styles = stylex.create({
   rungMeaning: { fontSize: '14px', lineHeight: 1.35 },
   rungStatus: { fontSize: '14px', whiteSpace: 'nowrap' },
   rungStatusEarned: { color: colorVars['--color-text-accent'], fontWeight: 600 },
-  // 4. Badges, four across — shorter to scroll past (Will, D-278).
-  grid: { width: '100%', display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', columnGap: '8px', rowGap: '4px' },
+  // 4. Badges, in a card of their own, set further from the ladder, title
+  // centred (Will, 5 October, D-307).
+  // Slim padding and no column gap, so the columns are as wide as they
+  // were outside the card and "Cornerstone" still fits.
+  badges: { width: '100%', marginBlockStart: '16px', paddingBlockStart: '20px' },
+  badgesTitle: { fontSize: '20px', lineHeight: 1.3, textAlign: 'center', width: '100%' },
+  // Four across — shorter to scroll past (Will, D-278).
+  grid: { width: '100%', display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', columnGap: '0px', rowGap: '4px' },
   badge: { minWidth: 0, paddingBlock: '8px' },
   badgeMark: { width: '52px', height: '52px' },
   badgeName: { fontSize: '13px', lineHeight: 1.25, fontWeight: 600, textAlign: 'center', maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
   badgeNote: { fontSize: '12px', lineHeight: 1.25, textAlign: 'center' },
+  badgeNoteEarned: { color: colorVars['--color-text-accent'], fontWeight: 600 },
   live: { position: 'absolute', width: '1px', height: '1px', overflow: 'hidden', clipPath: 'inset(50%)' },
 });
 
@@ -171,6 +186,9 @@ export default function PointsPage() {
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
   const { demoRole, setViewAs } = useRoleView(trueRole);
   const points = usePoints(session.status === 'signed-in' ? session.session.userId : null);
+  // Nothing awards a badge yet; the example member has earned Scholar
+  // (D-307), shown where the rest of the example data is.
+  const earned: readonly string[] = USE_DUMMY_PEOPLE && (demoRole ?? trueRole) === 'member' ? DUMMY_EARNED_BADGES : [];
   const [celebrate, setCelebrate] = useState(false);
 
   const current = points !== null ? badgeForPoints(points) : null;
@@ -200,6 +218,8 @@ export default function PointsPage() {
   }
 
   const others = BADGES.filter((badge) => badge.group !== 'core');
+  const earnedOthers = others.filter((badge) => earned.includes(badge.key));
+  const newest = earnedOthers.at(-1) ?? null;
   const from = current?.minPoints ?? 0;
   const to = next?.minPoints ?? from;
   const ways: { id: string; icon: ReactNode; label: string; worth: string }[] = [
@@ -290,6 +310,22 @@ export default function PointsPage() {
                   {t('points.hero.top')}
                 </Text>
               )}
+              {newest ? (
+                <>
+                  <Divider />
+                  <HStack gap={3} align="center" wrap="nowrap">
+                    <HStack align="center" justify="center" xstyle={styles.medal} aria-hidden>
+                      <BadgeArt badgeKey={newest.key} size={44} />
+                    </HStack>
+                    <VStack gap={0} xstyle={styles.newest}>
+                      <Text xstyle={styles.newestName}>{t(newest.labelKey)}</Text>
+                      <Text type="supporting" xstyle={styles.newestNote}>
+                        {t('points.hero.newest', { count: earnedOthers.length, total: others.length })}
+                      </Text>
+                    </VStack>
+                  </HStack>
+                </>
+              ) : null}
             </VStack>
           </Card>
         ) : null}
@@ -327,26 +363,31 @@ export default function PointsPage() {
           </VStack>
         </VStack>
 
-        {/* 4. Badges, as medals. */}
-        <VStack gap={2}>
-          <Heading level={2} xstyle={styles.section}>
-            {t('points.badgesTitle')}
-          </Heading>
-          <VStack xstyle={styles.grid}>
-            {others.map((badge) => (
-              <VStack key={badge.key} gap={1} align="center" xstyle={styles.badge}>
-                <HStack align="center" justify="center" xstyle={styles.badgeMark}>
-                  {/* Not earned yet, so in grey (D-295). */}
-                  <BadgeArt badgeKey={badge.key} size={52} isLocked />
-                </HStack>
-                <Text xstyle={styles.badgeName}>{t(badge.labelKey)}</Text>
-                <Text type="supporting" xstyle={styles.badgeNote}>
-                  {badge.blockedBy ? t('points.soon') : t('points.locked')}
-                </Text>
-              </VStack>
-            ))}
+        {/* 4. Badges, as medals, in their own card. */}
+        <Card padding={3} xstyle={styles.badges}>
+          <VStack gap={3}>
+            <Heading level={2} xstyle={styles.badgesTitle}>
+              {t('points.badgesTitle')}
+            </Heading>
+            <VStack xstyle={styles.grid}>
+              {others.map((badge) => {
+                const isEarned = earned.includes(badge.key);
+                return (
+                  <VStack key={badge.key} gap={1} align="center" xstyle={styles.badge}>
+                    <HStack align="center" justify="center" xstyle={styles.badgeMark}>
+                      {/* In colour once earned, grey until then (D-295). */}
+                      <BadgeArt badgeKey={badge.key} size={52} isLocked={!isEarned} />
+                    </HStack>
+                    <Text xstyle={styles.badgeName}>{t(badge.labelKey)}</Text>
+                    <Text type="supporting" xstyle={[styles.badgeNote, isEarned && styles.badgeNoteEarned]}>
+                      {isEarned ? t('points.earned') : badge.blockedBy ? t('points.soon') : t('points.locked')}
+                    </Text>
+                  </VStack>
+                );
+              })}
+            </VStack>
           </VStack>
-        </VStack>
+        </Card>
       </Page>
     </>
   );

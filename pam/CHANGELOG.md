@@ -134,7 +134,9 @@ no visit and are not saved. A place with a visit shows the same date chip on
 Explore as on Saved and opens to its visit. When a program has written to
 you, its page says "New message" with a pink dot and opens the conversation. Its
 preview is one line and ends in "…". Call on a place's page shows the phone
-number.
+number. On Your points, the badges sit in their own card, a little further
+below the ladder, with the title centred. The example member has earned
+Scholar, and the top card shows it as their newest badge.
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 

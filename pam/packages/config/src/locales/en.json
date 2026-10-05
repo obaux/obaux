@@ -1120,6 +1120,7 @@
   "messages.visit.label": "Your visit, {day} at {time}. See the place.",
   "points.hero.toNext": "{count} more to {next}",
   "points.hero.top": "You have reached the top of the ladder.",
+  "points.hero.newest": "Newest badge · {count} of {total} earned",
   "points.waysTitle": "Ways to earn",
   "points.way.attend": "Show up to a visit",
   "points.way.call": "Call a place",

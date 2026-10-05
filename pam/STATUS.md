@@ -377,7 +377,8 @@ are placed in pixels between the note and the half drawer (D-303). Nine example 
 three per category; three saved, two with visits (D-304). Place profile vs Visit profile
 is one story with controls; `VisitTag` is the one visit chip (Saved, Explore); a place's
 message row becomes "New message" with a pink dot when its program wrote (D-305); its
-preview is one line, and Call shows the number (D-306). Note:
+preview is one line, and Call shows the number (D-306). Points: badges in a card; the
+example member has earned Scholar, shown on the hero card too (D-307). Note:
 the web app's vitest tests are not run in CI. How points should be awarded — two rules live
 (save a place, finish setup), the rest to build, with order and open
 questions — is specified in `docs/points-awarding.md`. The

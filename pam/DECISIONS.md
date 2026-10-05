@@ -7266,6 +7266,32 @@ this applies to all places profiles. No need to hide info."
     Storybook build;
   - e2e 570/570.
 
+### D-307 — Badges in their own card; the example member has earned Scholar
+
+Will, 5 October, on the Points screen: "Let's wrap badges into a card, move
+it a bit lower so there [is] more gap from [the] ladder. And center align
+title badges inside card. Also let's award them the first badge on preview,
+and incorporate that on the hero card up top."
+
+- **The card:** the badge grid sits in a `Card`, 16px further below the
+  ladder, with "Badges" centred inside it. The card's padding is slim and
+  the grid has no column gap, so each column is as wide as it was outside
+  the card. "Cornerstone" and "Homecoming" fit at 390px; at 320px they end
+  in "…", as they already did.
+- **The award:** nothing awards a badge yet. `DUMMY_EARNED_BADGES`
+  (`@pam/config/dummy-badges`) holds Scholar, the first badge in the grid.
+  It shows only where the other example data shows (`USE_DUMMY_PEOPLE`)
+  and only to a member. An earned badge is drawn in colour, with "Earned"
+  in the accent colour.
+- **The hero card:** under the bar, after a divider, the newest earned
+  badge: its picture, its name and "Newest badge · 1 of 13 earned"
+  (`points.hero.newest`, en/es). With nothing earned, the row is left out.
+- **Proven by:**
+  - screenshots of the Points story at 390px and 320px;
+  - ui 67, config 238 and web 11 unit tests, typecheck, web build and
+    Storybook build;
+  - e2e 570/570.
+
 ---
 
 ## Notes for whoever picks this up next
