@@ -7546,17 +7546,73 @@ entire app?"
   English, 126 in Spanish), hard-coded screen text and metadata (titles,
   OG descriptions, the wordmark's alt), the gallery, stories, the e2e
   assertions, and the flow map's screen titles. 157 files, one word.
-- **Held back, for Will:** the text-message templates and the rule that
-  checks them still say "PAM:". That prefix is in the samples filed with
-  the carrier (`docs/sms-campaign-samples.md`), and a 160-character rule
-  and a human `reviewedBy` sit behind every template; changing them is a
-  campaign change, not a spelling fix. The invite email has no such
-  prefix; it reads "Pam" like the rest.
+- **Texts too** (Will, later the same day: "I want 'Pam:' on SMS too,
+  please change the templates, the rule and the campaign samples
+  together"): every template body, the "Pam: " prefix rule in
+  `supabase/functions/dispatch-sms/render.ts`, the shipped
+  `templates.json`, both test files and `docs/sms-campaign-samples.md`
+  changed in one pass. The copy changed by one word in each; `reviewedBy`
+  is unchanged, on Will's own instruction. The carrier samples need
+  re-filing with the new prefix — `docs/before-launch.md`.
 - Code is untouched: `@pam/*` packages, `pam.*` keys, `DUMMY_PAM_TEAM`,
   file names. The wordmark SVGs already draw the name in lower case. The
   OG images are pictures; if one shows the capitals it needs re-exporting.
 - **Proven by:** config 238, ui 67 and web 11 unit tests, typecheck, web
   and Storybook builds, e2e 570/570.
+
+### D-322 — Booking for somebody: who is already booked, who wrote, and a person who is new to Pam
+
+Will, 6 October, on Book a visit for a member: "we need to know if
+they're already booked, and the time of message, a way to preview last
+message snippet, max 1 line. And a way manually add a person in, which
+allows the program lead to fill in person's name and phone, and at the
+end sends a message to new members with a link to sign into Pam. And have
+that be the first screen the member sees, the confetti Trip booked, with
+button to return to place profile, and auto save that trip show up for
+them inside Trips. This is a workflow of collaboration…"
+
+- **The list.** Each person who wrote shows "Booked · Tue, Oct 6, 9:00
+  AM" (their next visit at this program, example or booked this session)
+  or "Not booked"; when they last wrote ("Wrote Today 7:52 AM",
+  "Yesterday", "Oct 3", in Messages' own words); and the last message on
+  one line, "You:" first when it was the program's. A row still opens New
+  trip for them.
+- **Add a person**, first in the list: somebody at the desk or on the
+  phone who has not used Pam. First name and number, nothing else — the
+  lead is filling it in for them — then the same When and Check steps,
+  the button reading "Book for Keisha". The ending says Pam texted them a
+  link, and shows the text itself so the lead knows what they got.
+- **The link.** `inviteLink(code, role, trip)` carries the booked trip
+  (`?trip=`); `readInvite` and the remembered invite keep it. The real
+  flow would make an invite with the phone pre-filled (`create_invite`
+  takes `p_phone`) and attach the appointment to the profile that redeems
+  it; here it is the session store, like every example flow.
+- **The arrival.** When the invite carried a trip, the member's last
+  sign-up step is "Your visit is booked" — confetti, the place, day and
+  time, "Pam will remind you before you go", **See the place** (the visit
+  profile) and Go to Trips. The trip is already on their Trips. A story,
+  Onboarding › "Member — a visit booked for them", walks it.
+- **The text is not a template yet.** Every SMS template needs a human
+  `reviewedBy` and the tests hold that line, so the copy is shown on the
+  program's ending and listed in `docs/before-launch.md` for review:
+  "Pam: {place} booked you for {day} at {time}. Tap to see it in Pam:
+  {link}". It is a first contact, so it will carry the STOP line.
+- **Proven by:** a scripted walk-through (list, Add a person, "Booking
+  for Keisha", the texted ending, the member's "Your visit is booked");
+  config 238, ui 67, typecheck, web and Storybook builds; e2e 570/570.
+
+### D-323 — A quieter head on a program lead's Home
+
+Will, 6 October: "This top header section looks messy, too many icons and
+things to look at, how can we simplify this?" Then, on the proposal: "Go
+ahead with recommendations 1,2, but for 3, let's show the search button
+(circle icon as is) on weekly, or monthly view."
+
+- The date row's arrows lose their white discs: plain chevrons, still
+  48px targets. The "12 visits" line under the date is gone — each day's
+  heading already counts who is coming. The search circle shows only on
+  the week and month views; a day is short enough to read.
+- **Proven by:** screenshots of the week and the day; e2e 570/570.
 
 ---
 

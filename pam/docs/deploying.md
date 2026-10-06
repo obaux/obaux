@@ -1,6 +1,6 @@
-# Putting PAM on the web
+# Putting Pam on the web
 
-PAM ships to the App Store and Google Play, and it still needs a web address.
+Pam ships to the App Store and Google Play, and it still needs a web address.
 Every invite arrives as a link in a text message, and that link has to open
 something for a person who has not installed anything yet. So the web build is
 not scaffolding thrown away at launch — it is the front door.

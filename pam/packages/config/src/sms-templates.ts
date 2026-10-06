@@ -7,7 +7,7 @@
  *
  *  - never name justice terms, programs that imply justice involvement,
  *    other users' full names, or health/legal detail
- *  - "PAM:" prefix, one clear action, <= 160 characters, no emoji
+ *  - "Pam:" prefix, one clear action, <= 160 characters, no emoji
  *  - STOP instruction on the first message to a number, and monthly after
  *  - every template carries `reviewedBy`; an unreviewed template cannot send
  */
@@ -45,7 +45,7 @@ export interface SmsTemplate {
    * draft — it is a human sign-off field.
    */
   readonly reviewedBy: string;
-  /** True when this is the first message PAM sends a number — forces STOP text. */
+  /** True when this is the first message Pam sends a number — forces STOP text. */
   readonly isFirstContact: boolean;
   /**
    * Per-variable length budget. A value longer than its budget is shortened at
@@ -136,7 +136,7 @@ const STOP_SUFFIX_ES = ' Responda STOP para no recibir mensajes.';
  * Who read this copy and signed it off.
  *
  * Every template shipped with this empty, and `renderSms` threw on an
- * unreviewed one, so PAM could not text anybody until a person had read the
+ * unreviewed one, so Pam could not text anybody until a person had read the
  * words. Will read all thirteen and approved them on 13 September 2026, and
  * this is that record.
  *
@@ -151,24 +151,24 @@ const REVIEWED_BY = 'Will (Oba), 13 September 2026';
 export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
   invite_member: {
     key: 'invite_member',
-    en: "PAM: You've been invited to PAM, an app for finding help and people near you. Tap to join: {link}",
-    es: 'PAM: Le invitaron a PAM, una app para encontrar ayuda y personas cerca. Toque para entrar: {link}',
+    en: "Pam: You've been invited to Pam, an app for finding help and people near you. Tap to join: {link}",
+    es: 'Pam: Le invitaron a Pam, una app para encontrar ayuda y personas cerca. Toque para entrar: {link}',
     vars: ['link'],
     reviewedBy: REVIEWED_BY,
     isFirstContact: true,
   },
   invite_provider: {
     key: 'invite_provider',
-    en: 'PAM: You have been invited to list your services on PAM. Tap to set up your page: {link}',
-    es: 'PAM: Le invitaron a publicar sus servicios en PAM. Toque para crear su pagina: {link}',
+    en: 'Pam: You have been invited to list your services on Pam. Tap to set up your page: {link}',
+    es: 'Pam: Le invitaron a publicar sus servicios en Pam. Toque para crear su pagina: {link}',
     vars: ['link'],
     reviewedBy: REVIEWED_BY,
     isFirstContact: true,
   },
   verify_code: {
     key: 'verify_code',
-    en: 'PAM: Your code is {code}. It works for 10 minutes.',
-    es: 'PAM: Su codigo es {code}. Sirve por 10 minutos.',
+    en: 'Pam: Your code is {code}. It works for 10 minutes.',
+    es: 'Pam: Su codigo es {code}. Sirve por 10 minutos.',
     vars: ['code'],
     reviewedBy: REVIEWED_BY,
     isFirstContact: false,
@@ -184,16 +184,16 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
    */
   facilitation_member: {
     key: 'facilitation_member',
-    en: 'PAM: {adminFirstName} connected you with a program that can help. Open PAM to say hi: {link}',
-    es: 'PAM: {adminFirstName} le conecto con un programa que puede ayudar. Abra PAM para saludar: {link}',
+    en: 'Pam: {adminFirstName} connected you with a program that can help. Open Pam to say hi: {link}',
+    es: 'Pam: {adminFirstName} le conecto con un programa que puede ayudar. Abra Pam para saludar: {link}',
     vars: ['adminFirstName', 'link'],
     reviewedBy: REVIEWED_BY,
     isFirstContact: false,
   },
   facilitation_provider: {
     key: 'facilitation_provider',
-    en: 'PAM: Someone was introduced to your program. Open PAM to reply: {link}',
-    es: 'PAM: Alguien fue presentado a su programa. Abra PAM para responder: {link}',
+    en: 'Pam: Someone was introduced to your program. Open Pam to reply: {link}',
+    es: 'Pam: Alguien fue presentado a su programa. Abra Pam para responder: {link}',
     vars: ['link'],
     reviewedBy: REVIEWED_BY,
     isFirstContact: false,
@@ -211,8 +211,8 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
    */
   appointment_24h: {
     key: 'appointment_24h',
-    en: 'PAM: You have a visit tomorrow at {time}. {address}. Tap for directions: {link}',
-    es: 'PAM: Tiene una visita mañana a las {time}. {address}. Toque para llegar: {link}',
+    en: 'Pam: You have a visit tomorrow at {time}. {address}. Tap for directions: {link}',
+    es: 'Pam: Tiene una visita mañana a las {time}. {address}. Toque para llegar: {link}',
     vars: ['time', 'address', 'link'],
     maxVarLengths: { address: 34 },
     reviewedBy: REVIEWED_BY,
@@ -220,8 +220,8 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
   },
   appointment_2h: {
     key: 'appointment_2h',
-    en: 'PAM: Your visit is at {time} today. {address}. Tap for directions: {link}',
-    es: 'PAM: Su visita es hoy a las {time}. {address}. Toque para llegar: {link}',
+    en: 'Pam: Your visit is at {time} today. {address}. Tap for directions: {link}',
+    es: 'Pam: Su visita es hoy a las {time}. {address}. Toque para llegar: {link}',
     vars: ['time', 'address', 'link'],
     maxVarLengths: { address: 34 },
     reviewedBy: REVIEWED_BY,
@@ -229,8 +229,8 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
   },
   appointment_morning_of: {
     key: 'appointment_morning_of',
-    en: 'PAM: Today at {time} you have a visit. {address}. Tap for directions: {link}',
-    es: 'PAM: Hoy a las {time} tiene una visita. {address}. Toque para llegar: {link}',
+    en: 'Pam: Today at {time} you have a visit. {address}. Tap for directions: {link}',
+    es: 'Pam: Hoy a las {time} tiene una visita. {address}. Toque para llegar: {link}',
     vars: ['time', 'address', 'link'],
     maxVarLengths: { address: 34 },
     reviewedBy: REVIEWED_BY,
@@ -238,8 +238,8 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
   },
   attendance_check: {
     key: 'attendance_check',
-    en: 'PAM: Did you make it today? Reply YES or NO.',
-    es: 'PAM: Pudo ir hoy? Responda YES o NO.',
+    en: 'Pam: Did you make it today? Reply YES or NO.',
+    es: 'Pam: Pudo ir hoy? Responda YES o NO.',
     vars: [],
     reviewedBy: REVIEWED_BY,
     isFirstContact: false,
@@ -247,8 +247,8 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
   /** §7.2: a missed visit is never penalised. Gentle, one action, no guilt. */
   attendance_missed_followup: {
     key: 'attendance_missed_followup',
-    en: 'PAM: No problem. We saved a step to set up a new time. Open PAM when you are ready: {link}',
-    es: 'PAM: No hay problema. Guardamos un paso para buscar otra fecha. Abra PAM cuando pueda: {link}',
+    en: 'Pam: No problem. We saved a step to set up a new time. Open Pam when you are ready: {link}',
+    es: 'Pam: No hay problema. Guardamos un paso para buscar otra fecha. Abra Pam cuando pueda: {link}',
     vars: ['link'],
     reviewedBy: REVIEWED_BY,
     isFirstContact: false,
@@ -263,8 +263,8 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
    */
   staff_request_approved: {
     key: 'staff_request_approved',
-    en: 'PAM: Your request was approved. Open PAM to get started: {link}',
-    es: 'PAM: Su solicitud fue aprobada. Abra PAM para empezar: {link}',
+    en: 'Pam: Your request was approved. Open Pam to get started: {link}',
+    es: 'Pam: Su solicitud fue aprobada. Abra Pam para empezar: {link}',
     vars: ['link'],
     reviewedBy: 'Will (Oba), 17 September 2026',
     isFirstContact: false,
@@ -282,8 +282,8 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
    */
   staff_request_denied: {
     key: 'staff_request_denied',
-    en: 'PAM: Your request was not approved. Questions? Call {supportPhone}.',
-    es: 'PAM: Su solicitud no fue aprobada. Preguntas? Llame al {supportPhone}.',
+    en: 'Pam: Your request was not approved. Questions? Call {supportPhone}.',
+    es: 'Pam: Su solicitud no fue aprobada. Preguntas? Llame al {supportPhone}.',
     vars: ['supportPhone'],
     reviewedBy: 'Will (Oba), 17 September 2026',
     isFirstContact: false,
@@ -291,8 +291,8 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
   /** §6.2: no names in a connection-request SMS. */
   connection_request: {
     key: 'connection_request',
-    en: 'PAM: Someone on PAM wants to connect. Open PAM to reply: {link}',
-    es: 'PAM: Alguien en PAM quiere conectar. Abra PAM para responder: {link}',
+    en: 'Pam: Someone on Pam wants to connect. Open Pam to reply: {link}',
+    es: 'Pam: Alguien en Pam quiere conectar. Abra Pam para responder: {link}',
     vars: ['link'],
     reviewedBy: REVIEWED_BY,
     isFirstContact: false,
@@ -321,16 +321,16 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
    */
   saved_place_closed: {
     key: 'saved_place_closed',
-    en: 'PAM: A place you saved is {reason}. Find others in PAM: {link}',
-    es: 'PAM: Un lugar que guardo {reason}. Vea otros en PAM: {link}',
+    en: 'Pam: A place you saved is {reason}. Find others in Pam: {link}',
+    es: 'Pam: Un lugar que guardo {reason}. Vea otros en Pam: {link}',
     vars: ['reason', 'link'],
     reviewedBy: REVIEWED_BY,
     isFirstContact: false,
   },
   access_limited_notice: {
     key: 'access_limited_notice',
-    en: 'PAM: Some parts of PAM are turned off for now. Call {supportPhone} with questions.',
-    es: 'PAM: Algunas partes de PAM estan apagadas por ahora. Llame al {supportPhone} si tiene preguntas.',
+    en: 'Pam: Some parts of Pam are turned off for now. Call {supportPhone} with questions.',
+    es: 'Pam: Algunas partes de Pam estan apagadas por ahora. Llame al {supportPhone} si tiene preguntas.',
     vars: ['supportPhone'],
     reviewedBy: REVIEWED_BY,
     isFirstContact: false,
@@ -464,8 +464,8 @@ const EMOJI_PATTERN =
 export function assertSmsIsSafe(body: string, key?: string): void {
   const where = key ? ` (template "${key}")` : '';
 
-  if (!body.startsWith('PAM:')) {
-    throw new SmsContentError(`SMS must start with the "PAM:" prefix${where}.`);
+  if (!body.startsWith('Pam:')) {
+    throw new SmsContentError(`SMS must start with the "Pam:" prefix${where}.`);
   }
   if (body.length > SMS_MAX_LENGTH) {
     throw new SmsContentError(

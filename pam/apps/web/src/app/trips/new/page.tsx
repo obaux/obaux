@@ -19,8 +19,13 @@ function NewTrip() {
   // From a program's "Book a visit for a member" (D-316): who it is for.
   const forId = params.get('for');
   const forName = params.get('forName');
+  // Somebody new to Pam (D-322): their number, so they can be texted a link.
+  const forPhone = params.get('forPhone');
   const seed = useMemo(() => (id ? { id, name, category, address } : null), [id, name, category, address]);
-  const forMember = useMemo(() => (forId ? { id: forId, name: forName ?? '' } : null), [forId, forName]);
+  const forMember = useMemo(
+    () => (forId ? { id: forId, name: forName ?? '', ...(forPhone ? { phone: forPhone } : {}) } : null),
+    [forId, forName, forPhone],
+  );
   return <NewTripView initialPlace={seed} changing={change} forMember={forMember} />;
 }
 

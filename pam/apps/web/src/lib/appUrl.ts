@@ -43,14 +43,19 @@ const ROLE_IN_LINK: Record<InviteRole, string> = {
  * `/j/{code}` form, which no page ever answered — a static export cannot
  * serve a path per code.
  */
-export function inviteLink(code: string, role: InviteRole): string {
-  return `${appUrl()}/signin/?invite=${encodeURIComponent(code)}&as=${ROLE_IN_LINK[role]}`;
+export function inviteLink(code: string, role: InviteRole, trip?: string | null): string {
+  // A visit booked for them before they had Pam rides along (D-322), so
+  // their first screen can be that visit.
+  const extra = trip ? `&trip=${encodeURIComponent(trip)}` : '';
+  return `${appUrl()}/signin/?invite=${encodeURIComponent(code)}&as=${ROLE_IN_LINK[role]}${extra}`;
 }
 
 /** An invite read back out of a link's query, or null if it carries none. */
 export interface Invite {
   readonly code: string;
   readonly role: InviteRole;
+  /** A trip a program booked for this person before they joined (D-322). */
+  readonly trip?: string | null;
 }
 
 export function readInvite(params: { get(name: string): string | null } | null | undefined): Invite | null {
@@ -58,7 +63,8 @@ export function readInvite(params: { get(name: string): string | null } | null |
   if (!code) return null;
   const as = params?.get('as');
   const role: InviteRole = as === 'program' ? 'provider' : as === 'case-manager' ? 'admin' : 'member';
-  return { code, role };
+  const trip = params?.get('trip')?.trim() || null;
+  return trip ? { code, role, trip } : { code, role };
 }
 
 /** Who a page is for, from `?as=` alone — no invite needed (D-259). */
@@ -91,7 +97,7 @@ export function recallInvite(): Invite | null {
     const parsed = JSON.parse(raw) as Partial<Invite>;
     if (typeof parsed.code !== 'string' || !parsed.code) return null;
     const role: InviteRole = parsed.role === 'provider' || parsed.role === 'admin' ? parsed.role : 'member';
-    return { code: parsed.code, role };
+    return typeof parsed.trip === 'string' && parsed.trip ? { code: parsed.code, role, trip: parsed.trip } : { code: parsed.code, role };
   } catch {
     return null;
   }

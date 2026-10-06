@@ -98,7 +98,7 @@ case manager profiles, and the redemption screen to show it.
 
 > "...and view the full database, in the admin account."
 
-**This is in tension with the §4.1 transparency contract**, which PAM shows
+**This is in tension with the §4.1 transparency contract**, which Pam shows
 members at onboarding and asks them to trust. It says, in the app, in plain
 words: the person who invited you **cannot** see what you write in your chats,
 and cannot see what you share with your buddies.
@@ -113,7 +113,7 @@ Three honest options, in the order I would recommend them:
    and the only thing given up is reading members' private messages — which no
    part of the product needs. **Recommended.**
 2. **Full access, and the transparency screen changes to say so** — before it
-   ships, not after. Members are told "the people who run PAM can read your
+   ships, not after. Members are told "the people who run Pam can read your
    messages". Honest, and it will cost trust with exactly the population that
    has least of it to spare.
 3. Full access with the screen unchanged. Not an option. It makes the product
@@ -204,7 +204,7 @@ A flag reaches the people it is about. It is not broadcast to staff.
 (`/reminders/`) is the single exception, on Will's call.
 
 It asks one question with two answers, both one tap away, and neither can fail
-in a way that calling PAM would fix. A third button beside them makes the
+in a way that calling Pam would fix. A third button beside them makes the
 question look harder than it is — and the screen a member is sent to right after
 their very first sign-in is the wrong place to imply they might need rescuing.
 
@@ -224,7 +224,7 @@ first.
 A8 set the bar for an exception — one question, no failure mode help would fix,
 and help one tap away wherever the person lands next. Sign-in clears two of
 those three outright, and answers the third differently: signing in *can* fail,
-and every one of its failure states already renders a notice carrying PAM's
+and every one of its failure states already renders a notice carrying Pam's
 number. The help path is therefore present exactly when it is useful and absent
 when it is noise, which is a stronger position than a permanent ghost button.
 
@@ -236,10 +236,10 @@ the exception's justification, not just a notice.
 ## A10 — Waiting is a spinner, not a sentence (16 September 2026, Will)
 
 §2.4 asks for plain language on every screen, and the SOP's loading guidance
-assumes copy. PAM's waiting state is now a centred spinner with no visible
+assumes copy. Pam's waiting state is now a centred spinner with no visible
 words, on Will's call.
 
-The reason is that the state is not one screen, it is all of them. PAM is a
+The reason is that the state is not one screen, it is all of them. Pam is a
 static export and the header's links are real anchors, so changing tab is a full
 page load: every screen shows its waiting state every time somebody moves. One
 sentence therefore has to be true everywhere, and the one we had — "Finding
@@ -252,7 +252,7 @@ rule about *explaining*, and this state has nothing to explain: it resolves in
 under a second, or it becomes an error notice that does explain, in words, with
 a phone number. A ring needs no reading level and no translation, which is worth
 more here than a sentence that has to be right in English, in Spanish, and in
-whatever PAM is translated into next.
+whatever Pam is translated into next.
 
 **What did not change, and is asserted by a browser test.** §0 still holds: the
 home screen's waiting state keeps its help bar, because a screen with nothing on
@@ -264,17 +264,17 @@ broken image, and what was promised to somebody who asked for less motion was
 less, not none.
 
 Anyone replacing this with copy again should be able to name a sentence that is
-true on every screen in PAM, including the ones that do not exist yet.
+true on every screen in Pam, including the ones that do not exist yet.
 
-## A11 — PAM says what a place does, in its own words (16 September 2026, Will)
+## A11 — Pam says what a place does, in its own words (16 September 2026, Will)
 
-0017 and §0 between them said PAM adds no words of its own to a provider's
-listing: a provider's name is theirs, shown as it is, and nothing PAM writes may
-imply what a member is there for. PAM now writes one sentence about every place
+0017 and §0 between them said Pam adds no words of its own to a provider's
+listing: a provider's name is theirs, shown as it is, and nothing Pam writes may
+imply what a member is there for. Pam now writes one sentence about every place
 in the catalogue, and shows it on the card and on the place's own screen.
 
 **Where this contradicts the original.** The neutrality rule was written to stop
-PAM labelling a person by labelling a place — "substance use treatment" beside
+Pam labelling a person by labelling a place — "substance use treatment" beside
 somebody's name on a shared screen is a disclosure they did not make. The rule
 worked, and it left 754 places reaching members as a name and an address. "J J
 Peters" tells nobody anything. Protecting a provider's framing at the cost of a
@@ -296,7 +296,7 @@ most 200 characters — a check constraint, not a guideline. From the source dat
 or a published source, never invented: `enrich-places` is not written yet and
 nothing here guesses. The `flag_unapproved_rewrite` trigger still flags any
 plain-language column a provider has edited, and 0050's approval step clears
-`needs_review` only for rows PAM itself wrote and no provider has touched.
+`needs_review` only for rows Pam itself wrote and no provider has touched.
 
 ## A12 — The first-load budget is 600 kB, not 500 (21 September 2026, Will)
 
@@ -357,7 +357,7 @@ bar; the chain now runs thread → Messages → the header's own mark → Home,
 which always does, two taps rather than one. That is a real loosening of
 the third test below, recorded here rather than left for the next reader
 to notice as a discrepancy. And the thread is the one screen
-in PAM with two pinned bars — header and composer — so a third would come out
+in Pam with two pinned bars — header and composer — so a third would come out
 of the messages, which is the screen's reason to exist.
 
 **What did not change.** The way back is always visible (it is pinned, so
@@ -435,5 +435,5 @@ walking. The row's second line says "Open in Google Maps", not "Walking
 route". DECISIONS D-294.
 
 **What did not change.** Coordinates still beat the address, and Google's
-place ID rides along when PAM has one (D-291). A place with nothing to
+place ID rides along when Pam has one (D-291). A place with nothing to
 route to still has no Get directions row.

@@ -10,12 +10,15 @@ import { Text } from '@astryxdesign/core/Text';
 import { CheckboxInput } from '@astryxdesign/core/CheckboxInput';
 import { RadioList, RadioListItem } from '@astryxdesign/core/RadioList';
 import { colorVars, spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
-import { BigButton, Loading, Notice, Page, PointsBadge, StarIcon, TextField, TextLink } from '@pam/ui';
+import { BigButton, Loading, Notice, Page, PointsBadge, StarIcon, TextField, TextLink, TripsIcon } from '@pam/ui';
 import { SubPageHeader } from '@pam/ui/SubPage';
 import { TRANSPARENCY_SCREEN, badgeForPoints, type Locale } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { navigate } from '@/lib/navigate';
 import { forgetInvite, recallInvite, type Invite } from '@/lib/appUrl';
+import { readAddedTrips, withMoves } from '@/lib/addedTrips';
+import { DUMMY_TRIPS } from '@pam/config/dummy-trips';
+import { Confetti } from '@pam/ui/SuccessScreen';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { usePhoneSignIn } from '@/lib/usePhoneSignIn';
 import { usePreviewSignIn } from '@/lib/usePreviewSignIn';
@@ -186,12 +189,16 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
    * It says what they were invited as instead. `?code=` still works too.
    */
   const [invitedAs, setInvitedAs] = useState<JoinKind | null>(null);
+  // A visit a program booked for them before they had Pam (D-322): the
+  // link carried it, and it is the first thing they see at the end.
+  const [bookedTrip, setBookedTrip] = useState<string | null>(null);
   useEffect(() => {
     const invite = preview?.invite ?? recallInvite();
     if (invite) {
       setInviteCode(invite.code);
       setKind(invite.role);
       setInvitedAs(invite.role);
+      setBookedTrip(invite.trip ?? null);
       return;
     }
     const fromLink = new URLSearchParams(window.location.search).get('code');
@@ -458,6 +465,13 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
         : STEP[phase];
 
   const onCode = flow.state.step === 'code' || flow.state.step === 'verifying';
+  // The booked visit itself, from the example trips or the ones a program
+  // added this session (D-322); null when the link carried none.
+  const booked = bookedTrip
+    ? (withMoves([...DUMMY_TRIPS, ...readAddedTrips()]).find((trip) => trip.id === bookedTrip) ?? null)
+    : null;
+  const bookedDay = new Intl.DateTimeFormat(locale, { weekday: 'long', month: 'long', day: 'numeric' });
+  const bookedTime = new Intl.DateTimeFormat(locale, { hour: 'numeric', minute: '2-digit' });
   const toPhone = () => {
     flow.startOver();
     setPhase('phone');
@@ -832,7 +846,37 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
           </Card>
         ) : null}
 
-        {phase === 'done' && !isStaff ? (
+        {phase === 'done' && !isStaff && booked ? (
+          <>
+            <Confetti />
+            <Card padding={4} xstyle={styles.card}>
+              <VStack gap={3} xstyle={styles.celebrate}>
+                <span aria-hidden="true" {...stylex.props(styles.medal)}>
+                  <TripsIcon />
+                </span>
+                <Text xstyle={styles.badgeName}>{t('join.booked.title')}</Text>
+                <Text xstyle={styles.body}>
+                  {t('join.booked.body', {
+                    place: booked.placeName,
+                    day: bookedDay.format(new Date(booked.startsAt)),
+                    time: bookedTime.format(new Date(booked.startsAt)),
+                  })}
+                </Text>
+                <BigButton
+                  label={t('join.booked.action')}
+                  onPress={() => {
+                    const href = `/place/?${new URLSearchParams({ id: booked.placeId, from: 'trips', trip: booked.id }).toString()}`;
+                    if (preview) navigate(href);
+                    else router.replace(href);
+                  }}
+                />
+                <TextLink label={t('join.booked.trips')} href="/trips/" />
+              </VStack>
+            </Card>
+          </>
+        ) : null}
+
+        {phase === 'done' && !isStaff && !booked ? (
           <Card padding={4} xstyle={styles.card}>
             <VStack gap={3} xstyle={styles.celebrate}>
               <span aria-hidden="true" {...stylex.props(styles.medal)}>

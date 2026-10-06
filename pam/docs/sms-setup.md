@@ -1,6 +1,6 @@
 # Turning on text messages
 
-PAM cannot do anything without this. Sign-in is a code by text; there is no
+Pam cannot do anything without this. Sign-in is a code by text; there is no
 password. Until an SMS provider is configured, the admin account exists, the
 sign-in screen exists, and **nobody can complete a sign-in**.
 
@@ -9,7 +9,7 @@ Two separate things use SMS, and they are set up in different places.
 ## 1. Sign-in codes — configured in Supabase, not in our code
 
 Supabase sends the six-digit sign-in code itself, through a provider you connect
-in its dashboard. PAM's own templates are not involved.
+in its dashboard. Pam's own templates are not involved.
 
 1. **Twilio**: create an account, buy a US number with SMS, and create a
    **Verify Service** (Console → Verify → Services). Note the Account SID, the
@@ -66,7 +66,7 @@ they cannot be redeployed away:
   texts off.
 
 The dispatcher decides only **how a message is worded**, and checks the finished
-words one last time before they leave: PAM must identify itself, 160 characters
+words one last time before they leave: Pam must identify itself, 160 characters
 maximum, no emoji, and nothing that reveals justice involvement. A message that
 fails goes back onto the queue as failed, with the reason — and the reason never
 repeats the offending word, because a log line quoting it is the same disclosure
@@ -113,7 +113,7 @@ still in trial mode. A trial account will only text numbers you have personally
 verified in the console, which is fine for testing and useless for a pilot: a
 member cannot verify themselves into somebody else's Twilio account.
 
-Two ways forward, and PAM needs both eventually:
+Two ways forward, and Pam needs both eventually:
 
 1. **Now, for testing:** Twilio console → Phone Numbers → Verified Caller IDs →
    add your own number. Sign-in starts working for you within a minute.
@@ -148,16 +148,16 @@ who Oba Design is. Have ready:
 
 **Then: the A2P brand and campaign** (Messaging → Regulatory Compliance → A2P
 10DLC). The brand is the business, and is usually approved within hours. The
-campaign describes what PAM actually sends, and takes a few days. It asks for:
+campaign describes what Pam actually sends, and takes a few days. It asks for:
 
-- **Use case.** PAM sends sign-in codes and appointment reminders — "Mixed" or
+- **Use case.** Pam sends sign-in codes and appointment reminders — "Mixed" or
   "Low Volume Mixed" covers both. Not marketing, which is held to a higher bar.
 - **Sample messages.** Paste the real ones from the review sheet, placeholders
   and all. Invented samples that do not match what goes out are a rejection.
 - **How people opt in.** This is the part carriers actually scrutinise, and the
-  part that is about PAM's screens rather than paperwork: a member is invited by
+  part that is about Pam's screens rather than paperwork: a member is invited by
   their case manager, types their own number into the sign-in screen, and that
-  screen has to say, in plain words, that PAM will text them and how to stop.
+  screen has to say, in plain words, that Pam will text them and how to stop.
   Expect to supply a screenshot of it.
 - The phone number the messages come from — the one already bought. Numbers can
   be added to or removed from a campaign afterwards, so swapping the sending
@@ -166,8 +166,8 @@ campaign describes what PAM actually sends, and takes a few days. It asks for:
 Cost is a few dollars one-off for the brand and roughly a dollar fifty a month
 for the campaign, plus the per-message price.
 
-**The opt-in wording on the sign-in screen is PAM's job, not paperwork.** It is
-now on the screen, at the foot of it below the help link: *"PAM will text you a
+**The opt-in wording on the sign-in screen is Pam's job, not paperwork.** It is
+now on the screen, at the foot of it below the help link: *"Pam will text you a
 code to sign in. Later, we may text you reminders and updates about your
 account. Reply STOP to stop texts. Reply HELP for help. Text and data rates may
 apply."* — in both languages, and held there by a browser test, because removing

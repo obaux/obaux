@@ -26,7 +26,7 @@ export function PrototypeSignIn() {
     verifyCode: async () => {
       navigate(
         intoJoin && invite
-          ? `/prototype/join/?kind=${invite.role}&invite=${encodeURIComponent(invite.code)}`
+          ? `/prototype/join/?kind=${invite.role}&invite=${encodeURIComponent(invite.code)}${invite.trip ? `&trip=${encodeURIComponent(invite.trip)}` : ''}`
           : '/',
       );
     },

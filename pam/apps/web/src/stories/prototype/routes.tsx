@@ -37,6 +37,7 @@ import { ProfileScreen } from '../../screens/ProfileScreen';
 import { ViewAsView } from '../../screens/ViewAsView';
 import { InviteView } from '../../screens/InviteView';
 import { BookForMemberView } from '../../screens/BookForMemberView';
+import { AddPersonView } from '../../screens/AddPersonView';
 import { AddProgramView } from '../../screens/AddProgramView';
 import { ProgramScreen } from '../../screens/ProgramView';
 import NewTripPage from '../../app/trips/new/page';
@@ -127,6 +128,7 @@ export const APP_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   // lead's own Program tab.
   '/invite/': screen(() => <InviteView />),
   '/program/book/': screen(() => <BookForMemberView />),
+  '/program/book/new/': screen(() => <AddPersonView />),
   '/programs/': screen(() => <ExploreScreen mode="programs" />),
   '/programs/new/': screen(() => <AddProgramView />),
   '/program/': screen(() => <ProgramScreen />),

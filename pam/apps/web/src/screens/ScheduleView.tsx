@@ -144,16 +144,13 @@ const styles = stylex.create({
   nav: { width: '100%' },
   navMiddle: { flexGrow: 1, minWidth: 0 },
   navLabel: { fontSize: '18px', fontWeight: 600, textAlign: 'center' },
-  navCount: { fontSize: '14px', lineHeight: '20px', minHeight: '20px', textAlign: 'center' },
+  // Plain arrows, no discs (Will, 6 October, D-323): the title row already
+  // has three round buttons; two more under it were the clutter.
   navButton: {
     width: '48px',
     height: '48px',
     borderRadius: '50%',
     flexShrink: 0,
-    borderWidth: '1px',
-    borderStyle: 'solid',
-    borderColor: colorVars['--color-border'],
-    backgroundColor: colorVars['--color-background-body'],
   },
   dayHeading: { fontSize: '18px', lineHeight: 1.3 },
   time: { width: '76px', flexShrink: 0 },
@@ -451,17 +448,6 @@ export function ScheduleView({
         : fmt.month.format(anchor);
 
   const dayList = onDay(anchor);
-  const rangeTotal =
-    view === 'week'
-      ? Array.from({ length: 7 }, (_, i) => onDay(addDays(weekFrom, i)).length).reduce((a, b) => a + b, 0)
-      : view === 'month'
-        ? (() => {
-            let n = 0;
-            const first = new Date(anchor.getFullYear(), anchor.getMonth(), 1);
-            for (let d = first; d.getMonth() === first.getMonth(); d = addDays(d, 1)) n += onDay(d).length;
-            return n;
-          })()
-        : 0;
   const monthDays = (() => {
     const first = new Date(anchor.getFullYear(), anchor.getMonth(), 1);
     const days: { date: Date; count: number }[] = [];
@@ -527,17 +513,20 @@ export function ScheduleView({
             isAccessoryInline
             actions={
               <>
-                <IconButton
-                  label={t('schedule.search.label')}
-                  variant="ghost"
-                  icon={
-                    <HStack>
-                      <ExploreIcon width={22} height={22} aria-hidden />
-                    </HStack>
-                  }
-                  onClick={() => setIsSearching(true)}
-                  xstyle={styles.round}
-                />
+                {/* Search only where there is a week or a month to search (D-323). */}
+                {view === 'day' ? null : (
+                  <IconButton
+                    label={t('schedule.search.label')}
+                    variant="ghost"
+                    icon={
+                      <HStack>
+                        <ExploreIcon width={22} height={22} aria-hidden />
+                      </HStack>
+                    }
+                    onClick={() => setIsSearching(true)}
+                    xstyle={styles.round}
+                  />
+                )}
                 {actions}
               </>
             }
@@ -581,17 +570,10 @@ export function ScheduleView({
                   view, so the date and the arrows never move when Day, Week
                   and Month change places.
                 */}
+                {/* The date alone (D-323): each day's heading already counts who is coming. */}
                 <VStack gap={0} align="center" xstyle={styles.navMiddle}>
                   <Text xstyle={styles.navLabel} aria-live="polite">
                     {navLabel}
-                  </Text>
-                  <Text type="supporting" xstyle={styles.navCount}>
-                    {/* Day: who is coming; Week and Month: the total, "0 visits" included (D-244). */}
-                    {view === 'day'
-                      ? dayList.length > 0
-                        ? t('schedule.count', { count: dayList.length })
-                        : ' '
-                      : t('schedule.total', { count: rangeTotal })}
                   </Text>
                 </VStack>
                 <IconButton

@@ -156,7 +156,12 @@ bursts, says "Checked in", and asks before undoing — and the subtitle says
 signed every policy. From the +, a program can book a visit for somebody who
 wrote to it; it shows on their Trips and the program's schedule.
 The app spells its own name "Pam" everywhere it is written (text messages
-still say "PAM:" until the carrier samples are redone).
+and texts begin "Pam:" too).
+Booking for a member shows who is already booked, when they last wrote, and
+what they said; a program can add somebody new by name and number, and Pam
+texts them a link that opens on their booked visit. The program lead's Home
+has a calmer head: plain arrows, no visit total, search only on the week
+and month.
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 

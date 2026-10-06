@@ -36,6 +36,18 @@ export const ProgramLead: StoryObj = screen('provider', 'Program lead', '/protot
  * opens its own page — who sent it, and a way to ask for it to be renewed,
  * which reaches the super admin's Requests.
  */
+/**
+ * A program booked their first visit before they had Pam (D-322): the link
+ * carries it, and after the steps the last screen is that visit — "Your
+ * visit is booked", confetti, and the place.
+ */
+export const MemberBooked: StoryObj = screen('member', 'Member — a visit booked for them', '/prototype/signin/', {
+  invite: 'PAM-7Q4K',
+  as: 'member',
+  trip: 'dummy-trip-1',
+  next: 'join',
+});
+
 export const ExpiredLink: StoryObj = screen('provider', 'Expired link', '/prototype/signin/', {
   invite: 'Pam-OLD1',
   as: 'program',

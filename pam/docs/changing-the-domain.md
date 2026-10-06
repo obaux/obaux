@@ -1,6 +1,6 @@
-# Changing PAM's domain
+# Changing Pam's domain
 
-Every link PAM builds to send somewhere else — an invite link (D-254, D-258),
+Every link Pam builds to send somewhere else — an invite link (D-254, D-258),
 the new link in an invite email and its logo (D-263), the picture a phone
 shows when an invite link is pasted into a text (D-263), anything in a text —
 comes from **one value**: `APP_URL` in

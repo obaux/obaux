@@ -54,7 +54,7 @@ And two things found while writing this, to fix as part of the build:
 5. **Taking an action back takes nothing back.** Unsaving a place,
    cancelling a trip and unsigning a policy keep the points already
    earned. Rules are built so this cannot be farmed (see "once per").
-6. **Honest about proof.** Points follow how sure PAM can be that it
+6. **Honest about proof.** Points follow how sure Pam can be that it
    happened: a program's check-in is worth more than a self-report. The
    member is never accused; a lower-confidence action just earns less.
 7. **No comparison** (§8): no leaderboards, no "top members", nothing
@@ -114,7 +114,7 @@ again pays nothing.
 
 ### 4. Plan a trip to a program
 
-"Sign up" in the old wording; in PAM's language a member signs up by
+"Sign up" in the old wording; in Pam's language a member signs up by
 planning a trip (Will, 5 October).
 
 - **Trigger:** a trip is booked through Plan a visit. Today trips are example
@@ -163,7 +163,7 @@ The rule that matters most, and the one worth the most.
 
 ### 6. Go back to a program again
 
-Replaces the "weekly streak". Will, 5 October: PAM cannot know how each
+Replaces the "weekly streak". Will, 5 October: Pam cannot know how each
 program structures its weeks, so it rewards returning, not a streak.
 
 - **Trigger:** an attended visit (rule 5, either kind) at a program where the
@@ -184,7 +184,7 @@ program structures its weeks, so it rewards returning, not a streak.
   enrollment.
 - **Tasks (10–50):** the task row carries the value; honour system; once per
   task. No tasks exist yet.
-- **Mentor (30), buddy (10/day):** blocked: PAM models member↔mentor and
+- **Mentor (30), buddy (10/day):** blocked: Pam models member↔mentor and
   member↔case manager only, and has no buddy system (see `blockedBy` in
   `BADGES`).
 - **Referral (100):** when someone the member invited finishes setup. Once per
@@ -193,7 +193,7 @@ program structures its weeks, so it rewards returning, not a streak.
 ### Possible new rule — sign a program's policies (needs Will)
 
 Signing every policy a program asks for (D-270) is exactly the kind of
-"getting ready" PAM wants to encourage. A proposal, **not on screen and not
+"getting ready" Pam wants to encourage. A proposal, **not on screen and not
 agreed:** 10 points when a member has signed all of a program's policies,
 once per program. Ask Will before building; add to "Ways to earn" if yes.
 

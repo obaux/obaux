@@ -22,6 +22,8 @@ export function PrototypeJoin() {
   const kind: JoinKind = raw === 'provider' || raw === 'admin' ? raw : 'member';
   // From an invite link's Sign in (D-254): the phone is done, the code known.
   const code = params?.get('invite');
+  // A visit booked for them before they joined (D-322).
+  const trip = params?.get('trip');
   // One step on its own (D-319): `step` names the screen the story opens on.
   // "code" is the phone step with the number already sent.
   const step = params?.get('step');
@@ -32,7 +34,7 @@ export function PrototypeJoin() {
       preview={{
         kind,
         firstName: NAMES[kind],
-        ...(code ? { invite: { code, role: kind } } : {}),
+        ...(code ? { invite: { code, role: kind, ...(trip ? { trip } : {}) } } : {}),
         ...(step === 'code' ? { phone: '(215) 555-0100' } : {}),
         ...(startAt ? { startAt } : {}),
       }}

@@ -78,7 +78,7 @@ describe('rendering a reviewed message', () => {
   it.each(Object.keys(REVIEWED.templates))('%s renders in both languages inside the limit', (key) => {
     for (const locale of ['en', 'es'] as const) {
       const body = render(REVIEWED, key, locale, VARS);
-      expect(body.startsWith('PAM: ')).toBe(true);
+      expect(body.startsWith('Pam: ')).toBe(true);
       expect(body.length).toBeLessThanOrEqual(160);
       expect(body).not.toMatch(/\{[a-zA-Z0-9_]+\}/);
     }
@@ -119,15 +119,15 @@ describe('rendering a reviewed message', () => {
 
 describe('the last safety check', () => {
   it('stops a message that would reveal justice involvement', () => {
-    expect(() => assertSafe('PAM: Your parole meeting is at 10am.')).toThrow(UnsendableError);
-    expect(() => assertSafe('PAM: Your case manager sent a note.')).toThrow(UnsendableError);
+    expect(() => assertSafe('Pam: Your parole meeting is at 10am.')).toThrow(UnsendableError);
+    expect(() => assertSafe('Pam: Your case manager sent a note.')).toThrow(UnsendableError);
   });
 
   it('never quotes the offending words back into a log line', () => {
     // A failure reason is written to the database and read by staff. Repeating
     // the word there is the same disclosure somewhere else.
     try {
-      assertSafe('PAM: Your probation officer called.');
+      assertSafe('Pam: Your probation officer called.');
       throw new Error('should have thrown');
     } catch (error) {
       expect((error as Error).message).not.toMatch(/probation/i);
@@ -135,8 +135,8 @@ describe('the last safety check', () => {
   });
 
   it('stops emoji, an unbranded message, and an over-long one', () => {
-    expect(() => assertSafe('PAM: Nice work! \u{1F389}')).toThrow(UnsendableError);
+    expect(() => assertSafe('Pam: Nice work! \u{1F389}')).toThrow(UnsendableError);
     expect(() => assertSafe('You have a visit tomorrow.')).toThrow(UnsendableError);
-    expect(() => assertSafe(`PAM: ${'a'.repeat(200)}`)).toThrow(UnsendableError);
+    expect(() => assertSafe(`Pam: ${'a'.repeat(200)}`)).toThrow(UnsendableError);
   });
 });
