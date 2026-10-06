@@ -16,7 +16,8 @@ test('the visit card says it is the next visit, where comes before what, and no 
   await expect(page.getByRole('link', { name: 'Change appointment' })).toBeVisible();
   // Address, then About (D-281); the hours are a row above both (D-309).
   const top = async (name: string) => (await page.getByRole('heading', { name }).boundingBox())!.y;
-  expect(await top('Address')).toBeLessThan(await top('About program'));
+  // About reads "About service" when the visit is for one (D-313).
+  expect(await top('Address')).toBeLessThan(await top('About service'));
   await expect(page.getByRole('button', { name: /^Hours: / })).toBeVisible();
   const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze();
   expect(results.violations).toEqual([]);

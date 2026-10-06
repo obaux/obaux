@@ -17,6 +17,7 @@ import { CATEGORY_DEFINITIONS, type Category } from '@pam/config';
 import { pam } from './tokens.stylex.js';
 import { textLinkLook } from './TextLink.js';
 import { MenuList, type MenuItem } from './MenuList.js';
+import { AutoHeight, TextSwap } from './Swap.js';
 
 /**
  * One place, on its own screen.
@@ -155,6 +156,9 @@ function categoryBadgeVariant(category: Category): BadgeVariant {
 
 const styles = stylex.create({
   card: { width: '100%' },
+  // A line under the open/closed line (Will, D-313): the place's head
+  // ends, and what it offers begins.
+  rule: { width: '100%', height: '1px', backgroundColor: colorVars['--color-border'], flexShrink: 0 },
   name: { fontSize: '26px', lineHeight: 1.2 },
   section: { fontSize: '17px' },
   body: { fontSize: '17px', lineHeight: 1.5 },
@@ -249,24 +253,34 @@ export function PlaceDetail({
   const [isWeekOpen, setWeekOpen] = useState(false);
   const aboutCard = description ? (
     <Card padding={4} xstyle={styles.card}>
-      <VStack gap={2}>
-        <Heading level={2} xstyle={styles.section}>
-          {labels.about}
-        </Heading>
-        <Text xstyle={styles.body}>{description}</Text>
-      </VStack>
+      <AutoHeight>
+        <TextSwap token={`${labels.about}|${description}`}>
+          <VStack gap={2}>
+            <Heading level={2} xstyle={styles.section}>
+              {labels.about}
+            </Heading>
+            <Text xstyle={styles.body}>{description}</Text>
+          </VStack>
+        </TextSwap>
+      </AutoHeight>
     </Card>
   ) : null;
+  // The words may change under the reader's eyes when a service is
+  // picked (D-313): revealed anew, and the card eases to its new height.
   const addressCard = address ? (
     <Card padding={4} xstyle={styles.card}>
-      <VStack gap={1}>
-        <Heading level={2} xstyle={styles.section}>
-          {labels.address}
-        </Heading>
-        <Text type="supporting" xstyle={styles.body}>
-          {address}
-        </Text>
-      </VStack>
+      <AutoHeight>
+        <TextSwap token={`${labels.address}|${address}`}>
+          <VStack gap={1}>
+            <Heading level={2} xstyle={styles.section}>
+              {labels.address}
+            </Heading>
+            <Text type="supporting" xstyle={styles.body}>
+              {address}
+            </Text>
+          </VStack>
+        </TextSwap>
+      </AutoHeight>
     </Card>
   ) : null;
 
@@ -429,6 +443,8 @@ export function PlaceDetail({
           ) : null}
         </HStack>
       </VStack>
+
+      {status ? <VStack aria-hidden xstyle={styles.rule} /> : null}
 
       {notice ?? null}
 

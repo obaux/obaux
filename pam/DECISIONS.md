@@ -7488,6 +7488,21 @@ each."
     it has one of its own (Open in Google and Get directions go there),
     and Call and Website are its. Order before booking: cards, About,
     Address, then the rows.
+  - **Dials, two shines, and no jumps** (Will, then: "Add dials… make the
+    shimmer only last 2 times… when selecting entire card it selects the
+    dial. When about and address is switching content, use a text mask
+    effect… and have cards resize gradually"; "add a separator line after
+    times… make the Pick the service bold and larger… clean up the extra
+    text"). Each card carries a drawn radio dial before the name — a ring,
+    a dot when picked — the card itself being the control. The shine went
+    (Will: "remove shimmer, instead change color to that light green on
+    secondary buttons use"): a picked card is outlined on
+    `--color-accent-muted`, the secondary button's light green. About and Address, when their words change, are
+    revealed anew through a soft left-to-right mask (`TextSwap`) and the
+    card eases to its new height (`AutoHeight`, a ResizeObserver and a
+    height transition) so the rows below slide rather than jump; both stop
+    under reduced motion. The ask is a heading, "Pick a service"; a
+    hairline sits under the open/closed line.
   - `PlaceDetail.layout = 'chooseFirst'` carries the order; the service
     details page (`/place/service/`) is gone — the page says what it said.
 - **Open:** whether service names should be free text or picked from a

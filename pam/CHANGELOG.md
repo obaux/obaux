@@ -173,7 +173,7 @@ keep their button at the foot the same way.
 A program can list the services it offers, each with its own phone number,
 website and policies: named when signing up, managed from the Program tab,
 shown first on the program's page as grey cards to pick from, then what the
-program is, then the address, then the rows. Pick a card and it shines; the
+program is, then the address, then the rows. Pick a card and its dial fills and it turns light green; the
 page then describes that service, with its address, number, website and
 directions, and Plan a trip is for it; a booked visit shows its own
 service's details. A service can be at a different address from the program.
