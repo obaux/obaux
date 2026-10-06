@@ -258,7 +258,7 @@ export const flows = [
       ['profile', 'points', 'Points'],
     ],
     changes: [
-      'D-313 — a program\'s services on its page, each with its own number, site and policies; "Which service?" when booking',
+      'D-313 — a program\'s services on its page, each with its own number, site and policies; the service is picked there, then booking is two steps',
       'D-305 — one visit tag on Saved and Explore; Place / Visit profile; New message on a place. D-292 — Saved: visit tags open the visit; coloured, glowing icons. D-291 — a place: Get directions, Send a message, Call, Website as rows. D-282 — a moved visit: confetti with the new time, then home. D-281 — a place from a trip: "Your next visit" card, Change appointment, hours before About',
       'D-278 — Points as a journey: level and progress, ways to earn, badge medals. D-279 — signing: pinned button, Done',
       'D-277 — Back returns to the screen you came from, everywhere. D-276 — a conversation shows the booked visit',
