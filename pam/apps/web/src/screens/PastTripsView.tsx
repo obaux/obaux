@@ -16,7 +16,7 @@ import { HeaderActions } from './HeaderActions';
 /**
  * Already went (D-234): the visits a member has made, newest first, on their
  * own page — reached from "Places already went" under their coming-up trips,
- * so the member's page leads with what is ahead. Example trips until PAM
+ * so the member's page leads with what is ahead. Example trips until Pam
  * books visits (D-172, D-227).
  */
 const TRIP_ART = { width: 40, height: 40, 'aria-hidden': true } as const;

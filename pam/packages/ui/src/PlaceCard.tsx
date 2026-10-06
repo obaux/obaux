@@ -62,7 +62,7 @@ export interface PlaceCardProps {
    */
   readonly distanceLabel?: string;
   /**
-   * Open or shut, already worded. Pass it only when PAM has hours it is willing
+   * Open or shut, already worded. Pass it only when Pam has hours it is willing
    * to stand behind — `hoursFor()` decides that, and returns nothing when the
    * answer would be a guess.
    */
@@ -287,9 +287,9 @@ export function PlaceCard({
  *
  * No travel mode (Will, 5 October, D-294; it was walking, per §5.1): Maps
  * picks the mode the member last used — the bus, a ride, on foot — instead
- * of PAM deciding for them.
+ * of Pam deciding for them.
  *
- * Coordinates beat the address when PAM has them: the city's feeds keep
+ * Coordinates beat the address when Pam has them: the city's feeds keep
  * geometry current and let address text rot, and a stale address routes
  * somebody to the wrong building. Returns null when there is nothing to route
  * to, so the caller can leave the control out rather than draw a dead one.

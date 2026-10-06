@@ -31,7 +31,7 @@ import { spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
  * member). Smaller than a page title, on purpose: this header repeats on
  * every conversation and shares the phone with the conversation itself.
  *
- * No help link on this screen (A14, D-194) — the third screen in PAM
+ * No help link on this screen (A14, D-194) — the third screen in Pam
  * without one (a fourth, Messages itself, followed at A15). Back leads to
  * Messages; the person here is already talking to their case manager or
  * program.

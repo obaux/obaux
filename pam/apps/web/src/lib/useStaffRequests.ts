@@ -142,7 +142,7 @@ export async function reviewStaffRequest(
 
 /**
  * The number a requester signed up with, so the super admin can text them
- * from their own phone about how PAM will work (0072, D-262). Only while the
+ * from their own phone about how Pam will work (0072, D-262). Only while the
  * request is open, and every read is audited; null if there is none.
  */
 export async function staffRequestPhone(userId: string): Promise<string | null> {

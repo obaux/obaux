@@ -46,7 +46,7 @@ export function contextFor(
   t: (key: string) => string,
 ): string | null {
   if (!other) return null;
-  // The person running PAM, to the staff they help (D-262).
+  // The person running Pam, to the staff they help (D-262).
   if (other.role === 'super_admin') return t('role.pamTeam');
   // The super admin talks only to staff, and needs to know which kind.
   if (viewer === 'super_admin') return pickerContextFor(other, t);

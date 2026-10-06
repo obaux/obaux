@@ -18,10 +18,10 @@ import '../theme/pam.css';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'PAM',
-  description: 'PAM helps you find people and places that can help.',
+  title: 'Pam',
+  description: 'Pam helps you find people and places that can help.',
   manifest: '/manifest.webmanifest',
-  appleWebApp: { capable: true, title: 'PAM', statusBarStyle: 'default' },
+  appleWebApp: { capable: true, title: 'Pam', statusBarStyle: 'default' },
 };
 
 export const viewport: Viewport = {

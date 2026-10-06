@@ -7,14 +7,14 @@
  * role as an argument. That is deliberate and it is the lesson of 0046: the
  * profiles table used to accept `role` from anybody who could update their own
  * row, so a person who could receive a text message could make themselves the
- * account that sees every account in PAM. `start_membership` creates a member
+ * account that sees every account in Pam. `start_membership` creates a member
  * because "member" is a literal inside it, and there is no parameter to pass
  * anything else to.
  *
  * The two staff answers do not create anything. Somebody who says they run a
  * program, or that they carry a caseload, is claiming the ability to see other
  * people's information, and a radio button is not a credential — so it writes a
- * request and a human at PAM checks it and sends an invite.
+ * request and a human at Pam checks it and sends an invite.
  */
 
 /** What somebody picked on the "which one fits you" question. */
@@ -22,7 +22,7 @@ export type JoinKind = 'member' | 'provider' | 'admin';
 
 export type JoinOutcome =
   | { result: 'member' }
-  /** PAM does not serve the city they typed. */
+  /** Pam does not serve the city they typed. */
   | { result: 'city-not-served' }
   /** A staff claim was recorded; somebody will call them. */
   | { result: 'staff' }
@@ -53,7 +53,7 @@ export interface JoinDetails {
 }
 
 /**
- * Postgres raises P0002 when the city is not one PAM is in.
+ * Postgres raises P0002 when the city is not one Pam is in.
  *
  * PostgREST hands the code back on the error rather than the message, which is
  * what makes this safe to branch on: the message is somebody's copy and will be
@@ -119,9 +119,9 @@ export type RedeemOutcome =
  * Turn a code somebody was given into the account it was made for.
  *
  * The invite carries the role and the region, chosen by the person who made
- * it — a case manager for members and programs, the person running PAM for a
+ * it — a case manager for members and programs, the person running Pam for a
  * case manager (0049). The screen sends the name and city alongside so an
- * invited person is not the one person PAM has no last name for.
+ * invited person is not the one person Pam has no last name for.
  *
  * The four failure words are the function's own (`INVITE_NOT_FOUND` and so
  * on). They are mapped here, once, to the notice keys that already exist for
@@ -161,7 +161,7 @@ export async function redeemInvite(
   }
 }
 
-/** Leave a name for a city PAM is not in yet. `wantsUpdates` is their choice. */
+/** Leave a name for a city Pam is not in yet. `wantsUpdates` is their choice. */
 export async function joinWaitingCity(city: string, wantsUpdates: boolean): Promise<boolean> {
   try {
     const { createClient } = await import('./supabase');
@@ -175,7 +175,7 @@ export async function joinWaitingCity(city: string, wantsUpdates: boolean): Prom
   }
 }
 
-/** The cities PAM is in, by name (0048). Empty when it cannot be asked. */
+/** The cities Pam is in, by name (0048). Empty when it cannot be asked. */
 export async function servedCities(): Promise<string[]> {
   try {
     const { createClient } = await import('./supabase');

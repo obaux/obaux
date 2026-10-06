@@ -21,7 +21,7 @@ import { CheckIcon } from './icons.js';
 export interface MenuItem {
   readonly id: string;
   readonly label: string;
-  /** A PAM icon drawn at 26px (`width={26} height={26}`). */
+  /** A Pam icon drawn at 26px (`width={26} height={26}`). */
   readonly icon: ReactNode;
   readonly href?: string;
   readonly onSelect?: () => void;

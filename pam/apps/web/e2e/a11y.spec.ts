@@ -170,7 +170,7 @@ test.describe('Astryx theme', () => {
 /**
  * What must survive a failed network.
  *
- * Lazy loading is how PAM stays inside the §12 budget, and it is dangerous in
+ * Lazy loading is how Pam stays inside the §12 budget, and it is dangerous in
  * exactly one place: anything a member needs when the network has ALREADY
  * failed. A chunk that cannot download is a blank screen at the moment someone
  * is most stuck, which is the dead end §0 forbids.
@@ -195,7 +195,7 @@ test.describe('the help path does not depend on JavaScript', () => {
 
     // Follow it the way a member would, with nothing hydrated.
     await help.click();
-    await expect(page.getByRole('link', { name: /Call PAM/ })).toHaveAttribute('href', /^tel:/);
+    await expect(page.getByRole('link', { name: /Call Pam/ })).toHaveAttribute('href', /^tel:/);
     // And a way back, which §0 also requires — the nested-page template's
     // round back button (D-213), a real link.
     await expect(page.getByRole('link', { name: /Back to Home/ })).toBeVisible();

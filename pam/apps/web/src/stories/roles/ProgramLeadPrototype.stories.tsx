@@ -17,4 +17,4 @@ export default meta;
  * about their own work. Then the code, then Home, signed in as this role.
  * Creating the account is its own story, under Onboarding.
  */
-export const Prototype: StoryObj = screen('provider', 'Prototype', '/prototype/signin/', { invite: 'PAM-7Q4K', as: 'program' });
+export const Prototype: StoryObj = screen('provider', 'Prototype', '/prototype/signin/', { invite: 'Pam-7Q4K', as: 'program' });

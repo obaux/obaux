@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs';
 import { SUPABASE_PUBLISHABLE_KEY, SUPABASE_URL, APP_URL } from './project';
 
 /**
- * The project this build talks to is checked in, so that PAM needs no
+ * The project this build talks to is checked in, so that Pam needs no
  * configuration to run. That trade is only safe while one thing stays true:
  * nothing in this file grants anything the access rules do not.
  *

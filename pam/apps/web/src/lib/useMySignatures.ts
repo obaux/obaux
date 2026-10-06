@@ -9,7 +9,7 @@ import { placeAsksForPolicies, type DummyPolicy } from '@pam/config/dummy-polici
  * **Example data only, for now**, like the program side (`usePolicies`,
  * D-261): nothing stores a signature anywhere but this browser tab. The
  * drawn signature is kept so the next policy is one tap — and kept in
- * *session* storage, not local, because PAM is often used on a phone that
+ * *session* storage, not local, because Pam is often used on a phone that
  * is shared or borrowed, and a signature is not something to leave behind
  * on one. The real version keeps it with the account (before-launch list).
  *

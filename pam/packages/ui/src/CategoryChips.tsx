@@ -10,7 +10,7 @@ import { ToneDot, type Tone } from './Tone.js';
 /**
  * A row of rounded chips under the search bar, one per kind of place (D-212).
  *
- * The reference's "All / Homes / Experiences / Services" row, carrying PAM's
+ * The reference's "All / Homes / Experiences / Services" row, carrying Pam's
  * own three categories (§2.5) and All. One chip is always chosen. The row
  * scrolls sideways when it does not fit — at 320px, and in Spanish, where
  * the words are longer — with the edge of the next chip showing, so it is

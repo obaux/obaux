@@ -14,7 +14,7 @@ import { useStoryText } from '../support/useStoryText';
  *
  * Each row's `text` is an i18n key with its variables, and `when` an ISO time,
  * turned into "Today" / "Yesterday" / a date the way the screen does it — so
- * the Language toolbar changes every word that is PAM's own.
+ * the Language toolbar changes every word that is Pam's own.
  */
 const styles = stylex.create({ card: { width: '100%' } });
 

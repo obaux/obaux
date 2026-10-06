@@ -354,7 +354,7 @@ function PlaceScreen() {
         change: visit.id,
       }).toString()}`
     : null;
-  // With the place's Google ID when PAM has one (D-291): Maps opens on the place itself.
+  // With the place's Google ID when Pam has one (D-291): Maps opens on the place itself.
   // Only a member is written to by a program here (D-305).
   const unread = (demoRole ?? trueRole) === 'member' ? newMessageFrom(place!.name) : null;
   const directions = directionsHref(place!.address, place!.lat, place!.lon, place!.placeId) ?? null;

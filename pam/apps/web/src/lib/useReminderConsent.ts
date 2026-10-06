@@ -8,7 +8,7 @@
  * show the reminders screen after a first sign-in, and it is why "Not now"
  * writes a row rather than doing nothing.
  *
- * The sign-in code is not covered by any of this. PAM has no passwords, so
+ * The sign-in code is not covered by any of this. Pam has no passwords, so
  * asking for a code is asking to be texted one; this is only about the messages
  * that arrive later, unprompted (D-085).
  */

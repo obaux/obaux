@@ -17,7 +17,7 @@ import { DEFAULT_LOCALE, isSupportedLocale, type Locale, type Role } from '@pam/
  * Five states, and two of them exist because the audit of the way in (14
  * September) found people falling through the gaps between the other three:
  *
- * - `no-profile` — the phone is verified and PAM has no record. Somebody
+ * - `no-profile` — the phone is verified and Pam has no record. Somebody
  *   halfway through signing up. Every screen used to treat this as signed out
  *   and offer the door they had just walked through.
  * - `suspended` — an account a case manager paused. The database refuses their
@@ -41,7 +41,7 @@ export interface Session {
   /**
    * Granted by a super admin, from the Everyone list (0057). When true, every
    * screen that has an example data set shows it regardless of whether this
-   * account's own data is empty — for showing PAM off without showing
+   * account's own data is empty — for showing Pam off without showing
    * anybody's real information. See `useDemoView`.
    */
   isDemo: boolean;

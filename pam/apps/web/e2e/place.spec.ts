@@ -15,9 +15,9 @@ import { settled } from './settled';
  *
  *   - the name is a heading once, not twice (the page title carries it)
  *   - getting there is the one primary action (§2.5), and routes to the point
- *     rather than the address when PAM has one (D-045)
+ *     rather than the address when Pam has one (D-045)
  *   - sample hours say out loud that they are samples
- *   - a place PAM cannot find is a sentence and a way out, never a blank (§0)
+ *   - a place Pam cannot find is a sentence and a way out, never a blank (§0)
  */
 
 const ME = 'de3b9c2e-ec2f-403b-93e5-86e6ee75349b';
@@ -99,7 +99,7 @@ test.describe("a place's own screen", () => {
       'href',
       /destination=39\.9612%2C-75\.2172/,
     );
-    // D-294: no travel mode — Maps chooses, not PAM.
+    // D-294: no travel mode — Maps chooses, not Pam.
     await expect(page.getByRole('link', { name: /^Get directions/ })).not.toHaveAttribute(
       'href',
       /travelmode/,
@@ -108,7 +108,7 @@ test.describe("a place's own screen", () => {
 
   test('routes to the address only when there is no point to route to', async ({ page }) => {
     // The city feeds keep geometry current and let address text rot, so the
-    // point wins whenever PAM has one. This is the row that has none.
+    // point wins whenever Pam has one. This is the row that has none.
     await signedIn(page);
     await page.route(DETAIL, (route) =>
       route.fulfill(json([{ ...PLACE, lat: null, lon: null }])),
@@ -121,7 +121,7 @@ test.describe("a place's own screen", () => {
     );
   });
 
-  test('directions open on the place itself when PAM has its Google ID', async ({ page }) => {
+  test('directions open on the place itself when Pam has its Google ID', async ({ page }) => {
     // D-291: the place ID rides along, so Maps opens on the place, not a pin.
     await signedIn(page);
     await page.route(DETAIL, (route) => route.fulfill(json([{ ...PLACE, place_id: 'ChIJexample123' }])));
@@ -180,7 +180,7 @@ test.describe("a place's own screen", () => {
     await page.getByRole('button', { name: /^Hours: / }).click();
     await expect(page.getByRole('heading', { name: 'Opening hours' })).toBeVisible();
     await expect(page.getByText('Today', { exact: true })).toBeVisible();
-    await expect(page.getByText(/sample hours while PAM checks the real ones/)).toBeVisible();
+    await expect(page.getByText(/sample hours while Pam checks the real ones/)).toBeVisible();
   });
 
   test('marks a place a member cannot walk into, above everything else', async ({ page }) => {
@@ -194,14 +194,14 @@ test.describe("a place's own screen", () => {
     await expect(page.getByText('Ages 10 to 17')).toBeVisible();
   });
 
-  test('a place PAM cannot find is a sentence and a way out, not a blank', async ({ page }) => {
+  test('a place Pam cannot find is a sentence and a way out, not a blank', async ({ page }) => {
     await signedIn(page);
     await page.route(DETAIL, (route) => route.fulfill(json([])));
     await page.goto('/place/?id=nope');
 
     await expect(page.getByRole('heading', { name: 'We could not find that place' })).toBeVisible();
     // §0: never dead-end. The list, and the number to call, both on the screen.
-    // "Not on PAM right now" is an empty state rather than an alarm — nothing
+    // "Not on Pam right now" is an empty state rather than an alarm — nothing
     // went wrong, the place is simply not there — so the number is a link on
     // the card, not inside a banner.
     await expect(page.getByRole('link', { name: 'Places' }).first()).toBeVisible();

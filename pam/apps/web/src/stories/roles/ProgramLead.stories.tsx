@@ -34,7 +34,7 @@ const SIGN_UP_STEPS = {
   Code: 'code',
   'About you': 'details',
   'Your program': 'program',
-  'What PAM shares': 'privacy',
+  'What Pam shares': 'privacy',
   Texts: 'texts',
   Welcome: 'done',
 } as const;
@@ -52,7 +52,7 @@ export const SignUp: Story = screenWithControls<SignUpArgs>(
   '/prototype/join/',
   {
     args: { step: 'Phone' },
-    argTypes: { step: { control: 'select', options: ['Phone', 'Code', 'About you', 'Your program', 'What PAM shares', 'Texts', 'Welcome'] } },
+    argTypes: { step: { control: 'select', options: ['Phone', 'Code', 'About you', 'Your program', 'What Pam shares', 'Texts', 'Welcome'] } },
   },
-  (args) => ({ kind: 'provider', ...(args.step === 'Your program' ? {} : { invite: 'PAM-7Q4K' }), step: SIGN_UP_STEPS[args.step] }),
+  (args) => ({ kind: 'provider', ...(args.step === 'Your program' ? {} : { invite: 'Pam-7Q4K' }), step: SIGN_UP_STEPS[args.step] }),
 );

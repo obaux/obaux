@@ -206,7 +206,7 @@ export function BackButton({
 }) {
   // `data-pam-back` (D-277): with a link, the app's own navigation takes the
   // member back through history to wherever they came from, and uses `href`
-  // only when there is nowhere in PAM to go back to.
+  // only when there is nowhere in Pam to go back to.
   return (
     <IconButton
       label={label}

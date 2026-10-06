@@ -12,7 +12,7 @@ import { PhoneIcon } from './icons.js';
  *
  * It navigates to the help screen rather than dialling directly. A raw `tel:`
  * is one tap faster and answers only one question; the help screen can say what
- * PAM support does, when someone answers, and what to do in the meantime — and
+ * Pam support does, when someone answers, and what to do in the meantime — and
  * it can grow a second route later without finding new space at the bottom of a
  * phone.
  *

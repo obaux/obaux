@@ -42,7 +42,7 @@ import { HeaderActions } from './HeaderActions';
  * - **The check asks first**, in a dialog — "Recommend {program} to
  *   {name}?" — with 32px corners over a page washed to 80% white.
  *
- * Every program PAM lists (`usePlaces`, the calls Explore makes). If the
+ * Every program Pam lists (`usePlaces`, the calls Explore makes). If the
  * database cannot be reached it falls back to the example programs, so the
  * screen is never empty. A recommendation is an example for now: nothing is
  * stored or sent, and the member still says yes themselves.

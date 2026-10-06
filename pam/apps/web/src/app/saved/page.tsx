@@ -36,7 +36,7 @@ import { RoleSwitchControl } from '../RoleSwitchControl';
  *
  * **The empty state carries no call button either** (Will, 16 September):
  * saving nothing yet is not a problem support can solve, so the notice loses
- * its "Call PAM" action (`supportPhone` withheld from this one `Notice`), and
+ * its "Call Pam" action (`supportPhone` withheld from this one `Notice`), and
  * the way to Places below it is a plain secondary button — the size Help
  * itself is drawn at elsewhere — rather than the screen's one primary action,
  * because reading an empty list is not the thing this screen exists to do.

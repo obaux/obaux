@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import type { Role } from '@pam/config';
 
 /**
- * Every account, for the person operating PAM.
+ * Every account, for the person operating Pam.
  *
  * A super admin had no screen at all until now: the case manager screen checks
  * for `role = 'admin'` exactly, so Will opening it was told it was not for him,

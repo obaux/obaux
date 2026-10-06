@@ -17,7 +17,7 @@ import { goBack } from '@/lib/navigate';
  * A long page somebody can actually find their way around.
  *
  * These two pages are read in two very different moods: somebody deciding
- * whether to trust PAM with a phone number, and somebody who wants one answer
+ * whether to trust Pam with a phone number, and somebody who wants one answer
  * now ("can my officer read my messages?"). The contents list serves the second
  * one — it is the whole reason this is not a wall of text — and the highlight
  * that follows the reading position keeps the answer to "where am I" visible

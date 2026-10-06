@@ -25,7 +25,7 @@ import {
 } from '@pam/ui';
 
 /**
- * PAM's own icons, for everything Astryx's chrome set has no picture of —
+ * Pam's own icons, for everything Astryx's chrome set has no picture of —
  * home, places, people, the plan. Drawn to Astryx's conventions (24 viewBox,
  * 1.5 stroke, `currentColor`, a 1em box), so they size with the text around
  * them and colour with it. Drawn plainly: a clever icon is a worse icon for

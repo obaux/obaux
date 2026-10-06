@@ -8,7 +8,7 @@ import { useI18n } from '@/lib/i18n';
 import { useStoryText } from '../support/useStoryText';
 
 /**
- * What PAM is, in three sentences over three photos of the city — the hero on
+ * What Pam is, in three sentences over three photos of the city — the hero on
  * the first step of sign-in. It runs edge to edge past the page gutter, plays
  * itself every six seconds (not under reduced motion), and shows a skeleton
  * in each slide until its photo has arrived.
@@ -25,7 +25,7 @@ function HeroHeader() {
   const { t } = useI18n();
   return (
     <VStack gap={4} align="center">
-      <img src="/pam-wordmark-white.svg" alt="PAM" {...stylex.props(styles.mark)} />
+      <img src="/pam-wordmark-white.svg" alt="Pam" {...stylex.props(styles.mark)} />
       <Badge variant="neutral" label={t('signin.city')} />
     </VStack>
   );

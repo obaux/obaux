@@ -7536,6 +7536,28 @@ fun, but sophisticated."
   Trips showing it); config 238, ui 67, typecheck, web and Storybook
   builds; e2e 570/570.
 
+### D-321 — The name is "Pam"
+
+Will, 6 October: "PAM is not written in all caps, it's not an acronym,
+it's a name. So Pam is correct spelling. Can you update this across
+entire app?"
+
+- Every user-visible "PAM" is now "Pam": both locales (127 strings in
+  English, 126 in Spanish), hard-coded screen text and metadata (titles,
+  OG descriptions, the wordmark's alt), the gallery, stories, the e2e
+  assertions, and the flow map's screen titles. 157 files, one word.
+- **Held back, for Will:** the text-message templates and the rule that
+  checks them still say "PAM:". That prefix is in the samples filed with
+  the carrier (`docs/sms-campaign-samples.md`), and a 160-character rule
+  and a human `reviewedBy` sit behind every template; changing them is a
+  campaign change, not a spelling fix. The invite email has no such
+  prefix; it reads "Pam" like the rest.
+- Code is untouched: `@pam/*` packages, `pam.*` keys, `DUMMY_PAM_TEAM`,
+  file names. The wordmark SVGs already draw the name in lower case. The
+  OG images are pictures; if one shows the capitals it needs re-exporting.
+- **Proven by:** config 238, ui 67 and web 11 unit tests, typecheck, web
+  and Storybook builds, e2e 570/570.
+
 ---
 
 ## Notes for whoever picks this up next

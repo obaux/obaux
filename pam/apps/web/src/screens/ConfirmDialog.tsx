@@ -9,7 +9,7 @@ import { VStack } from '@astryxdesign/core/VStack';
 import { BigButton } from '@pam/ui';
 
 /**
- * "Are you sure?", the one way PAM asks it (D-234, D-255): 32px corners over
+ * "Are you sure?", the one way Pam asks it (D-234, D-255): 32px corners over
  * the page washed to 80% white (`data-pam-dialog`, globals.css), a plain
  * question, the action as the one big button, and a quiet way not to.
  * Closing it any other way — the backdrop, Escape — is the quiet way.

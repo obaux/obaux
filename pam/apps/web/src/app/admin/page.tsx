@@ -312,7 +312,7 @@ export default function AdminPage() {
       {/*
           Real caseload is empty — every case manager's, until invites go out —
           so this is what the screen shows instead: the same list, made of
-          people who do not exist, so a first look at PAM has something to look
+          people who do not exist, so a first look at Pam has something to look
           at (Will, 16 September). The moment `useCaseload` stops returning
           `'empty'`, this disappears on its own; see `@pam/config/dummy-people`.
         */}
@@ -340,7 +340,7 @@ export default function AdminPage() {
       ) : null}
 
       {/*
-          "Program leads" — the providers a case manager works with, which PAM
+          "Program leads" — the providers a case manager works with, which Pam
           has no relationship to query yet (Will, 16 September). Always the
           same example set until that exists; see `@pam/config/dummy-people`.
         */}

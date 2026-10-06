@@ -4,7 +4,7 @@ import { Page, TextField, type TextFieldProps } from '@pam/ui';
 import { useStoryText } from '../support/useStoryText';
 
 /**
- * Astryx's TextInput at PAM's 56px, with a `purpose` that sets the keyboard,
+ * Astryx's TextInput at Pam's 56px, with a `purpose` that sets the keyboard,
  * autofill and name for the job — `phone` gets the dial pad, `code` the
  * number pad and one-time-code autofill.
  *

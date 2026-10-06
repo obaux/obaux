@@ -116,7 +116,7 @@ describe('assertSmsIsSafe', () => {
     expect(() => assertSmsIsSafe('PAM: Your case manager sent a note.')).toThrow(SmsContentError);
   });
 
-  it('rejects a message without the PAM prefix', () => {
+  it('rejects a message without the Pam prefix', () => {
     expect(() => assertSmsIsSafe('You have a visit tomorrow.')).toThrow(SmsContentError);
   });
 

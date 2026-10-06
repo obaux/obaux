@@ -46,7 +46,7 @@ export const ADMIN_CAN_SEE = [
   /**
    * Since D-242 (Will, 3 October) this is true of a program the member joined
    * as well as of their case manager: a program lead sees the last day a
-   * member used PAM, on the member's page, beside their visits with that
+   * member used Pam, on the member's page, beside their visits with that
    * program. Stated on the screen (`canSee.lastActive`), which no longer
    * promises the opposite. The database does not hand it to a program yet
    * (`04_transparency_contract_test.sql` part 3 still holds); that is a
@@ -102,7 +102,7 @@ export const ADMIN_CANNOT_SEE = [
    * Narrowed by exactly one fact on 21 September (D-199): a program now
    * learns *that* a member saved a new place, and when — see
    * `new_save_without_the_place` above. Narrowed again on 3 October
-   * (D-242): a program now sees the last day a member used PAM. What this
+   * (D-242): a program now sees the last day a member used Pam. What this
    * entry still covers: which places a member saved, their trips to other
    * programs, and their points — none of it shown to a program.
    */
@@ -165,7 +165,7 @@ export const TRANSPARENCY_SCREEN: {
     // D-242 — a program you joined sees this too; said here, not implied.
     {
       key: 'transparency.canSee.lastActive',
-      en: 'The last day you used PAM. A program you joined sees this too.',
+      en: 'The last day you used Pam. A program you joined sees this too.',
     },
     {
       key: 'transparency.canSee.connections',

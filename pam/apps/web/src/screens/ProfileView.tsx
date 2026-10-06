@@ -83,7 +83,7 @@ export function ProfileView({
       ? [
           {
             id: 'programs',
-            // A program lead browses the others: "Programs in PAM" (D-237).
+            // A program lead browses the others: "Programs in Pam" (D-237).
             label: t(role === 'provider' ? 'profile.menu.programsInPam' : 'profile.menu.programs'),
             href: '/programs/',
             icon: <PlacesIcon {...ICON} />,

@@ -13,7 +13,7 @@ import { navigate } from '@/lib/navigate';
  * make, so they can find their way around the city by them.
  *
  * **Google Maps when there is a key.** `NEXT_PUBLIC_GOOGLE_MAPS_KEY` — a
- * browser key, restricted to PAM's domains in the Google Cloud console — loads
+ * browser key, restricted to Pam's domains in the Google Cloud console — loads
  * the Maps JavaScript API and drops a marker per trip; tapping one opens the
  * place. No key, no request to Google.
  *

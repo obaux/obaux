@@ -134,7 +134,7 @@ test.describe('the way out', () => {
     await page.goto('/');
 
     await expect(page.getByRole('heading', { name: 'Your account is paused' })).toBeVisible();
-    await expect(page.getByRole('link', { name: /Call PAM/ })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Call Pam/ })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Sign out' })).toHaveAttribute('href', '/account/');
     // And not the generic failure, which would be a lie about what happened.
     await expect(page.getByText('Something went wrong')).toHaveCount(0);

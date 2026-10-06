@@ -68,7 +68,7 @@ export function CaseloadHome() {
               // Each opens the member's page (D-227), which shows a real
               // member only what this list already does — see `/person/`.
               // The line under the name is the points; when they last used
-              // PAM is on their page now (Will, 2 October).
+              // Pam is on their page now (Will, 2 October).
               people: caseload.members.map(
                 (member): HomePerson => ({
                   id: member.id,

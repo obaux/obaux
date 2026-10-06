@@ -160,7 +160,7 @@ export function PhoneSignInCard({
           isDisabled={state.step === 'sending' || phone.trim().length === 0}
         />
         {/*
-          What PAM will send, directly under the button that hands over the
+          What Pam will send, directly under the button that hands over the
           number, inside the same card, so it is part of the act rather
           than small print further down the page.
 

@@ -92,8 +92,8 @@ describe('PlaceCard — the four facts that decide whether to go', () => {
     expect(screen.getByText('In a school')).toBeInTheDocument();
   });
 
-  it('says nothing about opening hours when PAM does not know them', () => {
-    // Not "Closed" — a place PAM knows nothing about is not a place that is
+  it('says nothing about opening hours when Pam does not know them', () => {
+    // Not "Closed" — a place Pam knows nothing about is not a place that is
     // shut, and sending somebody away is as costly as sending them across town.
     card({ status: null });
     expect(screen.queryByText(/Open|Closed/)).not.toBeInTheDocument();
@@ -139,8 +139,8 @@ describe('HelpBar (§0 never dead-end)', () => {
   });
 
   it('can still go full width on a screen with room', () => {
-    render(<HelpBar label="Need help? Call PAM" variant="block" />);
-    expect(screen.getByRole('link', { name: 'Need help? Call PAM' })).toBeInTheDocument();
+    render(<HelpBar label="Need help? Call Pam" variant="block" />);
+    expect(screen.getByRole('link', { name: 'Need help? Call Pam' })).toBeInTheDocument();
   });
 });
 
@@ -210,7 +210,7 @@ describe('directions go to the point, not to a string', () => {
     const href = directionsHref('3001 E Allegheny Ave, Philadelphia, PA', 39.94738, -75.175);
     expect(href).toContain('destination=39.94738%2C-75.175');
     expect(href).not.toContain('Allegheny');
-    // D-294: no travel mode — Maps chooses, not PAM.
+    // D-294: no travel mode — Maps chooses, not Pam.
     expect(href).not.toContain('travelmode');
   });
 
@@ -248,27 +248,27 @@ describe('Google lookup uses the organisation name, not the tidied one', () => {
 });
 
 describe('the header says which app you are in', () => {
-  // PAM is one codebase serving a member, a programme's staff and an officer,
+  // Pam is one codebase serving a member, a programme's staff and an officer,
   // from the same components. The similarity is the point and the risk: the
   // chip is what answers "whose screen is this" when two are open at once.
   it('shows the wordmark on its own for the member app', () => {
     render(<AppHeader />);
-    expect(screen.getByRole('img', { name: 'PAM' })).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: 'Pam' })).toBeInTheDocument();
     expect(screen.queryByText('Case manager')).not.toBeInTheDocument();
   });
 
   it('names the role when there is one', () => {
     render(<AppHeader roleLabel="Case manager" />);
-    expect(screen.getByRole('img', { name: 'PAM' })).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: 'Pam' })).toBeInTheDocument();
     expect(screen.getByText('Case manager')).toBeInTheDocument();
   });
 
-  it('says "PAM" once, not once per artwork', () => {
+  it('says "Pam" once, not once per artwork', () => {
     // Two files — lime on dark grounds, deep green on light ones — chosen by
     // <picture>. Only the <img> carries the alt, so a screen reader announces
     // the name once whichever one the browser paints.
     render(<AppHeader />);
-    expect(screen.getAllByRole('img', { name: 'PAM' })).toHaveLength(1);
+    expect(screen.getAllByRole('img', { name: 'Pam' })).toHaveLength(1);
   });
 
   it('carries a mark for each colour scheme, so neither ground eats it', () => {
@@ -418,20 +418,20 @@ describe('the way in explains itself first', () => {
   const slides = [
     { id: 'places', image: '/onboarding/places.svg', text: 'Find places near you that can help.' },
     { id: 'people', image: '/onboarding/people.svg', text: 'A real person can point you to the right one.' },
-    { id: 'plan', image: '/onboarding/plan.svg', text: 'PAM reminds you before you go.' },
+    { id: 'plan', image: '/onboarding/plan.svg', text: 'Pam reminds you before you go.' },
   ];
 
   it('puts every slide in the page, so nothing depends on being able to swipe', () => {
     // A carousel that only reveals its content to a swipe hides two thirds of
     // the explanation from a keyboard, a screen reader, and anybody whose
     // finger does not drag cleanly on a cracked screen.
-    render(<OnboardingSlides slides={slides} label="How PAM works" />);
+    render(<OnboardingSlides slides={slides} label="How Pam works" />);
     for (const slide of slides) expect(screen.getByText(slide.text)).toBeInTheDocument();
   });
 
   it('names itself, so it can be skipped rather than waded through', () => {
-    render(<OnboardingSlides slides={slides} label="How PAM works" />);
-    expect(screen.getByRole('region', { name: 'How PAM works' })).toBeInTheDocument();
+    render(<OnboardingSlides slides={slides} label="How Pam works" />);
+    expect(screen.getByRole('region', { name: 'How Pam works' })).toBeInTheDocument();
   });
 });
 
@@ -441,7 +441,7 @@ describe('the way in explains itself first', () => {
  * Two things matter and neither is the animation: that a screen reader is told
  * something is happening, in the member's own language, and that the words are
  * not also painted on the screen — a ring plus a word is two things to read
- * where one will do, in whichever language PAM has not been translated into
+ * where one will do, in whichever language Pam has not been translated into
  * yet.
  */
 describe('Loading', () => {

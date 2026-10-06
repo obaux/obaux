@@ -150,7 +150,7 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
     [area.lat, area.lon, category],
   );
 
-  // Programs in PAM (D-238): search is a round button there, like a
+  // Programs in Pam (D-238): search is a round button there, like a
   // program's Home; tapping it swaps the top row for the pill and Cancel.
   const pill = (
         <SearchPill<PlaceSuggestion>

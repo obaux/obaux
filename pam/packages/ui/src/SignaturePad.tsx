@@ -11,7 +11,7 @@ import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
  * A box to sign in with a finger (D-270).
  *
  * Astryx has no signature field, and a `<canvas>` is the only element that
- * can take a drawing, so this is the one place PAM draws its own control.
+ * can take a drawing, so this is the one place Pam draws its own control.
  * What it keeps to:
  *
  *   - **Paper, in both themes.** The box is white with dark ink even in dark

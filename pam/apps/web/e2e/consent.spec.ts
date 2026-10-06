@@ -4,7 +4,7 @@ import en from '@pam/config/locales/en.json';
 import { settled } from './settled';
 
 /**
- * The sign-in screen has to say that PAM will text you a code, before you hand
+ * The sign-in screen has to say that Pam will text you a code, before you hand
  * over a phone number — nobody should learn they signed up for text messages by
  * receiving one.
  *
@@ -19,7 +19,7 @@ test.describe('consent to be texted', () => {
     await page.goto('/signin/');
   });
 
-  test('says PAM will text you a code, on the screen', async ({ page }) => {
+  test('says Pam will text you a code, on the screen', async ({ page }) => {
     const consent = page.getByText(en['signin.phone.consent']);
     await expect(consent).toBeVisible();
   });
@@ -52,7 +52,7 @@ test.describe('consent to be texted', () => {
 /**
  * Reminders are a separate yes, asked on their own screen.
  *
- * A carrier rejected PAM's first campaign with 30925 — "opt-in must be
+ * A carrier rejected Pam's first campaign with 30925 — "opt-in must be
  * unchecked by default; active consent required" — and the box that answers it
  * lives at /reminders/, not on the way in. Sign-in stays one job.
  */
@@ -81,7 +81,7 @@ test.describe('agreeing to reminders', () => {
   });
 
   test('signed out, it still explains the choice and points at sign-in', async ({ page }) => {
-    // Hiding the question behind a sign-in explains nothing. What PAM would
+    // Hiding the question behind a sign-in explains nothing. What Pam would
     // send is shown; the thing to do next is sign in, so that is the button.
     await page.goto('/reminders/');
     await expect(page.getByText(/reminder before a visit/i)).toBeVisible();
@@ -244,7 +244,7 @@ test.describe('arriving by an invite link (D-254)', () => {
     await page.goto('/signin/?invite=PAM7Q4KX&as=program');
     await expect(page).toHaveURL(/\/invite\/expired\/\?invite=PAM7Q4KX&as=program/);
     await expect(page.getByRole('heading', { name: en['invite.expired.title'], level: 1 })).toBeVisible();
-    await expect(page.getByText('Dana invited you to be a program partner in the PAM network.', { exact: false })).toBeVisible();
+    await expect(page.getByText('Dana invited you to be a program partner in the Pam network.', { exact: false })).toBeVisible();
 
     // Not an address: said so, and nothing is asked for.
     await page.getByLabel(en['invite.expired.email']).fill('andre');
@@ -316,7 +316,7 @@ test.describe('phone and code fields', () => {
 });
 
 /**
- * What PAM is, above the form.
+ * What Pam is, above the form.
  *
  * Somebody arriving has been handed a link and has no reason yet to type their
  * phone number into it. Three slides answer that, and all three have to be in
@@ -325,7 +325,7 @@ test.describe('phone and code fields', () => {
  * keyboard, a screen reader, and anybody whose finger does not drag cleanly.
  */
 test.describe('the way in explains itself', () => {
-  test('says what PAM does, one idea at a time, before the form', async ({ page }) => {
+  test('says what Pam does, one idea at a time, before the form', async ({ page }) => {
     await page.goto('/signin/');
     for (const key of ['onboarding.1', 'onboarding.2', 'onboarding.3'] as const) {
       await expect(page.getByText(en[key])).toBeAttached();
@@ -348,7 +348,7 @@ test.describe('the way in explains itself', () => {
 
   test('there is no second way out competing with it', async ({ page }) => {
     // Get help was removed from this screen deliberately (Will, 13 September,
-    // amendment A9). Every failure state still renders PAM's number in a
+    // amendment A9). Every failure state still renders Pam's number in a
     // notice — which the next test is what makes that removal defensible.
     await page.goto('/signin/');
     await expect(page.getByRole('link', { name: 'Get help' })).toHaveCount(0);

@@ -110,7 +110,7 @@ describe('rendering a reviewed message', () => {
     expect(render(REVIEWED, 'invite_member', 'es', VARS)).toContain('STOP');
   });
 
-  it('falls back to English for a language PAM does not speak', () => {
+  it('falls back to English for a language Pam does not speak', () => {
     expect(localeOf('pt')).toBe('en');
     expect(localeOf(null)).toBe('en');
     expect(localeOf('es')).toBe('es');

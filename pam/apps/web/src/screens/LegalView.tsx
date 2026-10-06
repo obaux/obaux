@@ -8,7 +8,7 @@ import { useI18n } from '@/lib/i18n';
 /**
  * Legal (D-213, from the reference Will gave on 1 October): one row on
  * Profile instead of three, opening this list. The policies themselves are
- * the ones PAM already has — the terms, the privacy policy, and the part of
+ * the ones Pam already has — the terms, the privacy policy, and the part of
  * it that says who can see what (`#who-can-see`).
  */
 const ICON = { width: 26, height: 26, 'aria-hidden': true } as const;

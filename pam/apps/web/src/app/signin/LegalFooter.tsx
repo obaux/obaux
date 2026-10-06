@@ -40,7 +40,7 @@ export function LegalFooter({ from }: { readonly from: 'signin' | 'join' }) {
       <VStack aria-hidden xstyle={styles.spacer} />
       {/* Three links, well apart (Will, 6 October, D-310): each is its own tap. */}
       <HStack gap={6} justify="center" wrap="nowrap" xstyle={styles.bar}>
-        {/* What PAM is, for somebody deciding whether to sign in (D-259). */}
+        {/* What Pam is, for somebody deciding whether to sign in (D-259). */}
         <TextLink label={t('legal.about')} href="/about/" size="quiet" />
         <TextLink label={t('legal.privacy')} href={`/privacy/?from=${from}`} size="quiet" />
         <TextLink label={t('legal.terms')} href={`/terms/?from=${from}`} size="quiet" />

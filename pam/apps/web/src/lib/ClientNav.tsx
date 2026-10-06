@@ -29,7 +29,7 @@ const SETTLE_MS = 700;
 let settle: (() => void) | null = null;
 
 /**
- * How many screens deep inside PAM this tab is (D-277): up by one on every
+ * How many screens deep inside Pam this tab is (D-277): up by one on every
  * move made here, down by one when the browser itself goes back. A back
  * button goes back through history while this is above zero — to wherever
  * the member came from, not a fixed screen — and to its own `href` when it
@@ -125,7 +125,7 @@ export function ClientNav(): null {
         runNavTransition('back', arrive(() => window.history.back()));
         return true;
       }
-      // Out of a flow (D-279): only as far as PAM's own history goes — a
+      // Out of a flow (D-279): only as far as Pam's own history goes — a
       // flow opened cold answers false and goes to its fallback. One
       // popstate arrives for the whole jump, so the count is brought down by
       // all but that one here.

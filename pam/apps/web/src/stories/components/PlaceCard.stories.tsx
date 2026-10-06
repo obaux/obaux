@@ -97,7 +97,7 @@ export const Saved: Story = { args: { isSaved: true } };
 /** No `onSave`: signed out, so there is nothing to save to. */
 export const WithoutSave: Story = { args: { onSave: undefined } };
 
-/** PAM has no hours it will stand behind, so it says nothing — unknown is not closed. */
+/** Pam has no hours it will stand behind, so it says nothing — unknown is not closed. */
 export const NoHoursKnown: Story = { args: { status: null } };
 
 /** Under 0.1 miles, a GPS fix cannot tell one storefront from the next. */

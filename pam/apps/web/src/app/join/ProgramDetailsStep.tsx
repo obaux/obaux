@@ -34,7 +34,7 @@ export interface ProgramDetailsStepProps {
   readonly onSubmit: () => void;
   readonly busy: boolean;
   readonly invalid: boolean;
-  /** The button's words — "Next" at sign-up, "Send to PAM" on Add a program (D-218). */
+  /** The button's words — "Next" at sign-up, "Send to Pam" on Add a program (D-218). */
   readonly submitLabel?: string;
 }
 

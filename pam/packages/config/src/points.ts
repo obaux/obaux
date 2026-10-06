@@ -175,7 +175,7 @@ export function progressToNextLevel(points: number): number {
 /**
  * The badges, named by Will (14 September).
  *
- * The names are the point of them. PAM's members are returning citizens, and
+ * The names are the point of them. Pam's members are returning citizens, and
  * the vocabulary a system uses about somebody becomes the vocabulary they use
  * about themselves — so these are drawn from the village rather than from the
  * gym: Returned, Rooted, Elder, Sankofa. Nothing here is a rank over another
@@ -198,7 +198,7 @@ export function progressToNextLevel(points: number): number {
  * not every member is a man. Steward, which replaced it, was removed too (Will,
  * 6 October, D-308), so the family track has one badge, Anchor.
  *
- * Two of these cannot be earned yet, and say so in `blockedBy`: PAM has no
+ * Two of these cannot be earned yet, and say so in `blockedBy`: Pam has no
  * buddy system — the only relationships modelled today are member to mentor and
  * member to case manager — so Drum and Elder wait on it. They are defined now
  * because the names are the decision; the rules can follow.
@@ -283,7 +283,7 @@ export const BADGES: readonly BadgeDefinition[] = [
     group: 'core',
     minPoints: 5000,
     rule: { type: 'is_mentor_to', atLeast: 1 },
-    blockedBy: 'No buddy system yet — PAM models member/mentor and member/case manager only.',
+    blockedBy: 'No buddy system yet — Pam models member/mentor and member/case manager only.',
   },
   {
     key: 'chief',
@@ -354,7 +354,7 @@ export const BADGES: readonly BadgeDefinition[] = [
     key: 'firstborn',
     labelKey: 'badge.firstborn',
     name: 'Firstborn',
-    descriptionPlain: 'First from your program or your city to join PAM.',
+    descriptionPlain: 'First from your program or your city to join Pam.',
     icon: 'sunrise',
     group: 'milestone',
     rule: { type: 'first_member_of', scope: ['org', 'region'] },
@@ -391,7 +391,7 @@ export const BADGES: readonly BadgeDefinition[] = [
     key: 'homecoming',
     labelKey: 'badge.homecoming',
     name: 'Homecoming',
-    descriptionPlain: 'One year with PAM.',
+    descriptionPlain: 'One year with Pam.',
     icon: 'home',
     group: 'milestone',
     rule: { type: 'account_age', months: 12 },

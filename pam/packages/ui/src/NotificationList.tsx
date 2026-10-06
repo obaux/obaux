@@ -33,7 +33,7 @@ import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
  * Messages, a new message to its conversation, a reported place to the
  * Reported places. `href` is optional — a row with nowhere to go (a place
  * taken off the list) stays a line of text. The whole row is the target,
- * the same stretched-link shape as every other row in PAM.
+ * the same stretched-link shape as every other row in Pam.
  *
  * **Layout (Will, 3 October: "cleaner, better hierarchy, easier to scan").**
  * The list is split into New and Earlier, so what arrived since last time

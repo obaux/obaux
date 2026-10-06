@@ -12,7 +12,7 @@ import {
 import type { AlertBannerHostProps } from './AlertBannerHost';
 
 /**
- * The one place PAM says something happened from outside a screen's own
+ * The one place Pam says something happened from outside a screen's own
  * layout (Will, 16 September) — a banner pinned above everything else,
  * dismissed by the person reading it, not a timer. "You are signed out" used
  * to be a sentence of plain text sitting in the sign-in screen's own column,

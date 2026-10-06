@@ -152,7 +152,7 @@ test.describe('keeping a place', () => {
     await expect(page.getByRole('link', { name: '35 points' })).toBeVisible();
   });
 
-  test('a balance PAM cannot read is shown as nothing, not as zero', async ({ page }) => {
+  test('a balance Pam cannot read is shown as nothing, not as zero', async ({ page }) => {
     // member_points returns null to anybody not entitled to the number, and a
     // "0 points" chip that becomes "35" a second later reads as losing points.
     await signedIn(page, [PLACE]);
@@ -184,11 +184,11 @@ test.describe('keeping a place', () => {
     await page.goto('/saved/');
 
     await expect(page.getByRole('heading', { name: 'Nothing saved yet' })).toBeVisible();
-    // Relabelled "Return" and shrunk to match Help's sizing, with the Call PAM
+    // Relabelled "Return" and shrunk to match Help's sizing, with the Call Pam
     // button removed from this particular empty state (Will, 16 September) —
     // there is nothing here support can solve.
     await expect(page.getByRole('link', { name: 'Return' })).toBeVisible();
-    await expect(page.getByRole('link', { name: /Call PAM/ })).toHaveCount(0);
+    await expect(page.getByRole('link', { name: /Call Pam/ })).toHaveCount(0);
   });
 
   test('has no WCAG A/AA violations', async ({ page }) => {

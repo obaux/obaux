@@ -24,8 +24,8 @@ import { useSupportPhone } from '@/lib/useSupportPhone';
  *
  * The two actions are what the privacy policy already offers ("Ask us for a
  * copy of what we keep about you, or ask us to delete it"). Neither is
- * self-serve in PAM today, so each opens a page that says so plainly and
- * puts the call to PAM one tap away — not a button that pretends.
+ * self-serve in Pam today, so each opens a page that says so plainly and
+ * puts the call to Pam one tap away — not a button that pretends.
  */
 const styles = stylex.create({
   intro: { fontSize: '18px', lineHeight: 1.5 },

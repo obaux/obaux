@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test';
 /**
  * The buttons wear the logo's colours, and stay readable doing it.
  *
- * PAM's accent is the wordmark's deep green on light grounds and Will's bright
+ * Pam's accent is the wordmark's deep green on light grounds and Will's bright
  * green on dark ones. Those two are not a light/dark pair of one hue: one is a
  * deep fill carrying white text, the other a bright fill carrying near-black
  * text. Every hover and pressed colour is named per mode in `src/theme/pam.ts`
@@ -102,7 +102,7 @@ test.describe('the brand on a button', () => {
   });
 
   test('the quieter buttons carry the brand as text, and stay readable', async ({ page }) => {
-    // Secondary and ghost are most of the controls in PAM — Help, Back,
+    // Secondary and ghost are most of the controls in Pam — Help, Back,
     // Privacy, Send it again — and they take the brand as their label colour
     // rather than staying grey while the primary turns green.
     await page.goto('/gallery/');

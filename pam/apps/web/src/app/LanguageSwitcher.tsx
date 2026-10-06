@@ -15,7 +15,7 @@ import { useI18n } from '@/lib/i18n';
 import { useChooseLanguage } from '@/lib/useChooseLanguage';
 
 /**
- * English or Spanish, wherever PAM offers the choice — the icon beside the
+ * English or Spanish, wherever Pam offers the choice — the icon beside the
  * bell on the way in, and a row in account settings (Will, 16 September).
  *
  * Language names are shown in themselves, not translated into whichever

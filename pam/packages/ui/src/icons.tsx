@@ -113,7 +113,7 @@ export function PhoneIcon(props: SVGProps<SVGSVGElement>) {
  * A bell. Things that have happened and need somebody.
  *
  * Astryx's icon registry has no bell, and its `Icon` takes an SVG component for
- * exactly this case — so this is one more glyph in PAM's own small set, not a
+ * exactly this case — so this is one more glyph in Pam's own small set, not a
  * second icon system. Drawn quiet on purpose: no motion lines, no clapper
  * swinging. These are things to attend to, not alarms.
  */
@@ -205,7 +205,7 @@ export function GlobeIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
-/** A star. Points — the only place in PAM that keeps a score. */
+/** A star. Points — the only place in Pam that keeps a score. */
 export function StarIcon({ isFilled = true, ...props }: SVGProps<SVGSVGElement> & { isFilled?: boolean }) {
   // Outlined when not filled — a case manager's "not starred" (D-218).
   return (
@@ -307,7 +307,7 @@ export function ConnectionsIcon(props: SVGProps<SVGSVGElement>) {
 
 /*
  * Place categories (D-212), for Explore's chips — the reference's
- * "Homes / Experiences / Services" row, carrying PAM's three fixed categories
+ * "Homes / Experiences / Services" row, carrying Pam's three fixed categories
  * (§2.5) instead. Same line weight as the rest of the set, so a chip reads as
  * part of the app rather than a sticker on it.
  */

@@ -14,7 +14,7 @@ import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
  * The Profile screen's cards (D-210): who you are, the two doors beside each
  * other, and a single offer. Modelled on the reference Will gave on 1 October —
  * white page, generous rounded cards lifted by the theme's card shadow, very
- * little text on each — and kept to PAM's floors: 48px targets, 18px body.
+ * little text on each — and kept to Pam's floors: 48px targets, 18px body.
  */
 
 // ---------------------------------------------------------------------------
@@ -27,7 +27,7 @@ export interface ProfileStat {
 
 export interface ProfileSummaryProps {
   readonly name: string;
-  /** "Member", "Case manager" — who PAM knows this account as. */
+  /** "Member", "Case manager" — who Pam knows this account as. */
   readonly roleLabel: string;
   /** A photo, when there is one; otherwise the avatar shows initials. */
   readonly photoUrl?: string | null;
@@ -102,7 +102,7 @@ export function ProfileSummary({ name, roleLabel, photoUrl, stats, corner, nameA
 export interface FeatureTileProps {
   readonly label: string;
   readonly href: string;
-  /** Drawn large above the label — a PAM icon or an avatar stack. */
+  /** Drawn large above the label — a Pam icon or an avatar stack. */
   readonly art: ReactNode;
   /**
    * A small ribbon across the foot of the art — "Your badge" on a member's

@@ -8,7 +8,7 @@ import { Skeleton } from '@astryxdesign/core/Skeleton';
 import { VisuallyHidden } from '@astryxdesign/core/VisuallyHidden';
 
 /**
- * Shimmer placeholders shaped like the two things PAM asks somebody to wait
+ * Shimmer placeholders shaped like the two things Pam asks somebody to wait
  * for most — a list of places or people, and one of either on its own screen
  * (Will, 16 September: skeletons for places and people, "only use the
  * spinner loading for other screens").
@@ -21,7 +21,7 @@ import { VisuallyHidden } from '@astryxdesign/core/VisuallyHidden';
  * reads as faster and jumps less into place than a ring that vanishes and
  * dumps the whole list in at once. See Astryx's own `Skeleton` doc: "use
  * Spinner instead" is explicitly for content whose *dimensions* are unknown,
- * which is the one thing not true of a list of cards PAM already knows the
+ * which is the one thing not true of a list of cards Pam already knows the
  * size of.
  *
  * Each list is announced once, politely, through a hidden live region —

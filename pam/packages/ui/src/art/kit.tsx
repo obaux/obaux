@@ -4,7 +4,7 @@ import { useId, type ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
 
 /**
- * The illustration kit (D-287, D-295): what every small PAM picture is made
+ * The illustration kit (D-287, D-295): what every small Pam picture is made
  * of, so the place cards, the badges and Profile's tiles read as one set.
  *
  * The language is the sign-in carousel's: flat, angular colour, a ground cut

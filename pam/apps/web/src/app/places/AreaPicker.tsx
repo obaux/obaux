@@ -27,10 +27,10 @@ import { useAreaSearch, type AreaOption } from '@/lib/useAreaSearch';
  *     or the scrim leaves the area as it was;
  *   - **our search bar**, already focused, "ZIP code or address";
  *   - **Use my current location** first — the phone's own position, kept on
- *     this device like any other choice and never sent to PAM;
+ *     this device like any other choice and never sent to Pam;
  *   - **the results as rows**: a pin, the place, and what it is (ZIP code,
  *     neighbourhood, address). The one chosen is bold and green with a
- *     tick, as every chosen row in PAM is.
+ *     tick, as every chosen row in Pam is.
  *
  * Suggestions arrive before anything is typed — the ZIP list comes back on an
  * empty query — so somebody who does not know what to type still sees

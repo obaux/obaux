@@ -20,13 +20,13 @@ export const Member: StoryObj = screen('member', 'Member', '/prototype/join/', {
  * "which one fits you best" — and on to Home.
  */
 export const CaseManager: StoryObj = screen('case-manager', 'Case manager', '/prototype/signin/', {
-  invite: 'PAM-7Q4K',
+  invite: 'Pam-7Q4K',
   as: 'case-manager',
   next: 'join',
 });
 
 export const ProgramLead: StoryObj = screen('provider', 'Program lead', '/prototype/signin/', {
-  invite: 'PAM-7Q4K',
+  invite: 'Pam-7Q4K',
   as: 'program',
   next: 'join',
 });
@@ -37,9 +37,9 @@ export const ProgramLead: StoryObj = screen('provider', 'Program lead', '/protot
  * which reaches the super admin's Requests.
  */
 export const ExpiredLink: StoryObj = screen('provider', 'Expired link', '/prototype/signin/', {
-  invite: 'PAM-OLD1',
+  invite: 'Pam-OLD1',
   as: 'program',
 });
 
-/** About PAM (D-259): what PAM is and how it helps each kind of person, from Sign in's footer. */
-export const About: StoryObj = screen('member', 'About PAM', '/about/');
+/** About Pam (D-259): what Pam is and how it helps each kind of person, from Sign in's footer. */
+export const About: StoryObj = screen('member', 'About Pam', '/about/');

@@ -9,7 +9,7 @@ import { Skeleton } from '@astryxdesign/core/Skeleton';
 import { Text } from '@astryxdesign/core/Text';
 
 /**
- * What PAM is, before somebody has any reason to care.
+ * What Pam is, before somebody has any reason to care.
  *
  * Three slides, one idea each, as a full-bleed hero the sign-in card floats
  * over — replacing an earlier build where each slide was a small icon on a
@@ -107,7 +107,7 @@ export interface OnboardingSlide {
 
 export interface OnboardingSlidesProps {
   readonly slides: readonly OnboardingSlide[];
-  /** Names the region for a screen reader, e.g. "How PAM works". */
+  /** Names the region for a screen reader, e.g. "How Pam works". */
   readonly label: string;
   /**
    * Rendered over the hero, pinned to its top edge — the mark, a region
@@ -117,7 +117,7 @@ export interface OnboardingSlidesProps {
   readonly header?: ReactNode;
   /**
    * `hero` (default): full width, flush to the top, words at the foot — Sign
-   * in. `inline` (D-259, About PAM): inside the page's margins, rounded
+   * in. `inline` (D-259, About Pam): inside the page's margins, rounded
    * corners, shorter, and the words in the middle of the picture.
    */
   readonly variant?: 'hero' | 'inline';
@@ -155,7 +155,7 @@ const styles = stylex.create({
     // Roughly half the window (Will, 17 September), which is also the
     // ceiling `consent.spec.ts` sets from the other direction: the card's
     // own content — the field, the button, and the consent sentence
-    // carriers review before PAM may send anything — has to fit in
+    // carriers review before Pam may send anything — has to fit in
     // whatever's left, unscrolled, on the shortest supported viewport.
     // Verified against that spec at 50vh rather than assumed.
     height: 'clamp(280px, 50vh, 520px)',

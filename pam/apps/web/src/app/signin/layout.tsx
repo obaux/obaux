@@ -3,7 +3,7 @@ import { APP_URL } from '@/lib/project';
 
 /**
  * What an invite link looks like when it is pasted into a text (Will,
- * 4 October, D-263): "a cover image like image 2 of carousel and the PAM logo
+ * 4 October, D-263): "a cover image like image 2 of carousel and the Pam logo
  * in center. With text saying: you're invited."
  *
  * Every invite is a link to Sign in (D-254), so the preview is Sign in's.
@@ -15,19 +15,19 @@ import { APP_URL } from '@/lib/project';
  */
 export const metadata: Metadata = {
   metadataBase: new URL(APP_URL),
-  title: 'You’re invited to PAM',
-  description: 'Sign in to PAM to get started.',
+  title: 'You’re invited to Pam',
+  description: 'Sign in to Pam to get started.',
   openGraph: {
     type: 'website',
-    siteName: 'PAM',
-    title: 'You’re invited to PAM',
-    description: 'Sign in to PAM to get started.',
+    siteName: 'Pam',
+    title: 'You’re invited to Pam',
+    description: 'Sign in to Pam to get started.',
     url: '/signin/',
-    images: [{ url: '/og/invite.jpg', width: 1200, height: 630, alt: 'PAM — You’re invited' }],
+    images: [{ url: '/og/invite.jpg', width: 1200, height: 630, alt: 'Pam — You’re invited' }],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'You’re invited to PAM',
+    title: 'You’re invited to Pam',
     images: ['/og/invite.jpg'],
   },
 };

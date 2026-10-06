@@ -155,6 +155,8 @@ bursts, says "Checked in", and asks before undoing — and the subtitle says
 "Not checked in" or "Checked in". A light-green pen marks someone who has
 signed every policy. From the +, a program can book a visit for somebody who
 wrote to it; it shows on their Trips and the program's schedule.
+The app spells its own name "Pam" everywhere it is written (text messages
+still say "PAM:" until the carrier samples are redone).
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 

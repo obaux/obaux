@@ -1,5 +1,5 @@
 /**
- * PAM's user flows — the source of the Figma file "PAM — User flows".
+ * Pam's user flows — the source of the Figma file "Pam — User flows".
  *
  * Will, 4 October 2026: "create a user flow for the entire app inside Figma
  * … document app changes by also updating user flows … so we have a visual
@@ -46,7 +46,7 @@ export const flows = [
         wide: true,
         path: '/signin/?invite=…&as=…',
         changed: 'D-263',
-        note: 'Second carousel picture, PAM logo, "You\'re invited"',
+        note: 'Second carousel picture, Pam logo, "You\'re invited"',
       },
       invited: {
         title: 'Sign in — invited',
@@ -90,7 +90,7 @@ export const flows = [
         note: 'The card sits flat under the pictures',
       },
       about: {
-        title: 'About PAM',
+        title: 'About Pam',
         story: 'onboarding--about',
         path: '/about/',
         changed: 'D-259',
@@ -120,7 +120,7 @@ export const flows = [
         story: 'onboarding-invite-email--program',
         path: 'Email (30-day link)',
         changed: 'D-263',
-        note: 'Open PAM goes to Sign in (invited). Approved; sends once a provider is set up',
+        note: 'Open Pam goes to Sign in (invited). Approved; sends once a provider is set up',
       },
     },
     edges: [
@@ -128,7 +128,7 @@ export const flows = [
       ['invited', 'code', 'Phone number'],
       ['code', 'join', '6-digit code'],
       ['join', 'cmHome', 'Done'],
-      ['signin', 'about', 'About PAM (footer)'],
+      ['signin', 'about', 'About Pam (footer)'],
       ['signin', 'memberJoin', 'Sign up'],
       ['expired', 'sent', 'Email me a new link'],
       ['sent', 'email', 'Arrives by email', { dashed: true }],
@@ -136,7 +136,7 @@ export const flows = [
     changes: [
       'D-266 — Sign in: the card sits flat under the pictures; the code step is drawn in to match',
       'D-263 — no phone needed to invite; 30-day links; expired links email a new one; "You\'re invited" preview',
-      'D-259 — About PAM from the foot of Sign in',
+      'D-259 — About Pam from the foot of Sign in',
       'D-254 — invites are links to Sign in',
     ],
   },
@@ -355,7 +355,7 @@ export const flows = [
       },
       messages: { title: 'Messages', story: 'program-lead-screens--messages', path: '/messages/' },
       profile: { title: 'Profile', story: 'program-lead-screens--profile', path: '/profile/' },
-      programs: { title: 'Programs in PAM', story: 'program-lead-screens--all-programs', path: '/programs/' },
+      programs: { title: 'Programs in Pam', story: 'program-lead-screens--all-programs', path: '/programs/' },
       alerts: { title: 'Text alerts', story: 'program-lead-screens--text-alerts', path: '/alerts/', changed: 'D-256' },
     },
     edges: [
@@ -364,7 +364,7 @@ export const flows = [
       ['home', 'invite', '+ Invite someone'],
       ['program', 'policies', 'Policies for participants'],
       ['policies', 'policy', 'A policy'],
-      ['profile', 'programs', 'Programs in PAM'],
+      ['profile', 'programs', 'Programs in Pam'],
       ['profile', 'alerts', 'Text alerts'],
     ],
     changes: [
@@ -379,7 +379,7 @@ export const flows = [
     key: 'super-admin',
     title: 'Super admin',
     intro:
-      'Three tabs: Home (requests), Messages, Profile. The person running PAM decides who becomes staff, keeps an eye on every invite, and talks to staff — never to members.',
+      'Three tabs: Home (requests), Messages, Profile. The person running Pam decides who becomes staff, keeps an eye on every invite, and talks to staff — never to members.',
     roots: ['home', 'messages', 'profile'],
     nodes: {
       home: { title: 'Home — Requests', story: 'super-admin-screens--home', path: '/', changed: 'D-262' },

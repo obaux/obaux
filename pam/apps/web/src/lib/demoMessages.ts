@@ -14,7 +14,7 @@ import { useEffect, useState } from 'react';
  *
  * Kept in `sessionStorage`, the same mechanism `useViewAs` uses for "which
  * role am I previewing", for the same reason: it should survive a "Viewing
- * as" switch within this tab and be gone the next time PAM is opened —
+ * as" switch within this tab and be gone the next time Pam is opened —
  * nothing here is real content that should outlive the session it was typed
  * in. Keyed by example conversation id (`dummy-conv-<member>-<staff>`), so
  * what a case manager preview types to Jordan is what a member preview of

@@ -2,7 +2,7 @@
  * The privacy notice and the terms, as structure rather than as a slab of text.
  *
  * The copy itself lives in the locale bundles like every other string, so these
- * pages are translated the same way the rest of PAM is and cannot quietly become
+ * pages are translated the same way the rest of Pam is and cannot quietly become
  * English-only. What lives here is the shape: which sections exist, in what
  * order, and how many paragraphs each one has — which is what the page needs to
  * build a table of contents, and what a test needs to prove nothing is missing
@@ -15,7 +15,7 @@
  *     the privacy page restates it for someone who has not signed in yet. The
  *     two must agree, so `visibility` names the section that carries it.
  *  2. **Plain language.** These are read by people deciding whether to trust
- *     PAM with a phone number, not by lawyers. Short sentences, no defined
+ *     Pam with a phone number, not by lawyers. Short sentences, no defined
  *     terms, no "hereby".
  */
 

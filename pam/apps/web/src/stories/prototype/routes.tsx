@@ -68,7 +68,7 @@ export const APP_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   '/': screen(() => <HomePage />),
   // Sign in, in the prototype, is the stand-in (D-248): the real page reads
   // the iframe's own address and sends a signed-in story Home. Every link to
-  // /signin/ — About PAM's "Sign in as…", Back from a policy, an expired
+  // /signin/ — About Pam's "Sign in as…", Back from a policy, an expired
   // link's "Sign in" — lands on a Sign in that works here (D-259).
   '/signin/': screen(() => <PrototypeSignIn />),
   // Where each role's prototype starts (D-253): Sign in, the code, Home.
@@ -77,7 +77,7 @@ export const APP_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   '/prototype/join/': screen(() => <PrototypeJoin />),
   // An invite link that has run out (D-258).
   '/invite/expired/': screen(() => <PrototypeInviteExpired />),
-  // About PAM, from the foot of Sign in (D-259).
+  // About Pam, from the foot of Sign in (D-259).
   '/about/': screen(() => <AboutPage />),
   // A program's policies for participants (D-261).
   '/program/policies/': screen(() => <PoliciesPage />),

@@ -1,7 +1,7 @@
 /**
- * Which PAM this build talks to.
+ * Which Pam this build talks to.
  *
- * These are checked in on purpose, and that is the whole point: **PAM needs no
+ * These are checked in on purpose, and that is the whole point: **Pam needs no
  * configuration to run.** Clone it and `pnpm dev` works. Push it and Vercel
  * builds something that works. Wrap it with Capacitor and the app works. Nobody
  * has to know that a dashboard somewhere holds four strings the build silently
@@ -40,7 +40,7 @@ export const SUPABASE_PUBLISHABLE_KEY =
   process.env['NEXT_PUBLIC_SUPABASE_ANON_KEY'] ?? 'sb_publishable_-Wl4FRkeoRtyQ6OeKnT9Xw_V0vzicKJ';
 
 /**
- * The address PAM answers on, for links that leave the app.
+ * The address Pam answers on, for links that leave the app.
  *
  * Not the origin the page was served from: an invite link is built inside the
  * Capacitor shell as often as in a browser, and there the origin is a local

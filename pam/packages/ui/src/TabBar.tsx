@@ -118,7 +118,7 @@ const styles = stylex.create({
     color: colorVars['--color-text-secondary'],
   },
   // The tab you are on is red, as in Will's mockups (2 October) — the icon
-  // follows, since PAM's icons draw in currentColor. A deeper red than the
+  // follows, since Pam's icons draw in currentColor. A deeper red than the
   // mockups' #FF385C, which is 3.5:1 on white and fails AA at 12px:
   // #E31C5F is 4.6:1; #FF6B86 is 6.3:1 on the dark page.
   tabOn: { color: pam.brandPink, fontWeight: 600 },

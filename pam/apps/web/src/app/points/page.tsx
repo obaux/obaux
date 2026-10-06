@@ -237,7 +237,7 @@ export default function PointsPage() {
       worth: t('points.way.plus', { count: POINTS_RULES.self_reported_signup.points }),
     },
     {
-      // A return, not a weekly streak (Will, 5 October): PAM cannot know how
+      // A return, not a weekly streak (Will, 5 October): Pam cannot know how
       // each program runs its weeks, only that somebody went back.
       id: 'return',
       icon: <StarIcon {...WAY_ICON} />,

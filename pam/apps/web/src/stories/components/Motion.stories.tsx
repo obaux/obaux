@@ -5,7 +5,7 @@ import { DUMMY_PLACES_BY_ID } from '@pam/config/dummy-places';
 import { useStoryText } from '../support/useStoryText';
 
 /**
- * PAM's motion: cards arriving in turn (40ms a row, capped at six), lists
+ * Pam's motion: cards arriving in turn (40ms a row, capped at six), lists
  * revealing as they scroll in, and a press that gives under the thumb. All of
  * it lives in a runtime `MotionProvider` loads only on a connection that can
  * afford it, and none of it plays under reduced motion — so with motion

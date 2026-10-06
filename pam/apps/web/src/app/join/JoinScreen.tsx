@@ -40,7 +40,7 @@ import { ProgramDetailsStep } from './ProgramDetailsStep';
 /**
  * Signing up: five steps, and four of them are one question each.
  *
- * Until this screen existed, every account in PAM was made by the seeding
+ * Until this screen existed, every account in Pam was made by the seeding
  * script or by an invite code, and somebody arriving at the front door with no
  * code was shown a sign-in button that led back to the same place. It also
  * answers a question Will asked on the 14th — how does the app know my name if
@@ -63,8 +63,8 @@ import { ProgramDetailsStep } from './ProgramDetailsStep';
  * is not a credential; 0046 has the long version. It is also why this screen
  * cannot be used to become a case manager by typing it.
  *
- * **A city PAM does not serve is a different screen, not an error.** Somebody
- * in Scranton typed their name in good faith. They are told where PAM is, and
+ * **A city Pam does not serve is a different screen, not an error.** Somebody
+ * in Scranton typed their name in good faith. They are told where Pam is, and
  * offered a text when it opens — which they have to tick, because an opt-in
  * that arrives pre-ticked is not one (A2P 30925).
  *
@@ -286,7 +286,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
     if (flow.state.step === 'done' && phase === 'phone') setPhase('details');
   }, [flow.state.step, phase]);
 
-  // Which cities PAM is in — for the sentence somebody in the wrong one reads.
+  // Which cities Pam is in — for the sentence somebody in the wrong one reads.
   useEffect(() => {
     if (phase !== 'details' && phase !== 'waiting') return;
     let cancelled = false;

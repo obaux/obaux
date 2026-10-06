@@ -96,7 +96,7 @@ test.describe('the case manager screen', () => {
     // never "permission denied", which tells somebody they did something wrong.
     await expect(page.getByRole('heading', { name: 'This screen is for case managers' })).toBeVisible();
     await expect(page.getByText(/does not open this/)).toBeVisible();
-    await expect(page.getByRole('link', { name: /Call PAM/ })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Call Pam/ })).toBeVisible();
   });
 
   test('a super admin previewing "Case manager" sees this screen, not a closed door', async ({ page }) => {
@@ -143,14 +143,14 @@ test.describe('the case manager screen', () => {
 
     await expect(page.getByRole('heading', { name: 'Dante' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Tanya' })).toBeVisible();
-    // "Has not opened PAM yet" can also land on a dummy program lead further
+    // "Has not opened Pam yet" can also land on a dummy program lead further
     // down the same screen (Will, 16 September) — .first() keeps this test
     // about the real caseload row, not the example roster below it.
-    await expect(page.getByText('Has not opened PAM yet').first()).toBeVisible();
+    await expect(page.getByText('Has not opened Pam yet').first()).toBeVisible();
 
     // An avatar per person, so the caseload reads as people rather than rows.
     // No photo is fetched: a member's picture is not on the §4.1 list, so the
-    // initial stands in — PAM's own rendering of a name the admin already has.
+    // initial stands in — Pam's own rendering of a name the admin already has.
     await expect(page.getByRole('img', { name: 'Dante' })).toBeVisible();
     await expect(page.getByRole('img', { name: 'Tanya' })).toBeVisible();
   });

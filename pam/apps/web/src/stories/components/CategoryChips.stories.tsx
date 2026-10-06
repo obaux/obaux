@@ -7,7 +7,7 @@ import { CATEGORY_ICONS, type ExploreCategory } from '../../screens/ExploreView'
 import { useStoryText } from '../support/useStoryText';
 
 /**
- * Explore's chips (D-212): All and PAM's three categories, one always
+ * Explore's chips (D-212): All and Pam's three categories, one always
  * chosen, each icon in its category's colour. They scroll sideways at
  * 320px and in Spanish.
  */

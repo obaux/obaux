@@ -16,7 +16,7 @@ import { edgeFade } from './edgeFade.js';
 export interface FloatingActionProps {
   readonly label: string;
   readonly href: string;
-  /** A PAM icon at 26px, as in a `MenuList` row. */
+  /** A Pam icon at 26px, as in a `MenuList` row. */
   readonly icon: ReactNode;
   /** A second line under the label — "People willing to help" (D-267). */
   readonly description?: string;

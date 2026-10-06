@@ -8,7 +8,7 @@ import { pam } from './tokens.stylex.js';
  *
  * Five screens each declared `{ minHeight: '48px', fontSize: '17px' }` for this
  * and called it `styles.link`. That is not a style, it is a component that had
- * not been written yet — and the giveaway is that the 48px is PAM's touch
+ * not been written yet — and the giveaway is that the 48px is Pam's touch
  * target rule (§2.5), which should be stated once and obeyed everywhere rather
  * than retyped by whoever writes the next screen.
  *

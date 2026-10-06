@@ -24,7 +24,7 @@ import { edgeFade } from './edgeFade.js';
  *
  * The card in the list answers "is this worth my time". This answers the
  * question that follows — *how do I actually get there and get in* — which is
- * the one PAM exists for, and which was previously squeezed into three
+ * the one Pam exists for, and which was previously squeezed into three
  * equal-width buttons and a corner menu.
  *
  * The order is the order somebody needs it in:
@@ -498,7 +498,7 @@ export function PlaceDetail({
           {onShare ? <ActionRow label={labels.share} icon={<ShareIcon />} onClick={onShare} /> : null}
           {/*
           Reporting a place is how the catalogue stays true — a place that has
-          closed or moved is the single most expensive error PAM can make, and
+          closed or moved is the single most expensive error Pam can make, and
           the member standing outside it is the only one who knows. Behind a
           "⋯" it was never going to be used.
         */}

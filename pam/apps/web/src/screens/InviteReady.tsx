@@ -14,7 +14,7 @@ import type { CreatedInvite } from '@/lib/useCaseload';
 
 /**
  * An invite, made (D-254, Will, 3 October): a **link**, not a code to read
- * out. It opens PAM's sign in with a black line on top saying what they were
+ * out. It opens Pam's sign in with a black line on top saying what they were
  * invited to be, and the code rides along to joining, so the person who
  * receives it never types it.
  *

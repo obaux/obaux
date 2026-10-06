@@ -18,7 +18,7 @@ import { pam } from './tokens.stylex.js';
  * `width` exists because two screens legitimately differ: a long legal document
  * reads better wider than a form does.
  *
- * It is also where a screen's arrival lives. Every screen in PAM goes through
+ * It is also where a screen's arrival lives. Every screen in Pam goes through
  * this component, so putting the fade here means no screen can forget it and no
  * two screens can disagree about it — and somebody who asked their phone for
  * less motion gets none of it, decided once in `MotionProvider`.

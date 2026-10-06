@@ -1,7 +1,7 @@
 import { APP_URL } from './project';
 
 /**
- * Where PAM lives on the web.
+ * Where Pam lives on the web.
  *
  * Every invite arrives as a link in a text message, so this is the first thing
  * a member ever taps — before there is an app on their phone, and possibly
@@ -72,7 +72,7 @@ export function readAudience(params: { get(name: string): string | null } | null
  * no account to /join/, a different page, and the code has to arrive with
  * them. Session storage, not local: it belongs to this visit, and a shared
  * phone should not hand somebody else's invite to the next person who opens
- * PAM. Every access is guarded — private windows throw.
+ * Pam. Every access is guarded — private windows throw.
  */
 const KEY = 'pam.invite';
 

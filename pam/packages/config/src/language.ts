@@ -5,7 +5,7 @@
  *  anywhere in UI, notifications, or data exports. Use 'member' and
  *  'returning citizen' only in internal docs."
  *
- * A person reading PAM over a member's shoulder — a landlord, an employer, a
+ * A person reading Pam over a member's shoulder — a landlord, an employer, a
  * child — must not learn anything about where they have been. That is why this
  * is a test that fails the build and not a style note.
  *
@@ -67,7 +67,7 @@ export class DignityViolationError extends Error {
   ) {
     super(
       `Copy at "${where}" contains the forbidden term "${term}". ` +
-        'PAM never shows justice involvement to a user (SOP §0).',
+        'Pam never shows justice involvement to a user (SOP §0).',
     );
     this.name = 'DignityViolationError';
   }

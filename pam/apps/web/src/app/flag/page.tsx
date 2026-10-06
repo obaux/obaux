@@ -20,7 +20,7 @@ import { useSupportPhone } from '@/lib/useSupportPhone';
  * "Something is wrong here."
  *
  * A member standing outside a place that is closed, or that moved, or that
- * never took new people, is the person PAM has failed most concretely — they
+ * never took new people, is the person Pam has failed most concretely — they
  * made a journey on our word. This screen is how that fact gets back, and it is
  * deliberately three taps: pick the reason, send, done.
  *
@@ -113,7 +113,7 @@ function FlagForm() {
         {header}
         {/*
           No phone number and no help bar on this screen (Will, 14 September).
-          Every other notice in PAM appears because something went wrong and
+          Every other notice in Pam appears because something went wrong and
           offers a person to call; this one is a thank-you. Offering help here
           implies the member has a problem they have just created, which is the
           opposite of what they did.

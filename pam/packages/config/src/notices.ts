@@ -1,12 +1,12 @@
 /**
- * What PAM says when something has gone wrong, or when there is nothing to show.
+ * What Pam says when something has gone wrong, or when there is nothing to show.
  *
  * The default behaviour of a database that refuses a read is silence: an empty
  * list, a null, a screen that looks broken. For this product silence is the
  * worst answer available. §0: "Never dead-end. Every screen has a visible way
  * back and a visible 'Get help'."
  *
- * So every condition PAM can land in has an entry here, and every entry says
+ * So every condition Pam can land in has an entry here, and every entry says
  * three things:
  *
  *   1. what happened, in plain words
@@ -100,7 +100,7 @@ export const NOTICES: Readonly<Record<NoticeKey, NoticeDefinition>> = {
     title: 'This person is in a different area',
     body:
       'You can only see people in your own area. If they should be on your list, ' +
-      'ask PAM support to move them.',
+      'ask Pam support to move them.',
     // No call button here. Help is always one tap away in the bottom bar, and a
     // second Call button on a screen that is not an emergency competes with the
     // persistent one — the member learns two places to look instead of one.
@@ -115,7 +115,7 @@ export const NOTICES: Readonly<Record<NoticeKey, NoticeDefinition>> = {
     title: 'Your account is paused',
     body:
       'You cannot sign in right now. The person who invited you can turn it back on. ' +
-      'Call PAM and we will help you reach them.',
+      'Call Pam and we will help you reach them.',
     offersSupport: true,
     audience: 'member',
   }),
@@ -127,7 +127,7 @@ export const NOTICES: Readonly<Record<NoticeKey, NoticeDefinition>> = {
     title: 'Some things are turned off',
     body:
       'You can still look at places and your plan. Messages and new people are off ' +
-      'for now. Call PAM if you have questions.',
+      'for now. Call Pam if you have questions.',
     offersSupport: true,
     audience: 'member',
   }),
@@ -142,7 +142,7 @@ export const NOTICES: Readonly<Record<NoticeKey, NoticeDefinition>> = {
     kind: 'banner',
     status: 'info',
     title: 'This part is turned off for now',
-    body: 'The person who invited you turned this off. Call PAM if you have questions.',
+    body: 'The person who invited you turned this off. Call Pam if you have questions.',
     offersSupport: true,
     audience: 'member',
   }),
@@ -208,7 +208,7 @@ export const NOTICES: Readonly<Record<NoticeKey, NoticeDefinition>> = {
     kind: 'empty',
     status: 'info',
     title: 'No places found here',
-    body: 'Try a bigger distance, or pick a different kind of help. You can also call PAM and we will look for you.',
+    body: 'Try a bigger distance, or pick a different kind of help. You can also call Pam and we will look for you.',
     offersSupport: true,
     audience: 'member',
   }),
@@ -218,7 +218,7 @@ export const NOTICES: Readonly<Record<NoticeKey, NoticeDefinition>> = {
     kind: 'empty',
     status: 'info',
     title: 'No people to show yet',
-    body: 'Check back soon. You can also call PAM and we will help you find someone.',
+    body: 'Check back soon. You can also call Pam and we will help you find someone.',
     offersSupport: true,
     audience: 'member',
   }),
@@ -232,8 +232,8 @@ export const NOTICES: Readonly<Record<NoticeKey, NoticeDefinition>> = {
     key: 'service_not_available',
     kind: 'empty',
     status: 'info',
-    title: 'This place is not on PAM right now',
-    body: 'It may come back. Call PAM and we can help you find another place.',
+    title: 'This place is not on Pam right now',
+    body: 'It may come back. Call Pam and we can help you find another place.',
     offersSupport: true,
     audience: 'member',
   }),
@@ -257,7 +257,7 @@ export const NOTICES: Readonly<Record<NoticeKey, NoticeDefinition>> = {
     kind: 'banner',
     status: 'error',
     title: 'Something went wrong',
-    body: 'This is not your fault. Try again, or call PAM and we will help.',
+    body: 'This is not your fault. Try again, or call Pam and we will help.',
     offersSupport: true,
     audience: 'member',
   }),

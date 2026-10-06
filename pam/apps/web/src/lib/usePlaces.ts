@@ -35,7 +35,7 @@ export interface NearbyPlace {
   lon: number | null;
   meters: number;
   /**
-   * Whether PAM holds opening hours for this place at all. True for six rows
+   * Whether Pam holds opening hours for this place at all. True for six rows
    * out of 754 today. `hoursFor()` in @pam/config decides what a screen may
    * show when it is false (D-044, and the placeholder Will asked for on 16
    * September).

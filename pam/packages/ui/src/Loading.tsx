@@ -5,7 +5,7 @@ import { Spinner } from '@astryxdesign/core/Spinner';
 /**
  * Waiting.
  *
- * Every screen in PAM used to say "Finding places nearby..." while it worked
+ * Every screen in Pam used to say "Finding places nearby..." while it worked
  * out who was signed in — including the ones that were not finding places.
  * Moving between tabs is a full page load in a static export, so that sentence
  * was what a person saw on the way to their account, their saved list, and the

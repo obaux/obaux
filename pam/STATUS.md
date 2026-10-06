@@ -383,7 +383,8 @@ drawer, Plan a trip in a fixed footer, "About program" (D-309). Sign in footer l
 Program tab lists policies with the rows and says "Contact phone number" (D-312, D-314). Sign up per step per role in Storybook (D-319). Case managers invite case managers
 (0073, written, NOT deployed); super admin invites from Profile and Invited people (D-315). Program Home range is a
 dropdown beside the title (D-320). Program Home check-ins (session-kept) with burst and undo, signature
-badge, and "Book a visit for a member" from the + (D-316). Note:
+badge, and "Book a visit for a member" from the + (D-316). "Pam", not "PAM", in every
+user-visible string; SMS templates still "PAM:" pending Will (D-321). Note:
 the web app's vitest tests are not run in CI. How points should be awarded — two rules live
 (save a place, finish setup), the rest to build, with order and open
 questions — is specified in `docs/points-awarding.md`. The

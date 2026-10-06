@@ -6,7 +6,7 @@ import { settled } from './settled';
  * "Something is wrong here", and where it goes.
  *
  * The member using this screen is standing outside a place that is closed, or
- * that moved, or that never took new people — PAM sent them there. Three taps:
+ * that moved, or that never took new people — Pam sent them there. Three taps:
  * pick a reason, send, done.
  *
  * The reasons are the four the database accepts, and the fan-out to super
@@ -87,7 +87,7 @@ test.describe('reporting a place', () => {
     await page.goto(`/flag/?place=${PLACE}`);
 
     await page.getByRole('radio', { name: 'It moved somewhere else' }).click();
-    await page.getByRole('button', { name: 'Send this to PAM' }).click();
+    await page.getByRole('button', { name: 'Send this to Pam' }).click();
 
     await expect(page.getByRole('heading', { name: 'Thank you. We will check it.' })).toBeVisible();
     await expect.poll(() => sent[0]?.p_reason).toBe('moved');

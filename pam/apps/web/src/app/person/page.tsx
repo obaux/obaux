@@ -353,7 +353,7 @@ function PersonScreen() {
         stats={
           isProgramView
             ? [
-                // Only what concerns this program, plus when they last used PAM (D-242).
+                // Only what concerns this program, plus when they last used Pam (D-242).
                 {
                   // The day and the time (Will, 3 October): "Oct 6, 9:00 AM".
                   value: nextVisits[0]

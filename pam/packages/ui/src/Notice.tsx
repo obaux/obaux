@@ -11,7 +11,7 @@ import { PhoneIcon } from './icons.js';
 import { NOTICES, type NoticeKey } from '@pam/config';
 
 /**
- * How PAM says something went wrong, or that there is nothing here.
+ * How Pam says something went wrong, or that there is nothing here.
  *
  * A query that returns null because an admin is out of region, or empty because
  * a feature was turned off, renders as a blank screen unless something says
@@ -44,9 +44,9 @@ export interface NoticeProps {
   /** Localised title and body, resolved by the caller through i18n. */
   title: string;
   body: string;
-  /** PAM's support line in E.164. Omit to hide the call action. */
+  /** Pam's support line in E.164. Omit to hide the call action. */
   supportPhone?: string | null;
-  /** Localised label for the call action, e.g. "Call PAM". */
+  /** Localised label for the call action, e.g. "Call Pam". */
   callLabel?: string;
   /**
    * An admin's own note to this person, from `access_controls.user_facing_note`.
@@ -93,7 +93,7 @@ export function Notice({
   title,
   body,
   supportPhone,
-  callLabel = 'Call PAM',
+  callLabel = 'Call Pam',
   userFacingNote,
   retry,
 }: NoticeProps) {

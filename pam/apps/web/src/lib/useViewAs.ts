@@ -14,7 +14,7 @@ import { ROLES, type Role } from '@pam/config';
  *
  * Kept in `sessionStorage` rather than the URL or the database: it should
  * survive a refresh while somebody is checking a screen, and should be gone the
- * next time they open PAM, because the normal state is your own role. A URL
+ * next time they open Pam, because the normal state is your own role. A URL
  * parameter would also mean a shared link could put somebody in a view they did
  * not choose.
  *

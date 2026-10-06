@@ -15,7 +15,7 @@ import { useSupportPhone } from '@/lib/useSupportPhone';
  * Get help, as a list of the kinds of help (D-213, from the reference Will
  * gave on 1 October: "there are different types of help").
  *
- * Calling PAM stays first and is the row itself — a `tel:` link, one tap,
+ * Calling Pam stays first and is the row itself — a `tel:` link, one tap,
  * with the hours under it — because it is what most people who open this
  * screen came for (§0, §2.4). The other rows open a page each, on the same
  * template. Every one of them is a plain link and static text, so the whole
@@ -33,7 +33,7 @@ const styles = stylex.create({
   note: { fontSize: '15px', lineHeight: 1.5 },
 });
 
-/** Call PAM as a row — the hours under it, one tap to dial (D-216). */
+/** Call Pam as a row — the hours under it, one tap to dial (D-216). */
 function CallPamRow({ label }: { readonly label: string }) {
   const { t } = useI18n();
   const supportPhone = useSupportPhone();
@@ -80,7 +80,7 @@ export function HelpView({ backHref = '/', backLabel }: { readonly backHref?: st
   );
 }
 
-/** What PAM support helps with, and what to do when it is closed. */
+/** What Pam support helps with, and what to do when it is closed. */
 export function HelpTopicsView() {
   const { t } = useI18n();
   const topics = [
@@ -116,7 +116,7 @@ export function HelpTopicsView() {
  * reading"). One card first, for the one thing that cannot wait — in danger,
  * call 911, the page's only big button. Under it, the two other situations as
  * plain rows, each a short line and one tap: a message that feels unsafe
- * (to Messages, where ⋯ › Report is), and someone to talk to (calls PAM). Then
+ * (to Messages, where ⋯ › Report is), and someone to talk to (calls Pam). Then
  * one quiet sentence on what reporting shares.
  */
 export function HelpSafetyView() {
@@ -171,7 +171,7 @@ export function HelpSafetyView() {
 }
 
 /**
- * How to tell PAM a listing is wrong — the report lives on the place itself
+ * How to tell Pam a listing is wrong — the report lives on the place itself
  * (D-185). "Find the place" opens Explore, where places are found now (D-216).
  */
 export function HelpReportPlaceView() {

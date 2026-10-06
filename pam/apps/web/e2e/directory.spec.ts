@@ -99,7 +99,7 @@ async function signedInAs(
   return asked;
 }
 
-test.describe('everyone, for the person running PAM', () => {
+test.describe('everyone, for the person running Pam', () => {
   test('lists the accounts, with what each person is', async ({ page }) => {
     await signedInAs(page, 'super_admin');
     await page.goto('/directory/');
@@ -141,9 +141,9 @@ test.describe('everyone, for the person running PAM', () => {
     await page.goto('/directory/');
 
     await expect(
-      page.getByRole('heading', { name: 'This screen is for the PAM team' }),
+      page.getByRole('heading', { name: 'This screen is for the Pam team' }),
     ).toBeVisible();
-    await expect(page.getByRole('link', { name: /Call PAM/ })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Call Pam/ })).toBeVisible();
     await expect(page.getByRole('link', { name: 'Back' })).toBeVisible();
   });
 
@@ -158,7 +158,7 @@ test.describe('everyone, for the person running PAM', () => {
     await page.goto('/directory/');
 
     await expect(
-      page.getByRole('heading', { name: 'This screen is for the PAM team' }),
+      page.getByRole('heading', { name: 'This screen is for the Pam team' }),
     ).toBeVisible();
     // The template still names the screen (D-217); what must not appear is
     // the list itself.
@@ -186,7 +186,7 @@ test.describe('everyone, for the person running PAM', () => {
 
   test('a super admin can look at the screen each role gets', async ({ page }) => {
     // One codebase, four very different screens. A case manager reporting that
-    // "the tile is missing" is describing a screen the person running PAM has
+    // "the tile is missing" is describing a screen the person running Pam has
     // never had (Will, 14 September).
     await signedInAs(page, 'super_admin');
     await page.route('**/rest/v1/rpc/member_points*', (route) => route.fulfill(json(400)));

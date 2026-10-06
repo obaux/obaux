@@ -60,7 +60,7 @@ export function DemoThread({
   };
 
   // D-187: a member sees who this is to them; staff see nothing beside a
-  // member's name; the PAM team is named as such (D-262).
+  // member's name; the Pam team is named as such (D-262).
   const context = contextFor(role, other ? { role: other.role, programName: other.orgName ?? null } : null, t);
 
   return (

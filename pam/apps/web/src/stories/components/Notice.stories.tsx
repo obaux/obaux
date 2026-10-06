@@ -4,7 +4,7 @@ import { NOTICES, type NoticeKey } from '@pam/config';
 import { useStoryText } from '../support/useStoryText';
 
 /**
- * How PAM says something went wrong, or that there is nothing here (§0: never
+ * How Pam says something went wrong, or that there is nothing here (§0: never
  * dead-end). A problem the reader must act on is a status card with
  * `role="alert"`; an empty area is Astryx's EmptyState. Which one, and whether
  * it offers a call, is decided by `@pam/config/notices` — not by the screen.

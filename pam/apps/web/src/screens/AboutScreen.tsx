@@ -14,13 +14,13 @@ import { useI18n } from '@/lib/i18n';
 import { goBack } from '@/lib/navigate';
 
 /**
- * About PAM (Will, 4 October, D-259), from the foot of Sign in: what PAM is,
+ * About Pam (Will, 4 October, D-259), from the foot of Sign in: what Pam is,
  * and how it helps each kind of person — a member, a case manager, a
  * program; not the super admin, who runs it rather than uses it.
  *
- * - The nested template: back (to where it was opened) and PAM's wordmark
+ * - The nested template: back (to where it was opened) and Pam's wordmark
  *   where the round buttons usually sit.
- * - One sentence for what PAM is; then a pill switch for who is reading, a
+ * - One sentence for what Pam is; then a pill switch for who is reading, a
  *   line for how it helps them, and their three-slide story — the Sign in
  *   carousel, but in line with the page, rounded, the words in the middle.
  *   The slides are the same lines Sign in shows each of them (D-254).

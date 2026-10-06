@@ -1,10 +1,10 @@
 /**
- * @pam/ui — the PAM-specific components from SOP §2.4.
+ * @pam/ui — the Pam-specific components from SOP §2.4.
  *
  * Everything here is composed from Astryx primitives. Nothing here reimplements
  * a component Astryx already ships, and no other UI library is used (§2).
  *
- * The recurring theme: Astryx is built for dense, capable interfaces, and PAM
+ * The recurring theme: Astryx is built for dense, capable interfaces, and Pam
  * needs the opposite. These wrappers are where that difference lives — bigger
  * targets, one action per screen, real links instead of handlers wherever a
  * flaky connection would otherwise dead-end someone.

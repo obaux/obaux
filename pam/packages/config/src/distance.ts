@@ -6,7 +6,7 @@ import type { Locale } from './index.js';
  * Raw arithmetic leaks: `3 * 0.6` is `1.7999999999999998` in IEEE 754, and a
  * member who sees "1.7999999999999998 miles" on a card learns that the app is
  * careless with the things it tells them. Distance is also never precise — it
- * is a straight line from a phone's GPS fix, not a walk — so PAM rounds to one
+ * is a straight line from a phone's GPS fix, not a walk — so Pam rounds to one
  * decimal and refuses to pretend below a tenth of a mile.
  *
  * This returns a key and its variables rather than a finished string so the

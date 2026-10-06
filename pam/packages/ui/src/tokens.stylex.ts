@@ -1,7 +1,7 @@
 import * as stylex from '@stylexjs/stylex';
 
 /**
- * PAM's own sizing floor, from SOP §0 and §2.5.
+ * Pam's own sizing floor, from SOP §0 and §2.5.
  *
  * These are not style preferences. A member may be using a cracked prepaid
  * phone in bright sun, with reading glasses they do not have, on their first
@@ -12,12 +12,12 @@ import * as stylex from '@stylexjs/stylex';
  *   - 18px body text on mobile, 16px on desktop
  *
  * Colour, type family and elevation all come from the Astryx theme. Only the
- * measurements PAM tightens live here.
+ * measurements Pam tightens live here.
  */
 export const pam = stylex.defineVars({
   touchTargetMin: '48px',
   // A text field's frame, not just its tap area. Astryx's largest input draws a
-  // 36px box, which is under PAM's floor: the target was already 48px, so the
+  // 36px box, which is under Pam's floor: the target was already 48px, so the
   // box you could hit was bigger than the box you could see, and on a phone a
   // person aims at the drawing.
   fieldHeight: '56px',
@@ -29,7 +29,7 @@ export const pam = stylex.defineVars({
   /**
    * How wide a screen reads at. Not a phone width — a column that stays
    * readable when the same build is opened on a laptop, which is where staff
-   * use PAM.
+   * use Pam.
    */
   pageWidth: '560px',
   /** A page title. One size, so every screen announces itself the same way. */

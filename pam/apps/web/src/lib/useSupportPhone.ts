@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 
 /**
- * PAM's support line.
+ * Pam's support line.
  *
  * Will has said this number will change over time, and it appears in the
  * HelpBar on every screen (§2.4), so it cannot be a build-time constant — a

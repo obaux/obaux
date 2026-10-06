@@ -9,7 +9,7 @@ import { useStoryText } from '../support/useStoryText';
  * the card offers exactly one action.
  *
  * `roleLine` is the person's own words and is not translated, as in the app;
- * the tags and the button are PAM's and follow the Language toolbar.
+ * the tags and the button are Pam's and follow the Language toolbar.
  */
 function LocalisedPerson({ sharedTags = [], orgBadgeLabel, messageLabel, ...rest }: PersonCardProps) {
   const tr = useStoryText();
