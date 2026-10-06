@@ -7476,8 +7476,20 @@ each."
     address, hours, About), with the number, site, address and policies the
     visit's service's, and that one service shown under the visit, outlined
     and still.
+  - **Simpler cards, smarter page** (Will, then: "only say service name…
+    a gradient skeleton loader animation… gray and white that shines on
+    the card when selected… update the About program to About service and
+    list details there, as well as update the program location… contact in
+    the list of action items… bring up address above action items, below
+    About"). A card is the service's name alone. Picked, it outlines and a
+    soft grey-and-white band sweeps across it (none under reduced motion),
+    and the page becomes the service's: About program reads "About
+    service" with its words, the address card reads "Service address" when
+    it has one of its own (Open in Google and Get directions go there),
+    and Call and Website are its. Order before booking: cards, About,
+    Address, then the rows.
   - `PlaceDetail.layout = 'chooseFirst'` carries the order; the service
-    details page (`/place/service/`) is gone — the card says what it said.
+    details page (`/place/service/`) is gone — the page says what it said.
 - **Open:** whether service names should be free text or picked from a
   list Pam keeps (free text here; a list would make Explore filterable by
   service). Storing services is a schema change for Will.

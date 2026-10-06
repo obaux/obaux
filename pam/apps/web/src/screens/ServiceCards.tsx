@@ -1,56 +1,57 @@
 'use client';
 
 import * as stylex from '@stylexjs/stylex';
-import { HStack } from '@astryxdesign/core/HStack';
 import { Card } from '@astryxdesign/core/Card';
 import { SelectableCard } from '@astryxdesign/core/SelectableCard';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
-import { displayPhone } from '@pam/config';
 import type { DummyService } from '@pam/config/dummy-services';
-import { GlobeIcon, PhoneIcon, PlacesIcon } from '@pam/ui';
 import { useI18n } from '@/lib/i18n';
-import { siteName } from '@/lib/siteName';
 
 /**
  * A program's services as cards to pick from (D-313, Will, 6 October:
- * "almost like an ecommerce feel to checkout, select type, and continue,
- * this takes priority over program info… the services simply laid out in
- * selectable cards, and a different color (gray) so they stick out").
+ * "almost like an ecommerce feel to checkout, select type, and continue";
+ * then "simplify the selection cards… only say service name… a cool
+ * effect when selected, like a gradient skeleton loader animation in
+ * background color, gray and white that shines on the card").
  *
  * Before a visit is booked the cards come first on the page, stacked,
- * grey, each small: the name, a line or two, and only what differs from
- * the program — its own number, site, address. Tap one and it outlines;
- * the rows below follow it and Plan a trip is for it. With a visit
- * booked, only the visit's service is shown, outlined and still: the page
- * is about that visit.
+ * grey, each just the service's name. Tap one: it outlines, a soft
+ * grey-and-white shine runs across it, and the page below becomes about
+ * that service — About, the address, the number and site in the rows.
+ * With a visit booked, only the visit's service is shown, outlined and
+ * still: the page is about that visit.
  */
-const META = { width: 16, height: 16, 'aria-hidden': true } as const;
+/**
+ * The shine (Will): a band of white sweeping across the grey, like a
+ * skeleton loading — a thing is happening to this card. Slow and soft, and
+ * none at all for somebody who asked their phone for less motion.
+ */
+const shine = stylex.keyframes({
+  '0%': { backgroundPosition: '150% 0' },
+  '100%': { backgroundPosition: '-50% 0' },
+});
 
 const styles = stylex.create({
   card: { width: '100%' },
   // Picked: a 2px accent outline (Will: "it outlines, like a selected
-  // card"), inside the corner so the radius follows, over the component's
-  // own quieter ring.
+  // card"), inside the corner so the radius follows, and the shine.
   cardOn: {
     outlineWidth: '2px',
     outlineStyle: 'solid',
     outlineColor: colorVars['--color-accent'],
     outlineOffset: '-2px',
+    backgroundImage: `linear-gradient(100deg, ${colorVars['--color-background-muted']} 30%, ${colorVars['--color-background-body']} 50%, ${colorVars['--color-background-muted']} 70%)`,
+    backgroundSize: '200% 100%',
+    backgroundRepeat: 'no-repeat',
+    animationName: shine,
+    animationDuration: '2.2s',
+    animationTimingFunction: 'ease-in-out',
+    animationIterationCount: 'infinite',
+    '@media (prefers-reduced-motion: reduce)': { animationName: 'none' },
   },
-  words: { minWidth: 0 },
   name: { fontSize: '18px', lineHeight: 1.3, fontWeight: 600 },
-  body: {
-    fontSize: '15px',
-    lineHeight: 1.4,
-    display: '-webkit-box',
-    WebkitBoxOrient: 'vertical',
-    WebkitLineClamp: 2,
-    overflow: 'hidden',
-  },
-  meta: { fontSize: '14px', lineHeight: 1.35, minWidth: 0 },
-  metaIcon: { flexShrink: 0, color: colorVars['--color-text-secondary'] },
   hint: { fontSize: '16px', lineHeight: 1.5 },
   eyebrow: { fontSize: '15px', fontWeight: 600 },
 });
@@ -82,40 +83,7 @@ export function ServiceCards({
       <VStack gap={2} aria-label={t('place.services.label')}>
         {shown.map((s) => {
           const isOn = s.id === selectedId;
-          const inside = (
-                <VStack gap={2} xstyle={styles.words}>
-                  <Text xstyle={styles.name}>{s.name}</Text>
-                  {s.description ? (
-                    <Text type="supporting" xstyle={styles.body}>
-                      {s.description}
-                    </Text>
-                  ) : null}
-                  <VStack gap={1}>
-                    {s.phone ? (
-                      <HStack gap={1} align="center" wrap="nowrap">
-                        <PhoneIcon {...META} {...stylex.props(styles.metaIcon)} />
-                        <Text type="supporting" xstyle={styles.meta}>
-                          {displayPhone(s.phone)}
-                        </Text>
-                      </HStack>
-                    ) : null}
-                    {s.website ? (
-                      <HStack gap={1} align="center" wrap="nowrap">
-                        <GlobeIcon {...META} {...stylex.props(styles.metaIcon)} />
-                        <Text type="supporting" xstyle={styles.meta}>
-                          {siteName(s.website)}
-                        </Text>
-                      </HStack>
-                    ) : null}
-                    <HStack gap={1} align="center" wrap="nowrap">
-                      <PlacesIcon {...META} {...stylex.props(styles.metaIcon)} />
-                      <Text type="supporting" xstyle={styles.meta}>
-                        {s.address ?? t('place.services.atProgram')}
-                      </Text>
-                    </HStack>
-                  </VStack>
-                </VStack>
-          );
+          const inside = <Text xstyle={styles.name}>{s.name}</Text>;
           return (
             <VStack key={s.id} gap={1}>
               {isLocked ? (

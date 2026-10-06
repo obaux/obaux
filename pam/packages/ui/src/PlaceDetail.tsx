@@ -108,7 +108,7 @@ export interface PlaceDetailProps {
   /**
    * `chooseFirst` (D-313): before a visit is booked, what the program
    * offers comes first — `extra` (the services to pick from, or when a
-   * drop-in program meets), then About, then the rows. The default keeps
+   * drop-in program meets), then About, then the address, then the rows. The default keeps
    * the rows first, for a place with a visit booked and for staff.
    */
   readonly layout?: 'default' | 'chooseFirst';
@@ -442,6 +442,7 @@ export function PlaceDetail({
         <>
           {extra ?? null}
           {aboutCard}
+          {addressCard}
           {quickActions && quickActions.length > 0 ? (
             <Card padding={1} xstyle={styles.card}>
               <MenuList label={quickActionsLabel ?? ''} hasDividers items={quickItems} />
@@ -473,7 +474,7 @@ export function PlaceDetail({
       */}
       {directionsHref ? <BigButton label={labels.directions} href={directionsHref} /> : null}
 
-      {addressFirst ? null : addressCard}
+      {addressFirst || layout === 'chooseFirst' ? null : addressCard}
 
       {addressFirst || hasWeek ? null : hoursCard}
 

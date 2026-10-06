@@ -1239,5 +1239,7 @@
   "place.dropin.biweekly": "Every other {day} · {time}",
   "place.dropin.monthly": "First {day} of the month · {time}",
   "place.dropin.next": "Next: {date}",
-  "place.dropin.body": "Nothing to book. Just come at that time."
+  "place.dropin.body": "Nothing to book. Just come at that time.",
+  "place.aboutService": "About service",
+  "place.address.service": "Service address"
 }

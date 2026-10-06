@@ -338,7 +338,9 @@ function PlaceScreen() {
   const allSigned = signedSoFar.signed === signedSoFar.total;
   // With a visit booked here (or arriving from Trips), the policies come up
   // under the name — orange to sign, green once signed — instead of at the foot.
-  const policiesOnTop = asksMember && (hasTrip || fromTrips);
+  // Not before booking on a program with services (Will, D-313): the
+  // policies are the service's, and come with the visit.
+  const policiesOnTop = asksMember && (hasTrip || fromTrips) && !(forPlace(place!.id).length > 0 && !fromTrips);
   // A member's one primary action is booking a visit (D-235), straight into
   // the New trip steps with this place already chosen — the page's footer,
   // always in reach (D-309, D-326). With a visit booked, nothing asks to
@@ -382,7 +384,9 @@ function PlaceScreen() {
     (service?.address
       ? directionsHref(service.address, null, null, null)
       : directionsHref(place!.address, place!.lat, place!.lon, place!.placeId)) ?? null;
-  const googleHref = googlePlaceHref(place!.lookupName || place!.name, place!.address, place!.placeId);
+  const googleHref = service?.address
+    ? googlePlaceHref(place!.name, service.address, null)
+    : googlePlaceHref(place!.lookupName || place!.name, place!.address, place!.placeId);
   const lines = status ? weekLines(status.hours, locale, t('place.hours.closed')) : undefined;
 
   return (
@@ -425,7 +429,9 @@ function PlaceScreen() {
       <PlaceDetail
         category={place!.category}
         categoryLabel={t(categoryLabelKey(place!.category))}
-        description={place!.description}
+        // The picked service's words and place (Will, D-313): About program
+        // becomes About service, and the address card says whose it is.
+        description={service?.description || place!.description}
         address={address}
         status={status ? { isOpen: status.isOpen, label: status.label } : null}
         weekLines={lines}
@@ -574,8 +580,8 @@ function PlaceScreen() {
           hours: t('place.hours'),
           today: t('place.hours.today'),
           hoursOnGoogle: t('place.hoursOnGoogle'),
-          about: t('place.about'),
-          address: t('place.address'),
+          about: service?.description ? t('place.aboutService') : t('place.about'),
+          address: service?.address ? t('place.address.service') : t('place.address'),
           save: t('place.save'),
           saved: t('places.saved'),
           share: t('place.share'),
