@@ -162,6 +162,8 @@ what they said; a program can add somebody new by name and number, and Pam
 texts them a link that opens on their booked visit. The program lead's Home
 has a calmer head: plain arrows, no visit total, search only on the week
 and month.
+On a member's profile a program sees "Policies signed · 3 of 4" and a page
+listing which, with a note on top when the member still has some to sign.
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 

@@ -19,6 +19,7 @@ export const Policy: Story = screen('provider', 'A policy', '/program/policies/v
 export const Messages: Story = screen('provider', 'Messages', '/messages/');
 export const Profile: Story = screen('provider', 'Profile', '/profile/');
 export const Member: Story = screen('provider', 'A member', '/person/', { id: 'dummy-m1' });
+export const MemberPolicies: Story = screen('provider', 'A member — policies signed', '/person/policies/', { id: 'dummy-m2' });
 export const Invite: Story = screen('provider', 'Invite someone', '/invite/');
 export const BookForMember: Story = screen('provider', 'Book a visit for a member', '/program/book/');
 export const AddPerson: Story = screen('provider', 'Add a person', '/program/book/new/');

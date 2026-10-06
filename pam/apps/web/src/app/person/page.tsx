@@ -9,8 +9,9 @@ import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { Badge } from '@astryxdesign/core/Badge';
 import { Avatar } from '@astryxdesign/core/Avatar';
-import { BigButton, BookmarkIcon, ConnectionsIcon, Loading, MessagesIcon, Notice, Page, TripsIcon } from '@pam/ui';
+import { BigButton, BookmarkIcon, ConnectionsIcon, Loading, MessagesIcon, Notice, Page, SignIcon, TripsIcon } from '@pam/ui';
 import { MenuList } from '@pam/ui/MenuList';
+import { signedBy, usePolicies } from '@/lib/usePolicies';
 import { ProfileSummary } from '@pam/ui/ProfileCards';
 import { TripCard } from '@pam/ui/TripCard';
 import { useRouter } from 'next/navigation';
@@ -151,6 +152,7 @@ function whenLastActive(iso: string | null, locale: string): string | null {
 
 function PersonScreen() {
   const { t, locale } = useI18n();
+  const { policies } = usePolicies();
   const supportPhone = useSupportPhone();
   const params = useSearchParams();
   const router = useRouter();
@@ -406,6 +408,22 @@ function PersonScreen() {
         <MenuList
           label={t('person.actions.label', { name: person.firstName })}
           items={[
+            // Which policies they have signed, in plain sight (Will, D-324):
+            // the badge by the name says all or not; this says which.
+            ...(isProgramView && isMember
+              ? [
+                  {
+                    id: 'policies',
+                    label: t('person.policies.title'),
+                    description: t('person.policies.row', {
+                      signed: signedBy(person.id, policies).length,
+                      total: policies.length,
+                    }),
+                    icon: <SignIcon width={26} height={26} />,
+                    href: `/person/policies/?${new URLSearchParams({ id: person.id, name: person.firstName ?? '' }).toString()}`,
+                  },
+                ]
+              : []),
             ...(viewedRole === 'admin'
               ? [
                   {

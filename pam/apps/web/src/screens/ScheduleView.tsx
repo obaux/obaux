@@ -16,7 +16,8 @@ import { Text } from '@astryxdesign/core/Text';
 import { Tooltip } from '@astryxdesign/core/Tooltip';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
-import { CheckIcon, ExploreIcon, NoResultsIcon, Page, SignIcon, TripsIcon, textLinkLook } from '@pam/ui';
+import { CheckIcon, ExploreIcon, NoResultsIcon, Page, TripsIcon, textLinkLook } from '@pam/ui';
+import { SignedMark } from './VerifiedBadge';
 import { SearchField } from '@pam/ui/SearchPill';
 import { LargeTitleHeader } from '@pam/ui/LargeTitleHeader';
 import { useI18n } from '@/lib/i18n';
@@ -189,16 +190,6 @@ const styles = stylex.create({
   // The name is the link now (a button cannot sit inside one), the rest of
   // the row plain; it reads the same (D-316).
   nameLink: { color: 'inherit', textDecorationLine: 'none' },
-  // A light-green signature: every policy signed (D-316, was a tick, D-261).
-  signed: {
-    width: '22px',
-    height: '22px',
-    borderRadius: '50%',
-    flexShrink: 0,
-    backgroundColor: colorVars['--color-success-muted'],
-    color: colorVars['--color-success'],
-  },
-  signedIcon: { width: '14px', height: '14px' },
   checkWrap: { position: 'relative', flexShrink: 0 },
   check: {
     width: '48px',
@@ -399,8 +390,8 @@ export function ScheduleView({
               <Text xstyle={styles.label}>{a.firstName}</Text>
             )}
             {isVerified(a.personId, policies) ? (
-              <HStack align="center" justify="center" xstyle={styles.signed} role="img" aria-label={t('verified.short')}>
-                <SignIcon {...stylex.props(styles.signedIcon)} aria-hidden />
+              <HStack role="img" aria-label={t('verified.short')}>
+                <SignedMark />
               </HStack>
             ) : null}
           </HStack>

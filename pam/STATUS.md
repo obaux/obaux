@@ -386,7 +386,8 @@ dropdown beside the title (D-320). Program Home check-ins (session-kept) with bu
 badge, and "Book a visit for a member" from the + (D-316). "Pam", not "PAM", in every
 user-visible string; texts say "Pam:" too (D-321). Book a visit: booked / wrote / snippet rows,
 Add a person, the member arrives on "Your visit is booked" (D-322). Program Home head
-simplified (D-323). Note:
+simplified (D-323). Member profile (program view): Policies signed row and page with
+a finish-signing alert; one SignedMark (D-324). Note:
 the web app's vitest tests are not run in CI. How points should be awarded — two rules live
 (save a place, finish setup), the rest to build, with order and open
 questions — is specified in `docs/points-awarding.md`. The

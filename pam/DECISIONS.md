@@ -7614,6 +7614,34 @@ ahead with recommendations 1,2, but for 3, let's show the search button
   the week and month views; a day is short enough to read.
 - **Proven by:** screenshots of the week and the day; e2e 570/570.
 
+### D-324 — On a member's profile, a program sees which policies they signed
+
+Will, 6 October: "The signature icon in light green is connected to this
+profile screen for program admins, please ensure they're tied, except
+here we can see which policies have been signed." And: "add a Policies
+signed item in their profile which is more clearly visible for program
+leads, which opens up an individual page, like the page members see when
+all policies are signed. If not all are signed, create an alert on top
+saying {first name} needs to finish signing on their device."
+
+- **One mark.** `SignedMark` (in `VerifiedBadge.tsx`) is the light-green
+  circle with the pen; Home's rows and the profile's name badge both draw
+  it, so they cannot drift. The badge on the profile still opens its
+  popover listing what was signed.
+- **Policies signed**, first among the member's actions on a program's
+  view: "3 of 4 signed" under it, the pen beside it. It opens
+  `/person/policies/?id=…`, the mirror of a member's own "Policies to
+  sign" page (D-270): each policy, "Signed on October 1" with the green
+  tick or "Not signed yet" with the book, and "3 of 4 signed" above.
+- **The alert.** With any unsigned, an Astryx `Banner` (warning) sits on
+  top: "Keisha needs to finish signing on their device — 1 still to sign.
+  They can do it from your program's page in Pam." A program cannot sign
+  for a member, so the page has nothing to tap into; it says whose move
+  it is.
+- **Proven by:** screenshots (the profile with badge and row; the page
+  with the alert for Keisha and without it for Jordan); config 238, ui
+  67, typecheck, web and Storybook builds; e2e 570/570.
+
 ---
 
 ## Notes for whoever picks this up next
