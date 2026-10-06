@@ -7554,6 +7554,12 @@ entire app?"
   changed in one pass. The copy changed by one word in each; `reviewedBy`
   is unchanged, on Will's own instruction. The carrier samples need
   re-filing with the new prefix — `docs/before-launch.md`.
+- **Codes stay "PAM-7Q4K".** The sweep also rewrote invite codes in
+  fixtures and stories to "Pam-…"; the app upper-cases every code it
+  reads, so the Storybook mock stopped recognising the expired example
+  and the flow-map script hung on it. A code is a code, not the name:
+  they are back to "PAM-", and `generate_invite_code()` was never
+  touched.
 - Code is untouched: `@pam/*` packages, `pam.*` keys, `DUMMY_PAM_TEAM`,
   file names. The wordmark SVGs already draw the name in lower case. The
   OG images are pictures; if one shows the capitals it needs re-exporting.
@@ -7641,6 +7647,28 @@ saying {first name} needs to finish signing on their device."
 - **Proven by:** screenshots (the profile with badge and row; the page
   with the alert for Keisha and without it for Jordan); config 238, ui
   67, typecheck, web and Storybook builds; e2e 570/570.
+
+### D-325 — Member stories in three folders: Created, Invited by program, Invited by case manager
+
+Will, 6 October: "Organize storybook screens for members by: Member
+created, Member invited by program, Member invited by case manager, and
+show only unique screens to that flow for program and case manager
+invited screens, the rest keep inside member created."
+
+- **Member › Created** is the whole app for a member who signed up from
+  the phone: the five tabs, every nested screen, Sign in, Sign up by
+  step and the whole walk (moved here from Onboarding), and the States
+  folder under it.
+- **Member › Invited by program** holds only what that path changes
+  (D-322): Sign in — invited, "Your visit is booked", and the whole way
+  in from the link with a booked trip.
+- **Member › Invited by case manager** likewise (D-254): Sign in —
+  invited, About you with no code to type, and the whole way in.
+- Member › Prototype keeps its place beside them. Onboarding keeps the
+  staff walks, the expired link and About Pam. Story ids changed, so the
+  flow map's `member-app-screens--*` became `member-created--*`.
+- **Proven by:** each new story opened and titled; Storybook build; the
+  flow map regenerated (all six pages).
 
 ---
 

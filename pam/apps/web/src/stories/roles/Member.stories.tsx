@@ -6,9 +6,13 @@ import { screen, screenWithControls } from './screen';
  * The member app, screen by screen (D-217) — every one on the redesign's two
  * templates, and every one clickable. Tab screens first, in the bar's order;
  * then the screens you tap into; then signing in, which comes before all of
- * it. To walk the app from the start, open Member app › Prototype.
+ * it. To walk the app from the start, open Member › Prototype.
+ *
+ * Three folders (D-325, Will, 6 October): **Created** is a member who signed
+ * up from the phone — every screen lives here; **Invited by program** and
+ * **Invited by case manager** hold only the screens that path changes.
  */
-const meta = { title: 'Member app/Screens' } satisfies Meta;
+const meta = { title: 'Member/Created' } satisfies Meta;
 
 export default meta;
 type Story = StoryObj;
@@ -82,7 +86,8 @@ export const Privacy: Story = screen('member', 'Privacy policy', '/privacy/');
 
 // Before any of it.
 export const SignIn: Story = screen('signed-out', 'Sign in', '/signin/');
-// Sign up, step by step, is below (D-319).
+// Sign up, step by step, is below (D-319); the whole walk, from the phone, here.
+export const SignUpWalk: Story = screen('member', 'Sign up — the whole walk', '/prototype/join/', { kind: 'member' });
 
 /** Each sign-up screen, in order, and the `step` the prototype opens on (D-319). */
 const SIGN_UP_STEPS = {

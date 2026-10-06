@@ -12,7 +12,6 @@ const meta = { title: 'Onboarding' } satisfies Meta;
 
 export default meta;
 
-export const Member: StoryObj = screen('member', 'Member', '/prototype/join/', { kind: 'member' });
 
 /**
  * A case manager and a program arrive by an invite link (D-254): its Sign in,
@@ -20,13 +19,13 @@ export const Member: StoryObj = screen('member', 'Member', '/prototype/join/', {
  * "which one fits you best" — and on to Home.
  */
 export const CaseManager: StoryObj = screen('case-manager', 'Case manager', '/prototype/signin/', {
-  invite: 'Pam-7Q4K',
+  invite: 'PAM-7Q4K',
   as: 'case-manager',
   next: 'join',
 });
 
 export const ProgramLead: StoryObj = screen('provider', 'Program lead', '/prototype/signin/', {
-  invite: 'Pam-7Q4K',
+  invite: 'PAM-7Q4K',
   as: 'program',
   next: 'join',
 });
@@ -36,20 +35,8 @@ export const ProgramLead: StoryObj = screen('provider', 'Program lead', '/protot
  * opens its own page — who sent it, and a way to ask for it to be renewed,
  * which reaches the super admin's Requests.
  */
-/**
- * A program booked their first visit before they had Pam (D-322): the link
- * carries it, and after the steps the last screen is that visit — "Your
- * visit is booked", confetti, and the place.
- */
-export const MemberBooked: StoryObj = screen('member', 'Member — a visit booked for them', '/prototype/signin/', {
-  invite: 'PAM-7Q4K',
-  as: 'member',
-  trip: 'dummy-trip-1',
-  next: 'join',
-});
-
 export const ExpiredLink: StoryObj = screen('provider', 'Expired link', '/prototype/signin/', {
-  invite: 'Pam-OLD1',
+  invite: 'PAM-OLD1',
   as: 'program',
 });
 

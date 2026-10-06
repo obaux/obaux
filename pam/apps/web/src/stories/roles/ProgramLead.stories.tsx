@@ -56,5 +56,5 @@ export const SignUp: Story = screenWithControls<SignUpArgs>(
     args: { step: 'Phone' },
     argTypes: { step: { control: 'select', options: ['Phone', 'Code', 'About you', 'Your program', 'What Pam shares', 'Texts', 'Welcome'] } },
   },
-  (args) => ({ kind: 'provider', ...(args.step === 'Your program' ? {} : { invite: 'Pam-7Q4K' }), step: SIGN_UP_STEPS[args.step] }),
+  (args) => ({ kind: 'provider', ...(args.step === 'Your program' ? {} : { invite: 'PAM-7Q4K' }), step: SIGN_UP_STEPS[args.step] }),
 );

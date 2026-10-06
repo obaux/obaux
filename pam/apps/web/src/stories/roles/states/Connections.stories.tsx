@@ -11,7 +11,7 @@ import { asRedesign } from '../../journeys/journey';
  * they cannot load).
  */
 const meta = {
-  title: 'Member app/States/Connections',
+  title: 'Member/Created/States/Connections',
   component: ConnectionsView,
   args: { connections: [] },
 } satisfies Meta<typeof ConnectionsView>;

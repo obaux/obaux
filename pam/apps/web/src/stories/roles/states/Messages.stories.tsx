@@ -9,7 +9,7 @@ import { asRedesign } from '../../journeys/journey';
  * into the bar. Tap search — the title gives way to a field and Cancel.
  */
 const meta = {
-  title: 'Member app/States/Messages',
+  title: 'Member/Created/States/Messages',
   component: MessagesView,
   args: {
     rows: [],

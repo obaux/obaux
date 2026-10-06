@@ -164,6 +164,8 @@ has a calmer head: plain arrows, no visit total, search only on the week
 and month.
 On a member's profile a program sees "Policies signed · 3 of 4" and a page
 listing which, with a note on top when the member still has some to sign.
+In Storybook, a member's screens sit under Created, Invited by program and
+Invited by case manager.
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 

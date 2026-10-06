@@ -114,7 +114,7 @@ function routesFor(journeyRole: JourneyRole): Route[] {
     // An example code (D-218's Invite someone); the real one is made by the database.
     on('/rpc/create_invite', (_url, _method, body) => ({
       body: {
-        code: 'Pam-7Q4K',
+        code: 'PAM-7Q4K',
         expires_at: new Date(Date.now() + 7 * 86_400_000).toISOString(),
         role: (body as { p_role?: string } | null)?.p_role ?? 'member',
       },
@@ -153,7 +153,7 @@ function routesFor(journeyRole: JourneyRole): Route[] {
     on('/rest/v1/app_settings', () => ({ body: { value: '+12673095265' } })),
     on('/rest/v1/regions', () => ({ body: [{ id: REGION_ID, name: 'Philadelphia' }] })),
     on('/rest/v1/staff_requests', () => ({ body: STAFF_REQUESTS })),
-    // Invite links (0071, D-258): Pam-OLD1 is the example expired link; any
+    // Invite links (0071, D-258): PAM-OLD1 is the example expired link; any
     // other code is still good. The super admin's log has every state (D-263).
     on('/rpc/invite_preview', (_url, _method, body) => {
       const code = String((body as { p_code?: string } | null)?.p_code ?? '').toUpperCase();
@@ -162,7 +162,7 @@ function routesFor(journeyRole: JourneyRole): Route[] {
           {
             inviter_first_name: 'Dana',
             invited_role: 'provider',
-            state: code === 'Pam-OLD1' ? 'expired' : 'valid',
+            state: code === 'PAM-OLD1' ? 'expired' : 'valid',
           },
         ],
       };

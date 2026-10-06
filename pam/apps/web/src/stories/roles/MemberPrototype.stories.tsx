@@ -7,7 +7,7 @@ import { screen } from './screen';
  * phone. Signed in against the pretend database; nothing reaches the live
  * project.
  */
-const meta = { title: 'Member app/Prototype' } satisfies Meta;
+const meta = { title: 'Member/Prototype' } satisfies Meta;
 
 export default meta;
 

@@ -10,7 +10,7 @@ import { asRedesign } from '../../journeys/journey';
  * and leaving with any waiting asks first (D-255).
  */
 const meta = {
-  title: 'Member app/States/Saved',
+  title: 'Member/Created/States/Saved',
   component: SavedView,
   args: {
     state: { status: 'ready', places: [] },
