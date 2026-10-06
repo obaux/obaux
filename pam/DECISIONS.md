@@ -7670,6 +7670,43 @@ invited screens, the rest keep inside member created."
 - **Proven by:** each new story opened and titled; Storybook build; the
   flow map regenerated (all six pages).
 
+### D-326 — A screen's action at its foot is the template's job: a sticky footer that fades the page out
+
+**Date:** 2026-10-06. Will, on the member's view of a place not yet
+booked: "the floating button is not working well, we need to update the
+page template to accommodate floating buttons stuck on bottom to be
+better, and add a white gradient so scroll fades out from bottom." And:
+"policies to sign need to be together with other items, not here."
+
+- **What was wrong.** D-309 put "Plan a trip" in a `position: fixed`
+  strip inside `PlaceDetail`, with a spacer and the bottom-edge fade. On a
+  full-page capture — how Will reviews, in Chromatic — a fixed strip is
+  painted where the first screenful ends: a white box with a hard edge in
+  the middle of the page, and the policies row running on underneath it.
+- **The template owns it.** `Page` (and so `SubPage`) takes a `footer`:
+  rendered last, `position: sticky; bottom: 0`, full-bleed. On a phone it
+  rides the bottom edge while the body scrolls under it; where the page is
+  shorter than the screen, or captured whole, it sits at the end. No
+  spacer, no fixed geometry a screen has to know about, and nothing can be
+  placed after it — a footer is the end of a screen.
+- **The fade.** The strip's top 56px is a gradient from nothing to the
+  page colour, so what scrolls under it fades out rather than being cut;
+  only the button's own part is solid. The faded part does not take taps
+  (`pointer-events: none`), the button does. Clear of the home indicator.
+- **Policies with the rows.** "Policies to sign · Read before your visit ·
+  0 of 4 signed" is the last row of the place's quick actions, after
+  Website — with Directions, Hours, Send a message and Call (D-291), where
+  the program's own tab already lists them (D-312) — instead of a list of
+  its own at the foot. Unchanged: a member with a visit booked sees the
+  policies as the status card under the name (D-271).
+- `PlaceDetail` no longer takes `primaryAction`; the place page passes the
+  footer to `Page` and drops the directions button when the footer is the
+  action. Staff viewing a place keep "How to get there" as before.
+- **Proven by:** screenshots of the member's place profile (the fade over
+  the last card, the row in the list, and the whole page captured with the
+  footer at its end); config 238, ui 67, typecheck, web and Storybook
+  builds; e2e 570/570.
+
 ---
 
 ## Notes for whoever picks this up next

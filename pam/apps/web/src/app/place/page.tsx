@@ -32,7 +32,6 @@ import { RoleSwitchControl } from '../RoleSwitchControl';
 import { sharePlace } from '@/lib/sharePlace';
 import { usePolicies } from '@/lib/usePolicies';
 import { useMySignatures } from '@/lib/useMySignatures';
-import { MenuList } from '@pam/ui/MenuList';
 import { PolicyStatusCard } from '@pam/ui/PolicyStatusCard';
 import { VisitCard } from '@pam/ui/VisitCard';
 import { VStack } from '@astryxdesign/core/VStack';
@@ -336,6 +335,11 @@ function PlaceScreen() {
   // With a visit booked here (or arriving from Trips), the policies come up
   // under the name — orange to sign, green once signed — instead of at the foot.
   const policiesOnTop = asksMember && (hasTrip || fromTrips);
+  // A member's one primary action is booking a visit (D-235), straight into
+  // the New trip steps with this place already chosen — the page's footer,
+  // always in reach (D-309, D-326). With a visit booked, nothing asks to
+  // plan one (D-273).
+  const plansVisit = (demoRole ?? trueRole) === 'member' && !visit;
   // The booked visit (D-273, D-281): "Your next visit", the day large, the
   // time under it, and a way to move it.
   const visitDay = new Intl.DateTimeFormat(locale, { weekday: 'long', month: 'long', day: 'numeric' });
@@ -362,7 +366,22 @@ function PlaceScreen() {
   const lines = status ? weekLines(status.hours, locale, t('place.hours.closed')) : undefined;
 
   return (
-    <Page gap={4}>
+    <Page
+      gap={4}
+      footer={
+        plansVisit ? (
+          <BigButton
+            label={t('place.schedule')}
+            href={`/trips/new/?${new URLSearchParams({
+              place: place!.id,
+              name: place!.name,
+              category: place!.category,
+              ...(place!.address ? { address: place!.address } : {}),
+            }).toString()}`}
+          />
+        ) : null
+      }
+    >
       {header(
         place!.name,
         <PlaceBarActions
@@ -389,24 +408,10 @@ function PlaceScreen() {
         audienceLabel={place!.audience ? t(`place.audience.${place!.audience}`) : null}
         phone={place!.phone}
         website={place!.website}
-        directionsHref={visitWhen ? null : directions}
+        // Nothing asks for directions as a button when the one action is
+        // planning a visit, or a visit is booked (D-273); the row has them.
+        directionsHref={visitWhen || plansVisit ? null : directions}
         addressFirst={visitWhen !== null}
-        // A member's one primary action is booking a visit (D-235), straight
-        // into the New trip steps with this place already chosen.
-        // With a visit booked, nothing asks to plan one (D-273).
-        primaryAction={
-          (demoRole ?? trueRole) === 'member' && !visitWhen
-            ? {
-                label: t('place.schedule'),
-                href: `/trips/new/?${new URLSearchParams({
-                  place: place!.id,
-                  name: place!.name,
-                  category: place!.category,
-                  ...(place!.address ? { address: place!.address } : {}),
-                }).toString()}`,
-              }
-            : null
-        }
         hoursHref={googleHref}
         isSaved={saved}
         notice={
@@ -498,6 +503,23 @@ function PlaceScreen() {
                 },
               ]
             : []),
+          // The program's policies, with the other rows (Will, 6 October,
+          // D-326; was the foot of the page, D-270): a member can read them
+          // before booking, and see how many are signed. Members only —
+          // staff do not sign a program's policies.
+          ...(asksMember && !policiesOnTop
+            ? [
+                {
+                  id: 'policies',
+                  label: t('place.policies'),
+                  description: allSigned
+                    ? t('place.policies.allSigned', { total: signedSoFar.total })
+                    : t('place.policies.hint', { signed: signedSoFar.signed, total: signedSoFar.total }),
+                  href: policiesHref(place!.id, place!.name),
+                  icon: allSigned ? <SignedIcon {...QUICK} /> : <BookIcon {...QUICK} />,
+                },
+              ]
+            : []),
         ]}
         labels={{
           directions: t('place.directions'),
@@ -515,27 +537,6 @@ function PlaceScreen() {
         }}
       />
 
-      {/*
-        The program's policies, at the foot of the page (Will, 5 October,
-        D-270): a member can read them before booking, and see how many are
-        signed. Members only — staff do not sign a program's policies.
-      */}
-      {asksMember && !policiesOnTop ? (
-        <MenuList
-          label={t('place.policies')}
-          items={[
-            {
-              id: 'policies',
-              label: t('place.policies'),
-              description: allSigned
-                ? t('place.policies.allSigned', { total: signedSoFar.total })
-                : t('place.policies.hint', { signed: signedSoFar.signed, total: signedSoFar.total }),
-              href: policiesHref(place!.id, place!.name),
-              icon: allSigned ? <SignedIcon {...QUICK} /> : <BookIcon {...QUICK} />,
-            },
-          ]}
-        />
-      ) : null}
     </Page>
   );
 }

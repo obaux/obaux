@@ -388,7 +388,9 @@ user-visible string; texts say "Pam:" too (D-321). Book a visit: booked / wrote 
 Add a person, the member arrives on "Your visit is booked" (D-322). Program Home head
 simplified (D-323). Member profile (program view): Policies signed row and page with
 a finish-signing alert; one SignedMark (D-324). Member stories in Created / Invited by program / Invited by case
-manager (D-325). Invite codes stay "PAM-". Note:
+manager (D-325). Invite codes stay "PAM-". A screen's one action can be the
+page's `footer` (sticky, with the page fading out above it); a place's Plan a
+trip is, and Policies to sign is a quick-action row (D-326). Note:
 the web app's vitest tests are not run in CI. How points should be awarded — two rules live
 (save a place, finish setup), the rest to build, with order and open
 questions — is specified in `docs/points-awarding.md`. The

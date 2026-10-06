@@ -17,7 +17,6 @@ import { CATEGORY_DEFINITIONS, type Category } from '@pam/config';
 import { pam } from './tokens.stylex.js';
 import { textLinkLook } from './TextLink.js';
 import { MenuList, type MenuItem } from './MenuList.js';
-import { edgeFade } from './edgeFade.js';
 
 /**
  * One place, on its own screen.
@@ -80,13 +79,6 @@ export interface PlaceDetailProps {
   readonly phone?: string | null;
   readonly website?: string | null;
   readonly directionsHref?: string | null;
-  /**
-   * The screen's one primary action, in place of "How to get there" — a
-   * member's "Plan a trip" (D-235). It floats at the foot of the screen, so
-   * it is always in reach however far somebody scrolls (Will, 6 October,
-   * D-309). Directions then lives in the quick actions.
-   */
-  readonly primaryAction?: { readonly label: string; readonly href: string } | null;
   readonly hoursHref?: string | null;
   readonly isSaved?: boolean;
   readonly onSave?: () => void;
@@ -179,21 +171,6 @@ const styles = stylex.create({
   dayLine: { minHeight: '44px', paddingInline: '12px', borderRadius: '12px' },
   todayLine: { backgroundColor: colorVars['--color-background-muted'] },
   todayTag: { fontSize: '13px', fontWeight: 600, color: colorVars['--color-text-accent'] },
-  // The primary action, floating at the foot of the screen (D-309). The
-  // place page has no tab bar, so it rests on the bottom edge, clear of the
-  // home indicator, with the same fade above it as every bottom edge.
-  footer: {
-    position: 'fixed',
-    insetInline: 0,
-    bottom: 0,
-    zIndex: 11,
-    backgroundColor: colorVars['--color-background-body'],
-    paddingBlockStart: '8px',
-    paddingBlockEnd: 'calc(16px + env(safe-area-inset-bottom, 0px))',
-  },
-  footerInner: { width: '100%', maxWidth: '560px', marginInline: 'auto', paddingInline: '24px' },
-  // So the end of the page scrolls clear of the footer.
-  footerSpacer: { height: '72px', flexShrink: 0 },
 });
 
 /** One labelled row in the "more" column, so the four of them cannot drift. */
@@ -242,7 +219,6 @@ export function PlaceDetail({
   phone,
   website,
   directionsHref,
-  primaryAction = null,
   hoursHref,
   isSaved = false,
   onSave,
@@ -460,22 +436,11 @@ export function PlaceDetail({
       {aboutCard}
 
       {/*
-        The one primary action on the screen (§2.5). Getting there is why
-        somebody opened a place rather than reading the card.
+        How to get there, the one primary action on a screen whose reader is
+        not a member (§2.5). A member's "Plan a trip" is the page's footer
+        now (D-326), not drawn here, and directions sit among the rows.
       */}
-      {primaryAction ? (
-        <>
-          <VStack aria-hidden xstyle={styles.footerSpacer} />
-          <HStack xstyle={styles.footer}>
-            <VStack aria-hidden xstyle={edgeFade.above} />
-            <VStack xstyle={styles.footerInner}>
-              <BigButton label={primaryAction.label} href={primaryAction.href} />
-            </VStack>
-          </HStack>
-        </>
-      ) : directionsHref ? (
-        <BigButton label={labels.directions} href={directionsHref} />
-      ) : null}
+      {directionsHref ? <BigButton label={labels.directions} href={directionsHref} /> : null}
 
       {addressFirst ? null : addressCard}
 

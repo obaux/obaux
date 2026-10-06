@@ -166,6 +166,9 @@ On a member's profile a program sees "Policies signed · 3 of 4" and a page
 listing which, with a note on top when the member still has some to sign.
 In Storybook, a member's screens sit under Created, Invited by program and
 Invited by case manager.
+On a place, "Plan a trip" stays at the foot of the screen while you scroll,
+with the page fading out above it instead of a hard edge, and "Policies to
+sign" sits with Send a message and Call.
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 

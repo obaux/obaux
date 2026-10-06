@@ -226,10 +226,11 @@ export function BackButton({
 export function SubPage({
   children,
   gap = 4,
+  footer,
   ...header
-}: SubPageHeaderProps & { readonly children: ReactNode; readonly gap?: 2 | 3 | 4 }) {
+}: SubPageHeaderProps & { readonly children: ReactNode; readonly gap?: 2 | 3 | 4; readonly footer?: ReactNode }) {
   return (
-    <Page gap={gap}>
+    <Page gap={gap} footer={footer}>
       <SubPageHeader {...header} />
       {children}
     </Page>
