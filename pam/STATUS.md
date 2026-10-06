@@ -404,7 +404,9 @@ a `Components/<Category>/<Component>` story, and usage rules are MDX under
 (`/place/friend/`, a link with the program and no code); sign in does not
 read that program yet (D-329). The friend screen is "Go together"; a friend who
 joins is worth 150 points (SOP amendment A18), listed first under Ways to
-earn, not yet awarded by the database (D-330). Note:
+earn, not yet awarded by the database (D-330). `ProgramVisitCard` (visit / invite) is the
+program card on Check and Go together; a booked place shows its service in the
+visit card, with no picker (D-332). Note:
 the web app's vitest tests are not run in CI. How points should be awarded — two rules live
 (save a place, finish setup), the rest to build, with order and open
 questions — is specified in `docs/points-awarding.md`. The

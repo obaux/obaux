@@ -194,6 +194,9 @@ banner on Trips is no longer washed out at its top edge (D-329).
 Bringing a friend is now "Go together": the program's picture, a preview of
 the text your friend will get, and 150 points when they join, which the
 Points page lists first among ways to earn (D-330).
+Planning a visit and bringing a friend now share one card that shows the
+program in its colour. Once a visit is booked, the place page names its service
+next to the time instead of showing the service picker (D-332).
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 

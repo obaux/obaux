@@ -21,3 +21,6 @@ type Story = StoryObj<typeof meta>;
 export const Default: Story = {};
 /** A visit already past: no link to change it. */
 export const Past: Story = { args: { eyebrow: 'Your visit', changeLabel: undefined, changeHref: null } };
+
+/** A visit for one of the program's services: the service follows the time (D-332). */
+export const WithService: Story = { args: { service: 'GED classes' } };

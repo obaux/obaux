@@ -1241,7 +1241,6 @@
   "place.services.atProgram": "En la dirección del programa",
   "program.service.address": "Dirección, si no es la del programa",
   "place.services.pickFirst": "Elige un servicio",
-  "place.services.booked": "Tu visita es para",
   "place.dropin.title": "Cuándo venir",
   "place.dropin.weekly": "Cada {day} · {time}",
   "place.dropin.biweekly": "Cada dos semanas, {day} · {time}",

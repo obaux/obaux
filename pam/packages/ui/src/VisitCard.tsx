@@ -27,6 +27,8 @@ export interface VisitCardProps {
   readonly day: string;
   /** "10:00 AM". */
   readonly time: string;
+  /** The service the visit is for, after the time: "10:00 AM · GED classes" (D-332). */
+  readonly service?: string | null;
   /** "Change appointment" — left out for a visit that has already happened. */
   readonly changeLabel?: string;
   readonly changeHref?: string | null;
@@ -66,7 +68,7 @@ const styles = stylex.create({
   },
 });
 
-export function VisitCard({ eyebrow, day, time, changeLabel, changeHref = null }: VisitCardProps) {
+export function VisitCard({ eyebrow, day, time, service = null, changeLabel, changeHref = null }: VisitCardProps) {
   return (
     <Card padding={5} xstyle={styles.card}>
       <VStack gap={3}>
@@ -78,7 +80,7 @@ export function VisitCard({ eyebrow, day, time, changeLabel, changeHref = null }
         </HStack>
         <VStack gap={0.5}>
           <Text xstyle={styles.day}>{day}</Text>
-          <Text xstyle={styles.time}>{time}</Text>
+          <Text xstyle={styles.time}>{service ? `${time} · ${service}` : time}</Text>
         </VStack>
         {changeLabel && changeHref ? (
           <VStack xstyle={styles.rule}>

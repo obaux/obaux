@@ -8027,6 +8027,32 @@ sentence, and make the "you" circle the category's darker shade.
 - **Proven by:** screenshots; the member prototype loads at the old id;
   typecheck; web and Storybook builds; e2e 570/570.
 
+### D-332 — One program card, in its colour; a booked visit names its service
+
+**Date:** 2026-10-06. Will, on Go together's picture and Plan a visit's
+summary card: "A marriage between these two … use the same component as
+booked visit, but update that component to show more color, and create a
+visual variant with friend icons + sign." Then, on a booked place: "no need
+for this dial component visible here, we need this info detailed up top …
+next to time."
+
+- **`ProgramVisitCard`** (`@pam/ui/ProgramVisitCard`). The card takes the
+  category's pale shade. The program's picture (ToneGround plus its icon, ink
+  in the category's deep shade) sits beside the name, with lines under it.
+  - **`visit`:** Plan a visit's Check step. The service, then the day and time.
+  - **`invite`:** Go together. You (the category's deep shade) and an empty
+    "+" overlap the picture's edge, with the name under them and no date.
+    It replaces the big hero square and its circles.
+- **A booked place drops the service picker.** "Your visit is for" with the
+  locked dial is gone. `VisitCard` takes `service`, and the time line reads
+  "10:00 AM · GED classes". `ServiceCards` lost its locked mode and
+  `place.services.booked`.
+- **Stories:** Components › Cards › ProgramVisitCard (Default, WithService,
+  Invite, InviteWork, FamilyServices, NoTone); VisitCard › WithService.
+- **Proven by:** screenshots (Go together, Check, Visit profile, card
+  variants); typecheck; config 238; web and Storybook builds; e2e 570/570;
+  flow map page 2 updated.
+
 ---
 
 ## Notes for whoever picks this up next

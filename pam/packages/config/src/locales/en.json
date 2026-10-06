@@ -1241,7 +1241,6 @@
   "place.services.atProgram": "At the program's address",
   "program.service.address": "Address, if not the program's",
   "place.services.pickFirst": "Pick a service",
-  "place.services.booked": "Your visit is for",
   "place.dropin.title": "When to come",
   "place.dropin.weekly": "Every {day} · {time}",
   "place.dropin.biweekly": "Every other {day} · {time}",

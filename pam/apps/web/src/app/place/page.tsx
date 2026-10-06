@@ -469,6 +469,9 @@ function PlaceScreen() {
                   eyebrow={t(visitAhead ? 'place.visit.next' : 'place.visit.last')}
                   day={visitWhen}
                   time={visitHour}
+                  // The service rides with the time (Will, 6 October, D-332):
+                  // the picker is gone once the visit is booked.
+                  service={visit && service ? service.name : null}
                   changeLabel={visitAhead ? t('place.visit.change') : undefined}
                   changeHref={visitAhead ? changeHref : null}
                 />
@@ -495,12 +498,10 @@ function PlaceScreen() {
         extra={
           <>
             {isDropIn && !visit ? <DropInCard schedule={booking.schedule} /> : null}
-            <ServiceCards
-              services={services}
-              selectedId={service?.id ?? null}
-              onSelect={setPickedService}
-              isLocked={visit !== null}
-            />
+            {/* Booked: the service is in the visit card, not a picker (D-332). */}
+            {visit ? null : (
+              <ServiceCards services={services} selectedId={service?.id ?? null} onSelect={setPickedService} />
+            )}
           </>
         }
         quickActionsLabel={t('place.quick.label')}

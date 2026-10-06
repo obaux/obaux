@@ -1,7 +1,6 @@
 'use client';
 
 import * as stylex from '@stylexjs/stylex';
-import { Card } from '@astryxdesign/core/Card';
 import { HStack } from '@astryxdesign/core/HStack';
 import { Heading } from '@astryxdesign/core/Heading';
 import { SelectableCard } from '@astryxdesign/core/SelectableCard';
@@ -74,33 +73,26 @@ const styles = stylex.create({
   // The ask, as a heading (Will: "bold and larger, so there's better
   // hierarchy"): "Pick a service", and nothing more.
   hint: { fontSize: '20px', lineHeight: 1.3, fontWeight: 700 },
-  eyebrow: { fontSize: '15px', fontWeight: 600 },
 });
 
 export function ServiceCards({
   services,
   selectedId,
   onSelect,
-  isLocked = false,
 }: {
   readonly services: readonly DummyService[];
   readonly selectedId: string | null;
   readonly onSelect: (id: string | null) => void;
-  /** A visit booked: only its service is shown, outlined, still (D-313). */
-  readonly isLocked?: boolean;
 }) {
   const { t } = useI18n();
-  const shown = isLocked ? services.filter((s) => s.id === selectedId) : services;
+  // Before booking only: a booked visit names its service in the visit card (D-332).
+  const shown = services;
   if (shown.length === 0) return null;
   return (
     <VStack gap={2}>
-      {isLocked ? (
-        <Text xstyle={styles.eyebrow}>{t('place.services.booked')}</Text>
-      ) : (
-        <Heading level={2} xstyle={styles.hint}>
-          {t('place.services.pickFirst')}
-        </Heading>
-      )}
+      <Heading level={2} xstyle={styles.hint}>
+        {t('place.services.pickFirst')}
+      </Heading>
       <VStack gap={2} aria-label={t('place.services.label')}>
         {shown.map((s) => {
           const isOn = s.id === selectedId;
@@ -114,23 +106,16 @@ export function ServiceCards({
           );
           return (
             <VStack key={s.id} gap={1}>
-              {isLocked ? (
-                // The visit's service, said and still — not a choice any more.
-                <Card variant="muted" padding={4} xstyle={[styles.card, styles.cardOn]}>
-                  {inside}
-                </Card>
-              ) : (
-                <SelectableCard
-                  label={isOn ? `${s.name} · ${t('place.services.selected')}` : s.name}
-                  isSelected={isOn}
-                  onChange={(on) => onSelect(on ? s.id : null)}
-                  variant="muted"
-                  padding={4}
-                  xstyle={[styles.card, isOn && styles.cardOn]}
-                >
-                  {inside}
-                </SelectableCard>
-              )}
+              <SelectableCard
+                label={isOn ? `${s.name} · ${t('place.services.selected')}` : s.name}
+                isSelected={isOn}
+                onChange={(on) => onSelect(on ? s.id : null)}
+                variant="muted"
+                padding={4}
+                xstyle={[styles.card, isOn && styles.cardOn]}
+              >
+                {inside}
+              </SelectableCard>
             </VStack>
           );
         })}

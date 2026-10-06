@@ -8,7 +8,8 @@ import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { POINTS_RULES } from '@pam/config';
 import { DUMMY_PLACES_BY_ID } from '@pam/config/dummy-places';
-import { BigButton, MeIcon, PlusIcon, StarIcon } from '@pam/ui';
+import { BigButton, StarIcon } from '@pam/ui';
+import { ProgramVisitCard } from '@pam/ui/ProgramVisitCard';
 import { SubPage } from '@pam/ui/SubPage';
 import { ToneGround } from '@pam/ui/Tone';
 import { useI18n } from '@/lib/i18n';
@@ -19,9 +20,9 @@ import { CategoryIcon, categoryTone } from './SavedView';
  * Bring a friend (D-329, D-330, Will, 6 October: "How can we make the bring
  * a friend nested screen more attractive?"). An invitation, not a form:
  *
- * - **A picture first**: the program's own art (its category colour and
- *   icon, as on Trips and Saved) with two circles on its edge — you, and an
- *   empty "+" for the friend. "You two, at this place" before a word is read.
+ * - **The program and the two of you first**: `ProgramVisitCard`'s invite
+ *   variant (D-332) — the program's picture in its colour, you and an empty
+ *   "+" beside it, on its pale shade. "You two, at this place".
  * - **One warm sentence**, and what it is worth: +150 points when they join.
  * - **What they'll get**: the text as it will arrive — a bubble and a link
  *   card with the program's name — instead of a raw address. Somebody wary
@@ -45,9 +46,8 @@ const BURST: readonly { readonly dx: number; readonly dy: number; readonly tone:
   { dx: -150, dy: -38, tone: 'var(--color-data-yellow-4)', size: 6 },
 ];
 
-const ART = { width: 52, height: 52, 'aria-hidden': true } as const;
+const ART = { width: 36, height: 36, 'aria-hidden': true } as const;
 const SMALL_ART = { width: 24, height: 24, 'aria-hidden': true } as const;
-const FACE = { width: 26, height: 26, 'aria-hidden': true } as const;
 
 // The ToneGround's pale shade, as a fill (see @pam/ui/Tone).
 const bubbleTone = stylex.create({
@@ -62,48 +62,7 @@ const bubbleTone = stylex.create({
   gray: { backgroundColor: 'var(--color-data-gray-1)' },
 });
 
-// You, in the category's deep shade (Will, 6 October): blue for school,
-// green for work, and so on; the accent green only when there is no tone.
-const youTone = stylex.create({
-  blue: { backgroundColor: colorVars['--color-icon-blue'] },
-  green: { backgroundColor: colorVars['--color-icon-green'] },
-  purple: { backgroundColor: colorVars['--color-icon-purple'] },
-  orange: { backgroundColor: colorVars['--color-icon-orange'] },
-  red: { backgroundColor: colorVars['--color-icon-red'] },
-  teal: { backgroundColor: colorVars['--color-icon-teal'] },
-  pink: { backgroundColor: colorVars['--color-icon-pink'] },
-  cyan: { backgroundColor: colorVars['--color-icon-cyan'] },
-  gray: { backgroundColor: colorVars['--color-icon-gray'] },
-});
-
 const styles = stylex.create({
-  hero: { alignItems: 'center', paddingBlockStart: '8px' },
-  art: {
-    width: '132px',
-    height: '132px',
-    borderRadius: '28px',
-    position: 'relative',
-    isolation: 'isolate',
-    overflow: 'hidden',
-    color: colorVars['--color-icon-accent'],
-    backgroundColor: colorVars['--color-background-card'],
-  },
-  // The two of you, sitting on the picture's bottom edge.
-  faces: { marginBlockStart: '-28px', position: 'relative', zIndex: 1 },
-  face: {
-    width: '56px',
-    height: '56px',
-    borderRadius: '50%',
-    borderWidth: '4px',
-    borderStyle: 'solid',
-    borderColor: colorVars['--color-background-body'],
-  },
-  you: { backgroundColor: colorVars['--color-accent'], color: colorVars['--color-on-accent'] },
-  friend: {
-    marginInlineStart: '-14px',
-    backgroundColor: colorVars['--color-background-muted'],
-    color: colorVars['--color-icon-secondary'],
-  },
   // Narrow, so the sentence breaks into even lines (Will, 6 October).
   body: { fontSize: '18px', lineHeight: 1.45, textAlign: 'center', alignSelf: 'center', maxWidth: '300px' },
   worth: {
@@ -248,20 +207,13 @@ export function BringFriendScreen({
       }
     >
       <VStack gap={4}>
-        <VStack xstyle={styles.hero} aria-hidden>
-          <HStack align="center" justify="center" xstyle={styles.art}>
-            <ToneGround tone={tone} />
-            <CategoryIcon category={kind} iconSize={ART} isBaked />
-          </HStack>
-          <HStack xstyle={styles.faces}>
-            <HStack align="center" justify="center" xstyle={[styles.face, styles.you, tone ? youTone[tone] : null]}>
-              <MeIcon {...FACE} />
-            </HStack>
-            <HStack align="center" justify="center" xstyle={[styles.face, styles.friend]}>
-              <PlusIcon {...FACE} />
-            </HStack>
-          </HStack>
-        </VStack>
+        {/* The program and the two of you, as one card (D-332). */}
+        <ProgramVisitCard
+          variant="invite"
+          name={placeName}
+          tone={tone}
+          art={<CategoryIcon category={kind} iconSize={ART} isBaked />}
+        />
 
         <Text xstyle={styles.body}>{t('friend.body', { place: placeName })}</Text>
 

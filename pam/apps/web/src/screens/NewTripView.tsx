@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { Button } from '@astryxdesign/core/Button';
-import { Card } from '@astryxdesign/core/Card';
 import { Heading } from '@astryxdesign/core/Heading';
 import { HStack } from '@astryxdesign/core/HStack';
 import { Text } from '@astryxdesign/core/Text';
@@ -24,7 +23,8 @@ import { inviteLink } from '@/lib/appUrl';
 import { navigate } from '@/lib/navigate';
 import { useServices } from '@/lib/useServices';
 import { HelpButton } from './HelpButton';
-import { BigCategoryIcon } from './SavedView';
+import { BigCategoryIcon, CategoryIcon, categoryTone } from './SavedView';
+import { ProgramVisitCard } from '@pam/ui/ProgramVisitCard';
 
 /**
  * New trip — planning a visit (D-225, Will, 2 October: the + on Trips "opens
@@ -92,8 +92,6 @@ const styles = stylex.create({
     borderStyle: 'solid',
     borderColor: colorVars['--color-border'],
   },
-  summaryName: { fontSize: '22px', lineHeight: 1.25, fontWeight: 700 },
-  summaryLine: { fontSize: '18px', lineHeight: 1.4 },
   note: { fontSize: '15px', lineHeight: 1.5 },
 });
 
@@ -412,18 +410,16 @@ export function NewTripView({
 
       {step === 'check' && place && day && time ? (
         <>
-          <Card padding={6}>
-            <VStack gap={4}>
-              <HStack gap={3} align="center" wrap="nowrap">
-                <BigCategoryIcon category={place.category} size={{ width: 40, height: 40, 'aria-hidden': true }} />
-                <Text xstyle={styles.summaryName}>{place.name}</Text>
-              </HStack>
-              {chosenService ? <Text xstyle={styles.summaryLine}>{t('trips.new.service', { service: chosenService.name })}</Text> : null}
-              <Text xstyle={styles.summaryLine}>
-                {dayLong.format(day)} · {timeFmt.format(at(day, time))}
-              </Text>
-            </VStack>
-          </Card>
+          {/* The program in its colour, then what is being booked (D-332). */}
+          <ProgramVisitCard
+            name={place.name}
+            tone={categoryTone(place.category)}
+            art={<CategoryIcon category={place.category} iconSize={{ width: 36, height: 36, 'aria-hidden': true }} isBaked />}
+            lines={[
+              ...(chosenService ? [t('trips.new.service', { service: chosenService.name })] : []),
+              `${dayLong.format(day)} · ${timeFmt.format(at(day, time))}`,
+            ]}
+          />
           <TextArea label={t('trips.new.note')} value={note} onChange={setNote} rows={2} width="100%" />
           <Text type="supporting" xstyle={styles.note}>
             {t('trips.new.example')}
