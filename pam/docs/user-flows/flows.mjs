@@ -159,14 +159,7 @@ export const flows = [
         story: 'member-created--place-profile',
         path: '/place/',
         changed: 'D-313',
-        note: 'Service cards to flip through; the picked one sets the rows and Plan a trip',
-      },
-      service: {
-        title: 'A service',
-        story: 'member-created--place-service',
-        path: '/place/service/',
-        changed: 'D-313',
-        note: 'Its own number, site and policies; Plan a trip for this',
+        note: 'Pre-booking: grey service cards first, About, then rows; drop-in programs say when to come. Post-booking: the visit and its service',
       },
       policies: {
         title: 'Policies to sign',
@@ -245,9 +238,6 @@ export const flows = [
     edges: [
       ['explore', 'place', 'Tap a place'],
       ['place', 'newTrip', 'Plan a trip · Change appointment'],
-      ['place', 'service', 'A service'],
-      ['service', 'newTrip', 'Plan a trip for this', { dashed: true }],
-      ['service', 'policies', 'Policies to sign (this service)', { dashed: true }],
       ['place', 'report', 'Report'],
       ['place', 'policies', 'Policies to sign', { over: true }],
       ['policies', 'policy', 'A policy'],

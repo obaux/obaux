@@ -42,6 +42,9 @@ import { policiesHref } from '../../screens/MemberPoliciesView';
 import { siteName } from '@/lib/siteName';
 import { useServices } from '@/lib/useServices';
 import { ServiceCards } from '../../screens/ServiceCards';
+import { DropInCard } from '../../screens/DropInCard';
+import { bookingFor } from '@pam/config/dummy-booking';
+import { policiesForService } from '@pam/config/dummy-services';
 
 /**
  * One place, on its own screen.
@@ -328,7 +331,10 @@ function PlaceScreen() {
   // The program's policies, for a member (D-270, D-271).
   const asksMember =
     (demoRole ?? trueRole) === 'member' && placeAsksForPolicies(place!.id) && policies.length > 0;
-  const signedSoFar = progress(place!.id, policies);
+  // Counted for the visit's or picked service once there is one (D-313).
+  const servicesHere = forPlace(place!.id);
+  const activeForPolicies = servicesHere.find((s) => s.id === (visit ? visit.serviceId : pickedService)) ?? null;
+  const signedSoFar = progress(place!.id, activeForPolicies ? policiesForService(activeForPolicies, policies, servicesHere) : policies);
   const allSigned = signedSoFar.signed === signedSoFar.total;
   // With a visit booked here (or arriving from Trips), the policies come up
   // under the name — orange to sign, green once signed — instead of at the foot.
@@ -339,6 +345,10 @@ function PlaceScreen() {
   // plan one (D-273).
   const plansVisit = (demoRole ?? trueRole) === 'member' && !visit;
   const services = forPlace(place!.id);
+  // How the program takes people (D-313): a visit to plan, or a schedule
+  // to just turn up to.
+  const booking = bookingFor(place!.id);
+  const isDropIn = booking.kind === 'dropin';
   const activeServiceId = visit ? visit.serviceId : pickedService;
   const service = services.find((s) => s.id === activeServiceId) ?? null;
   // What the page says to call, open and find: the chosen service's, where
@@ -379,9 +389,15 @@ function PlaceScreen() {
     <Page
       gap={4}
       footer={
-        plansVisit ? (
+        isDropIn && !visit ? (
+          // Nothing to book (D-313): the one action is getting there.
+          directions ? <BigButton label={t('place.quick.directions')} href={directions} /> : null
+        ) : plansVisit ? (
           <BigButton
             label={t('place.schedule')}
+            // Pick a service first, like a size before checkout (Will,
+            // D-313): the button waits until one is chosen.
+            isDisabled={services.length > 0 && !service}
             href={`/trips/new/?${new URLSearchParams({
               place: place!.id,
               name: place!.name,
@@ -448,7 +464,7 @@ function PlaceScreen() {
                   label={`${t(allSigned ? 'place.policies.done.title' : 'place.policies.toSign.title')}. ${t(
                     allSigned ? 'place.policies.done.body' : 'place.policies.toSign.body',
                   )}`}
-                  href={policiesHref(place!.id, place!.name)}
+                  href={policiesHref(place!.id, place!.name, service?.id ?? null)}
                 />
               ) : null}
             </VStack>
@@ -456,14 +472,19 @@ function PlaceScreen() {
         }
         // What the program offers, as services (D-313): each a row that
         // opens the service — its own number, site and what to sign.
+        // Before a visit: what the program offers comes first (D-313) — the
+        // services to pick from, or, for a drop-in program, when it meets.
+        layout={visit ? 'default' : 'chooseFirst'}
         extra={
-          <ServiceCards
-            services={services}
-            selectedId={service?.id ?? null}
-            onSelect={setPickedService}
-            isLocked={visit !== null}
-            detailsHref={(s) => `/place/service/?${new URLSearchParams({ place: place!.id, id: s.id }).toString()}`}
-          />
+          <>
+            {isDropIn && !visit ? <DropInCard schedule={booking.schedule} /> : null}
+            <ServiceCards
+              services={services}
+              selectedId={service?.id ?? null}
+              onSelect={setPickedService}
+              isLocked={visit !== null}
+            />
+          </>
         }
         quickActionsLabel={t('place.quick.label')}
         // Rows, most important first (Will, 5 October, D-291): getting
@@ -530,7 +551,9 @@ function PlaceScreen() {
           // D-326; was the foot of the page, D-270): a member can read them
           // before booking, and see how many are signed. Members only —
           // staff do not sign a program's policies.
-          ...(asksMember && !policiesOnTop
+          // Not before booking on a program with services (Will, D-313): the
+          // policies are the service's, and come with the visit.
+          ...(asksMember && !policiesOnTop && !(services.length > 0 && !visit)
             ? [
                 {
                   id: 'policies',
@@ -538,7 +561,7 @@ function PlaceScreen() {
                   description: allSigned
                     ? t('place.policies.allSigned', { total: signedSoFar.total })
                     : t('place.policies.hint', { signed: signedSoFar.signed, total: signedSoFar.total }),
-                  href: policiesHref(place!.id, place!.name),
+                  href: policiesHref(place!.id, place!.name, service?.id ?? null),
                   icon: allSigned ? <SignedIcon {...QUICK} /> : <BookIcon {...QUICK} />,
                 },
               ]

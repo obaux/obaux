@@ -106,6 +106,13 @@ export interface PlaceDetailProps {
    */
   readonly extra?: ReactNode;
   /**
+   * `chooseFirst` (D-313): before a visit is booked, what the program
+   * offers comes first — `extra` (the services to pick from, or when a
+   * drop-in program meets), then About, then the rows. The default keeps
+   * the rows first, for a place with a visit booked and for staff.
+   */
+  readonly layout?: 'default' | 'chooseFirst';
+  /**
    * The address before "What this place is" (D-273): with a visit booked,
    * where it is matters more than what it is — the member already decided.
    */
@@ -235,6 +242,7 @@ export function PlaceDetail({
   quickActionsLabel,
   notice,
   extra,
+  layout = 'default',
   addressFirst = false,
   labels,
 }: PlaceDetailProps) {
@@ -430,18 +438,33 @@ export function PlaceDetail({
         on Messages, icon, words, a line under them, a chevron. A row says
         what it does; a circle with a word under it only names it.
       */}
-      {quickActions && quickActions.length > 0 ? (
-        <Card padding={1} xstyle={styles.card}>
-          <MenuList label={quickActionsLabel ?? ''} hasDividers items={quickItems} />
-        </Card>
-      ) : null}
-      {weekSheet}
-      {extra ?? null}
+      {layout === 'chooseFirst' ? (
+        <>
+          {extra ?? null}
+          {aboutCard}
+          {quickActions && quickActions.length > 0 ? (
+            <Card padding={1} xstyle={styles.card}>
+              <MenuList label={quickActionsLabel ?? ''} hasDividers items={quickItems} />
+            </Card>
+          ) : null}
+          {weekSheet}
+        </>
+      ) : (
+        <>
+          {quickActions && quickActions.length > 0 ? (
+            <Card padding={1} xstyle={styles.card}>
+              <MenuList label={quickActionsLabel ?? ''} hasDividers items={quickItems} />
+            </Card>
+          ) : null}
+          {weekSheet}
+          {extra ?? null}
 
-      {/* With a visit booked, where and when come before what it is (D-273, D-281). */}
-      {addressFirst ? addressCard : null}
-      {addressFirst && !hasWeek ? hoursCard : null}
-      {aboutCard}
+          {/* With a visit booked, where and when come before what it is (D-273, D-281). */}
+          {addressFirst ? addressCard : null}
+          {addressFirst && !hasWeek ? hoursCard : null}
+          {aboutCard}
+        </>
+      )}
 
       {/*
         How to get there, the one primary action on a screen whose reader is

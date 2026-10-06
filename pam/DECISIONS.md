@@ -7448,6 +7448,36 @@ each."
   number and address. A service has an `address` of its own, set in its
   editor, shown on its page with Get directions; example trips remember
   their service.
+- **Two profiles, and a checkout feel** (Will, later still: "a more
+  sophisticated interface, almost like an ecommerce feel to checkout,
+  select type, and continue, this takes priority over program info… separate
+  screens for place profile, pre and post booking… services simply laid out
+  in selectable cards, and a different color (gray)… some programs won't
+  have services… some programs won't have a booking thing, only day/time…
+  weekly, bi weekly, or monthly. About program should come next under the
+  services, then the rest of action menu items"; and: keep the "Which
+  service?" step, drop the service details page; no policies row before
+  booking on a program with services).
+  - **Pre-booking.** Under the name: the services, stacked, grey
+    (`SelectableCard` muted), each small — the name, a line or two, its
+    own number, site and address where they differ. Then About program,
+    then the rows (directions, hours, message, call, website). Plan a trip
+    at the foot waits until a service is picked, like a size before
+    checkout; the picked card outlines and the rows follow it. No Policies
+    to sign here: they are the service's, and come with the visit.
+  - **No services.** The same page without the cards; Plan a trip at
+    once; the policies row stays.
+  - **Drop-in.** A program that meets on a schedule (`dummy-booking.ts`:
+    weekly, every other week, or the first such weekday of the month)
+    shows "When to come" in place of the cards — "Every Tuesday · 4:00
+    PM", the next date, "Nothing to book. Just come at that time." — and
+    Get directions at the foot instead of Plan a trip.
+  - **Post-booking.** As before (the visit on top, policies status, rows,
+    address, hours, About), with the number, site, address and policies the
+    visit's service's, and that one service shown under the visit, outlined
+    and still.
+  - `PlaceDetail.layout = 'chooseFirst'` carries the order; the service
+    details page (`/place/service/`) is gone — the card says what it said.
 - **Open:** whether service names should be free text or picked from a
   list Pam keeps (free text here; a list would make Explore filterable by
   service). Storing services is a schema change for Will.

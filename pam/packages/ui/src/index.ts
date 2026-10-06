@@ -94,6 +94,7 @@ export {
   SignedIcon,
   PlusIcon,
   NewMessageIcon,
+  ClockIcon,
 } from './icons.js';
 export { SavedStrip, type SavedStripProps, type SavedStripPlace } from './SavedStrip.js';
 export {

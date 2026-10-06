@@ -32,18 +32,29 @@ export const NewTripService: Story = screen('member', 'New trip — which servic
 });
 /*
  * A place, as a member sees it (Will, 5 October, D-305: "one storybook story
- * with parameters to switch"). Two kinds:
- *   - Place profile: no visit booked — "Plan a trip", the hours, the rest.
+ * with parameters to switch"). Four kinds (D-313):
+ *   - Place profile: services to pick from, then About, then the rows, and
+ *     "Plan a trip" once one is picked.
+ *   - No services: the same page without the cards; Plan a trip straight away.
+ *   - Drop-in: a program that meets on a schedule — "When to come", no
+ *     booking, Get directions at the foot.
  *   - Visit profile: a visit booked — "Your next visit" and Change
- *     appointment on top, then address and hours.
- * And either can have a new message from the program waiting, shown as the
- * "New message" row with a pink dot. Each combination is a real example
+ *     appointment on top, the visit's service, then address and hours.
+ * A new message from the program can wait on the first and last, shown as
+ * the "New message" row with a pink dot. Each combination is a real example
  * place, so what is on screen is what the app would show for it.
  */
-type PlaceProfileArgs = { profile: 'Place profile' | 'Visit profile'; newMessage: boolean };
+type PlaceProfileArgs = {
+  profile: 'Place profile' | 'No services' | 'Drop-in' | 'Visit profile';
+  newMessage: boolean;
+};
 const PLACE_FOR: Record<string, Record<string, string>> = {
   'Place profile|false': { id: 'dummy-place-library', from: 'explore' },
-  'Place profile|true': { id: 'dummy-place-food', from: 'explore' },
+  'Place profile|true': { id: 'dummy-place-learning', from: 'explore' },
+  'No services|false': { id: 'dummy-place-money', from: 'explore' },
+  'No services|true': { id: 'dummy-place-money', from: 'explore' },
+  'Drop-in|false': { id: 'dummy-place-family', from: 'explore' },
+  'Drop-in|true': { id: 'dummy-place-food', from: 'explore' },
   'Visit profile|true': { id: 'dummy-place-learning', from: 'explore', trip: 'dummy-trip-1' },
   'Visit profile|false': { id: 'dummy-place-workforce', from: 'explore', trip: 'dummy-trip-2' },
 };
@@ -54,17 +65,12 @@ export const PlaceProfile: Story = screenWithControls<PlaceProfileArgs>(
   {
     args: { profile: 'Place profile', newMessage: false },
     argTypes: {
-      profile: { control: 'inline-radio', options: ['Place profile', 'Visit profile'] },
+      profile: { control: 'inline-radio', options: ['Place profile', 'No services', 'Drop-in', 'Visit profile'] },
       newMessage: { control: 'boolean', name: 'New message from the program' },
     },
   },
   (args) => PLACE_FOR[`${args.profile}|${args.newMessage}`]!,
 );
-// One of a program's services (D-313): its own number, site and policies.
-export const PlaceService: Story = screen('member', 'A service of a place', '/place/service/', {
-  place: 'dummy-place-learning',
-  id: 'service-ged',
-});
 // A program's policies, read and signed by a member (D-270).
 export const PlacePolicies: Story = screen('member', 'Policies to sign', '/place/policies/', {
   id: 'dummy-place-learning',
