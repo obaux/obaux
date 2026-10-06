@@ -7968,6 +7968,42 @@ add it as an item on top of quick actions list."
   570/570 (the row-order test now expects Bring a friend first); flow map
   page 2 redrawn.
 
+### D-330 — Go together: Bring a friend as an invitation, worth 150 points
+
+**Date:** 2026-10-06. Will: "How can we make the bring a friend nested
+screen more attractive?" Then, on the proposal: "Yes build it, and let's also
+award points, and update how to earn points in profile rewards page", and
+"Let's make 150 points for inviting a friend."
+
+- **The screen is an invitation, not a form** (`BringFriendView`):
+  - Title "Go together", with the program name under it.
+  - The program's own picture (its category colour and icon, as on Trips and
+    Saved), with two circles on its bottom edge: you (accent) and an empty
+    "+" for the friend.
+  - One sentence: "Things are easier with someone you know. Send a friend a
+    link to join {program}."
+  - A light-green pill: "+150 points when they join".
+  - **What they'll get**: the text as it will arrive, a grey bubble ("Join me
+    at {program} on Pam") holding a link card with the program's picture and
+    name, instead of the raw URL.
+  - One footer button. Once sent it reads "Sent ✓", or "Link copied" where
+    there is no share sheet, and bursts like a Program Home check-in (D-316).
+    Reduced motion: no burst.
+  - The category rides in the link from the place page (`cat=`); an example
+    place falls back to its own.
+- **150 points for a friend who joins.** `POINTS_RULES.refer_someone` 100 →
+  150, the most one action earns; it departs from the SOP's §8 table, so it
+  is SOP amendment A18. Awarded when the friend joins, not when the link is
+  sent. Nothing awards it yet: the database has no referral award and sign in
+  does not read the link's program (D-329).
+- **Where it shows.** Points › Ways to earn lists "Bring a friend who joins
+  +150" first. The place row now reads "Bring a friend · Earn 150 points when
+  they join". The "what happens next" list I had proposed was left out to keep
+  the screen short.
+- **Proven by:** screenshots (Go together, Link copied with the burst, Points);
+  typecheck; config 238 (points test asserts 150), ui 69, web 11; web and
+  Storybook builds; e2e 570/570; flow map page 2 redrawn.
+
 ---
 
 ## Notes for whoever picks this up next

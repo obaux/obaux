@@ -9,7 +9,7 @@ import { placeNameFor } from '../../../screens/MemberPoliciesView';
 function Friend() {
   const params = useSearchParams();
   const id = params.get('id') ?? '';
-  return <BringFriendScreen placeId={id} placeName={placeNameFor(id, params.get('name'))} />;
+  return <BringFriendScreen placeId={id} placeName={placeNameFor(id, params.get('name'))} category={params.get('cat')} />;
 }
 
 export default function PlaceFriendPage() {

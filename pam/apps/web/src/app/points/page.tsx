@@ -13,6 +13,7 @@ import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import {
   BookmarkIcon,
   Page,
+  PeopleIcon,
   PhoneIcon,
   PlusIcon,
   StarIcon,
@@ -223,6 +224,13 @@ export default function PointsPage() {
   const from = current?.minPoints ?? 0;
   const to = next?.minPoints ?? from;
   const ways: { id: string; icon: ReactNode; label: string; worth: string }[] = [
+    {
+      // The most one action earns (D-330): a friend who joins from your link.
+      id: 'friend',
+      icon: <PeopleIcon {...WAY_ICON} />,
+      label: t('points.way.friend'),
+      worth: t('points.way.plus', { count: POINTS_RULES.refer_someone.points }),
+    },
     {
       id: 'attend',
       icon: <TripsIcon {...WAY_ICON} />,

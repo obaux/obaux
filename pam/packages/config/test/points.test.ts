@@ -43,7 +43,8 @@ describe('points rules (SOP §8)', () => {
     expect(POINTS_RULES.attend_appointment_verified.points).toBe(100);
     expect(POINTS_RULES.attend_appointment_sms.points).toBe(60);
     expect(POINTS_RULES.connect_with_mentor.points).toBe(30);
-    expect(POINTS_RULES.refer_someone.points).toBe(100);
+    // Raised from the SOP's 100 by Will (D-330).
+    expect(POINTS_RULES.refer_someone.points).toBe(150);
   });
 });
 

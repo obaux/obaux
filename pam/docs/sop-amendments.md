@@ -437,3 +437,19 @@ route". DECISIONS D-294.
 **What did not change.** Coordinates still beat the address, and Google's
 place ID rides along when Pam has one (D-291). A place with nothing to
 route to still has no Get directions row.
+
+
+## A18 — Bringing a friend is worth 150 points (6 October 2026, Will)
+
+§8's points table gives a referral 100. Will, on the new Bring a friend
+screen: "Let's make 150 points for inviting a friend."
+
+**Where this contradicts the original.** The 100. `POINTS_RULES.refer_someone`
+is 150, the most one action earns, and the points test asserts 150. The Points
+page lists it first under Ways to earn, and a program's Bring a friend row and
+screen say "+150 points when they join". DECISIONS D-330.
+
+**What did not change.** It is awarded when the friend joins, not when the
+link is sent, so sending links earns nothing on its own. Nothing awards it
+yet: the database has no referral award, and sign in does not read the
+link's program (D-329).

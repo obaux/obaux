@@ -110,11 +110,13 @@ export const POINTS_RULES: Readonly<Record<PointsReason, PointsRule>> = {
     dailyCap: 1,
     note: 'First message to a buddy each day.',
   },
+  /** Bring a friend (D-330, Will, 6 October): 150, up from the SOP's 100 — the most a single action earns. */
   refer_someone: {
     reason: 'refer_someone',
-    points: 100,
+    points: 150,
     verification: 'referral_code',
     dailyCap: null,
+    note: 'Awarded when the friend joins from a member\'s Bring a friend link, not when the link is sent.',
   },
   /** §10 step 10: finishing onboarding. */
   finish_setup: { reason: 'finish_setup', points: 25, verification: 'automatic', dailyCap: 1 },

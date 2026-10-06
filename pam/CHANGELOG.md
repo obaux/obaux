@@ -191,6 +191,9 @@ them (D-328).
 A program's page starts its list with "Bring a friend", which opens a link
 to send so a friend can join the same program. The sign-before-you-go
 banner on Trips is no longer washed out at its top edge (D-329).
+Bringing a friend is now "Go together": the program's picture, a preview of
+the text your friend will get, and 150 points when they join, which the
+Points page lists first among ways to earn (D-330).
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 

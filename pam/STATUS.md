@@ -402,7 +402,9 @@ is ready for Claude Design (D-328): the theme, Figtree and `tokens.css` live in
 a `Components/<Category>/<Component>` story, and usage rules are MDX under
 `Foundations/`. A member's program page leads with "Bring a friend"
 (`/place/friend/`, a link with the program and no code); sign in does not
-read that program yet (D-329). Note:
+read that program yet (D-329). The friend screen is "Go together"; a friend who
+joins is worth 150 points (SOP amendment A18), listed first under Ways to
+earn, not yet awarded by the database (D-330). Note:
 the web app's vitest tests are not run in CI. How points should be awarded — two rules live
 (save a place, finish setup), the rest to build, with order and open
 questions — is specified in `docs/points-awarding.md`. The

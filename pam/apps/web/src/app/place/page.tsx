@@ -21,7 +21,7 @@ import { PlaceBarActions, messageHrefFor, newMessageFrom } from '../../screens/P
 import { PlaceDetailSkeleton } from '@pam/ui/Skeletons';
 import { SubPageHeader } from '@pam/ui/SubPage';
 import { HelpButton } from '../../screens/HelpButton';
-import { categoryLabelKey, displayPhone, distanceLabel, NOTICES, type Category } from '@pam/config';
+import { categoryLabelKey, displayPhone, distanceLabel, NOTICES, POINTS_RULES, type Category } from '@pam/config';
 import { DUMMY_PLACES_BY_ID, isDummyPlaceId } from '@pam/config/dummy-places';
 import { useI18n } from '@/lib/i18n';
 import { useSupportPhone } from '@/lib/useSupportPhone';
@@ -514,9 +514,9 @@ function PlaceScreen() {
                 {
                   id: 'friend',
                   label: t('place.quick.friend'),
-                  description: t('place.quick.friend.body'),
+                  description: t('place.quick.friend.body', { count: POINTS_RULES.refer_someone.points }),
                   icon: <PeopleIcon {...QUICK} />,
-                  href: friendHref(place!.id, place!.name),
+                  href: friendHref(place!.id, place!.name, place!.category),
                 },
               ]
             : []),

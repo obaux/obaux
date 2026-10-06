@@ -165,8 +165,8 @@ export const flows = [
         title: 'Bring a friend',
         story: 'member-created--bring-friend',
         path: '/place/friend/',
-        changed: 'D-329',
-        note: 'A link for a friend to join this program too; Send the link',
+        changed: 'D-330',
+        note: 'Go together: the program\'s picture, +150 points, the text as they will get it; Send the link bursts',
       },
       policies: {
         title: 'Policies to sign',
@@ -238,8 +238,8 @@ export const flows = [
         title: 'Points',
         story: 'member-created--points',
         path: '/points/',
-        changed: 'D-278',
-        note: 'Your level with progress to the next, ways to earn, compact ladder, badge medals',
+        changed: 'D-330',
+        note: 'Your level with progress to the next, ways to earn (Bring a friend +150 first), compact ladder, badge medals',
       },
     },
     edges: [
@@ -266,9 +266,9 @@ export const flows = [
       ['profile', 'points', 'Points'],
     ],
     changes: [
+      'D-330 — Go together: Bring a friend redrawn as an invitation; +150 points, first among ways to earn',
       'D-329 — Bring a friend, first among a place\'s rows: a link for another member to join the program',
       'D-313 — a program\'s services on its page, each with its own number, site and policies; the service is picked there, then booking is two steps',
-      'D-327 — Trips: sign-before-you-go is one banner',
     ],
   },
   {
