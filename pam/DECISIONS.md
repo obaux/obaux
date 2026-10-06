@@ -7400,6 +7400,31 @@ phone and website per program."
   and in the join flow's program step (`ProgramDetailsStep`). Nothing to
   add; said here so it is not asked again.
 
+### D-319 — Sign up, one screen at a time, under each role
+
+Will, 6 October: "I don't see sign up screens for program and case manager
+staff individual pages in storybook." The Onboarding folder had each
+role's whole flow, started from Sign in; there was no way to open "About
+you" for a case manager on its own.
+
+- Each role's Screens folder gets a **Sign up** story with a `step`
+  control: Phone, Code, About you, (Your program, for a program lead),
+  What PAM shares, Texts, Welcome. It is `screenWithControls` over
+  `/prototype/join/?step=…`, so picking a step restarts the prototype on
+  that screen.
+- `JoinPreview.startAt` (a `JoinPhase`) tells the join screen where to
+  open; "Code" is the phone step with the number already sent, so it
+  reuses `preview.phone`. `PrototypeJoin` reads `step` from the URL. The
+  real `/join/` passes no preview and is unchanged.
+- A program lead's "Your program" is on the self-claim path (no invite),
+  so that one step drops the invite code: the count reads "3 of 5"
+  there and "of 4" elsewhere, which is what the real flow does.
+- The member's old "Sign up" story (the whole flow from `/join/`) is
+  replaced by this one; Onboarding keeps the walk-throughs.
+- **Proven by:** every step of all three roles opened and titled
+  correctly (19 screenshots); typecheck, web and Storybook builds; e2e
+  570/570.
+
 ---
 
 ## Notes for whoever picks this up next

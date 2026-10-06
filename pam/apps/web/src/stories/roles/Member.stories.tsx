@@ -82,4 +82,33 @@ export const Privacy: Story = screen('member', 'Privacy policy', '/privacy/');
 
 // Before any of it.
 export const SignIn: Story = screen('signed-out', 'Sign in', '/signin/');
-export const SignUp: Story = screen('signed-out', 'Sign up', '/join/');
+// Sign up, step by step, is below (D-319).
+
+/** Each sign-up screen, in order, and the `step` the prototype opens on (D-319). */
+const SIGN_UP_STEPS = {
+  Phone: 'phone',
+  Code: 'code',
+  'About you': 'details',
+  'Your program': 'program',
+  'What PAM shares': 'privacy',
+  Texts: 'texts',
+  Welcome: 'done',
+} as const;
+type SignUpStep = keyof typeof SIGN_UP_STEPS;
+
+/**
+ * Signing up, one screen at a time (D-319, Will, 6 October: "I don't see
+ * sign up screens for program and case manager staff individual pages").
+ * The Onboarding folder walks the whole flow; this opens on any step.
+ */
+type SignUpArgs = { step: SignUpStep };
+export const SignUp: Story = screenWithControls<SignUpArgs>(
+  'member',
+  'Sign up',
+  '/prototype/join/',
+  {
+    args: { step: 'Phone' },
+    argTypes: { step: { control: 'select', options: ['Phone', 'Code', 'About you', 'What PAM shares', 'Texts', 'Welcome'] } },
+  },
+  (args) => ({ kind: 'member', step: SIGN_UP_STEPS[args.step] }),
+);

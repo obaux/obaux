@@ -74,7 +74,8 @@ import { ProgramDetailsStep } from './ProgramDetailsStep';
  * something true about this app in the first minute: things you do here count.
  */
 
-type Phase = 'phone' | 'details' | 'program' | 'waiting' | 'waitingDone' | 'privacy' | 'texts' | 'done';
+export type JoinPhase = 'phone' | 'details' | 'program' | 'waiting' | 'waitingDone' | 'privacy' | 'texts' | 'done';
+type Phase = JoinPhase;
 
 /**
  * Which step a phase is, for the bar. 'program' and the shift it causes to
@@ -150,6 +151,8 @@ export interface JoinPreview {
   readonly phone?: string;
   /** Arriving by an invite link (D-254): the phone is done, open on About you. */
   readonly invite?: Invite;
+  /** Open on this step (D-319): one story per screen, not one per flow. */
+  readonly startAt?: JoinPhase;
 }
 
 export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview | null } = {}) {
@@ -256,8 +259,9 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
       if (preview.kind === 'provider') {
         setProgram({ ...EMPTY_PROGRAM, name: 'Example Learning Center', address: '123 Main St' });
       }
-      // By a link, the phone was done at Sign in (D-254).
-      setPhase(preview.invite ? 'details' : 'phone');
+      // By a link, the phone was done at Sign in (D-254); or wherever the
+      // story asked to open (D-319).
+      setPhase(preview.startAt ?? (preview.invite ? 'details' : 'phone'));
       return;
     }
     if (session.status === 'signed-out') setPhase('phone');

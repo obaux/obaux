@@ -380,7 +380,7 @@ message row becomes "New message" with a pink dot when its program wrote (D-305)
 preview is one line, and Call shows the number (D-306). Points: badges in a card; the
 example member has earned Scholar, shown on the hero card too (D-307). Steward is no longer a badge (D-308). Place: hours as a row (today) with the week in a
 drawer, Plan a trip in a fixed footer, "About program" (D-309). Sign in footer links spaced (D-310); small language dial (D-311);
-Program tab lists policies with the rows and says "Contact phone number" (D-312, D-314). Note:
+Program tab lists policies with the rows and says "Contact phone number" (D-312, D-314). Sign up per step per role in Storybook (D-319). Note:
 the web app's vitest tests are not run in CI. How points should be awarded — two rules live
 (save a place, finish setup), the rest to build, with order and open
 questions — is specified in `docs/points-awarding.md`. The

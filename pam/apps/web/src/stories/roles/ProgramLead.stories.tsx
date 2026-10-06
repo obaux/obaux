@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/nextjs';
-import { screen } from './screen';
+import { screen, screenWithControls } from './screen';
 
 /**
  * A program lead's app, screen by screen (D-217, D-218). Their bar is Home
@@ -26,3 +26,32 @@ export const Notifications: Story = screen('provider', 'Notifications', '/notifi
 export const Place: Story = screen('provider', 'A place', '/place/', { id: 'dummy-place-learning', from: 'explore' });
 export const TextAlerts: Story = screen('provider', 'Text alerts', '/alerts/');
 export const GetHelp: Story = screen('provider', 'Get help', '/help/');
+
+/** Each sign-up screen, in order, and the `step` the prototype opens on (D-319). */
+const SIGN_UP_STEPS = {
+  Phone: 'phone',
+  Code: 'code',
+  'About you': 'details',
+  'Your program': 'program',
+  'What PAM shares': 'privacy',
+  Texts: 'texts',
+  Welcome: 'done',
+} as const;
+type SignUpStep = keyof typeof SIGN_UP_STEPS;
+
+/**
+ * Signing up, one screen at a time (D-319, Will, 6 October: "I don't see
+ * sign up screens for program and case manager staff individual pages").
+ * The Onboarding folder walks the whole flow; this opens on any step.
+ */
+type SignUpArgs = { step: SignUpStep };
+export const SignUp: Story = screenWithControls<SignUpArgs>(
+  'provider',
+  'Sign up',
+  '/prototype/join/',
+  {
+    args: { step: 'Phone' },
+    argTypes: { step: { control: 'select', options: ['Phone', 'Code', 'About you', 'Your program', 'What PAM shares', 'Texts', 'Welcome'] } },
+  },
+  (args) => ({ kind: 'provider', ...(args.step === 'Your program' ? {} : { invite: 'PAM-7Q4K' }), step: SIGN_UP_STEPS[args.step] }),
+);

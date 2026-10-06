@@ -1,7 +1,7 @@
 'use client';
 
 import { useSearchParams } from 'next/navigation';
-import { JoinScreen } from '../../app/join/JoinScreen';
+import { JoinScreen, type JoinPhase } from '../../app/join/JoinScreen';
 import type { JoinKind } from '../../lib/useJoin';
 
 /**
@@ -14,15 +14,28 @@ import type { JoinKind } from '../../lib/useJoin';
  */
 const NAMES: Record<JoinKind, string> = { member: 'Marcus', provider: 'Alice', admin: 'Dana' };
 
+const STEPS: readonly JoinPhase[] = ['phone', 'details', 'program', 'waiting', 'waitingDone', 'privacy', 'texts', 'done'];
+
 export function PrototypeJoin() {
   const params = useSearchParams();
   const raw = params?.get('kind');
   const kind: JoinKind = raw === 'provider' || raw === 'admin' ? raw : 'member';
   // From an invite link's Sign in (D-254): the phone is done, the code known.
   const code = params?.get('invite');
+  // One step on its own (D-319): `step` names the screen the story opens on.
+  // "code" is the phone step with the number already sent.
+  const step = params?.get('step');
+  const startAt: JoinPhase | undefined =
+    step === 'code' ? 'phone' : step && STEPS.includes(step as JoinPhase) ? (step as JoinPhase) : undefined;
   return (
     <JoinScreen
-      preview={{ kind, firstName: NAMES[kind], ...(code ? { invite: { code, role: kind } } : {}) }}
+      preview={{
+        kind,
+        firstName: NAMES[kind],
+        ...(code ? { invite: { code, role: kind } } : {}),
+        ...(step === 'code' ? { phone: '(215) 555-0100' } : {}),
+        ...(startAt ? { startAt } : {}),
+      }}
     />
   );
 }
