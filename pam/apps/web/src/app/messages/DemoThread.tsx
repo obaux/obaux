@@ -26,11 +26,16 @@ export function DemoThread({
   role,
   speechLanguage,
   supportPhone,
+  backHref = '/messages/',
+  backLabel,
 }: {
   readonly conversationId: string;
   readonly role: Role;
   readonly speechLanguage: string;
   readonly supportPhone: string;
+  /** Where Back goes — the program's page when opened from it (D-313). */
+  readonly backHref?: string;
+  readonly backLabel?: string;
 }) {
   const { t } = useI18n();
   const typed = useDemoThread(conversationId);
@@ -68,8 +73,8 @@ export function DemoThread({
       <ThreadHeader
         name={other?.firstName ?? t('messages.thread.someone')}
         context={context}
-        backHref="/messages/"
-        backLabel={t('nav.back.messages')}
+        backHref={backHref}
+        backLabel={backLabel ?? t('nav.back.messages')}
         menuHref={`/messages/thread/options/?id=${encodeURIComponent(conversationId)}`}
       />
       {/* A member's visit with this program, under the name (D-276). */}

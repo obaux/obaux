@@ -1193,8 +1193,6 @@
   "place.quick.newMessage": "Mensaje nuevo",
   "place.services": "Servicios",
   "place.services.label": "Lo que ofrece este programa",
-  "trips.new.what": "¿Qué servicio?",
-  "trips.new.whatHint": "Este programa ofrece más de una cosa. Elige para cuál es tu visita.",
   "trips.new.service": "Para: {service}",
   "program.services": "Servicios",
   "program.services.label": "Lo que ofrece tu programa",
@@ -1241,5 +1239,6 @@
   "place.dropin.next": "Próximo: {date}",
   "place.dropin.body": "No hay que reservar. Solo ven a esa hora.",
   "place.aboutService": "Sobre el servicio",
-  "place.address.service": "Dirección del servicio"
+  "place.address.service": "Dirección del servicio",
+  "place.address.main": "Dirección principal"
 }

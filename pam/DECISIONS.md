@@ -7503,6 +7503,25 @@ each."
     height transition) so the rows below slide rather than jump; both stop
     under reduced motion. The ask is a heading, "Pick a service"; a
     hairline sits under the open/closed line.
+  - **No service step in booking** (Will, then: "We can kill the pick a
+    service nested page and adjust the steppers, also when going back from
+    booking flow it should return to the profile page, not all trips
+    page"). The service is picked on the place's page only. New trip from
+    a place is two steps — When, Check — and Back from When returns to
+    that place's page; from Trips it is three — Where, When, Check — and
+    choosing a program with services in Where opens its page to pick one.
+  - **Two addresses, and back from a message** (Will, then: "create a
+    sample for a service having a different address than the main
+    program… use label 'Main address' vs 'Service address' and use the same
+    mask effect"; "if user selects message from place profile, there should
+    be a back button that tracks back to program profile, so it's easy for
+    them to text, then return to book a visit"). Example Library Tech
+    Lab's Computer classes now meet at another address. When a program's
+    services span more than one address, the card reads "Main address"
+    until a service with its own is picked, then "Service address", the
+    words masking in anew. A conversation opened from a place's page
+    carries `from=place&place=`, and its Back reads "Back to Program"
+    and returns to that page.
   - `PlaceDetail.layout = 'chooseFirst'` carries the order; the service
     details page (`/place/service/`) is gone — the page says what it said.
 - **Open:** whether service names should be free text or picked from a

@@ -180,7 +180,7 @@ export const flows = [
         story: 'member-created--new-trip',
         path: '/trips/new/',
         changed: 'D-313',
-        note: 'A "Which service?" step when the program offers more than one',
+        note: 'From a place: When, Check (2 steps), Back returns to the place. From Trips: Where, When, Check',
       },
       report: { title: 'Report a place', story: 'member-created--report-place', path: '/flag/' },
       saved: { title: 'Saved', story: 'member-created--saved', path: '/saved/' },

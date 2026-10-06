@@ -12,7 +12,6 @@ import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { CATEGORY_DEFINITIONS, categoryLabelKey, type Category } from '@pam/config';
 import { DUMMY_PLACES_BY_ID, type DummySavedPlace } from '@pam/config/dummy-places';
-import type { DummyService } from '@pam/config/dummy-services';
 import { BigButton, ExploreIcon } from '@pam/ui';
 import { Icon } from '@astryxdesign/core/Icon';
 import { IconButton } from '@astryxdesign/core/IconButton';
@@ -32,10 +31,9 @@ import { BigCategoryIcon } from './SavedView';
  * up the appointment setting journey"). Three short steps on the nested
  * template, one decision each, so nobody has to hold more than one thing:
  *
- *   1. **Where** — a program, the saved ones first, one tap each.
- *   1½. **What** — only when the program offers more than one service
- *      (D-313): which one the visit is for, one tap. Skipped when the link
- *      came from a service's own page, which already said.
+ *   1. **Where** — a program, the saved ones first, one tap each. A
+ *      program with services opens its page instead, where the service is
+ *      picked (D-313); there is no service step here.
  *   2. **When** — a day (the next two weeks of weekdays) and a time, as big
  *      buttons; Next once both are picked.
  *   3. **Check** — the place, the day and time (each with Change), an
@@ -47,7 +45,7 @@ import { BigCategoryIcon } from './SavedView';
  * The trip is kept for the visit (`addedTrips`) so it appears on the map and
  * in the drawer as the real one will; the screen says so under the button.
  */
-type Step = 'where' | 'what' | 'when' | 'check';
+type Step = 'where' | 'when' | 'check';
 
 const TIMES: readonly (readonly [number, number])[] = [
   [9, 0],
@@ -166,12 +164,15 @@ export function NewTripView({
   const { forPlace } = useServices();
   const initial = useMemo(() => seedToPlace(initialPlace), [initialPlace]);
   const [place, setPlace] = useState<DummySavedPlace | null>(initial);
-  // The program's services (D-313): more than one means a What step.
+  // The service picked on the place's page (D-313), carried in the link.
   const offered = place ? forPlace(place.id) : [];
-  const [service, setService] = useState<DummyService | null>(null);
-  const chosenService = service ?? (initialService ? (offered.find((s) => s.id === initialService) ?? null) : null);
-  const asksWhat = offered.length > 1 && !changing;
-  const [step, setStep] = useState<Step>(initial ? (initialService || forPlace(initial.id).length <= 1 || changing ? 'when' : 'what') : 'where');
+  const chosenService = initialService ? (offered.find((s) => s.id === initialService) ?? null) : null;
+  // Started from a place's page: two steps, and Back returns to that page
+  // (Will, D-313: "when going back from booking flow it should return to
+  // the profile page, not all trips page").
+  const fromPlace = initial !== null && !changing;
+  const placeHref = initial ? `/place/?id=${encodeURIComponent(initial.id)}` : '/trips/';
+  const [step, setStep] = useState<Step>(initial ? 'when' : 'where');
   const [day, setDay] = useState<Date | null>(null);
   const [time, setTime] = useState<readonly [number, number] | null>(null);
   const [note, setNote] = useState('');
@@ -231,18 +232,16 @@ export function NewTripView({
     );
   }
 
-  const totalSteps = asksWhat ? 4 : 3;
-  const stepNumber = step === 'where' ? 1 : step === 'what' ? 2 : step === 'when' ? totalSteps - 1 : totalSteps;
+  const totalSteps = fromPlace ? 2 : 3;
+  const stepNumber = step === 'where' ? 1 : step === 'when' ? totalSteps - 1 : totalSteps;
   const title =
     changing && step === 'when'
       ? t('trips.new.changeTitle')
       : step === 'where'
         ? t('trips.new.where')
-        : step === 'what'
-          ? t('trips.new.what')
-          : step === 'when'
-            ? t('trips.new.when')
-            : t('trips.new.check');
+        : step === 'when'
+          ? t('trips.new.when')
+          : t('trips.new.check');
 
   return (
     <SubPage
@@ -252,18 +251,19 @@ export function NewTripView({
       subtitle={
         forMember ? t('trips.new.for', { name: forMember.name }) : changing ? undefined : t('trips.new.step', { current: stepNumber, total: totalSteps })
       }
-      backHref={forMember ? '/program/book/' : '/trips/'}
-      backLabel={step === 'where' ? t('nav.back.trips') : t('trips.new.back')}
+      backHref={forMember ? '/program/book/' : initial ? placeHref : '/trips/'}
+      backLabel={
+        step === 'where' ? t('nav.back.trips') : step === 'when' && initial && !forMember ? t('nav.back.place') : t('trips.new.back')
+      }
       // Back is a step (Will, 3 October, D-235): Check → When → Where →
       // Trips. That is the way to change an answer, so no "Change" links.
       // Moving a visit has no Where: back from When is back to the place.
-      {...(step === 'what'
+      // From a place's page, When has no step behind it: Back is the page.
+      {...(step === 'when' && !initial
         ? { onBack: () => setStep('where') }
-        : step === 'when' && !changing
-          ? { onBack: () => setStep(asksWhat ? 'what' : 'where') }
-          : step === 'check'
-            ? { onBack: () => setStep('when') }
-            : {})}
+        : step === 'check'
+          ? { onBack: () => setStep('when') }
+          : {})}
       // Plan a trip (D-235): search where Help was on the first step; no
       // Help on When either (Will). Check and Done keep Help.
       // The step's one button at the foot of the screen (D-326), like a
@@ -321,7 +321,7 @@ export function NewTripView({
             href="/"
             xstyle={styles.round}
           />
-        ) : step === 'when' || step === 'what' ? undefined : (
+        ) : step === 'when' ? undefined : (
           <HelpButton />
         )
       }
@@ -341,9 +341,13 @@ export function NewTripView({
               description: t(categoryLabelKey(p.category)),
               icon: <BigCategoryIcon category={p.category} size={ICON} />,
               onSelect: () => {
+                // A program with services: its page, to pick one (D-313).
+                if (forPlace(p.id).length > 0) {
+                  navigate(`/place/?id=${encodeURIComponent(p.id)}`);
+                  return;
+                }
                 setPlace(p);
-                setService(null);
-                setStep(forPlace(p.id).length > 1 ? 'what' : 'when');
+                setStep('when');
               },
             })),
               // A fourth way on (Will, 3 October): every place, on Explore.
@@ -354,30 +358,6 @@ export function NewTripView({
                 href: '/',
               },
             ]}
-          />
-        </>
-      ) : null}
-
-      {step === 'what' && place ? (
-        <>
-          <Text xstyle={styles.placeName}>{place.name}</Text>
-          <Text type="supporting" xstyle={styles.hint}>
-            {t('trips.new.whatHint')}
-          </Text>
-          <MenuList
-            label={t('trips.new.what')}
-            hasDividers
-            items={offered.map((s) => ({
-              id: s.id,
-              label: s.name,
-              description: s.description,
-              isDescriptionOneLine: true,
-              icon: <BigCategoryIcon category={place.category} size={ICON} />,
-              onSelect: () => {
-                setService(s);
-                setStep('when');
-              },
-            }))}
           />
         </>
       ) : null}

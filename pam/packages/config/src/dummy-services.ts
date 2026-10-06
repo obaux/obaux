@@ -75,7 +75,7 @@ export const DUMMY_SERVICES: readonly DummyService[] = [
     description: 'Six weeks from the mouse to email, forms and job sites. Tuesday and Thursday afternoons.',
     phone: null,
     website: 'https://example.org/lab-classes',
-    address: null,
+    address: '1500 Spring Garden St, Philadelphia, PA 19130',
     policyIds: [],
   },
   {

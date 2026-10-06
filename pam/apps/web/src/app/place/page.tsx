@@ -422,7 +422,7 @@ function PlaceScreen() {
           onSave={signedIn && (demoRole ?? trueRole) !== 'provider' ? toggleSave : undefined}
           onShare={() => void sharePlace(place!.name, place!.address)}
           flagHref={`/flag/?place=${encodeURIComponent(place!.id)}`}
-          messageHref={messageHrefFor(place!.name)}
+          messageHref={messageHrefFor(place!.name, place!.id)}
         />,
       )}
 
@@ -516,7 +516,7 @@ function PlaceScreen() {
                 label: t('place.quick.newMessage'),
                 description: unread.preview,
                 icon: <MessagesIcon {...QUICK} />,
-                href: unread.href,
+                href: `${unread.href}${unread.href.includes('?') ? '&' : '?'}from=place&place=${encodeURIComponent(place!.id)}`,
                 hasDot: true,
                 // One line, then "…" (Will, D-306): the row says there is a
                 // message, the conversation says the rest.
@@ -527,7 +527,7 @@ function PlaceScreen() {
                 label: t('place.quick.message'),
                 description: t('place.quick.message.body'),
                 icon: <MessagesIcon {...QUICK} />,
-                href: messageHrefFor(place!.name),
+                href: messageHrefFor(place!.name, place!.id),
               },
           ...(phone
             ? [
@@ -581,7 +581,14 @@ function PlaceScreen() {
           today: t('place.hours.today'),
           hoursOnGoogle: t('place.hoursOnGoogle'),
           about: service?.description ? t('place.aboutService') : t('place.about'),
-          address: service?.address ? t('place.address.service') : t('place.address'),
+          // Services at more than one address (Will, D-313): the card says
+          // which — the program's "Main address", or the picked "Service
+          // address" — and the words mask in anew when it changes.
+          address: service?.address
+            ? t('place.address.service')
+            : services.some((s) => s.address)
+              ? t('place.address.main')
+              : t('place.address'),
           save: t('place.save'),
           saved: t('places.saved'),
           share: t('place.share'),

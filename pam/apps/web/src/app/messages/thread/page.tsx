@@ -56,6 +56,11 @@ function ThreadScreen() {
   const { state: session } = useSession();
   const params = useSearchParams();
   const conversationId = params.get('id');
+  // Opened from a program's page (D-313): Back returns there, so a member
+  // can ask a question and go straight back to booking.
+  const fromPlaceId = params.get('from') === 'place' ? params.get('place') : null;
+  const backHref = fromPlaceId ? `/place/?id=${encodeURIComponent(fromPlaceId)}` : '/messages/';
+  const backLabel = fromPlaceId ? t('nav.back.program') : t('nav.back.messages');
   const demo = isDummyId(conversationId);
 
   const signedIn = session.status === 'signed-in';
@@ -86,7 +91,7 @@ function ThreadScreen() {
   if (session.status === 'signed-out' || session.status === 'no-profile' || session.status === 'suspended') {
     return (
       <Page gap={4}>
-        <SubPageHeader title={t('messages.title')} backHref="/messages/" backLabel={t('nav.back.messages')} />
+        <SubPageHeader title={t('messages.title')} backHref={backHref} backLabel={backLabel} />
         <NotIn status={session.status} title={t('messages.signedOut.title')} body={t('messages.signedOut.body')} />
       </Page>
     );
@@ -96,7 +101,7 @@ function ThreadScreen() {
     const key = session.offline ? 'offline' : 'something_went_wrong';
     return (
       <Page gap={4}>
-        <SubPageHeader title={t('messages.title')} backHref="/messages/" backLabel={t('nav.back.messages')} />
+        <SubPageHeader title={t('messages.title')} backHref={backHref} backLabel={backLabel} />
         <Notice
           notice={key}
           title={t(NOTICES[key].titleKey)}
@@ -111,7 +116,7 @@ function ThreadScreen() {
   if (!canMessage) {
     return (
       <Page gap={4}>
-        <SubPageHeader title={t('messages.title')} backHref="/messages/" backLabel={t('nav.back.messages')} />
+        <SubPageHeader title={t('messages.title')} backHref={backHref} backLabel={backLabel} />
         <Notice
           notice="no_mentors_found"
           title={t('messages.notForRole.title')}
@@ -133,6 +138,8 @@ function ThreadScreen() {
           role={viewedRole ?? 'member'}
           speechLanguage={speechLanguage}
           supportPhone={supportPhone}
+          backHref={backHref}
+          backLabel={backLabel}
         />
       </ThreadFrame>
     );
@@ -157,8 +164,8 @@ function ThreadScreen() {
           <ThreadHeader
             name={title}
             context={context}
-            backHref="/messages/"
-            backLabel={t('nav.back.messages')}
+            backHref={backHref}
+            backLabel={backLabel}
             menuHref={`/messages/thread/options/?id=${encodeURIComponent(conversationId ?? '')}`}
           />
           {/* A member's visit with this program, under the name (D-276). */}
@@ -181,7 +188,7 @@ function ThreadScreen() {
 
   return (
     <Page gap={4}>
-      <SubPageHeader title={title} backHref="/messages/" backLabel={t('nav.back.messages')} />
+      <SubPageHeader title={title} backHref={backHref} backLabel={backLabel} />
 
       {state.status === 'loading' ? <Loading label={t('common.loading')} variant="inline" /> : null}
 
