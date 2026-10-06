@@ -10,7 +10,7 @@ import { HStack } from '@astryxdesign/core/HStack';
 import { Icon } from '@astryxdesign/core/Icon';
 import { IconButton } from '@astryxdesign/core/IconButton';
 import { List, ListItem } from '@astryxdesign/core/List';
-import { SegmentedControl, SegmentedControlItem } from '@astryxdesign/core/SegmentedControl';
+import { DropdownMenu, DropdownMenuRadioGroup, DropdownMenuRadioItem } from '@astryxdesign/core/DropdownMenu';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
@@ -86,6 +86,24 @@ const styles = stylex.create({
     borderColor: colorVars['--color-border'],
   },
   heading: { fontSize: '26px', lineHeight: 1.2, fontWeight: 700 },
+  // "Coming in  this week ▾" (Will, 6 October, D-320): the range is a word
+  // beside the title, underlined, with a chevron — a dropdown, not a bar
+  // of three tabs taking a row of its own.
+  range: {
+    minHeight: '48px',
+    paddingInline: '4px',
+    fontSize: '22px',
+    lineHeight: 1.2,
+    fontWeight: 500,
+    color: colorVars['--color-text-primary'],
+    // The underline is a border: Astryx's button resets text-decoration on
+    // the words inside it.
+    borderRadius: '6px',
+    borderBottomWidth: '2px',
+    borderBottomStyle: 'solid',
+    borderBottomColor: colorVars['--color-border'],
+  },
+  rangeOption: { minHeight: '48px', fontSize: '17px', paddingInlineEnd: '24px' },
   nav: { width: '100%' },
   navMiddle: { flexGrow: 1, minWidth: 0 },
   navLabel: { fontSize: '18px', fontWeight: 600, textAlign: 'center' },
@@ -303,6 +321,26 @@ export function ScheduleView({
         ) : (
           <LargeTitleHeader
             title={t('schedule.title')}
+            titleAccessory={
+              <DropdownMenu
+                button={{
+                  label: t(`schedule.range.${view}`),
+                  'aria-label': `${t('schedule.view.label')}: ${t(`schedule.range.${view}`)}`,
+                  variant: 'ghost',
+                  size: 'sm',
+                  xstyle: styles.range,
+                }}
+                placement="below"
+                alignment="start"
+              >
+                <DropdownMenuRadioGroup label={t('schedule.view.label')} value={view} onChange={(next) => setView(next as View)}>
+                  <DropdownMenuRadioItem value="day" label={t('schedule.range.day')} xstyle={styles.rangeOption} />
+                  <DropdownMenuRadioItem value="week" label={t('schedule.range.week')} xstyle={styles.rangeOption} />
+                  <DropdownMenuRadioItem value="month" label={t('schedule.range.month')} xstyle={styles.rangeOption} />
+                </DropdownMenuRadioGroup>
+              </DropdownMenu>
+            }
+            isAccessoryInline
             actions={
               <>
                 <IconButton
@@ -343,18 +381,8 @@ export function ScheduleView({
         ) : (
           <>
             <VStack gap={3}>
-              <SegmentedControl
-                label={t('schedule.view.label')}
-                value={view}
-                onChange={(next) => setView(next as View)}
-                layout="fill"
-                size="lg"
-              >
-                <SegmentedControlItem value="day" label={t('schedule.view.day')} />
-                <SegmentedControlItem value="week" label={t('schedule.view.week')} />
-                <SegmentedControlItem value="month" label={t('schedule.view.month')} />
-              </SegmentedControl>
-              {/* One header for Day, Week and Month alike (Will, 2 October). */}
+              {/* The range is picked beside the title (D-320); one header for
+                  Day, Week and Month alike (Will, 2 October). */}
               <HStack gap={2} align="center" wrap="nowrap" xstyle={styles.nav}>
                 <IconButton
                   label={t(`schedule.prev.${view}`)}

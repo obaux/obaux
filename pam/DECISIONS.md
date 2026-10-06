@@ -7457,6 +7457,29 @@ white button there."
   still cannot); screenshots of all four screens and the link; config 238,
   ui 67, typecheck, web and Storybook builds; e2e 570/570.
 
+### D-320 — "Coming in  this week ▾": the range is a word beside the title
+
+Will, 6 October: "Let's remove the tab switcher 'day, week, month' and add
+a written filter with dropdown next to title 'Coming in' at the end. So
+default says 'Today', 'This week', 'This month', with down chevron next to
+it, and underline the label. Now it will read 'Coming in' <space> 'this
+week', and ultimately free up space."
+
+- The Day / Week / Month `SegmentedControl` is gone from a program lead's
+  Home. In its place, on the title's own line, a dropdown whose trigger is
+  the current range in words — "today", "this week", "this month" — with
+  a chevron and a 2px underline (a bottom border: Astryx's button resets
+  `text-decoration` on the words inside it). It opens a radio list of the
+  three. The week stays the default (D-267).
+- `LargeTitleHeader` gains `isAccessoryInline`: the accessory sits right
+  after the words, wrapping onto the next line if the phrase is long,
+  rather than at the far end of the line as Saved's switch does (D-233).
+- The old `schedule.view.day/week/month` keys are gone; `schedule.range.*`
+  (en/es, lower case, since they follow "Coming in") replace them. The
+  group's label is still "Show the schedule by", read with the choice.
+- **Proven by:** screenshots closed, open, and after picking "today";
+  config 238 and ui 67, typecheck, web and Storybook builds; e2e 570/570.
+
 ---
 
 ## Notes for whoever picks this up next
