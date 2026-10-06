@@ -12,6 +12,7 @@ import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { CATEGORY_DEFINITIONS, categoryLabelKey, type Category } from '@pam/config';
 import { DUMMY_PLACES_BY_ID, type DummySavedPlace } from '@pam/config/dummy-places';
+import type { DummyService } from '@pam/config/dummy-services';
 import { BigButton, ExploreIcon } from '@pam/ui';
 import { Icon } from '@astryxdesign/core/Icon';
 import { IconButton } from '@astryxdesign/core/IconButton';
@@ -22,6 +23,7 @@ import { useI18n } from '@/lib/i18n';
 import { addTrip, moveTrip } from '@/lib/addedTrips';
 import { inviteLink } from '@/lib/appUrl';
 import { navigate } from '@/lib/navigate';
+import { useServices } from '@/lib/useServices';
 import { HelpButton } from './HelpButton';
 import { BigCategoryIcon } from './SavedView';
 
@@ -31,6 +33,9 @@ import { BigCategoryIcon } from './SavedView';
  * template, one decision each, so nobody has to hold more than one thing:
  *
  *   1. **Where** — a program, the saved ones first, one tap each.
+ *   1½. **What** — only when the program offers more than one service
+ *      (D-313): which one the visit is for, one tap. Skipped when the link
+ *      came from a service's own page, which already said.
  *   2. **When** — a day (the next two weeks of weekdays) and a time, as big
  *      buttons; Next once both are picked.
  *   3. **Check** — the place, the day and time (each with Change), an
@@ -42,7 +47,7 @@ import { BigCategoryIcon } from './SavedView';
  * The trip is kept for the visit (`addedTrips`) so it appears on the map and
  * in the drawer as the real one will; the screen says so under the button.
  */
-type Step = 'where' | 'when' | 'check';
+type Step = 'where' | 'what' | 'when' | 'check';
 
 const TIMES: readonly (readonly [number, number])[] = [
   [9, 0],
@@ -137,10 +142,13 @@ function seedToPlace(seed: TripPlaceSeed | null | undefined): DummySavedPlace | 
 
 export function NewTripView({
   initialPlace = null,
+  initialService = null,
   changing = null,
   forMember = null,
 }: {
   readonly initialPlace?: TripPlaceSeed | null;
+  /** A service already chosen, from its own page (D-313). */
+  readonly initialService?: string | null;
   /**
    * A program booking for somebody who wrote to it (D-316): the trip is
    * theirs — it lands on their Trips — and the program is told so.
@@ -155,9 +163,15 @@ export function NewTripView({
 }) {
   const { t, locale } = useI18n();
   const places = useMemo(() => Object.values(DUMMY_PLACES_BY_ID), []);
+  const { forPlace } = useServices();
   const initial = useMemo(() => seedToPlace(initialPlace), [initialPlace]);
-  const [step, setStep] = useState<Step>(initial ? 'when' : 'where');
   const [place, setPlace] = useState<DummySavedPlace | null>(initial);
+  // The program's services (D-313): more than one means a What step.
+  const offered = place ? forPlace(place.id) : [];
+  const [service, setService] = useState<DummyService | null>(null);
+  const chosenService = service ?? (initialService ? (offered.find((s) => s.id === initialService) ?? null) : null);
+  const asksWhat = offered.length > 1 && !changing;
+  const [step, setStep] = useState<Step>(initial ? (initialService || forPlace(initial.id).length <= 1 || changing ? 'when' : 'what') : 'where');
   const [day, setDay] = useState<Date | null>(null);
   const [time, setTime] = useState<readonly [number, number] | null>(null);
   const [note, setNote] = useState('');
@@ -217,15 +231,18 @@ export function NewTripView({
     );
   }
 
-  const stepNumber = step === 'where' ? 1 : step === 'when' ? 2 : 3;
+  const totalSteps = asksWhat ? 4 : 3;
+  const stepNumber = step === 'where' ? 1 : step === 'what' ? 2 : step === 'when' ? totalSteps - 1 : totalSteps;
   const title =
     changing && step === 'when'
       ? t('trips.new.changeTitle')
       : step === 'where'
-      ? t('trips.new.where')
-      : step === 'when'
-        ? t('trips.new.when')
-        : t('trips.new.check');
+        ? t('trips.new.where')
+        : step === 'what'
+          ? t('trips.new.what')
+          : step === 'when'
+            ? t('trips.new.when')
+            : t('trips.new.check');
 
   return (
     <SubPage
@@ -233,20 +250,66 @@ export function NewTripView({
       // For a member (D-316), the subtitle says who, since the steps are
       // the same ones the member would see.
       subtitle={
-        forMember ? t('trips.new.for', { name: forMember.name }) : changing ? undefined : t('trips.new.step', { current: stepNumber, total: 3 })
+        forMember ? t('trips.new.for', { name: forMember.name }) : changing ? undefined : t('trips.new.step', { current: stepNumber, total: totalSteps })
       }
       backHref={forMember ? '/program/book/' : '/trips/'}
       backLabel={step === 'where' ? t('nav.back.trips') : t('trips.new.back')}
       // Back is a step (Will, 3 October, D-235): Check → When → Where →
       // Trips. That is the way to change an answer, so no "Change" links.
       // Moving a visit has no Where: back from When is back to the place.
-      {...(step === 'when' && !changing
+      {...(step === 'what'
         ? { onBack: () => setStep('where') }
-        : step === 'check'
-          ? { onBack: () => setStep('when') }
-          : {})}
+        : step === 'when' && !changing
+          ? { onBack: () => setStep(asksWhat ? 'what' : 'where') }
+          : step === 'check'
+            ? { onBack: () => setStep('when') }
+            : {})}
       // Plan a trip (D-235): search where Help was on the first step; no
       // Help on When either (Will). Check and Done keep Help.
+      // The step's one button at the foot of the screen (D-326), like a
+      // place's Plan a trip: Next on When, Add this trip on Check.
+      footer={
+        step === 'when' && place ? (
+          <BigButton label={t('trips.new.next')} onPress={() => setStep('check')} isDisabled={!day || !time} />
+        ) : step === 'check' && place && day && time ? (
+          <BigButton
+            label={
+              forMember ? t('trips.new.addFor', { name: forMember.name }) : t(changing ? 'trips.new.saveChange' : 'trips.new.add')
+            }
+            onPress={() => {
+              if (changing) {
+                const when = at(day, time);
+                moveTrip(changing, when.toISOString());
+                setMovedTo(when);
+                return;
+              }
+              const id = `added-${Date.now()}`;
+              addTrip({
+                id,
+                placeId: place.id,
+                placeName: place.name,
+                category: place.category,
+                lat: place.lat,
+                lon: place.lon,
+                startsAt: at(day, time).toISOString(),
+                note: note.trim(),
+                ...(forMember ? { forMemberId: forMember.id, forName: forMember.name } : {}),
+                ...(chosenService ? { serviceId: chosenService.id, serviceName: chosenService.name } : {}),
+              });
+              if (forMember) {
+                // The program's moment (D-316), then its Home — not the
+                // member's Trips, which is theirs.
+                setBookedTripId(id);
+                setBookedAt(at(day, time));
+                return;
+              }
+              // Straight to Trips (Will, 3 October, D-241): the drawer tall,
+              // confetti, and the new trip arriving in the list.
+              navigate(`/trips/?added=${encodeURIComponent(id)}`);
+            }}
+          />
+        ) : null
+      }
       actions={
         step === 'where' ? (
           // Search opens Explore, where every place can be searched (Will,
@@ -258,7 +321,7 @@ export function NewTripView({
             href="/"
             xstyle={styles.round}
           />
-        ) : step === 'when' ? undefined : (
+        ) : step === 'when' || step === 'what' ? undefined : (
           <HelpButton />
         )
       }
@@ -279,7 +342,8 @@ export function NewTripView({
               icon: <BigCategoryIcon category={p.category} size={ICON} />,
               onSelect: () => {
                 setPlace(p);
-                setStep('when');
+                setService(null);
+                setStep(forPlace(p.id).length > 1 ? 'what' : 'when');
               },
             })),
               // A fourth way on (Will, 3 October): every place, on Explore.
@@ -294,9 +358,38 @@ export function NewTripView({
         </>
       ) : null}
 
+      {step === 'what' && place ? (
+        <>
+          <Text xstyle={styles.placeName}>{place.name}</Text>
+          <Text type="supporting" xstyle={styles.hint}>
+            {t('trips.new.whatHint')}
+          </Text>
+          <MenuList
+            label={t('trips.new.what')}
+            hasDividers
+            items={offered.map((s) => ({
+              id: s.id,
+              label: s.name,
+              description: s.description,
+              isDescriptionOneLine: true,
+              icon: <BigCategoryIcon category={place.category} size={ICON} />,
+              onSelect: () => {
+                setService(s);
+                setStep('when');
+              },
+            }))}
+          />
+        </>
+      ) : null}
+
       {step === 'when' && place ? (
         <>
           <Text xstyle={styles.placeName}>{place.name}</Text>
+          {chosenService ? (
+            <Text type="supporting" xstyle={styles.hint}>
+              {t('trips.new.service', { service: chosenService.name })}
+            </Text>
+          ) : null}
           <VStack gap={2}>
             <Heading level={2} xstyle={styles.label}>
               {t('trips.new.day')}
@@ -334,7 +427,6 @@ export function NewTripView({
               })}
             </HStack>
           </VStack>
-          <BigButton label={t('trips.new.next')} onPress={() => setStep('check')} isDisabled={!day || !time} />
         </>
       ) : null}
 
@@ -346,47 +438,13 @@ export function NewTripView({
                 <BigCategoryIcon category={place.category} size={{ width: 40, height: 40, 'aria-hidden': true }} />
                 <Text xstyle={styles.summaryName}>{place.name}</Text>
               </HStack>
+              {chosenService ? <Text xstyle={styles.summaryLine}>{t('trips.new.service', { service: chosenService.name })}</Text> : null}
               <Text xstyle={styles.summaryLine}>
                 {dayLong.format(day)} · {timeFmt.format(at(day, time))}
               </Text>
             </VStack>
           </Card>
           <TextArea label={t('trips.new.note')} value={note} onChange={setNote} rows={2} width="100%" />
-          <BigButton
-            label={
-              forMember ? t('trips.new.addFor', { name: forMember.name }) : t(changing ? 'trips.new.saveChange' : 'trips.new.add')
-            }
-            onPress={() => {
-              if (changing) {
-                const when = at(day, time);
-                moveTrip(changing, when.toISOString());
-                setMovedTo(when);
-                return;
-              }
-              const id = `added-${Date.now()}`;
-              addTrip({
-                id,
-                placeId: place.id,
-                placeName: place.name,
-                category: place.category,
-                lat: place.lat,
-                lon: place.lon,
-                startsAt: at(day, time).toISOString(),
-                note: note.trim(),
-                ...(forMember ? { forMemberId: forMember.id, forName: forMember.name } : {}),
-              });
-              if (forMember) {
-                // The program's moment (D-316), then its Home — not the
-                // member's Trips, which is theirs.
-                setBookedTripId(id);
-                setBookedAt(at(day, time));
-                return;
-              }
-              // Straight to Trips (Will, 3 October, D-241): the drawer tall,
-              // confetti, and the new trip arriving in the list.
-              navigate(`/trips/?added=${encodeURIComponent(id)}`);
-            }}
-          />
           <Text type="supporting" xstyle={styles.note}>
             {t('trips.new.example')}
           </Text>

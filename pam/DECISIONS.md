@@ -7386,6 +7386,56 @@ list of items above, so it's not so hidden."
   count. The old `MenuList` and its import are gone from `ProgramView`.
 - **Proven by:** a screenshot of the Program tab; e2e 570/570.
 
+### D-313 — Services: a program offers several things, each with its own phone, website and policies
+
+**Date:** 2026-10-06. Will: "We need to allow programs to offer different
+kinds of services… add these during onboarding… manage them in edit mode…
+members can view these services from place profiles, and select service
+during booking a trip"; "Different services may require different
+policies, so that should also be considered"; then, "let's start on the
+multi service program detail with unique phone, website, and policies for
+each."
+
+- **What a service is.** One thing a program does — GED classes, the
+  computer room, a job-readiness workshop — with a name, a sentence or two,
+  and, only where they differ from the program's, a phone number and a
+  website. A program with no services listed is one service and reads as it
+  always has; nothing changes for it.
+- **Named at sign-up, filled in later.** The program step of joining asks
+  for the services by name, one field each, "Add another service" — and
+  says that phone, website and policies for each come later from the
+  Program tab, so sign-up stays short (0056's RPC takes the listing's own
+  fields; the names are kept on the client until a services table exists —
+  Will's call, like policies).
+- **Managed from the Program tab.** A Services card under the rows, each
+  service a row that opens its editor (`/program/service/?id=`); in Edit,
+  "Add a service" joins the rows. The editor: name, what it is, phone and
+  website ("leave blank to use the program's"), and which policies are
+  **only for this service**, as checkboxes; Remove asks first.
+- **Which policies apply.** A service names the policies that are only for
+  it; a policy no service names is the program's, asked of everyone. So a
+  newly uploaded policy applies to every service until a lead picks the
+  services it is for — the safe default. The lead's policies list says on
+  each row "Every service" or "Only for GED classes".
+- **A member sees** a Services card on the program's page (D-291 rows,
+  then services, then About); each opens the service: Call (the service's
+  number, or the program's, said so), Website, Policies to sign counted
+  for this service, what it is, and "Plan a trip for this" at the foot
+  (D-326). Policies to sign from a service lists only that service's;
+  Next on a policy walks that list.
+- **Booking** gains a step, "Which service?", only when the program offers
+  more than one (Step 2 of 4); skipped when the link came from a service's
+  own page, and when a visit is being moved. The chosen service is on the
+  Check card and kept on the trip.
+- **Example data** (`dummy-services.ts`): three services at Example
+  Learning Center, two at the Workforce Center, none elsewhere; a lead's
+  edits are kept for the session (`useServices`), like policies.
+- **Open:** whether service names should be free text or picked from a
+  list Pam keeps (free text here; a list would make Explore filterable by
+  service). Storing services is a schema change for Will.
+- **Proven by:** screenshots of every new screen; config 238, ui 67,
+  typecheck, web and Storybook builds; e2e.
+
 ### D-314 — "Contact phone number" on a program's own listing
 
 Will, 6 October: "Contact phone number should be the label on program
@@ -7702,6 +7752,14 @@ better, and add a white gradient so scroll fades out from bottom." And:
 - `PlaceDetail` no longer takes `primaryAction`; the place page passes the
   footer to `Page` and drops the directions button when the footer is the
   action. Staff viewing a place keep "How to get there" as before.
+- **Everywhere a screen has one button** (Will, later the same day: "make
+  sure the footer floating button on template is also used when booking a
+  visit for members, and when signing the policies, for consistency"):
+  New trip's Next (When) and Add this trip / Book for {name} (Check); a
+  member's Policies to sign (Start signing, Continue, Done) and a policy
+  (Sign with the saved signature above it, Next: …, Done — which replaces
+  D-279's own fixed dock and its spacers); a service's Plan a trip for
+  this (D-313). The example note on Check stays in the body, above.
 - **Proven by:** screenshots of the member's place profile (the fade over
   the last card, the row in the list, and the whole page captured with the
   footer at its end); config 238, ui 67, typecheck, web and Storybook

@@ -26,6 +26,10 @@ export const Profile: Story = screen('member', 'Profile', '/profile/');
 
 // Screens you tap into (the nested-page template, D-213).
 export const NewTrip: Story = screen('member', 'New trip', '/trips/new/');
+// From a program with more than one service (D-313): the "Which service?" step.
+export const NewTripService: Story = screen('member', 'New trip — which service', '/trips/new/', {
+  place: 'dummy-place-learning',
+});
 /*
  * A place, as a member sees it (Will, 5 October, D-305: "one storybook story
  * with parameters to switch"). Two kinds:
@@ -56,6 +60,11 @@ export const PlaceProfile: Story = screenWithControls<PlaceProfileArgs>(
   },
   (args) => PLACE_FOR[`${args.profile}|${args.newMessage}`]!,
 );
+// One of a program's services (D-313): its own number, site and policies.
+export const PlaceService: Story = screen('member', 'A service of a place', '/place/service/', {
+  place: 'dummy-place-learning',
+  id: 'service-ged',
+});
 // A program's policies, read and signed by a member (D-270).
 export const PlacePolicies: Story = screen('member', 'Policies to sign', '/place/policies/', {
   id: 'dummy-place-learning',

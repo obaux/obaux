@@ -41,6 +41,12 @@ export interface ProgramDetails {
   readonly address: string;
   readonly phone: string;
   readonly website: string;
+  /**
+   * The services the program offers, by name (D-313). Kept on the client
+   * for now: `request_provider` (0056) takes the listing's own fields, and a
+   * services table is a schema change for Will to approve.
+   */
+  readonly services: readonly string[];
 }
 
 export interface JoinDetails {

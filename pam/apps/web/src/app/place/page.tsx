@@ -39,6 +39,11 @@ import { DUMMY_TRIPS } from '@pam/config/dummy-trips';
 import { readAddedTrips, TRIPS_CHANGED, withMoves } from '@/lib/addedTrips';
 import { placeAsksForPolicies } from '@pam/config/dummy-policies';
 import { policiesHref } from '../../screens/MemberPoliciesView';
+import { siteName } from '@/lib/siteName';
+import { useServices } from '@/lib/useServices';
+import { BigCategoryIcon } from '../../screens/SavedView';
+import { Card } from '@astryxdesign/core/Card';
+import { MenuList } from '@pam/ui/MenuList';
 
 /**
  * One place, on its own screen.
@@ -69,15 +74,6 @@ import { policiesHref } from '../../screens/MemberPoliciesView';
  * still falls back to Places, which was this screen's only behaviour before.
  */
 const QUICK = { width: 26, height: 26, 'aria-hidden': true } as const;
-
-/** "example.org" from "https://www.example.org/learning" — the row's second line. */
-function siteName(url: string): string {
-  try {
-    return new URL(url).hostname.replace(/^www\./, '');
-  } catch {
-    return url;
-  }
-}
 
 const BACK_TARGETS = {
   home: { href: '/', labelKey: 'nav.back.home' },
@@ -228,6 +224,7 @@ function PlaceScreen() {
   const place = state.status === 'ready' ? state.place : null;
   const { policies } = usePolicies();
   const { progress } = useMySignatures();
+  const { forPlace } = useServices();
   // A visit booked here — from Trips, or anywhere — brings the policies up
   // to the top of the page (D-271). Opened from a trip card, the page is
   // about that visit (D-273): its day and time instead of "Plan a trip".
@@ -340,6 +337,7 @@ function PlaceScreen() {
   // always in reach (D-309, D-326). With a visit booked, nothing asks to
   // plan one (D-273).
   const plansVisit = (demoRole ?? trueRole) === 'member' && !visit;
+  const services = forPlace(place!.id);
   // The booked visit (D-273, D-281): "Your next visit", the day large, the
   // time under it, and a way to move it.
   const visitDay = new Intl.DateTimeFormat(locale, { weekday: 'long', month: 'long', day: 'numeric' });
@@ -440,6 +438,26 @@ function PlaceScreen() {
                 />
               ) : null}
             </VStack>
+          ) : null
+        }
+        // What the program offers, as services (D-313): each a row that
+        // opens the service — its own number, site and what to sign.
+        extra={
+          services.length > 0 ? (
+            <Card padding={1}>
+              <MenuList
+                label={t('place.services.label')}
+                hasDividers
+                items={services.map((s) => ({
+                  id: s.id,
+                  label: s.name,
+                  description: s.description,
+                  isDescriptionOneLine: true,
+                  icon: <BigCategoryIcon category={place!.category} size={QUICK} />,
+                  href: `/place/service/?${new URLSearchParams({ place: place!.id, id: s.id }).toString()}`,
+                }))}
+              />
+            </Card>
           ) : null
         }
         quickActionsLabel={t('place.quick.label')}

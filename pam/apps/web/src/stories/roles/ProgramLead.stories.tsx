@@ -14,6 +14,8 @@ type Story = StoryObj;
 
 export const Home: Story = screen('provider', 'Home — coming in', '/');
 export const Program: Story = screen('provider', 'Program', '/program/');
+export const EditService: Story = screen('provider', 'Program — edit a service', '/program/service/', { id: 'service-ged' });
+export const NewService: Story = screen('provider', 'Program — new service', '/program/service/');
 export const Policies: Story = screen('provider', 'Policies for participants', '/program/policies/');
 export const Policy: Story = screen('provider', 'A policy', '/program/policies/view/', { id: 'policy-confidentiality' });
 export const Messages: Story = screen('provider', 'Messages', '/messages/');

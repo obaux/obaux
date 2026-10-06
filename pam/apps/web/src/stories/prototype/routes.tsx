@@ -30,6 +30,8 @@ import PoliciesPage from '../../app/program/policies/page';
 import { PrototypePolicy } from './PrototypePolicy';
 import PlacePoliciesPage from '../../app/place/policies/page';
 import PlacePolicyPage from '../../app/place/policies/view/page';
+import PlaceServicePage from '../../app/place/service/page';
+import ProgramServicePage from '../../app/program/service/page';
 import { PrototypeRequestProgram } from './PrototypeRequestProgram';
 import { InvitesLogScreen } from '../../screens/InvitesLogScreen';
 import TermsPage from '../../app/terms/page';
@@ -92,6 +94,8 @@ export const APP_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   // A program's policies, for a member to read and sign (D-270).
   '/place/policies/': screen(() => <PlacePoliciesPage />),
   '/place/policies/view/': screen(() => <PlacePolicyPage />),
+  // One of a program's services, for a member (D-313).
+  '/place/service/': screen(() => <PlaceServicePage />),
   '/saved/': screen(() => <SavedPage />),
   '/flag/': screen(() => <FlagPage />),
   '/points/': screen(() => <PointsPage />),
@@ -134,6 +138,8 @@ export const APP_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   '/programs/': screen(() => <ExploreScreen mode="programs" />),
   '/programs/new/': screen(() => <AddProgramView />),
   '/program/': screen(() => <ProgramScreen />),
+  // A lead adds or edits one service (D-313).
+  '/program/service/': screen(() => <ProgramServicePage />),
   // D-225: planning a visit, from the + on Trips.
   '/trips/new/': screen(() => <NewTripPage />),
 };

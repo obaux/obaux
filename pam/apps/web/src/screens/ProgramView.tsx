@@ -10,10 +10,13 @@ import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { categoryLabelKey, type Category, displayPhone } from '@pam/config';
 import { DUMMY_SAVED_BY_ROLE } from '@pam/config/dummy-places';
-import { BookIcon, GlobeIcon, Page, PhoneIcon, PlaceDetail, PlacesIcon, TextField, TextLink, googlePlaceHref } from '@pam/ui';
+import { BookIcon, GlobeIcon, Page, PhoneIcon, PlaceDetail, PlacesIcon, PlusIcon, TextField, TextLink, googlePlaceHref } from '@pam/ui';
 import { LargeTitleHeader } from '@pam/ui/LargeTitleHeader';
+import { MenuList } from '@pam/ui/MenuList';
 import { useI18n } from '@/lib/i18n';
 import { usePolicies } from '@/lib/usePolicies';
+import { useServices } from '@/lib/useServices';
+import { BigCategoryIcon } from './SavedView';
 
 /**
  * Program — a program lead's own listing, their second tab (D-218, Will,
@@ -40,6 +43,9 @@ export interface ProgramDetailsData {
 }
 
 const QUICK = { width: 24, height: 24, 'aria-hidden': true } as const;
+const ROW = { width: 26, height: 26, 'aria-hidden': true } as const;
+/** The example program's place (D-218) until a lead's own listing is loaded. */
+const PROGRAM_PLACE_ID = 'dummy-place-learning';
 
 const styles = stylex.create({
   edit: {
@@ -53,8 +59,11 @@ const styles = stylex.create({
     borderColor: colorVars['--color-border'],
   },
   field: { width: '100%' },
+  heading: { fontSize: '18px', fontWeight: 600, lineHeight: 1.3 },
   note: { fontSize: '15px', lineHeight: 1.5 },
   saved: { fontSize: '16px', lineHeight: 1.5 },
+  servicesHint: { fontSize: '15px', lineHeight: 1.5 },
+  empty: { fontSize: '16px', lineHeight: 1.5 },
 });
 
 export function ProgramView({
@@ -71,6 +80,54 @@ export function ProgramView({
   const [saved, setSaved] = useState(false);
   const set = (patch: Partial<ProgramDetailsData>) => setDraft((d) => ({ ...d, ...patch }));
   const { policies } = usePolicies();
+  const { forPlace } = useServices();
+  const services = forPlace(PROGRAM_PLACE_ID);
+
+  // The services (D-313), as rows: reading, each opens its editor; editing,
+  // "Add a service" joins them on top. One list, so a lead learns one place.
+  const serviceRows = services.map((s) => ({
+    id: s.id,
+    label: s.name,
+    description: s.description || undefined,
+    isDescriptionOneLine: true,
+    icon: <BigCategoryIcon category={program.category} size={ROW} />,
+    href: `/program/service/?id=${encodeURIComponent(s.id)}`,
+  }));
+  const servicesCard = (
+    <Card padding={6}>
+      <VStack gap={3}>
+        <VStack gap={1}>
+          <Text xstyle={styles.heading}>{t('program.services.label')}</Text>
+          <Text type="supporting" xstyle={styles.servicesHint}>
+            {t('program.services.hint')}
+          </Text>
+        </VStack>
+        {services.length === 0 && !editing ? (
+          <Text type="supporting" xstyle={styles.empty}>
+            {t('program.services.empty')}
+          </Text>
+        ) : null}
+        <MenuList
+          label={t('program.services')}
+          hasDividers
+          items={[
+            ...(editing
+              ? [
+                  {
+                    id: 'add',
+                    label: t('program.services.add'),
+                    description: t('program.services.add.body'),
+                    icon: <PlusIcon {...ROW} />,
+                    href: '/program/service/',
+                  },
+                ]
+              : []),
+            ...serviceRows,
+          ]}
+        />
+      </VStack>
+    </Card>
+  );
 
   const save = () => {
     if (draft.name.trim() === '') return;
@@ -146,7 +203,9 @@ export function ProgramView({
             <TextLink label={t('program.cancel')} onClick={() => setEditing(false)} />
           </VStack>
         </Card>
-      ) : (
+      ) : null}
+      {editing ? servicesCard : null}
+      {editing ? null : (
         <PlaceDetail
           category={program.category}
           categoryLabel={t(categoryLabelKey(program.category))}
@@ -154,6 +213,7 @@ export function ProgramView({
           address={program.address}
           phone={program.phone || null}
           website={program.website || null}
+          extra={servicesCard}
           // The same round actions a member sees under the name (D-224).
           quickActionsLabel={t('place.quick.label')}
           quickActions={[

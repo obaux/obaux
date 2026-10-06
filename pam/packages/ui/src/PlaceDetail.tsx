@@ -100,6 +100,12 @@ export interface PlaceDetailProps {
    */
   readonly notice?: ReactNode;
   /**
+   * After the rows, before About: what the program offers as services
+   * (D-313) — the page's own card, drawn here so it sits in the order a
+   * member reads the place.
+   */
+  readonly extra?: ReactNode;
+  /**
    * The address before "What this place is" (D-273): with a visit booked,
    * where it is matters more than what it is — the member already decided.
    */
@@ -228,6 +234,7 @@ export function PlaceDetail({
   quickActions,
   quickActionsLabel,
   notice,
+  extra,
   addressFirst = false,
   labels,
 }: PlaceDetailProps) {
@@ -429,6 +436,7 @@ export function PlaceDetail({
         </Card>
       ) : null}
       {weekSheet}
+      {extra ?? null}
 
       {/* With a visit booked, where and when come before what it is (D-273, D-281). */}
       {addressFirst ? addressCard : null}

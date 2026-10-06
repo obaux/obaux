@@ -18,6 +18,8 @@ import { SignaturePad, type SignaturePadHandle } from '@pam/ui/SignaturePad';
 import { SubPage } from '@pam/ui/SubPage';
 import { placeAsksForPolicies, type DummyPolicy } from '@pam/config/dummy-policies';
 import { DUMMY_PLACES_BY_ID } from '@pam/config/dummy-places';
+import { policiesForService, servicesFor } from '@pam/config/dummy-services';
+import { useServices } from '@/lib/useServices';
 import { useI18n } from '@/lib/i18n';
 import { usePolicies } from '@/lib/usePolicies';
 import { useMySignatures } from '@/lib/useMySignatures';
@@ -68,23 +70,6 @@ const styles = stylex.create({
   savedImage: { height: '48px', width: 'auto', maxWidth: '60%', objectFit: 'contain', backgroundColor: 'white', borderRadius: '8px' },
   signedImage: { height: '72px', width: 'auto', maxWidth: '100%', objectFit: 'contain', backgroundColor: 'white', borderRadius: '12px', alignSelf: 'flex-start' },
   // Sign sits right under the signature it will use (Will, D-271).
-  // The pinned sign area (D-279): white, a hairline above, over the bottom
-  // of the screen and its safe area; as wide as the page's column.
-  dock: {
-    position: 'fixed',
-    insetInline: 0,
-    bottom: 0,
-    zIndex: 9,
-    backgroundColor: colorVars['--color-background-body'],
-    borderTopWidth: '1px',
-    borderTopStyle: 'solid',
-    borderTopColor: colorVars['--color-border'],
-    paddingTop: '12px',
-    paddingBottom: 'calc(12px + env(safe-area-inset-bottom, 0px))',
-  },
-  dockInner: { width: '100%', maxWidth: '560px', marginInline: 'auto', paddingInline: '16px' },
-  dockSpacer: { height: '88px', flexShrink: 0 },
-  dockSpacerTall: { height: '196px' },
   // The tiny white × on the box's corner: clear this signature and sign
   // again. 28px to look at, a 48px square to tap (§2.5) — every button keeps
   // the 48px floor, so the circle is drawn inside it.
@@ -160,13 +145,37 @@ export function placeNameFor(placeId: string, fromLink: string | null): string {
   return fromLink || DUMMY_PLACES_BY_ID[placeId]?.name || '';
 }
 
-function policiesHref(placeId: string, placeName: string): string {
-  return `/place/policies/?${new URLSearchParams({ id: placeId, name: placeName }).toString()}`;
+/** With a service (D-313), the list is that service's policies only. */
+function policiesHref(placeId: string, placeName: string, serviceId: string | null = null): string {
+  return `/place/policies/?${new URLSearchParams({ id: placeId, name: placeName, ...(serviceId ? { service: serviceId } : {}) }).toString()}`;
 }
 
-function policyHref(placeId: string, placeName: string, policyId: string): string {
+function policyHref(placeId: string, placeName: string, policyId: string, serviceId: string | null = null): string {
   // `via=list`: Done on the policy then leaves two screens, not one (D-279).
-  return `/place/policies/view/?${new URLSearchParams({ place: placeId, name: placeName, id: policyId, via: 'list' }).toString()}`;
+  return `/place/policies/view/?${new URLSearchParams({
+    place: placeId,
+    name: placeName,
+    id: policyId,
+    via: 'list',
+    ...(serviceId ? { service: serviceId } : {}),
+  }).toString()}`;
+}
+
+/**
+ * The policies this member is asked to sign here: the program's, or, for
+ * one of its services (D-313), the program's own plus that service's.
+ */
+function useShownPolicies(placeId: string, serviceId: string | null) {
+  const { policies } = usePolicies();
+  const { services } = useServices();
+  const here = servicesFor(placeId, services);
+  const service = serviceId ? (here.find((s) => s.id === serviceId) ?? null) : null;
+  const shown: readonly DummyPolicy[] = !placeAsksForPolicies(placeId)
+    ? []
+    : service
+      ? policiesForService(service, policies, here)
+      : policies;
+  return { shown, service };
 }
 
 /** The program's own page — where Done lands when history cannot reach it. */
@@ -195,22 +204,43 @@ function DoneButton({ steps, placeId }: { readonly steps: number; readonly place
 
 export { policiesHref };
 
-export function MemberPoliciesScreen({ placeId, placeName }: { readonly placeId: string; readonly placeName: string }) {
+export function MemberPoliciesScreen({
+  placeId,
+  placeName,
+  serviceId = null,
+}: {
+  readonly placeId: string;
+  readonly placeName: string;
+  /** One service's policies (D-313), from that service's page. */
+  readonly serviceId?: string | null;
+}) {
   const { t, locale } = useI18n();
-  const { policies } = usePolicies();
   const { signedAt, progress } = useMySignatures();
   const day = new Intl.DateTimeFormat(locale, { month: 'long', day: 'numeric' });
-  const shown = placeAsksForPolicies(placeId) ? policies : [];
+  const { shown, service } = useShownPolicies(placeId, serviceId);
   const { signed, total } = progress(placeId, shown);
   const firstUnsigned = shown.find((p) => !signedAt(placeId, p.id));
 
   return (
     <SubPage
       title={t('memberPolicies.title')}
-      subtitle={placeName || undefined}
+      subtitle={service ? `${service.name} · ${placeName}` : placeName || undefined}
       backHref={`/place/?id=${encodeURIComponent(placeId)}`}
       backLabel={t('nav.back.place')}
       actions={<DoneButton steps={1} placeId={placeId} />}
+      // The one button rides the foot of the screen (D-326), on every
+      // screen that has one — the same place as a place's Plan a trip.
+      footer={
+        shown.length === 0 ? null : firstUnsigned ? (
+          <BigButton
+            label={t(signed === 0 ? 'memberPolicies.start' : 'memberPolicies.continue')}
+            href={policyHref(placeId, placeName, firstUnsigned.id, service?.id ?? null)}
+          />
+        ) : (
+          // All signed: the way out is the screen's one button (D-279).
+          <BigButton label={t('memberPolicy.finish')} onPress={() => leaveFlow(1, placeHref(placeId))} />
+        )
+      }
     >
       {shown.length === 0 ? (
         <Text type="supporting" xstyle={styles.intro}>
@@ -233,25 +263,16 @@ export function MemberPoliciesScreen({ placeId, placeName }: { readonly placeId:
                 description: when
                   ? t('memberPolicies.signedOn', { date: day.format(new Date(when)) })
                   : t('memberPolicies.needed'),
-                href: policyHref(placeId, placeName, policy.id),
+                href: policyHref(placeId, placeName, policy.id, service?.id ?? null),
                 icon: when ? <SignedIcon {...ICON} {...stylex.props(styles.signedIcon)} /> : <BookIcon {...ICON} />,
               };
             })}
           />
-          {firstUnsigned ? (
-            <BigButton
-              label={t(signed === 0 ? 'memberPolicies.start' : 'memberPolicies.continue')}
-              href={policyHref(placeId, placeName, firstUnsigned.id)}
-            />
-          ) : (
-            <>
-              <HStack gap={2} align="center" wrap="nowrap">
-                <SignedIcon {...ICON} {...stylex.props(styles.signedIcon)} />
-                <Text xstyle={styles.done}>{t('memberPolicies.done')}</Text>
-              </HStack>
-              {/* All signed: the way out is the screen's one button (D-279). */}
-              <BigButton label={t('memberPolicy.finish')} onPress={() => leaveFlow(1, placeHref(placeId))} />
-            </>
+          {firstUnsigned ? null : (
+            <HStack gap={2} align="center" wrap="nowrap">
+              <SignedIcon {...ICON} {...stylex.props(styles.signedIcon)} />
+              <Text xstyle={styles.done}>{t('memberPolicies.done')}</Text>
+            </HStack>
           )}
         </>
       )}
@@ -264,15 +285,17 @@ export function MemberPolicyScreen({
   placeName,
   policyId,
   via = null,
+  serviceId = null,
 }: {
   readonly placeId: string;
   readonly placeName: string;
   readonly policyId: string | null;
   /** `list` when opened from the list, so Done leaves both (D-279). */
   readonly via?: string | null;
+  /** Signing for one service (D-313): Next walks that service's policies. */
+  readonly serviceId?: string | null;
 }) {
   const { t, locale } = useI18n();
-  const { policies } = usePolicies();
   const { signature, signedAt, signedWith, sign, unsign, forgetSignature } = useMySignatures();
   // Moving to the next policy happens here, not by a new link: the same
   // screen with a different `?id=` would reload the app (D-269).
@@ -280,7 +303,7 @@ export function MemberPolicyScreen({
   const [isSheetOpen, setSheetOpen] = useState(false);
   const day = new Intl.DateTimeFormat(locale, { month: 'long', day: 'numeric' });
 
-  const shown = placeAsksForPolicies(placeId) ? policies : [];
+  const { shown, service } = useShownPolicies(placeId, serviceId);
   const index = shown.findIndex((p) => p.id === (currentId ?? policyId));
   const policy: DummyPolicy | null = index >= 0 ? shown[index]! : null;
   const when = policy ? signedAt(placeId, policy.id) : null;
@@ -298,75 +321,16 @@ export function MemberPolicyScreen({
       <SubPage
         title={policy?.title ?? t('memberPolicies.title')}
         subtitle={policy ? t('memberPolicy.count', { current: index + 1, total: shown.length }) : undefined}
-        backHref={policiesHref(placeId, placeName)}
+        backHref={policiesHref(placeId, placeName, service?.id ?? null)}
         backLabel={t('nav.back.policiesToSign')}
         actions={<DoneButton steps={via === 'list' ? 2 : 1} placeId={placeId} />}
-      >
-        {policy ? (
-          <>
-            <Card padding={6}>
-              <VStack gap={3}>
-                {policy.body.length > 0 ? (
-                  policy.body.map((para, i) => (
-                    <Text key={i} xstyle={styles.body}>
-                      {para}
-                    </Text>
-                  ))
-                ) : (
-                  <Text type="supporting" xstyle={styles.body}>
-                    {t('policy.preview.file', { file: policy.fileName })}
-                  </Text>
-                )}
-              </VStack>
-            </Card>
+        // Sign, Next and Done stay under the same thumb from the first
+        // policy to the last (D-279), at the foot of the screen like every
+        // screen's one button (D-326).
+        footer={
+          policy ? (
+            <VStack gap={3}>
 
-            {when ? (
-              <>
-                {/* Signed: the signature on the page, and the way on. */}
-                <VStack gap={2} xstyle={styles.saved}>
-                  <HStack gap={2} align="center" wrap="nowrap">
-                    <SignedIcon {...ICON} {...stylex.props(styles.signedIcon)} />
-                    <Text xstyle={styles.signedWords}>
-                      {t('memberPolicy.signed', { date: day.format(new Date(when)) })}
-                    </Text>
-                  </HStack>
-                  {signedImage ? (
-                    <img src={signedImage} alt={t('memberPolicy.yourSignature')} {...stylex.props(styles.signedImage)} />
-                  ) : null}
-                  <ClearSignature
-                    label={t('memberPolicy.clear')}
-                    onPress={() => {
-                      // Off this policy, and a fresh signature to sign it with.
-                      unsign(placeId, policy.id);
-                      forgetSignature();
-                      setSheetOpen(true);
-                    }}
-                  />
-                </VStack>
-              </>
-            ) : null}
-            {/* Room under the last line for the pinned sign area (D-279). */}
-            <VStack aria-hidden xstyle={[styles.dockSpacer, !when && signature ? styles.dockSpacerTall : null]} />
-
-            <SignSheet
-              isOpen={isSheetOpen}
-              title={policy.title}
-              onClose={() => setSheetOpen(false)}
-              onSign={(drawn) => signNow(drawn)}
-            />
-          </>
-        ) : (
-          <Text type="supporting" xstyle={styles.intro}>
-            {t('memberPolicies.none')}
-          </Text>
-        )}
-      </SubPage>
-      {policy ? (
-        // Pinned to the bottom (Will, 5 October, D-279): Sign, Next and Done
-        // stay under the same thumb from the first policy to the last. Outside
-        // the page, so nothing on the page can carry it off.
-        <VStack xstyle={styles.dock}>
-          <VStack gap={3} xstyle={styles.dockInner}>
             {when ? (
               next ? (
                 <BigButton
@@ -415,9 +379,66 @@ export function MemberPolicyScreen({
                 />
               </>
             )}
-          </VStack>
-        </VStack>
-      ) : null}
+            </VStack>
+          ) : null
+        }
+      >
+        {policy ? (
+          <>
+            <Card padding={6}>
+              <VStack gap={3}>
+                {policy.body.length > 0 ? (
+                  policy.body.map((para, i) => (
+                    <Text key={i} xstyle={styles.body}>
+                      {para}
+                    </Text>
+                  ))
+                ) : (
+                  <Text type="supporting" xstyle={styles.body}>
+                    {t('policy.preview.file', { file: policy.fileName })}
+                  </Text>
+                )}
+              </VStack>
+            </Card>
+
+            {when ? (
+              <>
+                {/* Signed: the signature on the page, and the way on. */}
+                <VStack gap={2} xstyle={styles.saved}>
+                  <HStack gap={2} align="center" wrap="nowrap">
+                    <SignedIcon {...ICON} {...stylex.props(styles.signedIcon)} />
+                    <Text xstyle={styles.signedWords}>
+                      {t('memberPolicy.signed', { date: day.format(new Date(when)) })}
+                    </Text>
+                  </HStack>
+                  {signedImage ? (
+                    <img src={signedImage} alt={t('memberPolicy.yourSignature')} {...stylex.props(styles.signedImage)} />
+                  ) : null}
+                  <ClearSignature
+                    label={t('memberPolicy.clear')}
+                    onPress={() => {
+                      // Off this policy, and a fresh signature to sign it with.
+                      unsign(placeId, policy.id);
+                      forgetSignature();
+                      setSheetOpen(true);
+                    }}
+                  />
+                </VStack>
+              </>
+            ) : null}
+            <SignSheet
+              isOpen={isSheetOpen}
+              title={policy.title}
+              onClose={() => setSheetOpen(false)}
+              onSign={(drawn) => signNow(drawn)}
+            />
+          </>
+        ) : (
+          <Text type="supporting" xstyle={styles.intro}>
+            {t('memberPolicies.none')}
+          </Text>
+        )}
+      </SubPage>
     </>
   );
 }

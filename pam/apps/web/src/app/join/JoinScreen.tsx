@@ -105,6 +105,7 @@ const EMPTY_PROGRAM: ProgramDetails = {
   address: '',
   phone: '',
   website: '',
+  services: [],
 };
 
 const styles = stylex.create({

@@ -36,6 +36,7 @@ const EMPTY: ProgramDetails = {
   address: '',
   phone: '',
   website: '',
+  services: [],
 };
 
 const styles = stylex.create({

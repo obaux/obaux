@@ -19,6 +19,8 @@ import { SubPage } from '@pam/ui/SubPage';
 import type { DummyPolicy } from '@pam/config/dummy-policies';
 import { useI18n } from '@/lib/i18n';
 import { usePolicies } from '@/lib/usePolicies';
+import { servicesForPolicy } from '@pam/config/dummy-services';
+import { useServices } from '@/lib/useServices';
 import { ConfirmDialog } from './ConfirmDialog';
 
 /**
@@ -63,8 +65,19 @@ const styles = stylex.create({
 export function PoliciesScreen() {
   const { t } = useI18n();
   const { policies, add, remove } = usePolicies();
+  const { forPlace } = useServices();
   const [isEditing, setIsEditing] = useState(false);
   const [asking, setAsking] = useState<DummyPolicy | null>(null);
+  // Which services ask for it (D-313): named by none means everyone signs it.
+  const services = forPlace('dummy-place-learning');
+  const forWhom = (policy: DummyPolicy) => {
+    const only = servicesForPolicy(policy.id, services);
+    return services.length === 0
+      ? null
+      : only.length === 0
+        ? t('policies.forAll')
+        : t('policies.forServices', { services: only.map((s) => s.name).join(', ') });
+  };
 
   return (
     <SubPage
@@ -115,7 +128,7 @@ export function PoliciesScreen() {
               <VStack gap={0} xstyle={styles.rowWords}>
                 <Text xstyle={styles.rowTitle}>{policy.title}</Text>
                 <Text type="supporting" xstyle={styles.rowMeta}>
-                  {t('policies.signedCount', { count: policy.signedBy.length })}
+                  {[t('policies.signedCount', { count: policy.signedBy.length }), forWhom(policy)].filter(Boolean).join(' · ')}
                 </Text>
               </VStack>
               <IconButton
@@ -135,7 +148,7 @@ export function PoliciesScreen() {
           items={policies.map((policy) => ({
             id: policy.id,
             label: policy.title,
-            description: t('policies.signedCount', { count: policy.signedBy.length }),
+            description: [t('policies.signedCount', { count: policy.signedBy.length }), forWhom(policy)].filter(Boolean).join(' · '),
             href: `/program/policies/view/?id=${encodeURIComponent(policy.id)}`,
             icon: <BookIcon {...ICON} />,
           }))}

@@ -168,7 +168,12 @@ In Storybook, a member's screens sit under Created, Invited by program and
 Invited by case manager.
 On a place, "Plan a trip" stays at the foot of the screen while you scroll,
 with the page fading out above it instead of a hard edge, and "Policies to
-sign" sits with Send a message and Call.
+sign" sits with Send a message and Call. Planning a trip and signing policies
+keep their button at the foot the same way.
+A program can list the services it offers, each with its own phone number,
+website and policies: named when signing up, managed from the Program tab,
+shown on the program's page for members to open, and picked when booking a
+visit if there is more than one.
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 
