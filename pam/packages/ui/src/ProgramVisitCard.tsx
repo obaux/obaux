@@ -4,30 +4,24 @@ import { HStack } from '@astryxdesign/core/HStack';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
-import { MeIcon, PlusIcon } from './icons.js';
 import { ToneGround, type Tone } from './Tone.js';
 
 /**
  * A program, as one card (D-332, Will, 6 October): its picture in its
- * category's colour, its name, and what this card is about.
- *
- * - `visit`: the visit being booked, with the day and time under the name
- *   (Plan a visit's Check step).
- * - `invite`: you and an empty "+" beside the picture, and no date (Bring a
- *   friend's Go together): "you two, at this place".
+ * category's colour, its name, and the visit under it: the service, the day
+ * and time. On Plan a visit's Check step and the booked screen (D-333).
  *
  * The card takes the category's pale shade, so a school program reads blue
- * before a word is read; "you" takes its deep shade.
+ * before a word is read.
  */
 export interface ProgramVisitCardProps {
   readonly name: string;
-  /** The category's colour; null keeps the card white and "you" green. */
+  /** The category's colour; null keeps the card white. */
   readonly tone: Tone | null;
   /** The category's icon, drawn into the picture. */
   readonly art: ReactNode;
-  /** Under the name: the day and time, a service. None for `invite`. */
+  /** Under the name: the service, the day and time. */
   readonly lines?: readonly string[];
-  readonly variant?: 'visit' | 'invite';
 }
 
 const pale = stylex.create({
@@ -42,18 +36,6 @@ const pale = stylex.create({
   gray: { backgroundColor: 'var(--color-data-gray-1)' },
 });
 
-const deep = stylex.create({
-  blue: { backgroundColor: colorVars['--color-icon-blue'] },
-  green: { backgroundColor: colorVars['--color-icon-green'] },
-  purple: { backgroundColor: colorVars['--color-icon-purple'] },
-  orange: { backgroundColor: colorVars['--color-icon-orange'] },
-  red: { backgroundColor: colorVars['--color-icon-red'] },
-  teal: { backgroundColor: colorVars['--color-icon-teal'] },
-  pink: { backgroundColor: colorVars['--color-icon-pink'] },
-  cyan: { backgroundColor: colorVars['--color-icon-cyan'] },
-  gray: { backgroundColor: colorVars['--color-icon-gray'] },
-});
-
 // The picture's ink: a plain icon takes the category's deep shade too.
 const ink = stylex.create({
   blue: { color: colorVars['--color-icon-blue'] },
@@ -66,8 +48,6 @@ const ink = stylex.create({
   cyan: { color: colorVars['--color-icon-cyan'] },
   gray: { color: colorVars['--color-icon-gray'] },
 });
-
-const FACE = { width: 22, height: 22, 'aria-hidden': true } as const;
 
 const styles = stylex.create({
   card: {
@@ -89,29 +69,12 @@ const styles = stylex.create({
     backgroundColor: colorVars['--color-background-card'],
     boxShadow: '0 0 0 3px var(--color-background-card)',
   },
-  // You and the friend, overlapping the picture's right edge.
-  faces: { flexShrink: 0, marginInlineStart: '-14px' },
-  face: {
-    width: '44px',
-    height: '44px',
-    borderRadius: '50%',
-    borderWidth: '3px',
-    borderStyle: 'solid',
-    borderColor: colorVars['--color-background-card'],
-  },
-  you: { backgroundColor: colorVars['--color-accent'], color: colorVars['--color-on-accent'] },
-  friend: {
-    marginInlineStart: '-12px',
-    backgroundColor: colorVars['--color-background-card'],
-    color: colorVars['--color-icon-secondary'],
-  },
   words: { minWidth: 0, flexGrow: 1 },
   name: { fontSize: '20px', lineHeight: 1.25, fontWeight: 700 },
   line: { fontSize: '17px', lineHeight: 1.4 },
 });
 
-export function ProgramVisitCard({ name, tone, art, lines = [], variant = 'visit' }: ProgramVisitCardProps) {
-  const isInvite = variant === 'invite';
+export function ProgramVisitCard({ name, tone, art, lines = [] }: ProgramVisitCardProps) {
   return (
     <VStack gap={4} xstyle={[styles.card, tone ? pale[tone] : null]}>
       <HStack gap={4} align="center" wrap="nowrap">
@@ -119,22 +82,10 @@ export function ProgramVisitCard({ name, tone, art, lines = [], variant = 'visit
           <ToneGround tone={tone} />
           {art}
         </HStack>
-        {isInvite ? (
-          <HStack xstyle={styles.faces} aria-hidden>
-            <HStack align="center" justify="center" xstyle={[styles.face, styles.you, tone ? deep[tone] : null]}>
-              <MeIcon {...FACE} />
-            </HStack>
-            <HStack align="center" justify="center" xstyle={[styles.face, styles.friend]}>
-              <PlusIcon {...FACE} />
-            </HStack>
-          </HStack>
-        ) : (
-          <VStack xstyle={styles.words}>
-            <Text xstyle={styles.name}>{name}</Text>
-          </VStack>
-        )}
+        <VStack xstyle={styles.words}>
+          <Text xstyle={styles.name}>{name}</Text>
+        </VStack>
       </HStack>
-      {isInvite ? <Text xstyle={styles.name}>{name}</Text> : null}
       {lines.length > 0 ? (
         <VStack gap={1}>
           {lines.map((line) => (

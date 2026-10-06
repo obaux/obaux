@@ -63,6 +63,17 @@ export function PeopleIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+/** One figure and a plus. Bring someone along (D-333). */
+export function UserPlusIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <circle cx="9.5" cy="8" r="3.5" />
+      <path d="M3 20a6.5 6.5 0 0 1 13 0" />
+      <path d="M19 8v6M16 11h6" />
+    </svg>
+  );
+}
+
 /** A checklist. My Plan. */
 export function PlanIcon(props: SVGProps<SVGSVGElement>) {
   return (

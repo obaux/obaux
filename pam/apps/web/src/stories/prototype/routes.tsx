@@ -28,7 +28,6 @@ import { PrototypeInviteExpired } from './PrototypeInviteExpired';
 import AboutPage from '../../app/about/page';
 import PoliciesPage from '../../app/program/policies/page';
 import { PrototypePolicy } from './PrototypePolicy';
-import PlaceFriendPage from '../../app/place/friend/page';
 import PlacePoliciesPage from '../../app/place/policies/page';
 import PlacePolicyPage from '../../app/place/policies/view/page';
 import ProgramServicePage from '../../app/program/service/page';
@@ -92,7 +91,6 @@ export const APP_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   '/places/': screen(() => <PlacesPage />),
   '/place/': screen(() => <PlacePage />),
   // A program's policies, for a member to read and sign (D-270).
-  '/place/friend/': screen(() => <PlaceFriendPage />),
   '/place/policies/': screen(() => <PlacePoliciesPage />),
   '/place/policies/view/': screen(() => <PlacePolicyPage />),
   '/saved/': screen(() => <SavedPage />),

@@ -17,7 +17,13 @@ import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
  *   - **Paper, in both themes.** The box is white with dark ink even in dark
  *     mode, because the signature is saved as a picture and shown again on
  *     other screens; light ink saved in the dark would vanish in the light.
- *   - **The page does not scroll while you sign** (`touch-action: none`).
+ *   - **Every touch in the box draws, and nothing else** (D-333). The page
+ *     does not scroll, the sheet does not drag, and pull-to-refresh and the
+ *     back swipe do not fire: `touch-action: none`, pointer capture, and the
+ *     pointer and touch events stop here (a non-passive touch listener calls
+ *     `preventDefault`). A stroke that leaves the box keeps drawing, clipped
+ *     at its edge, until the finger lifts; `onDrawingChange` lets the sheet
+ *     hold still for that long.
  *   - **Typed is a signature too.** `setTyped(name)` writes a name into the
  *     box instead, for anybody who cannot draw one (a tremor, a screen
  *     reader, a cracked screen) — the sheet offers it as "Type my name
@@ -40,6 +46,8 @@ export interface SignaturePadProps {
   /** Shown in the empty box: "Sign here". */
   readonly placeholder: string;
   readonly onInkChange?: (hasInk: boolean) => void;
+  /** True from the finger going down in the box until it lifts (D-333). */
+  readonly onDrawingChange?: (isDrawing: boolean) => void;
   readonly ref?: Ref<SignaturePadHandle>;
 }
 
@@ -63,9 +71,13 @@ const styles = stylex.create({
     width: '100%',
     height: '100%',
     touchAction: 'none',
+    userSelect: 'none',
+    WebkitUserSelect: 'none',
+    WebkitTouchCallout: 'none',
     cursor: 'crosshair',
   },
-  // The line you sign on, with the "x" in front of it, as on paper.
+  // The line you sign on, with a faint "Sign here" on it (D-333: the "×"
+  // read as a delete button; Clear already resets).
   line: {
     position: 'absolute',
     insetInline: '24px',
@@ -75,18 +87,11 @@ const styles = stylex.create({
     borderBottomColor: 'oklch(0.85 0 0)',
     pointerEvents: 'none',
   },
-  x: { position: 'absolute', left: '24px', bottom: '50px', pointerEvents: 'none' },
-  xText: { fontSize: '20px', color: 'oklch(0.6 0 0)' },
-  hint: {
-    position: 'absolute',
-    inset: 0,
-    pointerEvents: 'none',
-    paddingBottom: '20px',
-  },
-  hintText: { fontSize: '17px', color: 'oklch(0.55 0 0)' },
+  signHere: { position: 'absolute', left: '24px', bottom: '50px', pointerEvents: 'none', userSelect: 'none' },
+  signHereText: { fontSize: '15px', color: 'oklch(0.68 0 0)' },
 });
 
-export function SignaturePad({ label, placeholder, onInkChange, ref }: SignaturePadProps) {
+export function SignaturePad({ label, placeholder, onInkChange, onDrawingChange, ref }: SignaturePadProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const drawing = useRef(false);
   const last = useRef<{ x: number; y: number } | null>(null);
@@ -127,6 +132,46 @@ export function SignaturePad({ label, placeholder, onInkChange, ref }: Signature
   useEffect(() => {
     ensureSized();
   }, [ensureSized]);
+
+  // Native touch events too: the sheet listens for them on its body, and
+  // only a non-passive listener can cancel the browser's own gestures.
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const hold = (event: TouchEvent) => {
+      event.stopPropagation();
+      if (event.cancelable) event.preventDefault();
+    };
+    const lift = (event: TouchEvent) => event.stopPropagation();
+    canvas.addEventListener('touchstart', hold, { passive: false });
+    canvas.addEventListener('touchmove', hold, { passive: false });
+    canvas.addEventListener('touchend', lift);
+    canvas.addEventListener('touchcancel', lift);
+    return () => {
+      canvas.removeEventListener('touchstart', hold);
+      canvas.removeEventListener('touchmove', hold);
+      canvas.removeEventListener('touchend', lift);
+      canvas.removeEventListener('touchcancel', lift);
+    };
+  }, []);
+
+  const setDrawing = useCallback(
+    (next: boolean) => {
+      if (drawing.current === next) return;
+      drawing.current = next;
+      onDrawingChange?.(next);
+    },
+    [onDrawingChange],
+  );
+
+  const stop = (event: PointerEvent<HTMLCanvasElement>) => {
+    event.stopPropagation();
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+    setDrawing(false);
+    last.current = null;
+  };
 
   const wipe = useCallback(() => {
     const canvas = canvasRef.current;
@@ -178,22 +223,19 @@ export function SignaturePad({ label, placeholder, onInkChange, ref }: Signature
   return (
     <VStack xstyle={styles.frame}>
       <HStack aria-hidden xstyle={styles.line} />
-      <HStack aria-hidden xstyle={styles.x}>
-        <Text xstyle={styles.xText}>×</Text>
+      <HStack aria-hidden xstyle={styles.signHere}>
+        <Text xstyle={styles.signHereText}>{placeholder}</Text>
       </HStack>
-      {hasInk ? null : (
-        <HStack aria-hidden align="center" justify="center" xstyle={styles.hint}>
-          <Text xstyle={styles.hintText}>{placeholder}</Text>
-        </HStack>
-      )}
       <canvas
         ref={canvasRef}
         role="img"
         aria-label={label}
         {...stylex.props(styles.canvas)}
         onPointerDown={(event) => {
+          // Held here until the finger lifts, even outside the box.
+          event.stopPropagation();
           event.currentTarget.setPointerCapture(event.pointerId);
-          drawing.current = true;
+          setDrawing(true);
           const p = point(event);
           last.current = p;
           const ctx = ensureSized();
@@ -206,6 +248,7 @@ export function SignaturePad({ label, placeholder, onInkChange, ref }: Signature
           if (!hasInk) announce(true);
         }}
         onPointerMove={(event) => {
+          event.stopPropagation();
           if (!drawing.current || !last.current) return;
           const ctx = event.currentTarget.getContext('2d');
           if (!ctx) return;
@@ -220,12 +263,10 @@ export function SignaturePad({ label, placeholder, onInkChange, ref }: Signature
           ctx.stroke();
           last.current = p;
         }}
-        onPointerUp={() => {
-          drawing.current = false;
-          last.current = null;
-        }}
-        onPointerCancel={() => {
-          drawing.current = false;
+        onPointerUp={stop}
+        onPointerCancel={stop}
+        onLostPointerCapture={() => {
+          setDrawing(false);
           last.current = null;
         }}
       />

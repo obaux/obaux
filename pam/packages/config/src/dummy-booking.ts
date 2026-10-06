@@ -36,6 +36,22 @@ export function bookingFor(placeId: string): DummyBooking {
   return schedule ? { kind: 'dropin', schedule } : { kind: 'appointment' };
 }
 
+/**
+ * The next `count` times this schedule meets (D-333): a walk-in's days to
+ * pick from in Plan your trip, so staff see who is coming.
+ */
+export function nextDropIns(schedule: DropInSchedule, count: number, now: Date = new Date()): Date[] {
+  const out: Date[] = [];
+  let from = now;
+  while (out.length < count) {
+    const next = nextDropIn(schedule, from);
+    out.push(next);
+    // Every other week skips the week between; the others find their next.
+    from = new Date(next.getTime() + (schedule.cadence === 'biweekly' ? 8 : 1) * 24 * 60 * 60 * 1000);
+  }
+  return out;
+}
+
 /** The next time this schedule meets, from now — for "Next: Tuesday, October 13". */
 export function nextDropIn(schedule: DropInSchedule, now: Date = new Date()): Date {
   const next = new Date(now);

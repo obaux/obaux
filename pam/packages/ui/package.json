@@ -32,6 +32,7 @@
     "./PolicyStatusCard": "./src/PolicyStatusCard.tsx",
     "./VisitCard": "./src/VisitCard.tsx",
     "./ProgramVisitCard": "./src/ProgramVisitCard.tsx",
+    "./BringFriend": "./src/BringFriend.tsx",
     "./VisitTag": "./src/VisitTag.tsx",
     "./CategoryArt": "./src/CategoryArt.tsx",
     "./BadgeArt": "./src/BadgeArt.tsx",

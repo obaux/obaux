@@ -18,13 +18,16 @@ import { MenuList } from '@pam/ui/MenuList';
 import { SubPage } from '@pam/ui/SubPage';
 import { SuccessScreen } from '@pam/ui/SuccessScreen';
 import { useI18n } from '@/lib/i18n';
-import { addTrip, moveTrip } from '@/lib/addedTrips';
-import { inviteLink } from '@/lib/appUrl';
+import { addTrip, moveTrip, readAddedTrips, withMoves } from '@/lib/addedTrips';
+import { DUMMY_TRIPS } from '@pam/config/dummy-trips';
+import { friendLink, inviteLink } from '@/lib/appUrl';
 import { navigate } from '@/lib/navigate';
 import { useServices } from '@/lib/useServices';
 import { HelpButton } from './HelpButton';
 import { BigCategoryIcon, CategoryIcon, categoryTone } from './SavedView';
 import { ProgramVisitCard } from '@pam/ui/ProgramVisitCard';
+import { BringFriend } from '@pam/ui/BringFriend';
+import { bookingFor, nextDropIns } from '@pam/config/dummy-booking';
 
 /**
  * New trip — planning a visit (D-225, Will, 2 October: the + on Trips "opens
@@ -39,13 +42,18 @@ import { ProgramVisitCard } from '@pam/ui/ProgramVisitCard';
  *   3. **Check** — the place, the day and time (each with Change), an
  *      optional note, and Add this trip — the step's one primary action.
  *
- * Then a plain "Trip added" with the way back to the map.
+ * Then **booked** (D-333): the program card with the day and time, and Bring
+ * a friend, folded, with the link to the booked slot; Done goes to Trips.
+ * A walk-in plans the same way, from the days it meets at its set time, so
+ * staff see who is coming.
  *
  * **Example only, for now**: nothing books an appointment with a program yet.
  * The trip is kept for the visit (`addedTrips`) so it appears on the map and
  * in the drawer as the real one will; the screen says so under the button.
  */
 type Step = 'where' | 'when' | 'check';
+
+const WALK_IN_DAYS = 4;
 
 const TIMES: readonly (readonly [number, number])[] = [
   [9, 0],
@@ -141,7 +149,10 @@ export function NewTripView({
   initialService = null,
   changing = null,
   forMember = null,
+  booked = null,
 }: {
+  /** A trip already booked (D-333): open on its booked screen. */
+  readonly booked?: string | null;
   readonly initialPlace?: TripPlaceSeed | null;
   /** A service already chosen, from its own page (D-313). */
   readonly initialService?: string | null;
@@ -161,10 +172,18 @@ export function NewTripView({
   const places = useMemo(() => Object.values(DUMMY_PLACES_BY_ID), []);
   const { forPlace } = useServices();
   const initial = useMemo(() => seedToPlace(initialPlace), [initialPlace]);
-  const [place, setPlace] = useState<DummySavedPlace | null>(initial);
+  // Opened on a booked trip (D-333): its place and slot, read once.
+  const [bookedTrip] = useState(() => {
+    if (!booked) return null;
+    const trip = withMoves([...DUMMY_TRIPS, ...readAddedTrips()]).find((x) => x.id === booked);
+    const at = trip ? DUMMY_PLACES_BY_ID[trip.placeId] : undefined;
+    return trip && at ? { trip, place: at } : null;
+  });
+  const [place, setPlace] = useState<DummySavedPlace | null>(bookedTrip?.place ?? initial);
   // The service picked on the place's page (D-313), carried in the link.
   const offered = place ? forPlace(place.id) : [];
-  const chosenService = initialService ? (offered.find((s) => s.id === initialService) ?? null) : null;
+  const serviceId = initialService ?? bookedTrip?.trip.serviceId ?? null;
+  const chosenService = serviceId ? (offered.find((s) => s.id === serviceId) ?? null) : null;
   // Started from a place's page: two steps, and Back returns to that page
   // (Will, D-313: "when going back from booking flow it should return to
   // the profile page, not all trips page").
@@ -179,6 +198,10 @@ export function NewTripView({
   // Booked for a member (D-316): the moment, then the program's Home.
   const [bookedAt, setBookedAt] = useState<Date | null>(null);
   const [bookedTripId, setBookedTripId] = useState<string | null>(null);
+  // The member's own booking, confirmed (D-333): the booked screen.
+  const [confirmed, setConfirmed] = useState<{ readonly id: string; readonly at: Date } | null>(
+    bookedTrip ? { id: bookedTrip.trip.id, at: new Date(bookedTrip.trip.startsAt) } : null,
+  );
   useEffect(() => {
     if (!bookedAt) return;
     const timer = setTimeout(() => navigate('/'), MOVED_HOLD_MS);
@@ -192,7 +215,21 @@ export function NewTripView({
     return () => clearTimeout(timer);
   }, [movedTo]);
 
-  const days = useMemo(() => nextWeekdays(10), []);
+  // A walk-in (D-333): the days it meets, at its set time; otherwise any
+  // weekday in the next two weeks, at one of four times.
+  const booking = place ? bookingFor(place.id) : null;
+  const walkIn = booking?.kind === 'dropin' ? booking.schedule : null;
+  const days = useMemo(
+    () => (walkIn ? nextDropIns(walkIn, WALK_IN_DAYS) : nextWeekdays(10)),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- the schedule is a lookup by place.
+    [place?.id],
+  );
+  const times: readonly (readonly [number, number])[] = walkIn ? [[walkIn.hour, walkIn.minute]] : TIMES;
+  // Its one time, already picked.
+  useEffect(() => {
+    if (walkIn) setTime([walkIn.hour, walkIn.minute]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [place?.id]);
   const dayFmt = new Intl.DateTimeFormat(locale, { weekday: 'short', month: 'short', day: 'numeric' });
   const dayLong = new Intl.DateTimeFormat(locale, { weekday: 'long', month: 'long', day: 'numeric' });
   const timeFmt = new Intl.DateTimeFormat(locale, { hour: 'numeric', minute: '2-digit' });
@@ -227,6 +264,37 @@ export function NewTripView({
           ? { note: t('trips.booked.sms', { ...vars, link: inviteLink('PAM-7Q4K', 'member', bookedTripId) }) }
           : {})}
       />
+    );
+  }
+
+  if (confirmed && place && !forMember) {
+    const done = `/trips/?added=${encodeURIComponent(confirmed.id)}`;
+    return (
+      <SubPage
+        title={t('trips.confirm.title')}
+        backHref={done}
+        backLabel={t('nav.back.trips')}
+        footer={<BigButton label={t('trips.confirm.done')} href={done} />}
+      >
+        <ProgramVisitCard
+          name={place.name}
+          tone={categoryTone(place.category)}
+          art={<CategoryIcon category={place.category} iconSize={{ width: 36, height: 36, 'aria-hidden': true }} isBaked />}
+          lines={[
+            ...(chosenService ? [t('trips.new.service', { service: chosenService.name })] : []),
+            `${dayLong.format(confirmed.at)} · ${timeFmt.format(confirmed.at)}`,
+          ]}
+        />
+        {/* Only now, with a real slot to point to (Will, D-333). */}
+        <BringFriend
+          label={t('friend.label')}
+          body={t('friend.body')}
+          link={friendLink(place.id, confirmed.at.toISOString())}
+          linkLabel={t('friend.link')}
+          copyLabel={t('friend.copy')}
+          copiedLabel={t('friend.copied')}
+        />
+      </SubPage>
     );
   }
 
@@ -301,9 +369,9 @@ export function NewTripView({
                 setBookedAt(at(day, time));
                 return;
               }
-              // Straight to Trips (Will, 3 October, D-241): the drawer tall,
-              // confetti, and the new trip arriving in the list.
-              navigate(`/trips/?added=${encodeURIComponent(id)}`);
+              // Booked (D-333): the confirmation with Bring a friend, then
+              // Trips with its confetti (D-241) from Done.
+              setConfirmed({ id, at: at(day, time) });
             }}
           />
         ) : null
@@ -390,7 +458,7 @@ export function NewTripView({
               {t('trips.new.time')}
             </Heading>
             <HStack gap={2} wrap="wrap" xstyle={styles.choices}>
-              {TIMES.map((slot) => {
+              {times.map((slot) => {
                 const isOn = time !== null && time[0] === slot[0] && time[1] === slot[1];
                 return (
                   <Button

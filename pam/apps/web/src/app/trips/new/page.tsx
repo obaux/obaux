@@ -23,12 +23,16 @@ function NewTrip() {
   const forPhone = params.get('forPhone');
   // From a service's own page (D-313): the visit is for that service.
   const service = params.get('service');
+  // A trip already booked (D-333): its booked screen, with Bring a friend.
+  const booked = params.get('booked');
   const seed = useMemo(() => (id ? { id, name, category, address } : null), [id, name, category, address]);
   const forMember = useMemo(
     () => (forId ? { id: forId, name: forName ?? '', ...(forPhone ? { phone: forPhone } : {}) } : null),
     [forId, forName, forPhone],
   );
-  return <NewTripView initialPlace={seed} initialService={service} changing={change} forMember={forMember} />;
+  return (
+    <NewTripView initialPlace={seed} initialService={service} changing={change} forMember={forMember} booked={booked} />
+  );
 }
 
 export default function NewTripPage() {

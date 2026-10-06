@@ -69,6 +69,7 @@ export {
   MeIcon,
   MeIconFilled,
   PeopleIcon,
+  UserPlusIcon,
   PhoneIcon,
   PlacesIcon,
   PlanIcon,

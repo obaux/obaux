@@ -197,6 +197,11 @@ Points page lists first among ways to earn (D-330).
 Planning a visit and bringing a friend now share one card that shows the
 program in its colour. Once a visit is booked, the place page names its service
 next to the time instead of showing the service picker (D-332).
+Booking a trip now ends on "Your trip is booked", where Bring a friend
+opens to the link and a Copy button; its separate page is gone. Walk-in
+programs are planned the same way, from the days they meet. Signing no
+longer lets the sheet slide while you draw, and the line says "Sign here"
+instead of an "×" (D-333).
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 

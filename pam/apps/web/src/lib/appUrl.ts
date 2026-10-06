@@ -56,8 +56,10 @@ export function inviteLink(code: string, role: InviteRole, trip?: string | null)
  * member does. The program rides along so sign in can say where they were
  * asked to.
  */
-export function friendLink(placeId: string): string {
-  return `${appUrl()}/signin/?as=member&program=${encodeURIComponent(placeId)}`;
+export function friendLink(placeId: string, at?: string | null): string {
+  // The booked slot rides along (D-333), so the link points to a real visit.
+  const slot = at ? `&at=${encodeURIComponent(at)}` : '';
+  return `${appUrl()}/signin/?as=member&program=${encodeURIComponent(placeId)}${slot}`;
 }
 
 /** An invite read back out of a link's query, or null if it carries none. */

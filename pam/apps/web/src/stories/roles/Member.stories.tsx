@@ -69,10 +69,8 @@ export const PlaceProfile: Story = screenWithControls<PlaceProfileArgs>(
   },
   (args) => PLACE_FOR[`${args.profile}|${args.newMessage}`]!,
 );
-// A link for a friend to join the same program (D-329).
-export const BringFriend: Story = screen('member', 'Bring a friend', '/place/friend/', {
-  id: 'dummy-place-learning',
-});
+// Booked (D-333): the trip, and Bring a friend folded under it.
+export const TripBooked: Story = screen('member', 'Trip booked', '/trips/new/', { booked: 'dummy-trip-1' });
 // A program's policies, read and signed by a member (D-270).
 export const PlacePolicies: Story = screen('member', 'Policies to sign', '/place/policies/', {
   id: 'dummy-place-learning',

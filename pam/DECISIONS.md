@@ -8053,6 +8053,87 @@ next to time."
   variants); typecheck; config 238; web and Storybook builds; e2e 570/570;
   flow map page 2 updated.
 
+### D-333 — Bring a friend lives on "Your trip is booked"; signing holds the sheet still
+
+**Date:** 2026-10-06. Will, from design review: two UI changes. Bring a friend
+moves off its own page into a folded section on the trip confirmation. The
+signature box locks every gesture while drawing. Asked before building (three
+answers):
+1. There was no confirmation screen, so a new "booked" step was added.
+2. Walk-ins book from the days they meet.
+3. Copy only, no native share sheet for now.
+
+- **Bring a friend.**
+  - `BringFriend` (`@pam/ui/BringFriend`) is an Astryx `Collapsible` in a
+    `Card`. Collapsed it is one row: a new `UserPlusIcon`, "Bring a friend"
+    and the chevron, 48px tall.
+  - Open, it shows "Going is easier with someone. Send this link so they can
+    come too." under the row, then the link in a read-only `TextField` with
+    a Copy `Button` beside it. Copy reads "Copied" for 1.5s.
+  - Copy only on every platform. The Capacitor share sheet waits for Will's
+    go-ahead.
+  - It sits on a new step after "Add this trip": **Your trip is booked** —
+    the program card (D-332) with the slot, the section under it, and Done
+    to Trips (still with D-241's confetti).
+  - `friendLink(placeId, at)` carries the booked slot.
+  - `/trips/new/?booked=<trip>` opens that screen for an existing trip; it
+    backs the Member › Trip booked story and the flow map.
+- **Removed:**
+  - `/place/friend/`, `BringFriendView`, its story and route.
+  - The place page's Bring a friend row (D-329) and the Go together screen
+    (D-330, D-332's invite variant of `ProgramVisitCard`).
+  - Their copy keys.
+- **Kept:** a friend who joins is still worth 150 on the Points page (D-330,
+  SOP A18). Nothing awards it yet.
+- **Walk-ins plan a trip too (contradicts D-313).** D-313 had drop-in
+  programs say "Nothing to book. Just come at that time" with Get directions.
+  - Now Plan a trip is their footer. The When step lists the next four days
+    the program meets (`nextDropIns`, every other week skipping a week) at
+    its set time, already picked. Then Check and the same booked screen, so
+    staff see who is coming.
+  - The When to come card now says "Pick a day in Plan a trip so they know
+    you're coming."
+- **Signature sheet.**
+  - The canvas has `touch-action: none` and `user-select: none` (and the
+    -webkit- forms). On pointerdown it calls `setPointerCapture` and
+    `stopPropagation`; pointermove calls `stopPropagation`; pointerup and
+    pointercancel release.
+  - A non-passive native `touchstart`/`touchmove` listener calls
+    `stopPropagation` and `preventDefault`. Astryx's sheet starts drags from
+    React pointer handlers and native touch listeners on its body, so
+    neither sees a stroke, and pull-to-refresh and the back swipe can't fire.
+  - A stroke that leaves the box keeps drawing, clipped at the edge, until
+    the finger lifts.
+  - `onDrawingChange` drives the sheet's `purpose`. It is `'info'` normally,
+    so the handle and copy drag and dismiss like any sheet, and `'form'`
+    while drawing; Astryx has no drag-off prop.
+  - **Contradicts the old setup:** the sheet was always `'form'`, so it could
+    never be swiped away. A scrim tap or swipe now closes it and drops an
+    unsigned drawing, as asked.
+  - The scrim's `showModal` locks the page behind.
+  - `overscroll-behavior: contain` is on the content (Astryx already sets it
+    on the sheet body).
+  - The "×" on the line is gone: a faint "Sign here" sits there instead, and
+    the middle hint is removed.
+- **Proven by:**
+  - Booking flows, in Chromium with touch emulation:
+    - Scheduled (no services): 10 weekdays, booked screen, row 48px,
+      expands and collapses, link carries the slot, clipboard gets it,
+      "Copied" back to "Copy" after 1.5s, Done to Trips.
+    - Walk-in: Wed Oct 7 / 21, Nov 4 / 18 at 6:00 PM picked, then the same
+      screen.
+  - Signature, with CDP touch events: a stroke from the box down past its
+    edge leaves the panel exactly where it was and ink on the box's bottom
+    row, and the handle drag then closes the sheet. With the old code the
+    same stroke stopped short (no ink on the bottom row) and the handle drag
+    could not close the sheet.
+  - Typecheck; ui 69, config 238, web 11; ui, web and Storybook builds;
+    e2e 570/570 (place.spec now asserts no Bring a friend row).
+  - Flow map page 2 redrawn.
+- **Not tested here:** iOS Safari, an Android WebView and the Capacitor
+  build. This sandbox has Chromium only, so the stroke test ran on emulated
+  touch. The iOS edge back-swipe in particular needs a device.
+
 ---
 
 ## Notes for whoever picks this up next

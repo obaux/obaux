@@ -125,7 +125,7 @@ const styles = stylex.create({
     backgroundImage: { default: 'none', ':hover': 'none', ':active': 'none' },
   },
   // Clear of the grab handle, as the New message sheet is.
-  sheet: { width: '100%', paddingInline: '20px', paddingBlockStart: spacingVars['--spacing-6'], paddingBottom: '24px' },
+  sheet: { width: '100%', paddingInline: '20px', paddingBlockStart: spacingVars['--spacing-6'], paddingBottom: '24px', overscrollBehavior: 'contain' },
   sheetTitle: { fontSize: '26px', lineHeight: 1.2, fontWeight: 700 },
   sheetHint: { fontSize: '17px', lineHeight: 1.45 },
   sheetRow: { width: '100%' },
@@ -462,6 +462,8 @@ function SignSheet({
   const { t } = useI18n();
   const pad = useRef<SignaturePadHandle | null>(null);
   const [hasInk, setHasInk] = useState(false);
+  // While a finger is drawing, the sheet holds still (D-333).
+  const [isDrawing, setDrawing] = useState(false);
   const [isTyping, setTyping] = useState(false);
   const [name, setName] = useState('');
 
@@ -470,7 +472,11 @@ function SignSheet({
       isOpen={isOpen}
       onOpenChange={(open) => (open ? undefined : onClose())}
       label={t('sign.title', { title })}
-      purpose="form"
+      // Drags and dismisses like any sheet from its handle, header and copy
+      // (Will, D-333), but not while a stroke is in progress: "form" blocks
+      // the swipe until the finger lifts. The pad stops its own touches
+      // reaching the sheet as well; the scrim locks the page behind.
+      purpose={isDrawing ? 'form' : 'info'}
       height="hug"
     >
       {isOpen ? (
@@ -479,7 +485,7 @@ function SignSheet({
             <Heading level={2} xstyle={styles.sheetTitle}>
               {t('sign.heading')}
             </Heading>
-            {/* The way out: a swipe cannot close this sheet (purpose="form"). */}
+            {/* A way out besides the swipe (D-333). */}
             <IconButton
               label={t('sign.cancel')}
               variant="ghost"
@@ -507,6 +513,7 @@ function SignSheet({
             label={t('sign.pad')}
             placeholder={t('sign.placeholder')}
             onInkChange={setHasInk}
+            onDrawingChange={setDrawing}
           />
           <HStack gap={2} align="center" justify="between" wrap="nowrap" xstyle={styles.sheetLinks}>
             <TextLink

@@ -406,7 +406,11 @@ read that program yet (D-329). The friend screen is "Go together"; a friend who
 joins is worth 150 points (SOP amendment A18), listed first under Ways to
 earn, not yet awarded by the database (D-330). `ProgramVisitCard` (visit / invite) is the
 program card on Check and Go together; a booked place shows its service in the
-visit card, with no picker (D-332). Note:
+visit card, with no picker (D-332). Bring a friend is a folded section on the new
+"Your trip is booked" step (no page, Copy only; native share sheet waits for
+Will); walk-ins plan a trip from their meeting days; the signature sheet
+holds still while drawing — tested in Chromium touch emulation, not yet on iOS
+Safari, an Android WebView or the Capacitor build (D-333). Note:
 the web app's vitest tests are not run in CI. How points should be awarded — two rules live
 (save a place, finish setup), the rest to build, with order and open
 questions — is specified in `docs/points-awarding.md`. The
