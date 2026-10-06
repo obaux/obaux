@@ -393,7 +393,9 @@ page's `footer` (sticky, with the page fading out above it); a place's Plan a
 trip is, and Policies to sign is a quick-action row (D-326). Services (D-313):
 example services per place with their own phone, website and policies, a lead's
 editor on the Program tab (session-kept), service names at sign-up, a member's
-service page, a "Which service?" booking step. Note:
+service picker on the place page (grey cards, Main/Service address, hours
+per service), drop-in programs, and booking in two steps from a place.
+Program onboarding as a simpler step by step is open (Will). Note:
 the web app's vitest tests are not run in CI. How points should be awarded — two rules live
 (save a place, finish setup), the rest to build, with order and open
 questions — is specified in `docs/points-awarding.md`. The

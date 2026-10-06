@@ -7522,6 +7522,23 @@ each."
     words masking in anew. A conversation opened from a place's page
     carries `from=place&place=`, and its Back reads "Back to Program"
     and returns to that page.
+  - **Hours per service, and copy that says so** (Will, then: "On program
+    onboarding, how can we make sure text reflects the latest changes,
+    since now we can accommodate more info per service, including hours";
+    the step-by-step redesign is "for another day"). A service may have
+    its own week of hours (`DummyService.hours`, the place's `WeekHours`
+    shape); the editor has a day-by-day list — tick a day, set from and
+    until (Astryx `TimeInput`) — and no day ticked means the program's
+    hours. On a place, the open/closed line and the hours row follow the
+    picked or booked service (Library's Computer classes: Tuesday and
+    Thursday 1–4). The services copy now names everything a service can
+    carry — address, hours, phone, website, policies — at sign-up, on the
+    Program tab and in the editor. Keeping it true: every place that
+    describes a service's fields says the same five, in that order; when
+    a field is added, `rg -n "phone, website" packages/config/src/locales`
+    finds every sentence that lists them.
+  - **Open:** program onboarding as a simpler step by step (one thing per
+    screen), with services in it — Will, for another day.
   - `PlaceDetail.layout = 'chooseFirst'` carries the order; the service
     details page (`/place/service/`) is gone — the page says what it said.
 - **Open:** whether service names should be free text or picked from a
@@ -7858,6 +7875,21 @@ better, and add a white gradient so scroll fades out from bottom." And:
   the last card, the row in the list, and the whole page captured with the
   footer at its end); config 238, ui 67, typecheck, web and Storybook
   builds; e2e 570/570.
+
+### D-327 — Trips: "sign before you go" is a banner, not a card
+
+**Date:** 2026-10-06. Will, on Trips after booking: "Can we make this an
+alert banner instead of this whole thing taking up space, also please
+condense this."
+
+- The card (a heading, two sentences and a big button) becomes one Astryx
+  `Banner`, warning: "Sign 4 policies for Example Library Tech Lab before
+  you go", with "Sign now" at its end opening that program's policies.
+  The trip card below it keeps its orange "Signatures needed" tag.
+- `trips.added.policies.body` is gone; the title carries the place and
+  the count.
+- **Proven by:** screenshot of Trips after booking; typecheck; web build;
+  e2e.
 
 ---
 

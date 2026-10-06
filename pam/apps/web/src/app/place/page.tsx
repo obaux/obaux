@@ -255,7 +255,16 @@ function PlaceScreen() {
     window.addEventListener(TRIPS_CHANGED, read);
     return () => window.removeEventListener(TRIPS_CHANGED, read);
   }, [place, tripId, fromTrips]);
-  const status = usePlaceStatus(place?.id ?? '', place?.hours ?? null, t, locale);
+  // A service with its own hours (D-313): the open/closed line and the
+  // hours row are its, once picked or booked.
+  const hoursService =
+    forPlace(place?.id ?? '').find((s) => s.id === (visit ? visit.serviceId : pickedService)) ?? null;
+  const status = usePlaceStatus(
+    hoursService?.hours ? `${place?.id ?? ''}:${hoursService.id}` : (place?.id ?? ''),
+    hoursService?.hours ?? place?.hours ?? null,
+    t,
+    locale,
+  );
 
   /*
    * The nested-page template (D-213): a place is something you tap into, so

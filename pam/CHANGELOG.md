@@ -178,7 +178,10 @@ page then describes that service, with its address, number, website and
 directions, and Plan a trip is for it; a booked visit shows its own
 service's details. A service can be at a different address from the program; the page then
 says "Main address" or "Service address". Messaging a program from its page
-and pressing Back returns to that page.
+and pressing Back returns to that page. A service can also keep its own
+hours, and the place's open or closed line follows the service you pick.
+After booking, Trips asks you to sign a program's policies in one short
+banner instead of a large card.
 A program that just meets on a schedule says when to come instead of asking
 you to book.
 

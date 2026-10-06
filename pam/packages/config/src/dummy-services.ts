@@ -20,6 +20,8 @@
  * schema change for Will to approve (`services` in 0003 is the listing
  * itself; this would be a child of it).
  */
+import type { WeekHours } from './hours.js';
+
 export interface DummyService {
   readonly id: string;
   /** A `dummy-places.ts` id. */
@@ -33,6 +35,12 @@ export interface DummyService {
   readonly website: string | null;
   /** Where it happens, when not at the program's address (Will: "services might be offered at different addresses"). */
   readonly address: string | null;
+  /**
+   * When it runs, when not the program's hours (Will, 6 October: "we can
+   * accommodate more info per service, including hours"). Same shape as a
+   * place's week (`hours.ts`): index 0 is Sunday.
+   */
+  readonly hours?: WeekHours | null;
   /** `dummy-policies.ts` ids that are only for this service. */
   readonly policyIds: readonly string[];
 }
@@ -76,6 +84,8 @@ export const DUMMY_SERVICES: readonly DummyService[] = [
     phone: null,
     website: 'https://example.org/lab-classes',
     address: '1500 Spring Garden St, Philadelphia, PA 19130',
+    // Tuesday and Thursday afternoons, as the card says.
+    hours: [[], [], [{ open: '13:00', close: '16:00' }], [], [{ open: '13:00', close: '16:00' }], [], []],
     policyIds: [],
   },
   {

@@ -1,14 +1,17 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, type ComponentProps } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { Card } from '@astryxdesign/core/Card';
 import { CheckboxInput } from '@astryxdesign/core/CheckboxInput';
 import { Heading } from '@astryxdesign/core/Heading';
+import { HStack } from '@astryxdesign/core/HStack';
+import { TimeInput } from '@astryxdesign/core/TimeInput';
 import { Text } from '@astryxdesign/core/Text';
 import { TextArea } from '@astryxdesign/core/TextArea';
 import { VStack } from '@astryxdesign/core/VStack';
 import type { DummyService } from '@pam/config/dummy-services';
+import type { WeekHours } from '@pam/config/hours';
 import { BigButton, TextField, TextLink } from '@pam/ui';
 import { SubPage } from '@pam/ui/SubPage';
 import { useI18n } from '@/lib/i18n';
@@ -35,6 +38,8 @@ const styles = stylex.create({
   heading: { fontSize: '18px', lineHeight: 1.3 },
   hint: { fontSize: '15px', lineHeight: 1.5 },
   choices: { rowGap: '12px' },
+  times: { width: '100%', paddingInlineStart: '36px' },
+  time: { flexGrow: 1, minWidth: 0 },
   need: { fontSize: '15px', lineHeight: 1.5 },
 });
 
@@ -60,6 +65,20 @@ export function ServiceEditView({ serviceId }: { readonly serviceId: string | nu
   const [tried, setTried] = useState(false);
   const [asking, setAsking] = useState(false);
   const set = (patch: Partial<DummyService>) => setDraft((d) => ({ ...d, ...patch }));
+  // Hours (D-313): a day ticked runs from–until; no day ticked means the
+  // program's hours. One opening a day — the common case — kept simple.
+  const { locale } = useI18n();
+  const dayName = (index: number) =>
+    new Intl.DateTimeFormat(locale, { weekday: 'long' }).format(new Date(2026, 0, 4 + index));
+  const week: WeekHours = draft.hours ?? [[], [], [], [], [], [], []];
+  const setDay = (index: number, periods: readonly { open: string; close: string }[]) => {
+    const next = week.map((day, i) => (i === index ? periods : day));
+    set({ hours: next.some((day) => day.length > 0) ? next : null });
+  };
+  // Stored as "HH:MM", which is the time field's own ISO format.
+  type Time = NonNullable<ComponentProps<typeof TimeInput>['value']>;
+  // Monday first, as people say a week.
+  const ORDER = [1, 2, 3, 4, 5, 6, 0];
   const invalid = tried && draft.name.trim() === '';
 
   const submit = () => {
@@ -72,6 +91,7 @@ export function ServiceEditView({ serviceId }: { readonly serviceId: string | nu
       phone: draft.phone?.trim() || null,
       website: draft.website?.trim() || null,
       address: draft.address?.trim() || null,
+      hours: draft.hours ?? null,
     });
     navigate('/program/');
   };
@@ -132,6 +152,54 @@ export function ServiceEditView({ serviceId }: { readonly serviceId: string | nu
               {t('program.service.need.name')}
             </Text>
           ) : null}
+        </VStack>
+      </Card>
+
+      {/* When it runs, if not the program's hours (D-313). */}
+      <Card padding={6}>
+        <VStack gap={3}>
+          <Heading level={2} xstyle={styles.heading}>
+            {t('program.service.hours')}
+          </Heading>
+          <Text type="supporting" xstyle={styles.hint}>
+            {t('program.service.hours.hint')}
+          </Text>
+          <VStack gap={2} xstyle={styles.choices}>
+            {ORDER.map((index) => {
+              const day = week[index] ?? [];
+              const on = day.length > 0;
+              const period = day[0] ?? { open: '09:00', close: '17:00' };
+              return (
+                <VStack key={index} gap={2}>
+                  <CheckboxInput
+                    label={dayName(index)}
+                    value={on}
+                    onChange={(next) => setDay(index, next ? [period] : [])}
+                  />
+                  {on ? (
+                    <HStack gap={2} wrap="nowrap" xstyle={styles.times}>
+                      <TimeInput
+                        label={t('program.service.hours.from', { day: dayName(index) })}
+                        isLabelHidden
+                        value={period.open as Time}
+                        onChange={(v) => setDay(index, [{ ...period, open: v ?? period.open }])}
+                        width="100%"
+                        xstyle={styles.time}
+                      />
+                      <TimeInput
+                        label={t('program.service.hours.to', { day: dayName(index) })}
+                        isLabelHidden
+                        value={period.close as Time}
+                        onChange={(v) => setDay(index, [{ ...period, close: v ?? period.close }])}
+                        width="100%"
+                        xstyle={styles.time}
+                      />
+                    </HStack>
+                  ) : null}
+                </VStack>
+              );
+            })}
+          </VStack>
         </VStack>
       </Card>
 

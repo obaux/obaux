@@ -2,12 +2,13 @@
 
 import { useEffect, useState, type ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
+import { Banner } from '@astryxdesign/core/Banner';
 import { EmptyState } from '@astryxdesign/core/EmptyState';
 import { Heading } from '@astryxdesign/core/Heading';
 import { HStack } from '@astryxdesign/core/HStack';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
-import { PlusIcon, TripsIcon } from '@pam/ui';
+import { PlusIcon, TextLink, TripsIcon } from '@pam/ui';
 import { Button } from '@astryxdesign/core/Button';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { readAddedTrips, readMoves, withMoves } from '@/lib/addedTrips';
@@ -20,8 +21,6 @@ import { dummyConnection } from '@pam/config/dummy-connections';
 import { useI18n } from '@/lib/i18n';
 import { BigCategoryIcon, CategoryIcon, categoryTone } from './SavedView';
 import { TripsMap } from './TripsMap';
-import { BigButton } from '@pam/ui';
-import { Card } from '@astryxdesign/core/Card';
 import { usePolicies } from '@/lib/usePolicies';
 import { useMySignatures } from '@/lib/useMySignatures';
 import { policiesHref } from './MemberPoliciesView';
@@ -105,9 +104,6 @@ const styles = stylex.create({
   count: { fontSize: '15px', textAlign: 'center' },
   state: { paddingBlock: '24px' },
   stateIcon: { width: '56px', height: '56px' },
-  toSign: { width: '100%' },
-  toSignTitle: { fontSize: '20px', lineHeight: 1.3 },
-  toSignBody: { fontSize: '17px', lineHeight: 1.5 },
   // The new trip's card rises into place after the drawer opens (D-241).
   arrive: {
     animationName: arriveIn,
@@ -200,25 +196,21 @@ export function TripsView({ trips, headerActions, justAdded = null }: TripsViewP
               the top of the list, while the confetti is still falling.
             */}
             {toSign ? (
-              <Card padding={6} xstyle={styles.toSign}>
-                <VStack gap={3}>
-                  <VStack gap={1}>
-                    <Heading level={2} xstyle={styles.toSignTitle}>
-                      {t('trips.added.policies.title')}
-                    </Heading>
-                    <Text type="supporting" xstyle={styles.toSignBody}>
-                      {t('trips.added.policies.body', {
-                        place: toSign.placeName,
-                        count: toSign.policies!.total - toSign.policies!.signed,
-                      })}
-                    </Text>
-                  </VStack>
-                  <BigButton
+              // One line, not a card (Will, 6 October): what is left to do
+              // before the visit, and a way straight to it.
+              <Banner
+                status="warning"
+                title={t('trips.added.policies.title', {
+                  place: toSign.placeName,
+                  count: toSign.policies!.total - toSign.policies!.signed,
+                })}
+                endContent={
+                  <TextLink
                     label={t('trips.added.policies.action')}
                     href={policiesHref(toSign.placeId, toSign.placeName)}
                   />
-                </VStack>
-              </Card>
+                }
+              />
             ) : null}
             {shown.map((trip) => {
               const card = (
