@@ -31,6 +31,8 @@ export interface DummyService {
   readonly phone: string | null;
   /** Its own page — or null to use the program's. */
   readonly website: string | null;
+  /** Where it happens, when not at the program's address (Will: "services might be offered at different addresses"). */
+  readonly address: string | null;
   /** `dummy-policies.ts` ids that are only for this service. */
   readonly policyIds: readonly string[];
 }
@@ -43,6 +45,7 @@ export const DUMMY_SERVICES: readonly DummyService[] = [
     description: 'Reading, writing and math toward the GED test, four mornings a week. Start any Monday.',
     phone: '+12155550101',
     website: 'https://example.org/ged',
+    address: null,
     policyIds: ['policy-conduct'],
   },
   {
@@ -52,6 +55,7 @@ export const DUMMY_SERVICES: readonly DummyService[] = [
     description: 'Open computers, printing and help with email, forms and job sites. Walk in.',
     phone: null,
     website: null,
+    address: null,
     policyIds: [],
   },
   {
@@ -61,6 +65,7 @@ export const DUMMY_SERVICES: readonly DummyService[] = [
     description: 'Two weeks on resumes, interviews and showing up ready. A certificate at the end.',
     phone: '+12155550102',
     website: 'https://example.org/job-ready',
+    address: '1420 Chestnut St, 2nd floor, Philadelphia, PA 19102',
     policyIds: ['policy-media'],
   },
   {
@@ -70,6 +75,7 @@ export const DUMMY_SERVICES: readonly DummyService[] = [
     description: 'Six weeks from the mouse to email, forms and job sites. Tuesday and Thursday afternoons.',
     phone: null,
     website: 'https://example.org/lab-classes',
+    address: null,
     policyIds: [],
   },
   {
@@ -79,6 +85,7 @@ export const DUMMY_SERVICES: readonly DummyService[] = [
     description: 'Bring your phone or a form and somebody sits with you. No sign-up.',
     phone: '+12155550121',
     website: null,
+    address: null,
     policyIds: [],
   },
   {
@@ -88,6 +95,7 @@ export const DUMMY_SERVICES: readonly DummyService[] = [
     description: 'Placements with local employers, paid from the first day, with a coach who checks in weekly.',
     phone: '+12155550150',
     website: 'https://example.org/apprentice',
+    address: '3200 N Broad St, Philadelphia, PA 19140',
     policyIds: [],
   },
   {
@@ -97,6 +105,7 @@ export const DUMMY_SERVICES: readonly DummyService[] = [
     description: 'Sit with somebody for an hour and leave with a resume you can send. No appointment.',
     phone: null,
     website: null,
+    address: null,
     policyIds: [],
   },
 ];

@@ -159,7 +159,7 @@ export const flows = [
         story: 'member-created--place-profile',
         path: '/place/',
         changed: 'D-313',
-        note: 'Services card; Plan a trip at the foot; Policies to sign with the rows',
+        note: 'Service cards to flip through; the picked one sets the rows and Plan a trip',
       },
       service: {
         title: 'A service',

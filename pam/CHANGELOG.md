@@ -172,8 +172,10 @@ sign" sits with Send a message and Call. Planning a trip and signing policies
 keep their button at the foot the same way.
 A program can list the services it offers, each with its own phone number,
 website and policies: named when signing up, managed from the Program tab,
-shown on the program's page for members to open, and picked when booking a
-visit if there is more than one.
+shown on the program's page as cards to flip through, and picked when booking
+a visit. Tap a card and the page's number, website and directions follow it,
+and Plan a trip is for it; a booked visit shows its own service's details.
+A service can be at a different address from the program.
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 

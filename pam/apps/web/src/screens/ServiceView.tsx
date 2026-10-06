@@ -9,7 +9,7 @@ import { displayPhone } from '@pam/config';
 import { DUMMY_PLACES_BY_ID } from '@pam/config/dummy-places';
 import { placeAsksForPolicies } from '@pam/config/dummy-policies';
 import { policiesForService, servicesFor } from '@pam/config/dummy-services';
-import { BigButton, BookIcon, GlobeIcon, PhoneIcon, SignedIcon } from '@pam/ui';
+import { BigButton, BookIcon, GlobeIcon, PhoneIcon, PlacesIcon, SignedIcon, directionsHref } from '@pam/ui';
 import { MenuList, type MenuItem } from '@pam/ui/MenuList';
 import { SubPage } from '@pam/ui/SubPage';
 import { useI18n } from '@/lib/i18n';
@@ -65,12 +65,31 @@ export function ServiceView({ placeId, serviceId }: { readonly placeId: string; 
 
   const phone = service.phone ?? place?.phone ?? null;
   const website = service.website ?? null;
+  // Where it happens: its own address, or the program's (Will, D-313).
+  const address = service.address ?? place?.address ?? null;
+  const directions = service.address
+    ? directionsHref(service.address, null, null, null)
+    : place
+      ? directionsHref(place.address, place.lat, place.lon, null)
+      : undefined;
   const asksToSign = placeAsksForPolicies(placeId) && policies.length > 0;
   const toSign = asksToSign ? policiesForService(service, policies, here) : [];
   const { signed, total } = progress(placeId, toSign);
   const allSigned = total > 0 && signed === total;
 
   const rows: MenuItem[] = [
+    ...(directions
+      ? [
+          {
+            id: 'directions',
+            label: t('place.quick.directions'),
+            description: address ?? t('place.quick.directions.body'),
+            icon: <PlacesIcon {...QUICK} />,
+            href: directions,
+            isExternal: true,
+          },
+        ]
+      : []),
     ...(phone
       ? [
           {

@@ -20,6 +20,8 @@ export interface DummyTrip {
   readonly startsAt: string;
   /** A `dummy-connections.ts` id — who they are meeting there. */
   readonly withId: string;
+  /** Which of the program's services the visit is for (D-313). */
+  readonly serviceId?: string;
 }
 
 const daysFromNow = (n: number, hour: number) => {
@@ -45,6 +47,7 @@ export const DUMMY_TRIPS: readonly DummyTrip[] = [
     lon: -75.1652,
     startsAt: daysFromNow(2, 10),
     withId: 'dummy-p1',
+    serviceId: 'service-ged',
   },
   {
     id: 'dummy-trip-2',
@@ -56,6 +59,7 @@ export const DUMMY_TRIPS: readonly DummyTrip[] = [
     lon: -75.1605,
     startsAt: daysFromNow(5, 13),
     withId: 'dummy-p2',
+    serviceId: 'service-apprentice',
   },
 ];
 

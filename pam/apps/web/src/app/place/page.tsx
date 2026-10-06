@@ -41,9 +41,7 @@ import { placeAsksForPolicies } from '@pam/config/dummy-policies';
 import { policiesHref } from '../../screens/MemberPoliciesView';
 import { siteName } from '@/lib/siteName';
 import { useServices } from '@/lib/useServices';
-import { BigCategoryIcon } from '../../screens/SavedView';
-import { Card } from '@astryxdesign/core/Card';
-import { MenuList } from '@pam/ui/MenuList';
+import { ServiceCards } from '../../screens/ServiceCards';
 
 /**
  * One place, on its own screen.
@@ -229,7 +227,10 @@ function PlaceScreen() {
   // to the top of the page (D-271). Opened from a trip card, the page is
   // about that visit (D-273): its day and time instead of "Plan a trip".
   const [hasTrip, setHasTrip] = useState(false);
-  const [visit, setVisit] = useState<{ id: string; startsAt: string } | null>(null);
+  const [visit, setVisit] = useState<{ id: string; startsAt: string; serviceId: string | null } | null>(null);
+  // The service a member has picked from the cards (D-313): what Plan a
+  // trip is for, and what the rows say. With a visit booked, the visit's.
+  const [pickedService, setPickedService] = useState<string | null>(null);
   // A visit card on Trips or in a conversation opens the place about that
   // visit (D-273, D-276).
   const tripId = params.get('trip');
@@ -244,7 +245,7 @@ function PlaceScreen() {
         .sort((a, b) => a.startsAt.localeCompare(b.startsAt));
       setHasTrip(here.length > 0);
       const found = here.find((trip) => trip.id === tripId) ?? (fromTrips ? here[0] : undefined);
-      setVisit(fromTrips && found ? { id: found.id, startsAt: found.startsAt } : null);
+      setVisit(fromTrips && found ? { id: found.id, startsAt: found.startsAt, serviceId: found.serviceId ?? null } : null);
     };
     read();
     // A visit moved from here (D-281) shows its new time on the way back.
@@ -338,6 +339,14 @@ function PlaceScreen() {
   // plan one (D-273).
   const plansVisit = (demoRole ?? trueRole) === 'member' && !visit;
   const services = forPlace(place!.id);
+  const activeServiceId = visit ? visit.serviceId : pickedService;
+  const service = services.find((s) => s.id === activeServiceId) ?? null;
+  // What the page says to call, open and find: the chosen service's, where
+  // it has its own, else the program's (Will: "services might be offered
+  // at different addresses also").
+  const phone = service?.phone ?? place!.phone;
+  const website = service?.website ?? place!.website;
+  const address = service?.address ?? place!.address;
   // The booked visit (D-273, D-281): "Your next visit", the day large, the
   // time under it, and a way to move it.
   const visitDay = new Intl.DateTimeFormat(locale, { weekday: 'long', month: 'long', day: 'numeric' });
@@ -359,7 +368,10 @@ function PlaceScreen() {
   // With the place's Google ID when Pam has one (D-291): Maps opens on the place itself.
   // Only a member is written to by a program here (D-305).
   const unread = (demoRole ?? trueRole) === 'member' ? newMessageFrom(place!.name) : null;
-  const directions = directionsHref(place!.address, place!.lat, place!.lon, place!.placeId) ?? null;
+  const directions =
+    (service?.address
+      ? directionsHref(service.address, null, null, null)
+      : directionsHref(place!.address, place!.lat, place!.lon, place!.placeId)) ?? null;
   const googleHref = googlePlaceHref(place!.lookupName || place!.name, place!.address, place!.placeId);
   const lines = status ? weekLines(status.hours, locale, t('place.hours.closed')) : undefined;
 
@@ -375,6 +387,8 @@ function PlaceScreen() {
               name: place!.name,
               category: place!.category,
               ...(place!.address ? { address: place!.address } : {}),
+              // The card they picked rides along (D-313): no "Which service?"
+              ...(service ? { service: service.id } : {}),
             }).toString()}`}
           />
         ) : null
@@ -396,7 +410,7 @@ function PlaceScreen() {
         category={place!.category}
         categoryLabel={t(categoryLabelKey(place!.category))}
         description={place!.description}
-        address={place!.address}
+        address={address}
         status={status ? { isOpen: status.isOpen, label: status.label } : null}
         weekLines={lines}
         todayIndex={status ? status.today : null}
@@ -404,8 +418,8 @@ function PlaceScreen() {
         hoursArePlaceholder={status ? !status.isReal : false}
         placeholderNote={t('place.hours.sample')}
         audienceLabel={place!.audience ? t(`place.audience.${place!.audience}`) : null}
-        phone={place!.phone}
-        website={place!.website}
+        phone={phone}
+        website={website}
         // Nothing asks for directions as a button when the one action is
         // planning a visit, or a visit is booked (D-273); the row has them.
         directionsHref={visitWhen || plansVisit ? null : directions}
@@ -443,22 +457,13 @@ function PlaceScreen() {
         // What the program offers, as services (D-313): each a row that
         // opens the service — its own number, site and what to sign.
         extra={
-          services.length > 0 ? (
-            <Card padding={1}>
-              <MenuList
-                label={t('place.services.label')}
-                hasDividers
-                items={services.map((s) => ({
-                  id: s.id,
-                  label: s.name,
-                  description: s.description,
-                  isDescriptionOneLine: true,
-                  icon: <BigCategoryIcon category={place!.category} size={QUICK} />,
-                  href: `/place/service/?${new URLSearchParams({ place: place!.id, id: s.id }).toString()}`,
-                }))}
-              />
-            </Card>
-          ) : null
+          <ServiceCards
+            services={services}
+            selectedId={service?.id ?? null}
+            onSelect={setPickedService}
+            isLocked={visit !== null}
+            detailsHref={(s) => `/place/service/?${new URLSearchParams({ place: place!.id, id: s.id }).toString()}`}
+          />
         }
         quickActionsLabel={t('place.quick.label')}
         // Rows, most important first (Will, 5 October, D-291): getting
@@ -469,7 +474,7 @@ function PlaceScreen() {
                 {
                   id: 'directions',
                   label: t('place.quick.directions'),
-                  description: t('place.quick.directions.body'),
+                  description: service?.address ?? t('place.quick.directions.body'),
                   icon: <PlacesIcon {...QUICK} />,
                   href: (directions ?? googleHref)!,
                   isExternal: true,
@@ -497,26 +502,26 @@ function PlaceScreen() {
                 icon: <MessagesIcon {...QUICK} />,
                 href: messageHrefFor(place!.name),
               },
-          ...(place!.phone
+          ...(phone
             ? [
                 {
                   id: 'call',
                   label: t('place.quick.call'),
                   // The number itself (Will, D-306: "no need to hide info").
-                  description: displayPhone(place!.phone!),
+                  description: displayPhone(phone),
                   icon: <PhoneIcon {...QUICK} />,
-                  href: `tel:${place!.phone}`,
+                  href: `tel:${phone}`,
                 },
               ]
             : []),
-          ...(place!.website
+          ...(website
             ? [
                 {
                   id: 'website',
                   label: t('place.quick.website'),
-                  description: siteName(place!.website),
+                  description: siteName(website),
                   icon: <GlobeIcon {...QUICK} />,
-                  href: place!.website,
+                  href: website,
                   isExternal: true,
                 },
               ]

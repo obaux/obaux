@@ -1237,5 +1237,11 @@
   "join.program.services.hint": "Name each thing you do — GED classes, the computer room. You can add a phone, website and policies for each later, from your Program tab.",
   "join.program.service": "Service {n}",
   "join.program.services.add": "Add another service",
-  "join.program.services.remove": "Remove service {n}"
+  "join.program.services.remove": "Remove service {n}",
+  "place.services.pick": "Tap a service to plan a visit for it.",
+  "place.services.selected": "Selected",
+  "place.services.details": "Details",
+  "place.services.atProgram": "At the program's address",
+  "program.service.address": "Address, if not the program's",
+  "service.address": "Where it is"
 }

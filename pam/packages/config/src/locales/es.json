@@ -1237,5 +1237,11 @@
   "join.program.services.hint": "Nombra cada cosa que haces: clases de GED, la sala de computadoras. Luego podrás agregar teléfono, sitio web y políticas para cada uno desde tu pestaña Programa.",
   "join.program.service": "Servicio {n}",
   "join.program.services.add": "Agregar otro servicio",
-  "join.program.services.remove": "Quitar servicio {n}"
+  "join.program.services.remove": "Quitar servicio {n}",
+  "place.services.pick": "Toca un servicio para planear una visita para él.",
+  "place.services.selected": "Seleccionado",
+  "place.services.details": "Detalles",
+  "place.services.atProgram": "En la dirección del programa",
+  "program.service.address": "Dirección, si no es la del programa",
+  "service.address": "Dónde está"
 }

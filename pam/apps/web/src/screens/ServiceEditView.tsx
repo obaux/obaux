@@ -53,6 +53,7 @@ export function ServiceEditView({ serviceId }: { readonly serviceId: string | nu
       description: '',
       phone: null,
       website: null,
+      address: null,
       policyIds: [],
     },
   );
@@ -70,6 +71,7 @@ export function ServiceEditView({ serviceId }: { readonly serviceId: string | nu
       description: draft.description.trim(),
       phone: draft.phone?.trim() || null,
       website: draft.website?.trim() || null,
+      address: draft.address?.trim() || null,
     });
     navigate('/program/');
   };
@@ -114,6 +116,14 @@ export function ServiceEditView({ serviceId }: { readonly serviceId: string | nu
             label={t('program.service.website')}
             value={draft.website ?? ''}
             onChange={(next) => set({ website: next })}
+            width="100%"
+            xstyle={styles.field}
+          />
+          <TextField
+            purpose="address"
+            label={t('program.service.address')}
+            value={draft.address ?? ''}
+            onChange={(next) => set({ address: next })}
             width="100%"
             xstyle={styles.field}
           />

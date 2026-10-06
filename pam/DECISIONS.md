@@ -7430,6 +7430,24 @@ each."
 - **Example data** (`dummy-services.ts`): three services at Example
   Learning Center, two at the Workforce Center, none elsewhere; a lead's
   edits are kept for the session (`useServices`), like policies.
+- **Cards, not rows** (Will, later the same day: "instead of using the
+  actions list component we should use a horizontal card carousel with all
+  of the details small inside card, letting users flip through… If user has
+  selected a card, it outlines… when they press plan trip it carries over
+  their service selection and when they see their trip confirmation place
+  profile it's related to the service details phone website address… services
+  might be offered at different addresses also"). On both of a member's
+  place profiles the services are a rail of `SelectableCard`s, full-bleed,
+  snapping, each with the name, a line or two, and only what differs from
+  the program — its own number, site and address (or "At the program's
+  address") — and "Details" under it to the service's page. Tapping a card
+  outlines it; the rows above (Call, Website, Get directions, Address)
+  follow the picked service, and Plan a trip carries it, so "Which service?"
+  is skipped. With a visit booked, the visit's service is the card outlined
+  and the others are quiet: the page is about that visit, at that service's
+  number and address. A service has an `address` of its own, set in its
+  editor, shown on its page with Get directions; example trips remember
+  their service.
 - **Open:** whether service names should be free text or picked from a
   list Pam keeps (free text here; a list would make Explore filterable by
   service). Storing services is a schema change for Will.
