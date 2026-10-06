@@ -50,6 +50,16 @@ export function inviteLink(code: string, role: InviteRole, trip?: string | null)
   return `${appUrl()}/signin/?invite=${encodeURIComponent(code)}&as=${ROLE_IN_LINK[role]}${extra}`;
 }
 
+/**
+ * A member's link for a friend to join the same program (D-329). No code:
+ * a member makes no invites in the database, and a friend signs up as any
+ * member does. The program rides along so sign in can say where they were
+ * asked to.
+ */
+export function friendLink(placeId: string): string {
+  return `${appUrl()}/signin/?as=member&program=${encodeURIComponent(placeId)}`;
+}
+
 /** An invite read back out of a link's query, or null if it carries none. */
 export interface Invite {
   readonly code: string;

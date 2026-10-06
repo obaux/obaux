@@ -400,7 +400,9 @@ is ready for Claude Design (D-328): the theme, Figtree and `tokens.css` live in
 `@pam/ui` (not apps/web), `PamProvider` mounts a component anywhere,
 `pnpm --filter @pam/ui build` writes `dist/` (CI builds it), every component has
 a `Components/<Category>/<Component>` story, and usage rules are MDX under
-`Foundations/`. Note:
+`Foundations/`. A member's program page leads with "Bring a friend"
+(`/place/friend/`, a link with the program and no code); sign in does not
+read that program yet (D-329). Note:
 the web app's vitest tests are not run in CI. How points should be awarded — two rules live
 (save a place, finish setup), the rest to build, with order and open
 questions — is specified in `docs/points-awarding.md`. The

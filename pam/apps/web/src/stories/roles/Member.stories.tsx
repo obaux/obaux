@@ -21,6 +21,8 @@ type Story = StoryObj;
 export const Explore: Story = screen('member', 'Explore', '/');
 export const Saved: Story = screen('member', 'Saved', '/saved/');
 export const Trips: Story = screen('member', 'Trips', '/trips/');
+// Just booked, with policies still to sign: the banner on top (D-327).
+export const TripsJustBooked: Story = screen('member', 'Trips — just booked', '/trips/', { added: 'dummy-trip-1' });
 export const Messages: Story = screen('member', 'Messages', '/messages/');
 export const Profile: Story = screen('member', 'Profile', '/profile/');
 
@@ -67,6 +69,10 @@ export const PlaceProfile: Story = screenWithControls<PlaceProfileArgs>(
   },
   (args) => PLACE_FOR[`${args.profile}|${args.newMessage}`]!,
 );
+// A link for a friend to join the same program (D-329).
+export const BringFriend: Story = screen('member', 'Bring a friend', '/place/friend/', {
+  id: 'dummy-place-learning',
+});
 // A program's policies, read and signed by a member (D-270).
 export const PlacePolicies: Story = screen('member', 'Policies to sign', '/place/policies/', {
   id: 'dummy-place-learning',

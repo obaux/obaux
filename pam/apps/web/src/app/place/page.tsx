@@ -9,6 +9,7 @@ import {
   MessagesIcon,
   Notice,
   Page,
+  PeopleIcon,
   PhoneIcon,
   PlaceDetail,
   PlacesIcon,
@@ -39,6 +40,7 @@ import { DUMMY_TRIPS } from '@pam/config/dummy-trips';
 import { readAddedTrips, TRIPS_CHANGED, withMoves } from '@/lib/addedTrips';
 import { placeAsksForPolicies } from '@pam/config/dummy-policies';
 import { policiesHref } from '../../screens/MemberPoliciesView';
+import { friendHref } from '../../screens/BringFriendView';
 import { siteName } from '@/lib/siteName';
 import { useServices } from '@/lib/useServices';
 import { ServiceCards } from '../../screens/ServiceCards';
@@ -505,6 +507,19 @@ function PlaceScreen() {
         // Rows, most important first (Will, 5 October, D-291): getting
         // there, then asking a question, then calling, then the website.
         quickActions={[
+          // Bring a friend (Will, 6 October, D-329): first in the list, a
+          // link for another member to join this program too. Members only.
+          ...((demoRole ?? trueRole) === 'member'
+            ? [
+                {
+                  id: 'friend',
+                  label: t('place.quick.friend'),
+                  description: t('place.quick.friend.body'),
+                  icon: <PeopleIcon {...QUICK} />,
+                  href: friendHref(place!.id, place!.name),
+                },
+              ]
+            : []),
           ...(directions || googleHref
             ? [
                 {

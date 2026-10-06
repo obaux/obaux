@@ -358,7 +358,12 @@ export function PlaceDetail({
     ...(action.isDescriptionOneLine ? { isDescriptionOneLine: true } : {}),
   }));
   // Right after directions: where it is, then when it is open.
-  if (hoursRow) quickItems.splice(quickItems[0]?.id === 'directions' ? 1 : 0, 0, hoursRow);
+  // Hours go after Directions, or first; never above "Bring a friend",
+  // which leads the list when it is there (D-329).
+  if (hoursRow) {
+    const directionsAt = quickItems.findIndex((item) => item.id === 'directions');
+    quickItems.splice(directionsAt >= 0 ? directionsAt + 1 : quickItems[0]?.id === 'friend' ? 1 : 0, 0, hoursRow);
+  }
 
   const weekSheet = hasWeek ? (
     <BottomSheet isOpen={isWeekOpen} onOpenChange={setWeekOpen} label={labels.hours} height="hug">

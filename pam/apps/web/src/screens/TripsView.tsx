@@ -102,6 +102,7 @@ const styles = stylex.create({
   },
   title: { fontSize: '26px', lineHeight: 1.2, fontWeight: 700, textAlign: 'center' },
   count: { fontSize: '15px', textAlign: 'center' },
+  signBanner: { position: 'relative', zIndex: 2 },
   state: { paddingBlock: '24px' },
   stateIcon: { width: '56px', height: '56px' },
   // The new trip's card rises into place after the drawer opens (D-241).
@@ -198,19 +199,23 @@ export function TripsView({ trips, headerActions, justAdded = null }: TripsViewP
             {toSign ? (
               // One line, not a card (Will, 6 October): what is left to do
               // before the visit, and a way straight to it.
-              <Banner
-                status="warning"
-                title={t('trips.added.policies.title', {
-                  place: toSign.placeName,
-                  count: toSign.policies!.total - toSign.policies!.signed,
-                })}
-                endContent={
-                  <TextLink
-                    label={t('trips.added.policies.action')}
-                    href={policiesHref(toSign.placeId, toSign.placeName)}
-                  />
-                }
-              />
+              // Above the drawer's top fade (zIndex 1), which washed out its
+              // top edge at rest (Will, 6 October).
+              <VStack xstyle={styles.signBanner}>
+                <Banner
+                  status="warning"
+                  title={t('trips.added.policies.title', {
+                    place: toSign.placeName,
+                    count: toSign.policies!.total - toSign.policies!.signed,
+                  })}
+                  endContent={
+                    <TextLink
+                      label={t('trips.added.policies.action')}
+                      href={policiesHref(toSign.placeId, toSign.placeName)}
+                    />
+                  }
+                />
+              </VStack>
             ) : null}
             {shown.map((trip) => {
               const card = (

@@ -188,6 +188,9 @@ The design system now stands on its own: its colours, fonts and theme ship
 with the component package, in one tokens file and a built stylesheet, every
 component has a story with its variants, and Storybook explains how to use
 them (D-328).
+A program's page starts its list with "Bring a friend", which opens a link
+to send so a friend can join the same program. The sign-before-you-go
+banner on Trips is no longer washed out at its top edge (D-329).
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 

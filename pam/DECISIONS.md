@@ -7936,6 +7936,38 @@ written down, fonts from the package, `Category/Component/Variant` names.
   and all 290 Components/Foundations entries (stories and docs pages) load
   with no error and a non-empty root; e2e 570/570.
 
+### D-329 — Bring a friend: the first row on a program's page
+
+**Date:** 2026-10-06. Will: "a white (simple, not too busy) alert under
+about and address asking if they want to bring a friend? When clicked it
+opens a nested page with an invite link for another member to join that
+program" — then, before it shipped: "Instead of bring a friend alert, we can
+add it as an item on top of quick actions list."
+
+- **A row, not a card.** "Bring a friend · Send a link so they can join too"
+  leads a member's quick actions on every program page, before Directions
+  and Hours. Members only. A member's list now starts with Bring a friend,
+  then Directions, then Hours; PlaceDetail puts Hours after Directions, or
+  after Bring a friend when there are no directions.
+- **`/place/friend/`** (`BringFriendView`, SubPage, Back to this place):
+  one sentence, the link shown, one footer button "Send the link" (share
+  sheet, or copy where there is none), and "They sign up with their own
+  phone number."
+- **The link has no invite code.** `friendLink(placeId)` →
+  `/signin/?as=member&program=<id>`. Members make no invites in the database
+  (`create_invite` is for case managers and programs), and a friend signs up the way any member
+  does. **Open:** sign in does not read `program` yet, so the friend lands
+  on plain sign in; showing "Your friend invited you to <program>" and opening
+  that program after joining is the next step.
+- **Trips banner (D-327 follow-up).** The drawer's top fade (z-index 1)
+  washed out the banner's top edge at rest; the banner now sits in a
+  positioned wrapper at z-index 2. A Storybook state, Member › Trips — just
+  booked, shows it.
+- **Proven by:** screenshots (place rows, Bring a friend, Trips banner);
+  typecheck; config 238, ui 69, web 11; web and Storybook builds; e2e
+  570/570 (the row-order test now expects Bring a friend first); flow map
+  page 2 redrawn.
+
 ---
 
 ## Notes for whoever picks this up next
