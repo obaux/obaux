@@ -7482,6 +7482,60 @@ week', and ultimately free up space."
 - **Proven by:** screenshots closed, open, and after picking "today";
   config 238 and ui 67, typecheck, web and Storybook builds; e2e 570/570.
 
+### D-316 — A program checks people in, and books a visit for somebody who wrote
+
+Will, 6 October, on a program lead's Home: "since they should be able to
+book on behalf of a user who's messaged them. This should register as a
+member who booked a trip, and should show up on the member dashboard.
+Let's add that as the first action on Plus icon button. Also the avatars
+on the calendar daily, weekly view, we should replace it with checkmarks
+in circles so they can check people in. When clicked a tooltip shows
+(Checked-in), and user can undo this with confirm modal. These actions
+should update the subtitle, in fact let's make that subtitle more explicit
+(Not checked-in, vs checked-in). Only programs can check members in (for
+now). And instead of using checkmark next to member name, we should add a
+light green signature icon to verify they've signed all policies." Then:
+"a special micro interaction that delights … little confetti bursting
+out … the button distort shape so it resembles real physics, something
+fun, but sophisticated."
+
+- **Check in.** Each visit's avatar is now a 48px circle with a check. A
+  tap checks the person in: the circle fills with the accent, squashes
+  and springs back (`squash`, 520ms, an overshooting ease), eight bits
+  fly out from behind it and fade (`fly`, 640ms, data hues), and a tip
+  says "Checked in" for 1.6s. The subtitle says it plainly either way:
+  "First visit · Not checked in" / "First visit · Checked in". A second
+  tap asks first — "Undo Jordan's check-in?" (`AlertDialog`) — because an
+  arrival is a fact, taken back on purpose. Both animations stop under
+  reduced motion; nothing moving is read out.
+- **Where it is kept.** `src/lib/checkIns.ts`, in the browser session
+  like a member's added trips (D-225): the appointments table already
+  has `checked_in_at` and `attendance_method` (0004) and nothing writes
+  them yet. `ScheduleView` takes `canCheckIn`; only the program's Home
+  passes it.
+- **The row.** A button cannot sit inside a link, so with the circle on,
+  the person's name carries the link and the row itself does not.
+- **The signature.** The tick for "signed every policy" (D-261) is now a
+  light-green circle with the signing pen (`SignIcon` on
+  `--color-success-muted` / `--color-success`), read out as before.
+- **Book a visit for a member.** First in the "+" menu. `/program/book/`
+  lists the people in the program's conversations ("Wrote to your
+  program"); a row opens New trip with this program as the place and
+  "Booking for Jordan" under the title, Back returning to the list. The
+  last step says "Book for Jordan"; saving adds the trip with
+  `forMemberId`/`forName` and shows "Booked for Jordan!" before going to
+  the program's Home. The trip then shows on the program's schedule (a
+  60-minute first visit) and on the member's Trips, from the same store.
+- The "+" items now leave by `navigate()`: `router.push` did nothing in
+  the Storybook prototype, for Invite someone too.
+- **Not done:** nothing reaches the database; the people listed are the
+  example conversations; the program is the example program (D-218).
+- **Proven by:** a scripted walk-through with screenshots (rows, the
+  burst and tip, the undo dialog, the "+" menu, the list, "Booking for
+  Jordan", "Booked for Jordan!", Home with the new row, the member's
+  Trips showing it); config 238, ui 67, typecheck, web and Storybook
+  builds; e2e 570/570.
+
 ---
 
 ## Notes for whoever picks this up next

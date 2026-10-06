@@ -150,6 +150,11 @@ A case manager can invite another case manager. The super admin has Invite
 someone on their Profile and a "+ New invite" button on Invited people.
 A program lead's Home reads "Coming in this week": the range is a word you
 tap to switch, instead of a row of three tabs.
+A program checks people in with the circle beside each visit — it springs and
+bursts, says "Checked in", and asks before undoing — and the subtitle says
+"Not checked in" or "Checked in". A light-green pen marks someone who has
+signed every policy. From the +, a program can book a visit for somebody who
+wrote to it; it shows on their Trips and the program's schedule.
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 

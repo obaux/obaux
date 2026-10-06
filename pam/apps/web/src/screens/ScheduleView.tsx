@@ -1,7 +1,8 @@
 'use client';
 
-import { useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
+import { AlertDialog } from '@astryxdesign/core/AlertDialog';
 import { Avatar } from '@astryxdesign/core/Avatar';
 import { Button } from '@astryxdesign/core/Button';
 import { EmptyState } from '@astryxdesign/core/EmptyState';
@@ -12,13 +13,15 @@ import { IconButton } from '@astryxdesign/core/IconButton';
 import { List, ListItem } from '@astryxdesign/core/List';
 import { DropdownMenu, DropdownMenuRadioGroup, DropdownMenuRadioItem } from '@astryxdesign/core/DropdownMenu';
 import { Text } from '@astryxdesign/core/Text';
+import { Tooltip } from '@astryxdesign/core/Tooltip';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
-import { ExploreIcon, NoResultsIcon, Page, TripsIcon, textLinkLook } from '@pam/ui';
+import { CheckIcon, ExploreIcon, NoResultsIcon, Page, SignIcon, TripsIcon, textLinkLook } from '@pam/ui';
 import { SearchField } from '@pam/ui/SearchPill';
 import { LargeTitleHeader } from '@pam/ui/LargeTitleHeader';
 import { useI18n } from '@/lib/i18n';
 import { isVerified, usePolicies } from '@/lib/usePolicies';
+import { checkIn, undoCheckIn, useCheckIns } from '@/lib/checkIns';
 
 /**
  * A program lead's Home (D-218, Will, 2 October): "a daily calendar view,
@@ -61,7 +64,40 @@ export interface ScheduleViewProps {
   readonly note?: string | null;
   /** Which view it opens on — Day, unless a story says otherwise. */
   readonly initialView?: View;
+  /** A circle to check each person in, in place of their avatar (D-316). Programs only, for now. */
+  readonly canCheckIn?: boolean;
 }
+
+/*
+ * The check-in's moment (Will, 6 October, D-316: "a special micro
+ * interaction that delights … little confetti bursting out … the button
+ * distort shape so it resembles real physics, something fun, but
+ * sophisticated"). The circle squashes and springs back like something
+ * pressed, and eight bits fly out from behind it and fade. Both are stilled
+ * by reduced motion; neither is read out — the row's words say "Checked in".
+ */
+const squash = stylex.keyframes({
+  '0%': { transform: 'scale(1)' },
+  '30%': { transform: 'scale(1.22, 0.78)' },
+  '55%': { transform: 'scale(0.86, 1.14)' },
+  '75%': { transform: 'scale(1.06, 0.96)' },
+  '100%': { transform: 'scale(1)' },
+});
+const fly = stylex.keyframes({
+  '0%': { transform: 'translate(0, 0) scale(1)', opacity: 1 },
+  '70%': { opacity: 1 },
+  '100%': { transform: 'translate(var(--dx), var(--dy)) scale(0.2)', opacity: 0 },
+});
+const BURST: readonly { readonly dx: number; readonly dy: number; readonly tone: string; readonly size: number }[] = [
+  { dx: 30, dy: -26, tone: 'var(--color-data-shamrock-3)', size: 7 },
+  { dx: -28, dy: -30, tone: 'var(--color-data-yellow-3)', size: 6 },
+  { dx: 36, dy: 6, tone: 'var(--color-data-orange-3)', size: 5 },
+  { dx: -36, dy: 4, tone: 'var(--color-data-blue-3)', size: 6 },
+  { dx: 22, dy: 32, tone: 'var(--color-data-purple-3)', size: 5 },
+  { dx: -20, dy: 34, tone: 'var(--color-data-shamrock-4)', size: 7 },
+  { dx: 6, dy: -40, tone: 'var(--color-data-red-3)', size: 5 },
+  { dx: -6, dy: 40, tone: 'var(--color-data-yellow-4)', size: 6 },
+];
 
 const styles = stylex.create({
   top: {
@@ -153,7 +189,133 @@ const styles = stylex.create({
   dayNumber: { fontSize: '18px', fontWeight: 600, lineHeight: 1.1, color: 'inherit' },
   dayCount: { fontSize: '12px', lineHeight: 1.2, minHeight: '15px', color: 'inherit' },
   note: { fontSize: '15px', lineHeight: 1.5 },
+  // The name is the link now (a button cannot sit inside one), the rest of
+  // the row plain; it reads the same (D-316).
+  nameLink: { color: 'inherit', textDecorationLine: 'none' },
+  // A light-green signature: every policy signed (D-316, was a tick, D-261).
+  signed: {
+    width: '22px',
+    height: '22px',
+    borderRadius: '50%',
+    flexShrink: 0,
+    backgroundColor: colorVars['--color-success-muted'],
+    color: colorVars['--color-success'],
+  },
+  signedIcon: { width: '14px', height: '14px' },
+  checkWrap: { position: 'relative', flexShrink: 0 },
+  check: {
+    width: '48px',
+    height: '48px',
+    minHeight: '48px',
+    borderRadius: '50%',
+    borderWidth: '2px',
+    borderStyle: 'solid',
+    borderColor: colorVars['--color-border'],
+    backgroundColor: colorVars['--color-background-body'],
+    color: colorVars['--color-text-secondary'],
+    transitionProperty: 'background-color, border-color, color',
+    transitionDuration: '160ms',
+  },
+  checkOn: {
+    borderColor: colorVars['--color-accent'],
+    backgroundColor: colorVars['--color-accent'],
+    color: colorVars['--color-on-accent'],
+  },
+  checkSquash: {
+    animationName: squash,
+    animationDuration: '520ms',
+    animationTimingFunction: 'cubic-bezier(0.2, 0.9, 0.3, 1.2)',
+    '@media (prefers-reduced-motion: reduce)': { animationName: 'none' },
+  },
+  burst: { position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'visible' },
+  bit: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    borderRadius: '2px',
+    marginTop: '-3px',
+    marginLeft: '-3px',
+    animationName: fly,
+    animationDuration: '640ms',
+    animationTimingFunction: 'cubic-bezier(0.15, 0.7, 0.3, 1)',
+    animationFillMode: 'both',
+    '@media (prefers-reduced-motion: reduce)': { animationName: 'none', opacity: 0 },
+  },
+  bitPlace: (dx: number, dy: number, tone: string, size: number) => ({
+    '--dx': `${dx}px`,
+    '--dy': `${dy}px`,
+    width: `${size}px`,
+    height: `${size}px`,
+    backgroundColor: tone,
+  }),
 });
+
+/**
+ * The circle beside a visit (D-316): tap when the person arrives. Checked, it
+ * fills green, bursts, and says "Checked in" in a small tip; tapped again it
+ * asks before taking it back — an arrival is a fact, undone on purpose.
+ */
+function CheckInButton({
+  id,
+  name,
+  isChecked,
+  t,
+}: {
+  id: string;
+  name: string;
+  isChecked: boolean;
+  t: (key: string, vars?: Record<string, string | number>) => string;
+}) {
+  const [burst, setBurst] = useState(0);
+  const [isTipOpen, setTipOpen] = useState(false);
+  const [isAsking, setAsking] = useState(false);
+  useEffect(() => {
+    if (!isTipOpen) return;
+    const timer = setTimeout(() => setTipOpen(false), 1600);
+    return () => clearTimeout(timer);
+  }, [isTipOpen]);
+  return (
+    <HStack xstyle={styles.checkWrap}>
+      <Tooltip content={t('schedule.checkedIn')} isOpen={isTipOpen} placement="above">
+        <IconButton
+          label={t(isChecked ? 'schedule.checkin.undo' : 'schedule.checkin.do', { name })}
+          variant="ghost"
+          aria-pressed={isChecked}
+          icon={<CheckIcon width={24} height={24} aria-hidden />}
+          onClick={() => {
+            if (isChecked) {
+              setAsking(true);
+              return;
+            }
+            checkIn(id);
+            setBurst((n) => n + 1);
+            setTipOpen(true);
+          }}
+          xstyle={[styles.check, isChecked && styles.checkOn, burst > 0 && styles.checkSquash]}
+        />
+      </Tooltip>
+      {burst > 0 ? (
+        <HStack key={burst} aria-hidden xstyle={styles.burst}>
+          {BURST.map((b, i) => (
+            <HStack key={i} xstyle={[styles.bit, styles.bitPlace(b.dx, b.dy, b.tone, b.size)]} />
+          ))}
+        </HStack>
+      ) : null}
+      <AlertDialog
+        isOpen={isAsking}
+        onOpenChange={setAsking}
+        title={t('schedule.checkin.undo.title', { name })}
+        description={t('schedule.checkin.undo.body')}
+        cancelLabel={t('schedule.checkin.undo.keep')}
+        actionLabel={t('schedule.checkin.undo.confirm')}
+        onAction={() => {
+          undoCheckIn(id);
+          setAsking(false);
+        }}
+      />
+    </HStack>
+  );
+}
 
 const startOfDay = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
 const addDays = (d: Date, n: number) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
@@ -172,7 +334,9 @@ export function ScheduleView({
   note,
   // A program lead opens on the week (Will, 5 October, D-267).
   initialView = 'week',
+  canCheckIn = false,
 }: ScheduleViewProps) {
+  const checkIns = useCheckIns();
   const { t, locale } = useI18n();
   const [view, setView] = useState<View>(initialView);
   const [anchor, setAnchor] = useState(() => startOfDay(today));
@@ -218,23 +382,36 @@ export function ScheduleView({
 
   const row = (a: Appointment, withDay = false) => {
     const d = new Date(a.startsAt);
+    const isChecked = Boolean(checkIns[a.id]);
+    const kind = withDay ? `${fmt.day.format(d)} · ${a.kindLabel}` : a.kindLabel;
     return (
       <ListItem
         key={a.id}
-        href={a.href}
+        // With a check-in circle, the name carries the link (a button cannot
+        // sit inside one); otherwise the whole row does.
+        {...(canCheckIn ? {} : { href: a.href })}
         label={
-          // A small tick for someone who has signed every policy (D-261);
-          // which ones is on their page — a row is one link, not two.
-          <HStack gap={1} align="center" wrap="nowrap">
-            <Text xstyle={styles.label}>{a.firstName}</Text>
+          // A light-green signature for someone who has signed every policy
+          // (D-316, D-261); which ones is on their page.
+          <HStack gap={2} align="center" wrap="nowrap">
+            {canCheckIn ? (
+              <a href={a.href} {...stylex.props(styles.label, styles.nameLink)}>
+                {a.firstName}
+              </a>
+            ) : (
+              <Text xstyle={styles.label}>{a.firstName}</Text>
+            )}
             {isVerified(a.personId, policies) ? (
-              <Icon icon="success" size="sm" color="accent" label={t('verified.short')} />
+              <HStack align="center" justify="center" xstyle={styles.signed} role="img" aria-label={t('verified.short')}>
+                <SignIcon {...stylex.props(styles.signedIcon)} aria-hidden />
+              </HStack>
             ) : null}
           </HStack>
         }
         description={
           <Text type="supporting" xstyle={styles.description}>
-            {withDay ? `${fmt.day.format(d)} · ${a.kindLabel}` : a.kindLabel}
+            {/* Said plainly either way (Will, D-316): "Not checked in" / "Checked in". */}
+            {canCheckIn ? `${kind} · ${t(isChecked ? 'schedule.checkedIn' : 'schedule.notCheckedIn')}` : kind}
           </Text>
         }
         startContent={
@@ -245,7 +422,13 @@ export function ScheduleView({
             </Text>
           </VStack>
         }
-        endContent={<Avatar size="md" name={a.firstName} tooltip={false} alt="" />}
+        endContent={
+          canCheckIn ? (
+            <CheckInButton id={a.id} name={a.firstName} isChecked={isChecked} t={t} />
+          ) : (
+            <Avatar size="md" name={a.firstName} tooltip={false} alt="" />
+          )
+        }
         xstyle={styles.row}
       />
     );

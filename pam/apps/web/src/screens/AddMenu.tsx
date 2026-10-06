@@ -1,11 +1,11 @@
 'use client';
 
 import * as stylex from '@stylexjs/stylex';
-import { useRouter } from 'next/navigation';
 import { DropdownMenu } from '@astryxdesign/core/DropdownMenu';
 import { HStack } from '@astryxdesign/core/HStack';
-import { PeopleIcon, PlacesIcon, PlusIcon } from '@pam/ui';
+import { PeopleIcon, PlacesIcon, PlusIcon, TripsIcon } from '@pam/ui';
 import { useI18n } from '@/lib/i18n';
+import { navigate } from '@/lib/navigate';
 
 const styles = stylex.create({
   // The brand's filled green, round — the one "make something" control in the
@@ -29,7 +29,6 @@ const ICON = { width: 22, height: 22, 'aria-hidden': true } as const;
  */
 export function AddMenu() {
   const { t } = useI18n();
-  const router = useRouter();
   return (
     <DropdownMenu
       button={{
@@ -48,17 +47,25 @@ export function AddMenu() {
       alignment="end"
       menuWidth={240}
       items={[
+        // First (Will, 6 October, D-316): a visit booked for somebody who
+        // wrote to the program — it lands on their Trips as if they had.
+        {
+          id: 'book',
+          label: t('home.book'),
+          icon: <TripsIcon {...ICON} />,
+          onClick: () => navigate('/program/book/'),
+        },
         {
           id: 'invite',
           label: t('profile.menu.invite'),
           icon: <PeopleIcon {...ICON} />,
-          onClick: () => router.push('/invite/'),
+          onClick: () => navigate('/invite/'),
         },
         {
           id: 'program',
           label: t('programs.add'),
           icon: <PlacesIcon {...ICON} />,
-          onClick: () => router.push('/programs/new/'),
+          onClick: () => navigate('/programs/new/'),
         },
       ]}
     />

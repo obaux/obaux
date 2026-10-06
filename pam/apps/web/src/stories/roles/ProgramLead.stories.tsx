@@ -20,6 +20,7 @@ export const Messages: Story = screen('provider', 'Messages', '/messages/');
 export const Profile: Story = screen('provider', 'Profile', '/profile/');
 export const Member: Story = screen('provider', 'A member', '/person/', { id: 'dummy-m1' });
 export const Invite: Story = screen('provider', 'Invite someone', '/invite/');
+export const BookForMember: Story = screen('provider', 'Book a visit for a member', '/program/book/');
 export const AllPrograms: Story = screen('provider', 'All programs', '/programs/');
 export const AddProgram: Story = screen('provider', 'Add a program', '/programs/new/');
 export const Notifications: Story = screen('provider', 'Notifications', '/notifications/');

@@ -15,6 +15,9 @@ export interface AddedTrip {
   readonly lon: number;
   readonly startsAt: string;
   readonly note: string;
+  /** Booked by a program for this member (D-316): their id and first name. */
+  readonly forMemberId?: string;
+  readonly forName?: string;
 }
 
 const KEY = 'pam.trips.added';

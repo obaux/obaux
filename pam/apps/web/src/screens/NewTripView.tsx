@@ -137,8 +137,14 @@ function seedToPlace(seed: TripPlaceSeed | null | undefined): DummySavedPlace | 
 export function NewTripView({
   initialPlace = null,
   changing = null,
+  forMember = null,
 }: {
   readonly initialPlace?: TripPlaceSeed | null;
+  /**
+   * A program booking for somebody who wrote to it (D-316): the trip is
+   * theirs — it lands on their Trips — and the program is told so.
+   */
+  readonly forMember?: { readonly id: string; readonly name: string } | null;
   /**
    * The trip being moved, from a place's "Change appointment" (D-281): the
    * same When and Check, then saving moves that trip instead of adding one
@@ -156,6 +162,13 @@ export function NewTripView({
   const [note, setNote] = useState('');
   // The visit's new time, once saved (D-282): the celebration shows it.
   const [movedTo, setMovedTo] = useState<Date | null>(null);
+  // Booked for a member (D-316): the moment, then the program's Home.
+  const [bookedAt, setBookedAt] = useState<Date | null>(null);
+  useEffect(() => {
+    if (!bookedAt) return;
+    const timer = setTimeout(() => navigate('/'), MOVED_HOLD_MS);
+    return () => clearTimeout(timer);
+  }, [bookedAt]);
   // A moment, not a stop (Will, 5 October): home on its own after a few
   // seconds, or straight away with the button.
   useEffect(() => {
@@ -185,6 +198,16 @@ export function NewTripView({
     );
   }
 
+  if (bookedAt && place && forMember) {
+    return (
+      <SuccessScreen
+        title={t('trips.booked.title', { name: forMember.name })}
+        body={t('trips.booked.body', { place: place.name, day: dayLong.format(bookedAt), time: timeFmt.format(bookedAt) })}
+        action={<Button label={t('trips.moved.home')} variant="secondary" href="/" xstyle={styles.home} />}
+      />
+    );
+  }
+
   const stepNumber = step === 'where' ? 1 : step === 'when' ? 2 : 3;
   const title =
     changing && step === 'when'
@@ -198,8 +221,12 @@ export function NewTripView({
   return (
     <SubPage
       title={title}
-      subtitle={changing ? undefined : t('trips.new.step', { current: stepNumber, total: 3 })}
-      backHref="/trips/"
+      // For a member (D-316), the subtitle says who, since the steps are
+      // the same ones the member would see.
+      subtitle={
+        forMember ? t('trips.new.for', { name: forMember.name }) : changing ? undefined : t('trips.new.step', { current: stepNumber, total: 3 })
+      }
+      backHref={forMember ? '/program/book/' : '/trips/'}
       backLabel={step === 'where' ? t('nav.back.trips') : t('trips.new.back')}
       // Back is a step (Will, 3 October, D-235): Check → When → Where →
       // Trips. That is the way to change an answer, so no "Change" links.
@@ -317,7 +344,9 @@ export function NewTripView({
           </Card>
           <TextArea label={t('trips.new.note')} value={note} onChange={setNote} rows={2} width="100%" />
           <BigButton
-            label={t(changing ? 'trips.new.saveChange' : 'trips.new.add')}
+            label={
+              forMember ? t('trips.new.addFor', { name: forMember.name }) : t(changing ? 'trips.new.saveChange' : 'trips.new.add')
+            }
             onPress={() => {
               if (changing) {
                 const when = at(day, time);
@@ -335,7 +364,14 @@ export function NewTripView({
                 lon: place.lon,
                 startsAt: at(day, time).toISOString(),
                 note: note.trim(),
+                ...(forMember ? { forMemberId: forMember.id, forName: forMember.name } : {}),
               });
+              if (forMember) {
+                // The program's moment (D-316), then its Home — not the
+                // member's Trips, which is theirs.
+                setBookedAt(at(day, time));
+                return;
+              }
               // Straight to Trips (Will, 3 October, D-241): the drawer tall,
               // confetti, and the new trip arriving in the list.
               navigate(`/trips/?added=${encodeURIComponent(id)}`);
