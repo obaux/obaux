@@ -7292,6 +7292,25 @@ and incorporate that on the hero card up top."
     Storybook build;
   - e2e 570/570.
 
+### D-308 — Steward is no longer a badge
+
+Will, 6 October: "Let's remove steward as a badge."
+
+- Steward (family track, five family enrollments) is gone from `BADGES`,
+  its picture from `BadgeArt`, and `badge.steward` / `.desc` from en and
+  es. No database row ever named it, since badges live in config, so no
+  migration is needed.
+- The family track keeps one badge, Anchor. The notes in `points.ts` say
+  so, and still record why "Patriarch" was turned down.
+- The grid is now 12 badges, three even rows of four. The hero card reads
+  "1 of 12 earned".
+- `points.spec` checked Steward's name; it now checks Anchor.
+- **Proven by:**
+  - a screenshot of the Points story;
+  - ui 67, config 238 and web 11 unit tests, typecheck, web build and
+    Storybook build;
+  - e2e 570/570.
+
 ---
 
 ## Notes for whoever picks this up next

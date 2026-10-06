@@ -82,7 +82,7 @@ test.describe('points and badges', () => {
     await signedIn(page, 400);
     await page.goto('/points/');
 
-    for (const name of ['Returned', 'Griot', 'Cornerstone', 'Steward', 'Sankofa', 'Kinkeeper']) {
+    for (const name of ['Returned', 'Griot', 'Cornerstone', 'Anchor', 'Sankofa', 'Kinkeeper']) {
       await expect(page.getByText(name, { exact: true })).toBeVisible();
     }
   });

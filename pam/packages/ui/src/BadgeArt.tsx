@@ -218,21 +218,6 @@ function Anchor() {
   );
 }
 
-/** Steward: a hearth, and its fire. */
-function Steward() {
-  return (
-    <>
-      <Ground base="orange2" shards={[{ d: 'M0 44 56 34v22H0z', f: 'red3' }]} />
-      <P d="M10 48V22h36v26h-8V34q-10-10-20 0v14z" f="red4" />
-      <P d="M28 22h18v26h-8V34q-5-5-10-5z" f="red5" />
-      <R x={8} y={17} w={40} h={5} f="orange4" />
-      <P d="M28 46c-8 0-7-8-3-13 0 4 3 4 3 1 0-4 3-6 3-10 5 6 6 12 4 17-1 3-4 5-7 5z" f="yellow3" />
-      <P d="M28 46c-4 0-4-4-2-7 1 2 3 2 3 0 2 2 3 5 1 6.5z" f="orange3" />
-      <R x={20} y={45} w={16} h={3} rx={1.5} f="orange5" />
-    </>
-  );
-}
-
 // --- Milestones ------------------------------------------------------------
 
 /** Firstborn: a sunrise — the first one. */
@@ -357,7 +342,6 @@ const ART: Readonly<Record<string, () => ReactElement>> = {
   craftsman: Craftsman,
   cornerstone: Cornerstone,
   anchor: Anchor,
-  steward: Steward,
   firstborn: Firstborn,
   torchbearer: Torchbearer,
   drum: Drum,

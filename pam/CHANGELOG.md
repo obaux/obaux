@@ -137,6 +137,7 @@ preview is one line and ends in "…". Call on a place's page shows the phone
 number. On Your points, the badges sit in their own card, a little further
 below the ladder, with the title centred. The example member has earned
 Scholar, and the top card shows it as their newest badge.
+The Steward badge has been removed.
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 

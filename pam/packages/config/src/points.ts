@@ -186,8 +186,8 @@ export function progressToNextLevel(points: number): number {
  *
  *   - **Core progression** is points, which come from real-world activity —
  *     enrolling, attending, keeping at it. These are the ladder.
- *   - **Category** badges belong to the three fixed tracks (§2.5), two per
- *     track: one for starting, one for depth.
+ *   - **Category** badges belong to the three fixed tracks (§2.5): one for
+ *     starting and one for depth, except family, which has only Anchor (D-308).
  *   - **Milestone** badges are one-offs. Some are warm (Homecoming), one is
  *     deliberately forgiving: Sankofa, the Akan symbol for going back to fetch
  *     what was left, reframes a lapse as a return. For a population whose
@@ -195,8 +195,8 @@ export function progressToNextLevel(points: number): number {
  *     is not decoration.
  *
  * `Patriarch` was offered for the family track and is deliberately not used:
- * not every member is a man, and Steward says the same thing about somebody who
- * holds a household together without assuming who they are.
+ * not every member is a man. Steward, which replaced it, was removed too (Will,
+ * 6 October, D-308), so the family track has one badge, Anchor.
  *
  * Two of these cannot be earned yet, and say so in `blockedBy`: PAM has no
  * buddy system — the only relationships modelled today are member to mentor and
@@ -297,7 +297,7 @@ export const BADGES: readonly BadgeDefinition[] = [
     blockedBy: 'No buddy system yet, and no circles.',
   },
 
-  // Category — two per fixed track: one for starting, one for depth.
+  // Category — one for starting, one for depth; family has only Anchor (D-308).
   {
     key: 'scholar',
     labelKey: 'badge.scholar',
@@ -347,16 +347,6 @@ export const BADGES: readonly BadgeDefinition[] = [
     group: 'category',
     category: 'family_services',
     rule: { type: 'completed_enrollment', category: 'family_services', atLeast: 1 },
-  },
-  {
-    key: 'steward',
-    labelKey: 'badge.steward',
-    name: 'Steward',
-    descriptionPlain: 'You hold the household together.',
-    icon: 'hearth',
-    group: 'category',
-    category: 'family_services',
-    rule: { type: 'completed_enrollment', category: 'family_services', atLeast: 5 },
   },
 
   // Milestones — one-offs, and the only place a lapse is named kindly.
