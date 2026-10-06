@@ -184,6 +184,10 @@ After booking, Trips asks you to sign a program's policies in one short
 banner instead of a large card.
 A program that just meets on a schedule says when to come instead of asking
 you to book.
+The design system now stands on its own: its colours, fonts and theme ship
+with the component package, in one tokens file and a built stylesheet, every
+component has a story with its variants, and Storybook explains how to use
+them (D-328).
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 

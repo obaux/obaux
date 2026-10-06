@@ -29,7 +29,8 @@ function LocalisedSwitch({ label, options, ...rest }: RoleSwitchProps) {
 }
 
 const meta = {
-  title: 'Components/RoleSwitch',
+  title: 'Components/Inputs/RoleSwitch',
+  tags: ['autodocs'],
   component: RoleSwitch,
   decorators: [
     (Story) => (
@@ -56,7 +57,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const OwnView: Story = {};
+export const Default: Story = {};
 export const ViewingAsMember: Story = { args: { value: 'member' } };
 export const ViewingAsCaseManager: Story = { args: { value: 'admin' } };
 

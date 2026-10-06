@@ -34,7 +34,8 @@ function forKey(notice: NoticeKey): Pick<NoticeProps, 'notice' | 'title' | 'body
 }
 
 const meta = {
-  title: 'Components/Notice',
+  title: 'Components/Feedback/Notice',
+  tags: ['autodocs'],
   component: Notice,
   decorators: [
     (Story) => (
@@ -57,7 +58,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const SomethingWentWrong: Story = {};
+export const Default: Story = {};
 
 /**
  * With the optional extra action, drawn before the call. No screen passes one

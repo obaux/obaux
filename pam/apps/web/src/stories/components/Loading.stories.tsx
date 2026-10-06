@@ -12,7 +12,8 @@ function LocalisedLoading({ label, ...rest }: LoadingProps) {
 }
 
 const meta = {
-  title: 'Components/Loading',
+  title: 'Components/Feedback/Loading',
+  tags: ['autodocs'],
   component: Loading,
   decorators: [
     (Story) => (
@@ -30,7 +31,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /** Fills the space under the header and centres in it, while a session resolves. */
-export const Screen: Story = {};
+export const Default: Story = {};
 
 /** Under a header that is already drawn: a list still arriving. */
 export const Inline: Story = { args: { variant: 'inline' } };

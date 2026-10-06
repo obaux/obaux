@@ -62,8 +62,8 @@ const styles = stylex.create({
   // the rule, not the drawing (§2.5). Matches the account button's size (Will,
   // 16 September) — the two are read as one pair, not two different weights.
   bell: {
-    minHeight: pam.touchTargetMin,
-    minWidth: pam.touchTargetMin,
+    minHeight: pam['--pam-touch-target-min'],
+    minWidth: pam['--pam-touch-target-min'],
     fontSize: '28px',
     borderRadius: '14px',
   },
@@ -93,7 +93,7 @@ const styles = stylex.create({
     // On a filled button the dot has to differ from the fill, so it takes the
     // button's own label colour and a ring of the page behind it.
     // The tab pink (D-289), so every "something new" dot is the same colour.
-    backgroundColor: pam.brandPink,
+    backgroundColor: pam['--pam-brand-pink'],
     borderWidth: '2px',
     borderStyle: 'solid',
     borderColor: colorVars['--color-background-body'],

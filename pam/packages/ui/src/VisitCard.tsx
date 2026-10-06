@@ -57,7 +57,7 @@ const styles = stylex.create({
   },
   change: {
     alignSelf: 'flex-start',
-    minHeight: pam.touchTargetMin,
+    minHeight: pam['--pam-touch-target-min'],
     fontSize: '17px',
     fontWeight: 600,
   },

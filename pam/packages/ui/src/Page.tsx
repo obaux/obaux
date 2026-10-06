@@ -62,10 +62,10 @@ const styles = stylex.create({
   page: {
     width: '100%',
     marginInline: 'auto',
-    paddingInline: pam.screenPadding,
+    paddingInline: pam['--pam-screen-padding'],
     paddingBlock: '24px',
   },
-  app: { maxWidth: pam.pageWidth },
+  app: { maxWidth: pam['--pam-page-width'] },
   read: { maxWidth: '720px' },
   centred: { textAlign: 'center' },
   // Room for the footer: its own fade overlaps the last of the content,
@@ -77,8 +77,8 @@ const styles = stylex.create({
     zIndex: 11,
     // Full-bleed, past the page's side padding, so the fade covers the
     // whole width of the screen and not just the column.
-    marginInline: `calc(-1 * ${pam.screenPadding})`,
-    paddingInline: pam.screenPadding,
+    marginInline: `calc(-1 * ${pam['--pam-screen-padding']})`,
+    paddingInline: pam['--pam-screen-padding'],
     // The fade: 56px of the content above washing out into the page colour,
     // then the strip itself, solid, down to the home indicator.
     marginBlockStart: '-24px',
@@ -90,7 +90,7 @@ const styles = stylex.create({
   },
   footerInner: {
     width: '100%',
-    maxWidth: pam.pageWidth,
+    maxWidth: pam['--pam-page-width'],
     marginInline: 'auto',
     paddingInline: '8px',
     pointerEvents: 'auto',

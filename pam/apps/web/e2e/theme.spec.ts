@@ -6,7 +6,7 @@ import { expect, test } from '@playwright/test';
  * Pam's accent is the wordmark's deep green on light grounds and Will's bright
  * green on dark ones. Those two are not a light/dark pair of one hue: one is a
  * deep fill carrying white text, the other a bright fill carrying near-black
- * text. Every hover and pressed colour is named per mode in `src/theme/pam.ts`
+ * text. Every hover and pressed colour is named per mode in `packages/ui/src/theme/pam.theme.ts`
  * for that reason, and a wrong one is invisible until somebody with low vision
  * cannot read a button they have already pressed.
  *

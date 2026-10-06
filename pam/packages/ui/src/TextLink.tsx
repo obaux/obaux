@@ -39,8 +39,8 @@ const linkLook = {
 } as const;
 
 const styles = stylex.create({
-  link: { minHeight: pam.touchTargetMin, fontSize: pam.linkSize, ...linkLook },
-  quiet: { minHeight: pam.touchTargetMin, fontSize: '15px', ...linkLook },
+  link: { minHeight: pam['--pam-touch-target-min'], fontSize: pam['--pam-link-size'], ...linkLook },
+  quiet: { minHeight: pam['--pam-touch-target-min'], fontSize: '15px', ...linkLook },
 });
 
 /**

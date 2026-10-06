@@ -134,7 +134,7 @@ const styles = stylex.create({
     position: 'relative',
   },
   track: {
-    // No corner radius under `pam.pageWidth` (560px) — the hero runs flush
+    // No corner radius under `pam['--pam-page-width']` (560px) — the hero runs flush
     // to the top and sides of the screen there, so a rounded corner has
     // nothing to read against. Above it, `Page` itself caps out and centres,
     // so the hero stops reaching the real viewport edges and a square corner

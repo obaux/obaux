@@ -8,7 +8,8 @@ import { CategoryArt } from '@pam/ui/CategoryArt';
 
 /** Every badge's picture, in the place cards' style (D-295): the ladder, the category badges, the milestones. */
 const meta = {
-  title: 'Components/BadgeArt',
+  title: 'Components/Illustration/BadgeArt',
+  tags: ['autodocs'],
   component: BadgeArt,
   args: { badgeKey: 'rooted', size: 72, shape: 'circle', isLocked: false },
 } satisfies Meta<typeof BadgeArt>;
@@ -16,7 +17,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const One: Story = {};
+export const Default: Story = {};
 export const Locked: Story = { args: { isLocked: true } };
 
 /** All twenty, then Profile's Connections and the three place pictures — one set. */

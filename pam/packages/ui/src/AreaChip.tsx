@@ -39,7 +39,7 @@ export interface AreaChipProps {
 
 const styles = stylex.create({
   area: {
-    minHeight: pam.touchTargetMin,
+    minHeight: pam['--pam-touch-target-min'],
     fontSize: '15px',
     // The header is a tight row. The area gives way before the mark does, and
     // a long address ends in an ellipsis rather than pushing the pencil off

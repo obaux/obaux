@@ -63,7 +63,8 @@ function fromDummy(rows: readonly DummyNotification[]): NotificationItem[] {
 const ago = (days: number) => new Date(Date.now() - days * 86_400_000).toISOString();
 
 const meta = {
-  title: 'Components/NotificationList',
+  title: 'Components/Feedback/NotificationList',
+  tags: ['autodocs'],
   component: NotificationList,
   decorators: [
     (Story) => (
@@ -83,7 +84,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /** What a member sees: points earned, and a saved place that changed. */
-export const Member: Story = {};
+export const Default: Story = {};
 
 /** A program: people interested in what they run. */
 export const Program: Story = { args: { items: fromDummy(DUMMY_NOTIFICATIONS.provider) } };

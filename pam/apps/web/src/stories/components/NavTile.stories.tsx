@@ -22,7 +22,8 @@ function LocalisedTile({ label, description, alertLabel, ...rest }: NavTileProps
 const ICONS = { places: <PlacesIcon />, people: <PeopleIcon />, bell: <BellIcon />, plan: <PlanIcon /> };
 
 const meta = {
-  title: 'Components/NavTile',
+  title: 'Components/Navigation/NavTile',
+  tags: ['autodocs'],
   component: NavTile,
   decorators: [
     (Story) => (
@@ -46,7 +47,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Places: Story = {};
+export const Default: Story = {};
 
 /** Unread messages: a count, and the count in the accessible name. */
 export const WithCount: Story = {

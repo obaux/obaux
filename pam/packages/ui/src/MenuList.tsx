@@ -64,7 +64,7 @@ export interface MenuListProps {
 const styles = stylex.create({
   list: { width: '100%' },
   row: { minHeight: '64px', fontSize: '18px' },
-  dot: { width: '10px', height: '10px', borderRadius: '50%', flexShrink: 0, backgroundColor: pam.brandPink },
+  dot: { width: '10px', height: '10px', borderRadius: '50%', flexShrink: 0, backgroundColor: pam['--pam-brand-pink'] },
   // No line under the last row (D-291). Astryx's own `:last-child` rule
   // is a shorthand, which loses to its longhand width, so the line stayed —
   // a stray rule at the foot of every card that holds a list.

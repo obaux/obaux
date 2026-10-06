@@ -3,7 +3,7 @@ import type { Decorator, Preview } from '@storybook/nextjs';
 import { Theme } from '@astryxdesign/core/theme';
 import { MotionProvider } from '@pam/ui';
 import type { Locale } from '@pam/config';
-import { pamTheme } from '../src/theme/pam.js';
+import { pamTheme } from '@pam/ui/theme';
 import { I18nProvider, useI18n } from '../src/lib/i18n';
 import { AlertBannerProvider } from '../src/lib/alertBanner';
 
@@ -11,7 +11,8 @@ import { AlertBannerProvider } from '../src/lib/alertBanner';
 import '../src/app/layers.css';
 import '@astryxdesign/core/reset.css';
 import '@astryxdesign/core/astryx.css';
-import '../src/theme/pam.css';
+import '@pam/ui/theme/pam.css';
+import '@pam/ui/fonts.css';
 import '../src/app/globals.css';
 
 /**

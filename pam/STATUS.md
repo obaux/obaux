@@ -395,7 +395,12 @@ example services per place with their own phone, website and policies, a lead's
 editor on the Program tab (session-kept), service names at sign-up, a member's
 service picker on the place page (grey cards, Main/Service address, hours
 per service), drop-in programs, and booking in two steps from a place.
-Program onboarding as a simpler step by step is open (Will). Note:
+Program onboarding as a simpler step by step is open (Will). The design system
+is ready for Claude Design (D-328): the theme, Figtree and `tokens.css` live in
+`@pam/ui` (not apps/web), `PamProvider` mounts a component anywhere,
+`pnpm --filter @pam/ui build` writes `dist/` (CI builds it), every component has
+a `Components/<Category>/<Component>` story, and usage rules are MDX under
+`Foundations/`. Note:
 the web app's vitest tests are not run in CI. How points should be awarded — two rules live
 (save a place, finish setup), the rest to build, with order and open
 questions — is specified in `docs/points-awarding.md`. The

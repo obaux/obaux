@@ -82,7 +82,8 @@ function Gallery({ size }: { readonly size: 'regular' | 'big' }) {
 }
 
 const meta = {
-  title: 'Components/Icons',
+  title: 'Foundations/Icons',
+  tags: ['autodocs'],
   component: Gallery,
   decorators: [
     (Story) => (
@@ -98,7 +99,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const All: Story = {};
+export const Default: Story = {};
 
 /** At 64px, where a wobbly path or a stray join shows. */
 export const Large: Story = { args: { size: 'big' } };

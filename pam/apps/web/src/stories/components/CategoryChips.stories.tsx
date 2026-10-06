@@ -33,7 +33,8 @@ function LocalisedChips({ initial }: { readonly initial: ExploreCategory }) {
 }
 
 const meta = {
-  title: 'Components/CategoryChips',
+  title: 'Components/Inputs/CategoryChips',
+  tags: ['autodocs'],
   component: LocalisedChips,
   decorators: [
     (Story) => (
@@ -48,7 +49,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const AllChosen: Story = {};
+export const Default: Story = {};
 export const WorkChosen: Story = { args: { initial: 'workforce' } };
 export const Spanish: Story = { globals: { locale: 'es' } };
 export const Narrow: Story = { globals: { viewport: { value: 'narrow320', isRotated: false } } };

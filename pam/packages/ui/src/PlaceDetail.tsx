@@ -175,12 +175,12 @@ const styles = stylex.create({
    */
   row: {
     width: '100%',
-    minHeight: pam.touchTargetMin,
+    minHeight: pam['--pam-touch-target-min'],
     justifyContent: 'flex-start',
     fontSize: '17px',
   },
   rows: { rowGap: spacingVars['--spacing-2'] },
-  hoursLink: { alignSelf: 'flex-start', minHeight: pam.touchTargetMin, fontSize: '16px', paddingInline: '0px' },
+  hoursLink: { alignSelf: 'flex-start', minHeight: pam['--pam-touch-target-min'], fontSize: '16px', paddingInline: '0px' },
   // The week drawer (D-309).
   // Clear of the sheet's handle above the title.
   sheet: { paddingInline: '24px', paddingBlock: '20px 24px' },

@@ -14,7 +14,8 @@ import { Providers } from '@/lib/providers';
 import './layers.css';
 import '@astryxdesign/core/reset.css';
 import '@astryxdesign/core/astryx.css';
-import '../theme/pam.css';
+import '@pam/ui/theme/pam.css';
+import '@pam/ui/fonts.css';
 import './globals.css';
 
 export const metadata: Metadata = {

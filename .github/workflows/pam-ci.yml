@@ -44,6 +44,12 @@ jobs:
       - name: Unit tests
         run: pnpm --filter @pam/config --filter @pam/ui test
 
+      # The design system as a package (dist/): tokens.css, fonts, compiled
+      # components and types. Also fails if tokens.css has drifted from its
+      # sources (packages/ui/scripts/tokens.mjs --check).
+      - name: Build the design system (@pam/ui dist)
+        run: pnpm --filter @pam/ui build
+
       # Deliberately not the real project. The browser checks stub the RPC
       # response, so the client only has to construct — pointing CI at the live
       # database would make a test suite depend on a network and a key, and

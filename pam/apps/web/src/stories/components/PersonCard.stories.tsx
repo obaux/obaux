@@ -26,7 +26,8 @@ function LocalisedPerson({ sharedTags = [], orgBadgeLabel, messageLabel, ...rest
 const sandra = DUMMY_PROGRAM_LEADS[0]!;
 
 const meta = {
-  title: 'Components/PersonCard',
+  title: 'Components/Cards/PersonCard',
+  tags: ['autodocs'],
   component: PersonCard,
   decorators: [
     (Story) => (
@@ -48,7 +49,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Mentor: Story = {};
+export const Default: Story = {};
 
 /** Verified program staff carry their organisation as a badge (§6.4). */
 export const ProgramStaff: Story = {

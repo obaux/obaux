@@ -1,0 +1,41 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Foundations/Spacing and layout" />
+
+# Spacing and layout
+
+Spacing is a 4px scale (`--spacing-1` = 4px … `--spacing-12` = 48px). In components it is the
+Astryx `gap` / `padding` number: `gap={4}` is 16px.
+
+## The rhythm
+
+| Where | Value | Token / prop |
+| --- | --- | --- |
+| Screen side padding | 16px | `--pam-screen-padding` |
+| Column width (phone and laptop) | 560px max | `--pam-page-width` |
+| Between sections on a screen | 16px | `Page gap={4}` (default) |
+| Between cards in a list | 12px | `--pam-card-gap`, `gap={3}` |
+| Inside a text card | 24px | `Card padding={6}` |
+| Inside a list card (rows) | 4px | `Card padding={1}` — rows bring their own padding |
+| Between a label and its line | 4–8px | `gap={1}`–`gap={2}` |
+| Touch target | 48px min | `--pam-touch-target-min` |
+| Primary button height | 56px | `--pam-big-button-height` |
+| Field height | 56px | `--pam-field-height` |
+
+## Radii
+
+- **Pills** (`--radius-full`) for every button and chip.
+- **Cards** (`--radius-page`, 28px) for cards and sheets on a screen.
+- **Fields** (`--radius-element`) for text inputs.
+
+## Layout patterns
+
+- **Page / SubPage** frame every screen: centred column, side padding, sections stacked with
+  `gap={4}`.
+- **The footer.** A screen's one action goes in `Page`/`SubPage` `footer`: pinned to the bottom,
+  full width, with the content fading out above it so nothing is cut off. Never position a button
+  yourself.
+- **Rows, not cards, for lists.** A list of places to go is `MenuList` rows inside one card; a
+  standalone summary is a card.
+- **Order on a place** before a visit: what it offers (services), About, Address, then the action
+  rows. After a visit is booked: the visit first.

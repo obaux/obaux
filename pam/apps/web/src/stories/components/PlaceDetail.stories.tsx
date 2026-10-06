@@ -81,7 +81,8 @@ const LABELS: DetailArgs['labels'] = {
 };
 
 const meta = {
-  title: 'Components/PlaceDetail',
+  title: 'Components/Places/PlaceDetail',
+  tags: ['autodocs'],
   component: PlaceDetail,
   decorators: [
     (Story) => (
@@ -120,7 +121,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /** Sample hours, said out loud under the week so a demo never reads as a promise. */
-export const SampleHours: Story = {};
+export const Default: Story = {};
 
 /** Real hours from the catalogue: no note under the week. */
 export const RealHours: Story = {

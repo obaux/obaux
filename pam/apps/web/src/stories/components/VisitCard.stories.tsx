@@ -3,7 +3,8 @@ import { VisitCard } from '@pam/ui/VisitCard';
 
 /** A place opened from a trip: the booked visit as a small hero, with a way to move it (D-281). */
 const meta = {
-  title: 'Components/VisitCard',
+  title: 'Components/Cards/VisitCard',
+  tags: ['autodocs'],
   component: VisitCard,
   args: {
     eyebrow: 'Your next visit',
@@ -17,6 +18,6 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Upcoming: Story = {};
+export const Default: Story = {};
 /** A visit already past: no link to change it. */
 export const Past: Story = { args: { eyebrow: 'Your visit', changeLabel: undefined, changeHref: null } };

@@ -13,7 +13,8 @@ function LocalisedTitle({ title, subtitle, backLabel, ...rest }: PageTitleProps)
 }
 
 const meta = {
-  title: 'Components/PageTitle',
+  title: 'Components/Navigation/PageTitle',
+  tags: ['autodocs'],
   component: PageTitle,
   decorators: [
     (Story) => (
@@ -30,7 +31,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const WithBack: Story = {};
+export const Default: Story = {};
 
 /** The start of things: no way back to draw. */
 export const WithoutBack: Story = { args: { title: 'home.title', backHref: undefined, backLabel: undefined } };

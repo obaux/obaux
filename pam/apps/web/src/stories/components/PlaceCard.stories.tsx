@@ -51,7 +51,8 @@ const food = DUMMY_PLACES_BY_ID['dummy-place-food']!;
 const reported = DUMMY_FLAGS[0]!;
 
 const meta = {
-  title: 'Components/PlaceCard',
+  title: 'Components/Cards/PlaceCard',
+  tags: ['autodocs'],
   component: PlaceCard,
   decorators: [
     (Story) => (
@@ -80,7 +81,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Open: Story = {};
+export const Default: Story = {};
 
 export const Closed: Story = {
   args: {

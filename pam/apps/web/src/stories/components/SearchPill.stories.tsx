@@ -42,7 +42,8 @@ function LocalisedPill({ onPick, onQuery }: { readonly onPick: () => void; reado
 }
 
 const meta = {
-  title: 'Components/SearchPill',
+  title: 'Components/Inputs/SearchPill',
+  tags: ['autodocs'],
   component: LocalisedPill,
   decorators: [
     (Story) => (
@@ -57,6 +58,6 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Empty: Story = {};
+export const Default: Story = {};
 export const Spanish: Story = { globals: { locale: 'es' } };
 export const Narrow: Story = { globals: { viewport: { value: 'narrow320', isRotated: false } } };

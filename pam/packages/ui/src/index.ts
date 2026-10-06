@@ -98,6 +98,7 @@ export {
 } from './icons.js';
 export { SavedStrip, type SavedStripProps, type SavedStripPlace } from './SavedStrip.js';
 export { TextSwap, AutoHeight } from './Swap.js';
+export { PamProvider } from './PamProvider.js';
 export {
   MotionProvider,
   PageEnter,

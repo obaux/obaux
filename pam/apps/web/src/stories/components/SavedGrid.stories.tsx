@@ -4,7 +4,8 @@ import { CategoryIcon } from '../../screens/SavedView';
 
 /** Saved's tiles (D-292): category colour with a glow on white; a booked visit shows as a green tag. */
 const meta = {
-  title: 'Components/SavedGrid',
+  title: 'Components/Cards/SavedGrid',
+  tags: ['autodocs'],
   component: SavedGrid,
   args: {
     label: 'Saved',
@@ -39,4 +40,4 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /** One place with a visit booked, one without. */
-export const WithAndWithoutAVisit: Story = {};
+export const Default: Story = {};

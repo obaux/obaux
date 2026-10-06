@@ -47,7 +47,8 @@ const keepsListening: SpeechRecognizer = {
 const cannotListen: SpeechRecognizer = { isAvailable: () => false, start: async () => '' };
 
 const meta = {
-  title: 'Components/VoiceInput',
+  title: 'Components/Inputs/VoiceInput',
+  tags: ['autodocs'],
   component: VoiceInput,
   decorators: [
     (Story) => (
@@ -72,7 +73,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /** Tap the mic: it fills in an address after a moment. */
-export const WithMic: Story = {};
+export const Default: Story = {};
 
 export const Listening: Story = {
   args: { recognizer: keepsListening },

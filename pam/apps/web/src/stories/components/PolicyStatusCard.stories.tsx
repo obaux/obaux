@@ -3,7 +3,8 @@ import { PolicyStatusCard } from '@pam/ui/PolicyStatusCard';
 
 /** Near the top of a place a member has a visit at: policies to sign, or all signed (D-271). */
 const meta = {
-  title: 'Components/PolicyStatusCard',
+  title: 'Components/Cards/PolicyStatusCard',
+  tags: ['autodocs'],
   component: PolicyStatusCard,
   args: {
     isDone: false,
@@ -17,7 +18,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const ToSign: Story = {};
+export const Default: Story = {};
 export const Signed: Story = {
   args: {
     isDone: true,

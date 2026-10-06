@@ -13,7 +13,8 @@ function LocalisedPoints({ label, ...rest }: PointsBadgeProps) {
 }
 
 const meta = {
-  title: 'Components/PointsBadge',
+  title: 'Components/Feedback/PointsBadge',
+  tags: ['autodocs'],
   component: PointsBadge,
   decorators: [
     (Story) => (
@@ -31,7 +32,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /** The first points, at the end of sign-up. */
-export const JustJoined: Story = {};
+export const Default: Story = {};
 export const NoPointsYet: Story = { args: { points: 0 } };
 
 /** A thousands separator, in the locale's own form. */

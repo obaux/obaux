@@ -51,7 +51,8 @@ function MotionDemo({ demo, run }: { readonly demo: 'cardEnter' | 'scrollReveal'
 }
 
 const meta = {
-  title: 'Components/Motion',
+  title: 'Foundations/Motion',
+  tags: ['autodocs'],
   component: MotionDemo,
   decorators: [
     (Story) => (
@@ -71,7 +72,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /** A list arriving: each card in its turn. */
-export const CardEntrance: Story = {};
+export const Default: Story = {};
 
 /** A long list: rows fade up as they scroll into view. */
 export const ScrollRevealList: Story = { args: { demo: 'scrollReveal' } };

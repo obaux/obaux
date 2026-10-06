@@ -49,7 +49,8 @@ const SLIDES: OnboardingSlidesProps['slides'] = [
 ];
 
 const meta = {
-  title: 'Components/OnboardingSlides',
+  title: 'Components/Illustration/OnboardingSlides',
+  tags: ['autodocs'],
   component: OnboardingSlides,
   decorators: [
     (Story) => (
@@ -67,7 +68,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /** As `/signin/` shows it: the mark and "Philadelphia" over the photos. */
-export const SignIn: Story = {};
+export const Default: Story = {};
 
 /** Without the overlaid header. */
 export const Bare: Story = { args: { header: undefined } };

@@ -118,12 +118,12 @@ const styles = stylex.create({
     display: 'inline-flex',
     alignItems: 'center',
     // The mark is 26px; the tap target around it is not.
-    minHeight: pam.touchTargetMin,
+    minHeight: pam['--pam-touch-target-min'],
     textDecoration: 'none',
   },
   account: {
-    minHeight: pam.touchTargetMin,
-    minWidth: pam.touchTargetMin,
+    minHeight: pam['--pam-touch-target-min'],
+    minWidth: pam['--pam-touch-target-min'],
     // Matches the bell (Will, 16 September): two icons of different sizes in
     // the same corner read as one of them mattering less.
     fontSize: '28px',

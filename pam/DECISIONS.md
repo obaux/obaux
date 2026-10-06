@@ -7891,6 +7891,51 @@ condense this."
 - **Proven by:** screenshot of Trips after booking; typecheck; web build;
   e2e.
 
+### D-328 — The design system stands on its own (for Claude Design)
+
+**Date:** 2026-10-06. Will: "Let's do some clean up so we can use this DS
+inside claude design" — components mount on their own, one tokens file,
+`dist/` builds cleanly, a real story for every component, usage rules
+written down, fonts from the package, `Category/Component/Variant` names.
+
+- **The theme and fonts live in `@pam/ui`.** `pam.theme.ts` and its built
+  `pam.css`/`pam.js` moved from `apps/web/src/theme/` to
+  `packages/ui/src/theme/` (rebuild with `pnpm --filter @pam/ui theme`);
+  Figtree's two woff2 files and their `@font-face` moved to
+  `packages/ui/src/fonts/` and `@pam/ui/fonts.css`. The app and Storybook
+  import `@pam/ui/theme`, `@pam/ui/theme/pam.css` and `@pam/ui/fonts.css`.
+- **`PamProvider`** (exported from `@pam/ui`) wraps Theme(pamTheme) and
+  MotionProvider, so a component mounts outside the app. Storybook's global
+  decorator already does the same for every story.
+- **One tokens file.** `pnpm --filter @pam/ui tokens` writes
+  `src/styles/tokens.css` (264 custom properties, grouped by family) from
+  Astryx's base, the Pam theme and `tokens.stylex.ts`. PAM's own StyleX
+  tokens are now named `--pam-*` literally (`pam['--pam-touch-target-min']`)
+  so the CSS and the code use the same names. `tokens --check` fails on
+  drift (a ui test runs it).
+- **`pnpm --filter @pam/ui build` writes `dist/`**: compiled JS (StyleX
+  extracted, no runtime injection), `.d.ts`, `stylex.css`, `fonts.css` with
+  `fonts/`, `tokens.css`, and `styles.css`, which declares the layer order
+  and imports tokens and fonts before the Astryx reset, base, Pam theme and
+  StyleX rules. `dist/` is gitignored; CI builds it on every run.
+- **Stories.** Every component in `@pam/ui` has a story file with a
+  `Default` story, controls on its typed props and its variants and states
+  (12 new: ConnectionCard, TripCard, ProfileCards, VisitTag, MenuList,
+  LargeTitleHeader, SubPage, StepHeader, FloatingAction, MapDrawer, Tone,
+  Text swap). Titles are `Components/<Category>/<Component>`, the
+  categories being Actions, Inputs, Navigation, Layout, Cards, Places,
+  Feedback and Illustration; Icons and Motion sit under Foundations. Every
+  component meta has `autodocs` and a description saying when to use it.
+  Role screens keep their titles, because the Figma flow map links to their
+  ids.
+- **Usage rules in MDX** under `Foundations/`: Introduction (how to mount and
+  import), Principles, Colour, Spacing and layout, Typography, Actions — which
+  one when, Writing. `@storybook/addon-docs` is added.
+- **Proven by:** typecheck; ui 69 tests; `@pam/ui` build (57 modules, 1,158
+  StyleX rules); web build bundles Figtree from the package; Storybook build,
+  and all 290 Components/Foundations entries (stories and docs pages) load
+  with no error and a non-empty root; e2e 570/570.
+
 ---
 
 ## Notes for whoever picks this up next

@@ -121,10 +121,10 @@ const styles = stylex.create({
   // follows, since Pam's icons draw in currentColor. A deeper red than the
   // mockups' #FF385C, which is 3.5:1 on white and fails AA at 12px:
   // #E31C5F is 4.6:1; #FF6B86 is 6.3:1 on the dark page.
-  tabOn: { color: pam.brandPink, fontWeight: 600 },
+  tabOn: { color: pam['--pam-brand-pink'], fontWeight: 600 },
   iconWrap: { position: 'relative' },
   // The tab pink, not the theme's error red (D-289): new, not wrong.
-  dot: { position: 'absolute', top: '-2px', insetInlineEnd: '-4px', backgroundColor: pam.brandPink },
+  dot: { position: 'absolute', top: '-2px', insetInlineEnd: '-4px', backgroundColor: pam['--pam-brand-pink'] },
   // The selected Profile tab rings the avatar in the brand, as the reference
   // rings it in its own colour.
   avatarRing: {
@@ -134,7 +134,7 @@ const styles = stylex.create({
     borderStyle: 'solid',
     borderColor: 'transparent',
   },
-  avatarRingOn: { borderColor: pam.brandPink },
+  avatarRingOn: { borderColor: pam['--pam-brand-pink'] },
 });
 
 export function TabBar({

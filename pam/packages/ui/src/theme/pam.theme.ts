@@ -8,7 +8,7 @@ import { neutralTheme } from '@astryxdesign/theme-neutral/built';
  * are generated and committed, because the deployment builds the app and does
  * not run the Astryx CLI. After editing this file:
  *
- *     pnpm exec astryx theme build src/theme/pam.theme.ts
+ *     pnpm exec pnpm --filter @pam/ui theme  (astryx theme build src/theme/pam.theme.ts, from packages/ui)
  *
  * and commit the three generated files with it. The source is named
  * `pam.theme.ts` rather than `pam.ts` on purpose: with both present, an import

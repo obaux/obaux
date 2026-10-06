@@ -1,0 +1,43 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Foundations/Introduction" />
+
+# Pam design system
+
+Pam connects people coming home from prison to programs, mentors and case managers. Every
+decision in this system answers one question:
+
+> **Can a person who hasn't used a phone in eight years enroll in a program, get to it, and keep
+> going — without help?**
+
+Pam is built on [Astryx](https://www.npmjs.com/package/@astryxdesign/core) with a Pam theme and a
+small set of Pam components on top. Use Astryx for anything general (buttons, fields, cards,
+sheets, menus); use a Pam component when one exists for the job.
+
+## How this Storybook is organised
+
+| Section | What it holds |
+| --- | --- |
+| **Foundations** | The rules: principles, colour, spacing and layout, type, actions, writing, icons, motion. Check generated UI against these. |
+| **Components / *Category* / *Component*** | Every `@pam/ui` component, one page each, with a **Default** story, its variants and states, and its props as controls. Categories: Actions, Inputs, Navigation, Layout, Cards, Places, Feedback, Illustration. |
+| **Member, Case manager, Program lead, Super admin, Onboarding** | Whole screens as each kind of person sees them, built from the components. Use them as reference for how pieces combine — not as components to reuse. |
+
+## Using the components outside the app
+
+Every component mounts on its own inside `PamProvider` with the stylesheet loaded:
+
+```tsx
+import '@pam/ui/dist/styles.css'; // tokens, Figtree, Astryx base, Pam theme, component styles
+import { PamProvider, BigButton } from '@pam/ui';
+
+<PamProvider mode="light">
+  <BigButton label="Plan a trip" href="/trips/new/" />
+</PamProvider>
+```
+
+- `dist/tokens.css` — every token as a CSS custom property (generated from the theme; never edit).
+- `dist/fonts.css` and `dist/fonts/` — Figtree, self-hosted. Nothing loads from Google.
+- `dist/styles.css` — the one stylesheet; it imports the two above.
+
+Build it with `pnpm --filter @pam/ui build`. In Storybook the same providers come from the global
+decorator, so stories never add their own.

@@ -4,7 +4,8 @@ import { CategoryArt } from '@pam/ui/CategoryArt';
 
 /** A small, flat illustration for each kind of place, in the sign-in carousel's style (D-287). */
 const meta = {
-  title: 'Components/CategoryArt',
+  title: 'Components/Illustration/CategoryArt',
+  tags: ['autodocs'],
   component: CategoryArt,
   args: { category: 'education', size: 56 },
 } satisfies Meta<typeof CategoryArt>;
@@ -12,7 +13,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const SchoolAndTraining: Story = {};
+export const Default: Story = {};
 export const WorkAndMoney: Story = { args: { category: 'workforce' } };
 export const HomeAndFamily: Story = { args: { category: 'family_services' } };
 /** All three, large, to check the drawing. */

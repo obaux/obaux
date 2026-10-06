@@ -4,7 +4,8 @@ import { NextTripCard } from '@pam/ui/NextTripCard';
 
 /** A member's next visit, on Explore (D-265). No program name — the kind, the day and the time. */
 const meta = {
-  title: 'Components/NextTripCard',
+  title: 'Components/Cards/NextTripCard',
+  tags: ['autodocs'],
   component: NextTripCard,
   args: {
     categoryLabel: 'School and training',

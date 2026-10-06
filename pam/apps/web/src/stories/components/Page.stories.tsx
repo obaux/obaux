@@ -25,7 +25,8 @@ function Screen(args: Omit<PageProps, 'children'>) {
 }
 
 const meta = {
-  title: 'Components/Page',
+  title: 'Components/Layout/Page',
+  tags: ['autodocs'],
   component: Page,
   render: (args) => <Screen width={args.width} align={args.align} gap={args.gap} />,
   args: { children: null, width: 'app', align: 'start', gap: 4 },
@@ -40,7 +41,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const App: Story = {};
+export const Default: Story = {};
 
 /** Wider, for legal text — try it at the Desktop viewport. */
 export const Read: Story = { args: { width: 'read' }, globals: { viewport: { value: 'desktop', isRotated: false } } };

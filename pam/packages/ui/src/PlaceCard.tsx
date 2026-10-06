@@ -165,8 +165,8 @@ const styles = stylex.create({
     position: 'relative',
     zIndex: 1,
     flexShrink: 0,
-    minHeight: pam.touchTargetMin,
-    minWidth: pam.touchTargetMin,
+    minHeight: pam['--pam-touch-target-min'],
+    minWidth: pam['--pam-touch-target-min'],
     fontSize: '22px',
     color: colorVars['--color-icon-accent'],
     // The whole 48px stays tappable, but it no longer sets the row's height

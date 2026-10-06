@@ -1,0 +1,54 @@
+import { Meta, ColorPalette, ColorItem } from '@storybook/addon-docs/blocks';
+
+<Meta title="Foundations/Colour" />
+
+# Colour
+
+Every colour is a token, and every token is a light/dark pair (`light-dark()`), so a screen works in
+both modes without extra code. Use the token, never the hex. All values live in `tokens.css`.
+
+## Rules
+
+- **Accent green is for action and choice.** The filled primary button, the selected state, links
+  and the accent ring of a picked card. Text on it uses `--color-on-accent`.
+- **Light green is the quiet action.** Secondary buttons and a picked service card use
+  `--color-accent-muted` with accent-coloured text.
+- **Brand pink means "you are here" or "something new".** Only the selected tab and the unread dot.
+  Never a button, never a heading.
+- **Status colours come in pairs.** A strong colour for icons and text (`--color-warning`), its
+  muted partner for the background (`--color-warning-muted`). Warning is "you still need to do
+  this"; error is "this failed"; success is "done".
+- **Grey cards are things to pick.** `--color-background-muted` sets a choice apart from content on
+  white surfaces.
+- **Contrast:** body text 4.5:1 or better on its background, in both modes. The pairs below are
+  measured.
+
+<ColorPalette>
+  <ColorItem
+    title="Accent"
+    subtitle="Primary action, selected, links"
+    colors={{ 'accent (light)': '#0F5847', 'accent (dark)': '#DCE068', 'on-accent (light)': '#FFFFFF', 'accent-muted (light)': '#E7EFE6' }}
+  />
+  <ColorItem
+    title="Brand pink"
+    subtitle="Selected tab and new-thing dot only"
+    colors={{ 'brand-pink (light)': '#E31C5F', 'brand-pink (dark)': '#FF6B86' }}
+  />
+  <ColorItem
+    title="Surfaces"
+    subtitle="Page, cards, grey choice cards"
+    colors={{ 'background-body': '#FFFFFF', 'background-surface': '#FFFFFF', 'background-muted': '#F1F1F1', border: '#00000014' }}
+  />
+  <ColorItem
+    title="Text"
+    subtitle="Primary, secondary, accent, disabled"
+    colors={{ 'text-primary': '#000000', 'text-secondary': '#474747', 'text-accent': '#0F5847', 'text-disabled': '#919191' }}
+  />
+  <ColorItem
+    title="Status"
+    subtitle="Strong / muted pairs"
+    colors={{ success: '#00490B', 'success-muted': '#BCE0BB', warning: '#4B3900', 'warning-muted': '#FAE19E', error: '#76000C', 'error-muted': '#FFC4BE' }}
+  />
+</ColorPalette>
+
+Swatches show the light-mode value; dark-mode values are in `tokens.css`.

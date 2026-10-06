@@ -21,7 +21,8 @@ function LocalisedBell({ label, unreadLabel, unreadCount, href }: NotificationBe
 }
 
 const meta = {
-  title: 'Components/NotificationBell',
+  title: 'Components/Feedback/NotificationBell',
+  tags: ['autodocs'],
   component: NotificationBell,
   decorators: [
     (Story) => (
@@ -38,7 +39,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const NothingNew: Story = {};
+export const Default: Story = {};
 export const TwoNew: Story = { args: { unreadCount: 2 } };
 export const ManyNew: Story = { args: { unreadCount: 128 } };
 export const Spanish: Story = { args: { unreadCount: 2 }, globals: { locale: 'es' } };

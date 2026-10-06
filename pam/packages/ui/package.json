@@ -35,11 +35,20 @@
     "./CategoryArt": "./src/CategoryArt.tsx",
     "./BadgeArt": "./src/BadgeArt.tsx",
     "./Tone": "./src/Tone.tsx",
-    "./MapDrawer": "./src/MapDrawer.tsx"
+    "./MapDrawer": "./src/MapDrawer.tsx",
+    "./theme": "./src/theme/pam.js",
+    "./theme/pam.css": "./src/theme/pam.css",
+    "./fonts.css": "./src/styles/fonts.css",
+    "./tokens.css": "./src/styles/tokens.css",
+    "./dist/*": "./dist/*",
+    "./styles.css": "./dist/styles.css"
   },
   "scripts": {
     "typecheck": "tsc -p tsconfig.json",
-    "test": "vitest run"
+    "test": "vitest run",
+    "theme": "astryx theme build src/theme/pam.theme.ts",
+    "build": "node scripts/build.mjs",
+    "tokens": "node scripts/tokens.mjs"
   },
   "dependencies": {
     "@astryxdesign/core": "^0.6.0",
@@ -64,6 +73,15 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "typescript": "^5.7.2",
-    "vitest": "^2.1.8"
-  }
+    "vitest": "^2.1.8",
+    "@astryxdesign/theme-neutral": "^0.6.0",
+    "@astryxdesign/cli": "^0.6.0",
+    "@babel/core": "^7.26.0",
+    "@babel/preset-typescript": "^7.26.0",
+    "@babel/preset-react": "^7.26.0"
+  },
+  "files": [
+    "dist",
+    "src"
+  ]
 }

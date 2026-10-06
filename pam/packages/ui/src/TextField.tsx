@@ -108,7 +108,7 @@ export interface TextFieldProps extends TextInputProps {
 
 const styles = stylex.create({
   frame: {
-    height: pam.fieldHeight,
+    height: pam['--pam-field-height'],
     // Astryx sets height from its size token; a taller box needs the padding to
     // grow with it or the text sits against the left edge.
     paddingInline: '14px',
