@@ -138,10 +138,10 @@ number. On Your points, the badges sit in their own card, a little further
 below the ladder, with the title centred. The example member has earned
 Scholar, and the top card shows it as their newest badge.
 The Steward badge has been removed.
-On a place's page, opening hours are a row showing today's day and times; tap
+On a place's page, opening hours are a row, "Hours: Monday", with today's times under it; tap
 it for the whole week with today marked. Plan a trip stays at the foot of the
 screen however far you scroll. "What this place is" is now "About program".
-Sign in and Enter your code have more room between their parts. The language
+The links at the foot of Sign in are further apart. The language
 menu's dial is smaller and evenly padded. A program lead's Program tab lists
 Policies for participants with the other rows, and labels its number "Contact
 phone number".

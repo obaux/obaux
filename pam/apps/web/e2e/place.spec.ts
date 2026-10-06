@@ -156,7 +156,7 @@ test.describe("a place's own screen", () => {
     );
     // D-309: the hours are a row too, today's on it; the week and Check
     // hours on Google open in a drawer.
-    await page.getByRole('button', { name: /^(Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday) · / }).click();
+    await page.getByRole('button', { name: /^Hours: / }).click();
     await expect(page.getByRole('link', { name: 'Check hours on Google' })).toHaveAttribute(
       'href',
       /google\.com\/maps\/search/,
@@ -177,7 +177,7 @@ test.describe("a place's own screen", () => {
     await page.goto(`/place/?id=${PLACE.id}`);
 
     // In the week drawer (D-309), with today marked.
-    await page.getByRole('button', { name: /^(Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday) · / }).click();
+    await page.getByRole('button', { name: /^Hours: / }).click();
     await expect(page.getByRole('heading', { name: 'Opening hours' })).toBeVisible();
     await expect(page.getByText('Today', { exact: true })).toBeVisible();
     await expect(page.getByText(/sample hours while PAM checks the real ones/)).toBeVisible();

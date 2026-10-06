@@ -94,9 +94,7 @@ export function PhoneSignInCard({
       // of 5" under it) says what this is. Then the boxes and the button, the
       // thing to do; then, quieter, where the code went, with a small
       // "Send again".
-      // Roomier between the boxes, the button and where the code went
-      // (Will, 6 October, D-310): they are three things, not one block.
-      <VStack gap={6} xstyle={[styles.card, styles.codeInset]}>
+      <VStack gap={4} xstyle={[styles.card, styles.codeInset]}>
         <CodeBoxes
           id={codeId}
           label={t('signin.code.label')}
@@ -139,8 +137,7 @@ export function PhoneSignInCard({
     // the rest of the app's cards, since this is the one screen where the
     // card is the entire job rather than one of several things on the page.
     <Card padding={5} xstyle={[styles.card, isFlat && styles.flat]}>
-      {/* Title, field, button, note — each given air (Will, 6 October, D-310). */}
-      <VStack gap={5}>
+      <VStack gap={3}>
         {/*
           The heading sits inside the card with the field it names, so the
           task is one block rather than a title floating above a box.

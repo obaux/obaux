@@ -7320,8 +7320,9 @@ let's add the Plan a trip button as a floating footer button so it's always
 visible. And instead of label 'what this place is' say 'About program'."
 
 - **The row.** Opening hours join the quick actions, right after Get
-  directions: a clock, today's day and times as the label ("Tuesday ·
-  8:00 AM – 9:00 PM"), the open/closed line under it. A tap opens a
+  directions: a clock, "Hours: Tuesday" as the label and today's times
+  under it ("8:00 AM – 9:00 PM"). Not whether it is open — the line under
+  the name already says that (Will, 6 October, second pass). A tap opens a
   `BottomSheet` with the whole week, today marked ("Today", bold, on a
   muted ground), the sample-hours note and "Check hours on Google". The
   sheet draws its own Close. The old hours card is gone from pages that
@@ -7354,11 +7355,12 @@ visible. And instead of label 'what this place is' say 'About program'."
 Will, 6 October: "Let's add more space between items on sign in, and code
 screen, so they're not too tight together."
 
-- The sign-in card's column (title, field, button, "PAM texts you a code")
-  goes from `gap={3}` to `gap={5}`; the code step (boxes, button, "Sent
-  to") from `gap={4}` to `gap={6}`. Nothing else moves: the hero, the
-  footer and the card's own padding are as they were.
-- **Proven by:** before/after screenshots of both steps; e2e 570/570.
+- First pass opened the card's column and the code step a step each;
+  Will: "return to the previous tighter parts. It's only the links on
+  foot that need more space." So those gaps are back as they were, and
+  `LegalFooter`'s three links (About PAM, Privacy, Terms of service) go
+  from `gap={2}` to `gap={6}` — each a tap of its own, read as three.
+- **Proven by:** a screenshot of the foot; e2e 570/570.
 
 ### D-311 — The language menu's dial is small, its right edge padded
 

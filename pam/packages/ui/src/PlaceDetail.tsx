@@ -68,6 +68,8 @@ export interface PlaceDetailProps {
    * row then says only "Opening hours", never a day guessed at build time.
    */
   readonly todayIndex?: number | null;
+  /** The hours row's label, "Hours: Monday" (D-309, Will, 6 October). */
+  readonly hoursRowLabel?: string | null;
   /**
    * True when the hours above are a stand-in rather than the place's own. The
    * screen says so, plainly, rather than letting a demo look like a promise.
@@ -233,6 +235,7 @@ export function PlaceDetail({
   status,
   weekLines,
   todayIndex = null,
+  hoursRowLabel = null,
   hoursArePlaceholder = false,
   placeholderNote,
   audienceLabel,
@@ -322,20 +325,21 @@ export function PlaceDetail({
   ) : null;
 
   /*
-   * Hours as a row among the quick actions (Will, 6 October, D-309): today's
-   * day and times on it, whether it is open under them, and the whole week
-   * one tap away in a drawer. Today comes from the browser's clock, the
-   * same one that says open or closed, and moves on at midnight.
+   * Hours as a row among the quick actions (Will, 6 October, D-309):
+   * "Hours: Monday" with today's times under it — not whether it is open,
+   * which the line under the name already says — and the whole week one
+   * tap away in a drawer. Today comes from the browser's clock, the same
+   * one that says open or closed, and moves on at midnight.
    */
   const today = todayIndex !== null && weekLines ? (weekLines[todayIndex] ?? null) : null;
   const hasWeek = Boolean(quickActions && weekLines && weekLines.length > 0);
   const hoursRow: MenuItem | null = hasWeek
     ? {
         id: 'hours',
-        label: today ? `${today.day} · ${today.hours}` : labels.hours,
+        label: today && hoursRowLabel ? hoursRowLabel : labels.hours,
         icon: <ClockIcon width={26} height={26} aria-hidden />,
         onSelect: () => setWeekOpen(true),
-        ...(status ? { description: status.label } : {}),
+        ...(today ? { description: today.hours } : {}),
       }
     : null;
   const quickItems: MenuItem[] = (quickActions ?? []).map((action) => ({

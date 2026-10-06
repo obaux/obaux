@@ -447,6 +447,7 @@
   "place.flag": "Something is wrong here",
   "place.hours": "Opening hours",
   "place.hours.closed": "Closed",
+  "place.hours.row": "Hours: {day}",
   "place.hours.today": "Today",
   "place.hours.sample": "These are sample hours while PAM checks the real ones. Call before you go.",
   "place.hoursOnGoogle": "Check hours on Google",
