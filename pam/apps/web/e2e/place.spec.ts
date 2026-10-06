@@ -138,7 +138,7 @@ test.describe("a place's own screen", () => {
 
   test('the actions are rows, directions first, and the rest is in the bar', async ({ page }) => {
     // D-291: Get directions, Send a message, Call and Website under the name,
-    // as rows with a line each (they were labelled circles, D-224); Check hours on Google at the foot of the hours card;
+    // as rows with a line each (they were labelled circles, D-224); the hours a row too, the week in a drawer (D-309);
     // Save and the ⋯ menu (Flag something, Share, Message) in the bar.
     await signedIn(page);
     await page.route(DETAIL, (route) => route.fulfill(json([PLACE])));
@@ -154,10 +154,14 @@ test.describe("a place's own screen", () => {
       'href',
       /google\.com\/maps\/dir/,
     );
+    // D-309: the hours are a row too, today's on it; the week and Check
+    // hours on Google open in a drawer.
+    await page.getByRole('button', { name: /^(Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday) · / }).click();
     await expect(page.getByRole('link', { name: 'Check hours on Google' })).toHaveAttribute(
       'href',
       /google\.com\/maps\/search/,
     );
+    await page.keyboard.press('Escape');
     await expect(page.getByRole('button', { name: 'Save this place' })).toBeVisible();
     await page.getByRole('button', { name: 'More options' }).click();
     await expect(page.getByRole('menuitem', { name: 'Flag something' })).toBeVisible();
@@ -172,7 +176,10 @@ test.describe("a place's own screen", () => {
     await page.route(DETAIL, (route) => route.fulfill(json([PLACE])));
     await page.goto(`/place/?id=${PLACE.id}`);
 
+    // In the week drawer (D-309), with today marked.
+    await page.getByRole('button', { name: /^(Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday) · / }).click();
     await expect(page.getByRole('heading', { name: 'Opening hours' })).toBeVisible();
+    await expect(page.getByText('Today', { exact: true })).toBeVisible();
     await expect(page.getByText(/sample hours while PAM checks the real ones/)).toBeVisible();
   });
 

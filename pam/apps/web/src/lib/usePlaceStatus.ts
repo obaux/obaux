@@ -21,6 +21,12 @@ export interface PlaceStatus {
   /** False when the hours behind this are a stand-in (see @pam/config/hours). */
   readonly isReal: boolean;
   readonly hours: PlaceHours;
+  /**
+   * Today, 0 for Sunday, from the same clock as `isOpen` (D-309), so the
+   * week drawer's "Today" and the open line can never disagree, and both
+   * move on at midnight.
+   */
+  readonly today: number;
 }
 
 type Translate = (key: string, vars?: Record<string, string | number>) => string;
@@ -77,7 +83,7 @@ export function placeStatus(
         ? t('place.closedUntil', { time: formatTime(state.opensAt, locale) })
         : t('place.closed');
 
-  return { isOpen: state.state === 'open', label, isReal: hours.isReal, hours };
+  return { isOpen: state.state === 'open', label, isReal: hours.isReal, hours, today: now.getDay() };
 }
 
 /** The same answer for a single place, for a screen showing exactly one. */

@@ -14,10 +14,10 @@ test('the visit card says it is the next visit, where comes before what, and no 
   await settled(page);
   await expect(page.getByText('Your next visit')).toBeVisible();
   await expect(page.getByRole('link', { name: 'Change appointment' })).toBeVisible();
-  // Address, then hours, then About (D-281).
+  // Address, then About (D-281); the hours are a row above both (D-309).
   const top = async (name: string) => (await page.getByRole('heading', { name }).boundingBox())!.y;
-  expect(await top('Address')).toBeLessThan(await top('Opening hours'));
-  expect(await top('Opening hours')).toBeLessThan(await top('What this place is'));
+  expect(await top('Address')).toBeLessThan(await top('About program'));
+  await expect(page.getByRole('button', { name: /^(Sunday|Monday|Tuesday|Wednesday|Thursday|Friday|Saturday) · / })).toBeVisible();
   const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']).analyze();
   expect(results.violations).toEqual([]);
 });

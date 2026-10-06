@@ -1,6 +1,6 @@
 'use client';
 
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { Card } from '@astryxdesign/core/Card';
 import { VStack } from '@astryxdesign/core/VStack';
@@ -8,14 +8,16 @@ import { HStack } from '@astryxdesign/core/HStack';
 import { Text } from '@astryxdesign/core/Text';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Badge, type BadgeVariant } from '@astryxdesign/core/Badge';
+import { BottomSheet } from '@astryxdesign/core/BottomSheet';
 import { Button } from '@astryxdesign/core/Button';
 import { colorVars, spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
-import { BookmarkIcon, FlagIcon, PhoneIcon, PlacesIcon, ShareIcon } from './icons.js';
+import { BookmarkIcon, ClockIcon, FlagIcon, PhoneIcon, PlacesIcon, ShareIcon } from './icons.js';
 import { BigButton } from './BigButton.js';
 import { CATEGORY_DEFINITIONS, type Category } from '@pam/config';
 import { pam } from './tokens.stylex.js';
 import { textLinkLook } from './TextLink.js';
-import { MenuList } from './MenuList.js';
+import { MenuList, type MenuItem } from './MenuList.js';
+import { edgeFade } from './edgeFade.js';
 
 /**
  * One place, on its own screen.
@@ -61,6 +63,12 @@ export interface PlaceDetailProps {
    */
   readonly weekLines?: readonly { readonly day: string; readonly hours: string }[];
   /**
+   * Today, as an index into `weekLines` (0 is Sunday, as `Date.getDay()`).
+   * From the browser's clock, so null until it has run (D-309): the hours
+   * row then says only "Opening hours", never a day guessed at build time.
+   */
+  readonly todayIndex?: number | null;
+  /**
    * True when the hours above are a stand-in rather than the place's own. The
    * screen says so, plainly, rather than letting a demo look like a promise.
    */
@@ -72,8 +80,9 @@ export interface PlaceDetailProps {
   readonly directionsHref?: string | null;
   /**
    * The screen's one primary action, in place of "How to get there" — a
-   * member's "Schedule a visit" (D-235). Directions then lives in the round
-   * quick actions.
+   * member's "Plan a trip" (D-235). It floats at the foot of the screen, so
+   * it is always in reach however far somebody scrolls (Will, 6 October,
+   * D-309). Directions then lives in the quick actions.
    */
   readonly primaryAction?: { readonly label: string; readonly href: string } | null;
   readonly hoursHref?: string | null;
@@ -106,6 +115,8 @@ export interface PlaceDetailProps {
     readonly call: string;
     readonly website: string;
     readonly hours: string;
+    /** "Today", beside today's line in the week (D-309). */
+    readonly today?: string;
     readonly hoursOnGoogle: string;
     readonly about: string;
     readonly address: string;
@@ -159,6 +170,27 @@ const styles = stylex.create({
   },
   rows: { rowGap: spacingVars['--spacing-2'] },
   hoursLink: { alignSelf: 'flex-start', minHeight: pam.touchTargetMin, fontSize: '16px', paddingInline: '0px' },
+  // The week drawer (D-309).
+  sheet: { paddingInline: '24px', paddingBlock: '8px 24px' },
+  sheetTitle: { fontSize: '22px', lineHeight: 1.25 },
+  dayLine: { minHeight: '44px', paddingInline: '12px', borderRadius: '12px' },
+  todayLine: { backgroundColor: colorVars['--color-background-muted'] },
+  todayTag: { fontSize: '13px', fontWeight: 600, color: colorVars['--color-text-accent'] },
+  // The primary action, floating at the foot of the screen (D-309). The
+  // place page has no tab bar, so it rests on the bottom edge, clear of the
+  // home indicator, with the same fade above it as every bottom edge.
+  footer: {
+    position: 'fixed',
+    insetInline: 0,
+    bottom: 0,
+    zIndex: 11,
+    backgroundColor: colorVars['--color-background-body'],
+    paddingBlockStart: '8px',
+    paddingBlockEnd: 'calc(16px + env(safe-area-inset-bottom, 0px))',
+  },
+  footerInner: { width: '100%', maxWidth: '560px', marginInline: 'auto', paddingInline: '24px' },
+  // So the end of the page scrolls clear of the footer.
+  footerSpacer: { height: '72px', flexShrink: 0 },
 });
 
 /** One labelled row in the "more" column, so the four of them cannot drift. */
@@ -199,6 +231,7 @@ export function PlaceDetail({
   distanceLabel,
   status,
   weekLines,
+  todayIndex = null,
   hoursArePlaceholder = false,
   placeholderNote,
   audienceLabel,
@@ -218,6 +251,7 @@ export function PlaceDetail({
   addressFirst = false,
   labels,
 }: PlaceDetailProps) {
+  const [isWeekOpen, setWeekOpen] = useState(false);
   const aboutCard = description ? (
     <Card padding={4} xstyle={styles.card}>
       <VStack gap={2}>
@@ -286,6 +320,89 @@ export function PlaceDetail({
     </Card>
   ) : null;
 
+  /*
+   * Hours as a row among the quick actions (Will, 6 October, D-309): today's
+   * day and times on it, whether it is open under them, and the whole week
+   * one tap away in a drawer. Today comes from the browser's clock, the
+   * same one that says open or closed, and moves on at midnight.
+   */
+  const today = todayIndex !== null && weekLines ? (weekLines[todayIndex] ?? null) : null;
+  const hasWeek = Boolean(quickActions && weekLines && weekLines.length > 0);
+  const hoursRow: MenuItem | null = hasWeek
+    ? {
+        id: 'hours',
+        label: today ? `${today.day} · ${today.hours}` : labels.hours,
+        icon: <ClockIcon width={26} height={26} aria-hidden />,
+        onSelect: () => setWeekOpen(true),
+        ...(status ? { description: status.label } : {}),
+      }
+    : null;
+  const quickItems: MenuItem[] = (quickActions ?? []).map((action) => ({
+    id: action.id,
+    label: action.label,
+    icon: action.icon,
+    href: action.href,
+    ...(action.description ? { description: action.description } : {}),
+    ...(action.isExternal ? { isExternal: true } : {}),
+    ...(action.hasDot ? { hasDot: true } : {}),
+    ...(action.isDescriptionOneLine ? { isDescriptionOneLine: true } : {}),
+  }));
+  // Right after directions: where it is, then when it is open.
+  if (hoursRow) quickItems.splice(quickItems[0]?.id === 'directions' ? 1 : 0, 0, hoursRow);
+
+  const weekSheet = hasWeek ? (
+    <BottomSheet isOpen={isWeekOpen} onOpenChange={setWeekOpen} label={labels.hours} height="hug">
+      {isWeekOpen ? (
+        <VStack gap={3} xstyle={styles.sheet}>
+          {/* The sheet draws its own Close; a second one would be two. */}
+          <Heading level={2} xstyle={styles.sheetTitle}>
+            {labels.hours}
+          </Heading>
+          <VStack gap={0.5}>
+            {weekLines!.map((line, index) => {
+              const isToday = index === todayIndex;
+              return (
+                <HStack
+                  key={line.day}
+                  gap={3}
+                  align="center"
+                  justify="between"
+                  wrap="nowrap"
+                  xstyle={[styles.dayLine, isToday && styles.todayLine]}
+                >
+                  <VStack gap={0}>
+                    <Text xstyle={[styles.dayRow, isToday && styles.today]}>{line.day}</Text>
+                    {isToday && labels.today ? <Text xstyle={styles.todayTag}>{labels.today}</Text> : null}
+                  </VStack>
+                  <Text type={isToday ? 'body' : 'supporting'} xstyle={[styles.dayRow, isToday && styles.today]}>
+                    {line.hours}
+                  </Text>
+                </HStack>
+              );
+            })}
+          </VStack>
+          {/* Said whenever the hours are a stand-in (see the hours card below). */}
+          {hoursArePlaceholder && placeholderNote ? (
+            <Text type="supporting" xstyle={styles.note}>
+              {placeholderNote}
+            </Text>
+          ) : null}
+          {hoursHref ? (
+            <Button
+              label={labels.hoursOnGoogle}
+              variant="ghost"
+              href={hoursHref}
+              target="_blank"
+              rel="noreferrer"
+              icon={<PlacesIcon />}
+              xstyle={[styles.hoursLink, textLinkLook.link]}
+            />
+          ) : null}
+        </VStack>
+      ) : null}
+    </BottomSheet>
+  ) : null;
+
   return (
     <VStack gap={4}>
       <VStack gap={2}>
@@ -327,26 +444,14 @@ export function PlaceDetail({
       */}
       {quickActions && quickActions.length > 0 ? (
         <Card padding={1} xstyle={styles.card}>
-          <MenuList
-            label={quickActionsLabel ?? ''}
-            hasDividers
-            items={quickActions.map((action) => ({
-              id: action.id,
-              label: action.label,
-              icon: action.icon,
-              href: action.href,
-              ...(action.description ? { description: action.description } : {}),
-              ...(action.isExternal ? { isExternal: true } : {}),
-              ...(action.hasDot ? { hasDot: true } : {}),
-              ...(action.isDescriptionOneLine ? { isDescriptionOneLine: true } : {}),
-            }))}
-          />
+          <MenuList label={quickActionsLabel ?? ''} hasDividers items={quickItems} />
         </Card>
       ) : null}
+      {weekSheet}
 
       {/* With a visit booked, where and when come before what it is (D-273, D-281). */}
       {addressFirst ? addressCard : null}
-      {addressFirst ? hoursCard : null}
+      {addressFirst && !hasWeek ? hoursCard : null}
       {aboutCard}
 
       {/*
@@ -354,14 +459,22 @@ export function PlaceDetail({
         somebody opened a place rather than reading the card.
       */}
       {primaryAction ? (
-        <BigButton label={primaryAction.label} href={primaryAction.href} />
+        <>
+          <VStack aria-hidden xstyle={styles.footerSpacer} />
+          <HStack xstyle={styles.footer}>
+            <VStack aria-hidden xstyle={edgeFade.above} />
+            <VStack xstyle={styles.footerInner}>
+              <BigButton label={primaryAction.label} href={primaryAction.href} />
+            </VStack>
+          </HStack>
+        </>
       ) : directionsHref ? (
         <BigButton label={labels.directions} href={directionsHref} />
       ) : null}
 
       {addressFirst ? null : addressCard}
 
-      {addressFirst ? null : hoursCard}
+      {addressFirst || hasWeek ? null : hoursCard}
 
       {quickActions ? null : (
         <VStack gap={2} xstyle={styles.rows}>

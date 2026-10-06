@@ -50,7 +50,7 @@ const detailLabels = {
   website: 'Their website',
   hours: 'Opening hours',
   hoursOnGoogle: 'Check hours on Google',
-  about: 'What this place is',
+  about: 'About program',
   address: 'Address',
   save: 'Save this place',
   saved: 'Saved',

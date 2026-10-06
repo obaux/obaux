@@ -138,6 +138,9 @@ number. On Your points, the badges sit in their own card, a little further
 below the ladder, with the title centred. The example member has earned
 Scholar, and the top card shows it as their newest badge.
 The Steward badge has been removed.
+On a place's page, opening hours are a row showing today's day and times; tap
+it for the whole week with today marked. Plan a trip stays at the foot of the
+screen however far you scroll. "What this place is" is now "About program".
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 

@@ -7311,6 +7311,44 @@ Will, 6 October: "Let's remove steward as a badge."
     Storybook build;
   - e2e 570/570.
 
+### D-309 — Hours as a row with the week in a drawer; Plan a trip floats; "About program"
+
+Will, 6 October: "Let's reimagine how we show hours, as an item, that can be
+clicked and a drawer opens with full weekly schedule. On the item, focus on
+today's day and time. Build this right so it works with current day. Also
+let's add the Plan a trip button as a floating footer button so it's always
+visible. And instead of label 'what this place is' say 'About program'."
+
+- **The row.** Opening hours join the quick actions, right after Get
+  directions: a clock, today's day and times as the label ("Tuesday ·
+  8:00 AM – 9:00 PM"), the open/closed line under it. A tap opens a
+  `BottomSheet` with the whole week, today marked ("Today", bold, on a
+  muted ground), the sample-hours note and "Check hours on Google". The
+  sheet draws its own Close. The old hours card is gone from pages that
+  have the row; `PlaceDetail` still draws it for a caller without quick
+  actions.
+- **Today, correctly.** `PlaceStatus` now carries `today` from the same
+  browser clock that decides open or closed (`useNow`, read after mount,
+  re-read every minute), so the label, the open line and the drawer's
+  "Today" cannot disagree, and all three move on at midnight. Until the
+  clock has run, the row says only "Opening hours": a static export never
+  guesses a day at build time.
+- **Plan a trip floats.** The primary action sits in a fixed footer at the
+  foot of the screen (the place page has no tab bar), clear of the home
+  indicator, with the same `edgeFade` every bottom edge uses, and a spacer
+  so the page's end scrolls clear of it. Only a member without a visit has
+  it, as before (D-235, D-273).
+- **"About program"** replaces "What this place is" (`place.about`, en/es),
+  on a member's place and a program lead's own Program tab alike.
+- **Proven by:**
+  - screenshots of the Place profile story (the row, the drawer, the
+    footer);
+  - ui 67 and config 238 unit tests, typecheck, web build and Storybook
+    build;
+  - e2e 570/570 (place.spec opens the drawer for Check hours on Google and
+    the sample note; visit-change.spec checks Address before About program
+    and the hours row).
+
 ---
 
 ## Notes for whoever picks this up next

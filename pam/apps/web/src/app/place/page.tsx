@@ -382,6 +382,7 @@ function PlaceScreen() {
         address={place!.address}
         status={status ? { isOpen: status.isOpen, label: status.label } : null}
         weekLines={lines}
+        todayIndex={status ? status.today : null}
         hoursArePlaceholder={status ? !status.isReal : false}
         placeholderNote={t('place.hours.sample')}
         audienceLabel={place!.audience ? t(`place.audience.${place!.audience}`) : null}
@@ -502,6 +503,7 @@ function PlaceScreen() {
           call: t('place.call'),
           website: t('place.website'),
           hours: t('place.hours'),
+          today: t('place.hours.today'),
           hoursOnGoogle: t('place.hoursOnGoogle'),
           about: t('place.about'),
           address: t('place.address'),
