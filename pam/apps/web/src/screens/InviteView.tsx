@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { Text } from '@astryxdesign/core/Text';
-import { MeIcon, Notice, PlacesIcon } from '@pam/ui';
+import { MeIcon, Notice, PlacesIcon, ShieldIcon } from '@pam/ui';
 import { MenuList } from '@pam/ui/MenuList';
 import { SubPage } from '@pam/ui/SubPage';
 import { useI18n } from '@/lib/i18n';
@@ -45,7 +45,7 @@ export function InviteView() {
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState(false);
 
-  const make = async (role: 'member' | 'provider') => {
+  const make = async (role: 'member' | 'provider' | 'admin') => {
     if (!canInvite) return;
     setBusy(true);
     setFailed(false);
@@ -84,6 +84,19 @@ export function InviteView() {
                 onSelect: () => void make('provider'),
                 icon: <PlacesIcon {...ICON} />,
               },
+              // A case manager or the super admin may invite a colleague too
+              // (D-315, 0073); a program may not.
+              ...(trueRole === 'admin' || trueRole === 'super_admin'
+                ? [
+                    {
+                      id: 'case-manager',
+                      label: t('invite.caseManager'),
+                      description: t('invite.caseManager.body'),
+                      onSelect: () => void make('admin'),
+                      icon: <ShieldIcon {...ICON} />,
+                    },
+                  ]
+                : []),
             ]}
           />
         </>

@@ -7425,6 +7425,38 @@ you" for a case manager on its own.
   correctly (19 screenshots); typecheck, web and Storybook builds; e2e
   570/570.
 
+### D-315 — A case manager can invite a case manager; the super admin invites from Profile and Invited people
+
+Will, 6 October: "Case managers should also be able to invite other case
+managers. Not only super admins should be able to invite." Then: "we need
+the same ability for super admins, so list that in admin profile settings
+also", and "Super admin top of page, instead of help, add '+ New invite'
+white button there."
+
+- **The database.** `create_invite` (0049, 0070) refused `p_role = 'admin'`
+  from anyone but the super admin. Migration **0073** lets a case manager
+  issue one too — into their own region only, like every invite they
+  make. A program lead still cannot; nobody is invited to be a super
+  admin. A case manager invited this way lands on nobody's caseload
+  (`assigned_admin_id` is a member's case manager, so it is null for any
+  non-member invite). Audited as before.
+  **Not deployed.** This session cannot read the live migration list
+  (`list_migrations` is denied), so per the shared-state rule it stays a
+  file until Will, or a session that can diff the ledger, applies it.
+- **The screen.** Invite someone gets a third row, "Invite a case manager
+  — Someone who helps people find programs", for a case manager and the
+  super admin; a program lead sees two rows as before. The link it makes
+  reads "A link for a case manager" and opens Sign in as `case-manager`
+  (`inviteLink` already knew the role).
+- **The super admin.** Profile lists Invite someone first, as a case
+  manager's does. Invited people replaces its Help button with a white
+  "+ New invite" pill (the page-top button shape, D-216) that opens
+  Invite someone. A Super admin › Invite someone story is added.
+- **Proven by:** `pnpm --filter @pam/db test` (a case manager invites a
+  case manager, on nobody's caseload, into their own city; a program
+  still cannot); screenshots of all four screens and the link; config 238,
+  ui 67, typecheck, web and Storybook builds; e2e 570/570.
+
 ---
 
 ## Notes for whoever picks this up next

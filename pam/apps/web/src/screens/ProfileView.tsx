@@ -72,8 +72,8 @@ export function ProfileView({
 
   const staffRows = [
     // Invite someone, a second way in for a case manager beside the strip
-    // on Home (D-226).
-    ...(role === 'admin'
+    // on Home (D-226); the super admin's only way in (D-315).
+    ...(role === 'admin' || role === 'super_admin'
       ? [{ id: 'invite', label: t('profile.menu.invite'), href: '/invite/', icon: <PeopleIcon {...ICON} /> }]
       : []),
     // Every program, a secondary path for staff (D-218): where to look one

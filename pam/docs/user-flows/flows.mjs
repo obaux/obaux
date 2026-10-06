@@ -27,7 +27,7 @@
  *   changes  — the newest decisions this flow shows, newest first
  */
 
-export const UPDATED = '5 October 2026';
+export const UPDATED = '2026-10-06';
 
 /** Where each screen opens live — the branch's Storybook on Chromatic. */
 export const STORYBOOK_URL = 'https://claude-pam-storybook--6abea9193da46b88ce90890f.chromatic.com';
@@ -279,8 +279,8 @@ export const flows = [
         title: 'Invite someone',
         story: 'case-manager-screens--invite',
         path: '/invite/',
-        changed: 'D-263',
-        note: 'No phone number asked',
+        changed: 'D-315',
+        note: 'A member, a program, or a case manager (D-315)',
       },
       inviteReady: {
         title: 'The link to send',
@@ -377,8 +377,15 @@ export const flows = [
         title: 'Invited people',
         story: 'super-admin-screens--invites-log',
         path: '/invites/',
-        changed: 'D-263',
-        note: 'Active · Link open · Link expired',
+        changed: 'D-315',
+        note: 'Active · Link open · Link expired · "+ New invite" top right',
+      },
+      invite: {
+        title: 'Invite someone',
+        story: 'super-admin-screens--invite',
+        path: '/invite/',
+        changed: 'D-315',
+        note: 'A member, a program, or a case manager',
       },
       messages: { title: 'Messages', story: 'super-admin-screens--messages', path: '/messages/', changed: 'D-262' },
       thread: {
@@ -395,12 +402,15 @@ export const flows = [
     edges: [
       ['home', 'requestProgram', 'The program they described'],
       ['home', 'invites', 'Invited people (floating)'],
+      ['invites', 'invite', '+ New invite'],
+      ['profile', 'invite', 'Invite someone'],
       ['messages', 'thread', 'Open'],
       ['profile', 'everyone', 'Everyone'],
       ['everyone', 'person', 'A person'],
       ['profile', 'viewAs', 'See the app as'],
     ],
     changes: [
+      'D-315 — Invite someone from Profile and from Invited people; a case manager can be invited by a case manager',
       'D-263 — Invited people log replaces renewal approvals',
       'D-262 — view a requested program, text the requester, message staff',
       'D-257 — Home is Requests',

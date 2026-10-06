@@ -47,15 +47,19 @@ begin
 end;
 $$;
 
+-- A case manager invites a case manager (0073): same region, no caseload.
 do $$
+declare
+  inv public.invites;
 begin
-  begin
-    perform public.create_invite('admin');
-    raise exception 'FAIL  an admin invite code was issued';
-  exception when others then
-    if sqlerrm like 'FAIL%' then raise; end if;
-    raise notice 'ok    admin accounts cannot be created by invite code';
-  end;
+  inv := public.create_invite('admin');
+  if inv.role <> 'admin' then
+    raise exception 'FAIL  the case manager invite came back as %', inv.role;
+  end if;
+  if inv.assigned_admin_id is not null then
+    raise exception 'FAIL  a case manager invite carries a caseload';
+  end if;
+  raise notice 'ok    a case manager invites a case manager, on nobody''s caseload';
 end;
 $$;
 
@@ -1214,14 +1218,14 @@ set role authenticated;
 select test.as_user(:'admin_north');
 
 do $$
+declare
+  inv public.invites;
 begin
-  begin
-    perform public.create_invite('admin');
-    raise exception 'FAIL  a case manager made a case manager';
-  exception when others then
-    if sqlerrm like 'FAIL%' then raise; end if;
-    raise notice 'ok    a case manager cannot invite a case manager';
-  end;
+  inv := public.create_invite('admin');
+  if inv.region_id <> '11111111-0000-0000-0000-000000000001' then
+    raise exception 'FAIL  a case manager''s case manager invite is for %', inv.region_id;
+  end if;
+  raise notice 'ok    a case manager invites a case manager into their own city (0073)';
 end;
 $$;
 

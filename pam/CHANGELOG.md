@@ -146,6 +146,8 @@ menu's dial is smaller and evenly padded. A program lead's Program tab lists
 Policies for participants with the other rows, and labels its number "Contact
 phone number".
 In Storybook, each role's Sign up can be opened on any one of its steps.
+A case manager can invite another case manager. The super admin has Invite
+someone on their Profile and a "+ New invite" button on Invited people.
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 
