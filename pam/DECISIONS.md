@@ -7349,6 +7349,55 @@ visible. And instead of label 'what this place is' say 'About program'."
     the sample note; visit-change.spec checks Address before About program
     and the hours row).
 
+### D-310 — More air on Sign in and Enter your code
+
+Will, 6 October: "Let's add more space between items on sign in, and code
+screen, so they're not too tight together."
+
+- The sign-in card's column (title, field, button, "PAM texts you a code")
+  goes from `gap={3}` to `gap={5}`; the code step (boxes, button, "Sent
+  to") from `gap={4}` to `gap={6}`. Nothing else moves: the hero, the
+  footer and the card's own padding are as they were.
+- **Proven by:** before/after screenshots of both steps; e2e 570/570.
+
+### D-311 — The language menu's dial is small, its right edge padded
+
+Will, 6 October: "On language dropdown, let's make dial smaller, and add
+more right padding on tooltip for symmetry."
+
+- Astryx sizes a menu's radio dial from the trigger's `size`, so the
+  globe button is drawn at `size: 'sm'`. `LanguageSwitcher`'s own `round`
+  style still holds the trigger at 48px, so nothing changes on the screen
+  but the dial.
+- Each option keeps a 48px floor and 17px words through `xstyle`, and
+  gets 24px on its end — the same room the dial has on its start.
+- **Proven by:** a before/after of the open menu; the trigger measured at
+  48×48.
+
+### D-312 — Policies for participants sits in the program's own list
+
+Will, 6 October: "Program lead's program tab, let's add policies to the
+list of items above, so it's not so hidden."
+
+- The row (D-261) moves from a list of one at the foot of the page into
+  the quick-action card, after Open in Google, with the same words and
+  count. The old `MenuList` and its import are gone from `ProgramView`.
+- **Proven by:** a screenshot of the Program tab; e2e 570/570.
+
+### D-314 — "Contact phone number" on a program's own listing
+
+Will, 6 October: "Contact phone number should be the label on program
+profile for program leads. Not Call. Also there should be an option to add
+phone and website per program."
+
+- On the lead's own Program tab the phone row is labelled "Contact phone
+  number" (`program.quick.phone`, en/es), with the number under it: this
+  is their listing, so the row names the thing rather than the verb. A
+  member's place still says "Call".
+- Phone and website were already fields, both in Edit on the Program tab
+  and in the join flow's program step (`ProgramDetailsStep`). Nothing to
+  add; said here so it is not asked again.
+
 ---
 
 ## Notes for whoever picks this up next

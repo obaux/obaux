@@ -14,7 +14,6 @@ import { BookIcon, GlobeIcon, Page, PhoneIcon, PlaceDetail, PlacesIcon, TextFiel
 import { LargeTitleHeader } from '@pam/ui/LargeTitleHeader';
 import { useI18n } from '@/lib/i18n';
 import { usePolicies } from '@/lib/usePolicies';
-import { MenuList } from '@pam/ui/MenuList';
 
 /**
  * Program — a program lead's own listing, their second tab (D-218, Will,
@@ -173,8 +172,9 @@ export function ProgramView({
               ? [
                   {
                     id: 'call',
-                    label: t('place.quick.call'),
-                    // The number itself, as on a member's place (D-306).
+                    // The lead's own listing names the thing, not the verb
+                    // (Will, 6 October, D-314): this is their number, to check.
+                    label: t('program.quick.phone'),
                     description: displayPhone(program.phone),
                     icon: <PhoneIcon {...QUICK} />,
                     href: `tel:${program.phone}`,
@@ -192,6 +192,15 @@ export function ProgramView({
                   },
                 ]
               : []),
+            // What people sign before taking part (D-261), in the list with
+            // the rest rather than alone at the foot (Will, 6 October, D-312).
+            {
+              id: 'policies',
+              label: t('program.policies.row'),
+              description: t('program.policies.rowBody', { count: policies.length }),
+              icon: <BookIcon {...QUICK} />,
+              href: '/program/policies/',
+            },
           ]}
           labels={{
             directions: t('place.directions'),
@@ -206,22 +215,6 @@ export function ProgramView({
             share: t('place.share'),
             flag: t('place.flag'),
           }}
-        />
-      )}
-
-      {editing ? null : (
-        // What people sign before taking part (Will, 4 October, D-261).
-        <MenuList
-          label={t('program.policies.row')}
-          items={[
-            {
-              id: 'policies',
-              label: t('program.policies.row'),
-              description: t('program.policies.rowBody', { count: policies.length }),
-              href: '/program/policies/',
-              icon: <BookIcon {...QUICK} />,
-            },
-          ]}
         />
       )}
 

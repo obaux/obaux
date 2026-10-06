@@ -67,6 +67,10 @@ const styles = stylex.create({
     borderStyle: 'solid',
     borderColor: colorVars['--color-border'],
   },
+  // The menu is drawn at the small size, so the radio dial is small (Will,
+  // 6 October, D-311) — the rows keep the 48px floor and their 17px words,
+  // and get as much room on the right as the dial has on the left.
+  option: { minHeight: '48px', fontSize: '17px', paddingInlineEnd: '24px' },
 });
 
 export function LanguageSwitcher({
@@ -87,7 +91,7 @@ export function LanguageSwitcher({
       onChange={(next) => choose(next as Locale)}
     >
       {OPTIONS.map((option) => (
-        <DropdownMenuRadioItem key={option.value} value={option.value} label={t(option.labelKey)} />
+        <DropdownMenuRadioItem key={option.value} value={option.value} label={t(option.labelKey)} xstyle={styles.option} />
       ))}
     </DropdownMenuRadioGroup>
   );
@@ -100,6 +104,7 @@ export function LanguageSwitcher({
           icon: <GlobeIcon />,
           isIconOnly: true,
           variant: 'ghost',
+          size: 'sm',
           xstyle: styles.round,
         }}
         hasChevron={false}

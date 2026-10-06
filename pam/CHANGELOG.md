@@ -141,6 +141,10 @@ The Steward badge has been removed.
 On a place's page, opening hours are a row showing today's day and times; tap
 it for the whole week with today marked. Plan a trip stays at the foot of the
 screen however far you scroll. "What this place is" is now "About program".
+Sign in and Enter your code have more room between their parts. The language
+menu's dial is smaller and evenly padded. A program lead's Program tab lists
+Policies for participants with the other rows, and labels its number "Contact
+phone number".
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 

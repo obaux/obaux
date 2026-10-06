@@ -171,7 +171,8 @@ const styles = stylex.create({
   rows: { rowGap: spacingVars['--spacing-2'] },
   hoursLink: { alignSelf: 'flex-start', minHeight: pam.touchTargetMin, fontSize: '16px', paddingInline: '0px' },
   // The week drawer (D-309).
-  sheet: { paddingInline: '24px', paddingBlock: '8px 24px' },
+  // Clear of the sheet's handle above the title.
+  sheet: { paddingInline: '24px', paddingBlock: '20px 24px' },
   sheetTitle: { fontSize: '22px', lineHeight: 1.25 },
   dayLine: { minHeight: '44px', paddingInline: '12px', borderRadius: '12px' },
   todayLine: { backgroundColor: colorVars['--color-background-muted'] },

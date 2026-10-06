@@ -1006,6 +1006,7 @@
   "alerts.connect": "Alguien quiere conectar",
   "alerts.connect.body": "Solo que alguien lo pidió. Nunca quién, en el mensaje.",
   "profile.promo.alerts.body.adminList": "Mensajes y viajes. Usted escoge cuáles.",
+  "program.quick.phone": "Número de contacto",
   "program.policies.row": "Políticas para participantes",
   "program.policies.rowBody": "{count} para firmar",
   "policies.title": "Políticas para participantes",
