@@ -96,7 +96,7 @@ export const flows = [
         changed: 'D-259',
         note: 'A short story for each kind of person',
       },
-      memberJoin: { title: 'Sign up (member)', story: 'onboarding--member', path: '/join/' },
+      memberJoin: { title: 'Sign up (member)', story: 'member-created--sign-up-walk', path: '/join/' },
       expired: {
         title: 'Link expired',
         story: 'onboarding--expired-link',
