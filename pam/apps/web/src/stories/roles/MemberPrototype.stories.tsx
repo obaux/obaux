@@ -7,7 +7,10 @@ import { screen } from './screen';
  * phone. Signed in against the pretend database; nothing reaches the live
  * project.
  */
-const meta = { title: 'Member/Prototype' } satisfies Meta;
+// A fixed id (D-331): the title moved to Member/Prototype in D-325, which
+// changed the id and broke every shared link to the member prototype.
+// `id` keeps the old address, `member-app-prototype--prototype`.
+const meta = { title: 'Member/Prototype', id: 'member-app-prototype' } satisfies Meta;
 
 export default meta;
 

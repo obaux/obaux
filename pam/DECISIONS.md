@@ -8004,6 +8004,29 @@ award points, and update how to earn points in profile rewards page", and
   typecheck; config 238 (points test asserts 150), ui 69, web 11; web and
   Storybook builds; e2e 570/570; flow map page 2 redrawn.
 
+### D-331 — The member prototype keeps its old link; Go together polished
+
+**Date:** 2026-10-06. Will: "Links not working" (the four prototype links),
+then on Go together: center the bottom section, give the preview the
+category's colour with centred text under the program card, narrow the
+sentence, and make the "you" circle the category's darker shade.
+
+- **Links.** D-325 retitled the member prototype `Member/Prototype`, which
+  changed its id to `member-prototype--prototype` and broke the shared
+  `member-app-prototype--prototype` link. The story file now sets
+  `id: 'member-app-prototype'`, so the old link works again. Case manager,
+  Program lead and Super admin keep their ids and load in a local build of
+  this branch; Chromatic published build 116 with all 378 stories passing.
+- **Go together.**
+  - The sentence is narrowed to 300px so it breaks into even lines.
+  - "What they'll get" and the preview are centred. The preview takes the
+    program's pale category colour (the ToneGround shade), with the program
+    card first and "Join me at … on Pam" centred under it, at most 250px wide.
+  - The "you" circle takes the category's deep icon shade (blue for school,
+    and so on), falling back to the accent green when there is no tone.
+- **Proven by:** screenshots; the member prototype loads at the old id;
+  typecheck; web and Storybook builds; e2e 570/570.
+
 ---
 
 ## Notes for whoever picks this up next

@@ -49,6 +49,33 @@ const ART = { width: 52, height: 52, 'aria-hidden': true } as const;
 const SMALL_ART = { width: 24, height: 24, 'aria-hidden': true } as const;
 const FACE = { width: 26, height: 26, 'aria-hidden': true } as const;
 
+// The ToneGround's pale shade, as a fill (see @pam/ui/Tone).
+const bubbleTone = stylex.create({
+  blue: { backgroundColor: 'var(--color-data-blue-1)' },
+  green: { backgroundColor: 'var(--color-data-shamrock-1)' },
+  purple: { backgroundColor: 'var(--color-data-purple-1)' },
+  orange: { backgroundColor: 'var(--color-data-orange-1)' },
+  red: { backgroundColor: 'var(--color-data-red-1)' },
+  teal: { backgroundColor: 'var(--color-data-teal-1)' },
+  pink: { backgroundColor: 'var(--color-data-pink-1)' },
+  cyan: { backgroundColor: 'var(--color-data-teal-1)' },
+  gray: { backgroundColor: 'var(--color-data-gray-1)' },
+});
+
+// You, in the category's deep shade (Will, 6 October): blue for school,
+// green for work, and so on; the accent green only when there is no tone.
+const youTone = stylex.create({
+  blue: { backgroundColor: colorVars['--color-icon-blue'] },
+  green: { backgroundColor: colorVars['--color-icon-green'] },
+  purple: { backgroundColor: colorVars['--color-icon-purple'] },
+  orange: { backgroundColor: colorVars['--color-icon-orange'] },
+  red: { backgroundColor: colorVars['--color-icon-red'] },
+  teal: { backgroundColor: colorVars['--color-icon-teal'] },
+  pink: { backgroundColor: colorVars['--color-icon-pink'] },
+  cyan: { backgroundColor: colorVars['--color-icon-cyan'] },
+  gray: { backgroundColor: colorVars['--color-icon-gray'] },
+});
+
 const styles = stylex.create({
   hero: { alignItems: 'center', paddingBlockStart: '8px' },
   art: {
@@ -77,7 +104,8 @@ const styles = stylex.create({
     backgroundColor: colorVars['--color-background-muted'],
     color: colorVars['--color-icon-secondary'],
   },
-  body: { fontSize: '18px', lineHeight: 1.45, textAlign: 'center' },
+  // Narrow, so the sentence breaks into even lines (Will, 6 October).
+  body: { fontSize: '18px', lineHeight: 1.45, textAlign: 'center', alignSelf: 'center', maxWidth: '300px' },
   worth: {
     alignSelf: 'center',
     paddingBlock: '8px',
@@ -87,17 +115,26 @@ const styles = stylex.create({
     color: colorVars['--color-text-accent'],
   },
   worthText: { fontSize: '16px', fontWeight: 600, color: 'inherit' },
-  previewLabel: { fontSize: '15px', fontWeight: 600, paddingBlockStart: '8px' },
-  // A received text: grey, round, its tail corner tucked in.
+  previewLabel: { fontSize: '15px', fontWeight: 600, paddingBlockStart: '8px', textAlign: 'center' },
+  // The text as it arrives, centred and in the program's own pale colour
+  // (Will, 6 October): the card first, the words under it.
   bubble: {
-    alignSelf: 'flex-start',
-    maxWidth: '88%',
+    alignSelf: 'center',
+    width: '100%',
+    maxWidth: '340px',
     padding: '12px',
     borderRadius: '22px',
-    borderEndStartRadius: '6px',
     backgroundColor: colorVars['--color-background-muted'],
   },
-  bubbleText: { fontSize: '17px', lineHeight: 1.35, paddingInline: '4px' },
+  bubbleText: {
+    fontSize: '17px',
+    lineHeight: 1.35,
+    paddingInline: '4px',
+    paddingBlockEnd: '2px',
+    textAlign: 'center',
+    alignSelf: 'center',
+    maxWidth: '250px',
+  },
   linkCard: {
     padding: '10px',
     borderRadius: '16px',
@@ -217,7 +254,7 @@ export function BringFriendScreen({
             <CategoryIcon category={kind} iconSize={ART} isBaked />
           </HStack>
           <HStack xstyle={styles.faces}>
-            <HStack align="center" justify="center" xstyle={[styles.face, styles.you]}>
+            <HStack align="center" justify="center" xstyle={[styles.face, styles.you, tone ? youTone[tone] : null]}>
               <MeIcon {...FACE} />
             </HStack>
             <HStack align="center" justify="center" xstyle={[styles.face, styles.friend]}>
@@ -237,8 +274,7 @@ export function BringFriendScreen({
           <Text type="supporting" xstyle={styles.previewLabel}>
             {t('friend.preview')}
           </Text>
-          <VStack gap={2} xstyle={styles.bubble}>
-            <Text xstyle={styles.bubbleText}>{t('friend.bubble', { place: placeName })}</Text>
+          <VStack gap={2} xstyle={[styles.bubble, tone ? bubbleTone[tone] : null]}>
             <HStack gap={3} align="center" wrap="nowrap" xstyle={styles.linkCard} aria-label={t('invite.link.label')}>
               <HStack align="center" justify="center" xstyle={styles.linkArt}>
                 <ToneGround tone={tone} />
@@ -251,6 +287,7 @@ export function BringFriendScreen({
                 </Text>
               </VStack>
             </HStack>
+            <Text xstyle={styles.bubbleText}>{t('friend.bubble', { place: placeName })}</Text>
           </VStack>
         </VStack>
       </VStack>
