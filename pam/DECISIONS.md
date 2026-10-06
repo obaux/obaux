@@ -7468,8 +7468,10 @@ week', and ultimately free up space."
 - The Day / Week / Month `SegmentedControl` is gone from a program lead's
   Home. In its place, on the title's own line, a dropdown whose trigger is
   the current range in words — "today", "this week", "this month" — with
-  a chevron and a 2px underline (a bottom border: Astryx's button resets
-  `text-decoration` on the words inside it). It opens a radio list of the
+  a chevron and a 2px underline painted just under the words (a
+  background line, not text-decoration, which Astryx's button resets on
+  the words inside it; not a border, which sat at the foot of the 48px
+  target). It opens a radio list of the
   three. The week stays the default (D-267).
 - `LargeTitleHeader` gains `isAccessoryInline`: the accessory sits right
   after the words, wrapping onto the next line if the phrase is long,

@@ -96,12 +96,13 @@ const styles = stylex.create({
     lineHeight: 1.2,
     fontWeight: 500,
     color: colorVars['--color-text-primary'],
-    // The underline is a border: Astryx's button resets text-decoration on
-    // the words inside it.
-    borderRadius: '6px',
-    borderBottomWidth: '2px',
-    borderBottomStyle: 'solid',
-    borderBottomColor: colorVars['--color-border'],
+    // The underline is painted just under the words (a border would sit at
+    // the foot of the 48px target): Astryx's button resets text-decoration
+    // on the words inside it.
+    backgroundImage: `linear-gradient(${colorVars['--color-border']}, ${colorVars['--color-border']})`,
+    backgroundRepeat: 'no-repeat',
+    backgroundSize: 'calc(100% - 8px) 2px',
+    backgroundPosition: '4px calc(50% + 16px)',
   },
   rangeOption: { minHeight: '48px', fontSize: '17px', paddingInlineEnd: '24px' },
   nav: { width: '100%' },
