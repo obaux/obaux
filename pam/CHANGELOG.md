@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.45.3] — 2026-10-07 · A program of their own, before it's live
+
+Until Pam approves a new program, the Program tab is a page of its own with
+no bottom bar: Back goes Home, and the button is pinned at the bottom. The
+step Pam is on spins and says it usually takes 1–2 days, and Home's card
+shimmers while Pam checks. "Text me when it's live" comes first, and goes
+once texts are on. Create new booking waits until there's a program to book
+into. From What you sent, a lead can delete what they sent and start over
+(D-383–D-386).
+
 ## [0.45.2] — 2026-10-07 · The wait for review
 
 While Pam checks a new program, its lead can get ready: add a photo, add

@@ -930,15 +930,14 @@ Open items Will asked to keep (7 October), newest first. Read this before
 - **One account, both roles — follow-ups** (D-375): notifications by
   role (the bell shows the acting side's; a dot on the switch for the other);
   the two transparency lines, worded by Will, before launch.
-- **Add a program, as its own flow** (Will, 7 October, "for later"): from the
-  Program tab it should hide the tab bar, keep Next pinned at the bottom,
-  and Back from the first step returns to Home. (The confetti "Sent to Pam"
-  screen with "Text me when it's live" is done — D-379.)
+- **Super admin's program review queue** (D-386): specified in
+  `docs/design/program-review-queue.md`, not built — submissions with a
+  status, withdrawn-on-start-over, Discard, Approve / Ask for changes.
 - **The review wait, for real** (D-381): in review / taking longer / needs
   changes, What you sent, and Home's status card run on sessionStorage and
   story state. Real status, Pam's note on "needs changes", and a text when it
   goes live need "Load a program lead's own program" (before-launch) plus a
-  reviewer-note field.
+  reviewer-note field. Delete and start over (D-385) clears it here only.
 - **Apply 0077, then 0078** after 0075/0076 (D-373, D-375).
 - **Apply 0075 then 0076 to the live project** — 0068/0069 carried over and
   reconciled with 0072 (D-346); DB suite green. Their `drop` statements need

@@ -1,9 +1,11 @@
 'use client';
 
+import { useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { Banner } from '@astryxdesign/core/Banner';
 import { Heading } from '@astryxdesign/core/Heading';
 import { HStack } from '@astryxdesign/core/HStack';
+import { Spinner } from '@astryxdesign/core/Spinner';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
@@ -15,6 +17,7 @@ import { Confetti } from '@pam/ui/SuccessScreen';
 import { useI18n } from '@/lib/i18n';
 import { useProgramSetup, type ReviewStatus } from '@/lib/programSetup';
 import { useSession } from '@/lib/useSession';
+import { hasTextAlerts } from './AlertsView';
 
 /**
  * Sent to Pam (Will, 7 October, D-379, D-380, D-381): a program a lead has
@@ -35,16 +38,20 @@ import { useSession } from '@/lib/useSession';
  *   because here something may have gone wrong — sop-amendments A19).
  *
  * It is also the Program tab until the program is approved, so Back goes
- * Home. Home shows the same status as a card (D-381).
+ * Home, and it covers the bottom bar like any page you tap into (D-383).
+ * Home shows the same status as a card (D-381).
  */
 const ICON = { width: 26, height: 26, 'aria-hidden': true } as const;
 
 const styles = stylex.create({
   body: { fontSize: '18px', lineHeight: 1.5 },
   steps: { paddingInline: '8px', paddingBlock: '12px' },
-  step: { fontSize: '17px', lineHeight: 1.45, minWidth: 0, paddingBottom: '22px' },
+  step: { minWidth: 0, paddingBottom: '22px' },
+  stepLabel: { fontSize: '17px', lineHeight: 1.45 },
   lastStep: { paddingBottom: '0px' },
   later: { color: colorVars['--color-text-secondary'] },
+  // How long Pam's step takes, faint, under it (Will, D-384).
+  note: { fontSize: '15px', lineHeight: 1.4, marginTop: '2px', color: colorVars['--color-text-secondary'] },
   // The marker and the line down to the next one: a progress flow (D-380).
   // The line fills the row, so it grows when a step's text wraps (D-382).
   rail: { alignItems: 'center', alignSelf: 'stretch', flexShrink: 0, width: '14px' },
@@ -71,7 +78,8 @@ const styles = stylex.create({
     boxSizing: 'border-box',
   },
   done: { backgroundColor: colorVars['--color-success'], borderColor: colorVars['--color-success'] },
-  now: { borderColor: colorVars['--color-success'] },
+  // The step Pam is on turns, to say it is being worked on (Will, D-384).
+  working: { marginTop: '6px', flexShrink: 0, color: colorVars['--color-success'] },
   // Changes asked for: the step that is waiting on them, in amber.
   needs: { backgroundColor: colorVars['--color-warning'], borderColor: colorVars['--color-warning'] },
   // Each group of rows set apart by a hairline above it.
@@ -95,6 +103,8 @@ export interface ProgramReviewViewProps {
   /** Pam's note when it asks for changes. */
   readonly changes?: string | null;
   readonly hasPhoto?: boolean;
+  /** Text alerts already on: no "Text me when it's live" row. */
+  readonly hasAlerts?: boolean;
 }
 
 export function ProgramReviewView({ isCelebrating = false, ...given }: ProgramReviewViewProps = {}) {
@@ -104,8 +114,14 @@ export function ProgramReviewView({ isCelebrating = false, ...given }: ProgramRe
   const status = given.status ?? setup.reviewStatus;
   const changes = given.changes ?? setup.sent?.changes ?? null;
   const hasPhoto = given.hasPhoto ?? setup.hasPhoto;
+  const [hasAlerts] = useState(() => given.hasAlerts ?? hasTextAlerts('provider'));
 
+  // "Text me" first — the one that answers "when?" — and gone once texts
+  // are on (Will, 7 October, D-386).
   const waitRows = [
+    ...(hasAlerts
+      ? []
+      : [{ id: 'text-me', label: t('programs.review.text'), description: t('programs.review.text.body'), href: '/alerts/', icon: <BellOutlineIcon {...ICON} /> }]),
     ...(hasPhoto
       ? []
       : [{ id: 'photo', label: t('programs.review.photo'), description: t('programs.review.photo.body'), href: '/profile/', icon: <MeIcon {...ICON} /> }]),
@@ -115,13 +131,6 @@ export function ProgramReviewView({ isCelebrating = false, ...given }: ProgramRe
       description: t('programs.review.policies.body'),
       href: '/program/policies/',
       icon: <LegalIcon {...ICON} />,
-    },
-    {
-      id: 'text-me',
-      label: t('programs.review.text'),
-      description: t('programs.review.text.body'),
-      href: '/alerts/',
-      icon: <BellOutlineIcon {...ICON} />,
     },
   ];
 
@@ -137,16 +146,20 @@ export function ProgramReviewView({ isCelebrating = false, ...given }: ProgramRe
       title={t(`programs.review.title.${status}`)}
       backHref="/"
       backLabel={t('nav.back.home')}
+      // Always Home: it stands in for the Program tab (D-385).
+      isBackFixed
       hero={<SetupArt kind="review" isHero />}
+      // It covers the bottom bar (D-383), so the one thing to do when Pam
+      // asks for changes is pinned to the foot, like Next in Add a program.
+      {...(status === 'changes'
+        ? { footer: <BigButton label={t('programs.review.changes.edit')} href="/programs/new/?edit=1" /> }
+        : {})}
     >
       {isCelebrating ? <Confetti /> : null}
       <Text xstyle={styles.body}>{t(`programs.review.body.${status}`)}</Text>
 
       {status === 'changes' ? (
-        <VStack gap={3}>
-          <Banner status="warning" title={t('programs.review.changes.title')} description={changes ?? undefined} />
-          <BigButton label={t('programs.review.changes.edit')} href="/programs/new/?edit=1" />
-        </VStack>
+        <Banner status="warning" title={t('programs.review.changes.title')} description={changes ?? undefined} />
       ) : null}
 
       <VStack gap={0} role="list" aria-label={t('programs.review.stepsLabel')} xstyle={styles.steps}>
@@ -156,16 +169,17 @@ export function ProgramReviewView({ isCelebrating = false, ...given }: ProgramRe
           return (
             <HStack key={step} gap={3} align="start" wrap="nowrap" role="listitem">
               <VStack aria-hidden gap={0} xstyle={styles.rail}>
-                <HStack
-                  xstyle={[
-                    styles.mark,
-                    i === 0 && styles.done,
-                    i === 1 && (status === 'changes' ? styles.needs : styles.now),
-                  ]}
-                />
+                {i === 1 && status !== 'changes' ? (
+                  <Spinner size="md" shade="inherit" xstyle={styles.working} />
+                ) : (
+                  <HStack xstyle={[styles.mark, i === 0 && styles.done, i === 1 && styles.needs]} />
+                )}
                 {isLast ? null : <HStack xstyle={[styles.line, i === 0 && styles.lineDone]} />}
               </VStack>
-              <Text xstyle={[styles.step, isLast && styles.later, isLast && styles.lastStep]}>{label}</Text>
+              <VStack gap={0} xstyle={[styles.step, isLast && styles.lastStep]}>
+                <Text xstyle={[styles.stepLabel, isLast && styles.later]}>{label}</Text>
+                {i === 1 ? <Text xstyle={styles.note}>{t(`programs.review.step.note.${status}`)}</Text> : null}
+              </VStack>
             </HStack>
           );
         })}

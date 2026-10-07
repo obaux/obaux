@@ -339,6 +339,16 @@ export function HelpIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+/** A bin with a lid. Delete — always behind an "Are you sure?" (D-385). */
+export function TrashIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <path d="M4.5 6.5h15M9.5 6.5V4h5v2.5" />
+      <path d="M6.5 6.5l1 13.5h9l1-13.5M10 10.5v6M14 10.5v6" />
+    </svg>
+  );
+}
+
 /** A page with lines. Legal — privacy and terms. */
 export function LegalIcon(props: SVGProps<SVGSVGElement>) {
   return (

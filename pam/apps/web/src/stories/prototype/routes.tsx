@@ -61,7 +61,7 @@ import { ThreadOptionsView, ThreadReportView } from '../../screens/ThreadOptions
 import { MessagesScreen } from '../../screens/MessagesScreen';
 import { HeaderActions } from '../shell/HeaderActions';
 import { LocalTabBar } from '../shell/LocalTabBar';
-import { isFreshAccount } from '../../lib/programSetup';
+import { isFreshAccount, isProgramLive } from '../../lib/programSetup';
 import type { Role } from '@pam/config';
 import { ROLES, type JourneyRole } from '../journeys/fixtures';
 import type { PrototypeRoute } from './PrototypeApp';
@@ -219,6 +219,9 @@ export function redesignChrome(role: JourneyRole) {
     const own = ROLES[role].profile?.role;
     if (!own) return null;
     const tab = tabFor(pathname);
+    // A lead's Program tab before the program is live is its own page — Add
+    // a program, then Sent to Pam — and covers the bar (Will, D-383).
+    if (tab === 'program' && !isProgramLive()) return null;
     // A fresh account (D-361) has no messages, so no dot on Messages.
     return tab ? <LocalTabBar current={tab} role={viewedRole(own)} name={name} unread={!isFreshAccount()} /> : null;
   };

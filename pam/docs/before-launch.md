@@ -75,6 +75,10 @@ STATUS row too.
   5. The review wait (D-381): the status (in review / taking longer / needs
      changes) and Pam's note from the database, a place for the reviewer to
      write that note, and a text to the lead when it goes live.
+  6. The super admin's program review queue, including Delete and start
+     over (D-385, D-386): build it as `docs/design/program-review-queue.md`
+     says — a withdrawn request shown as "Withdrawn — started over" with only
+     Discard, the new one approvable, and the database rules tested.
 
 ### Two roles (one account, member and program)
 

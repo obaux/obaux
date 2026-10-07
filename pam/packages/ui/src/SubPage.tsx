@@ -66,6 +66,12 @@ export interface SubPageHeaderProps {
    */
   readonly backIcon?: 'back' | 'close';
   /**
+   * Back always goes to `backHref`, never back through history (D-385): for
+   * a page that stands in for a tab, where Back means one place whatever
+   * came before — a lead's Program tab before approval goes Home.
+   */
+  readonly isBackFixed?: boolean;
+  /**
    * The hero template (Will, 7 October, D-376): a 240px picture, full width
    * and up to the top edge, with back over it; the title starts under it. No
    * Help button over the picture, and no help link anywhere on it: Will made
@@ -171,6 +177,7 @@ export function SubPageHeader({
   titleId,
   onBack,
   backIcon = 'back',
+  isBackFixed = false,
   hero,
   heroGap = 4,
 }: SubPageHeaderProps) {
@@ -187,7 +194,7 @@ export function SubPageHeader({
   const back = onBack ? (
     <BackButton label={backLabel} onPress={onBack} isClose={backIcon === 'close'} />
   ) : backHref ? (
-    <BackButton href={backHref} label={backLabel} isClose={backIcon === 'close'} />
+    <BackButton href={backHref} label={backLabel} isClose={backIcon === 'close'} isFixed={isBackFixed} />
   ) : null;
 
   if (variant === 'compact') {
@@ -282,6 +289,7 @@ export function BackButton({
   label,
   onPress,
   isClose = false,
+  isFixed = false,
 }: {
   readonly href?: string;
   readonly label: string;
@@ -289,6 +297,8 @@ export function BackButton({
   readonly onPress?: () => void;
   /** An × that goes to `href`, not back through history (D-334). */
   readonly isClose?: boolean;
+  /** The arrow, going to `href` and not back through history (D-385). */
+  readonly isFixed?: boolean;
 }) {
   // `data-pam-back` (D-277): with a link, the app's own navigation takes the
   // member back through history to wherever they came from, and uses `href`
@@ -296,7 +306,7 @@ export function BackButton({
   return (
     <IconButton
       label={label}
-      {...(onPress ? { onClick: onPress } : isClose ? { href } : { href, ...BACK_MARK })}
+      {...(onPress ? { onClick: onPress } : isClose || isFixed ? { href } : { href, ...BACK_MARK })}
       variant="ghost"
       icon={
         <HStack>

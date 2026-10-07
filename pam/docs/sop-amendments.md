@@ -476,3 +476,16 @@ needs its help back.
 can wait on for days. When the wait runs past three days it adds one row,
 "Ask Pam about it" (→ Get help), because by then something may have gone
 wrong. It is the only hero page that carries help, and only in that state.
+
+## A20 — Help inside a ⋯ menu on What you sent (7 October 2026, Will)
+
+Will: "instead of help button here … a top right button, 3 dots." What you
+sent's top right is a ⋯ menu (Delete and start over, then Help) instead of
+the Help button (D-385).
+
+**Where this contradicts the original.** "A visible way to get help": here
+help is one tap further, inside the menu, and not on the screen itself.
+
+**What did not change.** Help is still reachable from the screen, and the
+page keeps its way back. Elsewhere, a screen with a ⋯ menu keeps its Help
+button unless Will says otherwise.

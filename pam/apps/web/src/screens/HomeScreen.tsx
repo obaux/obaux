@@ -192,7 +192,7 @@ export function ProgramHome() {
       <Page gap={4}>
         <LargeTitleHeader title={t('home.setup.title')} actions={<HeaderActions role="provider" hasHelp={false} />} />
         <SetupCardList cards={[...cards, CALENDAR_CARD(t)]} />
-        <ProgramActions />
+        <ProgramActions canBook={setup.isLive} />
       </Page>
     );
   }
@@ -250,6 +250,9 @@ function setupCards(setup: ProgramSetup, t: (key: string) => string): Card[] {
             title: t(`home.setup.review.title.${setup.reviewStatus}`),
             body: t(`home.setup.review.body.${setup.reviewStatus}`),
             href: '/program/',
+            // Being worked on: the picture shimmers (D-384). Not when it's
+            // waiting on the lead's own changes.
+            ...(setup.reviewStatus === 'changes' ? {} : { loading: 'processing' as const }),
           },
         ]
       : setup.hasProgram
@@ -312,7 +315,12 @@ const homeStyles = stylex.create({
  * items, less Add a program, which has its card. The booked-visit screen's
  * rows (D-338), with as much room around them.
  */
-function ProgramActions() {
+/**
+ * "You can also" under Get started. Create new booking only once the program
+ * is approved: before that there is nothing to book into (Will, 7 October,
+ * D-384). Invite someone works from day one.
+ */
+function ProgramActions({ canBook }: { readonly canBook: boolean }) {
   const { t } = useI18n();
   return (
     <VStack gap={2} xstyle={homeStyles.actions}>
@@ -323,12 +331,9 @@ function ProgramActions() {
         label={t('home.setup.more')}
         hasDividers
         items={[
-          {
-            id: 'book',
-            label: t('home.book'),
-            icon: <TripsIcon {...ROW_ICON} />,
-            href: '/program/book/',
-          },
+          ...(canBook
+            ? [{ id: 'book', label: t('home.book'), icon: <TripsIcon {...ROW_ICON} />, href: '/program/book/' }]
+            : []),
           {
             id: 'invite',
             label: t('home.invite'),

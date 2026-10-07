@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/nextjs';
 import { ProgramReviewView } from '../../../screens/ProgramReviewView';
-import { asRole } from '../../journeys/journey';
+import { asRole, withSetup } from '../../journeys/journey';
 
 /**
  * Sent to Pam (D-379): a program a lead has just added, while a super admin
@@ -17,25 +17,31 @@ type Story = StoryObj;
 
 /** Right after Add program: the celebration. */
 export const JustSent: Story = {
-  ...asRole('provider', '/program/'),
+  ...withSetup(asRole('provider', '/program/'), { done: ['program'] }),
   name: 'Just sent',
   render: () => <ProgramReviewView isCelebrating />,
 };
 /** The Program tab, coming back to it while the program is still being checked. */
 export const UnderReview: Story = {
-  ...asRole('provider', '/program/'),
+  ...withSetup(asRole('provider', '/program/'), { done: ['program'] }),
   name: 'Under review (the Program tab)',
-  render: () => <ProgramReviewView status="review" hasPhoto={false} />,
+  render: () => <ProgramReviewView status="review" hasPhoto={false} hasAlerts={false} />,
+};
+/** Text alerts already on: no "Text me when it's live" row (D-386). */
+export const AlertsAlreadyOn: Story = {
+  ...withSetup(asRole('provider', '/program/'), { done: ['program'] }),
+  name: 'Under review, texts already on',
+  render: () => <ProgramReviewView status="review" hasPhoto={false} hasAlerts />,
 };
 /** After three days: honest about the wait, with a way to ask Pam (D-381). */
 export const TakingLonger: Story = {
-  ...asRole('provider', '/program/'),
+  ...withSetup(asRole('provider', '/program/'), { done: ['program'] }),
   name: 'Taking longer than usual',
   render: () => <ProgramReviewView status="late" hasPhoto={false} />,
 };
 /** Pam asked for changes (D-381): the step in amber, what to change, one button to fix it. */
 export const NeedsChanges: Story = {
-  ...asRole('provider', '/program/'),
+  ...withSetup(asRole('provider', '/program/'), { done: ['program'] }),
   name: 'Pam asked for changes',
   render: () => (
     <ProgramReviewView status="changes" changes="Add the street address members should go to, and your opening hours." />

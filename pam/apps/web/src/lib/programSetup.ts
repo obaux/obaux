@@ -60,6 +60,22 @@ export function saveSentProgram(details: ProgramDetails, extra: Partial<Omit<Sen
   window.dispatchEvent(new Event(SETUP_CHANGED));
 }
 
+/**
+ * Delete and start over (Will, 7 October, D-385): what was sent is gone and
+ * the account is back to having no program — the Program tab is Add a
+ * program again, and Home's first card is Add your program. In the real app
+ * this also withdraws the listing from Pam's review queue (before-launch).
+ */
+export function startOver(): void {
+  try {
+    sessionStorage.removeItem(SENT);
+    sessionStorage.removeItem(DONE + 'program');
+  } catch {
+    // Private mode: nothing was kept to delete.
+  }
+  window.dispatchEvent(new Event(SETUP_CHANGED));
+}
+
 export function readSentProgram(): SentProgram | null {
   try {
     const raw = sessionStorage.getItem(SENT);
@@ -105,6 +121,16 @@ export function markSetupDone(step: SetupStep): void {
   write(DONE + step);
 }
 
+/**
+ * Whether the lead's program is approved and live (D-383). Until it is, the
+ * Program tab is a page of its own — Add a program, then Sent to Pam — that
+ * covers the bottom bar and goes Back to Home. In the prototype only the
+ * example account has a live program; nothing approves a sent one.
+ */
+export function isProgramLive(): boolean {
+  return USE_DUMMY_PEOPLE && !read(FRESH);
+}
+
 /** Whether this tab's account just signed up — no example data for it. */
 export function isFreshAccount(): boolean {
   return read(FRESH);
@@ -121,6 +147,11 @@ export interface ProgramSetup {
    * own program (before-launch, Programs).
    */
   readonly isUnderReview: boolean;
+  /**
+   * Approved and taking visits: there is a program to book into (D-384). In
+   * the prototype, only the example account's.
+   */
+  readonly isLive: boolean;
   /** While under review: still checking, taking longer, or changes asked for (D-381). */
   readonly reviewStatus: ReviewStatus;
   /** What was sent, if this tab knows. */
@@ -142,6 +173,7 @@ export function useProgramSetup(session: SessionState): ProgramSetup {
     isExample,
     hasProgram: isExample || read(DONE + 'program'),
     isUnderReview: !isExample && read(DONE + 'program'),
+    isLive: isExample,
     reviewStatus: reviewStatusOf(readSentProgram()),
     sent: readSentProgram(),
     hasPhoto: isExample || photoUrl !== null || read(DONE + 'photo'),

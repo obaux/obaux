@@ -41,6 +41,23 @@ export const Calendar: Story = {
   },
 };
 
+/**
+ * Being worked on (D-384): the card works, and only the picture shimmers —
+ * a program Pam is checking.
+ */
+export const Processing: Story = {
+  args: {
+    kind: 'review',
+    title: 'Your program is in review',
+    body: 'Pam checks it in 1–2 days. See where it is.',
+    href: '/program/',
+    loading: 'processing',
+  },
+};
+
+/** Loading (D-384): the card's shape, animated, until what goes in it arrives. */
+export const Loading: Story = { args: { loading: 'skeleton' } };
+
 /** The three together, as a new lead's Home shows them. */
 export const AllThree: Story = {
   render: () => (

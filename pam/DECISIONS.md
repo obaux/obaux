@@ -9362,6 +9362,91 @@ spaced in between items. Have them grow if text grows tall."
   row), so a step whose text wraps gets a longer line; the gaps stay 8px.
   Measured at 300px wide with the Spanish copy.
 
+### D-383 — Before approval, the Program tab is a page of its own: no bottom bar, Back goes Home
+
+**Date:** 2026-10-07. Will: "the bottom bar should not display when a page
+like this opens. The way they enter this screen is via the bottom bar, sure.
+But when they click the nested page should cover the menu, and pressing back
+should return to home, until the program profile is ready and approved …
+This way the button on bottom can be fixed below."
+
+- Until the program is live (`isProgramLive()`), the prototype draws no bar
+  on `/program/` (`redesignChrome` in `routes.tsx`). That covers both
+  pre-approval states: Add a program (no program yet) and Sent to Pam.
+- Add a program as the tab: Back from the first question goes Home, and
+  Next is pinned to the foot as everywhere else in the wizard (D-357). This
+  closes the backlog item "Add a program, as its own flow".
+- "Needs changes": **Edit and send again** is the page's pinned footer.
+- The bar only exists in the prototype today; the real app has no tab bar
+  yet, so this is the rule it must follow when it gets one.
+
+### D-384 — Pam's step spins and says how long; SetupCard's two loading variants; booking only once live
+
+**Date:** 2026-10-07. Will: "For the step that's not filled out, how about we
+add a loading circle there … to signal we're processing this?"; "add a faint
+subtitle below Pam checks the details, with estimated time"; "adjust
+component, so there's two loading variants … skeleton … [and] Processing
+loading, where the image only gets a fade shimmer swoop diagonal animation";
+"create new booking won't make sense until the program is approved and
+established … only show when program is added."
+
+- **Steps.** The step Pam is on is an Astryx `Spinner` (14px, green) instead
+  of an outline circle — not in "needs changes", where the step is amber and
+  waiting on the lead. Under it, faint 15px: "Usually takes 1–2 days" /
+  "Taking longer than usual" / "Waiting for your changes". The time moved
+  out of the paragraph above, so it is said once; Home's card says "1–2
+  days" too.
+- **`SetupCard loading`.** `"skeleton"`: the card's shape, animated
+  (Astryx `Skeleton`), nothing to tap. `"processing"`: the card is whole and
+  works, and a soft light band sweeps diagonally across the picture every
+  2.6s; under reduced motion it doesn't. Home's "Your program is in review"
+  card uses `processing`, except when Pam asked for changes.
+- **Create new booking** is gone from Get started's "You can also" until the
+  program is live (`ProgramSetup.isLive`): there is nothing to book into.
+  The + menu keeps it — it only appears with the calendar, when visits come
+  in, so the program is live by then.
+
+### D-385 — What you sent: a ⋯ menu with Delete and start over
+
+**Date:** 2026-10-07. Will: "instead of help button here … a top right
+button, 3 dots. Secondary action. Opens dropdown to Delete, and start over.
+Which resets them back to add program screen, like a brand new program (also
+updates the homepage if program approval was pending)."
+
+- Top right of What you sent: the round ⋯ (as on a place). The menu:
+  **Delete and start over** (destructive, a new `TrashIcon`), a divider, then
+  **Help** — help stays on the screen, one tap further (sop-amendments A20).
+- Delete asks first ("Delete and start over?" — Pam stops checking it and
+  you add your program again from the beginning; Keep it). Yes clears what
+  was sent (`startOver()`), and opens the Program tab on Add a program's
+  first question; Home's first card is Add your program again.
+- **`SubPage isBackFixed`**: Back goes to `backHref`, never through history.
+  Pam's Back follows history (D-277), so after starting over it went back to
+  the page just deleted. Add a program as the tab and Sent to Pam use it:
+  Back is Home, whatever came before.
+- The super admin's side is specified in D-386.
+
+### D-386 — "Text me" first and only until texts are on; the super admin's review queue specified
+
+**Date:** 2026-10-07. Will: "Move text me item to top of list, if user has
+enabled permissions, remove this from list"; "If user deletes and starts
+over, make sure this is properly communicated in request for super admin.
+Timed out Request, then let super admin discard. And approve new program.
+Document this so it gets built properly."
+
+- "While you wait" leads with **Text me when it's live** — it answers the
+  question the page is about, "when?". It is left out once any text alert is
+  on (`hasTextAlerts('provider')`, the switches kept on this phone, D-260).
+- The super admin's side is **not built**: there is no program review list
+  yet. `docs/design/program-review-queue.md` specifies it — one submission
+  per send with a status (`in_review`, `changes_asked`, `approved`,
+  `withdrawn`, `discarded`) and `replaces_id`; starting over withdraws the
+  open one and deactivates its listing; the reviewer sees it faded as
+  "Withdrawn — started over" with only **Discard**, the new one as "Sent
+  again — replaces an earlier one" with **Approve** / **Ask for changes**;
+  a request past three days says how long it has waited. The rules the
+  database must enforce are listed there to be tested.
+
 ---
 
 ## Notes for whoever picks this up next

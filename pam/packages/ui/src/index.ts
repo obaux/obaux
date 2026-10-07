@@ -83,6 +83,7 @@ export {
   TripsIcon,
   SettingsIcon,
   HelpIcon,
+  TrashIcon,
   LegalIcon,
   SignOutIcon,
   ConnectionsIcon,

@@ -49,6 +49,8 @@ export function AddMenu({ onSearch = null }: { readonly onSearch?: (() => void) 
       items={[
         // First (Will, 6 October, D-316): a visit booked for somebody who
         // wrote to the program — it lands on their Trips as if they had.
+        // The + shows with the calendar, once visits come in, so the program
+        // is live by then (D-384).
         {
           id: 'book',
           label: t('home.book'),

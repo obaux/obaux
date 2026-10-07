@@ -43,7 +43,8 @@ const EMPTY: ProgramDetails = {
 
 /**
  * `isTab`: drawn as the Program tab itself, for a lead with no program yet
- * (D-361) — no Back, since a tab has nowhere to go back to.
+ * (D-361). It covers the bottom bar like any page you tap into, so Back
+ * from the first question goes Home and Next is pinned to the foot (D-383).
  */
 export function AddProgramView({ isTab = false }: { readonly isTab?: boolean } = {}) {
   const { t } = useI18n();
@@ -76,26 +77,22 @@ export function AddProgramView({ isTab = false }: { readonly isTab?: boolean } =
     <SubPage
       // The last step is its own page by name (Will, 7 October, D-367).
       title={t(PROGRAM_STEPS[step] === 'review' ? 'programs.new.review.title' : 'programs.new.title')}
-      {...(isTab
-        ? { backLabel: '' }
+      {...(isTab || fromHome
+        ? { backHref: '/', backLabel: t('nav.back.home'), isBackFixed: isTab }
         : isEditing
           ? { backHref: '/program/', backLabel: t('nav.back.program') }
-          : { backHref: fromHome ? '/' : '/programs/', backLabel: t(fromHome ? 'nav.back.home' : 'nav.back.programs') })}
+          : { backHref: '/programs/', backLabel: t('nav.back.programs') })}
       // Back goes one question back while there is one (D-347).
       {...(step > 0 ? { onBack: () => setStep(step - 1) } : {})}
       actions={<HelpButton />}
-      // Next stays at the foot of the screen, whatever the question (D-357).
-      // As the Program tab it sits above the tab bar, so Next stays in the
-      // card there rather than covering the bar (D-361).
-      {...(isTab ? {} : { footer: wizard.actions })}
+      // Next stays at the foot of the screen, whatever the question (D-357);
+      // as the Program tab too, now that it covers the bar (D-383).
+      footer={wizard.actions}
     >
       {/* Straight into the question, on the page — no card, no intro
           (Will, 7 October, D-365). That Pam checks a new program is said
           once, on the last step, where it is about to happen. */}
-      <VStack gap={4}>
-        {wizard.body}
-        {isTab ? wizard.actions : null}
-      </VStack>
+      <VStack gap={4}>{wizard.body}</VStack>
     </SubPage>
   );
 }

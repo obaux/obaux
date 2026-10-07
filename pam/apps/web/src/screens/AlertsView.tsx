@@ -65,6 +65,14 @@ function readChoices(who: string): Partial<Record<Kind, boolean>> | null {
   }
 }
 
+/**
+ * Whether any text alert is on for this kind of account, on this phone —
+ * so a screen can stop offering to turn them on (D-386).
+ */
+export function hasTextAlerts(who: 'member' | 'admin' | 'provider'): boolean {
+  return Object.values(readChoices(who) ?? {}).some(Boolean);
+}
+
 function writeChoices(who: string, choices: Partial<Record<Kind, boolean>>): void {
   try {
     window.localStorage.setItem(keyFor(who), JSON.stringify(choices));
