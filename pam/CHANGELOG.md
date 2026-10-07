@@ -2,6 +2,9 @@
 
 ## [0.43.0-programs] — 2026-10-07 · A program lead's first day
 
+**Messages, empty.** A new account's Messages says what will show up there,
+for a program or a case manager, with a New message button (D-363).
+
 **Getting started.** A program lead who has just signed up opens on **Get
 started**: three illustrated cards — Add your program, Add your photo, See
 who is coming in — and under them, as plain rows, Book a visit for a member
@@ -50,9 +53,9 @@ for a program in four short lines, each with a small picture: who is coming
 and checking them in, messages, policies signed before a visit, and what Pam
 never tells you (D-354).
 
-**For review:** the Program tab before a program exists — one card with Add
-your program over a faded preview of the page members will see — is a
-Storybook mockup only (D-352).
+**Approved, kept for later:** a no-program state for the Program tab (Add your
+program over a faded preview of the page) is a Storybook mockup; the tab
+opens Add a program instead (D-352, D-363).
 
 ## [0.42.0-members] — 2026-10-06 to 07 · The member experience, revamped
 

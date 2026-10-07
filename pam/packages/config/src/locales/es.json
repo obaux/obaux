@@ -289,7 +289,7 @@
   "level.starting_out": "Empezando",
   "level.steady": "Firme",
   "messages.empty.body.member": "En cuanto su gestor de casos o su programa le escriba, aparecerá aquí.",
-  "messages.empty.body.staff": "Escríbale a alguien de su lista para empezar una conversación.",
+  "messages.empty.body.staff": "Cuando alguien le escriba, o usted empiece una conversación, aparecerá aquí.",
   "messages.empty.title": "Todavía no hay conversaciones",
   "messages.notForRole.body": "Esta pantalla es para mensajes entre los miembros y los gestores de casos o programas que trabajan con ellos. No hay nada aquí para su cuenta.",
   "messages.notForRole.title": "Los mensajes son para miembros, gestores de casos y programas",
@@ -1306,5 +1306,7 @@
   "join.progress": "{current} de {total}",
   "home.invite": "Invitar a alguien a Pam",
   "notify.empty.title": "Aún no hay notificaciones",
-  "notify.empty.body": "Cuando alguien reserve una visita, le escriba o le necesite, aparecerá aquí."
+  "notify.empty.body": "Cuando alguien reserve una visita, le escriba o le necesite, aparecerá aquí.",
+  "messages.empty.body.provider": "Cuando un miembro le escriba sobre su programa, o usted le escriba a alguien que reservó, aparecerá aquí.",
+  "messages.empty.body.admin": "Cuando alguien que usted invitó le escriba, o usted le escriba, aparecerá aquí."
 }

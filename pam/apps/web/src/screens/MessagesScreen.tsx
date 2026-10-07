@@ -113,7 +113,17 @@ export function MessagesScreen() {
       ) : null}
       <MessagesView
         rows={useExamples ? examples : real}
-        emptyBody={t(role === 'member' ? 'messages.empty.body.member' : 'messages.empty.body.staff')}
+        // Said for who is reading (D-363): there is no "list below" yet for
+        // somebody new, so the line says what will fill this screen.
+        emptyBody={t(
+          role === 'member'
+            ? 'messages.empty.body.member'
+            : role === 'provider'
+              ? 'messages.empty.body.provider'
+              : role === 'admin'
+                ? 'messages.empty.body.admin'
+                : 'messages.empty.body.staff',
+        )}
         headerActions={<HeaderActions role={viewedRole} enabled={session.status === 'signed-in'} hasHelp={false} />}
         note={useExamples ? t('example.people.note') : null}
         {...(canMessage ? { onNewMessage: () => setPicking(true) } : {})}

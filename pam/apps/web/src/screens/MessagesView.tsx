@@ -229,6 +229,10 @@ export function MessagesView({
           icon={<MessagesIcon {...stylex.props(emptyState.icon)} aria-hidden />}
           title={t('messages.empty.redesign.title')}
           description={emptyBody}
+          // The one thing to do from here, when they can (D-363).
+          {...(onNewMessage
+            ? { actions: <Button label={t('messages.new.action')} variant="secondary" onClick={onNewMessage} /> }
+            : {})}
         />
       ) : null}
 

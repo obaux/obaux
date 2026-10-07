@@ -289,7 +289,7 @@
   "level.starting_out": "Starting Out",
   "level.steady": "Steady",
   "messages.empty.body.member": "Once your case manager or your program messages you, it will show up here.",
-  "messages.empty.body.staff": "Message someone on your list below to start a conversation.",
+  "messages.empty.body.staff": "When someone writes to you, or you start a conversation, it shows up here.",
   "messages.empty.title": "No conversations yet",
   "messages.notForRole.body": "This screen is for messages between members and the case managers or programs who work with them. There is nothing here for your account.",
   "messages.notForRole.title": "Messages are for members, case managers and programs",
@@ -1306,5 +1306,7 @@
   "join.progress": "{current} of {total}",
   "home.invite": "Invite someone to Pam",
   "notify.empty.title": "No notifications yet",
-  "notify.empty.body": "When someone books a visit, writes to you or needs you, it shows up here."
+  "notify.empty.body": "When someone books a visit, writes to you or needs you, it shows up here.",
+  "messages.empty.body.provider": "When a member writes to you about your program, or you message someone who booked, it shows up here.",
+  "messages.empty.body.admin": "When someone you invited writes to you, or you message them, it shows up here."
 }

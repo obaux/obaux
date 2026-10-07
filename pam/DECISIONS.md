@@ -8869,6 +8869,24 @@ icon", "the bell should be filled black when notification is on", and
   something is (with the pink dot), at search's 22px. The brief greyed bell
   is gone (superseded the same hour). The old filled-button bell is unchanged.
 
+### D-363 — Messages, empty, says what will fill it; the Program mockup is kept, unused
+
+**Date:** 2026-10-07. Will: "Yes mock up an empty state for that also"
+(Messages said "Message someone on your list below" to somebody with no
+list), "I approve the program tab mockup", then — asked which wins — "Keep
+Add a program".
+
+- Messages' empty line is said for who is reading: a program lead "When a
+  member writes to you about your program, or you message someone who
+  booked, it shows up here."; a case manager "When someone you invited
+  writes to you, or you message them, it shows up here."; anyone else on
+  staff the general line. The empty state has a **New message** button
+  (secondary) wherever New message exists, so the one thing to do is on the
+  screen. `messages.empty.body.provider` / `.admin` added; `.staff` reworded.
+- The Program tab keeps opening Add a program for a lead with none (D-361).
+  The approved `ProgramEmptyView` stays a Storybook story, retitled "approved
+  mockup, unused", for when the tab needs a no-program state again.
+
 ---
 
 ## Notes for whoever picks this up next

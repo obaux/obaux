@@ -855,22 +855,24 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
-## In progress: 0.43.0-programs (7 October, on `claude/pam-storybook`)
+## Release 0.43.0-programs (7 October)
 
-A program lead's Home is modular (D-352): **Get started** (three cards —
-program, photo, a calendar preview page — and Book a visit / Invite someone
-as rows) until somebody books; then the calendar, centred title, search past
-ten visits, the + back; **folded** with the remaining cards under it while
-setup is unfinished; month days as a two-row sideways strip. Staff sign-up is
-three steps and goes straight Home; no program at sign-up (D-353). The empty
-states show on the sign-up journey (a fresh account); the main prototypes
-keep the example program and bookings.
+A program lead's first day, D-352 to D-363. Home is Get started (program,
+photo, calendar preview cards; New booking and Invite someone to Pam rows)
+until somebody books, then the calendar: Day / Week / Month tabs (38px, below
+the floor on Will's word, D-355), Search in the +, folded while setup is
+unfinished, month days as a two-row strip with dots. Sign-up starts at About
+you (Sign in does the phone), two steps for staff and three for members, the
+count as a badge in each pinned button; What to expect for programs is four
+illustrated lines; Text messages has bell bullets. A fresh account sees no
+example notifications or messages and its Program tab is Add a program.
+Shared now in `@pam/ui`: `SetupCard`/`SetupArt`, `DashedRule`
+(`--pam-rule-dashed`), `BigButton badge`, `emptyState.icon`
+(`--pam-empty-icon`), `BellOutlineIcon`. Story: Program lead › Prototype ›
+New program lead. User-facing summary: the top of `CHANGELOG.md`.
 
-**Waiting on Will:** the Program tab's no-program state is a **mockup only**
-(`ProgramEmptyView`, Storybook "Program lead/States/Program — no program yet
-(mockup)") — he asked to see the faded preview before it is built. Wiring it
-needs the lead's real program (D-218's follow-up), which is also what would
-let the program card go for a real account on its own.
+**Known:** "a program" is only known once one is sent from this device — the
+app has no "my program" query yet (D-218's follow-up, backlog).
 
 ## Release 0.42.0-members (6–7 October)
 
@@ -898,8 +900,9 @@ Open items Will asked to keep (7 October), newest first. Read this before
   joins is not awarded by the database yet (D-330, D-336).
 - **Program leads switch between their programs** — and Add a program
   returns to the new one (D-318).
-- **The Program tab's no-program state** — mockup awaiting Will (D-352);
-  then load the lead's own program instead of the example.
+- **Load a lead's own program** instead of the example (D-218's follow-up):
+  then Get started and the Program tab know for real whether one exists
+  (D-352, D-361).
 - **Real staff photos to members** — staff can upload (D-345, 0074 live), but
   the booked place's badge and Messages still show the example photos
   (D-335) until they read `photo_url`.
