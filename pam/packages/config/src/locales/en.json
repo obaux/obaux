@@ -1016,6 +1016,7 @@
   "invite.add.failed": "We could not add your program",
   "useAs.title": "Use Pam as",
   "useAs.intro": "Your account has two sides. Pick the one you want to use now. You can switch back any time.",
+  "useAs.about": "About Use Pam as",
   "useAs.member": "Me",
   "useAs.member.body": "Your visits, saved places and points",
   "useAs.provider": "My program",

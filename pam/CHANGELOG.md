@@ -7,7 +7,8 @@ one account for both. When their program invites their number, Pam asks
 whether to add the program to the account they already have, and says
 first what stays private: their program won't see their visits, saved
 places or activity, and they can't book their own program as a member. They
-switch sides from Profile, under "Use Pam as" (D-375). The database change
+switch sides from Profile, under "Use Pam as" (D-375). The add screen opens
+on a picture of the two sides, with the choice pinned at the bottom (D-376). The database change
 (0078) is ready but not yet on the live project.
 
 ## [0.44.0-invites] — 2026-10-07 · Invites know who they're for

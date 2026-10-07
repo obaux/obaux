@@ -175,6 +175,10 @@ const grain = stylex.create({
   // Printed, not glossy (Will, 5 October, D-298: "add a texture similar to
   // what we see in illustrations"; stronger, D-299: "let's make grain stronger").
   rect: { mixBlendMode: 'multiply', opacity: 0.3, pointerEvents: 'none' },
+  // In a large banner the same grain reads as dirt, so it is quieter there
+  // (Will, 7 October, D-376: "when illustrations are used in larger banner
+  // like this, reduce the grain strength").
+  soft: { opacity: 0.1 },
 });
 
 /**
@@ -182,7 +186,7 @@ const grain = stylex.create({
  * noise, made grey, multiplied in at low strength. Draw it last, inside the
  * picture's own clip. Decoration only.
  */
-export function Grain() {
+export function Grain({ isSoft = false }: { readonly isSoft?: boolean } = {}) {
   const id = useId();
   return (
     <>
@@ -192,7 +196,7 @@ export function Grain() {
           <feColorMatrix type="saturate" values="0" />
         </filter>
       </defs>
-      <rect width="56" height="56" filter={`url(#${id})`} {...stylex.props(grain.rect)} />
+      <rect width="56" height="56" filter={`url(#${id})`} {...stylex.props(grain.rect, isSoft && grain.soft)} />
     </>
   );
 }
@@ -207,10 +211,13 @@ export function Grain() {
 export function ArtFrame({
   size,
   shape = 'square',
+  isSoftGrain = false,
   children,
 }: {
   readonly size: number | 'fill';
   readonly shape?: 'square' | 'circle';
+  /** Quieter grain, for a large banner (D-376). */
+  readonly isSoftGrain?: boolean;
   readonly children: ReactNode;
 }) {
   const clip = useId();
@@ -230,7 +237,7 @@ export function ArtFrame({
       </defs>
       <g clipPath={`url(#${clip})`}>
         {children}
-        <Grain />
+        <Grain isSoft={isSoftGrain} />
       </g>
     </svg>
   );

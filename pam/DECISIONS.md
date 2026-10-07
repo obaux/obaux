@@ -9195,6 +9195,39 @@ member — no; the switch is a Profile row — agreed.
   switches; a one-role account has no row. Every earlier DB test passes
   unchanged — single-role accounts behave as before.
 
+### D-376 — The hero template; Add your program and Use Pam as, simplified
+
+**Date:** 2026-10-07. Will, on "Add your program to your account": sticky
+footer buttons, bulleted points with more side padding, an illustration about
+switching accounts, and "Do we have a template like this nested page with a
+full width, to top and side edges banner behind buttons on top? … If not,
+let's create this an added template". Then: "remove help button from this
+template view, and shorten the banner height a bit … arrows also feel cubic
+and scale it down so it's smaller at center. When illustrations are used in
+larger banner like this, reduce the grain strength. Remember this"; "No need
+for get help link. This illustration template is an exception"; "show more
+of the yellow shard … rotate arrow heads so they neatly point in the
+direction of half circle end". On Use Pam as: "Simplify by adding info icon
+tooltip next to Use Pam as".
+
+- **`SubPage` `hero`** (new, no template like it existed): a 240px picture,
+  full width and flush with the top and sides; back over it, no Help; the
+  title under it; the page gap is accounted for so it sits flush at gaps 2–4.
+  Story: Components › Navigation › SubPage › Hero; rules in Foundations ›
+  Layout.
+- **No help on a hero screen** — Will's exception, written as
+  sop-amendments **A19**.
+- **`SetupArt isHero`**: the ground fills the banner, the subject drawn at
+  0.62 at the centre, grain at 10% instead of 30% (`ArtFrame isSoftGrain`).
+  The rule for every illustration used in a large banner.
+- **`switch` illustration**: you as a member and you at your program (a
+  shopfront badge), two chunky two-tone arrows, each head on its arc's end
+  line; a bigger yellow shard.
+- **Add your program**: the hero, the points as bullets set in 8px, "Add my
+  program" and "Not now" pinned in the footer.
+- **Use Pam as**: the intro moved into an info tip beside the title
+  (`SubPage` `titleAddon` now also works with the large title).
+
 ---
 
 ## Notes for whoever picks this up next

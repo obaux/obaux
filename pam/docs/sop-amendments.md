@@ -453,3 +453,21 @@ screen say "+150 points when they join". DECISIONS D-330.
 link is sent, so sending links earns nothing on its own. Nothing awards it
 yet: the database has no referral award, and sign in does not read the
 link's program (D-329).
+
+## A19 — The hero template has no help link (7 October 2026, Will)
+
+The SOP's rule: every screen has a visible way back and a visible way to get
+help. Will, on the first screen built on the hero template ("Add your program
+to your account"): "let's remove help button from this template view", then,
+when a help link was offered in its footer instead, "No need for get help
+link. This illustration template is an exception."
+
+**Where this contradicts the original.** Screens on `SubPage`'s `hero`
+template (D-376) carry no help button and no help link. They keep a visible
+way back (the round back button over the picture) and a pinned footer whose
+second choice ("Not now") leaves without changing anything.
+
+**What did not change.** Every other screen still has both. The hero is for
+a moment — a choice with an obvious way out — not for a screen somebody can
+get stuck on; if a hero screen ever needs typing or a multi-step task, it
+needs its help back.

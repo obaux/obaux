@@ -21,13 +21,23 @@ import { ArtFrame, C, Ground, L, P, R } from './art/kit.js';
  * And Profile's text-alerts card (D-360):
  *
  *   alerts   — a bell ringing, a red dot: Pam will text you
+ *
+ * And one account, two sides (D-376), for the hero of "Add your program":
+ *
+ *   switch   — two of you, a member and the program, with arrows between
  */
-export type SetupArtKind = 'program' | 'photo' | 'calendar' | 'message' | 'policy' | 'private' | 'alerts';
+export type SetupArtKind = 'program' | 'photo' | 'calendar' | 'message' | 'policy' | 'private' | 'alerts' | 'switch';
 
 export interface SetupArtProps {
   readonly kind: SetupArtKind;
   /** Square, in px — 56 like a place card — or `"fill"` (D-337). */
   readonly size?: number | 'fill';
+  /**
+   * In a large banner — the hero template (D-376): fills it, the subject
+   * drawn smaller at the centre, the grain quieter. A rule for every
+   * illustration used this big.
+   */
+  readonly isHero?: boolean;
 }
 
 /** Add your program: a shopfront, awning out. */
@@ -155,7 +165,49 @@ function Alerts() {
   );
 }
 
-const ART: Readonly<Record<SetupArtKind, () => ReactElement>> = {
+/**
+ * One account, two sides: you as a member (left) and you at your program
+ * (right, a little shopfront badge), with two chunky arrows turning between
+ * them — the same person, either way round. The arrows are drawn as shapes,
+ * lit from the left like everything else in the set, not as strokes (Will,
+ * D-376: "arrows also feel cubic"), each head turned to carry on the arc's
+ * own line. `zoom` draws the figures smaller on the
+ * full ground, for a banner.
+ */
+function Switch({ zoom = 1 }: { readonly zoom?: number }) {
+  return (
+    <>
+      <Ground base="teal2" shards={[{ d: 'M0 40 56 30v26H0z', f: 'teal3' }, { d: 'M30 0h26v24z', f: 'yellow3' }]} />
+      <g transform={`translate(28 28) scale(${zoom}) translate(-28 -28)`}>
+        {/* You, as a member */}
+        <P d="M8 39c0-6.5 3.6-10 8-10s8 3.5 8 10z" f="purple3" />
+        <P d="M16 29c4.4 0 8 3.5 8 10h-8z" f="purple4" />
+        <C cx={16} cy={22.5} r={4.5} f="orange3" />
+        <P d="M16 18a4.5 4.5 0 0 1 0 9z" f="orange4" />
+        {/* You, at your program */}
+        <P d="M32 39c0-6.5 3.6-10 8-10s8 3.5 8 10z" f="shamrock3" />
+        <P d="M40 29c4.4 0 8 3.5 8 10h-8z" f="shamrock4" />
+        <C cx={40} cy={22.5} r={4.5} f="orange3" />
+        <P d="M40 18a4.5 4.5 0 0 1 0 9z" f="orange4" />
+        <R x={37.5} y={33} w={5} h={4} rx={1} f="yellow3" />
+        <P d="M37 33h6l-.9-1.8h-4.2z" f="red3" />
+        {/* The turn between them: a thick band and a solid head, each way */}
+        <g transform="translate(0 -1.5)">
+        <P d="M19.5 15.5c3.6-5 13.2-5.6 17-1.8l-2.4 2.2c-3-2.8-9.6-2.4-12.2 1.4z" f="red3" />
+        <P d="M28 11.4c3.4-.3 6.5.6 8.5 2.3l-2.4 2.2c-1.5-1.3-3.7-2-6.1-2z" f="red4" />
+        <P d="M37.4 12.7 33.2 16.9 37.8 17.3z" f="red4" />
+        </g>
+        <g transform="translate(0 2.5)">
+        <P d="M36.5 40.5c-3.6 5-13.2 5.6-17 1.8l2.4-2.2c3 2.8 9.6 2.4 12.2-1.4z" f="red3" />
+        <P d="M28 44.6c-3.4.3-6.5-.6-8.5-2.3l2.4-2.2c1.5 1.3 3.7 2 6.1 2z" f="red4" />
+        <P d="M18.6 43.3 22.8 39.1 18.2 38.7z" f="red4" />
+        </g>
+      </g>
+    </>
+  );
+}
+
+const ART: Readonly<Record<SetupArtKind, (props: { readonly zoom?: number }) => ReactElement>> = {
   program: Program,
   photo: Photo,
   calendar: Calendar,
@@ -163,13 +215,14 @@ const ART: Readonly<Record<SetupArtKind, () => ReactElement>> = {
   policy: Policy,
   private: Private,
   alerts: Alerts,
+  switch: Switch,
 };
 
-export function SetupArt({ kind, size = 56 }: SetupArtProps) {
+export function SetupArt({ kind, size = 56, isHero = false }: SetupArtProps) {
   const Art = ART[kind];
   return (
-    <ArtFrame size={size}>
-      <Art />
+    <ArtFrame size={isHero ? 'fill' : size} isSoftGrain={isHero}>
+      <Art zoom={isHero ? 0.62 : 1} />
     </ArtFrame>
   );
 }

@@ -1,10 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import * as stylex from '@stylexjs/stylex';
-import { Text } from '@astryxdesign/core/Text';
 import type { Role } from '@pam/config';
 import { MeIcon, Notice, PlacesIcon } from '@pam/ui';
+import { InfoTip } from '@pam/ui/InfoTip';
 import { MenuList } from '@pam/ui/MenuList';
 import { SubPage } from '@pam/ui/SubPage';
 import { useI18n } from '@/lib/i18n';
@@ -24,8 +23,6 @@ import { useSupportPhone } from '@/lib/useSupportPhone';
  * reach until they switch back.
  */
 const ICON = { width: 26, height: 26, 'aria-hidden': true } as const;
-
-const styles = stylex.create({ intro: { fontSize: '18px', lineHeight: 1.5 } });
 
 export function UseAsView({ preview }: { readonly preview?: { roles: readonly Role[]; role: Role } } = {}) {
   const { t } = useI18n();
@@ -55,10 +52,14 @@ export function UseAsView({ preview }: { readonly preview?: { roles: readonly Ro
   const options = (['member', 'provider'] as const).filter((role) => roles.includes(role));
 
   return (
-    <SubPage title={t('useAs.title')} backHref="/profile/" backLabel={t('nav.back.profile')}>
-      <Text type="supporting" xstyle={styles.intro}>
-        {t('useAs.intro')}
-      </Text>
+    <SubPage
+      title={t('useAs.title')}
+      backHref="/profile/"
+      backLabel={t('nav.back.profile')}
+      // What the two sides are, behind an info tip (Will, D-376), so the page
+      // is just the choice.
+      titleAddon={<InfoTip label={t('useAs.about')} content={t('useAs.intro')} />}
+    >
       <MenuList
         label={t('useAs.title')}
         items={options.map((role) => ({

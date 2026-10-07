@@ -4,14 +4,16 @@ import { useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { Banner } from '@astryxdesign/core/Banner';
 import { Text } from '@astryxdesign/core/Text';
+import { HStack } from '@astryxdesign/core/HStack';
 import { VStack } from '@astryxdesign/core/VStack';
+import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { BigButton, Notice, TextLink } from '@pam/ui';
+import { SetupArt } from '@pam/ui/SetupArt';
 import { SubPage } from '@pam/ui/SubPage';
 import { useI18n } from '@/lib/i18n';
 import { navigate } from '@/lib/navigate';
 import { addRoleFromInvite } from '@/lib/useRoles';
 import { useSupportPhone } from '@/lib/useSupportPhone';
-import { HelpButton } from './HelpButton';
 
 /**
  * A member's number, invited to a program in their city (D-374): add the
@@ -22,10 +24,25 @@ import { HelpButton } from './HelpButton';
  * program will not see their member side — the database keeps them out of
  * that program's lists, and they cannot book it as a member). "Not now"
  * leaves everything as it is.
+ *
+ * The hero template (Will, 7 October, D-376): a picture of the two sides
+ * across the top, the points as bullets, the choice pinned to the bottom.
  */
 const styles = stylex.create({
   body: { fontSize: '18px', lineHeight: 1.5 },
-  point: { fontSize: '17px', lineHeight: 1.45 },
+  // Bullets, set in from both sides (Will, D-376).
+  points: { paddingInline: '8px' },
+  point: { fontSize: '17px', lineHeight: 1.45, minWidth: 0 },
+  // A dot on the first line's middle.
+  dot: {
+    width: '6px',
+    height: '6px',
+    marginTop: '10px',
+    borderRadius: '50%',
+    flexShrink: 0,
+    backgroundColor: colorVars['--color-text-primary'],
+  },
+  actions: { width: '100%', alignItems: 'center' },
 });
 
 export function InviteAddScreen({
@@ -53,14 +70,30 @@ export function InviteAddScreen({
   };
 
   return (
-    <SubPage title={t('invite.add.title')} backHref="/" backLabel={t('nav.back.home')} actions={<HelpButton />}>
+    <SubPage
+      title={t('invite.add.title')}
+      backHref="/"
+      backLabel={t('nav.back.home')}
+      hero={<SetupArt kind="switch" isHero />}
+      footer={
+        <VStack gap={2} xstyle={styles.actions}>
+          <BigButton
+            label={busy ? t('join.saving') : t('invite.add.yes')}
+            isDisabled={busy}
+            onPress={() => void add()}
+          />
+          <TextLink label={t('invite.add.no')} href="/" />
+        </VStack>
+      }
+    >
       <Banner status="success" title={t('invite.inUse.invited.program', { name })} />
       <Text xstyle={styles.body}>{t('invite.add.body')}</Text>
-      <VStack gap={3} role="list">
+      <VStack gap={3} role="list" xstyle={styles.points}>
         {[1, 2, 3].map((n) => (
-          <Text key={n} role="listitem" xstyle={styles.point}>
-            {t(`invite.add.point.${n}`)}
-          </Text>
+          <HStack key={n} gap={3} align="start" wrap="nowrap" role="listitem">
+            <HStack aria-hidden xstyle={styles.dot} />
+            <Text xstyle={styles.point}>{t(`invite.add.point.${n}`)}</Text>
+          </HStack>
         ))}
       </VStack>
       {failed ? (
@@ -72,8 +105,6 @@ export function InviteAddScreen({
           callLabel={t('help.callSupport')}
         />
       ) : null}
-      <BigButton label={busy ? t('join.saving') : t('invite.add.yes')} isDisabled={busy} onPress={() => void add()} />
-      <TextLink label={t('invite.add.no')} href="/" />
     </SubPage>
   );
 }

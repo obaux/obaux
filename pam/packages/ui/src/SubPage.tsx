@@ -11,6 +11,7 @@ import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { BackArrowIcon } from './icons.js';
 import { Page } from './Page.js';
+import { pam } from './tokens.stylex.js';
 
 /**
  * The top of every nested screen (D-213) — one template, so a screen you
@@ -64,6 +65,21 @@ export interface SubPageHeaderProps {
    * `backHref` itself, not back through history.
    */
   readonly backIcon?: 'back' | 'close';
+  /**
+   * The hero template (Will, 7 October, D-376): a 240px picture, full width
+   * and up to the top edge, with back over it; the title starts under it. No
+   * Help button over the picture, and no help link anywhere on it: Will made
+   * the hero template an exception to "every screen has a visible way to get
+   * help" (D-376, sop-amendments A19). Back is always there. For the pages that should feel like a moment — adding
+   * your program to your account — not for everyday screens. Decorative:
+   * the title says what the page is.
+   */
+  readonly hero?: ReactNode;
+  /**
+   * The page's gap, in Astryx steps (4px each), so the hero can sit flush
+   * with the top of the screen. `SubPage` passes its own.
+   */
+  readonly heroGap?: 2 | 3 | 4;
 }
 
 const COLLAPSE_AT = 48;
@@ -116,6 +132,30 @@ const styles = stylex.create({
     textOverflow: 'ellipsis',
   },
   large: { fontSize: '34px', lineHeight: 1.15, fontWeight: 700 },
+  // The hero (D-376). Flush with the screen's top and sides: past the page's
+  // 24px top padding and its side padding.
+  hero: {
+    position: 'relative',
+    zIndex: 0,
+    height: '240px',
+    marginTop: '-24px',
+    marginInline: `calc(-1 * ${pam['--pam-screen-padding']})`,
+    overflow: 'hidden',
+    display: 'flex',
+  },
+  // Back and the actions over the picture: the bar sits where it always
+  // does (12px down), drawn clear until the page scrolls under it.
+  barOverHero: { backgroundColor: 'transparent' },
+  // Pulled up by the picture's height less the bar's usual 12px, plus the
+  // page gap between them; the title pushed down to 16px under the picture.
+  pull2: { marginTop: '-236px' },
+  pull3: { marginTop: '-240px' },
+  pull4: { marginTop: '-244px' },
+  push2: { paddingTop: '172px' },
+  push3: { paddingTop: '168px' },
+  push4: { paddingTop: '164px' },
+  barOverHeroCollapsed: { backgroundColor: colorVars['--color-background-body'] },
+  titleRow: { width: '100%' },
   subtitle: { fontSize: '17px', lineHeight: 1.4 },
   actions: { flexShrink: 0 },
 });
@@ -131,6 +171,8 @@ export function SubPageHeader({
   titleId,
   onBack,
   backIcon = 'back',
+  hero,
+  heroGap = 4,
 }: SubPageHeaderProps) {
   const [collapsed, setCollapsed] = useState(false);
 
@@ -167,9 +209,32 @@ export function SubPageHeader({
     );
   }
 
+  // The hero's geometry (D-376): the picture runs from the top edge to
+  // 240px; the bar is pulled back up over it to 12px from the top; the title
+  // starts 16px under the picture. Per page gap (Astryx steps of 4px).
+  const isHero = hero !== undefined && hero !== null && hero !== false;
+  const pull = heroGap === 2 ? styles.pull2 : heroGap === 3 ? styles.pull3 : styles.pull4;
+  const push = heroGap === 2 ? styles.push2 : heroGap === 3 ? styles.push3 : styles.push4;
+
   return (
     <>
-      <HStack gap={2} align="center" wrap="nowrap" xstyle={[styles.bar, collapsed && styles.barCollapsed]}>
+      {isHero ? (
+        <HStack aria-hidden xstyle={styles.hero}>
+          {hero}
+        </HStack>
+      ) : null}
+      <HStack
+        gap={2}
+        align="center"
+        wrap="nowrap"
+        xstyle={[
+          styles.bar,
+          collapsed && styles.barCollapsed,
+          isHero && styles.barOverHero,
+          isHero && pull,
+          isHero && collapsed && styles.barOverHeroCollapsed,
+        ]}
+      >
         {back}
         <HStack align="center" wrap="nowrap" xstyle={styles.middle}>
           <Text xstyle={[styles.barTitle, collapsed && styles.shown]} aria-hidden="true">
@@ -182,10 +247,20 @@ export function SubPageHeader({
           </HStack>
         ) : null}
       </HStack>
-      <VStack gap={1}>
-        <Heading level={1} id={titleId} xstyle={styles.large}>
-          {title}
-        </Heading>
+      <VStack gap={1} xstyle={isHero ? push : undefined}>
+        {titleAddon ? (
+          // Something beside the title — an info tip (D-376).
+          <HStack gap={1} align="center" wrap="nowrap" xstyle={styles.titleRow}>
+            <Heading level={1} id={titleId} xstyle={styles.large}>
+              {title}
+            </Heading>
+            {titleAddon}
+          </HStack>
+        ) : (
+          <Heading level={1} id={titleId} xstyle={styles.large}>
+            {title}
+          </Heading>
+        )}
         {subtitle ? (
           <Text type="supporting" xstyle={styles.subtitle}>
             {subtitle}
@@ -242,7 +317,7 @@ export function SubPage({
 }: SubPageHeaderProps & { readonly children: ReactNode; readonly gap?: 2 | 3 | 4; readonly footer?: ReactNode }) {
   return (
     <Page gap={gap} footer={footer}>
-      <SubPageHeader {...header} />
+      <SubPageHeader heroGap={gap} {...header} />
       {children}
     </Page>
   );

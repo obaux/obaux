@@ -5,6 +5,7 @@ import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { BigButton, ShareIcon } from '@pam/ui';
 import { SubPage } from '@pam/ui/SubPage';
+import { SetupArt } from '@pam/ui/SetupArt';
 
 /**
  * Every nested screen — one you reach by tapping into something: a round back
@@ -103,5 +104,20 @@ export const BackAsAStep: Story = {
     backHref: undefined,
     backLabel: 'Back to the previous step',
     onBack: () => undefined,
+  },
+};
+
+/**
+ * The hero template (D-376): a 240px picture, full width and up to the top
+ * edge, back over it (no Help — the hero is an exception, A19), the title under
+ * it, the choice pinned
+ * to the bottom. For pages that should feel like a moment — adding your
+ * program to your account — not for everyday screens.
+ */
+export const Hero: Story = {
+  args: {
+    title: 'Add your program to your account',
+    hero: <SetupArt kind="switch" isHero />,
+    footer: <BigButton label="Add my program" />,
   },
 };
