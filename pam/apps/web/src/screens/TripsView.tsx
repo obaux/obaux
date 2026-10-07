@@ -22,6 +22,8 @@ import { useI18n } from '@/lib/i18n';
 import { BigCategoryIcon, CategoryIcon, categoryTone } from './SavedView';
 import { TripsMap } from './TripsMap';
 import { usePolicies } from '@/lib/usePolicies';
+import { useServices } from '@/lib/useServices';
+import { policiesForService } from '@pam/config/dummy-services';
 import { useMySignatures } from '@/lib/useMySignatures';
 import { policiesHref } from './MemberPoliciesView';
 
@@ -51,6 +53,8 @@ export interface Trip {
   readonly startsAt: string;
   readonly withName?: string | null;
   readonly withPhotoUrl?: string | null;
+  /** The service the visit is for (D-313): its policies are the ones to sign. */
+  readonly serviceId?: string | null;
   /** The program's policies, signed of total (D-270); null when it asks for none. */
   readonly policies?: { readonly signed: number; readonly total: number } | null;
 }
@@ -133,9 +137,17 @@ export function TripsView({ trips, headerActions, justAdded = null }: TripsViewP
   // The trip goes along, so the place can show this visit (D-273).
   const href = (trip: Trip) =>
     `/place/?id=${encodeURIComponent(trip.placeId)}&from=trips&trip=${encodeURIComponent(trip.id)}`;
-  // The trip just booked, if its program still wants signatures (D-270).
+  // The banner (D-270, D-336): the trip just booked if it still wants
+  // signatures, else the soonest coming trip that does — not only right
+  // after booking (Will, 7 October: "I'm not seeing the alert banner for
+  // trips with remaining policies").
+  const needsSigning = (trip: Trip) => Boolean(trip.policies && trip.policies.signed < trip.policies.total);
   const added = justAdded ? trips.find((trip) => trip.id === justAdded) : undefined;
-  const toSign = added?.policies && added.policies.signed < added.policies.total ? added : null;
+  const nowIso = new Date().toISOString();
+  const toSign =
+    (added && needsSigning(added) ? added : null) ??
+    trips.find((trip) => trip.startsAt >= nowIso && needsSigning(trip)) ??
+    null;
 
   return (
     // What a tapped next-trip card grows into (D-269): Trips has no `Page`.
@@ -211,7 +223,7 @@ export function TripsView({ trips, headerActions, justAdded = null }: TripsViewP
                   endContent={
                     <TextLink
                       label={t('trips.added.policies.action')}
-                      href={policiesHref(toSign.placeId, toSign.placeName)}
+                      href={policiesHref(toSign.placeId, toSign.placeName, toSign.serviceId ?? null)}
                     />
                   }
                 />
@@ -278,6 +290,7 @@ export function TripsScreen({ headerActions }: { readonly headerActions?: ReactN
         lat: trip.lat,
         lon: trip.lon,
         startsAt: trip.startsAt,
+        serviceId: trip.serviceId ?? null,
       })),
     );
   }, []);
@@ -293,13 +306,20 @@ export function TripsScreen({ headerActions }: { readonly headerActions?: ReactN
       startsAt: moves[trip.id] ?? trip.startsAt,
       withName: person?.firstName ?? null,
       withPhotoUrl: person?.photoUrl ?? null,
+      serviceId: trip.serviceId ?? null,
     };
   });
   // Where each program's policies stand for this member (D-270).
   const { policies } = usePolicies();
   const { progress } = useMySignatures();
+  const { forPlace } = useServices();
+  // A visit for a service counts that service's policies (D-313), the same
+  // set the booked screen and the place ask for; signing them all now shows
+  // "Policies signed" here (Will, D-336).
   const withPolicies = (trip: Trip): Trip => {
-    const p = progress(trip.placeId, policies);
+    const services = forPlace(trip.placeId);
+    const service = trip.serviceId ? services.find((s) => s.id === trip.serviceId) : undefined;
+    const p = progress(trip.placeId, service ? policiesForService(service, policies, services) : policies);
     return { ...trip, policies: p.total > 0 ? p : null };
   };
   return (

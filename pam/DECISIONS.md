@@ -8226,6 +8226,48 @@ name and title."
     for Teresa's and Sandra's photos and the thread for Teresa's.
   - Typecheck; ui 69, config 238, web 11; builds; e2e 570/570.
 
+### D-336 — How soon; the booked screen as rows; signing ends in Trips; Trips reads the visit's own policies; one-line floating rows
+
+**Date:** 2026-10-07. Will, in five asks: add "# of days from today" under
+the card's smaller subtitle; Bring a friend as an item with a chevron that
+opens a drawer, with a festive illustration as its hero; Policies to sign
+as a similar item that opens a page, and the last signature closes with an
+× into Trips, the trip animating in; Trips did not show signed policies
+nor the banner; Messages' floating row on one line ("People who offered
+help") with a line above and below, and that line on every floating row.
+
+- **Countdown:** `daysUntil` counts calendar days (local Y/M/D through UTC,
+  so a clock change cannot make it 0 or 2); `countdown` says Today,
+  Tomorrow or "In N days", and nothing for a past day. On
+  `ProgramVisitCard` (new `countdown` prop) on Check and the booked screen.
+  Lines are 15px now, so the name leads. Unit tested (web 16).
+- **Booked screen:** a Card of two `MenuList` rows, as the place's hours
+  row: Policies to sign ("Read before your visit · 0 of 3 signed", signed
+  icon once done; opens the list, carrying `trip`) and Bring a friend
+  (opens the drawer). `BringFriend` is now an Astryx `BottomSheet` (hug):
+  `FriendsArt` (new, drawn with the art kit: two friends and confetti), the
+  title, one sentence, the link at full width and Copy. Copy only still.
+- **Signing from a booked trip:** with `trip` set and everything signed, the
+  policy and list pages show an × (`SubPage backIcon="close"`) to
+  `/trips/?added=<id>` and Done goes there too, so the trip arrives with the
+  D-241 confetti. Without `trip`, D-279 stands.
+- **Trips:** a trip keeps its `serviceId` and counts only that service's
+  policies (`policiesForService`), which is why a fully signed visit read
+  "Signatures needed" — it was counting every service's policies. The banner
+  is the just-added trip if it needs signing, otherwise the soonest upcoming
+  one that does (it only ever showed for a just-added trip).
+- **Floating rows:** `FloatingAction` has a hairline at the bottom as well as
+  the top, so it is separate from the tab bar and the page: member Messages,
+  staff Home's Invite, super admin Requests. Messages' row is one line,
+  "People who offered help"; `messages.connections.body` removed.
+- **Proven by:** a walk through: booked shows "In 2 days"; the drawer opens
+  and Copy says Copied; signing three policies ends on × to Trips, which
+  reads "Policies signed" for that visit and shows the banner for the
+  Workforce Center's 4. Typecheck; ui 69, config 238, web 16; builds;
+  Storybook; e2e 570/570. Flow map: notes patched on page 2; the two new
+  links (booked → policies, policy → Trips) are in `flows.mjs` and the
+  regenerated script, not yet drawn on the Figma page.
+
 ---
 
 ## Notes for whoever picks this up next

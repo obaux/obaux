@@ -27,8 +27,10 @@ const BAR = 66;
 
 const styles = stylex.create({
   // A plain strip resting on the bottom bar (Will, 2 October, D-226): no
-  // card, no shadow, the bar's own hairline above it — the row's icon and
-  // words stay exactly where they were on the card.
+  // card, no shadow — the row's icon and words stay exactly where they were
+  // on the card. A hairline above and below (Will, 7 October, D-336), so it
+  // reads as its own band, apart from the page above and the bar below, on
+  // every screen that floats one: a member's Messages, staff Home, Requests.
   dock: {
     position: 'fixed',
     insetInline: 0,
@@ -40,6 +42,9 @@ const styles = stylex.create({
     borderTopWidth: '1px',
     borderTopStyle: 'solid',
     borderTopColor: colorVars['--color-border'],
+    borderBottomWidth: '1px',
+    borderBottomStyle: 'solid',
+    borderBottomColor: colorVars['--color-border'],
   },
   inner: { width: '100%', maxWidth: '560px', marginInline: 'auto', paddingInline: '24px' },
   spacer: { height: '72px', flexShrink: 0 },

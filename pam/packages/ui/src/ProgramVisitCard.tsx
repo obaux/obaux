@@ -24,6 +24,8 @@ export interface ProgramVisitCardProps {
   readonly art: ReactNode;
   /** Under the name: the service, the day and time. */
   readonly lines?: readonly string[];
+  /** Under those, how soon: "Today", "Tomorrow", "In 13 days" (D-336). */
+  readonly countdown?: string | null;
 }
 
 // The picture's ink: a plain icon takes the category's deep shade too.
@@ -63,10 +65,12 @@ const styles = stylex.create({
   },
   words: { minWidth: 0, flexGrow: 1 },
   name: { fontSize: '20px', lineHeight: 1.25, fontWeight: 700 },
-  line: { fontSize: '17px', lineHeight: 1.35 },
+  // Smaller than the name, so the name leads (Will, D-336).
+  line: { fontSize: '15px', lineHeight: 1.35, color: colorVars['--color-text-secondary'] },
+  countdown: { fontSize: '15px', lineHeight: 1.35, fontWeight: 600, color: colorVars['--color-text-accent'] },
 });
 
-export function ProgramVisitCard({ name, tone, art, lines = [] }: ProgramVisitCardProps) {
+export function ProgramVisitCard({ name, tone, art, lines = [], countdown = null }: ProgramVisitCardProps) {
   return (
     <HStack gap={4} align="center" wrap="nowrap" xstyle={styles.card}>
       <HStack align="center" justify="center" xstyle={[styles.art, tone ? ink[tone] : null]} aria-hidden>
@@ -81,6 +85,7 @@ export function ProgramVisitCard({ name, tone, art, lines = [] }: ProgramVisitCa
             {line}
           </Text>
         ))}
+        {countdown ? <Text xstyle={styles.countdown}>{countdown}</Text> : null}
       </VStack>
     </HStack>
   );

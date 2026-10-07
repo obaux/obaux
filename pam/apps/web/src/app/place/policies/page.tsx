@@ -8,7 +8,7 @@ import { MemberPoliciesScreen, placeNameFor } from '../../../screens/MemberPolic
 function Policies() {
   const params = useSearchParams();
   const id = params.get('id') ?? '';
-  return <MemberPoliciesScreen placeId={id} placeName={placeNameFor(id, params.get('name'))} serviceId={params.get('service')} />;
+  return <MemberPoliciesScreen placeId={id} placeName={placeNameFor(id, params.get('name'))} serviceId={params.get('service')} trip={params.get('trip')} />;
 }
 
 export default function PlacePoliciesPage() {

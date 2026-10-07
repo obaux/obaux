@@ -12,7 +12,8 @@ import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { CATEGORY_DEFINITIONS, categoryLabelKey, type Category } from '@pam/config';
 import { DUMMY_PLACES_BY_ID, type DummySavedPlace } from '@pam/config/dummy-places';
-import { BigButton, ExploreIcon } from '@pam/ui';
+import { BigButton, BookIcon, ExploreIcon, SignedIcon, UserPlusIcon } from '@pam/ui';
+import { Card } from '@astryxdesign/core/Card';
 import { Icon } from '@astryxdesign/core/Icon';
 import { IconButton } from '@astryxdesign/core/IconButton';
 import { MenuList } from '@pam/ui/MenuList';
@@ -23,12 +24,12 @@ import { addTrip, moveTrip, readAddedTrips, withMoves } from '@/lib/addedTrips';
 import { DUMMY_TRIPS } from '@pam/config/dummy-trips';
 import { friendLink, inviteLink } from '@/lib/appUrl';
 import { navigate } from '@/lib/navigate';
+import { countdown } from '@/lib/when';
 import { useServices } from '@/lib/useServices';
 import { HelpButton } from './HelpButton';
 import { BigCategoryIcon, CategoryIcon, categoryTone } from './SavedView';
 import { ProgramVisitCard } from '@pam/ui/ProgramVisitCard';
 import { BringFriend } from '@pam/ui/BringFriend';
-import { PolicyStatusCard } from '@pam/ui/PolicyStatusCard';
 import { placeAsksForPolicies } from '@pam/config/dummy-policies';
 import { policiesForService } from '@pam/config/dummy-services';
 import { usePolicies } from '@/lib/usePolicies';
@@ -75,6 +76,7 @@ const ICON = { width: 26, height: 26, 'aria-hidden': true } as const;
 const MOVED_HOLD_MS = 5000;
 
 const styles = stylex.create({
+  rows: { width: '100%' },
   home: { minHeight: '56px', fontSize: '17px', paddingInline: '28px', borderRadius: '999px' },
   hint: { fontSize: '18px', lineHeight: 1.5 },
   // The chosen place on When, in the trip card's name style (Will, D-235).
@@ -204,6 +206,8 @@ export function NewTripView({
   const [note, setNote] = useState('');
   // Next pressed with something missing (Will, 7 October, D-334): say what.
   const [triedNext, setTriedNext] = useState(false);
+  // The booked screen's Bring a friend drawer (D-336).
+  const [friendOpen, setFriendOpen] = useState(false);
   // The visit's new time, once saved (D-282): the celebration shows it.
   const [movedTo, setMovedTo] = useState<Date | null>(null);
   // Booked for a member (D-316): the moment, then the program's Home.
@@ -303,19 +307,46 @@ export function NewTripView({
             ...(chosenService ? [t('trips.new.service', { service: chosenService.name })] : []),
             `${dayLong.format(confirmed.at)} · ${timeFmt.format(confirmed.at)}`,
           ]}
+          countdown={countdown(confirmed.at, t)}
         />
-        {/* What to do before going (Will, D-334), above Bring a friend. */}
-        {toSign && toSign.signed < toSign.total ? (
-          <PolicyStatusCard
-            isDone={false}
-            title={t('place.policies.toSign.title')}
-            body={t('place.policies.toSign.body')}
-            label={`${t('place.policies.toSign.title')}. ${t('place.policies.toSign.body')}`}
-            href={policiesHref(place.id, place.name, chosenService?.id ?? null)}
+        {/*
+          What is left before going, as rows like a place's (Will, D-336):
+          Policies to sign opens its page, Bring a friend its drawer. The
+          link points to the booked slot (D-333).
+        */}
+        <Card padding={1} xstyle={styles.rows}>
+          <MenuList
+            label={t('trips.confirm.next')}
+            hasDividers
+            items={[
+              ...(toSign
+                ? [
+                    {
+                      id: 'policies',
+                      label: t('place.policies'),
+                      description:
+                        toSign.signed === toSign.total
+                          ? t('place.policies.allSigned', { total: toSign.total })
+                          : t('place.policies.hint', { signed: toSign.signed, total: toSign.total }),
+                      icon: toSign.signed === toSign.total ? <SignedIcon {...ICON} /> : <BookIcon {...ICON} />,
+                      // Carries the trip, so the last policy closes to Trips (D-336).
+                      href: `${policiesHref(place.id, place.name, chosenService?.id ?? null)}&trip=${encodeURIComponent(confirmed.id)}`,
+                    },
+                  ]
+                : []),
+              {
+                id: 'friend',
+                label: t('friend.label'),
+                description: t('friend.row'),
+                icon: <UserPlusIcon {...ICON} />,
+                onSelect: () => setFriendOpen(true),
+              },
+            ]}
           />
-        ) : null}
-        {/* Only now, with a real slot to point to (Will, D-333). */}
+        </Card>
         <BringFriend
+          isOpen={friendOpen}
+          onOpenChange={setFriendOpen}
           label={t('friend.label')}
           body={t('friend.body')}
           link={friendLink(place.id, confirmed.at.toISOString())}
@@ -530,6 +561,7 @@ export function NewTripView({
               ...(chosenService ? [t('trips.new.service', { service: chosenService.name })] : []),
               `${dayLong.format(day)} · ${timeFmt.format(at(day, time))}`,
             ]}
+            countdown={countdown(at(day, time), t)}
           />
           <TextArea label={t('trips.new.note')} value={note} onChange={setNote} rows={2} width="100%" />
           <Text type="supporting" xstyle={styles.note}>

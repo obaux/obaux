@@ -209,7 +209,14 @@ with a soft shadow, the day and time under the name. "Your trip is booked"
 shows any policies still to sign, and closes with an × to Trips (D-334).
 A booked place shows the face of the person you'll meet, at the right of
 the open/closed line; tap it for their name and title. Messages shows
-people's photos where Pam has them (D-335).
+people's photos where Pam has them (D-335). The trip card says how soon
+the visit is ("In 2 days"). "Your trip is booked" lists Policies to sign and
+Bring a friend as rows; Bring a friend opens a drawer with a picture, the
+link and Copy. Signing from there ends with an × back to Trips. Trips now
+shows "Policies signed" once a visit's own policies are signed, and a
+banner for the next trip still to sign. Messages' "People who offered help"
+is one line, with a line above and below it, like every row that floats
+above the menu (D-336).
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 

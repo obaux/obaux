@@ -120,9 +120,8 @@ export function MessagesScreen() {
         floating={
           role === 'member' ? (
             <FloatingAction
+              // One line (Will, 7 October, D-336): who they are, said once.
               label={t('messages.connections')}
-              // Who they are, under the name (Will, 5 October, D-267).
-              description={t('messages.connections.body')}
               href="/connections/"
               icon={<ConnectionsIcon width={26} height={26} aria-hidden />}
             />

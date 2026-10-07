@@ -413,7 +413,10 @@ holds still while drawing — tested in Chromium touch emulation, not yet on iOS
 Safari, an Android WebView or the Capacitor build (D-333). A footer is pinned to the bottom of the screen on
 every page that has one; the booked screen closes with an × and lists policies
 to sign (D-334). Staff photos (example only) on a booked place and in
-Messages (D-335). Note:
+Messages (D-335). Booked: how soon, Policies to sign and Bring a friend (a
+drawer) as rows; signing from a trip ends on × into Trips; Trips reads each
+visit's own service policies; floating rows have hairlines top and bottom
+(D-336). Note:
 the web app's vitest tests are not run in CI. How points should be awarded — two rules live
 (save a place, finish setup), the rest to build, with order and open
 questions — is specified in `docs/points-awarding.md`. The

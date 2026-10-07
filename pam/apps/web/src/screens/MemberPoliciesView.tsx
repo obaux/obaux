@@ -150,7 +150,18 @@ function policiesHref(placeId: string, placeName: string, serviceId: string | nu
   return `/place/policies/?${new URLSearchParams({ id: placeId, name: placeName, ...(serviceId ? { service: serviceId } : {}) }).toString()}`;
 }
 
-function policyHref(placeId: string, placeName: string, policyId: string, serviceId: string | null = null): string {
+/** Trips, with the trip just booked arriving in it (D-241, D-336). */
+function tripsHref(trip: string): string {
+  return `/trips/?added=${encodeURIComponent(trip)}`;
+}
+
+function policyHref(
+  placeId: string,
+  placeName: string,
+  policyId: string,
+  serviceId: string | null = null,
+  trip: string | null = null,
+): string {
   // `via=list`: Done on the policy then leaves two screens, not one (D-279).
   return `/place/policies/view/?${new URLSearchParams({
     place: placeId,
@@ -158,6 +169,8 @@ function policyHref(placeId: string, placeName: string, policyId: string, servic
     id: policyId,
     via: 'list',
     ...(serviceId ? { service: serviceId } : {}),
+    // From a just-booked trip (D-336): the end closes into Trips.
+    ...(trip ? { trip } : {}),
   }).toString()}`;
 }
 
@@ -208,11 +221,18 @@ export function MemberPoliciesScreen({
   placeId,
   placeName,
   serviceId = null,
+  trip = null,
 }: {
   readonly placeId: string;
   readonly placeName: string;
   /** One service's policies (D-313), from that service's page. */
   readonly serviceId?: string | null;
+  /**
+   * The trip just booked, when signing started from "Your trip is booked"
+   * (D-336): once all are signed, the way out is an × into Trips, where the
+   * trip arrives with its confetti.
+   */
+  readonly trip?: string | null;
 }) {
   const { t, locale } = useI18n();
   const { signedAt, progress } = useMySignatures();
@@ -225,17 +245,20 @@ export function MemberPoliciesScreen({
     <SubPage
       title={t('memberPolicies.title')}
       subtitle={service ? `${service.name} · ${placeName}` : placeName || undefined}
-      backHref={`/place/?id=${encodeURIComponent(placeId)}`}
-      backLabel={t('nav.back.place')}
-      actions={<DoneButton steps={1} placeId={placeId} />}
+      {...(trip && total > 0 && signed === total
+        ? { backIcon: 'close' as const, backHref: tripsHref(trip), backLabel: t('trips.confirm.close') }
+        : { backHref: `/place/?id=${encodeURIComponent(placeId)}`, backLabel: t('nav.back.place') })}
+      actions={trip ? undefined : <DoneButton steps={1} placeId={placeId} />}
       // The one button rides the foot of the screen (D-326), on every
       // screen that has one — the same place as a place's Plan a trip.
       footer={
         shown.length === 0 ? null : firstUnsigned ? (
           <BigButton
             label={t(signed === 0 ? 'memberPolicies.start' : 'memberPolicies.continue')}
-            href={policyHref(placeId, placeName, firstUnsigned.id, service?.id ?? null)}
+            href={policyHref(placeId, placeName, firstUnsigned.id, service?.id ?? null, trip)}
           />
+        ) : trip ? (
+          <BigButton label={t('memberPolicy.finish')} href={tripsHref(trip)} />
         ) : (
           // All signed: the way out is the screen's one button (D-279).
           <BigButton label={t('memberPolicy.finish')} onPress={() => leaveFlow(1, placeHref(placeId))} />
@@ -263,7 +286,7 @@ export function MemberPoliciesScreen({
                 description: when
                   ? t('memberPolicies.signedOn', { date: day.format(new Date(when)) })
                   : t('memberPolicies.needed'),
-                href: policyHref(placeId, placeName, policy.id, service?.id ?? null),
+                href: policyHref(placeId, placeName, policy.id, service?.id ?? null, trip),
                 icon: when ? <SignedIcon {...ICON} {...stylex.props(styles.signedIcon)} /> : <BookIcon {...ICON} />,
               };
             })}
@@ -286,6 +309,7 @@ export function MemberPolicyScreen({
   policyId,
   via = null,
   serviceId = null,
+  trip = null,
 }: {
   readonly placeId: string;
   readonly placeName: string;
@@ -294,6 +318,8 @@ export function MemberPolicyScreen({
   readonly via?: string | null;
   /** Signing for one service (D-313): Next walks that service's policies. */
   readonly serviceId?: string | null;
+  /** From "Your trip is booked" (D-336): the last one closes into Trips. */
+  readonly trip?: string | null;
 }) {
   const { t, locale } = useI18n();
   const { signature, signedAt, signedWith, sign, unsign, forgetSignature } = useMySignatures();
@@ -309,6 +335,7 @@ export function MemberPolicyScreen({
   const when = policy ? signedAt(placeId, policy.id) : null;
   const signedImage = policy ? signedWith(placeId, policy.id) : null;
   const next = policy ? shown.find((p, i) => i !== index && !signedAt(placeId, p.id)) : undefined;
+  const allDone = shown.length > 0 && shown.every((p) => signedAt(placeId, p.id));
 
   const signNow = (drawn?: string) => {
     if (!policy) return;
@@ -321,9 +348,15 @@ export function MemberPolicyScreen({
       <SubPage
         title={policy?.title ?? t('memberPolicies.title')}
         subtitle={policy ? t('memberPolicy.count', { current: index + 1, total: shown.length }) : undefined}
-        backHref={policiesHref(placeId, placeName, service?.id ?? null)}
-        backLabel={t('nav.back.policiesToSign')}
-        actions={<DoneButton steps={via === 'list' ? 2 : 1} placeId={placeId} />}
+        // The final screen of a booking's signing (Will, D-336): no back,
+        // an × that closes into Trips with the trip's confetti.
+        {...(trip && allDone
+          ? { backIcon: 'close' as const, backHref: tripsHref(trip), backLabel: t('trips.confirm.close') }
+          : {
+              backHref: `${policiesHref(placeId, placeName, service?.id ?? null)}${trip ? `&trip=${encodeURIComponent(trip)}` : ''}`,
+              backLabel: t('nav.back.policiesToSign'),
+            })}
+        actions={trip ? undefined : <DoneButton steps={via === 'list' ? 2 : 1} placeId={placeId} />}
         // Sign, Next and Done stay under the same thumb from the first
         // policy to the last (D-279), at the foot of the screen like every
         // screen's one button (D-326).
@@ -342,11 +375,15 @@ export function MemberPolicyScreen({
                 />
               ) : (
                 // The last one signed: Done leaves the flow, as the header's
-                // Done does (D-279).
-                <BigButton
-                  label={t('memberPolicy.finish')}
-                  onPress={() => leaveFlow(via === 'list' ? 2 : 1, placeHref(placeId))}
-                />
+                // Done does (D-279) — into Trips, from a booking (D-336).
+                trip ? (
+                  <BigButton label={t('memberPolicy.finish')} href={tripsHref(trip)} />
+                ) : (
+                  <BigButton
+                    label={t('memberPolicy.finish')}
+                    onPress={() => leaveFlow(via === 'list' ? 2 : 1, placeHref(placeId))}
+                  />
+                )
               )
             ) : (
               <>

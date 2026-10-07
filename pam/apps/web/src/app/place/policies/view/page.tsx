@@ -17,6 +17,7 @@ function Policy() {
       policyId={params.get('id')}
       via={params.get('via')}
       serviceId={params.get('service')}
+      trip={params.get('trip')}
     />
   );
 }
