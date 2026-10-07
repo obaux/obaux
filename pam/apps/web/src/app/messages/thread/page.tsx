@@ -12,6 +12,7 @@ import { useSession } from '@/lib/useSession';
 import { useRoleView } from '@/lib/useViewedRole';
 import { useThread } from '@/lib/useThread';
 import { ThreadViewLazy } from '../ThreadViewLazy';
+import { staffPhotoFor } from '@pam/config/dummy-connections';
 import { ThreadFrame, ThreadHeader, ThreadTop } from '../ThreadFrame';
 import { DemoThreadLazy } from '../DemoThreadLazy';
 import { ThreadVisit } from '../ThreadVisit';
@@ -176,6 +177,7 @@ function ThreadScreen() {
         <ThreadViewLazy
           messages={state.messages}
           otherName={state.otherName}
+          otherPhotoUrl={staffPhotoFor(state.otherName, state.otherProgramName ?? null)}
           onSend={send}
           sending={sending}
           sendFailed={sendFailed}

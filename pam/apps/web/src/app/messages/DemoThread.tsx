@@ -7,6 +7,7 @@ import { DUMMY_ANYONE } from '@pam/config/dummy-people';
 import { contextFor } from './DummyRows';
 import { useI18n } from '@/lib/i18n';
 import { sendDemoThreadMessage, useDemoThread } from '@/lib/demoMessages';
+import { staffPhotoFor } from '@pam/config/dummy-connections';
 import { ThreadView } from './ThreadView';
 import { ThreadHeader } from './ThreadFrame';
 import { ThreadVisit } from './ThreadVisit';
@@ -84,6 +85,7 @@ export function DemoThread({
       <ThreadView
         messages={messages}
         otherName={other?.firstName ?? null}
+        otherPhotoUrl={staffPhotoFor(other?.firstName, other?.orgName)}
         onSend={send}
         sending={false}
         sendFailed={false}

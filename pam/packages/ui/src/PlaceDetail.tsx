@@ -114,6 +114,11 @@ export interface PlaceDetailProps {
    */
   readonly layout?: 'default' | 'chooseFirst';
   /**
+   * At the right end of the open/closed row (D-335): who you'll meet there,
+   * a `StaffBadge`, once a visit is booked.
+   */
+  readonly statusAside?: ReactNode;
+  /**
    * The address before "What this place is" (D-273): with a visit booked,
    * where it is matters more than what it is — the member already decided.
    */
@@ -158,6 +163,7 @@ const styles = stylex.create({
   card: { width: '100%' },
   // A line under the open/closed line (Will, D-313): the place's head
   // ends, and what it offers begins.
+  statusWords: { flexGrow: 1, minWidth: 0 },
   rule: { width: '100%', height: '1px', backgroundColor: colorVars['--color-border'], flexShrink: 0 },
   name: { fontSize: '26px', lineHeight: 1.2 },
   section: { fontSize: '17px' },
@@ -227,6 +233,7 @@ export function PlaceDetail({
   address,
   distanceLabel,
   status,
+  statusAside,
   weekLines,
   todayIndex = null,
   hoursRowLabel = null,
@@ -430,7 +437,8 @@ export function PlaceDetail({
           <Badge variant={categoryBadgeVariant(category)} label={categoryLabel} />
           {audienceLabel ? <Badge variant="warning" label={audienceLabel} /> : null}
         </HStack>
-        <HStack gap={2} align="center" wrap="wrap">
+        <HStack gap={2} align="center" wrap="nowrap">
+          <HStack gap={2} align="center" wrap="wrap" xstyle={styles.statusWords}>
           {distanceLabel ? (
             <Text type="supporting" xstyle={styles.meta}>
               {distanceLabel}
@@ -441,6 +449,8 @@ export function PlaceDetail({
               {status.label}
             </Text>
           ) : null}
+          </HStack>
+          {statusAside ?? null}
         </HStack>
       </VStack>
 

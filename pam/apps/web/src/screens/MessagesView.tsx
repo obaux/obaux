@@ -39,6 +39,8 @@ export interface MessageRow {
   readonly when: string | null;
   readonly unread: boolean;
   readonly href: string;
+  /** Their photo when Pam has one (D-335); their initials otherwise. */
+  readonly photoUrl?: string | null;
 }
 
 export interface MessagesViewProps {
@@ -119,7 +121,9 @@ function MessageListRow({ row, newLabel }: { readonly row: MessageRow; readonly 
   return (
     <ListItem
       href={row.href}
-      startContent={<Avatar size="lg" name={row.name} tooltip={false} alt="" />}
+      startContent={
+        <Avatar size="lg" name={row.name} {...(row.photoUrl ? { src: row.photoUrl } : {})} tooltip={false} alt="" />
+      }
       label={
         <Text xstyle={[styles.name, row.unread && styles.nameUnread]}>
           {row.name}

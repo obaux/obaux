@@ -39,6 +39,8 @@ import { DUMMY_TRIPS } from '@pam/config/dummy-trips';
 import { readAddedTrips, TRIPS_CHANGED, withMoves } from '@/lib/addedTrips';
 import { placeAsksForPolicies } from '@pam/config/dummy-policies';
 import { policiesHref } from '../../screens/MemberPoliciesView';
+import { StaffBadge } from '@pam/ui/StaffBadge';
+import { programStaffFor } from '@pam/config/dummy-connections';
 import { siteName } from '@/lib/siteName';
 import { useServices } from '@/lib/useServices';
 import { ServiceCards } from '../../screens/ServiceCards';
@@ -356,6 +358,7 @@ function PlaceScreen() {
   // plan one (D-273).
   const plansVisit = (demoRole ?? trueRole) === 'member' && !visit;
   const services = forPlace(place!.id);
+  const staff = programStaffFor(place!.id);
   // How the program takes people (D-313): a visit to plan, or a schedule
   // to just turn up to.
   const booking = bookingFor(place!.id);
@@ -442,6 +445,18 @@ function PlaceScreen() {
         description={service?.description || place!.description}
         address={address}
         status={status ? { isOpen: status.isOpen, label: status.label } : null}
+        // Who you'll meet (Will, 7 October, D-335): once a visit is booked,
+        // the program's staff at the right of the open/closed row.
+        statusAside={
+          visit && staff ? (
+            <StaffBadge
+              name={staff.firstName}
+              title={t('staff.title.provider')}
+              photoUrl={staff.photoUrl}
+              label={t('staff.label', { name: staff.firstName, title: t('staff.title.provider') })}
+            />
+          ) : null
+        }
         weekLines={lines}
         todayIndex={status ? status.today : null}
         hoursRowLabel={status && lines ? t('place.hours.row', { day: lines[status.today]!.day }) : null}

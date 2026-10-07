@@ -93,6 +93,8 @@ export interface ThreadViewProps {
   readonly messages: readonly ThreadViewMessage[];
   /** The other person's first name; `null` shows "This person". */
   readonly otherName: string | null;
+  /** Their photo when Pam has one (D-335); their initials otherwise. */
+  readonly otherPhotoUrl?: string | null;
   readonly onSend: (body: string) => Promise<boolean>;
   readonly sending: boolean;
   readonly sendFailed: boolean;
@@ -150,6 +152,7 @@ function ScrollToBottom() {
 export function ThreadView({
   messages,
   otherName,
+  otherPhotoUrl = null,
   onSend,
   sending,
   sendFailed,
@@ -221,7 +224,9 @@ export function ThreadView({
             <ChatMessage
               key={message.id}
               sender={message.mine ? 'user' : 'assistant'}
-              avatar={message.mine ? undefined : <Avatar size="md" name={name} />}
+              avatar={
+                message.mine ? undefined : <Avatar size="md" name={name} {...(otherPhotoUrl ? { src: otherPhotoUrl } : {})} />
+              }
             >
               <ChatMessageBubble
                 name={

@@ -1152,6 +1152,8 @@
   "friend.link": "Enlace para enviar",
   "friend.copy": "Copiar",
   "friend.copied": "Copiado",
+  "staff.title.provider": "Responsable del programa",
+  "staff.label": "{name}, {title}. A quién verá",
   "trips.confirm.title": "Su visita está reservada",
   "trips.confirm.close": "Cerrar",
   "trips.confirm.done": "Listo",

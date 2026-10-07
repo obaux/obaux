@@ -1,5 +1,6 @@
 'use client';
 
+import { staffPhotoFor } from '@pam/config/dummy-connections';
 import { USE_DUMMY_PEOPLE } from '@pam/config/dummy-flag';
 import { dummyConversationsFor } from '@pam/config/dummy-conversations';
 import { DUMMY_ANYONE } from '@pam/config/dummy-people';
@@ -77,6 +78,7 @@ export function MessagesScreen() {
           when: c.lastMessageAt ? whenHappened(c.lastMessageAt, locale, t) : null,
           unread: c.unread,
           href: `/messages/thread/?id=${encodeURIComponent(c.id)}`,
+          photoUrl: staffPhotoFor(c.otherName, c.otherProgramName),
         }))
       : [];
 
@@ -92,6 +94,7 @@ export function MessagesScreen() {
           when: c.lastMessageAt ? whenHappened(c.lastMessageAt, locale, t) : null,
           unread: c.unread,
           href: `/messages/thread/?id=${encodeURIComponent(c.id)}`,
+          photoUrl: staffPhotoFor(other?.firstName, other?.orgName),
         };
       })
     : [];

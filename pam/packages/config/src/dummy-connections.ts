@@ -92,3 +92,22 @@ export const DUMMY_CONNECTIONS: readonly DummyConnection[] = [
 export function dummyConnection(id: string): DummyConnection | null {
   return DUMMY_CONNECTIONS.find((c) => c.id === id) ?? null;
 }
+
+/**
+ * A program's staff member, with their photo (D-335): for the booked place
+ * page's staff badge. The example program leads only; a real program has
+ * no photo here until staff can add one.
+ */
+export function programStaffFor(placeId: string): DummyConnection | null {
+  return DUMMY_CONNECTIONS.find((c) => c.role === 'provider' && c.placeId === placeId) ?? null;
+}
+
+/**
+ * The photo for a member's staff contact, if Pam has one (D-335): the same
+ * person by first name and program — or, for a case manager, no program.
+ * Anyone else keeps their initials.
+ */
+export function staffPhotoFor(firstName: string | null | undefined, programName: string | null | undefined): string | null {
+  if (!firstName) return null;
+  return DUMMY_CONNECTIONS.find((c) => c.firstName === firstName && c.programName === (programName ?? null))?.photoUrl ?? null;
+}

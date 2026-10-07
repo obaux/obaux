@@ -8194,6 +8194,38 @@ answers):
   - Typecheck; ui 69, config 238, web 11; ui, web and Storybook builds;
     e2e 570/570.
 
+### D-335 — Who you'll meet: the program's staff photo on a booked place, and photos in Messages
+
+**Date:** 2026-10-07. Will: "On this profile booked view, let's add the image
+of program lead there. Also inside the messages screen, if available.
+Otherwise keep their name avatar." Then: "Add image next to Open until. at
+the right corner of that row. Tapping it shows a tooltip with program staff
+name and title."
+
+- **`StaffBadge`** (`@pam/ui/StaffBadge`): an Astryx `Avatar` (40px, the
+  photo or initials) in a 48px ghost `Button` that opens an Astryx
+  `Popover` with the name (bold) and title. A tooltip only shows on hover,
+  which a phone does not have; a popover opens on a tap.
+- **PlaceDetail** gains `statusAside`, at the right end of the open/closed
+  row. The place page fills it only once a visit is booked, with the
+  program's staff from `programStaffFor(placeId)`: Sandra at the Learning
+  Center, Marcus at the Workforce Center. Title "Program lead" /
+  "Responsable del programa".
+- **Messages:**
+  - The list rows (`MessageRow.photoUrl`) and the conversation's avatars
+    (`ThreadView.otherPhotoUrl`, real and example threads) use
+    `staffPhotoFor(firstName, programName)`: the same person in Connections
+    by first name and program, or no program for a case manager.
+  - Sandra and Teresa show photos; Renee and anyone else keep initials.
+  - Example photos only, as in Connections: a real staff photo needs an
+    upload and a column.
+- **Proven by:**
+  - Badge: 48px at the row's right, opens "Sandra / Program lead", absent
+    before booking.
+  - With Unsplash stubbed (this sandbox blocks it), the Messages list asks
+    for Teresa's and Sandra's photos and the thread for Teresa's.
+  - Typecheck; ui 69, config 238, web 11; builds; e2e 570/570.
+
 ---
 
 ## Notes for whoever picks this up next

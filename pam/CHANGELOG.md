@@ -207,6 +207,9 @@ length of the page, so Sign on a policy is always in the same place. Pressing
 Next without a day or time says which is missing. The trip card is white
 with a soft shadow, the day and time under the name. "Your trip is booked"
 shows any policies still to sign, and closes with an × to Trips (D-334).
+A booked place shows the face of the person you'll meet, at the right of
+the open/closed line; tap it for their name and title. Messages shows
+people's photos where Pam has them (D-335).
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 
