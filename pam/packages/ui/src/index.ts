@@ -116,3 +116,5 @@ export { pam } from './tokens.stylex.js';
 export { sheet } from './sheet.js';
 export { PolicyUploadCard, type PolicyUploadCardProps } from './PolicyUploadCard.js';
 export { canShareSheet, shareText } from './share.js';
+export { SetupCard, type SetupCardProps } from './SetupCard.js';
+export { SetupArt, type SetupArtKind, type SetupArtProps } from './SetupArt.js';

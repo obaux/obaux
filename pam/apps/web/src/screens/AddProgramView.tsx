@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import * as stylex from '@stylexjs/stylex';
 import { Button } from '@astryxdesign/core/Button';
 import { Card } from '@astryxdesign/core/Card';
@@ -9,6 +10,8 @@ import { Text } from '@astryxdesign/core/Text';
 import { PlacesIcon } from '@pam/ui';
 import { SubPage } from '@pam/ui/SubPage';
 import { useI18n } from '@/lib/i18n';
+import { markSetupDone } from '@/lib/programSetup';
+import { navigate } from '@/lib/navigate';
 import type { ProgramDetails } from '@/lib/useJoin';
 import { ProgramWizard } from '../app/join/ProgramWizard';
 import { HelpButton } from './HelpButton';
@@ -27,6 +30,9 @@ import { HelpButton } from './HelpButton';
  * `services_write_provider`, 0007), so sending one as a `needs_review` row is
  * a follow-up, not a migration. Until it is wired, "Send to Pam" shows what
  * happens next and stores nothing.
+ *
+ * From Home's getting-started card (`?from=home`, D-352) Back goes Home, and
+ * sending it takes that card off Home.
  */
 const EMPTY: ProgramDetails = {
   name: '',
@@ -51,12 +57,13 @@ export function AddProgramView() {
   const [program, setProgram] = useState<ProgramDetails>(EMPTY);
   const [step, setStep] = useState(0);
   const [sent, setSent] = useState(false);
+  const fromHome = useSearchParams()?.get('from') === 'home';
 
   return (
     <SubPage
       title={t('programs.new.title')}
-      backHref="/programs/"
-      backLabel={t('nav.back.programs')}
+      backHref={fromHome ? '/' : '/programs/'}
+      backLabel={t(fromHome ? 'nav.back.home' : 'nav.back.programs')}
       // Back goes one question back while there is one (D-347).
       {...(!sent && step > 0 ? { onBack: () => setStep(step - 1) } : {})}
       actions={<HelpButton />}
@@ -69,6 +76,9 @@ export function AddProgramView() {
           title={t('programs.new.done.title')}
           description={t('programs.new.done.body')}
           actions={
+            fromHome ? (
+              <Button label={t('programs.new.home')} variant="primary" onClick={() => navigate('/')} />
+            ) : (
             <Button
               label={t('programs.new.another')}
               variant="secondary"
@@ -78,6 +88,7 @@ export function AddProgramView() {
                 setSent(false);
               }}
             />
+            )
           }
         />
       ) : (
@@ -89,7 +100,10 @@ export function AddProgramView() {
             <ProgramWizard
               value={program}
               onChange={setProgram}
-              onSubmit={() => setSent(true)}
+              onSubmit={() => {
+                setSent(true);
+                markSetupDone('program');
+              }}
               busy={false}
               submitLabel={t('programs.new.send')}
               step={step}

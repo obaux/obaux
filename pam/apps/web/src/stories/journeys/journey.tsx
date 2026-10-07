@@ -3,6 +3,8 @@ import { PrototypeApp, prototypeRouter } from '../prototype/PrototypeApp';
 import { REDESIGN_ROUTES, redesignChrome } from '../prototype/routes';
 import { ROLES, type JourneyRole } from './fixtures';
 import { installSupabaseMock } from './mockSupabase';
+import { markFreshAccount, markSetupDone, type SetupStep } from '../../lib/programSetup';
+import { addTrip, type AddedTrip } from '../../lib/addedTrips';
 
 /**
  * One screen, signed in as one kind of person. The loader runs before the
@@ -37,3 +39,26 @@ export function asRole(role: JourneyRole, pathname: string, query: Record<string
 
 /** The same as `asRole` — kept so the older stories read as they did. */
 export const asRedesign = asRole;
+
+/**
+ * A program lead part-way through getting started (D-352): a fresh account
+ * (no example data), the steps it has done, and any visits it has booked —
+ * set after the pretend database is installed, which clears the tab first.
+ */
+export function withSetup(
+  story: StoryObj,
+  state: { readonly done?: readonly SetupStep[]; readonly booked?: readonly AddedTrip[] },
+): StoryObj {
+  return {
+    ...story,
+    loaders: [
+      ...((story.loaders as StoryObj['loaders'][] | undefined) ?? []).flat(),
+      async () => {
+        markFreshAccount();
+        for (const step of state.done ?? []) markSetupDone(step);
+        for (const trip of state.booked ?? []) addTrip(trip);
+        return {};
+      },
+    ],
+  } as StoryObj;
+}

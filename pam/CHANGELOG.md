@@ -1,5 +1,34 @@
 # Changelog
 
+## [0.43.0-programs] — 2026-10-07 · A program lead's first day
+
+**Getting started.** A program lead who has just signed up opens on **Get
+started**: three illustrated cards — Add your program, Add your photo, See
+who is coming in — and under them, as plain rows, Book a visit for a member
+and Invite someone. The third card opens a page showing what the calendar
+will look like, with example people; Back returns to Get started. Each
+card goes once its step is done (D-352).
+
+**Home, once somebody books.** The calendar takes over Home: "Coming in"
+centred, "this week ▾" under it, bolder with a thicker line. Search appears
+once there are more than ten visits. While a card is still to do, the
+calendar opens folded — its first visits, fading out, and "See the whole
+calendar" — with the remaining cards under it. A month's busy days are tiles
+in two rows that scroll sideways (D-352).
+
+**Shorter sign-up for staff.** Program leads and case managers sign up in
+three steps and go straight to Home after "I understand". A program is added
+from Home, not during sign-up (D-353).
+
+**What to expect, for programs.** The last sign-up step says how Pam works
+for a program in four short lines, each with a small picture: who is coming
+and checking them in, messages, policies signed before a visit, and what Pam
+never tells you (D-354).
+
+**For review:** the Program tab before a program exists — one card with Add
+your program over a faded preview of the page members will see — is a
+Storybook mockup only (D-352).
+
 ## [0.42.0-members] — 2026-10-06 to 07 · The member experience, revamped
 
 **Booking a visit.** Planning a visit asks for a day and a time and, if

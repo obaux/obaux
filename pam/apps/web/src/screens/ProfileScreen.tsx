@@ -12,6 +12,7 @@ import { useSavedPlaces } from '@/lib/useSavedPlaces';
 import { HeaderActions } from './HeaderActions';
 import { ProfileView } from './ProfileView';
 import { previewOf, uploadStaffPhoto } from '@/lib/staffPhoto';
+import { markSetupDone } from '@/lib/programSetup';
 import { useI18n } from '@/lib/i18n';
 
 /**
@@ -49,7 +50,7 @@ export function ProfileScreen() {
       if (!url) {
         setPhoto(before);
         setPhotoFailed(true);
-      }
+      } else markSetupDone('photo');
     });
   };
 

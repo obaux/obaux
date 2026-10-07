@@ -8604,6 +8604,108 @@ in-app WebView, which has no `navigator.share`, on copy only).
 - Earlier notes that name the Capacitor build or Android WebView as a QA
   target (D-333 onwards) now read as "if the app is ever built".
 
+### D-352 — A program lead's Home is modular: getting started, then the calendar
+
+**Date:** 2026-10-07. Will: "We need an empty state that's more appealing to
+new program sign ups … the calendar is only one aspect of the app", then:
+"#3, this preview should open in a nested page", "if appointments are booked
+and user has not yet completed some things on the get started list, move
+those below calendar view … minimized … users can expand", "Actions under
+cards, no need for another Add a program", and "Empty states is what shows on
+sign up journey flow. Not on main prototypes."
+
+- **Nobody booked yet → Get started.** Three cards on the place card's frame
+  (`SetupCard`, new pictures in `SetupArt`): Add your program
+  (`/programs/new/?from=home`), Add your photo (Profile, where the camera
+  button is), See who is coming in (a nested page, `/home/calendar/`, the
+  example week with an explanation; Back is Home). Under them, "You can also":
+  Book a visit for a member and Invite someone as plain rows, the booked
+  screen's rows (D-338). No Add a program row — it has its card. No search,
+  no + on this Home: nothing to search, and the rows are the +.
+- **Somebody booked → the calendar**, with the + back (it belongs where the
+  calendar is). "Coming in" centred, the range under it in bolder, smaller
+  type with a 3px line (`LargeTitleHeader isCentered`). Search only past
+  **ten visits** (`SEARCH_FROM`), still not on a single day (D-323).
+- **Booked, but cards left → folded.** The calendar opens at 300px, fading
+  out, with "See the whole calendar"; unfolding grows it smoothly (max-height
+  transition, none with reduced motion). Folded, the week lists only its days
+  with people, so what is above the fold is visits, not "Nobody booked". The
+  remaining cards sit under it, "Finish setting up". A done card goes.
+- **Month's days, compact:** two rows scrolling sideways (a third column
+  peeks), each a tile with the date and the count, instead of a list of rows.
+  Everywhere, for consistency, not only folded.
+- **Fresh or example.** Stories and demo accounts show the example program
+  and bookings, as before, so the main prototype looks like a program in use.
+  An account that has just finished sign-up is marked fresh
+  (`markFreshAccount`, sessionStorage), and a fresh account sees no example
+  data — so the sign-up journey lands on Get started. Steps done this visit
+  are remembered the same way (`markSetupDone` from Add a program and the
+  photo upload), so the cards go in the prototype too. A real profile photo
+  also counts. Program: there is no "my program" query yet (D-218's
+  follow-up), so for a real account the program card goes when one is sent.
+- The old "Example people" footnote under the calendar is gone; the preview
+  page says it instead.
+- **Program tab with no program — mockup only.** Will asked to see the faded
+  preview before it is built: `ProgramEmptyView`, in Storybook under
+  "Program lead/States/Program — no program yet (mockup)". Not wired; the
+  Program tab still draws the example.
+- **Proven by:** typecheck (web, ui); unit tests (web 16, ui 74, config 238
+  incl. en/es parity); web build; Storybook build; the sign-up journey walked
+  in a browser (code → About you → What to expect, step 3 of 3 → I understand
+  → Get started), each card's tap and Back, the folded calendar unfolding;
+  e2e 567/573, the 6 failures being two tests (admin "failed invite", places
+  "failed query") in three viewports, both passing alone — timing under the
+  full run, as `flag.spec` was (D-350).
+
+### D-353 — Staff sign-up ends on What to expect, and asks for no program
+
+**Date:** 2026-10-07. Will: "Simplify login" (no program at sign-up — "we now
+have an add program widget that helps them do this in the app"), and "there's
+a final step that simply asks them to click to view home page, that's
+redundant, might as well just transition them straight to homepage."
+
+- A program lead or case manager signs up in **three steps**: phone, About
+  you, What to expect. "I understand" saves and goes straight Home — the
+  "Welcome, … Your screen is ready / Start" card is gone (`join.done.staff`
+  removed). A member's sign-up is unchanged (texts, then the welcome with
+  their first points).
+- The program questions (D-347) are no longer part of sign-up: the
+  `ProgramWizard` lives on in Add a program, reached from Home's first card.
+  `request_staff_access` already took the program as optional (0056), so a
+  self-claimed lead's request simply carries none. No migration.
+- `join.program.title` removed with the phase; the prototype's step list
+  (`PrototypeJoin`) loses `program`.
+
+- **Same day, Will's tweaks after seeing it:** the card sentence 15 → 14px
+  (the place card's meta size); "See the whole calendar" is a text link, not
+  a filled button (it shows more of the screen, it does not act); the
+  month's day tiles have no tint, no box and no inset, flush under their
+  heading; the calendar's arrows pulled up 12px under the range.
+
+### D-354 — What to expect, for a program lead: four lines with pictures
+
+**Date:** 2026-10-07. Will: "What to expect page is not very coherent for
+someone joining Pam as a program … clean up copy, check against latest design
+changes for how the app works, and create 3-4 simple checklist items for easy
+scanning … add small illustrations for each for pops of color."
+
+- Intro "Here is how Pam works for your program.", then four lines, each with
+  a 48px picture from `SetupArt` (three new: `message`, `policy`, `private`):
+  1. calendar — members plan visits; you see who is coming on Home and check
+     them in (D-316, D-352);
+  2. message — people can message you; you see only what they choose to tell
+     you;
+  3. policy — members sign your program's policies in Pam before they visit
+     (D-261, D-336);
+  4. private — Pam never tells you why someone is looking for help.
+- Dropped: "When someone in your program saves a new place — not which one."
+  It read as a fragment, and is not something a lead acts on; what a lead
+  sees is still bounded by the same rules. The member-facing promise
+  (`transparency.ts`) is untouched. The case manager's version keeps its
+  wording for now.
+- The Sign up step pickers in the program-lead and case-manager stories now
+  list the three staff steps only (D-353).
+
 ---
 
 ## Notes for whoever picks this up next

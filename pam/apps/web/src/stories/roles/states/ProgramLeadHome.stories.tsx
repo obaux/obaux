@@ -6,8 +6,9 @@ import { AddMenu } from '../../../screens/AddMenu';
 import { asRole } from '../../journeys/journey';
 
 /**
- * A program lead's Home (D-218): who is coming in — Day, Week or Month — with
- * search behind the round search button, and Invite someone in the + menu (D-221).
+ * A program lead's Home (D-218): who is coming in — Day, Week or Month — the
+ * title centred with the range under it, search past ten visits, and Invite
+ * someone in the + menu (D-221, D-352). The month's busy days scroll sideways.
  */
 const KIND: Record<string, string> = { intake: 'First visit', class: 'Class', checkin: 'Check-in', tour: 'Tour' };
 const appointments: Appointment[] = DUMMY_APPOINTMENTS.map((a) => ({
@@ -40,6 +41,10 @@ type Story = StoryObj<typeof meta>;
 export const Week: Story = { ...asRole('provider', '/'), name: 'Week' };
 export const Day: Story = { ...asRole('provider', '/'), name: 'Day', args: { initialView: 'day' } };
 export const Month: Story = { ...asRole('provider', '/'), name: 'Month', args: { initialView: 'month' } };
+/** Folded (D-352): while a getting-started card is still to do, the top of the calendar, with a button to see it all. */
+export const Folded: Story = { ...asRole('provider', '/'), name: 'Folded', args: { isCollapsed: true } };
+/** The calendar alone, as the preview page draws it (D-352). */
+export const Embedded: Story = { ...asRole('provider', '/'), name: 'Embedded', args: { isEmbedded: true } };
 export const NobodyBooked: Story = {
   ...asRole('provider', '/'),
   name: 'Nobody booked',

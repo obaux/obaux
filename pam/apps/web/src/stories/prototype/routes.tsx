@@ -41,6 +41,7 @@ import { BookForMemberView } from '../../screens/BookForMemberView';
 import { AddPersonView } from '../../screens/AddPersonView';
 import PersonPoliciesPage from '../../app/person/policies/page';
 import { AddProgramView } from '../../screens/AddProgramView';
+import CalendarPreviewPage from '../../app/home/calendar/page';
 import { ProgramScreen } from '../../screens/ProgramView';
 import NewTripPage from '../../app/trips/new/page';
 import { ExploreScreen } from '../../screens/ExploreScreen';
@@ -134,6 +135,8 @@ export const APP_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   '/person/policies/': screen(() => <PersonPoliciesPage />),
   '/programs/': screen(() => <ExploreScreen mode="programs" />),
   '/programs/new/': screen(() => <AddProgramView />),
+  // What the calendar will be, from a new lead's Home (D-352).
+  '/home/calendar/': screen(() => <CalendarPreviewPage />),
   '/program/': screen(() => <ProgramScreen />),
   // A lead adds or edits one service (D-313).
   '/program/service/': screen(() => <ProgramServicePage />),

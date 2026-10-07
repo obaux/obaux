@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/nextjs';
 import { screen, screenWithControls } from './screen';
+import { withSetup } from '../journeys/journey';
 
 /**
  * A program lead's app, screen by screen (D-217, D-218). Their bar is Home
@@ -13,6 +14,38 @@ export default meta;
 type Story = StoryObj;
 
 export const Home: Story = screen('provider', 'Home — coming in', '/');
+
+/*
+ * Home for a lead who has just signed up (D-352): what the sign-up journey
+ * lands on. The prototype above shows a program in use; these show it new.
+ */
+const soon = (days: number, hour: number) => {
+  const d = new Date();
+  d.setDate(d.getDate() + days);
+  d.setHours(hour, 0, 0, 0);
+  return d.toISOString();
+};
+const bookedFor = (n: number, name: string, days: number, hour: number) => ({
+  id: `added-story-${n}`,
+  placeId: 'dummy-place-learning',
+  placeName: 'Example Learning Center',
+  category: 'education',
+  lat: 39.95,
+  lon: -75.16,
+  startsAt: soon(days, hour),
+  note: '',
+  forMemberId: `dummy-m${n}`,
+  forName: name,
+});
+export const HomeGetStarted: Story = withSetup(screen('provider', 'Home — getting started', '/'), {});
+export const HomeProgramAdded: Story = withSetup(screen('provider', 'Home — getting started, program added', '/'), {
+  done: ['program'],
+});
+export const HomeFolded: Story = withSetup(screen('provider', 'Home — first bookings, photo still to add', '/'), {
+  done: ['program'],
+  booked: [bookedFor(1, 'Marcus', 1, 10), bookedFor(2, 'Tanya', 2, 13), bookedFor(3, 'Luis', 3, 11)],
+});
+export const CalendarPreview: Story = withSetup(screen('provider', 'Home — calendar preview', '/home/calendar/'), {});
 export const Program: Story = screen('provider', 'Program', '/program/');
 export const EditService: Story = screen('provider', 'Program — edit a service', '/program/service/', { id: 'service-ged' });
 export const NewService: Story = screen('provider', 'Program — new service', '/program/service/');
@@ -33,14 +66,12 @@ export const TextAlerts: Story = screen('provider', 'Text alerts', '/alerts/');
 export const GetHelp: Story = screen('provider', 'Get help', '/help/');
 
 /** Each sign-up screen, in order, and the `step` the prototype opens on (D-319). */
+// Staff sign-up is three steps and ends Home (D-353): no program, no texts, no welcome.
 const SIGN_UP_STEPS = {
   Phone: 'phone',
   Code: 'code',
   'About you': 'details',
-  'Your program': 'program',
-  'What Pam shares': 'privacy',
-  Texts: 'texts',
-  Welcome: 'done',
+  'What to expect': 'privacy',
 } as const;
 type SignUpStep = keyof typeof SIGN_UP_STEPS;
 
@@ -56,7 +87,7 @@ export const SignUp: Story = screenWithControls<SignUpArgs>(
   '/prototype/join/',
   {
     args: { step: 'Phone' },
-    argTypes: { step: { control: 'select', options: ['Phone', 'Code', 'About you', 'Your program', 'What Pam shares', 'Texts', 'Welcome'] } },
+    argTypes: { step: { control: 'select', options: ['Phone', 'Code', 'About you', 'What to expect'] } },
   },
-  (args) => ({ kind: 'provider', ...(args.step === 'Your program' ? {} : { invite: 'PAM-7Q4K' }), step: SIGN_UP_STEPS[args.step] }),
+  (args) => ({ kind: 'provider', invite: 'PAM-7Q4K', step: SIGN_UP_STEPS[args.step] }),
 );

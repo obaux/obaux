@@ -14,7 +14,7 @@ import type { JoinKind } from '../../lib/useJoin';
  */
 const NAMES: Record<JoinKind, string> = { member: 'Marcus', provider: 'Alice', admin: 'Dana' };
 
-const STEPS: readonly JoinPhase[] = ['phone', 'details', 'program', 'waiting', 'waitingDone', 'privacy', 'texts', 'done'];
+const STEPS: readonly JoinPhase[] = ['phone', 'details', 'waiting', 'waitingDone', 'privacy', 'texts', 'done'];
 
 export function PrototypeJoin() {
   const params = useSearchParams();

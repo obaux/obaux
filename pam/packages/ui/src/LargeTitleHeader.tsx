@@ -5,6 +5,7 @@ import * as stylex from '@stylexjs/stylex';
 import { HStack } from '@astryxdesign/core/HStack';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
+import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 
 /**
@@ -35,6 +36,11 @@ export interface LargeTitleHeaderProps {
    * "Coming in  this week ▾" (D-320), one phrase.
    */
   readonly isAccessoryInline?: boolean;
+  /**
+   * The title centred on the page, the accessory centred under it — a
+   * program lead's "Coming in / this week ▾" (Will, 7 October, D-352).
+   */
+  readonly isCentered?: boolean;
 }
 
 const COLLAPSE_AT = 40;
@@ -69,10 +75,18 @@ const styles = stylex.create({
   titleRow: { width: '100%', paddingBlockEnd: '8px' },
   largeInRow: { paddingBlockEnd: '0px', minWidth: 0 },
   // Wraps if the phrase is too long for the line, so the words never clip.
+  centered: { width: '100%', alignItems: 'center', paddingBlockEnd: '8px' },
+  largeCentered: { textAlign: 'center', paddingBlockEnd: '0px' },
   titleRowInline: { flexWrap: 'wrap', justifyContent: 'flex-start', alignItems: 'baseline', columnGap: '8px', rowGap: '0px' },
 });
 
-export function LargeTitleHeader({ title, actions, titleAccessory, isAccessoryInline = false }: LargeTitleHeaderProps) {
+export function LargeTitleHeader({
+  title,
+  actions,
+  titleAccessory,
+  isAccessoryInline = false,
+  isCentered = false,
+}: LargeTitleHeaderProps) {
   const [collapsed, setCollapsed] = useState(false);
 
   useEffect(() => {
@@ -98,7 +112,14 @@ export function LargeTitleHeader({ title, actions, titleAccessory, isAccessoryIn
           {actions}
         </HStack>
       </HStack>
-      {titleAccessory ? (
+      {isCentered ? (
+        <VStack gap={1} xstyle={styles.centered}>
+          <Heading level={1} xstyle={[styles.large, styles.largeCentered]}>
+            {title}
+          </Heading>
+          {titleAccessory}
+        </VStack>
+      ) : titleAccessory ? (
         <HStack
           align="center"
           justify="between"
