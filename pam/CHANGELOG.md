@@ -228,7 +228,7 @@ friend picture runs to the drawer's edges, the × sits in its corner, and
 at a time, lets you skip what you don't know yet, and shows everything on
 one screen before it is sent (D-347). Adding a policy is one card with a PDF
 and a Choose files button, or drop a file on it (D-348). The super admin can
-message a program's lead from the program's page (D-349).
+message a program's lead from the program's page (D-349). The Android app opens the phone's share sheet too, for Bring a friend, sharing a place and invite links (D-350).
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 

@@ -8567,6 +8567,28 @@ warns, two answers, five skips, review, Back steps one question; upload card
 light and dark; super admin place row → thread opens); typecheck; ui 69,
 config 238, web 16; builds; Storybook; e2e 573/573.
 
+### D-350 — The Android app gets the share sheet: `@capacitor/share`
+
+**Date:** 2026-10-07. Will: "Install android plug in" (D-344 left Android's
+in-app WebView, which has no `navigator.share`, on copy only).
+
+- `@capacitor/share` ^6.0.4 in `apps/native` (Capacitor 6, like the rest).
+  `cap add android` has not been run in the repo (`android/` is generated,
+  not committed); the next `pnpm --filter @pam/native sync` registers it.
+- `@pam/ui/share` (`canShareSheet`, `shareText`): in the app, the plugin,
+  reached at runtime through `window.Capacitor.Plugins` (the speech
+  recogniser's rule: the web build never imports Capacitor); in a phone's
+  browser, `navigator.share`; otherwise false, and the caller copies. A
+  closed sheet is not a failure.
+- Used by all three places Pam shares: Bring a friend (D-344), share a
+  place (`sharePlace`), and an invite link (`InviteReady`) — so a case
+  manager in the Android app gets the sheet for invites too.
+- **Proven by:** `test/share.test.tsx` (plugin in the app, browser sheet,
+  none, a closed sheet, the plugin ignored when not native); typecheck; ui
+  74; web build; e2e 572/573 then the one failure (`flag.spec`, narrow)
+  54/54 alone — unrelated and timing-dependent under the full run. **Not
+  run on an Android device**: that needs `cap add android` and a build.
+
 ---
 
 ## Notes for whoever picks this up next

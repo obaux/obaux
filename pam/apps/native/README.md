@@ -28,6 +28,7 @@ way a fixed bug appears to come back on device.
 | Speech-to-text | `@capacitor-community/speech-recognition` | Wired to `VoiceInput` via `src/speech.ts`; permission requested on first tap, not at launch |
 | Location | `@capacitor/geolocation` | Places map and the §8 geofence check-in. Denial must never block the app (§5.1) |
 | Push | `@capacitor/push-notifications` | **Secondary to SMS.** Nothing may depend on a push arriving (§1, §9) |
+| Share sheet | `@capacitor/share` | Bring a friend, share a place, send an invite (D-350). Reached at runtime through `window.Capacitor.Plugins` by `@pam/ui/share`, so the web build never imports Capacitor. Android's WebView has no `navigator.share`; this is what gives the Android app a sheet |
 
 ## Store budget
 

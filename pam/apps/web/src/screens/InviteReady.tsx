@@ -1,5 +1,6 @@
 'use client';
 
+import { shareText } from '@pam/ui/share';
 import { useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { Card } from '@astryxdesign/core/Card';
@@ -61,14 +62,8 @@ export function InviteReady({
 
   const send = async () => {
     const text = t('invite.link.message', { url });
-    try {
-      if (typeof navigator.share === 'function') {
-        await navigator.share({ text });
-        return;
-      }
-    } catch {
-      // Closed the sheet, or sharing is blocked: copy instead.
-    }
+    // The share sheet, in the app too (D-350); with none, copy instead.
+    if (await shareText(text)) return;
     try {
       await navigator.clipboard?.writeText(url);
       setCopied(true);

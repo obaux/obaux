@@ -14,6 +14,7 @@ import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { pam } from './tokens.stylex.js';
 import { TextField } from './TextField.js';
 import { sheet } from './sheet.js';
+import { canShareSheet, shareText } from './share.js';
 import { BigButton } from './BigButton.js';
 
 /**
@@ -175,7 +176,7 @@ export function BringFriend({
   closeLabel,
   copiedAt = null,
   shareLabel,
-  shareText,
+  shareText: message,
   heroSrc = null,
   heroSrcSet = null,
 }: BringFriendProps) {
@@ -200,19 +201,16 @@ export function BringFriend({
     if (await copyLink(link)) flash();
   };
 
-  // The phone's share sheet (D-344): iOS Safari, Android Chrome and the iOS
-  // app have one; a desktop browser and Android's in-app WebView do not.
+  // The phone's share sheet (D-344): a phone's browser, or the app on iOS
+  // and Android through @capacitor/share (D-350). A desktop browser has none.
   // Known only once on the device, so it is decided after the first render.
   const [canShare, setCanShare] = useState(false);
   useEffect(() => {
-    setCanShare(typeof navigator !== 'undefined' && typeof navigator.share === 'function');
+    setCanShare(canShareSheet());
   }, []);
   const share = async () => {
-    try {
-      await navigator.share({ text: shareText ?? link });
-    } catch {
-      // Closed the sheet: nothing to say, the link is still copied.
-    }
+    // Closed the sheet: nothing to say, the link is still copied.
+    await shareText(message ?? link);
   };
 
   return (
