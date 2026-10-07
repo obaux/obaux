@@ -71,6 +71,7 @@ export {
   PeopleIcon,
   UserPlusIcon,
   CameraIcon,
+  PdfIcon,
   PhoneIcon,
   PlacesIcon,
   PlanIcon,
@@ -113,3 +114,4 @@ export {
 } from './motion.js';
 export { pam } from './tokens.stylex.js';
 export { sheet } from './sheet.js';
+export { PolicyUploadCard, type PolicyUploadCardProps } from './PolicyUploadCard.js';

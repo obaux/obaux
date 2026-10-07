@@ -27,7 +27,7 @@
  *   changes  — the newest decisions this flow shows, newest first
  */
 
-export const UPDATED = '2026-10-06';
+export const UPDATED = '2026-10-07';
 
 /** Where each screen opens live — the branch's Storybook on Chromatic. */
 export const STORYBOOK_URL = 'https://claude-pam-storybook--6abea9193da46b88ce90890f.chromatic.com';
@@ -307,7 +307,13 @@ export const flows = [
       thread: { title: 'A conversation', story: 'case-manager-screens--conversation', path: '/messages/thread/' },
       profile: { title: 'Profile', story: 'case-manager-screens--profile', path: '/profile/' },
       programs: { title: 'All programs', story: 'case-manager-screens--all-programs', path: '/programs/' },
-      addProgram: { title: 'Add a program', story: 'case-manager-screens--add-program', path: '/programs/new/' },
+      addProgram: {
+        title: 'Add a program',
+        story: 'case-manager-screens--add-program',
+        path: '/programs/new/',
+        changed: 'D-347',
+        note: 'One question a screen: name, kind, focus, about, where, contact, services; then a review to change any answer',
+      },
       alerts: {
         title: 'Text alerts',
         story: 'case-manager-screens--text-alerts',
@@ -328,7 +334,7 @@ export const flows = [
       ['programs', 'addProgram', 'Add'],
       ['profile', 'alerts', 'Text alerts'],
     ],
-    changes: ['D-315 — a case manager can invite a case manager', 'D-263 — Invite someone makes the link straight away', 'D-260 — text alert switches'],
+    changes: ['D-347 — Add a program asks one question a screen, then a review', 'D-315 — a case manager can invite a case manager', 'D-263 — Invite someone makes the link straight away', 'D-260 — text alert switches'],
   },
   {
     key: 'program-lead',
@@ -391,8 +397,8 @@ export const flows = [
         title: 'Policies for participants',
         story: 'program-lead-screens--policies',
         path: '/program/policies/',
-        changed: 'D-313',
-        note: 'Each row says which services ask for it',
+        changed: 'D-348',
+        note: 'Add a policy: a dashed card with a PDF and Choose files (or drop a file); each row says which services ask for it',
       },
       policy: {
         title: 'A policy — Preview / Signed',
@@ -418,6 +424,7 @@ export const flows = [
       ['profile', 'alerts', 'Text alerts'],
     ],
     changes: [
+      'D-348 — Add a policy is one card: a PDF, Choose files, or drop a file',
       'D-313 — services: each with its own phone, website and policies; edited from the Program tab; named at sign-up',
       'D-324 — a member\'s Policies signed page, with an alert when some are not',
       'D-322 — Add a person: name and number, a text with a link, their visit as their first screen',
@@ -467,9 +474,24 @@ export const flows = [
       everyone: { title: 'Everyone', story: 'super-admin-screens--everyone', path: '/directory/' },
       person: { title: 'A person', story: 'super-admin-screens--person', path: '/person/' },
       viewAs: { title: 'See the app as', story: 'super-admin-screens--view-as', path: '/view-as/' },
+      place: {
+        title: "A program's page",
+        story: 'super-admin-screens--place',
+        path: '/place/',
+        changed: 'D-349',
+        note: 'Message {lead}: the program lead, to plan how they use Pam',
+      },
+      leadThread: {
+        title: 'With a program lead',
+        story: 'super-admin-screens--thread-with-program-lead',
+        path: '/messages/thread/',
+        changed: 'D-349',
+      },
     },
     edges: [
       ['home', 'requestProgram', 'The program they described'],
+      ['profile', 'place', 'All programs → a program'],
+      ['place', 'leadThread', 'Message Sandra'],
       ['home', 'invites', 'Invited people (floating)'],
       ['invites', 'invite', '+ New invite'],
       ['profile', 'invite', 'Invite someone'],
@@ -479,6 +501,7 @@ export const flows = [
       ['profile', 'viewAs', 'See the app as'],
     ],
     changes: [
+      'D-349 — message a program\'s lead from the program\'s page',
       'D-315 — Invite someone from Profile and from Invited people; a case manager can be invited by a case manager',
       'D-263 — Invited people log replaces renewal approvals',
       'D-262 — view a requested program, text the requester, message staff',

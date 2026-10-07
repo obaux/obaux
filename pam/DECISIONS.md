@@ -8514,6 +8514,59 @@ held-back migrations).
   built on the old Messages screen; the redesign's thread options have
   Report but no Block. 0076's functions are ready for one.
 
+### D-347 — A program is added one question at a time
+
+**Date:** 2026-10-07. Will: "proceed with staff onboarding, simplify using
+industry standards" (#78: "one thing per screen").
+
+- **Before:** sign-up's program step, and Add a program, were one long form —
+  name, two radio lists, a description, address, phone, website and
+  services — under a line saying most of it was optional.
+- **Now `ProgramWizard`** (replaces `ProgramDetailsStep`), the pattern sign-
+  ups that people finish use (Stripe, Airbnb, Shopify): one plain question
+  a screen with "n of 7" above it; only the name is required (Next without
+  it says so, D-334); the kind is pre-picked; focus, about, where, contact
+  (phone and website together) and services each have **Skip for now**;
+  then **Check your program**, every answer a row back to its question,
+  unanswered ones saying "Not added". Back on the screen steps back a
+  question (sign-up and Add a program both own the step). The fields and
+  what is sent are unchanged (0056, D-313).
+- Copy: `join.program.step.*`, `.progress`, `.skip`, `.review.*` (en, es);
+  `join.program.intro` removed. The name field's label is visually hidden
+  (the question is the label people read). Story
+  `Components/Forms/ProgramWizard` (name, focus, review).
+
+### D-348 — Add a policy is one card with a PDF
+
+**Date:** 2026-10-07. Will: "Policy uploaded" — D-317's "uploader as a full
+card with PDF icon, modern styling".
+
+`PolicyUploadCard` (@pam/ui): a dashed card, a `PdfIcon` (new, outline with
+"PDF" drawn in the line colour, legible in dark mode — a first version with a
+filled band was not) in a pale-green circle, "Add a policy", one line on what
+works, and **Choose files** (secondary). Files can also be dropped on it; the
+card lights while one is over it. It replaces Astryx's `FileInput` on the
+Policies screen; `usePolicies().add` takes the files as before. Story
+`Components/Actions/PolicyUploadCard`. `policies.upload.button` en/es.
+
+### D-349 — The super admin messages a program's lead from the program's page
+
+**Date:** 2026-10-07. Will: "super admin program messaging" (#54; D-262
+did requests, Text, and Messages).
+
+On a place, a super admin's rows have **Message {lead}** ("Program lead · plan
+how they use Pam") instead of a member's Send a message. It opens the
+conversation between the super admin and that program's lead
+(`leadMessageFor`; 0072 already allows super admin ↔ program lead). No lead
+known, no row. Story `Super admin/Screens/ThreadWithProgramLead`. Flow map
+page 5 redrawn with the program page and the thread; pages 3 and 4 notes
+patched for D-347 and D-348.
+
+**Proven by (all three):** Storybook walks (wizard: Next without a name
+warns, two answers, five skips, review, Back steps one question; upload card
+light and dark; super admin place row → thread opens); typecheck; ui 69,
+config 238, web 16; builds; Storybook; e2e 573/573.
+
 ---
 
 ## Notes for whoever picks this up next

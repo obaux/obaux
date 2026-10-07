@@ -553,3 +553,5 @@ Chromium.
 - D-346: 0075/0076 ported from the other branch (can_message keeps 0072's arm), test 12 + 04 fix, DB suite green. Live apply refused by the permission check when I tried to strip the drops to dodge the approval gate — left for Will. Also disclosed: 0074 policies were created without their no-op drops. Verified this session: signature pad (0px sheet movement, ink drawn, handle closes), banner touch-drag closes (top edge and middle), dark mode of booked/drawer/Trips/Saved/Explore/staff Profile.
 - Flow map: the three member links (booked → policies, booked → Plan a visit via Change appointment, last policy → Trips) drawn on Figma page 2 in place (root 40:2), "Done" relabelled "× · Done".
 
+- Merged #25 (767d73c) after CI green.
+- D-347 ProgramWizard (sign-up + Add a program, ProgramDetailsStep removed), D-348 PolicyUploadCard + PdfIcon, D-349 super admin Message {lead} on a place + story. Flow map: page 5 redrawn (root 44:2), pages 3/4 notes and tags patched. Checked: typecheck, ui 69, config 238, web 16, builds, Storybook, e2e 573/573.

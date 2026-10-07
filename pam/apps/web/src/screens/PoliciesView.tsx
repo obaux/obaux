@@ -5,7 +5,6 @@ import * as stylex from '@stylexjs/stylex';
 import { Avatar } from '@astryxdesign/core/Avatar';
 import { Button } from '@astryxdesign/core/Button';
 import { Card } from '@astryxdesign/core/Card';
-import { FileInput } from '@astryxdesign/core/FileInput';
 import { HStack } from '@astryxdesign/core/HStack';
 import { Icon } from '@astryxdesign/core/Icon';
 import { IconButton } from '@astryxdesign/core/IconButton';
@@ -15,6 +14,7 @@ import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { BookIcon } from '@pam/ui';
 import { MenuList } from '@pam/ui/MenuList';
+import { PolicyUploadCard } from '@pam/ui/PolicyUploadCard';
 import { SubPage } from '@pam/ui/SubPage';
 import type { DummyPolicy } from '@pam/config/dummy-policies';
 import { useI18n } from '@/lib/i18n';
@@ -28,7 +28,8 @@ import { ConfirmDialog } from './ConfirmDialog';
  * program asks people to read and sign — a confidentiality and disclosure
  * policy, a liability disclaimer, a photo release — laid out like Legal.
  *
- * - **Add** at the top: a PDF, or a photo of each page.
+ * - **Add** at the top: a PDF, or a photo of each page — one dashed card
+ *   with a PDF icon and a Choose files button, or a file dropped on it (D-348).
  * - **The list**, each with how many have signed; a row opens the policy.
  * - **Edit**, top right, puts a remove button on each row; removing asks
  *   first (a policy coming off is the one thing here that loses something).
@@ -99,20 +100,13 @@ export function PoliciesScreen() {
         {t('policies.intro')}
       </Text>
 
-      {/* New ones first, at the top (Will). */}
-      <Card padding={6}>
-        <FileInput
-          label={t('policies.upload.label')}
-          description={t('policies.upload.hint')}
-          value={null}
-          onChange={(files) => {
-            const list = files === null ? [] : Array.isArray(files) ? files : [files];
-            if (list.length > 0) add(list);
-          }}
-          accept=".pdf,image/*"
-          isMultiple
-        />
-      </Card>
+      {/* New ones first, at the top (Will); a full card with a PDF (D-348). */}
+      <PolicyUploadCard
+        title={t('policies.upload.label')}
+        hint={t('policies.upload.hint')}
+        buttonLabel={t('policies.upload.button')}
+        onFiles={add}
+      />
 
       <Text xstyle={styles.heading}>{t('policies.list')}</Text>
       {policies.length === 0 ? (
