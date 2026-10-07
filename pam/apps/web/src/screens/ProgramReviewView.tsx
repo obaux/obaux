@@ -46,11 +46,15 @@ const styles = stylex.create({
   lastStep: { paddingBottom: '0px' },
   later: { color: colorVars['--color-text-secondary'] },
   // The marker and the line down to the next one: a progress flow (D-380).
+  // The line fills the row, so it grows when a step's text wraps (D-382).
   rail: { alignItems: 'center', alignSelf: 'stretch', flexShrink: 0, width: '14px' },
   line: {
     width: '2px',
     flexGrow: 1,
-    marginBlock: '4px',
+    // Same 8px gap at both ends: the next marker sits 6px into its own row
+    // (`mark.marginTop`), so the bottom margin is 6px less (D-382).
+    marginTop: '8px',
+    marginBottom: '2px',
     borderRadius: '1px',
     backgroundColor: colorVars['--color-border'],
   },

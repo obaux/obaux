@@ -9350,6 +9350,18 @@ the before-launch item "Load a program lead's own program" plus a field for
 the reviewer's note. The seventh suggestion — telling the lead when it goes
 live — needs that backend too, and is not built.
 
+### D-382 — "Sent to Pam" steps: even gaps around the connector lines
+
+**Date:** 2026-10-07. Will: "Clean up gaps so the in between lines are neatly
+spaced in between items. Have them grow if text grows tall."
+
+- The line had 4px above it and 10px below (its 4px margin plus the next
+  marker's 6px drop to sit on the first line of text). Now 8px at both ends:
+  `marginTop: 8px`, `marginBottom: 2px`.
+- The line already fills its row (`flexGrow` in a rail stretched to the
+  row), so a step whose text wraps gets a longer line; the gaps stay 8px.
+  Measured at 300px wide with the Spanish copy.
+
 ---
 
 ## Notes for whoever picks this up next
