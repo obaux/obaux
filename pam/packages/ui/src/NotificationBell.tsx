@@ -1,7 +1,8 @@
 import * as stylex from '@stylexjs/stylex';
 import { IconButton } from '@astryxdesign/core/IconButton';
+import { HStack } from '@astryxdesign/core/HStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
-import { BellIcon } from './icons.js';
+import { BellIcon, BellOutlineIcon } from './icons.js';
 import { pam } from './tokens.stylex.js';
 
 /**
@@ -83,6 +84,9 @@ const styles = stylex.create({
     borderStyle: 'solid',
     borderColor: colorVars['--color-border'],
   },
+  // The round bell is drawn in line, in the text colour, like the search
+  // glass beside it (Will, 7 October, D-362).
+  roundIcon: { color: colorVars['--color-text-primary'] },
   dot: {
     position: 'absolute',
     top: '-2px',
@@ -114,10 +118,21 @@ export function NotificationBell({
     <span {...stylex.props(styles.root)}>
       <IconButton
         label={hasNew && unreadLabel ? `${label}, ${unreadLabel}` : label}
-        icon={<BellIcon />}
+        // Round (the header): filled black when something is new, the outline
+        // when not — the outline matches the search glass (Will, 7 October,
+        // D-362). Wrapped, as search's is, so the glyph keeps its 22px.
+        icon={
+          round ? (
+            <HStack>
+              {hasNew ? <BellIcon width={22} height={22} /> : <BellOutlineIcon width={22} height={22} />}
+            </HStack>
+          ) : (
+            <BellIcon />
+          )
+        }
         variant={round ? 'ghost' : hasNew ? 'primary' : 'ghost'}
         href={href}
-        xstyle={round ? [styles.bell, styles.round] : hasNew ? styles.bell : [styles.bell, styles.quiet]}
+        xstyle={round ? [styles.bell, styles.round, styles.roundIcon] : hasNew ? styles.bell : [styles.bell, styles.quiet]}
       />
       {hasNew ? <span aria-hidden="true" {...stylex.props(styles.dot)} /> : null}
     </span>

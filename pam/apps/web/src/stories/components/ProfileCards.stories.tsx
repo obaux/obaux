@@ -3,6 +3,7 @@ import { VStack } from '@astryxdesign/core/VStack';
 import { BellIcon, StarIcon } from '@pam/ui';
 import { BadgeArt, ConnectionsArt } from '@pam/ui/BadgeArt';
 import { FeatureTile, FeatureTileRow, ProfileSummary, PromoCard } from '@pam/ui/ProfileCards';
+import { SetupArt } from '@pam/ui/SetupArt';
 
 /** The Profile screen's cards: who you are with up to three numbers, two feature tiles side by side, and a single offer. Use ProfileSummary at the top of a profile. */
 const meta = {
@@ -58,7 +59,7 @@ export const Promo: Story = {
       title="Get text reminders"
       body="We can text you the day before a visit."
       href="/reminders/"
-      art={<BellIcon width={36} height={36} aria-hidden />}
+      art={<SetupArt kind="alerts" size={72} />}
     />
   ),
 };

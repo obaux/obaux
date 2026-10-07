@@ -11,6 +11,7 @@ import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { MessagesIcon, NoResultsIcon, OfflineIcon, Page, StarIcon } from '@pam/ui';
+import { emptyState } from '@pam/ui/emptyState';
 import { IconButton } from '@astryxdesign/core/IconButton';
 import { PersonRowSkeletonList } from '@pam/ui/Skeletons';
 import { SearchPill, type SearchPillItem } from '@pam/ui/SearchPill';
@@ -94,7 +95,6 @@ const styles = stylex.create({
   count: { fontSize: '16px' },
   note: { fontSize: '15px', lineHeight: 1.5 },
   state: { paddingBlock: '32px' },
-  stateIcon: { width: '72px', height: '72px', color: colorVars['--color-icon-accent'] },
   star: { width: '48px', height: '48px', color: colorVars['--color-text-secondary'] },
   message: { width: '48px', height: '48px', color: colorVars['--color-icon-accent'] },
   starOn: { color: colorVars['--color-icon-accent'] },
@@ -187,7 +187,7 @@ export function PeopleHomeView({
           <EmptyState
             headingLevel={2}
             xstyle={styles.state}
-            icon={<OfflineIcon {...stylex.props(styles.stateIcon)} aria-hidden />}
+            icon={<OfflineIcon {...stylex.props(emptyState.icon)} aria-hidden />}
             title={t(NOTICES[state.offline ? 'offline' : 'something_went_wrong'].titleKey)}
             description={t(NOTICES[state.offline ? 'offline' : 'something_went_wrong'].bodyKey)}
             // Try again only (Will, 1 October): Help is in the header on every
@@ -202,7 +202,7 @@ export function PeopleHomeView({
           <EmptyState
             headingLevel={2}
             xstyle={styles.state}
-            icon={<NoResultsIcon {...stylex.props(styles.stateIcon)} aria-hidden />}
+            icon={<NoResultsIcon {...stylex.props(emptyState.icon)} aria-hidden />}
             title={t('explore.empty.search.title', { query: query.trim() })}
             description={t('home.people.empty.search.body')}
             actions={

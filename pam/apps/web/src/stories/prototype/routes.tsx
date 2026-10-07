@@ -41,6 +41,7 @@ import { BookForMemberView } from '../../screens/BookForMemberView';
 import { AddPersonView } from '../../screens/AddPersonView';
 import PersonPoliciesPage from '../../app/person/policies/page';
 import { AddProgramView } from '../../screens/AddProgramView';
+import CalendarPreviewPage from '../../app/home/calendar/page';
 import { ProgramScreen } from '../../screens/ProgramView';
 import NewTripPage from '../../app/trips/new/page';
 import { ExploreScreen } from '../../screens/ExploreScreen';
@@ -56,6 +57,7 @@ import { ThreadOptionsView, ThreadReportView } from '../../screens/ThreadOptions
 import { MessagesScreen } from '../../screens/MessagesScreen';
 import { HeaderActions } from '../shell/HeaderActions';
 import { LocalTabBar } from '../shell/LocalTabBar';
+import { isFreshAccount } from '../../lib/programSetup';
 import type { Role } from '@pam/config';
 import { ROLES, type JourneyRole } from '../journeys/fixtures';
 import type { PrototypeRoute } from './PrototypeApp';
@@ -134,6 +136,8 @@ export const APP_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   '/person/policies/': screen(() => <PersonPoliciesPage />),
   '/programs/': screen(() => <ExploreScreen mode="programs" />),
   '/programs/new/': screen(() => <AddProgramView />),
+  // What the calendar will be, from a new lead's Home (D-352).
+  '/home/calendar/': screen(() => <CalendarPreviewPage />),
   '/program/': screen(() => <ProgramScreen />),
   // A lead adds or edits one service (D-313).
   '/program/service/': screen(() => <ProgramServicePage />),
@@ -207,7 +211,8 @@ export function redesignChrome(role: JourneyRole) {
     const own = ROLES[role].profile?.role;
     if (!own) return null;
     const tab = tabFor(pathname);
-    return tab ? <LocalTabBar current={tab} role={viewedRole(own)} name={name} /> : null;
+    // A fresh account (D-361) has no messages, so no dot on Messages.
+    return tab ? <LocalTabBar current={tab} role={viewedRole(own)} name={name} unread={!isFreshAccount()} /> : null;
   };
 }
 

@@ -11,14 +11,16 @@ import { HStack } from '@astryxdesign/core/HStack';
 import { Icon } from '@astryxdesign/core/Icon';
 import { IconButton } from '@astryxdesign/core/IconButton';
 import { List, ListItem } from '@astryxdesign/core/List';
-import { DropdownMenu, DropdownMenuRadioGroup, DropdownMenuRadioItem } from '@astryxdesign/core/DropdownMenu';
+import { SegmentedControl, SegmentedControlItem } from '@astryxdesign/core/SegmentedControl';
 import { Text } from '@astryxdesign/core/Text';
 import { Tooltip } from '@astryxdesign/core/Tooltip';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
-import { CheckIcon, ExploreIcon, NoResultsIcon, Page, TripsIcon, textLinkLook } from '@pam/ui';
+import { CheckIcon, NoResultsIcon, Page, TextLink, TripsIcon, textLinkLook } from '@pam/ui';
+import { emptyState } from '@pam/ui/emptyState';
 import { SignedMark } from './VerifiedBadge';
 import { SearchField } from '@pam/ui/SearchPill';
+import { DashedRule } from '@pam/ui/DashedRule';
 import { LargeTitleHeader } from '@pam/ui/LargeTitleHeader';
 import { useI18n } from '@/lib/i18n';
 import { isVerified, usePolicies } from '@/lib/usePolicies';
@@ -39,7 +41,17 @@ import { checkIn, undoCheckIn, useCheckIns } from '@/lib/checkIns';
  *
  * Search (the round button, D-221) finds people *or* times: a first name, a
  * weekday, a date ("Oct 6") or a time ("10:30") — across the whole schedule,
- * not just the page shown — and lists the matches as you type.
+ * not just the page shown — and lists the matches as you type. It appears
+ * once there is enough to search: more than ten visits (D-352).
+ *
+ * Home is modular now (Will, 7 October, D-352): the title centred with the
+ * range under it; and while the lead still has getting-started cards to do,
+ * the calendar opens **folded** — its top part, fading out, and a button to
+ * unfold it — so the cards under it (`below`) are on screen too. The month's
+ * list of days is a two-row strip that scrolls sideways, to save the room.
+ *
+ * `isEmbedded` draws only the calendar, for a page that brings its own
+ * frame: the preview a new lead opens from Home.
  */
 export interface Appointment {
   readonly id: string;
@@ -56,8 +68,11 @@ export type View = 'day' | 'week' | 'month';
 
 export interface ScheduleViewProps {
   readonly appointments: readonly Appointment[];
-  /** The bell and Help. */
-  readonly actions?: ReactNode;
+  /**
+   * The bell and the +. A function is handed `openSearch` (or null when there
+   * is too little to search), so the + menu can carry Search (D-358).
+   */
+  readonly actions?: ReactNode | ((openSearch: (() => void) | null) => ReactNode);
   /** Floats above the bottom bar — Invite someone. */
   readonly floating?: ReactNode;
   /** The day the schedule opens on — today, unless a story says otherwise. */
@@ -67,7 +82,16 @@ export interface ScheduleViewProps {
   readonly initialView?: View;
   /** A circle to check each person in, in place of their avatar (D-316). Programs only, for now. */
   readonly canCheckIn?: boolean;
+  /** Open folded, with a button to unfold it (D-352). */
+  readonly isCollapsed?: boolean;
+  /** Under the calendar, on the same page: Home's remaining cards. */
+  readonly below?: ReactNode;
+  /** The calendar alone, no page or header — for the preview page. */
+  readonly isEmbedded?: boolean;
 }
+
+/** Search appears past this many visits (D-352): below it, the list is the search. */
+export const SEARCH_FROM = 10;
 
 /*
  * The check-in's moment (Will, 6 October, D-316: "a special micro
@@ -111,38 +135,81 @@ const styles = stylex.create({
   },
   search: { flexGrow: 1, minWidth: 0 },
   cancel: { flexShrink: 0, fontSize: '17px', fontWeight: 600 },
-  // White with a thin grey edge, like the bell (D-216).
-  round: {
-    width: '48px',
-    height: '48px',
-    borderRadius: '50%',
-    flexShrink: 0,
-    backgroundColor: colorVars['--color-background-body'],
-    borderWidth: '1px',
-    borderStyle: 'solid',
-    borderColor: colorVars['--color-border'],
-  },
   heading: { fontSize: '26px', lineHeight: 1.2, fontWeight: 700 },
-  // "Coming in  this week ▾" (Will, 6 October, D-320): the range is a word
-  // beside the title, underlined, with a chevron — a dropdown, not a bar
-  // of three tabs taking a row of its own.
-  range: {
-    minHeight: '48px',
-    paddingInline: '4px',
-    fontSize: '22px',
-    lineHeight: 1.2,
-    fontWeight: 500,
-    color: colorVars['--color-text-primary'],
-    // The underline is painted just under the words (a border would sit at
-    // the foot of the 48px target): Astryx's button resets text-decoration
-    // on the words inside it.
-    backgroundImage: `linear-gradient(${colorVars['--color-border']}, ${colorVars['--color-border']})`,
-    backgroundRepeat: 'no-repeat',
-    backgroundSize: 'calc(100% - 8px) 2px',
-    backgroundPosition: '4px calc(50% + 16px)',
+  // Folded (D-352): the calendar's top, fading into the page, so what is
+  // under it shows on the same screen. Unfolding grows it smoothly.
+  fold: {
+    position: 'relative',
+    overflow: 'hidden',
+    maxHeight: '2400px',
+    transitionProperty: 'max-height',
+    transitionDuration: '520ms',
+    transitionTimingFunction: 'cubic-bezier(0.3, 0.7, 0.2, 1)',
+    '@media (prefers-reduced-motion: reduce)': { transitionDuration: '0ms' },
   },
-  rangeOption: { minHeight: '48px', fontSize: '17px', paddingInlineEnd: '24px' },
-  nav: { width: '100%' },
+  folded: { maxHeight: '300px' },
+  fade: {
+    position: 'absolute',
+    insetInline: 0,
+    bottom: 0,
+    height: '96px',
+    pointerEvents: 'none',
+    backgroundImage: `linear-gradient(to bottom, transparent, ${colorVars['--color-background-body']})`,
+  },
+  unfold: { width: '100%' },
+  // The month's days, two rows scrolling sideways (D-352), the page's edge
+  // to edge so a third column peeks in and says there is more.
+  strip: {
+    display: 'grid',
+    gridAutoFlow: 'column',
+    gridTemplateRows: 'repeat(2, auto)',
+    // A third column shows more of itself (D-355): it reads as more to see.
+    gridAutoColumns: '38%',
+    columnGap: '16px',
+    rowGap: '4px',
+    overflowX: 'auto',
+    scrollSnapType: 'x mandatory',
+    scrollPaddingInline: '16px',
+    marginInline: '-16px',
+    paddingInline: '16px',
+    paddingBlockEnd: '4px',
+    scrollbarWidth: 'none',
+  },
+  // Flush under the heading (Will, 7 October): no tint, no box, no inset —
+  // the date and its count, left-aligned with the words above. No hover
+  // fill, a small radius for the focus ring (D-355).
+  tile: {
+    width: '100%',
+    minHeight: '48px',
+    justifyContent: 'flex-start',
+    textAlign: 'start',
+    paddingInline: '0px',
+    paddingBlock: '4px',
+    borderRadius: '6px',
+    scrollSnapAlign: 'start',
+    backgroundColor: { default: 'transparent', ':hover': 'transparent', ':active': 'transparent' },
+  },
+  // Softer than the section heading above it (D-355).
+  tileDay: { fontSize: '15px', fontWeight: 500, lineHeight: 1.3, color: 'inherit' },
+  tileCount: { fontSize: '13px', lineHeight: 1.3 },
+  dots: { width: '100%', paddingBlockStart: '8px' },
+  dot: {
+    width: '6px',
+    height: '6px',
+    borderRadius: '50%',
+    backgroundColor: colorVars['--color-border'],
+    transitionProperty: 'background-color',
+    transitionDuration: '160ms',
+  },
+  dotOn: { backgroundColor: colorVars['--color-text-primary'] },
+  // 38px tabs (Will, 7 October, D-355: "small tabs, 38px touch target") —
+  // below the 48px floor on his word; see D-355. The theme sizes a small
+  // segment from --size-element-sm, so this control alone gets a smaller one.
+  // The site-wide floor (globals.css, D-008) is lowered for this control
+  // only: 30px segments in a 38px track.
+  tabs: { '--size-element-sm': '38px', '--pam-touch-target-min': '30px', height: '38px', fontSize: '14px' },
+  // Pulled up under the range (Will, 7 October: "the gap … is too wide").
+  nav: { width: '100%', marginBlockStart: '-12px' },
   navMiddle: { flexGrow: 1, minWidth: 0 },
   navLabel: { fontSize: '18px', fontWeight: 600, textAlign: 'center' },
   // Plain arrows, no discs (Will, 6 October, D-323): the title row already
@@ -154,6 +221,7 @@ const styles = stylex.create({
     flexShrink: 0,
   },
   dayHeading: { fontSize: '18px', lineHeight: 1.3 },
+  centred: { textAlign: 'center' },
   time: { width: '76px', flexShrink: 0 },
   timeText: { fontSize: '17px', fontWeight: 700 },
   length: { fontSize: '14px' },
@@ -165,7 +233,6 @@ const styles = stylex.create({
   description: { fontSize: '15px', lineHeight: 1.4 },
   quiet: { fontSize: '16px' },
   state: { paddingBlock: '32px' },
-  stateIcon: { width: '64px', height: '64px', color: colorVars['--color-icon-accent'] },
   // The month grid: seven equal columns across the full width (Will,
   // 2 October: "takes up more space on screen").
   grid: { width: '100%' },
@@ -323,7 +390,12 @@ export function ScheduleView({
   // A program lead opens on the week (Will, 5 October, D-267).
   initialView = 'week',
   canCheckIn = false,
+  isCollapsed = false,
+  below,
+  isEmbedded = false,
 }: ScheduleViewProps) {
+  const [isFolded, setFolded] = useState(isCollapsed);
+  const [stripPage, setStripPage] = useState(0);
   const checkIns = useCheckIns();
   const { t, locale } = useI18n();
   const [view, setView] = useState<View>(initialView);
@@ -439,6 +511,11 @@ export function ScheduleView({
         : fmt.month.format(anchor);
 
   const dayList = onDay(anchor);
+  // Folded, the week shows only its days with people (D-352), so the part
+  // above the fold is visits, not "Nobody booked"; unfolded, all seven.
+  const allWeek = Array.from({ length: 7 }, (_, i) => addDays(weekFrom, i));
+  const busyWeek = allWeek.filter((d) => onDay(d).length > 0);
+  const weekDays = isFolded && busyWeek.length > 0 ? busyWeek : allWeek;
   const monthDays = (() => {
     const first = new Date(anchor.getFullYear(), anchor.getMonth(), 1);
     const days: { date: Date; count: number }[] = [];
@@ -448,6 +525,183 @@ export function ScheduleView({
     }
     return days;
   })();
+  // Two rows, so a column holds two days; about two columns show at once.
+  const stripPages = Math.max(1, Math.ceil(Math.ceil(monthDays.length / 2) / 2));
+
+  const calendar = (
+    <>
+    <VStack gap={3}>
+      {/* The range is picked beside the title (D-320); one header for
+          Day, Week and Month alike (Will, 2 October). */}
+      <HStack gap={2} align="center" wrap="nowrap" xstyle={styles.nav}>
+        <IconButton
+          label={t(`schedule.prev.${view}`)}
+          variant="ghost"
+          onClick={() => step(-1)}
+          icon={<Icon icon="chevronLeft" size="md" />}
+          xstyle={styles.navButton}
+        />
+        {/*
+          The date, and under it how many are coming in, small (Will,
+          3 October, D-236). The second line keeps its height in every
+          view, so the date and the arrows never move when Day, Week
+          and Month change places.
+        */}
+        {/* The date alone (D-323): each day's heading already counts who is coming. */}
+        <VStack gap={0} align="center" xstyle={styles.navMiddle}>
+          <Text xstyle={styles.navLabel} aria-live="polite">
+            {navLabel}
+          </Text>
+        </VStack>
+        <IconButton
+          label={t(`schedule.next.${view}`)}
+          variant="ghost"
+          onClick={() => step(1)}
+          icon={<Icon icon="chevronRight" size="md" />}
+          xstyle={styles.navButton}
+        />
+      </HStack>
+      {/* A dashed rule between the arrows and what they page through (D-356). */}
+      <DashedRule />
+    </VStack>
+
+    {view === 'day' ? (
+      dayList.length > 0 ? (
+        <List aria-label={navLabel}>{dayList.map((a) => row(a))}</List>
+      ) : (
+        <EmptyState
+          headingLevel={2}
+          xstyle={styles.state}
+          icon={<TripsIcon {...stylex.props(emptyState.icon)} aria-hidden />}
+          title={t('schedule.none.title')}
+          description={t('schedule.none.body')}
+          {...(sameDay(anchor, today)
+            ? {}
+            : {
+                actions: (
+                  <Button
+                    label={t('schedule.today')}
+                    variant="secondary"
+                    onClick={() => setAnchor(startOfDay(today))}
+                  />
+                ),
+              })}
+        />
+      )
+    ) : null}
+
+    {view === 'week' ? (
+      <VStack gap={4}>
+        {weekDays.map((d) => {
+          const list = onDay(d);
+          return (
+            <VStack key={iso(d)} gap={1}>
+              <HStack gap={2} align="center" justify="between">
+                <Heading level={2} xstyle={styles.dayHeading}>
+                  {sameDay(d, today) ? `${t('schedule.today')} · ${fmt.day.format(d)}` : fmt.day.format(d)}
+                </Heading>
+                <Text type="supporting" xstyle={styles.quiet}>
+                  {list.length > 0 ? t('schedule.count', { count: list.length }) : t('schedule.week.none')}
+                </Text>
+              </HStack>
+              {list.length > 0 ? <List aria-label={fmt.day.format(d)}>{list.map((a) => row(a))}</List> : null}
+            </VStack>
+          );
+        })}
+      </VStack>
+    ) : null}
+
+    {view === 'month' ? (
+      // More room between the calendar and the list under it (D-244).
+      <VStack gap={8}>
+        <MonthGrid
+          month={anchor}
+          today={today}
+          selected={anchor}
+          countOn={(d) => onDay(d).length}
+          weekdayLabel={(d) => fmt.weekdayNarrow.format(d)}
+          dayLabel={(d, count) =>
+            count > 0 ? `${fmt.dayLong.format(d)}, ${t('schedule.count', { count })}` : fmt.dayLong.format(d)
+          }
+          onPick={(d) => {
+            setAnchor(d);
+            setView('day');
+          }}
+        />
+        {/* A dashed rule between the calendar and its list, the heading
+            centred, more room under it (Will, 7 October, D-356). */}
+        <VStack gap={5}>
+          <DashedRule />
+          <Heading level={2} xstyle={[styles.dayHeading, styles.centred]}>
+            {t('schedule.month.days')}
+          </Heading>
+          {/* Two rows scrolling sideways (D-352): a month's busy days in the room of four. */}
+          <VStack
+            role="list"
+            aria-label={t('schedule.month.days')}
+            xstyle={styles.strip}
+            onScroll={(e: React.UIEvent<HTMLElement>) => {
+              const el = e.currentTarget;
+              const room = el.scrollWidth - el.clientWidth;
+              setStripPage(room > 0 ? Math.round((el.scrollLeft / room) * (stripPages - 1)) : 0);
+            }}
+          >
+            {monthDays.map(({ date, count }) => (
+              <VStack key={iso(date)} role="listitem">
+                <Button
+                  label={`${fmt.day.format(date)}, ${t('schedule.count', { count })}`}
+                  variant="ghost"
+                  onClick={() => {
+                    setAnchor(date);
+                    setView('day');
+                  }}
+                  xstyle={styles.tile}
+                >
+                  <VStack gap={0} align="start">
+                    <Text xstyle={styles.tileDay}>{fmt.day.format(date)}</Text>
+                    <Text type="supporting" xstyle={styles.tileCount}>
+                      {t('schedule.count', { count })}
+                    </Text>
+                  </VStack>
+                </Button>
+              </VStack>
+            ))}
+          </VStack>
+          {/* Where you are in the strip (D-355): one dot a screenful. */}
+          {stripPages > 1 ? (
+            <HStack gap={1.5} justify="center" aria-hidden xstyle={styles.dots}>
+              {Array.from({ length: stripPages }, (_, i) => (
+                <HStack key={i} xstyle={[styles.dot, i === stripPage && styles.dotOn]} />
+              ))}
+            </HStack>
+          ) : null}
+        </VStack>
+      </VStack>
+    ) : null}
+    </>
+  );
+
+  /*
+   * Folded (D-352): the calendar's top, fading out, and a button under it to
+   * see all of it — so a lead with cards still to do sees both on one screen.
+   */
+  const folded = isCollapsed ? (
+    <VStack gap={2}>
+      <VStack gap={4} xstyle={[styles.fold, isFolded && styles.folded]}>
+        {calendar}
+        {isFolded ? <HStack aria-hidden xstyle={styles.fade} /> : null}
+      </VStack>
+      {/* A link, not a filled button (Will, 7 October): it shows more of
+          this screen rather than doing something. */}
+      <HStack justify="center" xstyle={styles.unfold}>
+        <TextLink label={t(isFolded ? 'schedule.unfold' : 'schedule.fold')} onClick={() => setFolded(!isFolded)} />
+      </HStack>
+    </VStack>
+  ) : (
+    calendar
+  );
+
+  if (isEmbedded) return calendar;
 
   return (
     <>
@@ -483,42 +737,28 @@ export function ScheduleView({
           <LargeTitleHeader
             title={t('schedule.title')}
             titleAccessory={
-              <DropdownMenu
-                button={{
-                  label: t(`schedule.range.${view}`),
-                  'aria-label': `${t('schedule.view.label')}: ${t(`schedule.range.${view}`)}`,
-                  variant: 'ghost',
-                  size: 'sm',
-                  xstyle: styles.range,
-                }}
-                placement="below"
-                alignment="start"
+              // Day, Week, Month as small tabs (Will, 7 October, D-355): the
+              // title is read out but not drawn — the tabs say what this is.
+              <SegmentedControl
+                label={t('schedule.view.label')}
+                value={view}
+                onChange={(next) => setView(next as View)}
+                size="sm"
+                xstyle={styles.tabs}
               >
-                <DropdownMenuRadioGroup label={t('schedule.view.label')} value={view} onChange={(next) => setView(next as View)}>
-                  <DropdownMenuRadioItem value="day" label={t('schedule.range.day')} xstyle={styles.rangeOption} />
-                  <DropdownMenuRadioItem value="week" label={t('schedule.range.week')} xstyle={styles.rangeOption} />
-                  <DropdownMenuRadioItem value="month" label={t('schedule.range.month')} xstyle={styles.rangeOption} />
-                </DropdownMenuRadioGroup>
-              </DropdownMenu>
+                <SegmentedControlItem value="day" label={t('schedule.tab.day')} />
+                <SegmentedControlItem value="week" label={t('schedule.tab.week')} />
+                <SegmentedControlItem value="month" label={t('schedule.tab.month')} />
+              </SegmentedControl>
             }
-            isAccessoryInline
+            isTitleHidden
+            isCentered
             actions={
               <>
-                {/* Search only where there is a week or a month to search (D-323). */}
-                {view === 'day' ? null : (
-                  <IconButton
-                    label={t('schedule.search.label')}
-                    variant="ghost"
-                    icon={
-                      <HStack>
-                        <ExploreIcon width={22} height={22} aria-hidden />
-                      </HStack>
-                    }
-                    onClick={() => setIsSearching(true)}
-                    xstyle={styles.round}
-                  />
-                )}
-                {actions}
+                {/* Search lives in the + menu now (D-358); past ten visits. */}
+                {typeof actions === 'function'
+                  ? actions(appointments.length > SEARCH_FROM ? () => setIsSearching(true) : null)
+                  : actions}
               </>
             }
           />
@@ -535,7 +775,7 @@ export function ScheduleView({
               <EmptyState
                 headingLevel={2}
                 xstyle={styles.state}
-                icon={<NoResultsIcon {...stylex.props(styles.stateIcon)} aria-hidden />}
+                icon={<NoResultsIcon {...stylex.props(emptyState.icon)} aria-hidden />}
                 title={t('schedule.search.none')}
                 description={t('schedule.search.empty.body')}
                 actions={<Button label={t('explore.search.clear')} variant="primary" onClick={() => setQuery('')} />}
@@ -543,132 +783,7 @@ export function ScheduleView({
             )}
           </VStack>
         ) : (
-          <>
-            <VStack gap={3}>
-              {/* The range is picked beside the title (D-320); one header for
-                  Day, Week and Month alike (Will, 2 October). */}
-              <HStack gap={2} align="center" wrap="nowrap" xstyle={styles.nav}>
-                <IconButton
-                  label={t(`schedule.prev.${view}`)}
-                  variant="ghost"
-                  onClick={() => step(-1)}
-                  icon={<Icon icon="chevronLeft" size="md" />}
-                  xstyle={styles.navButton}
-                />
-                {/*
-                  The date, and under it how many are coming in, small (Will,
-                  3 October, D-236). The second line keeps its height in every
-                  view, so the date and the arrows never move when Day, Week
-                  and Month change places.
-                */}
-                {/* The date alone (D-323): each day's heading already counts who is coming. */}
-                <VStack gap={0} align="center" xstyle={styles.navMiddle}>
-                  <Text xstyle={styles.navLabel} aria-live="polite">
-                    {navLabel}
-                  </Text>
-                </VStack>
-                <IconButton
-                  label={t(`schedule.next.${view}`)}
-                  variant="ghost"
-                  onClick={() => step(1)}
-                  icon={<Icon icon="chevronRight" size="md" />}
-                  xstyle={styles.navButton}
-                />
-              </HStack>
-            </VStack>
-
-            {view === 'day' ? (
-              dayList.length > 0 ? (
-                <List aria-label={navLabel}>{dayList.map((a) => row(a))}</List>
-              ) : (
-                <EmptyState
-                  headingLevel={2}
-                  xstyle={styles.state}
-                  icon={<TripsIcon {...stylex.props(styles.stateIcon)} aria-hidden />}
-                  title={t('schedule.none.title')}
-                  description={t('schedule.none.body')}
-                  {...(sameDay(anchor, today)
-                    ? {}
-                    : {
-                        actions: (
-                          <Button
-                            label={t('schedule.today')}
-                            variant="secondary"
-                            onClick={() => setAnchor(startOfDay(today))}
-                          />
-                        ),
-                      })}
-                />
-              )
-            ) : null}
-
-            {view === 'week' ? (
-              <VStack gap={4}>
-                {Array.from({ length: 7 }, (_, i) => addDays(weekFrom, i)).map((d) => {
-                  const list = onDay(d);
-                  return (
-                    <VStack key={iso(d)} gap={1}>
-                      <HStack gap={2} align="center" justify="between">
-                        <Heading level={2} xstyle={styles.dayHeading}>
-                          {sameDay(d, today) ? `${t('schedule.today')} · ${fmt.day.format(d)}` : fmt.day.format(d)}
-                        </Heading>
-                        <Text type="supporting" xstyle={styles.quiet}>
-                          {list.length > 0 ? t('schedule.count', { count: list.length }) : t('schedule.week.none')}
-                        </Text>
-                      </HStack>
-                      {list.length > 0 ? <List aria-label={fmt.day.format(d)}>{list.map((a) => row(a))}</List> : null}
-                    </VStack>
-                  );
-                })}
-              </VStack>
-            ) : null}
-
-            {view === 'month' ? (
-              // More room between the calendar and the list under it (D-244).
-              <VStack gap={8}>
-                <MonthGrid
-                  month={anchor}
-                  today={today}
-                  selected={anchor}
-                  countOn={(d) => onDay(d).length}
-                  weekdayLabel={(d) => fmt.weekdayNarrow.format(d)}
-                  dayLabel={(d, count) =>
-                    count > 0 ? `${fmt.dayLong.format(d)}, ${t('schedule.count', { count })}` : fmt.dayLong.format(d)
-                  }
-                  onPick={(d) => {
-                    setAnchor(d);
-                    setView('day');
-                  }}
-                />
-                <VStack gap={1}>
-                  <Heading level={2} xstyle={styles.dayHeading}>
-                    {t('schedule.month.days')}
-                  </Heading>
-                  <List aria-label={t('schedule.month.days')} density="compact">
-                    {monthDays.map(({ date, count }) => (
-                      <ListItem
-                        key={iso(date)}
-                        label={<Text xstyle={styles.label}>{fmt.day.format(date)}</Text>}
-                        onClick={() => {
-                          setAnchor(date);
-                          setView('day');
-                        }}
-                        endContent={
-                          <HStack gap={2} align="center" wrap="nowrap">
-                            <Text type="supporting" xstyle={styles.quiet}>
-                              {t('schedule.count', { count })}
-                            </Text>
-                            <Icon icon="chevronRight" size="md" />
-                          </HStack>
-                        }
-                        xstyle={styles.monthRow}
-                      />
-                    ))}
-                  </List>
-                </VStack>
-              </VStack>
-            ) : null}
-          </>
+          folded
         )}
 
         {note ? (
@@ -676,6 +791,7 @@ export function ScheduleView({
             {note}
           </Text>
         ) : null}
+        {below}
       </Page>
       {/* Outside the page: its motion wrapper would pin a fixed child to itself. */}
       {floating}

@@ -3,14 +3,16 @@
 import { useEffect, useId, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import * as stylex from '@stylexjs/stylex';
+import { HStack } from '@astryxdesign/core/HStack';
 import { VStack } from '@astryxdesign/core/VStack';
 import { Card } from '@astryxdesign/core/Card';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { CheckboxInput } from '@astryxdesign/core/CheckboxInput';
 import { RadioList, RadioListItem } from '@astryxdesign/core/RadioList';
+import { Button } from '@astryxdesign/core/Button';
 import { colorVars, spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
-import { BigButton, Loading, Notice, Page, PointsBadge, StarIcon, TextField, TextLink, TripsIcon } from '@pam/ui';
+import { BellIcon, BigButton, Loading, Notice, Page, PointsBadge, StarIcon, TextField, TextLink, TripsIcon } from '@pam/ui';
 import { SubPageHeader } from '@pam/ui/SubPage';
 import { TRANSPARENCY_SCREEN, badgeForPoints, type Locale } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
@@ -20,9 +22,7 @@ import { readAddedTrips, withMoves } from '@/lib/addedTrips';
 import { DUMMY_TRIPS } from '@pam/config/dummy-trips';
 import { Confetti } from '@pam/ui/SuccessScreen';
 import { useSupportPhone } from '@/lib/useSupportPhone';
-import { usePhoneSignIn } from '@/lib/usePhoneSignIn';
-import { usePreviewSignIn } from '@/lib/usePreviewSignIn';
-import { useSession } from '@/lib/useSession';
+import { signOut, useSession } from '@/lib/useSession';
 import { usePoints } from '@/lib/usePoints';
 import { setReminderConsent } from '@/lib/useReminderConsent';
 import {
@@ -33,12 +33,10 @@ import {
   submitDetails,
   type InviteProblem,
   type JoinKind,
-  type ProgramDetails,
 } from '@/lib/useJoin';
 import { NOTICES } from '@pam/config';
-import { PhoneSignInCard } from '../signin/PhoneSignInCard';
-import { LegalFooter } from '../signin/LegalFooter';
-import { ProgramWizard } from './ProgramWizard';
+import { markFreshAccount } from '@/lib/programSetup';
+import { SetupArt, type SetupArtKind } from '@pam/ui/SetupArt';
 
 /**
  * Signing up: five steps, and four of them are one question each.
@@ -77,39 +75,43 @@ import { ProgramWizard } from './ProgramWizard';
  * something true about this app in the first minute: things you do here count.
  */
 
-export type JoinPhase = 'phone' | 'details' | 'program' | 'waiting' | 'waitingDone' | 'privacy' | 'texts' | 'done';
+export type JoinPhase = 'details' | 'waiting' | 'waitingDone' | 'privacy' | 'texts' | 'done';
 type Phase = JoinPhase;
 
 /**
- * Which step a phase is, for the bar. 'program' and the shift it causes to
- * every step after it exist only for a program lead claiming the role
- * themselves (0056) — invited straight in by code, or claiming any other
- * role, never sees it, so those paths keep the numbers they always had.
+ * Which step a phase is, for the badge on its button (D-359). Sign in has
+ * already asked for the phone and the code, so About you is step 1: staff
+ * have two steps (About you, What to expect), a member three (and texts).
  */
 const STEP: Record<Phase, number> = {
-  phone: 1,
-  details: 2,
-  program: 3,
-  waiting: 2,
-  waitingDone: 2,
-  privacy: 3,
-  texts: 4,
-  done: 5,
+  details: 1,
+  waiting: 1,
+  waitingDone: 1,
+  privacy: 2,
+  texts: 3,
+  done: 3,
 };
 
-const EMPTY_PROGRAM: ProgramDetails = {
-  name: '',
-  category: 'education',
-  subcategory: '',
-  description: '',
-  address: '',
-  phone: '',
-  website: '',
-  services: [],
-};
+/** What to expect, for a program lead (D-354): one picture per line. */
+const PROVIDER_EXPECT: readonly SetupArtKind[] = ['calendar', 'message', 'policy', 'private'];
 
 const styles = stylex.create({
   card: { width: '100%' },
+  quietIntro: { fontSize: '16px', lineHeight: 1.5 },
+  // The bell in the brand green, its middle on the first line's middle.
+  bell: { flexShrink: 0, paddingBlockStart: '3px', color: colorVars['--color-icon-accent'] },
+  chipsLabel: { fontSize: '15px', lineHeight: 1.4, color: colorVars['--color-text-secondary'] },
+  // Plan a visit's chips (D-235): white with a grey edge; chosen, the
+  // secondary button's green (D-359).
+  chip: { minHeight: '48px', paddingInline: '18px', fontSize: '16px', borderRadius: '999px' },
+  chipOff: {
+    backgroundColor: colorVars['--color-background-body'],
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    borderColor: colorVars['--color-border'],
+  },
+  chipOn: { fontWeight: 600 },
+  expectArt: { flexShrink: 0, borderRadius: '14px', overflow: 'hidden' },
   intro: { fontSize: '18px', lineHeight: 1.5 },
   body: { fontSize: '17px', lineHeight: 1.5 },
   small: { fontSize: '15px', lineHeight: 1.5 },
@@ -164,13 +166,8 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
   const router = useRouter();
   const supportPhone = useSupportPhone();
   const { state: session } = useSession();
-  const live = usePhoneSignIn();
-  const stand = usePreviewSignIn(preview?.phone ? { step: 'code', phone: preview.phone } : undefined);
-  const flow = preview ? stand : live;
 
   const [phase, setPhase] = useState<Phase | null>(null);
-  const [phone, setPhone] = useState('');
-  const [code, setCode] = useState('');
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [city, setCity] = useState('');
@@ -211,9 +208,6 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState(false);
   const [invalid, setInvalid] = useState<'name' | 'city' | null>(null);
-  const [program, setProgram] = useState<ProgramDetails>(EMPTY_PROGRAM);
-  const [programStep, setProgramStep] = useState(0);
-  const [programInvalid, setProgramInvalid] = useState(false);
 
   const firstId = useId();
   const lastId = useId();
@@ -260,20 +254,17 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
       setKind(preview.kind);
       setFirstName(preview.firstName);
       setCity('Philadelphia');
-      setPhone(preview.phone ?? '(215) 555-0100');
-      setCode('123456');
       // Approved, as if invited: staff finish on "I understand" and go Home
       // rather than on the waiting-for-review notice.
       setHasAccount(true);
-      if (preview.kind === 'provider') {
-        setProgram({ ...EMPTY_PROGRAM, name: 'Example Learning Center', address: '123 Main St' });
-      }
-      // By a link, the phone was done at Sign in (D-254); or wherever the
-      // story asked to open (D-319).
-      setPhase(preview.startAt ?? (preview.invite ? 'details' : 'phone'));
+      // The phone was done at Sign in (D-254, D-359); or wherever the story
+      // asked to open (D-319).
+      setPhase(preview.startAt ?? 'details');
       return;
     }
-    if (session.status === 'signed-out') setPhase('phone');
+    // No verified phone yet: that is Sign in's job (D-359), and it comes
+    // back here once the code works. Any ?code= goes with it.
+    if (session.status === 'signed-out') router.replace(`/signin/${window.location.search}`);
     else if (session.status === 'no-profile') setPhase('details');
     else if (session.status === 'signed-in') {
       // Finished already: there is nothing here for them. Otherwise pick up at
@@ -290,10 +281,6 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
     }
   }, [session, phase, router, preview]);
 
-  /** Step 1 ends where step 2 begins: a verified phone with no profile yet. */
-  useEffect(() => {
-    if (flow.state.step === 'done' && phase === 'phone') setPhase('details');
-  }, [flow.state.step, phase]);
 
   // Which cities Pam is in — for the sentence somebody in the wrong one reads.
   useEffect(() => {
@@ -308,12 +295,9 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
   }, [phase]);
 
   const isStaff = kind !== 'member';
-  // A program lead claiming the role themselves gets one extra step to say
-  // what their program is (0056) — invited by code, they skip it entirely,
-  // since the role and its details would come from whoever invited them, not
-  // from a form.
-  const claimsProgramSelf = kind === 'provider' && inviteCode.trim() === '';
-  const total = kind === 'member' || claimsProgramSelf ? 5 : 4;
+  // A program is added from Home once the account exists (D-353), not asked
+  // for here: staff finish on What to expect, step 2 of 2 (D-359).
+  const total = kind === 'member' ? 3 : 2;
 
   const submit = async () => {
     if (firstName.trim() === '') {
@@ -328,7 +312,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
 
     // The preview moves on as if the database had said yes (D-249).
     if (preview) {
-      setPhase(claimsProgramSelf ? 'program' : 'privacy');
+      setPhase('privacy');
       return;
     }
 
@@ -351,12 +335,6 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
       return;
     }
 
-    // A program lead answers one more question before anything is recorded.
-    if (claimsProgramSelf) {
-      setPhase('program');
-      return;
-    }
-
     setBusy(true);
     setFailed(false);
     const outcome = await submitDetails({
@@ -376,48 +354,23 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
     }
   };
 
-  const submitProgram = async () => {
-    if (program.name.trim() === '') {
-      setProgramInvalid(true);
-      return;
-    }
-    setProgramInvalid(false);
-    if (preview) {
-      setPhase('privacy');
-      return;
-    }
-    setBusy(true);
-    setFailed(false);
-    const outcome = await submitDetails({
-      firstName,
-      lastName,
-      city,
-      kind,
-      language: locale,
-      program,
-    });
-    setBusy(false);
-
-    if (outcome.result === 'failed') setFailed(true);
-    else if (outcome.result === 'city-not-served') setPhase('waiting');
-    else setPhase('privacy');
-  };
-
   /** Staff with an account: nothing to ask about texts, so this is the end. */
   const finishStaff = async () => {
-    if (preview) {
-      setPhase('done');
-      return;
+    if (!preview) {
+      if (!userId) return;
+      setBusy(true);
+      const finished = await finishSetup(userId, false);
+      setBusy(false);
+      if (!finished) {
+        setFailed(true);
+        return;
+      }
     }
-    if (!userId) return;
-    setBusy(true);
-    const finished = await finishSetup(userId, false);
-    setBusy(false);
-    if (!finished) {
-      setFailed(true);
-      return;
-    }
-    setPhase('done');
+    // Straight Home (D-353): a last screen whose only words were "go Home"
+    // was a tap that did nothing. Home opens on getting started (D-352).
+    markFreshAccount();
+    if (preview) navigate('/');
+    else router.replace('/');
   };
 
   const answerTexts = async (wants: boolean) => {
@@ -453,20 +406,9 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
     );
   }
 
-  // 'program' shifts every step after it by one, only on the one path that
-  // ever shows it — everyone else keeps the numbers STEP already has.
-  const step =
-    phase === 'done'
-      ? kind === 'member'
-        ? 5
-        : claimsProgramSelf
-          ? 5
-          : 4
-      : phase === 'privacy' && claimsProgramSelf
-        ? 4
-        : STEP[phase];
-
-  const onCode = flow.state.step === 'code' || flow.state.step === 'verifying';
+  // Staff never reach 'done' (D-353): theirs ends on step 2 of 2.
+  const step = STEP[phase];
+  const progress = t('join.progress', { current: step, total });
   // The booked visit itself, from the example trips or the ones a program
   // added this session (D-322); null when the link carried none.
   const booked = bookedTrip
@@ -474,54 +416,94 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
     : null;
   const bookedDay = new Intl.DateTimeFormat(locale, { weekday: 'long', month: 'long', day: 'numeric' });
   const bookedTime = new Intl.DateTimeFormat(locale, { hour: 'numeric', minute: '2-digit' });
-  const toPhone = () => {
-    flow.startOver();
-    setPhase('phone');
+  // Back from About you is back to Sign in: signed out first, or Sign in
+  // would send a verified phone straight back here.
+  const toSignIn = () => {
+    if (preview) {
+      navigate('/prototype/signin/');
+      return;
+    }
+    void signOut().then(() => router.replace('/signin/'));
   };
   const back: { readonly backLabel: string; readonly backHref?: string; readonly onBack?: () => void } =
-    phase === 'phone'
-      ? {
-          backLabel: t('nav.back.signInScreen'),
-          // In the prototype, to the stand-in Sign in (D-253).
-          ...(preview ? { onBack: () => navigate('/prototype/signin/') } : { backHref: '/signin/' }),
-        }
-      : phase === 'details'
-        ? { backLabel: t('nav.back.signin'), onBack: toPhone }
-        : phase === 'program'
-          ? {
-              backLabel: t('trips.new.back'),
-              onBack: () => (programStep > 0 ? setProgramStep(programStep - 1) : setPhase('details')),
-            }
-          : phase === 'waiting'
-            ? { backLabel: t('trips.new.back'), onBack: () => setPhase('details') }
+    phase === 'details'
+        ? { backLabel: t('nav.back.signInScreen'), onBack: toSignIn }
+        : phase === 'waiting'
+          ? { backLabel: t('trips.new.back'), onBack: () => setPhase('details') }
           : phase === 'texts'
             ? { backLabel: t('trips.new.back'), onBack: () => setPhase('privacy') }
             : { backLabel: t('trips.new.back') };
 
+  /*
+   * Each step's button, pinned to the foot of the screen (Will, 7 October,
+   * D-359): past the phone step a person is filling in a form, not choosing
+   * how to arrive, so the legal links go and the next step stays in reach.
+   */
+  const footer =
+    phase === 'details' ? (
+      <BigButton
+        label={busy ? t('join.saving') : t('action.next')}
+        badge={progress}
+        onPress={() => void submit()}
+        isDisabled={busy}
+      />
+    ) : phase === 'waiting' ? (
+      <VStack gap={1} align="center">
+        <BigButton
+          label={busy ? t('join.saving') : t('join.waiting.action')}
+          onPress={() => void leaveName()}
+          isDisabled={busy}
+        />
+        <TextLink label={t('join.waiting.skip')} href="/" />
+      </VStack>
+    ) : phase === 'privacy' && !isStaff ? (
+      <BigButton label={t(TRANSPARENCY_SCREEN.confirmKey)} badge={progress} onPress={() => setPhase('texts')} />
+    ) : phase === 'privacy' && isStaff ? (
+      hasAccount ? (
+        // Came in by code: the account exists, and this is the last step.
+        <BigButton
+          label={busy ? t('join.saving') : t(TRANSPARENCY_SCREEN.confirmKey)}
+          badge={progress}
+          onPress={() => void finishStaff()}
+          isDisabled={busy}
+        />
+      ) : (
+        <BigButton label={t('action.done')} href="/" />
+      )
+    ) : phase === 'texts' ? (
+      // Either button is an answer, and the agreement is the button's own
+      // words — nothing here is pre-selected, because there is nothing to select.
+      <VStack gap={1} align="center">
+        <BigButton
+          label={busy ? t('join.saving') : t('reminders.optIn')}
+          badge={progress}
+          onPress={() => void answerTexts(true)}
+          isDisabled={busy}
+        />
+        <TextLink label={t('reminders.skip')} onClick={() => void answerTexts(false)} />
+      </VStack>
+    ) : null;
+
   return (
     <>
-      <Page gap={4}>
+      <Page gap={4} {...(footer ? { footer } : {})}>
         {/*
           The nested-page template with the step said under the title, as in
           Plan a trip (Will, 3 October, D-251) — no progress bar. Back goes one
           step back while there is one: from the phone or the code, to Sign in;
-          from About you, to the phone; from a program's details or the
-          waiting list, to About you; from Text messages, to the screen before.
+          from About you, to the phone; from the waiting list, to About you; from Text messages, to the screen before.
           Once the account exists (What others can see, and the end) there is
           nothing to go back to, so there is no back: the way out is the step.
         */}
         <SubPageHeader
           title={
-            phase === 'phone' && onCode
-              ? t('signin.code.title')
-              : // The privacy step is three different screens, so it is three
+            // The privacy step is three different screens, so it is three
                 // different titles: what a member is promised is not what a case
                 // manager is told they will see.
                 phase === 'privacy'
                 ? t(`join.privacy.title.${kind}`)
                 : t(`join.${phase}.title`)
           }
-          subtitle={t('join.step', { current: step, total })}
           {...back}
         />
 
@@ -533,31 +515,6 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
             supportPhone={supportPhone}
             callLabel={t('help.callSupport')}
           />
-        ) : null}
-
-        {phase === 'phone' ? (
-          <>
-            {flow.state.step === 'failed' ? (
-              <Notice
-                notice="something_went_wrong"
-                title={t(`signin.failed.${flow.state.reason}.title`)}
-                body={
-                  flow.state.phone === null ? t('signin.phone.invalid') : t(`signin.failed.${flow.state.reason}.body`)
-                }
-                supportPhone={supportPhone}
-                callLabel={t('help.callSupport')}
-              />
-            ) : null}
-            <PhoneSignInCard
-              flow={flow}
-              phone={phone}
-              onPhoneChange={setPhone}
-              code={code}
-              onCodeChange={setCode}
-              headingLevel={2}
-              codeAction={t('action.next')}
-            />
-          </>
         ) : null}
 
         {phase === 'details' ? (
@@ -609,15 +566,23 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
                 already send this locale as `language` — that part was here
                 before this control was; only the way to change it is new.
               */}
-              <RadioList
-                label={t('onboarding.language.title')}
-                value={locale}
-                onChange={(next) => setLocale(next as Locale)}
-                xstyle={styles.choices}
-              >
-                <RadioListItem value="en" label={t('language.en')} />
-                <RadioListItem value="es" label={t('language.es')} />
-              </RadioList>
+              {/* Chips, as Plan a visit's days and times (D-359); the chosen one
+                  in the secondary green. English unless already switched. */}
+              <VStack gap={2}>
+                <Text xstyle={styles.chipsLabel}>{t('onboarding.language.title')}</Text>
+                <HStack gap={2} wrap="wrap" role="group" aria-label={t('onboarding.language.title')}>
+                  {(['en', 'es'] as const).map((code) => (
+                    <Button
+                      key={code}
+                      label={t(`language.${code}`)}
+                      variant="secondary"
+                      aria-pressed={locale === code}
+                      onClick={() => setLocale(code as Locale)}
+                      xstyle={[styles.chip, locale === code ? styles.chipOn : styles.chipOff]}
+                    />
+                  ))}
+                </HStack>
+              </VStack>
 
               {invitedAs ? null : (
                 <>
@@ -670,26 +635,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
                 </RadioList>
               ) : null}
 
-              <BigButton
-                label={busy ? t('join.saving') : t('action.next')}
-                onPress={() => void submit()}
-                isDisabled={busy}
-              />
             </VStack>
-          </Card>
-        ) : null}
-
-        {phase === 'program' ? (
-          <Card padding={4} xstyle={styles.card}>
-            {/* One question a screen (D-347); Back steps back through them. */}
-            <ProgramWizard
-              value={program}
-              onChange={setProgram}
-              onSubmit={() => void submitProgram()}
-              busy={busy}
-              step={programStep}
-              onStep={setProgramStep}
-            />
           </Card>
         ) : null}
 
@@ -715,12 +661,6 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
               <Text type="supporting" xstyle={styles.small}>
                 {t('reminders.how')}
               </Text>
-              <BigButton
-                label={busy ? t('join.saving') : t('join.waiting.action')}
-                onPress={() => void leaveName()}
-                isDisabled={busy}
-              />
-              <TextLink label={t('join.waiting.skip')} href="/" />
             </VStack>
           </Card>
         ) : null}
@@ -771,8 +711,6 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
               <Text type="supporting" xstyle={styles.small}>
                 {t(TRANSPARENCY_SCREEN.footerKey)}
               </Text>
-
-              <BigButton label={t(TRANSPARENCY_SCREEN.confirmKey)} onPress={() => setPhase('texts')} />
             </VStack>
           </Card>
         ) : null}
@@ -782,21 +720,29 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
             <Card padding={4} xstyle={styles.card}>
               <VStack gap={3}>
                 <Text xstyle={styles.intro}>{t(`join.privacy.${kind}.intro`)}</Text>
-                {[1, 2, 3, 4].map((n) => (
-                  <Text key={n} xstyle={styles.item}>
-                    {t(`join.privacy.${kind}.${n}`)}
-                  </Text>
-                ))}
+                {kind === 'provider' ? (
+                  // Four things to scan, each with a small picture (Will,
+                  // 7 October, D-354): how Pam works for a program now.
+                  <VStack gap={4} role="list">
+                    {PROVIDER_EXPECT.map((art, i) => (
+                      <HStack key={art} gap={3} align="center" wrap="nowrap" role="listitem">
+                        <HStack xstyle={styles.expectArt}>
+                          <SetupArt kind={art} size={48} />
+                        </HStack>
+                        <Text xstyle={styles.item}>{t(`join.privacy.provider.${i + 1}`)}</Text>
+                      </HStack>
+                    ))}
+                  </VStack>
+                ) : (
+                  [1, 2, 3, 4].map((n) => (
+                    <Text key={n} xstyle={styles.item}>
+                      {t(`join.privacy.${kind}.${n}`)}
+                    </Text>
+                  ))
+                )}
               </VStack>
             </Card>
-            {hasAccount ? (
-              // Came in by code: the account exists, and this is the last step.
-              <BigButton
-                label={busy ? t('join.saving') : t(TRANSPARENCY_SCREEN.confirmKey)}
-                onPress={() => void finishStaff()}
-                isDisabled={busy}
-              />
-            ) : (
+            {hasAccount ? null : (
               <>
                 {/*
                   Nothing was created, and saying so is the whole screen. Somebody
@@ -810,7 +756,6 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
                   supportPhone={supportPhone}
                   callLabel={t('help.callSupport')}
                 />
-                <BigButton label={t('action.done')} href="/" />
               </>
             )}
           </>
@@ -819,38 +764,29 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
         {phase === 'texts' ? (
           <Card padding={4} xstyle={styles.card}>
             <VStack gap={3}>
-              <Text xstyle={styles.intro}>{t('reminders.intro')}</Text>
-              <VStack gap={2}>
+              {/* Easier to scan (Will, 7 October, D-359): a quieter intro, and
+                  what Pam would send as three bell bullets, evenly spaced. */}
+              <Text type="supporting" xstyle={styles.quietIntro}>
+                {t('reminders.intro')}
+              </Text>
+              <VStack gap={3}>
                 <Heading level={2} xstyle={styles.heading}>
                   {t('reminders.what')}
                 </Heading>
-                <Text xstyle={styles.item}>{t('reminders.what.1')}</Text>
-                <Text xstyle={styles.item}>{t('reminders.what.2')}</Text>
-                <Text xstyle={styles.item}>{t('reminders.what.3')}</Text>
+                <VStack gap={3} role="list">
+                  {[1, 2, 3].map((n) => (
+                    <HStack key={n} gap={3} align="start" wrap="nowrap" role="listitem">
+                      <HStack xstyle={styles.bell}>
+                        <BellIcon width={20} height={20} aria-hidden />
+                      </HStack>
+                      <Text xstyle={styles.item}>{t(`reminders.what.${n}`)}</Text>
+                    </HStack>
+                  ))}
+                </VStack>
               </VStack>
               <Text type="supporting" xstyle={styles.small}>
                 {t('reminders.how')}
               </Text>
-              {/*
-                Either button is an answer, and the agreement is the button's own
-                words — nothing here is pre-selected, because there is nothing to
-                select.
-              */}
-              <BigButton
-                label={busy ? t('join.saving') : t('reminders.optIn')}
-                onPress={() => void answerTexts(true)}
-                isDisabled={busy}
-              />
-              <TextLink label={t('reminders.skip')} onClick={() => void answerTexts(false)} />
-            </VStack>
-          </Card>
-        ) : null}
-
-        {phase === 'done' && isStaff ? (
-          <Card padding={4} xstyle={styles.card}>
-            <VStack gap={3} xstyle={styles.celebrate}>
-              <Text xstyle={styles.body}>{t('join.done.staff', { name: firstName.trim() || t('app.name') })}</Text>
-              <BigButton label={t('join.done.action')} onPress={() => (preview ? navigate('/') : router.replace('/'))} />
             </VStack>
           </Card>
         ) : null}
@@ -905,7 +841,6 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
         ) : null}
 
       </Page>
-      <LegalFooter from="join" />
     </>
   );
 }

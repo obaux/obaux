@@ -47,7 +47,11 @@
     "./fonts.css": "./src/styles/fonts.css",
     "./tokens.css": "./src/styles/tokens.css",
     "./dist/*": "./dist/*",
-    "./styles.css": "./dist/styles.css"
+    "./styles.css": "./dist/styles.css",
+    "./SetupCard": "./src/SetupCard.tsx",
+    "./SetupArt": "./src/SetupArt.tsx",
+    "./DashedRule": "./src/DashedRule.tsx",
+    "./emptyState": "./src/emptyState.ts"
   },
   "scripts": {
     "typecheck": "tsc -p tsconfig.json",

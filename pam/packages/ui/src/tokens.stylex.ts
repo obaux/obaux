@@ -55,4 +55,13 @@ export const pam = stylex.defineVars({
    * Keep the two the same.
    */
   '--pam-secondary-fill': 'light-dark(#E7EFE6, #24261A)',
+  // The dashed rule (Will, 7 October, D-356): 2px pill-capped dashes, black
+  // at 5%. In dark mode the same strength in white, or it would vanish.
+  // A badge sitting on a primary button (D-357): the button's green, darker,
+  // by laying black over it — so it follows the theme's green in both modes.
+  '--pam-on-accent-deep': 'rgba(0, 0, 0, 0.28)',
+  // Empty-state icons (Will, 7 October, D-362): a light green line drawing,
+  // the same on every empty screen.
+  '--pam-empty-icon': 'light-dark(#8FBFA6, #5F8F78)',
+  '--pam-rule-dashed': 'light-dark(rgba(0, 0, 0, 0.05), rgba(255, 255, 255, 0.08))',
 });

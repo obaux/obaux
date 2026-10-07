@@ -43,3 +43,5 @@ export const Default: Story = {};
 export const TwoNew: Story = { args: { unreadCount: 2 } };
 export const ManyNew: Story = { args: { unreadCount: 128 } };
 export const Spanish: Story = { args: { unreadCount: 2 }, globals: { locale: 'es' } };
+/** The round bell in the header (D-210): drawn in line, like search beside it (D-362). */
+export const Round: Story = { args: { unreadCount: 0, appearance: 'round' } };

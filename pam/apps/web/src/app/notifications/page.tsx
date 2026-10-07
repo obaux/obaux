@@ -2,10 +2,12 @@
 
 import { useEffect, type ReactNode } from 'react';
 import { VStack } from '@astryxdesign/core/VStack';
+import { EmptyState } from '@astryxdesign/core/EmptyState';
 import { Text } from '@astryxdesign/core/Text';
 import * as stylex from '@stylexjs/stylex';
 import {
   BellIcon,
+  BellOutlineIcon,
   BookmarkIcon,
   FlagIcon,
   Loading,
@@ -18,7 +20,9 @@ import {
   StarIcon,
 } from '@pam/ui';
 import { SubPageHeader } from '@pam/ui/SubPage';
+import { emptyState } from '@pam/ui/emptyState';
 import { USE_DUMMY_PEOPLE } from '@pam/config/dummy-flag';
+import { isFreshAccount } from '@/lib/programSetup';
 import { DUMMY_NOTIFICATIONS } from '@pam/config/dummy-notifications';
 import { useI18n } from '@/lib/i18n';
 import { NotIn } from '../NotIn';
@@ -58,6 +62,8 @@ import { whenHappened } from '@/lib/when';
 
 const styles = stylex.create({
   note: { fontSize: '15px', lineHeight: 1.5 },
+  // As Messages' empty state (MessagesView).
+  state: { paddingBlock: '48px' },
 });
 
 /**
@@ -130,6 +136,8 @@ export default function NotificationsPage() {
 
   const showDummy =
     USE_DUMMY_PEOPLE &&
+    // Nothing yet for an account that has just signed up (D-361).
+    !isFreshAccount() &&
     state.status === 'ready' &&
     (state.items.length === 0 || isDemo) &&
     Boolean(viewedRole);
@@ -184,7 +192,19 @@ export default function NotificationsPage() {
           />
         ) : null}
 
-        {state.status === 'ready' && !showDummy ? (
+        {/* Nothing yet: the same empty state as Messages (Will, 7 October,
+            D-361) — a picture, a title, one line — not a bare sentence. */}
+        {state.status === 'ready' && !showDummy && state.items.length === 0 ? (
+          <EmptyState
+            headingLevel={2}
+            xstyle={styles.state}
+            icon={<BellOutlineIcon {...stylex.props(emptyState.icon)} aria-hidden />}
+            title={t('notify.empty.title')}
+            description={t('notify.empty.body')}
+          />
+        ) : null}
+
+        {state.status === 'ready' && !showDummy && state.items.length > 0 ? (
           <NotificationList
             items={state.items.map((item) => ({
               id: item.id,

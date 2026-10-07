@@ -58,6 +58,7 @@ export { TextField, type TextFieldProps } from './TextField.js';
 export { CodeBoxes, type CodeBoxesProps } from './CodeBoxes.js';
 export {
   BellIcon,
+  BellOutlineIcon,
   BookmarkIcon,
   EditIcon,
   FlagIcon,
@@ -116,3 +117,6 @@ export { pam } from './tokens.stylex.js';
 export { sheet } from './sheet.js';
 export { PolicyUploadCard, type PolicyUploadCardProps } from './PolicyUploadCard.js';
 export { canShareSheet, shareText } from './share.js';
+export { SetupCard, type SetupCardProps } from './SetupCard.js';
+export { SetupArt, type SetupArtKind, type SetupArtProps } from './SetupArt.js';
+export { DashedRule } from './DashedRule.js';

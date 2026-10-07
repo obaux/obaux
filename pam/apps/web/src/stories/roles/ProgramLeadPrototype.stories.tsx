@@ -18,3 +18,15 @@ export default meta;
  * Creating the account is its own story, under Onboarding.
  */
 export const Prototype: StoryObj = screen('provider', 'Prototype', '/prototype/signin/', { invite: 'PAM-7Q4K', as: 'program' });
+
+/**
+ * A new program lead, start to finish (D-361): the invite link's Sign in,
+ * the code, About you, What to expect, then Home as a brand-new account —
+ * Get started, an empty bell, no messages, and the Program tab opening
+ * Add a program. The Prototype above is a program already in use.
+ */
+export const NewProgramLead: StoryObj = screen('provider', 'New program lead — sign up to Get started', '/prototype/signin/', {
+  invite: 'PAM-7Q4K',
+  as: 'program',
+  next: 'join',
+});

@@ -8604,6 +8604,289 @@ in-app WebView, which has no `navigator.share`, on copy only).
 - Earlier notes that name the Capacitor build or Android WebView as a QA
   target (D-333 onwards) now read as "if the app is ever built".
 
+### D-352 — A program lead's Home is modular: getting started, then the calendar
+
+**Date:** 2026-10-07. Will: "We need an empty state that's more appealing to
+new program sign ups … the calendar is only one aspect of the app", then:
+"#3, this preview should open in a nested page", "if appointments are booked
+and user has not yet completed some things on the get started list, move
+those below calendar view … minimized … users can expand", "Actions under
+cards, no need for another Add a program", and "Empty states is what shows on
+sign up journey flow. Not on main prototypes."
+
+- **Nobody booked yet → Get started.** Three cards on the place card's frame
+  (`SetupCard`, new pictures in `SetupArt`): Add your program
+  (`/programs/new/?from=home`), Add your photo (Profile, where the camera
+  button is), See who is coming in (a nested page, `/home/calendar/`, the
+  example week with an explanation; Back is Home). Under them, "You can also":
+  Book a visit for a member and Invite someone as plain rows, the booked
+  screen's rows (D-338). No Add a program row — it has its card. No search,
+  no + on this Home: nothing to search, and the rows are the +.
+- **Somebody booked → the calendar**, with the + back (it belongs where the
+  calendar is). "Coming in" centred, the range under it in bolder, smaller
+  type with a 3px line (`LargeTitleHeader isCentered`). Search only past
+  **ten visits** (`SEARCH_FROM`), still not on a single day (D-323).
+- **Booked, but cards left → folded.** The calendar opens at 300px, fading
+  out, with "See the whole calendar"; unfolding grows it smoothly (max-height
+  transition, none with reduced motion). Folded, the week lists only its days
+  with people, so what is above the fold is visits, not "Nobody booked". The
+  remaining cards sit under it, "Finish setting up". A done card goes.
+- **Month's days, compact:** two rows scrolling sideways (a third column
+  peeks), each a tile with the date and the count, instead of a list of rows.
+  Everywhere, for consistency, not only folded.
+- **Fresh or example.** Stories and demo accounts show the example program
+  and bookings, as before, so the main prototype looks like a program in use.
+  An account that has just finished sign-up is marked fresh
+  (`markFreshAccount`, sessionStorage), and a fresh account sees no example
+  data — so the sign-up journey lands on Get started. Steps done this visit
+  are remembered the same way (`markSetupDone` from Add a program and the
+  photo upload), so the cards go in the prototype too. A real profile photo
+  also counts. Program: there is no "my program" query yet (D-218's
+  follow-up), so for a real account the program card goes when one is sent.
+- The old "Example people" footnote under the calendar is gone; the preview
+  page says it instead.
+- **Program tab with no program — mockup only.** Will asked to see the faded
+  preview before it is built: `ProgramEmptyView`, in Storybook under
+  "Program lead/States/Program — no program yet (mockup)". Not wired; the
+  Program tab still draws the example.
+- **Proven by:** typecheck (web, ui); unit tests (web 16, ui 74, config 238
+  incl. en/es parity); web build; Storybook build; the sign-up journey walked
+  in a browser (code → About you → What to expect, step 3 of 3 → I understand
+  → Get started), each card's tap and Back, the folded calendar unfolding;
+  e2e 567/573, the 6 failures being two tests (admin "failed invite", places
+  "failed query") in three viewports, both passing alone — timing under the
+  full run, as `flag.spec` was (D-350).
+
+### D-353 — Staff sign-up ends on What to expect, and asks for no program
+
+**Date:** 2026-10-07. Will: "Simplify login" (no program at sign-up — "we now
+have an add program widget that helps them do this in the app"), and "there's
+a final step that simply asks them to click to view home page, that's
+redundant, might as well just transition them straight to homepage."
+
+- A program lead or case manager signs up in **three steps**: phone, About
+  you, What to expect. "I understand" saves and goes straight Home — the
+  "Welcome, … Your screen is ready / Start" card is gone (`join.done.staff`
+  removed). A member's sign-up is unchanged (texts, then the welcome with
+  their first points).
+- The program questions (D-347) are no longer part of sign-up: the
+  `ProgramWizard` lives on in Add a program, reached from Home's first card.
+  `request_staff_access` already took the program as optional (0056), so a
+  self-claimed lead's request simply carries none. No migration.
+- `join.program.title` removed with the phase; the prototype's step list
+  (`PrototypeJoin`) loses `program`.
+
+- **Same day, Will's tweaks after seeing it:** the card sentence 15 → 14px
+  (the place card's meta size); "See the whole calendar" is a text link, not
+  a filled button (it shows more of the screen, it does not act); the
+  month's day tiles have no tint, no box and no inset, flush under their
+  heading; the calendar's arrows pulled up 12px under the range.
+
+### D-354 — What to expect, for a program lead: four lines with pictures
+
+**Date:** 2026-10-07. Will: "What to expect page is not very coherent for
+someone joining Pam as a program … clean up copy, check against latest design
+changes for how the app works, and create 3-4 simple checklist items for easy
+scanning … add small illustrations for each for pops of color."
+
+- Intro "Here is how Pam works for your program.", then four lines, each with
+  a 48px picture from `SetupArt` (three new: `message`, `policy`, `private`):
+  1. calendar — members plan visits; you see who is coming on Home and check
+     them in (D-316, D-352);
+  2. message — people can message you; you see only what they choose to tell
+     you;
+  3. policy — members sign your program's policies in Pam before they visit
+     (D-261, D-336);
+  4. private — Pam never tells you why someone is looking for help.
+- Dropped: "When someone in your program saves a new place — not which one."
+  It read as a fragment, and is not something a lead acts on; what a lead
+  sees is still bounded by the same rules. The member-facing promise
+  (`transparency.ts`) is untouched. The case manager's version keeps its
+  wording for now.
+- The Sign up step pickers in the program-lead and case-manager stories now
+  list the three staff steps only (D-353).
+
+### D-355 — Program lead Home: Day / Week / Month tabs, no title
+
+**Date:** 2026-10-07. Will: "dropdown (scratch that), let's make small tabs
+38px touch target. Remove Coming in header … set weekly to default", then a
+list of finish notes on the month strip.
+
+- The range dropdown (D-320) is gone: an Astryx `SegmentedControl` (Day,
+  Week, Month), centred, Week first selected. "Coming in" is no longer drawn;
+  it stays the page's `<h1>` for screen readers (`LargeTitleHeader
+  isTitleHidden`) and still shows in the bar on scroll.
+- **38px, below the 48px floor — on Will's word.** The control is 38px tall
+  with 30px segments. The site-wide floor (globals.css, D-008) is lowered for
+  this one control only, by setting `--pam-touch-target-min` and
+  `--size-element-sm` on it; everything else keeps 48px. The a11y suite does
+  not reach a program lead's Home, so no test was loosened. Worth revisiting
+  in phone-browser QA.
+- Month's busy days: no hover fill, 6px radius, 15px / 500 date and 13px
+  count (softer than the section heading); columns 38% wide so the third
+  shows more; a dot per screenful under the strip, following the scroll.
+- `schedule.range.*` keys removed; `schedule.tab.*` added.
+
+### D-356 — A dashed rule in the design system
+
+**Date:** 2026-10-07. Will: "add a dashed separator line … style this line in
+the ds for use in future projects. Corner rounded pills dashed at 2px
+thickness black at 5% opacity. Don't apply it anywhere else a line is used,
+we'll use it moving forward", then "a bit tighter with rounded caps".
+
+- `@pam/ui/DashedRule` and token `--pam-rule-dashed` (black 5%; white 8% in
+  dark mode, where black would not show). Drawn as an SVG line with round
+  caps — a CSS dashed border has square ends. 6px dashes, 4px gaps.
+- Used only where Will asked: under the calendar preview's explanation (now
+  16px and fainter, with more room before the calendar), under the calendar's
+  date row (in place of the plain divider added for D-355), and above
+  "Days with people coming in", whose heading is now centred with more room
+  under it. Every existing solid divider is unchanged.
+- Story: Components/Layout/DashedRule.
+
+### D-357 — The step count rides in the Next button; Next sits at the foot
+
+**Date:** 2026-10-07. Will: "add these stepper counts inside the primary
+button as a badge on left corner (neatly tucked), with darker green
+background and white text … I want the next button to be stuck to footer",
+then "left padding matches top and bottom, no need for repeat 2 of 7 in main
+button label".
+
+- `BigButton badge`: a 32px pill 12px in from the left (12px top and bottom
+  in a 56px button), `--pam-on-accent-deep` (black 28% over the button's
+  green, so it follows the theme) with `--color-on-accent` text. The label
+  stays "Next"; the badge is plain text, read after it.
+- `ProgramWizard` splits into `useProgramWizard` → `{ body, actions }`; Add a
+  program puts `actions` in `SubPage footer`, so Next (and Skip for now) stay
+  at the bottom of the screen. "2 of 7" no longer sits above the question.
+
+### D-358 — Search moves into the + menu
+
+**Date:** 2026-10-07. Will: "move search action to the plus menu, clicking
+changes the top section to search bar expanded and ready to type."
+
+- The round search button is gone from the bar. Past ten visits
+  (`SEARCH_FROM`), the + menu ends with **Search**; choosing it swaps the bar
+  for the search field, focused (checked: the field has focus, typing
+  searches). `ScheduleView actions` may be a function handed `openSearch`.
+
+### D-359 — Sign-up starts at About you; buttons pinned, counted, no legal footer
+
+**Date:** 2026-10-07. Will: "Sign up from this point forward needs no footer.
+Pin button to bottom, and make the language selection selectable chips like
+we do for booking a visit, but use secondary color for selected, default set
+to english", "Use the step counter on left corner of button here also. and
+start steps at 1 from this screen forward … we already gather this info from
+sign in, so no need for this screen", "absolute position the step counter on
+button so it doesn't interfere with button label", and on Text messages:
+"Smaller subtitle text, fainter. Bullets with alert bell icons."
+
+- **No phone step in sign-up.** Sign in asks for the phone and the code and
+  sends a new number to `/join/` (it always did); `/join/` signed out now
+  sends you to `/signin/` (any `?code=` goes with it) instead of drawing the
+  same card again. Back from About you signs out and returns to Sign in, or
+  Sign in would send a verified phone straight back. `PhoneSignInCard` stays
+  Sign in's.
+- **Steps from 1:** About you 1, What to expect / What Pam shares 2, Texts 3
+  (members). Staff: 2 steps. The "Step x of y" subtitle is gone; the count is
+  the badge in the step's button (`BigButton badge`, D-357), e.g. "1 of 2".
+- **Buttons pinned** to the foot of each step (`Page footer`), with their
+  secondary link (Not now, Not right now) under them. The About Pam /
+  Privacy / Terms footer is gone from sign-up (it stays on Sign in).
+- **Language as chips**, Plan a visit's style: white with a grey edge,
+  chosen one in the secondary green, English unless already switched.
+- **Text messages:** the intro 16px and fainter; what Pam would send as three
+  bell bullets (`BellIcon`, brand green), evenly spaced.
+- **Badge inside the button, out of the flow:** drawn over the button it
+  covered part of the target (axe target-size failed); in the icon slot it
+  pushed the label off centre. Now absolutely placed inside, with equal 88px
+  padding both sides so the label stays centred and wraps on a narrow screen
+  rather than running under it. Accessible name "Next, 1 of 2".
+- **Tests:** `join.spec` and `account.spec` updated for the counts, the
+  redirect to Sign in, and Done for a staff claim. The join axe test now
+  scrolls to the end first: on a 320px screen the form scrolls beneath the
+  pinned button, and axe counts whatever is under it as crowding the target;
+  at the end of the page nothing is. Full e2e 573/573.
+
+### D-360 — Text alerts get an illustration
+
+**Date:** 2026-10-07. Will: "We need an illustration for text alerts, with bell."
+
+- `SetupArt kind="alerts"`: a yellow bell lit from the left, ringing lines, a
+  red dot for something new, on teal — the same kit as the other pictures.
+- Profile's text-alerts card (`PromoCard`) shows it at 72px, edge to edge in
+  its rounded box (`overflow: hidden` on the art box), for every role: staff's
+  "Get text alerts" and a member's reminders offer. The bell icon on a tint
+  (D-274) is replaced; a `PromoCard` given an icon still centres it on the tint.
+
+### D-361 — A brand-new program lead's app is empty, honestly; a journey for it
+
+**Date:** 2026-10-07. Will: "since no program has been added, clicking
+program on menu should just open the add program view. Also no
+notifications should appear (empty state), and messages empty state. We need
+a journey next to prototype for new user … from sign up to get started home
+and these screens", "on plus icon … invite someone to Pam, and New booking",
+and "That's not a good empty state for notifications, use something similar
+to empty state for messages".
+
+- **Program tab, no program yet:** the tab *is* Add a program
+  (`AddProgramView isTab`, decided once on entry so sending one shows its
+  "sent" screen): no Back, Next inside the card so the tab bar stays.
+- **Nothing that has not happened:** for a fresh account (`isFreshAccount`,
+  D-352) the example notifications and conversations are not shown — the
+  bell has no dot, Notifications and Messages show their empty states, and
+  the prototype's Messages tab loses its dot. In Storybook the pretend
+  database also answers a fresh account with no notifications and no
+  conversations; real data for a real account is never hidden.
+- **Notifications empty state** is now Messages' kind: picture, "No
+  notifications yet", one line ("When someone books a visit, writes to you or
+  needs you, it shows up here.") — not a bare sentence.
+- **+ menu and Home's rows:** "New booking" (was "Book a visit for a member")
+  and "Invite someone to Pam" (`home.invite`).
+- **Journey:** Program lead › Prototype › "New program lead — sign up to Get
+  started": the invite link's Sign in, code, About you, What to expect, then
+  Get started, the empty bell and Messages, and the Program tab as Add a
+  program. Also stories "Notifications — none yet" and "Messages — none yet".
+- Checked by walking the journey in a browser; e2e 573/573.
+
+### D-362 — One look for empty-state icons; the bell as a line
+
+**Date:** 2026-10-07. Will: "The empty state for notification bell is too
+black, make it light shade of green, and use this icon styling consistently
+across other empty states", "Use bell outline icon in button in black
+actually so it matches the search icon. On empty state also use outline
+icon", "the bell should be filled black when notification is on", and
+"Let's catch the light green icon on this state also" (the calendar's
+"Nobody is booked").
+
+- `@pam/ui/emptyState` (`emptyState.icon`: outline icon, 64px, token
+  `--pam-empty-icon`, a light green, a deeper one in dark mode) on every
+  `EmptyState` in the app — Notifications, Messages, the calendar's day and
+  search, Saved, Trips, Explore, the people lists, Connections, Add a
+  program's "sent". Sizes that were 56 and 72 are 64 now.
+- `BellOutlineIcon`. The header bell (`NotificationBell appearance="round"`):
+  the outline in the text colour when nothing is new, **filled** when
+  something is (with the pink dot), at search's 22px. The brief greyed bell
+  is gone (superseded the same hour). The old filled-button bell is unchanged.
+
+### D-363 — Messages, empty, says what will fill it; the Program mockup is kept, unused
+
+**Date:** 2026-10-07. Will: "Yes mock up an empty state for that also"
+(Messages said "Message someone on your list below" to somebody with no
+list), "I approve the program tab mockup", then — asked which wins — "Keep
+Add a program".
+
+- Messages' empty line is said for who is reading: a program lead "When a
+  member writes to you about your program, or you message someone who
+  booked, it shows up here."; a case manager "When someone you invited
+  writes to you, or you message them, it shows up here."; anyone else on
+  staff the general line. The empty state has a **New message** button
+  (secondary) wherever New message exists, so the one thing to do is on the
+  screen. `messages.empty.body.provider` / `.admin` added; `.staff` reworded.
+- The Program tab keeps opening Add a program for a lead with none (D-361).
+  The approved `ProgramEmptyView` stays a Storybook story, retitled "approved
+  mockup, unused", for when the tab needs a no-program state again.
+
 ---
 
 ## Notes for whoever picks this up next

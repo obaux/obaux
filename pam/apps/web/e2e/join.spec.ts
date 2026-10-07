@@ -124,8 +124,9 @@ test.describe('signing up', () => {
     await newcomer(page);
     await page.goto('/join/');
 
-    // D-251: the count is the step's subtitle, as in Plan a trip — no bar.
-    await expect(page.getByText('Step 2 of 5').first()).toBeVisible();
+    // D-359: the count rides in the button — Sign in did the phone, so About
+    // you is step 1 of a member's 3. Still no bar.
+    await expect(page.getByText('1 of 3', { exact: true })).toBeVisible();
     await expect(page.getByRole('progressbar')).toHaveCount(0);
   });
 
@@ -163,7 +164,7 @@ test.describe('signing up', () => {
 
     await page.getByRole('button', { name: 'I understand' }).click();
     await expect(page.getByRole('heading', { name: 'Text messages' })).toBeVisible();
-    await expect(page.getByText('Step 4 of 5').first()).toBeVisible();
+    await expect(page.getByText('3 of 3', { exact: true })).toBeVisible();
 
     await page.getByRole('button', { name: 'Yes, text me reminders' }).click();
 
@@ -193,8 +194,8 @@ test.describe('signing up', () => {
     expect(calls.staff[0]!['p_wants_role']).toBe('admin');
     expect(calls.start, 'a staff answer created a profile').toHaveLength(0);
 
-    // Four steps, not five: there is no account to attach text consent to.
-    await expect(page.getByText('Step 3 of 4').first()).toBeVisible();
+    // Nothing to attach text consent to, so no texts step: the way out is Done.
+    await expect(page.getByRole('link', { name: 'Done' })).toBeVisible();
   });
 
   test('invited by a link, nothing is asked that the link already said (D-254)', async ({ page }) => {
@@ -255,13 +256,13 @@ test.describe('signing up', () => {
     expect(calls.start, 'an empty name reached the database').toHaveLength(0);
   });
 
-  test('a signed-out visitor starts at the phone, with the consent sentence', async ({ page }) => {
-    // Step 1 is the same card as /signin/, including the sentence saying Pam
-    // will text a code — the STOP/rates language moved to /reminders/ (D-139).
+  test('a signed-out visitor is sent to Sign in for the phone, with the consent sentence', async ({ page }) => {
+    // The phone and the code are Sign in's (D-359), with the sentence saying
+    // Pam will text a code — the STOP/rates language is on /reminders/ (D-139).
     await page.route(USER, (route) => route.fulfill({ status: 401, body: '{}' }));
-    await page.goto('/join/');
+    await page.goto('/join/?code=PAM7Q4KX');
 
-    await expect(page.getByText('Step 1 of 5').first()).toBeVisible();
+    await expect(page).toHaveURL(/\/signin\/\?code=PAM7Q4KX/);
     await expect(page.getByLabel('Your phone number')).toBeVisible();
     await expect(page.getByText(/Pam texts you a code to sign in/)).toBeVisible();
   });
@@ -271,6 +272,10 @@ test.describe('signing up', () => {
     await page.goto('/join/');
     await expect(page.getByLabel('First name')).toBeVisible();
 
+    // Next is pinned to the foot (D-359), so on a 320px screen the form
+    // scrolls under it. At the end of the page nothing is beneath it — the
+    // page leaves room for the footer — which is where a person presses it.
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
     await settled(page);
 
     const results = await new AxeBuilder({ page })

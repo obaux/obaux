@@ -855,6 +855,63 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
+## Release 0.43.0-programs (7 October)
+
+A program lead's first day, D-352 to D-363. Home is Get started (program,
+photo, calendar preview cards; New booking and Invite someone to Pam rows)
+until somebody books, then the calendar: Day / Week / Month tabs (38px, below
+the floor on Will's word, D-355), Search in the +, folded while setup is
+unfinished, month days as a two-row strip with dots. Sign-up starts at About
+you (Sign in does the phone), two steps for staff and three for members, the
+count as a badge in each pinned button; What to expect for programs is four
+illustrated lines; Text messages has bell bullets. A fresh account sees no
+example notifications or messages and its Program tab is Add a program.
+Shared now in `@pam/ui`: `SetupCard`/`SetupArt`, `DashedRule`
+(`--pam-rule-dashed`), `BigButton badge`, `emptyState.icon`
+(`--pam-empty-icon`), `BellOutlineIcon`. Story: Program lead › Prototype ›
+New program lead. User-facing summary: the top of `CHANGELOG.md`.
+
+**Known:** "a program" is only known once one is sent from this device — the
+app has no "my program" query yet (D-218's follow-up, backlog).
+
+## Release 0.42.0-members (6–7 October)
+
+The member experience, revamped: booking ends on "Your trip is booked";
+policies, Bring a friend (copy, drawer, share sheet), category
+illustrations, staff photos, the program wizard, the policy upload card,
+super admin → program lead messages. D-327 to D-351, merged to main in
+#24, #25 and #26; the user-facing summary is the top of `CHANGELOG.md`.
+Trips' sign-before-you-go banner (D-327) and the member prototype's kept
+link (D-331) are part of it.
+
+## Backlog
+
+Open items Will asked to keep (7 October), newest first. Read this before
+"Next" below, which is older.
+
+- **Apply 0075 then 0076 to the live project** — 0068/0069 carried over and
+  reconciled with 0072 (D-346); DB suite green. Their `drop` statements need
+  a person's approval in the Supabase tool. Also on `docs/before-launch.md`.
+- **Block in conversations** — 0076 adds `block_in_conversation` /
+  `unblock_in_conversation` / `conversation_block_state`; the redesign's
+  thread options have Report but no Block row.
+- **The friend link is not read at sign-up** — Bring a friend's link carries
+  `program` and `at`; joining ignores them, and the +150 for a friend who
+  joins is not awarded by the database yet (D-330, D-336).
+- **Program leads switch between their programs** — and Add a program
+  returns to the new one (D-318).
+- **Load a lead's own program** instead of the example (D-218's follow-up):
+  then Get started and the Program tab know for real whether one exists
+  (D-352, D-361).
+- **Real staff photos to members** — staff can upload (D-345, 0074 live), but
+  the booked place's badge and Messages still show the example photos
+  (D-335) until they read `photo_url`.
+- **Real-device QA in phone browsers** — Safari on iPhone, Chrome on
+  Android (Pam stays a web app, D-351): copy-on-tap, the share sheet, the
+  signature sheet, the friend drawer's drag.
+- **DS for Claude Design** — usage rules in MDX (principles, buttons,
+  spacing, type, colour).
+
 ## Next
 
 Phase 1: invite redemption (generation works, and sign-up covers the person who

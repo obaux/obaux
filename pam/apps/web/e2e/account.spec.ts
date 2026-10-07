@@ -220,9 +220,9 @@ test.describe('a code from the person who invited you', () => {
     await page.getByLabel('City you live in').fill('Philadelphia');
     await page.getByRole('button', { name: 'Next' }).click();
 
-    // A case manager's privacy screen, and four steps rather than five.
+    // A case manager's privacy screen, the last of their two steps (D-359).
     await expect(page.getByRole('heading', { name: 'What you will see' })).toBeVisible();
-    await expect(page.getByText('Step 3 of 4').first()).toBeVisible();
+    await expect(page.getByText('2 of 2', { exact: true })).toBeVisible();
     expect(calls.start, 'self-serve sign-up ran alongside the code').toBe(0);
     expect(calls.redeem[0]).toMatchObject({
       p_code: 'P3TWVWTW',

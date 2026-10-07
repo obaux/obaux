@@ -1,5 +1,108 @@
 # Changelog
 
+## [0.43.0-programs] — 2026-10-07 · A program lead's first day
+
+**Messages, empty.** A new account's Messages says what will show up there,
+for a program or a case manager, with a New message button (D-363).
+
+**Getting started.** A program lead who has just signed up opens on **Get
+started**: three illustrated cards — Add your program, Add your photo, See
+who is coming in — and under them, as plain rows, Book a visit for a member
+and Invite someone. The third card opens a page showing what the calendar
+will look like, with example people; Back returns to Get started. Each
+card goes once its step is done (D-352).
+
+**Home, once somebody books.** The calendar takes over Home: "Coming in"
+centred, "this week ▾" under it, bolder with a thicker line. Search appears
+once there are more than ten visits. While a card is still to do, the
+calendar opens folded — its first visits, fading out, and "See the whole
+calendar" — with the remaining cards under it. A month's busy days are tiles
+in two rows that scroll sideways (D-352).
+
+**Finishing touches (same day).** Home's calendar switches with small Day /
+Week / Month tabs instead of a dropdown, with no title above; Search moved
+into the + menu and opens the search field ready to type. A month's busy
+days are quieter, show more of the next column, and have dots to show how
+far along you are. A new dashed line separates sections in a few places.
+Add a program keeps Next at the bottom of the screen, with "2 of 7" tucked
+into the button (D-355–D-358).
+
+**A new program lead starts empty.** Straight after signing up there are no
+example messages or alerts: the bell is quiet, Notifications and Messages
+say so plainly, and the Program tab opens Add a program. The + menu reads
+"New booking" and "Invite someone to Pam". Every empty screen now shows the
+same light green outline icon, and the header bell is an outline that fills
+in when something is new (D-361, D-362).
+
+**Text alerts, illustrated.** Profile's text-alerts card shows a drawn bell
+in the app's illustration style instead of an icon (D-360).
+
+**Sign-up, tidier.** Sign in already asks for the phone, so sign-up starts
+at About you: two steps for staff, three for members, the count shown on
+each step's button, and the button kept at the bottom of the screen. The
+legal links are only on Sign in now. Language is two chips, English chosen.
+Text messages reads more easily: a quieter intro and three bell bullets
+(D-359).
+
+**Shorter sign-up for staff.** Program leads and case managers sign up in
+three steps and go straight to Home after "I understand". A program is added
+from Home, not during sign-up (D-353).
+
+**What to expect, for programs.** The last sign-up step says how Pam works
+for a program in four short lines, each with a small picture: who is coming
+and checking them in, messages, policies signed before a visit, and what Pam
+never tells you (D-354).
+
+**Approved, kept for later:** a no-program state for the Program tab (Add your
+program over a faded preview of the page) is a Storybook mockup; the tab
+opens Add a program instead (D-352, D-363).
+
+## [0.42.0-members] — 2026-10-06 to 07 · The member experience, revamped
+
+**Booking a visit.** Planning a visit asks for a day and a time and, if
+either is missing when you press Next, says which. A walk-in program is
+planned from the days it meets. Every screen's one button sits at the
+bottom whatever the length of the page. Booking ends on **"Your trip is
+booked"**: the same green card a booked place shows, with the program, the
+day and time, how soon ("In 2 days", in plain text) and Change appointment
+with a chevron, evenly spaced in its corner. Under it, two plain rows:
+Policies to sign, and Bring a friend. Back from the policies returns to
+this screen, and the × closes into Trips, where the new trip slides in
+(D-332–D-343).
+
+**Policies.** Signing holds the sheet still while you draw, and the line
+says "Sign here". From a just-booked trip, the last signature closes with an
+× into Trips. Trips says "Policies signed" once a visit's own policies are
+signed, and a short banner names the next trip still to sign (D-327,
+D-333, D-336).
+
+**Bring a friend.** Tapping it copies the link straight away and opens a
+drawer under a banner picture, with "Link copied" across the link box for
+3 seconds, an × to close, and — on phones that have one — **Send to a
+friend**, which opens the share sheet with a short message (D-337–D-340,
+D-344). 150 points when a friend joins is first among ways to earn (D-330).
+
+**How things look.** Every picture of a place is its category's
+illustration; the pale tinted backgrounds are gone except on Explore's
+chips. Drawers have no dark outline. Rows that float above the tab bar have
+a line above and below; Messages' "People who offered help" is one line
+(D-336–D-338). A booked place shows the face of the person you'll meet;
+tap it for their name and title (D-335).
+
+**For staff.** Staff can add their own photo from Profile with a small
+camera button (D-345). Adding a program — at sign-up or from All programs —
+asks one question at a time, lets you skip what you don't know yet, and
+shows everything before it is sent (D-347). Adding a policy is one card
+with a PDF and Choose files, or drop a file on it (D-348). The super admin
+can message a program's lead from the program's page (D-349).
+
+**Behind the scenes.** The design system ships its own tokens, fonts and
+built stylesheet, every component has a story, and Storybook's shared
+prototype link keeps working (D-328, D-331). Case managers can invite case
+managers (live, 0073). Pam stays a web app for now; sharing uses the
+phone's own share sheet in its browser (D-350, D-351).
+
+
 ## [0.41.2-polish] — 2026-10-03 · Small fixes
 
 The search box for a new message looks the same as every other search in
@@ -180,55 +283,6 @@ service's details. A service can be at a different address from the program; the
 says "Main address" or "Service address". Messaging a program from its page
 and pressing Back returns to that page. A service can also keep its own
 hours, and the place's open or closed line follows the service you pick.
-After booking, Trips asks you to sign a program's policies in one short
-banner instead of a large card.
-A program that just meets on a schedule says when to come instead of asking
-you to book.
-The design system now stands on its own: its colours, fonts and theme ship
-with the component package, in one tokens file and a built stylesheet, every
-component has a story with its variants, and Storybook explains how to use
-them (D-328).
-A program's page starts its list with "Bring a friend", which opens a link
-to send so a friend can join the same program. The sign-before-you-go
-banner on Trips is no longer washed out at its top edge (D-329).
-Bringing a friend is now "Go together": the program's picture, a preview of
-the text your friend will get, and 150 points when they join, which the
-Points page lists first among ways to earn (D-330).
-Planning a visit and bringing a friend now share one card that shows the
-program in its colour. Once a visit is booked, the place page names its service
-next to the time instead of showing the service picker (D-332).
-Booking a trip now ends on "Your trip is booked", where Bring a friend
-opens to the link and a Copy button; its separate page is gone. Walk-in
-programs are planned the same way, from the days they meet. Signing no
-longer lets the sheet slide while you draw, and the line says "Sign here"
-instead of an "×" (D-333).
-A screen's one button now sits at the bottom of the screen whatever the
-length of the page, so Sign on a policy is always in the same place. Pressing
-Next without a day or time says which is missing. The trip card is white
-with a soft shadow, the day and time under the name. "Your trip is booked"
-shows any policies still to sign, and closes with an × to Trips (D-334).
-A booked place shows the face of the person you'll meet, at the right of
-the open/closed line; tap it for their name and title. Messages shows
-people's photos where Pam has them (D-335). The trip card says how soon
-the visit is ("In 2 days"). "Your trip is booked" lists Policies to sign and
-Bring a friend as rows; Bring a friend opens a drawer with a picture, the
-link and Copy. Signing from there ends with an × back to Trips. Trips now
-shows "Policies signed" once a visit's own policies are signed, and a
-banner for the next trip still to sign. Messages' "People who offered help"
-is one line, with a line above and below it, like every row that floats
-above the menu (D-336). "Your trip is booked" now shows the same green card as a
-booked place, with how soon and Change appointment, and Back from the
-policies returns to it. Tapping Bring a friend copies the link straight
-away and says "Link copied" for 3 seconds, under a new banner picture, with
-an × to close. Saved, trip cards and the next visit show each kind of
-place's own illustration (D-337). Drawers no longer have a dark outline. The Bring a
-friend picture runs to the drawer's edges, the × sits in its corner, and
-"Link copied" fills the link box in the same pale green as Copy (D-338). The green visit card has more room between its lines, and
-"Link copied" now spans the link box and Copy, centred (D-339). More room under the friend banner and above the link (D-340). "In 2 days" is plain text now, and Change appointment sits evenly in the card's corner (D-341). It has the same space above and below (D-342). It ends in a chevron, and the program's name on the card is black (D-343). Bring a friend has a "Send to a friend" button that opens your phone's share sheet with a short message and the link (D-344). Staff can add their own photo from Profile, with a small camera button on their picture (D-345). Adding a program now asks one question
-at a time, lets you skip what you don't know yet, and shows everything on
-one screen before it is sent (D-347). Adding a policy is one card with a PDF
-and a Choose files button, or drop a file on it (D-348). The super admin can
-message a program's lead from the program's page (D-349). The Android app opens the phone's share sheet too, for Bring a friend, sharing a place and invite links (D-350).
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 

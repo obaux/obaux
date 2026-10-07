@@ -18,6 +18,7 @@ import {
 import { Banner } from '@astryxdesign/core/Banner';
 import { LargeTitleHeader } from '@pam/ui/LargeTitleHeader';
 import { FeatureTile, FeatureTileRow, ProfileSummary, PromoCard } from '@pam/ui/ProfileCards';
+import { SetupArt } from '@pam/ui/SetupArt';
 import { BadgeArt, ConnectionsArt } from '@pam/ui/BadgeArt';
 import { MenuList } from '@pam/ui/MenuList';
 import { useI18n } from '@/lib/i18n';
@@ -61,7 +62,6 @@ export interface ProfileViewProps {
 }
 
 const ICON = { width: 26, height: 26, 'aria-hidden': true } as const;
-const ART = { width: 44, height: 44, 'aria-hidden': true } as const;
 
 export function ProfileView({
   name,
@@ -177,9 +177,9 @@ export function ProfileView({
           // first yes is still the reminders screen — the one the SMS carrier
           // reviewed — and their switches are a row in settings after that.
           href={role === 'member' ? '/reminders/' : '/alerts/'}
-          // A bell, for texts, for everyone (Will, 5 October, D-274) — the star
-          // read as points.
-          art={<BellIcon {...ART} />}
+          // A bell, for texts, for everyone (D-274) — drawn now, in the
+          // illustration set, not an icon on a tint (Will, 7 October, D-360).
+          art={<SetupArt kind="alerts" size={72} />}
         />
       )}
 
