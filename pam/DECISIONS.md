@@ -9050,6 +9050,17 @@ end could be thicker." And: the Home row and + menu label "Create new booking".
 - `home.book` is "Create new booking" / "Crear nueva reserva" (the Home row
   and the + menu share it).
 
+### D-371 — Info tip padding 18px; the signed list leads with the policies
+
+**Date:** 2026-10-07. Will: "Update tooltip padding to 18px. Instead of bold
+title, make title subtle and thin, and make policy labels stronger."
+
+- InfoTip padding is 18px all round: Astryx's surface 12px plus 6px on the
+  body (D-368 had 16px). Measured 18px to the first word.
+- The signed-policies tip: "Jordan signed" is 15px, regular weight, the
+  secondary text colour; each policy name is 16px at 600. What was signed is
+  the news; the heading only says whose list it is.
+
 ---
 
 ## Notes for whoever picks this up next

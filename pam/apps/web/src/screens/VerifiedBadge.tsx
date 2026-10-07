@@ -40,8 +40,10 @@ const styles = stylex.create({
     backgroundColor: colorVars['--color-success-muted'],
     color: colorVars['--color-success'],
   },
-  title: { fontSize: '17px', fontWeight: 700 },
-  item: { fontSize: '16px', lineHeight: 1.45 },
+  // The heading quiet, the policies strong (Will, 7 October, D-371): what
+  // was signed is the news, "Jordan signed" only says whose list it is.
+  title: { fontSize: '15px', fontWeight: 400, color: colorVars['--color-text-secondary'] },
+  item: { fontSize: '16px', lineHeight: 1.45, fontWeight: 600 },
 });
 
 export function VerifiedBadge({ personId, name }: { readonly personId: string; readonly name: string }) {

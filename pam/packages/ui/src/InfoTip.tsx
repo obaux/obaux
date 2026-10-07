@@ -21,7 +21,7 @@ import { pam } from './tokens.stylex.js';
  * it outweighs the words beside it. Anything that *does* something stays at
  * 48px. The site-wide floor (globals.css) is lowered for this button only.
  *
- * The popover has 16px of padding all round, and its text is a
+ * The popover has 18px of padding all round, and its text is a
  * block, so a wrapped paragraph lines up on the left.
  */
 export interface InfoTipProps {
@@ -48,10 +48,10 @@ const styles = stylex.create({
     flexShrink: 0,
     color: colorVars['--color-text-primary'],
   },
-  // 16px all round (Will tried 32, then: "16px padding is all we need"):
-  // Astryx's popover surface brings 12px, this the other 4.
+  // 18px all round (Will: 32, then 16, then "update tooltip padding to
+  // 18px"): Astryx's popover surface brings 12px, this the other 6.
   body: {
-    padding: '4px',
+    padding: '6px',
     fontSize: '15px',
     lineHeight: 1.5,
     textAlign: 'start',
