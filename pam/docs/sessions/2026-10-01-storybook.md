@@ -559,3 +559,4 @@ Chromium.
 - D-351: Will — web app for now. No native build; apps/native and @capacitor/share left in place, unused.
 - Merged #26 (ca3ba9c) after CI green on 20ab04e, at Will's yes.
 
+- STATUS gains a Backlog section with the open items (Will: "keep the open items on backlog"). Next up: program view redesign, after /compact.

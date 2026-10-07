@@ -855,6 +855,31 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
+## Backlog
+
+Open items Will asked to keep (7 October), newest first. Read this before
+"Next" below, which is older.
+
+- **Apply 0075 then 0076 to the live project** — 0068/0069 carried over and
+  reconciled with 0072 (D-346); DB suite green. Their `drop` statements need
+  a person's approval in the Supabase tool. Also on `docs/before-launch.md`.
+- **Block in conversations** — 0076 adds `block_in_conversation` /
+  `unblock_in_conversation` / `conversation_block_state`; the redesign's
+  thread options have Report but no Block row.
+- **The friend link is not read at sign-up** — Bring a friend's link carries
+  `program` and `at`; joining ignores them, and the +150 for a friend who
+  joins is not awarded by the database yet (D-330, D-336).
+- **Program leads switch between their programs** — and Add a program
+  returns to the new one (D-318).
+- **Real staff photos to members** — staff can upload (D-345, 0074 live), but
+  the booked place's badge and Messages still show the example photos
+  (D-335) until they read `photo_url`.
+- **Real-device QA in phone browsers** — Safari on iPhone, Chrome on
+  Android (Pam stays a web app, D-351): copy-on-tap, the share sheet, the
+  signature sheet, the friend drawer's drag.
+- **DS for Claude Design** — usage rules in MDX (principles, buttons,
+  spacing, type, colour).
+
 ## Next
 
 Phase 1: invite redemption (generation works, and sign-up covers the person who
