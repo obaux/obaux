@@ -49,13 +49,16 @@ type Story = StoryObj<typeof meta>;
 /** The first question: the name. */
 export const Name: Story = {};
 
-/** A middle question, skippable. */
-export const Focus: Story = { args: { start: 2, value: { ...EMPTY, name: 'Example Reentry Hub' } } };
+/** What kind of help: chips, and Other opens a box for their own words (D-366). */
+export const Kind: Story = { args: { start: 1, value: { ...EMPTY, name: 'Example Reentry Hub' } } };
+export const KindOther: Story = {
+  args: { start: 1, value: { ...EMPTY, name: 'Example Reentry Hub', category: 'other', categoryOther: 'Legal help' } },
+};
 
 /** The review: every answer, each a way back to change it. */
 export const Review: Story = {
   args: {
-    start: 7,
+    start: 6,
     value: {
       ...EMPTY,
       name: 'Example Reentry Hub',

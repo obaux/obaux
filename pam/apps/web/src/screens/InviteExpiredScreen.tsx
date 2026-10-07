@@ -111,6 +111,8 @@ export function InviteExpiredScreen({ invite }: { readonly invite: Invite | null
                   <TextField
                     purpose="email"
                     label={t('invite.expired.email')}
+                    // Ready to type on arrival (Will, 7 October, D-365).
+                    hasAutoFocus
                     value={email}
                     onChange={setEmail}
                     width="100%"

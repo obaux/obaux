@@ -86,6 +86,18 @@ export function PdfIcon(props: SVGProps<SVGSVGElement>) {
 }
 
 /** A camera: add or change a photo (D-345). */
+/** The camera, filled, its lens cut through (Will, 7 October, D-364): the photo button on Profile. */
+export function CameraFilledIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} fill="currentColor" stroke="none" {...props}>
+      <path
+        fillRule="evenodd"
+        d="M5.5 6.5h2l1.5-2.1c.3-.4.7-.6 1.2-.6h3.6c.5 0 .9.2 1.2.6l1.5 2.1h2A2.5 2.5 0 0 1 21 9v8.5a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 17.5V9a2.5 2.5 0 0 1 2.5-2.5zM12 17a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm0-2a2 2 0 1 0 0-4 2 2 0 0 0 0 4z"
+      />
+    </svg>
+  );
+}
+
 export function CameraIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <svg {...svgProps} {...props}>

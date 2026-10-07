@@ -10,7 +10,6 @@ import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { CheckboxInput } from '@astryxdesign/core/CheckboxInput';
 import { RadioList, RadioListItem } from '@astryxdesign/core/RadioList';
-import { Button } from '@astryxdesign/core/Button';
 import { colorVars, spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { BellIcon, BigButton, Loading, Notice, Page, PointsBadge, StarIcon, TextField, TextLink, TripsIcon } from '@pam/ui';
 import { SubPageHeader } from '@pam/ui/SubPage';
@@ -37,6 +36,7 @@ import {
 import { NOTICES } from '@pam/config';
 import { markFreshAccount } from '@/lib/programSetup';
 import { SetupArt, type SetupArtKind } from '@pam/ui/SetupArt';
+import { ChoiceChips } from '@pam/ui/ChoiceChips';
 
 /**
  * Signing up: five steps, and four of them are one question each.
@@ -101,16 +101,6 @@ const styles = stylex.create({
   // The bell in the brand green, its middle on the first line's middle.
   bell: { flexShrink: 0, paddingBlockStart: '3px', color: colorVars['--color-icon-accent'] },
   chipsLabel: { fontSize: '15px', lineHeight: 1.4, color: colorVars['--color-text-secondary'] },
-  // Plan a visit's chips (D-235): white with a grey edge; chosen, the
-  // secondary button's green (D-359).
-  chip: { minHeight: '48px', paddingInline: '18px', fontSize: '16px', borderRadius: '999px' },
-  chipOff: {
-    backgroundColor: colorVars['--color-background-body'],
-    borderWidth: '1px',
-    borderStyle: 'solid',
-    borderColor: colorVars['--color-border'],
-  },
-  chipOn: { fontWeight: 600 },
   expectArt: { flexShrink: 0, borderRadius: '14px', overflow: 'hidden' },
   intro: { fontSize: '18px', lineHeight: 1.5 },
   body: { fontSize: '17px', lineHeight: 1.5 },
@@ -526,6 +516,8 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
                 id={firstId}
                 purpose="name"
                 label={t('join.details.first')}
+                // Ready to type on arrival (Will, 7 October, D-365).
+                hasAutoFocus
                 value={firstName}
                 onChange={setFirstName}
                 width="100%"
@@ -570,18 +562,15 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
                   in the secondary green. English unless already switched. */}
               <VStack gap={2}>
                 <Text xstyle={styles.chipsLabel}>{t('onboarding.language.title')}</Text>
-                <HStack gap={2} wrap="wrap" role="group" aria-label={t('onboarding.language.title')}>
-                  {(['en', 'es'] as const).map((code) => (
-                    <Button
-                      key={code}
-                      label={t(`language.${code}`)}
-                      variant="secondary"
-                      aria-pressed={locale === code}
-                      onClick={() => setLocale(code as Locale)}
-                      xstyle={[styles.chip, locale === code ? styles.chipOn : styles.chipOff]}
-                    />
-                  ))}
-                </HStack>
+                <ChoiceChips
+                  label={t('onboarding.language.title')}
+                  options={[
+                    { value: 'en', label: t('language.en') },
+                    { value: 'es', label: t('language.es') },
+                  ]}
+                  value={locale as 'en' | 'es'}
+                  onChange={(code) => setLocale(code as Locale)}
+                />
               </VStack>
 
               {invitedAs ? null : (

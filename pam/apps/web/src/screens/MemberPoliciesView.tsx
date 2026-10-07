@@ -539,6 +539,8 @@ function SignSheet({
           {isTyping ? (
             <TextField
               label={t('sign.name')}
+              // Ready to type on arrival (Will, 7 October, D-365).
+              hasAutoFocus
               value={name}
               purpose="name"
               onChange={(value: string) => {

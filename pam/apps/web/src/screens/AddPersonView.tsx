@@ -52,6 +52,8 @@ export function AddPersonView() {
         <VStack gap={4}>
           <TextField
             label={t('book.new.name')}
+            // Ready to type on arrival (Will, 7 October, D-365).
+            hasAutoFocus
             value={name}
             onChange={setName}
             width="100%"

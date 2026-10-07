@@ -851,7 +851,6 @@
   "programs.add": "Agregar un programa",
   "nav.back.programs": "Volver a Todos los programas",
   "programs.new.title": "Agregar un programa",
-  "programs.new.intro": "Cuéntanos sobre un programa al que la gente puede ir. Pam revisa cada programa nuevo antes de que alguien lo vea.",
   "programs.new.done.title": "Enviado a Pam",
   "programs.new.done.body": "Lo revisaremos y lo agregaremos a la lista. Normalmente tarda uno o dos días.",
   "programs.new.another": "Agregar otro",
@@ -1308,5 +1307,8 @@
   "notify.empty.title": "Aún no hay notificaciones",
   "notify.empty.body": "Cuando alguien reserve una visita, le escriba o le necesite, aparecerá aquí.",
   "messages.empty.body.provider": "Cuando un miembro le escriba sobre su programa, o usted le escriba a alguien que reservó, aparecerá aquí.",
-  "messages.empty.body.admin": "Cuando alguien que usted invitó le escriba, o usted le escriba, aparecerá aquí."
+  "messages.empty.body.admin": "Cuando alguien que usted invitó le escriba, o usted le escriba, aparecerá aquí.",
+  "join.program.review.note": "Pam revisa cada programa nuevo antes de que los miembros lo vean.",
+  "join.program.other": "Otro",
+  "join.program.other.kind": "Diga qué tipo de ayuda, con sus palabras"
 }

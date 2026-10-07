@@ -47,6 +47,8 @@ export interface ProgramDetails {
    * services table is a schema change for Will to approve.
    */
   readonly services: readonly string[];
+  /** "Other" chosen for the kind of help (D-366): their own words. */
+  readonly categoryOther?: string;
 }
 
 export interface JoinDetails {

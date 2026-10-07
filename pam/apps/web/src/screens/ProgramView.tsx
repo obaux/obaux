@@ -168,6 +168,8 @@ export function ProgramView({
           <VStack gap={3}>
             <TextField
               label={t('program.name')}
+              // Ready to type on arrival (Will, 7 October, D-365).
+              hasAutoFocus
               value={draft.name}
               onChange={(next) => set({ name: next })}
               width="100%"

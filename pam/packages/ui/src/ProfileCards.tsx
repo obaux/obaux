@@ -11,7 +11,7 @@ import { Spinner } from '@astryxdesign/core/Spinner';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
-import { CameraIcon } from './icons.js';
+import { CameraFilledIcon } from './icons.js';
 import { pam } from './tokens.stylex.js';
 
 /**
@@ -68,9 +68,9 @@ const summary = stylex.create({
   statsUnderCorner: { paddingBlockStart: '28px' },
   value: { fontSize: '20px', lineHeight: 1.2, fontWeight: 700 },
   avatar: { position: 'relative' },
-  // A white, lifted circle on the avatar's lower right, the camera in the
-  // accent colour. 48px, Pam's touch floor (§2.5), which is still small
-  // beside the avatar.
+  // A white, lifted circle on the avatar's lower right. 48px, Pam's touch
+  // floor (§2.5), which is still small beside the avatar. The camera inside
+  // is filled, larger, and grey a little darker than the avatar (D-364).
   camera: {
     position: 'absolute',
     insetInlineEnd: '-6px',
@@ -81,7 +81,7 @@ const summary = stylex.create({
     padding: 0,
     borderRadius: '50%',
     backgroundColor: colorVars['--color-background-card'],
-    color: colorVars['--color-text-accent'],
+    color: pam['--pam-photo-icon'],
     boxShadow: '0 1px 4px light-dark(oklch(0 0 0 / 20%), oklch(0 0 0 / 50%))',
   },
   busy: {
@@ -126,7 +126,12 @@ export function ProfileSummary({
                   variant="ghost"
                   isDisabled={isPhotoBusy}
                   onClick={() => picker.current?.click()}
-                  icon={<CameraIcon width={22} height={22} aria-hidden />}
+                  icon={
+                    // Wrapped so the button keeps its 34px (as the bell's is).
+                    <HStack>
+                      <CameraFilledIcon width={34} height={34} aria-hidden />
+                    </HStack>
+                  }
                   xstyle={summary.camera}
                 />
                 <input

@@ -72,6 +72,7 @@ export {
   PeopleIcon,
   UserPlusIcon,
   CameraIcon,
+  CameraFilledIcon,
   PdfIcon,
   PhoneIcon,
   PlacesIcon,
@@ -120,3 +121,4 @@ export { canShareSheet, shareText } from './share.js';
 export { SetupCard, type SetupCardProps } from './SetupCard.js';
 export { SetupArt, type SetupArtKind, type SetupArtProps } from './SetupArt.js';
 export { DashedRule } from './DashedRule.js';
+export { ChoiceChips, type ChoiceChipsProps } from './ChoiceChips.js';

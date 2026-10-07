@@ -63,5 +63,8 @@ export const pam = stylex.defineVars({
   // Empty-state icons (Will, 7 October, D-362): a light green line drawing,
   // the same on every empty screen.
   '--pam-empty-icon': 'light-dark(#8FBFA6, #5F8F78)',
+  // The camera on Profile's photo button (D-364): a grey two steps darker
+  // than the avatar's own background (#f1f1f1 light, #1b1b1b dark).
+  '--pam-photo-icon': 'light-dark(#b4b4b4, #5c5c5c)',
   '--pam-rule-dashed': 'light-dark(rgba(0, 0, 0, 0.05), rgba(255, 255, 255, 0.08))',
 });

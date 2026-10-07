@@ -4,9 +4,7 @@ import { useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import * as stylex from '@stylexjs/stylex';
 import { Button } from '@astryxdesign/core/Button';
-import { Card } from '@astryxdesign/core/Card';
 import { EmptyState } from '@astryxdesign/core/EmptyState';
-import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { PlacesIcon } from '@pam/ui';
 import { emptyState } from '@pam/ui/emptyState';
@@ -48,8 +46,6 @@ const EMPTY: ProgramDetails = {
 };
 
 const styles = stylex.create({
-  intro: { fontSize: '18px', lineHeight: 1.5 },
-  card: { width: '100%' },
   state: { paddingBlock: '32px' },
 });
 
@@ -114,17 +110,13 @@ export function AddProgramView({ isTab = false }: { readonly isTab?: boolean } =
           }
         />
       ) : (
-        <>
-          <Text type="supporting" xstyle={styles.intro}>
-            {t('programs.new.intro')}
-          </Text>
-          <Card padding={6} xstyle={styles.card}>
-            <VStack gap={4}>
-              {wizard.body}
-              {isTab ? wizard.actions : null}
-            </VStack>
-          </Card>
-        </>
+        // Straight into the question, on the page — no card, no intro
+        // (Will, 7 October, D-365). That Pam checks a new program is said
+        // once, on the last step, where it is about to happen.
+        <VStack gap={4}>
+          {wizard.body}
+          {isTab ? wizard.actions : null}
+        </VStack>
       )}
     </SubPage>
   );

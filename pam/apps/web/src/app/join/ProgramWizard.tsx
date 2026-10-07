@@ -7,13 +7,13 @@ import { Heading } from '@astryxdesign/core/Heading';
 import { HStack } from '@astryxdesign/core/HStack';
 import { Icon } from '@astryxdesign/core/Icon';
 import { IconButton } from '@astryxdesign/core/IconButton';
-import { RadioList, RadioListItem } from '@astryxdesign/core/RadioList';
 import { Text } from '@astryxdesign/core/Text';
 import { TextArea } from '@astryxdesign/core/TextArea';
 import { VStack } from '@astryxdesign/core/VStack';
 import { BigButton, TextField, TextLink } from '@pam/ui';
 import { MenuList } from '@pam/ui/MenuList';
-import { CATEGORY_LIST, subcategoriesFor, type Category } from '@pam/config';
+import { ChoiceChips } from '@pam/ui/ChoiceChips';
+import { CATEGORY_LIST, type Category } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import type { ProgramDetails } from '@/lib/useJoin';
 
@@ -31,20 +31,20 @@ import type { ProgramDetails } from '@/lib/useJoin';
  * it before anything is sent.
  *
  *   1. What's it called?          — the one thing required
- *   2. What kind of help?         — three choices, one already picked
- *   3. What does it focus on?     — skip
- *   4. Tell people about it       — skip
- *   5. Where is it?               — skip
- *   6. How do people reach you?   — phone and website together, skip
- *   7. What does it offer?        — services, skip
- *   8. Check your program         — every answer, each a row that goes back
+ *   2. What kind of help?         — chips, or Other in their own words (D-366)
+ *   3. Tell people about it       — skip
+ *   4. Where is it?               — skip
+ *   5. How do people reach you?   — phone and website together, skip
+ *   6. What does it offer?        — services, skip
+ *   7. Check your program         — every answer, each a row that goes back
  *
  * The step is the parent's (`step`, `onStep`), so the screen's Back goes one
  * question back rather than out of the program, and its title stays put.
  * The fields are the same `ProgramDetails` as before (0056, D-313): only how
  * they are asked changed.
  */
-export const PROGRAM_STEPS = ['name', 'kind', 'focus', 'about', 'where', 'contact', 'services', 'review'] as const;
+// No 'focus' step (Will, 7 October, D-366): services say it, in more detail.
+export const PROGRAM_STEPS = ['name', 'kind', 'about', 'where', 'contact', 'services', 'review'] as const;
 export type ProgramStep = (typeof PROGRAM_STEPS)[number];
 
 export interface ProgramWizardProps {
@@ -61,6 +61,8 @@ export interface ProgramWizardProps {
 }
 
 const DESCRIPTION_MAX = 200;
+/** "Other" on the kind and focus chips (D-366): their own words follow. */
+const OTHER = 'other';
 
 const styles = stylex.create({
   card: { width: '100%' },
@@ -100,7 +102,9 @@ export function useProgramWizard({ value, onChange, onSubmit, busy, submitLabel,
   const next = () => onStep(step + 1);
   const needsName = value.name.trim() === '';
   const categoryLabel = CATEGORY_LIST.find((c) => c.key === category);
-  const focusLabel = subcategoriesFor(category).find((s) => s.key === value.subcategory);
+  // What the review row says: a chip's words, or theirs for Other (D-366).
+  const kindWords =
+    value.category === OTHER ? (value.categoryOther ?? '').trim() : categoryLabel ? t(categoryLabel.labelKey) : '';
   const filled = value.services.map((s) => s.trim()).filter(Boolean);
 
   // Skippable questions say so beside Next; the first two are not optional
@@ -121,6 +125,8 @@ export function useProgramWizard({ value, onChange, onSubmit, busy, submitLabel,
           <TextField
             purpose="name"
             label={t('join.program.name')}
+            // Ready to type on arrival (Will, 7 October, D-365).
+            hasAutoFocus
             // The question above is the label people read; this one is heard.
             isLabelHidden
             value={value.name}
@@ -135,41 +141,39 @@ export function useProgramWizard({ value, onChange, onSubmit, busy, submitLabel,
         </VStack>
       ) : null}
 
+      {/* Chips, as sign-up's language (Will, 7 October, D-366), with Other
+          opening a box for their own words. */}
       {at === 'kind' ? (
-        <RadioList
-          label={t('join.program.category')}
-          isLabelHidden
-          value={category}
-          onChange={(next) => {
-            const nextCategory = next as Category;
-            const stillValid = subcategoriesFor(nextCategory).some((s) => s.key === value.subcategory);
-            set({ category: nextCategory, subcategory: stillValid ? value.subcategory : '' });
-          }}
-          xstyle={styles.choices}
-        >
-          {CATEGORY_LIST.map((def) => (
-            <RadioListItem key={def.key} value={def.key} label={t(def.labelKey)} />
-          ))}
-        </RadioList>
-      ) : null}
-
-      {at === 'focus' ? (
-        <RadioList
-          label={t('join.program.subcategory')}
-          isLabelHidden
-          value={value.subcategory}
-          onChange={(next) => set({ subcategory: String(next) })}
-          xstyle={styles.choices}
-        >
-          {subcategoriesFor(category).map((sub) => (
-            <RadioListItem key={sub.key} value={sub.key} label={t(sub.labelKey)} />
-          ))}
-        </RadioList>
+        <VStack gap={3}>
+          <ChoiceChips
+            label={t('join.program.category')}
+            options={[
+              ...CATEGORY_LIST.map((def) => ({ value: def.key as string, label: t(def.labelKey) })),
+              { value: OTHER, label: t('join.program.other') },
+            ]}
+            value={value.category || null}
+            onChange={(next) => {
+              set({ category: next, subcategory: '' });
+            }}
+          />
+          {value.category === OTHER ? (
+            <TextField
+              label={t('join.program.other.kind')}
+              hasAutoFocus
+              value={value.categoryOther ?? ''}
+              onChange={(next) => set({ categoryOther: next })}
+              width="100%"
+              xstyle={styles.field}
+            />
+          ) : null}
+        </VStack>
       ) : null}
 
       {at === 'about' ? (
         <TextArea
           label={t('join.program.description')}
+          // Ready to type on arrival (Will, 7 October, D-365).
+          hasAutoFocus
           value={value.description}
           onChange={(next) => set({ description: next.slice(0, DESCRIPTION_MAX) })}
           rows={3}
@@ -181,6 +185,8 @@ export function useProgramWizard({ value, onChange, onSubmit, busy, submitLabel,
         <TextField
           purpose="address"
           label={t('join.program.address')}
+          // Ready to type on arrival (Will, 7 October, D-365).
+          hasAutoFocus
           value={value.address}
           onChange={(next) => set({ address: next })}
           width="100%"
@@ -193,6 +199,8 @@ export function useProgramWizard({ value, onChange, onSubmit, busy, submitLabel,
           <TextField
             purpose="phone"
             label={t('join.program.phone')}
+            // Ready to type on arrival (Will, 7 October, D-365).
+            hasAutoFocus
             value={value.phone}
             onChange={(next) => set({ phone: next })}
             width="100%"
@@ -217,6 +225,8 @@ export function useProgramWizard({ value, onChange, onSubmit, busy, submitLabel,
             <HStack key={i} gap={2} align="end" wrap="nowrap" xstyle={styles.serviceRow}>
               <TextField
                 label={t('join.program.service', { n: i + 1 })}
+                // The first service is ready to type into (D-365).
+                hasAutoFocus={i === 0}
                 value={name}
                 onChange={(next) => {
                   const list = value.services.length === 0 ? [''] : value.services;
@@ -244,6 +254,13 @@ export function useProgramWizard({ value, onChange, onSubmit, busy, submitLabel,
       ) : null}
 
       {at === 'review' ? (
+        // Said here, at the step where it is sent (D-365), not on arrival.
+        <Text type="supporting" xstyle={styles.hint}>
+          {t('join.program.review.note')}
+        </Text>
+      ) : null}
+
+      {at === 'review' ? (
         // Every answer, each a row back to its question (the review step
         // every checkout has). Unanswered ones say so, rather than vanish.
         <MenuList
@@ -251,8 +268,7 @@ export function useProgramWizard({ value, onChange, onSubmit, busy, submitLabel,
           hasDividers
           items={[
             { id: 'name', label: t('join.program.name'), value: value.name.trim() },
-            { id: 'kind', label: t('join.program.category'), value: categoryLabel ? t(categoryLabel.labelKey) : '' },
-            { id: 'focus', label: t('join.program.subcategory'), value: focusLabel ? t(focusLabel.labelKey) : '' },
+            { id: 'kind', label: t('join.program.category'), value: kindWords },
             { id: 'about', label: t('join.program.review.about'), value: value.description.trim() },
             { id: 'where', label: t('join.program.address'), value: value.address.trim() },
             {
