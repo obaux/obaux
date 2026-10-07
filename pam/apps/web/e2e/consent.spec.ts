@@ -322,6 +322,26 @@ test.describe('an invite waiting for the number (D-373)', () => {
     await expect(page.getByRole('heading', { name: en['invite.inUse.title'], level: 1 })).toBeVisible();
     await expect(page.getByText('Alice invited you as a program partner.')).toBeVisible();
   });
+
+  test('a member invited to a program in their city adds it to their account (D-374)', async ({ page }) => {
+    const added: Record<string, unknown>[] = [];
+    await page.route('**/rest/v1/rpc/add_role_from_invite*', async (route) => {
+      added.push(route.request().postDataJSON() as Record<string, unknown>);
+      await route.fulfill(json({ id: NIA, role: 'provider' }));
+    });
+    await signInWithCode(
+      page,
+      [{ code: 'MRC7Q4KX', invited_role: 'provider', first_name: 'Marcus', inviter_first_name: 'Alice', has_account: true, can_add: true }],
+      { id: NIA, role: 'member', first_name: 'Marcus', onboarded_at: '2026-09-12T00:00:00Z', access_status: 'active' },
+    );
+    await expect(page).toHaveURL(/\/invite\/add\/\?code=MRC7Q4KX&from=Alice/);
+    await expect(page.getByRole('heading', { name: en['invite.add.title'], level: 1 })).toBeVisible();
+    // What stays private is said before they say yes.
+    await expect(page.getByText(en['invite.add.point.2'])).toBeVisible();
+    await page.getByRole('button', { name: en['invite.add.yes'] }).click();
+    await expect.poll(() => added.length).toBe(1);
+    expect(added[0]).toMatchObject({ p_code: 'MRC7Q4KX' });
+  });
 });
 
 test.describe('phone and code fields', () => {

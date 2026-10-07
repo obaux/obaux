@@ -25,6 +25,8 @@ export const Trips: Story = screen('member', 'Trips', '/trips/');
 export const TripsJustBooked: Story = screen('member', 'Trips — just booked', '/trips/', { added: 'dummy-trip-1' });
 export const Messages: Story = screen('member', 'Messages', '/messages/');
 export const Profile: Story = screen('member', 'Profile', '/profile/');
+/** A member who also works at a program (D-374): pick which side to use Pam as. */
+export const UseAs: Story = screen('member', 'Use Pam as — member and program', '/use-as/');
 
 // Screens you tap into (the nested-page template, D-213).
 export const NewTrip: Story = screen('member', 'New trip', '/trips/new/');

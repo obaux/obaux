@@ -76,6 +76,7 @@ export function ProfileScreen() {
       connectionsCount={role === 'member' ? DUMMY_CONNECTIONS.length : 0}
       remindersOn={remindersOn}
       canViewAs={trueRole === 'super_admin'}
+      canUseAs={signedIn && session.session.roles.includes('member') && session.session.roles.includes('provider')}
       headerActions={<HeaderActions role={viewedRole} enabled={signedIn} />}
       onSignOut={() => {
         void signOut().finally(() => router.replace('/signin/?out=1'));

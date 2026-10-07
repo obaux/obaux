@@ -1,7 +1,8 @@
 # One account, two roles: member and program (D-374)
 
-**Status:** design note for Will's review, 7 October 2026. Nothing here is
-built. Decisions already made are marked **decided**; open questions are at
+**Status:** answered and built, 7 October 2026 (D-375) — same city: yes;
+booking their own program: no; the switch on Profile: agreed. Notifications
+by role and the transparency lines are still to do. Decisions already made are marked **decided**; open questions are at
 the end.
 
 ## What we're building

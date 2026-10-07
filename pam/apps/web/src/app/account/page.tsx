@@ -19,6 +19,7 @@ import {
   Notice,
   Page,
   PageTitle,
+  PeopleIcon,
   ShieldIcon,
 } from '@pam/ui';
 import { NOTICES } from '@pam/config';
@@ -218,6 +219,16 @@ export default function AccountPage() {
           <Heading level={2} xstyle={styles.value}>
             {t('account.settings')}
           </Heading>
+          {/* A member who also works at a program (D-374): first, its own page. */}
+          {session.session.roles.includes('member') && session.session.roles.includes('provider') ? (
+            <Button
+              label={`${t('profile.menu.useAs')}: ${t(session.session.role === 'provider' ? 'useAs.provider' : 'useAs.member')}`}
+              variant="ghost"
+              icon={<PeopleIcon />}
+              href="/use-as/"
+              xstyle={styles.row}
+            />
+          ) : null}
           <Button
             label={t('reminders.settings')}
             variant="ghost"

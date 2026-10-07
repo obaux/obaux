@@ -26,6 +26,8 @@ import { PrototypeSignIn } from './PrototypeSignIn';
 import { PrototypeJoin } from './PrototypeJoin';
 import { PrototypeInviteExpired } from './PrototypeInviteExpired';
 import { InviteInUseScreen } from '../../screens/InviteInUseScreen';
+import { InviteAddScreen } from '../../screens/InviteAddScreen';
+import { UseAsView } from '../../screens/UseAsView';
 import AboutPage from '../../app/about/page';
 import PoliciesPage from '../../app/program/policies/page';
 import { PrototypePolicy } from './PrototypePolicy';
@@ -84,6 +86,8 @@ export const APP_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   // An invite link that has run out (D-258).
   '/invite/expired/': screen(() => <PrototypeInviteExpired />),
   '/invite/in-use/': screen(() => <InviteInUseScreen as="program" from="Dana" />),
+  '/invite/add/': screen(() => <InviteAddScreen code="PAM7Q4KX" from="Alice" preview />),
+  '/use-as/': screen(() => <UseAsView preview={{ roles: ['member', 'provider'], role: 'member' }} />),
   // About Pam, from the foot of Sign in (D-259).
   '/about/': screen(() => <AboutPage />),
   // A program's policies for participants (D-261).

@@ -50,6 +50,8 @@ export interface PendingInvite {
   readonly firstName: string | null;
   readonly inviterFirstName: string | null;
   readonly hasAccount: boolean;
+  /** This account can add the invite's role: a member, a program invite, the same city (0078). */
+  readonly canAdd: boolean;
 }
 
 export async function pendingInviteForMe(): Promise<PendingInvite | null> {
@@ -64,6 +66,7 @@ export async function pendingInviteForMe(): Promise<PendingInvite | null> {
           first_name: string | null;
           inviter_first_name: string | null;
           has_account: boolean;
+          can_add?: boolean;
         }
       | undefined;
     if (!row?.code) return null;
@@ -74,6 +77,7 @@ export async function pendingInviteForMe(): Promise<PendingInvite | null> {
       firstName: row.first_name,
       inviterFirstName: row.inviter_first_name,
       hasAccount: row.has_account === true,
+      canAdd: row.can_add === true,
     };
   } catch {
     return null;

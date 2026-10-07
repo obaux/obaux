@@ -52,6 +52,11 @@ export interface ProfileViewProps {
    * "See the app as" row, so a preview is never a one-way door (D-217).
    */
   readonly canViewAs?: boolean;
+  /**
+   * A member who also works at a program (D-374): the "Use Pam as" row,
+   * which opens its own page. Never shown to a single-role account.
+   */
+  readonly canUseAs?: boolean;
   /** This account's photo (D-345). */
   readonly photoUrl?: string | null;
   /** Staff only: a photo was picked from the camera button. */
@@ -73,6 +78,7 @@ export function ProfileView({
   headerActions,
   onSignOut,
   canViewAs = false,
+  canUseAs = false,
   photoUrl = null,
   onPhotoPick,
   isPhotoBusy = false,
@@ -199,6 +205,19 @@ export function ProfileView({
         <MenuList
           label={t('profile.menu.label')}
           items={[
+            // First, so the side you are on is the first thing the settings
+            // say (D-374); a page of its own, so nobody switches by accident.
+            ...(canUseAs
+              ? [
+                  {
+                    id: 'use-as',
+                    label: t('profile.menu.useAs'),
+                    value: t(role === 'provider' ? 'useAs.provider' : 'useAs.member'),
+                    href: '/use-as/',
+                    icon: <PeopleIcon {...ICON} />,
+                  },
+                ]
+              : []),
             {
               id: 'language',
               label: t('profile.menu.language'),

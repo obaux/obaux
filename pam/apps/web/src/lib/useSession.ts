@@ -30,7 +30,13 @@ import { DEFAULT_LOCALE, isSupportedLocale, type Locale, type Role } from '@pam/
  */
 export interface Session {
   userId: string;
+  /** The role this account is acting as (0078, D-374). */
   role: Role;
+  /**
+   * Every role this account was given (`profile_roles`). Two only for a
+   * member who also works at a program; Profile then offers "Use Pam as".
+   */
+  roles: readonly Role[];
   firstName: string | null;
   /** `profiles.photo_url`: a staff member's own photo (D-345), or null. */
   photoUrl: string | null;
@@ -48,6 +54,9 @@ export interface Session {
    */
   isDemo: boolean;
 }
+
+/** Announced when this account's own role changes (D-374). */
+export const SESSION_CHANGED = 'pam:session-changed';
 
 export type SessionState =
   | { status: 'loading' }
@@ -88,7 +97,7 @@ export function useSession(): { state: SessionState; refresh: () => void } {
         const { data: profile, error } = await supabase
           .from('profiles')
           .select(
-            'id, role, first_name, photo_url, region_id, access_status, onboarded_at, preferred_language, is_demo, regions(name)',
+            'id, role, first_name, photo_url, region_id, access_status, onboarded_at, preferred_language, is_demo, regions(name), profile_roles(role)',
           )
           .eq('id', auth.user.id)
           .maybeSingle();
@@ -108,11 +117,13 @@ export function useSession(): { state: SessionState; refresh: () => void } {
         }
 
         const region = profile.regions as { name: string } | { name: string }[] | null;
+        const given = (profile.profile_roles as { role: Role }[] | null | undefined)?.map((r) => r.role) ?? [];
         setState({
           status: 'signed-in',
           session: {
             userId: profile.id as string,
             role: profile.role as Role,
+            roles: given.length > 0 ? given : [profile.role as Role],
             firstName: (profile.first_name as string | null) ?? null,
             photoUrl: (profile.photo_url as string | null) ?? null,
             regionId: (profile.region_id as string | null) ?? null,
@@ -135,6 +146,13 @@ export function useSession(): { state: SessionState; refresh: () => void } {
       cancelled = true;
     };
   }, [nonce]);
+
+  // This account changed underneath the screen — a role switched or added
+  // (D-374): every screen's session reads again.
+  useEffect(() => {
+    window.addEventListener(SESSION_CHANGED, refresh);
+    return () => window.removeEventListener(SESSION_CHANGED, refresh);
+  }, [refresh]);
 
   // The sign-in system says when the answer changed: a sign-out, or a code
   // that worked for a different person than the one this screen was drawn

@@ -45,6 +45,14 @@ STATUS row too.
   branch calls the 4-argument `create_invite`; until 0077 is live, making
   an invite from it fails. Ship them together.
 
+- [ ] **Deploy 0078 after 0077** (D-375): one account, member + program.
+  The app reads `profile_roles` in the session; it falls back to one role
+  without it, but switching and adding a program need 0078.
+
+- [ ] **Word the two transparency lines for two-role accounts** (D-375,
+  `docs/design/one-account-two-roles.md` §6) and add them to
+  `transparency.ts`.
+
 - [ ] **Approve the Pam-team line on the transparency screen** (STATUS row
   10b). Members were promised they would hear first if what is visible
   changes; the super admin's Everyone list and invite log are visible now.

@@ -9153,6 +9153,48 @@ Decided, not built:
   real work is 7 "is" functions, 4 that display a role, and the invite path.
   Three questions for Will at the end of the note.
 
+### D-375 — One account, two roles, built (member + program)
+
+**Date:** 2026-10-07. Will's answers to the design note's questions: both
+roles in the same city — yes; a staffer may book their own program as a
+member — no; the switch is a Profile row — agreed.
+
+- **0078** (local, not deployed; after 0077):
+  - `profile_roles` (given) beside `profiles.role` (acting). Only member +
+    provider may be held together (`ROLE_PAIR_NOT_ALLOWED`). Every profile
+    holds its role from creation (trigger); everyone already in Pam was
+    backfilled. A direct owner-level change of `profiles.role` to a role not
+    held re-designates (0033's promotion still works).
+  - `switch_role(role)` — only the caller, only to a role given; audited.
+  - `my_org()` is null while acting as a member: no program data from the
+    member side.
+  - Never a member of your own program: enrollments and appointments refuse
+    a member who is staff at that service's org (`OWN_PROGRAM`), and an
+    account cannot be made staff where its member side is still enrolled or
+    booked. Every program list is built from those, and `people_activity`
+    also excludes them.
+  - "Is" functions read `profile_roles`: `people_activity`, points on save and
+    on finishing setup, `can_message`, `directory_people`.
+  - `pending_invite_for_me` gains `can_add` (a member, a program invite, the
+    same city); `add_role_from_invite(code)` adds the program role and starts
+    acting as it. A case manager invite or another city still gets the D-373
+    screen.
+- **App:** the session carries `roles`; "Use Pam as" (`/use-as/`) is a row on
+  Profile and on the live `/account/` screen, only for two-role accounts;
+  sign-in sends a can-add invite to "Add your program to your account"
+  (`/invite/add/`), which says what stays private before they say yes.
+- **Not in this build:** notifications are not yet split by role (the bell
+  shows everything for the account); the transparency contract
+  (`transparency.ts`) is unchanged — this narrows what programs see rather
+  than widening it, but the two member-facing lines in the design note still
+  need Will's wording before launch.
+- **Tests:** DB suite file 14 (mixed account: pair rule, same city, someone
+  else's invite, acting as program vs member, switch refusals, API cannot
+  write role, own-program refusals both ways, points and the case manager
+  still see the member). e2e: add-your-program from sign-in; Use Pam as
+  switches; a one-role account has no row. Every earlier DB test passes
+  unchanged — single-role accounts behave as before.
+
 ---
 
 ## Notes for whoever picks this up next

@@ -35,3 +35,5 @@ export const LongName: Story = {
   args: { name: 'Maria Guadalupe Hernandez-Washington' },
 };
 export const Spanish: Story = { ...asRedesign('member', '/profile/'), globals: { locale: 'es' } };
+/** A member who also works at a program (D-374): "Use Pam as" leads the settings. */
+export const AlsoWorksAtAProgram: Story = { ...asRedesign('member', '/profile/'), args: { canUseAs: true } };

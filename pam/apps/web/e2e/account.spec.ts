@@ -28,7 +28,8 @@ function json(body: unknown) {
 }
 
 type Profile = {
-  role: 'member' | 'admin' | 'super_admin';
+  role: 'member' | 'admin' | 'super_admin' | 'provider';
+  profile_roles?: { role: string }[];
   access_status?: 'active' | 'suspended';
   onboarded_at?: string | null;
 } | null;
@@ -176,6 +177,28 @@ test.describe('the way out', () => {
     // A link to the invite Sign in, for a case manager (D-254).
     await expect(page.getByText(/\/signin\/\?invite=P3TWVWTW&as=case-manager/)).toBeVisible();
     expect(asked[0]).toMatchObject({ p_role: 'admin', p_region_id: 'r-pit', p_first_name: 'Kim', p_phone: '412 555 0199' });
+  });
+
+  test('a member who also works at a program picks a side on Profile (D-374)', async ({ page }) => {
+    const switched: Record<string, unknown>[] = [];
+    await signedIn(page, { role: 'member', profile_roles: [{ role: 'member' }, { role: 'provider' }] });
+    await page.route('**/rest/v1/rpc/switch_role*', async (route) => {
+      switched.push(route.request().postDataJSON() as Record<string, unknown>);
+      await route.fulfill(json({ id: WILL, role: 'provider' }));
+    });
+    await page.goto('/account/');
+    await page.getByRole('link', { name: /Use Pam as: Me/ }).click();
+    await expect(page.getByRole('heading', { name: 'Use Pam as', level: 1 })).toBeVisible();
+    await page.getByRole('button', { name: /My program/ }).click();
+    await expect.poll(() => switched.length).toBe(1);
+    expect(switched[0]).toMatchObject({ p_role: 'provider' });
+  });
+
+  test('a one-role account has no "Use Pam as"', async ({ page }) => {
+    await signedIn(page, { role: 'member' });
+    await page.goto('/account/');
+    await expect(page.getByRole('heading', { name: 'Your account' })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Use Pam as/ })).toHaveCount(0);
   });
 
   test('the account screen has no WCAG A/AA violations', async ({ page }) => {

@@ -855,6 +855,15 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
+## Release 0.45.0-two-roles (7 October) — one account, member and program
+
+D-375, on `claude/pam-storybook`, **not merged; 0078 not deployed** (order:
+0075, 0076, 0077, 0078). `profile_roles` + acting `profiles.role`,
+`switch_role`, `add_role_from_invite`, own-program guards; app: `roles` in the
+session, `/use-as/`, `/invite/add/`. DB suite (file 14) and e2e 588/588
+green. Left: notifications split by role; the transparency lines need Will's
+wording before launch.
+
 ## Release 0.44.0-invites (7 October) — invites know who they're for
 
 D-373, on `claude/pam-storybook`, **not merged; 0077 not deployed**. Invites
@@ -918,16 +927,15 @@ link (D-331) are part of it.
 Open items Will asked to keep (7 October), newest first. Read this before
 "Next" below, which is older.
 
-- **Phase next: one account, both roles** (D-374) — member + program only;
-  hidden from their own program's lists. Design note written
-  (`docs/design/one-account-two-roles.md`); waiting on Will's three answers,
-  then build.
+- **One account, both roles — follow-ups** (D-375): notifications by
+  role (the bell shows the acting side's; a dot on the switch for the other);
+  the two transparency lines, worded by Will, before launch.
 - **Add a program, as its own flow** (Will, 7 October, "for later"): from the
   Program tab it should hide the tab bar, keep Next pinned at the bottom,
   and Back from the first step returns to Home; after sending, a confetti
   "Sent to Pam for review" screen with a "Receive a text when it's ready"
   row that opens the text-message settings.
-- **Apply 0077** after 0075/0076 (D-373).
+- **Apply 0077, then 0078** after 0075/0076 (D-373, D-375).
 - **Apply 0075 then 0076 to the live project** — 0068/0069 carried over and
   reconciled with 0072 (D-346); DB suite green. Their `drop` statements need
   a person's approval in the Supabase tool. Also on `docs/before-launch.md`.

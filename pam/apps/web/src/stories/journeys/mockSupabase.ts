@@ -125,6 +125,9 @@ function routesFor(journeyRole: JourneyRole): Route[] {
     })),
     // Nobody is waiting on an invite in a story (0077); sign-in goes on as usual.
     on('/rpc/pending_invite_for_me', () => ({ body: [] })),
+    // One account, two roles (0078): a story never really switches.
+    on('/rpc/switch_role', () => ({ body: {} })),
+    on('/rpc/add_role_from_invite', () => ({ body: {} })),
     on('/rpc/flagged_services', () => ({ body: [] })),
     on('/rpc/served_cities', () => ({ body: [{ city: 'Philadelphia' }] })),
     on('/rest/v1/conversation_members', (url, method) => {

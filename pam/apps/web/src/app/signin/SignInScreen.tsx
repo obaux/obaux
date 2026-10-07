@@ -259,9 +259,17 @@ export function SignInScreen({
           return;
         }
 
-        // Already in Pam, with a staff invite made for this same number: one
-        // account holds one role until the next phase (D-373), so say so
-        // rather than leave the invite silently unusable.
+        // Already a member, with a program invite for this number and city:
+        // ask whether to add the program to their account (D-374).
+        if (waiting?.canAdd) {
+          const from = waiting.inviterFirstName ? `&from=${encodeURIComponent(waiting.inviterFirstName)}` : '';
+          router.replace(`/invite/add/?code=${encodeURIComponent(waiting.code)}${from}`);
+          return;
+        }
+
+        // Any other staff invite for a number already in Pam — a case
+        // manager's, or one for another city — cannot join this account, so
+        // say so rather than leave it silently unusable (D-373).
         if (waiting?.hasAccount) {
           const as = waiting.role === 'admin' ? 'case-manager' : 'program';
           const from = waiting.inviterFirstName ? `&from=${encodeURIComponent(waiting.inviterFirstName)}` : '';

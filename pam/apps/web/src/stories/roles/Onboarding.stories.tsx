@@ -47,5 +47,11 @@ export const ExpiredLink: StoryObj = screen('provider', 'Expired link', '/protot
  */
 export const NumberAlreadyInPam: StoryObj = screen('member', 'Number already in Pam', '/invite/in-use/');
 
+/**
+ * A member's number, invited to a program in their own city (D-374): add the
+ * program to the account they have — one account, both sides.
+ */
+export const AddYourProgram: StoryObj = screen('member', 'Add your program to your account', '/invite/add/');
+
 /** About Pam (D-259): what Pam is and how it helps each kind of person, from Sign in's footer. */
 export const About: StoryObj = screen('member', 'About Pam', '/about/');

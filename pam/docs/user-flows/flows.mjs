@@ -130,6 +130,13 @@ export const flows = [
         changed: 'D-373',
         note: 'A staff invite for a member\'s number: ask for another number; their own account unchanged',
       },
+      addProgram: {
+        title: 'Add your program to your account',
+        story: 'onboarding--add-your-program',
+        path: '/invite/add/',
+        changed: 'D-375',
+        note: 'A member invited to a program in their city: one account, both sides',
+      },
       email: {
         title: 'Email: your new link',
         story: 'onboarding-invite-email--program',
@@ -144,6 +151,7 @@ export const flows = [
       ['code', 'join', '6-digit code'],
       ['code', 'join', 'No link: Pam finds the invite for this number', { dashed: true }],
       ['code', 'inUse', 'Staff invite, number already a member'],
+      ['code', 'addProgram', 'Program invite, member in the same city'],
       ['join', 'cmHome', 'I understand — straight to Home'],
       ['signin', 'about', 'About Pam (footer)'],
       ['signin', 'memberJoin', 'Sign up'],
@@ -151,6 +159,7 @@ export const flows = [
       ['sent', 'email', 'Arrives by email', { dashed: true }],
     ],
     changes: [
+      'D-375 — a member can add their program to the same account; Use Pam as on Profile',
       'D-373 — invites need a name and phone; sign-in finds an invite waiting for the number; a member\'s number can\'t take a staff invite yet',
       'D-359 — sign-up starts at About you (Sign in did the phone); counts on the pinned button',
       'D-353 — staff sign-up ends on What to expect and goes straight Home; a program is added from Home, not at sign-up',
