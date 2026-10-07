@@ -47,6 +47,23 @@ STATUS row too.
 - [ ] **Review the SMS copy** still waiting for a name in `reviewedBy`
   (STATUS row 2).
 
+### Programs
+
+- [ ] **Load a program lead's own program** (Will, 7 October 2026: "still on
+  backlog list for programs before production"; D-218's follow-up, D-352,
+  D-361). Today the Program tab draws the example program, and Home's Get
+  started only knows a lead "has a program" once one is sent from that
+  device (`markSetupDone`, sessionStorage). Needs:
+  1. Read the lead's listing (their `org_id` and its `services` row, already
+     readable under `services_write_provider`, 0007) and show it on the
+     Program tab and in Edit, saving edits back.
+  2. Have Add a program write the listing as a `needs_review` row instead of
+     only showing "sent".
+  3. Drive `useProgramSetup().hasProgram` from that, so Get started, the
+     Program tab (Add a program when there is none) and the example data
+     follow the real account, on any device.
+  4. Then: switching between a lead's programs (D-318), also on the backlog.
+
 ## Done
 
 _(nothing yet)_

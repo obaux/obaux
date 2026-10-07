@@ -580,3 +580,4 @@ Chromium.
 - D-362: `@pam/ui/emptyState` + `--pam-empty-icon` across 9 screens' EmptyStates; `BellOutlineIcon`; round bell outline/filled by unread at 22px; the greyed `isEmpty` bell tried and removed. Checked: typecheck, ui 74, config 238, builds, screenshots (light/dark, day empty); e2e 573/573.
 - D-363: Messages empty copy per role + New message action in the empty state; ProgramEmpty story retitled (approved, unused — Will chose to keep Add a program). STATUS: Release 0.43.0-programs. Checked: typecheck, unit 16/74/238, builds, screenshot; e2e 573/573.
 - Merged #27 (84f4095) after CI green, at Will's word.
+- before-launch.md: new Programs section — load a lead's own program (Will: before production).

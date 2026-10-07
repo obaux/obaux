@@ -900,7 +900,8 @@ Open items Will asked to keep (7 October), newest first. Read this before
   joins is not awarded by the database yet (D-330, D-336).
 - **Program leads switch between their programs** — and Add a program
   returns to the new one (D-318).
-- **Load a lead's own program** instead of the example (D-218's follow-up):
+- **Load a lead's own program** instead of the example (D-218's follow-up;
+  on `docs/before-launch.md` under Programs since 7 October):
   then Get started and the Program tab know for real whether one exists
   (D-352, D-361).
 - **Real staff photos to members** — staff can upload (D-345, 0074 live), but
