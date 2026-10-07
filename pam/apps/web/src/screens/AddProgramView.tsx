@@ -10,14 +10,14 @@ import { PlacesIcon } from '@pam/ui';
 import { SubPage } from '@pam/ui/SubPage';
 import { useI18n } from '@/lib/i18n';
 import type { ProgramDetails } from '@/lib/useJoin';
-import { ProgramDetailsStep } from '../app/join/ProgramDetailsStep';
+import { ProgramWizard } from '../app/join/ProgramWizard';
 import { HelpButton } from './HelpButton';
 
 /**
  * Add a program (D-218, Will, 2 October: "both case managers and programs be
  * able to add new program"). Reached from the + on All programs.
  *
- * The same fields a program lead fills in at sign-up (`ProgramDetailsStep`,
+ * The same fields a program lead fills in at sign-up (`ProgramWizard`, one question a screen since D-347;
  * 0056), so a new program has one shape however it arrives; only the name is
  * required, and Pam checks every new program before it is listed (the
  * `needs_review` gate every manual entry goes through).
@@ -49,15 +49,16 @@ const styles = stylex.create({
 export function AddProgramView() {
   const { t } = useI18n();
   const [program, setProgram] = useState<ProgramDetails>(EMPTY);
-  const [tried, setTried] = useState(false);
+  const [step, setStep] = useState(0);
   const [sent, setSent] = useState(false);
-  const invalid = tried && program.name.trim() === '';
 
   return (
     <SubPage
       title={t('programs.new.title')}
       backHref="/programs/"
       backLabel={t('nav.back.programs')}
+      // Back goes one question back while there is one (D-347).
+      {...(!sent && step > 0 ? { onBack: () => setStep(step - 1) } : {})}
       actions={<HelpButton />}
     >
       {sent ? (
@@ -73,7 +74,7 @@ export function AddProgramView() {
               variant="secondary"
               onClick={() => {
                 setProgram(EMPTY);
-                setTried(false);
+                setStep(0);
                 setSent(false);
               }}
             />
@@ -85,16 +86,14 @@ export function AddProgramView() {
             {t('programs.new.intro')}
           </Text>
           <Card padding={6} xstyle={styles.card}>
-            <ProgramDetailsStep
+            <ProgramWizard
               value={program}
               onChange={setProgram}
-              onSubmit={() => {
-                setTried(true);
-                if (program.name.trim() !== '') setSent(true);
-              }}
+              onSubmit={() => setSent(true)}
               busy={false}
-              invalid={invalid}
               submitLabel={t('programs.new.send')}
+              step={step}
+              onStep={setStep}
             />
           </Card>
         </>

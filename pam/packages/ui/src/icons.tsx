@@ -74,6 +74,17 @@ export function UserPlusIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+/** A PDF document: a page with its corner turned, "PDF" drawn on it (D-348). */
+export function PdfIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" />
+      <path d="M14 3v5h5" />
+      <path d="M7.6 17.5v-4h1.3a1.25 1.25 0 0 1 0 2.5H7.6M11.1 17.5v-4h.9a2 2 0 0 1 0 4zM16.4 13.5h-1.9v4M14.5 15.5h1.5" strokeWidth={1.2} />
+    </svg>
+  );
+}
+
 /** A camera: add or change a photo (D-345). */
 export function CameraIcon(props: SVGProps<SVGSVGElement>) {
   return (

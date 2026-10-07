@@ -224,7 +224,11 @@ an × to close. Saved, trip cards and the next visit show each kind of
 place's own illustration (D-337). Drawers no longer have a dark outline. The Bring a
 friend picture runs to the drawer's edges, the × sits in its corner, and
 "Link copied" fills the link box in the same pale green as Copy (D-338). The green visit card has more room between its lines, and
-"Link copied" now spans the link box and Copy, centred (D-339). More room under the friend banner and above the link (D-340). "In 2 days" is plain text now, and Change appointment sits evenly in the card's corner (D-341). It has the same space above and below (D-342). It ends in a chevron, and the program's name on the card is black (D-343). Bring a friend has a "Send to a friend" button that opens your phone's share sheet with a short message and the link (D-344). Staff can add their own photo from Profile, with a small camera button on their picture (D-345).
+"Link copied" now spans the link box and Copy, centred (D-339). More room under the friend banner and above the link (D-340). "In 2 days" is plain text now, and Change appointment sits evenly in the card's corner (D-341). It has the same space above and below (D-342). It ends in a chevron, and the program's name on the card is black (D-343). Bring a friend has a "Send to a friend" button that opens your phone's share sheet with a short message and the link (D-344). Staff can add their own photo from Profile, with a small camera button on their picture (D-345). Adding a program now asks one question
+at a time, lets you skip what you don't know yet, and shows everything on
+one screen before it is sent (D-347). Adding a policy is one card with a PDF
+and a Choose files button, or drop a file on it (D-348). The super admin can
+message a program's lead from the program's page (D-349). The Android app opens the phone's share sheet too, for Bring a friend, sharing a place and invite links (D-350).
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 

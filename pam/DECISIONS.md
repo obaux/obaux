@@ -8514,6 +8514,96 @@ held-back migrations).
   built on the old Messages screen; the redesign's thread options have
   Report but no Block. 0076's functions are ready for one.
 
+### D-347 — A program is added one question at a time
+
+**Date:** 2026-10-07. Will: "proceed with staff onboarding, simplify using
+industry standards" (#78: "one thing per screen").
+
+- **Before:** sign-up's program step, and Add a program, were one long form —
+  name, two radio lists, a description, address, phone, website and
+  services — under a line saying most of it was optional.
+- **Now `ProgramWizard`** (replaces `ProgramDetailsStep`), the pattern sign-
+  ups that people finish use (Stripe, Airbnb, Shopify): one plain question
+  a screen with "n of 7" above it; only the name is required (Next without
+  it says so, D-334); the kind is pre-picked; focus, about, where, contact
+  (phone and website together) and services each have **Skip for now**;
+  then **Check your program**, every answer a row back to its question,
+  unanswered ones saying "Not added". Back on the screen steps back a
+  question (sign-up and Add a program both own the step). The fields and
+  what is sent are unchanged (0056, D-313).
+- Copy: `join.program.step.*`, `.progress`, `.skip`, `.review.*` (en, es);
+  `join.program.intro` removed. The name field's label is visually hidden
+  (the question is the label people read). Story
+  `Components/Forms/ProgramWizard` (name, focus, review).
+
+### D-348 — Add a policy is one card with a PDF
+
+**Date:** 2026-10-07. Will: "Policy uploaded" — D-317's "uploader as a full
+card with PDF icon, modern styling".
+
+`PolicyUploadCard` (@pam/ui): a dashed card, a `PdfIcon` (new, outline with
+"PDF" drawn in the line colour, legible in dark mode — a first version with a
+filled band was not) in a pale-green circle, "Add a policy", one line on what
+works, and **Choose files** (secondary). Files can also be dropped on it; the
+card lights while one is over it. It replaces Astryx's `FileInput` on the
+Policies screen; `usePolicies().add` takes the files as before. Story
+`Components/Actions/PolicyUploadCard`. `policies.upload.button` en/es.
+
+### D-349 — The super admin messages a program's lead from the program's page
+
+**Date:** 2026-10-07. Will: "super admin program messaging" (#54; D-262
+did requests, Text, and Messages).
+
+On a place, a super admin's rows have **Message {lead}** ("Program lead · plan
+how they use Pam") instead of a member's Send a message. It opens the
+conversation between the super admin and that program's lead
+(`leadMessageFor`; 0072 already allows super admin ↔ program lead). No lead
+known, no row. Story `Super admin/Screens/ThreadWithProgramLead`. Flow map
+page 5 redrawn with the program page and the thread; pages 3 and 4 notes
+patched for D-347 and D-348.
+
+**Proven by (all three):** Storybook walks (wizard: Next without a name
+warns, two answers, five skips, review, Back steps one question; upload card
+light and dark; super admin place row → thread opens); typecheck; ui 69,
+config 238, web 16; builds; Storybook; e2e 573/573.
+
+### D-350 — The Android app gets the share sheet: `@capacitor/share`
+
+**Date:** 2026-10-07. Will: "Install android plug in" (D-344 left Android's
+in-app WebView, which has no `navigator.share`, on copy only).
+
+- `@capacitor/share` ^6.0.4 in `apps/native` (Capacitor 6, like the rest).
+  `cap add android` has not been run in the repo (`android/` is generated,
+  not committed); the next `pnpm --filter @pam/native sync` registers it.
+- `@pam/ui/share` (`canShareSheet`, `shareText`): in the app, the plugin,
+  reached at runtime through `window.Capacitor.Plugins` (the speech
+  recogniser's rule: the web build never imports Capacitor); in a phone's
+  browser, `navigator.share`; otherwise false, and the caller copies. A
+  closed sheet is not a failure.
+- Used by all three places Pam shares: Bring a friend (D-344), share a
+  place (`sharePlace`), and an invite link (`InviteReady`) — so a case
+  manager in the Android app gets the sheet for invites too.
+- **Proven by:** `test/share.test.tsx` (plugin in the app, browser sheet,
+  none, a closed sheet, the plugin ignored when not native); typecheck; ui
+  74; web build; e2e 572/573 then the one failure (`flag.spec`, narrow)
+  54/54 alone — unrelated and timing-dependent under the full run. **Not
+  run on an Android device**: that needs `cap add android` and a build.
+
+### D-351 — Pam stays a web app for now
+
+**Date:** 2026-10-07. Will: "We're keeping this as a web app for now."
+
+- No native build is planned: `cap add android` / `ios` are not run, and
+  real-device QA means **phone browsers** (Safari on iPhone, Chrome on
+  Android), not the Capacitor shell or an Android WebView.
+- Nothing is removed. `apps/native` stays as it is, `@capacitor/share`
+  included (D-350): it costs the website nothing, since `@pam/ui/share` only
+  reaches it inside the app. In a phone's browser the share sheet comes from
+  `navigator.share`, which both Safari and Android Chrome have — so Bring a
+  friend, sharing a place and invite links already open the sheet there.
+- Earlier notes that name the Capacitor build or Android WebView as a QA
+  target (D-333 onwards) now read as "if the app is ever built".
+
 ---
 
 ## Notes for whoever picks this up next

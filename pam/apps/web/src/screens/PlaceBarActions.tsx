@@ -53,6 +53,25 @@ export function messageHrefFor(placeName: string, placeId?: string): string {
 }
 
 /**
+ * The super admin's way to a program's lead from the program's own page
+ * (D-349; Will, 7 October: "super admin program messaging"): the
+ * conversation between the super admin and that program's lead (0072 allows
+ * it both ways), or null when Pam knows no lead for the place.
+ */
+export function leadMessageFor(
+  placeName: string,
+  placeId?: string,
+): { readonly firstName: string; readonly href: string } | null {
+  const lead = DUMMY_PROGRAM_LEADS.find((person) => person.orgName === placeName);
+  if (!lead) return null;
+  const fromPlace = placeId ? `&from=place&place=${encodeURIComponent(placeId)}` : '';
+  return {
+    firstName: lead.firstName ?? '',
+    href: `/messages/thread/?id=${encodeURIComponent(dummyConversationIdBetween(lead.id, DUMMY_SELF_ID.super_admin))}${fromPlace}`,
+  };
+}
+
+/**
  * A place's bar for a member (D-224, Will, 2 October): Save, then ⋯ — a
  * secondary menu with Flag something, Share and Message the program, each
  * with its icon. The long column of buttons under the place is gone.

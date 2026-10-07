@@ -31,7 +31,7 @@ export type JoinOutcome =
 /**
  * What a program lead already knows about their own program, collected on
  * the extra step self-claiming `provider` adds (0056). Manual entry only —
- * see `ProgramDetailsStep` for why. Left undefined for every other kind.
+ * see `ProgramWizard` for why. Left undefined for every other kind.
  */
 export interface ProgramDetails {
   readonly name: string;

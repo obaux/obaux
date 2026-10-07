@@ -16,7 +16,7 @@ import {
   directionsHref,
   googlePlaceHref,
 } from '@pam/ui';
-import { PlaceBarActions, messageHrefFor, newMessageFrom } from '../../screens/PlaceBarActions';
+import { PlaceBarActions, leadMessageFor, messageHrefFor, newMessageFrom } from '../../screens/PlaceBarActions';
 import { PlaceDetailSkeleton } from '@pam/ui/Skeletons';
 import { SubPageHeader } from '@pam/ui/SubPage';
 import { HelpButton } from '../../screens/HelpButton';
@@ -393,6 +393,7 @@ function PlaceScreen() {
   // With the place's Google ID when Pam has one (D-291): Maps opens on the place itself.
   // Only a member is written to by a program here (D-305).
   const unread = (demoRole ?? trueRole) === 'member' ? newMessageFrom(place!.name) : null;
+  const leadMessage = leadMessageFor(place!.name, place!.id);
   const directions =
     (service?.address
       ? directionsHref(service.address, null, null, null)
@@ -535,27 +536,45 @@ function PlaceScreen() {
                 },
               ]
             : []),
-          // A message from the program waiting (D-305): the row says so, with a
-          // pink dot and their newest words, and opens that conversation.
-          unread
-            ? {
-                id: 'message',
-                label: t('place.quick.newMessage'),
-                description: unread.preview,
-                icon: <MessagesIcon {...QUICK} />,
-                href: `${unread.href}${unread.href.includes('?') ? '&' : '?'}from=place&place=${encodeURIComponent(place!.id)}`,
-                hasDot: true,
-                // One line, then "…" (Will, D-306): the row says there is a
-                // message, the conversation says the rest.
-                isDescriptionOneLine: true,
-              }
-            : {
-                id: 'message',
-                label: t('place.quick.message'),
-                description: t('place.quick.message.body'),
-                icon: <MessagesIcon {...QUICK} />,
-                href: messageHrefFor(place!.name, place!.id),
-              },
+          // The super admin writes to the program's lead, not as a member
+          // would (D-349): "Message Sandra", to coordinate how they use Pam.
+          // No lead known, no row.
+          ...((demoRole ?? trueRole) === 'super_admin'
+            ? leadMessage
+              ? [
+                  {
+                    id: 'message',
+                    label: t('place.quick.messageLead', { name: leadMessage.firstName }),
+                    description: t('place.quick.messageLead.body'),
+                    icon: <MessagesIcon {...QUICK} />,
+                    href: leadMessage.href,
+                  },
+                ]
+              : []
+            : [
+                // A message from the program waiting (D-305): the row says so,
+                // with a pink dot and their newest words, and opens that
+                // conversation.
+                unread
+                  ? {
+                      id: 'message',
+                      label: t('place.quick.newMessage'),
+                      description: unread.preview,
+                      icon: <MessagesIcon {...QUICK} />,
+                      href: `${unread.href}${unread.href.includes('?') ? '&' : '?'}from=place&place=${encodeURIComponent(place!.id)}`,
+                      hasDot: true,
+                      // One line, then "…" (Will, D-306): the row says there is a
+                      // message, the conversation says the rest.
+                      isDescriptionOneLine: true,
+                    }
+                  : {
+                      id: 'message',
+                      label: t('place.quick.message'),
+                      description: t('place.quick.message.body'),
+                      icon: <MessagesIcon {...QUICK} />,
+                      href: messageHrefFor(place!.name, place!.id),
+                    },
+              ]),
           ...(phone
             ? [
                 {

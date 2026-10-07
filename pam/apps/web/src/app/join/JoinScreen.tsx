@@ -38,7 +38,7 @@ import {
 import { NOTICES } from '@pam/config';
 import { PhoneSignInCard } from '../signin/PhoneSignInCard';
 import { LegalFooter } from '../signin/LegalFooter';
-import { ProgramDetailsStep } from './ProgramDetailsStep';
+import { ProgramWizard } from './ProgramWizard';
 
 /**
  * Signing up: five steps, and four of them are one question each.
@@ -212,6 +212,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
   const [failed, setFailed] = useState(false);
   const [invalid, setInvalid] = useState<'name' | 'city' | null>(null);
   const [program, setProgram] = useState<ProgramDetails>(EMPTY_PROGRAM);
+  const [programStep, setProgramStep] = useState(0);
   const [programInvalid, setProgramInvalid] = useState(false);
 
   const firstId = useId();
@@ -486,8 +487,13 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
         }
       : phase === 'details'
         ? { backLabel: t('nav.back.signin'), onBack: toPhone }
-        : phase === 'program' || phase === 'waiting'
-          ? { backLabel: t('trips.new.back'), onBack: () => setPhase('details') }
+        : phase === 'program'
+          ? {
+              backLabel: t('trips.new.back'),
+              onBack: () => (programStep > 0 ? setProgramStep(programStep - 1) : setPhase('details')),
+            }
+          : phase === 'waiting'
+            ? { backLabel: t('trips.new.back'), onBack: () => setPhase('details') }
           : phase === 'texts'
             ? { backLabel: t('trips.new.back'), onBack: () => setPhase('privacy') }
             : { backLabel: t('trips.new.back') };
@@ -675,12 +681,14 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
 
         {phase === 'program' ? (
           <Card padding={4} xstyle={styles.card}>
-            <ProgramDetailsStep
+            {/* One question a screen (D-347); Back steps back through them. */}
+            <ProgramWizard
               value={program}
               onChange={setProgram}
               onSubmit={() => void submitProgram()}
               busy={busy}
-              invalid={programInvalid}
+              step={programStep}
+              onStep={setProgramStep}
             />
           </Card>
         ) : null}

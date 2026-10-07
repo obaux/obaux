@@ -21,6 +21,12 @@ export const RequestProgram: Story = screen('super-admin', 'A requested program'
 export const Thread: Story = screen('super-admin', 'A conversation with a case manager', '/messages/thread/', {
   id: 'dummy-conv-dummy-a1-dummy-s1',
 });
+/** From a program's page, "Message Sandra" (D-349): a new thread with its lead. */
+export const ThreadWithProgramLead: Story = screen('super-admin', 'A conversation with a program lead', '/messages/thread/', {
+  id: 'dummy-conv-dummy-p1-dummy-s1',
+  from: 'place',
+  place: 'dummy-place-learning',
+});
 export const InvitesLog: Story = screen('super-admin', 'Invited people', '/invites/');
 export const Invite: Story = screen('super-admin', 'Invite someone', '/invite/');
 export const ViewAs: Story = screen('super-admin', 'See the app as', '/view-as/');

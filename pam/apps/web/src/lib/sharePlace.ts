@@ -1,5 +1,7 @@
 'use client';
 
+import { shareText } from '@pam/ui/share';
+
 /**
  * Hand a place to somebody else.
  *
@@ -20,11 +22,9 @@
 export async function sharePlace(name: string, address?: string | null): Promise<boolean> {
   const text = address ? `${name}, ${address}` : name;
 
+  // The share sheet, in the app too (D-350); a desktop browser copies.
+  if (await shareText(text, name)) return true;
   try {
-    if (typeof navigator !== 'undefined' && navigator.share) {
-      await navigator.share({ title: name, text });
-      return true;
-    }
     if (typeof navigator !== 'undefined' && navigator.clipboard) {
       await navigator.clipboard.writeText(text);
       return true;
