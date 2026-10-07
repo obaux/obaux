@@ -560,3 +560,4 @@ Chromium.
 - Merged #26 (ca3ba9c) after CI green on 20ab04e, at Will's yes.
 
 - STATUS gains a Backlog section with the open items (Will: "keep the open items on backlog"). Next up: program view redesign, after /compact.
+- Docs audit: every D-327–D-351 has a DECISIONS entry and a session-log line; CHANGELOG gets a 0.42.0-members entry for 6–7 October (end state, grouped), STATUS a release note.

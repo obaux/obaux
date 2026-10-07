@@ -855,6 +855,16 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
+## Release 0.42.0-members (6–7 October)
+
+The member experience, revamped: booking ends on "Your trip is booked";
+policies, Bring a friend (copy, drawer, share sheet), category
+illustrations, staff photos, the program wizard, the policy upload card,
+super admin → program lead messages. D-327 to D-351, merged to main in
+#24, #25 and #26; the user-facing summary is the top of `CHANGELOG.md`.
+Trips' sign-before-you-go banner (D-327) and the member prototype's kept
+link (D-331) are part of it.
+
 ## Backlog
 
 Open items Will asked to keep (7 October), newest first. Read this before
