@@ -8398,6 +8398,23 @@ doesn't match the bottom row, make it neatly spaced." Measured to the ink:
 Now 20px and 20px (divider padding 4px → 2px, the link's overhang
 -14px → -13px); the target is still 48px and inside the card.
 
+### D-343 — A chevron after Change appointment; the program's name in black
+
+**Date:** 2026-10-07. Will: "Add chevron next to change appointment
+matching font weight and underline. Make learning center a different
+color, like black."
+
+- **Chevron:** a "›" character (U+203A) after a no-break space, in the
+  link's own font at 1.3em, `aria-hidden`. A character rather than an Astryx
+  icon because an icon is an atomic inline: the underline the link shows on
+  hover would stop at the words. As text it takes the link's weight and the
+  underline runs on under it (checked on hover). The label is still the
+  accessible name (`children` replaces only the visible text).
+- **Eyebrow** (the program's name on the booked screen, "Your next visit"
+  on a place): `--color-text-primary`, bold, was the green icon colour.
+- **Proven by:** screenshots (rest and hover), typecheck, ui 69, web
+  build, e2e 573/573 (axe included, light and dark).
+
 ---
 
 ## Notes for whoever picks this up next

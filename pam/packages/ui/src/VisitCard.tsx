@@ -55,7 +55,9 @@ const styles = stylex.create({
     backgroundColor: colorVars['--color-background-card'],
     color: colorVars['--color-icon-green'],
   },
-  eyebrow: { fontSize: '16px', lineHeight: 1.3, fontWeight: 700, color: colorVars['--color-icon-green'] },
+  // The program's name in the body colour, not green (Will, D-343), so it
+  // reads as a name rather than another green label.
+  eyebrow: { fontSize: '16px', lineHeight: 1.3, fontWeight: 700, color: colorVars['--color-text-primary'] },
   day: { fontSize: '26px', lineHeight: 1.2, fontWeight: 700, color: colorVars['--color-text-primary'] },
   time: { fontSize: '20px', lineHeight: 1.3, fontWeight: 600, color: colorVars['--color-text-green'] },
   // Metadata, so it reads quieter than the day and time (Will, D-341): plain
@@ -80,6 +82,7 @@ const styles = stylex.create({
     fontSize: '17px',
     fontWeight: 600,
   },
+  chevron: { fontSize: '1.3em', lineHeight: 0, fontWeight: 'inherit', color: 'inherit', textDecorationLine: 'inherit' },
   changeColour: {
     color: { default: colorVars['--color-icon-green'], ':hover': colorVars['--color-text-green'] },
   },
@@ -110,7 +113,18 @@ export function VisitCard({ eyebrow, day, time, service = null, countdown = null
               href={changeHref}
               // A link, not a pill (D-280).
               xstyle={[styles.change, textLinkLook.link, styles.changeColour]}
-            />
+            >
+              {/*
+                A chevron after the words (Will, D-343). A character of the
+                same font rather than an icon, so it takes the link's weight
+                and its underline runs on under it; the label stays the
+                accessible name, the chevron is hidden from screen readers.
+              */}
+              {changeLabel}
+              <Text aria-hidden xstyle={styles.chevron}>
+                {'\u00A0\u203A'}
+              </Text>
+            </Button>
           </VStack>
         ) : null}
       </VStack>
