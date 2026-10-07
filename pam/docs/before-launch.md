@@ -1,6 +1,6 @@
-# To do before launching PAM
+# To do before launching Pam
 
-Will's list of what must be true before real people use PAM. Add to it when
+Will's list of what must be true before real people use Pam. Add to it when
 Will says "before launch", tick items off with the date and who did it, and
 never delete one: a done item stays, struck through, so the list is also the
 record of how launch was reached.
@@ -15,7 +15,7 @@ STATUS row too.
   D-263). The expired-link page already queues a fresh link in
   `public.invite_emails` (live since 0071); nothing sends it yet. Needs:
   1. Pick a provider (Resend, Postmark or SendGrid all work from a Supabase
-     Edge Function) and a from-address on PAM's own domain, with SPF/DKIM
+     Edge Function) and a from-address on Pam's own domain, with SPF/DKIM
      set up for it.
   2. Put the provider's API key in Supabase Edge Function secrets — never in
      this repo.
@@ -37,7 +37,7 @@ STATUS row too.
   0072's super admin ↔ staff arm before it goes live. Run the DB suite on the
   merged result first.
 
-- [ ] **Approve the PAM-team line on the transparency screen** (STATUS row
+- [ ] **Approve the Pam-team line on the transparency screen** (STATUS row
   10b). Members were promised they would hear first if what is visible
   changes; the super admin's Everyone list and invite log are visible now.
 
@@ -47,3 +47,5 @@ STATUS row too.
 ## Done
 
 _(nothing yet)_
+- [ ] Text-message samples re-filed with the carrier with the "Pam:" prefix (D-321, 6 October 2026).
+- [ ] A reviewed `booked_visit` SMS template (D-322): "Pam: {place} booked you for {day} at {time}. Tap to see it in Pam: {link}" — first contact, carries STOP; a human signs `reviewedBy`.

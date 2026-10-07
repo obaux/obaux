@@ -49,7 +49,7 @@ const pill = (
 );
 
 const meta = {
-  title: 'Member app/States/Explore',
+  title: 'Member/Created/States/Explore',
   component: ExploreView,
   args: {
     search: pill,

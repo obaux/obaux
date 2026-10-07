@@ -1,11 +1,14 @@
 'use client';
 
 import * as stylex from '@stylexjs/stylex';
+import { HStack } from '@astryxdesign/core/HStack';
+import { Icon } from '@astryxdesign/core/Icon';
+import { IconButton } from '@astryxdesign/core/IconButton';
 import { VStack } from '@astryxdesign/core/VStack';
 import { Text } from '@astryxdesign/core/Text';
 import { TextArea } from '@astryxdesign/core/TextArea';
 import { RadioList, RadioListItem } from '@astryxdesign/core/RadioList';
-import { BigButton, TextField } from '@pam/ui';
+import { BigButton, TextField, TextLink } from '@pam/ui';
 import { CATEGORY_LIST, subcategoriesFor, type Category } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import type { ProgramDetails } from '@/lib/useJoin';
@@ -34,7 +37,7 @@ export interface ProgramDetailsStepProps {
   readonly onSubmit: () => void;
   readonly busy: boolean;
   readonly invalid: boolean;
-  /** The button's words — "Next" at sign-up, "Send to PAM" on Add a program (D-218). */
+  /** The button's words — "Next" at sign-up, "Send to Pam" on Add a program (D-218). */
   readonly submitLabel?: string;
 }
 
@@ -43,6 +46,9 @@ const styles = stylex.create({
   field: { textAlign: 'start' },
   note: { fontSize: '15px', lineHeight: 1.5 },
   choices: { rowGap: '12px' },
+  serviceRow: { width: '100%' },
+  serviceField: { flexGrow: 1, minWidth: 0, textAlign: 'start' },
+  removeService: { width: '48px', height: '48px', flexShrink: 0 },
 });
 
 const DESCRIPTION_MAX = 200;
@@ -126,6 +132,40 @@ export function ProgramDetailsStep({ value, onChange, onSubmit, busy, invalid, s
         width="100%"
         xstyle={styles.field}
       />
+
+      {/*
+        What the program offers, by name (D-313): one field each, as many as
+        they do. Phone, website and policies per service come later, from
+        the Program tab, so sign-up stays short.
+      */}
+      <VStack gap={2}>
+        <Text xstyle={styles.field}>{t('join.program.services')}</Text>
+        <Text type="supporting" xstyle={[styles.note, styles.field]}>
+          {t('join.program.services.hint')}
+        </Text>
+        {value.services.map((name, i) => (
+          <HStack key={i} gap={2} align="end" wrap="nowrap" xstyle={styles.serviceRow}>
+            <TextField
+              label={t('join.program.service', { n: i + 1 })}
+              value={name}
+              onChange={(next) => set({ services: value.services.map((s, j) => (j === i ? next : s)) })}
+              width="100%"
+              xstyle={styles.serviceField}
+            />
+            <IconButton
+              label={t('join.program.services.remove', { n: i + 1 })}
+              icon={<Icon icon="close" size="md" />}
+              variant="ghost"
+              onClick={() => set({ services: value.services.filter((_, j) => j !== i) })}
+              xstyle={styles.removeService}
+            />
+          </HStack>
+        ))}
+        <TextLink
+          label={value.services.length === 0 ? t('program.services.add') : t('join.program.services.add')}
+          onClick={() => set({ services: [...value.services, ''] })}
+        />
+      </VStack>
 
       {invalid ? (
         <Text type="supporting" xstyle={styles.note}>

@@ -5,7 +5,7 @@ import { DUMMY_PLACES_BY_ID } from '@pam/config/dummy-places';
 import { useStoryText } from '../support/useStoryText';
 
 /**
- * PAM's motion: cards arriving in turn (40ms a row, capped at six), lists
+ * Pam's motion: cards arriving in turn (40ms a row, capped at six), lists
  * revealing as they scroll in, and a press that gives under the thumb. All of
  * it lives in a runtime `MotionProvider` loads only on a connection that can
  * afford it, and none of it plays under reduced motion — so with motion
@@ -51,7 +51,8 @@ function MotionDemo({ demo, run }: { readonly demo: 'cardEnter' | 'scrollReveal'
 }
 
 const meta = {
-  title: 'Components/Motion',
+  title: 'Foundations/Motion',
+  tags: ['autodocs'],
   component: MotionDemo,
   decorators: [
     (Story) => (
@@ -71,7 +72,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /** A list arriving: each card in its turn. */
-export const CardEntrance: Story = {};
+export const Default: Story = {};
 
 /** A long list: rows fade up as they scroll into view. */
 export const ScrollRevealList: Story = { args: { demo: 'scrollReveal' } };

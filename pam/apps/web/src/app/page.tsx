@@ -47,7 +47,7 @@ import { HomePeopleLazy } from './HomePeopleLazy';
  * member would have seen, which is a demo asking somebody to trust it with
  * their phone number.
  *
- * What replaces it is a menu, and nothing else. PAM's home is not a feed and
+ * What replaces it is a menu, and nothing else. Pam's home is not a feed and
  * not a dashboard of numbers: it is the shortest list of places to go, each one
  * named in the member's own words, with what is waiting shown as a count rather
  * than implied by a coloured dot. Points, a plan and a next step belong here
@@ -201,7 +201,7 @@ export default function HomePage() {
   }
 
   /*
-   * Half signed up, or paused. Say what PAM is for in one line and explain
+   * Half signed up, or paused. Say what Pam is for in one line and explain
    * the one thing that's true for that person — a verified phone with no
    * account yet, or a paused account and the way to sign out. No tiles,
    * because either one would ask for a sign-in on arrival.
@@ -261,7 +261,7 @@ export default function HomePage() {
       />
 
       {/*
-        Their own name if PAM has one. It often does not — a member can be
+        Their own name if Pam has one. It often does not — a member can be
         invited and signed in before onboarding asks — so the fallback is the
         screen's plain name rather than "Hi, there", which reads like a mail
         merge that failed.
@@ -361,7 +361,7 @@ export default function HomePage() {
         Two tiles came off this screen (Will, 14 September). Notifications is
         the bell in the header — the same destination twice is a menu arguing
         with itself. Text reminders belongs to signing up: it is the one
-        question PAM asks once, and a permanent tile invites somebody to
+        question Pam asks once, and a permanent tile invites somebody to
         re-answer a decision that is already made.
       */}
       <VStack gap={2}>

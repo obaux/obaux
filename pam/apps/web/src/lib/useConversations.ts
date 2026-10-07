@@ -6,7 +6,7 @@ import type { Role } from '@pam/config';
 /**
  * The conversations a member is actually part of (§4.1/A1).
  *
- * Messaging in PAM is staff-to-member: a case manager with a member on their
+ * Messaging in Pam is staff-to-member: a case manager with a member on their
  * caseload, or a program admin with a member enrolled in their program — never
  * member-to-member. This hook itself does not know or care which side of that
  * a signed-in account is on; it just reads every conversation the caller is a

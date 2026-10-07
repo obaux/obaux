@@ -63,6 +63,77 @@ const EXAMPLE_WORKFORCE_CENTER: DummySavedPlace = {
   description: 'Job training, help with a resume and openings posted every week.',
 };
 
+/*
+ * Six more (Will, 5 October, D-304): Explore had one place per category, all
+ * three with a visit booked. Three of each kind now, and most with nothing
+ * booked or saved, so a list looks like a list.
+ */
+const EXAMPLE_LIBRARY: DummySavedPlace = {
+  id: 'dummy-place-library',
+  name: 'Example Library Tech Lab',
+  category: 'education',
+  address: '1901 Vine St, Philadelphia, PA 19103',
+  phone: '+12155550120',
+  lat: 39.9596,
+  lon: -75.1711,
+  description: 'Free computer classes and help with email, phones and job sites. Drop in any afternoon.',
+};
+
+const EXAMPLE_TRADES: DummySavedPlace = {
+  id: 'dummy-place-trades',
+  name: 'Example Trade Skills Workshop',
+  category: 'workforce',
+  address: '2101 N Front St, Philadelphia, PA 19122',
+  phone: null,
+  lat: 39.9819,
+  lon: -75.1353,
+  description: 'Hands-on training in carpentry, electrical and heating work, with paid apprenticeships after.',
+};
+
+const EXAMPLE_FAMILY: DummySavedPlace = {
+  id: 'dummy-place-family',
+  name: 'Example Family Resource Center',
+  category: 'family_services',
+  address: '1500 S 5th St, Philadelphia, PA 19147',
+  phone: '+12155550133',
+  lat: 39.9301,
+  lon: -75.1531,
+  description: 'Help with childcare, school sign-up and benefits for the whole family.',
+};
+
+const EXAMPLE_ADULT_ED: DummySavedPlace = {
+  id: 'dummy-place-adult-ed',
+  name: 'Example Adult Learning Program',
+  category: 'education',
+  address: '4000 Lancaster Ave, Philadelphia, PA 19104',
+  phone: '+12155550144',
+  lat: 39.9632,
+  lon: -75.2041,
+  description: 'Reading, math and GED classes in small evening groups. Sign up at the front desk.',
+};
+
+const EXAMPLE_MONEY: DummySavedPlace = {
+  id: 'dummy-place-money',
+  name: 'Example Money Help Desk',
+  category: 'workforce',
+  address: '30 S 15th St, Philadelphia, PA 19102',
+  phone: null,
+  lat: 39.9512,
+  lon: -75.1655,
+  description: 'Free help opening a bank account, fixing credit and filing taxes.',
+};
+
+const EXAMPLE_HOUSING: DummySavedPlace = {
+  id: 'dummy-place-housing',
+  name: 'Example Housing Help Office',
+  category: 'family_services',
+  address: '1234 Market St, Philadelphia, PA 19107',
+  phone: '+12155550155',
+  lat: 39.9516,
+  lon: -75.1612,
+  description: 'Help finding a place to live, paying rent and talking with a landlord.',
+};
+
 /** What a member previewing "Member" sees on Saved and the Home strip. */
 export const DUMMY_SAVED_BY_ROLE: Partial<Record<Role, readonly DummySavedPlace[]>> = {
   member: [EXAMPLE_LEARNING_CENTER, EXAMPLE_FOOD_PANTRY],
@@ -91,7 +162,17 @@ export const DUMMY_SAVED_BY_PERSON: Readonly<Record<string, readonly DummySavedP
  * for. A dummy id never reaches the network now; see `isDummyPlaceId`.
  */
 export const DUMMY_PLACES_BY_ID: Readonly<Record<string, DummySavedPlace>> = Object.fromEntries(
-  [EXAMPLE_LEARNING_CENTER, EXAMPLE_FOOD_PANTRY, EXAMPLE_WORKFORCE_CENTER].map((place) => [
+  [
+    EXAMPLE_LEARNING_CENTER,
+    EXAMPLE_FOOD_PANTRY,
+    EXAMPLE_WORKFORCE_CENTER,
+    EXAMPLE_LIBRARY,
+    EXAMPLE_TRADES,
+    EXAMPLE_FAMILY,
+    EXAMPLE_ADULT_ED,
+    EXAMPLE_MONEY,
+    EXAMPLE_HOUSING,
+  ].map((place) => [
     place.id,
     place,
   ]),

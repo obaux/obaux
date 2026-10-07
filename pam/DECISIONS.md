@@ -6098,6 +6098,2323 @@ the sign button."
   - a typed name signs.
   The full e2e suite passed.
 
+### D-271 — Policies on top of a place with a visit booked; a corner × to sign again; links look like links
+
+Will, 5 October, from the phone, with four screenshots:
+- the place page needs "a way to show more prominently on top … that
+  signatures are needed", with "a version … that's green and verifies that
+  Signatures are completed";
+- the signed box needs even padding and "a tiny white circle X on top
+  corner to clear signature, and sign again";
+- "link buttons should not have this round pill shape, only text color
+  change with underline on hover";
+- Sign should sit "right under the pre-filled signature", "Sign a new way"
+  should go, and the box should say "Your signature:".
+
+- **`PolicyStatusCard` (`@pam/ui`).** A white card under the place's name
+  and open/closed line, above the round buttons (`PlaceDetail` `notice`).
+  - To sign: a pen in the trip token's orange circle, "Policies to sign",
+    "Sign before your visit", in the token's orange text colour.
+  - All signed: the green version, "Policies signed", "All signatures
+    complete".
+  - It shows when the member has a visit booked at this place (example or
+    added trips) or arrived from Trips. Otherwise the policies stay a row at
+    the foot of the page, as in D-270, and never both.
+  - The title is the token's text colour rather than a brighter orange: on
+    white, `--color-icon-orange` and `--color-text-orange` are the same dark
+    orange, and a lighter one would fail contrast.
+- **The signature box** has 16px padding all round, so the tick sits as far
+  from the top as from the left.
+  - The corner × is a 28px white circle drawn inside a 48px tap square,
+    because every button keeps PAM's 48px floor (a global rule).
+  - On a signed policy, × takes the signature off that policy, forgets the
+    saved one, and opens the sheet to sign again.
+  - On the "Your signature:" box, × forgets the saved signature and opens
+    the sheet.
+  - Each signed policy now keeps the picture it was signed with
+    (`useMySignatures` stores `{ at, image }`; old string entries still
+    read), so a new signature never changes an earlier one.
+- **Addendum, same day:** "The X button on top right is off." On Will's
+  phone the circle hung off the box's edge and Safari stretched it into a
+  pill: the flex container inside the button stretched the circle to the
+  button's 48px height.
+  - The × now sits inside the box's top-right corner, 14px in from both
+    edges and level with the "Signed" line.
+  - The circle is absolutely placed at a fixed 28×28 in the middle of the
+    48px tap square, so no flex rule can resize it.
+  - The "Your signature:" box keeps 56px clear on its right for it.
+- **Sign right under the signature.** The two sit together with 12px
+  between them; "Sign a new way" is gone.
+- **`TextLink` looks like a link, everywhere.** No padding, no pill on hover
+  or press (Astryx's ghost button paints one as a background image). The
+  colour turns accent and an underline appears on hover. It stays a 48px
+  target. The signing sheet's "Type my name instead" and "Clear" use it.
+- **Proven by:** `e2e/policies.spec.ts`, which adds a test that the corner ×
+  clears a signed policy and the saved signature. The full suite passed
+  (546/546).
+
+### D-272 — A Connections card is the whole profile: message button, program link, "Connected by"
+
+Will, 5 October, with a screenshot of Sandra's card:
+- "for program leads, there should be a badge under card saying who
+  connected them for context";
+- "On top right of cards, add message icon buttons";
+- "the program name should be a link with a chevron next to it (max 1
+  line) … making sure the back button goes back to connections";
+- "No need to have a new page for clicking connections card. We can remove
+  that page."
+
+- **The card no longer opens anything.** `ConnectionCard` is a plain `Card`
+  now, not a `ClickableCard`. Its controls are the ways on, and a card that
+  is itself a link cannot hold other links.
+- **Message, top right:** a round 48px button with the messages icon, to
+  the example conversation with that person.
+- **The program's name** is a one-line link (ellipsis, then a chevron) to
+  `/place/?id=…&from=connections`. The place page has a new `connections`
+  back target, so Back says "Back to Connections".
+  - A case manager has no program, so "Case manager" stays plain text.
+- **"Connected by Teresa"** sits at the foot of a program person's card,
+  with Teresa's face, as a `Token`. Text is 15px: Astryx's largest token is
+  12px, too small at arm's length for this audience.
+  - Example data: `connectedById` on `DummyConnection`, the case manager.
+  - Real data will need who made the referral, which `recommendations`
+    already records.
+- **Removed:**
+  - `/connections/person/` (the page, its route, its role and state
+    stories);
+  - `ConnectionProfileView`;
+  - the `connections.about` string.
+  - "View program details" in a conversation's options now opens the
+    program's place page (`from=messages`, back to Messages) instead of the
+    removed profile.
+- **Map:** the Member page loses "A connection". Connections → A
+  conversation is now the round button. The program link has no arrow: it
+  would cross every card on the page, so the Connections note says it
+  instead.
+- **Proven by:** typecheck, config 236/236, ui 66/66, the full e2e suite
+  546/546, and Storybook screenshots of the cards and of the place opened
+  from one ("Back to Connections").
+
+### D-273 — A place opened from a trip is about that visit
+
+Will, 5 October: "When users open places from Trip cards, the place profile
+needs to reflect their visit details, not ask them to plan a trip. Use the
+item box component with calendar icon, and use green for a confirmed feel
+… Date and time, but not have a chevron since it's not clickable. Address
+should move up, and about this place should move down."
+
+- **`StatusCard` (`@pam/ui/PolicyStatusCard`).** The D-271 card,
+  generalised: a tone (orange or green), an icon, two lines, and an
+  optional `href`. With no `href` it is a plain `Card` with no chevron,
+  because it is a statement and nothing about it should look tappable.
+  `PolicyStatusCard` is now a thin use of it.
+- **The visit card.** Green, a calendar, the day as the title ("Wednesday,
+  October 7") and "10:00 AM · Visit booked" under it. The day and time on
+  one line wrapped "AM" onto a line of its own.
+  - It sits above the policies card.
+  - Trip cards now pass `&trip=<id>` so the page knows which visit; without
+    it, the soonest trip at that place is shown.
+- **No "Plan a trip"** when a visit is shown, and no fallback Directions
+  button either (Directions is already a round button).
+- **Address above "What this place is"** (`PlaceDetail addressFirst`).
+  With a visit booked, where it is matters more than what it is.
+
+### D-274 — Small round: message-button shadow, Profile award tile, bell for texts, chosen rows, Explore's area link
+
+Will, 5 October, five messages while D-273 was being built.
+
+- **Connections' message button** has the search pill's layered shadow
+  instead of a grey outline: a tight shadow where it touches and a soft one
+  around it ("the realistic shadow").
+- **Profile, members:** the "Past trips" tile becomes their award. It shows
+  the level their points have reached, in its own words ("Getting Going",
+  `levelForPoints`), with a new `AwardIcon` (a medal), and opens Points.
+  Past visits are still on Trips. The `profile.tile.trips` string is
+  removed.
+- **Profile, everyone:** the text-reminders and text-alerts card shows a
+  bell, not a star. The star read as points.
+- **A chosen row (`MenuList isSelected`)** — Language, See the app as:
+  - the label is bold and in the accent green;
+  - the tick is the same green, heavier (`CheckIcon`, stroke 3) and 24px.
+    The thin black tick at the far edge was easy to miss.
+- **Explore's area** (`AreaChip`) is a link, not a pill:
+  - no background, an underline and the accent colour on hover;
+  - narrower, so "Todos los programas" and "Cerca de City Hall" fit on one
+    row;
+  - the heading keeps to one line and ends in "…" before it would push the
+    link underneath.
+- **Proven by:** typecheck, config 236/236, ui 66/66, the full e2e suite
+  546/546, and Storybook screenshots: the place from a trip, Profile, the
+  Language list, Connections, and Explore in English and Spanish.
+
+### D-275 — Choosing the area is a drawer, like every location lookup people know
+
+Will, 5 October, on the old panel (a bare text field, a hint, an error
+line, a privacy note and Cancel, all inline): "This whole UI is wack, let's
+create an open drawer for this, and allow them to search using our new
+search bar component, but placing it in context, and press done on top
+right … This screen doesn't look like industry standard behavior for
+looking up a location."
+
+- **A tall `BottomSheet`** (keyboard-safe), from the area link on Explore
+  and on the older Places screen alike. It is kept mounted, so it slides
+  away as it came.
+- **Top:** "Location" and **Done** at the right, as a word in the accent.
+  Done keeps the choice. A swipe down, the scrim or Escape leaves the area
+  as it was: the choice is held inside the drawer until Done, so looking
+  around never moves the list behind it.
+- **Our search bar** (`SearchField`, the subtle in-sheet version), with the
+  cursor already in it. The sheet would otherwise focus its first button,
+  Done.
+- **"Use my current location"** first, as every location lookup has it. The
+  phone's own position becomes the origin. It is kept on this device with
+  every other choice and never sent to PAM; the row says "Stays on this
+  phone". If the phone will not say, the row says so and the search is
+  still there.
+- **Results as rows** (`MenuList`), each with a pin, the place, and what it
+  is: ZIP code, neighborhood, landmark or address.
+  - The chosen one is bold and green with the D-274 tick.
+  - It stays at the top of the results while you search past it, so the
+    tick never disappears.
+  - Suggestions still arrive before anything is typed.
+- **Removed:** the inline panel, its hint line and the Cancel button
+  (`places.areaCancel`). The Spanish privacy and no-results lines gained
+  their accents and the "tú" the rest of the app uses.
+- **Storybook:** `search_areas` has a fixture (four ZIPs, two
+  neighbourhoods, a landmark), so the drawer has something to show.
+- **Proven by:** `e2e/area-picker.spec.ts`, updated (rows, Done) plus a new
+  test that closing without Done changes nothing. axe passes with the
+  drawer open, and the full suite passed (549/549).
+
+### D-276 — A booked visit sits at the top of the conversation with its program
+
+Will, 5 October: "show another message in member's storybook view, so users
+can see the message from Sandra's learning center. Also if an appointment
+was made, please show the appointment item used in place profile from trip,
+but this time it has a chevron and it opens the profile when clicked, and
+if going back it should return to message."
+
+- **`ThreadVisit`** (`apps/web/src/app/messages/ThreadVisit.tsx`): the
+  D-273 green visit card, pinned under the conversation's header, in a
+  member's conversation with a program. Here it has a chevron and opens
+  the place (`/place/?…&from=thread&thread=<id>&trip=<id>`), which shows
+  the same visit; the place's Back is "Back to the conversation", by id.
+  - The program is matched to an example place by name, and the soonest
+    upcoming example or added trip there is shown. Nothing when there is
+    none. Real data: a trip's program id, once trips are stored.
+- **Sandra's thread in Storybook.** The example set already had Jordan ↔
+  Sandra; the stand-in database gave a member one "real" conversation
+  (Teresa), which hid the example list. A member's list now falls to the
+  example set, as the super admin's does, so both Teresa and Sandra show.
+  The one real thread is still reachable by its own address for the
+  conversation stories.
+
+### D-277 — Back goes to where you came from
+
+Will, 5 October: "When I click on alerts from profile then hit back, it
+returns to home. Is there a way to keep the previous page … This is a
+problem across various places in app."
+
+- Every nested screen names a fixed screen for Back, which is right for a
+  link opened cold and wrong inside the app: Text alerts says Home, and a
+  member who opened it from Profile went Home.
+- Since D-269 the app no longer reloads between screens, so the browser's
+  history is PAM's own. Back buttons (`SubPage`'s `BackButton`, which the
+  conversation header uses too, and `PageTitle`'s) carry `data-pam-back`.
+  `ClientNav` keeps a count of how deep inside PAM the tab is — up on every
+  move it makes, down when the browser goes back — and a marked back button
+  goes back through history while the count is above zero, with the 'back'
+  transition. At zero (a shared link, a reload with no history) it uses its
+  `href` as before.
+  - The count lives in session storage, so a reload keeps it in step with
+    the history the tab still has. The browser's forward button is not
+    counted; a wrong count only means a back button uses its fixed target.
+  - The prototype does the same with its own stack.
+- `onBack` steps (New trip's Where → When → Check) are untouched: they
+  are steps on one screen, not history.
+- **Proven by:** `e2e/back.spec.ts`: Places, whose fixed target is Home,
+  returns to Help when opened from Help, and still goes Home when opened
+  cold. The prototype was checked by hand (Profile → Text reminders → Back
+  lands on Profile).
+
+### D-279 — Signing: the button stays put, and Done leaves the whole flow
+
+Will, 5 October:
+- "During sign mode, let's keep the primary button floating on bottom so
+  it's easy to sign all on the same place by tapping."
+- Then, of the list after everything was signed: "it's unclear what to do
+  next, if I go back it takes me back to policy … We could also add a done
+  button on top right instead of help. Like we do on zipcode drawer (I like
+  this better)."
+
+(D-278 is the Points redesign, which Will numbered first.)
+
+- **The sign area is pinned to the bottom** of a policy screen: white, a
+  hairline above, over the safe area.
+  - It holds "Your signature:" with its ×, and Sign; or Next / Done once
+    the policy is signed.
+  - Measured, the button sits at the same height (y = 632 at 390×700) on
+    Sign, Next, Sign, Next. Signing four policies is four taps on one spot.
+  - It is drawn outside the page, so the page's own arrival cannot carry it
+    off. A spacer keeps the last line of the policy clear of it.
+- **Done, top right, in place of Help**, on the list and on each policy, as
+  on the Location drawer: the accent word.
+  - It leaves the whole signing flow: one screen back from the list, two
+    from a policy opened from the list (`via=list`). That is wherever it
+    was started, usually the program's page.
+  - Back still steps through one screen at a time.
+  - `leaveFlow(steps, fallback)` in `navigate.ts` goes back only as far as
+    PAM's own history reaches (`ClientNav`'s count, D-277). A flow opened
+    cold goes to the program's page instead, never to a blank tab — that
+    was the first version's bug, caught by its test.
+  - The prototype pops that many screens off its stack.
+- **The last policy's pinned button is Done**, doing the same. On the list,
+  "You have signed them all" now has a Done button under it, the screen's
+  one primary action.
+- **Help moves off these two screens.** That is Will's call. The SOP wants
+  a visible way to help on every screen. It is one tap away here: Done or
+  Back lands on the program's page, whose header has it. Recorded so it is
+  a decision, not a slip; easy to put back beside Done.
+- **Proven by:** `e2e/policies.spec.ts`:
+  - Done from a policy opened via the list returns two screens, to where
+    the flow started;
+  - Done on a list opened cold goes to the program.
+  Also checked in the prototype: a place → policies → sign all four →
+  Done lands on the place with the green "Policies signed" card.
+
+### D-278 — Points, as a journey: where you stand, how to get there, what you have
+
+Will, 5 October: "This page doesn't feel gamified enough, it doesn't feel
+exciting at all. How can we improve this UI, and make it fit industry
+standard for gamified journeys?" On the proposal: "build it as D-278, but
+let's make the coming next and list of steps smaller, so it's less
+scrolling."
+
+The old screen was the ladder as a tall stepper with a sentence per rung,
+then two more of the same. It never said how points are earned, and the one
+number that matters — how far to the next level — sat in a grey subtitle.
+The gamified journeys people know (Duolingo, Nike Run Club, Headspace)
+share an order: where you stand, how close the next step is, how to get
+there, what you have. The screen now follows that order.
+
+- **Where you stand**, in a card:
+  - the medal of the rung reached (`AwardIcon`, accent);
+  - its name at 28px, and the points;
+  - a progress bar (Astryx `ProgressBar`) from this rung to the next;
+  - "350 more to Builder" under it.
+- **Ways to earn**: five one-line rows from the real rules
+  (`POINTS_RULES`, `STREAK_POINTS_PER_WEEK`), each with what it is worth:
+  - show up to a visit, +100;
+  - plan a trip to a program, +25;
+  - go back to a program again, +50;
+  - call a place, +10;
+  - save a place, +5.
+- **Addendum, same day (Will):** the first version said "Come back each
+  week, +50 a week" and "Sign up for a program". Neither fits:
+  - PAM cannot know how each program runs its weeks, only that somebody
+    went back, so the row is "Go back to a program again, +50", with no
+    "a week".
+  - Signing up is planning a trip, in the app's own words, so the row is
+    "Plan a trip to a program", with a + mark.
+  - The weekly-streak rule in config is unchanged; whoever implements
+    awarding should make it a return bonus to match. The full awarding
+    logic, rule by rule, is in `docs/points-awarding.md` (Will asked for
+    it, to build later).
+- **The ladder, compact.**
+  - One 44px row a rung: a 32px mark, the name, and the status on the
+    right (Earned / 350 more to go / Coming later).
+  - The current rung is in the accent with a ring that breathes; reduced
+    motion keeps it still.
+  - Only the next rung keeps its meaning line, since it is the one
+    somebody is reaching for.
+- **Badges as medals**, four across (48px). They are greyed with "Not yet"
+  or "Coming later": nothing records earned category or one-off badges
+  yet, so none is shown earned.
+- **A new level is celebrated once.** The first time the screen sees a
+  higher rung than it saw last (`pam.points.seenLevel`, this device), there
+  is confetti and "New level: Builder" is read out.
+- **Profile's award tile uses the same ladder.** D-274 used `LEVELS`
+  ("Getting Going") while Points used `BADGES` ("Rooted"), two names for
+  one balance. It is `badgeForPoints` now. `LEVELS` is unused by screens
+  and left for whoever reconciles the two lists in config.
+- Kept: Will's names, no comparison between members (§8), and "Coming
+  later" rather than hiding what cannot be earned yet. The older Spanish
+  strings on this screen still say "usted" ("Sus puntos"); the new ones say
+  "tú", like the rest of the app — left for a copy pass.
+- **Proven by:** typecheck, config 236/236, the full e2e suite 561/561,
+  and Storybook screenshots in English and Spanish.
+
+### D-280 — Every text action is a link, not a pill
+
+Will, 5 October, on "Check hours on Google": "should not have this weird
+hover, let's make this a link instead". The same complaint as D-271's,
+about a button that rule had not reached.
+
+- **`textLinkLook`** (`@pam/ui/TextLink`) is the D-271 look on its own: no
+  padding, no background image on hover or press, the accent colour and an
+  underline on hover. A text button that is not a `TextLink` adds it after
+  its own size styles.
+- **Applied to:**
+  - "Check hours on Google" on a place;
+  - the Cancel beside the search bar on Explore, Messages, the program
+    lead's schedule and Connect.
+- **Not applied, on purpose:**
+  - outlined buttons (Program's and Policies' Edit), which look like
+    buttons at rest;
+  - buttons in dialogs;
+  - the drawer's grab handle;
+  - the alert banner's action, which sits on a coloured strip.
+- **Proven by:** typecheck, and Storybook hover measured on "Check hours on
+  Google" (`background-image: none`, underline, accent colour).
+
+### D-281 — A place opened from a trip leads with the visit, and the visit can move
+
+Will, 5 October: "For Trip view of place profile, let's bring in hours above
+the about. Also the green item will need to be more complex. As it needs to
+clearly label: Your next visit, and allow for them to "change appointment"
+maybe with a link below. So I'm thinking we use more of a hero card instead
+of the item, so we have more space. Also this place is saved for member, but
+not showing up as saved on trip profile, why is that?"
+
+- **`VisitCard`** (`@pam/ui/VisitCard`) replaces D-273's green row. It is a
+  green-tinted card with:
+  - "Your next visit" beside a calendar in a white disc;
+  - the day, large;
+  - the time, in green;
+  - under a hairline, a "Change appointment" text link (D-280's look, in green).
+
+  The card itself is not a link; only "Change appointment" is. A visit that
+  has already happened says "Your visit" and has no link.
+- **Order with a visit:** address, then opening hours, then "What this place
+  is". `PlaceDetail`'s `addressFirst` now moves the hours card up too.
+- **Change appointment** opens Plan a visit with `change=<trip id>`:
+  - it starts at When, titled "Change your visit", with no step count;
+  - Back from When returns to the place, because there is no Where to go
+    back to;
+  - Check's button says "Save the new time".
+
+  Saving does not add a second trip. It records the new time under that
+  trip's id in `pam.trips.moved` (session storage), then `leaveFlow(2)`
+  returns to the place. Every screen that lists trips reads through the move
+  map: the place, Trips, a conversation's visit card and Explore's next visit.
+  The place listens for a `pam:trips-changed` event, so a copy still mounted
+  underneath (the prototype keeps one) shows the new time when it comes back.
+  It is a map rather than an edit because example trips are constants. This
+  is example data like the rest of Trips (D-225); a real move waits for
+  appointments in the database.
+- **Why the saved place didn't show as saved:** one example place had two
+  ids. Storybook's fixtures named the three example places `s1`/`s2`/`s3`,
+  and Explore, Saved and `saved_places_mine` used those ids. Trips, and the
+  place a trip opens, use the example set's own ids (`dummy-place-learning`
+  and so on). `isSaved('dummy-place-learning')` was therefore false, even
+  though "Example Learning Center" was on Saved as `s1`.
+
+  The fixtures now use the example set's ids, so one place has one id
+  everywhere. The real app was never affected: real places have one id in
+  `services`.
+- **Proven by:** `e2e/visit-change.spec.ts`. It checks:
+  - the label and the link;
+  - that the address, hours and About headings come in that order;
+  - axe;
+  - picking a new day and time, saving, and landing back on the place
+    showing them.
+
+### D-282 — A moved visit gets a moment, then goes home
+
+Will, 5 October: "We need a temporary fun screen to confirm the appointment
+was changed at new time, then redirect to home page."
+
+- Saving a change (D-281) no longer goes straight back to the place. It
+  shows the `SuccessScreen` template (D-240), which has:
+  - confetti;
+  - the title "Your visit is moved!";
+  - the line "{place}, {day} at {time}. See you there.", which is a live
+    status, so a screen reader reads it out;
+  - a "Go home" button;
+  - the note "Taking you home in a few seconds."
+- **Home on its own after 5 seconds** (`MOVED_HOLD_MS` in `NewTripView`),
+  or straight away with the button. That is why the screen is a moment and
+  not a stop. The button means nobody has to wait, and the note means
+  nobody is surprised when the screen changes. Reduced motion stills the
+  confetti but keeps the redirect.
+- **Temporary, as Will said.** When moving a visit becomes a real request to
+  the program, this screen is where "sent, waiting for the program to
+  confirm" goes instead of "moved".
+- **Proven by:** `e2e/visit-change.spec.ts`. It checks the celebration, its
+  line with the new day and time, Go home, the redirect to `/`, and the
+  place showing the new time afterwards.
+
+### D-283 — The tab bar has a fade above it
+
+Will, 5 October, with a screenshot of Explore: "let's add a white fade on
+bottom of member screen so the place cards don't shock against the bottom
+menu."
+
+- **What it is:** a 40px gradient from transparent to the page colour
+  (`--color-background-body`, so it is dark on the dark theme), sitting
+  directly on top of the bar.
+  - It is part of `TabBar`, so it moves with the bar and needs nothing from
+    each screen.
+  - It is hidden from screen readers, and `pointer-events: none` means a tap
+    on the card under it still lands on the card.
+  - The bar's hairline stays.
+- **Every role gets it, not only members:** every role's tab screens have
+  the same bar, and the same hard edge under a scrolling list. Doing it once
+  in `TabBar` is simpler than a member-only exception.
+- **Proven by:** typecheck, and Storybook screenshots of Explore scrolled
+  under the bar.
+
+### D-284 — A taller, stronger fade, and room at the end of a list
+
+Will, 5 October: "Let's make the fade stronger so it takes up more height."
+
+- **Height:** 96px instead of 40px.
+- **Shape:** eased rather than linear. It reaches 55% page colour by 40% of
+  the way down, 90% by 75%, then solid at the bar. A card going under it
+  washes out instead of showing a thin grey band.
+- **More room at the end of a list:** the bar's spacer grows by 56px. With
+  a fade this tall, the last card of a list would otherwise stay half
+  washed out even when scrolled all the way down. Now it scrolls clear.
+- **Proven by:** typecheck, and Storybook screenshots of Explore at the top
+  and scrolled to the end.
+
+### D-285 — Nothing that rests on the bar sits under its fade
+
+Will, 5 October: "this could create conflicts for users with item stuck
+above the fade, so we should prob check z index of those to ensure items
+are visible through the fade."
+
+The fade is inside the tab bar (z-index 10). An audit of everything fixed
+to the bottom on a tab screen found two conflicts:
+
+- **"Invite someone" (`FloatingAction`):** it was at z-index 9, directly on
+  the bar, so the fade washed over it. It is now at z-index 11 and draws
+  the same fade above itself.
+- **Trips' drawer:** it ends at the bar. Docked, it is 112px tall, so a 96px
+  fade would wash out nearly all of it. `TabBar` takes `hasFade`, and the
+  prototype turns it off on Trips. Raising the drawer instead would have
+  put it over Trips' own top controls (z-index 7) when it is pulled up.
+
+Not affected:
+- the signing dock and the conversation composer, which are on screens
+  with no tab bar;
+- `SuccessScreen` (z-index 20), which has no bar.
+
+The style itself moved to `@pam/ui`'s `edgeFade`, so the bar and the strip
+draw an identical fade.
+
+One finding for STATUS: the tab bar exists only in Storybook's prototype.
+The live app has no bottom bar yet (the member shell is still to build), so
+none of this reaches the deployed site until it does.
+
+### D-286 — "Your badge" on the award tile
+
+Will, 5 October: on a member's Profile, "Rooted" needs "a hint that the
+item … is a reward… very subtly so it doesn't deviate from the symmetry
+against the connections item."
+
+- **What:** a small white pill, "Your badge", across the foot of the medal's
+  art (11px, bold, accent colour, a soft shadow), like a ribbon on a medal.
+- **Symmetry:** the pill is laid over the art, not added under it, so the
+  tile keeps exactly the size and the label position of Connections beside
+  it.
+- **Screen readers:** the tile's accessible name becomes "Your badge:
+  Rooted".
+- **Built as:** `FeatureTile` takes `hint`.
+
+### D-287 — Place cards: illustrated art at the top left, a quieter open line
+
+Will, 5 October, choosing option B from the mock: "ensure icon sits at top
+so padding on top and left match. Make open text and distance text more
+subtle and smaller", and "instead of bold icons on colored bg, can we
+create 2D illustration style icons… that matches style of sign in page
+carousel".
+
+- **`CategoryArt`** (`@pam/ui/CategoryArt`): one 56px illustration per
+  category, in the carousel's language:
+  - a ground cut by two diagonal shards;
+  - one object, lit from the left, with a darker right half for shadow;
+  - no outlines;
+  - the carousel's palette of orange, green, purple, pink and yellow.
+
+  The three pictures:
+  - **School and training:** a mortarboard on two books, on pink and purple.
+  - **Work and money:** a briefcase, on greens.
+  - **Family and food:** a grocery bag with greens and an apple, on purple.
+
+  Every colour is a theme data token (`--color-data-*-N`), never a raw hex,
+  written as literal strings because StyleX compiles them at build time.
+  The art is hidden from screen readers.
+- **`PlaceCard`, layout B:**
+  - The padding is 16px, and the art sits at the very top left, so the
+    space above it and beside it match.
+  - The name and the open line sit beside the art. The description runs
+    full width under both.
+  - The 48px Save button is pulled up and out with negative margins. The
+    bookmark's middle sits on the name's first line, and the button no
+    longer sets the row's height. That height was the 30px gap Will
+    disliked.
+- **The open line is quieter:** 14px instead of 15, at weight 500 instead of
+  600.
+  - Open comes first, with a 6px dot.
+  - The distance follows in grey, after a "·".
+  - A closed place keeps its uncoloured label.
+- **Where:** `PlaceCard` takes `category`, and every list passes it:
+  Explore, All programs, Saved, a member's saved list, Connect and Reported.
+  The loading skeleton has the same shape.
+- **Proven by:** typecheck, the web build, Storybook screenshots (Explore,
+  Profile, a case manager's Home, Trips), and the full e2e suite.
+
+### D-288 — A glow behind each category chip's icon
+
+Will, 5 October, on Explore's category chips: "can we add a tinge of color
+pop behind icon? Like a circle with blur so it looks like icons pop a bit
+more? They're not standing out enough."
+
+- **The glow:** a 24px circle in the bright data shade of the chip's tone
+  (`--color-data-*-3`), blurred 5px at 60% opacity, centred behind the icon.
+- **The icon** keeps its deep tone colour, so it still reads on the glow.
+- **Stacking:** the icon wrapper is its own stacking context (`isolation`),
+  so the glow sits behind the icon but in front of the chip's white face.
+- **"All"** has no tone, so it has no glow.
+- **Where:** `CategoryChips`, so it shows on both Explore and Connect.
+- **Proven by:** the web build, and a Storybook screenshot of Explore's
+  chips.
+
+### D-289 — A closed Trips drawer shows no card; "new" dots are the tab pink
+
+Will, 5 October, with a phone screenshot: "The closed drawer view needs to
+drop lower so no trip cards are visible", and "the alert red dot should
+match the bright pink on menu selected items. Do this for alert icon
+buttons on top pages also."
+
+- **Drawer:** the docked height drops from 112px to 100px. Docked, the list
+  is hidden outright (`opacity: 0`, `visibility: hidden`), not just cut off.
+  - A fixed height alone can't promise "no card": how tall the title and its
+    count draw depends on the phone's fonts. On Will's phone, 112px left the
+    top of the first card showing.
+  - The list was already `aria-hidden` when docked. It now matches what is
+    on screen.
+  - It shows again the moment a drag starts or the drawer steps up.
+- **Dots:** the pink became a token, `pam.brandPink`
+  (`light-dark(#E31C5F, #FF6B86)`, which is 4.6:1 on white and 6.3:1 on
+  dark). It is used by:
+  - the selected tab (it was already that pink, as a raw value);
+  - the Profile tab's ring;
+  - the tab bar's unread dot (a `StatusDot` overridden from the error
+    variant);
+  - the bell's dot on every top header (`NotificationBell`).
+
+  The point is that something new isn't something wrong; the theme's error
+  red stays for errors.
+- **Not changed:** dots that mean "unread" inside lists (the notification
+  list, `NavTile`) use the accent green as part of the row. Will asked
+  about the menu and the top buttons.
+- **Proven by:** typecheck, and Storybook screenshots of the docked drawer at
+  390px and 320px and of a case manager's header bell.
+
+### D-290 — The half-open drawer is 48px taller
+
+Will, 5 October: "let's make the middle drawer 48px taller so it shows more
+of the third card from list."
+
+- **Half:** now half the available height plus 48px, capped at the full
+  height so a short screen never gets a "half" taller than "full".
+- **Why:** a member sees well into the third trip, so it is clear the list
+  goes on without having to pull the drawer up.
+- **Not changed:** dock (D-289) and full.
+- **Proven by:** typecheck, and a Storybook screenshot at 390×844 showing the
+  third trip's name, date and companion.
+
+### D-291 — A place's actions are rows, directions first, with Google's place ID
+
+Will, 5 October, on a place opened from a trip: "An important action here
+… is to get directions, and secondly message them. Let's use the inline
+item component instead of these circle buttons (similar to … 'my
+connections' at root of messages screen)… clicking get directions will
+open google map with location ID pre loaded."
+
+- **Rows instead of circles:** `PlaceDetail`'s quick actions are a
+  `MenuList` in a card. Each row has an icon, a label, a line under it and
+  a chevron; this is the same row as "My connections" on Messages.
+- **Order:**
+  - Get directions ("Walking route in Google Maps");
+  - Send a message ("Ask a question before you go");
+  - Call ("Talk to someone there");
+  - Website (its site name).
+
+  This replaces D-224's Website, Message, Call, Directions. A row says what
+  it does; a circle with a word under it only named it.
+- **Google's place ID:** `directionsHref` takes the place's Google ID and
+  adds `destination_place_id`, so Maps opens on the place itself rather
+  than a dropped pin. The walking route and `destination` (coordinates
+  first) are kept, because Google requires both.
+  - The example places have no ID, so their links route to the point, as
+    before.
+  - External rows open in a new tab: `MenuItem` takes `isExternal`.
+- **Also changes:** a program's own profile (`ProgramView`) uses the same
+  quick actions, so its Website, Call and "Open in Google" are rows too.
+- **Fixed along the way:** a list's last row drew a stray line at the foot
+  of its card. Astryx's `:last-child` rule is a shorthand that loses to its
+  own longhand width. `MenuList` now drops the line on the last row itself;
+  computed widths are 1px, 1px, 0px.
+- **Proven by:** `place.spec.ts`. It checks the new names, a new test for
+  `destination_place_id` and `target=_blank`, and that the rows run
+  directions then message. The full e2e suite passes (570), with Storybook
+  screenshots.
+
+### D-292 — Saved shows your visits, and its pictures take the category's colour
+
+Will, 5 October, on a member's Saved: "This screen needs to be more
+dynamic… if an appointment is booked on their saved list, a small tag
+inside square image should state date and time, and opening profile from
+there… should open the trip profile with appointment info. If appointment
+date changed this should also update here. If no appointment is made…
+show regular place profile. Also… use the color coded icons per category
+with glow behind icon. White image bg."
+
+- **The visit tag:** a saved place with a visit still ahead shows a small
+  green tag at the foot of its picture. It has a calendar icon and two
+  short lines, the day ("Wed, Oct 7") and the time ("10:00 AM"), so
+  neither is cut off on a 320px phone. The green is the confirmed-visit
+  green (D-273).
+  - The tile's spoken name becomes "Example Learning Center. Your visit:
+    Wed, Oct 7 · 10:00 AM".
+  - With a tag, the icon centres in the space above it.
+- **Opening it:** the tile links to `/place/?id=…&from=saved&trip=<id>`.
+  - The place page now treats any `trip` in the link as the visit view:
+    "Your next visit", Change appointment, and hours before About.
+  - Back still follows `from`, so it returns to Saved ("Back to Saved").
+  - Without a visit, the link and page are the place as before.
+- **Staying current:** `useNextVisits` returns the soonest upcoming visit
+  per place. It reads the example and added trips through `withMoves`
+  (D-281) and listens for `pam:trips-changed`, so a changed appointment
+  changes the tag. It is on for members only; staff have no trips.
+- **The pictures:** the tiles are white. Each category's icon is drawn in
+  that category's colour (the chips' tone: blue, green, purple), with a
+  large soft glow behind it.
+  - That glow is the chips' (D-288), moved into a shared `GlowIcon` with
+    `sm` (chips) and `lg` (tiles) sizes; `CategoryChips` now uses it too.
+  - The picture no longer takes taps, so positioning it for the tag can't
+    cover the card's link.
+- **Proven by:**
+  - typecheck and the web build;
+  - Storybook screenshots at 390px and 320px;
+  - a clicked-through check in the Storybook prototype: tap a tile, see
+    "Your next visit" and "Back to Saved", change the time, go home, open
+    Saved, and the tag reads "Thu, Oct 15 · 3:30 PM";
+  - the full e2e suite (570).
+
+  The live `/saved/` page is still the older list. This tiled screen is the
+  redesign (Storybook), so the e2e suite does not reach it. The new
+  `SavedGrid` story shows a tile with a visit next to one without.
+
+### D-293 — One softer glow everywhere; trip cards are colour-coded
+
+Will, 5 October: "No need for new illustration on trip cards, let's just
+make sure they're color coded… Make glow even softer and make this
+consistent everywhere the glow is used."
+
+- **One glow:** `GlowIcon` is the only place the glow is drawn. The chips,
+  Saved and every trip card use it. It is softer: a wider blur at about a
+  third of the opacity, in the same proportions at three sizes:
+  - `sm` (chips): 26px circle, 8px blur, 38%;
+  - `md` (trip cards): 64px circle, 18px blur, 32%;
+  - `lg` (Saved tiles): 80px circle, 22px blur, 32%.
+- **`CategoryGlow`** (in `SavedView`): a category's icon in its tone with
+  the glow. It is used by:
+  - Saved;
+  - Trips' cards;
+  - Explore's "Your next visit";
+  - past trips;
+  - a member's page for a case manager.
+
+  The map pins stay black, with a white icon.
+- **Tiles are white:**
+  - `TripCard`'s art box is white with a hairline, and was grey.
+  - `NextTripCard`'s front tile is white, and was accent green.
+
+  The grey dulled the category colour, and a green tile under a blue icon
+  read as a mistake.
+- **No new illustrations on trip cards**, as Will asked. `CategoryArt`
+  (D-287) stays on place cards only.
+- **Proven by:** typecheck, the web build, Storybook screenshots (Trips,
+  Explore's chips and next visit, Saved), and the full e2e suite (570).
+
+### D-294 — Directions pick no travel mode; a row's second line is smaller
+
+Will, 5 October: "For get direction, let's not set a walking route, just
+general. Replace any text saying walking route with something more
+general, and update this component so the subtext is smaller size, update
+across entire app."
+
+- **Directions:** `directionsHref` no longer sends `travelmode=walking`.
+  Google Maps chooses the mode, which is usually whatever the member used
+  last. This reverses §5.1, so it is recorded as A17 in
+  `docs/sop-amendments.md`. Coordinates still win, and the place ID still
+  rides along (D-291).
+- **Wording:** the row's line reads "Open in Google Maps" ("Abrir en Google
+  Maps"). Nothing else in the app said "walking".
+- **Smaller second line:** `MenuList`'s description is 14px, down from
+  15px, everywhere a `MenuList` row is used. Labels stay at 18px.
+- **Proven by:** `place.spec.ts`, which now asserts there is no travel
+  mode, and the UI unit test for `directionsHref`.
+
+### D-295 — Pictures for Profile's tiles, every badge and every rung
+
+Will, 5 October: "I want illustrations for the profile screen:
+connections icon and reward/award icon. Then next create illustrations for
+each badge, and ladder award using that same style."
+
+- **One kit:** `art/kit.tsx` holds the whole palette as classes (every
+  `--color-data-<hue>-<1..5>`), the shapes (`P`, `C`, `R`, `L`), `Ground`
+  and `ArtFrame`. The frame is a 56-grid clipped to a rounded square or a
+  circle. `CategoryArt` was rewritten on the kit; its pictures are
+  unchanged.
+- **`BadgeArt`:** twenty pictures, one for each badge in config, each the
+  object it is named for, on cut colour.
+
+  | Group | Badge and picture |
+  |---|---|
+  | Ladder | Returned: an open, lit door |
+  | | Rooted: a seedling with roots |
+  | | Builder: a hammer |
+  | | Provider: a full basket |
+  | | Pillar: a column |
+  | | Elder: a carved staff |
+  | | Chief: a crown |
+  | Category | Scholar: an open book |
+  | | Griot: a scroll |
+  | | Craftsman: a wrench and bolt |
+  | | Cornerstone: a brick wall and its stone |
+  | | Anchor: an anchor |
+  | | Steward: a hearth |
+  | Milestone | Firstborn: a sunrise |
+  | | Torchbearer: a torch |
+  | | Drum: a djembe |
+  | | Rainmaker: a rain cloud |
+  | | Homecoming: a house and its path |
+  | | Sankofa: a bird looking back to its egg |
+  | | Kinkeeper: a family of three |
+
+  - A badge is a medal, so it is round by default.
+  - Not earned yet, it is drawn grey at 60%.
+  - A unit test (`badge-art.test.tsx`) fails if a badge in config has no
+    picture.
+- **Profile:**
+  - The award tile shows the member's current level's own picture (Rooted
+    is the seedling), square to match.
+  - Connections is a new `ConnectionsArt`: two people and a speech bubble.
+  - Both fill the 88px art box. The "Your badge" ribbon (D-286) still sits
+    across the foot.
+- **Points:**
+  - The hero's medal is the current level's picture, at 72px.
+  - Each ladder rung is its badge's picture at 36px: coloured when earned,
+    grey when not. The breathing ring stays on the current rung.
+  - The badge grid shows each badge's picture at 52px, grey until earned.
+    It replaced the category-icon and star placeholder.
+
+### Found while doing D-295: CI had been red since D-287
+
+`pnpm --filter @pam/ui test` is part of CI's "Types, unit tests, build".
+The D-287 place card added "· " to the distance's own text, so the unit
+test that finds "0.4 miles" failed. That job was red on every push from
+`79263b5` to `673cf9e`, and I did not notice: those sessions ran
+typecheck, the web build and e2e, but not the UI package's unit tests.
+
+The fix draws the dot as its own `aria-hidden` mark, which also reads
+better to a screen reader ("Open until 9 PM, 0.2 miles"). The local check
+now runs `pnpm --filter @pam/ui --filter @pam/config test` every time.
+
+The Publish Storybook job on several of those pushes was cancelled by the
+next push, so Chromatic lagged behind the branch at times.
+
+### D-296 — Saved: a white visit chip, and no glow
+
+Will, 5 October, with a screenshot of Saved: "This is too much. Chips
+should be white and subtle. The glow is not working here, let's remove
+them."
+
+- **The visit tag (D-292)** is now a small white chip in the picture's top
+  corner:
+  - one line, "Oct 7 · 10:00 AM", at 12px semibold in the primary text
+    colour;
+  - a soft shadow; no calendar icon, no green;
+  - an ellipsis if it is ever too long.
+
+  It no longer sits over the icon, so the icon stays centred, and the
+  "move the icon up" padding is gone.
+- **No glow on Saved:** the icon keeps its category colour on white.
+  `GlowIcon` takes `hasGlow`, and `CategoryGlow` passes it through. The
+  chips and trip cards keep their glow (D-293); Will's note was about this
+  screen.
+- **Unchanged:** a tile with a visit still opens the visit view, and the
+  spoken name still includes the time.
+- **Proven by:** Storybook screenshots at 390px and 320px; the UI (67) and
+  config (236) unit tests; typecheck; the web build; and e2e 570.
+
+### D-297 — Flat colour, not glow: half-circle chips, full-colour pictures
+
+Will, 5 October: "We need to rethink the glow style, it doesn't suit the
+other flat illustration aesthetic… small pops of color that feel unified
+to illustration cubic colorful feel, but subtle without being overbearing.
+More flat than blurry for sure." He saw a mock of flat facets and chose:
+"inside chip lets make them half circles halves that create a full color
+circle. Also on square images… use a shade of color instead of white bg,
+for a full color coverage." Also: "Keep the faint style no need for
+opacity increase."
+
+- **The glow is gone.** `GlowIcon` (D-288, D-293) is deleted. In its place
+  is `@pam/ui/Tone`:
+  - `ToneDot`: a 26px circle of two half circles, the lit half and the
+    shaded half. It sits behind a chip's icon. "All" has no tone and no
+    circle. A chip with a circle starts 8px from its edge, with an 8px gap
+    before its words.
+  - `ToneGround`: fills a square picture edge to edge with the category's
+    palest shade, cut by two diagonal shards (the low ground and a top
+    corner), the same ground the illustrations stand on. It is used by
+    Saved's tiles (`SavedTile.tone`), trip cards (`TripCard.tone`) and the
+    front tile of Explore's next visit (`NextTripCard.tone`). The trip
+    card's hairline is gone, because the colour edges it.
+  - `ToneIcon`: the icon in its category's deep colour, so it reads on
+    both. `CategoryIcon` in `SavedView` replaces `CategoryGlow`.
+- **Faint, on purpose:** only the palest shade (`--color-data-*-1`) and a
+  facet half a step darker. The facet is a `color-mix` of shades 1 and 2,
+  because shade 2 on its own was too strong when tried. There is no blur
+  and no opacity.
+- **One style:** the shapes and tokens are the illustrations' own (D-287,
+  D-295), so a chip, a saved place, a trip and a badge read as one set.
+- **Proven by:**
+  - Storybook screenshots of Explore's chips and next visit, Saved and
+    Trips;
+  - the UI and config unit tests, typecheck and the web build;
+  - e2e: 569 of 570 on the full run, plus `saved.spec.ts` at 72/72 over
+    three repeats. The one failure was the Save button on the iPhone SE
+    viewport, a place card this change does not touch, and it did not
+    come back.
+
+### D-298 — A print grain on every picture; half circles go strong to soft
+
+Will, 5 October: "any way to add a texture similar to what we see in
+illustrations? Also for half circles let's make the darker half circle be
+on left side… so it goes strong to soft."
+
+- **Grain:** `Grain` in `art/kit.tsx` is the carousel's printed texture,
+  made as fractal noise (`feTurbulence`, base frequency 1.15, two octaves),
+  turned grey and multiplied in at 16%.
+  - Every `ArtFrame` draws it last, inside its clip: place cards, every
+    badge and rung, and Profile's tiles.
+  - `ToneGround` draws it too: Saved, trip cards, and the next visit.
+  - So the flat colour and the illustrations share one surface.
+  - It is SVG, so there is no image to load, and the bundle is still
+    within budget.
+- **Half circles:** `ToneDot`'s darker facet is now the left half, the
+  pale one the right, going strong to soft.
+- **Not grained:** the 26px chip circle. At that size, noise reads as dirt
+  rather than texture.
+- **Proven by:** Storybook screenshots at 3× (Saved, Explore's chips and
+  next visit, the badges); the UI and config unit tests; typecheck; the web
+  build and budget; and e2e 570/570.
+
+### D-299 — Stronger grain; a flaky Save test fixed rather than re-run
+
+Will, 5 October: "Let's make grain stronger."
+
+- **Grain:** `Grain` multiplies in at 30%, up from 16%. The frequency is
+  unchanged. At 2× and 3× it reads as print: visible on the pale grounds
+  and the badges, and still behind the icons and words.
+- **The flake:** `saved.spec.ts` "saving writes it down…" failed once in
+  each of two full runs, on iPhone SE and then dark-320, and passed alone.
+  The page is pre-rendered, so the Save button is on screen before the app
+  has hydrated and loaded the saved list. A tap in that gap is lost, and
+  the button stays "Save". The two tests in the file that tap right after
+  loading now wait with `settled()` (network idle and fonts ready), as the
+  file's axe test already did.
+
+  Proven by `saved.spec.ts` at 120/120 (five repeats, four workers) and a
+  full run of 570/570. A real member could hit the same gap on a slow phone,
+  but a lost first tap on a button that visibly does not change is
+  recoverable. It is noted here rather than fixed in the app.
+
+### D-300 — The chip's circle sits as far from the left as from the top
+
+Will, 5 October, on a category chip: "ensure the top space on circle
+matches the left space."
+
+- **Measured first:** in Storybook the chip is 48px tall (the touch
+  floor), and the 26px circle sat 11px from the top and bottom but only 4px
+  from the left. Astryx pulls a button's icon in by 4px, so the 8px padding
+  from D-297 gave 4px.
+- **Fix:** `chipWithDot` is `paddingInlineStart: 15px`. Measured after the
+  change: 11 / 11 / 11 (top, bottom, left) on both category chips, at
+  390px and 320px.
+- **Proven by:** those measurements; the UI and config unit tests;
+  typecheck; the web build; and e2e 570/570.
+
+### D-301 — Home and family get their own pictures, in the grocery bag's colours
+
+Will, 5 October: "For place cards, I love those illustrations. We need
+variants that also include family and home, right now the grocery store
+one is not a fit, but I love its colors."
+
+- **Two pictures replace the grocery bag** for Home and family. Both keep
+  its palette: a purple ground and shard, a pink corner, yellow, red and
+  greens.
+  - `FamilyHome`: a house with a heart on its door, a lit window, a bush and
+    the path in.
+  - `FamilyPeople`: a parent and a child in front of a home's outline, a
+    heart above them.
+- **Variants by place:** `CategoryArt` takes a category's list of
+  pictures, and `seed` (the place's id) picks one with a small stable hash.
+  A list of several family places shows both, and one place always shows
+  the same picture. `PlaceCard` takes `artSeed`, and every list passes the
+  place's id. `variant` picks one directly, for the stories. Education and
+  Work still have one picture each.
+- **Asked at the same time, not built:** an overlay blend for the icons on
+  trip cards and the next visit. A mock compared normal, overlay, multiply,
+  and multiply with a mid-shade icon. Overlay made the dark icon a faint
+  ghost on the pale ground, and multiply alone looked like today. Waiting
+  on Will.
+- **Proven by:** a Storybook screenshot of the four pictures and Explore's
+  cards; the UI and config unit tests; typecheck; the web build; and e2e
+  570/570.
+
+### D-302 — Trip icons baked in with a doubled overlay; Home and family is the home
+
+Will, 5 October: "Let's do overlay icon but double up icons so it shows up
+stronger. Let's go with home with heart on door."
+
+- **Baked icons:** `ToneBakedIcon` draws the icon twice, both in
+  `mix-blend-mode: overlay`, stacked in one grid cell. The icon takes the
+  ground's own colour and grain, so it looks pressed into the picture
+  rather than set on it. The second pass gives it the strength one pass
+  lacked; a single overlay was a faint ghost.
+  - Used through `CategoryIcon isBaked` on Trips' cards, Explore's next
+    visit, past trips and a member's page.
+  - Saved keeps the plain, deep-colour icon, because Will did not ask for
+    it there.
+  - The art box sets `isolation`, so the blend is with the ground and
+    nothing behind the card.
+  - The icon is decoration (`aria-hidden`); the card's words carry its
+    meaning.
+- **Home and family:** `FamilyHome` (the house with a heart on its door) is
+  the category's one picture, and `FamilyPeople` is removed. The per-place
+  picture list (D-301) stays, for when a category gets more than one.
+- **Proven by:** 3× Storybook screenshots of Trips, the next visit and the
+  food pantry's card; the UI and config unit tests; typecheck; the web
+  build; and e2e 570/570.
+
+### D-303 — Saved's date chip sits in from the corner; the pantry has no visit
+
+Will, 5 October: "position it a bit lower and a bit more to right so the
+card's corner radius feels proportional to the chip. Also let's not make
+the food pantry look like appointments were set so we can see the
+difference between them and how the profiles look different when opening."
+
+- **The chip** sits 12px from the top and left, up from 8px. That is half
+  the tile's 24px corner radius (measured, not assumed), so the chip's
+  round end sits inside the curve. Its max width follows.
+- **The pantry's visit is gone** from a member's example trips:
+  - `DUMMY_TRIPS` holds two visits.
+  - Saved shows two tiles with a date chip and one without.
+  - The pantry opens as an ordinary place, with "Plan a trip" and no "Your
+    next visit".
+  - Trips says "2 coming up".
+
+  The pantry trip is still in the pool for other people's example
+  histories (`dummyTripsFor`, a case manager's view of a member), so those
+  keep three places.
+- **Found from it: the Trips map placed pins by percentage.** With two
+  trips, the westernmost pin sat on the "Map preview" note. A first fix,
+  moving the band down, pushed a pin's name under the drawer at 390px and
+  still hit the note at 320×640.
+  - Pins are now placed in pixels from the screen's height. Each pin's foot
+    falls between one pin's height below the note and the half-open
+    drawer's edge, and horizontally from 44% to 80%, clear of the note.
+  - On a phone too short for both, the note wins and the drawer, which sits
+    on top, covers the date.
+  - Checked at 390×844, 320×640 and 430×932.
+- **Proven by:** measurements in Storybook; screenshots of Saved, the
+  pantry's profile and Trips at three sizes; the UI and config unit tests;
+  typecheck; the web build; and e2e 570/570.
+
+### D-304 — Nine example programs, not three
+
+Will, 5 October: "use more example programs in the Explore page so we don't
+only have one program per category, and also so not every program in
+Explore already has an appointment created."
+
+- **Six more example places**, two per category, in config's
+  `dummy-places.ts` (so `/place/?id=dummy-place-…` and Plan a visit know
+  them) and in Storybook's `PLACES`:
+  - School and training: Example Library Tech Lab, Example Adult Learning
+    Program.
+  - Work and money: Example Trade Skills Workshop, Example Money Help Desk.
+  - Home and family: Example Family Resource Center, Example Housing Help
+    Office.
+
+  Each has an ordinary description; none touches anything that hints at
+  justice involvement. The phone numbers are 555 example numbers, like the
+  rest.
+- **Most are plain:** of nine, three are saved (the member's own three),
+  and two have visits (D-303). The Storybook mock's `saved_places_mine`
+  returns the first three only, so Explore shows both filled and empty
+  bookmarks.
+- **Opening a place shows that place.** The mock's `service_detail` answered
+  every id with the first place. It now looks the id up; the example ids
+  never reach it anyway.
+- **Distances:** spaced 0.45 miles apart instead of 0.9, so nine places run
+  from 0.2 to 2.5 miles.
+- **Proven by:** Explore in Storybook (9 cards, 3 saved); the Home and family
+  filter (3 places); a new place opened (its own page, no visit); the UI
+  and config unit tests; typecheck; the web build; and e2e 570/570.
+
+### D-305 — One visit tag everywhere; Place profile and Visit profile; "New message" on a place
+
+Will, 5 October: "unify what is inside chips and how that tags all of the
+saved places and places from Explore… so there's no disconnect around
+places that have been set up with appointments versus those that have
+not… What do we call profiles that have been scheduled vs those that
+haven't? That should be one storybook story with parameters to switch…
+also show an alert dot next to profiles (messages item), a variant that
+says new message, so they can view messages straight from profile view."
+
+- **Names:**
+  - A **Place profile** is a place's page with no visit booked: "Plan a
+    trip", then what the place is, then address and hours.
+  - A **Visit profile** is the same page when the member has a visit there:
+    "Your next visit" and Change appointment on top, then address, hours,
+    and the rest (D-273, D-281).
+
+  These are the words in Storybook, in this log, and in conversation. A
+  member never sees them; they see the page.
+- **One tag:** `VisitTag` (`@pam/ui/VisitTag`) is the visit chip, used
+  wherever a place appears with a visit. It reads "Oct 7 · 10:00 AM", is
+  white with a soft shadow, and is one line at 12px.
+  - On Saved, it is pinned in the picture's corner, as before (D-296,
+    D-303).
+  - On Explore's place cards (`PlaceCard visitTag`), it sits under the
+    open line.
+  - Both get their words from one function, `visitTagLabel`.
+  - Both open a place with a visit as its Visit profile (`trip` in the
+    link), and Back follows `from`.
+  - Explore reads the same `useNextVisits` as Saved, for members only, so
+    moving an appointment moves both tags.
+- **One story:** `Member app › Screens › Place profile` replaces "A place"
+  and "A place, from a trip". It has two controls, `profile` (Place profile
+  or Visit profile) and `New message from the program`. Each combination is
+  a real example place, so the page shown is what the app would show:
+
+  | Profile | New message | Place |
+  |---|---|---|
+  | Place profile | no | Library Tech Lab |
+  | Place profile | yes | Food Pantry |
+  | Visit profile | yes | Learning Center |
+  | Visit profile | no | Workforce Center |
+
+  `screenWithControls` (beside `screen()`) builds the prototype's start
+  address from the controls. The flow map's place node points at the new
+  story.
+- **"New message":** when the place's program has written to the member and
+  they have not answered, the profile's message row says "New message" with
+  their newest words under it and a pink dot (`MenuItem.hasDot`, the D-289
+  pink), and opens that conversation. Otherwise it is "Send a message" as
+  before.
+  - It is driven by the example conversations
+    (`src/lib/placeMessages.ts`, `newMessageFrom`).
+  - A new example conversation, Renee at Example Food Pantry writing to
+    Jordan, gives a Place profile with a new message. The member's Messages
+    list now has three conversations.
+- **Not changed:** the old live `/places/` and `/saved/` pages; visits there
+  would be example data shown to real members. Staff never see the tag or
+  the row; both are a member's.
+- **Proven by:**
+  - all four combinations of the story (the right place, the "New message"
+    row and "Your next visit" each present or not);
+  - Explore's tags in a screenshot;
+  - `placeMessages.test.ts` (2 tests);
+  - the UI and config unit tests, typecheck and the web build;
+  - e2e 570/570, then 117/117 for the place, visit, messages and saved specs
+    after the last refactor.
+
+  The web app's own unit tests (`apps/web`, vitest) are not in CI, which
+  runs only config and UI. That is worth adding; it is not done here.
+
+### D-306 — A place's message preview is one line; Call shows the number
+
+Will, 5 October: "For new message item, keep message preview subtitle max 1
+line then truncate. Also list the phone number under the call item subtitle,
+this applies to all places profiles. No need to hide info."
+
+- **The preview:** `MenuItem.isDescriptionOneLine` clips a row's subtitle to
+  one line with "…". Only the "New message" row sets it. The row's job is to
+  say a message is there; the conversation holds the rest. Other rows keep
+  wrapping, because their subtitles are short and fixed.
+- **Call:** the subtitle is the place's number, "(215) 555-0100", in place
+  of "Talk to someone there". `displayPhone()` in `@pam/config` formats a
+  10-digit US number, or 11 digits starting with 1. Anything else (an
+  extension, letters, a foreign number) is shown as stored, not guessed at.
+- **Where:** every place profile (Place profile and Visit profile, every
+  role) and a program's own profile (`ProgramView`). A number is public
+  catalogue data, so there is nothing to hide. The unused
+  `place.quick.call.body` key is removed from en and es.
+- **Proven by:**
+  - `phone.test.ts`;
+  - screenshots of the story (a long preview ending in "…", the number
+    under Call);
+  - ui 67, config 238 and web 11 unit tests, typecheck, web build and
+    Storybook build;
+  - e2e 570/570.
+
+### D-307 — Badges in their own card; the example member has earned Scholar
+
+Will, 5 October, on the Points screen: "Let's wrap badges into a card, move
+it a bit lower so there [is] more gap from [the] ladder. And center align
+title badges inside card. Also let's award them the first badge on preview,
+and incorporate that on the hero card up top."
+
+- **The card:** the badge grid sits in a `Card`, 16px further below the
+  ladder, with "Badges" centred inside it. The card's padding is slim and
+  the grid has no column gap, so each column is as wide as it was outside
+  the card. "Cornerstone" and "Homecoming" fit at 390px; at 320px they end
+  in "…", as they already did.
+- **The award:** nothing awards a badge yet. `DUMMY_EARNED_BADGES`
+  (`@pam/config/dummy-badges`) holds Scholar, the first badge in the grid.
+  It shows only where the other example data shows (`USE_DUMMY_PEOPLE`)
+  and only to a member. An earned badge is drawn in colour, with "Earned"
+  in the accent colour.
+- **The hero card:** under the bar, after a divider, the newest earned
+  badge: its picture, its name and "Newest badge · 1 of 13 earned"
+  (`points.hero.newest`, en/es). With nothing earned, the row is left out.
+- **Proven by:**
+  - screenshots of the Points story at 390px and 320px;
+  - ui 67, config 238 and web 11 unit tests, typecheck, web build and
+    Storybook build;
+  - e2e 570/570.
+
+### D-308 — Steward is no longer a badge
+
+Will, 6 October: "Let's remove steward as a badge."
+
+- Steward (family track, five family enrollments) is gone from `BADGES`,
+  its picture from `BadgeArt`, and `badge.steward` / `.desc` from en and
+  es. No database row ever named it, since badges live in config, so no
+  migration is needed.
+- The family track keeps one badge, Anchor. The notes in `points.ts` say
+  so, and still record why "Patriarch" was turned down.
+- The grid is now 12 badges, three even rows of four. The hero card reads
+  "1 of 12 earned".
+- `points.spec` checked Steward's name; it now checks Anchor.
+- **Proven by:**
+  - a screenshot of the Points story;
+  - ui 67, config 238 and web 11 unit tests, typecheck, web build and
+    Storybook build;
+  - e2e 570/570.
+
+### D-309 — Hours as a row with the week in a drawer; Plan a trip floats; "About program"
+
+Will, 6 October: "Let's reimagine how we show hours, as an item, that can be
+clicked and a drawer opens with full weekly schedule. On the item, focus on
+today's day and time. Build this right so it works with current day. Also
+let's add the Plan a trip button as a floating footer button so it's always
+visible. And instead of label 'what this place is' say 'About program'."
+
+- **The row.** Opening hours join the quick actions, right after Get
+  directions: a clock, "Hours: Tuesday" as the label and today's times
+  under it ("8:00 AM – 9:00 PM"). Not whether it is open — the line under
+  the name already says that (Will, 6 October, second pass). A tap opens a
+  `BottomSheet` with the whole week, today marked ("Today", bold, on a
+  muted ground), the sample-hours note and "Check hours on Google". The
+  sheet draws its own Close. The old hours card is gone from pages that
+  have the row; `PlaceDetail` still draws it for a caller without quick
+  actions.
+- **Today, correctly.** `PlaceStatus` now carries `today` from the same
+  browser clock that decides open or closed (`useNow`, read after mount,
+  re-read every minute), so the label, the open line and the drawer's
+  "Today" cannot disagree, and all three move on at midnight. Until the
+  clock has run, the row says only "Opening hours": a static export never
+  guesses a day at build time.
+- **Plan a trip floats.** The primary action sits in a fixed footer at the
+  foot of the screen (the place page has no tab bar), clear of the home
+  indicator, with the same `edgeFade` every bottom edge uses, and a spacer
+  so the page's end scrolls clear of it. Only a member without a visit has
+  it, as before (D-235, D-273).
+- **"About program"** replaces "What this place is" (`place.about`, en/es),
+  on a member's place and a program lead's own Program tab alike.
+- **Proven by:**
+  - screenshots of the Place profile story (the row, the drawer, the
+    footer);
+  - ui 67 and config 238 unit tests, typecheck, web build and Storybook
+    build;
+  - e2e 570/570 (place.spec opens the drawer for Check hours on Google and
+    the sample note; visit-change.spec checks Address before About program
+    and the hours row).
+
+### D-310 — More air on Sign in and Enter your code
+
+Will, 6 October: "Let's add more space between items on sign in, and code
+screen, so they're not too tight together."
+
+- First pass opened the card's column and the code step a step each;
+  Will: "return to the previous tighter parts. It's only the links on
+  foot that need more space." So those gaps are back as they were, and
+  `LegalFooter`'s three links (About PAM, Privacy, Terms of service) go
+  from `gap={2}` to `gap={6}` — each a tap of its own, read as three.
+- **Proven by:** a screenshot of the foot; e2e 570/570.
+
+### D-311 — The language menu's dial is small, its right edge padded
+
+Will, 6 October: "On language dropdown, let's make dial smaller, and add
+more right padding on tooltip for symmetry."
+
+- Astryx sizes a menu's radio dial from the trigger's `size`, so the
+  globe button is drawn at `size: 'sm'`. `LanguageSwitcher`'s own `round`
+  style still holds the trigger at 48px, so nothing changes on the screen
+  but the dial.
+- Each option keeps a 48px floor and 17px words through `xstyle`, and
+  gets 24px on its end — the same room the dial has on its start.
+- **Proven by:** a before/after of the open menu; the trigger measured at
+  48×48.
+
+### D-312 — Policies for participants sits in the program's own list
+
+Will, 6 October: "Program lead's program tab, let's add policies to the
+list of items above, so it's not so hidden."
+
+- The row (D-261) moves from a list of one at the foot of the page into
+  the quick-action card, after Open in Google, with the same words and
+  count. The old `MenuList` and its import are gone from `ProgramView`.
+- **Proven by:** a screenshot of the Program tab; e2e 570/570.
+
+### D-313 — Services: a program offers several things, each with its own phone, website and policies
+
+**Date:** 2026-10-06. Will: "We need to allow programs to offer different
+kinds of services… add these during onboarding… manage them in edit mode…
+members can view these services from place profiles, and select service
+during booking a trip"; "Different services may require different
+policies, so that should also be considered"; then, "let's start on the
+multi service program detail with unique phone, website, and policies for
+each."
+
+- **What a service is.** One thing a program does — GED classes, the
+  computer room, a job-readiness workshop — with a name, a sentence or two,
+  and, only where they differ from the program's, a phone number and a
+  website. A program with no services listed is one service and reads as it
+  always has; nothing changes for it.
+- **Named at sign-up, filled in later.** The program step of joining asks
+  for the services by name, one field each, "Add another service" — and
+  says that phone, website and policies for each come later from the
+  Program tab, so sign-up stays short (0056's RPC takes the listing's own
+  fields; the names are kept on the client until a services table exists —
+  Will's call, like policies).
+- **Managed from the Program tab.** A Services card under the rows, each
+  service a row that opens its editor (`/program/service/?id=`); in Edit,
+  "Add a service" joins the rows. The editor: name, what it is, phone and
+  website ("leave blank to use the program's"), and which policies are
+  **only for this service**, as checkboxes; Remove asks first.
+- **Which policies apply.** A service names the policies that are only for
+  it; a policy no service names is the program's, asked of everyone. So a
+  newly uploaded policy applies to every service until a lead picks the
+  services it is for — the safe default. The lead's policies list says on
+  each row "Every service" or "Only for GED classes".
+- **A member sees** a Services card on the program's page (D-291 rows,
+  then services, then About); each opens the service: Call (the service's
+  number, or the program's, said so), Website, Policies to sign counted
+  for this service, what it is, and "Plan a trip for this" at the foot
+  (D-326). Policies to sign from a service lists only that service's;
+  Next on a policy walks that list.
+- **Booking** gains a step, "Which service?", only when the program offers
+  more than one (Step 2 of 4); skipped when the link came from a service's
+  own page, and when a visit is being moved. The chosen service is on the
+  Check card and kept on the trip.
+- **Example data** (`dummy-services.ts`): three services at Example
+  Learning Center, two at the Workforce Center, none elsewhere; a lead's
+  edits are kept for the session (`useServices`), like policies.
+- **Cards, not rows** (Will, later the same day: "instead of using the
+  actions list component we should use a horizontal card carousel with all
+  of the details small inside card, letting users flip through… If user has
+  selected a card, it outlines… when they press plan trip it carries over
+  their service selection and when they see their trip confirmation place
+  profile it's related to the service details phone website address… services
+  might be offered at different addresses also"). On both of a member's
+  place profiles the services are a rail of `SelectableCard`s, full-bleed,
+  snapping, each with the name, a line or two, and only what differs from
+  the program — its own number, site and address (or "At the program's
+  address") — and "Details" under it to the service's page. Tapping a card
+  outlines it; the rows above (Call, Website, Get directions, Address)
+  follow the picked service, and Plan a trip carries it, so "Which service?"
+  is skipped. With a visit booked, the visit's service is the card outlined
+  and the others are quiet: the page is about that visit, at that service's
+  number and address. A service has an `address` of its own, set in its
+  editor, shown on its page with Get directions; example trips remember
+  their service.
+- **Two profiles, and a checkout feel** (Will, later still: "a more
+  sophisticated interface, almost like an ecommerce feel to checkout,
+  select type, and continue, this takes priority over program info… separate
+  screens for place profile, pre and post booking… services simply laid out
+  in selectable cards, and a different color (gray)… some programs won't
+  have services… some programs won't have a booking thing, only day/time…
+  weekly, bi weekly, or monthly. About program should come next under the
+  services, then the rest of action menu items"; and: keep the "Which
+  service?" step, drop the service details page; no policies row before
+  booking on a program with services).
+  - **Pre-booking.** Under the name: the services, stacked, grey
+    (`SelectableCard` muted), each small — the name, a line or two, its
+    own number, site and address where they differ. Then About program,
+    then the rows (directions, hours, message, call, website). Plan a trip
+    at the foot waits until a service is picked, like a size before
+    checkout; the picked card outlines and the rows follow it. No Policies
+    to sign here: they are the service's, and come with the visit.
+  - **No services.** The same page without the cards; Plan a trip at
+    once; the policies row stays.
+  - **Drop-in.** A program that meets on a schedule (`dummy-booking.ts`:
+    weekly, every other week, or the first such weekday of the month)
+    shows "When to come" in place of the cards — "Every Tuesday · 4:00
+    PM", the next date, "Nothing to book. Just come at that time." — and
+    Get directions at the foot instead of Plan a trip.
+  - **Post-booking.** As before (the visit on top, policies status, rows,
+    address, hours, About), with the number, site, address and policies the
+    visit's service's, and that one service shown under the visit, outlined
+    and still.
+  - **Simpler cards, smarter page** (Will, then: "only say service name…
+    a gradient skeleton loader animation… gray and white that shines on
+    the card when selected… update the About program to About service and
+    list details there, as well as update the program location… contact in
+    the list of action items… bring up address above action items, below
+    About"). A card is the service's name alone. Picked, it outlines and a
+    soft grey-and-white band sweeps across it (none under reduced motion),
+    and the page becomes the service's: About program reads "About
+    service" with its words, the address card reads "Service address" when
+    it has one of its own (Open in Google and Get directions go there),
+    and Call and Website are its. Order before booking: cards, About,
+    Address, then the rows.
+  - **Dials, two shines, and no jumps** (Will, then: "Add dials… make the
+    shimmer only last 2 times… when selecting entire card it selects the
+    dial. When about and address is switching content, use a text mask
+    effect… and have cards resize gradually"; "add a separator line after
+    times… make the Pick the service bold and larger… clean up the extra
+    text"). Each card carries a drawn radio dial before the name — a ring,
+    a dot when picked — the card itself being the control. The shine went
+    (Will: "remove shimmer, instead change color to that light green on
+    secondary buttons use"): a picked card is outlined on
+    `--color-accent-muted`, the secondary button's light green. About and Address, when their words change, are
+    revealed anew through a soft left-to-right mask (`TextSwap`) and the
+    card eases to its new height (`AutoHeight`, a ResizeObserver and a
+    height transition) so the rows below slide rather than jump; both stop
+    under reduced motion. The ask is a heading, "Pick a service"; a
+    hairline sits under the open/closed line.
+  - **No service step in booking** (Will, then: "We can kill the pick a
+    service nested page and adjust the steppers, also when going back from
+    booking flow it should return to the profile page, not all trips
+    page"). The service is picked on the place's page only. New trip from
+    a place is two steps — When, Check — and Back from When returns to
+    that place's page; from Trips it is three — Where, When, Check — and
+    choosing a program with services in Where opens its page to pick one.
+  - **Two addresses, and back from a message** (Will, then: "create a
+    sample for a service having a different address than the main
+    program… use label 'Main address' vs 'Service address' and use the same
+    mask effect"; "if user selects message from place profile, there should
+    be a back button that tracks back to program profile, so it's easy for
+    them to text, then return to book a visit"). Example Library Tech
+    Lab's Computer classes now meet at another address. When a program's
+    services span more than one address, the card reads "Main address"
+    until a service with its own is picked, then "Service address", the
+    words masking in anew. A conversation opened from a place's page
+    carries `from=place&place=`, and its Back reads "Back to Program"
+    and returns to that page.
+  - **Hours per service, and copy that says so** (Will, then: "On program
+    onboarding, how can we make sure text reflects the latest changes,
+    since now we can accommodate more info per service, including hours";
+    the step-by-step redesign is "for another day"). A service may have
+    its own week of hours (`DummyService.hours`, the place's `WeekHours`
+    shape); the editor has a day-by-day list — tick a day, set from and
+    until (Astryx `TimeInput`) — and no day ticked means the program's
+    hours. On a place, the open/closed line and the hours row follow the
+    picked or booked service (Library's Computer classes: Tuesday and
+    Thursday 1–4). The services copy now names everything a service can
+    carry — address, hours, phone, website, policies — at sign-up, on the
+    Program tab and in the editor. Keeping it true: every place that
+    describes a service's fields says the same five, in that order; when
+    a field is added, `rg -n "phone, website" packages/config/src/locales`
+    finds every sentence that lists them.
+  - **Open:** program onboarding as a simpler step by step (one thing per
+    screen), with services in it — Will, for another day.
+  - `PlaceDetail.layout = 'chooseFirst'` carries the order; the service
+    details page (`/place/service/`) is gone — the page says what it said.
+- **Open:** whether service names should be free text or picked from a
+  list Pam keeps (free text here; a list would make Explore filterable by
+  service). Storing services is a schema change for Will.
+- **Proven by:** screenshots of every new screen; config 238, ui 67,
+  typecheck, web and Storybook builds; e2e.
+
+### D-314 — "Contact phone number" on a program's own listing
+
+Will, 6 October: "Contact phone number should be the label on program
+profile for program leads. Not Call. Also there should be an option to add
+phone and website per program."
+
+- On the lead's own Program tab the phone row is labelled "Contact phone
+  number" (`program.quick.phone`, en/es), with the number under it: this
+  is their listing, so the row names the thing rather than the verb. A
+  member's place still says "Call".
+- Phone and website were already fields, both in Edit on the Program tab
+  and in the join flow's program step (`ProgramDetailsStep`). Nothing to
+  add; said here so it is not asked again.
+
+### D-319 — Sign up, one screen at a time, under each role
+
+Will, 6 October: "I don't see sign up screens for program and case manager
+staff individual pages in storybook." The Onboarding folder had each
+role's whole flow, started from Sign in; there was no way to open "About
+you" for a case manager on its own.
+
+- Each role's Screens folder gets a **Sign up** story with a `step`
+  control: Phone, Code, About you, (Your program, for a program lead),
+  What PAM shares, Texts, Welcome. It is `screenWithControls` over
+  `/prototype/join/?step=…`, so picking a step restarts the prototype on
+  that screen.
+- `JoinPreview.startAt` (a `JoinPhase`) tells the join screen where to
+  open; "Code" is the phone step with the number already sent, so it
+  reuses `preview.phone`. `PrototypeJoin` reads `step` from the URL. The
+  real `/join/` passes no preview and is unchanged.
+- A program lead's "Your program" is on the self-claim path (no invite),
+  so that one step drops the invite code: the count reads "3 of 5"
+  there and "of 4" elsewhere, which is what the real flow does.
+- The member's old "Sign up" story (the whole flow from `/join/`) is
+  replaced by this one; Onboarding keeps the walk-throughs.
+- **Proven by:** every step of all three roles opened and titled
+  correctly (19 screenshots); typecheck, web and Storybook builds; e2e
+  570/570.
+
+### D-315 — A case manager can invite a case manager; the super admin invites from Profile and Invited people
+
+Will, 6 October: "Case managers should also be able to invite other case
+managers. Not only super admins should be able to invite." Then: "we need
+the same ability for super admins, so list that in admin profile settings
+also", and "Super admin top of page, instead of help, add '+ New invite'
+white button there."
+
+- **The database.** `create_invite` (0049, 0070) refused `p_role = 'admin'`
+  from anyone but the super admin. Migration **0073** lets a case manager
+  issue one too — into their own region only, like every invite they
+  make. A program lead still cannot; nobody is invited to be a super
+  admin. A case manager invited this way lands on nobody's caseload
+  (`assigned_admin_id` is a member's case manager, so it is null for any
+  non-member invite). Audited as before.
+  **Not deployed.** This session cannot read the live migration list
+  (`list_migrations` is denied), so per the shared-state rule it stays a
+  file until Will, or a session that can diff the ledger, applies it.
+- **The screen.** Invite someone gets a third row, "Invite a case manager
+  — Someone who helps people find programs", for a case manager and the
+  super admin; a program lead sees two rows as before. The link it makes
+  reads "A link for a case manager" and opens Sign in as `case-manager`
+  (`inviteLink` already knew the role).
+- **The super admin.** Profile lists Invite someone first, as a case
+  manager's does. Invited people replaces its Help button with a white
+  "+ New invite" pill (the page-top button shape, D-216) that opens
+  Invite someone. A Super admin › Invite someone story is added.
+- **Proven by:** `pnpm --filter @pam/db test` (a case manager invites a
+  case manager, on nobody's caseload, into their own city; a program
+  still cannot); screenshots of all four screens and the link; config 238,
+  ui 67, typecheck, web and Storybook builds; e2e 570/570.
+
+### D-320 — "Coming in  this week ▾": the range is a word beside the title
+
+Will, 6 October: "Let's remove the tab switcher 'day, week, month' and add
+a written filter with dropdown next to title 'Coming in' at the end. So
+default says 'Today', 'This week', 'This month', with down chevron next to
+it, and underline the label. Now it will read 'Coming in' <space> 'this
+week', and ultimately free up space."
+
+- The Day / Week / Month `SegmentedControl` is gone from a program lead's
+  Home. In its place, on the title's own line, a dropdown whose trigger is
+  the current range in words — "today", "this week", "this month" — with
+  a chevron and a 2px underline painted just under the words (a
+  background line, not text-decoration, which Astryx's button resets on
+  the words inside it; not a border, which sat at the foot of the 48px
+  target). It opens a radio list of the
+  three. The week stays the default (D-267).
+- `LargeTitleHeader` gains `isAccessoryInline`: the accessory sits right
+  after the words, wrapping onto the next line if the phrase is long,
+  rather than at the far end of the line as Saved's switch does (D-233).
+- The old `schedule.view.day/week/month` keys are gone; `schedule.range.*`
+  (en/es, lower case, since they follow "Coming in") replace them. The
+  group's label is still "Show the schedule by", read with the choice.
+- **Proven by:** screenshots closed, open, and after picking "today";
+  config 238 and ui 67, typecheck, web and Storybook builds; e2e 570/570.
+
+### D-316 — A program checks people in, and books a visit for somebody who wrote
+
+Will, 6 October, on a program lead's Home: "since they should be able to
+book on behalf of a user who's messaged them. This should register as a
+member who booked a trip, and should show up on the member dashboard.
+Let's add that as the first action on Plus icon button. Also the avatars
+on the calendar daily, weekly view, we should replace it with checkmarks
+in circles so they can check people in. When clicked a tooltip shows
+(Checked-in), and user can undo this with confirm modal. These actions
+should update the subtitle, in fact let's make that subtitle more explicit
+(Not checked-in, vs checked-in). Only programs can check members in (for
+now). And instead of using checkmark next to member name, we should add a
+light green signature icon to verify they've signed all policies." Then:
+"a special micro interaction that delights … little confetti bursting
+out … the button distort shape so it resembles real physics, something
+fun, but sophisticated."
+
+- **Check in.** Each visit's avatar is now a 48px circle with a check. A
+  tap checks the person in: the circle fills with the accent, squashes
+  and springs back (`squash`, 520ms, an overshooting ease), eight bits
+  fly out from behind it and fade (`fly`, 640ms, data hues), and a tip
+  says "Checked in" for 1.6s. The subtitle says it plainly either way:
+  "First visit · Not checked in" / "First visit · Checked in". A second
+  tap asks first — "Undo Jordan's check-in?" (`AlertDialog`) — because an
+  arrival is a fact, taken back on purpose. Both animations stop under
+  reduced motion; nothing moving is read out.
+- **Where it is kept.** `src/lib/checkIns.ts`, in the browser session
+  like a member's added trips (D-225): the appointments table already
+  has `checked_in_at` and `attendance_method` (0004) and nothing writes
+  them yet. `ScheduleView` takes `canCheckIn`; only the program's Home
+  passes it.
+- **The row.** A button cannot sit inside a link, so with the circle on,
+  the person's name carries the link and the row itself does not.
+- **The signature.** The tick for "signed every policy" (D-261) is now a
+  light-green circle with the signing pen (`SignIcon` on
+  `--color-success-muted` / `--color-success`), read out as before.
+- **Book a visit for a member.** First in the "+" menu. `/program/book/`
+  lists the people in the program's conversations ("Wrote to your
+  program"); a row opens New trip with this program as the place and
+  "Booking for Jordan" under the title, Back returning to the list. The
+  last step says "Book for Jordan"; saving adds the trip with
+  `forMemberId`/`forName` and shows "Booked for Jordan!" before going to
+  the program's Home. The trip then shows on the program's schedule (a
+  60-minute first visit) and on the member's Trips, from the same store.
+- The "+" items now leave by `navigate()`: `router.push` did nothing in
+  the Storybook prototype, for Invite someone too.
+- **Not done:** nothing reaches the database; the people listed are the
+  example conversations; the program is the example program (D-218).
+- **Proven by:** a scripted walk-through with screenshots (rows, the
+  burst and tip, the undo dialog, the "+" menu, the list, "Booking for
+  Jordan", "Booked for Jordan!", Home with the new row, the member's
+  Trips showing it); config 238, ui 67, typecheck, web and Storybook
+  builds; e2e 570/570.
+
+### D-321 — The name is "Pam"
+
+Will, 6 October: "PAM is not written in all caps, it's not an acronym,
+it's a name. So Pam is correct spelling. Can you update this across
+entire app?"
+
+- Every user-visible "PAM" is now "Pam": both locales (127 strings in
+  English, 126 in Spanish), hard-coded screen text and metadata (titles,
+  OG descriptions, the wordmark's alt), the gallery, stories, the e2e
+  assertions, and the flow map's screen titles. 157 files, one word.
+- **Texts too** (Will, later the same day: "I want 'Pam:' on SMS too,
+  please change the templates, the rule and the campaign samples
+  together"): every template body, the "Pam: " prefix rule in
+  `supabase/functions/dispatch-sms/render.ts`, the shipped
+  `templates.json`, both test files and `docs/sms-campaign-samples.md`
+  changed in one pass. The copy changed by one word in each; `reviewedBy`
+  is unchanged, on Will's own instruction. The carrier samples need
+  re-filing with the new prefix — `docs/before-launch.md`.
+- **Codes stay "PAM-7Q4K".** The sweep also rewrote invite codes in
+  fixtures and stories to "Pam-…"; the app upper-cases every code it
+  reads, so the Storybook mock stopped recognising the expired example
+  and the flow-map script hung on it. A code is a code, not the name:
+  they are back to "PAM-", and `generate_invite_code()` was never
+  touched.
+- Code is untouched: `@pam/*` packages, `pam.*` keys, `DUMMY_PAM_TEAM`,
+  file names. The wordmark SVGs already draw the name in lower case. The
+  OG images are pictures; if one shows the capitals it needs re-exporting.
+- **Proven by:** config 238, ui 67 and web 11 unit tests, typecheck, web
+  and Storybook builds, e2e 570/570.
+
+### D-322 — Booking for somebody: who is already booked, who wrote, and a person who is new to Pam
+
+Will, 6 October, on Book a visit for a member: "we need to know if
+they're already booked, and the time of message, a way to preview last
+message snippet, max 1 line. And a way manually add a person in, which
+allows the program lead to fill in person's name and phone, and at the
+end sends a message to new members with a link to sign into Pam. And have
+that be the first screen the member sees, the confetti Trip booked, with
+button to return to place profile, and auto save that trip show up for
+them inside Trips. This is a workflow of collaboration…"
+
+- **The list.** Each person who wrote shows "Booked · Tue, Oct 6, 9:00
+  AM" (their next visit at this program, example or booked this session)
+  or "Not booked"; when they last wrote ("Wrote Today 7:52 AM",
+  "Yesterday", "Oct 3", in Messages' own words); and the last message on
+  one line, "You:" first when it was the program's. A row still opens New
+  trip for them.
+- **Add a person**, first in the list: somebody at the desk or on the
+  phone who has not used Pam. First name and number, nothing else — the
+  lead is filling it in for them — then the same When and Check steps,
+  the button reading "Book for Keisha". The ending says Pam texted them a
+  link, and shows the text itself so the lead knows what they got.
+- **The link.** `inviteLink(code, role, trip)` carries the booked trip
+  (`?trip=`); `readInvite` and the remembered invite keep it. The real
+  flow would make an invite with the phone pre-filled (`create_invite`
+  takes `p_phone`) and attach the appointment to the profile that redeems
+  it; here it is the session store, like every example flow.
+- **The arrival.** When the invite carried a trip, the member's last
+  sign-up step is "Your visit is booked" — confetti, the place, day and
+  time, "Pam will remind you before you go", **See the place** (the visit
+  profile) and Go to Trips. The trip is already on their Trips. A story,
+  Onboarding › "Member — a visit booked for them", walks it.
+- **The text is not a template yet.** Every SMS template needs a human
+  `reviewedBy` and the tests hold that line, so the copy is shown on the
+  program's ending and listed in `docs/before-launch.md` for review:
+  "Pam: {place} booked you for {day} at {time}. Tap to see it in Pam:
+  {link}". It is a first contact, so it will carry the STOP line.
+- **Proven by:** a scripted walk-through (list, Add a person, "Booking
+  for Keisha", the texted ending, the member's "Your visit is booked");
+  config 238, ui 67, typecheck, web and Storybook builds; e2e 570/570.
+
+### D-323 — A quieter head on a program lead's Home
+
+Will, 6 October: "This top header section looks messy, too many icons and
+things to look at, how can we simplify this?" Then, on the proposal: "Go
+ahead with recommendations 1,2, but for 3, let's show the search button
+(circle icon as is) on weekly, or monthly view."
+
+- The date row's arrows lose their white discs: plain chevrons, still
+  48px targets. The "12 visits" line under the date is gone — each day's
+  heading already counts who is coming. The search circle shows only on
+  the week and month views; a day is short enough to read.
+- **Proven by:** screenshots of the week and the day; e2e 570/570.
+
+### D-324 — On a member's profile, a program sees which policies they signed
+
+Will, 6 October: "The signature icon in light green is connected to this
+profile screen for program admins, please ensure they're tied, except
+here we can see which policies have been signed." And: "add a Policies
+signed item in their profile which is more clearly visible for program
+leads, which opens up an individual page, like the page members see when
+all policies are signed. If not all are signed, create an alert on top
+saying {first name} needs to finish signing on their device."
+
+- **One mark.** `SignedMark` (in `VerifiedBadge.tsx`) is the light-green
+  circle with the pen; Home's rows and the profile's name badge both draw
+  it, so they cannot drift. The badge on the profile still opens its
+  popover listing what was signed.
+- **Policies signed**, first among the member's actions on a program's
+  view: "3 of 4 signed" under it, the pen beside it. It opens
+  `/person/policies/?id=…`, the mirror of a member's own "Policies to
+  sign" page (D-270): each policy, "Signed on October 1" with the green
+  tick or "Not signed yet" with the book, and "3 of 4 signed" above.
+- **The alert.** With any unsigned, an Astryx `Banner` (warning) sits on
+  top: "Keisha needs to finish signing on their device — 1 still to sign.
+  They can do it from your program's page in Pam." A program cannot sign
+  for a member, so the page has nothing to tap into; it says whose move
+  it is.
+- **Proven by:** screenshots (the profile with badge and row; the page
+  with the alert for Keisha and without it for Jordan); config 238, ui
+  67, typecheck, web and Storybook builds; e2e 570/570.
+
+### D-325 — Member stories in three folders: Created, Invited by program, Invited by case manager
+
+Will, 6 October: "Organize storybook screens for members by: Member
+created, Member invited by program, Member invited by case manager, and
+show only unique screens to that flow for program and case manager
+invited screens, the rest keep inside member created."
+
+- **Member › Created** is the whole app for a member who signed up from
+  the phone: the five tabs, every nested screen, Sign in, Sign up by
+  step and the whole walk (moved here from Onboarding), and the States
+  folder under it.
+- **Member › Invited by program** holds only what that path changes
+  (D-322): Sign in — invited, "Your visit is booked", and the whole way
+  in from the link with a booked trip.
+- **Member › Invited by case manager** likewise (D-254): Sign in —
+  invited, About you with no code to type, and the whole way in.
+- Member › Prototype keeps its place beside them. Onboarding keeps the
+  staff walks, the expired link and About Pam. Story ids changed, so the
+  flow map's `member-app-screens--*` became `member-created--*`.
+- **Proven by:** each new story opened and titled; Storybook build; the
+  flow map regenerated (all six pages).
+
+### D-326 — A screen's action at its foot is the template's job: a sticky footer that fades the page out
+
+**Date:** 2026-10-06. Will, on the member's view of a place not yet
+booked: "the floating button is not working well, we need to update the
+page template to accommodate floating buttons stuck on bottom to be
+better, and add a white gradient so scroll fades out from bottom." And:
+"policies to sign need to be together with other items, not here."
+
+- **What was wrong.** D-309 put "Plan a trip" in a `position: fixed`
+  strip inside `PlaceDetail`, with a spacer and the bottom-edge fade. On a
+  full-page capture — how Will reviews, in Chromatic — a fixed strip is
+  painted where the first screenful ends: a white box with a hard edge in
+  the middle of the page, and the policies row running on underneath it.
+- **The template owns it.** `Page` (and so `SubPage`) takes a `footer`:
+  rendered last, `position: sticky; bottom: 0`, full-bleed. On a phone it
+  rides the bottom edge while the body scrolls under it; where the page is
+  shorter than the screen, or captured whole, it sits at the end. No
+  spacer, no fixed geometry a screen has to know about, and nothing can be
+  placed after it — a footer is the end of a screen.
+- **The fade.** The strip's top 56px is a gradient from nothing to the
+  page colour, so what scrolls under it fades out rather than being cut;
+  only the button's own part is solid. The faded part does not take taps
+  (`pointer-events: none`), the button does. Clear of the home indicator.
+- **Policies with the rows.** "Policies to sign · Read before your visit ·
+  0 of 4 signed" is the last row of the place's quick actions, after
+  Website — with Directions, Hours, Send a message and Call (D-291), where
+  the program's own tab already lists them (D-312) — instead of a list of
+  its own at the foot. Unchanged: a member with a visit booked sees the
+  policies as the status card under the name (D-271).
+- `PlaceDetail` no longer takes `primaryAction`; the place page passes the
+  footer to `Page` and drops the directions button when the footer is the
+  action. Staff viewing a place keep "How to get there" as before.
+- **Everywhere a screen has one button** (Will, later the same day: "make
+  sure the footer floating button on template is also used when booking a
+  visit for members, and when signing the policies, for consistency"):
+  New trip's Next (When) and Add this trip / Book for {name} (Check); a
+  member's Policies to sign (Start signing, Continue, Done) and a policy
+  (Sign with the saved signature above it, Next: …, Done — which replaces
+  D-279's own fixed dock and its spacers); a service's Plan a trip for
+  this (D-313). The example note on Check stays in the body, above.
+- **Proven by:** screenshots of the member's place profile (the fade over
+  the last card, the row in the list, and the whole page captured with the
+  footer at its end); config 238, ui 67, typecheck, web and Storybook
+  builds; e2e 570/570.
+
+### D-327 — Trips: "sign before you go" is a banner, not a card
+
+**Date:** 2026-10-06. Will, on Trips after booking: "Can we make this an
+alert banner instead of this whole thing taking up space, also please
+condense this."
+
+- The card (a heading, two sentences and a big button) becomes one Astryx
+  `Banner`, warning: "Sign 4 policies for Example Library Tech Lab before
+  you go", with "Sign now" at its end opening that program's policies.
+  The trip card below it keeps its orange "Signatures needed" tag.
+- `trips.added.policies.body` is gone; the title carries the place and
+  the count.
+- **Proven by:** screenshot of Trips after booking; typecheck; web build;
+  e2e.
+
+### D-328 — The design system stands on its own (for Claude Design)
+
+**Date:** 2026-10-06. Will: "Let's do some clean up so we can use this DS
+inside claude design" — components mount on their own, one tokens file,
+`dist/` builds cleanly, a real story for every component, usage rules
+written down, fonts from the package, `Category/Component/Variant` names.
+
+- **The theme and fonts live in `@pam/ui`.** `pam.theme.ts` and its built
+  `pam.css`/`pam.js` moved from `apps/web/src/theme/` to
+  `packages/ui/src/theme/` (rebuild with `pnpm --filter @pam/ui theme`);
+  Figtree's two woff2 files and their `@font-face` moved to
+  `packages/ui/src/fonts/` and `@pam/ui/fonts.css`. The app and Storybook
+  import `@pam/ui/theme`, `@pam/ui/theme/pam.css` and `@pam/ui/fonts.css`.
+- **`PamProvider`** (exported from `@pam/ui`) wraps Theme(pamTheme) and
+  MotionProvider, so a component mounts outside the app. Storybook's global
+  decorator already does the same for every story.
+- **One tokens file.** `pnpm --filter @pam/ui tokens` writes
+  `src/styles/tokens.css` (264 custom properties, grouped by family) from
+  Astryx's base, the Pam theme and `tokens.stylex.ts`. PAM's own StyleX
+  tokens are now named `--pam-*` literally (`pam['--pam-touch-target-min']`)
+  so the CSS and the code use the same names. `tokens --check` fails on
+  drift (a ui test runs it).
+- **`pnpm --filter @pam/ui build` writes `dist/`**: compiled JS (StyleX
+  extracted, no runtime injection), `.d.ts`, `stylex.css`, `fonts.css` with
+  `fonts/`, `tokens.css`, and `styles.css`, which declares the layer order
+  and imports tokens and fonts before the Astryx reset, base, Pam theme and
+  StyleX rules. `dist/` is gitignored; CI builds it on every run.
+- **Stories.** Every component in `@pam/ui` has a story file with a
+  `Default` story, controls on its typed props and its variants and states
+  (12 new: ConnectionCard, TripCard, ProfileCards, VisitTag, MenuList,
+  LargeTitleHeader, SubPage, StepHeader, FloatingAction, MapDrawer, Tone,
+  Text swap). Titles are `Components/<Category>/<Component>`, the
+  categories being Actions, Inputs, Navigation, Layout, Cards, Places,
+  Feedback and Illustration; Icons and Motion sit under Foundations. Every
+  component meta has `autodocs` and a description saying when to use it.
+  Role screens keep their titles, because the Figma flow map links to their
+  ids.
+- **Usage rules in MDX** under `Foundations/`: Introduction (how to mount and
+  import), Principles, Colour, Spacing and layout, Typography, Actions — which
+  one when, Writing. `@storybook/addon-docs` is added.
+- **Proven by:** typecheck; ui 69 tests; `@pam/ui` build (57 modules, 1,158
+  StyleX rules); web build bundles Figtree from the package; Storybook build,
+  and all 290 Components/Foundations entries (stories and docs pages) load
+  with no error and a non-empty root; e2e 570/570.
+
+### D-329 — Bring a friend: the first row on a program's page
+
+**Date:** 2026-10-06. Will: "a white (simple, not too busy) alert under
+about and address asking if they want to bring a friend? When clicked it
+opens a nested page with an invite link for another member to join that
+program" — then, before it shipped: "Instead of bring a friend alert, we can
+add it as an item on top of quick actions list."
+
+- **A row, not a card.** "Bring a friend · Send a link so they can join too"
+  leads a member's quick actions on every program page, before Directions
+  and Hours. Members only. A member's list now starts with Bring a friend,
+  then Directions, then Hours; PlaceDetail puts Hours after Directions, or
+  after Bring a friend when there are no directions.
+- **`/place/friend/`** (`BringFriendView`, SubPage, Back to this place):
+  one sentence, the link shown, one footer button "Send the link" (share
+  sheet, or copy where there is none), and "They sign up with their own
+  phone number."
+- **The link has no invite code.** `friendLink(placeId)` →
+  `/signin/?as=member&program=<id>`. Members make no invites in the database
+  (`create_invite` is for case managers and programs), and a friend signs up the way any member
+  does. **Open:** sign in does not read `program` yet, so the friend lands
+  on plain sign in; showing "Your friend invited you to <program>" and opening
+  that program after joining is the next step.
+- **Trips banner (D-327 follow-up).** The drawer's top fade (z-index 1)
+  washed out the banner's top edge at rest; the banner now sits in a
+  positioned wrapper at z-index 2. A Storybook state, Member › Trips — just
+  booked, shows it.
+- **Proven by:** screenshots (place rows, Bring a friend, Trips banner);
+  typecheck; config 238, ui 69, web 11; web and Storybook builds; e2e
+  570/570 (the row-order test now expects Bring a friend first); flow map
+  page 2 redrawn.
+
+### D-330 — Go together: Bring a friend as an invitation, worth 150 points
+
+**Date:** 2026-10-06. Will: "How can we make the bring a friend nested
+screen more attractive?" Then, on the proposal: "Yes build it, and let's also
+award points, and update how to earn points in profile rewards page", and
+"Let's make 150 points for inviting a friend."
+
+- **The screen is an invitation, not a form** (`BringFriendView`):
+  - Title "Go together", with the program name under it.
+  - The program's own picture (its category colour and icon, as on Trips and
+    Saved), with two circles on its bottom edge: you (accent) and an empty
+    "+" for the friend.
+  - One sentence: "Things are easier with someone you know. Send a friend a
+    link to join {program}."
+  - A light-green pill: "+150 points when they join".
+  - **What they'll get**: the text as it will arrive, a grey bubble ("Join me
+    at {program} on Pam") holding a link card with the program's picture and
+    name, instead of the raw URL.
+  - One footer button. Once sent it reads "Sent ✓", or "Link copied" where
+    there is no share sheet, and bursts like a Program Home check-in (D-316).
+    Reduced motion: no burst.
+  - The category rides in the link from the place page (`cat=`); an example
+    place falls back to its own.
+- **150 points for a friend who joins.** `POINTS_RULES.refer_someone` 100 →
+  150, the most one action earns; it departs from the SOP's §8 table, so it
+  is SOP amendment A18. Awarded when the friend joins, not when the link is
+  sent. Nothing awards it yet: the database has no referral award and sign in
+  does not read the link's program (D-329).
+- **Where it shows.** Points › Ways to earn lists "Bring a friend who joins
+  +150" first. The place row now reads "Bring a friend · Earn 150 points when
+  they join". The "what happens next" list I had proposed was left out to keep
+  the screen short.
+- **Proven by:** screenshots (Go together, Link copied with the burst, Points);
+  typecheck; config 238 (points test asserts 150), ui 69, web 11; web and
+  Storybook builds; e2e 570/570; flow map page 2 redrawn.
+
+### D-331 — The member prototype keeps its old link; Go together polished
+
+**Date:** 2026-10-06. Will: "Links not working" (the four prototype links),
+then on Go together: center the bottom section, give the preview the
+category's colour with centred text under the program card, narrow the
+sentence, and make the "you" circle the category's darker shade.
+
+- **Links.** D-325 retitled the member prototype `Member/Prototype`, which
+  changed its id to `member-prototype--prototype` and broke the shared
+  `member-app-prototype--prototype` link. The story file now sets
+  `id: 'member-app-prototype'`, so the old link works again. Case manager,
+  Program lead and Super admin keep their ids and load in a local build of
+  this branch; Chromatic published build 116 with all 378 stories passing.
+- **Go together.**
+  - The sentence is narrowed to 300px so it breaks into even lines.
+  - "What they'll get" and the preview are centred. The preview takes the
+    program's pale category colour (the ToneGround shade), with the program
+    card first and "Join me at … on Pam" centred under it, at most 250px wide.
+  - The "you" circle takes the category's deep icon shade (blue for school,
+    and so on), falling back to the accent green when there is no tone.
+- **Proven by:** screenshots; the member prototype loads at the old id;
+  typecheck; web and Storybook builds; e2e 570/570.
+
+### D-332 — One program card, in its colour; a booked visit names its service
+
+**Date:** 2026-10-06. Will, on Go together's picture and Plan a visit's
+summary card: "A marriage between these two … use the same component as
+booked visit, but update that component to show more color, and create a
+visual variant with friend icons + sign." Then, on a booked place: "no need
+for this dial component visible here, we need this info detailed up top …
+next to time."
+
+- **`ProgramVisitCard`** (`@pam/ui/ProgramVisitCard`). The card takes the
+  category's pale shade. The program's picture (ToneGround plus its icon, ink
+  in the category's deep shade) sits beside the name, with lines under it.
+  - **`visit`:** Plan a visit's Check step. The service, then the day and time.
+  - **`invite`:** Go together. You (the category's deep shade) and an empty
+    "+" overlap the picture's edge, with the name under them and no date.
+    It replaces the big hero square and its circles.
+- **A booked place drops the service picker.** "Your visit is for" with the
+  locked dial is gone. `VisitCard` takes `service`, and the time line reads
+  "10:00 AM · GED classes". `ServiceCards` lost its locked mode and
+  `place.services.booked`.
+- **Stories:** Components › Cards › ProgramVisitCard (Default, WithService,
+  Invite, InviteWork, FamilyServices, NoTone); VisitCard › WithService.
+- **Proven by:** screenshots (Go together, Check, Visit profile, card
+  variants); typecheck; config 238; web and Storybook builds; e2e 570/570;
+  flow map page 2 updated.
+
+### D-333 — Bring a friend lives on "Your trip is booked"; signing holds the sheet still
+
+**Date:** 2026-10-06. Will, from design review: two UI changes. Bring a friend
+moves off its own page into a folded section on the trip confirmation. The
+signature box locks every gesture while drawing. Asked before building (three
+answers):
+1. There was no confirmation screen, so a new "booked" step was added.
+2. Walk-ins book from the days they meet.
+3. Copy only, no native share sheet for now.
+
+- **Bring a friend.**
+  - `BringFriend` (`@pam/ui/BringFriend`) is an Astryx `Collapsible` in a
+    `Card`. Collapsed it is one row: a new `UserPlusIcon`, "Bring a friend"
+    and the chevron, 48px tall.
+  - Open, it shows "Going is easier with someone. Send this link so they can
+    come too." under the row, then the link in a read-only `TextField` with
+    a Copy `Button` beside it. Copy reads "Copied" for 1.5s.
+  - Copy only on every platform. The Capacitor share sheet waits for Will's
+    go-ahead.
+  - It sits on a new step after "Add this trip": **Your trip is booked** —
+    the program card (D-332) with the slot, the section under it, and Done
+    to Trips (still with D-241's confetti).
+  - `friendLink(placeId, at)` carries the booked slot.
+  - `/trips/new/?booked=<trip>` opens that screen for an existing trip; it
+    backs the Member › Trip booked story and the flow map.
+- **Removed:**
+  - `/place/friend/`, `BringFriendView`, its story and route.
+  - The place page's Bring a friend row (D-329) and the Go together screen
+    (D-330, D-332's invite variant of `ProgramVisitCard`).
+  - Their copy keys.
+- **Kept:** a friend who joins is still worth 150 on the Points page (D-330,
+  SOP A18). Nothing awards it yet.
+- **Walk-ins plan a trip too (contradicts D-313).** D-313 had drop-in
+  programs say "Nothing to book. Just come at that time" with Get directions.
+  - Now Plan a trip is their footer. The When step lists the next four days
+    the program meets (`nextDropIns`, every other week skipping a week) at
+    its set time, already picked. Then Check and the same booked screen, so
+    staff see who is coming.
+  - The When to come card now says "Pick a day in Plan a trip so they know
+    you're coming."
+- **Signature sheet.**
+  - The canvas has `touch-action: none` and `user-select: none` (and the
+    -webkit- forms). On pointerdown it calls `setPointerCapture` and
+    `stopPropagation`; pointermove calls `stopPropagation`; pointerup and
+    pointercancel release.
+  - A non-passive native `touchstart`/`touchmove` listener calls
+    `stopPropagation` and `preventDefault`. Astryx's sheet starts drags from
+    React pointer handlers and native touch listeners on its body, so
+    neither sees a stroke, and pull-to-refresh and the back swipe can't fire.
+  - A stroke that leaves the box keeps drawing, clipped at the edge, until
+    the finger lifts.
+  - `onDrawingChange` drives the sheet's `purpose`. It is `'info'` normally,
+    so the handle and copy drag and dismiss like any sheet, and `'form'`
+    while drawing; Astryx has no drag-off prop.
+  - **Contradicts the old setup:** the sheet was always `'form'`, so it could
+    never be swiped away. A scrim tap or swipe now closes it and drops an
+    unsigned drawing, as asked.
+  - The scrim's `showModal` locks the page behind.
+  - `overscroll-behavior: contain` is on the content (Astryx already sets it
+    on the sheet body).
+  - The "×" on the line is gone: a faint "Sign here" sits there instead, and
+    the middle hint is removed.
+- **Proven by:**
+  - Booking flows, in Chromium with touch emulation:
+    - Scheduled (no services): 10 weekdays, booked screen, row 48px,
+      expands and collapses, link carries the slot, clipboard gets it,
+      "Copied" back to "Copy" after 1.5s, Done to Trips.
+    - Walk-in: Wed Oct 7 / 21, Nov 4 / 18 at 6:00 PM picked, then the same
+      screen.
+  - Signature, with CDP touch events: a stroke from the box down past its
+    edge leaves the panel exactly where it was and ink on the box's bottom
+    row, and the handle drag then closes the sheet. With the old code the
+    same stroke stopped short (no ink on the bottom row) and the handle drag
+    could not close the sheet.
+  - Typecheck; ui 69, config 238, web 11; ui, web and Storybook builds;
+    e2e 570/570 (place.spec now asserts no Bring a friend row).
+  - Flow map page 2 redrawn.
+- **Not tested here:** iOS Safari, an Android WebView and the Capacitor
+  build. This sandbox has Chromium only, so the stroke test ran on emulated
+  touch. The iOS edge back-swipe in particular needs a device.
+
+### D-334 — The footer is pinned to the screen; Next says what is missing; the booked screen closes with an ×
+
+**Date:** 2026-10-07. Will, in order:
+- "For policy signatures … use the sticky floating button on bottom so
+  regardless of policy length it's a simple tap always visible at same
+  position."
+- On Plan a visit's When step: Next at the foot, and if a day or time is
+  missing, an alert above Day saying which.
+- On Check: the day and time under the name, the card white again, with a
+  realistic shadow.
+- On the booked screen:
+  - the link field filling the row;
+  - a darker, larger chevron and no card around Bring a friend;
+  - "sign policies" above Bring a friend;
+  - an × instead of back, closing to Trips where the new trip animates in.
+
+- **Template (`Page`).** A page with a `footer` is at least a screen tall
+  (`100dvh`, `100vh` fallback), and the footer's top margin is `auto`.
+  - A short policy and a long one put Sign 16px above the bottom edge. So
+    do the place page, booking and the policies list: one template, one
+    position.
+  - Measured on Policy 1 of 4: 390×844, page exactly the screen, Sign at
+    y 772–828. 320×568, page scrolls (786px), Sign at y 496–552.
+  - Before, on a short page, the footer sat right under the content.
+- **When step.**
+  - Next is always tappable. Pressed with something missing, an Astryx
+    `Banner` (warning) above Day says "Day must be selected", "Time must
+    be selected" or "Day & time must be selected", and updates as they pick.
+  - A walk-in's one time is already picked, so only the day can be missing.
+- **`ProgramVisitCard`.** White, with a four-layer shadow (contact, then
+  wider and fainter; deeper in dark mode). The service and the day and time
+  sit under the name beside the picture. The pale tint (D-332) is gone; the
+  picture keeps the category's colour.
+- **`BringFriend`.**
+  - No `Card`: it sits on the page.
+  - Rebuilt on Astryx's `useCollapsible`, with an Astryx ghost `Button` as
+    the row: the user-plus icon, the label, and `Icon chevronDown` large in
+    the primary text colour, turning 180° when open. `Collapsible`'s own
+    chevron cannot be restyled.
+  - The link field is `width="100%"` in a growing wrapper, so it fills up
+    to Copy.
+- **Your trip is booked.**
+  - `SubPage` gains `backIcon="close"`: an Astryx `close` × that goes to
+    `backHref` itself, not back through history. Here that is
+    `/trips/?added=<id>`, so the new trip animates in (D-241). The Done
+    footer stays.
+  - When the program asks for policies and some for this visit (its
+    service's, or the program's) are unsigned, the orange Policies to sign
+    card (D-271) sits above Bring a friend.
+- **Proven by:**
+  - Measured positions as above.
+  - When: nothing picked → both; day only → time; time only → day; both
+    → Check.
+  - Booked: × links to `/trips/?added=dummy-trip-1` and lands on Trips;
+    the policies card links to the GED service's policies.
+  - Bring a friend: the row is 48px, the field 262px wide on a 390px phone,
+    and Copy and Copied still work.
+  - Typecheck; ui 69, config 238, web 11; ui, web and Storybook builds;
+    e2e 570/570.
+
+### D-335 — Who you'll meet: the program's staff photo on a booked place, and photos in Messages
+
+**Date:** 2026-10-07. Will: "On this profile booked view, let's add the image
+of program lead there. Also inside the messages screen, if available.
+Otherwise keep their name avatar." Then: "Add image next to Open until. at
+the right corner of that row. Tapping it shows a tooltip with program staff
+name and title."
+
+- **`StaffBadge`** (`@pam/ui/StaffBadge`): an Astryx `Avatar` (40px, the
+  photo or initials) in a 48px ghost `Button` that opens an Astryx
+  `Popover` with the name (bold) and title. A tooltip only shows on hover,
+  which a phone does not have; a popover opens on a tap.
+- **PlaceDetail** gains `statusAside`, at the right end of the open/closed
+  row. The place page fills it only once a visit is booked, with the
+  program's staff from `programStaffFor(placeId)`: Sandra at the Learning
+  Center, Marcus at the Workforce Center. Title "Program lead" /
+  "Responsable del programa".
+- **Messages:**
+  - The list rows (`MessageRow.photoUrl`) and the conversation's avatars
+    (`ThreadView.otherPhotoUrl`, real and example threads) use
+    `staffPhotoFor(firstName, programName)`: the same person in Connections
+    by first name and program, or no program for a case manager.
+  - Sandra and Teresa show photos; Renee and anyone else keep initials.
+  - Example photos only, as in Connections: a real staff photo needs an
+    upload and a column.
+- **Proven by:**
+  - Badge: 48px at the row's right, opens "Sandra / Program lead", absent
+    before booking.
+  - With Unsplash stubbed (this sandbox blocks it), the Messages list asks
+    for Teresa's and Sandra's photos and the thread for Teresa's.
+  - Typecheck; ui 69, config 238, web 11; builds; e2e 570/570.
+
+### D-336 — How soon; the booked screen as rows; signing ends in Trips; Trips reads the visit's own policies; one-line floating rows
+
+**Date:** 2026-10-07. Will, in five asks: add "# of days from today" under
+the card's smaller subtitle; Bring a friend as an item with a chevron that
+opens a drawer, with a festive illustration as its hero; Policies to sign
+as a similar item that opens a page, and the last signature closes with an
+× into Trips, the trip animating in; Trips did not show signed policies
+nor the banner; Messages' floating row on one line ("People who offered
+help") with a line above and below, and that line on every floating row.
+
+- **Countdown:** `daysUntil` counts calendar days (local Y/M/D through UTC,
+  so a clock change cannot make it 0 or 2); `countdown` says Today,
+  Tomorrow or "In N days", and nothing for a past day. On
+  `ProgramVisitCard` (new `countdown` prop) on Check and the booked screen.
+  Lines are 15px now, so the name leads. Unit tested (web 16).
+- **Booked screen:** a Card of two `MenuList` rows, as the place's hours
+  row: Policies to sign ("Read before your visit · 0 of 3 signed", signed
+  icon once done; opens the list, carrying `trip`) and Bring a friend
+  (opens the drawer). `BringFriend` is now an Astryx `BottomSheet` (hug):
+  `FriendsArt` (new, drawn with the art kit: two friends and confetti), the
+  title, one sentence, the link at full width and Copy. Copy only still.
+- **Signing from a booked trip:** with `trip` set and everything signed, the
+  policy and list pages show an × (`SubPage backIcon="close"`) to
+  `/trips/?added=<id>` and Done goes there too, so the trip arrives with the
+  D-241 confetti. Without `trip`, D-279 stands.
+- **Trips:** a trip keeps its `serviceId` and counts only that service's
+  policies (`policiesForService`), which is why a fully signed visit read
+  "Signatures needed" — it was counting every service's policies. The banner
+  is the just-added trip if it needs signing, otherwise the soonest upcoming
+  one that does (it only ever showed for a just-added trip).
+- **Floating rows:** `FloatingAction` has a hairline at the bottom as well as
+  the top, so it is separate from the tab bar and the page: member Messages,
+  staff Home's Invite, super admin Requests. Messages' row is one line,
+  "People who offered help"; `messages.connections.body` removed.
+- **Proven by:** a walk through: booked shows "In 2 days"; the drawer opens
+  and Copy says Copied; signing three policies ends on × to Trips, which
+  reads "Policies signed" for that visit and shows the banner for the
+  Workforce Center's 4. Typecheck; ui 69, config 238, web 16; builds;
+  Storybook; e2e 570/570. Flow map: notes patched on page 2; the two new
+  links (booked → policies, policy → Trips) are in `flows.mjs` and the
+  regenerated script, not yet drawn on the Figma page.
+
+### D-337 — The booked screen is the green visit card; Bring a friend copies on open, under Will's banner; every place picture is its illustration
+
+**Date:** 2026-10-07. Will, in four messages: use the green card for the
+confirmed booking, with Change and the number of days in it; Policies to
+sign and Bring a friend as plain items on the page; Back from Policies
+should return to the confirmation, not to step 1; for Saved and every
+program/place card "just use the illustrations by category … Only keep the
+shaded colors on chips on explore"; "instead of coming up with an
+illustration for it, use this banner on top of drawer. Compress it and get
+it ready for production"; opening Bring a friend copies the link, says so
+over the field for 3 seconds, and the drawer gets an × at the top right.
+
+- **Booked screen:** the `VisitCard` a booked place shows, with the
+  program's name as its eyebrow, the day, the time and service, how soon
+  (new `countdown` prop, also on the place's card) and Change appointment
+  (the same `/trips/new/?change=` link). `ProgramVisitCard` stays on Check
+  only. The two rows are a `MenuList` straight on the page, no card.
+- **Back from Policies:** after Add this trip the screen replaces its URL
+  with `/trips/new/?booked=<id>` (`router.replace`), so history (and the
+  prototype's stack) holds the booked screen, not a fresh Plan a visit.
+  New e2e `trip-booked.spec.ts` books, opens Policies, goes back.
+- **Pictures:** `CategoryArt` takes `size="fill"` (`ArtFrame` stretches to
+  its box, square corners left to the box), and `CategoryPicture` in
+  SavedView draws it on Saved's tiles, trip cards (Trips, past trips, a
+  member's page), Explore's next visit and Check. `ToneGround`,
+  `ToneIcon`, `ToneBakedIcon` and `CategoryIcon` are gone; `ToneDot` (the
+  chips) is all of `Tone.tsx` that remains. The illustrations keep their own
+  grounds and grain — those are the "sharp 80s" pictures Will is keeping;
+  what went is the pale tint behind an icon.
+- **Banner:** Will's 1608 × 629 PNG (1.1 MB, from Drive) →
+  `public/friend/bring-a-friend-800.webp` (21 KB) and `-1200.webp` (35 KB)
+  by `apps/web/scripts/friend-banner.mjs` (sharp, WebP q74, metadata
+  stripped), served with `srcset`. If it fails to load the drawer shows no
+  banner, not a broken image. `FriendsArt` (D-336) is deleted.
+- **Copy on open:** the row's tap calls `copyLink` (exported from
+  `BringFriend`) — inside the tap, because Safari only allows a clipboard
+  write there — and passes `copiedAt`; the drawer shows a dark "Link
+  copied" pill over the field (a `role="status"`, so it is read out) for
+  `COPIED_MS` = 3s. Copy copies again. An `IconButton` × (48px, white
+  circle) closes it at the top right. Copy only still; no share sheet.
+- **Proven by:** screenshots (booked, drawer, Saved, Trips, Explore);
+  clipboard read back in Chromium, pill gone after 3s, × closes; typecheck;
+  ui 69, config 238, web 16; builds; Storybook; e2e 573/573. Not on a real
+  iPhone.
+
+### D-338 — Drawers lose their outline; the friend banner runs edge to edge; "Link copied" fills the field
+
+**Date:** 2026-10-07. Will: "Banner should take up full width and touch top
+edge of drawer. Also why do drawers have black outlines? Remove that. The
+link copied tag would take up same space as full input field, and be light
+green color as secondary button. Make message holder with checkmark at the
+start. X circle button is not nearly tucked in corner."
+
+- **No outlines:** Astryx's `BottomSheet` panel has a 1px `--color-border`
+  border, which over the scrim read as a black line. `sheet.panel`
+  (`@pam/ui/sheet`, new) zeroes it through the sheet's `xstyle`, on every
+  drawer: hours, Bring a friend, signing, the area picker, new message.
+- **Banner to the edges:** the hero cancels the sheet's side padding and
+  sits at its top; the panel's own rounded, clipped corners shape it.
+  Astryx paints a white fade under its drag handle (a z-index 1 strip), which
+  washed out the top of the picture, so the banner sits above it (z-index 2)
+  and lets taps through (`pointer-events: none`) to the handle beneath: the
+  drawer still drags shut from its top edge (checked). It draws its own
+  white pill where the handle's was. Tried first and dropped: overriding
+  `--color-background-surface` inside the sheet, which also turned the
+  field and Copy grey.
+- **"Link copied":** covers the whole field (inset 0, the field's 12px
+  corners), the tick first then the words, on Copy's pale green. That green
+  was a literal in the theme's secondary-button rule, so it is now a token,
+  `--pam-secondary-fill` (`light-dark(#E7EFE6, #24261A)`), to be kept equal
+  to that rule; text in `--color-text-accent` like Copy's label.
+- **×:** 12px from the top and right edges of the drawer (it was 8px inside
+  a banner that was itself inset 20px).
+- **Proven by:** screenshots; sheet border reads 0px; a drag from the top
+  edge closes the drawer; typecheck; ui 69, config 238, web 16; builds;
+  Storybook; e2e 573/573.
+
+### D-339 — Room in the green visit card; "Link copied" spans the whole row, centred
+
+**Date:** 2026-10-07. Will: "Add more vertical space in cards so things
+aren't squished together. And add a bit of space below link. Have link
+copied bar take up full width covering the copy button also. And center
+align text inside shape."
+
+- **VisitCard** (the booked place's card and the booked screen's): 20px
+  between the header, the day-and-time block and Change (was 12px), 8px
+  between day, time and how soon (was 2px), 12px from the calendar mark to
+  the name. Read as the card he was looking at; trip and place cards are
+  unchanged.
+- **Friend drawer:** 44px under the link row (was 28px). "Link copied"
+  now covers the field and Copy together, centred, tick first; it is
+  always present as an empty, absolutely placed `role="status"` so screen
+  readers hear it appear, and taps pass through it, so Copy still works
+  under it (checked: copying again brings it back).
+- **Proven by:** screenshots; typecheck; ui 69; web build; e2e 573/573.
+
+### D-340 — Room around the friend drawer's words
+
+**Date:** 2026-10-07. Will: "I want space between banner image and bottom of
+subtitle also." Read as: more room under the banner (before the title) and
+under the sentence (before the link). 24px each, was 12px. A layout-only
+change, no test touches it.
+
+### D-341 — "In 2 days" reads as metadata; Change appointment sits evenly in its corner
+
+**Date:** 2026-10-07. Will: "the change appointment button doesn't fit
+neatly tucked in the corner, seems like bottom padding is stronger than
+right. Also 2 days text should not be bold or green so it stands out as
+metadata."
+
+- **Change appointment:** its words sat 33px above the card's bottom edge
+  and 18px from its left, because the 48px target centres the words and
+  adds its own space under them. The target now hangs 14px into the card's
+  padding (`marginBlockEnd: -14px`), so the words are 19px from the bottom
+  and 18px from the side; the target is still 48px and still inside the
+  card (measured).
+- **"In 2 days":** plain weight, 16px, in the body colour. The secondary
+  grey was tried first and failed axe in dark mode (4.08:1 on the dark
+  green, under 4.5), caught by `visit-change.spec`.
+- **Proven by:** measurement, screenshot, typecheck, ui 69, web build, e2e
+  573/573.
+
+### D-342 — Change appointment: the same space above and below
+
+**Date:** 2026-10-07. Will: "The top padding above change appointment
+doesn't match the bottom row, make it neatly spaced." Measured to the ink:
+22px from the divider to the words, 19px from the words to the card's edge.
+Now 20px and 20px (divider padding 4px → 2px, the link's overhang
+-14px → -13px); the target is still 48px and inside the card.
+
+### D-343 — A chevron after Change appointment; the program's name in black
+
+**Date:** 2026-10-07. Will: "Add chevron next to change appointment
+matching font weight and underline. Make learning center a different
+color, like black."
+
+- **Chevron:** a "›" character (U+203A) after a no-break space, in the
+  link's own font at 1.3em, `aria-hidden`. A character rather than an Astryx
+  icon because an icon is an atomic inline: the underline the link shows on
+  hover would stop at the words. As text it takes the link's weight and the
+  underline runs on under it (checked on hover). The label is still the
+  accessible name (`children` replaces only the visible text).
+- **Eyebrow** (the program's name on the booked screen, "Your next visit"
+  on a place): `--color-text-primary`, bold, was the green icon colour.
+- **Proven by:** screenshots (rest and hover), typecheck, ui 69, web
+  build, e2e 573/573 (axe included, light and dark).
+
 ---
 
 ## Notes for whoever picks this up next

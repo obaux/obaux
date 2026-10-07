@@ -51,7 +51,8 @@ const food = DUMMY_PLACES_BY_ID['dummy-place-food']!;
 const reported = DUMMY_FLAGS[0]!;
 
 const meta = {
-  title: 'Components/PlaceCard',
+  title: 'Components/Cards/PlaceCard',
+  tags: ['autodocs'],
   component: PlaceCard,
   decorators: [
     (Story) => (
@@ -63,6 +64,7 @@ const meta = {
   render: (args) => <LocalisedPlaceCard {...args} />,
   args: {
     name: learning.name,
+    category: learning.category,
     href: `/place/?id=${learning.id}&from=places`,
     description: learning.description,
     distanceLabel: 'places.miles?count=1.2',
@@ -79,11 +81,12 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Open: Story = {};
+export const Default: Story = {};
 
 export const Closed: Story = {
   args: {
     name: food.name,
+    category: food.category,
     description: food.description,
     distanceLabel: 'places.miles?count=0.4',
     status: { isOpen: false, label: 'place.closedUntil?time=09:00' },
@@ -95,7 +98,7 @@ export const Saved: Story = { args: { isSaved: true } };
 /** No `onSave`: signed out, so there is nothing to save to. */
 export const WithoutSave: Story = { args: { onSave: undefined } };
 
-/** PAM has no hours it will stand behind, so it says nothing — unknown is not closed. */
+/** Pam has no hours it will stand behind, so it says nothing — unknown is not closed. */
 export const NoHoursKnown: Story = { args: { status: null } };
 
 /** Under 0.1 miles, a GPS fix cannot tell one storefront from the next. */

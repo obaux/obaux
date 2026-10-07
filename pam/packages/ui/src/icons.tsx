@@ -63,6 +63,17 @@ export function PeopleIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+/** One figure and a plus. Bring someone along (D-333). */
+export function UserPlusIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <circle cx="9.5" cy="8" r="3.5" />
+      <path d="M3 20a6.5 6.5 0 0 1 13 0" />
+      <path d="M19 8v6M16 11h6" />
+    </svg>
+  );
+}
+
 /** A checklist. My Plan. */
 export function PlanIcon(props: SVGProps<SVGSVGElement>) {
   return (
@@ -113,7 +124,7 @@ export function PhoneIcon(props: SVGProps<SVGSVGElement>) {
  * A bell. Things that have happened and need somebody.
  *
  * Astryx's icon registry has no bell, and its `Icon` takes an SVG component for
- * exactly this case — so this is one more glyph in PAM's own small set, not a
+ * exactly this case — so this is one more glyph in Pam's own small set, not a
  * second icon system. Drawn quiet on purpose: no motion lines, no clapper
  * swinging. These are things to attend to, not alarms.
  */
@@ -205,7 +216,7 @@ export function GlobeIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
-/** A star. Points — the only place in PAM that keeps a score. */
+/** A star. Points — the only place in Pam that keeps a score. */
 export function StarIcon({ isFilled = true, ...props }: SVGProps<SVGSVGElement> & { isFilled?: boolean }) {
   // Outlined when not filled — a case manager's "not starred" (D-218).
   return (
@@ -307,7 +318,7 @@ export function ConnectionsIcon(props: SVGProps<SVGSVGElement>) {
 
 /*
  * Place categories (D-212), for Explore's chips — the reference's
- * "Homes / Experiences / Services" row, carrying PAM's three fixed categories
+ * "Homes / Experiences / Services" row, carrying Pam's three fixed categories
  * (§2.5) instead. Same line weight as the rest of the set, so a chip reads as
  * part of the app rather than a sticker on it.
  */
@@ -397,6 +408,26 @@ export function BookIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+/** A heavy tick. The chosen row in a list of options (D-274). */
+export function CheckIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} strokeWidth={3} {...props}>
+      <path d="m5 12.5 4.5 4.5L19 7.5" />
+    </svg>
+  );
+}
+
+/** A medal on a ribbon. A member's award level, on Profile (D-274). */
+export function AwardIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <circle cx="12" cy="14.5" r="5.5" />
+      <path d="M8.5 10.25 5.5 3.5h4l2.5 5M15.5 10.25l3-6.75h-4L12 8.5" />
+      <path d="m12 12 .9 1.6 1.8.3-1.3 1.2.3 1.8-1.7-.9-1.7.9.3-1.8-1.3-1.2 1.8-.3z" />
+    </svg>
+  );
+}
+
 /** A pen on a line. A policy still to sign (D-270). */
 export function SignIcon(props: SVGProps<SVGSVGElement>) {
   return (
@@ -432,6 +463,16 @@ export function NewMessageIcon(props: SVGProps<SVGSVGElement>) {
     <svg {...svgProps} {...props}>
       <path d="M4.5 5.5h15a1 1 0 0 1 1 1v9.5a1 1 0 0 1-1 1H10l-4.5 3.5V17h-1a1 1 0 0 1-1-1V6.5a1 1 0 0 1 1-1z" />
       <path d="M12 8.5v6M9 11.5h6" />
+    </svg>
+  );
+}
+
+/** A clock face. A place's opening hours (D-309). */
+export function ClockIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="M12 7.5V12l3 2" />
     </svg>
   );
 }

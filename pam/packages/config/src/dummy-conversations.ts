@@ -107,6 +107,13 @@ export const DUMMY_THREADS: Readonly<Record<string, readonly DummyThreadMessage[
     ['member', 'Sorry. My shift ran over. Can I still come Friday?', hoursAgo(20)],
     ['staff', 'Of course. Friday at 10. See you then.', hoursAgo(19)],
   ]),
+  // Jordan (member) and Renee (program: Example Food Pantry) — D-305: a
+  // program that has written to a member who has no visit with them, so a
+  // place without a visit can show "New message" too.
+  thread(dummyConversationIdBetween('dummy-m1', 'dummy-p3'), [
+    ['staff', 'Hi Jordan, this is Renee at Example Food Pantry. Teresa said you might stop by.', daysAgo(1, 10)],
+    ['staff', 'We have fresh fruit and vegetables this Saturday, 9 to 1. No sign-up needed.', hoursAgo(2)],
+  ]),
   // Keisha (member) and Teresa (case manager)
   thread(dummyConversationIdBetween('dummy-m2', 'dummy-a1'), [
     ['staff', 'Hi Keisha, it is Teresa. The food pantry on Broad Street is open Saturdays now, 9 to 1.', daysAgo(4, 10)],
@@ -125,11 +132,11 @@ export const DUMMY_THREADS: Readonly<Record<string, readonly DummyThreadMessage[
     ['member', 'Can we start at 10:30 next time? My bus gets in late.', hoursAgo(26)],
     ['staff', 'Yes, 10:30 works. I will save you a seat.', hoursAgo(25)],
   ]),
-  // Teresa (case manager) and Robin (super admin, running PAM) — D-262.
-  // Staff sit in the first slot here, the PAM team in the second: the slots
-  // are "the person being helped to use PAM" and "the person helping".
+  // Teresa (case manager) and Robin (super admin, running Pam) — D-262.
+  // Staff sit in the first slot here, the Pam team in the second: the slots
+  // are "the person being helped to use Pam" and "the person helping".
   thread(dummyConversationIdBetween('dummy-a1', 'dummy-s1'), [
-    ['staff', 'Hi Teresa, it is Robin from the PAM team. Welcome. Can I help you set up your first invites?', daysAgo(2, 10)],
+    ['staff', 'Hi Teresa, it is Robin from the Pam team. Welcome. Can I help you set up your first invites?', daysAgo(2, 10)],
     ['member', 'Yes please. Do I send the link, or do you?', daysAgo(2, 11)],
     ['staff', 'You do. Tap Invite someone, put in their phone number, and send the link from your phone.', daysAgo(2, 11)],
     ['member', 'Done for two people. One said the link did not work.', hoursAgo(8)],
@@ -159,7 +166,7 @@ export function dummySideFor(role: Role): DummySide {
 
 /**
  * Which slot of a pair "you" are in. Usually your role says (a member is the
- * first slot, staff the second), but a case manager talking to the PAM team
+ * first slot, staff the second), but a case manager talking to the Pam team
  * sits in the first (D-262) — so the pair is asked first, the role after.
  */
 function sideIn(pair: { memberId: string; staffId: string } | null, role: Role): DummySide {
@@ -243,7 +250,7 @@ export const DUMMY_STARTABLE: Readonly<Record<DummyMessagingRole, readonly strin
   member: [],
   admin: ['dummy-m4', 'dummy-m5'],
   provider: ['dummy-m6'],
-  // The PAM team reaches staff, never members (D-262).
+  // The Pam team reaches staff, never members (D-262).
   super_admin: ['dummy-p1', 'dummy-a2'],
 };
 

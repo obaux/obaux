@@ -41,9 +41,9 @@ import { whenHappened } from '@/lib/when';
  * whatever the caller wires — a real insert, or a
  * sessionStorage append — and this file never imports Supabase.
  *
- * PAM's rules, kept on top of Astryx's defaults: every control is a 48px
+ * Pam's rules, kept on top of Astryx's defaults: every control is a 48px
  * square — the send button included, which is this screen's one primary
- * action and, since A13 (D-192), the one primary action in PAM that is not
+ * action and, since A13 (D-192), the one primary action in Pam that is not
  * 64px: a chat's primary action repeats dozens of times per screen, and a
  * 64px block ate the message area on a phone. Message text is 18px. The
  * mic (`ChatDictationButton`) hides itself when the browser has no speech
@@ -93,6 +93,8 @@ export interface ThreadViewProps {
   readonly messages: readonly ThreadViewMessage[];
   /** The other person's first name; `null` shows "This person". */
   readonly otherName: string | null;
+  /** Their photo when Pam has one (D-335); their initials otherwise. */
+  readonly otherPhotoUrl?: string | null;
   readonly onSend: (body: string) => Promise<boolean>;
   readonly sending: boolean;
   readonly sendFailed: boolean;
@@ -150,6 +152,7 @@ function ScrollToBottom() {
 export function ThreadView({
   messages,
   otherName,
+  otherPhotoUrl = null,
   onSend,
   sending,
   sendFailed,
@@ -221,7 +224,9 @@ export function ThreadView({
             <ChatMessage
               key={message.id}
               sender={message.mine ? 'user' : 'assistant'}
-              avatar={message.mine ? undefined : <Avatar size="md" name={name} />}
+              avatar={
+                message.mine ? undefined : <Avatar size="md" name={name} {...(otherPhotoUrl ? { src: otherPhotoUrl } : {})} />
+              }
             >
               <ChatMessageBubble
                 name={

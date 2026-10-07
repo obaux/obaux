@@ -2,13 +2,13 @@ import { defineTheme } from '@astryxdesign/core/theme';
 import { neutralTheme } from '@astryxdesign/theme-neutral/built';
 
 /**
- * PAM's theme: the neutral theme, wearing the logo's colours.
+ * Pam's theme: the neutral theme, wearing the logo's colours.
  *
  * **This file is the source, not what runs.** `pam.css` and `pam.js` beside it
  * are generated and committed, because the deployment builds the app and does
  * not run the Astryx CLI. After editing this file:
  *
- *     pnpm exec astryx theme build src/theme/pam.theme.ts
+ *     pnpm exec pnpm --filter @pam/ui theme  (astryx theme build src/theme/pam.theme.ts, from packages/ui)
  *
  * and commit the three generated files with it. The source is named
  * `pam.theme.ts` rather than `pam.ts` on purpose: with both present, an import
@@ -162,7 +162,7 @@ export const pamTheme = defineTheme({
       },
     },
     // The bottom bar marks the current tab by colour alone, as the mockups do
-    // (D-215) — no underline. TabBar is the only TabList in PAM.
+    // (D-215) — no underline. TabBar is the only TabList in Pam.
     // (Through its colour variable: the component's own opacity and colour
     // rules outrank a theme override; a custom property set on the element
     // does not — the same route the button overrides above take.)

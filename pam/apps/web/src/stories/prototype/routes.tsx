@@ -30,12 +30,16 @@ import PoliciesPage from '../../app/program/policies/page';
 import { PrototypePolicy } from './PrototypePolicy';
 import PlacePoliciesPage from '../../app/place/policies/page';
 import PlacePolicyPage from '../../app/place/policies/view/page';
+import ProgramServicePage from '../../app/program/service/page';
 import { PrototypeRequestProgram } from './PrototypeRequestProgram';
 import { InvitesLogScreen } from '../../screens/InvitesLogScreen';
 import TermsPage from '../../app/terms/page';
 import { ProfileScreen } from '../../screens/ProfileScreen';
 import { ViewAsView } from '../../screens/ViewAsView';
 import { InviteView } from '../../screens/InviteView';
+import { BookForMemberView } from '../../screens/BookForMemberView';
+import { AddPersonView } from '../../screens/AddPersonView';
+import PersonPoliciesPage from '../../app/person/policies/page';
 import { AddProgramView } from '../../screens/AddProgramView';
 import { ProgramScreen } from '../../screens/ProgramView';
 import NewTripPage from '../../app/trips/new/page';
@@ -46,7 +50,7 @@ import { LegalView } from '../../screens/LegalView';
 import { LanguageView } from '../../screens/LanguageView';
 import { DataCopyView, DeleteAccountView, PrivacyControlsView } from '../../screens/PrivacyViews';
 import { HelpReportPlaceView, HelpSafetyView, HelpTopicsView } from '../../screens/HelpViews';
-import { ConnectionProfileScreen, ConnectionsScreen } from '../../screens/ConnectionsScreen';
+import { ConnectionsScreen } from '../../screens/ConnectionsScreen';
 import { SavedScreen } from '../../screens/SavedView';
 import { ThreadOptionsView, ThreadReportView } from '../../screens/ThreadOptionsViews';
 import { MessagesScreen } from '../../screens/MessagesScreen';
@@ -67,7 +71,7 @@ export const APP_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   '/': screen(() => <HomePage />),
   // Sign in, in the prototype, is the stand-in (D-248): the real page reads
   // the iframe's own address and sends a signed-in story Home. Every link to
-  // /signin/ — About PAM's "Sign in as…", Back from a policy, an expired
+  // /signin/ — About Pam's "Sign in as…", Back from a policy, an expired
   // link's "Sign in" — lands on a Sign in that works here (D-259).
   '/signin/': screen(() => <PrototypeSignIn />),
   // Where each role's prototype starts (D-253): Sign in, the code, Home.
@@ -76,7 +80,7 @@ export const APP_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   '/prototype/join/': screen(() => <PrototypeJoin />),
   // An invite link that has run out (D-258).
   '/invite/expired/': screen(() => <PrototypeInviteExpired />),
-  // About PAM, from the foot of Sign in (D-259).
+  // About Pam, from the foot of Sign in (D-259).
   '/about/': screen(() => <AboutPage />),
   // A program's policies for participants (D-261).
   '/program/policies/': screen(() => <PoliciesPage />),
@@ -121,14 +125,18 @@ export const APP_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   '/connections/': screen(() => <ConnectionsScreen />),
   '/messages/thread/options/': screen(() => <ThreadOptionsView />),
   '/messages/thread/report/': screen(() => <ThreadReportView />),
-  '/connections/person/': screen(() => <ConnectionProfileScreen />),
   '/view-as/': screen(() => <ViewAsView />),
   // D-218: Invite someone, All programs and Add a program, and a program
   // lead's own Program tab.
   '/invite/': screen(() => <InviteView />),
+  '/program/book/': screen(() => <BookForMemberView />),
+  '/program/book/new/': screen(() => <AddPersonView />),
+  '/person/policies/': screen(() => <PersonPoliciesPage />),
   '/programs/': screen(() => <ExploreScreen mode="programs" />),
   '/programs/new/': screen(() => <AddProgramView />),
   '/program/': screen(() => <ProgramScreen />),
+  // A lead adds or edits one service (D-313).
+  '/program/service/': screen(() => <ProgramServicePage />),
   // D-225: planning a visit, from the + on Trips.
   '/trips/new/': screen(() => <NewTripPage />),
 };

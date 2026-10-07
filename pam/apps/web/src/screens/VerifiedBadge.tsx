@@ -3,6 +3,7 @@
 import * as stylex from '@stylexjs/stylex';
 import { HStack } from '@astryxdesign/core/HStack';
 import { Icon } from '@astryxdesign/core/Icon';
+import { SignIcon } from '@pam/ui';
 import { IconButton } from '@astryxdesign/core/IconButton';
 import { Popover } from '@astryxdesign/core/Popover';
 import { Text } from '@astryxdesign/core/Text';
@@ -20,6 +21,17 @@ import { isVerified, signedBy, usePolicies } from '@/lib/usePolicies';
  * not a half one.
  */
 const styles = stylex.create({
+  // The one mark for "signed every policy" (D-316, D-324): a light-green
+  // circle with the signing pen, the same beside a name on Home and here.
+  mark: {
+    width: '22px',
+    height: '22px',
+    borderRadius: '50%',
+    flexShrink: 0,
+    backgroundColor: colorVars['--color-success-muted'],
+    color: colorVars['--color-success'],
+  },
+  markIcon: { width: '14px', height: '14px' },
   button: {
     width: '40px',
     height: '40px',
@@ -56,9 +68,18 @@ export function VerifiedBadge({ personId, name }: { readonly personId: string; r
       <IconButton
         label={t('verified.label', { name })}
         variant="ghost"
-        icon={<Icon icon="success" size="sm" />}
+        icon={<SignedMark />}
         xstyle={styles.button}
       />
     </Popover>
+  );
+}
+
+/** The light-green pen on its own — decorative; the caller names it. */
+export function SignedMark() {
+  return (
+    <HStack align="center" justify="center" xstyle={styles.mark} aria-hidden>
+      <SignIcon {...stylex.props(styles.markIcon)} aria-hidden />
+    </HStack>
   );
 }

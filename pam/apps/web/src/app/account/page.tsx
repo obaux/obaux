@@ -33,16 +33,16 @@ import { RoleSwitchControl } from '../RoleSwitchControl';
 /**
  * Your account — and the way out.
  *
- * Until the audit of the way in (14 September) the only sign-out in PAM was a
+ * Until the audit of the way in (14 September) the only sign-out in Pam was a
  * text link at the bottom of the case manager's screen. A member had none. On
  * a shared phone, or a phone handed to somebody else at a program, the person
  * who signed in stayed signed in for ninety days — which is §12's rule about
  * not timing people out doing exactly the wrong job.
  *
  * This is the one screen every signed-in person has, reached from the same
- * button in every header. It says who PAM thinks you are, in the words the
+ * button in every header. It says who Pam thinks you are, in the words the
  * sign-up screen used, and it has one action: sign out. The account is not
- * editable here yet — a name or a city typed wrong at sign-up is a call to PAM
+ * editable here yet — a name or a city typed wrong at sign-up is a call to Pam
  * for now, and that is said rather than hidden.
  *
  * Sign out goes to the sign-in screen, which says so. A sign-out that reloads

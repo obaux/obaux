@@ -76,7 +76,7 @@ describe('notices (SOP §0 — never dead-end)', () => {
     // bottom bar, and a second one competes with it. The notice must still name
     // a next step, which the "offers a way forward" test above enforces.
     expect(outOfRegion.offersSupport).toBe(false);
-    expect(outOfRegion.body).toMatch(/ask PAM support/i);
+    expect(outOfRegion.body).toMatch(/ask Pam support/i);
   });
 
   it('stays close to the grade-5 reading target', () => {

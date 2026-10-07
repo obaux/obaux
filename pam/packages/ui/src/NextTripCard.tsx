@@ -20,7 +20,7 @@ export interface NextTripCardProps {
   readonly categoryLabel: string;
   /** The category's icon, at 20px, coloured. */
   readonly categoryIcon: ReactNode;
-  /** The same icon drawn large for the picture. */
+  /** The category's illustration, `size="fill"` (D-337). */
   readonly art: ReactNode;
   /** "Your next visit". */
   readonly title: string;
@@ -52,7 +52,11 @@ const styles = stylex.create({
   back: { transform: 'rotate(-7deg)', backgroundColor: colorVars['--color-background-muted'] },
   front: {
     transform: 'rotate(3deg)',
-    backgroundColor: colorVars['--color-accent-muted'],
+    // The category's illustration fills it (D-337); the white rim and shadow
+    // still lift it off the card.
+    backgroundColor: colorVars['--color-background-card'],
+    isolation: 'isolate',
+    overflow: 'hidden',
     color: colorVars['--color-icon-accent'],
   },
 });

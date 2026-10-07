@@ -1,10 +1,10 @@
 /**
- * @pam/ui — the PAM-specific components from SOP §2.4.
+ * @pam/ui — the Pam-specific components from SOP §2.4.
  *
  * Everything here is composed from Astryx primitives. Nothing here reimplements
  * a component Astryx already ships, and no other UI library is used (§2).
  *
- * The recurring theme: Astryx is built for dense, capable interfaces, and PAM
+ * The recurring theme: Astryx is built for dense, capable interfaces, and Pam
  * needs the opposite. These wrappers are where that difference lives — bigger
  * targets, one action per screen, real links instead of handlers wherever a
  * flaky connection would otherwise dead-end someone.
@@ -46,7 +46,7 @@ export { RoleSwitch, type RoleSwitchProps } from './RoleSwitch.js';
  * (17 September). Import it as `@pam/ui/OnboardingSlides`.
  */
 export { NavTile, type NavTileProps } from './NavTile.js';
-export { TextLink, type TextLinkProps } from './TextLink.js';
+export { TextLink, textLinkLook, type TextLinkProps } from './TextLink.js';
 export { NotificationBell, type NotificationBellProps } from './NotificationBell.js';
 export {
   NotificationList,
@@ -69,6 +69,7 @@ export {
   MeIcon,
   MeIconFilled,
   PeopleIcon,
+  UserPlusIcon,
   PhoneIcon,
   PlacesIcon,
   PlanIcon,
@@ -87,13 +88,18 @@ export {
   OfflineIcon,
   NoResultsIcon,
   BackArrowIcon,
+  AwardIcon,
+  CheckIcon,
   BookIcon,
   SignIcon,
   SignedIcon,
   PlusIcon,
   NewMessageIcon,
+  ClockIcon,
 } from './icons.js';
 export { SavedStrip, type SavedStripProps, type SavedStripPlace } from './SavedStrip.js';
+export { TextSwap, AutoHeight } from './Swap.js';
+export { PamProvider } from './PamProvider.js';
 export {
   MotionProvider,
   PageEnter,
@@ -105,3 +111,4 @@ export {
   PAM_MOTION,
 } from './motion.js';
 export { pam } from './tokens.stylex.js';
+export { sheet } from './sheet.js';

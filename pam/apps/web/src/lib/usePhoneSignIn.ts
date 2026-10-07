@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 
 /**
- * Phone sign-in. There is no password anywhere in PAM (§9).
+ * Phone sign-in. There is no password anywhere in Pam (§9).
  *
  * Two steps, and the second one is the whole reason for the first: a code
  * arrives by text, and the member types it. Nothing here decides who somebody
@@ -35,7 +35,7 @@ export type SignInStep =
  */
 function reportSignInProblem(step: 'send' | 'verify', error: unknown): void {
   const detail = error instanceof Error ? error.message : String(error);
-  console.error(`PAM sign-in failed at "${step}": ${detail}`);
+  console.error(`Pam sign-in failed at "${step}": ${detail}`);
 }
 
 /** Digits in, E.164 out. A member types what is on their phone bill. */

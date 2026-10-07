@@ -95,7 +95,7 @@ describe('open or closed', () => {
   });
 
   it('says nothing at all when the hours are unknown', () => {
-    // Not "closed". A place PAM knows nothing about is not a place that is shut.
+    // Not "closed". A place Pam knows nothing about is not a place that is shut.
     expect(openState(null, at(1, '12:00'))).toEqual({ state: 'unknown' });
   });
 

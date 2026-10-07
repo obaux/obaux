@@ -12,7 +12,7 @@ import * as stylex from '@stylexjs/stylex';
 import { PAM_MOTION } from './motion-tempo.js';
 
 /**
- * How PAM moves, and who pays for it.
+ * How Pam moves, and who pays for it.
  *
  * Motion here is doing a job, not decorating: it says where a thing came from,
  * that a tap landed, and that something left rather than vanished. The tempo
@@ -27,9 +27,9 @@ import { PAM_MOTION } from './motion-tempo.js';
  * separately and fails the build if it ever leaks in (Will, 13 September).
  *
  * It is fetched only when the connection can carry it. A member on 2G, or with
- * Data Saver on, gets PAM with no animation chunk at all: every component below
+ * Data Saver on, gets Pam with no animation chunk at all: every component below
  * renders a plain wrapper, every screen works, nothing waits. On a $40 prepaid
- * plan, 37 kB of easing curves is not a trade PAM gets to make on their behalf.
+ * plan, 37 kB of easing curves is not a trade Pam gets to make on their behalf.
  *
  * `navigator.connection` is Chromium-only — which is most Android phones, the
  * population this protects. Elsewhere the check is absent and motion loads,
@@ -172,7 +172,7 @@ export function ScrollReveal({ children, index = 0 }: { children: ReactNode; ind
  * A tap, acknowledged: three per cent for 120ms.
  *
  * Enough that a thumb covering the button still feels the press at the edges,
- * small enough that nothing reflows — and the one piece of motion in PAM a
+ * small enough that nothing reflows — and the one piece of motion in Pam a
  * member will feel hundreds of times.
  */
 export function Press({ children }: { children: ReactNode }) {

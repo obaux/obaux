@@ -37,7 +37,7 @@ import { TextRequesterButton } from './TextRequesterButton';
  *
  * Reached from the Everyone list rather than from the notification itself
  * (Will, 17 September) — a notification here stays what it already is
- * everywhere else in PAM, a line in a log rather than a button (D-080). The
+ * everywhere else in Pam, a line in a log rather than a button (D-080). The
  * notification says something is waiting; this screen is where it gets
  * decided.
  *

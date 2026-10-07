@@ -11,7 +11,7 @@ import { IconButton } from '@astryxdesign/core/IconButton';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
-import { BigButton, Loading, Page, PlaceCard } from '@pam/ui';
+import { BigButton, Loading, Page, PlaceCard, textLinkLook } from '@pam/ui';
 import { CategoryChips, type CategoryChip, type ChipTone } from '@pam/ui/CategoryChips';
 import { SearchField } from '@pam/ui/SearchPill';
 import { SubPageHeader } from '@pam/ui/SubPage';
@@ -42,7 +42,7 @@ import { HeaderActions } from './HeaderActions';
  * - **The check asks first**, in a dialog — "Recommend {program} to
  *   {name}?" — with 32px corners over a page washed to 80% white.
  *
- * Every program PAM lists (`usePlaces`, the calls Explore makes). If the
+ * Every program Pam lists (`usePlaces`, the calls Explore makes). If the
  * database cannot be reached it falls back to the example programs, so the
  * screen is never empty. A recommendation is an example for now: nothing is
  * stored or sent, and the member still says yes themselves.
@@ -238,7 +238,7 @@ export function ConnectView({ personId, name }: { readonly personId: string; rea
               setIsSearching(false);
               setQuery('');
             }}
-            xstyle={styles.cancel}
+            xstyle={[styles.cancel, textLinkLook.link]}
           />
         </HStack>
       ) : (
@@ -266,6 +266,8 @@ export function ConnectView({ personId, name }: { readonly personId: string; rea
               <PlaceCard
                 key={program.id}
                 name={program.name}
+                category={program.category}
+                artSeed={program.id}
                 href={`/place/?id=${encodeURIComponent(program.id)}`}
                 description={program.description}
                 {...(miles ? { distanceLabel: t(miles.key, miles.vars) } : {})}

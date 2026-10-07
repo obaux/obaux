@@ -7,7 +7,8 @@ import { LocalTabBar } from './LocalTabBar';
  * lead: Home, Program, Messages, Profile. Help is in each screen's header.
  */
 const meta = {
-  title: 'Components/TabBar',
+  title: 'Components/Navigation/TabBar',
+  tags: ['autodocs'],
   component: LocalTabBar,
   args: { current: 'explore', unread: true },
   argTypes: {
@@ -19,7 +20,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const OnExplore: Story = {};
+export const Default: Story = {};
 export const OnSaved: Story = { args: { current: 'saved' } };
 export const OnTrips: Story = { args: { current: 'trips' } };
 export const OnMessages: Story = { args: { current: 'messages', unread: false } };

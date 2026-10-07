@@ -2,8 +2,8 @@
   "templates": {
     "invite_member": {
       "key": "invite_member",
-      "en": "PAM: You've been invited to PAM, an app for finding help and people near you. Tap to join: {link}",
-      "es": "PAM: Le invitaron a PAM, una app para encontrar ayuda y personas cerca. Toque para entrar: {link}",
+      "en": "Pam: You've been invited to Pam, an app for finding help and people near you. Tap to join: {link}",
+      "es": "Pam: Le invitaron a Pam, una app para encontrar ayuda y personas cerca. Toque para entrar: {link}",
       "vars": [
         "link"
       ],
@@ -12,8 +12,8 @@
     },
     "invite_provider": {
       "key": "invite_provider",
-      "en": "PAM: You have been invited to list your services on PAM. Tap to set up your page: {link}",
-      "es": "PAM: Le invitaron a publicar sus servicios en PAM. Toque para crear su pagina: {link}",
+      "en": "Pam: You have been invited to list your services on Pam. Tap to set up your page: {link}",
+      "es": "Pam: Le invitaron a publicar sus servicios en Pam. Toque para crear su pagina: {link}",
       "vars": [
         "link"
       ],
@@ -22,8 +22,8 @@
     },
     "verify_code": {
       "key": "verify_code",
-      "en": "PAM: Your code is {code}. It works for 10 minutes.",
-      "es": "PAM: Su codigo es {code}. Sirve por 10 minutos.",
+      "en": "Pam: Your code is {code}. It works for 10 minutes.",
+      "es": "Pam: Su codigo es {code}. Sirve por 10 minutos.",
       "vars": [
         "code"
       ],
@@ -32,8 +32,8 @@
     },
     "facilitation_member": {
       "key": "facilitation_member",
-      "en": "PAM: {adminFirstName} connected you with a program that can help. Open PAM to say hi: {link}",
-      "es": "PAM: {adminFirstName} le conecto con un programa que puede ayudar. Abra PAM para saludar: {link}",
+      "en": "Pam: {adminFirstName} connected you with a program that can help. Open Pam to say hi: {link}",
+      "es": "Pam: {adminFirstName} le conecto con un programa que puede ayudar. Abra Pam para saludar: {link}",
       "vars": [
         "adminFirstName",
         "link"
@@ -43,8 +43,8 @@
     },
     "facilitation_provider": {
       "key": "facilitation_provider",
-      "en": "PAM: Someone was introduced to your program. Open PAM to reply: {link}",
-      "es": "PAM: Alguien fue presentado a su programa. Abra PAM para responder: {link}",
+      "en": "Pam: Someone was introduced to your program. Open Pam to reply: {link}",
+      "es": "Pam: Alguien fue presentado a su programa. Abra Pam para responder: {link}",
       "vars": [
         "link"
       ],
@@ -53,8 +53,8 @@
     },
     "appointment_24h": {
       "key": "appointment_24h",
-      "en": "PAM: You have a visit tomorrow at {time}. {address}. Tap for directions: {link}",
-      "es": "PAM: Tiene una visita mañana a las {time}. {address}. Toque para llegar: {link}",
+      "en": "Pam: You have a visit tomorrow at {time}. {address}. Tap for directions: {link}",
+      "es": "Pam: Tiene una visita mañana a las {time}. {address}. Toque para llegar: {link}",
       "vars": [
         "time",
         "address",
@@ -68,8 +68,8 @@
     },
     "appointment_2h": {
       "key": "appointment_2h",
-      "en": "PAM: Your visit is at {time} today. {address}. Tap for directions: {link}",
-      "es": "PAM: Su visita es hoy a las {time}. {address}. Toque para llegar: {link}",
+      "en": "Pam: Your visit is at {time} today. {address}. Tap for directions: {link}",
+      "es": "Pam: Su visita es hoy a las {time}. {address}. Toque para llegar: {link}",
       "vars": [
         "time",
         "address",
@@ -83,8 +83,8 @@
     },
     "appointment_morning_of": {
       "key": "appointment_morning_of",
-      "en": "PAM: Today at {time} you have a visit. {address}. Tap for directions: {link}",
-      "es": "PAM: Hoy a las {time} tiene una visita. {address}. Toque para llegar: {link}",
+      "en": "Pam: Today at {time} you have a visit. {address}. Tap for directions: {link}",
+      "es": "Pam: Hoy a las {time} tiene una visita. {address}. Toque para llegar: {link}",
       "vars": [
         "time",
         "address",
@@ -98,16 +98,16 @@
     },
     "attendance_check": {
       "key": "attendance_check",
-      "en": "PAM: Did you make it today? Reply YES or NO.",
-      "es": "PAM: Pudo ir hoy? Responda YES o NO.",
+      "en": "Pam: Did you make it today? Reply YES or NO.",
+      "es": "Pam: Pudo ir hoy? Responda YES o NO.",
       "vars": [],
       "reviewedBy": "Will (Oba), 13 September 2026",
       "isFirstContact": false
     },
     "attendance_missed_followup": {
       "key": "attendance_missed_followup",
-      "en": "PAM: No problem. We saved a step to set up a new time. Open PAM when you are ready: {link}",
-      "es": "PAM: No hay problema. Guardamos un paso para buscar otra fecha. Abra PAM cuando pueda: {link}",
+      "en": "Pam: No problem. We saved a step to set up a new time. Open Pam when you are ready: {link}",
+      "es": "Pam: No hay problema. Guardamos un paso para buscar otra fecha. Abra Pam cuando pueda: {link}",
       "vars": [
         "link"
       ],
@@ -116,8 +116,8 @@
     },
     "staff_request_approved": {
       "key": "staff_request_approved",
-      "en": "PAM: Your request was approved. Open PAM to get started: {link}",
-      "es": "PAM: Su solicitud fue aprobada. Abra PAM para empezar: {link}",
+      "en": "Pam: Your request was approved. Open Pam to get started: {link}",
+      "es": "Pam: Su solicitud fue aprobada. Abra Pam para empezar: {link}",
       "vars": [
         "link"
       ],
@@ -126,8 +126,8 @@
     },
     "staff_request_denied": {
       "key": "staff_request_denied",
-      "en": "PAM: Your request was not approved. Questions? Call {supportPhone}.",
-      "es": "PAM: Su solicitud no fue aprobada. Preguntas? Llame al {supportPhone}.",
+      "en": "Pam: Your request was not approved. Questions? Call {supportPhone}.",
+      "es": "Pam: Su solicitud no fue aprobada. Preguntas? Llame al {supportPhone}.",
       "vars": [
         "supportPhone"
       ],
@@ -136,8 +136,8 @@
     },
     "connection_request": {
       "key": "connection_request",
-      "en": "PAM: Someone on PAM wants to connect. Open PAM to reply: {link}",
-      "es": "PAM: Alguien en PAM quiere conectar. Abra PAM para responder: {link}",
+      "en": "Pam: Someone on Pam wants to connect. Open Pam to reply: {link}",
+      "es": "Pam: Alguien en Pam quiere conectar. Abra Pam para responder: {link}",
       "vars": [
         "link"
       ],
@@ -146,8 +146,8 @@
     },
     "saved_place_closed": {
       "key": "saved_place_closed",
-      "en": "PAM: A place you saved is {reason}. Find others in PAM: {link}",
-      "es": "PAM: Un lugar que guardo {reason}. Vea otros en PAM: {link}",
+      "en": "Pam: A place you saved is {reason}. Find others in Pam: {link}",
+      "es": "Pam: Un lugar que guardo {reason}. Vea otros en Pam: {link}",
       "vars": [
         "reason",
         "link"
@@ -157,8 +157,8 @@
     },
     "access_limited_notice": {
       "key": "access_limited_notice",
-      "en": "PAM: Some parts of PAM are turned off for now. Call {supportPhone} with questions.",
-      "es": "PAM: Algunas partes de PAM estan apagadas por ahora. Llame al {supportPhone} si tiene preguntas.",
+      "en": "Pam: Some parts of Pam are turned off for now. Call {supportPhone} with questions.",
+      "es": "Pam: Algunas partes de Pam estan apagadas por ahora. Llame al {supportPhone} si tiene preguntas.",
       "vars": [
         "supportPhone"
       ],

@@ -7,7 +7,8 @@ import { SignaturePad } from '@pam/ui/SignaturePad';
  * Draw in it with the mouse here.
  */
 const meta = {
-  title: 'Components/SignaturePad',
+  title: 'Components/Inputs/SignaturePad',
+  tags: ['autodocs'],
   component: SignaturePad,
   args: {
     label: 'Signature box. Draw your signature here.',
@@ -18,4 +19,4 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Empty: Story = {};
+export const Default: Story = {};

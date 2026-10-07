@@ -30,6 +30,11 @@ export interface LargeTitleHeaderProps {
    * Programs switch on Saved (Will, 3 October, D-233).
    */
   readonly titleAccessory?: ReactNode;
+  /**
+   * The accessory right after the words instead of at the line's end —
+   * "Coming in  this week ▾" (D-320), one phrase.
+   */
+  readonly isAccessoryInline?: boolean;
 }
 
 const COLLAPSE_AT = 40;
@@ -63,9 +68,11 @@ const styles = stylex.create({
   large: { fontSize: '34px', lineHeight: 1.15, fontWeight: 700, paddingBlockEnd: '8px' },
   titleRow: { width: '100%', paddingBlockEnd: '8px' },
   largeInRow: { paddingBlockEnd: '0px', minWidth: 0 },
+  // Wraps if the phrase is too long for the line, so the words never clip.
+  titleRowInline: { flexWrap: 'wrap', justifyContent: 'flex-start', alignItems: 'baseline', columnGap: '8px', rowGap: '0px' },
 });
 
-export function LargeTitleHeader({ title, actions, titleAccessory }: LargeTitleHeaderProps) {
+export function LargeTitleHeader({ title, actions, titleAccessory, isAccessoryInline = false }: LargeTitleHeaderProps) {
   const [collapsed, setCollapsed] = useState(false);
 
   useEffect(() => {
@@ -92,7 +99,13 @@ export function LargeTitleHeader({ title, actions, titleAccessory }: LargeTitleH
         </HStack>
       </HStack>
       {titleAccessory ? (
-        <HStack align="center" justify="between" wrap="nowrap" gap={4} xstyle={styles.titleRow}>
+        <HStack
+          align="center"
+          justify="between"
+          wrap="nowrap"
+          gap={4}
+          xstyle={[styles.titleRow, isAccessoryInline && styles.titleRowInline]}
+        >
           <Heading level={1} xstyle={[styles.large, styles.largeInRow]}>
             {title}
           </Heading>

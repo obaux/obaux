@@ -19,13 +19,13 @@ import { HelpButton } from './HelpButton';
  *
  * The same fields a program lead fills in at sign-up (`ProgramDetailsStep`,
  * 0056), so a new program has one shape however it arrives; only the name is
- * required, and PAM checks every new program before it is listed (the
+ * required, and Pam checks every new program before it is listed (the
  * `needs_review` gate every manual entry goes through).
  *
  * **Front end only, for now.** The rules already let a case manager and a
  * program lead write a listing (`services_write_admin` /
  * `services_write_provider`, 0007), so sending one as a `needs_review` row is
- * a follow-up, not a migration. Until it is wired, "Send to PAM" shows what
+ * a follow-up, not a migration. Until it is wired, "Send to Pam" shows what
  * happens next and stores nothing.
  */
 const EMPTY: ProgramDetails = {
@@ -36,6 +36,7 @@ const EMPTY: ProgramDetails = {
   address: '',
   phone: '',
   website: '',
+  services: [],
 };
 
 const styles = stylex.create({

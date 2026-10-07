@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Loading, Notice, Page, PeopleIcon } from '@pam/ui';
 import { FloatingAction } from '@pam/ui/FloatingAction';
@@ -9,6 +10,7 @@ import { USE_DUMMY_PEOPLE } from '@pam/config/dummy-flag';
 import { DUMMY_MEMBERS } from '@pam/config/dummy-people';
 import { DUMMY_APPOINTMENTS } from '@pam/config/dummy-appointments';
 import { ScheduleView, type Appointment } from './ScheduleView';
+import { readAddedTrips, TRIPS_CHANGED, withMoves, type AddedTrip } from '@/lib/addedTrips';
 import { AddMenu } from './AddMenu';
 import { useI18n } from '@/lib/i18n';
 import { useSupportPhone } from '@/lib/useSupportPhone';
@@ -66,7 +68,7 @@ export function CaseloadHome() {
               // Each opens the member's page (D-227), which shows a real
               // member only what this list already does — see `/person/`.
               // The line under the name is the points; when they last used
-              // PAM is on their page now (Will, 2 October).
+              // Pam is on their page now (Will, 2 October).
               people: caseload.members.map(
                 (member): HomePerson => ({
                   id: member.id,
@@ -146,20 +148,34 @@ export function CaseloadHome() {
  */
 export function ProgramHome() {
   const { t } = useI18n();
+  const booked = useBookedForMembers();
   const appointments: Appointment[] = USE_DUMMY_PEOPLE
-    ? DUMMY_APPOINTMENTS.map((a) => ({
-        id: a.id,
-        personId: a.personId,
-        firstName: a.firstName,
-        startsAt: a.startsAt,
-        minutes: a.minutes,
-        kindLabel: t(`schedule.kind.${a.kind}`),
-        href: `/person/?id=${a.personId}`,
-      }))
+    ? [
+        ...DUMMY_APPOINTMENTS.map((a) => ({
+          id: a.id,
+          personId: a.personId,
+          firstName: a.firstName,
+          startsAt: a.startsAt,
+          minutes: a.minutes,
+          kindLabel: t(`schedule.kind.${a.kind}`),
+          href: `/person/?id=${a.personId}`,
+        })),
+        // Visits the program booked for people (D-316), on its own schedule too.
+        ...booked.map((b) => ({
+          id: b.id,
+          personId: b.forMemberId!,
+          firstName: b.forName ?? '',
+          startsAt: b.startsAt,
+          minutes: 60,
+          kindLabel: t('schedule.kind.intake'),
+          href: `/person/?id=${b.forMemberId}`,
+        })),
+      ]
     : [];
   return (
     <ScheduleView
       appointments={appointments}
+      canCheckIn
       // Search, the bell and + (D-221): Invite someone lives in the + now.
       actions={
         <>
@@ -182,4 +198,16 @@ export function InviteFloating() {
       icon={<PeopleIcon width={26} height={26} aria-hidden />}
     />
   );
+}
+
+/** Trips this program booked for members this visit (D-316), re-read when one is added. */
+function useBookedForMembers(): AddedTrip[] {
+  const [trips, setTrips] = useState<AddedTrip[]>([]);
+  useEffect(() => {
+    const read = () => setTrips(withMoves(readAddedTrips()).filter((trip) => Boolean(trip.forMemberId)));
+    read();
+    window.addEventListener(TRIPS_CHANGED, read);
+    return () => window.removeEventListener(TRIPS_CHANGED, read);
+  }, []);
+  return trips;
 }

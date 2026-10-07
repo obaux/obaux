@@ -9,7 +9,7 @@ import { asRedesign } from '../../journeys/journey';
  * `NEXT_PUBLIC_GOOGLE_MAPS_KEY` set it is Google Maps.
  */
 const meta = {
-  title: 'Member app/States/Trips',
+  title: 'Member/Created/States/Trips',
   component: TripsView,
   args: { trips: [], headerActions: <NewTripButton /> },
 } satisfies Meta<typeof TripsView>;

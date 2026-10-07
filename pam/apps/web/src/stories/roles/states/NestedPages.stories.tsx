@@ -12,7 +12,7 @@ import { asRedesign } from '../../journeys/journey';
  * (compact) a conversation.
  */
 const meta = {
-  title: 'Member app/States/Nested pages',
+  title: 'Member/Created/States/Nested pages',
   component: LegalView,
 } satisfies Meta<typeof LegalView>;
 

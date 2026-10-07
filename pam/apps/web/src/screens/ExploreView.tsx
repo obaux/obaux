@@ -108,6 +108,7 @@ const styles = stylex.create({
   rowHidden: { opacity: 0, pointerEvents: 'none' },
   search: { flexGrow: 1, minWidth: 0 },
   heading: { fontSize: '22px', lineHeight: 1.25, fontWeight: 700 },
+  oneLine: { flexGrow: 1, flexShrink: 1, minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
   source: { fontSize: '15px', lineHeight: 1.5 },
   state: { paddingBlock: '32px' },
   stateIcon: { width: '72px', height: '72px', color: colorVars['--color-icon-accent'] },
@@ -134,7 +135,8 @@ export function ExploreView({
   const searching = query.trim() !== '';
   // The search row hides scrolling down and comes back scrolling up (D-222,
   // Will, 2 October) — never while a search is typed or the area is open.
-  const hidden = useHideOnScroll({ isDisabled: searching || Boolean(areaPanel) });
+  // The area drawer is modal (D-275), so it no longer holds the header open.
+  const hidden = useHideOnScroll({ isDisabled: searching });
   const chipsRef = useRef<HTMLElement | null>(null);
   const [hideBy, setHideBy] = useState(0);
   useLayoutEffect(() => {
@@ -175,13 +177,16 @@ export function ExploreView({
       {notice}
       {searching ? null : nextTrip}
 
-      <HStack gap={2} align="center" justify="between" wrap="wrap">
+      {/* One row, always (D-274): the heading takes one line and ends in
+          "…" before it pushes the area link underneath — "Todos los
+          programas" did. */}
+      <HStack gap={3} align="center" justify="between" wrap="nowrap">
         {searching ? (
-          <Heading level={1} xstyle={styles.heading}>
+          <Heading level={1} xstyle={[styles.heading, styles.oneLine]}>
             {t('explore.results', { query: query.trim() })}
           </Heading>
         ) : (
-          <Heading level={1} xstyle={styles.heading}>
+          <Heading level={1} xstyle={[styles.heading, styles.oneLine]}>
             {/* "All programs" over the list though the chip says "All" — the
                 heading gives the context the short chip cannot (Will, 1 October). */}
             {category === 'all'

@@ -23,7 +23,7 @@ export interface Bundle {
 export const SMS_MAX_LENGTH = 160;
 
 // §9. The same list the config package tests against; repeated here because
-// this is the last point before the words leave PAM, and a last check is only
+// this is the last point before the words leave Pam, and a last check is only
 // worth having if it holds on its own.
 const FORBIDDEN = [
   /\bparole\b/i,
@@ -52,7 +52,7 @@ export function localeOf(value: string | null | undefined): Locale {
 
 /** §9, applied to the finished words rather than to the template. */
 export function assertSafe(body: string): void {
-  if (!body.startsWith('PAM: ')) throw new UnsendableError('message does not identify PAM');
+  if (!body.startsWith('Pam: ')) throw new UnsendableError('message does not identify Pam');
   if (body.length > SMS_MAX_LENGTH) {
     throw new UnsendableError(
       `message is ${body.length} characters, over the ${SMS_MAX_LENGTH} limit`,
@@ -79,7 +79,7 @@ export function render(
   if (!template) throw new UnsendableError(`unknown template "${key}"`);
 
   // The gate. An unreviewed template is not a missing feature — it is copy
-  // nobody has read yet, and PAM stays quiet until somebody has.
+  // nobody has read yet, and Pam stays quiet until somebody has.
   if (!template.reviewedBy) {
     throw new UnsendableError(`template "${key}" has no reviewedBy — copy is not signed off`);
   }

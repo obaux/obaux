@@ -26,7 +26,7 @@ import type { GlossaryTerm } from '@pam/config';
  *   - someone messages you — that one is waiting, never what it says.
  *
  * **Consent stays an act.** Every switch starts off — a carrier rejected
- * PAM's first campaign for an opt-in that arrived pre-selected (30925) — and
+ * Pam's first campaign for an opt-in that arrived pre-selected (30925) — and
  * the STOP / HELP / rates line sits under them, as on the member's screen.
  * Turning any switch on records consent (`setReminderConsent(true)`); turning
  * the last one off withdraws it.
@@ -129,7 +129,7 @@ export function AlertsView() {
       <Card padding={6}>
         <VStack gap={5}>
           {KINDS.map((kind) => (
-            // PAM's own sizes for the words (17px, 15px under it): Astryx's
+            // Pam's own sizes for the words (17px, 15px under it): Astryx's
             // switch label is set smaller than §12 allows on a phone. The
             // switch keeps its label, hidden, so it is still named.
             <HStack key={kind} gap={3} align="center" wrap="nowrap">

@@ -1,6 +1,6 @@
 # Sample messages for the carrier registration
 
-Everything PAM can send, in the order a person is likely to meet it. Paste these
+Everything Pam can send, in the order a person is likely to meet it. Paste these
 into the A2P campaign's sample-message boxes exactly as they appear — carriers
 compare them against real traffic later, and a sample that does not match what
 goes out is what gets a campaign suspended after approval.
@@ -15,9 +15,9 @@ edited there, regenerate this list rather than editing it here.
 ## What to say in the campaign's own fields
 
 - **Use case:** Low Volume Mixed — account notifications (sign-in codes) and
-  appointment reminders. Not marketing. PAM never sends promotional messages.
+  appointment reminders. Not marketing. Pam never sends promotional messages.
 - **How people opt in:** a person is invited by their case manager, then types
-  their own phone number into PAM's sign-in screen, which states that PAM will
+  their own phone number into Pam's sign-in screen, which states that Pam will
   text them, that STOP stops it, and that rates may apply. Attach a screenshot of
   that screen.
 - **How people opt out:** STOP, which is honoured immediately and permanently
@@ -33,7 +33,7 @@ failed once each.
 
 | Field | Answer |
 |---|---|
-| Brand | **Oba** — the registered LLC, matching the EIN letter exactly. PAM is the campaign beneath it, not the brand. |
+| Brand | **Oba** — the registered LLC, matching the EIN letter exactly. Pam is the campaign beneath it, not the brand. |
 | Use case | **Low Volume Mixed** — account notifications (sign-in codes) and appointment reminders |
 | Embedded links | **Yes** ← *rejected before.* Nine of the thirteen messages carry `{link}`. |
 | Embedded phone numbers | **Yes** — `access_limited_notice` ends "Call {supportPhone} with questions" |
@@ -55,26 +55,26 @@ another round.
 
 ## "Opt-in message" — what a person receives right after consenting
 
-The first message anybody gets from PAM is their sign-in code, because
+The first message anybody gets from Pam is their sign-in code, because
 submitting their number *is* the consent and the code is the answer to it.
 Carriers expect that first message to carry the brand, the rates warning and
 both keywords, so it reads:
 
-> PAM: Your code is 123456. It works for 10 minutes. Msg & data rates may apply. Reply HELP for help, STOP to stop.
+> Pam: Your code is 123456. It works for 10 minutes. Msg & data rates may apply. Reply HELP for help, STOP to stop.
 
 113 characters, one segment.
 
 **Where this message actually comes from, which matters.** Sign-in codes are sent
-by Twilio Verify, called by Supabase — not by PAM's own dispatcher. So the
-wording above is set in the Twilio console under Verify → Services → the PAM
+by Twilio Verify, called by Supabase — not by Pam's own dispatcher. So the
+wording above is set in the Twilio console under Verify → Services → the Pam
 service → message template, not in `packages/config/src/sms-templates.ts`. The
 `verify_code` template in this repo is not the text that sends while sign-in
-goes through Verify; it exists for the day PAM sends its own codes.
+goes through Verify; it exists for the day Pam sends its own codes.
 
 Two consequences worth knowing before submitting:
 
 1. Custom Verify templates go through their own Twilio approval, and a default
-   template will say something closer to *"Your PAM verification code is:
+   template will say something closer to *"Your Pam verification code is:
    123456"* — no rates line, no keywords. Submit the wording you will actually
    have. If the custom template is not approved in time, declare the default and
    correct it later rather than declaring copy that does not send.
@@ -110,13 +110,13 @@ sign-in codes go out whenever somebody asks for one, and a person reading a
 screen about text messages does not separate the two. Will's call, and the right
 one — a promise that is true of most messages is not a promise.
 
-The sign-in screen still carries the one line the code itself needs: *"PAM texts
+The sign-in screen still carries the one line the code itself needs: *"Pam texts
 you a code to sign in. No password to remember."* The STOP/rates language moved
 to the reminders screen below (D-139, 17 September) — sign-in codes are not
 optional the way reminders are, so the room to be honest about STOP, HELP and
 rates belongs on the screen where a member is actually choosing something.
 
-> End users opt in inside the PAM app, on a screen dedicated to that choice, and nothing is pre-selected. A person is invited by a staff member and enters their own mobile number on the sign-in screen to request a one-time code; PAM has no passwords, so requesting the code is the request to be texted it. After signing in, the person is shown a "Text reminders" screen listing what would be sent (for a member: a reminder before a planned visit, a note if a saved place closes or moves, a note when someone wants to connect), how often (a few messages a week at most), and that STOP stops them permanently, HELP reaches a person, and rates may apply. Consent is a button labelled "Agree to receive texts": pressing it is the affirmative act, and the words agreed to are on the control itself. There is no checkbox, so nothing can arrive pre-selected. A "Not now" button records the decline, and PAM works either way, so consent is never required to use PAM. Numbers are never bought, rented, or entered by staff for anyone.
+> End users opt in inside the Pam app, on a screen dedicated to that choice, and nothing is pre-selected. A person is invited by a staff member and enters their own mobile number on the sign-in screen to request a one-time code; Pam has no passwords, so requesting the code is the request to be texted it. After signing in, the person is shown a "Text reminders" screen listing what would be sent (for a member: a reminder before a planned visit, a note if a saved place closes or moves, a note when someone wants to connect), how often (a few messages a week at most), and that STOP stops them permanently, HELP reaches a person, and rates may apply. Consent is a button labelled "Agree to receive texts": pressing it is the affirmative act, and the words agreed to are on the control itself. There is no checkbox, so nothing can arrive pre-selected. A "Not now" button records the decline, and Pam works either way, so consent is never required to use Pam. Numbers are never bought, rented, or entered by staff for anyone.
 
 Attach the **Text reminders** screenshot, not the sign-in one. The reviewer is
 checking that the box is really unticked and that the wording quoted here is
@@ -130,110 +130,110 @@ can receive is named on purpose: reviewers compare the description against the
 samples and, later, against real traffic, and a description narrower than what
 actually sends is how an approved campaign gets suspended.
 
-> PAM is an app by Oba that connects people to community programs, services and the staff who support them. People receive messages only after entering their own phone number on PAM's sign-in screen, which states that PAM will text them and how to stop.
+> Pam is an app by Oba that connects people to community programs, services and the staff who support them. People receive messages only after entering their own phone number on Pam's sign-in screen, which states that Pam will text them and how to stop.
 >
-> Messages are account notifications and appointment reminders, at low volume and low throughput. A person first receives a one-time sign-in code, because PAM uses a phone number instead of a password. After that they may receive: reminders for appointments they scheduled in the app, a check-in asking whether they made it, a notice when a place they saved has closed or moved, a notice that someone wants to connect, and, for staff, a notice of an introduction or an account change.
+> Messages are account notifications and appointment reminders, at low volume and low throughput. A person first receives a one-time sign-in code, because Pam uses a phone number instead of a password. After that they may receive: reminders for appointments they scheduled in the app, a check-in asking whether they made it, a notice when a place they saved has closed or moved, a notice that someone wants to connect, and, for staff, a notice of an introduction or an account change.
 >
-> Nothing is promotional. PAM sends no marketing, no advertising and no third-party content, and does not sell or share phone numbers. Every message names PAM and fits one segment, in English or Spanish. STOP ends all messages permanently; HELP returns support contact.
+> Nothing is promotional. Pam sends no marketing, no advertising and no third-party content, and does not sell or share phone numbers. Every message names Pam and fits one segment, in English or Spanish. STOP ends all messages permanently; HELP returns support contact.
 
 ### The shorter fields, if the form asks separately
 
 - **Campaign use case:** Low Volume Mixed — account notification and customer
   care.
 - **Description of opt-in:** The person is invited by a staff member, then enters
-  their own phone number on PAM's sign-in screen to request a code. That screen
-  states that PAM will text them, that STOP stops it, that HELP gets help, and
+  their own phone number on Pam's sign-in screen to request a code. That screen
+  states that Pam will text them, that STOP stops it, that HELP gets help, and
   that message and data rates may apply. A screenshot is attached.
 - **Opt-in keywords:** none. Consent is given in the app, not by texting a
   keyword to a number.
-- **Opt-out message:** You will not get any more texts from PAM. Reply START to
+- **Opt-out message:** You will not get any more texts from Pam. Reply START to
   get them again.
-- **Help message:** PAM: Call {supportPhone} and a person will help you.
+- **Help message:** Pam: Call {supportPhone} and a person will help you.
 - **Age-gated or affiliate marketing:** No.
 
 ## The messages
 
 **1. Sign-in code (the one carriers care most about)**
 
-> PAM: Your code is {code}. It works for 10 minutes.
+> Pam: Your code is {code}. It works for 10 minutes.
 >
-> _Spanish:_ PAM: Su codigo es {code}. Sirve por 10 minutos.
+> _Spanish:_ Pam: Su codigo es {code}. Sirve por 10 minutos.
 
 **2. Invitation to join, sent by a case manager**
 
-> PAM: You've been invited to PAM, an app for finding help and people near you. Tap to join: {link} Reply STOP to stop texts.
+> Pam: You've been invited to Pam, an app for finding help and people near you. Tap to join: {link} Reply STOP to stop texts.
 >
-> _Spanish:_ PAM: Le invitaron a PAM, una app para encontrar ayuda y personas cerca. Toque para entrar: {link} Responda STOP para no recibir mas.
+> _Spanish:_ Pam: Le invitaron a Pam, una app para encontrar ayuda y personas cerca. Toque para entrar: {link} Responda STOP para no recibir mas.
 
 **3. Invitation to an organisation to list its services**
 
-> PAM: You have been invited to list your services on PAM. Tap to set up your page: {link} Reply STOP to stop texts.
+> Pam: You have been invited to list your services on Pam. Tap to set up your page: {link} Reply STOP to stop texts.
 >
-> _Spanish:_ PAM: Le invitaron a publicar sus servicios en PAM. Toque para crear su pagina: {link} Responda STOP para no recibir mas.
+> _Spanish:_ Pam: Le invitaron a publicar sus servicios en Pam. Toque para crear su pagina: {link} Responda STOP para no recibir mas.
 
 **4. A case manager introduced someone to a program**
 
-> PAM: {adminFirstName} connected you with a program that can help. Open PAM to say hi: {link}
+> Pam: {adminFirstName} connected you with a program that can help. Open Pam to say hi: {link}
 >
-> _Spanish:_ PAM: {adminFirstName} le conecto con un programa que puede ayudar. Abra PAM para saludar: {link}
+> _Spanish:_ Pam: {adminFirstName} le conecto con un programa que puede ayudar. Abra Pam para saludar: {link}
 
 **5. A program is told someone was introduced to them**
 
-> PAM: Someone was introduced to your program. Open PAM to reply: {link}
+> Pam: Someone was introduced to your program. Open Pam to reply: {link}
 >
-> _Spanish:_ PAM: Alguien fue presentado a su programa. Abra PAM para responder: {link}
+> _Spanish:_ Pam: Alguien fue presentado a su programa. Abra Pam para responder: {link}
 
 **6. Appointment reminder, the day before**
 
-> PAM: You have a visit tomorrow at {time}. {address}. Tap for directions: {link}
+> Pam: You have a visit tomorrow at {time}. {address}. Tap for directions: {link}
 >
-> _Spanish:_ PAM: Tiene una visita mañana a las {time}. {address}. Toque para llegar: {link}
+> _Spanish:_ Pam: Tiene una visita mañana a las {time}. {address}. Toque para llegar: {link}
 
 **7. Appointment reminder, two hours before**
 
-> PAM: Your visit is at {time} today. {address}. Tap for directions: {link}
+> Pam: Your visit is at {time} today. {address}. Tap for directions: {link}
 >
-> _Spanish:_ PAM: Su visita es hoy a las {time}. {address}. Toque para llegar: {link}
+> _Spanish:_ Pam: Su visita es hoy a las {time}. {address}. Toque para llegar: {link}
 
 **8. Appointment reminder, the morning of**
 
-> PAM: Today at {time} you have a visit. {address}. Tap for directions: {link}
+> Pam: Today at {time} you have a visit. {address}. Tap for directions: {link}
 >
-> _Spanish:_ PAM: Hoy a las {time} tiene una visita. {address}. Toque para llegar: {link}
+> _Spanish:_ Pam: Hoy a las {time} tiene una visita. {address}. Toque para llegar: {link}
 
 **9. Did you make it? (the only message expecting a reply)**
 
-> PAM: Did you make it today? Reply YES or NO.
+> Pam: Did you make it today? Reply YES or NO.
 >
-> _Spanish:_ PAM: Pudo ir hoy? Responda YES o NO.
+> _Spanish:_ Pam: Pudo ir hoy? Responda YES o NO.
 
 **10. After a missed appointment**
 
-> PAM: No problem. We saved a step to set up a new time. Open PAM when you are ready: {link}
+> Pam: No problem. We saved a step to set up a new time. Open Pam when you are ready: {link}
 >
-> _Spanish:_ PAM: No hay problema. Guardamos un paso para buscar otra fecha. Abra PAM cuando pueda: {link}
+> _Spanish:_ Pam: No hay problema. Guardamos un paso para buscar otra fecha. Abra Pam cuando pueda: {link}
 
 **11. Somebody wants to connect**
 
-> PAM: Someone on PAM wants to connect. Open PAM to reply: {link}
+> Pam: Someone on Pam wants to connect. Open Pam to reply: {link}
 >
-> _Spanish:_ PAM: Alguien en PAM quiere conectar. Abra PAM para responder: {link}
+> _Spanish:_ Pam: Alguien en Pam quiere conectar. Abra Pam para responder: {link}
 
 **12. A saved place is no longer worth a trip**
 
-> PAM: A place you saved is {reason}. Find others in PAM: {link}
+> Pam: A place you saved is {reason}. Find others in Pam: {link}
 >
-> _Spanish:_ PAM: Un lugar que guardo {reason}. Vea otros en PAM: {link}
+> _Spanish:_ Pam: Un lugar que guardo {reason}. Vea otros en Pam: {link}
 
 **13. Some parts of the app are switched off**
 
-> PAM: Some parts of PAM are turned off for now. Call {supportPhone} with questions.
+> Pam: Some parts of Pam are turned off for now. Call {supportPhone} with questions.
 >
-> _Spanish:_ PAM: Algunas partes de PAM estan apagadas por ahora. Llame al {supportPhone} si tiene preguntas.
+> _Spanish:_ Pam: Algunas partes de Pam estan apagadas por ahora. Llame al {supportPhone} si tiene preguntas.
 
 ## Notes a reviewer may ask about
 
-- **Two languages.** PAM sends in English or Spanish, whichever the person chose.
+- **Two languages.** Pam sends in English or Spanish, whichever the person chose.
   Both are listed above, and the Spanish is written without accents so every
   message fits a single segment.
 - **STOP on first contact.** The two invitations are the first message anybody
@@ -241,5 +241,5 @@ actually sends is how an approved campaign gets suspended.
   message itself. Later messages do not repeat it, because the number is by then
   a known one and the instruction still works.
 - **No message names a program, a condition, or anything about why somebody is
-  using PAM.** A text lands on a lock screen a stranger can read, and that rule
+  using Pam.** A text lands on a lock screen a stranger can read, and that rule
   is enforced by tests rather than by care.

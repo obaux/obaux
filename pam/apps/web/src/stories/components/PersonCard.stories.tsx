@@ -9,7 +9,7 @@ import { useStoryText } from '../support/useStoryText';
  * the card offers exactly one action.
  *
  * `roleLine` is the person's own words and is not translated, as in the app;
- * the tags and the button are PAM's and follow the Language toolbar.
+ * the tags and the button are Pam's and follow the Language toolbar.
  */
 function LocalisedPerson({ sharedTags = [], orgBadgeLabel, messageLabel, ...rest }: PersonCardProps) {
   const tr = useStoryText();
@@ -26,7 +26,8 @@ function LocalisedPerson({ sharedTags = [], orgBadgeLabel, messageLabel, ...rest
 const sandra = DUMMY_PROGRAM_LEADS[0]!;
 
 const meta = {
-  title: 'Components/PersonCard',
+  title: 'Components/Cards/PersonCard',
+  tags: ['autodocs'],
   component: PersonCard,
   decorators: [
     (Story) => (
@@ -48,7 +49,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Mentor: Story = {};
+export const Default: Story = {};
 
 /** Verified program staff carry their organisation as a badge (§6.4). */
 export const ProgramStaff: Story = {

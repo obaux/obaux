@@ -109,27 +109,27 @@ describe('SMS templates', () => {
 
 describe('assertSmsIsSafe', () => {
   it('rejects a message that reveals justice involvement', () => {
-    expect(() => assertSmsIsSafe('PAM: Your parole meeting is at 10am.')).toThrow(SmsContentError);
-    expect(() => assertSmsIsSafe('PAM: Check in with your probation officer.')).toThrow(
+    expect(() => assertSmsIsSafe('Pam: Your parole meeting is at 10am.')).toThrow(SmsContentError);
+    expect(() => assertSmsIsSafe('Pam: Check in with your probation officer.')).toThrow(
       SmsContentError,
     );
-    expect(() => assertSmsIsSafe('PAM: Your case manager sent a note.')).toThrow(SmsContentError);
+    expect(() => assertSmsIsSafe('Pam: Your case manager sent a note.')).toThrow(SmsContentError);
   });
 
-  it('rejects a message without the PAM prefix', () => {
+  it('rejects a message without the Pam prefix', () => {
     expect(() => assertSmsIsSafe('You have a visit tomorrow.')).toThrow(SmsContentError);
   });
 
   it('rejects emoji', () => {
-    expect(() => assertSmsIsSafe('PAM: Nice work! 🎉')).toThrow(SmsContentError);
+    expect(() => assertSmsIsSafe('Pam: Nice work! 🎉')).toThrow(SmsContentError);
   });
 
   it('rejects an over-length message', () => {
-    expect(() => assertSmsIsSafe('PAM: ' + 'a'.repeat(SMS_MAX_LENGTH))).toThrow(SmsContentError);
+    expect(() => assertSmsIsSafe('Pam: ' + 'a'.repeat(SMS_MAX_LENGTH))).toThrow(SmsContentError);
   });
 
   it('accepts a compliant message', () => {
-    expect(() => assertSmsIsSafe('PAM: You have a visit tomorrow at 10:00 AM.')).not.toThrow();
+    expect(() => assertSmsIsSafe('Pam: You have a visit tomorrow at 10:00 AM.')).not.toThrow();
   });
 });
 

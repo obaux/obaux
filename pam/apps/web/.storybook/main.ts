@@ -25,7 +25,9 @@ const babelrc = require('../.babelrc.js') as { plugins: unknown[] };
  */
 const config: StorybookConfig = {
   stories: ['../src/stories/**/*.mdx', '../src/stories/**/*.stories.@(ts|tsx)'],
-  addons: ['@storybook/addon-a11y'],
+  // Docs: autodocs pages from each component's JSDoc and props, and the
+  // Foundations MDX — the usage rules a design tool checks its output against.
+  addons: ['@storybook/addon-a11y', '@storybook/addon-docs'],
   framework: {
     name: '@storybook/nextjs',
     options: { nextConfigPath: '../next.config.mjs' },

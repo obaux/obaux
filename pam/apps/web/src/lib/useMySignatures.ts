@@ -9,7 +9,7 @@ import { placeAsksForPolicies, type DummyPolicy } from '@pam/config/dummy-polici
  * **Example data only, for now**, like the program side (`usePolicies`,
  * D-261): nothing stores a signature anywhere but this browser tab. The
  * drawn signature is kept so the next policy is one tap — and kept in
- * *session* storage, not local, because PAM is often used on a phone that
+ * *session* storage, not local, because Pam is often used on a phone that
  * is shared or borrowed, and a signature is not something to leave behind
  * on one. The real version keeps it with the account (before-launch list).
  *
@@ -19,9 +19,19 @@ import { placeAsksForPolicies, type DummyPolicy } from '@pam/config/dummy-polici
 const KEY = 'pam.mySignatures';
 const EVENT = 'pam:mySignatures';
 
+/** One signed policy: when, and the signature it was signed with. */
+interface Signed {
+  readonly at: string;
+  readonly image: string | null;
+}
+
 interface Kept {
-  /** `${placeId}:${policyId}` → when it was signed. */
-  readonly signed: Readonly<Record<string, string>>;
+  /**
+   * `${placeId}:${policyId}` → when, and with what. Each policy keeps the
+   * picture it was signed with, so drawing a new signature later does not
+   * change what an earlier policy shows (D-271).
+   */
+  readonly signed: Readonly<Record<string, Signed | string>>;
   /** The drawn signature, as a PNG data URL. */
   readonly signature: string | null;
 }
@@ -52,11 +62,21 @@ export interface PolicyProgress {
   readonly signed: number;
 }
 
+/** A stored entry; the first version kept only the time, as a string. */
+function entry(value: Signed | string | undefined): Signed | null {
+  if (!value) return null;
+  return typeof value === 'string' ? { at: value, image: null } : value;
+}
+
 export function useMySignatures(): {
   readonly signature: string | null;
   readonly signedAt: (placeId: string, policyId: string) => string | null;
+  /** The signature a policy was signed with. */
+  readonly signedWith: (placeId: string, policyId: string) => string | null;
   readonly progress: (placeId: string, policies: readonly DummyPolicy[]) => PolicyProgress;
   readonly sign: (placeId: string, policyId: string, signature?: string) => void;
+  /** Takes a signature off one policy, to sign it again (D-271). */
+  readonly unsign: (placeId: string, policyId: string) => void;
   readonly forgetSignature: () => void;
 } {
   const [kept, setKept] = useState<Kept>(EMPTY);
@@ -69,7 +89,15 @@ export function useMySignatures(): {
   }, []);
 
   const signedAt = useCallback(
-    (placeId: string, policyId: string) => kept.signed[`${placeId}:${policyId}`] ?? null,
+    (placeId: string, policyId: string) => entry(kept.signed[`${placeId}:${policyId}`])?.at ?? null,
+    [kept],
+  );
+
+  const signedWith = useCallback(
+    (placeId: string, policyId: string) => {
+      const found = entry(kept.signed[`${placeId}:${policyId}`]);
+      return found ? (found.image ?? kept.signature) : null;
+    },
     [kept],
   );
 
@@ -86,15 +114,23 @@ export function useMySignatures(): {
 
   const sign = useCallback((placeId: string, policyId: string, signature?: string) => {
     const now = read();
+    const image = signature ?? now.signature;
     write({
-      signature: signature ?? now.signature,
-      signed: { ...now.signed, [`${placeId}:${policyId}`]: new Date().toISOString() },
+      signature: image,
+      signed: { ...now.signed, [`${placeId}:${policyId}`]: { at: new Date().toISOString(), image } },
     });
+  }, []);
+
+  const unsign = useCallback((placeId: string, policyId: string) => {
+    const now = read();
+    const signed = { ...now.signed };
+    delete signed[`${placeId}:${policyId}`];
+    write({ ...now, signed });
   }, []);
 
   const forgetSignature = useCallback(() => {
     write({ ...read(), signature: null });
   }, []);
 
-  return { signature: kept.signature, signedAt, progress, sign, forgetSignature };
+  return { signature: kept.signature, signedAt, signedWith, progress, sign, unsign, forgetSignature };
 }

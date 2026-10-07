@@ -14,7 +14,8 @@ function LocalisedHelp({ label, ...rest }: HelpBarProps) {
 }
 
 const meta = {
-  title: 'Components/HelpBar',
+  title: 'Components/Navigation/HelpBar',
+  tags: ['autodocs'],
   component: HelpBar,
   decorators: [
     (Story) => (
@@ -31,7 +32,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Compact: Story = {};
+export const Default: Story = {};
 
 /** At the foot of a screen, as `/place/` and the error screens use it. */
 export const Block: Story = { args: { variant: 'block' } };

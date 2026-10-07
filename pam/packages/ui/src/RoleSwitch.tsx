@@ -8,7 +8,7 @@ import { PeopleIcon } from './icons.js';
 /**
  * Which role's screen a super admin is looking at.
  *
- * PAM is one codebase serving four very different people, and the person
+ * Pam is one codebase serving four very different people, and the person
  * running it has to be able to see what each of them sees — a case manager
  * reporting that "the tile is missing" is describing a screen the super admin
  * has never had (Will, 14 September). So the role chip in the header, which was

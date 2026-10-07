@@ -8,7 +8,7 @@ import { Skeleton } from '@astryxdesign/core/Skeleton';
 import { VisuallyHidden } from '@astryxdesign/core/VisuallyHidden';
 
 /**
- * Shimmer placeholders shaped like the two things PAM asks somebody to wait
+ * Shimmer placeholders shaped like the two things Pam asks somebody to wait
  * for most — a list of places or people, and one of either on its own screen
  * (Will, 16 September: skeletons for places and people, "only use the
  * spinner loading for other screens").
@@ -21,7 +21,7 @@ import { VisuallyHidden } from '@astryxdesign/core/VisuallyHidden';
  * reads as faster and jumps less into place than a ring that vanishes and
  * dumps the whole list in at once. See Astryx's own `Skeleton` doc: "use
  * Spinner instead" is explicitly for content whose *dimensions* are unknown,
- * which is the one thing not true of a list of cards PAM already knows the
+ * which is the one thing not true of a list of cards Pam already knows the
  * size of.
  *
  * Each list is announced once, politely, through a hidden live region —
@@ -32,19 +32,27 @@ import { VisuallyHidden } from '@astryxdesign/core/VisuallyHidden';
 
 const styles = stylex.create({
   card: { width: '100%' },
+  grow: { flexGrow: 1, minWidth: 0 },
 });
 
 function PlaceCardSkeleton({ index }: { readonly index: number }) {
-  const base = index * 4;
+  const base = index * 5;
+  // The card's shape (D-287): the art at the top left, the name and the
+  // open line beside it, the description under both.
   return (
     <Card padding={4} xstyle={styles.card}>
-      <VStack gap={2}>
-        <Skeleton width="60%" height={20} index={base} />
-        <HStack gap={2} align="center">
-          <Skeleton width={56} height={14} index={base + 1} />
-          <Skeleton width={96} height={14} index={base + 2} />
+      <VStack gap={3}>
+        <HStack gap={3} align="start" wrap="nowrap">
+          <Skeleton width={56} height={56} radius="rounded" index={base} />
+          <VStack gap={2} xstyle={styles.grow}>
+            <Skeleton width="70%" height={20} index={base + 1} />
+            <HStack gap={2} align="center">
+              <Skeleton width={96} height={12} index={base + 2} />
+              <Skeleton width={48} height={12} index={base + 3} />
+            </HStack>
+          </VStack>
         </HStack>
-        <Skeleton width="100%" height={14} index={base + 3} />
+        <Skeleton width="100%" height={14} index={base + 4} />
       </VStack>
     </Card>
   );

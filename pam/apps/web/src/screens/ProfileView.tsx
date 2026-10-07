@@ -3,10 +3,9 @@
 import type { ReactNode } from 'react';
 import { VStack } from '@astryxdesign/core/VStack';
 import { Divider } from '@astryxdesign/core/Divider';
-import type { Role } from '@pam/config';
+import { badgeForPoints, type Role } from '@pam/config';
 import {
   BellIcon,
-  ConnectionsIcon,
   GlobeIcon,
   HelpIcon,
   LegalIcon,
@@ -15,18 +14,17 @@ import {
   PlacesIcon,
   ShieldIcon,
   SignOutIcon,
-  StarIcon,
-  TripsIcon,
 } from '@pam/ui';
 import { LargeTitleHeader } from '@pam/ui/LargeTitleHeader';
 import { FeatureTile, FeatureTileRow, ProfileSummary, PromoCard } from '@pam/ui/ProfileCards';
+import { BadgeArt, ConnectionsArt } from '@pam/ui/BadgeArt';
 import { MenuList } from '@pam/ui/MenuList';
 import { useI18n } from '@/lib/i18n';
 
 /**
  * Profile — the redesign's first screen (D-210, Will, 1 October).
  *
- * Who you are and your numbers; two doors (past trips, and Connections — the
+ * Who you are and your numbers; two doors (your award level since D-274, and Connections — the
  * case manager and programs on your side); one offer (text reminders); then
  * a plain list. Since D-213 the list is shorter: Language (the one thing the
  * old Account screen held that Profile did not), text reminders once they
@@ -74,8 +72,8 @@ export function ProfileView({
 
   const staffRows = [
     // Invite someone, a second way in for a case manager beside the strip
-    // on Home (D-226).
-    ...(role === 'admin'
+    // on Home (D-226); the super admin's only way in (D-315).
+    ...(role === 'admin' || role === 'super_admin'
       ? [{ id: 'invite', label: t('profile.menu.invite'), href: '/invite/', icon: <PeopleIcon {...ICON} /> }]
       : []),
     // Every program, a secondary path for staff (D-218): where to look one
@@ -85,7 +83,7 @@ export function ProfileView({
       ? [
           {
             id: 'programs',
-            // A program lead browses the others: "Programs in PAM" (D-237).
+            // A program lead browses the others: "Programs in Pam" (D-237).
             label: t(role === 'provider' ? 'profile.menu.programsInPam' : 'profile.menu.programs'),
             href: '/programs/',
             icon: <PlacesIcon {...ICON} />,
@@ -128,8 +126,20 @@ export function ProfileView({
       */}
       {isMember ? (
         <FeatureTileRow>
-          <FeatureTile label={t('profile.tile.trips')} href="/trips/" art={<TripsIcon {...ART} />} />
-          <FeatureTile label={t('profile.tile.connections')} href="/connections/" art={<ConnectionsIcon {...ART} />} />
+          {/*
+            Their award, not past trips (Will, 5 October, D-274): the rung of
+            the ladder their points have reached — the same names as Points
+            (D-278: it said "Getting Going" while Points said "Rooted") —
+            opening Points. Past visits are still on Trips.
+          */}
+          <FeatureTile
+            label={t(badgeForPoints(points).labelKey)}
+            hint={t('profile.tile.badgeHint')}
+            href="/points/"
+            // The level's own picture (D-295) — Rooted is a seedling.
+            art={<BadgeArt badgeKey={badgeForPoints(points).key} size={88} shape="square" />}
+          />
+          <FeatureTile label={t('profile.tile.connections')} href="/connections/" art={<ConnectionsArt size={88} />} />
         </FeatureTileRow>
       ) : null}
 
@@ -149,7 +159,9 @@ export function ProfileView({
           // first yes is still the reminders screen — the one the SMS carrier
           // reviewed — and their switches are a row in settings after that.
           href={role === 'member' ? '/reminders/' : '/alerts/'}
-          art={<StarIcon {...ART} />}
+          // A bell, for texts, for everyone (Will, 5 October, D-274) — the star
+          // read as points.
+          art={<BellIcon {...ART} />}
         />
       )}
 

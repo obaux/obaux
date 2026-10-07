@@ -13,7 +13,8 @@ function Boxes({ initial }: { readonly initial: string }) {
 }
 
 const meta = {
-  title: 'Components/CodeBoxes',
+  title: 'Components/Inputs/CodeBoxes',
+  tags: ['autodocs'],
   decorators: [
     (Story) => (
       <Page gap={4}>
@@ -25,7 +26,7 @@ const meta = {
 
 export default meta;
 
-export const Empty: StoryObj = { render: () => <Boxes initial="" /> };
+export const Default: StoryObj = { render: () => <Boxes initial="" /> };
 
 export const PartlyTyped: StoryObj = { render: () => <Boxes initial="12" /> };
 

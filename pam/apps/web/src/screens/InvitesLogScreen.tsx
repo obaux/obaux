@@ -1,13 +1,15 @@
 'use client';
 
 import * as stylex from '@stylexjs/stylex';
+import { Button } from '@astryxdesign/core/Button';
+import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { Heading } from '@astryxdesign/core/Heading';
 import { List, ListItem } from '@astryxdesign/core/List';
 import { Text } from '@astryxdesign/core/Text';
 import { Token } from '@astryxdesign/core/Token';
 import { VStack } from '@astryxdesign/core/VStack';
 import { NOTICES } from '@pam/config';
-import { Loading, Notice } from '@pam/ui';
+import { Loading, Notice, PlusIcon } from '@pam/ui';
 import { SubPage } from '@pam/ui/SubPage';
 import { useI18n } from '@/lib/i18n';
 import { goBack } from '@/lib/navigate';
@@ -15,7 +17,6 @@ import { useInvitesLog, type InviteLogRow } from '@/lib/useInviteLinks';
 import { useSession } from '@/lib/useSession';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useRoleView } from '@/lib/useViewedRole';
-import { HelpButton } from './HelpButton';
 
 /**
  * Invited people (Will, 4 October, D-263): "keep a log of invited people in
@@ -29,7 +30,20 @@ import { HelpButton } from './HelpButton';
  * sent again by email after expiring says where it went. Nothing here needs
  * a decision; expired links renew themselves by email (D-263).
  */
+// The white pill every page-top button is (D-216), with a plus.
+const NEW_ICON = { width: 20, height: 20, 'aria-hidden': true } as const;
+
 const styles = stylex.create({
+  newInvite: {
+    minHeight: '48px',
+    borderRadius: '999px',
+    paddingInline: '18px',
+    fontSize: '17px',
+    backgroundColor: colorVars['--color-background-body'],
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    borderColor: colorVars['--color-border'],
+  },
   day: { fontSize: '17px', lineHeight: 1.3, marginTop: '8px' },
   name: { fontSize: '18px', lineHeight: 1.3 },
   line: { fontSize: '15px', lineHeight: 1.4 },
@@ -71,7 +85,17 @@ export function InvitesLogScreen() {
       {...(subtitle ? { subtitle } : {})}
       onBack={() => goBack('/')}
       backLabel={t('nav.back.home')}
-      actions={<HelpButton />}
+      // "+ New invite" where Help was (Will, 6 October, D-315): the page is
+      // the list of invites, so making one is its action.
+      actions={
+        <Button
+          label={t('invites.log.new')}
+          icon={<PlusIcon {...NEW_ICON} />}
+          variant="ghost"
+          href="/invite/"
+          xstyle={styles.newInvite}
+        />
+      }
     >
       {!isSuperAdmin && session.status !== 'loading' ? (
         <Notice

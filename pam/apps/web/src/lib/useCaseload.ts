@@ -204,7 +204,7 @@ export async function createInvite(
   }
 }
 
-/** The cities PAM serves, with ids, for somebody allowed to see them. */
+/** The cities Pam serves, with ids, for somebody allowed to see them. */
 export async function listRegions(): Promise<{ id: string; name: string }[]> {
   try {
     const { createClient } = await import('./supabase');

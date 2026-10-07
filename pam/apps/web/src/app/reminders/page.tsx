@@ -16,7 +16,7 @@ import { useSession } from '@/lib/useSession';
 import { setReminderConsent } from '@/lib/useReminderConsent';
 
 /**
- * Do you want PAM to text you about the things you plan?
+ * Do you want Pam to text you about the things you plan?
  *
  * Its own screen, for two reasons that point the same way.
  *
@@ -40,7 +40,7 @@ import { setReminderConsent } from '@/lib/useReminderConsent';
  * **No help link here, deliberately** (Will, 13 September) — the one exception
  * to §0's "every screen has a visible way to get help". This screen asks one
  * question with two answers, both one tap away, and neither can fail in a way
- * calling PAM would fix. A third button next to them makes the question look
+ * calling Pam would fix. A third button next to them makes the question look
  * harder than it is, and the screen a member is sent to right after their first
  * sign-in is the wrong place to imply they might need rescuing. Help is one tap
  * away everywhere they land next, and the signed-out state below still carries

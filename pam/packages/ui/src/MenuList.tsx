@@ -1,10 +1,13 @@
 import type { ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
+import { pam } from './tokens.stylex.js';
 import { Icon } from '@astryxdesign/core/Icon';
 import { HStack } from '@astryxdesign/core/HStack';
 import { List, ListItem } from '@astryxdesign/core/List';
 import { Text } from '@astryxdesign/core/Text';
 import { Badge } from '@astryxdesign/core/Badge';
+import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
+import { CheckIcon } from './icons.js';
 
 /**
  * A plain list of places to go, one per row: icon, words, chevron (D-210).
@@ -18,7 +21,7 @@ import { Badge } from '@astryxdesign/core/Badge';
 export interface MenuItem {
   readonly id: string;
   readonly label: string;
-  /** A PAM icon drawn at 26px (`width={26} height={26}`). */
+  /** A Pam icon drawn at 26px (`width={26} height={26}`). */
   readonly icon: ReactNode;
   readonly href?: string;
   readonly onSelect?: () => void;
@@ -38,6 +41,16 @@ export interface MenuItem {
   readonly badge?: string;
   /** The badge's spoken meaning — "2 new messages". */
   readonly badgeLabel?: string;
+  /** Opens in a new tab: Google Maps, a program's website (D-291). */
+  readonly isExternal?: boolean;
+  /**
+   * Something new behind this row — a pink dot before the chevron, the same
+   * pink as every other "new" dot (D-289, D-305). Decoration: the row's own
+   * words say it ("New message").
+   */
+  readonly hasDot?: boolean;
+  /** One line, then "…" — a message's preview (Will, D-306). */
+  readonly isDescriptionOneLine?: boolean;
 }
 
 export interface MenuListProps {
@@ -51,37 +64,52 @@ export interface MenuListProps {
 const styles = stylex.create({
   list: { width: '100%' },
   row: { minHeight: '64px', fontSize: '18px' },
+  dot: { width: '10px', height: '10px', borderRadius: '50%', flexShrink: 0, backgroundColor: pam['--pam-brand-pink'] },
+  // No line under the last row (D-291). Astryx's own `:last-child` rule
+  // is a shorthand, which loses to its longhand width, so the line stayed —
+  // a stray rule at the foot of every card that holds a list.
+  lastRow: { borderBlockEndWidth: '0px' },
   value: { fontSize: '16px' },
   // The label at 18px (§2.5): ListItem's own label size is smaller.
   label: { fontSize: '18px', lineHeight: 1.35 },
-  description: { fontSize: '15px', lineHeight: 1.4 },
+  // Smaller than the label, so the row reads as a name and a note
+  // (Will, 5 October, D-294).
+  description: { fontSize: '14px', lineHeight: 1.35 },
+  oneLine: { display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0, maxWidth: '100%' },
+  // The chosen option (Will, 5 October, D-274): bold and in the accent
+  // green, words and tick alike, with a heavier tick — a thin black tick at
+  // the far edge was easy to miss.
+  labelSelected: { fontWeight: 700, color: colorVars['--color-text-accent'] },
+  check: { width: '24px', height: '24px', color: colorVars['--color-icon-accent'], flexShrink: 0 },
 });
 
 export function MenuList({ label, items, hasDividers = false }: MenuListProps) {
   return (
     <List aria-label={label} hasDividers={hasDividers} xstyle={styles.list}>
-      {items.map((item) => (
+      {items.map((item, index) => (
         <ListItem
           key={item.id}
-          label={<Text xstyle={styles.label}>{item.label}</Text>}
+          label={<Text xstyle={[styles.label, item.isSelected === true && styles.labelSelected]}>{item.label}</Text>}
           description={
             item.description ? (
-              <Text type="supporting" xstyle={styles.description}>
+              <Text type="supporting" xstyle={[styles.description, item.isDescriptionOneLine === true && styles.oneLine]}>
                 {item.description}
               </Text>
             ) : undefined
           }
           href={item.href}
+          {...(item.href && item.isExternal ? { target: '_blank', rel: 'noreferrer' } : {})}
           onClick={item.onSelect ? () => item.onSelect?.() : undefined}
           startContent={item.icon}
           {...(item.isSelected !== undefined ? { 'aria-current': item.isSelected ? ('true' as const) : undefined } : {})}
           endContent={
             item.isSelected !== undefined ? (
               item.isSelected ? (
-                <Icon icon="check" size="md" />
+                <CheckIcon {...stylex.props(styles.check)} aria-hidden />
               ) : undefined
             ) : item.href || item.onSelect ? (
               <HStack gap={2} align="center" wrap="nowrap">
+                {item.hasDot ? <HStack aria-hidden xstyle={styles.dot} /> : null}
                 {item.badge ? <Badge variant="error" label={item.badge} aria-label={item.badgeLabel} /> : null}
                 {item.value ? (
                   <Text type="supporting" xstyle={styles.value}>
@@ -92,7 +120,7 @@ export function MenuList({ label, items, hasDividers = false }: MenuListProps) {
               </HStack>
             ) : undefined
           }
-          xstyle={styles.row}
+          xstyle={[styles.row, index === items.length - 1 && styles.lastRow]}
         />
       ))}
     </List>

@@ -1,9 +1,9 @@
 /**
- * When a place is open — and, for now, a stand-in for when PAM does not know.
+ * When a place is open — and, for now, a stand-in for when Pam does not know.
  *
  * Six places out of 754 have real hours. Until `enrich-places` runs, an
- * open/closed line on a card would be a claim PAM cannot make, which is why
- * D-044 said PAM would show no open/closed state at all.
+ * open/closed line on a card would be a claim Pam cannot make, which is why
+ * D-044 said Pam would show no open/closed state at all.
  *
  * Will asked on 16 September for placeholder hours so the screens can be
  * demonstrated. They are here, in one file, behind one flag, and they are

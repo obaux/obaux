@@ -28,6 +28,33 @@ const SETTLE_MS = 700;
 
 let settle: (() => void) | null = null;
 
+/**
+ * How many screens deep inside Pam this tab is (D-277): up by one on every
+ * move made here, down by one when the browser itself goes back. A back
+ * button goes back through history while this is above zero — to wherever
+ * the member came from, not a fixed screen — and to its own `href` when it
+ * is not (a shared link opened cold). Kept for the tab, so a reload keeps
+ * the count the history still has. The browser's forward button is not
+ * counted; a wrong count only means a back button uses its fixed target.
+ */
+const DEPTH_KEY = 'pam.nav.depth';
+
+function depth(): number {
+  try {
+    return Math.max(0, Number(sessionStorage.getItem(DEPTH_KEY)) || 0);
+  } catch {
+    return 0;
+  }
+}
+
+function setDepth(next: number): void {
+  try {
+    sessionStorage.setItem(DEPTH_KEY, String(Math.max(0, next)));
+  } catch {
+    // Storage off: every back button uses its fixed target.
+  }
+}
+
 function routable(url: URL): boolean {
   if (url.origin !== window.location.origin) return false;
   const last = url.pathname.split('/').pop() ?? '';
@@ -64,8 +91,16 @@ export function ClientNav(): null {
       // A tapped card always opens into its screen, even when that screen is a tab.
       const kind = source ? 'forward' : navKindFor(window.location.pathname, url.pathname);
       runNavTransition(kind, arrive(() => router.push(`${url.pathname}${url.search}${url.hash}`)), source);
+      setDepth(depth() + 1);
       return true;
     };
+
+    const back = (): boolean => {
+      if (depth() === 0) return false;
+      runNavTransition('back', arrive(() => window.history.back()));
+      return true;
+    };
+    const onPop = () => setDepth(depth() - 1);
 
     const onClick = (event: MouseEvent) => {
       if (event.defaultPrevented || event.button !== 0) return;
@@ -75,18 +110,36 @@ export function ClientNav(): null {
       if (anchor.target === '_blank' || anchor.hasAttribute('download')) return;
       const raw = anchor.getAttribute('href') ?? '';
       if (raw.startsWith('#') || /^[a-z][a-z0-9+.-]*:/i.test(raw)) return;
+      // A back button (D-277): through history when there is some.
+      if (anchor.hasAttribute('data-pam-back') && back()) {
+        event.preventDefault();
+        return;
+      }
       if (push(anchor.href, morphSourceFor(anchor))) event.preventDefault();
     };
 
-    setClientNav((href, mode) => {
+    setClientNav((href, mode, steps) => {
       if (mode === 'push') return push(href);
-      runNavTransition('back', arrive(() => window.history.back()));
+      // `goBack()`: one screen, the browser's own way (D-250).
+      if (steps === undefined) {
+        runNavTransition('back', arrive(() => window.history.back()));
+        return true;
+      }
+      // Out of a flow (D-279): only as far as Pam's own history goes — a
+      // flow opened cold answers false and goes to its fallback. One
+      // popstate arrives for the whole jump, so the count is brought down by
+      // all but that one here.
+      if (depth() < steps) return false;
+      setDepth(depth() - steps + 1);
+      runNavTransition('back', arrive(() => window.history.go(-steps)));
       return true;
     });
     document.addEventListener('click', onClick);
+    window.addEventListener('popstate', onPop);
     return () => {
       setClientNav(null);
       document.removeEventListener('click', onClick);
+      window.removeEventListener('popstate', onPop);
     };
   }, [router]);
 

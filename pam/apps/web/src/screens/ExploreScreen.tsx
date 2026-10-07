@@ -2,10 +2,13 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { EducationIcon, FamilyServicesIcon, Notice, PlaceCard, PlusIcon, ScrollReveal, WorkforceIcon } from '@pam/ui';
+import { EducationIcon, FamilyServicesIcon, Notice, PlaceCard, PlusIcon, ScrollReveal, WorkforceIcon, textLinkLook } from '@pam/ui';
 import { SearchLauncher, SearchPill, type SearchPillItem } from '@pam/ui/SearchPill';
 import { NextTripCard } from '@pam/ui/NextTripCard';
 import { DUMMY_TRIPS } from '@pam/config/dummy-trips';
+import { readMoves } from '@/lib/addedTrips';
+import { useNextVisits, visitTagLabel } from '@/lib/useNextVisits';
+import { CategoryPicture } from './SavedView';
 import { USE_DUMMY_PEOPLE } from '@pam/config/dummy-flag';
 import { categoryLabelKey, distanceLabel } from '@pam/config';
 import type { SearchSource } from '@astryxdesign/core/Typeahead';
@@ -65,9 +68,9 @@ function useDebounced(value: string, ms: number): string {
 }
 
 /** The soonest example visit still ahead — what a member's Explore shows (D-265). */
-function upcomingTrip() {
+function upcomingTrip(moves: Readonly<Record<string, string>>) {
   const now = Date.now();
-  return [...DUMMY_TRIPS]
+  return DUMMY_TRIPS.map((trip) => (moves[trip.id] ? { ...trip, startsAt: moves[trip.id]! } : trip))
     .filter((trip) => new Date(trip.startsAt).getTime() > now)
     .sort((a, b) => a.startsAt.localeCompare(b.startsAt))[0] ?? null;
 }
@@ -81,16 +84,10 @@ function tripWhen(iso: string, locale: string): string {
 }
 
 const TRIP_ICON = { width: 20, height: 20, 'aria-hidden': true } as const;
-const TRIP_BIG = { width: 44, height: 44, 'aria-hidden': true } as const;
 const TRIP_ICONS = {
   education: <EducationIcon {...TRIP_ICON} />,
   workforce: <WorkforceIcon {...TRIP_ICON} />,
   family_services: <FamilyServicesIcon {...TRIP_ICON} />,
-} as const;
-const TRIP_ART = {
-  education: <EducationIcon {...TRIP_BIG} />,
-  workforce: <WorkforceIcon {...TRIP_BIG} />,
-  family_services: <FamilyServicesIcon {...TRIP_BIG} />,
 } as const;
 
 /**
@@ -152,7 +149,7 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
     [area.lat, area.lon, category],
   );
 
-  // Programs in PAM (D-238): search is a round button there, like a
+  // Programs in Pam (D-238): search is a round button there, like a
   // program's Home; tapping it swaps the top row for the pill and Cancel.
   const pill = (
         <SearchPill<PlaceSuggestion>
@@ -173,7 +170,13 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
   // are on Profile), the search bar at rest is a centred launcher, and the
   // next visit sits above the list. Staff reach this screen as All programs.
   const isMember = mode === 'tab' && (demoRole ?? trueRole) === 'member';
-  const nextTrip = isMember && USE_DUMMY_PEOPLE ? upcomingTrip() : null;
+  // A visit moved with "Change appointment" (D-281), read after mount.
+  const [moves, setMoves] = useState<Readonly<Record<string, string>>>({});
+  useEffect(() => setMoves(readMoves()), []);
+  const nextTrip = isMember && USE_DUMMY_PEOPLE ? upcomingTrip(moves) : null;
+  // A member's visits, so a place with one carries Saved's chip and opens as
+  // the Visit profile (D-305) — the same wherever the place appears.
+  const visits = useNextVisits(isMember && USE_DUMMY_PEOPLE);
 
   return (
     <ExploreView
@@ -198,7 +201,7 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
               setIsSearching(false);
               setClearSignal((n) => n + 1);
             }}
-            xstyle={styles.cancel}
+            xstyle={[styles.cancel, textLinkLook.link]}
           />
         ) : mode === 'programs' ? (
           <>
@@ -231,7 +234,7 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
           <NextTripCard
             categoryLabel={t(categoryLabelKey(nextTrip.category))}
             categoryIcon={TRIP_ICONS[nextTrip.category]}
-            art={TRIP_ART[nextTrip.category]}
+            art={<CategoryPicture category={nextTrip.category} />}
             title={t('explore.nextTrip.title')}
             when={tripWhen(nextTrip.startsAt, locale)}
             href="/trips/"
@@ -246,15 +249,16 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
       onCategory={setCategory}
       area={<AreaTrigger area={area} onOpen={() => setIsPickingArea(true)} />}
       areaPanel={
-        isPickingArea ? (
-          <AreaSearch
-            onChange={(next) => {
-              setArea(next);
-              saveOrigin(next);
-            }}
-            onClose={() => setIsPickingArea(false)}
-          />
-        ) : null
+        // A drawer now (D-275), kept mounted so it slides away as it came.
+        <AreaSearch
+          isOpen={isPickingArea}
+          current={area}
+          onChange={(next) => {
+            setArea(next);
+            saveOrigin(next);
+          }}
+          onClose={() => setIsPickingArea(false)}
+        />
       }
       notice={
         saveFailed ? (
@@ -279,7 +283,14 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
           <ScrollReveal key={place.id} index={index}>
             <PlaceCard
               name={place.name}
-              href={`/place/?id=${encodeURIComponent(place.id)}&from=${from}`}
+              category={place.category}
+              artSeed={place.id}
+              href={`/place/?${new URLSearchParams({
+                id: place.id,
+                from,
+                ...(visits[place.id] ? { trip: visits[place.id]!.id } : {}),
+              }).toString()}`}
+              visitTag={visits[place.id] ? visitTagLabel(visits[place.id]!.startsAt, locale) : null}
               description={place.description}
               {...(miles ? { distanceLabel: t(miles.key, miles.vars) } : {})}
               status={placeStatus(place.id, place.hours, now, t, locale)}

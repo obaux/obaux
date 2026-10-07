@@ -32,15 +32,15 @@ describe('Notice — the out-of-region case Will raised', () => {
     render(
       <Notice
         notice="admin_out_of_region" title={n.title} body={n.body}
-        supportPhone={SUPPORT} callLabel="Call PAM"
+        supportPhone={SUPPORT} callLabel="Call Pam"
       />,
     );
     // D-038: Help is persistent and one tap away. A second Call button here
     // teaches two places to look for the same thing, and this is not an
     // emergency — the admin simply cannot see someone outside their area.
-    expect(screen.queryByRole('link', { name: /Call PAM/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /Call Pam/ })).not.toBeInTheDocument();
     // The way forward is still named, in words.
-    expect(screen.getByText(/ask PAM support/i)).toBeInTheDocument();
+    expect(screen.getByText(/ask Pam support/i)).toBeInTheDocument();
   });
 
   it('still offers the call where the reader really is stuck', () => {
@@ -50,10 +50,10 @@ describe('Notice — the out-of-region case Will raised', () => {
     render(
       <Notice
         notice="account_suspended" title={suspended.title} body={suspended.body}
-        supportPhone={SUPPORT} callLabel="Call PAM"
+        supportPhone={SUPPORT} callLabel="Call Pam"
       />,
     );
-    expect(screen.getByRole('link', { name: /Call PAM/ })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /Call Pam/ })).toHaveAttribute(
       'href', `tel:${SUPPORT}`,
     );
   });
@@ -85,7 +85,7 @@ describe('Notice — problems that need acting on', () => {
     );
     // Astryx renders error and warning banners as role="alert".
     expect(container.querySelector('[role="alert"]')).not.toBeNull();
-    expect(screen.getByRole('link', { name: /Call PAM/ })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Call Pam/ })).toBeInTheDocument();
   });
 
   it('cannot be dismissed when it explains why someone is locked out', () => {
@@ -104,7 +104,7 @@ describe('Notice — problems that need acting on', () => {
       />,
     );
     expect(screen.getByRole('button', { name: 'Try again' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /Call PAM/ })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Call Pam/ })).toBeInTheDocument();
   });
 });
 

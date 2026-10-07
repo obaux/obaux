@@ -84,6 +84,9 @@ test.describe('keeping a place', () => {
   test('saving writes it down, and the card says so without saying it', async ({ page }) => {
     const writes = await signedIn(page, []);
     await page.goto('/places/');
+    // Hydrated and the saved list loaded before tapping: a tap on the
+    // pre-rendered button before then was lost, a flake seen twice (D-299).
+    await settled(page);
 
     const save = page.getByRole('button', { name: 'Save' });
     await expect(save).toBeVisible();
@@ -116,6 +119,9 @@ test.describe('keeping a place', () => {
   test('the bookmark takes it out, and says whose place it is taking out', async ({ page }) => {
     const writes = await signedIn(page, [PLACE]);
     await page.goto('/');
+    // Hydrated and the saved list loaded before tapping: a tap on the
+    // pre-rendered button before then was lost, a flake seen twice (D-299).
+    await settled(page);
 
     // Named per card, because "Remove" three times in a row tells a screen
     // reader user nothing about which one they are on.
@@ -146,7 +152,7 @@ test.describe('keeping a place', () => {
     await expect(page.getByRole('link', { name: '35 points' })).toBeVisible();
   });
 
-  test('a balance PAM cannot read is shown as nothing, not as zero', async ({ page }) => {
+  test('a balance Pam cannot read is shown as nothing, not as zero', async ({ page }) => {
     // member_points returns null to anybody not entitled to the number, and a
     // "0 points" chip that becomes "35" a second later reads as losing points.
     await signedIn(page, [PLACE]);
@@ -178,11 +184,11 @@ test.describe('keeping a place', () => {
     await page.goto('/saved/');
 
     await expect(page.getByRole('heading', { name: 'Nothing saved yet' })).toBeVisible();
-    // Relabelled "Return" and shrunk to match Help's sizing, with the Call PAM
+    // Relabelled "Return" and shrunk to match Help's sizing, with the Call Pam
     // button removed from this particular empty state (Will, 16 September) —
     // there is nothing here support can solve.
     await expect(page.getByRole('link', { name: 'Return' })).toBeVisible();
-    await expect(page.getByRole('link', { name: /Call PAM/ })).toHaveCount(0);
+    await expect(page.getByRole('link', { name: /Call Pam/ })).toHaveCount(0);
   });
 
   test('has no WCAG A/AA violations', async ({ page }) => {

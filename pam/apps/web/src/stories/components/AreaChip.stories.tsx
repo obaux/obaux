@@ -18,7 +18,8 @@ function LocalisedChip({ label, onChange }: AreaChipProps) {
 }
 
 const meta = {
-  title: 'Components/AreaChip',
+  title: 'Components/Inputs/AreaChip',
+  tags: ['autodocs'],
   component: AreaChip,
   decorators: [
     (Story) => (
@@ -35,7 +36,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const NearCityHall: Story = {};
+export const Default: Story = {};
 export const NearAZipCode: Story = { args: { label: 'places.near?area=19122' } };
 export const NearMe: Story = { args: { label: 'places.nearMe' } };
 export const NearHome: Story = { args: { label: 'places.nearHome' } };

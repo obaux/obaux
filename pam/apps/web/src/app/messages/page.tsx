@@ -32,7 +32,7 @@ import type { PickablePerson } from './NewMessagePicker';
  * Messages: every conversation this person is in, and — for a case manager
  * or a super admin — the messages somebody said were not safe.
  *
- * **Messaging in PAM is staff-to-member, not member-to-member** (D-163,
+ * **Messaging in Pam is staff-to-member, not member-to-member** (D-163,
  * D-176): a case manager and the members on their caseload, a program admin
  * and the members enrolled with them, in either direction. `messageable_people()`
  * (0063) is the list and `open_direct_conversation()` is the rule, so a name
@@ -327,7 +327,7 @@ function MessagesScreen() {
       ) : null}
 
       {/*
-        No help link on this screen (A15) — the fourth in PAM without one.
+        No help link on this screen (A15) — the fourth in Pam without one.
         The header's own mark is one tap back to Home, which always carries
         the HelpBar; this screen already carries the number on every failure
         state it can reach (conversations, reports).

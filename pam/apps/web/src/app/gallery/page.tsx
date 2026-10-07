@@ -34,7 +34,7 @@ import { PeopleStrip } from '@pam/ui/PeopleStrip';
 import { OnboardingSlides } from '@pam/ui/OnboardingSlides';
 
 /**
- * Every PAM component, in the states that matter.
+ * Every Pam component, in the states that matter.
  *
  * Not a demo. Two jobs:
  *
@@ -66,7 +66,7 @@ const DETAIL_LABELS = {
   website: 'Their website',
   hours: 'Opening hours',
   hoursOnGoogle: 'Check hours on Google',
-  about: 'What this place is',
+  about: 'About program',
   address: 'Address',
   save: 'Save this place',
   saved: 'Saved',
@@ -100,7 +100,7 @@ export default function GalleryPage() {
         Components
       </Heading>
       <Text type="supporting" xstyle={styles.note}>
-        Every piece PAM is built from, including the states you cannot click your
+        Every piece Pam is built from, including the states you cannot click your
         way to. Change one here and it changes on every screen.
       </Text>
 
@@ -165,12 +165,12 @@ export default function GalleryPage() {
       </Section>
 
       <Section
-        title="What PAM is"
+        title="What Pam is"
         note="A full-bleed hero the sign-in card rides up over, redesigned 16 September from a Figma reference — the mark (white, larger), a region pill and the locale switcher sit over the art via the header slot, on the exact gradient stops Will specified (40.88%/66.12%) so white text and the mark stay legible over whatever photo is underneath."
       >
         <OnboardingSlides
-          label="How PAM works"
-          header={<img src="/pam-wordmark-white.svg" alt="PAM" {...stylex.props(styles.heroMark)} />}
+          label="How Pam works"
+          header={<img src="/pam-wordmark-white.svg" alt="Pam" {...stylex.props(styles.heroMark)} />}
           slides={[
             {
               id: 'places',
@@ -185,7 +185,7 @@ export default function GalleryPage() {
             {
               id: 'plan',
               image: '/onboarding/hero-sneakers.webp',
-              text: 'PAM reminds you before you go, so nothing gets missed.',
+              text: 'Pam reminds you before you go, so nothing gets missed.',
             },
           ]}
         />
@@ -259,7 +259,7 @@ export default function GalleryPage() {
             labels={PLACE_LABELS}
           />
           <PlaceCard
-            name="A place PAM has no hours for"
+            name="A place Pam has no hours for"
             href="/place/?id=demo"
             description="Nothing claims it is open or shut — an unknown is not a closure."
             distanceLabel="2.6 miles"
@@ -286,10 +286,10 @@ export default function GalleryPage() {
             { day: 'Sunday', hours: 'Closed' },
           ]}
           hoursArePlaceholder
-          placeholderNote="These are sample hours while PAM checks the real ones. Call before you go."
+          placeholderNote="These are sample hours while Pam checks the real ones. Call before you go."
           phone="+12155550100"
           website="https://example.org"
-          directionsHref="https://www.google.com/maps/dir/?api=1&destination=1234%20Market%20St&travelmode=walking"
+          directionsHref="https://www.google.com/maps/dir/?api=1&destination=1234%20Market%20St"
           hoursHref="https://www.google.com/maps/search/?api=1&query=Riverside"
           onSave={() => {}}
           onShare={() => {}}
@@ -379,16 +379,16 @@ export default function GalleryPage() {
           <Notice
             notice="offline"
             title="You are not connected"
-            body="PAM needs the internet for this. Try again when you have signal."
+            body="Pam needs the internet for this. Try again when you have signal."
             supportPhone="+12673095265"
-            callLabel="Call PAM for help"
+            callLabel="Call Pam for help"
           />
           <Notice
             notice="something_went_wrong"
             title="Something went wrong"
-            body="This is not your fault. Try again, or call PAM and we will help."
+            body="This is not your fault. Try again, or call Pam and we will help."
             supportPhone="+12673095265"
-            callLabel="Call PAM for help"
+            callLabel="Call Pam for help"
           />
         </VStack>
       </Section>

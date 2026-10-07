@@ -9,17 +9,17 @@ import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { Badge } from '@astryxdesign/core/Badge';
 import { Avatar } from '@astryxdesign/core/Avatar';
-import { BigButton, BookmarkIcon, ConnectionsIcon, Loading, MessagesIcon, Notice, Page, TripsIcon } from '@pam/ui';
+import { BigButton, BookmarkIcon, ConnectionsIcon, Loading, MessagesIcon, Notice, Page, SignIcon, TripsIcon } from '@pam/ui';
 import { MenuList } from '@pam/ui/MenuList';
+import { signedBy, usePolicies } from '@/lib/usePolicies';
 import { ProfileSummary } from '@pam/ui/ProfileCards';
 import { TripCard } from '@pam/ui/TripCard';
 import { useRouter } from 'next/navigation';
 import { dummyTripsFor } from '@pam/config/dummy-trips';
 import { useCaseload, type CaseloadMember } from '@/lib/useCaseload';
 import { openConversation } from '@/lib/openConversation';
-import { BigCategoryIcon } from '../../screens/SavedView';
+import { CategoryPicture } from '../../screens/SavedView';
 
-const TRIP_ART = { width: 40, height: 40, 'aria-hidden': true } as const;
 import { SubPageHeader } from '@pam/ui/SubPage';
 import { useStarredPeople } from '@/lib/useStarredPeople';
 import { StarToggle } from '../../screens/PeopleHomeView';
@@ -151,6 +151,7 @@ function whenLastActive(iso: string | null, locale: string): string | null {
 
 function PersonScreen() {
   const { t, locale } = useI18n();
+  const { policies } = usePolicies();
   const supportPhone = useSupportPhone();
   const params = useSearchParams();
   const router = useRouter();
@@ -301,7 +302,7 @@ function PersonScreen() {
       placeName={trip.placeName}
       when={tripWhen(trip.startsAt)}
       href={`/place/?id=${encodeURIComponent(trip.placeId)}`}
-      art={<BigCategoryIcon category={trip.category} size={TRIP_ART} />}
+      art={<CategoryPicture category={trip.category} />}
       label={`${trip.placeName}, ${tripWhen(trip.startsAt)}`}
     />
   );
@@ -352,7 +353,7 @@ function PersonScreen() {
         stats={
           isProgramView
             ? [
-                // Only what concerns this program, plus when they last used PAM (D-242).
+                // Only what concerns this program, plus when they last used Pam (D-242).
                 {
                   // The day and the time (Will, 3 October): "Oct 6, 9:00 AM".
                   value: nextVisits[0]
@@ -405,6 +406,22 @@ function PersonScreen() {
         <MenuList
           label={t('person.actions.label', { name: person.firstName })}
           items={[
+            // Which policies they have signed, in plain sight (Will, D-324):
+            // the badge by the name says all or not; this says which.
+            ...(isProgramView && isMember
+              ? [
+                  {
+                    id: 'policies',
+                    label: t('person.policies.title'),
+                    description: t('person.policies.row', {
+                      signed: signedBy(person.id, policies).length,
+                      total: policies.length,
+                    }),
+                    icon: <SignIcon width={26} height={26} />,
+                    href: `/person/policies/?${new URLSearchParams({ id: person.id, name: person.firstName ?? '' }).toString()}`,
+                  },
+                ]
+              : []),
             ...(viewedRole === 'admin'
               ? [
                   {

@@ -336,7 +336,93 @@ example data until tables, file storage and a transparency line are agreed.
 Members can now read a program's policies from the foot of its page, and sign
 them: the first Sign opens a half sheet to draw (or type) a signature, and
 each policy after that is one tap. Trips show "Signatures needed" or
-"Policies signed", and a just-booked trip offers Sign policies (D-270). The
+"Policies signed", and a just-booked trip offers Sign policies (D-270). A place with a visit
+booked shows the policies under its name, orange to sign or green when done,
+and a corner × clears a signature to sign again (D-271). Connections cards are
+the whole profile: a message button, the program as a link, and who connected
+the member; the separate profile page is gone (D-272). A place opened from a trip shows the visit
+(green, day and time) instead of "Plan a trip" (D-273). Profile's member
+tile is the award level (D-274). Choosing the area is a drawer with search,
+current location and Done (D-275). A conversation with a program shows the booked
+visit, opening the place and back (D-276). Back goes through history to
+wherever the member came from, with the fixed target only for a cold link
+(D-277). Signing keeps its button pinned at the bottom, and Done (top
+right) leaves the whole flow (D-279). Points is a journey screen: hero with progress
+to the next rung, ways to earn, compact ladder, badge medals, confetti on a
+new level (D-278). A place opened from a trip leads with a green "Your next visit"
+card whose "Change appointment" moves the visit and returns, with address and hours
+before About; Storybook's example places now share the example set's ids, so a saved
+one shows saved from a trip too (D-281). Saving the new time celebrates it
+(confetti, the new day and time) and goes home after 5 seconds or on Go home (D-282). A 96px eased fade sits above the tab bar so lists soften into it, with room for the last card to scroll clear (D-283, D-284); a strip resting on the bar
+draws its own fade above it, and Trips has none (D-285). The tab bar exists only in
+Storybook's prototype: the live app has no bottom bar until the member shell is built.
+The award tile has a "Your badge" ribbon (D-286). Place cards lead with an illustrated
+category tile (`CategoryArt`), a top-aligned save, and a quieter open line (D-287). Category chips glow behind
+their icons (D-288). The docked Trips drawer is 100px with its list hidden; unread dots on
+the tab bar and the bell use `pam.brandPink`, the selected tab's pink (D-289). The half stop is 50% of the height + 48px (D-290). A place's quick actions are
+`MenuList` rows (directions, message, call, website), and directions carry Google's
+place ID when known (D-291). Saved's tiles are white with a glowing category icon, and
+show a visit's day and time when one is booked, opening the visit view (D-292). `GlowIcon` (sm/md/lg) is the single, softer glow; trip
+cards and the next-visit card use `CategoryGlow` on white tiles (D-293). Directions set no
+travel mode (D-294, SOP A17); MenuList descriptions are 14px. Every badge, every rung and
+Profile's two tiles have pictures from one art kit (`art/kit.tsx`, `BadgeArt`,
+`ConnectionsArt`), and a unit test keeps badges and pictures in step (D-295). CI's unit-test
+job was red from D-287 to D-293 (a PlaceCard test) and is fixed with D-295. Saved's visit tag is a small white chip in the corner (D-296). Category colour is flat
+everywhere: `ToneDot` (half-circle pair) on chips, `ToneGround` (pale fill + shards) on
+Saved, trip cards and the next-visit tile; `GlowIcon` is deleted (D-297). A print grain (`Grain`, 30%, D-299) sits on every ArtFrame and
+ToneGround; ToneDot is darker on the left (D-298) and sits 11px from the chip's top and left (D-300). Home and family's picture is the home with a heart on
+its door (D-301, D-302); trip icons are baked in with a doubled overlay (`ToneBakedIcon`, D-302). Saved's chip is
+12px in from the corner; a member's example trips are two (no pantry visit); Trips map pins
+are placed in pixels between the note and the half drawer (D-303). Nine example places,
+three per category; three saved, two with visits (D-304). Place profile vs Visit profile
+is one story with controls; `VisitTag` is the one visit chip (Saved, Explore); a place's
+message row becomes "New message" with a pink dot when its program wrote (D-305); its
+preview is one line, and Call shows the number (D-306). Points: badges in a card; the
+example member has earned Scholar, shown on the hero card too (D-307). Steward is no longer a badge (D-308). Place: hours as a row (today) with the week in a
+drawer, Plan a trip in a fixed footer, "About program" (D-309). Sign in footer links spaced (D-310); small language dial (D-311);
+Program tab lists policies with the rows and says "Contact phone number" (D-312, D-314). Sign up per step per role in Storybook (D-319). Case managers invite case managers
+(0073, written, NOT deployed); super admin invites from Profile and Invited people (D-315). Program Home range is a
+dropdown beside the title (D-320). Program Home check-ins (session-kept) with burst and undo, signature
+badge, and "Book a visit for a member" from the + (D-316). "Pam", not "PAM", in every
+user-visible string; texts say "Pam:" too (D-321). Book a visit: booked / wrote / snippet rows,
+Add a person, the member arrives on "Your visit is booked" (D-322). Program Home head
+simplified (D-323). Member profile (program view): Policies signed row and page with
+a finish-signing alert; one SignedMark (D-324). Member stories in Created / Invited by program / Invited by case
+manager (D-325). Invite codes stay "PAM-". A screen's one action can be the
+page's `footer` (sticky, with the page fading out above it); a place's Plan a
+trip is, and Policies to sign is a quick-action row (D-326). Services (D-313):
+example services per place with their own phone, website and policies, a lead's
+editor on the Program tab (session-kept), service names at sign-up, a member's
+service picker on the place page (grey cards, Main/Service address, hours
+per service), drop-in programs, and booking in two steps from a place.
+Program onboarding as a simpler step by step is open (Will). The design system
+is ready for Claude Design (D-328): the theme, Figtree and `tokens.css` live in
+`@pam/ui` (not apps/web), `PamProvider` mounts a component anywhere,
+`pnpm --filter @pam/ui build` writes `dist/` (CI builds it), every component has
+a `Components/<Category>/<Component>` story, and usage rules are MDX under
+`Foundations/`. A member's program page leads with "Bring a friend"
+(`/place/friend/`, a link with the program and no code); sign in does not
+read that program yet (D-329). The friend screen is "Go together"; a friend who
+joins is worth 150 points (SOP amendment A18), listed first under Ways to
+earn, not yet awarded by the database (D-330). `ProgramVisitCard` (visit / invite) is the
+program card on Check and Go together; a booked place shows its service in the
+visit card, with no picker (D-332). Bring a friend is a folded section on the new
+"Your trip is booked" step (no page, Copy only; native share sheet waits for
+Will); walk-ins plan a trip from their meeting days; the signature sheet
+holds still while drawing — tested in Chromium touch emulation, not yet on iOS
+Safari, an Android WebView or the Capacitor build (D-333). A footer is pinned to the bottom of the screen on
+every page that has one; the booked screen closes with an × and lists policies
+to sign (D-334). Staff photos (example only) on a booked place and in
+Messages (D-335). Booked: how soon, Policies to sign and Bring a friend (a
+drawer) as rows; signing from a trip ends on × into Trips; Trips reads each
+visit's own service policies; floating rows have hairlines top and bottom
+(D-336). The booked screen is the green visit card with Change; Back from
+its policies returns to it; Bring a friend copies on tap, under Will's banner
+(WebP, 21/35 KB); every place picture is its category illustration, the
+tinted grounds are gone except the chips (D-337). Drawers have no border (`sheet.panel` on every BottomSheet); the friend banner runs edge to edge over the handle strip (D-338). VisitCard spacing opened up; "Link copied" spans field and Copy (D-339). Friend drawer: 24px under the banner and above the link (D-340). VisitCard: countdown plain, Change link even in its corner (D-341). 20px above and below it (D-342). Chevron after it; eyebrow in black (D-343). Note:
+the web app's vitest tests are not run in CI. How points should be awarded — two rules live
+(save a place, finish setup), the rest to build, with order and open
+questions — is specified in `docs/points-awarding.md`. The
 signatures are example data too, kept only for the visit (session storage).
 From a request the super admin can open the requested program and text the
 requester. In the redesign they can also message staff (never members),
@@ -700,6 +786,7 @@ while the copy is unsigned, so it earned the first live test, not the last.*
 | 10c | **Confirm the Twilio account's state** | Anybody whose number is not verified | This row said the account was in trial. Will, 16 September: the Twilio console says it is active. That earlier claim came from a 13–14 September finding and was repeated afterwards without re-checking; this session did not verify it either way, so it stands as Will's word and unverified here. If it is active the trial concern is gone; if not, a code to an unverified number is not sent and nothing says so — the live logs on the 14th show one phone asking three times. Carrier registration is a separate question (row 10). |
 | 10b | **A line about the PAM team on the transparency screen** | A promise already made | Members were told they would hear first if what is visible changes, and the directory now shows a super admin every account (name, role, region, status, last active; never messages or contact details). Proposed, for `packages/config/transparency.ts`: *"The PAM team can see your name, your city and the last day you used PAM. Never your messages."* It is a change to the contract, so it wants Will's word. |
 | 14 | **Storing members' policy signatures** | Policies being real (D-261, D-270) | Signing works on example data, kept in the browser tab only. Making it real needs a table for each program's policies and one for signatures (who, which policy and which version, when, the drawn image or typed name), file storage for the documents, and a transparency line telling a member the program keeps a record of what they signed. Schema and contract changes, so Will's word first. |
+| 15 | **Points: four questions before awarding is built** | Points beyond saving and finishing setup | Listed at the top of `docs/points-awarding.md` under "Decide before building": points for signing policies (+10 per program?); the return bonus window (weekly or daily); location at visit time for the checked-in award; whether points ever redeem. Two fixes ride along: reseed the database's `badges` table from config, and delete the unused `LEVELS` ladder. |
 | 10 | ~~Twilio credentials into the dispatcher's secrets~~ **Done** | — | Will, 17 September. Confirmed with a real end-to-end test: a `staff_request_denied` text queued to Will's own number was picked up by the 5-minute dispatcher cycle and sent successfully (`status: sent`, no failure reason). PAM can now text for real. |
 | 11 | ~~Sign off `staff_request_approved`'s wording~~ **Done** | — | Will, 17 September. `pnpm --filter @pam/config test` is green. |
 | 12 | ~~Migrations 0054 through 0057 are local only~~ **Done** | — | Applied to the live Supabase project 17 September, along with two follow-ups `get_advisors` surfaced: `notify_on_staff_request` (0058) was callable directly via PostgREST, unlike its two siblings in 0038 — its own migration run never got the schema-level default-privileges lockdown 0038's did; and `staff_requests` had two foreign keys with no covering index (0059). `/requests/`, `/join/`'s program step, and the demo view all work against the real database now. |

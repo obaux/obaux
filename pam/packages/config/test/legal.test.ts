@@ -45,7 +45,7 @@ describe('the privacy notice and the terms', () => {
     expect(findDignityViolations(legal)).toEqual([]);
   });
 
-  it('reads at roughly the level the rest of PAM does', () => {
+  it('reads at roughly the level the rest of Pam does', () => {
     // Legal pages are where plain language usually goes to die. The rule here is
     // the same one the product is held to: if the median paragraph is harder
     // than the app, the page is not doing its job.

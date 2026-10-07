@@ -15,6 +15,9 @@ function Policy() {
       placeId={place}
       placeName={placeNameFor(place, params.get('name'))}
       policyId={params.get('id')}
+      via={params.get('via')}
+      serviceId={params.get('service')}
+      trip={params.get('trip')}
     />
   );
 }

@@ -69,7 +69,7 @@ test.describe('points and badges', () => {
   });
 
   test('a badge nobody can earn yet says so rather than hiding', async ({ page }) => {
-    // Elder and Chief need a buddy system PAM does not have. Hiding them would
+    // Elder and Chief need a buddy system Pam does not have. Hiding them would
     // mean they appear from nowhere the day it ships.
     await signedIn(page, 400);
     await page.goto('/points/');
@@ -82,7 +82,7 @@ test.describe('points and badges', () => {
     await signedIn(page, 400);
     await page.goto('/points/');
 
-    for (const name of ['Returned', 'Griot', 'Cornerstone', 'Steward', 'Sankofa', 'Kinkeeper']) {
+    for (const name of ['Returned', 'Griot', 'Cornerstone', 'Anchor', 'Sankofa', 'Kinkeeper']) {
       await expect(page.getByText(name, { exact: true })).toBeVisible();
     }
   });

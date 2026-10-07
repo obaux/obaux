@@ -1,5 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 import { Button } from '@astryxdesign/core/Button';
+import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { EditIcon } from './icons.js';
 import { pam } from './tokens.stylex.js';
 
@@ -38,7 +39,7 @@ export interface AreaChipProps {
 
 const styles = stylex.create({
   area: {
-    minHeight: pam.touchTargetMin,
+    minHeight: pam['--pam-touch-target-min'],
     fontSize: '15px',
     // The header is a tight row. The area gives way before the mark does, and
     // a long address ends in an ellipsis rather than pushing the pencil off
@@ -47,6 +48,16 @@ const styles = stylex.create({
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
+    flexShrink: 0,
+    // A link, not a pill (Will, 5 October, D-274): narrower, so it fits
+    // beside the heading in Spanish too — no background on hover or press,
+    // the colour changes and an underline appears, as `TextLink` does.
+    paddingInline: '0px',
+    gap: '6px',
+    backgroundImage: { default: 'none', ':hover': 'none', ':active': 'none' },
+    color: { default: colorVars['--color-text-primary'], ':hover': colorVars['--color-text-accent'] },
+    textDecorationLine: { default: 'none', ':hover': 'underline' },
+    textUnderlineOffset: '4px',
   },
 });
 

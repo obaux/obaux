@@ -1,14 +1,18 @@
 import type { Meta, StoryObj } from '@storybook/nextjs';
 import { CONVO_ID } from '../journeys/fixtures';
-import { screen } from './screen';
+import { screen, screenWithControls } from './screen';
 
 /**
  * The member app, screen by screen (D-217) — every one on the redesign's two
  * templates, and every one clickable. Tab screens first, in the bar's order;
  * then the screens you tap into; then signing in, which comes before all of
- * it. To walk the app from the start, open Member app › Prototype.
+ * it. To walk the app from the start, open Member › Prototype.
+ *
+ * Three folders (D-325, Will, 6 October): **Created** is a member who signed
+ * up from the phone — every screen lives here; **Invited by program** and
+ * **Invited by case manager** hold only the screens that path changes.
  */
-const meta = { title: 'Member app/Screens' } satisfies Meta;
+const meta = { title: 'Member/Created' } satisfies Meta;
 
 export default meta;
 type Story = StoryObj;
@@ -17,12 +21,56 @@ type Story = StoryObj;
 export const Explore: Story = screen('member', 'Explore', '/');
 export const Saved: Story = screen('member', 'Saved', '/saved/');
 export const Trips: Story = screen('member', 'Trips', '/trips/');
+// Just booked, with policies still to sign: the banner on top (D-327).
+export const TripsJustBooked: Story = screen('member', 'Trips — just booked', '/trips/', { added: 'dummy-trip-1' });
 export const Messages: Story = screen('member', 'Messages', '/messages/');
 export const Profile: Story = screen('member', 'Profile', '/profile/');
 
 // Screens you tap into (the nested-page template, D-213).
 export const NewTrip: Story = screen('member', 'New trip', '/trips/new/');
-export const Place: Story = screen('member', 'A place', '/place/', { id: 's1', from: 'explore' });
+/*
+ * A place, as a member sees it (Will, 5 October, D-305: "one storybook story
+ * with parameters to switch"). Four kinds (D-313):
+ *   - Place profile: services to pick from, then About, then the rows, and
+ *     "Plan a trip" once one is picked.
+ *   - No services: the same page without the cards; Plan a trip straight away.
+ *   - Drop-in: a program that meets on a schedule — "When to come", no
+ *     booking, Get directions at the foot.
+ *   - Visit profile: a visit booked — "Your next visit" and Change
+ *     appointment on top, the visit's service, then address and hours.
+ * A new message from the program can wait on the first and last, shown as
+ * the "New message" row with a pink dot. Each combination is a real example
+ * place, so what is on screen is what the app would show for it.
+ */
+type PlaceProfileArgs = {
+  profile: 'Place profile' | 'No services' | 'Drop-in' | 'Visit profile';
+  newMessage: boolean;
+};
+const PLACE_FOR: Record<string, Record<string, string>> = {
+  'Place profile|false': { id: 'dummy-place-library', from: 'explore' },
+  'Place profile|true': { id: 'dummy-place-learning', from: 'explore' },
+  'No services|false': { id: 'dummy-place-money', from: 'explore' },
+  'No services|true': { id: 'dummy-place-money', from: 'explore' },
+  'Drop-in|false': { id: 'dummy-place-family', from: 'explore' },
+  'Drop-in|true': { id: 'dummy-place-food', from: 'explore' },
+  'Visit profile|true': { id: 'dummy-place-learning', from: 'explore', trip: 'dummy-trip-1' },
+  'Visit profile|false': { id: 'dummy-place-workforce', from: 'explore', trip: 'dummy-trip-2' },
+};
+export const PlaceProfile: Story = screenWithControls<PlaceProfileArgs>(
+  'member',
+  'Place profile',
+  '/place/',
+  {
+    args: { profile: 'Place profile', newMessage: false },
+    argTypes: {
+      profile: { control: 'inline-radio', options: ['Place profile', 'No services', 'Drop-in', 'Visit profile'] },
+      newMessage: { control: 'boolean', name: 'New message from the program' },
+    },
+  },
+  (args) => PLACE_FOR[`${args.profile}|${args.newMessage}`]!,
+);
+// Booked (D-333): the trip, and Bring a friend folded under it.
+export const TripBooked: Story = screen('member', 'Trip booked', '/trips/new/', { booked: 'dummy-trip-1' });
 // A program's policies, read and signed by a member (D-270).
 export const PlacePolicies: Story = screen('member', 'Policies to sign', '/place/policies/', {
   id: 'dummy-place-learning',
@@ -31,14 +79,13 @@ export const PlacePolicy: Story = screen('member', 'A policy to sign', '/place/p
   place: 'dummy-place-learning',
   id: 'policy-confidentiality',
 });
-export const ReportPlace: Story = screen('member', 'Report a place', '/flag/', { place: 's1' });
+export const ReportPlace: Story = screen('member', 'Report a place', '/flag/', { place: 'dummy-place-learning' });
 export const Conversation: Story = screen('member', 'A conversation', '/messages/thread/', { id: CONVO_ID });
 export const ConversationOptions: Story = screen('member', 'Conversation options', '/messages/thread/options/', {
   id: CONVO_ID,
 });
 export const Notifications: Story = screen('member', 'Notifications', '/notifications/');
 export const Connections: Story = screen('member', 'Connections', '/connections/');
-export const ConnectionProfile: Story = screen('member', 'A connection', '/connections/person/', { id: 'dummy-p1' });
 export const Points: Story = screen('member', 'Points', '/points/');
 export const Reminders: Story = screen('member', 'Text reminders', '/reminders/');
 export const TextAlerts: Story = screen('member', 'Text alerts', '/alerts/');
@@ -54,4 +101,34 @@ export const Privacy: Story = screen('member', 'Privacy policy', '/privacy/');
 
 // Before any of it.
 export const SignIn: Story = screen('signed-out', 'Sign in', '/signin/');
-export const SignUp: Story = screen('signed-out', 'Sign up', '/join/');
+// Sign up, step by step, is below (D-319); the whole walk, from the phone, here.
+export const SignUpWalk: Story = screen('member', 'Sign up — the whole walk', '/prototype/join/', { kind: 'member' });
+
+/** Each sign-up screen, in order, and the `step` the prototype opens on (D-319). */
+const SIGN_UP_STEPS = {
+  Phone: 'phone',
+  Code: 'code',
+  'About you': 'details',
+  'Your program': 'program',
+  'What Pam shares': 'privacy',
+  Texts: 'texts',
+  Welcome: 'done',
+} as const;
+type SignUpStep = keyof typeof SIGN_UP_STEPS;
+
+/**
+ * Signing up, one screen at a time (D-319, Will, 6 October: "I don't see
+ * sign up screens for program and case manager staff individual pages").
+ * The Onboarding folder walks the whole flow; this opens on any step.
+ */
+type SignUpArgs = { step: SignUpStep };
+export const SignUp: Story = screenWithControls<SignUpArgs>(
+  'member',
+  'Sign up',
+  '/prototype/join/',
+  {
+    args: { step: 'Phone' },
+    argTypes: { step: { control: 'select', options: ['Phone', 'Code', 'About you', 'What Pam shares', 'Texts', 'Welcome'] } },
+  },
+  (args) => ({ kind: 'member', step: SIGN_UP_STEPS[args.step] }),
+);

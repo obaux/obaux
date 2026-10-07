@@ -12,7 +12,6 @@ const meta = { title: 'Onboarding' } satisfies Meta;
 
 export default meta;
 
-export const Member: StoryObj = screen('member', 'Member', '/prototype/join/', { kind: 'member' });
 
 /**
  * A case manager and a program arrive by an invite link (D-254): its Sign in,
@@ -41,5 +40,5 @@ export const ExpiredLink: StoryObj = screen('provider', 'Expired link', '/protot
   as: 'program',
 });
 
-/** About PAM (D-259): what PAM is and how it helps each kind of person, from Sign in's footer. */
-export const About: StoryObj = screen('member', 'About PAM', '/about/');
+/** About Pam (D-259): what Pam is and how it helps each kind of person, from Sign in's footer. */
+export const About: StoryObj = screen('member', 'About Pam', '/about/');

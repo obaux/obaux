@@ -44,7 +44,11 @@ const styles = stylex.create({
     // parallel (Will, 3 October).
     borderRadius: '14px',
     color: colorVars['--color-icon-accent'],
-    backgroundColor: colorVars['--color-background-muted'],
+    // The category's illustration fills it (D-337); white is only the fallback.
+    backgroundColor: colorVars['--color-background-card'],
+    position: 'relative',
+    isolation: 'isolate',
+    overflow: 'hidden',
   },
   body: { minWidth: 0, flexGrow: 1 },
   // One line, ending in "…" — a long program name no longer pushes the
@@ -63,7 +67,16 @@ const styles = stylex.create({
 
 const TOKEN_ICON = { width: 14, height: 14, 'aria-hidden': true } as const;
 
-export function TripCard({ placeName, when, href, art, withName, withPhotoUrl, label, policies = null }: TripCardProps) {
+export function TripCard({
+  placeName,
+  when,
+  href,
+  art,
+  withName,
+  withPhotoUrl,
+  label,
+  policies = null,
+}: TripCardProps) {
   return (
     <ClickableCard label={label} href={href} padding={3} xstyle={styles.card}>
       <HStack gap={4} align="center" wrap="nowrap">

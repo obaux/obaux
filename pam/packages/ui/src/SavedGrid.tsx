@@ -8,6 +8,7 @@ import { IconButton } from '@astryxdesign/core/IconButton';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
+import { VisitTag } from './VisitTag.js';
 
 /**
  * Saved places as a two-by-two grid (D-213, from the reference Will gave on
@@ -27,8 +28,16 @@ export interface SavedTile {
   /** "School and training", or a distance. */
   readonly subtitle?: string | null;
   readonly href: string;
-  /** The placeholder picture's icon. */
+  /** The picture: the category's illustration, `size="fill"` (D-337). */
   readonly art: ReactNode;
+  /**
+   * A booked visit, "Oct 7 · 10:00 AM" (D-292): a small white chip in the
+   * picture's top corner (Will, D-296: "chips should be white and subtle"),
+   * so the saved place says when you are going. Left out with no visit.
+   */
+  readonly tag?: string | null;
+  /** The tile's spoken name when it has a tag — "Example Learning Center. Your visit: …". */
+  readonly label?: string;
 }
 
 const styles = stylex.create({
@@ -38,8 +47,15 @@ const styles = stylex.create({
     aspectRatio: '1 / 1',
     width: '100%',
     color: colorVars['--color-icon-accent'],
-    backgroundColor: colorVars['--color-background-muted'],
+    // White, so the category's coloured icon and its glow carry the
+    // picture (Will, D-292) — grey made every tile look like a placeholder.
+    backgroundColor: colorVars['--color-background-card'],
     fontSize: '48px',
+    position: 'relative',
+    isolation: 'isolate',
+    // The picture is decoration over the card's own link: taps go through
+    // to the link (positioning it for the tag had put it on top).
+    pointerEvents: 'none',
   },
   name: {
     fontSize: '17px',
@@ -88,6 +104,7 @@ export function SavedGrid({ tiles, label, isEditing = false, onRemove, removeLab
             <Card padding={0} xstyle={styles.square}>
               <HStack align="center" justify="center" xstyle={styles.square}>
                 {tile.art}
+                {tile.tag ? <VisitTag label={tile.tag} isOverlay /> : null}
               </HStack>
             </Card>
             <VStack gap={0.5} xstyle={styles.words}>
@@ -114,7 +131,7 @@ export function SavedGrid({ tiles, label, isEditing = false, onRemove, removeLab
                 {body}
               </>
             ) : (
-              <ClickableCard label={tile.name} href={tile.href} variant="transparent" padding={0} xstyle={styles.link}>
+              <ClickableCard label={tile.label ?? tile.name} href={tile.href} variant="transparent" padding={0} xstyle={styles.link}>
                 {body}
               </ClickableCard>
             )}

@@ -43,7 +43,7 @@ import { CITY_HALL, loadOrigin, saveOrigin, type AreaOption } from '@/lib/useAre
 import { AreaSearch, AreaTrigger } from './AreaPicker';
 
 /**
- * The first screen in PAM that shows real data.
+ * The first screen in Pam that shows real data.
  *
  * Everything on it comes from the catalogue in Supabase through one RPC. There
  * is no fixture and no fallback list: if the query fails, the screen says so in
@@ -52,10 +52,10 @@ import { AreaSearch, AreaTrigger } from './AreaPicker';
  *
  * What it deliberately does not do:
  *
- *   - claim a place is open. PAM holds no opening hours for any imported
+ *   - claim a place is open. Pam holds no opening hours for any imported
  *     provider, so the first action is Hours, which opens the place's Google
  *     listing (D-032, D-044).
- *   - name a condition. The card shows the provider's own name and PAM's
+ *   - name a condition. The card shows the provider's own name and Pam's
  *     neutral category, never a subcategory the source implied (0020).
  *
  * The origin is City Hall until onboarding asks where someone is staying. That
@@ -68,7 +68,7 @@ import { AreaSearch, AreaTrigger } from './AreaPicker';
  * numbers, close to `<Page>`'s but not the same (520px against 560px), and
  * skipped `<Page>`'s `PageEnter` wrapper entirely — so its edges sat a few
  * pixels off from every screen either side of it, and it was the one screen in
- * PAM that did not fade in like the rest. `Page.tsx`'s own file comment
+ * Pam that did not fade in like the rest. `Page.tsx`'s own file comment
  * already named this exact failure mode before it happened here.
  *
  * **"Saved" is a fifth chip in the filter row, not a button below the list**
@@ -158,7 +158,7 @@ function PlacesScreen() {
 
   /*
    * Save now writes. It used to flip a boolean in this component, which is why
-   * a member could save a place, walk to the bus stop, reopen PAM and find it
+   * a member could save a place, walk to the bus stop, reopen Pam and find it
    * gone (D-102).
    */
   const { state: session } = useSession();
@@ -222,9 +222,7 @@ function PlacesScreen() {
         }
       />
 
-      {isPickingArea ? (
-        <AreaSearch onChange={chooseArea} onClose={() => setIsPickingArea(false)} />
-      ) : null}
+      <AreaSearch isOpen={isPickingArea} current={area} onChange={chooseArea} onClose={() => setIsPickingArea(false)} />
 
       <PageTitle title={t('places.title')} backHref="/" backLabel={t('nav.back.home')} />
 
@@ -256,7 +254,7 @@ function PlacesScreen() {
         places yet and will say so rather than vanish. Saved is the fifth chip
         and the odd one out in this row — a real link to its own screen, not a
         filter — so it carries the icon that already means "saved" everywhere
-        else in PAM rather than pretending to be a sixth category.
+        else in Pam rather than pretending to be a sixth category.
       */}
       <HStack gap={2} wrap="wrap" role="group" aria-label={t('places.filterLabel')}>
         <Button
@@ -350,6 +348,8 @@ function PlacesScreen() {
                 <ScrollReveal key={place.id} index={index}>
                 <PlaceCard
                   name={place.name}
+                  category={place.category}
+                  artSeed={place.id}
                   href={`/place/?id=${encodeURIComponent(place.id)}&from=places`}
                   description={place.description}
                   {...(miles ? { distanceLabel: t(miles.key, miles.vars) } : {})}

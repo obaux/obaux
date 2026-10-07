@@ -4,7 +4,7 @@ import { Page, TextField, type TextFieldProps } from '@pam/ui';
 import { useStoryText } from '../support/useStoryText';
 
 /**
- * Astryx's TextInput at PAM's 56px, with a `purpose` that sets the keyboard,
+ * Astryx's TextInput at Pam's 56px, with a `purpose` that sets the keyboard,
  * autofill and name for the job — `phone` gets the dial pad, `code` the
  * number pad and one-time-code autofill.
  *
@@ -28,7 +28,8 @@ function LocalisedField({ label, description, value, status, ...rest }: TextFiel
 }
 
 const meta = {
-  title: 'Components/TextField',
+  title: 'Components/Inputs/TextField',
+  tags: ['autodocs'],
   component: TextField,
   decorators: [
     (Story) => (
@@ -50,7 +51,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Phone: Story = {};
+export const Default: Story = {};
 export const PhoneFilled: Story = { args: { value: '215 555 0100' } };
 export const Code: Story = { args: { label: 'signin.code.label', purpose: 'code', value: '123456' } };
 

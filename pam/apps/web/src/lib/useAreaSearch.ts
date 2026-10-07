@@ -16,7 +16,7 @@ import { useEffect, useState } from 'react';
  *      the browser can ask it directly. It is an enhancement: if it is slow,
  *      blocked, or offline, the ZIP list still answers.
  *
- * The typed text goes to the city's public address list and nowhere else. PAM
+ * The typed text goes to the city's public address list and nowhere else. Pam
  * does not log it, does not store it, and does not send it to its own server —
  * where a person is staying is exactly the kind of fact this audience has good
  * reason to guard (D-054).

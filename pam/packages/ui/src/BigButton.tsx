@@ -6,10 +6,10 @@ import type { ReactNode } from 'react';
 import { Press } from './motion.js';
 
 /**
- * The primary call to action, everywhere in PAM (§2.4).
+ * The primary call to action, everywhere in Pam (§2.4).
  *
  * Astryx's own Button tops out at 36px tall (`size="lg"`), which is right for a
- * dense desktop tool and wrong for this product. PAM sets the button at 56px
+ * dense desktop tool and wrong for this product. Pam sets the button at 56px
  * with 17px text (§2.5 as amended by D-239), so BigButton overrides the height
  * through `xstyle` — the sanctioned escape hatch — rather than forking it.
  *
@@ -41,7 +41,7 @@ const styles = stylex.create({
     minHeight: '56px',
     fontSize: '17px',
     fontWeight: 600,
-    // A full pill, like every button in PAM (Will, 3 October, D-253).
+    // A full pill, like every button in Pam (Will, 3 October, D-253).
     borderRadius: '999px',
   },
 });

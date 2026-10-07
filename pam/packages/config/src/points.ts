@@ -110,11 +110,13 @@ export const POINTS_RULES: Readonly<Record<PointsReason, PointsRule>> = {
     dailyCap: 1,
     note: 'First message to a buddy each day.',
   },
+  /** Bring a friend (D-330, Will, 6 October): 150, up from the SOP's 100 — the most a single action earns. */
   refer_someone: {
     reason: 'refer_someone',
-    points: 100,
+    points: 150,
     verification: 'referral_code',
     dailyCap: null,
+    note: 'Awarded when the friend joins from a member\'s Bring a friend link, not when the link is sent.',
   },
   /** §10 step 10: finishing onboarding. */
   finish_setup: { reason: 'finish_setup', points: 25, verification: 'automatic', dailyCap: 1 },
@@ -175,7 +177,7 @@ export function progressToNextLevel(points: number): number {
 /**
  * The badges, named by Will (14 September).
  *
- * The names are the point of them. PAM's members are returning citizens, and
+ * The names are the point of them. Pam's members are returning citizens, and
  * the vocabulary a system uses about somebody becomes the vocabulary they use
  * about themselves — so these are drawn from the village rather than from the
  * gym: Returned, Rooted, Elder, Sankofa. Nothing here is a rank over another
@@ -186,8 +188,8 @@ export function progressToNextLevel(points: number): number {
  *
  *   - **Core progression** is points, which come from real-world activity —
  *     enrolling, attending, keeping at it. These are the ladder.
- *   - **Category** badges belong to the three fixed tracks (§2.5), two per
- *     track: one for starting, one for depth.
+ *   - **Category** badges belong to the three fixed tracks (§2.5): one for
+ *     starting and one for depth, except family, which has only Anchor (D-308).
  *   - **Milestone** badges are one-offs. Some are warm (Homecoming), one is
  *     deliberately forgiving: Sankofa, the Akan symbol for going back to fetch
  *     what was left, reframes a lapse as a return. For a population whose
@@ -195,10 +197,10 @@ export function progressToNextLevel(points: number): number {
  *     is not decoration.
  *
  * `Patriarch` was offered for the family track and is deliberately not used:
- * not every member is a man, and Steward says the same thing about somebody who
- * holds a household together without assuming who they are.
+ * not every member is a man. Steward, which replaced it, was removed too (Will,
+ * 6 October, D-308), so the family track has one badge, Anchor.
  *
- * Two of these cannot be earned yet, and say so in `blockedBy`: PAM has no
+ * Two of these cannot be earned yet, and say so in `blockedBy`: Pam has no
  * buddy system — the only relationships modelled today are member to mentor and
  * member to case manager — so Drum and Elder wait on it. They are defined now
  * because the names are the decision; the rules can follow.
@@ -283,7 +285,7 @@ export const BADGES: readonly BadgeDefinition[] = [
     group: 'core',
     minPoints: 5000,
     rule: { type: 'is_mentor_to', atLeast: 1 },
-    blockedBy: 'No buddy system yet — PAM models member/mentor and member/case manager only.',
+    blockedBy: 'No buddy system yet — Pam models member/mentor and member/case manager only.',
   },
   {
     key: 'chief',
@@ -297,7 +299,7 @@ export const BADGES: readonly BadgeDefinition[] = [
     blockedBy: 'No buddy system yet, and no circles.',
   },
 
-  // Category — two per fixed track: one for starting, one for depth.
+  // Category — one for starting, one for depth; family has only Anchor (D-308).
   {
     key: 'scholar',
     labelKey: 'badge.scholar',
@@ -348,23 +350,13 @@ export const BADGES: readonly BadgeDefinition[] = [
     category: 'family_services',
     rule: { type: 'completed_enrollment', category: 'family_services', atLeast: 1 },
   },
-  {
-    key: 'steward',
-    labelKey: 'badge.steward',
-    name: 'Steward',
-    descriptionPlain: 'You hold the household together.',
-    icon: 'hearth',
-    group: 'category',
-    category: 'family_services',
-    rule: { type: 'completed_enrollment', category: 'family_services', atLeast: 5 },
-  },
 
   // Milestones — one-offs, and the only place a lapse is named kindly.
   {
     key: 'firstborn',
     labelKey: 'badge.firstborn',
     name: 'Firstborn',
-    descriptionPlain: 'First from your program or your city to join PAM.',
+    descriptionPlain: 'First from your program or your city to join Pam.',
     icon: 'sunrise',
     group: 'milestone',
     rule: { type: 'first_member_of', scope: ['org', 'region'] },
@@ -401,7 +393,7 @@ export const BADGES: readonly BadgeDefinition[] = [
     key: 'homecoming',
     labelKey: 'badge.homecoming',
     name: 'Homecoming',
-    descriptionPlain: 'One year with PAM.',
+    descriptionPlain: 'One year with Pam.',
     icon: 'home',
     group: 'milestone',
     rule: { type: 'account_age', months: 12 },

@@ -14,7 +14,7 @@ import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
  * The Profile screen's cards (D-210): who you are, the two doors beside each
  * other, and a single offer. Modelled on the reference Will gave on 1 October —
  * white page, generous rounded cards lifted by the theme's card shadow, very
- * little text on each — and kept to PAM's floors: 48px targets, 18px body.
+ * little text on each — and kept to Pam's floors: 48px targets, 18px body.
  */
 
 // ---------------------------------------------------------------------------
@@ -27,7 +27,7 @@ export interface ProfileStat {
 
 export interface ProfileSummaryProps {
   readonly name: string;
-  /** "Member", "Case manager" — who PAM knows this account as. */
+  /** "Member", "Case manager" — who Pam knows this account as. */
   readonly roleLabel: string;
   /** A photo, when there is one; otherwise the avatar shows initials. */
   readonly photoUrl?: string | null;
@@ -102,13 +102,21 @@ export function ProfileSummary({ name, roleLabel, photoUrl, stats, corner, nameA
 export interface FeatureTileProps {
   readonly label: string;
   readonly href: string;
-  /** Drawn large above the label — a PAM icon or an avatar stack. */
+  /** Drawn large above the label — a Pam icon or an avatar stack. */
   readonly art: ReactNode;
+  /**
+   * A small ribbon across the foot of the art — "Your badge" on a member's
+   * award tile (Will, 5 October, D-286), so "Rooted" reads as something
+   * earned, not a place. Laid over the art, not under it, so this tile
+   * stays exactly the shape of the one beside it.
+   */
+  readonly hint?: string;
 }
 
 const tile = stylex.create({
   card: { flexGrow: 1, flexBasis: 0, minWidth: 0 },
   art: {
+    position: 'relative',
     width: '88px',
     height: '88px',
     borderRadius: '24px',
@@ -117,14 +125,36 @@ const tile = stylex.create({
     backgroundColor: colorVars['--color-accent-muted'],
   },
   label: { fontSize: '18px', fontWeight: 600, textAlign: 'center' },
+  hint: {
+    position: 'absolute',
+    bottom: '-9px',
+    left: '50%',
+    transform: 'translateX(-50%)',
+    whiteSpace: 'nowrap',
+    paddingInline: '8px',
+    paddingBlock: '2px',
+    borderRadius: '999px',
+    fontSize: '11px',
+    lineHeight: 1.4,
+    fontWeight: 700,
+    letterSpacing: '0.02em',
+    color: colorVars['--color-text-accent'],
+    backgroundColor: colorVars['--color-background-card'],
+    boxShadow: '0 1px 3px light-dark(oklch(0 0 0 / 14%), oklch(0 0 0 / 50%))',
+  },
 });
 
-export function FeatureTile({ label, href, art }: FeatureTileProps) {
+export function FeatureTile({ label, href, art, hint }: FeatureTileProps) {
   return (
-    <ClickableCard label={label} href={href} padding={4} xstyle={tile.card}>
+    <ClickableCard label={hint ? `${hint}: ${label}` : label} href={href} padding={4} xstyle={tile.card}>
       <VStack gap={3} align="center">
         <HStack align="center" justify="center" xstyle={tile.art}>
           {art}
+          {hint ? (
+            <Text aria-hidden xstyle={tile.hint}>
+              {hint}
+            </Text>
+          ) : null}
         </HStack>
         <Text xstyle={tile.label}>{label}</Text>
       </VStack>

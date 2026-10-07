@@ -7,8 +7,10 @@ import { DUMMY_ANYONE } from '@pam/config/dummy-people';
 import { contextFor } from './DummyRows';
 import { useI18n } from '@/lib/i18n';
 import { sendDemoThreadMessage, useDemoThread } from '@/lib/demoMessages';
+import { staffPhotoFor } from '@pam/config/dummy-connections';
 import { ThreadView } from './ThreadView';
 import { ThreadHeader } from './ThreadFrame';
+import { ThreadVisit } from './ThreadVisit';
 
 /**
  * An example conversation, for a role preview (D-180, D-183): the written
@@ -25,11 +27,16 @@ export function DemoThread({
   role,
   speechLanguage,
   supportPhone,
+  backHref = '/messages/',
+  backLabel,
 }: {
   readonly conversationId: string;
   readonly role: Role;
   readonly speechLanguage: string;
   readonly supportPhone: string;
+  /** Where Back goes — the program's page when opened from it (D-313). */
+  readonly backHref?: string;
+  readonly backLabel?: string;
 }) {
   const { t } = useI18n();
   const typed = useDemoThread(conversationId);
@@ -59,7 +66,7 @@ export function DemoThread({
   };
 
   // D-187: a member sees who this is to them; staff see nothing beside a
-  // member's name; the PAM team is named as such (D-262).
+  // member's name; the Pam team is named as such (D-262).
   const context = contextFor(role, other ? { role: other.role, programName: other.orgName ?? null } : null, t);
 
   return (
@@ -67,13 +74,18 @@ export function DemoThread({
       <ThreadHeader
         name={other?.firstName ?? t('messages.thread.someone')}
         context={context}
-        backHref="/messages/"
-        backLabel={t('nav.back.messages')}
+        backHref={backHref}
+        backLabel={backLabel ?? t('nav.back.messages')}
         menuHref={`/messages/thread/options/?id=${encodeURIComponent(conversationId)}`}
       />
+      {/* A member's visit with this program, under the name (D-276). */}
+      {role === 'member' && other?.role === 'provider' ? (
+        <ThreadVisit programName={other.orgName ?? null} threadId={conversationId} />
+      ) : null}
       <ThreadView
         messages={messages}
         otherName={other?.firstName ?? null}
+        otherPhotoUrl={staffPhotoFor(other?.firstName, other?.orgName)}
         onSend={send}
         sending={false}
         sendFailed={false}

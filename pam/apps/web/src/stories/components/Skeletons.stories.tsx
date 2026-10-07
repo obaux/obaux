@@ -35,7 +35,8 @@ function Skeletons({ shape, count }: { readonly shape: Shape; readonly count?: n
 }
 
 const meta = {
-  title: 'Components/Skeletons',
+  title: 'Components/Feedback/Skeletons',
+  tags: ['autodocs'],
   component: Skeletons,
   decorators: [
     (Story) => (
@@ -55,7 +56,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /** Places, while the list loads — four cards, as `/places/` asks for. */
-export const PlaceCardList: Story = {};
+export const Default: Story = {};
 
 /** A place's own screen, while `service_detail` answers. */
 export const PlaceDetail: Story = { args: { shape: 'placeDetail' } };

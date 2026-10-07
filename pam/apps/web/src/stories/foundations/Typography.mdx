@@ -1,0 +1,38 @@
+import { Meta, Typeset } from '@storybook/addon-docs/blocks';
+
+<Meta title="Foundations/Typography" />
+
+# Typography
+
+One family, **Figtree**, self-hosted from `@pam/ui` (`fonts.css`) — nothing loads from Google.
+Fallback: the system UI font.
+
+## Pam's sizes
+
+Astryx's type roles are tuned for dense desktop apps; Pam sets its own sizes for phones and says so
+in each component.
+
+| Role | Size | Weight | Used for |
+| --- | --- | --- | --- |
+| Large title | 34px | 700 | The `h1` of a nested screen (`SubPage`) |
+| Page title | 28px | 700 | Tab screens (`--pam-title-size`) |
+| Section heading | 20–22px | 700 | "Pick a service", card headings |
+| Body | 18px | 400 | Anything a member must read (`--pam-body-text-mobile`) |
+| Row label | 17–18px | 400–600 | `MenuList` rows, card names |
+| Supporting | 15–17px | 400 | Second lines, hints, times |
+| Button | 17px | 600 | `BigButton` |
+
+Never go below 15px for something a member reads. Line height 1.4–1.5 for body text.
+
+<Typeset
+  fontFamily="Figtree, system-ui, sans-serif"
+  fontSizes={[34, 28, 22, 18, 17, 15]}
+  fontWeight={700}
+  sampleText="Plan a trip to Example Learning Center"
+/>
+<Typeset
+  fontFamily="Figtree, system-ui, sans-serif"
+  fontSizes={[18, 17, 15]}
+  fontWeight={400}
+  sampleText="Reading, writing and math toward the GED test, four mornings a week."
+/>

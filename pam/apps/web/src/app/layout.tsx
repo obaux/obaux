@@ -14,14 +14,15 @@ import { Providers } from '@/lib/providers';
 import './layers.css';
 import '@astryxdesign/core/reset.css';
 import '@astryxdesign/core/astryx.css';
-import '../theme/pam.css';
+import '@pam/ui/theme/pam.css';
+import '@pam/ui/fonts.css';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'PAM',
-  description: 'PAM helps you find people and places that can help.',
+  title: 'Pam',
+  description: 'Pam helps you find people and places that can help.',
   manifest: '/manifest.webmanifest',
-  appleWebApp: { capable: true, title: 'PAM', statusBarStyle: 'default' },
+  appleWebApp: { capable: true, title: 'Pam', statusBarStyle: 'default' },
 };
 
 export const viewport: Viewport = {

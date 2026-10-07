@@ -29,7 +29,7 @@ import { useDemoView } from '@/lib/useDemoView';
 import { RoleSwitchControl } from '../RoleSwitchControl';
 
 /**
- * Everyone on PAM, for the person running it.
+ * Everyone on Pam, for the person running it.
  *
  * The first screen a super admin has ever had. Until now the role existed in
  * the database — it decides flagged places (0032) and receives reports (A7) —
@@ -95,7 +95,7 @@ export default function DirectoryPage() {
   /**
    * Bringing somebody in.
    *
-   * The person running PAM is the only one who can make a case manager (0049),
+   * The person running Pam is the only one who can make a case manager (0049),
    * and they have no city of their own, so the card asks which city first. The
    * code is the product: read down the phone or texted, eight characters that
    * survive being said out loud.

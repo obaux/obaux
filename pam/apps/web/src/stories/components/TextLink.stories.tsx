@@ -12,7 +12,8 @@ function LocalisedLink({ label, ...rest }: TextLinkProps) {
 }
 
 const meta = {
-  title: 'Components/TextLink',
+  title: 'Components/Actions/TextLink',
+  tags: ['autodocs'],
   component: TextLink,
   decorators: [
     (Story) => (

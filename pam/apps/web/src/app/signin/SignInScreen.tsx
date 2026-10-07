@@ -21,12 +21,12 @@ import { previewInvite } from '@/lib/useInviteLinks';
 import { navigate } from '@/lib/navigate';
 
 /**
- * The only way into PAM, and the same door for everybody: a member, a program
+ * The only way into Pam, and the same door for everybody: a member, a program
  * manager, a case manager, a super admin. No password, ever (§9). What you see
  * after the code comes from the account, never from which link you followed —
  * nobody has to know what kind of user they are in order to get in.
  *
- * The screen is two things stacked. Above: three slides saying what PAM is,
+ * The screen is two things stacked. Above: three slides saying what Pam is,
  * one idea each, because somebody arriving has been handed a link and has no
  * reason yet to type their phone number into it. Below: the card, which is the
  * whole job. The card itself lives in `PhoneSignInCard` — step 1 of `/join/`
@@ -41,7 +41,7 @@ import { navigate } from '@/lib/navigate';
  * ghost button between the slides and the card reads as a fourth thing to
  * decide before anybody has decided the first. The path it guarded is still
  * open where it matters: every failure on this screen renders a Notice
- * carrying PAM's number, which is where somebody stuck actually is.
+ * carrying Pam's number, which is where somebody stuck actually is.
  */
 
 const styles = stylex.create({
@@ -121,7 +121,7 @@ export function SignInScreen({
   readonly invite?: Invite | null;
   /**
    * Who is reading, without an invite — `/signin/?as=case-manager` from
-   * About PAM's "Sign in as…" (D-259). Only the slides change.
+   * About Pam's "Sign in as…" (D-259). Only the slides change.
    */
   readonly audience?: InviteRole | null;
 } = {}) {
@@ -168,7 +168,7 @@ export function SignInScreen({
   }, [session, state.step, router, preview]);
 
   /**
-   * What PAM is, in three sentences: a place to look, a person to ask, a
+   * What Pam is, in three sentences: a place to look, a person to ask, a
    * reminder so it does not get missed. That is the product, in the order
    * somebody meets it.
    *
@@ -212,7 +212,7 @@ export function SignInScreen({
    *
    * Three ways out, in the order they are decided.
    *
-   * **No profile** means the phone is verified and PAM has no record of this
+   * **No profile** means the phone is verified and Pam has no record of this
    * person: they are signing up, not signing in, and the flow picks them up at
    * step 2 with the step behind them already done. Until sign-up existed this
    * case landed on a home screen that offered them the door they had just come
@@ -310,7 +310,7 @@ export function SignInScreen({
   const heroHeader = (
     <div {...stylex.props(styles.heroHeader)}>
       <VStack gap={4} align="center" xstyle={styles.heroBrand}>
-        <img src="/pam-wordmark-white.svg" alt="PAM" {...stylex.props(styles.heroMark)} />
+        <img src="/pam-wordmark-white.svg" alt="Pam" {...stylex.props(styles.heroMark)} />
         <Text xstyle={styles.heroCity}>{t('signin.city')}</Text>
       </VStack>
       <div {...stylex.props(styles.heroGlobe)}>
@@ -335,7 +335,7 @@ export function SignInScreen({
           like every other (D-253), with only "Sent to" centred. */}
       <Page align={onFirstStep ? 'center' : 'start'} gap={3}>
         {onFirstStep ? (
-          // Somebody waiting on a code has already decided what PAM is: the
+          // Somebody waiting on a code has already decided what Pam is: the
           // hero belongs to the first step only, and the card rides up over
           // its bottom edge instead of sitting in a header-then-card stack.
           <VStack gap={0} align="center" xstyle={styles.heroGroup}>

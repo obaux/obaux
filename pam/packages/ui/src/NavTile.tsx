@@ -60,7 +60,7 @@ const styles = stylex.create({
   // A whole card is the target, so it clears the floor several times over — but
   // stated, because a tile with a one-word description could otherwise shrink
   // under it.
-  body: { minHeight: pam.touchTargetMin },
+  body: { minHeight: pam['--pam-touch-target-min'] },
   art: {
     fontSize: '28px',
     lineHeight: 1,

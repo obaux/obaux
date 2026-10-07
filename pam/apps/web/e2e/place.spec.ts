@@ -15,9 +15,9 @@ import { settled } from './settled';
  *
  *   - the name is a heading once, not twice (the page title carries it)
  *   - getting there is the one primary action (§2.5), and routes to the point
- *     rather than the address when PAM has one (D-045)
+ *     rather than the address when Pam has one (D-045)
  *   - sample hours say out loud that they are samples
- *   - a place PAM cannot find is a sentence and a way out, never a blank (§0)
+ *   - a place Pam cannot find is a sentence and a way out, never a blank (§0)
  */
 
 const ME = 'de3b9c2e-ec2f-403b-93e5-86e6ee75349b';
@@ -90,58 +90,80 @@ test.describe("a place's own screen", () => {
     await expect(page.getByText(/free or low cost for most people/)).toBeVisible();
 
     // D-235, D-247: a member's one primary action is Plan a trip, straight into
-    // the New trip steps with this place chosen; Directions is the fourth circle.
+    // the New trip steps with this place chosen; Get directions is the first row (D-291).
     await expect(page.getByRole('link', { name: 'Plan a trip' })).toHaveAttribute(
       'href',
       new RegExp(`/trips/new/\\?place=${PLACE.id}`),
     );
-    await expect(page.getByRole('link', { name: 'Directions', exact: true })).toHaveAttribute(
+    await expect(page.getByRole('link', { name: /^Get directions/ })).toHaveAttribute(
       'href',
       /destination=39\.9612%2C-75\.2172/,
     );
-    await expect(page.getByRole('link', { name: 'Directions', exact: true })).toHaveAttribute(
+    // D-294: no travel mode — Maps chooses, not Pam.
+    await expect(page.getByRole('link', { name: /^Get directions/ })).not.toHaveAttribute(
       'href',
-      /travelmode=walking/,
+      /travelmode/,
     );
   });
 
   test('routes to the address only when there is no point to route to', async ({ page }) => {
     // The city feeds keep geometry current and let address text rot, so the
-    // point wins whenever PAM has one. This is the row that has none.
+    // point wins whenever Pam has one. This is the row that has none.
     await signedIn(page);
     await page.route(DETAIL, (route) =>
       route.fulfill(json([{ ...PLACE, lat: null, lon: null }])),
     );
     await page.goto(`/place/?id=${PLACE.id}`);
 
-    await expect(page.getByRole('link', { name: 'Directions', exact: true })).toHaveAttribute(
+    await expect(page.getByRole('link', { name: /^Get directions/ })).toHaveAttribute(
       'href',
       /destination=111%20N%2049th%20St/,
     );
   });
 
-  test('the actions are round buttons with words, and the rest is in the bar', async ({ page }) => {
-    // D-224: Website, Message, Call and Directions under the name, each a
-    // labelled circle; Check hours on Google at the foot of the hours card;
+  test('directions open on the place itself when Pam has its Google ID', async ({ page }) => {
+    // D-291: the place ID rides along, so Maps opens on the place, not a pin.
+    await signedIn(page);
+    await page.route(DETAIL, (route) => route.fulfill(json([{ ...PLACE, place_id: 'ChIJexample123' }])));
+    await page.goto(`/place/?id=${PLACE.id}`);
+
+    const directions = page.getByRole('link', { name: /^Get directions/ });
+    await expect(directions).toHaveAttribute('href', /destination_place_id=ChIJexample123/);
+    await expect(directions).toHaveAttribute('target', '_blank');
+    // Directions, then message, then call, then the website. Bring a friend
+    // is not here: it waits for the booked screen (D-333).
+    const rows = page.getByRole('list', { name: 'Ways to reach this place' }).getByRole('link');
+    await expect(rows.nth(0)).toHaveAccessibleName(/^Get directions/);
+    await expect(rows.nth(1)).toHaveAccessibleName(/^Send a message/);
+    await expect(page.getByText('Bring a friend')).toHaveCount(0);
+  });
+
+  test('the actions are rows, directions first, and the rest is in the bar', async ({ page }) => {
+    // D-291: Get directions, Send a message, Call and Website under the name,
+    // as rows with a line each (they were labelled circles, D-224); the hours a row too, the week in a drawer (D-309);
     // Save and the ⋯ menu (Flag something, Share, Message) in the bar.
     await signedIn(page);
     await page.route(DETAIL, (route) => route.fulfill(json([PLACE])));
     await page.goto(`/place/?id=${PLACE.id}`);
 
-    await expect(page.getByRole('link', { name: 'Call', exact: true })).toHaveAttribute('href', 'tel:+12155550100');
-    await expect(page.getByRole('link', { name: 'Website', exact: true })).toHaveAttribute(
+    await expect(page.getByRole('link', { name: /^Call/ })).toHaveAttribute('href', 'tel:+12155550100');
+    await expect(page.getByRole('link', { name: /^Website/ })).toHaveAttribute(
       'href',
       'https://example.org/kirkbride',
     );
-    // D-235: the fourth circle is Directions, and routes there.
-    await expect(page.getByRole('link', { name: 'Directions', exact: true })).toHaveAttribute(
+    // D-235, D-291: Get directions comes first, and routes there.
+    await expect(page.getByRole('link', { name: /^Get directions/ })).toHaveAttribute(
       'href',
       /google\.com\/maps\/dir/,
     );
+    // D-309: the hours are a row too, today's on it; the week and Check
+    // hours on Google open in a drawer.
+    await page.getByRole('button', { name: /^Hours: / }).click();
     await expect(page.getByRole('link', { name: 'Check hours on Google' })).toHaveAttribute(
       'href',
       /google\.com\/maps\/search/,
     );
+    await page.keyboard.press('Escape');
     await expect(page.getByRole('button', { name: 'Save this place' })).toBeVisible();
     await page.getByRole('button', { name: 'More options' }).click();
     await expect(page.getByRole('menuitem', { name: 'Flag something' })).toBeVisible();
@@ -156,8 +178,11 @@ test.describe("a place's own screen", () => {
     await page.route(DETAIL, (route) => route.fulfill(json([PLACE])));
     await page.goto(`/place/?id=${PLACE.id}`);
 
+    // In the week drawer (D-309), with today marked.
+    await page.getByRole('button', { name: /^Hours: / }).click();
     await expect(page.getByRole('heading', { name: 'Opening hours' })).toBeVisible();
-    await expect(page.getByText(/sample hours while PAM checks the real ones/)).toBeVisible();
+    await expect(page.getByText('Today', { exact: true })).toBeVisible();
+    await expect(page.getByText(/sample hours while Pam checks the real ones/)).toBeVisible();
   });
 
   test('marks a place a member cannot walk into, above everything else', async ({ page }) => {
@@ -171,14 +196,14 @@ test.describe("a place's own screen", () => {
     await expect(page.getByText('Ages 10 to 17')).toBeVisible();
   });
 
-  test('a place PAM cannot find is a sentence and a way out, not a blank', async ({ page }) => {
+  test('a place Pam cannot find is a sentence and a way out, not a blank', async ({ page }) => {
     await signedIn(page);
     await page.route(DETAIL, (route) => route.fulfill(json([])));
     await page.goto('/place/?id=nope');
 
     await expect(page.getByRole('heading', { name: 'We could not find that place' })).toBeVisible();
     // §0: never dead-end. The list, and the number to call, both on the screen.
-    // "Not on PAM right now" is an empty state rather than an alarm — nothing
+    // "Not on Pam right now" is an empty state rather than an alarm — nothing
     // went wrong, the place is simply not there — so the number is a link on
     // the card, not inside a banner.
     await expect(page.getByRole('link', { name: 'Places' }).first()).toBeVisible();
@@ -198,6 +223,12 @@ test.describe("a place's own screen", () => {
     await page.goto(`/place/?id=${PLACE.id}`);
     await expect(page.getByRole('heading', { name: 'Kirkbride Center' })).toBeVisible();
 
+    await settled(page);
+    // "Plan a trip" rides the bottom edge while the page scrolls under it
+    // (D-326); on a short phone the last row is half under it until you
+    // scroll, which axe reads as an obscured target. Read the page at its
+    // end, where everything is in the open and the footer is just the end.
+    await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
     await settled(page);
     const results = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa', 'wcag22aa'])

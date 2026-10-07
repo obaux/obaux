@@ -97,7 +97,7 @@ test.describe('with motion on', () => {
     await page.evaluate(() => {
       (window as unknown as { __pamStayed?: boolean }).__pamStayed = true;
     });
-    await page.getByRole('link', { name: 'About PAM' }).click();
+    await page.getByRole('link', { name: 'About Pam' }).click();
     await expect(page).toHaveURL(/\/about\/$/);
     await expect(page.locator('main')).toBeVisible();
     expect(await page.evaluate(() => (window as unknown as { __pamStayed?: boolean }).__pamStayed)).toBe(true);

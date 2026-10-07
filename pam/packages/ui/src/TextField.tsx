@@ -5,9 +5,9 @@ import { TextInput, type TextInputProps } from '@astryxdesign/core/TextInput';
 import { pam } from './tokens.stylex.js';
 
 /**
- * A text field at PAM's size.
+ * A text field at Pam's size.
  *
- * Astryx draws its largest input at 36px tall. PAM's floor is a 48px touch
+ * Astryx draws its largest input at 36px tall. Pam's floor is a 48px touch
  * target (§2.5), which the field already met — by extending the hit area beyond
  * the frame. That is the wrong half to grow: on a phone a person aims at what
  * they can see, so a box that is smaller than its target teaches people they
@@ -108,7 +108,7 @@ export interface TextFieldProps extends TextInputProps {
 
 const styles = stylex.create({
   frame: {
-    height: pam.fieldHeight,
+    height: pam['--pam-field-height'],
     // Astryx sets height from its size token; a taller box needs the padding to
     // grow with it or the text sits against the left edge.
     paddingInline: '14px',

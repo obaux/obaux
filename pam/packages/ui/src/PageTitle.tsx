@@ -41,13 +41,13 @@ export interface PageTitleProps {
 }
 
 const styles = stylex.create({
-  title: { fontSize: pam.titleSize, lineHeight: 1.2 },
+  title: { fontSize: pam['--pam-title-size'], lineHeight: 1.2 },
   subtitle: { fontSize: '17px' },
   // Pulled toward the edge of the page so the arrow lines up with the content
   // below it rather than sitting indented from everything.
   back: {
-    minHeight: pam.touchTargetMin,
-    minWidth: pam.touchTargetMin,
+    minHeight: pam['--pam-touch-target-min'],
+    minWidth: pam['--pam-touch-target-min'],
     marginInlineStart: '-10px',
     fontSize: '22px',
   },
@@ -63,6 +63,8 @@ export function PageTitle({ title, subtitle, backHref, backLabel, titleControl }
             icon={<Icon icon="chevronLeft" />}
             variant="ghost"
             href={backHref}
+            // Back through history when there is some (D-277).
+            {...({ 'data-pam-back': '' } as Record<string, string>)}
             xstyle={styles.back}
           />
         ) : null}

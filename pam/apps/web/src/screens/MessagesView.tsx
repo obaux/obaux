@@ -10,7 +10,7 @@ import { List } from '@astryxdesign/core/List';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
-import { ExploreIcon, MessagesIcon, NewMessageIcon, NoResultsIcon, Page } from '@pam/ui';
+import { ExploreIcon, MessagesIcon, NewMessageIcon, NoResultsIcon, Page, textLinkLook } from '@pam/ui';
 import { LargeTitleHeader } from '@pam/ui/LargeTitleHeader';
 import { SearchField } from '@pam/ui/SearchPill';
 import { useI18n } from '@/lib/i18n';
@@ -39,6 +39,8 @@ export interface MessageRow {
   readonly when: string | null;
   readonly unread: boolean;
   readonly href: string;
+  /** Their photo when Pam has one (D-335); their initials otherwise. */
+  readonly photoUrl?: string | null;
 }
 
 export interface MessagesViewProps {
@@ -119,7 +121,9 @@ function MessageListRow({ row, newLabel }: { readonly row: MessageRow; readonly 
   return (
     <ListItem
       href={row.href}
-      startContent={<Avatar size="lg" name={row.name} tooltip={false} alt="" />}
+      startContent={
+        <Avatar size="lg" name={row.name} {...(row.photoUrl ? { src: row.photoUrl } : {})} tooltip={false} alt="" />
+      }
       label={
         <Text xstyle={[styles.name, row.unread && styles.nameUnread]}>
           {row.name}
@@ -180,7 +184,7 @@ export function MessagesView({
             label={t('messages.search.cancel')}
             variant="ghost"
             onClick={() => setQuery(null)}
-            xstyle={styles.cancel}
+            xstyle={[styles.cancel, textLinkLook.link]}
           />
         </HStack>
       ) : (

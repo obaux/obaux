@@ -7,7 +7,8 @@ import { SuccessScreen } from '@pam/ui/SuccessScreen';
  * quiet secondary way on. Shown here as Connect's done state.
  */
 const meta = {
-  title: 'Components/SuccessScreen',
+  title: 'Components/Feedback/SuccessScreen',
+  tags: ['autodocs'],
   component: SuccessScreen,
   args: {
     title: 'You’re helping Marcus on their way!',
@@ -20,4 +21,4 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Recommended: Story = {};
+export const Default: Story = {};

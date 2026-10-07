@@ -1,13 +1,13 @@
 /**
  * The email with a fresh invite link (Will, 4 October, D-263): "only ask for
  * email and email them the new invite link for their role. Let's draft an
- * email message. Format email with PAM logo on top center. Center aligned
+ * email message. Format email with Pam logo on top center. Center aligned
  * email format. Simple."
  *
  * Sent when someone holding an expired link gives their address on the
  * expired-link page (`request_invite_link`, 0071). One email, one button. It
  * says who invited them and as what — the context the expired page kept —
- * and nothing about why anybody might be joining PAM: the dignity rules for
+ * and nothing about why anybody might be joining Pam: the dignity rules for
  * texts (§9) apply to email too, so no justice-related words, ever.
  *
  * Plain tables and inline styles, because that is what email clients render
@@ -41,30 +41,30 @@ export const INVITE_EMAIL: {
   readonly reviewedBy: string;
 } = {
   en: {
-    subject: 'Your new PAM link',
-    preheader: 'Here is a new link to join PAM. It works for 30 days.',
+    subject: 'Your new Pam link',
+    preheader: 'Here is a new link to join Pam. It works for 30 days.',
     title: 'Here is your new link',
     body: {
-      member: '{inviter} invited you to join the PAM network. Your last link ran out, so here is a new one. It works for 30 days.',
-      provider: '{inviter} invited you to be a program partner in the PAM network. Your last link ran out, so here is a new one. It works for 30 days.',
-      admin: '{inviter} invited you to be a case manager in the PAM network. Your last link ran out, so here is a new one. It works for 30 days.',
+      member: '{inviter} invited you to join the Pam network. Your last link ran out, so here is a new one. It works for 30 days.',
+      provider: '{inviter} invited you to be a program partner in the Pam network. Your last link ran out, so here is a new one. It works for 30 days.',
+      admin: '{inviter} invited you to be a case manager in the Pam network. Your last link ran out, so here is a new one. It works for 30 days.',
     },
-    button: 'Open PAM',
+    button: 'Open Pam',
     fallback: 'If the button does not work, copy this link into your browser:',
-    footer: 'You asked for this link on PAM. If it was not you, you can ignore this email.',
+    footer: 'You asked for this link on Pam. If it was not you, you can ignore this email.',
   },
   es: {
-    subject: 'Su nuevo enlace de PAM',
-    preheader: 'Aquí tiene un enlace nuevo para unirse a PAM. Sirve por 30 días.',
+    subject: 'Su nuevo enlace de Pam',
+    preheader: 'Aquí tiene un enlace nuevo para unirse a Pam. Sirve por 30 días.',
     title: 'Aquí tiene su enlace nuevo',
     body: {
-      member: '{inviter} le invitó a unirse a la red de PAM. Su enlace anterior se venció, así que aquí tiene uno nuevo. Sirve por 30 días.',
-      provider: '{inviter} le invitó a ser un programa aliado en la red de PAM. Su enlace anterior se venció, así que aquí tiene uno nuevo. Sirve por 30 días.',
-      admin: '{inviter} le invitó a ser gestor de casos en la red de PAM. Su enlace anterior se venció, así que aquí tiene uno nuevo. Sirve por 30 días.',
+      member: '{inviter} le invitó a unirse a la red de Pam. Su enlace anterior se venció, así que aquí tiene uno nuevo. Sirve por 30 días.',
+      provider: '{inviter} le invitó a ser un programa aliado en la red de Pam. Su enlace anterior se venció, así que aquí tiene uno nuevo. Sirve por 30 días.',
+      admin: '{inviter} le invitó a ser gestor de casos en la red de Pam. Su enlace anterior se venció, así que aquí tiene uno nuevo. Sirve por 30 días.',
     },
-    button: 'Abrir PAM',
+    button: 'Abrir Pam',
     fallback: 'Si el botón no funciona, copie este enlace en su navegador:',
-    footer: 'Usted pidió este enlace en PAM. Si no fue usted, puede ignorar este correo.',
+    footer: 'Usted pidió este enlace en Pam. Si no fue usted, puede ignorar este correo.',
   },
   reviewedBy: 'Will (Oba), 4 October 2026',
 };
@@ -76,7 +76,7 @@ export interface InviteEmailInput {
   /** The inviter's first name; "Someone" / "Alguien" when unknown. */
   readonly inviterFirstName: string | null;
   readonly locale: InviteEmailLocale;
-  /** Where PAM lives, for the logo. No trailing slash. */
+  /** Where Pam lives, for the logo. No trailing slash. */
   readonly appUrl: string;
   /** Render a draft anyway — for previews only, never for sending. */
   readonly draft?: boolean;
@@ -101,7 +101,7 @@ export function renderInviteEmail(input: InviteEmailInput): RenderedEmail {
   const link = escape(input.link);
   const logo = `${input.appUrl}/email/pam-logo.png`;
 
-  // Centred, one column, 480px at most; PAM's ink, white and its green button.
+  // Centred, one column, 480px at most; Pam's ink, white and its green button.
   const html = `<!doctype html>
 <html lang="${input.locale}">
 <head>
@@ -116,7 +116,7 @@ export function renderInviteEmail(input: InviteEmailInput): RenderedEmail {
 <tr><td align="center" style="padding:32px 16px;">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:480px;background-color:#ffffff;border-radius:24px;">
 <tr><td align="center" style="padding:40px 32px 8px;">
-<img src="${escape(logo)}" width="112" alt="PAM" style="display:block;width:112px;height:auto;border:0;">
+<img src="${escape(logo)}" width="112" alt="Pam" style="display:block;width:112px;height:auto;border:0;">
 </td></tr>
 <tr><td align="center" style="padding:24px 32px 0;font-family:Helvetica,Arial,sans-serif;font-size:26px;line-height:1.25;font-weight:700;color:#111111;">
 ${escape(copy.title)}

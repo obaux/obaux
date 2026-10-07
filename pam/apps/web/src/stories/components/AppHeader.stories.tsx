@@ -50,7 +50,8 @@ function Switch({ viewing }: { readonly viewing: (typeof ROLES)[number] }) {
 }
 
 const meta = {
-  title: 'Components/AppHeader',
+  title: 'Components/Navigation/AppHeader',
+  tags: ['autodocs'],
   component: AppHeader,
   decorators: [
     (Story) => (
@@ -71,7 +72,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const Member: Story = { args: { trailing: <Bell unread={0} /> } };
+export const Default: Story = { args: { trailing: <Bell unread={0} /> } };
 
 export const CaseManagerWithNews: Story = {
   args: { roleLabel: 'role.admin', trailing: <Bell unread={2} /> },

@@ -9,7 +9,7 @@
 // The three refusals, in order of how much they matter:
 //
 //   1. No `reviewedBy` on the template  -> nothing sends. This is the one that
-//      keeps PAM silent until Will reads the copy.
+//      keeps Pam silent until Will reads the copy.
 //   2. Fails the safety check           -> that message is dropped and logged.
 //      §9: no message may reveal justice involvement, exceed 160 characters,
 //      or carry emoji.

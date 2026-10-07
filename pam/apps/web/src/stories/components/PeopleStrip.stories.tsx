@@ -36,7 +36,8 @@ const caseload: PeopleStripProps['people'] = DUMMY_MEMBERS.map((person, index) =
 });
 
 const meta = {
-  title: 'Components/PeopleStrip',
+  title: 'Components/Cards/PeopleStrip',
+  tags: ['autodocs'],
   component: PeopleStrip,
   decorators: [
     (Story) => (
@@ -53,7 +54,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /** A case manager's members. */
-export const CaseManager: Story = {};
+export const Default: Story = {};
 
 /** Nobody has done anything new: no rings. */
 export const NothingNew: Story = {

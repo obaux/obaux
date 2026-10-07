@@ -11,7 +11,7 @@ import { settled } from './settled';
  *  - the request it sends never names a role, so nobody types their way into
  *    seeing other people's information (0046);
  *  - the two staff answers create no account at all;
- *  - a city PAM does not serve gets an offer, not an error, and the text
+ *  - a city Pam does not serve gets an offer, not an error, and the text
  *    opt-in on that screen is never pre-ticked.
  *
  * Supabase is unreachable from here, so auth and every RPC are stubbed at the
@@ -44,10 +44,10 @@ interface Calls {
 }
 
 /**
- * A verified phone with no PAM record: the person step 2 exists for.
+ * A verified phone with no Pam record: the person step 2 exists for.
  *
  * `cityServed` false makes `start_membership` answer the way Postgres does for
- * a city PAM is not in — P0002, which is what the screen branches on.
+ * a city Pam is not in — P0002, which is what the screen branches on.
  */
 async function newcomer(
   page: import('@playwright/test').Page,
@@ -91,7 +91,7 @@ async function newcomer(
       await route.fulfill({
         status: 400,
         contentType: 'application/json',
-        body: JSON.stringify({ code: 'P0002', message: 'PAM is not in that city yet' }),
+        body: JSON.stringify({ code: 'P0002', message: 'Pam is not in that city yet' }),
       });
       return;
     }
@@ -210,17 +210,17 @@ test.describe('signing up', () => {
     await expect(page.getByRole('radio', { name: 'Parole Officer or Case Manager' })).toHaveCount(0);
   });
 
-  test('a city PAM does not serve is an offer, not an error', async ({ page }) => {
+  test('a city Pam does not serve is an offer, not an error', async ({ page }) => {
     const calls = await newcomer(page, { cityServed: false });
     await page.goto('/join/');
     await fillDetails(page, 'Scranton');
     await page.getByRole('button', { name: 'Next' }).click();
 
-    await expect(page.getByText('PAM is not in Scranton yet.')).toBeVisible();
-    await expect(page.getByText('Right now PAM is in Philadelphia.')).toBeVisible();
+    await expect(page.getByText('Pam is not in Scranton yet.')).toBeVisible();
+    await expect(page.getByText('Right now Pam is in Philadelphia.')).toBeVisible();
 
     // Unticked, and it stays unticked unless somebody ticks it (A2P 30925).
-    const optIn = page.getByRole('checkbox', { name: /Text me when PAM opens/ });
+    const optIn = page.getByRole('checkbox', { name: /Text me when Pam opens/ });
     await expect(optIn).not.toBeChecked();
 
     await page.getByRole('button', { name: 'Save my city' }).click();
@@ -237,12 +237,12 @@ test.describe('signing up', () => {
     await fillDetails(page, 'Scranton');
     await page.getByRole('button', { name: 'Next' }).click();
 
-    await page.getByRole('checkbox', { name: /Text me when PAM opens/ }).check();
+    await page.getByRole('checkbox', { name: /Text me when Pam opens/ }).check();
     await page.getByRole('button', { name: 'Save my city' }).click();
 
     await expect.poll(() => calls.waiting.length).toBe(1);
     expect(calls.waiting[0]!['p_wants_updates']).toBe(true);
-    await expect(page.getByText(/We will text you when PAM opens/)).toBeVisible();
+    await expect(page.getByText(/We will text you when Pam opens/)).toBeVisible();
   });
 
   test('a name is asked for before anything is sent', async ({ page }) => {
@@ -256,14 +256,14 @@ test.describe('signing up', () => {
   });
 
   test('a signed-out visitor starts at the phone, with the consent sentence', async ({ page }) => {
-    // Step 1 is the same card as /signin/, including the sentence saying PAM
+    // Step 1 is the same card as /signin/, including the sentence saying Pam
     // will text a code — the STOP/rates language moved to /reminders/ (D-139).
     await page.route(USER, (route) => route.fulfill({ status: 401, body: '{}' }));
     await page.goto('/join/');
 
     await expect(page.getByText('Step 1 of 5').first()).toBeVisible();
     await expect(page.getByLabel('Your phone number')).toBeVisible();
-    await expect(page.getByText(/PAM texts you a code to sign in/)).toBeVisible();
+    await expect(page.getByText(/Pam texts you a code to sign in/)).toBeVisible();
   });
 
   test('has no WCAG A/AA violations', async ({ page }) => {

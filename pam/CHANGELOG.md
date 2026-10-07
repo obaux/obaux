@@ -69,7 +69,162 @@ when there are three or four. At the foot of a place's page, members can read
 the program's policies before a visit and sign them: draw your name with your
 finger (or type it) the first time, and every policy after that is one tap.
 Trips show "Signatures needed" or "Policies signed", and booking a visit ends
-with a button to sign.
+with a button to sign. A place you have a visit at shows its policies near
+the top: orange "Sign before your visit", or green once everything is signed.
+A small × on a signature clears it so you can sign again, the Sign button sits
+right under your saved signature, and text links no longer show a grey pill
+when pressed. Each card on Connections now has a message button in its corner;
+a program person's card links to the program's page and says who connected
+you, and there is no separate profile page any more. Opening a place from a trip
+shows that visit's day and time instead of "Plan a trip", with the address
+first. On Profile a member sees their award level instead of past trips, and
+the text reminders card has a bell. The chosen language is bold and green
+with a heavier tick, and Explore's area is a link that fits on one line. Changing the area opens a
+drawer: search with the usual search bar, use your current location, pick a
+result, and press Done. A conversation with a program shows your booked
+visit at the top; tapping it opens the place, and Back returns to the
+conversation. Back now returns to the screen you came from, everywhere. When signing
+policies, the Sign button stays at the bottom of the screen, and Done at the
+top right takes you straight back to the program.
+Your points screen is a journey now: your level with a progress bar to the
+next one, the ways to earn points and what each is worth, a shorter ladder,
+and badges as medals. Reaching a new level brings confetti.
+"Check hours on Google" and the Cancel beside each search are plain links.
+A place opened from a trip leads with a larger green card: "Your next
+visit", the day and time, and "Change appointment", which moves the visit
+and comes back to the place. Its address and hours now come before what the
+place is. A place you saved shows as saved when you open it from a trip. Saving a new
+time shows a short celebration with the new day and time, then goes home.
+Cards scrolling under the bottom menu fade out over a taller band, and the end of a list scrolls clear of it.
+"Invite someone" stays clear above the fade, and Trips' drawer has none. A
+member's award on Profile carries a small "Your badge" ribbon. Place cards
+have a small illustration for their kind of place at the top left, the
+save mark lines up with the name, and the open line is smaller and quieter.
+Category chips have a soft glow of their colour behind each icon.
+Closed, the Trips drawer shows only its title, with no card peeking out. The
+"something new" dots on the bottom menu and the bell are the same bright pink
+as the selected tab. Half open, the Trips drawer shows more of the third trip.
+A place's actions are now a list — Get directions first, then Send a message,
+Call and Website — each with a line saying what it does; directions open
+Google Maps on the place itself when PAM knows it.
+On Saved, a place you have a visit at shows the day and time on its picture,
+and opening it shows that visit (Back returns to Saved); a changed time
+changes the tag. Each picture is white, with its category's icon in colour
+and a soft glow.
+Trip cards and Explore's next-visit card show each category's icon in its own
+colour on white, and the glow behind icons is softer and the same everywhere.
+Get directions opens Google Maps without forcing a walking route, and the
+smaller second line on list rows says "Open in Google Maps". Profile's award
+and Connections tiles, every badge and every rung of the ladder now have
+their own pictures, in the same style as the place cards; badges you have
+not earned yet are shown in grey. On Saved, a visit shows as a small white
+chip in the picture's corner. The soft glows are gone: category chips show a
+small two-tone circle behind their icon, and the pictures on Saved, trip
+cards and the next-visit card are filled with the category's palest colour,
+cut by flat shards like the illustrations. Pictures and illustrations share a
+printed grain, and the chips' circles are darker on the left.
+Home and family places show a home with a heart on its door instead of a
+grocery bag, in the same colours. On trip cards and the next-visit card the
+icon is printed into the picture's colour rather than drawn on top.
+Saved's date chip sits a little further in from the corner. The example food
+pantry no longer has a visit, so Saved and its page show a place without one.
+Pins on the Trips map no longer cover the "Map preview" note or fall under the
+drawer. Explore's examples are nine programs, three of each kind, and most have
+no visit and are not saved. A place with a visit shows the same date chip on
+Explore as on Saved and opens to its visit. When a program has written to
+you, its page says "New message" with a pink dot and opens the conversation. Its
+preview is one line and ends in "…". Call on a place's page shows the phone
+number. On Your points, the badges sit in their own card, a little further
+below the ladder, with the title centred. The example member has earned
+Scholar, and the top card shows it as their newest badge.
+The Steward badge has been removed.
+On a place's page, opening hours are a row, "Hours: Monday", with today's times under it; tap
+it for the whole week with today marked. Plan a trip stays at the foot of the
+screen however far you scroll. "What this place is" is now "About program".
+The links at the foot of Sign in are further apart. The language
+menu's dial is smaller and evenly padded. A program lead's Program tab lists
+Policies for participants with the other rows, and labels its number "Contact
+phone number".
+In Storybook, each role's Sign up can be opened on any one of its steps.
+A case manager can invite another case manager. The super admin has Invite
+someone on their Profile and a "+ New invite" button on Invited people.
+A program lead's Home reads "Coming in this week": the range is a word you
+tap to switch, instead of a row of three tabs.
+A program checks people in with the circle beside each visit — it springs and
+bursts, says "Checked in", and asks before undoing — and the subtitle says
+"Not checked in" or "Checked in". A light-green pen marks someone who has
+signed every policy. From the +, a program can book a visit for somebody who
+wrote to it; it shows on their Trips and the program's schedule.
+The app spells its own name "Pam" everywhere it is written (text messages
+and texts begin "Pam:" too).
+Booking for a member shows who is already booked, when they last wrote, and
+what they said; a program can add somebody new by name and number, and Pam
+texts them a link that opens on their booked visit. The program lead's Home
+has a calmer head: plain arrows, no visit total, search only on the week
+and month.
+On a member's profile a program sees "Policies signed · 3 of 4" and a page
+listing which, with a note on top when the member still has some to sign.
+In Storybook, a member's screens sit under Created, Invited by program and
+Invited by case manager.
+On a place, "Plan a trip" stays at the foot of the screen while you scroll,
+with the page fading out above it instead of a hard edge, and "Policies to
+sign" sits with Send a message and Call. Planning a trip and signing policies
+keep their button at the foot the same way.
+A program can list the services it offers, each with its own phone number,
+website and policies: named when signing up, managed from the Program tab,
+shown first on the program's page as grey cards to pick from, then what the
+program is, then the address, then the rows. Pick a card and its dial fills and it turns light green; the
+page then describes that service, with its address, number, website and
+directions, and Plan a trip is for it; a booked visit shows its own
+service's details. A service can be at a different address from the program; the page then
+says "Main address" or "Service address". Messaging a program from its page
+and pressing Back returns to that page. A service can also keep its own
+hours, and the place's open or closed line follows the service you pick.
+After booking, Trips asks you to sign a program's policies in one short
+banner instead of a large card.
+A program that just meets on a schedule says when to come instead of asking
+you to book.
+The design system now stands on its own: its colours, fonts and theme ship
+with the component package, in one tokens file and a built stylesheet, every
+component has a story with its variants, and Storybook explains how to use
+them (D-328).
+A program's page starts its list with "Bring a friend", which opens a link
+to send so a friend can join the same program. The sign-before-you-go
+banner on Trips is no longer washed out at its top edge (D-329).
+Bringing a friend is now "Go together": the program's picture, a preview of
+the text your friend will get, and 150 points when they join, which the
+Points page lists first among ways to earn (D-330).
+Planning a visit and bringing a friend now share one card that shows the
+program in its colour. Once a visit is booked, the place page names its service
+next to the time instead of showing the service picker (D-332).
+Booking a trip now ends on "Your trip is booked", where Bring a friend
+opens to the link and a Copy button; its separate page is gone. Walk-in
+programs are planned the same way, from the days they meet. Signing no
+longer lets the sheet slide while you draw, and the line says "Sign here"
+instead of an "×" (D-333).
+A screen's one button now sits at the bottom of the screen whatever the
+length of the page, so Sign on a policy is always in the same place. Pressing
+Next without a day or time says which is missing. The trip card is white
+with a soft shadow, the day and time under the name. "Your trip is booked"
+shows any policies still to sign, and closes with an × to Trips (D-334).
+A booked place shows the face of the person you'll meet, at the right of
+the open/closed line; tap it for their name and title. Messages shows
+people's photos where Pam has them (D-335). The trip card says how soon
+the visit is ("In 2 days"). "Your trip is booked" lists Policies to sign and
+Bring a friend as rows; Bring a friend opens a drawer with a picture, the
+link and Copy. Signing from there ends with an × back to Trips. Trips now
+shows "Policies signed" once a visit's own policies are signed, and a
+banner for the next trip still to sign. Messages' "People who offered help"
+is one line, with a line above and below it, like every row that floats
+above the menu (D-336). "Your trip is booked" now shows the same green card as a
+booked place, with how soon and Change appointment, and Back from the
+policies returns to it. Tapping Bring a friend copies the link straight
+away and says "Link copied" for 3 seconds, under a new banner picture, with
+an × to close. Saved, trip cards and the next visit show each kind of
+place's own illustration (D-337). Drawers no longer have a dark outline. The Bring a
+friend picture runs to the drawer's edges, the × sits in its corner, and
+"Link copied" fills the link box in the same pale green as Copy (D-338). The green visit card has more room between its lines, and
+"Link copied" now spans the link box and Copy, centred (D-339). More room under the friend banner and above the link (D-340). "In 2 days" is plain text now, and Change appointment sits evenly in the card's corner (D-341). It has the same space above and below (D-342). It ends in a chevron, and the program's name on the card is black (D-343).
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 

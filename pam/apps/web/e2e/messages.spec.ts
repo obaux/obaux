@@ -136,7 +136,7 @@ test.describe('the conversation list', () => {
     await settled(page);
 
     await expect(page.getByRole('link', { name: /Help/ })).toHaveCount(0);
-    await expect(page.getByRole('link', { name: 'PAM' })).toHaveAttribute('href', '/');
+    await expect(page.getByRole('link', { name: 'Pam' })).toHaveAttribute('href', '/');
   });
 
   test('the title switches sections for a case manager, by tap and by keyboard', async ({ page }) => {
@@ -445,7 +445,7 @@ test.describe('a conversation', () => {
     await expect(page.getByRole('radiogroup', { name: 'Say this message is not safe' })).toBeVisible();
     await page.getByRole('radio', { name: /threatens me/ }).check();
     await page.getByRole('button', { name: 'Send report' }).click();
-    await expect(page.getByText('Thank you. PAM will look at it.')).toBeVisible();
+    await expect(page.getByText('Thank you. Pam will look at it.')).toBeVisible();
     // Never a dead end: the way back to the conversation.
     await expect(page.getByRole('link', { name: 'Back to the conversation' }).first()).toBeVisible();
   });

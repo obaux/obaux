@@ -7,7 +7,7 @@ import en from '@pam/config/locales/en.json';
 /**
  * The privacy notice and the terms.
  *
- * These are read by somebody deciding whether to trust PAM with a phone number,
+ * These are read by somebody deciding whether to trust Pam with a phone number,
  * often looking for one specific answer. So the tests are about finding things:
  * that the contents list exists, that it goes where it says, and that the page
  * tells you where you are as you read.

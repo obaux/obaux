@@ -14,6 +14,7 @@ export * from './points.js';
 export * from './language.js';
 export * from './notices.js';
 export * from './distance.js';
+export * from './phone.js';
 /*
  * `hours` is deliberately NOT re-exported here. It is a places concern, and a
  * barrel export puts it in the first load of every screen — including home,
@@ -35,7 +36,7 @@ export function isSupportedLocale(value: string): value is Locale {
 /**
  * Roles (§3). Role is set by invite type and never self-selected (§10 step 6).
  *
- * `super_admin` is the one nobody is invited into: it is PAM's own operator,
+ * `super_admin` is the one nobody is invited into: it is Pam's own operator,
  * added to the database in 0032 for deciding flagged places and absent from
  * this list until 0043 gave that person a screen. The code was already
  * rendering `role.super_admin` from a session — the type was simply behind the
@@ -58,7 +59,7 @@ export type AccessStatus = (typeof ACCESS_STATUSES)[number];
  *
  * **Messages are not on this list and must not be added.** Will's call, and it
  * is the right shape of rule: a returning citizen cut off from messaging is cut
- * off from the people PAM exists to connect them to, and the person doing the
+ * off from the people Pam exists to connect them to, and the person doing the
  * cutting is the one with power over them. Everything else here degrades
  * somebody's experience; that one isolates them.
  *
@@ -149,7 +150,7 @@ export const SESSION_PERSIST_DAYS = 90;
  */
 export const INVITE_CODE_ALPHABET = '34679ACDEFGHJKMNPQRTUVWXY';
 export const INVITE_CODE_LENGTH = 8;
-export const INVITE_CODE_PREFIX = 'PAM-';
+export const INVITE_CODE_PREFIX = 'Pam-';
 export const INVITE_EXPIRY_DAYS = 30;
 
 /** §11 — self-harm flag surfaces this line in-app to the sender. */

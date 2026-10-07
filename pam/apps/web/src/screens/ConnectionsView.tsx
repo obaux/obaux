@@ -1,15 +1,13 @@
 'use client';
 
 import * as stylex from '@stylexjs/stylex';
-import { Avatar } from '@astryxdesign/core/Avatar';
 import { Card } from '@astryxdesign/core/Card';
 import { EmptyState } from '@astryxdesign/core/EmptyState';
-import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
-import { BigButton, ConnectionsIcon } from '@pam/ui';
+import { ConnectionsIcon } from '@pam/ui';
 import { SubPage } from '@pam/ui/SubPage';
-import { ConnectionCard, ConnectionStats, type ConnectionStat } from '@pam/ui/ConnectionCard';
+import { ConnectionCard, type ConnectionStat } from '@pam/ui/ConnectionCard';
 import { useI18n } from '@/lib/i18n';
 
 /**
@@ -19,8 +17,9 @@ import { useI18n } from '@/lib/i18n';
  * Exactly the people `can_message()` (0063) relates to the member — their
  * case manager, and a person at each program they are enrolled in — so
  * nobody appears here who could not also be messaged. Each card is a person
- * (Will, 1 October: "focus on people first"), and opens their profile, where
- * the one action is to message them.
+ * (Will, 1 October: "focus on people first"). Since D-272 the card is the
+ * whole profile — there is no page behind it: message them from the round
+ * button, open their program from its name, and see who connected you.
  */
 export interface Connection {
   readonly id: string;
@@ -35,6 +34,12 @@ export interface Connection {
   readonly peopleHelped?: number;
   /** Written in themselves: "EN · ES". */
   readonly languages?: string;
+  /** The program's place, for the link under the name (D-272). */
+  readonly placeId?: string | null;
+  /** The example conversation with them, or wherever a message starts. */
+  readonly messageHref: string;
+  /** Who connected the member to this person — their case manager (D-272). */
+  readonly connectedBy?: { readonly firstName: string; readonly photoUrl?: string | null } | null;
 }
 
 export interface ConnectionsViewProps {
@@ -43,9 +48,6 @@ export interface ConnectionsViewProps {
 
 const styles = stylex.create({
   intro: { fontSize: '18px', lineHeight: 1.5 },
-  subtitle: { fontSize: '18px', textAlign: 'center' },
-  help: { fontSize: '18px', lineHeight: 1.55 },
-  heading: { fontSize: '20px', lineHeight: 1.3 },
 });
 
 export function connectionSubtitle(person: Connection, t: (key: string) => string): string {
@@ -87,54 +89,31 @@ export function ConnectionsView({ connections }: ConnectionsViewProps) {
                   key={person.id}
                   name={person.firstName}
                   subtitle={subtitle}
+                  subtitleHref={
+                    person.role === 'provider' && person.placeId
+                      ? `/place/?id=${encodeURIComponent(person.placeId)}&from=connections`
+                      : null
+                  }
                   photoUrl={person.photoUrl ?? null}
                   help={person.help ?? ''}
                   stats={connectionStats(person, t, locale)}
-                  href={`/connections/person/?id=${encodeURIComponent(person.id)}`}
-                  label={`${person.firstName}, ${subtitle}`}
+                  messageHref={person.messageHref}
+                  messageLabel={t('connections.message', { name: person.firstName })}
+                  connectedBy={
+                    person.role === 'provider' && person.connectedBy
+                      ? {
+                          label: t('connections.connectedBy', { name: person.connectedBy.firstName }),
+                          name: person.connectedBy.firstName,
+                          photoUrl: person.connectedBy.photoUrl ?? null,
+                        }
+                      : null
+                  }
                 />
               );
             })}
           </VStack>
         </>
       )}
-    </SubPage>
-  );
-}
-
-/**
- * One connection's profile (D-213): who they are, how they can help, the
- * three facts, and one action — message them. On the nested-page template,
- * back to Connections.
- */
-export function ConnectionProfileView({
-  person,
-  messageHref,
-}: {
-  readonly person: Connection;
-  readonly messageHref: string;
-}) {
-  const { t, locale } = useI18n();
-  return (
-    <SubPage title={person.firstName} backHref="/connections/" backLabel={t('nav.back.connections')}>
-      <VStack gap={2} align="center">
-        <Avatar size="xl" name={person.firstName} src={person.photoUrl ?? undefined} tooltip={false} alt="" />
-        <Text type="supporting" xstyle={styles.subtitle}>
-          {connectionSubtitle(person, t)}
-        </Text>
-      </VStack>
-      <Card padding={4}>
-        <ConnectionStats stats={connectionStats(person, t, locale)} />
-      </Card>
-      {person.help ? (
-        <VStack gap={2}>
-          <Heading level={2} xstyle={styles.heading}>
-            {t('connections.about', { name: person.firstName })}
-          </Heading>
-          <Text xstyle={styles.help}>{person.help}</Text>
-        </VStack>
-      ) : null}
-      <BigButton label={t('connections.message', { name: person.firstName })} href={messageHref} />
     </SubPage>
   );
 }

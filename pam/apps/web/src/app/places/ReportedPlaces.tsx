@@ -6,7 +6,7 @@ import { VStack } from '@astryxdesign/core/VStack';
 import { Text } from '@astryxdesign/core/Text';
 import { Button } from '@astryxdesign/core/Button';
 import { Loading, Notice, PlaceCard } from '@pam/ui';
-import { NOTICES } from '@pam/config';
+import { NOTICES, type Category } from '@pam/config';
 import { DUMMY_FLAGS } from '@pam/config/dummy-places';
 import { useI18n } from '@/lib/i18n';
 import { placeStatus } from '@/lib/usePlaceStatus';
@@ -35,6 +35,7 @@ interface Row {
   readonly id: string;
   readonly flagId: string;
   readonly name: string;
+  readonly category: Category;
   readonly description: string | null;
   readonly reason: FlaggedPlace['reason'];
   readonly count: number;
@@ -71,6 +72,7 @@ export function ReportedPlaces({
         id: f.place.id,
         flagId: f.id,
         name: f.place.name,
+        category: f.place.category,
         description: f.place.description,
         reason: f.reason,
         count: f.count,
@@ -82,6 +84,7 @@ export function ReportedPlaces({
           id: p.id,
           flagId: p.flagId,
           name: p.name,
+          category: p.category,
           description: p.description,
           reason: p.reason,
           count: p.flagCount,
@@ -146,6 +149,8 @@ export function ReportedPlaces({
           <PlaceCard
             key={row.flagId}
             name={row.name}
+            category={row.category}
+            artSeed={row.id}
             href={row.href}
             description={row.description}
             status={placeStatus(row.id, row.hours, now, t, locale)}

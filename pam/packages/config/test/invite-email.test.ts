@@ -17,7 +17,7 @@ describe('the invite email (D-263)', () => {
 
   it('says who invited them and as what, with the link twice and the logo from the app', () => {
     const email = renderInviteEmail({ ...input, draft: true });
-    expect(email.subject).toBe('Your new PAM link');
+    expect(email.subject).toBe('Your new Pam link');
     expect(email.html).toContain('Dana invited you to be a program partner');
     expect(email.html.match(/href="https:\/\/pam\.example\/signin\/\?invite=ABCD2345&amp;as=program"/g)).toHaveLength(2);
     expect(email.html).toContain('src="https://pam.example/email/pam-logo.png"');

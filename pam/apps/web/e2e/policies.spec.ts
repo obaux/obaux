@@ -63,3 +63,43 @@ test('a name can be typed instead of drawn', async ({ page }) => {
   await page.getByRole('dialog').getByRole('button', { name: 'Sign', exact: true }).click();
   await expect(page.getByText(/^Signed /)).toBeVisible();
 });
+
+test('the corner × clears a signature to sign again (D-271)', async ({ page }) => {
+  await page.goto(FIRST);
+  await page.getByRole('button', { name: 'Sign', exact: true }).click();
+  await draw(page);
+  await page.getByRole('dialog').getByRole('button', { name: 'Sign', exact: true }).click();
+  await expect(page.getByText(/^Signed /)).toBeVisible();
+
+  // Signed: × takes the signature off this policy and opens the sheet.
+  await page.getByRole('button', { name: 'Clear signature and sign again' }).click();
+  await expect(page.getByRole('dialog').getByRole('heading', { name: 'Your signature' })).toBeVisible();
+  await page.keyboard.press('Escape');
+  await expect(page.getByText(/^Signed /)).toHaveCount(0);
+  // No saved signature any more: Sign opens the sheet again.
+  await expect(page.getByText('Your signature:')).toHaveCount(0);
+});
+
+test('Done leaves the whole signing flow, back to where it started (D-279)', async ({ page }) => {
+  await page.goto('/help/');
+  // Into the list from another screen, inside the app (no reload).
+  await page.evaluate((href) => {
+    const a = document.createElement('a');
+    a.href = href;
+    a.textContent = 'Policies';
+    document.body.append(a);
+  }, LIST);
+  await page.getByRole('link', { name: 'Policies', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Policies to sign' })).toBeVisible();
+  // ... into a policy, then Done: two screens back in one go.
+  await page.getByRole('link', { name: /Confidentiality and disclosure/ }).click();
+  await expect(page.getByRole('heading', { name: 'Confidentiality and disclosure' })).toBeVisible();
+  await page.getByRole('button', { name: 'Done' }).click();
+  await expect(page).toHaveURL(/\/help\/$/);
+});
+
+test('Done on a list opened cold goes to the program (D-279)', async ({ page }) => {
+  await page.goto(LIST);
+  await page.getByRole('button', { name: 'Done' }).click();
+  await expect(page).toHaveURL(/\/place\/\?id=dummy-place-learning/);
+});

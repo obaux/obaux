@@ -13,7 +13,7 @@ import { SUPABASE_PUBLISHABLE_KEY, SUPABASE_URL } from './project';
  * a half-finished enrolment.
  *
  * Plain `supabase-js`, not `@supabase/ssr`. The SSR client keeps the session in
- * a cookie so a server can read it — and PAM has no server: it is a static
+ * a cookie so a server can read it — and Pam has no server: it is a static
  * export, wrapped by Capacitor into an app served from a local file scheme
  * where cookie behaviour is a coin toss. A session that quietly fails to
  * persist would sign a member out mid-enrolment, which is the exact failure
@@ -24,7 +24,7 @@ export function createClient() {
   // No configuration step, and nothing to forget: the project this app talks to
   // is checked in (see ./project), and an environment variable only overrides
   // it. A build that cannot reach the database because a dashboard field was
-  // left blank is a failure mode PAM does not have.
+  // left blank is a failure mode Pam does not have.
   return createSupabaseClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
     auth: {
       persistSession: true,

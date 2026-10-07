@@ -10,7 +10,7 @@ import { GLOSSARY, type GlossaryTerm } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 
 /**
- * A small "i" that explains one of PAM's own words (D-260), from the
+ * A small "i" that explains one of Pam's own words (D-260), from the
  * glossary in `@pam/config` — so a word is defined once, the same way,
  * wherever it is explained. A tap opens it (a popover, not a hover tooltip:
  * phones have no hover); tapping elsewhere closes it. Still a 48px target.

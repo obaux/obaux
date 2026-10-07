@@ -16,7 +16,7 @@ import type { AlertBannerInput, AlertBannerStatus } from './alertBanner';
  * heaviest thing this file used to touch; it is gone entirely now, in favour
  * of a compact composition from plain Astryx primitives (`HStack`, `Text`,
  * `IconButton`), the same move `Notice`/`AreaChip`/`PeopleStrip` already make
- * where PAM's own product needs something narrower than what the library's
+ * where Pam's own product needs something narrower than what the library's
  * own component draws.
  *
  * **A real block at the top of the page, not a floating overlay** (Will, 17
@@ -53,19 +53,19 @@ const styles = stylex.create({
     lineHeight: 1.3,
   },
   // A smaller glyph than the 48px button drawing it: the touch target stays
-  // at PAM's own floor (§2.5), which is what actually costs height here, but
+  // at Pam's own floor (§2.5), which is what actually costs height here, but
   // the icon inside it does not have to match that size to be legible.
   dismissIcon: { fontSize: '16px' },
   // `TextLink` has no styling escape hatch (by design — see its own file
   // comment), so the action reaches for `Button` directly instead, the same
   // way this whole file reaches for primitives over a wrapper that does not
   // fit. Still the same 48px floor `TextLink` bakes in for exactly this
-  // reason — `apps/web`'s own screens all state PAM's touch-target rule as
+  // reason — `apps/web`'s own screens all state Pam's touch-target rule as
   // this literal directly rather than importing `packages/ui`'s `pam`
   // tokens into their own `stylex.create()`, which StyleX's babel plugin
   // cannot statically resolve across a workspace package boundary.
   action: { minHeight: '48px', fontSize: '14px', paddingInline: 0 },
-  // The 32px `IconButton` renders at by default is well under PAM's own
+  // The 32px `IconButton` renders at by default is well under Pam's own
   // floor — every other icon-only control in this app sets this same pair
   // explicitly (see `AppHeader`'s account button, `AreaChip`) rather than
   // trusting Astryx's own default.

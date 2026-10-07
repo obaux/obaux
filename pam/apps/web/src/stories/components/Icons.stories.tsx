@@ -25,7 +25,7 @@ import {
 } from '@pam/ui';
 
 /**
- * PAM's own icons, for everything Astryx's chrome set has no picture of —
+ * Pam's own icons, for everything Astryx's chrome set has no picture of —
  * home, places, people, the plan. Drawn to Astryx's conventions (24 viewBox,
  * 1.5 stroke, `currentColor`, a 1em box), so they size with the text around
  * them and colour with it. Drawn plainly: a clever icon is a worse icon for
@@ -82,7 +82,8 @@ function Gallery({ size }: { readonly size: 'regular' | 'big' }) {
 }
 
 const meta = {
-  title: 'Components/Icons',
+  title: 'Foundations/Icons',
+  tags: ['autodocs'],
   component: Gallery,
   decorators: [
     (Story) => (
@@ -98,7 +99,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const All: Story = {};
+export const Default: Story = {};
 
 /** At 64px, where a wobbly path or a stray join shows. */
 export const Large: Story = { args: { size: 'big' } };

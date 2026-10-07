@@ -14,7 +14,7 @@ import { useStoryText } from '../support/useStoryText';
  *
  * Each row's `text` is an i18n key with its variables, and `when` an ISO time,
  * turned into "Today" / "Yesterday" / a date the way the screen does it — so
- * the Language toolbar changes every word that is PAM's own.
+ * the Language toolbar changes every word that is Pam's own.
  */
 const styles = stylex.create({ card: { width: '100%' } });
 
@@ -63,7 +63,8 @@ function fromDummy(rows: readonly DummyNotification[]): NotificationItem[] {
 const ago = (days: number) => new Date(Date.now() - days * 86_400_000).toISOString();
 
 const meta = {
-  title: 'Components/NotificationList',
+  title: 'Components/Feedback/NotificationList',
+  tags: ['autodocs'],
   component: NotificationList,
   decorators: [
     (Story) => (
@@ -83,7 +84,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /** What a member sees: points earned, and a saved place that changed. */
-export const Member: Story = {};
+export const Default: Story = {};
 
 /** A program: people interested in what they run. */
 export const Program: Story = { args: { items: fromDummy(DUMMY_NOTIFICATIONS.provider) } };

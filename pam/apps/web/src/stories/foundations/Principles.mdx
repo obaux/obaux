@@ -1,0 +1,42 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Foundations/Principles" />
+
+# Principles
+
+These are rules, not preferences. Several are enforced by tests. Generated UI that breaks one is
+wrong, however it looks.
+
+## The non-negotiables
+
+1. **48px minimum touch target, everywhere.** Icon buttons, rows, chips, links. A 24px icon sits in
+   a 48px hit area. Token: `--pam-touch-target-min`.
+2. **One primary action per screen.** One filled `BigButton`. A second action is a
+   `BigButton variant="secondary"`, a `TextLink`, or a row — never a second filled button.
+3. **Never dead-end.** Every screen has a visible way back (the round back button) and a visible way
+   to get help.
+4. **18px body text on phones.** Nothing a member has to read is smaller than 15px; supporting
+   lines are 15–17px. Token: `--pam-body-text-mobile`.
+5. **Astryx only.** No other component library, no hand-rolled controls. Style through StyleX and
+   tokens — never inline styles, never a raw hex or px where a token exists.
+6. **Never show justice terms.** Not "prisoner", "ex-offender", "inmate", or anything about a
+   conviction — anywhere a person can see, including texts and exports.
+7. **English and Spanish, key for key.** Every string goes through i18n; nothing is hard-coded.
+
+## How Pam feels
+
+- **Plain over clever.** "Plan a trip", not "Schedule an engagement". One idea per line.
+- **Show the next step, not every step.** A screen asks for one thing. Long forms become steps.
+- **Big, calm, and certain.** Large type, generous spacing, clear outcomes ("Your visit is booked").
+- **The member's thumb decides.** The screen's one action sits at the foot, in reach, while the
+  page scrolls under it (see Layout).
+- **Motion explains, never decorates.** Under a quarter second, opacity and transform only, and none
+  for people who asked their phone for less motion.
+
+## Two screen templates
+
+- **A tab screen** (Explore, Saved, Trips, Messages, Profile) starts with `LargeTitleHeader`.
+- **A screen you tap into** starts with `SubPage`: round back button, large title, optional
+  subtitle, optional `footer` for the screen's one action.
+
+Do not hand-roll a new header.

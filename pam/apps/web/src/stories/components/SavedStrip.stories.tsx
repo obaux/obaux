@@ -38,7 +38,8 @@ function asStrip(place: { id: string; name: string; category: Parameters<typeof 
 }
 
 const meta = {
-  title: 'Components/SavedStrip',
+  title: 'Components/Cards/SavedStrip',
+  tags: ['autodocs'],
   component: SavedStrip,
   decorators: [
     (Story) => (
@@ -61,7 +62,7 @@ export default meta;
 type Story = StoryObj<typeof meta>;
 
 /** A member's two example saves. */
-export const TwoSaved: Story = {};
+export const Default: Story = {};
 
 export const OneSaved: Story = {
   args: { places: [asStrip(DUMMY_PLACES_BY_ID['dummy-place-workforce']!)] },

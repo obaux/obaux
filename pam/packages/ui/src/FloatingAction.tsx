@@ -4,6 +4,7 @@ import { HStack } from '@astryxdesign/core/HStack';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { MenuList } from './MenuList.js';
+import { edgeFade } from './edgeFade.js';
 
 /**
  * One row floating just above the bottom bar (D-218, Will, 2 October):
@@ -15,7 +16,7 @@ import { MenuList } from './MenuList.js';
 export interface FloatingActionProps {
   readonly label: string;
   readonly href: string;
-  /** A PAM icon at 26px, as in a `MenuList` row. */
+  /** A Pam icon at 26px, as in a `MenuList` row. */
   readonly icon: ReactNode;
   /** A second line under the label — "People willing to help" (D-267). */
   readonly description?: string;
@@ -26,17 +27,24 @@ const BAR = 66;
 
 const styles = stylex.create({
   // A plain strip resting on the bottom bar (Will, 2 October, D-226): no
-  // card, no shadow, the bar's own hairline above it — the row's icon and
-  // words stay exactly where they were on the card.
+  // card, no shadow — the row's icon and words stay exactly where they were
+  // on the card. A hairline above and below (Will, 7 October, D-336), so it
+  // reads as its own band, apart from the page above and the bar below, on
+  // every screen that floats one: a member's Messages, staff Home, Requests.
   dock: {
     position: 'fixed',
     insetInline: 0,
     bottom: `calc(${BAR}px + env(safe-area-inset-bottom, 0px))`,
-    zIndex: 9,
+    // Above the tab bar's own fade (D-285), which would otherwise wash over
+    // this strip; it draws the same fade above itself instead.
+    zIndex: 11,
     backgroundColor: colorVars['--color-background-body'],
     borderTopWidth: '1px',
     borderTopStyle: 'solid',
     borderTopColor: colorVars['--color-border'],
+    borderBottomWidth: '1px',
+    borderBottomStyle: 'solid',
+    borderBottomColor: colorVars['--color-border'],
   },
   inner: { width: '100%', maxWidth: '560px', marginInline: 'auto', paddingInline: '24px' },
   spacer: { height: '72px', flexShrink: 0 },
@@ -48,6 +56,7 @@ export function FloatingAction({ label, href, icon, description }: FloatingActio
     <>
       <VStack aria-hidden xstyle={[styles.spacer, description ? styles.spacerTall : null]} />
       <HStack xstyle={styles.dock}>
+        <VStack aria-hidden xstyle={edgeFade.above} />
         <VStack xstyle={styles.inner}>
           <MenuList label={label} items={[{ id: 'action', label, href, icon, ...(description ? { description } : {}) }]} />
         </VStack>

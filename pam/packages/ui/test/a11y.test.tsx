@@ -50,7 +50,7 @@ const detailLabels = {
   website: 'Their website',
   hours: 'Opening hours',
   hoursOnGoogle: 'Check hours on Google',
-  about: 'What this place is',
+  about: 'About program',
   address: 'Address',
   save: 'Save this place',
   saved: 'Saved',
@@ -75,7 +75,7 @@ describe('accessibility', () => {
   it('OnboardingSlides', async () => {
     const { container } = render(
       <OnboardingSlides
-        label="How PAM works"
+        label="How Pam works"
         slides={[
           { id: 'a', image: '/onboarding/places.svg', text: 'Find places near you that can help.' },
           { id: 'b', image: '/onboarding/people.svg', text: 'A real person can answer questions.' },

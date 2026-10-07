@@ -5,11 +5,11 @@
  *
  * The phone's own share sheet when there is one, which is every modern phone:
  * it reaches whichever app the two people already use — a text, WhatsApp,
- * anything — rather than PAM deciding for them. On a desktop browser without
+ * anything — rather than Pam deciding for them. On a desktop browser without
  * it, the text goes to the clipboard instead, which is what a person would
  * have done by hand anyway.
  *
- * What gets shared is the name and the address, not a link into PAM. A PAM link
+ * What gets shared is the name and the address, not a link into Pam. A Pam link
  * is useless to somebody without an account, and a member sharing a place is
  * usually telling a friend or a cousin where to go, not recruiting them. The
  * address is the useful part, and it is already public information.

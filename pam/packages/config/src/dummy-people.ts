@@ -8,7 +8,7 @@ import type { AccessStatus, Locale, Role } from './index.js';
  * A case manager screen with a real invite system and zero invited people, a
  * provider screen for a feature that is not built yet, a directory with one
  * real account in it — none of that demonstrates anything to somebody looking
- * at PAM for the first time.
+ * at Pam for the first time.
  *
  * Notifications and saved places have their own files —
  * `dummy-notifications.ts`, `dummy-places.ts` — even though they read like
@@ -39,7 +39,7 @@ import type { AccessStatus, Locale, Role } from './index.js';
  *
  * "Fake avatars" here means Astryx's own initials-and-colour fallback —
  * `<Avatar name="…">` with no `src` — the same avatar every real person in
- * PAM already gets. A case manager's `PersonCard` already deliberately never
+ * Pam already gets. A case manager's `PersonCard` already deliberately never
  * fetches a photo: "a member's photo is not on the §4.1 list of what an admin
  * may see, and fetching it here would widen the contract by a column." A
  * placeholder photo for a *fictional* person would not widen anybody's real
@@ -62,7 +62,7 @@ export interface DummyPerson {
   readonly role: Role;
   readonly regionName: string;
   readonly accessStatus: AccessStatus;
-  /** ISO timestamp, or null for "has not opened PAM yet". */
+  /** ISO timestamp, or null for "has not opened Pam yet". */
   readonly lastActiveAt: string | null;
   /** `profiles.preferred_language` — see `/person/`, which shows this instead of repeating the name. */
   readonly language: Locale;
@@ -225,7 +225,7 @@ export const DUMMY_CASE_MANAGERS: readonly DummyPerson[] = [
 ];
 
 /**
- * The person running PAM, as staff meet them in Messages (D-262). Not in
+ * The person running Pam, as staff meet them in Messages (D-262). Not in
  * `DUMMY_EVERYONE` — that is the super admin's own directory, and they are
  * not somebody they look up.
  */
@@ -248,7 +248,7 @@ export const DUMMY_EVERYONE: readonly DummyPerson[] = [
   ...DUMMY_CASE_MANAGERS,
 ];
 
-/** Anybody an example conversation can name, the PAM team included (D-262). */
+/** Anybody an example conversation can name, the Pam team included (D-262). */
 export const DUMMY_ANYONE: readonly DummyPerson[] = [...DUMMY_EVERYONE, ...DUMMY_PAM_TEAM];
 
 export interface DummyInterest {

@@ -1,9 +1,9 @@
 /**
- * PAM's own words, defined once (Will, 4 October, D-260: "this tooltip info
+ * Pam's own words, defined once (Will, 4 October, D-260: "this tooltip info
  * should be stored somewhere since we're using unique terms which may need to
  * be defined across various places in app").
  *
- * A term is a word PAM uses in a sense of its own — a "trip" is not a
+ * A term is a word Pam uses in a sense of its own — a "trip" is not a
  * holiday. Each has a short name and one plain definition, both through i18n
  * so English and Spanish stay key-for-key. Any screen that uses the word and
  * wants to explain it shows `TermInfo` (apps/web) with the term's id; the

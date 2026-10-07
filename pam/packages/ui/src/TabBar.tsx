@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
+import { edgeFade } from './edgeFade.js';
+import { pam } from './tokens.stylex.js';
 import { Avatar } from '@astryxdesign/core/Avatar';
 import { HStack } from '@astryxdesign/core/HStack';
 import { StatusDot } from '@astryxdesign/core/StatusDot';
@@ -38,6 +40,12 @@ export interface TabBarProps {
    * no Trips. Defaults to the member's bar.
    */
   readonly tabs?: readonly TabKey[];
+  /**
+   * The fade above the bar (D-283). Off where something opaque already
+   * rests on the bar — Trips' drawer, which a 96px fade would wash out
+   * almost entirely when docked (D-285).
+   */
+  readonly hasFade?: boolean;
   /** The landmark's name, e.g. "Main". */
   readonly label: string;
   /** The person's first name, for the Profile tab's initials. */
@@ -91,7 +99,9 @@ const styles = stylex.create({
   // Holds the bar's height in the page, so the end of a long list scrolls
   // clear of it instead of sitting underneath.
   spacer: {
-    height: 'calc(66px + env(safe-area-inset-bottom, 0px))',
+    // The bar, plus most of the fade (D-284): at the very end of a list the
+    // last card scrolls clear of it instead of staying half washed out.
+    height: 'calc(66px + 56px + env(safe-area-inset-bottom, 0px))',
     flexShrink: 0,
   },
   tabs: { flexGrow: 1, minWidth: 0 },
@@ -108,12 +118,13 @@ const styles = stylex.create({
     color: colorVars['--color-text-secondary'],
   },
   // The tab you are on is red, as in Will's mockups (2 October) — the icon
-  // follows, since PAM's icons draw in currentColor. A deeper red than the
+  // follows, since Pam's icons draw in currentColor. A deeper red than the
   // mockups' #FF385C, which is 3.5:1 on white and fails AA at 12px:
   // #E31C5F is 4.6:1; #FF6B86 is 6.3:1 on the dark page.
-  tabOn: { color: 'light-dark(#E31C5F, #FF6B86)', fontWeight: 600 },
+  tabOn: { color: pam['--pam-brand-pink'], fontWeight: 600 },
   iconWrap: { position: 'relative' },
-  dot: { position: 'absolute', top: '-2px', insetInlineEnd: '-4px' },
+  // The tab pink, not the theme's error red (D-289): new, not wrong.
+  dot: { position: 'absolute', top: '-2px', insetInlineEnd: '-4px', backgroundColor: pam['--pam-brand-pink'] },
   // The selected Profile tab rings the avatar in the brand, as the reference
   // rings it in its own colour.
   avatarRing: {
@@ -123,7 +134,7 @@ const styles = stylex.create({
     borderStyle: 'solid',
     borderColor: 'transparent',
   },
-  avatarRingOn: { borderColor: 'light-dark(#E31C5F, #FF6B86)' },
+  avatarRingOn: { borderColor: pam['--pam-brand-pink'] },
 });
 
 export function TabBar({
@@ -137,6 +148,7 @@ export function TabBar({
   isHome = false,
   homeIcon = 'house',
   tabs = MEMBER_TABS,
+  hasFade = true,
 }: TabBarProps) {
   const to = { ...DEFAULT_HREFS, ...hrefs };
 
@@ -186,6 +198,7 @@ export function TabBar({
     <>
       <VStack aria-hidden xstyle={styles.spacer} />
       <footer data-pam-tabbar="" {...stylex.props(styles.bar)}>
+        {hasFade ? <VStack aria-hidden xstyle={edgeFade.above} /> : null}
         <HStack align="center" wrap="nowrap" xstyle={styles.inner}>
           <TabList
             value={current ?? ''}

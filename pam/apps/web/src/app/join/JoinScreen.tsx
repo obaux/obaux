@@ -10,12 +10,15 @@ import { Text } from '@astryxdesign/core/Text';
 import { CheckboxInput } from '@astryxdesign/core/CheckboxInput';
 import { RadioList, RadioListItem } from '@astryxdesign/core/RadioList';
 import { colorVars, spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
-import { BigButton, Loading, Notice, Page, PointsBadge, StarIcon, TextField, TextLink } from '@pam/ui';
+import { BigButton, Loading, Notice, Page, PointsBadge, StarIcon, TextField, TextLink, TripsIcon } from '@pam/ui';
 import { SubPageHeader } from '@pam/ui/SubPage';
 import { TRANSPARENCY_SCREEN, badgeForPoints, type Locale } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { navigate } from '@/lib/navigate';
 import { forgetInvite, recallInvite, type Invite } from '@/lib/appUrl';
+import { readAddedTrips, withMoves } from '@/lib/addedTrips';
+import { DUMMY_TRIPS } from '@pam/config/dummy-trips';
+import { Confetti } from '@pam/ui/SuccessScreen';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { usePhoneSignIn } from '@/lib/usePhoneSignIn';
 import { usePreviewSignIn } from '@/lib/usePreviewSignIn';
@@ -40,7 +43,7 @@ import { ProgramDetailsStep } from './ProgramDetailsStep';
 /**
  * Signing up: five steps, and four of them are one question each.
  *
- * Until this screen existed, every account in PAM was made by the seeding
+ * Until this screen existed, every account in Pam was made by the seeding
  * script or by an invite code, and somebody arriving at the front door with no
  * code was shown a sign-in button that led back to the same place. It also
  * answers a question Will asked on the 14th — how does the app know my name if
@@ -63,8 +66,8 @@ import { ProgramDetailsStep } from './ProgramDetailsStep';
  * is not a credential; 0046 has the long version. It is also why this screen
  * cannot be used to become a case manager by typing it.
  *
- * **A city PAM does not serve is a different screen, not an error.** Somebody
- * in Scranton typed their name in good faith. They are told where PAM is, and
+ * **A city Pam does not serve is a different screen, not an error.** Somebody
+ * in Scranton typed their name in good faith. They are told where Pam is, and
  * offered a text when it opens — which they have to tick, because an opt-in
  * that arrives pre-ticked is not one (A2P 30925).
  *
@@ -74,7 +77,8 @@ import { ProgramDetailsStep } from './ProgramDetailsStep';
  * something true about this app in the first minute: things you do here count.
  */
 
-type Phase = 'phone' | 'details' | 'program' | 'waiting' | 'waitingDone' | 'privacy' | 'texts' | 'done';
+export type JoinPhase = 'phone' | 'details' | 'program' | 'waiting' | 'waitingDone' | 'privacy' | 'texts' | 'done';
+type Phase = JoinPhase;
 
 /**
  * Which step a phase is, for the bar. 'program' and the shift it causes to
@@ -101,6 +105,7 @@ const EMPTY_PROGRAM: ProgramDetails = {
   address: '',
   phone: '',
   website: '',
+  services: [],
 };
 
 const styles = stylex.create({
@@ -150,6 +155,8 @@ export interface JoinPreview {
   readonly phone?: string;
   /** Arriving by an invite link (D-254): the phone is done, open on About you. */
   readonly invite?: Invite;
+  /** Open on this step (D-319): one story per screen, not one per flow. */
+  readonly startAt?: JoinPhase;
 }
 
 export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview | null } = {}) {
@@ -183,12 +190,16 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
    * It says what they were invited as instead. `?code=` still works too.
    */
   const [invitedAs, setInvitedAs] = useState<JoinKind | null>(null);
+  // A visit a program booked for them before they had Pam (D-322): the
+  // link carried it, and it is the first thing they see at the end.
+  const [bookedTrip, setBookedTrip] = useState<string | null>(null);
   useEffect(() => {
     const invite = preview?.invite ?? recallInvite();
     if (invite) {
       setInviteCode(invite.code);
       setKind(invite.role);
       setInvitedAs(invite.role);
+      setBookedTrip(invite.trip ?? null);
       return;
     }
     const fromLink = new URLSearchParams(window.location.search).get('code');
@@ -256,8 +267,9 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
       if (preview.kind === 'provider') {
         setProgram({ ...EMPTY_PROGRAM, name: 'Example Learning Center', address: '123 Main St' });
       }
-      // By a link, the phone was done at Sign in (D-254).
-      setPhase(preview.invite ? 'details' : 'phone');
+      // By a link, the phone was done at Sign in (D-254); or wherever the
+      // story asked to open (D-319).
+      setPhase(preview.startAt ?? (preview.invite ? 'details' : 'phone'));
       return;
     }
     if (session.status === 'signed-out') setPhase('phone');
@@ -282,7 +294,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
     if (flow.state.step === 'done' && phase === 'phone') setPhase('details');
   }, [flow.state.step, phase]);
 
-  // Which cities PAM is in — for the sentence somebody in the wrong one reads.
+  // Which cities Pam is in — for the sentence somebody in the wrong one reads.
   useEffect(() => {
     if (phase !== 'details' && phase !== 'waiting') return;
     let cancelled = false;
@@ -454,6 +466,13 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
         : STEP[phase];
 
   const onCode = flow.state.step === 'code' || flow.state.step === 'verifying';
+  // The booked visit itself, from the example trips or the ones a program
+  // added this session (D-322); null when the link carried none.
+  const booked = bookedTrip
+    ? (withMoves([...DUMMY_TRIPS, ...readAddedTrips()]).find((trip) => trip.id === bookedTrip) ?? null)
+    : null;
+  const bookedDay = new Intl.DateTimeFormat(locale, { weekday: 'long', month: 'long', day: 'numeric' });
+  const bookedTime = new Intl.DateTimeFormat(locale, { hour: 'numeric', minute: '2-digit' });
   const toPhone = () => {
     flow.startOver();
     setPhase('phone');
@@ -828,7 +847,37 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
           </Card>
         ) : null}
 
-        {phase === 'done' && !isStaff ? (
+        {phase === 'done' && !isStaff && booked ? (
+          <>
+            <Confetti />
+            <Card padding={4} xstyle={styles.card}>
+              <VStack gap={3} xstyle={styles.celebrate}>
+                <span aria-hidden="true" {...stylex.props(styles.medal)}>
+                  <TripsIcon />
+                </span>
+                <Text xstyle={styles.badgeName}>{t('join.booked.title')}</Text>
+                <Text xstyle={styles.body}>
+                  {t('join.booked.body', {
+                    place: booked.placeName,
+                    day: bookedDay.format(new Date(booked.startsAt)),
+                    time: bookedTime.format(new Date(booked.startsAt)),
+                  })}
+                </Text>
+                <BigButton
+                  label={t('join.booked.action')}
+                  onPress={() => {
+                    const href = `/place/?${new URLSearchParams({ id: booked.placeId, from: 'trips', trip: booked.id }).toString()}`;
+                    if (preview) navigate(href);
+                    else router.replace(href);
+                  }}
+                />
+                <TextLink label={t('join.booked.trips')} href="/trips/" />
+              </VStack>
+            </Card>
+          </>
+        ) : null}
+
+        {phase === 'done' && !isStaff && !booked ? (
           <Card padding={4} xstyle={styles.card}>
             <VStack gap={3} xstyle={styles.celebrate}>
               <span aria-hidden="true" {...stylex.props(styles.medal)}>

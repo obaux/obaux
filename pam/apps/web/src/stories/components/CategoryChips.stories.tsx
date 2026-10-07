@@ -7,7 +7,7 @@ import { CATEGORY_ICONS, type ExploreCategory } from '../../screens/ExploreView'
 import { useStoryText } from '../support/useStoryText';
 
 /**
- * Explore's chips (D-212): All and PAM's three categories, one always
+ * Explore's chips (D-212): All and Pam's three categories, one always
  * chosen, each icon in its category's colour. They scroll sideways at
  * 320px and in Spanish.
  */
@@ -33,7 +33,8 @@ function LocalisedChips({ initial }: { readonly initial: ExploreCategory }) {
 }
 
 const meta = {
-  title: 'Components/CategoryChips',
+  title: 'Components/Inputs/CategoryChips',
+  tags: ['autodocs'],
   component: LocalisedChips,
   decorators: [
     (Story) => (
@@ -48,7 +49,7 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-export const AllChosen: Story = {};
+export const Default: Story = {};
 export const WorkChosen: Story = { args: { initial: 'workforce' } };
 export const Spanish: Story = { globals: { locale: 'es' } };
 export const Narrow: Story = { globals: { viewport: { value: 'narrow320', isRotated: false } } };

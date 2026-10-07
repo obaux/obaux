@@ -8,7 +8,7 @@ import { asRedesign } from '../../journeys/journey';
  * bar, which keeps the bell and Help in reach.
  */
 const meta = {
-  title: 'Member app/States/Profile',
+  title: 'Member/Created/States/Profile',
   component: ProfileView,
   args: {
     name: 'Marcus',

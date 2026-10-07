@@ -10,7 +10,7 @@ import { pam } from './tokens.stylex.js';
 /**
  * The wordmark, and who you are signed in as.
  *
- * PAM is one codebase serving three very different people — somebody who just
+ * Pam is one codebase serving three very different people — somebody who just
  * came home, the staff running a programme, the officer watching a caseload —
  * and the screens are deliberately similar, because they are built from the
  * same components. That similarity is a liability the moment somebody has two
@@ -26,7 +26,7 @@ import { pam } from './tokens.stylex.js';
  * coral on dark grounds and deep green on light ones, and neither survives the
  * other's background. `<picture>` picks between them from the browser's own
  * colour scheme, with no JavaScript and no flash of the wrong one — and one
- * `alt` on the `<img>`, so a screen reader hears "PAM" once, not twice.
+ * `alt` on the `<img>`, so a screen reader hears "Pam" once, not twice.
  *
  * Static files rather than inlined SVG. At 5.7 kB each that is now a close call
  * either way, but keeping them out of the JavaScript bundle costs nothing and
@@ -118,12 +118,12 @@ const styles = stylex.create({
     display: 'inline-flex',
     alignItems: 'center',
     // The mark is 26px; the tap target around it is not.
-    minHeight: pam.touchTargetMin,
+    minHeight: pam['--pam-touch-target-min'],
     textDecoration: 'none',
   },
   account: {
-    minHeight: pam.touchTargetMin,
-    minWidth: pam.touchTargetMin,
+    minHeight: pam['--pam-touch-target-min'],
+    minWidth: pam['--pam-touch-target-min'],
     // Matches the bell (Will, 16 September): two icons of different sizes in
     // the same corner read as one of them mattering less.
     fontSize: '28px',
@@ -175,7 +175,7 @@ export function AppHeader({
   const mark = (
     <picture>
       <source srcSet="/pam-wordmark-dark.svg" media="(prefers-color-scheme: dark)" />
-      <img src="/pam-wordmark-light.svg" alt="PAM" {...stylex.props(styles.mark)} />
+      <img src="/pam-wordmark-light.svg" alt="Pam" {...stylex.props(styles.mark)} />
     </picture>
   );
 
@@ -190,8 +190,8 @@ export function AppHeader({
         <HStack gap={2} align="center" wrap="wrap">
           {/*
             A real anchor, so it works with no JavaScript and middle-clicks the
-            way every other logo on the web does. The `alt` is already "PAM", so
-            the link announces itself as "PAM" — which is what it goes to.
+            way every other logo on the web does. The `alt` is already "Pam", so
+            the link announces itself as "Pam" — which is what it goes to.
           */}
           {homeHref ? (
             <a href={homeHref} {...stylex.props(styles.markLink)}>

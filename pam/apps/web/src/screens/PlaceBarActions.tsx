@@ -37,10 +37,18 @@ const ICON = { width: 22, height: 22, 'aria-hidden': true } as const;
  * example conversation between them and the example member, while messaging
  * runs on example people; otherwise Messages, where New message is.
  */
-export function messageHrefFor(placeName: string): string {
+export { newMessageFrom } from '@/lib/placeMessages';
+
+/**
+ * The conversation with a place's program. Opened from the place's page,
+ * it remembers the place (`from=place&place=`), so Back in the thread goes
+ * back to the program — text, then return to book (Will, 6 October, D-313).
+ */
+export function messageHrefFor(placeName: string, placeId?: string): string {
   const lead = DUMMY_PROGRAM_LEADS.find((person) => person.orgName === placeName);
+  const fromPlace = placeId ? `&from=place&place=${encodeURIComponent(placeId)}` : '';
   return lead
-    ? `/messages/thread/?id=${encodeURIComponent(dummyConversationIdBetween(DUMMY_SELF_ID.member, lead.id))}`
+    ? `/messages/thread/?id=${encodeURIComponent(dummyConversationIdBetween(DUMMY_SELF_ID.member, lead.id))}${fromPlace}`
     : '/messages/';
 }
 

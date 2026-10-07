@@ -11,7 +11,7 @@ import { staffRequestPhone } from '@/lib/useStaffRequests';
 /**
  * "Text Andre" on a staff request (Will, 4 October, D-262): "a way to message
  * the program lead or case manager … to make sure they coordinate how to use
- * the app." Somebody still waiting has no staff role yet, so PAM's own
+ * the app." Somebody still waiting has no staff role yet, so Pam's own
  * messages cannot reach them; this opens the super admin's own texting app
  * with their number filled in. The number is read on the tap, not when the
  * list loads — each read is audited (0072), so it is read only when used.

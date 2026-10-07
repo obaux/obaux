@@ -65,10 +65,25 @@ function routesFor(journeyRole: JourneyRole): Route[] {
     on('/rest/v1/notification_preferences', () => ({ body: null })),
     on('/rest/v1/access_controls', () => ({ body: [] })),
     on('/rpc/member_points', () => ({ body: 400 })),
+    // The area drawer's suggestions (D-275): a few real Philadelphia ZIPs,
+    // neighbourhoods and landmarks, filtered like the real `search_areas`.
+    on('/rpc/search_areas', (_url, _method, body) => {
+      const q = (((body ?? {}) as { p_query?: string }).p_query ?? '').trim().toLowerCase();
+      const areas = [
+        { id: 'zip:19107', kind: 'zip', label: '19107', lat: 39.9516, lon: -75.1587 },
+        { id: 'zip:19122', kind: 'zip', label: '19122', lat: 39.9777, lon: -75.143 },
+        { id: 'zip:19104', kind: 'zip', label: '19104', lat: 39.9638, lon: -75.2029 },
+        { id: 'zip:19143', kind: 'zip', label: '19143', lat: 39.9434, lon: -75.2275 },
+        { id: 'hood:kensington', kind: 'neighborhood', label: 'Kensington', lat: 39.9946, lon: -75.1214 },
+        { id: 'hood:north-philadelphia', kind: 'neighborhood', label: 'North Philadelphia', lat: 39.991, lon: -75.1557 },
+        { id: 'landmark:temple', kind: 'landmark', label: 'Temple University', lat: 39.9812, lon: -75.1554 },
+      ];
+      return { body: areas.filter((a) => !q || a.label.toLowerCase().includes(q)).slice(0, 8) };
+    }),
     on('/rpc/services_near', (_url, _method, body) => {
       const category = ((body ?? {}) as { p_category?: string | null }).p_category;
       return {
-        body: PLACES.map((place, i) => ({ ...place, meters: 400 + i * 900, has_hours: false })).filter(
+        body: PLACES.map((place, i) => ({ ...place, meters: 400 + i * 450, has_hours: false })).filter(
           (place) => !category || place.category === category,
         ),
       };
@@ -80,16 +95,20 @@ function routesFor(journeyRole: JourneyRole): Route[] {
       const args = (body ?? {}) as { p_query?: string; p_category?: string | null };
       const words = (args.p_query ?? '').toLowerCase().split(/\s+/).filter(Boolean);
       return {
-        body: PLACES.map((place, i) => ({ ...place, meters: 400 + i * 900, has_hours: false })).filter(
+        body: PLACES.map((place, i) => ({ ...place, meters: 400 + i * 450, has_hours: false })).filter(
           (place) =>
             (!args.p_category || place.category === args.p_category) &&
             words.every((word) => `${place.name} ${place.address ?? ''}`.toLowerCase().includes(word)),
         ),
       };
     }),
-    on('/rpc/service_detail', () => ({ body: [PLACES[0]] })),
+    on('/rpc/service_detail', (_url, _method, body) => {
+      const id = ((body ?? {}) as { p_id?: string }).p_id;
+      return { body: [PLACES.find((place) => place.id === id) ?? PLACES[0]] };
+    }),
     on('/rpc/directory_people', () => ({ body: DIRECTORY_PEOPLE })),
-    on('/rpc/saved_places_mine', () => ({ body: PLACES })),
+    // The member's three (D-304): the rest of Explore is not saved.
+    on('/rpc/saved_places_mine', () => ({ body: PLACES.slice(0, 3) })),
     on('/rest/v1/saved_places', () => ({ body: [] })),
     on('/rpc/flag_service', () => ({ body: { id: 'flag-1' } })),
     // An example code (D-218's Invite someone); the real one is made by the database.
@@ -115,7 +134,10 @@ function routesFor(journeyRole: JourneyRole): Route[] {
       // The one example conversation is a member's with their case manager;
       // the super admin is never in one with a member (D-262), so their list
       // falls to the example set, where Teresa is.
-      if (role === 'super_admin') return { body: [] };
+      // ... and a member's list falls to the example set too (D-276), where
+      // both Teresa and Sandra are; the one real thread (CONVO_ID) is still
+      // reachable by its own address, as the conversation stories use it.
+      if (role === 'super_admin' || role === 'member') return { body: [] };
       return { body: [{ conversation_id: CONVO_ID, last_read_at: null }] };
     }),
     // Message {name} on a caseload member's page (D-231, D-234) opens the one

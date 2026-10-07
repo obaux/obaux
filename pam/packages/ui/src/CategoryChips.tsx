@@ -5,11 +5,12 @@ import * as stylex from '@stylexjs/stylex';
 import { Button } from '@astryxdesign/core/Button';
 import { HStack } from '@astryxdesign/core/HStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
+import { ToneDot, type Tone } from './Tone.js';
 
 /**
  * A row of rounded chips under the search bar, one per kind of place (D-212).
  *
- * The reference's "All / Homes / Experiences / Services" row, carrying PAM's
+ * The reference's "All / Homes / Experiences / Services" row, carrying Pam's
  * own three categories (§2.5) and All. One chip is always chosen. The row
  * scrolls sideways when it does not fit — at 320px, and in Spanish, where
  * the words are longer — with the edge of the next chip showing, so it is
@@ -31,7 +32,7 @@ export interface CategoryChip<K extends string> {
   readonly tone?: ChipTone;
 }
 
-export type ChipTone = 'blue' | 'green' | 'purple' | 'orange' | 'red' | 'teal' | 'pink' | 'cyan' | 'gray';
+export type ChipTone = Tone;
 
 export interface CategoryChipsProps<K extends string> {
   readonly chips: readonly CategoryChip<K>[];
@@ -79,6 +80,11 @@ const styles = stylex.create({
     boxShadow: '0 1px 4px light-dark(oklch(0 0 0 / 7%), oklch(0 0 0 / 35%))',
     '::before': { content: "''", position: 'absolute', insetBlock: '-4px', insetInline: '-2px' },
   },
+  // A chip with a colour circle keeps a gap before its words (D-297), and
+  // the circle sits as far from the left edge as from the top (Will, D-300):
+  // the chip is 48px and the circle 26px, so 11px each way. Astryx pulls a
+  // button's icon in by 4px, hence 15px here — measured, not guessed.
+  chipWithDot: { paddingInlineStart: '15px', gap: '8px' },
   chipOn: {
     borderWidth: '2px',
     borderColor: colorVars['--color-text-primary'],
@@ -87,17 +93,7 @@ const styles = stylex.create({
   icon: { width: '18px', height: '18px', flexShrink: 0 },
 });
 
-const tones = stylex.create({
-  blue: { color: colorVars['--color-icon-blue'] },
-  green: { color: colorVars['--color-icon-green'] },
-  purple: { color: colorVars['--color-icon-purple'] },
-  orange: { color: colorVars['--color-icon-orange'] },
-  red: { color: colorVars['--color-icon-red'] },
-  teal: { color: colorVars['--color-icon-teal'] },
-  pink: { color: colorVars['--color-icon-pink'] },
-  cyan: { color: colorVars['--color-icon-cyan'] },
-  gray: { color: colorVars['--color-icon-gray'] },
-});
+
 
 export function CategoryChips<K extends string>({ chips, value, onChange, label }: CategoryChipsProps<K>) {
   return (
@@ -110,9 +106,14 @@ export function CategoryChips<K extends string>({ chips, value, onChange, label 
             label={chip.label}
             variant="secondary"
             aria-pressed={on}
-            icon={<HStack xstyle={[styles.icon, chip.tone && tones[chip.tone]]}>{chip.icon}</HStack>}
+            icon={
+              // The category's colour on a circle of two half circles (D-297).
+              <ToneDot tone={chip.tone ?? null}>
+                <HStack xstyle={styles.icon}>{chip.icon}</HStack>
+              </ToneDot>
+            }
             onClick={() => onChange(chip.key)}
-            xstyle={[styles.chip, on && styles.chipOn]}
+            xstyle={[styles.chip, chip.tone ? styles.chipWithDot : null, on && styles.chipOn]}
           />
         );
       })}

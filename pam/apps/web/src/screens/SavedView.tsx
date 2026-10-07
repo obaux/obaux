@@ -28,7 +28,10 @@ import { StarToggle } from './PeopleHomeView';
 import { LargeTitleHeader } from '@pam/ui/LargeTitleHeader';
 import { SavedGrid } from '@pam/ui/SavedGrid';
 import { PlaceCardSkeletonList } from '@pam/ui/Skeletons';
-import { categoryLabelKey, NOTICES } from '@pam/config';
+import { CATEGORY_DEFINITIONS, categoryLabelKey, NOTICES, type Category } from '@pam/config';
+import { type Tone } from '@pam/ui/Tone';
+import { CategoryArt } from '@pam/ui/CategoryArt';
+import { useNextVisits, visitTagLabel, type NextVisit } from '@/lib/useNextVisits';
 import { useI18n } from '@/lib/i18n';
 import { useSession } from '@/lib/useSession';
 import { useRoleView } from '@/lib/useViewedRole';
@@ -70,9 +73,16 @@ export interface SavedViewProps {
   };
   /** Removed in Edit and not yet confirmed: hidden until Done, or put back. */
   readonly hidden?: ReadonlySet<string>;
+  /** A member's next visit at each place, by place id (D-292). */
+  readonly visits?: Readonly<Record<string, NextVisit>>;
 }
 
 const ART = { width: 52, height: 52, 'aria-hidden': true } as const;
+
+/** A category's colour, as the chips use it (D-288, D-297). */
+export function categoryTone(category: string): Tone | null {
+  return (CATEGORY_DEFINITIONS[category as Category]?.colorToken as Tone | undefined) ?? null;
+}
 
 const styles = stylex.create({
   // The People / Programs switch as one round pill, like the search bar and
@@ -111,8 +121,10 @@ export function SavedView({
   browseHref = '/',
   edit,
   hidden,
+  visits = {},
 }: SavedViewProps) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
+  // "Wed, Oct 7 · 10:00 AM", the trip card's own form.
   const all = state.status === 'ready' && !replace ? state.places : [];
   const places = hidden ? all.filter((place) => !hidden.has(place.id)) : all;
   const editing = edit.isOn;
@@ -180,17 +192,42 @@ export function SavedView({
           isEditing={editing}
           onRemove={onUnsave}
           removeLabel={(name) => t('saved.unsave', { name })}
-          tiles={places.map((place) => ({
-            id: place.id,
-            name: place.name,
-            subtitle: t(categoryLabelKey(place.category)),
-            href: `/place/?id=${encodeURIComponent(place.id)}&from=saved`,
-            art: <BigCategoryIcon category={place.category} />,
-          }))}
+          tiles={places.map((place) => {
+            // A visit booked here (Will, 5 October, D-292): its day and time
+            // on the picture, and the place opens about that visit — Back
+            // still comes to Saved.
+            const visit = visits[place.id];
+            const tag = visit ? visitTagLabel(visit.startsAt, locale) : null;
+            return {
+              id: place.id,
+              name: place.name,
+              subtitle: t(categoryLabelKey(place.category)),
+              href: `/place/?${new URLSearchParams({
+                id: place.id,
+                from: 'saved',
+                ...(visit ? { trip: visit.id } : {}),
+              }).toString()}`,
+              // The category's illustration fills the picture (D-337).
+              art: <CategoryPicture category={place.category} seed={place.id} />,
+              tag,
+              ...(tag ? { label: t('saved.visitLabel', { name: place.name, when: tag }) } : {}),
+            };
+          })}
         />
       ) : null}
     </Page>
   );
+}
+
+/**
+ * A category's illustration, edge to edge in the box it sits in (Will,
+ * 7 October, D-337: "just use the illustrations by category"): Saved's
+ * tiles, every trip card, Explore's next visit and Check. The pale ground
+ * with shards and grain behind an icon (D-297) is gone; only the chips keep
+ * their shaded dot.
+ */
+export function CategoryPicture({ category, seed }: { readonly category: string; readonly seed?: string }) {
+  return <CategoryArt category={(category in CATEGORY_DEFINITIONS ? category : 'education') as Category} size="fill" {...(seed ? { seed } : {})} />;
 }
 
 /** The chips' icon for a category, drawn large for the placeholder picture. */
@@ -233,6 +270,8 @@ export function SavedScreen() {
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
   const { demoRole, viewedRole } = useRoleView(trueRole);
   const { state, unsave, failed } = useSavedPlaces(session.status === 'signed-in', demoRole);
+  // A member's next visits, for the tags on Saved (D-292).
+  const visits = useNextVisits(viewedRole === 'member');
   const supportPhone = useSupportPhone();
   const starred = useStarredPeople();
   const [pane, setPane] = useState<Pane>('people');
@@ -289,6 +328,7 @@ export function SavedScreen() {
         state={state}
         onUnsave={stage}
         hidden={onPeople ? undefined : pending}
+        visits={visits}
         // Edit alone at the top: a member's Saved since D-224, and a case
         // manager's too now (Will, 3 October, D-255) — no bell, no Help.
         headerActions={undefined}
