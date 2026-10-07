@@ -9,6 +9,7 @@ import { HStack } from '@astryxdesign/core/HStack';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { PlusIcon, TextLink, TripsIcon } from '@pam/ui';
+import { emptyState } from '@pam/ui/emptyState';
 import { Button } from '@astryxdesign/core/Button';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { readAddedTrips, readMoves, withMoves } from '@/lib/addedTrips';
@@ -108,7 +109,6 @@ const styles = stylex.create({
   count: { fontSize: '15px', textAlign: 'center' },
   signBanner: { position: 'relative', zIndex: 2 },
   state: { paddingBlock: '24px' },
-  stateIcon: { width: '56px', height: '56px' },
   // The new trip's card rises into place after the drawer opens (D-241).
   arrive: {
     animationName: arriveIn,
@@ -197,7 +197,7 @@ export function TripsView({ trips, headerActions, justAdded = null }: TripsViewP
           <EmptyState
             headingLevel={2}
             xstyle={styles.state}
-            icon={<TripsIcon {...stylex.props(styles.stateIcon)} aria-hidden />}
+            icon={<TripsIcon {...stylex.props(emptyState.icon)} aria-hidden />}
             title={t('trips.empty.title')}
             description={t('trips.empty.body')}
           />

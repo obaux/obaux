@@ -5,6 +5,7 @@ import type { Role } from '@pam/config';
 import { NotificationBell } from '@pam/ui';
 import { useI18n } from '@/lib/i18n';
 import { useNotifications, unreadCount } from '@/lib/useNotifications';
+import { isFreshAccount } from '@/lib/programSetup';
 
 /**
  * The bell, wherever a signed-in screen needs one.
@@ -63,7 +64,8 @@ export function HeaderBell({
     let cancelled = false;
     void (async () => {
       const { USE_DUMMY_PEOPLE } = await import('@pam/config/dummy-flag');
-      if (!USE_DUMMY_PEOPLE) return;
+      // A fresh account (D-361) has no example alerts: the bell is quiet.
+      if (!USE_DUMMY_PEOPLE || isFreshAccount()) return;
       const { DUMMY_NOTIFICATIONS } = await import('@pam/config/dummy-notifications');
       if (cancelled) return;
       setDummyUnread(DUMMY_NOTIFICATIONS[role as Role].filter((item) => item.isNew).length);

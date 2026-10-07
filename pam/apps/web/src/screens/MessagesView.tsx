@@ -11,6 +11,7 @@ import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { ExploreIcon, MessagesIcon, NewMessageIcon, NoResultsIcon, Page, textLinkLook } from '@pam/ui';
+import { emptyState } from '@pam/ui/emptyState';
 import { LargeTitleHeader } from '@pam/ui/LargeTitleHeader';
 import { SearchField } from '@pam/ui/SearchPill';
 import { useI18n } from '@/lib/i18n';
@@ -91,7 +92,6 @@ const styles = stylex.create({
   field: { flexGrow: 1, minWidth: 0 },
   cancel: { flexShrink: 0, fontSize: '17px', fontWeight: 600 },
   state: { paddingBlock: '48px' },
-  stateIcon: { width: '64px', height: '64px' },
   note: { fontSize: '15px', lineHeight: 1.5 },
   list: { width: '100%' },
   // The row Will picked (1 October): name, one quiet line, a subtle time.
@@ -226,7 +226,7 @@ export function MessagesView({
         <EmptyState
           headingLevel={2}
           xstyle={styles.state}
-          icon={<MessagesIcon {...stylex.props(styles.stateIcon)} aria-hidden />}
+          icon={<MessagesIcon {...stylex.props(emptyState.icon)} aria-hidden />}
           title={t('messages.empty.redesign.title')}
           description={emptyBody}
         />
@@ -236,7 +236,7 @@ export function MessagesView({
         <EmptyState
           headingLevel={2}
           xstyle={styles.state}
-          icon={<NoResultsIcon {...stylex.props(styles.stateIcon)} aria-hidden />}
+          icon={<NoResultsIcon {...stylex.props(emptyState.icon)} aria-hidden />}
           title={t('messages.search.empty.title')}
           description={t('messages.search.empty.body')}
           actions={<Button label={t('explore.search.clear')} variant="secondary" onClick={() => setQuery('')} />}

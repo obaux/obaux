@@ -7,7 +7,9 @@ import { Button } from '@astryxdesign/core/Button';
 import { Card } from '@astryxdesign/core/Card';
 import { EmptyState } from '@astryxdesign/core/EmptyState';
 import { Text } from '@astryxdesign/core/Text';
+import { VStack } from '@astryxdesign/core/VStack';
 import { PlacesIcon } from '@pam/ui';
+import { emptyState } from '@pam/ui/emptyState';
 import { SubPage } from '@pam/ui/SubPage';
 import { useI18n } from '@/lib/i18n';
 import { markSetupDone } from '@/lib/programSetup';
@@ -49,10 +51,13 @@ const styles = stylex.create({
   intro: { fontSize: '18px', lineHeight: 1.5 },
   card: { width: '100%' },
   state: { paddingBlock: '32px' },
-  stateIcon: { width: '64px', height: '64px' },
 });
 
-export function AddProgramView() {
+/**
+ * `isTab`: drawn as the Program tab itself, for a lead with no program yet
+ * (D-361) — no Back, since a tab has nowhere to go back to.
+ */
+export function AddProgramView({ isTab = false }: { readonly isTab?: boolean } = {}) {
   const { t } = useI18n();
   const [program, setProgram] = useState<ProgramDetails>(EMPTY);
   const [step, setStep] = useState(0);
@@ -74,23 +79,26 @@ export function AddProgramView() {
   return (
     <SubPage
       title={t('programs.new.title')}
-      backHref={fromHome ? '/' : '/programs/'}
-      backLabel={t(fromHome ? 'nav.back.home' : 'nav.back.programs')}
+      {...(isTab
+        ? { backLabel: '' }
+        : { backHref: fromHome ? '/' : '/programs/', backLabel: t(fromHome ? 'nav.back.home' : 'nav.back.programs') })}
       // Back goes one question back while there is one (D-347).
       {...(!sent && step > 0 ? { onBack: () => setStep(step - 1) } : {})}
       actions={<HelpButton />}
       // Next stays at the foot of the screen, whatever the question (D-357).
-      {...(sent ? {} : { footer: wizard.actions })}
+      // As the Program tab it sits above the tab bar, so Next stays in the
+      // card there rather than covering the bar (D-361).
+      {...(sent || isTab ? {} : { footer: wizard.actions })}
     >
       {sent ? (
         <EmptyState
           headingLevel={2}
           xstyle={styles.state}
-          icon={<PlacesIcon {...stylex.props(styles.stateIcon)} aria-hidden />}
+          icon={<PlacesIcon {...stylex.props(emptyState.icon)} aria-hidden />}
           title={t('programs.new.done.title')}
           description={t('programs.new.done.body')}
           actions={
-            fromHome ? (
+            fromHome || isTab ? (
               <Button label={t('programs.new.home')} variant="primary" onClick={() => navigate('/')} />
             ) : (
             <Button
@@ -111,7 +119,10 @@ export function AddProgramView() {
             {t('programs.new.intro')}
           </Text>
           <Card padding={6} xstyle={styles.card}>
-            {wizard.body}
+            <VStack gap={4}>
+              {wizard.body}
+              {isTab ? wizard.actions : null}
+            </VStack>
           </Card>
         </>
       )}

@@ -872,7 +872,7 @@
   "schedule.checkin.undo.body": "Su visita vuelve a quedar sin registrar.",
   "schedule.checkin.undo.keep": "Mantener",
   "schedule.checkin.undo.confirm": "Deshacer registro",
-  "home.book": "Reservar una visita para un miembro",
+  "home.book": "Nueva reserva",
   "book.title": "Reservar una visita para un miembro",
   "book.intro": "Personas que han escrito a su programa. Elija una, luego el día y la hora.",
   "book.row": "Escribió a su programa",
@@ -1303,5 +1303,8 @@
   "schedule.tab.week": "Semana",
   "schedule.tab.month": "Mes",
   "home.search": "Buscar",
-  "join.progress": "{current} de {total}"
+  "join.progress": "{current} de {total}",
+  "home.invite": "Invitar a alguien a Pam",
+  "notify.empty.title": "Aún no hay notificaciones",
+  "notify.empty.body": "Cuando alguien reserve una visita, le escriba o le necesite, aparecerá aquí."
 }

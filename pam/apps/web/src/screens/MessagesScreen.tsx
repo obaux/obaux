@@ -2,6 +2,7 @@
 
 import { staffPhotoFor } from '@pam/config/dummy-connections';
 import { USE_DUMMY_PEOPLE } from '@pam/config/dummy-flag';
+import { isFreshAccount } from '@/lib/programSetup';
 import { dummyConversationsFor } from '@pam/config/dummy-conversations';
 import { DUMMY_ANYONE } from '@pam/config/dummy-people';
 import { useI18n } from '@/lib/i18n';
@@ -82,7 +83,8 @@ export function MessagesScreen() {
         }))
       : [];
 
-  const useExamples = real.length === 0 && USE_DUMMY_PEOPLE && state.status !== 'loading';
+  // No example conversations for an account that has just signed up (D-361).
+  const useExamples = real.length === 0 && USE_DUMMY_PEOPLE && !isFreshAccount() && state.status !== 'loading';
   const examples: MessageRow[] = useExamples
     ? dummyConversationsFor(role).map((c) => {
         const other = DUMMY_ANYONE.find((p) => p.id === c.otherId) ?? null;

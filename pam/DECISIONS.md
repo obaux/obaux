@@ -8819,6 +8819,56 @@ button so it doesn't interfere with button label", and on Text messages:
   "Get text alerts" and a member's reminders offer. The bell icon on a tint
   (D-274) is replaced; a `PromoCard` given an icon still centres it on the tint.
 
+### D-361 — A brand-new program lead's app is empty, honestly; a journey for it
+
+**Date:** 2026-10-07. Will: "since no program has been added, clicking
+program on menu should just open the add program view. Also no
+notifications should appear (empty state), and messages empty state. We need
+a journey next to prototype for new user … from sign up to get started home
+and these screens", "on plus icon … invite someone to Pam, and New booking",
+and "That's not a good empty state for notifications, use something similar
+to empty state for messages".
+
+- **Program tab, no program yet:** the tab *is* Add a program
+  (`AddProgramView isTab`, decided once on entry so sending one shows its
+  "sent" screen): no Back, Next inside the card so the tab bar stays.
+- **Nothing that has not happened:** for a fresh account (`isFreshAccount`,
+  D-352) the example notifications and conversations are not shown — the
+  bell has no dot, Notifications and Messages show their empty states, and
+  the prototype's Messages tab loses its dot. In Storybook the pretend
+  database also answers a fresh account with no notifications and no
+  conversations; real data for a real account is never hidden.
+- **Notifications empty state** is now Messages' kind: picture, "No
+  notifications yet", one line ("When someone books a visit, writes to you or
+  needs you, it shows up here.") — not a bare sentence.
+- **+ menu and Home's rows:** "New booking" (was "Book a visit for a member")
+  and "Invite someone to Pam" (`home.invite`).
+- **Journey:** Program lead › Prototype › "New program lead — sign up to Get
+  started": the invite link's Sign in, code, About you, What to expect, then
+  Get started, the empty bell and Messages, and the Program tab as Add a
+  program. Also stories "Notifications — none yet" and "Messages — none yet".
+- Checked by walking the journey in a browser; e2e 573/573.
+
+### D-362 — One look for empty-state icons; the bell as a line
+
+**Date:** 2026-10-07. Will: "The empty state for notification bell is too
+black, make it light shade of green, and use this icon styling consistently
+across other empty states", "Use bell outline icon in button in black
+actually so it matches the search icon. On empty state also use outline
+icon", "the bell should be filled black when notification is on", and
+"Let's catch the light green icon on this state also" (the calendar's
+"Nobody is booked").
+
+- `@pam/ui/emptyState` (`emptyState.icon`: outline icon, 64px, token
+  `--pam-empty-icon`, a light green, a deeper one in dark mode) on every
+  `EmptyState` in the app — Notifications, Messages, the calendar's day and
+  search, Saved, Trips, Explore, the people lists, Connections, Add a
+  program's "sent". Sizes that were 56 and 72 are 64 now.
+- `BellOutlineIcon`. The header bell (`NotificationBell appearance="round"`):
+  the outline in the text colour when nothing is new, **filled** when
+  something is (with the pink dot), at search's 22px. The brief greyed bell
+  is gone (superseded the same hour). The old filled-button bell is unchanged.
+
 ---
 
 ## Notes for whoever picks this up next

@@ -20,6 +20,7 @@ import {
   WorkforceIcon,
 } from '@pam/ui';
 import { CategoryChips, type CategoryChip, type ChipTone } from '@pam/ui/CategoryChips';
+import { emptyState } from '@pam/ui/emptyState';
 import { PlaceCardSkeletonList } from '@pam/ui/Skeletons';
 import { CATEGORY_LIST, NOTICES, type Category } from '@pam/config';
 import type { NearbyPlace, PlacesState } from '@/lib/usePlaces';
@@ -111,7 +112,6 @@ const styles = stylex.create({
   oneLine: { flexGrow: 1, flexShrink: 1, minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
   source: { fontSize: '15px', lineHeight: 1.5 },
   state: { paddingBlock: '32px' },
-  stateIcon: { width: '72px', height: '72px', color: colorVars['--color-icon-accent'] },
 });
 
 export function ExploreView({
@@ -203,7 +203,7 @@ export function ExploreView({
         <EmptyState
           headingLevel={2}
           xstyle={styles.state}
-          icon={<OfflineIcon {...stylex.props(styles.stateIcon)} aria-hidden />}
+          icon={<OfflineIcon {...stylex.props(emptyState.icon)} aria-hidden />}
           title={t(NOTICES[state.offline ? 'offline' : 'something_went_wrong'].titleKey)}
           description={t(NOTICES[state.offline ? 'offline' : 'something_went_wrong'].bodyKey)}
           // Try again only (Will, 1 October): Help is in the header on every
@@ -217,7 +217,7 @@ export function ExploreView({
           <EmptyState
             headingLevel={2}
             xstyle={styles.state}
-            icon={<NoResultsIcon {...stylex.props(styles.stateIcon)} aria-hidden />}
+            icon={<NoResultsIcon {...stylex.props(emptyState.icon)} aria-hidden />}
             title={t('explore.empty.search.title', { query: query.trim() })}
             description={t('explore.empty.search.body')}
             actions={<Button label={t('explore.search.clear')} variant="primary" onClick={onClearSearch} />}
@@ -226,7 +226,7 @@ export function ExploreView({
           <EmptyState
             headingLevel={2}
             xstyle={styles.state}
-            icon={<NoResultsIcon {...stylex.props(styles.stateIcon)} aria-hidden />}
+            icon={<NoResultsIcon {...stylex.props(emptyState.icon)} aria-hidden />}
             title={t(NOTICES.no_places_found.titleKey)}
             description={t('explore.empty.category.body')}
             actions={

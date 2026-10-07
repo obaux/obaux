@@ -45,6 +45,8 @@ export const HomeFolded: Story = withSetup(screen('provider', 'Home — first bo
   done: ['program'],
   booked: [bookedFor(1, 'Marcus', 1, 10), bookedFor(2, 'Tanya', 2, 13), bookedFor(3, 'Luis', 3, 11)],
 });
+export const NotificationsNone: Story = withSetup(screen('provider', 'Notifications — none yet', '/notifications/'), {});
+export const MessagesNone: Story = withSetup(screen('provider', 'Messages — none yet', '/messages/'), {});
 export const CalendarPreview: Story = withSetup(screen('provider', 'Home — calendar preview', '/home/calendar/'), {});
 export const Program: Story = screen('provider', 'Program', '/program/');
 export const EditService: Story = screen('provider', 'Program — edit a service', '/program/service/', { id: 'service-ged' });

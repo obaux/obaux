@@ -57,7 +57,7 @@ export function AddMenu({ onSearch = null }: { readonly onSearch?: (() => void) 
         },
         {
           id: 'invite',
-          label: t('profile.menu.invite'),
+          label: t('home.invite'),
           icon: <PeopleIcon {...ICON} />,
           onClick: () => navigate('/invite/'),
         },

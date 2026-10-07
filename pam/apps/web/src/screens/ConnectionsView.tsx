@@ -6,6 +6,7 @@ import { EmptyState } from '@astryxdesign/core/EmptyState';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { ConnectionsIcon } from '@pam/ui';
+import { emptyState } from '@pam/ui/emptyState';
 import { SubPage } from '@pam/ui/SubPage';
 import { ConnectionCard, type ConnectionStat } from '@pam/ui/ConnectionCard';
 import { useI18n } from '@/lib/i18n';
@@ -72,7 +73,7 @@ export function ConnectionsView({ connections }: ConnectionsViewProps) {
           <EmptyState
             title={t('connections.empty.title')}
             description={t('connections.empty.body')}
-            icon={<ConnectionsIcon width={48} height={48} aria-hidden />}
+            icon={<ConnectionsIcon {...stylex.props(emptyState.icon)} aria-hidden />}
             headingLevel={2}
           />
         </Card>

@@ -9,6 +9,7 @@
  * client is pointed at the live project by default (src/lib/project.ts).
  */
 import { SUPABASE_URL } from '../../lib/project';
+import { isFreshAccount } from '../../lib/programSetup';
 import {
   CASELOAD,
   CONVO_ID,
@@ -63,7 +64,8 @@ function routesFor(journeyRole: JourneyRole): Route[] {
             }
           : { body: null },
     ),
-    on('/rest/v1/notifications', () => ({ body: NOTIFICATIONS })),
+    // A brand-new account has had nothing happen to it yet (D-361).
+    on('/rest/v1/notifications', () => ({ body: isFreshAccount() ? [] : NOTIFICATIONS })),
     on('/rest/v1/notification_preferences', () => ({ body: null })),
     on('/rest/v1/access_controls', () => ({ body: [] })),
     on('/rpc/member_points', () => ({ body: 400 })),
@@ -140,6 +142,8 @@ function routesFor(journeyRole: JourneyRole): Route[] {
       // both Teresa and Sandra are; the one real thread (CONVO_ID) is still
       // reachable by its own address, as the conversation stories use it.
       if (role === 'super_admin' || role === 'member') return { body: [] };
+      // A brand-new account is in no conversation yet (D-361).
+      if (isFreshAccount()) return { body: [] };
       return { body: [{ conversation_id: CONVO_ID, last_read_at: null }] };
     }),
     // Message {name} on a caseload member's page (D-231, D-234) opens the one

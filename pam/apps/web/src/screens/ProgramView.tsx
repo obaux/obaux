@@ -14,6 +14,9 @@ import { BookIcon, GlobeIcon, Page, PhoneIcon, PlaceDetail, PlacesIcon, PlusIcon
 import { LargeTitleHeader } from '@pam/ui/LargeTitleHeader';
 import { MenuList } from '@pam/ui/MenuList';
 import { useI18n } from '@/lib/i18n';
+import { useSession } from '@/lib/useSession';
+import { useProgramSetup } from '@/lib/programSetup';
+import { AddProgramView } from './AddProgramView';
 import { usePolicies } from '@/lib/usePolicies';
 import { useServices } from '@/lib/useServices';
 import { BigCategoryIcon } from './SavedView';
@@ -290,6 +293,12 @@ export function ProgramView({
 /** The Program tab, with the example program until the real listing is loaded (D-218). */
 export function ProgramScreen() {
   const { t } = useI18n();
+  const { state: session } = useSession();
+  const setup = useProgramSetup(session);
+  // No program yet (a fresh account, D-361): the tab is Add a program. Decided
+  // once, so sending one shows its "sent" screen rather than swapping away.
+  const [isAdding] = useState(() => !setup.hasProgram);
+  if (isAdding) return <AddProgramView isTab />;
   const example = DUMMY_SAVED_BY_ROLE.member?.[0];
   return (
     <ProgramView

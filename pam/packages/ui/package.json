@@ -50,7 +50,8 @@
     "./styles.css": "./dist/styles.css",
     "./SetupCard": "./src/SetupCard.tsx",
     "./SetupArt": "./src/SetupArt.tsx",
-    "./DashedRule": "./src/DashedRule.tsx"
+    "./DashedRule": "./src/DashedRule.tsx",
+    "./emptyState": "./src/emptyState.ts"
   },
   "scripts": {
     "typecheck": "tsc -p tsconfig.json",

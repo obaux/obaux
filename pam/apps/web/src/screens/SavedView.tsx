@@ -26,6 +26,7 @@ import { useCaseload } from '@/lib/useCaseload';
 import { PersonRow } from '../app/PersonRow';
 import { StarToggle } from './PeopleHomeView';
 import { LargeTitleHeader } from '@pam/ui/LargeTitleHeader';
+import { emptyState } from '@pam/ui/emptyState';
 import { SavedGrid } from '@pam/ui/SavedGrid';
 import { PlaceCardSkeletonList } from '@pam/ui/Skeletons';
 import { CATEGORY_DEFINITIONS, categoryLabelKey, NOTICES, type Category } from '@pam/config';
@@ -104,7 +105,6 @@ const styles = stylex.create({
     borderColor: colorVars['--color-border'],
   },
   state: { paddingBlock: '48px' },
-  stateIcon: { width: '64px', height: '64px' },
   count: { fontSize: '16px' },
   // A star tapped off in Edit, waiting for Done (D-255).
   waiting: { opacity: 0.5 },
@@ -169,7 +169,7 @@ export function SavedView({
         <EmptyState
           headingLevel={2}
           xstyle={styles.state}
-          icon={<OfflineIcon {...stylex.props(styles.stateIcon)} aria-hidden />}
+          icon={<OfflineIcon {...stylex.props(emptyState.icon)} aria-hidden />}
           title={t(NOTICES[state.offline ? 'offline' : 'something_went_wrong'].titleKey)}
           description={t(NOTICES[state.offline ? 'offline' : 'something_went_wrong'].bodyKey)}
         />
@@ -179,7 +179,7 @@ export function SavedView({
         <EmptyState
           headingLevel={2}
           xstyle={styles.state}
-          icon={<BookmarkIcon {...stylex.props(styles.stateIcon)} aria-hidden />}
+          icon={<BookmarkIcon {...stylex.props(emptyState.icon)} aria-hidden />}
           title={t('saved.empty.title')}
           description={t('saved.empty.body')}
           actions={<Button label={t('explore.empty.showAll')} variant="primary" href={browseHref} />}
@@ -454,7 +454,7 @@ function StarredPeople({
       <EmptyState
         headingLevel={2}
         xstyle={styles.state}
-        icon={<StarIcon isFilled={false} {...stylex.props(styles.stateIcon)} aria-hidden />}
+        icon={<StarIcon isFilled={false} {...stylex.props(emptyState.icon)} aria-hidden />}
         title={t('saved.people.empty.title')}
         description={t('saved.people.empty.body')}
         actions={<Button label={t('tab.home')} variant="primary" href="/" />}

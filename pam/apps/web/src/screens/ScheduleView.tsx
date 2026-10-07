@@ -17,6 +17,7 @@ import { Tooltip } from '@astryxdesign/core/Tooltip';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { CheckIcon, NoResultsIcon, Page, TextLink, TripsIcon, textLinkLook } from '@pam/ui';
+import { emptyState } from '@pam/ui/emptyState';
 import { SignedMark } from './VerifiedBadge';
 import { SearchField } from '@pam/ui/SearchPill';
 import { DashedRule } from '@pam/ui/DashedRule';
@@ -232,7 +233,6 @@ const styles = stylex.create({
   description: { fontSize: '15px', lineHeight: 1.4 },
   quiet: { fontSize: '16px' },
   state: { paddingBlock: '32px' },
-  stateIcon: { width: '64px', height: '64px', color: colorVars['--color-icon-accent'] },
   // The month grid: seven equal columns across the full width (Will,
   // 2 October: "takes up more space on screen").
   grid: { width: '100%' },
@@ -572,7 +572,7 @@ export function ScheduleView({
         <EmptyState
           headingLevel={2}
           xstyle={styles.state}
-          icon={<TripsIcon {...stylex.props(styles.stateIcon)} aria-hidden />}
+          icon={<TripsIcon {...stylex.props(emptyState.icon)} aria-hidden />}
           title={t('schedule.none.title')}
           description={t('schedule.none.body')}
           {...(sameDay(anchor, today)
@@ -775,7 +775,7 @@ export function ScheduleView({
               <EmptyState
                 headingLevel={2}
                 xstyle={styles.state}
-                icon={<NoResultsIcon {...stylex.props(styles.stateIcon)} aria-hidden />}
+                icon={<NoResultsIcon {...stylex.props(emptyState.icon)} aria-hidden />}
                 title={t('schedule.search.none')}
                 description={t('schedule.search.empty.body')}
                 actions={<Button label={t('explore.search.clear')} variant="primary" onClick={() => setQuery('')} />}

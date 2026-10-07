@@ -58,6 +58,7 @@ export { TextField, type TextFieldProps } from './TextField.js';
 export { CodeBoxes, type CodeBoxesProps } from './CodeBoxes.js';
 export {
   BellIcon,
+  BellOutlineIcon,
   BookmarkIcon,
   EditIcon,
   FlagIcon,

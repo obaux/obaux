@@ -149,6 +149,16 @@ export function PhoneIcon(props: SVGProps<SVGSVGElement>) {
  * second icon system. Drawn quiet on purpose: no motion lines, no clapper
  * swinging. These are things to attend to, not alarms.
  */
+/** The bell in line, like the search glass beside it (Will, 7 October, D-362). */
+export function BellOutlineIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <path d="M12 3a6 6 0 0 0-6 6c0 4.4-1.7 6-2.5 6.6h17c-.8-.6-2.5-2.2-2.5-6.6a6 6 0 0 0-6-6z" />
+      <path d="M10 19a2.2 2.2 0 0 0 4 0" />
+    </svg>
+  );
+}
+
 export function BellIcon(props: SVGProps<SVGSVGElement>) {
   /*
    * Filled, unlike the navigation icons, which are drawn in line (Will, 13

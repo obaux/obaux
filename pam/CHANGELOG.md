@@ -24,6 +24,13 @@ far along you are. A new dashed line separates sections in a few places.
 Add a program keeps Next at the bottom of the screen, with "2 of 7" tucked
 into the button (D-355–D-358).
 
+**A new program lead starts empty.** Straight after signing up there are no
+example messages or alerts: the bell is quiet, Notifications and Messages
+say so plainly, and the Program tab opens Add a program. The + menu reads
+"New booking" and "Invite someone to Pam". Every empty screen now shows the
+same light green outline icon, and the header bell is an outline that fills
+in when something is new (D-361, D-362).
+
 **Text alerts, illustrated.** Profile's text-alerts card shows a drawn bell
 in the app's illustration style instead of an icon (D-360).
 
