@@ -287,6 +287,23 @@
   }
 
   /*
+   * Form fields (Will, 7 October, D-367): 8px between a label and its box
+   * (Astryx's 4px read as cramped), the label a step heavier so it is found
+   * before the box, and the words typed at 16px everywhere — legible, and
+   * the size at which iOS does not zoom on focus.
+   */
+  .astryx-field {
+    row-gap: 8px;
+  }
+  .astryx-field-label {
+    font-weight: 600;
+  }
+  .astryx-text-input input,
+  .astryx-field textarea {
+    font-size: 16px;
+  }
+
+  /*
    * Segmented controls are pills, inside and out (Will, 3 October, D-233):
    * the segments and the sliding highlight match the round search bar, chips
    * and buttons. Astryx has no prop for the segment's radius.

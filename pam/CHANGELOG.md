@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.43.1] — 2026-10-07 · Forms, tidied
+
+Adding a program goes straight to its name, ready to type, with no card
+around it; kind of help is a row of choices with Other for your own words;
+the "focus" question is gone; services are explained behind an info icon; and
+the last step, "Review details", says Pam reviews new programs just above
+the Add program button. Every form opens with its first field ready to type,
+labels are a little bolder with more room, and typed text is 16px. Profile's
+photo button has a larger, filled grey camera (D-364–D-367).
+
 ## [0.43.0-programs] — 2026-10-07 · A program lead's first day
 
 **Messages, empty.** A new account's Messages says what will show up there,

@@ -854,7 +854,7 @@
   "programs.new.done.title": "Sent to Pam",
   "programs.new.done.body": "We will check it and add it to the list. That usually takes a day or two.",
   "programs.new.another": "Add another",
-  "programs.new.send": "Send to Pam",
+  "programs.new.send": "Add program",
   "schedule.title": "Coming in",
   "schedule.view.label": "Show the schedule by",
   "schedule.prev.day": "Previous day",
@@ -1308,7 +1308,9 @@
   "notify.empty.body": "When someone books a visit, writes to you or needs you, it shows up here.",
   "messages.empty.body.provider": "When a member writes to you about your program, or you message someone who booked, it shows up here.",
   "messages.empty.body.admin": "When someone you invited writes to you, or you message them, it shows up here.",
-  "join.program.review.note": "Pam checks every new program before members see it.",
+  "join.program.review.note": "Pam reviews every new program before members can find it. We will let you know when yours is live.",
   "join.program.other": "Other",
-  "join.program.other.kind": "Say what kind of help, in your words"
+  "join.program.other.kind": "Say what kind of help, in your words",
+  "programs.new.review.title": "Review details",
+  "join.program.services.more": "About services"
 }

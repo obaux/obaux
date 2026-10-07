@@ -581,3 +581,4 @@ Chromium.
 - D-363: Messages empty copy per role + New message action in the empty state; ProgramEmpty story retitled (approved, unused — Will chose to keep Add a program). STATUS: Release 0.43.0-programs. Checked: typecheck, unit 16/74/238, builds, screenshot; e2e 573/573.
 - Merged #27 (84f4095) after CI green, at Will's word.
 - before-launch.md: new Programs section — load a lead's own program (Will: before production).
+- D-364 CameraFilledIcon 34px + --pam-photo-icon; D-365 hasAutoFocus on first fields (not Sign in, not optional notes), Add a program without card/intro; D-366 ChoiceChips (+ sign-up language), kind Other + categoryOther, focus step removed (6 steps); D-367 globals.css field label gap 8 / weight 600 / input 16px, services InfoIcon + Popover (36px), review title "Review details", info Banner, CTA "Add program". Checked: typecheck, unit 74/238, builds, screenshots; e2e 573/573.

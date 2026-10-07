@@ -8887,6 +8887,65 @@ Add a program".
   The approved `ProgramEmptyView` stays a Storybook story, retitled "approved
   mockup, unused", for when the tab needs a no-program state again.
 
+### D-364 — Profile's photo button: a filled grey camera, larger
+
+**Date:** 2026-10-07. Will: "a larger photo icon, filled style, and make it
+gray, 2 shades darker than avatar background", then "1.2X larger".
+
+- `CameraFilledIcon` (lens cut through) at 34px in the 48px white circle,
+  colour `--pam-photo-icon` (#b4b4b4 light / #5c5c5c dark — two steps past the
+  avatar's #f1f1f1 / #1b1b1b). Wrapped so the button keeps the size.
+- Contrast: about 2:1 on white, under the 3:1 guideline for a meaningful
+  icon; the button has a spoken name ("Add a photo"), and Will chose the
+  softer look. Worth a second look in phone-browser QA.
+
+### D-365 — Fields ready to type; Add a program straight to the question
+
+**Date:** 2026-10-07. Will: "Add program widget, let's remove elements from
+inside the card. Clear the text above … leave that only to be communicated at
+final step", "go straight into adding program name, pre selected so users can
+just type. Do this for all inputs in forms, except sign in screen".
+
+- The first field of every form takes focus on arrival (`hasAutoFocus`):
+  About you, Add a program (each text step, the first service), Add a person,
+  a service, editing the Program, the signature name, an expired link's
+  email. Not Sign in, as asked; not the optional notes on Plan a visit and
+  Report a place, where a keyboard would cover the screen's real choice.
+- Add a program is on the page: no card, no intro; "Pam checks" moves to the
+  last step (D-367).
+
+### D-366 — Kind of help as chips with Other; no "focus" step
+
+**Date:** 2026-10-07. Will: "Make these chips, like we do during sign up …
+also add an other category where a textbox opens", then of "What does it
+focus on?": "Kill this step" (services say it, in more detail).
+
+- `@pam/ui/ChoiceChips` — the sign-up language chips made a component (the
+  chosen one in the secondary green, the rest outlined), used for language
+  and for kind of help. **Other** opens "Say what kind of help, in your
+  words" (`categoryOther`), and the review shows their words.
+- The wizard is six steps: name, kind, about, where, contact, services, then
+  the review. `subcategory` stays in the data, unasked.
+
+### D-367 — Fields read better; services explained behind an info icon; "Review details"
+
+**Date:** 2026-10-07. Will: more gap between label and field, a heavier
+label, space above it, "all input text is 16px"; the services paragraph "in
+a tooltip tapped and shown on info icon … okay if touch target is smaller
+than 48px"; and on the last screen: titled "Review details", no "Check your
+program", the Pam-checks line "to alert on bottom, and adjust copy", CTA "Add
+Program".
+
+- Every form field (globals.css, so all of them): label 8px above its box
+  (was 4px), label weight 600, typed text 16px (it was 14px).
+- Services: the explanation sits in a `Popover` on a 36px info button
+  (`InfoIcon`) beside "What does it offer?"; the fields start straight under
+  the question, 16px apart.
+- Review: the page title becomes "Review details"; no subheading; an info
+  `Banner` above the button — "Pam reviews every new program before members
+  can find it. We will let you know when yours is live."; the button "Add
+  program" (`programs.new.send`).
+
 ---
 
 ## Notes for whoever picks this up next

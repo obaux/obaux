@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { Banner } from '@astryxdesign/core/Banner';
+import { Button } from '@astryxdesign/core/Button';
+import { Popover } from '@astryxdesign/core/Popover';
 import { Heading } from '@astryxdesign/core/Heading';
 import { HStack } from '@astryxdesign/core/HStack';
 import { Icon } from '@astryxdesign/core/Icon';
@@ -10,7 +12,7 @@ import { IconButton } from '@astryxdesign/core/IconButton';
 import { Text } from '@astryxdesign/core/Text';
 import { TextArea } from '@astryxdesign/core/TextArea';
 import { VStack } from '@astryxdesign/core/VStack';
-import { BigButton, TextField, TextLink } from '@pam/ui';
+import { BigButton, InfoIcon, TextField, TextLink } from '@pam/ui';
 import { MenuList } from '@pam/ui/MenuList';
 import { ChoiceChips } from '@pam/ui/ChoiceChips';
 import { CATEGORY_LIST, type Category } from '@pam/config';
@@ -74,6 +76,10 @@ const styles = stylex.create({
   serviceField: { flexGrow: 1, minWidth: 0, textAlign: 'start' },
   removeService: { width: '48px', height: '48px', flexShrink: 0 },
   actions: { width: '100%', alignItems: 'center' },
+  reviewNote: { width: '100%', marginBlockEnd: '8px' },
+  popover: { fontSize: '15px', lineHeight: 1.45, textAlign: 'start', maxWidth: '280px', paddingBlock: '10px', paddingInline: '14px' },
+  // 36px, under the 48px floor on Will's word (D-367): a hint, not a step.
+  info: { width: '36px', height: '36px', minHeight: '36px', minWidth: '36px', padding: 0, borderRadius: '50%', flexShrink: 0 },
 });
 
 /**
@@ -116,9 +122,34 @@ export function useProgramWizard({ value, onChange, onSubmit, busy, submitLabel,
 
   const body = (
     <VStack gap={4} xstyle={styles.card}>
-      <Heading level={2} xstyle={styles.question}>
-        {t(`join.program.step.${at}`)}
-      </Heading>
+      {/* The review has the page's own title, "Review details" (D-367). */}
+      {at === 'review' ? null : (
+        <HStack gap={1} align="center" wrap="nowrap">
+          <Heading level={2} xstyle={styles.question}>
+            {t(`join.program.step.${at}`)}
+          </Heading>
+          {at === 'services' ? (
+            // The longer explanation, behind an info icon a tap opens
+            // (Will, 7 October, D-367: smaller than 48px is fine here).
+            <Popover
+              label={t('join.program.services.more')}
+              placement="below"
+              alignment="end"
+              content={
+                <Text xstyle={styles.popover}>{t('join.program.services.hint')}</Text>
+              }
+            >
+              <Button
+                label={t('join.program.services.more')}
+                variant="ghost"
+                isIconOnly
+                icon={<InfoIcon width={22} height={22} aria-hidden />}
+                xstyle={styles.info}
+              />
+            </Popover>
+          ) : null}
+        </HStack>
+      )}
 
       {at === 'name' ? (
         <VStack gap={2}>
@@ -217,10 +248,7 @@ export function useProgramWizard({ value, onChange, onSubmit, busy, submitLabel,
       ) : null}
 
       {at === 'services' ? (
-        <VStack gap={2}>
-          <Text type="supporting" xstyle={styles.hint}>
-            {t('join.program.services.hint')}
-          </Text>
+        <VStack gap={4}>
           {(value.services.length === 0 ? [''] : value.services).map((name, i) => (
             <HStack key={i} gap={2} align="end" wrap="nowrap" xstyle={styles.serviceRow}>
               <TextField
@@ -251,13 +279,6 @@ export function useProgramWizard({ value, onChange, onSubmit, busy, submitLabel,
             onClick={() => set({ services: [...(value.services.length === 0 ? [''] : value.services), ''] })}
           />
         </VStack>
-      ) : null}
-
-      {at === 'review' ? (
-        // Said here, at the step where it is sent (D-365), not on arrival.
-        <Text type="supporting" xstyle={styles.hint}>
-          {t('join.program.review.note')}
-        </Text>
       ) : null}
 
       {at === 'review' ? (
@@ -292,6 +313,11 @@ export function useProgramWizard({ value, onChange, onSubmit, busy, submitLabel,
 
   const actions = (
       <VStack gap={1} xstyle={styles.actions}>
+        {at === 'review' ? (
+          // That Pam checks it, said where it is about to happen (D-365),
+          // as an alert just above the button (D-367).
+          <Banner status="info" title={t('join.program.review.note')} xstyle={styles.reviewNote} />
+        ) : null}
         {at === 'review' ? (
           <BigButton
             label={busy ? t('join.saving') : (submitLabel ?? t('action.next'))}

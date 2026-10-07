@@ -13,7 +13,7 @@ import { useI18n } from '@/lib/i18n';
 import { markSetupDone } from '@/lib/programSetup';
 import { navigate } from '@/lib/navigate';
 import type { ProgramDetails } from '@/lib/useJoin';
-import { useProgramWizard } from '../app/join/ProgramWizard';
+import { PROGRAM_STEPS, useProgramWizard } from '../app/join/ProgramWizard';
 import { HelpButton } from './HelpButton';
 
 /**
@@ -74,7 +74,8 @@ export function AddProgramView({ isTab = false }: { readonly isTab?: boolean } =
 
   return (
     <SubPage
-      title={t('programs.new.title')}
+      // The last step is its own page by name (Will, 7 October, D-367).
+      title={t(!sent && PROGRAM_STEPS[step] === 'review' ? 'programs.new.review.title' : 'programs.new.title')}
       {...(isTab
         ? { backLabel: '' }
         : { backHref: fromHome ? '/' : '/programs/', backLabel: t(fromHome ? 'nav.back.home' : 'nav.back.programs') })}
