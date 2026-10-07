@@ -26,7 +26,8 @@ import { ArtFrame, C, Ground, L, P, R } from './art/kit.js';
  *
  *   switch   — two of you, a member and the program, with arrows between
  */
-export type SetupArtKind = 'program' | 'photo' | 'calendar' | 'message' | 'policy' | 'private' | 'alerts' | 'switch';
+export const SETUP_ART_KINDS = ['program', 'photo', 'calendar', 'message', 'policy', 'private', 'alerts', 'switch'] as const;
+export type SetupArtKind = (typeof SETUP_ART_KINDS)[number];
 
 export interface SetupArtProps {
   readonly kind: SetupArtKind;

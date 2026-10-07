@@ -9228,6 +9228,22 @@ tooltip next to Use Pam as".
 - **Use Pam as**: the intro moved into an info tip beside the title
   (`SubPage` `titleAddon` now also works with the large title).
 
+### D-377 — Foundations › Illustrations: the inventory
+
+**Date:** 2026-10-07. Will: "Please keep inventory of all illustrations in
+storybook Foundations for the best DS organization."
+
+- A new page, Foundations › Illustrations: the language (flat, two-tone, lit
+  from the left; one object on a ground; grain; shapes not strokes; one kit;
+  decorative), then every set — `SetupArt` (8), `CategoryArt` (3),
+  `BadgeArt` (every badge and rung, locked and square forms, Connections),
+  the hero sample, and the photographs in `apps/web/public` — each with its
+  code, where it is used and its decision. Ends with how to add one.
+- **It cannot go stale:** the sets render from the code's own lists
+  (`SETUP_ART_KINDS`, new and exported; `CATEGORIES`; `BADGE_ART_KEYS`), so a
+  new illustration appears there the moment it exists. Only the photographs
+  are listed by hand.
+
 ---
 
 ## Notes for whoever picks this up next

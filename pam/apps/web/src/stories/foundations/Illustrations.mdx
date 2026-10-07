@@ -1,0 +1,69 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+import { BadgeSet, CategorySet, HeroSample, LockedBadge, PhotoSet, SetupSet } from './IllustrationGallery';
+
+<Meta title="Foundations/Illustrations" />
+
+# Illustrations
+
+Every picture in Pam, in one place. The sets below are drawn from the code's own lists
+(`SETUP_ART_KINDS`, `CATEGORIES`, `BADGE_ART_KEYS`), so a new illustration appears here the
+moment it exists. Before you draw one, check it isn't already here.
+
+## The language
+
+- **Flat colour, lit from the left.** Each object is two tones: the lit side and the shade
+  (D-297). No glow, no gradients.
+- **One object per picture, on a ground.** A flat ground and up to two diagonal shards behind it.
+- **A print grain** over every picture (D-298, D-299): 30% at card size.
+- **Shapes, not strokes.** Arrows and marks are solid, chunky, two-tone shapes, not lines
+  (D-376).
+- **One kit.** Every vector picture is drawn with `art/kit.tsx`: its colours (`--color-data-*`,
+  which have light and dark pairs), its grain and its frame. Don't hand-roll an SVG.
+- **Decorative.** Pictures are `aria-hidden`. The words next to them carry the meaning.
+
+## Getting started and sign-up — `SetupArt`
+
+Cards on a program lead's Home, the lines on What to expect, Profile's alerts card, and hero
+banners.
+
+<SetupSet />
+
+## Kinds of place — `CategoryArt`
+
+One picture per category, keyed to the category's colour.
+
+<CategorySet />
+
+## Badges and Profile tiles — `BadgeArt`
+
+Every badge and every rung of the points ladder, plus Profile's Connections tile (D-295). A
+test checks that every badge in `BADGES` has a picture.
+
+<BadgeSet />
+
+<LockedBadge />
+
+## In a banner — the hero template
+
+`SetupArt isHero` inside `SubPage`'s `hero` (240px, full width). The ground fills the banner,
+the subject is drawn smaller at the centre, and **the grain is quieter (10%)**, because at
+banner size the full grain reads as dirt. This holds for every illustration used in a large
+banner (D-376).
+
+<HeroSample />
+
+## Photographs
+
+Raster images in `apps/web/public`. Each is sized and compressed once (webp where the browser
+allows).
+
+<PhotoSet />
+
+## Adding one
+
+1. Draw it with `art/kit.tsx` in the language above. Keep the subject inside the middle band
+   so a banner crop never cuts it.
+2. Add it to its set (`SETUP_ART_KINDS`, a category, or `BadgeArt`'s map) — it then shows up
+   on this page by itself.
+3. Give it a line in its set's notes here (where it's used, and the D-number).
+4. Check it at card size and, if it will be used in a banner, with `isHero`.
