@@ -9264,6 +9264,37 @@ under storybook for easy handoff."
   this"). The example Unsplash portraits stay hotlinked in the example data
   only; they are not imagery Pam ships, so they are not in the inventory.
 
+### D-379 — "Sent to Pam": the program under review, on the hero template
+
+**Date:** 2026-10-07. Will: "Let's use banner template to celebrate program
+added confirmation while it's under review. and this is the page user sees
+when in program tab, until Pam super admin approves. Create a celebratory
+illustration similar to our cubic 80s style, and document it on storybook
+(remember this flow for new illustrations). If user hits back button they
+return home. but at this stage, they no longer see 'Add a program' in home
+card." (And, earlier, "for later": confetti, and "Receive a text when ready,
+which opens up the text message permission settings".)
+
+- **`ProgramReviewView`** on the hero template (D-376): the new `review`
+  picture; "Sent to Pam" and a sentence on what happens; three steps with
+  markers — sent (done), Pam checks the details (now), members can find it
+  (next); a row "Text me when it's live" to Text alerts. Confetti only right
+  after sending. Back goes Home. No help (A19).
+- **Where it shows:** the end of Add a program (replacing the empty-state
+  "Sent to Pam", from Home, from Programs and from the tab alike), and the
+  Program tab while the program is under review
+  (`useProgramSetup().isUnderReview`: sent from this device, not example
+  data; nothing approves in the prototype). Home's Add your program card was
+  already gone once sent.
+- **The `review` illustration:** the shopfront, confetti in 80s Memphis
+  shapes (triangles, squares, a zigzag, dots — solid, two-tone) and a timer
+  badge. It is in Foundations › Imagery by itself (its set's list).
+- **The illustration flow is now in `pam/CLAUDE.md`** ("New illustrations: the
+  standing flow"), so every session follows it; the no-help exception is noted
+  beside the never-dead-end rule.
+- Stories: Program lead › States › Program — sent for review (Just sent,
+  Under review, Spanish). Flow map: `programSent` node and edges.
+
 ---
 
 ## Notes for whoever picks this up next

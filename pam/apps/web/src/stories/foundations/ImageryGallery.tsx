@@ -120,6 +120,7 @@ const SETUP_NOTES: Readonly<Record<SetupArtKind, string>> = {
   private: 'What to expect, programs (D-354)',
   alerts: 'Profile: text alerts card (D-360)',
   switch: 'Hero of Add your program to your account (D-376)',
+  review: 'Hero of Sent to Pam — a program under review (D-379)',
 };
 
 const CATEGORY_NAMES: Readonly<Record<Category, string>> = {

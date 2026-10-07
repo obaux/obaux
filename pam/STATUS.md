@@ -932,9 +932,8 @@ Open items Will asked to keep (7 October), newest first. Read this before
   the two transparency lines, worded by Will, before launch.
 - **Add a program, as its own flow** (Will, 7 October, "for later"): from the
   Program tab it should hide the tab bar, keep Next pinned at the bottom,
-  and Back from the first step returns to Home; after sending, a confetti
-  "Sent to Pam for review" screen with a "Receive a text when it's ready"
-  row that opens the text-message settings.
+  and Back from the first step returns to Home. (The confetti "Sent to Pam"
+  screen with "Text me when it's live" is done — D-379.)
 - **Apply 0077, then 0078** after 0075/0076 (D-373, D-375).
 - **Apply 0075 then 0076 to the live project** — 0068/0069 carried over and
   reconciled with 0072 (D-346); DB suite green. Their `drop` statements need

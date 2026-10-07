@@ -400,6 +400,13 @@ export const flows = [
         changed: 'D-352',
         note: 'One question a screen; Next pinned to the foot with "2 of 7" in it; from Home, Back and the end go Home',
       },
+      programSent: {
+        title: 'Sent to Pam',
+        story: 'program-lead-states-program-sent-for-review--just-sent',
+        path: '/program/ (under review)',
+        changed: 'D-379',
+        note: 'Hero with confetti; Sent → Pam checks → live; text me when it\'s live. The Program tab until approved; Back is Home',
+      },
       home: {
         title: 'Home — coming in',
         story: 'program-lead-screens--home',
@@ -470,6 +477,9 @@ export const flows = [
     },
     edges: [
       ['getStarted', 'addProgram', 'Add your program'],
+      ['addProgram', 'programSent', 'Add program'],
+      ['programSent', 'getStarted', 'Back — Home, no Add a program card'],
+      ['programSent', 'alerts', 'Text me when it\'s live'],
       ['getStarted', 'profile', 'Add your photo'],
       ['getStarted', 'calendarPreview', 'See who is coming in'],
       ['getStarted', 'book', 'Book a visit for a member'],
@@ -488,6 +498,7 @@ export const flows = [
       ['profile', 'alerts', 'Text alerts'],
     ],
     changes: [
+      'D-379 — after Add program: "Sent to Pam" (hero, confetti, three steps); the Program tab until approved',
       'D-352 — a new lead\'s Home is getting started: three cards and two rows; the calendar folds while setup is unfinished; title centred; search past ten visits',
       'D-348 — Add a policy is one card: a PDF, Choose files, or drop a file',
       'D-313 — services: each with its own phone, website and policies; edited from the Program tab; named at sign-up',

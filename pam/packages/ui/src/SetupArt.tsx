@@ -25,8 +25,13 @@ import { ArtFrame, C, Ground, L, P, R } from './art/kit.js';
  * And one account, two sides (D-376), for the hero of "Add your program":
  *
  *   switch   — two of you, a member and the program, with arrows between
+ *
+ * And the hero of "Sent to Pam" (D-379):
+ *
+ *   review   — your shopfront, confetti in the air, a timer badge: sent, and
+ *              Pam is looking at it
  */
-export const SETUP_ART_KINDS = ['program', 'photo', 'calendar', 'message', 'policy', 'private', 'alerts', 'switch'] as const;
+export const SETUP_ART_KINDS = ['program', 'photo', 'calendar', 'message', 'policy', 'private', 'alerts', 'switch', 'review'] as const;
 export type SetupArtKind = (typeof SETUP_ART_KINDS)[number];
 
 export interface SetupArtProps {
@@ -208,6 +213,48 @@ function Switch({ zoom = 1 }: { readonly zoom?: number }) {
   );
 }
 
+/**
+ * Sent, and being looked at: the shopfront (the same one as Add your program)
+ * with confetti thrown over it — triangles, squares, a zigzag and dots, the
+ * 80s Memphis pieces drawn as flat two-tone shapes — and a round timer badge
+ * at its corner for "Pam is checking it". `zoom` as for `switch`.
+ */
+function Review({ zoom = 1 }: { readonly zoom?: number }) {
+  return (
+    <>
+      <Ground base="purple2" shards={[{ d: 'M0 42 56 32v24H0z', f: 'purple3' }, { d: 'M0 0h22L0 16z', f: 'pink2' }]} />
+      <g transform={`translate(28 28) scale(${zoom}) translate(-28 -28)`}>
+        {/* Confetti, behind the shop */}
+        <P d="M10 9l5 1.5-3.6 3.8z" f="yellow3" />
+        <P d="M12.6 10.2 15 10.5l-3.6 3.8z" f="yellow4" />
+        <R x={41} y={7} w={4.2} h={4.2} rx={0.6} f="teal3" />
+        <R x={43.1} y={7} w={2.1} h={4.2} f="teal4" />
+        <P d="M20 6.5l1.6-2 1.6 2 1.6-2 1.6 2 1.6-2 1.6 2-.9 1.1-.7-.9-1.6 2-1.6-2-1.6 2-1.6-2-1.6 2-.7-.9z" f="red3" />
+        <C cx={34} cy={8.5} r={1.5} f="shamrock3" />
+        <C cx={7} cy={22} r={1.3} f="orange3" />
+        <C cx={49} cy={20} r={1.3} f="yellow3" />
+        <P d="M47 13.5l3.6.8-1.4 3.4z" f="pink2" />
+        <R x={5.5} y={30} w={3.4} h={3.4} rx={0.5} f="blue3" />
+        {/* The shopfront */}
+        <R x={13} y={25} w={30} h={20} f="yellow3" />
+        <R x={28} y={25} w={15} h={20} f="yellow4" />
+        <R x={16.5} y={31} w={8.5} h={7.5} f="teal4" />
+        <R x={30.5} y={31} w={8.5} h={14} rx={1} f="purple5" />
+        <P d="M11 17h34l2.5 8H8.5z" f="red3" />
+        <P d="M28 17h17l2.5 8H28z" f="red4" />
+        <P d="M16 17h6l-.8 8h-6zM34 17h6l1.6 8h-6z" f="pink2" />
+        <R x={9} y={45} w={38} h={2.6} f="purple4" />
+        {/* The timer badge: Pam is checking */}
+        <C cx={44} cy={36} r={6.2} f="gray1" />
+        <P d="M44 29.8a6.2 6.2 0 0 1 0 12.4z" f="gray2" />
+        <P d="M41.6 32.6h4.8l-2.4 3.4zM41.6 39.4h4.8l-2.4-3.4z" f="blue4" />
+        <R x={41} y={31.8} w={6} h={1} rx={0.5} f="purple5" />
+        <R x={41} y={39.2} w={6} h={1} rx={0.5} f="purple5" />
+      </g>
+    </>
+  );
+}
+
 const ART: Readonly<Record<SetupArtKind, (props: { readonly zoom?: number }) => ReactElement>> = {
   program: Program,
   photo: Photo,
@@ -217,6 +264,7 @@ const ART: Readonly<Record<SetupArtKind, (props: { readonly zoom?: number }) => 
   private: Private,
   alerts: Alerts,
   switch: Switch,
+  review: Review,
 };
 
 export function SetupArt({ kind, size = 56, isHero = false }: SetupArtProps) {

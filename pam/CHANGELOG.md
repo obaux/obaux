@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.45.1] — 2026-10-07 · "Sent to Pam"
+
+After a program lead adds their program, a celebration: confetti, a picture
+of their shopfront, and what happens next — sent, Pam checks it, members can
+find it — with a way to get a text when it's live. Until Pam approves it,
+that's what the Program tab shows; Back goes Home (D-379).
+
 ## [0.45.0-two-roles] — 2026-10-07 · One account, member and program
 
 Someone who uses Pam as a member and also works at a program can now keep

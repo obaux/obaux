@@ -17,6 +17,7 @@ import { useI18n } from '@/lib/i18n';
 import { useSession } from '@/lib/useSession';
 import { useProgramSetup } from '@/lib/programSetup';
 import { AddProgramView } from './AddProgramView';
+import { ProgramReviewView } from './ProgramReviewView';
 import { usePolicies } from '@/lib/usePolicies';
 import { useServices } from '@/lib/useServices';
 import { BigCategoryIcon } from './SavedView';
@@ -301,6 +302,8 @@ export function ProgramScreen() {
   // once, so sending one shows its "sent" screen rather than swapping away.
   const [isAdding] = useState(() => !setup.hasProgram);
   if (isAdding) return <AddProgramView isTab />;
+  // Sent, not approved yet: the tab is "Sent to Pam" until it is (D-379).
+  if (setup.isUnderReview) return <ProgramReviewView />;
   const example = DUMMY_SAVED_BY_ROLE.member?.[0];
   return (
     <ProgramView

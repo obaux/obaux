@@ -66,6 +66,13 @@ export interface ProgramSetup {
   /** Example data is shown: a demo or story account, not a fresh one. */
   readonly isExample: boolean;
   readonly hasProgram: boolean;
+  /**
+   * Sent to Pam and not approved yet (D-379): the Program tab is "Sent to
+   * Pam" until a super admin approves it. In the prototype nothing approves,
+   * so a sent program stays here; the real state comes with loading a lead's
+   * own program (before-launch, Programs).
+   */
+  readonly isUnderReview: boolean;
   readonly hasPhoto: boolean;
 }
 
@@ -82,6 +89,7 @@ export function useProgramSetup(session: SessionState): ProgramSetup {
   return {
     isExample,
     hasProgram: isExample || read(DONE + 'program'),
+    isUnderReview: !isExample && read(DONE + 'program'),
     hasPhoto: isExample || photoUrl !== null || read(DONE + 'photo'),
   };
 }

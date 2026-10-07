@@ -2,19 +2,14 @@
 
 import { useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import * as stylex from '@stylexjs/stylex';
-import { Button } from '@astryxdesign/core/Button';
-import { EmptyState } from '@astryxdesign/core/EmptyState';
 import { VStack } from '@astryxdesign/core/VStack';
-import { PlacesIcon } from '@pam/ui';
-import { emptyState } from '@pam/ui/emptyState';
 import { SubPage } from '@pam/ui/SubPage';
 import { useI18n } from '@/lib/i18n';
 import { markSetupDone } from '@/lib/programSetup';
-import { navigate } from '@/lib/navigate';
 import type { ProgramDetails } from '@/lib/useJoin';
 import { PROGRAM_STEPS, useProgramWizard } from '../app/join/ProgramWizard';
 import { HelpButton } from './HelpButton';
+import { ProgramReviewView } from './ProgramReviewView';
 
 /**
  * Add a program (D-218, Will, 2 October: "both case managers and programs be
@@ -32,7 +27,8 @@ import { HelpButton } from './HelpButton';
  * happens next and stores nothing.
  *
  * From Home's getting-started card (`?from=home`, D-352) Back goes Home, and
- * sending it takes that card off Home.
+ * sending it takes that card off Home. Sent, it becomes "Sent to Pam"
+ * (`ProgramReviewView`, D-379), which is also the Program tab until approval.
  */
 const EMPTY: ProgramDetails = {
   name: '',
@@ -44,10 +40,6 @@ const EMPTY: ProgramDetails = {
   website: '',
   services: [],
 };
-
-const styles = stylex.create({
-  state: { paddingBlock: '32px' },
-});
 
 /**
  * `isTab`: drawn as the Program tab itself, for a lead with no program yet
@@ -72,53 +64,31 @@ export function AddProgramView({ isTab = false }: { readonly isTab?: boolean } =
     onStep: setStep,
   });
 
+  // Sent: the celebration, and what happens next (D-379).
+  if (sent) return <ProgramReviewView isCelebrating />;
+
   return (
     <SubPage
       // The last step is its own page by name (Will, 7 October, D-367).
-      title={t(!sent && PROGRAM_STEPS[step] === 'review' ? 'programs.new.review.title' : 'programs.new.title')}
+      title={t(PROGRAM_STEPS[step] === 'review' ? 'programs.new.review.title' : 'programs.new.title')}
       {...(isTab
         ? { backLabel: '' }
         : { backHref: fromHome ? '/' : '/programs/', backLabel: t(fromHome ? 'nav.back.home' : 'nav.back.programs') })}
       // Back goes one question back while there is one (D-347).
-      {...(!sent && step > 0 ? { onBack: () => setStep(step - 1) } : {})}
+      {...(step > 0 ? { onBack: () => setStep(step - 1) } : {})}
       actions={<HelpButton />}
       // Next stays at the foot of the screen, whatever the question (D-357).
       // As the Program tab it sits above the tab bar, so Next stays in the
       // card there rather than covering the bar (D-361).
-      {...(sent || isTab ? {} : { footer: wizard.actions })}
+      {...(isTab ? {} : { footer: wizard.actions })}
     >
-      {sent ? (
-        <EmptyState
-          headingLevel={2}
-          xstyle={styles.state}
-          icon={<PlacesIcon {...stylex.props(emptyState.icon)} aria-hidden />}
-          title={t('programs.new.done.title')}
-          description={t('programs.new.done.body')}
-          actions={
-            fromHome || isTab ? (
-              <Button label={t('programs.new.home')} variant="primary" onClick={() => navigate('/')} />
-            ) : (
-            <Button
-              label={t('programs.new.another')}
-              variant="secondary"
-              onClick={() => {
-                setProgram(EMPTY);
-                setStep(0);
-                setSent(false);
-              }}
-            />
-            )
-          }
-        />
-      ) : (
-        // Straight into the question, on the page — no card, no intro
-        // (Will, 7 October, D-365). That Pam checks a new program is said
-        // once, on the last step, where it is about to happen.
-        <VStack gap={4}>
-          {wizard.body}
-          {isTab ? wizard.actions : null}
-        </VStack>
-      )}
+      {/* Straight into the question, on the page — no card, no intro
+          (Will, 7 October, D-365). That Pam checks a new program is said
+          once, on the last step, where it is about to happen. */}
+      <VStack gap={4}>
+        {wizard.body}
+        {isTab ? wizard.actions : null}
+      </VStack>
     </SubPage>
   );
 }
