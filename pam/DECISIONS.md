@@ -8345,6 +8345,25 @@ start. X circle button is not nearly tucked in corner."
   edge closes the drawer; typecheck; ui 69, config 238, web 16; builds;
   Storybook; e2e 573/573.
 
+### D-339 — Room in the green visit card; "Link copied" spans the whole row, centred
+
+**Date:** 2026-10-07. Will: "Add more vertical space in cards so things
+aren't squished together. And add a bit of space below link. Have link
+copied bar take up full width covering the copy button also. And center
+align text inside shape."
+
+- **VisitCard** (the booked place's card and the booked screen's): 20px
+  between the header, the day-and-time block and Change (was 12px), 8px
+  between day, time and how soon (was 2px), 12px from the calendar mark to
+  the name. Read as the card he was looking at; trip and place cards are
+  unchanged.
+- **Friend drawer:** 44px under the link row (was 28px). "Link copied"
+  now covers the field and Copy together, centred, tick first; it is
+  always present as an empty, absolutely placed `role="status"` so screen
+  readers hear it appear, and taps pass through it, so Copy still works
+  under it (checked: copying again brings it back).
+- **Proven by:** screenshots; typecheck; ui 69; web build; e2e 573/573.
+
 ---
 
 ## Notes for whoever picks this up next

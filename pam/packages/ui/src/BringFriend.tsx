@@ -89,7 +89,7 @@ export async function copyLink(text: string): Promise<boolean> {
 }
 
 const styles = stylex.create({
-  sheet: { width: '100%', paddingInline: '20px', paddingBlockStart: '0px', paddingBlockEnd: '28px' },
+  sheet: { width: '100%', paddingInline: '20px', paddingBlockStart: '0px', paddingBlockEnd: '44px' },
   // Edge to edge and up to the drawer's top (Will, D-338); the sheet's own
   // rounded corners clip it.
   // Above Astryx's handle strip (z-index 1), whose white fade would wash out
@@ -130,18 +130,19 @@ const styles = stylex.create({
   },
   title: { fontSize: '26px', lineHeight: 1.2, fontWeight: 700, textAlign: 'center' },
   body: { fontSize: '17px', lineHeight: 1.45, textAlign: 'center', alignSelf: 'center', maxWidth: '320px' },
-  field: { flexGrow: 1, minWidth: 0, position: 'relative' },
-  // "Link copied", covering the whole field (Will, D-338): Copy's own pale
-  // green, the tick first, fading in.
+  field: { flexGrow: 1, minWidth: 0 },
+  row: { position: 'relative' },
+  // Always there, so a screen reader hears it change; empty and invisible
+  // until the link is copied.
+  status: { position: 'absolute', inset: 0, pointerEvents: 'none' },
+  // "Link copied", covering the field and Copy (Will, D-338, D-339): Copy's
+  // own pale green, the tick first, centred, fading in.
   copied: {
-    position: 'absolute',
-    inset: 0,
     paddingInline: '14px',
     borderRadius: '12px',
     // Copy's own pale green, opaque, so the link under it never shows.
     backgroundColor: pam['--pam-secondary-fill'],
     color: colorVars['--color-text-accent'],
-    pointerEvents: 'none',
     animationName: stylex.keyframes({ from: { opacity: 0 }, to: { opacity: 1 } }),
     animationDuration: '160ms',
     animationTimingFunction: 'ease-out',
@@ -223,21 +224,31 @@ export function BringFriend({
             {label}
           </Heading>
           <Text xstyle={styles.body}>{body}</Text>
-          <HStack gap={2} align="end" wrap="nowrap">
+          <HStack gap={2} align="end" wrap="nowrap" xstyle={styles.row}>
             {/* The link takes all the room Copy leaves it (D-334). */}
             <VStack xstyle={styles.field}>
               <TextField label={linkLabel} isLabelHidden value={link} isReadOnly width="100%" />
-              {/* Said out loud as well as shown (a status, not an alert). */}
-              <HStack role="status" gap={2} align="center" wrap="nowrap" xstyle={copied ? styles.copied : null}>
-                {copied ? (
-                  <>
-                    <Icon icon="check" size="md" />
-                    <Text xstyle={styles.copiedText}>{copiedLabel}</Text>
-                  </>
-                ) : null}
-              </HStack>
             </VStack>
             <Button label={copyLabel} variant="secondary" onClick={() => void copy()} xstyle={styles.copy} />
+            {/*
+              Over the field and Copy both, centred (Will, D-339). Said out
+              loud as well as shown: a status, not an alert. Taps go through.
+            */}
+            <HStack
+              role="status"
+              gap={2}
+              align="center"
+              justify="center"
+              wrap="nowrap"
+              xstyle={[styles.status, copied ? styles.copied : null]}
+            >
+              {copied ? (
+                <>
+                  <Icon icon="check" size="md" />
+                  <Text xstyle={styles.copiedText}>{copiedLabel}</Text>
+                </>
+              ) : null}
+            </HStack>
           </HStack>
         </VStack>
       ) : null}

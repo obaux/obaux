@@ -79,14 +79,16 @@ const styles = stylex.create({
 export function VisitCard({ eyebrow, day, time, service = null, countdown = null, changeLabel, changeHref = null }: VisitCardProps) {
   return (
     <Card padding={5} xstyle={styles.card}>
-      <VStack gap={3}>
-        <HStack gap={2} align="center" wrap="nowrap">
+      {/* Room between each line (Will, 7 October, D-339: "so things aren't
+          squished together"). */}
+      <VStack gap={5}>
+        <HStack gap={3} align="center" wrap="nowrap">
           <HStack align="center" justify="center" xstyle={styles.mark}>
             <Icon icon="calendar" size="md" />
           </HStack>
           <Text xstyle={styles.eyebrow}>{eyebrow}</Text>
         </HStack>
-        <VStack gap={0.5}>
+        <VStack gap={2}>
           <Text xstyle={styles.day}>{day}</Text>
           <Text xstyle={styles.time}>{service ? `${time} · ${service}` : time}</Text>
           {countdown ? <Text xstyle={styles.countdown}>{countdown}</Text> : null}
