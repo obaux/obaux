@@ -36,6 +36,9 @@ STATUS row too.
   live)** — whichever is deployed second wins, so 0069 must be rebased to keep
   0072's super admin ↔ staff arm before it goes live. Run the DB suite on the
   merged result first.
+  - Merged and rebased 7 October as **0075/0076** (D-346): `can_message` keeps
+    0072's arm, the DB suite passes. **Left: apply 0075 then 0076 to the live
+    project, approving their `drop` statements.**
 
 - [ ] **Approve the Pam-team line on the transparency screen** (STATUS row
   10b). Members were promised they would hear first if what is visible
