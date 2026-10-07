@@ -58,7 +58,10 @@ const styles = stylex.create({
   eyebrow: { fontSize: '16px', lineHeight: 1.3, fontWeight: 700, color: colorVars['--color-icon-green'] },
   day: { fontSize: '26px', lineHeight: 1.2, fontWeight: 700, color: colorVars['--color-text-primary'] },
   time: { fontSize: '20px', lineHeight: 1.3, fontWeight: 600, color: colorVars['--color-text-green'] },
-  countdown: { fontSize: '16px', lineHeight: 1.3, fontWeight: 700, color: colorVars['--color-icon-green'] },
+  // Metadata, so it reads quieter than the day and time (Will, D-341): plain
+  // weight, smaller, in the body colour. Not the secondary grey — on the
+  // dark-mode green that is 4.08:1, under AA's 4.5.
+  countdown: { fontSize: '16px', lineHeight: 1.3, fontWeight: 400, color: colorVars['--color-text-primary'] },
   rule: {
     borderTopWidth: '1px',
     borderTopStyle: 'solid',
@@ -67,6 +70,10 @@ const styles = stylex.create({
   },
   change: {
     alignSelf: 'flex-start',
+    // The 48px target hangs into the card's bottom padding, so the words sit
+    // as far from the bottom edge as from the left (Will, D-341: "bottom
+    // padding is stronger than right"); it was 33px under, 18px beside.
+    marginBlockEnd: '-14px',
     minHeight: pam['--pam-touch-target-min'],
     fontSize: '17px',
     fontWeight: 600,

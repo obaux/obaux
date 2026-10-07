@@ -8371,6 +8371,25 @@ subtitle also." Read as: more room under the banner (before the title) and
 under the sentence (before the link). 24px each, was 12px. A layout-only
 change, no test touches it.
 
+### D-341 — "In 2 days" reads as metadata; Change appointment sits evenly in its corner
+
+**Date:** 2026-10-07. Will: "the change appointment button doesn't fit
+neatly tucked in the corner, seems like bottom padding is stronger than
+right. Also 2 days text should not be bold or green so it stands out as
+metadata."
+
+- **Change appointment:** its words sat 33px above the card's bottom edge
+  and 18px from its left, because the 48px target centres the words and
+  adds its own space under them. The target now hangs 14px into the card's
+  padding (`marginBlockEnd: -14px`), so the words are 19px from the bottom
+  and 18px from the side; the target is still 48px and still inside the
+  card (measured).
+- **"In 2 days":** plain weight, 16px, in the body colour. The secondary
+  grey was tried first and failed axe in dark mode (4.08:1 on the dark
+  green, under 4.5), caught by `visit-change.spec`.
+- **Proven by:** measurement, screenshot, typecheck, ui 69, web build, e2e
+  573/573.
+
 ---
 
 ## Notes for whoever picks this up next
