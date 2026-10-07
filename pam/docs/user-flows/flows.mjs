@@ -86,7 +86,7 @@ export const flows = [
         story: 'case-manager-screens--home',
         path: '/',
         changed: 'D-353',
-        note: 'Staff land here from What others can see — no last "go Home" screen',
+        note: 'Staff land here from the last sign-up step — no last "go Home" screen',
       },
       signin: {
         title: 'Sign in',
@@ -140,7 +140,7 @@ export const flows = [
       ['sent', 'email', 'Arrives by email', { dashed: true }],
     ],
     changes: [
-      'D-353 — staff sign-up ends on What others can see and goes straight Home; a program is added from Home, not at sign-up',
+      'D-353 — staff sign-up ends on What to expect and goes straight Home; a program is added from Home, not at sign-up',
       'D-266 — Sign in: the card sits flat under the pictures; the code step is drawn in to match',
       'D-263 — no phone needed to invite; 30-day links; expired links email a new one; "You\'re invited" preview',
       'D-259 — About Pam from the foot of Sign in',
