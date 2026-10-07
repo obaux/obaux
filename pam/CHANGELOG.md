@@ -12,7 +12,10 @@ and the signed list shows each policy with a green tick (D-368, D-369).
 Dropdowns open under their box instead of over it, match the text fields,
 have taller rows and a bolder tick; "New booking" is now "Create new
 booking" (D-370). Info notes have a little more room, and the signed list
-puts the policy names first (D-371).
+puts the policy names first (D-371). Dropdown arrows are larger and sit
+further in; search boxes type at 16px like every other field; info notes
+have 20px of room and a softer, deeper shadow; the signed list is smaller
+ticks with lines between (D-372).
 
 ## [0.43.1] — 2026-10-07 · Forms, tidied
 

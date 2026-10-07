@@ -17,8 +17,9 @@ import { pam } from './tokens.stylex.js';
  *   a long list scrolls inside its panel.
  * - **The box is a field's box** — 56px tall, 12px corners, 16px words — so a
  *   dropdown in a form sits flush with the text fields around it.
- * - **Each row is 48px** and the chosen row's tick is heavier: both in
- *   `globals.css`, where Astryx's option rows can be reached.
+ * - **Each row is 48px** and the chosen row's tick is heavier; the closed
+ *   box's chevron is 20px and bolder, 20px from the edge (D-372): the row and
+ *   chevron rules are in `globals.css`, where Astryx's parts can be reached.
  */
 export type DropdownProps = ComponentProps<typeof Selector>;
 
@@ -27,7 +28,9 @@ const styles = stylex.create({
     height: pam['--pam-field-height'],
     minHeight: pam['--pam-field-height'],
     borderRadius: '12px',
-    paddingInline: '14px',
+    paddingInlineStart: '14px',
+    // The chevron tucked in, not against the edge (Will, D-372).
+    paddingInlineEnd: '20px',
     fontSize: '16px',
   },
 });
@@ -37,6 +40,7 @@ export function Dropdown({ xstyle, ...props }: DropdownProps) {
     <Selector
       size="lg"
       placement="below"
+      data-pam-dropdown=""
       {...props}
       xstyle={[styles.box, xstyle] as DropdownProps['xstyle']}
     />

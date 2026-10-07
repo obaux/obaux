@@ -9061,6 +9061,31 @@ title, make title subtle and thin, and make policy labels stronger."
   secondary text colour; each policy name is 16px at 600. What was signed is
   the news; the heading only says whose list it is.
 
+### D-372 — Dropdown chevron tucked in; 16px in every input; the signed list ruled; tips at 20px with a real shadow
+
+**Date:** 2026-10-07. Will: the dropdown's chevron "bolder and larger, right
+padding should be higher so chevron looks neatly tucked on right"; "are we
+using 16px font size for all inputs?"; the signed tip's "checkmark circles
+smaller, and add separator lines between policies, skip end policy line";
+"Tooltip bring to 20px of padding"; "Add a bit more shadow (realistic)
+behind tooltip".
+
+- **Dropdown:** chevron 20px (was 16), stroke 2.25 (was 1.5); the box's right
+  padding 20px, so the chevron sits 21px from the edge (was 15). The rules
+  sit in globals.css on `.astryx-selector:has(> [data-pam-dropdown])`;
+  `Dropdown` puts the attribute on its button.
+- **16px inputs — not quite, until now.** Scanning every story: all text
+  fields, textareas and dropdowns were 16px, but the search pills' typeahead
+  input (Explore's "Search programs", a case manager's "Search your members")
+  was 14px. globals.css now sets 16px on every text, search, tel and email
+  input and every textarea.
+- **Signed tip:** tick circles 18px (were 22), the tick 12px; a hairline
+  (`--color-border`) under each policy but the last, 8px above and below.
+- **InfoTip:** 20px padding (Astryx's 12 + 8); a three-layer shadow (1px
+  close, 4px soft, 16px wide and faint), darker in dark mode, on
+  `.astryx-popover-surface:has([data-pam-tip])` — info tips only, not other
+  popovers.
+
 ---
 
 ## Notes for whoever picks this up next

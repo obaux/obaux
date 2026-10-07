@@ -298,8 +298,16 @@
   .astryx-field-label {
     font-weight: 600;
   }
+  /* Every place you type, search included (D-372): the search pills'
+     typeahead input was 14px. */
   .astryx-text-input input,
-  .astryx-field textarea {
+  .astryx-field textarea,
+  input[type='text'],
+  input[type='search'],
+  input[type='tel'],
+  input[type='email'],
+  input:not([type]),
+  textarea {
     font-size: 16px;
   }
 
@@ -315,6 +323,26 @@
   }
   .astryx-selector-option-row[data-selected] > span:last-child .astryx-icon svg {
     stroke-width: 2.5;
+  }
+
+  /* The closed box's chevron (D-372): larger and bolder, tucked 20px in
+     from the right edge (Dropdown sets the padding) rather than 15px. */
+  .astryx-selector:has(> [data-pam-dropdown]) .astryx-icon,
+  .astryx-selector:has(> [data-pam-dropdown]) .astryx-icon svg {
+    width: 20px;
+    height: 20px;
+  }
+  .astryx-selector:has(> [data-pam-dropdown]) .astryx-icon svg {
+    stroke-width: 2.25;
+  }
+
+  /* An info tip's popover sits up off the page (D-372): a soft close shadow
+     and a wide, faint one, as paper casts, rather than Astryx's one. */
+  .astryx-popover-surface:has([data-pam-tip]) {
+    box-shadow:
+      0 1px 2px light-dark(oklch(0 0 0 / 6%), oklch(0 0 0 / 30%)),
+      0 4px 10px light-dark(oklch(0 0 0 / 8%), oklch(0 0 0 / 35%)),
+      0 16px 36px light-dark(oklch(0 0 0 / 14%), oklch(0 0 0 / 50%));
   }
 
   /*

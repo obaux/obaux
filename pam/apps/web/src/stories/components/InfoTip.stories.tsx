@@ -5,7 +5,7 @@ import { InfoTip } from '@pam/ui/InfoTip';
 
 /**
  * An info tip (D-368): a 36px round icon — under the 48px floor on purpose,
- * because it explains and never acts — that opens a popover with 18px of
+ * because it explains and never acts — that opens a popover with 20px of
  * padding. Put it beside the heading or name it explains. See Foundations ›
  * Actions for the rule on small targets.
  */

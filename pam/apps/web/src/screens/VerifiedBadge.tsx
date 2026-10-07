@@ -33,8 +33,8 @@ const styles = stylex.create({
   // Each signed policy (Will, 7 October, D-369): a tick in the mark's own
   // light-green circle, so the list reads as done at a glance.
   tick: {
-    width: '22px',
-    height: '22px',
+    width: '18px',
+    height: '18px',
     borderRadius: '50%',
     flexShrink: 0,
     backgroundColor: colorVars['--color-success-muted'],
@@ -44,6 +44,15 @@ const styles = stylex.create({
   // was signed is the news, "Jordan signed" only says whose list it is.
   title: { fontSize: '15px', fontWeight: 400, color: colorVars['--color-text-secondary'] },
   item: { fontSize: '16px', lineHeight: 1.45, fontWeight: 600 },
+  // A hairline between policies, none after the last (Will, D-372).
+  row: { paddingBlock: '8px' },
+  ruled: {
+    borderBottomWidth: '1px',
+    borderBottomStyle: 'solid',
+    borderBottomColor: colorVars['--color-border'],
+  },
+  list: { rowGap: 0 },
+  tickIcon: { fontSize: '12px' },
 });
 
 export function VerifiedBadge({ personId, name }: { readonly personId: string; readonly name: string }) {
@@ -58,14 +67,24 @@ export function VerifiedBadge({ personId, name }: { readonly personId: string; r
       content={
         <>
           <Text xstyle={styles.title}>{t('verified.title', { name })}</Text>
-          {signedBy(personId, policies).map((p) => (
-            <HStack key={p.id} gap={2} align="center" wrap="nowrap">
-              <HStack align="center" justify="center" xstyle={styles.tick} aria-hidden>
-                <Icon icon="check" size="sm" />
+          <VStack xstyle={styles.list}>
+            {signedBy(personId, policies).map((p, i, all) => (
+              <HStack
+                key={p.id}
+                gap={2}
+                align="center"
+                wrap="nowrap"
+                xstyle={[styles.row, i < all.length - 1 && styles.ruled]}
+              >
+                <HStack align="center" justify="center" xstyle={styles.tick} aria-hidden>
+                  <HStack xstyle={styles.tickIcon}>
+                    <Icon icon="check" size="sm" />
+                  </HStack>
+                </HStack>
+                <Text xstyle={styles.item}>{p.title}</Text>
               </HStack>
-              <Text xstyle={styles.item}>{p.title}</Text>
-            </HStack>
-          ))}
+            ))}
+          </VStack>
         </>
       }
     />
