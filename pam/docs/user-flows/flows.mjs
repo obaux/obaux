@@ -71,8 +71,8 @@ export const flows = [
         title: 'About you (joining)',
         story: 'onboarding--case-manager',
         path: '/join/',
-        changed: 'D-359',
-        note: 'Step 1 — the count on the pinned Next; language chips; no legal links',
+        changed: 'D-369',
+        note: 'Step 1 — no card; invited-as banner; city from a list; no role question; count on the pinned Next',
         actions: [
           { fill: 'Your phone number', value: '215 555 0100' },
           { click: 'Send me a code' },

@@ -413,7 +413,9 @@ function PersonScreen() {
                   {
                     id: 'policies',
                     label: t('person.policies.title'),
+                    // "Jordan has signed 4 of 4" (Will, 7 October, D-369).
                     description: t('person.policies.row', {
+                      name: person.firstName ?? '',
                       signed: signedBy(person.id, policies).length,
                       total: policies.length,
                     }),

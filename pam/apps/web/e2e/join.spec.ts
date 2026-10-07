@@ -71,7 +71,14 @@ async function newcomer(
 
   await page.route(USER, (route) => route.fulfill(json({ id: NEWCOMER })));
   await page.route(NOTIFICATIONS, (route) => route.fulfill(json([])));
-  await page.route(CITIES, (route) => route.fulfill(json([{ city: 'Philadelphia' }])));
+  // The city is a list of the served ones (D-369). A city Pam is not in can
+  // only be typed when that list could not be fetched — the box comes back —
+  // so a test of that path has the first ask fail and the later one (the
+  // waiting screen's "Right now Pam is in …") answer.
+  let citiesAsked = 0;
+  await page.route(CITIES, (route) =>
+    route.fulfill(json(options.cityServed === false && citiesAsked++ === 0 ? [] : [{ city: 'Philadelphia' }])),
+  );
   await page.route(POINTS, (route) => route.fulfill(json(25)));
   await page.route(PREFS, (route) => route.fulfill(json([])));
 
@@ -115,7 +122,10 @@ async function newcomer(
 async function fillDetails(page: import('@playwright/test').Page, city = 'Philadelphia') {
   await page.getByLabel('First name').fill('Marcus');
   await page.getByLabel('Last name').fill('Reeves');
-  await page.getByLabel('City you live in').fill(city);
+  // A list of the served cities (D-369), or the box when there is no list.
+  const list = page.getByRole('combobox', { name: 'City you live in' });
+  if (await list.count()) await expect(list).toContainText(city);
+  else await page.getByLabel('City you live in').fill(city);
 }
 
 test.describe('signing up', () => {
@@ -181,21 +191,19 @@ test.describe('signing up', () => {
       .toBe(true);
   });
 
-  test('a case manager is a claim, not an account', async ({ page }) => {
-    // These roles read other people's information. A form is not a credential.
+  test('without a link, nobody can say they are staff (D-369)', async ({ page }) => {
+    // A program or a case manager joins by the link they are sent; the form
+    // has no question a member could answer as staff by mistake.
     const calls = await newcomer(page);
     await page.goto('/join/');
     await fillDetails(page);
-    await page.getByRole('radio', { name: 'Parole Officer or Case Manager' }).click();
+    await expect(page.getByRole('radio')).toHaveCount(0);
+    await expect(page.getByText('Parole Officer or Case Manager')).toHaveCount(0);
     await page.getByRole('button', { name: 'Next' }).click();
 
-    await expect(page.getByRole('heading', { name: 'Someone will call you' })).toBeVisible();
-    expect(calls.staff, 'the claim was not recorded').toHaveLength(1);
-    expect(calls.staff[0]!['p_wants_role']).toBe('admin');
-    expect(calls.start, 'a staff answer created a profile').toHaveLength(0);
-
-    // Nothing to attach text consent to, so no texts step: the way out is Done.
-    await expect(page.getByRole('link', { name: 'Done' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'What others can see' })).toBeVisible();
+    expect(calls.staff, 'a staff claim was sent').toHaveLength(0);
+    expect(calls.start, 'start_membership was not called').toHaveLength(1);
   });
 
   test('invited by a link, nothing is asked that the link already said (D-254)', async ({ page }) => {
@@ -206,7 +214,8 @@ test.describe('signing up', () => {
     await newcomer(page);
     await page.goto('/join/');
 
-    await expect(page.getByText('You were invited as a case manager.')).toBeVisible();
+    await expect(page.getByText('You were invited as:')).toBeVisible();
+    await expect(page.getByText('Case manager', { exact: true })).toBeVisible();
     await expect(page.getByLabel('Code from the person who invited you')).toHaveCount(0);
     await expect(page.getByRole('radio', { name: 'Parole Officer or Case Manager' })).toHaveCount(0);
   });
@@ -249,7 +258,8 @@ test.describe('signing up', () => {
   test('a name is asked for before anything is sent', async ({ page }) => {
     const calls = await newcomer(page);
     await page.goto('/join/');
-    await page.getByLabel('City you live in').fill('Philadelphia');
+    // The city is pre-set from the served list (D-369); only the name is empty.
+    await expect(page.getByRole('combobox', { name: 'City you live in' })).toContainText('Philadelphia');
     await page.getByRole('button', { name: 'Next' }).click();
 
     await expect(page.getByText(/We need your first name/)).toBeVisible();

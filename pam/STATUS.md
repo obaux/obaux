@@ -855,6 +855,19 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
+## Release 0.43.2 (7 October) — forms, tidied; sign-up, cleaner
+
+D-364 to D-369, on `claude/pam-storybook`, **not merged**. Add a program is
+on the page, no card, no focus step, kind as `ChoiceChips` with Other,
+"Review details" with the review note as a banner. Fields: label 8px above,
+weight 600, typed text 16px. `@pam/ui/InfoTip` — a 36px circle
+(`--pam-touch-target-tip`, documented in Foundations › Actions as the
+explain-only exception) that picks the side of its button it fits on.
+Sign-up: no cards, "You were invited as: **role**" banner, city a `Selector`
+of served cities (text box only if the list fails — the one path left to
+the waiting list), no role question (members only without a link), code
+hint in an InfoTip. Member page: "Jordan has signed 4 of 4", green ticks.
+
 ## Release 0.43.0-programs (7 October)
 
 A program lead's first day, D-352 to D-363. Home is Get started (program,

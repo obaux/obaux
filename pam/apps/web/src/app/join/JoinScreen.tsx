@@ -5,11 +5,11 @@ import { useRouter } from 'next/navigation';
 import * as stylex from '@stylexjs/stylex';
 import { HStack } from '@astryxdesign/core/HStack';
 import { VStack } from '@astryxdesign/core/VStack';
-import { Card } from '@astryxdesign/core/Card';
+import { Banner } from '@astryxdesign/core/Banner';
+import { Selector } from '@astryxdesign/core/Selector';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { CheckboxInput } from '@astryxdesign/core/CheckboxInput';
-import { RadioList, RadioListItem } from '@astryxdesign/core/RadioList';
 import { colorVars, spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { BellIcon, BigButton, Loading, Notice, Page, PointsBadge, StarIcon, TextField, TextLink, TripsIcon } from '@pam/ui';
 import { SubPageHeader } from '@pam/ui/SubPage';
@@ -37,6 +37,7 @@ import { NOTICES } from '@pam/config';
 import { markFreshAccount } from '@/lib/programSetup';
 import { SetupArt, type SetupArtKind } from '@pam/ui/SetupArt';
 import { ChoiceChips } from '@pam/ui/ChoiceChips';
+import { InfoTip } from '@pam/ui/InfoTip';
 
 /**
  * Signing up: five steps, and four of them are one question each.
@@ -54,15 +55,13 @@ import { ChoiceChips } from '@pam/ui/ChoiceChips';
  * screen to read, one yes-or-no about texts. Five, counting the one that
  * congratulates you.
  *
- * **Nothing here says "role".** A member picks from three sentences about
- * themselves — "Someone in need of support", "Someone willing to help",
- * "Parole Officer or Case Manager" — because role is a word this system uses
- * about people, not a word people use about themselves (Will, 14 September).
- *
- * **The two staff answers create nothing.** They record a claim and say
- * somebody will call. Those roles read other people's information, and a form
- * is not a credential; 0046 has the long version. It is also why this screen
- * cannot be used to become a case manager by typing it.
+ * **Nothing here says "role", and nobody picks one.** There used to be three
+ * sentences to choose from ("Someone in need of support", "Someone willing to
+ * help", "Parole Officer or Case Manager"); since D-369 there are none. A
+ * program or a case manager arrives by the link they were sent, which says
+ * what they are; without one, this is a member's sign-up, so nobody can call
+ * themselves staff by mistake. (A staff claim made here before created
+ * nothing anyway — 0046.)
  *
  * **A city Pam does not serve is a different screen, not an error.** Somebody
  * in Scranton typed their name in good faith. They are told where Pam is, and
@@ -95,21 +94,25 @@ const STEP: Record<Phase, number> = {
 /** What to expect, for a program lead (D-354): one picture per line. */
 const PROVIDER_EXPECT: readonly SetupArtKind[] = ['calendar', 'message', 'policy', 'private'];
 
+/** The small print at the foot of the city list: shown, never chosen. */
+const CITY_NOTE = '__note';
+
 const styles = stylex.create({
-  card: { width: '100%' },
+  // Small print, centred, at the foot of the city list (D-369).
+  cityNote: { width: '100%', textAlign: 'center', fontSize: '13px', lineHeight: 1.4 },
   quietIntro: { fontSize: '16px', lineHeight: 1.5 },
   // The bell in the brand green, its middle on the first line's middle.
   bell: { flexShrink: 0, paddingBlockStart: '3px', color: colorVars['--color-icon-accent'] },
-  chipsLabel: { fontSize: '15px', lineHeight: 1.4, color: colorVars['--color-text-secondary'] },
+  // A label that is not a field's own — the language chips, the code row with
+  // its info tip — drawn like a field's (globals.css: 14px, 600), so the page
+  // reads as one form (D-369).
+  chipsLabel: { fontSize: '14px', lineHeight: '20px', fontWeight: 600, color: colorVars['--color-text-secondary'] },
   expectArt: { flexShrink: 0, borderRadius: '14px', overflow: 'hidden' },
   intro: { fontSize: '18px', lineHeight: 1.5 },
   body: { fontSize: '17px', lineHeight: 1.5 },
   small: { fontSize: '15px', lineHeight: 1.5 },
   heading: { fontSize: '17px' },
   field: { textAlign: 'start' },
-  // 12px between the three sentences, so they read as three things to choose
-  // between rather than one paragraph (the flag screen learned this first).
-  choices: { rowGap: spacingVars['--spacing-3'] },
   item: { fontSize: '17px', lineHeight: 1.45 },
   /** The badge the last screen hands over. */
   medal: {
@@ -127,12 +130,6 @@ const styles = stylex.create({
   badgeName: { fontSize: '22px', fontWeight: 700 },
 });
 
-/** The three sentences, and what each one means to the database. */
-const KINDS: readonly { readonly kind: JoinKind; readonly key: string }[] = [
-  { kind: 'member', key: 'join.fit.member' },
-  { kind: 'provider', key: 'join.fit.provider' },
-  { kind: 'admin', key: 'join.fit.admin' },
-];
 
 /**
  * For the Storybook prototype only (D-249): sign up as this kind of person,
@@ -277,7 +274,10 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
     if (phase !== 'details' && phase !== 'waiting') return;
     let cancelled = false;
     void servedCities().then((list) => {
-      if (!cancelled) setCities(list);
+      if (cancelled) return;
+      setCities(list);
+      // Pre-set to a city Pam is in (D-369): the list is the admin's.
+      setCity((current) => (current && list.includes(current) ? current : (list[0] ?? current)));
     });
     return () => {
       cancelled = true;
@@ -508,10 +508,25 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
         ) : null}
 
         {phase === 'details' ? (
-          <Card padding={4} xstyle={styles.card}>
+          <>
             <VStack gap={3}>
-              {/* What they were invited as, first: the reason this form is short. */}
-              {invitedAs ? <Text xstyle={styles.intro}>{t(`join.invited.${invitedAs}`)}</Text> : null}
+              {/* What they were invited as, first: the reason this form is short —
+                  a green alert, the role in bold (Will, 7 October, D-369). */}
+              {invitedAs ? (
+                <Banner
+                  status="success"
+                  title={
+                    <>
+                      <Text as="span" weight="normal">
+                        {t('join.invited.as')}
+                      </Text>{' '}
+                      <Text as="span" weight="bold">
+                        {t(`join.invited.role.${invitedAs}`)}
+                      </Text>
+                    </>
+                  }
+                />
+              ) : null}
               <TextField
                 id={firstId}
                 purpose="name"
@@ -532,15 +547,46 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
                 width="100%"
                 xstyle={styles.field}
               />
-              <TextField
-                id={cityId}
-                purpose="city"
-                label={t('join.details.city')}
-                value={city}
-                onChange={setCity}
-                width="100%"
-                xstyle={styles.field}
-              />
+              {/* A list, not a box to type in (Will, 7 October, D-369): Pam is
+                  only in the cities an admin has set up, so the list is those,
+                  with a line of small print at its foot that says so. If the
+                  list cannot be fetched, the box comes back — somebody offline
+                  can still say where they live. */}
+              {cities.length > 0 ? (
+                <Selector
+                  label={t('join.details.city')}
+                  size="lg"
+                  width="100%"
+                  value={city}
+                  options={[
+                    ...cities.map((name) => ({ value: name, label: name })),
+                    { type: 'divider' as const },
+                    { value: CITY_NOTE, label: t('join.details.city.note'), disabled: true },
+                  ]}
+                  renderOption={(option) =>
+                    option.value === CITY_NOTE ? (
+                      <Text type="supporting" xstyle={styles.cityNote}>
+                        {option.label}
+                      </Text>
+                    ) : (
+                      option.label
+                    )
+                  }
+                  onChange={(next) => {
+                    if (next !== CITY_NOTE) setCity(next);
+                  }}
+                />
+              ) : (
+                <TextField
+                  id={cityId}
+                  purpose="city"
+                  label={t('join.details.city')}
+                  value={city}
+                  onChange={setCity}
+                  width="100%"
+                  xstyle={styles.field}
+                />
+              )}
 
               {invalid ? (
                 <Text type="supporting" xstyle={styles.body}>
@@ -580,18 +626,27 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
                   because it replaces them: a person with a code was told what
                   they are by the person who gave it to them.
                 */}
-                <TextField
-                  id={codeFieldId}
-                  purpose="inviteCode"
-                  label={t('join.code.label')}
-                  value={inviteCode}
-                  onChange={(next) => setInviteCode(next.toUpperCase())}
-                  width="100%"
-                  xstyle={styles.field}
-                />
-                <Text type="supporting" xstyle={styles.small}>
-                  {t('join.code.hint')}
-                </Text>
+                {/* The hint behind an info tip on the label's line (D-369):
+                    the form stays fields; the field keeps its own label for
+                    screen readers, and the line you see is that label again. */}
+                <VStack gap={1}>
+                  <HStack gap={1} align="center" wrap="nowrap">
+                    <Text aria-hidden="true" xstyle={styles.chipsLabel}>
+                      {t('join.code.label')}
+                    </Text>
+                    <InfoTip label={t('join.code.more')} content={t('join.code.hint')} />
+                  </HStack>
+                  <TextField
+                    id={codeFieldId}
+                    purpose="inviteCode"
+                    label={t('join.code.label')}
+                    isLabelHidden
+                    value={inviteCode}
+                    onChange={(next) => setInviteCode(next.toUpperCase())}
+                    width="100%"
+                    xstyle={styles.field}
+                  />
+                </VStack>
                 </>
               )}
 
@@ -605,31 +660,17 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
                 />
               ) : null}
 
-              {/*
-                Three sentences about the person, not three roles. Always one
-                selected, and the first one is the one most people arriving here
-                are — asking somebody to declare themselves before they have seen
-                anything is hard enough without a blank set of buttons.
-              */}
-              {inviteCode.trim() === '' && !invitedAs ? (
-                <RadioList
-                  label={t('join.details.fit')}
-                  value={kind}
-                  onChange={(next) => setKind(next as JoinKind)}
-                  xstyle={styles.choices}
-                >
-                  {KINDS.map((option) => (
-                    <RadioListItem key={option.kind} value={option.kind} label={t(option.key)} />
-                  ))}
-                </RadioList>
-              ) : null}
+              {/* No "Which one fits you best?" (Will, 7 October, D-369): a
+                  program or a case manager joins by the link they are sent, so
+                  a member cannot say they are staff by mistake. Without a link,
+                  this is a member's sign-up. */}
 
             </VStack>
-          </Card>
+          </>
         ) : null}
 
         {phase === 'waiting' ? (
-          <Card padding={4} xstyle={styles.card}>
+          <>
             <VStack gap={3}>
               <Text xstyle={styles.intro}>{t('join.waiting.body', { city: city.trim() })}</Text>
               {cities.length > 0 ? (
@@ -651,7 +692,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
                 {t('reminders.how')}
               </Text>
             </VStack>
-          </Card>
+          </>
         ) : null}
 
         {phase === 'waitingDone' ? (
@@ -671,7 +712,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
           asked to trust us with their life (Will, 14 September).
         */}
         {phase === 'privacy' && !isStaff ? (
-          <Card padding={4} xstyle={styles.card}>
+          <>
             <VStack gap={3}>
               <Text xstyle={styles.intro}>{t('join.privacy.member.intro')}</Text>
 
@@ -701,12 +742,12 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
                 {t(TRANSPARENCY_SCREEN.footerKey)}
               </Text>
             </VStack>
-          </Card>
+          </>
         ) : null}
 
         {phase === 'privacy' && isStaff ? (
           <>
-            <Card padding={4} xstyle={styles.card}>
+            <>
               <VStack gap={3}>
                 <Text xstyle={styles.intro}>{t(`join.privacy.${kind}.intro`)}</Text>
                 {kind === 'provider' ? (
@@ -730,7 +771,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
                   ))
                 )}
               </VStack>
-            </Card>
+            </>
             {hasAccount ? null : (
               <>
                 {/*
@@ -751,7 +792,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
         ) : null}
 
         {phase === 'texts' ? (
-          <Card padding={4} xstyle={styles.card}>
+          <>
             <VStack gap={3}>
               {/* Easier to scan (Will, 7 October, D-359): a quieter intro, and
                   what Pam would send as three bell bullets, evenly spaced. */}
@@ -777,13 +818,13 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
                 {t('reminders.how')}
               </Text>
             </VStack>
-          </Card>
+          </>
         ) : null}
 
         {phase === 'done' && !isStaff && booked ? (
           <>
             <Confetti />
-            <Card padding={4} xstyle={styles.card}>
+            <>
               <VStack gap={3} xstyle={styles.celebrate}>
                 <span aria-hidden="true" {...stylex.props(styles.medal)}>
                   <TripsIcon />
@@ -806,12 +847,12 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
                 />
                 <TextLink label={t('join.booked.trips')} href="/trips/" />
               </VStack>
-            </Card>
+            </>
           </>
         ) : null}
 
         {phase === 'done' && !isStaff && !booked ? (
-          <Card padding={4} xstyle={styles.card}>
+          <>
             <VStack gap={3} xstyle={styles.celebrate}>
               <span aria-hidden="true" {...stylex.props(styles.medal)}>
                 <StarIcon />
@@ -826,7 +867,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
               <Text xstyle={styles.body}>{t('join.done.body', { name: firstName.trim() || t('app.name') })}</Text>
               <BigButton label={t('join.done.action')} onPress={() => (preview ? navigate('/') : router.replace('/'))} />
             </VStack>
-          </Card>
+          </>
         ) : null}
 
       </Page>

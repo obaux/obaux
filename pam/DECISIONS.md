@@ -8946,6 +8946,82 @@ Program".
   can find it. We will let you know when yours is live."; the button "Add
   program" (`programs.new.send`).
 
+### D-368 — InfoTip: a 36px circle that explains, and the rule for smaller targets
+
+**Date:** 2026-10-07. Will: the info button "looks oval not circle … ensure
+it's a perfect circle, and keep smaller touch target"; "why is the start of
+sentence indented?"; the same on the signature mark on a member's profile;
+"ensure these smaller touch targets are documented in the DS since we'll use
+them to communicate tooltip info"; padding "min 32px", then "16px padding is
+all we need here, 32 is too much".
+
+- `@pam/ui/InfoTip`: an icon-only ghost `Button` opening an Astryx `Popover`
+  (tap, not hover — a phone has none). Replaces D-367's ad-hoc Popover on the
+  services step and the IconButton + Popover in `VerifiedBadge`.
+- **Why it was oval:** globals.css gives every button `min-height:
+  var(--pam-touch-target-min)` (48px). The tip lowers that variable on itself
+  only, to `--pam-touch-target-tip` (36px, new token), and sets width = height
+  with `border-radius: 50%`. Measured 36 × 36 in both places.
+- **Why the first line was indented:** padding sat on an inline `Text` span, so
+  only the first line box got it. The padding is on the block `VStack` now.
+- **Padding:** 16px all round — Astryx's popover surface brings 12px, the tip's
+  body the other 4. (32px was tried first and dropped on Will's word.)
+- **The rule, documented** in Foundations › Actions ("Touch targets — 48px, and
+  the two exceptions") and the InfoTip story: 48px for anything that acts; an
+  info tip, which only explains, may be 36px; the range tabs 38px (D-355).
+  Nothing else goes below 48px without a decision of its own.
+
+### D-369 — Sign-up without cards; invites as a green alert; cities as a list; no role question
+
+**Date:** 2026-10-07. Will: "For sign up, let's remove the form from card
+also. And make a green alert for the detail up top 'You were invited as:
+{Role in bold}'. This no card layout should be consistent for all sign up
+flows … extra info either communicated in info tooltip or via alert banners";
+"City you live in, that's a dropdown, city is pre-set by admin … Add a small
+note under listed city (inside dropdown), that we only support selected
+cities (center aligned small print text)"; "During sign up, we won't be asking
+this question any longer, since we'll have special links for login for
+programs and case managers. We don't want to let members select that they're
+a staff by mistake"; the signed-policies tip: "green bright circles with
+checkmarks … match green from tooltip icon"; the member page's Policies row
+to read "Jordan has signed # of #"; and the tip text "getting cut off, make
+sure this works, without running out of screen".
+
+- **No cards in sign-up.** Every `/join/` step (About you, the waiting list,
+  What others can see / What to expect, Text messages, the last screen) and
+  the expired-invite form sit straight on the page, like Add a program
+  (D-365).
+- **Invited as:** a success `Banner`, "You were invited as: **Program
+  partner**" (case manager / program partner / member), the role in bold, the
+  lead-in at normal weight. Replaces the plain sentence.
+- **Extra words go behind an info tip.** The invite code's hint ("8 letters
+  and numbers …") is now an InfoTip beside the field's label; the field keeps
+  its own (visually hidden) label for screen readers. "Choose a language" is
+  drawn like the other field labels (14px, 600).
+- **City is a list.** A `Selector` of the cities `served_cities` returns (the
+  admin's list), pre-set to the first, with a disabled last row of centred
+  small print, "Pam is only in these cities for now." If the list cannot be
+  fetched, the text box comes back, so somebody offline can still say where
+  they live — which is also now the only way to reach the waiting list ("Pam
+  is not in Scranton yet"); that screen stays, the e2e tests now reach it
+  that way.
+- **No "Which one fits you best?"** Without an invite link, sign-up is a
+  member's. The three sentences (and their locale keys) are gone; a program
+  or case manager arrives by their link, which already says what they are.
+  `request_staff_access` is no longer called from this form (it created
+  nothing anyway — 0046); the RPC and the Requests screen stay for now.
+- **InfoTip placement.** Astryx gives an aligned popover only the room between
+  its button and one screen edge, so a tip mid-line came out a word wide (or,
+  forced to `max-content`, clipped). The tip now picks its side when it opens:
+  along the button, back from it, or centred, whichever keeps 320px on screen;
+  if none does, the side with more room, wrapping to fit. Text always fills
+  its box and stays on screen.
+- **Signed policies:** each one in the tip is a tick in a 22px light-green
+  circle (`--color-success-muted` / `--color-success`, the signature mark's
+  own colours).
+- **Member page:** the Policies row reads "{name} has signed {signed} of
+  {total}".
+
 ---
 
 ## Notes for whoever picks this up next

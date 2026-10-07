@@ -21,6 +21,10 @@ import * as stylex from '@stylexjs/stylex';
  */
 export const pam = stylex.defineVars({
   '--pam-touch-target-min': '48px',
+  // The one sanctioned exception (Will, 7 October, D-368): an info tip — a
+  // small round icon that opens a popover of explanation, never an action.
+  // 36px, a true circle. Use it only through `InfoTip`.
+  '--pam-touch-target-tip': '36px',
   // A text field's frame, not just its tap area. Astryx's largest input draws a
   // 36px box, which is under Pam's floor: the target was already 48px, so the
   // box you could hit was bigger than the box you could see, and on a phone a

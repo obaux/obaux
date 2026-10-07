@@ -52,7 +52,8 @@
     "./SetupArt": "./src/SetupArt.tsx",
     "./DashedRule": "./src/DashedRule.tsx",
     "./emptyState": "./src/emptyState.ts",
-    "./ChoiceChips": "./src/ChoiceChips.tsx"
+    "./ChoiceChips": "./src/ChoiceChips.tsx",
+    "./InfoTip": "./src/InfoTip.tsx"
   },
   "scripts": {
     "typecheck": "tsc -p tsconfig.json",

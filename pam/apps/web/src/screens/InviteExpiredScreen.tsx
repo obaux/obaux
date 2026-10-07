@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
-import { Card } from '@astryxdesign/core/Card';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
@@ -105,8 +104,8 @@ export function InviteExpiredScreen({ invite }: { readonly invite: Invite | null
           ) : (
             <>
               <Text xstyle={styles.body}>{t(`invite.expired.body.${role}`, { name })}</Text>
-              <Card padding={6}>
-                <VStack gap={3}>
+              {/* No card: sign-up forms sit on the page (Will, 7 October, D-369). */}
+              <VStack gap={3}>
                   <Text xstyle={styles.body}>{t('invite.expired.ask')}</Text>
                   <TextField
                     purpose="email"
@@ -137,7 +136,6 @@ export function InviteExpiredScreen({ invite }: { readonly invite: Invite | null
                     isDisabled={busy || email.trim() === ''}
                   />
                 </VStack>
-              </Card>
             </>
           )
         ) : null}

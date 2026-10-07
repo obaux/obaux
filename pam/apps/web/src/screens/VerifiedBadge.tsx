@@ -3,9 +3,7 @@
 import * as stylex from '@stylexjs/stylex';
 import { HStack } from '@astryxdesign/core/HStack';
 import { Icon } from '@astryxdesign/core/Icon';
-import { SignIcon } from '@pam/ui';
-import { IconButton } from '@astryxdesign/core/IconButton';
-import { Popover } from '@astryxdesign/core/Popover';
+import { InfoTip, SignIcon } from '@pam/ui';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
@@ -16,7 +14,7 @@ import { isVerified, signedBy, usePolicies } from '@/lib/usePolicies';
  * Verified (Will, 4 October, D-261): a small tick beside a member's name,
  * in a program's own views, when they have signed every one of the
  * program's policies. Tapping it says which. Kept small — it is a detail,
- * not a status — but still a 48px target around a small mark. Shown for
+ * not a status — an info tip (D-368), 36px around the small mark. Shown for
  * nobody who has not signed everything; a half-signed person has no mark,
  * not a half one.
  */
@@ -32,15 +30,16 @@ const styles = stylex.create({
     color: colorVars['--color-success'],
   },
   markIcon: { width: '14px', height: '14px' },
-  button: {
-    width: '40px',
-    height: '40px',
-    minHeight: '40px',
-    marginBlock: '-4px',
+  // Each signed policy (Will, 7 October, D-369): a tick in the mark's own
+  // light-green circle, so the list reads as done at a glance.
+  tick: {
+    width: '22px',
+    height: '22px',
+    borderRadius: '50%',
     flexShrink: 0,
-    color: colorVars['--color-icon-accent'],
+    backgroundColor: colorVars['--color-success-muted'],
+    color: colorVars['--color-success'],
   },
-  card: { maxWidth: '280px', padding: '16px' },
   title: { fontSize: '17px', fontWeight: 700 },
   item: { fontSize: '16px', lineHeight: 1.45 },
 });
@@ -50,28 +49,24 @@ export function VerifiedBadge({ personId, name }: { readonly personId: string; r
   const { policies } = usePolicies();
   if (!isVerified(personId, policies)) return null;
   return (
-    <Popover
-      placement="below"
-      alignment="start"
+    // An info tip (D-368): 36px, a true circle, the popover with room.
+    <InfoTip
+      label={t('verified.label', { name })}
+      icon={<SignedMark />}
       content={
-        <VStack gap={1} xstyle={styles.card}>
+        <>
           <Text xstyle={styles.title}>{t('verified.title', { name })}</Text>
           {signedBy(personId, policies).map((p) => (
             <HStack key={p.id} gap={2} align="center" wrap="nowrap">
-              <Icon icon="check" size="sm" />
+              <HStack align="center" justify="center" xstyle={styles.tick} aria-hidden>
+                <Icon icon="check" size="sm" />
+              </HStack>
               <Text xstyle={styles.item}>{p.title}</Text>
             </HStack>
           ))}
-        </VStack>
+        </>
       }
-    >
-      <IconButton
-        label={t('verified.label', { name })}
-        variant="ghost"
-        icon={<SignedMark />}
-        xstyle={styles.button}
-      />
-    </Popover>
+    />
   );
 }
 

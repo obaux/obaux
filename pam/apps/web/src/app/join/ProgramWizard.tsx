@@ -3,8 +3,6 @@
 import { useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { Banner } from '@astryxdesign/core/Banner';
-import { Button } from '@astryxdesign/core/Button';
-import { Popover } from '@astryxdesign/core/Popover';
 import { Heading } from '@astryxdesign/core/Heading';
 import { HStack } from '@astryxdesign/core/HStack';
 import { Icon } from '@astryxdesign/core/Icon';
@@ -12,7 +10,7 @@ import { IconButton } from '@astryxdesign/core/IconButton';
 import { Text } from '@astryxdesign/core/Text';
 import { TextArea } from '@astryxdesign/core/TextArea';
 import { VStack } from '@astryxdesign/core/VStack';
-import { BigButton, InfoIcon, TextField, TextLink } from '@pam/ui';
+import { BigButton, InfoTip, TextField, TextLink } from '@pam/ui';
 import { MenuList } from '@pam/ui/MenuList';
 import { ChoiceChips } from '@pam/ui/ChoiceChips';
 import { CATEGORY_LIST, type Category } from '@pam/config';
@@ -77,9 +75,6 @@ const styles = stylex.create({
   removeService: { width: '48px', height: '48px', flexShrink: 0 },
   actions: { width: '100%', alignItems: 'center' },
   reviewNote: { width: '100%', marginBlockEnd: '8px' },
-  popover: { fontSize: '15px', lineHeight: 1.45, textAlign: 'start', maxWidth: '280px', paddingBlock: '10px', paddingInline: '14px' },
-  // 36px, under the 48px floor on Will's word (D-367): a hint, not a step.
-  info: { width: '36px', height: '36px', minHeight: '36px', minWidth: '36px', padding: 0, borderRadius: '50%', flexShrink: 0 },
 });
 
 /**
@@ -131,22 +126,7 @@ export function useProgramWizard({ value, onChange, onSubmit, busy, submitLabel,
           {at === 'services' ? (
             // The longer explanation, behind an info icon a tap opens
             // (Will, 7 October, D-367: smaller than 48px is fine here).
-            <Popover
-              label={t('join.program.services.more')}
-              placement="below"
-              alignment="end"
-              content={
-                <Text xstyle={styles.popover}>{t('join.program.services.hint')}</Text>
-              }
-            >
-              <Button
-                label={t('join.program.services.more')}
-                variant="ghost"
-                isIconOnly
-                icon={<InfoIcon width={22} height={22} aria-hidden />}
-                xstyle={styles.info}
-              />
-            </Popover>
+            <InfoTip label={t('join.program.services.more')} content={t('join.program.services.hint')} />
           ) : null}
         </HStack>
       )}

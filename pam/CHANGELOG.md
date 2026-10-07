@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.43.2] — 2026-10-07 · Sign-up, cleaner
+
+Signing up is just the form now — no cards. If you were invited, a green
+note at the top says as what, in bold. Your city is chosen from the cities
+Pam is in, with a small line saying so; nobody is asked whether they are
+staff any more (programs and case managers come in by their own link). Extra
+explanations sit behind small round info buttons, whose notes now always fit
+on the screen. On a member's page, a program sees "Jordan has signed 4 of 4",
+and the signed list shows each policy with a green tick (D-368, D-369).
+
 ## [0.43.1] — 2026-10-07 · Forms, tidied
 
 Adding a program goes straight to its name, ready to type, with no card

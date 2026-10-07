@@ -217,7 +217,8 @@ test.describe('a code from the person who invited you', () => {
 
     await page.getByLabel('First name').fill('Kim');
     await page.getByLabel('Last name').fill('Adeyemi');
-    await page.getByLabel('City you live in').fill('Philadelphia');
+    // The served cities are a list, pre-set to the one there is (D-369).
+    await expect(page.getByRole('combobox', { name: 'City you live in' })).toContainText('Philadelphia');
     await page.getByRole('button', { name: 'Next' }).click();
 
     // A case manager's privacy screen, the last of their two steps (D-359).
