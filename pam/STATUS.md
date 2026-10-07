@@ -381,7 +381,7 @@ preview is one line, and Call shows the number (D-306). Points: badges in a card
 example member has earned Scholar, shown on the hero card too (D-307). Steward is no longer a badge (D-308). Place: hours as a row (today) with the week in a
 drawer, Plan a trip in a fixed footer, "About program" (D-309). Sign in footer links spaced (D-310); small language dial (D-311);
 Program tab lists policies with the rows and says "Contact phone number" (D-312, D-314). Sign up per step per role in Storybook (D-319). Case managers invite case managers
-(0073, written, NOT deployed); super admin invites from Profile and Invited people (D-315). Program Home range is a
+(0073, deployed 7 October); super admin invites from Profile and Invited people (D-315). Program Home range is a
 dropdown beside the title (D-320). Program Home check-ins (session-kept) with burst and undo, signature
 badge, and "Book a visit for a member" from the + (D-316). "Pam", not "PAM", in every
 user-visible string; texts say "Pam:" too (D-321). Book a visit: booked / wrote / snippet rows,
@@ -418,7 +418,7 @@ visit's own service policies; floating rows have hairlines top and bottom
 (D-336). The booked screen is the green visit card with Change; Back from
 its policies returns to it; Bring a friend copies on tap, under Will's banner
 (WebP, 21/35 KB); every place picture is its category illustration, the
-tinted grounds are gone except the chips (D-337). Drawers have no border (`sheet.panel` on every BottomSheet); the friend banner runs edge to edge over the handle strip (D-338). VisitCard spacing opened up; "Link copied" spans field and Copy (D-339). Friend drawer: 24px under the banner and above the link (D-340). VisitCard: countdown plain, Change link even in its corner (D-341). 20px above and below it (D-342). Chevron after it; eyebrow in black (D-343). Bring a friend shares through the phone's share sheet where there is one; Android WebView copies only (D-344). Note:
+tinted grounds are gone except the chips (D-337). Drawers have no border (`sheet.panel` on every BottomSheet); the friend banner runs edge to edge over the handle strip (D-338). VisitCard spacing opened up; "Link copied" spans field and Copy (D-339). Friend drawer: 24px under the banner and above the link (D-340). VisitCard: countdown plain, Change link even in its corner (D-341). 20px above and below it (D-342). Chevron after it; eyebrow in black (D-343). Bring a friend shares through the phone's share sheet where there is one; Android WebView copies only (D-344). Staff photos: camera button on Profile, `staff-photos` bucket (0074, live) (D-345). Note:
 the web app's vitest tests are not run in CI. How points should be awarded — two rules live
 (save a place, finish setup), the rest to build, with order and open
 questions — is specified in `docs/points-awarding.md`. The

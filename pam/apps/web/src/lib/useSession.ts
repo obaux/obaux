@@ -32,6 +32,8 @@ export interface Session {
   userId: string;
   role: Role;
   firstName: string | null;
+  /** `profiles.photo_url`: a staff member's own photo (D-345), or null. */
+  photoUrl: string | null;
   regionId: string | null;
   regionName: string | null;
   /** Finished the sign-up steps. False sends somebody back into the flow. */
@@ -86,7 +88,7 @@ export function useSession(): { state: SessionState; refresh: () => void } {
         const { data: profile, error } = await supabase
           .from('profiles')
           .select(
-            'id, role, first_name, region_id, access_status, onboarded_at, preferred_language, is_demo, regions(name)',
+            'id, role, first_name, photo_url, region_id, access_status, onboarded_at, preferred_language, is_demo, regions(name)',
           )
           .eq('id', auth.user.id)
           .maybeSingle();
@@ -112,6 +114,7 @@ export function useSession(): { state: SessionState; refresh: () => void } {
             userId: profile.id as string,
             role: profile.role as Role,
             firstName: (profile.first_name as string | null) ?? null,
+            photoUrl: (profile.photo_url as string | null) ?? null,
             regionId: (profile.region_id as string | null) ?? null,
             regionName: Array.isArray(region) ? (region[0]?.name ?? null) : (region?.name ?? null),
             isOnboarded: profile.onboarded_at !== null && profile.onboarded_at !== undefined,

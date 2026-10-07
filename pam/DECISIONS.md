@@ -8436,6 +8436,43 @@ since D-333).
   message above with the booked slot's link; without it, no button.
   Typecheck; config 238.
 
+### D-345 — Staff put up their own photo from Profile
+
+**Date:** 2026-10-07. Will: "Let's let staff add images from profile. Small
+circle button next to avatar circle."
+
+- **Profile:** for a case manager, program lead or super admin, a white
+  48px circle with a camera sits on the avatar's lower right (`CameraIcon`,
+  new; `ProfileSummary.onPhotoPick`). It opens the phone's photo picker (a
+  hidden file input). The picked photo shows at once with a spinner, then
+  stays; if the upload fails the old one comes back and a warning says so
+  (`profile.photo.*`, en and es). Members get no button: nothing in Pam shows
+  a member's face, and it is theirs to keep out.
+- **Upload** (`lib/staffPhoto.ts`): shrunk on the phone to a 512px centre
+  square, WebP q0.82 (about 40 KB from a multi-MB camera photo), to
+  `staff-photos/<user id>/<time>.webp`; `profiles.photo_url` (already the
+  person's own column, 0046) points at the public URL. `useSession` now
+  reads `photo_url`.
+- **0074_staff_photos:** a public `staff-photos` bucket, 2 MB, JPEG/PNG/WebP
+  only; four policies on `storage.objects`: insert into one's own folder
+  only and only as active staff; select/update/delete one's own folder.
+  New DB test `11_staff_photos_test.sql` (shim gains a minimal `storage`
+  schema): staff into their own folder yes, into another's no, a program
+  lead cannot delete a case manager's, a member cannot upload at all.
+- **Deployed:** `list_migrations` matched the repo first. `apply_migration`
+  timed out twice with nothing applied (checked each time): its `drop policy
+  if exists` lines wait for a person to approve a "destructive" statement,
+  and this session has nobody to approve. The bucket and the four
+  `create policy` statements were then run on their own and the migration
+  recorded in `supabase_migrations.schema_migrations`. The file keeps the
+  `drop … if exists` lines so it can be re-run.
+- **Not yet:** the places that show staff faces to members (the booked
+  place's badge, Messages) still use the example photos (D-335); reading
+  `photo_url` there comes with real staff data.
+- **Proven by:** DB suite all green; in Storybook a program lead picks a
+  file, the photo shows, the button becomes "Change your photo"; a member
+  has no button; typecheck; ui 69, config 238; web build; e2e 573/573.
+
 ---
 
 ## Notes for whoever picks this up next

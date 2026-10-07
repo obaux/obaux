@@ -11,6 +11,8 @@ import { getReminderConsent } from '@/lib/useReminderConsent';
 import { useSavedPlaces } from '@/lib/useSavedPlaces';
 import { HeaderActions } from './HeaderActions';
 import { ProfileView } from './ProfileView';
+import { previewOf, uploadStaffPhoto } from '@/lib/staffPhoto';
+import { useI18n } from '@/lib/i18n';
 
 /**
  * Profile, wired (D-217): whoever is signed in, as the role they are looking
@@ -27,6 +29,29 @@ export function ProfileScreen() {
   const points = usePoints(signedIn ? session.session.userId : null);
   const { state: saved } = useSavedPlaces(signedIn, demoRole);
   const [remindersOn, setRemindersOn] = useState(false);
+  const { t } = useI18n();
+  // A staff photo (D-345): shown at once from the phone, kept if the upload
+  // lands, put back if it does not.
+  const [photo, setPhoto] = useState<string | null>(null);
+  const [photoBusy, setPhotoBusy] = useState(false);
+  const [photoFailed, setPhotoFailed] = useState(false);
+  const shownPhoto = photo ?? (signedIn && !demoRole ? session.session.photoUrl : null);
+  const pickPhoto = (file: File) => {
+    if (!signedIn) return;
+    const before = shownPhoto;
+    setPhoto(previewOf(file));
+    setPhotoBusy(true);
+    setPhotoFailed(false);
+    void uploadStaffPhoto(session.session.userId, file).then((url) => {
+      setPhotoBusy(false);
+      // Saved: keep showing the picture already on screen, which is the
+      // same photo; the stored copy is what everyone else sees.
+      if (!url) {
+        setPhoto(before);
+        setPhotoFailed(true);
+      }
+    });
+  };
 
   useEffect(() => {
     if (!signedIn) return;
@@ -54,6 +79,10 @@ export function ProfileScreen() {
       onSignOut={() => {
         void signOut().finally(() => router.replace('/signin/?out=1'));
       }}
+      photoUrl={shownPhoto}
+      onPhotoPick={pickPhoto}
+      isPhotoBusy={photoBusy}
+      photoNotice={photoFailed ? t('profile.photo.failed') : null}
     />
   );
 }

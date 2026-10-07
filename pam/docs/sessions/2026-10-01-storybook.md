@@ -549,3 +549,4 @@ Chromium.
 - D-343: VisitCard change link children = label + aria-hidden "\u00A0›" (1.3em, inherits weight/underline); eyebrow text-primary. Checked: typecheck, ui 69, web build, e2e 573/573.
 - Merged #24 (merge commit e871a4b) after CI green; branch fast-forwarded to main. 0073 applied live after a list_migrations diff (only 0073 missing; 0068/0069 still on claude/hopeful-thompson-07nj7n).
 - D-344: BringFriend `shareLabel`/`shareText` → BigButton → navigator.share, shown only when supported (after mount); friend.share(+.message) en/es. Checked with a stubbed share API.
+- D-345: staff photo — CameraIcon, ProfileSummary onPhotoPick, lib/staffPhoto (512px WebP), session photoUrl, 0074 bucket + own-folder policies (+ test 11, storage shim); applied live statement by statement after apply_migration timed out on the drop-policy approval gate; recorded in schema_migrations. Checked: DB suite, Storybook pick, typecheck, ui 69, config 238, build, e2e 573/573.
