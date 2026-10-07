@@ -410,7 +410,9 @@ visit card, with no picker (D-332). Bring a friend is a folded section on the ne
 "Your trip is booked" step (no page, Copy only; native share sheet waits for
 Will); walk-ins plan a trip from their meeting days; the signature sheet
 holds still while drawing — tested in Chromium touch emulation, not yet on iOS
-Safari, an Android WebView or the Capacitor build (D-333). Note:
+Safari, an Android WebView or the Capacitor build (D-333). A footer is pinned to the bottom of the screen on
+every page that has one; the booked screen closes with an × and lists policies
+to sign (D-334). Note:
 the web app's vitest tests are not run in CI. How points should be awarded — two rules live
 (save a place, finish setup), the rest to build, with order and open
 questions — is specified in `docs/points-awarding.md`. The

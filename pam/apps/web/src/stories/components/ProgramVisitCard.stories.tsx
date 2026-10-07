@@ -5,8 +5,8 @@ import { ProgramVisitCard } from '@pam/ui/ProgramVisitCard';
 const ART = { width: 36, height: 36, 'aria-hidden': true } as const;
 
 /**
- * A program as one card, in its category's colour (D-332), with the service,
- * day and time under its name: Plan a visit's Check step and the booked
+ * A program as one white card with a layered shadow (D-334), its picture in
+ * its category's colour, the service, day and time under its name: Plan a visit's Check step and the booked
  * screen (D-333).
  */
 const meta = {
@@ -42,5 +42,5 @@ export const FamilyServices: Story = {
 
 export const Work: Story = { args: { name: 'Example Job Center', tone: 'green', art: <WorkforceIcon {...ART} /> } };
 
-/** No tone: a white card. */
+/** No tone: a plain picture.*/
 export const NoTone: Story = { args: { tone: null } };

@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { Button } from '@astryxdesign/core/Button';
-import { Card } from '@astryxdesign/core/Card';
-import { Collapsible } from '@astryxdesign/core/Collapsible';
+import { useCollapsible } from '@astryxdesign/core/Collapsible';
+import { Icon } from '@astryxdesign/core/Icon';
 import { HStack } from '@astryxdesign/core/HStack';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
@@ -24,6 +24,9 @@ import { TextField } from './TextField.js';
  *   button that says "Copied" for about a second and a half.
  * - No preview and no page of its own. Copy only, everywhere: the native
  *   share sheet waits for Will (D-333).
+ * - On the page itself, not in a card, with a large dark chevron (Will,
+ *   D-334): Astryx's `useCollapsible` for the state, an Astryx `Button` for
+ *   the row, since `Collapsible`'s own chevron cannot be restyled.
  */
 export interface BringFriendProps {
   /** "Bring a friend". */
@@ -46,8 +49,22 @@ export interface BringFriendProps {
 export const COPIED_MS = 1500;
 
 const styles = stylex.create({
-  card: { width: '100%' },
-  trigger: { minHeight: pam['--pam-touch-target-min'] },
+  section: { width: '100%' },
+  trigger: {
+    width: '100%',
+    minHeight: pam['--pam-touch-target-min'],
+    justifyContent: 'flex-start',
+    paddingInline: 0,
+    textAlign: 'start',
+  },
+  grow: { flexGrow: 1, minWidth: 0 },
+  chevron: {
+    color: colorVars['--color-text-primary'],
+    transitionProperty: 'transform',
+    transitionDuration: '200ms',
+    '@media (prefers-reduced-motion: reduce)': { transitionDuration: '0s' },
+  },
+  chevronOpen: { transform: 'rotate(180deg)' },
   icon: { width: '24px', height: '24px', flexShrink: 0, color: colorVars['--color-icon-primary'] },
   label: { fontSize: '18px', fontWeight: 600, lineHeight: 1.3 },
   body: { fontSize: '17px', lineHeight: 1.45 },
@@ -66,6 +83,8 @@ export function BringFriend({
   defaultIsOpen = false,
 }: BringFriendProps) {
   const [copied, setCopied] = useState(false);
+  const contentId = useId();
+  const disclosure = useCollapsible({ isCollapsible: { defaultIsOpen } });
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => () => {
     if (timer.current) clearTimeout(timer.current);
@@ -84,20 +103,28 @@ export function BringFriend({
   };
 
   return (
-    <Card padding={4} xstyle={styles.card}>
-      <Collapsible
-        defaultIsOpen={defaultIsOpen}
-        trigger={
-          <HStack gap={3} align="center" wrap="nowrap" xstyle={styles.trigger}>
-            <UserPlusIcon aria-hidden {...stylex.props(styles.icon)} />
-            <Text xstyle={styles.label}>{label}</Text>
-          </HStack>
-        }
+    <VStack gap={3} xstyle={styles.section}>
+      <Button
+        label={label}
+        variant="ghost"
+        size="lg"
+        aria-expanded={disclosure.isOpen}
+        aria-controls={contentId}
+        onClick={disclosure.toggle}
+        icon={<UserPlusIcon aria-hidden {...stylex.props(styles.icon)} />}
+        endContent={<Icon icon="chevronDown" size="lg" xstyle={[styles.chevron, disclosure.isOpen && styles.chevronOpen]} />}
+        xstyle={styles.trigger}
       >
-        <VStack gap={3}>
+        <Text xstyle={[styles.label, styles.grow]}>{label}</Text>
+      </Button>
+      {disclosure.isOpen ? (
+        <VStack gap={3} id={contentId} role="region" aria-label={label}>
           <Text xstyle={styles.body}>{body}</Text>
           <HStack gap={2} align="end" wrap="nowrap">
-            <TextField label={linkLabel} isLabelHidden value={link} isReadOnly xstyle={styles.field} />
+            {/* The link takes all the room Copy leaves it (Will, D-334). */}
+            <VStack xstyle={styles.field}>
+              <TextField label={linkLabel} isLabelHidden value={link} isReadOnly width="100%" />
+            </VStack>
             <Button
               label={copied ? copiedLabel : copyLabel}
               variant="secondary"
@@ -106,7 +133,7 @@ export function BringFriend({
             />
           </HStack>
         </VStack>
-      </Collapsible>
-    </Card>
+      ) : null}
+    </VStack>
   );
 }

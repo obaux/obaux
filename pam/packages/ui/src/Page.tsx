@@ -35,9 +35,11 @@ import { pam } from './tokens.stylex.js';
  * (Will, 6 October: "the floating button is not working well").
  *
  * So it is the last thing in the page, **sticky** to the bottom edge: on a
- * phone it stays at the foot while the body scrolls under it, and where the
- * page is shorter than the screen, or captured whole, it simply sits at the
- * end, where it belongs. The content above fades out into it — a gradient
+ * phone it stays at the foot while the body scrolls under it. A page with a
+ * footer is at least as tall as the screen, and the footer is pushed to its
+ * end (D-334, Will, 7 October: "regardless of policy length … always visible
+ * at same position"), so a short policy and a long one put Sign in the same
+ * place. The content above fades out into it — a gradient
  * from nothing to the page colour over the top of the strip, so there is no
  * edge, the way every bottom edge in Pam fades (`edgeFade`). Clear of the
  * home indicator. Nothing goes after it; a footer is the end of a screen.
@@ -69,8 +71,15 @@ const styles = stylex.create({
   read: { maxWidth: '720px' },
   centred: { textAlign: 'center' },
   // Room for the footer: its own fade overlaps the last of the content,
-  // so the page needs no spacer beyond what the fade is tall.
-  withFooter: { paddingBlockEnd: '0px' },
+  // so the page needs no spacer beyond what the fade is tall. At least a
+  // screen tall, so the footer sits at the bottom edge on a short page too
+  // (D-334); `dvh` follows the phone's collapsing toolbars.
+  withFooter: {
+    paddingBlockEnd: '0px',
+    display: 'flex',
+    flexDirection: 'column',
+    minHeight: { default: '100vh', '@supports (min-height: 100dvh)': '100dvh' },
+  },
   footer: {
     position: 'sticky',
     bottom: 0,
@@ -81,7 +90,9 @@ const styles = stylex.create({
     paddingInline: pam['--pam-screen-padding'],
     // The fade: 56px of the content above washing out into the page colour,
     // then the strip itself, solid, down to the home indicator.
-    marginBlockStart: '-24px',
+    // Pushed to the end of a short page; on a long one, `auto` is nothing
+    // and it follows the content as before.
+    marginBlockStart: 'auto',
     paddingBlockStart: '56px',
     paddingBlockEnd: 'calc(16px + env(safe-area-inset-bottom, 0px))',
     backgroundImage: `linear-gradient(to bottom, transparent 0px, color-mix(in srgb, ${colorVars['--color-background-body']} 55%, transparent) 22px, color-mix(in srgb, ${colorVars['--color-background-body']} 90%, transparent) 42px, ${colorVars['--color-background-body']} 56px)`,

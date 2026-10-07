@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
+import { Banner } from '@astryxdesign/core/Banner';
 import { Button } from '@astryxdesign/core/Button';
 import { Heading } from '@astryxdesign/core/Heading';
 import { HStack } from '@astryxdesign/core/HStack';
@@ -27,6 +28,12 @@ import { HelpButton } from './HelpButton';
 import { BigCategoryIcon, CategoryIcon, categoryTone } from './SavedView';
 import { ProgramVisitCard } from '@pam/ui/ProgramVisitCard';
 import { BringFriend } from '@pam/ui/BringFriend';
+import { PolicyStatusCard } from '@pam/ui/PolicyStatusCard';
+import { placeAsksForPolicies } from '@pam/config/dummy-policies';
+import { policiesForService } from '@pam/config/dummy-services';
+import { usePolicies } from '@/lib/usePolicies';
+import { useMySignatures } from '@/lib/useMySignatures';
+import { policiesHref } from './MemberPoliciesView';
 import { bookingFor, nextDropIns } from '@pam/config/dummy-booking';
 
 /**
@@ -171,6 +178,8 @@ export function NewTripView({
   const { t, locale } = useI18n();
   const places = useMemo(() => Object.values(DUMMY_PLACES_BY_ID), []);
   const { forPlace } = useServices();
+  const { policies } = usePolicies();
+  const { progress } = useMySignatures();
   const initial = useMemo(() => seedToPlace(initialPlace), [initialPlace]);
   // Opened on a booked trip (D-333): its place and slot, read once.
   const [bookedTrip] = useState(() => {
@@ -193,6 +202,8 @@ export function NewTripView({
   const [day, setDay] = useState<Date | null>(null);
   const [time, setTime] = useState<readonly [number, number] | null>(null);
   const [note, setNote] = useState('');
+  // Next pressed with something missing (Will, 7 October, D-334): say what.
+  const [triedNext, setTriedNext] = useState(false);
   // The visit's new time, once saved (D-282): the celebration shows it.
   const [movedTo, setMovedTo] = useState<Date | null>(null);
   // Booked for a member (D-316): the moment, then the program's Home.
@@ -268,12 +279,20 @@ export function NewTripView({
   }
 
   if (confirmed && place && !forMember) {
+    // Trips, where the new trip animates in (D-241).
     const done = `/trips/?added=${encodeURIComponent(confirmed.id)}`;
+    // What is still to sign for this visit (D-334): the service's policies,
+    // or the program's.
+    const forVisit = chosenService ? policiesForService(chosenService, policies, offered) : policies;
+    const toSign = placeAsksForPolicies(place.id) && forVisit.length > 0 ? progress(place.id, forVisit) : null;
     return (
       <SubPage
         title={t('trips.confirm.title')}
+        // The end of the flow (Will, D-334): an × that closes to Trips, not
+        // a way back into booking.
+        backIcon="close"
         backHref={done}
-        backLabel={t('nav.back.trips')}
+        backLabel={t('trips.confirm.close')}
         footer={<BigButton label={t('trips.confirm.done')} href={done} />}
       >
         <ProgramVisitCard
@@ -285,6 +304,16 @@ export function NewTripView({
             `${dayLong.format(confirmed.at)} · ${timeFmt.format(confirmed.at)}`,
           ]}
         />
+        {/* What to do before going (Will, D-334), above Bring a friend. */}
+        {toSign && toSign.signed < toSign.total ? (
+          <PolicyStatusCard
+            isDone={false}
+            title={t('place.policies.toSign.title')}
+            body={t('place.policies.toSign.body')}
+            label={`${t('place.policies.toSign.title')}. ${t('place.policies.toSign.body')}`}
+            href={policiesHref(place.id, place.name, chosenService?.id ?? null)}
+          />
+        ) : null}
         {/* Only now, with a real slot to point to (Will, D-333). */}
         <BringFriend
           label={t('friend.label')}
@@ -336,7 +365,15 @@ export function NewTripView({
       // place's Plan a trip: Next on When, Add this trip on Check.
       footer={
         step === 'when' && place ? (
-          <BigButton label={t('trips.new.next')} onPress={() => setStep('check')} isDisabled={!day || !time} />
+          // Always tappable at the foot (D-334): with a day or time missing it
+          // says which, above Day, rather than sitting greyed out.
+          <BigButton
+            label={t('trips.new.next')}
+            onPress={() => {
+              if (day && time) setStep('check');
+              else setTriedNext(true);
+            }}
+          />
         ) : step === 'check' && place && day && time ? (
           <BigButton
             label={
@@ -430,6 +467,12 @@ export function NewTripView({
 
       {step === 'when' && place ? (
         <>
+          {triedNext && (!day || !time) ? (
+            <Banner
+              status="warning"
+              title={t(!day && !time ? 'trips.new.missing.both' : !day ? 'trips.new.missing.day' : 'trips.new.missing.time')}
+            />
+          ) : null}
           <Text xstyle={styles.placeName}>{place.name}</Text>
           {chosenService ? (
             <Text type="supporting" xstyle={styles.hint}>

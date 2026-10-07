@@ -3,6 +3,7 @@
 import { useEffect, useState, type ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { HStack } from '@astryxdesign/core/HStack';
+import { Icon } from '@astryxdesign/core/Icon';
 import { Heading } from '@astryxdesign/core/Heading';
 import { IconButton } from '@astryxdesign/core/IconButton';
 import { Text } from '@astryxdesign/core/Text';
@@ -57,6 +58,12 @@ export interface SubPageHeaderProps {
   readonly titleAddon?: ReactNode;
   /** An id on the `<h1>` — the policies' "Back to top" link targets it. */
   readonly titleId?: string;
+  /**
+   * `close` (D-334): an × instead of the back arrow, for the end of a flow
+   * there is no going back into — "Your trip is booked". It goes to
+   * `backHref` itself, not back through history.
+   */
+  readonly backIcon?: 'back' | 'close';
 }
 
 const COLLAPSE_AT = 48;
@@ -123,6 +130,7 @@ export function SubPageHeader({
   titleAddon,
   titleId,
   onBack,
+  backIcon = 'back',
 }: SubPageHeaderProps) {
   const [collapsed, setCollapsed] = useState(false);
 
@@ -135,9 +143,9 @@ export function SubPageHeader({
   }, [variant]);
 
   const back = onBack ? (
-    <BackButton label={backLabel} onPress={onBack} />
+    <BackButton label={backLabel} onPress={onBack} isClose={backIcon === 'close'} />
   ) : backHref ? (
-    <BackButton href={backHref} label={backLabel} />
+    <BackButton href={backHref} label={backLabel} isClose={backIcon === 'close'} />
   ) : null;
 
   if (variant === 'compact') {
@@ -198,11 +206,14 @@ export function BackButton({
   href,
   label,
   onPress,
+  isClose = false,
 }: {
   readonly href?: string;
   readonly label: string;
   /** Instead of `href`: back one step on the same screen (D-235). */
   readonly onPress?: () => void;
+  /** An × that goes to `href`, not back through history (D-334). */
+  readonly isClose?: boolean;
 }) {
   // `data-pam-back` (D-277): with a link, the app's own navigation takes the
   // member back through history to wherever they came from, and uses `href`
@@ -210,11 +221,11 @@ export function BackButton({
   return (
     <IconButton
       label={label}
-      {...(onPress ? { onClick: onPress } : { href, ...BACK_MARK })}
+      {...(onPress ? { onClick: onPress } : isClose ? { href } : { href, ...BACK_MARK })}
       variant="ghost"
       icon={
         <HStack>
-          <BackArrowIcon width={22} height={22} aria-hidden />
+          {isClose ? <Icon icon="close" size="md" /> : <BackArrowIcon width={22} height={22} aria-hidden />}
         </HStack>
       }
       xstyle={styles.back}

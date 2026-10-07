@@ -8134,6 +8134,66 @@ answers):
   build. This sandbox has Chromium only, so the stroke test ran on emulated
   touch. The iOS edge back-swipe in particular needs a device.
 
+### D-334 — The footer is pinned to the screen; Next says what is missing; the booked screen closes with an ×
+
+**Date:** 2026-10-07. Will, in order:
+- "For policy signatures … use the sticky floating button on bottom so
+  regardless of policy length it's a simple tap always visible at same
+  position."
+- On Plan a visit's When step: Next at the foot, and if a day or time is
+  missing, an alert above Day saying which.
+- On Check: the day and time under the name, the card white again, with a
+  realistic shadow.
+- On the booked screen:
+  - the link field filling the row;
+  - a darker, larger chevron and no card around Bring a friend;
+  - "sign policies" above Bring a friend;
+  - an × instead of back, closing to Trips where the new trip animates in.
+
+- **Template (`Page`).** A page with a `footer` is at least a screen tall
+  (`100dvh`, `100vh` fallback), and the footer's top margin is `auto`.
+  - A short policy and a long one put Sign 16px above the bottom edge. So
+    do the place page, booking and the policies list: one template, one
+    position.
+  - Measured on Policy 1 of 4: 390×844, page exactly the screen, Sign at
+    y 772–828. 320×568, page scrolls (786px), Sign at y 496–552.
+  - Before, on a short page, the footer sat right under the content.
+- **When step.**
+  - Next is always tappable. Pressed with something missing, an Astryx
+    `Banner` (warning) above Day says "Day must be selected", "Time must
+    be selected" or "Day & time must be selected", and updates as they pick.
+  - A walk-in's one time is already picked, so only the day can be missing.
+- **`ProgramVisitCard`.** White, with a four-layer shadow (contact, then
+  wider and fainter; deeper in dark mode). The service and the day and time
+  sit under the name beside the picture. The pale tint (D-332) is gone; the
+  picture keeps the category's colour.
+- **`BringFriend`.**
+  - No `Card`: it sits on the page.
+  - Rebuilt on Astryx's `useCollapsible`, with an Astryx ghost `Button` as
+    the row: the user-plus icon, the label, and `Icon chevronDown` large in
+    the primary text colour, turning 180° when open. `Collapsible`'s own
+    chevron cannot be restyled.
+  - The link field is `width="100%"` in a growing wrapper, so it fills up
+    to Copy.
+- **Your trip is booked.**
+  - `SubPage` gains `backIcon="close"`: an Astryx `close` × that goes to
+    `backHref` itself, not back through history. Here that is
+    `/trips/?added=<id>`, so the new trip animates in (D-241). The Done
+    footer stays.
+  - When the program asks for policies and some for this visit (its
+    service's, or the program's) are unsigned, the orange Policies to sign
+    card (D-271) sits above Bring a friend.
+- **Proven by:**
+  - Measured positions as above.
+  - When: nothing picked → both; day only → time; time only → day; both
+    → Check.
+  - Booked: × links to `/trips/?added=dummy-trip-1` and lands on Trips;
+    the policies card links to the GED service's policies.
+  - Bring a friend: the row is 48px, the field 262px wide on a 390px phone,
+    and Copy and Copied still work.
+  - Typecheck; ui 69, config 238, web 11; ui, web and Storybook builds;
+    e2e 570/570.
+
 ---
 
 ## Notes for whoever picks this up next
