@@ -919,8 +919,9 @@ Open items Will asked to keep (7 October), newest first. Read this before
 "Next" below, which is older.
 
 - **Phase next: one account, both roles** (D-374) — member + program only;
-  hidden from their own program's lists. Start with the design note (the
-  ~29 direct `role` references sorted, the privacy wording), then build.
+  hidden from their own program's lists. Design note written
+  (`docs/design/one-account-two-roles.md`); waiting on Will's three answers,
+  then build.
 - **Add a program, as its own flow** (Will, 7 October, "for later"): from the
   Program tab it should hide the tab bar, keep Next pinned at the bottom,
   and Back from the first step returns to Home; after sending, a confetti

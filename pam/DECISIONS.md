@@ -9146,7 +9146,12 @@ Decided, not built:
   session, tab bars, landing and notifications by acting role; and the
   transparency contract and member wording updated before it ships.
 - First step of the phase: a design note with that audit, for review, before
-  any migration.
+  any migration — written: `docs/design/one-account-two-roles.md`. Measured
+  on a database built from 0001–0077: none of the 94 policies read `role`
+  directly (23 go through the three helpers), so `profiles.role` can stay as
+  the *acting* role with a new `profile_roles` table for what is given; the
+  real work is 7 "is" functions, 4 that display a role, and the invite path.
+  Three questions for Will at the end of the note.
 
 ---
 
