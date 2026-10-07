@@ -927,11 +927,6 @@ link (D-331) are part of it.
 Open items Will asked to keep (7 October), newest first. Read this before
 "Next" below, which is older.
 
-- **Bring the example people's photos into the repo** (D-378): three
-  Unsplash portraits in `packages/config/src/dummy-connections.ts` are
-  hotlinked; download to `apps/web/public/people/`, point `photoUrl` there,
-  add them to `stories/foundations/imagery.ts`. Needs `images.unsplash.com`
-  allowed in the environment's network access (blocked here).
 - **One account, both roles — follow-ups** (D-375): notifications by
   role (the bell shows the acting side's; a dot on the switch for the other);
   the two transparency lines, worded by Will, before launch.

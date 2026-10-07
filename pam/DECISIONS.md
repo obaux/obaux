@@ -9259,10 +9259,10 @@ under storybook for easy handoff."
 - **Kept complete by a test:** `imagery.ts` lists every file, and
   `imagery.test.ts` fails if a file in `apps/web/public` is missing from it or
   listed but gone. Illustrations still list themselves from code.
-- **Not done — the example people's photos are still hotlinked from
-  Unsplash.** Bringing them into `public/people/` was blocked: this
-  environment's network policy refuses `images.unsplash.com`. The page shows
-  them with that flag; STATUS backlog has the step.
+- **Staff photos are left out** (Will: "The staff images are just
+  placeholders waiting for users to add their own image, I think we can skip
+  this"). The example Unsplash portraits stay hotlinked in the example data
+  only; they are not imagery Pam ships, so they are not in the inventory.
 
 ---
 

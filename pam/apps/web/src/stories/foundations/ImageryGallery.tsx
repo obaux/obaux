@@ -10,7 +10,7 @@ import { BADGE_ART_KEYS, BadgeArt, ConnectionsArt } from '@pam/ui/BadgeArt';
 import { CategoryArt } from '@pam/ui/CategoryArt';
 import { SETUP_ART_KINDS, SetupArt, type SetupArtKind } from '@pam/ui/SetupArt';
 import { TextLink } from '@pam/ui';
-import { BRAND, PEOPLE, PHOTOGRAPHS, type ImageryItem } from './imagery';
+import { BRAND, PHOTOGRAPHS, type ImageryItem } from './imagery';
 
 /**
  * The imagery inventory for Foundations › Imagery (Will, 7 October: "keep
@@ -41,8 +41,6 @@ const styles = stylex.create({
   photo: { width: '100%', maxWidth: '320px', borderRadius: '16px', display: 'block' },
   mark: { width: '100%', maxWidth: '220px', display: 'block', padding: '24px', borderRadius: '16px', backgroundColor: colorVars['--color-background-muted'], boxSizing: 'border-box' },
   onDark: { backgroundColor: '#1F2421' },
-  person: { width: '96px', height: '96px', borderRadius: '50%', objectFit: 'cover', display: 'block' },
-  warn: { fontSize: '13px', lineHeight: 1.4, color: colorVars['--color-warning'] },
 });
 
 /** The properties a picture's look depends on, written onto each element. */
@@ -257,25 +255,6 @@ export function BrandSet() {
         <FileTile key={item.src} item={item}>
           <img src={item.src} alt="" {...stylex.props(styles.mark, item.isOnDark && styles.onDark)} />
         </FileTile>
-      ))}
-    </HStack>
-  );
-}
-
-/** Example people (D-335) — still linked from Unsplash, not in the repo yet. */
-export function PeopleSet() {
-  return (
-    <HStack xstyle={styles.grid}>
-      {PEOPLE.map((person) => (
-        <VStack key={person.src} gap={1} xstyle={styles.tile}>
-          <img src={person.src} alt="" {...stylex.props(styles.person)} />
-          <Text xstyle={styles.name}>{person.name}</Text>
-          <Text xstyle={styles.note}>{person.note}</Text>
-          <Text xstyle={styles.warn}>Linked from Unsplash — not in the repo yet</Text>
-          <Link href={person.src} isExternalLink>
-            Open original
-          </Link>
-        </VStack>
       ))}
     </HStack>
   );

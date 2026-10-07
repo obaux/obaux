@@ -1,5 +1,3 @@
-import { DUMMY_CONNECTIONS } from '@pam/config/dummy-connections';
-
 /**
  * Every raster image and brand mark Pam ships, for Foundations › Imagery
  * (Will, 7 October: "bring in photos and treat it all under storybook for
@@ -40,13 +38,3 @@ export const BRAND: readonly ImageryItem[] = [
   { src: '/pam-wordmark-white.svg', name: 'Wordmark, white', note: 'Over pictures (the sign-in carousel)', isOnDark: true },
   { src: '/email/pam-logo.png', name: 'Email logo', note: 'Invite and renewal emails (D-263)' },
 ];
-
-/**
- * Example people's photos (D-335): still hotlinked from Unsplash, not yet in
- * the repo — this environment's network policy blocks images.unsplash.com.
- */
-export const PEOPLE = DUMMY_CONNECTIONS.map((person) => ({
-  src: person.photoUrl,
-  name: person.firstName,
-  note: person.programName ? `Staff at ${person.programName} (example)` : 'Example connection',
-}));
