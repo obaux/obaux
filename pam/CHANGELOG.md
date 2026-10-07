@@ -16,6 +16,14 @@ calendar opens folded — its first visits, fading out, and "See the whole
 calendar" — with the remaining cards under it. A month's busy days are tiles
 in two rows that scroll sideways (D-352).
 
+**Finishing touches (same day).** Home's calendar switches with small Day /
+Week / Month tabs instead of a dropdown, with no title above; Search moved
+into the + menu and opens the search field ready to type. A month's busy
+days are quieter, show more of the next column, and have dots to show how
+far along you are. A new dashed line separates sections in a few places.
+Add a program keeps Next at the bottom of the screen, with "2 of 7" tucked
+into the button (D-355–D-358).
+
 **Shorter sign-up for staff.** Program leads and case managers sign up in
 three steps and go straight to Home after "I understand". A program is added
 from Home, not during sign-up (D-353).

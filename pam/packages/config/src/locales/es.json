@@ -865,9 +865,6 @@
   "schedule.next.week": "Semana siguiente",
   "schedule.prev.month": "Mes anterior",
   "schedule.next.month": "Mes siguiente",
-  "schedule.range.day": "hoy",
-  "schedule.range.week": "esta semana",
-  "schedule.range.month": "este mes",
   "schedule.checkedIn": "Registrado",
   "schedule.notCheckedIn": "Sin registrar",
   "schedule.checkin.do": "Registrar la llegada de {name}",
@@ -1302,5 +1299,9 @@
   "program.empty.preview.kind": "Qué tipo de ayuda",
   "program.empty.preview.about": "Lo que ofrece, en una o dos frases, para que la gente sepa si es para ellos.",
   "program.empty.preview.address": "Dónde está",
-  "program.empty.preview.name": "El nombre de su programa"
+  "program.empty.preview.name": "El nombre de su programa",
+  "schedule.tab.day": "Día",
+  "schedule.tab.week": "Semana",
+  "schedule.tab.month": "Mes",
+  "home.search": "Buscar"
 }

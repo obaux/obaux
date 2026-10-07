@@ -568,3 +568,8 @@ Chromium.
 - Will's tweaks on D-352: SetupCard body 14px; unfold is a TextLink; month tiles ghost, no border, no inset, gap 1 under the heading; nav -12px under the range.
 - D-354: provider What to expect — new intro and four lines with SetupArt (calendar, message, policy, private; three new pictures); old line 4 dropped; staff Sign up step pickers trimmed to Phone / Code / About you / What to expect (or What you will see). Checked: typecheck, config 238, Storybook build, screenshots.
 - Flow map: pages 1 (Sign in & joining, root 45:2) and 4 (Program lead, root 46:161) redrawn — four new program-lead screens, nine edges, the join edge relabelled; screenshot slots empty (mcp.figma.com still blocked).
+- D-355: SegmentedControl Day/Week/Month (38px, floor lowered on that control only via `--pam-touch-target-min`/`--size-element-sm`), `LargeTitleHeader isTitleHidden`; month tiles: no hover, 6px radius, 15/500 + 13px, 38% columns, scroll dots.
+- D-356: `@pam/ui/DashedRule` + `--pam-rule-dashed` (story), on the calendar preview explainer (16px, supporting, gap 5 + 16px), under the date row, above the centred month-days heading. Dashes 4 6 with round caps.
+- D-357: `BigButton badge` (+ `--pam-on-accent-deep`, story), `useProgramWizard` body/actions, Add a program footer. D-358: Search in AddMenu (`home.search`), `actions` as a function of `openSearch`; field focused on open (checked in the browser).
+- Checked: typecheck web + ui, ui 74, config 238, web + Storybook builds, screenshots (tabs 38px measured, wizard light/dark, search focus, month, badge); e2e 567/573, the same two load-timing tests as before.
+- Flow map page 4: Home and Add a program notes patched in place (46:232, 46:244).

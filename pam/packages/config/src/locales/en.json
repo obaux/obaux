@@ -865,9 +865,6 @@
   "schedule.next.week": "Next week",
   "schedule.prev.month": "Previous month",
   "schedule.next.month": "Next month",
-  "schedule.range.day": "today",
-  "schedule.range.week": "this week",
-  "schedule.range.month": "this month",
   "schedule.checkedIn": "Checked in",
   "schedule.notCheckedIn": "Not checked in",
   "schedule.checkin.do": "Check {name} in",
@@ -1302,5 +1299,9 @@
   "program.empty.preview.kind": "What kind of help",
   "program.empty.preview.about": "What you offer, in a sentence or two, so people know if it is for them.",
   "program.empty.preview.address": "Where you are",
-  "program.empty.preview.name": "Your program's name"
+  "program.empty.preview.name": "Your program's name",
+  "schedule.tab.day": "Day",
+  "schedule.tab.week": "Week",
+  "schedule.tab.month": "Month",
+  "home.search": "Search"
 }

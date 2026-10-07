@@ -376,14 +376,14 @@ export const flows = [
         story: 'program-lead-screens--add-program',
         path: '/programs/new/?from=home',
         changed: 'D-352',
-        note: 'One question a screen; from Home, Back and the end go Home',
+        note: 'One question a screen; Next pinned to the foot with "2 of 7" in it; from Home, Back and the end go Home',
       },
       home: {
         title: 'Home — coming in',
         story: 'program-lead-screens--home',
         path: '/',
         changed: 'D-352',
-        note: '"Coming in" centred, "this week ▾" under it; search past ten visits; month days scroll sideways in two rows',
+        note: 'Day / Week / Month tabs; Search in the + past ten visits; month days scroll sideways in two rows, with dots',
       },
       book: {
         title: 'Book a visit for a member',

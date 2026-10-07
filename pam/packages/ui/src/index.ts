@@ -118,3 +118,4 @@ export { PolicyUploadCard, type PolicyUploadCardProps } from './PolicyUploadCard
 export { canShareSheet, shareText } from './share.js';
 export { SetupCard, type SetupCardProps } from './SetupCard.js';
 export { SetupArt, type SetupArtKind, type SetupArtProps } from './SetupArt.js';
+export { DashedRule } from './DashedRule.js';

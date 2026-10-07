@@ -298,4 +298,6 @@
   --pam-link-size: 17px;
   --pam-brand-pink: light-dark(#E31C5F, #FF6B86);
   --pam-secondary-fill: light-dark(#E7EFE6, #24261A);
+  --pam-on-accent-deep: rgba(0, 0, 0, 0.28);
+  --pam-rule-dashed: light-dark(rgba(0, 0, 0, 0.05), rgba(255, 255, 255, 0.08));
 }

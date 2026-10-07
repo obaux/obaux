@@ -41,6 +41,12 @@ export interface LargeTitleHeaderProps {
    * program lead's "Coming in / this week ▾" (Will, 7 October, D-352).
    */
   readonly isCentered?: boolean;
+  /**
+   * The large title read out but not drawn — the accessory stands in for it
+   * (a program lead's Day / Week / Month tabs, D-355). It still appears in
+   * the bar once the page scrolls.
+   */
+  readonly isTitleHidden?: boolean;
 }
 
 const COLLAPSE_AT = 40;
@@ -77,6 +83,14 @@ const styles = stylex.create({
   // Wraps if the phrase is too long for the line, so the words never clip.
   centered: { width: '100%', alignItems: 'center', paddingBlockEnd: '8px' },
   largeCentered: { textAlign: 'center', paddingBlockEnd: '0px' },
+  hidden: {
+    position: 'absolute',
+    width: '1px',
+    height: '1px',
+    overflow: 'hidden',
+    clipPath: 'inset(50%)',
+    whiteSpace: 'nowrap',
+  },
   titleRowInline: { flexWrap: 'wrap', justifyContent: 'flex-start', alignItems: 'baseline', columnGap: '8px', rowGap: '0px' },
 });
 
@@ -86,6 +100,7 @@ export function LargeTitleHeader({
   titleAccessory,
   isAccessoryInline = false,
   isCentered = false,
+  isTitleHidden = false,
 }: LargeTitleHeaderProps) {
   const [collapsed, setCollapsed] = useState(false);
 
@@ -114,7 +129,7 @@ export function LargeTitleHeader({
       </HStack>
       {isCentered ? (
         <VStack gap={1} xstyle={styles.centered}>
-          <Heading level={1} xstyle={[styles.large, styles.largeCentered]}>
+          <Heading level={1} xstyle={[styles.large, styles.largeCentered, isTitleHidden && styles.hidden]}>
             {title}
           </Heading>
           {titleAccessory}

@@ -9,6 +9,7 @@ import { VStack } from '@astryxdesign/core/VStack';
 import { Loading, Notice, Page, PeopleIcon, TripsIcon } from '@pam/ui';
 import { LargeTitleHeader } from '@pam/ui/LargeTitleHeader';
 import { MenuList } from '@pam/ui/MenuList';
+import { DashedRule } from '@pam/ui/DashedRule';
 import { SetupCard, type SetupCardProps } from '@pam/ui/SetupCard';
 import { SubPage } from '@pam/ui/SubPage';
 import { useProgramSetup, type ProgramSetup } from '@/lib/programSetup';
@@ -199,13 +200,13 @@ export function ProgramHome() {
     <ScheduleView
       appointments={appointments}
       canCheckIn
-      // Search (past ten visits), the bell and + (D-221, D-352).
-      actions={
+      // The bell and + (D-221); Search is in the + past ten visits (D-358).
+      actions={(openSearch) => (
         <>
           <HeaderActions role="provider" hasHelp={false} />
-          <AddMenu />
+          <AddMenu onSearch={openSearch} />
         </>
-      }
+      )}
       isCollapsed={cards.length > 0}
       below={
         cards.length > 0 ? (
@@ -289,7 +290,8 @@ const homeStyles = stylex.create({
   section: { fontSize: '20px', lineHeight: 1.3, fontWeight: 700 },
   // Room above the rows (Will: "plenty of breathing room around them").
   actions: { paddingBlock: '24px 16px' },
-  intro: { fontSize: '18px', lineHeight: 1.5 },
+  intro: { fontSize: '16px', lineHeight: 1.5 },
+  explainer: { paddingBlockEnd: '16px' },
   note: { fontSize: '15px', lineHeight: 1.5 },
 });
 
@@ -335,7 +337,14 @@ export function CalendarPreviewView() {
   const { t } = useI18n();
   return (
     <SubPage title={t('home.calendar.preview.title')} backHref="/" backLabel={t('nav.back.home')}>
-      <Text xstyle={homeStyles.intro}>{t('home.calendar.preview.intro')}</Text>
+      {/* Smaller and fainter, a dashed rule under it, room before the
+          calendar (Will, 7 October, D-356). */}
+      <VStack gap={5} xstyle={homeStyles.explainer}>
+        <Text type="supporting" xstyle={homeStyles.intro}>
+          {t('home.calendar.preview.intro')}
+        </Text>
+        <DashedRule />
+      </VStack>
       <ScheduleView appointments={exampleAppointments(t)} canCheckIn isEmbedded />
       <Text type="supporting" xstyle={homeStyles.note}>
         {t('home.calendar.preview.note')}

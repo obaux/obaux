@@ -64,7 +64,6 @@ const DESCRIPTION_MAX = 200;
 
 const styles = stylex.create({
   card: { width: '100%' },
-  progress: { fontSize: '15px', lineHeight: 1.4 },
   question: { fontSize: '24px', lineHeight: 1.25, fontWeight: 700 },
   hint: { fontSize: '16px', lineHeight: 1.5 },
   field: { textAlign: 'start' },
@@ -75,7 +74,22 @@ const styles = stylex.create({
   actions: { width: '100%', alignItems: 'center' },
 });
 
-export function ProgramWizard({ value, onChange, onSubmit, busy, submitLabel, step, onStep }: ProgramWizardProps) {
+/**
+ * The wizard in two parts (D-357): the question, and its buttons — so a page
+ * can pin the buttons to its footer (`SubPage footer`) while the question
+ * scrolls. `ProgramWizard` is both, stacked.
+ */
+export function ProgramWizard(props: ProgramWizardProps) {
+  const { body, actions } = useProgramWizard(props);
+  return (
+    <VStack gap={4} xstyle={styles.card}>
+      {body}
+      {actions}
+    </VStack>
+  );
+}
+
+export function useProgramWizard({ value, onChange, onSubmit, busy, submitLabel, step, onStep }: ProgramWizardProps) {
   const { t } = useI18n();
   // Next is always tappable (D-334): without a name it says what is missing.
   const [triedName, setTriedName] = useState(false);
@@ -93,22 +107,14 @@ export function ProgramWizard({ value, onChange, onSubmit, busy, submitLabel, st
   // (a name) or already answered (a kind is picked for you).
   const skippable = at !== 'name' && at !== 'kind' && at !== 'review';
 
-  return (
+  // How far along, in the Next button's corner now (D-357), not over the question.
+  const progress = t('join.program.progress', { current: step + 1, total: questions });
+
+  const body = (
     <VStack gap={4} xstyle={styles.card}>
-      {at !== 'review' ? (
-        <VStack gap={1}>
-          <Text type="supporting" xstyle={styles.progress}>
-            {t('join.program.progress', { current: step + 1, total: questions })}
-          </Text>
-          <Heading level={2} xstyle={styles.question}>
-            {t(`join.program.step.${at}`)}
-          </Heading>
-        </VStack>
-      ) : (
-        <Heading level={2} xstyle={styles.question}>
-          {t('join.program.step.review')}
-        </Heading>
-      )}
+      <Heading level={2} xstyle={styles.question}>
+        {t(`join.program.step.${at}`)}
+      </Heading>
 
       {at === 'name' ? (
         <VStack gap={2}>
@@ -265,6 +271,10 @@ export function ProgramWizard({ value, onChange, onSubmit, busy, submitLabel, st
         />
       ) : null}
 
+    </VStack>
+  );
+
+  const actions = (
       <VStack gap={1} xstyle={styles.actions}>
         {at === 'review' ? (
           <BigButton
@@ -280,6 +290,7 @@ export function ProgramWizard({ value, onChange, onSubmit, busy, submitLabel, st
         ) : (
           <BigButton
             label={t('action.next')}
+            badge={progress}
             onPress={() => {
               if (at === 'name' && needsName) setTriedName(true);
               else next();
@@ -288,6 +299,7 @@ export function ProgramWizard({ value, onChange, onSubmit, busy, submitLabel, st
         )}
         {skippable ? <TextLink label={t('join.program.skip')} onClick={next} /> : null}
       </VStack>
-    </VStack>
   );
+
+  return { body, actions };
 }

@@ -13,14 +13,14 @@ import { useI18n } from '@/lib/i18n';
 import { markSetupDone } from '@/lib/programSetup';
 import { navigate } from '@/lib/navigate';
 import type { ProgramDetails } from '@/lib/useJoin';
-import { ProgramWizard } from '../app/join/ProgramWizard';
+import { useProgramWizard } from '../app/join/ProgramWizard';
 import { HelpButton } from './HelpButton';
 
 /**
  * Add a program (D-218, Will, 2 October: "both case managers and programs be
  * able to add new program"). Reached from the + on All programs.
  *
- * The same fields a program lead fills in at sign-up (`ProgramWizard`, one question a screen since D-347;
+ * The program questions (`ProgramWizard`, one question a screen since D-347; no longer asked at sign-up, D-353;
  * 0056), so a new program has one shape however it arrives; only the name is
  * required, and Pam checks every new program before it is listed (the
  * `needs_review` gate every manual entry goes through).
@@ -58,6 +58,18 @@ export function AddProgramView() {
   const [step, setStep] = useState(0);
   const [sent, setSent] = useState(false);
   const fromHome = useSearchParams()?.get('from') === 'home';
+  const wizard = useProgramWizard({
+    value: program,
+    onChange: setProgram,
+    onSubmit: () => {
+      setSent(true);
+      markSetupDone('program');
+    },
+    busy: false,
+    submitLabel: t('programs.new.send'),
+    step,
+    onStep: setStep,
+  });
 
   return (
     <SubPage
@@ -67,6 +79,8 @@ export function AddProgramView() {
       // Back goes one question back while there is one (D-347).
       {...(!sent && step > 0 ? { onBack: () => setStep(step - 1) } : {})}
       actions={<HelpButton />}
+      // Next stays at the foot of the screen, whatever the question (D-357).
+      {...(sent ? {} : { footer: wizard.actions })}
     >
       {sent ? (
         <EmptyState
@@ -97,18 +111,7 @@ export function AddProgramView() {
             {t('programs.new.intro')}
           </Text>
           <Card padding={6} xstyle={styles.card}>
-            <ProgramWizard
-              value={program}
-              onChange={setProgram}
-              onSubmit={() => {
-                setSent(true);
-                markSetupDone('program');
-              }}
-              busy={false}
-              submitLabel={t('programs.new.send')}
-              step={step}
-              onStep={setStep}
-            />
+            {wizard.body}
           </Card>
         </>
       )}

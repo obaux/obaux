@@ -8706,6 +8706,70 @@ scanning … add small illustrations for each for pops of color."
 - The Sign up step pickers in the program-lead and case-manager stories now
   list the three staff steps only (D-353).
 
+### D-355 — Program lead Home: Day / Week / Month tabs, no title
+
+**Date:** 2026-10-07. Will: "dropdown (scratch that), let's make small tabs
+38px touch target. Remove Coming in header … set weekly to default", then a
+list of finish notes on the month strip.
+
+- The range dropdown (D-320) is gone: an Astryx `SegmentedControl` (Day,
+  Week, Month), centred, Week first selected. "Coming in" is no longer drawn;
+  it stays the page's `<h1>` for screen readers (`LargeTitleHeader
+  isTitleHidden`) and still shows in the bar on scroll.
+- **38px, below the 48px floor — on Will's word.** The control is 38px tall
+  with 30px segments. The site-wide floor (globals.css, D-008) is lowered for
+  this one control only, by setting `--pam-touch-target-min` and
+  `--size-element-sm` on it; everything else keeps 48px. The a11y suite does
+  not reach a program lead's Home, so no test was loosened. Worth revisiting
+  in phone-browser QA.
+- Month's busy days: no hover fill, 6px radius, 15px / 500 date and 13px
+  count (softer than the section heading); columns 38% wide so the third
+  shows more; a dot per screenful under the strip, following the scroll.
+- `schedule.range.*` keys removed; `schedule.tab.*` added.
+
+### D-356 — A dashed rule in the design system
+
+**Date:** 2026-10-07. Will: "add a dashed separator line … style this line in
+the ds for use in future projects. Corner rounded pills dashed at 2px
+thickness black at 5% opacity. Don't apply it anywhere else a line is used,
+we'll use it moving forward", then "a bit tighter with rounded caps".
+
+- `@pam/ui/DashedRule` and token `--pam-rule-dashed` (black 5%; white 8% in
+  dark mode, where black would not show). Drawn as an SVG line with round
+  caps — a CSS dashed border has square ends. 6px dashes, 4px gaps.
+- Used only where Will asked: under the calendar preview's explanation (now
+  16px and fainter, with more room before the calendar), under the calendar's
+  date row (in place of the plain divider added for D-355), and above
+  "Days with people coming in", whose heading is now centred with more room
+  under it. Every existing solid divider is unchanged.
+- Story: Components/Layout/DashedRule.
+
+### D-357 — The step count rides in the Next button; Next sits at the foot
+
+**Date:** 2026-10-07. Will: "add these stepper counts inside the primary
+button as a badge on left corner (neatly tucked), with darker green
+background and white text … I want the next button to be stuck to footer",
+then "left padding matches top and bottom, no need for repeat 2 of 7 in main
+button label".
+
+- `BigButton badge`: a 32px pill 12px in from the left (12px top and bottom
+  in a 56px button), `--pam-on-accent-deep` (black 28% over the button's
+  green, so it follows the theme) with `--color-on-accent` text. The label
+  stays "Next"; the badge is plain text, read after it.
+- `ProgramWizard` splits into `useProgramWizard` → `{ body, actions }`; Add a
+  program puts `actions` in `SubPage footer`, so Next (and Skip for now) stay
+  at the bottom of the screen. "2 of 7" no longer sits above the question.
+
+### D-358 — Search moves into the + menu
+
+**Date:** 2026-10-07. Will: "move search action to the plus menu, clicking
+changes the top section to search bar expanded and ready to type."
+
+- The round search button is gone from the bar. Past ten visits
+  (`SEARCH_FROM`), the + menu ends with **Search**; choosing it swaps the bar
+  for the search field, focused (checked: the field has focus, typing
+  searches). `ScheduleView actions` may be a function handed `openSearch`.
+
 ---
 
 ## Notes for whoever picks this up next

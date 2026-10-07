@@ -3,7 +3,7 @@
 import * as stylex from '@stylexjs/stylex';
 import { DropdownMenu } from '@astryxdesign/core/DropdownMenu';
 import { HStack } from '@astryxdesign/core/HStack';
-import { PeopleIcon, PlacesIcon, PlusIcon, TripsIcon } from '@pam/ui';
+import { ExploreIcon, PeopleIcon, PlacesIcon, PlusIcon, TripsIcon } from '@pam/ui';
 import { useI18n } from '@/lib/i18n';
 import { navigate } from '@/lib/navigate';
 
@@ -27,7 +27,7 @@ const ICON = { width: 22, height: 22, 'aria-hidden': true } as const;
  * where Invite someone lives now, beside Add a program — the two things a
  * staff member starts from Home. A menu, so the bar stays three round buttons.
  */
-export function AddMenu() {
+export function AddMenu({ onSearch = null }: { readonly onSearch?: (() => void) | null } = {}) {
   const { t } = useI18n();
   return (
     <DropdownMenu
@@ -67,6 +67,11 @@ export function AddMenu() {
           icon: <PlacesIcon {...ICON} />,
           onClick: () => navigate('/programs/new/'),
         },
+        // Search, from the + now (Will, 7 October, D-358): the bar turns into
+        // the search field, ready to type. Only once there is enough to search.
+        ...(onSearch
+          ? [{ id: 'search', label: t('home.search'), icon: <ExploreIcon {...ICON} />, onClick: onSearch }]
+          : []),
       ]}
     />
   );
