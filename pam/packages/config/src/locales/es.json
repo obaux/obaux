@@ -1154,6 +1154,8 @@
   "friend.copy": "Copiar",
   "friend.copied": "Enlace copiado",
   "friend.close": "Cerrar",
+  "friend.share": "Enviar a alguien",
+  "friend.share.message": "Voy a {place} el {when}. Ven conmigo: {link}",
   "staff.title.provider": "Responsable del programa",
   "staff.label": "{name}, {title}. A quién verá",
   "when.countdown.today": "Hoy",

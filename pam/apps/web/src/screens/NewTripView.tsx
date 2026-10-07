@@ -368,6 +368,12 @@ export function NewTripView({
           copyLabel={t('friend.copy')}
           copiedLabel={t('friend.copied')}
           closeLabel={t('friend.close')}
+          shareLabel={t('friend.share')}
+          shareText={t('friend.share.message', {
+            place: place.name,
+            when: `${dayLong.format(confirmed.at)}, ${timeFmt.format(confirmed.at)}`,
+            link: friendLink(place.id, confirmed.at.toISOString()),
+          })}
           copiedAt={friendCopiedAt}
           heroSrc={FRIEND_BANNER}
           heroSrcSet={FRIEND_BANNER_SRCSET}

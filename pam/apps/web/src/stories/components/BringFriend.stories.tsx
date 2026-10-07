@@ -25,6 +25,8 @@ const meta = {
     copyLabel: 'Copy',
     copiedLabel: 'Link copied',
     closeLabel: 'Close',
+    shareLabel: 'Send to a friend',
+    shareText: "I'm going to Example Learning Center on Friday, October 9, 10:00 AM. Come with me: https://web-ten-umber-88.vercel.app/signin/",
     heroSrc: FRIEND_BANNER,
     heroSrcSet: FRIEND_BANNER_SRCSET,
   },
@@ -57,6 +59,7 @@ export const Spanish: Story = {
     copyLabel: 'Copiar',
     copiedLabel: 'Enlace copiado',
     closeLabel: 'Cerrar',
+    shareLabel: 'Enviar a alguien',
   },
 };
 

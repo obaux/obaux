@@ -8415,6 +8415,27 @@ color, like black."
 - **Proven by:** screenshots (rest and hover), typecheck, ui 69, web
   build, e2e 573/573 (axe included, light and dark).
 
+### D-344 — Bring a friend opens the phone's share sheet
+
+**Date:** 2026-10-07. Will: "continue on share sheet" (it had waited on him
+since D-333).
+
+- Under the link, a full-width **Send to a friend** button opens the phone's
+  own share sheet (`navigator.share`) with a ready message: "I'm going to
+  {place} on {day, time}. Come with me: {link}" (`friend.share.message`, en
+  and es). Whichever app the two people already use, not one Pam picks —
+  the same reasoning as `sharePlace` and `InviteReady`.
+- It shows only where the phone has a share sheet: iOS Safari, Android
+  Chrome, the iOS app. Decided after mount, so the static page never
+  promises one. A closed sheet is not an error. The link is still copied on
+  open (D-337) and Copy stays.
+- **Gap:** Android's in-app WebView (the Capacitor Android build) has no
+  `navigator.share`, so there the button is hidden and copying is the way.
+  `@capacitor/share` would fill it but needs a native rebuild; not added.
+- **Proven by:** with `navigator.share` stubbed, the button shares the
+  message above with the booked slot's link; without it, no button.
+  Typecheck; config 238.
+
 ---
 
 ## Notes for whoever picks this up next

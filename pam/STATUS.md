@@ -407,8 +407,7 @@ joins is worth 150 points (SOP amendment A18), listed first under Ways to
 earn, not yet awarded by the database (D-330). `ProgramVisitCard` (visit / invite) is the
 program card on Check and Go together; a booked place shows its service in the
 visit card, with no picker (D-332). Bring a friend is a folded section on the new
-"Your trip is booked" step (no page, Copy only; native share sheet waits for
-Will); walk-ins plan a trip from their meeting days; the signature sheet
+"Your trip is booked" step (no page, Copy, then the share sheet — D-344); walk-ins plan a trip from their meeting days; the signature sheet
 holds still while drawing — tested in Chromium touch emulation, not yet on iOS
 Safari, an Android WebView or the Capacitor build (D-333). A footer is pinned to the bottom of the screen on
 every page that has one; the booked screen closes with an × and lists policies
@@ -419,7 +418,7 @@ visit's own service policies; floating rows have hairlines top and bottom
 (D-336). The booked screen is the green visit card with Change; Back from
 its policies returns to it; Bring a friend copies on tap, under Will's banner
 (WebP, 21/35 KB); every place picture is its category illustration, the
-tinted grounds are gone except the chips (D-337). Drawers have no border (`sheet.panel` on every BottomSheet); the friend banner runs edge to edge over the handle strip (D-338). VisitCard spacing opened up; "Link copied" spans field and Copy (D-339). Friend drawer: 24px under the banner and above the link (D-340). VisitCard: countdown plain, Change link even in its corner (D-341). 20px above and below it (D-342). Chevron after it; eyebrow in black (D-343). Note:
+tinted grounds are gone except the chips (D-337). Drawers have no border (`sheet.panel` on every BottomSheet); the friend banner runs edge to edge over the handle strip (D-338). VisitCard spacing opened up; "Link copied" spans field and Copy (D-339). Friend drawer: 24px under the banner and above the link (D-340). VisitCard: countdown plain, Change link even in its corner (D-341). 20px above and below it (D-342). Chevron after it; eyebrow in black (D-343). Bring a friend shares through the phone's share sheet where there is one; Android WebView copies only (D-344). Note:
 the web app's vitest tests are not run in CI. How points should be awarded — two rules live
 (save a place, finish setup), the rest to build, with order and open
 questions — is specified in `docs/points-awarding.md`. The

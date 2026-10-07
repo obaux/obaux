@@ -547,3 +547,5 @@ Chromium.
 - D-341: VisitCard Change target marginBlockEnd -14px (words 19px from bottom, 18px from side); countdown 400 weight, text-primary (secondary grey failed dark-mode axe at 4.08). Checked: typecheck, ui 69, web build, e2e 573/573.
 - D-342: VisitCard rule padding 4→2px, change overhang -14→-13px: 20px ink-to-line and ink-to-edge (pixel-measured). Checked: ui 69, web build, visit-change + trip-booked e2e.
 - D-343: VisitCard change link children = label + aria-hidden "\u00A0›" (1.3em, inherits weight/underline); eyebrow text-primary. Checked: typecheck, ui 69, web build, e2e 573/573.
+- Merged #24 (merge commit e871a4b) after CI green; branch fast-forwarded to main. 0073 applied live after a list_migrations diff (only 0073 missing; 0068/0069 still on claude/hopeful-thompson-07nj7n).
+- D-344: BringFriend `shareLabel`/`shareText` → BigButton → navigator.share, shown only when supported (after mount); friend.share(+.message) en/es. Checked with a stubbed share API.
