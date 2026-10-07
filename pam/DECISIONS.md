@@ -8364,6 +8364,13 @@ align text inside shape."
   under it (checked: copying again brings it back).
 - **Proven by:** screenshots; typecheck; ui 69; web build; e2e 573/573.
 
+### D-340 — Room around the friend drawer's words
+
+**Date:** 2026-10-07. Will: "I want space between banner image and bottom of
+subtitle also." Read as: more room under the banner (before the title) and
+under the sentence (before the link). 24px each, was 12px. A layout-only
+change, no test touches it.
+
 ---
 
 ## Notes for whoever picks this up next

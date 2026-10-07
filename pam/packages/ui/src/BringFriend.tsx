@@ -95,7 +95,8 @@ const styles = stylex.create({
   // Above Astryx's handle strip (z-index 1), whose white fade would wash out
   // the picture's top; the picture lets taps through to the handle beneath,
   // so the drawer still drags from its top edge, and draws its own pill.
-  top: { position: 'relative', zIndex: 2, minHeight: '64px', marginInline: '-20px' },
+  // 24px from the banner to the title, with the stack's gap (Will, D-340).
+  top: { position: 'relative', zIndex: 2, minHeight: '64px', marginInline: '-20px', marginBlockEnd: '12px' },
   grip: {
     position: 'absolute',
     top: '10px',
@@ -129,7 +130,8 @@ const styles = stylex.create({
     boxShadow: '0 1px 4px oklch(0 0 0 / 18%)',
   },
   title: { fontSize: '26px', lineHeight: 1.2, fontWeight: 700, textAlign: 'center' },
-  body: { fontSize: '17px', lineHeight: 1.45, textAlign: 'center', alignSelf: 'center', maxWidth: '320px' },
+  // 24px from the sentence to the link, with the stack's gap (D-340).
+  body: { fontSize: '17px', lineHeight: 1.45, textAlign: 'center', alignSelf: 'center', maxWidth: '320px', marginBlockEnd: '12px' },
   field: { flexGrow: 1, minWidth: 0 },
   row: { position: 'relative' },
   // Always there, so a screen reader hears it change; empty and invisible
