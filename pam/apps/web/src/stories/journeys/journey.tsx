@@ -3,7 +3,8 @@ import { PrototypeApp, prototypeRouter } from '../prototype/PrototypeApp';
 import { REDESIGN_ROUTES, redesignChrome } from '../prototype/routes';
 import { ROLES, type JourneyRole } from './fixtures';
 import { installSupabaseMock } from './mockSupabase';
-import { markFreshAccount, markSetupDone, type SetupStep } from '../../lib/programSetup';
+import { markFreshAccount, markSetupDone, saveSentProgram, type SetupStep } from '../../lib/programSetup';
+import type { ProgramDetails } from '../../lib/useJoin';
 import { addTrip, type AddedTrip } from '../../lib/addedTrips';
 
 /**
@@ -47,7 +48,12 @@ export const asRedesign = asRole;
  */
 export function withSetup(
   story: StoryObj,
-  state: { readonly done?: readonly SetupStep[]; readonly booked?: readonly AddedTrip[] },
+  state: {
+    readonly done?: readonly SetupStep[];
+    readonly booked?: readonly AddedTrip[];
+    /** A program already sent to Pam (D-381): how long ago, and any changes asked for. */
+    readonly sent?: { readonly details: ProgramDetails; readonly daysAgo?: number; readonly changes?: string };
+  },
 ): StoryObj {
   return {
     ...story,
@@ -57,6 +63,12 @@ export function withSetup(
         markFreshAccount();
         for (const step of state.done ?? []) markSetupDone(step);
         for (const trip of state.booked ?? []) addTrip(trip);
+        if (state.sent) {
+          saveSentProgram(state.sent.details, {
+            sentAt: new Date(Date.now() - (state.sent.daysAgo ?? 0) * 86_400_000).toISOString(),
+            changes: state.sent.changes ?? null,
+          });
+        }
         return {};
       },
     ],

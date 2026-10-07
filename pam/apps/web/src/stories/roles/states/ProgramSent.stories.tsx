@@ -25,6 +25,20 @@ export const JustSent: Story = {
 export const UnderReview: Story = {
   ...asRole('provider', '/program/'),
   name: 'Under review (the Program tab)',
-  render: () => <ProgramReviewView />,
+  render: () => <ProgramReviewView status="review" hasPhoto={false} />,
+};
+/** After three days: honest about the wait, with a way to ask Pam (D-381). */
+export const TakingLonger: Story = {
+  ...asRole('provider', '/program/'),
+  name: 'Taking longer than usual',
+  render: () => <ProgramReviewView status="late" hasPhoto={false} />,
+};
+/** Pam asked for changes (D-381): the step in amber, what to change, one button to fix it. */
+export const NeedsChanges: Story = {
+  ...asRole('provider', '/program/'),
+  name: 'Pam asked for changes',
+  render: () => (
+    <ProgramReviewView status="changes" changes="Add the street address members should go to, and your opening hours." />
+  ),
 };
 export const Spanish: Story = { ...UnderReview, name: 'Spanish', globals: { locale: 'es' } };

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { USE_DUMMY_PEOPLE } from '@pam/config/dummy-flag';
 import type { SessionState } from './useSession';
+import type { ProgramDetails } from './useJoin';
 
 /**
  * What a program lead has set up, for Home's getting-started cards (D-352).
@@ -29,6 +30,53 @@ const DONE = 'pam.setup.done.';
 export const SETUP_CHANGED = 'pam:setup-changed';
 
 export type SetupStep = 'program' | 'photo';
+
+const SENT = 'pam.setup.sent';
+/** After this long, the review page says it is taking longer (D-381). */
+export const REVIEW_DAYS = 3;
+
+/**
+ * What a lead sent, and when (D-381): for "See what you sent", for editing
+ * after Pam asks for changes, and for saying honestly when the wait runs
+ * long. Kept for the tab, like the rest (the real record comes with loading
+ * a lead's own program, before launch). `changes` is Pam's note when it
+ * asks for some — nothing sets it in the prototype but a story.
+ */
+export interface SentProgram {
+  readonly details: ProgramDetails;
+  readonly sentAt: string;
+  readonly changes?: string | null;
+}
+
+export function saveSentProgram(details: ProgramDetails, extra: Partial<Omit<SentProgram, 'details'>> = {}): void {
+  try {
+    sessionStorage.setItem(
+      SENT,
+      JSON.stringify({ details, sentAt: extra.sentAt ?? new Date().toISOString(), changes: extra.changes ?? null }),
+    );
+  } catch {
+    // Without storage, "See what you sent" has nothing to show; harmless.
+  }
+  window.dispatchEvent(new Event(SETUP_CHANGED));
+}
+
+export function readSentProgram(): SentProgram | null {
+  try {
+    const raw = sessionStorage.getItem(SENT);
+    return raw ? (JSON.parse(raw) as SentProgram) : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Where a sent program stands (D-381). */
+export type ReviewStatus = 'review' | 'late' | 'changes';
+
+export function reviewStatusOf(sent: SentProgram | null, now = Date.now()): ReviewStatus {
+  if (sent?.changes) return 'changes';
+  if (sent && now - Date.parse(sent.sentAt) > REVIEW_DAYS * 86_400_000) return 'late';
+  return 'review';
+}
 
 function read(key: string): boolean {
   try {
@@ -73,6 +121,10 @@ export interface ProgramSetup {
    * own program (before-launch, Programs).
    */
   readonly isUnderReview: boolean;
+  /** While under review: still checking, taking longer, or changes asked for (D-381). */
+  readonly reviewStatus: ReviewStatus;
+  /** What was sent, if this tab knows. */
+  readonly sent: SentProgram | null;
   readonly hasPhoto: boolean;
 }
 
@@ -90,6 +142,8 @@ export function useProgramSetup(session: SessionState): ProgramSetup {
     isExample,
     hasProgram: isExample || read(DONE + 'program'),
     isUnderReview: !isExample && read(DONE + 'program'),
+    reviewStatus: reviewStatusOf(readSentProgram()),
+    sent: readSentProgram(),
     hasPhoto: isExample || photoUrl !== null || read(DONE + 'photo'),
   };
 }

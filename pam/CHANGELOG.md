@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.45.2] — 2026-10-07 · The wait for review
+
+While Pam checks a new program, its lead can get ready: add a photo, add
+policies, turn on a text for when it's live. Home shows where the program
+is. If Pam needs changes, the page says what, and one button opens what was
+sent to fix and send again. "See what you sent" shows every answer. After
+three days the page says it's taking longer than usual, and offers a way to
+ask Pam (D-381).
+
 ## [0.45.1] — 2026-10-07 · "Sent to Pam"
 
 After a program lead adds their program, a celebration: confetti, a picture

@@ -934,6 +934,11 @@ Open items Will asked to keep (7 October), newest first. Read this before
   Program tab it should hide the tab bar, keep Next pinned at the bottom,
   and Back from the first step returns to Home. (The confetti "Sent to Pam"
   screen with "Text me when it's live" is done — D-379.)
+- **The review wait, for real** (D-381): in review / taking longer / needs
+  changes, What you sent, and Home's status card run on sessionStorage and
+  story state. Real status, Pam's note on "needs changes", and a text when it
+  goes live need "Load a program lead's own program" (before-launch) plus a
+  reviewer-note field.
 - **Apply 0077, then 0078** after 0075/0076 (D-373, D-375).
 - **Apply 0075 then 0076 to the live project** — 0068/0069 carried over and
   reconciled with 0072 (D-346); DB suite green. Their `drop` statements need

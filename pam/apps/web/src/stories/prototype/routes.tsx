@@ -28,6 +28,7 @@ import { PrototypeInviteExpired } from './PrototypeInviteExpired';
 import { InviteInUseScreen } from '../../screens/InviteInUseScreen';
 import { InviteAddScreen } from '../../screens/InviteAddScreen';
 import { UseAsView } from '../../screens/UseAsView';
+import { WhatYouSentView } from '../../screens/WhatYouSentView';
 import AboutPage from '../../app/about/page';
 import PoliciesPage from '../../app/program/policies/page';
 import { PrototypePolicy } from './PrototypePolicy';
@@ -145,6 +146,7 @@ export const APP_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   // What the calendar will be, from a new lead's Home (D-352).
   '/home/calendar/': screen(() => <CalendarPreviewPage />),
   '/program/': screen(() => <ProgramScreen />),
+  '/program/sent/': screen(() => <WhatYouSentView />),
   // A lead adds or edits one service (D-313).
   '/program/service/': screen(() => <ProgramServicePage />),
   // D-225: planning a visit, from the + on Trips.

@@ -92,6 +92,33 @@ export function ProgramWizard(props: ProgramWizardProps) {
   );
 }
 
+/**
+ * A program's answers as labelled rows (D-381): the review step, and "See
+ * what you sent" after it went to Pam. Unanswered ones say so.
+ */
+export function programSummary(
+  value: ProgramDetails,
+  t: (key: string) => string,
+): { readonly id: ProgramStep; readonly label: string; readonly value: string }[] {
+  const category = (value.category || 'education') as Category;
+  const categoryLabel = CATEGORY_LIST.find((c) => c.key === category);
+  const kindWords =
+    value.category === OTHER ? (value.categoryOther ?? '').trim() : categoryLabel ? t(categoryLabel.labelKey) : '';
+  const filled = value.services.map((s) => s.trim()).filter(Boolean);
+  return [
+    { id: 'name', label: t('join.program.name'), value: value.name.trim() },
+    { id: 'kind', label: t('join.program.category'), value: kindWords },
+    { id: 'about', label: t('join.program.review.about'), value: value.description.trim() },
+    { id: 'where', label: t('join.program.address'), value: value.address.trim() },
+    {
+      id: 'contact',
+      label: t('join.program.review.contact'),
+      value: [value.phone.trim(), value.website.trim()].filter(Boolean).join(' · '),
+    },
+    { id: 'services', label: t('join.program.services'), value: filled.join(', ') },
+  ];
+}
+
 export function useProgramWizard({ value, onChange, onSubmit, busy, submitLabel, step, onStep }: ProgramWizardProps) {
   const { t } = useI18n();
   // Next is always tappable (D-334): without a name it says what is missing.
@@ -267,23 +294,12 @@ export function useProgramWizard({ value, onChange, onSubmit, busy, submitLabel,
         <MenuList
           label={t('join.program.step.review')}
           hasDividers
-          items={[
-            { id: 'name', label: t('join.program.name'), value: value.name.trim() },
-            { id: 'kind', label: t('join.program.category'), value: kindWords },
-            { id: 'about', label: t('join.program.review.about'), value: value.description.trim() },
-            { id: 'where', label: t('join.program.address'), value: value.address.trim() },
-            {
-              id: 'contact',
-              label: t('join.program.review.contact'),
-              value: [value.phone.trim(), value.website.trim()].filter(Boolean).join(' · '),
-            },
-            { id: 'services', label: t('join.program.services'), value: filled.join(', ') },
-          ].map((row) => ({
+          items={programSummary(value, t).map((row) => ({
             id: row.id,
             label: row.label,
             description: row.value || t('join.program.review.empty'),
             icon: null,
-            onSelect: () => onStep(PROGRAM_STEPS.indexOf(row.id as ProgramStep)),
+            onSelect: () => onStep(PROGRAM_STEPS.indexOf(row.id)),
           }))}
         />
       ) : null}

@@ -9307,6 +9307,49 @@ Add a top border above text me when it's live, and change icon to line icon."
 - A hairline (`--color-border`) above "Text me when it's live"; its bell is
   the outline bell (`BellOutlineIcon`), as on the header.
 
+### D-381 — The wait for review, given a shape: status on Home, "needs changes", what you sent, an honest wait
+
+**Date:** 2026-10-07. Will took up six of the suggestions made for the new
+program lead's journey: "Give the wait something to do. Show progress on
+Home, not just on the Program tab. Plan for 'needs changes'. Let them check
+what they sent. Make the wait honest. Keep the first-run order simple."
+
+- **Something to do while waiting.** "Sent to Pam" gains a "While you wait"
+  group: Add your photo (only until there is one), Add your policies, Text me
+  when it's live. Each is something a lead needs on day one anyway, so the
+  wait is spent getting ready rather than refreshing.
+- **Progress on Home.** While the program is in review, Home's first Get
+  started card is its status ("Your program is in review", the `review`
+  picture) and opens the Program tab. It replaces the Add your program card
+  rather than vanishing with it, so Home never looks as though nothing
+  happened.
+- **"Needs changes".** A third state beside in review and late. The title
+  says "A few changes needed"; a warning banner carries Pam's note; one
+  primary button, "Edit and send again", opens Add a program at its review
+  step with what was sent filled in (`/programs/new/?edit=1`). The middle
+  step turns amber and reads "Pam asked for a few changes". "While you wait"
+  is hidden in this state: there is one thing to do. Home's card says the
+  same.
+- **What you sent.** A read-only page, `/program/sent/`, one row from the
+  review page: the date it was sent and each answer, from the same
+  `programSummary()` the wizard's review step uses, so the two can't drift.
+  It is an ordinary SubPage, with help.
+- **An honest wait.** After `REVIEW_DAYS` (3) the title becomes "Still
+  checking" and the body says it is taking longer than usual and that nothing
+  is wrong on their side. It does **not** promise a text: one only comes if
+  they turned text alerts on. In this state the page adds "Ask Pam about it"
+  (→ Get help) — the one help link a hero page carries (sop-amendments A19,
+  amended).
+- **First-run order.** No new step was added. Home's order stays: the program
+  (now its status), then the photo, then who's coming in.
+
+**Prototype only.** What was sent and when lives in sessionStorage
+(`saveSentProgram`, `readSentProgram`, `reviewStatusOf`); the "changes"
+state and its note are set by stories. The real status and Pam's note need
+the before-launch item "Load a program lead's own program" plus a field for
+the reviewer's note. The seventh suggestion — telling the lead when it goes
+live — needs that backend too, and is not built.
+
 ---
 
 ## Notes for whoever picks this up next

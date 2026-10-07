@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { VStack } from '@astryxdesign/core/VStack';
 import { SubPage } from '@pam/ui/SubPage';
 import { useI18n } from '@/lib/i18n';
-import { markSetupDone } from '@/lib/programSetup';
+import { markSetupDone, readSentProgram, saveSentProgram } from '@/lib/programSetup';
 import type { ProgramDetails } from '@/lib/useJoin';
 import { PROGRAM_STEPS, useProgramWizard } from '../app/join/ProgramWizard';
 import { HelpButton } from './HelpButton';
@@ -47,15 +47,20 @@ const EMPTY: ProgramDetails = {
  */
 export function AddProgramView({ isTab = false }: { readonly isTab?: boolean } = {}) {
   const { t } = useI18n();
-  const [program, setProgram] = useState<ProgramDetails>(EMPTY);
-  const [step, setStep] = useState(0);
+  const params = useSearchParams();
+  const fromHome = params?.get('from') === 'home';
+  // Editing after Pam asked for changes (D-381): what was sent, at the review.
+  const isEditing = params?.get('edit') === '1';
+  const [program, setProgram] = useState<ProgramDetails>(() => (isEditing ? readSentProgram()?.details : null) ?? EMPTY);
+  const [step, setStep] = useState(() => (isEditing ? PROGRAM_STEPS.length - 1 : 0));
   const [sent, setSent] = useState(false);
-  const fromHome = useSearchParams()?.get('from') === 'home';
   const wizard = useProgramWizard({
     value: program,
     onChange: setProgram,
     onSubmit: () => {
       setSent(true);
+      // Kept for "See what you sent", editing, and an honest wait (D-381).
+      saveSentProgram(program);
       markSetupDone('program');
     },
     busy: false,
@@ -73,7 +78,9 @@ export function AddProgramView({ isTab = false }: { readonly isTab?: boolean } =
       title={t(PROGRAM_STEPS[step] === 'review' ? 'programs.new.review.title' : 'programs.new.title')}
       {...(isTab
         ? { backLabel: '' }
-        : { backHref: fromHome ? '/' : '/programs/', backLabel: t(fromHome ? 'nav.back.home' : 'nav.back.programs') })}
+        : isEditing
+          ? { backHref: '/program/', backLabel: t('nav.back.program') }
+          : { backHref: fromHome ? '/' : '/programs/', backLabel: t(fromHome ? 'nav.back.home' : 'nav.back.programs') })}
       // Back goes one question back while there is one (D-347).
       {...(step > 0 ? { onBack: () => setStep(step - 1) } : {})}
       actions={<HelpButton />}

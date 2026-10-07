@@ -38,8 +38,42 @@ const bookedFor = (n: number, name: string, days: number, hour: number) => ({
   forName: name,
 });
 export const HomeGetStarted: Story = withSetup(screen('provider', 'Home — getting started', '/'), {});
-export const HomeProgramAdded: Story = withSetup(screen('provider', 'Home — getting started, program added', '/'), {
+/** An example program as a lead would send it (D-381). */
+const SENT_PROGRAM = {
+  name: 'Northside Learning Center',
+  category: 'education',
+  subcategory: '',
+  description: 'Free GED classes and a computer room, open to anyone coming home.',
+  address: '1200 W Girard Ave, Philadelphia',
+  phone: '215 555 0142',
+  website: 'northsidelearning.org',
+  services: ['GED classes', 'Computer room'],
+};
+/** Sent and in review (D-381): Home says where it stands instead of the card going away. */
+export const HomeProgramAdded: Story = withSetup(screen('provider', 'Home — program in review', '/'), {
   done: ['program'],
+  sent: { details: SENT_PROGRAM },
+});
+export const HomeProgramChanges: Story = withSetup(screen('provider', 'Home — Pam asked for changes', '/'), {
+  done: ['program'],
+  sent: { details: SENT_PROGRAM, changes: 'Add the street address members should go to, and your opening hours.' },
+});
+/** The Program tab while it is in review, from the real tab (D-379, D-381). */
+export const ProgramInReview: Story = withSetup(screen('provider', 'Program — in review', '/program/'), {
+  done: ['program'],
+  sent: { details: SENT_PROGRAM },
+});
+export const ProgramTakingLonger: Story = withSetup(screen('provider', 'Program — taking longer than usual', '/program/'), {
+  done: ['program'],
+  sent: { details: SENT_PROGRAM, daysAgo: 4 },
+});
+export const ProgramChanges: Story = withSetup(screen('provider', 'Program — Pam asked for changes', '/program/'), {
+  done: ['program'],
+  sent: { details: SENT_PROGRAM, changes: 'Add the street address members should go to, and your opening hours.' },
+});
+export const WhatYouSent: Story = withSetup(screen('provider', 'What you sent', '/program/sent/'), {
+  done: ['program'],
+  sent: { details: SENT_PROGRAM, daysAgo: 1 },
 });
 export const HomeFolded: Story = withSetup(screen('provider', 'Home — first bookings, photo still to add', '/'), {
   done: ['program'],

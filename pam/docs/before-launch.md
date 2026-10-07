@@ -72,6 +72,9 @@ STATUS row too.
      Program tab (Add a program when there is none) and the example data
      follow the real account, on any device.
   4. Then: switching between a lead's programs (D-318), also on the backlog.
+  5. The review wait (D-381): the status (in review / taking longer / needs
+     changes) and Pam's note from the database, a place for the reviewer to
+     write that note, and a text to the lead when it goes live.
 
 ### Two roles (one account, member and program)
 

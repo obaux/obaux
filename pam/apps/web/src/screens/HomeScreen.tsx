@@ -240,7 +240,19 @@ type Card = SetupCardProps & { readonly id: string };
 /** The cards still to do, in Will's order: program first, then the photo. */
 function setupCards(setup: ProgramSetup, t: (key: string) => string): Card[] {
   return [
-    ...(setup.hasProgram
+    // Sent and being checked (D-381): where it stands, opening the review
+    // page, instead of the card simply going away.
+    ...(setup.isUnderReview
+      ? [
+          {
+            id: 'review',
+            kind: 'review' as const,
+            title: t(`home.setup.review.title.${setup.reviewStatus}`),
+            body: t(`home.setup.review.body.${setup.reviewStatus}`),
+            href: '/program/',
+          },
+        ]
+      : setup.hasProgram
       ? []
       : [
           {

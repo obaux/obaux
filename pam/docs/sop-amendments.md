@@ -471,3 +471,8 @@ second choice ("Not now") leaves without changing anything.
 a moment — a choice with an obvious way out — not for a screen somebody can
 get stuck on; if a hero screen ever needs typing or a multi-step task, it
 needs its help back.
+
+**Amended (D-381, 7 October 2026).** "Sent to Pam" is a hero page somebody
+can wait on for days. When the wait runs past three days it adds one row,
+"Ask Pam about it" (→ Get help), because by then something may have gone
+wrong. It is the only hero page that carries help, and only in that state.
