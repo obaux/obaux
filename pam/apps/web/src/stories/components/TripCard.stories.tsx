@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/nextjs';
-import { EducationIcon, FamilyServicesIcon, WorkforceIcon } from '@pam/ui';
+import { CategoryArt } from '@pam/ui/CategoryArt';
 import { TripCard } from '@pam/ui/TripCard';
 
 /** One visit a member has agreed to make — the place, the day and time, and who they are meeting; the whole card opens the place. Use it in the Trips list. */
@@ -11,20 +11,13 @@ const meta = {
     placeName: 'Example Learning Center',
     when: 'Thursday, Oct 8 · 10:00 AM',
     href: '/place/?id=dummy-place-learning&from=trips',
-    art: <EducationIcon width={44} height={44} aria-hidden />,
+    art: <CategoryArt category="education" size="fill" />,
     withName: 'Sandra',
     withPhotoUrl: null,
     label: 'Example Learning Center, Thursday, Oct 8 · 10:00 AM, with Sandra',
     policies: null,
-    tone: 'blue',
   },
-  argTypes: {
-    tone: {
-      control: 'select',
-      options: ['blue', 'green', 'purple', 'orange', 'red', 'teal', 'pink', 'cyan', 'gray'],
-    },
-    art: { control: false },
-  },
+  argTypes: { art: { control: false } },
 } satisfies Meta<typeof TripCard>;
 
 export default meta;
@@ -43,11 +36,10 @@ export const PoliciesSigned: Story = {
     placeName: 'Example Workforce Center',
     when: 'Sunday, Oct 11 · 1:00 PM',
     href: '/place/?id=dummy-place-workforce&from=trips',
-    art: <WorkforceIcon width={44} height={44} aria-hidden />,
+    art: <CategoryArt category="workforce" size="fill" />,
     withName: 'Marcus',
     label: 'Example Workforce Center, Sunday, Oct 11 · 1:00 PM, with Marcus',
     policies: { label: 'Policies signed', isDone: true },
-    tone: 'green',
   },
 };
 
@@ -55,10 +47,9 @@ export const PoliciesSigned: Story = {
 export const PlaceOnly: Story = {
   args: {
     placeName: 'Example Family Center',
-    art: <FamilyServicesIcon width={44} height={44} aria-hidden />,
+    art: <CategoryArt category="family_services" size="fill" />,
     withName: null,
     label: 'Example Family Center, Thursday, Oct 8 · 10:00 AM',
-    tone: 'purple',
   },
 };
 

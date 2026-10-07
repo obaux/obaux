@@ -24,3 +24,11 @@ export const Past: Story = { args: { eyebrow: 'Your visit', changeLabel: undefin
 
 /** A visit for one of the program's services: the service follows the time (D-332). */
 export const WithService: Story = { args: { service: 'GED classes' } };
+
+/** How soon, under the time (D-337). */
+export const WithCountdown: Story = { args: { service: 'GED classes', countdown: 'In 2 days' } };
+
+/** "Your trip is booked": named for the program, with how soon and Change (D-337). */
+export const Booked: Story = {
+  args: { eyebrow: 'Example Learning Center', day: 'Friday, October 9', service: 'GED classes', countdown: 'In 2 days' },
+};

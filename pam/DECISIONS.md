@@ -8268,6 +8268,51 @@ help") with a line above and below, and that line on every floating row.
   links (booked → policies, policy → Trips) are in `flows.mjs` and the
   regenerated script, not yet drawn on the Figma page.
 
+### D-337 — The booked screen is the green visit card; Bring a friend copies on open, under Will's banner; every place picture is its illustration
+
+**Date:** 2026-10-07. Will, in four messages: use the green card for the
+confirmed booking, with Change and the number of days in it; Policies to
+sign and Bring a friend as plain items on the page; Back from Policies
+should return to the confirmation, not to step 1; for Saved and every
+program/place card "just use the illustrations by category … Only keep the
+shaded colors on chips on explore"; "instead of coming up with an
+illustration for it, use this banner on top of drawer. Compress it and get
+it ready for production"; opening Bring a friend copies the link, says so
+over the field for 3 seconds, and the drawer gets an × at the top right.
+
+- **Booked screen:** the `VisitCard` a booked place shows, with the
+  program's name as its eyebrow, the day, the time and service, how soon
+  (new `countdown` prop, also on the place's card) and Change appointment
+  (the same `/trips/new/?change=` link). `ProgramVisitCard` stays on Check
+  only. The two rows are a `MenuList` straight on the page, no card.
+- **Back from Policies:** after Add this trip the screen replaces its URL
+  with `/trips/new/?booked=<id>` (`router.replace`), so history (and the
+  prototype's stack) holds the booked screen, not a fresh Plan a visit.
+  New e2e `trip-booked.spec.ts` books, opens Policies, goes back.
+- **Pictures:** `CategoryArt` takes `size="fill"` (`ArtFrame` stretches to
+  its box, square corners left to the box), and `CategoryPicture` in
+  SavedView draws it on Saved's tiles, trip cards (Trips, past trips, a
+  member's page), Explore's next visit and Check. `ToneGround`,
+  `ToneIcon`, `ToneBakedIcon` and `CategoryIcon` are gone; `ToneDot` (the
+  chips) is all of `Tone.tsx` that remains. The illustrations keep their own
+  grounds and grain — those are the "sharp 80s" pictures Will is keeping;
+  what went is the pale tint behind an icon.
+- **Banner:** Will's 1608 × 629 PNG (1.1 MB, from Drive) →
+  `public/friend/bring-a-friend-800.webp` (21 KB) and `-1200.webp` (35 KB)
+  by `apps/web/scripts/friend-banner.mjs` (sharp, WebP q74, metadata
+  stripped), served with `srcset`. If it fails to load the drawer shows no
+  banner, not a broken image. `FriendsArt` (D-336) is deleted.
+- **Copy on open:** the row's tap calls `copyLink` (exported from
+  `BringFriend`) — inside the tap, because Safari only allows a clipboard
+  write there — and passes `copiedAt`; the drawer shows a dark "Link
+  copied" pill over the field (a `role="status"`, so it is read out) for
+  `COPIED_MS` = 3s. Copy copies again. An `IconButton` × (48px, white
+  circle) closes it at the top right. Copy only still; no share sheet.
+- **Proven by:** screenshots (booked, drawer, Saved, Trips, Explore);
+  clipboard read back in Chromium, pill gone after 3s, × closes; typecheck;
+  ui 69, config 238, web 16; builds; Storybook; e2e 573/573. Not on a real
+  iPhone.
+
 ---
 
 ## Notes for whoever picks this up next

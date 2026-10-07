@@ -18,9 +18,8 @@ import { useRouter } from 'next/navigation';
 import { dummyTripsFor } from '@pam/config/dummy-trips';
 import { useCaseload, type CaseloadMember } from '@/lib/useCaseload';
 import { openConversation } from '@/lib/openConversation';
-import { CategoryIcon, categoryTone } from '../../screens/SavedView';
+import { CategoryPicture } from '../../screens/SavedView';
 
-const TRIP_ART = { width: 40, height: 40, 'aria-hidden': true } as const;
 import { SubPageHeader } from '@pam/ui/SubPage';
 import { useStarredPeople } from '@/lib/useStarredPeople';
 import { StarToggle } from '../../screens/PeopleHomeView';
@@ -303,8 +302,7 @@ function PersonScreen() {
       placeName={trip.placeName}
       when={tripWhen(trip.startsAt)}
       href={`/place/?id=${encodeURIComponent(trip.placeId)}`}
-      art={<CategoryIcon category={trip.category} iconSize={TRIP_ART} isBaked />}
-      tone={categoryTone(trip.category)}
+      art={<CategoryPicture category={trip.category} />}
       label={`${trip.placeName}, ${tripWhen(trip.startsAt)}`}
     />
   );

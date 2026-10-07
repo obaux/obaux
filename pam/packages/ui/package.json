@@ -34,7 +34,6 @@
     "./ProgramVisitCard": "./src/ProgramVisitCard.tsx",
     "./BringFriend": "./src/BringFriend.tsx",
     "./StaffBadge": "./src/StaffBadge.tsx",
-    "./FriendsArt": "./src/FriendsArt.tsx",
     "./VisitTag": "./src/VisitTag.tsx",
     "./CategoryArt": "./src/CategoryArt.tsx",
     "./BadgeArt": "./src/BadgeArt.tsx",

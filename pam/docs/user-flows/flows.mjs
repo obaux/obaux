@@ -165,8 +165,8 @@ export const flows = [
         title: 'Your trip is booked',
         story: 'member-created--trip-booked',
         path: '/trips/new/?booked=',
-        changed: 'D-336',
-        note: 'The program card with the slot and how soon ("In 2 days"); rows: Policies to sign (opens the list) and Bring a friend (a drawer: picture, link, Copy). × or Done: Trips, the new trip animating in',
+        changed: 'D-337',
+        note: 'The green visit card: program, day, time, how soon, Change appointment. Plain rows: Policies to sign (Back returns here) and Bring a friend (copies the link; a drawer with the banner, "Link copied", ×). × or Done: Trips',
       },
       policies: {
         title: 'Policies to sign',
@@ -252,6 +252,7 @@ export const flows = [
       ['newTrip', 'booked', 'Add this trip'],
       ['booked', 'trips', '× · Done', { dashed: true }],
       ['booked', 'policies', 'Policies to sign'],
+      ['booked', 'newTrip', 'Change appointment', { dashed: true }],
       ['policy', 'trips', '× after the last signature', { dashed: true }],
       ['newTrip', 'explore', 'Visit moved: confetti, then home', { dashed: true }],
       ['messages', 'thread', 'Open'],
@@ -268,6 +269,7 @@ export const flows = [
       ['profile', 'points', 'Points'],
     ],
     changes: [
+      'D-337 — booked: the green visit card with Change; the friend drawer copies on open, with Will\'s banner and an ×; every place picture is its category illustration',
       'D-336 — booked: how soon, Policies to sign and Bring a friend (a drawer) as rows; × into Trips; Trips reads signatures per service',
       'D-333 — Bring a friend moves to "Your trip is booked", folded, with Copy; walk-ins plan a trip too; signing locks the sheet while drawing',
       'D-332 — one program card in its colour on Check; a booked visit names its service',

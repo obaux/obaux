@@ -33,6 +33,7 @@ import { sharePlace } from '@/lib/sharePlace';
 import { usePolicies } from '@/lib/usePolicies';
 import { useMySignatures } from '@/lib/useMySignatures';
 import { PolicyStatusCard } from '@pam/ui/PolicyStatusCard';
+import { countdown } from '@/lib/when';
 import { VisitCard } from '@pam/ui/VisitCard';
 import { VStack } from '@astryxdesign/core/VStack';
 import { DUMMY_TRIPS } from '@pam/config/dummy-trips';
@@ -484,6 +485,8 @@ function PlaceScreen() {
                   // The service rides with the time (Will, 6 October, D-332):
                   // the picker is gone once the visit is booked.
                   service={visit && service ? service.name : null}
+                  // How soon (D-337), like the booked screen's card.
+                  countdown={visitAhead && visit ? countdown(new Date(visit.startsAt), t) : null}
                   changeLabel={visitAhead ? t('place.visit.change') : undefined}
                   changeHref={visitAhead ? changeHref : null}
                 />

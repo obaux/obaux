@@ -1,8 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/nextjs';
+import { CategoryArt } from '@pam/ui/CategoryArt';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
-import { EducationIcon, FamilyServicesIcon, WorkforceIcon } from '@pam/ui';
 import { MapDrawer } from '@pam/ui/MapDrawer';
 import { TripCard } from '@pam/ui/TripCard';
 
@@ -13,8 +13,6 @@ import { TripCard } from '@pam/ui/TripCard';
  * the search bar). Drag the handle, or tap it to step up a height. Use it for a
  * list that belongs to a map.
  */
-const ART = { width: 44, height: 44, 'aria-hidden': true } as const;
-
 const TRIPS = [
   (
     <TripCard
@@ -22,8 +20,7 @@ const TRIPS = [
       placeName="Example Learning Center"
       when="Tuesday, Oct 7 · 10:00 AM"
       href="/place/?id=learning"
-      art={<EducationIcon {...ART} />}
-      tone="blue"
+      art={<CategoryArt category="education" size="fill" />}
       withName="Sandra"
       policies={{ label: 'Signatures needed', isDone: false }}
       label="Example Learning Center, Tuesday, Oct 7 · 10:00 AM, with Sandra"
@@ -35,8 +32,7 @@ const TRIPS = [
       placeName="Example Job Center"
       when="Thursday, Oct 9 · 1:30 PM"
       href="/place/?id=jobs"
-      art={<WorkforceIcon {...ART} />}
-      tone="green"
+      art={<CategoryArt category="workforce" size="fill" />}
       withName="Jordan"
       policies={{ label: 'Policies signed', isDone: true }}
       label="Example Job Center, Thursday, Oct 9 · 1:30 PM, with Jordan"
@@ -48,8 +44,7 @@ const TRIPS = [
       placeName="Example Family Resource Center"
       when="Monday, Oct 13 · 9:00 AM"
       href="/place/?id=family"
-      art={<FamilyServicesIcon {...ART} />}
-      tone="purple"
+      art={<CategoryArt category="family_services" size="fill" />}
       label="Example Family Resource Center, Monday, Oct 13 · 9:00 AM"
     />
   ),
@@ -59,8 +54,7 @@ const TRIPS = [
       placeName="Example Learning Center"
       when="Wednesday, Oct 15 · 3:00 PM"
       href="/place/?id=learning"
-      art={<EducationIcon {...ART} />}
-      tone="blue"
+      art={<CategoryArt category="education" size="fill" />}
       withName="Marcus"
       label="Example Learning Center, Wednesday, Oct 15 · 3:00 PM, with Marcus"
     />

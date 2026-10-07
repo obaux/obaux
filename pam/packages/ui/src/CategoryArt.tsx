@@ -11,8 +11,11 @@ import { ArtFrame, C, Ground, L, P, R } from './art/kit.js';
  */
 export interface CategoryArtProps {
   readonly category: Category;
-  /** Square, in px. 56 on a place card. */
-  readonly size?: number;
+  /**
+   * Square, in px: 56 on a place card. Or `"fill"`, edge to edge in the box
+   * it sits in (D-337): Saved, the trip cards, the next visit, Check.
+   */
+  readonly size?: number | 'fill';
   /** The place's id: chooses among a category's pictures, the same every time (D-301). */
   readonly seed?: string;
   /** Or one picture by number — the stories show each. */

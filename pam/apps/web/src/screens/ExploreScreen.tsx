@@ -8,7 +8,7 @@ import { NextTripCard } from '@pam/ui/NextTripCard';
 import { DUMMY_TRIPS } from '@pam/config/dummy-trips';
 import { readMoves } from '@/lib/addedTrips';
 import { useNextVisits, visitTagLabel } from '@/lib/useNextVisits';
-import { CategoryIcon, categoryTone } from './SavedView';
+import { CategoryPicture } from './SavedView';
 import { USE_DUMMY_PEOPLE } from '@pam/config/dummy-flag';
 import { categoryLabelKey, distanceLabel } from '@pam/config';
 import type { SearchSource } from '@astryxdesign/core/Typeahead';
@@ -84,7 +84,6 @@ function tripWhen(iso: string, locale: string): string {
 }
 
 const TRIP_ICON = { width: 20, height: 20, 'aria-hidden': true } as const;
-const TRIP_BIG = { width: 44, height: 44, 'aria-hidden': true } as const;
 const TRIP_ICONS = {
   education: <EducationIcon {...TRIP_ICON} />,
   workforce: <WorkforceIcon {...TRIP_ICON} />,
@@ -235,8 +234,7 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
           <NextTripCard
             categoryLabel={t(categoryLabelKey(nextTrip.category))}
             categoryIcon={TRIP_ICONS[nextTrip.category]}
-            art={<CategoryIcon category={nextTrip.category} iconSize={TRIP_BIG} isBaked />}
-            tone={categoryTone(nextTrip.category)}
+            art={<CategoryPicture category={nextTrip.category} />}
             title={t('explore.nextTrip.title')}
             when={tripWhen(nextTrip.startsAt, locale)}
             href="/trips/"

@@ -19,7 +19,7 @@ import { TripCard } from '@pam/ui/TripCard';
 import { DUMMY_TRIPS } from '@pam/config/dummy-trips';
 import { dummyConnection } from '@pam/config/dummy-connections';
 import { useI18n } from '@/lib/i18n';
-import { BigCategoryIcon, CategoryIcon, categoryTone } from './SavedView';
+import { BigCategoryIcon, CategoryPicture } from './SavedView';
 import { TripsMap } from './TripsMap';
 import { usePolicies } from '@/lib/usePolicies';
 import { useServices } from '@/lib/useServices';
@@ -119,7 +119,6 @@ const styles = stylex.create({
   },
 });
 
-const ART = { width: 40, height: 40, 'aria-hidden': true } as const;
 const PIN_ART = { width: 20, height: 20, 'aria-hidden': true } as const;
 
 export function TripsView({ trips, headerActions, justAdded = null }: TripsViewProps) {
@@ -237,8 +236,7 @@ export function TripsView({ trips, headerActions, justAdded = null }: TripsViewP
                 when={when(trip.startsAt)}
                 href={href(trip)}
                 // Colour-coded by category, with the soft glow (D-293).
-                art={<CategoryIcon category={trip.category} iconSize={ART} isBaked />}
-                tone={categoryTone(trip.category)}
+                art={<CategoryPicture category={trip.category} />}
                 withName={trip.withName ?? null}
                 withPhotoUrl={trip.withPhotoUrl ?? null}
                 policies={

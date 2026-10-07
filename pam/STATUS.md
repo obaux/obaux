@@ -416,7 +416,10 @@ to sign (D-334). Staff photos (example only) on a booked place and in
 Messages (D-335). Booked: how soon, Policies to sign and Bring a friend (a
 drawer) as rows; signing from a trip ends on × into Trips; Trips reads each
 visit's own service policies; floating rows have hairlines top and bottom
-(D-336). Note:
+(D-336). The booked screen is the green visit card with Change; Back from
+its policies returns to it; Bring a friend copies on tap, under Will's banner
+(WebP, 21/35 KB); every place picture is its category illustration, the
+tinted grounds are gone except the chips (D-337). Note:
 the web app's vitest tests are not run in CI. How points should be awarded — two rules live
 (save a place, finish setup), the rest to build, with order and open
 questions — is specified in `docs/points-awarding.md`. The

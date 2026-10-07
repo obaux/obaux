@@ -8,7 +8,6 @@ import { IconButton } from '@astryxdesign/core/IconButton';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
-import { ToneGround, type Tone } from './Tone.js';
 import { VisitTag } from './VisitTag.js';
 
 /**
@@ -29,7 +28,7 @@ export interface SavedTile {
   /** "School and training", or a distance. */
   readonly subtitle?: string | null;
   readonly href: string;
-  /** The placeholder picture's icon. */
+  /** The picture: the category's illustration, `size="fill"` (D-337). */
   readonly art: ReactNode;
   /**
    * A booked visit, "Oct 7 · 10:00 AM" (D-292): a small white chip in the
@@ -37,8 +36,6 @@ export interface SavedTile {
    * so the saved place says when you are going. Left out with no visit.
    */
   readonly tag?: string | null;
-  /** The category's colour, filling the picture with flat shards (D-297). */
-  readonly tone?: Tone | null;
   /** The tile's spoken name when it has a tag — "Example Learning Center. Your visit: …". */
   readonly label?: string;
 }
@@ -106,7 +103,6 @@ export function SavedGrid({ tiles, label, isEditing = false, onRemove, removeLab
           <VStack gap={2}>
             <Card padding={0} xstyle={styles.square}>
               <HStack align="center" justify="center" xstyle={styles.square}>
-                <ToneGround tone={tile.tone ?? null} />
                 {tile.art}
                 {tile.tag ? <VisitTag label={tile.tag} isOverlay /> : null}
               </HStack>

@@ -216,7 +216,12 @@ link and Copy. Signing from there ends with an × back to Trips. Trips now
 shows "Policies signed" once a visit's own policies are signed, and a
 banner for the next trip still to sign. Messages' "People who offered help"
 is one line, with a line above and below it, like every row that floats
-above the menu (D-336).
+above the menu (D-336). "Your trip is booked" now shows the same green card as a
+booked place, with how soon and Change appointment, and Back from the
+policies returns to it. Tapping Bring a friend copies the link straight
+away and says "Link copied" for 3 seconds, under a new banner picture, with
+an × to close. Saved, trip cards and the next visit show each kind of
+place's own illustration (D-337).
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 

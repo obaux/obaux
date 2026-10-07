@@ -4,9 +4,12 @@ import type { ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { HStack } from '@astryxdesign/core/HStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
-import { Grain } from './art/kit.js';
 
 /**
+ * Only the chips now (Will, 7 October, D-337: "Only keep the shaded colors on
+ * chips on explore"): every picture of a place is the category's
+ * illustration, and `ToneGround`, `ToneIcon` and `ToneBakedIcon` are gone.
+ *
  * A category's colour, in the illustrations' language (Will, 5 October,
  * D-297): flat shapes, cut clean, never blurred. It replaces the glow
  * (D-288, D-293), which was soft and photographic beside hard-edged art.
@@ -66,39 +69,7 @@ const styles = stylex.create({
   dot: { position: 'relative', flexShrink: 0, isolation: 'isolate' },
   dotSize: { width: '26px', height: '26px' },
   dotArt: { position: 'absolute', inset: 0, zIndex: -1, pointerEvents: 'none' },
-  // Behind the picture's own content: the box it sits in sets `isolation`.
-  // Baked into the picture (Will, D-302): overlay, so the icon takes the
-  // ground's own colour and grain; drawn twice, because one overlay pass
-  // on a pale ground is a ghost. The box it sits in sets `isolation`, so
-  // it blends with the ground and nothing beyond.
-  baked: { position: 'relative', display: 'grid' },
-  bakedLayer: { gridArea: '1 / 1', mixBlendMode: 'overlay' },
-  ground: { position: 'absolute', inset: 0, width: '100%', height: '100%', pointerEvents: 'none', zIndex: -1 },
 });
-
-/** The icon in its tone's deep colour. */
-export function ToneIcon({ tone, children }: { readonly tone?: Tone | null; readonly children: ReactNode }) {
-  return (
-    <HStack align="center" justify="center" xstyle={tone ? icons[tone] : null}>
-      {children}
-    </HStack>
-  );
-}
-
-/**
- * The icon pressed into a `ToneGround` rather than set on it (D-302): the
- * same icon twice, both in overlay, stacked in one grid cell. For trip cards
- * and the next visit; elsewhere the plain `ToneIcon` reads better.
- */
-export function ToneBakedIcon({ tone, children }: { readonly tone?: Tone | null; readonly children: ReactNode }) {
-  if (!tone) return <>{children}</>;
-  return (
-    <HStack aria-hidden xstyle={[styles.baked, icons[tone]]}>
-      <HStack xstyle={styles.bakedLayer}>{children}</HStack>
-      <HStack xstyle={styles.bakedLayer}>{children}</HStack>
-    </HStack>
-  );
-}
 
 /** A small icon on a circle of two half circles — the chips (D-297). */
 export function ToneDot({ tone, children }: { readonly tone?: Tone | null; readonly children: ReactNode }) {
@@ -112,21 +83,5 @@ export function ToneDot({ tone, children }: { readonly tone?: Tone | null; reado
       </svg>
       {children}
     </HStack>
-  );
-}
-
-/**
- * The colour edge to edge behind a square picture, cut by two shards
- * (D-297). Place it first inside a positioned box; it stretches to fill.
- */
-export function ToneGround({ tone }: { readonly tone?: Tone | null }) {
-  if (!tone) return null;
-  return (
-    <svg viewBox="0 0 56 56" preserveAspectRatio="none" aria-hidden focusable="false" {...stylex.props(styles.ground)}>
-      <rect width="56" height="56" {...stylex.props(pale[tone])} />
-      <path d="M0 40 56 26v30H0z" {...stylex.props(facet[tone])} />
-      <path d="M40 0h16v12z" {...stylex.props(facet[tone])} />
-      <Grain />
-    </svg>
   );
 }

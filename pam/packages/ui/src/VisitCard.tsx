@@ -19,6 +19,11 @@ import { textLinkLook } from './TextLink.js';
  *
  * Green, like the trip card's confirmed token (D-273), so it reads as done.
  * The card itself is not a link — only "Change appointment" is.
+ *
+ * Also the booked screen's card (Will, 7 October, D-337: "use the Green card
+ * for confirmed booking allowing for changing booking from confirmation
+ * screen. Bring in the number of days piece into that card"): there the
+ * eyebrow is the program's name, and `countdown` says how soon.
  */
 export interface VisitCardProps {
   /** "Your next visit". */
@@ -29,6 +34,8 @@ export interface VisitCardProps {
   readonly time: string;
   /** The service the visit is for, after the time: "10:00 AM · GED classes" (D-332). */
   readonly service?: string | null;
+  /** How soon, under the time: "Today", "Tomorrow", "In 2 days" (D-337). */
+  readonly countdown?: string | null;
   /** "Change appointment" — left out for a visit that has already happened. */
   readonly changeLabel?: string;
   readonly changeHref?: string | null;
@@ -51,6 +58,7 @@ const styles = stylex.create({
   eyebrow: { fontSize: '16px', lineHeight: 1.3, fontWeight: 700, color: colorVars['--color-icon-green'] },
   day: { fontSize: '26px', lineHeight: 1.2, fontWeight: 700, color: colorVars['--color-text-primary'] },
   time: { fontSize: '20px', lineHeight: 1.3, fontWeight: 600, color: colorVars['--color-text-green'] },
+  countdown: { fontSize: '16px', lineHeight: 1.3, fontWeight: 700, color: colorVars['--color-icon-green'] },
   rule: {
     borderTopWidth: '1px',
     borderTopStyle: 'solid',
@@ -68,7 +76,7 @@ const styles = stylex.create({
   },
 });
 
-export function VisitCard({ eyebrow, day, time, service = null, changeLabel, changeHref = null }: VisitCardProps) {
+export function VisitCard({ eyebrow, day, time, service = null, countdown = null, changeLabel, changeHref = null }: VisitCardProps) {
   return (
     <Card padding={5} xstyle={styles.card}>
       <VStack gap={3}>
@@ -81,6 +89,7 @@ export function VisitCard({ eyebrow, day, time, service = null, changeLabel, cha
         <VStack gap={0.5}>
           <Text xstyle={styles.day}>{day}</Text>
           <Text xstyle={styles.time}>{service ? `${time} · ${service}` : time}</Text>
+          {countdown ? <Text xstyle={styles.countdown}>{countdown}</Text> : null}
         </VStack>
         {changeLabel && changeHref ? (
           <VStack xstyle={styles.rule}>

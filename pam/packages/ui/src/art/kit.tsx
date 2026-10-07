@@ -166,7 +166,10 @@ export function Ground({ base, shards = [] }: { readonly base: Fill; readonly sh
   );
 }
 
-const frame = stylex.create({ svg: { display: 'block', flexShrink: 0 } });
+const frame = stylex.create({
+  svg: { display: 'block', flexShrink: 0 },
+  fill: { position: 'absolute', inset: 0, width: '100%', height: '100%' },
+});
 
 const grain = stylex.create({
   // Printed, not glossy (Will, 5 October, D-298: "add a texture similar to
@@ -197,23 +200,32 @@ export function Grain() {
 /**
  * The frame every picture is drawn in: a 56-grid scaled to `size`, clipped
  * to a rounded square (place cards, Profile) or a circle (badges, the
- * ladder — a medal).
+ * ladder — a medal). `size="fill"` stretches it to the box it sits in, edge
+ * to edge, and leaves the corners to that box (D-337: the picture on Saved,
+ * the trip cards and the next visit).
  */
 export function ArtFrame({
   size,
   shape = 'square',
   children,
 }: {
-  readonly size: number;
+  readonly size: number | 'fill';
   readonly shape?: 'square' | 'circle';
   readonly children: ReactNode;
 }) {
   const clip = useId();
+  const fill = size === 'fill';
   return (
-    <svg width={size} height={size} viewBox="0 0 56 56" aria-hidden focusable="false" {...stylex.props(frame.svg)}>
+    <svg
+      viewBox="0 0 56 56"
+      aria-hidden
+      focusable="false"
+      {...(fill ? { preserveAspectRatio: 'xMidYMid slice' } : { width: size, height: size })}
+      {...stylex.props(frame.svg, fill && frame.fill)}
+    >
       <defs>
         <clipPath id={clip}>
-          {shape === 'circle' ? <circle cx="28" cy="28" r="28" /> : <rect width="56" height="56" rx="16" />}
+          {shape === 'circle' ? <circle cx="28" cy="28" r="28" /> : <rect width="56" height="56" rx={fill ? 0 : 16} />}
         </clipPath>
       </defs>
       <g clipPath={`url(#${clip})`}>

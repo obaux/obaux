@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/nextjs';
+import { CategoryArt } from '@pam/ui/CategoryArt';
 import { SavedGrid } from '@pam/ui/SavedGrid';
-import { CategoryIcon } from '../../screens/SavedView';
 
 /** Saved's tiles (D-292): category colour with a glow on white; a booked visit shows as a green tag. */
 const meta = {
@@ -15,10 +15,7 @@ const meta = {
         name: 'Example Learning Center',
         subtitle: 'School and training',
         href: '/place/?id=dummy-place-learning&from=saved&trip=dummy-trip-1',
-        art: (
-          <CategoryIcon category="education" />
-        ),
-        tone: 'blue',
+        art: <CategoryArt category="education" size="fill" />,
         tag: 'Oct 7 · 10:00 AM',
         label: 'Example Learning Center. Your visit: Oct 7 · 10:00 AM',
       },
@@ -27,10 +24,7 @@ const meta = {
         name: 'Example Food Pantry',
         subtitle: 'Home and family',
         href: '/place/?id=dummy-place-food&from=saved',
-        tone: 'purple',
-        art: (
-          <CategoryIcon category="family_services" />
-        ),
+        art: <CategoryArt category="family_services" size="fill" />,
       },
     ],
   },

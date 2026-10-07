@@ -1,12 +1,14 @@
 import type { Meta, StoryObj } from '@storybook/nextjs';
 import { useState } from 'react';
 import { BringFriend } from '@pam/ui/BringFriend';
-import { BigButton, FriendsArt } from '@pam/ui';
+import { BigButton } from '@pam/ui';
+import { FRIEND_BANNER, FRIEND_BANNER_SRCSET } from '@/lib/friendBanner';
 
 /**
  * Bring a friend, as a drawer (D-336): opened from its row on "Your trip is
- * booked". `FriendsArt` across the top, one sentence, then the link and
- * Copy, which says "Copied" for 1.5s. Only after a visit is booked, so the
+ * booked". Will's banner across the top (D-337), one sentence, then the link and
+ * Copy. Opening it copies the link and says "Link copied" over the field for
+ * 3s (D-337); an × at the top right closes it. Only after a visit is booked, so the
  * link points to a real slot (D-333).
  */
 const meta = {
@@ -21,7 +23,10 @@ const meta = {
     link: 'https://web-ten-umber-88.vercel.app/signin/?as=member&program=dummy-place-learning&at=2026-10-08T14%3A00%3A00.000Z',
     linkLabel: 'Link to send',
     copyLabel: 'Copy',
-    copiedLabel: 'Copied',
+    copiedLabel: 'Link copied',
+    closeLabel: 'Close',
+    heroSrc: FRIEND_BANNER,
+    heroSrcSet: FRIEND_BANNER_SRCSET,
   },
   render: function Render(args) {
     const [isOpen, setOpen] = useState(args.isOpen);
@@ -40,6 +45,9 @@ type Story = StoryObj<typeof meta>;
 /** Open, as after tapping its row. */
 export const Default: Story = {};
 
+/** Just opened from its row, which copied the link: "Link copied" over the field. */
+export const JustCopied: Story = { args: { copiedAt: 1 } };
+
 /** In Spanish. */
 export const Spanish: Story = {
   args: {
@@ -47,9 +55,10 @@ export const Spanish: Story = {
     body: 'Ir es más fácil con alguien. Envíe este enlace para que también venga.',
     linkLabel: 'Enlace para enviar',
     copyLabel: 'Copiar',
-    copiedLabel: 'Copiado',
+    copiedLabel: 'Enlace copiado',
+    closeLabel: 'Cerrar',
   },
 };
 
-/** The illustration on its own. */
-export const Illustration: StoryObj = { render: () => <FriendsArt size={240} /> };
+/** Without the banner (it could not load): the drawer still reads. */
+export const NoBanner: Story = { args: { heroSrc: null, heroSrcSet: null } };

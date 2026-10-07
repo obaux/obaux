@@ -10,7 +10,7 @@ import { dummyTripsFor } from '@pam/config/dummy-trips';
 import { useI18n } from '@/lib/i18n';
 import { useSession } from '@/lib/useSession';
 import { useRoleView } from '@/lib/useViewedRole';
-import { CategoryIcon, categoryTone } from './SavedView';
+import { CategoryPicture } from './SavedView';
 import { HeaderActions } from './HeaderActions';
 
 /**
@@ -19,7 +19,6 @@ import { HeaderActions } from './HeaderActions';
  * so the member's page leads with what is ahead. Example trips until Pam
  * books visits (D-172, D-227).
  */
-const TRIP_ART = { width: 40, height: 40, 'aria-hidden': true } as const;
 
 const styles = stylex.create({
   meta: { fontSize: '16px' },
@@ -56,8 +55,7 @@ export function PastTripsView({ personId, name }: { readonly personId: string; r
               placeName={trip.placeName}
               when={when(trip.startsAt)}
               href={`/place/?id=${encodeURIComponent(trip.placeId)}`}
-              art={<CategoryIcon category={trip.category} iconSize={TRIP_ART} isBaked />}
-              tone={categoryTone(trip.category)}
+              art={<CategoryPicture category={trip.category} />}
               label={`${trip.placeName}, ${when(trip.startsAt)}`}
             />
           ))}

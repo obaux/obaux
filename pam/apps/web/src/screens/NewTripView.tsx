@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
+import { useRouter } from 'next/navigation';
 import { Banner } from '@astryxdesign/core/Banner';
 import { Button } from '@astryxdesign/core/Button';
 import { Heading } from '@astryxdesign/core/Heading';
@@ -13,7 +14,6 @@ import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { CATEGORY_DEFINITIONS, categoryLabelKey, type Category } from '@pam/config';
 import { DUMMY_PLACES_BY_ID, type DummySavedPlace } from '@pam/config/dummy-places';
 import { BigButton, BookIcon, ExploreIcon, SignedIcon, UserPlusIcon } from '@pam/ui';
-import { Card } from '@astryxdesign/core/Card';
 import { Icon } from '@astryxdesign/core/Icon';
 import { IconButton } from '@astryxdesign/core/IconButton';
 import { MenuList } from '@pam/ui/MenuList';
@@ -25,11 +25,13 @@ import { DUMMY_TRIPS } from '@pam/config/dummy-trips';
 import { friendLink, inviteLink } from '@/lib/appUrl';
 import { navigate } from '@/lib/navigate';
 import { countdown } from '@/lib/when';
+import { FRIEND_BANNER, FRIEND_BANNER_SRCSET } from '@/lib/friendBanner';
 import { useServices } from '@/lib/useServices';
 import { HelpButton } from './HelpButton';
-import { BigCategoryIcon, CategoryIcon, categoryTone } from './SavedView';
+import { BigCategoryIcon, CategoryPicture } from './SavedView';
 import { ProgramVisitCard } from '@pam/ui/ProgramVisitCard';
-import { BringFriend } from '@pam/ui/BringFriend';
+import { VisitCard } from '@pam/ui/VisitCard';
+import { BringFriend, copyLink } from '@pam/ui/BringFriend';
 import { placeAsksForPolicies } from '@pam/config/dummy-policies';
 import { policiesForService } from '@pam/config/dummy-services';
 import { usePolicies } from '@/lib/usePolicies';
@@ -76,7 +78,6 @@ const ICON = { width: 26, height: 26, 'aria-hidden': true } as const;
 const MOVED_HOLD_MS = 5000;
 
 const styles = stylex.create({
-  rows: { width: '100%' },
   home: { minHeight: '56px', fontSize: '17px', paddingInline: '28px', borderRadius: '999px' },
   hint: { fontSize: '18px', lineHeight: 1.5 },
   // The chosen place on When, in the trip card's name style (Will, D-235).
@@ -178,6 +179,7 @@ export function NewTripView({
   readonly changing?: string | null;
 }) {
   const { t, locale } = useI18n();
+  const router = useRouter();
   const places = useMemo(() => Object.values(DUMMY_PLACES_BY_ID), []);
   const { forPlace } = useServices();
   const { policies } = usePolicies();
@@ -208,6 +210,7 @@ export function NewTripView({
   const [triedNext, setTriedNext] = useState(false);
   // The booked screen's Bring a friend drawer (D-336).
   const [friendOpen, setFriendOpen] = useState(false);
+  const [friendCopiedAt, setFriendCopiedAt] = useState<number | null>(null);
   // The visit's new time, once saved (D-282): the celebration shows it.
   const [movedTo, setMovedTo] = useState<Date | null>(null);
   // Booked for a member (D-316): the moment, then the program's Home.
@@ -299,51 +302,62 @@ export function NewTripView({
         backLabel={t('trips.confirm.close')}
         footer={<BigButton label={t('trips.confirm.done')} href={done} />}
       >
-        <ProgramVisitCard
-          name={place.name}
-          tone={categoryTone(place.category)}
-          art={<CategoryIcon category={place.category} iconSize={{ width: 36, height: 36, 'aria-hidden': true }} isBaked />}
-          lines={[
-            ...(chosenService ? [t('trips.new.service', { service: chosenService.name })] : []),
-            `${dayLong.format(confirmed.at)} · ${timeFmt.format(confirmed.at)}`,
-          ]}
-          countdown={countdown(confirmed.at, t)}
-        />
         {/*
-          What is left before going, as rows like a place's (Will, D-336):
-          Policies to sign opens its page, Bring a friend its drawer. The
-          link points to the booked slot (D-333).
+          The confirmed visit is the green card a booked place shows (Will,
+          7 October, D-337), named for the program, with how soon and a way
+          to move it right here.
         */}
-        <Card padding={1} xstyle={styles.rows}>
-          <MenuList
-            label={t('trips.confirm.next')}
-            hasDividers
-            items={[
-              ...(toSign
-                ? [
-                    {
-                      id: 'policies',
-                      label: t('place.policies'),
-                      description:
-                        toSign.signed === toSign.total
-                          ? t('place.policies.allSigned', { total: toSign.total })
-                          : t('place.policies.hint', { signed: toSign.signed, total: toSign.total }),
-                      icon: toSign.signed === toSign.total ? <SignedIcon {...ICON} /> : <BookIcon {...ICON} />,
-                      // Carries the trip, so the last policy closes to Trips (D-336).
-                      href: `${policiesHref(place.id, place.name, chosenService?.id ?? null)}&trip=${encodeURIComponent(confirmed.id)}`,
-                    },
-                  ]
-                : []),
-              {
-                id: 'friend',
-                label: t('friend.label'),
-                description: t('friend.row'),
-                icon: <UserPlusIcon {...ICON} />,
-                onSelect: () => setFriendOpen(true),
+        <VisitCard
+          eyebrow={place.name}
+          day={dayLong.format(confirmed.at)}
+          time={timeFmt.format(confirmed.at)}
+          service={chosenService?.name ?? null}
+          countdown={countdown(confirmed.at, t)}
+          changeLabel={t('place.visit.change')}
+          changeHref={`/trips/new/?${new URLSearchParams({
+            place: place.id,
+            name: place.name,
+            category: place.category,
+            ...(place.address ? { address: place.address } : {}),
+            change: confirmed.id,
+          }).toString()}`}
+        />
+        {/* Plain rows on the page, like a place's (D-337): no card around them. */}
+        <MenuList
+          label={t('trips.confirm.next')}
+          hasDividers
+          items={[
+            ...(toSign
+              ? [
+                  {
+                    id: 'policies',
+                    label: t('place.policies'),
+                    description:
+                      toSign.signed === toSign.total
+                        ? t('place.policies.allSigned', { total: toSign.total })
+                        : t('place.policies.hint', { signed: toSign.signed, total: toSign.total }),
+                    icon: toSign.signed === toSign.total ? <SignedIcon {...ICON} /> : <BookIcon {...ICON} />,
+                    // Carries the trip, so the last policy closes to Trips (D-336).
+                    href: `${policiesHref(place.id, place.name, chosenService?.id ?? null)}&trip=${encodeURIComponent(confirmed.id)}`,
+                  },
+                ]
+              : []),
+            {
+              id: 'friend',
+              label: t('friend.label'),
+              description: t('friend.row'),
+              icon: <UserPlusIcon {...ICON} />,
+              // Copies the link in this tap (Safari allows it only here),
+              // then opens the drawer saying so (D-337).
+              onSelect: () => {
+                void copyLink(friendLink(place.id, confirmed.at.toISOString())).then((ok) => {
+                  if (ok) setFriendCopiedAt(Date.now());
+                });
+                setFriendOpen(true);
               },
-            ]}
-          />
-        </Card>
+            },
+          ]}
+        />
         <BringFriend
           isOpen={friendOpen}
           onOpenChange={setFriendOpen}
@@ -353,6 +367,10 @@ export function NewTripView({
           linkLabel={t('friend.link')}
           copyLabel={t('friend.copy')}
           copiedLabel={t('friend.copied')}
+          closeLabel={t('friend.close')}
+          copiedAt={friendCopiedAt}
+          heroSrc={FRIEND_BANNER}
+          heroSrcSet={FRIEND_BANNER_SRCSET}
         />
       </SubPage>
     );
@@ -440,6 +458,10 @@ export function NewTripView({
               // Booked (D-333): the confirmation with Bring a friend, then
               // Trips with its confetti (D-241) from Done.
               setConfirmed({ id, at: at(day, time) });
+              // The booked screen takes this screen's place in history (Will,
+              // 7 October, D-337): Back from Policies to sign returns here,
+              // not to a fresh Plan a visit at its first step.
+              router.replace(`/trips/new/?booked=${encodeURIComponent(id)}`, { scroll: false });
             }}
           />
         ) : null
@@ -555,8 +577,7 @@ export function NewTripView({
           {/* The program in its colour, then what is being booked (D-332). */}
           <ProgramVisitCard
             name={place.name}
-            tone={categoryTone(place.category)}
-            art={<CategoryIcon category={place.category} iconSize={{ width: 36, height: 36, 'aria-hidden': true }} isBaked />}
+            art={<CategoryPicture category={place.category} />}
             lines={[
               ...(chosenService ? [t('trips.new.service', { service: chosenService.name })] : []),
               `${dayLong.format(day)} · ${timeFmt.format(at(day, time))}`,
