@@ -857,7 +857,7 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ## Release 0.43.2 (7 October) — forms, tidied; sign-up, cleaner
 
-D-364 to D-369, on `claude/pam-storybook`, **not merged**. Add a program is
+D-364 to D-370, on `claude/pam-storybook`, **not merged**. Add a program is
 on the page, no card, no focus step, kind as `ChoiceChips` with Other,
 "Review details" with the review note as a banner. Fields: label 8px above,
 weight 600, typed text 16px. `@pam/ui/InfoTip` — a 36px circle
@@ -867,6 +867,8 @@ Sign-up: no cards, "You were invited as: **role**" banner, city a `Selector`
 of served cities (text box only if the list fails — the one path left to
 the waiting list), no role question (members only without a link), code
 hint in an InfoTip. Member page: "Jordan has signed 4 of 4", green ticks.
+`@pam/ui/Dropdown` (D-370): the list under the box, field-sized box, 48px
+rows, heavier tick; "Create new booking".
 
 ## Release 0.43.0-programs (7 October)
 

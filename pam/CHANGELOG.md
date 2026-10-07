@@ -9,6 +9,9 @@ staff any more (programs and case managers come in by their own link). Extra
 explanations sit behind small round info buttons, whose notes now always fit
 on the screen. On a member's page, a program sees "Jordan has signed 4 of 4",
 and the signed list shows each policy with a green tick (D-368, D-369).
+Dropdowns open under their box instead of over it, match the text fields,
+have taller rows and a bolder tick; "New booking" is now "Create new
+booking" (D-370).
 
 ## [0.43.1] — 2026-10-07 · Forms, tidied
 

@@ -304,6 +304,20 @@
   }
 
   /*
+   * Dropdown options (Will, 7 October, D-370): each row is a tap, so it
+   * meets the 48px floor like every other control (Astryx's large row was
+   * 36px), and the chosen row's tick is drawn heavier so it reads as chosen
+   * at a glance. Astryx has no prop for either; `Dropdown` (@pam/ui) is the
+   * one way in, so these reach every list.
+   */
+  .astryx-selector-option-row {
+    min-height: var(--pam-touch-target-min);
+  }
+  .astryx-selector-option-row[data-selected] > span:last-child .astryx-icon svg {
+    stroke-width: 2.5;
+  }
+
+  /*
    * Segmented controls are pills, inside and out (Will, 3 October, D-233):
    * the segments and the sliding highlight match the round search bar, chips
    * and buttons. Astryx has no prop for the segment's radius.

@@ -6,7 +6,6 @@ import * as stylex from '@stylexjs/stylex';
 import { HStack } from '@astryxdesign/core/HStack';
 import { VStack } from '@astryxdesign/core/VStack';
 import { Banner } from '@astryxdesign/core/Banner';
-import { Selector } from '@astryxdesign/core/Selector';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { CheckboxInput } from '@astryxdesign/core/CheckboxInput';
@@ -38,6 +37,7 @@ import { markFreshAccount } from '@/lib/programSetup';
 import { SetupArt, type SetupArtKind } from '@pam/ui/SetupArt';
 import { ChoiceChips } from '@pam/ui/ChoiceChips';
 import { InfoTip } from '@pam/ui/InfoTip';
+import { Dropdown } from '@pam/ui/Dropdown';
 
 /**
  * Signing up: five steps, and four of them are one question each.
@@ -553,9 +553,8 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
                   list cannot be fetched, the box comes back — somebody offline
                   can still say where they live. */}
               {cities.length > 0 ? (
-                <Selector
+                <Dropdown
                   label={t('join.details.city')}
-                  size="lg"
                   width="100%"
                   value={city}
                   options={[

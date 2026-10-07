@@ -6,10 +6,9 @@ import { VStack } from '@astryxdesign/core/VStack';
 import { Card } from '@astryxdesign/core/Card';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
-import { Selector } from '@astryxdesign/core/Selector';
 import { Switch } from '@astryxdesign/core/Switch';
 import { RadioList, RadioListItem } from '@astryxdesign/core/RadioList';
-import { BigButton, Loading, Notice, Page, ScrollReveal, TextLink } from '@pam/ui';
+import { BigButton, Dropdown, Loading, Notice, Page, ScrollReveal, TextLink } from '@pam/ui';
 import { SubPageHeader } from '@pam/ui/SubPage';
 import { HelpButton } from '../../screens/HelpButton';
 import { InviteReady } from '../../screens/InviteReady';
@@ -269,9 +268,8 @@ export default function DirectoryPage() {
         Who the list is about — moved out of the old app header into the page
         when the screen joined the nested template (D-217).
       */}
-      <Selector
+      <Dropdown
         label={t('directory.filter')}
-        size="lg"
         value={filter}
         options={FILTERS.map((option) => ({
           value: option,

@@ -869,7 +869,7 @@
   "schedule.checkin.undo.body": "Their visit goes back to not checked in.",
   "schedule.checkin.undo.keep": "Keep it",
   "schedule.checkin.undo.confirm": "Undo check-in",
-  "home.book": "New booking",
+  "home.book": "Create new booking",
   "book.title": "Book a visit for a member",
   "book.intro": "People who have written to your program. Pick one, then the day and time.",
   "book.row": "Wrote to your program",

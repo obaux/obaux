@@ -9022,6 +9022,34 @@ sure this works, without running out of screen".
 - **Member page:** the Policies row reads "{name} has signed {signed} of
   {total}".
 
+### D-370 — Dropdown: one design, the list under the box, 48px rows
+
+**Date:** 2026-10-07. Will: "improve our dropdown design in the DS for both
+aesthetic and consistency … make the dropdown item a bit taller. Min 32px …
+what are the consequences of showing dropdown under input? If no foreseen
+issues then let's do that, so it doesn't look overlapped … Green checkmark at
+end could be thicker." And: the Home row and + menu label "Create new booking".
+
+- `@pam/ui/Dropdown` wraps Astryx's `Selector` the one way: `size="lg"`,
+  `placement="below"`, and a field's box (56px, 12px corners, 14px inset, 16px
+  words) so it lines up with the text fields. Sign-up's city and the
+  directory's filter use it; nothing calls `Selector` directly any more.
+- **Under, not over.** Astryx's default lays the chosen row over the box (a
+  desktop-menu habit). Setting a placement opts out. What that costs, checked:
+  near the bottom of the screen the list flips above the box (Astryx's
+  position fallbacks); a long list scrolls inside its panel; and the list
+  covers what is below the box while it is open, as any popover does. None of
+  that is a problem on our screens. What is lost is the chosen row sitting
+  under the thumb, which matters little with short lists.
+- **Rows are 48px, not 32.** Astryx's large row was already 36px. Each row is
+  a tap, so it meets Pam's 48px floor like every other control (globals.css,
+  `.astryx-selector-option-row`). The chosen row's tick is stroked at 2.5
+  (was 1.5), in the brand green it already had.
+- Story: Components › Forms › Dropdown (closed, and open with the small-print
+  row).
+- `home.book` is "Create new booking" / "Crear nueva reserva" (the Home row
+  and the + menu share it).
+
 ---
 
 ## Notes for whoever picks this up next

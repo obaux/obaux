@@ -123,4 +123,5 @@ export { SetupCard, type SetupCardProps } from './SetupCard.js';
 export { SetupArt, type SetupArtKind, type SetupArtProps } from './SetupArt.js';
 export { DashedRule } from './DashedRule.js';
 export { ChoiceChips, type ChoiceChipsProps } from './ChoiceChips.js';
+export { Dropdown, type DropdownProps } from './Dropdown.js';
 export { InfoTip, type InfoTipProps } from './InfoTip.js';

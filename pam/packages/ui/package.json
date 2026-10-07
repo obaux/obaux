@@ -53,6 +53,7 @@
     "./DashedRule": "./src/DashedRule.tsx",
     "./emptyState": "./src/emptyState.ts",
     "./ChoiceChips": "./src/ChoiceChips.tsx",
+    "./Dropdown": "./src/Dropdown.tsx",
     "./InfoTip": "./src/InfoTip.tsx"
   },
   "scripts": {
