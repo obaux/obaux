@@ -49,10 +49,6 @@ STATUS row too.
   The app reads `profile_roles` in the session; it falls back to one role
   without it, but switching and adding a program need 0078.
 
-- [ ] **Word the two transparency lines for two-role accounts** (D-375,
-  `docs/design/one-account-two-roles.md` §6) and add them to
-  `transparency.ts`.
-
 - [ ] **Approve the Pam-team line on the transparency screen** (STATUS row
   10b). Members were promised they would hear first if what is visible
   changes; the super admin's Everyone list and invite log are visible now.
@@ -76,6 +72,24 @@ STATUS row too.
      Program tab (Add a program when there is none) and the example data
      follow the real account, on any device.
   4. Then: switching between a lead's programs (D-318), also on the backlog.
+
+### Two roles (one account, member and program)
+
+Will, 7 October 2026: "Add these to Before launch doc" (D-375).
+
+- [ ] **Split notifications by side.** Today the bell shows everything for
+  the account, whichever side it is acting as. Each notification should
+  carry the role it is about; the bell shows the acting side's, and the
+  other side's count shows as a dot on "Use Pam as".
+
+- [ ] **Word the two lines on Pam's privacy promise to members** (Will to
+  word; `docs/design/one-account-two-roles.md` §6), then add them to
+  `transparency.ts` — the transparency tests will fail until the contract
+  changes, by design:
+  - to a member who also works at a program: people at that program can't
+    see their activity as a member;
+  - on What to expect for a program: if someone who works with you also uses
+    Pam as a member, you won't see their member activity.
 
 ## Done
 
