@@ -221,7 +221,9 @@ booked place, with how soon and Change appointment, and Back from the
 policies returns to it. Tapping Bring a friend copies the link straight
 away and says "Link copied" for 3 seconds, under a new banner picture, with
 an × to close. Saved, trip cards and the next visit show each kind of
-place's own illustration (D-337).
+place's own illustration (D-337). Drawers no longer have a dark outline. The Bring a
+friend picture runs to the drawer's edges, the × sits in its corner, and
+"Link copied" fills the link box in the same pale green as Copy (D-338).
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 

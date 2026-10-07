@@ -33,6 +33,7 @@
     "./VisitCard": "./src/VisitCard.tsx",
     "./ProgramVisitCard": "./src/ProgramVisitCard.tsx",
     "./BringFriend": "./src/BringFriend.tsx",
+    "./sheet": "./src/sheet.ts",
     "./StaffBadge": "./src/StaffBadge.tsx",
     "./VisitTag": "./src/VisitTag.tsx",
     "./CategoryArt": "./src/CategoryArt.tsx",

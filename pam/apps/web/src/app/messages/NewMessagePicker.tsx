@@ -3,6 +3,7 @@
 import { useMemo, useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { BottomSheet } from '@astryxdesign/core/BottomSheet';
+import { sheet } from '@pam/ui/sheet';
 import { List, ListItem } from '@astryxdesign/core/List';
 import { Avatar } from '@astryxdesign/core/Avatar';
 import { Heading } from '@astryxdesign/core/Heading';
@@ -96,7 +97,7 @@ export function NewMessagePicker({
   };
 
   return (
-    <BottomSheet isOpen={isOpen} onOpenChange={onOpenChange} label={t('messages.new.action')} height="tall">
+    <BottomSheet isOpen={isOpen} onOpenChange={onOpenChange} label={t('messages.new.action')} height="tall" xstyle={sheet.panel}>
       <VStack gap={3} xstyle={styles.body}>
         <Heading level={2} xstyle={styles.title}>
           {t('messages.new.action')}

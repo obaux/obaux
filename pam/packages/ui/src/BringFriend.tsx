@@ -13,6 +13,7 @@ import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { pam } from './tokens.stylex.js';
 import { TextField } from './TextField.js';
+import { sheet } from './sheet.js';
 
 /**
  * The banner across the top is Will's picture (D-337, 7 October: "instead of
@@ -88,23 +89,39 @@ export async function copyLink(text: string): Promise<boolean> {
 }
 
 const styles = stylex.create({
-  sheet: { width: '100%', paddingInline: '20px', paddingBlockStart: '8px', paddingBlockEnd: '28px' },
-  top: { position: 'relative', minHeight: pam['--pam-touch-target-min'] },
-  // Full width, the banner's own shape (1608 × 629), corners like a card's.
+  sheet: { width: '100%', paddingInline: '20px', paddingBlockStart: '0px', paddingBlockEnd: '28px' },
+  // Edge to edge and up to the drawer's top (Will, D-338); the sheet's own
+  // rounded corners clip it.
+  // Above Astryx's handle strip (z-index 1), whose white fade would wash out
+  // the picture's top; the picture lets taps through to the handle beneath,
+  // so the drawer still drags from its top edge, and draws its own pill.
+  top: { position: 'relative', zIndex: 2, minHeight: '64px', marginInline: '-20px' },
+  grip: {
+    position: 'absolute',
+    top: '10px',
+    insetInlineStart: 'calc(50% - 20px)',
+    width: '40px',
+    height: '5px',
+    borderRadius: '3px',
+    backgroundColor: 'oklch(1 0 0 / 75%)',
+    pointerEvents: 'none',
+  },
+  // Full width, the banner's own shape (1608 × 629).
   hero: {
     display: 'block',
     width: '100%',
     height: 'auto',
     aspectRatio: '1608 / 629',
     objectFit: 'cover',
-    borderRadius: '20px',
     backgroundColor: colorVars['--color-background-muted'],
+    pointerEvents: 'none',
   },
-  // The × at the top right, a white circle so it reads on the picture.
+  // The × tucked into the top right corner, a white circle so it reads on
+  // the picture (D-338).
   close: {
     position: 'absolute',
-    top: '8px',
-    insetInlineEnd: '8px',
+    top: '12px',
+    insetInlineEnd: '12px',
     width: pam['--pam-touch-target-min'],
     height: pam['--pam-touch-target-min'],
     borderRadius: '50%',
@@ -114,28 +131,22 @@ const styles = stylex.create({
   title: { fontSize: '26px', lineHeight: 1.2, fontWeight: 700, textAlign: 'center' },
   body: { fontSize: '17px', lineHeight: 1.45, textAlign: 'center', alignSelf: 'center', maxWidth: '320px' },
   field: { flexGrow: 1, minWidth: 0, position: 'relative' },
-  // "Link copied", over the field: a dark pill in its middle, fading in.
+  // "Link copied", covering the whole field (Will, D-338): Copy's own pale
+  // green, the tick first, fading in.
   copied: {
     position: 'absolute',
     inset: 0,
-    alignItems: 'center',
-    justifyContent: 'center',
+    paddingInline: '14px',
+    borderRadius: '12px',
+    // Copy's own pale green, opaque, so the link under it never shows.
+    backgroundColor: pam['--pam-secondary-fill'],
+    color: colorVars['--color-text-accent'],
     pointerEvents: 'none',
-    animationName: stylex.keyframes({ from: { opacity: 0, transform: 'scale(0.96)' }, to: { opacity: 1, transform: 'none' } }),
+    animationName: stylex.keyframes({ from: { opacity: 0 }, to: { opacity: 1 } }),
     animationDuration: '160ms',
     animationTimingFunction: 'ease-out',
   },
-  pill: {
-    paddingInline: '16px',
-    paddingBlock: '8px',
-    borderRadius: '999px',
-    backgroundColor: colorVars['--color-text-primary'],
-    color: colorVars['--color-background-body'],
-    fontSize: '16px',
-    fontWeight: 600,
-    boxShadow: '0 4px 14px oklch(0 0 0 / 20%)',
-  },
-  pillText: { color: colorVars['--color-background-body'], fontSize: '16px', fontWeight: 600 },
+  copiedText: { fontSize: '17px', fontWeight: 600, color: colorVars['--color-text-accent'] },
   // As tall as the link field beside it.
   copy: { height: pam['--pam-field-height'], minHeight: pam['--pam-field-height'], flexShrink: 0, borderRadius: '12px' },
 });
@@ -176,7 +187,13 @@ export function BringFriend({
   };
 
   return (
-    <BottomSheet isOpen={isOpen} onOpenChange={onOpenChange} label={label} height="hug">
+    <BottomSheet
+      isOpen={isOpen}
+      onOpenChange={onOpenChange}
+      label={label}
+      height="hug"
+      xstyle={sheet.panel}
+    >
       {isOpen ? (
         <VStack gap={3} xstyle={styles.sheet}>
           <VStack xstyle={styles.top}>
@@ -193,6 +210,7 @@ export function BringFriend({
                 {...stylex.props(styles.hero)}
               />
             ) : null}
+            {heroSrc && !heroFailed ? <HStack aria-hidden xstyle={styles.grip} /> : null}
             <IconButton
               label={closeLabel}
               icon={<Icon icon="close" size="md" />}
@@ -210,12 +228,12 @@ export function BringFriend({
             <VStack xstyle={styles.field}>
               <TextField label={linkLabel} isLabelHidden value={link} isReadOnly width="100%" />
               {/* Said out loud as well as shown (a status, not an alert). */}
-              <HStack role="status" xstyle={copied ? styles.copied : null}>
+              <HStack role="status" gap={2} align="center" wrap="nowrap" xstyle={copied ? styles.copied : null}>
                 {copied ? (
-                  <HStack gap={1.5} align="center" wrap="nowrap" xstyle={styles.pill}>
-                    <Icon icon="check" size="sm" />
-                    <Text xstyle={styles.pillText}>{copiedLabel}</Text>
-                  </HStack>
+                  <>
+                    <Icon icon="check" size="md" />
+                    <Text xstyle={styles.copiedText}>{copiedLabel}</Text>
+                  </>
                 ) : null}
               </HStack>
             </VStack>

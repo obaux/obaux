@@ -297,4 +297,5 @@
   --pam-title-size: 28px;
   --pam-link-size: 17px;
   --pam-brand-pink: light-dark(#E31C5F, #FF6B86);
+  --pam-secondary-fill: light-dark(#E7EFE6, #24261A);
 }

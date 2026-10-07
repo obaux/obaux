@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { BottomSheet } from '@astryxdesign/core/BottomSheet';
+import { sheet } from '@pam/ui/sheet';
 import { Button } from '@astryxdesign/core/Button';
 import { Heading } from '@astryxdesign/core/Heading';
 import { HStack } from '@astryxdesign/core/HStack';
@@ -146,6 +147,7 @@ export function AreaSearch({
       onOpenChange={(open) => (open ? undefined : onClose())}
       label={t('places.area.title')}
       height="tall"
+      xstyle={sheet.panel}
     >
       {isOpen ? (
         <VStack ref={body} gap={3} xstyle={styles.body}>

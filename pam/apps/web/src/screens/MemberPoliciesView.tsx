@@ -3,6 +3,7 @@
 import { useRef, useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { BottomSheet } from '@astryxdesign/core/BottomSheet';
+import { sheet } from '@pam/ui/sheet';
 import { Card } from '@astryxdesign/core/Card';
 import { Button } from '@astryxdesign/core/Button';
 import { Heading } from '@astryxdesign/core/Heading';
@@ -509,6 +510,7 @@ function SignSheet({
       isOpen={isOpen}
       onOpenChange={(open) => (open ? undefined : onClose())}
       label={t('sign.title', { title })}
+      xstyle={sheet.panel}
       // Drags and dismisses like any sheet from its handle, header and copy
       // (Will, D-333), but not while a stroke is in progress: "form" blocks
       // the swipe until the finger lifts. The pad stops its own touches

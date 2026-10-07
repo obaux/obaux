@@ -8313,6 +8313,38 @@ over the field for 3 seconds, and the drawer gets an × at the top right.
   ui 69, config 238, web 16; builds; Storybook; e2e 573/573. Not on a real
   iPhone.
 
+### D-338 — Drawers lose their outline; the friend banner runs edge to edge; "Link copied" fills the field
+
+**Date:** 2026-10-07. Will: "Banner should take up full width and touch top
+edge of drawer. Also why do drawers have black outlines? Remove that. The
+link copied tag would take up same space as full input field, and be light
+green color as secondary button. Make message holder with checkmark at the
+start. X circle button is not nearly tucked in corner."
+
+- **No outlines:** Astryx's `BottomSheet` panel has a 1px `--color-border`
+  border, which over the scrim read as a black line. `sheet.panel`
+  (`@pam/ui/sheet`, new) zeroes it through the sheet's `xstyle`, on every
+  drawer: hours, Bring a friend, signing, the area picker, new message.
+- **Banner to the edges:** the hero cancels the sheet's side padding and
+  sits at its top; the panel's own rounded, clipped corners shape it.
+  Astryx paints a white fade under its drag handle (a z-index 1 strip), which
+  washed out the top of the picture, so the banner sits above it (z-index 2)
+  and lets taps through (`pointer-events: none`) to the handle beneath: the
+  drawer still drags shut from its top edge (checked). It draws its own
+  white pill where the handle's was. Tried first and dropped: overriding
+  `--color-background-surface` inside the sheet, which also turned the
+  field and Copy grey.
+- **"Link copied":** covers the whole field (inset 0, the field's 12px
+  corners), the tick first then the words, on Copy's pale green. That green
+  was a literal in the theme's secondary-button rule, so it is now a token,
+  `--pam-secondary-fill` (`light-dark(#E7EFE6, #24261A)`), to be kept equal
+  to that rule; text in `--color-text-accent` like Copy's label.
+- **×:** 12px from the top and right edges of the drawer (it was 8px inside
+  a banner that was itself inset 20px).
+- **Proven by:** screenshots; sheet border reads 0px; a drag from the top
+  edge closes the drawer; typecheck; ui 69, config 238, web 16; builds;
+  Storybook; e2e 573/573.
+
 ---
 
 ## Notes for whoever picks this up next

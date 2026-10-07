@@ -9,6 +9,7 @@ import { Text } from '@astryxdesign/core/Text';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Badge, type BadgeVariant } from '@astryxdesign/core/Badge';
 import { BottomSheet } from '@astryxdesign/core/BottomSheet';
+import { sheet } from './sheet.js';
 import { Button } from '@astryxdesign/core/Button';
 import { colorVars, spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { BookmarkIcon, ClockIcon, FlagIcon, PhoneIcon, PlacesIcon, ShareIcon } from './icons.js';
@@ -368,7 +369,7 @@ export function PlaceDetail({
   if (hoursRow) quickItems.splice(quickItems[0]?.id === 'directions' ? 1 : 0, 0, hoursRow);
 
   const weekSheet = hasWeek ? (
-    <BottomSheet isOpen={isWeekOpen} onOpenChange={setWeekOpen} label={labels.hours} height="hug">
+    <BottomSheet isOpen={isWeekOpen} onOpenChange={setWeekOpen} label={labels.hours} height="hug" xstyle={sheet.panel}>
       {isWeekOpen ? (
         <VStack gap={3} xstyle={styles.sheet}>
           {/* The sheet draws its own Close; a second one would be two. */}

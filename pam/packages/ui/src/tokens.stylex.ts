@@ -48,4 +48,11 @@ export const pam = stylex.defineVars({
    * the dark page.
    */
   '--pam-brand-pink': 'light-dark(#E31C5F, #FF6B86)',
+  /**
+   * A secondary button's pale green (the theme's
+   * `.astryx-button[data-variant="secondary"]`), for something that should
+   * read as belonging to one: "Link copied" over the friend link (D-338).
+   * Keep the two the same.
+   */
+  '--pam-secondary-fill': 'light-dark(#E7EFE6, #24261A)',
 });
