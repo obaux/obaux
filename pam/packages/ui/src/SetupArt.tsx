@@ -17,8 +17,12 @@ import { ArtFrame, C, Ground, L, P, R } from './art/kit.js';
  *   message  — two speech bubbles: people write to you
  *   policy   — a page with a signature: your policies, signed
  *   private  — a shield with a keyhole: what Pam keeps to itself
+ *
+ * And Profile's text-alerts card (D-360):
+ *
+ *   alerts   — a bell ringing, a red dot: Pam will text you
  */
-export type SetupArtKind = 'program' | 'photo' | 'calendar' | 'message' | 'policy' | 'private';
+export type SetupArtKind = 'program' | 'photo' | 'calendar' | 'message' | 'policy' | 'private' | 'alerts';
 
 export interface SetupArtProps {
   readonly kind: SetupArtKind;
@@ -134,6 +138,23 @@ function Private() {
   );
 }
 
+/** Text alerts: a bell, ringing, with a dot for something new. */
+function Alerts() {
+  return (
+    <>
+      <Ground base="teal2" shards={[{ d: 'M0 40 56 28v28H0z', f: 'teal3' }, { d: 'M40 0h16v12z', f: 'purple3' }]} />
+      <L d="M12 20c-2 3-2.6 6-2 9M44 20c2 3 2.6 6 2 9" f="purple4" w={2.4} />
+      <C cx={28} cy={12.5} r={2.5} f="orange4" />
+      <P d="M28 13c-7 0-12 5.4-12 12.5V34l-4 5h32l-4-5v-8.5C40 18.4 35 13 28 13z" f="yellow3" />
+      <P d="M28 13c7 0 12 5.4 12 12.5V34l4 5H28z" f="yellow4" />
+      <R x={12} y={38} w={32} h={3} rx={1.5} f="orange3" />
+      <P d="M23.5 41h9a4.5 4.5 0 0 1-9 0z" f="orange4" />
+      <C cx={38} cy={14} r={4.5} f="red3" />
+      <P d="M38 9.5a4.5 4.5 0 0 1 0 9z" f="red4" />
+    </>
+  );
+}
+
 const ART: Readonly<Record<SetupArtKind, () => ReactElement>> = {
   program: Program,
   photo: Photo,
@@ -141,6 +162,7 @@ const ART: Readonly<Record<SetupArtKind, () => ReactElement>> = {
   message: Message,
   policy: Policy,
   private: Private,
+  alerts: Alerts,
 };
 
 export function SetupArt({ kind, size = 56 }: SetupArtProps) {

@@ -269,6 +269,9 @@ const promo = stylex.create({
     height: '72px',
     flexShrink: 0,
     borderRadius: '16px',
+    // An illustration fills the box edge to edge (D-360); an icon still
+    // sits centred on the tint.
+    overflow: 'hidden',
     fontSize: '36px',
     color: colorVars['--color-icon-accent'],
     backgroundColor: colorVars['--color-accent-muted'],

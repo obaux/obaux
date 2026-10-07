@@ -24,6 +24,9 @@ far along you are. A new dashed line separates sections in a few places.
 Add a program keeps Next at the bottom of the screen, with "2 of 7" tucked
 into the button (D-355–D-358).
 
+**Text alerts, illustrated.** Profile's text-alerts card shows a drawn bell
+in the app's illustration style instead of an icon (D-360).
+
 **Sign-up, tidier.** Sign in already asks for the phone, so sign-up starts
 at About you: two steps for staff, three for members, the count shown on
 each step's button, and the button kept at the bottom of the screen. The

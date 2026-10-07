@@ -8808,6 +8808,17 @@ button so it doesn't interfere with button label", and on Text messages:
   pinned button, and axe counts whatever is under it as crowding the target;
   at the end of the page nothing is. Full e2e 573/573.
 
+### D-360 — Text alerts get an illustration
+
+**Date:** 2026-10-07. Will: "We need an illustration for text alerts, with bell."
+
+- `SetupArt kind="alerts"`: a yellow bell lit from the left, ringing lines, a
+  red dot for something new, on teal — the same kit as the other pictures.
+- Profile's text-alerts card (`PromoCard`) shows it at 72px, edge to edge in
+  its rounded box (`overflow: hidden` on the art box), for every role: staff's
+  "Get text alerts" and a member's reminders offer. The bell icon on a tint
+  (D-274) is replaced; a `PromoCard` given an icon still centres it on the tint.
+
 ---
 
 ## Notes for whoever picks this up next
