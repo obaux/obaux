@@ -15,6 +15,7 @@ import {
   ShieldIcon,
   SignOutIcon,
 } from '@pam/ui';
+import { Banner } from '@astryxdesign/core/Banner';
 import { LargeTitleHeader } from '@pam/ui/LargeTitleHeader';
 import { FeatureTile, FeatureTileRow, ProfileSummary, PromoCard } from '@pam/ui/ProfileCards';
 import { BadgeArt, ConnectionsArt } from '@pam/ui/BadgeArt';
@@ -50,6 +51,13 @@ export interface ProfileViewProps {
    * "See the app as" row, so a preview is never a one-way door (D-217).
    */
   readonly canViewAs?: boolean;
+  /** This account's photo (D-345). */
+  readonly photoUrl?: string | null;
+  /** Staff only: a photo was picked from the camera button. */
+  readonly onPhotoPick?: (file: File) => void;
+  readonly isPhotoBusy?: boolean;
+  /** Said under the card when a photo did not upload. */
+  readonly photoNotice?: string | null;
 }
 
 const ICON = { width: 26, height: 26, 'aria-hidden': true } as const;
@@ -65,6 +73,10 @@ export function ProfileView({
   headerActions,
   onSignOut,
   canViewAs = false,
+  photoUrl = null,
+  onPhotoPick,
+  isPhotoBusy = false,
+  photoNotice = null,
 }: ProfileViewProps) {
   const { t, locale } = useI18n();
   const number = (n: number) => new Intl.NumberFormat(locale).format(n);
@@ -108,6 +120,11 @@ export function ProfileView({
       <ProfileSummary
         name={name}
         roleLabel={t(`role.${role}`)}
+        photoUrl={photoUrl}
+        // Staff put up their own face (Will, D-345); a member's stays theirs.
+        {...(!isMember && onPhotoPick
+          ? { onPhotoPick, photoLabel: t(photoUrl ? 'profile.photo.change' : 'profile.photo.add'), isPhotoBusy }
+          : {})}
         stats={
           isMember
             ? [
@@ -118,6 +135,7 @@ export function ProfileView({
             : []
         }
       />
+      {photoNotice ? <Banner status="warning" title={photoNotice} /> : null}
 
       {/*
         Points, trips and connections are a member's (D-217): staff are not

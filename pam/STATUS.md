@@ -381,7 +381,7 @@ preview is one line, and Call shows the number (D-306). Points: badges in a card
 example member has earned Scholar, shown on the hero card too (D-307). Steward is no longer a badge (D-308). Place: hours as a row (today) with the week in a
 drawer, Plan a trip in a fixed footer, "About program" (D-309). Sign in footer links spaced (D-310); small language dial (D-311);
 Program tab lists policies with the rows and says "Contact phone number" (D-312, D-314). Sign up per step per role in Storybook (D-319). Case managers invite case managers
-(0073, written, NOT deployed); super admin invites from Profile and Invited people (D-315). Program Home range is a
+(0073, deployed 7 October); super admin invites from Profile and Invited people (D-315). Program Home range is a
 dropdown beside the title (D-320). Program Home check-ins (session-kept) with burst and undo, signature
 badge, and "Book a visit for a member" from the + (D-316). "Pam", not "PAM", in every
 user-visible string; texts say "Pam:" too (D-321). Book a visit: booked / wrote / snippet rows,
@@ -407,8 +407,7 @@ joins is worth 150 points (SOP amendment A18), listed first under Ways to
 earn, not yet awarded by the database (D-330). `ProgramVisitCard` (visit / invite) is the
 program card on Check and Go together; a booked place shows its service in the
 visit card, with no picker (D-332). Bring a friend is a folded section on the new
-"Your trip is booked" step (no page, Copy only; native share sheet waits for
-Will); walk-ins plan a trip from their meeting days; the signature sheet
+"Your trip is booked" step (no page, Copy, then the share sheet — D-344); walk-ins plan a trip from their meeting days; the signature sheet
 holds still while drawing — tested in Chromium touch emulation, not yet on iOS
 Safari, an Android WebView or the Capacitor build (D-333). A footer is pinned to the bottom of the screen on
 every page that has one; the booked screen closes with an × and lists policies
@@ -419,7 +418,7 @@ visit's own service policies; floating rows have hairlines top and bottom
 (D-336). The booked screen is the green visit card with Change; Back from
 its policies returns to it; Bring a friend copies on tap, under Will's banner
 (WebP, 21/35 KB); every place picture is its category illustration, the
-tinted grounds are gone except the chips (D-337). Drawers have no border (`sheet.panel` on every BottomSheet); the friend banner runs edge to edge over the handle strip (D-338). VisitCard spacing opened up; "Link copied" spans field and Copy (D-339). Friend drawer: 24px under the banner and above the link (D-340). VisitCard: countdown plain, Change link even in its corner (D-341). 20px above and below it (D-342). Chevron after it; eyebrow in black (D-343). Note:
+tinted grounds are gone except the chips (D-337). Drawers have no border (`sheet.panel` on every BottomSheet); the friend banner runs edge to edge over the handle strip (D-338). VisitCard spacing opened up; "Link copied" spans field and Copy (D-339). Friend drawer: 24px under the banner and above the link (D-340). VisitCard: countdown plain, Change link even in its corner (D-341). 20px above and below it (D-342). Chevron after it; eyebrow in black (D-343). Bring a friend shares through the phone's share sheet where there is one; Android WebView copies only (D-344). Staff photos: camera button on Profile, `staff-photos` bucket (0074, live) (D-345). 0073 live. 0068/0069 carried over as 0075/0076 (reconciled with 0072, DB suite green) — **written, not deployed: Will applies them, approving their drop statements** (D-346). Note:
 the web app's vitest tests are not run in CI. How points should be awarded — two rules live
 (save a place, finish setup), the rest to build, with order and open
 questions — is specified in `docs/points-awarding.md`. The
@@ -808,7 +807,7 @@ while the copy is unsigned, so it earned the first live test, not the last.*
 | 28 | **A Chromatic project token** | Storybook updating on every push | chromatic.com → sign in with GitHub → link `obaux/obaux` → add the token as the repository secret `CHROMATIC_PROJECT_TOKEN`. The workflow (`pam-storybook.yml`) skips itself until then. |
 | 29 | ~~Where the dock's People and My Plan lead~~ **Answered by the redesign (D-210)** | — | Will, 1 October: the bar is Explore, Saved, Trips, Messages, Profile; Help moves to each screen's header and Profile. Next: his reference screenshots for the other screens, then wiring the redesigned views to routes and data. Walk it in `Prototype/Redesign — member` (D-211). |
 | 30 | ~~Deploy `0071` and `0072`~~ **Done (Will, 4 October)** | — | `list_migrations` first: live ran to `0070`, no live-only drift; `can_message`, `messageable_people` and `open_direct_conversation` matched 0063 exactly, which 0072 was written against. Both applied; `get_advisors` (security) shows no new kind of finding (the definer functions are guarded inside, as every other one is; `invite_preview` and `request_invite_link` are anon on purpose). Spot-checked: `invite_emails` forced RLS with one policy and no anon access; `invites_log` and `staff_request_phone` not callable signed out. See D-264. |
-| 31 | **The before-launch list** | Launch | `docs/before-launch.md` — Will's list of what must be done before real people use PAM. First entry: the email provider for invite links. **0068/0069 vs 0072**: both rewrite `can_message`; 0069 must keep 0072's arm when it is merged and deployed. |
+| 31 | **The before-launch list** | Launch | `docs/before-launch.md` — Will's list of what must be done before real people use PAM. First entry: the email provider for invite links. **0068/0069** are merged as 0075/0076 with 0072's arm kept (D-346); they wait for Will to apply them live. |
 
 ---
 

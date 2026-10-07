@@ -43,6 +43,8 @@ function routesFor(journeyRole: JourneyRole): Route[] {
       ? on('/auth/v1/user', () => ({ body: { id: ME_ID, phone: '12155550199' } }))
       : on('/auth/v1/', () => ({ status: 401, body: {} })),
     on('/auth/v1/', () => ({ body: {} })),
+    // A staff photo upload (D-345): accepted, never stored.
+    on('/storage/v1/object/', () => ({ body: { Key: 'staff-photos/example.webp' } })),
     on('/rest/v1/profiles', (url) =>
       url.includes('role=eq.member')
         ? { body: CASELOAD }

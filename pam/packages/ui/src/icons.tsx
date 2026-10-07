@@ -74,6 +74,16 @@ export function UserPlusIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+/** A camera: add or change a photo (D-345). */
+export function CameraIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <path d="M4 8.5A1.5 1.5 0 0 1 5.5 7h2.2l1.6-2.2h5.4L16.3 7h2.2A1.5 1.5 0 0 1 20 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5z" />
+      <circle cx="12" cy="13" r="3.5" />
+    </svg>
+  );
+}
+
 /** A checklist. My Plan. */
 export function PlanIcon(props: SVGProps<SVGSVGElement>) {
   return (

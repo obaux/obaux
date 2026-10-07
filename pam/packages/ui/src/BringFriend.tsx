@@ -14,6 +14,7 @@ import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { pam } from './tokens.stylex.js';
 import { TextField } from './TextField.js';
 import { sheet } from './sheet.js';
+import { BigButton } from './BigButton.js';
 
 /**
  * The banner across the top is Will's picture (D-337, 7 October: "instead of
@@ -64,6 +65,14 @@ export interface BringFriendProps {
    * yes): the drawer opens with "Link copied" over the field.
    */
   readonly copiedAt?: number | null;
+  /**
+   * "Send to a friend": opens the phone's own share sheet with `shareText`
+   * (D-344). Shown only where the phone has one; elsewhere the link and
+   * Copy are the way.
+   */
+  readonly shareLabel?: string;
+  /** The message the share sheet starts with, the link inside it. */
+  readonly shareText?: string;
   /** The banner: the 1200px WebP. */
   readonly heroSrc?: string | null;
   /** The banner's sizes, "…-800.webp 800w, …-1200.webp 1200w". */
@@ -165,6 +174,8 @@ export function BringFriend({
   copiedLabel,
   closeLabel,
   copiedAt = null,
+  shareLabel,
+  shareText,
   heroSrc = null,
   heroSrcSet = null,
 }: BringFriendProps) {
@@ -187,6 +198,21 @@ export function BringFriend({
 
   const copy = async () => {
     if (await copyLink(link)) flash();
+  };
+
+  // The phone's share sheet (D-344): iOS Safari, Android Chrome and the iOS
+  // app have one; a desktop browser and Android's in-app WebView do not.
+  // Known only once on the device, so it is decided after the first render.
+  const [canShare, setCanShare] = useState(false);
+  useEffect(() => {
+    setCanShare(typeof navigator !== 'undefined' && typeof navigator.share === 'function');
+  }, []);
+  const share = async () => {
+    try {
+      await navigator.share({ text: shareText ?? link });
+    } catch {
+      // Closed the sheet: nothing to say, the link is still copied.
+    }
   };
 
   return (
@@ -252,6 +278,7 @@ export function BringFriend({
               ) : null}
             </HStack>
           </HStack>
+          {canShare && shareLabel ? <BigButton label={shareLabel} onPress={() => void share()} /> : null}
         </VStack>
       ) : null}
     </BottomSheet>
