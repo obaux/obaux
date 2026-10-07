@@ -25,6 +25,7 @@ import SavedPage from '../../app/saved/page';
 import { PrototypeSignIn } from './PrototypeSignIn';
 import { PrototypeJoin } from './PrototypeJoin';
 import { PrototypeInviteExpired } from './PrototypeInviteExpired';
+import { InviteInUseScreen } from '../../screens/InviteInUseScreen';
 import AboutPage from '../../app/about/page';
 import PoliciesPage from '../../app/program/policies/page';
 import { PrototypePolicy } from './PrototypePolicy';
@@ -82,6 +83,7 @@ export const APP_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   '/prototype/join/': screen(() => <PrototypeJoin />),
   // An invite link that has run out (D-258).
   '/invite/expired/': screen(() => <PrototypeInviteExpired />),
+  '/invite/in-use/': screen(() => <InviteInUseScreen as="program" from="Dana" />),
   // About Pam, from the foot of Sign in (D-259).
   '/about/': screen(() => <AboutPage />),
   // A program's policies for participants (D-261).

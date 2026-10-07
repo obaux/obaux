@@ -40,6 +40,11 @@ STATUS row too.
     0072's arm, the DB suite passes. **Left: apply 0075 then 0076 to the live
     project, approving their `drop` statements.**
 
+- [ ] **Deploy 0077 after 0075/0076** (D-373): invites need a name and a
+  phone, and sign-in finds a waiting invite by phone. The app on this
+  branch calls the 4-argument `create_invite`; until 0077 is live, making
+  an invite from it fails. Ship them together.
+
 - [ ] **Approve the Pam-team line on the transparency screen** (STATUS row
   10b). Members were promised they would hear first if what is visible
   changes; the super admin's Everyone list and invite log are visible now.

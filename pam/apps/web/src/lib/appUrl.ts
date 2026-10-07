@@ -68,6 +68,8 @@ export interface Invite {
   readonly role: InviteRole;
   /** A trip a program booked for this person before they joined (D-322). */
   readonly trip?: string | null;
+  /** The name the invite was made for (0077, D-373) — prefills joining. */
+  readonly firstName?: string | null;
 }
 
 export function readInvite(params: { get(name: string): string | null } | null | undefined): Invite | null {
@@ -109,7 +111,12 @@ export function recallInvite(): Invite | null {
     const parsed = JSON.parse(raw) as Partial<Invite>;
     if (typeof parsed.code !== 'string' || !parsed.code) return null;
     const role: InviteRole = parsed.role === 'provider' || parsed.role === 'admin' ? parsed.role : 'member';
-    return typeof parsed.trip === 'string' && parsed.trip ? { code: parsed.code, role, trip: parsed.trip } : { code: parsed.code, role };
+    return {
+      code: parsed.code,
+      role,
+      ...(typeof parsed.trip === 'string' && parsed.trip ? { trip: parsed.trip } : {}),
+      ...(typeof parsed.firstName === 'string' && parsed.firstName ? { firstName: parsed.firstName } : {}),
+    };
   } catch {
     return null;
   }

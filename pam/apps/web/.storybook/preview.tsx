@@ -132,9 +132,11 @@ const preview: Preview = {
     // prototype (D-217); the components after them.
     options: {
       storySort: {
+        // Member first (Will, 7 October): the stories are titled "Member/…",
+        // so the old "Member app" never matched and Member fell to the end.
         order: [
-          'Member app',
-          ['Prototype', 'Screens', 'States'],
+          'Member',
+          ['Prototype', 'Created', 'Invited by case manager', 'Invited by program'],
           'Case manager',
           ['Prototype', 'Screens', 'States'],
           'Program lead',

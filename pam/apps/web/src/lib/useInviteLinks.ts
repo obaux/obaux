@@ -38,6 +38,48 @@ export async function previewInvite(code: string): Promise<InvitePreview | null>
   }
 }
 
+/**
+ * The invite waiting for the number just verified (0077, D-373): somebody who
+ * signs in without the link still finds what they were invited to. Only ever
+ * the caller's own number. `hasAccount` — the number already has an account,
+ * so a staff invite needs another number for now (D-373).
+ */
+export interface PendingInvite {
+  readonly code: string;
+  readonly role: InviteRole;
+  readonly firstName: string | null;
+  readonly inviterFirstName: string | null;
+  readonly hasAccount: boolean;
+}
+
+export async function pendingInviteForMe(): Promise<PendingInvite | null> {
+  try {
+    const { createClient } = await import('./supabase');
+    const { data, error } = await createClient().rpc('pending_invite_for_me');
+    if (error || !data) return null;
+    const row = (Array.isArray(data) ? data[0] : data) as
+      | {
+          code: string;
+          invited_role: string;
+          first_name: string | null;
+          inviter_first_name: string | null;
+          has_account: boolean;
+        }
+      | undefined;
+    if (!row?.code) return null;
+    const role: InviteRole = row.invited_role === 'admin' || row.invited_role === 'provider' ? row.invited_role : 'member';
+    return {
+      code: row.code,
+      role,
+      firstName: row.first_name,
+      inviterFirstName: row.inviter_first_name,
+      hasAccount: row.has_account === true,
+    };
+  } catch {
+    return null;
+  }
+}
+
 /** Looks like an email address — the database checks the same shape. */
 export function isEmailAddress(value: string): boolean {
   return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(value.trim());

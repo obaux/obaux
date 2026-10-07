@@ -9086,6 +9086,68 @@ behind tooltip".
   `.astryx-popover-surface:has([data-pam-tip])` — info tips only, not other
   popovers.
 
+### D-373 — An invite knows who it is for; sign-in finds it by phone
+
+**Date:** 2026-10-07. Will, after asking how to route people who land on a
+member's sign-up by mistake: "Let's run with #1 (required phone number and
+name fields)". Industry pattern (Slack, GitHub, Google Workspace): look up a
+waiting invitation when someone signs in, not only when they click the link.
+
+- **0077** (local; not deployed — it uses 0075's `to_e164`, and 0075/0076
+  still await the live project):
+  - `invites.first_name`; `create_invite(p_role, p_phone, p_region_id,
+    p_first_name)` requires both name and phone (`INVITE_NEEDS_NAME`,
+    `INVITE_NEEDS_PHONE`), stores the phone as E.164. The 3-argument version
+    is dropped. Invites made before 0077, without a phone, still redeem.
+  - `pending_invite_for_me()` — the newest live invite for the caller's own
+    verified number: code, role, the name, the inviter's first name and
+    `has_account`. Signed-out callers are refused; nobody can ask about
+    another number.
+  - A renewed link (0071) keeps the name and phone.
+- **App:** every place an invite is made (Invite someone, the case manager's
+  admin screen, the directory) asks "Their first name" and "Their mobile
+  number" first (`InviteForWho`). After the sign-in code works, Pam asks for a
+  waiting invite: with no account, joining starts as that invite — the
+  invited-as banner, the name prefilled — even without the link.
+- **The privacy call (mine):** Pam does not tell the inviter that a number
+  already has an account. That would let a program or case manager test
+  whether somebody uses Pam — itself something a returning citizen may not
+  want known. The person signing in is told instead: a member whose number
+  has a staff invite goes to "This number is already in Pam"
+  (`/invite/in-use/`), which asks them to have it sent to another number and
+  says their own account is unchanged. That screen is the interim until one
+  account can hold both roles (D-374).
+- **Tests:** DB suite 13 (`13_invites_know_who_test.sql`) and the 17 older
+  `create_invite` calls updated; the "open invite without a phone" test now
+  checks it is refused. e2e: sign-in with a waiting invite joins as a
+  program partner with the name filled; a member's number with a staff invite
+  lands on the in-use page; invite creation sends name and phone.
+- Storybook: Member is first in the sidebar again (the sort said "Member
+  app"; the stories are titled "Member/…").
+
+### D-374 — One account, both roles: member and program (next phase, decided)
+
+**Date:** 2026-10-07. Will: "allow member and program only"; "a staffer's
+own program can see them as a member … Create an extra rule hiding them from
+their own program's lists"; "Build #1, then build both roles in next phase."
+
+Decided, not built:
+- An account may hold **member and program** together. Not case manager +
+  member (a case manager supervises members), not super admin with anything.
+- **Acting role:** the account has the roles it was given and the one it is
+  acting as; `my_role()`, `is_admin()` and friends answer from the acting
+  role, so most RLS stays as written. Switching is an RPC that only allows a
+  given role; a "Use Pam as" switch on Profile.
+- **Hidden from their own program:** while a person is staff at a program,
+  that program's lists (who's coming, members, check-ins) do not show their
+  member side. An extra rule, tested as such.
+- **The work:** about 29 direct `role` references outside the helpers each
+  need sorting into "acting as" or "is"; DB tests for mixed accounts; the
+  session, tab bars, landing and notifications by acting role; and the
+  transparency contract and member wording updated before it ships.
+- First step of the phase: a design note with that audit, for review, before
+  any migration.
+
 ---
 
 ## Notes for whoever picks this up next

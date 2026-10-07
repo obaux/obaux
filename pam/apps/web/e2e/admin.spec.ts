@@ -167,13 +167,25 @@ test.describe('the case manager screen', () => {
 
   test('an invite is a link to send, with the code kept for a phone call (D-254)', async ({ page }) => {
     await signedInAs(page, 'admin', []);
-    await page.route(INVITE, (route) =>
-      route.fulfill(
+    const asked: Record<string, unknown>[] = [];
+    await page.route(INVITE, async (route) => {
+      asked.push(route.request().postDataJSON() as Record<string, unknown>);
+      await route.fulfill(
         json({ code: '9T3YTVMT', expires_at: '2026-10-12T21:09:28Z', role: 'member' }),
-      ),
-    );
+      );
+    });
     await page.goto('/admin/');
     await page.getByRole('button', { name: 'Someone coming home' }).click();
+
+    // Who it is for, both required (D-373): nothing is sent without them.
+    await page.getByRole('button', { name: 'Create link' }).click();
+    await expect(page.getByText('Add their first name.')).toBeVisible();
+    expect(asked).toHaveLength(0);
+    await page.getByLabel('Their first name').fill('Rosa');
+    await page.getByLabel('Their mobile number').fill('215 555 0111');
+    await page.getByRole('button', { name: 'Create link' }).click();
+    await expect.poll(() => asked.length).toBe(1);
+    expect(asked[0]).toMatchObject({ p_role: 'member', p_first_name: 'Rosa', p_phone: '215 555 0111' });
 
     // The link opens Sign in with the code and who it is for; nobody types it.
     await expect(page.getByText(/\/signin\/\?invite=9T3YTVMT&as=member/)).toBeVisible();
@@ -188,6 +200,9 @@ test.describe('the case manager screen', () => {
     await page.route(INVITE, (route) => route.fulfill({ status: 500, body: '{}' }));
     await page.goto('/admin/');
     await page.getByRole('button', { name: 'Someone coming home' }).click();
+    await page.getByLabel('Their first name').fill('Rosa');
+    await page.getByLabel('Their mobile number').fill('215 555 0111');
+    await page.getByRole('button', { name: 'Create link' }).click();
 
     await expect(page.getByRole('heading', { name: 'We could not make a code' })).toBeVisible();
   });

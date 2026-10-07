@@ -16,8 +16,8 @@ import { useAlertBanner } from '@/lib/alertBanner';
 import { LanguageSwitcher } from '../LanguageSwitcher';
 import { PhoneSignInCard } from './PhoneSignInCard';
 import { LegalFooter } from './LegalFooter';
-import { rememberInvite, type Invite, type InviteRole } from '@/lib/appUrl';
-import { previewInvite } from '@/lib/useInviteLinks';
+import { recallInvite, rememberInvite, type Invite, type InviteRole } from '@/lib/appUrl';
+import { pendingInviteForMe, previewInvite } from '@/lib/useInviteLinks';
 import { navigate } from '@/lib/navigate';
 
 /**
@@ -243,10 +243,29 @@ export function SignInScreen({
           .maybeSingle();
         if (cancelled) return;
 
+        // An invite waiting for this number (0077, D-373): somebody who lost
+        // the link, or never opened it, still joins as what they were invited
+        // to be — not as a member by mistake.
+        const waiting = await pendingInviteForMe();
+        if (cancelled) return;
+
         // No record, or a record whose setup was never finished: both belong
         // in the flow, which picks up at whichever step is outstanding.
         if (!profile || profile.onboarded_at === null) {
+          if (waiting && !waiting.hasAccount && !recallInvite()) {
+            rememberInvite({ code: waiting.code, role: waiting.role, firstName: waiting.firstName });
+          }
           router.replace('/join/');
+          return;
+        }
+
+        // Already in Pam, with a staff invite made for this same number: one
+        // account holds one role until the next phase (D-373), so say so
+        // rather than leave the invite silently unusable.
+        if (waiting?.hasAccount) {
+          const as = waiting.role === 'admin' ? 'case-manager' : 'program';
+          const from = waiting.inviterFirstName ? `&from=${encodeURIComponent(waiting.inviterFirstName)}` : '';
+          router.replace(`/invite/in-use/?as=${as}${from}`);
           return;
         }
 

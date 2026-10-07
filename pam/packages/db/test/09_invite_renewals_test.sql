@@ -24,7 +24,7 @@ declare
   inv public.invites;
   days numeric;
 begin
-  inv := public.create_invite('member');
+  inv := public.create_invite('member', '+15555550801', null, 'Ana');
   days := round(extract(epoch from (inv.expires_at - now())) / 86400);
   if days <> 30 then
     raise exception 'FAIL  a new invite lasts % days, not 30', days;

@@ -37,7 +37,7 @@ export const flows = [
     key: 'signin',
     title: 'Sign in & joining',
     intro:
-      'How every person arrives. Staff come in by an invite link, which shows a "You\'re invited" picture when it is pasted into a text. Members can sign up from the phone. A link older than 30 days opens its own page, which emails a new one.',
+      'How every person arrives. Staff come in by an invite link, which shows a "You\'re invited" picture when it is pasted into a text. Members can sign up from the phone. A link older than 30 days opens its own page, which emails a new one. Every invite names the person and their phone, so signing in with that number finds the invite even without the link (D-373).',
     roots: ['preview', 'signin', 'expired'],
     nodes: {
       preview: {
@@ -123,6 +123,13 @@ export const flows = [
           { wait: 800 },
         ],
       },
+      inUse: {
+        title: 'This number is already in Pam',
+        story: 'onboarding--number-already-in-pam',
+        path: '/invite/in-use/',
+        changed: 'D-373',
+        note: 'A staff invite for a member\'s number: ask for another number; their own account unchanged',
+      },
       email: {
         title: 'Email: your new link',
         story: 'onboarding-invite-email--program',
@@ -135,6 +142,8 @@ export const flows = [
       ['preview', 'invited', 'Tap the link'],
       ['invited', 'code', 'Phone number'],
       ['code', 'join', '6-digit code'],
+      ['code', 'join', 'No link: Pam finds the invite for this number', { dashed: true }],
+      ['code', 'inUse', 'Staff invite, number already a member'],
       ['join', 'cmHome', 'I understand — straight to Home'],
       ['signin', 'about', 'About Pam (footer)'],
       ['signin', 'memberJoin', 'Sign up'],
@@ -142,6 +151,7 @@ export const flows = [
       ['sent', 'email', 'Arrives by email', { dashed: true }],
     ],
     changes: [
+      'D-373 — invites need a name and phone; sign-in finds an invite waiting for the number; a member\'s number can\'t take a staff invite yet',
       'D-359 — sign-up starts at About you (Sign in did the phone); counts on the pinned button',
       'D-353 — staff sign-up ends on What to expect and goes straight Home; a program is added from Home, not at sign-up',
       'D-266 — Sign in: the card sits flat under the pictures; the code step is drawn in to match',

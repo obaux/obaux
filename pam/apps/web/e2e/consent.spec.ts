@@ -265,6 +265,65 @@ test.describe('arriving by an invite link (D-254)', () => {
   });
 });
 
+test.describe('an invite waiting for the number (D-373)', () => {
+  const NIA = 'b9a0c1d2-0000-4000-8000-0000000000d1';
+  const json = (body: unknown) => ({ status: 200, contentType: 'application/json', body: JSON.stringify(body) });
+
+  async function signInWithCode(
+    page: import('@playwright/test').Page,
+    waiting: unknown[],
+    profile: Record<string, unknown> | null,
+  ) {
+    await page.route('**/auth/v1/otp*', (route) => route.fulfill(json({})));
+    await page.route('**/auth/v1/verify*', (route) =>
+      route.fulfill(
+        json({
+          access_token: 'test-access-token',
+          refresh_token: 'test-refresh-token',
+          token_type: 'bearer',
+          expires_in: 3600,
+          expires_at: Math.floor(Date.now() / 1000) + 3600,
+          user: { id: NIA, aud: 'authenticated', role: 'authenticated', phone: '12155550100' },
+        }),
+      ),
+    );
+    await page.route('**/auth/v1/user*', (route) => route.fulfill(json({ id: NIA, phone: '12155550100' })));
+    await page.route('**/rest/v1/profiles*', (route) => route.fulfill(json(profile ? [profile] : [])));
+    await page.route('**/rest/v1/notifications*', (route) => route.fulfill(json([])));
+    await page.route('**/rest/v1/notification_preferences*', (route) => route.fulfill(json([{ reminders_consent: true }])));
+    await page.route('**/rest/v1/rpc/served_cities*', (route) => route.fulfill(json([{ city: 'Philadelphia' }])));
+    await page.route('**/rest/v1/rpc/pending_invite_for_me*', (route) => route.fulfill(json(waiting)));
+
+    await page.goto('/signin/');
+    await page.getByLabel('Your phone number').fill('215 555 0100');
+    await page.getByRole('button', { name: en['signin.phone.action'] }).click();
+    await page.getByLabel(en['signin.code.label']).fill('123456');
+  }
+
+  test('somebody who signs in without the link still joins as what they were invited to be', async ({ page }) => {
+    await signInWithCode(
+      page,
+      [{ code: 'NIA7Q4KX', invited_role: 'provider', first_name: 'Nia', inviter_first_name: 'Alice', has_account: false }],
+      null,
+    );
+    await expect(page).toHaveURL(/\/join\//);
+    await expect(page.getByText('You were invited as:')).toBeVisible();
+    await expect(page.getByText('Program partner', { exact: true })).toBeVisible();
+    await expect(page.getByLabel('First name')).toHaveValue('Nia');
+  });
+
+  test('a member whose number has a staff invite is told, not switched', async ({ page }) => {
+    await signInWithCode(
+      page,
+      [{ code: 'MRC7Q4KX', invited_role: 'provider', first_name: 'Marcus', inviter_first_name: 'Alice', has_account: true }],
+      { id: NIA, role: 'member', first_name: 'Marcus', onboarded_at: '2026-09-12T00:00:00Z', access_status: 'active' },
+    );
+    await expect(page).toHaveURL(/\/invite\/in-use\/\?as=program&from=Alice/);
+    await expect(page.getByRole('heading', { name: en['invite.inUse.title'], level: 1 })).toBeVisible();
+    await expect(page.getByText('Alice invited you as a program partner.')).toBeVisible();
+  });
+});
+
 test.describe('phone and code fields', () => {
   test('the code is six boxes over one field that takes a paste (D-251)', async ({ page }) => {
     await page.route('**/auth/v1/otp*', (route) =>

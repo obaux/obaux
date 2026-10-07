@@ -10,6 +10,7 @@ import { BigButton, Loading, Notice, Page, TextLink } from '@pam/ui';
 import { SubPageHeader } from '@pam/ui/SubPage';
 import { HelpButton } from '../../screens/HelpButton';
 import { InviteReady } from '../../screens/InviteReady';
+import { InviteForWho, type InviteWho } from '../../screens/InviteForWho';
 import { PersonRowSkeletonList } from '@pam/ui/Skeletons';
 import { NOTICES } from '@pam/config';
 import { USE_DUMMY_PEOPLE } from '@pam/config/dummy-flag';
@@ -86,13 +87,16 @@ export default function AdminPage() {
   const [invite, setInvite] = useState<CreatedInvite | null>(null);
   const [inviteBusy, setInviteBusy] = useState(false);
   const [inviteFailed, setInviteFailed] = useState(false);
+  // Who it is for, asked before the invite is made (D-373).
+  const [asking, setAsking] = useState<'member' | 'provider' | null>(null);
 
-  const makeInvite = async (role: 'member' | 'provider') => {
+  const makeInvite = async (role: 'member' | 'provider', who: InviteWho) => {
     setInviteBusy(true);
     setInviteFailed(false);
-    const created = await createInvite(role);
+    const created = await createInvite(role, who);
     setInviteBusy(false);
     if (created) {
+      setAsking(null);
       setInvite(created);
       refresh();
     } else {
@@ -235,19 +239,24 @@ export default function AdminPage() {
 
       {invite ? (
         <InviteReady invite={invite} onAnother={() => setInvite(null)} />
+      ) : asking ? (
+        <InviteForWho
+          role={asking}
+          busy={inviteBusy}
+          onSubmit={(who) => void makeInvite(asking, who)}
+          onCancel={() => setAsking(null)}
+        />
       ) : (
         <VStack gap={2}>
           <BigButton
-            label={inviteBusy ? t('admin.invite.creating') : t('admin.invite.member')}
-            onPress={() => void makeInvite('member')}
-            isDisabled={inviteBusy}
+            label={t('admin.invite.member')}
+            onPress={() => setAsking('member')}
           />
           {/* The same size and type as the button above it (D-239). */}
           <BigButton
             label={t('admin.invite.provider')}
             variant="secondary"
-            onPress={() => void makeInvite('provider')}
-            isDisabled={inviteBusy}
+            onPress={() => setAsking('provider')}
           />
         </VStack>
       )}

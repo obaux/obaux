@@ -184,6 +184,8 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
       setKind(invite.role);
       setInvitedAs(invite.role);
       setBookedTrip(invite.trip ?? null);
+      // The name the invite was made for (D-373), theirs to change.
+      if (invite.firstName) setFirstName((current) => current || invite.firstName || '');
       return;
     }
     const fromLink = new URLSearchParams(window.location.search).get('code');

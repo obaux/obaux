@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.44.0-invites] — 2026-10-07 · Invites know who they're for
+
+Making an invite now asks for the person's first name and mobile number.
+When they sign in with that number, Pam finds the invite even if they never
+opened the link, and they join as what they were invited to be, with their
+name already filled in. If a program invites a number that already belongs
+to a member, that person is told to ask for the invite on another number;
+their own account doesn't change (D-373). The database change (0077) is
+ready but not yet on the live project.
+
 ## [0.43.2] — 2026-10-07 · Sign-up, cleaner
 
 Signing up is just the form now — no cards. If you were invited, a green

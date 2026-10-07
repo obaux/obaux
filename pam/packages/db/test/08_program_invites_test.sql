@@ -21,7 +21,7 @@ do $$
 declare
   inv public.invites;
 begin
-  inv := public.create_invite('member');
+  inv := public.create_invite('member', '+15555550701', null, 'Ana');
   if inv.region_id is distinct from '11111111-0000-0000-0000-000000000001'::uuid then
     raise exception 'FAIL  a program''s member invite did not land in the program''s region';
   end if;
@@ -36,7 +36,7 @@ do $$
 declare
   inv public.invites;
 begin
-  inv := public.create_invite('provider');
+  inv := public.create_invite('provider', '+15555550702', null, 'Bo');
   if inv.role <> 'provider' then
     raise exception 'FAIL  a program''s program invite has role %', inv.role;
   end if;
@@ -47,21 +47,21 @@ $$;
 do $$
 begin
   begin
-    perform public.create_invite('admin');
+    perform public.create_invite('admin', '+15555550703', null, 'Cy');
     raise exception 'FAIL  a program issued a case manager invite';
   exception when others then
     if sqlerrm like 'FAIL%' then raise; end if;
     raise notice 'ok    a program cannot invite a case manager';
   end;
   begin
-    perform public.create_invite('super_admin');
+    perform public.create_invite('super_admin', '+15555550703', null, 'Cy');
     raise exception 'FAIL  a program issued a super admin invite';
   exception when others then
     if sqlerrm like 'FAIL%' then raise; end if;
     raise notice 'ok    a program cannot invite a super admin';
   end;
   begin
-    perform public.create_invite('member', null, '11111111-0000-0000-0000-000000000002');
+    perform public.create_invite('member', '+15555550703', '11111111-0000-0000-0000-000000000002', 'Cy');
     raise exception 'FAIL  a program invited into another region';
   exception when others then
     if sqlerrm like 'FAIL%' then raise; end if;

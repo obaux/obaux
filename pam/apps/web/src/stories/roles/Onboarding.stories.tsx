@@ -40,5 +40,12 @@ export const ExpiredLink: StoryObj = screen('provider', 'Expired link', '/protot
   as: 'program',
 });
 
+/**
+ * A staff invite for a number that already has a Pam account (D-373): one
+ * number is one account until the next phase, so Pam tells the person — not
+ * the inviter — and asks for the invite to go to another number.
+ */
+export const NumberAlreadyInPam: StoryObj = screen('member', 'Number already in Pam', '/invite/in-use/');
+
 /** About Pam (D-259): what Pam is and how it helps each kind of person, from Sign in's footer. */
 export const About: StoryObj = screen('member', 'About Pam', '/about/');

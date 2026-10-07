@@ -49,7 +49,7 @@ select test.check('a member who signed up alone has the number they verified, as
 
 set role authenticated;
 select test.as_user(:'admin_north');
-select (public.create_invite('member', '+12675550103', null)).code as lee_code \gset
+select (public.create_invite('member', '+12675550103', null, 'Lee')).code as lee_code \gset
 
 select test.as_user(:'lee');
 select (public.redeem_invite(:'lee_code', 'Lee')).id as lee_profile \gset

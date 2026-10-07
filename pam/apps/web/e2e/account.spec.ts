@@ -169,10 +169,13 @@ test.describe('the way out', () => {
 
     await page.getByRole('radio', { name: 'Pittsburgh' }).click();
     await page.getByRole('button', { name: 'A case manager' }).click();
+    await page.getByLabel('Their first name').fill('Kim');
+    await page.getByLabel('Their mobile number').fill('412 555 0199');
+    await page.getByRole('button', { name: 'Create link' }).click();
 
     // A link to the invite Sign in, for a case manager (D-254).
     await expect(page.getByText(/\/signin\/\?invite=P3TWVWTW&as=case-manager/)).toBeVisible();
-    expect(asked[0]).toMatchObject({ p_role: 'admin', p_region_id: 'r-pit' });
+    expect(asked[0]).toMatchObject({ p_role: 'admin', p_region_id: 'r-pit', p_first_name: 'Kim', p_phone: '412 555 0199' });
   });
 
   test('the account screen has no WCAG A/AA violations', async ({ page }) => {

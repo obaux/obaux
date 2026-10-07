@@ -123,6 +123,8 @@ function routesFor(journeyRole: JourneyRole): Route[] {
         role: (body as { p_role?: string } | null)?.p_role ?? 'member',
       },
     })),
+    // Nobody is waiting on an invite in a story (0077); sign-in goes on as usual.
+    on('/rpc/pending_invite_for_me', () => ({ body: [] })),
     on('/rpc/flagged_services', () => ({ body: [] })),
     on('/rpc/served_cities', () => ({ body: [{ city: 'Philadelphia' }] })),
     on('/rest/v1/conversation_members', (url, method) => {

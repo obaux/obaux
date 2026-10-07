@@ -182,6 +182,8 @@ export interface CreatedInvite {
  */
 export async function createInvite(
   role: 'member' | 'provider' | 'admin',
+  /** Who it is for — both required (0077, D-373). */
+  who: { readonly firstName: string; readonly phone: string },
   /** Which city, when the caller has none of their own — a super admin (0049). */
   regionId?: string,
 ): Promise<CreatedInvite | null> {
@@ -189,6 +191,8 @@ export async function createInvite(
     const { createClient } = await import('./supabase');
     const { data, error } = await createClient().rpc('create_invite', {
       p_role: role,
+      p_first_name: who.firstName,
+      p_phone: who.phone,
       ...(regionId ? { p_region_id: regionId } : {}),
     });
     if (error || !data) return null;

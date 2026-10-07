@@ -855,6 +855,17 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
+## Release 0.44.0-invites (7 October) — invites know who they're for
+
+D-373, on `claude/pam-storybook`, **not merged; 0077 not deployed**. Invites
+need a name and phone (`InviteForWho` on every invite screen); sign-in asks
+`pending_invite_for_me()` and joins a person as their waiting invite even
+without the link; a member's number with a staff invite gets
+`/invite/in-use/`. Migration `0077_invites_know_who.sql` + DB test 13 (suite
+green locally). Order for the live project: 0075, 0076, then 0077.
+D-374 (one account, member + program; hidden from their own program's lists)
+is decided and is the next phase — design note first.
+
 ## Release 0.43.2 (7 October) — forms, tidied; sign-up, cleaner
 
 D-364 to D-372, on `claude/pam-storybook`, **not merged**. Add a program is
@@ -907,6 +918,15 @@ link (D-331) are part of it.
 Open items Will asked to keep (7 October), newest first. Read this before
 "Next" below, which is older.
 
+- **Phase next: one account, both roles** (D-374) — member + program only;
+  hidden from their own program's lists. Start with the design note (the
+  ~29 direct `role` references sorted, the privacy wording), then build.
+- **Add a program, as its own flow** (Will, 7 October, "for later"): from the
+  Program tab it should hide the tab bar, keep Next pinned at the bottom,
+  and Back from the first step returns to Home; after sending, a confetti
+  "Sent to Pam for review" screen with a "Receive a text when it's ready"
+  row that opens the text-message settings.
+- **Apply 0077** after 0075/0076 (D-373).
 - **Apply 0075 then 0076 to the live project** — 0068/0069 carried over and
   reconciled with 0072 (D-346); DB suite green. Their `drop` statements need
   a person's approval in the Supabase tool. Also on `docs/before-launch.md`.

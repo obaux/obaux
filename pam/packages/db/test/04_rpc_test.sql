@@ -36,7 +36,7 @@ do $$
 declare
   inv public.invites;
 begin
-  inv := public.create_invite('member', '+15555550111');
+  inv := public.create_invite('member', '+15555550111', null, 'Rosa');
   if inv.code !~ '^[34679ACDEFGHJKMNPQRTUVWXY]{8}$' then
     raise exception 'FAIL  invite code % has an unexpected shape', inv.code;
   end if;
@@ -52,7 +52,7 @@ do $$
 declare
   inv public.invites;
 begin
-  inv := public.create_invite('admin');
+  inv := public.create_invite('admin', '+15555550999', null, 'Cam');
   if inv.role <> 'admin' then
     raise exception 'FAIL  the case manager invite came back as %', inv.role;
   end if;
@@ -146,10 +146,36 @@ do $$
 declare
   inv public.invites;
 begin
-  -- No phone prefill: the code alone is the credential.
-  inv := public.create_invite('member');
+  -- Who it is for is required (0077): no name, no phone, no invite.
+  begin
+    perform public.create_invite('member', '+15555550333');
+    raise exception 'FAIL  an invite was made with no name';
+  exception when others then
+    if sqlerrm like 'FAIL%' then raise; end if;
+    if sqlerrm <> 'INVITE_NEEDS_NAME' then raise exception 'FAIL  expected INVITE_NEEDS_NAME, got %', sqlerrm; end if;
+    raise notice 'ok    an invite needs the person''s name (0077)';
+  end;
+  begin
+    perform public.create_invite('member', null, null, 'Dee');
+    raise exception 'FAIL  an invite was made with no phone';
+  exception when others then
+    if sqlerrm like 'FAIL%' then raise; end if;
+    if sqlerrm <> 'INVITE_NEEDS_PHONE' then raise exception 'FAIL  expected INVITE_NEEDS_PHONE, got %', sqlerrm; end if;
+    raise notice 'ok    ...and their phone (0077)';
+  end;
+  begin
+    perform public.create_invite('member', '555-01', null, 'Dee');
+    raise exception 'FAIL  an invite was made for a number that is not one';
+  exception when others then
+    if sqlerrm like 'FAIL%' then raise; end if;
+    raise notice 'ok    ...a real one';
+  end;
+  inv := public.create_invite('member', '(555) 555-0333', null, 'Dee');
+  if inv.phone <> '+15555550333' or inv.first_name <> 'Dee' then
+    raise exception 'FAIL  the invite stored % / %', inv.phone, inv.first_name;
+  end if;
   perform set_config('pam.open_code', inv.code, false);
-  raise notice 'ok    admin created an open invite %', inv.code;
+  raise notice 'ok    admin created an invite for Dee, the number stored as E.164';
 end;
 $$;
 
@@ -160,7 +186,7 @@ declare
 begin
   p := public.redeem_invite(current_setting('pam.open_code'), 'Dee');
   if p.role <> 'member' then raise exception 'FAIL  unexpected role %', p.role; end if;
-  raise notice 'ok    an open invite redeems without a phone prefill';
+  raise notice 'ok    Dee redeems the invite made for her number';
 end;
 $$;
 
@@ -1221,7 +1247,7 @@ do $$
 declare
   inv public.invites;
 begin
-  inv := public.create_invite('admin');
+  inv := public.create_invite('admin', '+15555550998', null, 'Sam');
   if inv.region_id <> '11111111-0000-0000-0000-000000000001' then
     raise exception 'FAIL  a case manager''s case manager invite is for %', inv.region_id;
   end if;
@@ -1243,7 +1269,7 @@ begin
   raise notice 'ok    a super admin can see the regions';
 
   begin
-    perform public.create_invite('admin');
+    perform public.create_invite('admin', '+15555550881', null, 'Kim');
     raise exception 'FAIL  an admin invite was made for no city';
   exception when others then
     if sqlerrm like 'FAIL%' then raise; end if;
@@ -1251,14 +1277,14 @@ begin
   end;
 
   begin
-    perform public.create_invite('super_admin', null, '11111111-0000-0000-0000-000000000002');
+    perform public.create_invite('super_admin', '+15555550881', '11111111-0000-0000-0000-000000000002', 'Kim');
     raise exception 'FAIL  somebody was invited to be a super admin';
   exception when others then
     if sqlerrm like 'FAIL%' then raise; end if;
     raise notice 'ok    nobody is invited to be a super admin';
   end;
 
-  inv := public.create_invite('admin', null, '11111111-0000-0000-0000-000000000002');
+  inv := public.create_invite('admin', '+15555550881', '11111111-0000-0000-0000-000000000002', 'Kim');
   if inv.role <> 'admin' or inv.region_id <> '11111111-0000-0000-0000-000000000002' then
     raise exception 'FAIL  the admin invite came back as % in %', inv.role, inv.region_id;
   end if;
@@ -1268,7 +1294,7 @@ begin
   perform set_config('pam.admin_code', inv.code, false);
   raise notice 'ok    a super admin can invite a case manager into a city';
 
-  inv := public.create_invite('member', null, '11111111-0000-0000-0000-000000000001');
+  inv := public.create_invite('member', '+15555550882', '11111111-0000-0000-0000-000000000001', 'Ana');
   perform set_config('pam.member_code', inv.code, false);
   raise notice 'ok    ...and a member, who lands on nobody''s caseload';
 end;
