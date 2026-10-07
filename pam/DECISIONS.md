@@ -9295,6 +9295,18 @@ which opens up the text message permission settings".)
 - Stories: Program lead › States › Program — sent for review (Just sent,
   Under review, Spanish). Flow map: `programSent` node and edges.
 
+### D-380 — "Sent to Pam": the steps as a progress flow
+
+**Date:** 2026-10-07. Will: "Add lines in between the steps so it looks like a
+progress flow in the UI. Add more room between checklist, and other elements.
+Add a top border above text me when it's live, and change icon to line icon."
+
+- Each step's marker sits on a rail with a 2px line down to the next: green
+  after a done step, grey after the current one; none after the last.
+- 12px more above and below the steps, 22px between them.
+- A hairline (`--color-border`) above "Text me when it's live"; its bell is
+  the outline bell (`BellOutlineIcon`), as on the header.
+
 ---
 
 ## Notes for whoever picks this up next
