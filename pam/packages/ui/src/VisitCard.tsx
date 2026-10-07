@@ -66,14 +66,16 @@ const styles = stylex.create({
     borderTopWidth: '1px',
     borderTopStyle: 'solid',
     borderTopColor: colorVars['--color-border-green'],
-    paddingBlockStart: '4px',
+    // With the change link's -13px below, its words sit 20px under this line
+    // and 20px above the card's edge, measured to the ink (Will, D-342).
+    paddingBlockStart: '2px',
   },
   change: {
     alignSelf: 'flex-start',
     // The 48px target hangs into the card's bottom padding, so the words sit
     // as far from the bottom edge as from the left (Will, D-341: "bottom
     // padding is stronger than right"); it was 33px under, 18px beside.
-    marginBlockEnd: '-14px',
+    marginBlockEnd: '-13px',
     minHeight: pam['--pam-touch-target-min'],
     fontSize: '17px',
     fontWeight: 600,

@@ -8390,6 +8390,14 @@ metadata."
 - **Proven by:** measurement, screenshot, typecheck, ui 69, web build, e2e
   573/573.
 
+### D-342 — Change appointment: the same space above and below
+
+**Date:** 2026-10-07. Will: "The top padding above change appointment
+doesn't match the bottom row, make it neatly spaced." Measured to the ink:
+22px from the divider to the words, 19px from the words to the card's edge.
+Now 20px and 20px (divider padding 4px → 2px, the link's overhang
+-14px → -13px); the target is still 48px and inside the card.
+
 ---
 
 ## Notes for whoever picks this up next

@@ -224,7 +224,7 @@ an × to close. Saved, trip cards and the next visit show each kind of
 place's own illustration (D-337). Drawers no longer have a dark outline. The Bring a
 friend picture runs to the drawer's edges, the × sits in its corner, and
 "Link copied" fills the link box in the same pale green as Copy (D-338). The green visit card has more room between its lines, and
-"Link copied" now spans the link box and Copy, centred (D-339). More room under the friend banner and above the link (D-340). "In 2 days" is plain text now, and Change appointment sits evenly in the card's corner (D-341).
+"Link copied" now spans the link box and Copy, centred (D-339). More room under the friend banner and above the link (D-340). "In 2 days" is plain text now, and Change appointment sits evenly in the card's corner (D-341). It has the same space above and below (D-342).
 
 ## [0.41.1-invites] — 2026-10-02 · Programs can invite people
 
