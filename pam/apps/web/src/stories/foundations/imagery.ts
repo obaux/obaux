@@ -1,0 +1,52 @@
+import { DUMMY_CONNECTIONS } from '@pam/config/dummy-connections';
+
+/**
+ * Every raster image and brand mark Pam ships, for Foundations › Imagery
+ * (Will, 7 October: "bring in photos and treat it all under storybook for
+ * easy handoff"). The vector illustrations are listed from code instead
+ * (`SETUP_ART_KINDS`, `CATEGORIES`, `BADGE_ART_KEYS`).
+ *
+ * `imagery.test.ts` fails if a file in `apps/web/public` is not listed here,
+ * so nothing ships without a place in the inventory.
+ */
+export interface ImageryItem {
+  /** Path under `apps/web/public`, as the app serves it. */
+  readonly src: string;
+  readonly name: string;
+  /** Where it is used, and the decision that put it there. */
+  readonly note: string;
+  /** Other sizes of the same picture, also in `public`. */
+  readonly alsoAt?: readonly string[];
+  /** Shown on a dark ground (a white mark). */
+  readonly isOnDark?: boolean;
+}
+
+export const PHOTOGRAPHS: readonly ImageryItem[] = [
+  { src: '/onboarding/hero-city.webp', name: 'Sign in, slide 1', note: 'A place to look — commissioned illustration (D-135)' },
+  { src: '/onboarding/hero-phone.webp', name: 'Sign in, slide 2', note: 'A person to ask (D-135)' },
+  { src: '/onboarding/hero-sneakers.webp', name: 'Sign in, slide 3', note: 'A plan to go (D-135)' },
+  {
+    src: '/friend/bring-a-friend-800.webp',
+    name: 'Bring a friend',
+    note: 'The friend drawer (D-337)',
+    alsoAt: ['/friend/bring-a-friend-1200.webp'],
+  },
+  { src: '/og/invite.jpg', name: 'Invite link preview', note: 'Shown when a link is pasted into a text (D-263)' },
+];
+
+export const BRAND: readonly ImageryItem[] = [
+  { src: '/pam-wordmark-light.svg', name: 'Wordmark, for light grounds', note: 'Sign in, About Pam' },
+  { src: '/pam-wordmark-dark.svg', name: 'Wordmark, for dark grounds', note: 'Dark mode', isOnDark: true },
+  { src: '/pam-wordmark-white.svg', name: 'Wordmark, white', note: 'Over pictures (the sign-in carousel)', isOnDark: true },
+  { src: '/email/pam-logo.png', name: 'Email logo', note: 'Invite and renewal emails (D-263)' },
+];
+
+/**
+ * Example people's photos (D-335): still hotlinked from Unsplash, not yet in
+ * the repo — this environment's network policy blocks images.unsplash.com.
+ */
+export const PEOPLE = DUMMY_CONNECTIONS.map((person) => ({
+  src: person.photoUrl,
+  name: person.firstName,
+  note: person.programName ? `Staff at ${person.programName} (example)` : 'Example connection',
+}));

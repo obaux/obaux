@@ -1,15 +1,20 @@
 import { Meta } from '@storybook/addon-docs/blocks';
-import { BadgeSet, CategorySet, HeroSample, LockedBadge, PhotoSet, SetupSet } from './IllustrationGallery';
+import { BadgeSet, BrandSet, CategorySet, HeroSample, LockedBadge, PeopleSet, PhotoSet, SetupSet } from './ImageryGallery';
 
-<Meta title="Foundations/Illustrations" />
+<Meta title="Foundations/Imagery" />
 
-# Illustrations
+# Imagery
 
-Every picture in Pam, in one place. The sets below are drawn from the code's own lists
-(`SETUP_ART_KINDS`, `CATEGORIES`, `BADGE_ART_KEYS`), so a new illustration appears here the
-moment it exists. Before you draw one, check it isn't already here.
+Every picture Pam ships, in one place, for handoff: the illustrations, the photographs and
+commissioned art, the brand marks and the example people. Each one can be downloaded from here:
+a file as it ships, or a vector illustration as an SVG with its colours written in.
 
-## The language
+**It can't go out of date.** The illustration sets are drawn from the code's own lists
+(`SETUP_ART_KINDS`, `CATEGORIES`, `BADGE_ART_KEYS`), and the files from `imagery.ts`, which a
+test keeps in step with `apps/web/public`. Before you draw or add a picture, check it isn't
+already here.
+
+## Illustrations — the language
 
 - **Flat colour, lit from the left.** Each object is two tones: the lit side and the shade
   (D-297). No glow, no gradients.
@@ -52,14 +57,33 @@ banner (D-376).
 
 <HeroSample />
 
-## Photographs
+## Photographs and commissioned art
 
-Raster images in `apps/web/public`. Each is sized and compressed once (webp where the browser
-allows).
+Raster images in `apps/web/public`, sized and compressed once (webp where browsers allow).
 
 <PhotoSet />
 
+## Brand marks
+
+The wordmark in its three colourways, and the logo emails use.
+
+<BrandSet />
+
+## Example people
+
+The faces on example connections and staff (D-335). These are still **linked from Unsplash**
+rather than kept in the repo: the network policy of the environment that built this page
+blocked `images.unsplash.com`. Bring them into `apps/web/public/people/` before launch. Real
+staff photos come from staff themselves (D-345).
+
+<PeopleSet />
+
 ## Adding one
+
+**A file** (photo, art, mark): put it in `apps/web/public`, add it to `imagery.ts` with where it
+is used and its decision — the inventory test fails until you do.
+
+**An illustration:**
 
 1. Draw it with `art/kit.tsx` in the language above. Keep the subject inside the middle band
    so a banner crop never cuts it.

@@ -9244,6 +9244,26 @@ storybook Foundations for the best DS organization."
   new illustration appears there the moment it exists. Only the photographs
   are listed by hand.
 
+### D-378 — Foundations › Imagery: everything, downloadable, for handoff
+
+**Date:** 2026-10-07. Will: "Let's also bring in photos and treat it all
+under storybook for easy handoff."
+
+- Foundations › Illustrations (D-377) becomes **Foundations › Imagery**:
+  illustrations, photographs and commissioned art, brand marks (the three
+  wordmarks and the email logo) and the example people, one page.
+- **Downloadable:** every file links to itself as it ships; every vector
+  illustration has "Download SVG", which saves it with each element's
+  computed colours written in, since StyleX classes and theme variables mean
+  nothing outside the app (checked: the saved file renders on its own).
+- **Kept complete by a test:** `imagery.ts` lists every file, and
+  `imagery.test.ts` fails if a file in `apps/web/public` is missing from it or
+  listed but gone. Illustrations still list themselves from code.
+- **Not done — the example people's photos are still hotlinked from
+  Unsplash.** Bringing them into `public/people/` was blocked: this
+  environment's network policy refuses `images.unsplash.com`. The page shows
+  them with that flag; STATUS backlog has the step.
+
 ---
 
 ## Notes for whoever picks this up next
