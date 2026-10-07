@@ -24,6 +24,13 @@ far along you are. A new dashed line separates sections in a few places.
 Add a program keeps Next at the bottom of the screen, with "2 of 7" tucked
 into the button (D-355–D-358).
 
+**Sign-up, tidier.** Sign in already asks for the phone, so sign-up starts
+at About you: two steps for staff, three for members, the count shown on
+each step's button, and the button kept at the bottom of the screen. The
+legal links are only on Sign in now. Language is two chips, English chosen.
+Text messages reads more easily: a quieter intro and three bell bullets
+(D-359).
+
 **Shorter sign-up for staff.** Program leads and case managers sign up in
 three steps and go straight to Home after "I understand". A program is added
 from Home, not during sign-up (D-353).

@@ -264,7 +264,6 @@
   "join.saving": "Saving...",
   "join.staff.body": "We check every request by hand before we open an account. It takes a day or two.",
   "join.staff.title": "Someone will call you",
-  "join.step": "Step {current} of {total}",
   "join.texts.title": "Text messages",
   "join.waiting.action": "Save my city",
   "join.waiting.body": "Pam is not in {city} yet.",
@@ -1303,5 +1302,6 @@
   "schedule.tab.day": "Day",
   "schedule.tab.week": "Week",
   "schedule.tab.month": "Month",
-  "home.search": "Search"
+  "home.search": "Search",
+  "join.progress": "{current} of {total}"
 }

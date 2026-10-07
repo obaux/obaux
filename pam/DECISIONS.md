@@ -8770,6 +8770,44 @@ changes the top section to search bar expanded and ready to type."
   for the search field, focused (checked: the field has focus, typing
   searches). `ScheduleView actions` may be a function handed `openSearch`.
 
+### D-359 — Sign-up starts at About you; buttons pinned, counted, no legal footer
+
+**Date:** 2026-10-07. Will: "Sign up from this point forward needs no footer.
+Pin button to bottom, and make the language selection selectable chips like
+we do for booking a visit, but use secondary color for selected, default set
+to english", "Use the step counter on left corner of button here also. and
+start steps at 1 from this screen forward … we already gather this info from
+sign in, so no need for this screen", "absolute position the step counter on
+button so it doesn't interfere with button label", and on Text messages:
+"Smaller subtitle text, fainter. Bullets with alert bell icons."
+
+- **No phone step in sign-up.** Sign in asks for the phone and the code and
+  sends a new number to `/join/` (it always did); `/join/` signed out now
+  sends you to `/signin/` (any `?code=` goes with it) instead of drawing the
+  same card again. Back from About you signs out and returns to Sign in, or
+  Sign in would send a verified phone straight back. `PhoneSignInCard` stays
+  Sign in's.
+- **Steps from 1:** About you 1, What to expect / What Pam shares 2, Texts 3
+  (members). Staff: 2 steps. The "Step x of y" subtitle is gone; the count is
+  the badge in the step's button (`BigButton badge`, D-357), e.g. "1 of 2".
+- **Buttons pinned** to the foot of each step (`Page footer`), with their
+  secondary link (Not now, Not right now) under them. The About Pam /
+  Privacy / Terms footer is gone from sign-up (it stays on Sign in).
+- **Language as chips**, Plan a visit's style: white with a grey edge,
+  chosen one in the secondary green, English unless already switched.
+- **Text messages:** the intro 16px and fainter; what Pam would send as three
+  bell bullets (`BellIcon`, brand green), evenly spaced.
+- **Badge inside the button, out of the flow:** drawn over the button it
+  covered part of the target (axe target-size failed); in the icon slot it
+  pushed the label off centre. Now absolutely placed inside, with equal 88px
+  padding both sides so the label stays centred and wraps on a narrow screen
+  rather than running under it. Accessible name "Next, 1 of 2".
+- **Tests:** `join.spec` and `account.spec` updated for the counts, the
+  redirect to Sign in, and Done for a staff claim. The join axe test now
+  scrolls to the end first: on a 320px screen the form scrolls beneath the
+  pinned button, and axe counts whatever is under it as crowding the target;
+  at the end of the page nothing is. Full e2e 573/573.
+
 ---
 
 ## Notes for whoever picks this up next

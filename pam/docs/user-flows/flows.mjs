@@ -71,6 +71,8 @@ export const flows = [
         title: 'About you (joining)',
         story: 'onboarding--case-manager',
         path: '/join/',
+        changed: 'D-359',
+        note: 'Step 1 — the count on the pinned Next; language chips; no legal links',
         actions: [
           { fill: 'Your phone number', value: '215 555 0100' },
           { click: 'Send me a code' },
@@ -140,6 +142,7 @@ export const flows = [
       ['sent', 'email', 'Arrives by email', { dashed: true }],
     ],
     changes: [
+      'D-359 — sign-up starts at About you (Sign in did the phone); counts on the pinned button',
       'D-353 — staff sign-up ends on What to expect and goes straight Home; a program is added from Home, not at sign-up',
       'D-266 — Sign in: the card sits flat under the pictures; the code step is drawn in to match',
       'D-263 — no phone needed to invite; 30-day links; expired links email a new one; "You\'re invited" preview',

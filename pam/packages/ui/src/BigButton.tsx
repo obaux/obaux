@@ -3,7 +3,6 @@
 import * as stylex from '@stylexjs/stylex';
 import { Button } from '@astryxdesign/core/Button';
 import type { ReactNode } from 'react';
-import { HStack } from '@astryxdesign/core/HStack';
 import { Text } from '@astryxdesign/core/Text';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { Press } from './motion.js';
@@ -35,7 +34,7 @@ export interface BigButtonProps {
   isLoading?: boolean;
   /**
    * A short count tucked into the button's left end — "2 of 7" on a step
-   * (Will, 7 October, D-357). Plain text over the button, read out after it.
+   * (Will, 7 October, D-357). Drawn inside the button; part of its name.
    */
   badge?: string;
   /** Escape hatch for layout only (margins). Never for colour or type. */
@@ -43,7 +42,10 @@ export interface BigButtonProps {
 }
 
 const styles = stylex.create({
-  wrap: { position: 'relative', width: '100%' },
+  // Equal room both sides of the label, the badge's width and a little: the
+  // label stays centred, and a long one wraps rather than running under it.
+  withBadge: { position: 'relative', paddingInline: '88px' },
+  label: { fontSize: '17px', fontWeight: 600, lineHeight: 1.15, color: 'inherit', textAlign: 'center', whiteSpace: 'normal' },
   // As far from the left end as from the top and bottom (D-357): 32px tall
   // in a 56px button, so 12px all round.
   badge: {
@@ -85,9 +87,13 @@ export function BigButton({
   badge,
   xstyle,
 }: BigButtonProps) {
-  const button = (
+  // The badge is drawn inside the button, out of the flow (D-357): over the
+  // button it would cover part of the target, and in the icon slot it pushed
+  // the label off centre. The name says both: "Next, 2 of 7".
+  return (
+    <Press>
       <Button
-        label={label}
+        label={badge ? `${label}, ${badge}` : label}
         variant={variant}
         size="lg"
         width="100%"
@@ -96,22 +102,19 @@ export function BigButton({
         isDisabled={isDisabled}
         isLoading={isLoading}
         clickAction={onPress}
-        xstyle={[styles.root, xstyle]}
-      />
-  );
-  return (
-    <Press>
-      {badge ? (
-        <HStack xstyle={styles.wrap}>
-          {button}
-          {/* Read after the button, as the words it is (D-357). */}
-          <Text xstyle={styles.badge}>
-            {badge}
-          </Text>
-        </HStack>
-      ) : (
-        button
-      )}
+        xstyle={[styles.root, badge ? styles.withBadge : null, xstyle]}
+      >
+        {badge ? (
+          <>
+            <Text aria-hidden xstyle={styles.badge}>
+              {badge}
+            </Text>
+            <Text aria-hidden xstyle={styles.label}>
+              {label}
+            </Text>
+          </>
+        ) : undefined}
+      </Button>
     </Press>
   );
 }

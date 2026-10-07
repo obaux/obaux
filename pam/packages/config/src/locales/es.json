@@ -264,7 +264,6 @@
   "join.saving": "Guardando...",
   "join.staff.body": "Revisamos cada solicitud a mano antes de abrir una cuenta. Toma un día o dos.",
   "join.staff.title": "Alguien te va a llamar",
-  "join.step": "Paso {current} de {total}",
   "join.texts.title": "Mensajes de texto",
   "join.waiting.action": "Guardar mi ciudad",
   "join.waiting.body": "Pam todavía no está en {city}.",
@@ -1303,5 +1302,6 @@
   "schedule.tab.day": "Día",
   "schedule.tab.week": "Semana",
   "schedule.tab.month": "Mes",
-  "home.search": "Buscar"
+  "home.search": "Buscar",
+  "join.progress": "{current} de {total}"
 }

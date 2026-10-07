@@ -68,8 +68,6 @@ export const GetHelp: Story = screen('provider', 'Get help', '/help/');
 /** Each sign-up screen, in order, and the `step` the prototype opens on (D-319). */
 // Staff sign-up is three steps and ends Home (D-353): no program, no texts, no welcome.
 const SIGN_UP_STEPS = {
-  Phone: 'phone',
-  Code: 'code',
   'About you': 'details',
   'What to expect': 'privacy',
 } as const;
@@ -86,8 +84,8 @@ export const SignUp: Story = screenWithControls<SignUpArgs>(
   'Sign up',
   '/prototype/join/',
   {
-    args: { step: 'Phone' },
-    argTypes: { step: { control: 'select', options: ['Phone', 'Code', 'About you', 'What to expect'] } },
+    args: { step: 'About you' },
+    argTypes: { step: { control: 'select', options: ['About you', 'What to expect'] } },
   },
   (args) => ({ kind: 'provider', invite: 'PAM-7Q4K', step: SIGN_UP_STEPS[args.step] }),
 );

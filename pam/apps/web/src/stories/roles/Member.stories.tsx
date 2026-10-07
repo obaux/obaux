@@ -106,10 +106,7 @@ export const SignUpWalk: Story = screen('member', 'Sign up — the whole walk', 
 
 /** Each sign-up screen, in order, and the `step` the prototype opens on (D-319). */
 const SIGN_UP_STEPS = {
-  Phone: 'phone',
-  Code: 'code',
   'About you': 'details',
-  'Your program': 'program',
   'What Pam shares': 'privacy',
   Texts: 'texts',
   Welcome: 'done',
@@ -127,8 +124,8 @@ export const SignUp: Story = screenWithControls<SignUpArgs>(
   'Sign up',
   '/prototype/join/',
   {
-    args: { step: 'Phone' },
-    argTypes: { step: { control: 'select', options: ['Phone', 'Code', 'About you', 'What Pam shares', 'Texts', 'Welcome'] } },
+    args: { step: 'About you' },
+    argTypes: { step: { control: 'select', options: ['About you', 'What Pam shares', 'Texts', 'Welcome'] } },
   },
   (args) => ({ kind: 'member', step: SIGN_UP_STEPS[args.step] }),
 );
