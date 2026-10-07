@@ -8589,6 +8589,21 @@ in-app WebView, which has no `navigator.share`, on copy only).
   54/54 alone — unrelated and timing-dependent under the full run. **Not
   run on an Android device**: that needs `cap add android` and a build.
 
+### D-351 — Pam stays a web app for now
+
+**Date:** 2026-10-07. Will: "We're keeping this as a web app for now."
+
+- No native build is planned: `cap add android` / `ios` are not run, and
+  real-device QA means **phone browsers** (Safari on iPhone, Chrome on
+  Android), not the Capacitor shell or an Android WebView.
+- Nothing is removed. `apps/native` stays as it is, `@capacitor/share`
+  included (D-350): it costs the website nothing, since `@pam/ui/share` only
+  reaches it inside the app. In a phone's browser the share sheet comes from
+  `navigator.share`, which both Safari and Android Chrome have — so Bring a
+  friend, sharing a place and invite links already open the sheet there.
+- Earlier notes that name the Capacitor build or Android WebView as a QA
+  target (D-333 onwards) now read as "if the app is ever built".
+
 ---
 
 ## Notes for whoever picks this up next

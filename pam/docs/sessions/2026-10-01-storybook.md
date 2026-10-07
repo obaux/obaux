@@ -556,3 +556,4 @@ Chromium.
 - Merged #25 (767d73c) after CI green.
 - D-347 ProgramWizard (sign-up + Add a program, ProgramDetailsStep removed), D-348 PolicyUploadCard + PdfIcon, D-349 super admin Message {lead} on a place + story. Flow map: page 5 redrawn (root 44:2), pages 3/4 notes and tags patched. Checked: typecheck, ui 69, config 238, web 16, builds, Storybook, e2e 573/573.
 - D-350: @capacitor/share ^6.0.4 in apps/native; @pam/ui/share helper (runtime Capacitor.Plugins, else navigator.share) used by BringFriend, sharePlace, InviteReady; test/share.test.tsx (5). e2e 572/573, flag.spec narrow failed once in the full run, 54/54 alone.
+- D-351: Will — web app for now. No native build; apps/native and @capacitor/share left in place, unused.
