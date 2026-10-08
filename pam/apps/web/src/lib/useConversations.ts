@@ -47,6 +47,8 @@ export interface ConversationRow {
    * reach through this hook either.
    */
   readonly lastMessageBody: string | null;
+  /** The last message carried a photo (D-394); the row says "Photo". */
+  readonly lastMessageIsPhoto: boolean;
   readonly lastMessageMine: boolean;
   /** A message from the other person arrived since this was last opened. */
   readonly unread: boolean;
@@ -75,6 +77,7 @@ interface LatestMessageRow {
   conversation_id: string;
   sender_id: string;
   body: string | null;
+  attachment_kind: string | null;
   created_at: string;
 }
 
@@ -129,7 +132,7 @@ export function useConversations(enabled: boolean): {
             supabase.rpc('conversation_partners'),
             supabase
               .from('messages')
-              .select('conversation_id, sender_id, body, created_at')
+              .select('conversation_id, sender_id, body, attachment_kind, created_at')
               .in('conversation_id', ids)
               .order('created_at', { ascending: false })
               .limit(RECENCY_SCAN_LIMIT),
@@ -181,6 +184,7 @@ export function useConversations(enabled: boolean): {
               otherProgramName: other?.programName ?? null,
               lastMessageAt: latestMsg?.created_at ?? null,
               lastMessageBody: latestMsg?.body ?? null,
+              lastMessageIsPhoto: latestMsg?.attachment_kind === 'photo',
               lastMessageMine: latestMsg ? latestMsg.sender_id === me : false,
               unread,
             };

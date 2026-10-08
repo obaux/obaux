@@ -57,6 +57,14 @@ STATUS row too.
   account, member + program. The session reads `profile_roles`; it names the
   `profile_id` foreign key, because the table points at `profiles` twice.
 
+- [ ] **Photos in messages: deploy 0079, and tell members first** (Will,
+  8 October 2026, D-394). The private `message-photos` store and who can
+  see a photo live in 0079 — applied to the live project before the branch
+  that sends photos is merged, or the photo button fails. The transparency
+  screen, privacy notice and terms now name photos; two member accounts on
+  live saw the old wording, so if either is a real person they hear about
+  photos before the merge ("If this changes, we will tell you first").
+
 - [ ] **Approve the Pam-team line on the transparency screen** (STATUS row
   10b). Members were promised they would hear first if what is visible
   changes; the super admin's Everyone list and invite log are visible now.

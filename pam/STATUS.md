@@ -855,9 +855,9 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
-## Conversations, redrawn (8 October) — 0.45.5 to 0.45.9, on the branch
+## Conversations, redrawn (8 October) — 0.45.5 to 0.46.0, on the branch
 
-D-389 to D-393, **on `claude/pam-storybook`, not merged to `main`.** A
+D-389 to D-394, **on `claude/pam-storybook`, not merged to `main`.** A
 conversation opens each day with one divider ("Today", "Yesterday", a
 weekday, a date). Bubbles carry no name or time: mine are light green on the
 right, theirs grey on the left with their photo, and a sideways drag slides
@@ -866,9 +866,17 @@ time" as its screen-reader label). The composer is one rounded field: the
 mic bottom left, a round send button bottom right, grey until there is text,
 then dark green; every icon in the conversation at stroke 2.25. Bubbles sit 12px from the screen
 edge, the composer 8px from the sides and at least 40px off the bottom
-(D-391, D-393); the jump-to-newest button is white with a shadow and a
-24px arrow. Each day is a section: 32px above its divider, 16px below; message
-and composer text are 16px (D-392, A21). No attach button — see Backlog.
+(D-391, D-393); the jump-to-newest button is white with a 24px arrow. Each day is a section: 32px above its divider, 16px below; message
+and composer text are 16px (D-392, A21).
+
+**Photos (D-394, 0.46.0).** A picture button beside the mic sends a photo
+(with or without words), shrunk to 1600px and stripped of where/when on the
+phone, into a private per-conversation folder (`message-photos`, 0079).
+Only the two people see it; a reported photo reaches the report's reviewers
+and nobody else (`test/15_message_photos_test.sql`, 18 checks). Photos are
+downloaded with the person's sign-in, never handed out as links. The
+transparency screen, privacy notice, terms and staff sign-up copy name
+photos. **0079 is local until applied to live** — see before-launch.
 
 ## Release 0.45.0-two-roles (7 October) — one account, member and program
 
@@ -942,10 +950,8 @@ link (D-331) are part of it.
 Open items Will asked to keep (7 October), newest first. Read this before
 "Next" below, which is older.
 
-- **Photos in messages** (D-389, D-390): Will's reference has a paperclip;
-  Pam has no storage for message attachments. `messages` already has
-  `attachment_url`/`attachment_kind`, so it is a bucket, its policies, an
-  upload and rendering — waiting on Will's yes.
+- **Voice notes** (D-394): `attachment_kind 'voice'` is refused by 0079
+  until voice notes get storage and rules of their own. Photos are built.
 - **One account, both roles — follow-ups** (D-375): notifications by
   role (the bell shows the acting side's; a dot on the switch for the other);
   the two transparency lines, worded by Will, before launch.

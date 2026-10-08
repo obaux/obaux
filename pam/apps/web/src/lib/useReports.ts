@@ -23,6 +23,8 @@ export interface ReportRow {
   readonly targetType: string;
   readonly reason: string | null;
   readonly excerpt: string | null;
+  /** The photo in a reported message, as an on-phone link (D-394), or null. */
+  readonly photoUrl: string | null;
   readonly createdAt: string;
   readonly resolvedAt: string | null;
   readonly resolution: string | null;
@@ -63,12 +65,24 @@ export function useReports(enabled: boolean): { state: ReportsState; refresh: ()
     const load = async () => {
       try {
         const { createClient } = await import('./supabase');
-        const { data, error } = await createClient().rpc('reports_for_review');
+        const supabase = createClient();
+        const [{ data, error }, { data: photoRows }] = await Promise.all([
+          supabase.rpc('reports_for_review'),
+          // The photo in a reported message (0079): the same audience as the
+          // report itself, downloaded with the reviewer's own sign-in.
+          supabase.rpc('report_photos_for_review'),
+        ]);
         if (cancelled) return;
         if (error) {
           setState({ status: 'error', offline: !navigator.onLine });
           return;
         }
+        const photoPaths = new Map(
+          ((photoRows ?? []) as { report_id: string; photo_path: string }[]).map((r) => [r.report_id, r.photo_path]),
+        );
+        const { loadPhotos } = await import('./messagePhoto');
+        const links = await loadPhotos([...photoPaths.values()]);
+        if (cancelled) return;
         setState({
           status: 'ready',
           reports: ((data ?? []) as Row[]).map((row) => ({
@@ -76,6 +90,7 @@ export function useReports(enabled: boolean): { state: ReportsState; refresh: ()
             targetType: row.target_type,
             reason: row.reason,
             excerpt: row.target_excerpt,
+            photoUrl: links[photoPaths.get(row.id) ?? ''] ?? null,
             createdAt: row.created_at,
             resolvedAt: row.resolved_at,
             resolution: row.resolution,

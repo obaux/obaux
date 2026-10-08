@@ -1,10 +1,20 @@
 # Changelog
 
+## [0.46.0] — 2026-10-08 · Photos in messages
+
+You can send a photo in a conversation: tap the picture button beside the
+microphone, pick one or take one, add words if you like, and send. Pam makes
+it smaller and removes where and when it was taken before it leaves your
+phone. Only the person you send it to can see it — and if someone reports
+the message it is in, the people who check reports. Tap a photo to see it
+full size. The privacy notice, the terms, and what members and staff are
+told about who can see what all say so (D-394).
+
 ## [0.45.9] — 2026-10-08 · A clearer way back to the newest message
 
 The message box sits higher still off the bottom of the screen. The button
-that jumps back to the newest message is white with a shadow and a bigger,
-bolder arrow, so it stands out from the conversation behind it (D-393).
+that jumps back to the newest message is white with a bigger, bolder
+arrow, so it stands out from the conversation behind it (D-393).
 
 ## [0.45.8] — 2026-10-08 · Days you can tell apart
 

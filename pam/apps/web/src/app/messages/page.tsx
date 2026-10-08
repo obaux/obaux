@@ -246,13 +246,12 @@ function MessagesScreen() {
               key={c.id}
               name={c.otherName ?? t('messages.thread.someone')}
               context={contextFor(trueRole, c.otherRole, c.otherProgramName, t)}
-              preview={
-                c.lastMessageBody === null
-                  ? t('messages.preview.none')
-                  : c.lastMessageMine
-                    ? t('messages.preview.you', { text: c.lastMessageBody })
-                    : c.lastMessageBody
-              }
+              preview={(() => {
+                // A photo with no words reads "Photo" (D-394).
+                const text = c.lastMessageBody ?? (c.lastMessageIsPhoto ? t('messages.preview.photo') : null);
+                if (text === null) return t('messages.preview.none');
+                return c.lastMessageMine ? t('messages.preview.you', { text }) : text;
+              })()}
               when={c.lastMessageAt ? whenHappened(c.lastMessageAt, locale, t) : null}
               unread={c.unread}
               unreadLabel={t('notify.new')}

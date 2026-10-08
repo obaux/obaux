@@ -84,6 +84,7 @@ export {
   SettingsIcon,
   HelpIcon,
   TrashIcon,
+  PhotoIcon,
   LegalIcon,
   SignOutIcon,
   ConnectionsIcon,

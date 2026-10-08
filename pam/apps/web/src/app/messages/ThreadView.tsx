@@ -4,6 +4,7 @@ import { Fragment, useRef, useState, type ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import {
   ChatComposer,
+  ChatComposerDrawer,
   ChatComposerInput,
   ChatDictationButton,
   ChatLayout,
@@ -24,7 +25,9 @@ import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { HStack } from '@astryxdesign/core/HStack';
 import { VisuallyHidden } from '@astryxdesign/core/VisuallyHidden';
-import { Notice } from '@pam/ui';
+import { Thumbnail } from '@astryxdesign/core/Thumbnail';
+import { Lightbox } from '@astryxdesign/core/Lightbox';
+import { Notice, PhotoIcon } from '@pam/ui';
 import { useI18n } from '@/lib/i18n';
 import { colorVars, spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { dayKey, dayLabel } from '@/lib/when';
@@ -109,6 +112,8 @@ import { dayKey, dayLabel } from '@/lib/when';
 export interface ThreadViewMessage {
   readonly id: string;
   readonly body: string | null;
+  /** A link to the message's photo (D-394), or null. */
+  readonly photoUrl?: string | null;
   readonly createdAt: string;
   readonly mine: boolean;
 }
@@ -119,7 +124,8 @@ export interface ThreadViewProps {
   readonly otherName: string | null;
   /** Their photo when Pam has one (D-335); their initials otherwise. */
   readonly otherPhotoUrl?: string | null;
-  readonly onSend: (body: string) => Promise<boolean>;
+  /** Sends the words, the photo, or both; true once it has gone. */
+  readonly onSend: (body: string, photo: Blob | null) => Promise<boolean>;
   readonly sending: boolean;
   readonly sendFailed: boolean;
   /** BCP-47 tag for dictation, e.g. "en-US" or "es-US". */
@@ -187,6 +193,17 @@ const styles = stylex.create({
   // times without becoming a second scroll box.
   reveal: { width: '100%', overflowX: 'clip', touchAction: 'pan-y' },
   notice: { paddingInline: spacingVars['--spacing-3'] },
+  // A photo in a bubble (D-394): a 240px square, cropped to fill, that opens
+  // full size when tapped. A photo on its own sits in a thin rim of the
+  // bubble's colour; with words, the words follow it.
+  photo: { width: '240px', height: '240px', maxWidth: '100%', borderRadius: '14px' },
+  photoOnly: { paddingBlock: spacingVars['--spacing-1'], paddingInline: spacingVars['--spacing-1'] },
+  caption: { paddingInline: spacingVars['--spacing-2'], paddingBlockEnd: spacingVars['--spacing-1'] },
+  // The photo picked and not sent yet, above where you type.
+  pending: { width: '72px', height: '72px', borderRadius: '12px' },
+  // The file picker itself is never seen: the photo button opens it (the
+  // same pattern as the staff photo and policy uploads in @pam/ui).
+  fileInput: { position: 'absolute', width: '1px', height: '1px', opacity: 0, pointerEvents: 'none' },
   // §2.5's floor, as a square: send and mic alike (A13, D-192).
   square: { width: '48px', height: '48px', minWidth: '48px', minHeight: '48px', flexShrink: 0 },
   // The send button is a circle (D-389): grey until there is something to
@@ -295,9 +312,10 @@ function RevealTimes({ children }: { readonly children: ReactNode }) {
  * `IconButton` that clears the 48px floor and holds its chevron. Hidden,
  * not removed, while the log is at the bottom.
  *
- * White, lifted, with a bigger, heavier arrow (Will, 8 October, D-393): the
- * pale green it had read as part of the conversation underneath it, not as
- * a control floating over it. White is the popover ground, so in dark mode
+ * White, with a bigger, heavier arrow (Will, 8 October, D-393): the pale
+ * green it had read as part of the conversation underneath it, not as a
+ * control floating over it. Its shadow stays the light one it always had
+ * (Will: "ignore stronger shadow"). White is the popover ground, so in dark mode
  * it is the raised grey a floating control takes there rather than a white
  * disc; the arrow is the 24px icon at the composer's 2.25 stroke
  * (`globals.css`).
@@ -315,7 +333,7 @@ function ScrollToBottom() {
         icon={<Icon icon="chevronDown" size="lg" />}
         variant="secondary"
         size="md"
-        elevation="high"
+        elevation="low"
         onClick={() => scroll.scrollToBottom()}
         xstyle={[styles.square, styles.floating]}
       />
@@ -339,12 +357,27 @@ export function ThreadView({
   const dictation = useChatDictation({ inputRef, lang: speechLanguage });
 
   const name = otherName ?? t('messages.thread.someone');
-  const canSend = draft.trim() !== '' && !sending;
+  // A photo picked to send (D-394), shown above where you type until it goes.
+  const picker = useRef<HTMLInputElement>(null);
+  const [photo, setPhoto] = useState<{ file: File; preview: string } | null>(null);
+  // The photo open full size, if any.
+  const [viewing, setViewing] = useState<{ src: string; alt: string } | null>(null);
+  const canSend = (draft.trim() !== '' || photo !== null) && !sending;
+
+  const clearPhoto = () => {
+    setPhoto((prev) => {
+      if (prev) URL.revokeObjectURL(prev.preview);
+      return null;
+    });
+  };
 
   const submit = async (value: string) => {
-    if (sending || value.trim() === '') return;
-    const ok = await onSend(value);
-    if (ok) setDraft('');
+    if (sending || (value.trim() === '' && !photo)) return;
+    const ok = await onSend(value, photo?.file ?? null);
+    if (ok) {
+      setDraft('');
+      clearPhoto();
+    }
   };
 
   const composer = (
@@ -355,6 +388,28 @@ export function ThreadView({
       placeholder={t('messages.thread.placeholder')}
       isDisabled={sending}
       elevation="none"
+      drawer={
+        photo ? (
+          <ChatComposerDrawer>
+            <HStack gap={2} align="center">
+              <Thumbnail
+                src={photo.preview}
+                alt={t('messages.thread.photo.picked')}
+                label={t('messages.thread.photo.picked')}
+                xstyle={styles.pending}
+              />
+              <IconButton
+                label={t('messages.thread.photo.remove')}
+                icon={<Icon icon="close" size="md" />}
+                variant="ghost"
+                size="md"
+                onClick={clearPhoto}
+                xstyle={styles.square}
+              />
+            </HStack>
+          </ChatComposerDrawer>
+        ) : undefined
+      }
       input={
         <ChatComposerInput
           handleRef={inputRef}
@@ -365,17 +420,46 @@ export function ThreadView({
         />
       }
       footerActions={
-        <ChatDictationButton
-          dictation={dictation}
-          size="md"
-          label={dictation.isListening ? t('messages.thread.dictateStop') : t('messages.thread.dictate')}
-          xstyle={styles.square}
-        />
+        <>
+          <ChatDictationButton
+            dictation={dictation}
+            size="md"
+            label={dictation.isListening ? t('messages.thread.dictateStop') : t('messages.thread.dictate')}
+            xstyle={styles.square}
+          />
+          <IconButton
+            label={t('messages.thread.photo.add')}
+            icon={<Icon icon={PhotoIcon} size="md" />}
+            variant="ghost"
+            size="md"
+            isDisabled={sending}
+            onClick={() => picker.current?.click()}
+            xstyle={styles.square}
+          />
+          <input
+            ref={picker}
+            type="file"
+            accept="image/*"
+            tabIndex={-1}
+            aria-hidden
+            onChange={(event) => {
+              const file = event.target.files?.[0];
+              event.target.value = '';
+              if (!file) return;
+              clearPhoto();
+              setPhoto({ file, preview: URL.createObjectURL(file) });
+            }}
+            {...stylex.props(styles.fileInput)}
+          />
+        </>
       }
       sendButton={
         <ChatSendButton
           size="md"
           sendIcon={<Icon icon="arrowUp" size="md" />}
+          // Its own rule, not the composer's: a photo with no words can go.
+          isDisabled={!canSend}
+          onSend={() => void submit(draft)}
           xstyle={[styles.square, styles.round, !canSend && styles.sendIdle]}
         />
       }
@@ -383,6 +467,7 @@ export function ThreadView({
   );
 
   return (
+    <>
     <ChatLayout composer={composer} density="compact" scrollButton={<ScrollToBottom />} xstyle={styles.layout}>
     <VStack gap={4} xstyle={styles.messages}>
       <RevealTimes>
@@ -427,8 +512,35 @@ export function ThreadView({
                     )
                   }
                 >
-                  <ChatMessageBubble xstyle={[styles.bubble, message.mine && styles.mine]}>
-                    <Text xstyle={styles.body}>{message.body ?? ''}</Text>
+                  <ChatMessageBubble
+                    xstyle={[
+                      styles.bubble,
+                      message.mine && styles.mine,
+                      message.photoUrl != null && !message.body && styles.photoOnly,
+                    ]}
+                  >
+                    {message.photoUrl ? (
+                      <VStack gap={2}>
+                        <Thumbnail
+                          src={message.photoUrl}
+                          alt={message.mine ? t('messages.thread.photo.yours') : t('messages.thread.photo.theirs', { name })}
+                          onClick={() =>
+                            setViewing({
+                              src: message.photoUrl!,
+                              alt: message.mine
+                                ? t('messages.thread.photo.yours')
+                                : t('messages.thread.photo.theirs', { name }),
+                            })
+                          }
+                          xstyle={styles.photo}
+                        />
+                        {message.body ? (
+                          <Text xstyle={[styles.body, styles.caption]}>{message.body}</Text>
+                        ) : null}
+                      </VStack>
+                    ) : (
+                      <Text xstyle={styles.body}>{message.body ?? ''}</Text>
+                    )}
                   </ChatMessageBubble>
                   <Text type="supporting" aria-hidden xstyle={styles.stamp}>
                     {time}
@@ -453,5 +565,14 @@ export function ThreadView({
       ) : null}
     </VStack>
     </ChatLayout>
+    <Lightbox
+      isOpen={viewing !== null}
+      onOpenChange={(open) => {
+        if (!open) setViewing(null);
+      }}
+      media={{ src: viewing?.src ?? '', alt: viewing?.alt ?? '' }}
+      hasZoom
+    />
+    </>
   );
 }

@@ -40,7 +40,7 @@ export function DemoThread({
 }) {
   const { t } = useI18n();
   const typed = useDemoThread(conversationId);
-  const [added, setAdded] = useState<{ id: string; body: string; at: string }[]>([]);
+  const [added, setAdded] = useState<{ id: string; body: string; at: string; photoUrl?: string }[]>([]);
 
   const otherId = dummyOtherIdFor(conversationId, role);
   const other = DUMMY_ANYONE.find((p) => p.id === otherId) ?? null;
@@ -53,12 +53,25 @@ export function DemoThread({
         createdAt: m.at,
         mine: m.mine,
       })),
-      ...[...typed, ...added].map((m) => ({ id: m.id, body: m.body, createdAt: m.at, mine: true })),
+      ...[...typed, ...added].map((m) => ({
+        id: m.id,
+        body: m.body,
+        photoUrl: 'photoUrl' in m ? (m.photoUrl ?? null) : null,
+        createdAt: m.at,
+        mine: true,
+      })),
     ],
     [conversationId, role, typed, added],
   );
 
-  const send = async (body: string) => {
+  const send = async (body: string, photo: Blob | null) => {
+    // A photo in an example thread (D-394) is shown from the phone and kept
+    // only while this page is open: nothing is uploaded from a preview.
+    if (photo) {
+      const at = new Date().toISOString();
+      setAdded((prev) => [...prev, { id: `photo-${at}`, body: body.trim(), at, photoUrl: URL.createObjectURL(photo) }]);
+      return true;
+    }
     const message = sendDemoThreadMessage(conversationId, body);
     if (!message) return false;
     setAdded((prev) => [...prev, message]);

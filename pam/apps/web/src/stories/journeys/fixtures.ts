@@ -247,13 +247,33 @@ const THREAD = [
 export function threadFor(role: Role | null) {
   const staffSpeaks = role === 'member' ? OTHER_ID : ME_ID;
   const memberSpeaks = role === 'member' ? ME_ID : OTHER_ID;
-  return THREAD.map((body, i) => ({
+  const rows: {
+    id: string;
+    conversation_id: string;
+    sender_id: string;
+    body: string | null;
+    attachment_url?: string;
+    attachment_kind?: 'photo';
+    created_at: string;
+  }[] = THREAD.map((body, i) => ({
     id: `m-${i}`,
     conversation_id: CONVO_ID,
     sender_id: i % 2 === 0 ? staffSpeaks : memberSpeaks,
     body,
     created_at: hoursAgo((THREAD.length - i) * 6),
   }));
+  // A photo (D-394): the member checks the stop, with a picture and a few
+  // words, between "The 47 stops right outside" and "Got it".
+  rows.splice(3, 0, {
+    id: 'm-photo',
+    conversation_id: CONVO_ID,
+    sender_id: memberSpeaks,
+    body: 'Is this the one?',
+    attachment_url: `${CONVO_ID}/example-stop.jpg`,
+    attachment_kind: 'photo',
+    created_at: hoursAgo((THREAD.length - 2) * 6 - 3),
+  });
+  return rows;
 }
 
 export function partnerFor(role: Role | null) {

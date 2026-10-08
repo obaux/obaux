@@ -118,6 +118,22 @@ export function CameraIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+/**
+ * A picture: a frame, the sun, a hill. Adds a photo to a message (D-394) —
+ * a picture rather than a camera, because the phone's picker offers the
+ * photos already on it as well as taking a new one.
+ */
+export function PhotoIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <rect x="3.5" y="4.5" width="17" height="15" rx="2.5" />
+      <circle cx="9" cy="9.5" r="1.75" />
+      <path d="M4 17l4.6-4.6a1.5 1.5 0 0 1 2.1 0L14 15.7" />
+      <path d="M13 14.7l1.9-1.9a1.5 1.5 0 0 1 2.1 0l3 3" />
+    </svg>
+  );
+}
+
 /** A checklist. My Plan. */
 export function PlanIcon(props: SVGProps<SVGSVGElement>) {
   return (

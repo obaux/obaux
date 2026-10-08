@@ -90,6 +90,17 @@ describe('the privacy page and the transparency screen agree', () => {
     expect(text).toMatch(/reports it as not safe/);
   });
 
+  it('names photos wherever it names messages (D-394)', () => {
+    // A photo is part of a message, and nobody reading "your messages" should
+    // have to guess whether that includes the pictures. Both the page and the
+    // screen say so in words.
+    const text = visibility!.bodyKeys.map((k) => (en[k as keyof typeof en] as string).toLowerCase()).join(' ');
+    expect(text).toMatch(/cannot read your messages or see your photos/);
+    expect(text).toMatch(/its photo/);
+    const flagged = TRANSPARENCY_SCREEN.canSee.find((l) => l.key === 'transparency.canSee.flagged');
+    expect(flagged?.en).toMatch(/message or photo/);
+  });
+
   it('promises to tell members before the list changes, exactly as the screen does', () => {
     const page = visibility!.bodyKeys.map((k) => en[k as keyof typeof en] as string).join(' ');
     expect(page).toMatch(/we will tell you first/i);

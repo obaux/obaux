@@ -54,6 +54,13 @@ export const ADMIN_CAN_SEE = [
    */
   'last_active_date',
   'active_connections_names_and_kind',
+  /**
+   * A reported message reaches the people who see the report, and nothing
+   * else from the chat does. Since D-394 (8 October) a message can carry a
+   * photo, and a reported message's photo reaches the same people the same
+   * way (0079, `can_see_message_photo`) — said on the screen ("A message or
+   * photo…") rather than left to "message" meaning both.
+   */
   'flagged_messages_routed_through_reports',
   /**
    * Added when messaging shipped as staff-to-member rather than
@@ -84,6 +91,8 @@ export type AdminVisibleField = (typeof ADMIN_CAN_SEE)[number];
 /** Explicitly NOT visible. Kept as data so tests can assert the negative. */
 export const ADMIN_CANNOT_SEE = [
   'message_bodies',
+  /** D-394: photos in a conversation, outside a report — no admin policy on the bucket, as on `messages`. */
+  'message_photos',
   'buddy_feed_posts',
   'members_outside_caseload_or_region',
   'other_regions',
@@ -173,11 +182,11 @@ export const TRANSPARENCY_SCREEN: {
     },
     {
       key: 'transparency.canSee.flagged',
-      en: 'A message only if someone says it is not safe',
+      en: 'A message or photo only if someone says it is not safe',
     },
     {
       key: 'transparency.canSee.directMessages',
-      en: 'Everything you say to them, if they message you directly',
+      en: 'Everything you say or send to them, if they message you directly',
     },
     /**
      * D-199 — the one activity fact a program is also allowed. "A program"
@@ -193,7 +202,7 @@ export const TRANSPARENCY_SCREEN: {
   cannotSeeHeadingKey: 'transparency.cannotSee.heading',
   cannotSeeHeading: 'They cannot see:',
   cannotSee: [
-    { key: 'transparency.cannotSee.messages', en: 'What you say to someone else' },
+    { key: 'transparency.cannotSee.messages', en: 'What you say or send to someone else' },
     { key: 'transparency.cannotSee.buddyFeed', en: 'What you share with your buddies' },
     { key: 'transparency.cannotSee.otherPeople', en: 'Anyone who is not on their list' },
   ],

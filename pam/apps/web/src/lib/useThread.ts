@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import type { Role } from '@pam/config';
+import { loadPhotos, removeUnsentPhoto, shrinkPhoto, uploadMessagePhoto } from './messagePhoto';
 
 /**
  * One conversation: who is in it, and what has been said.
@@ -23,11 +24,18 @@ import type { Role } from '@pam/config';
  * select. See `useConversations` for why: a row policy that hands back a
  * whole `profiles` row hands back `last_active_at` and `phone` along with the
  * name, and D-154 closed exactly that hole.
+ *
+ * A message may carry a photo (D-394, 0079): stored privately, it is
+ * downloaded with the messages and shown from the phone's memory. Sending one shrinks it on
+ * the phone, stores it, then inserts the message that points at it; if the
+ * message does not go in, the stored photo is taken back.
  */
 export interface ThreadMessage {
   readonly id: string;
   readonly senderId: string;
   readonly body: string | null;
+  /** The message's photo, as an on-phone link (D-394), or null. */
+  readonly photoUrl: string | null;
   readonly createdAt: string;
   readonly mine: boolean;
 }
@@ -51,8 +59,14 @@ interface MessageRow {
   id: string;
   sender_id: string;
   body: string | null;
+  attachment_url: string | null;
+  attachment_kind: string | null;
   created_at: string;
 }
+
+const MESSAGE_COLUMNS = 'id, sender_id, body, attachment_url, attachment_kind, created_at';
+
+const photoPathOf = (row: MessageRow) => (row.attachment_kind === 'photo' ? row.attachment_url : null);
 
 function one<T>(value: T | T[] | null): T | null {
   return Array.isArray(value) ? (value[0] ?? null) : value;
@@ -60,7 +74,7 @@ function one<T>(value: T | T[] | null): T | null {
 
 export function useThread(conversationId: string | null): {
   state: ThreadState;
-  send: (body: string) => Promise<boolean>;
+  send: (body: string, photo?: Blob | null) => Promise<boolean>;
   sending: boolean;
   sendFailed: boolean;
   refresh: () => void;
@@ -131,7 +145,7 @@ export function useThread(conversationId: string | null): {
 
         const { data: rows, error: messagesError } = await supabase
           .from('messages')
-          .select('id, sender_id, body, created_at')
+          .select(MESSAGE_COLUMNS)
           .eq('conversation_id', conversationId)
           .order('created_at', { ascending: true })
           .limit(200);
@@ -141,6 +155,9 @@ export function useThread(conversationId: string | null): {
           setState({ status: 'error', offline: !navigator.onLine });
           return;
         }
+        const loaded = (rows ?? []) as MessageRow[];
+        const links = await loadPhotos(loaded.map(photoPathOf).filter((p): p is string => p !== null));
+        if (cancelled) return;
 
         setState({
           status: 'ready',
@@ -149,10 +166,11 @@ export function useThread(conversationId: string | null): {
           otherRole: partner?.role ?? null,
           otherProgramName: partner?.program_name ?? null,
           kind: conv?.kind ?? 'direct',
-          messages: ((rows ?? []) as MessageRow[]).map((row) => ({
+          messages: loaded.map((row) => ({
             id: row.id,
             senderId: row.sender_id,
             body: row.body,
+            photoUrl: links[photoPathOf(row) ?? ''] ?? null,
             createdAt: row.created_at,
             mine: row.sender_id === me,
           })),
@@ -178,21 +196,35 @@ export function useThread(conversationId: string | null): {
   }, [conversationId, nonce]);
 
   const send = useCallback(
-    async (body: string): Promise<boolean> => {
+    async (body: string, photo: Blob | null = null): Promise<boolean> => {
       const trimmed = body.trim();
-      if (!trimmed || !conversationId || state.status !== 'ready') return false;
+      if ((!trimmed && !photo) || !conversationId || state.status !== 'ready') return false;
 
       setSending(true);
       setSendFailed(false);
+      let stored: string | null = null;
       try {
+        let shrunk: Blob | null = null;
+        if (photo) {
+          shrunk = await shrinkPhoto(photo);
+          if (!shrunk) throw new Error('could not read the photo');
+          stored = await uploadMessagePhoto(conversationId, shrunk);
+          if (!stored) throw new Error('upload failed');
+        }
         const { createClient } = await import('./supabase');
         const supabase = createClient();
         const { data, error } = await supabase
           .from('messages')
-          .insert({ conversation_id: conversationId, sender_id: state.meId, body: trimmed })
-          .select('id, sender_id, body, created_at')
+          .insert({
+            conversation_id: conversationId,
+            sender_id: state.meId,
+            body: trimmed || null,
+            ...(stored ? { attachment_url: stored, attachment_kind: 'photo' } : {}),
+          })
+          .select(MESSAGE_COLUMNS)
           .single();
         if (error || !data) throw error ?? new Error('insert failed');
+        stored = null;
 
         const row = data as MessageRow;
         setState((prev) =>
@@ -205,6 +237,9 @@ export function useThread(conversationId: string | null): {
                     id: row.id,
                     senderId: row.sender_id,
                     body: row.body,
+                    // What was just picked, shown from the phone; the stored
+                    // copy is what the other person's link reads.
+                    photoUrl: shrunk ? URL.createObjectURL(shrunk) : null,
                     createdAt: row.created_at,
                     mine: true,
                   },
@@ -214,6 +249,7 @@ export function useThread(conversationId: string | null): {
         );
         return true;
       } catch {
+        if (stored) void removeUnsentPhoto(stored);
         setSendFailed(true);
         return false;
       } finally {

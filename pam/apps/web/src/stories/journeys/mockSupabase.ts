@@ -27,7 +27,8 @@ import {
   type JourneyRole,
 } from './fixtures';
 
-type Answer = { status?: number; body: unknown };
+/** `file`: answer with a file Storybook itself serves, not JSON (a photo, D-394). */
+type Answer = { status?: number; body: unknown; file?: string };
 type Route = (url: string, method: string, body: unknown) => Answer | null;
 
 const PROJECT_REF = new URL(SUPABASE_URL).hostname.split('.')[0];
@@ -44,8 +45,18 @@ function routesFor(journeyRole: JourneyRole): Route[] {
       ? on('/auth/v1/user', () => ({ body: { id: ME_ID, phone: '12155550199' } }))
       : on('/auth/v1/', () => ({ status: 401, body: {} })),
     on('/auth/v1/', () => ({ body: {} })),
+    // A photo in a conversation (D-394): a download answers with a picture
+    // Storybook already serves; an upload is accepted and never stored. No
+    // request reaches the live project.
+    (url, method) =>
+      url.includes('/storage/v1/object/') && url.includes('/message-photos/')
+        ? method === 'GET'
+          ? { body: null, file: '/onboarding/hero-city.webp' }
+          : { body: { Key: 'message-photos/example.jpg' } }
+        : null,
     // A staff photo upload (D-345): accepted, never stored.
     on('/storage/v1/object/', () => ({ body: { Key: 'staff-photos/example.webp' } })),
+    on('/rpc/report_photos_for_review', () => ({ body: [] })),
     on('/rest/v1/profiles', (url) =>
       url.includes('role=eq.member')
         ? { body: CASELOAD }
@@ -246,6 +257,7 @@ export function installSupabaseMock(journeyRole: JourneyRole): void {
       console.info('[journey] no fixture for', method, url);
       answer = { body: [] };
     }
+    if (answer.file) return real(answer.file);
     return new Response(JSON.stringify(answer.body), {
       status: answer.status ?? 200,
       headers: { 'content-type': 'application/json' },

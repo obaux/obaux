@@ -9651,8 +9651,10 @@ stronger icon and shadow."
 - **Scroll to the newest message.** The 48px round button is the popover
   ground (`--color-background-popover`: white in light mode, Pam's dark
   surface in dark, where a white disc would glare) instead of the pale green
-  secondary ground, with the dark text colour for its arrow, the `high`
-  elevation shadow, and a 24px chevron (was 16px).
+  secondary ground, with the dark text colour for its arrow and a 24px
+  chevron (was 16px). Its shadow stays the `low` elevation it had: the
+  `high` one shipped first and Will took it back the same hour ("ignore
+  stronger shadow").
 - **Stroke.** The arrow takes the composer icons' 2.25 stroke. The D-390
   rule widened from `.astryx-chat-composer svg` to `.astryx-chat-layout svg`,
   so the mic, the send arrow and this arrow stay matched; the thread header
@@ -9660,3 +9662,90 @@ stronger icon and shadow."
 - **Not changed:** the faint blurred sliver of a message under the composer
   while scrolled up is `ChatLayout`'s frosted-glass layer behind the dock,
   Astryx's own design.
+
+### D-394 — Photos in conversations, and what everyone is told about them
+
+**Date:** 2026-10-08. Will: "let's build the photo storage and update the
+privacy policy and what we tell members and staff about it" (after asking
+why Pam didn't allow images — it never decided not to; nothing stored them).
+
+**Who can see a photo — the database decides (0079).**
+- A private bucket, `message-photos`, one folder per conversation
+  (`<conversation id>/<random>.jpg`), 5 MB cap, JPEG/PNG/WebP.
+- **Put one there:** a person in that conversation, active, chat allowed,
+  no block in the conversation — the same four tests a message insert makes
+  (0076).
+- **See one:** the two people in the conversation. Once the message holding
+  it is reported, also the people who see that report
+  (`report_visible_to_me`, 0065: the case manager responsible for either
+  person, and the super admins) — the same route a reported message's words
+  take, and the only one. There is no admin policy on the bucket, as there
+  is none on `messages`.
+- **Change or remove one:** nobody edits a photo. The uploader may delete it
+  only while no message uses it (a send that failed half way). A sent photo
+  stays with its message, like words do.
+- **A message's photo must be in its own conversation's folder** (a check
+  constraint), so a message can't point at somebody else's picture. Voice
+  notes stay unbuilt: until they have storage and rules, an attachment is a
+  photo.
+- The reviewer screen reads a reported photo's path from a new
+  `report_photos_for_review()` — a new function, not a column on
+  `reports_for_review()`, because changing its return type means dropping it.
+- `test/15_message_photos_test.sql`: 18 checks — private bucket; members in,
+  outsiders out; a case manager not in the conversation, and a super admin,
+  see nothing until a report; after it, the reporter's case manager and the
+  super admin do and an unrelated case manager still doesn't; a report opens
+  no other message; nobody deletes the other person's or a sent photo.
+
+**On the phone.**
+- A photo button (Pam's new `PhotoIcon` — a picture, not a camera: the
+  picker offers the photo library and the camera) beside the mic opens the
+  phone's picker. The picked photo waits above where you type
+  (`ChatComposerDrawer` + `Thumbnail`) with its own 48px "Take this photo
+  out" button — the thumbnail's built-in remove is under the 48px floor.
+  Send works with a photo and no words.
+- Before upload the photo is re-drawn at 1600px on its longest side as a
+  JPEG, turned upright first. Re-drawing drops what a phone writes into a
+  photo besides the picture: where it was taken, when, and on what.
+- **Photos are downloaded with the person's own sign-in and shown from
+  memory, never as signed links.** A signed link works for anyone holding
+  it until it expires; a photo here is nobody else's to open. (Also what
+  keeps Storybook off the live project: the mock answers a download with a
+  picture Storybook serves.)
+- In a bubble: a 240px square, tap for Astryx's `Lightbox` full size. A
+  photo on its own sits in a thin rim of the bubble colour; words follow it.
+  Each photo has alt text ("A photo from Teresa", "A photo you sent").
+- The conversation list says "Photo" for a last message with no words. Text
+  alerts and the bell never quote a message (0064), so a photo never
+  reaches a lock screen.
+- A reported photo shows on the report card in Reported, tap for full size.
+
+**What people are told** (en + es, the same day):
+- **Members, on the transparency screen** (shown at sign-up, and on What
+  others can see): "A message or photo only if someone says it is not
+  safe"; "Everything you say or send to them, if they message you
+  directly"; cannot see "What you say or send to someone else".
+  `ADMIN_CANNOT_SEE` gains `message_photos`; the
+  `flagged_messages_routed_through_reports` entry notes it carries a
+  reported photo. Not a widening — a photo is part of a message and reaches
+  nobody a message doesn't — but said in words rather than left to
+  "message" meaning both.
+- **Privacy notice:** what we keep (messages and photos), a new paragraph
+  that a photo is shrunk and stripped of where and when before it leaves
+  the phone and only the person it's sent to can see it; who can see it
+  (cannot see your photos; a reported message "and its photo if it has
+  one"); how long (kept with your account); other companies (the one that
+  stores our data). Updated date 8 October. A test now requires photos to
+  be named on both the page and the screen.
+- **Terms:** a fourth "being decent" line — only send photos that are yours
+  to share, and none of someone who didn't say yes.
+- **Staff:** the case manager's "What you will see" at sign-up ("Not their
+  chats or photos. A message or photo reaches you only if someone reports
+  it.") and the card on a member's page ("Not their messages or photos");
+  a program lead's "What to expect" ("…and send photos. You see only what
+  they choose to send you."). The report screens say the reviewer sees
+  "this one message, and its photo if it has one".
+- **"If this changes, we will tell you first."** Live has two member
+  accounts, both of which saw the old screen; if either is a real person
+  rather than a test account, they hear about photos before the branch is
+  merged (before-launch).
