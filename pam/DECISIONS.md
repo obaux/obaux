@@ -9845,3 +9845,31 @@ type a lot the box grows taller."
   to its end, and the heard phrase is in view. On the old build it fails on
   both counts (88px tall; 338px of text below sight).
 
+### D-398 — The jump-to-newest button comes and goes gently
+
+**Date:** 2026-10-08. Will: "That button to scroll down if clicked should
+grow smoothly then fade out, if scroll up it fades back in growing in.
+Gentle micro interactions."
+
+- Scroll up and it fades in growing from 60% (240ms, Pam's `enter` curve).
+  Tap it and it swells to 115%, then fades out still growing (260ms) while
+  the conversation runs down to the newest message. Scroll back down by
+  hand and it leaves the way it came, shrinking as it fades (180ms, Pam's
+  `exit`). Opacity and transform only, under a quarter second — the tempo
+  every motion in Pam keeps (`motion-tempo.ts`).
+- CSS keyframes, not the motion runtime: no download, and nothing remounts.
+  The button stays on screen while it leaves (a phase: shown / sent /
+  leaving / hidden), taken out when its exit has had time to finish; it
+  takes no taps while leaving. Arriving fills backwards only, so the
+  button's own press is not held under the animation's last frame.
+- With reduced motion it appears and goes at once, as before.
+- Found while testing it: after a tap, Astryx reports the log as scrolled
+  up again for part of its run down, so the button popped back in halfway
+  through swelling away and shrank out a second time at the bottom. A tap
+  now starts a run that ignores that until the log reaches the bottom, or
+  until the reader scrolls up themselves.
+- e2e with motion on (`messages.spec`): frame by frame, it arrives smaller
+  and see-through and settles whole; tapped, it grows past full size, fades,
+  never comes back during the run, and is gone; scroll up again and it
+  returns.
+

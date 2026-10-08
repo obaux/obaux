@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.46.4] — 2026-10-08 · A gentler way back down
+
+The button that takes you to the newest message now fades in as it grows
+when you scroll up, and when you tap it, it swells a little and fades away
+as the conversation slides down. With reduced motion on, it simply appears
+and goes (D-398).
+
 ## [0.46.3] — 2026-10-08 · Talk as long as you like
 
 When you speak a message, the box now follows your words: the newest line

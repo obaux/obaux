@@ -583,6 +583,86 @@ test.describe('a conversation', () => {
   });
 });
 
+test.describe('the jump-to-newest button, with motion on (D-398)', () => {
+  // The rest of the suite runs with reduced motion; this is where the
+  // button's coming and going is seen at all.
+  test.use({ reducedMotion: 'no-preference' });
+
+  const LABEL = 'Jump to the newest message';
+  // Samples the button every frame for a while: its scale and opacity, or
+  // `gone` once it is out of the page.
+  const watch = (page: import('@playwright/test').Page, ms: number, tap = false) =>
+    page.evaluate(
+      async ([label, duration, shouldTap]) => {
+        const find = () => document.querySelector<HTMLElement>(`button[aria-label="${label}"]`);
+        if (shouldTap) find()!.click();
+        const frames: { gone: boolean; scale: number; opacity: number }[] = [];
+        const start = performance.now();
+        while (performance.now() - start < duration) {
+          await new Promise((done) => requestAnimationFrame(done));
+          const el = find();
+          if (!el) {
+            frames.push({ gone: true, scale: 0, opacity: 0 });
+            continue;
+          }
+          const style = getComputedStyle(el);
+          const matrix = new DOMMatrix(style.transform === 'none' ? undefined : style.transform);
+          frames.push({ gone: false, scale: matrix.a, opacity: Number(style.opacity) });
+        }
+        return frames;
+      },
+      [LABEL, ms, tap] as const,
+    );
+
+  test('it grows in as you scroll up, and swells then fades when tapped', async ({ page }) => {
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    await page.route(MESSAGES, (route) =>
+      route.fulfill(
+        json(
+          Array.from({ length: 30 }, (_, i) => ({
+            id: `m-${i}`,
+            conversation_id: CONVO,
+            sender_id: i % 2 ? ME : OTHER,
+            body: `Message number ${i + 1} in a long conversation.`,
+            created_at: new Date(Date.now() - (30 - i) * 60_000).toISOString(),
+          })),
+        ),
+      ),
+    );
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+    await expect(page.getByRole('button', { name: LABEL })).toHaveCount(0);
+
+    // Scroll up: it arrives smaller and see-through, and settles whole.
+    const log = page.getByRole('log');
+    await log.hover();
+    await page.mouse.wheel(0, -600);
+    const arriving = await watch(page, 500);
+    const seen = arriving.filter((f) => !f.gone);
+    expect(seen.some((f) => f.scale < 0.95 && f.opacity < 1)).toBe(true);
+    expect(seen.at(-1)).toMatchObject({ scale: 1, opacity: 1 });
+
+    // Tapped: bigger than itself first, then fading, then gone.
+    const leaving = await watch(page, 600, true);
+    const before = leaving.filter((f) => !f.gone);
+    expect(Math.max(...before.map((f) => f.scale))).toBeGreaterThan(1.05);
+    expect(before.some((f) => f.scale > 1 && f.opacity < 0.5)).toBe(true);
+    // Once it starts to fade it only fades: it never pops back in while the
+    // conversation runs down to the newest message.
+    const fading = before.slice(before.findIndex((f) => f.opacity < 1));
+    expect(fading.every((f, i) => i === 0 || f.opacity <= fading[i - 1]!.opacity + 0.01)).toBe(true);
+    expect(leaving.at(-1)!.gone).toBe(true);
+
+    // And the conversation is at its newest message.
+    await expect(log.getByText('Message number 30 in a long conversation.')).toBeInViewport();
+
+    // Scroll up again and it comes back.
+    await page.mouse.wheel(0, -600);
+    await expect(page.getByRole('button', { name: LABEL })).toBeVisible();
+  });
+});
+
 test.describe('an example person', () => {
   test('a case manager preview can message a member from their profile, into an example chat', async ({ page }) => {
     await page.addInitScript(() => sessionStorage.setItem('pam.view-as', 'admin'));

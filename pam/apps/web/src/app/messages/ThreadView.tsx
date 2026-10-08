@@ -154,6 +154,29 @@ const slideMotion = {
   transitionTimingFunction: 'cubic-bezier(0.2, 0.8, 0.2, 1)',
 } as const;
 
+// The scroll-to-bottom button comes and goes gently (Will, 8 October,
+// D-398): it fades in growing from a little smaller when you scroll up;
+// tapped, it swells a touch, then fades as the conversation runs down; and
+// if you scroll back down by hand it leaves the way it came. Pam's tempo
+// (`PAM_MOTION`, under a quarter second, opacity and transform only), CSS
+// so it costs no download, and none of it with reduced motion.
+const ARRIVE_MS = 240;
+const SENT_MS = 260;
+const LEAVE_MS = 180;
+const arrive = stylex.keyframes({
+  from: { opacity: 0, transform: 'scale(0.6)' },
+  to: { opacity: 1, transform: 'scale(1)' },
+});
+const swellAway = stylex.keyframes({
+  '0%': { opacity: 1, transform: 'scale(1)' },
+  '45%': { opacity: 1, transform: 'scale(1.15)' },
+  '100%': { opacity: 0, transform: 'scale(1.3)' },
+});
+const shrinkAway = stylex.keyframes({
+  from: { opacity: 1, transform: 'scale(1)' },
+  to: { opacity: 0, transform: 'scale(0.6)' },
+});
+
 const styles = stylex.create({
   list: { width: '100%' },
   body: { fontSize: '16px', lineHeight: 1.4, whiteSpace: 'pre-wrap' },
@@ -242,6 +265,32 @@ const styles = stylex.create({
     backgroundColor: colorVars['--color-background-popover'],
     color: colorVars['--color-text-primary'],
   },
+  // Arriving fills backwards only, so once it has arrived the button's own
+  // press is not held under the last frame; leaving holds its last frame
+  // (gone) until it is taken out.
+  arriving: {
+    animationName: arrive,
+    animationDuration: `${ARRIVE_MS}ms`,
+    animationTimingFunction: 'cubic-bezier(0.2, 0, 0, 1)',
+    animationFillMode: 'backwards',
+    '@media (prefers-reduced-motion: reduce)': { animationName: 'none' },
+  },
+  sent: {
+    animationName: swellAway,
+    animationDuration: `${SENT_MS}ms`,
+    animationTimingFunction: 'ease-out',
+    animationFillMode: 'forwards',
+    pointerEvents: 'none',
+    '@media (prefers-reduced-motion: reduce)': { animationName: 'none' },
+  },
+  leaving: {
+    animationName: shrinkAway,
+    animationDuration: `${LEAVE_MS}ms`,
+    animationTimingFunction: 'cubic-bezier(0.4, 0, 1, 1)',
+    animationFillMode: 'forwards',
+    pointerEvents: 'none',
+    '@media (prefers-reduced-motion: reduce)': { animationName: 'none' },
+  },
 });
 
 const dynamic = stylex.create({
@@ -328,13 +377,65 @@ function RevealTimes({ children }: { readonly children: ReactNode }) {
  * it is the raised grey a floating control takes there rather than a white
  * disc; the arrow is the 24px icon at the composer's 2.25 stroke
  * (`globals.css`).
+ *
+ * It stays on screen while it leaves (D-398), so it can be seen going:
+ * tapped, it swells and fades (`sent`); scrolled away from by hand, it
+ * shrinks and fades (`leaving`); scroll up again mid-way and it comes back.
+ * Astryx clears `isScrolledUp` the moment the button is tapped, but reports
+ * the log as scrolled up again for part of its run down to the newest
+ * message — enough, at first, to pop the button straight back in halfway
+ * through swelling away, then shrink it a second time at the bottom. So a
+ * tap starts a run (`running`) that ignores that until the log reaches the
+ * bottom, or the reader scrolls up themselves. With reduced motion it simply
+ * goes, as it always did.
  */
+type ScrollButtonPhase = 'hidden' | 'shown' | 'sent' | 'leaving';
+
+const prefersStillness = () =>
+  typeof window !== 'undefined' && window.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true;
+
 function ScrollToBottom() {
   const { t } = useI18n();
   const layout = useChatLayoutContext();
   const fallback = useRef<HTMLElement | null>(null);
   const scroll = useChatStreamScroll({ scrollRef: layout?.scrollContainerRef ?? fallback });
-  if (!scroll.isScrolledUp) return null;
+  const [phase, setPhase] = useState<ScrollButtonPhase>('hidden');
+  const [running, setRunning] = useState(false);
+
+  useEffect(() => {
+    if (scroll.isScrolledUp && !running) {
+      setPhase('shown');
+      return;
+    }
+    setPhase((now) => {
+      if (now !== 'shown') return now;
+      if (prefersStillness()) return 'hidden';
+      return running ? 'sent' : 'leaving';
+    });
+  }, [scroll.isScrolledUp, running]);
+
+  // The run is over at the bottom, or the moment the reader moves up.
+  const container = layout?.scrollContainerRef;
+  useEffect(() => {
+    const el = container?.current;
+    if (!el || !running) return;
+    let last = el.scrollTop;
+    const onScroll = () => {
+      const top = el.scrollTop;
+      if (top < last - 1 || el.scrollHeight - top - el.clientHeight < 2) setRunning(false);
+      last = top;
+    };
+    el.addEventListener('scroll', onScroll, { passive: true });
+    return () => el.removeEventListener('scroll', onScroll);
+  }, [container, running]);
+
+  useEffect(() => {
+    if (phase !== 'sent' && phase !== 'leaving') return;
+    const gone = setTimeout(() => setPhase('hidden'), phase === 'sent' ? SENT_MS : LEAVE_MS);
+    return () => clearTimeout(gone);
+  }, [phase]);
+
+  if (phase === 'hidden') return null;
   return (
     <HStack justify="center" xstyle={styles.scrollWrap}>
       <IconButton
@@ -343,8 +444,15 @@ function ScrollToBottom() {
         variant="secondary"
         size="md"
         elevation="low"
-        onClick={() => scroll.scrollToBottom()}
-        xstyle={[styles.square, styles.floating]}
+        onClick={() => {
+          setRunning(true);
+          scroll.scrollToBottom();
+        }}
+        xstyle={[
+          styles.square,
+          styles.floating,
+          phase === 'shown' ? styles.arriving : phase === 'sent' ? styles.sent : styles.leaving,
+        ]}
       />
     </HStack>
   );

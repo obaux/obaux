@@ -855,9 +855,9 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
-## Conversations, redrawn (8 October) — 0.45.5 to 0.46.3, on the branch
+## Conversations, redrawn (8 October) — 0.45.5 to 0.46.4, on the branch
 
-D-389 to D-397, **on `claude/pam-storybook`, not merged to `main`.** A
+D-389 to D-398, **on `claude/pam-storybook`, not merged to `main`.** A
 conversation's header says who the person is on a line under the name —
 "Program lead at Example Food Pantry", "Case manager" (D-395). Each day opens
 with one divider ("Today", "Yesterday", a weekday, a date). Bubbles carry no name or time: mine are light green on the
@@ -870,7 +870,8 @@ edge, the composer 8px from the sides and at least 40px off the bottom,
 that room inside the dock's frosted fade so the conversation runs to the
 edge (D-391, D-393, D-396); mic, photo and idle send in the secondary icon
 grey (D-396); the box grows to 8 lines, and while the mic listens it
-scrolls to the newest words (D-397); the jump-to-newest button is white with a 24px arrow. Each day is a section: 32px above its divider, 16px below; message
+scrolls to the newest words (D-397); the jump-to-newest button is white with a 24px arrow, grows in as it fades
+in, and swells then fades when tapped (D-398, CSS, none with reduced motion). Each day is a section: 32px above its divider, 16px below; message
 and composer text are 16px (D-392, A21).
 
 **Photos (D-394, 0.46.0).** A picture button beside the mic sends a photo
