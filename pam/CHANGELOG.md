@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.45.7] — 2026-10-08 · Room under the message box
+
+The box you type a message in sits higher off the bottom of the screen, so
+it no longer crowds the edge on phones without a home bar (D-391).
+
 ## [0.45.6] — 2026-10-08 · Drag to see the time
 
 In a conversation, your messages are light green and theirs grey, and

@@ -9607,3 +9607,15 @@ iMessages. Light Green chat bubbles is me, and gray is them."
   conversation sits on Astryx's own 12px list padding and the composer on
   its 8px dock: bubbles 12px from the screen edge (was 24), the composer 8px
   (was 20).
+
+### D-391 — The composer sits at least 24px off the bottom of the screen
+
+**Date:** 2026-10-08. Will: "Add more bottom padding below text box."
+
+The thread frame's bottom padding was the device's safe-area inset alone,
+which is 0 on a phone with no home indicator (and in Storybook), so the
+composer sat 8px off the bottom edge — only its `ChatLayout` dock's own
+padding. It is now `max(env(safe-area-inset-bottom, 0px), 16px)`: 24px in
+all with the dock's 8px, and unchanged on an iPhone, whose 34px inset is
+already larger. In `ThreadFrame`, so a real thread and the example thread
+get it alike.

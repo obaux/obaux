@@ -50,6 +50,12 @@ import { spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
  * needs only `env(safe-area-inset-bottom, 0px)` — the actual device inset,
  * not the 72px sized for a bar this screen never draws — to clear a home
  * indicator.
+ *
+ * Never less than 16px, though (Will, 8 October, D-391: "more bottom
+ * padding below text box"): on a phone with no home indicator the inset is
+ * 0, which left the composer 8px — only its dock's own padding — off the
+ * bottom edge. `max()` keeps the device's inset where it is larger, so an
+ * iPhone's composer does not climb any higher than it did.
  */
 
 // The same numbers `Page` and `PageTitle` take from `@pam/ui`'s tokens
@@ -65,7 +71,7 @@ const styles = stylex.create({
     maxWidth: '560px',
     marginInline: 'auto',
     paddingBlockStart: spacingVars['--spacing-4'],
-    paddingBlockEnd: 'env(safe-area-inset-bottom, 0px)',
+    paddingBlockEnd: `max(env(safe-area-inset-bottom, 0px), ${spacingVars['--spacing-4']})`,
     display: 'flex',
     flexDirection: 'column',
     minHeight: 0,

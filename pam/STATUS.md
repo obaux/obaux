@@ -855,9 +855,9 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
-## Conversations, redrawn (8 October) — 0.45.5 and 0.45.6, on the branch
+## Conversations, redrawn (8 October) — 0.45.5 to 0.45.7, on the branch
 
-D-389 and D-390, **on `claude/pam-storybook`, not merged to `main`.** A
+D-389 to D-391, **on `claude/pam-storybook`, not merged to `main`.** A
 conversation opens each day with one divider ("Today", "Yesterday", a
 weekday, a date). Bubbles carry no name or time: mine are light green on the
 right, theirs grey on the left with their photo, and a sideways drag slides
@@ -865,7 +865,8 @@ the times in at the right edge (`RevealTimes`; each message keeps "name,
 time" as its screen-reader label). The composer is one rounded field: the
 mic bottom left, a round send button bottom right, grey until there is text,
 then dark green; both icons at stroke 2.25. Bubbles sit 12px from the screen
-edge, the composer 8px. No attach button — see Backlog.
+edge, the composer 8px from the sides and at least 24px off the bottom
+(D-391). No attach button — see Backlog.
 
 ## Release 0.45.0-two-roles (7 October) — one account, member and program
 
