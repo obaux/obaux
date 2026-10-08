@@ -9537,3 +9537,32 @@ names its key, `profile_roles!profile_roles_profile_id_fkey(role)`; the
 response key is unchanged. Rule for next time: any new table with two
 foreign keys to the same table needs its embeds hinted, and a test that
 reads the select string, not just the mock's answer.
+
+### D-389 — Conversations: one divider per day; one rounded composer, send turns green
+
+**Date:** 2026-10-08. Will: "Separating bubbles by date instead of listing
+dates under each box. This way it's cleaner. And redesigning the chat box
+like this, minus gif support. When text is entered the send button gets dark
+green." (A reference: one rounded box, placeholder on top, a row of icons
+under it, a round send button bottom right.)
+
+- **Days.** Each day opens with one centred divider — Astryx's own
+  `ChatSystemMessage variant="divider"`, made for date separators — reading
+  "Today", "Yesterday", the weekday within the last week, then "Mon, Sep 21"
+  (the year only when it isn't this year). `dayLabel()`/`dayKey()` in
+  `lib/when.ts` count local calendar days, as `daysUntil` does; tested,
+  English and Spanish. A bubble keeps only its time.
+- **Composer.** `ChatComposer elevation="none"`: flat with a border, the
+  text on top, the footer row under it — the mic on the left
+  (`footerActions`), the send button on the right. The send button is a 48px
+  circle: grey (`--color-background-muted`, secondary text colour) while
+  there's nothing to send — not the half-faded green a disabled primary
+  button draws by default — and Pam's dark green primary once there is.
+  Typed text is 18px, like the messages (a `globals.css` rule on
+  `.astryx-chat-composer-input > div`; Astryx draws it at the type scale's
+  14px, 16px on touch, with no prop to reach it).
+- **No attach button.** The reference has a paperclip; Pam has no storage
+  for message attachments (only `staff-photos`), and a button that does
+  nothing is worse than none (§1). `messages` already has
+  `attachment_url`/`attachment_kind ('voice','photo')` columns, so adding it
+  is a bucket, its policies, an upload, and rendering — Will's call.

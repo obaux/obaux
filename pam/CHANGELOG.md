@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.45.5] — 2026-10-08 · Cleaner conversations
+
+A conversation is split by day — "Today", "Yesterday", the weekday, then the
+date — instead of a date under every message; each message keeps just its
+time. The box you type in is one rounded field with the microphone on the
+left and a round send button that turns dark green when there's something to
+send (D-389).
+
 ## [0.45.4] — 2026-10-08 · Live
 
 The changes since 0.43 are live: invites name the person they're for, one

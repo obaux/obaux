@@ -182,6 +182,15 @@
     outline: none;
   }
 
+  /*
+   * What you type in a conversation is the same 18px as what was said to you
+   * (D-389). Astryx sets the editor and its placeholder from the type scale
+   * (14px, 16px on touch) on the two children, with no prop to reach them.
+   */
+  .astryx-chat-composer-input > div {
+    font-size: 18px;
+  }
+
   :has(> input:focus-visible),
   :has(> textarea:focus-visible) {
     outline: 3px solid currentColor;

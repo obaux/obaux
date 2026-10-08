@@ -231,8 +231,8 @@ export const flows = [
         title: 'A conversation',
         story: 'member-created--conversation',
         path: '/messages/thread/',
-        changed: 'D-276',
-        note: 'With a program: the booked visit on top, opening the place; Back returns here',
+        changed: 'D-389',
+        note: 'Days divide the conversation, bubbles keep the time; one rounded composer, send turns green with text. With a program: the booked visit on top, opening the place',
       },
       options: { title: 'Conversation options', story: 'member-created--conversation-options', path: '/messages/thread/options/' },
       profile: {
@@ -297,6 +297,7 @@ export const flows = [
       ['profile', 'points', 'Points'],
     ],
     changes: [
+      'D-389 — a conversation: one divider per day (Today, Yesterday, a weekday, a date), each bubble just its time; the composer one rounded box, mic left, round send grey until there is text, then dark green',
       'D-337 — booked: the green visit card with Change; the friend drawer copies on open, with Will\'s banner and an ×; every place picture is its category illustration',
       'D-336 — booked: how soon, Policies to sign and Bring a friend (a drawer) as rows; × into Trips; Trips reads signatures per service',
       'D-333 — Bring a friend moves to "Your trip is booked", folded, with Copy; walk-ins plan a trip too; signing locks the sheet while drawing',
@@ -332,7 +333,13 @@ export const flows = [
       },
       saved: { title: 'Saved — starred people', story: 'case-manager-screens--saved', path: '/saved/' },
       messages: { title: 'Messages', story: 'case-manager-screens--messages', path: '/messages/' },
-      thread: { title: 'A conversation', story: 'case-manager-screens--conversation', path: '/messages/thread/' },
+      thread: {
+        title: 'A conversation',
+        story: 'case-manager-screens--conversation',
+        path: '/messages/thread/',
+        changed: 'D-389',
+        note: 'One divider per day; one rounded composer, send turns green with text',
+      },
       profile: { title: 'Profile', story: 'case-manager-screens--profile', path: '/profile/' },
       programs: { title: 'All programs', story: 'case-manager-screens--all-programs', path: '/programs/' },
       addProgram: {
@@ -362,7 +369,7 @@ export const flows = [
       ['programs', 'addProgram', 'Add'],
       ['profile', 'alerts', 'Text alerts'],
     ],
-    changes: ['D-347 — Add a program asks one question a screen, then a review', 'D-315 — a case manager can invite a case manager', 'D-263 — Invite someone makes the link straight away', 'D-260 — text alert switches'],
+    changes: ["D-389 — a conversation: one divider per day (Today, Yesterday, a weekday, a date), each bubble just its time; the composer one rounded box, mic left, round send grey until there is text, then dark green", 'D-347 — Add a program asks one question a screen, then a review', 'D-315 — a case manager can invite a case manager', 'D-263 — Invite someone makes the link straight away', 'D-260 — text alert switches'],
   },
   {
     key: 'program-lead',
@@ -557,7 +564,7 @@ export const flows = [
         title: 'With a case manager',
         story: 'super-admin-screens--thread',
         path: '/messages/thread/',
-        changed: 'D-262',
+        changed: 'D-389',
       },
       profile: { title: 'Profile', story: 'super-admin-screens--profile', path: '/profile/' },
       everyone: { title: 'Everyone', story: 'super-admin-screens--everyone', path: '/directory/' },
@@ -590,6 +597,7 @@ export const flows = [
       ['profile', 'viewAs', 'See the app as'],
     ],
     changes: [
+      'D-389 — a conversation: one divider per day (Today, Yesterday, a weekday, a date), each bubble just its time; the composer one rounded box, mic left, round send grey until there is text, then dark green',
       'D-349 — message a program\'s lead from the program\'s page',
       'D-315 — Invite someone from Profile and from Invited people; a case manager can be invited by a case manager',
       'D-263 — Invited people log replaces renewal approvals',

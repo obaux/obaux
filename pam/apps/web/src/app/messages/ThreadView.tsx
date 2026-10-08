@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef, useState } from 'react';
+import { Fragment, useRef, useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import {
   ChatComposer,
@@ -12,6 +12,7 @@ import {
   ChatMessageList,
   ChatMessageMetadata,
   ChatSendButton,
+  ChatSystemMessage,
   useChatDictation,
   useChatLayoutContext,
   useChatStreamScroll,
@@ -25,7 +26,8 @@ import { VStack } from '@astryxdesign/core/VStack';
 import { HStack } from '@astryxdesign/core/HStack';
 import { Notice } from '@pam/ui';
 import { useI18n } from '@/lib/i18n';
-import { whenHappened } from '@/lib/when';
+import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
+import { dayKey, dayLabel } from '@/lib/when';
 
 /**
  * One conversation, drawn with Astryx's Chat family (D-181): `ChatMessageList`
@@ -69,8 +71,21 @@ import { whenHappened } from '@/lib/when';
  * together (`ChatMessageList.tsx`'s `gapCompact`/`gapSpacious`), so this one
  * prop both tightens the row gap and, incidentally, gives bubbles more of
  * the phone's width — nothing here is hand-overridden. Every message still
- * carries its own name/timestamp row, so a tighter gap does not run two
- * bubbles from the same sender together without a visible break.
+ * carries its own name row, so a tighter gap does not run two bubbles from
+ * the same sender together without a visible break.
+ *
+ * Days, not dates, under bubbles (Will, 8 October, D-389): each day opens
+ * with one centred divider — "Today", "Yesterday", a weekday, then a date —
+ * and a bubble keeps only its time. A date repeated under every bubble was
+ * noise; one per day is what the conversation apps people already use do.
+ *
+ * The composer is one rounded box (D-389, Will's reference): the text on top,
+ * a row under it with the mic on the left and a round send button on the
+ * right — grey while there is nothing to send, Pam's dark green once there
+ * is. Flat, with a border (`elevation="none"`), so it reads as a field and
+ * not as a card floating over the conversation. No attach button yet: Pam
+ * has nowhere to keep a photo (no storage bucket), and a button that does
+ * nothing is worse than none.
  *
  * `ChatLayout` (D-192) owns the scrolling: the messages scroll, the
  * composer stays docked at the bottom as a sticky flex item, so the last
@@ -109,6 +124,17 @@ const styles = stylex.create({
   time: { fontSize: '13px' },
   // §2.5's floor, as a square: send and mic alike (A13, D-192).
   square: { width: '48px', height: '48px', minWidth: '48px', minHeight: '48px', flexShrink: 0 },
+  // The send button is a circle (D-389): grey until there is something to
+  // send — not the half-faded green a disabled primary button draws — then
+  // Pam's dark green.
+  round: { borderRadius: '50%' },
+  sendIdle: {
+    opacity: 1,
+    backgroundImage: 'none',
+    backgroundColor: colorVars['--color-background-muted'],
+    color: colorVars['--color-text-secondary'],
+  },
+  day: { fontSize: '14px', fontWeight: 600 },
   // The scroll region's inner column keeps the page's reading width.
   messages: { width: '100%' },
   // Reaching the end of the messages must not scroll the page under them.
@@ -165,6 +191,7 @@ export function ThreadView({
   const dictation = useChatDictation({ inputRef, lang: speechLanguage });
 
   const name = otherName ?? t('messages.thread.someone');
+  const canSend = draft.trim() !== '' && !sending;
 
   const submit = async (value: string) => {
     if (sending || value.trim() === '') return;
@@ -179,6 +206,7 @@ export function ThreadView({
       onSubmit={(value) => void submit(value)}
       placeholder={t('messages.thread.placeholder')}
       isDisabled={sending}
+      elevation="none"
       input={
         <ChatComposerInput
           handleRef={inputRef}
@@ -188,7 +216,7 @@ export function ThreadView({
           maxRows={4}
         />
       }
-      sendActions={
+      footerActions={
         <ChatDictationButton
           dictation={dictation}
           size="md"
@@ -197,7 +225,11 @@ export function ThreadView({
         />
       }
       sendButton={
-        <ChatSendButton size="md" sendIcon={<Icon icon="arrowUp" size="md" />} xstyle={styles.square} />
+        <ChatSendButton
+          size="md"
+          sendIcon={<Icon icon="arrowUp" size="md" />}
+          xstyle={[styles.square, styles.round, !canSend && styles.sendIdle]}
+        />
       }
     />
   );
@@ -215,38 +247,49 @@ export function ThreadView({
           </Text>
         }
       >
-        {messages.map((message) => {
-          const when = whenHappened(message.createdAt, locale, t);
+        {messages.map((message, i) => {
           const time = new Intl.DateTimeFormat(locale, { hour: 'numeric', minute: '2-digit' }).format(
             new Date(message.createdAt),
           );
+          // A divider opens each day (D-389).
+          const isNewDay = i === 0 || dayKey(message.createdAt) !== dayKey(messages[i - 1]!.createdAt);
           return (
-            <ChatMessage
-              key={message.id}
-              sender={message.mine ? 'user' : 'assistant'}
-              avatar={
-                message.mine ? undefined : <Avatar size="md" name={name} {...(otherPhotoUrl ? { src: otherPhotoUrl } : {})} />
-              }
-            >
-              <ChatMessageBubble
-                name={
-                  <Text type="supporting" xstyle={styles.time}>
-                    {message.mine ? t('messages.thread.you') : name}
+            <Fragment key={message.id}>
+              {isNewDay ? (
+                <ChatSystemMessage variant="divider">
+                  <Text type="supporting" xstyle={styles.day}>
+                    {dayLabel(message.createdAt, locale, t)}
                   </Text>
-                }
-                metadata={
-                  <ChatMessageMetadata
-                    timestamp={
-                      <Text type="supporting" xstyle={styles.time}>
-                        {when} · {time}
-                      </Text>
-                    }
-                  />
+                </ChatSystemMessage>
+              ) : null}
+              <ChatMessage
+                sender={message.mine ? 'user' : 'assistant'}
+                avatar={
+                  message.mine ? undefined : (
+                    <Avatar size="md" name={name} {...(otherPhotoUrl ? { src: otherPhotoUrl } : {})} />
+                  )
                 }
               >
-                <Text xstyle={styles.body}>{message.body ?? ''}</Text>
-              </ChatMessageBubble>
-            </ChatMessage>
+                <ChatMessageBubble
+                  name={
+                    <Text type="supporting" xstyle={styles.time}>
+                      {message.mine ? t('messages.thread.you') : name}
+                    </Text>
+                  }
+                  metadata={
+                    <ChatMessageMetadata
+                      timestamp={
+                        <Text type="supporting" xstyle={styles.time}>
+                          {time}
+                        </Text>
+                      }
+                    />
+                  }
+                >
+                  <Text xstyle={styles.body}>{message.body ?? ''}</Text>
+                </ChatMessageBubble>
+              </ChatMessage>
+            </Fragment>
           );
         })}
       </ChatMessageList>
