@@ -347,6 +347,72 @@ test.describe('a conversation', () => {
     expect(mic).not.toBe(heading);
   });
 
+  test('speaking a long message: the box grows to 8 lines, then keeps the newest words in view (D-397)', async ({ page }) => {
+    // A stand-in for the browser's speech recogniser: the test says the
+    // words, as final results, the way a phone's would arrive.
+    await page.addInitScript(() => {
+      type Handler = ((event?: unknown) => void) | null;
+      class FakeRecognition {
+        lang = '';
+        continuous = true;
+        interimResults = true;
+        onstart: Handler = null;
+        onend: Handler = null;
+        onresult: Handler = null;
+        onerror: Handler = null;
+        onnomatch: Handler = null;
+        onspeechstart: Handler = null;
+        onspeechend: Handler = null;
+        start() {
+          (window as unknown as { __speech: FakeRecognition }).__speech = this;
+          setTimeout(() => this.onstart?.(), 0);
+        }
+        stop() {
+          setTimeout(() => this.onend?.(), 0);
+        }
+        abort() {
+          this.onend?.();
+        }
+      }
+      const w = window as unknown as Record<string, unknown>;
+      w.SpeechRecognition = FakeRecognition;
+      w.webkitSpeechRecognition = FakeRecognition;
+      w.__say = (text: string, isFinal: boolean) => {
+        const result = Object.assign([{ transcript: text }], { isFinal });
+        (w.__speech as FakeRecognition).onresult?.({ resultIndex: 0, results: [result] });
+      };
+    });
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+
+    await page.getByRole('button', { name: 'Speak your message' }).click();
+    await expect(page.getByRole('button', { name: 'Stop listening' })).toBeVisible();
+    const editable = page.locator('.astryx-chat-composer-input [contenteditable="true"]');
+    const say = (text: string, isFinal: boolean) =>
+      page.evaluate(([words, final]) => (window as unknown as { __say: (t: string, f: boolean) => void }).__say(words, final), [text, isFinal] as const);
+
+    for (let i = 1; i <= 12; i++) {
+      await say(`This is sentence number ${i}, long enough to fill a line of the box.`, true);
+    }
+    await say('and these are the words still being heard', false);
+
+    const box = await editable.evaluate((el) => ({
+      height: el.clientHeight,
+      lineHeight: parseFloat(getComputedStyle(el).lineHeight),
+      gapBelow: el.scrollHeight - el.scrollTop - el.clientHeight,
+      overflowing: el.scrollHeight > el.clientHeight,
+    }));
+    // Grown past the old 4 lines, stopped at 8 (plus the box's own padding).
+    expect(box.overflowing).toBe(true);
+    expect(box.height).toBeGreaterThan(7 * box.lineHeight);
+    expect(box.height).toBeLessThanOrEqual(8 * box.lineHeight + 8);
+    // Scrolled to the newest words, not left on an old line.
+    expect(box.gapBelow).toBeLessThanOrEqual(1);
+    await expect(page.getByText('and these are the words still being heard')).toBeInViewport();
+  });
+
   test('the send icon matches the mic icon\'s size (D-192 addendum)', async ({ page }) => {
     await signedInAs(page, 'admin');
     await withOneConversation(page);

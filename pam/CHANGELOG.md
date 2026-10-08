@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.46.3] — 2026-10-08 · Talk as long as you like
+
+When you speak a message, the box now follows your words: the newest line
+stays in sight instead of disappearing below. The box also grows to eight
+lines before it starts to scroll, so a long message, spoken or typed, has
+room (D-397).
+
 ## [0.46.2] — 2026-10-08 · A quieter message box
 
 The space under the message box is now part of the soft fade behind it,

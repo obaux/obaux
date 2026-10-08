@@ -9815,3 +9815,33 @@ less emphasis."
   the blur working on the phone; if the strip under the composer should be
   page colour rather than frosted, that is a tint on this same layer.
 
+### D-397 — Speaking a long message: the box follows the words, and grows to 8 lines
+
+**Date:** 2026-10-08. Will: "When voice is enabled, the text line should
+follow the words, rn after 4 lines it stays on 4th line even though I keep
+talking and new lines are added below out of sight. Scroll to track new
+lines, and allow up to 8 lines of text for box expansion so if they're
+type a lot the box grows taller."
+
+- The box grew to 4 lines (`maxRows={4}`), then scrolled inside itself.
+  Typing keeps the caret in view because the browser scrolls to it; the
+  mic does not type. `useChatDictation` writes into the box from script —
+  a grey span of the words still being heard at the end, then the settled
+  words through the input's `insertText` — and the browser follows none of
+  that. Measured with a stand-in recogniser on the old build: after twelve
+  spoken sentences the newest words sat 338px below the bottom of the box.
+- While the mic listens, a `MutationObserver` on the box scrolls it to its
+  last line after every change, so the words being heard are always the
+  line you see. Only while listening: somebody editing the middle of a long
+  message by hand is never pulled to the end. Settled words arrive before
+  the recogniser's end event, so the last of them is followed too.
+- `maxRows` 4 → 8, Astryx's own default: the box grows to 8 lines (176px of
+  text at the input's 22px line) before it scrolls, for typing as much as
+  for speaking. On a small phone with the keyboard up that leaves less of
+  the conversation showing while a long message is being written; it comes
+  back as soon as the message is sent.
+- e2e: a stand-in recogniser says twelve long sentences and a phrase still
+  being heard; the box is taller than 7 lines and no taller than 8, scrolled
+  to its end, and the heard phrase is in view. On the old build it fails on
+  both counts (88px tall; 338px of text below sight).
+

@@ -1,6 +1,6 @@
 'use client';
 
-import { Fragment, useRef, useState, type ReactNode } from 'react';
+import { Fragment, useEffect, useRef, useState, type ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import {
   ChatComposer,
@@ -365,6 +365,29 @@ export function ThreadView({
   const [draft, setDraft] = useState('');
   const dictation = useChatDictation({ inputRef, lang: speechLanguage });
 
+  // While the mic is on, the words follow you (Will, 8 October, D-397). The
+  // box grows to 8 lines, then scrolls inside itself; a typed word keeps
+  // the caret in view because the browser scrolls to it, but dictated words
+  // are written into the box from script — the grey words still being heard
+  // at the end, then the settled ones — and the browser follows none of
+  // that, so from the 9th line on you talked into lines out of sight. So
+  // while it listens, every change to the box scrolls it to its last line.
+  // Only then: someone editing the middle of a long message by hand is
+  // never pulled away from where they are.
+  const inputBox = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!dictation.isListening) return;
+    const editable = inputBox.current?.querySelector<HTMLElement>('[contenteditable]');
+    if (!editable) return;
+    const follow = () => {
+      editable.scrollTop = editable.scrollHeight;
+    };
+    follow();
+    const watch = new MutationObserver(follow);
+    watch.observe(editable, { childList: true, subtree: true, characterData: true });
+    return () => watch.disconnect();
+  }, [dictation.isListening]);
+
   const name = otherName ?? t('messages.thread.someone');
   // A photo picked to send (D-394), shown above where you type until it goes.
   const picker = useRef<HTMLInputElement>(null);
@@ -422,11 +445,12 @@ export function ThreadView({
       }
       input={
         <ChatComposerInput
+          ref={inputBox}
           handleRef={inputRef}
           label={t('messages.thread.placeholder')}
           placeholder={t('messages.thread.placeholder')}
           hasHistory={false}
-          maxRows={4}
+          maxRows={8}
         />
       }
       footerActions={
