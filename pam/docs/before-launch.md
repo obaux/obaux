@@ -29,7 +29,7 @@ STATUS row too.
   Until this is done, someone with an expired link is told "Check your email"
   and nothing arrives.
 
-- [ ] **Merge and deploy 0068 and 0069** (readiness fixes and blocking, on
+- [x] **Merge and deploy 0068 and 0069** — done 8 October as 0075/0076 (D-388) (readiness fixes and blocking, on
   branch `claude/hopeful-thompson-07nj7n`, not yet on this one). 0068 is what
   lets an invite be redeemed at all (phone format) and closes several live
   holes (D-204–D-207). **0069 rewrites `can_message`, and so did 0072 (now
@@ -48,14 +48,14 @@ STATUS row too.
     `profiles_phone_e164` trigger) is live as a side effect of isolating
     this; 0075 is correctly not recorded as deployed.
 
-- [ ] **Deploy 0077 after 0075/0076** (D-373): invites need a name and a
+- [x] **Deploy 0077 after 0075/0076** — done 8 October (D-388) (D-373): invites need a name and a
   phone, and sign-in finds a waiting invite by phone. The app on this
   branch calls the 4-argument `create_invite`; until 0077 is live, making
   an invite from it fails. Ship them together.
 
-- [ ] **Deploy 0078 after 0077** (D-375): one account, member + program.
-  The app reads `profile_roles` in the session; it falls back to one role
-  without it, but switching and adding a program need 0078.
+- [x] **Deploy 0078 after 0077** — done 8 October (D-388) (D-375): one
+  account, member + program. The session reads `profile_roles`; it names the
+  `profile_id` foreign key, because the table points at `profiles` twice.
 
 - [ ] **Approve the Pam-team line on the transparency screen** (STATUS row
   10b). Members were promised they would hear first if what is visible
