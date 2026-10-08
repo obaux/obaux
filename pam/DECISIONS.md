@@ -9566,3 +9566,44 @@ under it, a round send button bottom right.)
   nothing is worse than none (§1). `messages` already has
   `attachment_url`/`attachment_kind ('voice','photo')` columns, so adding it
   is a bucket, its policies, an upload, and rendering — Will's call.
+
+### D-390 — Conversations: drag to see the times; mine green, theirs grey; bolder icons; slimmer sides
+
+**Date:** 2026-10-08. Will, on D-389's screenshot: "The mic icon and attach
+icon need to be bolder. Less left and right padding on screen. The metadata
+you and timestamp should be something you drag to side to see, like
+iMessages. Light Green chat bubbles is me, and gray is them."
+
+- **Who and when, out of sight.** No "You"/name over a bubble and no time
+  under it. Side, colour and the photo say who. Dragging the conversation
+  sideways slides each time in at the right edge; letting go eases it back
+  (`RevealTimes` in `ThreadView.tsx`). As in iMessage, only my bubbles move
+  — theirs, the avatars and the day dividers stay put — so every bubble
+  leaves the 84px time column free (`min(max(80%, 280px), 100% - 84px)`,
+  Astryx's own cap otherwise), and a time never lands on a bubble.
+- **How the drag is built.** Pointer events on one wrapper with
+  `touch-action: pan-y`: a drag that starts sideways is ours (pointer
+  capture, clamped to 84px), one that starts up or down stays the browser's
+  scroll. The distance is a custom property (`--pam-reveal`) set on the
+  wrapper and read by the bubbles and times, so a pointer move restyles one
+  element and re-renders no messages. The times sit just past each row's
+  end, clipped by `overflow-x: clip` (not `hidden`, which would make a
+  second scroll box). Reduced motion: no ease, it snaps back.
+- **Screen readers lose nothing.** Each message's name and time are its
+  label — `ChatMessage`'s own `name` slot, visually hidden — so the article
+  reads "Teresa, 3:01 PM" (before this it was Astryx's fallback, "Message
+  from assistant"). The visible time is `aria-hidden`. A hidden name row
+  still brings Astryx's 4px gap; the bubble takes it back with a −4px
+  margin so it sits level with the avatar.
+- **Colours.** Mine `--color-background-green` (Astryx's light green, a
+  token in both modes); theirs the default `--color-neutral` grey.
+- **Bolder icons.** The composer's mic and send arrow are drawn at stroke
+  2.25 instead of 1.5, both together so they stay matched (D-192). The mic
+  is `ChatDictationButton`'s own with no icon prop, so it is one
+  `globals.css` rule, `.astryx-chat-composer svg`. There is no attach icon:
+  that is still Will's call (D-389).
+- **Slimmer sides.** The thread frame's 12px side padding moved onto the
+  header block (`ThreadTop`, which the demo thread now uses too), so the
+  conversation sits on Astryx's own 12px list padding and the composer on
+  its 8px dock: bubbles 12px from the screen edge (was 24), the composer 8px
+  (was 20).

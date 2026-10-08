@@ -325,6 +325,7 @@
   "messages.report.failed.title": "That did not send",
   "messages.report.failed.body": "Your connection dropped, or this message was already reported. Try again, or call Pam.",
   "messages.start.member.title": "Message your case manager or program",
+  "messages.thread.from": "{name}, {time}",
   "messages.thread.you": "You",
   "messages.thread.dictate": "Speak your message",
   "messages.thread.dictateStop": "Stop listening",

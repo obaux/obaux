@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.45.6] — 2026-10-08 · Drag to see the time
+
+In a conversation, your messages are light green and theirs grey, and
+neither has a name or time printed with it any more: drag the conversation
+sideways to see when each one was sent, and let go to put it back, as on an
+iPhone. The messages reach closer to the edges of the screen, and the
+microphone and send arrow are drawn heavier (D-390).
+
 ## [0.45.5] — 2026-10-08 · Cleaner conversations
 
 A conversation is split by day — "Today", "Yesterday", the weekday, then the

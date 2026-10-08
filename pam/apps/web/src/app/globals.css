@@ -191,6 +191,17 @@
     font-size: 18px;
   }
 
+  /*
+   * The composer's two icons, the mic and the send arrow, drawn heavier than
+   * Astryx's 1.5 (Will, 8 October, D-390: "need to be bolder"). The mic is
+   * `ChatDictationButton`'s own, with no icon prop to swap; the SVG's
+   * `stroke-width` attribute is the weakest rule there is, so this one line
+   * is enough. Both together, so the pair stays matched (D-192).
+   */
+  .astryx-chat-composer svg {
+    stroke-width: 2.25;
+  }
+
   :has(> input:focus-visible),
   :has(> textarea:focus-visible) {
     outline: 3px solid currentColor;

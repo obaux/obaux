@@ -18,8 +18,8 @@ import { spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
  * screen where that is wrong on a phone: the name you are talking to and
  * the box you type in have to stay put while the history moves.
  *
- * So this is a fixed full-viewport flex column, close to `Page`'s own width
- * and side padding, and no `PageEnter` fade: the composer is the thing
+ * So this is a fixed full-viewport flex column at `Page`'s own width, and no
+ * `PageEnter` fade: the composer is the thing
  * somebody is reaching for and should not arrive late. `ChatLayout` inside
  * it owns the scroll region and docks the composer as a sticky flex item,
  * so the last message is never under it (the library's own layout
@@ -64,14 +64,16 @@ const styles = stylex.create({
     width: '100%',
     maxWidth: '560px',
     marginInline: 'auto',
-    paddingInline: spacingVars['--spacing-3'],
     paddingBlockStart: spacingVars['--spacing-4'],
     paddingBlockEnd: 'env(safe-area-inset-bottom, 0px)',
     display: 'flex',
     flexDirection: 'column',
     minHeight: 0,
   },
-  top: { flexShrink: 0, paddingBlockEnd: '8px' },
+  // The side gutter is the header's alone (D-390): the conversation under it
+  // runs closer to the screen's edges, on Astryx's own 12px list padding and
+  // 8px composer dock.
+  top: { flexShrink: 0, paddingBlockEnd: '8px', paddingInline: spacingVars['--spacing-3'] },
   row: { width: '100%', minHeight: '48px' },
   back: {
     minHeight: '48px',

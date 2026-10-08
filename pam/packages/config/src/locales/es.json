@@ -325,6 +325,7 @@
   "messages.report.failed.title": "Eso no se envio",
   "messages.report.failed.body": "Se perdio la conexion, o este mensaje ya fue reportado. Intente de nuevo, o llame a Pam.",
   "messages.start.member.title": "Escribale a su gestor de casos o a su programa",
+  "messages.thread.from": "{name}, {time}",
   "messages.thread.you": "Usted",
   "messages.thread.dictate": "Diga su mensaje",
   "messages.thread.dictateStop": "Dejar de escuchar",

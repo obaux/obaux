@@ -855,6 +855,18 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
+## Conversations, redrawn (8 October) — 0.45.5 and 0.45.6, on the branch
+
+D-389 and D-390, **on `claude/pam-storybook`, not merged to `main`.** A
+conversation opens each day with one divider ("Today", "Yesterday", a
+weekday, a date). Bubbles carry no name or time: mine are light green on the
+right, theirs grey on the left with their photo, and a sideways drag slides
+the times in at the right edge (`RevealTimes`; each message keeps "name,
+time" as its screen-reader label). The composer is one rounded field: the
+mic bottom left, a round send button bottom right, grey until there is text,
+then dark green; both icons at stroke 2.25. Bubbles sit 12px from the screen
+edge, the composer 8px. No attach button — see Backlog.
+
 ## Release 0.45.0-two-roles (7 October) — one account, member and program
 
 D-375, **merged to `main` 8 October; 0078 live 8 October (D-388)**
@@ -927,6 +939,10 @@ link (D-331) are part of it.
 Open items Will asked to keep (7 October), newest first. Read this before
 "Next" below, which is older.
 
+- **Photos in messages** (D-389, D-390): Will's reference has a paperclip;
+  Pam has no storage for message attachments. `messages` already has
+  `attachment_url`/`attachment_kind`, so it is a bucket, its policies, an
+  upload and rendering — waiting on Will's yes.
 - **One account, both roles — follow-ups** (D-375): notifications by
   role (the bell shows the acting side's; a dot on the switch for the other);
   the two transparency lines, worded by Will, before launch.

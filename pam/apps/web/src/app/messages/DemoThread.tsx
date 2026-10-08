@@ -9,7 +9,7 @@ import { useI18n } from '@/lib/i18n';
 import { sendDemoThreadMessage, useDemoThread } from '@/lib/demoMessages';
 import { staffPhotoFor } from '@pam/config/dummy-connections';
 import { ThreadView } from './ThreadView';
-import { ThreadHeader } from './ThreadFrame';
+import { ThreadHeader, ThreadTop } from './ThreadFrame';
 import { ThreadVisit } from './ThreadVisit';
 
 /**
@@ -71,17 +71,19 @@ export function DemoThread({
 
   return (
     <>
-      <ThreadHeader
-        name={other?.firstName ?? t('messages.thread.someone')}
-        context={context}
-        backHref={backHref}
-        backLabel={backLabel ?? t('nav.back.messages')}
-        menuHref={`/messages/thread/options/?id=${encodeURIComponent(conversationId)}`}
-      />
-      {/* A member's visit with this program, under the name (D-276). */}
-      {role === 'member' && other?.role === 'provider' ? (
-        <ThreadVisit programName={other.orgName ?? null} threadId={conversationId} />
-      ) : null}
+      <ThreadTop>
+        <ThreadHeader
+          name={other?.firstName ?? t('messages.thread.someone')}
+          context={context}
+          backHref={backHref}
+          backLabel={backLabel ?? t('nav.back.messages')}
+          menuHref={`/messages/thread/options/?id=${encodeURIComponent(conversationId)}`}
+        />
+        {/* A member's visit with this program, under the name (D-276). */}
+        {role === 'member' && other?.role === 'provider' ? (
+          <ThreadVisit programName={other.orgName ?? null} threadId={conversationId} />
+        ) : null}
+      </ThreadTop>
       <ThreadView
         messages={messages}
         otherName={other?.firstName ?? null}
