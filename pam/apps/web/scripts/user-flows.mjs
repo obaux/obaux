@@ -217,6 +217,23 @@ function header(flow, width) {
 </div>`;
 }
 
+/**
+ * The latest-changes panel sits at the top right, 400px wide and 460px in
+ * from the edge. When the first screens already reach that edge it sat on
+ * the last of them (the member map, 8 October, once it had seven changes),
+ * so the page widens until the panel clears every screen beside it. Its
+ * height is estimated from the text: 13px at 145% in a 356px column, about
+ * 50 characters a line.
+ */
+function clearOfPanel(flow, pos, width) {
+  const changes = flow.changes ?? [];
+  if (!changes.length) return width;
+  const bottom = 56 + 58 + changes.reduce((h, c) => h + 8 + Math.ceil(c.length / 50) * 19, 0);
+  const beside = Object.entries(pos).filter(([, p]) => p.y < bottom);
+  const right = Math.max(0, ...beside.map(([id, p]) => p.x + cardW(flow.nodes[id])));
+  return Math.max(width, right + 40 + 460);
+}
+
 function changesPanel(flow, width) {
   if (!flow.changes?.length) return '';
   return `
@@ -246,7 +263,8 @@ const homes = {};
 
 for (const flow of flows) {
   if (only && flow.key !== only) continue;
-  const { pos, width, height } = layout(flow);
+  const { pos, width: laidOut, height } = layout(flow);
+  const width = clearOfPanel(flow, pos, laidOut);
   const shots = {};
   for (const [id, node] of Object.entries(flow.nodes)) {
     shots[id] = await shoot(node, join(out, 'thumbs', `${flow.key}--${id}.jpg`));
