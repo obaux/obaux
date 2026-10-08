@@ -27,7 +27,7 @@
  *   changes  — the newest decisions this flow shows, newest first
  */
 
-export const UPDATED = '2026-10-07';
+export const UPDATED = '2026-10-08';
 
 /** Where each screen opens live — the branch's Storybook on Chromatic. */
 export const STORYBOOK_URL = 'https://claude-pam-storybook--6abea9193da46b88ce90890f.chromatic.com';
@@ -72,7 +72,7 @@ export const flows = [
         story: 'onboarding--case-manager',
         path: '/join/',
         changed: 'D-369',
-        note: 'Step 1 — no card; invited-as banner; city from a list; no role question; count on the pinned Next',
+        note: 'Step 1 — no card; invited-as banner; city from a list; no role question; count on the pinned Next. No link? Pam finds the invite for the number',
         actions: [
           { fill: 'Your phone number', value: '215 555 0100' },
           { click: 'Send me a code' },
@@ -149,7 +149,6 @@ export const flows = [
       ['preview', 'invited', 'Tap the link'],
       ['invited', 'code', 'Phone number'],
       ['code', 'join', '6-digit code'],
-      ['code', 'join', 'No link: Pam finds the invite for this number', { dashed: true }],
       ['code', 'inUse', 'Staff invite, number already a member'],
       ['code', 'addProgram', 'Program invite, member in the same city'],
       ['join', 'cmHome', 'I understand — straight to Home'],
@@ -376,8 +375,8 @@ export const flows = [
         title: 'Home — getting started',
         story: 'program-lead-screens--home-get-started',
         path: '/ (new account)',
-        changed: 'D-352',
-        note: 'Add your program, Add your photo, See who is coming in; then Book a visit and Invite someone as rows. No search, no +',
+        changed: 'D-384',
+        note: 'Add your program — or, once sent, its status, the picture shimmering while Pam checks; Add your photo; See who is coming in. Then Invite someone; Create new booking only once the program is live. No search, no +',
       },
       folded: {
         title: 'Home — first bookings',
@@ -397,15 +396,15 @@ export const flows = [
         title: 'Add a program',
         story: 'program-lead-screens--add-program',
         path: '/programs/new/?from=home',
-        changed: 'D-352',
-        note: 'One question a screen; Next pinned to the foot with "2 of 7" in it; from Home, Back and the end go Home',
+        changed: 'D-383',
+        note: 'One question a screen; Next pinned to the foot with "2 of 7" in it. From Home, or as the Program tab before approval (no bottom bar), Back goes Home',
       },
       programSent: {
         title: 'Sent to Pam',
         story: 'program-lead-states-program-sent-for-review--just-sent',
         path: '/program/ (under review)',
-        changed: 'D-381',
-        note: 'Hero with confetti; Sent → Pam checks → live; While you wait (photo, policies, text me). The Program tab until approved; Back is Home. After 3 days "Still checking" + Ask Pam; "needs changes" shows Pam\'s note + Edit and send again',
+        changed: 'D-386',
+        note: 'Hero with confetti; Sent → Pam checks (spinning, "1–2 days") → live; While you wait (text me first, until texts are on; photo; policies). No bottom bar. The Program tab until approved; Back is Home. After 3 days "Still checking" + Ask Pam; "needs changes" shows Pam\'s note + Edit and send again',
       },
       whatYouSent: {
         title: 'What you sent',
@@ -486,14 +485,14 @@ export const flows = [
     edges: [
       ['getStarted', 'addProgram', 'Add your program'],
       ['addProgram', 'programSent', 'Add program'],
-      ['programSent', 'getStarted', 'Back — Home, no Add a program card'],
+      ['programSent', 'getStarted', 'Back · Home'],
       ['programSent', 'alerts', 'Text me when it\'s live'],
       ['programSent', 'profile', 'Add your photo'],
       ['programSent', 'policies', 'Add your policies'],
       ['programSent', 'whatYouSent', 'See what you sent'],
       ['whatYouSent', 'addProgram', '⋯ Delete and start over'],
-      ['addProgram', 'getStarted', 'Back (as the Program tab) — Home'],
-      ['programSent', 'addProgram', 'Needs changes — Edit and send again'],
+      ['addProgram', 'getStarted', 'Back · Home'],
+      ['programSent', 'addProgram', 'Edit and send again'],
       ['programSent', 'help', 'Taking longer — Ask Pam'],
       ['getStarted', 'programSent', 'Your program is in review'],
       ['getStarted', 'profile', 'Add your photo'],
@@ -513,7 +512,10 @@ export const flows = [
       ['profile', 'alerts', 'Text alerts'],
     ],
     changes: [
-      'D-383–386 — before approval the Program tab covers the bar, Back Home; Pam\'s step spins with "1–2 days"; Home card shimmers; Create new booking only once live; Text me first; ⋯ Delete and start over',
+      'D-386 — Sent to Pam: Text me when it\'s live first, gone once texts are on',
+      'D-385 — What you sent: ⋯ Delete and start over (asks first) → Add a program; Back on the pre-approval tab is always Home',
+      'D-384 — Pam\'s step spins, "Usually takes 1–2 days"; Home\'s review card shimmers; Create new booking only once live',
+      'D-383 — before approval the Program tab covers the bottom bar; Next and Edit and send again pinned',
       'D-381 — the wait: Home shows the status; While you wait; needs changes → Edit and send again; What you sent; Ask Pam after 3 days',
       'D-379 — after Add program: "Sent to Pam" (hero, confetti, three steps); the Program tab until approved',
       'D-352 — a new lead\'s Home is getting started: three cards and two rows; the calendar folds while setup is unfinished; title centred; search past ten visits',
