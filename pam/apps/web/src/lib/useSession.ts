@@ -94,10 +94,13 @@ export function useSession(): { state: SessionState; refresh: () => void } {
         }
         knownUser.current = auth.user.id;
 
+        // `profile_roles` points at `profiles` twice (whose roles, and who
+        // granted them), so the embed names its foreign key: without the hint
+        // PostgREST refuses the ambiguous join and every sign-in fails (D-388).
         const { data: profile, error } = await supabase
           .from('profiles')
           .select(
-            'id, role, first_name, photo_url, region_id, access_status, onboarded_at, preferred_language, is_demo, regions(name), profile_roles(role)',
+            'id, role, first_name, photo_url, region_id, access_status, onboarded_at, preferred_language, is_demo, regions(name), profile_roles!profile_roles_profile_id_fkey(role)',
           )
           .eq('id', auth.user.id)
           .maybeSingle();

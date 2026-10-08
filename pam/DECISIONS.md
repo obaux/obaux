@@ -9514,3 +9514,26 @@ then 0077, then 0078 (0078 redefines `can_message()`, `people_activity()`,
 idempotent `create or replace`, safe to run after the others). Re-run
 `list_migrations` immediately before, since this session confirmed there is
 no drift as of 8 October but that can change.
+
+### D-388 — 0075–0078 live from the SQL editor; the session names its `profile_roles` key
+
+**Date:** 2026-10-08. The merge (D-387) put code on production that needs
+0075–0078 before they were live. Will then ran them himself in the Supabase
+SQL editor, from one file: the four migrations in order inside one
+transaction, then a guarded insert into `supabase_migrations.schema_migrations`
+under the file names (versions `20261008160000`–`…03`). That file was run
+through the full DB suite in place of the four before Will ran it. Checked on
+live afterwards: all four recorded; `profile_roles` holds every account's
+role; `create_invite` takes the name; `phone` is no longer readable by
+`authenticated`; every stored phone is E.164; `get_advisors` shows only the
+by-design SECURITY DEFINER warnings.
+
+**A bug the mocks could not catch.** `profile_roles` has two foreign keys to
+`profiles` (`profile_id`, `granted_by`). The session's
+`select(... profile_roles(role))` is therefore ambiguous to PostgREST, which
+refuses it (PGRST201), so every sign-in would fail even with 0078 live. The
+e2e suite answers the session from a mock and never saw it. Fix: the embed
+names its key, `profile_roles!profile_roles_profile_id_fkey(role)`; the
+response key is unchanged. Rule for next time: any new table with two
+foreign keys to the same table needs its embeds hinted, and a test that
+reads the select string, not just the mock's answer.

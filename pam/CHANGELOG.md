@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.45.4] — 2026-10-08 · Live
+
+The changes since 0.43 are live: invites name the person they're for, one
+account can be both a member and a program, people can block each other in
+a conversation, and phone numbers are kept out of reach of the app. Signing
+in works again after the database caught up (D-388).
+
 ## [0.45.3] — 2026-10-07 · A program of their own, before it's live
 
 Until Pam approves a new program, the Program tab is a page of its own with

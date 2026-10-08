@@ -857,7 +857,7 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ## Release 0.45.0-two-roles (7 October) — one account, member and program
 
-D-375, **merged to `main` 8 October (PR #27); 0078 still not deployed**
+D-375, **merged to `main` 8 October; 0078 live 8 October (D-388)**
 (order: 0075, 0076, 0077, 0078). `profile_roles` + acting `profiles.role`,
 `switch_role`, `add_role_from_invite`, own-program guards; app: `roles` in the
 session, `/use-as/`, `/invite/add/`. DB suite (file 14) and e2e 588/588
@@ -866,7 +866,7 @@ wording before launch.
 
 ## Release 0.44.0-invites (7 October) — invites know who they're for
 
-D-373, **merged to `main` 8 October (PR #27); 0077 still not deployed**.
+D-373, **merged to `main` 8 October; 0077 live 8 October (D-388)**.
 Invites need a name and phone (`InviteForWho` on every invite screen);
 sign-in asks `pending_invite_for_me()` and joins a person as their waiting
 invite even without the link; a member's number with a staff invite gets
@@ -938,21 +938,11 @@ Open items Will asked to keep (7 October), newest first. Read this before
   story state. Real status, Pam's note on "needs changes", and a text when it
   goes live need "Load a program lead's own program" (before-launch) plus a
   reviewer-note field. Delete and start over (D-385) clears it here only.
-- **Apply 0077, then 0078** after 0075/0076 (D-373, D-375).
-- **Apply 0075 then 0076 to the live project** — 0068/0069 carried over and
-  reconciled with 0072 (D-346); DB suite green. Their `drop` statements need
-  a person's approval in the Supabase tool. Also on `docs/before-launch.md`.
-  **Confirmed 8 October, not just assumed (D-387):** isolated the exact
-  blocker. `CREATE FUNCTION`/`CREATE TRIGGER`/`COMMENT`/`REVOKE` all run
-  instantly against the live project; a bare `DROP TRIGGER IF EXISTS`
-  times out every time, reproducibly, through both `apply_migration` and
-  raw `execute_sql` — on a trigger that did not even exist yet, so it is
-  not about the object, it is about the statement. No tool in this session
-  can get past it; it needs Will, directly, in the Supabase dashboard. Side
-  effect while isolating this: `to_e164()`, `normalise_phone()`, and the
-  `profiles_phone_e164` trigger (phone normalised to E.164 on
-  insert/update) are live — a harmless, idempotent slice of 0075, not the
-  whole thing. `0075` is correctly **not** recorded as deployed.
+- **0075–0078 are live** (8 October, D-388): Will ran them from the Supabase
+  SQL editor as one transaction (the connector can't run `DROP TRIGGER`/
+  `DROP POLICY`, D-387); recorded in `schema_migrations` under their file
+  names, so `list_migrations` matches `packages/db/migrations/` again.
+  `get_advisors` shows only the by-design SECURITY DEFINER warnings.
 - **Block in conversations** — 0076 adds `block_in_conversation` /
   `unblock_in_conversation` / `conversation_block_state`; the redesign's
   thread options have Report but no Block row.
