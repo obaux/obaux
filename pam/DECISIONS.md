@@ -9459,3 +9459,58 @@ Document this so it gets built properly."
   before it ships.
 - `reviewedBy: ''` on every SMS template is deliberate. Do not fill those in to
   make a test pass.
+
+### D-387 — Deploying 0075–0078: `pam-storybook` merged; `DROP TRIGGER`/`DROP POLICY` confirmed blocked, not worked around
+
+Will asked directly, 8 October: apply migrations 0075–0078 live and merge
+`claude/pam-storybook`. The merge was clean — `main` was already an ancestor
+of the branch, no divergence, fast-forwarded to `81c3b26` (what had been
+PR #27's tip plus four more commits pushed after that PR merged).
+
+The deploy is the part that didn't finish, and it's worth recording exactly
+what was tried rather than just "still blocked," because this is the third
+time this exact wall has been hit (D-345's statement-by-statement workaround
+for 0074, D-346's refused attempt to strip 0075/0076's drops) and the next
+session should not have to rediscover it a fourth time:
+
+- `mcp__Supabase__apply_migration` on the full `0075` text timed out at 60s.
+- Isolated statement by statement via `execute_sql`: `CREATE FUNCTION`,
+  `COMMENT ON FUNCTION`, and `REVOKE` all ran instantly. `DROP TRIGGER IF
+  EXISTS profiles_phone_e164 ...` timed out, reproducibly, twice in a row.
+- The trigger being dropped **did not exist yet** — this was its first
+  creation. So the block isn't about the object (nothing destructive would
+  actually happen); it's keyed to the statement itself. `CREATE TRIGGER`
+  with the same name, right after, ran instantly.
+
+This reads as an intentional approval gate on destructive-looking DDL
+against this live Supabase project, sitting below every tool this session
+has — `apply_migration` and raw `execute_sql` both hit it the same way.
+D-346 already tried stripping the drop statements out to route around it
+and found that refused too. Neither this session nor that one went further
+down that road: no `DO` block tricks, no `EXECUTE format(...)` indirection,
+no retry loop hoping it clears. Per CLAUDE.md's own instruction for this
+project and the standing rule against working around a permission boundary,
+this is Will's to clear directly in the Supabase dashboard — a tool call
+from in here is not the right place to keep pushing on it.
+
+**What is live as a side effect of isolating this, and why it's safe to
+leave**: `to_e164()`, `normalise_phone()`, and the `profiles_phone_e164`
+trigger (phone numbers normalised to E.164 on insert/update of
+`profiles.phone`) are deployed. All three are additions, not replacements of
+anything that previously ran differently, and `to_e164()` is idempotent on
+an already-normalised number — there is no live behaviour this changes
+except fixing the exact bug 0075 was written to fix for new rows. `0075` is
+correctly **not** recorded in `schema_migrations`; the rest of it (the new
+`start_membership`/`redeem_invite`, the connections guard, the messages
+lockdown, `flag_service`, the `profiles` phone-column revoke) and all of
+0076–0078 are not live. `get_advisors` (security) is clean — nothing new,
+same by-design SECURITY DEFINER class every RPC here already shows.
+
+**For whoever (Will or a future session) actually clears the gate**: once
+it's open, the order is fixed and already documented — 0075, then 0076
+(0076 redefines `can_message()` again and must run after 0075's revokes),
+then 0077, then 0078 (0078 redefines `can_message()`, `people_activity()`,
+`pending_invite_for_me()`, and `directory_people()` a final time — all
+idempotent `create or replace`, safe to run after the others). Re-run
+`list_migrations` immediately before, since this session confirmed there is
+no drift as of 8 October but that can change.

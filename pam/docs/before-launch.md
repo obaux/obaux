@@ -39,6 +39,14 @@ STATUS row too.
   - Merged and rebased 7 October as **0075/0076** (D-346): `can_message` keeps
     0072's arm, the DB suite passes. **Left: apply 0075 then 0076 to the live
     project, approving their `drop` statements.**
+  - 8 October: Will asked for this deploy directly. Confirmed exactly what
+    blocks it (D-387) — `DROP TRIGGER`/`DROP POLICY` statements time out
+    through every tool this session has, Supabase-side, whether or not the
+    object exists; `CREATE`/`COMMENT`/`REVOKE` all work instantly. This
+    needs Will, in the Supabase dashboard itself, not another attempt from
+    here. A harmless slice of 0075 (`to_e164()`, `normalise_phone()`, the
+    `profiles_phone_e164` trigger) is live as a side effect of isolating
+    this; 0075 is correctly not recorded as deployed.
 
 - [ ] **Deploy 0077 after 0075/0076** (D-373): invites need a name and a
   phone, and sign-in finds a waiting invite by phone. The app on this

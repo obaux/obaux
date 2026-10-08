@@ -857,8 +857,8 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ## Release 0.45.0-two-roles (7 October) — one account, member and program
 
-D-375, on `claude/pam-storybook`, **not merged; 0078 not deployed** (order:
-0075, 0076, 0077, 0078). `profile_roles` + acting `profiles.role`,
+D-375, **merged to `main` 8 October (PR #27); 0078 still not deployed**
+(order: 0075, 0076, 0077, 0078). `profile_roles` + acting `profiles.role`,
 `switch_role`, `add_role_from_invite`, own-program guards; app: `roles` in the
 session, `/use-as/`, `/invite/add/`. DB suite (file 14) and e2e 588/588
 green. Left: notifications split by role; the transparency lines need Will's
@@ -866,10 +866,10 @@ wording before launch.
 
 ## Release 0.44.0-invites (7 October) — invites know who they're for
 
-D-373, on `claude/pam-storybook`, **not merged; 0077 not deployed**. Invites
-need a name and phone (`InviteForWho` on every invite screen); sign-in asks
-`pending_invite_for_me()` and joins a person as their waiting invite even
-without the link; a member's number with a staff invite gets
+D-373, **merged to `main` 8 October (PR #27); 0077 still not deployed**.
+Invites need a name and phone (`InviteForWho` on every invite screen);
+sign-in asks `pending_invite_for_me()` and joins a person as their waiting
+invite even without the link; a member's number with a staff invite gets
 `/invite/in-use/`. Migration `0077_invites_know_who.sql` + DB test 13 (suite
 green locally). Order for the live project: 0075, 0076, then 0077.
 D-374 (one account, member + program; hidden from their own program's lists)
@@ -877,7 +877,7 @@ is decided and is the next phase — design note first.
 
 ## Release 0.43.2 (7 October) — forms, tidied; sign-up, cleaner
 
-D-364 to D-372, on `claude/pam-storybook`, **not merged**. Add a program is
+D-364 to D-372, **merged to `main` 8 October (PR #27)**. Add a program is
 on the page, no card, no focus step, kind as `ChoiceChips` with Other,
 "Review details" with the review note as a banner. Fields: label 8px above,
 weight 600, typed text 16px. `@pam/ui/InfoTip` — a 36px circle
@@ -942,6 +942,17 @@ Open items Will asked to keep (7 October), newest first. Read this before
 - **Apply 0075 then 0076 to the live project** — 0068/0069 carried over and
   reconciled with 0072 (D-346); DB suite green. Their `drop` statements need
   a person's approval in the Supabase tool. Also on `docs/before-launch.md`.
+  **Confirmed 8 October, not just assumed (D-387):** isolated the exact
+  blocker. `CREATE FUNCTION`/`CREATE TRIGGER`/`COMMENT`/`REVOKE` all run
+  instantly against the live project; a bare `DROP TRIGGER IF EXISTS`
+  times out every time, reproducibly, through both `apply_migration` and
+  raw `execute_sql` — on a trigger that did not even exist yet, so it is
+  not about the object, it is about the statement. No tool in this session
+  can get past it; it needs Will, directly, in the Supabase dashboard. Side
+  effect while isolating this: `to_e164()`, `normalise_phone()`, and the
+  `profiles_phone_e164` trigger (phone normalised to E.164 on
+  insert/update) are live — a harmless, idempotent slice of 0075, not the
+  whole thing. `0075` is correctly **not** recorded as deployed.
 - **Block in conversations** — 0076 adds `block_in_conversation` /
   `unblock_in_conversation` / `conversation_block_state`; the redesign's
   thread options have Report but no Block row.
