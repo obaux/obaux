@@ -28,7 +28,9 @@ const LIMIT = 48_000;
 
 // Shared helpers, prepended to every drawing script.
 const HELPERS = `
-const INK={r:0.067,g:0.067,b:0.067}, MUTED={r:0.4,g:0.4,b:0.4}, ACCENT={r:0.059,g:0.345,b:0.278}, NEW={r:0.91,g:0.349,b:0.047}, GREY={r:0.6,g:0.6,b:0.6}, LINE={r:0.85,g:0.85,b:0.85}, PANEL={r:0.965,g:0.965,b:0.957}, WHITE={r:1,g:1,b:1};
+const INK={r:0.067,g:0.067,b:0.067}, MUTED={r:0.4,g:0.4,b:0.4}, ACCENT={r:0.059,g:0.345,b:0.278}, NEW={r:0.91,g:0.349,b:0.047}, GREY={r:0.6,g:0.6,b:0.6}, LINE={r:0.85,g:0.85,b:0.85}, PANEL={r:0.965,g:0.965,b:0.957}, WHITE={r:1,g:1,b:1}, BG={r:0.925,g:0.925,b:0.918};
+// Screens sit white on a light grey page, lifted by a soft shadow (Will, 8 October).
+const LIFT=[{type:'DROP_SHADOW',color:{r:0,g:0,b:0,a:0.10},offset:{x:0,y:6},radius:18,spread:0,visible:true,blendMode:'NORMAL'},{type:'DROP_SHADOW',color:{r:0,g:0,b:0,a:0.06},offset:{x:0,y:1},radius:3,spread:0,visible:true,blendMode:'NORMAL'}];
 await Promise.all([['Inter','Regular'],['Inter','Medium'],['Inter','Semi Bold'],['Inter','Bold'],['Inter','Extra Bold']].map(([family,style])=>figma.loadFontAsync({family,style})));
 const solid=(c)=>[{type:'SOLID',color:c}];
 function text(parent,str,{size=14,style='Regular',color=INK,width=null,x=null,y=null,lh=null,mono=false}={}){
@@ -108,7 +110,7 @@ function flowScript(L, pageName, index) {
   return `${HELPERS}
 const L=${js({ ...L, edges })};
 const page=await pageNamed(${js(pageName)},${index});
-const root=figma.createFrame(); root.name='Flow — '+L.title; root.resize(L.width,L.height); root.fills=solid(WHITE); root.clipsContent=false; page.appendChild(root); root.x=0; root.y=0;
+const root=figma.createFrame(); root.name='Flow — '+L.title; root.resize(L.width,L.height); root.fills=solid(BG); root.clipsContent=false; page.appendChild(root); root.x=0; root.y=0;
 // Title block
 text(root,('PAM · User flows · '+L.title).toUpperCase(),{size:14,style:'Semi Bold',color:ACCENT,x:80,y:56});
 text(root,L.title,{size:44,style:'Extra Bold',x:80,y:82});
@@ -116,7 +118,7 @@ text(root,L.intro,{size:18,color:{r:0.2,g:0.2,b:0.2},width:820,x:80,y:146,lh:150
 text(root,'Updated '+L.updated+'   ·   orange tag = changed in the latest round   ·   solid arrow: a tap   ·   dashed: leaves the app, or a way back',{size:13,style:'Medium',color:MUTED,x:80,y:236});
 if(L.changes.length){
   const p=figma.createAutoLayout('VERTICAL',{name:'Latest changes',itemSpacing:8,paddingLeft:22,paddingRight:22,paddingTop:20,paddingBottom:20,cornerRadius:20});
-  p.fills=solid(PANEL); root.appendChild(p); p.x=L.width-460; p.y=56;
+  p.fills=solid(WHITE); root.appendChild(p); p.x=L.width-460; p.y=56;
   text(p,'Latest changes',{size:15,style:'Bold'});
   for(const c of L.changes){ text(p,c,{size:13,color:{r:0.2,g:0.2,b:0.2},width:356,lh:145}); }
 }
@@ -134,7 +136,7 @@ for(const [id,n] of Object.entries(L.nodes)){
   if(n.changed) pill(row,n.changed,{bg:isNew?NEW:GREY});
   text(card,n.path,{size:12,style:'Medium',color:MUTED});
   const shot=figma.createRectangle(); shot.name='shot:'+L.key+'--'+id; shot.resize(n.w,n.shotH);
-  shot.cornerRadius=n.wide?16:28; shot.fills=solid(PANEL);
+  shot.cornerRadius=n.wide?16:28; shot.fills=solid(WHITE); shot.effects=LIFT;
   shot.strokes=solid(isNew?NEW:LINE); shot.strokeWeight=isNew?3:1; shot.strokeAlign='INSIDE';
   card.appendChild(shot);
   if(n.note){ text(card,n.note,{size:13,color:MUTED,width:n.w,lh:135}); }
@@ -164,7 +166,7 @@ function overviewScript(layouts) {
 const cols=${js(cols)}; const latest=${js(latest)};
 const page=await pageNamed('0 · Overview',0);
 const OW=300, GAP=60, TOPC=440, W=80*2+cols.length*OW+(cols.length-1)*GAP;
-const root=figma.createFrame(); root.name='Overview'; root.resize(W,TOPC+150+650+120); root.fills=solid(WHITE); root.clipsContent=false; page.appendChild(root);
+const root=figma.createFrame(); root.name='Overview'; root.resize(W,TOPC+150+650+120); root.fills=solid(BG); root.clipsContent=false; page.appendChild(root);
 text(root,'PAM · USER FLOWS',{size:14,style:'Semi Bold',color:ACCENT,x:80,y:56});
 text(root,'How PAM fits together',{size:52,style:'Extra Bold',x:80,y:82});
 text(root,'Every screen of the app, by the person using it, drawn from the real screens in Storybook. Each page in this file is one person\\'s app; arrows are taps. Updated '+${js(UPDATED)}+'.',{size:18,color:{r:0.2,g:0.2,b:0.2},width:900,x:80,y:156,lh:150});
@@ -174,7 +176,7 @@ cols.forEach((c,i)=>{
   const col=figma.createAutoLayout('VERTICAL',{name:c.title,itemSpacing:10}); col.fills=[]; root.appendChild(col); col.x=x; col.y=TOPC;
   text(col,c.title,{size:24,style:'Extra Bold'});
   text(col,c.intro,{size:14,color:{r:0.27,g:0.27,b:0.27},width:OW,lh:145});
-  const r=figma.createRectangle(); r.name='shot:overview--'+c.key; r.resize(OW,c.wide?Math.round(OW*630/1200):Math.round(OW*844/390)); r.cornerRadius=c.wide?16:28; r.fills=solid(PANEL); r.strokes=solid(LINE); r.strokeWeight=1; r.strokeAlign='INSIDE'; col.appendChild(r);
+  const r=figma.createRectangle(); r.name='shot:overview--'+c.key; r.resize(OW,c.wide?Math.round(OW*630/1200):Math.round(OW*844/390)); r.cornerRadius=c.wide?16:28; r.fills=solid(WHITE); r.effects=LIFT; r.strokes=solid(LINE); r.strokeWeight=1; r.strokeAlign='INSIDE'; col.appendChild(r);
   text(col,c.count+' screens · page “'+c.title+'”',{size:13,style:'Semi Bold',color:ACCENT});
   slotLabel(col,r,c.title,c.url);
 });

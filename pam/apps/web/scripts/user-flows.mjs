@@ -158,7 +158,7 @@ function card(id, node, p, shot, latest) {
     ${node.changed ? `<span style="font:700 11px/1 ${FONT};color:#fff;background:${isNew ? NEW : '#9A9A9A'};border-radius:999px;padding:4px 8px;flex-shrink:0;">${esc(node.changed)}</span>` : ''}
   </div>
   <div style="font:500 12px/1.4 'SF Mono', Menlo, monospace;color:${MUTED};height:28px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(node.path ?? '')}</div>
-  <img src="data:${shot.type};base64,${shot.data}" width="${w}" height="${shotH(node)}" style="display:block;width:${w}px;height:${shotH(node)}px;border-radius:${node.wide ? 16 : 28}px;border:${isNew ? `3px solid ${NEW}` : '1px solid #D9D9D9'};box-sizing:border-box;object-fit:cover;background:#fff;">
+  <img src="data:${shot.type};base64,${shot.data}" width="${w}" height="${shotH(node)}" style="display:block;width:${w}px;height:${shotH(node)}px;border-radius:${node.wide ? 16 : 28}px;border:${isNew ? `3px solid ${NEW}` : '1px solid #D9D9D9'};box-sizing:border-box;object-fit:cover;background:#fff;box-shadow:0 6px 18px rgba(0,0,0,.10),0 1px 3px rgba(0,0,0,.06);">
   <div style="font:400 13px/1.35 ${FONT};color:${MUTED};margin-top:8px;height:${NOTE - 8}px;overflow:hidden;">${esc(node.note ?? '')}</div>
 </div>`;
 }
@@ -220,7 +220,7 @@ function header(flow, width) {
 function changesPanel(flow, width) {
   if (!flow.changes?.length) return '';
   return `
-<div style="position:absolute;left:${width - 460}px;top:56px;width:400px;background:#F6F6F4;border-radius:20px;padding:20px 22px;box-sizing:border-box;">
+<div style="position:absolute;left:${width - 460}px;top:56px;width:400px;background:#FFFFFF;border-radius:20px;padding:20px 22px;box-sizing:border-box;">
   <div style="font:700 15px/1.2 ${FONT};color:${INK};">Latest changes</div>
   ${flow.changes.map((c) => `<div style="font:400 13px/1.45 ${FONT};color:#333;margin-top:8px;">${esc(c)}</div>`).join('')}
 </div>`;
@@ -228,8 +228,8 @@ function changesPanel(flow, width) {
 
 function page(title, width, height, body, svg) {
   return `<!doctype html><html><head><meta charset="utf-8"><title>${esc(title)}</title>
-<style>html,body{margin:0;background:#FFFFFF;}</style></head>
-<body><div id="canvas" style="position:relative;width:${width}px;height:${height}px;background:#FFFFFF;overflow:hidden;">
+<style>html,body{margin:0;background:#ECECEA;}</style></head>
+<body><div id="canvas" style="position:relative;width:${width}px;height:${height}px;background:#ECECEA;overflow:hidden;">
 <svg width="${width}" height="${height}" style="position:absolute;left:0;top:0;" xmlns="http://www.w3.org/2000/svg">
 <defs>
 <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="${INK}"/></marker>
@@ -304,7 +304,7 @@ if (!only) {
 <div style="position:absolute;left:${x}px;top:${CARDS_TOP}px;width:${OW}px;">
   <div style="font:800 24px/1.2 ${FONT};color:${INK};">${esc(f.title)}</div>
   <div style="font:400 14px/1.45 ${FONT};color:#444;margin-top:8px;height:104px;overflow:hidden;">${esc(f.intro)}</div>
-  <img src="data:${shot.type};base64,${shot.data}" width="${OW}" height="${h}" style="display:block;width:${OW}px;height:${h}px;border-radius:28px;border:1px solid #D9D9D9;box-sizing:border-box;margin-top:12px;">
+  <img src="data:${shot.type};base64,${shot.data}" width="${OW}" height="${h}" style="display:block;width:${OW}px;height:${h}px;border-radius:28px;border:1px solid #D9D9D9;box-sizing:border-box;margin-top:12px;background:#fff;box-shadow:0 6px 18px rgba(0,0,0,.10),0 1px 3px rgba(0,0,0,.06);">
   <div style="font:600 13px/1.4 ${FONT};color:${ACCENT};margin-top:12px;">${Object.keys(f.nodes).length} screens · page “${esc(f.title)}”</div>
 </div>`;
     })
