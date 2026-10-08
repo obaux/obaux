@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.46.2] — 2026-10-08 · A quieter message box
+
+The space under the message box is now part of the soft fade behind it,
+so the conversation runs all the way to the bottom of the screen instead of
+stopping above a blank strip. The microphone, photo and send buttons are a
+softer grey until there is something to send (D-396).
+
 ## [0.46.1] — 2026-10-08 · Who you're talking to, in full
 
 At the top of a conversation, under the person's name, Pam now says who

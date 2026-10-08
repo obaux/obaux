@@ -205,6 +205,17 @@
     stroke-width: 2.25;
   }
 
+  /*
+   * The mic in the composer is Astryx's secondary icon grey, like the photo
+   * button and the idle send arrow beside it (Will, 8 October, D-396: "more
+   * greyed out, less emphasis"). Those two take `color="secondary"` and a
+   * token in `ThreadView`; `ChatDictationButton` draws its own icon with no
+   * colour prop, so the mic is reached here.
+   */
+  .astryx-chat-dictation-button svg {
+    color: var(--color-icon-secondary);
+  }
+
   :has(> input:focus-visible),
   :has(> textarea:focus-visible) {
     outline: 3px solid currentColor;

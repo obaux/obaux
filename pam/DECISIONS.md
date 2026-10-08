@@ -9778,3 +9778,40 @@ it, make the bottom row say role + place if they're a program."
   it now matches the example ones).
 - `SubPageHeader`'s compact form takes `subtitle` for this (it was the
   large form's alone), with a story, *Compact with subtitle*.
+
+### D-396 — The room under the composer is inside its fade; quieter composer icons
+
+**Date:** 2026-10-08. Will, on a phone screenshot of a conversation scrolled
+up: "Bottom padding added in the wrong place, it should be inside the box
+with fade, not outside of it. Also make icons for button more greyed out,
+less emphasis."
+
+- The "box with fade" is `ChatLayout`'s dock: the composer sits in a sticky
+  strip whose lowest 80px is a frosted layer (a 12px backdrop blur that
+  fades in over its top 24px), so messages scrolling under it soften
+  instead of stopping at a line. D-391 and D-393 added the room under the
+  composer as the *frame's* bottom padding, which ended the scroll region —
+  and the frosted layer with it — 32px above the screen's edge: under the
+  fade, a strip of bare page that nothing scrolled through.
+- The frame has no bottom padding now; the room is the composer's own
+  bottom margin, `max(env(safe-area-inset-bottom, 0px), 32px)`, inside the
+  dock. Same distance as before — the composer's box ends 40px above the
+  edge with the dock's 8px, or the phone's home-indicator inset where that
+  is larger — but the conversation runs to the bottom edge and that room is
+  part of the fade. `ChatComposer`'s `xstyle` lands on its bordered box, so
+  the margin is inside the composer's root and the dock grows by it.
+- The mic, the photo button and the send arrow while there is nothing to
+  send are Astryx's secondary icon grey (`--color-icon-secondary`, #6a6a6a /
+  #9e9e9e dark) instead of black; the stroke stays the 2.25 Will asked for
+  in D-390. The send button keeps its white arrow on green once there is
+  something to send — that is the action. The photo icon takes
+  `color="secondary"`, the idle send a token; the mic is
+  `ChatDictationButton`'s own icon with no colour prop, so one rule in
+  `globals.css` beside the stroke rule reaches it. The scroll-to-bottom
+  arrow is unchanged (D-393 asked for it strong).
+- Seen while checking it: in headless Chromium the frosted layer barely
+  blurs the last few pixels at the very bottom edge, so a message passing
+  under the composer reads almost sharp there. Will's own screenshot shows
+  the blur working on the phone; if the strip under the composer should be
+  page colour rather than frosted, that is a tint on this same layer.
+

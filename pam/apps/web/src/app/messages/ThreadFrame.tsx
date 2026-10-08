@@ -54,12 +54,10 @@ import { spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
  * not the 72px sized for a bar this screen never draws — to clear a home
  * indicator.
  *
- * Never less than 32px, though (Will, 8 October: D-391 "more bottom
- * padding below text box", then D-393 "even more"): on a phone with no home
- * indicator the inset is 0, which left the composer 8px — only its dock's
- * own padding — off the bottom edge; it is 40px now. `max()` keeps the
- * device's inset where it is larger, so an iPhone's composer sits about
- * where it did (its 34px inset, nearly the same).
+ * The frame itself has no bottom padding (D-396). The room under the
+ * composer (D-391, D-393) is the composer's own, inside `ChatLayout`'s
+ * frosted dock — see `ThreadView` — so the conversation runs to the bottom
+ * edge and that room is part of the fade, not a strip of bare page under it.
  */
 
 // The same numbers `Page` and `PageTitle` take from `@pam/ui`'s tokens
@@ -75,7 +73,6 @@ const styles = stylex.create({
     maxWidth: '560px',
     marginInline: 'auto',
     paddingBlockStart: spacingVars['--spacing-4'],
-    paddingBlockEnd: `max(env(safe-area-inset-bottom, 0px), ${spacingVars['--spacing-8']})`,
     display: 'flex',
     flexDirection: 'column',
     minHeight: 0,

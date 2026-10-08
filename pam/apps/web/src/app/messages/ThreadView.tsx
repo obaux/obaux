@@ -92,17 +92,20 @@ import { dayKey, dayLabel } from '@/lib/when';
  * visually hidden, through Astryx's own `ChatMessage` `name` wiring.
  *
  * The composer is one rounded box (D-389, Will's reference): the text on top,
- * a row under it with the mic on the left and a round send button on the
- * right — grey while there is nothing to send, Pam's dark green once there
- * is. Flat, with a border (`elevation="none"`), so it reads as a field and
- * not as a card floating over the conversation. No attach button yet: Pam
- * has nowhere to keep a photo (no storage bucket), and a button that does
- * nothing is worse than none.
+ * a row under it with the mic and the photo button (D-394) on the left and a
+ * round send button on the right — grey while there is nothing to send,
+ * Pam's dark green once there is. Flat, with a border (`elevation="none"`),
+ * so it reads as a field and not as a card floating over the conversation.
+ * The mic, photo and idle arrow are Astryx's secondary icon grey (Will,
+ * 8 October, D-396: "more greyed out, less emphasis") at the heavier
+ * stroke D-390 asked for; the words are what the box is for.
  *
  * `ChatLayout` (D-192) owns the scrolling: the messages scroll, the
  * composer stays docked at the bottom as a sticky flex item, so the last
  * message is never under it. The frame around this — the pinned headers —
- * is `ThreadFrame`, which also owns the composer's true bottom inset.
+ * is `ThreadFrame`. The room under the composer is the composer's own
+ * margin (D-396), so it sits inside `ChatLayout`'s frosted dock and the
+ * conversation fades under it to the bottom edge.
  *
  * Reporting (D-177) no longer lives here (D-213, Will, 1 October): a warning
  * button under every message crowded the conversation. It is one row on the
@@ -204,6 +207,12 @@ const styles = stylex.create({
   // The file picker itself is never seen: the photo button opens it (the
   // same pattern as the staff photo and policy uploads in @pam/ui).
   fileInput: { position: 'absolute', width: '1px', height: '1px', opacity: 0, pointerEvents: 'none' },
+  // Room under the composer, inside the dock's frosted fade (Will, 8 October,
+  // D-396: "it should be inside the box with fade"). Was the frame's bottom
+  // padding (D-391, D-393), which put a strip of bare page under the fade.
+  // 32px here and the dock's own 8px: still 40px off the bottom edge, or the
+  // phone's home-indicator inset where that is larger.
+  composer: { marginBlockEnd: `max(env(safe-area-inset-bottom, 0px), ${spacingVars['--spacing-8']})` },
   // §2.5's floor, as a square: send and mic alike (A13, D-192).
   square: { width: '48px', height: '48px', minWidth: '48px', minHeight: '48px', flexShrink: 0 },
   // The send button is a circle (D-389): grey until there is something to
@@ -214,7 +223,7 @@ const styles = stylex.create({
     opacity: 1,
     backgroundImage: 'none',
     backgroundColor: colorVars['--color-background-muted'],
-    color: colorVars['--color-text-secondary'],
+    color: colorVars['--color-icon-secondary'],
   },
   day: { fontSize: '14px', fontWeight: 600 },
   // A day is a section (D-392): more air above its divider than inside it,
@@ -388,6 +397,7 @@ export function ThreadView({
       placeholder={t('messages.thread.placeholder')}
       isDisabled={sending}
       elevation="none"
+      xstyle={styles.composer}
       drawer={
         photo ? (
           <ChatComposerDrawer>
@@ -429,7 +439,7 @@ export function ThreadView({
           />
           <IconButton
             label={t('messages.thread.photo.add')}
-            icon={<Icon icon={PhotoIcon} size="md" />}
+            icon={<Icon icon={PhotoIcon} size="md" color="secondary" />}
             variant="ghost"
             size="md"
             isDisabled={sending}

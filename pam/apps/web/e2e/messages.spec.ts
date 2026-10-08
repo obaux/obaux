@@ -320,6 +320,31 @@ test.describe('a conversation', () => {
     const composerBox = await composer.boundingBox();
     expect(composerBox).not.toBeNull();
     expect(composerBox!.y + composerBox!.height).toBeLessThanOrEqual(box!.y + box!.height);
+
+    // The room under the composer is inside the conversation's frosted dock
+    // (D-396), not a strip of bare page under it: the scroll region runs to
+    // the bottom edge, and the composer's box ends 40px above that edge (32px
+    // of its own and the dock's 8px; no home-indicator inset here).
+    const layout = await page.locator('.astryx-chat-layout').boundingBox();
+    expect(Math.round(layout!.y + layout!.height)).toBe(viewport!.height);
+    const field = await page.locator('.astryx-chat-composer > div').first().boundingBox();
+    expect(Math.round(viewport!.height - (field!.y + field!.height))).toBe(40);
+  });
+
+  test('the composer\'s buttons are quiet: mic, photo and an idle send share one grey (D-396)', async ({ page }) => {
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+
+    const colour = (name: string | RegExp) =>
+      page.getByRole('button', { name }).locator('svg').evaluate((svg) => getComputedStyle(svg).color);
+    const mic = await colour('Speak your message');
+    expect(await colour('Add a photo')).toBe(mic);
+    expect(await colour(/send/i)).toBe(mic);
+    // Quieter than the words around them.
+    const heading = await page.getByRole('heading', { name: 'Marcus', level: 1 }).evaluate((h) => getComputedStyle(h).color);
+    expect(mic).not.toBe(heading);
   });
 
   test('the send icon matches the mic icon\'s size (D-192 addendum)', async ({ page }) => {
