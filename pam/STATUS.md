@@ -876,7 +876,9 @@ Only the two people see it; a reported photo reaches the report's reviewers
 and nobody else (`test/15_message_photos_test.sql`, 18 checks). Photos are
 downloaded with the person's sign-in, never handed out as links. The
 transparency screen, privacy notice, terms and staff sign-up copy name
-photos. **0079 is local until applied to live** — see before-launch.
+photos. **0079 is not on live yet:** the connector stopped at its approval
+step, so it waits for Will in the SQL editor (a tested one-transaction file;
+before-launch).
 
 ## Release 0.45.0-two-roles (7 October) — one account, member and program
 

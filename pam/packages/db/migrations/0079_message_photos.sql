@@ -8,9 +8,10 @@
 --
 --   * A private bucket, `message-photos`. Never public, and never handed out
 --     as a link: the app downloads a photo with the person's own sign-in, so
---     a photo is read only by somebody the policies below let read it. 5 MB at most, JPEG, PNG or WebP (the app sends a
---     JPEG of at most 1600px, re-drawn on the phone, which also drops the
---     location and camera details a phone writes into a photo).
+--     a photo is read only by somebody the policies below let read it. 5 MB
+--     at most, JPEG, PNG or WebP (the app sends a JPEG of at most 1600px,
+--     re-drawn on the phone, which also drops the location and camera
+--     details a phone writes into a photo).
 --   * One folder per conversation: `<conversation id>/<random>.jpg`.
 --   * Who can put a photo there: a member of that conversation, with an
 --     active account and chat allowed, in a conversation with no block in

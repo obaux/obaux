@@ -9749,3 +9749,10 @@ why Pam didn't allow images — it never decided not to; nothing stored them).
   accounts, both of which saw the old screen; if either is a real person
   rather than a test account, they hear about photos before the branch is
   merged (before-launch).
+- **Deploying 0079.** `list_migrations` was clean through 0078; live had no
+  message attachments, so the new check cannot trip on old rows. The
+  connector's `apply_migration` stopped at its approval step for the
+  `drop … if exists` guards, as 0075 did (D-388), and applied nothing
+  (checked: no bucket, policies, functions or constraint). It goes in
+  through the SQL editor as one transaction that records itself in
+  `schema_migrations` — the same route 0075–0078 took.

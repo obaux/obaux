@@ -60,7 +60,11 @@ STATUS row too.
 - [ ] **Photos in messages: deploy 0079, and tell members first** (Will,
   8 October 2026, D-394). The private `message-photos` store and who can
   see a photo live in 0079 — applied to the live project before the branch
-  that sends photos is merged, or the photo button fails. The transparency
+  that sends photos is merged, or the photo button fails. The connector
+  stopped at its approval step for the `drop … if exists` guards (as with
+  0075), so it is a one-transaction file for the SQL editor, tested against
+  a copy built through 0078 (and harmless run twice); it records itself in
+  `schema_migrations`. The transparency
   screen, privacy notice and terms now name photos; two member accounts on
   live saw the old wording, so if either is a real person they hear about
   photos before the merge ("If this changes, we will tell you first").
