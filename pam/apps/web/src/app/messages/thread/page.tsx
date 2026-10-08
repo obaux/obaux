@@ -16,6 +16,7 @@ import { staffPhotoFor } from '@pam/config/dummy-connections';
 import { ThreadFrame, ThreadHeader, ThreadTop } from '../ThreadFrame';
 import { DemoThreadLazy } from '../DemoThreadLazy';
 import { ThreadVisit } from '../ThreadVisit';
+import { threadLineFor } from '@/lib/threadLine';
 
 /**
  * One conversation — read what has been said, and send the next thing.
@@ -147,15 +148,12 @@ function ThreadScreen() {
   }
 
   const title = state.status === 'ready' ? (state.otherName ?? t('messages.thread.someone')) : t('messages.title');
-  // What the name alone cannot say (D-187): a member sees "Case manager" or
-  // the program's name beside it; staff looking at a member see nothing.
+  // What the name alone cannot say (D-187, D-395): the line under it — "Case
+  // manager", or "Program lead at …" with the program's whole name; staff
+  // looking at a member see nothing.
   const context =
-    state.status === 'ready' && trueRole === 'member'
-      ? state.otherRole === 'provider'
-        ? (state.otherProgramName ?? t('role.provider'))
-        : state.otherRole === 'admin'
-          ? t('role.admin')
-          : null
+    state.status === 'ready'
+      ? threadLineFor(trueRole, { role: state.otherRole, programName: state.otherProgramName }, t)
       : null;
 
   if (state.status === 'ready') {

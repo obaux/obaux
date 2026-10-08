@@ -327,6 +327,8 @@
   "messages.report.failed.body": "Se perdio la conexion, o este mensaje ya fue reportado. Intente de nuevo, o llame a Pam.",
   "messages.start.member.title": "Escribale a su gestor de casos o a su programa",
   "messages.thread.from": "{name}, {time}",
+  "messages.thread.lead": "Lider de programa",
+  "messages.thread.leadAt": "Lider de programa en {program}",
   "messages.thread.photo.add": "Agregar una foto",
   "messages.thread.photo.remove": "Quitar esta foto",
   "messages.thread.photo.picked": "La foto que eligio",

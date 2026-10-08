@@ -47,7 +47,11 @@ export interface SubPageHeaderProps {
    * step (Plan a trip, D-235). `backHref` is ignored when this is set.
    */
   readonly onBack?: () => void;
-  /** A line under the large title. */
+  /**
+   * A line under the title. In the compact form it is who the person is to
+   * you — "Program lead at Example Food Pantry" — and may take two lines
+   * rather than be cut (D-395).
+   */
   readonly subtitle?: string;
   readonly actions?: ReactNode;
   /**
@@ -117,6 +121,18 @@ const styles = stylex.create({
     color: colorVars['--color-text-primary'],
   },
   middle: { flexGrow: 1, minWidth: 0 },
+  // The compact form's line under the name (D-395): the whole width beside
+  // back, up to two lines, then cut — a program's full name fits where a
+  // chip beside the name had room for a word.
+  compactStack: { minWidth: 0, flexGrow: 1 },
+  compactSubtitle: {
+    fontSize: '16px',
+    lineHeight: 1.3,
+    display: '-webkit-box',
+    WebkitLineClamp: 2,
+    WebkitBoxOrient: 'vertical',
+    overflow: 'hidden',
+  },
   barTitle: {
     fontSize: '18px',
     fontWeight: 700,
@@ -202,10 +218,26 @@ export function SubPageHeader({
       <HStack gap={2} align="center" wrap="nowrap" xstyle={styles.bar}>
         {back}
         <HStack gap={2} align="center" wrap="nowrap" xstyle={styles.middle}>
-          <Heading level={1} xstyle={styles.compactTitle}>
-            {title}
-          </Heading>
-          {titleAddon}
+          {subtitle ? (
+            <VStack gap={0} xstyle={styles.compactStack}>
+              <HStack gap={2} align="center" wrap="nowrap">
+                <Heading level={1} xstyle={styles.compactTitle}>
+                  {title}
+                </Heading>
+                {titleAddon}
+              </HStack>
+              <Text type="supporting" xstyle={styles.compactSubtitle}>
+                {subtitle}
+              </Text>
+            </VStack>
+          ) : (
+            <>
+              <Heading level={1} xstyle={styles.compactTitle}>
+                {title}
+              </Heading>
+              {titleAddon}
+            </>
+          )}
         </HStack>
         {actions ? (
           <HStack gap={1} align="center" wrap="nowrap" xstyle={styles.actions}>

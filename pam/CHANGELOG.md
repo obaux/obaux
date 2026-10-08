@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.46.1] — 2026-10-08 · Who you're talking to, in full
+
+At the top of a conversation, under the person's name, Pam now says who
+they are in full — "Program lead at Example Food Pantry" — instead of a
+small tag that cut the program's name short (D-395).
+
 ## [0.46.0] — 2026-10-08 · Photos in messages
 
 You can send a photo in a conversation: tap the picture button beside the

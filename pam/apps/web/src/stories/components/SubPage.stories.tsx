@@ -86,6 +86,27 @@ export const Compact: Story = {
   },
 };
 
+/**
+ * The compact form with a line under the name (D-395): who the person is to
+ * you, given the whole width and up to two lines instead of a chip that cut
+ * a program's name to a word.
+ */
+export const CompactWithSubtitle: Story = {
+  args: {
+    title: 'Renee',
+    variant: 'compact',
+    backHref: '/messages/',
+    backLabel: 'Back to Messages',
+    subtitle: 'Program lead at Example Food Pantry of North Philadelphia',
+    children: (
+      <VStack gap={3}>
+        <Text>Hi Renee, can I come by on Thursday?</Text>
+        <Text type="supporting">Yes — the pantry is open 10 to 2. Ask for me at the front.</Text>
+      </VStack>
+    ),
+  },
+};
+
 /** One action pinned to the bottom of the screen, with a fade above it. */
 export const WithFooter: Story = {
   args: {

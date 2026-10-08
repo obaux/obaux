@@ -327,6 +327,8 @@
   "messages.report.failed.body": "Your connection dropped, or this message was already reported. Try again, or call Pam.",
   "messages.start.member.title": "Message your case manager or program",
   "messages.thread.from": "{name}, {time}",
+  "messages.thread.lead": "Program lead",
+  "messages.thread.leadAt": "Program lead at {program}",
   "messages.thread.photo.add": "Add a photo",
   "messages.thread.photo.remove": "Take this photo out",
   "messages.thread.photo.picked": "The photo you picked",

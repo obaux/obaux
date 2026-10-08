@@ -832,7 +832,7 @@ pnpm --filter @pam/config test          # SMS safety, copy rules, points
 pnpm --filter @pam/ui test              # components + axe
 pnpm --filter @pam/db test              # migrations + RLS penetration suite
 pnpm --filter @pam/web build
-pnpm --filter @pam/web test:a11y        # browser: contrast, target size, 320px
+pnpm --filter @pam/web test:a11y        # browser: contrast, target size, 320px — serves out/, so build first
 node scripts/check-bundle-budget.mjs    # §12 first-load budget
 ```
 
@@ -855,11 +855,12 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
-## Conversations, redrawn (8 October) — 0.45.5 to 0.46.0, on the branch
+## Conversations, redrawn (8 October) — 0.45.5 to 0.46.1, on the branch
 
-D-389 to D-394, **on `claude/pam-storybook`, not merged to `main`.** A
-conversation opens each day with one divider ("Today", "Yesterday", a
-weekday, a date). Bubbles carry no name or time: mine are light green on the
+D-389 to D-395, **on `claude/pam-storybook`, not merged to `main`.** A
+conversation's header says who the person is on a line under the name —
+"Program lead at Example Food Pantry", "Case manager" (D-395). Each day opens
+with one divider ("Today", "Yesterday", a weekday, a date). Bubbles carry no name or time: mine are light green on the
 right, theirs grey on the left with their photo, and a sideways drag slides
 the times in at the right edge (`RevealTimes`; each message keeps "name,
 time" as its screen-reader label). The composer is one rounded field: the

@@ -7,7 +7,6 @@ import { Icon } from '@astryxdesign/core/Icon';
 import { IconButton } from '@astryxdesign/core/IconButton';
 import { SubPageHeader } from '@pam/ui/SubPage';
 import { useI18n } from '@/lib/i18n';
-import { Token } from '@astryxdesign/core/Token';
 import { spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
 
 /**
@@ -26,10 +25,14 @@ import { spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
  * contract) — `position: fixed` only takes the frame itself out of the
  * document; it is not what pins the composer within it.
  *
- * `ThreadHeader` is one row (D-193): back, the name, and a `Token` beside
- * it for who they are to you (D-187 — nothing for staff looking at a
- * member). Smaller than a page title, on purpose: this header repeats on
- * every conversation and shares the phone with the conversation itself.
+ * `ThreadHeader` is one bar (D-193): back, the name, and under the name who
+ * they are to you (D-187 — nothing for staff looking at a member). That
+ * line was a `Token` beside the name until 8 October (D-395): a chip beside
+ * a name has room for a word, so "Example Food Pantry" read "Example
+ * Food …". Under the name it has the whole width and two lines, and says
+ * the role with the place — "Program lead at Example Food Pantry". Smaller
+ * than a page title, on purpose: this header repeats on every conversation
+ * and shares the phone with the conversation itself.
  *
  * No help link on this screen (A14, D-194) — the third screen in Pam
  * without one (a fourth, Messages itself, followed at A15). Back leads to
@@ -97,8 +100,6 @@ const styles = stylex.create({
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
   },
-  // A long program name is cut, never wrapped: the row stays one row.
-  tag: { maxWidth: '40%', flexShrink: 1 },
   more: { width: '48px', height: '48px', borderRadius: '50%', flexShrink: 0 },
 });
 
@@ -128,7 +129,7 @@ export function ThreadHeader({
   menuHref,
 }: {
   readonly name: string;
-  /** "Case manager", or the program's name — `null` draws no tag (D-187). */
+  /** "Case manager", or "Program lead at …" — under the name; `null` draws nothing (D-187, D-395). */
   readonly context: string | null;
   readonly backHref: string;
   readonly backLabel: string;
@@ -142,7 +143,7 @@ export function ThreadHeader({
       title={name}
       backHref={backHref}
       backLabel={backLabel}
-      titleAddon={context ? <Token label={context} size="sm" xstyle={styles.tag} /> : null}
+      {...(context ? { subtitle: context } : {})}
       actions={
         menuHref ? (
           <IconButton

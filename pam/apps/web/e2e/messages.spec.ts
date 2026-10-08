@@ -462,10 +462,17 @@ test.describe('a conversation', () => {
     await settled(page);
 
     await expect(page.getByRole('heading', { name: 'Teresa', level: 1 })).toBeVisible();
-    // Who they are to you sits beside the name, one row (D-193, D-187).
+    // Who they are to you sits on the line under the name (D-395, was a tag
+    // beside it — D-193, D-187): just below it, starting where it starts.
     const heading = await page.getByRole('heading', { name: 'Teresa', level: 1 }).boundingBox();
-    const tag = await page.getByText('Case manager', { exact: true }).last().boundingBox();
-    expect(Math.abs(tag!.y + tag!.height / 2 - (heading!.y + heading!.height / 2))).toBeLessThan(12);
+    const line = await page
+      .getByRole('heading', { name: 'Teresa', level: 1 })
+      .locator('xpath=../..')
+      .getByText('Case manager', { exact: true })
+      .boundingBox();
+    expect(line!.y).toBeGreaterThanOrEqual(heading!.y + heading!.height - 2);
+    expect(line!.y - (heading!.y + heading!.height)).toBeLessThan(8);
+    expect(Math.abs(line!.x - heading!.x)).toBeLessThan(2);
     await expect(page.getByRole('log')).toBeVisible();
     // The same thread Teresa's own preview reads, from Jordan's side (D-183).
     await expect(page.getByRole('log').getByText(/room 12/)).toBeVisible();

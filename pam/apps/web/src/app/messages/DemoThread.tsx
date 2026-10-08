@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react';
 import type { Role } from '@pam/config';
 import { dummyOtherIdFor, dummyThreadFor } from '@pam/config/dummy-conversations';
 import { DUMMY_ANYONE } from '@pam/config/dummy-people';
-import { contextFor } from './DummyRows';
+import { threadLineFor } from '@/lib/threadLine';
 import { useI18n } from '@/lib/i18n';
 import { sendDemoThreadMessage, useDemoThread } from '@/lib/demoMessages';
 import { staffPhotoFor } from '@pam/config/dummy-connections';
@@ -80,7 +80,7 @@ export function DemoThread({
 
   // D-187: a member sees who this is to them; staff see nothing beside a
   // member's name; the Pam team is named as such (D-262).
-  const context = contextFor(role, other ? { role: other.role, programName: other.orgName ?? null } : null, t);
+  const context = threadLineFor(role, other ? { role: other.role, programName: other.orgName ?? null } : null, t);
 
   return (
     <>

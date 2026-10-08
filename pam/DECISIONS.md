@@ -9756,3 +9756,25 @@ why Pam didn't allow images — it never decided not to; nothing stored them).
   (checked: no bucket, policies, functions or constraint). It goes in
   through the SQL editor as one transaction that records itself in
   `schema_migrations` — the same route 0075–0078 took.
+
+### D-395 — A conversation's header: who they are on a line under the name
+
+**Date:** 2026-10-08. Will, on a phone screenshot ("Renee · Example
+Food …"): "On header instead of truncating program name in chip next to
+it, make the bottom row say role + place if they're a program."
+
+- The chip beside the name had room for a word: a program's name came out
+  "Example Food …". Who the person is now sits on a line under the name,
+  across the whole width beside back, and may take two lines before it is
+  cut. It says the role with the place: "Program lead at Example Food
+  Pantry" ("Program lead" when the program is not known). A case manager
+  reads "Case manager", the Pam team "Pam team" — the same line, so every
+  conversation header has one shape.
+- Who sees the line is unchanged (D-187, D-262): a member sees their case
+  manager's or program lead's; the super admin sees which kind of staff;
+  staff looking at a member see nothing. One helper,
+  `lib/threadLine.ts`, for the real thread and the example threads (the
+  real thread showed nothing for the super admin's staff threads before;
+  it now matches the example ones).
+- `SubPageHeader`'s compact form takes `subtitle` for this (it was the
+  large form's alone), with a story, *Compact with subtitle*.
