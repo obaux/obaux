@@ -9619,3 +9619,21 @@ padding. It is now `max(env(safe-area-inset-bottom, 0px), 16px)`: 24px in
 all with the dock's 8px, and unchanged on an iPhone, whose 34px inset is
 already larger. In `ThreadFrame`, so a real thread and the example thread
 get it alike.
+
+### D-392 — Conversations: more room between days; messages at 16px
+
+**Date:** 2026-10-08. Will: "Add more gap between day sections in chat for
+better hierarchy, so things aren't so squished together. And drop font down
+to 16px."
+
+- **Days as sections.** A day's divider gets 24px above it and 8px below,
+  on top of the list's 8px row gap: 32px before a new day, 16px from the
+  divider to its first message, 8px between messages. The space says which
+  break is bigger before the label is read. The first day's divider has
+  nothing extra above it. (`xstyle` on `ChatSystemMessage`, which Astryx
+  passes to the divider's wrapper.)
+- **16px text.** Message text and the composer's typed text both drop from
+  18px to 16px, still matched (D-389). This is below §2.5's 18px body floor,
+  so it is an SOP amendment, A21, scoped to the conversation; the page's own
+  base size and its test are unchanged. 16px is the floor for the composer
+  in any case: iOS zooms into a field below it.

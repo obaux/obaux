@@ -183,12 +183,13 @@
   }
 
   /*
-   * What you type in a conversation is the same 18px as what was said to you
-   * (D-389). Astryx sets the editor and its placeholder from the type scale
-   * (14px, 16px on touch) on the two children, with no prop to reach them.
+   * What you type in a conversation is the same 16px as what was said to you
+   * (D-389, D-392). Astryx sets the editor and its placeholder from the type
+   * scale (14px, 16px on touch) on the two children, with no prop to reach
+   * them; 16px is also the size below which iOS zooms into a field.
    */
   .astryx-chat-composer-input > div {
-    font-size: 18px;
+    font-size: 16px;
   }
 
   /*

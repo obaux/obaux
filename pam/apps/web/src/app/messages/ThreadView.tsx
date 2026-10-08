@@ -47,7 +47,10 @@ import { dayKey, dayLabel } from '@/lib/when';
  * square — the send button included, which is this screen's one primary
  * action and, since A13 (D-192), the one primary action in Pam that is not
  * 64px: a chat's primary action repeats dozens of times per screen, and a
- * 64px block ate the message area on a phone. Message text is 18px. The
+ * 64px block ate the message area on a phone. Message text is 16px — the
+ * one place Pam drops below its 18px body floor (A21, D-392: a phone's
+ * conversation apps read at 16–17px, and at 18px the bubbles wrapped every
+ * few words). The
  * mic (`ChatDictationButton`) hides itself when the browser has no speech
  * recognition, which is the same §1 rule `VoiceInput` follows — a dead
  * button is worse than no button.
@@ -144,7 +147,7 @@ const slideMotion = {
 
 const styles = stylex.create({
   list: { width: '100%' },
-  body: { fontSize: '18px', lineHeight: 1.4, whiteSpace: 'pre-wrap' },
+  body: { fontSize: '16px', lineHeight: 1.4, whiteSpace: 'pre-wrap' },
   // Each message row is the anchor for its own time (D-390).
   row: { position: 'relative' },
   // The time, parked just past the row's end — outside what the list shows,
@@ -197,6 +200,12 @@ const styles = stylex.create({
     color: colorVars['--color-text-secondary'],
   },
   day: { fontSize: '14px', fontWeight: 600 },
+  // A day is a section (D-392): more air above its divider than inside it,
+  // so the break between days reads before the break between messages —
+  // 32px above (the list's 8px gap and this 24px), 16px below. The first
+  // day's divider needs none above it.
+  dayGap: { marginBlockStart: spacingVars['--spacing-6'], marginBlockEnd: spacingVars['--spacing-2'] },
+  dayFirst: { marginBlockEnd: spacingVars['--spacing-2'] },
   // The scroll region's inner column keeps the page's reading width.
   messages: { width: '100%' },
   // Reaching the end of the messages must not scroll the page under them.
@@ -384,7 +393,7 @@ export function ThreadView({
             return (
               <Fragment key={message.id}>
                 {isNewDay ? (
-                  <ChatSystemMessage variant="divider">
+                  <ChatSystemMessage variant="divider" xstyle={i === 0 ? styles.dayFirst : styles.dayGap}>
                     <Text type="supporting" xstyle={styles.day}>
                       {dayLabel(message.createdAt, locale, t)}
                     </Text>

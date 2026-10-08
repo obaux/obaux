@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.45.8] — 2026-10-08 · Days you can tell apart
+
+In a conversation, each day has more room above it, so a new day stands
+out from the messages inside it. Messages and what you type are a little
+smaller, 16px, so more of a message fits on a line (D-392).
+
 ## [0.45.7] — 2026-10-08 · Room under the message box
 
 The box you type a message in sits higher off the bottom of the screen, so

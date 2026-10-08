@@ -489,3 +489,18 @@ help is one tap further, inside the menu, and not on the screen itself.
 **What did not change.** Help is still reachable from the screen, and the
 page keeps its way back. Elsewhere, a screen with a ⋯ menu keeps its Help
 button unless Will says otherwise.
+
+## A21 — Conversation text is 16px (8 October 2026, Will)
+
+Will: "drop font down to 16px." In a conversation, what was said and what
+you are typing are 16px (D-392).
+
+**Where this contradicts the original.** §2.5: "18px body text on mobile."
+Messages were the one place that floor read as oversized — the conversation
+apps people already use draw messages at 16–17px, and at 18px a bubble
+wrapped every few words on a phone.
+
+**What did not change.** Everywhere else body text stays 18px; the page's
+base size (`--pam-body-size`, which `a11y.spec.ts` checks) is untouched.
+16px is also the floor for the field you type in: below it, iOS zooms the
+page when the field takes focus.
