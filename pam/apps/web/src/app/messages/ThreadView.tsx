@@ -211,6 +211,11 @@ const styles = stylex.create({
   // Reaching the end of the messages must not scroll the page under them.
   layout: { overscrollBehavior: 'contain' },
   scrollWrap: { width: '100%', paddingBlockEnd: '12px', pointerEvents: 'auto' },
+  // The scroll-to-bottom button floats over the conversation (D-393).
+  floating: {
+    backgroundColor: colorVars['--color-background-popover'],
+    color: colorVars['--color-text-primary'],
+  },
 });
 
 const dynamic = stylex.create({
@@ -289,6 +294,13 @@ function RevealTimes({ children }: { readonly children: ReactNode }) {
  * `useChatStreamScroll` against the layout's scroll container — drawn as an
  * `IconButton` that clears the 48px floor and holds its chevron. Hidden,
  * not removed, while the log is at the bottom.
+ *
+ * White, lifted, with a bigger, heavier arrow (Will, 8 October, D-393): the
+ * pale green it had read as part of the conversation underneath it, not as
+ * a control floating over it. White is the popover ground, so in dark mode
+ * it is the raised grey a floating control takes there rather than a white
+ * disc; the arrow is the 24px icon at the composer's 2.25 stroke
+ * (`globals.css`).
  */
 function ScrollToBottom() {
   const { t } = useI18n();
@@ -300,12 +312,12 @@ function ScrollToBottom() {
     <HStack justify="center" xstyle={styles.scrollWrap}>
       <IconButton
         label={t('messages.thread.scrollToBottom')}
-        icon={<Icon icon="chevronDown" size="sm" />}
+        icon={<Icon icon="chevronDown" size="lg" />}
         variant="secondary"
         size="md"
-        elevation="low"
+        elevation="high"
         onClick={() => scroll.scrollToBottom()}
-        xstyle={styles.square}
+        xstyle={[styles.square, styles.floating]}
       />
     </HStack>
   );

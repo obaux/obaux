@@ -9637,3 +9637,26 @@ to 16px."
   so it is an SOP amendment, A21, scoped to the conversation; the page's own
   base size and its test are unchanged. 16px is the floor for the composer
   in any case: iOS zooms into a field below it.
+
+### D-393 — Even more room under the composer; a white scroll-down button
+
+**Date:** 2026-10-08. Will, on a screenshot of the composer: "please add
+even more padding below text box. And make the arrow down white with larger
+stronger icon and shadow."
+
+- **Bottom.** The thread frame's minimum bottom padding goes from 16px
+  (D-391) to 32px: the composer sits 40px off the bottom edge with the dock's
+  own 8px. An iPhone's 34px home-indicator inset still wins where it is
+  larger, so there the composer sits nearly where it did.
+- **Scroll to the newest message.** The 48px round button is the popover
+  ground (`--color-background-popover`: white in light mode, Pam's dark
+  surface in dark, where a white disc would glare) instead of the pale green
+  secondary ground, with the dark text colour for its arrow, the `high`
+  elevation shadow, and a 24px chevron (was 16px).
+- **Stroke.** The arrow takes the composer icons' 2.25 stroke. The D-390
+  rule widened from `.astryx-chat-composer svg` to `.astryx-chat-layout svg`,
+  so the mic, the send arrow and this arrow stay matched; the thread header
+  sits outside `ChatLayout` and keeps 1.5.
+- **Not changed:** the faint blurred sliver of a message under the composer
+  while scrolled up is `ChatLayout`'s frosted-glass layer behind the dock,
+  Astryx's own design.

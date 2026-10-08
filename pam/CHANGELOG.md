@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.45.9] — 2026-10-08 · A clearer way back to the newest message
+
+The message box sits higher still off the bottom of the screen. The button
+that jumps back to the newest message is white with a shadow and a bigger,
+bolder arrow, so it stands out from the conversation behind it (D-393).
+
 ## [0.45.8] — 2026-10-08 · Days you can tell apart
 
 In a conversation, each day has more room above it, so a new day stands

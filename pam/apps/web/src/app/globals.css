@@ -193,13 +193,15 @@
   }
 
   /*
-   * The composer's two icons, the mic and the send arrow, drawn heavier than
-   * Astryx's 1.5 (Will, 8 October, D-390: "need to be bolder"). The mic is
-   * `ChatDictationButton`'s own, with no icon prop to swap; the SVG's
-   * `stroke-width` attribute is the weakest rule there is, so this one line
-   * is enough. Both together, so the pair stays matched (D-192).
+   * Every icon in a conversation — the mic, the send arrow, the
+   * scroll-to-bottom arrow — is drawn heavier than Astryx's 1.5 (Will,
+   * 8 October: D-390 "need to be bolder", D-393 "larger stronger icon").
+   * The mic is `ChatDictationButton`'s own, with no icon prop to swap; the
+   * SVG's `stroke-width` attribute is the weakest rule there is, so this one
+   * line is enough, and all three stay matched (D-192). The thread header
+   * above the conversation is outside `ChatLayout` and keeps Pam's 1.5.
    */
-  .astryx-chat-composer svg {
+  .astryx-chat-layout svg {
     stroke-width: 2.25;
   }
 
