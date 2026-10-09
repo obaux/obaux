@@ -66,6 +66,10 @@ function ThreadScreen() {
 
   const signedIn = session.status === 'signed-in';
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
+  // A limited account reads but cannot send (0031): the composer says so
+  // before they type, and `useThread` says so if the account was limited
+  // after this screen loaded (terms.s.limits.p3, D-426).
+  const accountLimited = session.status === 'signed-in' && session.session.accessStatus === 'limited';
   const { viewedRole } = useRoleView(trueRole);
   // The super admin messages staff too (0072, D-262) — never a member; the
   // database holds that line, not this screen.
@@ -77,7 +81,7 @@ function ThreadScreen() {
   // drawn for whichever role is being previewed and touches nothing real.
   const canMessage = demo ? viewedCanMessage : realCanMessage;
 
-  const { state, send, sending, sendFailed } = useThread(signedIn && realCanMessage && !demo ? conversationId : null);
+  const { state, send, sending, sendFailed, limited } = useThread(signedIn && realCanMessage && !demo ? conversationId : null);
 
   const speechLanguage = locale === 'es' ? 'es-US' : 'en-US';
 
@@ -181,6 +185,7 @@ function ThreadScreen() {
           onSend={send}
           sending={sending}
           sendFailed={sendFailed}
+          limited={limited || accountLimited}
           speechLanguage={speechLanguage}
           supportPhone={supportPhone}
         />

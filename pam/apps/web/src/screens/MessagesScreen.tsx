@@ -31,6 +31,9 @@ export function MessagesScreen() {
   const { t, locale } = useI18n();
   const { state: session } = useSession();
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
+  // A limited account reads but cannot start a message (0031): no New message,
+  // and the screen says what is off and who to call (terms.s.limits.p3, D-426).
+  const limited = session.status === 'signed-in' && session.session.accessStatus === 'limited';
   const { viewedRole } = useRoleView(trueRole);
   // The super admin may message staff, to help them start (0072, D-262).
   const canMessage =
@@ -125,8 +128,8 @@ export function MessagesScreen() {
                 : 'messages.empty.body.staff',
         )}
         headerActions={<HeaderActions role={viewedRole} enabled={session.status === 'signed-in'} hasHelp={false} />}
-        note={useExamples ? t('example.people.note') : null}
-        {...(canMessage ? { onNewMessage: () => setPicking(true) } : {})}
+        note={limited ? t('access.limitedNotice') : useExamples ? t('example.people.note') : null}
+        {...(canMessage && !limited ? { onNewMessage: () => setPicking(true) } : {})}
         // A member's people, one tap away (Will, 3 October, D-246): the same
         // strip a case manager's Home floats for Invite someone.
         floating={

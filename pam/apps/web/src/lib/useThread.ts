@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import type { Role } from '@pam/config';
+import { readAccountLimited } from './accountLimited';
 
 /**
  * One conversation: who is in it, and what has been said.
@@ -63,11 +64,18 @@ export function useThread(conversationId: string | null): {
   send: (body: string) => Promise<boolean>;
   sending: boolean;
   sendFailed: boolean;
+  /**
+   * The last send was refused because this account is limited, not because
+   * the connection dropped. The screen then says what is off and who to call
+   * (terms.s.limits.p3, D-426) instead of "Your connection dropped".
+   */
+  limited: boolean;
   refresh: () => void;
 } {
   const [state, setState] = useState<ThreadState>({ status: 'loading' });
   const [sending, setSending] = useState(false);
   const [sendFailed, setSendFailed] = useState(false);
+  const [limited, setLimited] = useState(false);
   const [nonce, setNonce] = useState(0);
   const refresh = useCallback(() => setNonce((n) => n + 1), []);
 
@@ -214,7 +222,13 @@ export function useThread(conversationId: string | null): {
         );
         return true;
       } catch {
-        setSendFailed(true);
+        // A refusal and a dropped connection look alike from here; only one
+        // of them is the account's doing, and it deserves its own words.
+        if (await readAccountLimited()) {
+          setLimited(true);
+        } else {
+          setSendFailed(true);
+        }
         return false;
       } finally {
         setSending(false);
@@ -223,5 +237,5 @@ export function useThread(conversationId: string | null): {
     [conversationId, state],
   );
 
-  return { state, send, sending, sendFailed, refresh };
+  return { state, send, sending, sendFailed, limited, refresh };
 }

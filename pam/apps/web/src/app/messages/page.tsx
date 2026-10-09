@@ -23,6 +23,7 @@ import { useReports } from '@/lib/useReports';
 import { openConversation } from '@/lib/openConversation';
 import { whenHappened } from '@/lib/when';
 import { ConversationRow } from './ConversationRow';
+import { LimitedNotice } from './LimitedNotice';
 import { ReportsList } from './ReportsList';
 import { DummyConversationsLazy, DummyReportsLazy } from './DummyRowsLazy';
 import { NewMessagePickerLazy } from './NewMessagePickerLazy';
@@ -84,6 +85,9 @@ function MessagesScreen() {
 
   const signedIn = session.status === 'signed-in';
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
+  // A limited account reads but cannot start a message (0031): the New
+  // message button gives way to the notice that says so (terms.s.limits.p3, D-426).
+  const limited = session.status === 'signed-in' && session.session.accessStatus === 'limited';
   const { viewedRole, demoRole, setViewAs } = useRoleView(trueRole);
   const isDemo = useDemoView(session);
   const previewing = demoRole !== null || isDemo;
@@ -281,9 +285,11 @@ function MessagesScreen() {
         The one primary action (D-186): everyone this person may message, in a
         sheet with a search box. Never for a super admin (D-171).
       */}
-      {showConversations ? (
+      {showConversations && !limited ? (
         <BigButton label={t('messages.new.action')} onPress={() => setPicking(true)} />
       ) : null}
+
+      {showConversations && limited ? <LimitedNotice supportPhone={supportPhone} /> : null}
 
       {picking ? (
         <NewMessagePickerLazy

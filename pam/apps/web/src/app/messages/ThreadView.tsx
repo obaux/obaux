@@ -25,6 +25,7 @@ import { VStack } from '@astryxdesign/core/VStack';
 import { HStack } from '@astryxdesign/core/HStack';
 import { Notice } from '@pam/ui';
 import { useI18n } from '@/lib/i18n';
+import { LimitedNotice } from './LimitedNotice';
 import { whenHappened } from '@/lib/when';
 
 /**
@@ -98,6 +99,12 @@ export interface ThreadViewProps {
   readonly onSend: (body: string) => Promise<boolean>;
   readonly sending: boolean;
   readonly sendFailed: boolean;
+  /**
+   * A limited account (0031) can read but not send. The composer gives way to
+   * the notice that says what is off and who to call (terms.s.limits.p3,
+   * D-426); the messages stay where they are.
+   */
+  readonly limited?: boolean;
   /** BCP-47 tag for dictation, e.g. "en-US" or "es-US". */
   readonly speechLanguage: string;
   readonly supportPhone: string;
@@ -156,6 +163,7 @@ export function ThreadView({
   onSend,
   sending,
   sendFailed,
+  limited = false,
   speechLanguage,
   supportPhone,
 }: ThreadViewProps) {
@@ -172,7 +180,9 @@ export function ThreadView({
     if (ok) setDraft('');
   };
 
-  const composer = (
+  const composer = limited ? (
+    <LimitedNotice supportPhone={supportPhone} />
+  ) : (
     <ChatComposer
       value={draft}
       onChange={setDraft}
@@ -251,7 +261,7 @@ export function ThreadView({
         })}
       </ChatMessageList>
 
-      {sendFailed ? (
+      {sendFailed && !limited ? (
         <Notice
           notice="something_went_wrong"
           title={t('messages.thread.failed.title')}

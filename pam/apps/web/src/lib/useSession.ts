@@ -53,6 +53,13 @@ export interface Session {
    * anybody's real information. See `useDemoView`.
    */
   isDemo: boolean;
+  /**
+   * `profiles.access_status`. `limited` is an account that can read but not
+   * send or start a message (0031's `is_active_account()`); the screens that
+   * would otherwise offer it say so and who to call (terms.s.limits.p3, D-426).
+   * `suspended` never reaches here: it is its own session state above.
+   */
+  accessStatus: 'active' | 'limited';
 }
 
 /** Announced when this account's own role changes (D-374). */
@@ -136,6 +143,7 @@ export function useSession(): { state: SessionState; refresh: () => void } {
               ? (profile.preferred_language as Locale)
               : DEFAULT_LOCALE,
             isDemo: Boolean(profile.is_demo),
+            accessStatus: profile.access_status === 'limited' ? 'limited' : 'active',
           },
         });
       } catch {
