@@ -175,7 +175,7 @@ up on their desired language … implement it."
   email provider are all in `docs/before-launch.md`.
 - **The `copy:draft` network call has not run** (no API key here); its prompt,
   parsing and batching are tested against a fake provider.
-- **0085 is not applied** (by hand with 0079–0081, before the merge).
+- **0085 is not applied** — nor 0079–0081. They are now one file, `packages/db/manual/2026-10-09-photos-documents-links-and-languages.sql`, for Will to paste into the SQL editor (D-428); then the merge. Will said photos follow the message rule, which the database confirms, so "tell members first" no longer blocks it.
 - **The `PAM Language fit` workflow has not run on GitHub** (only its commands
   locally), and `scripts/fit-known.json` it reads **does not exist yet**: the audit
   that would write it (`--write-known`) is slow (~110 minutes for all eight

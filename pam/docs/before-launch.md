@@ -57,27 +57,27 @@ STATUS row too.
   account, member + program. The session reads `profile_roles`; it names the
   `profile_id` foreign key, because the table points at `profiles` twice.
 
-- [ ] **Photos, documents and link previews in messages: deploy 0079 + 0080
-  + 0081, and tell members first** (Will, 8–9 October 2026, D-394, D-399,
-  D-407). All three now go in one SQL-editor file (`message-photos`,
-  `message-files`, `message_link_previews` + `link-previews`; one
-  transaction, tested through 0078, run twice, then the whole policy suite);
-  it replaces the 0079 + 0080 file. The `link-preview` Edge Function is
-  already deployed and refuses every request until 0081 is in. What
-  follows was written for photos and holds for documents too (D-394). The private `message-photos` store and who can
-  see a photo live in 0079 — applied to the live project before the branch
-  that sends photos is merged, or the photo button fails. The connector
-  stopped at its approval step for the `drop … if exists` guards (as with
-  0075), so it is a one-transaction file for the SQL editor, tested against
-  a copy built through 0078 (and harmless run twice); it records itself in
-  `schema_migrations`. The transparency
-  screen, privacy notice and terms now name photos; two member accounts on
-  live saw the old wording, so if either is a real person they hear about
-  photos before the merge ("If this changes, we will tell you first").
-  **9 October 2026 (Will): the merge to `main` is held until these three are
-  live** — `claude/gallant-clarke-0dhizj` (the seven languages) carries this
-  photo, document and link UI, so it waits too. 0083 and 0084 went in ahead of
-  them, and touch nothing they create.
+- [ ] **Photos, documents and link previews in messages: run the one SQL file,
+  then merge** (Will, 8–9 October 2026, D-394, D-399, D-407, D-428). **Will, 9
+  October: "Photo and messages are treated the same. Only reported if flagged."**
+  Checked against the database: a photo or document is seen by the two people in
+  the conversation and by a guide or super admin only after someone reports that
+  message, by the same test as its words; link previews only by the two people,
+  reported or not; no admin policy on any of them; the privacy copy says so. So
+  the promise to members is unchanged and **"tell members first" no longer blocks
+  the merge** — a heads-up to the two member accounts on the live project is
+  Will's courtesy to give or skip. What is left:
+  1. **Will runs `packages/db/manual/2026-10-09-photos-documents-links-and-
+     languages.sql`** in the Supabase dashboard (SQL editor, `pam` project, paste,
+     Run, "Success"). It is 0079 + 0080 + 0081 + 0085 in one transaction, refuses
+     the wrong database, rolls itself back if its own checks fail, and is safe to
+     run twice. Its README says how it was proved.
+  2. Claude reads the database back (`list_migrations`, `get_advisors`) and merges
+     to `main`; Vercel deploys. Migration first, app second: the `link-preview`
+     Edge Function is already deployed and refuses every request until 0081 is in,
+     and the photo button fails without 0079.
+  3. Send one photo, one document and one link between two test accounts and look
+     at both screens.
 
 - [ ] **Approve the Pam-team line on the transparency screen** (STATUS row
   10b). Members were promised they would hear first if what is visible

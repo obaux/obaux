@@ -11325,3 +11325,31 @@ D-426, found free from this branch's side, and was renumbered on 9 October when 
 branch pushed its own D-426 ("Numbers are claimed in one file"); every reference on
 this branch moved with it. This branch has no allocations file: claim the row there
 when the two meet.
+
+### D-428 — Photos and documents follow the message rule; the held migrations are one file
+
+**Date:** 2026-10-09. Will: "Photo and messages are treated the same. Only
+reported if flagged."
+
+- **It is true in the database, checked.** A photo or a document (0079, 0080) is
+  read by the two people in the conversation, and by a guide or a super admin
+  only once someone reports the message it is in, through the same test the
+  message's own words pass (`report_visible_to_me`, 0065). There is no admin
+  policy on either bucket, as there is none on `messages` (0007). A link preview
+  (0081) is stricter still: only the two people, reported or not, because a
+  report already carries the link in the words. The privacy copy says the same
+  (`privacy.s.who-can-see.p3`, `transparency.canSee.flagged`), and
+  `privacy.s.what-we-keep.p6` says Pam's server opens a shared page once.
+- **So the promise does not change; photos join it.** That is how I read Will's
+  line, and it is why "tell members first" (D-394, D-399, D-407) is no longer a
+  gate on the merge: nothing that was private becomes visible. It is Will's call
+  whether the two member accounts on the live project get a courtesy heads-up
+  anyway; it blocks nothing.
+- **The apply step is one file** (`packages/db/manual/2026-10-09-photos-documents-
+  links-and-languages.sql`): 0079 + 0080 + 0081 + 0085 in one transaction, for
+  the SQL editor because the connector stops at a `drop`. It refuses a database
+  that lacks 0078 or 0084, checks its own work and rolls back if a bucket is
+  public or a policy missing, records the four in the ledger, and is safe to run
+  twice. Proved on a database shaped like the live one (0001–0078 and 0082–0084):
+  run twice, then the whole policy suite; and proved to refuse and to roll back
+  (nothing left behind). A test stops it drifting from the migrations.
