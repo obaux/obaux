@@ -11409,3 +11409,40 @@ D-427: "Moving forward, we'll send emails with privacy policy updates", "Delete"
   gains *Messages — account limited*, *A conversation — account limited* and the
   *Report a message* screen (which had a story only since D-427), with the edges
   that reach them; `UPDATED` is 9 October.
+
+### D-430 — The limited notice says what is off, why, then Pam — in a calm card
+
+**Date:** 2026-10-09. **Decided by:** Will, looking at the limited Messages screen:
+"This wording 'your plan' doesn't make sense. Just start with You cannot send
+messages. And explain why. Then call PAM. Also let's add more padding on this card,
+and make text the smallest. Call Pam for help should be a link, not a primary button."
+
+- **The words.** `notice.account_limited.body` is now: "You cannot send messages
+  right now. Your guide turned this off for your account. You can still read your
+  messages. Call Pam and we will help you reach your guide." It starts with what is
+  off, gives the reason that is always true (a limit is set by the case manager the
+  person is assigned to: `admin_set_access_status` is gated by `admin_covers`, 0082
+  — so "your guide turned this off" is accurate, and it never states the internal
+  reason, §4.1), and ends on Pam, like the paused notice. "Look at places and your
+  plan" and "meet new people" are gone. Reworded in all seven languages and the
+  English source in `notices.ts`; `copy:status` reads in step.
+  **The five languages other than Spanish are Claude's drafts, not a native
+  reader's** (the same standing as the rest of them, `docs/before-launch.md`).
+- **The card.** `Notice` gains `quiet`: `padding={6}` (the text-card padding) instead
+  of 4; the title and the message at the body-text floor, 16px
+  (`--pam-body-text-mobile`, A23), instead of 19px and 17px; and the call is a
+  link — accent colour, underlined, phone icon, no fill, still a 48px target and
+  still a `tel:` anchor — instead of a primary button. Only the limited notice uses
+  it (`LimitedNotice`). Every other notice (offline, something went wrong, paused,
+  turned off) keeps the primary call button: those are faults where calling is the
+  one thing to do. If Will wants the calm look on all of them it is one prop.
+- **Checked in a browser** (`e2e/messages.spec.ts`): the notice begins "You cannot
+  send messages right now.", says "Your guide turned this off for your account.",
+  never mentions a plan, its text is 16px, and the call is an underlined link with
+  a transparent background at least 48px tall; axe clean at 320px and iPhone SE.
+  Storybook: *Components / Feedback / Notice / Some Things Turned Off Quiet*, and the
+  limited-account states.
+- **For the next session** (assign and limit): `admin_set_access_status`'s error
+  still reads "That person is not on your caseload or in your region" (0008); since
+  0082 there is no region, so the message should change when that screen is built.
+

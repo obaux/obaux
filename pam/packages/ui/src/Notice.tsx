@@ -8,6 +8,8 @@ import { Text } from '@astryxdesign/core/Text';
 import { Icon } from '@astryxdesign/core/Icon';
 import { Button } from './Button.js';
 import { PhoneIcon } from './icons.js';
+import { textLinkLook } from './TextLink.js';
+import { pam } from './tokens.stylex.js';
 import { NOTICES, type NoticeKey } from '@pam/config';
 
 /**
@@ -58,6 +60,14 @@ export interface NoticeProps {
   userFacingNote?: string | null;
   /** Optional extra action, e.g. "Try again". Rendered before the call button. */
   retry?: { label: string; onPress: () => void };
+  /**
+   * A calm card for something that is on purpose and has a reason, rather than
+   * a fault (a limited account, D-430): more room round the words, the smallest
+   * body text Pam allows (16px, A23) for the title and the message alike, and
+   * the call as a link, not a primary button. Everything else is the same: the
+   * `tel:` anchor, the 48px target, the alert role.
+   */
+  quiet?: boolean;
 }
 
 const styles = stylex.create({
@@ -69,6 +79,16 @@ const styles = stylex.create({
   body: { fontSize: '17px', lineHeight: 1.5 },
   // A coloured edge rather than a coloured fill: it survives a high-contrast
   // mode, and it never fights the text for contrast (§2.5 wants AAA body text).
+  // The quiet look (D-430): the body-text floor for everything on the card, and a
+  // call that reads as a link (accent, underlined) at the same size.
+  quietTitle: { fontSize: pam['--pam-body-text-mobile'], lineHeight: 1.4 },
+  quietBody: { fontSize: pam['--pam-body-text-mobile'], lineHeight: 1.5 },
+  quietCall: {
+    minHeight: '48px',
+    fontSize: pam['--pam-body-text-mobile'],
+    color: { default: 'var(--color-text-accent, currentColor)', ':hover': 'var(--color-text-accent, currentColor)' },
+    textDecorationLine: 'underline',
+  },
   card: {
     width: '100%',
     borderInlineStartWidth: '4px',
@@ -96,6 +116,7 @@ export function Notice({
   callLabel = 'Call Pam',
   userFacingNote,
   retry,
+  quiet = false,
 }: NoticeProps) {
   const definition = NOTICES[notice];
   const message = userFacingNote?.trim() || body;
@@ -111,13 +132,23 @@ export function Notice({
         />
       ) : null}
       {definition.offersSupport && supportPhone ? (
-        <Button
-          label={callLabel}
-          variant="primary"
-          href={`tel:${supportPhone}`}
-          icon={<PhoneIcon />}
-          xstyle={styles.action}
-        />
+        quiet ? (
+          <Button
+            label={callLabel}
+            variant="ghost"
+            href={`tel:${supportPhone}`}
+            icon={<PhoneIcon />}
+            xstyle={[textLinkLook.link, styles.quietCall]}
+          />
+        ) : (
+          <Button
+            label={callLabel}
+            variant="primary"
+            href={`tel:${supportPhone}`}
+            icon={<PhoneIcon />}
+            xstyle={styles.action}
+          />
+        )
       ) : null}
     </>
   );
@@ -138,7 +169,7 @@ export function Notice({
 
   return (
     <Card
-      padding={4}
+      padding={quiet ? 6 : 4}
       xstyle={[styles.card, styles[definition.status]]}
       // Errors and warnings interrupt; an informational note is announced when
       // the reader gets to it. Nothing here is dismissable — a member should not
@@ -148,11 +179,11 @@ export function Notice({
       <VStack gap={2}>
         <HStack gap={2} align="center">
           <Icon icon={STATUS_ICON[definition.status]} color={STATUS_ICON_COLOR[definition.status]} />
-          <Heading level={2} xstyle={styles.title}>
+          <Heading level={2} xstyle={quiet ? styles.quietTitle : styles.title}>
             {title}
           </Heading>
         </HStack>
-        <Text xstyle={styles.body}>{message}</Text>
+        <Text xstyle={quiet ? styles.quietBody : styles.body}>{message}</Text>
         {hasActions ? (
           <HStack gap={2} wrap="wrap">
             {actions}

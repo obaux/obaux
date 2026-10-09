@@ -378,7 +378,7 @@
   "nav.back.places": "返回“地点”",
   "nav.back.saved": "返回“收藏”",
   "nav.help": "帮助",
-  "notice.account_limited.body": "您仍然可以查看地点和您的计划，也可以阅读您的消息。暂时不能发送消息，也不能认识新的人。如有疑问，请给您的引导人或Pam打电话。",
+  "notice.account_limited.body": "您现在不能发送消息。您的引导人关闭了您账户的这项功能。您仍然可以阅读您的消息。请给Pam打电话，我们帮您联系您的引导人。",
   "notice.account_limited.title": "部分功能已关闭",
   "notice.account_suspended.body": "您现在无法登录。您的引导人可以重新开启您的账户。请给Pam打电话，我们帮您联系对方。",
   "notice.account_suspended.title": "您的账户已暂停",

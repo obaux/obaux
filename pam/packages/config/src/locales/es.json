@@ -375,7 +375,7 @@
   "nav.back.places": "Volver a Lugares",
   "nav.back.saved": "Volver a Guardados",
   "nav.help": "Ayuda",
-  "notice.account_limited.body": "Todavía puede ver lugares y su plan, y leer sus mensajes. Por ahora no puede enviar mensajes ni conocer personas nuevas. Llame a su guía o a Pam si tiene preguntas.",
+  "notice.account_limited.body": "No puede enviar mensajes por ahora. Su guía lo desactivó en su cuenta. Todavía puede leer sus mensajes. Llame a Pam y le ayudaremos a comunicarse con su guía.",
   "notice.account_limited.title": "Algunas cosas están apagadas",
   "notice.account_suspended.body": "No puede entrar ahora. Su guía puede activarla otra vez. Llame a Pam y le ayudamos a comunicarse con esa persona.",
   "notice.account_suspended.title": "Su cuenta está en pausa",

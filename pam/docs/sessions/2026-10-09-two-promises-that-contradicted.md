@@ -94,6 +94,13 @@ decided.
   `claude-pam-storybook` Chromatic address in `STORYBOOK_URL`, which does not have
   these stories; change it when this branch's Storybook has an address.
 
+- **Will's note on the limited screen (D-430).** "Your plan" made no sense; the
+  notice now starts "You cannot send messages right now", says why, then Pam, in a
+  calm card (`Notice quiet`: more padding, 16px text, the call as a link). All seven
+  languages reworded (five are Claude's drafts). Merged `main` (the languages branch,
+  D-422–D-428) into this branch first; the full browser suite passes on the merged
+  tree (834), and the messages spec after this change (165).
+
 ## What was wrong, and what missed it
 
 **A test hardcoded a count and broke without anyone seeing.** `e2e/legal.spec.ts`

@@ -625,8 +625,24 @@ test.describe('a conversation', () => {
     await expect(page.getByRole('button', { name: /send/i })).toHaveCount(0);
     // ...and Pam says so, with a way to reach a person.
     await expect(page.getByRole('alert').getByText('Some things are turned off')).toBeVisible();
-    await expect(page.getByRole('alert').getByText(/Call your guide or Pam/)).toBeVisible();
-    await expect(page.getByRole('alert').getByRole('link', { name: /Call/ })).toHaveAttribute('href', /^tel:/);
+    // It begins with what is off, says why, then points to Pam (Will, 9 October).
+    const notice = page.getByRole('alert');
+    await expect(notice.getByText(/^You cannot send messages right now\./)).toBeVisible();
+    await expect(notice.getByText(/Your guide turned this off for your account\./)).toBeVisible();
+    await expect(notice.getByText(/your plan/i)).toHaveCount(0);
+    const call = notice.getByRole('link', { name: /Call/ });
+    await expect(call).toHaveAttribute('href', /^tel:/);
+    // The quiet card: body text at the smallest size (16px), and the call is a
+    // link, not a filled primary button — still a 48px target.
+    expect(await notice.getByText(/^You cannot send messages/).evaluate((el) => getComputedStyle(el).fontSize)).toBe('16px');
+    const look = await call.evaluate((el) => {
+      const c = getComputedStyle(el);
+      return { size: c.fontSize, line: c.textDecorationLine, bg: c.backgroundColor, h: el.getBoundingClientRect().height };
+    });
+    expect(look.size).toBe('16px');
+    expect(look.line).toContain('underline');
+    expect(look.bg).toBe('rgba(0, 0, 0, 0)');
+    expect(look.h).toBeGreaterThanOrEqual(48);
 
     const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
     expect(results.violations).toEqual([]);
