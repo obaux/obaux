@@ -14,6 +14,7 @@ import { BookIcon, GlobeIcon, Page, PhoneIcon, PlaceDetail, PlacesIcon, PlusIcon
 import { LargeTitleHeader } from '@pam/ui/LargeTitleHeader';
 import { MenuList } from '@pam/ui/MenuList';
 import { useI18n } from '@/lib/i18n';
+import { addressActionsFor } from '@/lib/addressActions';
 import { useSession } from '@/lib/useSession';
 import { useProgramSetup } from '@/lib/programSetup';
 import { AddProgramView } from './AddProgramView';
@@ -217,6 +218,7 @@ export function ProgramView({
           categoryLabel={t(categoryLabelKey(program.category))}
           description={program.description}
           address={program.address}
+          addressActions={addressActionsFor(t, program.address)}
           phone={program.phone || null}
           website={program.website || null}
           extra={servicesCard}

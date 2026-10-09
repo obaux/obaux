@@ -15,6 +15,7 @@ export {
   PlaceCard,
   type PlaceCardProps,
   directionsHref,
+  appleMapsHref,
   googlePlaceHref,
 } from './PlaceCard.js';
 export { PlaceDetail, type PlaceDetailProps } from './PlaceDetail.js';

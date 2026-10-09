@@ -951,9 +951,10 @@ migrations is on the live project** — correction, 9 October, later: 0083, 0084
   reader yet"); pull a language by emptying its `reviewedBy`. A text always goes out:
   English if the person's language is not signed or cannot be sent safely. The live
   `dispatch-sms` (v15) is older than the repo ("PAM:" prefix, English/Spanish) and is
-  **not redeployed** — see before-launch. 160 characters, or 70
-  where the script needs the other encoding (the appointment reminders have no
-  text there); a justice-word list per language, applied again in the
+  **not redeployed** — see before-launch (the carrier filing comes first). 160
+  characters, or 70 where the script needs the other encoding, **except the three
+  appointment reminders, which may take two segments (134) in Chinese, Russian and
+  Arabic (D-431, Will)**; a justice-word list per language, applied again in the
   dispatcher; one STOP table the dispatcher and the config package share; a
   parity test renders both. **Migration 0085 (not applied; by hand, and nothing waits on it)**
   keeps the language a person asked in on staff requests and invite emails. The
@@ -965,7 +966,15 @@ migrations is on the live project** — correction, 9 October, later: 0083, 0084
   six translations are answered or kept on purpose. Storybook's *Pseudo-language*
   (English +45%), a `PAM Language fit` workflow on pull requests, web unit tests
   now in CI. How: `docs/copy-changes.md`. Numbers (D-, A, migrations) are claimed
-  in `docs/allocations.md` (D-426).
+  in `docs/allocations.md` (D-426). **The fit check has its baseline (D-434):**
+  the full audit's 137 defects were looked at and 121 distinct ones are in
+  `apps/web/scripts/fit-known.json` with reasons; one real fault was fixed (the
+  header's invisible compact title pushed its buttons off the screen); the tab bar
+  is left for Will (before-launch). The job takes about an hour (limit 90 minutes).
+- **An address can be copied or opened in Apple Maps (D-435, 0.52.0).** On the
+  address card of a place or program: a copy button, an "Open in Apple Maps" link
+  beside Google's "Get directions", and the address kept in its own reading order in
+  Arabic. Four strings in seven languages (the six are machine drafts).
 - **Migrations 0083 and 0084 are live** (applied 9 October after a
   `list_migrations` check; `get_advisors` clean). 0083 is
   `profiles_language_supported` taking the five new codes; 0084 is

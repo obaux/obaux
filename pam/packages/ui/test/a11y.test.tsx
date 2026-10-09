@@ -119,6 +119,15 @@ describe('accessibility', () => {
           categoryLabel="School and training"
           description="GED classes and help with reading."
           address="123 Main St"
+          addressActions={{
+            appleMapsHref: 'https://maps.apple.com/?daddr=123%20Main%20St',
+            labels: {
+              copy: 'Copy address',
+              copied: 'Address copied',
+              copyFailed: 'Could not copy. Press and hold the address to copy it.',
+              appleMaps: 'Open in Apple Maps',
+            },
+          }}
           distanceLabel="1.2 miles"
           status={{ isOpen: true, label: 'Open until 5:00pm' }}
           weekLines={[{ day: 'Monday', hours: '9:00am – 5:00pm' }]}

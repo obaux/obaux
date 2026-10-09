@@ -23,6 +23,7 @@ import { HelpButton } from '../../screens/HelpButton';
 import { categoryLabelKey, displayPhone, distanceLabel, NOTICES, POINTS_RULES, type Category, intlLocale } from '@pam/config';
 import { DUMMY_PLACES_BY_ID, isDummyPlaceId } from '@pam/config/dummy-places';
 import { useI18n } from '@/lib/i18n';
+import { addressActionsFor } from '@/lib/addressActions';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
 import { useSavedPlaces } from '@/lib/useSavedPlaces';
@@ -446,6 +447,7 @@ function PlaceScreen() {
         // becomes About service, and the address card says whose it is.
         description={service?.description || place!.description}
         address={address}
+        addressActions={addressActionsFor(t, address, service?.address ? null : place!.lat, service?.address ? null : place!.lon)}
         status={status ? { isOpen: status.isOpen, label: status.label } : null}
         // Who you'll meet (Will, 7 October, D-335): once a visit is booked,
         // the program's staff at the right of the open/closed row.

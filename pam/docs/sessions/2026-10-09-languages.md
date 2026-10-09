@@ -313,3 +313,22 @@ minutes, 3,752 measurements, none unmeasurable): 137 defects new in a language.
   wider). Looked at, added with the same reason (121 entries), and the job's timeout
   raised from 60 to 90 minutes because it used 55. Re-run on the push after this.
 
+## Part 7 — an address can be copied, or opened in Apple Maps (D-435)
+
+Will, on the Arabic address finding: "Let's ensure the address listed is easily copied
+into google maps or apple maps to help them navigate."
+
+- **Code:** `PlaceDetail`'s address card gets `addressActions`: a copy button (the D-417
+  `CopyButton`, copying exactly the address), an "Open in Apple Maps" link, and the
+  address text isolated for reading direction (`unicode-bidi: plaintext`) and selectable.
+  `appleMapsHref` beside `directionsHref` (coordinates beat the address, as for Google).
+  Wired in the place page, the program page and the request-a-program screen through
+  `lib/addressActions.ts`. Four strings in seven languages (`copy:ack`). Eight new UI
+  tests and the axe test covers the controls; stories *PlaceDetail* and *ArabicAddress*.
+- **Looked at** in Storybook, English and Arabic: the Arabic address keeps its order
+  (123 Main St first), the copy button mirrors to the left, "فتح في خرائط Apple" reads
+  right. A first screenshot showed the Apple Maps link centred across the card; it now
+  starts where the address does.
+- **Not run:** the browser (Playwright/axe) suite for contrast and target size; CI does.
+- **Not done:** Trips cards and booking confirmations show the place name, not an address.
+

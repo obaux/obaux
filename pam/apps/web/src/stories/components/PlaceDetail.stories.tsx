@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/nextjs';
-import { Page, PageTitle, directionsHref, googlePlaceHref } from '@pam/ui';
+import { Page, PageTitle, appleMapsHref, directionsHref, googlePlaceHref } from '@pam/ui';
 import { PlaceDetail, type PlaceDetailProps } from '@pam/ui/PlaceDetail';
 import { DUMMY_PLACES_BY_ID } from '@pam/config/dummy-places';
 import { categoryLabelKey } from '@pam/config';
@@ -31,11 +31,21 @@ const OPEN_LATE: PlaceHours = {
 
 type DetailArgs = PlaceDetailProps;
 
-function LocalisedPlaceDetail({ status, audienceLabel, labels, ...rest }: DetailArgs) {
+function LocalisedPlaceDetail({ status, audienceLabel, labels, addressActions, ...rest }: DetailArgs) {
   const tr = useStoryText();
   return (
     <PlaceDetail
       {...rest}
+      addressActions={
+        addressActions
+          ? {
+              appleMapsHref: addressActions.appleMapsHref ?? null,
+              labels: Object.fromEntries(
+                Object.entries(addressActions.labels).map(([name, key]) => [name, tr(key)]),
+              ) as NonNullable<DetailArgs['addressActions']>['labels'],
+            }
+          : undefined
+      }
       categoryLabel={tr(rest.categoryLabel)}
       status={status ? { isOpen: status.isOpen, label: tr(status.label) } : null}
       audienceLabel={tr(audienceLabel)}
@@ -102,6 +112,17 @@ const meta = {
     phone: learning.phone,
     website: 'https://example.org',
     directionsHref: directionsHref(learning.address, learning.lat, learning.lon) ?? null,
+    // Copy the address, or open it in Apple Maps (Will, 9 October 2026); Google
+    // Maps is the button above. Labels are i18n keys, said by the story.
+    addressActions: {
+      appleMapsHref: appleMapsHref(learning.address, learning.lat, learning.lon) ?? null,
+      labels: {
+        copy: 'place.address.copy',
+        copied: 'place.address.copied',
+        copyFailed: 'place.address.copyFailed',
+        appleMaps: 'place.address.appleMaps',
+      },
+    },
     hoursHref: googlePlaceHref(learning.name, learning.address),
     isSaved: false,
     onSave: () => {},
@@ -178,6 +199,13 @@ export const LongName: Story = {
 };
 
 export const Spanish: Story = { ...LongName, globals: { locale: 'es' } };
+
+/**
+ * An English street address inside an Arabic screen (D-435). The address
+ * keeps its own order — number first — instead of being reordered by the
+ * right-to-left page, and the copy button and Apple Maps link sit beside it.
+ */
+export const ArabicAddress: Story = { globals: { locale: 'ar' } };
 
 /** Without `PageTitle` above it, the component draws the name itself. */
 export const WithOwnHeading: Story = {

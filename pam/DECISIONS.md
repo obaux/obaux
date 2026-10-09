@@ -11502,3 +11502,42 @@ looked at, so its first run would have failed on the whole backlog.
   Entries for the pseudo-language mean "worse than any real language", not "fine":
   they matter on the day a language with longer words is added.
 
+### D-435 — An address can be copied, or opened in Apple Maps, from the place and program pages
+
+**Date:** 2026-10-09. Will, on my finding that an English street address inside an
+Arabic sentence is reordered: "Let's ensure the address listed is easily copied into
+google maps or apple maps to help them navigate."
+
+- **What a person gets.** On the address card of a place or a program: the address as
+  plain, selectable words; a **copy button** (the same 48px round icon as the page-copy
+  button, D-417: a tick and "Address copied" for five seconds, or "Could not copy. Press
+  and hold the address to copy it." when a browser refuses); and an **"Open in Apple
+  Maps"** link. Google Maps was already there as the primary "Get directions" button, so
+  it is not repeated. Copy is the one that reaches every other app (Waze, a ride app, a
+  paper note); Apple Maps is for the many iPhone readers who have no Google Maps.
+- **Same door in both.** `appleMapsHref` follows `directionsHref`: coordinates beat the
+  address when Pam has them (a stale address routes to the wrong building), the address
+  otherwise, nothing when there is nothing. A picked service has its own address and no
+  point of its own, so it sends both apps to the address. On an iPhone or Mac the link
+  opens the Maps app; elsewhere Apple's page in the browser. No travel mode, so Maps
+  picks what the person last used.
+- **What is copied is exactly the address**, as written: no hidden direction marks. The
+  *display* is what is isolated (`unicode-bidi: plaintext`): in Arabic the address keeps
+  its own order, number first, instead of being reordered by the right-to-left page.
+  That fixes the address card; the same fault in other sentences that carry data (an area
+  chip's "Near {area}") is the separate task queued from the text-fit audit.
+- **Where.** The place page, the program page (member's and program lead's view), and the
+  request-a-program screen: everywhere `PlaceDetail` draws an address. Not on the sample
+  address of the empty-program preview. The texts are unchanged: a reminder already
+  carries the address and a link.
+- **Four new strings** (`place.address.copy`, `.copied`, `.copyFailed`, `.appleMaps`) in
+  seven languages. The six that are not English are machine drafts like the rest and
+  have no native reader yet; "Apple Maps" stays in Latin letters in all of them.
+- **Checked.** `appleMapsHref` (address, coordinates, nothing); the card with and without
+  the actions; the exact clipboard text; the refusal message; axe on the new controls.
+  Storybook: *PlaceDetail* (every language) and *ArabicAddress*. The browser run (contrast,
+  target size) is CI's.
+- **Not done.** The Trips visit cards and booking confirmation show the place's name, not
+  its address, so they have nothing to copy; if Will wants an address there it is the same
+  card. Google Maps itself still only has the one link.
+

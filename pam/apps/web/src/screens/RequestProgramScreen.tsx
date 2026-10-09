@@ -8,6 +8,7 @@ import { categoryLabelKey, type Category } from '@pam/config';
 import { Loading, PlaceDetail } from '@pam/ui';
 import { SubPage } from '@pam/ui/SubPage';
 import { useI18n } from '@/lib/i18n';
+import { addressActionsFor } from '@/lib/addressActions';
 import { goBack } from '@/lib/navigate';
 import { useSession } from '@/lib/useSession';
 import { useStaffRequests } from '@/lib/useStaffRequests';
@@ -70,6 +71,7 @@ export function RequestProgramScreen({ userId }: { readonly userId: string | nul
         categoryLabel={t(categoryLabelKey(program.category ?? ''))}
         description={program.description}
         address={program.address}
+        addressActions={addressActionsFor(t, program.address)}
         phone={program.phone}
         website={program.website}
         labels={{

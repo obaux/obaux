@@ -16,7 +16,8 @@ import { BookmarkIcon, ClockIcon, FlagIcon, PhoneIcon, PlacesIcon, ShareIcon } f
 import { BigButton } from './BigButton.js';
 import { CATEGORY_DEFINITIONS, type Category } from '@pam/config';
 import { pam } from './tokens.stylex.js';
-import { textLinkLook } from './TextLink.js';
+import { TextLink, textLinkLook } from './TextLink.js';
+import { CopyButton } from './CopyButton.js';
 import { MenuList, type MenuItem } from './MenuList.js';
 import { AutoHeight, TextSwap } from './Swap.js';
 import { landFocus, landFocusStyle } from './landFocus.js';
@@ -56,6 +57,25 @@ export interface PlaceDetailProps {
   readonly categoryLabel: string;
   readonly description?: string | null;
   readonly address?: string | null;
+  /**
+   * Ways to take the address somewhere (Will, 9 October 2026: "easily copied
+   * into Google Maps or Apple Maps to help them navigate"): a copy button
+   * beside the heading, and a link that opens it in Apple Maps. Google Maps is
+   * the "Get directions" button. Left out, the card is only the words.
+   */
+  readonly addressActions?: {
+    readonly appleMapsHref?: string | null;
+    readonly labels: {
+      /** "Copy address", the button's name. */
+      readonly copy: string;
+      /** "Address copied". */
+      readonly copied: string;
+      /** "Could not copy. Press and hold the address to copy it." */
+      readonly copyFailed: string;
+      /** "Open in Apple Maps". */
+      readonly appleMaps: string;
+    };
+  };
   readonly distanceLabel?: string | null;
   /** Already worded: "Open until 5:00pm", "Closed · opens 9:00am". */
   readonly status?: { readonly isOpen: boolean; readonly label: string } | null;
@@ -170,6 +190,7 @@ const styles = stylex.create({
   name: { fontSize: '26px', lineHeight: 1.2 },
   section: { fontSize: '17px' },
   body: { fontSize: '17px', lineHeight: 1.5 },
+  addressText: { unicodeBidi: 'plaintext', userSelect: 'text', overflowWrap: 'anywhere' },
   meta: { fontSize: '16px' },
   open: { fontSize: '17px', fontWeight: 600, color: colorVars['--color-text-accent'] },
   shut: { fontSize: '17px', fontWeight: 600 },
@@ -233,6 +254,7 @@ export function PlaceDetail({
   categoryLabel,
   description,
   address,
+  addressActions,
   distanceLabel,
   status,
   statusAside,
@@ -281,12 +303,33 @@ export function PlaceDetail({
       <AutoHeight>
         <TextSwap token={`${labels.address}|${address}`}>
           <VStack gap={1}>
-            <Heading level={2} xstyle={styles.section}>
-              {labels.address}
-            </Heading>
-            <Text type="supporting" xstyle={styles.body}>
+            <HStack align="center" justify="between" wrap="nowrap" gap={2}>
+              <Heading level={2} xstyle={styles.section}>
+                {labels.address}
+              </Heading>
+              {addressActions ? (
+                <CopyButton
+                  text={address}
+                  label={addressActions.labels.copy}
+                  copiedLabel={addressActions.labels.copied}
+                  failedLabel={addressActions.labels.copyFailed}
+                />
+              ) : null}
+            </HStack>
+            {/* The address reads in its own direction, not the screen's: in
+                Arabic an English street address was reordered, its number
+                jumping to the far end. Plain text, so it can also be selected
+                and copied by hand. */}
+            <Text type="supporting" xstyle={[styles.body, styles.addressText]}>
               {address}
             </Text>
+            {addressActions?.appleMapsHref ? (
+              // In a row of its own so the link is as wide as its words and
+              // starts where the address does, not centred across the card.
+              <HStack justify="start">
+                <TextLink label={addressActions.labels.appleMaps} href={addressActions.appleMapsHref} />
+              </HStack>
+            ) : null}
           </VStack>
         </TextSwap>
       </AutoHeight>
