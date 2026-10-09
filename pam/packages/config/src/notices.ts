@@ -123,7 +123,7 @@ export const NOTICES: Readonly<Record<NoticeKey, NoticeDefinition>> = {
   /**
    * A limited account (0007's `is_active_account()`): it can read, including its
    * messages, but cannot send a message or start a conversation, or connect with
-   * a new person. The words say that (D-426) — they used to say "messages are off",
+   * a new person. The words say that (D-427) — they used to say "messages are off",
    * which was untrue of reading — and name who to call, as `terms.s.limits.p3`
    * promises ("Pam tells you it is off and who to call").
    */

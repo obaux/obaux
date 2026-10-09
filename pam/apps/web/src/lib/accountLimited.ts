@@ -6,7 +6,7 @@
  * 0031). From the phone a refusal and a dropped connection look the same — an
  * insert that came back with an error — and "Your connection dropped" is not
  * true of the first (terms.s.limits.p3: "Pam tells you it is off and who to
- * call", D-426). So a send that failed asks once, here, which one it was.
+ * call", D-427). So a send that failed asks once, here, which one it was.
  *
  * Returns false whenever it cannot tell (offline, signed out): the generic
  * failure notice is the honest answer then.

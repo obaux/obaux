@@ -60,7 +60,7 @@ const PROJECT_REF = new URL(SUPABASE_URL).hostname.split('.')[0];
 
 /** What a story can change about the pretend account. */
 export interface MockOptions {
-  /** A limited account (0031): reads, but the database refuses a send (D-426). */
+  /** A limited account (0031): reads, but the database refuses a send (D-427). */
   readonly limited?: boolean;
 }
 

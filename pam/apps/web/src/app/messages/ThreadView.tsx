@@ -159,7 +159,7 @@ export interface ThreadViewProps {
   /**
    * A limited account (0031) can read but not send. The composer gives way to
    * the notice that says what is off and who to call (terms.s.limits.p3,
-   * D-426); the messages stay where they are.
+   * D-427); the messages stay where they are.
    */
   readonly limited?: boolean;
   /** BCP-47 tag for dictation, e.g. "en-US" or "es-US". */

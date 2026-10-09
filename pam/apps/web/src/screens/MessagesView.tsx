@@ -59,7 +59,7 @@ export interface MessagesViewProps {
   /** Under the list — "These are example people". */
   readonly note?: string | null;
   /**
-   * For a limited account (D-426): the notice that says what is off and who to
+   * For a limited account (D-427): the notice that says what is off and who to
    * call, under the title, in New message's place. The account can still read
    * the list.
    */

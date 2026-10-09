@@ -112,7 +112,7 @@ STATUS row too.
   case manager (signed up alone, or invited by a program lead or a super
   admin) are read by none: the screen to assign one is on the STATUS backlog.
 
-- [x] **Make `terms.s.limits.p3` true** — **done 9 October 2026 (Will, D-426:
+- [x] **Make `terms.s.limits.p3` true** — **done 9 October 2026 (Will, D-427:
   "resolve the remaining")** (Will, 9 October 2026: "Keep terms.s.limits.p3").
   The terms promise "When something is turned off, Pam tells you it is off and
   who to call." Messages now shows the `account_limited` notice (with the call

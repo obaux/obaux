@@ -63,7 +63,7 @@ decided.
   heading, and one copy icon top right (tooltip, tick for 5 seconds). The plain
   look and its code were deleted.
 
-- **The remaining items (D-426).** Will: "resolve the remaining. Yes use Your guide
+- **The remaining items (D-427).** Will: "resolve the remaining. Yes use Your guide
   for short." (1) "Your guide" is the short word: the long phrase now appears only
   where it defines the word; Help, the three report screens and the paused /
   turned-off / limited notices say "your guide" (eight strings, en + es,
@@ -115,7 +115,7 @@ about one thing, side by side — a translator's habit, not a test's.
   screens, in two looks for Will to choose.
 - D-417 — Will's choices: icons; a short Profile screen; a flat policy with one
   copy icon (tooltip, tick, 5 seconds).
-- D-426 — "your guide" for short; a limited account is told it is off and who to
+- D-427 — "your guide" for short; a limited account is told it is off and who to
   call (p3 kept and built).
 
 ## Verified
@@ -138,10 +138,10 @@ about one thing, side by side — a translator's habit, not a test's.
 | `pnpm -r typecheck` | 5/5 packages clean |
 | Playwright `legal`, `join`, `a11y` specs (fresh build; 320px light and dark, iPhone SE; axe incl. contrast and target size) | pass, after one fix (the hardcoded section count above): 39 legal tests pass, join and a11y pass |
 | Playwright, **full suite**, fresh build with the 16px body (D-418) | **588 passed, 0 failed** (light and dark 320px, iPhone SE) |
-| `node scripts/check-bundle-budget.mjs` after D-426, on a fresh Next build | **556.4 kB** of 600 kB gzipped, 43.6 kB to spare |
+| `node scripts/check-bundle-budget.mjs` after D-427, on a fresh Next build | **556.4 kB** of 600 kB gzipped, 43.6 kB to spare |
 | Playwright `messages.spec.ts`, with four new tests (limited list; limited conversation; a send refused with 42501 for an account that was active at load; a 500 for an account that is not limited) | 72 pass at three viewports; the two send tests give opposite answers to the same failing POST, differing only in `access_status`, so the refused-send test does discriminate |
-| Playwright, **full suite**, fresh build (D-426) | **600 passed, 0 failed** (6.5 minutes) |
-| `pnpm -r typecheck`, `pnpm --filter @pam/config test` (242), `pnpm --filter @pam/ui test` (79), `pnpm --filter @pam/web test` (18) after D-426 | clean / pass |
+| Playwright, **full suite**, fresh build (D-427) | **600 passed, 0 failed** (6.5 minutes) |
+| `pnpm -r typecheck`, `pnpm --filter @pam/config test` (242), `pnpm --filter @pam/ui test` (79), `pnpm --filter @pam/web test` (18) after D-427 | clean / pass |
 | Storybook, rebuilt twice; limited Messages, limited conversation (en, es), Help, the report-a-message screen, the three notices photographed at 390px | The first photograph of limited Messages showed the notice under the list, inside the 96px fade above the floating strip and tab bar (`edgeFade`): its call button and left edge were washed out. It moved to under the title; the second photograph is clean |
 
 ## Left undone
@@ -150,7 +150,7 @@ about one thing, side by side — a translator's habit, not a test's.
   can limit or pause…") is Claude's draft of Will's decision; he should read it.
   So should the four short-version lines (`transparency.summary.*`, STATUS row 34).
 - The New message picker's own failure line ("Your connection dropped") is
-  reachable only by an account limited *after* Messages loaded. Not changed (D-426).
+  reachable only by an account limited *after* Messages loaded. Not changed (D-427).
 - The app has no button that limits anyone (nothing calls
   `admin_set_access_status`), and no screen to assign a case manager to a member
   (STATUS backlog); since 0082 a member with none is read by no case manager.
@@ -158,12 +158,14 @@ about one thing, side by side — a translator's habit, not a test's.
   that already agreed; `transparency_ack_at` is set once.
 - The other five languages are now on `claude/gallant-clarke-0dhizj` (it merged
   `main` at 932d052 and translated D-412–D-415's strings). The eight strings
-  D-426 changed were sent to that session; expect conflicts in `es.json` and
+  D-427 changed were sent to that session; expect conflicts in `es.json` and
   `en.json` on those lines, and renumber when the branches meet (`docs/allocations.md`
-  there says D-424 is next; this branch took D-426 and left D-424/D-425 free).
+  says D-427 is next; this entry first took D-426 and was renumbered D-427 when
+  that branch pushed its own D-426 — the collision `allocations.md` exists to catch,
+  found here by a message from that session rather than by a test).
   Native review of the new languages is open on their side.
 - `claude/pam-storybook` (D-411) is not merged and is behind `main`.
 
 ## Needs a human
 
-- Will: read the new privacy section and the short-version lines; say whether to merge this follow-up (D-426) to `main` — `CLAUDE.md` says not without asking.
+- Will: read the new privacy section and the short-version lines; say whether to merge this follow-up (D-427) to `main` — `CLAUDE.md` says not without asking.

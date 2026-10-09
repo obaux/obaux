@@ -139,7 +139,7 @@ up on their desired language … implement it."
   0079–0081 are live: this branch carries pam-storybook's photo, document and
   link UI. Branch merged with `main` (932d052) and pushed; `main` untouched.
 - **Other sessions.** Both told (seven languages, the wrapping components, the
-  numbers; what is held). `docs/allocations.md` + `numbering.test.ts` (D-427; the other session had taken D-426 in the meantime, so this one moved).
+  numbers; what is held). `docs/allocations.md` + `numbering.test.ts` (D-426; the other session had also taken D-426, and moved its own decision to D-427).
 - **Texts and emails in the recipient's language (D-424)** — see DECISIONS. The
   dispatcher and the config renderer had drifted (the dispatcher never shortened
   a long address; the Spanish STOP line had two spellings); a parity test now

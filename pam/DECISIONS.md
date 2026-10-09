@@ -11241,7 +11241,20 @@ saying the old thing, with every check green.
   still owed for every language (docs/before-launch.md). A key whose translation
   is "kept" is a person's statement, not a machine's.
 
-### D-426 — "Your guide" everywhere a member is told who to call; a limited account is told it is off, and who to call (p3 kept)
+### D-426 — Numbers are claimed in one file, and a test fails on a duplicate
+
+**Date:** 2026-10-09. Will: "Ensure the other sessions align with this one."
+Three sessions had each taken D-404, two had taken migration 0082 and two had
+taken A22; each was found by a person at merge time and cost a renumbering that
+had to rewrite every cross-reference. `docs/allocations.md` holds the next free
+decision, amendment, migration and changelog number and the rule (fetch, bump
+the row, push that line before writing the entry; a conflict on that row *is*
+the collision). `packages/config/test/numbering.test.ts` fails on a duplicate in
+a tree and on a table that is behind the repo. It cannot see another branch;
+the rule is how a session does. The other two sessions were told what this
+branch changed (seven languages, the wrapping components, the numbers).
+
+### D-427 — "Your guide" everywhere a member is told who to call; a limited account is told it is off, and who to call (p3 kept)
 
 **Date:** 2026-10-09. **Decided by:** Will: "resolve the remaining. Yes use Your
 guide for short."
@@ -11306,22 +11319,9 @@ account* (Messages, A conversation, Spanish), with `installSupabaseMock(role,
 { limited: true })` limiting the pretend member and refusing the insert as
 `messages_insert_sender` does.
 
-**Numbering.** D-426 because `claude/gallant-clarke-0dhizj` holds D-421–D-423 and
-its `docs/allocations.md` (not on `main` yet) says D-424 is next; D-424 and D-425
-are left for it. This branch has no allocations file; claim the number there when
-the two meet.
-
-*(The two branches met when the languages branch merged this one: D-424 and D-425 are that branch's, as left for it, and D-427 is the numbering decision.)*
-
-### D-427 — Numbers are claimed in one file, and a test fails on a duplicate
-
-**Date:** 2026-10-09. Will: "Ensure the other sessions align with this one."
-Three sessions had each taken D-404, two had taken migration 0082 and two had
-taken A22; each was found by a person at merge time and cost a renumbering that
-had to rewrite every cross-reference. `docs/allocations.md` holds the next free
-decision, amendment, migration and changelog number and the rule (fetch, bump
-the row, push that line before writing the entry; a conflict on that row *is*
-the collision). `packages/config/test/numbering.test.ts` fails on a duplicate in
-a tree and on a table that is behind the repo. It cannot see another branch;
-the rule is how a session does. The other two sessions were told what this
-branch changed (seven languages, the wrapping components, the numbers).
+**Numbering.** D-427 because `claude/gallant-clarke-0dhizj` holds D-421–D-426 (its
+`docs/allocations.md`, not on `main` yet, says D-427 is next). This entry first took
+D-426, found free from this branch's side, and was renumbered on 9 October when that
+branch pushed its own D-426 ("Numbers are claimed in one file"); every reference on
+this branch moved with it. This branch has no allocations file: claim the row there
+when the two meet.

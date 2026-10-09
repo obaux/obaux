@@ -38,7 +38,7 @@ export function MessagesScreen() {
   const supportPhone = useSupportPhone();
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
   // A limited account reads but cannot start a message (0031): no New message,
-  // and the screen says what is off and who to call (terms.s.limits.p3, D-426).
+  // and the screen says what is off and who to call (terms.s.limits.p3, D-427).
   const limited = session.status === 'signed-in' && session.session.accessStatus === 'limited';
   const { viewedRole } = useRoleView(trueRole);
   // The super admin may message staff, to help them start (0072, D-262).

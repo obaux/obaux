@@ -113,7 +113,7 @@ export const ConversationFiles: Story = screen('member', 'Stuff shared', '/messa
 export const ConversationOptions: Story = screen('member', 'Conversation options', '/messages/thread/options/', {
   id: CONVO_ID,
 });
-/** Reporting the last message (D-177): says who sees it — "Pam and your guide" (D-426). */
+/** Reporting the last message (D-177): says who sees it — "Pam and your guide" (D-427). */
 export const ReportMessage: Story = screen('member', 'Report a message', '/messages/thread/report/', {
   id: CONVO_ID,
 });
