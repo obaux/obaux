@@ -4,7 +4,7 @@ import { VStack } from '@astryxdesign/core/VStack';
 import { HStack } from '@astryxdesign/core/HStack';
 import { Text } from '@astryxdesign/core/Text';
 import { Heading } from '@astryxdesign/core/Heading';
-import { Badge } from '@astryxdesign/core/Badge';
+import { Badge } from './Badge.js';
 import { Avatar } from '@astryxdesign/core/Avatar';
 import { BigButton } from './BigButton.js';
 

@@ -1,18 +1,21 @@
 import type { Meta, StoryObj } from '@storybook/nextjs';
 import { HStack } from '@astryxdesign/core/HStack';
+import { Icon } from '@astryxdesign/core/Icon';
 import { IconButton } from '@astryxdesign/core/IconButton';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { BigButton, ShareIcon } from '@pam/ui';
 import { SubPage } from '@pam/ui/SubPage';
+import { roundAction } from '@pam/ui/roundAction';
 import { SetupArt } from '@pam/ui/SetupArt';
 
 /**
  * Every nested screen — one you reach by tapping into something: a round back
  * button that says where it goes, then the screen's name, large, then its
- * content. The name moves into the sticky bar as the page scrolls. `compact`
- * puts the title in the bar beside back (a conversation); `footer` pins one
- * action to the bottom of the screen with a fade above it.
+ * content. The name moves into the sticky bar as the page scrolls. A
+ * conversation uses it too, its ⋯ in the bar (D-411 — there was a compact
+ * form until then); `footer` pins one action to the bottom of the screen with
+ * a fade above it.
  */
 const meta = {
   title: 'Components/Navigation/SubPage',
@@ -22,7 +25,6 @@ const meta = {
     title: 'Get help',
     backHref: '/profile/',
     backLabel: 'Back to Profile',
-    variant: 'large',
     gap: 4,
     children: (
       <VStack gap={3}>
@@ -33,7 +35,6 @@ const meta = {
     ),
   },
   argTypes: {
-    variant: { control: 'inline-radio', options: ['large', 'compact'] },
     gap: { control: 'inline-radio', options: [2, 3, 4] },
     children: { control: false },
     footer: { control: false },
@@ -69,18 +70,30 @@ export const WithSubtitle: Story = {
   },
 };
 
-/** SubPageHeader's compact form: the name rides in the bar beside back — a conversation. */
-export const Compact: Story = {
+/**
+ * A conversation's header (D-411): back and ⋯ where they are on every nested
+ * screen, the name large, who they are on one line under it (D-400).
+ */
+export const Conversation: Story = {
   args: {
-    title: 'Jordan',
-    variant: 'compact',
+    title: 'Renee',
     backHref: '/messages/',
     backLabel: 'Back to Messages',
-    titleAddon: <Text type="supporting">Mentor</Text>,
+    subtitle: 'Program lead at Example Food Pantry of North Philadelphia',
+    hasOneLineSubtitle: true,
+    actions: (
+      <IconButton
+        label="More"
+        href="/messages/thread/options/"
+        variant="ghost"
+        icon={<Icon icon="moreHorizontal" size="md" />}
+        xstyle={roundAction.button}
+      />
+    ),
     children: (
       <VStack gap={3}>
-        <Text>Hi Jordan, are we still on for Thursday at the learning center?</Text>
-        <Text type="supporting">Yes — 10 AM. I will meet you at the front desk.</Text>
+        <Text>Hi Renee, can I come by on Thursday?</Text>
+        <Text type="supporting">Yes — the pantry is open 10 to 2. Ask for me at the front.</Text>
       </VStack>
     ),
   },

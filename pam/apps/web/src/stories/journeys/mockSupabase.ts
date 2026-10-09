@@ -24,10 +24,36 @@ import {
   INVITES_LOG,
   partnerFor,
   threadFor,
+  linkPreviewsFor,
   type JourneyRole,
 } from './fixtures';
 
-type Answer = { status?: number; body: unknown };
+/**
+ * `file`: answer with a file Storybook itself serves, not JSON (a photo,
+ * D-394). `raw`: answer with these bytes as `contentType` (a document, D-399).
+ */
+type Answer = { status?: number; body: unknown; file?: string; raw?: string; contentType?: string };
+
+/** Which picture Storybook serves for each example photo in a conversation. */
+const PHOTO_FILES: readonly (readonly [string, string])[] = [
+  ['example-stop', '/onboarding/hero-city.webp'],
+  ['example-room', '/friend/bring-a-friend-800.webp'],
+  ['example-door', '/onboarding/hero-sneakers.webp'],
+];
+
+/** A one-page PDF, made here so a story never fetches one (D-399). */
+const EXAMPLE_PDF = [
+  '%PDF-1.4',
+  '1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj',
+  '2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj',
+  '3 0 obj<</Type/Page/Parent 2 0 R/MediaBox[0 0 612 792]/Contents 4 0 R/Resources<</Font<</F1 5 0 R>>>>>>endobj',
+  '4 0 obj<</Length 52>>stream',
+  'BT /F1 24 Tf 72 700 Td (An example letter) Tj ET',
+  'endstream endobj',
+  '5 0 obj<</Type/Font/Subtype/Type1/BaseFont/Helvetica>>endobj',
+  'trailer<</Root 1 0 R>>',
+  '%%EOF',
+].join('\n');
 type Route = (url: string, method: string, body: unknown) => Answer | null;
 
 const PROJECT_REF = new URL(SUPABASE_URL).hostname.split('.')[0];
@@ -50,8 +76,36 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
       ? on('/auth/v1/user', () => ({ body: { id: ME_ID, phone: '12155550199' } }))
       : on('/auth/v1/', () => ({ status: 401, body: {} })),
     on('/auth/v1/', () => ({ body: {} })),
+    // A photo in a conversation (D-394): a download answers with a picture
+    // Storybook already serves; an upload is accepted and never stored. No
+    // request reaches the live project.
+    (url, method) =>
+      url.includes('/storage/v1/object/') && url.includes('/message-photos/')
+        ? method === 'GET'
+          ? { body: null, file: PHOTO_FILES.find(([name]) => url.includes(name))?.[1] ?? '/onboarding/hero-city.webp' }
+          : { body: { Key: 'message-photos/example.jpg' } }
+        : null,
+    // A document in a conversation (D-399): a download answers with a
+    // one-page PDF made here; an upload is accepted and never stored.
+    (url, method) =>
+      url.includes('/storage/v1/object/') && url.includes('/message-files/')
+        ? method === 'GET'
+          ? { body: null, raw: EXAMPLE_PDF, contentType: 'application/pdf' }
+          : { body: { Key: 'message-files/example.pdf' } }
+        : null,
+    // A link preview's picture (D-407): a picture Storybook already serves.
+    (url, method) =>
+      url.includes('/storage/v1/object/') && url.includes('/link-previews/') && method === 'GET'
+        ? { body: null, file: '/friend/bring-a-friend-800.webp' }
+        : null,
     // A staff photo upload (D-345): accepted, never stored.
     on('/storage/v1/object/', () => ({ body: { Key: 'staff-photos/example.webp' } })),
+    // Link previews (D-407): the example conversation's kept preview, and
+    // Pam's server, which is never asked for real from a story.
+    on('/rest/v1/message_link_previews', () => ({ body: linkPreviewsFor(role) })),
+    on('/functions/v1/link-preview', () => ({ body: { made: 0 } })),
+    on('/rpc/report_photos_for_review', () => ({ body: [] })),
+    on('/rpc/report_files_for_review', () => ({ body: [] })),
     on('/rest/v1/profiles', (url) =>
       url.includes('role=eq.member')
         ? { body: CASELOAD }
@@ -257,6 +311,10 @@ export function installSupabaseMock(journeyRole: JourneyRole, options: MockOptio
       // eslint-disable-next-line no-console
       console.info('[journey] no fixture for', method, url);
       answer = { body: [] };
+    }
+    if (answer.file) return real(answer.file);
+    if (answer.raw !== undefined) {
+      return new Response(answer.raw, { status: answer.status ?? 200, headers: { 'content-type': answer.contentType ?? 'application/octet-stream' } });
     }
     return new Response(JSON.stringify(answer.body), {
       status: answer.status ?? 200,

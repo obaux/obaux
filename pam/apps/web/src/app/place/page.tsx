@@ -20,7 +20,7 @@ import { PlaceBarActions, leadMessageFor, messageHrefFor, newMessageFrom } from 
 import { PlaceDetailSkeleton } from '@pam/ui/Skeletons';
 import { SubPageHeader } from '@pam/ui/SubPage';
 import { HelpButton } from '../../screens/HelpButton';
-import { categoryLabelKey, displayPhone, distanceLabel, NOTICES, POINTS_RULES, type Category } from '@pam/config';
+import { categoryLabelKey, displayPhone, distanceLabel, NOTICES, POINTS_RULES, type Category, intlLocale } from '@pam/config';
 import { DUMMY_PLACES_BY_ID, isDummyPlaceId } from '@pam/config/dummy-places';
 import { useI18n } from '@/lib/i18n';
 import { useSupportPhone } from '@/lib/useSupportPhone';
@@ -374,8 +374,8 @@ function PlaceScreen() {
   const address = service?.address ?? place!.address;
   // The booked visit (D-273, D-281): "Your next visit", the day large, the
   // time under it, and a way to move it.
-  const visitDay = new Intl.DateTimeFormat(locale, { weekday: 'long', month: 'long', day: 'numeric' });
-  const visitTime = new Intl.DateTimeFormat(locale, { hour: 'numeric', minute: '2-digit' });
+  const visitDay = new Intl.DateTimeFormat(intlLocale(locale), { weekday: 'long', month: 'long', day: 'numeric' });
+  const visitTime = new Intl.DateTimeFormat(intlLocale(locale), { hour: 'numeric', minute: '2-digit' });
   const visitWhen = visit ? visitDay.format(new Date(visit.startsAt)) : null;
   const visitHour = visit ? visitTime.format(new Date(visit.startsAt)) : '';
   const visitAhead = visit ? new Date(visit.startsAt).getTime() > Date.now() : false;

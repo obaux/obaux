@@ -41,9 +41,10 @@ export interface TabBarProps {
    */
   readonly tabs?: readonly TabKey[];
   /**
-   * The fade above the bar (D-283). Off where something opaque already
-   * rests on the bar — Trips' drawer, which a 96px fade would wash out
-   * almost entirely when docked (D-285).
+   * The fade above the bar (D-283). On for every tab (D-403): Trips' drawer
+   * now sits above it and draws the same fade in its own list
+   * (`edgeFade.inScroll`), so the bar is the same element on every tab and a
+   * switch changes nothing but the highlighted tab. Off only for a story.
    */
   readonly hasFade?: boolean;
   /** The landmark's name, e.g. "Main". */
@@ -90,9 +91,10 @@ const styles = stylex.create({
     bottom: 0,
     zIndex: 10,
     backgroundColor: colorVars['--color-background-body'],
-    borderTopWidth: '1px',
-    borderTopStyle: 'solid',
-    borderTopColor: colorVars['--color-border'],
+    // No line along the top (Will, 9 October, D-403): the fade is the edge,
+    // on every tab. It hid the line everywhere but Trips, which had no fade,
+    // so only Trips showed one. The one line left on a tab screen is a
+    // floating row's own (Messages' "People who offered help").
     paddingBottom: 'env(safe-area-inset-bottom, 0px)',
   },
   inner: { width: '100%', maxWidth: '560px', marginInline: 'auto' },
@@ -116,6 +118,10 @@ const styles = stylex.create({
     fontSize: '12px',
     fontWeight: 400,
     color: colorVars['--color-text-secondary'],
+    // The lit tab changes at once (D-403). Astryx fades a tab's colour over
+    // 125ms; in a switch that showed two tabs half lit, and the new tab's
+    // filled icon dark for a beat before it turned pink.
+    transitionProperty: 'none',
   },
   // The tab you are on is red, as in Will's mockups (2 October) — the icon
   // follows, since Pam's icons draw in currentColor. A deeper red than the

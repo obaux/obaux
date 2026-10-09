@@ -5,7 +5,7 @@ import * as stylex from '@stylexjs/stylex';
 import { BottomSheet } from '@astryxdesign/core/BottomSheet';
 import { sheet } from '@pam/ui/sheet';
 import { Card } from '@astryxdesign/core/Card';
-import { Button } from '@astryxdesign/core/Button';
+import { Button } from '@pam/ui/Button';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Icon } from '@astryxdesign/core/Icon';
 import { IconButton } from '@astryxdesign/core/IconButton';
@@ -25,6 +25,7 @@ import { useI18n } from '@/lib/i18n';
 import { usePolicies } from '@/lib/usePolicies';
 import { useMySignatures } from '@/lib/useMySignatures';
 import { leaveFlow } from '@/lib/navigate';
+import { intlLocale } from '@pam/config';
 
 /**
  * A program's policies, from the member's side (D-270, Will, 5 October:
@@ -79,7 +80,7 @@ const styles = stylex.create({
   clear: {
     position: 'absolute',
     top: '4px',
-    right: '4px',
+    insetInlineEnd: '4px',
     width: '48px',
     height: '48px',
     minWidth: '48px',
@@ -96,7 +97,7 @@ const styles = stylex.create({
   clearDot: {
     position: 'absolute',
     top: '10px',
-    left: '10px',
+    insetInlineStart: '10px',
     width: '28px',
     height: '28px',
     minWidth: '28px',
@@ -114,7 +115,7 @@ const styles = stylex.create({
     boxShadow: '0 1px 4px light-dark(oklch(0 0 0 / 12%), oklch(0 0 0 / 40%))',
   },
   // The "Your signature:" box keeps its picture clear of the ×.
-  savedRow: { paddingRight: '56px' },
+  savedRow: { paddingInlineEnd: '56px' },
   sheetLinks: { width: '100%' },
   // "Done" in the header, as on the Location drawer (D-275, D-279).
   doneButton: {
@@ -237,7 +238,7 @@ export function MemberPoliciesScreen({
 }) {
   const { t, locale } = useI18n();
   const { signedAt, progress } = useMySignatures();
-  const day = new Intl.DateTimeFormat(locale, { month: 'long', day: 'numeric' });
+  const day = new Intl.DateTimeFormat(intlLocale(locale), { month: 'long', day: 'numeric' });
   const { shown, service } = useShownPolicies(placeId, serviceId);
   const { signed, total } = progress(placeId, shown);
   const firstUnsigned = shown.find((p) => !signedAt(placeId, p.id));
@@ -328,7 +329,7 @@ export function MemberPolicyScreen({
   // screen with a different `?id=` would reload the app (D-269).
   const [currentId, setCurrentId] = useState<string | null>(policyId);
   const [isSheetOpen, setSheetOpen] = useState(false);
-  const day = new Intl.DateTimeFormat(locale, { month: 'long', day: 'numeric' });
+  const day = new Intl.DateTimeFormat(intlLocale(locale), { month: 'long', day: 'numeric' });
 
   const { shown, service } = useShownPolicies(placeId, serviceId);
   const index = shown.findIndex((p) => p.id === (currentId ?? policyId));

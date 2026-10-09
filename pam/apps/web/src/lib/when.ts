@@ -5,6 +5,8 @@
  * difference that decides whether somebody acts now — "13 Sept" makes a reader
  * do arithmetic to answer "is this new?".
  */
+import { intlLocale } from '@pam/config';
+
 export function whenHappened(
   iso: string,
   locale: string,
@@ -14,7 +16,7 @@ export function whenHappened(
   const days = Math.floor((Date.now() - then.getTime()) / 86_400_000);
   if (days <= 0) return t('when.today');
   if (days === 1) return t('when.yesterday');
-  return new Intl.DateTimeFormat(locale, { month: 'short', day: 'numeric' }).format(then);
+  return new Intl.DateTimeFormat(intlLocale(locale), { month: 'short', day: 'numeric' }).format(then);
 }
 
 /**
@@ -35,4 +37,36 @@ export function countdown(when: Date, t: (key: string, vars?: Record<string, str
   if (days === 0) return t('when.countdown.today');
   if (days === 1) return t('when.countdown.tomorrow');
   return t('when.countdown.days', { count: days });
+}
+
+/**
+ * The label over a day's messages in a conversation (Will, 8 October,
+ * D-389): "Today", "Yesterday", the weekday within the last week, then the
+ * date — with the year only when it is not this year. Calendar days, as
+ * `daysUntil` counts them, so a message sent at 11 PM is "Yesterday" by
+ * breakfast.
+ */
+export function dayLabel(
+  iso: string,
+  locale: string,
+  t: (key: string) => string,
+  now: Date = new Date(),
+): string {
+  const then = new Date(iso);
+  const days = -daysUntil(then, now);
+  if (days <= 0) return t('when.today');
+  if (days === 1) return t('when.yesterday');
+  if (days < 7) return new Intl.DateTimeFormat(intlLocale(locale), { weekday: 'long' }).format(then);
+  return new Intl.DateTimeFormat(intlLocale(locale), {
+    weekday: 'short',
+    month: 'short',
+    day: 'numeric',
+    ...(then.getFullYear() === now.getFullYear() ? {} : { year: 'numeric' }),
+  }).format(then);
+}
+
+/** The local calendar day of `iso`, as a key to group a conversation by. */
+export function dayKey(iso: string): string {
+  const d = new Date(iso);
+  return `${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
 }

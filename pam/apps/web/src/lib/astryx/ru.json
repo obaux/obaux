@@ -1,0 +1,740 @@
+{
+ "@astryx.pagination.label": {
+  "defaultMessage": "Постраничная навигация"
+ },
+ "@astryx.pagination.previous": {
+  "defaultMessage": "Перейти на предыдущую страницу"
+ },
+ "@astryx.pagination.next": {
+  "defaultMessage": "Перейти на следующую страницу"
+ },
+ "@astryx.pagination.previousBy": {
+  "defaultMessage": "Назад на {step, number} {step, plural, one {страницу} few {страницы} many {страниц} other {страницы}}"
+ },
+ "@astryx.pagination.nextBy": {
+  "defaultMessage": "Вперёд на {step, number} {step, plural, one {страницу} few {страницы} many {страниц} other {страницы}}"
+ },
+ "@astryx.pagination.first": {
+  "defaultMessage": "Перейти на первую страницу"
+ },
+ "@astryx.pagination.last": {
+  "defaultMessage": "Перейти на последнюю страницу"
+ },
+ "@astryx.pagination.goToPage": {
+  "defaultMessage": "Перейти на страницу {page, number}"
+ },
+ "@astryx.pagination.goToPageInput": {
+  "defaultMessage": "Перейти на страницу"
+ },
+ "@astryx.pagination.pageLabel": {
+  "defaultMessage": "Страница"
+ },
+ "@astryx.pagination.pageIndicators": {
+  "defaultMessage": "Индикаторы страниц"
+ },
+ "@astryx.pagination.itemsPerPage": {
+  "defaultMessage": "Элементов на странице"
+ },
+ "@astryx.pagination.count": {
+  "defaultMessage": "{from, number}–{to, number} из {total, number}"
+ },
+ "@astryx.pagination.pageOfTotal": {
+  "defaultMessage": "Страница {current, number} из {total, number}"
+ },
+ "@astryx.pagination.pageAnnounce": {
+  "defaultMessage": "Страница {current, number}"
+ },
+ "@astryx.powersearch.editor.field": {
+  "defaultMessage": "Поле"
+ },
+ "@astryx.powersearch.editor.operator": {
+  "defaultMessage": "Оператор"
+ },
+ "@astryx.powersearch.editor.addFilter": {
+  "defaultMessage": "+ Добавить фильтр"
+ },
+ "@astryx.powersearch.editor.removeFilter": {
+  "defaultMessage": "Удалить фильтр"
+ },
+ "@astryx.powersearch.editor.groupOperator": {
+  "defaultMessage": "Оператор группы"
+ },
+ "@astryx.powersearch.editor.group": {
+  "defaultMessage": "Группа"
+ },
+ "@astryx.powersearch.editor.delete": {
+  "defaultMessage": "Удалить"
+ },
+ "@astryx.powersearch.editor.cancel": {
+  "defaultMessage": "Отмена"
+ },
+ "@astryx.powersearch.editor.apply": {
+  "defaultMessage": "Применить"
+ },
+ "@astryx.powersearch.valueEditor.value": {
+  "defaultMessage": "Значение"
+ },
+ "@astryx.powersearch.valueEditor.values": {
+  "defaultMessage": "Значения"
+ },
+ "@astryx.powersearch.valueEditor.time": {
+  "defaultMessage": "Время"
+ },
+ "@astryx.powersearch.valueEditor.date": {
+  "defaultMessage": "Дата"
+ },
+ "@astryx.powersearch.valueEditor.relativeDate": {
+  "defaultMessage": "Относительная дата"
+ },
+ "@astryx.powersearch.valueEditor.startDate": {
+  "defaultMessage": "Дата начала"
+ },
+ "@astryx.powersearch.valueEditor.endDate": {
+  "defaultMessage": "Дата окончания"
+ },
+ "@astryx.powersearch.valueEditor.entities": {
+  "defaultMessage": "Сущности"
+ },
+ "@astryx.powersearch.valueEditor.searchPlaceholder": {
+  "defaultMessage": "Поиск…"
+ },
+ "@astryx.powersearch.valueEditor.enterValuePlaceholder": {
+  "defaultMessage": "Введите значение…"
+ },
+ "@astryx.powersearch.valueEditor.addValuesPlaceholder": {
+  "defaultMessage": "Добавьте значения…"
+ },
+ "@astryx.powersearch.valueEditor.enterNumberPlaceholder": {
+  "defaultMessage": "Введите число…"
+ },
+ "@astryx.powersearch.valueEditor.selectValuesPlaceholder": {
+  "defaultMessage": "Выберите значения…"
+ },
+ "@astryx.powersearch.operator.contains": {
+  "defaultMessage": "содержит"
+ },
+ "@astryx.powersearch.operator.notContains": {
+  "defaultMessage": "не содержит"
+ },
+ "@astryx.powersearch.operator.startsWith": {
+  "defaultMessage": "начинается с"
+ },
+ "@astryx.powersearch.operator.notStartsWith": {
+  "defaultMessage": "не начинается с"
+ },
+ "@astryx.powersearch.operator.endsWith": {
+  "defaultMessage": "заканчивается на"
+ },
+ "@astryx.powersearch.operator.notEndsWith": {
+  "defaultMessage": "не заканчивается на"
+ },
+ "@astryx.powersearch.operator.is": {
+  "defaultMessage": "равно"
+ },
+ "@astryx.powersearch.operator.isNot": {
+  "defaultMessage": "не равно"
+ },
+ "@astryx.powersearch.operator.equals": {
+  "defaultMessage": "равно"
+ },
+ "@astryx.powersearch.operator.notEquals": {
+  "defaultMessage": "не равно"
+ },
+ "@astryx.powersearch.operator.greaterThan": {
+  "defaultMessage": "больше чем"
+ },
+ "@astryx.powersearch.operator.lessThan": {
+  "defaultMessage": "меньше чем"
+ },
+ "@astryx.powersearch.operator.greaterThanOrEqual": {
+  "defaultMessage": "больше или равно"
+ },
+ "@astryx.powersearch.operator.lessThanOrEqual": {
+  "defaultMessage": "меньше или равно"
+ },
+ "@astryx.powersearch.operator.before": {
+  "defaultMessage": "раньше"
+ },
+ "@astryx.powersearch.operator.after": {
+  "defaultMessage": "позже"
+ },
+ "@astryx.powersearch.operator.between": {
+  "defaultMessage": "между"
+ },
+ "@astryx.powersearch.operator.isTrue": {
+  "defaultMessage": "истина"
+ },
+ "@astryx.powersearch.operator.isFalse": {
+  "defaultMessage": "ложь"
+ },
+ "@astryx.powersearch.operator.isAnyOf": {
+  "defaultMessage": "любое из"
+ },
+ "@astryx.powersearch.operator.isNoneOf": {
+  "defaultMessage": "ни одно из"
+ },
+ "@astryx.powersearch.valueEditor.itemsCount": {
+  "defaultMessage": "{count, number} {count, plural, one {элемент} few {элемента} many {элементов} other {элемента}}"
+ },
+ "@astryx.powersearch.valueEditor.entitiesCount": {
+  "defaultMessage": "{count, number} {count, plural, one {сущность} few {сущности} many {сущностей} other {сущности}}"
+ },
+ "@astryx.powersearch.valueEditor.dateRange": {
+  "defaultMessage": "диапазон дат"
+ },
+ "@astryx.powersearch.valueEditor.filtersCount": {
+  "defaultMessage": "{count, number} {count, plural, one {фильтр} few {фильтра} many {фильтров} other {фильтра}}"
+ },
+ "@astryx.powersearch.resultCount": {
+  "defaultMessage": "{count, number} {count, plural, one {результат} few {результата} many {результатов} other {результата}}"
+ },
+ "@astryx.alertDialog.cancel": {
+  "defaultMessage": "Отмена"
+ },
+ "@astryx.appShell.mobileNavigation": {
+  "defaultMessage": "Мобильная навигация"
+ },
+ "@astryx.appShell.skipToContent": {
+  "defaultMessage": "Перейти к содержимому"
+ },
+ "@astryx.avatarGroup.label": {
+  "defaultMessage": "Аватары"
+ },
+ "@astryx.avatarGroup.keyboardHint": {
+  "defaultMessage": "Используйте стрелки для перемещения между аватарами"
+ },
+ "@astryx.avatarGroup.overflow": {
+  "defaultMessage": "ещё {count, number}"
+ },
+ "@astryx.banner.dismiss": {
+  "defaultMessage": "Закрыть"
+ },
+ "@astryx.calendar.previousMonth": {
+  "defaultMessage": "Предыдущий месяц"
+ },
+ "@astryx.calendar.nextMonth": {
+  "defaultMessage": "Следующий месяц"
+ },
+ "@astryx.calendar.daySelected": {
+  "defaultMessage": "{date}, выбрано"
+ },
+ "@astryx.calendar.dayRangeStart": {
+  "defaultMessage": "{date}, начало диапазона"
+ },
+ "@astryx.calendar.dayRangeEnd": {
+  "defaultMessage": "{date}, конец диапазона"
+ },
+ "@astryx.calendar.dayRangeStartAndEnd": {
+  "defaultMessage": "{date}, начало и конец диапазона"
+ },
+ "@astryx.calendar.dayInRange": {
+  "defaultMessage": "{date}, в диапазоне"
+ },
+ "@astryx.calendar.rangeStartAnnounce": {
+  "defaultMessage": "Дата начала {date}. Выберите дату окончания."
+ },
+ "@astryx.calendar.rangeCompleteAnnounce": {
+  "defaultMessage": "Выбранный диапазон: с {start} по {end}."
+ },
+ "@astryx.carousel.label": {
+  "defaultMessage": "Карусель"
+ },
+ "@astryx.carousel.scrollLeft": {
+  "defaultMessage": "Прокрутить влево"
+ },
+ "@astryx.carousel.scrollRight": {
+  "defaultMessage": "Прокрутить вправо"
+ },
+ "@astryx.carousel.slideLabel": {
+  "defaultMessage": "Слайд {current, number} из {total, number}"
+ },
+ "@astryx.chat.status.sending": {
+  "defaultMessage": "Отправка"
+ },
+ "@astryx.chat.status.sent": {
+  "defaultMessage": "Отправлено"
+ },
+ "@astryx.chat.status.delivered": {
+  "defaultMessage": "Доставлено"
+ },
+ "@astryx.chat.status.read": {
+  "defaultMessage": "Прочитано"
+ },
+ "@astryx.chat.status.failed": {
+  "defaultMessage": "Ошибка"
+ },
+ "@astryx.chat.messageAriaLabel": {
+  "defaultMessage": "Сообщение {status}"
+ },
+ "@astryx.chat.pastedText.expand": {
+  "defaultMessage": "Развернуть"
+ },
+ "@astryx.checkboxList.item.checkbox": {
+  "defaultMessage": "Флажок"
+ },
+ "@astryx.commandPalette.emptySearch": {
+  "defaultMessage": "Ничего не найдено"
+ },
+ "@astryx.commandPalette.emptyBootstrap": {
+  "defaultMessage": "Введите запрос для поиска"
+ },
+ "@astryx.commandPalette.resultCount": {
+  "defaultMessage": "{count, number} {count, plural, one {результат} few {результата} many {результатов} other {результата}}"
+ },
+ "@astryx.commandPalette.noResultsFor": {
+  "defaultMessage": "Ничего не найдено по запросу {query}"
+ },
+ "@astryx.commandPalette.loading": {
+  "defaultMessage": "Загрузка"
+ },
+ "@astryx.dateRangeInput.presetDateRanges": {
+  "defaultMessage": "Предустановленные диапазоны дат"
+ },
+ "@astryx.dateTimeInput.timePlaceholder": {
+  "defaultMessage": "Выберите время"
+ },
+ "@astryx.dialog.close": {
+  "defaultMessage": "Закрыть"
+ },
+ "@astryx.dropdownMenu.label": {
+  "defaultMessage": "Меню"
+ },
+ "@astryx.lightbox.close": {
+  "defaultMessage": "Закрыть"
+ },
+ "@astryx.lightbox.previous": {
+  "defaultMessage": "Назад"
+ },
+ "@astryx.lightbox.next": {
+  "defaultMessage": "Далее"
+ },
+ "@astryx.markdown.taskList": {
+  "defaultMessage": "Список задач"
+ },
+ "@astryx.markdown.table": {
+  "defaultMessage": "Таблица"
+ },
+ "@astryx.mobileNav.closeNavigation": {
+  "defaultMessage": "Закрыть навигацию"
+ },
+ "@astryx.multiSelector.selectAll": {
+  "defaultMessage": "Выбрать все"
+ },
+ "@astryx.multiSelector.searchPlaceholder": {
+  "defaultMessage": "Поиск…"
+ },
+ "@astryx.multiSelector.searchOptions": {
+  "defaultMessage": "Параметры поиска"
+ },
+ "@astryx.multiSelector.selectAllPartiallySelected": {
+  "defaultMessage": "{label}, выбрано частично"
+ },
+ "@astryx.popover.close": {
+  "defaultMessage": "Закрыть всплывающее окно"
+ },
+ "@astryx.selector.searchPlaceholder": {
+  "defaultMessage": "Поиск…"
+ },
+ "@astryx.selector.searchOptions": {
+  "defaultMessage": "Параметры поиска"
+ },
+ "@astryx.sideNav.label": {
+  "defaultMessage": "Боковая навигация"
+ },
+ "@astryx.sideNav.resizeSidebar": {
+  "defaultMessage": "Изменить размер боковой панели"
+ },
+ "@astryx.sideNav.heading.openMenu": {
+  "defaultMessage": "Открыть меню"
+ },
+ "@astryx.tabList.label": {
+  "defaultMessage": "Вкладки"
+ },
+ "@astryx.table.label": {
+  "defaultMessage": "Таблица"
+ },
+ "@astryx.table.noData": {
+  "defaultMessage": "Нет данных"
+ },
+ "@astryx.table.filter.allPlaceholder": {
+  "defaultMessage": "Все"
+ },
+ "@astryx.table.filter.reset": {
+  "defaultMessage": "Сбросить"
+ },
+ "@astryx.table.filter.apply": {
+  "defaultMessage": "Применить"
+ },
+ "@astryx.table.selection.selectAllRows": {
+  "defaultMessage": "Выбрать все строки"
+ },
+ "@astryx.table.selection.selectRow": {
+  "defaultMessage": "Выбрать строку"
+ },
+ "@astryx.table.selection.selectRowNamed": {
+  "defaultMessage": "Выбрать {label}"
+ },
+ "@astryx.table.sort.ascending": {
+  "defaultMessage": "Сортировать по возрастанию"
+ },
+ "@astryx.table.sort.descending": {
+  "defaultMessage": "Сортировать по убыванию"
+ },
+ "@astryx.table.sort.clear": {
+  "defaultMessage": "Сбросить сортировку"
+ },
+ "@astryx.table.sort.direction.ascending": {
+  "defaultMessage": "по возрастанию"
+ },
+ "@astryx.table.sort.direction.descending": {
+  "defaultMessage": "по убыванию"
+ },
+ "@astryx.table.sort.sortBy": {
+  "defaultMessage": "Сортировать по {label}"
+ },
+ "@astryx.table.sort.sortedBy": {
+  "defaultMessage": "Сортировать по {label}, отсортировано {direction}"
+ },
+ "@astryx.table.sort.sortedByWithPriority": {
+  "defaultMessage": "Сортировать по {label}, отсортировано {direction}, приоритет {rank, number} из {total, number}"
+ },
+ "@astryx.toast.dismiss": {
+  "defaultMessage": "Закрыть уведомление"
+ },
+ "@astryx.toast.viewport": {
+  "defaultMessage": "Уведомления"
+ },
+ "@astryx.tokenizer.clearAll": {
+  "defaultMessage": "Очистить все"
+ },
+ "@astryx.topNav.heading.openMenu": {
+  "defaultMessage": "Открыть меню"
+ },
+ "@astryx.topNav.landmarkLabel": {
+  "defaultMessage": "Верхняя навигация"
+ },
+ "@astryx.treeList.toggleChildren": {
+  "defaultMessage": "Развернуть или свернуть дочерние элементы"
+ },
+ "@astryx.typeahead.emptySearchResults": {
+  "defaultMessage": "Ничего не найдено"
+ },
+ "@astryx.typeahead.loading": {
+  "defaultMessage": "Загрузка"
+ },
+ "@astryx.typeahead.searchResults": {
+  "defaultMessage": "Результаты поиска"
+ },
+ "@astryx.typeahead.clearSelection": {
+  "defaultMessage": "Очистить выбор"
+ },
+ "@astryx.breadcrumbs.label": {
+  "defaultMessage": "Хлебные крошки"
+ },
+ "@astryx.chat.composer.placeholder": {
+  "defaultMessage": "Введите сообщение…"
+ },
+ "@astryx.chat.composerDrawer.label": {
+  "defaultMessage": "Элементы"
+ },
+ "@astryx.chat.composerInput.label": {
+  "defaultMessage": "Поле ввода сообщения"
+ },
+ "@astryx.chat.speechRecognition.noSpeechDetected": {
+  "defaultMessage": "Речь не обнаружена."
+ },
+ "@astryx.commandPalette.label": {
+  "defaultMessage": "Командная палитра"
+ },
+ "@astryx.commandPalette.input.placeholder": {
+  "defaultMessage": "Поиск…"
+ },
+ "@astryx.commandPalette.list.label": {
+  "defaultMessage": "Команды"
+ },
+ "@astryx.contextMenu.label": {
+  "defaultMessage": "Контекстное меню"
+ },
+ "@astryx.dateInput.placeholder": {
+  "defaultMessage": "Выберите дату"
+ },
+ "@astryx.dateInput.dialogLabel": {
+  "defaultMessage": "Выбор даты"
+ },
+ "@astryx.dateInput.closeCalendar": {
+  "defaultMessage": "Закрыть календарь"
+ },
+ "@astryx.dateInput.openCalendar": {
+  "defaultMessage": "Открыть календарь"
+ },
+ "@astryx.dateInput.toggleCalendarClose": {
+  "defaultMessage": "Закрыть календарь"
+ },
+ "@astryx.dateInput.clear": {
+  "defaultMessage": "Очистить {label}"
+ },
+ "@astryx.dateTimeInput.timeSuffix": {
+  "defaultMessage": "время: {label}"
+ },
+ "@astryx.dateRangeInput.placeholder": {
+  "defaultMessage": "Выберите диапазон дат"
+ },
+ "@astryx.dateRangeInput.dialogLabel": {
+  "defaultMessage": "Выбор диапазона дат"
+ },
+ "@astryx.dateTimeInput.placeholder": {
+  "defaultMessage": "Выберите дату"
+ },
+ "@astryx.link.newTab": {
+  "defaultMessage": "(откроется в новой вкладке)"
+ },
+ "@astryx.mobileNav.toggle.open": {
+  "defaultMessage": "Открыть навигацию"
+ },
+ "@astryx.moreMenu.label": {
+  "defaultMessage": "Дополнительные параметры"
+ },
+ "@astryx.multiSelector.selectPlaceholder": {
+  "defaultMessage": "Выберите…"
+ },
+ "@astryx.outline.label": {
+  "defaultMessage": "Оглавление"
+ },
+ "@astryx.powersearch.label": {
+  "defaultMessage": "Поиск"
+ },
+ "@astryx.powersearch.placeholder": {
+  "defaultMessage": "Поиск…"
+ },
+ "@astryx.resizable.collapsed": {
+  "defaultMessage": "Свёрнуто"
+ },
+ "@astryx.resizable.handle.label": {
+  "defaultMessage": "Маркер изменения размера"
+ },
+ "@astryx.selector.placeholder": {
+  "defaultMessage": "Выберите…"
+ },
+ "@astryx.sideNav.heading.dialogLabel": {
+  "defaultMessage": "Меню навигации"
+ },
+ "@astryx.table.pagination.label": {
+  "defaultMessage": "Постраничная навигация таблицы"
+ },
+ "@astryx.timeInput.placeholder": {
+  "defaultMessage": "Выберите время"
+ },
+ "@astryx.topNav.heading.dialogLabel": {
+  "defaultMessage": "Меню навигации"
+ },
+ "@astryx.typeahead.searchPlaceholder": {
+  "defaultMessage": "Поиск…"
+ },
+ "@astryx.banner.collapse": {
+  "defaultMessage": "Свернуть"
+ },
+ "@astryx.banner.expand": {
+  "defaultMessage": "Развернуть"
+ },
+ "@astryx.button.loading": {
+  "defaultMessage": "Загрузка"
+ },
+ "@astryx.chatComposerDrawer.expand": {
+  "defaultMessage": "Развернуть {label}"
+ },
+ "@astryx.chatComposerDrawer.collapse": {
+  "defaultMessage": "Свернуть {label}"
+ },
+ "@astryx.chatDictationButton.startDictation": {
+  "defaultMessage": "Начать диктовку"
+ },
+ "@astryx.chatDictationButton.stopDictation": {
+  "defaultMessage": "Остановить диктовку"
+ },
+ "@astryx.chatLayout.newMessages": {
+  "defaultMessage": "Новые сообщения"
+ },
+ "@astryx.chatLayoutScrollButton.scrollToBottom": {
+  "defaultMessage": "Прокрутить вниз"
+ },
+ "@astryx.chatMessage.messageFrom": {
+  "defaultMessage": "Сообщение от {sender}"
+ },
+ "@astryx.chatSendButton.stop": {
+  "defaultMessage": "Стоп"
+ },
+ "@astryx.chatSendButton.send": {
+  "defaultMessage": "Отправить"
+ },
+ "@astryx.chatToolCalls.error": {
+  "defaultMessage": "Ошибка: {message}"
+ },
+ "@astryx.chatToolCalls.groupLabel": {
+  "defaultMessage": "{count} вызовов инструментов"
+ },
+ "@astryx.chatTriggerMenu.suggestions": {
+  "defaultMessage": "Предложения"
+ },
+ "@astryx.citation.label": {
+  "defaultMessage": "Источник {number}: {title}"
+ },
+ "@astryx.codeBlock.copied": {
+  "defaultMessage": "Скопировано"
+ },
+ "@astryx.codeBlock.copyCode": {
+  "defaultMessage": "Копировать код"
+ },
+ "@astryx.codeBlock.code": {
+  "defaultMessage": "Код"
+ },
+ "@astryx.field.optional": {
+  "defaultMessage": "Необязательно"
+ },
+ "@astryx.field.required": {
+  "defaultMessage": "Обязательно"
+ },
+ "@astryx.fileInput.clearLabel": {
+  "defaultMessage": "Очистить {label}"
+ },
+ "@astryx.fileInput.required": {
+  "defaultMessage": "Обязательно"
+ },
+ "@astryx.keyboardHint.toNavigate": {
+  "defaultMessage": "для навигации"
+ },
+ "@astryx.lightbox.mediaViewer": {
+  "defaultMessage": "Просмотр медиа"
+ },
+ "@astryx.lightbox.zoom": {
+  "defaultMessage": "Масштаб"
+ },
+ "@astryx.lightbox.zoomedIn": {
+  "defaultMessage": "Увеличено, используйте стрелки для перемещения"
+ },
+ "@astryx.lightbox.zoomedOut": {
+  "defaultMessage": "Уменьшено"
+ },
+ "@astryx.metadataList.showMore": {
+  "defaultMessage": "Показать больше"
+ },
+ "@astryx.metadataList.showLess": {
+  "defaultMessage": "Показать меньше"
+ },
+ "@astryx.mobileNav.navigation": {
+  "defaultMessage": "Навигация"
+ },
+ "@astryx.multiSelector.clearAll": {
+  "defaultMessage": "Очистить все {label}"
+ },
+ "@astryx.input.statusButton.error": {
+  "defaultMessage": "Сведения об ошибке"
+ },
+ "@astryx.input.statusButton.warning": {
+  "defaultMessage": "Сведения о предупреждении"
+ },
+ "@astryx.input.statusButton.success": {
+  "defaultMessage": "Сведения об успешном выполнении"
+ },
+ "@astryx.numberInput.clearLabel": {
+  "defaultMessage": "Очистить {label}"
+ },
+ "@astryx.selector.clearLabel": {
+  "defaultMessage": "Очистить {label}"
+ },
+ "@astryx.sideNavCollapseButton.expandSidebar": {
+  "defaultMessage": "Развернуть боковую панель"
+ },
+ "@astryx.sideNavCollapseButton.collapseSidebar": {
+  "defaultMessage": "Свернуть боковую панель"
+ },
+ "@astryx.sideNavItem.expand": {
+  "defaultMessage": "Развернуть {label}"
+ },
+ "@astryx.sideNavItem.collapse": {
+  "defaultMessage": "Свернуть {label}"
+ },
+ "@astryx.tableFiltering.filterByColumn": {
+  "defaultMessage": "Фильтровать {header}"
+ },
+ "@astryx.tableGroupedRows.expandGroup": {
+  "defaultMessage": "Развернуть группу {groupKey}"
+ },
+ "@astryx.tableGroupedRows.collapseGroup": {
+  "defaultMessage": "Свернуть группу {groupKey}"
+ },
+ "@astryx.tableRowExpansion.collapseRow": {
+  "defaultMessage": "Свернуть строку"
+ },
+ "@astryx.tableRowExpansion.expandRow": {
+  "defaultMessage": "Развернуть строку"
+ },
+ "@astryx.tableRowExpansion.collapseAllRows": {
+  "defaultMessage": "Свернуть все строки"
+ },
+ "@astryx.tableRowExpansion.expandAllRows": {
+  "defaultMessage": "Развернуть все строки"
+ },
+ "@astryx.step.goToStep": {
+  "defaultMessage": "Перейти к шагу {stepNumber, number}: {label}"
+ },
+ "@astryx.step.goToStepWithStatus": {
+  "defaultMessage": "Перейти к шагу {stepNumber, number}: {label}, {status}"
+ },
+ "@astryx.step.status.completed": {
+  "defaultMessage": "завершено"
+ },
+ "@astryx.step.status.warning": {
+  "defaultMessage": "предупреждение"
+ },
+ "@astryx.step.status.error": {
+  "defaultMessage": "ошибка"
+ },
+ "@astryx.tableTree.collapseRow": {
+  "defaultMessage": "Свернуть строку"
+ },
+ "@astryx.tableTree.expandRow": {
+  "defaultMessage": "Развернуть строку"
+ },
+ "@astryx.tableTree.collapseAllRows": {
+  "defaultMessage": "Свернуть все строки"
+ },
+ "@astryx.tableTree.expandAllRows": {
+  "defaultMessage": "Развернуть все строки"
+ },
+ "@astryx.textArea.charactersRemaining": {
+  "defaultMessage": "осталось {count, number} {count, plural, one {символ} few {символа} many {символов} other {символа}}"
+ },
+ "@astryx.textArea.charactersOverLimit": {
+  "defaultMessage": "{count, number} {count, plural, one {символ} few {символа} many {символов} other {символа}} сверх лимита"
+ },
+ "@astryx.textInput.clearLabel": {
+  "defaultMessage": "Очистить {label}"
+ },
+ "@astryx.thumbnail.remove": {
+  "defaultMessage": "Удалить {accessibleName}"
+ },
+ "@astryx.thumbnail.open": {
+  "defaultMessage": "Открыть {accessibleName}"
+ },
+ "@astryx.thumbnail.fallbackName": {
+  "defaultMessage": "Миниатюра"
+ },
+ "@astryx.timeInput.clearLabel": {
+  "defaultMessage": "Очистить {label}"
+ },
+ "@astryx.timestamp.copyValue": {
+  "defaultMessage": "Копировать {value}"
+ },
+ "@astryx.timestamp.copy": {
+  "defaultMessage": "Копировать"
+ },
+ "@astryx.timestamp.copied": {
+  "defaultMessage": "Скопировано"
+ },
+ "@astryx.timestamp.detailsLabel": {
+  "defaultMessage": "Сведения о метке времени"
+ },
+ "@astryx.token.remove": {
+  "defaultMessage": "Удалить {label}"
+ }
+}

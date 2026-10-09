@@ -2,6 +2,15 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import type { Role } from '@pam/config';
+import { requestLinkPreviews, wantsPreview } from './linkPreview';
+import { loadPhotos, removeUnsentPhoto, shrinkPhoto, uploadMessagePhoto } from './messagePhoto';
+import {
+  displayFileName,
+  removeUnsentFile,
+  uploadMessageFile,
+  type MessageFile,
+  type OutgoingAttachment,
+} from './messageFile';
 import { readAccountLimited } from './accountLimited';
 
 /**
@@ -24,11 +33,24 @@ import { readAccountLimited } from './accountLimited';
  * select. See `useConversations` for why: a row policy that hands back a
  * whole `profiles` row hands back `last_active_at` and `phone` along with the
  * name, and D-154 closed exactly that hole.
+ *
+ * A message may carry a photo (D-394, 0079): stored privately, it is
+ * downloaded with the messages and shown from the phone's memory. Sending one shrinks it on
+ * the phone, stores it, then inserts the message that points at it; if the
+ * message does not go in, the stored photo is taken back.
+ *
+ * Or a document (D-399, 0080): stored the same way in its own bucket, and the
+ * message carries its name and size. It is not downloaded with the messages —
+ * the conversation shows its name and size, and it is fetched when tapped.
  */
 export interface ThreadMessage {
   readonly id: string;
   readonly senderId: string;
   readonly body: string | null;
+  /** The message's photo, as an on-phone link (D-394), or null. */
+  readonly photoUrl: string | null;
+  /** The message's document (D-399), not yet downloaded, or null. */
+  readonly file: MessageFile | null;
   readonly createdAt: string;
   readonly mine: boolean;
 }
@@ -52,8 +74,27 @@ interface MessageRow {
   id: string;
   sender_id: string;
   body: string | null;
+  attachment_url: string | null;
+  attachment_kind: string | null;
+  attachment_name: string | null;
+  attachment_bytes: number | null;
   created_at: string;
 }
+
+const MESSAGE_COLUMNS =
+  'id, sender_id, body, attachment_url, attachment_kind, attachment_name, attachment_bytes, created_at';
+// Until 0080 is on the live project (D-399), the two document columns do not
+// exist and asking for them fails the whole read — every conversation would
+// fail to open if this reached production first. The columns every
+// conversation has had since 0005 still read it.
+const MESSAGE_COLUMNS_BEFORE_0080 = 'id, sender_id, body, attachment_url, attachment_kind, created_at';
+
+const photoPathOf = (row: MessageRow) => (row.attachment_kind === 'photo' ? row.attachment_url : null);
+
+const fileOf = (row: MessageRow): MessageFile | null =>
+  row.attachment_kind === 'file' && row.attachment_url
+    ? { path: row.attachment_url, name: displayFileName(row.attachment_name ?? ''), bytes: row.attachment_bytes ?? 0 }
+    : null;
 
 function one<T>(value: T | T[] | null): T | null {
   return Array.isArray(value) ? (value[0] ?? null) : value;
@@ -61,7 +102,7 @@ function one<T>(value: T | T[] | null): T | null {
 
 export function useThread(conversationId: string | null): {
   state: ThreadState;
-  send: (body: string) => Promise<boolean>;
+  send: (body: string, attachment?: OutgoingAttachment | null) => Promise<boolean>;
   sending: boolean;
   sendFailed: boolean;
   /**
@@ -137,18 +178,24 @@ export function useThread(conversationId: string | null): {
           ).find((row) => row.conversation_id === conversationId) ?? null;
         const conv = one(mine.conversations);
 
-        const { data: rows, error: messagesError } = await supabase
-          .from('messages')
-          .select('id, sender_id, body, created_at')
-          .eq('conversation_id', conversationId)
-          .order('created_at', { ascending: true })
-          .limit(200);
+        const read = (columns: string) =>
+          supabase
+            .from('messages')
+            .select(columns)
+            .eq('conversation_id', conversationId)
+            .order('created_at', { ascending: true })
+            .limit(200);
+        let { data: rows, error: messagesError } = await read(MESSAGE_COLUMNS);
+        if (messagesError) ({ data: rows, error: messagesError } = await read(MESSAGE_COLUMNS_BEFORE_0080));
 
         if (cancelled) return;
         if (messagesError) {
           setState({ status: 'error', offline: !navigator.onLine });
           return;
         }
+        const loaded = (rows ?? []) as unknown as MessageRow[];
+        const links = await loadPhotos(loaded.map(photoPathOf).filter((p): p is string => p !== null));
+        if (cancelled) return;
 
         setState({
           status: 'ready',
@@ -157,10 +204,12 @@ export function useThread(conversationId: string | null): {
           otherRole: partner?.role ?? null,
           otherProgramName: partner?.program_name ?? null,
           kind: conv?.kind ?? 'direct',
-          messages: ((rows ?? []) as MessageRow[]).map((row) => ({
+          messages: loaded.map((row) => ({
             id: row.id,
             senderId: row.sender_id,
             body: row.body,
+            photoUrl: links[photoPathOf(row) ?? ''] ?? null,
+            file: fileOf(row),
             createdAt: row.created_at,
             mine: row.sender_id === me,
           })),
@@ -186,23 +235,47 @@ export function useThread(conversationId: string | null): {
   }, [conversationId, nonce]);
 
   const send = useCallback(
-    async (body: string): Promise<boolean> => {
+    async (body: string, attachment: OutgoingAttachment | null = null): Promise<boolean> => {
       const trimmed = body.trim();
-      if (!trimmed || !conversationId || state.status !== 'ready') return false;
+      if ((!trimmed && !attachment) || !conversationId || state.status !== 'ready') return false;
 
       setSending(true);
       setSendFailed(false);
+      let stored: { path: string; kind: 'photo' | 'file' } | null = null;
       try {
+        let shrunk: Blob | null = null;
+        let named: { name: string; bytes: number } | null = null;
+        if (attachment?.kind === 'photo') {
+          shrunk = attachment.isReady ? attachment.file : await shrinkPhoto(attachment.file);
+          if (!shrunk) throw new Error('could not read the photo');
+          const path = await uploadMessagePhoto(conversationId, shrunk);
+          if (!path) throw new Error('upload failed');
+          stored = { path, kind: 'photo' };
+        } else if (attachment?.kind === 'file') {
+          const path = await uploadMessageFile(conversationId, attachment.file);
+          if (!path) throw new Error('upload failed');
+          stored = { path, kind: 'file' };
+          named = { name: displayFileName(attachment.file.name), bytes: attachment.file.size };
+        }
         const { createClient } = await import('./supabase');
         const supabase = createClient();
         const { data, error } = await supabase
           .from('messages')
-          .insert({ conversation_id: conversationId, sender_id: state.meId, body: trimmed })
-          .select('id, sender_id, body, created_at')
+          .insert({
+            conversation_id: conversationId,
+            sender_id: state.meId,
+            body: trimmed || null,
+            ...(stored ? { attachment_url: stored.path, attachment_kind: stored.kind } : {}),
+            ...(named ? { attachment_name: named.name, attachment_bytes: named.bytes } : {}),
+          })
+          .select(MESSAGE_COLUMNS)
           .single();
         if (error || !data) throw error ?? new Error('insert failed');
+        stored = null;
 
         const row = data as MessageRow;
+        // A link starts its preview now, so Stuff shared has it ready (D-407).
+        if (wantsPreview(row.body)) void requestLinkPreviews([row.id]);
         setState((prev) =>
           prev.status === 'ready'
             ? {
@@ -213,6 +286,10 @@ export function useThread(conversationId: string | null): {
                     id: row.id,
                     senderId: row.sender_id,
                     body: row.body,
+                    // What was just picked, shown from the phone; the stored
+                    // copy is what the other person's link reads.
+                    photoUrl: shrunk ? URL.createObjectURL(shrunk) : null,
+                    file: fileOf(row),
                     createdAt: row.created_at,
                     mine: true,
                   },
@@ -222,6 +299,8 @@ export function useThread(conversationId: string | null): {
         );
         return true;
       } catch {
+        if (stored?.kind === 'photo') void removeUnsentPhoto(stored.path);
+        if (stored?.kind === 'file') void removeUnsentFile(stored.path);
         // A refusal and a dropped connection look alike from here; only one
         // of them is the account's doing, and it deserves its own words.
         if (await readAccountLimited()) {

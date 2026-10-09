@@ -26,11 +26,16 @@
     "./dummy-policies": "./src/dummy-policies.ts",
     "./dummy-services": "./src/dummy-services.ts",
     "./dummy-booking": "./src/dummy-booking.ts",
-    "./invite-email": "./src/invite-email.ts"
+    "./invite-email": "./src/invite-email.ts",
+    "./copy-sync": "./src/copy-sync.ts",
+    "./pseudo": "./src/pseudo.ts"
   },
   "scripts": {
     "typecheck": "tsc -p tsconfig.json",
-    "test": "vitest run"
+    "test": "vitest run",
+    "copy:status": "node scripts/copy-sync.mjs status",
+    "copy:draft": "node scripts/copy-sync.mjs draft",
+    "copy:ack": "node scripts/copy-sync.mjs ack"
   },
   "devDependencies": {
     "typescript": "^5.7.2",

@@ -86,6 +86,12 @@ Supabase is invisible to every other session and to Will reading the repo —
 it is the exact failure this rule exists to prevent, the same class as an
 unrecorded build session.
 
+**Numbers are shared too.** Decision (`D-nnn`), amendment (`Ann`), migration and
+changelog numbers are handed out by whichever session writes next, and each
+sees only its own branch. Claim yours in `docs/allocations.md` (fetch first, bump
+the row, push that line) before you write the entry; `packages/config/test/numbering.test.ts`
+fails on a duplicate that reaches one tree.
+
 **Session end-of-turn writes are shared files, not yours alone.** Before
 editing `STATUS.md`, `DECISIONS.md`, or `CHANGELOG.md` at the end of a
 session, `git pull`/fetch the branch you're pushing to first. If another
@@ -181,8 +187,10 @@ These come from the build SOP and are enforced by tests, not convention:
   `!important`, never a raw hex or px where a token exists.
 - **Never display** "prisoner", "ex-offender", "inmate", or conviction details
   anywhere a user can see — UI, notifications, or exports. CI checks this.
-- **No SMS may reveal justice involvement**, exceed 160 characters, carry emoji,
-  or send without a human recorded in `reviewedBy`.
+- **No SMS may reveal justice involvement**, exceed 160 characters (70 in a
+  script GSM-7 cannot carry — Chinese, Russian, Arabic), carry emoji, or send
+  without a human recorded in `reviewedBy` **for that language**. A language
+  nobody has signed is texted in English, never in a draft (A25).
 - **Never dead-end.** Every screen has a visible way back and a visible way to
   get help. (The hero template's screens keep the way back but carry no help —
   Will's exception, `docs/sop-amendments.md` A19.)
@@ -190,7 +198,15 @@ These come from the build SOP and are enforced by tests, not convention:
   is doing two things (a `variant="secondary"` one beside it is fine — D-239).
 - **48px minimum touch target, 56px primary buttons (secondary the same — D-239), 16px body text on mobile (A23).**
 - Every `security definer` function sets `search_path = public, extensions`.
-- Strings go through i18n from day one. English and Spanish stay key-for-key.
+- Strings go through i18n from day one. Every language Pam offers (English,
+  Spanish, Brazilian Portuguese, Simplified and Traditional Chinese, Russian,
+  Arabic — A24) stays key-for-key **and in step**: reword the English and the
+  other six go stale, which `copy:status` lists and the tests fail on
+  (`locales/ledger.json`, A25). Text on screen wraps and grows rather than
+  being cut (`@pam/ui/Button`, `Badge`, `Segment`); `pnpm --filter @pam/web
+  audit:fit` checks it against a Storybook build, and Storybook's
+  *Pseudo-language* shows a string 40% longer. How to change copy, in all
+  seven languages and in texts and emails: `docs/copy-changes.md`.
 
 ## Verify, don't assume
 

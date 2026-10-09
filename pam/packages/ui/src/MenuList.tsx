@@ -5,7 +5,7 @@ import { Icon } from '@astryxdesign/core/Icon';
 import { HStack } from '@astryxdesign/core/HStack';
 import { List, ListItem } from '@astryxdesign/core/List';
 import { Text } from '@astryxdesign/core/Text';
-import { Badge } from '@astryxdesign/core/Badge';
+import { Badge } from './Badge.js';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { CheckIcon } from './icons.js';
 
@@ -75,7 +75,7 @@ const styles = stylex.create({
   // Smaller than the label, so the row reads as a name and a note
   // (Will, 5 October, D-294).
   description: { fontSize: '14px', lineHeight: 1.35 },
-  oneLine: { display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', minWidth: 0, maxWidth: '100%' },
+  oneLine: { display: 'block', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', unicodeBidi: 'plaintext', minWidth: 0, maxWidth: '100%' },
   // The chosen option (Will, 5 October, D-274): bold and in the accent
   // green, words and tick alike, with a heavier tick — a thin black tick at
   // the far edge was easy to miss.

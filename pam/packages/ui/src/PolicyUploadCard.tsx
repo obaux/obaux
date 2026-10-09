@@ -2,7 +2,7 @@
 
 import { useRef, useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
-import { Button } from '@astryxdesign/core/Button';
+import { Button } from './Button.js';
 import { Heading } from '@astryxdesign/core/Heading';
 import { HStack } from '@astryxdesign/core/HStack';
 import { Text } from '@astryxdesign/core/Text';

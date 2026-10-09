@@ -5,7 +5,7 @@ import { VStack } from '@astryxdesign/core/VStack';
 import { HStack } from '@astryxdesign/core/HStack';
 import { Text } from '@astryxdesign/core/Text';
 import { Heading } from '@astryxdesign/core/Heading';
-import { Badge } from '@astryxdesign/core/Badge';
+import { Badge } from './Badge.js';
 import { IconButton } from '@astryxdesign/core/IconButton';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import type { Category } from '@pam/config';

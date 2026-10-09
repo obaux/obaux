@@ -60,7 +60,7 @@ const styles = stylex.create({
   message: {
     position: 'absolute',
     top: '16px',
-    right: '16px',
+    insetInlineEnd: '16px',
     width: '48px',
     height: '48px',
     borderRadius: '50%',
@@ -82,6 +82,10 @@ const styles = stylex.create({
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
+    // Its own direction (D-422): a program's name is written in whatever language its
+    // people use, and an English name in an Arabic screen must lose its end to the
+    // ellipsis, not its beginning.
+    unicodeBidi: 'plaintext',
     minWidth: 0,
   },
   chevron: { flexShrink: 0 },
@@ -95,9 +99,15 @@ const styles = stylex.create({
     lineHeight: 1.45,
     textAlign: 'center',
     display: '-webkit-box',
-    WebkitLineClamp: 3,
+    // Six lines, not three (D-422). Three held English; "Ayuda con currículums,
+    // entrevistas y ofertas de trabajo que se publican cada semana. Sin cita."
+    // is four in Spanish and its last words — walk-ins welcome — are the ones
+    // somebody acts on. A longer description than six lines is cut, not the
+    // translation of a short one.
+    WebkitLineClamp: 6,
     WebkitBoxOrient: 'vertical',
     overflow: 'hidden',
+    overflowWrap: 'anywhere',
   },
   stat: { flexGrow: 1, flexBasis: 0, minWidth: 0 },
   value: { fontSize: '20px', lineHeight: 1.2, fontWeight: 700, textAlign: 'center' },

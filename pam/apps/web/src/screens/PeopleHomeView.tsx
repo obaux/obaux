@@ -3,7 +3,7 @@
 import { useMemo, useState, type ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { Avatar } from '@astryxdesign/core/Avatar';
-import { Button } from '@astryxdesign/core/Button';
+import { Button } from '@pam/ui/Button';
 import { EmptyState } from '@astryxdesign/core/EmptyState';
 import { Heading } from '@astryxdesign/core/Heading';
 import { HStack } from '@astryxdesign/core/HStack';

@@ -24,14 +24,8 @@ export * from './phone.js';
 export * from './legal.js';
 export * from './glossary.js';
 
-/** Languages at launch (§2.3). [ASK WILL] on any additional language. */
-export const SUPPORTED_LOCALES = ['en', 'es'] as const;
-export type Locale = (typeof SUPPORTED_LOCALES)[number];
-export const DEFAULT_LOCALE: Locale = 'en';
-
-export function isSupportedLocale(value: string): value is Locale {
-  return (SUPPORTED_LOCALES as readonly string[]).includes(value);
-}
+export * from './i18n.js';
+export * from './translation.js';
 
 /**
  * Roles (§3). Role is set by invite type and never self-selected (§10 step 6).

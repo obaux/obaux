@@ -7,7 +7,7 @@ import { VStack } from '@astryxdesign/core/VStack';
 import { HStack } from '@astryxdesign/core/HStack';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
-import { Badge } from '@astryxdesign/core/Badge';
+import { Badge } from '@pam/ui/Badge';
 import { Avatar } from '@astryxdesign/core/Avatar';
 import { BigButton, BookmarkIcon, ConnectionsIcon, Loading, MessagesIcon, Notice, Page, SignIcon, TripsIcon } from '@pam/ui';
 import { MenuList } from '@pam/ui/MenuList';
@@ -27,7 +27,7 @@ import { VerifiedBadge } from '../../screens/VerifiedBadge';
 import { HeaderActions } from '../../screens/HeaderActions';
 import { useConversations } from '@/lib/useConversations';
 import { PersonDetailSkeleton } from '@pam/ui/Skeletons';
-import { NOTICES } from '@pam/config';
+import { NOTICES, intlLocale } from '@pam/config';
 import { DUMMY_EVERYONE, type DummyPerson } from '@pam/config/dummy-people';
 import { DUMMY_SAVED_BY_PERSON } from '@pam/config/dummy-places';
 import { DUMMY_APPOINTMENTS } from '@pam/config/dummy-appointments';
@@ -146,7 +146,7 @@ function fromCaseload(member: CaseloadMember | null, regionName: string | null):
 
 function whenLastActive(iso: string | null, locale: string): string | null {
   if (!iso) return null;
-  return new Intl.DateTimeFormat(locale, { month: 'short', day: 'numeric' }).format(new Date(iso));
+  return new Intl.DateTimeFormat(intlLocale(locale), { month: 'short', day: 'numeric' }).format(new Date(iso));
 }
 
 function PersonScreen() {
@@ -291,11 +291,11 @@ function PersonScreen() {
   const nextVisits = visits.filter((a) => new Date(a.startsAt).getTime() >= now);
   const pastVisits = visits.filter((a) => new Date(a.startsAt).getTime() < now);
   const shortDay = (iso: string) =>
-    new Intl.DateTimeFormat(locale, { month: 'short', day: 'numeric' }).format(new Date(iso));
+    new Intl.DateTimeFormat(intlLocale(locale), { month: 'short', day: 'numeric' }).format(new Date(iso));
   const visitWhen = (iso: string) =>
-    `${new Intl.DateTimeFormat(locale, { weekday: 'short', month: 'short', day: 'numeric' }).format(new Date(iso))} · ${new Intl.DateTimeFormat(locale, { hour: 'numeric', minute: '2-digit' }).format(new Date(iso))}`;
+    `${new Intl.DateTimeFormat(intlLocale(locale), { weekday: 'short', month: 'short', day: 'numeric' }).format(new Date(iso))} · ${new Intl.DateTimeFormat(intlLocale(locale), { hour: 'numeric', minute: '2-digit' }).format(new Date(iso))}`;
   const tripWhen = (iso: string) =>
-    `${new Intl.DateTimeFormat(locale, { weekday: 'long', month: 'short', day: 'numeric' }).format(new Date(iso))} · ${new Intl.DateTimeFormat(locale, { hour: 'numeric', minute: '2-digit' }).format(new Date(iso))}`;
+    `${new Intl.DateTimeFormat(intlLocale(locale), { weekday: 'long', month: 'short', day: 'numeric' }).format(new Date(iso))} · ${new Intl.DateTimeFormat(intlLocale(locale), { hour: 'numeric', minute: '2-digit' }).format(new Date(iso))}`;
   const tripCard = (trip: (typeof trips)[number]) => (
     <TripCard
       key={trip.id}
@@ -359,7 +359,7 @@ function PersonScreen() {
                   value: nextVisits[0]
                     ? // No-break spaces inside each part, so a narrow card breaks
                       // after the comma: "Oct 6," then "9:00 AM".
-                      `${shortDay(nextVisits[0].startsAt).replace(/\s/g, '\u00a0')}, ${new Intl.DateTimeFormat(locale, { hour: 'numeric', minute: '2-digit' }).format(new Date(nextVisits[0].startsAt)).replace(/\s/g, '\u00a0')}`
+                      `${shortDay(nextVisits[0].startsAt).replace(/\s/g, '\u00a0')}, ${new Intl.DateTimeFormat(intlLocale(locale), { hour: 'numeric', minute: '2-digit' }).format(new Date(nextVisits[0].startsAt)).replace(/\s/g, '\u00a0')}`
                     : t('person.stat.never'),
                   label: t('person.stat.nextVisit'),
                 },

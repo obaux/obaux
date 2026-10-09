@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { BottomSheet } from '@astryxdesign/core/BottomSheet';
-import { Button } from '@astryxdesign/core/Button';
+import { Button } from './Button.js';
 import { Icon } from '@astryxdesign/core/Icon';
 import { IconButton } from '@astryxdesign/core/IconButton';
 import { Heading } from '@astryxdesign/core/Heading';
@@ -17,6 +17,7 @@ import { sheet } from './sheet.js';
 import { canShareSheet, shareText } from './share.js';
 import { COPIED_MS, copyLink } from './clipboard.js';
 import { BigButton } from './BigButton.js';
+import { landFocus, landFocusStyle } from './landFocus.js';
 
 /**
  * The banner across the top is Will's picture (D-337, 7 October: "instead of
@@ -207,7 +208,7 @@ export function BringFriend({
       xstyle={sheet.panel}
     >
       {isOpen ? (
-        <VStack gap={3} xstyle={styles.sheet}>
+        <VStack gap={3} {...landFocus} xstyle={[styles.sheet, landFocusStyle.quiet]}>
           <VStack xstyle={styles.top}>
             {heroSrc && !heroFailed ? (
               // Decoration: the title under it says what the drawer is.

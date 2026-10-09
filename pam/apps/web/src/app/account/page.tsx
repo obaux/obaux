@@ -8,8 +8,8 @@ import { HStack } from '@astryxdesign/core/HStack';
 import { Card } from '@astryxdesign/core/Card';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
-import { Badge } from '@astryxdesign/core/Badge';
-import { Button } from '@astryxdesign/core/Button';
+import { Badge } from '@pam/ui/Badge';
+import { Button } from '@pam/ui/Button';
 import {
   AppHeader,
   BellIcon,
@@ -82,7 +82,7 @@ const styles = stylex.create({
     minHeight: '48px',
     fontSize: '17px',
     justifyContent: 'flex-start',
-    textAlign: 'left',
+    textAlign: 'start',
   },
 });
 

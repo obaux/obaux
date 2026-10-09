@@ -1,0 +1,734 @@
+{
+ "@astryx.pagination.label": {
+  "defaultMessage": "Paginação"
+ },
+ "@astryx.pagination.previous": {
+  "defaultMessage": "Ir para a página anterior"
+ },
+ "@astryx.pagination.next": {
+  "defaultMessage": "Ir para a próxima página"
+ },
+ "@astryx.pagination.previousBy": {
+  "defaultMessage": "Voltar {step, number} {step, plural, one {página} many {páginas} other {páginas}}"
+ },
+ "@astryx.pagination.nextBy": {
+  "defaultMessage": "Avançar {step, number} {step, plural, one {página} many {páginas} other {páginas}}"
+ },
+ "@astryx.pagination.first": {
+  "defaultMessage": "Ir para a primeira página"
+ },
+ "@astryx.pagination.last": {
+  "defaultMessage": "Ir para a última página"
+ },
+ "@astryx.pagination.goToPage": {
+  "defaultMessage": "Ir para a página {page, number}"
+ },
+ "@astryx.pagination.goToPageInput": {
+  "defaultMessage": "Ir para a página"
+ },
+ "@astryx.pagination.pageLabel": {
+  "defaultMessage": "Página"
+ },
+ "@astryx.pagination.pageIndicators": {
+  "defaultMessage": "Indicadores de página"
+ },
+ "@astryx.pagination.itemsPerPage": {
+  "defaultMessage": "Itens por página"
+ },
+ "@astryx.pagination.count": {
+  "defaultMessage": "{from, number}–{to, number} de {total, number}"
+ },
+ "@astryx.pagination.pageOfTotal": {
+  "defaultMessage": "Página {current, number} de {total, number}"
+ },
+ "@astryx.pagination.pageAnnounce": {
+  "defaultMessage": "Página {current, number}"
+ },
+ "@astryx.powersearch.editor.field": {
+  "defaultMessage": "Campo"
+ },
+ "@astryx.powersearch.editor.operator": {
+  "defaultMessage": "Operador"
+ },
+ "@astryx.powersearch.editor.addFilter": {
+  "defaultMessage": "+ Adicionar filtro"
+ },
+ "@astryx.powersearch.editor.removeFilter": {
+  "defaultMessage": "Remover filtro"
+ },
+ "@astryx.powersearch.editor.groupOperator": {
+  "defaultMessage": "Operador de grupo"
+ },
+ "@astryx.powersearch.editor.group": {
+  "defaultMessage": "Grupo"
+ },
+ "@astryx.powersearch.editor.delete": {
+  "defaultMessage": "Excluir"
+ },
+ "@astryx.powersearch.editor.cancel": {
+  "defaultMessage": "Cancelar"
+ },
+ "@astryx.powersearch.editor.apply": {
+  "defaultMessage": "Aplicar"
+ },
+ "@astryx.powersearch.valueEditor.value": {
+  "defaultMessage": "Valor"
+ },
+ "@astryx.powersearch.valueEditor.values": {
+  "defaultMessage": "Valores"
+ },
+ "@astryx.powersearch.valueEditor.time": {
+  "defaultMessage": "Hora"
+ },
+ "@astryx.powersearch.valueEditor.date": {
+  "defaultMessage": "Data"
+ },
+ "@astryx.powersearch.valueEditor.relativeDate": {
+  "defaultMessage": "Data relativa"
+ },
+ "@astryx.powersearch.valueEditor.startDate": {
+  "defaultMessage": "Data de início"
+ },
+ "@astryx.powersearch.valueEditor.endDate": {
+  "defaultMessage": "Data de término"
+ },
+ "@astryx.powersearch.valueEditor.entities": {
+  "defaultMessage": "Entidades"
+ },
+ "@astryx.powersearch.valueEditor.searchPlaceholder": {
+  "defaultMessage": "Pesquisar…"
+ },
+ "@astryx.powersearch.valueEditor.enterValuePlaceholder": {
+  "defaultMessage": "Insira um valor…"
+ },
+ "@astryx.powersearch.valueEditor.addValuesPlaceholder": {
+  "defaultMessage": "Adicionar valores…"
+ },
+ "@astryx.powersearch.valueEditor.enterNumberPlaceholder": {
+  "defaultMessage": "Insira um número…"
+ },
+ "@astryx.powersearch.valueEditor.selectValuesPlaceholder": {
+  "defaultMessage": "Selecione valores…"
+ },
+ "@astryx.powersearch.operator.contains": {
+  "defaultMessage": "contém"
+ },
+ "@astryx.powersearch.operator.notContains": {
+  "defaultMessage": "não contém"
+ },
+ "@astryx.powersearch.operator.startsWith": {
+  "defaultMessage": "começa com"
+ },
+ "@astryx.powersearch.operator.notStartsWith": {
+  "defaultMessage": "não começa com"
+ },
+ "@astryx.powersearch.operator.endsWith": {
+  "defaultMessage": "termina com"
+ },
+ "@astryx.powersearch.operator.notEndsWith": {
+  "defaultMessage": "não termina com"
+ },
+ "@astryx.powersearch.operator.is": {
+  "defaultMessage": "é"
+ },
+ "@astryx.powersearch.operator.isNot": {
+  "defaultMessage": "não é"
+ },
+ "@astryx.powersearch.operator.equals": {
+  "defaultMessage": "é"
+ },
+ "@astryx.powersearch.operator.notEquals": {
+  "defaultMessage": "não é"
+ },
+ "@astryx.powersearch.operator.greaterThan": {
+  "defaultMessage": "é maior que"
+ },
+ "@astryx.powersearch.operator.lessThan": {
+  "defaultMessage": "é menor que"
+ },
+ "@astryx.powersearch.operator.greaterThanOrEqual": {
+  "defaultMessage": "é maior ou igual a"
+ },
+ "@astryx.powersearch.operator.lessThanOrEqual": {
+  "defaultMessage": "é menor ou igual a"
+ },
+ "@astryx.powersearch.operator.before": {
+  "defaultMessage": "é anterior a"
+ },
+ "@astryx.powersearch.operator.after": {
+  "defaultMessage": "é posterior a"
+ },
+ "@astryx.powersearch.operator.between": {
+  "defaultMessage": "está entre"
+ },
+ "@astryx.powersearch.operator.isTrue": {
+  "defaultMessage": "é verdadeiro"
+ },
+ "@astryx.powersearch.operator.isFalse": {
+  "defaultMessage": "é falso"
+ },
+ "@astryx.powersearch.operator.isAnyOf": {
+  "defaultMessage": "é qualquer um de"
+ },
+ "@astryx.powersearch.operator.isNoneOf": {
+  "defaultMessage": "não é nenhum de"
+ },
+ "@astryx.powersearch.valueEditor.itemsCount": {
+  "defaultMessage": "{count, number} {count, plural, one {item} many {itens} other {itens}}"
+ },
+ "@astryx.powersearch.valueEditor.entitiesCount": {
+  "defaultMessage": "{count, number} {count, plural, one {entidade} many {entidades} other {entidades}}"
+ },
+ "@astryx.powersearch.valueEditor.dateRange": {
+  "defaultMessage": "intervalo de datas"
+ },
+ "@astryx.powersearch.valueEditor.filtersCount": {
+  "defaultMessage": "{count, number} {count, plural, one {filtro} many {filtros} other {filtros}}"
+ },
+ "@astryx.powersearch.resultCount": {
+  "defaultMessage": "{count, number} {count, plural, one {resultado} many {resultados} other {resultados}}"
+ },
+ "@astryx.alertDialog.cancel": {
+  "defaultMessage": "Cancelar"
+ },
+ "@astryx.appShell.mobileNavigation": {
+  "defaultMessage": "Navegação mobile"
+ },
+ "@astryx.appShell.skipToContent": {
+  "defaultMessage": "Pular para o conteúdo"
+ },
+ "@astryx.avatarGroup.label": {
+  "defaultMessage": "Avatares"
+ },
+ "@astryx.avatarGroup.keyboardHint": {
+  "defaultMessage": "Use as teclas de seta para navegar entre os avatares"
+ },
+ "@astryx.avatarGroup.overflow": {
+  "defaultMessage": "mais {count, number}"
+ },
+ "@astryx.banner.dismiss": {
+  "defaultMessage": "Dispensar"
+ },
+ "@astryx.calendar.previousMonth": {
+  "defaultMessage": "Mês anterior"
+ },
+ "@astryx.calendar.nextMonth": {
+  "defaultMessage": "Próximo mês"
+ },
+ "@astryx.calendar.daySelected": {
+  "defaultMessage": "{date}, selecionado"
+ },
+ "@astryx.calendar.dayRangeStart": {
+  "defaultMessage": "{date}, início do intervalo"
+ },
+ "@astryx.calendar.dayRangeEnd": {
+  "defaultMessage": "{date}, fim do intervalo"
+ },
+ "@astryx.calendar.dayRangeStartAndEnd": {
+  "defaultMessage": "{date}, início e fim do intervalo"
+ },
+ "@astryx.calendar.dayInRange": {
+  "defaultMessage": "{date}, no intervalo"
+ },
+ "@astryx.calendar.rangeStartAnnounce": {
+  "defaultMessage": "Data de início {date}. Selecione uma data de término."
+ },
+ "@astryx.calendar.rangeCompleteAnnounce": {
+  "defaultMessage": "Intervalo selecionado: {start} a {end}."
+ },
+ "@astryx.carousel.label": {
+  "defaultMessage": "Carrossel"
+ },
+ "@astryx.carousel.scrollLeft": {
+  "defaultMessage": "Rolar para a esquerda"
+ },
+ "@astryx.carousel.scrollRight": {
+  "defaultMessage": "Rolar para a direita"
+ },
+ "@astryx.carousel.slideLabel": {
+  "defaultMessage": "Slide {current, number} de {total, number}"
+ },
+ "@astryx.chat.status.sending": {
+  "defaultMessage": "Enviando"
+ },
+ "@astryx.chat.status.sent": {
+  "defaultMessage": "Enviado"
+ },
+ "@astryx.chat.status.delivered": {
+  "defaultMessage": "Entregue"
+ },
+ "@astryx.chat.status.read": {
+  "defaultMessage": "Lido"
+ },
+ "@astryx.chat.status.failed": {
+  "defaultMessage": "Falhou"
+ },
+ "@astryx.chat.messageAriaLabel": {
+  "defaultMessage": "Mensagem {status}"
+ },
+ "@astryx.chat.pastedText.expand": {
+  "defaultMessage": "Expandir"
+ },
+ "@astryx.checkboxList.item.checkbox": {
+  "defaultMessage": "Caixa de seleção"
+ },
+ "@astryx.commandPalette.emptySearch": {
+  "defaultMessage": "Nenhum resultado"
+ },
+ "@astryx.commandPalette.emptyBootstrap": {
+  "defaultMessage": "Digite para pesquisar"
+ },
+ "@astryx.commandPalette.resultCount": {
+  "defaultMessage": "{count, number} {count, plural, one {resultado} many {resultados} other {resultados}}"
+ },
+ "@astryx.commandPalette.noResultsFor": {
+  "defaultMessage": "Nenhum resultado para {query}"
+ },
+ "@astryx.commandPalette.loading": {
+  "defaultMessage": "Carregando"
+ },
+ "@astryx.dateRangeInput.presetDateRanges": {
+  "defaultMessage": "Intervalos de datas predefinidos"
+ },
+ "@astryx.dateTimeInput.timePlaceholder": {
+  "defaultMessage": "Selecione um horário"
+ },
+ "@astryx.dialog.close": {
+  "defaultMessage": "Fechar"
+ },
+ "@astryx.lightbox.close": {
+  "defaultMessage": "Fechar"
+ },
+ "@astryx.lightbox.previous": {
+  "defaultMessage": "Anterior"
+ },
+ "@astryx.lightbox.next": {
+  "defaultMessage": "Próximo"
+ },
+ "@astryx.markdown.taskList": {
+  "defaultMessage": "Lista de tarefas"
+ },
+ "@astryx.markdown.table": {
+  "defaultMessage": "Tabela"
+ },
+ "@astryx.mobileNav.closeNavigation": {
+  "defaultMessage": "Fechar navegação"
+ },
+ "@astryx.multiSelector.selectAll": {
+  "defaultMessage": "Selecionar tudo"
+ },
+ "@astryx.multiSelector.searchPlaceholder": {
+  "defaultMessage": "Pesquisar…"
+ },
+ "@astryx.multiSelector.searchOptions": {
+  "defaultMessage": "Opções de pesquisa"
+ },
+ "@astryx.multiSelector.selectAllPartiallySelected": {
+  "defaultMessage": "{label}, parcialmente selecionado"
+ },
+ "@astryx.popover.close": {
+  "defaultMessage": "Fechar o popover"
+ },
+ "@astryx.selector.searchPlaceholder": {
+  "defaultMessage": "Pesquisar…"
+ },
+ "@astryx.selector.searchOptions": {
+  "defaultMessage": "Opções de pesquisa"
+ },
+ "@astryx.sideNav.label": {
+  "defaultMessage": "Navegação lateral"
+ },
+ "@astryx.sideNav.resizeSidebar": {
+  "defaultMessage": "Redimensionar a barra lateral"
+ },
+ "@astryx.sideNav.heading.openMenu": {
+  "defaultMessage": "Abrir menu"
+ },
+ "@astryx.tabList.label": {
+  "defaultMessage": "Guias"
+ },
+ "@astryx.table.label": {
+  "defaultMessage": "Tabela"
+ },
+ "@astryx.table.noData": {
+  "defaultMessage": "Sem dados"
+ },
+ "@astryx.table.filter.allPlaceholder": {
+  "defaultMessage": "Todos"
+ },
+ "@astryx.table.filter.reset": {
+  "defaultMessage": "Redefinir"
+ },
+ "@astryx.table.filter.apply": {
+  "defaultMessage": "Aplicar"
+ },
+ "@astryx.table.selection.selectAllRows": {
+  "defaultMessage": "Selecionar todas as linhas"
+ },
+ "@astryx.table.selection.selectRow": {
+  "defaultMessage": "Selecionar linha"
+ },
+ "@astryx.table.selection.selectRowNamed": {
+  "defaultMessage": "Selecionar {label}"
+ },
+ "@astryx.table.sort.ascending": {
+  "defaultMessage": "Ordenar em ordem crescente"
+ },
+ "@astryx.table.sort.descending": {
+  "defaultMessage": "Ordenar em ordem decrescente"
+ },
+ "@astryx.table.sort.clear": {
+  "defaultMessage": "Limpar ordenação"
+ },
+ "@astryx.table.sort.direction.ascending": {
+  "defaultMessage": "crescente"
+ },
+ "@astryx.table.sort.direction.descending": {
+  "defaultMessage": "decrescente"
+ },
+ "@astryx.table.sort.sortBy": {
+  "defaultMessage": "Ordenar por {label}"
+ },
+ "@astryx.table.sort.sortedBy": {
+  "defaultMessage": "Ordenar por {label}, ordenado de forma {direction}"
+ },
+ "@astryx.table.sort.sortedByWithPriority": {
+  "defaultMessage": "Ordenar por {label}, ordenado de forma {direction}, prioridade {rank, number} de {total, number}"
+ },
+ "@astryx.toast.dismiss": {
+  "defaultMessage": "Dispensar notificação"
+ },
+ "@astryx.toast.viewport": {
+  "defaultMessage": "Notificações"
+ },
+ "@astryx.tokenizer.clearAll": {
+  "defaultMessage": "Limpar tudo"
+ },
+ "@astryx.topNav.heading.openMenu": {
+  "defaultMessage": "Abrir menu"
+ },
+ "@astryx.topNav.landmarkLabel": {
+  "defaultMessage": "Navegação superior"
+ },
+ "@astryx.treeList.toggleChildren": {
+  "defaultMessage": "Mostrar/ocultar itens filhos"
+ },
+ "@astryx.typeahead.emptySearchResults": {
+  "defaultMessage": "Nenhum resultado encontrado"
+ },
+ "@astryx.typeahead.loading": {
+  "defaultMessage": "Carregando"
+ },
+ "@astryx.typeahead.searchResults": {
+  "defaultMessage": "Resultados da pesquisa"
+ },
+ "@astryx.typeahead.clearSelection": {
+  "defaultMessage": "Limpar seleção"
+ },
+ "@astryx.breadcrumbs.label": {
+  "defaultMessage": "Trilha de navegação"
+ },
+ "@astryx.chat.composer.placeholder": {
+  "defaultMessage": "Digite uma mensagem…"
+ },
+ "@astryx.chat.composerDrawer.label": {
+  "defaultMessage": "Itens"
+ },
+ "@astryx.chat.composerInput.label": {
+  "defaultMessage": "Entrada de mensagem"
+ },
+ "@astryx.chat.speechRecognition.noSpeechDetected": {
+  "defaultMessage": "Nenhuma fala foi detectada."
+ },
+ "@astryx.commandPalette.label": {
+  "defaultMessage": "Paleta de comandos"
+ },
+ "@astryx.commandPalette.input.placeholder": {
+  "defaultMessage": "Pesquisar…"
+ },
+ "@astryx.commandPalette.list.label": {
+  "defaultMessage": "Comandos"
+ },
+ "@astryx.contextMenu.label": {
+  "defaultMessage": "Menu de contexto"
+ },
+ "@astryx.dateInput.placeholder": {
+  "defaultMessage": "Selecione uma data"
+ },
+ "@astryx.dateInput.dialogLabel": {
+  "defaultMessage": "Escolha uma data"
+ },
+ "@astryx.dateInput.closeCalendar": {
+  "defaultMessage": "Fechar calendário"
+ },
+ "@astryx.dateInput.openCalendar": {
+  "defaultMessage": "Abrir calendário"
+ },
+ "@astryx.dateInput.toggleCalendarClose": {
+  "defaultMessage": "Fechar calendário"
+ },
+ "@astryx.dateInput.clear": {
+  "defaultMessage": "Limpar {label}"
+ },
+ "@astryx.dateTimeInput.timeSuffix": {
+  "defaultMessage": "Horário de {label}"
+ },
+ "@astryx.dateRangeInput.placeholder": {
+  "defaultMessage": "Selecione um intervalo de datas"
+ },
+ "@astryx.dateRangeInput.dialogLabel": {
+  "defaultMessage": "Escolha um intervalo de datas"
+ },
+ "@astryx.dateTimeInput.placeholder": {
+  "defaultMessage": "Selecione uma data"
+ },
+ "@astryx.link.newTab": {
+  "defaultMessage": "(abre em uma nova guia)"
+ },
+ "@astryx.mobileNav.toggle.open": {
+  "defaultMessage": "Abrir navegação"
+ },
+ "@astryx.moreMenu.label": {
+  "defaultMessage": "Mais opções"
+ },
+ "@astryx.multiSelector.selectPlaceholder": {
+  "defaultMessage": "Selecione…"
+ },
+ "@astryx.outline.label": {
+  "defaultMessage": "Índice"
+ },
+ "@astryx.powersearch.label": {
+  "defaultMessage": "Pesquisar"
+ },
+ "@astryx.powersearch.placeholder": {
+  "defaultMessage": "Pesquisar…"
+ },
+ "@astryx.resizable.collapsed": {
+  "defaultMessage": "Recolhido"
+ },
+ "@astryx.resizable.handle.label": {
+  "defaultMessage": "Alça de redimensionamento"
+ },
+ "@astryx.selector.placeholder": {
+  "defaultMessage": "Selecione…"
+ },
+ "@astryx.sideNav.heading.dialogLabel": {
+  "defaultMessage": "Menu de navegação"
+ },
+ "@astryx.table.pagination.label": {
+  "defaultMessage": "Paginação da tabela"
+ },
+ "@astryx.timeInput.placeholder": {
+  "defaultMessage": "Selecione um horário"
+ },
+ "@astryx.topNav.heading.dialogLabel": {
+  "defaultMessage": "Menu de navegação"
+ },
+ "@astryx.typeahead.searchPlaceholder": {
+  "defaultMessage": "Pesquisar…"
+ },
+ "@astryx.banner.collapse": {
+  "defaultMessage": "Recolher"
+ },
+ "@astryx.banner.expand": {
+  "defaultMessage": "Expandir"
+ },
+ "@astryx.button.loading": {
+  "defaultMessage": "Carregando"
+ },
+ "@astryx.chatComposerDrawer.expand": {
+  "defaultMessage": "Expandir {label}"
+ },
+ "@astryx.chatComposerDrawer.collapse": {
+  "defaultMessage": "Recolher {label}"
+ },
+ "@astryx.chatDictationButton.startDictation": {
+  "defaultMessage": "Iniciar ditado"
+ },
+ "@astryx.chatDictationButton.stopDictation": {
+  "defaultMessage": "Parar ditado"
+ },
+ "@astryx.chatLayout.newMessages": {
+  "defaultMessage": "Novas mensagens"
+ },
+ "@astryx.chatLayoutScrollButton.scrollToBottom": {
+  "defaultMessage": "Rolar até o fim"
+ },
+ "@astryx.chatMessage.messageFrom": {
+  "defaultMessage": "Mensagem de {sender}"
+ },
+ "@astryx.chatSendButton.stop": {
+  "defaultMessage": "Parar"
+ },
+ "@astryx.chatSendButton.send": {
+  "defaultMessage": "Enviar"
+ },
+ "@astryx.chatToolCalls.error": {
+  "defaultMessage": "Erro: {message}"
+ },
+ "@astryx.chatToolCalls.groupLabel": {
+  "defaultMessage": "{count} chamadas de ferramenta"
+ },
+ "@astryx.chatTriggerMenu.suggestions": {
+  "defaultMessage": "Sugestões"
+ },
+ "@astryx.citation.label": {
+  "defaultMessage": "Citação {number}: {title}"
+ },
+ "@astryx.codeBlock.copied": {
+  "defaultMessage": "Copiado"
+ },
+ "@astryx.codeBlock.copyCode": {
+  "defaultMessage": "Copiar código"
+ },
+ "@astryx.codeBlock.code": {
+  "defaultMessage": "Código"
+ },
+ "@astryx.field.optional": {
+  "defaultMessage": "Opcional"
+ },
+ "@astryx.field.required": {
+  "defaultMessage": "Obrigatório"
+ },
+ "@astryx.fileInput.clearLabel": {
+  "defaultMessage": "Limpar {label}"
+ },
+ "@astryx.fileInput.required": {
+  "defaultMessage": "Obrigatório"
+ },
+ "@astryx.keyboardHint.toNavigate": {
+  "defaultMessage": "para navegar"
+ },
+ "@astryx.lightbox.mediaViewer": {
+  "defaultMessage": "Visualizador de mídia"
+ },
+ "@astryx.lightbox.zoomedIn": {
+  "defaultMessage": "Ampliado, use as teclas de seta para deslocar"
+ },
+ "@astryx.lightbox.zoomedOut": {
+  "defaultMessage": "Reduzido"
+ },
+ "@astryx.metadataList.showMore": {
+  "defaultMessage": "Mostrar mais"
+ },
+ "@astryx.metadataList.showLess": {
+  "defaultMessage": "Mostrar menos"
+ },
+ "@astryx.mobileNav.navigation": {
+  "defaultMessage": "Navegação"
+ },
+ "@astryx.multiSelector.clearAll": {
+  "defaultMessage": "Limpar tudo {label}"
+ },
+ "@astryx.input.statusButton.error": {
+  "defaultMessage": "Detalhes do erro"
+ },
+ "@astryx.input.statusButton.warning": {
+  "defaultMessage": "Detalhes do aviso"
+ },
+ "@astryx.input.statusButton.success": {
+  "defaultMessage": "Detalhes do sucesso"
+ },
+ "@astryx.numberInput.clearLabel": {
+  "defaultMessage": "Limpar {label}"
+ },
+ "@astryx.selector.clearLabel": {
+  "defaultMessage": "Limpar {label}"
+ },
+ "@astryx.sideNavCollapseButton.expandSidebar": {
+  "defaultMessage": "Expandir a barra lateral"
+ },
+ "@astryx.sideNavCollapseButton.collapseSidebar": {
+  "defaultMessage": "Recolher a barra lateral"
+ },
+ "@astryx.sideNavItem.expand": {
+  "defaultMessage": "Expandir {label}"
+ },
+ "@astryx.sideNavItem.collapse": {
+  "defaultMessage": "Recolher {label}"
+ },
+ "@astryx.tableFiltering.filterByColumn": {
+  "defaultMessage": "Filtrar {header}"
+ },
+ "@astryx.tableGroupedRows.expandGroup": {
+  "defaultMessage": "Expandir o grupo {groupKey}"
+ },
+ "@astryx.tableGroupedRows.collapseGroup": {
+  "defaultMessage": "Recolher o grupo {groupKey}"
+ },
+ "@astryx.tableRowExpansion.collapseRow": {
+  "defaultMessage": "Recolher linha"
+ },
+ "@astryx.tableRowExpansion.expandRow": {
+  "defaultMessage": "Expandir linha"
+ },
+ "@astryx.tableRowExpansion.collapseAllRows": {
+  "defaultMessage": "Recolher todas as linhas"
+ },
+ "@astryx.tableRowExpansion.expandAllRows": {
+  "defaultMessage": "Expandir todas as linhas"
+ },
+ "@astryx.step.goToStep": {
+  "defaultMessage": "Ir para a etapa {stepNumber, number}: {label}"
+ },
+ "@astryx.step.goToStepWithStatus": {
+  "defaultMessage": "Ir para a etapa {stepNumber, number}: {label}, {status}"
+ },
+ "@astryx.step.status.completed": {
+  "defaultMessage": "concluído"
+ },
+ "@astryx.step.status.warning": {
+  "defaultMessage": "aviso"
+ },
+ "@astryx.step.status.error": {
+  "defaultMessage": "erro"
+ },
+ "@astryx.tableTree.collapseRow": {
+  "defaultMessage": "Recolher linha"
+ },
+ "@astryx.tableTree.expandRow": {
+  "defaultMessage": "Expandir linha"
+ },
+ "@astryx.tableTree.collapseAllRows": {
+  "defaultMessage": "Recolher todas as linhas"
+ },
+ "@astryx.tableTree.expandAllRows": {
+  "defaultMessage": "Expandir todas as linhas"
+ },
+ "@astryx.textArea.charactersRemaining": {
+  "defaultMessage": "{count, number} {count, plural, one {caractere restante} many {caracteres restantes} other {caracteres restantes}}"
+ },
+ "@astryx.textArea.charactersOverLimit": {
+  "defaultMessage": "{count, number} {count, plural, one {caractere acima do limite} many {caracteres acima do limite} other {caracteres acima do limite}}"
+ },
+ "@astryx.textInput.clearLabel": {
+  "defaultMessage": "Limpar {label}"
+ },
+ "@astryx.thumbnail.remove": {
+  "defaultMessage": "Remover {accessibleName}"
+ },
+ "@astryx.thumbnail.open": {
+  "defaultMessage": "Abrir {accessibleName}"
+ },
+ "@astryx.thumbnail.fallbackName": {
+  "defaultMessage": "Miniatura"
+ },
+ "@astryx.timeInput.clearLabel": {
+  "defaultMessage": "Limpar {label}"
+ },
+ "@astryx.timestamp.copyValue": {
+  "defaultMessage": "Copiar {value}"
+ },
+ "@astryx.timestamp.copy": {
+  "defaultMessage": "Copiar"
+ },
+ "@astryx.timestamp.copied": {
+  "defaultMessage": "Copiado"
+ },
+ "@astryx.timestamp.detailsLabel": {
+  "defaultMessage": "Detalhes do carimbo de data/hora"
+ },
+ "@astryx.token.remove": {
+  "defaultMessage": "Remover {label}"
+ }
+}

@@ -9,6 +9,7 @@ import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { nextDropIn, type DropInSchedule } from '@pam/config/dummy-booking';
 import { ClockIcon } from '@pam/ui';
 import { useI18n } from '@/lib/i18n';
+import { intlLocale } from '@pam/config';
 
 /**
  * When a drop-in program meets (D-313, Will: "some programs won't have a
@@ -29,9 +30,9 @@ const styles = stylex.create({
 export function DropInCard({ schedule }: { readonly schedule: DropInSchedule }) {
   const { t, locale } = useI18n();
   const next = nextDropIn(schedule);
-  const day = new Intl.DateTimeFormat(locale, { weekday: 'long' }).format(next);
-  const time = new Intl.DateTimeFormat(locale, { hour: 'numeric', minute: '2-digit' }).format(next);
-  const date = new Intl.DateTimeFormat(locale, { weekday: 'long', month: 'long', day: 'numeric' }).format(next);
+  const day = new Intl.DateTimeFormat(intlLocale(locale), { weekday: 'long' }).format(next);
+  const time = new Intl.DateTimeFormat(intlLocale(locale), { hour: 'numeric', minute: '2-digit' }).format(next);
+  const date = new Intl.DateTimeFormat(intlLocale(locale), { weekday: 'long', month: 'long', day: 'numeric' }).format(next);
   return (
     <Card padding={6} xstyle={styles.card}>
       <VStack gap={2}>

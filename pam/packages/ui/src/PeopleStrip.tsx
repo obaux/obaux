@@ -53,7 +53,7 @@ const styles = stylex.create({
     width: 'calc(100% + 32px)',
     marginInline: '-16px',
     containerType: 'inline-size',
-    maskImage: 'linear-gradient(to right, black calc(100% - 48px), transparent)',
+    maskImage: 'linear-gradient(calc(90deg * var(--pam-flip, 1)), black calc(100% - 48px), transparent)',
   },
   track: { paddingInline: '16px' },
   tile: {
@@ -98,6 +98,7 @@ const styles = stylex.create({
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
+    unicodeBidi: 'plaintext', // its own direction, not the screen's (D-422)
     width: '100%',
   },
 });

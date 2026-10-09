@@ -2,7 +2,8 @@
 
 import { useMemo, useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
-import { SegmentedControl, SegmentedControlItem } from '@astryxdesign/core/SegmentedControl';
+import { SegmentedControl } from '@astryxdesign/core/SegmentedControl';
+import { Segment } from '@pam/ui/Segment';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
@@ -69,10 +70,13 @@ export function AboutScreen() {
         value={who}
         onChange={(next) => setWho(next as Who)}
         size="md"
+        // Equal thirds, so a long label takes a second line inside its own
+        // third instead of pushing the others off the screen (D-422).
+        layout="fill"
         xstyle={styles.pills}
       >
         {WHO.map((w) => (
-          <SegmentedControlItem key={w} value={w} label={t(`about.tab.${w}`)} />
+          <Segment key={w} value={w} label={t(`about.tab.${w}`)} />
         ))}
       </SegmentedControl>
 

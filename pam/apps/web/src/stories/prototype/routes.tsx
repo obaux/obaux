@@ -58,6 +58,7 @@ import { HelpReportPlaceView, HelpSafetyView, HelpTopicsView } from '../../scree
 import { ConnectionsScreen } from '../../screens/ConnectionsScreen';
 import { SavedScreen } from '../../screens/SavedView';
 import { ThreadOptionsView, ThreadReportView } from '../../screens/ThreadOptionsViews';
+import { ThreadFilesView } from '../../screens/ThreadFilesView';
 import { MessagesScreen } from '../../screens/MessagesScreen';
 import { HeaderActions } from '../shell/HeaderActions';
 import { LocalTabBar } from '../shell/LocalTabBar';
@@ -134,6 +135,7 @@ export const APP_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   '/connections/': screen(() => <ConnectionsScreen />),
   '/messages/thread/options/': screen(() => <ThreadOptionsView />),
   '/messages/thread/report/': screen(() => <ThreadReportView />),
+  '/messages/thread/files/': screen(() => <ThreadFilesView />),
   '/view-as/': screen(() => <ViewAsView />),
   // D-218: Invite someone, All programs and Add a program, and a program
   // lead's own Program tab.

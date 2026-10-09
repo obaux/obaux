@@ -6,6 +6,7 @@ import { isFreshAccount } from '@/lib/programSetup';
 import { dummyConversationsFor } from '@pam/config/dummy-conversations';
 import { DUMMY_ANYONE } from '@pam/config/dummy-people';
 import { useI18n } from '@/lib/i18n';
+import { usePreloadThreadView } from '@/app/messages/ThreadViewLazy';
 import { useSession } from '@/lib/useSession';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useRoleView } from '@/lib/useViewedRole';
@@ -31,6 +32,8 @@ import { MessagesView, type MessageRow } from './MessagesView';
  * kept for demos.
  */
 export function MessagesScreen() {
+  // A conversation opens ready, its composer and fades already loaded (D-400).
+  usePreloadThreadView();
   const { t, locale } = useI18n();
   const { state: session } = useSession();
   const supportPhone = useSupportPhone();
@@ -90,7 +93,13 @@ export function MessagesScreen() {
           id: c.id,
           name: c.otherName ?? t('messages.thread.someone'),
           context: contextFor(role, c.otherRole ? { role: c.otherRole, programName: c.otherProgramName } : null, t),
-          preview: preview(c.lastMessageBody, c.lastMessageMine),
+          // A photo with no words reads "Photo" (D-394).
+          preview: preview(c.lastMessageBody ??
+            (c.lastMessageAttachment === 'photo'
+              ? t('messages.preview.photo')
+              : c.lastMessageAttachment === 'file'
+                ? t('messages.preview.file')
+                : null), c.lastMessageMine),
           when: c.lastMessageAt ? whenHappened(c.lastMessageAt, locale, t) : null,
           unread: c.unread,
           href: `/messages/thread/?id=${encodeURIComponent(c.id)}`,

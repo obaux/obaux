@@ -23,6 +23,7 @@ export { StepHeader, type StepHeaderProps } from './StepHeader.js';
 export { PointsBadge, type PointsBadgeProps } from './PointsBadge.js';
 export { HelpBar, type HelpBarProps } from './HelpBar.js';
 export { Loading, type LoadingProps } from './Loading.js';
+export { LanguageSwitching, type LanguageSwitchingProps } from './LanguageSwitching.js';
 /*
  * `Skeletons` is deliberately NOT re-exported here, the same call `hours.ts`
  * and `dummy-data`'s split made on 16 September: Places, the place screen,
@@ -84,6 +85,8 @@ export {
   SettingsIcon,
   HelpIcon,
   TrashIcon,
+  PhotoIcon,
+  DocumentIcon,
   LegalIcon,
   SignOutIcon,
   ConnectionsIcon,
@@ -128,5 +131,7 @@ export { SetupCard, type SetupCardProps } from './SetupCard.js';
 export { SETUP_ART_KINDS, SetupArt, type SetupArtKind, type SetupArtProps } from './SetupArt.js';
 export { DashedRule } from './DashedRule.js';
 export { ChoiceChips, type ChoiceChipsProps } from './ChoiceChips.js';
+export { MarqueeText, type MarqueeTextProps } from './MarqueeText.js';
 export { Dropdown, type DropdownProps } from './Dropdown.js';
 export { InfoTip, type InfoTipProps } from './InfoTip.js';
+export { FileTypeIcon, type FileTypeIconKind } from './FileTypeIcon.js';

@@ -12,7 +12,7 @@ import { CheckboxInput } from '@astryxdesign/core/CheckboxInput';
 import { colorVars, spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { BellIcon, BigButton, Loading, Notice, Page, PointsBadge, StarIcon, TextField, TextLink, TripsIcon } from '@pam/ui';
 import { SubPageHeader } from '@pam/ui/SubPage';
-import { TRANSPARENCY_SCREEN, badgeForPoints, type Locale } from '@pam/config';
+import { SUPPORTED_LOCALES, TRANSPARENCY_SCREEN, badgeForPoints, type Locale, intlLocale } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { navigate } from '@/lib/navigate';
 import { forgetInvite, recallInvite, type Invite } from '@/lib/appUrl';
@@ -150,7 +150,7 @@ export interface JoinPreview {
 }
 
 export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview | null } = {}) {
-  const { t, locale, setLocale } = useI18n();
+  const { t, locale, pendingLocale, setLocale } = useI18n();
   const router = useRouter();
   const supportPhone = useSupportPhone();
   const { state: session } = useSession();
@@ -407,8 +407,8 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
   const booked = bookedTrip
     ? (withMoves([...DUMMY_TRIPS, ...readAddedTrips()]).find((trip) => trip.id === bookedTrip) ?? null)
     : null;
-  const bookedDay = new Intl.DateTimeFormat(locale, { weekday: 'long', month: 'long', day: 'numeric' });
-  const bookedTime = new Intl.DateTimeFormat(locale, { hour: 'numeric', minute: '2-digit' });
+  const bookedDay = new Intl.DateTimeFormat(intlLocale(locale), { weekday: 'long', month: 'long', day: 'numeric' });
+  const bookedTime = new Intl.DateTimeFormat(intlLocale(locale), { hour: 'numeric', minute: '2-digit' });
   // Back from About you is back to Sign in: signed out first, or Sign in
   // would send a verified phone straight back here.
   const toSignIn = () => {
@@ -612,11 +612,8 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
                 <Text xstyle={styles.chipsLabel}>{t('onboarding.language.title')}</Text>
                 <ChoiceChips
                   label={t('onboarding.language.title')}
-                  options={[
-                    { value: 'en', label: t('language.en') },
-                    { value: 'es', label: t('language.es') },
-                  ]}
-                  value={locale as 'en' | 'es'}
+                  options={SUPPORTED_LOCALES.map((code) => ({ value: code, label: t(`language.${code}`) }))}
+                  value={pendingLocale ?? locale}
                   onChange={(code) => setLocale(code as Locale)}
                 />
               </VStack>

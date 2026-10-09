@@ -1,4 +1,4 @@
-import type { Locale } from './index.js';
+import { intlLocale, type Locale } from './i18n.js';
 
 /**
  * How far away a place is, said the way a person would say it.
@@ -10,14 +10,18 @@ import type { Locale } from './index.js';
  * decimal and refuses to pretend below a tenth of a mile.
  *
  * This returns a key and its variables rather than a finished string so the
- * copy stays in the locale bundles (§2.3) and Spanish keeps its own decimal
- * comma and its own plural rule.
+ * copy stays in the locale bundles (§2.3) and each language keeps its own
+ * decimal mark and its own plural rule.
+ *
+ * `count` is the figure as shown ("1,5"), which cannot be read back as a
+ * number, so `plural` carries the number itself for the languages that say
+ * "1 mile / 2 miles / 5 miles" three different ways (`pickTemplate`).
  */
 export type DistanceKey = 'places.mile' | 'places.miles' | 'places.milesUnder';
 
 export interface DistanceLabel {
   key: DistanceKey;
-  vars: { count: string };
+  vars: { count: string; plural: number };
 }
 
 /** Below this, a GPS fix cannot tell one storefront from the next. */
@@ -31,22 +35,24 @@ const MIN_REPORTABLE_MILES = 0.1;
 export function distanceLabel(miles: number, locale: Locale = 'en'): DistanceLabel | null {
   if (!Number.isFinite(miles) || miles < 0) return null;
 
+  const tag = intlLocale(locale);
   const format = (value: number): string =>
-    new Intl.NumberFormat(locale, { minimumFractionDigits: 0, maximumFractionDigits: 1 }).format(
-      value,
-    );
+    new Intl.NumberFormat(tag, { minimumFractionDigits: 0, maximumFractionDigits: 1 }).format(value);
 
   if (miles < MIN_REPORTABLE_MILES) {
-    return { key: 'places.milesUnder', vars: { count: format(MIN_REPORTABLE_MILES) } };
+    return {
+      key: 'places.milesUnder',
+      vars: { count: format(MIN_REPORTABLE_MILES), plural: MIN_REPORTABLE_MILES },
+    };
   }
 
   // Round first, then pluralise on what is actually shown: 1.04 displays as "1"
   // and has to read "1 mile", not "1 miles".
   const rounded = Math.round(miles * 10) / 10;
-  const plural = new Intl.PluralRules(locale).select(rounded);
+  const category = new Intl.PluralRules(tag).select(rounded);
 
   return {
-    key: plural === 'one' ? 'places.mile' : 'places.miles',
-    vars: { count: format(rounded) },
+    key: category === 'one' ? 'places.mile' : 'places.miles',
+    vars: { count: format(rounded), plural: rounded },
   };
 }

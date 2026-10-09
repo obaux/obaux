@@ -7,7 +7,7 @@ import { HStack } from '@astryxdesign/core/HStack';
 import { Card } from '@astryxdesign/core/Card';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
-import { Button } from '@astryxdesign/core/Button';
+import { Button } from '@pam/ui/Button';
 import { RadioList, RadioListItem } from '@astryxdesign/core/RadioList';
 import { Loading, Notice, Page, PeopleIcon, PlacesIcon } from '@pam/ui';
 import { FloatingAction } from '@pam/ui/FloatingAction';
@@ -16,7 +16,7 @@ import { SubPageHeader } from '@pam/ui/SubPage';
 import { HelpButton } from './HelpButton';
 import { HeaderActions } from './HeaderActions';
 import { LargeTitleHeader } from '@pam/ui/LargeTitleHeader';
-import { NOTICES } from '@pam/config';
+import { NOTICES, intlLocale } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { NotIn } from '../app/NotIn';
 import { useSupportPhone } from '@/lib/useSupportPhone';
@@ -57,7 +57,7 @@ const styles = stylex.create({
 });
 
 function requestedWhen(iso: string, locale: string): string {
-  return new Intl.DateTimeFormat(locale, { month: 'short', day: 'numeric' }).format(new Date(iso));
+  return new Intl.DateTimeFormat(intlLocale(locale), { month: 'short', day: 'numeric' }).format(new Date(iso));
 }
 
 /**

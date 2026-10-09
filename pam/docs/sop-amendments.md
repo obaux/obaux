@@ -541,3 +541,45 @@ do. Nothing a member has to read is smaller than 15px; supporting lines stay
 15–17px. 48px targets, 56px primary buttons, AAA contrast for body text and
 scaling to 200% are as before.
 
+## A24 — Pam is in seven languages, not two (9 October 2026, Will)
+
+Will: "Let's also add a Brazilian portuguese language" — then Chinese
+(Mandarin and Cantonese), Russian and Arabic — and "everyone in the city
+speaks different languages": the choice is the person's, not the place's
+(D-422).
+
+**Where this contradicts the original.** §2.3 and CLAUDE.md say English and
+Spanish, key-for-key. Every language Pam offers is now held to that: the
+same keys, the same placeholders, plural forms where the language has them
+(Russian four, Arabic six), and the dignity check, as tests, not convention.
+A new or changed English string is not finished until the other six have it.
+
+**What did not change.** Text messages and emails are English and Spanish
+only until each template in another language is drafted and signed off
+(`reviewedBy`); a person reading Pam in another language gets those in
+English. The 16px body size (A23), 48px targets and every rule about words
+that must never appear apply in every language. §12's first-load budget
+holds: only English is in it; the other six are fetched when somebody picks
+one.
+
+
+
+## A25 — Copy is answered in every language, and texts go out only in a language someone has signed (9 October 2026, Will)
+
+Will: "We want SMS and emails to show up on their desired language ... and
+that it fits within the component we're working on."
+
+- **Rewording the English is not finishing.** A translation that still says
+  what the English used to say fails the tests (`locales/ledger.json`). It is
+  re-translated, or kept on purpose when the meaning did not change. How:
+  `docs/copy-changes.md`. Supersedes the SOP's "locale parity" check, which
+  only noticed a key that was missing, never one that was reworded.
+- **Texts and emails are written in all seven languages, signed one language at
+  a time.** A person is texted or emailed in their own language when a person who
+  reads it has signed that wording (`reviewedBy`, per language), and in English
+  otherwise — never in a draft. This amends §9's "no SMS may be sent unreviewed"
+  from "per template" to "per template and language".
+- **One segment is 160 characters, or 70 in a script the cheap encoding cannot
+  carry** (Chinese, Russian, Arabic). A template that cannot be said in that
+  with its time, address and link has no text in that language and is sent in
+  English, until Will decides about two segments.
