@@ -192,6 +192,24 @@ Russian, Arabic (D-422); messages read in the reader's language (D-423).
   傾談), not Taiwan's. Arabic: Modern Standard, and check that the
   right-to-left screens read naturally. Russian: "вы" throughout.
 
+- [ ] **Arabic: names, addresses and other data inside a sentence are reordered**
+  (found 9 October 2026 by the text-fit audit; Will asked whether it is on this
+  list). An English street address, person's name, program name or file name placed
+  in the middle of an Arabic sentence is laid out by the right-to-left rules, so a
+  leading number jumps to the wrong end ("Near 1231 N Broad St" reads with the 1231
+  beside the Arabic words and the rest on the far side) and an ellipsis cuts the
+  start of the value instead of its end. **Done (D-435): the address card on a place
+  or program** keeps its own order. **Left: every other sentence that carries data**,
+  the area chip's "Near {area}" first (`places.near`, the `long-address` story), then
+  anything built from `{name}`, `{program}`, `{address}`. The fix is to wrap each
+  interpolated value in a first-strong isolate (U+2068 … U+2069) when the screen is
+  right-to-left, in the translate function (`packages/config/src/i18n.ts`,
+  `apps/web/src/lib/i18n.tsx`), keeping those marks out of texts, emails and
+  screen-reader labels. A suggested task with the full brief is queued in the app
+  (title "Isolate interpolated values in Arabic strings"); say "do the Arabic
+  isolates" and Claude does it here. A native Arabic reader should confirm the result
+  (the item below).
+
 - [ ] **Texts and the invite email in the new languages: approved to learn from;
   deploy, and decide the rest** (D-424, D-430). **Will, 9 October: "approve new
   languages for now ... fail first then fix ... adjust languages based on
