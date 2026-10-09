@@ -39,6 +39,7 @@ import {
   type MessageFile,
   type OutgoingAttachment,
 } from '@/lib/messageFile';
+import { MESSAGE_PHOTO_ACCEPT, photoType, shrinkPhoto } from '@/lib/messagePhoto';
 import { FileSummary, GoogleLinkCard, MessageFileCard } from './MessageFileCard';
 import { PhotoViewer } from './PhotoViewer';
 
@@ -548,10 +549,10 @@ export function ThreadView({
   const picker = useRef<HTMLInputElement>(null);
   const docPicker = useRef<HTMLInputElement>(null);
   const [picked, setPicked] = useState<
-    { readonly kind: 'photo'; readonly file: File; readonly preview: string } | { readonly kind: 'file'; readonly file: File } | null
+    { readonly kind: 'photo'; readonly file: Blob; readonly preview: string } | { readonly kind: 'file'; readonly file: File } | null
   >(null);
   // Why the last file offered was not taken, said where it would have gone.
-  const [attachProblem, setAttachProblem] = useState<'wrongType' | 'tooBig' | null>(null);
+  const [attachProblem, setAttachProblem] = useState<'wrongType' | 'tooBig' | 'heic' | 'unreadable' | null>(null);
   // Something is being dragged over the conversation.
   const [dropping, setDropping] = useState(false);
   // The photo open full size, if any.
@@ -566,15 +567,23 @@ export function ThreadView({
   };
 
   // Any way a file arrives — a picker, a drop, a paste — comes through here:
-  // a picture is a photo; a PDF or a Word file of 10 MB or less is a
-  // document; anything else is refused in words.
-  const take = (files: readonly File[]) => {
+  // a JPEG, a PNG or an iPhone photo is a photo, shrunk to a JPEG right away
+  // so the person sees what will be sent (and learns now if it cannot be
+  // opened); a PDF or a Word file of 10 MB or less is a document; anything
+  // else is refused in words (D-399, D-408).
+  const take = async (files: readonly File[]) => {
     const file = files[0];
     if (!file) return;
     setAttachProblem(null);
-    if (file.type.startsWith('image/')) {
+    const photo = photoType(file);
+    if (photo) {
+      const shrunk = await shrinkPhoto(file);
+      if (!shrunk) {
+        setAttachProblem(photo === 'heic' ? 'heic' : 'unreadable');
+        return;
+      }
       clearPicked();
-      setPicked({ kind: 'photo', file, preview: URL.createObjectURL(file) });
+      setPicked({ kind: 'photo', file: shrunk, preview: URL.createObjectURL(shrunk) });
       return;
     }
     if (!messageFileType(file)) {
@@ -591,7 +600,10 @@ export function ThreadView({
 
   const submit = async (value: string) => {
     if (sending || (value.trim() === '' && !picked)) return;
-    const ok = await onSend(value, picked ? { kind: picked.kind, file: picked.file } : null);
+    const ok = await onSend(
+      value,
+      picked ? (picked.kind === 'photo' ? { kind: 'photo', file: picked.file, isReady: true } : { kind: 'file', file: picked.file }) : null,
+    );
     if (ok) {
       setDraft('');
       clearPicked();
@@ -617,7 +629,7 @@ export function ThreadView({
       const files = [...event.dataTransfer.files];
       if (files.length > 0) {
         event.preventDefault();
-        take(files);
+        void take(files);
         return;
       }
       const link = event.dataTransfer
@@ -689,7 +701,11 @@ export function ThreadView({
             <Text role="alert" xstyle={styles.attachNote}>
               {attachProblem === 'tooBig'
                 ? t('messages.thread.attach.tooBig')
-                : t('messages.thread.attach.wrongType')}
+                : attachProblem === 'heic'
+                  ? t('messages.thread.attach.heic')
+                  : attachProblem === 'unreadable'
+                    ? t('messages.thread.attach.unreadable')
+                    : t('messages.thread.attach.wrongType')}
             </Text>
           </ChatComposerDrawer>
         ) : undefined
@@ -702,7 +718,19 @@ export function ThreadView({
           placeholder={t('messages.thread.placeholder')}
           hasHistory={false}
           maxRows={8}
-          onFiles={take}
+          onFiles={(files) => void take(files)}
+          // Some browsers hand a pasted picture over only as a clipboard
+          // "item", not a file; take it from there too, rather than paste
+          // nothing (D-408).
+          onPaste={(event, text) => {
+            const files = [...event.clipboardData.items]
+              .filter((item) => item.kind === 'file')
+              .map((item) => item.getAsFile())
+              .filter((file): file is File => file !== null);
+            if (files.length === 0 || text.trim() !== '') return false;
+            void take(files);
+            return true;
+          }}
         />
       }
       footerActions={
@@ -725,13 +753,13 @@ export function ThreadView({
           <input
             ref={picker}
             type="file"
-            accept="image/*"
+            accept={MESSAGE_PHOTO_ACCEPT}
             tabIndex={-1}
             aria-hidden
             onChange={(event) => {
               const files = [...(event.target.files ?? [])];
               event.target.value = '';
-              take(files);
+              void take(files);
             }}
             {...stylex.props(styles.fileInput)}
           />
@@ -753,7 +781,7 @@ export function ThreadView({
             onChange={(event) => {
               const files = [...(event.target.files ?? [])];
               event.target.value = '';
-              take(files);
+              void take(files);
             }}
             {...stylex.props(styles.fileInput)}
           />

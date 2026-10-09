@@ -858,9 +858,9 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
-## Conversations, redrawn (8–9 October) — 0.45.5 to 0.49.0, on the branch
+## Conversations, redrawn (8–9 October) — 0.45.5 to 0.49.1, on the branch
 
-D-389 to D-407 (D-405: Trips' policies banner action is just "Sign"; D-406: a photo's name set like its time), **on `claude/pam-storybook`, not merged to `main`.** A
+D-389 to D-408 (D-405: Trips' policies banner action is just "Sign"; D-406: a photo's name set like its time; D-408: photos are JPEG, PNG or an iPhone's, documents PDF or Word, and either can be pasted into the box), **on `claude/pam-storybook`, not merged to `main`.** A
 conversation's header says who the person is on a line under the name —
 "Program lead at Example Food Pantry", "Case manager" (D-395). Each day opens
 with one divider ("Today", "Yesterday", a weekday, a date). Bubbles carry no name or time: mine are light green on the
@@ -920,6 +920,14 @@ person through `link_preview_targets` (0081), opens https public pages only
 picture in the private `link-previews` bucket (`test/17`, 17 unit tests).
 **0081 is not live:** it rides in the 0079 + 0080 + 0081 SQL-editor file
 (before-launch); until then links show as their address.
+
+**What can be attached (D-408, 0.49.1).** Photos: JPEG, PNG, or an iPhone's
+HEIC — the photo button asks for JPEG/PNG so an iPhone converts its own; a
+HEIC dropped or pasted on a computer opens where the browser can read it
+(Safari) and is refused in words where it cannot. Documents: PDF and Word
+only. Picking, dropping and pasting into the message box all go through one
+`take()`; a photo is shrunk to the JPEG that will be sent as soon as it is
+picked.
 
 ## Release 0.45.0-two-roles (7 October) — one account, member and program
 

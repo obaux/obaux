@@ -238,7 +238,7 @@ export function useThread(conversationId: string | null): {
         let shrunk: Blob | null = null;
         let named: { name: string; bytes: number } | null = null;
         if (attachment?.kind === 'photo') {
-          shrunk = await shrinkPhoto(attachment.file);
+          shrunk = attachment.isReady ? attachment.file : await shrinkPhoto(attachment.file);
           if (!shrunk) throw new Error('could not read the photo');
           const path = await uploadMessagePhoto(conversationId, shrunk);
           if (!path) throw new Error('upload failed');

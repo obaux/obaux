@@ -649,7 +649,7 @@ test.describe('documents in a conversation (D-399)', () => {
 
     await docInput(page).setInputFiles({ name: 'notes.txt', mimeType: 'text/plain', buffer: Buffer.from('hello') });
     const composer = page.locator('.astryx-chat-composer');
-    await expect(composer.getByRole('alert')).toHaveText('Pam can send a photo, a PDF or a Word file.');
+    await expect(composer.getByRole('alert')).toHaveText('Pam can send a photo (JPEG, PNG or from an iPhone), a PDF or a Word file.');
 
     await docInput(page).setInputFiles({ ...PDF, buffer: Buffer.alloc(10 * 1024 * 1024 + 1) });
     await expect(composer.getByRole('alert')).toHaveText('That file is bigger than 10 MB. Try a smaller one.');
@@ -792,6 +792,132 @@ test.describe('documents in a conversation (D-399)', () => {
     await page.goto('/messages/');
     await settled(page);
     await expect(page.getByText('Document', { exact: true })).toBeVisible();
+  });
+});
+
+test.describe('photos and documents, picked or pasted (D-408)', () => {
+  // A one-pixel PNG, and the same bytes again under other names.
+  const PNG = Buffer.from(
+    'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+    'base64',
+  ).toString('base64');
+  const editable = (page: import('@playwright/test').Page) => page.locator('.astryx-chat-composer-input [contenteditable="true"]');
+  const composer = (page: import('@playwright/test').Page) => page.locator('.astryx-chat-composer');
+
+  /** Pastes one file (bytes as base64) into the message box, the way a phone's or computer's paste does. */
+  const paste = (page: import('@playwright/test').Page, file: { name: string; type: string; base64: string }) =>
+    editable(page).evaluate((el, f) => {
+      const bytes = Uint8Array.from(atob(f.base64), (c) => c.charCodeAt(0));
+      const data = new DataTransfer();
+      data.items.add(new File([bytes], f.name, { type: f.type }));
+      el.focus();
+      el.dispatchEvent(new ClipboardEvent('paste', { bubbles: true, cancelable: true, clipboardData: data }));
+    }, file);
+
+  test('the photo button asks for JPEG or PNG — so an iPhone hands its photos over as JPEGs — and the document button for PDF or Word', async ({ page }) => {
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+
+    const inputs = page.locator('.astryx-chat-composer input[type="file"]');
+    await expect(inputs).toHaveCount(2);
+    expect(await inputs.nth(0).getAttribute('accept')).toBe('image/jpeg,image/png');
+    const docs = (await inputs.nth(1).getAttribute('accept'))!.split(',');
+    expect(docs).toEqual(expect.arrayContaining(['.pdf', '.doc', '.docx', 'application/pdf']));
+    expect(docs.some((type) => type.startsWith('image/'))).toBe(false);
+  });
+
+  test('a pasted PNG is a photo: seen before it goes, and sent as a JPEG', async ({ page }) => {
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    const uploads: string[] = [];
+    await page.route('**/storage/v1/object/message-photos/**', (route) => {
+      uploads.push(route.request().url());
+      return route.fulfill(json({ Key: 'message-photos/x.jpg' }));
+    });
+    let inserted: Record<string, unknown> | null = null;
+    await page.route(MESSAGES, (route) => {
+      if (route.request().method() === 'POST') {
+        inserted = route.request().postDataJSON() as Record<string, unknown>;
+        return route.fulfill(
+          json({ id: 'new-photo', sender_id: ME, body: null, attachment_url: inserted.attachment_url, attachment_kind: 'photo', created_at: new Date().toISOString() }),
+        );
+      }
+      return route.fulfill(json([]));
+    });
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+
+    await paste(page, { name: 'image.png', type: 'image/png', base64: PNG });
+    await expect(composer(page).getByRole('img', { name: 'The photo you picked' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Take this photo out' })).toBeVisible();
+    // Nothing went into the box as words.
+    await expect(editable(page)).toHaveText('');
+
+    await page.getByRole('button', { name: /send/i }).click();
+    await expect.poll(() => inserted).not.toBeNull();
+    expect(uploads).toHaveLength(1);
+    expect(uploads[0]).toMatch(new RegExp(`/message-photos/${CONVO}/[0-9a-f-]+\\.jpg$`));
+    expect(inserted).toMatchObject({ conversation_id: CONVO, attachment_kind: 'photo' });
+  });
+
+  test('a pasted PDF or Word file is a document, the same as from the button; pasted words are still words', async ({ page }) => {
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+
+    await paste(page, { name: 'Pay stub.pdf', type: 'application/pdf', base64: Buffer.from('%PDF-1.4\n%%EOF').toString('base64') });
+    await expect(page.getByText('Pay stub.pdf')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Take this document out' })).toBeVisible();
+
+    await paste(page, {
+      name: 'Resume.docx',
+      type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      base64: Buffer.from('PK').toString('base64'),
+    });
+    await expect(page.getByText('Resume.docx')).toBeVisible();
+    await expect(page.getByText('Pay stub.pdf')).toHaveCount(0);
+
+    await editable(page).evaluate((el) => {
+      const data = new DataTransfer();
+      data.setData('text/plain', 'See you at 3');
+      el.focus();
+      el.dispatchEvent(new ClipboardEvent('paste', { bubbles: true, cancelable: true, clipboardData: data }));
+    });
+    await expect(editable(page)).toHaveText('See you at 3');
+    await expect(page.getByText('Resume.docx')).toBeVisible();
+  });
+
+  test('anything else is refused in words: a GIF, a WebP, a photo that will not open, an iPhone photo this browser cannot read', async ({ page }) => {
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+    const alert = composer(page).getByRole('alert');
+    const wrong = 'Pam can send a photo (JPEG, PNG or from an iPhone), a PDF or a Word file.';
+
+    await paste(page, { name: 'dance.gif', type: 'image/gif', base64: PNG });
+    await expect(alert).toHaveText(wrong);
+    await paste(page, { name: 'photo.webp', type: 'image/webp', base64: PNG });
+    await expect(alert).toHaveText(wrong);
+    await paste(page, { name: 'notes.txt', type: 'text/plain', base64: Buffer.from('hello').toString('base64') });
+    await expect(alert).toHaveText(wrong);
+
+    await paste(page, { name: 'broken.jpg', type: 'image/jpeg', base64: Buffer.from('not a picture').toString('base64') });
+    await expect(alert).toHaveText("That photo couldn't be opened. Try another one.");
+
+    // Chromium has no HEIC decoder; Safari does, and would take it.
+    await paste(page, { name: 'IMG_0412.HEIC', type: 'image/heic', base64: Buffer.from('....ftypheic').toString('base64') });
+    await expect(alert).toHaveText("This browser can't open that iPhone photo. Try sending it from your phone.");
+
+    // Nothing was picked, so there is nothing to send.
+    await expect(page.getByRole('button', { name: /send/i })).toBeDisabled();
+    // And a good one after a refusal clears the words.
+    await paste(page, { name: 'image.png', type: 'image/png', base64: PNG });
+    await expect(composer(page).getByRole('img', { name: 'The photo you picked' })).toBeVisible();
+    await expect(alert).toHaveCount(0);
   });
 });
 

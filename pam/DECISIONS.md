@@ -10207,3 +10207,48 @@ horizontally when text truncates so they can see end of long named files."
   the list (Excel, PowerPoint, text) is a change to 0080 before it ships.
 - The document card drops D-404's "who · …" line, stamp and wide size;
   nothing else used them.
+
+### D-408 — What can be attached: JPEG, PNG or an iPhone photo; a PDF or a Word file; and all of it by pasting
+
+**Date:** 2026-10-09. Will, answering D-407's open question about "docs
+(any kind)": "Docs only word docs and pdfs for now. Images, any jpeg, png.
+Or iPhone photo. Also allow users to paste these things into chat composer."
+
+- **Documents stay PDF and Word** (`.pdf`, `.doc`, `.docx` — 0080's list,
+  unchanged). D-407's "widening the list is a change to 0080 before it
+  ships" is closed: it is not widened.
+- **Photos are JPEG, PNG or an iPhone's HEIC/HEIF** (`photoType` in
+  `lib/messagePhoto.ts`, by type, or by name when the phone gives no type).
+  Everything else that is a picture — GIF, WebP, SVG, BMP, TIFF, AVIF — is
+  refused in words, like any other file Pam does not take. Whatever comes
+  in, a JPEG goes out (shrunk to 1,600px, re-drawn so where and when it was
+  taken is gone — D-394); a PNG's see-through parts become white rather than
+  the black a JPEG would otherwise give them.
+- **iPhone photos without a converter.** The photo button asks for
+  `image/jpeg,image/png` only. That is deliberate: when a web page asks for
+  those, an iPhone hands over its HEIC photos already turned into JPEGs —
+  the phone does the work, and Pam ships no HEIC decoder (a large library,
+  for a case the phone already handles). A HEIC that arrives another way —
+  dropped or pasted, on a computer — is opened by the browser if it can
+  (Safari can); where it cannot (Chrome, Firefox), the person is told so:
+  "This browser can't open that iPhone photo. Try sending it from your
+  phone." A JPEG or PNG that will not open says "That photo couldn't be
+  opened. Try another one." Neither sends nothing silently.
+- **The photo is shrunk when it is picked, not when it is sent**, so the
+  preview above the box is the picture that will go, and a photo that cannot
+  be opened is caught at once, where the person is looking. The send then
+  uploads it as it is (`isReady`), without shrinking it twice.
+- **Pasting.** A photo or document pasted into the message box is taken the
+  same way as one picked with a button or dropped on the conversation — one
+  `take()` for all of them, with the same refusals. Astryx's composer hands
+  over pasted files; where a browser offers a pasted picture only as a
+  clipboard *item* (some do, after "Copy image"), the composer's `onPaste`
+  takes it from there instead of pasting nothing. Pasted words are still
+  words. Only the first file is taken, as with the buttons.
+- The refusal now says what *is* taken: "Pam can send a photo (JPEG, PNG or
+  from an iPhone), a PDF or a Word file." (es "Pam puede enviar una foto
+  (JPEG, PNG o de un iPhone), un PDF o un archivo de Word.")
+- No database change. The app only ever uploads the JPEG it makes; the
+  `message-photos` bucket's own list (0079: JPEG, PNG, WebP, 5 MB) is wider
+  than that and is left alone, since 0079 is already in the SQL-editor file
+  Will has. The documents bucket takes only PDF and Word (0080).

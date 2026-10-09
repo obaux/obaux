@@ -160,7 +160,9 @@ export function googleLinkIn(body: string | null): { readonly url: string; reado
 
 /** What goes out with a message: nothing, a photo, or a document (D-394, D-399). */
 export type OutgoingAttachment =
-  | { readonly kind: 'photo'; readonly file: Blob }
+  // `isReady`: already shrunk to a JPEG when it was picked (D-408), so it is
+  // not re-drawn on the way out.
+  | { readonly kind: 'photo'; readonly file: Blob; readonly isReady?: boolean }
   | { readonly kind: 'file'; readonly file: File };
 
 /** A document in a message, as the conversation shows it before it is opened. */

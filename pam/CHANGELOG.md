@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.49.1] — 2026-10-09 · Paste a photo or a document
+
+You can now paste a photo, a PDF or a Word file straight into the message
+box, the same as picking it with a button. Pam takes JPEG and PNG photos and
+photos from an iPhone; documents stay PDF and Word. A photo is made ready
+as soon as you pick it, so the preview is exactly what will be sent — and if
+a photo can't be opened, Pam says so right away instead of sending nothing
+(D-408).
+
 ## [0.49.0] — 2026-10-09 · Stuff shared
 
 The page behind a conversation's ⋯ is now called Stuff shared: one simple
