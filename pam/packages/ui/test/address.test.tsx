@@ -18,12 +18,16 @@ const labels = {
 };
 
 const addressActions = {
+  googleMapsHref: 'https://www.google.com/maps/dir/?api=1&destination=1231%20N%20Broad%20St',
   appleMapsHref: 'https://maps.apple.com/?daddr=1231%20N%20Broad%20St',
   labels: {
     copy: 'Copy address',
     copied: 'Address copied',
     copyFailed: 'Could not copy. Press and hold the address to copy it.',
-    appleMaps: 'Open in Apple Maps',
+    openIn: 'Open in…',
+    openInTitle: 'Open in',
+    googleMaps: 'Google Maps',
+    appleMaps: 'Apple Maps',
   },
 };
 
@@ -65,12 +69,34 @@ describe('the address card', () => {
     </main>
   );
 
-  it('offers a copy button and an Apple Maps link beside the address', () => {
+  it('offers a small copy button and "Open in…" beside the address', () => {
     render(place({ addressActions }));
     expect(screen.getByText('1231 N Broad St, North Philadelphia')).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Copy address' })).toBeTruthy();
-    const link = screen.getByRole('link', { name: 'Open in Apple Maps' });
-    expect(link.getAttribute('href')).toBe(addressActions.appleMapsHref);
+    expect(screen.getByRole('button', { name: 'Open in…' })).toBeTruthy();
+    // The apps are behind the drawer, not on the card.
+    expect(screen.queryByRole('link', { name: 'Google Maps' })).toBeNull();
+    expect(screen.queryByRole('link', { name: 'Apple Maps' })).toBeNull();
+  });
+
+  it('opens a drawer with Google Maps and Apple Maps, each a link to that app', async () => {
+    render(place({ addressActions }));
+    fireEvent.click(screen.getByRole('button', { name: 'Open in…' }));
+    const google = await screen.findByRole('link', { name: 'Google Maps' });
+    const apple = await screen.findByRole('link', { name: 'Apple Maps' });
+    expect(google.getAttribute('href')).toBe(addressActions.googleMapsHref);
+    expect(apple.getAttribute('href')).toBe(addressActions.appleMapsHref);
+    // Each row carries the app's symbol, drawn, not read out.
+    const rowOf = (link: HTMLElement) => link.closest('li') ?? link.parentElement!.parentElement!;
+    expect(rowOf(google).querySelector('svg[aria-hidden="true"]')).toBeTruthy();
+    expect(rowOf(apple).querySelector('svg[aria-hidden="true"]')).toBeTruthy();
+  });
+
+  it('offers only the app it has a link for', async () => {
+    render(place({ addressActions: { ...addressActions, googleMapsHref: null } }));
+    fireEvent.click(screen.getByRole('button', { name: 'Open in…' }));
+    expect(await screen.findByRole('link', { name: 'Apple Maps' })).toBeTruthy();
+    expect(screen.queryByRole('link', { name: 'Google Maps' })).toBeNull();
   });
 
   it('puts exactly the address on the clipboard — plain words, nothing hidden', async () => {
@@ -92,14 +118,14 @@ describe('the address card', () => {
   it('is only the words when nobody asks for the actions, or there is no address', () => {
     const { rerender } = render(place());
     expect(screen.queryByRole('button', { name: 'Copy address' })).toBeNull();
-    expect(screen.queryByRole('link', { name: 'Open in Apple Maps' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Open in…' })).toBeNull();
     rerender(place({ address: null, addressActions }));
     expect(screen.queryByRole('button', { name: 'Copy address' })).toBeNull();
   });
 
-  it('leaves the Apple Maps link out when there is no link to give', () => {
-    render(place({ addressActions: { ...addressActions, appleMapsHref: null } }));
+  it('leaves "Open in…" out when there is no link to give, but keeps copy', () => {
+    render(place({ addressActions: { ...addressActions, googleMapsHref: null, appleMapsHref: null } }));
     expect(screen.getByRole('button', { name: 'Copy address' })).toBeTruthy();
-    expect(screen.queryByRole('link', { name: 'Open in Apple Maps' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Open in…' })).toBeNull();
   });
 });

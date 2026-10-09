@@ -1,12 +1,13 @@
 # Changelog
 
-## [0.52.0] — 2026-10-09 · Copy an address, or open it in Apple Maps
+## [0.52.0] — 2026-10-09 · Copy an address, or open it in a maps app
 
-On a place or a program, the address card now has a copy button: tap it and the
-address is on your phone's clipboard, ready to paste into any maps app, a ride
-app or a note. Under the address there is also "Open in Apple Maps", beside the
-"Get directions" button that opens Google Maps. In Arabic the address now keeps
-its own order instead of being turned around (D-435).
+On a place or a program, the address card now has a small copy button: tap it and
+the address is on your phone's clipboard, ready to paste into any maps app, a
+ride app or a note. Under the address, "Open in…" opens a drawer with Google Maps
+and Apple Maps, each with its own icon, and one tap hands the address to that app.
+In Arabic the address now keeps its own order instead of being turned around
+(D-435).
 
 ## [0.51.0] — 2026-10-09 · Pam speaks seven languages
 

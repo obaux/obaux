@@ -18,6 +18,7 @@ import { CATEGORY_DEFINITIONS, type Category } from '@pam/config';
 import { pam } from './tokens.stylex.js';
 import { TextLink, textLinkLook } from './TextLink.js';
 import { CopyButton } from './CopyButton.js';
+import { AppleMapsAppIcon, GoogleMapsAppIcon } from './MapAppIcons.js';
 import { MenuList, type MenuItem } from './MenuList.js';
 import { AutoHeight, TextSwap } from './Swap.js';
 import { landFocus, landFocusStyle } from './landFocus.js';
@@ -59,11 +60,13 @@ export interface PlaceDetailProps {
   readonly address?: string | null;
   /**
    * Ways to take the address somewhere (Will, 9 October 2026: "easily copied
-   * into Google Maps or Apple Maps to help them navigate"): a copy button
-   * beside the heading, and a link that opens it in Apple Maps. Google Maps is
-   * the "Get directions" button. Left out, the card is only the words.
+   * into Google Maps or Apple Maps to help them navigate"): a small copy button
+   * beside the heading, and "Open in…", which opens a drawer to choose Google
+   * Maps or Apple Maps. Left out, the card is only the words.
    */
   readonly addressActions?: {
+    /** Google Maps and Apple Maps, behind "Open in…". Either may be absent; with neither, no link. */
+    readonly googleMapsHref?: string | null;
     readonly appleMapsHref?: string | null;
     readonly labels: {
       /** "Copy address", the button's name. */
@@ -72,7 +75,12 @@ export interface PlaceDetailProps {
       readonly copied: string;
       /** "Could not copy. Press and hold the address to copy it." */
       readonly copyFailed: string;
-      /** "Open in Apple Maps". */
+      /** "Open in…", the link under the address. */
+      readonly openIn: string;
+      /** "Open in", the drawer's title. */
+      readonly openInTitle: string;
+      /** "Google Maps" and "Apple Maps": the apps' names in the person's language. */
+      readonly googleMaps: string;
       readonly appleMaps: string;
     };
   };
@@ -210,6 +218,8 @@ const styles = stylex.create({
   },
   rows: { rowGap: spacingVars['--spacing-2'] },
   hoursLink: { alignSelf: 'flex-start', minHeight: pam['--pam-touch-target-min'], fontSize: '16px', paddingInline: '0px' },
+  // The "Open in…" drawer: a 48px app symbol, then the app's name, the whole row a link.
+  appIcon: { width: '48px', height: '48px', fontSize: '48px', flexShrink: 0 },
   // The week drawer (D-309).
   // Clear of the sheet's handle above the title.
   sheet: { paddingInline: '24px', paddingBlock: '20px 24px' },
@@ -282,6 +292,7 @@ export function PlaceDetail({
   labels,
 }: PlaceDetailProps) {
   const [isWeekOpen, setWeekOpen] = useState(false);
+  const [isMapsOpen, setMapsOpen] = useState(false);
   const aboutCard = description ? (
     <Card padding={4} xstyle={styles.card}>
       <AutoHeight>
@@ -309,6 +320,7 @@ export function PlaceDetail({
               </Heading>
               {addressActions ? (
                 <CopyButton
+                  placement="inCard"
                   text={address}
                   label={addressActions.labels.copy}
                   copiedLabel={addressActions.labels.copied}
@@ -323,11 +335,11 @@ export function PlaceDetail({
             <Text type="supporting" xstyle={[styles.body, styles.addressText]}>
               {address}
             </Text>
-            {addressActions?.appleMapsHref ? (
+            {addressActions && (addressActions.googleMapsHref || addressActions.appleMapsHref) ? (
               // In a row of its own so the link is as wide as its words and
               // starts where the address does, not centred across the card.
               <HStack justify="start">
-                <TextLink label={addressActions.labels.appleMaps} href={addressActions.appleMapsHref} />
+                <TextLink label={addressActions.labels.openIn} onClick={() => setMapsOpen(true)} />
               </HStack>
             ) : null}
           </VStack>
@@ -465,6 +477,45 @@ export function PlaceDetail({
     </BottomSheet>
   ) : null;
 
+  // "Open in…" (Will, 9 October 2026): the two maps apps as app symbols in
+  // square frames, each a plain link that hands the address to that app.
+  const mapApps = addressActions
+    ? [
+        { id: 'google', href: addressActions.googleMapsHref, name: addressActions.labels.googleMaps, icon: <GoogleMapsAppIcon /> },
+        { id: 'apple', href: addressActions.appleMapsHref, name: addressActions.labels.appleMaps, icon: <AppleMapsAppIcon /> },
+      ].filter((app): app is typeof app & { href: string } => Boolean(app.href))
+    : [];
+  const mapsSheet =
+    addressActions && mapApps.length > 0 ? (
+      <BottomSheet
+        isOpen={isMapsOpen}
+        onOpenChange={setMapsOpen}
+        label={addressActions.labels.openInTitle}
+        height="hug"
+        xstyle={sheet.panel}
+      >
+        {isMapsOpen ? (
+          <VStack gap={2} {...landFocus} xstyle={[styles.sheet, landFocusStyle.quiet]}>
+            <Heading level={2} xstyle={styles.sheetTitle}>
+              {addressActions.labels.openInTitle}
+            </Heading>
+            <MenuList
+              label={addressActions.labels.openInTitle}
+              items={mapApps.map((app) => ({
+                id: app.id,
+                label: app.name,
+                icon: <HStack xstyle={styles.appIcon}>{app.icon}</HStack>,
+                href: app.href,
+                isExternal: true,
+                // Hand the address over, and put the drawer away.
+                onSelect: () => setMapsOpen(false),
+              }))}
+            />
+          </VStack>
+        ) : null}
+      </BottomSheet>
+    ) : null;
+
   return (
     <VStack gap={4}>
       <VStack gap={2}>
@@ -573,6 +624,7 @@ export function PlaceDetail({
           {flagHref ? <ActionRow label={labels.flag} icon={<FlagIcon />} href={flagHref} /> : null}
         </VStack>
       )}
+      {mapsSheet}
     </VStack>
   );
 }

@@ -447,7 +447,7 @@ function PlaceScreen() {
         // becomes About service, and the address card says whose it is.
         description={service?.description || place!.description}
         address={address}
-        addressActions={addressActionsFor(t, address, service?.address ? null : place!.lat, service?.address ? null : place!.lon)}
+        addressActions={addressActionsFor(t, address, service?.address ? null : place!.lat, service?.address ? null : place!.lon, service?.address ? null : place!.placeId)}
         status={status ? { isOpen: status.isOpen, label: status.label } : null}
         // Who you'll meet (Will, 7 October, D-335): once a visit is booked,
         // the program's staff at the right of the open/closed row.

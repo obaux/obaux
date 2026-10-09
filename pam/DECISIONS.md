@@ -11502,19 +11502,31 @@ looked at, so its first run would have failed on the whole backlog.
   Entries for the pseudo-language mean "worse than any real language", not "fine":
   they matter on the day a language with longer words is added.
 
-### D-435 — An address can be copied, or opened in Apple Maps, from the place and program pages
+### D-435 — An address can be copied, or opened in Google Maps or Apple Maps, from the place and program pages
 
 **Date:** 2026-10-09. Will, on my finding that an English street address inside an
 Arabic sentence is reordered: "Let's ensure the address listed is easily copied into
 google maps or apple maps to help them navigate."
 
 - **What a person gets.** On the address card of a place or a program: the address as
-  plain, selectable words; a **copy button** (the same 48px round icon as the page-copy
-  button, D-417: a tick and "Address copied" for five seconds, or "Could not copy. Press
-  and hold the address to copy it." when a browser refuses); and an **"Open in Apple
-  Maps"** link. Google Maps was already there as the primary "Get directions" button, so
-  it is not repeated. Copy is the one that reaches every other app (Waze, a ride app, a
-  paper note); Apple Maps is for the many iPhone readers who have no Google Maps.
+  plain, selectable words; a **small copy button** at the card's corner; and an
+  **"Open in…"** link under the address that opens a drawer with **Google Maps** and
+  **Apple Maps**, each an app symbol in a square frame, in full colour, with its name
+  (Will, same day: "the CTA just says Open in… then a drawer pops up"). Copy is the one
+  that reaches every other app (Waze, a ride app, a paper note); the drawer is for
+  everyone who wants to tap and go. "Get directions" (Google) is still the page's
+  primary button where it is shown.
+- **In-card copy actions are 32px, with no ring (Will, same day: "much smaller, 32px
+  touch target… this applies to in-card copy actions… no grey border in the circle when
+  inside a card").** `CopyButton placement="inCard"`: a 32px target, an 18px glyph,
+  nothing round it; its tick and "Address copied" tooltip (five seconds) are unchanged.
+  The page-level copy button stays the 48px circle with a thin edge (D-417). This is a
+  deliberate exception to the 48px touch-target rule (§2.5) for this one kind of control;
+  it is still above the 24px WCAG 2.2 minimum that axe checks.
+- **The two app symbols are drawn here** (`MapAppIcons.tsx`), as plain stand-ins that read
+  as the apps they name — Google's four-colour pin on white, Apple's map with a highway
+  and a blue arrow — not copied from either company's files, which I did not fetch. If
+  Will wants the companies' official artwork, only those two components change.
 - **Same door in both.** `appleMapsHref` follows `directionsHref`: coordinates beat the
   address when Pam has them (a stale address routes to the wrong building), the address
   otherwise, nothing when there is nothing. A picked service has its own address and no
@@ -11530,12 +11542,13 @@ google maps or apple maps to help them navigate."
   request-a-program screen: everywhere `PlaceDetail` draws an address. Not on the sample
   address of the empty-program preview. The texts are unchanged: a reminder already
   carries the address and a link.
-- **Four new strings** (`place.address.copy`, `.copied`, `.copyFailed`, `.appleMaps`) in
-  seven languages. The six that are not English are machine drafts like the rest and
-  have no native reader yet; "Apple Maps" stays in Latin letters in all of them.
+- **Seven new strings** (`place.address.copy`, `.copied`, `.copyFailed`, `.openIn`,
+  `.openInTitle`, `.app.google`, `.app.apple`) in seven languages. The six that are not
+  English are machine drafts like the rest and have no native reader yet. The app names
+  are the ones a phone in that language shows (Google 地图, Google Карты, خرائط Google).
 - **Checked.** `appleMapsHref` (address, coordinates, nothing); the card with and without
   the actions; the exact clipboard text; the refusal message; axe on the new controls.
-  Storybook: *PlaceDetail* (every language) and *ArabicAddress*. The browser run (contrast,
+  The drawer opens with both apps, with one, and with none (no link). Storybook: *PlaceDetail* (every language) and *ArabicAddress*. The browser run (contrast,
   target size) is CI's.
 - **Not done.** The Trips visit cards and booking confirmation show the place's name, not
   its address, so they have nothing to copy; if Will wants an address there it is the same

@@ -31,6 +31,13 @@ import { CheckIcon, CopyIcon, InfoIcon } from './icons.js';
  * clipboard only inside one.
  */
 export interface CopyButtonProps {
+  /**
+   * Where it sits. `header` is the 48px circle with a thin edge, top right of a
+   * page (D-417). `inCard` is for a copy action inside a card (Will, 9 October
+   * 2026): 32px, no edge — a small quiet icon at the corner of what it copies,
+   * not a button the size of the thumb. Both say the same words.
+   */
+  readonly placement?: 'header' | 'inCard';
   /** What lands on the clipboard. */
   readonly text: string;
   /** The button's name for a screen reader: "Copy this page". */
@@ -85,10 +92,24 @@ const styles = stylex.create({
       backgroundColor: colorVars['--color-text-primary'],
     },
   },
+  // Inside a card (Will, 9 October 2026): 32px and no ring. The glyph is 18px,
+  // and it keeps the page copy button's tick and tooltip.
+  inCard: {
+    width: '32px',
+    height: '32px',
+    minWidth: '32px',
+    minHeight: '32px',
+    padding: '0px',
+    borderWidth: '0px',
+    backgroundColor: 'transparent',
+  },
+  // The tooltip's point sits over the middle of a 32px button, not a 48px one.
+  tipInCard: { '::before': { insetInlineEnd: '11px' } },
   tipText: { position: 'relative', fontSize: '15px', lineHeight: 1.35, color: colorVars['--color-background-body'] },
 });
 
-export function CopyButton({ text, label, copiedLabel, failedLabel }: CopyButtonProps) {
+export function CopyButton({ text, label, copiedLabel, failedLabel, placement = 'header' }: CopyButtonProps) {
+  const isInCard = placement === 'inCard';
   const [state, setState] = useState<CopyState>('idle');
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -106,13 +127,14 @@ export function CopyButton({ text, label, copiedLabel, failedLabel }: CopyButton
     timer.current = setTimeout(() => setState('idle'), COPY_STATUS_MS);
   };
 
+  const glyph = isInCard ? 18 : 22;
   const icon =
     state === 'copied' ? (
-      <CheckIcon width={22} height={22} />
+      <CheckIcon width={glyph} height={glyph} />
     ) : state === 'failed' ? (
-      <InfoIcon width={22} height={22} />
+      <InfoIcon width={glyph} height={glyph} />
     ) : (
-      <CopyIcon width={22} height={22} />
+      <CopyIcon width={glyph} height={glyph} />
     );
 
   return (
@@ -123,11 +145,11 @@ export function CopyButton({ text, label, copiedLabel, failedLabel }: CopyButton
         isIconOnly
         icon={<HStack>{icon}</HStack>}
         onClick={() => void copy()}
-        xstyle={styles.button}
+        xstyle={[styles.button, isInCard && styles.inCard]}
       />
       <span role="status" aria-live="polite">
         {state !== 'idle' ? (
-          <HStack xstyle={styles.tip} align="center">
+          <HStack xstyle={[styles.tip, isInCard && styles.tipInCard]} align="center">
             <Text xstyle={styles.tipText}>{state === 'copied' ? copiedLabel : failedLabel}</Text>
           </HStack>
         ) : null}

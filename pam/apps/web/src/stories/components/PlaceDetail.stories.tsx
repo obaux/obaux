@@ -39,6 +39,7 @@ function LocalisedPlaceDetail({ status, audienceLabel, labels, addressActions, .
       addressActions={
         addressActions
           ? {
+              googleMapsHref: addressActions.googleMapsHref ?? null,
               appleMapsHref: addressActions.appleMapsHref ?? null,
               labels: Object.fromEntries(
                 Object.entries(addressActions.labels).map(([name, key]) => [name, tr(key)]),
@@ -112,15 +113,19 @@ const meta = {
     phone: learning.phone,
     website: 'https://example.org',
     directionsHref: directionsHref(learning.address, learning.lat, learning.lon) ?? null,
-    // Copy the address, or open it in Apple Maps (Will, 9 October 2026); Google
-    // Maps is the button above. Labels are i18n keys, said by the story.
+    // Copy the address, or "Open in…" Google Maps or Apple Maps (Will, 9 October
+    // 2026). Labels are i18n keys, said by the story.
     addressActions: {
+      googleMapsHref: directionsHref(learning.address, learning.lat, learning.lon) ?? null,
       appleMapsHref: appleMapsHref(learning.address, learning.lat, learning.lon) ?? null,
       labels: {
         copy: 'place.address.copy',
         copied: 'place.address.copied',
         copyFailed: 'place.address.copyFailed',
-        appleMaps: 'place.address.appleMaps',
+        openIn: 'place.address.openIn',
+        openInTitle: 'place.address.openInTitle',
+        googleMaps: 'place.address.app.google',
+        appleMaps: 'place.address.app.apple',
       },
     },
     hoursHref: googlePlaceHref(learning.name, learning.address),

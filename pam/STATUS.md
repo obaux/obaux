@@ -971,10 +971,12 @@ migrations is on the live project** — correction, 9 October, later: 0083, 0084
   `apps/web/scripts/fit-known.json` with reasons; one real fault was fixed (the
   header's invisible compact title pushed its buttons off the screen); the tab bar
   is left for Will (before-launch). The job takes about an hour (limit 90 minutes).
-- **An address can be copied or opened in Apple Maps (D-435, 0.52.0).** On the
-  address card of a place or program: a copy button, an "Open in Apple Maps" link
-  beside Google's "Get directions", and the address kept in its own reading order in
-  Arabic. Four strings in seven languages (the six are machine drafts).
+- **An address can be copied or opened in a maps app (D-435, 0.52.0).** On the
+  address card of a place or program: a small 32px copy button (no ring: Will's rule for
+  copy actions inside a card), "Open in…" opening a drawer with Google Maps and Apple
+  Maps as app symbols (drawn stand-ins, not the companies' files), and the address kept
+  in its own reading order in Arabic. Seven strings in seven languages (the six are
+  machine drafts).
 - **Migrations 0083 and 0084 are live** (applied 9 October after a
   `list_migrations` check; `get_advisors` clean). 0083 is
   `profiles_language_supported` taking the five new codes; 0084 is

@@ -332,3 +332,13 @@ into google maps or apple maps to help them navigate."
 - **Not run:** the browser (Playwright/axe) suite for contrast and target size; CI does.
 - **Not done:** Trips cards and booking confirmations show the place name, not an address.
 
+- **Will's changes the same day:** the copy button inside a card is 32px with no ring
+  (`CopyButton placement="inCard"`; the page-level one stays 48px), and the link just
+  says "Open in…" and opens a drawer with Google Maps and Apple Maps as full-colour app
+  symbols in square frames (`MapAppIcons.tsx`). The symbols are my redrawn stand-ins,
+  not the companies' artwork. The UI tests now stub `matchMedia` and the `<dialog>`
+  methods in `test/setup.ts`, because jsdom lacks both and Astryx's drawer needs them.
+  The first Storybook screenshot of the *Components/Places/PlaceDetail* story showed
+  the older action-rows layout, which is only what that story draws (it passes no
+  `quickActions`); the live place page uses the round quick actions (D-224).
+

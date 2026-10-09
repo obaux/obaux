@@ -120,12 +120,16 @@ describe('accessibility', () => {
           description="GED classes and help with reading."
           address="123 Main St"
           addressActions={{
+            googleMapsHref: 'https://www.google.com/maps/dir/?api=1&destination=123%20Main%20St',
             appleMapsHref: 'https://maps.apple.com/?daddr=123%20Main%20St',
             labels: {
               copy: 'Copy address',
               copied: 'Address copied',
               copyFailed: 'Could not copy. Press and hold the address to copy it.',
-              appleMaps: 'Open in Apple Maps',
+              openIn: 'Open in…',
+              openInTitle: 'Open in',
+              googleMaps: 'Google Maps',
+              appleMaps: 'Apple Maps',
             },
           }}
           distanceLabel="1.2 miles"

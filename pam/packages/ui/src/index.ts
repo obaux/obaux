@@ -136,3 +136,4 @@ export { MarqueeText, type MarqueeTextProps } from './MarqueeText.js';
 export { Dropdown, type DropdownProps } from './Dropdown.js';
 export { InfoTip, type InfoTipProps } from './InfoTip.js';
 export { FileTypeIcon, type FileTypeIconKind } from './FileTypeIcon.js';
+export { AppleMapsAppIcon, GoogleMapsAppIcon } from './MapAppIcons.js';
