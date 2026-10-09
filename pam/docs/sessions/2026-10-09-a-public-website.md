@@ -20,6 +20,11 @@ manager's and a super admin's powers over assigning, limiting and pausing).
 - CI builds and tests it; `docs/deploying.md` has the deploy steps;
   `docs/before-launch.md` has the item that blocks deploying it.
 
+- **Later the same day: Support's index redesigned** after Figma's help center
+  (D-433, last bullet): hero band with search, topic cards, popular articles,
+  still-need-help. Looked at in Chromium at 1280px and 390px, and the search
+  checked with a hit and a miss. No test covers the search yet.
+
 ## What was wrong, and what missed it
 
 - **First build failed** importing `TextLink` from the `@pam/ui` barrel in a

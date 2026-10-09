@@ -914,7 +914,7 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ## A public website (9 October) — `apps/site`, built, not deployed
 
-Home and Support, for anyone to read before they have an account (D-433). A
+Home and Support, for anyone to read before they have an account (D-433). Support's index is a help-center home: search, topics, popular articles. A
 separate Next static export (`pnpm --filter @pam/site dev|build|test`) on the
 app's theme, Figtree and Astryx components; no Supabase, no sign-in. Support's
 first post, **Case manager assignments** (`src/content/`), has an introduction

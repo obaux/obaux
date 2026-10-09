@@ -11408,4 +11408,13 @@ the table of who can do what.
 - **Numbers.** D-433 rather than D-432: another branch
   (`claude/gallant-clarke-0dhizj`) listed D-432 as its next free number when this
   was claimed.
+- **Support's index follows Figma's help center (Will, 9 October).** A grey band
+  with "How can we help?" and a large search box; Browse by topic (one card per
+  audience — Members, Case managers, Programs; a topic with no posts says
+  "Articles coming soon" instead of linking nowhere); Popular articles; Still
+  need help. Search is an in-page filter over title, summary and `keywords`
+  (`SupportBrowser.tsx`); there is no server. Figma's site could not be fetched
+  from the sandbox, so this follows its known layout, not a reading of the page.
+  "Still need help" points at the person who invited you and the app's Help
+  button — no invented support email or phone.
 
