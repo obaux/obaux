@@ -48,7 +48,7 @@ export const PRIVACY: LegalDocument = {
   introKey: 'privacy.intro',
   updatedKey: 'privacy.updated',
   sections: [
-    section('privacy', 'what-we-keep', 4),
+    section('privacy', 'what-we-keep', 5),
     // The section that restates the transparency contract. Named in a test.
     section('privacy', 'who-can-see', 4),
     section('privacy', 'texts', 3),

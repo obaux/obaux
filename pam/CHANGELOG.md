@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.47.0] — 2026-10-08 · Documents in messages
+
+You can send a PDF or a Word file in a conversation: tap the document
+button beside the photo button, or drop the file onto the conversation. The
+other person sees its name and size, and it downloads only when they tap
+it. A Google Docs link shows as a card that opens it in Google. The privacy
+notice, the terms, and what members and staff are told about who can see
+what now name documents too (D-399).
+
 ## [0.46.4] — 2026-10-08 · A gentler way back down
 
 The button that takes you to the newest message now fades in as it grows

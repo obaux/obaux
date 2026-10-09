@@ -253,7 +253,9 @@ export function threadFor(role: Role | null) {
     sender_id: string;
     body: string | null;
     attachment_url?: string;
-    attachment_kind?: 'photo';
+    attachment_kind?: 'photo' | 'file';
+    attachment_name?: string;
+    attachment_bytes?: number;
     created_at: string;
   }[] = THREAD.map((body, i) => ({
     id: `m-${i}`,
@@ -273,6 +275,28 @@ export function threadFor(role: Role | null) {
     attachment_kind: 'photo',
     created_at: hoursAgo((THREAD.length - 2) * 6 - 3),
   });
+  // A document and a Google Doc (D-399): the case worker sends the letter
+  // for the ID office, then the class schedule as a Google Docs link.
+  rows.push(
+    {
+      id: 'm-file',
+      conversation_id: CONVO_ID,
+      sender_id: staffSpeaks,
+      body: 'Here is the letter for the ID office.',
+      attachment_url: `${CONVO_ID}/id-office-letter.pdf`,
+      attachment_kind: 'file',
+      attachment_name: 'ID office letter.pdf',
+      attachment_bytes: 184_320,
+      created_at: hoursAgo(2),
+    },
+    {
+      id: 'm-google',
+      conversation_id: CONVO_ID,
+      sender_id: staffSpeaks,
+      body: 'And the class schedule: https://docs.google.com/document/d/example-class-schedule/edit',
+      created_at: hoursAgo(1),
+    },
+  );
   return rows;
 }
 

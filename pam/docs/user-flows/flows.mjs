@@ -231,8 +231,8 @@ export const flows = [
         title: 'A conversation',
         story: 'member-created--conversation',
         path: '/messages/thread/',
-        changed: 'D-395',
-        note: 'Under the name: Program lead at the program, or Case manager. Photos; mine green, theirs grey; drag sideways for the times. With a program: the booked visit on top, opening the place',
+        changed: 'D-399',
+        note: 'Under the name: Program lead at the program, or Case manager. Photos and documents (PDF, Word); Google Docs links as cards; mine green, theirs grey; drag sideways for the times. With a program: the booked visit on top, opening the place',
       },
       options: { title: 'Conversation options', story: 'member-created--conversation-options', path: '/messages/thread/options/' },
       profile: {
@@ -297,6 +297,7 @@ export const flows = [
       ['profile', 'points', 'Points'],
     ],
     changes: [
+      'D-399 — a conversation: send a PDF or Word file (the document button, or drop it on), opened when tapped; a Google Docs link shows as a card that opens it in Google',
       'D-395 — a conversation: under the name, who they are in full (Program lead at Example Food Pantry; Case manager), not a cut-off tag',
       'D-394 — a conversation: send a photo (the picture button beside the mic), tap one to see it full size; only the two people see it, and whoever checks a report about it',
       'D-390 — a conversation: mine light green, theirs grey, no name or time on a bubble; drag sideways to see the times; closer to the edges; bolder mic and send',
@@ -340,7 +341,7 @@ export const flows = [
         title: 'A conversation',
         story: 'case-manager-screens--conversation',
         path: '/messages/thread/',
-        changed: 'D-395',
+        changed: 'D-399',
         note: 'Photos: send one, tap one to see it full size. Mine green, theirs grey; drag sideways for the times',
       },
       profile: { title: 'Profile', story: 'case-manager-screens--profile', path: '/profile/' },
@@ -372,7 +373,7 @@ export const flows = [
       ['programs', 'addProgram', 'Add'],
       ['profile', 'alerts', 'Text alerts'],
     ],
-    changes: ['D-395 — a conversation: under the name, who they are in full (Program lead at Example Food Pantry; Case manager), not a cut-off tag', 'D-394 — a conversation: send a photo (the picture button beside the mic), tap one to see it full size; only the two people see it, and whoever checks a report about it', 'D-390 — a conversation: mine light green, theirs grey, no name or time on a bubble; drag sideways to see the times; closer to the edges; bolder mic and send', "D-389 — a conversation: one divider per day (Today, Yesterday, a weekday, a date), each bubble just its time; the composer one rounded box, mic left, round send grey until there is text, then dark green", 'D-347 — Add a program asks one question a screen, then a review', 'D-315 — a case manager can invite a case manager', 'D-263 — Invite someone makes the link straight away', 'D-260 — text alert switches'],
+    changes: ['D-399 — a conversation: send a PDF or Word file (the document button, or drop it on), opened when tapped; a Google Docs link shows as a card that opens it in Google', 'D-395 — a conversation: under the name, who they are in full (Program lead at Example Food Pantry; Case manager), not a cut-off tag', 'D-394 — a conversation: send a photo (the picture button beside the mic), tap one to see it full size; only the two people see it, and whoever checks a report about it', 'D-390 — a conversation: mine light green, theirs grey, no name or time on a bubble; drag sideways to see the times; closer to the edges; bolder mic and send', "D-389 — a conversation: one divider per day (Today, Yesterday, a weekday, a date), each bubble just its time; the composer one rounded box, mic left, round send grey until there is text, then dark green", 'D-347 — Add a program asks one question a screen, then a review', 'D-315 — a case manager can invite a case manager', 'D-263 — Invite someone makes the link straight away', 'D-260 — text alert switches'],
   },
   {
     key: 'program-lead',
@@ -567,7 +568,7 @@ export const flows = [
         title: 'With a case manager',
         story: 'super-admin-screens--thread',
         path: '/messages/thread/',
-        changed: 'D-395',
+        changed: 'D-399',
       },
       profile: { title: 'Profile', story: 'super-admin-screens--profile', path: '/profile/' },
       everyone: { title: 'Everyone', story: 'super-admin-screens--everyone', path: '/directory/' },
@@ -600,6 +601,7 @@ export const flows = [
       ['profile', 'viewAs', 'See the app as'],
     ],
     changes: [
+      'D-399 — a conversation: send a PDF or Word file (the document button, or drop it on), opened when tapped; a Google Docs link shows as a card that opens it in Google',
       'D-395 — a conversation: under the name, who they are in full (Program lead at Example Food Pantry; Case manager), not a cut-off tag',
       'D-394 — a conversation: send a photo (the picture button beside the mic), tap one to see it full size; only the two people see it, and whoever checks a report about it',
       'D-390 — a conversation: mine light green, theirs grey, no name or time on a bubble; drag sideways to see the times; closer to the edges; bolder mic and send',

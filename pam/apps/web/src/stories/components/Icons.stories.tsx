@@ -8,6 +8,7 @@ import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import {
   BellIcon,
   BookmarkIcon,
+  DocumentIcon,
   EditIcon,
   FlagIcon,
   GlobeIcon,
@@ -15,8 +16,10 @@ import {
   MeIcon,
   MeIconFilled,
   Page,
+  PdfIcon,
   PeopleIcon,
   PhoneIcon,
+  PhotoIcon,
   PlacesIcon,
   PlanIcon,
   ShareIcon,
@@ -54,6 +57,9 @@ const ICONS: Record<string, ComponentType<SVGProps<SVGSVGElement>>> = {
   ShieldIcon,
   GlobeIcon,
   StarIcon,
+  PhotoIcon,
+  PdfIcon,
+  DocumentIcon,
 };
 
 function Gallery({ size }: { readonly size: 'regular' | 'big' }) {

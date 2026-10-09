@@ -9873,3 +9873,81 @@ Gentle micro interactions."
   never comes back during the run, and is gone; scroll up again and it
   returns.
 
+### D-399 — Documents in a conversation: PDF and Word files, and Google Docs as links
+
+**Date:** 2026-10-08. Will: "We should also allow files like pdf. Word doc.
+And Google Docs. To be dropped in."
+
+- **What goes in.** A PDF or a Word file (.doc, .docx), 10 MB at most, one
+  attachment a message (a photo or a document, with or without words). From
+  a new document button beside the photo button, by dropping a file onto
+  the conversation, or by pasting one into the box — all three through one
+  `take()`, so they behave alike: a picture is a photo, a PDF or Word file is
+  a document, anything else is refused in words above the box ("Pam can send
+  a photo, a PDF or a Word file."; "That file is bigger than 10 MB."). A
+  phone often hands over a Word file with no type, so the name's ending
+  decides then; a type that says otherwise wins over the name. Macro Word
+  files (.docm) and everything else are refused by type, in the app and by
+  the bucket.
+- **Google Docs are links, not files.** A Google Doc has no file to send —
+  it lives in Google, and who can open it is set there. So a Google Docs,
+  Sheets, Slides, Forms or Drive link in a message keeps its words as sent
+  and gets a card under them ("Google Doc — Opens in Google") that opens it
+  in a new tab. Only `https://docs.google.com/…` and `drive.google.com`
+  count (`googleLinkIn`, unit-tested against look-alike hosts). A link
+  dragged from another tab onto the conversation goes into the message.
+  Exporting a Google Doc as PDF or Word from the phone's file picker gives a
+  real file, which goes in as one.
+- **Storage (0080).** A second private bucket, `message-files`, with
+  exactly the photo bucket's rules (0079): one folder per conversation; put
+  there only by someone in it, active, with chat allowed and no block; seen
+  by the two people and, once the message is reported, by that report's
+  reviewers (`can_see_message_file`, `report_files_for_review()`); deleted
+  only by the uploader while no message uses it. The message carries the
+  file's name and size (`attachment_name`, `attachment_bytes`), checked: a
+  name, not a path, 200 characters at most; 10 MB at most; a photo has
+  neither. DB test 16, 23 checks.
+- **A CHECK that comes out NULL passes.** Writing 0080's rule, test 16
+  sent a document with no name and it went in: `char_length(NULL) between
+  1 and 200` is NULL, not false. 0079's photo rule had the same hole (a
+  message marked as a photo with no path at all). 0080's rule says every
+  required part `is not null` in so many words, and replaces 0079's.
+- **Fetched when tapped.** A photo is downloaded with the conversation; a
+  document is not. The other person sees the icon (PDF, or a page for Word),
+  the name in full (two lines, then cut) and "PDF · 180 kB", and the file is
+  downloaded with their own sign-in only when they tap it — a 6 MB lease is
+  not something to spend somebody's data plan on unasked. It is handed to
+  the phone under its own name (a link with `download`, not a new window,
+  which a phone blocks after the wait), kept for the visit, and "Could not
+  open it. Tap to try again." if the download fails.
+- **Sent as it is.** Unlike a photo, nothing is taken out of a document —
+  Pam cannot clean a PDF the way it redraws a photo. The privacy notice says
+  so, and says the Google part: "Pam sends it just as it is, so look at what
+  is in it first … A Google Docs link opens in Google, and Google decides
+  who can see that doc, not Pam." (what-we-keep, a fifth paragraph).
+- **What everyone is told.** Every line that named photos names documents:
+  the transparency screen ("A message, photo or document only if someone
+  says it is not safe"; `message_files` on ADMIN_CANNOT_SEE), privacy
+  (what we keep, how long, who can see), terms ("Only send photos and
+  documents that are yours to share"), staff sign-up and the member card
+  ("Not their messages, photos or documents"), the report screens ("and its
+  photo or document if it has one"). The conversation list says "Document"
+  for a document sent with no words. Members who saw the old wording hear
+  first (before-launch, with the photos item).
+- **Spanish.** The new strings, and five from D-394/D-395 that went in
+  without accents ("Lider", "eligio", "envio", "reporto"), are written with
+  them. Older strings across `es.json` still lack accents — a separate pass,
+  not this change.
+- **Deploying.** 0079 is still not on live (`list_migrations` ends at
+  0078), so 0080 ships with it: one SQL-editor file for both, one
+  transaction, recording both in `schema_migrations`; tested on a copy
+  built through 0078, run twice, with the whole DB suite after it.
+- **Safe if the app gets there first.** A conversation now reads the two
+  new columns, and asking for a column that is not there fails the whole
+  read — so if this branch reached production before 0080 (another session
+  merged this branch early once, D-387), every conversation would fail to
+  open. `useThread` falls back to the columns every conversation has had
+  since 0005 when the first read fails (e2e: "a conversation still opens
+  before the live database has the document columns"). Sending a document
+  before 0080 fails like any failed send, with the message saying so.
+

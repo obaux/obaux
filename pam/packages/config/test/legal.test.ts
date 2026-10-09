@@ -98,7 +98,26 @@ describe('the privacy page and the transparency screen agree', () => {
     expect(text).toMatch(/cannot read your messages or see your photos/);
     expect(text).toMatch(/its photo/);
     const flagged = TRANSPARENCY_SCREEN.canSee.find((l) => l.key === 'transparency.canSee.flagged');
-    expect(flagged?.en).toMatch(/message or photo/);
+    expect(flagged?.en).toMatch(/message, photo/);
+  });
+
+  it('names documents wherever it names photos (D-399)', () => {
+    // A PDF or a Word file is sent as it is — unlike a photo, nothing is
+    // taken out of it — and a Google Docs link is Google's to share, not
+    // Pam's. The page says both, and every line about who sees a photo says
+    // the same of a document.
+    const keep = PRIVACY.sections
+      .flatMap((s) => s.bodyKeys)
+      .map((k) => en[k as keyof typeof en] as string)
+      .join(' ');
+    expect(keep).toMatch(/messages, photos and documents you send/);
+    expect(keep).toMatch(/sends it just as it is/);
+    expect(keep).toMatch(/Google decides who can see that doc, not Pam/);
+    const text = visibility!.bodyKeys.map((k) => (en[k as keyof typeof en] as string).toLowerCase()).join(' ');
+    expect(text).toMatch(/see your photos or documents/);
+    expect(text).toMatch(/its photo or document/);
+    const flagged = TRANSPARENCY_SCREEN.canSee.find((l) => l.key === 'transparency.canSee.flagged');
+    expect(flagged?.en).toMatch(/message, photo or document/);
   });
 
   it('promises to tell members before the list changes, exactly as the screen does', () => {

@@ -855,9 +855,9 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
-## Conversations, redrawn (8 October) — 0.45.5 to 0.46.4, on the branch
+## Conversations, redrawn (8 October) — 0.45.5 to 0.47.0, on the branch
 
-D-389 to D-398, **on `claude/pam-storybook`, not merged to `main`.** A
+D-389 to D-399, **on `claude/pam-storybook`, not merged to `main`.** A
 conversation's header says who the person is on a line under the name —
 "Program lead at Example Food Pantry", "Case manager" (D-395). Each day opens
 with one divider ("Today", "Yesterday", a weekday, a date). Bubbles carry no name or time: mine are light green on the
@@ -884,6 +884,16 @@ transparency screen, privacy notice, terms and staff sign-up copy name
 photos. **0079 is not on live yet:** the connector stopped at its approval
 step, so it waits for Will in the SQL editor (a tested one-transaction file;
 before-launch).
+
+**Documents (D-399, 0.47.0).** A document button beside the photo button
+(and a drop onto the conversation, or a paste) sends a PDF or Word file, 10
+MB at most, into a second private bucket (`message-files`, 0080) with the
+photo rules; the message carries its name and size, and the file is fetched
+with the reader's sign-in only when tapped. A Google Docs link in a message
+gets a card that opens it in Google. Copy everywhere that named photos names
+documents (`test/16_message_files_test.sql`, 23 checks; legal test).
+**0079 and 0080 go to live together** in one tested SQL-editor file for Will
+(before-launch).
 
 ## Release 0.45.0-two-roles (7 October) — one account, member and program
 

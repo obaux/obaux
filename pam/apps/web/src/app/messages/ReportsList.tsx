@@ -10,6 +10,8 @@ import { Text } from '@astryxdesign/core/Text';
 import { Badge } from '@astryxdesign/core/Badge';
 import { Thumbnail } from '@astryxdesign/core/Thumbnail';
 import { Lightbox } from '@astryxdesign/core/Lightbox';
+import type { MessageFile } from '@/lib/messageFile';
+import { MessageFileCard } from './MessageFileCard';
 import { MESSAGE_REPORT_REASONS, type Role } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { whenHappened } from '@/lib/when';
@@ -30,6 +32,8 @@ export interface ReportListItem {
   readonly excerpt: string | null;
   /** The reported message's photo (D-394), when it had one. */
   readonly photoUrl?: string | null;
+  /** The reported message's document (D-399), when it had one; opened on a tap. */
+  readonly file?: MessageFile | null;
   readonly createdAt: string;
   readonly resolvedAt: string | null;
   readonly reporterName: string | null;
@@ -85,6 +89,7 @@ export function ReportsList({ reports }: { readonly reports: readonly ReportList
                   xstyle={styles.photo}
                 />
               ) : null}
+              {report.file ? <MessageFileCard file={report.file} /> : null}
               {report.excerpt ? <Text xstyle={styles.excerpt}>{report.excerpt}</Text> : null}
               <Heading level={3} xstyle={styles.name}>
                 {t('reports.about', { name: report.aboutName ?? t('messages.thread.someone') })}

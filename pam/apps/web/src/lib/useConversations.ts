@@ -47,8 +47,8 @@ export interface ConversationRow {
    * reach through this hook either.
    */
   readonly lastMessageBody: string | null;
-  /** The last message carried a photo (D-394); the row says "Photo". */
-  readonly lastMessageIsPhoto: boolean;
+  /** What the last message carried (D-394, D-399); with no words, the row says "Photo" or "Document". */
+  readonly lastMessageAttachment: 'photo' | 'file' | null;
   readonly lastMessageMine: boolean;
   /** A message from the other person arrived since this was last opened. */
   readonly unread: boolean;
@@ -83,6 +83,9 @@ interface LatestMessageRow {
 
 /** How many of the most recent messages, across every conversation, to scan for recency. */
 const RECENCY_SCAN_LIMIT = 500;
+
+const attachmentOf = (kind: string | null | undefined): 'photo' | 'file' | null =>
+  kind === 'photo' || kind === 'file' ? kind : null;
 
 export function useConversations(enabled: boolean): {
   state: ConversationsState;
@@ -184,7 +187,7 @@ export function useConversations(enabled: boolean): {
               otherProgramName: other?.programName ?? null,
               lastMessageAt: latestMsg?.created_at ?? null,
               lastMessageBody: latestMsg?.body ?? null,
-              lastMessageIsPhoto: latestMsg?.attachment_kind === 'photo',
+              lastMessageAttachment: attachmentOf(latestMsg?.attachment_kind),
               lastMessageMine: latestMsg ? latestMsg.sender_id === me : false,
               unread,
             };

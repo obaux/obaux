@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import { displayFileName, type MessageFile } from './messageFile';
 import type { Role } from '@pam/config';
 
 /**
@@ -25,6 +26,8 @@ export interface ReportRow {
   readonly excerpt: string | null;
   /** The photo in a reported message, as an on-phone link (D-394), or null. */
   readonly photoUrl: string | null;
+  /** The document in a reported message (D-399), fetched when the reviewer taps it, or null. */
+  readonly file: MessageFile | null;
   readonly createdAt: string;
   readonly resolvedAt: string | null;
   readonly resolution: string | null;
@@ -66,11 +69,14 @@ export function useReports(enabled: boolean): { state: ReportsState; refresh: ()
       try {
         const { createClient } = await import('./supabase');
         const supabase = createClient();
-        const [{ data, error }, { data: photoRows }] = await Promise.all([
+        const [{ data, error }, { data: photoRows }, { data: fileRows }] = await Promise.all([
           supabase.rpc('reports_for_review'),
           // The photo in a reported message (0079): the same audience as the
           // report itself, downloaded with the reviewer's own sign-in.
           supabase.rpc('report_photos_for_review'),
+          // And a document (0080): its name and size now, the file itself
+          // only if the reviewer opens it.
+          supabase.rpc('report_files_for_review'),
         ]);
         if (cancelled) return;
         if (error) {
@@ -79,6 +85,14 @@ export function useReports(enabled: boolean): { state: ReportsState; refresh: ()
         }
         const photoPaths = new Map(
           ((photoRows ?? []) as { report_id: string; photo_path: string }[]).map((r) => [r.report_id, r.photo_path]),
+        );
+        const files = new Map(
+          (
+            (fileRows ?? []) as { report_id: string; file_path: string; file_name: string | null; file_bytes: number | null }[]
+          ).map((r) => [
+            r.report_id,
+            { path: r.file_path, name: displayFileName(r.file_name ?? ''), bytes: r.file_bytes ?? 0 } satisfies MessageFile,
+          ]),
         );
         const { loadPhotos } = await import('./messagePhoto');
         const links = await loadPhotos([...photoPaths.values()]);
@@ -91,6 +105,7 @@ export function useReports(enabled: boolean): { state: ReportsState; refresh: ()
             reason: row.reason,
             excerpt: row.target_excerpt,
             photoUrl: links[photoPaths.get(row.id) ?? ''] ?? null,
+            file: files.get(row.id) ?? null,
             createdAt: row.created_at,
             resolvedAt: row.resolved_at,
             resolution: row.resolution,

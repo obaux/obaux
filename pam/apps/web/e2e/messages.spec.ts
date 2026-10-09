@@ -583,6 +583,211 @@ test.describe('a conversation', () => {
   });
 });
 
+test.describe('documents in a conversation (D-399)', () => {
+  const FILES = '**/storage/v1/object/message-files/**';
+  const PDF = { name: 'Lease 2026.pdf', mimeType: 'application/pdf', buffer: Buffer.from('%PDF-1.4\n%%EOF') };
+  const docInput = (page: import('@playwright/test').Page) => page.locator('input[type="file"][accept*=".pdf"]');
+
+  test('a picked document shows its name and size, and goes with the message', async ({ page }) => {
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    const uploads: string[] = [];
+    await page.route(FILES, (route) => {
+      uploads.push(route.request().url());
+      return route.fulfill(json({ Key: 'message-files/x.pdf' }));
+    });
+    let inserted: Record<string, unknown> | null = null;
+    await page.route(MESSAGES, (route) => {
+      if (route.request().method() === 'POST') {
+        inserted = route.request().postDataJSON() as Record<string, unknown>;
+        return route.fulfill(
+          json({
+            id: 'new-file',
+            sender_id: ME,
+            body: null,
+            attachment_url: inserted.attachment_url,
+            attachment_kind: 'file',
+            attachment_name: inserted.attachment_name,
+            attachment_bytes: inserted.attachment_bytes,
+            created_at: new Date().toISOString(),
+          }),
+        );
+      }
+      return route.fulfill(json([]));
+    });
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+
+    await expect(page.getByRole('button', { name: 'Add a document' })).toBeVisible();
+    await docInput(page).setInputFiles(PDF);
+    // Above the box, before it goes: what it is called and what it is.
+    await expect(page.getByText('Lease 2026.pdf')).toBeVisible();
+    await expect(page.getByText(/^PDF · \d+ (kB|B)$/)).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Take this document out' })).toBeVisible();
+
+    await page.getByRole('button', { name: /send/i }).click();
+    await expect.poll(() => inserted).not.toBeNull();
+    expect(uploads).toHaveLength(1);
+    expect(uploads[0]).toContain(`/message-files/${CONVO}/`);
+    expect(inserted).toMatchObject({
+      conversation_id: CONVO,
+      body: null,
+      attachment_kind: 'file',
+      attachment_name: 'Lease 2026.pdf',
+      attachment_bytes: PDF.buffer.length,
+    });
+    expect(String(inserted!.attachment_url)).toMatch(new RegExp(`^${CONVO}/[0-9a-f-]+\\.pdf$`));
+    // In the conversation: a card that opens it.
+    await expect(page.getByRole('button', { name: /^Open Lease 2026\.pdf, PDF, / })).toBeVisible();
+  });
+
+  test('a file Pam does not take is refused in words, where it would have gone', async ({ page }) => {
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+
+    await docInput(page).setInputFiles({ name: 'notes.txt', mimeType: 'text/plain', buffer: Buffer.from('hello') });
+    const composer = page.locator('.astryx-chat-composer');
+    await expect(composer.getByRole('alert')).toHaveText('Pam can send a photo, a PDF or a Word file.');
+
+    await docInput(page).setInputFiles({ ...PDF, buffer: Buffer.alloc(10 * 1024 * 1024 + 1) });
+    await expect(composer.getByRole('alert')).toHaveText('That file is bigger than 10 MB. Try a smaller one.');
+    // Nothing was picked, so there is nothing to send.
+    await expect(page.getByRole('button', { name: /send/i })).toBeDisabled();
+  });
+
+  test('a document dropped on the conversation is picked, the same as from the button', async ({ page }) => {
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+
+    await page.evaluate(() => {
+      const target = document.querySelector('.astryx-chat-layout')!;
+      const data = new DataTransfer();
+      data.items.add(new File(['%PDF-1.4'], 'Dropped letter.pdf', { type: 'application/pdf' }));
+      target.dispatchEvent(new DragEvent('dragover', { bubbles: true, cancelable: true, dataTransfer: data }));
+      target.dispatchEvent(new DragEvent('drop', { bubbles: true, cancelable: true, dataTransfer: data }));
+    });
+    await expect(page.getByText('Dropped letter.pdf')).toBeVisible();
+    await expect(page.getByRole('button', { name: /send/i })).toBeEnabled();
+  });
+
+  test('a document someone sent is fetched only when tapped, with your own sign-in', async ({ page }) => {
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    const downloads: string[] = [];
+    await page.route(FILES, (route) => {
+      downloads.push(route.request().url());
+      return route.fulfill({ status: 200, contentType: 'application/pdf', body: '%PDF-1.4\n%%EOF' });
+    });
+    await page.route(MESSAGES, (route) =>
+      route.fulfill(
+        json([
+          {
+            id: 'their-file',
+            conversation_id: CONVO,
+            sender_id: OTHER,
+            body: 'My resume',
+            attachment_url: `${CONVO}/abc.docx`,
+            attachment_kind: 'file',
+            attachment_name: 'Resume.docx',
+            attachment_bytes: 1_258_291,
+            created_at: new Date().toISOString(),
+          },
+        ]),
+      ),
+    );
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+
+    const card = page.getByRole('button', { name: 'Open Resume.docx, Word document, 1.2 MB' });
+    await expect(card).toBeAttached();
+    expect(downloads).toHaveLength(0);
+    const saved = page.waitForEvent('download');
+    // A tap lands on the card itself (its button is for a screen reader and a keyboard).
+    await page.getByText('Resume.docx', { exact: true }).click();
+    expect((await saved).suggestedFilename()).toBe('Resume.docx');
+    expect(downloads).toHaveLength(1);
+    expect(downloads[0]).toContain(`/message-files/${CONVO}/abc.docx`);
+  });
+
+  test('a Google Docs link is a card that opens it in Google, in a new tab', async ({ page }) => {
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    await page.route(MESSAGES, (route) =>
+      route.fulfill(
+        json([
+          {
+            id: 'their-link',
+            conversation_id: CONVO,
+            sender_id: OTHER,
+            body: 'The schedule: https://docs.google.com/document/d/abc123/edit',
+            created_at: new Date().toISOString(),
+          },
+        ]),
+      ),
+    );
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+
+    const link = page.getByRole('link', { name: 'Google Doc: opens in Google, in a new tab' });
+    await expect(link).toHaveAttribute('href', 'https://docs.google.com/document/d/abc123/edit');
+    await expect(link).toHaveAttribute('target', '_blank');
+    // The words keep the link as it was sent.
+    await expect(page.getByText('The schedule: https://docs.google.com/document/d/abc123/edit')).toBeVisible();
+  });
+
+  test('a conversation still opens before the live database has the document columns (0080)', async ({ page }) => {
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    await page.route(MESSAGES, (route) =>
+      route.request().url().includes('attachment_name')
+        ? route.fulfill({
+            status: 400,
+            contentType: 'application/json',
+            body: JSON.stringify({ code: '42703', message: 'column messages.attachment_name does not exist' }),
+          })
+        : route.fulfill(
+            json([
+              {
+                id: MSG_THEIRS,
+                conversation_id: CONVO,
+                sender_id: OTHER,
+                body: 'Is the class still on Tuesday?',
+                created_at: new Date().toISOString(),
+              },
+            ]),
+          ),
+    );
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+    await expect(page.getByRole('log').getByText('Is the class still on Tuesday?')).toBeVisible();
+  });
+
+  test('a conversation whose last message is a document says so in the list', async ({ page }) => {
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    await page.route(MESSAGES, (route) =>
+      route.fulfill(
+        json([
+          {
+            conversation_id: CONVO,
+            sender_id: OTHER,
+            body: null,
+            attachment_kind: 'file',
+            created_at: new Date().toISOString(),
+          },
+        ]),
+      ),
+    );
+    await page.goto('/messages/');
+    await settled(page);
+    await expect(page.getByText('Document', { exact: true })).toBeVisible();
+  });
+});
+
 test.describe('the jump-to-newest button, with motion on (D-398)', () => {
   // The rest of the suite runs with reduced motion; this is where the
   // button's coming and going is seen at all.

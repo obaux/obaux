@@ -7,6 +7,7 @@ import { DUMMY_ANYONE } from '@pam/config/dummy-people';
 import { threadLineFor } from '@/lib/threadLine';
 import { useI18n } from '@/lib/i18n';
 import { sendDemoThreadMessage, useDemoThread } from '@/lib/demoMessages';
+import { displayFileName, type MessageFile, type OutgoingAttachment } from '@/lib/messageFile';
 import { staffPhotoFor } from '@pam/config/dummy-connections';
 import { ThreadView } from './ThreadView';
 import { ThreadHeader, ThreadTop } from './ThreadFrame';
@@ -40,7 +41,9 @@ export function DemoThread({
 }) {
   const { t } = useI18n();
   const typed = useDemoThread(conversationId);
-  const [added, setAdded] = useState<{ id: string; body: string; at: string; photoUrl?: string }[]>([]);
+  const [added, setAdded] = useState<
+    { id: string; body: string; at: string; photoUrl?: string; file?: MessageFile; fileUrl?: string }[]
+  >([]);
 
   const otherId = dummyOtherIdFor(conversationId, role);
   const other = DUMMY_ANYONE.find((p) => p.id === otherId) ?? null;
@@ -57,6 +60,8 @@ export function DemoThread({
         id: m.id,
         body: m.body,
         photoUrl: 'photoUrl' in m ? (m.photoUrl ?? null) : null,
+        file: 'file' in m ? (m.file ?? null) : null,
+        fileUrl: 'fileUrl' in m ? (m.fileUrl ?? null) : null,
         createdAt: m.at,
         mine: true,
       })),
@@ -64,12 +69,26 @@ export function DemoThread({
     [conversationId, role, typed, added],
   );
 
-  const send = async (body: string, photo: Blob | null) => {
-    // A photo in an example thread (D-394) is shown from the phone and kept
-    // only while this page is open: nothing is uploaded from a preview.
-    if (photo) {
+  const send = async (body: string, attachment: OutgoingAttachment | null) => {
+    // A photo (D-394) or a document (D-399) in an example thread is shown
+    // from the phone and kept only while this page is open: nothing is
+    // uploaded from a preview.
+    if (attachment) {
       const at = new Date().toISOString();
-      setAdded((prev) => [...prev, { id: `photo-${at}`, body: body.trim(), at, photoUrl: URL.createObjectURL(photo) }]);
+      const url = URL.createObjectURL(attachment.file);
+      const file = attachment.file;
+      setAdded((prev) => [
+        ...prev,
+        attachment.kind === 'photo'
+          ? { id: `photo-${at}`, body: body.trim(), at, photoUrl: url }
+          : {
+              id: `file-${at}`,
+              body: body.trim(),
+              at,
+              file: { path: `example/${at}`, name: displayFileName(file instanceof File ? file.name : ''), bytes: file.size },
+              fileUrl: url,
+            },
+      ]);
       return true;
     }
     const message = sendDemoThreadMessage(conversationId, body);

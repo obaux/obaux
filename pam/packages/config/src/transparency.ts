@@ -59,7 +59,9 @@ export const ADMIN_CAN_SEE = [
    * else from the chat does. Since D-394 (8 October) a message can carry a
    * photo, and a reported message's photo reaches the same people the same
    * way (0079, `can_see_message_photo`) — said on the screen ("A message or
-   * photo…") rather than left to "message" meaning both.
+   * photo…") rather than left to "message" meaning both. Since D-399 the
+   * same for a document (0080, `can_see_message_file`): "A message, photo or
+   * document…".
    */
   'flagged_messages_routed_through_reports',
   /**
@@ -93,6 +95,8 @@ export const ADMIN_CANNOT_SEE = [
   'message_bodies',
   /** D-394: photos in a conversation, outside a report — no admin policy on the bucket, as on `messages`. */
   'message_photos',
+  /** D-399: documents in a conversation, outside a report — the same, on `message-files` (0080). */
+  'message_files',
   'buddy_feed_posts',
   'members_outside_caseload_or_region',
   'other_regions',
@@ -182,7 +186,7 @@ export const TRANSPARENCY_SCREEN: {
     },
     {
       key: 'transparency.canSee.flagged',
-      en: 'A message or photo only if someone says it is not safe',
+      en: 'A message, photo or document only if someone says it is not safe',
     },
     {
       key: 'transparency.canSee.directMessages',

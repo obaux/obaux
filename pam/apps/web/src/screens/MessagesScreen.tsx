@@ -76,7 +76,12 @@ export function MessagesScreen() {
           name: c.otherName ?? t('messages.thread.someone'),
           context: contextFor(role, c.otherRole ? { role: c.otherRole, programName: c.otherProgramName } : null, t),
           // A photo with no words reads "Photo" (D-394).
-          preview: preview(c.lastMessageBody ?? (c.lastMessageIsPhoto ? t('messages.preview.photo') : null), c.lastMessageMine),
+          preview: preview(c.lastMessageBody ??
+            (c.lastMessageAttachment === 'photo'
+              ? t('messages.preview.photo')
+              : c.lastMessageAttachment === 'file'
+                ? t('messages.preview.file')
+                : null), c.lastMessageMine),
           when: c.lastMessageAt ? whenHappened(c.lastMessageAt, locale, t) : null,
           unread: c.unread,
           href: `/messages/thread/?id=${encodeURIComponent(c.id)}`,

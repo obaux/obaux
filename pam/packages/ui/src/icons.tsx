@@ -85,6 +85,21 @@ export function PdfIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+/**
+ * A page with its corner folded and three lines of writing: a document — a
+ * Word file or a Google Doc in a conversation, and the button that adds one
+ * (D-399). PDFs keep `PdfIcon`.
+ */
+export function DocumentIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" />
+      <path d="M14 3v5h5" />
+      <path d="M8.5 12.5h7M8.5 15.5h7M8.5 18h4" />
+    </svg>
+  );
+}
+
 /** A camera: add or change a photo (D-345). */
 /** The camera, filled, its lens cut through (Will, 7 October, D-364): the photo button on Profile. */
 /** "More about this": a circled i (D-367). */

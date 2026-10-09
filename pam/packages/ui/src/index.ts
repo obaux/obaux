@@ -85,6 +85,7 @@ export {
   HelpIcon,
   TrashIcon,
   PhotoIcon,
+  DocumentIcon,
   LegalIcon,
   SignOutIcon,
   ConnectionsIcon,

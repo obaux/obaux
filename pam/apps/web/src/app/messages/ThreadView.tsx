@@ -27,10 +27,20 @@ import { HStack } from '@astryxdesign/core/HStack';
 import { VisuallyHidden } from '@astryxdesign/core/VisuallyHidden';
 import { Thumbnail } from '@astryxdesign/core/Thumbnail';
 import { Lightbox } from '@astryxdesign/core/Lightbox';
-import { Notice, PhotoIcon } from '@pam/ui';
+import { DocumentIcon, Notice, PhotoIcon } from '@pam/ui';
 import { useI18n } from '@/lib/i18n';
 import { colorVars, spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { dayKey, dayLabel } from '@/lib/when';
+import {
+  MESSAGE_FILE_ACCEPT,
+  MESSAGE_FILE_LIMIT,
+  displayFileName,
+  googleLinkIn,
+  messageFileType,
+  type MessageFile,
+  type OutgoingAttachment,
+} from '@/lib/messageFile';
+import { FileSummary, GoogleLinkCard, MessageFileCard } from './MessageFileCard';
 
 /**
  * One conversation, drawn with Astryx's Chat family (D-181): `ChatMessageList`
@@ -117,6 +127,10 @@ export interface ThreadViewMessage {
   readonly body: string | null;
   /** A link to the message's photo (D-394), or null. */
   readonly photoUrl?: string | null;
+  /** The message's document (D-399), or null. */
+  readonly file?: MessageFile | null;
+  /** The document already on this phone (just sent, or an example's), so tapping it needs no download. */
+  readonly fileUrl?: string | null;
   readonly createdAt: string;
   readonly mine: boolean;
 }
@@ -127,8 +141,8 @@ export interface ThreadViewProps {
   readonly otherName: string | null;
   /** Their photo when Pam has one (D-335); their initials otherwise. */
   readonly otherPhotoUrl?: string | null;
-  /** Sends the words, the photo, or both; true once it has gone. */
-  readonly onSend: (body: string, photo: Blob | null) => Promise<boolean>;
+  /** Sends the words, a photo or a document, or words with one; true once it has gone. */
+  readonly onSend: (body: string, attachment: OutgoingAttachment | null) => Promise<boolean>;
   readonly sending: boolean;
   readonly sendFailed: boolean;
   /** BCP-47 tag for dictation, e.g. "en-US" or "es-US". */
@@ -227,8 +241,19 @@ const styles = stylex.create({
   caption: { paddingInline: spacingVars['--spacing-2'], paddingBlockEnd: spacingVars['--spacing-1'] },
   // The photo picked and not sent yet, above where you type.
   pending: { width: '72px', height: '72px', borderRadius: '12px' },
-  // The file picker itself is never seen: the photo button opens it (the
-  // same pattern as the staff photo and policy uploads in @pam/ui).
+  // A document picked and not sent yet (D-399): its card, as wide as it can be.
+  pickedFile: { minWidth: 0, flexGrow: 1 },
+  attachNote: { fontSize: '16px', lineHeight: 1.4 },
+  // Something is being dragged over the conversation (D-399): the box it
+  // will land in says so.
+  dropping: {
+    outlineWidth: '2px',
+    outlineStyle: 'dashed',
+    outlineColor: colorVars['--color-accent'],
+    outlineOffset: '2px',
+  },
+  // The file pickers are never seen: the photo and document buttons open
+  // them (the same pattern as the staff photo and policy uploads in @pam/ui).
   fileInput: { position: 'absolute', width: '1px', height: '1px', opacity: 0, pointerEvents: 'none' },
   // Room under the composer, inside the dock's frosted fade (Will, 8 October,
   // D-396: "it should be inside the box with fade"). Was the frame's bottom
@@ -497,27 +522,94 @@ export function ThreadView({
   }, [dictation.isListening]);
 
   const name = otherName ?? t('messages.thread.someone');
-  // A photo picked to send (D-394), shown above where you type until it goes.
+  // What is picked to send — a photo (D-394) or a document (D-399), one at a
+  // time — shown above where you type until it goes.
   const picker = useRef<HTMLInputElement>(null);
-  const [photo, setPhoto] = useState<{ file: File; preview: string } | null>(null);
+  const docPicker = useRef<HTMLInputElement>(null);
+  const [picked, setPicked] = useState<
+    { readonly kind: 'photo'; readonly file: File; readonly preview: string } | { readonly kind: 'file'; readonly file: File } | null
+  >(null);
+  // Why the last file offered was not taken, said where it would have gone.
+  const [attachProblem, setAttachProblem] = useState<'wrongType' | 'tooBig' | null>(null);
+  // Something is being dragged over the conversation.
+  const [dropping, setDropping] = useState(false);
   // The photo open full size, if any.
   const [viewing, setViewing] = useState<{ src: string; alt: string } | null>(null);
-  const canSend = (draft.trim() !== '' || photo !== null) && !sending;
+  const canSend = (draft.trim() !== '' || picked !== null) && !sending;
 
-  const clearPhoto = () => {
-    setPhoto((prev) => {
-      if (prev) URL.revokeObjectURL(prev.preview);
+  const clearPicked = () => {
+    setPicked((prev) => {
+      if (prev?.kind === 'photo') URL.revokeObjectURL(prev.preview);
       return null;
     });
   };
 
+  // Any way a file arrives — a picker, a drop, a paste — comes through here:
+  // a picture is a photo; a PDF or a Word file of 10 MB or less is a
+  // document; anything else is refused in words.
+  const take = (files: readonly File[]) => {
+    const file = files[0];
+    if (!file) return;
+    setAttachProblem(null);
+    if (file.type.startsWith('image/')) {
+      clearPicked();
+      setPicked({ kind: 'photo', file, preview: URL.createObjectURL(file) });
+      return;
+    }
+    if (!messageFileType(file)) {
+      setAttachProblem('wrongType');
+      return;
+    }
+    if (file.size > MESSAGE_FILE_LIMIT) {
+      setAttachProblem('tooBig');
+      return;
+    }
+    clearPicked();
+    setPicked({ kind: 'file', file });
+  };
+
   const submit = async (value: string) => {
-    if (sending || (value.trim() === '' && !photo)) return;
-    const ok = await onSend(value, photo?.file ?? null);
+    if (sending || (value.trim() === '' && !picked)) return;
+    const ok = await onSend(value, picked ? { kind: picked.kind, file: picked.file } : null);
     if (ok) {
       setDraft('');
-      clearPhoto();
+      clearPicked();
+      setAttachProblem(null);
     }
+  };
+
+  // A drop anywhere on the conversation (D-399): files are taken as above; a
+  // link dragged from another tab — a Google Doc — goes into the message.
+  const carriesSomething = (event: React.DragEvent) =>
+    [...event.dataTransfer.types].some((type) => type === 'Files' || type === 'text/uri-list');
+  const dropHandlers = {
+    onDragOver: (event: React.DragEvent) => {
+      if (!carriesSomething(event)) return;
+      event.preventDefault();
+      setDropping(true);
+    },
+    onDragLeave: (event: React.DragEvent) => {
+      if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setDropping(false);
+    },
+    onDrop: (event: React.DragEvent) => {
+      setDropping(false);
+      const files = [...event.dataTransfer.files];
+      if (files.length > 0) {
+        event.preventDefault();
+        take(files);
+        return;
+      }
+      const link = event.dataTransfer
+        .getData('text/uri-list')
+        .split('\n')
+        .map((line) => line.trim())
+        .find((line) => line !== '' && !line.startsWith('#'));
+      if (link) {
+        event.preventDefault();
+        inputRef.current?.focus();
+        inputRef.current?.insertText(`${link} `);
+      }
+    },
   };
 
   const composer = (
@@ -528,13 +620,19 @@ export function ThreadView({
       placeholder={t('messages.thread.placeholder')}
       isDisabled={sending}
       elevation="none"
-      xstyle={styles.composer}
+      xstyle={[styles.composer, dropping && styles.dropping]}
       drawer={
-        photo ? (
+        dropping ? (
+          <ChatComposerDrawer>
+            <Text type="supporting" xstyle={styles.attachNote}>
+              {t('messages.thread.attach.drop')}
+            </Text>
+          </ChatComposerDrawer>
+        ) : picked?.kind === 'photo' ? (
           <ChatComposerDrawer>
             <HStack gap={2} align="center">
               <Thumbnail
-                src={photo.preview}
+                src={picked.preview}
                 alt={t('messages.thread.photo.picked')}
                 label={t('messages.thread.photo.picked')}
                 xstyle={styles.pending}
@@ -544,10 +642,34 @@ export function ThreadView({
                 icon={<Icon icon="close" size="md" />}
                 variant="ghost"
                 size="md"
-                onClick={clearPhoto}
+                onClick={clearPicked}
                 xstyle={styles.square}
               />
             </HStack>
+          </ChatComposerDrawer>
+        ) : picked?.kind === 'file' ? (
+          <ChatComposerDrawer>
+            <HStack gap={2} align="center">
+              <VStack xstyle={styles.pickedFile}>
+                <FileSummary name={displayFileName(picked.file.name)} bytes={picked.file.size} />
+              </VStack>
+              <IconButton
+                label={t('messages.thread.file.remove')}
+                icon={<Icon icon="close" size="md" />}
+                variant="ghost"
+                size="md"
+                onClick={clearPicked}
+                xstyle={styles.square}
+              />
+            </HStack>
+          </ChatComposerDrawer>
+        ) : attachProblem ? (
+          <ChatComposerDrawer>
+            <Text role="alert" xstyle={styles.attachNote}>
+              {attachProblem === 'tooBig'
+                ? t('messages.thread.attach.tooBig')
+                : t('messages.thread.attach.wrongType')}
+            </Text>
           </ChatComposerDrawer>
         ) : undefined
       }
@@ -559,6 +681,7 @@ export function ThreadView({
           placeholder={t('messages.thread.placeholder')}
           hasHistory={false}
           maxRows={8}
+          onFiles={take}
         />
       }
       footerActions={
@@ -585,11 +708,31 @@ export function ThreadView({
             tabIndex={-1}
             aria-hidden
             onChange={(event) => {
-              const file = event.target.files?.[0];
+              const files = [...(event.target.files ?? [])];
               event.target.value = '';
-              if (!file) return;
-              clearPhoto();
-              setPhoto({ file, preview: URL.createObjectURL(file) });
+              take(files);
+            }}
+            {...stylex.props(styles.fileInput)}
+          />
+          <IconButton
+            label={t('messages.thread.file.add')}
+            icon={<Icon icon={DocumentIcon} size="md" color="secondary" />}
+            variant="ghost"
+            size="md"
+            isDisabled={sending}
+            onClick={() => docPicker.current?.click()}
+            xstyle={styles.square}
+          />
+          <input
+            ref={docPicker}
+            type="file"
+            accept={MESSAGE_FILE_ACCEPT}
+            tabIndex={-1}
+            aria-hidden
+            onChange={(event) => {
+              const files = [...(event.target.files ?? [])];
+              event.target.value = '';
+              take(files);
             }}
             {...stylex.props(styles.fileInput)}
           />
@@ -599,7 +742,7 @@ export function ThreadView({
         <ChatSendButton
           size="md"
           sendIcon={<Icon icon="arrowUp" size="md" />}
-          // Its own rule, not the composer's: a photo with no words can go.
+          // Its own rule, not the composer's: a photo or document with no words can go.
           isDisabled={!canSend}
           onSend={() => void submit(draft)}
           xstyle={[styles.square, styles.round, !canSend && styles.sendIdle]}
@@ -610,7 +753,13 @@ export function ThreadView({
 
   return (
     <>
-    <ChatLayout composer={composer} density="compact" scrollButton={<ScrollToBottom />} xstyle={styles.layout}>
+    <ChatLayout
+      composer={composer}
+      density="compact"
+      scrollButton={<ScrollToBottom />}
+      xstyle={styles.layout}
+      {...dropHandlers}
+    >
     <VStack gap={4} xstyle={styles.messages}>
       <RevealTimes>
         <ChatMessageList
@@ -627,6 +776,8 @@ export function ThreadView({
             const time = new Intl.DateTimeFormat(locale, { hour: 'numeric', minute: '2-digit' }).format(
               new Date(message.createdAt),
             );
+            // A Google Docs link in the words shows as a card under them (D-399).
+            const google = message.photoUrl || message.file ? null : googleLinkIn(message.body);
             // A divider opens each day (D-389).
             const isNewDay = i === 0 || dayKey(message.createdAt) !== dayKey(messages[i - 1]!.createdAt);
             return (
@@ -658,7 +809,7 @@ export function ThreadView({
                     xstyle={[
                       styles.bubble,
                       message.mine && styles.mine,
-                      message.photoUrl != null && !message.body && styles.photoOnly,
+                      (message.photoUrl != null || message.file != null) && !message.body && styles.photoOnly,
                     ]}
                   >
                     {message.photoUrl ? (
@@ -679,6 +830,16 @@ export function ThreadView({
                         {message.body ? (
                           <Text xstyle={[styles.body, styles.caption]}>{message.body}</Text>
                         ) : null}
+                      </VStack>
+                    ) : message.file ? (
+                      <VStack gap={2}>
+                        <MessageFileCard file={message.file} localUrl={message.fileUrl ?? null} />
+                        {message.body ? <Text xstyle={styles.body}>{message.body}</Text> : null}
+                      </VStack>
+                    ) : google ? (
+                      <VStack gap={2}>
+                        <Text xstyle={styles.body}>{message.body}</Text>
+                        <GoogleLinkCard url={google.url} kind={google.kind} />
                       </VStack>
                     ) : (
                       <Text xstyle={styles.body}>{message.body ?? ''}</Text>

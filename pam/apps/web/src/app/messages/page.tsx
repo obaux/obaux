@@ -248,7 +248,12 @@ function MessagesScreen() {
               context={contextFor(trueRole, c.otherRole, c.otherProgramName, t)}
               preview={(() => {
                 // A photo with no words reads "Photo" (D-394).
-                const text = c.lastMessageBody ?? (c.lastMessageIsPhoto ? t('messages.preview.photo') : null);
+                const text = c.lastMessageBody ??
+            (c.lastMessageAttachment === 'photo'
+              ? t('messages.preview.photo')
+              : c.lastMessageAttachment === 'file'
+                ? t('messages.preview.file')
+                : null);
                 if (text === null) return t('messages.preview.none');
                 return c.lastMessageMine ? t('messages.preview.you', { text }) : text;
               })()}
