@@ -207,11 +207,12 @@ Russian, Arabic (D-422); messages read in the reader's language (D-423).
   2. **Re-file the campaign** with the carrier: the registered samples are English and
      Spanish, and (unticked, below) the "Pam:" prefix. This is the "fail" to watch:
      a text in an unregistered language may be filtered.
-  3. **Will: two segments or English for the three appointment reminders** in
-     Chinese, Russian and Arabic (they cannot be said in 70 characters with a time, an
-     address and a link, so those readers get English). Two segments doubles their
-     cost and changes the registration, which says one. A shorter link fits more: the
-     live `app_url` is 36 characters.
+  3. ~~Two segments or English for the three appointment reminders~~ **Decided,
+     9 October 2026 (D-431): two segments** for those three in Chinese, Russian and
+     Arabic (134 characters), one for everything else. The reminders are written, in
+     the code and tested; what is left is the filing in item 2, which now has to say
+     it (`docs/sms-campaign-samples.md`: the description, the checklist row and the
+     sample).
   4. The email provider (the item at the top) is what sends the invite email at all.
   5. **Feedback loop:** when somebody who reads one of these languages says it is
      wrong, tell Claude the language, where, and what it should say; it is fixed in

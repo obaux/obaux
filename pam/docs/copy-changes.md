@@ -56,11 +56,14 @@ seen them, and what people say about them changes them. To pull one language bac
 to English, empty its `reviewedBy`; the others are untouched.
 
 - A text in a script the cheap encoding cannot carry (Chinese, Russian, Arabic)
-  is held to **70 characters**, not 160, because Pam promised the carrier one
-  segment per message. A template that cannot be said that briefly in a language
-  — an appointment reminder has a time, an address and a link — has no text in
-  it, and the person is texted in English. Allowing two segments would double the
-  cost and change the registered campaign: Will's call (docs/before-launch.md).
+  is held to **70 characters**, not 160, because Pam told the carrier one segment
+  per message. The one exception is the three appointment reminders, which carry a
+  time, an address and a link and may take **two segments, 134 characters**
+  (`ucs2Segments: 2`; Will, 9 October 2026, D-431). A template that cannot be said
+  that briefly in a language has no text in it, and the person is texted in
+  English. Giving another template a second segment doubles its cost and changes
+  the registered campaign: Will's call, and `docs/sms-campaign-samples.md` changes
+  with it.
 - Every language has its own list of words a text may never contain (justice
   involvement), applied on top of the English list, and re-checked by the
   dispatcher as the last step before Twilio.

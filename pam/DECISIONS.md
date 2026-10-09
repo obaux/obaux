@@ -11162,6 +11162,7 @@ it."
   so an English reminder is never refused over how an address is spelled.
   **Will's call, not made here:** allow two segments for the reminders (doubles
   their cost, and the campaign registration says one) or keep them English.
+  *(Made the same day: two segments, D-431.)*
 - **The last check is per language.** The justice-involvement word list was
   English only: a Spanish text with "libertad condicional" passed everything.
   Each language now has its own list (`sms-terms.ts`, built on the UI lists in
@@ -11414,3 +11415,42 @@ preventing them from receiving texts, right?"
   Spanish only, so the first text in another language may be filtered — which,
   depending on how sign-in codes are sent, could touch more than that one text.
   That is the "fail", to be learned from; the brake above is one line.
+
+### D-431 — The three appointment reminders may take two segments in Chinese, Russian and Arabic
+
+**Date:** 2026-10-09. Will, asked why SMS has a length limit at all and whether the
+person should simply get the text in the language they chose: "allow two segments
+for those three reminders only and update the registration. The extra cost is small,
+and these readers would get the reminder in their own language."
+
+- **Why there was a limit.** A text in a script the cheap encoding cannot carry is
+  70 characters a segment, not 160; a longer one is split, each part is billed, and
+  Pam told the carrier every message is one segment (D-424). The three reminders
+  (a day before, two hours before, the morning of) carry a time, an address and a
+  36-character link, and could not be said in 70, so those readers were texted them
+  in English — the opposite of the point of choosing a language.
+- **What changed.** `ucs2Segments: 2` on exactly those three templates
+  (`sms-templates.ts`, mirrored in the dispatcher's `render.ts`; the bundle carries
+  it). In a wide script they may run to **134** characters (two joined parts of 67);
+  English, Spanish and Portuguese stay inside the cheap encoding at 160 and one
+  segment, and every other template in every script stays at 70. Twelve new drafts
+  (3 reminders × zh-CN, zh-HK, ru, ar), in the words the screens already use for a
+  visit (预约, 到訪, визит, زيارة). They fit with the longest link (36), a clipped
+  address (34) and a ten-character time with at least eight characters to spare —
+  tested at the budgets rather than at a typical address — and the dispatcher and
+  the config renderer agree on all of them (the parity test caught the dispatcher
+  when I broke it on purpose).
+- **The twelve carry Will's approval to learn from** (D-430), on the strength of his
+  word that these readers get the reminder in their own language. They are
+  machine-drafted and nobody who reads those languages has seen them; emptying a
+  `reviewedBy` sends that one back to English.
+- **The registration.** `docs/sms-campaign-samples.md` now says it: the campaign
+  description (rewritten to 1,018 of 1,024 characters, so it dropped "low
+  throughput" and why Pam uses a code instead of a password to make room), the
+  seven languages, the two-segment exception, a sample of the reminder in each added
+  language, and the checklist row. **Filing it with the carrier is Will's step** — the
+  form is his account and his brand — and it has to come before `dispatch-sms` is
+  redeployed.
+- **Not changed.** Nothing is deployed: the live `dispatch-sms` is still v15 (English
+  and Spanish, "PAM:"). Nothing queues these reminders yet; the cost is two segments
+  each only once something does, and only for readers of three scripts.

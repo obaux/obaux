@@ -188,7 +188,8 @@ These come from the build SOP and are enforced by tests, not convention:
 - **Never display** "prisoner", "ex-offender", "inmate", or conviction details
   anywhere a user can see — UI, notifications, or exports. CI checks this.
 - **No SMS may reveal justice involvement**, exceed 160 characters (70 in a
-  script GSM-7 cannot carry — Chinese, Russian, Arabic), carry emoji, or send
+  script GSM-7 cannot carry — Chinese, Russian, Arabic; 134 for the three
+  appointment reminders, D-431), carry emoji, or send
   without a human recorded in `reviewedBy` **for that language**. A language
   nobody has signed is texted in English, never in a draft (A25).
 - **Never dead-end.** Every screen has a visible way back and a visible way to

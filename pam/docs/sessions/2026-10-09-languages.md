@@ -248,3 +248,29 @@ a fail first then fix it approach. We'll adjust languages based on feedback."
   on text that wrapped differently than I had assumed and stopped half way. Edits
   before the assertion were applied, the ones after were not; check `git diff` after
   a scripted edit, not the script's last line.
+
+## Part 5 — two segments for the three reminders (D-431)
+
+Will asked why SMS has a length limit and whether people should simply get the text in
+the language they chose. The limit is the encoding (70 characters a segment in
+Chinese, Russian and Arabic) plus the carrier registration that says one segment;
+the three appointment reminders could not be said in 70, so those readers were
+being texted them in English. Will: "allow two segments for those three reminders
+only and update the registration."
+
+- **Code:** `ucs2Segments: 2` on `appointment_24h`, `appointment_2h`,
+  `appointment_morning_of`; a wide script may run to 134 (two parts of 67),
+  everything else is unchanged. Mirrored in the dispatcher's `render.ts`; the
+  generated bundle carries it. Twelve new drafts (3 reminders × zh-CN, zh-HK, ru, ar)
+  carrying Will's approval to learn from.
+- **Tests:** the limit per template; the cheap encoding never gets two; each reminder
+  rendered at its variable budgets with the 36-character link has ≥ 8 characters to
+  spare; the dispatcher accepts 134 and falls back to English at 135; the parity
+  test fails if the dispatcher is stuck at 70 (checked by breaking it, then restoring).
+- **Registration:** `docs/sms-campaign-samples.md` — the description rewritten to
+  1,018 of 1,024 characters, seven languages, the two-segment exception, a sample of
+  the reminder in each added language. **Will files it with the carrier**, before
+  `dispatch-sms` is redeployed. I did not touch the Twilio account.
+- **Found, not fixed:** nothing queues any appointment reminder yet (no function,
+  trigger or screen references them), so the time format a reminder carries in each
+  language is not decided; the tests assume up to ten characters.

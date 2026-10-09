@@ -143,8 +143,25 @@
         "pt-BR": {
           "body": "Pam: Voce tem uma visita amanha as {time}. {address}. Toque para chegar: {link}",
           "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
+        },
+        "zh-CN": {
+          "body": "Pam: 您明天{time}有预约。{address}。点按查看路线：{link}",
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
+        },
+        "zh-HK": {
+          "body": "Pam: 你明天{time}有一次到訪。{address}。點按查看路線：{link}",
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
+        },
+        "ru": {
+          "body": "Pam: Завтра в {time} у вас визит. {address}. Маршрут: {link}",
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
+        },
+        "ar": {
+          "body": "Pam: لديك زيارة غدا في {time}. {address}. الاتجاهات: {link}",
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         }
       },
+      "ucs2Segments": 2,
       "vars": [
         "time",
         "address",
@@ -164,8 +181,25 @@
         "pt-BR": {
           "body": "Pam: Sua visita é hoje as {time}. {address}. Toque para chegar: {link}",
           "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
+        },
+        "zh-CN": {
+          "body": "Pam: 您今天{time}有预约。{address}。点按查看路线：{link}",
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
+        },
+        "zh-HK": {
+          "body": "Pam: 你今天{time}有一次到訪。{address}。點按查看路線：{link}",
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
+        },
+        "ru": {
+          "body": "Pam: Ваш визит сегодня в {time}. {address}. Маршрут: {link}",
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
+        },
+        "ar": {
+          "body": "Pam: زيارتك اليوم في {time}. {address}. الاتجاهات: {link}",
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         }
       },
+      "ucs2Segments": 2,
       "vars": [
         "time",
         "address",
@@ -185,8 +219,25 @@
         "pt-BR": {
           "body": "Pam: Hoje as {time} voce tem uma visita. {address}. Toque para chegar: {link}",
           "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
+        },
+        "zh-CN": {
+          "body": "Pam: 今天{time}您有预约。{address}。点按查看路线：{link}",
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
+        },
+        "zh-HK": {
+          "body": "Pam: 今天{time}你有一次到訪。{address}。點按查看路線：{link}",
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
+        },
+        "ru": {
+          "body": "Pam: Сегодня в {time} у вас визит. {address}. Маршрут: {link}",
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
+        },
+        "ar": {
+          "body": "Pam: اليوم في {time} لديك زيارة. {address}. الاتجاهات: {link}",
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         }
       },
+      "ucs2Segments": 2,
       "vars": [
         "time",
         "address",

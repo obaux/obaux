@@ -174,7 +174,8 @@ describe('a language is used while it carries an approval, and English when it d
         }
       }
     }
-    expect(inTheirLanguage).toBe(53);
+    // 53, plus the three appointment reminders in the four scripts (D-431) = 65.
+    expect(inTheirLanguage).toBe(65);
   });
 
   it('writes every one in English once the approvals are emptied, for every template', () => {
@@ -275,6 +276,37 @@ describe('the dispatcher and the config package say the same words', () => {
     expect(why[0]).toMatch(/over the 70 limit/);
     // The same length in English is one cheap message.
     expect(render(long, 'verify_code', 'en', VARS).length).toBeLessThanOrEqual(160);
+  });
+
+  it('lets a template with two segments run to 134 in a wide script, and no further', () => {
+    const withTwo = (body: string) => ({
+      ...SIGNED,
+      templates: {
+        ...SIGNED.templates,
+        verify_code: {
+          ...SIGNED.templates['verify_code']!,
+          ucs2Segments: 2 as const,
+          more: { ru: { body, reviewedBy: 'a native reader' } },
+        },
+      },
+    });
+    // 5 for "Pam: " and 129 more: exactly two segments, sent in Russian.
+    const exact = `Pam: ${'я'.repeat(129)}`;
+    expect(exact.length).toBe(134);
+    expect(render(withTwo(exact), 'verify_code', 'ru', VARS)).toBe(exact);
+    // One character over: the person is texted in English, and the log says why.
+    const why: string[] = [];
+    const over = `${exact}я`;
+    expect(render(withTwo(over), 'verify_code', 'ru', VARS, (r) => why.push(r))).toBe(
+      render(withTwo(over), 'verify_code', 'en', VARS),
+    );
+    expect(why[0]).toMatch(/over the 134 limit/);
+    // A template without the allowance stays at 70, however long its neighbour may run.
+    const one = { ...withTwo(exact) };
+    one.templates.verify_code = { ...one.templates.verify_code, ucs2Segments: undefined } as never;
+    const why2: string[] = [];
+    render(one, 'verify_code', 'ru', VARS, (r) => why2.push(r));
+    expect(why2[0]).toMatch(/over the 70 limit/);
   });
 
   it('applies the language’s own forbidden words as the last check', () => {

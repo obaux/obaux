@@ -65,6 +65,12 @@ export interface SmsTemplate {
    * `SMS_MAX_LENGTH_UCS2`) — that language gets English for it, on purpose.
    */
   readonly more?: Readonly<Partial<Record<MoreLocale, SmsDraft>>>;
+  /**
+   * How many segments this template may take in a script the cheap encoding
+   * cannot carry. Absent means one (70 characters). Only the appointment
+   * reminders have two (D-431): in English, Spanish and Portuguese they stay one.
+   */
+  readonly ucs2Segments?: 1 | 2;
   /** Named placeholders this template expects. Render fails if any is missing. */
   readonly vars: readonly string[];
   /**
@@ -97,15 +103,25 @@ export const SMS_MAX_LENGTH = 160;
 
 /**
  * A text in a script GSM-7 cannot carry (Chinese, Russian, Arabic) is sent as
- * UCS-2, and one segment of that holds 70 characters, not 160. Pam promised the
+ * UCS-2, and one segment of that holds 70 characters, not 160. Pam told the
  * carrier that every message fits one segment, so these texts are held to 70 —
  * and a template that cannot be said in 70 characters in a language, with a
  * 36-character link and a time, has no text in it and falls back to English.
- * Allowing two segments for the reminders would double their cost and change
- * the registered campaign; that is Will's call (docs/before-launch.md), not
- * something to slip in here.
+ *
+ * One exception, by Will's word (9 October 2026, D-431): the three appointment
+ * reminders carry a time, an address and a link, and may take **two** segments
+ * in these scripts (`ucs2Segments: 2` on the template). A message of two or more
+ * UCS-2 segments is joined by the phone, and each part holds 67 characters (the
+ * rest of each is the joining header), so two segments are 134 characters.
+ * Everything else stays at one.
  */
 export const SMS_MAX_LENGTH_UCS2 = 70;
+
+/** One part of a joined UCS-2 message: 3 fewer than a lone segment, which carries no header. */
+export const SMS_MAX_LENGTH_UCS2_PART = 67;
+
+/** What a template allowed two segments in the wide encoding holds: 2 × 67. */
+export const SMS_MAX_LENGTH_UCS2_TWO_SEGMENTS = 2 * SMS_MAX_LENGTH_UCS2_PART;
 
 /**
  * Longest link a text carries: the live `app_url` setting, which the staff
@@ -114,9 +130,14 @@ export const SMS_MAX_LENGTH_UCS2 = 70;
  */
 export const SMS_WORST_CASE_LINK_LENGTH = 36;
 
-/** The limit a text is held to: 160 for the cheap encoding, 70 for the other. */
-export function segmentLimitFor(templateText: string): number {
-  return isGsm7(templateText.replace(/\{[a-zA-Z0-9_]+\}/g, '')) ? SMS_MAX_LENGTH : SMS_MAX_LENGTH_UCS2;
+/**
+ * The limit a text is held to: 160 for the cheap encoding, 70 for the other —
+ * or, for a template that is allowed two segments in the other (`ucs2Segments`),
+ * 134. The cheap encoding is never given more than one segment.
+ */
+export function segmentLimitFor(templateText: string, ucs2Segments: 1 | 2 = 1): number {
+  if (isGsm7(templateText.replace(/\{[a-zA-Z0-9_]+\}/g, ''))) return SMS_MAX_LENGTH;
+  return ucs2Segments === 1 ? SMS_MAX_LENGTH_UCS2 : SMS_MAX_LENGTH_UCS2_TWO_SEGMENTS;
 }
 
 /**
@@ -318,7 +339,12 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
     es: 'Pam: Tiene una visita mañana a las {time}. {address}. Toque para llegar: {link}',
     more: {
       'pt-BR': approved('Pam: Voce tem uma visita amanha as {time}. {address}. Toque para chegar: {link}'),
+      'zh-CN': approved('Pam: 您明天{time}有预约。{address}。点按查看路线：{link}'),
+      'zh-HK': approved('Pam: 你明天{time}有一次到訪。{address}。點按查看路線：{link}'),
+      'ru': approved('Pam: Завтра в {time} у вас визит. {address}. Маршрут: {link}'),
+      'ar': approved('Pam: لديك زيارة غدا في {time}. {address}. الاتجاهات: {link}'),
     },
+    ucs2Segments: 2,
     vars: ['time', 'address', 'link'],
     maxVarLengths: { address: 34 },
     reviewedBy: REVIEWED_BY,
@@ -330,7 +356,12 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
     es: 'Pam: Su visita es hoy a las {time}. {address}. Toque para llegar: {link}',
     more: {
       'pt-BR': approved('Pam: Sua visita é hoje as {time}. {address}. Toque para chegar: {link}'),
+      'zh-CN': approved('Pam: 您今天{time}有预约。{address}。点按查看路线：{link}'),
+      'zh-HK': approved('Pam: 你今天{time}有一次到訪。{address}。點按查看路線：{link}'),
+      'ru': approved('Pam: Ваш визит сегодня в {time}. {address}. Маршрут: {link}'),
+      'ar': approved('Pam: زيارتك اليوم في {time}. {address}. الاتجاهات: {link}'),
     },
+    ucs2Segments: 2,
     vars: ['time', 'address', 'link'],
     maxVarLengths: { address: 34 },
     reviewedBy: REVIEWED_BY,
@@ -342,7 +373,12 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
     es: 'Pam: Hoy a las {time} tiene una visita. {address}. Toque para llegar: {link}',
     more: {
       'pt-BR': approved('Pam: Hoje as {time} voce tem uma visita. {address}. Toque para chegar: {link}'),
+      'zh-CN': approved('Pam: 今天{time}您有预约。{address}。点按查看路线：{link}'),
+      'zh-HK': approved('Pam: 今天{time}你有一次到訪。{address}。點按查看路線：{link}'),
+      'ru': approved('Pam: Сегодня в {time} у вас визит. {address}. Маршрут: {link}'),
+      'ar': approved('Pam: اليوم في {time} لديك زيارة. {address}. الاتجاهات: {link}'),
     },
+    ucs2Segments: 2,
     vars: ['time', 'address', 'link'],
     maxVarLengths: { address: 34 },
     reviewedBy: REVIEWED_BY,
@@ -602,7 +638,7 @@ export function renderSms(options: RenderSmsOptions): string {
   // The limit follows the template's own words, not what a member's address
   // happens to contain: a plain English reminder stays a 160-character message
   // even if a street name carries a curly apostrophe.
-  const limit = segmentLimitFor(wording.body + (stop ? STOP_SUFFIX[locale] : ''));
+  const limit = segmentLimitFor(wording.body + (stop ? STOP_SUFFIX[locale] : ''), template.ucs2Segments);
   assertSmsIsSafe(body, key, locale, limit);
   return body;
 }

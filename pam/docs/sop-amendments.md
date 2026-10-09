@@ -587,4 +587,6 @@ that it fits within the component we're working on."
 - **One segment is 160 characters, or 70 in a script the cheap encoding cannot
   carry** (Chinese, Russian, Arabic). A template that cannot be said in that
   with its time, address and link has no text in that language and is sent in
-  English, until Will decides about two segments.
+  English. *Same day, later (D-431):* Will allowed **two segments, 134
+  characters, for the three appointment reminders only**; everything else stays
+  at one.

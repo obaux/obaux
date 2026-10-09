@@ -24,6 +24,8 @@ export interface Template {
   reviewedBy: string;
   isFirstContact?: boolean;
   maxVarLengths?: Record<string, number>;
+  /** Segments allowed in a script GSM-7 cannot carry: absent means one (D-431 gives the reminders two). */
+  ucs2Segments?: 1 | 2;
   more?: Partial<Record<Locale, Draft>>;
 }
 
@@ -47,6 +49,8 @@ export interface Bundle {
 export const SMS_MAX_LENGTH = 160;
 /** One segment of a script GSM-7 cannot carry (Chinese, Russian, Arabic). */
 export const SMS_MAX_LENGTH_UCS2 = 70;
+/** One part of a joined UCS-2 message: a template allowed two segments holds 2 × 67 = 134. */
+export const SMS_MAX_LENGTH_UCS2_PART = 67;
 
 // §9, in English. The same list the config package tests against; repeated here
 // because this is the last point before the words leave Pam, and a last check
@@ -222,9 +226,12 @@ function renderIn(
   // Twilio compliance: the way out travels with the first message somebody gets
   // from a number they do not recognise.
   const stop = template.isFirstContact ? bundle.stop[locale] : '';
+  const segments = template.ucs2Segments ?? 1;
   const limit = isGsm7(bundle, wording.body.replace(/\{[a-zA-Z0-9_]+\}/g, '') + stop)
     ? SMS_MAX_LENGTH
-    : SMS_MAX_LENGTH_UCS2;
+    : segments === 1
+      ? SMS_MAX_LENGTH_UCS2
+      : segments * SMS_MAX_LENGTH_UCS2_PART;
   body += stop;
 
   assertSafe(body, locale, bundle.forbidden, limit);
