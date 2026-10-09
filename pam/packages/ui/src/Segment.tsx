@@ -21,11 +21,17 @@ const styles = stylex.create({
     height: 'auto',
     minHeight: `calc(${sizeVars['--size-element-md']} - 4px)`,
     paddingBlock: spacingVars['--spacing-1'],
+    paddingInline: spacingVars['--spacing-2'],
     whiteSpace: 'normal',
     textAlign: 'center',
     lineHeight: 1.2,
-    overflowWrap: 'anywhere',
-    minWidth: 0,
+    // A word is never broken to make room (it would read "Участн / ики"):
+    // `break-word` leaves a word whole while it can stand on a line of its
+    // own, and a segment will not shrink below its longest word. A control of
+    // three shares the line (`layout="fill"`), each at least as wide as its
+    // longest word.
+    overflowWrap: 'break-word',
+    minWidth: 'auto',
   },
 });
 

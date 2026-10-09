@@ -104,7 +104,8 @@ function measure() {
   };
   const clipsOf = (el) => {
     const clips = [];
-    for (let n = el.parentElement; n && n !== document.documentElement; n = n.parentElement) {
+    // The element holding the text counts too: a fixed-height box that hides its overflow cuts its own words.
+    for (let n = el; n && n !== document.documentElement; n = n.parentElement) {
       const s = style(n);
       const ox = s.overflowX, oy = s.overflowY;
       const cx = ox === 'hidden' || ox === 'clip';
@@ -117,7 +118,7 @@ function measure() {
   };
   // A scroller (auto/scroll) is the intended way to reach what is beyond its edge.
   const inScroller = (el) => {
-    for (let n = el.parentElement; n && n !== document.documentElement; n = n.parentElement) {
+    for (let n = el; n && n !== document.documentElement; n = n.parentElement) {
       const s = style(n);
       if ((s.overflowX === 'auto' || s.overflowX === 'scroll') && n.scrollWidth > n.clientWidth + 1) return n;
     }

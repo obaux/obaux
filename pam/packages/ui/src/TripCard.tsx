@@ -60,6 +60,7 @@ const styles = stylex.create({
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
+    unicodeBidi: 'plaintext', // its own direction, not the screen's (D-413)
   },
   when: { fontSize: '16px', lineHeight: 1.35 },
   token: { maxWidth: '100%' },

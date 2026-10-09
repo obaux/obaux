@@ -190,7 +190,11 @@ These come from the build SOP and are enforced by tests, not convention:
   is doing two things (a `variant="secondary"` one beside it is fine — D-239).
 - **48px minimum touch target, 56px primary buttons (secondary the same — D-239), 18px body text on mobile.**
 - Every `security definer` function sets `search_path = public, extensions`.
-- Strings go through i18n from day one. English and Spanish stay key-for-key.
+- Strings go through i18n from day one. Every language Pam offers (English,
+  Spanish, Brazilian Portuguese, Simplified and Traditional Chinese, Russian,
+  Arabic — A22) stays key-for-key. Text on screen wraps and grows rather than
+  being cut (`@pam/ui/Button`, `Badge`, `Segment`); `pnpm --filter @pam/web
+  audit:fit` checks it against a Storybook build.
 
 ## Verify, don't assume
 

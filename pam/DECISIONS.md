@@ -10437,3 +10437,179 @@ D-399 left for later.
   this was renumbered when the two branches were merged (D-412, 0.50.1). Their seven new Spanish strings
   (D-402's Photos and documents page) were already accented; none of the 172
   strings here was one they had changed.
+
+### D-413 — Seven languages, and text that fits in every one of them
+
+**Date:** 2026-10-09. Will: "Let's also add a Brazilian portuguese language",
+then "…Chinese (including Mandarin and Cantonese), Russian, Arabic"; "Keep in
+mind this is not location based, per say, everyone in the city speaks
+different languages"; "If downloading language is needed in production app,
+then add a loader screen as language transitions. State what the system is
+doing in their selected language"; and, last, "Audit all screens across
+languages to ensure text fits in components when displaying other languages,
+and resolve them using best UI/UX practices."
+
+*The languages*
+
+- **Seven, and one registry.** `SUPPORTED_LOCALES` in
+  `packages/config/src/i18n.ts`: `en`, `es`, `pt-BR`, `zh-CN`, `zh-HK`, `ru`,
+  `ar` — BCP 47 tags, spelled exactly that way, because the app hands them
+  straight to `Intl`, to `<html lang>` and to the speech recogniser. The
+  database check (0082, `profiles_language_supported`) is case-sensitive on
+  purpose: `pt-br`, `pt`, `zh`, `ar-EG` are refused rather than stored as a
+  second spelling. **Chinese is two bundles, not one**, because Mandarin and
+  Cantonese readers read different scripts here: `zh-CN` (Simplified) and
+  `zh-HK` (Traditional, Hong Kong vocabulary). A script check (OpenCC) keeps
+  them apart. Astryx ships no `zh-HK` catalog, so its own few components use
+  its `zh-TW` one.
+- **Not location-based.** Nothing here reads where anybody is. The language
+  is the person's own choice, saved to their account; before they choose,
+  the phone's language is the *starting point* (`matchLocale`) and is never
+  saved as if it were a choice (a person who never picks keeps following
+  their phone).
+- **Loaded when needed.** English is in the first load; the other six are
+  lazy bundles, with a slim Astryx catalog each (`build-astryx-catalogs.mjs`).
+  The first load is 541.8 kB of the 600 kB budget (58.2 kB to spare, measured
+  on the merged build): the six bundles are not in it, they are fetched when
+  somebody picks one.
+- **The loader Will asked for.** When the words of a language have to be
+  downloaded, `LanguageSwitching` covers the window with a spinner and one
+  line *in the language being switched to* — "Cambiando a español…", "正在切换到简体中文…",
+  "جارٍ التبديل إلى العربية…" — appearing only if the wait passes 150 ms and,
+  once shown, staying 500 ms so it never flashes. If the download fails the
+  person stays in the language they had and is told. (Seven lines, in
+  `SWITCHING_LANGUAGE`.)
+- **Plurals the way each language does them.** Russian has four forms and
+  Arabic six. A `{count}` string carries every CLDR category its language
+  needs (`key.one`, `.few`, `.many`, `.zero`, `.two`), and a test fails if one
+  is missing or if a language that needs none carries dead ones.
+- **Right to left.** `<html dir>` follows the language; Astryx mirrors from
+  it; logical CSS properties do the rest. What they cannot say lives in
+  `globals.css`: `--pam-flip` (a slide's direction), `[data-pam-directional]`
+  arrows, phone/email/code fields kept left-to-right, no letter-spacing in
+  Arabic (it breaks the joins), Latin digits in Arabic (`ar-u-nu-latn`: a
+  phone number or a time is read the same in every language), and swipe
+  gestures flipped. A name in the other direction (an English program in an
+  Arabic screen) is set in its own direction where it ends in an ellipsis
+  (`unicode-bidi: plaintext`), so it loses its end, not its beginning.
+- **Dignity holds in every language.** The §0 rule is a substring check
+  against a per-language list (`language.ts`), run on all seven bundles.
+  Known gap: Spanish has no list of its own yet (it is checked with the
+  English terms only) — in STATUS's backlog.
+- **Texts and emails stay as they were.** SMS and invite emails are drafted
+  and signed off in English and Spanish only (`reviewedBy`, 160 characters,
+  no emoji). Somebody who reads Pam in another language still gets those two
+  in English until their copy is written and signed off; nothing is machine
+  translated into a text message. In `docs/before-launch.md`.
+- **Who translated.** Brazilian Portuguese by me; the other four by four
+  parallel agents against a frozen snapshot of the English, with a checking
+  tool (placeholders, plural forms, script, length, a re-read for the
+  dignity rule), then a second pass. **No native speaker has read any of it.**
+  That is the first item in `docs/before-launch.md`, loudest for the privacy
+  page, the terms and the transparency screen, which are promises.
+
+*Text that fits*
+
+- **The audit.** `pnpm --filter @pam/web build-storybook` then
+  `pnpm --filter @pam/web audit:fit` opens every story (455 on the merged
+  tree) in every language (3,185 pages) at 320px and measures the rendered page, text node by
+  text node: words half inside a box that hides overflow (`cut`), an ellipsis
+  or line clamp that is actually trimming (`ellipsis`, `clamp`), text outside
+  the control that holds it (`spill`), two elements' text on top of each other
+  (`overlap`), the page scrolling sideways (`scroll`). English is the
+  baseline: what is already in English is the design's, and only what is *new*
+  in a language counts. The first run (446 stories, before the merge) found 353 new defects (137
+  of them Russian); after the fixes below, 29 remain, each looked at by eye: four
+  are a date near the bottom of a sheet that fades out by design; four are
+  a Chinese line box a hair taller than its badge (the glyphs are whole, seen
+  at 4×); two are an ellipsized line's untrimmed width; twelve are the sliding
+  titles on Stuff shared (D-407), which overflow on purpose; two are the
+  folded calendar's second row, a teaser under a fade; four are an address
+  that ends in an ellipsis on purpose; one is an avatar initial. None is a
+  word somebody cannot read, and none needed a change.
+- **Wrap and grow; never trim a label.** An interface string — a button, a
+  tab, a status, a notification — takes another line and the box grows. An
+  ellipsis stays only on what somebody else wrote and Pam cannot shorten: a
+  program's name, an address, a file name. `Button` and `Badge` (Astryx's trim
+  to one line at a fixed height) are now `@pam/ui/Button` and
+  `@pam/ui/Badge`: same look, same height for one line, a second line when
+  needed; `Segment` does the same for a segmented control (the About tabs).
+  Anything that wants a taller target says `minHeight`, never `height`.
+- **Not smaller type.** The question came up (Will, "Chinese and Russian may
+  need smaller font sizes, no?"). Russian words are 30–40% longer, but body
+  text and labels stay at the sizes an older reader can see (§2.5), and Chinese
+  needs less width than English, not less size. The one place type does step
+  down is the large page title when it is a single word that cannot wrap
+  ("Конфиденциальность", 380px at 34px on a 320px screen): `useFitTitle`
+  measures the longest word once and picks 34, 30, 27 or 24px; past 24 the
+  word may break. Measured once, not searched for, because trying sizes in a
+  loop reads the old size under reduced motion.
+- **Superseded: D-274's "one row, always".** Explore's heading and the area
+  link no longer stay on one row at the price of "Все програ…": the link
+  goes under the heading when they do not both fit.
+- **Smaller changes.** Notifications show their whole sentence (it was
+  clamped to two lines) and their title wraps; a connection's description
+  holds six lines, not three; a visit tag wraps instead of ending in "…"; a
+  file or Google card puts its words under its icon when the bubble is
+  narrow; the month grid uses a single letter for a weekday in Arabic (the
+  whole word overlapped its neighbour); and `overflow-wrap: break-word`
+  everywhere, `hyphens: auto` for every language but English, `line-break:
+  strict` for Chinese.
+- **What the audit cannot see**: whether a translation is *good*, text in an
+  image, Chinese and Arabic in the fonts real phones have (the container has
+  fallbacks), and anything behind a sign-in the stories do not reproduce.
+  `e2e/languages.spec.ts` keeps the real pages honest: sign-in, About,
+  Privacy and Terms in every language, no word off the screen.
+- **Numbered D-413** (written as D-404 and D-405 while the other session's
+  D-404–D-411 were still unmerged); the migrations are 0082 and 0083 for the
+  same reason.
+
+### D-414 — Messages, read in the reader's own language (built, switched off)
+
+**Date:** 2026-10-09. Will: "For messaging, programs and case managers may use
+english or spanish, but let's use Uber's approach where the user sees the
+messenger's message in their language translated, labeled translated, but
+there's a link under it to show the original."
+
+- **Nothing is written in another language.** A message is stored exactly as
+  typed. What a reader sees is a translation made when they open the
+  conversation, into *their* language (`profiles.preferred_language`), from
+  whatever language the message turns out to be in — found by the
+  translation service, not assumed from the sender's role or place. Staff
+  write English or Spanish; a member who writes Arabic is read in English or
+  Spanish the same way.
+- **The reader sees** the translation, then "Translated" and a link, "Show
+  original"; tapping it swaps the words and the label ("Original",
+  "Show translation") with the way back. The original is set in its own
+  direction and marked with its language. Your own messages are never
+  translated for you; photos and documents are untouched; a caption is
+  translated like any words.
+- **The pieces.** Migration `0083`: `message_translations` (message, language
+  read in, language written in, words, provider), written *only* by the
+  function with the service role, read only by the people in the conversation,
+  **no admin policy** (as on `messages`), gone with the message. Function
+  `translate-messages`: reads the messages **as the reader** with their own
+  sign-in (so the database decides what may be translated), asks the service
+  only about messages it has no answer for, keeps the answers, never logs a
+  word. The service is behind a seam (`Translator`), today Anthropic's
+  Messages API with `claude-haiku-5-5`, its key a function secret. The
+  prompt calls the messages *data* and says never to follow instructions
+  inside them; what it sends is ids and words — no names, no phone numbers,
+  no conversation, nothing about who the people are (a test holds that to the
+  dignity rule too).
+- **Off, twice, and tied to what we tell people.** `MESSAGE_TRANSLATION` in
+  `packages/config` (the app) *and* `MESSAGE_TRANSLATION=on` on the function
+  must both be set before a word leaves Pam. The privacy page's section about
+  it (`privacy.s.translation`, written in all seven languages already) is in
+  the page **exactly when the app's switch is on** — a test fails if they
+  disagree either way, and another if the switch is flipped without someone
+  updating it.
+- **Why off.** It sends members' words to another company. What is owed
+  before it is switched on is in `docs/before-launch.md`: the service's terms
+  (no retention, no training), the key, a native read of the translations and
+  the privacy copy, members told first (the transparency promise), and a
+  per-person cap on how many translations a day (abuse and cost).
+- **Not done.** A report still shows reviewers the original, as written. No
+  translation of what a person types before they send it. No "always show
+  original" setting. Storybook shows the component (`TranslatedBody`), not
+  the thread, because the thread's switch is off.

@@ -575,13 +575,13 @@ Numbers here are from the last run, not aspirations.
 | Check | Result | What it actually proves |
 |---|---|---|
 | Typecheck | 5/5 packages | — |
-| `@pam/config` tests | 231 pass (21 September) | No SMS can send unreviewed, over 160 chars, with emoji, or with a term that reveals justice involvement. Locales are key-for-key. The transparency screen matches its contract, including the new `new_save_without_the_place` line (D-199). |
-| `@pam/ui` tests | 65 pass | Every component is axe-clean. `PlaceCard` offers exactly three actions in a fixed order. Reduced motion is respected. The mic hides when unsupported. |
-| Database suite | 302 checks pass (21 September, `0001`–`0067`) | See below. Grew from 286 with `07_people_activity_test.sql` (D-199): 16 checks that `people_activity()` returns a time and nothing else, only for `can_message()`'s own relationship, and that a case manager or a program admin still cannot read `saved_places` directly. `0067` is now live. |
+| `@pam/config` tests | **397 pass** (9 October: all seven languages key-for-key with plural forms, the translation core and handler, the privacy-switch tie; was 231 on 21 September) | No SMS can send unreviewed, over 160 chars, with emoji, or with a term that reveals justice involvement. Locales are key-for-key. The transparency screen matches its contract, including the new `new_save_without_the_place` line (D-199). |
+| `@pam/ui` tests | **74 pass** (9 October; 65 on 21 September) | Every component is axe-clean. `PlaceCard` offers exactly three actions in a fixed order. Reduced motion is respected. The mic hides when unsupported. |
+| Database suite | **509 checks pass** (9 October, `0001`–`0083`, through `19_message_translations_test.sql`; 302 on 21 September, `0001`–`0067`) | See below. Grew from 286 with `07_people_activity_test.sql` (D-199): 16 checks that `people_activity()` returns a time and nothing else, only for `can_message()`'s own relationship, and that a case manager or a program admin still cannot read `saved_places` directly. `0067` is now live. |
 | Live RLS fingerprint | **not re-verified since `0060`–`0062` deployed** | This row's last "identical to local" claim predates today. `0060`–`0062` (deployed under their original names, `0054`–`0056`) are now live and `get_advisors` came back clean, but the fingerprint comparison itself hasn't been re-run against the combined migration set — this repo and the other concurrent session's are now merged, but neither has been re-fingerprinted since (see D-169/D-170, and the drift note under "What is live") |
 | Live anonymous attack | 0 rows leaked | A signed-out caller reads no profiles, messages, invites or audit rows on the real database, while still reaching the support number and the public catalogue |
-| Browser a11y + theme (Playwright, full suite) | **639 pass** (9 October, `claude/gallant-clarke-0dhizj` = `claude/pam-storybook` through D-402 + D-403, on a fresh `pnpm build`; `PLAYWRIGHT_CHROMIUM_PATH=/opt/pw-browsers/chromium`). Earlier: 507 (21 September, `claude/pam-messenger-touchups`) | No WCAG AA violations at 320px or iPhone SE. Every control clears 48px. No horizontal scroll. The Astryx theme really resolves. Runs in dark mode as well as light. Includes the people strip (D-198) and the fourth round of phone touchups (A15, D-200–D-203): no help link on Messages, the thread frame fills the true viewport, the send icon matches the mic icon, and message rows measure the compact density directly rather than by on-screen distance. |
-| First-load JS | 505.3 kB of **600 kB** — within budget, 94.7 kB to spare (ceiling raised from 500 on 21 September: A12, D-191) | §12 budget, measured gzipped on what `index.html` actually loads; `/signin` and `/gallery` carry `OnboardingSlides`' `framer-motion` weight on their own subpath export (D-140), every other route unaffected. Grew from 500.7 kB across the messaging sessions alone (1.0 kB, D-162), entirely new locale strings — irreducible without lazy-loading translations per route, which is out of scope. Grew a further 2.3 kB when merged with the other concurrent session's own additions (D-170). Grew 0.3 kB on the 17th (D-174), **and 1.0 kB on 20 September** (the messenger's locale strings and `Badge` in `NavTile`; `useConversations` and the whole Chat family were kept out of Home's first load — D-181, D-182) — the messaging-preview/demo-send/program-badge session's other additions (D-172, D-173, D-175) all landed off Home's own bundle and did not move this number, though D-175's `Token` component does add real weight to `/admin/`, `/person/` and `/directory/` individually (~4 kB each), not tracked by this check |
+| Browser a11y + theme (Playwright, full suite) | **816 pass** (9 October, `claude/gallant-clarke-0dhizj` = `claude/pam-storybook` through D-411 + D-412–D-414, on a fresh `pnpm build`, three projects, 6 minutes at 4 workers; `PLAYWRIGHT_CHROMIUM_PATH=/opt/pw-browsers/chromium`); includes `languages.spec.ts` — sign-in, About, Privacy and Terms in all seven languages with no word off the screen. Earlier: 639 (9 October, through D-402), 507 (21 September, `claude/pam-messenger-touchups`) | No WCAG AA violations at 320px or iPhone SE. Every control clears 48px. No horizontal scroll. The Astryx theme really resolves. Runs in dark mode as well as light. Includes the people strip (D-198) and the fourth round of phone touchups (A15, D-200–D-203): no help link on Messages, the thread frame fills the true viewport, the send icon matches the mic icon, and message rows measure the compact density directly rather than by on-screen distance. |
+| First-load JS | **541.8 kB** of **600 kB** — within budget, 58.2 kB to spare (9 October, merged build; only English is in it, the other six languages load when picked — D-413). Earlier: 505.3 kB, 94.7 kB to spare (ceiling raised from 500 on 21 September: A12, D-191) | §12 budget, measured gzipped on what `index.html` actually loads; `/signin` and `/gallery` carry `OnboardingSlides`' `framer-motion` weight on their own subpath export (D-140), every other route unaffected. Grew from 500.7 kB across the messaging sessions alone (1.0 kB, D-162), entirely new locale strings — irreducible without lazy-loading translations per route, which is out of scope. Grew a further 2.3 kB when merged with the other concurrent session's own additions (D-170). Grew 0.3 kB on the 17th (D-174), **and 1.0 kB on 20 September** (the messenger's locale strings and `Badge` in `NavTile`; `useConversations` and the whole Chat family were kept out of Home's first load — D-181, D-182) — the messaging-preview/demo-send/program-badge session's other additions (D-172, D-173, D-175) all landed off Home's own bundle and did not move this number, though D-175's `Token` component does add real weight to `/admin/`, `/person/` and `/directory/` individually (~4 kB each), not tracked by this check |
 
 ### The database suite is the one that matters
 
@@ -811,6 +811,8 @@ while the copy is unsigned, so it earned the first live test, not the last.*
 | 29 | ~~Where the dock's People and My Plan lead~~ **Answered by the redesign (D-210)** | — | Will, 1 October: the bar is Explore, Saved, Trips, Messages, Profile; Help moves to each screen's header and Profile. Next: his reference screenshots for the other screens, then wiring the redesigned views to routes and data. Walk it in `Prototype/Redesign — member` (D-211). |
 | 30 | ~~Deploy `0071` and `0072`~~ **Done (Will, 4 October)** | — | `list_migrations` first: live ran to `0070`, no live-only drift; `can_message`, `messageable_people` and `open_direct_conversation` matched 0063 exactly, which 0072 was written against. Both applied; `get_advisors` (security) shows no new kind of finding (the definer functions are guarded inside, as every other one is; `invite_preview` and `request_invite_link` are anon on purpose). Spot-checked: `invite_emails` forced RLS with one policy and no anon access; `invites_log` and `staff_request_phone` not callable signed out. See D-264. |
 | 31 | **The before-launch list** | Launch | `docs/before-launch.md` — Will's list of what must be done before real people use PAM. First entry: the email provider for invite links. **0068/0069** are merged as 0075/0076 with 0072's arm kept (D-346); they wait for Will to apply them live. Program sign-up and Add a program are a one-question wizard with a review (D-347); Add a policy is a card (D-348); super admin → program lead message from a place (D-349). |
+| 32 | **Languages: native readers, the texts and emails, deploy 0082** | The new languages going to real people (D-413, A22) | Nobody who speaks Portuguese, Chinese, Russian or Arabic has read the six new bundles; start with the privacy page, the terms, the transparency screen, the notices and the seven "Switching to…" lines. Texts and emails exist only in English and Spanish and need a yes/no per template per language. 0082 must be live before the app that offers the languages. Open question left at its default (no restriction): should staff be able to pick any language? In `docs/before-launch.md`. |
+| 33 | **Messages in your own language: switching it on** | D-414 | Built and off. Needs the provider's no-retention terms in writing, the key as a function secret, a native read of `privacy.s.translation.*`, a way to tell members first, a per-person daily cap, then both switches. `docs/before-launch.md`. |
 
 ---
 
@@ -858,18 +860,44 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
-## Spanish, spelled properly (9 October) — 0.48.1, on a branch
+## Seven languages, messages in your own language, and text that fits (9 October) — 0.50.1 and 0.51.0, on a branch
 
-D-403, **on `claude/gallant-clarke-0dhizj`, which is `claude/pam-storybook`
-(D-389–D-402, at `f7bc710`) plus this one commit; neither is merged to
-`main`.** 172 strings in `es.json` got back the accents, ñ and opening ¿
-they were typed without ("Todavía", "le invitó", "está", "conexión",
-"Compañeros", "¿Cuál es su número de teléfono?"). Spelling only, checked by
-script: with the marks taken off, every changed string is what it was. No
-key, placeholder, English string or register changed; the transparency
-screen and the legal pages read the same in English and promise nothing
-new. Spanish wording questions found on the way (not spelling) are in the
-backlog below.
+D-412 to D-414, **on `claude/gallant-clarke-0dhizj`, which is
+`claude/pam-storybook` (through D-411, `1a89000`) plus this work, merged and
+renumbered; none of it is merged to `main` and none of it is on the live
+project.**
+
+- **Languages (D-413).** English, Spanish, **Brazilian Portuguese, Simplified
+  Chinese (Mandarin readers), Traditional Chinese (Cantonese readers),
+  Russian, Arabic**. One registry (`packages/config/src/i18n.ts`); the six
+  non-English bundles load when picked, behind a switching screen that says
+  what is happening in the language being switched to; plural forms where the
+  language has them; right-to-left for Arabic; the phone's language as the
+  starting point (never saved as a choice; nothing uses location). **Native
+  speakers have not read any of the six new ones** — the first item in
+  `docs/before-launch.md`. Texts and emails stay English/Spanish (A22).
+- **Text fits (D-413).** Wrapping `@pam/ui/Button`, `Badge` and `Segment`
+  (Astryx's trim a label to one line); titles that step down 34→24px for a
+  word that cannot wrap; notifications in full; and more. Checked by
+  `pnpm --filter @pam/web build-storybook` then `audit:fit` (455 stories ×
+  7 languages at 320px; English is the baseline). **353 new defects at
+  first, 29 now, each looked at** (see D-413). The audit is a floor: it
+  cannot judge a translation or see real phone fonts.
+- **Messages in your own language (D-414) — built, off.** Migration 0083,
+  the `translate-messages` function, the thread UI ("Translated", "Show
+  original"), seven languages of copy, and the privacy section that appears
+  with the switch. `MESSAGE_TRANSLATION.enabled` is `false`, and the function
+  answers `{enabled:false}` unless its own secret is set. What is owed first
+  is in `docs/before-launch.md`.
+- **Spanish, spelled properly (D-412, 0.50.1).** 172 strings got their
+  accents, ñ and ¿ back; spelling only, checked by script.
+- **Migrations, files only:** 0082 (`profiles_language_supported` takes the
+  five new codes — **deploy before the app that offers them**) and 0083
+  (`message_translations`, can wait). Both come after 0081 (link previews,
+  the other session's). Nothing applied to Supabase; `list_migrations` first.
+- **Two things to know about copy.** A reworded English string does *not*
+  update the other six languages (a new key fails the tests, a reworded one
+  stays stale silently); and every string anybody adds is now seven.
 
 ## Conversations, redrawn (8–9 October) — 0.45.5 to 0.50.0, on the branch
 
@@ -1070,6 +1098,24 @@ Open items Will asked to keep (7 October), newest first. Read this before
   signature sheet, the friend drawer's drag.
 - **DS for Claude Design** — usage rules in MDX (principles, buttons,
   spacing, type, colour).
+- **Keeping seven languages in step (D-413).** A new English key fails the
+  tests until all seven have it; a *reworded* English string does not, and
+  the other six go stale without a word. A check that compares each
+  translation against the English it was made from, and a script that drafts
+  the new and changed lines for a native speaker to sign off, would close it —
+  not built, Will to say.
+- **Spanish has no dignity-term list of its own** (`language.ts` checks it
+  against the English terms); the other six do. Found while adding the lists.
+- **Counts that need no plural form still read "1 people" in a few places in
+  English, Spanish and Portuguese** (Russian and Arabic have theirs because
+  they must). Found by the plural tests, left alone because it is wording.
+- **Wording noticed by the translation pass, not investigated:** a line in
+  the points copy and a line in the messages copy that seem to say different
+  things, and `place.dropin.monthly`'s phrasing. They are in the English; the
+  translators kept them.
+- **The audit's blind spots (D-413):** a translation's quality, text inside
+  images, and real phone fonts for Chinese and Arabic (the container's are
+  fallbacks).
 
 ## Next
 

@@ -98,6 +98,7 @@ const styles = stylex.create({
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
+    unicodeBidi: 'plaintext', // its own direction, not the screen's (D-413)
     width: '100%',
   },
 });

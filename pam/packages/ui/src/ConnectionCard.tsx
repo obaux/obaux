@@ -82,6 +82,10 @@ const styles = stylex.create({
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
+    // Its own direction (D-413): a program's name is written in whatever language its
+    // people use, and an English name in an Arabic screen must lose its end to the
+    // ellipsis, not its beginning.
+    unicodeBidi: 'plaintext',
     minWidth: 0,
   },
   chevron: { flexShrink: 0 },

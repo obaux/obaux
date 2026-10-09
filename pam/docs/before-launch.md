@@ -124,6 +124,59 @@ Will, 7 October 2026: "Add these to Before launch doc" (D-375).
   - on What to expect for a program: if someone who works with you also uses
     Pam as a member, you won't see their member activity.
 
+### Languages, and messages in your own language
+
+Will, 9 October 2026: Brazilian Portuguese, Chinese (Mandarin and Cantonese),
+Russian, Arabic (D-413); messages read in the reader's language (D-414).
+
+- [ ] **Deploy 0082 before the app that offers the languages ships.** It is
+  the one check (`profiles_language_supported`) that lets a profile hold
+  `pt-BR`, `zh-CN`, `zh-HK`, `ru` or `ar`. Until it is live, somebody who
+  picks one gets a failed save. It does not touch any other table. Check
+  `list_migrations` against `packages/db/migrations` first (CLAUDE.md): 0081
+  (link previews) is the one before it. **0083 (message translations) can
+  wait** until translation is switched on; it changes nothing a member sees.
+
+- [ ] **Have a native speaker read every new language** — nobody has. The six
+  new bundles were drafted by a model (Brazilian Portuguese; the other four in
+  parallel against a frozen English snapshot, then re-checked by script) and
+  have not been read by anybody who speaks them. **Start with what is a
+  promise:** the privacy notice, the terms, the transparency screen, the
+  notices (`NOTICES`), and the seven "Switching to…" lines
+  (`SWITCHING_LANGUAGE`, the first words somebody sees in their language).
+  Cantonese readers: check `zh-HK` for Hong Kong wording (訊息, 電話號碼,
+  傾談), not Taiwan's. Arabic: Modern Standard, and check that the
+  right-to-left screens read naturally. Russian: "вы" throughout.
+
+- [ ] **Write and sign off the texts and emails in each language, or decide
+  they stay English/Spanish.** SMS and invite email are drafted and signed
+  off (`reviewedBy`, 160 characters, no emoji, nothing about justice
+  involvement) in English and Spanish only; a person who reads Pam in
+  another language gets those in English. That may be fine for a code that
+  expires in minutes; it is not fine for a reminder. Needs Will's decision
+  per template.
+
+- [ ] **Messages in your own language — switching it on.** Built and tested,
+  off (`MESSAGE_TRANSLATION` in `packages/config/src/translation.ts`; the
+  function's own switch is the secret `MESSAGE_TRANSLATION=on`). Before
+  either is turned on:
+  1. Deploy 0083, then `translate-messages` (`supabase functions deploy
+     translate-messages`), and read `get_advisors`.
+  2. Set `ANTHROPIC_API_KEY` as a function secret — never in this repo — on an
+     account whose terms say what is sent is **not kept and not used to
+     train**. Get that in writing; the privacy page says it ("It keeps
+     nothing and does not learn from them").
+  3. A native speaker reads `privacy.s.translation.*` in all seven languages
+     (it appears on the privacy page the moment the switch is on).
+  4. **Tell members first** (the transparency promise): translation sends the
+     words of a message to another company. Will to word it, as for the two
+     roles (above).
+  5. Decide a cap per person per day. The function limits one call to 30
+     messages and 4,000 characters each, not how often it is called.
+  6. Flip `MESSAGE_TRANSLATION.enabled` to `true`; `legal.test.ts` fails on
+     purpose until it is updated with it. Send two messages between two test
+     accounts in different languages and look at both screens.
+
 ## Done
 
 _(nothing yet)_

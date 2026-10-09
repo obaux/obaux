@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.51.0] — 2026-10-09 · Pam speaks seven languages
+
+Pam is now in Brazilian Portuguese, Simplified Chinese (for Mandarin
+readers), Traditional Chinese (for Cantonese readers), Russian and Arabic, as
+well as English and Spanish. Pick one on the sign-in screen, when you join, or
+under Language. If your phone is set to one of them, Pam starts there. The
+words are downloaded only when you choose a language, with a short screen
+that says in your language what is happening. Arabic reads from right to
+left. Every screen was checked in every language so the words fit: buttons,
+tabs and notifications take a second line instead of being cut off, and a long
+page title gets a little smaller instead of running off the screen (D-413).
+Texts and emails are still written in English and Spanish only.
+
 ## [0.50.1] — 2026-10-09 · Spanish, spelled properly
 
 Pam in Spanish now has its accents, its ñ and its opening ¿ wherever

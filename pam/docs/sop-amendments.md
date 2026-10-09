@@ -504,3 +504,23 @@ wrapped every few words on a phone.
 base size (`--pam-body-size`, which `a11y.spec.ts` checks) is untouched.
 16px is also the floor for the field you type in: below it, iOS zooms the
 page when the field takes focus.
+
+## A22 — Pam is in seven languages, not two (9 October 2026, Will)
+
+Will: "Let's also add a Brazilian portuguese language" — then Chinese
+(Mandarin and Cantonese), Russian and Arabic — and "everyone in the city
+speaks different languages": the choice is the person's, not the place's
+(D-413).
+
+**Where this contradicts the original.** §2.3 and CLAUDE.md say English and
+Spanish, key-for-key. Every language Pam offers is now held to that: the
+same keys, the same placeholders, plural forms where the language has them
+(Russian four, Arabic six), and the dignity check, as tests, not convention.
+
+**What did not change.** Text messages and emails are English and Spanish
+only until each template in another language is drafted and signed off
+(`reviewedBy`); a person reading Pam in another language gets those in
+English. The 18px body size, 48px targets and every rule about words that
+must never appear apply in every language. §12's first-load budget holds:
+only English is in it; the other six are fetched when somebody picks one.
+
