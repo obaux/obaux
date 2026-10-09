@@ -855,6 +855,19 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
+## Spanish, spelled properly (9 October) — 0.48.1, on a branch
+
+D-403, **on `claude/gallant-clarke-0dhizj`, which is `claude/pam-storybook`
+(D-389–D-402, at `f7bc710`) plus this one commit; neither is merged to
+`main`.** 172 strings in `es.json` got back the accents, ñ and opening ¿
+they were typed without ("Todavía", "le invitó", "está", "conexión",
+"Compañeros", "¿Cuál es su número de teléfono?"). Spelling only, checked by
+script: with the marks taken off, every changed string is what it was. No
+key, placeholder, English string or register changed; the transparency
+screen and the legal pages read the same in English and promise nothing
+new. Spanish wording questions found on the way (not spelling) are in the
+backlog below.
+
 ## Conversations, redrawn (8–9 October) — 0.45.5 to 0.48.0, on the branch
 
 D-389 to D-402, **on `claude/pam-storybook`, not merged to `main`.** A
@@ -980,6 +993,14 @@ link (D-331) are part of it.
 Open items Will asked to keep (7 October), newest first. Read this before
 "Next" below, which is older.
 
+- **Spanish wording pass** (D-403, for someone fluent to sign off): one name
+  for a case manager (`gestor de casos` almost everywhere; "Gerentes de caso",
+  "Un trabajador del caso", "administrador de casos" once each); "Visitas"
+  vs "Viajes" for trips; "resume" → "currículum"
+  (`category.sub.resume_interview_help`); "quiere trabajar en"
+  (`transparency.canSee.goals`); "se inscriba" (`privacy.s.sharing.p2`);
+  and whether the tú screens (sign-in, account, join, the redesigned member
+  screens) should be usted like the rest.
 - **Voice notes** (D-394): `attachment_kind 'voice'` is refused by 0079
   until voice notes get storage and rules of their own. Photos are built.
 - **One account, both roles — follow-ups** (D-375): notifications by

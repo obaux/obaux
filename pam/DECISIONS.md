@@ -10045,3 +10045,66 @@ list. This will help users access files / photos shared easily."
 - Stories: Member and Case manager › *Photos and documents*; the prototype
   route; the flow map's options node gains the page.
 
+### D-403 — Spanish, spelled properly: accents, ñ and ¿ restored across `es.json`
+
+**Date:** 2026-10-09. Will: "Do a careful proofreading pass over `es.json`
+only … restore accents and ñ where standard Spanish requires them." The pass
+D-399 left for later.
+
+- **What changed.** 172 of 1,423 Spanish strings, nowhere else. "Todavia" →
+  "Todavía", "le invito" → "le invitó", "esta mal" → "está mal", "Olvidelo" →
+  "Olvídelo", "conexion" → "conexión", "revision" → "revisión", "aparecera
+  aqui" → "aparecerá aquí", "Companeros" → "Compañeros", "Ninos" → "Niños",
+  "contrasena" → "contraseña", "telefono" → "teléfono", "Lider" → "Líder".
+  By area: notices (25), privacy (17), terms (16), onboarding (12), admin
+  (10), sign-in (9), the transparency screen (8), and fewer elsewhere.
+  Strings that already had their accents were not touched.
+- **Accents only, checked by script.** Every changed string, with its
+  accents, ñ, ü and ¿¡ taken off, is identical to what it was. So no word,
+  key, `{placeholder}` or punctuation changed apart from those marks, and
+  meaning cannot have drifted.
+- **¿ added where the question had lost it.** Eight questions had only the
+  closing mark ("Le sirvio esto?" → "¿Le sirvió esto?"; "Cual es su numero
+  de telefono?" → "¿Cuál es su número de teléfono?"). The same cause as the
+  missing accents: typed without the Spanish keyboard. Standard Spanish
+  needs both marks, so they are in. Every `?` and `!` in `es.json` now has
+  its opening mark.
+- **The ones that depend on use were decided by use.** que/qué,
+  como/cómo, cuando/cuándo, donde/dónde, quien/quién, esta/está, si/sí,
+  tu/tú, el/él, mas/más. A question, said straight or reported, takes the
+  accent: "Elija qué está mal", "para que vea cómo se ve esto", "le puede
+  indicar cuál". A relative or a condition does not: "la persona que le
+  invitó", "Cuando alguien use su código", "Llame a Pam si tiene preguntas".
+  The privacy and transparency lines about saves were read against their
+  English ("when you save a new place — not which one" is *what* the person
+  sees, a reported question) and now say "cuándo guarda un lugar nuevo —
+  no cuál", matching `admin.seeing.body`, which already did. "Usó Pam"
+  (`admin.lastActive`) is the past tense the English says ("Last used
+  Pam"), not "Uso" (I use).
+- **"Solo" stays without an accent.** The RAE dropped it in 2010 and the
+  newer strings already write it that way.
+- **Register left alone.** No single string mixes tú and usted (checked
+  string by string; the hits were third-person verbs like "Pam revisa" and
+  the noun "un toque"). Some screens are tú (sign-in, account, join, the
+  member-side redesign) and most are usted; that is a choice between
+  strings, out of scope here, so nothing moved.
+- **Not a change to what anyone is promised.** The transparency screen and
+  the privacy and terms pages changed spelling only. The English, which
+  `transparency.ts` and the legal tests hold word for word, is untouched;
+  the "Actualizado el 8 de octubre" dates stay, because the terms did not
+  change; and no member needs telling first.
+- **Noticed, not changed, because they are wording, not spelling.**
+  `category.sub.resume_interview_help` says "resume", which is English
+  ("currículum"); a case manager is called four things ("gestor de casos"
+  almost everywhere, but "Gerentes de caso", "Un trabajador del caso",
+  "administrador de casos" in one string each); a trip is both "Visitas"
+  (the tab) and "Viajes" (`trips.booked.body`, `join.booked.trips`);
+  `transparency.canSee.goals` lacks its "en" ("quiere trabajar en");
+  `privacy.s.sharing.p2` wants the subjunctive ("se inscriba"). Listed in
+  STATUS's backlog for a wording pass that someone fluent signs off.
+- **Numbered D-403, written as D-400.** Another session's D-400–D-402 (and
+  0.47.1/0.48.0) reached `claude/pam-storybook` while this pass was being
+  checked; this one was not yet pushed, so it took the next numbers (D-403,
+  0.48.1) and was rebuilt on top of theirs. Their seven new Spanish strings
+  (D-402's Photos and documents page) were already accented; none of the 172
+  strings here was one they had changed.

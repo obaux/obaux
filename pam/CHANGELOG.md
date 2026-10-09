@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.48.1] — 2026-10-09 · Spanish, spelled properly
+
+Pam in Spanish now has its accents, its ñ and its opening ¿ wherever
+Spanish needs them: "Todavía", "teléfono", "Compañeros", "¿Cuál es su número
+de teléfono?". 172 lines were fixed, from the sign-in screen and the notices
+to the privacy page and the terms. Only the spelling changed, so nothing
+says anything new (D-403).
+
 ## [0.48.0] — 2026-10-09 · Everything shared, in one place
 
 A conversation's ⋯ page has a new first row, Photos and documents: every
