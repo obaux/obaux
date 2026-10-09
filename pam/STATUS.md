@@ -427,6 +427,17 @@ From a request the super admin can open the requested program and text the
 requester. In the redesign they can also message staff (never members),
 backed by 0072, now live (D-262).
 
+**9 October (D-412): two English promises that contradicted other copy,
+found by translators.** *Points* — fixed: Will confirmed case managers see
+awards, badges and points, so `points.intro` now says the person who invited
+you can see them and programs and other members cannot (en + es; nothing
+widened). *Messages* — **open, waiting on Will**: `terms.s.limits.p2` says
+"Messages are never turned off", but a **limited** account cannot send or
+start a message (`is_active_account()` on `messages_insert_sender` and
+`open_direct_conversation`, live) and a **suspended** one cannot sign in; only
+the per-feature switch is refused (0031, A6). See "What needs a human" row 32.
+The pt-BR, zh-CN, zh-HK, ru and ar bundles are on no branch here.
+
 This is the handover document: what exists, what is proven, what is live, and
 what the next person needs to know before touching anything.
 
@@ -807,6 +818,7 @@ while the copy is unsigned, so it earned the first live test, not the last.*
 | 28 | **A Chromatic project token** | Storybook updating on every push | chromatic.com → sign in with GitHub → link `obaux/obaux` → add the token as the repository secret `CHROMATIC_PROJECT_TOKEN`. The workflow (`pam-storybook.yml`) skips itself until then. |
 | 29 | ~~Where the dock's People and My Plan lead~~ **Answered by the redesign (D-210)** | — | Will, 1 October: the bar is Explore, Saved, Trips, Messages, Profile; Help moves to each screen's header and Profile. Next: his reference screenshots for the other screens, then wiring the redesigned views to routes and data. Walk it in `Prototype/Redesign — member` (D-211). |
 | 30 | ~~Deploy `0071` and `0072`~~ **Done (Will, 4 October)** | — | `list_migrations` first: live ran to `0070`, no live-only drift; `can_message`, `messageable_people` and `open_direct_conversation` matched 0063 exactly, which 0072 was written against. Both applied; `get_advisors` (security) shows no new kind of finding (the definer functions are guarded inside, as every other one is; `invite_preview` and `request_invite_link` are anon on purpose). Spot-checked: `invite_emails` forced RLS with one policy and no anon access; `invites_log` and `staff_request_phone` not callable signed out. See D-264. |
+| 32 | **Messages: can an account's messages ever be turned off?** | `terms.s.limits.p2`, `notice.account_limited.body` | Two answers, both Will's to choose (D-412 follows up). The copy says "never turned off"; the database turns sending off for a `limited` account and sign-in off for a `suspended` one (set by any case manager covering the person, with a reason, via `admin_set_access_status`; no screen calls it yet, nothing shows `account_limited`, and no live account is limited). Either change the code (a limited account keeps messaging; wording says a paused account can't sign in) or change the promise (members told first, `docs/before-launch.md`; A6 noted as covering only the feature switch). Also open: whether the member's transparency line should name badges, and the bundles for the five new languages. |
 | 31 | **The before-launch list** | Launch | `docs/before-launch.md` — Will's list of what must be done before real people use PAM. First entry: the email provider for invite links. **0068/0069** are merged as 0075/0076 with 0072's arm kept (D-346); they wait for Will to apply them live. Program sign-up and Add a program are a one-question wizard with a review (D-347); Add a policy is a card (D-348); super admin → program lead message from a place (D-349). |
 
 ---

@@ -9537,3 +9537,52 @@ names its key, `profile_roles!profile_roles_profile_id_fkey(role)`; the
 response key is unchanged. Rule for next time: any new table with two
 foreign keys to the same table needs its embeds hinted, and a test that
 reads the select string, not just the mock's answer.
+
+### D-412 — The Points screen says who can see points
+
+**Date:** 2026-10-09. **Decided by:** Will — "Case manager can see awards,
+badges, and points from members."
+
+**What was wrong.** Two translators, translating Pam into Chinese, noticed
+that `points.intro` said "They are yours and nobody else sees them" while
+`transparency.canSee.points`, `join.privacy.admin.1` and `admin.seeing.body`
+all say the case manager who invited a member can see their points. The
+sentence was the odd one out, not the behaviour:
+
+- `points_ledger_select_admin` (`0007_rls.sql:592`) and `member_points()`
+  (`0010_harden_functions.sql:102`) hand the balance to an admin who
+  `admin_covers()` the member — and to the member. Nobody else: there is no
+  program policy, and `member_points()` returns null for any other caller.
+  Checked on the live project (policies and function bodies) on 9 October.
+- A case manager's Home rows, `/admin/` and the member's page show "N points".
+- `points_and_level` is in `ADMIN_CAN_SEE`; the database suite asserts a
+  case manager reads their caseload's points (`04_rpc_test.sql`).
+- The long privacy page already said so (`privacy.s.who-can-see.p1`).
+
+**What changed.** `points.intro`, English and Spanish: "They are yours. The
+person who invited you can see them. Programs and other members cannot." It
+states what is true and the two protections that hold (a program never sees
+points — `member_activity_for_a_program` in `ADMIN_CANNOT_SEE`; nor does any
+other member). `docs/points-awarding.md` principle 8 now says the same. No
+behaviour, migration or contract change: the promise was corrected to match
+the code, which already matched the contract, so nothing was widened and
+there is nothing to tell members beforehand. (The live project had three
+accounts, all `active`, when this was checked.)
+
+**Left open, for Will.**
+
+1. **Badges.** Will's answer includes badges. The case manager can read
+   them (`member_badges_select_admin`, `0007_rls.sql:600`) and
+   `join.privacy.admin.1` tells the case manager so ("Their badges, their
+   points…"), but the member-facing line is "Your points and your level"
+   (`transparency.canSee.points`). Whether "level" covers badges is a
+   contract question; the line was not changed without his word.
+2. **Region, not only the inviter.** `admin_covers()` also covers any case
+   manager in the member's city. Every member-facing line says "the person who
+   invited you". True for the ordinary case; not the whole truth.
+3. **Other languages.** The five bundles the translators worked on
+   (pt-BR, zh-CN, zh-HK, ru, ar) are on no branch of this repository; only
+   `en` and `es` exist. `points.intro` must be changed in each when they land.
+
+**Numbering.** `claude/pam-storybook` already reaches D-411 and
+`claude/gallant-clarke-0dhizj` D-403; this is D-412 to stay clear of both.

@@ -491,7 +491,7 @@
   "points.group.category": "Para cada tipo de ayuda",
   "points.group.core": "La escalera",
   "points.group.milestone": "Una sola vez",
-  "points.intro": "Los puntos vienen de lo que usted hace allá afuera: inscribirse, presentarse, seguir adelante. Son suyos y nadie más los ve.",
+  "points.intro": "Los puntos vienen de lo que usted hace allá afuera: inscribirse, presentarse, seguir adelante. Son suyos. La persona que le invitó puede verlos. Los programas y otras personas no pueden.",
   "points.label": "Sus puntos",
   "points.locked": "Todavía no",
   "points.next": "Faltan {count}",

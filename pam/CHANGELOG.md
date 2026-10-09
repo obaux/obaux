@@ -1,5 +1,11 @@
 # Changelog
 
+## [Unreleased] — 2026-10-09 · Points say who can see them
+
+The Points screen no longer says "nobody else sees them". It now says what is
+true: the person who invited you can see your points, and programs and other
+members cannot (D-412).
+
 ## [0.45.4] — 2026-10-08 · Live
 
 The changes since 0.43 are live: invites name the person they're for, one
