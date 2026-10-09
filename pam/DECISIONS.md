@@ -10035,3 +10035,70 @@ app now shows all of it. **Not merged, and now behind `main`:**
 next resolves those conflicts (and renumbers: their D-numbers and 0079–0081 do not
 collide with D-412–D-420 or 0082, but the changelog versions will need ordering).
 
+
+### D-426 — "Your guide" everywhere a member is told who to call; a limited account is told it is off, and who to call (p3 kept)
+
+**Date:** 2026-10-09. **Decided by:** Will: "resolve the remaining. Yes use Your
+guide for short."
+
+**Why.** Three things D-413–D-417 had left open, each a promise Pam made and did
+not keep or a word it had not settled:
+
+1. **"Your guide" for short (D-416's open question).** The long phrase — "the
+   person who invited you, or a staff member responsible for guiding you" — now
+   appears only where it *defines* the word (the transparency screen, the guide
+   card, the privacy policy). Everywhere else a member is told who to call or who
+   sees a report it is "your guide": Help (`help.what.person`), the three report
+   screens (`messages.report.intro`, `.done.body`, `.thread.intro`), the paused
+   and turned-off notices (`notice.account_suspended.body`,
+   `notice.feature_turned_off.body`), `access.limitedNotice`, and the matching
+   English sources in `notices.ts`. Spanish in step ("su guía", "tu guía" in the
+   thread report, which already used *tú*). The invite-code strings, which are
+   about the inviter literally, did not change.
+2. **`notice.account_limited.body` said the opposite of the terms.** It read
+   "Messages and new people are off for now"; the terms (D-413) say a limited
+   account can read messages and cannot send or meet new people. It now says
+   exactly that, and offers the guide *and* Pam as the people to call.
+3. **`terms.s.limits.p3` is true.** "When something is turned off, Pam tells you
+   it is off and who to call" was unkept: nothing rendered `account_limited` and
+   a refused send said "Your connection dropped". Now:
+   - `Session.accessStatus` (`profiles.access_status`, already selected): `active`
+     or `limited`. `suspended` stays its own state.
+   - **Messages** (`app/messages/page.tsx`): a limited member sees the list and,
+     where *New message* would be, the `account_limited` notice with the call
+     button. (One primary action per screen: the notice replaces the button, it
+     does not sit beside it.) The Storybook redesign of Messages
+     (`screens/MessagesScreen.tsx` → `MessagesView`'s `limited` slot) drops *New
+     message* and shows the same notice under the list.
+   - **A conversation**: every message stays; the notice stands where the
+     composer was (`ThreadView`'s `limited` prop, `LimitedNotice`).
+   - **A refused send**: `useThread.send` no longer assumes a failed insert is a
+     dropped connection. On failure it asks once (`lib/accountLimited.ts`,
+     `profiles.access_status` for the signed-in account) whether the account is
+     limited; if so `limited` is set and the screen swaps the composer for the
+     notice, otherwise `sendFailed` and "Your connection dropped" as before. If it
+     cannot tell (offline) the answer is the generic one, which is then true.
+   - A refused *start* (`open_direct_conversation`, from a person's page, the
+     Home caseload or Connections) already navigates to Messages on failure
+     (`router.push('/messages/')`), where a limited account now sees the notice.
+
+**Not done, deliberately.** The New message picker's own failure line
+(`messages.start.failed.body`, "Your connection dropped") is only reachable by an
+account that was limited *after* Messages loaded; the button is gone for one that
+was limited before. Left as is: a rare edge, and the next load says the right
+thing. A limited *case manager* (the fixtures have one) takes the same paths.
+
+**Tests.** `e2e/messages.spec.ts`: a limited list (no *New message*, notice with a
+`tel:` link, axe clean); a limited conversation (log still readable, no textbox,
+no send button, notice, axe clean); a send refused with `42501` for an account that
+was active when the screen loaded (notice appears, no "Your connection dropped",
+composer gone); a send that fails with a 500 for an account that is not limited
+(still "Your connection dropped"). Storybook: *Member / Created / States / Limited
+account* (Messages, A conversation, Spanish), with `installSupabaseMock(role,
+{ limited: true })` limiting the pretend member and refusing the insert as
+`messages_insert_sender` does.
+
+**Numbering.** D-426 because `claude/gallant-clarke-0dhizj` holds D-421–D-423 and
+its `docs/allocations.md` (not on `main` yet) says D-424 is next; D-424 and D-425
+are left for it. This branch has no allocations file; claim the number there when
+the two meet.

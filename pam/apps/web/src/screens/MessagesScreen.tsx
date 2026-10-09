@@ -7,12 +7,14 @@ import { dummyConversationsFor } from '@pam/config/dummy-conversations';
 import { DUMMY_ANYONE } from '@pam/config/dummy-people';
 import { useI18n } from '@/lib/i18n';
 import { useSession } from '@/lib/useSession';
+import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useRoleView } from '@/lib/useViewedRole';
 import { useConversations } from '@/lib/useConversations';
 import { whenHappened } from '@/lib/when';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { contextFor, dummyPickerPeople, pickerContextFor } from '../app/messages/DummyRows';
 import { NewMessagePickerLazy } from '../app/messages/NewMessagePickerLazy';
+import { LimitedNotice } from '../app/messages/LimitedNotice';
 import type { PickablePerson } from '../app/messages/NewMessagePicker';
 import { useMessageableMembers } from '@/lib/useMessageableMembers';
 import { openConversation } from '@/lib/openConversation';
@@ -30,6 +32,7 @@ import { MessagesView, type MessageRow } from './MessagesView';
 export function MessagesScreen() {
   const { t, locale } = useI18n();
   const { state: session } = useSession();
+  const supportPhone = useSupportPhone();
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
   // A limited account reads but cannot start a message (0031): no New message,
   // and the screen says what is off and who to call (terms.s.limits.p3, D-426).
@@ -128,7 +131,8 @@ export function MessagesScreen() {
                 : 'messages.empty.body.staff',
         )}
         headerActions={<HeaderActions role={viewedRole} enabled={session.status === 'signed-in'} hasHelp={false} />}
-        note={limited ? t('access.limitedNotice') : useExamples ? t('example.people.note') : null}
+        note={useExamples ? t('example.people.note') : null}
+        {...(limited ? { limited: <LimitedNotice supportPhone={supportPhone} /> } : {})}
         {...(canMessage && !limited ? { onNewMessage: () => setPicking(true) } : {})}
         // A member's people, one tap away (Will, 3 October, D-246): the same
         // strip a case manager's Home floats for Invite someone.

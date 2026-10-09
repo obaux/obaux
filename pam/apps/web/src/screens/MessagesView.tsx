@@ -58,6 +58,11 @@ export interface MessagesViewProps {
   readonly onNewMessage?: () => void;
   /** Under the list — "These are example people". */
   readonly note?: string | null;
+  /**
+   * Where New message would be, for a limited account (D-426): the notice that
+   * says what is off and who to call. The account can still read the list.
+   */
+  readonly limited?: ReactNode;
   /** Open in search mode (for a story). */
   readonly initialSearch?: string | null;
   /**
@@ -157,6 +162,7 @@ export function MessagesView({
   emptyBody,
   headerActions,
   note,
+  limited,
   initialSearch = null,
   onNewMessage,
   floating,
@@ -261,6 +267,8 @@ export function MessagesView({
           ) : null}
         </VStack>
       ) : null}
+
+      {limited}
     </Page>
     {floating}
     </>

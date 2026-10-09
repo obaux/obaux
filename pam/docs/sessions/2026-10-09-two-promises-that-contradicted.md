@@ -63,6 +63,17 @@ decided.
   heading, and one copy icon top right (tooltip, tick for 5 seconds). The plain
   look and its code were deleted.
 
+- **The remaining items (D-426).** Will: "resolve the remaining. Yes use Your guide
+  for short." (1) "Your guide" is the short word: the long phrase now appears only
+  where it defines the word; Help, the three report screens and the paused /
+  turned-off / limited notices say "your guide" (eight strings, en + es,
+  `notices.ts`). (2) `terms.s.limits.p3` is true: a limited account sees the
+  `account_limited` notice on Messages (in place of New message) and where the
+  composer was in a conversation, and a refused send no longer says "Your
+  connection dropped" — `useThread.send` asks once whether the account is limited
+  (`lib/accountLimited.ts`). `Session` gained `accessStatus`. (3) The first-load
+  budget check ran. (4) The translation session was sent the eight changed keys.
+
 ## What was wrong, and what missed it
 
 **A test hardcoded a count and broke without anyone seeing.** `e2e/legal.spec.ts`
@@ -83,6 +94,14 @@ at a different time (A6 on 12 September, the points screen later). The
 translators saw it because translation forces every sentence to be read slowly
 and side by side.
 
+**`notice.account_limited.body` said the opposite of the terms we had just
+written.** Found while wiring p3: it read "Messages and new people are off for
+now", and D-413's terms say a limited account can *read* messages. It existed since
+before this session and nothing rendered it, so nothing showed the contradiction.
+Rewritten (en + es) to what the database does. The check that would have caught it
+is the same one that caught the first two: reading every sentence a member can meet
+about one thing, side by side — a translator's habit, not a test's.
+
 ## Decisions
 
 - D-412 — points: the Points screen says who can see them.
@@ -96,6 +115,8 @@ and side by side.
   screens, in two looks for Will to choose.
 - D-417 — Will's choices: icons; a short Profile screen; a flat policy with one
   copy icon (tooltip, tick, 5 seconds).
+- D-426 — "your guide" for short; a limited account is told it is off and who to
+  call (p3 kept and built).
 
 ## Verified
 
