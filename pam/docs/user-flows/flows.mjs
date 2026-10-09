@@ -243,18 +243,18 @@ export const flows = [
         note: 'Says who sees the one message: Pam and your guide',
       },
       messagesLimited: {
-        title: 'Messages — account limited',
+        title: 'Limited Messages',
         story: 'member-created-states-limited-account--messages',
         path: '/messages/',
         changed: 'D-427',
-        note: 'Reads as before, but no New message: a notice says what is off and who to call',
+        note: 'No New message; a notice says what is off and who to call',
       },
       threadLimited: {
-        title: 'A conversation — account limited',
+        title: 'Limited chat',
         story: 'member-created-states-limited-account--conversation',
         path: '/messages/thread/',
         changed: 'D-427',
-        note: 'Every message stays; the notice, with a call button, stands where the composer was',
+        note: 'Messages stay; the notice stands where the composer was',
       },
       profile: {
         title: 'Profile',

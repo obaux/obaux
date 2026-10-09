@@ -84,8 +84,15 @@ decided.
   branch also publishes five machine-translated languages, privacy page, terms
   and transparency screen included, which its own record says no native speaker
   has read, and Will's answer on that is still to come. Privacy-by-email is not
-  yet possible: Pam holds no member email address (D-429). The flow map: pages
-  `2 · Member` changed in `flows.mjs`.
+  yet possible: Pam holds no member email address (D-429). The flow map: `flows.mjs` gained Limited
+  Messages, Limited chat and Report a message (and three edges); the Figma page
+  `1 · Member` of "PAM — User flows" was redrawn from it (25 screens, 28 arrows,
+  checked in a Figma screenshot). Left as it was: the `0 · Overview` page (a
+  one-flow run would have replaced all five columns with one; it needs a full run
+  of every flow) and the screenshots in the slots (mcp.figma.com is blocked here,
+  D-264). The "Open in Storybook" links on the three new cards use the old
+  `claude-pam-storybook` Chromatic address in `STORYBOOK_URL`, which does not have
+  these stories; change it when this branch's Storybook has an address.
 
 ## What was wrong, and what missed it
 
