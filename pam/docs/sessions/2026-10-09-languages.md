@@ -81,9 +81,9 @@ added:
 | `@pam/ui` tests | 74 pass |
 | `@pam/web` unit tests | 40 pass |
 | Database suite | all pass through `19_message_translations_test.sql` (0084); `18_more_languages` proves 0083; `19` proves who can read, write and delete a translation |
-| Browser e2e (3 projects, `pnpm build` first, run twice: before and after the last tab and bidi changes) | **816 pass**, 0 fail (6 minutes at 4 workers) — includes the new language page-fit checks |
-| First-load JS (`check-bundle-budget.mjs`) | 541.8 kB of 600 kB; 58.2 kB to spare |
-| Storybook build | passes (455 stories outside Foundations) |
+| Browser e2e (3 projects, `pnpm build` first, run twice: before and after the last tab and bidi changes) | **816 pass**, 0 fail (8 minutes at 2 workers, re-run on the tree merged with `main` at D-420) — includes the new language page-fit checks |
+| First-load JS (`check-bundle-budget.mjs`) | 542.7 kB of 600 kB; 57.3 kB to spare (after merging `main`) |
+| Storybook build | passes on the merged tree (455 stories outside Foundations) |
 | Fit audit, 455 stories × 7 languages × 320px (first run, before the merge: 446) | first run 353 new defects; after the fixes 29 remain, each looked at (design or detector noise — listed in D-422); the About tabs re-checked at 0 |
 | Mutation checks | reading with the service role instead of the reader's sign-in fails 8 handler tests; the dignity check on the translation prompt was vacuous until it was given an object instead of a string |
 
