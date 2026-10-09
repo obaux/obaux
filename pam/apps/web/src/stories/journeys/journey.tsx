@@ -2,7 +2,7 @@ import type { StoryObj } from '@storybook/nextjs';
 import { PrototypeApp, prototypeRouter } from '../prototype/PrototypeApp';
 import { REDESIGN_ROUTES, redesignChrome } from '../prototype/routes';
 import { ROLES, type JourneyRole } from './fixtures';
-import { installSupabaseMock } from './mockSupabase';
+import { installSupabaseMock, type MockOptions } from './mockSupabase';
 import { markFreshAccount, markSetupDone, saveSentProgram, type SetupStep } from '../../lib/programSetup';
 import type { ProgramDetails } from '../../lib/useJoin';
 import { addTrip, type AddedTrip } from '../../lib/addedTrips';
@@ -16,14 +16,19 @@ import { addTrip, type AddedTrip } from '../../lib/addedTrips';
  * is a tab, so a tap on a card, a link or Back goes to the app's next screen
  * as it now looks — never to the old design, and never to a 404.
  */
-export function asRole(role: JourneyRole, pathname: string, query: Record<string, string> = {}): StoryObj {
+export function asRole(
+  role: JourneyRole,
+  pathname: string,
+  query: Record<string, string> = {},
+  options: MockOptions = {},
+): StoryObj {
   const search = new URLSearchParams(query).toString();
   const start = `${pathname}${search ? `?${search}` : ''}`;
   return {
     name: ROLES[role].title,
     loaders: [
       async () => {
-        installSupabaseMock(role);
+        installSupabaseMock(role, options);
         return {};
       },
     ],

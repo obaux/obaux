@@ -58,7 +58,13 @@ type Route = (url: string, method: string, body: unknown) => Answer | null;
 
 const PROJECT_REF = new URL(SUPABASE_URL).hostname.split('.')[0];
 
-function routesFor(journeyRole: JourneyRole): Route[] {
+/** What a story can change about the pretend account. */
+export interface MockOptions {
+  /** A limited account (0031): reads, but the database refuses a send (D-426). */
+  readonly limited?: boolean;
+}
+
+function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[] {
   const profile = ROLES[journeyRole].profile;
   const role = profile?.role ?? null;
   const has = (part: string) => (url: string) => url.includes(part);
@@ -109,7 +115,7 @@ function routesFor(journeyRole: JourneyRole): Route[] {
                 id: ME_ID,
                 ...profile,
                 region_id: REGION_ID,
-                access_status: 'active',
+                access_status: options.limited ? 'limited' : 'active',
                 onboarded_at: new Date().toISOString(),
                 preferred_language: 'en',
                 is_demo: false,
@@ -210,11 +216,17 @@ function routesFor(journeyRole: JourneyRole): Route[] {
     on('/rpc/open_direct_conversation', () => ({ body: CONVO_ID })),
     on('/rpc/conversation_partners', () => ({ body: [partnerFor(role)] })),
     on('/rpc/conversation_block_state', () => ({ body: [{ i_blocked: false, blocked_me: false }] })),
-    on('/rest/v1/messages', (_url, method) =>
-      method === 'POST'
-        ? { body: { id: 'new', sender_id: ME_ID, body: 'Sent from Storybook', created_at: new Date().toISOString() } }
-        : { body: threadFor(role) },
-    ),
+    on('/rest/v1/messages', (_url, method) => {
+      if (method !== 'POST') return { body: threadFor(role) };
+      // What `messages_insert_sender` answers a limited account (0031).
+      if (options.limited) {
+        return {
+          status: 403,
+          body: { code: '42501', message: 'new row violates row-level security policy for table "messages"' },
+        };
+      }
+      return { body: { id: 'new', sender_id: ME_ID, body: 'Sent from Storybook', created_at: new Date().toISOString() } };
+    }),
     on('/rest/v1/app_settings', () => ({ body: { value: '+12673095265' } })),
     on('/rest/v1/regions', () => ({ body: [{ id: REGION_ID, name: 'Philadelphia' }] })),
     on('/rest/v1/staff_requests', () => ({ body: STAFF_REQUESTS })),
@@ -255,7 +267,7 @@ function urlOf(input: RequestInfo | URL): string {
   return input.url;
 }
 
-export function installSupabaseMock(journeyRole: JourneyRole): void {
+export function installSupabaseMock(journeyRole: JourneyRole, options: MockOptions = {}): void {
   const profile = ROLES[journeyRole].profile;
 
   // A fresh browser for every story: no previous story's preview role,
@@ -278,7 +290,7 @@ export function installSupabaseMock(journeyRole: JourneyRole): void {
   }
 
   const real = (window.__pamRealFetch ??= window.fetch.bind(window));
-  const routes = routesFor(journeyRole);
+  const routes = routesFor(journeyRole, options);
 
   window.fetch = async (input: RequestInfo | URL, init?: RequestInit) => {
     const url = urlOf(input);

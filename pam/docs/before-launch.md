@@ -112,15 +112,19 @@ STATUS row too.
   case manager (signed up alone, or invited by a program lead or a super
   admin) are read by none: the screen to assign one is on the STATUS backlog.
 
-- [ ] **Make `terms.s.limits.p3` true** (Will, 9 October 2026: "Keep
-  terms.s.limits.p3"). The terms promise "When something is turned off, Pam
-  tells you it is off and who to call." Nothing shows the `account_limited`
-  notice, and a refused send says "Your connection dropped"
-  (`messages.thread.failed.body`), which would be untrue for a limited
-  account. Show the notice (it already says what is off and offers the call
-  button) where a limited member meets it — Messages and a conversation at
-  least — and make a refused send for a limited account say why. Before any
-  case manager can limit anyone.
+- [x] **Make `terms.s.limits.p3` true** — **done 9 October 2026 (Will, D-426:
+  "resolve the remaining")** (Will, 9 October 2026: "Keep terms.s.limits.p3").
+  The terms promise "When something is turned off, Pam tells you it is off and
+  who to call." Messages now shows the `account_limited` notice (with the call
+  button) in place of New message, a conversation shows it where the composer
+  was, and a send the database refuses for a limited account says so instead of
+  "Your connection dropped". Covered by `e2e/messages.spec.ts` and the Storybook
+  story *Member / Created / States / Limited account*. Left over, on purpose: the
+  New message picker's own failure line, reachable only by an account limited
+  after Messages loaded. The app has no button that
+  limits anyone yet (nothing calls `admin_set_access_status`, and the screen to
+  assign a case manager is on the STATUS backlog), so a member only meets this
+  once the database function is used by hand or that screen exists.
 
 - [ ] **Review the SMS copy** still waiting for a name in `reviewedBy`
   (STATUS row 2).

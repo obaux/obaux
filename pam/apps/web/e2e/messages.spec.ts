@@ -51,7 +51,12 @@ async function seedSession(page: import('@playwright/test').Page) {
   }, ME);
 }
 
-async function signedInAs(page: import('@playwright/test').Page, role: 'admin' | 'member' | 'super_admin') {
+async function signedInAs(
+  page: import('@playwright/test').Page,
+  role: 'admin' | 'member' | 'super_admin',
+  /** Read at each request, so a test can limit the account part-way through. */
+  accessStatus: () => 'active' | 'limited' = () => 'active',
+) {
   await seedSession(page);
   await page.route(NOTIFICATIONS, (route) => route.fulfill(json([])));
   await page.route(CONTROLS, (route) => route.fulfill(json([])));
@@ -63,6 +68,7 @@ async function signedInAs(page: import('@playwright/test').Page, role: 'admin' |
         id: ME,
         role,
         first_name: 'Will',
+        access_status: accessStatus(),
         region_id: '0195b1c0-0000-4000-8000-000000000001',
         regions: { name: 'Philadelphia' },
       }),
@@ -145,6 +151,23 @@ test.describe('the conversation list', () => {
     expect(pad.right).toBe('12px');
     // The page's own 16px gutter, and nothing added inside the row.
     expect(pad.picture).toBe(16);
+  });
+
+  test('a limited account reads its list, with no New message and a notice that says why (terms.s.limits.p3)', async ({
+    page,
+  }) => {
+    await signedInAs(page, 'member', () => 'limited');
+    await withOneConversation(page);
+    await page.goto('/messages/');
+    await settled(page);
+
+    await expect(page.getByRole('link', { name: /Marcus/ })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'New message' })).toHaveCount(0);
+    await expect(page.getByRole('alert').getByText('Some things are turned off')).toBeVisible();
+    await expect(page.getByRole('alert').getByRole('link', { name: /Call/ })).toHaveAttribute('href', /^tel:/);
+
+    const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
+    expect(results.violations).toEqual([]);
   });
 
   test('has no help link (A15) — the logo is one tap back to Home, which always has one', async ({ page }) => {
@@ -537,6 +560,76 @@ test.describe('a conversation', () => {
     await page.getByRole('textbox').fill('See you Thursday.');
     await page.getByRole('button', { name: /send/i }).click();
     await expect(page.getByRole('log').getByText('See you Thursday.')).toBeVisible();
+  });
+
+  test('a limited account reads, and the composer says what is off and who to call (terms.s.limits.p3)', async ({ page }) => {
+    await signedInAs(page, 'member', () => 'limited');
+    await withOneConversation(page);
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+
+    // The conversation is still there to read...
+    await expect(page.getByRole('log').getByText('Is the class still on Tuesday?')).toBeVisible();
+    // ...there is nowhere to type or send...
+    await expect(page.getByRole('textbox')).toHaveCount(0);
+    await expect(page.getByRole('button', { name: /send/i })).toHaveCount(0);
+    // ...and Pam says so, with a way to reach a person.
+    await expect(page.getByRole('alert').getByText('Some things are turned off')).toBeVisible();
+    await expect(page.getByRole('alert').getByText(/Call your guide or Pam/)).toBeVisible();
+    await expect(page.getByRole('alert').getByRole('link', { name: /Call/ })).toHaveAttribute('href', /^tel:/);
+
+    const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
+    expect(results.violations).toEqual([]);
+  });
+
+  test('a send the database refuses because the account was limited says so, not "your connection dropped"', async ({
+    page,
+  }) => {
+    // Active when the screen loads; limited by the time the send is refused.
+    let limited = false;
+    await signedInAs(page, 'member', () => (limited ? 'limited' : 'active'));
+    await withOneConversation(page);
+    await page.route(MESSAGES, (route) => {
+      if (route.request().method() === 'POST') {
+        limited = true;
+        return route.fulfill({
+          status: 403,
+          contentType: 'application/json',
+          body: JSON.stringify({ code: '42501', message: 'new row violates row-level security policy for table "messages"' }),
+        });
+      }
+      return route.fulfill(
+        json([{ id: MSG_THEIRS, conversation_id: CONVO, sender_id: OTHER, body: 'Is the class still on Tuesday?', created_at: new Date().toISOString() }]),
+      );
+    });
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+
+    await page.getByRole('textbox').fill('See you Thursday.');
+    await page.getByRole('button', { name: /send/i }).click();
+
+    await expect(page.getByRole('alert').getByText('Some things are turned off')).toBeVisible();
+    await expect(page.getByText('Your connection dropped')).toHaveCount(0);
+    await expect(page.getByRole('textbox')).toHaveCount(0);
+  });
+
+  test('a send that fails for any other reason still says the connection dropped', async ({ page }) => {
+    await signedInAs(page, 'member');
+    await withOneConversation(page);
+    await page.route(MESSAGES, (route) => {
+      if (route.request().method() === 'POST') return route.fulfill({ status: 500, contentType: 'application/json', body: '{}' });
+      return route.fulfill(
+        json([{ id: MSG_THEIRS, conversation_id: CONVO, sender_id: OTHER, body: 'Is the class still on Tuesday?', created_at: new Date().toISOString() }]),
+      );
+    });
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+
+    await page.getByRole('textbox').fill('See you Thursday.');
+    await page.getByRole('button', { name: /send/i }).click();
+
+    await expect(page.getByText('Your connection dropped')).toBeVisible();
+    await expect(page.getByText('Some things are turned off')).toHaveCount(0);
   });
 
   test('reporting picks a reason and ends in a thank-you, never a dead end', async ({ page }) => {

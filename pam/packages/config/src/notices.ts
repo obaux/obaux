@@ -114,21 +114,28 @@ export const NOTICES: Readonly<Record<NoticeKey, NoticeDefinition>> = {
     status: 'error',
     title: 'Your account is paused',
     body:
-      'You cannot sign in right now. The person who invited you, or a staff member ' +
-      'responsible for guiding you, can turn it back on. ' +
+      'You cannot sign in right now. Your guide can turn it back on. ' +
       'Call Pam and we will help you reach them.',
     offersSupport: true,
     audience: 'member',
   }),
 
+  /**
+   * A limited account (0007's `is_active_account()`): it can read, including its
+   * messages, but cannot send a message or start a conversation, or connect with
+   * a new person. The words say that (D-426) — they used to say "messages are off",
+   * which was untrue of reading — and name who to call, as `terms.s.limits.p3`
+   * promises ("Pam tells you it is off and who to call").
+   */
   account_limited: define({
     key: 'account_limited',
     kind: 'banner',
     status: 'warning',
     title: 'Some things are turned off',
     body:
-      'You can still look at places and your plan. Messages and new people are off ' +
-      'for now. Call Pam if you have questions.',
+      'You can still look at places and your plan, and read your messages. ' +
+      'You cannot send messages or meet new people for now. ' +
+      'Call your guide or Pam if you have questions.',
     offersSupport: true,
     audience: 'member',
   }),
@@ -143,9 +150,7 @@ export const NOTICES: Readonly<Record<NoticeKey, NoticeDefinition>> = {
     kind: 'banner',
     status: 'info',
     title: 'This part is turned off for now',
-    body:
-      'The person who invited you, or a staff member responsible for guiding you, ' +
-      'turned this off. Call Pam if you have questions.',
+    body: 'Your guide turned this off. Call Pam if you have questions.',
     offersSupport: true,
     audience: 'member',
   }),

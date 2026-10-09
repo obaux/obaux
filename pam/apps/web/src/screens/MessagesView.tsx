@@ -58,6 +58,12 @@ export interface MessagesViewProps {
   readonly onNewMessage?: () => void;
   /** Under the list — "These are example people". */
   readonly note?: string | null;
+  /**
+   * For a limited account (D-426): the notice that says what is off and who to
+   * call, under the title, in New message's place. The account can still read
+   * the list.
+   */
+  readonly limited?: ReactNode;
   /** Open in search mode (for a story). */
   readonly initialSearch?: string | null;
   /**
@@ -161,6 +167,7 @@ export function MessagesView({
   emptyBody,
   headerActions,
   note,
+  limited,
   initialSearch = null,
   onNewMessage,
   floating,
@@ -225,6 +232,9 @@ export function MessagesView({
           }
         />
       )}
+
+      {/* Above the list, not below it: under a short list the notice would sit in the bottom edge fade. */}
+      {limited}
 
       {rows.length === 0 && !searching ? (
         <EmptyState

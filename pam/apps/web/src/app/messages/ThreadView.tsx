@@ -45,6 +45,7 @@ import { FileSummary, GoogleLinkCard, MessageFileCard } from './MessageFileCard'
 import { PhotoViewer } from './PhotoViewer';
 import { TranslatedBody, type MessageTranslation } from './TranslatedBody';
 import { intlLocale } from '@pam/config';
+import { LimitedNotice } from './LimitedNotice';
 
 /**
  * One conversation, drawn with Astryx's Chat family (D-181): `ChatMessageList`
@@ -155,6 +156,12 @@ export interface ThreadViewProps {
   readonly onSend: (body: string, attachment: OutgoingAttachment | null) => Promise<boolean>;
   readonly sending: boolean;
   readonly sendFailed: boolean;
+  /**
+   * A limited account (0031) can read but not send. The composer gives way to
+   * the notice that says what is off and who to call (terms.s.limits.p3,
+   * D-426); the messages stay where they are.
+   */
+  readonly limited?: boolean;
   /** BCP-47 tag for dictation, e.g. "en-US" or "es-US". */
   readonly speechLanguage: string;
   readonly supportPhone: string;
@@ -547,6 +554,7 @@ export function ThreadView({
   onSend,
   sending,
   sendFailed,
+  limited = false,
   speechLanguage,
   supportPhone,
 }: ThreadViewProps) {
@@ -686,7 +694,9 @@ export function ThreadView({
     },
   };
 
-  const composer = (
+  const composer = limited ? (
+    <LimitedNotice supportPhone={supportPhone} />
+  ) : (
     <ChatComposer
       value={draft}
       onChange={setDraft}
@@ -966,7 +976,7 @@ export function ThreadView({
         </ChatMessageList>
       </RevealTimes>
 
-      {sendFailed ? (
+      {sendFailed && !limited ? (
         <VStack xstyle={styles.notice}>
           <Notice
             notice="something_went_wrong"
