@@ -11241,7 +11241,7 @@ saying the old thing, with every check green.
   still owed for every language (docs/before-launch.md). A key whose translation
   is "kept" is a person's statement, not a machine's.
 
-### D-426 — Numbers are claimed in one file, and a test fails on a duplicate
+### D-427 — Numbers are claimed in one file, and a test fails on a duplicate
 
 **Date:** 2026-10-09. Will: "Ensure the other sessions align with this one."
 Three sessions had each taken D-404, two had taken migration 0082 and two had

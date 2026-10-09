@@ -959,7 +959,7 @@ held; 0082 is `main`'s and is live).
   six translations are answered or kept on purpose. Storybook's *Pseudo-language*
   (English +45%), a `PAM Language fit` workflow on pull requests, web unit tests
   now in CI. How: `docs/copy-changes.md`. Numbers (D-, A, migrations) are claimed
-  in `docs/allocations.md` (D-426).
+  in `docs/allocations.md` (D-427).
 - **Migrations 0083 and 0084 are live** (applied 9 October after a
   `list_migrations` check; `get_advisors` clean). 0083 is
   `profiles_language_supported` taking the five new codes; 0084 is
