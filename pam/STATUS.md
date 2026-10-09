@@ -444,6 +444,20 @@ for a limited account (nothing shows the notice; Will: keep it), and the
 pt-BR, zh-CN, zh-HK, ru and ar bundles are on no branch here so their strings
 are unchanged. See "What needs a human" row 32.
 
+**Later that day (D-415): a case manager reaches only the people assigned to
+them.** Will meant "in their list" as the caseload, not the city, so
+`admin_covers()` loses its same-city arm (migration `0082`, SOP amendment
+A22): profile, goals, enrollments, appointments, connections, points, badges,
+and limiting or pausing someone are the caseload alone. The member copy now
+says "the person who invited you, or a staff member responsible for guiding
+you" wherever it describes the case manager (en + es). DB suite **440 checks,
+0 failures** (was 420; the new `17_assigned_only_test.sql` fails without
+0082). **`0082` is written, tested and not applied to the live project**
+(`docs/before-launch.md`): the live project has one super admin, two members,
+no case managers and no assignments, so applying it changes nothing for
+anyone today. A member with no assigned case manager is read by none, and
+there is no screen to assign one (Backlog).
+
 This is the handover document: what exists, what is proven, what is live, and
 what the next person needs to know before touching anything.
 
@@ -605,7 +619,8 @@ result with one test user per role. It proves:
 
 - members reach only their own rows
 - `is_public = false` hides a member from all discovery; blocks are mutual
-- an admin reaches their caseload and region, and **no other region**
+- an admin reaches their caseload and **no one else** (0082; until then,
+  also their city — `17_assigned_only_test.sql`)
 - **an admin cannot read message bodies or buddy-feed posts** — the promise
   members are shown at onboarding
 - providers reach a member only through an enrollment, appointment or connection
@@ -824,6 +839,7 @@ while the copy is unsigned, so it earned the first live test, not the last.*
 | 28 | **A Chromatic project token** | Storybook updating on every push | chromatic.com → sign in with GitHub → link `obaux/obaux` → add the token as the repository secret `CHROMATIC_PROJECT_TOKEN`. The workflow (`pam-storybook.yml`) skips itself until then. |
 | 29 | ~~Where the dock's People and My Plan lead~~ **Answered by the redesign (D-210)** | — | Will, 1 October: the bar is Explore, Saved, Trips, Messages, Profile; Help moves to each screen's header and Profile. Next: his reference screenshots for the other screens, then wiring the redesigned views to routes and data. Walk it in `Prototype/Redesign — member` (D-211). |
 | 30 | ~~Deploy `0071` and `0072`~~ **Done (Will, 4 October)** | — | `list_migrations` first: live ran to `0070`, no live-only drift; `can_message`, `messageable_people` and `open_direct_conversation` matched 0063 exactly, which 0072 was written against. Both applied; `get_advisors` (security) shows no new kind of finding (the definer functions are guarded inside, as every other one is; `invite_preview` and `request_invite_link` are anon on purpose). Spot-checked: `invite_emails` forced RLS with one policy and no anon access; `invites_log` and `staff_request_phone` not callable signed out. See D-264. |
+| 33 | **Apply `0082`; update the language bundles for D-415's wording** | Launch (D-415) | `0082_admin_reaches_assigned_only.sql` is not live (`list_migrations` first; `before-launch.md`). The bundles for pt-BR, zh-CN, zh-HK, ru and ar are not in this repository; a session on `claude/gallant-clarke-0dhizj` appears to be holding them (it is auditing text fit, including a long Russian title) — not pushed, so not readable from here. D-415 lists every changed string. |
 | 32 | **Wire the limited notice, ship the policy, update five languages** | Launch (D-413, D-414) | Will, 9 October: the terms say a limited account can read but not send and a paused one cannot sign in; the transparency line names badges; members are told in the privacy policy (new section "When we limit an account", written — ships when the branch is merged). Left: (1) `terms.s.limits.p3` ("Pam tells you it is off and who to call") is unkept — nothing renders `account_limited` and a refused send says "Your connection dropped"; Will: keep it, on `docs/before-launch.md`; (2) the privacy section's wording is a draft for Will to edit; (3) the six strings (`points.intro`, `terms.s.limits.p2`, `transparency.canSee.points`, `privacy.s.who-can-see.p1`, `admin.seeing.body`, and the new `privacy.s.limits.*`) in pt-BR, zh-CN, zh-HK, ru, ar, which are on no branch of this repository. |
 | 31 | **The before-launch list** | Launch | `docs/before-launch.md` — Will's list of what must be done before real people use PAM. First entry: the email provider for invite links. **0068/0069** are merged as 0075/0076 with 0072's arm kept (D-346); they wait for Will to apply them live. Program sign-up and Add a program are a one-question wizard with a review (D-347); Add a policy is a card (D-348); super admin → program lead message from a place (D-349). |
 
@@ -945,6 +961,12 @@ link (D-331) are part of it.
 Open items Will asked to keep (7 October), newest first. Read this before
 "Next" below, which is older.
 
+- **Assigning a case manager** (D-415). Only the inviting case manager is
+  assigned, when the invite names one. A member who signed up alone, or was
+  invited by a program lead or a super admin, has none and is read by no case
+  manager since 0082. Needs a way for a case manager (or a super admin) to
+  take a member on, hand one over, and see who is unassigned; the schema
+  already allows one active case manager per member (`admin_assignments`).
 - **How a case manager limits or pauses someone** (Will, 9 October, D-414:
   "We'll need to enrich how case managers do this later on"). Only the RPC
   `admin_set_access_status` exists — no screen, no member-facing notice (see

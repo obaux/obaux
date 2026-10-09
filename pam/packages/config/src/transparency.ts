@@ -95,7 +95,13 @@ export type AdminVisibleField = (typeof ADMIN_CAN_SEE)[number];
 export const ADMIN_CANNOT_SEE = [
   'message_bodies',
   'buddy_feed_posts',
-  'members_outside_caseload_or_region',
+  /**
+   * Since 0082 (D-415, Will, 9 October) a case manager reaches only the people
+   * assigned to them — not everyone in their city, which `admin_covers()` also
+   * allowed until then. This entry used to be `members_outside_caseload_or_region`.
+   * `other_regions` is kept: still true, and now implied by the line above.
+   */
+  'members_outside_caseload',
   'other_regions',
   /**
    * Will, confirming and widening D-154's messaging-only finding: "program
@@ -104,7 +110,8 @@ export const ADMIN_CANNOT_SEE = [
    * the case manager who invited a member. This one entry is the single
    * place the two roles genuinely differ: `last_active_date` above is still
    * true of a case manager, and false of a program admin, in every path
-   * that reaches a member's profile — `admin_covers()` for a case manager,
+   * that reaches a member's profile — `admin_covers()` (the caseload) for a
+   * case manager,
    * `provider_linked_to()` for a program admin, now through
    * `provider_linked_members()` (0056) rather than a raw table read that
    * could not draw this distinction at all.
@@ -131,7 +138,8 @@ export function isAdminVisible(field: string): field is AdminVisibleField {
  * Plain language, 5th-grade level, one line per item, in the same order and
  * with the same content as ADMIN_CAN_SEE / ADMIN_CANNOT_SEE above. The person
  * in §4.1 is "the admin"; to a member they are the person who invited them, so
- * the copy says "the person who invited you" — §9 forbids naming the role.
+ * the copy says "the person who invited you, or a staff member responsible for
+ * guiding you" (D-415) — §9 forbids naming the role.
  *
  * These are i18n keys AND their English source, kept together so a reviewer can
  * read the screen without opening the locale file. The Spanish lives in
@@ -157,7 +165,7 @@ export const TRANSPARENCY_SCREEN: {
   readonly confirm: string;
 } = {
   titleKey: 'transparency.title',
-  title: 'What the person who invited you can see',
+  title: 'What the person who invited you, or a staff member responsible for guiding you, can see',
 
   canSeeHeadingKey: 'transparency.canSee.heading',
   canSeeHeading: 'They can see:',

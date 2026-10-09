@@ -17,6 +17,13 @@ limit or pause an account, what a limited account can and cannot do, and that
 you can always call Pam. The privacy policy and the terms both say they were
 last updated on 9 October 2026 (D-414).
 
+A case manager will see only the people assigned to them, not everyone in
+their city, so what they can see of your points, badges and the rest is
+limited to a case manager you have been given. This takes effect when
+migration 0082 is applied to the live database; it is written and tested but
+not yet applied. Wherever Pam describes that person it now says "the person
+who invited you, or a staff member responsible for guiding you" (D-415).
+
 ## [0.45.4] — 2026-10-08 · Live
 
 The changes since 0.43 are live: invites name the person they're for, one

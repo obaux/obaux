@@ -36,6 +36,23 @@ decided.
   limit someone ("any Case manager with that person in their list" — what the
   code already does) and to keep `terms.s.limits.p3`.
 
+- **Who may limit someone — and read points and badges (D-415).** Will had
+  meant only people *assigned* to a case manager, not "in their list" as the
+  app shows it. `admin_covers()` lost its same-city arm: migration
+  `0082_admin_reaches_assigned_only.sql`, SOP amendment A22, a new DB test file
+  (`17_assigned_only_test.sql`), and one changed assertion in
+  `02_rls_test.sql`. **Written and tested, not applied to the live project.**
+- **Member copy (D-415).** Will: add "or a staff responsible to guiding you"
+  to describe the case manager. Eleven strings now read "the person who
+  invited you, or a staff member responsible for guiding you" (en + es,
+  `transparency.ts`, `notices.ts`); the invite-code strings, which are about
+  the inviter literally, did not change.
+- **The language files.** Will asked whether he needed to supply them. They
+  are not on any branch. A running session on `claude/gallant-clarke-0dhizj`
+  (title "Restore missing Spanish accents in Pam es.json", last summary "text-fit
+  audit: fixing About tabs and long Russian title") appears to hold them;
+  nothing from it is pushed, so they cannot be read from here.
+
 ## What was wrong, and what missed it
 
 Nothing in the code was wrong; the *copy* made promises the rest of the system
@@ -52,8 +69,10 @@ and side by side.
 - D-412 — points: the Points screen says who can see them.
 - D-413 — messages: the terms say a limited account cannot send and a paused
   one cannot sign in; badges named on the member's transparency line.
-- D-414 — members are told in the privacy policy; any case manager with the
-  person in their list may limit them (unchanged); p3 kept.
+- D-414 — members are told in the privacy policy; p3 kept. (Its reading of
+  "in their list" was corrected the same day by D-415.)
+- D-415 — a case manager reaches only the people assigned to them (0082,
+  A22); member copy adds "or a staff member responsible for guiding you".
 
 ## Verified
 
@@ -62,10 +81,15 @@ and side by side.
 | Live project `shobqzuhicoiymtumiaz`, read-only: `messages_insert_sender` | Requires `is_active_account()`, `my_feature_allowed('chat')`, no block |
 | Live: `access_controls_reject_chat` trigger | Present (0031) |
 | Live: `open_direct_conversation` body | Contains `is_active_account` |
-| Live: `points_ledger` policies | `select_own`, `select_admin` (`admin_covers`) only |
-| Live: profiles by `access_status` | 3, all `active`; no `access_controls` rows |
-| `pnpm --filter @pam/config test` | 238 pass (after the privacy section too) |
+| Live: `points_ledger` / `member_badges` policies | Own, `admin_covers`; badges also buddies; no program policy |
+| Live: accounts | 1 super admin, 2 members; 0 case managers; 0 active assignments |
+| Live: `admin_covers()` | Still has the city arm (0082 not applied) |
+| `pnpm --filter @pam/db test`, baseline before 0082 | 420 checks, 0 failures |
+| `pnpm --filter @pam/db test`, with 0082 | **440 checks, 0 failures** |
+| Same suite with 0082 moved aside | Fails at `17_assigned_only_test.sql` ("Dana cannot read Tanya…"), so the tests bite |
+| `pnpm --filter @pam/config test` | 238 pass |
 | `pnpm -r typecheck` | 5/5 packages clean |
+| Not run | Playwright / Storybook: only strings changed; the two longest are a screen title and a Help row |
 
 ## Left undone
 
@@ -75,14 +99,18 @@ and side by side.
   as its own item; not built.
 - The privacy section's wording ("A person who has you on their list in Pam
   can limit or pause…") is Claude's draft of Will's decision; he should read it.
-- If Will meant only people *assigned* to a case manager (no region arm),
-  `admin_covers()` has to change, which also narrows points and badges. Read
-  as "what the case manager's list already shows"; unchanged.
+- `0082` is not applied to the live project (`docs/before-launch.md`).
+  `list_migrations` first. It numbers 0082 because both unmerged branches use
+  0079–0081.
+- There is no way to assign a case manager to a member (STATUS backlog), and
+  since 0082 a member with none is read by no case manager.
+- The longest new strings (`transparency.title`, `help.what.person`) have not
+  been seen on a phone.
 - Nothing re-shows the privacy policy or the transparency screen to an account
   that already agreed; `transparency_ack_at` is set once.
 - pt-BR, zh-CN, zh-HK, ru, ar are on no branch of this repository (checked on
-  every remote branch, including `claude/gallant-clarke-0dhizj`). The six
-  strings listed in STATUS row 32 must change in each when they land.
+  every remote branch, including `claude/gallant-clarke-0dhizj`). Every string
+  changed this session (D-412–D-415) must change in each when they land.
 - This branch is at `main` (D-388); `claude/pam-storybook` (D-411) and
   `claude/gallant-clarke-0dhizj` (D-403) are far ahead and both edit
   `es.json`; expect conflicts on the strings changed here, and renumber the
@@ -90,4 +118,5 @@ and side by side.
 
 ## Needs a human
 
-- Will: read the new privacy section; say where the five language bundles are.
+- Will: apply `0082` (or ask for it to be applied); read the new privacy
+  section; get the translations pushed from the `gallant-clarke` session.

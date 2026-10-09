@@ -104,15 +104,16 @@ select test.check('blocker is invisible to the blocked user',
 
 -- ===========================================================================
 \echo ''
-\echo '--- Admin scope: caseload and region only, never another region (§4) ---'
+\echo '--- Admin scope: the caseload only (§4; 0082 removed the city arm) ---'
 -- ===========================================================================
 select test.as_user(:'admin_north');
 
 select test.check('admin sees a member on their caseload',
   (select count(*) from public.profiles where id = :'marcus'), 1);
 
-select test.check('admin sees an unassigned member in their own region',
-  (select count(*) from public.profiles where id = :'tanya'), 1);
+-- Until 0082 this read 1: a case manager reached everyone in their city.
+select test.check('admin CANNOT see an unassigned member in their own region (0082)',
+  (select count(*) from public.profiles where id = :'tanya'), 0);
 
 select test.check('admin CANNOT see a member in another region',
   (select count(*) from public.profiles where id = :'luis'), 0);

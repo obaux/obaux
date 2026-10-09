@@ -500,3 +500,25 @@ help is one tap further, inside the menu, and not on the screen itself.
 **What did not change.** Help is still reachable from the screen, and the
 page keeps its way back. Elsewhere, a screen with a ⋯ menu keeps its Help
 button unless Will says otherwise.
+
+## A22 — A case manager reaches only the people assigned to them (9 October 2026, Will)
+
+Will, asked whether "any case manager with that person in their list" meant
+the case manager's caseload or their city: "I meant only people assigned to
+that case manager, and it would also narrow who can read points and badges."
+
+**Where this contradicts the original.** SOP §4 and §4.1: "an admin reaches a
+member through the caseload, or through the region." There is no region
+arm any more. `admin_covers()` (0082) is the caseload alone, so a case
+manager reads a member's profile, goals, enrollments, appointments,
+connections, points and badges, and may limit or pause them, only when an
+active `admin_assignments` row names them. The region still scopes what a
+case manager can *create* (an invite is for their own city).
+
+**What did not change.** Messaging (`can_message()`) and who sees a report
+already read assignments directly. Program leads, super admins and members
+are unaffected.
+
+**What it leaves.** A member who signed up alone, or was invited by a program
+lead or a super admin, has no case manager and is read by no case manager.
+There is no screen to assign one yet (STATUS backlog).

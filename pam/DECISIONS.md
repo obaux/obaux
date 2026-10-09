@@ -9683,3 +9683,86 @@ managers do this later on".
   badges (D-412 item 2). Member copy still says "the person who invited you"
   there. Left as it is; the privacy section above is the first line that says
   "a person who has you on their list".
+
+**Update, same day.** Will meant only people *assigned* to the case manager,
+which is a change to `admin_covers()`: D-415. The privacy section's wording
+quoted above ("a person who has you on their list") was replaced in D-415.
+
+### D-415 — A case manager reaches only the people assigned to them; member copy says "or a staff member responsible for guiding you"
+
+**Date:** 2026-10-09. **Decided by:** Will, replying to D-414's reading of
+"any case manager with that person in their list": "I meant only people
+assigned to that case manager, and it would also narrow who can read points
+and badges." And, to the copy: "update the member copy, to also include
+language 'or a staff responsible to guiding you' to describe their case
+manager."
+
+**The change.** `admin_covers()` reached a member two ways: an active row in
+`admin_assignments`, or any member whose `region_id` was the caller's own.
+Migration `0082_admin_reaches_assigned_only.sql` removes the second arm. It
+is one `create or replace function` and a comment (same signature, security
+definer and `search_path`; the grants are untouched). Everything that asks
+`admin_covers()` follows: a case manager's read of a member's profile, goals, enrollments, appointments, connections, **points**
+and **badges**, their write to a member's access status, assignment and
+feature switches, and `admin_set_access_status` /
+`admin_set_feature_access`. `can_message()` and `report_visible_to_me()` read
+`admin_assignments` directly already and do not move. This is SOP amendment
+A22; the contract key `members_outside_caseload_or_region` is now
+`members_outside_caseload`.
+
+**Consequences, stated plainly.**
+
+- A member who signed up alone, or was invited by a program lead or a super
+  admin, has no case manager. No case manager reads them, at all, until
+  someone is assigned. There is no screen for assigning one (redeeming an
+  invite that names a case manager assigns them; nothing else does): STATUS backlog,
+  matching Will's "we'll need to enrich how case managers do this later on".
+- The unique index on active assignments means a member has one case manager.
+- A case manager's Home list, `/admin/` and `/person/` need no code change:
+  they read through RLS and simply return fewer rows. The `no_caseload_members`
+  notice ("When someone uses your invite code, they will show up here") was
+  already the right words.
+- It narrows, never widens. Nothing the transparency screen promises moves;
+  it is now truer ("Anyone who is not on their list").
+
+**Tested.** `packages/db/test/17_assigned_only_test.sql` (new): a second case
+manager in the same city, with nobody assigned, cannot read Marcus's profile,
+points, balance, badges or enrollments, nor limit him or switch a feature off;
+the assigned case manager still can; reassigning moves access both ways;
+Dana cannot limit the unassigned Tanya. `02_rls_test.sql`'s "admin sees an
+unassigned member in their own region" now expects 0. **440 checks, 0 failures**
+(was 420); the new file fails without 0082 (run, 9 October). No other test
+depended on the city arm.
+
+**Not applied to the live project.** The file is written and tested, not
+deployed: it changes who can read members on a database the live app uses, and
+Will has applied migrations himself each time. `docs/before-launch.md` has the
+item, with the `list_migrations` check first. It is numbered 0082 because
+both unmerged branches use 0079–0081. Checked on the live project on 9
+October: one super admin, two members, **no case managers and no active
+assignments**, and `admin_covers()` still has the city arm — so applying 0082
+changes what no current account can see.
+
+**Member copy.** Wherever member-facing copy describes the case manager,
+"the person who invited you" is now "the person who invited you, or a staff
+member responsible for guiding you" — Will's words, with the grammar smoothed
+("a staff responsible to guiding you" → "a staff member responsible for
+guiding you"). Because assignment is what matters now, the inviter and the
+assigned case manager can be different people. Changed, en + es:
+`transparency.title` (and `transparency.ts`, which a test holds identical),
+`points.intro`, `privacy.s.who-can-see.p1`, `privacy.s.limits.p1` (replacing
+D-414's "a person who has you on their list"), `access.limitedNotice`,
+`help.what.person`, `messages.report.intro`, `messages.report.done.body`,
+`messages.report.thread.intro`, `notice.account_suspended.body` and
+`notice.feature_turned_off.body` (the last two also in `notices.ts`).
+**Not changed**, because they are about the inviter literally: the invite
+code, expiry and "ask who invited you for a new code" strings. The longest
+changes are a screen title (`transparency.title`) and a Help row
+(`help.what.person`); worth a look at phone width, and in the other languages.
+
+**Other languages.** Not in this repository. A session is open on
+`claude/gallant-clarke-0dhizj` ("Restore missing Spanish accents", currently on
+a text-fit audit that mentions a long Russian title), which is where the
+translations appear to be; nothing from it has been pushed. The strings above
+(plus `terms.s.limits.p2`, `transparency.canSee.points`, `admin.seeing.body`
+and `privacy.s.limits.*`) must change in each bundle when they land.

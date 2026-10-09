@@ -66,14 +66,29 @@ STATUS row too.
   privacy policy"). Members were promised they would hear first when a promise
   changes. Written: a privacy section, "When we limit an account"
   (`privacy.s.limits.*`, en + es), and both documents' dates moved to 9
-  October. It says a person with you on their list can limit or pause an
-  account that is hurting others, that a limited account can read messages but
-  not send them, and that a paused one cannot sign in. The badges now named on
+  October. It says the person who invited you, or a staff member responsible
+  for guiding you, can limit or pause an account that is hurting others, that
+  a limited account can read messages but not send them, and that a paused one
+  cannot sign in. The badges now named on
   the transparency line are in the privacy page's list too. Tick this when the
   branch is live. When this was written the live project had three accounts,
   so no one has agreed to the old wording who is not on the team. Nothing
   re-shows the policy to an account that already agreed (`transparency_ack_at`
   is set once); decide if that matters before the first real member.
+
+- [ ] **Apply migration 0082 to the live project** (Will, 9 October 2026,
+  D-415: a case manager reaches only the people assigned to them). Written
+  and tested (DB suite 440 checks, 0 failures; fails without it), **not
+  applied**. The member copy already promises it ("the person who invited you,
+  or a staff member responsible for guiding you"), so the live database must
+  match before launch. First run `list_migrations` and diff against
+  `packages/db/migrations/`; the file is one `create or replace function` plus
+  a comment, so it does not hit the `DROP` gate (D-387). It numbers 0082
+  because `claude/pam-storybook` and `claude/gallant-clarke-0dhizj` both use
+  0079–0081 for their own migrations. Until it is live, a case manager can
+  still read everyone in their city. Applying it also means members with no
+  case manager (signed up alone, or invited by a program lead or a super
+  admin) are read by none: the screen to assign one is on the STATUS backlog.
 
 - [ ] **Make `terms.s.limits.p3` true** (Will, 9 October 2026: "Keep
   terms.s.limits.p3"). The terms promise "When something is turned off, Pam
