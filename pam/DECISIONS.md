@@ -10069,7 +10069,10 @@ not keep or a word it had not settled:
      button. (One primary action per screen: the notice replaces the button, it
      does not sit beside it.) The Storybook redesign of Messages
      (`screens/MessagesScreen.tsx` → `MessagesView`'s `limited` slot) drops *New
-     message* and shows the same notice under the list.
+     message* and shows the same notice **under the title, above the list**:
+     below a short list it sat inside the 96px fade above the floating strip and
+     the tab bar (`edgeFade`) and its call button was washed out — found in the
+     photograph, not by a test.
    - **A conversation**: every message stays; the notice stands where the
      composer was (`ThreadView`'s `limited` prop, `LimitedNotice`).
    - **A refused send**: `useThread.send` no longer assumes a failed insert is a

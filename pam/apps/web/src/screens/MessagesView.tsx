@@ -59,8 +59,9 @@ export interface MessagesViewProps {
   /** Under the list — "These are example people". */
   readonly note?: string | null;
   /**
-   * Where New message would be, for a limited account (D-426): the notice that
-   * says what is off and who to call. The account can still read the list.
+   * For a limited account (D-426): the notice that says what is off and who to
+   * call, under the title, in New message's place. The account can still read
+   * the list.
    */
   readonly limited?: ReactNode;
   /** Open in search mode (for a story). */
@@ -228,6 +229,9 @@ export function MessagesView({
         />
       )}
 
+      {/* Above the list, not below it: under a short list the notice would sit in the bottom edge fade. */}
+      {limited}
+
       {rows.length === 0 && !searching ? (
         <EmptyState
           headingLevel={2}
@@ -267,8 +271,6 @@ export function MessagesView({
           ) : null}
         </VStack>
       ) : null}
-
-      {limited}
     </Page>
     {floating}
     </>

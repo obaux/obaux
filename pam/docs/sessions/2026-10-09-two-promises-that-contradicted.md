@@ -132,41 +132,38 @@ about one thing, side by side — a translator's habit, not a test's.
 | `pnpm --filter @pam/db test`, with 0082 | **440 checks, 0 failures** |
 | Same suite with 0082 moved aside | Fails at `17_assigned_only_test.sql` ("Dana cannot read Tanya…"), so the tests bite |
 | `pnpm --filter @pam/config test` | 242 pass (4 new for the grouping) |
-| `pnpm --filter @pam/ui test` | 81 pass (7 new: copy status, live region, axe in both looks) |
+| `pnpm --filter @pam/ui test` | 79 pass (was 81 until D-417 deleted the plain look and its two tests) |
 | `pnpm --filter @pam/web build-storybook` | builds; the three screens in both looks and the "Copied" state photographed at 390px |
 | Copy button size in the browser | 48 × 48 px |
 | `pnpm -r typecheck` | 5/5 packages clean |
 | Playwright `legal`, `join`, `a11y` specs (fresh build; 320px light and dark, iPhone SE; axe incl. contrast and target size) | pass, after one fix (the hardcoded section count above): 39 legal tests pass, join and a11y pass |
 | Playwright, **full suite**, fresh build with the 16px body (D-418) | **588 passed, 0 failed** (light and dark 320px, iPhone SE) |
-| Not run | The first-load budget check (`scripts/check-bundle-budget.mjs`) |
+| `node scripts/check-bundle-budget.mjs` after D-426, on a fresh Next build | **556.4 kB** of 600 kB gzipped, 43.6 kB to spare |
+| Playwright `messages.spec.ts`, with four new tests (limited list; limited conversation; a send refused with 42501 for an account that was active at load; a 500 for an account that is not limited) | 72 pass at three viewports; the two send tests give opposite answers to the same failing POST, differing only in `access_status`, so the refused-send test does discriminate |
+| Playwright, **full suite**, fresh build (D-426) | **600 passed, 0 failed** (6.5 minutes) |
+| `pnpm -r typecheck`, `pnpm --filter @pam/config test` (242), `pnpm --filter @pam/ui test` (79), `pnpm --filter @pam/web test` (18) after D-426 | clean / pass |
+| Storybook, rebuilt twice; limited Messages, limited conversation (en, es), Help, the report-a-message screen, the three notices photographed at 390px | The first photograph of limited Messages showed the notice under the list, inside the 96px fade above the floating strip and tab bar (`edgeFade`): its call button and left edge were washed out. It moved to under the title; the second photograph is clean |
 
 ## Left undone
 
-- `terms.s.limits.p3` is unkept for a limited account: nothing shows
-  `account_limited`, and a refused send says "Your connection dropped"
-  (`messages.thread.failed.body`). Will: keep it. On `docs/before-launch.md`
-  as its own item; not built.
 - The privacy section's wording ("A person who has you on their list in Pam
   can limit or pause…") is Claude's draft of Will's decision; he should read it.
-- `0082` was applied to the live project on 9 October (D-420) — `list_migrations`
-  first showed no drift. It numbers 0082 because both unmerged branches use
-  0079–0081, so the live ledger has a gap there until those land.
-- There is no way to assign a case manager to a member (STATUS backlog), and
-  since 0082 a member with none is read by no case manager.
-- D-416/D-417: Will to read the short-version wording (STATUS row 34); the long
-  phrase remains in Help, the report screens and two notices.
-- The first-load budget check (`node scripts/check-bundle-budget.mjs`) has not
-  been run since D-416; the Playwright suite passes in full (588).
+  So should the four short-version lines (`transparency.summary.*`, STATUS row 34).
+- The New message picker's own failure line ("Your connection dropped") is
+  reachable only by an account limited *after* Messages loaded. Not changed (D-426).
+- The app has no button that limits anyone (nothing calls
+  `admin_set_access_status`), and no screen to assign a case manager to a member
+  (STATUS backlog); since 0082 a member with none is read by no case manager.
 - Nothing re-shows the privacy policy or the transparency screen to an account
   that already agreed; `transparency_ack_at` is set once.
-- pt-BR, zh-CN, zh-HK, ru, ar are on no branch of this repository (checked on
-  every remote branch, including `claude/gallant-clarke-0dhizj`). Every string
-  changed this session (D-412–D-415) must change in each when they land.
-- This branch is at `main` (D-388); `claude/pam-storybook` (D-411) and
-  `claude/gallant-clarke-0dhizj` (D-403) are far ahead and both edit
-  `es.json`; expect conflicts on the strings changed here, and renumber the
-  changelog heading ("Unreleased") when merging.
+- The other five languages are now on `claude/gallant-clarke-0dhizj` (it merged
+  `main` at 932d052 and translated D-412–D-415's strings). The eight strings
+  D-426 changed were sent to that session; expect conflicts in `es.json` and
+  `en.json` on those lines, and renumber when the branches meet (`docs/allocations.md`
+  there says D-424 is next; this branch took D-426 and left D-424/D-425 free).
+  Native review of the new languages is open on their side.
+- `claude/pam-storybook` (D-411) is not merged and is behind `main`.
 
 ## Needs a human
 
-- Will: read the new privacy section; get the translations pushed from the `gallant-clarke` session.
+- Will: read the new privacy section and the short-version lines; say whether to merge this follow-up (D-426) to `main` — `CLAUDE.md` says not without asking.
