@@ -8,28 +8,19 @@ import { HStack } from '@astryxdesign/core/HStack';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
-import { CopyButton, type CopyButtonProps } from './CopyButton.js';
 import { CheckIcon, CrossIcon } from './icons.js';
 import { pam } from './tokens.stylex.js';
 
 /**
- * Cards for reading something long and important (Will, 9 October, D-416): the
- * rules about who can see what, the privacy policy, the terms. People who are
- * new to Pam, and may not read easily, are asked to take in a lot; these are
- * the pieces that make it quick to scan.
+ * Pieces for reading something long and important (Will, 9 October, D-416,
+ * D-417): the rules about who can see what, the privacy policy, the terms.
+ * People who are new to Pam, and may not read easily, are asked to take in a
+ * lot; these are what make it quick to scan.
  *
- * Two looks, chosen by `decor`, so the same content can be judged both ways:
- *
- * - **`icons`** — a small round icon on each card and a tick or a cross on
- *   each row. Quicker to scan for most people; one more thing to look at.
- * - **`plain`** — words only: a coloured edge instead of an icon, a hairline
- *   between rows. Nothing is drawn.
- *
- * Whichever is chosen, meaning never rests on the picture or the colour alone
- * (§12): every row says it in words, and every icon is `aria-hidden`.
+ * Icons lead each heading and each row (Will chose the icon look over a plain
+ * one, D-417). Meaning never rests on the picture or the colour alone (§12):
+ * every row says it in words, and every icon is `aria-hidden`.
  */
-export type Decor = 'icons' | 'plain';
-
 const styles = stylex.create({
   // The round tile an icon sits in: Pam's pale green, the icon in the accent.
   tile: {
@@ -50,27 +41,16 @@ const styles = stylex.create({
   titleBox: { flexGrow: 1, minWidth: 0 },
   groupTitle: { fontSize: '15px', textTransform: 'uppercase', letterSpacing: '0.06em' },
   list: { width: '100%', listStyle: 'none', paddingInline: 0, marginBlock: 0 },
-  row: { width: '100%' },
-  // Plain rows: a hairline above each but the first.
-  rowRule: {
-    paddingBlock: '12px',
-    borderBlockStartWidth: { default: '1px', ':first-child': '0px' },
-    borderBlockStartStyle: 'solid',
-    borderBlockStartColor: colorVars['--color-border'],
-  },
-  rowIcons: { paddingBlock: '8px' },
+  row: { width: '100%', paddingBlock: '8px' },
   lead: { fontSize: '18px', lineHeight: 1.45, fontWeight: 600 },
-  leadPlain: { fontSize: '18px', lineHeight: 1.45 },
-  detail: { fontSize: '16px', lineHeight: 1.45 },
-  body: { fontSize: '18px', lineHeight: 1.55 },
-  // Plain cards say what they are with a bar down the leading edge.
-  edge: {
-    borderInlineStartWidth: '4px',
-    borderInlineStartStyle: 'solid',
-    borderInlineStartColor: colorVars['--color-icon-accent'],
-  },
-  edgeNo: { borderInlineStartColor: colorVars['--color-border'] },
-  tinted: { backgroundColor: pam['--pam-secondary-fill'] },
+  detail: { fontSize: '16px', lineHeight: 1.45, fontWeight: 400 },
+  // The guide: smaller than the cards (Will, D-417), icon beside the title.
+  guide: { backgroundColor: pam['--pam-secondary-fill'] },
+  guideTitle: { fontSize: '18px', lineHeight: 1.3 },
+  guideIcon: { display: 'flex', flexShrink: 0, color: colorVars['--color-icon-accent'], fontSize: '24px' },
+  guideBody: { fontSize: '16px', lineHeight: 1.5 },
+  // A section heading with a bare icon: no tile, no card.
+  sectionIcon: { display: 'flex', flexShrink: 0, color: colorVars['--color-icon-accent'], fontSize: '26px' },
 });
 
 /** A round tile holding an icon. Decorative. */
@@ -82,31 +62,23 @@ function Tile({ children, small = false, no = false }: { children: ReactNode; sm
   );
 }
 
-/**
- * A titled card. With `copy`, a copy icon sits top right and puts `copy.text`
- * on the clipboard. With `icon` (and `decor="icons"`), a round icon leads the
- * title.
- */
+/** A titled card, an icon in a tile leading its title. */
 export interface ReadCardProps {
   readonly title: string;
-  readonly decor: Decor;
   readonly icon?: ReactNode;
-  readonly copy?: CopyButtonProps;
-  readonly id?: string;
   readonly headingLevel?: 2 | 3;
   readonly children: ReactNode;
 }
 
-export function ReadCard({ title, decor, icon, copy, id, headingLevel = 2, children }: ReadCardProps) {
+export function ReadCard({ title, icon, headingLevel = 2, children }: ReadCardProps) {
   return (
-    <Card padding={4} {...(id ? { id } : {})}>
+    <Card padding={4}>
       <VStack gap={3}>
         <HStack gap={2} align="center" wrap="nowrap">
-          {decor === 'icons' && icon ? <Tile>{icon}</Tile> : null}
+          {icon ? <Tile>{icon}</Tile> : null}
           <Heading level={headingLevel} xstyle={[styles.title, styles.titleBox]}>
             {title}
           </Heading>
-          {copy ? <CopyButton {...copy} /> : null}
         </HStack>
         {children}
       </VStack>
@@ -117,62 +89,89 @@ export function ReadCard({ title, decor, icon, copy, id, headingLevel = 2, child
 /**
  * Who "your guide" is, said once at the top (D-416): the person who invited
  * you, or a staff member responsible for guiding you. Everything below can
- * then say "your guide".
+ * then say "your guide". Small (D-417): the icon sits beside the title and the
+ * sentence runs full width underneath.
  */
 export interface GuideCardProps {
   readonly title: string;
   readonly body: string;
-  readonly decor: Decor;
   readonly icon?: ReactNode;
 }
 
-export function GuideCard({ title, body, decor, icon }: GuideCardProps) {
+export function GuideCard({ title, body, icon }: GuideCardProps) {
   return (
-    <Card padding={4} xstyle={[styles.tinted, decor === 'plain' ? styles.edge : null]}>
-      <HStack gap={3} align="start" wrap="nowrap">
-        {decor === 'icons' && icon ? <Tile>{icon}</Tile> : null}
-        <VStack gap={1}>
-          <Heading level={2} xstyle={styles.title}>
+    <Card padding={3} xstyle={styles.guide}>
+      <VStack gap={1}>
+        <HStack gap={2} align="center" wrap="nowrap">
+          {icon ? (
+            <HStack xstyle={styles.guideIcon} aria-hidden="true">
+              {icon}
+            </HStack>
+          ) : null}
+          <Heading level={2} xstyle={styles.guideTitle}>
             {title}
           </Heading>
-          <Text xstyle={styles.body}>{body}</Text>
-        </VStack>
-      </HStack>
+        </HStack>
+        <Text xstyle={styles.guideBody}>{body}</Text>
+      </VStack>
     </Card>
   );
 }
 
-/** One row: a short lead, and a grey line under it when there is more to say. */
+/** A section's heading with a bare icon beside it — for flat pages with no cards. */
+export function SectionHeading({
+  title,
+  icon,
+  level = 2,
+}: {
+  readonly title: string;
+  readonly icon?: ReactNode;
+  readonly level?: 2 | 3;
+}) {
+  return (
+    <HStack gap={2} align="center" wrap="nowrap">
+      {icon ? (
+        <HStack xstyle={styles.sectionIcon} aria-hidden="true">
+          {icon}
+        </HStack>
+      ) : null}
+      <Heading level={level} xstyle={styles.title}>
+        {title}
+      </Heading>
+    </HStack>
+  );
+}
+
+/** One row: a tick or a cross, a short lead, and a grey line under it when there is more to say. */
 export interface FactRowProps {
   readonly lead: string;
   readonly detail?: string | undefined;
-  /** `yes` draws a tick, `no` a cross; left out, no mark. Ignored in `plain`. */
-  readonly mark?: 'yes' | 'no';
-  readonly decor: Decor;
+  /** `yes` draws a tick, `no` a cross. */
+  readonly mark: 'yes' | 'no';
 }
 
-export function FactRow({ lead, detail, mark, decor }: FactRowProps) {
+export function FactRow({ lead, detail, mark }: FactRowProps) {
   return (
-    <HStack
-      gap={3}
-      align="start"
-      wrap="nowrap"
-      role="listitem"
-      xstyle={[styles.row, decor === 'plain' ? styles.rowRule : styles.rowIcons]}
-    >
-      {decor === 'icons' && mark ? (
-        <Tile small no={mark === 'no'}>
-          {mark === 'yes' ? <CheckIcon /> : <CrossIcon />}
-        </Tile>
-      ) : null}
-      <VStack gap={0}>
-        <Text xstyle={decor === 'plain' ? styles.leadPlain : styles.lead}>{lead}</Text>
+    <HStack gap={3} align="start" wrap="nowrap" role="listitem" xstyle={styles.row}>
+      <Tile small no={mark === 'no'}>
+        {mark === 'yes' ? <CheckIcon /> : <CrossIcon />}
+      </Tile>
+      {/*
+        One element, so the sentence is one piece of text — read aloud, found by
+        search, and equal to the contract's line — with the second sentence drawn
+        on its own line in grey (D-417).
+      */}
+      <Text xstyle={styles.lead}>
+        {lead}
         {detail ? (
-          <Text type="supporting" xstyle={styles.detail}>
-            {detail}
-          </Text>
+          <>
+            {' '}
+            <Text display="block" type="supporting" xstyle={styles.detail}>
+              {detail}
+            </Text>
+          </>
         ) : null}
-      </VStack>
+      </Text>
     </HStack>
   );
 }
@@ -194,7 +193,7 @@ export function FactGroup({ title, children }: { readonly title?: string; readon
 }
 
 /**
- * The short version, first (D-416): three lines, each a true summary of the
+ * The short version, first (D-416): a few lines, each a true summary of the
  * detail below, for the person who reads one thing and moves on.
  */
 export interface SummaryLine {
@@ -203,15 +202,7 @@ export interface SummaryLine {
   readonly icon?: ReactNode;
 }
 
-export function SummaryCard({
-  title,
-  lines,
-  decor,
-}: {
-  readonly title: string;
-  readonly lines: readonly SummaryLine[];
-  readonly decor: Decor;
-}) {
+export function SummaryCard({ title, lines }: { readonly title: string; readonly lines: readonly SummaryLine[] }) {
   return (
     <Card padding={4}>
       <VStack gap={2}>
@@ -220,19 +211,10 @@ export function SummaryCard({
         </Heading>
         <VStack gap={0} role="list" xstyle={styles.list}>
           {lines.map((line) => (
-            <HStack
-              key={line.text}
-              gap={3}
-              align="start"
-              wrap="nowrap"
-              role="listitem"
-              xstyle={[styles.row, decor === 'plain' ? styles.rowRule : styles.rowIcons]}
-            >
-              {decor === 'icons' ? (
-                <Tile small no={line.mark === 'no'}>
-                  {line.icon ?? (line.mark === 'no' ? <CrossIcon /> : <CheckIcon />)}
-                </Tile>
-              ) : null}
+            <HStack key={line.text} gap={3} align="start" wrap="nowrap" role="listitem" xstyle={styles.row}>
+              <Tile small no={line.mark === 'no'}>
+                {line.icon ?? (line.mark === 'no' ? <CrossIcon /> : <CheckIcon />)}
+              </Tile>
               <Text xstyle={styles.lead}>{line.text}</Text>
             </HStack>
           ))}

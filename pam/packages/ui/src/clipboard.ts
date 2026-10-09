@@ -10,8 +10,12 @@
 /** How long "Link copied" / "Copied" stays up (D-337). */
 export const COPIED_MS = 3000;
 
-/** How long "could not copy" stays up: longer, because it tells you what to do instead. */
-export const COPY_FAILED_MS = 6000;
+/**
+ * How long the copy icon shows its tick and its tooltip before it goes back
+ * to a copy icon (Will, 9 October, D-417: "resets after 5 seconds"). The same
+ * for "could not copy", which tells you what to do instead.
+ */
+export const COPY_STATUS_MS = 5000;
 
 /**
  * Copies `text`; true when the clipboard took it. Call it inside a tap: that

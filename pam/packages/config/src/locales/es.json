@@ -786,7 +786,6 @@
   "messages.search.cancel": "Cancelar",
   "privacy.controls.title": "Lo que otros pueden ver",
   "privacy.controls.intro": "Lo que Pam guarda sobre ti, quién lo puede ver y qué puedes hacer al respecto.",
-  "privacy.controls.data": "Tus datos",
   "privacy.controls.copy": "Pedir una copia de mis datos",
   "privacy.controls.delete": "Borrar mi cuenta",
   "privacy.controls.policy": "Leer la política de privacidad completa",
@@ -1394,7 +1393,7 @@
   "transparency.group.plans": "Sus planes",
   "transparency.group.progress": "Su progreso",
   "transparency.group.people": "Su gente y sus mensajes",
-  "copy.section": "Copiar esta sección",
+  "copy.page": "Copiar esta página",
   "copy.done": "Copiado",
   "copy.failed": "No se pudo copiar. Mantenga presionado el texto para copiarlo."
 }

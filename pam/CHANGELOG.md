@@ -29,8 +29,12 @@ read. They name "your guide" once, at the top, then say it in short: a short
 version first, the long list in three small groups, and a small copy icon on
 each section that says "Copied" when it works. The privacy policy and terms
 are sections you can copy, with a row of jump buttons in place of a long
-contents list. Two looks, with and without little icons, are in Storybook for
-Will to choose (D-416).
+contents list (D-416). Then, from Will's choices (D-417): Profile › What others
+can see is just the guide and the short version, a link to the full privacy
+policy, and the two things you can do about your data. The privacy policy and
+terms are flat pages with a small icon beside each heading, tabs like Explore's,
+and one copy icon at the top right that copies the whole page and says "Copied"
+for 5 seconds.
 
 ## [0.45.4] — 2026-10-08 · Live
 

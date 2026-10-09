@@ -4,27 +4,23 @@ import * as stylex from '@stylexjs/stylex';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { EyeIcon, EyeOffIcon, MessagesIcon, PeopleIcon, PhoneIcon } from '@pam/ui';
-import {
-  FactGroup,
-  FactRow,
-  GuideCard,
-  ReadCard,
-  SummaryCard,
-  type Decor,
-  type SummaryLine,
-} from '@pam/ui/Reading';
+import { FactGroup, FactRow, GuideCard, ReadCard, SummaryCard, type SummaryLine } from '@pam/ui/Reading';
 import { TRANSPARENCY_GROUPS, TRANSPARENCY_SCREEN } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
-import { READING_STYLE } from '@/lib/readingStyle';
 
 /**
- * What your guide can see, for somebody who knows nothing about Pam (D-416).
+ * What your guide can see, for somebody who knows nothing about Pam (D-416,
+ * D-417).
  *
- * One component for both places a member reads it — the last step of signing
- * up, and Profile › What others can see — so they cannot drift apart. Top to
- * bottom: who "your guide" is (said once), the short version, then the detail
- * as two cards, "can see" in three short groups and "cannot see". Each card
- * has a copy icon that puts its text on the clipboard.
+ * Top to bottom: who "your guide" is (said once, small), the short version, and
+ * — where `detail` is on — the whole list as two cards, "can see" in three short
+ * groups and "cannot see".
+ *
+ * - **The last step of signing up shows the detail.** That screen is the
+ *   contract's: SOP §4.1 requires it to list every line, so it cannot be
+ *   shortened to a summary.
+ * - **Profile › What others can see shows the short version only** (Will,
+ *   D-417), with a link to the full privacy policy after it.
  *
  * The words of every line are `TRANSPARENCY_SCREEN` (packages/config/
  * transparency.ts) and are never re-worded here; a line that says two things
@@ -46,37 +42,10 @@ export function splitLine(text: string): { lead: string; detail?: string } {
 /** A card title is the contract's heading without its trailing colon. */
 const asTitle = (heading: string) => heading.replace(/[:：]\s*$/, '');
 
-export function TransparencyReading({ decor = READING_STYLE }: { readonly decor?: Decor }) {
+export function TransparencyReading({ detail = true }: { readonly detail?: boolean }) {
   const { t } = useI18n();
 
   const byKey = new Map(TRANSPARENCY_SCREEN.canSee.map((line) => [line.key, line] as const));
-  const source = `Pam — ${t('privacy.controls.title')}`;
-  const copyProps = (text: string) => ({
-    text,
-    label: t('copy.section'),
-    copiedLabel: t('copy.done'),
-    failedLabel: t('copy.failed'),
-  });
-
-  const canTitle = asTitle(t(TRANSPARENCY_SCREEN.canSeeHeadingKey));
-  const cannotTitle = asTitle(t(TRANSPARENCY_SCREEN.cannotSeeHeadingKey));
-
-  const canText = [
-    canTitle,
-    ...TRANSPARENCY_GROUPS.flatMap((group) => [
-      '',
-      t(group.titleKey),
-      ...group.keys.map((key) => `- ${t(key)}`),
-    ]),
-    '',
-    source,
-  ].join('\n');
-  const cannotText = [
-    cannotTitle,
-    ...TRANSPARENCY_SCREEN.cannotSee.map((line) => `- ${t(line.key)}`),
-    '',
-    source,
-  ].join('\n');
 
   const summary: SummaryLine[] = [
     { text: t('transparency.summary.see'), mark: 'yes', icon: <EyeIcon /> },
@@ -87,37 +56,41 @@ export function TransparencyReading({ decor = READING_STYLE }: { readonly decor?
 
   return (
     <VStack gap={3}>
-      <GuideCard title={t('guide.title')} body={t('guide.body')} decor={decor} icon={<PeopleIcon />} />
+      <GuideCard title={t('guide.title')} body={t('guide.body')} icon={<PeopleIcon />} />
 
-      <SummaryCard title={t('transparency.summary.title')} lines={summary} decor={decor} />
+      <SummaryCard title={t('transparency.summary.title')} lines={summary} />
 
-      <ReadCard title={canTitle} decor={decor} icon={<EyeIcon />} copy={copyProps(canText)}>
-        <VStack gap={3}>
-          {TRANSPARENCY_GROUPS.map((group) => (
-            <FactGroup key={group.titleKey} title={t(group.titleKey)}>
-              {group.keys.map((key) => {
-                const line = byKey.get(key);
-                if (!line) return null;
-                const { lead, detail } = splitLine(t(line.key));
-                return <FactRow key={key} lead={lead} detail={detail} mark="yes" decor={decor} />;
+      {detail ? (
+        <>
+          <ReadCard title={asTitle(t(TRANSPARENCY_SCREEN.canSeeHeadingKey))} icon={<EyeIcon />}>
+            <VStack gap={3}>
+              {TRANSPARENCY_GROUPS.map((group) => (
+                <FactGroup key={group.titleKey} title={t(group.titleKey)}>
+                  {group.keys.map((key) => {
+                    const line = byKey.get(key);
+                    if (!line) return null;
+                    const { lead, detail: more } = splitLine(t(line.key));
+                    return <FactRow key={key} lead={lead} detail={more} mark="yes" />;
+                  })}
+                </FactGroup>
+              ))}
+            </VStack>
+          </ReadCard>
+
+          <ReadCard title={asTitle(t(TRANSPARENCY_SCREEN.cannotSeeHeadingKey))} icon={<EyeOffIcon />}>
+            <FactGroup>
+              {TRANSPARENCY_SCREEN.cannotSee.map((line) => {
+                const { lead, detail: more } = splitLine(t(line.key));
+                return <FactRow key={line.key} lead={lead} detail={more} mark="no" />;
               })}
             </FactGroup>
-          ))}
-        </VStack>
-      </ReadCard>
+          </ReadCard>
 
-      <ReadCard title={cannotTitle} decor={decor} icon={<EyeOffIcon />} copy={copyProps(cannotText)}>
-        <FactGroup>
-          {TRANSPARENCY_SCREEN.cannotSee.map((line) => {
-            const { lead, detail } = splitLine(t(line.key));
-            return <FactRow key={line.key} lead={lead} detail={detail} mark="no" decor={decor} />;
-          })}
-        </FactGroup>
-      </ReadCard>
-
-      <Text type="supporting" xstyle={styles.small}>
-        {t(TRANSPARENCY_SCREEN.footerKey)}
-      </Text>
+          <Text type="supporting" xstyle={styles.small}>
+            {t(TRANSPARENCY_SCREEN.footerKey)}
+          </Text>
+        </>
+      ) : null}
     </VStack>
   );
 }

@@ -9,9 +9,7 @@ import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { BigButton, TextLink } from '@pam/ui';
 import { SubPage } from '@pam/ui/SubPage';
-import type { Decor } from '@pam/ui/Reading';
 import { TransparencyReading } from '@/screens/TransparencyReading';
-import { READING_STYLE } from '@/lib/readingStyle';
 import { useI18n } from '@/lib/i18n';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 
@@ -48,7 +46,7 @@ function ActionCard({ label, href }: { readonly label: string; readonly href: st
   );
 }
 
-export function PrivacyControlsView({ decor = READING_STYLE }: { readonly decor?: Decor } = {}) {
+export function PrivacyControlsView() {
   const { t } = useI18n();
   return (
     <SubPage title={t('privacy.controls.title')} backHref="/legal/" backLabel={t('nav.back.legal')}>
@@ -56,17 +54,16 @@ export function PrivacyControlsView({ decor = READING_STYLE }: { readonly decor?
         {t('privacy.controls.intro')}
       </Text>
 
-      <TransparencyReading decor={decor} />
+      {/* The guide and the short version, then the full policy (Will, D-417). */}
+      <TransparencyReading detail={false} />
 
+      <TextLink label={t('privacy.controls.policy')} href="/privacy/" />
+
+      {/* No heading: straight into what a person can do about their data (Will, D-417). */}
       <VStack gap={3}>
-        <Heading level={2} xstyle={styles.heading}>
-          {t('privacy.controls.data')}
-        </Heading>
         <ActionCard label={t('privacy.controls.copy')} href="/legal/privacy/copy/" />
         <ActionCard label={t('privacy.controls.delete')} href="/legal/privacy/delete/" />
       </VStack>
-
-      <TextLink label={t('privacy.controls.policy')} href="/privacy/" />
     </SubPage>
   );
 }

@@ -9820,10 +9820,10 @@ answer below the fold.
 **Two looks.** `decor="icons"`: a round icon on each card and a tick or cross
 on each row. `decor="plain"`: words only, a coloured edge in place of an icon,
 hairlines between rows. Both say everything in words; every icon is
-`aria-hidden`. Storybook › Member › **Reading options** has the three screens
-in both. `READING_STYLE` in `apps/web/src/lib/readingStyle.ts` picks what the
-app shows; it is **'plain'** until Will chooses (flip one line, then delete the
-other look if wanted).
+`aria-hidden`. Both were built so Will could choose; **he chose icons, and
+reshaped the screens, in D-417**, which removes the plain look, the `decor`
+prop and `READING_STYLE`, and supersedes the per-card copy icons and the policy
+cards described here.
 
 **Skipped on purpose.** The Listen (read aloud) button (Will).
 
@@ -9850,3 +9850,75 @@ other languages are not in this repository: every string added here
 (`guide.*`, `transparency.summary.*`, `transparency.group.*`, `copy.*`) and the
 two headings must be translated in each bundle when they land. Spanish is
 Claude's draft. A reviewed wording of the short version is still open.
+
+### D-417 — Will's direction after seeing both looks: icons; a short Profile screen; a flat policy with one copy icon
+
+**Date:** 2026-10-09. **Decided by:** Will, from the screenshots of both looks
+(D-416).
+
+> What others can see, keep the icon version up to short version, then just
+> link to read full privacy policy. At the bottom, remove the header "Your
+> data" just go straight into the clickable actions.
+> For Privacy page (using a similar design to terms policy also): make the
+> Your guide definition smaller, place the icon next to the Your guide header
+> (same for What others can see). The tabs follow Explore's tabs: white,
+> smaller, the selected one a dark outline. The rest of the policy: keep the
+> icons in headers, but remove things from cards; and instead of a copy button
+> on each section, one copy icon at the top right of the page that copies
+> all. A simple confirmation, a tooltip under the button: no special
+> micro-interaction animation — when clicked the icon is replaced by a
+> checkmark, then resets after 5 seconds.
+
+**What was built.**
+
+- **The icon look is the look.** The plain look, the `decor` prop,
+  `READING_STYLE` (`lib/readingStyle.ts`), the `?decor=` plumbing and the
+  Member › Reading options stories are deleted.
+- **Profile › What others can see** (`PrivacyControlsView`): the guide card, the
+  short version, then "Read the full privacy policy" (a link to `/privacy/`),
+  then Request a copy of my data and Delete my account **with no "Your data"
+  heading** (`privacy.controls.data` removed from both bundles). The detailed
+  cards are not on this screen any more.
+- **The sign-up step keeps the full list.** Claude's call, not Will's words:
+  SOP §4.1 requires that required step to list every line of the contract
+  (`TRANSPARENCY_SCREEN`), so it cannot be cut to a summary. It shows the
+  small guide card, the short version, then the detail as two cards in the icon
+  look, three short groups for "can see". `TransparencyReading` takes
+  `detail` (true on sign-up, false on Profile). No copy icons there.
+- **Your guide, smaller.** `GuideCard`: padding 12px, the icon beside the title
+  on one row, the sentence at 16px full width underneath.
+- **Privacy and terms, one design** (`LegalPage`): the jump row is Explore's
+  chips (white 40px pills, 15px, soft lift, 1px border; the one you are on a 2px
+  dark outline and weight 600; an invisible 4px margin keeps the 48px tap area),
+  with no visible "On this page" label (the nav keeps its accessible name). The
+  sections are flat — no cards — an icon beside each heading
+  (`SectionHeading`, a bare 26px icon in the accent) and the paragraphs. **I read
+  "remove things from cards" as "no cards"**; if Will meant something else
+  (only the copy buttons), the cards are a one-line return.
+- **One copy icon per page**, top right of the page header (`SubPageHeader`'s
+  `actions`), copying the whole document: title, updated line, the guide's
+  definition (privacy), every section, and "Pam — Privacy". Per-card copy
+  buttons are gone (`copy.section` became `copy.page`, "Copy this page").
+- **The copy icon's feedback is a tooltip, not a pill.** Under the button, its
+  right edge on the button's, a small point up at the icon, dark on the light
+  page. Tapped: the icon is **replaced** by a tick (a plain swap; nothing fades
+  or moves, so nothing is left for reduced motion to remove) and the tooltip says
+  "Copied"; **after 5 seconds** (`COPY_STATUS_MS`) it is a copy icon again. A
+  refused clipboard shows an "i" and "Could not copy. Press and hold the text to
+  copy it." for the same 5 seconds. Still a `role="status"` live region present
+  before anything is said.
+- **A split line stays one piece of text.** A contract line that says two
+  things ("… A program you joined sees this too.") is one text element with the
+  second sentence on its own grey line, not two elements, so it is read as one
+  sentence, found by search, and the join test's assertion on the whole line
+  holds.
+
+**Tested.** `@pam/ui` 79 (copy: tick swap, "Copied", reset at 5 seconds,
+refusal, live region; the pieces have no structural axe violations),
+`@pam/config` 242, typecheck clean, Storybook builds.
+
+**Left.** Wording of the short version is still Claude's draft for Will to read.
+The long phrase is still in Help, the report screens and two notices. Strings to
+translate in the other languages: `guide.*`, `transparency.summary.*`,
+`transparency.group.*`, `copy.page`, `copy.done`, `copy.failed`, the two
+contract headings and `transparency.title`; `privacy.controls.data` is gone.

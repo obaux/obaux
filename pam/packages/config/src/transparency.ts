@@ -246,7 +246,7 @@ export const TRANSPARENCY_I18N_KEYS: readonly string[] = [
   'transparency.summary.cannot',
   'transparency.summary.reported',
   ...['plans', 'progress', 'people'].map((g) => `transparency.group.${g}`),
-  'copy.section',
+  'copy.page',
   'copy.done',
   'copy.failed',
 ];

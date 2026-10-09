@@ -119,7 +119,7 @@ describe('transparency screen, grouped for reading (D-416)', () => {
       expect(en, `en ${g.titleKey}`).toHaveProperty(g.titleKey);
       expect(es, `es ${g.titleKey}`).toHaveProperty(g.titleKey);
     }
-    for (const key of ['guide.title', 'guide.body', 'copy.section', 'copy.done', 'copy.failed']) {
+    for (const key of ['guide.title', 'guide.body', 'copy.page', 'copy.done', 'copy.failed']) {
       expect(en).toHaveProperty(key);
       expect(es).toHaveProperty(key);
     }

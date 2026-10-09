@@ -53,13 +53,15 @@ decided.
   audit: fixing About tabs and long Russian title") appears to hold them;
   nothing from it is pushed, so they cannot be read from here.
 
-- **Reading experience (D-416).** Will asked for ways to make the long screens
-  easier for someone who knows nothing, then: "Short word is good, skip listen
-  button. Go ahead and implement … one with icons and other without." Built
-  "your guide" (defined once), a short version, three groups, a 48px copy
-  icon with a status pill, jump chips and cards on the policy pages, in two
-  looks (`icons`, `plain`), each photographed at 390px. The app shows `plain`
-  until Will chooses.
+- **Reading experience (D-416, D-417).** Will asked for ways to make the long
+  screens easier for someone who knows nothing, then: "Short word is good, skip
+  listen button … do one with icons and other without." Built both. After seeing
+  them he chose icons and reshaped the screens (D-417): Profile › What others can
+  see is the guide + short version + a link to the full policy + the two data
+  actions (no "Your data" heading); the sign-up step keeps the full list (SOP
+  §4.1); privacy and terms are flat, with Explore-style chips, an icon beside each
+  heading, and one copy icon top right (tooltip, tick for 5 seconds). The plain
+  look and its code were deleted.
 
 ## What was wrong, and what missed it
 
@@ -83,6 +85,8 @@ and side by side.
   A22); member copy adds "or a staff member responsible for guiding you".
 - D-416 — "your guide", a short version, groups and a copy icon on the long
   screens, in two looks for Will to choose.
+- D-417 — Will's choices: icons; a short Profile screen; a flat policy with one
+  copy icon (tooltip, tick, 5 seconds).
 
 ## Verified
 
@@ -117,9 +121,8 @@ and side by side.
   0079–0081.
 - There is no way to assign a case manager to a member (STATUS backlog), and
   since 0082 a member with none is read by no case manager.
-- D-416: Will to choose the icons or plain look (STATUS row 34) and to read the
-  short-version wording; the long phrase remains in Help, the report screens
-  and two notices.
+- D-416/D-417: Will to read the short-version wording (STATUS row 34); the long
+  phrase remains in Help, the report screens and two notices.
 - The Playwright a11y suite and the first-load budget check were not run after
   D-416.
 - Nothing re-shows the privacy policy or the transparency screen to an account
