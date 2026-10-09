@@ -9979,3 +9979,9 @@ a card like the two below it, with a policy-document icon (`LegalIcon`) in a gre
 tile: three rows in one group — the full policy, Request a copy of my data
 (grey), Delete my account (red). **The deletion's label is red too**
 (`--color-text-red`), not only its icon.
+
+**And the guide card is flat too** (Will: "remove shadow from the green your
+guide card, do this for privacy policy also"). `GuideCard` is one component, so
+it has no shadow on the sign-up step, Profile › What others can see and the
+privacy page alike; the pale-green fill is its edge now.
+

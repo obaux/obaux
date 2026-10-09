@@ -52,7 +52,7 @@ const styles = stylex.create({
   // 18px of the rows below.
   // Measured in the browser against the link: 17px, weight 500, line height 24.3px.
   summaryText: { fontSize: pam['--pam-link-size'], lineHeight: 1.43, fontWeight: 500 },
-  // No shadow: this card sits flat on the page.
+  // No shadow: the short version and the guide sit flat on the page (Will, D-418).
   flat: { boxShadow: 'none' },
   detail: { fontSize: '16px', lineHeight: 1.45, fontWeight: 400 },
   // The guide: smaller than the cards (Will, D-417), icon beside the title.
@@ -135,7 +135,7 @@ export interface GuideCardProps {
 
 export function GuideCard({ title, body, icon }: GuideCardProps) {
   return (
-    <Card padding={5} xstyle={styles.guide}>
+    <Card padding={5} xstyle={[styles.guide, styles.flat]}>
       <VStack gap={2}>
         <HStack gap={2} align="center" wrap="nowrap">
           {icon ? (
