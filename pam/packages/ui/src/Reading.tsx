@@ -48,9 +48,10 @@ const styles = stylex.create({
   row: { width: '100%', paddingBlock: '8px' },
   lead: { fontSize: '18px', lineHeight: 1.45, fontWeight: 600 },
   // The short version's lines read like "Read the full privacy policy" under
-  // them (Will, D-417): the link's size and a regular weight, not the heavier
+  // them (Will, D-417): the link's size and weight (500), not the heavier 600
   // 18px of the rows below.
-  summaryText: { fontSize: pam['--pam-link-size'], lineHeight: 1.45, fontWeight: 400 },
+  // Measured in the browser against the link: 17px, weight 500, line height 24.3px.
+  summaryText: { fontSize: pam['--pam-link-size'], lineHeight: 1.43, fontWeight: 500 },
   // No shadow: this card sits flat on the page.
   flat: { boxShadow: 'none' },
   detail: { fontSize: '16px', lineHeight: 1.45, fontWeight: 400 },

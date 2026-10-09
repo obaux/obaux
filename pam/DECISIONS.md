@@ -9928,7 +9928,7 @@ stays 18px. The guide card's sentence and the grey detail lines are 16px too, so
 text below the SOP's 18px mobile body size is now a deliberate, listed set:
 the intro, the guide sentence, detail lines, and 15px chips and group labels.
 (5) The short version's lines are the size and weight of "Read the full privacy
-policy" under them (`--pam-link-size`, 17px, regular) — Will: "make the short version
+policy" under them (`--pam-link-size`, 17px, weight 500, line height 1.43 — measured in the browser against the link) — Will: "make the short version
 section text smaller … text matching 'Read the full privacy policy'" — and its card
 has no shadow (`box-shadow: none`). A white card with no shadow on a white page has
 no visible edge, so it now reads as a plain section; a hairline outline or dropping
