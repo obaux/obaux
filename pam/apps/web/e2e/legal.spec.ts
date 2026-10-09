@@ -2,6 +2,7 @@ import AxeBuilder from '@axe-core/playwright';
 import { settled } from './settled';
 import { expect, test } from '@playwright/test';
 import en from '@pam/config/locales/en.json';
+import { PRIVACY, TERMS } from '@pam/config';
 
 
 /**
@@ -12,9 +13,9 @@ import en from '@pam/config/locales/en.json';
  * that the contents list exists, that it goes where it says, and that the page
  * tells you where you are as you read.
  */
-for (const [name, path] of [
-  ['privacy', '/privacy/'],
-  ['terms', '/terms/'],
+for (const [name, path, sections] of [
+  ['privacy', '/privacy/', PRIVACY.sections.length],
+  ['terms', '/terms/', TERMS.sections.length],
 ] as const) {
   test.describe(name, () => {
     test.beforeEach(async ({ page }) => {
@@ -26,7 +27,10 @@ for (const [name, path] of [
       const toc = page.getByRole('navigation', { name: en['legal.toc'] });
       await expect(toc).toBeVisible();
       const links = toc.getByRole('link');
-      await expect(links).toHaveCount(8);
+      // One entry per section of THIS document: privacy has nine since D-414 (it
+      // gained "When we limit an account"), terms eight. A fixed number here is
+      // what let that go unnoticed until the suite was run.
+      await expect(links).toHaveCount(sections);
     });
 
     test('every entry lands on a heading that exists', async ({ page }) => {

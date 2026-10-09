@@ -65,8 +65,17 @@ decided.
 
 ## What was wrong, and what missed it
 
-Nothing in the code was wrong; the *copy* made promises the rest of the system
-did not. Neither contradiction could be caught by a test: `copy.test.ts` keeps
+**A test hardcoded a count and broke without anyone seeing.** `e2e/legal.spec.ts`
+asserted exactly eight contents entries. D-414 added a ninth privacy section
+("When we limit an account") and only the config and database suites were run, so
+the browser suite went red unnoticed until it was run for D-417 (three viewports
+failed, 111 passed). Nothing in CI runs it per change here (STATUS: the web app's
+suites are not in CI). Fixed by counting each document's sections from
+`@pam/config`; the lesson is the one the file already states — a fixed number
+in a test is a promise nobody re-reads.
+
+Nothing in the code was wrong in the first two contradictions; the *copy* made
+promises the rest of the system did not. Neither contradiction could be caught by a test: `copy.test.ts` keeps
 the transparency screen identical to its contract and the locales key-for-key,
 but nothing reads a sentence in `points.*` or `terms.*` against RLS. They
 survived because each sentence was written in isolation, in the right spirit,
@@ -106,7 +115,8 @@ and side by side.
 | `pnpm --filter @pam/web build-storybook` | builds; the three screens in both looks and the "Copied" state photographed at 390px |
 | Copy button size in the browser | 48 × 48 px |
 | `pnpm -r typecheck` | 5/5 packages clean |
-| Not run | The Playwright a11y suite (real routes: contrast, target size) and the first-load budget check, after D-416 |
+| Playwright `legal`, `join`, `a11y` specs (fresh build; 320px light and dark, iPhone SE; axe incl. contrast and target size) | pass, after one fix (the hardcoded section count above): 39 legal tests pass, join and a11y pass |
+| Not run | The first-load budget check (`scripts/check-bundle-budget.mjs`); the rest of the Playwright suite |
 
 ## Left undone
 

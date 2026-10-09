@@ -1,5 +1,6 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { ClickableCard } from '@astryxdesign/core/ClickableCard';
 import { Heading } from '@astryxdesign/core/Heading';
@@ -7,7 +8,8 @@ import { HStack } from '@astryxdesign/core/HStack';
 import { Icon } from '@astryxdesign/core/Icon';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
-import { BigButton, TextLink } from '@pam/ui';
+import { BigButton, CopyIcon, TextLink, TrashIcon } from '@pam/ui';
+import { IconTile } from '@pam/ui/Reading';
 import { SubPage } from '@pam/ui/SubPage';
 import { TransparencyReading } from '@/screens/TransparencyReading';
 import { useI18n } from '@/lib/i18n';
@@ -35,10 +37,12 @@ const styles = stylex.create({
   body: { fontSize: '18px', lineHeight: 1.55 },
 });
 
-function ActionCard({ label, href }: { readonly label: string; readonly href: string }) {
+function ActionCard({ label, href, icon }: { readonly label: string; readonly href: string; readonly icon: ReactNode }) {
   return (
     <ClickableCard label={label} href={href} padding={5} xstyle={styles.action}>
-      <HStack gap={2} align="center" wrap="nowrap">
+      <HStack gap={3} align="center" wrap="nowrap">
+        {/* The same small round tile as the statements above (Will, D-417). */}
+        <IconTile small>{icon}</IconTile>
         <Text xstyle={styles.actionLabel}>{label}</Text>
         <Icon icon="chevronRight" size="md" />
       </HStack>
@@ -61,8 +65,8 @@ export function PrivacyControlsView() {
 
       {/* No heading: straight into what a person can do about their data (Will, D-417). */}
       <VStack gap={3}>
-        <ActionCard label={t('privacy.controls.copy')} href="/legal/privacy/copy/" />
-        <ActionCard label={t('privacy.controls.delete')} href="/legal/privacy/delete/" />
+        <ActionCard label={t('privacy.controls.copy')} href="/legal/privacy/copy/" icon={<CopyIcon />} />
+        <ActionCard label={t('privacy.controls.delete')} href="/legal/privacy/delete/" icon={<TrashIcon />} />
       </VStack>
     </SubPage>
   );

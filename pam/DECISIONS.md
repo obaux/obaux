@@ -9913,9 +9913,24 @@ Claude's draft. A reviewed wording of the short version is still open.
   sentence, found by search, and the join test's assertion on the whole line
   holds.
 
+**Then, the same day, three small things from Will.** (1) The copy icon is a
+48px white circle with a 1px grey edge, the same as Help and the bell (`HelpButton`'s
+look). (2) The two actions on Profile › What others can see each lead with an icon
+in the same small round tile as the statements above: a copy icon for Request a
+copy of my data, a bin for Delete my account (`IconTile`, exported from
+`@pam/ui/Reading`). (3) The guide card has 20px padding all round (was 12px), on
+all three screens it appears on, since it is one component.
+
 **Tested.** `@pam/ui` 79 (copy: tick swap, "Copied", reset at 5 seconds,
 refusal, live region; the pieces have no structural axe violations),
 `@pam/config` 242, typecheck clean, Storybook builds.
+
+**Real browser.** The Playwright legal, join and a11y specs ran against a fresh
+build at 320px (light and dark) and iPhone SE: contrast and 48px tap targets
+included, all passing. The first run found one failure, which was not this work:
+`e2e/legal.spec.ts` expected exactly eight contents entries, and the privacy page
+has had nine since D-414 added "When we limit an account". It now counts each
+document's own sections from `@pam/config`.
 
 **Left.** Wording of the short version is still Claude's draft for Will to read.
 The long phrase is still in Help, the report screens and two notices. Strings to

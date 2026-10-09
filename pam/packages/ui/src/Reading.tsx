@@ -54,6 +54,10 @@ const styles = stylex.create({
 });
 
 /** A round tile holding an icon. Decorative. */
+export function IconTile(props: { children: ReactNode; small?: boolean; no?: boolean }) {
+  return <Tile {...props} />;
+}
+
 function Tile({ children, small = false, no = false }: { children: ReactNode; small?: boolean; no?: boolean }) {
   return (
     <HStack xstyle={[styles.tile, small ? styles.tileSmall : null, no ? styles.tileNo : null]} aria-hidden="true">
@@ -90,7 +94,8 @@ export function ReadCard({ title, icon, headingLevel = 2, children }: ReadCardPr
  * Who "your guide" is, said once at the top (D-416): the person who invited
  * you, or a staff member responsible for guiding you. Everything below can
  * then say "your guide". Small (D-417): the icon sits beside the title and the
- * sentence runs full width underneath.
+ * sentence runs full width underneath, with 20px of padding all round (Will,
+ * D-417: "more padding on this card").
  */
 export interface GuideCardProps {
   readonly title: string;
@@ -100,8 +105,8 @@ export interface GuideCardProps {
 
 export function GuideCard({ title, body, icon }: GuideCardProps) {
   return (
-    <Card padding={3} xstyle={styles.guide}>
-      <VStack gap={1}>
+    <Card padding={5} xstyle={styles.guide}>
+      <VStack gap={2}>
         <HStack gap={2} align="center" wrap="nowrap">
           {icon ? (
             <HStack xstyle={styles.guideIcon} aria-hidden="true">
