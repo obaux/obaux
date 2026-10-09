@@ -14,6 +14,8 @@ import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
  * Eased, so it is mostly page colour well before the edge. Decoration only:
  * hidden from screen readers, never in the way of a tap.
  */
+const FADE = `linear-gradient(to bottom, transparent 0%, color-mix(in srgb, ${colorVars['--color-background-body']} 55%, transparent) 40%, color-mix(in srgb, ${colorVars['--color-background-body']} 90%, transparent) 75%, ${colorVars['--color-background-body']} 100%)`;
+
 export const edgeFade = stylex.create({
   above: {
     position: 'absolute',
@@ -21,6 +23,23 @@ export const edgeFade = stylex.create({
     bottom: '100%',
     height: '96px',
     pointerEvents: 'none',
-    backgroundImage: `linear-gradient(to bottom, transparent 0%, color-mix(in srgb, ${colorVars['--color-background-body']} 55%, transparent) 40%, color-mix(in srgb, ${colorVars['--color-background-body']} 90%, transparent) 75%, ${colorVars['--color-background-body']} 100%)`,
+    backgroundImage: FADE,
+  },
+  /**
+   * The same fade at the foot of something that scrolls and rests on the
+   * bar — Trips' drawer (Will, 9 October, D-403: Trips "should look like
+   * explore"). Sticky to the bottom of the scroll area, so the list dissolves
+   * into the bar exactly as a page does under `above`. Its own 96px at the
+   * end of the list is the room the last card scrolls clear into. Put it
+   * last in the scrolling element, and give that element no bottom padding:
+   * a sticky element stops short of its scroller's padding.
+   */
+  inScroll: {
+    position: 'sticky',
+    bottom: 0,
+    flexShrink: 0,
+    height: '96px',
+    pointerEvents: 'none',
+    backgroundImage: FADE,
   },
 });

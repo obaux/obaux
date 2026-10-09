@@ -33,6 +33,13 @@ import {
  */
 type Answer = { status?: number; body: unknown; file?: string; raw?: string; contentType?: string };
 
+/** Which picture Storybook serves for each example photo in a conversation. */
+const PHOTO_FILES: readonly (readonly [string, string])[] = [
+  ['example-stop', '/onboarding/hero-city.webp'],
+  ['example-room', '/friend/bring-a-friend-800.webp'],
+  ['example-door', '/onboarding/hero-sneakers.webp'],
+];
+
 /** A one-page PDF, made here so a story never fetches one (D-399). */
 const EXAMPLE_PDF = [
   '%PDF-1.4',
@@ -68,7 +75,7 @@ function routesFor(journeyRole: JourneyRole): Route[] {
     (url, method) =>
       url.includes('/storage/v1/object/') && url.includes('/message-photos/')
         ? method === 'GET'
-          ? { body: null, file: '/onboarding/hero-city.webp' }
+          ? { body: null, file: PHOTO_FILES.find(([name]) => url.includes(name))?.[1] ?? '/onboarding/hero-city.webp' }
           : { body: { Key: 'message-photos/example.jpg' } }
         : null,
     // A document in a conversation (D-399): a download answers with a

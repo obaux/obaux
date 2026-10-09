@@ -964,14 +964,31 @@ test.describe('photos and documents in one place (D-402)', () => {
     await expect(page.getByRole('heading', { name: 'Photos and documents', level: 1 })).toBeVisible();
 
     await expect(page.getByRole('heading', { name: 'Photos', level: 2 })).toBeVisible();
-    const photos = page.getByRole('button', { name: /^Open A photo (you sent|from Marcus)/ });
+    // The photos are a row to swipe through, each with who and when under it (D-404).
+    const carousel = page.getByRole('region', { name: 'Photos' });
+    const photos = carousel.getByRole('button', { name: /^Open A photo (you sent|from Marcus)/ });
     await expect(photos).toHaveCount(2);
     // Newest first: mine (10 minutes ago) before theirs (50).
-    await expect(photos.first()).toHaveAccessibleName(/^Open A photo you sent/);
-    await expect(page.getByRole('button', { name: /^Open Lease\.pdf, PDF, / })).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Google Doc: opens in Google, in a new tab' })).toBeVisible();
-    await expect(page.getByText(/^You · /)).toBeVisible();
-    await expect(page.getByText(/^Marcus · /)).toBeVisible();
+    await expect(photos.first()).toHaveAccessibleName(/^Open A photo you sent, \w+ \d+, \d+:\d\d/);
+    await expect(carousel.getByText(/^\w+ \d+ · \d+:\d\d\s?[AP]M$/).first()).toBeVisible();
+
+    // One Documents list: PDFs, Word files and Google Docs together, newest first,
+    // who on the second line, when at the end.
+    await expect(page.getByRole('heading', { name: 'Documents', level: 2 })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Google Docs' })).toHaveCount(0);
+    const google = page.getByRole('link', { name: 'Google Doc: opens in Google, in a new tab' });
+    const pdf = page.getByRole('button', { name: /^Open Lease\.pdf, PDF, / });
+    await expect(google).toBeAttached();
+    await expect(pdf).toBeAttached();
+    await expect(page.getByText('Marcus · Opens in Google')).toBeVisible();
+    await expect(page.getByText(/^You · PDF · /)).toBeVisible();
+    const googleBox = (await page.getByText('Marcus · Opens in Google').boundingBox())!;
+    const pdfBox = (await page.getByText(/^You · PDF · /).boundingBox())!;
+    expect(googleBox.y).toBeLessThan(pdfBox.y);
+    // 32px or more between the photos and the documents.
+    const photosEnd = (await carousel.boundingBox())!;
+    const docsHeading = (await page.getByRole('heading', { name: 'Documents', level: 2 }).boundingBox())!;
+    expect(docsHeading.y - (photosEnd.y + photosEnd.height)).toBeGreaterThanOrEqual(32);
 
     await photos.first().click();
     await expect(page.locator('dialog.astryx-lightbox')).toBeVisible();

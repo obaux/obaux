@@ -258,7 +258,18 @@ ${body}
 </div></body></html>`;
 }
 
-const latestDecisions = (flow) => (flow.changes ?? []).slice(0, 2).map((c) => c.split(' ')[0]);
+// The D-numbers of the two newest change lines. A line can name a range
+// ("D-400–401 — …"), which stands for every decision in it, so a screen
+// changed by D-401 is tagged as new too.
+const latestDecisions = (flow) =>
+  (flow.changes ?? []).slice(0, 2).flatMap((c) => {
+    const head = c.split(' ')[0];
+    const range = /^D-(\d+)[–-](\d+)$/.exec(head);
+    if (!range) return [head];
+    const out = [];
+    for (let n = Number(range[1]); n <= Number(range[2]); n += 1) out.push(`D-${n}`);
+    return out;
+  });
 const homes = {};
 
 for (const flow of flows) {

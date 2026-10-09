@@ -28,8 +28,6 @@ export function LocalTabBar({
       isHome={isHome}
       homeIcon={role === 'provider' ? 'calendar' : role === 'admin' ? 'people' : 'house'}
       tabs={tabsFor(role)}
-      // Trips' drawer rests on the bar; a fade would wash it out (D-285).
-      hasFade={current !== 'trips'}
       labels={{
         explore: t(isHome ? 'tab.home' : 'tab.explore'),
         saved: t('tab.saved'),

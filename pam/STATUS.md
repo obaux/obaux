@@ -354,7 +354,10 @@ card whose "Change appointment" moves the visit and returns, with address and ho
 before About; Storybook's example places now share the example set's ids, so a saved
 one shows saved from a trip too (D-281). Saving the new time celebrates it
 (confetti, the new day and time) and goes home after 5 seconds or on Go home (D-282). A 96px eased fade sits above the tab bar so lists soften into it, with room for the last card to scroll clear (D-283, D-284); a strip resting on the bar
-draws its own fade above it, and Trips has none (D-285). The tab bar exists only in
+draws its own fade above it (D-285). Since D-403 the bar is the same on every tab: no
+top line, the fade on every tab, Trips included (its drawer sits above the bar and
+draws the same fade at the foot of its list, `edgeFade.inScroll`), and a switch neither
+cross-fades the bar nor fades a tab's colour. The tab bar exists only in
 Storybook's prototype: the live app has no bottom bar until the member shell is built.
 The award tile has a "Your badge" ribbon (D-286). Place cards lead with an illustrated
 category tile (`CategoryArt`), a top-aligned save, and a quieter open line (D-287). Category chips glow behind
@@ -855,9 +858,9 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
-## Conversations, redrawn (8–9 October) — 0.45.5 to 0.48.0, on the branch
+## Conversations, redrawn (8–9 October) — 0.45.5 to 0.48.1, on the branch
 
-D-389 to D-402, **on `claude/pam-storybook`, not merged to `main`.** A
+D-389 to D-404, **on `claude/pam-storybook`, not merged to `main`.** A
 conversation's header says who the person is on a line under the name —
 "Program lead at Example Food Pantry", "Case manager" (D-395). Each day opens
 with one divider ("Today", "Yesterday", a weekday, a date). Bubbles carry no name or time: mine are light green on the
@@ -904,9 +907,12 @@ an even 8px rim; document icons are `FileTypeIcon` in Google-Doc blue
 (`--pam-document-blue`); photos open in `PhotoViewer` on near-black with
 48px dark circle buttons.
 
-**Photos and documents page (D-402, 0.48.0).** From a conversation's ⋯:
-its photos (grid → viewer, paging), documents and Google Docs, newest first,
-with who and when — read through `useThread`, so nothing new to query.
+**Photos and documents page (D-402, D-404, 0.48.1).** From a conversation's
+⋯: its photos as a swipeable row (Astryx `Carousel`, 200px, who and
+"date · time" under each; tap → viewer, paging), then one Documents list —
+PDFs, Word files and Google Docs together, full-width cards with who on the
+second line and the date over the time at the end — newest first, 32px
+between the two. Read through `useThread`, so nothing new to query.
 
 ## Release 0.45.0-two-roles (7 October) — one account, member and program
 

@@ -275,6 +275,27 @@ export function threadFor(role: Role | null) {
     attachment_kind: 'photo',
     created_at: hoursAgo((THREAD.length - 2) * 6 - 3),
   });
+  // Two more (D-404), so the Photos and documents page has a row to swipe:
+  // the member sends the classroom on its own, no words, and the case
+  // worker shows the way in to the ID office.
+  rows.splice(7, 0, {
+    id: 'm-photo-room',
+    conversation_id: CONVO_ID,
+    sender_id: memberSpeaks,
+    body: null,
+    attachment_url: `${CONVO_ID}/example-room.jpg`,
+    attachment_kind: 'photo',
+    created_at: hoursAgo((THREAD.length - 5) * 6 - 1),
+  });
+  rows.splice(9, 0, {
+    id: 'm-photo-door',
+    conversation_id: CONVO_ID,
+    sender_id: staffSpeaks,
+    body: 'The way in is round the side.',
+    attachment_url: `${CONVO_ID}/example-door.jpg`,
+    attachment_kind: 'photo',
+    created_at: hoursAgo((THREAD.length - 6) * 6 - 1),
+  });
   // A document and a Google Doc (D-399): the case worker sends the letter
   // for the ID office, then the class schedule as a Google Docs link.
   rows.push(

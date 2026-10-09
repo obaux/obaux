@@ -27,7 +27,7 @@
  *   changes  — the newest decisions this flow shows, newest first
  */
 
-export const UPDATED = '2026-10-08';
+export const UPDATED = '2026-10-09';
 
 /** Where each screen opens live — the branch's Storybook on Chromatic. */
 export const STORYBOOK_URL = 'https://claude-pam-storybook--6abea9193da46b88ce90890f.chromatic.com';
@@ -223,8 +223,8 @@ export const flows = [
         title: 'Trips',
         story: 'member-created--trips',
         path: '/trips/',
-        changed: 'D-336',
-        note: 'Signatures needed / Policies signed per visit\'s service; a banner for the soonest trip still to sign',
+        changed: 'D-403',
+        note: 'Signatures needed / Policies signed per visit\'s service; a banner for the soonest trip still to sign. The list fades into the tab bar like every tab, no line',
       },
       messages: { title: 'Messages', story: 'member-created--messages', path: '/messages/' },
       thread: {
@@ -239,8 +239,8 @@ export const flows = [
         title: 'Photos and documents',
         story: 'member-created--conversation-files',
         path: '/messages/thread/files/',
-        changed: 'D-402',
-        note: 'Everything shared in this conversation: photos as a grid that opens full size, documents and Google Docs as their cards, newest first, who and when',
+        changed: 'D-404',
+        note: 'Everything shared in this conversation, newest first: photos as a row you swipe, who and when under each, opening full size; then one Documents list (PDF, Word, Google Docs), full-width cards with who and the date and time inside',
       },
       profile: {
         title: 'Profile',
@@ -305,6 +305,8 @@ export const flows = [
       ['profile', 'points', 'Points'],
     ],
     changes: [
+      'D-404 — Photos and documents: photos as a swipeable row with who and when; one Documents list with who and when inside full-width cards',
+      'D-403 — the tab bar is the same on every tab: the fade always there (Trips too), no line, no flicker when switching',
       'D-402 — a conversation\'s ⋯: Photos and documents, everything shared in it in one place (photos open full size and page through; documents and Google Docs as cards)',
       'D-400–401 — a conversation: a smaller visit card and a blurred fade under the header; one line under the name; an even frame round photos; the send button tucked into a rounder corner; photos open on near-black',
       'D-399 — a conversation: send a PDF or Word file (the document button, or drop it on), opened when tapped; a Google Docs link shows as a card that opens it in Google',

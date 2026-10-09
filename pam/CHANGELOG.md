@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.48.1] — 2026-10-09 · Easier to look through, steadier to move around
+
+On the Photos and documents page, photos are now a row you swipe through,
+each with who sent it and when underneath. Documents and Google Docs are
+one list, each card the full width of the screen with who sent it and, at
+its end, the date and time. There is more room between the two (D-404).
+
+In the prototype's member app, the tab bar looks the same on every tab:
+the soft fade above it is always there, Trips included, with no line along
+its top, and switching tabs no longer flickers the fade or lights two tabs
+at once (D-403).
+
 ## [0.48.0] — 2026-10-09 · Everything shared, in one place
 
 A conversation's ⋯ page has a new first row, Photos and documents: every

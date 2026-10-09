@@ -451,6 +451,18 @@
   ::view-transition-group(pam-tabbar) {
     animation: none;
   }
+  /*
+   * Nor are its pictures cross-faded (Will, 9 October, D-403): with the
+   * default old-out / new-in fade, a tab switch showed two tabs lit at once
+   * and the fade above the bar dissolving and coming back. The new bar is
+   * shown at once, whole, for the length of the switch.
+   */
+  ::view-transition-old(pam-tabbar) {
+    display: none;
+  }
+  ::view-transition-new(pam-tabbar) {
+    animation: none;
+  }
 
   html[data-pam-nav='forward']::view-transition-old(root) {
     animation: 200ms cubic-bezier(0.4, 0, 1, 1) both pam-nav-out-left;

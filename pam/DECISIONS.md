@@ -10045,3 +10045,68 @@ list. This will help users access files / photos shared easily."
 - Stories: Member and Case manager › *Photos and documents*; the prototype
   route; the flow map's options node gains the page.
 
+
+### D-403 — One tab bar on every tab: the fade everywhere, no line, nothing cross-faded
+
+**Date:** 2026-10-09. Will, of the member app: "notice how switching tabs
+doesn't always look the same. The white fade glitches, trips it doesn't
+always show. And the line appear in trips when it should look like explore,
+clean no line. Line is only for messages. And white fade should be loaded
+ahead of time before the person switches tab."
+
+Three causes, found by recording a switch frame by frame in Storybook (the
+tab bar exists only in the prototype, `LocalTabBar`):
+
+- **The line.** The bar had a 1px top border. On every tab but Trips the
+  last row of its own fade, the page colour, covered it; Trips turned the
+  fade off (D-285), so only Trips showed the line. The border is gone: the
+  fade is the bar's edge on every tab. The one line left on a tab screen is
+  a floating row's own (Messages' "People who offered help"), as Will wants.
+- **Trips without a fade.** The fade was off there because Trips' drawer
+  rests on the bar, and docked (100px) it would be washed out under a 96px
+  fade. Now the bar keeps its fade on every tab — it is the same element
+  everywhere, so a switch changes nothing but the lit tab — and the drawer
+  sits above it (z-index 11 over the bar's 10). The drawer draws the same
+  fade at the foot of its own list, `edgeFade.inScroll`: sticky to the
+  bottom of the list, so cards dissolve into the bar exactly as Explore's
+  do, and its own 96px at the end is the room the last card scrolls clear
+  into. (The list's bottom padding went: a sticky element stops short of
+  its scroller's padding, which first left the fade floating 96px above the
+  bar, over the middle of a card.) This supersedes D-285 for Trips; a strip
+  resting on the bar still draws its own fade above itself.
+- **The glitch.** The bar keeps still in a switch (D-269, its own
+  view-transition layer), but the browser still cross-faded its old and new
+  pictures: for the length of the switch two tabs were lit and the fade
+  thinned and came back. Its old picture is now hidden and the new one shown
+  at once (`globals.css`). And Astryx fades a tab's colour over 125ms, which
+  showed the new tab's filled icon dark for a beat before it turned pink; a
+  tab now lights at once (`transitionProperty: none` on the tab).
+
+"Loaded ahead of time": the fade is StyleX in the global stylesheet and the
+bar never unmounts in a switch, so with the fade on for every tab there is
+nothing left to arrive late. The page content keeps D-269's quick
+cross-fade.
+
+### D-404 — Photos and documents, laid out to read
+
+**Date:** 2026-10-09. Will, of the page from D-402: "let's just merge
+documents together. Also, we need timestamps on photos too. Let's clean up
+layout so it reads better with times on end. Also let's make doc container
+spread full width. Add timestamp and person's name inside it, and list them
+one on top of the other. Photos can be handled like a slider with carousel
+and timestamp under photo. Add more gap between doc list and photo list."
+
+- **Photos** are a row you swipe (Astryx's `Carousel`, snapping a photo at a
+  time, with its own next and previous buttons while there is more to
+  see), 200px square, so
+  the next photo shows at the edge and says there is more. Under each: who
+  sent it, then "Oct 9 · 2:14 PM". A screen reader hears the date and time
+  in the photo's name too. A tap still opens the viewer, paging through all
+  of them.
+- **Documents** are one list — PDFs, Word files and Google Docs together,
+  newest first — one card on top of the other, each the full width. Inside
+  each card: the name; "Teresa · PDF · 180 kB" (who first); and at its end
+  the date over the time. The conversation's own cards are unchanged.
+- **32px** between the photos and the documents (was 16).
+- Storybook's example conversation has three photos now, not one, so the
+  row has something to swipe (Storybook pictures only).
