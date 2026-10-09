@@ -9,6 +9,7 @@ import { DUMMY_PLACES_BY_ID } from '@pam/config/dummy-places';
 import { DUMMY_TRIPS } from '@pam/config/dummy-trips';
 import { useI18n } from '@/lib/i18n';
 import { readAddedTrips, withMoves } from '@/lib/addedTrips';
+import { intlLocale } from '@pam/config';
 
 /**
  * A booked visit, at the top of a conversation with the program it is at
@@ -60,8 +61,8 @@ export function ThreadVisit({
 
   if (!visit) return null;
   const at = new Date(visit.startsAt);
-  const day = new Intl.DateTimeFormat(locale, { weekday: 'long', month: 'long', day: 'numeric' }).format(at);
-  const time = new Intl.DateTimeFormat(locale, { hour: 'numeric', minute: '2-digit' }).format(at);
+  const day = new Intl.DateTimeFormat(intlLocale(locale), { weekday: 'long', month: 'long', day: 'numeric' }).format(at);
+  const time = new Intl.DateTimeFormat(intlLocale(locale), { hour: 'numeric', minute: '2-digit' }).format(at);
   const href = `/place/?${new URLSearchParams({
     id: visit.placeId,
     from: 'thread',

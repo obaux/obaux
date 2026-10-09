@@ -4,13 +4,14 @@ import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Loading, Notice, Page } from '@pam/ui';
 import { SubPageHeader } from '@pam/ui/SubPage';
-import { NOTICES } from '@pam/config';
+import { NOTICES, speechLanguageFor } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { NotIn } from '../../NotIn';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
 import { useRoleView } from '@/lib/useViewedRole';
 import { useThread } from '@/lib/useThread';
+import { useMessageTranslations } from '@/lib/useMessageTranslations';
 import { ThreadViewLazy } from '../ThreadViewLazy';
 import { staffPhotoFor } from '@pam/config/dummy-connections';
 import { ThreadFrame, ThreadHeader, ThreadTop } from '../ThreadFrame';
@@ -52,6 +53,8 @@ function isDummyId(id: string | null): boolean {
   return id !== null && id.startsWith('dummy-conv-');
 }
 
+const NO_MESSAGES: readonly never[] = [];
+
 function ThreadScreen() {
   const { t, locale } = useI18n();
   const supportPhone = useSupportPhone();
@@ -80,7 +83,11 @@ function ThreadScreen() {
 
   const { state, send, sending, sendFailed } = useThread(signedIn && realCanMessage && !demo ? conversationId : null);
 
-  const speechLanguage = locale === 'es' ? 'es-US' : 'en-US';
+  const speechLanguage = speechLanguageFor(locale);
+
+  // Other people's words in the reader's language, labelled (D-405). Nothing
+  // happens while MESSAGE_TRANSLATION is off.
+  const translations = useMessageTranslations(state.status === 'ready' ? state.messages : NO_MESSAGES);
 
   if (session.status === 'loading') {
     return (
@@ -174,6 +181,7 @@ function ThreadScreen() {
         </ThreadTop>
         <ThreadViewLazy
           messages={state.messages}
+          translations={translations}
           otherName={state.otherName}
           otherPhotoUrl={staffPhotoFor(state.otherName, state.otherProgramName ?? null)}
           onSend={send}

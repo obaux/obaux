@@ -41,6 +41,8 @@ import {
 } from '@/lib/messageFile';
 import { FileSummary, GoogleLinkCard, MessageFileCard } from './MessageFileCard';
 import { PhotoViewer } from './PhotoViewer';
+import { TranslatedBody, type MessageTranslation } from './TranslatedBody';
+import { intlLocale } from '@pam/config';
 
 /**
  * One conversation, drawn with Astryx's Chat family (D-181): `ChatMessageList`
@@ -137,6 +139,12 @@ export interface ThreadViewMessage {
 
 export interface ThreadViewProps {
   readonly messages: readonly ThreadViewMessage[];
+  /**
+   * Other people's messages in the reader's language, by message id (D-405):
+   * shown under the label "Translated", with a link to what was written.
+   * Absent for a message that needed none, and always while translation is off.
+   */
+  readonly translations?: Readonly<Record<string, MessageTranslation>>;
   /** The other person's first name; `null` shows "This person". */
   readonly otherName: string | null;
   /** Their photo when Pam has one (D-335); their initials otherwise. */
@@ -160,7 +168,7 @@ const REVEAL = 84;
 // What a drag moves, it moves by this one custom property, set once on
 // `RevealTimes` and read by every bubble and time below it — so a pointer
 // move restyles one element and re-renders none of the messages.
-const SLIDE = 'translateX(calc(-1 * var(--pam-reveal, 0px)))';
+const SLIDE = 'translateX(calc(-1 * var(--pam-flip, 1) * var(--pam-reveal, 0px)))';
 const slideMotion = {
   transform: SLIDE,
   transitionProperty: 'transform',
@@ -364,6 +372,9 @@ const dynamic = stylex.create({
  * browser untouched.
  */
 function RevealTimes({ children }: { readonly children: ReactNode }) {
+  // Right to left, the times wait at the left edge and a drag to the right brings them.
+  const { dir } = useI18n();
+  const flip = dir === 'rtl' ? -1 : 1;
   const [offset, setOffset] = useState(0);
   const [isDragging, setDragging] = useState(false);
   const drag = useRef<{ x: number; y: number; id: number; axis: 'x' | 'y' | null } | null>(null);
@@ -394,7 +405,7 @@ function RevealTimes({ children }: { readonly children: ReactNode }) {
             setDragging(true);
           }
         }
-        if (d.axis === 'x') setOffset(Math.min(Math.max(-dx, 0), REVEAL));
+        if (d.axis === 'x') setOffset(Math.min(Math.max(-dx * flip, 0), REVEAL));
       }}
       onPointerUp={end}
       onPointerCancel={end}
@@ -506,6 +517,7 @@ function ScrollToBottom() {
 
 export function ThreadView({
   messages,
+  translations,
   otherName,
   otherPhotoUrl = null,
   onSend,
@@ -794,11 +806,21 @@ export function ThreadView({
           }
         >
           {messages.map((message, i) => {
-            const time = new Intl.DateTimeFormat(locale, { hour: 'numeric', minute: '2-digit' }).format(
+            const time = new Intl.DateTimeFormat(intlLocale(locale), { hour: 'numeric', minute: '2-digit' }).format(
               new Date(message.createdAt),
             );
             // A Google Docs link in the words shows as a card under them (D-399).
             const google = message.photoUrl || message.file ? null : googleLinkIn(message.body);
+            // The words, as written — or, for another person's message that
+            // came back translated, in the reader's language with its label and
+            // a link to the original (D-405).
+            const translation = message.mine ? undefined : translations?.[message.id];
+            const words = (extra?: stylex.StyleXStyles) =>
+              translation && message.body ? (
+                <TranslatedBody original={message.body} translation={translation} {...(extra ? { captionStyle: extra } : {})} />
+              ) : (
+                <Text xstyle={[styles.body, extra]}>{message.body ?? ''}</Text>
+              );
             // A divider opens each day (D-389).
             const isNewDay = i === 0 || dayKey(message.createdAt) !== dayKey(messages[i - 1]!.createdAt);
             return (
@@ -848,24 +870,20 @@ export function ThreadView({
                           }
                           xstyle={styles.photo}
                         />
-                        {message.body ? (
-                          <Text xstyle={[styles.body, styles.caption]}>{message.body}</Text>
-                        ) : null}
+                        {message.body ? words(styles.caption) : null}
                       </VStack>
                     ) : message.file ? (
                       <VStack gap={3}>
                         <MessageFileCard file={message.file} localUrl={message.fileUrl ?? null} />
-                        {message.body ? (
-                          <Text xstyle={[styles.body, styles.caption]}>{message.body}</Text>
-                        ) : null}
+                        {message.body ? words(styles.caption) : null}
                       </VStack>
                     ) : google ? (
                       <VStack gap={2}>
-                        <Text xstyle={styles.body}>{message.body}</Text>
+                        {words()}
                         <GoogleLinkCard url={google.url} kind={google.kind} />
                       </VStack>
                     ) : (
-                      <Text xstyle={styles.body}>{message.body ?? ''}</Text>
+                      words()
                     )}
                   </ChatMessageBubble>
                   <Text type="supporting" aria-hidden xstyle={styles.stamp}>

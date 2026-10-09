@@ -12,6 +12,7 @@ import { BigButton, TextLink } from '@pam/ui';
 import { useI18n } from '@/lib/i18n';
 import { inviteLink } from '@/lib/appUrl';
 import type { CreatedInvite } from '@/lib/useCaseload';
+import { intlLocale } from '@pam/config';
 
 /**
  * An invite, made (D-254, Will, 3 October): a **link**, not a code to read
@@ -58,7 +59,7 @@ export function InviteReady({
   const { t, locale } = useI18n();
   const [copied, setCopied] = useState(false);
   const url = inviteLink(invite.code, invite.role);
-  const date = new Intl.DateTimeFormat(locale, { month: 'long', day: 'numeric' }).format(new Date(invite.expiresAt));
+  const date = new Intl.DateTimeFormat(intlLocale(locale), { month: 'long', day: 'numeric' }).format(new Date(invite.expiresAt));
 
   const send = async () => {
     const text = t('invite.link.message', { url });

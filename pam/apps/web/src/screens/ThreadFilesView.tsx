@@ -16,6 +16,7 @@ import { useThread, type ThreadMessage } from '@/lib/useThread';
 import { googleLinkIn } from '@/lib/messageFile';
 import { GoogleLinkCard, MessageFileCard } from '@/app/messages/MessageFileCard';
 import { PhotoViewer } from '@/app/messages/PhotoViewer';
+import { intlLocale } from '@pam/config';
 
 /**
  * Everything shared in one conversation, in one place (Will, 9 October,
@@ -54,7 +55,7 @@ function ThreadFiles() {
   const otherName = state.status === 'ready' ? (state.otherName ?? t('messages.thread.someone')) : '';
   const who = (m: ThreadMessage) => (m.mine ? t('messages.thread.you') : otherName);
   const when = (m: ThreadMessage) =>
-    new Intl.DateTimeFormat(locale, { month: 'short', day: 'numeric' }).format(new Date(m.createdAt));
+    new Intl.DateTimeFormat(intlLocale(locale), { month: 'short', day: 'numeric' }).format(new Date(m.createdAt));
   const from = (m: ThreadMessage) => t('messages.files.from', { who: who(m), date: when(m) });
 
   const photos = messages.filter((m) => m.photoUrl);

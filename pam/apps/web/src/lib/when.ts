@@ -5,6 +5,8 @@
  * difference that decides whether somebody acts now — "13 Sept" makes a reader
  * do arithmetic to answer "is this new?".
  */
+import { intlLocale } from '@pam/config';
+
 export function whenHappened(
   iso: string,
   locale: string,
@@ -14,7 +16,7 @@ export function whenHappened(
   const days = Math.floor((Date.now() - then.getTime()) / 86_400_000);
   if (days <= 0) return t('when.today');
   if (days === 1) return t('when.yesterday');
-  return new Intl.DateTimeFormat(locale, { month: 'short', day: 'numeric' }).format(then);
+  return new Intl.DateTimeFormat(intlLocale(locale), { month: 'short', day: 'numeric' }).format(then);
 }
 
 /**
@@ -54,8 +56,8 @@ export function dayLabel(
   const days = -daysUntil(then, now);
   if (days <= 0) return t('when.today');
   if (days === 1) return t('when.yesterday');
-  if (days < 7) return new Intl.DateTimeFormat(locale, { weekday: 'long' }).format(then);
-  return new Intl.DateTimeFormat(locale, {
+  if (days < 7) return new Intl.DateTimeFormat(intlLocale(locale), { weekday: 'long' }).format(then);
+  return new Intl.DateTimeFormat(intlLocale(locale), {
     weekday: 'short',
     month: 'short',
     day: 'numeric',

@@ -551,16 +551,16 @@
 
 /* Keyframes for D-269's moves between screens and the page body's rise. */
 @keyframes pam-nav-in-right {
-  from { opacity: 0; transform: translateX(24px); }
+  from { opacity: 0; transform: translateX(calc(24px * var(--pam-flip, 1))); }
 }
 @keyframes pam-nav-out-left {
-  to { opacity: 0; transform: translateX(-12px); }
+  to { opacity: 0; transform: translateX(calc(-12px * var(--pam-flip, 1))); }
 }
 @keyframes pam-nav-in-left {
-  from { opacity: 0; transform: translateX(-24px); }
+  from { opacity: 0; transform: translateX(calc(-24px * var(--pam-flip, 1))); }
 }
 @keyframes pam-nav-out-right {
-  to { opacity: 0; transform: translateX(12px); }
+  to { opacity: 0; transform: translateX(calc(12px * var(--pam-flip, 1))); }
 }
 @keyframes pam-nav-fade-in {
   from { opacity: 0; }
@@ -571,3 +571,57 @@
 @keyframes pam-rise {
   from { opacity: 0; transform: translateY(8px); }
 }
+
+/*
+ * Right to left (Arabic, D-404). `<html dir>` follows the language
+ * (`I18nProvider`); Astryx's own components mirror from it, and logical
+ * properties do the rest. What is left lives here.
+ *
+ * --pam-flip is +1 reading left to right and -1 right to left. It turns the
+ * few things CSS logical properties cannot say: a slide's direction, a fade's
+ * side, the way a swipe reveals the times.
+ */
+:root { --pam-flip: 1; }
+:root[dir='rtl'] { --pam-flip: -1; }
+
+/* An arrow that points "back" points the other way. */
+:root[dir='rtl'] [data-pam-directional] { transform: scaleX(-1); }
+
+/* Arabic joins its letters. Spacing them apart breaks the word. */
+:root[lang='ar'] * { letter-spacing: 0; }
+
+/*
+ * A phone number, an email address and a code are written left to right even
+ * on a right-to-left page, and sit at the end of the field where the eye
+ * expects them.
+ */
+:root[dir='rtl'] :is(
+  input[type='tel'],
+  input[type='email'],
+  input[type='url'],
+  input[inputmode='numeric'],
+  input[autocomplete='one-time-code']
+) {
+  direction: ltr;
+  text-align: right;
+}
+
+/*
+ * Longer words (D-404). English is the shortest of the seven languages Pam
+ * speaks, and every layout was first drawn around it: "Privacy" is 7 letters,
+ * "Конфиденциальность" is 18. A word wider than its box is cropped at the
+ * edge of the screen with nothing to say so, and the page does not scroll, so
+ * no overflow check ever notices.
+ *
+ * - Every language may break a word that cannot fit on a line of its own, as
+ *   a last resort (`break-word` — never mid-word while it fits).
+ * - Everything but English may hyphenate at the places its dictionary knows
+ *   ("Конфиден-циальность"), which keeps lines even and avoids the last-resort
+ *   break. English is left alone: its words are short, and a hyphen in a
+ *   button label is noise.
+ * - Chinese has no spaces, so the browser may break between any two
+ *   characters, but not in front of closing punctuation (`strict`).
+ */
+:root { overflow-wrap: break-word; }
+:root:not([lang='en']) { hyphens: auto; }
+:root:lang(zh-CN), :root:lang(zh-HK) { line-break: strict; }

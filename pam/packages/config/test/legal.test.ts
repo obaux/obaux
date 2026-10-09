@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import en from '../src/locales/en.json' with { type: 'json' };
-import es from '../src/locales/es.json' with { type: 'json' };
+import { BUNDLES } from './_bundles.js';
 import {
   LEGAL_DOCUMENTS,
   PRIVACY,
@@ -8,13 +7,15 @@ import {
   legalKeys,
 } from '../src/legal.js';
 import { TRANSPARENCY_SCREEN } from '../src/transparency.js';
+import { MESSAGE_TRANSLATION } from '../src/translation.js';
 import { fleschKincaidGrade, findDignityViolations } from '../src/language.js';
 
-const bundles = { en, es } as Record<string, Record<string, string>>;
+const en = BUNDLES.en;
+const bundles: Record<string, Record<string, string>> = BUNDLES;
 
 describe('the privacy notice and the terms', () => {
   it.each(LEGAL_DOCUMENTS.map((d) => [d.id, d] as const))(
-    '%s has every string in both languages',
+    '%s has every string in every language',
     (_id, doc) => {
       for (const key of legalKeys(doc)) {
         for (const [locale, bundle] of Object.entries(bundles)) {
@@ -36,10 +37,7 @@ describe('the privacy notice and the terms', () => {
   it('never uses a word that reduces somebody to their record', () => {
     const legal = Object.fromEntries(
       LEGAL_DOCUMENTS.flatMap((doc) =>
-        legalKeys(doc).flatMap((k) => [
-          [`en.${k}`, en[k as keyof typeof en]],
-          [`es.${k}`, es[k as keyof typeof es]],
-        ]),
+        legalKeys(doc).flatMap((k) => Object.entries(BUNDLES).map(([locale, bundle]) => [`${locale}.${k}`, bundle[k]!])),
       ),
     ) as Record<string, string>;
     expect(findDignityViolations(legal)).toEqual([]);
@@ -124,5 +122,54 @@ describe('the privacy page and the transparency screen agree', () => {
     const page = visibility!.bodyKeys.map((k) => en[k as keyof typeof en] as string).join(' ');
     expect(page).toMatch(/we will tell you first/i);
     expect(TRANSPARENCY_SCREEN.footer).toMatch(/we will tell you first/i);
+  });
+});
+
+describe('messages read in the reader’s language (D-405)', () => {
+  const TRANSLATION_KEYS = ['title', 'p1', 'p2', 'p3'].map((k) => `privacy.s.translation.${k}`);
+
+  it('is off until somebody turns it on (and Will has been told)', () => {
+    // Flip MESSAGE_TRANSLATION.enabled only with the items in
+    // docs/before-launch.md done. This test is here so that is a decision,
+    // not a side effect: it will fail, and whoever flips it updates it.
+    expect(MESSAGE_TRANSLATION.enabled).toBe(false);
+  });
+
+  it('is on the privacy page exactly when it is true — never before, never after', () => {
+    const says = PRIVACY.sections.some((s) => s.id === 'translation');
+    expect(says).toBe(MESSAGE_TRANSLATION.enabled);
+    if (!MESSAGE_TRANSLATION.enabled) {
+      // While it is off, nothing on the page claims or hints at it.
+      for (const key of legalKeys(PRIVACY)) {
+        expect(en[key as keyof typeof en] as string, key).not.toMatch(/translat/i);
+      }
+    }
+  });
+
+  it('is already written in every language, so turning it on cannot ship a gap', () => {
+    for (const key of TRANSLATION_KEYS) {
+      for (const [locale, bundle] of Object.entries(bundles)) {
+        expect(bundle[key], `${key} missing in ${locale}`).toBeTruthy();
+      }
+    }
+  });
+
+  it('tells people what is sent, what is not, and what is kept', () => {
+    const text = TRANSLATION_KEYS.map((k) => en[k as keyof typeof en] as string).join(' ');
+    expect(text).toMatch(/sends the words/i);
+    expect(text).toMatch(/not get your name, your phone number/i);
+    expect(text).toMatch(/keeps nothing/i);
+    expect(text).toMatch(/Only the people in that chat/i);
+    expect(text).toMatch(/can be wrong/i);
+  });
+
+  it('reads like the rest of the page and never reduces anybody to their record', () => {
+    const strings = Object.fromEntries(
+      TRANSLATION_KEYS.flatMap((k) => Object.entries(bundles).map(([locale, bundle]) => [`${locale}.${k}`, bundle[k]!])),
+    );
+    expect(findDignityViolations(strings)).toEqual([]);
+    for (const k of TRANSLATION_KEYS.slice(1)) {
+      expect(fleschKincaidGrade(en[k as keyof typeof en] as string), k).toBeLessThanOrEqual(9);
+    }
   });
 });

@@ -114,6 +114,12 @@ describe('rendering a reviewed message', () => {
     expect(localeOf('pt')).toBe('en');
     expect(localeOf(null)).toBe('en');
     expect(localeOf('es')).toBe('es');
+    // Texts are written and signed off in English and Spanish only. Every other
+    // language a member can pick still gets its texts in English until its own
+    // wording has been written and a person has signed it off (§9) — a text is
+    // the one place Pam cannot show a draft to someone first. A new language
+    // must not start receiving machine-drafted texts just because the app speaks it.
+    for (const code of ['pt-BR', 'zh-CN', 'zh-HK', 'ru', 'ar']) expect(localeOf(code)).toBe('en');
   });
 });
 

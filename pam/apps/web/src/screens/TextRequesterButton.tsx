@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { Text } from '@astryxdesign/core/Text';
-import { Button } from '@astryxdesign/core/Button';
+import { Button } from '@pam/ui/Button';
 import { VStack } from '@astryxdesign/core/VStack';
 import { useI18n } from '@/lib/i18n';
 import { staffRequestPhone } from '@/lib/useStaffRequests';

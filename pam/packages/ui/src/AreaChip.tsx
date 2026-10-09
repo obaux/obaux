@@ -41,10 +41,10 @@ const styles = stylex.create({
   area: {
     minHeight: pam['--pam-touch-target-min'],
     fontSize: '15px',
-    // The header is a tight row. The area gives way before the mark does, and
-    // a long address ends in an ellipsis rather than pushing the pencil off
-    // the screen.
-    maxWidth: '46vw',
+    // A long address ends in an ellipsis rather than pushing the pencil off
+    // the screen. The row it sits in wraps (D-404), so the link goes under its
+    // heading before it is ever squeezed; the whole width is its to use then.
+    maxWidth: '100%',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',

@@ -7,6 +7,7 @@ import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
+import { useFitTitle } from './fitTitle.js';
 
 /**
  * A screen's title, large at the top and shrinking into a bar as the page
@@ -51,6 +52,10 @@ export interface LargeTitleHeaderProps {
 
 const COLLAPSE_AT = 40;
 
+const sizes = stylex.create({
+  title: (px: number) => ({ fontSize: `${px}px` }),
+});
+
 const styles = stylex.create({
   bar: {
     position: 'sticky',
@@ -77,7 +82,16 @@ const styles = stylex.create({
   smallShown: { opacity: 1 },
   // Large and bold, like the reference: the screen says where you are before
   // anything else on it does.
-  large: { fontSize: '34px', lineHeight: 1.15, fontWeight: 700, paddingBlockEnd: '8px' },
+  // 34px, stepping down for a word that will not fit (D-404, `useFitTitle`).
+  large: {
+    fontSize: '34px',
+    lineHeight: 1.15,
+    fontWeight: 700,
+    paddingBlockEnd: '8px',
+    overflowWrap: 'normal',
+    hyphens: 'manual',
+  },
+  largeBreaks: { overflowWrap: 'anywhere' },
   titleRow: { width: '100%', paddingBlockEnd: '8px' },
   largeInRow: { paddingBlockEnd: '0px', minWidth: 0 },
   // Wraps if the phrase is too long for the line, so the words never clip.
@@ -103,6 +117,8 @@ export function LargeTitleHeader({
   isTitleHidden = false,
 }: LargeTitleHeaderProps) {
   const [collapsed, setCollapsed] = useState(false);
+  const fit = useFitTitle<HTMLHeadingElement>(title);
+  const fitted = [sizes.title(fit.size), fit.mustBreak && styles.largeBreaks];
 
   useEffect(() => {
     const onScroll = () => setCollapsed(window.scrollY > COLLAPSE_AT);
@@ -129,7 +145,7 @@ export function LargeTitleHeader({
       </HStack>
       {isCentered ? (
         <VStack gap={1} xstyle={styles.centered}>
-          <Heading level={1} xstyle={[styles.large, styles.largeCentered, isTitleHidden && styles.hidden]}>
+          <Heading level={1} ref={fit.ref} xstyle={[styles.large, ...fitted, styles.largeCentered, isTitleHidden && styles.hidden]}>
             {title}
           </Heading>
           {titleAccessory}
@@ -142,13 +158,13 @@ export function LargeTitleHeader({
           gap={4}
           xstyle={[styles.titleRow, isAccessoryInline && styles.titleRowInline]}
         >
-          <Heading level={1} xstyle={[styles.large, styles.largeInRow]}>
+          <Heading level={1} ref={fit.ref} xstyle={[styles.large, ...fitted, styles.largeInRow]}>
             {title}
           </Heading>
           {titleAccessory}
         </HStack>
       ) : (
-        <Heading level={1} xstyle={styles.large}>
+        <Heading level={1} ref={fit.ref} xstyle={[styles.large, ...fitted]}>
           {title}
         </Heading>
       )}

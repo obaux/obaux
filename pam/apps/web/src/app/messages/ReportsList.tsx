@@ -7,7 +7,7 @@ import { HStack } from '@astryxdesign/core/HStack';
 import { Card } from '@astryxdesign/core/Card';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
-import { Badge } from '@astryxdesign/core/Badge';
+import { Badge } from '@pam/ui/Badge';
 import { Thumbnail } from '@astryxdesign/core/Thumbnail';
 import type { MessageFile } from '@/lib/messageFile';
 import { MessageFileCard } from './MessageFileCard';

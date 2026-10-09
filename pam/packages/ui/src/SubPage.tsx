@@ -12,6 +12,7 @@ import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { BackArrowIcon } from './icons.js';
 import { Page } from './Page.js';
 import { pam } from './tokens.stylex.js';
+import { useFitTitle } from './fitTitle.js';
 
 /**
  * The top of every nested screen (D-213) — one template, so a screen you
@@ -94,6 +95,10 @@ export interface SubPageHeaderProps {
 
 const COLLAPSE_AT = 48;
 
+const sizes = stylex.create({
+  title: (px: number) => ({ fontSize: `${px}px` }),
+});
+
 const styles = stylex.create({
   bar: {
     position: 'sticky',
@@ -153,7 +158,11 @@ const styles = stylex.create({
     overflow: 'hidden',
     textOverflow: 'ellipsis',
   },
-  large: { fontSize: '34px', lineHeight: 1.15, fontWeight: 700 },
+  // 34px, stepping down for a word that will not fit (D-404, `useFitTitle`).
+  // While it is being measured a word may not break, so one that is too wide
+  // overflows and says so; only past the smallest step is it allowed to.
+  large: { fontSize: '34px', lineHeight: 1.15, fontWeight: 700, overflowWrap: 'normal', hyphens: 'manual' },
+  largeBreaks: { overflowWrap: 'anywhere' },
   // The hero (D-376). Flush with the screen's top and sides: past the page's
   // 24px top padding and its side padding.
   hero: {
@@ -198,6 +207,7 @@ export function SubPageHeader({
   heroGap = 4,
 }: SubPageHeaderProps) {
   const [collapsed, setCollapsed] = useState(false);
+  const fit = useFitTitle<HTMLHeadingElement>(title);
 
   useEffect(() => {
     if (variant === 'compact') return;
@@ -290,13 +300,13 @@ export function SubPageHeader({
         {titleAddon ? (
           // Something beside the title — an info tip (D-376).
           <HStack gap={1} align="center" wrap="nowrap" xstyle={styles.titleRow}>
-            <Heading level={1} id={titleId} xstyle={styles.large}>
+            <Heading level={1} id={titleId} ref={fit.ref} xstyle={[styles.large, sizes.title(fit.size), fit.mustBreak && styles.largeBreaks]}>
               {title}
             </Heading>
             {titleAddon}
           </HStack>
         ) : (
-          <Heading level={1} id={titleId} xstyle={styles.large}>
+          <Heading level={1} id={titleId} ref={fit.ref} xstyle={[styles.large, sizes.title(fit.size), fit.mustBreak && styles.largeBreaks]}>
             {title}
           </Heading>
         )}

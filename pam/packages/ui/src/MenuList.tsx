@@ -5,7 +5,7 @@ import { Icon } from '@astryxdesign/core/Icon';
 import { HStack } from '@astryxdesign/core/HStack';
 import { List, ListItem } from '@astryxdesign/core/List';
 import { Text } from '@astryxdesign/core/Text';
-import { Badge } from '@astryxdesign/core/Badge';
+import { Badge } from './Badge.js';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { CheckIcon } from './icons.js';
 

@@ -23,6 +23,7 @@ export { StepHeader, type StepHeaderProps } from './StepHeader.js';
 export { PointsBadge, type PointsBadgeProps } from './PointsBadge.js';
 export { HelpBar, type HelpBarProps } from './HelpBar.js';
 export { Loading, type LoadingProps } from './Loading.js';
+export { LanguageSwitching, type LanguageSwitchingProps } from './LanguageSwitching.js';
 /*
  * `Skeletons` is deliberately NOT re-exported here, the same call `hours.ts`
  * and `dummy-data`'s split made on 16 September: Places, the place screen,

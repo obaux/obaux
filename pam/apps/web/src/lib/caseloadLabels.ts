@@ -3,6 +3,8 @@
  * case manager's redesigned home (D-212) says it the same way.
  */
 
+import { intlLocale } from '@pam/config';
+
 /**
  * What the status chip should say.
  *
@@ -31,7 +33,7 @@ export function statusChip(
 
 export function whenLastActive(iso: string | null, locale: string): string | null {
   if (!iso) return null;
-  return new Intl.DateTimeFormat(locale, { month: 'short', day: 'numeric' }).format(new Date(iso));
+  return new Intl.DateTimeFormat(intlLocale(locale), { month: 'short', day: 'numeric' }).format(new Date(iso));
 }
 
 /** The simpler chip a dummy row gets — no `featuresOff` to explain, unlike a real one. */

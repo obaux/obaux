@@ -3,7 +3,7 @@
 import type { ReactNode } from 'react';
 import { VStack } from '@astryxdesign/core/VStack';
 import { Divider } from '@astryxdesign/core/Divider';
-import { badgeForPoints, type Role } from '@pam/config';
+import { badgeForPoints, type Role, intlLocale } from '@pam/config';
 import {
   BellIcon,
   GlobeIcon,
@@ -85,7 +85,7 @@ export function ProfileView({
   photoNotice = null,
 }: ProfileViewProps) {
   const { t, locale } = useI18n();
-  const number = (n: number) => new Intl.NumberFormat(locale).format(n);
+  const number = (n: number) => new Intl.NumberFormat(intlLocale(locale)).format(n);
   const isMember = role === 'member';
 
   const staffRows = [
@@ -221,7 +221,7 @@ export function ProfileView({
             {
               id: 'language',
               label: t('profile.menu.language'),
-              value: t(locale === 'es' ? 'language.es' : 'language.en'),
+              value: t(`language.${locale}`),
               href: '/language/',
               icon: <GlobeIcon {...ICON} />,
             },

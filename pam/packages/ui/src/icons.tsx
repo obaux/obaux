@@ -487,7 +487,8 @@ export function NoResultsIcon(props: SVGProps<SVGSVGElement>) {
 /** An arrow pointing back. The nested-page back button (D-213). */
 export function BackArrowIcon(props: SVGProps<SVGSVGElement>) {
   return (
-    <svg {...svgProps} {...props}>
+    // `data-pam-directional`: globals.css turns it round when the page reads right to left.
+    <svg {...svgProps} {...props} data-pam-directional="">
       <path d="M19.5 12h-15M10.5 6l-6 6 6 6" />
     </svg>
   );

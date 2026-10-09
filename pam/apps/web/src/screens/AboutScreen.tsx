@@ -2,7 +2,8 @@
 
 import { useMemo, useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
-import { SegmentedControl, SegmentedControlItem } from '@astryxdesign/core/SegmentedControl';
+import { SegmentedControl } from '@astryxdesign/core/SegmentedControl';
+import { Segment } from '@pam/ui/Segment';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
@@ -72,7 +73,7 @@ export function AboutScreen() {
         xstyle={styles.pills}
       >
         {WHO.map((w) => (
-          <SegmentedControlItem key={w} value={w} label={t(`about.tab.${w}`)} />
+          <Segment key={w} value={w} label={t(`about.tab.${w}`)} />
         ))}
       </SegmentedControl>
 

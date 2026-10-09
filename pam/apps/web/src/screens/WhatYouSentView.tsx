@@ -14,6 +14,7 @@ import { useI18n } from '@/lib/i18n';
 import { navigate } from '@/lib/navigate';
 import { readSentProgram, startOver, type SentProgram } from '@/lib/programSetup';
 import { ConfirmDialog } from './ConfirmDialog';
+import { intlLocale } from '@pam/config';
 
 /**
  * What you sent (D-381): the program as it went to Pam, read-only — so a
@@ -96,7 +97,7 @@ export function WhatYouSentView({ sent: given }: { readonly sent?: SentProgram |
         <>
           <Text type="supporting" xstyle={styles.when}>
             {t('programs.sent.when', {
-              date: new Intl.DateTimeFormat(locale, { month: 'long', day: 'numeric' }).format(new Date(sent.sentAt)),
+              date: new Intl.DateTimeFormat(intlLocale(locale), { month: 'long', day: 'numeric' }).format(new Date(sent.sentAt)),
             })}
           </Text>
           <MenuList

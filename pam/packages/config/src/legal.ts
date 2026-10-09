@@ -19,6 +19,8 @@
  *     terms, no "hereby".
  */
 
+import { MESSAGE_TRANSLATION } from './translation.js';
+
 export interface LegalSection {
   /** Anchor in the URL and the id the table of contents scrolls to. */
   readonly id: string;
@@ -54,6 +56,9 @@ export const PRIVACY: LegalDocument = {
     section('privacy', 'texts', 3),
     section('privacy', 'never-say', 2),
     section('privacy', 'sharing', 3),
+    // Only while messages are translated (D-405): the page says it exactly
+    // when it is true, never before and never after.
+    ...(MESSAGE_TRANSLATION.enabled ? [section('privacy', 'translation', 3)] : []),
     section('privacy', 'how-long', 2),
     section('privacy', 'your-choices', 3),
     section('privacy', 'contact', 2),

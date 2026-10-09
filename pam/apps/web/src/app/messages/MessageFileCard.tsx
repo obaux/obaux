@@ -38,7 +38,10 @@ const styles = stylex.create({
   card: { width: '100%', maxWidth: '300px', borderRadius: '14px' },
   // On a page of its own (Photos and documents, D-402) a card spans the column.
   wide: { maxWidth: 'none' },
-  text: { minWidth: 0 },
+  // At least 120px for the words, or they drop under the icon (D-404). A card
+  // in a narrow bubble has about 60px beside its icon, which held "Google Doc"
+  // but cut "Документ Google" to "Докуме / нт…".
+  text: { minWidth: 0, flexGrow: 1, flexBasis: '120px' },
   name: {
     fontSize: '16px',
     lineHeight: 1.3,
@@ -57,7 +60,7 @@ export function FileSummary({ name, bytes, note }: { readonly name: string; read
   const { t, locale } = useI18n();
   const kind = messageFileKind(name);
   return (
-    <HStack gap={3} align="center">
+    <HStack gap={3} align="center" wrap="wrap">
       <FileTypeIcon kind={kind} />
       <VStack gap={0.5} xstyle={styles.text}>
         <Text xstyle={styles.name}>{name}</Text>
@@ -160,7 +163,7 @@ export function GoogleLinkCard({
       padding={3}
       xstyle={[styles.card, isWide && styles.wide]}
     >
-      <HStack gap={3} align="center">
+      <HStack gap={3} align="center" wrap="wrap">
         <FileTypeIcon kind="google" />
         <VStack gap={0.5} xstyle={styles.text}>
           <Text xstyle={styles.name}>{title}</Text>

@@ -10,18 +10,19 @@ import {
   DropdownMenuRadioItem,
 } from '@astryxdesign/core/DropdownMenu';
 import { GlobeIcon } from '@pam/ui';
-import type { Locale } from '@pam/config';
+import { SUPPORTED_LOCALES, type Locale } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { useChooseLanguage } from '@/lib/useChooseLanguage';
 
 /**
- * English or Spanish, wherever Pam offers the choice — the icon beside the
- * bell on the way in, and a row in account settings (Will, 16 September).
+ * English, Spanish or Brazilian Portuguese, wherever Pam offers the choice —
+ * the icon beside the bell on the way in, and a row in account settings
+ * (Will, 16 September).
  *
  * Language names are shown in themselves, not translated into whichever
- * locale is currently active: "English" and "Español" read the same to
- * everybody looking for their own language in a list, which is the point of
- * a language switcher — see `language.en` / `language.es`.
+ * locale is currently active: "English", "Español" and "Português (Brasil)"
+ * read the same to everybody looking for their own language in a list, which
+ * is the point of a language switcher — see the `language.<code>` keys.
  *
  * Switching updates the active locale immediately either way. Signed in, it
  * also writes `profiles.preferred_language`, which is what a later sign-in
@@ -30,10 +31,10 @@ import { useChooseLanguage } from '@/lib/useChooseLanguage';
  * account exists to attach it to.
  */
 
-const OPTIONS: readonly { value: Locale; labelKey: 'language.en' | 'language.es' }[] = [
-  { value: 'en', labelKey: 'language.en' },
-  { value: 'es', labelKey: 'language.es' },
-];
+const OPTIONS: readonly { value: Locale; labelKey: string }[] = SUPPORTED_LOCALES.map((value) => ({
+  value,
+  labelKey: `language.${value}`,
+}));
 
 const styles = stylex.create({
   // Astryx's own Badge has no plain/white variant, and no xstyle to add one —
@@ -81,13 +82,13 @@ export function LanguageSwitcher({
   /** The same row style every other Settings item uses, for the trigger button. */
   readonly rowStyle?: StyleXStyles;
 }) {
-  const { locale, t } = useI18n();
+  const { locale, pendingLocale, t } = useI18n();
   const choose = useChooseLanguage();
 
   const items = (
     <DropdownMenuRadioGroup
       label={t('language.title')}
-      value={locale}
+      value={pendingLocale ?? locale}
       onChange={(next) => choose(next as Locale)}
     >
       {OPTIONS.map((option) => (
@@ -123,7 +124,7 @@ export function LanguageSwitcher({
         variant: 'ghost',
         icon: <GlobeIcon />,
         endContent: (
-          <Text xstyle={styles.chip}>{t(locale === 'en' ? 'language.en' : 'language.es')}</Text>
+          <Text xstyle={styles.chip}>{t(`language.${locale}`)}</Text>
         ),
         xstyle: rowStyle,
       }}

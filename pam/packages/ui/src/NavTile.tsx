@@ -6,7 +6,7 @@ import { ClickableCard } from '@astryxdesign/core/ClickableCard';
 import { HStack } from '@astryxdesign/core/HStack';
 import { VStack } from '@astryxdesign/core/VStack';
 import { Text } from '@astryxdesign/core/Text';
-import { Badge } from '@astryxdesign/core/Badge';
+import { Badge } from './Badge.js';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { Press } from './motion.js';
 import { pam } from './tokens.stylex.js';

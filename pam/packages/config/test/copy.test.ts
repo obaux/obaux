@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import en from '../src/locales/en.json' with { type: 'json' };
-import es from '../src/locales/es.json' with { type: 'json' };
+import { readdirSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import {
   findDignityViolations,
   assertCopyIsDignified,
@@ -8,15 +8,26 @@ import {
   fleschKincaidGrade,
   READABILITY_TARGET_GRADE,
 } from '../src/language.js';
+import { PLURAL_CATEGORIES_REQUIRED, SUPPORTED_LOCALES } from '../src/i18n.js';
 import { TRANSPARENCY_I18N_KEYS, TRANSPARENCY_SCREEN } from '../src/transparency.js';
 import { CATEGORY_LIST, CATEGORIES } from '../src/categories.js';
 import { LEVELS, BADGES } from '../src/points.js';
+import { BUNDLES, COUNT_KEYS, EN, OTHER_LOCALES, baseKey, isVariant, placeholders } from './_bundles.js';
 
-const bundles = { en, es } as const satisfies Record<string, Record<string, string>>;
+const en = BUNDLES.en;
+const es = BUNDLES.es;
+const bundles = BUNDLES;
 
 describe('locale bundles', () => {
-  it('have identical key sets, so no screen falls back to English mid-flow', () => {
-    expect(Object.keys(es).sort()).toEqual(Object.keys(en).sort());
+  it('exist for every supported language, and for nothing else', () => {
+    const dir = fileURLToPath(new URL('../src/locales/', import.meta.url));
+    const files = readdirSync(dir).filter((f) => f.endsWith('.json')).map((f) => f.replace(/\.json$/, ''));
+    expect(files.sort()).toEqual([...SUPPORTED_LOCALES].sort());
+  });
+
+  it.each(Object.entries(bundles))('%s has the same keys as English, so no screen falls back mid-flow', (_l, bundle) => {
+    const own = Object.keys(bundle).filter((k) => !isVariant(k));
+    expect(own.sort()).toEqual(Object.keys(en).sort());
   });
 
   it.each(Object.entries(bundles))('%s has no empty strings', (_locale, bundle) => {
@@ -30,9 +41,79 @@ describe('locale bundles', () => {
 
   it.each(Object.entries(bundles))('%s keeps placeholders matched with English', (_l, bundle) => {
     for (const [key, value] of Object.entries(bundle)) {
-      const source = (en as Record<string, string>)[key]!;
-      const ph = (s: string) => [...s.matchAll(/\{(\w+)\}/g)].map((m) => m[1]).sort();
-      expect(ph(value), `placeholders drifted on "${key}"`).toEqual(ph(source));
+      const source = en[baseKey(key)];
+      expect(source, `"${key}" has no English source`).toBeDefined();
+      expect(placeholders(value), `placeholders drifted on "${key}"`).toEqual(placeholders(source!));
+    }
+  });
+
+  it.each(Object.entries(bundles))('%s has no straight double quotes inside a string', (_l, bundle) => {
+    expect(Object.entries(bundle).filter(([, v]) => v.includes('"')).map(([k]) => k)).toEqual([]);
+  });
+});
+
+describe('plural forms', () => {
+  it.each(OTHER_LOCALES)('%s writes every plural category for every {count} string, or none', (locale) => {
+    const required = PLURAL_CATEGORIES_REQUIRED[locale] ?? [];
+    const bundle = BUNDLES[locale];
+    for (const key of COUNT_KEYS) {
+      for (const category of required) {
+        expect(bundle, `${locale} is missing ${key}.${category}`).toHaveProperty(`${key}.${category}`);
+      }
+    }
+    // A language that does not need forms must not carry dead ones.
+    if (required.length === 0) expect(Object.keys(bundle).filter(isVariant)).toEqual([]);
+  });
+
+  it('knows which languages need forms (the CLDR categories, minus "other")', () => {
+    for (const [locale, categories] of Object.entries(PLURAL_CATEGORIES_REQUIRED)) {
+      const cldr = new Intl.PluralRules(locale === 'ar' ? 'ar' : locale).resolvedOptions().pluralCategories;
+      expect([...categories!].sort()).toEqual(cldr.filter((c) => c !== 'other').sort());
+    }
+  });
+});
+
+describe('every other language is actually translated', () => {
+  // Names, brands and badge names Spanish also leaves alone, plus the role label
+  // kept short in Portuguese (like English "Super admin" is already a coinage).
+  const MAY_MATCH_ENGLISH = new Set(
+    Object.keys(EN).filter((k) => EN[k] === es[k] || k.startsWith('badge.') || k.startsWith('language.')),
+  );
+  MAY_MATCH_ENGLISH.add('directory.filter.super_admin');
+  MAY_MATCH_ENGLISH.add('role.super_admin');
+
+  it.each(OTHER_LOCALES)('%s differs from English except where a name or a symbol should not change', (locale) => {
+    const same = Object.keys(EN).filter((k) => BUNDLES[locale][k] === EN[k] && /[A-Za-z]{3}/.test(EN[k]!));
+    expect(same.filter((k) => !MAY_MATCH_ENGLISH.has(k))).toEqual([]);
+  });
+
+  const SCRIPTS: Partial<Record<(typeof OTHER_LOCALES)[number], RegExp>> = {
+    'zh-CN': /[\u4e00-\u9fff]/,
+    'zh-HK': /[\u4e00-\u9fff]/,
+    ru: /[\u0400-\u04ff]/,
+    ar: /[\u0600-\u06ff]/,
+  };
+  it.each(Object.entries(SCRIPTS))('%s is written in its own script', (locale, script) => {
+    const bundle = BUNDLES[locale as keyof typeof BUNDLES];
+    const lacking = Object.keys(EN).filter(
+      (k) => /[A-Za-z]{3}/.test(EN[k]!) && !MAY_MATCH_ENGLISH.has(k) && !script.test(bundle[k]!),
+    );
+    expect(lacking).toEqual([]);
+  });
+
+  it('keeps Spanish punctuation and letters out of Portuguese, and Portuguese letters out of Spanish', () => {
+    const spanishMarks = Object.entries(BUNDLES['pt-BR']).filter(([k, v]) => /[ñ¿¡]/.test(v) && !MAY_MATCH_ENGLISH.has(k));
+    expect(spanishMarks.map(([k]) => k)).toEqual([]);
+    const portugueseMarks = Object.entries(BUNDLES.es).filter(([, v]) => /[ãõ]/.test(v));
+    expect(portugueseMarks.map(([k]) => k)).toEqual([]);
+  });
+
+  it('does not put English where Spanish or Portuguese belong', () => {
+    for (const locale of ['es', 'pt-BR'] as const) {
+      const leaked = Object.entries(BUNDLES[locale]).filter(
+        ([k, v]) => !MAY_MATCH_ENGLISH.has(k) && k !== 'trips.booked.sms' && /\b(the|your|you|with)\b/i.test(v),
+      );
+      expect(leaked.map(([k]) => k), locale).toEqual([]);
     }
   });
 });
@@ -82,10 +163,11 @@ describe('readability (SOP §14)', () => {
 });
 
 describe('transparency screen (SOP §4.1)', () => {
-  it('has every key translated in both languages', () => {
+  it('has every key translated in every language', () => {
     for (const key of TRANSPARENCY_I18N_KEYS) {
-      expect(en, `en is missing ${key}`).toHaveProperty(key);
-      expect(es, `es is missing ${key}`).toHaveProperty(key);
+      for (const [locale, bundle] of Object.entries(bundles)) {
+        expect(bundle, `${locale} is missing ${key}`).toHaveProperty(key);
+      }
     }
   });
 
@@ -108,13 +190,13 @@ describe('taxonomy (SOP §2.5)', () => {
     expect([...CATEGORIES]).toEqual(['education', 'workforce', 'family_services']);
   });
 
-  it('translates every category and subcategory in both languages', () => {
-    for (const category of CATEGORY_LIST) {
-      expect(en, `en missing ${category.labelKey}`).toHaveProperty(category.labelKey);
-      expect(es, `es missing ${category.labelKey}`).toHaveProperty(category.labelKey);
-      for (const s of category.subcategories) {
-        expect(en, `en missing ${s.labelKey}`).toHaveProperty(s.labelKey);
-        expect(es, `es missing ${s.labelKey}`).toHaveProperty(s.labelKey);
+  it('translates every category and subcategory in every language', () => {
+    for (const [locale, bundle] of Object.entries(bundles)) {
+      for (const category of CATEGORY_LIST) {
+        expect(bundle, `${locale} missing ${category.labelKey}`).toHaveProperty(category.labelKey);
+        for (const s of category.subcategories) {
+          expect(bundle, `${locale} missing ${s.labelKey}`).toHaveProperty(s.labelKey);
+        }
       }
     }
   });
@@ -131,10 +213,11 @@ describe('taxonomy (SOP §2.5)', () => {
 });
 
 describe('levels and badges (SOP §8)', () => {
-  it('translates every level and badge in both languages', () => {
-    for (const { labelKey } of [...LEVELS, ...BADGES]) {
-      expect(en, `en missing ${labelKey}`).toHaveProperty(labelKey);
-      expect(es, `es missing ${labelKey}`).toHaveProperty(labelKey);
+  it('translates every level and badge in every language', () => {
+    for (const [locale, bundle] of Object.entries(bundles)) {
+      for (const { labelKey } of [...LEVELS, ...BADGES]) {
+        expect(bundle, `${locale} missing ${labelKey}`).toHaveProperty(labelKey);
+      }
     }
   });
 });

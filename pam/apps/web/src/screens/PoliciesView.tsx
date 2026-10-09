@@ -3,12 +3,13 @@
 import { useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { Avatar } from '@astryxdesign/core/Avatar';
-import { Button } from '@astryxdesign/core/Button';
+import { Button } from '@pam/ui/Button';
 import { Card } from '@astryxdesign/core/Card';
 import { HStack } from '@astryxdesign/core/HStack';
 import { Icon } from '@astryxdesign/core/Icon';
 import { IconButton } from '@astryxdesign/core/IconButton';
-import { SegmentedControl, SegmentedControlItem } from '@astryxdesign/core/SegmentedControl';
+import { SegmentedControl } from '@astryxdesign/core/SegmentedControl';
+import { Segment } from '@pam/ui/Segment';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
@@ -22,6 +23,7 @@ import { usePolicies } from '@/lib/usePolicies';
 import { servicesForPolicy } from '@pam/config/dummy-services';
 import { useServices } from '@/lib/useServices';
 import { ConfirmDialog } from './ConfirmDialog';
+import { intlLocale } from '@pam/config';
 
 /**
  * Policies for participants (Will, 4 October, D-261): the documents a
@@ -170,7 +172,7 @@ export function PolicyScreen({ id }: { readonly id: string | null }) {
   const { policies } = usePolicies();
   const [tab, setTab] = useState<'preview' | 'signed'>('preview');
   const policy = policies.find((p) => p.id === id) ?? null;
-  const day = new Intl.DateTimeFormat(locale, { month: 'long', day: 'numeric' });
+  const day = new Intl.DateTimeFormat(intlLocale(locale), { month: 'long', day: 'numeric' });
 
   return (
     <SubPage
@@ -188,8 +190,8 @@ export function PolicyScreen({ id }: { readonly id: string | null }) {
             size="md"
             xstyle={styles.pills}
           >
-            <SegmentedControlItem value="preview" label={t('policy.tab.preview')} />
-            <SegmentedControlItem value="signed" label={`${t('policy.tab.signed')} · ${policy.signedBy.length}`} />
+            <Segment value="preview" label={t('policy.tab.preview')} />
+            <Segment value="signed" label={`${t('policy.tab.signed')} · ${policy.signedBy.length}`} />
           </SegmentedControl>
 
           {tab === 'preview' ? (

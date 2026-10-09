@@ -1,0 +1,746 @@
+{
+ "@astryx.pagination.label": {
+  "defaultMessage": "分頁"
+ },
+ "@astryx.pagination.previous": {
+  "defaultMessage": "前往上一頁"
+ },
+ "@astryx.pagination.next": {
+  "defaultMessage": "前往下一頁"
+ },
+ "@astryx.pagination.previousBy": {
+  "defaultMessage": "後退 {step, number} {step, plural, other {頁}}"
+ },
+ "@astryx.pagination.nextBy": {
+  "defaultMessage": "前進 {step, number} {step, plural, other {頁}}"
+ },
+ "@astryx.pagination.first": {
+  "defaultMessage": "前往第一頁"
+ },
+ "@astryx.pagination.last": {
+  "defaultMessage": "前往最後一頁"
+ },
+ "@astryx.pagination.goToPage": {
+  "defaultMessage": "前往第 {page, number} 頁"
+ },
+ "@astryx.pagination.goToPageInput": {
+  "defaultMessage": "前往頁面"
+ },
+ "@astryx.pagination.pageLabel": {
+  "defaultMessage": "頁"
+ },
+ "@astryx.pagination.pageIndicators": {
+  "defaultMessage": "頁碼指示器"
+ },
+ "@astryx.pagination.itemsPerPage": {
+  "defaultMessage": "每頁項目數"
+ },
+ "@astryx.pagination.count": {
+  "defaultMessage": "{from, number}–{to, number}，共 {total, number}"
+ },
+ "@astryx.pagination.pageOfTotal": {
+  "defaultMessage": "第 {current, number} 頁，共 {total, number} 頁"
+ },
+ "@astryx.pagination.pageAnnounce": {
+  "defaultMessage": "第 {current, number} 頁"
+ },
+ "@astryx.powersearch.editor.field": {
+  "defaultMessage": "欄位"
+ },
+ "@astryx.powersearch.editor.operator": {
+  "defaultMessage": "運算子"
+ },
+ "@astryx.powersearch.editor.addFilter": {
+  "defaultMessage": "＋ 新增篩選條件"
+ },
+ "@astryx.powersearch.editor.removeFilter": {
+  "defaultMessage": "移除篩選條件"
+ },
+ "@astryx.powersearch.editor.groupOperator": {
+  "defaultMessage": "群組運算子"
+ },
+ "@astryx.powersearch.editor.group": {
+  "defaultMessage": "群組"
+ },
+ "@astryx.powersearch.editor.delete": {
+  "defaultMessage": "刪除"
+ },
+ "@astryx.powersearch.editor.cancel": {
+  "defaultMessage": "取消"
+ },
+ "@astryx.powersearch.editor.apply": {
+  "defaultMessage": "套用"
+ },
+ "@astryx.powersearch.valueEditor.value": {
+  "defaultMessage": "值"
+ },
+ "@astryx.powersearch.valueEditor.values": {
+  "defaultMessage": "值"
+ },
+ "@astryx.powersearch.valueEditor.time": {
+  "defaultMessage": "時間"
+ },
+ "@astryx.powersearch.valueEditor.date": {
+  "defaultMessage": "日期"
+ },
+ "@astryx.powersearch.valueEditor.relativeDate": {
+  "defaultMessage": "相對日期"
+ },
+ "@astryx.powersearch.valueEditor.startDate": {
+  "defaultMessage": "開始日期"
+ },
+ "@astryx.powersearch.valueEditor.endDate": {
+  "defaultMessage": "結束日期"
+ },
+ "@astryx.powersearch.valueEditor.entities": {
+  "defaultMessage": "實體"
+ },
+ "@astryx.powersearch.valueEditor.searchPlaceholder": {
+  "defaultMessage": "搜尋…"
+ },
+ "@astryx.powersearch.valueEditor.enterValuePlaceholder": {
+  "defaultMessage": "輸入值…"
+ },
+ "@astryx.powersearch.valueEditor.addValuesPlaceholder": {
+  "defaultMessage": "新增值…"
+ },
+ "@astryx.powersearch.valueEditor.enterNumberPlaceholder": {
+  "defaultMessage": "輸入數字…"
+ },
+ "@astryx.powersearch.valueEditor.selectValuesPlaceholder": {
+  "defaultMessage": "選擇值…"
+ },
+ "@astryx.powersearch.operator.contains": {
+  "defaultMessage": "包含"
+ },
+ "@astryx.powersearch.operator.notContains": {
+  "defaultMessage": "不包含"
+ },
+ "@astryx.powersearch.operator.startsWith": {
+  "defaultMessage": "以此開頭"
+ },
+ "@astryx.powersearch.operator.notStartsWith": {
+  "defaultMessage": "不以此開頭"
+ },
+ "@astryx.powersearch.operator.endsWith": {
+  "defaultMessage": "以此結尾"
+ },
+ "@astryx.powersearch.operator.notEndsWith": {
+  "defaultMessage": "不以此結尾"
+ },
+ "@astryx.powersearch.operator.is": {
+  "defaultMessage": "等於"
+ },
+ "@astryx.powersearch.operator.isNot": {
+  "defaultMessage": "不等於"
+ },
+ "@astryx.powersearch.operator.equals": {
+  "defaultMessage": "等於"
+ },
+ "@astryx.powersearch.operator.notEquals": {
+  "defaultMessage": "不等於"
+ },
+ "@astryx.powersearch.operator.greaterThan": {
+  "defaultMessage": "大於"
+ },
+ "@astryx.powersearch.operator.lessThan": {
+  "defaultMessage": "小於"
+ },
+ "@astryx.powersearch.operator.greaterThanOrEqual": {
+  "defaultMessage": "大於或等於"
+ },
+ "@astryx.powersearch.operator.lessThanOrEqual": {
+  "defaultMessage": "小於或等於"
+ },
+ "@astryx.powersearch.operator.before": {
+  "defaultMessage": "早於"
+ },
+ "@astryx.powersearch.operator.after": {
+  "defaultMessage": "晚於"
+ },
+ "@astryx.powersearch.operator.between": {
+  "defaultMessage": "介於"
+ },
+ "@astryx.powersearch.operator.isTrue": {
+  "defaultMessage": "為真"
+ },
+ "@astryx.powersearch.operator.isFalse": {
+  "defaultMessage": "為假"
+ },
+ "@astryx.powersearch.operator.isAnyOf": {
+  "defaultMessage": "是其中任一"
+ },
+ "@astryx.powersearch.operator.isNoneOf": {
+  "defaultMessage": "不是其中任何一個"
+ },
+ "@astryx.powersearch.valueEditor.itemsCount": {
+  "defaultMessage": "{count, number} {count, plural, other {個項目}}"
+ },
+ "@astryx.powersearch.valueEditor.entitiesCount": {
+  "defaultMessage": "{count, number} {count, plural, other {個實體}}"
+ },
+ "@astryx.powersearch.valueEditor.dateRange": {
+  "defaultMessage": "日期範圍"
+ },
+ "@astryx.powersearch.valueEditor.filtersCount": {
+  "defaultMessage": "{count, number} {count, plural, other {個篩選條件}}"
+ },
+ "@astryx.powersearch.resultCount": {
+  "defaultMessage": "{count, number} {count, plural, other {個結果}}"
+ },
+ "@astryx.alertDialog.cancel": {
+  "defaultMessage": "取消"
+ },
+ "@astryx.appShell.mobileNavigation": {
+  "defaultMessage": "行動裝置導覽"
+ },
+ "@astryx.appShell.skipToContent": {
+  "defaultMessage": "跳至內容"
+ },
+ "@astryx.avatar.nameWithStatus": {
+  "defaultMessage": "{name}，{status}"
+ },
+ "@astryx.avatarGroup.label": {
+  "defaultMessage": "頭像"
+ },
+ "@astryx.avatarGroup.keyboardHint": {
+  "defaultMessage": "使用方向鍵在頭像之間移動"
+ },
+ "@astryx.avatarGroup.overflow": {
+  "defaultMessage": "還有 {count, number} 個"
+ },
+ "@astryx.banner.dismiss": {
+  "defaultMessage": "關閉"
+ },
+ "@astryx.calendar.previousMonth": {
+  "defaultMessage": "上個月"
+ },
+ "@astryx.calendar.nextMonth": {
+  "defaultMessage": "下個月"
+ },
+ "@astryx.calendar.daySelected": {
+  "defaultMessage": "{date}，已選取"
+ },
+ "@astryx.calendar.dayRangeStart": {
+  "defaultMessage": "{date}，範圍開始"
+ },
+ "@astryx.calendar.dayRangeEnd": {
+  "defaultMessage": "{date}，範圍結束"
+ },
+ "@astryx.calendar.dayRangeStartAndEnd": {
+  "defaultMessage": "{date}，範圍開始及結束"
+ },
+ "@astryx.calendar.dayInRange": {
+  "defaultMessage": "{date}，範圍內"
+ },
+ "@astryx.calendar.rangeStartAnnounce": {
+  "defaultMessage": "開始日期 {date}。請選擇結束日期。"
+ },
+ "@astryx.calendar.rangeCompleteAnnounce": {
+  "defaultMessage": "已選範圍：{start} 至 {end}。"
+ },
+ "@astryx.carousel.label": {
+  "defaultMessage": "輪播"
+ },
+ "@astryx.carousel.scrollLeft": {
+  "defaultMessage": "向左捲動"
+ },
+ "@astryx.carousel.scrollRight": {
+  "defaultMessage": "向右捲動"
+ },
+ "@astryx.carousel.slideLabel": {
+  "defaultMessage": "第 {current, number} 張投影片，共 {total, number} 張"
+ },
+ "@astryx.chat.status.sending": {
+  "defaultMessage": "傳送中"
+ },
+ "@astryx.chat.status.sent": {
+  "defaultMessage": "已傳送"
+ },
+ "@astryx.chat.status.delivered": {
+  "defaultMessage": "已送達"
+ },
+ "@astryx.chat.status.read": {
+  "defaultMessage": "已讀"
+ },
+ "@astryx.chat.status.failed": {
+  "defaultMessage": "失敗"
+ },
+ "@astryx.chat.messageAriaLabel": {
+  "defaultMessage": "訊息 {status}"
+ },
+ "@astryx.chat.pastedText.expand": {
+  "defaultMessage": "展開"
+ },
+ "@astryx.checkboxList.item.checkbox": {
+  "defaultMessage": "核取方塊"
+ },
+ "@astryx.commandPalette.emptySearch": {
+  "defaultMessage": "無結果"
+ },
+ "@astryx.commandPalette.emptyBootstrap": {
+  "defaultMessage": "輸入以搜尋"
+ },
+ "@astryx.commandPalette.resultCount": {
+  "defaultMessage": "{count, number} {count, plural, other {個結果}}"
+ },
+ "@astryx.commandPalette.noResultsFor": {
+  "defaultMessage": "找不到關於 {query} 的結果"
+ },
+ "@astryx.commandPalette.loading": {
+  "defaultMessage": "載入中"
+ },
+ "@astryx.dateRangeInput.presetDateRanges": {
+  "defaultMessage": "預設日期範圍"
+ },
+ "@astryx.dateTimeInput.timePlaceholder": {
+  "defaultMessage": "選擇時間"
+ },
+ "@astryx.dialog.close": {
+  "defaultMessage": "關閉"
+ },
+ "@astryx.dropdownMenu.label": {
+  "defaultMessage": "功能表"
+ },
+ "@astryx.lightbox.close": {
+  "defaultMessage": "關閉"
+ },
+ "@astryx.lightbox.previous": {
+  "defaultMessage": "上一個"
+ },
+ "@astryx.lightbox.next": {
+  "defaultMessage": "下一個"
+ },
+ "@astryx.markdown.taskList": {
+  "defaultMessage": "工作清單"
+ },
+ "@astryx.markdown.table": {
+  "defaultMessage": "表格"
+ },
+ "@astryx.mobileNav.closeNavigation": {
+  "defaultMessage": "關閉導覽"
+ },
+ "@astryx.multiSelector.selectAll": {
+  "defaultMessage": "全選"
+ },
+ "@astryx.multiSelector.searchPlaceholder": {
+  "defaultMessage": "搜尋…"
+ },
+ "@astryx.multiSelector.searchOptions": {
+  "defaultMessage": "搜尋選項"
+ },
+ "@astryx.multiSelector.selectAllPartiallySelected": {
+  "defaultMessage": "{label}，部分選取"
+ },
+ "@astryx.popover.close": {
+  "defaultMessage": "關閉彈出視窗"
+ },
+ "@astryx.selector.searchPlaceholder": {
+  "defaultMessage": "搜尋…"
+ },
+ "@astryx.selector.searchOptions": {
+  "defaultMessage": "搜尋選項"
+ },
+ "@astryx.sideNav.label": {
+  "defaultMessage": "側邊導覽"
+ },
+ "@astryx.sideNav.resizeSidebar": {
+  "defaultMessage": "調整側邊欄大小"
+ },
+ "@astryx.sideNav.heading.openMenu": {
+  "defaultMessage": "開啟功能表"
+ },
+ "@astryx.tabList.label": {
+  "defaultMessage": "索引標籤"
+ },
+ "@astryx.table.label": {
+  "defaultMessage": "表格"
+ },
+ "@astryx.table.noData": {
+  "defaultMessage": "無資料"
+ },
+ "@astryx.table.filter.allPlaceholder": {
+  "defaultMessage": "全部"
+ },
+ "@astryx.table.filter.reset": {
+  "defaultMessage": "重設"
+ },
+ "@astryx.table.filter.apply": {
+  "defaultMessage": "套用"
+ },
+ "@astryx.table.selection.selectAllRows": {
+  "defaultMessage": "選取所有列"
+ },
+ "@astryx.table.selection.selectRow": {
+  "defaultMessage": "選取列"
+ },
+ "@astryx.table.selection.selectRowNamed": {
+  "defaultMessage": "選取 {label}"
+ },
+ "@astryx.table.sort.ascending": {
+  "defaultMessage": "遞增排序"
+ },
+ "@astryx.table.sort.descending": {
+  "defaultMessage": "遞減排序"
+ },
+ "@astryx.table.sort.clear": {
+  "defaultMessage": "清除排序"
+ },
+ "@astryx.table.sort.direction.ascending": {
+  "defaultMessage": "遞增"
+ },
+ "@astryx.table.sort.direction.descending": {
+  "defaultMessage": "遞減"
+ },
+ "@astryx.table.sort.sortBy": {
+  "defaultMessage": "依 {label} 排序"
+ },
+ "@astryx.table.sort.sortedBy": {
+  "defaultMessage": "依 {label} 排序，{direction}"
+ },
+ "@astryx.table.sort.sortedByWithPriority": {
+  "defaultMessage": "依 {label} 排序，{direction}，優先順序 {rank, number}/{total, number}"
+ },
+ "@astryx.toast.dismiss": {
+  "defaultMessage": "關閉通知"
+ },
+ "@astryx.toast.viewport": {
+  "defaultMessage": "通知"
+ },
+ "@astryx.tokenizer.clearAll": {
+  "defaultMessage": "全部清除"
+ },
+ "@astryx.topNav.heading.openMenu": {
+  "defaultMessage": "開啟功能表"
+ },
+ "@astryx.topNav.landmarkLabel": {
+  "defaultMessage": "頂部導覽"
+ },
+ "@astryx.treeList.toggleChildren": {
+  "defaultMessage": "切換子項目"
+ },
+ "@astryx.typeahead.emptySearchResults": {
+  "defaultMessage": "找不到結果"
+ },
+ "@astryx.typeahead.loading": {
+  "defaultMessage": "載入中"
+ },
+ "@astryx.typeahead.searchResults": {
+  "defaultMessage": "搜尋結果"
+ },
+ "@astryx.typeahead.clearSelection": {
+  "defaultMessage": "清除選取"
+ },
+ "@astryx.breadcrumbs.label": {
+  "defaultMessage": "麵包屑導覽"
+ },
+ "@astryx.chat.composer.placeholder": {
+  "defaultMessage": "輸入訊息…"
+ },
+ "@astryx.chat.composerDrawer.label": {
+  "defaultMessage": "項目"
+ },
+ "@astryx.chat.composerInput.label": {
+  "defaultMessage": "訊息輸入框"
+ },
+ "@astryx.chat.speechRecognition.noSpeechDetected": {
+  "defaultMessage": "未偵測到語音。"
+ },
+ "@astryx.commandPalette.label": {
+  "defaultMessage": "命令選擇區"
+ },
+ "@astryx.commandPalette.input.placeholder": {
+  "defaultMessage": "搜尋…"
+ },
+ "@astryx.commandPalette.list.label": {
+  "defaultMessage": "命令"
+ },
+ "@astryx.contextMenu.label": {
+  "defaultMessage": "快顯功能表"
+ },
+ "@astryx.dateInput.placeholder": {
+  "defaultMessage": "選擇日期"
+ },
+ "@astryx.dateInput.dialogLabel": {
+  "defaultMessage": "選擇日期"
+ },
+ "@astryx.dateInput.closeCalendar": {
+  "defaultMessage": "關閉行事曆"
+ },
+ "@astryx.dateInput.openCalendar": {
+  "defaultMessage": "開啟行事曆"
+ },
+ "@astryx.dateInput.toggleCalendarClose": {
+  "defaultMessage": "關閉行事曆"
+ },
+ "@astryx.dateInput.clear": {
+  "defaultMessage": "清除 {label}"
+ },
+ "@astryx.dateTimeInput.timeSuffix": {
+  "defaultMessage": "{label}時間"
+ },
+ "@astryx.dateRangeInput.placeholder": {
+  "defaultMessage": "選擇日期範圍"
+ },
+ "@astryx.dateRangeInput.dialogLabel": {
+  "defaultMessage": "選擇日期範圍"
+ },
+ "@astryx.dateTimeInput.placeholder": {
+  "defaultMessage": "選擇日期"
+ },
+ "@astryx.link.newTab": {
+  "defaultMessage": "（在新分頁中開啟）"
+ },
+ "@astryx.mobileNav.toggle.open": {
+  "defaultMessage": "開啟導覽"
+ },
+ "@astryx.moreMenu.label": {
+  "defaultMessage": "更多選項"
+ },
+ "@astryx.multiSelector.selectPlaceholder": {
+  "defaultMessage": "選擇…"
+ },
+ "@astryx.outline.label": {
+  "defaultMessage": "目錄"
+ },
+ "@astryx.powersearch.label": {
+  "defaultMessage": "搜尋"
+ },
+ "@astryx.powersearch.placeholder": {
+  "defaultMessage": "搜尋…"
+ },
+ "@astryx.resizable.collapsed": {
+  "defaultMessage": "已收合"
+ },
+ "@astryx.resizable.handle.label": {
+  "defaultMessage": "大小調整控點"
+ },
+ "@astryx.selector.placeholder": {
+  "defaultMessage": "選擇…"
+ },
+ "@astryx.sideNav.heading.dialogLabel": {
+  "defaultMessage": "導覽功能表"
+ },
+ "@astryx.table.pagination.label": {
+  "defaultMessage": "表格分頁"
+ },
+ "@astryx.timeInput.placeholder": {
+  "defaultMessage": "選擇時間"
+ },
+ "@astryx.topNav.heading.dialogLabel": {
+  "defaultMessage": "導覽功能表"
+ },
+ "@astryx.typeahead.searchPlaceholder": {
+  "defaultMessage": "搜尋…"
+ },
+ "@astryx.banner.collapse": {
+  "defaultMessage": "收合"
+ },
+ "@astryx.banner.expand": {
+  "defaultMessage": "展開"
+ },
+ "@astryx.button.loading": {
+  "defaultMessage": "載入中"
+ },
+ "@astryx.chatComposerDrawer.expand": {
+  "defaultMessage": "展開 {label}"
+ },
+ "@astryx.chatComposerDrawer.collapse": {
+  "defaultMessage": "收合 {label}"
+ },
+ "@astryx.chatDictationButton.startDictation": {
+  "defaultMessage": "開始語音輸入"
+ },
+ "@astryx.chatDictationButton.stopDictation": {
+  "defaultMessage": "停止語音輸入"
+ },
+ "@astryx.chatLayout.newMessages": {
+  "defaultMessage": "新訊息"
+ },
+ "@astryx.chatLayoutScrollButton.scrollToBottom": {
+  "defaultMessage": "捲動至底部"
+ },
+ "@astryx.chatMessage.messageFrom": {
+  "defaultMessage": "來自 {sender} 的訊息"
+ },
+ "@astryx.chatSendButton.stop": {
+  "defaultMessage": "停止"
+ },
+ "@astryx.chatSendButton.send": {
+  "defaultMessage": "傳送"
+ },
+ "@astryx.chatToolCalls.error": {
+  "defaultMessage": "錯誤：{message}"
+ },
+ "@astryx.chatToolCalls.groupLabel": {
+  "defaultMessage": "{count} 次工具呼叫"
+ },
+ "@astryx.chatTriggerMenu.suggestions": {
+  "defaultMessage": "建議"
+ },
+ "@astryx.citation.label": {
+  "defaultMessage": "引用 {number}：{title}"
+ },
+ "@astryx.codeBlock.copied": {
+  "defaultMessage": "已複製"
+ },
+ "@astryx.codeBlock.copyCode": {
+  "defaultMessage": "複製程式碼"
+ },
+ "@astryx.codeBlock.code": {
+  "defaultMessage": "程式碼"
+ },
+ "@astryx.field.optional": {
+  "defaultMessage": "選填"
+ },
+ "@astryx.field.required": {
+  "defaultMessage": "必填"
+ },
+ "@astryx.fileInput.clearLabel": {
+  "defaultMessage": "清除 {label}"
+ },
+ "@astryx.fileInput.required": {
+  "defaultMessage": "必填"
+ },
+ "@astryx.fileInput.triggerWithFiles": {
+  "defaultMessage": "{label}，{fileNames}"
+ },
+ "@astryx.keyboardHint.toNavigate": {
+  "defaultMessage": "進行導覽"
+ },
+ "@astryx.lightbox.mediaViewer": {
+  "defaultMessage": "媒體檢視器"
+ },
+ "@astryx.lightbox.zoom": {
+  "defaultMessage": "縮放"
+ },
+ "@astryx.lightbox.zoomedIn": {
+  "defaultMessage": "已放大，使用方向鍵平移"
+ },
+ "@astryx.lightbox.zoomedOut": {
+  "defaultMessage": "已縮小"
+ },
+ "@astryx.metadataList.showMore": {
+  "defaultMessage": "顯示更多"
+ },
+ "@astryx.metadataList.showLess": {
+  "defaultMessage": "收合"
+ },
+ "@astryx.mobileNav.navigation": {
+  "defaultMessage": "導覽"
+ },
+ "@astryx.multiSelector.clearAll": {
+  "defaultMessage": "清除全部 {label}"
+ },
+ "@astryx.input.statusButton.error": {
+  "defaultMessage": "錯誤詳細資料"
+ },
+ "@astryx.input.statusButton.warning": {
+  "defaultMessage": "警告詳細資料"
+ },
+ "@astryx.input.statusButton.success": {
+  "defaultMessage": "成功詳細資料"
+ },
+ "@astryx.numberInput.clearLabel": {
+  "defaultMessage": "清除 {label}"
+ },
+ "@astryx.selector.clearLabel": {
+  "defaultMessage": "清除 {label}"
+ },
+ "@astryx.sideNavCollapseButton.expandSidebar": {
+  "defaultMessage": "展開側邊欄"
+ },
+ "@astryx.sideNavCollapseButton.collapseSidebar": {
+  "defaultMessage": "收合側邊欄"
+ },
+ "@astryx.sideNavItem.expand": {
+  "defaultMessage": "展開 {label}"
+ },
+ "@astryx.sideNavItem.collapse": {
+  "defaultMessage": "收合 {label}"
+ },
+ "@astryx.tableFiltering.filterByColumn": {
+  "defaultMessage": "篩選 {header}"
+ },
+ "@astryx.tableGroupedRows.expandGroup": {
+  "defaultMessage": "展開群組 {groupKey}"
+ },
+ "@astryx.tableGroupedRows.collapseGroup": {
+  "defaultMessage": "收合群組 {groupKey}"
+ },
+ "@astryx.tableRowExpansion.collapseRow": {
+  "defaultMessage": "收合列"
+ },
+ "@astryx.tableRowExpansion.expandRow": {
+  "defaultMessage": "展開列"
+ },
+ "@astryx.tableRowExpansion.collapseAllRows": {
+  "defaultMessage": "收合所有列"
+ },
+ "@astryx.tableRowExpansion.expandAllRows": {
+  "defaultMessage": "展開所有列"
+ },
+ "@astryx.step.goToStep": {
+  "defaultMessage": "前往步驟 {stepNumber, number}：{label}"
+ },
+ "@astryx.step.goToStepWithStatus": {
+  "defaultMessage": "前往步驟 {stepNumber, number}：{label}，{status}"
+ },
+ "@astryx.step.status.completed": {
+  "defaultMessage": "已完成"
+ },
+ "@astryx.step.status.warning": {
+  "defaultMessage": "警告"
+ },
+ "@astryx.step.status.error": {
+  "defaultMessage": "錯誤"
+ },
+ "@astryx.tableTree.collapseRow": {
+  "defaultMessage": "收合列"
+ },
+ "@astryx.tableTree.expandRow": {
+  "defaultMessage": "展開列"
+ },
+ "@astryx.tableTree.collapseAllRows": {
+  "defaultMessage": "收合所有列"
+ },
+ "@astryx.tableTree.expandAllRows": {
+  "defaultMessage": "展開所有列"
+ },
+ "@astryx.textArea.charactersRemaining": {
+  "defaultMessage": "還剩 {count, number} {count, plural, other {個字元}}"
+ },
+ "@astryx.textArea.charactersOverLimit": {
+  "defaultMessage": "超出 {count, number} {count, plural, other {個字元}}"
+ },
+ "@astryx.textInput.clearLabel": {
+  "defaultMessage": "清除 {label}"
+ },
+ "@astryx.thumbnail.remove": {
+  "defaultMessage": "移除 {accessibleName}"
+ },
+ "@astryx.thumbnail.open": {
+  "defaultMessage": "開啟 {accessibleName}"
+ },
+ "@astryx.thumbnail.fallbackName": {
+  "defaultMessage": "縮圖"
+ },
+ "@astryx.timeInput.clearLabel": {
+  "defaultMessage": "清除 {label}"
+ },
+ "@astryx.timestamp.copyValue": {
+  "defaultMessage": "複製 {value}"
+ },
+ "@astryx.timestamp.copy": {
+  "defaultMessage": "複製"
+ },
+ "@astryx.timestamp.copied": {
+  "defaultMessage": "已複製"
+ },
+ "@astryx.timestamp.detailsLabel": {
+  "defaultMessage": "時間戳記詳細資料"
+ },
+ "@astryx.token.remove": {
+  "defaultMessage": "移除 {label}"
+ }
+}

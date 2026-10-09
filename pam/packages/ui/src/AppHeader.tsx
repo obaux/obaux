@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { HStack } from '@astryxdesign/core/HStack';
-import { Badge } from '@astryxdesign/core/Badge';
+import { Badge } from './Badge.js';
 import { IconButton } from '@astryxdesign/core/IconButton';
 import { MeIconFilled } from './icons.js';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
@@ -101,7 +101,7 @@ const styles = stylex.create({
   trailingFloating: {
     position: 'absolute',
     top: '50%',
-    right: 0,
+    insetInlineEnd: 0,
     transform: 'translateY(-50%)',
   },
   sticky: {

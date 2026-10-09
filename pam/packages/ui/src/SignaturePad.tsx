@@ -87,7 +87,7 @@ const styles = stylex.create({
     borderBottomColor: 'oklch(0.85 0 0)',
     pointerEvents: 'none',
   },
-  signHere: { position: 'absolute', left: '24px', bottom: '50px', pointerEvents: 'none', userSelect: 'none' },
+  signHere: { position: 'absolute', insetInlineStart: '24px', bottom: '50px', pointerEvents: 'none', userSelect: 'none' },
   signHereText: { fontSize: '15px', color: 'oklch(0.68 0 0)' },
 });
 

@@ -14,6 +14,8 @@
  * A Google Doc is not a file — it is a link to Google. `googleLinkIn` finds
  * one in a message so the conversation can show it as a card (D-399).
  */
+import { intlLocale } from '@pam/config';
+
 const BUCKET = 'message-files';
 
 /** 10 MB, the bucket's own limit (0080). */
@@ -57,9 +59,9 @@ export function messageFileKind(name: string): MessageFileKind {
 export function formatFileSize(bytes: number, locale: string): string {
   const mb = bytes / (1024 * 1024);
   if (mb >= 1) {
-    return new Intl.NumberFormat(locale, { style: 'unit', unit: 'megabyte', maximumFractionDigits: 1 }).format(mb);
+    return new Intl.NumberFormat(intlLocale(locale), { style: 'unit', unit: 'megabyte', maximumFractionDigits: 1 }).format(mb);
   }
-  return new Intl.NumberFormat(locale, { style: 'unit', unit: 'kilobyte', maximumFractionDigits: 0 }).format(
+  return new Intl.NumberFormat(intlLocale(locale), { style: 'unit', unit: 'kilobyte', maximumFractionDigits: 0 }).format(
     Math.max(1, Math.round(bytes / 1024)),
   );
 }

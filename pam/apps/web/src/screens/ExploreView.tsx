@@ -3,7 +3,7 @@
 import { useLayoutEffect, useRef, useState, type ReactNode } from 'react';
 import { useHideOnScroll } from '@/lib/useHideOnScroll';
 import * as stylex from '@stylexjs/stylex';
-import { Button } from '@astryxdesign/core/Button';
+import { Button } from '@pam/ui/Button';
 import { EmptyState } from '@astryxdesign/core/EmptyState';
 import { Heading } from '@astryxdesign/core/Heading';
 import { HStack } from '@astryxdesign/core/HStack';
@@ -109,7 +109,7 @@ const styles = stylex.create({
   rowHidden: { opacity: 0, pointerEvents: 'none' },
   search: { flexGrow: 1, minWidth: 0 },
   heading: { fontSize: '22px', lineHeight: 1.25, fontWeight: 700 },
-  oneLine: { flexGrow: 1, flexShrink: 1, minWidth: 0, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
+  grows: { flexGrow: 1, flexShrink: 1, minWidth: 0 },
   source: { fontSize: '15px', lineHeight: 1.5 },
   state: { paddingBlock: '32px' },
 });
@@ -177,16 +177,18 @@ export function ExploreView({
       {notice}
       {searching ? null : nextTrip}
 
-      {/* One row, always (D-274): the heading takes one line and ends in
-          "…" before it pushes the area link underneath — "Todos los
-          programas" did. */}
-      <HStack gap={3} align="center" justify="between" wrap="nowrap">
+      {/* One row while it fits (D-274); when it does not, the area link goes
+          underneath (D-404). D-274 cut the heading to "Todos los progra…" so
+          the link stayed beside it — in Russian and Portuguese that is "Все
+          програ…", a title nobody can read. A heading says what the list is;
+          the link can go a line down. */}
+      <HStack gap={3} align="center" justify="between" wrap="wrap">
         {searching ? (
-          <Heading level={1} xstyle={[styles.heading, styles.oneLine]}>
+          <Heading level={1} xstyle={[styles.heading, styles.grows]}>
             {t('explore.results', { query: query.trim() })}
           </Heading>
         ) : (
-          <Heading level={1} xstyle={[styles.heading, styles.oneLine]}>
+          <Heading level={1} xstyle={[styles.heading, styles.grows]}>
             {/* "All programs" over the list though the chip says "All" — the
                 heading gives the context the short chip cannot (Will, 1 October). */}
             {category === 'all'

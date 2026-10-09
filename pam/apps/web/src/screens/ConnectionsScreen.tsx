@@ -1,5 +1,6 @@
 'use client';
 
+import type { Locale } from '@pam/config';
 import { DUMMY_CONNECTIONS, dummyConnection, type DummyConnection } from '@pam/config/dummy-connections';
 import { DUMMY_SELF_ID, dummyConversationIdBetween } from '@pam/config/dummy-conversations';
 import { useI18n } from '@/lib/i18n';
@@ -13,7 +14,7 @@ import { ConnectionsView, type Connection } from './ConnectionsView';
  * The profile page behind each card is gone (D-272): the card carries the
  * message button, the program link and who connected you.
  */
-function toConnection(c: DummyConnection, locale: string): Connection {
+function toConnection(c: DummyConnection, locale: Locale): Connection {
   const by = c.connectedById ? dummyConnection(c.connectedById) : null;
   return {
     id: c.id,
@@ -21,7 +22,7 @@ function toConnection(c: DummyConnection, locale: string): Connection {
     role: c.role,
     programName: c.programName,
     photoUrl: c.photoUrl,
-    help: locale === 'es' ? c.help.es : c.help.en,
+    help: c.help[locale],
     yearsHelping: c.yearsHelping,
     peopleHelped: c.peopleHelped,
     languages: c.languages,

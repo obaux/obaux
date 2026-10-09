@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/nextjs';
 import { fn } from 'storybook/test';
+import { speechLanguageFor } from '@pam/config';
 import { Page, VoiceInput, type SpeechRecognizer, type VoiceInputProps } from '@pam/ui';
 import { useI18n } from '@/lib/i18n';
 import { useStoryText } from '../support/useStoryText';
@@ -20,7 +21,7 @@ function LocalisedVoice({ label, description, micLabels, value, onChange, ...res
       {...rest}
       label={tr(label)}
       {...(description ? { description: tr(description) } : {})}
-      language={locale === 'es' ? 'es-US' : 'en-US'}
+      language={speechLanguageFor(locale)}
       value={current}
       onChange={(next) => {
         setCurrent(next);

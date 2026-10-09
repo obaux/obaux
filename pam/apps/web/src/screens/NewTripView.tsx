@@ -4,14 +4,14 @@ import { useEffect, useMemo, useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { useRouter } from 'next/navigation';
 import { Banner } from '@astryxdesign/core/Banner';
-import { Button } from '@astryxdesign/core/Button';
+import { Button } from '@pam/ui/Button';
 import { Heading } from '@astryxdesign/core/Heading';
 import { HStack } from '@astryxdesign/core/HStack';
 import { Text } from '@astryxdesign/core/Text';
 import { TextArea } from '@astryxdesign/core/TextArea';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
-import { CATEGORY_DEFINITIONS, categoryLabelKey, type Category } from '@pam/config';
+import { CATEGORY_DEFINITIONS, categoryLabelKey, type Category, intlLocale } from '@pam/config';
 import { DUMMY_PLACES_BY_ID, type DummySavedPlace } from '@pam/config/dummy-places';
 import { BigButton, BookIcon, ExploreIcon, SignedIcon, UserPlusIcon } from '@pam/ui';
 import { Icon } from '@astryxdesign/core/Icon';
@@ -248,9 +248,9 @@ export function NewTripView({
     if (walkIn) setTime([walkIn.hour, walkIn.minute]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [place?.id]);
-  const dayFmt = new Intl.DateTimeFormat(locale, { weekday: 'short', month: 'short', day: 'numeric' });
-  const dayLong = new Intl.DateTimeFormat(locale, { weekday: 'long', month: 'long', day: 'numeric' });
-  const timeFmt = new Intl.DateTimeFormat(locale, { hour: 'numeric', minute: '2-digit' });
+  const dayFmt = new Intl.DateTimeFormat(intlLocale(locale), { weekday: 'short', month: 'short', day: 'numeric' });
+  const dayLong = new Intl.DateTimeFormat(intlLocale(locale), { weekday: 'long', month: 'long', day: 'numeric' });
+  const timeFmt = new Intl.DateTimeFormat(intlLocale(locale), { hour: 'numeric', minute: '2-digit' });
   const at = (d: Date, [h, m]: readonly [number, number]) => {
     const x = new Date(d);
     x.setHours(h, m, 0, 0);
