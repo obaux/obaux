@@ -27,7 +27,7 @@
  *   changes  — the newest decisions this flow shows, newest first
  */
 
-export const UPDATED = '2026-10-08';
+export const UPDATED = '2026-10-09';
 
 /** Where each screen opens live — the branch's Storybook on Chromatic. */
 export const STORYBOOK_URL = 'https://claude-pam-storybook--6abea9193da46b88ce90890f.chromatic.com';
@@ -235,6 +235,27 @@ export const flows = [
         note: 'With a program: the booked visit on top, opening the place; Back returns here',
       },
       options: { title: 'Conversation options', story: 'member-created--conversation-options', path: '/messages/thread/options/' },
+      reportMessage: {
+        title: 'Report a message',
+        story: 'member-created--report-message',
+        path: '/messages/thread/report/',
+        changed: 'D-427',
+        note: 'Says who sees the one message: Pam and your guide',
+      },
+      messagesLimited: {
+        title: 'Messages — account limited',
+        story: 'member-created-states-limited-account--messages',
+        path: '/messages/',
+        changed: 'D-427',
+        note: 'Reads as before, but no New message: a notice says what is off and who to call',
+      },
+      threadLimited: {
+        title: 'A conversation — account limited',
+        story: 'member-created-states-limited-account--conversation',
+        path: '/messages/thread/',
+        changed: 'D-427',
+        note: 'Every message stays; the notice, with a call button, stands where the composer was',
+      },
       profile: {
         title: 'Profile',
         story: 'member-created--profile',
@@ -285,6 +306,10 @@ export const flows = [
       ['newTrip', 'explore', 'Visit moved: confetti, then home', { dashed: true }],
       ['messages', 'thread', 'Open'],
       ['thread', 'options', '⋯'],
+      ['options', 'reportMessage', 'Report'],
+      ['messages', 'messagesLimited', 'Account limited (or New message refused)', { dashed: true }],
+      ['messagesLimited', 'threadLimited', 'Open'],
+      ['thread', 'threadLimited', 'Account limited (or a send refused)', { dashed: true }],
       ['profile', 'connections', 'Connections'],
       ['connections', 'thread', 'Message (round button)', { dashed: true }],
       ['profile', 'reminders', 'Get text reminders'],
@@ -297,6 +322,7 @@ export const flows = [
       ['profile', 'points', 'Points'],
     ],
     changes: [
+      'D-427 — a limited account reads Messages and its conversations but cannot send or start one; a notice says what is off and who to call, and a refused send says so',
       'D-337 — booked: the green visit card with Change; the friend drawer copies on open, with Will\'s banner and an ×; every place picture is its category illustration',
       'D-336 — booked: how soon, Policies to sign and Bring a friend (a drawer) as rows; × into Trips; Trips reads signatures per service',
       'D-333 — Bring a friend moves to "Your trip is booked", folded, with Copy; walk-ins plan a trip too; signing locks the sheet while drawing',

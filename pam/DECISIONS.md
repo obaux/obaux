@@ -10114,3 +10114,48 @@ D-426, found free from this branch's side, and was renumbered on 9 October when 
 branch pushed its own D-426 ("Numbers are claimed in one file"); every reference on
 this branch moved with it. This branch has no allocations file: claim the row there
 when the two meet.
+
+### D-429 — Privacy changes go out by email; a refused New message says the account is limited; the unused key goes; the flow map shows the limited states
+
+**Date:** 2026-10-09. **Decided by:** Will, answering the list of what was left after
+D-427: "Moving forward, we'll send emails with privacy policy updates", "Delete",
+"Do that", "Yes update flow map".
+
+- **Privacy policy updates are sent by email.** Recorded as Will's rule going
+  forward; it replaces "re-show it in the app to anyone who agreed before"
+  (`transparency_ack_at` is set once and nothing re-asks) as the way members
+  hear first. **It cannot be done yet, and the reason matters:** Pam holds no
+  email address for a member. `profiles` has no email column *by design* —
+  auth is phone-only (`0002_identity.sql`, §9) — and the only addresses Pam
+  keeps are the ones typed on the expired-invite page (`invite_emails`, 0071),
+  for a different purpose. So sending a policy update by email needs, in order:
+  (1) the email provider that `docs/before-launch.md` already lists for invite
+  links; (2) a decision on how Pam comes to hold a member's email at all — a new
+  thing Pam keeps, so it must be asked for plainly, must be optional or have a
+  fallback, and must appear in the privacy policy's "what we keep" and in the
+  transparency screen before it is collected (those tests fail by design);
+  (3) what a member with no email gets — the app's own notice, or a text that a
+  person has signed off (`reviewedBy`). None of that is decided here: it is
+  Will's. Put on `docs/before-launch.md` as its own item. Until then the policy
+  and terms carry their date (9 October) and the two member accounts on the
+  live project are the only ones that exist outside the team.
+- **A New message the database refuses says why** (the "Do that"). D-427 covered
+  the composer, a refused send and Messages opened by a limited account; the
+  last gap was the New message sheet when the account was limited *after* Messages
+  loaded: it said "Your connection dropped". `pick` (`app/messages/page.tsx`,
+  `screens/MessagesScreen.tsx`) now asks `readAccountLimited()` when
+  `open_direct_conversation` fails; if the account is limited the sheet closes and
+  the notice replaces New message, otherwise the old words stay. Two e2e tests:
+  refused-because-limited (notice, sheet closed, no "connection dropped", no New
+  message) and a 500 for an account that is not limited (still "connection
+  dropped", no notice).
+- **`access.limitedNotice` is deleted** from English and Spanish. It was never
+  referenced by the app (before or after D-427), but it was still being
+  translated into seven languages. The other five bundles live on
+  `claude/gallant-clarke-0dhizj`; that session was asked to delete it there too, so
+  its key-for-key and `copy:status` checks agree when the branches meet.
+- **The flow map** (`docs/user-flows/flows.mjs`, "PAM — User flows", Member page)
+  gains *Messages — account limited*, *A conversation — account limited* and the
+  *Report a message* screen (which had a story only since D-427), with the edges
+  that reach them; `UPDATED` is 9 October.
+

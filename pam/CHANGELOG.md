@@ -45,7 +45,9 @@ off", what you can still do (read your messages, look at places and your plan), 
 a button to call, in place of the New message button; a conversation keeps all of
 its messages and shows the same notice where you would type. A message that
 cannot be sent because your account is limited no longer says "Your connection
-dropped" (D-427).
+dropped" (D-427). The same goes for the New message sheet: if the account was
+limited while Messages was open, it says so instead of "Your connection dropped"
+(D-429).
 
 ## [0.45.4] — 2026-10-08 · Live
 

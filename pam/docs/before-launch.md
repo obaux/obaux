@@ -104,6 +104,16 @@ STATUS row too.
   assign a case manager is on the STATUS backlog), so a member only meets this
   once the database function is used by hand or that screen exists.
 
+- [ ] **Decide how privacy policy updates reach members by email** (Will,
+  9 October 2026, D-429: "Moving forward, we'll send emails with privacy policy
+  updates"). Pam holds no member email: `profiles` has none by design (auth is
+  phone-only, `0002_identity.sql`), so this needs, in order: the email provider
+  (the first item on this list), a plain, optional way for a member to give an
+  email (which the privacy policy's "what we keep" and the transparency screen
+  must name *before* it is collected), and a fallback for a member with none (an
+  in-app notice, or a text a person has signed off). Until then the policy and
+  terms are dated 9 October and only team accounts and two members exist.
+
 - [ ] **Review the SMS copy** still waiting for a name in `reviewedBy`
   (STATUS row 2).
 

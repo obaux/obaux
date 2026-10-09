@@ -21,6 +21,7 @@ import { useConversations } from '@/lib/useConversations';
 import { useMessageableMembers } from '@/lib/useMessageableMembers';
 import { useReports } from '@/lib/useReports';
 import { openConversation } from '@/lib/openConversation';
+import { readAccountLimited } from '@/lib/accountLimited';
 import { whenHappened } from '@/lib/when';
 import { ConversationRow } from './ConversationRow';
 import { LimitedNotice } from './LimitedNotice';
@@ -87,7 +88,10 @@ function MessagesScreen() {
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
   // A limited account reads but cannot start a message (0031): the New
   // message button gives way to the notice that says so (terms.s.limits.p3, D-427).
-  const limited = session.status === 'signed-in' && session.session.accessStatus === 'limited';
+  // ...or found out part-way through: the account was limited after this screen
+  // loaded, and starting a conversation was refused (`pick`, below).
+  const [limitedNow, setLimitedNow] = useState(false);
+  const limited = limitedNow || (session.status === 'signed-in' && session.session.accessStatus === 'limited');
   const { viewedRole, demoRole, setViewAs } = useRoleView(trueRole);
   const isDemo = useDemoView(session);
   const previewing = demoRole !== null || isDemo;
@@ -149,7 +153,15 @@ function MessagesScreen() {
     async (id: string): Promise<string | null> => {
       if (previewing) return dummyPicker ? dummyPicker.hrefFor(id) : null;
       const conversationId = await openConversation(id);
-      return conversationId ? `/messages/thread/?id=${encodeURIComponent(conversationId)}` : null;
+      if (conversationId) return `/messages/thread/?id=${encodeURIComponent(conversationId)}`;
+      // A refusal and a dropped connection look alike from here; if the account
+      // is limited say so, and close the sheet, instead of "Your connection
+      // dropped" (terms.s.limits.p3, D-429).
+      if (await readAccountLimited()) {
+        setLimitedNow(true);
+        setPicking(false);
+      }
+      return null;
     },
     [previewing, dummyPicker],
   );

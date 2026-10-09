@@ -74,6 +74,19 @@ decided.
   (`lib/accountLimited.ts`). `Session` gained `accessStatus`. (3) The first-load
   budget check ran. (4) The translation session was sent the eight changed keys.
 
+- **After the merge (D-429).** Will's answers to what was left: the big branch
+  "go for it", privacy updates by email going forward, he will ask the other
+  session about the native read, the assign-and-limit build in a new session
+  (handoff in STATUS's Backlog), delete the unused key, make a refused New
+  message say the account is limited, update the flow map. Done: the last four and
+  the handoff. **Not merged: the big branch.** The ledger shows 0079–0081 live
+  (the other session applied them, D-428) so the hold Will set is met; but the
+  branch also publishes five machine-translated languages, privacy page, terms
+  and transparency screen included, which its own record says no native speaker
+  has read, and Will's answer on that is still to come. Privacy-by-email is not
+  yet possible: Pam holds no member email address (D-429). The flow map: pages
+  `2 · Member` changed in `flows.mjs`.
+
 ## What was wrong, and what missed it
 
 **A test hardcoded a count and broke without anyone seeing.** `e2e/legal.spec.ts`

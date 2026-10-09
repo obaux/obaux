@@ -986,9 +986,26 @@ Open items Will asked to keep (7 October), newest first. Read this before
   already allows one active case manager per member (`admin_assignments`).
 - **How a case manager limits or pauses someone** (Will, 9 October, D-414:
   "We'll need to enrich how case managers do this later on"). Only the RPC
-  `admin_set_access_status` exists — no screen, no member-facing notice (see
-  `terms.s.limits.p3` in `docs/before-launch.md`), and any case manager with
-  the person in their list may use it.
+  `admin_set_access_status` exists — **no screen** (nothing in the app calls
+  it), and it works for a case manager the person is assigned to (0082). What a
+  limited member meets is built (D-427: the notice on Messages and in a
+  conversation; a refused send and a refused New message say why).
+
+  **Start here for the next session** (Will, 9 October: "I'll handle this in a
+  new session"). These two items belong together: a limit button has nobody to
+  act on until a member is assigned. Already true and tested, so build on it, do
+  not redo it: the schema (`admin_assignments`, one active case manager per
+  member), the rule that a case manager reaches only assigned people (0082, A22,
+  `17_assigned_only_test.sql`), the transparency contract and the privacy section
+  "When we limit an account" (Will approved the wording), the member-side notice
+  and its tests (`e2e/messages.spec.ts`), and the Storybook state *Member / Created
+  / States / Limited account*. Missing: the case manager's screen to take on /
+  hand over / see unassigned members, and the limit / pause / turn back on
+  control with a plain note (never the internal reason, §4.1). A change that adds
+  a screen also needs its story, its route in `src/stories/prototype/routes.tsx`,
+  and `docs/user-flows/flows.mjs` regenerated. Claim decision, amendment and
+  migration numbers in `docs/allocations.md` (on `claude/gallant-clarke-0dhizj`
+  until that branch merges).
 
 - **One account, both roles — follow-ups** (D-375): notifications by
   role (the bell shows the acting side's; a dot on the switch for the other);

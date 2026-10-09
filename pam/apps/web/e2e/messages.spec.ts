@@ -152,6 +152,56 @@ test.describe('the conversation list', () => {
     expect(results.violations).toEqual([]);
   });
 
+  test('a New message the database refuses because the account was limited says so, and closes the sheet', async ({
+    page,
+  }) => {
+    // Active when the screen loads; limited by the time the pick is refused.
+    let limited = false;
+    await signedInAs(page, 'member', () => (limited ? 'limited' : 'active'));
+    await withOneConversation(page);
+    await page.route(PEOPLE, (route) =>
+      route.fulfill(json([{ profile_id: OTHER, first_name: 'Marcus', role: 'member' }])),
+    );
+    await page.route('**/rest/v1/rpc/open_direct_conversation*', (route) => {
+      limited = true;
+      return route.fulfill({
+        status: 403,
+        contentType: 'application/json',
+        body: JSON.stringify({ code: '42501', message: 'not allowed' }),
+      });
+    });
+    await page.goto('/messages/');
+    await settled(page);
+
+    await page.getByRole('button', { name: 'New message' }).click();
+    const sheet = page.getByRole('dialog', { name: 'New message' });
+    await sheet.getByRole('button', { name: /Marcus/ }).click();
+
+    await expect(page.getByRole('alert').getByText('Some things are turned off')).toBeVisible();
+    await expect(page.getByRole('dialog', { name: 'New message' })).toHaveCount(0);
+    await expect(page.getByText('Your connection dropped')).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'New message' })).toHaveCount(0);
+  });
+
+  test('a New message that fails for any other reason still says the connection dropped', async ({ page }) => {
+    await signedInAs(page, 'member');
+    await withOneConversation(page);
+    await page.route(PEOPLE, (route) =>
+      route.fulfill(json([{ profile_id: OTHER, first_name: 'Marcus', role: 'member' }])),
+    );
+    await page.route('**/rest/v1/rpc/open_direct_conversation*', (route) =>
+      route.fulfill({ status: 500, contentType: 'application/json', body: '{}' }),
+    );
+    await page.goto('/messages/');
+    await settled(page);
+
+    await page.getByRole('button', { name: 'New message' }).click();
+    await page.getByRole('dialog', { name: 'New message' }).getByRole('button', { name: /Marcus/ }).click();
+
+    await expect(page.getByText(/Your connection dropped/)).toBeVisible();
+    await expect(page.getByText('Some things are turned off')).toHaveCount(0);
+  });
+
   test('has no help link (A15) — the logo is one tap back to Home, which always has one', async ({ page }) => {
     await signedInAs(page, 'admin');
     await withOneConversation(page);
