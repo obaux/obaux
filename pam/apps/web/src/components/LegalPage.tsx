@@ -95,8 +95,13 @@ const styles = stylex.create({
   // The reading position, drawn as a heavier outline and weight rather than a
   // colour change: a colour alone would be the only signal (§12).
   tocLinkHere: { borderWidth: '2px', borderColor: colorVars['--color-text-primary'], fontWeight: 600 },
-  section: { width: '100%', scrollMarginBlockStart: '16px' },
-  body: { fontSize: '18px', lineHeight: 1.6 },
+  // 24px more above each section on top of the page's own gap (Will, D-419: "more
+  // gap between sections"), so a new heading starts a clear block.
+  section: { width: '100%', scrollMarginBlockStart: '16px', marginBlockStart: '24px' },
+  // 16px more between the guide card and the tabs (Will, D-419).
+  tocWrap: { marginBlockStart: '16px' },
+  // 16px, the body size (SOP A23), with a comfortable 1.6 line height (Will, D-419).
+  body: { fontSize: '16px', lineHeight: 1.6 },
 });
 
 /** The small icon on each card, in the "icons" look (D-416). */
@@ -231,7 +236,7 @@ export function LegalPage({ doc }: { doc: LegalDocument }) {
           <GuideCard title={t('guide.title')} body={t('guide.body')} icon={<PeopleIcon />} />
         ) : null}
 
-        <nav aria-label={t('legal.toc')}>
+        <nav aria-label={t('legal.toc')} {...stylex.props(styles.tocWrap)}>
           <ul {...stylex.props(styles.toc)}>
             {doc.sections.map((section) => {
               const isHere = section.id === here;
@@ -255,7 +260,8 @@ export function LegalPage({ doc }: { doc: LegalDocument }) {
         {/* Flat sections, no cards (Will, D-417): an icon beside each heading, then the words. */}
         {doc.sections.map((section) => (
           <section key={section.id} id={section.id} {...stylex.props(styles.section)}>
-            <VStack gap={2}>
+            {/* 16px between paragraphs (Will, D-419: "more space between paragraphs"). */}
+            <VStack gap={4}>
               <SectionHeading title={t(section.titleKey)} icon={SECTION_ICONS[section.id]} />
               {section.bodyKeys.map((key) => (
                 <Text key={key} xstyle={styles.body}>

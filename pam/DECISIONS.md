@@ -9991,3 +9991,15 @@ and dark, and iPhone SE), including axe's contrast and 48px target-size rules on
 the legal, join and Profile screens and the changed "body text is at least 16px"
 check. (The build predates the guide card losing its shadow, a one-line style.)
 
+### D-419 — Privacy and terms: smaller text, more room
+
+**Date:** 2026-10-09. **Decided by:** Will: "privacy policy text should be smaller
+and more space between paragraphs, and more gap between green card and tabs, more
+gap between sections." One component serves both pages, so Terms has it too.
+
+Section text is 16px (was 18px; the body size since SOP A23, line height 1.6);
+paragraphs are 16px apart (was 8px); each section starts 24px lower than the page's
+own gap (so about 40px between one section's last line and the next heading); the
+tab row starts 16px lower, under the guide card. `apps/web/src/components/
+LegalPage.tsx` only; no copy changed.
+
