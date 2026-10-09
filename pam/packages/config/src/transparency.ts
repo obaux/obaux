@@ -44,6 +44,16 @@ export const ADMIN_CAN_SEE = [
   'appointments_and_attendance',
   'points_and_level',
   /**
+   * Said on the screen since D-413 (Will, 9 October: "Case manager can see
+   * awards, badges, and points from members"). It was always true —
+   * `member_badges_select_admin` (0007) reads badges through `admin_covers()`
+   * exactly as the ledger is read — and the case manager's own onboarding line
+   * (`join.privacy.admin.1`) already said "badges"; only the member's line
+   * lacked the word. A program reads no badges (no policy exists for one;
+   * checked on the live project, 9 October).
+   */
+  'badges',
+  /**
    * Since D-242 (Will, 3 October) this is true of a program the member joined
    * as well as of their case manager: a program lead sees the last day a
    * member used Pam, on the member's page, beside their visits with that
@@ -106,7 +116,13 @@ export const ADMIN_CANNOT_SEE = [
    */
   'message_link_previews',
   'buddy_feed_posts',
-  'members_outside_caseload_or_region',
+  /**
+   * Since 0082 (D-415, Will, 9 October) a case manager reaches only the people
+   * assigned to them — not everyone in their city, which `admin_covers()` also
+   * allowed until then. This entry used to be `members_outside_caseload_or_region`.
+   * `other_regions` is kept: still true, and now implied by the line above.
+   */
+  'members_outside_caseload',
   'other_regions',
   /**
    * Will, confirming and widening D-154's messaging-only finding: "program
@@ -115,7 +131,8 @@ export const ADMIN_CANNOT_SEE = [
    * the case manager who invited a member. This one entry is the single
    * place the two roles genuinely differ: `last_active_date` above is still
    * true of a case manager, and false of a program admin, in every path
-   * that reaches a member's profile — `admin_covers()` for a case manager,
+   * that reaches a member's profile — `admin_covers()` (the caseload) for a
+   * case manager,
    * `provider_linked_to()` for a program admin, now through
    * `provider_linked_members()` (0056) rather than a raw table read that
    * could not draw this distinction at all.
@@ -142,7 +159,9 @@ export function isAdminVisible(field: string): field is AdminVisibleField {
  * Plain language, 5th-grade level, one line per item, in the same order and
  * with the same content as ADMIN_CAN_SEE / ADMIN_CANNOT_SEE above. The person
  * in §4.1 is "the admin"; to a member they are the person who invited them, so
- * the copy says "the person who invited you" — §9 forbids naming the role.
+ * the copy says "your guide" (D-416), defined once on the screen as "the person
+ * who invited you, or a staff member responsible for guiding you" (D-415) —
+ * §9 forbids naming the role.
  *
  * These are i18n keys AND their English source, kept together so a reviewer can
  * read the screen without opening the locale file. The Spanish lives in
@@ -168,10 +187,10 @@ export const TRANSPARENCY_SCREEN: {
   readonly confirm: string;
 } = {
   titleKey: 'transparency.title',
-  title: 'What the person who invited you can see',
+  title: 'What your guide can see',
 
   canSeeHeadingKey: 'transparency.canSee.heading',
-  canSeeHeading: 'They can see:',
+  canSeeHeading: 'Your guide can see:',
   canSee: [
     { key: 'transparency.canSee.goals', en: 'What you said you want to work on' },
     {
@@ -182,7 +201,8 @@ export const TRANSPARENCY_SCREEN: {
       key: 'transparency.canSee.appointments',
       en: 'Your visits, and if you went or missed one',
     },
-    { key: 'transparency.canSee.points', en: 'Your points and your level' },
+    // D-413 — badges named, not left to "level": a case manager already reads them.
+    { key: 'transparency.canSee.points', en: 'Your points, your level and your badges' },
     // D-242 — a program you joined sees this too; said here, not implied.
     {
       key: 'transparency.canSee.lastActive',
@@ -212,7 +232,7 @@ export const TRANSPARENCY_SCREEN: {
   ],
 
   cannotSeeHeadingKey: 'transparency.cannotSee.heading',
-  cannotSeeHeading: 'They cannot see:',
+  cannotSeeHeading: 'Your guide cannot see:',
   cannotSee: [
     { key: 'transparency.cannotSee.messages', en: 'What you say or send to someone else' },
     { key: 'transparency.cannotSee.buddyFeed', en: 'What you share with your buddies' },
@@ -239,4 +259,45 @@ export const TRANSPARENCY_I18N_KEYS: readonly string[] = [
   ...TRANSPARENCY_SCREEN.cannotSee.map((l) => l.key),
   TRANSPARENCY_SCREEN.footerKey,
   TRANSPARENCY_SCREEN.confirmKey,
+  // The reading aids around the list (D-416).
+  'guide.title',
+  'guide.body',
+  'transparency.summary.title',
+  'transparency.summary.see',
+  'transparency.summary.cannot',
+  'transparency.summary.reported',
+  ...['plans', 'progress', 'people'].map((g) => `transparency.group.${g}`),
+  'copy.page',
+  'copy.done',
+  'copy.failed',
+];
+
+/**
+ * How the "can see" list is chunked on screen (D-416): three groups of three,
+ * each under a small heading, so nine lines are three short lists rather than
+ * one long one. Presentation only — the words of every line are the contract's
+ * and are rendered unchanged, in the contract's own order within a group. A
+ * test holds that every line in `TRANSPARENCY_SCREEN.canSee` is in exactly one
+ * group, so a line added to the contract cannot go missing from the screen.
+ */
+export const TRANSPARENCY_GROUPS: readonly {
+  readonly titleKey: string;
+  readonly keys: readonly string[];
+}[] = [
+  {
+    titleKey: 'transparency.group.plans',
+    keys: ['transparency.canSee.goals', 'transparency.canSee.enrollments', 'transparency.canSee.appointments'],
+  },
+  {
+    titleKey: 'transparency.group.progress',
+    keys: ['transparency.canSee.points', 'transparency.canSee.lastActive', 'transparency.canSee.saves'],
+  },
+  {
+    titleKey: 'transparency.group.people',
+    keys: [
+      'transparency.canSee.connections',
+      'transparency.canSee.flagged',
+      'transparency.canSee.directMessages',
+    ],
+  },
 ];

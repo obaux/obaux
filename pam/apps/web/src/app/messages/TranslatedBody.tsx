@@ -10,7 +10,7 @@ import { useI18n } from '@/lib/i18n';
 
 /**
  * The words of a message, in the reader's language, labelled as such (Will,
- * 9 October, D-414 — Uber's way): the translation, then under it "Translated"
+ * 9 October, D-423 — Uber's way): the translation, then under it "Translated"
  * and a link that shows what was actually written. Tap it and the original
  * replaces the translation, labelled "Original", with the way back.
  *

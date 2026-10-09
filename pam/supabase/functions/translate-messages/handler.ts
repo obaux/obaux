@@ -3,7 +3,7 @@
 //
 // Called by the app, as the signed-in reader, when they open a conversation
 // that has messages from somebody else. It answers from what it has already
-// translated (public.message_translations, 0083) and asks the translation
+// translated (public.message_translations, 0084) and asks the translation
 // service only about the rest, then keeps what it learned.
 //
 // The three rules that matter:

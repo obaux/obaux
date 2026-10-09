@@ -1,12 +1,31 @@
 'use client';
 
-import { Suspense, useEffect, useRef, useState } from 'react';
+import { Suspense, useEffect, useRef, useState, type ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { VStack } from '@astryxdesign/core/VStack';
-import { Heading } from '@astryxdesign/core/Heading';
+import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { Text } from '@astryxdesign/core/Text';
 import { Button } from '@pam/ui/Button';
-import { Page, TextLink } from '@pam/ui';
+import {
+  AwardIcon,
+  BookIcon,
+  ClockIcon,
+  EyeIcon,
+  FlagIcon,
+  InfoIcon,
+  MeIcon,
+  MessagesIcon,
+  Page,
+  PeopleIcon,
+  PhoneIcon,
+  PlacesIcon,
+  SettingsIcon,
+  ShareIcon,
+  ShieldIcon,
+  TextLink,
+} from '@pam/ui';
+import { CopyButton } from '@pam/ui/CopyButton';
+import { GuideCard, SectionHeading } from '@pam/ui/Reading';
 import { SubPageHeader } from '@pam/ui/SubPage';
 import type { LegalDocument } from '@pam/config';
 import { useSearchParams } from 'next/navigation';
@@ -30,32 +49,80 @@ import { goBack } from '@/lib/navigate';
  */
 
 const styles = stylex.create({
-  intro: { fontSize: '18px', lineHeight: 1.5 },
+  // 16px: the body size (SOP A23), the line under the title.
+  intro: { fontSize: '16px', lineHeight: 1.5 },
   updated: { fontSize: '15px' },
-  tocHeading: { fontSize: '15px', textTransform: 'uppercase', letterSpacing: '0.06em' },
-  toc: { width: '100%', paddingInline: 0, marginBlock: 0, listStyle: 'none' },
-  tocItem: { marginBlock: '2px' },
+  // The jump row follows Explore's tabs (Will, 9 October, D-417): white 40px
+  // pills with a soft lift, the one you are on outlined dark. The 48px a finger
+  // needs (§2.5) is an invisible margin round each pill (::before), as there.
+  // It starts in line with the page and runs to the screen's right edge.
+  toc: {
+    display: 'flex',
+    flexDirection: 'row',
+    gap: '8px',
+    overflowX: 'auto',
+    listStyle: 'none',
+    marginBlock: 0,
+    marginInlineStart: '-4px',
+    marginInlineEnd: '-16px',
+    paddingInlineStart: '4px',
+    paddingInlineEnd: '16px',
+    paddingBlock: '6px 10px',
+    scrollbarWidth: 'none',
+    scrollSnapType: 'x proximity',
+    scrollPaddingInline: '4px',
+  },
+  tocItem: { flexShrink: 0, scrollSnapAlign: 'start' },
   tocLink: {
+    position: 'relative',
     display: 'flex',
     alignItems: 'center',
-    minHeight: '48px',
-    paddingInline: '12px',
-    borderRadius: '8px',
-    fontSize: '17px',
-    lineHeight: 1.3,
-    textAlign: 'start',
+    minHeight: '40px',
+    paddingInline: '14px',
+    borderRadius: '999px',
+    fontSize: '15px',
+    lineHeight: 1.2,
+    whiteSpace: 'nowrap',
     textDecoration: 'none',
-    color: 'inherit',
-    // The reading position, shown as a filled row rather than a colour change:
-    // a colour alone would be the only signal, and one in ten men cannot rely
-    // on it. §12 also wants AA contrast, which a tint of the page ground keeps.
-    backgroundColor: { default: 'transparent', ':hover': 'rgba(127, 127, 127, 0.12)' },
+    color: colorVars['--color-text-primary'],
+    backgroundColor: colorVars['--color-background-body'],
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    borderColor: colorVars['--color-border'],
+    boxShadow: '0 1px 4px light-dark(oklch(0 0 0 / 7%), oklch(0 0 0 / 35%))',
+    '::before': { content: "''", position: 'absolute', insetBlock: '-4px', insetInline: '-2px' },
   },
-  tocLinkHere: { backgroundColor: 'rgba(127, 127, 127, 0.18)', fontWeight: 700 },
-  section: { width: '100%', scrollMarginBlockStart: '16px' },
-  sectionTitle: { fontSize: '21px', lineHeight: 1.3 },
-  body: { fontSize: '18px', lineHeight: 1.6 },
+  // The reading position, drawn as a heavier outline and weight rather than a
+  // colour change: a colour alone would be the only signal (§12).
+  tocLinkHere: { borderWidth: '2px', borderColor: colorVars['--color-text-primary'], fontWeight: 600 },
+  // 24px more above each section on top of the page's own gap (Will, D-419: "more
+  // gap between sections"), so a new heading starts a clear block.
+  section: { width: '100%', scrollMarginBlockStart: '16px', marginBlockStart: '24px' },
+  // 16px more between the guide card and the tabs (Will, D-419).
+  tocWrap: { marginBlockStart: '16px' },
+  // 16px, the body size (SOP A23), with a comfortable 1.6 line height (Will, D-419).
+  body: { fontSize: '16px', lineHeight: 1.6 },
 });
+
+/** The small icon on each card, in the "icons" look (D-416). */
+const SECTION_ICONS: Record<string, ReactNode> = {
+  'what-we-keep': <BookIcon />,
+  'who-can-see': <EyeIcon />,
+  limits: <FlagIcon />,
+  texts: <MessagesIcon />,
+  'never-say': <ShieldIcon />,
+  sharing: <ShareIcon />,
+  'how-long': <ClockIcon />,
+  'your-choices': <SettingsIcon />,
+  contact: <PhoneIcon />,
+  'what-pam-is': <InfoIcon />,
+  emergencies: <PhoneIcon />,
+  'your-account': <MeIcon />,
+  'being-decent': <PeopleIcon />,
+  programs: <PlacesIcon />,
+  points: <AwardIcon />,
+  changes: <ClockIcon />,
+};
 
 export function LegalPage({ doc }: { doc: LegalDocument }) {
   const { t } = useI18n();
@@ -131,49 +198,71 @@ export function LegalPage({ doc }: { doc: LegalDocument }) {
     };
   }, [doc]);
 
+  // One copy icon, top right of the page, for the whole document (Will, D-417):
+  // the title, when it was updated, who "your guide" is, every section, and where
+  // it came from, so a pasted line can be traced.
+  const pageText = [
+    t(doc.titleKey),
+    t(doc.updatedKey),
+    '',
+    t(doc.introKey),
+    ...(doc.id === 'privacy' ? ['', `${t('guide.title')}: ${t('guide.body')}`] : []),
+    ...doc.sections.flatMap((section) => ['', t(section.titleKey), ...section.bodyKeys.map((key) => t(key))]),
+    '',
+    `Pam — ${t(doc.titleKey)}`,
+  ].join('\n');
+  const copyAction = (
+    <CopyButton
+      text={pageText}
+      label={t('copy.page')}
+      copiedLabel={t('copy.done')}
+      failedLabel={t('copy.failed')}
+    />
+  );
+
   return (
     <Page width="read">
         {/* The nested-page template (D-213): these open from Legal. */}
-        <Suspense fallback={<LegalHeader doc={doc} door={null} />}>
-          <LegalHeaderFromUrl doc={doc} />
+        <Suspense fallback={<LegalHeader doc={doc} door={null} actions={copyAction} />}>
+          <LegalHeaderFromUrl doc={doc} actions={copyAction} />
         </Suspense>
         <Text xstyle={styles.intro}>{t(doc.introKey)}</Text>
         <Text type="supporting" xstyle={styles.updated}>
           {t(doc.updatedKey)}
         </Text>
 
-        <nav aria-label={t('legal.toc')}>
-          <VStack gap={1}>
-            <Text type="supporting" xstyle={styles.tocHeading}>
-              {t('legal.toc')}
-            </Text>
-            <ul {...stylex.props(styles.toc)}>
-              {doc.sections.map((section) => {
-                const isHere = section.id === here;
-                return (
-                  <li key={section.id} {...stylex.props(styles.tocItem)}>
-                    <a
-                      href={`#${section.id}`}
-                      // Tells a screen reader what the highlight is saying to
-                      // everybody else: this is the part you are reading.
-                      aria-current={isHere ? 'true' : undefined}
-                      {...stylex.props(styles.tocLink, isHere && styles.tocLinkHere)}
-                    >
-                      {t(section.titleKey)}
-                    </a>
-                  </li>
-                );
-              })}
-            </ul>
-          </VStack>
+        {/* Who "your guide" is, said once, before the page says "your guide" (D-416). */}
+        {doc.id === 'privacy' ? (
+          <GuideCard title={t('guide.title')} body={t('guide.body')} icon={<PeopleIcon />} />
+        ) : null}
+
+        <nav aria-label={t('legal.toc')} {...stylex.props(styles.tocWrap)}>
+          <ul {...stylex.props(styles.toc)}>
+            {doc.sections.map((section) => {
+              const isHere = section.id === here;
+              return (
+                <li key={section.id} {...stylex.props(styles.tocItem)}>
+                  <a
+                    href={`#${section.id}`}
+                    // Tells a screen reader what the highlight is saying to
+                    // everybody else: this is the part you are reading.
+                    aria-current={isHere ? 'true' : undefined}
+                    {...stylex.props(styles.tocLink, isHere && styles.tocLinkHere)}
+                  >
+                    {t(section.titleKey)}
+                  </a>
+                </li>
+              );
+            })}
+          </ul>
         </nav>
 
+        {/* Flat sections, no cards (Will, D-417): an icon beside each heading, then the words. */}
         {doc.sections.map((section) => (
           <section key={section.id} id={section.id} {...stylex.props(styles.section)}>
-            <VStack gap={2}>
-              <Heading level={2} xstyle={styles.sectionTitle}>
-                {t(section.titleKey)}
-              </Heading>
+            {/* 16px between paragraphs (Will, D-419: "more space between paragraphs"). */}
+            <VStack gap={4}>
+              <SectionHeading title={t(section.titleKey)} icon={SECTION_ICONS[section.id]} />
               {section.bodyKeys.map((key) => (
                 <Text key={key} xstyle={styles.body}>
                   {t(key)}
@@ -210,7 +299,7 @@ function useDoor(): Door {
   return from === 'signin' || from === 'join' ? from : null;
 }
 
-function LegalHeader({ doc, door }: { doc: LegalDocument; door: Door }) {
+function LegalHeader({ doc, door, actions }: { doc: LegalDocument; door: Door; actions?: ReactNode }) {
   const { t } = useI18n();
   const fallback = door === 'signin' ? '/signin/' : door === 'join' ? '/join/' : '/legal/';
   return (
@@ -218,6 +307,7 @@ function LegalHeader({ doc, door }: { doc: LegalDocument; door: Door }) {
     <SubPageHeader
       title={t(doc.titleKey)}
       titleId="top"
+      {...(actions ? { actions } : {})}
       backHref={fallback}
       backLabel={
         door === 'signin'
@@ -231,8 +321,8 @@ function LegalHeader({ doc, door }: { doc: LegalDocument; door: Door }) {
   );
 }
 
-function LegalHeaderFromUrl({ doc }: { doc: LegalDocument }) {
-  return <LegalHeader doc={doc} door={useDoor()} />;
+function LegalHeaderFromUrl({ doc, actions }: { doc: LegalDocument; actions?: ReactNode }) {
+  return <LegalHeader doc={doc} door={useDoor()} actions={actions} />;
 }
 
 /** The other document, keeping where this one was opened from. */

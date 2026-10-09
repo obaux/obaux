@@ -1,6 +1,6 @@
--- 0082 — More languages (Will, 9 October 2026: "Let's also add a Brazilian
+-- 0083 — More languages (Will, 9 October 2026: "Let's also add a Brazilian
 -- portuguese language", then "Chinese (including Mandarin and Cantonese),
--- Russian, Arabic"). D-413.
+-- Russian, Arabic"). D-422.
 --
 -- The whole database change: `profiles.preferred_language` may now hold
 --   'en', 'es'                 (as before)

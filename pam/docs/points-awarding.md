@@ -59,10 +59,13 @@ And two things found while writing this, to fix as part of the build:
    member is never accused; a lower-confidence action just earns less.
 7. **No comparison** (§8): no leaderboards, no "top members", nothing
    ranking one member against another. `LEADERBOARDS_ENABLED = false`.
-8. **Nobody else sees a member's points** except as the transparency
-   contract already says (`points_ledger_select_admin`, 0007). The Points
-   screen tells members "they are yours and nobody else sees them"; if
-   staff visibility ever widens, change `transparency.ts` first.
+8. **Only the case manager a member is assigned to sees their points**, as
+   the transparency contract says (`points_ledger_select_admin`, 0007; the
+   caseload alone since 0082, D-415). Programs and other members never do.
+   The Points screen tells members "they are yours. The person who invited
+   you, or a staff member responsible for guiding you, can see them. Programs
+   and other members cannot" (D-412, D-415); if staff visibility ever widens,
+   change `transparency.ts` first.
 
 ---
 

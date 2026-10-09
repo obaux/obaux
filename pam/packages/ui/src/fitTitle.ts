@@ -3,7 +3,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 /**
- * A page title that steps down to fit (D-413).
+ * A page title that steps down to fit (D-422).
  *
  * Titles are drawn at 34px, which holds "Privacy" and "Notificaciones" on a
  * 320px screen. It does not hold "Конфиденциальность" — one word, 380px wide —

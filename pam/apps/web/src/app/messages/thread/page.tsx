@@ -85,7 +85,7 @@ function ThreadScreen() {
 
   const speechLanguage = speechLanguageFor(locale);
 
-  // Other people's words in the reader's language, labelled (D-414). Nothing
+  // Other people's words in the reader's language, labelled (D-423). Nothing
   // happens while MESSAGE_TRANSLATION is off.
   const translations = useMessageTranslations(state.status === 'ready' ? state.messages : NO_MESSAGES);
 

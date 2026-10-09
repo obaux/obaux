@@ -142,7 +142,7 @@ export interface ThreadViewMessage {
 export interface ThreadViewProps {
   readonly messages: readonly ThreadViewMessage[];
   /**
-   * Other people's messages in the reader's language, by message id (D-414):
+   * Other people's messages in the reader's language, by message id (D-423):
    * shown under the label "Translated", with a link to what was written.
    * Absent for a message that needed none, and always while translation is off.
    */
@@ -883,7 +883,7 @@ export function ThreadView({
             const google = message.photoUrl || message.file ? null : googleLinkIn(message.body);
             // The words, as written — or, for another person's message that
             // came back translated, in the reader's language with its label and
-            // a link to the original (D-414).
+            // a link to the original (D-423).
             const translation = message.mine ? undefined : translations?.[message.id];
             const words = (extra?: stylex.StyleXStyles) =>
               translation && message.body ? (

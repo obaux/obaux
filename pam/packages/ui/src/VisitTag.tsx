@@ -35,7 +35,7 @@ const styles = stylex.create({
     lineHeight: 1.3,
     fontWeight: 600,
     color: colorVars['--color-text-primary'],
-    // Wraps, never trimmed (D-413): the day and time are the whole point of
+    // Wraps, never trimmed (D-422): the day and time are the whole point of
     // the tag, and "10月11日 · 上午1…" says neither. A longer language gives it
     // a second line.
     overflowWrap: 'anywhere',

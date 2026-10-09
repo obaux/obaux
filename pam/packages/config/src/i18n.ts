@@ -1,7 +1,7 @@
 /**
  * Languages (§2.3): English and Spanish at launch; Brazilian Portuguese,
  * Simplified and Traditional Chinese, Russian and Arabic added 9 October 2026
- * at Will's ask (sop-amendments A22, D-413). [ASK WILL] before any further one.
+ * at Will's ask (sop-amendments A24, D-422). [ASK WILL] before any further one.
  *
  * The codes are BCP 47 tags on purpose. `Intl.DateTimeFormat(tag)` and friends
  * take them as they are, and `lang` on the page wants exactly this, so a date,
@@ -68,7 +68,7 @@ export function matchLocale(preferences: readonly string[]): Locale | null {
 
 /**
  * What the screen says while a language is being fetched: "Switching to X…",
- * in X (Will, 9 October, D-413: "state what the system is doing in their
+ * in X (Will, 9 October, D-422: "state what the system is doing in their
  * selected language"). It cannot live in the language's own bundle, which is
  * exactly what has not arrived yet, so these seven short lines travel with the
  * code instead — written in the language they announce, and naming it so it

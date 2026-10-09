@@ -1,4 +1,4 @@
--- More languages (0082, D-413): Brazilian Portuguese, Simplified and
+-- More languages (0083, D-422): Brazilian Portuguese, Simplified and
 -- Traditional Chinese, Russian, Arabic.
 --
 -- One column decides which languages an account can hold. These check that

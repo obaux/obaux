@@ -419,7 +419,7 @@ export function ScheduleView({
       // The month grid's seven columns are about 40px each at 320px. Arabic's
       // short weekday is the whole word ("الخميس"), which overlaps its
       // neighbour, so it is the single letter every Arabic calendar uses
-      // there (D-413); the day's full name is on its button for a screen reader.
+      // there (D-422); the day's full name is on its button for a screen reader.
       weekdayNarrow: new Intl.DateTimeFormat(intlLocale(locale), { weekday: locale === 'ar' ? 'narrow' : 'short' }),
       month: new Intl.DateTimeFormat(intlLocale(locale), { month: 'long', year: 'numeric' }),
     }),

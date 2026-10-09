@@ -1,7 +1,7 @@
 # 2026-10-09 — Seven languages, messages in your own language, and text that fits
 
 **Phase:** 1 (member flows) · **Sessions so far:** the one that proofread Spanish
-(D-412) and this one are the same conversation; the other concurrent session
+(D-421) and this one are the same conversation; the other concurrent session
 was on `claude/pam-storybook` (D-404–D-411) and was merged in at the end.
 
 ## What changed
@@ -11,24 +11,24 @@ added:
 
 1. **Brazilian Portuguese, then Chinese (Mandarin and Cantonese), Russian,
    Arabic** — `pt-BR`, `zh-CN`, `zh-HK`, `ru`, `ar` beside `en` and `es`
-   (D-413). One registry (`packages/config/src/i18n.ts`); lazily loaded
+   (D-422). One registry (`packages/config/src/i18n.ts`); lazily loaded
    bundles; CLDR plurals; right-to-left; the phone's language as a starting
    point; a switching screen that says what is happening in the language being
-   switched to; migration 0082 (the one check). SMS and email deliberately
+   switched to; migration 0083 (the one check). SMS and email deliberately
    stay English/Spanish.
 2. **Messages, read in the reader's language** — "Uber's approach": the
    translation, labelled Translated, a link to show the original. Built end to
-   end and **switched off** (D-414): migration 0083, the `translate-messages`
+   end and **switched off** (D-423): migration 0084, the `translate-messages`
    function, the thread UI, copy in all seven languages, and the privacy
    section that appears with the switch.
 3. **A text-fit audit** of every story in every language at 320px
    (`pnpm --filter @pam/web audit:fit`), and the fixes it led to: wrapping
    `Button`, `Badge` and `Segment`; large titles that step down for a word
    that will not wrap; notifications in full; Explore's heading row; and more
-   (D-413).
+   (D-422).
 4. **Merged `claude/pam-storybook`**, which had taken D-404–D-411, migration
-   0081 and its own changelog numbers. Mine are now D-412 (Spanish), D-413,
-   D-414; migrations 0082, 0083; CHANGELOG 0.50.1, 0.51.0.
+   0081 and its own changelog numbers. Mine are now D-421 (Spanish), D-422,
+   D-423; migrations 0083, 0084; CHANGELOG 0.50.1, 0.51.0.
 
 ## What was wrong, and what missed it
 
@@ -67,10 +67,10 @@ added:
 
 ## Decisions
 
-- D-412 — Spanish, spelled properly (first numbered D-403).
-- D-413 — Seven languages, and text that fits in every one of them.
-- D-414 — Messages, read in the reader's own language (built, switched off).
-- `docs/sop-amendments.md` A22 — Pam is in seven languages, not two.
+- D-421 — Spanish, spelled properly (first numbered D-403).
+- D-422 — Seven languages, and text that fits in every one of them.
+- D-423 — Messages, read in the reader's own language (built, switched off).
+- `docs/sop-amendments.md` A24 — Pam is in seven languages, not two.
 
 ## Verified
 
@@ -80,16 +80,16 @@ added:
 | `@pam/config` tests | 397 pass (16 files), including the translation core and handler (51) and the privacy-switch tie |
 | `@pam/ui` tests | 74 pass |
 | `@pam/web` unit tests | 40 pass |
-| Database suite | all pass through `19_message_translations_test.sql` (0083); `18_more_languages` proves 0082; `19` proves who can read, write and delete a translation |
+| Database suite | all pass through `19_message_translations_test.sql` (0084); `18_more_languages` proves 0083; `19` proves who can read, write and delete a translation |
 | Browser e2e (3 projects, `pnpm build` first, run twice: before and after the last tab and bidi changes) | **816 pass**, 0 fail (6 minutes at 4 workers) — includes the new language page-fit checks |
 | First-load JS (`check-bundle-budget.mjs`) | 541.8 kB of 600 kB; 58.2 kB to spare |
 | Storybook build | passes (455 stories outside Foundations) |
-| Fit audit, 455 stories × 7 languages × 320px (first run, before the merge: 446) | first run 353 new defects; after the fixes 29 remain, each looked at (design or detector noise — listed in D-413); the About tabs re-checked at 0 |
+| Fit audit, 455 stories × 7 languages × 320px (first run, before the merge: 446) | first run 353 new defects; after the fixes 29 remain, each looked at (design or detector noise — listed in D-422); the About tabs re-checked at 0 |
 | Mutation checks | reading with the service role instead of the reader's sign-in fails 8 handler tests; the dignity check on the translation prompt was vacuous until it was given an object instead of a string |
 
 ## Left undone
 
-- **Nothing was applied to the live Supabase project.** 0082 and 0083 are
+- **Nothing was applied to the live Supabase project.** 0083 and 0084 are
   files only; `translate-messages` is not deployed. Order and conditions are in
   `docs/before-launch.md`.
 - **No native speaker has read any of the six new bundles.** See
@@ -116,4 +116,4 @@ added:
 - Will: before translation is switched on — the provider's no-retention terms in
   writing, the wording that tells members first, a per-person cap.
 - Whoever applies migrations: `list_migrations` against the repo first;
-  0081 (link previews) must be live or deliberately held before 0082 goes in.
+  0081 (link previews) must be live or deliberately held before 0083 goes in.

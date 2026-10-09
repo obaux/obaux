@@ -135,7 +135,7 @@ const styles = stylex.create({
     transitionDuration: '150ms',
   },
   shown: { opacity: 1 },
-  // 34px, stepping down for a word that will not fit (D-413, `useFitTitle`).
+  // 34px, stepping down for a word that will not fit (D-422, `useFitTitle`).
   // While it is being measured a word may not break, so one that is too wide
   // overflows and says so; only past the smallest step is it allowed to.
   large: { fontSize: '34px', lineHeight: 1.15, fontWeight: 700, overflowWrap: 'normal', hyphens: 'manual' },

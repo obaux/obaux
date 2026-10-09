@@ -94,7 +94,8 @@ export const A11Y = {
   minTouchTargetPx: 48,
   /** §2.4 — the primary CTA everywhere. */
   primaryButtonHeightPx: 56,
-  bodyTextMobilePx: 18,
+  /** §2.5 — 16px body text, mobile and desktop alike (SOP A23, Will, 9 October; was 18px). */
+  bodyTextMobilePx: 16,
   bodyTextDesktopPx: 16,
   /** §2.5 — AAA for body text. */
   bodyContrastRatio: 7,

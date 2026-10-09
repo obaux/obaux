@@ -3,7 +3,7 @@ import { handle, type Deps } from '../../../supabase/functions/translate-message
 import type { Incoming, Translated, Translator } from '../../../supabase/functions/translate-messages/core.ts';
 
 /**
- * The function around the core (D-414): who it reads as, what it writes with,
+ * The function around the core (D-423): who it reads as, what it writes with,
  * and what it does when things are off or down. Run against a fake database
  * and a fake translation service; nothing leaves the test.
  */

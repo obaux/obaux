@@ -9,7 +9,7 @@ import {
   READABILITY_TARGET_GRADE,
 } from '../src/language.js';
 import { PLURAL_CATEGORIES_REQUIRED, SUPPORTED_LOCALES } from '../src/i18n.js';
-import { TRANSPARENCY_I18N_KEYS, TRANSPARENCY_SCREEN } from '../src/transparency.js';
+import { TRANSPARENCY_GROUPS, TRANSPARENCY_I18N_KEYS, TRANSPARENCY_SCREEN } from '../src/transparency.js';
 import { CATEGORY_LIST, CATEGORIES } from '../src/categories.js';
 import { LEVELS, BADGES } from '../src/points.js';
 import { BUNDLES, COUNT_KEYS, EN, OTHER_LOCALES, baseKey, isVariant, placeholders } from './_bundles.js';
@@ -183,6 +183,35 @@ describe('transparency screen (SOP §4.1)', () => {
     for (const line of [...TRANSPARENCY_SCREEN.canSee, ...TRANSPARENCY_SCREEN.cannotSee]) {
       expect(bundle[line.key], `drift on ${line.key}`).toBe(line.en);
     }
+  });
+});
+
+describe('transparency screen, grouped for reading (D-416)', () => {
+  const lines = TRANSPARENCY_SCREEN.canSee.map((l) => l.key);
+  const grouped = TRANSPARENCY_GROUPS.flatMap((g) => [...g.keys]);
+
+  it('puts every line of the contract in exactly one group', () => {
+    expect([...grouped].sort()).toEqual([...lines].sort());
+  });
+
+  it('keeps each group short enough to take in at a glance', () => {
+    for (const g of TRANSPARENCY_GROUPS) expect(g.keys.length, g.titleKey).toBeLessThanOrEqual(4);
+  });
+
+  it('names every group and every reading aid in both languages', () => {
+    for (const g of TRANSPARENCY_GROUPS) {
+      expect(en, `en ${g.titleKey}`).toHaveProperty(g.titleKey);
+      expect(es, `es ${g.titleKey}`).toHaveProperty(g.titleKey);
+    }
+    for (const key of ['guide.title', 'guide.body', 'copy.page', 'copy.done', 'copy.failed']) {
+      expect(en).toHaveProperty(key);
+      expect(es).toHaveProperty(key);
+    }
+  });
+
+  it('defines "your guide" once, as the person who invited you or a staff member guiding you', () => {
+    expect((en as Record<string, string>)['guide.body']).toMatch(/invited you/);
+    expect((en as Record<string, string>)['guide.body']).toMatch(/responsible for guiding you/);
   });
 });
 

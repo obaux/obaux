@@ -10374,7 +10374,504 @@ selected. Only input fields ready to type (except sign in)."
   does not focus its field on arrival (it did not before either), so the
   keyboard does not cover the page before it is read.
 
-### D-412 — Spanish, spelled properly: accents, ñ and ¿ restored across `es.json`
+### D-412 — The Points screen says who can see points
+
+**Date:** 2026-10-09. **Decided by:** Will — "Case manager can see awards,
+badges, and points from members."
+
+**What was wrong.** Two translators, translating Pam into Chinese, noticed
+that `points.intro` said "They are yours and nobody else sees them" while
+`transparency.canSee.points`, `join.privacy.admin.1` and `admin.seeing.body`
+all say the case manager who invited a member can see their points. The
+sentence was the odd one out, not the behaviour:
+
+- `points_ledger_select_admin` (`0007_rls.sql:592`) and `member_points()`
+  (`0010_harden_functions.sql:102`) hand the balance to an admin who
+  `admin_covers()` the member — and to the member. Nobody else: there is no
+  program policy, and `member_points()` returns null for any other caller.
+  Checked on the live project (policies and function bodies) on 9 October.
+- A case manager's Home rows, `/admin/` and the member's page show "N points".
+- `points_and_level` is in `ADMIN_CAN_SEE`; the database suite asserts a
+  case manager reads their caseload's points (`04_rpc_test.sql`).
+- The long privacy page already said so (`privacy.s.who-can-see.p1`).
+
+**What changed.** `points.intro`, English and Spanish: "They are yours. The
+person who invited you can see them. Programs and other members cannot." It
+states what is true and the two protections that hold (a program never sees
+points — `member_activity_for_a_program` in `ADMIN_CANNOT_SEE`; nor does any
+other member). `docs/points-awarding.md` principle 8 now says the same. No
+behaviour, migration or contract change: the promise was corrected to match
+the code, which already matched the contract, so nothing was widened and
+there is nothing to tell members beforehand. (The live project had three
+accounts, all `active`, when this was checked.)
+
+**Left open, for Will.**
+
+1. **Badges.** Will's answer includes badges. The case manager can read
+   them (`member_badges_select_admin`, `0007_rls.sql:600`) and
+   `join.privacy.admin.1` tells the case manager so ("Their badges, their
+   points…"), but the member-facing line is "Your points and your level"
+   (`transparency.canSee.points`). Whether "level" covers badges is a
+   contract question; the line was not changed without his word.
+2. **Region, not only the inviter.** `admin_covers()` also covers any case
+   manager in the member's city. Every member-facing line says "the person who
+   invited you". True for the ordinary case; not the whole truth.
+3. **Other languages.** The five bundles the translators worked on
+   (pt-BR, zh-CN, zh-HK, ru, ar) are on no branch of this repository; only
+   `en` and `es` exist. `points.intro` must be changed in each when they land.
+
+**Numbering.** `claude/pam-storybook` already reaches D-411 and
+`claude/gallant-clarke-0dhizj` D-403; this is D-412 to stay clear of both.
+
+**Update, same day.** Item 1 (badges) was put to Will and is settled in D-413;
+items 2 and 3 stand.
+
+### D-413 — "Messages are never turned off" becomes what is true; badges named on the member's screen
+
+**Date:** 2026-10-09. **Decided by:** Will, on two questions put to him after
+D-412, both found by translators. Messages: "No, it can be turned off
+(promise changes)". Badges: "Yes, name badges".
+
+**Messages — what was wrong.** `terms.s.limits.p2` said "Messages are never
+turned off. Anyone can always reach for help." That is true of the per-feature
+switch only (0031 and A6: `access_controls` refuses a `chat` row, by trigger,
+live). It was never true of account status. On the live project
+`messages_insert_sender` requires `is_active_account()`, and so does
+`open_direct_conversation()` (0063, restated by 0072, 0075 and 0076), so a
+`limited` account can read but not send or start a message; a `suspended`
+one cannot sign in (`useSession.ts`). Both are set by `admin_set_access_status`
+(0008) by any case manager covering the person (caseload or region), with a
+written reason. No screen calls it yet, nothing renders `account_limited`,
+and the live project had three accounts, all `active`. `notice.account_limited`
+("Messages and new people are off for now") was accurate to the database all
+along. `feature.chat` is an unreachable label (the database cannot hold that
+row); it was left alone.
+
+**Messages — what changed.** The promise now matches the code. Three options
+were put to Will: change the code so a limited account keeps messaging; change
+the promise; or let only the Pam team turn sending off. He chose the promise.
+`terms.s.limits.p2`, en + es: "If an account is limited, it can read messages
+but not send them. If an account is paused, it cannot sign in. Either way, you
+can always call Pam for help." `notice.account_limited.body` is unchanged.
+`docs/sop-amendments.md` A6 now says it covers the feature switch only, and
+that the isolation concern it records was weighed for Limited and accepted —
+a future session should not "fix" Limited to match A6 without asking.
+**This weakens a promise**, so members must be told before it ships:
+`docs/before-launch.md`.
+
+**Badges — what changed.** Will's answer to D-412 included badges. A case
+manager reads them (`member_badges_select_admin`, 0007; live: own, case
+manager, buddies — no program) and `join.privacy.admin.1` already tells the
+case manager so, but the member's line said "Your points and your level".
+`transparency.canSee.points` is now "Your points, your level and your
+badges" (en + es), `'badges'` joins `ADMIN_CAN_SEE`, and the two other
+statements of the same list were kept in step: `privacy.s.who-can-see.p1`
+("the same list we show you when you join") and `admin.seeing.body` ("they
+were told exactly this"). That is more than Will's words strictly covered —
+the line he approved plus the two places that quote it — and is easy to
+revert. It states what already happened, so nothing was widened in practice.
+
+**Left open.**
+
+- **terms.s.limits.p3** ("Pam tells you it is off and who to call") is not
+  kept for a limited account: nothing shows `account_limited`, and a refused
+  send says "Your connection dropped". Added to `before-launch.md`, marked as
+  Claude's addition for Will to keep or strike. Not built.
+- **Who may limit.** Any case manager in the member's city can set Limited or
+  Paused, not only the one who invited them. Unchanged.
+- **Other languages.** pt-BR, zh-CN, zh-HK, ru and ar are on no branch of this
+  repository (checked on all of them). `terms.s.limits.p2`, `points.intro`,
+  `transparency.canSee.points`, `privacy.s.who-can-see.p1` and
+  `admin.seeing.body` must change in each when they land.
+- **No database change, no migration.** The DB suite was not run: nothing in
+  `packages/db` changed.
+
+### D-414 — Members are told in the privacy policy; who may limit an account; p3 stays
+
+**Date:** 2026-10-09. **Decided by:** Will, answering the three things D-413
+left open: "Keep terms.s.limits.p3. We can tell members this in privacy policy.
+any Case manager with that person in their list (We'll need to enrich how case
+managers do this later on".
+
+- **Telling members.** D-413 weakened a promise and members must be told first.
+  Will's answer: the privacy policy. It now has a section, "When we limit an
+  account" (`privacy.s.limits.p1`–`p2`, en + es, in `legal.ts`): a person who
+  has you on their list can limit or pause an account that is hurting other
+  people and must write down why; a limited account can read messages but not
+  send them; a paused one cannot sign in; you can always call Pam. Both
+  documents' "last updated" moved to 9 October. The wording of that section is
+  Claude's draft of Will's decision, for Will to edit. Member copy says "a person
+  who has you on their list", not "case manager", for the reason
+  `transparency.ts` gives (the role is not named to a member). It is not yet
+  live: the branch is not merged. The before-launch item is now "ship it".
+- **Who may limit.** "Any case manager with that person in their list." That
+  is what the code already does: `admin_set_access_status` requires
+  `admin_covers()` — the caseload, or the same region — and the case manager's
+  Home list is built from the same function, so "in their list" and "covered"
+  are the same set. Nothing changed. If Will meant only people assigned to a
+  case manager (no region arm), that is a change to `admin_covers()` that also
+  narrows who can read points and badges; ask before doing it. Will added that
+  how case managers do this needs enriching later: there is no screen for it
+  at all (only the RPC), so that is the backlog item (STATUS).
+- **`terms.s.limits.p3` is kept.** Its before-launch item is now Will's, not
+  Claude's addition, and a precondition to anyone being limited.
+- **Points, again.** The set who may limit is the set who read points and
+  badges (D-412 item 2). Member copy still says "the person who invited you"
+  there. Left as it is; the privacy section above is the first line that says
+  "a person who has you on their list".
+
+**Update, same day.** Will meant only people *assigned* to the case manager,
+which is a change to `admin_covers()`: D-415. The privacy section's wording
+quoted above ("a person who has you on their list") was replaced in D-415.
+
+### D-415 — A case manager reaches only the people assigned to them; member copy says "or a staff member responsible for guiding you"
+
+**Date:** 2026-10-09. **Decided by:** Will, replying to D-414's reading of
+"any case manager with that person in their list": "I meant only people
+assigned to that case manager, and it would also narrow who can read points
+and badges." And, to the copy: "update the member copy, to also include
+language 'or a staff responsible to guiding you' to describe their case
+manager."
+
+**The change.** `admin_covers()` reached a member two ways: an active row in
+`admin_assignments`, or any member whose `region_id` was the caller's own.
+Migration `0082_admin_reaches_assigned_only.sql` removes the second arm. It
+is one `create or replace function` and a comment (same signature, security
+definer and `search_path`; the grants are untouched). Everything that asks
+`admin_covers()` follows: a case manager's read of a member's profile, goals, enrollments, appointments, connections, **points**
+and **badges**, their write to a member's access status, assignment and
+feature switches, and `admin_set_access_status` /
+`admin_set_feature_access`. `can_message()` and `report_visible_to_me()` read
+`admin_assignments` directly already and do not move. This is SOP amendment
+A22; the contract key `members_outside_caseload_or_region` is now
+`members_outside_caseload`.
+
+**Consequences, stated plainly.**
+
+- A member who signed up alone, or was invited by a program lead or a super
+  admin, has no case manager. No case manager reads them, at all, until
+  someone is assigned. There is no screen for assigning one (redeeming an
+  invite that names a case manager assigns them; nothing else does): STATUS backlog,
+  matching Will's "we'll need to enrich how case managers do this later on".
+- The unique index on active assignments means a member has one case manager.
+- A case manager's Home list, `/admin/` and `/person/` need no code change:
+  they read through RLS and simply return fewer rows. The `no_caseload_members`
+  notice ("When someone uses your invite code, they will show up here") was
+  already the right words.
+- It narrows, never widens. Nothing the transparency screen promises moves;
+  it is now truer ("Anyone who is not on their list").
+
+**Tested.** `packages/db/test/17_assigned_only_test.sql` (new): a second case
+manager in the same city, with nobody assigned, cannot read Marcus's profile,
+points, balance, badges or enrollments, nor limit him or switch a feature off;
+the assigned case manager still can; reassigning moves access both ways;
+Dana cannot limit the unassigned Tanya. `02_rls_test.sql`'s "admin sees an
+unassigned member in their own region" now expects 0. **440 checks, 0 failures**
+(was 420); the new file fails without 0082 (run, 9 October). No other test
+depended on the city arm.
+
+**(Applied 9 October: D-420.) Not applied to the live project when this was
+written.** The file was written and tested, not deployed: it changes who can read members on a database the live app uses, and
+Will has applied migrations himself each time. `docs/before-launch.md` has the
+item, with the `list_migrations` check first. It is numbered 0082 because
+both unmerged branches use 0079–0081. Checked on the live project on 9
+October: one super admin, two members, **no case managers and no active
+assignments**, and `admin_covers()` still has the city arm — so applying 0082
+changes what no current account can see.
+
+**Member copy.** Wherever member-facing copy describes the case manager,
+"the person who invited you" is now "the person who invited you, or a staff
+member responsible for guiding you" — Will's words, with the grammar smoothed
+("a staff responsible to guiding you" → "a staff member responsible for
+guiding you"). Because assignment is what matters now, the inviter and the
+assigned case manager can be different people. Changed, en + es:
+`transparency.title` (and `transparency.ts`, which a test holds identical),
+`points.intro`, `privacy.s.who-can-see.p1`, `privacy.s.limits.p1` (replacing
+D-414's "a person who has you on their list"), `access.limitedNotice`,
+`help.what.person`, `messages.report.intro`, `messages.report.done.body`,
+`messages.report.thread.intro`, `notice.account_suspended.body` and
+`notice.feature_turned_off.body` (the last two also in `notices.ts`).
+**Not changed**, because they are about the inviter literally: the invite
+code, expiry and "ask who invited you for a new code" strings. The longest
+changes are a screen title (`transparency.title`) and a Help row
+(`help.what.person`); worth a look at phone width, and in the other languages.
+
+**Other languages.** Not in this repository. A session is open on
+`claude/gallant-clarke-0dhizj` ("Restore missing Spanish accents", currently on
+a text-fit audit that mentions a long Russian title), which is where the
+translations appear to be; nothing from it has been pushed. The strings above
+(plus `terms.s.limits.p2`, `transparency.canSee.points`, `admin.seeing.body`
+and `privacy.s.limits.*`) must change in each bundle when they land.
+
+### D-416 — Easier to read: "your guide", a short version, short groups, a copy icon — in two looks, for Will to choose
+
+**Date:** 2026-10-09. **Decided by:** Will, after looking at the screens (D-415)
+and asking for ways to make them easier for someone new: "Short word is good,
+skip listen button. Go ahead and implement your idea, do one with icons and
+other without, for me to see here and decide."
+
+**Why.** The sign-up step, Profile › What others can see, and the privacy page
+asked a new member to take in a lot as undifferentiated text: nine lines in one
+list, "They" never defined, the case manager's full description repeated eleven
+times, a ~3,500px page under a nine-row contents list that pushed the first
+answer below the fold.
+
+**What was built.**
+
+- **"Your guide"** — the short word for "the person who invited you, or a staff
+  member responsible for guiding you", defined once in a card at the top
+  (`guide.title`, `guide.body`) of the sign-up step, Profile › What others can
+  see, and the privacy page. Because "They can see:" had no antecedent, the
+  contract's two headings are now "Your guide can see:" / "Your guide cannot
+  see:" (`transparency.ts`, en + es) and the unused contract title is "What
+  your guide can see". On the privacy page `who-can-see.p1` and `limits.p1`
+  now say "Your guide".
+- **The short version** — four lines in a card before the detail
+  (`transparency.summary.*`; the call line is the privacy page's own
+  `privacy.s.contact.p1`). Each is a true subset of the contract. **Claude's
+  draft wording, for Will to read** — it is a new member-facing promise.
+- **Short groups** — the nine "can see" lines are three groups of three (your
+  plans, your progress, your people and messages). `TRANSPARENCY_GROUPS` is in
+  the contract file and a test holds every contract line in exactly one group,
+  so a line added to the contract cannot go missing from the screen. The words
+  of every line are unchanged; a line that says two things is split at the full
+  stop into a lead and a grey line, every word kept, in order.
+- **A copy icon**, top right of each card (`@pam/ui/CopyButton`): a 22px glyph
+  in a 48px button (it acts, so it keeps the floor; measured 48 × 48 in the
+  browser). Tapped, the icon becomes a green tick and a pale-green pill under
+  it says "Copied" for 3 seconds; if the clipboard refuses it says "Could not
+  copy. Press and hold the text to copy it." for 6. The status sits in a
+  `role="status"` live region that is in the page before anything is said, so
+  it is announced; the icon changes shape (not only colour); the pill does not
+  fade under reduced motion. What it copies is the card's text plus a source
+  line ("Pam — What others can see", or the policy's title and "Last updated"),
+  so a pasted line can be traced. `copyLink`/`COPIED_MS` moved to `clipboard.ts`
+  (BringFriend re-exports them), so the button does not bundle the drawer.
+- **Policy and terms pages** (`LegalPage`): sections are cards with a copy icon;
+  the nine-row contents list is a row of 48px jump chips (the first answer is
+  now on the first screen); the privacy page opens with the guide card.
+- **Reading cards** (`@pam/ui/Reading`): `ReadCard`, `GuideCard`, `SummaryCard`,
+  `FactGroup`, `FactRow`, each taking `decor`.
+
+**Two looks.** `decor="icons"`: a round icon on each card and a tick or cross
+on each row. `decor="plain"`: words only, a coloured edge in place of an icon,
+hairlines between rows. Both say everything in words; every icon is
+`aria-hidden`. Both were built so Will could choose; **he chose icons, and
+reshaped the screens, in D-417**, which removes the plain look, the `decor`
+prop and `READING_STYLE`, and supersedes the per-card copy icons and the policy
+cards described here.
+
+**Skipped on purpose.** The Listen (read aloud) button (Will).
+
+**Not changed, on purpose.** The long phrase still stands in Help › What we can
+help with, the report screens, and the paused / turned-off notices
+(D-415): those screens have no guide card to define the short word. Once Will
+picks a look and "your guide" is settled, they can switch to it.
+
+**Tested.** `@pam/ui` 81 tests (7 new: the copy icon says "Copied", says what to
+do when refused and stays longer, keeps a live region in the page; the cards
+have no structural axe violations in either look and draw icons only in
+`icons`). `@pam/config` 242 (4 new: the grouping covers the contract, groups
+are at most four, every key exists in both languages, "your guide" is defined).
+Storybook builds; the six comparison stories and the copy states were
+photographed at 390px (a "Copied" state with the pill, both looks).
+
+**Not run.** The Playwright a11y suite (contrast and target size across the real
+routes) and the first-load budget check: neither was run. The new components
+load only on the join, legal and privacy routes, and four icons were added to
+the barrel.
+
+**Not done.** The terms page has no guide card (it does not use the word). The
+other languages are not in this repository: every string added here
+(`guide.*`, `transparency.summary.*`, `transparency.group.*`, `copy.*`) and the
+two headings must be translated in each bundle when they land. Spanish is
+Claude's draft. A reviewed wording of the short version is still open.
+
+### D-417 — Will's direction after seeing both looks: icons; a short Profile screen; a flat policy with one copy icon
+
+**Date:** 2026-10-09. **Decided by:** Will, from the screenshots of both looks
+(D-416).
+
+> What others can see, keep the icon version up to short version, then just
+> link to read full privacy policy. At the bottom, remove the header "Your
+> data" just go straight into the clickable actions.
+> For Privacy page (using a similar design to terms policy also): make the
+> Your guide definition smaller, place the icon next to the Your guide header
+> (same for What others can see). The tabs follow Explore's tabs: white,
+> smaller, the selected one a dark outline. The rest of the policy: keep the
+> icons in headers, but remove things from cards; and instead of a copy button
+> on each section, one copy icon at the top right of the page that copies
+> all. A simple confirmation, a tooltip under the button: no special
+> micro-interaction animation — when clicked the icon is replaced by a
+> checkmark, then resets after 5 seconds.
+
+**What was built.**
+
+- **The icon look is the look.** The plain look, the `decor` prop,
+  `READING_STYLE` (`lib/readingStyle.ts`), the `?decor=` plumbing and the
+  Member › Reading options stories are deleted.
+- **Profile › What others can see** (`PrivacyControlsView`): the guide card, the
+  short version, then "Read the full privacy policy" (a link to `/privacy/`),
+  then Request a copy of my data and Delete my account **with no "Your data"
+  heading** (`privacy.controls.data` removed from both bundles). The detailed
+  cards are not on this screen any more.
+- **The sign-up step keeps the full list.** Claude's call, not Will's words:
+  SOP §4.1 requires that required step to list every line of the contract
+  (`TRANSPARENCY_SCREEN`), so it cannot be cut to a summary. It shows the
+  small guide card, the short version, then the detail as two cards in the icon
+  look, three short groups for "can see". `TransparencyReading` takes
+  `detail` (true on sign-up, false on Profile). No copy icons there.
+- **Your guide, smaller.** `GuideCard`: padding 12px, the icon beside the title
+  on one row, the sentence at 16px full width underneath.
+- **Privacy and terms, one design** (`LegalPage`): the jump row is Explore's
+  chips (white 40px pills, 15px, soft lift, 1px border; the one you are on a 2px
+  dark outline and weight 600; an invisible 4px margin keeps the 48px tap area),
+  with no visible "On this page" label (the nav keeps its accessible name). The
+  sections are flat — no cards — an icon beside each heading
+  (`SectionHeading`, a bare 26px icon in the accent) and the paragraphs. **I read
+  "remove things from cards" as "no cards"**; if Will meant something else
+  (only the copy buttons), the cards are a one-line return.
+- **One copy icon per page**, top right of the page header (`SubPageHeader`'s
+  `actions`), copying the whole document: title, updated line, the guide's
+  definition (privacy), every section, and "Pam — Privacy". Per-card copy
+  buttons are gone (`copy.section` became `copy.page`, "Copy this page").
+- **The copy icon's feedback is a tooltip, not a pill.** Under the button, its
+  right edge on the button's, a small point up at the icon, dark on the light
+  page. Tapped: the icon is **replaced** by a tick (a plain swap; nothing fades
+  or moves, so nothing is left for reduced motion to remove) and the tooltip says
+  "Copied"; **after 5 seconds** (`COPY_STATUS_MS`) it is a copy icon again. A
+  refused clipboard shows an "i" and "Could not copy. Press and hold the text to
+  copy it." for the same 5 seconds. Still a `role="status"` live region present
+  before anything is said.
+- **A split line stays one piece of text.** A contract line that says two
+  things ("… A program you joined sees this too.") is one text element with the
+  second sentence on its own grey line, not two elements, so it is read as one
+  sentence, found by search, and the join test's assertion on the whole line
+  holds.
+
+**Then, the same day, three small things from Will.** (1) The copy icon is a
+48px white circle with a 1px grey edge, the same as Help and the bell (`HelpButton`'s
+look). (2) The two actions on Profile › What others can see each lead with an icon
+in the same small round tile as the statements above: a copy icon for Request a
+copy of my data, a bin for Delete my account (`IconTile`, exported from
+`@pam/ui/Reading`), **grey for the copy and red for the deletion** (Will: "make
+those icons grey and red": muted grey tile with a secondary-text icon;
+`--color-background-red` tile with `--color-icon-red`). (3) The guide card has 20px padding all round (was 12px), on
+all three screens it appears on, since it is one component. (4) The introduction
+under the page title on Privacy and Terms is 16px (was 18px): Will, "make privacy
+policy text under header smaller" — read as that line, not the section text, which
+stays 18px. The guide card's sentence and the grey detail lines are 16px too, so
+text below the SOP's 18px mobile body size was a deliberate, listed set
+(superseded the same day: D-418 makes 16px the body size, so the intro, the guide
+sentence and the detail lines are now at it; only the 15px chips and group
+labels are under).
+(5) The short version's lines are the size and weight of "Read the full privacy
+policy" under them (`--pam-link-size`, 17px, weight 500, line height 1.43 — measured in the browser against the link) — Will: "make the short version
+section text smaller … text matching 'Read the full privacy policy'" — and its card
+has no shadow (`box-shadow: none`). A white card with no shadow on a white page has
+no visible edge, so it now reads as a plain section; a hairline outline or dropping
+its side padding to line up with the page text are the next steps if wanted.
+
+**Tested.** `@pam/ui` 79 (copy: tick swap, "Copied", reset at 5 seconds,
+refusal, live region; the pieces have no structural axe violations),
+`@pam/config` 242, typecheck clean, Storybook builds.
+
+**Real browser.** The Playwright legal, join and a11y specs ran against a fresh
+build at 320px (light and dark) and iPhone SE: contrast and 48px tap targets
+included, all passing. The first run found one failure, which was not this work:
+`e2e/legal.spec.ts` expected exactly eight contents entries, and the privacy page
+has had nine since D-414 added "When we limit an account". It now counts each
+document's own sections from `@pam/config`.
+
+**Left.** Wording of the short version is still Claude's draft for Will to read.
+The long phrase is still in Help, the report screens and two notices. Strings to
+translate in the other languages: `guide.*`, `transparency.summary.*`,
+`transparency.group.*`, `copy.page`, `copy.done`, `copy.failed`, the two
+contract headings and `transparency.title`; `privacy.controls.data` is gone.
+
+### D-418 — Body text is 16px (SOP A23); the policy link is a card; "Delete my account" is red
+
+**Date:** 2026-10-09. **Decided by:** Will, three instructions:
+"Let's update the rule and the text token to 16px body size." / "Let's wrap the
+Read full privacy policy into a similar card item as the items below for
+consistency and add icon of policy doc." / "Make Delete my account text red."
+
+**The 16px rule (SOP A23, `docs/sop-amendments.md`).** The accessibility floor
+"18px body text on mobile" is now **16px, on mobile and on desktop**. It lived
+in five places that had to agree and were changed together: the written rule
+(`CLAUDE.md`, and the comment in `tokens.stylex.ts`); the budget
+`A11Y.bodyTextMobilePx` (18 → 16) in `@pam/config`, which the e2e check "body text
+is at least 16px on mobile" reads; the `--pam-body-text-mobile` token
+(`tokens.stylex.ts` and `tokens.css`); `--pam-body-size` in `globals.css`, which
+sets the page's `body` (its ≥768px override is deleted, both being 16px); and the
+Foundations pages (Principles, Typography). **It is a floor, not a target**: no
+component was rewritten, so the many that set 17–18px for themselves still do.
+Making them 16px as well is a separate, visible change for Will to ask for.
+Unchanged: nothing a member must read is under 15px; 48px targets, 56px
+buttons, AAA body contrast, 200% scaling.
+
+**Profile › What others can see, the foot.** "Read the full privacy policy" is
+a card like the two below it, with a policy-document icon (`LegalIcon`) in a grey
+tile: three rows in one group — the full policy, Request a copy of my data
+(grey), Delete my account (red). **The deletion's label is red too**
+(`--color-text-red`), not only its icon.
+
+**And the guide card is flat too** (Will: "remove shadow from the green your
+guide card, do this for privacy policy also"). `GuideCard` is one component, so
+it has no shadow on the sign-up step, Profile › What others can see and the
+privacy page alike; the pale-green fill is its edge now.
+
+**Real browser, after D-417 and D-418.** The whole Playwright suite ran against a
+fresh build with the 16px body: **588 passed, 0 failed** (6 minutes; 320px light
+and dark, and iPhone SE), including axe's contrast and 48px target-size rules on
+the legal, join and Profile screens and the changed "body text is at least 16px"
+check. (The build predates the guide card losing its shadow, a one-line style.)
+
+### D-419 — Privacy and terms: smaller text, more room
+
+**Date:** 2026-10-09. **Decided by:** Will: "privacy policy text should be smaller
+and more space between paragraphs, and more gap between green card and tabs, more
+gap between sections." One component serves both pages, so Terms has it too.
+
+Section text is 16px (was 18px; the body size since SOP A23, line height 1.6);
+paragraphs are 16px apart (was 8px); each section starts 24px lower than the page's
+own gap (so about 40px between one section's last line and the next heading); the
+tab row starts 16px lower, under the guide card. `apps/web/src/components/
+LegalPage.tsx` only; no copy changed.
+
+### D-420 — 0082 applied to the live project, and the branch merged to `main`
+
+**Date:** 2026-10-09. **Decided by:** Will: "Migrate and proceed to merge."
+
+**The migration.** Before applying, `list_migrations` against the live project
+(`shobqzuhicoiymtumiaz`) and `packages/db/migrations/`: live ended at 0078, exactly
+the repo's through 0078, with no live-only migration and no local, committed,
+undeployed one other than 0082 itself (0079–0081 belong to the two unmerged
+branches and are not on this one). `0082_admin_reaches_assigned_only.sql` was
+applied with `apply_migration` (recorded as version `20261009064534`, name
+`0082_admin_reaches_assigned_only`): one `create or replace function` and a
+comment, so no `DROP` approval gate. **Checked after:** `admin_covers` no longer
+mentions the region, reads `admin_assignments`, is still `security definer` with
+`search_path = public, extensions`, and keeps its `anon` and `authenticated`
+execute grants (the `anon` one is 0012's, deliberate: it returns false for anyone
+who is not a case manager); `get_advisors` (security) lists only the by-design
+SECURITY DEFINER class and the leaked-password-protection warning, nothing new. The
+live project had one super admin, two members, no case managers and no active
+assignments, so no account saw anything change.
+
+**The merge.** `claude/affectionate-goldberg-tvu4sz` into `main`, fast-forward (`main`
+was the branch's base; 15 commits at the time of the check, since several more). It
+carries D-412 to D-420: the Points sentence, the messages promise and the terms and
+privacy wording, who may limit someone and read points, "your guide" and the reading
+screens, the 16px body rule (A23), and 0082. **`main` deploys to Vercel**, so the
+app now shows all of it. **Not merged, and now behind `main`:**
+`claude/pam-storybook` (D-411, migrations 0079–0081) and
+`claude/gallant-clarke-0dhizj` (D-403, 0079–0080) both edit `es.json`,
+`transparency.ts`, `STATUS.md`, `DECISIONS.md` and `CHANGELOG.md`; whoever merges them
+next resolves those conflicts (and renumbers: their D-numbers and 0079–0081 do not
+collide with D-412–D-420 or 0082, but the changelog versions will need ordering).
+
+### D-421 — Spanish, spelled properly: accents, ñ and ¿ restored across `es.json`
 
 **Date:** 2026-10-09. Will: "Do a careful proofreading pass over `es.json`
 only … restore accents and ñ where standard Spanish requires them." The pass
@@ -10431,14 +10928,15 @@ D-399 left for later.
   `transparency.canSee.goals` lacks its "en" ("quiere trabajar en");
   `privacy.s.sharing.p2` wants the subjunctive ("se inscriba"). Listed in
   STATUS's backlog for a wording pass that someone fluent signs off.
-- **Numbered D-412 (first D-403, written as D-400).** Another session's
+- **Numbered D-421 (first D-403, written as D-400).** Another session's
   D-400–D-402 reached `claude/pam-storybook` while this pass was being
   checked, so it took D-403; that session then used D-403–D-411 as well, and
-  this was renumbered when the two branches were merged (D-412, 0.50.1). Their seven new Spanish strings
+  this was renumbered twice as the branches met (D-421, 0.50.1: the session on
+  `claude/affectionate-goldberg-tvu4sz` took D-412–D-420). Their seven new Spanish strings
   (D-402's Photos and documents page) were already accented; none of the 172
   strings here was one they had changed.
 
-### D-413 — Seven languages, and text that fits in every one of them
+### D-422 — Seven languages, and text that fits in every one of them
 
 **Date:** 2026-10-09. Will: "Let's also add a Brazilian portuguese language",
 then "…Chinese (including Mandarin and Cantonese), Russian, Arabic"; "Keep in
@@ -10455,7 +10953,7 @@ and resolve them using best UI/UX practices."
   `packages/config/src/i18n.ts`: `en`, `es`, `pt-BR`, `zh-CN`, `zh-HK`, `ru`,
   `ar` — BCP 47 tags, spelled exactly that way, because the app hands them
   straight to `Intl`, to `<html lang>` and to the speech recogniser. The
-  database check (0082, `profiles_language_supported`) is case-sensitive on
+  database check (0083, `profiles_language_supported`) is case-sensitive on
   purpose: `pt-br`, `pt`, `zh`, `ar-EG` are refused rather than stored as a
   second spelling. **Chinese is two bundles, not one**, because Mandarin and
   Cantonese readers read different scripts here: `zh-CN` (Simplified) and
@@ -10560,11 +11058,15 @@ and resolve them using best UI/UX practices."
   fallbacks), and anything behind a sign-in the stories do not reproduce.
   `e2e/languages.spec.ts` keeps the real pages honest: sign-in, About,
   Privacy and Terms in every language, no word off the screen.
-- **Numbered D-413** (written as D-404 and D-405 while the other session's
-  D-404–D-411 were still unmerged); the migrations are 0082 and 0083 for the
-  same reason.
+- **Numbered D-422** (written first as D-404, then D-413, as the other
+  sessions took D-404–D-420); the migrations are 0083 and 0084 after the
+  other session's 0082 (`admin_reaches_assigned_only`, live), the amendment is
+  A24 after its A22 and A23, and the changelog entries 0.50.1 and 0.51.0. The
+  merge also brought in 32 English strings from that session (the "your guide"
+  wording, the account-limits sections, the short version of the transparency
+  screen); all six other languages were written for them in the same merge.
 
-### D-414 — Messages, read in the reader's own language (built, switched off)
+### D-423 — Messages, read in the reader's own language (built, switched off)
 
 **Date:** 2026-10-09. Will: "For messaging, programs and case managers may use
 english or spanish, but let's use Uber's approach where the user sees the
@@ -10584,7 +11086,7 @@ there's a link under it to show the original."
   direction and marked with its language. Your own messages are never
   translated for you; photos and documents are untouched; a caption is
   translated like any words.
-- **The pieces.** Migration `0083`: `message_translations` (message, language
+- **The pieces.** Migration `0084`: `message_translations` (message, language
   read in, language written in, words, provider), written *only* by the
   function with the service role, read only by the people in the conversation,
   **no admin policy** (as on `messages`), gone with the message. Function

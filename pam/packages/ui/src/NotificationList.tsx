@@ -86,7 +86,7 @@ const styles = stylex.create({
     backgroundColor: colorVars['--color-background-muted'],
   },
   icon: { width: '22px', height: '22px' },
-  // The sentence, in full (D-413). It was clamped to two lines, which was
+  // The sentence, in full (D-422). It was clamped to two lines, which was
   // enough in English; "Se reportó Example Learning Center: Está cerrado" is
   // three in Spanish and four in Russian, and the end of the sentence is the
   // part that says what to do. It is a phrase built from a key, never
@@ -116,7 +116,7 @@ function Rows({ items, newLabel }: { readonly items: readonly NotificationItem[]
         <ListItem
           key={item.id}
           // Not a bare string: Astryx trims a string label to one line with an
-          // ellipsis, a node it lets wrap (D-413) — "Проблема с мес…" was the
+          // ellipsis, a node it lets wrap (D-422) — "Проблема с мес…" was the
           // name of the event.
           label={<>{item.title ?? item.text}</>}
           description={

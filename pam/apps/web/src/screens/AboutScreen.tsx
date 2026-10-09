@@ -71,7 +71,7 @@ export function AboutScreen() {
         onChange={(next) => setWho(next as Who)}
         size="md"
         // Equal thirds, so a long label takes a second line inside its own
-        // third instead of pushing the others off the screen (D-413).
+        // third instead of pushing the others off the screen (D-422).
         layout="fill"
         xstyle={styles.pills}
       >

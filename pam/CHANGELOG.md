@@ -10,7 +10,7 @@ words are downloaded only when you choose a language, with a short screen
 that says in your language what is happening. Arabic reads from right to
 left. Every screen was checked in every language so the words fit: buttons,
 tabs and notifications take a second line instead of being cut off, and a long
-page title gets a little smaller instead of running off the screen (D-413).
+page title gets a little smaller instead of running off the screen (D-422).
 Texts and emails are still written in English and Spanish only.
 
 ## [0.50.1] — 2026-10-09 · Spanish, spelled properly
@@ -19,7 +19,45 @@ Pam in Spanish now has its accents, its ñ and its opening ¿ wherever
 Spanish needs them: "Todavía", "teléfono", "Compañeros", "¿Cuál es su número
 de teléfono?". 172 lines were fixed, from the sign-in screen and the notices
 to the privacy page and the terms. Only the spelling changed, so nothing
-says anything new (D-412).
+says anything new (D-421).
+
+## [Unreleased] — 2026-10-09 · Two promises, made true
+
+The Points screen no longer says "nobody else sees them". It now says what is
+true: the person who invited you can see your points, and programs and other
+members cannot (D-412).
+
+The terms no longer say "Messages are never turned off". They now say what
+happens: an account that is limited can read messages but not send them, and
+one that is paused cannot sign in, and you can always call Pam for help. The
+screen that lists what the person who invited you can see now says badges as
+well as points and level (D-413).
+
+The privacy policy has a new section, "When we limit an account": who can
+limit or pause an account, what a limited account can and cannot do, and that
+you can always call Pam. The privacy policy and the terms both say they were
+last updated on 9 October 2026 (D-414).
+
+A case manager will see only the people assigned to them, not everyone in
+their city, so what they can see of your points, badges and the rest is
+limited to a case manager you have been given. This is live: the database
+change (migration 0082) was applied on 9 October (D-420). Wherever Pam describes
+that person it now says "the person who invited you, or a staff member
+responsible for guiding you" (D-415).
+
+The screens that explain what the person guiding you can see are easier to
+read. They name "your guide" once, at the top, then say it in short: a short
+version first, the long list in three small groups, and a small copy icon on
+each section that says "Copied" when it works. The privacy policy and terms
+are sections you can copy, with a row of jump buttons in place of a long
+contents list (D-416). Then, from Will's choices (D-417): Profile › What others
+can see is just the guide and the short version, a link to the full privacy
+policy, and the two things you can do about your data. The privacy policy and
+terms are flat pages with a small icon beside each heading, tabs like Explore's,
+and one copy icon at the top right that copies the whole page and says "Copied"
+for 5 seconds. Body text is 16px (it was 18px on phones) and What others can see
+ends in three matching rows — read the full policy, request a copy of your data,
+and delete your account in red (D-418).
 
 ## [0.50.0] — 2026-10-09 · Buttons where you expect them
 

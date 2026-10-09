@@ -68,7 +68,7 @@ const styles = stylex.create({
     // 56px with 17px text, full width (D-239, Will, 3 October: primary and
     // secondary matched — §2.5's 64px amended). Secondary uses this too.
     // `minHeight`, not `height`: a label that needs a second line grows the
-    // button rather than being cut (D-413). One line is still exactly 56px.
+    // button rather than being cut (D-422). One line is still exactly 56px.
     minHeight: '56px',
     fontSize: '17px',
     fontWeight: 600,

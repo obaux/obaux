@@ -60,7 +60,9 @@
     "./ChoiceChips": "./src/ChoiceChips.tsx",
     "./MarqueeText": "./src/MarqueeText.tsx",
     "./Dropdown": "./src/Dropdown.tsx",
-    "./InfoTip": "./src/InfoTip.tsx"
+    "./InfoTip": "./src/InfoTip.tsx",
+    "./CopyButton": "./src/CopyButton.tsx",
+    "./Reading": "./src/Reading.tsx"
   },
   "scripts": {
     "typecheck": "tsc -p tsconfig.json",

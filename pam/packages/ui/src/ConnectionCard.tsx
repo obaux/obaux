@@ -82,7 +82,7 @@ const styles = stylex.create({
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
-    // Its own direction (D-413): a program's name is written in whatever language its
+    // Its own direction (D-422): a program's name is written in whatever language its
     // people use, and an English name in an Arabic screen must lose its end to the
     // ellipsis, not its beginning.
     unicodeBidi: 'plaintext',
@@ -99,7 +99,7 @@ const styles = stylex.create({
     lineHeight: 1.45,
     textAlign: 'center',
     display: '-webkit-box',
-    // Six lines, not three (D-413). Three held English; "Ayuda con currículums,
+    // Six lines, not three (D-422). Three held English; "Ayuda con currículums,
     // entrevistas y ofertas de trabajo que se publican cada semana. Sin cita."
     // is four in Spanish and its last words — walk-ins welcome — are the ones
     // somebody acts on. A longer description than six lines is cut, not the

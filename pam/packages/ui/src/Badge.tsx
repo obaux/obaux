@@ -7,7 +7,7 @@ import { spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
 export type { BadgeVariant } from '@astryxdesign/core/Badge';
 
 /**
- * Astryx's `Badge`, whose label may take a second line (D-413).
+ * Astryx's `Badge`, whose label may take a second line (D-422).
  *
  * A badge is one line, 20px tall, and trims what does not fit with an
  * ellipsis — and in English it fits: "Open", "2". "En una escuela · solo

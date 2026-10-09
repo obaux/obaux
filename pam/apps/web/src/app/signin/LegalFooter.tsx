@@ -18,7 +18,7 @@ import { useI18n } from '@/lib/i18n';
  * is a rule nobody reads. `from` tells the page where Back returns (D-250).
  * The spacer keeps the end of the screen's own content clear of the bar.
  *
- * **The row wraps** (D-413). Three links fit side by side in English; "Конфиденциальность"
+ * **The row wraps** (D-422). Three links fit side by side in English; "Конфиденциальность"
  * and "Условия использования" do not at 390px, and the bar was cropped at both
  * edges with nothing to say so — the page itself did not scroll, so no overflow
  * check noticed. So it wraps, and the spacer follows the bar's real height

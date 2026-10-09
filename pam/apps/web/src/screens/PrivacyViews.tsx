@@ -1,16 +1,18 @@
 'use client';
 
+import type { ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
-import { Card } from '@astryxdesign/core/Card';
 import { ClickableCard } from '@astryxdesign/core/ClickableCard';
 import { Heading } from '@astryxdesign/core/Heading';
 import { HStack } from '@astryxdesign/core/HStack';
+import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { Icon } from '@astryxdesign/core/Icon';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
-import { BigButton, TextLink } from '@pam/ui';
+import { BigButton, CopyIcon, LegalIcon, TrashIcon } from '@pam/ui';
+import { IconTile } from '@pam/ui/Reading';
 import { SubPage } from '@pam/ui/SubPage';
-import { TRANSPARENCY_SCREEN } from '@pam/config';
+import { TransparencyReading } from '@/screens/TransparencyReading';
 import { useI18n } from '@/lib/i18n';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 
@@ -33,14 +35,31 @@ const styles = stylex.create({
   line: { fontSize: '17px', lineHeight: 1.5 },
   action: { width: '100%' },
   actionLabel: { fontSize: '18px', fontWeight: 600, flexGrow: 1 },
+  // The deletion's words are red too (Will, D-417), not only its icon.
+  actionLabelRed: { color: colorVars['--color-text-red'] },
   body: { fontSize: '18px', lineHeight: 1.55 },
 });
 
-function ActionCard({ label, href }: { readonly label: string; readonly href: string }) {
+function ActionCard({
+  label,
+  href,
+  icon,
+  tone,
+}: {
+  readonly label: string;
+  readonly href: string;
+  readonly icon: ReactNode;
+  readonly tone: 'grey' | 'red';
+}) {
   return (
     <ClickableCard label={label} href={href} padding={5} xstyle={styles.action}>
-      <HStack gap={2} align="center" wrap="nowrap">
-        <Text xstyle={styles.actionLabel}>{label}</Text>
+      <HStack gap={3} align="center" wrap="nowrap">
+        {/* The same small round tile as the statements above, grey for a copy and red for
+            a deletion (Will, D-417). */}
+        <IconTile small tone={tone}>
+          {icon}
+        </IconTile>
+        <Text xstyle={[styles.actionLabel, tone === 'red' ? styles.actionLabelRed : null]}>{label}</Text>
         <Icon icon="chevronRight" size="md" />
       </HStack>
     </ClickableCard>
@@ -55,36 +74,15 @@ export function PrivacyControlsView() {
         {t('privacy.controls.intro')}
       </Text>
 
-      <Card padding={4}>
-        <VStack gap={3}>
-          <Heading level={2} xstyle={styles.heading}>
-            {t(TRANSPARENCY_SCREEN.canSeeHeadingKey)}
-          </Heading>
-          {TRANSPARENCY_SCREEN.canSee.map((line) => (
-            <Text key={line.key} xstyle={styles.line}>
-              • {t(line.key)}
-            </Text>
-          ))}
-          <Heading level={2} xstyle={styles.heading}>
-            {t(TRANSPARENCY_SCREEN.cannotSeeHeadingKey)}
-          </Heading>
-          {TRANSPARENCY_SCREEN.cannotSee.map((line) => (
-            <Text key={line.key} xstyle={styles.line}>
-              • {t(line.key)}
-            </Text>
-          ))}
-        </VStack>
-      </Card>
+      {/* The guide and the short version, then the full policy (Will, D-417). */}
+      <TransparencyReading detail={false} />
 
+      {/* Three rows, one look (Will, D-417): the full policy, then what you can do about your data. */}
       <VStack gap={3}>
-        <Heading level={2} xstyle={styles.heading}>
-          {t('privacy.controls.data')}
-        </Heading>
-        <ActionCard label={t('privacy.controls.copy')} href="/legal/privacy/copy/" />
-        <ActionCard label={t('privacy.controls.delete')} href="/legal/privacy/delete/" />
+        <ActionCard label={t('privacy.controls.policy')} href="/privacy/" icon={<LegalIcon />} tone="grey" />
+        <ActionCard label={t('privacy.controls.copy')} href="/legal/privacy/copy/" icon={<CopyIcon />} tone="grey" />
+        <ActionCard label={t('privacy.controls.delete')} href="/legal/privacy/delete/" icon={<TrashIcon />} tone="red" />
       </VStack>
-
-      <TextLink label={t('privacy.controls.policy')} href="/privacy/" />
     </SubPage>
   );
 }

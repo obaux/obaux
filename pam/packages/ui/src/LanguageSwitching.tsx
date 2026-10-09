@@ -5,7 +5,7 @@ import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 
 /**
- * The screen between two languages (Will, 9 October, D-413): when the words of
+ * The screen between two languages (Will, 9 October, D-422): when the words of
  * the language somebody just chose have to be downloaded first, the screen is
  * covered by a spinner and one line saying what is happening, in the language
  * being switched to — "Cambiando a español…" — so the wait is explained to the

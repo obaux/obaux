@@ -1,8 +1,8 @@
--- 0083 — Messages, read in your own language (Will, 9 October 2026: "programs
+-- 0084 — Messages, read in your own language (Will, 9 October 2026: "programs
 -- and case managers may use english or spanish, but let's use Uber's approach
 -- where the user sees the messenger's message in their language translated,
 -- labeled translated, but there's a link under it to show the original").
--- D-414.
+-- D-423.
 --
 -- This is the cache behind that. A message is only ever written in the
 -- language its sender typed; what a reader sees, in their language, is a
@@ -27,7 +27,7 @@
 --     written; its translation does not travel with it.
 --   * Gone when the message is (`on delete cascade`), so deleting an account
 --     deletes the translations of everything it said.
---   * Languages are the ones the app offers (0082), spelled the way the app
+--   * Languages are the ones the app offers (0083), spelled the way the app
 --     spells them. `source_locale` is whatever the service reports — a BCP 47
 --     tag, or 'und' when it could not tell — and is only ever shown, never
 --     matched against the list.
@@ -74,13 +74,26 @@ alter table public.message_translations force row level security;
 revoke all on public.message_translations from anon, authenticated;
 grant select on public.message_translations to authenticated;
 
-drop policy if exists message_translations_select_conversation_member on public.message_translations;
-create policy message_translations_select_conversation_member on public.message_translations
-  for select to authenticated
-  using (
-    exists (
-      select 1 from public.messages m
-      where m.id = message_translations.message_id
-        and public.in_conversation(m.conversation_id)
-    )
-  );
+-- Created only if it is not there: a `drop policy` guard would be the one
+-- statement the live connector stops at for approval (0075, D-387), and on a
+-- table this migration has just made there is nothing to drop. Run twice, it
+-- changes nothing the second time.
+do $$
+begin
+  if not exists (
+    select 1 from pg_policies
+    where schemaname = 'public' and tablename = 'message_translations'
+      and policyname = 'message_translations_select_conversation_member'
+  ) then
+    create policy message_translations_select_conversation_member on public.message_translations
+      for select to authenticated
+      using (
+        exists (
+          select 1 from public.messages m
+          where m.id = message_translations.message_id
+            and public.in_conversation(m.conversation_id)
+        )
+      );
+  end if;
+end;
+$$;

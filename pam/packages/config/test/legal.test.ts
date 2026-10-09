@@ -135,7 +135,7 @@ describe('the privacy page and the transparency screen agree', () => {
   });
 });
 
-describe('messages read in the reader’s language (D-414)', () => {
+describe('messages read in the reader’s language (D-423)', () => {
   const TRANSLATION_KEYS = ['title', 'p1', 'p2', 'p3'].map((k) => `privacy.s.translation.${k}`);
 
   it('is off until somebody turns it on (and Will has been told)', () => {

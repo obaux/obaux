@@ -35,18 +35,13 @@
      */
 
     /*
-     * §2.5 token overrides. 18px body on mobile is the floor, not the target;
-     * desktop relaxes to 16px where reading distance is shorter.
+     * §2.5 token overrides. 16px body text, on mobile and on desktop alike
+     * (Will, 9 October, SOP A23 — it was 18px on mobile). It is the floor, not
+     * the target: a component may be larger.
      */
-    --pam-body-size: 18px;
+    --pam-body-size: 16px;
     --pam-touch-target-min: 48px;
     --pam-big-button-height: 56px;
-  }
-
-  @media (min-width: 768px) {
-    :root {
-      --pam-body-size: 16px;
-    }
   }
 
   html {
@@ -590,7 +585,7 @@
 }
 
 /*
- * Right to left (Arabic, D-413). `<html dir>` follows the language
+ * Right to left (Arabic, D-422). `<html dir>` follows the language
  * (`I18nProvider`); Astryx's own components mirror from it, and logical
  * properties do the rest. What is left lives here.
  *
@@ -624,7 +619,7 @@
 }
 
 /*
- * Longer words (D-413). English is the shortest of the seven languages Pam
+ * Longer words (D-422). English is the shortest of the seven languages Pam
  * speaks, and every layout was first drawn around it: "Privacy" is 7 letters,
  * "Конфиденциальность" is 18. A word wider than its box is cropped at the
  * edge of the screen with nothing to say so, and the page does not scroll, so

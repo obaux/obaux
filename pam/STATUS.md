@@ -430,6 +430,53 @@ From a request the super admin can open the requested program and text the
 requester. In the redesign they can also message staff (never members),
 backed by 0072, now live (D-262).
 
+**9 October (D-412, D-413): two English promises that contradicted other
+copy, found by translators — both now say what is true.** *Points:* Will
+confirmed case managers see awards, badges and points, so `points.intro` says
+the person who invited you can see them and programs and other members cannot.
+*Messages:* "Messages are never turned off" was true only of the per-feature
+switch (0031, A6); a **limited** account cannot send or start a message
+(`is_active_account()` on `messages_insert_sender` and
+`open_direct_conversation`, live) and a **suspended** one cannot sign in. Will
+chose to change the promise, not the code: `terms.s.limits.p2` now says so
+(A6 clarified). The member's transparency line also names badges. Members
+are told in the privacy policy, which has a new section for it (D-414: any
+case manager with the person in their list may limit them; Will wants how
+they do it enriched later). Two things remain: `terms.s.limits.p3` is not kept
+for a limited account (nothing shows the notice; Will: keep it), and the
+pt-BR, zh-CN, zh-HK, ru and ar bundles are on no branch here so their strings
+are unchanged. See "What needs a human" row 32.
+
+**Later that day (D-415): a case manager reaches only the people assigned to
+them.** Will meant "in their list" as the caseload, not the city, so
+`admin_covers()` loses its same-city arm (migration `0082`, SOP amendment
+A22): profile, goals, enrollments, appointments, connections, points, badges,
+and limiting or pausing someone are the caseload alone. The member copy now
+says "the person who invited you, or a staff member responsible for guiding
+you" wherever it describes the case manager (en + es). DB suite **440 checks,
+0 failures** (was 420; the new `17_assigned_only_test.sql` fails without
+0082). **`0082` is applied to the live project** (Will, 9 October, D-420; the
+branch merged to `main` the same day): the live project has one super admin,
+two members, no case managers and no assignments, so it changed nothing for
+anyone today. A member with no assigned case manager is read by none, and
+there is no screen to assign one (Backlog).
+
+**And (D-416, D-417): the long, important screens are easier to read.**
+"Your guide" is the short word for the person who invited you or a staff member
+responsible for guiding you, defined once in a small card (icon beside the
+title) on the sign-up step, Profile › What others can see and the privacy page.
+Will chose the icon look after seeing both (D-417): **Profile › What others can
+see** is now the guide, the short version, a link to the full privacy policy,
+then Request a copy / Delete my account with no "Your data" heading. **The
+sign-up step keeps the full list**, because SOP §4.1 requires that required
+step to list every line. **Privacy and terms** are one flat design — Explore's
+white chips for the sections, an icon beside each heading, no cards — with one
+copy icon top right that copies the whole page and shows a "Copied" tooltip,
+the icon swapped for a tick, for 5 seconds. The Listen button was skipped. Still
+open: his read of the short-version wording, the same strings in the other
+languages, and the long phrase in Help, the report screens and two notices,
+which can switch to "your guide".
+
 This is the handover document: what exists, what is proven, what is live, and
 what the next person needs to know before touching anything.
 
@@ -591,7 +638,8 @@ result with one test user per role. It proves:
 
 - members reach only their own rows
 - `is_public = false` hides a member from all discovery; blocks are mutual
-- an admin reaches their caseload and region, and **no other region**
+- an admin reaches their caseload and **no one else** (0082; until then,
+  also their city — `17_assigned_only_test.sql`)
 - **an admin cannot read message bodies or buddy-feed posts** — the promise
   members are shown at onboarding
 - providers reach a member only through an enrollment, appointment or connection
@@ -810,9 +858,12 @@ while the copy is unsigned, so it earned the first live test, not the last.*
 | 28 | **A Chromatic project token** | Storybook updating on every push | chromatic.com → sign in with GitHub → link `obaux/obaux` → add the token as the repository secret `CHROMATIC_PROJECT_TOKEN`. The workflow (`pam-storybook.yml`) skips itself until then. |
 | 29 | ~~Where the dock's People and My Plan lead~~ **Answered by the redesign (D-210)** | — | Will, 1 October: the bar is Explore, Saved, Trips, Messages, Profile; Help moves to each screen's header and Profile. Next: his reference screenshots for the other screens, then wiring the redesigned views to routes and data. Walk it in `Prototype/Redesign — member` (D-211). |
 | 30 | ~~Deploy `0071` and `0072`~~ **Done (Will, 4 October)** | — | `list_migrations` first: live ran to `0070`, no live-only drift; `can_message`, `messageable_people` and `open_direct_conversation` matched 0063 exactly, which 0072 was written against. Both applied; `get_advisors` (security) shows no new kind of finding (the definer functions are guarded inside, as every other one is; `invite_preview` and `request_invite_link` are anon on purpose). Spot-checked: `invite_emails` forced RLS with one policy and no anon access; `invites_log` and `staff_request_phone` not callable signed out. See D-264. |
+| 34 | **Read the short version; translate the new strings** | D-416, D-417 | The look is chosen (icons) and built. Still Claude's draft for Will's word: the four short-version lines (`transparency.summary.*`) — a new promise. Then the long phrase in Help, the report screens and the paused / turned-off notices can say "your guide". Strings to translate in the other languages: `guide.*`, `transparency.summary.*`, `transparency.group.*`, `copy.page`, `copy.done`, `copy.failed`, `transparency.canSee.heading`, `transparency.cannotSee.heading`, `transparency.title` (and `privacy.controls.data` is deleted). |
+| 33 | ~~Apply `0082`~~ **Done (9 October, D-420)**; **update the language bundles for D-415's wording — done in the merge with `claude/gallant-clarke-0dhizj` (drafts for native review)** | Launch (D-415) | `0082_admin_reaches_assigned_only.sql` is live (`list_migrations` first, no drift; function checked; `get_advisors` unchanged in kind). The bundles for pt-BR, zh-CN, zh-HK, ru and ar are not in this repository; a session on `claude/gallant-clarke-0dhizj` appears to be holding them (it is auditing text fit, including a long Russian title) — not pushed, so not readable from here. D-415 lists every changed string. |
+| 32 | **Wire the limited notice, ship the policy, update five languages** | Launch (D-413, D-414) | Will, 9 October: the terms say a limited account can read but not send and a paused one cannot sign in; the transparency line names badges; members are told in the privacy policy (new section "When we limit an account", written — ships when the branch is merged). Left: (1) `terms.s.limits.p3` ("Pam tells you it is off and who to call") is unkept — nothing renders `account_limited` and a refused send says "Your connection dropped"; Will: keep it, on `docs/before-launch.md`; (2) the privacy section's wording is a draft for Will to edit; (3) the six strings (`points.intro`, `terms.s.limits.p2`, `transparency.canSee.points`, `privacy.s.who-can-see.p1`, `admin.seeing.body`, and the new `privacy.s.limits.*`) in pt-BR, zh-CN, zh-HK, ru, ar, which are on no branch of this repository. |
 | 31 | **The before-launch list** | Launch | `docs/before-launch.md` — Will's list of what must be done before real people use PAM. First entry: the email provider for invite links. **0068/0069** are merged as 0075/0076 with 0072's arm kept (D-346); they wait for Will to apply them live. Program sign-up and Add a program are a one-question wizard with a review (D-347); Add a policy is a card (D-348); super admin → program lead message from a place (D-349). |
-| 32 | **Languages: native readers, the texts and emails, deploy 0082** | The new languages going to real people (D-413, A22) | Nobody who speaks Portuguese, Chinese, Russian or Arabic has read the six new bundles; start with the privacy page, the terms, the transparency screen, the notices and the seven "Switching to…" lines. Texts and emails exist only in English and Spanish and need a yes/no per template per language. 0082 must be live before the app that offers the languages. Open question left at its default (no restriction): should staff be able to pick any language? In `docs/before-launch.md`. |
-| 33 | **Messages in your own language: switching it on** | D-414 | Built and off. Needs the provider's no-retention terms in writing, the key as a function secret, a native read of `privacy.s.translation.*`, a way to tell members first, a per-person daily cap, then both switches. `docs/before-launch.md`. |
+| 34 | **Languages: native readers, the texts and emails, deploy 0083** | The new languages going to real people (D-422, A24) | Nobody who speaks Portuguese, Chinese, Russian or Arabic has read the six new bundles; start with the privacy page, the terms, the transparency screen, the notices and the seven "Switching to…" lines. Texts and emails exist only in English and Spanish and need a yes/no per template per language. 0083 must be live before the app that offers the languages. Open question left at its default (no restriction): should staff be able to pick any language? In `docs/before-launch.md`. |
+| 35 | **Messages in your own language: switching it on** | D-423 | Built and off. Needs the provider's no-retention terms in writing, the key as a function secret, a native read of `privacy.s.translation.*`, a way to tell members first, a per-person daily cap, then both switches. `docs/before-launch.md`. |
 
 ---
 
@@ -862,12 +913,13 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ## Seven languages, messages in your own language, and text that fits (9 October) — 0.50.1 and 0.51.0, on a branch
 
-D-412 to D-414, **on `claude/gallant-clarke-0dhizj`, which is
-`claude/pam-storybook` (through D-411, `1a89000`) plus this work, merged and
-renumbered; none of it is merged to `main` and none of it is on the live
-project.**
+D-421 to D-423, **on `claude/gallant-clarke-0dhizj`, which is
+`claude/pam-storybook` (through D-411, `1a89000`) plus `main` (through D-420,
+`932d052`) plus this work; none of it is merged to `main` yet and none of its
+migrations is on the live project** (0079–0081 are the other branch's and are
+held; 0082 is `main`'s and is live).
 
-- **Languages (D-413).** English, Spanish, **Brazilian Portuguese, Simplified
+- **Languages (D-422).** English, Spanish, **Brazilian Portuguese, Simplified
   Chinese (Mandarin readers), Traditional Chinese (Cantonese readers),
   Russian, Arabic**. One registry (`packages/config/src/i18n.ts`); the six
   non-English bundles load when picked, behind a switching screen that says
@@ -875,26 +927,30 @@ project.**
   language has them; right-to-left for Arabic; the phone's language as the
   starting point (never saved as a choice; nothing uses location). **Native
   speakers have not read any of the six new ones** — the first item in
-  `docs/before-launch.md`. Texts and emails stay English/Spanish (A22).
-- **Text fits (D-413).** Wrapping `@pam/ui/Button`, `Badge` and `Segment`
+  `docs/before-launch.md`. Texts and emails stay English/Spanish (A24).
+- **Text fits (D-422).** Wrapping `@pam/ui/Button`, `Badge` and `Segment`
   (Astryx's trim a label to one line); titles that step down 34→24px for a
   word that cannot wrap; notifications in full; and more. Checked by
   `pnpm --filter @pam/web build-storybook` then `audit:fit` (455 stories ×
   7 languages at 320px; English is the baseline). **353 new defects at
-  first, 29 now, each looked at** (see D-413). The audit is a floor: it
+  first, 29 now, each looked at** (see D-422). The audit is a floor: it
   cannot judge a translation or see real phone fonts.
-- **Messages in your own language (D-414) — built, off.** Migration 0083,
+- **Messages in your own language (D-423) — built, off.** Migration 0084,
   the `translate-messages` function, the thread UI ("Translated", "Show
   original"), seven languages of copy, and the privacy section that appears
   with the switch. `MESSAGE_TRANSLATION.enabled` is `false`, and the function
   answers `{enabled:false}` unless its own secret is set. What is owed first
   is in `docs/before-launch.md`.
-- **Spanish, spelled properly (D-412, 0.50.1).** 172 strings got their
+- **Spanish, spelled properly (D-421, 0.50.1).** 172 strings got their
   accents, ñ and ¿ back; spelling only, checked by script.
-- **Migrations, files only:** 0082 (`profiles_language_supported` takes the
-  five new codes — **deploy before the app that offers them**) and 0083
-  (`message_translations`, can wait). Both come after 0081 (link previews,
-  the other session's). Nothing applied to Supabase; `list_migrations` first.
+- **Migrations, files only:** 0083 (`profiles_language_supported` takes the
+  five new codes — **deploy before the app that offers them**) and 0084
+  (`message_translations`, can wait). Both come after 0082 (`main`'s, live)
+  and 0081 (link previews, held). `list_migrations` first.
+- **Merged with `main` (9 October):** the "your guide" wording, the account-limits
+  sections and the short transparency screen (D-412–D-420) arrived in English
+  and Spanish; the other five languages were written for all 32 of those
+  strings in the same merge (drafts, for native review).
 - **Two things to know about copy.** A reworded English string does *not*
   update the other six languages (a new key fails the tests, a reworded one
   stays stale silently); and every string anybody adds is now seven.
@@ -1062,6 +1118,18 @@ Open items Will asked to keep (7 October), newest first. Read this before
   screens) should be usted like the rest.
 - **Voice notes** (D-394): `attachment_kind 'voice'` is refused by 0079
   until voice notes get storage and rules of their own. Photos are built.
+- **Assigning a case manager** (D-415). Only the inviting case manager is
+  assigned, when the invite names one. A member who signed up alone, or was
+  invited by a program lead or a super admin, has none and is read by no case
+  manager since 0082. Needs a way for a case manager (or a super admin) to
+  take a member on, hand one over, and see who is unassigned; the schema
+  already allows one active case manager per member (`admin_assignments`).
+- **How a case manager limits or pauses someone** (Will, 9 October, D-414:
+  "We'll need to enrich how case managers do this later on"). Only the RPC
+  `admin_set_access_status` exists — no screen, no member-facing notice (see
+  `terms.s.limits.p3` in `docs/before-launch.md`), and any case manager with
+  the person in their list may use it.
+
 - **One account, both roles — follow-ups** (D-375): notifications by
   role (the bell shows the acting side's; a dot on the switch for the other);
   the two transparency lines, worded by Will, before launch.
@@ -1098,7 +1166,7 @@ Open items Will asked to keep (7 October), newest first. Read this before
   signature sheet, the friend drawer's drag.
 - **DS for Claude Design** — usage rules in MDX (principles, buttons,
   spacing, type, colour).
-- **Keeping seven languages in step (D-413).** A new English key fails the
+- **Keeping seven languages in step (D-422).** A new English key fails the
   tests until all seven have it; a *reworded* English string does not, and
   the other six go stale without a word. A check that compares each
   translation against the English it was made from, and a script that drafts
@@ -1113,7 +1181,7 @@ Open items Will asked to keep (7 October), newest first. Read this before
   the points copy and a line in the messages copy that seem to say different
   things, and `place.dropin.monthly`'s phrasing. They are in the English; the
   translators kept them.
-- **The audit's blind spots (D-413):** a translation's quality, text inside
+- **The audit's blind spots (D-422):** a translation's quality, text inside
   images, and real phone fonts for Chinese and Arabic (the container's are
   fallbacks).
 

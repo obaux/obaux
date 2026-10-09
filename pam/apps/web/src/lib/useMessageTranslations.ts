@@ -6,7 +6,7 @@ import { useI18n } from './i18n';
 import type { MessageTranslation } from '@/app/messages/TranslatedBody';
 
 /**
- * Other people's messages, in the reader's language (D-414).
+ * Other people's messages, in the reader's language (D-423).
  *
  * Asks the `translate-messages` function — once for each message, in the
  * language the reader uses — and returns what it found, by message id. A

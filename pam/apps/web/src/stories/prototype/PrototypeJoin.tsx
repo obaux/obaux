@@ -27,6 +27,7 @@ export function PrototypeJoin() {
   // One step on its own (D-319). The phone and code are Sign in's (D-359).
   const step = params?.get('step');
   const startAt: JoinPhase | undefined = step && STEPS.includes(step as JoinPhase) ? (step as JoinPhase) : undefined;
+
   return (
     <JoinScreen
       preview={{

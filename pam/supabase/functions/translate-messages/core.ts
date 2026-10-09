@@ -7,7 +7,7 @@
 // does the one call that leaves the building. Everything that decides what a
 // reader is shown lives here, where a test can attack it.
 
-/** The languages Pam is offered in, spelled as the app and the database spell them (0082). */
+/** The languages Pam is offered in, spelled as the app and the database spell them (0083). */
 export const LOCALES = ['en', 'es', 'pt-BR', 'zh-CN', 'zh-HK', 'ru', 'ar'] as const;
 export type Locale = (typeof LOCALES)[number];
 

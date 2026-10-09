@@ -114,7 +114,8 @@ export const NOTICES: Readonly<Record<NoticeKey, NoticeDefinition>> = {
     status: 'error',
     title: 'Your account is paused',
     body:
-      'You cannot sign in right now. The person who invited you can turn it back on. ' +
+      'You cannot sign in right now. The person who invited you, or a staff member ' +
+      'responsible for guiding you, can turn it back on. ' +
       'Call Pam and we will help you reach them.',
     offersSupport: true,
     audience: 'member',
@@ -142,7 +143,9 @@ export const NOTICES: Readonly<Record<NoticeKey, NoticeDefinition>> = {
     kind: 'banner',
     status: 'info',
     title: 'This part is turned off for now',
-    body: 'The person who invited you turned this off. Call Pam if you have questions.',
+    body:
+      'The person who invited you, or a staff member responsible for guiding you, ' +
+      'turned this off. Call Pam if you have questions.',
     offersSupport: true,
     audience: 'member',
   }),

@@ -60,7 +60,7 @@ const styles = stylex.create({
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
-    unicodeBidi: 'plaintext', // its own direction, not the screen's (D-413)
+    unicodeBidi: 'plaintext', // its own direction, not the screen's (D-422)
   },
   when: { fontSize: '16px', lineHeight: 1.35 },
   token: { maxWidth: '100%' },
@@ -99,7 +99,7 @@ export function TripCard({
                 <Avatar size="sm" name={withName} src={withPhotoUrl ?? undefined} tooltip={false} alt="" />
               ) : null}
               {policies ? (
-                // A `Badge`, not a `Token` (D-413): a token trims its label to one
+                // A `Badge`, not a `Token` (D-422): a token trims its label to one
                 // line with an ellipsis and has no way to say otherwise, so
                 // "Signatures needed" was "Нужны подп…". A badge wraps.
                 <Badge

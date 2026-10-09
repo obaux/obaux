@@ -79,6 +79,45 @@ STATUS row too.
   10b). Members were promised they would hear first if what is visible
   changes; the super admin's Everyone list and invite log are visible now.
 
+- [ ] **Ship the privacy policy that tells members what limiting an account
+  does** (Will, 9 October 2026, D-413, D-414: "We can tell members this in
+  privacy policy"). Members were promised they would hear first when a promise
+  changes. Written: a privacy section, "When we limit an account"
+  (`privacy.s.limits.*`, en + es), and both documents' dates moved to 9
+  October. It says the person who invited you, or a staff member responsible
+  for guiding you, can limit or pause an account that is hurting others, that
+  a limited account can read messages but not send them, and that a paused one
+  cannot sign in. The badges now named on
+  the transparency line are in the privacy page's list too. Tick this when the
+  branch is live. When this was written the live project had three accounts,
+  so no one has agreed to the old wording who is not on the team. Nothing
+  re-shows the policy to an account that already agreed (`transparency_ack_at`
+  is set once); decide if that matters before the first real member.
+
+- [x] **Apply migration 0082 to the live project** — **done 9 October 2026
+  (Will, D-420)**, together with the merge to `main`. (Will, 9 October 2026,
+  D-415: a case manager reaches only the people assigned to them). Written
+  and tested (DB suite 440 checks, 0 failures; fails without it). The member copy already promises it ("the person who invited you,
+  or a staff member responsible for guiding you"), so the live database must
+  match before launch. First run `list_migrations` and diff against
+  `packages/db/migrations/`; the file is one `create or replace function` plus
+  a comment, so it does not hit the `DROP` gate (D-387). It numbers 0082
+  because `claude/pam-storybook` and `claude/gallant-clarke-0dhizj` both use
+  0079–0081 for their own migrations. Until it is live, a case manager can
+  still read everyone in their city. Applying it also means members with no
+  case manager (signed up alone, or invited by a program lead or a super
+  admin) are read by none: the screen to assign one is on the STATUS backlog.
+
+- [ ] **Make `terms.s.limits.p3` true** (Will, 9 October 2026: "Keep
+  terms.s.limits.p3"). The terms promise "When something is turned off, Pam
+  tells you it is off and who to call." Nothing shows the `account_limited`
+  notice, and a refused send says "Your connection dropped"
+  (`messages.thread.failed.body`), which would be untrue for a limited
+  account. Show the notice (it already says what is off and offers the call
+  button) where a limited member meets it — Messages and a conversation at
+  least — and make a refused send for a limited account say why. Before any
+  case manager can limit anyone.
+
 - [ ] **Review the SMS copy** still waiting for a name in `reviewedBy`
   (STATUS row 2).
 
@@ -127,14 +166,14 @@ Will, 7 October 2026: "Add these to Before launch doc" (D-375).
 ### Languages, and messages in your own language
 
 Will, 9 October 2026: Brazilian Portuguese, Chinese (Mandarin and Cantonese),
-Russian, Arabic (D-413); messages read in the reader's language (D-414).
+Russian, Arabic (D-422); messages read in the reader's language (D-423).
 
-- [ ] **Deploy 0082 before the app that offers the languages ships.** It is
+- [ ] **Deploy 0083 before the app that offers the languages ships.** It is
   the one check (`profiles_language_supported`) that lets a profile hold
   `pt-BR`, `zh-CN`, `zh-HK`, `ru` or `ar`. Until it is live, somebody who
   picks one gets a failed save. It does not touch any other table. Check
   `list_migrations` against `packages/db/migrations` first (CLAUDE.md): 0081
-  (link previews) is the one before it. **0083 (message translations) can
+  (link previews) is the one before it. **0084 (message translations) can
   wait** until translation is switched on; it changes nothing a member sees.
 
 - [ ] **Have a native speaker read every new language** — nobody has. The six
@@ -160,7 +199,7 @@ Russian, Arabic (D-413); messages read in the reader's language (D-414).
   off (`MESSAGE_TRANSLATION` in `packages/config/src/translation.ts`; the
   function's own switch is the secret `MESSAGE_TRANSLATION=on`). Before
   either is turned on:
-  1. Deploy 0083, then `translate-messages` (`supabase functions deploy
+  1. Deploy 0084, then `translate-messages` (`supabase functions deploy
      translate-messages`), and read `get_advisors`.
   2. Set `ANTHROPIC_API_KEY` as a function secret — never in this repo — on an
      account whose terms say what is sent is **not kept and not used to

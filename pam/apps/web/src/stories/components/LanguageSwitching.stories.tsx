@@ -3,7 +3,7 @@ import { directionOf, SWITCHING_LANGUAGE, type Locale } from '@pam/config';
 import { LanguageSwitching } from '@pam/ui';
 
 /**
- * The screen between two languages (D-413). When the words of the language
+ * The screen between two languages (D-422). When the words of the language
  * somebody just chose have to be downloaded, the window is covered by a
  * spinner and one line — "Cambiando a español…" — in the language being
  * switched to, so the wait is explained in words they can read. It appears

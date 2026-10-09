@@ -46,7 +46,7 @@ const styles = stylex.create({
     lineHeight: 1.35,
     overflow: 'hidden',
     textOverflow: 'ellipsis',
-    unicodeBidi: 'plaintext', // its own direction, not the screen's (D-413)
+    unicodeBidi: 'plaintext', // its own direction, not the screen's (D-422)
     whiteSpace: 'nowrap',
   },
   previewUnread: { fontWeight: 600 },

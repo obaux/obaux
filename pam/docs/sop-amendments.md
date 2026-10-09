@@ -169,6 +169,17 @@ at all; the quoted excerpt on the report is the only route, and since 0034 the
 database writes that quote rather than the reporter. The transparency screen
 stands as written.
 
+**Clarified (D-413, 9 October 2026, Will).** "Never switchable off" means the
+*feature switch* (`access_controls`, refused by 0031) and nothing more. It was
+never true of account status: a **limited** account can read messages but not
+send them or start a conversation, and a **paused** one cannot sign in
+(`is_active_account()` on `messages_insert_sender` and
+`open_direct_conversation()`). Will chose to keep that and say it, rather than
+change the code: `terms.s.limits.p2` now states it. The isolation concern
+recorded above applies to Limited as much as to a feature switch; it was
+weighed and accepted, so a future session should not "fix" Limited to match
+A6 without asking.
+
 ## A7 — Who is told when something is flagged (12 September 2026, Will)
 
 > "When a message is flagged, or a program is flagged, make sure to notify the
@@ -490,37 +501,64 @@ help is one tap further, inside the menu, and not on the screen itself.
 page keeps its way back. Elsewhere, a screen with a ⋯ menu keeps its Help
 button unless Will says otherwise.
 
-## A21 — Conversation text is 16px (8 October 2026, Will)
+## A22 — A case manager reaches only the people assigned to them (9 October 2026, Will)
 
-Will: "drop font down to 16px." In a conversation, what was said and what
-you are typing are 16px (D-392).
+Will, asked whether "any case manager with that person in their list" meant
+the case manager's caseload or their city: "I meant only people assigned to
+that case manager, and it would also narrow who can read points and badges."
 
-**Where this contradicts the original.** §2.5: "18px body text on mobile."
-Messages were the one place that floor read as oversized — the conversation
-apps people already use draw messages at 16–17px, and at 18px a bubble
-wrapped every few words on a phone.
+**Where this contradicts the original.** SOP §4 and §4.1: "an admin reaches a
+member through the caseload, or through the region." There is no region
+arm any more. `admin_covers()` (0082) is the caseload alone, so a case
+manager reads a member's profile, goals, enrollments, appointments,
+connections, points and badges, and may limit or pause them, only when an
+active `admin_assignments` row names them. The region still scopes what a
+case manager can *create* (an invite is for their own city).
 
-**What did not change.** Everywhere else body text stays 18px; the page's
-base size (`--pam-body-size`, which `a11y.spec.ts` checks) is untouched.
-16px is also the floor for the field you type in: below it, iOS zooms the
-page when the field takes focus.
+**What did not change.** Messaging (`can_message()`) and who sees a report
+already read assignments directly. Program leads, super admins and members
+are unaffected.
 
-## A22 — Pam is in seven languages, not two (9 October 2026, Will)
+**What it leaves.** A member who signed up alone, or was invited by a program
+lead or a super admin, has no case manager and is read by no case manager.
+There is no screen to assign one yet (STATUS backlog).
+
+## A23 — Body text is 16px on mobile (9 October 2026, Will)
+
+Will: "Let's update the rule and the text token to 16px body size."
+
+**Where this contradicts the original.** SOP §2.5 and §12: "18px body text on
+mobile" (16px on desktop). It is now 16px everywhere. Changed together: the
+rule in `CLAUDE.md`; `A11Y.bodyTextMobilePx` (18 → 16) in `@pam/config`, which the
+e2e check "body text is at least 16px on mobile" reads; the `--pam-body-text-mobile`
+token in `tokens.stylex.ts` and `tokens.css`; and `--pam-body-size` in
+`globals.css`, which sets the page's `body` (the desktop override is gone — both
+are 16px now). The Foundations pages say the same.
+
+**What did not change.** It is a floor, not a target: a heading, a row label or a
+card may be larger, and the many components that set 17–18px for themselves still
+do. Nothing a member has to read is smaller than 15px; supporting lines stay
+15–17px. 48px targets, 56px primary buttons, AAA contrast for body text and
+scaling to 200% are as before.
+
+## A24 — Pam is in seven languages, not two (9 October 2026, Will)
 
 Will: "Let's also add a Brazilian portuguese language" — then Chinese
 (Mandarin and Cantonese), Russian and Arabic — and "everyone in the city
 speaks different languages": the choice is the person's, not the place's
-(D-413).
+(D-422).
 
 **Where this contradicts the original.** §2.3 and CLAUDE.md say English and
 Spanish, key-for-key. Every language Pam offers is now held to that: the
 same keys, the same placeholders, plural forms where the language has them
 (Russian four, Arabic six), and the dignity check, as tests, not convention.
+A new or changed English string is not finished until the other six have it.
 
 **What did not change.** Text messages and emails are English and Spanish
 only until each template in another language is drafted and signed off
 (`reviewedBy`); a person reading Pam in another language gets those in
-English. The 18px body size, 48px targets and every rule about words that
-must never appear apply in every language. §12's first-load budget holds:
-only English is in it; the other six are fetched when somebody picks one.
+English. The 16px body size (A23), 48px targets and every rule about words
+that must never appear apply in every language. §12's first-load budget
+holds: only English is in it; the other six are fetched when somebody picks
+one.
 

@@ -5,7 +5,7 @@ import { SegmentedControlItem, type SegmentedControlItemProps } from '@astryxdes
 import { sizeVars, spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
 
 /**
- * One choice in a `SegmentedControl` that lets its words wrap (D-413).
+ * One choice in a `SegmentedControl` that lets its words wrap (D-422).
  *
  * Astryx sets a segment to one line, exactly 28px tall, and trims what does
  * not fit with an ellipsis. Three English words fit; "Programas",

@@ -5,7 +5,7 @@ import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { TranslatedBody } from '@/app/messages/TranslatedBody';
 
 /**
- * Another person's message in the reader's language (D-414, Will's "Uber's
+ * Another person's message in the reader's language (D-423, Will's "Uber's
  * way"): the translation, then under it "Translated" and a link to what was
  * actually written. Tap the link and the original takes its place, labelled
  * "Original", with the way back. The label always says which one is on

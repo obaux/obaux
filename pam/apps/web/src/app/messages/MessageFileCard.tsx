@@ -37,7 +37,7 @@ import {
  */
 const styles = stylex.create({
   card: { width: '100%', maxWidth: '300px', borderRadius: '14px' },
-  // At least 120px for the words, or they drop under the icon (D-413). A card
+  // At least 120px for the words, or they drop under the icon (D-422). A card
   // in a narrow bubble has about 60px beside its icon, which held "Google Doc"
   // but cut "Документ Google" to "Докуме / нт…".
   text: { minWidth: 0, flexGrow: 1, flexBasis: '120px' },
