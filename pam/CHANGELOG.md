@@ -40,12 +40,12 @@ and delete your account in red (D-418).
 
 Everywhere Pam tells you who to call — Help, the screens for reporting a message,
 and the notices for a paused or turned-off feature — it now says "your guide" in
-short (D-426). A limited account is told so: Messages shows "Some things are turned
+short (D-427). A limited account is told so: Messages shows "Some things are turned
 off", what you can still do (read your messages, look at places and your plan), and
 a button to call, in place of the New message button; a conversation keeps all of
 its messages and shows the same notice where you would type. A message that
 cannot be sent because your account is limited no longer says "Your connection
-dropped" (D-426).
+dropped" (D-427).
 
 ## [0.45.4] — 2026-10-08 · Live
 

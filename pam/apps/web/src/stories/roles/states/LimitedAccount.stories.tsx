@@ -4,7 +4,7 @@ import { CONVO_ID } from '../../journeys/fixtures';
 import { REDESIGN_ROUTES } from '../../prototype/routes';
 
 /**
- * A limited account (Will, 9 October, D-413, D-426): the member can read their
+ * A limited account (Will, 9 October, D-413, D-427): the member can read their
  * messages but not send or start one, and the terms promise "Pam tells you it
  * is off and who to call" (terms.s.limits.p3).
  *

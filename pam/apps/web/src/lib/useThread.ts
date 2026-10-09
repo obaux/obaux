@@ -67,7 +67,7 @@ export function useThread(conversationId: string | null): {
   /**
    * The last send was refused because this account is limited, not because
    * the connection dropped. The screen then says what is off and who to call
-   * (terms.s.limits.p3, D-426) instead of "Your connection dropped".
+   * (terms.s.limits.p3, D-427) instead of "Your connection dropped".
    */
   limited: boolean;
   refresh: () => void;

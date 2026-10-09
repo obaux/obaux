@@ -10036,7 +10036,7 @@ next resolves those conflicts (and renumbers: their D-numbers and 0079–0081 do
 collide with D-412–D-420 or 0082, but the changelog versions will need ordering).
 
 
-### D-426 — "Your guide" everywhere a member is told who to call; a limited account is told it is off, and who to call (p3 kept)
+### D-427 — "Your guide" everywhere a member is told who to call; a limited account is told it is off, and who to call (p3 kept)
 
 **Date:** 2026-10-09. **Decided by:** Will: "resolve the remaining. Yes use Your
 guide for short."
@@ -10101,7 +10101,9 @@ account* (Messages, A conversation, Spanish), with `installSupabaseMock(role,
 { limited: true })` limiting the pretend member and refusing the insert as
 `messages_insert_sender` does.
 
-**Numbering.** D-426 because `claude/gallant-clarke-0dhizj` holds D-421–D-423 and
-its `docs/allocations.md` (not on `main` yet) says D-424 is next; D-424 and D-425
-are left for it. This branch has no allocations file; claim the number there when
-the two meet.
+**Numbering.** D-427 because `claude/gallant-clarke-0dhizj` holds D-421–D-426 (its
+`docs/allocations.md`, not on `main` yet, says D-427 is next). This entry first took
+D-426, found free from this branch's side, and was renumbered on 9 October when that
+branch pushed its own D-426 ("Numbers are claimed in one file"); every reference on
+this branch moved with it. This branch has no allocations file: claim the row there
+when the two meet.

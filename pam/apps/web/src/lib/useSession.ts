@@ -56,7 +56,7 @@ export interface Session {
   /**
    * `profiles.access_status`. `limited` is an account that can read but not
    * send or start a message (0031's `is_active_account()`); the screens that
-   * would otherwise offer it say so and who to call (terms.s.limits.p3, D-426).
+   * would otherwise offer it say so and who to call (terms.s.limits.p3, D-427).
    * `suspended` never reaches here: it is its own session state above.
    */
   accessStatus: 'active' | 'limited';

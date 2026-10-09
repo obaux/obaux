@@ -68,7 +68,7 @@ function ThreadScreen() {
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
   // A limited account reads but cannot send (0031): the composer says so
   // before they type, and `useThread` says so if the account was limited
-  // after this screen loaded (terms.s.limits.p3, D-426).
+  // after this screen loaded (terms.s.limits.p3, D-427).
   const accountLimited = session.status === 'signed-in' && session.session.accessStatus === 'limited';
   const { viewedRole } = useRoleView(trueRole);
   // The super admin messages staff too (0072, D-262) — never a member; the

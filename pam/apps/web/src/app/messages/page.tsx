@@ -86,7 +86,7 @@ function MessagesScreen() {
   const signedIn = session.status === 'signed-in';
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
   // A limited account reads but cannot start a message (0031): the New
-  // message button gives way to the notice that says so (terms.s.limits.p3, D-426).
+  // message button gives way to the notice that says so (terms.s.limits.p3, D-427).
   const limited = session.status === 'signed-in' && session.session.accessStatus === 'limited';
   const { viewedRole, demoRole, setViewAs } = useRoleView(trueRole);
   const isDemo = useDemoView(session);
