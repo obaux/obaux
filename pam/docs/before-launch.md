@@ -74,6 +74,10 @@ STATUS row too.
   screen, privacy notice and terms now name photos; two member accounts on
   live saw the old wording, so if either is a real person they hear about
   photos before the merge ("If this changes, we will tell you first").
+  **9 October 2026 (Will): the merge to `main` is held until these three are
+  live** — `claude/gallant-clarke-0dhizj` (the seven languages) carries this
+  photo, document and link UI, so it waits too. 0083 and 0084 went in ahead of
+  them, and touch nothing they create.
 
 - [ ] **Approve the Pam-team line on the transparency screen** (STATUS row
   10b). Members were promised they would hear first if what is visible

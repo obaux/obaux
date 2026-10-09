@@ -114,6 +114,10 @@ added:
 
 ## Needs a human
 
+- Will, decided 9 October: **the merge to `main` is held** until 0079–0081
+  (photos, documents, link previews) are live and members are told, because this
+  branch carries that UI (STATUS row 36, `docs/before-launch.md`). Everything
+  else is done: pushed, checked on the merged tree, 0083 and 0084 live.
 - Will: a native reader for each new language (above), and a yes/no per SMS/email
   template for the languages it is not yet written in.
 - Will: whether the language picker should be limited for staff (it is not;
