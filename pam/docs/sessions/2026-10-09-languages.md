@@ -274,3 +274,10 @@ only and update the registration."
 - **Found, not fixed:** nothing queues any appointment reminder yet (no function,
   trigger or screen references them), so the time format a reminder carries in each
   language is not decided; the tests assume up to ten characters.
+- **Will asked for the carrier filing and its instructions on the before-launch
+  list** ("no need for my approval on wording added"): a new item, *File the updated
+  text-message registration with the carrier, then deploy `dispatch-sms`*, with eight
+  steps from "copy what is registered today" to "read one text in each script on
+  your phone". It points at `docs/sms-campaign-samples.md` rather than repeating it.
+  Two things in it are unverified and say so: the Twilio menu path, and whether an
+  approved campaign can be edited or has to be replaced.
