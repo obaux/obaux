@@ -39,6 +39,13 @@ wrong silently. (Why each piece exists: D-424, D-425.)
    the pseudo-language on a pull request that touches copy or UI.
    Text should wrap and grow (`@pam/ui` `Button`, `Badge`, `Segment`), never be
    trimmed; only a page title steps down in size (D-422).
+   **If the check names a defect:** look at it in Storybook in that language at 320px
+   first. A text that is really cut off or covered is fixed (let it wrap, or shorten
+   the string). A line that is one line with an ellipsis *by design*, a list that
+   scrolls under a fade, or a detector reading of text that is clipped on purpose
+   goes in `apps/web/scripts/fit-known.json` with the reason and the date, so it is
+   not looked at twice (D-434). `node scripts/audit-language-fit.mjs --write-known
+   out.json` writes the entries for you to give reasons to.
 
 ## In a text message
 

@@ -272,6 +272,16 @@ Russian, Arabic (D-422); messages read in the reader's language (D-423).
   If a new language later changes what a text says materially, or another template
   is given a second segment, the filing changes with it (`docs/copy-changes.md`).
 
+- [ ] **Decide how the tab bar behaves when a language has longer words than
+  Russian** (D-434; Will's design, so his call; not blocking while the seven
+  languages are the only ones). Five one-word labels share 320px and a tab does not
+  shrink below its longest word. Tested 9 October: equal tabs that wrap **break**
+  Russian, Portuguese and Spanish words mid-word (do not); tabs sized by their
+  content (`flex: 1 1 auto`, `min-width: 0`, wrapping, in `packages/ui/src/TabBar.tsx`)
+  fit all seven and wrap the pseudo-language, and move the English tabs by a few
+  pixels. Say "size the tabs by content" and Claude makes the change and re-runs the
+  fit check; or leave it until a language with longer words is added.
+
 - [ ] **Apply 0085 whenever convenient — nothing waits on it** (D-424, D-428). It
   keeps the language a person asked in, so a denial text and a fresh-link email
   are written in it and an approved account opens in it. It replaces two

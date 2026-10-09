@@ -11454,3 +11454,47 @@ and these readers would get the reminder in their own language."
 - **Not changed.** Nothing is deployed: the live `dispatch-sms` is still v15 (English
   and Spanish, "PAM:"). Nothing queues these reminders yet; the cost is two segments
   each only once something does, and only for readers of three scripts.
+
+### D-434 — The text-fit baseline: what was looked at, what was fixed, what is left
+
+**Date:** 2026-10-09. Will asked for "the full text-fit audit (fills the fit check's
+accepted list)". The `PAM Language fit` check fails only on a defect that is **new in
+a language and not already looked at**; until now nothing had been written down as
+looked at, so its first run would have failed on the whole backlog.
+
+- **The audit.** Every story (469) in all seven languages and the pseudo-language at
+  320px: 3,752 measurements, none that could not be measured. **137 defects were new
+  in a language** (English's own 159 are the design's and are not counted): 35 in real
+  languages (Spanish 9, Portuguese 10, Russian 8, Traditional Chinese 4, Simplified
+  Chinese 2, Arabic 2) and 102 in the pseudo-language, which is English made about 45%
+  longer and padded, longer than any real one.
+- **Looked at, each in a screenshot.** None of the 35 in real languages is a text cut
+  off on a screen that should have shown it. They are: the Trips drawer and the folded
+  Home week scrolling or fading by design (the detector sees text "partly hidden"); a
+  conversation row's program line, and a Shared-things title, kept to one line with an
+  ellipsis by design (the title slides to show its end, D-407); a thread scrolling
+  under its opaque header; an area chip ending a long address in an ellipsis. The 119
+  that are recorded (some repeat) are in `apps/web/scripts/fit-known.json`, each with
+  the reason and the date.
+- **One real fault, fixed.** In the pseudo-language, nine screens scrolled sideways:
+  the invisible compact title in the header (`LargeTitleHeader`) sat beside the three
+  buttons, did not shrink, and pushed the buttons 12px past the edge. It now shortens
+  with an ellipsis when it must (`minWidth: 0`, one line); where it fits, nothing moves. Nine screens down to one in the pseudo-language; English is unchanged
+  (159 before and after).
+- **Left, and why.** (1) **The tab bar:** five one-word labels share 320px and a tab
+  does not shrink below its longest word, so a language with longer words than
+  Russian's runs off the edge (Russian already fills the bar). I tried the obvious fix
+  (equal tabs that wrap) and it **broke** Russian, Portuguese and Spanish words
+  mid-word, so I did not ship it; tabs sized by their content (`flex: 1 1 auto`,
+  `min-width: 0`) fit all seven languages and wrap the pseudo-language, but move the
+  English tabs a few pixels. It is Will's design, so it is on the before-launch list
+  as his call. (2) **The About segments** never break a word (D-422), so a long word
+  overflows; fine in all seven. (3) **Arabic and interpolated values:** an English
+  address in an Arabic sentence is reordered (the number jumps); found because the
+  audit flagged it, but it is a bidi fault, not a fit one, and is a separate task.
+- **What this baseline does not prove.** It was made in this sandbox. The workflow
+  runs on GitHub's Ubuntu runner with its own fonts, so its first run may list a
+  Chinese or Arabic defect that is not here; each is looked at the same way and added.
+  Entries for the pseudo-language mean "worse than any real language", not "fine":
+  they matter on the day a language with longer words is added.
+

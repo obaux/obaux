@@ -75,6 +75,15 @@ const styles = stylex.create({
   small: {
     fontSize: '20px',
     fontWeight: 700,
+    // The compact title shares a row with the buttons. It may be shortened
+    // there (the large title above already says it whole), but it may not push
+    // the buttons off the screen: in a language with a longer word than
+    // English's, the row came out wider than the phone and the page scrolled
+    // sideways (text-fit audit, 9 October 2026). In English nothing moves.
+    minWidth: 0,
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
     opacity: 0,
     transitionProperty: 'opacity',
     transitionDuration: '150ms',

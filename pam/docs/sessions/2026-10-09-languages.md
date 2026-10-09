@@ -281,3 +281,29 @@ only and update the registration."
   your phone". It points at `docs/sms-campaign-samples.md` rather than repeating it.
   Two things in it are unverified and say so: the Twilio menu path, and whether an
   approved campaign can be edited or has to be replaced.
+
+## Part 6 — the text-fit baseline (D-434)
+
+Will: "do the full text-fit audit (fills the fit check's accepted list)". The audit ran
+over every story, all seven languages and the pseudo-language, at 320px (about 37
+minutes, 3,752 measurements, none unmeasurable): 137 defects new in a language.
+
+- **Looked at, in screenshots.** The 35 in real languages are not text cut off where it
+  should show; they are scrolling or fading areas, lines that are one line with an
+  ellipsis by design (a Shared-things title slides to show its end, D-407), a thread
+  scrolling under its header. All 119 distinct ones are in
+  `apps/web/scripts/fit-known.json` with a reason each, so the `PAM Language fit` job
+  has its baseline. A first slice run with `--known` exits 0.
+- **One real fault fixed:** `LargeTitleHeader`'s invisible compact title pushed the
+  header buttons past the edge in the pseudo-language (nine screens scrolled
+  sideways); it now shortens. Re-audited English and pseudo on a rebuilt Storybook:
+  pseudo 102 → 94, sideways scroll 9 screens → 1, English unchanged at 159.
+- **A fix I tried and did not ship:** letting tab labels wrap. It broke Russian,
+  Portuguese and Spanish words mid-word, which the first screenshot showed at once.
+  Tabs sized by content work but move the English tabs; Will's call (before-launch).
+- **Numbers:** I pushed a claim for D-432 that the goldberg branch had already taken,
+  because I read their allocations row after bumping mine; corrected within minutes to
+  D-434 (goldberg D-429, D-432; bohr D-433). Read the other branches' rows *before*
+  editing yours.
+- **Not known:** whether GitHub's runner (its own fonts) reports defects this sandbox did
+  not; the first run of the job will say. Each would be looked at and added.
