@@ -37,6 +37,10 @@ const styles = stylex.create({
   },
   tileSmall: { width: '32px', height: '32px', fontSize: '18px' },
   tileNo: { backgroundColor: colorVars['--color-background-muted'], color: colorVars['--color-text-primary'] },
+  // A grey tile and a red one, for the actions at the foot of a screen (Will,
+  // D-417): grey for something ordinary, red for something that cannot be undone.
+  tileGrey: { backgroundColor: colorVars['--color-background-muted'], color: colorVars['--color-text-secondary'] },
+  tileRed: { backgroundColor: colorVars['--color-background-red'], color: colorVars['--color-icon-red'] },
   title: { fontSize: '21px', lineHeight: 1.3 },
   titleBox: { flexGrow: 1, minWidth: 0 },
   groupTitle: { fontSize: '15px', textTransform: 'uppercase', letterSpacing: '0.06em' },
@@ -54,13 +58,32 @@ const styles = stylex.create({
 });
 
 /** A round tile holding an icon. Decorative. */
-export function IconTile(props: { children: ReactNode; small?: boolean; no?: boolean }) {
+export function IconTile(props: { children: ReactNode; small?: boolean; tone?: 'grey' | 'red' }) {
   return <Tile {...props} />;
 }
 
-function Tile({ children, small = false, no = false }: { children: ReactNode; small?: boolean; no?: boolean }) {
+function Tile({
+  children,
+  small = false,
+  no = false,
+  tone,
+}: {
+  children: ReactNode;
+  small?: boolean;
+  no?: boolean;
+  tone?: 'grey' | 'red';
+}) {
   return (
-    <HStack xstyle={[styles.tile, small ? styles.tileSmall : null, no ? styles.tileNo : null]} aria-hidden="true">
+    <HStack
+      xstyle={[
+        styles.tile,
+        small ? styles.tileSmall : null,
+        no ? styles.tileNo : null,
+        tone === 'grey' ? styles.tileGrey : null,
+        tone === 'red' ? styles.tileRed : null,
+      ]}
+      aria-hidden="true"
+    >
       {children}
     </HStack>
   );

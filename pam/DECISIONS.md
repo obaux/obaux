@@ -9918,7 +9918,9 @@ Claude's draft. A reviewed wording of the short version is still open.
 look). (2) The two actions on Profile › What others can see each lead with an icon
 in the same small round tile as the statements above: a copy icon for Request a
 copy of my data, a bin for Delete my account (`IconTile`, exported from
-`@pam/ui/Reading`). (3) The guide card has 20px padding all round (was 12px), on
+`@pam/ui/Reading`), **grey for the copy and red for the deletion** (Will: "make
+those icons grey and red": muted grey tile with a secondary-text icon;
+`--color-background-red` tile with `--color-icon-red`). (3) The guide card has 20px padding all round (was 12px), on
 all three screens it appears on, since it is one component.
 
 **Tested.** `@pam/ui` 79 (copy: tick swap, "Copied", reset at 5 seconds,

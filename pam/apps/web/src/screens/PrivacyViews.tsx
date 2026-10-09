@@ -37,12 +37,25 @@ const styles = stylex.create({
   body: { fontSize: '18px', lineHeight: 1.55 },
 });
 
-function ActionCard({ label, href, icon }: { readonly label: string; readonly href: string; readonly icon: ReactNode }) {
+function ActionCard({
+  label,
+  href,
+  icon,
+  tone,
+}: {
+  readonly label: string;
+  readonly href: string;
+  readonly icon: ReactNode;
+  readonly tone: 'grey' | 'red';
+}) {
   return (
     <ClickableCard label={label} href={href} padding={5} xstyle={styles.action}>
       <HStack gap={3} align="center" wrap="nowrap">
-        {/* The same small round tile as the statements above (Will, D-417). */}
-        <IconTile small>{icon}</IconTile>
+        {/* The same small round tile as the statements above, grey for a copy and red for
+            a deletion (Will, D-417). */}
+        <IconTile small tone={tone}>
+          {icon}
+        </IconTile>
         <Text xstyle={styles.actionLabel}>{label}</Text>
         <Icon icon="chevronRight" size="md" />
       </HStack>
@@ -65,8 +78,8 @@ export function PrivacyControlsView() {
 
       {/* No heading: straight into what a person can do about their data (Will, D-417). */}
       <VStack gap={3}>
-        <ActionCard label={t('privacy.controls.copy')} href="/legal/privacy/copy/" icon={<CopyIcon />} />
-        <ActionCard label={t('privacy.controls.delete')} href="/legal/privacy/delete/" icon={<TrashIcon />} />
+        <ActionCard label={t('privacy.controls.copy')} href="/legal/privacy/copy/" icon={<CopyIcon />} tone="grey" />
+        <ActionCard label={t('privacy.controls.delete')} href="/legal/privacy/delete/" icon={<TrashIcon />} tone="red" />
       </VStack>
     </SubPage>
   );
