@@ -102,6 +102,10 @@ export {
   PlusIcon,
   NewMessageIcon,
   ClockIcon,
+  CopyIcon,
+  CrossIcon,
+  EyeIcon,
+  EyeOffIcon,
 } from './icons.js';
 export { SavedStrip, type SavedStripProps, type SavedStripPlace } from './SavedStrip.js';
 export { TextSwap, AutoHeight } from './Swap.js';

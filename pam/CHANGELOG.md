@@ -24,6 +24,14 @@ migration 0082 is applied to the live database; it is written and tested but
 not yet applied. Wherever Pam describes that person it now says "the person
 who invited you, or a staff member responsible for guiding you" (D-415).
 
+The screens that explain what the person guiding you can see are easier to
+read. They name "your guide" once, at the top, then say it in short: a short
+version first, the long list in three small groups, and a small copy icon on
+each section that says "Copied" when it works. The privacy policy and terms
+are sections you can copy, with a row of jump buttons in place of a long
+contents list. Two looks, with and without little icons, are in Storybook for
+Will to choose (D-416).
+
 ## [0.45.4] — 2026-10-08 · Live
 
 The changes since 0.43 are live: invites name the person they're for, one

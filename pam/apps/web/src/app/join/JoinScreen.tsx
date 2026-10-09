@@ -20,6 +20,8 @@ import { readAddedTrips, withMoves } from '@/lib/addedTrips';
 import { DUMMY_TRIPS } from '@pam/config/dummy-trips';
 import { Confetti } from '@pam/ui/SuccessScreen';
 import { useSupportPhone } from '@/lib/useSupportPhone';
+import { TransparencyReading } from '@/screens/TransparencyReading';
+import { decorFromParam } from '@/lib/readingStyle';
 import { signOut, useSession } from '@/lib/useSession';
 import { usePoints } from '@/lib/usePoints';
 import { setReminderConsent } from '@/lib/useReminderConsent';
@@ -146,6 +148,8 @@ export interface JoinPreview {
   readonly invite?: Invite;
   /** Open on this step (D-319): one story per screen, not one per flow. */
   readonly startAt?: JoinPhase;
+  /** "icons" or "plain": how What Pam shares is drawn, so Storybook can show both (D-416). */
+  readonly decor?: string;
 }
 
 export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview | null } = {}) {
@@ -712,39 +716,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
           three different people are reading it and only one of them is being
           asked to trust us with their life (Will, 14 September).
         */}
-        {phase === 'privacy' && !isStaff ? (
-          <>
-            <VStack gap={3}>
-              <Text xstyle={styles.intro}>{t('join.privacy.member.intro')}</Text>
-
-              <VStack gap={2}>
-                <Heading level={2} xstyle={styles.heading}>
-                  {t(TRANSPARENCY_SCREEN.canSeeHeadingKey)}
-                </Heading>
-                {TRANSPARENCY_SCREEN.canSee.map((line) => (
-                  <Text key={line.key} xstyle={styles.item}>
-                    {t(line.key)}
-                  </Text>
-                ))}
-              </VStack>
-
-              <VStack gap={2}>
-                <Heading level={2} xstyle={styles.heading}>
-                  {t(TRANSPARENCY_SCREEN.cannotSeeHeadingKey)}
-                </Heading>
-                {TRANSPARENCY_SCREEN.cannotSee.map((line) => (
-                  <Text key={line.key} xstyle={styles.item}>
-                    {t(line.key)}
-                  </Text>
-                ))}
-              </VStack>
-
-              <Text type="supporting" xstyle={styles.small}>
-                {t(TRANSPARENCY_SCREEN.footerKey)}
-              </Text>
-            </VStack>
-          </>
-        ) : null}
+        {phase === 'privacy' && !isStaff ? <TransparencyReading decor={decorFromParam(preview?.decor)} /> : null}
 
         {phase === 'privacy' && isStaff ? (
           <>

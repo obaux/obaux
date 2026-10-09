@@ -1,7 +1,6 @@
 'use client';
 
 import * as stylex from '@stylexjs/stylex';
-import { Card } from '@astryxdesign/core/Card';
 import { ClickableCard } from '@astryxdesign/core/ClickableCard';
 import { Heading } from '@astryxdesign/core/Heading';
 import { HStack } from '@astryxdesign/core/HStack';
@@ -10,7 +9,9 @@ import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { BigButton, TextLink } from '@pam/ui';
 import { SubPage } from '@pam/ui/SubPage';
-import { TRANSPARENCY_SCREEN } from '@pam/config';
+import type { Decor } from '@pam/ui/Reading';
+import { TransparencyReading } from '@/screens/TransparencyReading';
+import { READING_STYLE } from '@/lib/readingStyle';
 import { useI18n } from '@/lib/i18n';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 
@@ -47,7 +48,7 @@ function ActionCard({ label, href }: { readonly label: string; readonly href: st
   );
 }
 
-export function PrivacyControlsView() {
+export function PrivacyControlsView({ decor = READING_STYLE }: { readonly decor?: Decor } = {}) {
   const { t } = useI18n();
   return (
     <SubPage title={t('privacy.controls.title')} backHref="/legal/" backLabel={t('nav.back.legal')}>
@@ -55,26 +56,7 @@ export function PrivacyControlsView() {
         {t('privacy.controls.intro')}
       </Text>
 
-      <Card padding={4}>
-        <VStack gap={3}>
-          <Heading level={2} xstyle={styles.heading}>
-            {t(TRANSPARENCY_SCREEN.canSeeHeadingKey)}
-          </Heading>
-          {TRANSPARENCY_SCREEN.canSee.map((line) => (
-            <Text key={line.key} xstyle={styles.line}>
-              • {t(line.key)}
-            </Text>
-          ))}
-          <Heading level={2} xstyle={styles.heading}>
-            {t(TRANSPARENCY_SCREEN.cannotSeeHeadingKey)}
-          </Heading>
-          {TRANSPARENCY_SCREEN.cannotSee.map((line) => (
-            <Text key={line.key} xstyle={styles.line}>
-              • {t(line.key)}
-            </Text>
-          ))}
-        </VStack>
-      </Card>
+      <TransparencyReading decor={decor} />
 
       <VStack gap={3}>
         <Heading level={2} xstyle={styles.heading}>

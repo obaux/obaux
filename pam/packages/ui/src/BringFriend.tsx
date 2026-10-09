@@ -15,6 +15,7 @@ import { pam } from './tokens.stylex.js';
 import { TextField } from './TextField.js';
 import { sheet } from './sheet.js';
 import { canShareSheet, shareText } from './share.js';
+import { COPIED_MS, copyLink } from './clipboard.js';
 import { BigButton } from './BigButton.js';
 
 /**
@@ -80,23 +81,7 @@ export interface BringFriendProps {
   readonly heroSrcSet?: string | null;
 }
 
-/** How long "Link copied" stays over the field (D-337). */
-export const COPIED_MS = 3000;
-
-/**
- * Copies `text`; true when the clipboard took it. Call it inside a tap: that
- * is the only time Safari allows it.
- */
-export async function copyLink(text: string): Promise<boolean> {
-  try {
-    if (!navigator.clipboard) return false;
-    await navigator.clipboard.writeText(text);
-    return true;
-  } catch {
-    // No clipboard: the link is in the field, to copy by hand.
-    return false;
-  }
-}
+export { COPIED_MS, copyLink };
 
 const styles = stylex.create({
   sheet: { width: '100%', paddingInline: '20px', paddingBlockStart: '0px', paddingBlockEnd: '44px' },

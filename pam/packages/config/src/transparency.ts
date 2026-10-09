@@ -138,8 +138,9 @@ export function isAdminVisible(field: string): field is AdminVisibleField {
  * Plain language, 5th-grade level, one line per item, in the same order and
  * with the same content as ADMIN_CAN_SEE / ADMIN_CANNOT_SEE above. The person
  * in §4.1 is "the admin"; to a member they are the person who invited them, so
- * the copy says "the person who invited you, or a staff member responsible for
- * guiding you" (D-415) — §9 forbids naming the role.
+ * the copy says "your guide" (D-416), defined once on the screen as "the person
+ * who invited you, or a staff member responsible for guiding you" (D-415) —
+ * §9 forbids naming the role.
  *
  * These are i18n keys AND their English source, kept together so a reviewer can
  * read the screen without opening the locale file. The Spanish lives in
@@ -165,10 +166,10 @@ export const TRANSPARENCY_SCREEN: {
   readonly confirm: string;
 } = {
   titleKey: 'transparency.title',
-  title: 'What the person who invited you, or a staff member responsible for guiding you, can see',
+  title: 'What your guide can see',
 
   canSeeHeadingKey: 'transparency.canSee.heading',
-  canSeeHeading: 'They can see:',
+  canSeeHeading: 'Your guide can see:',
   canSee: [
     { key: 'transparency.canSee.goals', en: 'What you said you want to work on' },
     {
@@ -210,7 +211,7 @@ export const TRANSPARENCY_SCREEN: {
   ],
 
   cannotSeeHeadingKey: 'transparency.cannotSee.heading',
-  cannotSeeHeading: 'They cannot see:',
+  cannotSeeHeading: 'Your guide cannot see:',
   cannotSee: [
     { key: 'transparency.cannotSee.messages', en: 'What you say to someone else' },
     { key: 'transparency.cannotSee.buddyFeed', en: 'What you share with your buddies' },
@@ -237,4 +238,45 @@ export const TRANSPARENCY_I18N_KEYS: readonly string[] = [
   ...TRANSPARENCY_SCREEN.cannotSee.map((l) => l.key),
   TRANSPARENCY_SCREEN.footerKey,
   TRANSPARENCY_SCREEN.confirmKey,
+  // The reading aids around the list (D-416).
+  'guide.title',
+  'guide.body',
+  'transparency.summary.title',
+  'transparency.summary.see',
+  'transparency.summary.cannot',
+  'transparency.summary.reported',
+  ...['plans', 'progress', 'people'].map((g) => `transparency.group.${g}`),
+  'copy.section',
+  'copy.done',
+  'copy.failed',
+];
+
+/**
+ * How the "can see" list is chunked on screen (D-416): three groups of three,
+ * each under a small heading, so nine lines are three short lists rather than
+ * one long one. Presentation only — the words of every line are the contract's
+ * and are rendered unchanged, in the contract's own order within a group. A
+ * test holds that every line in `TRANSPARENCY_SCREEN.canSee` is in exactly one
+ * group, so a line added to the contract cannot go missing from the screen.
+ */
+export const TRANSPARENCY_GROUPS: readonly {
+  readonly titleKey: string;
+  readonly keys: readonly string[];
+}[] = [
+  {
+    titleKey: 'transparency.group.plans',
+    keys: ['transparency.canSee.goals', 'transparency.canSee.enrollments', 'transparency.canSee.appointments'],
+  },
+  {
+    titleKey: 'transparency.group.progress',
+    keys: ['transparency.canSee.points', 'transparency.canSee.lastActive', 'transparency.canSee.saves'],
+  },
+  {
+    titleKey: 'transparency.group.people',
+    keys: [
+      'transparency.canSee.connections',
+      'transparency.canSee.flagged',
+      'transparency.canSee.directMessages',
+    ],
+  },
 ];

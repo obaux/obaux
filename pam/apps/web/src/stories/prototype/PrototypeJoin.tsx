@@ -27,6 +27,8 @@ export function PrototypeJoin() {
   // One step on its own (D-319). The phone and code are Sign in's (D-359).
   const step = params?.get('step');
   const startAt: JoinPhase | undefined = step && STEPS.includes(step as JoinPhase) ? (step as JoinPhase) : undefined;
+  // How What Pam shares is drawn: "icons" or "plain" (D-416).
+  const decor = params?.get('decor');
   return (
     <JoinScreen
       preview={{
@@ -34,6 +36,7 @@ export function PrototypeJoin() {
         firstName: NAMES[kind],
         ...(code ? { invite: { code, role: kind, ...(trip ? { trip } : {}) } } : {}),
         ...(startAt ? { startAt } : {}),
+        ...(decor ? { decor } : {}),
       }}
     />
   );

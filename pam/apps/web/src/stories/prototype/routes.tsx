@@ -24,6 +24,7 @@ import RequestsPage from '../../app/requests/page';
 import SavedPage from '../../app/saved/page';
 import { PrototypeSignIn } from './PrototypeSignIn';
 import { PrototypeJoin } from './PrototypeJoin';
+import { PrototypePrivacyPolicy, PrototypeWhatOthersCanSee } from './PrototypeReading';
 import { PrototypeInviteExpired } from './PrototypeInviteExpired';
 import { InviteInUseScreen } from '../../screens/InviteInUseScreen';
 import { InviteAddScreen } from '../../screens/InviteAddScreen';
@@ -84,6 +85,9 @@ export const APP_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   // Joining is the Onboarding stories' own route.
   '/prototype/signin/': screen(() => <PrototypeSignIn />),
   '/prototype/join/': screen(() => <PrototypeJoin />),
+  // The long, important screens in their two looks (D-416).
+  '/prototype/reading/what-others/': screen(() => <PrototypeWhatOthersCanSee />),
+  '/prototype/reading/privacy/': screen(() => <PrototypePrivacyPolicy />),
   // An invite link that has run out (D-258).
   '/invite/expired/': screen(() => <PrototypeInviteExpired />),
   '/invite/in-use/': screen(() => <InviteInUseScreen as="program" from="Dana" />),

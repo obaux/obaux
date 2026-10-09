@@ -458,6 +458,20 @@ no case managers and no assignments, so applying it changes nothing for
 anyone today. A member with no assigned case manager is read by none, and
 there is no screen to assign one (Backlog).
 
+**And (D-416): the long, important screens are easier to read.** "Your guide"
+is the short word for the person who invited you or a staff member responsible
+for guiding you, defined once in a card at the top of the sign-up step,
+Profile › What others can see and the privacy page. Those screens now open
+with a short version, show the "can see" list in three small groups, and
+carry a 48px copy icon on each card that says "Copied" (or what to do if it
+cannot). The privacy page and terms are cards with a row of jump chips. **Two
+looks — with icons and plain — are built for Will to choose** in Storybook ›
+Member › Reading options; the app shows `READING_STYLE` ('plain') until he
+does. The Listen button was skipped. Still open: his read of the short-version
+wording, the same strings in the other languages, and the long phrase in
+Help, the report screens and two notices, which can switch to "your guide"
+once he has chosen.
+
 This is the handover document: what exists, what is proven, what is live, and
 what the next person needs to know before touching anything.
 
@@ -839,6 +853,7 @@ while the copy is unsigned, so it earned the first live test, not the last.*
 | 28 | **A Chromatic project token** | Storybook updating on every push | chromatic.com → sign in with GitHub → link `obaux/obaux` → add the token as the repository secret `CHROMATIC_PROJECT_TOKEN`. The workflow (`pam-storybook.yml`) skips itself until then. |
 | 29 | ~~Where the dock's People and My Plan lead~~ **Answered by the redesign (D-210)** | — | Will, 1 October: the bar is Explore, Saved, Trips, Messages, Profile; Help moves to each screen's header and Profile. Next: his reference screenshots for the other screens, then wiring the redesigned views to routes and data. Walk it in `Prototype/Redesign — member` (D-211). |
 | 30 | ~~Deploy `0071` and `0072`~~ **Done (Will, 4 October)** | — | `list_migrations` first: live ran to `0070`, no live-only drift; `can_message`, `messageable_people` and `open_direct_conversation` matched 0063 exactly, which 0072 was written against. Both applied; `get_advisors` (security) shows no new kind of finding (the definer functions are guarded inside, as every other one is; `invite_preview` and `request_invite_link` are anon on purpose). Spot-checked: `invite_emails` forced RLS with one policy and no anon access; `invites_log` and `staff_request_phone` not callable signed out. See D-264. |
+| 34 | **Choose the reading look; read the short version; translate** | D-416 | Storybook › Member › Reading options: with icons / plain, for the sign-up step, What others can see and the privacy page. Flip `READING_STYLE` (`apps/web/src/lib/readingStyle.ts`) to the one he picks and delete the other. The four short-version lines (`transparency.summary.*`) are Claude's draft of a promise: his word first. Then the long phrase in Help, the report screens and the paused / turned-off notices can say "your guide". Strings to translate in the other languages: `guide.*`, `transparency.summary.*`, `transparency.group.*`, `copy.*`, `transparency.canSee.heading`, `transparency.cannotSee.heading`, `transparency.title`. |
 | 33 | **Apply `0082`; update the language bundles for D-415's wording** | Launch (D-415) | `0082_admin_reaches_assigned_only.sql` is not live (`list_migrations` first; `before-launch.md`). The bundles for pt-BR, zh-CN, zh-HK, ru and ar are not in this repository; a session on `claude/gallant-clarke-0dhizj` appears to be holding them (it is auditing text fit, including a long Russian title) — not pushed, so not readable from here. D-415 lists every changed string. |
 | 32 | **Wire the limited notice, ship the policy, update five languages** | Launch (D-413, D-414) | Will, 9 October: the terms say a limited account can read but not send and a paused one cannot sign in; the transparency line names badges; members are told in the privacy policy (new section "When we limit an account", written — ships when the branch is merged). Left: (1) `terms.s.limits.p3` ("Pam tells you it is off and who to call") is unkept — nothing renders `account_limited` and a refused send says "Your connection dropped"; Will: keep it, on `docs/before-launch.md`; (2) the privacy section's wording is a draft for Will to edit; (3) the six strings (`points.intro`, `terms.s.limits.p2`, `transparency.canSee.points`, `privacy.s.who-can-see.p1`, `admin.seeing.body`, and the new `privacy.s.limits.*`) in pt-BR, zh-CN, zh-HK, ru, ar, which are on no branch of this repository. |
 | 31 | **The before-launch list** | Launch | `docs/before-launch.md` — Will's list of what must be done before real people use PAM. First entry: the email provider for invite links. **0068/0069** are merged as 0075/0076 with 0072's arm kept (D-346); they wait for Will to apply them live. Program sign-up and Add a program are a one-question wizard with a review (D-347); Add a policy is a card (D-348); super admin → program lead message from a place (D-349). |

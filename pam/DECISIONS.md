@@ -9766,3 +9766,87 @@ a text-fit audit that mentions a long Russian title), which is where the
 translations appear to be; nothing from it has been pushed. The strings above
 (plus `terms.s.limits.p2`, `transparency.canSee.points`, `admin.seeing.body`
 and `privacy.s.limits.*`) must change in each bundle when they land.
+
+### D-416 — Easier to read: "your guide", a short version, short groups, a copy icon — in two looks, for Will to choose
+
+**Date:** 2026-10-09. **Decided by:** Will, after looking at the screens (D-415)
+and asking for ways to make them easier for someone new: "Short word is good,
+skip listen button. Go ahead and implement your idea, do one with icons and
+other without, for me to see here and decide."
+
+**Why.** The sign-up step, Profile › What others can see, and the privacy page
+asked a new member to take in a lot as undifferentiated text: nine lines in one
+list, "They" never defined, the case manager's full description repeated eleven
+times, a ~3,500px page under a nine-row contents list that pushed the first
+answer below the fold.
+
+**What was built.**
+
+- **"Your guide"** — the short word for "the person who invited you, or a staff
+  member responsible for guiding you", defined once in a card at the top
+  (`guide.title`, `guide.body`) of the sign-up step, Profile › What others can
+  see, and the privacy page. Because "They can see:" had no antecedent, the
+  contract's two headings are now "Your guide can see:" / "Your guide cannot
+  see:" (`transparency.ts`, en + es) and the unused contract title is "What
+  your guide can see". On the privacy page `who-can-see.p1` and `limits.p1`
+  now say "Your guide".
+- **The short version** — four lines in a card before the detail
+  (`transparency.summary.*`; the call line is the privacy page's own
+  `privacy.s.contact.p1`). Each is a true subset of the contract. **Claude's
+  draft wording, for Will to read** — it is a new member-facing promise.
+- **Short groups** — the nine "can see" lines are three groups of three (your
+  plans, your progress, your people and messages). `TRANSPARENCY_GROUPS` is in
+  the contract file and a test holds every contract line in exactly one group,
+  so a line added to the contract cannot go missing from the screen. The words
+  of every line are unchanged; a line that says two things is split at the full
+  stop into a lead and a grey line, every word kept, in order.
+- **A copy icon**, top right of each card (`@pam/ui/CopyButton`): a 22px glyph
+  in a 48px button (it acts, so it keeps the floor; measured 48 × 48 in the
+  browser). Tapped, the icon becomes a green tick and a pale-green pill under
+  it says "Copied" for 3 seconds; if the clipboard refuses it says "Could not
+  copy. Press and hold the text to copy it." for 6. The status sits in a
+  `role="status"` live region that is in the page before anything is said, so
+  it is announced; the icon changes shape (not only colour); the pill does not
+  fade under reduced motion. What it copies is the card's text plus a source
+  line ("Pam — What others can see", or the policy's title and "Last updated"),
+  so a pasted line can be traced. `copyLink`/`COPIED_MS` moved to `clipboard.ts`
+  (BringFriend re-exports them), so the button does not bundle the drawer.
+- **Policy and terms pages** (`LegalPage`): sections are cards with a copy icon;
+  the nine-row contents list is a row of 48px jump chips (the first answer is
+  now on the first screen); the privacy page opens with the guide card.
+- **Reading cards** (`@pam/ui/Reading`): `ReadCard`, `GuideCard`, `SummaryCard`,
+  `FactGroup`, `FactRow`, each taking `decor`.
+
+**Two looks.** `decor="icons"`: a round icon on each card and a tick or cross
+on each row. `decor="plain"`: words only, a coloured edge in place of an icon,
+hairlines between rows. Both say everything in words; every icon is
+`aria-hidden`. Storybook › Member › **Reading options** has the three screens
+in both. `READING_STYLE` in `apps/web/src/lib/readingStyle.ts` picks what the
+app shows; it is **'plain'** until Will chooses (flip one line, then delete the
+other look if wanted).
+
+**Skipped on purpose.** The Listen (read aloud) button (Will).
+
+**Not changed, on purpose.** The long phrase still stands in Help › What we can
+help with, the report screens, and the paused / turned-off notices
+(D-415): those screens have no guide card to define the short word. Once Will
+picks a look and "your guide" is settled, they can switch to it.
+
+**Tested.** `@pam/ui` 81 tests (7 new: the copy icon says "Copied", says what to
+do when refused and stays longer, keeps a live region in the page; the cards
+have no structural axe violations in either look and draw icons only in
+`icons`). `@pam/config` 242 (4 new: the grouping covers the contract, groups
+are at most four, every key exists in both languages, "your guide" is defined).
+Storybook builds; the six comparison stories and the copy states were
+photographed at 390px (a "Copied" state with the pill, both looks).
+
+**Not run.** The Playwright a11y suite (contrast and target size across the real
+routes) and the first-load budget check: neither was run. The new components
+load only on the join, legal and privacy routes, and four icons were added to
+the barrel.
+
+**Not done.** The terms page has no guide card (it does not use the word). The
+other languages are not in this repository: every string added here
+(`guide.*`, `transparency.summary.*`, `transparency.group.*`, `copy.*`) and the
+two headings must be translated in each bundle when they land. Spanish is
+Claude's draft. A reviewed wording of the short version is still open.

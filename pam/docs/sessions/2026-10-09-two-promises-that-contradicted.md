@@ -53,6 +53,14 @@ decided.
   audit: fixing About tabs and long Russian title") appears to hold them;
   nothing from it is pushed, so they cannot be read from here.
 
+- **Reading experience (D-416).** Will asked for ways to make the long screens
+  easier for someone who knows nothing, then: "Short word is good, skip listen
+  button. Go ahead and implement … one with icons and other without." Built
+  "your guide" (defined once), a short version, three groups, a 48px copy
+  icon with a status pill, jump chips and cards on the policy pages, in two
+  looks (`icons`, `plain`), each photographed at 390px. The app shows `plain`
+  until Will chooses.
+
 ## What was wrong, and what missed it
 
 Nothing in the code was wrong; the *copy* made promises the rest of the system
@@ -73,6 +81,8 @@ and side by side.
   "in their list" was corrected the same day by D-415.)
 - D-415 — a case manager reaches only the people assigned to them (0082,
   A22); member copy adds "or a staff member responsible for guiding you".
+- D-416 — "your guide", a short version, groups and a copy icon on the long
+  screens, in two looks for Will to choose.
 
 ## Verified
 
@@ -87,9 +97,12 @@ and side by side.
 | `pnpm --filter @pam/db test`, baseline before 0082 | 420 checks, 0 failures |
 | `pnpm --filter @pam/db test`, with 0082 | **440 checks, 0 failures** |
 | Same suite with 0082 moved aside | Fails at `17_assigned_only_test.sql` ("Dana cannot read Tanya…"), so the tests bite |
-| `pnpm --filter @pam/config test` | 238 pass |
+| `pnpm --filter @pam/config test` | 242 pass (4 new for the grouping) |
+| `pnpm --filter @pam/ui test` | 81 pass (7 new: copy status, live region, axe in both looks) |
+| `pnpm --filter @pam/web build-storybook` | builds; the three screens in both looks and the "Copied" state photographed at 390px |
+| Copy button size in the browser | 48 × 48 px |
 | `pnpm -r typecheck` | 5/5 packages clean |
-| Not run | Playwright / Storybook: only strings changed; the two longest are a screen title and a Help row |
+| Not run | The Playwright a11y suite (real routes: contrast, target size) and the first-load budget check, after D-416 |
 
 ## Left undone
 
@@ -104,8 +117,11 @@ and side by side.
   0079–0081.
 - There is no way to assign a case manager to a member (STATUS backlog), and
   since 0082 a member with none is read by no case manager.
-- The longest new strings (`transparency.title`, `help.what.person`) have not
-  been seen on a phone.
+- D-416: Will to choose the icons or plain look (STATUS row 34) and to read the
+  short-version wording; the long phrase remains in Help, the report screens
+  and two notices.
+- The Playwright a11y suite and the first-load budget check were not run after
+  D-416.
 - Nothing re-shows the privacy policy or the transparency screen to an account
   that already agreed; `transparency_ack_at` is set once.
 - pt-BR, zh-CN, zh-HK, ru, ar are on no branch of this repository (checked on

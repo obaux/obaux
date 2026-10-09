@@ -1,17 +1,36 @@
 'use client';
 
-import { Suspense, useEffect, useRef, useState } from 'react';
+import { Suspense, useEffect, useRef, useState, type ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { VStack } from '@astryxdesign/core/VStack';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { Button } from '@astryxdesign/core/Button';
-import { Page, TextLink } from '@pam/ui';
+import {
+  AwardIcon,
+  BookIcon,
+  ClockIcon,
+  EyeIcon,
+  FlagIcon,
+  InfoIcon,
+  MeIcon,
+  MessagesIcon,
+  Page,
+  PeopleIcon,
+  PhoneIcon,
+  PlacesIcon,
+  SettingsIcon,
+  ShareIcon,
+  ShieldIcon,
+  TextLink,
+} from '@pam/ui';
+import { GuideCard, ReadCard, type Decor } from '@pam/ui/Reading';
 import { SubPageHeader } from '@pam/ui/SubPage';
 import type { LegalDocument } from '@pam/config';
 import { useSearchParams } from 'next/navigation';
 import { useI18n } from '@/lib/i18n';
 import { goBack } from '@/lib/navigate';
+import { READING_STYLE } from '@/lib/readingStyle';
 
 /**
  * A long page somebody can actually find their way around.
@@ -33,20 +52,39 @@ const styles = stylex.create({
   intro: { fontSize: '18px', lineHeight: 1.5 },
   updated: { fontSize: '15px' },
   tocHeading: { fontSize: '15px', textTransform: 'uppercase', letterSpacing: '0.06em' },
-  toc: { width: '100%', paddingInline: 0, marginBlock: 0, listStyle: 'none' },
-  tocItem: { marginBlock: '2px' },
+  // A row of jump chips instead of nine stacked rows (D-416): the first answer
+  // is on the first screen, and the row scrolls sideways to the edge of the page.
+  toc: {
+    display: 'flex',
+    flexDirection: 'row',
+    gap: '8px',
+    overflowX: 'auto',
+    listStyle: 'none',
+    marginBlock: 0,
+    marginInline: '-16px',
+    paddingInline: '16px',
+    paddingBlockEnd: '4px',
+    scrollbarWidth: 'none',
+    scrollSnapType: 'x proximity',
+    // Snap to the padding, not the edge: the first chip keeps its 16px.
+    scrollPaddingInline: '16px',
+  },
+  tocItem: { flexShrink: 0, scrollSnapAlign: 'start' },
   tocLink: {
     display: 'flex',
     alignItems: 'center',
     minHeight: '48px',
-    paddingInline: '12px',
-    borderRadius: '8px',
+    paddingInline: '18px',
+    borderRadius: '24px',
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    borderColor: 'rgba(127, 127, 127, 0.35)',
     fontSize: '17px',
-    lineHeight: 1.3,
-    textAlign: 'start',
+    lineHeight: 1.2,
+    whiteSpace: 'nowrap',
     textDecoration: 'none',
     color: 'inherit',
-    // The reading position, shown as a filled row rather than a colour change:
+    // The reading position, shown as a filled chip rather than a colour change:
     // a colour alone would be the only signal, and one in ten men cannot rely
     // on it. §12 also wants AA contrast, which a tint of the page ground keeps.
     backgroundColor: { default: 'transparent', ':hover': 'rgba(127, 127, 127, 0.12)' },
@@ -57,7 +95,27 @@ const styles = stylex.create({
   body: { fontSize: '18px', lineHeight: 1.6 },
 });
 
-export function LegalPage({ doc }: { doc: LegalDocument }) {
+/** The small icon on each card, in the "icons" look (D-416). */
+const SECTION_ICONS: Record<string, ReactNode> = {
+  'what-we-keep': <BookIcon />,
+  'who-can-see': <EyeIcon />,
+  limits: <FlagIcon />,
+  texts: <MessagesIcon />,
+  'never-say': <ShieldIcon />,
+  sharing: <ShareIcon />,
+  'how-long': <ClockIcon />,
+  'your-choices': <SettingsIcon />,
+  contact: <PhoneIcon />,
+  'what-pam-is': <InfoIcon />,
+  emergencies: <PhoneIcon />,
+  'your-account': <MeIcon />,
+  'being-decent': <PeopleIcon />,
+  programs: <PlacesIcon />,
+  points: <AwardIcon />,
+  changes: <ClockIcon />,
+};
+
+export function LegalPage({ doc, decor = READING_STYLE }: { doc: LegalDocument; decor?: Decor }) {
   const { t } = useI18n();
   const [here, setHere] = useState<string | null>(doc.sections[0]?.id ?? null);
   const endRef = useRef<HTMLDivElement | null>(null);
@@ -142,6 +200,11 @@ export function LegalPage({ doc }: { doc: LegalDocument }) {
           {t(doc.updatedKey)}
         </Text>
 
+        {/* Who "your guide" is, said once, before the page says "your guide" (D-416). */}
+        {doc.id === 'privacy' ? (
+          <GuideCard title={t('guide.title')} body={t('guide.body')} decor={decor} icon={<PeopleIcon />} />
+        ) : null}
+
         <nav aria-label={t('legal.toc')}>
           <VStack gap={1}>
             <Text type="supporting" xstyle={styles.tocHeading}>
@@ -168,20 +231,34 @@ export function LegalPage({ doc }: { doc: LegalDocument }) {
           </VStack>
         </nav>
 
-        {doc.sections.map((section) => (
-          <section key={section.id} id={section.id} {...stylex.props(styles.section)}>
-            <VStack gap={2}>
-              <Heading level={2} xstyle={styles.sectionTitle}>
-                {t(section.titleKey)}
-              </Heading>
-              {section.bodyKeys.map((key) => (
-                <Text key={key} xstyle={styles.body}>
-                  {t(key)}
-                </Text>
-              ))}
-            </VStack>
-          </section>
-        ))}
+        {doc.sections.map((section) => {
+          const title = t(section.titleKey);
+          const paragraphs = section.bodyKeys.map((key) => t(key));
+          return (
+            <section key={section.id} id={section.id} {...stylex.props(styles.section)}>
+              <ReadCard
+                title={title}
+                decor={decor}
+                icon={SECTION_ICONS[section.id]}
+                copy={{
+                  // The section, then where it came from, so a pasted line can be traced.
+                  text: [title, '', ...paragraphs.flatMap((p) => [p, '']), `Pam — ${t(doc.titleKey)}. ${t(doc.updatedKey)}`].join('\n'),
+                  label: t('copy.section'),
+                  copiedLabel: t('copy.done'),
+                  failedLabel: t('copy.failed'),
+                }}
+              >
+                <VStack gap={2}>
+                  {paragraphs.map((text, i) => (
+                    <Text key={section.bodyKeys[i]} xstyle={styles.body}>
+                      {text}
+                    </Text>
+                  ))}
+                </VStack>
+              </ReadCard>
+            </section>
+          );
+        })}
 
         <div ref={endRef} aria-hidden="true" />
 
