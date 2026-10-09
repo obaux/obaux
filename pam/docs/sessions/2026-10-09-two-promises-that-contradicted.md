@@ -41,7 +41,7 @@ decided.
   app shows it. `admin_covers()` lost its same-city arm: migration
   `0082_admin_reaches_assigned_only.sql`, SOP amendment A22, a new DB test file
   (`17_assigned_only_test.sql`), and one changed assertion in
-  `02_rls_test.sql`. **Written and tested, not applied to the live project.**
+  `02_rls_test.sql`. **Applied to the live project later the same day (Will, D-420).**
 - **Member copy (D-415).** Will: add "or a staff responsible to guiding you"
   to describe the case manager. Eleven strings now read "the person who
   invited you, or a staff member responsible for guiding you" (en + es,
@@ -106,7 +106,7 @@ and side by side.
 | Live: `open_direct_conversation` body | Contains `is_active_account` |
 | Live: `points_ledger` / `member_badges` policies | Own, `admin_covers`; badges also buddies; no program policy |
 | Live: accounts | 1 super admin, 2 members; 0 case managers; 0 active assignments |
-| Live: `admin_covers()` | Still has the city arm (0082 not applied) |
+| Live: `admin_covers()` | Had the city arm before 0082; after applying it (D-420) it reads `admin_assignments` only, no region, still security definer with `search_path = public, extensions`, grants unchanged |
 | `pnpm --filter @pam/db test`, baseline before 0082 | 420 checks, 0 failures |
 | `pnpm --filter @pam/db test`, with 0082 | **440 checks, 0 failures** |
 | Same suite with 0082 moved aside | Fails at `17_assigned_only_test.sql` ("Dana cannot read Tanya…"), so the tests bite |
@@ -127,9 +127,9 @@ and side by side.
   as its own item; not built.
 - The privacy section's wording ("A person who has you on their list in Pam
   can limit or pause…") is Claude's draft of Will's decision; he should read it.
-- `0082` is not applied to the live project (`docs/before-launch.md`).
-  `list_migrations` first. It numbers 0082 because both unmerged branches use
-  0079–0081.
+- `0082` was applied to the live project on 9 October (D-420) — `list_migrations`
+  first showed no drift. It numbers 0082 because both unmerged branches use
+  0079–0081, so the live ledger has a gap there until those land.
 - There is no way to assign a case manager to a member (STATUS backlog), and
   since 0082 a member with none is read by no case manager.
 - D-416/D-417: Will to read the short-version wording (STATUS row 34); the long
@@ -148,5 +148,4 @@ and side by side.
 
 ## Needs a human
 
-- Will: apply `0082` (or ask for it to be applied); read the new privacy
-  section; get the translations pushed from the `gallant-clarke` session.
+- Will: read the new privacy section; get the translations pushed from the `gallant-clarke` session.

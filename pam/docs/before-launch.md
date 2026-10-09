@@ -76,10 +76,10 @@ STATUS row too.
   re-shows the policy to an account that already agreed (`transparency_ack_at`
   is set once); decide if that matters before the first real member.
 
-- [ ] **Apply migration 0082 to the live project** (Will, 9 October 2026,
+- [x] **Apply migration 0082 to the live project** — **done 9 October 2026
+  (Will, D-420)**, together with the merge to `main`. (Will, 9 October 2026,
   D-415: a case manager reaches only the people assigned to them). Written
-  and tested (DB suite 440 checks, 0 failures; fails without it), **not
-  applied**. The member copy already promises it ("the person who invited you,
+  and tested (DB suite 440 checks, 0 failures; fails without it). The member copy already promises it ("the person who invited you,
   or a staff member responsible for guiding you"), so the live database must
   match before launch. First run `list_migrations` and diff against
   `packages/db/migrations/`; the file is one `create or replace function` plus

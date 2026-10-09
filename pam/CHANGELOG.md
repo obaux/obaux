@@ -19,10 +19,10 @@ last updated on 9 October 2026 (D-414).
 
 A case manager will see only the people assigned to them, not everyone in
 their city, so what they can see of your points, badges and the rest is
-limited to a case manager you have been given. This takes effect when
-migration 0082 is applied to the live database; it is written and tested but
-not yet applied. Wherever Pam describes that person it now says "the person
-who invited you, or a staff member responsible for guiding you" (D-415).
+limited to a case manager you have been given. This is live: the database
+change (migration 0082) was applied on 9 October (D-420). Wherever Pam describes
+that person it now says "the person who invited you, or a staff member
+responsible for guiding you" (D-415).
 
 The screens that explain what the person guiding you can see are easier to
 read. They name "your guide" once, at the top, then say it in short: a short

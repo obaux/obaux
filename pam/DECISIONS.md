@@ -9734,8 +9734,8 @@ unassigned member in their own region" now expects 0. **440 checks, 0 failures**
 (was 420); the new file fails without 0082 (run, 9 October). No other test
 depended on the city arm.
 
-**Not applied to the live project.** The file is written and tested, not
-deployed: it changes who can read members on a database the live app uses, and
+**(Applied 9 October: D-420.) Not applied to the live project when this was
+written.** The file was written and tested, not deployed: it changes who can read members on a database the live app uses, and
 Will has applied migrations himself each time. `docs/before-launch.md` has the
 item, with the `list_migrations` check first. It is numbered 0082 because
 both unmerged branches use 0079–0081. Checked on the live project on 9
@@ -10002,4 +10002,36 @@ paragraphs are 16px apart (was 8px); each section starts 24px lower than the pag
 own gap (so about 40px between one section's last line and the next heading); the
 tab row starts 16px lower, under the guide card. `apps/web/src/components/
 LegalPage.tsx` only; no copy changed.
+
+### D-420 — 0082 applied to the live project, and the branch merged to `main`
+
+**Date:** 2026-10-09. **Decided by:** Will: "Migrate and proceed to merge."
+
+**The migration.** Before applying, `list_migrations` against the live project
+(`shobqzuhicoiymtumiaz`) and `packages/db/migrations/`: live ended at 0078, exactly
+the repo's through 0078, with no live-only migration and no local, committed,
+undeployed one other than 0082 itself (0079–0081 belong to the two unmerged
+branches and are not on this one). `0082_admin_reaches_assigned_only.sql` was
+applied with `apply_migration` (recorded as version `20261009064534`, name
+`0082_admin_reaches_assigned_only`): one `create or replace function` and a
+comment, so no `DROP` approval gate. **Checked after:** `admin_covers` no longer
+mentions the region, reads `admin_assignments`, is still `security definer` with
+`search_path = public, extensions`, and keeps its `anon` and `authenticated`
+execute grants (the `anon` one is 0012's, deliberate: it returns false for anyone
+who is not a case manager); `get_advisors` (security) lists only the by-design
+SECURITY DEFINER class and the leaked-password-protection warning, nothing new. The
+live project had one super admin, two members, no case managers and no active
+assignments, so no account saw anything change.
+
+**The merge.** `claude/affectionate-goldberg-tvu4sz` into `main`, fast-forward (`main`
+was the branch's base; 15 commits at the time of the check, since several more). It
+carries D-412 to D-420: the Points sentence, the messages promise and the terms and
+privacy wording, who may limit someone and read points, "your guide" and the reading
+screens, the 16px body rule (A23), and 0082. **`main` deploys to Vercel**, so the
+app now shows all of it. **Not merged, and now behind `main`:**
+`claude/pam-storybook` (D-411, migrations 0079–0081) and
+`claude/gallant-clarke-0dhizj` (D-403, 0079–0080) both edit `es.json`,
+`transparency.ts`, `STATUS.md`, `DECISIONS.md` and `CHANGELOG.md`; whoever merges them
+next resolves those conflicts (and renumbers: their D-numbers and 0079–0081 do not
+collide with D-412–D-420 or 0082, but the changelog versions will need ordering).
 
