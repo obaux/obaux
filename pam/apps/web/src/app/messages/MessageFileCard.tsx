@@ -83,7 +83,7 @@ export function MessageFileCard({
   readonly file: MessageFile;
   readonly localUrl?: string | null;
 }) {
-  const { t } = useI18n();
+  const { t, tPlain } = useI18n();
   const [fetched, setFetched] = useState<string | null>(localUrl);
   const [state, setState] = useState<'idle' | 'opening' | 'failed'>('idle');
 
@@ -105,7 +105,7 @@ export function MessageFileCard({
 
   return (
     <ClickableCard
-      label={t('messages.file.open', { name: file.name })}
+      label={tPlain('messages.file.open', { name: file.name })}
       onClick={() => void open()}
       padding={3}
       xstyle={styles.card}
@@ -138,11 +138,11 @@ export function GoogleLinkCard({
   readonly url: string;
   readonly kind: GoogleLinkKind;
 }) {
-  const { t } = useI18n();
+  const { t, tPlain } = useI18n();
   const title = t(GOOGLE_TITLE[kind]);
   return (
     <ClickableCard
-      label={t('messages.google.open', { what: title })}
+      label={tPlain('messages.google.open', { what: title })}
       href={url}
       target="_blank"
       padding={3}

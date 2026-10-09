@@ -1,6 +1,7 @@
 import * as stylex from '@stylexjs/stylex';
 import { Button } from '@astryxdesign/core/Button';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
+import { splitIsolated } from '@pam/config';
 import { EditIcon } from './icons.js';
 import { pam } from './tokens.stylex.js';
 
@@ -28,6 +29,15 @@ import { pam } from './tokens.stylex.js';
  * The visible text is the area name; the accessible name is the fuller
  * sentence ("Change the area: Near City Hall"), so a screen reader hears what
  * the button does, not just where it currently reads from.
+ *
+ * **In Arabic the address is a box of its own** (D-435). `t` lays a value out
+ * as a piece by wrapping it in isolates, so "بالقرب من 1231 N Broad St" reads
+ * in order — but a line that is too long is cut at its edge, which in a
+ * right-to-left line is the left, and the left of an English address is its
+ * street number. So when the label has a value in it, the words keep their
+ * width and the value gets the rest and ends in its own ellipsis: what is lost
+ * is the end of the address, as in English. A label with no isolates in it
+ * (every other language) is drawn as it always was.
  */
 export interface AreaChipProps {
   /** The area, already localised and short, e.g. "Near 19122". */
@@ -59,7 +69,33 @@ const styles = stylex.create({
     textDecorationLine: { default: 'none', ':hover': 'underline' },
     textUnderlineOffset: '4px',
   },
+  // The words and the value, side by side in the reading direction.
+  sentence: { display: 'flex', alignItems: 'baseline', minWidth: 0 },
+  words: { flexShrink: 0, whiteSpace: 'pre' },
+  value: { minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
 });
+
+/** The label, with each value in it laid out as a box of its own; as it is when it holds none. */
+function Sentence({ label }: { readonly label: string }) {
+  const pieces = splitIsolated(label);
+  if (!pieces.some((piece) => piece.isValue)) return <>{label}</>;
+  return (
+    <span {...stylex.props(styles.sentence)}>
+      {pieces.map((piece, index) =>
+        piece.isValue ? (
+          // `auto`: it runs the way its own first letter reads, so an English address is cut at its end.
+          <span key={index} dir="auto" {...stylex.props(styles.value)}>
+            {piece.text}
+          </span>
+        ) : (
+          <span key={index} {...stylex.props(styles.words)}>
+            {piece.text}
+          </span>
+        ),
+      )}
+    </span>
+  );
+}
 
 export function AreaChip({ label, changeLabel, onChange }: AreaChipProps) {
   return (
@@ -70,7 +106,7 @@ export function AreaChip({ label, changeLabel, onChange }: AreaChipProps) {
       endContent={<EditIcon />}
       xstyle={styles.area}
     >
-      {label}
+      <Sentence label={label} />
     </Button>
   );
 }

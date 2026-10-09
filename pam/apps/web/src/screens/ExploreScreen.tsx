@@ -96,7 +96,7 @@ const TRIP_ICONS = {
  * top right, Add a program (case managers and program leads both can).
  */
 export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'programs' } = {}) {
-  const { t, locale } = useI18n();
+  const { t, tPlain, locale } = useI18n();
   const router = useRouter();
   const supportPhone = useSupportPhone();
   const { state: session } = useSession();
@@ -238,7 +238,7 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
             title={t('explore.nextTrip.title')}
             when={tripWhen(nextTrip.startsAt, locale)}
             href="/trips/"
-            label={t('explore.nextTrip.label', {
+            label={tPlain('explore.nextTrip.label', {
               kind: t(categoryLabelKey(nextTrip.category)),
               when: tripWhen(nextTrip.startsAt, locale),
             })}

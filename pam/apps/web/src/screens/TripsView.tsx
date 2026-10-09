@@ -123,7 +123,7 @@ const styles = stylex.create({
 const PIN_ART = { width: 20, height: 20, 'aria-hidden': true } as const;
 
 export function TripsView({ trips, headerActions, justAdded = null }: TripsViewProps) {
-  const { t, locale } = useI18n();
+  const { t, tPlain, locale } = useI18n();
   const shown = trips;
   // Bring the new trip into view once the drawer has opened.
   const arrive = (el: HTMLElement | null) => {
@@ -247,7 +247,7 @@ export function TripsView({ trips, headerActions, justAdded = null }: TripsViewP
                       : { label: t('trips.policies.needed'), isDone: false }
                     : null
                 }
-                label={t('trips.card.label', {
+                label={tPlain('trips.card.label', {
                   place: trip.placeName,
                   when: when(trip.startsAt),
                   name: trip.withName ?? '',

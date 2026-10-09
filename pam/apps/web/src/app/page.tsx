@@ -74,7 +74,7 @@ const styles = stylex.create({
 });
 
 export default function HomePage() {
-  const { t } = useI18n();
+  const { t, tPlain } = useI18n();
   const router = useRouter();
   const supportPhone = useSupportPhone();
   const { state: session } = useSession();
@@ -251,7 +251,7 @@ export default function HomePage() {
               value={viewed}
               ownValue={me.role}
               label={t('view.switch')}
-              viewingLabel={(roleLabel) => t('view.as', { role: roleLabel })}
+              viewingLabel={(roleLabel) => tPlain('view.as', { role: roleLabel })}
               options={ROLES.map((role) => ({ value: role, label: t(`role.${role}`) }))}
               onChange={(next) => setViewAs(next as typeof me.role)}
             />
@@ -321,7 +321,7 @@ export default function HomePage() {
               href: `/place/?id=${encodeURIComponent(place.id)}&from=home`,
             }))}
             label={t('saved.title')}
-            removeLabel={(name) => t('saved.remove', { name })}
+            removeLabel={(name) => tPlain('saved.remove', { name })}
             onRemove={(id) => void unsave(id)}
           />
         </VStack>
@@ -442,7 +442,7 @@ export default function HomePage() {
             label={t('messages.title')}
             description={t('home.go.messages')}
             count={unreadMessages}
-            alertLabel={unreadMessages > 0 ? t('notify.unread', { count: unreadMessages }) : undefined}
+            alertLabel={unreadMessages > 0 ? tPlain('notify.unread', { count: unreadMessages }) : undefined}
           />
         ) : null}
 

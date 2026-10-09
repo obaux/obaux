@@ -133,8 +133,22 @@ interface I18nValue {
    * A missing key falls back to English, then to the key itself: on a screen a
    * member is trying to get through, a visible `onboarding.name.title` is a
    * bug report, while a blank space is a dead end.
+   *
+   * **In a right-to-left language each text value is wrapped in invisible
+   * isolates** (D-435), so an English name or address inside an Arabic sentence
+   * is laid out as its own piece instead of being pulled apart by it. Use `t`
+   * for text that is drawn, and `tPlain` for anything that is not.
    */
   t: (key: string, vars?: Record<string, string | number>) => string;
+  /**
+   * `t` with nothing added, in every language: for text that is not read off
+   * the screen, where an invisible character would be a bug. An `aria-label`
+   * (a screen reader speaks it; it has no layout to protect), the text handed
+   * to a share sheet or the clipboard, a string that code compares. Anything
+   * built from a `t` result and then given to one of those has to be built from
+   * `tPlain` all the way, or the isolates travel inside it.
+   */
+  tPlain: (key: string, vars?: Record<string, string | number>) => string;
   /** Switches the active locale and remembers it in this browser. */
   setLocale: (next: Locale) => void;
 }
@@ -240,13 +254,19 @@ export function I18nProvider({ children, bundles, initialLocale }: I18nProviderP
   }, [active.locale]);
 
   const value = useMemo<I18nValue>(
-    () => ({
-      locale: active.locale,
-      pendingLocale,
-      dir: directionOf(active.locale),
-      setLocale,
-      t: (key, vars) => fillTemplate(pickTemplate(active.locale, active.bundle, en, key, vars), vars),
-    }),
+    () => {
+      const dir = directionOf(active.locale);
+      const template = (key: string, vars?: Record<string, string | number>) =>
+        pickTemplate(active.locale, active.bundle, en, key, vars);
+      return {
+        locale: active.locale,
+        pendingLocale,
+        dir,
+        setLocale,
+        t: (key, vars) => fillTemplate(template(key, vars), vars, dir),
+        tPlain: (key, vars) => fillTemplate(template(key, vars), vars),
+      };
+    },
     [active, pendingLocale, setLocale],
   );
 

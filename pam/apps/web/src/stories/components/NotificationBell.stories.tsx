@@ -10,12 +10,13 @@ import { useStoryText } from '../support/useStoryText';
  */
 function LocalisedBell({ label, unreadLabel, unreadCount, href }: NotificationBellProps) {
   const tr = useStoryText();
+  const plain = useStoryText({ plain: true });
   return (
     <NotificationBell
       href={href}
       label={tr(label)}
       unreadCount={unreadCount}
-      unreadLabel={tr(unreadLabel ?? `notify.unread?count=${unreadCount}`)}
+      unreadLabel={plain(unreadLabel ?? `notify.unread?count=${unreadCount}`)}
     />
   );
 }

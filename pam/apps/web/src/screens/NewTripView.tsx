@@ -178,7 +178,7 @@ export function NewTripView({
    */
   readonly changing?: string | null;
 }) {
-  const { t, locale } = useI18n();
+  const { t, tPlain, locale } = useI18n();
   const router = useRouter();
   const places = useMemo(() => Object.values(DUMMY_PLACES_BY_ID), []);
   const { forPlace } = useServices();
@@ -369,7 +369,7 @@ export function NewTripView({
           copiedLabel={t('friend.copied')}
           closeLabel={t('friend.close')}
           shareLabel={t('friend.share')}
-          shareText={t('friend.share.message', {
+          shareText={tPlain('friend.share.message', {
             place: place.name,
             when: `${dayLong.format(confirmed.at)}, ${timeFmt.format(confirmed.at)}`,
             link: friendLink(place.id, confirmed.at.toISOString()),

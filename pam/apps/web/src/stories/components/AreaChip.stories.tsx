@@ -13,8 +13,10 @@ import { useStoryText } from '../support/useStoryText';
  */
 function LocalisedChip({ label, onChange }: AreaChipProps) {
   const tr = useStoryText();
-  const near = tr(label);
-  return <AreaChip label={near} changeLabel={tr(`places.changeArea?area=${near}`)} onChange={onChange} />;
+  // The accessible name is what a screen reader is given, so it is built from
+  // the plain text, as the app does (D-435): no isolates in Arabic.
+  const plain = useStoryText({ plain: true });
+  return <AreaChip label={tr(label)} changeLabel={plain(`places.changeArea?area=${plain(label)}`)} onChange={onChange} />;
 }
 
 const meta = {
@@ -45,3 +47,12 @@ export const NearHome: Story = { args: { label: 'places.nearHome' } };
 export const LongAddress: Story = { args: { label: 'places.near?area=1231 N Broad St, North Philadelphia' } };
 
 export const Spanish: Story = { ...LongAddress, globals: { locale: 'es' } };
+
+/**
+ * The same address in Arabic (D-435). An English address inside an Arabic
+ * sentence is laid out as a piece of its own, so it reads in order — "1231 N
+ * Broad St, North Philadelphia", left to right, beside "بالقرب من" — and a
+ * line too long for the chip loses the end of the address, as in English,
+ * rather than its street number.
+ */
+export const Arabic: Story = { ...LongAddress, globals: { locale: 'ar' } };

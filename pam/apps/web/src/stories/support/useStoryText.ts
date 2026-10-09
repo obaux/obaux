@@ -18,6 +18,10 @@ import { intlLocale } from '@pam/config';
  * `place.openUntil?time=17:00`, `places.miles?count=1.2`. A `HH:MM` value is
  * formatted as a time and a number as a number, both in the current locale,
  * so Spanish reads "17:00" and "1,2" where English reads "5:00 PM" and "1.2".
+ *
+ * `{ plain: true }` is for a prop the app fills with `tPlain` — an accessible
+ * name, text for a share sheet — so the story hands the component what the
+ * app does, with no invisible isolates in Arabic (D-435).
  */
 const KEY = /^[a-z][\w-]*(\.[\w-]+)+$/i;
 const TIME = /^\d{1,2}:\d{2}$/;
@@ -28,8 +32,9 @@ export type StoryText = {
   (value: string | null | undefined): string | null | undefined;
 };
 
-export function useStoryText(): StoryText {
-  const { t, locale } = useI18n();
+export function useStoryText(options?: { readonly plain?: boolean }): StoryText {
+  const { t: display, tPlain, locale } = useI18n();
+  const t = options?.plain ? tPlain : display;
   return useCallback(
     ((value: string | null | undefined) => {
       if (value == null) return value;

@@ -14,12 +14,13 @@ import { useStoryText } from '../support/useStoryText';
  */
 function LocalisedStrip({ places, label, onRemove }: SavedStripProps) {
   const tr = useStoryText();
+  const plain = useStoryText({ plain: true });
   const [shown, setShown] = useState(places);
   return (
     <SavedStrip
       places={shown.map((place) => ({ ...place, categoryLabel: tr(place.categoryLabel) }))}
       label={tr(label)}
-      removeLabel={(name) => tr(`saved.remove?name=${name}`)}
+      removeLabel={(name) => plain(`saved.remove?name=${name}`)}
       onRemove={(id) => {
         setShown((current) => current.filter((place) => place.id !== id));
         onRemove(id);

@@ -212,7 +212,7 @@ function useServiceDetail(id: string | null): State {
 }
 
 function PlaceScreen() {
-  const { t, locale } = useI18n();
+  const { t, tPlain, locale } = useI18n();
   const supportPhone = useSupportPhone();
   const params = useSearchParams();
   const id = params.get('id');
@@ -455,7 +455,7 @@ function PlaceScreen() {
               name={staff.firstName}
               title={t('staff.title.provider')}
               photoUrl={staff.photoUrl}
-              label={t('staff.label', { name: staff.firstName, title: t('staff.title.provider') })}
+              label={tPlain('staff.label', { name: staff.firstName, title: t('staff.title.provider') })}
             />
           ) : null
         }

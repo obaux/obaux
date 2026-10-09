@@ -56,13 +56,13 @@ export function InviteReady({
   /** Inside a card already (the directory): the content without its own. */
   readonly isBare?: boolean;
 }) {
-  const { t, locale } = useI18n();
+  const { t, tPlain, locale } = useI18n();
   const [copied, setCopied] = useState(false);
   const url = inviteLink(invite.code, invite.role);
   const date = new Intl.DateTimeFormat(intlLocale(locale), { month: 'long', day: 'numeric' }).format(new Date(invite.expiresAt));
 
   const send = async () => {
-    const text = t('invite.link.message', { url });
+    const text = tPlain('invite.link.message', { url });
     // The share sheet, in the app too (D-350); with none, copy instead.
     if (await shareText(text)) return;
     try {

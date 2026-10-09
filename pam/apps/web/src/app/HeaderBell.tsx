@@ -53,7 +53,7 @@ export function HeaderBell({
   /** `round` for the redesigned headers (D-210). */
   readonly appearance?: 'filled' | 'round';
 }) {
-  const { t } = useI18n();
+  const { t, tPlain } = useI18n();
   const { state } = useNotifications(enabled);
   const [dummyUnread, setDummyUnread] = useState<number | null>(null);
 
@@ -86,7 +86,7 @@ export function HeaderBell({
       href="/notifications/"
       label={t('notify.title')}
       unreadCount={unread}
-      unreadLabel={t('notify.unread', { count: unread })}
+      unreadLabel={tPlain('notify.unread', { count: unread })}
     />
   );
 }

@@ -558,7 +558,7 @@ export function ThreadView({
   speechLanguage,
   supportPhone,
 }: ThreadViewProps) {
-  const { t, locale } = useI18n();
+  const { t, tPlain, locale } = useI18n();
   const inputRef = useRef<ChatComposerInputHandle>(null);
   const [draft, setDraft] = useState('');
   const dictation = useChatDictation({ inputRef, lang: speechLanguage });
@@ -919,7 +919,7 @@ export function ThreadView({
                   // screen reader hears "You, 2:14 PM" before the words.
                   name={
                     <VisuallyHidden>
-                      {t('messages.thread.from', { name: message.mine ? t('messages.thread.you') : name, time })}
+                      {tPlain('messages.thread.from', { name: message.mine ? tPlain('messages.thread.you') : name, time })}
                     </VisuallyHidden>
                   }
                   avatar={
@@ -939,13 +939,13 @@ export function ThreadView({
                       <VStack gap={3}>
                         <Thumbnail
                           src={message.photoUrl}
-                          alt={message.mine ? t('messages.thread.photo.yours') : t('messages.thread.photo.theirs', { name })}
+                          alt={message.mine ? tPlain('messages.thread.photo.yours') : tPlain('messages.thread.photo.theirs', { name })}
                           onClick={() =>
                             setViewing({
                               src: message.photoUrl!,
                               alt: message.mine
-                                ? t('messages.thread.photo.yours')
-                                : t('messages.thread.photo.theirs', { name }),
+                                ? tPlain('messages.thread.photo.yours')
+                                : tPlain('messages.thread.photo.theirs', { name }),
                             })
                           }
                           xstyle={styles.photo}
