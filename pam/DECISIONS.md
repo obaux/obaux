@@ -11319,6 +11319,13 @@ account* (Messages, A conversation, Spanish), with `installSupabaseMock(role,
 { limited: true })` limiting the pretend member and refusing the insert as
 `messages_insert_sender` does.
 
+**Reviewed and merged.** Will, 9 October, on being shown the plan: "Yes, merge" (this
+follow-up to `main`, a fast-forward: five commits, no database change); "read and
+approved" (the privacy section "When we limit an account", D-414, and the four
+short-version lines, D-416); "Leave big branch held for now"
+(`claude/gallant-clarke-0dhizj` stays unmerged until 0079–0081 are live and members
+are told).
+
 **Numbering.** D-427 because `claude/gallant-clarke-0dhizj` holds D-421–D-426 (its
 `docs/allocations.md`, not on `main` yet, says D-427 is next). This entry first took
 D-426, found free from this branch's side, and was renumbered on 9 October when that

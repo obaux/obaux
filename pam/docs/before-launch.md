@@ -79,17 +79,17 @@ STATUS row too.
   10b). Members were promised they would hear first if what is visible
   changes; the super admin's Everyone list and invite log are visible now.
 
-- [ ] **Ship the privacy policy that tells members what limiting an account
-  does** (Will, 9 October 2026, D-413, D-414: "We can tell members this in
-  privacy policy"). Members were promised they would hear first when a promise
+- [x] **Ship the privacy policy that tells members what limiting an account
+  does** — **live since the 9 October 2026 merge to `main` (D-420); Will read
+  and approved the wording the same day (D-427)** (Will, 9 October 2026, D-413,
+  D-414: "We can tell members this in privacy policy"). Members were promised they would hear first when a promise
   changes. Written: a privacy section, "When we limit an account"
   (`privacy.s.limits.*`, en + es), and both documents' dates moved to 9
   October. It says the person who invited you, or a staff member responsible
   for guiding you, can limit or pause an account that is hurting others, that
   a limited account can read messages but not send them, and that a paused one
   cannot sign in. The badges now named on
-  the transparency line are in the privacy page's list too. Tick this when the
-  branch is live. When this was written the live project had three accounts,
+  the transparency line are in the privacy page's list too. When this was written the live project had three accounts,
   so no one has agreed to the old wording who is not on the team. Nothing
   re-shows the policy to an account that already agreed (`transparency_ack_at`
   is set once); decide if that matters before the first real member.

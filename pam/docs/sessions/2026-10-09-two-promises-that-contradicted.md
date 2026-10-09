@@ -146,9 +146,8 @@ about one thing, side by side — a translator's habit, not a test's.
 
 ## Left undone
 
-- The privacy section's wording ("A person who has you on their list in Pam
-  can limit or pause…") is Claude's draft of Will's decision; he should read it.
-  So should the four short-version lines (`transparency.summary.*`, STATUS row 34).
+- ~~The privacy section's wording and the four short-version lines are Claude's
+  draft~~ — Will read and approved both on 9 October (D-427).
 - The New message picker's own failure line ("Your connection dropped") is
   reachable only by an account limited *after* Messages loaded. Not changed (D-427).
 - The app has no button that limits anyone (nothing calls
@@ -168,4 +167,4 @@ about one thing, side by side — a translator's habit, not a test's.
 
 ## Needs a human
 
-- Will: read the new privacy section and the short-version lines; say whether to merge this follow-up (D-427) to `main` — `CLAUDE.md` says not without asking.
+- Nothing from this session. Will said "Yes, merge" for this follow-up (done) and "Leave big branch held for now" for `claude/gallant-clarke-0dhizj`. The next build, when Will wants it, is the screen to assign a case manager and a limit / pause button: nothing in the app calls `admin_set_access_status`.
