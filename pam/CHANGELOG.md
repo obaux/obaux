@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.49.0] — 2026-10-09 · Stuff shared
+
+The page behind a conversation's ⋯ is now called Stuff shared: one simple
+list of every photo, document and link sent in the conversation, newest
+first. Each row has a small preview, the name, what it is, and who sent it
+and when at the end. A long file name slides over to show its end. Links
+show the page's title and picture, which Pam's server fetches once so your
+phone doesn't visit the page until you tap it (D-407).
+
 ## [0.48.2] — 2026-10-09 · Short and sweet
 
 On Trips, the yellow reminder to sign a program's policies now ends in

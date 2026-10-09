@@ -931,21 +931,36 @@ test.describe('the conversation, drawn closer (D-400, D-401)', () => {
   });
 });
 
-test.describe('photos and documents in one place (D-402)', () => {
-  test('the ⋯ page leads to everything shared, newest first, and a photo opens there', async ({ page }) => {
+test.describe('stuff shared, in one list (D-402, D-407)', () => {
+  const PNG = Buffer.from(
+    'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+    'base64',
+  );
+  const at = (minutesAgo: number) => new Date(Date.now() - minutesAgo * 60_000).toISOString();
+  const LONG = 'Marcus Johnson resume for the warehouse job at the North Philadelphia distribution center.docx';
+
+  async function picturesServed(page: import('@playwright/test').Page) {
+    for (const bucket of ['message-photos', 'link-previews']) {
+      await page.route(`**/storage/v1/object/${bucket}/**`, (route) =>
+        route.fulfill({ status: 200, contentType: 'image/png', body: PNG }),
+      );
+    }
+  }
+
+  test('the ⋯ page leads to Stuff shared: one flat list, newest first, who and when at the end', async ({ page }) => {
     await signedInAs(page, 'admin');
     await withOneConversation(page);
-    await page.route('**/storage/v1/object/message-photos/**', (route) =>
-      route.fulfill({
-        status: 200,
-        contentType: 'image/png',
-        body: Buffer.from(
-          'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
-          'base64',
-        ),
-      }),
+    await picturesServed(page);
+    await page.route('**/rest/v1/message_link_previews*', (route) =>
+      route.fulfill(
+        json([{ message_id: 'l1', title: 'Free resume workshop', site: 'Example Library', image_path: `${CONVO}/l1.png` }]),
+      ),
     );
-    const at = (minutesAgo: number) => new Date(Date.now() - minutesAgo * 60_000).toISOString();
+    let asked = 0;
+    await page.route('**/functions/v1/link-preview', (route) => {
+      asked += 1;
+      return route.fulfill(json({ made: 0 }));
+    });
     await page.route(MESSAGES, (route) =>
       route.fulfill(
         json([
@@ -953,45 +968,125 @@ test.describe('photos and documents in one place (D-402)', () => {
           { id: 't1', conversation_id: CONVO, sender_id: ME, body: 'Thanks', created_at: at(40) },
           { id: 'f1', conversation_id: CONVO, sender_id: ME, body: null, attachment_url: `${CONVO}/b.pdf`, attachment_kind: 'file', attachment_name: 'Lease.pdf', attachment_bytes: 245_760, created_at: at(30) },
           { id: 'g1', conversation_id: CONVO, sender_id: OTHER, body: 'https://docs.google.com/document/d/x/edit', created_at: at(20) },
+          { id: 'l1', conversation_id: CONVO, sender_id: OTHER, body: 'Saturday: https://example-library.org/workshop', created_at: at(15) },
           { id: 'p2', conversation_id: CONVO, sender_id: ME, body: 'Mine', attachment_url: `${CONVO}/c.jpg`, attachment_kind: 'photo', created_at: at(10) },
         ]),
       ),
     );
     await page.goto(`/messages/thread/options/?id=${CONVO}`);
     await settled(page);
-    await page.getByRole('link', { name: 'Photos and documents' }).click();
+    await page.getByRole('link', { name: 'Stuff shared' }).click();
     await expect(page).toHaveURL(new RegExp(`/messages/thread/files/\\?id=${CONVO}`));
-    await expect(page.getByRole('heading', { name: 'Photos and documents', level: 1 })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Stuff shared', level: 1 })).toBeVisible();
 
-    await expect(page.getByRole('heading', { name: 'Photos', level: 2 })).toBeVisible();
-    // The photos are a row to swipe through, each with who and when under it (D-404).
-    const carousel = page.getByRole('region', { name: 'Photos' });
-    const photos = carousel.getByRole('button', { name: /^Open A photo (you sent|from Marcus)/ });
-    await expect(photos).toHaveCount(2);
-    // Newest first: mine (10 minutes ago) before theirs (50).
-    await expect(photos.first()).toHaveAccessibleName(/^Open A photo you sent, \w+ \d+, \d+:\d\d/);
-    await expect(carousel.getByText(/^\w+ \d+ · \d+:\d\d\s?[AP]M$/).first()).toBeVisible();
+    // One list — no sections, no carousel — newest first.
+    const list = page.getByRole('list', { name: 'Stuff shared' });
+    const rows = list.getByRole('listitem');
+    await expect(rows).toHaveCount(5);
+    await expect(page.getByRole('region')).toHaveCount(0);
+    await expect(rows.nth(0)).toContainText('Mine');
+    await expect(rows.nth(1)).toContainText('Free resume workshop');
+    await expect(rows.nth(2)).toContainText('Google Doc');
+    await expect(rows.nth(3)).toContainText('Lease.pdf');
+    await expect(rows.nth(4)).toContainText('Photo');
 
-    // One Documents list: PDFs, Word files and Google Docs together, newest first,
-    // who on the second line, when at the end.
-    await expect(page.getByRole('heading', { name: 'Documents', level: 2 })).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Google Docs' })).toHaveCount(0);
-    const google = page.getByRole('link', { name: 'Google Doc: opens in Google, in a new tab' });
-    const pdf = page.getByRole('button', { name: /^Open Lease\.pdf, PDF, / });
-    await expect(google).toBeAttached();
-    await expect(pdf).toBeAttached();
-    await expect(page.getByText('Marcus · Opens in Google')).toBeVisible();
-    await expect(page.getByText(/^You · PDF · /)).toBeVisible();
-    const googleBox = (await page.getByText('Marcus · Opens in Google').boundingBox())!;
-    const pdfBox = (await page.getByText(/^You · PDF · /).boundingBox())!;
-    expect(googleBox.y).toBeLessThan(pdfBox.y);
-    // 32px or more between the photos and the documents.
-    const photosEnd = (await carousel.boundingBox())!;
-    const docsHeading = (await page.getByRole('heading', { name: 'Documents', level: 2 }).boundingBox())!;
-    expect(docsHeading.y - (photosEnd.y + photosEnd.height)).toBeGreaterThanOrEqual(32);
+    // Who over when, at the end of the row where a chevron would be.
+    await expect(rows.nth(0)).toContainText('You');
+    await expect(rows.nth(1)).toContainText('Marcus');
+    const name = (await rows.nth(3).getByText('Lease.pdf').boundingBox())!;
+    const who = (await rows.nth(3).getByText('You', { exact: true }).boundingBox())!;
+    expect(who.x).toBeGreaterThan(name.x + name.width);
 
-    await photos.first().click();
+    // Each row says it all to a screen reader, who and when included.
+    await expect(page.getByRole('button', { name: /^Mine Photo, Sent by You, / })).toBeVisible();
+    const link = page.getByRole('link', { name: /^Free resume workshop Example Library, Sent by Marcus, / });
+    await expect(link).toHaveAttribute('href', 'https://example-library.org/workshop');
+    await expect(link).toHaveAttribute('target', '_blank');
+    await expect(page.getByRole('link', { name: /^Google Doc Opens in Google, Sent by Marcus, / })).toBeVisible();
+    await expect(page.getByRole('button', { name: /^Lease\.pdf PDF · 240 kB, Sent by You, / })).toBeVisible();
+    await expect(page.getByRole('button', { name: /^Photo Sent by Marcus, / })).toBeVisible();
+
+    // The link's picture came from Pam's storage; nothing was asked of the server.
+    await expect(rows.nth(1).locator('img')).toHaveCount(1);
+    expect(asked).toBe(0);
+
+    await page.getByRole('button', { name: /Mine.*Photo/ }).click();
     await expect(page.locator('dialog.astryx-lightbox')).toBeVisible();
+  });
+
+  test('an older link with no preview asks Pam\'s server once, then shows it', async ({ page }) => {
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    await picturesServed(page);
+    let made = false;
+    const bodies: unknown[] = [];
+    await page.route('**/rest/v1/message_link_previews*', (route) =>
+      route.fulfill(json(made ? [{ message_id: 'l1', title: 'Route 47 bus times', site: 'Example Transit', image_path: null }] : [])),
+    );
+    await page.route('**/functions/v1/link-preview', (route) => {
+      bodies.push(route.request().postDataJSON());
+      made = true;
+      return route.fulfill(json({ made: 1 }));
+    });
+    await page.route(MESSAGES, (route) =>
+      route.fulfill(json([{ id: 'l1', conversation_id: CONVO, sender_id: ME, body: 'https://example-transit.org/route-47', created_at: at(5) }])),
+    );
+    await page.goto(`/messages/thread/files/?id=${CONVO}`);
+    await settled(page);
+    await expect(page.getByText('Route 47 bus times')).toBeVisible();
+    expect(bodies).toEqual([{ message_ids: ['l1'] }]);
+  });
+
+  test.describe('with motion allowed', () => {
+    // The rest of the suite runs with reduced motion (playwright.config).
+    test.use({ reducedMotion: 'no-preference' });
+    test('a name too long for one line slides to show its end, once; a short one stays still', async ({ page }) => {
+      await signedInAs(page, 'admin');
+      await withOneConversation(page);
+      await page.route(MESSAGES, (route) =>
+        route.fulfill(
+          json([
+            { id: 'f1', conversation_id: CONVO, sender_id: ME, body: null, attachment_url: `${CONVO}/r.docx`, attachment_kind: 'file', attachment_name: LONG, attachment_bytes: 48_128, created_at: at(30) },
+            { id: 'f2', conversation_id: CONVO, sender_id: ME, body: null, attachment_url: `${CONVO}/b.pdf`, attachment_kind: 'file', attachment_name: 'Lease.pdf', attachment_bytes: 1000, created_at: at(20) },
+          ]),
+        ),
+      );
+      await page.goto(`/messages/thread/files/?id=${CONVO}`);
+      await settled(page);
+      const long = page.locator('[data-marquee]', { hasText: LONG });
+      const short = page.locator('[data-marquee]', { hasText: 'Lease.pdf' });
+      // One line, whatever the length.
+      const box = (await long.locator('xpath=..').boundingBox())!;
+      expect(box.height).toBeLessThan(30);
+      await expect(short).toHaveAttribute('data-marquee', 'fits');
+      await expect(long).toHaveAttribute('data-marquee', 'moving');
+      const animation = await long.evaluate((el) => {
+        const s = getComputedStyle(el);
+        return { name: s.animationName, ms: parseFloat(s.animationDuration) * 1000, shift: s.getPropertyValue('--pam-marquee-shift') };
+      });
+      expect(animation.name).not.toBe('none');
+      expect(animation.ms).toBeLessThanOrEqual(5000);
+      expect(parseFloat(animation.shift)).toBeLessThan(0);
+      // It plays once and stops, cut off again (WCAG 2.2.2: under five seconds, no loop).
+      await expect(long).toHaveAttribute('data-marquee', 'cut', { timeout: 8000 });
+    });
+  });
+
+  test('with reduced motion, a long name never moves', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    await page.route(MESSAGES, (route) =>
+      route.fulfill(
+        json([{ id: 'f1', conversation_id: CONVO, sender_id: ME, body: null, attachment_url: `${CONVO}/r.docx`, attachment_kind: 'file', attachment_name: LONG, attachment_bytes: 48_128, created_at: at(30) }]),
+      ),
+    );
+    await page.goto(`/messages/thread/files/?id=${CONVO}`);
+    await settled(page);
+    const long = page.locator('[data-marquee]', { hasText: LONG });
+    await expect(long).toHaveAttribute('data-marquee', 'cut');
+    await page.waitForTimeout(1500);
+    await expect(long).toHaveAttribute('data-marquee', 'cut');
   });
 
   test('a conversation with nothing shared says so', async ({ page }) => {
@@ -999,9 +1094,10 @@ test.describe('photos and documents in one place (D-402)', () => {
     await withOneConversation(page);
     await page.goto(`/messages/thread/files/?id=${CONVO}`);
     await settled(page);
-    await expect(page.getByText(/^Nothing yet\. Photos and documents sent in this conversation will be here/)).toBeVisible();
+    await expect(page.getByText(/^Nothing yet\. Photos, documents and links sent in this conversation will be here/)).toBeVisible();
   });
 });
+
 
 test.describe('the jump-to-newest button, with motion on (D-398)', () => {
   // The rest of the suite runs with reduced motion; this is where the

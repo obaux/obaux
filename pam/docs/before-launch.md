@@ -57,10 +57,13 @@ STATUS row too.
   account, member + program. The session reads `profile_roles`; it names the
   `profile_id` foreign key, because the table points at `profiles` twice.
 
-- [ ] **Photos and documents in messages: deploy 0079 + 0080, and tell
-  members first** (Will, 8 October 2026, D-394, D-399). Both now go in one
-  SQL-editor file (`message-photos` and `message-files`, one transaction,
-  tested through 0078 and run twice); it replaces the 0079-only file. What
+- [ ] **Photos, documents and link previews in messages: deploy 0079 + 0080
+  + 0081, and tell members first** (Will, 8–9 October 2026, D-394, D-399,
+  D-407). All three now go in one SQL-editor file (`message-photos`,
+  `message-files`, `message_link_previews` + `link-previews`; one
+  transaction, tested through 0078, run twice, then the whole policy suite);
+  it replaces the 0079 + 0080 file. The `link-preview` Edge Function is
+  already deployed and refuses every request until 0081 is in. What
   follows was written for photos and holds for documents too (D-394). The private `message-photos` store and who can
   see a photo live in 0079 — applied to the live project before the branch
   that sends photos is merged, or the photo button fails. The connector

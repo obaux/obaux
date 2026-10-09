@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import type { Role } from '@pam/config';
+import { requestLinkPreviews, wantsPreview } from './linkPreview';
 import { loadPhotos, removeUnsentPhoto, shrinkPhoto, uploadMessagePhoto } from './messagePhoto';
 import {
   displayFileName,
@@ -265,6 +266,8 @@ export function useThread(conversationId: string | null): {
         stored = null;
 
         const row = data as MessageRow;
+        // A link starts its preview now, so Stuff shared has it ready (D-407).
+        if (wantsPreview(row.body)) void requestLinkPreviews([row.id]);
         setState((prev) =>
           prev.status === 'ready'
             ? {

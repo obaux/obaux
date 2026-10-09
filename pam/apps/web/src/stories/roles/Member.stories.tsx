@@ -88,7 +88,7 @@ export const ConversationWithAProgram: Story = screen('member', 'A conversation 
   id: 'dummy-conv-dummy-m1-dummy-p1',
 });
 /** Everything shared in a conversation, from its ⋯ (D-402). */
-export const ConversationFiles: Story = screen('member', 'Photos and documents', '/messages/thread/files/', { id: CONVO_ID });
+export const ConversationFiles: Story = screen('member', 'Stuff shared', '/messages/thread/files/', { id: CONVO_ID });
 export const ConversationOptions: Story = screen('member', 'Conversation options', '/messages/thread/options/', {
   id: CONVO_ID,
 });

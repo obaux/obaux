@@ -10132,3 +10132,78 @@ only. Short and sweet."
   regular weight, as the "Oct 8 · 7:47 AM" line under it (it was 16px
   semibold black). The two lines read as one quiet caption, and the photo
   stays the thing you look at. The document cards are unchanged.
+
+### D-407 — Stuff shared: one flat list, who and when at the end, titles that slide, and link previews from Pam's server
+
+**Date:** 2026-10-09. Will, after the carousel (D-404): "I don't like the
+image carousel. Scratch that idea. Instead let's just title page: Stuff
+shared, and create a flat list item, similar to policy item (not a card
+with shadow) … photo (tiny preview), docs (any kind) and also links … with
+social image previews. Let's mockup some versions … before you build."
+Four mockups went up (A one list, B by day, C filters, D bigger previews).
+He chose: "Go ahead and set up server function. Let's go with list A. But
+instead of chevron, add timestamp and person there, tucked at the end.
+Let's keep asset title labels max at 1 line, but animate text through
+horizontally when text truncates so they can see end of long named files."
+
+- **The page** is "Stuff shared" (es "Cosas compartidas"), the ⋯ page's
+  row too. One list, newest first, in the policy row's shape (`MenuList`,
+  D-210: 64px, 18px name, 14px grey line, dividers), no sections, no
+  carousel, no card. Where the icon goes, a 48px preview: the photo; a
+  document's icon on a tint of its colour (PDF red, Word and Google Docs
+  blue, Google Sheets green); a link's picture, or a globe. Then the name,
+  then what it is ("PDF · 180 kB", "Opens in Google", the site), and at the
+  end, where the chevron was, who sent it over when (the time today,
+  "Yesterday", or the day). A screen reader hears all of it on the row
+  ("… Sent by Teresa, Oct 8, 7:47 AM"). A photo opens the viewer and pages
+  through every photo; a document downloads with the person's sign-in; a
+  Google Doc or a link opens in a new tab. The mockup stories are gone —
+  Storybook shows what is built.
+- **One-line names that slide** (`MarqueeText`, @pam/ui). A name that fits
+  never moves. One that is cut off shows an ellipsis; when its row comes
+  into view it waits a beat, slides left until the last letter shows
+  ("…center.docx"), holds, and slides back — once, in five seconds at most,
+  replayed each time the row comes back into view. It never loops: moving
+  text that starts by itself must stop within five seconds or offer a pause
+  (WCAG 2.2.2), and a list of names sliding forever would be the busiest
+  thing in the app. Rows that arrive together are staggered. With reduced
+  motion it never moves. The whole name is always there for a screen reader.
+- **Link previews come from Pam's server** — the `link-preview` Edge
+  Function, deployed 9 October (verify_jwt on) — because a phone cannot read
+  another site's preview: browsers will not hand one site's page to
+  another. It is asked with the person's own sign-in when a link is sent,
+  and from Stuff shared for any older link without one. It asks the
+  database, as the person, which of the (at most ten) messages are in their
+  own conversations (`link_preview_targets`, 0081), opens each page once,
+  and keeps the title, site name and a *copy* of the picture in a private
+  bucket — so looking at the list contacts nobody else; only tapping the
+  link does. A page it cannot read is remembered ('none') so it is never
+  asked twice.
+- **What the server will open** is the security line (`preview.ts`, 17 unit
+  tests): https on the usual port only; no user name or password in the
+  address; never a local name (`localhost`, `.local`, `.internal`, …) or a
+  private, loopback, link-local, carrier-grade-NAT, documentation, multicast
+  or reserved address, however written (`::ffff:127.0.0.1`, `0x7f000001`,
+  `169.254.169.254`); every address a name resolves to must be public;
+  redirects followed by hand (three at most) and checked again; 5 seconds,
+  512 KB of page (only its head is read), 2 MB of picture, JPEG/PNG/WebP/GIF
+  only. Where the runtime cannot look names up, the name checks stand alone.
+  It logs counts, never addresses.
+- **0081** (`test/17_link_previews_test.sql`): `message_link_previews`
+  (forced RLS; the two people in the conversation read it; nobody signed in
+  writes it; a trigger files each preview under its message's
+  conversation), the private `link-previews` bucket (2 MB, pictures, read by
+  the same two), and `link_preview_targets`. No admin sees a preview,
+  reported or not — transparency `message_link_previews`; a report shows
+  the message, whose words carry the link. Privacy notice, what we keep:
+  "When you send a link, Pam's server opens the page once to get its title
+  and picture … Your phone does not visit the page until you tap the link."
+- **Not live yet:** 0081 joins 0079 and 0080 in one SQL-editor file for
+  Will (tested through 0078, twice, then the whole policy suite). Until it
+  runs the function answers "not allowed" and every link shows as its
+  address with a globe.
+- **Still open from Will's "docs (any kind)":** uploads stay PDF and Word
+  (0080's list), Google Docs/Sheets/Slides/Forms/Drive as links. Widening
+  the list (Excel, PowerPoint, text) is a change to 0080 before it ships.
+- The document card drops D-404's "who · …" line, stamp and wide size;
+  nothing else used them.

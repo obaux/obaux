@@ -317,8 +317,43 @@ export function threadFor(role: Role | null) {
       body: 'And the class schedule: https://docs.google.com/document/d/example-class-schedule/edit',
       created_at: hoursAgo(1),
     },
+    // A link with a preview, and a document with a name too long for one
+    // line (D-407): Stuff shared slides it to show the end.
+    {
+      id: 'm-link',
+      conversation_id: CONVO_ID,
+      sender_id: staffSpeaks,
+      body: 'This is on Saturday: https://example-library.org/events/resume-workshop',
+      created_at: hoursAgo(0.75),
+    },
+    {
+      id: 'm-file-long',
+      conversation_id: CONVO_ID,
+      sender_id: memberSpeaks,
+      body: null,
+      attachment_url: `${CONVO_ID}/resume.docx`,
+      attachment_kind: 'file',
+      attachment_name: 'Marcus Johnson resume for the warehouse job at the North Philadelphia distribution center.docx',
+      attachment_bytes: 48_128,
+      created_at: hoursAgo(0.5),
+    },
   );
   return rows;
+}
+
+/** The preview Pam's server kept for the example conversation's link (D-407). */
+export function linkPreviewsFor(_role: Role | null) {
+  return [
+    {
+      message_id: 'm-link',
+      conversation_id: CONVO_ID,
+      url: 'https://example-library.org/events/resume-workshop',
+      title: 'Free resume workshop this Saturday',
+      site: 'Example Library',
+      image_path: `${CONVO_ID}/m-link.webp`,
+      status: 'ready',
+    },
+  ];
 }
 
 export function partnerFor(role: Role | null) {

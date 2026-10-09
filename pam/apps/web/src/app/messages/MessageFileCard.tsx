@@ -36,12 +36,7 @@ import {
  */
 const styles = stylex.create({
   card: { width: '100%', maxWidth: '300px', borderRadius: '14px' },
-  // On a page of its own (Photos and documents, D-402) a card spans the column.
-  wide: { maxWidth: 'none' },
   text: { minWidth: 0, flexGrow: 1 },
-  // When it was sent, at the end of the card (D-404): the date over the time.
-  stamp: { flexShrink: 0, alignSelf: 'flex-start', alignItems: 'flex-end' },
-  stampLine: { fontSize: '14px', lineHeight: 1.3, whiteSpace: 'nowrap' },
   name: {
     fontSize: '16px',
     lineHeight: 1.3,
@@ -55,41 +50,15 @@ const styles = stylex.create({
   meta: { fontSize: '14px', lineHeight: 1.3 },
 });
 
-/** Who sent something and when, for a card that says so (the Photos and documents page, D-404). */
-export interface SentBy {
-  readonly who: string;
-  readonly date: string;
-  readonly time: string;
-}
-
-function Stamp({ sent }: { readonly sent: SentBy }) {
-  return (
-    <VStack gap={0.5} xstyle={styles.stamp}>
-      <Text type="supporting" xstyle={styles.stampLine}>
-        {sent.date}
-      </Text>
-      <Text type="supporting" xstyle={styles.stampLine}>
-        {sent.time}
-      </Text>
-    </VStack>
-  );
-}
-
-/**
- * The icon, name, and "PDF · 240 kB" — what every document card shows. With
- * `sent`, the second line starts with who sent it and the card ends with
- * when ("Teresa · PDF · 180 kB … Oct 8, 2:14 PM").
- */
+/** The icon, name, and "PDF · 240 kB" — what every document card shows. */
 export function FileSummary({
   name,
   bytes,
   note,
-  sent,
 }: {
   readonly name: string;
   readonly bytes: number;
   readonly note?: string;
-  readonly sent?: SentBy;
 }) {
   const { t, locale } = useI18n();
   const kind = messageFileKind(name);
@@ -103,10 +72,9 @@ export function FileSummary({
       <VStack gap={0.5} xstyle={styles.text}>
         <Text xstyle={styles.name}>{name}</Text>
         <Text type="supporting" xstyle={styles.meta}>
-          {note ?? (sent ? t('messages.files.by', { who: sent.who, what: meta }) : meta)}
+          {note ?? meta}
         </Text>
       </VStack>
-      {sent ? <Stamp sent={sent} /> : null}
     </HStack>
   );
 }
@@ -119,14 +87,9 @@ export function FileSummary({
 export function MessageFileCard({
   file,
   localUrl = null,
-  isWide = false,
-  sent,
 }: {
   readonly file: MessageFile;
   readonly localUrl?: string | null;
-  readonly isWide?: boolean;
-  /** Who sent it and when, shown inside the card (D-404). */
-  readonly sent?: SentBy;
 }) {
   const { t, locale } = useI18n();
   const [fetched, setFetched] = useState<string | null>(localUrl);
@@ -158,12 +121,11 @@ export function MessageFileCard({
       })}
       onClick={() => void open()}
       padding={3}
-      xstyle={[styles.card, isWide && styles.wide]}
+      xstyle={styles.card}
     >
       <FileSummary
         name={file.name}
         bytes={file.bytes}
-        {...(sent ? { sent } : {})}
         {...(state === 'opening'
           ? { note: t('messages.file.opening') }
           : state === 'failed'
@@ -186,14 +148,9 @@ const GOOGLE_TITLE: Record<GoogleLinkKind, string> = {
 export function GoogleLinkCard({
   url,
   kind,
-  isWide = false,
-  sent,
 }: {
   readonly url: string;
   readonly kind: GoogleLinkKind;
-  readonly isWide?: boolean;
-  /** Who sent it and when, shown inside the card (D-404). */
-  readonly sent?: SentBy;
 }) {
   const { t } = useI18n();
   const title = t(GOOGLE_TITLE[kind]);
@@ -203,17 +160,16 @@ export function GoogleLinkCard({
       href={url}
       target="_blank"
       padding={3}
-      xstyle={[styles.card, isWide && styles.wide]}
+      xstyle={styles.card}
     >
       <HStack gap={3} align="center">
         <FileTypeIcon kind="google" />
         <VStack gap={0.5} xstyle={styles.text}>
           <Text xstyle={styles.name}>{title}</Text>
           <Text type="supporting" xstyle={styles.meta}>
-            {sent ? t('messages.files.by', { who: sent.who, what: t('messages.google.opens') }) : t('messages.google.opens')}
+            {t('messages.google.opens')}
           </Text>
         </VStack>
-        {sent ? <Stamp sent={sent} /> : null}
       </HStack>
     </ClickableCard>
   );

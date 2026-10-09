@@ -24,6 +24,7 @@ import {
   INVITES_LOG,
   partnerFor,
   threadFor,
+  linkPreviewsFor,
   type JourneyRole,
 } from './fixtures';
 
@@ -86,8 +87,17 @@ function routesFor(journeyRole: JourneyRole): Route[] {
           ? { body: null, raw: EXAMPLE_PDF, contentType: 'application/pdf' }
           : { body: { Key: 'message-files/example.pdf' } }
         : null,
+    // A link preview's picture (D-407): a picture Storybook already serves.
+    (url, method) =>
+      url.includes('/storage/v1/object/') && url.includes('/link-previews/') && method === 'GET'
+        ? { body: null, file: '/friend/bring-a-friend-800.webp' }
+        : null,
     // A staff photo upload (D-345): accepted, never stored.
     on('/storage/v1/object/', () => ({ body: { Key: 'staff-photos/example.webp' } })),
+    // Link previews (D-407): the example conversation's kept preview, and
+    // Pam's server, which is never asked for real from a story.
+    on('/rest/v1/message_link_previews', () => ({ body: linkPreviewsFor(role) })),
+    on('/functions/v1/link-preview', () => ({ body: { made: 0 } })),
     on('/rpc/report_photos_for_review', () => ({ body: [] })),
     on('/rpc/report_files_for_review', () => ({ body: [] })),
     on('/rest/v1/profiles', (url) =>

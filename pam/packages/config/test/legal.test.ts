@@ -7,7 +7,7 @@ import {
   PRIVACY_VISIBILITY_SECTION,
   legalKeys,
 } from '../src/legal.js';
-import { TRANSPARENCY_SCREEN } from '../src/transparency.js';
+import { ADMIN_CANNOT_SEE, TRANSPARENCY_SCREEN } from '../src/transparency.js';
 import { fleschKincaidGrade, findDignityViolations } from '../src/language.js';
 
 const bundles = { en, es } as Record<string, Record<string, string>>;
@@ -118,6 +118,16 @@ describe('the privacy page and the transparency screen agree', () => {
     expect(text).toMatch(/its photo or document/);
     const flagged = TRANSPARENCY_SCREEN.canSee.find((l) => l.key === 'transparency.canSee.flagged');
     expect(flagged?.en).toMatch(/message, photo or document/);
+  });
+
+  it('says that Pam\'s server opens a shared link for its preview, and the phone does not (D-407)', () => {
+    const keep = PRIVACY.sections
+      .flatMap((s) => s.bodyKeys)
+      .map((k) => en[k as keyof typeof en] as string)
+      .join(' ');
+    expect(keep).toMatch(/Pam's server opens the page once/);
+    expect(keep).toMatch(/Your phone does not visit the page until you tap the link/);
+    expect(ADMIN_CANNOT_SEE).toContain('message_link_previews');
   });
 
   it('promises to tell members before the list changes, exactly as the screen does', () => {

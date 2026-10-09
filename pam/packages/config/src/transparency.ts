@@ -97,6 +97,14 @@ export const ADMIN_CANNOT_SEE = [
   'message_photos',
   /** D-399: documents in a conversation, outside a report — the same, on `message-files` (0080). */
   'message_files',
+  /**
+   * D-407: a link's preview — the page's title and picture, fetched by Pam's
+   * server — is read by the two people in the conversation and nobody else,
+   * reported or not (0081: no admin policy on `message_link_previews` or the
+   * `link-previews` bucket). A report shows the message, whose words already
+   * carry the link.
+   */
+  'message_link_previews',
   'buddy_feed_posts',
   'members_outside_caseload_or_region',
   'other_regions',

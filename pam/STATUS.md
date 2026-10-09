@@ -858,9 +858,9 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
-## Conversations, redrawn (8–9 October) — 0.45.5 to 0.48.2, on the branch
+## Conversations, redrawn (8–9 October) — 0.45.5 to 0.49.0, on the branch
 
-D-389 to D-406 (D-405: Trips' policies banner action is just "Sign"; D-406: a photo's name set like its time), **on `claude/pam-storybook`, not merged to `main`.** A
+D-389 to D-407 (D-405: Trips' policies banner action is just "Sign"; D-406: a photo's name set like its time), **on `claude/pam-storybook`, not merged to `main`.** A
 conversation's header says who the person is on a line under the name —
 "Program lead at Example Food Pantry", "Case manager" (D-395). Each day opens
 with one divider ("Today", "Yesterday", a weekday, a date). Bubbles carry no name or time: mine are light green on the
@@ -895,8 +895,8 @@ photo rules; the message carries its name and size, and the file is fetched
 with the reader's sign-in only when tapped. A Google Docs link in a message
 gets a card that opens it in Google. Copy everywhere that named photos names
 documents (`test/16_message_files_test.sql`, 23 checks; legal test).
-**0079 and 0080 go to live together** in one tested SQL-editor file for Will
-(before-launch).
+**0079, 0080 and 0081 go to live together** in one tested SQL-editor file for
+Will (before-launch).
 
 **Header, composer and viewer (D-400, D-401, 0.47.1).** The visit card is
 the compact `StatusCard`; a 32px blurred fade hangs under the header so
@@ -907,18 +907,19 @@ an even 8px rim; document icons are `FileTypeIcon` in Google-Doc blue
 (`--pam-document-blue`); photos open in `PhotoViewer` on near-black with
 48px dark circle buttons.
 
-**Next for it: "Stuff shared" (mockups only, 9 October).** Will dropped the
-carousel: the page becomes "Stuff shared", one flat list of policy-style rows
-for photos, documents and links (with social image previews). Four versions
-wait for his pick in Storybook (Member › Created › States › Stuff shared
-(mockups)); nothing is built yet.
-
-**Photos and documents page (D-402, D-404, 0.48.1).** From a conversation's
-⋯: its photos as a swipeable row (Astryx `Carousel`, 200px, who and
-"date · time" under each, both in the same 14px grey (D-406); tap → viewer, paging), then one Documents list —
-PDFs, Word files and Google Docs together, full-width cards with who on the
-second line and the date over the time at the end — newest first, 32px
-between the two. Read through `useThread`, so nothing new to query.
+**Stuff shared (D-402 → D-407, 0.49.0).** From a conversation's ⋯: one flat
+list of policy-style rows, newest first — a 48px preview (photo; document
+icon on its colour; a link's picture or a globe), the name on one line
+(`MarqueeText` slides a cut-off name to its end once per view, ≤5s, never
+with reduced motion), what it is, and who over when at the end. Photos open
+the viewer; documents download; Google Docs and links open in a new tab.
+**Link previews** come from the `link-preview` Edge Function (deployed 9
+October, verify_jwt): asked on send and for older links, it checks the
+person through `link_preview_targets` (0081), opens https public pages only
+(SSRF guard in `preview.ts`), and keeps title, site and a copy of the
+picture in the private `link-previews` bucket (`test/17`, 17 unit tests).
+**0081 is not live:** it rides in the 0079 + 0080 + 0081 SQL-editor file
+(before-launch); until then links show as their address.
 
 ## Release 0.45.0-two-roles (7 October) — one account, member and program
 
