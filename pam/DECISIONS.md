@@ -11365,3 +11365,47 @@ reported if flagged."
 - **Nothing waits on 0085.** The app asks with `p_language` and, if the database
   has no such parameter (PGRST202, raised before anything runs), asks again
   without it (`rpcLanguage.ts`). Remove that helper once 0085 has been live a while.
+
+### D-433 — A public website: its own app, the app's own design system, Home and Support
+
+**Date:** 2026-10-09. Will: "Create a public facing website for PAM using our
+design system. Home page, and Support page. Under support, we list out who can
+do what … a public site that members can refer to to learn how the system works,
+since it's complex." First post: "Case manager assignments", an introduction and
+the table of who can do what.
+
+- **Its own app, `pam/apps/site`, not routes inside `apps/web`.** The app is a
+  member product with a sign-in session, a bottom tab bar, a help bar and a
+  bundle budget (§12). A page that anyone can read before they have an account
+  should not ship any of that, and should be deployable and re-addressable on
+  its own. Cost: a second set of build config (Babel + StyleX + PostCSS copied
+  from `apps/web`), kept deliberately thin.
+- **The design system, not a copy of it.** It uses `@pam/ui`'s theme, Figtree and
+  Button/TextLink, and Astryx's `TopNav`, `Table`, `Card`, `Grid`, `Breadcrumbs`.
+  It is "a website, not an app": a wide header with the wordmark, a 1080px
+  column, a footer, and light and dark that follow the device. No app chrome. The
+  wordmark switches to the coral version in dark mode (the app's own SVGs).
+  The three illustrations are the app's sign-in pictures.
+- **`@pam/ui/TextLink` is now a package export.** The barrel pulls in client-only
+  files that a server component cannot import; the subpath is what a static site
+  needs.
+- **The table is a table on a wide screen and stacked cards on a phone** (below
+  720px; one of the two is `display: none`, so a screen reader reads it once).
+  Three columns of sentences scroll sideways on a 390px phone, which is the
+  hardest thing to read on one, and members are the audience.
+- **Two cells of Will's table said "see question 2" and "see question 3"** —
+  pointers into the conversation it was drafted in. They are removed; each cell
+  stands on its own ("They can't see who is unassigned."; "Anyone."). "(as today)"
+  was dropped for the same reason. The privacy quote is verified against
+  `privacy.s.limits.p1` ("They have to write down why.").
+- **The post describes behaviour that is not all built.** Taking on, handing
+  over, unassigning, the Unassigned filter and Turn back on have no screen
+  (STATUS backlog, D-415). The site is not deployed, and
+  `docs/before-launch.md` says why it must not be until the post is true or
+  softened. This is the decision most worth questioning.
+- **Copy says "people coming home"**, as the app's About does; never the words
+  Pam never displays (a test in `apps/site/test` checks).
+- **Numbers.** D-433 rather than D-432: another branch
+  (`claude/gallant-clarke-0dhizj`) listed D-432 as its next free number when this
+  was claimed.
+

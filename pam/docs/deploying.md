@@ -40,6 +40,25 @@ one.
   update Supabase. Links already sent keep working as long as the old URL
   redirects.
 
+## The public site (`apps/site`)
+
+Pam's public website (Home and Support, D-433) is a second, separate Vercel
+project from the same repository, so it can have its own address and nobody who
+reads a support page is ever near the app's sign-in code.
+
+1. **Add New → Project**, pick `obaux/obaux` again, and set **Root Directory**
+   to `pam/apps/site`, **Framework Preset** to Other. Its `vercel.json` carries
+   the build.
+2. No environment variables. It never talks to Supabase. Its "Sign in",
+   "Privacy" and "Terms" links point at the app (`apps/site/src/lib/links.ts`,
+   `NEXT_PUBLIC_APP_URL`, the same default as `apps/web/src/lib/project.ts` —
+   change both when the app's address changes).
+3. Locally: `pnpm --filter @pam/site dev` (port 3100), `pnpm --filter @pam/site build`.
+
+New support posts: add an entry to `apps/site/src/content/posts.ts` and a body
+component beside `CaseManagerAssignments.tsx`, then register it in
+`apps/site/src/app/support/[slug]/page.tsx`.
+
 ## What this does not cover
 
 Store submission. Capacitor wraps this same build; `cap add ios` and

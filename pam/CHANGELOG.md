@@ -1,5 +1,14 @@
 # Changelog
 
+## [Unreleased] — 2026-10-09 · A public website
+
+Pam has a public website with a Home page and a Support page, built from the same
+design system as the app and shown in light or dark to match your device. Support
+has its first post, "Case manager assignments": who can take on a member, hand
+one over, unassign, limit or pause, and that every change needs a written reason.
+On a phone the table becomes one card per action. It is built and not yet put
+online (D-433).
+
 ## [0.51.0] — 2026-10-09 · Pam speaks seven languages
 
 Pam is now in Brazilian Portuguese, Simplified Chinese (for Mandarin

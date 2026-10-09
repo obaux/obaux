@@ -11,6 +11,16 @@ STATUS row too.
 
 ## Open
 
+- [ ] **Public site: deploy it, and hold "Case manager assignments" until it is
+  true** (Will, 9 October 2026, D-433). `apps/site` is built and not deployed
+  (`docs/deploying.md`, "The public site"). The post describes who may take on,
+  hand over, unassign and see unassigned members, and requires a written reason
+  for every limit or pause. Today only the case manager's own limit/pause RPC
+  exists; taking a member on, handing over, unassigning, the "Unassigned" filter
+  and "Turn back on" have no screen (STATUS backlog, D-415). Either build them
+  first, or soften the post to what is live, before the site goes to members.
+  Also: set the real domain in `apps/site/src/lib/links.ts` when there is one.
+
 - [ ] **Set up the email provider for invite links** (Will, 4 October 2026,
   D-263). The expired-link page already queues a fresh link in
   `public.invite_emails` (live since 0071); nothing sends it yet. Needs:

@@ -1,0 +1,18 @@
+/*
+ * Cascade layer order — SOP §2.2: "Declare layer order explicitly in
+ * globals.css and put any project CSS in a named layer."
+ *
+ * This file is imported first, before any Astryx stylesheet, because a layer's
+ * priority is fixed by where its name FIRST appears. Declaring the order up
+ * front means import order can never decide it.
+ *
+ * The three Astryx sheets declare their own layers internally (`reset`,
+ * `astryx-base`, `astryx-theme`), so they are imported plainly. Adding
+ * `layer()` to those imports double-layers them and Next's CSS pipeline turns
+ * the result into an invalid `@media layer(reset)` block — which silently drops
+ * the entire reset, including the rule that sets the body font. That is what
+ * made the first build render in browser-default serif.
+ *
+ * `pam` is last so PAM's overrides win without `!important` (§2.3 forbids it).
+ */
+@layer reset, astryx-base, astryx-theme, stylex, pam;

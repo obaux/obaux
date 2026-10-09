@@ -912,6 +912,21 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
+## A public website (9 October) — `apps/site`, built, not deployed
+
+Home and Support, for anyone to read before they have an account (D-433). A
+separate Next static export (`pnpm --filter @pam/site dev|build|test`) on the
+app's theme, Figtree and Astryx components; no Supabase, no sign-in. Support's
+first post, **Case manager assignments** (`src/content/`), has an introduction
+and the "who can do what" table (a real table from 720px up, stacked cards
+below). Built in CI (`pam-ci.yml`) and covered by `test/content.test.ts`;
+looked at in light, dark and a 390px phone. **Not deployed**, and it should not
+be until the post is true: taking on, handing over and unassigning a member, the
+Unassigned filter and "Turn back on" are not built (backlog, D-415) —
+`docs/before-launch.md`. Deploy steps: `docs/deploying.md`. Not on the user-flow
+map: it is not a screen of the app. Session log:
+`docs/sessions/2026-10-09-a-public-website.md`.
+
 ## Seven languages, messages in your own language, and text that fits (9 October) — 0.50.1 and 0.51.0, on a branch
 
 D-421 to D-423, **on `claude/gallant-clarke-0dhizj`, which is

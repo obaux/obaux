@@ -1,0 +1,37 @@
+import { describe, expect, it } from 'vitest';
+import { ASSIGNMENT_ROWS } from '../src/content/assignments';
+import { POSTS, formatDate, postBySlug } from '../src/content/posts';
+
+const everyWord = JSON.stringify([ASSIGNMENT_ROWS, POSTS]).toLowerCase();
+
+describe('public site content', () => {
+  it('never uses the words Pam never displays (pam/CLAUDE.md)', () => {
+    for (const word of ['prisoner', 'ex-offender', 'inmate', 'convict']) {
+      expect(everyWord).not.toContain(word);
+    }
+  });
+
+  it('carries no pointers to a conversation the reader was not in', () => {
+    expect(everyWord).not.toMatch(/see question|question \d/);
+  });
+
+  it('has the seven rows of the assignments table, each answered for both roles', () => {
+    expect(ASSIGNMENT_ROWS).toHaveLength(7);
+    for (const row of ASSIGNMENT_ROWS) {
+      for (const cell of [row.caseManager, row.superAdmin]) {
+        expect(cell.answer ?? cell.note).toBeTruthy();
+      }
+    }
+  });
+
+  it('quotes the privacy policy as the app words it', () => {
+    const reason = ASSIGNMENT_ROWS.find((r) => r.action === 'Reason');
+    expect(reason?.caseManager.note).toContain('They have to write down why.');
+  });
+
+  it('finds a post by slug and formats its date', () => {
+    expect(postBySlug('case-manager-assignments')?.title).toBe('Case manager assignments');
+    expect(postBySlug('nope')).toBeUndefined();
+    expect(formatDate('2026-10-09')).toBe('October 9, 2026');
+  });
+});
