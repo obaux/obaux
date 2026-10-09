@@ -89,10 +89,19 @@ export function isEmailAddress(value: string): boolean {
   return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(value.trim());
 }
 
-export async function requestInviteLink(code: string, email: string): Promise<boolean> {
+/**
+ * Asks for a fresh link by email. `language` is the one the person is reading
+ * this page in (0085): the email is written in it, since there is no account to
+ * read a language from.
+ */
+export async function requestInviteLink(code: string, email: string, language = 'en'): Promise<boolean> {
   try {
     const { createClient } = await import('./supabase');
-    const { error } = await createClient().rpc('request_invite_link', { p_code: code, p_email: email.trim() });
+    const { error } = await createClient().rpc('request_invite_link', {
+      p_code: code,
+      p_email: email.trim(),
+      p_language: language,
+    });
     return !error;
   } catch {
     return false;

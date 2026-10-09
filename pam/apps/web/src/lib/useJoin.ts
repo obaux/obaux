@@ -93,6 +93,9 @@ export async function submitDetails(details: JoinDetails): Promise<JoinOutcome> 
       p_first_name: details.firstName.trim(),
       p_last_name: details.lastName.trim(),
       p_city: details.city.trim(),
+      // The language they are reading Pam in, so the text that answers the
+      // request is written in it (0085): a denial has no profile to ask.
+      p_language: details.language,
       ...(program
         ? {
             p_program_name: program.name.trim(),
