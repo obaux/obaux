@@ -45,7 +45,19 @@ type CopyState = 'idle' | 'copied' | 'failed';
 
 const styles = stylex.create({
   wrap: { position: 'relative', flexShrink: 0 },
-  button: { color: colorVars['--color-text-primary'] },
+  // White with a thin grey edge, a 48px circle: the same as Help and the bell
+  // in a screen's top bar (Will, 9 October, D-417).
+  button: {
+    width: '48px',
+    height: '48px',
+    borderRadius: '50%',
+    flexShrink: 0,
+    color: colorVars['--color-text-primary'],
+    backgroundColor: colorVars['--color-background-body'],
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    borderColor: colorVars['--color-border'],
+  },
   // A tooltip: under the button, its right edge on the button's, a small
   // point up at the icon. Dark on the light page and light on the dark one,
   // so it reads on either. Taps go through to what is under it.
