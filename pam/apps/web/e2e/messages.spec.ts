@@ -1207,8 +1207,9 @@ test.describe('stuff shared, in one list (D-402, D-407)', () => {
 
     // Each row says it all to a screen reader, who and when included.
     await expect(page.getByRole('button', { name: /^Mine Photo, Sent by You, / })).toBeVisible();
-    // What each thing is, in a word: Photo, Document or Link (D-409).
-    const link = page.getByRole('link', { name: /^Free resume workshop Link, Sent by Marcus, / });
+    // What each thing is, in a word — Photo or Document (D-409) — and for a
+    // link, where it goes: its real address, not the page's own name (D-410).
+    const link = page.getByRole('link', { name: /^Free resume workshop example-library\.org, Sent by Marcus, / });
     await expect(link).toHaveAttribute('href', 'https://example-library.org/workshop');
     await expect(link).toHaveAttribute('target', '_blank');
     await expect(page.getByRole('link', { name: /^Google Doc Document, Sent by Marcus, / })).toBeVisible();
@@ -1245,6 +1246,20 @@ test.describe('stuff shared, in one list (D-402, D-407)', () => {
     await settled(page);
     await expect(page.getByText('Route 47 bus times')).toBeVisible();
     expect(bodies).toEqual([{ message_ids: ['l1'] }]);
+  });
+
+  test('a link with no preview is its own address, and says it is a link (D-410)', async ({ page }) => {
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    await picturesServed(page);
+    await page.route('**/rest/v1/message_link_previews*', (route) => route.fulfill(json([])));
+    await page.route('**/functions/v1/link-preview', (route) => route.fulfill(json({ made: 0 })));
+    await page.route(MESSAGES, (route) =>
+      route.fulfill(json([{ id: 'l1', conversation_id: CONVO, sender_id: ME, body: 'https://www.example-transit.org/route-47', created_at: at(5) }])),
+    );
+    await page.goto(`/messages/thread/files/?id=${CONVO}`);
+    await settled(page);
+    await expect(page.getByRole('link', { name: /^example-transit\.org\/route-47 Link, Sent by You, / })).toBeVisible();
   });
 
   test.describe('with motion allowed', () => {

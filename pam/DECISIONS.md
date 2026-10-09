@@ -10297,3 +10297,20 @@ something off. Similar to industry standard micro interaction patterns."
   others says two different things.
 - Storybook: Member › Created › "A conversation — a file Pam can't send"
   (pastes a GIF on load).
+
+### D-410 — A link shows where it goes; who and when stay
+
+**Date:** 2026-10-09. Will, after D-409: "Link makes sense to show. From who
+and when also makes sense."
+
+- **A link's line on Stuff shared is its address** — "example-library.org"
+  under the page's title — not the word "Link" (D-409) and not the name the
+  page gives itself ("Example Library", 0.49.0). The address, because it is
+  the one thing about a link a page cannot make up: any page can call itself
+  a library or a bank in its preview, but not change where it actually is.
+  "www." is dropped.
+- With no preview yet (0081 not run, a page that could not be read), the
+  row's name is already the address ("example-transit.org/route-47"), so the
+  line under it says "Link" rather than repeat it.
+- Photos and documents keep D-409: "Photo", "Document". Who sent it over when
+  stays at the end of every row, as D-407 put it.

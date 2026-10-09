@@ -239,8 +239,8 @@ export const flows = [
         title: 'Stuff shared',
         story: 'member-created--conversation-files',
         path: '/messages/thread/files/',
-        changed: 'D-409',
-        note: 'One flat list, newest first: photos, documents and links with a small preview, the name on one line (slides to show a long name\'s end), then Photo, Document or Link, and who over when at the end. Links show their page\'s title and picture, fetched by Pam\'s server',
+        changed: 'D-410',
+        note: 'One flat list, newest first: photos, documents and links with a small preview, the name on one line (slides to show a long name\'s end), then Photo, Document or the link\'s address, and who over when at the end. Links show their page\'s title and picture, fetched by Pam\'s server',
       },
       profile: {
         title: 'Profile',
@@ -305,6 +305,7 @@ export const flows = [
       ['profile', 'points', 'Points'],
     ],
     changes: [
+      'D-410 — Stuff shared: a link shows its address under its title; who and when stay at the end',
       "D-409 — Stuff shared and documents say just Photo, Document or Link; a file Pam can't take gets a yellow alert in the box that shakes",
       'D-408 — a conversation: photos are JPEG, PNG or from an iPhone, documents PDF or Word; paste either straight into the message box',
       'D-407 — Stuff shared (was Photos and documents): one flat list of photos, documents and links, who and when at the end, long names slide to their end, link previews from Pam\'s server',

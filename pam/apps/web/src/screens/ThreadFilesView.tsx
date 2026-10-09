@@ -47,10 +47,11 @@ import { PhotoViewer } from '@/app/messages/PhotoViewer';
  * red, Word and Google Docs blue, Google Sheets green); a link's picture from
  * its page, or a globe — then its name on one line, which slides to show its
  * end when it is cut off (`MarqueeText`), then what kind of thing it is —
- * only "Photo", "Document" or "Link" (Will, 9 October, D-409: "for the end
- * user, they only care if it's a link, doc, or photo. So the formats don't
- * need to show"; it was "PDF · 180 kB", "Google Sheet", the site) — and at
- * the end who sent it over when. Pam still tells formats apart underneath:
+ * "Photo" or "Document" (Will, 9 October, D-409: "for the end user, they
+ * only care if it's a link, doc, or photo. So the formats don't need to
+ * show"; it was "PDF · 180 kB", "Google Sheet"), or for a link where it goes,
+ * "example-library.org" (D-410: "Link makes sense to show") — and at the end
+ * who sent it over when (D-410: "From who and when also makes sense"). Pam still tells formats apart underneath:
  * the preview's icon and colour, and what it accepts (D-408).
  *
  * A photo opens the viewer, paging through every photo; a document downloads
@@ -245,7 +246,11 @@ function ThreadFiles() {
     }
     // A Google Doc, Sheet or Slides is, to the person, a document.
     if (item.kind === 'google') return t('messages.file.document');
-    return t('messages.files.link');
+    // A link shows where it goes (Will, D-410: "Link makes sense to show"):
+    // its real address, never the name the page gives itself, which can be
+    // anything. With no preview the address is already the name above, so
+    // this just says it is a link.
+    return previews[item.message.id]?.title ? item.url.hostname.replace(/^www\./, '') : t('messages.files.link');
   };
 
   const openFile = async (item: Extract<Shared, { kind: 'file' }>) => {

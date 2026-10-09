@@ -858,9 +858,9 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
-## Conversations, redrawn (8–9 October) — 0.45.5 to 0.49.2, on the branch
+## Conversations, redrawn (8–9 October) — 0.45.5 to 0.49.3, on the branch
 
-D-389 to D-409 (D-405: Trips' policies banner action is just "Sign"; D-406: a photo's name set like its time; D-408: photos are JPEG, PNG or an iPhone's, documents PDF or Word, and either can be pasted into the box; D-409: things are called Photo, Document or Link, and a refused file gets a shaking alert banner), **on `claude/pam-storybook`, not merged to `main`.** A
+D-389 to D-410 (D-405: Trips' policies banner action is just "Sign"; D-406: a photo's name set like its time; D-408: photos are JPEG, PNG or an iPhone's, documents PDF or Word, and either can be pasted into the box; D-409: things are called Photo, Document or Link, and a refused file gets a shaking alert banner; D-410: a link shows its address instead), **on `claude/pam-storybook`, not merged to `main`.** A
 conversation's header says who the person is on a line under the name —
 "Program lead at Example Food Pantry", "Case manager" (D-395). Each day opens
 with one divider ("Today", "Yesterday", a weekday, a date). Bubbles carry no name or time: mine are light green on the
@@ -911,8 +911,8 @@ an even 8px rim; document icons are `FileTypeIcon` in Google-Doc blue
 list of policy-style rows, newest first — a 48px preview (photo; document
 icon on its colour; a link's picture or a globe), the name on one line
 (`MarqueeText` slides a cut-off name to its end once per view, ≤5s, never
-with reduced motion), what it is in one word — Photo, Document or Link
-(D-409) — and who over when at the end. Photos open
+with reduced motion), what it is in one word — Photo or Document (D-409), or
+for a link its address (D-410) — and who over when at the end. Photos open
 the viewer; documents download; Google Docs and links open in a new tab.
 **Link previews** come from the `link-preview` Edge Function (deployed 9
 October, verify_jwt): asked on send and for older links, it checks the

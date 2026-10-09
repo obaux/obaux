@@ -1,5 +1,11 @@
 # Changelog
 
+## [0.49.3] — 2026-10-09 · Where a link goes
+
+On Stuff shared, a link now shows its web address under its title, so you
+can see where it goes before you tap it. Who sent it and when stay at the
+end of each row (D-410).
+
 ## [0.49.2] — 2026-10-09 · Just what it is
 
 On Stuff shared, each thing now simply says what it is: Photo, Document or
