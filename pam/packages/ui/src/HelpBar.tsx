@@ -1,5 +1,5 @@
 import * as stylex from '@stylexjs/stylex';
-import { Button } from '@astryxdesign/core/Button';
+import { Button } from './Button.js';
 import { PhoneIcon } from './icons.js';
 
 /**

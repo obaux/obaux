@@ -19,6 +19,8 @@
  *     terms, no "hereby".
  */
 
+import { MESSAGE_TRANSLATION } from './translation.js';
+
 export interface LegalSection {
   /** Anchor in the URL and the id the table of contents scrolls to. */
   readonly id: string;
@@ -48,7 +50,7 @@ export const PRIVACY: LegalDocument = {
   introKey: 'privacy.intro',
   updatedKey: 'privacy.updated',
   sections: [
-    section('privacy', 'what-we-keep', 3),
+    section('privacy', 'what-we-keep', 6),
     // The section that restates the transparency contract. Named in a test.
     section('privacy', 'who-can-see', 4),
     // D-414 — where members are told what limiting an account does (the
@@ -57,6 +59,9 @@ export const PRIVACY: LegalDocument = {
     section('privacy', 'texts', 3),
     section('privacy', 'never-say', 2),
     section('privacy', 'sharing', 3),
+    // Only while messages are translated (D-423): the page says it exactly
+    // when it is true, never before and never after.
+    ...(MESSAGE_TRANSLATION.enabled ? [section('privacy', 'translation', 3)] : []),
     section('privacy', 'how-long', 2),
     section('privacy', 'your-choices', 3),
     section('privacy', 'contact', 2),
@@ -75,7 +80,7 @@ export const TERMS: LegalDocument = {
     section('terms', 'what-pam-is', 3),
     section('terms', 'emergencies', 2),
     section('terms', 'your-account', 3),
-    section('terms', 'being-decent', 3),
+    section('terms', 'being-decent', 4),
     section('terms', 'programs', 3),
     section('terms', 'points', 2),
     section('terms', 'limits', 3),

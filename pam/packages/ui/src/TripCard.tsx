@@ -5,7 +5,7 @@ import { ClickableCard } from '@astryxdesign/core/ClickableCard';
 import { Heading } from '@astryxdesign/core/Heading';
 import { HStack } from '@astryxdesign/core/HStack';
 import { Text } from '@astryxdesign/core/Text';
-import { Token } from '@astryxdesign/core/Token';
+import { Badge } from './Badge.js';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { SignIcon, SignedIcon } from './icons.js';
@@ -60,6 +60,7 @@ const styles = stylex.create({
     whiteSpace: 'nowrap',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
+    unicodeBidi: 'plaintext', // its own direction, not the screen's (D-422)
   },
   when: { fontSize: '16px', lineHeight: 1.35 },
   token: { maxWidth: '100%' },
@@ -98,9 +99,11 @@ export function TripCard({
                 <Avatar size="sm" name={withName} src={withPhotoUrl ?? undefined} tooltip={false} alt="" />
               ) : null}
               {policies ? (
-                <Token
-                  size="sm"
-                  color={policies.isDone ? 'green' : 'orange'}
+                // A `Badge`, not a `Token` (D-422): a token trims its label to one
+                // line with an ellipsis and has no way to say otherwise, so
+                // "Signatures needed" was "Нужны подп…". A badge wraps.
+                <Badge
+                  variant={policies.isDone ? 'green' : 'orange'}
                   label={policies.label}
                   icon={policies.isDone ? <SignedIcon {...TOKEN_ICON} /> : <SignIcon {...TOKEN_ICON} />}
                   xstyle={styles.token}

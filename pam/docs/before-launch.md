@@ -57,6 +57,24 @@ STATUS row too.
   account, member + program. The session reads `profile_roles`; it names the
   `profile_id` foreign key, because the table points at `profiles` twice.
 
+- [ ] **Photos, documents and link previews in messages: merge, then look**
+  (Will, 8–9 October 2026, D-394, D-399, D-407, D-428). **Will, 9 October: "Photo
+  and messages are treated the same. Only reported if flagged."** Checked against
+  the database: a photo or document is seen by the two people in the conversation
+  and by a guide or super admin only after someone reports that message, by the
+  same test as its words; link previews only by the two people, reported or not;
+  no admin policy on any of them; the privacy copy says so. So the promise to
+  members is unchanged and **"tell members first" does not block the merge** — a
+  heads-up to the two member accounts on the live project is Will's courtesy to
+  give or skip.
+  - **Done 9 October:** 0079, 0080 and 0081 are live (applied through the
+    connector without their no-op `drop … if exists` guards; read back: three
+    private buckets, seven storage policies, link-preview table with row-level
+    security forced and no `anon` access; `get_advisors` shows nothing new).
+  - **Left:** (1) Will says "merge"; Claude merges to `main` and watches the
+    Vercel deploy. (2) Send one photo, one document and one link between two test
+    accounts and look at both screens.
+
 - [ ] **Approve the Pam-team line on the transparency screen** (STATUS row
   10b). Members were promised they would hear first if what is visible
   changes; the super admin's Everyone list and invite log are visible now.
@@ -148,6 +166,86 @@ Will, 7 October 2026: "Add these to Before launch doc" (D-375).
     see their activity as a member;
   - on What to expect for a program: if someone who works with you also uses
     Pam as a member, you won't see their member activity.
+
+### Languages, and messages in your own language
+
+Will, 9 October 2026: Brazilian Portuguese, Chinese (Mandarin and Cantonese),
+Russian, Arabic (D-422); messages read in the reader's language (D-423).
+
+- [x] **Deploy 0083 before the app that offers the languages ships** — done
+  9 October 2026 (Will asked for the migration and the merge together; applied
+  after `list_migrations` against `packages/db/migrations`, checked by reading
+  `profiles_language_supported` back). It is the one check that lets a profile
+  hold `pt-BR`, `zh-CN`, `zh-HK`, `ru` or `ar`. **0084 (message translations)
+  went in with it** — it creates a table nothing reads or writes until
+  translation is switched on, so it changes nothing a member sees. 0079–0081
+  went in after them; neither pair touches what the other creates.
+
+- [ ] **Have a native speaker read every new language** — nobody has. The six
+  new bundles were drafted by a model (Brazilian Portuguese; the other four in
+  parallel against a frozen English snapshot, then re-checked by script) and
+  have not been read by anybody who speaks them. **Start with what is a
+  promise:** the privacy notice, the terms, the transparency screen, the
+  notices (`NOTICES`), and the seven "Switching to…" lines
+  (`SWITCHING_LANGUAGE`, the first words somebody sees in their language).
+  Cantonese readers: check `zh-HK` for Hong Kong wording (訊息, 電話號碼,
+  傾談), not Taiwan's. Arabic: Modern Standard, and check that the
+  right-to-left screens read naturally. Russian: "вы" throughout.
+
+- [ ] **Sign off the texts and the invite email, language by language, and
+  decide the two things only Will can** (D-424). Drafts now exist: **53 texts**
+  (Portuguese 15, Simplified Chinese 12, Traditional Chinese 12, Russian 7,
+  Arabic 7 — `unsignedSmsDrafts()` lists them) and the **invite email in all
+  five**. None is signed, so **everyone is still texted and emailed in English
+  (or Spanish) whatever their language**; the day a person writes their name in a
+  draft's `reviewedBy`, that language starts for that message and no other.
+  Needs:
+  1. A native reader for each language reads its texts and email against §9 (no
+     word that reveals justice involvement — each language has its own list now —
+     160 characters, or 70 in Chinese, Russian and Arabic, no emoji) and signs
+     them. **I never fill in `reviewedBy`.**
+  2. **Will: two segments or English for the reminders?** The three appointment
+     reminders (a time, an address, a link) cannot be said in 70 characters in
+     Chinese, Russian or Arabic, so those readers get them in English. Allowing
+     two segments doubles their cost and changes the carrier registration, which
+     says one. Also the shorter the link, the more fits: the live `app_url` is
+     36 characters.
+  3. **Re-file the campaign** with the carrier before the first text in a new
+     language: `docs/sms-campaign-samples.md` names English and Spanish only.
+  4. The email provider (the item at the top) is what sends the invite email at
+     all.
+
+- [ ] **Apply 0085 whenever convenient — nothing waits on it** (D-424, D-428). It
+  keeps the language a person asked in, so a denial text and a fresh-link email
+  are written in it and an approved account opens in it. It replaces two
+  functions, so the live connector hangs on it (tried 9 October; nothing left
+  behind) and it goes in by hand: paste
+  `packages/db/manual/2026-10-09-language-where-there-is-no-profile.sql` into the
+  Supabase SQL editor (`pam` project), Run, "Success"; tell Claude "applied". Until
+  then the app asks for the language and, finding no such parameter, asks again
+  without it, so everything works and is simply in English. Run
+  `list_migrations` first.
+
+- [ ] **Messages in your own language — switching it on.** Built and tested,
+  off (`MESSAGE_TRANSLATION` in `packages/config/src/translation.ts`; the
+  function's own switch is the secret `MESSAGE_TRANSLATION=on`). Before
+  either is turned on:
+  1. 0084 is live (9 October); deploy `translate-messages` (`supabase functions deploy
+     translate-messages`), and read `get_advisors`.
+  2. Set `ANTHROPIC_API_KEY` as a function secret — never in this repo — on an
+     account whose terms say what is sent is **not kept and not used to
+     train**. Get that in writing; the privacy page says it ("It keeps
+     nothing and does not learn from them").
+  3. A native speaker reads `privacy.s.translation.*` in all seven languages
+     (it appears on the privacy page the moment the switch is on).
+  4. **Tell members first** (the transparency promise): translation sends the
+     words of a message to another company. Will to word it, as for the two
+     roles (above).
+  5. Decide a cap per person per day. The function limits one call to 30
+     messages and 4,000 characters each, not how often it is called.
+  6. Flip `MESSAGE_TRANSLATION.enabled` to `true`; `legal.test.ts` fails on
+     purpose until it is updated with it. Send two messages between two test
+     accounts in different languages and look at both screens.
 
 ## Done
 

@@ -43,7 +43,7 @@ const styles = stylex.create({
 });
 
 export function InviteExpiredScreen({ invite }: { readonly invite: Invite | null }) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
   const [preview, setPreview] = useState<InvitePreview | null | 'loading'>('loading');
   const [email, setEmail] = useState('');
   const [isInvalid, setIsInvalid] = useState(false);
@@ -78,7 +78,7 @@ export function InviteExpiredScreen({ invite }: { readonly invite: Invite | null
     setIsInvalid(false);
     setBusy(true);
     setFailed(false);
-    const ok = await requestInviteLink(invite.code, email);
+    const ok = await requestInviteLink(invite.code, email, locale);
     setBusy(false);
     if (ok) setSent(true);
     else setFailed(true);

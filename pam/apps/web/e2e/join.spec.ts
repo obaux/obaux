@@ -161,7 +161,9 @@ test.describe('signing up', () => {
 
     // Step 3: what is visible, and what is not.
     await expect(page.getByRole('heading', { name: 'What others can see' })).toBeVisible();
-    await expect(page.getByText('What you say to someone else')).toBeVisible();
+    await expect(page.getByText('What you say or send to someone else')).toBeVisible();
+    // D-394, D-399: photos and documents are named, not left to "message" meaning all.
+    await expect(page.getByText('A message, photo or document only if someone says it is not safe')).toBeVisible();
     // D-199: the one activity fact a program is allowed is stated here, not
     // left to be inferred from a lit ring on somebody else's screen.
     await expect(

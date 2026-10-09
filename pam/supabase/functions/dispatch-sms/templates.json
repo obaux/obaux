@@ -4,6 +4,20 @@
       "key": "invite_member",
       "en": "Pam: You've been invited to Pam, an app for finding help and people near you. Tap to join: {link}",
       "es": "Pam: Le invitaron a Pam, una app para encontrar ayuda y personas cerca. Toque para entrar: {link}",
+      "more": {
+        "pt-BR": {
+          "body": "Pam: Convidaram voce para o Pam, um app para achar ajuda e pessoas por perto. Toque para entrar: {link}",
+          "reviewedBy": ""
+        },
+        "zh-CN": {
+          "body": "Pam: 您受邀加入 Pam：{link}",
+          "reviewedBy": ""
+        },
+        "zh-HK": {
+          "body": "Pam: 你獲邀加入 Pam：{link}",
+          "reviewedBy": ""
+        }
+      },
       "vars": [
         "link"
       ],
@@ -14,6 +28,20 @@
       "key": "invite_provider",
       "en": "Pam: You have been invited to list your services on Pam. Tap to set up your page: {link}",
       "es": "Pam: Le invitaron a publicar sus servicios en Pam. Toque para crear su pagina: {link}",
+      "more": {
+        "pt-BR": {
+          "body": "Pam: Voce recebeu um convite para anunciar seus servicos no Pam. Toque para criar sua pagina: {link}",
+          "reviewedBy": ""
+        },
+        "zh-CN": {
+          "body": "Pam: 邀请您发布服务：{link}",
+          "reviewedBy": ""
+        },
+        "zh-HK": {
+          "body": "Pam: 邀請你發佈服務：{link}",
+          "reviewedBy": ""
+        }
+      },
       "vars": [
         "link"
       ],
@@ -24,6 +52,28 @@
       "key": "verify_code",
       "en": "Pam: Your code is {code}. It works for 10 minutes.",
       "es": "Pam: Su codigo es {code}. Sirve por 10 minutos.",
+      "more": {
+        "pt-BR": {
+          "body": "Pam: Seu codigo é {code}. Vale por 10 minutos.",
+          "reviewedBy": ""
+        },
+        "zh-CN": {
+          "body": "Pam: 您的验证码是 {code}，10 分钟内有效。",
+          "reviewedBy": ""
+        },
+        "zh-HK": {
+          "body": "Pam: 你的驗證碼是 {code}，10 分鐘內有效。",
+          "reviewedBy": ""
+        },
+        "ru": {
+          "body": "Pam: Ваш код {code}. Действует 10 минут.",
+          "reviewedBy": ""
+        },
+        "ar": {
+          "body": "Pam: رمزك {code}. صالح لمدة 10 دقائق.",
+          "reviewedBy": ""
+        }
+      },
       "vars": [
         "code"
       ],
@@ -34,6 +84,26 @@
       "key": "facilitation_member",
       "en": "Pam: {adminFirstName} connected you with a program that can help. Open Pam to say hi: {link}",
       "es": "Pam: {adminFirstName} le conecto con un programa que puede ayudar. Abra Pam para saludar: {link}",
+      "more": {
+        "pt-BR": {
+          "body": "Pam: {adminFirstName} conectou voce a um programa que pode ajudar. Abra o Pam para dizer oi: {link}",
+          "reviewedBy": ""
+        },
+        "zh-CN": {
+          "body": "Pam: {adminFirstName} 帮您联系了项目：{link}",
+          "reviewedBy": "",
+          "maxVarLengths": {
+            "adminFirstName": 14
+          }
+        },
+        "zh-HK": {
+          "body": "Pam: {adminFirstName} 幫你聯絡了計劃：{link}",
+          "reviewedBy": "",
+          "maxVarLengths": {
+            "adminFirstName": 14
+          }
+        }
+      },
       "vars": [
         "adminFirstName",
         "link"
@@ -45,6 +115,20 @@
       "key": "facilitation_provider",
       "en": "Pam: Someone was introduced to your program. Open Pam to reply: {link}",
       "es": "Pam: Alguien fue presentado a su programa. Abra Pam para responder: {link}",
+      "more": {
+        "pt-BR": {
+          "body": "Pam: Alguem foi apresentado ao seu programa. Abra o Pam para responder: {link}",
+          "reviewedBy": ""
+        },
+        "zh-CN": {
+          "body": "Pam: 有人被介绍到您的项目。打开 Pam 回复：{link}",
+          "reviewedBy": ""
+        },
+        "zh-HK": {
+          "body": "Pam: 有人獲介紹到你的計劃。打開 Pam 回覆：{link}",
+          "reviewedBy": ""
+        }
+      },
       "vars": [
         "link"
       ],
@@ -55,6 +139,12 @@
       "key": "appointment_24h",
       "en": "Pam: You have a visit tomorrow at {time}. {address}. Tap for directions: {link}",
       "es": "Pam: Tiene una visita mañana a las {time}. {address}. Toque para llegar: {link}",
+      "more": {
+        "pt-BR": {
+          "body": "Pam: Voce tem uma visita amanha as {time}. {address}. Toque para chegar: {link}",
+          "reviewedBy": ""
+        }
+      },
       "vars": [
         "time",
         "address",
@@ -70,6 +160,12 @@
       "key": "appointment_2h",
       "en": "Pam: Your visit is at {time} today. {address}. Tap for directions: {link}",
       "es": "Pam: Su visita es hoy a las {time}. {address}. Toque para llegar: {link}",
+      "more": {
+        "pt-BR": {
+          "body": "Pam: Sua visita é hoje as {time}. {address}. Toque para chegar: {link}",
+          "reviewedBy": ""
+        }
+      },
       "vars": [
         "time",
         "address",
@@ -85,6 +181,12 @@
       "key": "appointment_morning_of",
       "en": "Pam: Today at {time} you have a visit. {address}. Tap for directions: {link}",
       "es": "Pam: Hoy a las {time} tiene una visita. {address}. Toque para llegar: {link}",
+      "more": {
+        "pt-BR": {
+          "body": "Pam: Hoje as {time} voce tem uma visita. {address}. Toque para chegar: {link}",
+          "reviewedBy": ""
+        }
+      },
       "vars": [
         "time",
         "address",
@@ -100,6 +202,28 @@
       "key": "attendance_check",
       "en": "Pam: Did you make it today? Reply YES or NO.",
       "es": "Pam: Pudo ir hoy? Responda YES o NO.",
+      "more": {
+        "pt-BR": {
+          "body": "Pam: Voce conseguiu ir hoje? Responda YES ou NO.",
+          "reviewedBy": ""
+        },
+        "zh-CN": {
+          "body": "Pam: 您今天到了吗？回复 YES 或 NO。",
+          "reviewedBy": ""
+        },
+        "zh-HK": {
+          "body": "Pam: 你今日到了嗎？回覆 YES 或 NO。",
+          "reviewedBy": ""
+        },
+        "ru": {
+          "body": "Pam: Вы сегодня дошли? Ответьте YES или NO.",
+          "reviewedBy": ""
+        },
+        "ar": {
+          "body": "Pam: هل وصلت اليوم؟ رد بـ YES أو NO.",
+          "reviewedBy": ""
+        }
+      },
       "vars": [],
       "reviewedBy": "Will (Oba), 13 September 2026",
       "isFirstContact": false
@@ -108,6 +232,28 @@
       "key": "attendance_missed_followup",
       "en": "Pam: No problem. We saved a step to set up a new time. Open Pam when you are ready: {link}",
       "es": "Pam: No hay problema. Guardamos un paso para buscar otra fecha. Abra Pam cuando pueda: {link}",
+      "more": {
+        "pt-BR": {
+          "body": "Pam: Sem problema. Guardamos um passo para marcar outra data. Abra o Pam quando puder: {link}",
+          "reviewedBy": ""
+        },
+        "zh-CN": {
+          "body": "Pam: 没关系。打开 Pam 重新约时间：{link}",
+          "reviewedBy": ""
+        },
+        "zh-HK": {
+          "body": "Pam: 不要緊。打開 Pam 重新約時間：{link}",
+          "reviewedBy": ""
+        },
+        "ru": {
+          "body": "Pam: Не страшно. Новое время: {link}",
+          "reviewedBy": ""
+        },
+        "ar": {
+          "body": "Pam: لا بأس. موعد جديد: {link}",
+          "reviewedBy": ""
+        }
+      },
       "vars": [
         "link"
       ],
@@ -118,6 +264,28 @@
       "key": "staff_request_approved",
       "en": "Pam: Your request was approved. Open Pam to get started: {link}",
       "es": "Pam: Su solicitud fue aprobada. Abra Pam para empezar: {link}",
+      "more": {
+        "pt-BR": {
+          "body": "Pam: Seu pedido foi aprovado. Abra o Pam para comecar: {link}",
+          "reviewedBy": ""
+        },
+        "zh-CN": {
+          "body": "Pam: 您的申请已获批准。打开 Pam 开始：{link}",
+          "reviewedBy": ""
+        },
+        "zh-HK": {
+          "body": "Pam: 你的申請已獲批准。打開 Pam 開始：{link}",
+          "reviewedBy": ""
+        },
+        "ru": {
+          "body": "Pam: Заявка одобрена: {link}",
+          "reviewedBy": ""
+        },
+        "ar": {
+          "body": "Pam: تمت الموافقة على طلبك: {link}",
+          "reviewedBy": ""
+        }
+      },
       "vars": [
         "link"
       ],
@@ -128,6 +296,28 @@
       "key": "staff_request_denied",
       "en": "Pam: Your request was not approved. Questions? Call {supportPhone}.",
       "es": "Pam: Su solicitud no fue aprobada. Preguntas? Llame al {supportPhone}.",
+      "more": {
+        "pt-BR": {
+          "body": "Pam: Seu pedido nao foi aprovado. Duvidas? Ligue para {supportPhone}.",
+          "reviewedBy": ""
+        },
+        "zh-CN": {
+          "body": "Pam: 您的申请未获批准。有疑问请拨打 {supportPhone}。",
+          "reviewedBy": ""
+        },
+        "zh-HK": {
+          "body": "Pam: 你的申請未獲批准。如有疑問請致電 {supportPhone}。",
+          "reviewedBy": ""
+        },
+        "ru": {
+          "body": "Pam: Заявку не одобрили. Вопросы? Звоните {supportPhone}",
+          "reviewedBy": ""
+        },
+        "ar": {
+          "body": "Pam: لم تتم الموافقة على طلبك. للاستفسار: {supportPhone}",
+          "reviewedBy": ""
+        }
+      },
       "vars": [
         "supportPhone"
       ],
@@ -138,6 +328,28 @@
       "key": "connection_request",
       "en": "Pam: Someone on Pam wants to connect. Open Pam to reply: {link}",
       "es": "Pam: Alguien en Pam quiere conectar. Abra Pam para responder: {link}",
+      "more": {
+        "pt-BR": {
+          "body": "Pam: Alguem no Pam quer se conectar. Abra o Pam para responder: {link}",
+          "reviewedBy": ""
+        },
+        "zh-CN": {
+          "body": "Pam: 有人想在 Pam 联系您。打开 Pam 回复：{link}",
+          "reviewedBy": ""
+        },
+        "zh-HK": {
+          "body": "Pam: 有人想在 Pam 與你聯絡。打開 Pam 回覆：{link}",
+          "reviewedBy": ""
+        },
+        "ru": {
+          "body": "Pam: С вами хотят связаться: {link}",
+          "reviewedBy": ""
+        },
+        "ar": {
+          "body": "Pam: شخص يريد التواصل: {link}",
+          "reviewedBy": ""
+        }
+      },
       "vars": [
         "link"
       ],
@@ -148,6 +360,20 @@
       "key": "saved_place_closed",
       "en": "Pam: A place you saved is {reason}. Find others in Pam: {link}",
       "es": "Pam: Un lugar que guardo {reason}. Vea otros en Pam: {link}",
+      "more": {
+        "pt-BR": {
+          "body": "Pam: Um lugar que voce salvou {reason}. Veja outros no Pam: {link}",
+          "reviewedBy": ""
+        },
+        "zh-CN": {
+          "body": "Pam: 您收藏的地点{reason}。看其他：{link}",
+          "reviewedBy": ""
+        },
+        "zh-HK": {
+          "body": "Pam: 你儲存的地點{reason}。看其他：{link}",
+          "reviewedBy": ""
+        }
+      },
       "vars": [
         "reason",
         "link"
@@ -159,6 +385,28 @@
       "key": "access_limited_notice",
       "en": "Pam: Some parts of Pam are turned off for now. Call {supportPhone} with questions.",
       "es": "Pam: Algunas partes de Pam estan apagadas por ahora. Llame al {supportPhone} si tiene preguntas.",
+      "more": {
+        "pt-BR": {
+          "body": "Pam: Algumas partes do Pam estao desligadas por enquanto. Ligue para {supportPhone} se tiver duvidas.",
+          "reviewedBy": ""
+        },
+        "zh-CN": {
+          "body": "Pam: Pam 的部分功能暂时关闭。有疑问请拨打 {supportPhone}。",
+          "reviewedBy": ""
+        },
+        "zh-HK": {
+          "body": "Pam: Pam 部分功能暫時關閉。如有疑問請致電 {supportPhone}。",
+          "reviewedBy": ""
+        },
+        "ru": {
+          "body": "Pam: Часть функций Pam пока отключена. Звоните {supportPhone}",
+          "reviewedBy": ""
+        },
+        "ar": {
+          "body": "Pam: بعض ميزات Pam متوقفة الآن. اتصل بـ {supportPhone}",
+          "reviewedBy": ""
+        }
+      },
       "vars": [
         "supportPhone"
       ],
@@ -169,19 +417,324 @@
   "reasons": {
     "closed": {
       "en": "closed, so there is no need to go",
-      "es": "ya no abre, no hace falta ir"
+      "es": "ya no abre, no hace falta ir",
+      "pt-BR": "fechou, nao precisa ir",
+      "zh-CN": "已关闭，无需前往",
+      "zh-HK": "已結業，無需前往"
     },
     "moved": {
       "en": "at a new address now",
-      "es": "cambio de direccion"
+      "es": "cambio de direccion",
+      "pt-BR": "mudou de endereco",
+      "zh-CN": "已搬到新地址",
+      "zh-HK": "已搬到新地址"
     },
     "not_accepting": {
       "en": "not taking new people, so there is no need to go",
-      "es": "no acepta gente nueva, no hace falta ir"
+      "es": "no acepta gente nueva, no hace falta ir",
+      "pt-BR": "nao aceita gente nova, nao precisa ir",
+      "zh-CN": "暂不接收新人，无需前往",
+      "zh-HK": "暫不接收新人，無需前往"
     },
     "wrong_info": {
       "en": "listed wrong here",
-      "es": "esta mal anotado aqui"
+      "es": "esta mal anotado aqui",
+      "pt-BR": "esta com informacao errada aqui",
+      "zh-CN": "这里的信息有误",
+      "zh-HK": "這裡的資料有誤"
     }
-  }
+  },
+  "stop": {
+    "en": " Reply STOP to stop texts.",
+    "es": " Responda STOP para no recibir mas.",
+    "pt-BR": " Responda STOP para nao receber mais.",
+    "zh-CN": " 回复 STOP 退订。",
+    "zh-HK": " 回覆 STOP 取消接收。",
+    "ru": " Ответьте STOP для отписки.",
+    "ar": " للإلغاء أرسل STOP."
+  },
+  "forbidden": {
+    "en": [
+      "parole",
+      "probation",
+      "officer",
+      "case manager",
+      "inmate",
+      "prisoner",
+      "offender",
+      "ex-offender",
+      "convict",
+      "conviction",
+      "felon",
+      "felony",
+      "incarcerat",
+      "reentry",
+      "re-entry",
+      "halfway house",
+      "correctional",
+      "corrections",
+      "jail",
+      "prison",
+      "release",
+      "supervision",
+      "court",
+      "sentence"
+    ],
+    "es": [
+      "libertad condicional",
+      "libertad vigilada",
+      "condicional",
+      "prision",
+      "preso",
+      "presidiari",
+      "recluso",
+      "reclusion",
+      "carcel",
+      "encarcel",
+      "penitenciari",
+      "convicto",
+      "exconvicto",
+      "condena",
+      "condenad",
+      "sentencia",
+      "antecedentes penales",
+      "delincuente",
+      "delito",
+      "criminal",
+      "tribunal",
+      "juzgado",
+      "gestor de caso",
+      "gestora de caso",
+      "trabajador de caso",
+      "oficial de libertad",
+      "reinsercion",
+      "supervision",
+      "excarcel"
+    ],
+    "pt-BR": [
+      "presidiari",
+      "ex-preso",
+      "ex-detent",
+      "ex-condenad",
+      "ex-apenad",
+      "ex-interno",
+      "encarcera",
+      "condenad",
+      "condenac",
+      "sentenciad",
+      "apenad",
+      "criminos",
+      "delinquen",
+      "antecedentes criminais",
+      "ficha criminal",
+      "folha corrida",
+      "prisional",
+      "penitenciari",
+      "prisao",
+      "reclusao",
+      "egresso",
+      "liberdade condicional",
+      "livramento condicional",
+      "liberdade vigiada",
+      "tornozeleira",
+      "regime semiaberto",
+      "regime aberto",
+      "condicional",
+      "preso",
+      "detento",
+      "cadeia",
+      "delegacia",
+      "tribunal",
+      "sentenca",
+      "reincid",
+      "reentrada",
+      "gestor de caso",
+      "gestora de caso",
+      "gerente de caso",
+      "agente de liberdade",
+      "supervisao"
+    ],
+    "zh-CN": [
+      "囚犯",
+      "犯人",
+      "罪犯",
+      "前科",
+      "定罪",
+      "有罪",
+      "重罪",
+      "在押",
+      "刑期",
+      "前囚",
+      "更生人",
+      "犯罪记录",
+      "犯罪記錄",
+      "犯罪紀錄",
+      "刑满",
+      "刑滿",
+      "刑释",
+      "刑釋",
+      "受刑人",
+      "释放人员",
+      "釋放人員",
+      "出狱",
+      "出獄",
+      "入狱",
+      "入獄",
+      "服刑",
+      "坐牢",
+      "监狱",
+      "監獄",
+      "劳改",
+      "勞改",
+      "假释",
+      "假釋",
+      "缓刑",
+      "緩刑",
+      "狱",
+      "犯",
+      "案件经理",
+      "案件經理",
+      "个案经理",
+      "個案經理",
+      "个案管理",
+      "個案管理",
+      "法院",
+      "法庭",
+      "判决",
+      "判決",
+      "宣判",
+      "监管",
+      "監管",
+      "监督",
+      "監督",
+      "释放",
+      "釋放",
+      "重返社会",
+      "重返社會",
+      "更生"
+    ],
+    "zh-HK": [
+      "囚犯",
+      "犯人",
+      "罪犯",
+      "前科",
+      "定罪",
+      "有罪",
+      "重罪",
+      "在押",
+      "刑期",
+      "前囚",
+      "更生人",
+      "犯罪记录",
+      "犯罪記錄",
+      "犯罪紀錄",
+      "刑满",
+      "刑滿",
+      "刑释",
+      "刑釋",
+      "受刑人",
+      "释放人员",
+      "釋放人員",
+      "出狱",
+      "出獄",
+      "入狱",
+      "入獄",
+      "服刑",
+      "坐牢",
+      "监狱",
+      "監獄",
+      "劳改",
+      "勞改",
+      "假释",
+      "假釋",
+      "缓刑",
+      "緩刑",
+      "狱",
+      "犯",
+      "案件经理",
+      "案件經理",
+      "个案经理",
+      "個案經理",
+      "个案管理",
+      "個案管理",
+      "法院",
+      "法庭",
+      "判决",
+      "判決",
+      "宣判",
+      "监管",
+      "監管",
+      "监督",
+      "監督",
+      "释放",
+      "釋放",
+      "重返社会",
+      "重返社會",
+      "更生"
+    ],
+    "ru": [
+      "заключенн",
+      "зэк",
+      "осужденн",
+      "осуждени",
+      "судимост",
+      "тюрь",
+      "колони",
+      "исправительн",
+      "освободивш",
+      "отбыв",
+      "условно-досрочн",
+      "испытательныи срок",
+      "пробаци",
+      "уголовн",
+      "преступ",
+      "правонарушител",
+      "рецидив",
+      "арестант",
+      "лишени",
+      "изолятор",
+      "сизо",
+      "суд",
+      "приговор",
+      "надзор",
+      "куратор",
+      "кеис-менеджер",
+      "менеджер по делу",
+      "освобожд"
+    ],
+    "ar": [
+      "سجين",
+      "سجناء",
+      "مسجون",
+      "نزلاء",
+      "معتقل",
+      "سجن",
+      "مجرم",
+      "جريمة",
+      "جرايم",
+      "جنايي",
+      "سوابق",
+      "محكوم",
+      "مدان",
+      "ادانة",
+      "الافراج المشروط",
+      "ضابط مراقبة",
+      "عقوبة",
+      "افراج",
+      "افرج",
+      "مراقبة سلوك",
+      "فترة اختبار",
+      "اختبار قضايي",
+      "محكمة",
+      "قاضي",
+      "حكم بالسجن",
+      "اعادة ادماج",
+      "اعادة الادماج",
+      "مدير الحالة",
+      "مدير حالة",
+      "مسوول الحالة",
+      "اشراف"
+    ]
+  },
+  "gsm7": "@£$¥èéùìòÇ\nØø\rÅåΔ_ΦΓΛΩΠΨΣΘΞÆæßÉ !\"#¤%&'()*+,-./0123456789:;<=>?¡ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÑÜ§¿abcdefghijklmnopqrstuvwxyzäöñüà^{}\\[~]|€"
 }

@@ -2,7 +2,15 @@ import { useEffect } from 'react';
 import type { Decorator, Preview } from '@storybook/nextjs';
 import { Theme } from '@astryxdesign/core/theme';
 import { MotionProvider } from '@pam/ui';
-import type { Locale } from '@pam/config';
+import { isSupportedLocale, type Locale, type TextBundle } from '@pam/config';
+import en from '@pam/config/locales/en.json';
+import es from '@pam/config/locales/es.json';
+import ptBR from '@pam/config/locales/pt-BR.json';
+import zhCN from '@pam/config/locales/zh-CN.json';
+import zhHK from '@pam/config/locales/zh-HK.json';
+import ru from '@pam/config/locales/ru.json';
+import ar from '@pam/config/locales/ar.json';
+import { pseudoBundle } from '@pam/config/pseudo';
 import { pamTheme } from '@pam/ui/theme';
 import { I18nProvider, useI18n } from '../src/lib/i18n';
 import { AlertBannerProvider } from '../src/lib/alertBanner';
@@ -29,6 +37,20 @@ function SchemeBridge({ mode }: { readonly mode: 'light' | 'dark' }) {
   return null;
 }
 
+/**
+ * Every language, already in hand: Storybook has no network to wait on and a
+ * story must paint in its language the first time, not English and then
+ * Spanish. (The app loads them on demand.)
+ */
+const BUNDLES: Record<Locale, TextBundle> = { en, es, 'pt-BR': ptBR, 'zh-CN': zhCN, 'zh-HK': zhHK, ru, ar };
+
+/**
+ * The English stretched ~40% and wrapped in ⟦ ⟧ (D-424): a way to see whether a
+ * screen holds longer words before any translation exists, and to find a string
+ * that never went through `t()` (it stays unaccented). Storybook only.
+ */
+const BUNDLES_PSEUDO: Record<Locale, TextBundle> = { ...BUNDLES, en: pseudoBundle(en) };
+
 /** Follows the toolbar's language switch. */
 function LocaleBridge({ locale }: { readonly locale: Locale }) {
   const { setLocale } = useI18n();
@@ -43,11 +65,13 @@ function LocaleBridge({ locale }: { readonly locale: Locale }) {
  */
 const withPam: Decorator = (Story, context) => {
   const mode = context.globals['theme'] === 'dark' ? 'dark' : 'light';
-  const locale = (context.globals['locale'] === 'es' ? 'es' : 'en') as Locale;
+  const chosen = String(context.globals['locale'] ?? '');
+  const pseudo = chosen === 'pseudo';
+  const locale: Locale = isSupportedLocale(chosen) ? chosen : 'en';
   return (
     <Theme theme={pamTheme} mode={mode}>
       <MotionProvider>
-        <I18nProvider>
+        <I18nProvider key={pseudo ? 'pseudo' : 'real'} bundles={pseudo ? BUNDLES_PSEUDO : BUNDLES} initialLocale={locale}>
           <SchemeBridge mode={mode} />
           <LocaleBridge locale={locale} />
           <AlertBannerProvider>
@@ -92,6 +116,12 @@ const preview: Preview = {
         items: [
           { value: 'en', title: 'English' },
           { value: 'es', title: 'Español' },
+          { value: 'pt-BR', title: 'Português (Brasil)' },
+          { value: 'zh-CN', title: '简体中文（普通话）' },
+          { value: 'zh-HK', title: '繁體中文（廣東話）' },
+          { value: 'ru', title: 'Русский' },
+          { value: 'ar', title: 'العربية' },
+          { value: 'pseudo', title: 'Pseudo-language (English +40%)' },
         ],
         dynamicTitle: true,
       },

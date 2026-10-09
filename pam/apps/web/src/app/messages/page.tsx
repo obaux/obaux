@@ -10,6 +10,7 @@ import { AppHeader, BigButton, Loading, Notice, Page, PageTitle } from '@pam/ui'
 import { NOTICES, type Role } from '@pam/config';
 import { USE_DUMMY_PEOPLE } from '@pam/config/dummy-flag';
 import { useI18n } from '@/lib/i18n';
+import { usePreloadThreadView } from './ThreadViewLazy';
 import { NotIn } from '../NotIn';
 import { HeaderBell } from '../HeaderBell';
 import { useSupportPhone } from '@/lib/useSupportPhone';
@@ -78,6 +79,8 @@ function contextFor(
 }
 
 function MessagesScreen() {
+  // A conversation opens ready, its composer and fades already loaded (D-400).
+  usePreloadThreadView();
   const { t, locale } = useI18n();
   const supportPhone = useSupportPhone();
   const { state: session } = useSession();
@@ -250,13 +253,17 @@ function MessagesScreen() {
               key={c.id}
               name={c.otherName ?? t('messages.thread.someone')}
               context={contextFor(trueRole, c.otherRole, c.otherProgramName, t)}
-              preview={
-                c.lastMessageBody === null
-                  ? t('messages.preview.none')
-                  : c.lastMessageMine
-                    ? t('messages.preview.you', { text: c.lastMessageBody })
-                    : c.lastMessageBody
-              }
+              preview={(() => {
+                // A photo with no words reads "Photo" (D-394).
+                const text = c.lastMessageBody ??
+            (c.lastMessageAttachment === 'photo'
+              ? t('messages.preview.photo')
+              : c.lastMessageAttachment === 'file'
+                ? t('messages.preview.file')
+                : null);
+                if (text === null) return t('messages.preview.none');
+                return c.lastMessageMine ? t('messages.preview.you', { text }) : text;
+              })()}
               when={c.lastMessageAt ? whenHappened(c.lastMessageAt, locale, t) : null}
               unread={c.unread}
               unreadLabel={t('notify.new')}

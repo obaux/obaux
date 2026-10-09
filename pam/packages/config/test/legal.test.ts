@@ -1,20 +1,21 @@
 import { describe, expect, it } from 'vitest';
-import en from '../src/locales/en.json' with { type: 'json' };
-import es from '../src/locales/es.json' with { type: 'json' };
+import { BUNDLES } from './_bundles.js';
 import {
   LEGAL_DOCUMENTS,
   PRIVACY,
   PRIVACY_VISIBILITY_SECTION,
   legalKeys,
 } from '../src/legal.js';
-import { TRANSPARENCY_SCREEN } from '../src/transparency.js';
+import { ADMIN_CANNOT_SEE, TRANSPARENCY_SCREEN } from '../src/transparency.js';
+import { MESSAGE_TRANSLATION } from '../src/translation.js';
 import { fleschKincaidGrade, findDignityViolations } from '../src/language.js';
 
-const bundles = { en, es } as Record<string, Record<string, string>>;
+const en = BUNDLES.en;
+const bundles: Record<string, Record<string, string>> = BUNDLES;
 
 describe('the privacy notice and the terms', () => {
   it.each(LEGAL_DOCUMENTS.map((d) => [d.id, d] as const))(
-    '%s has every string in both languages',
+    '%s has every string in every language',
     (_id, doc) => {
       for (const key of legalKeys(doc)) {
         for (const [locale, bundle] of Object.entries(bundles)) {
@@ -36,10 +37,7 @@ describe('the privacy notice and the terms', () => {
   it('never uses a word that reduces somebody to their record', () => {
     const legal = Object.fromEntries(
       LEGAL_DOCUMENTS.flatMap((doc) =>
-        legalKeys(doc).flatMap((k) => [
-          [`en.${k}`, en[k as keyof typeof en]],
-          [`es.${k}`, es[k as keyof typeof es]],
-        ]),
+        legalKeys(doc).flatMap((k) => Object.entries(BUNDLES).map(([locale, bundle]) => [`${locale}.${k}`, bundle[k]!])),
       ),
     ) as Record<string, string>;
     expect(findDignityViolations(legal)).toEqual([]);
@@ -90,9 +88,98 @@ describe('the privacy page and the transparency screen agree', () => {
     expect(text).toMatch(/reports it as not safe/);
   });
 
+  it('names photos wherever it names messages (D-394)', () => {
+    // A photo is part of a message, and nobody reading "your messages" should
+    // have to guess whether that includes the pictures. Both the page and the
+    // screen say so in words.
+    const text = visibility!.bodyKeys.map((k) => (en[k as keyof typeof en] as string).toLowerCase()).join(' ');
+    expect(text).toMatch(/cannot read your messages or see your photos/);
+    expect(text).toMatch(/its photo/);
+    const flagged = TRANSPARENCY_SCREEN.canSee.find((l) => l.key === 'transparency.canSee.flagged');
+    expect(flagged?.en).toMatch(/message, photo/);
+  });
+
+  it('names documents wherever it names photos (D-399)', () => {
+    // A PDF or a Word file is sent as it is — unlike a photo, nothing is
+    // taken out of it — and a Google Docs link is Google's to share, not
+    // Pam's. The page says both, and every line about who sees a photo says
+    // the same of a document.
+    const keep = PRIVACY.sections
+      .flatMap((s) => s.bodyKeys)
+      .map((k) => en[k as keyof typeof en] as string)
+      .join(' ');
+    expect(keep).toMatch(/messages, photos and documents you send/);
+    expect(keep).toMatch(/sends it just as it is/);
+    expect(keep).toMatch(/Google decides who can see that doc, not Pam/);
+    const text = visibility!.bodyKeys.map((k) => (en[k as keyof typeof en] as string).toLowerCase()).join(' ');
+    expect(text).toMatch(/see your photos or documents/);
+    expect(text).toMatch(/its photo or document/);
+    const flagged = TRANSPARENCY_SCREEN.canSee.find((l) => l.key === 'transparency.canSee.flagged');
+    expect(flagged?.en).toMatch(/message, photo or document/);
+  });
+
+  it('says that Pam\'s server opens a shared link for its preview, and the phone does not (D-407)', () => {
+    const keep = PRIVACY.sections
+      .flatMap((s) => s.bodyKeys)
+      .map((k) => en[k as keyof typeof en] as string)
+      .join(' ');
+    expect(keep).toMatch(/Pam's server opens the page once/);
+    expect(keep).toMatch(/Your phone does not visit the page until you tap the link/);
+    expect(ADMIN_CANNOT_SEE).toContain('message_link_previews');
+  });
+
   it('promises to tell members before the list changes, exactly as the screen does', () => {
     const page = visibility!.bodyKeys.map((k) => en[k as keyof typeof en] as string).join(' ');
     expect(page).toMatch(/we will tell you first/i);
     expect(TRANSPARENCY_SCREEN.footer).toMatch(/we will tell you first/i);
+  });
+});
+
+describe('messages read in the reader’s language (D-423)', () => {
+  const TRANSLATION_KEYS = ['title', 'p1', 'p2', 'p3'].map((k) => `privacy.s.translation.${k}`);
+
+  it('is off until somebody turns it on (and Will has been told)', () => {
+    // Flip MESSAGE_TRANSLATION.enabled only with the items in
+    // docs/before-launch.md done. This test is here so that is a decision,
+    // not a side effect: it will fail, and whoever flips it updates it.
+    expect(MESSAGE_TRANSLATION.enabled).toBe(false);
+  });
+
+  it('is on the privacy page exactly when it is true — never before, never after', () => {
+    const says = PRIVACY.sections.some((s) => s.id === 'translation');
+    expect(says).toBe(MESSAGE_TRANSLATION.enabled);
+    if (!MESSAGE_TRANSLATION.enabled) {
+      // While it is off, nothing on the page claims or hints at it.
+      for (const key of legalKeys(PRIVACY)) {
+        expect(en[key as keyof typeof en] as string, key).not.toMatch(/translat/i);
+      }
+    }
+  });
+
+  it('is already written in every language, so turning it on cannot ship a gap', () => {
+    for (const key of TRANSLATION_KEYS) {
+      for (const [locale, bundle] of Object.entries(bundles)) {
+        expect(bundle[key], `${key} missing in ${locale}`).toBeTruthy();
+      }
+    }
+  });
+
+  it('tells people what is sent, what is not, and what is kept', () => {
+    const text = TRANSLATION_KEYS.map((k) => en[k as keyof typeof en] as string).join(' ');
+    expect(text).toMatch(/sends the words/i);
+    expect(text).toMatch(/not get your name, your phone number/i);
+    expect(text).toMatch(/keeps nothing/i);
+    expect(text).toMatch(/Only the people in that chat/i);
+    expect(text).toMatch(/can be wrong/i);
+  });
+
+  it('reads like the rest of the page and never reduces anybody to their record', () => {
+    const strings = Object.fromEntries(
+      TRANSLATION_KEYS.flatMap((k) => Object.entries(bundles).map(([locale, bundle]) => [`${locale}.${k}`, bundle[k]!])),
+    );
+    expect(findDignityViolations(strings)).toEqual([]);
+    for (const k of TRANSLATION_KEYS.slice(1)) {
+      expect(fleschKincaidGrade(en[k as keyof typeof en] as string), k).toBeLessThanOrEqual(9);
+    }
   });
 });

@@ -69,7 +69,7 @@ const styles = stylex.create({
     // The soft end: opaque until the last 48px, then gone by the edge. A mask
     // rather than a gradient overlay, so it works on whatever the page colour
     // happens to be in either mode.
-    maskImage: 'linear-gradient(to right, black calc(100% - 48px), transparent)',
+    maskImage: 'linear-gradient(calc(90deg * var(--pam-flip, 1)), black calc(100% - 48px), transparent)',
   },
   /** Puts the first card back where the page's own content starts. */
   track: { paddingInline: '16px' },
@@ -129,7 +129,7 @@ const styles = stylex.create({
   bookmark: {
     position: 'absolute',
     top: '2px',
-    right: '2px',
+    insetInlineEnd: '2px',
     minHeight: pam['--pam-touch-target-min'],
     minWidth: pam['--pam-touch-target-min'],
     fontSize: '18px',

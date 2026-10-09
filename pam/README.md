@@ -52,7 +52,7 @@ pnpm --filter @pam/config test          # SMS safety, copy rules, points
 pnpm --filter @pam/ui test              # components + axe
 pnpm --filter @pam/db test              # migrations + RLS penetration suite
 pnpm --filter @pam/web build
-pnpm --filter @pam/web test:a11y        # browser: contrast, target size, 320px
+pnpm --filter @pam/web test:a11y        # browser: contrast, target size, 320px — serves out/, so build first
 node scripts/check-bundle-budget.mjs    # §12 first-load budget
 ```
 

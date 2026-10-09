@@ -10,7 +10,7 @@ import { readMoves } from '@/lib/addedTrips';
 import { useNextVisits, visitTagLabel } from '@/lib/useNextVisits';
 import { CategoryPicture } from './SavedView';
 import { USE_DUMMY_PEOPLE } from '@pam/config/dummy-flag';
-import { categoryLabelKey, distanceLabel } from '@pam/config';
+import { categoryLabelKey, distanceLabel, intlLocale } from '@pam/config';
 import type { SearchSource } from '@astryxdesign/core/Typeahead';
 import { useI18n } from '@/lib/i18n';
 import { useSupportPhone } from '@/lib/useSupportPhone';
@@ -27,7 +27,7 @@ import { HelpButton } from './HelpButton';
 import * as stylex from '@stylexjs/stylex';
 import { HStack } from '@astryxdesign/core/HStack';
 import { IconButton } from '@astryxdesign/core/IconButton';
-import { Button } from '@astryxdesign/core/Button';
+import { Button } from '@pam/ui/Button';
 import { Icon } from '@astryxdesign/core/Icon';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { BackButton } from '@pam/ui/SubPage';
@@ -78,8 +78,8 @@ function upcomingTrip(moves: Readonly<Record<string, string>>) {
 /** "Tue, Oct 7 · 10:00 AM". */
 function tripWhen(iso: string, locale: string): string {
   const d = new Date(iso);
-  const day = new Intl.DateTimeFormat(locale, { weekday: 'short', month: 'short', day: 'numeric' }).format(d);
-  const time = new Intl.DateTimeFormat(locale, { hour: 'numeric', minute: '2-digit' }).format(d);
+  const day = new Intl.DateTimeFormat(intlLocale(locale), { weekday: 'short', month: 'short', day: 'numeric' }).format(d);
+  const time = new Intl.DateTimeFormat(intlLocale(locale), { hour: 'numeric', minute: '2-digit' }).format(d);
   return `${day} · ${time}`;
 }
 

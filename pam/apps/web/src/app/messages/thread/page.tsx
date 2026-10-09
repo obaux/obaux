@@ -4,18 +4,20 @@ import { Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { Loading, Notice, Page } from '@pam/ui';
 import { SubPageHeader } from '@pam/ui/SubPage';
-import { NOTICES } from '@pam/config';
+import { NOTICES, speechLanguageFor } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { NotIn } from '../../NotIn';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
 import { useRoleView } from '@/lib/useViewedRole';
 import { useThread } from '@/lib/useThread';
+import { useMessageTranslations } from '@/lib/useMessageTranslations';
 import { ThreadViewLazy } from '../ThreadViewLazy';
 import { staffPhotoFor } from '@pam/config/dummy-connections';
 import { ThreadFrame, ThreadHeader, ThreadTop } from '../ThreadFrame';
 import { DemoThreadLazy } from '../DemoThreadLazy';
 import { ThreadVisit } from '../ThreadVisit';
+import { threadLineFor } from '@/lib/threadLine';
 
 /**
  * One conversation — read what has been said, and send the next thing.
@@ -32,8 +34,8 @@ import { ThreadVisit } from '../ThreadVisit';
  * `in_conversation()` already allows.
  *
  * Drawn with Astryx's Chat family through `ThreadView` (D-181), inside
- * `ThreadFrame` (D-192): a one-row thread header (the nested-page template's
- * compact form, D-213) pinned
+ * `ThreadFrame` (D-192): the nested-page template's header, as on every
+ * screen you tap into (D-213, D-411), pinned
  * at the top, the composer pinned at the bottom, only the messages
  * scrolling. No help link on this screen (A14, D-194): back leads to
  * Messages, which has one. One primary action: the 48px send button (A13). Reporting (D-177) and the
@@ -50,6 +52,8 @@ import { ThreadVisit } from '../ThreadVisit';
 function isDummyId(id: string | null): boolean {
   return id !== null && id.startsWith('dummy-conv-');
 }
+
+const NO_MESSAGES: readonly never[] = [];
 
 function ThreadScreen() {
   const { t, locale } = useI18n();
@@ -83,7 +87,11 @@ function ThreadScreen() {
 
   const { state, send, sending, sendFailed, limited } = useThread(signedIn && realCanMessage && !demo ? conversationId : null);
 
-  const speechLanguage = locale === 'es' ? 'es-US' : 'en-US';
+  const speechLanguage = speechLanguageFor(locale);
+
+  // Other people's words in the reader's language, labelled (D-423). Nothing
+  // happens while MESSAGE_TRANSLATION is off.
+  const translations = useMessageTranslations(state.status === 'ready' ? state.messages : NO_MESSAGES);
 
   if (session.status === 'loading') {
     return (
@@ -151,15 +159,12 @@ function ThreadScreen() {
   }
 
   const title = state.status === 'ready' ? (state.otherName ?? t('messages.thread.someone')) : t('messages.title');
-  // What the name alone cannot say (D-187): a member sees "Case manager" or
-  // the program's name beside it; staff looking at a member see nothing.
+  // What the name alone cannot say (D-187, D-395): the line under it — "Case
+  // manager", or "Program lead at …" with the program's whole name; staff
+  // looking at a member see nothing.
   const context =
-    state.status === 'ready' && trueRole === 'member'
-      ? state.otherRole === 'provider'
-        ? (state.otherProgramName ?? t('role.provider'))
-        : state.otherRole === 'admin'
-          ? t('role.admin')
-          : null
+    state.status === 'ready'
+      ? threadLineFor(trueRole, { role: state.otherRole, programName: state.otherProgramName }, t)
       : null;
 
   if (state.status === 'ready') {
@@ -180,6 +185,7 @@ function ThreadScreen() {
         </ThreadTop>
         <ThreadViewLazy
           messages={state.messages}
+          translations={translations}
           otherName={state.otherName}
           otherPhotoUrl={staffPhotoFor(state.otherName, state.otherProgramName ?? null)}
           onSend={send}

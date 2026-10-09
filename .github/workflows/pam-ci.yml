@@ -40,9 +40,11 @@ jobs:
         run: pnpm -r typecheck
 
       # Covers the SMS safety gates, the dignity-language rules, locale parity,
-      # the transparency contract, and the a11y structure of every component.
+      # the translation ledger (a reworded English string whose translations were
+      # not answered fails here), the transparency contract, and the a11y
+      # structure of every component. The web app's own unit tests ride along.
       - name: Unit tests
-        run: pnpm --filter @pam/config --filter @pam/ui test
+        run: pnpm --filter @pam/config --filter @pam/ui --filter @pam/web test
 
       # The design system as a package (dist/): tokens.css, fonts, compiled
       # components and types. Also fails if tokens.css has drifted from its

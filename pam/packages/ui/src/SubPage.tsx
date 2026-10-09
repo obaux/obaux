@@ -12,6 +12,7 @@ import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { BackArrowIcon } from './icons.js';
 import { Page } from './Page.js';
 import { pam } from './tokens.stylex.js';
+import { useFitTitle } from './fitTitle.js';
 
 /**
  * The top of every nested screen (D-213) — one template, so a screen you
@@ -20,9 +21,11 @@ import { pam } from './tokens.stylex.js';
  * it changes. From the reference Will gave on 1 October ("Legal", "Get help").
  *
  * Used by Legal, Language, Get help and its pages, Notifications, a place,
- * Connections, the policies — and, in its `compact` form, a conversation,
- * where the name rides in the bar beside the back button because the screen
- * belongs to the messages, not the title (D-193 still holds).
+ * Connections, the policies — and a conversation. A conversation had a
+ * `compact` form of its own, the name in the bar beside back (D-193, D-213),
+ * until Will, 9 October (D-411): "the compact view is not great, because the
+ * top buttons aren't positioned in same place across other pages". Now back
+ * and the bar's buttons sit in the same place on every screen you tap into.
  *
  * - **Back is a real link**, with an accessible name that says where it goes
  *   ("Back to Profile") — the rule `PageTitle` set (13 September), kept.
@@ -47,15 +50,15 @@ export interface SubPageHeaderProps {
    * step (Plan a trip, D-235). `backHref` is ignored when this is set.
    */
   readonly onBack?: () => void;
-  /** A line under the large title. */
+  /** A line under the title. */
   readonly subtitle?: string;
-  readonly actions?: ReactNode;
   /**
-   * `large` (the default): back in the bar, the title large beneath it.
-   * `compact`: the title in the bar beside back, one row — a conversation.
+   * Keep the subtitle to one line, cut with an ellipsis when it runs long —
+   * a conversation's "Program lead at Example Food Pantry" (D-395, D-400).
    */
-  readonly variant?: 'large' | 'compact';
-  /** Beside a compact title — who the person is to you (a `Token`). */
+  readonly hasOneLineSubtitle?: boolean;
+  readonly actions?: ReactNode;
+  /** Beside the title — an info tip (D-376). */
   readonly titleAddon?: ReactNode;
   /** An id on the `<h1>` — the policies' "Back to top" link targets it. */
   readonly titleId?: string;
@@ -89,6 +92,10 @@ export interface SubPageHeaderProps {
 }
 
 const COLLAPSE_AT = 48;
+
+const sizes = stylex.create({
+  title: (px: number) => ({ fontSize: `${px}px` }),
+});
 
 const styles = stylex.create({
   bar: {
@@ -128,16 +135,11 @@ const styles = stylex.create({
     transitionDuration: '150ms',
   },
   shown: { opacity: 1 },
-  compactTitle: {
-    fontSize: '20px',
-    lineHeight: 1.2,
-    fontWeight: 700,
-    minWidth: 0,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-  },
-  large: { fontSize: '34px', lineHeight: 1.15, fontWeight: 700 },
+  // 34px, stepping down for a word that will not fit (D-422, `useFitTitle`).
+  // While it is being measured a word may not break, so one that is too wide
+  // overflows and says so; only past the smallest step is it allowed to.
+  large: { fontSize: '34px', lineHeight: 1.15, fontWeight: 700, overflowWrap: 'normal', hyphens: 'manual' },
+  largeBreaks: { overflowWrap: 'anywhere' },
   // The hero (D-376). Flush with the screen's top and sides: past the page's
   // 24px top padding and its side padding.
   hero: {
@@ -163,6 +165,8 @@ const styles = stylex.create({
   barOverHeroCollapsed: { backgroundColor: colorVars['--color-background-body'] },
   titleRow: { width: '100%' },
   subtitle: { fontSize: '17px', lineHeight: 1.4 },
+  // One line, cut with an ellipsis (Will, 9 October, D-400; two lines until then, D-395).
+  subtitleOneLine: { display: 'block', maxWidth: '100%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' },
   actions: { flexShrink: 0 },
 });
 
@@ -171,8 +175,8 @@ export function SubPageHeader({
   backHref,
   backLabel,
   subtitle,
+  hasOneLineSubtitle = false,
   actions,
-  variant = 'large',
   titleAddon,
   titleId,
   onBack,
@@ -182,39 +186,20 @@ export function SubPageHeader({
   heroGap = 4,
 }: SubPageHeaderProps) {
   const [collapsed, setCollapsed] = useState(false);
+  const fit = useFitTitle<HTMLHeadingElement>(title);
 
   useEffect(() => {
-    if (variant === 'compact') return;
     const onScroll = () => setCollapsed(window.scrollY > COLLAPSE_AT);
     onScroll();
     window.addEventListener('scroll', onScroll, { passive: true });
     return () => window.removeEventListener('scroll', onScroll);
-  }, [variant]);
+  }, []);
 
   const back = onBack ? (
     <BackButton label={backLabel} onPress={onBack} isClose={backIcon === 'close'} />
   ) : backHref ? (
     <BackButton href={backHref} label={backLabel} isClose={backIcon === 'close'} isFixed={isBackFixed} />
   ) : null;
-
-  if (variant === 'compact') {
-    return (
-      <HStack gap={2} align="center" wrap="nowrap" xstyle={styles.bar}>
-        {back}
-        <HStack gap={2} align="center" wrap="nowrap" xstyle={styles.middle}>
-          <Heading level={1} xstyle={styles.compactTitle}>
-            {title}
-          </Heading>
-          {titleAddon}
-        </HStack>
-        {actions ? (
-          <HStack gap={1} align="center" wrap="nowrap" xstyle={styles.actions}>
-            {actions}
-          </HStack>
-        ) : null}
-      </HStack>
-    );
-  }
 
   // The hero's geometry (D-376): the picture runs from the top edge to
   // 240px; the bar is pulled back up over it to 12px from the top; the title
@@ -258,18 +243,18 @@ export function SubPageHeader({
         {titleAddon ? (
           // Something beside the title — an info tip (D-376).
           <HStack gap={1} align="center" wrap="nowrap" xstyle={styles.titleRow}>
-            <Heading level={1} id={titleId} xstyle={styles.large}>
+            <Heading level={1} id={titleId} ref={fit.ref} xstyle={[styles.large, sizes.title(fit.size), fit.mustBreak && styles.largeBreaks]}>
               {title}
             </Heading>
             {titleAddon}
           </HStack>
         ) : (
-          <Heading level={1} id={titleId} xstyle={styles.large}>
+          <Heading level={1} id={titleId} ref={fit.ref} xstyle={[styles.large, sizes.title(fit.size), fit.mustBreak && styles.largeBreaks]}>
             {title}
           </Heading>
         )}
         {subtitle ? (
-          <Text type="supporting" xstyle={styles.subtitle}>
+          <Text type="supporting" xstyle={[styles.subtitle, hasOneLineSubtitle && styles.subtitleOneLine]}>
             {subtitle}
           </Text>
         ) : null}

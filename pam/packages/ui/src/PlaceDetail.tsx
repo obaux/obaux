@@ -7,10 +7,10 @@ import { VStack } from '@astryxdesign/core/VStack';
 import { HStack } from '@astryxdesign/core/HStack';
 import { Text } from '@astryxdesign/core/Text';
 import { Heading } from '@astryxdesign/core/Heading';
-import { Badge, type BadgeVariant } from '@astryxdesign/core/Badge';
+import { Badge, type BadgeVariant } from './Badge.js';
 import { BottomSheet } from '@astryxdesign/core/BottomSheet';
 import { sheet } from './sheet.js';
-import { Button } from '@astryxdesign/core/Button';
+import { Button } from './Button.js';
 import { colorVars, spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { BookmarkIcon, ClockIcon, FlagIcon, PhoneIcon, PlacesIcon, ShareIcon } from './icons.js';
 import { BigButton } from './BigButton.js';
@@ -19,6 +19,7 @@ import { pam } from './tokens.stylex.js';
 import { textLinkLook } from './TextLink.js';
 import { MenuList, type MenuItem } from './MenuList.js';
 import { AutoHeight, TextSwap } from './Swap.js';
+import { landFocus, landFocusStyle } from './landFocus.js';
 
 /**
  * One place, on its own screen.
@@ -371,7 +372,7 @@ export function PlaceDetail({
   const weekSheet = hasWeek ? (
     <BottomSheet isOpen={isWeekOpen} onOpenChange={setWeekOpen} label={labels.hours} height="hug" xstyle={sheet.panel}>
       {isWeekOpen ? (
-        <VStack gap={3} xstyle={styles.sheet}>
+        <VStack gap={3} {...landFocus} xstyle={[styles.sheet, landFocusStyle.quiet]}>
           {/* The sheet draws its own Close; a second one would be two. */}
           <Heading level={2} xstyle={styles.sheetTitle}>
             {labels.hours}

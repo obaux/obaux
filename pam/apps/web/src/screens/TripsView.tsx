@@ -10,7 +10,7 @@ import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { PlusIcon, TextLink, TripsIcon } from '@pam/ui';
 import { emptyState } from '@pam/ui/emptyState';
-import { Button } from '@astryxdesign/core/Button';
+import { Button } from '@pam/ui/Button';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { readAddedTrips, readMoves, withMoves } from '@/lib/addedTrips';
 import { MapDrawer } from '@pam/ui/MapDrawer';
@@ -27,6 +27,7 @@ import { useServices } from '@/lib/useServices';
 import { policiesForService } from '@pam/config/dummy-services';
 import { useMySignatures } from '@/lib/useMySignatures';
 import { policiesHref } from './MemberPoliciesView';
+import { intlLocale } from '@pam/config';
 
 /**
  * Trips — the visits somebody has agreed to make (D-210, D-213).
@@ -130,9 +131,9 @@ export function TripsView({ trips, headerActions, justAdded = null }: TripsViewP
   };
 
   const day = (iso: string) =>
-    new Intl.DateTimeFormat(locale, { weekday: 'short', month: 'short', day: 'numeric' }).format(new Date(iso));
+    new Intl.DateTimeFormat(intlLocale(locale), { weekday: 'short', month: 'short', day: 'numeric' }).format(new Date(iso));
   const when = (iso: string) =>
-    `${new Intl.DateTimeFormat(locale, { weekday: 'long', month: 'short', day: 'numeric' }).format(new Date(iso))} · ${new Intl.DateTimeFormat(locale, { hour: 'numeric', minute: '2-digit' }).format(new Date(iso))}`;
+    `${new Intl.DateTimeFormat(intlLocale(locale), { weekday: 'long', month: 'short', day: 'numeric' }).format(new Date(iso))} · ${new Intl.DateTimeFormat(intlLocale(locale), { hour: 'numeric', minute: '2-digit' }).format(new Date(iso))}`;
   // The trip goes along, so the place can show this visit (D-273).
   const href = (trip: Trip) =>
     `/place/?id=${encodeURIComponent(trip.placeId)}&from=trips&trip=${encodeURIComponent(trip.id)}`;

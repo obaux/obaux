@@ -12,6 +12,9 @@
  *  - every template carries `reviewedBy`; an unreviewed template cannot send
  */
 
+import type { Locale } from './i18n.js';
+import { smsTermHits } from './sms-terms.js';
+
 export type SmsTemplateKey =
   | 'invite_member'
   | 'invite_provider'
@@ -29,6 +32,21 @@ export type SmsTemplateKey =
   | 'staff_request_approved'
   | 'staff_request_denied';
 
+/** The languages whose texts are signed off one by one; English and Spanish are signed with the template. */
+export type MoreLocale = Exclude<Locale, 'en' | 'es'>;
+
+export interface SmsDraft {
+  readonly body: string;
+  /**
+   * Who read this wording, in this language, against §9. Empty means nobody has:
+   * the text is a draft and will not send. **Only a person fills this in** —
+   * never an agent on its own authority, the same rule as `reviewedBy` below.
+   */
+  readonly reviewedBy: string;
+  /** Tighter than the template's budgets, for a language that has less room. */
+  readonly maxVarLengths?: Readonly<Record<string, number>>;
+}
+
 export interface SmsTemplate {
   readonly key: SmsTemplateKey;
   /**
@@ -37,6 +55,15 @@ export interface SmsTemplate {
    */
   readonly en: string;
   readonly es: string;
+  /**
+   * The same message in the languages added on 9 October 2026 (A24), each with
+   * its own sign-off. **A draft with an empty `reviewedBy` is never sent**: the
+   * dispatcher texts that person in English instead, because a text is the one
+   * place Pam cannot show somebody a draft first. A template with no entry for
+   * a language is one that does not fit a single message in it (see
+   * `SMS_MAX_LENGTH_UCS2`) — that language gets English for it, on purpose.
+   */
+  readonly more?: Readonly<Partial<Record<MoreLocale, SmsDraft>>>;
   /** Named placeholders this template expects. Render fails if any is missing. */
   readonly vars: readonly string[];
   /**
@@ -58,39 +85,38 @@ export interface SmsTemplate {
   readonly maxVarLengths?: Readonly<Record<string, number>>;
 }
 
-/**
- * Words that must never appear in an outbound SMS. Checked case-insensitively
- * against the rendered body. This is a backstop against a careless edit, not a
- * substitute for review.
- */
-export const FORBIDDEN_SMS_TERMS: readonly string[] = [
-  'parole',
-  'probation',
-  'officer',
-  'case manager',
-  'inmate',
-  'prisoner',
-  'offender',
-  'ex-offender',
-  'convict',
-  'conviction',
-  'felon',
-  'felony',
-  'incarcerat',
-  'reentry',
-  're-entry',
-  'halfway house',
-  'correctional',
-  'corrections',
-  'jail',
-  'prison',
-  'release',
-  'supervision',
-  'court',
-  'sentence',
-];
+export {
+  FORBIDDEN_SMS_TERMS,
+  FORBIDDEN_SMS_TERMS_BY_LOCALE,
+  smsTermHits,
+  foldedSmsTermsByLocale,
+} from './sms-terms.js';
 
 export const SMS_MAX_LENGTH = 160;
+
+/**
+ * A text in a script GSM-7 cannot carry (Chinese, Russian, Arabic) is sent as
+ * UCS-2, and one segment of that holds 70 characters, not 160. Pam promised the
+ * carrier that every message fits one segment, so these texts are held to 70 —
+ * and a template that cannot be said in 70 characters in a language, with a
+ * 36-character link and a time, has no text in it and falls back to English.
+ * Allowing two segments for the reminders would double their cost and change
+ * the registered campaign; that is Will's call (docs/before-launch.md), not
+ * something to slip in here.
+ */
+export const SMS_MAX_LENGTH_UCS2 = 70;
+
+/**
+ * Longest link a text carries: the live `app_url` setting, which the staff
+ * request texts use as they are. Twilio shortens the others to about 22
+ * characters, so this is the worst case for a script that has only 70.
+ */
+export const SMS_WORST_CASE_LINK_LENGTH = 36;
+
+/** The limit a text is held to: 160 for the cheap encoding, 70 for the other. */
+export function segmentLimitFor(templateText: string): number {
+  return isGsm7(templateText.replace(/\{[a-zA-Z0-9_]+\}/g, '')) ? SMS_MAX_LENGTH : SMS_MAX_LENGTH_UCS2;
+}
 
 /**
  * Why a place came out of the catalogue, in the words a member reads.
@@ -108,18 +134,30 @@ export const SERVICE_FLAG_REASONS = {
   closed: {
     en: 'closed, so there is no need to go',
     es: 'ya no abre, no hace falta ir',
+    'pt-BR': 'fechou, nao precisa ir',
+    'zh-CN': '已关闭，无需前往',
+    'zh-HK': '已結業，無需前往',
   },
   moved: {
     en: 'at a new address now',
     es: 'cambio de direccion',
+    'pt-BR': 'mudou de endereco',
+    'zh-CN': '已搬到新地址',
+    'zh-HK': '已搬到新地址',
   },
   not_accepting: {
     en: 'not taking new people, so there is no need to go',
     es: 'no acepta gente nueva, no hace falta ir',
+    'pt-BR': 'nao aceita gente nova, nao precisa ir',
+    'zh-CN': '暂不接收新人，无需前往',
+    'zh-HK': '暫不接收新人，無需前往',
   },
   wrong_info: {
     en: 'listed wrong here',
     es: 'esta mal anotado aqui',
+    'pt-BR': 'esta com informacao errada aqui',
+    'zh-CN': '这里的信息有误',
+    'zh-HK': '這裡的資料有誤',
   },
 } as const;
 
@@ -129,8 +167,26 @@ export const SERVICE_FLAG_REASON_KEYS = Object.keys(
   SERVICE_FLAG_REASONS,
 ) as ServiceFlagReason[];
 
-const STOP_SUFFIX_EN = ' Reply STOP to stop texts.';
-const STOP_SUFFIX_ES = ' Responda STOP para no recibir mensajes.';
+/**
+ * The way out, in each language. STOP stays STOP in all of them — it is the
+ * keyword the carrier and the reply parser listen for — with the sentence
+ * around it in the reader's language. Spanish is the wording registered with
+ * the carrier (docs/sms-campaign-samples.md); the dispatcher reads this same
+ * table, so the two can no longer say different things.
+ */
+export const STOP_SUFFIX: Readonly<Record<Locale, string>> = {
+  en: ' Reply STOP to stop texts.',
+  es: ' Responda STOP para no recibir mas.',
+  'pt-BR': ' Responda STOP para nao receber mais.',
+  'zh-CN': ' 回复 STOP 退订。',
+  'zh-HK': ' 回覆 STOP 取消接收。',
+  ru: ' Ответьте STOP для отписки.',
+  ar: ' للإلغاء أرسل STOP.',
+};
+
+/** A wording nobody has read yet: it exists to be read, and does not send. */
+const unsigned = (body: string, maxVarLengths?: Readonly<Record<string, number>>): SmsDraft =>
+  maxVarLengths ? { body, reviewedBy: '', maxVarLengths } : { body, reviewedBy: '' };
 
 /**
  * Who read this copy and signed it off.
@@ -153,6 +209,11 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
     key: 'invite_member',
     en: "Pam: You've been invited to Pam, an app for finding help and people near you. Tap to join: {link}",
     es: 'Pam: Le invitaron a Pam, una app para encontrar ayuda y personas cerca. Toque para entrar: {link}',
+    more: {
+      'pt-BR': unsigned('Pam: Convidaram voce para o Pam, um app para achar ajuda e pessoas por perto. Toque para entrar: {link}'),
+      'zh-CN': unsigned('Pam: 您受邀加入 Pam：{link}'),
+      'zh-HK': unsigned('Pam: 你獲邀加入 Pam：{link}'),
+    },
     vars: ['link'],
     reviewedBy: REVIEWED_BY,
     isFirstContact: true,
@@ -161,6 +222,11 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
     key: 'invite_provider',
     en: 'Pam: You have been invited to list your services on Pam. Tap to set up your page: {link}',
     es: 'Pam: Le invitaron a publicar sus servicios en Pam. Toque para crear su pagina: {link}',
+    more: {
+      'pt-BR': unsigned('Pam: Voce recebeu um convite para anunciar seus servicos no Pam. Toque para criar sua pagina: {link}'),
+      'zh-CN': unsigned('Pam: 邀请您发布服务：{link}'),
+      'zh-HK': unsigned('Pam: 邀請你發佈服務：{link}'),
+    },
     vars: ['link'],
     reviewedBy: REVIEWED_BY,
     isFirstContact: true,
@@ -169,6 +235,13 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
     key: 'verify_code',
     en: 'Pam: Your code is {code}. It works for 10 minutes.',
     es: 'Pam: Su codigo es {code}. Sirve por 10 minutos.',
+    more: {
+      'pt-BR': unsigned('Pam: Seu codigo é {code}. Vale por 10 minutos.'),
+      'zh-CN': unsigned('Pam: 您的验证码是 {code}，10 分钟内有效。'),
+      'zh-HK': unsigned('Pam: 你的驗證碼是 {code}，10 分鐘內有效。'),
+      'ru': unsigned('Pam: Ваш код {code}. Действует 10 минут.'),
+      'ar': unsigned('Pam: رمزك {code}. صالح لمدة 10 دقائق.'),
+    },
     vars: ['code'],
     reviewedBy: REVIEWED_BY,
     isFirstContact: false,
@@ -186,6 +259,11 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
     key: 'facilitation_member',
     en: 'Pam: {adminFirstName} connected you with a program that can help. Open Pam to say hi: {link}',
     es: 'Pam: {adminFirstName} le conecto con un programa que puede ayudar. Abra Pam para saludar: {link}',
+    more: {
+      'pt-BR': unsigned('Pam: {adminFirstName} conectou voce a um programa que pode ajudar. Abra o Pam para dizer oi: {link}'),
+      'zh-CN': unsigned('Pam: {adminFirstName} 帮您联系了项目：{link}', { adminFirstName: 14 }),
+      'zh-HK': unsigned('Pam: {adminFirstName} 幫你聯絡了計劃：{link}', { adminFirstName: 14 }),
+    },
     vars: ['adminFirstName', 'link'],
     reviewedBy: REVIEWED_BY,
     isFirstContact: false,
@@ -194,6 +272,11 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
     key: 'facilitation_provider',
     en: 'Pam: Someone was introduced to your program. Open Pam to reply: {link}',
     es: 'Pam: Alguien fue presentado a su programa. Abra Pam para responder: {link}',
+    more: {
+      'pt-BR': unsigned('Pam: Alguem foi apresentado ao seu programa. Abra o Pam para responder: {link}'),
+      'zh-CN': unsigned('Pam: 有人被介绍到您的项目。打开 Pam 回复：{link}'),
+      'zh-HK': unsigned('Pam: 有人獲介紹到你的計劃。打開 Pam 回覆：{link}'),
+    },
     vars: ['link'],
     reviewedBy: REVIEWED_BY,
     isFirstContact: false,
@@ -213,6 +296,9 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
     key: 'appointment_24h',
     en: 'Pam: You have a visit tomorrow at {time}. {address}. Tap for directions: {link}',
     es: 'Pam: Tiene una visita mañana a las {time}. {address}. Toque para llegar: {link}',
+    more: {
+      'pt-BR': unsigned('Pam: Voce tem uma visita amanha as {time}. {address}. Toque para chegar: {link}'),
+    },
     vars: ['time', 'address', 'link'],
     maxVarLengths: { address: 34 },
     reviewedBy: REVIEWED_BY,
@@ -222,6 +308,9 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
     key: 'appointment_2h',
     en: 'Pam: Your visit is at {time} today. {address}. Tap for directions: {link}',
     es: 'Pam: Su visita es hoy a las {time}. {address}. Toque para llegar: {link}',
+    more: {
+      'pt-BR': unsigned('Pam: Sua visita é hoje as {time}. {address}. Toque para chegar: {link}'),
+    },
     vars: ['time', 'address', 'link'],
     maxVarLengths: { address: 34 },
     reviewedBy: REVIEWED_BY,
@@ -231,6 +320,9 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
     key: 'appointment_morning_of',
     en: 'Pam: Today at {time} you have a visit. {address}. Tap for directions: {link}',
     es: 'Pam: Hoy a las {time} tiene una visita. {address}. Toque para llegar: {link}',
+    more: {
+      'pt-BR': unsigned('Pam: Hoje as {time} voce tem uma visita. {address}. Toque para chegar: {link}'),
+    },
     vars: ['time', 'address', 'link'],
     maxVarLengths: { address: 34 },
     reviewedBy: REVIEWED_BY,
@@ -240,6 +332,13 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
     key: 'attendance_check',
     en: 'Pam: Did you make it today? Reply YES or NO.',
     es: 'Pam: Pudo ir hoy? Responda YES o NO.',
+    more: {
+      'pt-BR': unsigned('Pam: Voce conseguiu ir hoje? Responda YES ou NO.'),
+      'zh-CN': unsigned('Pam: 您今天到了吗？回复 YES 或 NO。'),
+      'zh-HK': unsigned('Pam: 你今日到了嗎？回覆 YES 或 NO。'),
+      'ru': unsigned('Pam: Вы сегодня дошли? Ответьте YES или NO.'),
+      'ar': unsigned('Pam: هل وصلت اليوم؟ رد بـ YES أو NO.'),
+    },
     vars: [],
     reviewedBy: REVIEWED_BY,
     isFirstContact: false,
@@ -249,6 +348,13 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
     key: 'attendance_missed_followup',
     en: 'Pam: No problem. We saved a step to set up a new time. Open Pam when you are ready: {link}',
     es: 'Pam: No hay problema. Guardamos un paso para buscar otra fecha. Abra Pam cuando pueda: {link}',
+    more: {
+      'pt-BR': unsigned('Pam: Sem problema. Guardamos um passo para marcar outra data. Abra o Pam quando puder: {link}'),
+      'zh-CN': unsigned('Pam: 没关系。打开 Pam 重新约时间：{link}'),
+      'zh-HK': unsigned('Pam: 不要緊。打開 Pam 重新約時間：{link}'),
+      'ru': unsigned('Pam: Не страшно. Новое время: {link}'),
+      'ar': unsigned('Pam: لا بأس. موعد جديد: {link}'),
+    },
     vars: ['link'],
     reviewedBy: REVIEWED_BY,
     isFirstContact: false,
@@ -265,6 +371,13 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
     key: 'staff_request_approved',
     en: 'Pam: Your request was approved. Open Pam to get started: {link}',
     es: 'Pam: Su solicitud fue aprobada. Abra Pam para empezar: {link}',
+    more: {
+      'pt-BR': unsigned('Pam: Seu pedido foi aprovado. Abra o Pam para comecar: {link}'),
+      'zh-CN': unsigned('Pam: 您的申请已获批准。打开 Pam 开始：{link}'),
+      'zh-HK': unsigned('Pam: 你的申請已獲批准。打開 Pam 開始：{link}'),
+      'ru': unsigned('Pam: Заявка одобрена: {link}'),
+      'ar': unsigned('Pam: تمت الموافقة على طلبك: {link}'),
+    },
     vars: ['link'],
     reviewedBy: 'Will (Oba), 17 September 2026',
     isFirstContact: false,
@@ -284,6 +397,13 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
     key: 'staff_request_denied',
     en: 'Pam: Your request was not approved. Questions? Call {supportPhone}.',
     es: 'Pam: Su solicitud no fue aprobada. Preguntas? Llame al {supportPhone}.',
+    more: {
+      'pt-BR': unsigned('Pam: Seu pedido nao foi aprovado. Duvidas? Ligue para {supportPhone}.'),
+      'zh-CN': unsigned('Pam: 您的申请未获批准。有疑问请拨打 {supportPhone}。'),
+      'zh-HK': unsigned('Pam: 你的申請未獲批准。如有疑問請致電 {supportPhone}。'),
+      'ru': unsigned('Pam: Заявку не одобрили. Вопросы? Звоните {supportPhone}'),
+      'ar': unsigned('Pam: لم تتم الموافقة على طلبك. للاستفسار: {supportPhone}'),
+    },
     vars: ['supportPhone'],
     reviewedBy: 'Will (Oba), 17 September 2026',
     isFirstContact: false,
@@ -293,6 +413,13 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
     key: 'connection_request',
     en: 'Pam: Someone on Pam wants to connect. Open Pam to reply: {link}',
     es: 'Pam: Alguien en Pam quiere conectar. Abra Pam para responder: {link}',
+    more: {
+      'pt-BR': unsigned('Pam: Alguem no Pam quer se conectar. Abra o Pam para responder: {link}'),
+      'zh-CN': unsigned('Pam: 有人想在 Pam 联系您。打开 Pam 回复：{link}'),
+      'zh-HK': unsigned('Pam: 有人想在 Pam 與你聯絡。打開 Pam 回覆：{link}'),
+      'ru': unsigned('Pam: С вами хотят связаться: {link}'),
+      'ar': unsigned('Pam: شخص يريد التواصل: {link}'),
+    },
     vars: ['link'],
     reviewedBy: REVIEWED_BY,
     isFirstContact: false,
@@ -323,6 +450,11 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
     key: 'saved_place_closed',
     en: 'Pam: A place you saved is {reason}. Find others in Pam: {link}',
     es: 'Pam: Un lugar que guardo {reason}. Vea otros en Pam: {link}',
+    more: {
+      'pt-BR': unsigned('Pam: Um lugar que voce salvou {reason}. Veja outros no Pam: {link}'),
+      'zh-CN': unsigned('Pam: 您收藏的地点{reason}。看其他：{link}'),
+      'zh-HK': unsigned('Pam: 你儲存的地點{reason}。看其他：{link}'),
+    },
     vars: ['reason', 'link'],
     reviewedBy: REVIEWED_BY,
     isFirstContact: false,
@@ -331,6 +463,13 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
     key: 'access_limited_notice',
     en: 'Pam: Some parts of Pam are turned off for now. Call {supportPhone} with questions.',
     es: 'Pam: Algunas partes de Pam estan apagadas por ahora. Llame al {supportPhone} si tiene preguntas.',
+    more: {
+      'pt-BR': unsigned('Pam: Algumas partes do Pam estao desligadas por enquanto. Ligue para {supportPhone} se tiver duvidas.'),
+      'zh-CN': unsigned('Pam: Pam 的部分功能暂时关闭。有疑问请拨打 {supportPhone}。'),
+      'zh-HK': unsigned('Pam: Pam 部分功能暫時關閉。如有疑問請致電 {supportPhone}。'),
+      'ru': unsigned('Pam: Часть функций Pam пока отключена. Звоните {supportPhone}'),
+      'ar': unsigned('Pam: بعض ميزات Pam متوقفة الآن. اتصل بـ {supportPhone}'),
+    },
     vars: ['supportPhone'],
     reviewedBy: REVIEWED_BY,
     isFirstContact: false,
@@ -338,9 +477,9 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
 };
 
 export class UnreviewedTemplateError extends Error {
-  constructor(key: SmsTemplateKey) {
+  constructor(key: SmsTemplateKey, locale?: Locale) {
     super(
-      `SMS template "${key}" has no reviewedBy and cannot be sent. ` +
+      `SMS template "${key}"${locale && locale !== 'en' ? ` in ${locale}` : ''} has no reviewedBy and cannot be sent. ` +
         'A human must review the copy against SOP §9 and record their name.',
     );
     this.name = 'UnreviewedTemplateError';
@@ -356,7 +495,7 @@ export class SmsContentError extends Error {
 
 export interface RenderSmsOptions {
   readonly key: SmsTemplateKey;
-  readonly locale: 'en' | 'es';
+  readonly locale: Locale;
   readonly vars?: Readonly<Record<string, string>>;
   /** Force the STOP suffix — true for first contact and the monthly reminder. */
   readonly includeStop?: boolean;
@@ -365,6 +504,41 @@ export interface RenderSmsOptions {
    * application code; the dispatcher does not pass it.
    */
   readonly allowUnreviewed?: boolean;
+}
+
+/** The wording of `key` in `locale`, and the name that signed it — or nothing, if there is none. */
+function wordingOf(
+  template: SmsTemplate,
+  locale: Locale,
+): { body: string; reviewedBy: string; maxVarLengths?: Readonly<Record<string, number>> } | undefined {
+  if (locale === 'en') return { body: template.en, reviewedBy: template.reviewedBy };
+  if (locale === 'es') return { body: template.es, reviewedBy: template.reviewedBy };
+  return template.more?.[locale];
+}
+
+/**
+ * The language a text to this person is actually written in: the one they
+ * chose when there is signed-off wording for it, English when there is not.
+ *
+ * Spanish is signed with the template. Every other language is signed one
+ * template at a time, so a person who reads Pam in Russian gets the Russian
+ * wording for the messages a reader has signed and English for the rest —
+ * and never a draft. A text cannot be shown to somebody for a second opinion.
+ */
+export function usableSmsLocale(key: SmsTemplateKey, wanted: Locale): Locale {
+  const wording = wordingOf(SMS_TEMPLATES[key], wanted);
+  return wording && wording.reviewedBy ? wanted : 'en';
+}
+
+/** Every wording a person has not yet read, as `template (language)`: what is left to sign. */
+export function unsignedSmsDrafts(): { key: SmsTemplateKey; locale: MoreLocale }[] {
+  const left: { key: SmsTemplateKey; locale: MoreLocale }[] = [];
+  for (const template of Object.values(SMS_TEMPLATES)) {
+    for (const [locale, draft] of Object.entries(template.more ?? {})) {
+      if (!draft.reviewedBy) left.push({ key: template.key, locale: locale as MoreLocale });
+    }
+  }
+  return left;
 }
 
 /**
@@ -376,19 +550,23 @@ export interface RenderSmsOptions {
 export function renderSms(options: RenderSmsOptions): string {
   const { key, locale, vars = {}, includeStop, allowUnreviewed = false } = options;
   const template = SMS_TEMPLATES[key];
+  const wording = wordingOf(template, locale);
 
-  if (!template.reviewedBy && !allowUnreviewed) {
-    throw new UnreviewedTemplateError(key);
+  if (!wording) {
+    throw new SmsContentError(`Template "${key}" has no text in ${locale}.`);
+  }
+  if (!wording.reviewedBy && !allowUnreviewed) {
+    throw new UnreviewedTemplateError(key, locale);
   }
 
-  let body = locale === 'es' ? template.es : template.en;
+  let body = wording.body;
 
   for (const name of template.vars) {
     const value = vars[name];
     if (value === undefined || value === '') {
       throw new SmsContentError(`Template "${key}" is missing required variable "${name}".`);
     }
-    const budget = template.maxVarLengths?.[name];
+    const budget = wording.maxVarLengths?.[name] ?? template.maxVarLengths?.[name];
     const fitted = budget === undefined ? value : shortenToFit(value, budget);
     body = body.split(`{${name}}`).join(fitted);
   }
@@ -398,11 +576,14 @@ export function renderSms(options: RenderSmsOptions): string {
     throw new SmsContentError(`Template "${key}" left an unfilled placeholder: ${leftover[0]}`);
   }
 
-  if (includeStop ?? template.isFirstContact) {
-    body += locale === 'es' ? STOP_SUFFIX_ES : STOP_SUFFIX_EN;
-  }
+  const stop = includeStop ?? template.isFirstContact;
+  if (stop) body += STOP_SUFFIX[locale];
 
-  assertSmsIsSafe(body, key);
+  // The limit follows the template's own words, not what a member's address
+  // happens to contain: a plain English reminder stays a 160-character message
+  // even if a street name carries a curly apostrophe.
+  const limit = segmentLimitFor(wording.body + (stop ? STOP_SUFFIX[locale] : ''));
+  assertSmsIsSafe(body, key, locale, limit);
   return body;
 }
 
@@ -434,15 +615,14 @@ export function shortenToFit(value: string, max: number): string {
  * is allowed to stay: it is in this set, so "mañana" is spelled correctly at no
  * cost. Anything added to the Spanish copy has to pass this check.
  */
-const GSM7_CHARS = new Set(
-  (
-    '@£$¥èéùìòÇ\nØø\rÅåΔ_ΦΓΛΩΠΨΣΘΞÆæßÉ !"#¤%&\'()*+,-./0123456789:;<=>?' +
-    '¡ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÑÜ§¿abcdefghijklmnopqrstuvwxyzäöñüà' +
-    // The extension table. These cost two characters each rather than one, so
-    // they are legal but not free.
-    '^{}\\[~]|€'
-  ).split(''),
-);
+export const GSM7_ALPHABET =
+  '@£$¥èéùìòÇ\nØø\rÅåΔ_ΦΓΛΩΠΨΣΘΞÆæßÉ !"#¤%&\'()*+,-./0123456789:;<=>?' +
+  '¡ABCDEFGHIJKLMNOPQRSTUVWXYZÄÖÑÜ§¿abcdefghijklmnopqrstuvwxyzäöñüà' +
+  // The extension table. These cost two characters each rather than one, so
+  // they are legal but not free.
+  '^{}\\[~]|€';
+
+const GSM7_CHARS = new Set(GSM7_ALPHABET.split(''));
 
 /** Every character in `text` fits the cheap encoding. */
 export function isGsm7(text: string): boolean {
@@ -460,30 +640,35 @@ const EMOJI_PATTERN =
 /**
  * Final gate before a body reaches Twilio. Exported so the dispatcher can
  * re-check a body it assembled from any path, not just `renderSms`.
+ *
+ * `locale` picks the forbidden-term list to apply on top of the English one;
+ * `limit` is the segment limit (`segmentLimitFor`), 160 unless the text is in a
+ * script that needs the 70-character encoding.
  */
-export function assertSmsIsSafe(body: string, key?: string): void {
+export function assertSmsIsSafe(
+  body: string,
+  key?: string,
+  locale: Locale = 'en',
+  limit: number = SMS_MAX_LENGTH,
+): void {
   const where = key ? ` (template "${key}")` : '';
 
   if (!body.startsWith('Pam:')) {
     throw new SmsContentError(`SMS must start with the "Pam:" prefix${where}.`);
   }
-  if (body.length > SMS_MAX_LENGTH) {
-    throw new SmsContentError(
-      `SMS is ${body.length} characters, over the ${SMS_MAX_LENGTH} limit${where}.`,
-    );
+  if (body.length > limit) {
+    throw new SmsContentError(`SMS is ${body.length} characters, over the ${limit} limit${where}.`);
   }
   if (EMOJI_PATTERN.test(body)) {
     throw new SmsContentError(`SMS must not contain emoji${where}.`);
   }
 
-  const lowered = body.toLowerCase();
-  for (const term of FORBIDDEN_SMS_TERMS) {
-    if (lowered.includes(term)) {
-      throw new SmsContentError(
-        `SMS contains the forbidden term "${term}"${where}. ` +
-          'Outbound texts must never reveal justice involvement (SOP §9).',
-      );
-    }
+  const [term] = smsTermHits(body, locale);
+  if (term !== undefined) {
+    throw new SmsContentError(
+      `SMS contains the forbidden term "${term}"${where}. ` +
+        'Outbound texts must never reveal justice involvement (SOP §9).',
+    );
   }
 }
 

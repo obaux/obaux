@@ -335,11 +335,14 @@ export function OnboardingSlides({ slides, label, header, variant = 'hero' }: On
       carousel.current?.scrollTo(index);
       return;
     }
+    // Right to left, slide 0 is at the right edge and `scrollLeft` counts down from 0.
+    const sign = getComputedStyle(scroller).direction === 'rtl' ? -1 : 1;
+    const target = sign * index * scroller.clientWidth;
     if (reducedMotion) {
-      scroller.scrollLeft = index * scroller.clientWidth;
+      scroller.scrollLeft = target;
       return;
     }
-    animate(scroller.scrollLeft, index * scroller.clientWidth, {
+    animate(scroller.scrollLeft, target, {
       duration: SCROLL_EASE_MS / 1000,
       ease: [0.4, 0, 0.2, 1],
       onUpdate: (value) => {

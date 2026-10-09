@@ -6,7 +6,7 @@ import { useSearchParams } from 'next/navigation';
 import { HStack } from '@astryxdesign/core/HStack';
 import { VStack } from '@astryxdesign/core/VStack';
 import { Text } from '@astryxdesign/core/Text';
-import { Button } from '@astryxdesign/core/Button';
+import { Button } from '@pam/ui/Button';
 import { TextInput } from '@astryxdesign/core/TextInput';
 import {
   AppHeader,

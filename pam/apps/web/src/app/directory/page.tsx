@@ -14,7 +14,7 @@ import { HelpButton } from '../../screens/HelpButton';
 import { InviteReady } from '../../screens/InviteReady';
 import { InviteForWho, type InviteWho } from '../../screens/InviteForWho';
 import { PersonRowSkeletonList } from '@pam/ui/Skeletons';
-import { NOTICES, ROLES, type Role } from '@pam/config';
+import { NOTICES, ROLES, type Role, intlLocale } from '@pam/config';
 import { USE_DUMMY_PEOPLE } from '@pam/config/dummy-flag';
 import { DUMMY_EVERYONE } from '@pam/config/dummy-people';
 import { useI18n } from '@/lib/i18n';
@@ -69,7 +69,7 @@ type Filter = (typeof FILTERS)[number];
 
 function whenLastActive(iso: string | null, locale: string): string | null {
   if (!iso) return null;
-  return new Intl.DateTimeFormat(locale, { month: 'short', day: 'numeric' }).format(new Date(iso));
+  return new Intl.DateTimeFormat(intlLocale(locale), { month: 'short', day: 'numeric' }).format(new Date(iso));
 }
 
 export default function DirectoryPage() {

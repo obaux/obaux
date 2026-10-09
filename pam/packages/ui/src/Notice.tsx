@@ -6,7 +6,7 @@ import { HStack } from '@astryxdesign/core/HStack';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { Icon } from '@astryxdesign/core/Icon';
-import { Button } from '@astryxdesign/core/Button';
+import { Button } from './Button.js';
 import { PhoneIcon } from './icons.js';
 import { NOTICES, type NoticeKey } from '@pam/config';
 

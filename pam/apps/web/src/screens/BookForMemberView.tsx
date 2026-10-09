@@ -21,6 +21,7 @@ import { readAddedTrips, TRIPS_CHANGED, withMoves } from '@/lib/addedTrips';
 import { useI18n } from '@/lib/i18n';
 import { whenHappened } from '@/lib/when';
 import { HelpButton } from './HelpButton';
+import { intlLocale } from '@pam/config';
 
 /**
  * Book a visit for a member (D-316, D-322; Will, 6 October): the first thing
@@ -92,8 +93,8 @@ export function BookForMemberView() {
     .map((c) => ({ convo: c, person: DUMMY_MEMBERS.find((m) => m.id === c.otherId) }))
     .filter((x): x is { convo: (typeof x)['convo']; person: NonNullable<(typeof x)['person']> } => Boolean(x.person));
 
-  const when = new Intl.DateTimeFormat(locale, { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
-  const clock = new Intl.DateTimeFormat(locale, { hour: 'numeric', minute: '2-digit' });
+  const when = new Intl.DateTimeFormat(intlLocale(locale), { weekday: 'short', month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+  const clock = new Intl.DateTimeFormat(intlLocale(locale), { hour: 'numeric', minute: '2-digit' });
   /** "Today 2:37 PM", "Yesterday", "Oct 3" — Messages' own words, with the time when it is today. */
   const wrote = (iso: string) => {
     const said = whenHappened(iso, locale, t);

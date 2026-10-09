@@ -39,6 +39,98 @@ export const FORBIDDEN_UI_TERMS: readonly string[] = [
 ];
 
 /**
+ * The same rule in every other language Pam speaks (added with the languages,
+ * D-422). Matching is by substring — `includes` on the lower-cased text — so
+ * each entry is a stem chosen not to sit inside an ordinary word. That is why
+ * Portuguese has no bare "preso" (inside "surpreso", surprised), "detento"
+ * (inside "detentor", holder), "recluso" or "cadeia" (a chain), and why Arabic
+ * has "نزلاء" but not "نزيل" (inside "تنزيل", download). If a word the copy
+ * needs trips one of these, reword the copy: the stems are the ones that
+ * would out somebody.
+ *
+ * Every list is applied to every bundle (`ALL_FORBIDDEN_TERMS`), so a term
+ * from one language can never hide in another's file.
+ *
+ * Spanish has no list of its own yet (found 9 October 2026); until it does,
+ * `es.json` is only checked against the English terms above and the others
+ * here.
+ */
+export const FORBIDDEN_UI_TERMS_PT: readonly string[] = [
+  'presidiári', // presidiário/a — inmate
+  'ex-preso',
+  'ex-detent',
+  'ex-condenad',
+  'ex-apenad',
+  'ex-interno',
+  'encarcera', // encarcerado/a, encarceramento
+  'condenad', // condenado/a — convicted
+  'condenaç', // condenação — a conviction
+  'sentenciad',
+  'apenad', // apenado/a — the legal word for someone serving a sentence
+  'criminos', // criminoso/a/s
+  'delinquen',
+  'antecedentes criminais',
+  'ficha criminal',
+  'folha corrida',
+  'prisional', // sistema prisional
+  'penitenciári',
+  'prisão',
+  'reclusão',
+  'egresso', // egresso do sistema prisional
+  'liberdade condicional',
+  'livramento condicional',
+  'liberdade vigiada',
+  'tornozeleira', // ankle monitor
+  'regime semiaberto',
+  'regime aberto',
+];
+
+/** Chinese, both scripts (Simplified for zh-CN, Traditional for zh-HK). */
+export const FORBIDDEN_UI_TERMS_ZH: readonly string[] = [
+  '囚犯', '犯人', '罪犯', '前科', '定罪', '有罪', '重罪', '在押', '刑期', '前囚', '更生人', // prisoner, offender, record, convicted
+  '犯罪记录', '犯罪記錄', '犯罪紀錄', // criminal record
+  '刑满', '刑滿', '刑释', '刑釋', '受刑人', // released after sentence
+  '释放人员', '釋放人員',
+  '出狱', '出獄', '入狱', '入獄', '服刑', '坐牢', // jail, prison, serving a sentence
+  '监狱', '監獄',
+  '劳改', '勞改',
+  '假释', '假釋', '缓刑', '緩刑', // parole, probation
+];
+
+export const FORBIDDEN_UI_TERMS_RU: readonly string[] = [
+  'заключённ', 'заключенн', // заключённый — prisoner
+  'зэк',
+  'осуждённ', 'осужденн', 'осуждени', // convicted, conviction
+  'судимост', // a record
+  'тюрь', // prison
+  'колони', // penal colony
+  'исправительн',
+  'освободивш', // освободившийся — someone released
+  'отбыв', // served a sentence
+  'условно-досрочн', // parole
+  'испытательный срок', // probation
+  'пробаци',
+  'уголовн', // criminal
+  'преступ', // crime, offender
+  'правонарушител',
+  'рецидив',
+  'арестант',
+  'лишени', // лишение свободы — deprivation of liberty
+  'изолятор',
+  'сизо',
+];
+
+export const FORBIDDEN_UI_TERMS_AR: readonly string[] = [
+  'سجين', 'سجناء', 'مسجون', 'نزلاء', 'معتقل', // prisoner, inmates, detainee
+  'سجن', // prison / jail
+  'مجرم', 'جريمة', 'جرائم', 'جنائي', // criminal, crime
+  'سوابق', // a record
+  'محكوم', 'مدان', 'إدانة', // sentenced, convicted
+  'الإفراج المشروط', 'ضابط مراقبة', // parole, probation officer
+  'عقوبة',
+];
+
+/**
  * Jargon §0 bans by name, mapped to what to say instead. Not build-blocking —
  * a word like "plan" is fine in some sentences — but `findJargon` surfaces it
  * in review so copy drifts toward plain language rather than away from it.
@@ -60,6 +152,14 @@ export const JARGON_REPLACEMENTS: Readonly<Record<string, string>> = {
   provider: 'program',
 };
 
+const ALL_FORBIDDEN_TERMS: readonly string[] = [
+  ...FORBIDDEN_UI_TERMS,
+  ...FORBIDDEN_UI_TERMS_PT,
+  ...FORBIDDEN_UI_TERMS_ZH,
+  ...FORBIDDEN_UI_TERMS_RU,
+  ...FORBIDDEN_UI_TERMS_AR,
+];
+
 export class DignityViolationError extends Error {
   constructor(
     readonly term: string,
@@ -79,7 +179,7 @@ export class DignityViolationError extends Error {
  */
 export function assertCopyIsDignified(text: string, where: string): void {
   const lowered = text.toLowerCase();
-  for (const term of FORBIDDEN_UI_TERMS) {
+  for (const term of ALL_FORBIDDEN_TERMS) {
     if (lowered.includes(term)) {
       throw new DignityViolationError(term, where);
     }
@@ -99,7 +199,7 @@ export function findDignityViolations(
   const issues: CopyIssue[] = [];
   for (const [key, value] of Object.entries(strings)) {
     const lowered = value.toLowerCase();
-    for (const term of FORBIDDEN_UI_TERMS) {
+    for (const term of ALL_FORBIDDEN_TERMS) {
       if (lowered.includes(term)) issues.push({ where: key, term });
     }
   }

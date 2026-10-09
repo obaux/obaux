@@ -7,7 +7,14 @@ import {
   UnsendableError,
   type Bundle,
 } from '../../../supabase/functions/dispatch-sms/render.ts';
-import { SMS_TEMPLATES, SERVICE_FLAG_REASONS } from '../src/sms-templates.js';
+import {
+  SMS_TEMPLATES,
+  SERVICE_FLAG_REASONS,
+  STOP_SUFFIX,
+  renderSms,
+  type SmsTemplateKey,
+} from '../src/sms-templates.js';
+import { SUPPORTED_LOCALES, type Locale } from '../src/i18n.js';
 
 /**
  * The dispatcher is the last thing between a queued row and somebody's phone.
@@ -19,7 +26,7 @@ const REAL = bundle as unknown as Bundle;
 
 /** The same bundle with every template signed off, to test what happens after. */
 const REVIEWED: Bundle = {
-  reasons: REAL.reasons,
+  ...REAL,
   templates: Object.fromEntries(
     Object.entries(REAL.templates).map(([key, t]) => [key, { ...t, reviewedBy: 'a-human' }]),
   ),
@@ -44,7 +51,13 @@ describe('the shipped bundle', () => {
     for (const [key, template] of Object.entries(REAL.templates)) {
       expect(template.en).toBe(SMS_TEMPLATES[key as keyof typeof SMS_TEMPLATES].en);
       expect(template.es).toBe(SMS_TEMPLATES[key as keyof typeof SMS_TEMPLATES].es);
+      // The later languages, with who signed them: a bundle that is behind the
+      // source would send a wording the source no longer has.
+      expect(template.more ?? {}).toEqual(SMS_TEMPLATES[key as keyof typeof SMS_TEMPLATES].more ?? {});
     }
+    expect(REAL.reasons).toEqual(JSON.parse(JSON.stringify(SERVICE_FLAG_REASONS)));
+    expect(REAL.stop).toEqual(STOP_SUFFIX);
+    expect(Object.keys(REAL.forbidden).sort()).toEqual([...SUPPORTED_LOCALES].sort());
   });
 
   it('carries the sign-off, so the dispatcher will actually send', () => {
@@ -64,7 +77,7 @@ describe('the shipped bundle', () => {
     // The gate itself, on a copy of the bundle. It has to keep working now that
     // the real catalogue no longer exercises it.
     const unsigned: Bundle = {
-      reasons: REAL.reasons,
+      ...REAL,
       templates: {
         ...REAL.templates,
         verify_code: { ...REAL.templates['verify_code']!, reviewedBy: '' },
@@ -110,10 +123,147 @@ describe('rendering a reviewed message', () => {
     expect(render(REVIEWED, 'invite_member', 'es', VARS)).toContain('STOP');
   });
 
-  it('falls back to English for a language Pam does not speak', () => {
+  it('knows every language a member can pick, and falls back to English for the rest', () => {
     expect(localeOf('pt')).toBe('en');
     expect(localeOf(null)).toBe('en');
     expect(localeOf('es')).toBe('es');
+    for (const code of SUPPORTED_LOCALES) expect(localeOf(code)).toBe(code);
+  });
+});
+
+describe('a language nobody has signed gets English', () => {
+  // Texts are written in every language, signed one at a time. Until a person
+  // has put their name against a wording, the person it is meant for is texted
+  // in English: a text is the one place Pam cannot show a draft first, so a new
+  // language must not start receiving machine-drafted texts just because the
+  // app speaks it.
+  const keys = Object.keys(REAL.templates);
+  const later = SUPPORTED_LOCALES.filter((l) => l !== 'en' && l !== 'es');
+
+  it('renders every unsigned language as the English text, for every template', () => {
+    for (const key of keys) {
+      for (const locale of later) {
+        expect(render(REAL, key, locale, VARS), `${key} ${locale}`).toBe(render(REAL, key, 'en', VARS));
+      }
+    }
+  });
+
+  it('uses the wording once a person has signed it, in that language only', () => {
+    const signed: Bundle = {
+      ...REAL,
+      templates: {
+        ...REAL.templates,
+        verify_code: {
+          ...REAL.templates['verify_code']!,
+          more: { ...REAL.templates['verify_code']!.more, ru: { ...REAL.templates['verify_code']!.more!['ru']!, reviewedBy: 'a native reader' } },
+        },
+      },
+    };
+    expect(render(signed, 'verify_code', 'ru', VARS)).toContain('Ваш код');
+    expect(render(signed, 'verify_code', 'ar', VARS)).toBe(render(signed, 'verify_code', 'en', VARS));
+  });
+
+  it('falls back for the whole message when a reason has no phrase in the language', () => {
+    const signed: Bundle = {
+      ...REAL,
+      reasons: { ...REAL.reasons, closed: { en: REAL.reasons['closed']!['en']!, es: REAL.reasons['closed']!['es']! } },
+      templates: {
+        ...REAL.templates,
+        saved_place_closed: {
+          ...REAL.templates['saved_place_closed']!,
+          more: { 'zh-CN': { ...REAL.templates['saved_place_closed']!.more!['zh-CN']!, reviewedBy: 'a native reader' } },
+        },
+      },
+    };
+    const vars = { reason_key: 'closed', link: 'https://pam.to/a1b2c3d' };
+    expect(render(signed, 'saved_place_closed', 'zh-CN', vars)).toBe(render(signed, 'saved_place_closed', 'en', vars));
+    // And with the phrase present, the language is used.
+    expect(render({ ...signed, reasons: REAL.reasons }, 'saved_place_closed', 'zh-CN', vars)).toContain('已关闭');
+  });
+});
+
+describe('the dispatcher and the config package say the same words', () => {
+  // The dispatcher cannot import the config package, so it carries its own
+  // renderer. This is what keeps the two from drifting: every template, in every
+  // language it has a wording for, once signed, rendered both ways.
+  const SIGNED: Bundle = {
+    ...REAL,
+    templates: Object.fromEntries(
+      Object.entries(REAL.templates).map(([key, t]) => [
+        key,
+        {
+          ...t,
+          more: Object.fromEntries(Object.entries(t.more ?? {}).map(([l, d]) => [l, { ...d, reviewedBy: 'a native reader' }])),
+        },
+      ]),
+    ),
+  };
+  const varsFor = (locale: Locale): Record<string, string> => {
+    const gsm = locale === 'en' || locale === 'es' || locale === 'pt-BR';
+    return {
+      link: gsm ? 'https://pam.to/a1b2c3d' : 'https://web-ten-umber-88.vercel.app/',
+      code: '123456',
+      adminFirstName: 'Cassandra',
+      time: '10:00 AM',
+      address: '18200 Northwest Martin Luther King Junior Memorial Boulevard',
+      supportPhone: '+12673095265',
+    };
+  };
+
+  it.each(Object.keys(SIGNED.templates))('%s', (key) => {
+    for (const locale of SUPPORTED_LOCALES) {
+      const template = SIGNED.templates[key]!;
+      const has = locale === 'en' || locale === 'es' || template.more?.[locale];
+      if (!has) continue;
+      const base = varsFor(locale);
+      const vars: Record<string, string> = key === 'saved_place_closed' ? { ...base, reason_key: 'moved' } : base;
+      const configVars: Record<string, string> =
+        key === 'saved_place_closed'
+          ? { ...base, reason: (SERVICE_FLAG_REASONS.moved as Record<string, string>)[locale]! }
+          : base;
+      const fromDispatcher = render(SIGNED, key, locale, vars);
+      const fromConfig = renderSms({ key: key as SmsTemplateKey, locale, vars: configVars, allowUnreviewed: true });
+      expect(fromDispatcher, `${key} ${locale}`).toBe(fromConfig);
+    }
+  });
+
+  it('holds a script with 70 characters to 70, and a Latin one to 160', () => {
+    const long = {
+      ...SIGNED,
+      templates: {
+        ...SIGNED.templates,
+        verify_code: {
+          ...SIGNED.templates['verify_code']!,
+          more: { ru: { body: `Pam: ${'я'.repeat(70)}`, reviewedBy: 'a native reader' } },
+        },
+      },
+    };
+    expect(() => render(long, 'verify_code', 'ru', VARS)).toThrow(UnsendableError);
+    // The same length in English is one cheap message.
+    expect(render(long, 'verify_code', 'en', VARS).length).toBeLessThanOrEqual(160);
+  });
+
+  it('applies the language’s own forbidden words as the last check', () => {
+    const bad = {
+      ...SIGNED,
+      templates: {
+        ...SIGNED.templates,
+        verify_code: {
+          ...SIGNED.templates['verify_code']!,
+          more: {
+            ru: { body: 'Pam: Условно-досрочное {code}', reviewedBy: 'a native reader' },
+            'zh-CN': { body: 'Pam: 假释 {code}', reviewedBy: 'a native reader' },
+          },
+        },
+      },
+    };
+    expect(() => render(bad, 'verify_code', 'ru', VARS)).toThrow(UnsendableError);
+    expect(() => render(bad, 'verify_code', 'zh-CN', VARS)).toThrow('reveal justice involvement');
+  });
+
+  it('keeps a plain English reminder at 160 when the address has a curly apostrophe', () => {
+    const body = render(SIGNED, 'appointment_24h', 'en', { ...varsFor('en'), address: 'Rev. Dr. Martin’s Plaza' });
+    expect(body.length).toBeLessThanOrEqual(160);
   });
 });
 

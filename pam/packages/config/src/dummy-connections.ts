@@ -14,6 +14,8 @@
  * real profiles exist, a photo is the person's own upload or nothing (the
  * avatar's initials). Where an image cannot load, the avatar shows initials.
  */
+import type { Locale } from './index.js';
+
 export interface DummyConnection {
   readonly id: string;
   readonly firstName: string;
@@ -28,8 +30,8 @@ export interface DummyConnection {
    */
   readonly connectedById: string | null;
   readonly photoUrl: string;
-  /** How they can help — a sentence, in both languages. */
-  readonly help: { readonly en: string; readonly es: string };
+  /** How they can help — a sentence, in every language. */
+  readonly help: Readonly<Record<Locale, string>>;
   readonly yearsHelping: number;
   readonly peopleHelped: number;
   /** Languages they speak, written in themselves: "EN · ES". */
@@ -50,6 +52,11 @@ export const DUMMY_CONNECTIONS: readonly DummyConnection[] = [
     help: {
       en: 'Your case manager. Teresa helps you find programs, sort out ID and benefits, and plan your week.',
       es: 'Tu administradora de casos. Teresa te ayuda a encontrar programas, arreglar tu identificación y beneficios, y planear tu semana.',
+      'pt-BR': 'Sua gestora de casos. Teresa ajuda você a encontrar programas, resolver seus documentos de identidade e benefícios, e planejar a sua semana.',
+      'zh-CN': '您的个案管理员。Teresa 会帮您找到合适的项目、办理身份证件和福利申请，并安排您这一周的计划。',
+      'zh-HK': '您的個案經理。Teresa 會協助您尋找合適的計劃、辦理身份證明文件和福利申請，並安排您這一週的行程。',
+      ru: 'Ваш кейс-менеджер. Teresa поможет вам найти программы, оформить документы и пособия и спланировать неделю.',
+      ar: 'مديرة الحالة الخاصة بك. تساعدك Teresa في العثور على البرامج وترتيب وثائق الهوية والمزايا والتخطيط لأسبوعك.',
     },
     yearsHelping: 9,
     peopleHelped: 140,
@@ -66,6 +73,11 @@ export const DUMMY_CONNECTIONS: readonly DummyConnection[] = [
     help: {
       en: 'Runs the GED class. Ask Sandra about class times, getting caught up, or the computer room.',
       es: 'Dirige la clase de GED. Pregúntale a Sandra por los horarios, cómo ponerte al día o la sala de computadoras.',
+      'pt-BR': 'Coordena a turma de GED. Pergunte a Sandra sobre os horários das aulas, como colocar os estudos em dia ou a sala de informática.',
+      'zh-CN': '负责 GED 课程。有关上课时间、如何赶上进度或电脑室的问题，都可以问 Sandra。',
+      'zh-HK': '負責 GED 課程。有關上課時間、如何追上進度或電腦室的問題，都可以問 Sandra。',
+      ru: 'Ведёт курс GED. Спросите Sandra о расписании занятий, о том, как нагнать материал, или о компьютерном классе.',
+      ar: 'تدير دورة GED. اسأل Sandra عن مواعيد الدروس أو كيفية اللحاق بالمنهج أو غرفة الحاسوب.',
     },
     yearsHelping: 6,
     peopleHelped: 85,
@@ -82,6 +94,11 @@ export const DUMMY_CONNECTIONS: readonly DummyConnection[] = [
     help: {
       en: 'Helps with résumés, interviews and job openings posted each week. Walk-ins welcome.',
       es: 'Ayuda con currículums, entrevistas y ofertas de trabajo que se publican cada semana. Sin cita.',
+      'pt-BR': 'Ajuda com currículos, entrevistas e vagas de emprego publicadas toda semana. Sem hora marcada.',
+      'zh-CN': '协助撰写简历、准备面试，并提供每周更新的招聘信息。无需预约，欢迎直接前来。',
+      'zh-HK': '協助撰寫履歷、準備面試，並提供每星期更新的職位空缺。毋須預約，歡迎直接前來。',
+      ru: 'Помогает с резюме, собеседованиями и вакансиями, которые публикуются каждую неделю. Можно прийти без записи.',
+      ar: 'تساعد في كتابة السيرة الذاتية والاستعداد للمقابلات والاطلاع على الوظائف الشاغرة التي تُنشر كل أسبوع. الزيارة بدون موعد مسبق مرحّب بها.',
     },
     yearsHelping: 4,
     peopleHelped: 60,

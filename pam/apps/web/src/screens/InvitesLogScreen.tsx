@@ -1,14 +1,14 @@
 'use client';
 
 import * as stylex from '@stylexjs/stylex';
-import { Button } from '@astryxdesign/core/Button';
+import { Button } from '@pam/ui/Button';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { Heading } from '@astryxdesign/core/Heading';
 import { List, ListItem } from '@astryxdesign/core/List';
 import { Text } from '@astryxdesign/core/Text';
 import { Token } from '@astryxdesign/core/Token';
 import { VStack } from '@astryxdesign/core/VStack';
-import { NOTICES } from '@pam/config';
+import { NOTICES, intlLocale } from '@pam/config';
 import { Loading, Notice, PlusIcon } from '@pam/ui';
 import { SubPage } from '@pam/ui/SubPage';
 import { useI18n } from '@/lib/i18n';
@@ -65,7 +65,7 @@ export function InvitesLogScreen() {
   const isSuperAdmin = viewedRole === 'super_admin';
   const { state } = useInvitesLog(isSuperAdmin);
 
-  const dayLabel = new Intl.DateTimeFormat(locale, { weekday: 'long', month: 'long', day: 'numeric' });
+  const dayLabel = new Intl.DateTimeFormat(intlLocale(locale), { weekday: 'long', month: 'long', day: 'numeric' });
   const days: { label: string; rows: InviteLogRow[] }[] = [];
   if (state.status === 'ready') {
     for (const row of state.invites) {

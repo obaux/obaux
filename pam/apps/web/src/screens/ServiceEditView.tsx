@@ -20,6 +20,7 @@ import { usePolicies } from '@/lib/usePolicies';
 import { useServices } from '@/lib/useServices';
 import { ConfirmDialog } from './ConfirmDialog';
 import { HelpButton } from './HelpButton';
+import { intlLocale } from '@pam/config';
 
 /**
  * A program lead adds or edits one service (D-313): its name, what it is,
@@ -69,7 +70,7 @@ export function ServiceEditView({ serviceId }: { readonly serviceId: string | nu
   // program's hours. One opening a day — the common case — kept simple.
   const { locale } = useI18n();
   const dayName = (index: number) =>
-    new Intl.DateTimeFormat(locale, { weekday: 'long' }).format(new Date(2026, 0, 4 + index));
+    new Intl.DateTimeFormat(intlLocale(locale), { weekday: 'long' }).format(new Date(2026, 0, 4 + index));
   const week: WeekHours = draft.hours ?? [[], [], [], [], [], [], []];
   const setDay = (index: number, periods: readonly { open: string; close: string }[]) => {
     const next = week.map((day, i) => (i === index ? periods : day));

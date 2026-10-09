@@ -85,6 +85,21 @@ export function PdfIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+/**
+ * A page with its corner folded and three lines of writing: a document — a
+ * Word file or a Google Doc in a conversation, and the button that adds one
+ * (D-399). PDFs keep `PdfIcon`.
+ */
+export function DocumentIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z" />
+      <path d="M14 3v5h5" />
+      <path d="M8.5 12.5h7M8.5 15.5h7M8.5 18h4" />
+    </svg>
+  );
+}
+
 /** A camera: add or change a photo (D-345). */
 /** The camera, filled, its lens cut through (Will, 7 October, D-364): the photo button on Profile. */
 /** "More about this": a circled i (D-367). */
@@ -114,6 +129,22 @@ export function CameraIcon(props: SVGProps<SVGSVGElement>) {
     <svg {...svgProps} {...props}>
       <path d="M4 8.5A1.5 1.5 0 0 1 5.5 7h2.2l1.6-2.2h5.4L16.3 7h2.2A1.5 1.5 0 0 1 20 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5z" />
       <circle cx="12" cy="13" r="3.5" />
+    </svg>
+  );
+}
+
+/**
+ * A picture: a frame, the sun, a hill. Adds a photo to a message (D-394) —
+ * a picture rather than a camera, because the phone's picker offers the
+ * photos already on it as well as taking a new one.
+ */
+export function PhotoIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg {...svgProps} {...props}>
+      <rect x="3.5" y="4.5" width="17" height="15" rx="2.5" />
+      <circle cx="9" cy="9.5" r="1.75" />
+      <path d="M4 17l4.6-4.6a1.5 1.5 0 0 1 2.1 0L14 15.7" />
+      <path d="M13 14.7l1.9-1.9a1.5 1.5 0 0 1 2.1 0l3 3" />
     </svg>
   );
 }
@@ -456,7 +487,8 @@ export function NoResultsIcon(props: SVGProps<SVGSVGElement>) {
 /** An arrow pointing back. The nested-page back button (D-213). */
 export function BackArrowIcon(props: SVGProps<SVGSVGElement>) {
   return (
-    <svg {...svgProps} {...props}>
+    // `data-pam-directional`: globals.css turns it round when the page reads right to left.
+    <svg {...svgProps} {...props} data-pam-directional="">
       <path d="M19.5 12h-15M10.5 6l-6 6 6 6" />
     </svg>
   );

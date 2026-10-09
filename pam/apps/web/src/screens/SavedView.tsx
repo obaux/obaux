@@ -2,7 +2,7 @@
 
 import { useState, type ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
-import { Button } from '@astryxdesign/core/Button';
+import { Button } from '@pam/ui/Button';
 import { EmptyState } from '@astryxdesign/core/EmptyState';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import {
@@ -16,7 +16,8 @@ import {
   StarIcon,
   WorkforceIcon,
 } from '@pam/ui';
-import { SegmentedControl, SegmentedControlItem } from '@astryxdesign/core/SegmentedControl';
+import { SegmentedControl } from '@astryxdesign/core/SegmentedControl';
+import { Segment } from '@pam/ui/Segment';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { DUMMY_MEMBERS } from '@pam/config/dummy-people';
@@ -29,7 +30,7 @@ import { LargeTitleHeader } from '@pam/ui/LargeTitleHeader';
 import { emptyState } from '@pam/ui/emptyState';
 import { SavedGrid } from '@pam/ui/SavedGrid';
 import { PlaceCardSkeletonList } from '@pam/ui/Skeletons';
-import { CATEGORY_DEFINITIONS, categoryLabelKey, NOTICES, type Category } from '@pam/config';
+import { CATEGORY_DEFINITIONS, categoryLabelKey, NOTICES, type Category, intlLocale } from '@pam/config';
 import { type Tone } from '@pam/ui/Tone';
 import { CategoryArt } from '@pam/ui/CategoryArt';
 import { useNextVisits, visitTagLabel, type NextVisit } from '@/lib/useNextVisits';
@@ -289,7 +290,7 @@ export function SavedScreen() {
   const names = (onPeople ? people.map((p) => ({ id: p.id, name: p.firstName })) : places)
     .filter((item) => pending.has(item.id))
     .map((item) => item.name);
-  const listed = new Intl.ListFormat(locale, { type: 'conjunction' }).format(names);
+  const listed = new Intl.ListFormat(intlLocale(locale), { type: 'conjunction' }).format(names);
   const isDirty = isEditing && pending.size > 0;
 
   const stage = (id: string) =>
@@ -353,8 +354,8 @@ export function SavedScreen() {
               size="md"
               xstyle={styles.pills}
             >
-              <SegmentedControlItem value="people" label={t('saved.pane.people')} />
-              <SegmentedControlItem value="programs" label={t('saved.pane.programs')} />
+              <Segment value="people" label={t('saved.pane.people')} />
+              <Segment value="programs" label={t('saved.pane.programs')} />
             </SegmentedControl>
           ) : undefined
         }
