@@ -166,7 +166,7 @@ up on their desired language … implement it."
 | Database suite | 546 checks pass, 0 fail, `0001`–`0085`; 0083–0085 run a second time cleanly |
 | Mutation checks | sign-off ignored (config, dispatcher, email) → caught; UCS-2 held to 160 → caught; language word lists off → caught; RTL off → caught; a reworded English string → 6 stale entries reported |
 | Typecheck | clean, all packages |
-| e2e / Storybook / budget | e2e 816/816, first load 542.7 kB and Storybook build were run on the merged tree **before** this part; re-run results are in the entry below |
+| e2e / Storybook / budget | On the tree merged with `main` and with `claude/affectionate-goldberg-tvu4sz` (D-427): e2e **828/828** (816 + that session's 12), first load **544.6 kB** of 600 (55.4 to spare), Storybook builds with no `[journey] no fixture`. The full eight-column fit audit was started and **stopped** (about 800 of 3,720 renders, ~75 minutes more) because the merge changed what it measured; see left undone |
 
 ## Part 2 — left undone
 
@@ -177,4 +177,9 @@ up on their desired language … implement it."
   parsing and batching are tested against a fake provider.
 - **0085 is not applied** (by hand with 0079–0081, before the merge).
 - **The `PAM Language fit` workflow has not run on GitHub** (only its commands
-  locally).
+  locally), and `scripts/fit-known.json` it reads **does not exist yet**: the audit
+  that would write it (`--write-known`) is slow (~110 minutes for all eight
+  columns, ~60 for the four it runs), so the first pull request that touches copy
+  or UI will fail it once, listing the defects to look at and accept. The
+  seven-language audit of 9 October (D-422) found 21 new defects after the fixes,
+  each looked at, listed in D-422.
