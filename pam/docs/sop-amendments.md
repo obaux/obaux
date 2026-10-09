@@ -579,7 +579,7 @@ that it fits within the component we're working on."
   reads it has signed that wording (`reviewedBy`, per language), and in English
   otherwise — never in a draft. This amends §9's "no SMS may be sent unreviewed"
   from "per template" to "per template and language". *Same day, later:* Will
-  approved every new language to learn from, "fail first, then fix" (D-429), and
+  approved every new language to learn from, "fail first, then fix" (D-430), and
   `reviewedBy` records that in so many words. A language whose `reviewedBy` is
   empty is still texted in English, and so is a signed text that fails a check at
   send time: the sign-off picks the language, it never decides whether the person

@@ -217,7 +217,7 @@ After the merge (PR #29, `8dee5d4`, Vercel READY) Will answered the open
 question about the new languages: "Let's approve new languages for now. We'll take
 a fail first then fix it approach. We'll adjust languages based on feedback."
 
-- **The sign-off is recorded in so many words** (D-429): `reviewedBy` on the 53 text
+- **The sign-off is recorded in so many words** (D-430): `reviewedBy` on the 53 text
   drafts and the five invite-email languages reads `APPROVED_TO_LEARN_FROM` ("Will
   (Oba), 9 October 2026 — approved to learn from; no native reader yet"). Tests
   rewritten for the approved state; a new one empties the approvals and asserts

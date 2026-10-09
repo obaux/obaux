@@ -51,7 +51,7 @@ does not fit): **a text always goes out**, in the best language that is safe,
 and the dispatcher logs which template fell back and why — never the words.
 
 Since 9 October 2026 every language carries Will's approval *to learn from*
-(D-429): the texts go out in the person's language while no native reader has
+(D-430): the texts go out in the person's language while no native reader has
 seen them, and what people say about them changes them. To pull one language back
 to English, empty its `reviewedBy`; the others are untouched.
 
@@ -87,7 +87,7 @@ when they asked travels with the request (migration 0085).
 
 ## When somebody says a translation is wrong
 
-We shipped the new languages on a "fail first, then fix" footing (D-429), so
+We shipped the new languages on a "fail first, then fix" footing (D-430), so
 feedback is the review. When a member, a case manager or a reader says a word is
 wrong:
 
@@ -97,7 +97,7 @@ wrong:
    `invite-email.ts`). Leave the English alone: a better translation is not a
    change of meaning, so `copy:status` lists it as *edited* and `copy:ack` records
    the new wording against the same English. A fix that makes the wording say
-   more, or something new, goes back to Will first (D-429).
+   more, or something new, goes back to Will first (D-430).
 3. **If the fix is in a text**, run the config tests (they check length,
    forbidden words and the dispatcher bundle) and redeploy `dispatch-sms`.
 4. **If it is a pattern** — a word used wrongly everywhere — put the right word in

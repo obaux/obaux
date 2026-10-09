@@ -11186,7 +11186,7 @@ it."
   default. Held with the rest.
 - **Not done.** No email is sent (there is no provider yet, before-launch). No
   language is signed *(superseded the same day: Will approved all of them to learn
-  from, D-429; an unsigned language is still English, and so is a signed text that
+  from, D-430; an unsigned language is still English, and so is a signed text that
   fails a check at send time)*. The carrier registration (docs/sms-campaign-samples.md)
   names English and Spanish; it must be re-filed before the first text in
   another language goes out. Phone-only invitations (`invite_member`) are sent
@@ -11368,12 +11368,14 @@ reported if flagged."
   has no such parameter (PGRST202, raised before anything runs), asks again
   without it (`rpcLanguage.ts`). Remove that helper once 0085 has been live a while.
 
-### D-429 — The new languages are approved to learn from: fail first, then fix on feedback
+### D-430 — The new languages are approved to learn from: fail first, then fix on feedback
 
 **Date:** 2026-10-09. Will: "Let's approve new languages for now. We'll take a fail
 first then fix it approach. We'll adjust languages based on feedback." And, when I
 described how a sign-off works: "signing off shouldn't have anything to do with
 preventing them from receiving texts, right?"
+
+*(Numbered D-430: the affectionate-goldberg session pushed its own D-429 first, and this one moved, by `sed` over its own lines only — allocations rule 3.)*
 
 - **What was signed.** `reviewedBy` on the 53 text drafts and the five invite-email
   languages now reads `APPROVED_TO_LEARN_FROM`: "Will (Oba), 9 October 2026 —

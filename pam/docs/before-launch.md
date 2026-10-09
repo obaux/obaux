@@ -193,7 +193,7 @@ Russian, Arabic (D-422); messages read in the reader's language (D-423).
   right-to-left screens read naturally. Russian: "вы" throughout.
 
 - [ ] **Texts and the invite email in the new languages: approved to learn from;
-  deploy, and decide the rest** (D-424, D-429). **Will, 9 October: "approve new
+  deploy, and decide the rest** (D-424, D-430). **Will, 9 October: "approve new
   languages for now ... fail first then fix ... adjust languages based on
   feedback."** Done: his approval is on all 53 text drafts (Portuguese 15, Simplified
   Chinese 12, Traditional Chinese 12, Russian 7, Arabic 7) and the five email
