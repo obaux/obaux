@@ -279,6 +279,13 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
     void servedCities().then((list) => {
       if (cancelled) return;
       setCities(list);
+      // On the waiting screen the city is the one Pam just said it is not in:
+      // it stays, and so does what is saved for it. Asked again there only for
+      // "Right now Pam is in …". Without this the answer came back, replaced
+      // the city with the first one on the list, and a person in Scranton was
+      // told "Pam is not in Philadelphia yet" and left on the list for it —
+      // found as a test that passed only if it looked within the first moments.
+      if (phase === 'waiting') return;
       // Pre-set to a city Pam is in (D-369): the list is the admin's.
       setCity((current) => (current && list.includes(current) ? current : (list[0] ?? current)));
     });

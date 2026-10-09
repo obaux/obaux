@@ -342,3 +342,25 @@ into google maps or apple maps to help them navigate."
   the older action-rows layout, which is only what that story draws (it passes no
   `quickActions`); the live place page uses the round quick actions (D-224).
 
+## Part 8 — a flaky join test that was a real bug
+
+CI's *Accessibility (browser)* failed on the push run of the drawer commit — one test,
+`join.spec.ts` "a city Pam does not serve is an offer", on a different viewport each
+time, failing on the retry and on a re-run — while the pull-request run of the *same
+commit* passed. Not reproducible locally (165 runs, up to 16 workers). Reading the join
+screen: on the waiting screen the second "which cities is Pam in" answer replaced the
+city the person had typed with the first one on the list, so a person in Scranton was
+told "Pam is not in Philadelphia yet" and would have been put on the waiting list *for
+Philadelphia*. The test only passed by looking within the few milliseconds before that
+answer came back; a loaded runner looks later. Proved by making the test look 400ms
+later (it failed every time), then fixed:
+
+- **App** (`JoinScreen.tsx`): on the waiting screen the answer fills the list for "Right
+  now Pam is in …" and leaves the city alone. Only reachable when the first ask for the
+  list failed (the box came back) and the second succeeded.
+- **Test**: waits for "Right now Pam is in Philadelphia." (the answer has landed) *then*
+  checks the city is still Scranton, so it fails the same way every time on the old code.
+- Full browser suite on the fixed build: 827 of 828 first time, the one failure
+  (`places.spec` "an empty area says so", narrow-320, no retry) passed 60 of 60 alone.
+- This is outside the address work; it is in this PR because it kept this PR's check red.
+
