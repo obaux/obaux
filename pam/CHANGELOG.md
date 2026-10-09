@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.51.1] — 2026-10-09 · Arabic reads in the right order
+
+In Arabic, a name, an address or a date that Pam writes into a sentence now
+stays in one piece. Before, the Arabic words around it pulled it apart: an
+address like "1231 N Broad St, North Philadelphia" came out with its number
+beside "بالقرب من" and the rest on the far side, and the same thing happened
+to a date after "Pam:", to the signed-policy counts, to the points left to the
+next level, and to the full stop at the end of an English message. They now
+read in order. When an address is too long for the space at the top of Places,
+it loses its end, as in English, rather than its street number. Nothing
+changes in English or in the other five languages (D-435).
+
 ## [0.51.0] — 2026-10-09 · Pam speaks seven languages
 
 Pam is now in Brazilian Portuguese, Simplified Chinese (for Mandarin

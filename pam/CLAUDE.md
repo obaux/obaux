@@ -207,6 +207,14 @@ These come from the build SOP and are enforced by tests, not convention:
   audit:fit` checks it against a Storybook build, and Storybook's
   *Pseudo-language* shows a string 40% longer. How to change copy, in all
   seven languages and in texts and emails: `docs/copy-changes.md`.
+- **`t` for what is drawn, `tPlain` for what is not (D-435).** In Arabic `t` wraps
+  each text value it writes into a sentence in invisible bidi isolates, so an
+  English name or address is not pulled apart by the Arabic around it. Text that
+  is not read off the screen must not carry them: an `aria-label` or other
+  accessible name, an `alt`, `VisuallyHidden` text, and what is handed to a share
+  sheet or the clipboard all use `tPlain`, and build any sentence they contain from
+  `tPlain` all the way down. `audit:fit` fails on an isolate in one of those places.
+  Texts and emails fill their own templates and never see them.
 
 ## Verify, don't assume
 
