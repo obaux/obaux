@@ -61,6 +61,26 @@ STATUS row too.
   10b). Members were promised they would hear first if what is visible
   changes; the super admin's Everyone list and invite log are visible now.
 
+- [ ] **Tell members about the two promises that changed on 9 October**
+  (D-413; members were promised they would hear first). Neither is in
+  anyone's hands yet: when this was written the live project had three
+  accounts. Before real people agree to the terms:
+  1. `terms.s.limits.p2` is weaker than before — it used to say messages are
+     never turned off; it now says a limited account can read but not send,
+     and a paused one cannot sign in.
+  2. The member's transparency line now names badges ("Your points, your
+     level and your badges"), as do the privacy page and the case manager's
+     "What you can see" — it states what a case manager could already read.
+  Decide how an account that agreed to the old wording is told (nothing
+  re-shows the terms or the transparency screen today; `transparency_ack_at`
+  is set once), or confirm that no account that did exists by launch.
+  *Added by Claude, for Will to keep or strike:* `terms.s.limits.p3` promises
+  "Pam tells you it is off and who to call", but nothing shows the
+  `account_limited` notice, and a refused send says "Your connection dropped"
+  (`messages.thread.failed.body`), which would be untrue for a limited
+  account. With p2 now saying sending can be turned off, p3 is the promise
+  that makes it bearable — it should be wired before anyone can be limited.
+
 - [ ] **Review the SMS copy** still waiting for a name in `reviewedBy`
   (STATUS row 2).
 

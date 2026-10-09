@@ -1,10 +1,16 @@
 # Changelog
 
-## [Unreleased] — 2026-10-09 · Points say who can see them
+## [Unreleased] — 2026-10-09 · Two promises, made true
 
 The Points screen no longer says "nobody else sees them". It now says what is
 true: the person who invited you can see your points, and programs and other
 members cannot (D-412).
+
+The terms no longer say "Messages are never turned off". They now say what
+happens: an account that is limited can read messages but not send them, and
+one that is paused cannot sign in, and you can always call Pam for help. The
+screen that lists what the person who invited you can see now says badges as
+well as points and level (D-413).
 
 ## [0.45.4] — 2026-10-08 · Live
 

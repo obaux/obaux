@@ -44,6 +44,16 @@ export const ADMIN_CAN_SEE = [
   'appointments_and_attendance',
   'points_and_level',
   /**
+   * Said on the screen since D-413 (Will, 9 October: "Case manager can see
+   * awards, badges, and points from members"). It was always true —
+   * `member_badges_select_admin` (0007) reads badges through `admin_covers()`
+   * exactly as the ledger is read — and the case manager's own onboarding line
+   * (`join.privacy.admin.1`) already said "badges"; only the member's line
+   * lacked the word. A program reads no badges (no policy exists for one;
+   * checked on the live project, 9 October).
+   */
+  'badges',
+  /**
    * Since D-242 (Will, 3 October) this is true of a program the member joined
    * as well as of their case manager: a program lead sees the last day a
    * member used Pam, on the member's page, beside their visits with that
@@ -161,7 +171,8 @@ export const TRANSPARENCY_SCREEN: {
       key: 'transparency.canSee.appointments',
       en: 'Your visits, and if you went or missed one',
     },
-    { key: 'transparency.canSee.points', en: 'Your points and your level' },
+    // D-413 — badges named, not left to "level": a case manager already reads them.
+    { key: 'transparency.canSee.points', en: 'Your points, your level and your badges' },
     // D-242 — a program you joined sees this too; said here, not implied.
     {
       key: 'transparency.canSee.lastActive',

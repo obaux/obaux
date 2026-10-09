@@ -9586,3 +9586,66 @@ accounts, all `active`, when this was checked.)
 
 **Numbering.** `claude/pam-storybook` already reaches D-411 and
 `claude/gallant-clarke-0dhizj` D-403; this is D-412 to stay clear of both.
+
+**Update, same day.** Item 1 (badges) was put to Will and is settled in D-413;
+items 2 and 3 stand.
+
+### D-413 — "Messages are never turned off" becomes what is true; badges named on the member's screen
+
+**Date:** 2026-10-09. **Decided by:** Will, on two questions put to him after
+D-412, both found by translators. Messages: "No, it can be turned off
+(promise changes)". Badges: "Yes, name badges".
+
+**Messages — what was wrong.** `terms.s.limits.p2` said "Messages are never
+turned off. Anyone can always reach for help." That is true of the per-feature
+switch only (0031 and A6: `access_controls` refuses a `chat` row, by trigger,
+live). It was never true of account status. On the live project
+`messages_insert_sender` requires `is_active_account()`, and so does
+`open_direct_conversation()` (0063, restated by 0072, 0075 and 0076), so a
+`limited` account can read but not send or start a message; a `suspended`
+one cannot sign in (`useSession.ts`). Both are set by `admin_set_access_status`
+(0008) by any case manager covering the person (caseload or region), with a
+written reason. No screen calls it yet, nothing renders `account_limited`,
+and the live project had three accounts, all `active`. `notice.account_limited`
+("Messages and new people are off for now") was accurate to the database all
+along. `feature.chat` is an unreachable label (the database cannot hold that
+row); it was left alone.
+
+**Messages — what changed.** The promise now matches the code. Three options
+were put to Will: change the code so a limited account keeps messaging; change
+the promise; or let only the Pam team turn sending off. He chose the promise.
+`terms.s.limits.p2`, en + es: "If an account is limited, it can read messages
+but not send them. If an account is paused, it cannot sign in. Either way, you
+can always call Pam for help." `notice.account_limited.body` is unchanged.
+`docs/sop-amendments.md` A6 now says it covers the feature switch only, and
+that the isolation concern it records was weighed for Limited and accepted —
+a future session should not "fix" Limited to match A6 without asking.
+**This weakens a promise**, so members must be told before it ships:
+`docs/before-launch.md`.
+
+**Badges — what changed.** Will's answer to D-412 included badges. A case
+manager reads them (`member_badges_select_admin`, 0007; live: own, case
+manager, buddies — no program) and `join.privacy.admin.1` already tells the
+case manager so, but the member's line said "Your points and your level".
+`transparency.canSee.points` is now "Your points, your level and your
+badges" (en + es), `'badges'` joins `ADMIN_CAN_SEE`, and the two other
+statements of the same list were kept in step: `privacy.s.who-can-see.p1`
+("the same list we show you when you join") and `admin.seeing.body` ("they
+were told exactly this"). That is more than Will's words strictly covered —
+the line he approved plus the two places that quote it — and is easy to
+revert. It states what already happened, so nothing was widened in practice.
+
+**Left open.**
+
+- **terms.s.limits.p3** ("Pam tells you it is off and who to call") is not
+  kept for a limited account: nothing shows `account_limited`, and a refused
+  send says "Your connection dropped". Added to `before-launch.md`, marked as
+  Claude's addition for Will to keep or strike. Not built.
+- **Who may limit.** Any case manager in the member's city can set Limited or
+  Paused, not only the one who invited them. Unchanged.
+- **Other languages.** pt-BR, zh-CN, zh-HK, ru and ar are on no branch of this
+  repository (checked on all of them). `terms.s.limits.p2`, `points.intro`,
+  `transparency.canSee.points`, `privacy.s.who-can-see.p1` and
+  `admin.seeing.body` must change in each when they land.
+- **No database change, no migration.** The DB suite was not run: nothing in
+  `packages/db` changed.

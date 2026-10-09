@@ -1,4 +1,4 @@
-# 2026-10-09 — two promises that contradicted other copy (points fixed, messages open)
+# 2026-10-09 — two promises that contradicted other copy
 
 **Phase:** Phase 1 (member-facing product), pre-launch · **Sessions so far:** many
 
@@ -15,14 +15,20 @@ decided.
   points from members." English and Spanish now say the person who invited you
   can see them and programs and other members cannot. `docs/points-awarding.md`
   matches. No behaviour or contract change.
-- **Messages — open.** `terms.s.limits.p2` ("Messages are never turned off")
-  is true of the per-feature switch only (0031, A6: a trigger refuses a `chat`
-  row; live). It is false of account status: `is_active_account()` gates
-  `messages_insert_sender` and `open_direct_conversation()` (live), so a
-  `limited` account can read but not send or start a message, and a
-  `suspended` one cannot sign in (`useSession.ts`). `feature.chat` is an
-  unreachable label (the database cannot hold that row). Nothing was changed;
-  Will asked for the problem to be explained more. See STATUS row 32.
+- **Messages — the promise changed (D-413).** `terms.s.limits.p2` ("Messages
+  are never turned off") was true of the per-feature switch only (0031, A6: a
+  trigger refuses a `chat` row; live). It was false of account status:
+  `is_active_account()` gates `messages_insert_sender` and
+  `open_direct_conversation()` (live), so a `limited` account can read but not
+  send or start a message, and a `suspended` one cannot sign in
+  (`useSession.ts`). Will first asked for the problem to be explained, then
+  chose to change the promise rather than the code (the alternatives were:
+  limited accounts keep messaging; only the Pam team can turn sending off).
+  The terms now say what happens; A6 is clarified; `before-launch.md` says
+  members are told first. `feature.chat` is an unreachable label, left alone.
+- **Badges named (D-413).** Will's answer included badges; the member's line
+  now says "Your points, your level and your badges", and the privacy page and
+  the case manager's "What you can see" were kept in step with it.
 
 ## What was wrong, and what missed it
 
@@ -37,8 +43,9 @@ and side by side.
 
 ## Decisions
 
-- D-412 — points: the Points screen says who can see them; badges, the region
-  arm and the missing language bundles left open for Will.
+- D-412 — points: the Points screen says who can see them.
+- D-413 — messages: the terms say a limited account cannot send and a paused
+  one cannot sign in; badges named on the member's transparency line.
 
 ## Verified
 
@@ -54,19 +61,24 @@ and side by side.
 
 ## Left undone
 
-- Messages: Will's choice between changing the code (limited accounts keep
-  messaging) and changing the promise (members told first). Then the English
-  strings, `es`, and — if the contract moves — `transparency.ts`.
-- The member-facing line names "points and your level" but the case manager
-  can also read badges (`member_badges_select_admin`): Will's word needed.
+- Tell members before the changed wording ships (`docs/before-launch.md`).
+  Nothing re-shows the terms or the transparency screen to an account that
+  already agreed; `transparency_ack_at` is set once.
+- `terms.s.limits.p3` is unkept for a limited account: nothing shows
+  `account_limited`, and a refused send says "Your connection dropped"
+  (`messages.thread.failed.body`). Not built; on the before-launch list as
+  Claude's addition for Will to keep or strike.
 - pt-BR, zh-CN, zh-HK, ru, ar are on no branch of this repository (checked on
-  every remote branch, including `claude/gallant-clarke-0dhizj`); the same
-  strings must change in each when they land.
+  every remote branch, including `claude/gallant-clarke-0dhizj`). The five
+  strings listed in STATUS row 32 must change in each when they land.
+- Any case manager in a member's city can set Limited or Paused, not only the
+  one who invited them. Unchanged, and now worth Will's eye.
 - This branch is at `main` (D-388); `claude/pam-storybook` (D-411) and
   `claude/gallant-clarke-0dhizj` (D-403) are far ahead and both edit
-  `es.json`; expect a merge conflict on the strings changed here.
+  `es.json`; expect conflicts on the strings changed here, and renumber the
+  changelog heading ("Unreleased") when merging.
 
 ## Needs a human
 
-- Will: the messages decision (STATUS row 32), and whether badges belong on
-  the member's transparency line.
+- Will: whether to keep `terms.s.limits.p3` on the before-launch list, how an
+  account that already agreed is told, and where the five language bundles are.

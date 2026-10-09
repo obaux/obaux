@@ -169,6 +169,17 @@ at all; the quoted excerpt on the report is the only route, and since 0034 the
 database writes that quote rather than the reporter. The transparency screen
 stands as written.
 
+**Clarified (D-413, 9 October 2026, Will).** "Never switchable off" means the
+*feature switch* (`access_controls`, refused by 0031) and nothing more. It was
+never true of account status: a **limited** account can read messages but not
+send them or start a conversation, and a **paused** one cannot sign in
+(`is_active_account()` on `messages_insert_sender` and
+`open_direct_conversation()`). Will chose to keep that and say it, rather than
+change the code: `terms.s.limits.p2` now states it. The isolation concern
+recorded above applies to Limited as much as to a feature switch; it was
+weighed and accepted, so a future session should not "fix" Limited to match
+A6 without asking.
+
 ## A7 — Who is told when something is flagged (12 September 2026, Will)
 
 > "When a message is flagged, or a program is flagged, make sure to notify the
