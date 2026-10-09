@@ -99,7 +99,9 @@ decided.
   calm card (`Notice quiet`: more padding, 16px text, the call as a link). All seven
   languages reworded (five are Claude's drafts). Merged `main` (the languages branch,
   D-422–D-428) into this branch first; the full browser suite passes on the merged
-  tree (834), and the messages spec after this change (165).
+  tree (834) and again after this change (834, fresh build); the `Member` page of
+  the Figma flow map was redrawn from the merged `flows.mjs` (26 screens, 29 arrows,
+  including the other session's Stuff shared).
 
 ## What was wrong, and what missed it
 
