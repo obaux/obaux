@@ -5,10 +5,11 @@ import * as stylex from '@stylexjs/stylex';
 import { ClickableCard } from '@astryxdesign/core/ClickableCard';
 import { Heading } from '@astryxdesign/core/Heading';
 import { HStack } from '@astryxdesign/core/HStack';
+import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { Icon } from '@astryxdesign/core/Icon';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
-import { BigButton, CopyIcon, TextLink, TrashIcon } from '@pam/ui';
+import { BigButton, CopyIcon, LegalIcon, TrashIcon } from '@pam/ui';
 import { IconTile } from '@pam/ui/Reading';
 import { SubPage } from '@pam/ui/SubPage';
 import { TransparencyReading } from '@/screens/TransparencyReading';
@@ -34,6 +35,8 @@ const styles = stylex.create({
   line: { fontSize: '17px', lineHeight: 1.5 },
   action: { width: '100%' },
   actionLabel: { fontSize: '18px', fontWeight: 600, flexGrow: 1 },
+  // The deletion's words are red too (Will, D-417), not only its icon.
+  actionLabelRed: { color: colorVars['--color-text-red'] },
   body: { fontSize: '18px', lineHeight: 1.55 },
 });
 
@@ -56,7 +59,7 @@ function ActionCard({
         <IconTile small tone={tone}>
           {icon}
         </IconTile>
-        <Text xstyle={styles.actionLabel}>{label}</Text>
+        <Text xstyle={[styles.actionLabel, tone === 'red' ? styles.actionLabelRed : null]}>{label}</Text>
         <Icon icon="chevronRight" size="md" />
       </HStack>
     </ClickableCard>
@@ -74,10 +77,9 @@ export function PrivacyControlsView() {
       {/* The guide and the short version, then the full policy (Will, D-417). */}
       <TransparencyReading detail={false} />
 
-      <TextLink label={t('privacy.controls.policy')} href="/privacy/" />
-
-      {/* No heading: straight into what a person can do about their data (Will, D-417). */}
+      {/* Three rows, one look (Will, D-417): the full policy, then what you can do about your data. */}
       <VStack gap={3}>
+        <ActionCard label={t('privacy.controls.policy')} href="/privacy/" icon={<LegalIcon />} tone="grey" />
         <ActionCard label={t('privacy.controls.copy')} href="/legal/privacy/copy/" icon={<CopyIcon />} tone="grey" />
         <ActionCard label={t('privacy.controls.delete')} href="/legal/privacy/delete/" icon={<TrashIcon />} tone="red" />
       </VStack>

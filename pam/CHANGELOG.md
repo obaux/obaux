@@ -34,7 +34,9 @@ can see is just the guide and the short version, a link to the full privacy
 policy, and the two things you can do about your data. The privacy policy and
 terms are flat pages with a small icon beside each heading, tabs like Explore's,
 and one copy icon at the top right that copies the whole page and says "Copied"
-for 5 seconds.
+for 5 seconds. Body text is 16px (it was 18px on phones) and What others can see
+ends in three matching rows — read the full policy, request a copy of your data,
+and delete your account in red (D-418).
 
 ## [0.45.4] — 2026-10-08 · Live
 

@@ -35,18 +35,13 @@
      */
 
     /*
-     * §2.5 token overrides. 18px body on mobile is the floor, not the target;
-     * desktop relaxes to 16px where reading distance is shorter.
+     * §2.5 token overrides. 16px body text, on mobile and on desktop alike
+     * (Will, 9 October, SOP A23 — it was 18px on mobile). It is the floor, not
+     * the target: a component may be larger.
      */
-    --pam-body-size: 18px;
+    --pam-body-size: 16px;
     --pam-touch-target-min: 48px;
     --pam-big-button-height: 56px;
-  }
-
-  @media (min-width: 768px) {
-    :root {
-      --pam-body-size: 16px;
-    }
   }
 
   html {

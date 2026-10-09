@@ -9925,8 +9925,10 @@ all three screens it appears on, since it is one component. (4) The introduction
 under the page title on Privacy and Terms is 16px (was 18px): Will, "make privacy
 policy text under header smaller" — read as that line, not the section text, which
 stays 18px. The guide card's sentence and the grey detail lines are 16px too, so
-text below the SOP's 18px mobile body size is now a deliberate, listed set:
-the intro, the guide sentence, detail lines, and 15px chips and group labels.
+text below the SOP's 18px mobile body size was a deliberate, listed set
+(superseded the same day: D-418 makes 16px the body size, so the intro, the guide
+sentence and the detail lines are now at it; only the 15px chips and group
+labels are under).
 (5) The short version's lines are the size and weight of "Read the full privacy
 policy" under them (`--pam-link-size`, 17px, weight 500, line height 1.43 — measured in the browser against the link) — Will: "make the short version
 section text smaller … text matching 'Read the full privacy policy'" — and its card
@@ -9950,3 +9952,30 @@ The long phrase is still in Help, the report screens and two notices. Strings to
 translate in the other languages: `guide.*`, `transparency.summary.*`,
 `transparency.group.*`, `copy.page`, `copy.done`, `copy.failed`, the two
 contract headings and `transparency.title`; `privacy.controls.data` is gone.
+
+### D-418 — Body text is 16px (SOP A23); the policy link is a card; "Delete my account" is red
+
+**Date:** 2026-10-09. **Decided by:** Will, three instructions:
+"Let's update the rule and the text token to 16px body size." / "Let's wrap the
+Read full privacy policy into a similar card item as the items below for
+consistency and add icon of policy doc." / "Make Delete my account text red."
+
+**The 16px rule (SOP A23, `docs/sop-amendments.md`).** The accessibility floor
+"18px body text on mobile" is now **16px, on mobile and on desktop**. It lived
+in five places that had to agree and were changed together: the written rule
+(`CLAUDE.md`, and the comment in `tokens.stylex.ts`); the budget
+`A11Y.bodyTextMobilePx` (18 → 16) in `@pam/config`, which the e2e check "body text
+is at least 16px on mobile" reads; the `--pam-body-text-mobile` token
+(`tokens.stylex.ts` and `tokens.css`); `--pam-body-size` in `globals.css`, which
+sets the page's `body` (its ≥768px override is deleted, both being 16px); and the
+Foundations pages (Principles, Typography). **It is a floor, not a target**: no
+component was rewritten, so the many that set 17–18px for themselves still do.
+Making them 16px as well is a separate, visible change for Will to ask for.
+Unchanged: nothing a member must read is under 15px; 48px targets, 56px
+buttons, AAA body contrast, 200% scaling.
+
+**Profile › What others can see, the foot.** "Read the full privacy policy" is
+a card like the two below it, with a policy-document icon (`LegalIcon`) in a grey
+tile: three rows in one group — the full policy, Request a copy of my data
+(grey), Delete my account (red). **The deletion's label is red too**
+(`--color-text-red`), not only its icon.

@@ -188,7 +188,7 @@ These come from the build SOP and are enforced by tests, not convention:
   Will's exception, `docs/sop-amendments.md` A19.)
 - **One primary action per screen.** Two primary `BigButton`s means the screen
   is doing two things (a `variant="secondary"` one beside it is fine — D-239).
-- **48px minimum touch target, 56px primary buttons (secondary the same — D-239), 18px body text on mobile.**
+- **48px minimum touch target, 56px primary buttons (secondary the same — D-239), 16px body text on mobile (A23).**
 - Every `security definer` function sets `search_path = public, extensions`.
 - Strings go through i18n from day one. English and Spanish stay key-for-key.
 

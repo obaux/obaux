@@ -9,7 +9,8 @@ import * as stylex from '@stylexjs/stylex';
  *
  *   - 48px minimum touch target, everywhere
  *   - 64px primary buttons (BigButton)
- *   - 18px body text on mobile, 16px on desktop
+ *   - 16px body text, on mobile and on desktop (Will, 9 October, SOP A23; it was
+ *     18px on mobile)
  *
  * Colour, type family and elevation all come from the Astryx theme. Only the
  * measurements Pam tightens live here.
@@ -31,7 +32,7 @@ export const pam = stylex.defineVars({
   // person aims at the drawing.
   '--pam-field-height': '56px',
   '--pam-big-button-height': '56px',
-  '--pam-body-text-mobile': '18px',
+  '--pam-body-text-mobile': '16px',
   '--pam-body-text-desktop': '16px',
   '--pam-card-gap': '12px',
   '--pam-screen-padding': '16px',

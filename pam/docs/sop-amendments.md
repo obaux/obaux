@@ -522,3 +522,22 @@ are unaffected.
 **What it leaves.** A member who signed up alone, or was invited by a program
 lead or a super admin, has no case manager and is read by no case manager.
 There is no screen to assign one yet (STATUS backlog).
+
+## A23 — Body text is 16px on mobile (9 October 2026, Will)
+
+Will: "Let's update the rule and the text token to 16px body size."
+
+**Where this contradicts the original.** SOP §2.5 and §12: "18px body text on
+mobile" (16px on desktop). It is now 16px everywhere. Changed together: the
+rule in `CLAUDE.md`; `A11Y.bodyTextMobilePx` (18 → 16) in `@pam/config`, which the
+e2e check "body text is at least 16px on mobile" reads; the `--pam-body-text-mobile`
+token in `tokens.stylex.ts` and `tokens.css`; and `--pam-body-size` in
+`globals.css`, which sets the page's `body` (the desktop override is gone — both
+are 16px now). The Foundations pages say the same.
+
+**What did not change.** It is a floor, not a target: a heading, a row label or a
+card may be larger, and the many components that set 17–18px for themselves still
+do. Nothing a member has to read is smaller than 15px; supporting lines stay
+15–17px. 48px targets, 56px primary buttons, AAA contrast for body text and
+scaling to 200% are as before.
+

@@ -18,7 +18,7 @@ import { pam } from './tokens.stylex.js';
  * The Profile screen's cards (D-210): who you are, the two doors beside each
  * other, and a single offer. Modelled on the reference Will gave on 1 October —
  * white page, generous rounded cards lifted by the theme's card shadow, very
- * little text on each — and kept to Pam's floors: 48px targets, 18px body.
+ * little text on each — and kept to Pam's floors: 48px targets, 16px body.
  */
 
 // ---------------------------------------------------------------------------

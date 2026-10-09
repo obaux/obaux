@@ -67,7 +67,7 @@ test.describe('accessibility', () => {
     expect(box?.height).toBe(A11Y.primaryButtonHeightPx);
   });
 
-  test('body text is at least 18px on mobile (§2.5)', async ({ page }) => {
+  test('body text is at least 16px on mobile (§2.5, SOP A23)', async ({ page }) => {
     await page.goto('/');
     const size = await page.evaluate(() =>
       parseFloat(getComputedStyle(document.body).fontSize),
