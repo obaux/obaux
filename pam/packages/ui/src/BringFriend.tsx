@@ -16,6 +16,7 @@ import { TextField } from './TextField.js';
 import { sheet } from './sheet.js';
 import { canShareSheet, shareText } from './share.js';
 import { BigButton } from './BigButton.js';
+import { landFocus, landFocusStyle } from './landFocus.js';
 
 /**
  * The banner across the top is Will's picture (D-337, 7 October: "instead of
@@ -222,7 +223,7 @@ export function BringFriend({
       xstyle={sheet.panel}
     >
       {isOpen ? (
-        <VStack gap={3} xstyle={styles.sheet}>
+        <VStack gap={3} {...landFocus} xstyle={[styles.sheet, landFocusStyle.quiet]}>
           <VStack xstyle={styles.top}>
             {heroSrc && !heroFailed ? (
               // Decoration: the title under it says what the drawer is.

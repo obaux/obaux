@@ -1,5 +1,6 @@
 'use client';
 
+import { useLayoutEffect, useRef } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { Lightbox, type LightboxMedia } from '@astryxdesign/core/Lightbox';
 
@@ -15,6 +16,13 @@ import { Lightbox, type LightboxMedia } from '@astryxdesign/core/Lightbox';
  * `globals.css`, scoped to `.astryx-lightbox`.
  *
  * One viewer for a conversation, the report screen and the photos page.
+ *
+ * It opens on the photo, not on ×: the browser puts focus on the first
+ * button, and a phone draws that button as chosen (Will, 9 October, D-411).
+ * So once Lightbox has opened, focus moves to the viewer itself — in a
+ * layout effect, before anything is painted, so × never shows as chosen.
+ * Escape and the arrow keys work from there; Tab reaches ×. (`autofocus` on
+ * the dialog would say the same, but Chromium ignores it there.)
  */
 const styles = stylex.create({
   dark: { backgroundColor: 'var(--pam-viewer-backdrop)' },
@@ -33,8 +41,17 @@ export function PhotoViewer({
   readonly onClose: () => void;
 }) {
   const items = media ?? { src: '', alt: '' };
+  const viewer = useRef<HTMLDialogElement>(null);
+  const isOpen = media !== null;
+  // After Lightbox's own layout effect (children's run first) has called
+  // showModal(), which focused ×.
+  useLayoutEffect(() => {
+    if (isOpen) viewer.current?.focus({ preventScroll: true });
+  }, [isOpen]);
   return (
     <Lightbox
+      ref={viewer}
+      tabIndex={-1}
       isOpen={media !== null}
       onOpenChange={(open) => {
         if (!open) onClose();

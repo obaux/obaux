@@ -83,7 +83,7 @@ export const PlacePolicy: Story = screen('member', 'A policy to sign', '/place/p
 });
 export const ReportPlace: Story = screen('member', 'Report a place', '/flag/', { place: 'dummy-place-learning' });
 export const Conversation: Story = screen('member', 'A conversation', '/messages/thread/', { id: CONVO_ID });
-/** With a program (D-276, D-400): the booked visit pinned under the name, compact, and the messages fading under it. */
+/** With a program (D-276, D-400, D-411): the booked visit pinned under the name, compact; the header as on every nested screen, no fade. */
 export const ConversationWithAProgram: Story = screen('member', 'A conversation with a program', '/messages/thread/', {
   id: 'dummy-conv-dummy-m1-dummy-p1',
 });

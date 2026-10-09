@@ -185,6 +185,32 @@ test.describe("a place's own screen", () => {
     await expect(page.getByText(/sample hours while Pam checks the real ones/)).toBeVisible();
   });
 
+  test('the week drawer opens with nothing chosen, and the bar\'s ⋯ is outlined and lifted (D-411)', async ({ page }) => {
+    await signedIn(page);
+    await page.route(DETAIL, (route) => route.fulfill(json([PLACE])));
+    await page.goto(`/place/?id=${PLACE.id}`);
+
+    // ⋯ reads as a button on a plain page: a grey outline you can see, and a shadow.
+    const more = page.getByRole('button', { name: 'More' });
+    const look = await more.evaluate((el) => {
+      const s = getComputedStyle(el);
+      return { border: s.borderTopWidth, colour: s.borderTopColor, shadow: s.boxShadow };
+    });
+    expect(look.border).toBe('1px');
+    expect(look.colour).not.toMatch(/rgba\(0, 0, 0, 0\.0\d+\)/);
+    expect(look.shadow).not.toBe('none');
+
+    await page.getByRole('button', { name: /^Hours: / }).click();
+    await expect(page.getByRole('heading', { name: 'Opening hours' })).toBeVisible();
+    // Focus is in the drawer, on its content — not on Close or any button.
+    const focused = await page.evaluate(() => {
+      const a = document.activeElement!;
+      return { tag: a.tagName, inDialog: a.closest('dialog') !== null, isControl: a.matches('button, a, input, [role=button]') };
+    });
+    expect(focused.inDialog).toBe(true);
+    expect(focused.isControl).toBe(false);
+  });
+
   test('marks a place a member cannot walk into, above everything else', async ({ page }) => {
     // An adult who reads the phone number, works out the bus and then finds a
     // centre for 10 to 17 year olds has been failed by the screen, not by the

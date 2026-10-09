@@ -19,6 +19,7 @@ import { pam } from './tokens.stylex.js';
 import { textLinkLook } from './TextLink.js';
 import { MenuList, type MenuItem } from './MenuList.js';
 import { AutoHeight, TextSwap } from './Swap.js';
+import { landFocus, landFocusStyle } from './landFocus.js';
 
 /**
  * One place, on its own screen.
@@ -371,7 +372,7 @@ export function PlaceDetail({
   const weekSheet = hasWeek ? (
     <BottomSheet isOpen={isWeekOpen} onOpenChange={setWeekOpen} label={labels.hours} height="hug" xstyle={sheet.panel}>
       {isWeekOpen ? (
-        <VStack gap={3} xstyle={styles.sheet}>
+        <VStack gap={3} {...landFocus} xstyle={[styles.sheet, landFocusStyle.quiet]}>
           {/* The sheet draws its own Close; a second one would be two. */}
           <Heading level={2} xstyle={styles.sheetTitle}>
             {labels.hours}

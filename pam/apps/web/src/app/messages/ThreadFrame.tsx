@@ -6,8 +6,9 @@ import { VStack } from '@astryxdesign/core/VStack';
 import { Icon } from '@astryxdesign/core/Icon';
 import { IconButton } from '@astryxdesign/core/IconButton';
 import { SubPageHeader } from '@pam/ui/SubPage';
+import { roundAction } from '@pam/ui/roundAction';
 import { useI18n } from '@/lib/i18n';
-import { colorVars, spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
+import { spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
 
 /**
  * The thread screen's frame (D-192): the app header and the thread header
@@ -25,14 +26,14 @@ import { colorVars, spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
  * contract) — `position: fixed` only takes the frame itself out of the
  * document; it is not what pins the composer within it.
  *
- * `ThreadHeader` is one bar (D-193): back, the name, and under the name who
- * they are to you (D-187 — nothing for staff looking at a member). That
- * line was a `Token` beside the name until 8 October (D-395): a chip beside
- * a name has room for a word, so "Example Food Pantry" read "Example
- * Food …". Under the name it has the whole width and two lines, and says
- * the role with the place — "Program lead at Example Food Pantry". Smaller
- * than a page title, on purpose: this header repeats on every conversation
- * and shares the phone with the conversation itself.
+ * `ThreadHeader` is the nested-page template as every other screen you tap
+ * into has it (Will, 9 October, D-411 — it was a one-row compact bar, D-193,
+ * whose back and ⋯ sat a few pixels off from everywhere else): the round
+ * back at the top left and the ⋯ at the top right, in exactly the places
+ * they are on Legal or a place, then the name, large, and under it who they
+ * are to you on one line (D-187, D-395, D-400 — nothing for staff looking at
+ * a member). `ThreadTop` has `Page`'s own padding so the bar lands where
+ * `Page` puts it.
  *
  * No help link on this screen (A14, D-194) — the third screen in Pam
  * without one (a fourth, Messages itself, followed at A15). Back leads to
@@ -72,76 +73,41 @@ const styles = stylex.create({
     width: '100%',
     maxWidth: '560px',
     marginInline: 'auto',
-    paddingBlockStart: spacingVars['--spacing-4'],
+    // `Page`'s own top padding, so back and ⋯ land where they do on every
+    // nested screen (D-411).
+    paddingBlockStart: spacingVars['--spacing-6'],
     display: 'flex',
     flexDirection: 'column',
     minHeight: 0,
   },
   // The side gutter is the header's alone (D-390): the conversation under it
   // runs closer to the screen's edges, on Astryx's own 12px list padding and
-  // 8px composer dock.
+  // 8px composer dock. The header's is `Page`'s 16px (D-411). No fade under
+  // it any more (Will, 9 October, D-411: "I don't like the fade on top"; it
+  // was D-400's blur and white fade): the messages simply go under the edge.
   top: {
     flexShrink: 0,
     paddingBlockEnd: '8px',
-    paddingInline: spacingVars['--spacing-3'],
-    // Above the conversation, so its fade lies over the messages (D-400).
-    position: 'relative',
-    zIndex: 1,
+    paddingInline: spacingVars['--spacing-4'],
   },
-  // Under the header — and the visit card, when there is one — the messages
-  // blur and fade into the page as they scroll up (Will, 9 October, D-400:
-  // "the header should have the blur and white fade"), instead of being cut
-  // at a line. The composer's dock does the same at the bottom (Astryx's
-  // frosted layer). Decoration: no taps, nothing for a screen reader.
-  fade: {
-    position: 'absolute',
-    insetInline: 0,
-    top: '100%',
-    height: '32px',
-    pointerEvents: 'none',
-    backgroundColor: colorVars['--color-background-body'],
-    backdropFilter: 'blur(12px)',
-    WebkitBackdropFilter: 'blur(12px)',
-    maskImage: 'linear-gradient(to bottom, black, transparent)',
-    WebkitMaskImage: 'linear-gradient(to bottom, black, transparent)',
-  },
-  row: { width: '100%', minHeight: '48px' },
-  back: {
-    minHeight: '48px',
-    minWidth: '48px',
-    marginInlineStart: '-10px',
-    fontSize: '22px',
-    flexShrink: 0,
-  },
-  name: {
-    fontSize: '20px',
-    lineHeight: 1.2,
-    minWidth: 0,
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap',
-  },
-  more: { width: '48px', height: '48px', borderRadius: '50%', flexShrink: 0 },
 });
 
 export function ThreadFrame({ children }: { readonly children: ReactNode }) {
   return <main {...stylex.props(styles.frame)}>{children}</main>;
 }
 
-/** The pinned block above the messages: the app header, then the thread header. */
+/** The pinned block above the messages: the thread header, then the visit card, if any. */
 export function ThreadTop({ children }: { readonly children: ReactNode }) {
   return (
-    <VStack gap={2} xstyle={styles.top}>
+    <VStack gap={4} xstyle={styles.top}>
       {children}
-      <VStack aria-hidden xstyle={styles.fade} />
     </VStack>
   );
 }
 
 /**
- * The nested-page template in its compact form (D-213): the round back
- * button, then the name in the same bar, with who they are beside it — one
- * row, as D-193 asked, now drawn the way every nested screen starts.
+ * The nested-page template (D-213, D-411): round back, ⋯ in an outline with
+ * a shadow so it is not missed, the name large, who they are under it.
  */
 export function ThreadHeader({
   name,
@@ -161,11 +127,10 @@ export function ThreadHeader({
   const { t } = useI18n();
   return (
     <SubPageHeader
-      variant="compact"
       title={name}
       backHref={backHref}
       backLabel={backLabel}
-      {...(context ? { subtitle: context } : {})}
+      {...(context ? { subtitle: context, hasOneLineSubtitle: true } : {})}
       actions={
         menuHref ? (
           <IconButton
@@ -173,7 +138,7 @@ export function ThreadHeader({
             href={menuHref}
             variant="ghost"
             icon={<Icon icon="moreHorizontal" size="md" />}
-            xstyle={styles.more}
+            xstyle={roundAction.button}
           />
         ) : undefined
       }

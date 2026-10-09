@@ -10314,3 +10314,62 @@ and when also makes sense."
   line under it says "Link" rather than repeat it.
 - Photos and documents keep D-409: "Photo", "Document". Who sent it over when
   stays at the end of every row, as D-407 put it.
+
+### D-411 — A conversation's header like every other; ⋯ outlined; Messages rows flush left; nothing chosen when a dialog opens
+
+**Date:** 2026-10-09. Will: "The messaging screen, the message item, let's
+remove left padding, and keep right padding. On message thread screen, I
+don't like the fade on top, keep the same header position, circle button, as
+the regular. The compact view is not great, because the top buttons aren't
+positioned in same place across other pages. The ellipsis more actions
+button needs a grey outline and shadow. It's getting missed. Also why are
+buttons automatically selected on modals etc? like uncheck confirmation
+modal. Or image preview full screen X button. Those should not be auto
+selected. Only input fields ready to type (except sign in)."
+
+- **A conversation uses the regular nested-page header** (`SubPageHeader`,
+  D-213): the round back at the top left and ⋯ at the top right, in exactly
+  the places they are on Legal or a place (measured the same to the pixel),
+  then the name, large, and who they are under it on one line (D-400's one
+  line kept, as `hasOneLineSubtitle`). The frame takes `Page`'s own padding
+  (24px top, 16px sides) so the bar lands where `Page` puts it. The compact
+  variant is gone from `SubPage` — the conversation was its only user — and
+  its stories with it. The header is taller than the one-row bar was — the
+  name is large now — which is the price of the buttons not moving between
+  screens.
+- **No fade under the header.** D-400's blur and white fade is removed; the
+  messages go under the header's edge. The composer's frosted dock at the
+  bottom stays (Will named the top).
+- **⋯ is outlined and lifted**, everywhere it appears in a bar — a
+  conversation, a place, What you sent — and a place's save button beside it:
+  `roundAction` (@pam/ui), 48px, the page's colour, Astryx's *emphasized*
+  border (#CCD3DB — the default border, 8% black, is what made it vanish) and
+  a soft shadow.
+- **Messages rows have no left padding**: the avatar starts at the page's
+  16px edge; the right keeps the list's 12px for the time. Done on both the
+  app's `ConversationRow` and the redesign's `MessagesView` (Storybook). Set
+  as `paddingInline`, the property Astryx's Item sets with doubled
+  specificity — a `paddingInlineStart` loses to it.
+- **Nothing is chosen when a dialog or sheet opens.** A modal must take focus
+  (or a screen reader stays on the page behind it), and the browser picks
+  the first button — which a phone draws as chosen and Enter presses; in an
+  "are you sure", that is the destructive one. Now focus lands on the
+  dialog's content, which is not a control: no ring, Enter does nothing, a
+  screen reader reads the question, Tab reaches the first button.
+  `landFocus` (@pam/ui) does it for Pam's `ConfirmDialog` (every "are you
+  sure", D-234), the Bring a friend sheet and a place's opening-hours sheet
+  (the native `autofocus` attribute, which `showModal()` honours inside a
+  dialog, plus Astryx's `data-autofocus`). The photo viewer (Astryx
+  Lightbox, which gives no say) moves focus to itself in a layout effect
+  right after it opens, before anything is painted — Chromium ignores
+  `autofocus` on the dialog element itself. The info popovers already
+  focused their panel, not a button; left as they are.
+- **Undo check-in** (the "uncheck" confirmation) was Astryx's
+  `AlertDialog`, which always opens with Cancel chosen and has no way to
+  change it. It is now Pam's `ConfirmDialog`, like every other question Pam
+  asks: "Undo Marcus's check-in?", Undo check-in as the big button, Keep it
+  under it.
+- **Fields still get focus** where typing is the point: the search boxes,
+  New message's search, the area picker, the first field of joining. Sign in
+  does not focus its field on arrival (it did not before either), so the
+  keyboard does not cover the page before it is read.

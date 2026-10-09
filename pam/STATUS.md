@@ -858,9 +858,9 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
-## Conversations, redrawn (8–9 October) — 0.45.5 to 0.49.3, on the branch
+## Conversations, redrawn (8–9 October) — 0.45.5 to 0.50.0, on the branch
 
-D-389 to D-410 (D-405: Trips' policies banner action is just "Sign"; D-406: a photo's name set like its time; D-408: photos are JPEG, PNG or an iPhone's, documents PDF or Word, and either can be pasted into the box; D-409: things are called Photo, Document or Link, and a refused file gets a shaking alert banner; D-410: a link shows its address instead), **on `claude/pam-storybook`, not merged to `main`.** A
+D-389 to D-411 (D-405: Trips' policies banner action is just "Sign"; D-406: a photo's name set like its time; D-408: photos are JPEG, PNG or an iPhone's, documents PDF or Word, and either can be pasted into the box; D-409: things are called Photo, Document or Link, and a refused file gets a shaking alert banner; D-410: a link shows its address instead; D-411: the conversation header is the regular one, ⋯ outlined, Messages rows flush left, no button pre-chosen in dialogs), **on `claude/pam-storybook`, not merged to `main`.** A
 conversation's header says who the person is on a line under the name —
 "Program lead at Example Food Pantry", "Case manager" (D-395). Each day opens
 with one divider ("Today", "Yesterday", a weekday, a date). Bubbles carry no name or time: mine are light green on the
@@ -899,13 +899,20 @@ documents (`test/16_message_files_test.sql`, 23 checks; legal test).
 Will (before-launch).
 
 **Header, composer and viewer (D-400, D-401, 0.47.1).** The visit card is
-the compact `StatusCard`; a 32px blurred fade hangs under the header so
-messages thin out instead of being cut; the subtitle is one line; the
+the compact `StatusCard`; the subtitle is one line (the blurred fade under
+the header was removed by D-411); the
 Messages list preloads the conversation's code. The composer's bottom
 corners round to 32px around the send button; photos and documents sit in
 an even 8px rim; document icons are `FileTypeIcon` in Google-Doc blue
 (`--pam-document-blue`); photos open in `PhotoViewer` on near-black with
 48px dark circle buttons.
+
+**The conversation's header (D-411, 0.50.0)** is the nested-page template
+every other tapped-into screen has — back and ⋯ (outlined, `roundAction`) in
+the same places, the name large, who they are on one line; no fade under it.
+Dialogs and sheets open with focus on their content, not a button
+(`landFocus`; the photo viewer focuses itself); undo check-in is a
+`ConfirmDialog`. Messages rows start at the page edge.
 
 **Stuff shared (D-402 → D-407, 0.49.0).** From a conversation's ⋯: one flat
 list of policy-style rows, newest first — a 48px preview (photo; document

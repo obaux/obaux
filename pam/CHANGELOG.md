@@ -1,5 +1,15 @@
 # Changelog
 
+## [0.50.0] — 2026-10-09 · Buttons where you expect them
+
+A conversation now starts like every other screen you tap into: the round
+back button and the ⋯ button sit in the same places as everywhere else,
+with the person's name large underneath. The fade over the top of the
+messages is gone. The ⋯ button has a grey outline and a soft shadow so it
+is easy to spot, on places too. In Messages, each conversation lines up with
+the left edge of the page. And when a question or a photo opens, no button
+is pre-selected any more — nothing is chosen until you choose it (D-411).
+
 ## [0.49.3] — 2026-10-09 · Where a link goes
 
 On Stuff shared, a link now shows its web address under its title, so you

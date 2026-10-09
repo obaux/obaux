@@ -129,6 +129,24 @@ test.describe('the conversation list', () => {
     await expect(page.getByRole('button', { name: 'New message' })).toBeVisible();
   });
 
+  test('a row has no padding on the left — its picture starts at the page\'s edge — and keeps it on the right (D-411)', async ({ page }) => {
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    await page.goto('/messages/');
+    await settled(page);
+    const row = page.getByRole('link', { name: /Marcus/ });
+    const pad = await row.evaluate((el) => {
+      const item = el.closest('li')!;
+      const s = getComputedStyle(item);
+      const picture = item.querySelector('.astryx-avatar')!.getBoundingClientRect();
+      return { left: s.paddingInlineStart, right: s.paddingInlineEnd, picture: picture.left };
+    });
+    expect(pad.left).toBe('0px');
+    expect(pad.right).toBe('12px');
+    // The page's own 16px gutter, and nothing added inside the row.
+    expect(pad.picture).toBe(16);
+  });
+
   test('has no help link (A15) — the logo is one tap back to Home, which always has one', async ({ page }) => {
     await signedInAs(page, 'admin');
     await withOneConversation(page);
@@ -1054,27 +1072,46 @@ test.describe('the conversation, drawn closer (D-400, D-401)', () => {
     expect(await line.evaluate((el) => getComputedStyle(el).textOverflow)).toBe('ellipsis');
   });
 
-  test('messages blur and fade under the header instead of meeting it at a line', async ({ page }) => {
+  test('the header is the one every nested screen has: back and ⋯ in the same places, the name large, no fade (D-411)', async ({ page }) => {
     await signedInAs(page, 'admin');
     await withOneConversation(page);
+    await page.goto('/legal/');
+    await settled(page);
+    const legalBack = (await page.getByRole('link', { name: /^Back/ }).first().boundingBox())!;
+    const legalTitle = (await page.getByRole('heading', { level: 1 }).boundingBox())!;
+
     await page.goto(`/messages/thread/?id=${CONVO}`);
     await settled(page);
-    const fade = await page.evaluate(() => {
-      const heading = document.querySelector('main h1')!;
-      const top = heading.closest('main')!.firstElementChild as HTMLElement;
-      const layer = [...top.children].at(-1) as HTMLElement;
-      const style = getComputedStyle(layer);
-      return {
-        hidden: layer.getAttribute('aria-hidden'),
-        blur: style.backdropFilter,
-        mask: style.maskImage || style.webkitMaskImage,
-        startsAtHeaderEnd: Math.abs(layer.getBoundingClientRect().top - top.getBoundingClientRect().bottom) < 1,
-        overConversation:
-          layer.getBoundingClientRect().bottom > document.querySelector('.astryx-chat-layout')!.getBoundingClientRect().top,
-      };
+    const back = (await page.getByRole('link', { name: /^Back/ }).first().boundingBox())!;
+    expect(back).toEqual(legalBack);
+    const title = page.getByRole('heading', { level: 1 });
+    const titleBox = (await title.boundingBox())!;
+    expect(titleBox.x).toBe(legalTitle.x);
+    expect(titleBox.y).toBe(legalTitle.y);
+    expect(await title.evaluate((el) => getComputedStyle(el).fontSize)).toBe('34px');
+
+    // ⋯ at the bar's right edge, as on a place: outlined in a grey you can see, and lifted.
+    const more = page.getByRole('link', { name: 'More options' });
+    const moreBox = (await more.boundingBox())!;
+    expect(moreBox.y).toBe(back.y);
+    expect(moreBox.x + moreBox.width).toBe(page.viewportSize()!.width - 16);
+    const look = await more.evaluate((el) => {
+      const s = getComputedStyle(el);
+      return { border: s.borderTopWidth, colour: s.borderTopColor, shadow: s.boxShadow };
     });
-    expect(fade).toMatchObject({ hidden: 'true', blur: 'blur(12px)', startsAtHeaderEnd: true, overConversation: true });
-    expect(fade.mask).toContain('linear-gradient');
+    expect(look.border).toBe('1px');
+    expect(look.colour).not.toMatch(/rgba\(0, 0, 0, 0\.0\d+\)/);
+    expect(look.shadow).not.toBe('none');
+
+    // No blur or fade laid over the messages under the header.
+    const faded = await page.evaluate(() => {
+      const top = document.querySelector('main')!.firstElementChild!;
+      return [...top.querySelectorAll('*')].some((el) => {
+        const style = getComputedStyle(el);
+        return style.backdropFilter.includes('blur') || (style.maskImage || style.webkitMaskImage || '').includes('gradient');
+      });
+    });
+    expect(faded).toBe(false);
   });
 
   test('the send button hugs the box\'s rounder bottom corner; the mic sits nearer its own', async ({ page }) => {
@@ -1121,6 +1158,8 @@ test.describe('the conversation, drawn closer (D-400, D-401)', () => {
     const dialog = page.locator('dialog.astryx-lightbox');
     await expect(dialog).toBeVisible();
     expect(await dialog.evaluate((el) => getComputedStyle(el).backgroundColor)).toBe('rgba(0, 0, 0, 0.9)');
+    // It opens on the photo, not on × (D-411): nothing looks chosen.
+    await expect.poll(() => dialog.evaluate((el) => document.activeElement === el)).toBe(true);
     const close = dialog.locator('.astryx-button').first();
     const look = await close.evaluate((el) => {
       const style = getComputedStyle(el);
@@ -1137,6 +1176,7 @@ test.describe('the conversation, drawn closer (D-400, D-401)', () => {
     expect(look).toMatchObject({ width: 48, radius: '50%', border: '1px', background: 'rgb(43, 43, 43)', icon: 24 });
     expect(look.iconColor).toBe('rgb(255, 255, 255)');
   });
+
 });
 
 test.describe('stuff shared, in one list (D-402, D-407)', () => {

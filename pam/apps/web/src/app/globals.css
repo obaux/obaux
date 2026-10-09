@@ -224,6 +224,11 @@
    * buttons with no prop to change, so this one rule reaches them
    * (`PhotoViewer`).
    */
+  /* The viewer itself takes focus when it opens (D-411); it is not a
+     control, so no ring around the whole screen. */
+  dialog.astryx-lightbox:focus {
+    outline: none;
+  }
   .astryx-lightbox .astryx-button {
     width: var(--pam-touch-target-min);
     height: var(--pam-touch-target-min);
