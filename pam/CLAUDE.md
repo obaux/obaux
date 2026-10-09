@@ -25,6 +25,16 @@ help?**
    over, including the ones that contradict it. Read this before trusting a rule
    you remember from the SOP itself.
 
+**Every session except "PAM Agent 1" reads the record before it claims a
+number or drafts a plan** (Will, 9 October 2026). That means `STATUS.md`, the
+newest session log, and the `DECISIONS.md` entries the task touches (for the
+assign-and-limit build: D-414, D-415, D-427). Only then claim numbers in
+`docs/allocations.md` and write the plan. "PAM Agent 1" is Will's long-running
+coordinating session (`session_018wn7LF7RMsHnXSAzvk6s1p`). It is exempt
+because it already holds the record. Any other session, whether started by
+Will or by another session, is not exempt. If you can't tell which session you
+are, assume you are not PAM Agent 1.
+
 Do not re-derive state by reading source files when `STATUS.md` already answers
 the question. Do not repeat a decision that `DECISIONS.md` already settled — if
 you disagree with one, say so and change it deliberately, in writing.
