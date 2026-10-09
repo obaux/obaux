@@ -75,7 +75,7 @@ export const AccountPaused: Story = { args: forKey('account_suspended') };
 export const SomeThingsTurnedOff: Story = { args: forKey('account_limited') };
 
 /**
- * The calm card (D-430): what a limited member meets on Messages and in a
+ * The calm card (D-432): what a limited member meets on Messages and in a
  * conversation. More room, the smallest body text (16px), and the call as a
  * link rather than a primary button.
  */

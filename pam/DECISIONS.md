@@ -11410,7 +11410,7 @@ D-427: "Moving forward, we'll send emails with privacy policy updates", "Delete"
   *Report a message* screen (which had a story only since D-427), with the edges
   that reach them; `UPDATED` is 9 October.
 
-### D-430 — The limited notice says what is off, why, then Pam — in a calm card
+### D-432 — The limited notice says what is off, why, then Pam — in a calm card
 
 **Date:** 2026-10-09. **Decided by:** Will, looking at the limited Messages screen:
 "This wording 'your plan' doesn't make sense. Just start with You cannot send
@@ -11445,4 +11445,8 @@ and make text the smallest. Call Pam for help should be a link, not a primary bu
 - **For the next session** (assign and limit): `admin_set_access_status`'s error
   still reads "That person is not on your caseload or in your region" (0008); since
   0082 there is no region, so the message should change when that screen is built.
+- **Numbering.** This entry first took D-430, then D-431 was free on the languages
+  branch's ledger; both were taken there by the time I read its message (it pushed
+  D-430 "The new languages are approved to learn from" and D-431 first), so this is
+  D-432 and every reference on this branch moved with it. Next free: D-433.
 

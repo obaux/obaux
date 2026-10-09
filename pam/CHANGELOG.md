@@ -72,7 +72,7 @@ limited while Messages was open, it says so instead of "Your connection dropped"
 cannot send messages right now. Your guide turned this off for your account. You can
 still read your messages. Call Pam and we will help you reach your guide." It sits in
 a calmer card — more room, smaller text — and "Call Pam for help" is a link rather
-than a big green button (D-430).
+than a big green button (D-432).
 
 ## [0.50.0] — 2026-10-09 · Buttons where you expect them
 

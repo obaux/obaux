@@ -62,7 +62,7 @@ export interface NoticeProps {
   retry?: { label: string; onPress: () => void };
   /**
    * A calm card for something that is on purpose and has a reason, rather than
-   * a fault (a limited account, D-430): more room round the words, the smallest
+   * a fault (a limited account, D-432): more room round the words, the smallest
    * body text Pam allows (16px, A23) for the title and the message alike, and
    * the call as a link, not a primary button. Everything else is the same: the
    * `tel:` anchor, the 48px target, the alert role.
@@ -79,7 +79,7 @@ const styles = stylex.create({
   body: { fontSize: '17px', lineHeight: 1.5 },
   // A coloured edge rather than a coloured fill: it survives a high-contrast
   // mode, and it never fights the text for contrast (§2.5 wants AAA body text).
-  // The quiet look (D-430): the body-text floor for everything on the card, and a
+  // The quiet look (D-432): the body-text floor for everything on the card, and a
   // call that reads as a link (accent, underlined) at the same size.
   quietTitle: { fontSize: pam['--pam-body-text-mobile'], lineHeight: 1.4 },
   quietBody: { fontSize: pam['--pam-body-text-mobile'], lineHeight: 1.5 },

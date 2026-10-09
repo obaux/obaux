@@ -94,7 +94,7 @@ decided.
   `claude-pam-storybook` Chromatic address in `STORYBOOK_URL`, which does not have
   these stories; change it when this branch's Storybook has an address.
 
-- **Will's note on the limited screen (D-430).** "Your plan" made no sense; the
+- **Will's note on the limited screen (D-432).** "Your plan" made no sense; the
   notice now starts "You cannot send messages right now", says why, then Pam, in a
   calm card (`Notice quiet`: more padding, 16px text, the call as a link). All seven
   languages reworded (five are Claude's drafts). Merged `main` (the languages branch,
