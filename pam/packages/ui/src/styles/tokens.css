@@ -303,4 +303,8 @@
   --pam-empty-icon: light-dark(#8FBFA6, #5F8F78);
   --pam-photo-icon: light-dark(#b4b4b4, #5c5c5c);
   --pam-rule-dashed: light-dark(rgba(0, 0, 0, 0.05), rgba(255, 255, 255, 0.08));
+  --pam-document-blue: light-dark(#1a73e8, #8ab4f8);
+  --pam-viewer-backdrop: rgba(0, 0, 0, 0.9);
+  --pam-viewer-control: #2b2b2b;
+  --pam-viewer-control-rim: #5c5c5c;
 }

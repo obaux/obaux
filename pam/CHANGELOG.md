@@ -1,5 +1,22 @@
 # Changelog
 
+## [0.48.0] — 2026-10-09 · Everything shared, in one place
+
+A conversation's ⋯ page has a new first row, Photos and documents: every
+photo, document and Google Doc sent in that conversation, newest first,
+with who sent it and when. Tap a photo to see it full size and swipe
+through the rest (D-402).
+
+## [0.47.1] — 2026-10-09 · A calmer conversation
+
+The visit card at the top of a conversation with a program is smaller, and
+messages now blur and fade as they scroll up under the header instead of
+being cut off. The line under the name stays on one line. The message box's
+buttons sit closer to its corners, photos sit in an even frame with a
+little more room before their words, document icons are a bright blue, and
+a photo opens on a near-black screen with a bigger, clearer close button
+(D-400, D-401).
+
 ## [0.47.0] — 2026-10-08 · Documents in messages
 
 You can send a PDF or a Word file in a conversation: tap the document

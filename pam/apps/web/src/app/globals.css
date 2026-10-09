@@ -216,6 +216,35 @@
     color: var(--color-icon-secondary);
   }
 
+  /*
+   * The photo viewer's buttons — close, and previous / next in a gallery —
+   * are Pam's circle buttons for a dark ground (Will, 9 October, D-401): 48px,
+   * dark grey with a lighter rim, and a larger, heavier white mark, so they
+   * read against a near-black screen. Astryx's Lightbox draws them as ghost
+   * buttons with no prop to change, so this one rule reaches them
+   * (`PhotoViewer`).
+   */
+  .astryx-lightbox .astryx-button {
+    width: var(--pam-touch-target-min);
+    height: var(--pam-touch-target-min);
+    min-width: var(--pam-touch-target-min);
+    border-radius: 50%;
+    border: 1px solid var(--pam-viewer-control-rim);
+    background-color: var(--pam-viewer-control);
+    color: var(--color-on-dark);
+  }
+  .astryx-lightbox .astryx-button:hover {
+    background-color: var(--pam-viewer-control-rim);
+  }
+  .astryx-lightbox .astryx-button .astryx-icon {
+    width: 24px;
+    height: 24px;
+    font-size: 24px;
+  }
+  .astryx-lightbox .astryx-button svg {
+    stroke-width: 2.5;
+  }
+
   :has(> input:focus-visible),
   :has(> textarea:focus-visible) {
     outline: 3px solid currentColor;

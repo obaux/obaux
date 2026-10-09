@@ -10,6 +10,7 @@ import { AppHeader, BigButton, Loading, Notice, Page, PageTitle } from '@pam/ui'
 import { NOTICES, type Role } from '@pam/config';
 import { USE_DUMMY_PEOPLE } from '@pam/config/dummy-flag';
 import { useI18n } from '@/lib/i18n';
+import { usePreloadThreadView } from './ThreadViewLazy';
 import { NotIn } from '../NotIn';
 import { HeaderBell } from '../HeaderBell';
 import { useSupportPhone } from '@/lib/useSupportPhone';
@@ -77,6 +78,8 @@ function contextFor(
 }
 
 function MessagesScreen() {
+  // A conversation opens ready, its composer and fades already loaded (D-400).
+  usePreloadThreadView();
   const { t, locale } = useI18n();
   const supportPhone = useSupportPhone();
   const { state: session } = useSession();

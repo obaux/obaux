@@ -34,6 +34,10 @@ export const Invite: Story = screen('case-manager', 'Invite someone', '/invite/'
 export const AllPrograms: Story = screen('case-manager', 'All programs', '/programs/');
 export const AddProgram: Story = screen('case-manager', 'Add a program', '/programs/new/');
 export const Conversation: Story = screen('case-manager', 'A conversation', '/messages/thread/', { id: CONVO_ID });
+/** Everything shared in a conversation, from its ⋯ (D-402). */
+export const ConversationFiles: Story = screen('case-manager', 'Photos and documents', '/messages/thread/files/', {
+  id: CONVO_ID,
+});
 export const Notifications: Story = screen('case-manager', 'Notifications', '/notifications/');
 export const Place: Story = screen('case-manager', 'A place', '/place/', { id: 'dummy-place-learning', from: 'explore' });
 export const TextAlerts: Story = screen('case-manager', 'Text alerts', '/alerts/');

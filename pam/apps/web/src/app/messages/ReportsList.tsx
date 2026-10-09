@@ -9,9 +9,9 @@ import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { Badge } from '@astryxdesign/core/Badge';
 import { Thumbnail } from '@astryxdesign/core/Thumbnail';
-import { Lightbox } from '@astryxdesign/core/Lightbox';
 import type { MessageFile } from '@/lib/messageFile';
 import { MessageFileCard } from './MessageFileCard';
+import { PhotoViewer } from './PhotoViewer';
 import { MESSAGE_REPORT_REASONS, type Role } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { whenHappened } from '@/lib/when';
@@ -56,13 +56,9 @@ export function ReportsList({ reports }: { readonly reports: readonly ReportList
 
   return (
     <VStack gap={3}>
-      <Lightbox
-        isOpen={viewing !== null}
-        onOpenChange={(open) => {
-          if (!open) setViewing(null);
-        }}
-        media={{ src: viewing ?? '', alt: t('reports.photo') }}
-        hasZoom
+      <PhotoViewer
+        media={viewing !== null ? { src: viewing, alt: t('reports.photo') } : null}
+        onClose={() => setViewing(null)}
       />
       {reports.map((report) => {
         const reason =

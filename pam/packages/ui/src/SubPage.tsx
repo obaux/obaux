@@ -49,8 +49,8 @@ export interface SubPageHeaderProps {
   readonly onBack?: () => void;
   /**
    * A line under the title. In the compact form it is who the person is to
-   * you — "Program lead at Example Food Pantry" — and may take two lines
-   * rather than be cut (D-395).
+   * you — "Program lead at Example Food Pantry" — on one line, cut with an
+   * ellipsis when it runs long (D-395, D-400).
    */
   readonly subtitle?: string;
   readonly actions?: ReactNode;
@@ -122,16 +122,16 @@ const styles = stylex.create({
   },
   middle: { flexGrow: 1, minWidth: 0 },
   // The compact form's line under the name (D-395): the whole width beside
-  // back, up to two lines, then cut — a program's full name fits where a
-  // chip beside the name had room for a word.
+  // back — a program's full name fits where a chip beside the name had room
+  // for a word.
   compactStack: { minWidth: 0, flexGrow: 1 },
+  // One line, cut with an ellipsis (Will, 9 October, D-400; two lines until then, D-395).
   compactSubtitle: {
     fontSize: '16px',
     lineHeight: 1.3,
-    display: '-webkit-box',
-    WebkitLineClamp: 2,
-    WebkitBoxOrient: 'vertical',
+    whiteSpace: 'nowrap',
     overflow: 'hidden',
+    textOverflow: 'ellipsis',
   },
   barTitle: {
     fontSize: '18px',

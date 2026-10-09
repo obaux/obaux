@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import * as stylex from '@stylexjs/stylex';
 import { RadioList, RadioListItem } from '@astryxdesign/core/RadioList';
 import { Text } from '@astryxdesign/core/Text';
-import { BigButton, FlagIcon, Notice, PlacesIcon } from '@pam/ui';
+import { BigButton, FlagIcon, Notice, PhotoIcon, PlacesIcon } from '@pam/ui';
 import { SubPage } from '@pam/ui/SubPage';
 import { MenuList } from '@pam/ui/MenuList';
 import { MESSAGE_REPORT_REASONS, type MessageReportReason } from '@pam/config';
@@ -66,6 +66,13 @@ function ThreadOptions() {
       <MenuList
         label={t('messages.options.title')}
         items={[
+          // Everything shared here, in one list (D-402).
+          {
+            id: 'files',
+            label: t('messages.options.files'),
+            href: `/messages/thread/files/?id=${encodeURIComponent(id)}`,
+            icon: <PhotoIcon {...ICON} />,
+          },
           {
             id: 'report',
             label: t('messages.options.report'),

@@ -735,6 +735,13 @@ test.describe('documents in a conversation (D-399)', () => {
     const link = page.getByRole('link', { name: 'Google Doc: opens in Google, in a new tab' });
     await expect(link).toHaveAttribute('href', 'https://docs.google.com/document/d/abc123/edit');
     await expect(link).toHaveAttribute('target', '_blank');
+    // Its page icon is Google-Doc blue (D-401): #1a73e8 light, #8ab4f8 dark.
+    const blue = await link
+      .locator('xpath=ancestor::*[contains(@class,"astryx-clickable-card")][1]')
+      .locator('svg')
+      .first()
+      .evaluate((svg) => getComputedStyle(svg).color);
+    expect(['rgb(26, 115, 232)', 'rgb(138, 180, 248)']).toContain(blue);
     // The words keep the link as it was sent.
     await expect(page.getByText('The schedule: https://docs.google.com/document/d/abc123/edit')).toBeVisible();
   });
@@ -785,6 +792,197 @@ test.describe('documents in a conversation (D-399)', () => {
     await page.goto('/messages/');
     await settled(page);
     await expect(page.getByText('Document', { exact: true })).toBeVisible();
+  });
+});
+
+test.describe('the conversation, drawn closer (D-400, D-401)', () => {
+  // A one-pixel PNG: what a stored photo downloads as here.
+  const PNG = Buffer.from(
+    'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+    'base64',
+  );
+  const withAPhoto = async (page: import('@playwright/test').Page) => {
+    await page.route('**/storage/v1/object/message-photos/**', (route) =>
+      route.fulfill({ status: 200, contentType: 'image/png', body: PNG }),
+    );
+    await page.route(MESSAGES, (route) =>
+      route.fulfill(
+        json([
+          {
+            id: 'their-photo',
+            conversation_id: CONVO,
+            sender_id: OTHER,
+            body: 'Is this the one?',
+            attachment_url: `${CONVO}/stop.jpg`,
+            attachment_kind: 'photo',
+            created_at: new Date().toISOString(),
+          },
+        ]),
+      ),
+    );
+  };
+
+  test('who they are stays on one line under the name, however long the program', async ({ page }) => {
+    await signedInAs(page, 'member');
+    await withOneConversation(page);
+    await page.route(PARTNERS, (route) =>
+      route.fulfill(
+        json([
+          {
+            conversation_id: CONVO,
+            profile_id: OTHER,
+            first_name: 'Renee',
+            role: 'provider',
+            program_name: 'Example Food Pantry of North Philadelphia and the Neighborhoods Around It',
+          },
+        ]),
+      ),
+    );
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+    const line = page.getByText(/^Program lead at Example Food Pantry/);
+    const box = await line.boundingBox();
+    expect(box!.height).toBeLessThan(24);
+    expect(await line.evaluate((el) => getComputedStyle(el).textOverflow)).toBe('ellipsis');
+  });
+
+  test('messages blur and fade under the header instead of meeting it at a line', async ({ page }) => {
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+    const fade = await page.evaluate(() => {
+      const heading = document.querySelector('main h1')!;
+      const top = heading.closest('main')!.firstElementChild as HTMLElement;
+      const layer = [...top.children].at(-1) as HTMLElement;
+      const style = getComputedStyle(layer);
+      return {
+        hidden: layer.getAttribute('aria-hidden'),
+        blur: style.backdropFilter,
+        mask: style.maskImage || style.webkitMaskImage,
+        startsAtHeaderEnd: Math.abs(layer.getBoundingClientRect().top - top.getBoundingClientRect().bottom) < 1,
+        overConversation:
+          layer.getBoundingClientRect().bottom > document.querySelector('.astryx-chat-layout')!.getBoundingClientRect().top,
+      };
+    });
+    expect(fade).toMatchObject({ hidden: 'true', blur: 'blur(12px)', startsAtHeaderEnd: true, overConversation: true });
+    expect(fade.mask).toContain('linear-gradient');
+  });
+
+  test('the send button hugs the box\'s rounder bottom corner; the mic sits nearer its own', async ({ page }) => {
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+    const box = page.locator('.astryx-chat-composer > div').first();
+    const shell = (await box.boundingBox())!;
+    const send = (await page.getByRole('button', { name: /send/i }).boundingBox())!;
+    const mic = (await page.getByRole('button', { name: 'Speak your message' }).boundingBox())!;
+    // 8px in from the box's outer edge, border included, on both sides.
+    expect(Math.round(shell.x + shell.width - (send.x + send.width))).toBe(8);
+    expect(Math.round(shell.y + shell.height - (send.y + send.height))).toBe(8);
+    expect(Math.round(mic.x - shell.x)).toBe(8);
+    expect(Math.round(shell.y + shell.height - (mic.y + mic.height))).toBe(8);
+    expect(await box.evaluate((el) => getComputedStyle(el).borderBottomRightRadius)).toBe('32px');
+    expect(await box.evaluate((el) => getComputedStyle(el).borderTopRightRadius)).not.toBe('32px');
+  });
+
+  test('a photo sits in an even rim, with room before the words under it', async ({ page }) => {
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    await withAPhoto(page);
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+    const photo = page.getByRole('button', { name: 'A photo from Marcus' });
+    await expect(photo).toBeVisible();
+    const p = (await photo.boundingBox())!;
+    const bubble = (await photo.locator('xpath=ancestor::*[contains(@class,"astryx-chat-message-bubble")][1]').boundingBox())!;
+    const words = (await page.getByText('Is this the one?').boundingBox())!;
+    expect(Math.round(p.y - bubble.y)).toBe(Math.round(p.x - bubble.x));
+    expect(Math.round(p.x - bubble.x)).toBe(8);
+    expect(Math.round(words.y - (p.y + p.height))).toBeGreaterThanOrEqual(12);
+  });
+
+  test('a photo opens on near-black, with a round close button you can see', async ({ page }) => {
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    await withAPhoto(page);
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+    await page.getByRole('button', { name: 'A photo from Marcus' }).click();
+    const dialog = page.locator('dialog.astryx-lightbox');
+    await expect(dialog).toBeVisible();
+    expect(await dialog.evaluate((el) => getComputedStyle(el).backgroundColor)).toBe('rgba(0, 0, 0, 0.9)');
+    const close = dialog.locator('.astryx-button').first();
+    const look = await close.evaluate((el) => {
+      const style = getComputedStyle(el);
+      const svg = el.querySelector('svg')!;
+      return {
+        width: el.getBoundingClientRect().width,
+        radius: style.borderRadius,
+        border: style.borderTopWidth,
+        background: style.backgroundColor,
+        icon: svg.getBoundingClientRect().width,
+        iconColor: getComputedStyle(svg).color,
+      };
+    });
+    expect(look).toMatchObject({ width: 48, radius: '50%', border: '1px', background: 'rgb(43, 43, 43)', icon: 24 });
+    expect(look.iconColor).toBe('rgb(255, 255, 255)');
+  });
+});
+
+test.describe('photos and documents in one place (D-402)', () => {
+  test('the ⋯ page leads to everything shared, newest first, and a photo opens there', async ({ page }) => {
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    await page.route('**/storage/v1/object/message-photos/**', (route) =>
+      route.fulfill({
+        status: 200,
+        contentType: 'image/png',
+        body: Buffer.from(
+          'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+          'base64',
+        ),
+      }),
+    );
+    const at = (minutesAgo: number) => new Date(Date.now() - minutesAgo * 60_000).toISOString();
+    await page.route(MESSAGES, (route) =>
+      route.fulfill(
+        json([
+          { id: 'p1', conversation_id: CONVO, sender_id: OTHER, body: null, attachment_url: `${CONVO}/a.jpg`, attachment_kind: 'photo', created_at: at(50) },
+          { id: 't1', conversation_id: CONVO, sender_id: ME, body: 'Thanks', created_at: at(40) },
+          { id: 'f1', conversation_id: CONVO, sender_id: ME, body: null, attachment_url: `${CONVO}/b.pdf`, attachment_kind: 'file', attachment_name: 'Lease.pdf', attachment_bytes: 245_760, created_at: at(30) },
+          { id: 'g1', conversation_id: CONVO, sender_id: OTHER, body: 'https://docs.google.com/document/d/x/edit', created_at: at(20) },
+          { id: 'p2', conversation_id: CONVO, sender_id: ME, body: 'Mine', attachment_url: `${CONVO}/c.jpg`, attachment_kind: 'photo', created_at: at(10) },
+        ]),
+      ),
+    );
+    await page.goto(`/messages/thread/options/?id=${CONVO}`);
+    await settled(page);
+    await page.getByRole('link', { name: 'Photos and documents' }).click();
+    await expect(page).toHaveURL(new RegExp(`/messages/thread/files/\\?id=${CONVO}`));
+    await expect(page.getByRole('heading', { name: 'Photos and documents', level: 1 })).toBeVisible();
+
+    await expect(page.getByRole('heading', { name: 'Photos', level: 2 })).toBeVisible();
+    const photos = page.getByRole('button', { name: /^Open A photo (you sent|from Marcus)/ });
+    await expect(photos).toHaveCount(2);
+    // Newest first: mine (10 minutes ago) before theirs (50).
+    await expect(photos.first()).toHaveAccessibleName(/^Open A photo you sent/);
+    await expect(page.getByRole('button', { name: /^Open Lease\.pdf, PDF, / })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Google Doc: opens in Google, in a new tab' })).toBeVisible();
+    await expect(page.getByText(/^You · /)).toBeVisible();
+    await expect(page.getByText(/^Marcus · /)).toBeVisible();
+
+    await photos.first().click();
+    await expect(page.locator('dialog.astryx-lightbox')).toBeVisible();
+  });
+
+  test('a conversation with nothing shared says so', async ({ page }) => {
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    await page.goto(`/messages/thread/files/?id=${CONVO}`);
+    await settled(page);
+    await expect(page.getByText(/^Nothing yet\. Photos and documents sent in this conversation will be here/)).toBeVisible();
   });
 });
 

@@ -7,7 +7,7 @@ import { Icon } from '@astryxdesign/core/Icon';
 import { IconButton } from '@astryxdesign/core/IconButton';
 import { SubPageHeader } from '@pam/ui/SubPage';
 import { useI18n } from '@/lib/i18n';
-import { spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
+import { colorVars, spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
 
 /**
  * The thread screen's frame (D-192): the app header and the thread header
@@ -80,7 +80,31 @@ const styles = stylex.create({
   // The side gutter is the header's alone (D-390): the conversation under it
   // runs closer to the screen's edges, on Astryx's own 12px list padding and
   // 8px composer dock.
-  top: { flexShrink: 0, paddingBlockEnd: '8px', paddingInline: spacingVars['--spacing-3'] },
+  top: {
+    flexShrink: 0,
+    paddingBlockEnd: '8px',
+    paddingInline: spacingVars['--spacing-3'],
+    // Above the conversation, so its fade lies over the messages (D-400).
+    position: 'relative',
+    zIndex: 1,
+  },
+  // Under the header — and the visit card, when there is one — the messages
+  // blur and fade into the page as they scroll up (Will, 9 October, D-400:
+  // "the header should have the blur and white fade"), instead of being cut
+  // at a line. The composer's dock does the same at the bottom (Astryx's
+  // frosted layer). Decoration: no taps, nothing for a screen reader.
+  fade: {
+    position: 'absolute',
+    insetInline: 0,
+    top: '100%',
+    height: '32px',
+    pointerEvents: 'none',
+    backgroundColor: colorVars['--color-background-body'],
+    backdropFilter: 'blur(12px)',
+    WebkitBackdropFilter: 'blur(12px)',
+    maskImage: 'linear-gradient(to bottom, black, transparent)',
+    WebkitMaskImage: 'linear-gradient(to bottom, black, transparent)',
+  },
   row: { width: '100%', minHeight: '48px' },
   back: {
     minHeight: '48px',
@@ -109,6 +133,7 @@ export function ThreadTop({ children }: { readonly children: ReactNode }) {
   return (
     <VStack gap={2} xstyle={styles.top}>
       {children}
+      <VStack aria-hidden xstyle={styles.fade} />
     </VStack>
   );
 }

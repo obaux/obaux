@@ -26,7 +26,6 @@ import { VStack } from '@astryxdesign/core/VStack';
 import { HStack } from '@astryxdesign/core/HStack';
 import { VisuallyHidden } from '@astryxdesign/core/VisuallyHidden';
 import { Thumbnail } from '@astryxdesign/core/Thumbnail';
-import { Lightbox } from '@astryxdesign/core/Lightbox';
 import { DocumentIcon, Notice, PhotoIcon } from '@pam/ui';
 import { useI18n } from '@/lib/i18n';
 import { colorVars, spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
@@ -41,6 +40,7 @@ import {
   type OutgoingAttachment,
 } from '@/lib/messageFile';
 import { FileSummary, GoogleLinkCard, MessageFileCard } from './MessageFileCard';
+import { PhotoViewer } from './PhotoViewer';
 
 /**
  * One conversation, drawn with Astryx's Chat family (D-181): `ChatMessageList`
@@ -174,6 +174,9 @@ const slideMotion = {
 // if you scroll back down by hand it leaves the way it came. Pam's tempo
 // (`PAM_MOTION`, under a quarter second, opacity and transform only), CSS
 // so it costs no download, and none of it with reduced motion.
+// How tall the header's fade is over the top of the conversation (ThreadFrame, D-400).
+const FADE = '32px';
+
 const ARRIVE_MS = 240;
 const SENT_MS = 260;
 const LEAVE_MS = 180;
@@ -234,10 +237,12 @@ const styles = stylex.create({
   reveal: { width: '100%', overflowX: 'clip', touchAction: 'pan-y' },
   notice: { paddingInline: spacingVars['--spacing-3'] },
   // A photo in a bubble (D-394): a 240px square, cropped to fill, that opens
-  // full size when tapped. A photo on its own sits in a thin rim of the
-  // bubble's colour; with words, the words follow it.
+  // full size when tapped. A photo or a document sits in an even 8px rim of
+  // the bubble's colour — the same above it as beside it (Will, 9 October,
+  // D-401; it was Astryx's 12px above and 16px beside) — and any words under
+  // it keep a text bubble's own 16px from the edge, 12px below the photo.
   photo: { width: '240px', height: '240px', maxWidth: '100%', borderRadius: '14px' },
-  photoOnly: { paddingBlock: spacingVars['--spacing-1'], paddingInline: spacingVars['--spacing-1'] },
+  rim: { paddingBlock: spacingVars['--spacing-2'], paddingInline: spacingVars['--spacing-2'] },
   caption: { paddingInline: spacingVars['--spacing-2'], paddingBlockEnd: spacingVars['--spacing-1'] },
   // The photo picked and not sent yet, above where you type.
   pending: { width: '72px', height: '72px', borderRadius: '12px' },
@@ -260,7 +265,21 @@ const styles = stylex.create({
   // padding (D-391, D-393), which put a strip of bare page under the fade.
   // 32px here and the dock's own 8px: still 40px off the bottom edge, or the
   // phone's home-indicator inset where that is larger.
-  composer: { marginBlockEnd: `max(env(safe-area-inset-bottom, 0px), ${spacingVars['--spacing-8']})` },
+  composer: {
+    marginBlockEnd: `max(env(safe-area-inset-bottom, 0px), ${spacingVars['--spacing-8']})`,
+    // The buttons sit closer to the box's bottom corners, and the bottom
+    // corners round to the send button's own curve, 8px out from it — the
+    // circle hugs the corner (Will, 9 October, D-401). Astryx's is 12px of
+    // padding all round and its 28px chat radius; the top keeps both. Less
+    // the box's 1px border, as Astryx's own padding is, so the send button
+    // and the mic both sit 8px in from the outer edge.
+    paddingBlockEnd: `calc(${spacingVars['--spacing-2']} - 1px)`,
+    paddingInlineEnd: `calc(${spacingVars['--spacing-2']} - 1px)`,
+    borderEndStartRadius: `calc(${spacingVars['--spacing-2']} + 24px)`,
+    borderEndEndRadius: `calc(${spacingVars['--spacing-2']} + 24px)`,
+  },
+  // The mic, first in the row, 4px nearer the left edge to match.
+  tuck: { marginInlineStart: `calc(-1 * ${spacingVars['--spacing-1']})` },
   // §2.5's floor, as a square: send and mic alike (A13, D-192).
   square: { width: '48px', height: '48px', minWidth: '48px', minHeight: '48px', flexShrink: 0 },
   // The send button is a circle (D-389): grey until there is something to
@@ -280,8 +299,10 @@ const styles = stylex.create({
   // day's divider needs none above it.
   dayGap: { marginBlockStart: spacingVars['--spacing-6'], marginBlockEnd: spacingVars['--spacing-2'] },
   dayFirst: { marginBlockEnd: spacingVars['--spacing-2'] },
-  // The scroll region's inner column keeps the page's reading width.
-  messages: { width: '100%' },
+  // The scroll region's inner column keeps the page's reading width. Its top
+  // padding is the height of the header's fade (ThreadFrame, D-400), so at
+  // the top of the conversation nothing sits under the fade.
+  messages: { width: '100%', paddingBlockStart: FADE },
   // Reaching the end of the messages must not scroll the page under them.
   layout: { overscrollBehavior: 'contain' },
   scrollWrap: { width: '100%', paddingBlockEnd: '12px', pointerEvents: 'auto' },
@@ -690,7 +711,7 @@ export function ThreadView({
             dictation={dictation}
             size="md"
             label={dictation.isListening ? t('messages.thread.dictateStop') : t('messages.thread.dictate')}
-            xstyle={styles.square}
+            xstyle={[styles.square, styles.tuck]}
           />
           <IconButton
             label={t('messages.thread.photo.add')}
@@ -809,11 +830,11 @@ export function ThreadView({
                     xstyle={[
                       styles.bubble,
                       message.mine && styles.mine,
-                      (message.photoUrl != null || message.file != null) && !message.body && styles.photoOnly,
+                      (message.photoUrl != null || message.file != null) && styles.rim,
                     ]}
                   >
                     {message.photoUrl ? (
-                      <VStack gap={2}>
+                      <VStack gap={3}>
                         <Thumbnail
                           src={message.photoUrl}
                           alt={message.mine ? t('messages.thread.photo.yours') : t('messages.thread.photo.theirs', { name })}
@@ -832,9 +853,11 @@ export function ThreadView({
                         ) : null}
                       </VStack>
                     ) : message.file ? (
-                      <VStack gap={2}>
+                      <VStack gap={3}>
                         <MessageFileCard file={message.file} localUrl={message.fileUrl ?? null} />
-                        {message.body ? <Text xstyle={styles.body}>{message.body}</Text> : null}
+                        {message.body ? (
+                          <Text xstyle={[styles.body, styles.caption]}>{message.body}</Text>
+                        ) : null}
                       </VStack>
                     ) : google ? (
                       <VStack gap={2}>
@@ -868,14 +891,7 @@ export function ThreadView({
       ) : null}
     </VStack>
     </ChatLayout>
-    <Lightbox
-      isOpen={viewing !== null}
-      onOpenChange={(open) => {
-        if (!open) setViewing(null);
-      }}
-      media={{ src: viewing?.src ?? '', alt: viewing?.alt ?? '' }}
-      hasZoom
-    />
+    <PhotoViewer media={viewing} onClose={() => setViewing(null)} />
     </>
   );
 }

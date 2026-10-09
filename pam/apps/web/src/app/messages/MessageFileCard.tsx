@@ -6,8 +6,7 @@ import { ClickableCard } from '@astryxdesign/core/ClickableCard';
 import { HStack } from '@astryxdesign/core/HStack';
 import { VStack } from '@astryxdesign/core/VStack';
 import { Text } from '@astryxdesign/core/Text';
-import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
-import { DocumentIcon, PdfIcon } from '@pam/ui';
+import { FileTypeIcon } from '@pam/ui';
 import { useI18n } from '@/lib/i18n';
 import {
   formatFileSize,
@@ -22,7 +21,8 @@ import {
  * Documents and Google links in a conversation (D-399).
  *
  * A document shows what it is before anybody spends data on it: its icon
- * (a PDF, or a page for Word), its name in full (two lines before it is
+ * (`FileTypeIcon`: a red PDF, or a page in Google-Doc blue for Word and for
+ * a Google link — D-401), its name in full (two lines before it is
  * cut), and "PDF · 240 kB". Tapping it downloads it with the person's own
  * sign-in and hands it to the phone under its own name — opened in the
  * phone's viewer, or saved for the app that opens Word files. Once fetched
@@ -36,8 +36,8 @@ import {
  */
 const styles = stylex.create({
   card: { width: '100%', maxWidth: '300px', borderRadius: '14px' },
-  icon: { fontSize: '32px', lineHeight: 1, flexShrink: 0, color: colorVars['--color-icon-secondary'] },
-  pdf: { color: colorVars['--color-icon-red'] },
+  // On a page of its own (Photos and documents, D-402) a card spans the column.
+  wide: { maxWidth: 'none' },
   text: { minWidth: 0 },
   name: {
     fontSize: '16px',
@@ -56,12 +56,9 @@ const styles = stylex.create({
 export function FileSummary({ name, bytes, note }: { readonly name: string; readonly bytes: number; readonly note?: string }) {
   const { t, locale } = useI18n();
   const kind = messageFileKind(name);
-  const Glyph = kind === 'pdf' ? PdfIcon : DocumentIcon;
   return (
     <HStack gap={3} align="center">
-      <Text aria-hidden xstyle={[styles.icon, kind === 'pdf' && styles.pdf]}>
-        <Glyph />
-      </Text>
+      <FileTypeIcon kind={kind} />
       <VStack gap={0.5} xstyle={styles.text}>
         <Text xstyle={styles.name}>{name}</Text>
         <Text type="supporting" xstyle={styles.meta}>
@@ -81,7 +78,15 @@ export function FileSummary({ name, bytes, note }: { readonly name: string; read
  * already on this phone (just sent, or the example conversation's), which
  * needs no download.
  */
-export function MessageFileCard({ file, localUrl = null }: { readonly file: MessageFile; readonly localUrl?: string | null }) {
+export function MessageFileCard({
+  file,
+  localUrl = null,
+  isWide = false,
+}: {
+  readonly file: MessageFile;
+  readonly localUrl?: string | null;
+  readonly isWide?: boolean;
+}) {
   const { t, locale } = useI18n();
   const [fetched, setFetched] = useState<string | null>(localUrl);
   const [state, setState] = useState<'idle' | 'opening' | 'failed'>('idle');
@@ -112,7 +117,7 @@ export function MessageFileCard({ file, localUrl = null }: { readonly file: Mess
       })}
       onClick={() => void open()}
       padding={3}
-      xstyle={styles.card}
+      xstyle={[styles.card, isWide && styles.wide]}
     >
       <FileSummary
         name={file.name}
@@ -136,7 +141,15 @@ const GOOGLE_TITLE: Record<GoogleLinkKind, string> = {
 };
 
 /** A Google Docs, Sheets, Slides, Forms or Drive link, as a card that opens it in Google. */
-export function GoogleLinkCard({ url, kind }: { readonly url: string; readonly kind: GoogleLinkKind }) {
+export function GoogleLinkCard({
+  url,
+  kind,
+  isWide = false,
+}: {
+  readonly url: string;
+  readonly kind: GoogleLinkKind;
+  readonly isWide?: boolean;
+}) {
   const { t } = useI18n();
   const title = t(GOOGLE_TITLE[kind]);
   return (
@@ -145,12 +158,10 @@ export function GoogleLinkCard({ url, kind }: { readonly url: string; readonly k
       href={url}
       target="_blank"
       padding={3}
-      xstyle={styles.card}
+      xstyle={[styles.card, isWide && styles.wide]}
     >
       <HStack gap={3} align="center">
-        <Text aria-hidden xstyle={styles.icon}>
-          <DocumentIcon />
-        </Text>
+        <FileTypeIcon kind="google" />
         <VStack gap={0.5} xstyle={styles.text}>
           <Text xstyle={styles.name}>{title}</Text>
           <Text type="supporting" xstyle={styles.meta}>

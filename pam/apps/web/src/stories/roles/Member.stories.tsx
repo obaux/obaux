@@ -83,6 +83,12 @@ export const PlacePolicy: Story = screen('member', 'A policy to sign', '/place/p
 });
 export const ReportPlace: Story = screen('member', 'Report a place', '/flag/', { place: 'dummy-place-learning' });
 export const Conversation: Story = screen('member', 'A conversation', '/messages/thread/', { id: CONVO_ID });
+/** With a program (D-276, D-400): the booked visit pinned under the name, compact, and the messages fading under it. */
+export const ConversationWithAProgram: Story = screen('member', 'A conversation with a program', '/messages/thread/', {
+  id: 'dummy-conv-dummy-m1-dummy-p1',
+});
+/** Everything shared in a conversation, from its ⋯ (D-402). */
+export const ConversationFiles: Story = screen('member', 'Photos and documents', '/messages/thread/files/', { id: CONVO_ID });
 export const ConversationOptions: Story = screen('member', 'Conversation options', '/messages/thread/options/', {
   id: CONVO_ID,
 });

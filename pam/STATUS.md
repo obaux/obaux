@@ -855,9 +855,9 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
-## Conversations, redrawn (8 October) — 0.45.5 to 0.47.0, on the branch
+## Conversations, redrawn (8–9 October) — 0.45.5 to 0.48.0, on the branch
 
-D-389 to D-399, **on `claude/pam-storybook`, not merged to `main`.** A
+D-389 to D-402, **on `claude/pam-storybook`, not merged to `main`.** A
 conversation's header says who the person is on a line under the name —
 "Program lead at Example Food Pantry", "Case manager" (D-395). Each day opens
 with one divider ("Today", "Yesterday", a weekday, a date). Bubbles carry no name or time: mine are light green on the
@@ -894,6 +894,19 @@ gets a card that opens it in Google. Copy everywhere that named photos names
 documents (`test/16_message_files_test.sql`, 23 checks; legal test).
 **0079 and 0080 go to live together** in one tested SQL-editor file for Will
 (before-launch).
+
+**Header, composer and viewer (D-400, D-401, 0.47.1).** The visit card is
+the compact `StatusCard`; a 32px blurred fade hangs under the header so
+messages thin out instead of being cut; the subtitle is one line; the
+Messages list preloads the conversation's code. The composer's bottom
+corners round to 32px around the send button; photos and documents sit in
+an even 8px rim; document icons are `FileTypeIcon` in Google-Doc blue
+(`--pam-document-blue`); photos open in `PhotoViewer` on near-black with
+48px dark circle buttons.
+
+**Photos and documents page (D-402, 0.48.0).** From a conversation's ⋯:
+its photos (grid → viewer, paging), documents and Google Docs, newest first,
+with who and when — read through `useThread`, so nothing new to query.
 
 ## Release 0.45.0-two-roles (7 October) — one account, member and program
 

@@ -21,6 +21,10 @@ import { readAddedTrips, withMoves } from '@/lib/addedTrips';
  * time — with a chevron here, because here it goes somewhere: the place,
  * which shows the visit too, and whose Back returns to this conversation.
  *
+ * Pinned above every message, it is the compact card (D-400, Will, 9
+ * October: "should be smaller"), and the conversation fades out as it
+ * scrolls up under it rather than stopping at a line (ThreadView).
+ *
  * Example trips only, as Trips itself is (D-213): the program is matched to
  * an example place by name, and the soonest visit there is shown. Nothing
  * when there is no visit, or no program.
@@ -69,11 +73,12 @@ export function ThreadVisit({
     <VStack xstyle={styles.wrap}>
       <StatusCard
         tone="green"
-        icon={<Icon icon="calendar" size="md" />}
+        icon={<Icon icon="calendar" size="sm" />}
         title={day}
         body={t('place.visit.body', { time })}
         href={href}
         label={t('messages.visit.label', { day, time })}
+        isCompact
       />
     </VStack>
   );

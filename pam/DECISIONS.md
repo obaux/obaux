@@ -9951,3 +9951,97 @@ And Google Docs. To be dropped in."
   before the live database has the document columns"). Sending a document
   before 0080 fails like any failed send, with the message saying so.
 
+### D-400 — A conversation's header: a smaller visit card, a blurred fade under it, one line under the name
+
+**Date:** 2026-10-09. Will, on two phone screenshots: "This pinned event
+banner should be smaller, and there should be a fade behind it not a harsh
+cut otherwise text gets cropped behind it", then "The header should have the
+blur and white fade (white fades and blurs should not load when page opens.
+Preload these when user goes to messages so they're ready by the time the
+thread opens to avoid any glitching. Also on header subtitle, please
+truncate at 1 line max."
+
+- **The visit card** (D-276) is `StatusCard`'s new compact size in a
+  conversation: a 32px circle, 16px and 14px lines, 8px above and below —
+  56px tall instead of 78, still one whole-card target over the 48px floor.
+  The place page keeps the full size. Story: *PolicyStatusCard › Visit
+  compact*; a member's conversation with a program is now a story of its
+  own (*Member › A conversation with a program*).
+- **The fade.** Messages used to stop at a hard line under the header, with
+  words sliced mid-line. Under the header — and the visit card when there is
+  one — a 32px layer now hangs over the top of the conversation: the page's
+  own colour fading out, with a 12px backdrop blur, the same treatment the
+  composer's dock has at the bottom. The conversation gets 32px at its top so
+  nothing sits under the fade when you are at the start. (A mask on the
+  scroll region's top edge was the first try; it faded the words but had no
+  blur, so the header's fade replaced it.)
+- **Ready before it opens.** The header is in the route; `ThreadView` — the
+  composer, its dock and blur — is a separate chunk, so a cold open drew the
+  header first and the rest a beat later. The Messages list now fetches that
+  chunk (and the example conversation's) once it is idle
+  (`usePreloadThreadView`); not with Data Saver on, where the code is paid
+  for only when a conversation is opened. The fades are StyleX in the global
+  sheet, so they never arrive late themselves.
+- **One line under the name**, cut with an ellipsis (it took two since
+  D-395). e2e: a very long program name stays one line.
+
+### D-401 — The composer's corner, an even rim around a photo, Google-Doc blue, a darker photo viewer
+
+**Date:** 2026-10-09. Will, on screenshots: "Mic and photo/attachment button
+should be tucked a bit closer to bottom and left edge. The bottom corner
+radius of text box could be larger so the send button hugs it nicely";
+"Padding around image inside text bubble (top padding) should match the left
+and right padding. Also the text is too close to image, any way to add 4px
+extra gap there"; "Document Icon should be bright blue like a google doc
+color"; and of the full-size photo: "Make background extra dark overlay so
+photo stands out. The X button on top should use our circle button
+convention. But a dark grey outline and white X icon (make X a bit larger
+and thicker for visibility)."
+
+- **Composer.** The bottom and right padding go from Astryx's 12px to 8px
+  (less the box's 1px border, as Astryx's own padding is), the mic shifts
+  4px left, and the bottom corners round to 32px — 8px out from the 48px
+  send circle, so the circle sits concentric in the corner. The top keeps
+  Astryx's 28px. Measured: send and mic 8px from the outer edge.
+- **Photos and documents in a bubble** sit in an even 8px rim — top the same
+  as the sides (it was Astryx's 12px above and 16px beside). Words under one
+  keep a text bubble's 16px from the edge, and 12px below the photo (was 8).
+  A photo on its own had a 4px rim (D-394); it is 8px now too, so a photo
+  looks the same with or without words.
+- **Document icons** are `FileTypeIcon` (@pam/ui): a red PDF, or a page in
+  the bright blue of a Google Doc for Word files and Google links. The
+  theme's blue (`--color-icon-blue`) is a navy, so the colour is a Pam token,
+  `--pam-document-blue` (#1a73e8 / #8ab4f8 dark; 4.6:1 and 7:1 on their
+  card). The composer's document button stays the quiet grey of D-396.
+- **The photo viewer** is `PhotoViewer`, one wrapper for the conversation,
+  the report screen and the new photos page: Astryx's `Lightbox` with the
+  dialog painted near-black (`--pam-viewer-backdrop`, 90% black over
+  Astryx's own 50%), and its round buttons — close, previous, next — as
+  Pam's circle buttons for a dark ground: 48px, `--pam-viewer-control`
+  (#2b2b2b) with a #5c5c5c rim, a 24px white mark at stroke 2.5 (was a 16px
+  ghost icon). Lightbox has no prop for its buttons, so that is one
+  `globals.css` rule scoped to `.astryx-lightbox`, beside the chat rules
+  that already reach inside Astryx.
+
+### D-402 — Photos and documents: everything shared in a conversation, in one place
+
+**Date:** 2026-10-09. Will: "Secondary buttons, add a nested page to view a
+list of images and documents in the chat, a summary. Almost like a file
+list. This will help users access files / photos shared easily."
+
+- A new first row on the conversation's ⋯ page, **Photos and documents**,
+  opens `/messages/thread/files/?id=…` on the nested-page template: the
+  photos as a three-across grid (newest first) that opens the viewer and
+  pages through all of them; the documents as the same cards the
+  conversation shows, full width; the Google Docs links as their cards —
+  each with who sent it and when ("You · Oct 9", "Teresa · Oct 8").
+  Nothing shared: "Nothing yet. Photos and documents sent in this
+  conversation will be here, so they are easy to find."
+- It reads exactly what the conversation reads (`useThread`: the same 200
+  messages, photos downloaded with the person's sign-in, documents fetched
+  only when tapped), so it shows nothing the conversation would not, and
+  needs no new query or policy. An example conversation has nothing shared,
+  and says so.
+- Stories: Member and Case manager › *Photos and documents*; the prototype
+  route; the flow map's options node gains the page.
+

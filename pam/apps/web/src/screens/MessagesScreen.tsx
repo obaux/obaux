@@ -6,6 +6,7 @@ import { isFreshAccount } from '@/lib/programSetup';
 import { dummyConversationsFor } from '@pam/config/dummy-conversations';
 import { DUMMY_ANYONE } from '@pam/config/dummy-people';
 import { useI18n } from '@/lib/i18n';
+import { usePreloadThreadView } from '@/app/messages/ThreadViewLazy';
 import { useSession } from '@/lib/useSession';
 import { useRoleView } from '@/lib/useViewedRole';
 import { useConversations } from '@/lib/useConversations';
@@ -28,6 +29,8 @@ import { MessagesView, type MessageRow } from './MessagesView';
  * kept for demos.
  */
 export function MessagesScreen() {
+  // A conversation opens ready, its composer and fades already loaded (D-400).
+  usePreloadThreadView();
   const { t, locale } = useI18n();
   const { state: session } = useSession();
   const trueRole = session.status === 'signed-in' ? session.session.role : null;

@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/nextjs';
-import { PolicyStatusCard } from '@pam/ui/PolicyStatusCard';
+import { Icon } from '@astryxdesign/core/Icon';
+import { PolicyStatusCard, StatusCard } from '@pam/ui/PolicyStatusCard';
 
 /** Near the top of a place a member has a visit at: policies to sign, or all signed (D-271). */
 const meta = {
@@ -26,4 +27,19 @@ export const Signed: Story = {
     body: 'All signatures complete',
     label: 'Policies signed. All signatures complete',
   },
+};
+
+/** The compact card pinned above a conversation with a program: the booked visit (D-276, D-400). */
+export const VisitCompact: Story = {
+  render: () => (
+    <StatusCard
+      tone="green"
+      icon={<Icon icon="calendar" size="sm" />}
+      title="Saturday, October 10"
+      body="10:00 AM · Visit booked"
+      href="/place/?id=dummy-place-learning"
+      label="Your visit, Saturday, October 10 at 10:00 AM"
+      isCompact
+    />
+  ),
 };
