@@ -11185,7 +11185,9 @@ it."
   Migration first, app second: the old app's calls still resolve through the
   default. Held with the rest.
 - **Not done.** No email is sent (there is no provider yet, before-launch). No
-  language is signed. The carrier registration (docs/sms-campaign-samples.md)
+  language is signed *(superseded the same day: Will approved all of them to learn
+  from, D-429; an unsigned language is still English, and so is a signed text that
+  fails a check at send time)*. The carrier registration (docs/sms-campaign-samples.md)
   names English and Spanish; it must be re-filed before the first text in
   another language goes out. Phone-only invitations (`invite_member`) are sent
   by the inviter and carry no language of the invitee; they follow the
@@ -11365,3 +11367,48 @@ reported if flagged."
 - **Nothing waits on 0085.** The app asks with `p_language` and, if the database
   has no such parameter (PGRST202, raised before anything runs), asks again
   without it (`rpcLanguage.ts`). Remove that helper once 0085 has been live a while.
+
+### D-429 — The new languages are approved to learn from: fail first, then fix on feedback
+
+**Date:** 2026-10-09. Will: "Let's approve new languages for now. We'll take a fail
+first then fix it approach. We'll adjust languages based on feedback." And, when I
+described how a sign-off works: "signing off shouldn't have anything to do with
+preventing them from receiving texts, right?"
+
+- **What was signed.** `reviewedBy` on the 53 text drafts and the five invite-email
+  languages now reads `APPROVED_TO_LEARN_FROM`: "Will (Oba), 9 October 2026 —
+  approved to learn from; no native reader yet". It says what it is. It is Will's,
+  given in so many words, which is the only authority that field accepts (D-424
+  said an agent never writes it on its own). The screens in the five languages
+  (privacy, terms, transparency and notices included) went live with the merge on
+  the same footing: machine-drafted, no native reader yet.
+- **Signing decides the language, never whether a person is texted.** That was
+  already how an unsigned language worked (English instead, never nothing). Reading
+  the dispatcher with Will's question in mind found one place it was not true: a
+  *signed* text that failed a check at the moment of sending — a link a few
+  characters longer than the wording was written for, a word list that caught
+  something — was refused and the person got nothing. It now falls back to the
+  English text, says why in the log (never quoting the words), and throws only when
+  English cannot be sent either (a missing variable, an unknown template). Tests:
+  signed → their language; approval emptied → English; signed but failing → English;
+  English failing too → throws. The same rule covers Spanish.
+- **How feedback is handled.** Somebody who reads a language says what is wrong → the
+  string is fixed in that language only (screens: edit the string, `copy:ack`; texts
+  and email: edit the draft). A fix that brings a draft closer to the English
+  meaning keeps the approval; anything that says more, or says something new, goes
+  back to Will. **Pulling a language** from texts and email is emptying its
+  `reviewedBy` (English from the next deploy). There is no equivalent switch for the
+  screens: a bad translation is fixed, not hidden. (A reader's report has nowhere to
+  go in the app yet: it reaches Will, who tells Claude.)
+- **Not deployed, and why.** The live `dispatch-sms` (v15, 17 September) is older than
+  the repo: it sends the **"PAM:"** prefix and only English and Spanish; the repo says
+  **"Pam:"** (D-321), and the carrier re-filing for that prefix is still an unticked
+  item. Redeploying to switch the languages on would also silently change the live
+  prefix, so it is a decision of its own (docs/before-launch.md). Nothing is lost by
+  waiting: one test text has ever been queued (17 September), the dispatcher runs
+  every five minutes with an empty queue, and all three accounts are English.
+- **The risk accepted** (Will's "fail first"): machine-drafted words for the promise
+  pages in five languages are live; and the carrier registration names English and
+  Spanish only, so the first text in another language may be filtered — which,
+  depending on how sign-in codes are sent, could touch more than that one text.
+  That is the "fail", to be learned from; the brake above is one line.

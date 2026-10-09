@@ -19,6 +19,7 @@ import {
   STOP_SUFFIX,
   SMS_MAX_LENGTH_UCS2,
   SMS_WORST_CASE_LINK_LENGTH,
+  APPROVED_TO_LEARN_FROM,
   type MoreLocale,
   type SmsTemplate,
   type SmsTemplateKey,
@@ -290,32 +291,48 @@ describe('texts in the newer languages', () => {
     }
   });
 
-  it('sends none of them: a draft nobody has signed renders as English', () => {
-    // The point of the whole structure. If this fails, a machine-drafted text
-    // is on its way to somebody's phone.
-    const signed = drafts.filter((d) => d.draft.reviewedBy);
-    expect(signed, 'a person signs these in sms-templates.ts, with a date').toEqual([]);
-    for (const { key, locale } of drafts) {
-      expect(usableSmsLocale(key, locale), `${key} (${locale})`).toBe('en');
-      expect(() => renderSms({ key, locale, vars: varsFor(locale) })).toThrow(UnreviewedTemplateError);
+  it('carries Will’s approval on every draft, worded for what it is', () => {
+    // 9 October 2026: "approve new languages for now ... fail first then fix it ...
+    // adjust languages based on feedback." The wording says so plainly: approved to
+    // learn from, no native reader yet. Nothing else has signed them.
+    expect(APPROVED_TO_LEARN_FROM).toMatch(/^Will \(Oba\), 9 October 2026/);
+    expect(APPROVED_TO_LEARN_FROM).toContain('no native reader yet');
+    for (const { key, locale, draft } of drafts) {
+      expect(draft.reviewedBy, `${key} (${locale})`).toBe(APPROVED_TO_LEARN_FROM);
     }
-    expect(unsignedSmsDrafts().length).toBe(drafts.length);
+    expect(unsignedSmsDrafts()).toEqual([]);
   });
 
-  it('uses a draft once a person has signed it, and only that one', () => {
+  it('takes a language back to English the moment its approval is emptied — for every draft', () => {
+    // The brake. Emptying the approval is how a language is pulled after feedback.
+    const catalogue = SMS_TEMPLATES as Record<string, SmsTemplate>;
+    for (const { key, locale } of drafts) {
+      const original = catalogue[key]!;
+      catalogue[key] = { ...original, more: { ...original.more, [locale]: { ...original.more![locale]!, reviewedBy: '' } } };
+      try {
+        expect(usableSmsLocale(key, locale), `${key} (${locale})`).toBe('en');
+        expect(() => renderSms({ key, locale, vars: varsFor(locale) })).toThrow(UnreviewedTemplateError);
+      } finally {
+        catalogue[key] = original;
+      }
+    }
+  });
+
+  it('uses a language while it carries an approval, and only that one', () => {
     const catalogue = SMS_TEMPLATES as Record<string, SmsTemplate>;
     const original = catalogue['verify_code']!;
     catalogue['verify_code'] = {
       ...original,
-      more: { ...original.more, ru: { ...original.more!['ru']!, reviewedBy: 'a native reader, 1 January 2027' } },
+      more: { ...original.more, ru: { ...original.more!['ru']!, reviewedBy: '' } },
     };
     try {
-      expect(usableSmsLocale('verify_code', 'ru')).toBe('ru');
-      expect(usableSmsLocale('verify_code', 'ar')).toBe('en');
-      expect(renderSms({ key: 'verify_code', locale: 'ru', vars: varsFor('ru') })).toContain('Ваш код');
+      expect(usableSmsLocale('verify_code', 'ru')).toBe('en');
+      expect(usableSmsLocale('verify_code', 'ar')).toBe('ar');
     } finally {
       catalogue['verify_code'] = original;
     }
+    expect(usableSmsLocale('verify_code', 'ru')).toBe('ru');
+    expect(renderSms({ key: 'verify_code', locale: 'ru', vars: varsFor('ru') })).toContain('Ваш код');
   });
 
   it('falls back to English for a template with no text in the language at all', () => {

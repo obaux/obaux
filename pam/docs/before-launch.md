@@ -192,28 +192,30 @@ Russian, Arabic (D-422); messages read in the reader's language (D-423).
   傾談), not Taiwan's. Arabic: Modern Standard, and check that the
   right-to-left screens read naturally. Russian: "вы" throughout.
 
-- [ ] **Sign off the texts and the invite email, language by language, and
-  decide the two things only Will can** (D-424). Drafts now exist: **53 texts**
-  (Portuguese 15, Simplified Chinese 12, Traditional Chinese 12, Russian 7,
-  Arabic 7 — `unsignedSmsDrafts()` lists them) and the **invite email in all
-  five**. None is signed, so **everyone is still texted and emailed in English
-  (or Spanish) whatever their language**; the day a person writes their name in a
-  draft's `reviewedBy`, that language starts for that message and no other.
-  Needs:
-  1. A native reader for each language reads its texts and email against §9 (no
-     word that reveals justice involvement — each language has its own list now —
-     160 characters, or 70 in Chinese, Russian and Arabic, no emoji) and signs
-     them. **I never fill in `reviewedBy`.**
-  2. **Will: two segments or English for the reminders?** The three appointment
-     reminders (a time, an address, a link) cannot be said in 70 characters in
-     Chinese, Russian or Arabic, so those readers get them in English. Allowing
-     two segments doubles their cost and changes the carrier registration, which
-     says one. Also the shorter the link, the more fits: the live `app_url` is
-     36 characters.
-  3. **Re-file the campaign** with the carrier before the first text in a new
-     language: `docs/sms-campaign-samples.md` names English and Spanish only.
-  4. The email provider (the item at the top) is what sends the invite email at
-     all.
+- [ ] **Texts and the invite email in the new languages: approved to learn from;
+  deploy, and decide the rest** (D-424, D-429). **Will, 9 October: "approve new
+  languages for now ... fail first then fix ... adjust languages based on
+  feedback."** Done: his approval is on all 53 text drafts (Portuguese 15, Simplified
+  Chinese 12, Traditional Chinese 12, Russian 7, Arabic 7) and the five email
+  languages; a text always goes out (English if the person's language cannot be sent
+  safely); pull a language by emptying its `reviewedBy`. Left:
+  1. **Deploy `dispatch-sms`** (`supabase functions deploy dispatch-sms`, or the
+     connector). The live one is v15 from 17 September: it sends **"PAM:"** and only
+     English and Spanish; the repo says **"Pam:"** and has the new languages. Deploying
+     switches both on at once. Nothing is queued today, so it can go any time — but
+     do it together with the next item, because the prefix changes on the live number.
+  2. **Re-file the campaign** with the carrier: the registered samples are English and
+     Spanish, and (unticked, below) the "Pam:" prefix. This is the "fail" to watch:
+     a text in an unregistered language may be filtered.
+  3. **Will: two segments or English for the three appointment reminders** in
+     Chinese, Russian and Arabic (they cannot be said in 70 characters with a time, an
+     address and a link, so those readers get English). Two segments doubles their
+     cost and changes the registration, which says one. A shorter link fits more: the
+     live `app_url` is 36 characters.
+  4. The email provider (the item at the top) is what sends the invite email at all.
+  5. **Feedback loop:** when somebody who reads one of these languages says it is
+     wrong, tell Claude the language, where, and what it should say; it is fixed in
+     that language (docs/copy-changes.md).
 
 - [ ] **Apply 0085 whenever convenient — nothing waits on it** (D-424, D-428). It
   keeps the language a person asked in, so a denial text and a fresh-link email

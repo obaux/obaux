@@ -57,9 +57,10 @@ export interface SmsTemplate {
   readonly es: string;
   /**
    * The same message in the languages added on 9 October 2026 (A24), each with
-   * its own sign-off. **A draft with an empty `reviewedBy` is never sent**: the
+   * its own sign-off. **A draft with an empty `reviewedBy` is never used**: the
    * dispatcher texts that person in English instead, because a text is the one
-   * place Pam cannot show somebody a draft first. A template with no entry for
+   * place Pam cannot show somebody a draft first. (Will approved all of them on 9
+   * October 2026 to learn from — `APPROVED_TO_LEARN_FROM`.) A template with no entry for
    * a language is one that does not fit a single message in it (see
    * `SMS_MAX_LENGTH_UCS2`) — that language gets English for it, on purpose.
    */
@@ -184,9 +185,28 @@ export const STOP_SUFFIX: Readonly<Record<Locale, string>> = {
   ar: ' للإلغاء أرسل STOP.',
 };
 
-/** A wording nobody has read yet: it exists to be read, and does not send. */
-const unsigned = (body: string, maxVarLengths?: Readonly<Record<string, number>>): SmsDraft =>
-  maxVarLengths ? { body, reviewedBy: '', maxVarLengths } : { body, reviewedBy: '' };
+/**
+ * Will's approval of the drafts in the five later languages (Portuguese, both
+ * Chinese, Russian, Arabic), 9 October 2026: "Let's approve new languages for
+ * now. We'll take a fail first then fix it approach. We'll adjust languages based
+ * on feedback."
+ *
+ * It is worded for what it is. These were drafted by a model and **no native
+ * speaker has read them**; they are approved to learn from, and are changed when
+ * somebody who reads the language says they are wrong. A fix that brings a draft
+ * closer to the English meaning keeps this approval; anything that says more or
+ * something new goes back to Will. Emptying it for a language puts that language
+ * back to English at the next deploy. **An agent never writes this on its own
+ * authority** — this one is Will's, given in so many words.
+ */
+export const APPROVED_TO_LEARN_FROM =
+  'Will (Oba), 9 October 2026 — approved to learn from; no native reader yet';
+
+/** A wording in one of the later languages, carrying Will's approval above. */
+const approved = (body: string, maxVarLengths?: Readonly<Record<string, number>>): SmsDraft =>
+  maxVarLengths
+    ? { body, reviewedBy: APPROVED_TO_LEARN_FROM, maxVarLengths }
+    : { body, reviewedBy: APPROVED_TO_LEARN_FROM };
 
 /**
  * Who read this copy and signed it off.
@@ -210,9 +230,9 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
     en: "Pam: You've been invited to Pam, an app for finding help and people near you. Tap to join: {link}",
     es: 'Pam: Le invitaron a Pam, una app para encontrar ayuda y personas cerca. Toque para entrar: {link}',
     more: {
-      'pt-BR': unsigned('Pam: Convidaram voce para o Pam, um app para achar ajuda e pessoas por perto. Toque para entrar: {link}'),
-      'zh-CN': unsigned('Pam: 您受邀加入 Pam：{link}'),
-      'zh-HK': unsigned('Pam: 你獲邀加入 Pam：{link}'),
+      'pt-BR': approved('Pam: Convidaram voce para o Pam, um app para achar ajuda e pessoas por perto. Toque para entrar: {link}'),
+      'zh-CN': approved('Pam: 您受邀加入 Pam：{link}'),
+      'zh-HK': approved('Pam: 你獲邀加入 Pam：{link}'),
     },
     vars: ['link'],
     reviewedBy: REVIEWED_BY,
@@ -223,9 +243,9 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
     en: 'Pam: You have been invited to list your services on Pam. Tap to set up your page: {link}',
     es: 'Pam: Le invitaron a publicar sus servicios en Pam. Toque para crear su pagina: {link}',
     more: {
-      'pt-BR': unsigned('Pam: Voce recebeu um convite para anunciar seus servicos no Pam. Toque para criar sua pagina: {link}'),
-      'zh-CN': unsigned('Pam: 邀请您发布服务：{link}'),
-      'zh-HK': unsigned('Pam: 邀請你發佈服務：{link}'),
+      'pt-BR': approved('Pam: Voce recebeu um convite para anunciar seus servicos no Pam. Toque para criar sua pagina: {link}'),
+      'zh-CN': approved('Pam: 邀请您发布服务：{link}'),
+      'zh-HK': approved('Pam: 邀請你發佈服務：{link}'),
     },
     vars: ['link'],
     reviewedBy: REVIEWED_BY,
@@ -236,11 +256,11 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
     en: 'Pam: Your code is {code}. It works for 10 minutes.',
     es: 'Pam: Su codigo es {code}. Sirve por 10 minutos.',
     more: {
-      'pt-BR': unsigned('Pam: Seu codigo é {code}. Vale por 10 minutos.'),
-      'zh-CN': unsigned('Pam: 您的验证码是 {code}，10 分钟内有效。'),
-      'zh-HK': unsigned('Pam: 你的驗證碼是 {code}，10 分鐘內有效。'),
-      'ru': unsigned('Pam: Ваш код {code}. Действует 10 минут.'),
-      'ar': unsigned('Pam: رمزك {code}. صالح لمدة 10 دقائق.'),
+      'pt-BR': approved('Pam: Seu codigo é {code}. Vale por 10 minutos.'),
+      'zh-CN': approved('Pam: 您的验证码是 {code}，10 分钟内有效。'),
+      'zh-HK': approved('Pam: 你的驗證碼是 {code}，10 分鐘內有效。'),
+      'ru': approved('Pam: Ваш код {code}. Действует 10 минут.'),
+      'ar': approved('Pam: رمزك {code}. صالح لمدة 10 دقائق.'),
     },
     vars: ['code'],
     reviewedBy: REVIEWED_BY,
@@ -260,9 +280,9 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
     en: 'Pam: {adminFirstName} connected you with a program that can help. Open Pam to say hi: {link}',
     es: 'Pam: {adminFirstName} le conecto con un programa que puede ayudar. Abra Pam para saludar: {link}',
     more: {
-      'pt-BR': unsigned('Pam: {adminFirstName} conectou voce a um programa que pode ajudar. Abra o Pam para dizer oi: {link}'),
-      'zh-CN': unsigned('Pam: {adminFirstName} 帮您联系了项目：{link}', { adminFirstName: 14 }),
-      'zh-HK': unsigned('Pam: {adminFirstName} 幫你聯絡了計劃：{link}', { adminFirstName: 14 }),
+      'pt-BR': approved('Pam: {adminFirstName} conectou voce a um programa que pode ajudar. Abra o Pam para dizer oi: {link}'),
+      'zh-CN': approved('Pam: {adminFirstName} 帮您联系了项目：{link}', { adminFirstName: 14 }),
+      'zh-HK': approved('Pam: {adminFirstName} 幫你聯絡了計劃：{link}', { adminFirstName: 14 }),
     },
     vars: ['adminFirstName', 'link'],
     reviewedBy: REVIEWED_BY,
@@ -273,9 +293,9 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
     en: 'Pam: Someone was introduced to your program. Open Pam to reply: {link}',
     es: 'Pam: Alguien fue presentado a su programa. Abra Pam para responder: {link}',
     more: {
-      'pt-BR': unsigned('Pam: Alguem foi apresentado ao seu programa. Abra o Pam para responder: {link}'),
-      'zh-CN': unsigned('Pam: 有人被介绍到您的项目。打开 Pam 回复：{link}'),
-      'zh-HK': unsigned('Pam: 有人獲介紹到你的計劃。打開 Pam 回覆：{link}'),
+      'pt-BR': approved('Pam: Alguem foi apresentado ao seu programa. Abra o Pam para responder: {link}'),
+      'zh-CN': approved('Pam: 有人被介绍到您的项目。打开 Pam 回复：{link}'),
+      'zh-HK': approved('Pam: 有人獲介紹到你的計劃。打開 Pam 回覆：{link}'),
     },
     vars: ['link'],
     reviewedBy: REVIEWED_BY,
@@ -297,7 +317,7 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
     en: 'Pam: You have a visit tomorrow at {time}. {address}. Tap for directions: {link}',
     es: 'Pam: Tiene una visita mañana a las {time}. {address}. Toque para llegar: {link}',
     more: {
-      'pt-BR': unsigned('Pam: Voce tem uma visita amanha as {time}. {address}. Toque para chegar: {link}'),
+      'pt-BR': approved('Pam: Voce tem uma visita amanha as {time}. {address}. Toque para chegar: {link}'),
     },
     vars: ['time', 'address', 'link'],
     maxVarLengths: { address: 34 },
@@ -309,7 +329,7 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
     en: 'Pam: Your visit is at {time} today. {address}. Tap for directions: {link}',
     es: 'Pam: Su visita es hoy a las {time}. {address}. Toque para llegar: {link}',
     more: {
-      'pt-BR': unsigned('Pam: Sua visita é hoje as {time}. {address}. Toque para chegar: {link}'),
+      'pt-BR': approved('Pam: Sua visita é hoje as {time}. {address}. Toque para chegar: {link}'),
     },
     vars: ['time', 'address', 'link'],
     maxVarLengths: { address: 34 },
@@ -321,7 +341,7 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
     en: 'Pam: Today at {time} you have a visit. {address}. Tap for directions: {link}',
     es: 'Pam: Hoy a las {time} tiene una visita. {address}. Toque para llegar: {link}',
     more: {
-      'pt-BR': unsigned('Pam: Hoje as {time} voce tem uma visita. {address}. Toque para chegar: {link}'),
+      'pt-BR': approved('Pam: Hoje as {time} voce tem uma visita. {address}. Toque para chegar: {link}'),
     },
     vars: ['time', 'address', 'link'],
     maxVarLengths: { address: 34 },
@@ -333,11 +353,11 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
     en: 'Pam: Did you make it today? Reply YES or NO.',
     es: 'Pam: Pudo ir hoy? Responda YES o NO.',
     more: {
-      'pt-BR': unsigned('Pam: Voce conseguiu ir hoje? Responda YES ou NO.'),
-      'zh-CN': unsigned('Pam: 您今天到了吗？回复 YES 或 NO。'),
-      'zh-HK': unsigned('Pam: 你今日到了嗎？回覆 YES 或 NO。'),
-      'ru': unsigned('Pam: Вы сегодня дошли? Ответьте YES или NO.'),
-      'ar': unsigned('Pam: هل وصلت اليوم؟ رد بـ YES أو NO.'),
+      'pt-BR': approved('Pam: Voce conseguiu ir hoje? Responda YES ou NO.'),
+      'zh-CN': approved('Pam: 您今天到了吗？回复 YES 或 NO。'),
+      'zh-HK': approved('Pam: 你今日到了嗎？回覆 YES 或 NO。'),
+      'ru': approved('Pam: Вы сегодня дошли? Ответьте YES или NO.'),
+      'ar': approved('Pam: هل وصلت اليوم؟ رد بـ YES أو NO.'),
     },
     vars: [],
     reviewedBy: REVIEWED_BY,
@@ -349,11 +369,11 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
     en: 'Pam: No problem. We saved a step to set up a new time. Open Pam when you are ready: {link}',
     es: 'Pam: No hay problema. Guardamos un paso para buscar otra fecha. Abra Pam cuando pueda: {link}',
     more: {
-      'pt-BR': unsigned('Pam: Sem problema. Guardamos um passo para marcar outra data. Abra o Pam quando puder: {link}'),
-      'zh-CN': unsigned('Pam: 没关系。打开 Pam 重新约时间：{link}'),
-      'zh-HK': unsigned('Pam: 不要緊。打開 Pam 重新約時間：{link}'),
-      'ru': unsigned('Pam: Не страшно. Новое время: {link}'),
-      'ar': unsigned('Pam: لا بأس. موعد جديد: {link}'),
+      'pt-BR': approved('Pam: Sem problema. Guardamos um passo para marcar outra data. Abra o Pam quando puder: {link}'),
+      'zh-CN': approved('Pam: 没关系。打开 Pam 重新约时间：{link}'),
+      'zh-HK': approved('Pam: 不要緊。打開 Pam 重新約時間：{link}'),
+      'ru': approved('Pam: Не страшно. Новое время: {link}'),
+      'ar': approved('Pam: لا بأس. موعد جديد: {link}'),
     },
     vars: ['link'],
     reviewedBy: REVIEWED_BY,
@@ -372,11 +392,11 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
     en: 'Pam: Your request was approved. Open Pam to get started: {link}',
     es: 'Pam: Su solicitud fue aprobada. Abra Pam para empezar: {link}',
     more: {
-      'pt-BR': unsigned('Pam: Seu pedido foi aprovado. Abra o Pam para comecar: {link}'),
-      'zh-CN': unsigned('Pam: 您的申请已获批准。打开 Pam 开始：{link}'),
-      'zh-HK': unsigned('Pam: 你的申請已獲批准。打開 Pam 開始：{link}'),
-      'ru': unsigned('Pam: Заявка одобрена: {link}'),
-      'ar': unsigned('Pam: تمت الموافقة على طلبك: {link}'),
+      'pt-BR': approved('Pam: Seu pedido foi aprovado. Abra o Pam para comecar: {link}'),
+      'zh-CN': approved('Pam: 您的申请已获批准。打开 Pam 开始：{link}'),
+      'zh-HK': approved('Pam: 你的申請已獲批准。打開 Pam 開始：{link}'),
+      'ru': approved('Pam: Заявка одобрена: {link}'),
+      'ar': approved('Pam: تمت الموافقة على طلبك: {link}'),
     },
     vars: ['link'],
     reviewedBy: 'Will (Oba), 17 September 2026',
@@ -398,11 +418,11 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
     en: 'Pam: Your request was not approved. Questions? Call {supportPhone}.',
     es: 'Pam: Su solicitud no fue aprobada. Preguntas? Llame al {supportPhone}.',
     more: {
-      'pt-BR': unsigned('Pam: Seu pedido nao foi aprovado. Duvidas? Ligue para {supportPhone}.'),
-      'zh-CN': unsigned('Pam: 您的申请未获批准。有疑问请拨打 {supportPhone}。'),
-      'zh-HK': unsigned('Pam: 你的申請未獲批准。如有疑問請致電 {supportPhone}。'),
-      'ru': unsigned('Pam: Заявку не одобрили. Вопросы? Звоните {supportPhone}'),
-      'ar': unsigned('Pam: لم تتم الموافقة على طلبك. للاستفسار: {supportPhone}'),
+      'pt-BR': approved('Pam: Seu pedido nao foi aprovado. Duvidas? Ligue para {supportPhone}.'),
+      'zh-CN': approved('Pam: 您的申请未获批准。有疑问请拨打 {supportPhone}。'),
+      'zh-HK': approved('Pam: 你的申請未獲批准。如有疑問請致電 {supportPhone}。'),
+      'ru': approved('Pam: Заявку не одобрили. Вопросы? Звоните {supportPhone}'),
+      'ar': approved('Pam: لم تتم الموافقة على طلبك. للاستفسار: {supportPhone}'),
     },
     vars: ['supportPhone'],
     reviewedBy: 'Will (Oba), 17 September 2026',
@@ -414,11 +434,11 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
     en: 'Pam: Someone on Pam wants to connect. Open Pam to reply: {link}',
     es: 'Pam: Alguien en Pam quiere conectar. Abra Pam para responder: {link}',
     more: {
-      'pt-BR': unsigned('Pam: Alguem no Pam quer se conectar. Abra o Pam para responder: {link}'),
-      'zh-CN': unsigned('Pam: 有人想在 Pam 联系您。打开 Pam 回复：{link}'),
-      'zh-HK': unsigned('Pam: 有人想在 Pam 與你聯絡。打開 Pam 回覆：{link}'),
-      'ru': unsigned('Pam: С вами хотят связаться: {link}'),
-      'ar': unsigned('Pam: شخص يريد التواصل: {link}'),
+      'pt-BR': approved('Pam: Alguem no Pam quer se conectar. Abra o Pam para responder: {link}'),
+      'zh-CN': approved('Pam: 有人想在 Pam 联系您。打开 Pam 回复：{link}'),
+      'zh-HK': approved('Pam: 有人想在 Pam 與你聯絡。打開 Pam 回覆：{link}'),
+      'ru': approved('Pam: С вами хотят связаться: {link}'),
+      'ar': approved('Pam: شخص يريد التواصل: {link}'),
     },
     vars: ['link'],
     reviewedBy: REVIEWED_BY,
@@ -451,9 +471,9 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
     en: 'Pam: A place you saved is {reason}. Find others in Pam: {link}',
     es: 'Pam: Un lugar que guardo {reason}. Vea otros en Pam: {link}',
     more: {
-      'pt-BR': unsigned('Pam: Um lugar que voce salvou {reason}. Veja outros no Pam: {link}'),
-      'zh-CN': unsigned('Pam: 您收藏的地点{reason}。看其他：{link}'),
-      'zh-HK': unsigned('Pam: 你儲存的地點{reason}。看其他：{link}'),
+      'pt-BR': approved('Pam: Um lugar que voce salvou {reason}. Veja outros no Pam: {link}'),
+      'zh-CN': approved('Pam: 您收藏的地点{reason}。看其他：{link}'),
+      'zh-HK': approved('Pam: 你儲存的地點{reason}。看其他：{link}'),
     },
     vars: ['reason', 'link'],
     reviewedBy: REVIEWED_BY,
@@ -464,11 +484,11 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
     en: 'Pam: Some parts of Pam are turned off for now. Call {supportPhone} with questions.',
     es: 'Pam: Algunas partes de Pam estan apagadas por ahora. Llame al {supportPhone} si tiene preguntas.',
     more: {
-      'pt-BR': unsigned('Pam: Algumas partes do Pam estao desligadas por enquanto. Ligue para {supportPhone} se tiver duvidas.'),
-      'zh-CN': unsigned('Pam: Pam 的部分功能暂时关闭。有疑问请拨打 {supportPhone}。'),
-      'zh-HK': unsigned('Pam: Pam 部分功能暫時關閉。如有疑問請致電 {supportPhone}。'),
-      'ru': unsigned('Pam: Часть функций Pam пока отключена. Звоните {supportPhone}'),
-      'ar': unsigned('Pam: بعض ميزات Pam متوقفة الآن. اتصل بـ {supportPhone}'),
+      'pt-BR': approved('Pam: Algumas partes do Pam estao desligadas por enquanto. Ligue para {supportPhone} se tiver duvidas.'),
+      'zh-CN': approved('Pam: Pam 的部分功能暂时关闭。有疑问请拨打 {supportPhone}。'),
+      'zh-HK': approved('Pam: Pam 部分功能暫時關閉。如有疑問請致電 {supportPhone}。'),
+      'ru': approved('Pam: Часть функций Pam пока отключена. Звоните {supportPhone}'),
+      'ar': approved('Pam: بعض ميزات Pam متوقفة الآن. اتصل بـ {supportPhone}'),
     },
     vars: ['supportPhone'],
     reviewedBy: REVIEWED_BY,

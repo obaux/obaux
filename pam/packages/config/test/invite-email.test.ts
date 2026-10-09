@@ -83,34 +83,41 @@ describe('the invite email in every language', () => {
     }
   });
 
-  it('sends the English email in place of any draft nobody has signed', () => {
-    // The point of the structure. If this fails, a machine-drafted email is on
-    // its way to somebody.
-    expect(unsignedInviteEmailLocales().sort()).toEqual([...MORE].sort());
+  it('carries Will’s approval on every language, worded for what it is', () => {
+    // 9 October 2026: approved to learn from, no native reader yet.
+    expect(unsignedInviteEmailLocales()).toEqual([]);
     for (const locale of MORE) {
-      expect(usableInviteEmailLocale(locale), locale).toBe('en');
-      const sent = renderInviteEmail({ ...input, locale });
-      const english = renderInviteEmail({ ...input, locale: 'en' });
-      expect(sent.locale, locale).toBe('en');
-      expect(sent.html, locale).toBe(english.html);
-      expect(sent.subject, locale).toBe(english.subject);
+      expect(INVITE_EMAIL_MORE[locale].reviewedBy, locale).toContain('Will (Oba), 9 October 2026');
+      expect(INVITE_EMAIL_MORE[locale].reviewedBy, locale).toContain('no native reader yet');
+      expect(usableInviteEmailLocale(locale), locale).toBe(locale);
     }
   });
 
-  it('uses a language once a person has signed it, and only that one', () => {
+  it('sends the English email once a language’s approval is emptied — each in turn', () => {
     const more = INVITE_EMAIL_MORE as Record<string, { copy: InviteEmailCopy; reviewedBy: string }>;
-    const original = more['ru']!;
-    more['ru'] = { ...original, reviewedBy: 'a native reader, 1 January 2027' };
-    try {
-      expect(usableInviteEmailLocale('ru')).toBe('ru');
-      expect(usableInviteEmailLocale('ar')).toBe('en');
-      const email = renderInviteEmail({ ...input, locale: 'ru' });
-      expect(email.locale).toBe('ru');
-      expect(email.html).toContain('Dana приглашает вас');
-      expect(email.html).toContain('lang="ru"');
-    } finally {
-      more['ru'] = original;
+    for (const locale of MORE) {
+      const original = more[locale]!;
+      more[locale] = { ...original, reviewedBy: '' };
+      try {
+        expect(unsignedInviteEmailLocales(), locale).toEqual([locale]);
+        expect(usableInviteEmailLocale(locale), locale).toBe('en');
+        const sent = renderInviteEmail({ ...input, locale });
+        const english = renderInviteEmail({ ...input, locale: 'en' });
+        expect(sent.locale, locale).toBe('en');
+        expect(sent.html, locale).toBe(english.html);
+        expect(sent.subject, locale).toBe(english.subject);
+      } finally {
+        more[locale] = original;
+      }
     }
+  });
+
+  it('writes the email in the person’s language while it carries an approval', () => {
+    const email = renderInviteEmail({ ...input, locale: 'ru' });
+    expect(email.locale).toBe('ru');
+    expect(email.html).toContain('Dana приглашает вас');
+    expect(email.html).toContain('lang="ru"');
+    expect(renderInviteEmail({ ...input, locale: 'ar' }).html).toContain('dir="rtl"');
   });
 
   it('shows a draft in a preview, in the language asked for', () => {

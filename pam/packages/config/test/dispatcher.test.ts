@@ -131,54 +131,84 @@ describe('rendering a reviewed message', () => {
   });
 });
 
-describe('a language nobody has signed gets English', () => {
-  // Texts are written in every language, signed one at a time. Until a person
-  // has put their name against a wording, the person it is meant for is texted
-  // in English: a text is the one place Pam cannot show a draft first, so a new
-  // language must not start receiving machine-drafted texts just because the
-  // app speaks it.
+describe('a language is used while it carries an approval, and English when it does not', () => {
+  // Will approved the later languages on 9 October 2026 to learn from (fail first,
+  // then fix on feedback). Emptying a language's approval is how it is pulled: the
+  // person is then texted in English, never in a draft.
   const keys = Object.keys(REAL.templates);
   const later = SUPPORTED_LOCALES.filter((l) => l !== 'en' && l !== 'es');
 
-  it('renders every unsigned language as the English text, for every template', () => {
-    for (const key of keys) {
-      for (const locale of later) {
-        expect(render(REAL, key, locale, VARS), `${key} ${locale}`).toBe(render(REAL, key, 'en', VARS));
+  /** The shipped bundle with every later-language approval emptied. */
+  const WITHDRAWN: Bundle = {
+    ...REAL,
+    templates: Object.fromEntries(
+      Object.entries(REAL.templates).map(([key, t]) => [
+        key,
+        { ...t, more: Object.fromEntries(Object.entries(t.more ?? {}).map(([l, d]) => [l, { ...d, reviewedBy: '' }])) },
+      ]),
+    ),
+  };
+  /** saved_place_closed asks for its reason by key, as the queue does. */
+  const varsFor = (key: string) => (key === 'saved_place_closed' ? { link: 'https://pam.to/a1b2c3d', reason_key: 'closed' } : VARS);
+
+  it('carries Will’s approval on every draft in the shipped bundle', () => {
+    for (const template of Object.values(REAL.templates)) {
+      for (const [locale, draft] of Object.entries(template.more ?? {})) {
+        expect(draft.reviewedBy, `${template.key} ${locale}`).toContain('Will (Oba), 9 October 2026');
       }
     }
   });
 
-  it('uses the wording once a person has signed it, in that language only', () => {
-    const signed: Bundle = {
+  it('writes the text in the person’s language wherever there is a wording, and in English where there is none', () => {
+    let inTheirLanguage = 0;
+    for (const key of keys) {
+      for (const locale of later) {
+        const body = render(REAL, key, locale, varsFor(key));
+        const english = render(REAL, key, 'en', varsFor(key));
+        if (REAL.templates[key]!.more?.[locale]) {
+          expect(body, `${key} ${locale}`).not.toBe(english);
+          expect(body.startsWith('Pam: ')).toBe(true);
+          inTheirLanguage += 1;
+        } else {
+          expect(body, `${key} ${locale}`).toBe(english);
+        }
+      }
+    }
+    expect(inTheirLanguage).toBe(53);
+  });
+
+  it('writes every one in English once the approvals are emptied, for every template', () => {
+    for (const key of keys) {
+      for (const locale of later) {
+        expect(render(WITHDRAWN, key, locale, varsFor(key)), `${key} ${locale}`).toBe(render(WITHDRAWN, key, 'en', varsFor(key)));
+      }
+    }
+  });
+
+  it('pulls one language and leaves the others', () => {
+    const pulled: Bundle = {
       ...REAL,
       templates: {
         ...REAL.templates,
         verify_code: {
           ...REAL.templates['verify_code']!,
-          more: { ...REAL.templates['verify_code']!.more, ru: { ...REAL.templates['verify_code']!.more!['ru']!, reviewedBy: 'a native reader' } },
+          more: { ...REAL.templates['verify_code']!.more, ru: { ...REAL.templates['verify_code']!.more!['ru']!, reviewedBy: '' } },
         },
       },
     };
-    expect(render(signed, 'verify_code', 'ru', VARS)).toContain('Ваш код');
-    expect(render(signed, 'verify_code', 'ar', VARS)).toBe(render(signed, 'verify_code', 'en', VARS));
+    expect(render(pulled, 'verify_code', 'ru', VARS)).toBe(render(pulled, 'verify_code', 'en', VARS));
+    expect(render(pulled, 'verify_code', 'ar', VARS)).toContain('رمزك');
   });
 
   it('falls back for the whole message when a reason has no phrase in the language', () => {
-    const signed: Bundle = {
+    const noPhrase: Bundle = {
       ...REAL,
       reasons: { ...REAL.reasons, closed: { en: REAL.reasons['closed']!['en']!, es: REAL.reasons['closed']!['es']! } },
-      templates: {
-        ...REAL.templates,
-        saved_place_closed: {
-          ...REAL.templates['saved_place_closed']!,
-          more: { 'zh-CN': { ...REAL.templates['saved_place_closed']!.more!['zh-CN']!, reviewedBy: 'a native reader' } },
-        },
-      },
     };
     const vars = { reason_key: 'closed', link: 'https://pam.to/a1b2c3d' };
-    expect(render(signed, 'saved_place_closed', 'zh-CN', vars)).toBe(render(signed, 'saved_place_closed', 'en', vars));
+    expect(render(noPhrase, 'saved_place_closed', 'zh-CN', vars)).toBe(render(noPhrase, 'saved_place_closed', 'en', vars));
     // And with the phrase present, the language is used.
-    expect(render({ ...signed, reasons: REAL.reasons }, 'saved_place_closed', 'zh-CN', vars)).toContain('已关闭');
+    expect(render(REAL, 'saved_place_closed', 'zh-CN', vars)).toContain('已关闭');
   });
 });
 

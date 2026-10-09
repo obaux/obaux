@@ -210,3 +210,41 @@ Will: "Photo and messages are treated the same. Only reported if flagged." Then:
   twice-safe.
 - **Left:** Will's word to merge; one photo, document and link between two test
   accounts; 0085 whenever convenient.
+
+## Part 4 — merged; the languages approved to learn from; the draft script run end to end
+
+After the merge (PR #29, `8dee5d4`, Vercel READY) Will answered the open
+question about the new languages: "Let's approve new languages for now. We'll take
+a fail first then fix it approach. We'll adjust languages based on feedback."
+
+- **The sign-off is recorded in so many words** (D-429): `reviewedBy` on the 53 text
+  drafts and the five invite-email languages reads `APPROVED_TO_LEARN_FROM` ("Will
+  (Oba), 9 October 2026 — approved to learn from; no native reader yet"). Tests
+  rewritten for the approved state; a new one empties the approvals and asserts
+  everyone is texted in English again, and one pulls a single language and leaves the
+  rest.
+- **Will asked whether signing could ever stop someone getting a text. It could, in
+  one place.** An unsigned language already meant English, never nothing. But a
+  *signed* text that failed a check at send time (a link longer than the wording
+  was written for, a forbidden word) was refused and the person got nothing. The
+  dispatcher now falls back to English, logs the template, language and reason (never
+  the words), and throws only when English cannot be sent either.
+- **The draft script (`copy:draft`) was run end to end** against a stand-in
+  Anthropic API (`ANTHROPIC_BASE_URL`), which found a real bug: plural forms in
+  Russian and Arabic were left stale because the script drafted the base key. It
+  now drafts the actual stale keys with a `form` hint. `test/copy-sync-cli.test.ts`
+  covers the dry run (sends nothing), the six requests, the plural forms and the
+  refusal without a key; a mutation check confirmed the test catches the bug. It
+  has still not talked to the real API (no key here).
+- **Not redeployed.** The live `dispatch-sms` (v15) is the old one: "PAM:" prefix,
+  English and Spanish only. Redeploying switches the prefix to "Pam:" and starts
+  texting in the new languages, so it goes together with re-filing the carrier
+  campaign — Will's call.
+- **Left:** the redeploy and the carrier filing; two segments for the three
+  appointment reminders in Chinese, Russian and Arabic; an email provider and a
+  domain; native readers for the privacy, terms and transparency screens; the full
+  text-fit audit baseline (`apps/web/scripts/fit-known.json`).
+- **A note for the next session:** the Python I used to edit these records asserted
+  on text that wrapped differently than I had assumed and stopped half way. Edits
+  before the assertion were applied, the ones after were not; check `git diff` after
+  a scripted edit, not the script's last line.

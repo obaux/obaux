@@ -237,10 +237,11 @@ actually sends is how an approved campaign gets suspended.
   Both are listed above, and the Spanish is written without accents so every
   message fits a single segment. (Pam is also written in Brazilian Portuguese,
   Simplified and Traditional Chinese, Russian and Arabic — drafts of these texts
-  exist, none is signed off, and nobody is sent one: a person reading Pam in
-  those languages is still texted in English. **This registration must be
-  updated before the first text in another language goes out** —
-  docs/before-launch.md, D-424.)
+  exist; Will approved them to learn from on 9 October 2026 (D-429), with no
+  native reader yet, so once `dispatch-sms` is redeployed a person reading Pam in
+  one of those languages is texted in it, in one segment: 160 characters, 70 in
+  Chinese, Russian and Arabic. **This registration must be updated before that
+  deploy** — docs/before-launch.md, D-424, D-429.)
 - **STOP on first contact.** The two invitations are the first message anybody
   receives from an unknown number, so they carry the opt-out instruction in the
   message itself. Later messages do not repeat it, because the number is by then
