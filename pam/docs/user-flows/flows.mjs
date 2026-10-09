@@ -231,16 +231,16 @@ export const flows = [
         title: 'A conversation',
         story: 'member-created--conversation',
         path: '/messages/thread/',
-        changed: 'D-408',
-        note: 'Photos (JPEG, PNG, iPhone) and PDF or Word files: picked, dropped or pasted. Google Docs links as cards. Who they are under the name; with a program, the visit on top',
+        changed: 'D-409',
+        note: "Photos and documents, picked, dropped or pasted; a file Pam can't take gets an alert that shakes. Who they are under the name; with a program, the visit on top",
       },
       options: { title: 'Conversation options', story: 'member-created--conversation-options', path: '/messages/thread/options/', changed: 'D-407', note: 'Stuff shared first, then View program details (a program), then Report' },
       files: {
         title: 'Stuff shared',
         story: 'member-created--conversation-files',
         path: '/messages/thread/files/',
-        changed: 'D-407',
-        note: 'One flat list, newest first: photos, documents and links with a small preview, the name on one line (slides to show a long name\'s end), what it is, and who over when at the end. Links show their page\'s title and picture, fetched by Pam\'s server',
+        changed: 'D-409',
+        note: 'One flat list, newest first: photos, documents and links with a small preview, the name on one line (slides to show a long name\'s end), then Photo, Document or Link, and who over when at the end. Links show their page\'s title and picture, fetched by Pam\'s server',
       },
       profile: {
         title: 'Profile',
@@ -305,6 +305,7 @@ export const flows = [
       ['profile', 'points', 'Points'],
     ],
     changes: [
+      "D-409 — Stuff shared and documents say just Photo, Document or Link; a file Pam can't take gets a yellow alert in the box that shakes",
       'D-408 — a conversation: photos are JPEG, PNG or from an iPhone, documents PDF or Word; paste either straight into the message box',
       'D-407 — Stuff shared (was Photos and documents): one flat list of photos, documents and links, who and when at the end, long names slide to their end, link previews from Pam\'s server',
       'D-403 — the tab bar is the same on every tab: the fade always there (Trips too), no line, no flicker when switching',

@@ -4,8 +4,8 @@ import { FileSummary, GoogleLinkCard, MessageFileCard } from '@/app/messages/Mes
 
 /**
  * Documents and Google links in a conversation (D-399). A document shows its
- * icon, its name in full (two lines at most) and "PDF · 180 kB" before
- * anybody spends data on it; tapping downloads it with the person's own
+ * icon, its name in full (two lines at most) and "Document" (D-409: the kind,
+ * not the format or size) before anybody spends data on it; tapping downloads it with the person's own
  * sign-in and hands it to the phone. A Google Docs link in a message gets a
  * card under the words that opens it in Google, in a new tab.
  *
@@ -41,7 +41,7 @@ export const WordWithALongName: Story = {
 
 /** What sits above the box once a document is picked, before it is sent. */
 export const Picked: Story = {
-  render: () => <FileSummary name="Lease 2026.pdf" bytes={245_760} />,
+  render: () => <FileSummary name="Lease 2026.pdf" />,
 };
 
 /** A Google Docs, Sheets, Slides, Forms or Drive link in a message. */

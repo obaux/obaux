@@ -17,7 +17,6 @@ import { useI18n } from '@/lib/i18n';
 import { useSession } from '@/lib/useSession';
 import { useThread, type ThreadMessage } from '@/lib/useThread';
 import {
-  formatFileSize,
   googleLinkIn,
   handOver,
   loadMessageFile,
@@ -47,8 +46,12 @@ import { PhotoViewer } from '@/app/messages/PhotoViewer';
  * the icon goes — the photo; a document's icon on a tint of its colour (PDF
  * red, Word and Google Docs blue, Google Sheets green); a link's picture from
  * its page, or a globe — then its name on one line, which slides to show its
- * end when it is cut off (`MarqueeText`), then what it is ("PDF · 180 kB",
- * "example-library.org"), and at the end who sent it over when.
+ * end when it is cut off (`MarqueeText`), then what kind of thing it is —
+ * only "Photo", "Document" or "Link" (Will, 9 October, D-409: "for the end
+ * user, they only care if it's a link, doc, or photo. So the formats don't
+ * need to show"; it was "PDF · 180 kB", "Google Sheet", the site) — and at
+ * the end who sent it over when. Pam still tells formats apart underneath:
+ * the preview's icon and colour, and what it accepts (D-408).
  *
  * A photo opens the viewer, paging through every photo; a document downloads
  * with the person's sign-in, as in the conversation; a Google Doc or a link
@@ -238,14 +241,11 @@ function ThreadFiles() {
       const state = opening[item.message.id];
       if (state === 'opening') return t('messages.file.opening');
       if (state === 'failed') return t('messages.file.failed');
-      const kind = messageFileKind(item.file.name);
-      return t('messages.file.meta', {
-        kind: t(kind === 'pdf' ? 'messages.file.kind.pdf' : 'messages.file.kind.word'),
-        size: formatFileSize(item.file.bytes, locale),
-      });
+      return t('messages.file.document');
     }
-    if (item.kind === 'google') return t('messages.google.opens');
-    return previews[item.message.id]?.site ?? item.url.hostname.replace(/^www\./, '');
+    // A Google Doc, Sheet or Slides is, to the person, a document.
+    if (item.kind === 'google') return t('messages.file.document');
+    return t('messages.files.link');
   };
 
   const openFile = async (item: Extract<Shared, { kind: 'file' }>) => {

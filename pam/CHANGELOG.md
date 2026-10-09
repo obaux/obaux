@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.49.2] — 2026-10-09 · Just what it is
+
+On Stuff shared, each thing now simply says what it is: Photo, Document or
+Link — no file types or sizes. Documents in a conversation say "Document"
+the same way. And if you try to send a file Pam can't take, a yellow alert
+appears above the box with a quick shake, saying what went wrong and what
+you can send instead (D-409).
+
 ## [0.49.1] — 2026-10-09 · Paste a photo or a document
 
 You can now paste a photo, a PDF or a Word file straight into the message

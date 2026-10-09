@@ -622,7 +622,8 @@ test.describe('documents in a conversation (D-399)', () => {
     await docInput(page).setInputFiles(PDF);
     // Above the box, before it goes: what it is called and what it is.
     await expect(page.getByText('Lease 2026.pdf')).toBeVisible();
-    await expect(page.getByText(/^PDF · \d+ (kB|B)$/)).toBeVisible();
+    // What it is, in a word — not its format or size (D-409).
+    await expect(page.locator('.astryx-chat-composer').getByText('Document', { exact: true })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Take this document out' })).toBeVisible();
 
     await page.getByRole('button', { name: /send/i }).click();
@@ -638,7 +639,7 @@ test.describe('documents in a conversation (D-399)', () => {
     });
     expect(String(inserted!.attachment_url)).toMatch(new RegExp(`^${CONVO}/[0-9a-f-]+\\.pdf$`));
     // In the conversation: a card that opens it.
-    await expect(page.getByRole('button', { name: /^Open Lease 2026\.pdf, PDF, / })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Open Lease 2026.pdf, document' })).toBeVisible();
   });
 
   test('a file Pam does not take is refused in words, where it would have gone', async ({ page }) => {
@@ -649,10 +650,12 @@ test.describe('documents in a conversation (D-399)', () => {
 
     await docInput(page).setInputFiles({ name: 'notes.txt', mimeType: 'text/plain', buffer: Buffer.from('hello') });
     const composer = page.locator('.astryx-chat-composer');
-    await expect(composer.getByRole('alert')).toHaveText('Pam can send a photo (JPEG, PNG or from an iPhone), a PDF or a Word file.');
+    await expect(composer.getByRole('alert')).toContainText("Pam can't send that file");
+    await expect(composer.getByRole('alert')).toContainText('Send a photo, a PDF or a Word file.');
 
     await docInput(page).setInputFiles({ ...PDF, buffer: Buffer.alloc(10 * 1024 * 1024 + 1) });
-    await expect(composer.getByRole('alert')).toHaveText('That file is bigger than 10 MB. Try a smaller one.');
+    await expect(composer.getByRole('alert')).toContainText('That file is too big');
+    await expect(composer.getByRole('alert')).toContainText('Send one smaller than 10 MB.');
     // Nothing was picked, so there is nothing to send.
     await expect(page.getByRole('button', { name: /send/i })).toBeDisabled();
   });
@@ -702,7 +705,7 @@ test.describe('documents in a conversation (D-399)', () => {
     await page.goto(`/messages/thread/?id=${CONVO}`);
     await settled(page);
 
-    const card = page.getByRole('button', { name: 'Open Resume.docx, Word document, 1.2 MB' });
+    const card = page.getByRole('button', { name: 'Open Resume.docx, document' });
     await expect(card).toBeAttached();
     expect(downloads).toHaveLength(0);
     const saved = page.waitForEvent('download');
@@ -896,21 +899,24 @@ test.describe('photos and documents, picked or pasted (D-408)', () => {
     await page.goto(`/messages/thread/?id=${CONVO}`);
     await settled(page);
     const alert = composer(page).getByRole('alert');
-    const wrong = 'Pam can send a photo (JPEG, PNG or from an iPhone), a PDF or a Word file.';
+    const says = async (title: string, hint: string) => {
+      await expect(alert).toContainText(title);
+      await expect(alert).toContainText(hint);
+    };
 
     await paste(page, { name: 'dance.gif', type: 'image/gif', base64: PNG });
-    await expect(alert).toHaveText(wrong);
+    await says("Pam can't send that file", 'Send a photo, a PDF or a Word file.');
     await paste(page, { name: 'photo.webp', type: 'image/webp', base64: PNG });
-    await expect(alert).toHaveText(wrong);
+    await says("Pam can't send that file", 'Send a photo, a PDF or a Word file.');
     await paste(page, { name: 'notes.txt', type: 'text/plain', base64: Buffer.from('hello').toString('base64') });
-    await expect(alert).toHaveText(wrong);
+    await says("Pam can't send that file", 'Send a photo, a PDF or a Word file.');
 
     await paste(page, { name: 'broken.jpg', type: 'image/jpeg', base64: Buffer.from('not a picture').toString('base64') });
-    await expect(alert).toHaveText("That photo couldn't be opened. Try another one.");
+    await says("That photo couldn't be opened", 'Try another one.');
 
     // Chromium has no HEIC decoder; Safari does, and would take it.
     await paste(page, { name: 'IMG_0412.HEIC', type: 'image/heic', base64: Buffer.from('....ftypheic').toString('base64') });
-    await expect(alert).toHaveText("This browser can't open that iPhone photo. Try sending it from your phone.");
+    await says("This browser can't open that iPhone photo", 'Try sending it from your phone.');
 
     // Nothing was picked, so there is nothing to send.
     await expect(page.getByRole('button', { name: /send/i })).toBeDisabled();
@@ -918,6 +924,82 @@ test.describe('photos and documents, picked or pasted (D-408)', () => {
     await paste(page, { name: 'image.png', type: 'image/png', base64: PNG });
     await expect(composer(page).getByRole('img', { name: 'The photo you picked' })).toBeVisible();
     await expect(alert).toHaveCount(0);
+  });
+});
+
+test.describe('a file Pam cannot take: the alert banner shakes (D-409)', () => {
+  const composer = (page: import('@playwright/test').Page) => page.locator('.astryx-chat-composer');
+  const pasteGif = (page: import('@playwright/test').Page, name = 'dance.gif') =>
+    page.locator('.astryx-chat-composer-input [contenteditable="true"]').evaluate((el, n) => {
+      const data = new DataTransfer();
+      data.items.add(new File(['GIF89a'], n, { type: 'image/gif' }));
+      el.focus();
+      el.dispatchEvent(new ClipboardEvent('paste', { bubbles: true, cancelable: true, clipboardData: data }));
+    }, name);
+  const motion = (page: import('@playwright/test').Page) =>
+    page.locator('[data-refusal]').evaluate((el) => {
+      const s = getComputedStyle(el);
+      return { name: s.animationName, ms: parseFloat(s.animationDuration) * 1000 };
+    });
+
+  test('it is the warning banner, in the box, with a 48px way to close it', async ({ page }) => {
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+
+    await pasteGif(page);
+    const banner = composer(page).locator('.astryx-banner');
+    await expect(banner).toHaveAttribute('data-status', 'warning');
+    // Announced as an alert, and only once: the banner is the alert.
+    await expect(composer(page).getByRole('alert')).toHaveCount(1);
+    await expect(composer(page).getByRole('alert')).toContainText("Pam can't send that file");
+    const close = composer(page).getByRole('button', { name: 'Close this message' });
+    const box = (await close.boundingBox())!;
+    expect(box.width).toBeGreaterThanOrEqual(48);
+    expect(box.height).toBeGreaterThanOrEqual(48);
+    // It fits the box: nothing sticks out at the sides.
+    const frame = (await composer(page).boundingBox())!;
+    const b = (await banner.boundingBox())!;
+    expect(b.x).toBeGreaterThanOrEqual(frame.x - 1);
+    expect(b.x + b.width).toBeLessThanOrEqual(frame.x + frame.width + 1);
+
+    await close.click();
+    await expect(composer(page).getByRole('alert')).toHaveCount(0);
+  });
+
+  test.describe('with motion allowed', () => {
+    test.use({ reducedMotion: 'no-preference' });
+
+    test('it shakes once, quickly — and again for the next wrong file', async ({ page }) => {
+      await signedInAs(page, 'admin');
+      await withOneConversation(page);
+      await page.goto(`/messages/thread/?id=${CONVO}`);
+      await settled(page);
+
+      await pasteGif(page);
+      const first = await motion(page);
+      expect(first.name).not.toBe('none');
+      expect(first.ms).toBeGreaterThan(0);
+      expect(first.ms).toBeLessThanOrEqual(500);
+      const before = await page.locator('[data-refusal]').elementHandle();
+
+      // A second wrong file is a new banner, so it shakes (and is announced) again.
+      await pasteGif(page, 'again.gif');
+      await expect.poll(() => before!.evaluate((el) => el.isConnected)).toBe(false);
+      expect((await motion(page)).name).not.toBe('none');
+    });
+  });
+
+  test('with reduced motion it does not shake', async ({ page }) => {
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+
+    await pasteGif(page);
+    await expect(composer(page).getByRole('alert')).toBeVisible();
+    expect((await motion(page)).name).toBe('none');
   });
 });
 
@@ -1125,11 +1207,13 @@ test.describe('stuff shared, in one list (D-402, D-407)', () => {
 
     // Each row says it all to a screen reader, who and when included.
     await expect(page.getByRole('button', { name: /^Mine Photo, Sent by You, / })).toBeVisible();
-    const link = page.getByRole('link', { name: /^Free resume workshop Example Library, Sent by Marcus, / });
+    // What each thing is, in a word: Photo, Document or Link (D-409).
+    const link = page.getByRole('link', { name: /^Free resume workshop Link, Sent by Marcus, / });
     await expect(link).toHaveAttribute('href', 'https://example-library.org/workshop');
     await expect(link).toHaveAttribute('target', '_blank');
-    await expect(page.getByRole('link', { name: /^Google Doc Opens in Google, Sent by Marcus, / })).toBeVisible();
-    await expect(page.getByRole('button', { name: /^Lease\.pdf PDF · 240 kB, Sent by You, / })).toBeVisible();
+    await expect(page.getByRole('link', { name: /^Google Doc Document, Sent by Marcus, / })).toBeVisible();
+    await expect(page.getByRole('button', { name: /^Lease\.pdf Document, Sent by You, / })).toBeVisible();
+    await expect(page.getByText(/kB|PDF ·|Example Library/)).toHaveCount(0);
     await expect(page.getByRole('button', { name: /^Photo Sent by Marcus, / })).toBeVisible();
 
     // The link's picture came from Pam's storage; nothing was asked of the server.

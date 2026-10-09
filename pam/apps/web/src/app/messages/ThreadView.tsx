@@ -19,6 +19,7 @@ import {
   type ChatComposerInputHandle,
 } from '@astryxdesign/core/Chat';
 import { IconButton } from '@astryxdesign/core/IconButton';
+import { Banner } from '@astryxdesign/core/Banner';
 import { Avatar } from '@astryxdesign/core/Avatar';
 import { Icon } from '@astryxdesign/core/Icon';
 import { Text } from '@astryxdesign/core/Text';
@@ -194,6 +195,20 @@ const shrinkAway = stylex.keyframes({
   from: { opacity: 1, transform: 'scale(1)' },
   to: { opacity: 0, transform: 'scale(0.6)' },
 });
+// A file Pam cannot take (D-409): the banner gives a short, quick side-to-side
+// shake, the way a wrong passcode does — something is off — settling in
+// under half a second.
+const shake = stylex.keyframes({
+  '0%': { transform: 'translateX(0)' },
+  '15%': { transform: 'translateX(-8px)' },
+  '30%': { transform: 'translateX(7px)' },
+  '45%': { transform: 'translateX(-5px)' },
+  '60%': { transform: 'translateX(4px)' },
+  '75%': { transform: 'translateX(-2px)' },
+  '90%': { transform: 'translateX(1px)' },
+  '100%': { transform: 'translateX(0)' },
+});
+const SHAKE_MS = 450;
 
 const styles = stylex.create({
   list: { width: '100%' },
@@ -250,6 +265,14 @@ const styles = stylex.create({
   // A document picked and not sent yet (D-399): its card, as wide as it can be.
   pickedFile: { minWidth: 0, flexGrow: 1 },
   attachNote: { fontSize: '16px', lineHeight: 1.4 },
+  refusal: {
+    width: '100%',
+    animationName: shake,
+    animationDuration: `${SHAKE_MS}ms`,
+    animationTimingFunction: 'cubic-bezier(0.36, 0.07, 0.19, 0.97)',
+    animationIterationCount: 1,
+    '@media (prefers-reduced-motion: reduce)': { animationName: 'none' },
+  },
   // Something is being dragged over the conversation (D-399): the box it
   // will land in says so.
   dropping: {
@@ -552,7 +575,13 @@ export function ThreadView({
     { readonly kind: 'photo'; readonly file: Blob; readonly preview: string } | { readonly kind: 'file'; readonly file: File } | null
   >(null);
   // Why the last file offered was not taken, said where it would have gone.
+  // `refusals` counts them, so a second wrong file shakes the banner again.
   const [attachProblem, setAttachProblem] = useState<'wrongType' | 'tooBig' | 'heic' | 'unreadable' | null>(null);
+  const [refusals, setRefusals] = useState(0);
+  const refuse = (problem: 'wrongType' | 'tooBig' | 'heic' | 'unreadable') => {
+    setAttachProblem(problem);
+    setRefusals((n) => n + 1);
+  };
   // Something is being dragged over the conversation.
   const [dropping, setDropping] = useState(false);
   // The photo open full size, if any.
@@ -579,7 +608,7 @@ export function ThreadView({
     if (photo) {
       const shrunk = await shrinkPhoto(file);
       if (!shrunk) {
-        setAttachProblem(photo === 'heic' ? 'heic' : 'unreadable');
+        refuse(photo === 'heic' ? 'heic' : 'unreadable');
         return;
       }
       clearPicked();
@@ -587,11 +616,11 @@ export function ThreadView({
       return;
     }
     if (!messageFileType(file)) {
-      setAttachProblem('wrongType');
+      refuse('wrongType');
       return;
     }
     if (file.size > MESSAGE_FILE_LIMIT) {
-      setAttachProblem('tooBig');
+      refuse('tooBig');
       return;
     }
     clearPicked();
@@ -684,7 +713,7 @@ export function ThreadView({
           <ChatComposerDrawer>
             <HStack gap={2} align="center">
               <VStack xstyle={styles.pickedFile}>
-                <FileSummary name={displayFileName(picked.file.name)} bytes={picked.file.size} />
+                <FileSummary name={displayFileName(picked.file.name)} />
               </VStack>
               <IconButton
                 label={t('messages.thread.file.remove')}
@@ -697,16 +726,29 @@ export function ThreadView({
             </HStack>
           </ChatComposerDrawer>
         ) : attachProblem ? (
+          // A file Pam cannot take (D-409): Pam's alert banner, the same
+          // warning as Trips' reminder to sign, shaken once — a new one each
+          // time, so a second wrong file shakes it again and is announced
+          // again. With reduced motion it does not shake. It goes when a file is taken,
+          // the message is sent, or it is closed.
           <ChatComposerDrawer>
-            <Text role="alert" xstyle={styles.attachNote}>
-              {attachProblem === 'tooBig'
-                ? t('messages.thread.attach.tooBig')
-                : attachProblem === 'heic'
-                  ? t('messages.thread.attach.heic')
-                  : attachProblem === 'unreadable'
-                    ? t('messages.thread.attach.unreadable')
-                    : t('messages.thread.attach.wrongType')}
-            </Text>
+            <VStack key={refusals} data-refusal={attachProblem} xstyle={styles.refusal}>
+              <Banner
+                status="warning"
+                title={t(`messages.thread.attach.${attachProblem}.title`)}
+                description={t(`messages.thread.attach.${attachProblem}.hint`)}
+                endContent={
+                  <IconButton
+                    label={t('messages.thread.attach.close')}
+                    icon={<Icon icon="close" size="md" />}
+                    variant="ghost"
+                    size="md"
+                    onClick={() => setAttachProblem(null)}
+                    xstyle={styles.square}
+                  />
+                }
+              />
+            </VStack>
           </ChatComposerDrawer>
         ) : undefined
       }

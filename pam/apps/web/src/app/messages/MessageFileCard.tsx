@@ -9,7 +9,6 @@ import { Text } from '@astryxdesign/core/Text';
 import { FileTypeIcon } from '@pam/ui';
 import { useI18n } from '@/lib/i18n';
 import {
-  formatFileSize,
   handOver,
   loadMessageFile,
   messageFileKind,
@@ -23,7 +22,9 @@ import {
  * A document shows what it is before anybody spends data on it: its icon
  * (`FileTypeIcon`: a red PDF, or a page in Google-Doc blue for Word and for
  * a Google link — D-401), its name in full (two lines before it is
- * cut), and "PDF · 240 kB". Tapping it downloads it with the person's own
+ * cut), and under it just "Document" — the person cares that it is a
+ * document, not which format or how big (Will, 9 October, D-409; it was
+ * "PDF · 240 kB"). Tapping it downloads it with the person's own
  * sign-in and hands it to the phone under its own name — opened in the
  * phone's viewer, or saved for the app that opens Word files. Once fetched
  * it is kept for the visit, so a second tap does not download it again.
@@ -50,29 +51,17 @@ const styles = stylex.create({
   meta: { fontSize: '14px', lineHeight: 1.3 },
 });
 
-/** The icon, name, and "PDF · 240 kB" — what every document card shows. */
-export function FileSummary({
-  name,
-  bytes,
-  note,
-}: {
-  readonly name: string;
-  readonly bytes: number;
-  readonly note?: string;
-}) {
-  const { t, locale } = useI18n();
+/** The icon, the name, and "Document" — what every document card shows. */
+export function FileSummary({ name, note }: { readonly name: string; readonly note?: string }) {
+  const { t } = useI18n();
   const kind = messageFileKind(name);
-  const meta = t('messages.file.meta', {
-    kind: t(kind === 'pdf' ? 'messages.file.kind.pdf' : 'messages.file.kind.word'),
-    size: formatFileSize(bytes, locale),
-  });
   return (
     <HStack gap={3} align="center">
       <FileTypeIcon kind={kind} />
       <VStack gap={0.5} xstyle={styles.text}>
         <Text xstyle={styles.name}>{name}</Text>
         <Text type="supporting" xstyle={styles.meta}>
-          {note ?? meta}
+          {note ?? t('messages.file.document')}
         </Text>
       </VStack>
     </HStack>
@@ -91,10 +80,9 @@ export function MessageFileCard({
   readonly file: MessageFile;
   readonly localUrl?: string | null;
 }) {
-  const { t, locale } = useI18n();
+  const { t } = useI18n();
   const [fetched, setFetched] = useState<string | null>(localUrl);
   const [state, setState] = useState<'idle' | 'opening' | 'failed'>('idle');
-  const kind = messageFileKind(file.name);
 
   const open = async () => {
     if (state === 'opening') return;
@@ -114,18 +102,13 @@ export function MessageFileCard({
 
   return (
     <ClickableCard
-      label={t('messages.file.open', {
-        name: file.name,
-        kind: t(kind === 'pdf' ? 'messages.file.kind.pdf' : 'messages.file.kind.word'),
-        size: formatFileSize(file.bytes, locale),
-      })}
+      label={t('messages.file.open', { name: file.name })}
       onClick={() => void open()}
       padding={3}
       xstyle={styles.card}
     >
       <FileSummary
         name={file.name}
-        bytes={file.bytes}
         {...(state === 'opening'
           ? { note: t('messages.file.opening') }
           : state === 'failed'

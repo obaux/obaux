@@ -10252,3 +10252,48 @@ Or iPhone photo. Also allow users to paste these things into chat composer."
   `message-photos` bucket's own list (0079: JPEG, PNG, WebP, 5 MB) is wider
   than that and is left alone, since 0079 is already in the SQL-editor file
   Will has. The documents bucket takes only PDF and Word (0080).
+
+### D-409 — Photo, Document or Link — never the format; a file Pam can't take shakes its alert
+
+**Date:** 2026-10-09. Will, looking at Stuff shared: "for our own backend
+classification of asset format is good. But for the end user, they only care
+if it's a link, doc, or photo. So the formats don't need to show. Also let's
+set up alerts banner when file not supported is pasted or tried to be
+attached into composer. Have the alert shake a bit so it communicates
+something off. Similar to industry standard micro interaction patterns."
+
+- **One word for what a thing is.** On Stuff shared the line under each name
+  is now "Photo", "Document" or "Link" (es "Foto", "Documento", "Enlace") —
+  never "PDF · 180 kB", "Word document · 47 kB", "Opens in Google" or the
+  site's name. A Google Doc, Sheet or Slides is a "Document" there. The
+  document card in a conversation, and above the box once one is picked,
+  says "Document" under its name the same way, and a screen reader hears
+  "Open Lease.pdf, document". Sizes go too: they are a format's detail, and
+  10 MB is the most anyone can send.
+- **Pam still tells formats apart underneath**, where that is its job, not
+  the person's: what it accepts (D-408), how it stores and opens each one,
+  and the preview's icon and colour (a red PDF, a blue page) — the icon is a
+  picture of the thing, not a label to read. The file's own name is left as
+  it was sent, ".pdf" and all: it is the sender's name for it.
+- **The Google card in a conversation keeps "Opens in Google".** That is
+  what tapping it does, not what format it is, and D-399's reason stands —
+  nobody should be surprised to leave Pam.
+- **A file Pam can't take gets Pam's alert banner**, in the box where the
+  file would have gone: Astryx `Banner`, status warning — the same yellow
+  alert as Trips' reminder to sign (D-405) — with a short title and what to
+  do: "Pam can't send that file / Send a photo, a PDF or a Word file."; "That
+  file is too big / Send one smaller than 10 MB."; "This browser can't open
+  that iPhone photo / Try sending it from your phone."; "That photo couldn't
+  be opened / Try another one." It is announced as an alert, and closes with
+  a 48px ×, or goes by itself when a file is taken or the message is sent.
+  The refusal is the one place that still names PDF and Word: it is where a
+  person needs to know which documents work.
+- **The shake.** Once, under half a second (450 ms), side to side and
+  settling — 8, 7, 5, 4, 2, 1 px — the wrong-passcode shake people already
+  read as "something's off". Each new refusal is a new banner, so a second
+  wrong file shakes again and is announced again rather than sitting
+  unchanged. With reduced motion it does not move. No vibration: it is not
+  available on iPhones, and a banner that buzzes on some phones and not
+  others says two different things.
+- Storybook: Member › Created › "A conversation — a file Pam can't send"
+  (pastes a GIF on load).
