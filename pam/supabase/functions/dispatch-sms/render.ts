@@ -142,8 +142,37 @@ export function usableLocale(bundle: Bundle, key: string, wanted: Locale): Local
   return wanted;
 }
 
-/** Renders a queued message, or explains why it must not be sent. */
+/**
+ * Renders a queued message in the person's language, and — if that cannot be
+ * done safely — in English, so the person still gets it.
+ *
+ * A language being signed off decides which language a text is written in,
+ * never whether the person is texted. So when the words in their language fail
+ * a check at the moment of sending (a link a few characters longer than the
+ * wording was written for, a word list that has caught something), the English
+ * text goes instead, and `onFallback` says why (never quoting the words). Only
+ * when English cannot be sent either — a missing variable, an unknown template —
+ * does this throw.
+ */
 export function render(
+  bundle: Bundle,
+  key: string,
+  wanted: Locale,
+  vars: Record<string, string>,
+  onFallback?: (reason: string) => void,
+): string {
+  if (usableLocale(bundle, key, wanted) === 'en') return renderIn(bundle, key, 'en', vars);
+  try {
+    return renderIn(bundle, key, wanted, vars);
+  } catch (error) {
+    if (!(error instanceof UnsendableError)) throw error;
+    onFallback?.(error.message);
+    return renderIn(bundle, key, 'en', vars);
+  }
+}
+
+/** Renders a queued message in one language, or explains why it must not be sent. */
+function renderIn(
   bundle: Bundle,
   key: string,
   wanted: Locale,

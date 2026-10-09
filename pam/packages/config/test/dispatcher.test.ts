@@ -238,7 +238,11 @@ describe('the dispatcher and the config package say the same words', () => {
         },
       },
     };
-    expect(() => render(long, 'verify_code', 'ru', VARS)).toThrow(UnsendableError);
+    // Over 70 in Russian: the check catches it (and says why), and the person is texted
+    // in English instead of not at all.
+    const why: string[] = [];
+    expect(render(long, 'verify_code', 'ru', VARS, (r) => why.push(r))).toBe(render(long, 'verify_code', 'en', VARS));
+    expect(why[0]).toMatch(/over the 70 limit/);
     // The same length in English is one cheap message.
     expect(render(long, 'verify_code', 'en', VARS).length).toBeLessThanOrEqual(160);
   });
@@ -257,8 +261,15 @@ describe('the dispatcher and the config package say the same words', () => {
         },
       },
     };
-    expect(() => render(bad, 'verify_code', 'ru', VARS)).toThrow(UnsendableError);
-    expect(() => render(bad, 'verify_code', 'zh-CN', VARS)).toThrow('reveal justice involvement');
+    // Each is caught, named without quoting the word, and the person is texted in English.
+    for (const locale of ['ru', 'zh-CN'] as const) {
+      const why: string[] = [];
+      expect(render(bad, 'verify_code', locale, VARS, (r) => why.push(r)), locale).toBe(render(bad, 'verify_code', 'en', VARS));
+      expect(why, locale).toEqual(['message would reveal justice involvement']);
+    }
+    // And the check itself, on the words, still refuses them.
+    expect(() => assertSafe('Pam: Условно-досрочное 123456', 'ru', REAL.forbidden)).toThrow(UnsendableError);
+    expect(() => assertSafe('Pam: 假释 123456', 'zh-CN', REAL.forbidden)).toThrow('reveal justice involvement');
   });
 
   it('keeps a plain English reminder at 160 when the address has a curly apostrophe', () => {
@@ -288,5 +299,67 @@ describe('the last safety check', () => {
     expect(() => assertSafe('Pam: Nice work! \u{1F389}')).toThrow(UnsendableError);
     expect(() => assertSafe('You have a visit tomorrow.')).toThrow(UnsendableError);
     expect(() => assertSafe(`Pam: ${'a'.repeat(200)}`)).toThrow(UnsendableError);
+  });
+});
+
+describe('a signed language never stops a text from going out', () => {
+  // Signing a language off decides which language the person is texted in. It
+  // is never a reason for them not to be texted: if the wording in their
+  // language cannot be sent safely at the moment of sending, the English goes.
+  const sign = (bundle: Bundle, key: string, locale: Locale, body?: string): Bundle => ({
+    ...bundle,
+    templates: {
+      ...bundle.templates,
+      [key]: {
+        ...bundle.templates[key]!,
+        more: {
+          ...bundle.templates[key]!.more,
+          [locale]: { ...bundle.templates[key]!.more![locale]!, ...(body ? { body } : {}), reviewedBy: 'Will, a test' },
+        },
+      },
+    },
+  });
+
+  it('sends the English when the signed wording is too long for its segment', () => {
+    const signed = sign(REAL, 'staff_request_approved', 'zh-CN');
+    const why: string[] = [];
+    // A link much longer than the 36 characters the wording was written for.
+    const vars = { ...VARS, link: `https://pam.example.org/${'x'.repeat(60)}` };
+    const body = render(signed, 'staff_request_approved', 'zh-CN', vars, (r) => why.push(r));
+    expect(body).toBe(render(REAL, 'staff_request_approved', 'en', vars));
+    expect(why).toHaveLength(1);
+    expect(why[0]).toMatch(/characters, over the 70 limit/);
+  });
+
+  it('sends the English when the signed wording trips a word list, and does not quote the word', () => {
+    const signed = sign(REAL, 'verify_code', 'ru', 'Pam: Условно-досрочное {code}');
+    const why: string[] = [];
+    const body = render(signed, 'verify_code', 'ru', VARS, (r) => why.push(r));
+    expect(body).toBe(render(REAL, 'verify_code', 'en', VARS));
+    expect(why.join()).toBe('message would reveal justice involvement');
+  });
+
+  it('does the same for a signed Spanish text that has gone wrong', () => {
+    const broken: Bundle = {
+      ...REAL,
+      templates: { ...REAL.templates, verify_code: { ...REAL.templates['verify_code']!, es: `Pam: ${'a'.repeat(200)} {code}` } },
+    };
+    const why: string[] = [];
+    expect(render(broken, 'verify_code', 'es', VARS, (r) => why.push(r))).toBe(render(REAL, 'verify_code', 'en', VARS));
+    expect(why).toHaveLength(1);
+  });
+
+  it('says nothing when the person’s language worked, and when it was English to begin with', () => {
+    const signed = sign(REAL, 'verify_code', 'ru');
+    const why: string[] = [];
+    expect(render(signed, 'verify_code', 'ru', VARS, (r) => why.push(r))).toContain('Ваш код');
+    render(REAL, 'verify_code', 'en', VARS, (r) => why.push(r));
+    expect(why).toEqual([]);
+  });
+
+  it('still throws when English cannot be sent either: nothing to say is not a text', () => {
+    const signed = sign(REAL, 'appointment_24h', 'pt-BR');
+    expect(() => render(signed, 'appointment_24h', 'pt-BR', { time: '10:00 AM' })).toThrow(UnsendableError);
+    expect(() => render(REAL, 'no_such_template', 'ru', VARS)).toThrow(UnsendableError);
   });
 });
