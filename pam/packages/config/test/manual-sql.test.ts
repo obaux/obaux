@@ -2,54 +2,43 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 
 /**
- * The file Will pastes into the Supabase SQL editor (D-428) is the four
- * migrations the connector cannot apply, in order, in one transaction. It is
- * built from them by hand, so this is what stops it drifting: edit a migration
- * before it is applied and this fails until the file is rebuilt and re-proved
- * (packages/db/manual/README.md).
+ * The file Will can paste into the Supabase SQL editor for migration 0085
+ * (D-428). The live connector hangs on a `drop`, and 0085 replaces two
+ * functions, so it is applied by hand. The file is the migration, whole, in one
+ * transaction with a pre-flight check and a self-check; this stops it drifting
+ * from the migration (packages/db/manual/README.md).
  */
 const root = new URL('../../../', import.meta.url);
 const read = (path: string) => readFileSync(new URL(path, root), 'utf8');
 
-const FILE = read('packages/db/manual/2026-10-09-photos-documents-links-and-languages.sql');
-const MIGRATIONS = [
-  '0079_message_photos',
-  '0080_message_files',
-  '0081_link_previews',
-  '0085_language_where_there_is_no_profile',
-];
+const FILE = read('packages/db/manual/2026-10-09-language-where-there-is-no-profile.sql');
+const MIGRATION = read('packages/db/migrations/0085_language_where_there_is_no_profile.sql').trimEnd();
 
-describe('the one SQL file for the SQL editor', () => {
-  it('contains every migration it stands in for, whole, in order', () => {
-    let at = 0;
-    for (const name of MIGRATIONS) {
-      const sql = read(`packages/db/migrations/${name}.sql`).trimEnd();
-      const found = FILE.indexOf(sql, at);
-      expect(found, `${name}.sql is not in the file, or is out of order`).toBeGreaterThanOrEqual(at);
-      at = found + sql.length;
-    }
+describe('the SQL editor file for migration 0085', () => {
+  it('contains the migration, whole', () => {
+    expect(FILE.includes(MIGRATION), '0085 changed after the file was built — rebuild it and re-prove it').toBe(true);
   });
 
-  it('is one transaction: begins once, commits once, and is safe to run twice', () => {
+  it('is one transaction, and refuses a database it was not written for', () => {
     expect(FILE.match(/^begin;$/gm)).toHaveLength(1);
     expect(FILE.match(/^commit;$/gm)).toHaveLength(1);
-    // Refuses a database it was not written for, and says so in words.
     expect(FILE).toContain("name = '0078_one_account_two_roles'");
     expect(FILE).toContain("name = '0084_message_translations'");
+    // Before the migration, not after it.
+    expect(FILE.indexOf('STOP:')).toBeLessThan(FILE.indexOf(MIGRATION));
   });
 
   it('checks its own work before it commits, and records itself once', () => {
-    const checks = FILE.slice(FILE.indexOf('Check the work before keeping it'));
-    expect(checks).toContain('three private buckets');
-    expect(checks).toContain('message_link_previews');
+    const checks = FILE.slice(FILE.indexOf(MIGRATION) + MIGRATION.length);
     expect(checks).toContain('an old function signature is still there');
+    expect(checks).toContain('a new function signature is missing');
+    expect(checks).toContain('a language column is missing');
     expect(checks).toContain('where not exists');
-    for (const name of MIGRATIONS) expect(checks).toContain(`'${name}'`);
+    expect(checks).toContain("'0085_language_where_there_is_no_profile'");
   });
 
-  it('does not hold the migrations it stands in for as separate steps nobody applied', () => {
-    // 0079–0081 and 0085 are held (STATUS row 36). If one is ever applied the
-    // normal way, this file must not be run on top of it as if it were new.
-    expect(read('packages/db/manual/README.md')).toContain('Run it once');
+  it('says that nothing waits on it: the app asks again without the language when it is not applied', () => {
+    expect(FILE).toContain('rpcLanguage.ts');
+    expect(read('apps/web/src/lib/rpcLanguage.ts')).toContain("'PGRST202'");
   });
 });

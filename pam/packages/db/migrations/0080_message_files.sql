@@ -1,3 +1,7 @@
+-- APPLIED to the live project on 9 October 2026, through the connector, without three `drop policy if exists` guards (its two constraint replacements were kept):
+-- no-ops on a database where these objects did not exist yet, and the connector hangs on them (D-387).
+-- Everything else is exactly what is below.
+
 -- 0080 — Documents in a conversation (Will, 8 October 2026: "We should also
 -- allow files like pdf. Word doc. And Google Docs. To be dropped in."). D-399.
 --

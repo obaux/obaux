@@ -17,6 +17,8 @@
  * request and a human at Pam checks it and sends an invite.
  */
 
+import { rpcWithLanguage } from './rpcLanguage';
+
 /** What somebody picked on the "which one fits you" question. */
 export type JoinKind = 'member' | 'provider' | 'admin';
 
@@ -88,14 +90,13 @@ export async function submitDetails(details: JoinDetails): Promise<JoinOutcome> 
     }
 
     const program = details.program;
-    const { error } = await supabase.rpc('request_staff_access', {
+    // The language they are reading Pam in goes with the request, so the text that
+    // answers it is written in it (0085): a denial has no profile to ask.
+    const { error } = await rpcWithLanguage(supabase, 'request_staff_access', {
       p_wants_role: details.kind,
       p_first_name: details.firstName.trim(),
       p_last_name: details.lastName.trim(),
       p_city: details.city.trim(),
-      // The language they are reading Pam in, so the text that answers the
-      // request is written in it (0085): a denial has no profile to ask.
-      p_language: details.language,
       ...(program
         ? {
             p_program_name: program.name.trim(),
@@ -107,7 +108,7 @@ export async function submitDetails(details: JoinDetails): Promise<JoinOutcome> 
             p_program_website: program.website.trim(),
           }
         : {}),
-    });
+    }, details.language);
     return error ? { result: 'failed' } : { result: 'staff' };
   } catch {
     return { result: 'failed' };

@@ -57,27 +57,23 @@ STATUS row too.
   account, member + program. The session reads `profile_roles`; it names the
   `profile_id` foreign key, because the table points at `profiles` twice.
 
-- [ ] **Photos, documents and link previews in messages: run the one SQL file,
-  then merge** (Will, 8–9 October 2026, D-394, D-399, D-407, D-428). **Will, 9
-  October: "Photo and messages are treated the same. Only reported if flagged."**
-  Checked against the database: a photo or document is seen by the two people in
-  the conversation and by a guide or super admin only after someone reports that
-  message, by the same test as its words; link previews only by the two people,
-  reported or not; no admin policy on any of them; the privacy copy says so. So
-  the promise to members is unchanged and **"tell members first" no longer blocks
-  the merge** — a heads-up to the two member accounts on the live project is
-  Will's courtesy to give or skip. What is left:
-  1. **Will runs `packages/db/manual/2026-10-09-photos-documents-links-and-
-     languages.sql`** in the Supabase dashboard (SQL editor, `pam` project, paste,
-     Run, "Success"). It is 0079 + 0080 + 0081 + 0085 in one transaction, refuses
-     the wrong database, rolls itself back if its own checks fail, and is safe to
-     run twice. Its README says how it was proved.
-  2. Claude reads the database back (`list_migrations`, `get_advisors`) and merges
-     to `main`; Vercel deploys. Migration first, app second: the `link-preview`
-     Edge Function is already deployed and refuses every request until 0081 is in,
-     and the photo button fails without 0079.
-  3. Send one photo, one document and one link between two test accounts and look
-     at both screens.
+- [ ] **Photos, documents and link previews in messages: merge, then look**
+  (Will, 8–9 October 2026, D-394, D-399, D-407, D-428). **Will, 9 October: "Photo
+  and messages are treated the same. Only reported if flagged."** Checked against
+  the database: a photo or document is seen by the two people in the conversation
+  and by a guide or super admin only after someone reports that message, by the
+  same test as its words; link previews only by the two people, reported or not;
+  no admin policy on any of them; the privacy copy says so. So the promise to
+  members is unchanged and **"tell members first" does not block the merge** — a
+  heads-up to the two member accounts on the live project is Will's courtesy to
+  give or skip.
+  - **Done 9 October:** 0079, 0080 and 0081 are live (applied through the
+    connector without their no-op `drop … if exists` guards; read back: three
+    private buckets, seven storage policies, link-preview table with row-level
+    security forced and no `anon` access; `get_advisors` shows nothing new).
+  - **Left:** (1) Will says "merge"; Claude merges to `main` and watches the
+    Vercel deploy. (2) Send one photo, one document and one link between two test
+    accounts and look at both screens.
 
 - [ ] **Approve the Pam-team line on the transparency screen** (STATUS row
   10b). Members were promised they would hear first if what is visible
@@ -183,7 +179,7 @@ Russian, Arabic (D-422); messages read in the reader's language (D-423).
   hold `pt-BR`, `zh-CN`, `zh-HK`, `ru` or `ar`. **0084 (message translations)
   went in with it** — it creates a table nothing reads or writes until
   translation is switched on, so it changes nothing a member sees. 0079–0081
-  are still not live; neither migration touches what they create.
+  went in after them; neither pair touches what the other creates.
 
 - [ ] **Have a native speaker read every new language** — nobody has. The six
   new bundles were drafted by a model (Brazilian Portuguese; the other four in
@@ -219,12 +215,16 @@ Russian, Arabic (D-422); messages read in the reader's language (D-423).
   4. The email provider (the item at the top) is what sends the invite email at
      all.
 
-- [ ] **Apply 0085 with 0079–0081, then merge** (D-424). It keeps the language a
-  person asked in, so a denial text and a fresh-link email are written in it and
-  an approved account opens in it. Two functions change shape, so it is by hand
-  in the SQL editor (the connector stops at a `drop`, D-387), **before** the
-  branch that sends `p_language` is merged: migration first, app second; the old
-  app still works against it. Run `list_migrations` first.
+- [ ] **Apply 0085 whenever convenient — nothing waits on it** (D-424, D-428). It
+  keeps the language a person asked in, so a denial text and a fresh-link email
+  are written in it and an approved account opens in it. It replaces two
+  functions, so the live connector hangs on it (tried 9 October; nothing left
+  behind) and it goes in by hand: paste
+  `packages/db/manual/2026-10-09-language-where-there-is-no-profile.sql` into the
+  Supabase SQL editor (`pam` project), Run, "Success"; tell Claude "applied". Until
+  then the app asks for the language and, finding no such parameter, asks again
+  without it, so everything works and is simply in English. Run
+  `list_migrations` first.
 
 - [ ] **Messages in your own language — switching it on.** Built and tested,
   off (`MESSAGE_TRANSLATION` in `packages/config/src/translation.ts`; the

@@ -864,7 +864,7 @@ while the copy is unsigned, so it earned the first live test, not the last.*
 | 31 | **The before-launch list** | Launch | `docs/before-launch.md` — Will's list of what must be done before real people use PAM. First entry: the email provider for invite links. **0068/0069** are merged as 0075/0076 with 0072's arm kept (D-346); they wait for Will to apply them live. Program sign-up and Add a program are a one-question wizard with a review (D-347); Add a policy is a card (D-348); super admin → program lead message from a place (D-349). |
 | 34 | **Languages: native readers, the texts and emails, deploy 0083** | The new languages going to real people (D-422, A24) | Nobody who speaks Portuguese, Chinese, Russian or Arabic has read the six new bundles; start with the privacy page, the terms, the transparency screen, the notices and the seven "Switching to…" lines. Texts and the invite email have drafts in all five (53 texts) and are **sent in English until a person signs each** — `docs/before-launch.md` has what only Will can decide (two segments for reminders; re-filing the carrier campaign). **0083 is live** (applied 9 October, with the merge to `main`). Open question left at its default (no restriction): should staff be able to pick any language? In `docs/before-launch.md`. |
 | 35 | **Messages in your own language: switching it on** | D-423 | Built and off. Needs the provider's no-retention terms in writing, the key as a function secret, a native read of `privacy.s.translation.*`, a way to tell members first, a per-person daily cap, then both switches. `docs/before-launch.md`. |
-| 36 | **Merge of `claude/gallant-clarke-0dhizj` to `main`: one step left, Will's** | Will, 9 October 2026 (hold until 0079–0081 are live; then "Photo and messages are treated the same. Only reported if flagged.", D-428) | The branch is `main` plus `claude/pam-storybook` plus the seven languages and the other session's D-427, pushed and checked (e2e 828, Storybook, first load 544.6 kB, DB suite 546). It ships the photo, document and link UI, whose migrations 0079–0081 (and 0085) are not live. **Photos follow the message rule (checked), so "tell members first" no longer gates the merge.** Left: Will pastes `packages/db/manual/2026-10-09-photos-documents-links-and-languages.sql` into the Supabase SQL editor (one transaction, proved on a live-shaped database), then Claude reads it back and merges. If `main` moves first, merge it into the branch again (`list_migrations` first). |
+| 36 | **Merge of `claude/gallant-clarke-0dhizj` to `main`: ready, waiting for Will's word** | Will, 9 October 2026 (hold until 0079–0081 are live — they now are; "Photo and messages are treated the same. Only reported if flagged.", D-428) | The branch is `main` plus `claude/pam-storybook` plus the seven languages and the other session's D-427, pushed and checked (e2e 828, Storybook, first load 544.6 kB, DB suite 546). **0079–0081 are live** (9 October, read back; advisors show nothing new for `anon`), so the photo, document and link buttons will work. Photos follow the message rule (checked), so "tell members first" does not gate the merge. 0085 is not applied and nothing waits on it (the app falls back; `packages/db/manual/…language-where-there-is-no-profile.sql` applies it when convenient). Left: Will says "merge"; Claude merges, watches the Vercel deploy, and Will sends one photo, one document and one link between two test accounts. If `main` moves first, merge it into the branch again (`list_migrations` first). |
 
 ---
 
@@ -917,8 +917,9 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 D-421 to D-423, **on `claude/gallant-clarke-0dhizj`, which is
 `claude/pam-storybook` (through D-411, `1a89000`) plus `main` (through D-420,
 `932d052`) plus this work; none of it is merged to `main` yet and none of its
-migrations is on the live project** (0079–0081 are the other branch's and are
-held; 0082 is `main`'s and is live).
+migrations is on the live project** — correction, 9 October, later: 0083, 0084 and
+0079–0081 (the other branch's) are now live; 0082 is `main`'s and is live; only
+0085 is not).
 
 - **Languages (D-422).** English, Spanish, **Brazilian Portuguese, Simplified
   Chinese (Mandarin readers), Traditional Chinese (Cantonese readers),
@@ -951,9 +952,11 @@ held; 0082 is `main`'s and is live).
   where the script needs the other encoding (the appointment reminders have no
   text there); a justice-word list per language, applied again in the
   dispatcher; one STOP table the dispatcher and the config package share; a
-  parity test renders both. **Migration 0085 (held, by hand, with 0079–0081)**
-  keeps the language a person asked in on staff requests and invite emails; the
-  app already sends it (`p_language`) — apply the migration *before* merging.
+  parity test renders both. **Migration 0085 (not applied; by hand, and nothing waits on it)**
+  keeps the language a person asked in on staff requests and invite emails. The
+  app sends it (`p_language`) and, while the database has no such parameter,
+  asks again without it (`rpcLanguage.ts`); `packages/db/manual/2026-10-09-
+  language-where-there-is-no-profile.sql` applies it whenever convenient.
 - **Keeping the languages in step (D-425, A25).** `locales/ledger.json` +
   `copy:status|draft|ack`: a reworded English string fails the tests until its
   six translations are answered or kept on purpose. Storybook's *Pseudo-language*
@@ -965,9 +968,9 @@ held; 0082 is `main`'s and is live).
   `profiles_language_supported` taking the five new codes; 0084 is
   `message_translations` (RLS on and forced, `select` for the people in the
   conversation only, nothing for `anon` — read back from the live database).
-  They sit after 0082 (the other session's, live) and *before* 0079–0081
-  (photos, documents, link previews), which are still held; neither touches
-  anything those three create.
+  They sit after 0082 (the other session's, live); 0079–0081 (photos,
+  documents, link previews) went in after them the same day, and neither pair
+  touches anything the other creates.
 - **Merged with `main` (9 October):** the "your guide" wording, the account-limits
   sections and the short transparency screen (D-412–D-420) arrived in English
   and Spanish; the other five languages were written for all 32 of those
@@ -1002,9 +1005,10 @@ Only the two people see it; a reported photo reaches the report's reviewers
 and nobody else (`test/15_message_photos_test.sql`, 18 checks). Photos are
 downloaded with the person's sign-in, never handed out as links. The
 transparency screen, privacy notice, terms and staff sign-up copy name
-photos. **0079 is not on live yet:** the connector stopped at its approval
-step, so it waits for Will in the SQL editor (a tested one-transaction file;
-before-launch).
+photos. **0079 is live (9 October)**: applied through the connector, without
+the `drop … if exists` guards the connector hangs on (no-ops on objects that did
+not exist yet), and read back (private bucket, three policies, constraint, no
+`anon` access).
 
 **Documents (D-399, 0.47.0).** A document button beside the photo button
 (and a drop onto the conversation, or a paste) sends a PDF or Word file, 10
@@ -1013,8 +1017,8 @@ photo rules; the message carries its name and size, and the file is fetched
 with the reader's sign-in only when tapped. A Google Docs link in a message
 gets a card that opens it in Google. Copy everywhere that named photos names
 documents (`test/16_message_files_test.sql`, 23 checks; legal test).
-**0079, 0080 and 0081 go to live together** in one tested SQL-editor file for
-Will (before-launch).
+**0079, 0080 and 0081 are live (9 October)**, applied one by one through the
+connector the same way.
 
 **Header, composer and viewer (D-400, D-401, 0.47.1).** The visit card is
 the compact `StatusCard`; the subtitle is one line (the blurred fade under
@@ -1044,8 +1048,9 @@ October, verify_jwt): asked on send and for older links, it checks the
 person through `link_preview_targets` (0081), opens https public pages only
 (SSRF guard in `preview.ts`), and keeps title, site and a copy of the
 picture in the private `link-previews` bucket (`test/17`, 17 unit tests).
-**0081 is not live:** it rides in the 0079 + 0080 + 0081 SQL-editor file
-(before-launch); until then links show as their address.
+**0081 is live (9 October)** — the table and bucket exist; the `link-preview`
+function was already deployed and now has a table to write to. Until the app that
+asks for previews is merged, links show as their address.
 
 **What can be attached (D-408, 0.49.1).** Photos: JPEG, PNG, or an iPhone's
 HEIC — the photo button asks for JPEG/PNG so an iPhone converts its own; a

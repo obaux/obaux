@@ -1,3 +1,7 @@
+-- APPLIED to the live project on 9 October 2026, through the connector, without one `drop trigger if exists` and two `drop policy if exists` guards:
+-- no-ops on a database where these objects did not exist yet, and the connector hangs on them (D-387).
+-- Everything else is exactly what is below.
+
 -- 0081 — Link previews (Will, 9 October 2026: "add links shared go on the
 -- list, with social image previews … Go ahead and set up server function").
 -- D-407.

@@ -11345,11 +11345,16 @@ reported if flagged."
   gate on the merge: nothing that was private becomes visible. It is Will's call
   whether the two member accounts on the live project get a courtesy heads-up
   anyway; it blocks nothing.
-- **The apply step is one file** (`packages/db/manual/2026-10-09-photos-documents-
-  links-and-languages.sql`): 0079 + 0080 + 0081 + 0085 in one transaction, for
-  the SQL editor because the connector stops at a `drop`. It refuses a database
-  that lacks 0078 or 0084, checks its own work and rolls back if a bucket is
-  public or a policy missing, records the four in the ledger, and is safe to run
-  twice. Proved on a database shaped like the live one (0001–0078 and 0082–0084):
-  run twice, then the whole policy suite; and proved to refuse and to roll back
-  (nothing left behind). A test stops it drifting from the migrations.
+- **How the migrations went in.** The connector hangs on `drop` statements
+  (D-387; 60 s time-out, nothing left behind — verified). 0079, 0080 and 0081
+  contain `drop policy/trigger if exists` guards that do nothing where the objects
+  do not yet exist, so they went in through the connector one by one **without
+  those guards** (0080 keeps its two real constraint replacements) and were read
+  back. 0085 must really drop two function signatures; it still hangs. So it is one
+  short file for the SQL editor (`packages/db/manual/2026-10-09-language-where-
+  there-is-no-profile.sql`: pre-flight, self-check that rolls back, ledger row,
+  twice-safe; proved on a live-shaped database, refused/rolled back as it should),
+  guarded against drift by a test.
+- **Nothing waits on 0085.** The app asks with `p_language` and, if the database
+  has no such parameter (PGRST202, raised before anything runs), asks again
+  without it (`rpcLanguage.ts`). Remove that helper once 0085 has been live a while.

@@ -35,14 +35,14 @@ Update the number in the second column when you claim it, and name the branch.
 |---|---|---|---|
 | Decision | **D-429** | `DECISIONS.md` (`### D-nnn — …`) | `claude/gallant-clarke-0dhizj` (D-422–D-426, D-428); `claude/affectionate-goldberg-tvu4sz` (D-427) |
 | SOP amendment | **A26** | `docs/sop-amendments.md` (`## Ann — …`) | `claude/gallant-clarke-0dhizj` (A24, A25) |
-| Migration | **0086** | `packages/db/migrations/nnnn_name.sql` | `claude/gallant-clarke-0dhizj` (0083, 0084, 0085 — 0085 is held, applied by hand with 0079–0081) |
+| Migration | **0086** | `packages/db/migrations/nnnn_name.sql` | `claude/gallant-clarke-0dhizj` (0083, 0084 live; 0085 written, not applied — by hand, nothing waits on it) |
 | Changelog | **0.51.1** or **0.52.0** | `CHANGELOG.md` (`## [x.y.z] — …`) | `claude/gallant-clarke-0dhizj` (0.50.1, 0.51.0) |
 
-Held numbers, so nobody reuses them: **0079, 0080, 0081** (photos, documents,
-link previews — on `claude/pam-storybook`, not live, "tell members first").
-Live but numbered out of order: **0082** (`admin_reaches_assigned_only`) was
-applied before 0079–0081; the ledger reads 0078, 0082, 0083, 0084 and that is
-expected.
+Live but numbered out of order: **0082** (`admin_reaches_assigned_only`) was applied
+first, then 0083 and 0084, then 0079, 0080 and 0081 (photos, documents, link
+previews — `claude/pam-storybook`), all on 9 October; the ledger lists them by
+the time they were applied and that is expected. **0085** is written and tested but
+not applied (`packages/db/manual/`).
 
 ## Live project
 

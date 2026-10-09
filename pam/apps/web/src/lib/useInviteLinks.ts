@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import type { InviteRole } from './appUrl';
+import { rpcWithLanguage } from './rpcLanguage';
 
 /**
  * Invite links after they are made (0071; D-258, reworked by D-263).
@@ -97,11 +98,12 @@ export function isEmailAddress(value: string): boolean {
 export async function requestInviteLink(code: string, email: string, language = 'en'): Promise<boolean> {
   try {
     const { createClient } = await import('./supabase');
-    const { error } = await createClient().rpc('request_invite_link', {
-      p_code: code,
-      p_email: email.trim(),
-      p_language: language,
-    });
+    const { error } = await rpcWithLanguage(
+      createClient(),
+      'request_invite_link',
+      { p_code: code, p_email: email.trim() },
+      language,
+    );
     return !error;
   } catch {
     return false;

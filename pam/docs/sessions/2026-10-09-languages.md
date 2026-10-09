@@ -114,19 +114,18 @@ added:
 
 ## Needs a human
 
-- Will, decided 9 October: **the merge to `main` is held** until 0079–0081
-  (photos, documents, link previews) are live and members are told, because this
-  branch carries that UI (STATUS row 36, `docs/before-launch.md`). Everything
-  else is done: pushed, checked on the merged tree, 0083 and 0084 live.
+- Will, 9 October: the merge to `main` was held until 0079–0081 (photos,
+  documents, link previews) were live; then "Photo and messages are treated the
+  same. Only reported if flagged." (D-428). **0079–0081 are now live**, so what is
+  left is Will's word to merge (STATUS row 36, `docs/before-launch.md`).
 - Will: a native reader for each new language (above), and a yes/no per SMS/email
   template for the languages it is not yet written in.
 - Will: whether the language picker should be limited for staff (it is not;
   default left open, because a case manager may be a Russian speaker too).
 - Will: before translation is switched on — the provider's no-retention terms in
   writing, the wording that tells members first, a per-person cap.
-- Whoever applies 0079–0081 next: `list_migrations` first. 0083 and 0084 are
-  already live ahead of them, so the ledger now reads 0078, 0082, 0083, 0084
-  and the three are still to come.
+- Whoever applies 0085: `list_migrations` first. The ledger reads 0078, 0082,
+  0083, 0084, 0079, 0080, 0081 (in the order they were applied).
 
 
 ## Part 2 — merged, applied, and the rest of the ask (same session)
@@ -175,7 +174,7 @@ up on their desired language … implement it."
   email provider are all in `docs/before-launch.md`.
 - **The `copy:draft` network call has not run** (no API key here); its prompt,
   parsing and batching are tested against a fake provider.
-- **0085 is not applied** — nor 0079–0081. They are now one file, `packages/db/manual/2026-10-09-photos-documents-links-and-languages.sql`, for Will to paste into the SQL editor (D-428); then the merge. Will said photos follow the message rule, which the database confirms, so "tell members first" no longer blocks it.
+- **0085 is not applied; nothing waits on it.** 0079–0081 *were* applied (below). 0085 replaces two functions, the connector timed out on its `drop function` (again leaving nothing behind), so it is one short file, `packages/db/manual/2026-10-09-language-where-there-is-no-profile.sql`, for Will to paste whenever convenient (D-428). The app asks for the language and falls back without it (`rpcLanguage.ts`), so the merge does not wait.
 - **The `PAM Language fit` workflow has not run on GitHub** (only its commands
   locally), and `scripts/fit-known.json` it reads **does not exist yet**: the audit
   that would write it (`--write-known`) is slow (~110 minutes for all eight
@@ -183,3 +182,31 @@ up on their desired language … implement it."
   or UI will fail it once, listing the defects to look at and accept. The
   seven-language audit of 9 October (D-422) found 21 new defects after the fixes,
   each looked at, listed in D-422.
+
+## Part 3 — photos, documents, link previews live; 0085 left for Will
+
+Will: "Photo and messages are treated the same. Only reported if flagged." Then:
+"Still need me to paste file to Supabase?"
+
+- **Checked, not assumed.** 0079/0080 policies and the privacy copy do exactly
+  that (D-428). Link previews are stricter still.
+- **0079, 0080 and 0081 applied through the connector** after `list_migrations`
+  showed no drift. The first attempt at 0079 timed out (60 s) on its `drop policy
+  if exists` guards and left nothing behind (no bucket, functions, policies,
+  constraint or ledger row; no hung query). Retried without the guards — no-ops
+  on objects that did not exist — and it went in; 0080 kept its two real
+  constraint replacements and went in; 0081 likewise. Read back: three private
+  buckets (5 / 10 / 2 MB), seven storage policies, the preview table with row
+  security forced, one policy, no write for signed-in users and no read for
+  `anon`; the two attachment constraints; `anon` cannot call the new functions.
+  `get_advisors`: nothing new for `anon`. The applied SQL is the migration files'
+  statements minus those guards (stated in each migration's comment).
+- **0085 timed out** on its real `drop function` and left nothing behind (checked
+  the same way). Rather than make Will paste before merging, the app now asks
+  with the language and, on PGRST202 ("no such function"), asks again without it
+  (`apps/web/src/lib/rpcLanguage.ts`, 4 tests). The short 0085 file replaces the
+  four-in-one file; proved again on a database shaped like the live one: refused
+  without 0084, rolled back (no columns, no ledger row) when its own check failed,
+  twice-safe.
+- **Left:** Will's word to merge; one photo, document and link between two test
+  accounts; 0085 whenever convenient.

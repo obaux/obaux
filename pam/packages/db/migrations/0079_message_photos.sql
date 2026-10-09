@@ -1,3 +1,7 @@
+-- APPLIED to the live project on 9 October 2026, through the connector, without three `drop policy if exists` guards and one `drop constraint if exists`:
+-- no-ops on a database where these objects did not exist yet, and the connector hangs on them (D-387).
+-- Everything else is exactly what is below.
+
 -- 0079 — Photos in a conversation (Will, 8 October 2026: "let's build the
 -- photo storage and update the privacy policy and what we tell members and
 -- staff about it"). D-394.
