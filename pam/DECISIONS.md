@@ -10045,7 +10045,336 @@ list. This will help users access files / photos shared easily."
 - Stories: Member and Case manager › *Photos and documents*; the prototype
   route; the flow map's options node gains the page.
 
-### D-403 — Spanish, spelled properly: accents, ñ and ¿ restored across `es.json`
+
+### D-403 — One tab bar on every tab: the fade everywhere, no line, nothing cross-faded
+
+**Date:** 2026-10-09. Will, of the member app: "notice how switching tabs
+doesn't always look the same. The white fade glitches, trips it doesn't
+always show. And the line appear in trips when it should look like explore,
+clean no line. Line is only for messages. And white fade should be loaded
+ahead of time before the person switches tab."
+
+Three causes, found by recording a switch frame by frame in Storybook (the
+tab bar exists only in the prototype, `LocalTabBar`):
+
+- **The line.** The bar had a 1px top border. On every tab but Trips the
+  last row of its own fade, the page colour, covered it; Trips turned the
+  fade off (D-285), so only Trips showed the line. The border is gone: the
+  fade is the bar's edge on every tab. The one line left on a tab screen is
+  a floating row's own (Messages' "People who offered help"), as Will wants.
+- **Trips without a fade.** The fade was off there because Trips' drawer
+  rests on the bar, and docked (100px) it would be washed out under a 96px
+  fade. Now the bar keeps its fade on every tab — it is the same element
+  everywhere, so a switch changes nothing but the lit tab — and the drawer
+  sits above it (z-index 11 over the bar's 10). The drawer draws the same
+  fade at the foot of its own list, `edgeFade.inScroll`: sticky to the
+  bottom of the list, so cards dissolve into the bar exactly as Explore's
+  do, and its own 96px at the end is the room the last card scrolls clear
+  into. (The list's bottom padding went: a sticky element stops short of
+  its scroller's padding, which first left the fade floating 96px above the
+  bar, over the middle of a card.) This supersedes D-285 for Trips; a strip
+  resting on the bar still draws its own fade above itself.
+- **The glitch.** The bar keeps still in a switch (D-269, its own
+  view-transition layer), but the browser still cross-faded its old and new
+  pictures: for the length of the switch two tabs were lit and the fade
+  thinned and came back. Its old picture is now hidden and the new one shown
+  at once (`globals.css`). And Astryx fades a tab's colour over 125ms, which
+  showed the new tab's filled icon dark for a beat before it turned pink; a
+  tab now lights at once (`transitionProperty: none` on the tab).
+
+"Loaded ahead of time": the fade is StyleX in the global stylesheet and the
+bar never unmounts in a switch, so with the fade on for every tab there is
+nothing left to arrive late. The page content keeps D-269's quick
+cross-fade.
+
+### D-404 — Photos and documents, laid out to read
+
+**Date:** 2026-10-09. Will, of the page from D-402: "let's just merge
+documents together. Also, we need timestamps on photos too. Let's clean up
+layout so it reads better with times on end. Also let's make doc container
+spread full width. Add timestamp and person's name inside it, and list them
+one on top of the other. Photos can be handled like a slider with carousel
+and timestamp under photo. Add more gap between doc list and photo list."
+
+- **Photos** are a row you swipe (Astryx's `Carousel`, snapping a photo at a
+  time, with its own next and previous buttons while there is more to
+  see), 200px square, so
+  the next photo shows at the edge and says there is more. Under each: who
+  sent it, then "Oct 9 · 2:14 PM". A screen reader hears the date and time
+  in the photo's name too. A tap still opens the viewer, paging through all
+  of them.
+- **Documents** are one list — PDFs, Word files and Google Docs together,
+  newest first — one card on top of the other, each the full width. Inside
+  each card: the name; "Teresa · PDF · 180 kB" (who first); and at its end
+  the date over the time. The conversation's own cards are unchanged.
+- **32px** between the photos and the documents (was 16).
+- Storybook's example conversation has three photos now, not one, so the
+  row has something to swipe (Storybook pictures only).
+
+### D-405 — The policies alert's action is one word: "Sign"
+
+**Date:** 2026-10-09. Will, on Trips' warning banner ("Sign 3 policies for
+Example Learning Center before you go · Sign now"): "Alert action 'Sign'
+only. Short and sweet."
+
+- `trips.added.policies.action` is "Sign" (was "Sign now", D-284's banner).
+  Spanish already said "Firmar". The banner's title before it says what is
+  signed and for where, so the link needs no more; it still opens that
+  program's policies.
+- Storybook's Foundations › Actions guide quotes the new label.
+
+### D-406 — Under a photo, the name is set like the time
+
+**Date:** 2026-10-09. Will, on the Photos and documents page (D-404):
+"Match name style to subtitle style."
+
+- Under each photo, who sent it is now the same 14px secondary grey,
+  regular weight, as the "Oct 8 · 7:47 AM" line under it (it was 16px
+  semibold black). The two lines read as one quiet caption, and the photo
+  stays the thing you look at. The document cards are unchanged.
+
+### D-407 — Stuff shared: one flat list, who and when at the end, titles that slide, and link previews from Pam's server
+
+**Date:** 2026-10-09. Will, after the carousel (D-404): "I don't like the
+image carousel. Scratch that idea. Instead let's just title page: Stuff
+shared, and create a flat list item, similar to policy item (not a card
+with shadow) … photo (tiny preview), docs (any kind) and also links … with
+social image previews. Let's mockup some versions … before you build."
+Four mockups went up (A one list, B by day, C filters, D bigger previews).
+He chose: "Go ahead and set up server function. Let's go with list A. But
+instead of chevron, add timestamp and person there, tucked at the end.
+Let's keep asset title labels max at 1 line, but animate text through
+horizontally when text truncates so they can see end of long named files."
+
+- **The page** is "Stuff shared" (es "Cosas compartidas"), the ⋯ page's
+  row too. One list, newest first, in the policy row's shape (`MenuList`,
+  D-210: 64px, 18px name, 14px grey line, dividers), no sections, no
+  carousel, no card. Where the icon goes, a 48px preview: the photo; a
+  document's icon on a tint of its colour (PDF red, Word and Google Docs
+  blue, Google Sheets green); a link's picture, or a globe. Then the name,
+  then what it is ("PDF · 180 kB", "Opens in Google", the site), and at the
+  end, where the chevron was, who sent it over when (the time today,
+  "Yesterday", or the day). A screen reader hears all of it on the row
+  ("… Sent by Teresa, Oct 8, 7:47 AM"). A photo opens the viewer and pages
+  through every photo; a document downloads with the person's sign-in; a
+  Google Doc or a link opens in a new tab. The mockup stories are gone —
+  Storybook shows what is built.
+- **One-line names that slide** (`MarqueeText`, @pam/ui). A name that fits
+  never moves. One that is cut off shows an ellipsis; when its row comes
+  into view it waits a beat, slides left until the last letter shows
+  ("…center.docx"), holds, and slides back — once, in five seconds at most,
+  replayed each time the row comes back into view. It never loops: moving
+  text that starts by itself must stop within five seconds or offer a pause
+  (WCAG 2.2.2), and a list of names sliding forever would be the busiest
+  thing in the app. Rows that arrive together are staggered. With reduced
+  motion it never moves. The whole name is always there for a screen reader.
+- **Link previews come from Pam's server** — the `link-preview` Edge
+  Function, deployed 9 October (verify_jwt on) — because a phone cannot read
+  another site's preview: browsers will not hand one site's page to
+  another. It is asked with the person's own sign-in when a link is sent,
+  and from Stuff shared for any older link without one. It asks the
+  database, as the person, which of the (at most ten) messages are in their
+  own conversations (`link_preview_targets`, 0081), opens each page once,
+  and keeps the title, site name and a *copy* of the picture in a private
+  bucket — so looking at the list contacts nobody else; only tapping the
+  link does. A page it cannot read is remembered ('none') so it is never
+  asked twice.
+- **What the server will open** is the security line (`preview.ts`, 17 unit
+  tests): https on the usual port only; no user name or password in the
+  address; never a local name (`localhost`, `.local`, `.internal`, …) or a
+  private, loopback, link-local, carrier-grade-NAT, documentation, multicast
+  or reserved address, however written (`::ffff:127.0.0.1`, `0x7f000001`,
+  `169.254.169.254`); every address a name resolves to must be public;
+  redirects followed by hand (three at most) and checked again; 5 seconds,
+  512 KB of page (only its head is read), 2 MB of picture, JPEG/PNG/WebP/GIF
+  only. Where the runtime cannot look names up, the name checks stand alone.
+  It logs counts, never addresses.
+- **0081** (`test/17_link_previews_test.sql`): `message_link_previews`
+  (forced RLS; the two people in the conversation read it; nobody signed in
+  writes it; a trigger files each preview under its message's
+  conversation), the private `link-previews` bucket (2 MB, pictures, read by
+  the same two), and `link_preview_targets`. No admin sees a preview,
+  reported or not — transparency `message_link_previews`; a report shows
+  the message, whose words carry the link. Privacy notice, what we keep:
+  "When you send a link, Pam's server opens the page once to get its title
+  and picture … Your phone does not visit the page until you tap the link."
+- **Not live yet:** 0081 joins 0079 and 0080 in one SQL-editor file for
+  Will (tested through 0078, twice, then the whole policy suite). Until it
+  runs the function answers "not allowed" and every link shows as its
+  address with a globe.
+- **Still open from Will's "docs (any kind)":** uploads stay PDF and Word
+  (0080's list), Google Docs/Sheets/Slides/Forms/Drive as links. Widening
+  the list (Excel, PowerPoint, text) is a change to 0080 before it ships.
+- The document card drops D-404's "who · …" line, stamp and wide size;
+  nothing else used them.
+
+### D-408 — What can be attached: JPEG, PNG or an iPhone photo; a PDF or a Word file; and all of it by pasting
+
+**Date:** 2026-10-09. Will, answering D-407's open question about "docs
+(any kind)": "Docs only word docs and pdfs for now. Images, any jpeg, png.
+Or iPhone photo. Also allow users to paste these things into chat composer."
+
+- **Documents stay PDF and Word** (`.pdf`, `.doc`, `.docx` — 0080's list,
+  unchanged). D-407's "widening the list is a change to 0080 before it
+  ships" is closed: it is not widened.
+- **Photos are JPEG, PNG or an iPhone's HEIC/HEIF** (`photoType` in
+  `lib/messagePhoto.ts`, by type, or by name when the phone gives no type).
+  Everything else that is a picture — GIF, WebP, SVG, BMP, TIFF, AVIF — is
+  refused in words, like any other file Pam does not take. Whatever comes
+  in, a JPEG goes out (shrunk to 1,600px, re-drawn so where and when it was
+  taken is gone — D-394); a PNG's see-through parts become white rather than
+  the black a JPEG would otherwise give them.
+- **iPhone photos without a converter.** The photo button asks for
+  `image/jpeg,image/png` only. That is deliberate: when a web page asks for
+  those, an iPhone hands over its HEIC photos already turned into JPEGs —
+  the phone does the work, and Pam ships no HEIC decoder (a large library,
+  for a case the phone already handles). A HEIC that arrives another way —
+  dropped or pasted, on a computer — is opened by the browser if it can
+  (Safari can); where it cannot (Chrome, Firefox), the person is told so:
+  "This browser can't open that iPhone photo. Try sending it from your
+  phone." A JPEG or PNG that will not open says "That photo couldn't be
+  opened. Try another one." Neither sends nothing silently.
+- **The photo is shrunk when it is picked, not when it is sent**, so the
+  preview above the box is the picture that will go, and a photo that cannot
+  be opened is caught at once, where the person is looking. The send then
+  uploads it as it is (`isReady`), without shrinking it twice.
+- **Pasting.** A photo or document pasted into the message box is taken the
+  same way as one picked with a button or dropped on the conversation — one
+  `take()` for all of them, with the same refusals. Astryx's composer hands
+  over pasted files; where a browser offers a pasted picture only as a
+  clipboard *item* (some do, after "Copy image"), the composer's `onPaste`
+  takes it from there instead of pasting nothing. Pasted words are still
+  words. Only the first file is taken, as with the buttons.
+- The refusal now says what *is* taken: "Pam can send a photo (JPEG, PNG or
+  from an iPhone), a PDF or a Word file." (es "Pam puede enviar una foto
+  (JPEG, PNG o de un iPhone), un PDF o un archivo de Word.")
+- No database change. The app only ever uploads the JPEG it makes; the
+  `message-photos` bucket's own list (0079: JPEG, PNG, WebP, 5 MB) is wider
+  than that and is left alone, since 0079 is already in the SQL-editor file
+  Will has. The documents bucket takes only PDF and Word (0080).
+
+### D-409 — Photo, Document or Link — never the format; a file Pam can't take shakes its alert
+
+**Date:** 2026-10-09. Will, looking at Stuff shared: "for our own backend
+classification of asset format is good. But for the end user, they only care
+if it's a link, doc, or photo. So the formats don't need to show. Also let's
+set up alerts banner when file not supported is pasted or tried to be
+attached into composer. Have the alert shake a bit so it communicates
+something off. Similar to industry standard micro interaction patterns."
+
+- **One word for what a thing is.** On Stuff shared the line under each name
+  is now "Photo", "Document" or "Link" (es "Foto", "Documento", "Enlace") —
+  never "PDF · 180 kB", "Word document · 47 kB", "Opens in Google" or the
+  site's name. A Google Doc, Sheet or Slides is a "Document" there. The
+  document card in a conversation, and above the box once one is picked,
+  says "Document" under its name the same way, and a screen reader hears
+  "Open Lease.pdf, document". Sizes go too: they are a format's detail, and
+  10 MB is the most anyone can send.
+- **Pam still tells formats apart underneath**, where that is its job, not
+  the person's: what it accepts (D-408), how it stores and opens each one,
+  and the preview's icon and colour (a red PDF, a blue page) — the icon is a
+  picture of the thing, not a label to read. The file's own name is left as
+  it was sent, ".pdf" and all: it is the sender's name for it.
+- **The Google card in a conversation keeps "Opens in Google".** That is
+  what tapping it does, not what format it is, and D-399's reason stands —
+  nobody should be surprised to leave Pam.
+- **A file Pam can't take gets Pam's alert banner**, in the box where the
+  file would have gone: Astryx `Banner`, status warning — the same yellow
+  alert as Trips' reminder to sign (D-405) — with a short title and what to
+  do: "Pam can't send that file / Send a photo, a PDF or a Word file."; "That
+  file is too big / Send one smaller than 10 MB."; "This browser can't open
+  that iPhone photo / Try sending it from your phone."; "That photo couldn't
+  be opened / Try another one." It is announced as an alert, and closes with
+  a 48px ×, or goes by itself when a file is taken or the message is sent.
+  The refusal is the one place that still names PDF and Word: it is where a
+  person needs to know which documents work.
+- **The shake.** Once, under half a second (450 ms), side to side and
+  settling — 8, 7, 5, 4, 2, 1 px — the wrong-passcode shake people already
+  read as "something's off". Each new refusal is a new banner, so a second
+  wrong file shakes again and is announced again rather than sitting
+  unchanged. With reduced motion it does not move. No vibration: it is not
+  available on iPhones, and a banner that buzzes on some phones and not
+  others says two different things.
+- Storybook: Member › Created › "A conversation — a file Pam can't send"
+  (pastes a GIF on load).
+
+### D-410 — A link shows where it goes; who and when stay
+
+**Date:** 2026-10-09. Will, after D-409: "Link makes sense to show. From who
+and when also makes sense."
+
+- **A link's line on Stuff shared is its address** — "example-library.org"
+  under the page's title — not the word "Link" (D-409) and not the name the
+  page gives itself ("Example Library", 0.49.0). The address, because it is
+  the one thing about a link a page cannot make up: any page can call itself
+  a library or a bank in its preview, but not change where it actually is.
+  "www." is dropped.
+- With no preview yet (0081 not run, a page that could not be read), the
+  row's name is already the address ("example-transit.org/route-47"), so the
+  line under it says "Link" rather than repeat it.
+- Photos and documents keep D-409: "Photo", "Document". Who sent it over when
+  stays at the end of every row, as D-407 put it.
+
+### D-411 — A conversation's header like every other; ⋯ outlined; Messages rows flush left; nothing chosen when a dialog opens
+
+**Date:** 2026-10-09. Will: "The messaging screen, the message item, let's
+remove left padding, and keep right padding. On message thread screen, I
+don't like the fade on top, keep the same header position, circle button, as
+the regular. The compact view is not great, because the top buttons aren't
+positioned in same place across other pages. The ellipsis more actions
+button needs a grey outline and shadow. It's getting missed. Also why are
+buttons automatically selected on modals etc? like uncheck confirmation
+modal. Or image preview full screen X button. Those should not be auto
+selected. Only input fields ready to type (except sign in)."
+
+- **A conversation uses the regular nested-page header** (`SubPageHeader`,
+  D-213): the round back at the top left and ⋯ at the top right, in exactly
+  the places they are on Legal or a place (measured the same to the pixel),
+  then the name, large, and who they are under it on one line (D-400's one
+  line kept, as `hasOneLineSubtitle`). The frame takes `Page`'s own padding
+  (24px top, 16px sides) so the bar lands where `Page` puts it. The compact
+  variant is gone from `SubPage` — the conversation was its only user — and
+  its stories with it. The header is taller than the one-row bar was — the
+  name is large now — which is the price of the buttons not moving between
+  screens.
+- **No fade under the header.** D-400's blur and white fade is removed; the
+  messages go under the header's edge. The composer's frosted dock at the
+  bottom stays (Will named the top).
+- **⋯ is outlined and lifted**, everywhere it appears in a bar — a
+  conversation, a place, What you sent — and a place's save button beside it:
+  `roundAction` (@pam/ui), 48px, the page's colour, Astryx's *emphasized*
+  border (#CCD3DB — the default border, 8% black, is what made it vanish) and
+  a soft shadow.
+- **Messages rows have no left padding**: the avatar starts at the page's
+  16px edge; the right keeps the list's 12px for the time. Done on both the
+  app's `ConversationRow` and the redesign's `MessagesView` (Storybook). Set
+  as `paddingInline`, the property Astryx's Item sets with doubled
+  specificity — a `paddingInlineStart` loses to it.
+- **Nothing is chosen when a dialog or sheet opens.** A modal must take focus
+  (or a screen reader stays on the page behind it), and the browser picks
+  the first button — which a phone draws as chosen and Enter presses; in an
+  "are you sure", that is the destructive one. Now focus lands on the
+  dialog's content, which is not a control: no ring, Enter does nothing, a
+  screen reader reads the question, Tab reaches the first button.
+  `landFocus` (@pam/ui) does it for Pam's `ConfirmDialog` (every "are you
+  sure", D-234), the Bring a friend sheet and a place's opening-hours sheet
+  (the native `autofocus` attribute, which `showModal()` honours inside a
+  dialog, plus Astryx's `data-autofocus`). The photo viewer (Astryx
+  Lightbox, which gives no say) moves focus to itself in a layout effect
+  right after it opens, before anything is painted — Chromium ignores
+  `autofocus` on the dialog element itself. The info popovers already
+  focused their panel, not a button; left as they are.
+- **Undo check-in** (the "uncheck" confirmation) was Astryx's
+  `AlertDialog`, which always opens with Cancel chosen and has no way to
+  change it. It is now Pam's `ConfirmDialog`, like every other question Pam
+  asks: "Undo Marcus's check-in?", Undo check-in as the big button, Keep it
+  under it.
+- **Fields still get focus** where typing is the point: the search boxes,
+  New message's search, the area picker, the first field of joining. Sign in
+  does not focus its field on arrival (it did not before either), so the
+  keyboard does not cover the page before it is read.
+
+### D-412 — Spanish, spelled properly: accents, ñ and ¿ restored across `es.json`
 
 **Date:** 2026-10-09. Will: "Do a careful proofreading pass over `es.json`
 only … restore accents and ñ where standard Spanish requires them." The pass
@@ -10102,9 +10431,9 @@ D-399 left for later.
   `transparency.canSee.goals` lacks its "en" ("quiere trabajar en");
   `privacy.s.sharing.p2` wants the subjunctive ("se inscriba"). Listed in
   STATUS's backlog for a wording pass that someone fluent signs off.
-- **Numbered D-403, written as D-400.** Another session's D-400–D-402 (and
-  0.47.1/0.48.0) reached `claude/pam-storybook` while this pass was being
-  checked; this one was not yet pushed, so it took the next numbers (D-403,
-  0.48.1) and was rebuilt on top of theirs. Their seven new Spanish strings
+- **Numbered D-412 (first D-403, written as D-400).** Another session's
+  D-400–D-402 reached `claude/pam-storybook` while this pass was being
+  checked, so it took D-403; that session then used D-403–D-411 as well, and
+  this was renumbered when the two branches were merged (D-412, 0.50.1). Their seven new Spanish strings
   (D-402's Photos and documents page) were already accented; none of the 172
   strings here was one they had changed.

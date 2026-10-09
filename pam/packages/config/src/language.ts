@@ -40,7 +40,7 @@ export const FORBIDDEN_UI_TERMS: readonly string[] = [
 
 /**
  * The same rule in every other language Pam speaks (added with the languages,
- * D-404). Matching is by substring — `includes` on the lower-cased text — so
+ * D-413). Matching is by substring — `includes` on the lower-cased text — so
  * each entry is a stem chosen not to sit inside an ordinary word. That is why
  * Portuguese has no bare "preso" (inside "surpreso", surprised), "detento"
  * (inside "detentor", holder), "recluso" or "cadeia" (a chain), and why Arabic

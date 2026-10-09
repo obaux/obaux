@@ -27,7 +27,7 @@
  *   changes  — the newest decisions this flow shows, newest first
  */
 
-export const UPDATED = '2026-10-08';
+export const UPDATED = '2026-10-09';
 
 /** Where each screen opens live — the branch's Storybook on Chromatic. */
 export const STORYBOOK_URL = 'https://claude-pam-storybook--6abea9193da46b88ce90890f.chromatic.com';
@@ -223,24 +223,24 @@ export const flows = [
         title: 'Trips',
         story: 'member-created--trips',
         path: '/trips/',
-        changed: 'D-336',
-        note: 'Signatures needed / Policies signed per visit\'s service; a banner for the soonest trip still to sign',
+        changed: 'D-403',
+        note: 'Signatures needed / Policies signed per visit\'s service; a banner for the soonest trip still to sign. The list fades into the tab bar like every tab, no line',
       },
-      messages: { title: 'Messages', story: 'member-created--messages', path: '/messages/' },
+      messages: { title: 'Messages', story: 'member-created--messages', path: '/messages/', changed: 'D-411', note: 'Rows start at the page edge' },
       thread: {
         title: 'A conversation',
         story: 'member-created--conversation',
         path: '/messages/thread/',
-        changed: 'D-401',
-        note: 'Under the name: Program lead at the program, or Case manager. Photos and documents (PDF, Word); Google Docs links as cards; mine green, theirs grey; drag sideways for the times. With a program: the booked visit on top, opening the place',
+        changed: 'D-411',
+        note: "Header as on every nested screen: back, ⋯, the name large, no fade. Photos and documents picked, dropped or pasted; a file Pam can't take gets an alert that shakes",
       },
-      options: { title: 'Conversation options', story: 'member-created--conversation-options', path: '/messages/thread/options/', changed: 'D-402', note: 'Photos and documents first, then View program details (a program), then Report' },
+      options: { title: 'Conversation options', story: 'member-created--conversation-options', path: '/messages/thread/options/', changed: 'D-407', note: 'Stuff shared first, then View program details (a program), then Report' },
       files: {
-        title: 'Photos and documents',
+        title: 'Stuff shared',
         story: 'member-created--conversation-files',
         path: '/messages/thread/files/',
-        changed: 'D-402',
-        note: 'Everything shared in this conversation: photos as a grid that opens full size, documents and Google Docs as their cards, newest first, who and when',
+        changed: 'D-410',
+        note: 'One flat list, newest first: photos, documents and links with a small preview, the name on one line (slides to show a long name\'s end), then Photo, Document or the link\'s address, and who over when at the end. Links show their page\'s title and picture, fetched by Pam\'s server',
       },
       profile: {
         title: 'Profile',
@@ -292,7 +292,7 @@ export const flows = [
       ['newTrip', 'explore', 'Visit moved: confetti, then home', { dashed: true }],
       ['messages', 'thread', 'Open'],
       ['thread', 'options', '⋯'],
-      ['options', 'files', 'Photos and documents'],
+      ['options', 'files', 'Stuff shared'],
       ['profile', 'connections', 'Connections'],
       ['connections', 'thread', 'Message (round button)', { dashed: true }],
       ['profile', 'reminders', 'Get text reminders'],
@@ -305,6 +305,12 @@ export const flows = [
       ['profile', 'points', 'Points'],
     ],
     changes: [
+      "D-411 — a conversation: back and ⋯ where every nested screen has them, the name large, no fade; ⋯ outlined; Messages rows start at the page edge; dialogs open with no button chosen",
+      'D-410 — Stuff shared: a link shows its address under its title; who and when stay at the end',
+      "D-409 — Stuff shared and documents say just Photo, Document or Link; a file Pam can't take gets a yellow alert in the box that shakes",
+      'D-408 — a conversation: photos are JPEG, PNG or from an iPhone, documents PDF or Word; paste either straight into the message box',
+      'D-407 — Stuff shared (was Photos and documents): one flat list of photos, documents and links, who and when at the end, long names slide to their end, link previews from Pam\'s server',
+      'D-403 — the tab bar is the same on every tab: the fade always there (Trips too), no line, no flicker when switching',
       'D-402 — a conversation\'s ⋯: Photos and documents, everything shared in it in one place (photos open full size and page through; documents and Google Docs as cards)',
       'D-400–401 — a conversation: a smaller visit card and a blurred fade under the header; one line under the name; an even frame round photos; the send button tucked into a rounder corner; photos open on near-black',
       'D-399 — a conversation: send a PDF or Word file (the document button, or drop it on), opened when tapped; a Google Docs link shows as a card that opens it in Google',
@@ -351,8 +357,8 @@ export const flows = [
         title: 'A conversation',
         story: 'case-manager-screens--conversation',
         path: '/messages/thread/',
-        changed: 'D-401',
-        note: 'Photos: send one, tap one to see it full size. Mine green, theirs grey; drag sideways for the times',
+        changed: 'D-411',
+        note: 'The header as on every nested screen, no fade. Photos: send one, tap one to see it full size. Mine green, theirs grey',
       },
       profile: { title: 'Profile', story: 'case-manager-screens--profile', path: '/profile/' },
       programs: { title: 'All programs', story: 'case-manager-screens--all-programs', path: '/programs/' },
@@ -383,7 +389,7 @@ export const flows = [
       ['programs', 'addProgram', 'Add'],
       ['profile', 'alerts', 'Text alerts'],
     ],
-    changes: ['D-400–401 — a conversation: a smaller visit card and a blurred fade under the header; one line under the name; an even frame round photos; the send button tucked into a rounder corner; photos open on near-black', 'D-399 — a conversation: send a PDF or Word file (the document button, or drop it on), opened when tapped; a Google Docs link shows as a card that opens it in Google', 'D-395 — a conversation: under the name, who they are in full (Program lead at Example Food Pantry; Case manager), not a cut-off tag', 'D-394 — a conversation: send a photo (the picture button beside the mic), tap one to see it full size; only the two people see it, and whoever checks a report about it', 'D-390 — a conversation: mine light green, theirs grey, no name or time on a bubble; drag sideways to see the times; closer to the edges; bolder mic and send', "D-389 — a conversation: one divider per day (Today, Yesterday, a weekday, a date), each bubble just its time; the composer one rounded box, mic left, round send grey until there is text, then dark green", 'D-347 — Add a program asks one question a screen, then a review', 'D-315 — a case manager can invite a case manager', 'D-263 — Invite someone makes the link straight away', 'D-260 — text alert switches'],
+    changes: ["D-411 — a conversation: back and ⋯ where every nested screen has them, the name large, no fade; ⋯ outlined; Messages rows start at the page edge; dialogs open with no button chosen", 'D-400–401 — a conversation: a smaller visit card and a blurred fade under the header; one line under the name; an even frame round photos; the send button tucked into a rounder corner; photos open on near-black', 'D-399 — a conversation: send a PDF or Word file (the document button, or drop it on), opened when tapped; a Google Docs link shows as a card that opens it in Google', 'D-395 — a conversation: under the name, who they are in full (Program lead at Example Food Pantry; Case manager), not a cut-off tag', 'D-394 — a conversation: send a photo (the picture button beside the mic), tap one to see it full size; only the two people see it, and whoever checks a report about it', 'D-390 — a conversation: mine light green, theirs grey, no name or time on a bubble; drag sideways to see the times; closer to the edges; bolder mic and send', "D-389 — a conversation: one divider per day (Today, Yesterday, a weekday, a date), each bubble just its time; the composer one rounded box, mic left, round send grey until there is text, then dark green", 'D-347 — Add a program asks one question a screen, then a review', 'D-315 — a case manager can invite a case manager', 'D-263 — Invite someone makes the link straight away', 'D-260 — text alert switches'],
   },
   {
     key: 'program-lead',
@@ -578,7 +584,7 @@ export const flows = [
         title: 'With a case manager',
         story: 'super-admin-screens--thread',
         path: '/messages/thread/',
-        changed: 'D-401',
+        changed: 'D-411',
       },
       profile: { title: 'Profile', story: 'super-admin-screens--profile', path: '/profile/' },
       everyone: { title: 'Everyone', story: 'super-admin-screens--everyone', path: '/directory/' },
@@ -611,6 +617,7 @@ export const flows = [
       ['profile', 'viewAs', 'See the app as'],
     ],
     changes: [
+      "D-411 — a conversation: back and ⋯ where every nested screen has them, the name large, no fade; ⋯ outlined; Messages rows start at the page edge; dialogs open with no button chosen",
       'D-400–401 — a conversation: a smaller visit card and a blurred fade under the header; one line under the name; an even frame round photos; the send button tucked into a rounder corner; photos open on near-black',
       'D-399 — a conversation: send a PDF or Word file (the document button, or drop it on), opened when tapped; a Google Docs link shows as a card that opens it in Google',
       'D-395 — a conversation: under the name, who they are in full (Program lead at Example Food Pantry; Case manager), not a cut-off tag',

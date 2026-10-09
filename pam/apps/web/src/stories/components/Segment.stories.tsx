@@ -6,7 +6,7 @@ import { Segment } from '@pam/ui/Segment';
 import { useI18n } from '../../lib/i18n';
 
 /**
- * A choice in a segmented control that lets its words wrap (D-404). Astryx
+ * A choice in a segmented control that lets its words wrap (D-413). Astryx
  * keeps a segment to one line and trims the rest with an ellipsis; in a
  * longer language that leaves somebody choosing between "Prog…" and "Ges…".
  * Here a segment takes a second line instead, and grows to hold it.

@@ -275,6 +275,27 @@ export function threadFor(role: Role | null) {
     attachment_kind: 'photo',
     created_at: hoursAgo((THREAD.length - 2) * 6 - 3),
   });
+  // Two more (D-404), so the Photos and documents page has a row to swipe:
+  // the member sends the classroom on its own, no words, and the case
+  // worker shows the way in to the ID office.
+  rows.splice(7, 0, {
+    id: 'm-photo-room',
+    conversation_id: CONVO_ID,
+    sender_id: memberSpeaks,
+    body: null,
+    attachment_url: `${CONVO_ID}/example-room.jpg`,
+    attachment_kind: 'photo',
+    created_at: hoursAgo((THREAD.length - 5) * 6 - 1),
+  });
+  rows.splice(9, 0, {
+    id: 'm-photo-door',
+    conversation_id: CONVO_ID,
+    sender_id: staffSpeaks,
+    body: 'The way in is round the side.',
+    attachment_url: `${CONVO_ID}/example-door.jpg`,
+    attachment_kind: 'photo',
+    created_at: hoursAgo((THREAD.length - 6) * 6 - 1),
+  });
   // A document and a Google Doc (D-399): the case worker sends the letter
   // for the ID office, then the class schedule as a Google Docs link.
   rows.push(
@@ -296,8 +317,43 @@ export function threadFor(role: Role | null) {
       body: 'And the class schedule: https://docs.google.com/document/d/example-class-schedule/edit',
       created_at: hoursAgo(1),
     },
+    // A link with a preview, and a document with a name too long for one
+    // line (D-407): Stuff shared slides it to show the end.
+    {
+      id: 'm-link',
+      conversation_id: CONVO_ID,
+      sender_id: staffSpeaks,
+      body: 'This is on Saturday: https://example-library.org/events/resume-workshop',
+      created_at: hoursAgo(0.75),
+    },
+    {
+      id: 'm-file-long',
+      conversation_id: CONVO_ID,
+      sender_id: memberSpeaks,
+      body: null,
+      attachment_url: `${CONVO_ID}/resume.docx`,
+      attachment_kind: 'file',
+      attachment_name: 'Marcus Johnson resume for the warehouse job at the North Philadelphia distribution center.docx',
+      attachment_bytes: 48_128,
+      created_at: hoursAgo(0.5),
+    },
   );
   return rows;
+}
+
+/** The preview Pam's server kept for the example conversation's link (D-407). */
+export function linkPreviewsFor(_role: Role | null) {
+  return [
+    {
+      message_id: 'm-link',
+      conversation_id: CONVO_ID,
+      url: 'https://example-library.org/events/resume-workshop',
+      title: 'Free resume workshop this Saturday',
+      site: 'Example Library',
+      image_path: `${CONVO_ID}/m-link.webp`,
+      status: 'ready',
+    },
+  ];
 }
 
 export function partnerFor(role: Role | null) {

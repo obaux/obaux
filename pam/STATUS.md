@@ -354,7 +354,10 @@ card whose "Change appointment" moves the visit and returns, with address and ho
 before About; Storybook's example places now share the example set's ids, so a saved
 one shows saved from a trip too (D-281). Saving the new time celebrates it
 (confetti, the new day and time) and goes home after 5 seconds or on Go home (D-282). A 96px eased fade sits above the tab bar so lists soften into it, with room for the last card to scroll clear (D-283, D-284); a strip resting on the bar
-draws its own fade above it, and Trips has none (D-285). The tab bar exists only in
+draws its own fade above it (D-285). Since D-403 the bar is the same on every tab: no
+top line, the fade on every tab, Trips included (its drawer sits above the bar and
+draws the same fade at the foot of its list, `edgeFade.inScroll`), and a switch neither
+cross-fades the bar nor fades a tab's colour. The tab bar exists only in
 Storybook's prototype: the live app has no bottom bar until the member shell is built.
 The award tile has a "Your badge" ribbon (D-286). Place cards lead with an illustrated
 category tile (`CategoryArt`), a top-aligned save, and a quieter open line (D-287). Category chips glow behind
@@ -868,9 +871,9 @@ screen and the legal pages read the same in English and promise nothing
 new. Spanish wording questions found on the way (not spelling) are in the
 backlog below.
 
-## Conversations, redrawn (8–9 October) — 0.45.5 to 0.48.0, on the branch
+## Conversations, redrawn (8–9 October) — 0.45.5 to 0.50.0, on the branch
 
-D-389 to D-402, **on `claude/pam-storybook`, not merged to `main`.** A
+D-389 to D-411 (D-405: Trips' policies banner action is just "Sign"; D-406: a photo's name set like its time; D-408: photos are JPEG, PNG or an iPhone's, documents PDF or Word, and either can be pasted into the box; D-409: things are called Photo, Document or Link, and a refused file gets a shaking alert banner; D-410: a link shows its address instead; D-411: the conversation header is the regular one, ⋯ outlined, Messages rows flush left, no button pre-chosen in dialogs), **on `claude/pam-storybook`, not merged to `main`.** A
 conversation's header says who the person is on a line under the name —
 "Program lead at Example Food Pantry", "Case manager" (D-395). Each day opens
 with one divider ("Today", "Yesterday", a weekday, a date). Bubbles carry no name or time: mine are light green on the
@@ -905,21 +908,49 @@ photo rules; the message carries its name and size, and the file is fetched
 with the reader's sign-in only when tapped. A Google Docs link in a message
 gets a card that opens it in Google. Copy everywhere that named photos names
 documents (`test/16_message_files_test.sql`, 23 checks; legal test).
-**0079 and 0080 go to live together** in one tested SQL-editor file for Will
-(before-launch).
+**0079, 0080 and 0081 go to live together** in one tested SQL-editor file for
+Will (before-launch).
 
 **Header, composer and viewer (D-400, D-401, 0.47.1).** The visit card is
-the compact `StatusCard`; a 32px blurred fade hangs under the header so
-messages thin out instead of being cut; the subtitle is one line; the
+the compact `StatusCard`; the subtitle is one line (the blurred fade under
+the header was removed by D-411); the
 Messages list preloads the conversation's code. The composer's bottom
 corners round to 32px around the send button; photos and documents sit in
 an even 8px rim; document icons are `FileTypeIcon` in Google-Doc blue
 (`--pam-document-blue`); photos open in `PhotoViewer` on near-black with
 48px dark circle buttons.
 
-**Photos and documents page (D-402, 0.48.0).** From a conversation's ⋯:
-its photos (grid → viewer, paging), documents and Google Docs, newest first,
-with who and when — read through `useThread`, so nothing new to query.
+**The conversation's header (D-411, 0.50.0)** is the nested-page template
+every other tapped-into screen has — back and ⋯ (outlined, `roundAction`) in
+the same places, the name large, who they are on one line; no fade under it.
+Dialogs and sheets open with focus on their content, not a button
+(`landFocus`; the photo viewer focuses itself); undo check-in is a
+`ConfirmDialog`. Messages rows start at the page edge.
+
+**Stuff shared (D-402 → D-407, 0.49.0).** From a conversation's ⋯: one flat
+list of policy-style rows, newest first — a 48px preview (photo; document
+icon on its colour; a link's picture or a globe), the name on one line
+(`MarqueeText` slides a cut-off name to its end once per view, ≤5s, never
+with reduced motion), what it is in one word — Photo or Document (D-409), or
+for a link its address (D-410) — and who over when at the end. Photos open
+the viewer; documents download; Google Docs and links open in a new tab.
+**Link previews** come from the `link-preview` Edge Function (deployed 9
+October, verify_jwt): asked on send and for older links, it checks the
+person through `link_preview_targets` (0081), opens https public pages only
+(SSRF guard in `preview.ts`), and keeps title, site and a copy of the
+picture in the private `link-previews` bucket (`test/17`, 17 unit tests).
+**0081 is not live:** it rides in the 0079 + 0080 + 0081 SQL-editor file
+(before-launch); until then links show as their address.
+
+**What can be attached (D-408, 0.49.1).** Photos: JPEG, PNG, or an iPhone's
+HEIC — the photo button asks for JPEG/PNG so an iPhone converts its own; a
+HEIC dropped or pasted on a computer opens where the browser can read it
+(Safari) and is refused in words where it cannot. Documents: PDF and Word
+only. Picking, dropping and pasting into the message box all go through one
+`take()`; a photo is shrunk to the JPEG that will be sent as soon as it is
+picked.
+A file Pam can't take gets a warning `Banner` in the box that shakes once
+(450 ms; none with reduced motion) and closes with a 48px × (D-409).
 
 ## Release 0.45.0-two-roles (7 October) — one account, member and program
 

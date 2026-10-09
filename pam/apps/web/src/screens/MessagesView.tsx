@@ -9,7 +9,7 @@ import { IconButton } from '@astryxdesign/core/IconButton';
 import { List } from '@astryxdesign/core/List';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
-import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
+import { colorVars, spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { ExploreIcon, MessagesIcon, NewMessageIcon, NoResultsIcon, Page, textLinkLook } from '@pam/ui';
 import { emptyState } from '@pam/ui/emptyState';
 import { LargeTitleHeader } from '@pam/ui/LargeTitleHeader';
@@ -108,7 +108,11 @@ const styles = stylex.create({
     whiteSpace: 'nowrap',
   },
   when: { fontSize: '13px', whiteSpace: 'nowrap', alignSelf: 'flex-start', paddingBlockStart: '4px' },
-  row: { minHeight: '72px' },
+  // Flush with the page's left edge — the avatar lines up with the title —
+  // and the right padding kept for the time (Will, 9 October, D-411). Set as
+  // `paddingInline`, the property Astryx's Item sets, so this replaces its
+  // value rather than losing to it; the right side is Item's own.
+  row: { minHeight: '72px', paddingInline: `0px ${spacingVars['--spacing-3']}` },
 });
 
 /**

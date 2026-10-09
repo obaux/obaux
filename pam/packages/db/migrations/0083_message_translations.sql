@@ -1,8 +1,8 @@
--- 0082 — Messages, read in your own language (Will, 9 October 2026: "programs
+-- 0083 — Messages, read in your own language (Will, 9 October 2026: "programs
 -- and case managers may use english or spanish, but let's use Uber's approach
 -- where the user sees the messenger's message in their language translated,
 -- labeled translated, but there's a link under it to show the original").
--- D-405.
+-- D-414.
 --
 -- This is the cache behind that. A message is only ever written in the
 -- language its sender typed; what a reader sees, in their language, is a
@@ -27,14 +27,14 @@
 --     written; its translation does not travel with it.
 --   * Gone when the message is (`on delete cascade`), so deleting an account
 --     deletes the translations of everything it said.
---   * Languages are the ones the app offers (0081), spelled the way the app
+--   * Languages are the ones the app offers (0082), spelled the way the app
 --     spells them. `source_locale` is whatever the service reports — a BCP 47
 --     tag, or 'und' when it could not tell — and is only ever shown, never
 --     matched against the list.
 --
 -- Nothing calls this until `MESSAGE_TRANSLATION` is switched on in
 -- packages/config and the function has its key; shipping this migration
--- changes nothing a member sees. test/18_message_translations_test.sql
+-- changes nothing a member sees. test/19_message_translations_test.sql
 -- attacks it.
 
 create table if not exists public.message_translations (

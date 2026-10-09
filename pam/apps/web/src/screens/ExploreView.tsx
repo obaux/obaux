@@ -178,7 +178,7 @@ export function ExploreView({
       {searching ? null : nextTrip}
 
       {/* One row while it fits (D-274); when it does not, the area link goes
-          underneath (D-404). D-274 cut the heading to "Todos los progra…" so
+          underneath (D-413). D-274 cut the heading to "Todos los progra…" so
           the link stayed beside it — in Russian and Portuguese that is "Все
           програ…", a title nobody can read. A heading says what the list is;
           the link can go a line down. */}

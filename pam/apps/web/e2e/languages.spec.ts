@@ -10,7 +10,7 @@ import ar from '@pam/config/locales/ar.json';
 import { settled } from './settled';
 
 /**
- * Seven languages (D-404). Each is its own chunk, fetched when somebody picks
+ * Seven languages (D-413). Each is its own chunk, fetched when somebody picks
  * it, and each sets the page's `lang` and `dir`. What these check is what
  * could be wrong in a real browser and right in every unit test: the chunk
  * arrives, the screen is really in that language, nothing spills past a 320px

@@ -1,6 +1,6 @@
--- 0081 — More languages (Will, 9 October 2026: "Let's also add a Brazilian
+-- 0082 — More languages (Will, 9 October 2026: "Let's also add a Brazilian
 -- portuguese language", then "Chinese (including Mandarin and Cantonese),
--- Russian, Arabic"). D-404.
+-- Russian, Arabic"). D-413.
 --
 -- The whole database change: `profiles.preferred_language` may now hold
 --   'en', 'es'                 (as before)
@@ -24,7 +24,7 @@
 -- Safe to run twice. Existing rows can only hold 'en' or 'es' (the old check
 -- said so), so re-adding the check cannot fail on data.
 --
--- test/17_portuguese_test.sql attacks it.
+-- test/18_more_languages_test.sql attacks it.
 
 alter table public.profiles drop constraint if exists profiles_language_supported;
 alter table public.profiles

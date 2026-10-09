@@ -8,25 +8,14 @@ import { Icon } from '@astryxdesign/core/Icon';
 import { IconButton } from '@astryxdesign/core/IconButton';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { BookmarkIcon, FlagIcon, MessagesIcon, ShareIcon } from '@pam/ui';
+import { roundAction } from '@pam/ui/roundAction';
 import { DUMMY_PROGRAM_LEADS } from '@pam/config/dummy-people';
 import { DUMMY_SELF_ID, dummyConversationIdBetween } from '@pam/config/dummy-conversations';
 import { useI18n } from '@/lib/i18n';
 
+// The bar's round buttons — save and ⋯ — are `roundAction` (D-411: white,
+// a grey edge and a soft shadow, as on every bar).
 const styles = stylex.create({
-  // White with a thin grey edge, like the bell and Help (D-216).
-  round: {
-    width: '48px',
-    height: '48px',
-    minWidth: '48px',
-    borderRadius: '50%',
-    paddingInline: '0px',
-    flexShrink: 0,
-    backgroundColor: colorVars['--color-background-body'],
-    borderWidth: '1px',
-    borderStyle: 'solid',
-    borderColor: colorVars['--color-border'],
-    color: colorVars['--color-text-primary'],
-  },
   saved: { color: colorVars['--color-icon-accent'] },
 });
 
@@ -104,7 +93,7 @@ export function PlaceBarActions({
               <BookmarkIcon {...ICON} isFilled={isSaved} />
             </HStack>
           }
-          xstyle={[styles.round, isSaved && styles.saved]}
+          xstyle={[roundAction.button, isSaved && styles.saved]}
         />
       ) : null}
       <DropdownMenu
@@ -113,7 +102,7 @@ export function PlaceBarActions({
           isIconOnly: true,
           variant: 'ghost',
           icon: <Icon icon="moreHorizontal" size="md" />,
-          xstyle: styles.round,
+          xstyle: roundAction.button,
         }}
         hasChevron={false}
         placement="below"

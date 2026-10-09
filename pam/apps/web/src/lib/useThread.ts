@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import type { Role } from '@pam/config';
+import { requestLinkPreviews, wantsPreview } from './linkPreview';
 import { loadPhotos, removeUnsentPhoto, shrinkPhoto, uploadMessagePhoto } from './messagePhoto';
 import {
   displayFileName,
@@ -237,7 +238,7 @@ export function useThread(conversationId: string | null): {
         let shrunk: Blob | null = null;
         let named: { name: string; bytes: number } | null = null;
         if (attachment?.kind === 'photo') {
-          shrunk = await shrinkPhoto(attachment.file);
+          shrunk = attachment.isReady ? attachment.file : await shrinkPhoto(attachment.file);
           if (!shrunk) throw new Error('could not read the photo');
           const path = await uploadMessagePhoto(conversationId, shrunk);
           if (!path) throw new Error('upload failed');
@@ -265,6 +266,8 @@ export function useThread(conversationId: string | null): {
         stored = null;
 
         const row = data as MessageRow;
+        // A link starts its preview now, so Stuff shared has it ready (D-407).
+        if (wantsPreview(row.body)) void requestLinkPreviews([row.id]);
         setState((prev) =>
           prev.status === 'ready'
             ? {

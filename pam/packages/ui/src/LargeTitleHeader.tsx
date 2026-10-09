@@ -82,7 +82,7 @@ const styles = stylex.create({
   smallShown: { opacity: 1 },
   // Large and bold, like the reference: the screen says where you are before
   // anything else on it does.
-  // 34px, stepping down for a word that will not fit (D-404, `useFitTitle`).
+  // 34px, stepping down for a word that will not fit (D-413, `useFitTitle`).
   large: {
     fontSize: '34px',
     lineHeight: 1.15,

@@ -83,12 +83,33 @@ export const PlacePolicy: Story = screen('member', 'A policy to sign', '/place/p
 });
 export const ReportPlace: Story = screen('member', 'Report a place', '/flag/', { place: 'dummy-place-learning' });
 export const Conversation: Story = screen('member', 'A conversation', '/messages/thread/', { id: CONVO_ID });
-/** With a program (D-276, D-400): the booked visit pinned under the name, compact, and the messages fading under it. */
+/** With a program (D-276, D-400, D-411): the booked visit pinned under the name, compact; the header as on every nested screen, no fade. */
 export const ConversationWithAProgram: Story = screen('member', 'A conversation with a program', '/messages/thread/', {
   id: 'dummy-conv-dummy-m1-dummy-p1',
 });
+/**
+ * A file Pam can't send (D-409): pasted or picked, a GIF — the alert banner in
+ * the box, shaken once. Paste or pick another wrong file to see it shake again.
+ */
+export const ConversationFileRefused: Story = {
+  ...screen('member', "A conversation — a file Pam can't send", '/messages/thread/', { id: CONVO_ID }),
+  play: async ({ canvasElement }) => {
+    const box = await new Promise<HTMLElement>((resolve) => {
+      const look = () => {
+        const el = canvasElement.querySelector<HTMLElement>('.astryx-chat-composer-input [contenteditable="true"]');
+        if (el) resolve(el);
+        else setTimeout(look, 100);
+      };
+      look();
+    });
+    const data = new DataTransfer();
+    data.items.add(new File(['GIF89a'], 'dance.gif', { type: 'image/gif' }));
+    box.focus();
+    box.dispatchEvent(new ClipboardEvent('paste', { bubbles: true, cancelable: true, clipboardData: data }));
+  },
+};
 /** Everything shared in a conversation, from its ⋯ (D-402). */
-export const ConversationFiles: Story = screen('member', 'Photos and documents', '/messages/thread/files/', { id: CONVO_ID });
+export const ConversationFiles: Story = screen('member', 'Stuff shared', '/messages/thread/files/', { id: CONVO_ID });
 export const ConversationOptions: Story = screen('member', 'Conversation options', '/messages/thread/options/', {
   id: CONVO_ID,
 });

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
+import { edgeFade } from './edgeFade.js';
 import { Button } from './Button.js';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
@@ -46,7 +47,12 @@ const styles = stylex.create({
   drawer: {
     position: 'fixed',
     insetInline: 0,
-    zIndex: 6,
+    // Above the tab bar's fade (z-index 10), which it rests on: docked, it
+    // is 100px and the fade 96px, so under the fade it would be washed out
+    // (D-285). It draws the same fade in its own list instead (D-403). It
+    // never reaches Trips' top controls: at full height it stops short of
+    // them (`topOffset`).
+    zIndex: 11,
     marginInline: 'auto',
     width: '100%',
     maxWidth: '560px',
@@ -91,7 +97,10 @@ const styles = stylex.create({
     backgroundColor: colorVars['--color-border'],
   },
   header: { paddingInline: '16px', paddingBlockStart: '22px', paddingBlockEnd: '4px' },
-  body: { flexGrow: 1, minHeight: 0, overflowY: 'auto', paddingInline: '16px', paddingBlockEnd: '24px' },
+  // No padding at the end: the fade at the foot of the list (D-403) is the
+  // room the last card scrolls clear into, and a sticky element stops at
+  // its scroller's padding, so padding here would lift the fade off the bar.
+  body: { flexGrow: 1, minHeight: 0, overflowY: 'auto', paddingInline: '16px' },
   // A fade at the top of the list, so cards scrolling up dissolve under the
   // header instead of being cut by a hard edge (Will, 3 October). Sticky, so
   // it stays put while the list moves; it takes no room (the negative
@@ -190,6 +199,7 @@ export function MapDrawer({
       >
         <VStack aria-hidden xstyle={styles.fade} />
         {children}
+        <VStack aria-hidden xstyle={edgeFade.inScroll} />
       </VStack>
     </VStack>
   );

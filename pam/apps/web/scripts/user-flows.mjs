@@ -73,7 +73,9 @@ async function shoot(node, thumbPath) {
     await page.close();
     return { data: raw.toString('base64'), type: 'image/jpeg' };
   }
-  const page = await browser.newPage({ viewport: { width: W, height: H }, deviceScaleFactor: 0.5 });
+  // Reduced motion: a screen is photographed at rest, never mid-slide (D-407's
+  // sliding names would otherwise be caught half-way).
+  const page = await browser.newPage({ viewport: { width: W, height: H }, deviceScaleFactor: 0.5, reducedMotion: 'reduce' });
   await page.goto(`${base}/iframe.html?id=${node.story}&viewMode=story`);
   await page.waitForTimeout(2500);
   for (const step of node.actions ?? []) await act(page, step);
@@ -82,7 +84,7 @@ async function shoot(node, thumbPath) {
   // is size-limited); full size for the HTML page.
   writeFileSync(thumbPath, await page.screenshot({ type: 'jpeg', quality: 60 }));
   await page.setViewportSize({ width: W, height: H });
-  const full = await browser.newPage({ viewport: { width: W, height: H } });
+  const full = await browser.newPage({ viewport: { width: W, height: H }, reducedMotion: 'reduce' });
   await full.goto(page.url());
   await full.waitForTimeout(2500);
   for (const step of node.actions ?? []) await act(full, step);
@@ -258,7 +260,18 @@ ${body}
 </div></body></html>`;
 }
 
-const latestDecisions = (flow) => (flow.changes ?? []).slice(0, 2).map((c) => c.split(' ')[0]);
+// The D-numbers of the two newest change lines. A line can name a range
+// ("D-400–401 — …"), which stands for every decision in it, so a screen
+// changed by D-401 is tagged as new too.
+const latestDecisions = (flow) =>
+  (flow.changes ?? []).slice(0, 2).flatMap((c) => {
+    const head = c.split(' ')[0];
+    const range = /^D-(\d+)[–-](\d+)$/.exec(head);
+    if (!range) return [head];
+    const out = [];
+    for (let n = Number(range[1]); n <= Number(range[2]); n += 1) out.push(`D-${n}`);
+    return out;
+  });
 const homes = {};
 
 for (const flow of flows) {

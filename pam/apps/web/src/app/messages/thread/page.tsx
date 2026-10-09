@@ -34,8 +34,8 @@ import { threadLineFor } from '@/lib/threadLine';
  * `in_conversation()` already allows.
  *
  * Drawn with Astryx's Chat family through `ThreadView` (D-181), inside
- * `ThreadFrame` (D-192): a one-row thread header (the nested-page template's
- * compact form, D-213) pinned
+ * `ThreadFrame` (D-192): the nested-page template's header, as on every
+ * screen you tap into (D-213, D-411), pinned
  * at the top, the composer pinned at the bottom, only the messages
  * scrolling. No help link on this screen (A14, D-194): back leads to
  * Messages, which has one. One primary action: the 48px send button (A13). Reporting (D-177) and the
@@ -85,7 +85,7 @@ function ThreadScreen() {
 
   const speechLanguage = speechLanguageFor(locale);
 
-  // Other people's words in the reader's language, labelled (D-405). Nothing
+  // Other people's words in the reader's language, labelled (D-414). Nothing
   // happens while MESSAGE_TRANSLATION is off.
   const translations = useMessageTranslations(state.status === 'ready' ? state.messages : NO_MESSAGES);
 

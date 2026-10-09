@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
-import { AlertDialog } from '@astryxdesign/core/AlertDialog';
 import { Avatar } from '@astryxdesign/core/Avatar';
 import { Button } from '@pam/ui/Button';
 import { EmptyState } from '@astryxdesign/core/EmptyState';
@@ -26,6 +25,7 @@ import { useI18n } from '@/lib/i18n';
 import { isVerified, usePolicies } from '@/lib/usePolicies';
 import { checkIn, undoCheckIn, useCheckIns } from '@/lib/checkIns';
 import { intlLocale } from '@pam/config';
+import { ConfirmDialog } from './ConfirmDialog';
 
 /**
  * A program lead's Home (D-218, Will, 2 October): "a daily calendar view,
@@ -357,17 +357,22 @@ function CheckInButton({
           ))}
         </HStack>
       ) : null}
-      <AlertDialog
+      {/*
+        Pam's own "are you sure" (D-234), not Astryx's AlertDialog, which
+        always opens with Keep it chosen (D-411: nothing chosen until the
+        person chooses).
+      */}
+      <ConfirmDialog
         isOpen={isAsking}
-        onOpenChange={setAsking}
         title={t('schedule.checkin.undo.title', { name })}
-        description={t('schedule.checkin.undo.body')}
-        cancelLabel={t('schedule.checkin.undo.keep')}
-        actionLabel={t('schedule.checkin.undo.confirm')}
-        onAction={() => {
+        body={t('schedule.checkin.undo.body')}
+        confirmLabel={t('schedule.checkin.undo.confirm')}
+        onConfirm={() => {
           undoCheckIn(id);
           setAsking(false);
         }}
+        cancelLabel={t('schedule.checkin.undo.keep')}
+        onCancel={() => setAsking(false)}
       />
     </HStack>
   );
@@ -414,7 +419,7 @@ export function ScheduleView({
       // The month grid's seven columns are about 40px each at 320px. Arabic's
       // short weekday is the whole word ("الخميس"), which overlaps its
       // neighbour, so it is the single letter every Arabic calendar uses
-      // there (D-404); the day's full name is on its button for a screen reader.
+      // there (D-413); the day's full name is on its button for a screen reader.
       weekdayNarrow: new Intl.DateTimeFormat(intlLocale(locale), { weekday: locale === 'ar' ? 'narrow' : 'short' }),
       month: new Intl.DateTimeFormat(intlLocale(locale), { month: 'long', year: 'numeric' }),
     }),

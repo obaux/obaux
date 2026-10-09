@@ -5,7 +5,7 @@ import { Button as AstryxButton, type ButtonProps } from '@astryxdesign/core/But
 import { sizeVars, spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
 
 /**
- * Astryx's `Button`, with a label that may take a second line (D-404).
+ * Astryx's `Button`, with a label that may take a second line (D-413).
  *
  * Astryx fixes a button to one line and a set height and trims what does not
  * fit with an ellipsis. In English that holds. "Человек, который ведёт

@@ -5,7 +5,7 @@
  * Words get longer in Russian, wider in Arabic's longest forms, taller in
  * Chinese and Thai-style stacking; a layout that was tuned on English strings
  * quietly crops, truncates or overlaps them. Nothing throws and the page does
- * not scroll sideways, so no ordinary test notices (D-404). This opens each
+ * not scroll sideways, so no ordinary test notices (D-413). This opens each
  * story in each language and measures it instead.
  *
  *   pnpm --filter @pam/web build-storybook

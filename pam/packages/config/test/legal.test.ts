@@ -6,7 +6,7 @@ import {
   PRIVACY_VISIBILITY_SECTION,
   legalKeys,
 } from '../src/legal.js';
-import { TRANSPARENCY_SCREEN } from '../src/transparency.js';
+import { ADMIN_CANNOT_SEE, TRANSPARENCY_SCREEN } from '../src/transparency.js';
 import { MESSAGE_TRANSLATION } from '../src/translation.js';
 import { fleschKincaidGrade, findDignityViolations } from '../src/language.js';
 
@@ -118,6 +118,16 @@ describe('the privacy page and the transparency screen agree', () => {
     expect(flagged?.en).toMatch(/message, photo or document/);
   });
 
+  it('says that Pam\'s server opens a shared link for its preview, and the phone does not (D-407)', () => {
+    const keep = PRIVACY.sections
+      .flatMap((s) => s.bodyKeys)
+      .map((k) => en[k as keyof typeof en] as string)
+      .join(' ');
+    expect(keep).toMatch(/Pam's server opens the page once/);
+    expect(keep).toMatch(/Your phone does not visit the page until you tap the link/);
+    expect(ADMIN_CANNOT_SEE).toContain('message_link_previews');
+  });
+
   it('promises to tell members before the list changes, exactly as the screen does', () => {
     const page = visibility!.bodyKeys.map((k) => en[k as keyof typeof en] as string).join(' ');
     expect(page).toMatch(/we will tell you first/i);
@@ -125,7 +135,7 @@ describe('the privacy page and the transparency screen agree', () => {
   });
 });
 
-describe('messages read in the reader’s language (D-405)', () => {
+describe('messages read in the reader’s language (D-414)', () => {
   const TRANSLATION_KEYS = ['title', 'p1', 'p2', 'p3'].map((k) => `privacy.s.translation.${k}`);
 
   it('is off until somebody turns it on (and Will has been told)', () => {

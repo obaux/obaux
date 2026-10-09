@@ -33,7 +33,7 @@ import en from '@pam/config/locales/en.json';
  * somebody is signed in — see that file for why the account, not this cache,
  * is the source of truth once one exists.
  *
- * **Only English is in the first load** (9 October 2026, D-404, when the
+ * **Only English is in the first load** (9 October 2026, D-413, when the
  * languages went from two to seven). English is what the static HTML is
  * written in and the fallback for any key a bundle lacks; every other bundle
  * is its own chunk, fetched when somebody chooses that language, because each
@@ -56,7 +56,7 @@ import en from '@pam/config/locales/en.json';
  * device guess is never saved as though it were a choice. Language is a
  * person's own, not where they are: nothing here looks at a city or a region.
  *
- * **While it waits** (Will, 9 October, D-404) the screen is covered by a spinner
+ * **While it waits** (Will, 9 October, D-413) the screen is covered by a spinner
  * and one line, in the language being switched to, saying what is happening
  * (`LanguageSwitching`, `SWITCHING_LANGUAGE`). It appears only if the wait runs
  * past `SHOW_AFTER_MS` — a language already fetched, or one the browser has

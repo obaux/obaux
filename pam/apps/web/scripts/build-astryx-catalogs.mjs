@@ -5,7 +5,7 @@
  * message, which makes it 14 kB gzipped where the messages alone are 3.5.
  * This writes the messages alone, one file per language Pam speaks, into
  * `src/lib/astryx/<pam code>.json`, so the app can load them beside Pam's own
- * words (D-404). Run it again after an Astryx upgrade (`node
+ * words (D-413). Run it again after an Astryx upgrade (`node
  * scripts/build-astryx-catalogs.mjs`); the files are checked in.
  *
  *   Pam code  Astryx catalog   note

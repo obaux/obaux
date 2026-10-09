@@ -20,6 +20,32 @@
 const LONG_EDGE = 1600;
 const BUCKET = 'message-photos';
 
+/**
+ * The photos Pam takes (Will, 9 October, D-408: "Images, any jpeg, png. Or
+ * iPhone photo"): JPEG, PNG, and an iPhone's own HEIC/HEIF. Whatever comes
+ * in, a JPEG goes out.
+ *
+ * The photo button asks for JPEG or PNG only. That is deliberate: an iPhone
+ * then hands over its HEIC photos already turned into JPEGs, which every
+ * phone can open. A HEIC that arrives some other way — dropped or pasted —
+ * is opened by the browser if it can (Safari can); where it cannot, the
+ * person is told in words rather than sending nothing.
+ */
+export const MESSAGE_PHOTO_ACCEPT = 'image/jpeg,image/png';
+
+export type PhotoType = 'jpeg' | 'png' | 'heic';
+
+export function photoType(file: { readonly name: string; readonly type: string }): PhotoType | null {
+  const type = file.type.toLowerCase();
+  if (type === 'image/jpeg' || type === 'image/jpg' || type === 'image/pjpeg') return 'jpeg';
+  if (type === 'image/png') return 'png';
+  if (type === 'image/heic' || type === 'image/heif' || type === 'image/heic-sequence' || type === 'image/heif-sequence') return 'heic';
+  if (type && type !== 'application/octet-stream') return null;
+  const dot = file.name.lastIndexOf('.');
+  const ext = dot === -1 ? '' : file.name.slice(dot + 1).toLowerCase();
+  return ext === 'jpg' || ext === 'jpeg' ? 'jpeg' : ext === 'png' ? 'png' : ext === 'heic' || ext === 'heif' ? 'heic' : null;
+}
+
 export async function shrinkPhoto(file: Blob): Promise<Blob | null> {
   try {
     const bitmap = await createImageBitmap(file, { imageOrientation: 'from-image' });
@@ -31,6 +57,9 @@ export async function shrinkPhoto(file: Blob): Promise<Blob | null> {
     canvas.height = height;
     const ctx = canvas.getContext('2d');
     if (!ctx) return null;
+    // A JPEG has no see-through: a PNG's clear parts go white, not black.
+    ctx.fillStyle = 'white';
+    ctx.fillRect(0, 0, width, height);
     ctx.drawImage(bitmap, 0, 0, width, height);
     bitmap.close();
     return await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/jpeg', 0.82));

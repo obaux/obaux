@@ -21,7 +21,7 @@ import { SUPPORTED_LOCALES } from '../src/index.js';
 import { findDignityViolations } from '../src/language.js';
 
 /**
- * Messages, read in the reader's language (D-405). The function around this
+ * Messages, read in the reader's language (D-414). The function around this
  * core is thin; what it decides lives here, and these tests run it against a
  * fake translator, so nothing leaves the test and nothing needs a key.
  */

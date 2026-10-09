@@ -1,12 +1,72 @@
 # Changelog
 
-## [0.48.1] — 2026-10-09 · Spanish, spelled properly
+## [0.50.1] — 2026-10-09 · Spanish, spelled properly
 
 Pam in Spanish now has its accents, its ñ and its opening ¿ wherever
 Spanish needs them: "Todavía", "teléfono", "Compañeros", "¿Cuál es su número
 de teléfono?". 172 lines were fixed, from the sign-in screen and the notices
 to the privacy page and the terms. Only the spelling changed, so nothing
-says anything new (D-403).
+says anything new (D-412).
+
+## [0.50.0] — 2026-10-09 · Buttons where you expect them
+
+A conversation now starts like every other screen you tap into: the round
+back button and the ⋯ button sit in the same places as everywhere else,
+with the person's name large underneath. The fade over the top of the
+messages is gone. The ⋯ button has a grey outline and a soft shadow so it
+is easy to spot, on places too. In Messages, each conversation lines up with
+the left edge of the page. And when a question or a photo opens, no button
+is pre-selected any more — nothing is chosen until you choose it (D-411).
+
+## [0.49.3] — 2026-10-09 · Where a link goes
+
+On Stuff shared, a link now shows its web address under its title, so you
+can see where it goes before you tap it. Who sent it and when stay at the
+end of each row (D-410).
+
+## [0.49.2] — 2026-10-09 · Just what it is
+
+On Stuff shared, each thing now simply says what it is: Photo, Document or
+Link — no file types or sizes. Documents in a conversation say "Document"
+the same way. And if you try to send a file Pam can't take, a yellow alert
+appears above the box with a quick shake, saying what went wrong and what
+you can send instead (D-409).
+
+## [0.49.1] — 2026-10-09 · Paste a photo or a document
+
+You can now paste a photo, a PDF or a Word file straight into the message
+box, the same as picking it with a button. Pam takes JPEG and PNG photos and
+photos from an iPhone; documents stay PDF and Word. A photo is made ready
+as soon as you pick it, so the preview is exactly what will be sent — and if
+a photo can't be opened, Pam says so right away instead of sending nothing
+(D-408).
+
+## [0.49.0] — 2026-10-09 · Stuff shared
+
+The page behind a conversation's ⋯ is now called Stuff shared: one simple
+list of every photo, document and link sent in the conversation, newest
+first. Each row has a small preview, the name, what it is, and who sent it
+and when at the end. A long file name slides over to show its end. Links
+show the page's title and picture, which Pam's server fetches once so your
+phone doesn't visit the page until you tap it (D-407).
+
+## [0.48.2] — 2026-10-09 · Short and sweet
+
+On Trips, the yellow reminder to sign a program's policies now ends in
+just "Sign" (D-405). On the Photos and documents page, the name under
+each photo is now the same soft grey as the time under it (D-406).
+
+## [0.48.1] — 2026-10-09 · Easier to look through, steadier to move around
+
+On the Photos and documents page, photos are now a row you swipe through,
+each with who sent it and when underneath. Documents and Google Docs are
+one list, each card the full width of the screen with who sent it and, at
+its end, the date and time. There is more room between the two (D-404).
+
+In the prototype's member app, the tab bar looks the same on every tab:
+the soft fade above it is always there, Trips included, with no line along
+its top, and switching tabs no longer flickers the fade or lights two tabs
+at once (D-403).
 
 ## [0.48.0] — 2026-10-09 · Everything shared, in one place
 

@@ -1,5 +1,6 @@
 'use client';
 
+import { useId } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { Button } from '@pam/ui/Button';
 import { Dialog } from '@astryxdesign/core/Dialog';
@@ -7,6 +8,7 @@ import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { BigButton } from '@pam/ui';
+import { landFocus, landFocusStyle } from '@pam/ui/landFocus';
 
 /**
  * "Are you sure?", the one way Pam asks it (D-234, D-255): 32px corners over
@@ -16,6 +18,10 @@ import { BigButton } from '@pam/ui';
  *
  * `secondary` is for the rare question with two real answers besides "not
  * now": leaving Saved with removals waiting asks Remove, or Put back.
+ *
+ * It opens on the question, not on a button (D-411, `landFocus`): nothing
+ * looks chosen before the person chooses, and Enter cannot press the big
+ * button by accident. The question names the dialog for a screen reader.
  */
 const styles = stylex.create({
   title: { fontSize: '22px', lineHeight: 1.3 },
@@ -43,6 +49,7 @@ export function ConfirmDialog({
   onCancel,
   secondary,
 }: ConfirmDialogProps) {
+  const titleId = useId();
   return (
     <Dialog
       isOpen={isOpen}
@@ -52,9 +59,10 @@ export function ConfirmDialog({
       width={360}
       padding={6}
       data-pam-dialog="confirm"
+      aria-labelledby={titleId}
     >
-      <VStack gap={4}>
-        <Heading level={2} xstyle={styles.title}>
+      <VStack gap={4} {...landFocus} xstyle={landFocusStyle.quiet}>
+        <Heading level={2} id={titleId} xstyle={styles.title}>
           {title}
         </Heading>
         {body ? (

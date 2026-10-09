@@ -42,7 +42,7 @@ const styles = stylex.create({
     minHeight: pam['--pam-touch-target-min'],
     fontSize: '15px',
     // A long address ends in an ellipsis rather than pushing the pencil off
-    // the screen. The row it sits in wraps (D-404), so the link goes under its
+    // the screen. The row it sits in wraps (D-413), so the link goes under its
     // heading before it is ever squeezed; the whole width is its to use then.
     maxWidth: '100%',
     overflow: 'hidden',

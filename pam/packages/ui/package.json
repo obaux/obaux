@@ -55,7 +55,10 @@
     "./SetupArt": "./src/SetupArt.tsx",
     "./DashedRule": "./src/DashedRule.tsx",
     "./emptyState": "./src/emptyState.ts",
+    "./roundAction": "./src/roundAction.ts",
+    "./landFocus": "./src/landFocus.ts",
     "./ChoiceChips": "./src/ChoiceChips.tsx",
+    "./MarqueeText": "./src/MarqueeText.tsx",
     "./Dropdown": "./src/Dropdown.tsx",
     "./InfoTip": "./src/InfoTip.tsx"
   },

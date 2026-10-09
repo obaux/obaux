@@ -98,7 +98,7 @@ export function TripCard({
                 <Avatar size="sm" name={withName} src={withPhotoUrl ?? undefined} tooltip={false} alt="" />
               ) : null}
               {policies ? (
-                // A `Badge`, not a `Token` (D-404): a token trims its label to one
+                // A `Badge`, not a `Token` (D-413): a token trims its label to one
                 // line with an ellipsis and has no way to say otherwise, so
                 // "Signatures needed" was "Нужны подп…". A badge wraps.
                 <Badge

@@ -81,6 +81,8 @@ describe('every other language is actually translated', () => {
   );
   MAY_MATCH_ENGLISH.add('directory.filter.super_admin');
   MAY_MATCH_ENGLISH.add('role.super_admin');
+  // "Link" is the Brazilian word for a link (the bundle says "Link aberto" too).
+  MAY_MATCH_ENGLISH.add('messages.files.link');
 
   it.each(OTHER_LOCALES)('%s differs from English except where a name or a symbol should not change', (locale) => {
     const same = Object.keys(EN).filter((k) => BUNDLES[locale][k] === EN[k] && /[A-Za-z]{3}/.test(EN[k]!));
