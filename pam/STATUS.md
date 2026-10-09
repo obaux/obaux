@@ -907,6 +907,12 @@ an even 8px rim; document icons are `FileTypeIcon` in Google-Doc blue
 (`--pam-document-blue`); photos open in `PhotoViewer` on near-black with
 48px dark circle buttons.
 
+**Next for it: "Stuff shared" (mockups only, 9 October).** Will dropped the
+carousel: the page becomes "Stuff shared", one flat list of policy-style rows
+for photos, documents and links (with social image previews). Four versions
+wait for his pick in Storybook (Member › Created › States › Stuff shared
+(mockups)); nothing is built yet.
+
 **Photos and documents page (D-402, D-404, 0.48.1).** From a conversation's
 ⋯: its photos as a swipeable row (Astryx `Carousel`, 200px, who and
 "date · time" under each, both in the same 14px grey (D-406); tap → viewer, paging), then one Documents list —
