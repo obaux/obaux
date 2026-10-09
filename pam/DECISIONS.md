@@ -11121,3 +11121,135 @@ there's a link under it to show the original."
   translation of what a person types before they send it. No "always show
   original" setting. Storybook shows the component (`TranslatedBody`), not
   the thread, because the thread's switch is off.
+
+### D-424 — Texts and emails reach people in their own language, and nothing a machine drafted is ever sent
+
+**Date:** 2026-10-09. Will: "We want SMS and emails to show up on their
+desired language, what are best practices for handling this, and implement
+it."
+
+- **Rendered at send time, in the recipient's language.** A text is queued
+  against a member and worded when it is sent, from their
+  `preferred_language` (0039), so switching language changes their next text
+  with nothing more to do. What was missing was the two places with no profile
+  to read it from: a staff request that is *denied* (its text was queued with
+  `'en'` written in, 0055) and an invite link mailed to an address nothing is
+  known about (0071). And an *approved* request opened an English account
+  whatever it was asked in. **Migration 0085** keeps the language the person
+  was reading Pam in on `staff_requests` and `invite_emails`, copies it onto the
+  profile on approval and onto the denial text, and treats an unknown code as
+  English instead of refusing the request. The app passes it
+  (`p_language`, from the language screen they are on).
+- **Signed one language at a time, English until then.** Every template has a
+  draft in all seven languages where one fits; each draft has its own
+  `reviewedBy`, empty. `usableSmsLocale` / `usableInviteEmailLocale` (and the
+  dispatcher's `usableLocale`) return the person's language only when a person
+  has signed that wording, English otherwise. A text is the one place Pam
+  cannot show a draft to someone first; the old rule ("a new language must not
+  start receiving machine-drafted texts just because the app speaks it") now
+  holds per language and per template instead of by leaving them out. **I did
+  not fill in any `reviewedBy`**: that is a person's name, and mine is not one.
+- **One segment, so 70 characters in a script that needs it.** Spanish and
+  Portuguese are written without accents so they stay in the cheap encoding
+  (160 characters, as Spanish was; Portuguese keeps only `é`, which is free).
+  Chinese, Russian and Arabic cannot be, and a segment of the other encoding
+  holds 70 — Pam told the carrier every message fits one. So those drafts are
+  held to 70 with the live `app_url` (36 characters) as the link, and a template
+  that cannot be said in 70 characters with a time, an address and a link — the
+  three appointment reminders — has *no* text in those languages and is sent in
+  English. 53 drafts exist (pt-BR 15, zh-CN 12, zh-HK 12, ru 7, ar 7); the limit
+  follows the template's own words, not a street name with a curly apostrophe,
+  so an English reminder is never refused over how an address is spelled.
+  **Will's call, not made here:** allow two segments for the reminders (doubles
+  their cost, and the campaign registration says one) or keep them English.
+- **The last check is per language.** The justice-involvement word list was
+  English only: a Spanish text with "libertad condicional" passed everything.
+  Each language now has its own list (`sms-terms.ts`, built on the UI lists in
+  `language.ts`), folded for accents and marks, applied on top of the English
+  one and repeated in the dispatcher as the final step. The STOP sentence is
+  one table in the config package that the dispatcher reads; it had two
+  spellings ("mensajes" vs "mas"), and the registered one (docs/sms-campaign-
+  samples.md) is now the one both use.
+- **The dispatcher and the config renderer say the same words.** The
+  dispatcher cannot import the package, so it had a second renderer that had
+  already drifted (it never shortened a long address). A parity test renders
+  every template, in every language that has a wording, through both.
+- **The invite email** is in all seven languages (`INVITE_EMAIL_MORE`): Arabic
+  set right to left, a font stack per script (an email cannot load a font),
+  Russian in the present tense (the past tense must say whether the inviter is
+  a man or a woman, and the database does not know), terminology taken from the
+  sign-in screen's invitation sentences so the email and the page it opens
+  agree. Same signing rule; a Storybook story per language.
+- **Applying 0085 is by hand,** with 0079–0081: two functions change shape, so
+  the old signatures are dropped, and the connector stops at a `drop` (D-387).
+  Migration first, app second: the old app's calls still resolve through the
+  default. Held with the rest.
+- **Not done.** No email is sent (there is no provider yet, before-launch). No
+  language is signed. The carrier registration (docs/sms-campaign-samples.md)
+  names English and Spanish; it must be re-filed before the first text in
+  another language goes out. Phone-only invitations (`invite_member`) are sent
+  by the inviter and carry no language of the invitee; they follow the
+  inviter's choice.
+
+### D-425 — Keeping seven languages in step: a ledger, a draft script, a pseudo-language, and a fit job
+
+**Date:** 2026-10-09. Will: "What's the best approach to handle future copy
+changes, so that it shows up on their desired language, and that it fits within
+the component we're working on?" and, earlier, "Does this mean that every time
+we update copy, it will update automatically across all languages?" — it did
+not: a new key failed the tests, but a *reworded* one left six translations
+saying the old thing, with every check green.
+
+- **A ledger.** `locales/ledger.json` keeps, per language and key, two short
+  hashes: of the English a translation was made from and of the translation.
+  The tests fail on any translation whose English has changed and which has not
+  (*stale*), and on any change not yet recorded. `copy:ack` records what was
+  answered and **cannot acknowledge a stale key by accident** — a
+  meaning-preserving English fix is kept on purpose (`--keep key`). Plural
+  variants follow their base key. One line per entry, sorted, so two sessions'
+  edits merge instead of conflicting. The baseline is the merged tree as it is
+  (the 32 keys changed on 9 October were translated in the merge); whether
+  anything was already stale before the ledger cannot be reconstructed from
+  history, because merges make "which changed first" ambiguous — an attempt
+  flagged 66 keys that were all ordering artefacts.
+- **A draft script.** `copy:draft` asks a model for exactly the stale and
+  missing keys, with what the English *was*, what the translation says now, and
+  the same screen's other strings as terminology, per-language style notes
+  (formal address, Hong Kong wording, gender-neutral Russian), and checks the
+  answer (every key, the same placeholders, no markup, not absurdly long). It is
+  a draft: the dignity and parity tests still apply, and anything that is a
+  promise still needs a native reader. The key lives in the environment, never a
+  file. The network call is the only part not tested (there is no key here); the
+  prompt, the parsing and the batching are, against a fake provider. The
+  prompt names no word that labels a person by their past, and a test holds it
+  to that.
+- **A pseudo-language** in Storybook's switch: English with every letter an
+  accented look-alike and most words stretched (about 45% on real copy, which is
+  what Russian does), wrapped in ⟦ ⟧ so a cut-off string shows, and with
+  `{placeholders}` intact. It finds a screen that will not hold longer words
+  before there is a translation, and a string that never went through `t()`.
+- **A fit job** (`.github/workflows/pam-fit.yml`) on pull requests that touch
+  copy or UI: builds Storybook and measures every story at 320px in English,
+  Russian, Arabic, Simplified Chinese and the pseudo-language. A defect that is
+  new in a language fails it unless it is in `scripts/fit-known.json` with a
+  reason. Not run on every push (it is slow); the full seven-language run is the
+  session's.
+- **Web unit tests join CI.** `pnpm --filter @pam/web test` (44 tests) was never
+  in the workflow; it is now.
+- **What this does not do.** It cannot judge whether a translation is *good*,
+  or read text in an image, or see real phone fonts; and a native reader is
+  still owed for every language (docs/before-launch.md). A key whose translation
+  is "kept" is a person's statement, not a machine's.
+
+### D-426 — Numbers are claimed in one file, and a test fails on a duplicate
+
+**Date:** 2026-10-09. Will: "Ensure the other sessions align with this one."
+Three sessions had each taken D-404, two had taken migration 0082 and two had
+taken A22; each was found by a person at merge time and cost a renumbering that
+had to rewrite every cross-reference. `docs/allocations.md` holds the next free
+decision, amendment, migration and changelog number and the rule (fetch, bump
+the row, push that line before writing the entry; a conflict on that row *is*
+the collision). `packages/config/test/numbering.test.ts` fails on a duplicate in
+a tree and on a table that is behind the repo. It cannot see another branch;
+the rule is how a session does. The other two sessions were told what this
+branch changed (seven languages, the wrapping components, the numbers).

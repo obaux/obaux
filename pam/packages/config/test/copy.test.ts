@@ -21,7 +21,10 @@ const bundles = BUNDLES;
 describe('locale bundles', () => {
   it('exist for every supported language, and for nothing else', () => {
     const dir = fileURLToPath(new URL('../src/locales/', import.meta.url));
-    const files = readdirSync(dir).filter((f) => f.endsWith('.json')).map((f) => f.replace(/\.json$/, ''));
+    // `ledger.json` is the translation ledger (copy-sync.ts), not a language.
+    const files = readdirSync(dir)
+      .filter((f) => f.endsWith('.json') && f !== 'ledger.json')
+      .map((f) => f.replace(/\.json$/, ''));
     expect(files.sort()).toEqual([...SUPPORTED_LOCALES].sort());
   });
 

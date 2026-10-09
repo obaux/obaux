@@ -192,13 +192,35 @@ Russian, Arabic (D-422); messages read in the reader's language (D-423).
   傾談), not Taiwan's. Arabic: Modern Standard, and check that the
   right-to-left screens read naturally. Russian: "вы" throughout.
 
-- [ ] **Write and sign off the texts and emails in each language, or decide
-  they stay English/Spanish.** SMS and invite email are drafted and signed
-  off (`reviewedBy`, 160 characters, no emoji, nothing about justice
-  involvement) in English and Spanish only; a person who reads Pam in
-  another language gets those in English. That may be fine for a code that
-  expires in minutes; it is not fine for a reminder. Needs Will's decision
-  per template.
+- [ ] **Sign off the texts and the invite email, language by language, and
+  decide the two things only Will can** (D-424). Drafts now exist: **53 texts**
+  (Portuguese 15, Simplified Chinese 12, Traditional Chinese 12, Russian 7,
+  Arabic 7 — `unsignedSmsDrafts()` lists them) and the **invite email in all
+  five**. None is signed, so **everyone is still texted and emailed in English
+  (or Spanish) whatever their language**; the day a person writes their name in a
+  draft's `reviewedBy`, that language starts for that message and no other.
+  Needs:
+  1. A native reader for each language reads its texts and email against §9 (no
+     word that reveals justice involvement — each language has its own list now —
+     160 characters, or 70 in Chinese, Russian and Arabic, no emoji) and signs
+     them. **I never fill in `reviewedBy`.**
+  2. **Will: two segments or English for the reminders?** The three appointment
+     reminders (a time, an address, a link) cannot be said in 70 characters in
+     Chinese, Russian or Arabic, so those readers get them in English. Allowing
+     two segments doubles their cost and changes the carrier registration, which
+     says one. Also the shorter the link, the more fits: the live `app_url` is
+     36 characters.
+  3. **Re-file the campaign** with the carrier before the first text in a new
+     language: `docs/sms-campaign-samples.md` names English and Spanish only.
+  4. The email provider (the item at the top) is what sends the invite email at
+     all.
+
+- [ ] **Apply 0085 with 0079–0081, then merge** (D-424). It keeps the language a
+  person asked in, so a denial text and a fresh-link email are written in it and
+  an approved account opens in it. Two functions change shape, so it is by hand
+  in the SQL editor (the connector stops at a `drop`, D-387), **before** the
+  branch that sends `p_language` is merged: migration first, app second; the old
+  app still works against it. Run `list_migrations` first.
 
 - [ ] **Messages in your own language — switching it on.** Built and tested,
   off (`MESSAGE_TRANSLATION` in `packages/config/src/translation.ts`; the

@@ -11,6 +11,8 @@
  *   pnpm --filter @pam/web build-storybook
  *   node apps/web/scripts/audit-language-fit.mjs [--locales ru,ar] [--match Cards/] [--out file.json]
  *     [--from earlier.json]   re-check only the stories that run found defects in
+ *     [--known scripts/fit-known.json]   defects somebody has looked at and accepted; only others fail the run
+ *     [--write-known file.json]          write what this run found as that list (then say why each is accepted)
  *   SB_ROOT=dir                 measure another Storybook build
  *
  * What is a defect (all measured from the rendered page, text node by text node):
@@ -47,6 +49,8 @@ const WIDTH = Number(opt('width', '320'));
 const WORKERS = Number(opt('workers', '4'));
 const OUT = opt('out', '');
 const FROM = opt('from', '');
+const KNOWN = opt('known', '');
+const WRITE_KNOWN = opt('write-known', '');
 const ROOT = path.resolve(process.env.SB_ROOT ?? path.join(here, '../storybook-static'));
 
 // ── a tiny static server: `python -m http.server` is one thread, and four workers queue on it ──
@@ -243,7 +247,10 @@ function measure() {
 }
 
 async function run() {
-  const browser = await chromium.launch({ executablePath: process.env.PLAYWRIGHT_CHROMIUM_PATH ?? '/opt/pw-browsers/chromium' });
+  // A browser path from the environment, else the sandbox's own copy if it is there, else
+  // whatever `playwright install chromium` put on this machine (CI).
+  const executablePath = process.env.PLAYWRIGHT_CHROMIUM_PATH ?? (fs.existsSync('/opt/pw-browsers/chromium') ? '/opt/pw-browsers/chromium' : undefined);
+  const browser = await chromium.launch(executablePath ? { executablePath } : {});
   const jobs = [];
   for (const story of stories) for (const locale of LOCALES) jobs.push({ story, locale });
   const results = [];
@@ -307,4 +314,17 @@ console.log(' by locale:', JSON.stringify(by(fresh, (x) => x.locale)));
 console.log(`Already in English (the design's own): ${existing.length}  ${JSON.stringify(by(existing, (x) => x.kind))}`);
 if (failures.length) console.log(`Could not measure: ${failures.length} (${failures.slice(0, 3).map((f) => f.id + ':' + f.error).join('; ')})`);
 for (const x of fresh.slice(0, 400)) console.log(`${x.locale.padEnd(6)} ${x.kind.padEnd(8)} ${x.id}  «${x.text}»  ${x.detail}`);
-process.exitCode = fresh.length ? 1 : 0;
+// A defect somebody has looked at and accepted (detector noise, or the design's own
+// choice in that language) is recorded with the reason, and is not a failure again.
+const keyOf = (x) => `${x.locale}|${x.kind}|${x.id}|${x.text}`;
+if (WRITE_KNOWN) {
+  fs.writeFileSync(
+    WRITE_KNOWN,
+    `${JSON.stringify(fresh.map((x) => ({ key: keyOf(x), reason: 'TODO: say why this is accepted' })), null, 2)}\n`,
+  );
+  console.log(`Wrote ${fresh.length} to ${WRITE_KNOWN}. Give each a reason.`);
+}
+const known = new Set(KNOWN ? JSON.parse(fs.readFileSync(KNOWN, 'utf8')).map((k) => k.key) : []);
+const unexplained = fresh.filter((x) => !known.has(keyOf(x)));
+if (KNOWN) console.log(`\nOf those, ${fresh.length - unexplained.length} are accepted in ${path.basename(KNOWN)}; ${unexplained.length} are not.`);
+process.exitCode = unexplained.length ? 1 : 0;

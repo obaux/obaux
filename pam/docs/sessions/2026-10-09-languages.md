@@ -127,3 +127,54 @@ added:
 - Whoever applies 0079–0081 next: `list_migrations` first. 0083 and 0084 are
   already live ahead of them, so the ledger now reads 0078, 0082, 0083, 0084
   and the three are still to come.
+
+
+## Part 2 — merged, applied, and the rest of the ask (same session)
+
+Will: "Migrate and proceed to merge. Ensure the other sessions align with this
+one." and, before it, "what are best practices … We want SMS and emails to show
+up on their desired language … implement it."
+
+- **Migrated.** 0083 and 0084 live (see above). **Merge held by Will** until
+  0079–0081 are live: this branch carries pam-storybook's photo, document and
+  link UI. Branch merged with `main` (932d052) and pushed; `main` untouched.
+- **Other sessions.** Both told (seven languages, the wrapping components, the
+  numbers; what is held). `docs/allocations.md` + `numbering.test.ts` (D-426).
+- **Texts and emails in the recipient's language (D-424)** — see DECISIONS. The
+  dispatcher and the config renderer had drifted (the dispatcher never shortened
+  a long address; the Spanish STOP line had two spellings); a parity test now
+  renders both. A reminder in English with a curly apostrophe in the street was
+  one edit from being refused by a naive 70-character rule; the limit follows the
+  template's own words instead.
+- **Language where there is no profile — migration 0085.** Run twice on the
+  throwaway database it changes nothing the second time; 17 new checks.
+- **The copy pipeline (D-425, A25).** Ledger, draft script, pseudo-language, a
+  fit workflow, `docs/copy-changes.md`.
+- **Mistakes caught on the way.** A history check for "which translations are
+  already stale" flagged 66 keys that were artefacts of merge order, so it is not
+  claimed; the ledger starts from the merged tree. An early draft of the
+  prompt for the draft script named the justice system; a test now forbids it.
+  The font stacks first broke the email's `style="…"` attribute with their
+  double quotes; a test now looks for that.
+
+## Part 2 — what was checked
+
+| Check | Result |
+|---|---|
+| `@pam/config` | 695 pass (was 401): texts in seven languages (349 in `sms.test.ts`), dispatcher parity, the invite email (14), the ledger and drafting (20), numbering (5) |
+| `@pam/web` unit | 44 pass (was 40); now in CI |
+| Database suite | 546 checks pass, 0 fail, `0001`–`0085`; 0083–0085 run a second time cleanly |
+| Mutation checks | sign-off ignored (config, dispatcher, email) → caught; UCS-2 held to 160 → caught; language word lists off → caught; RTL off → caught; a reworded English string → 6 stale entries reported |
+| Typecheck | clean, all packages |
+| e2e / Storybook / budget | e2e 816/816, first load 542.7 kB and Storybook build were run on the merged tree **before** this part; re-run results are in the entry below |
+
+## Part 2 — left undone
+
+- **No language is signed**, so nothing is sent in another language. A native
+  reader per language, Will's two-segments call, the carrier re-filing and the
+  email provider are all in `docs/before-launch.md`.
+- **The `copy:draft` network call has not run** (no API key here); its prompt,
+  parsing and batching are tested against a fake provider.
+- **0085 is not applied** (by hand with 0079–0081, before the merge).
+- **The `PAM Language fit` workflow has not run on GitHub** (only its commands
+  locally).

@@ -562,3 +562,24 @@ that must never appear apply in every language. §12's first-load budget
 holds: only English is in it; the other six are fetched when somebody picks
 one.
 
+
+
+## A25 — Copy is answered in every language, and texts go out only in a language someone has signed (9 October 2026, Will)
+
+Will: "We want SMS and emails to show up on their desired language ... and
+that it fits within the component we're working on."
+
+- **Rewording the English is not finishing.** A translation that still says
+  what the English used to say fails the tests (`locales/ledger.json`). It is
+  re-translated, or kept on purpose when the meaning did not change. How:
+  `docs/copy-changes.md`. Supersedes the SOP's "locale parity" check, which
+  only noticed a key that was missing, never one that was reworded.
+- **Texts and emails are written in all seven languages, signed one language at
+  a time.** A person is texted or emailed in their own language when a person who
+  reads it has signed that wording (`reviewedBy`, per language), and in English
+  otherwise — never in a draft. This amends §9's "no SMS may be sent unreviewed"
+  from "per template" to "per template and language".
+- **One segment is 160 characters, or 70 in a script the cheap encoding cannot
+  carry** (Chinese, Russian, Arabic). A template that cannot be said in that
+  with its time, address and link has no text in that language and is sent in
+  English, until Will decides about two segments.

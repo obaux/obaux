@@ -33,9 +33,9 @@ Update the number in the second column when you claim it, and name the branch.
 
 | Ledger | Next free | Where it lives | Last claimed by |
 |---|---|---|---|
-| Decision | **D-424** | `DECISIONS.md` (`### D-nnn — …`) | `claude/gallant-clarke-0dhizj` (D-422, D-423) |
-| SOP amendment | **A25** | `docs/sop-amendments.md` (`## Ann — …`) | `claude/gallant-clarke-0dhizj` (A24) |
-| Migration | **0085** | `packages/db/migrations/nnnn_name.sql` | `claude/gallant-clarke-0dhizj` (0083, 0084) |
+| Decision | **D-427** | `DECISIONS.md` (`### D-nnn — …`) | `claude/gallant-clarke-0dhizj` (D-422–D-426) |
+| SOP amendment | **A26** | `docs/sop-amendments.md` (`## Ann — …`) | `claude/gallant-clarke-0dhizj` (A24, A25) |
+| Migration | **0086** | `packages/db/migrations/nnnn_name.sql` | `claude/gallant-clarke-0dhizj` (0083, 0084, 0085 — 0085 is held, applied by hand with 0079–0081) |
 | Changelog | **0.51.1** or **0.52.0** | `CHANGELOG.md` (`## [x.y.z] — …`) | `claude/gallant-clarke-0dhizj` (0.50.1, 0.51.0) |
 
 Held numbers, so nobody reuses them: **0079, 0080, 0081** (photos, documents,
