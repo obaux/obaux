@@ -231,8 +231,8 @@ export const flows = [
         title: 'A conversation',
         story: 'member-created--conversation',
         path: '/messages/thread/',
-        changed: 'D-401',
-        note: 'Under the name: Program lead at the program, or Case manager. Photos and documents (PDF, Word); Google Docs links as cards; mine green, theirs grey; drag sideways for the times. With a program: the booked visit on top, opening the place',
+        changed: 'D-408',
+        note: 'Photos (JPEG, PNG, iPhone) and PDF or Word files: picked, dropped or pasted. Google Docs links as cards. Who they are under the name; with a program, the visit on top',
       },
       options: { title: 'Conversation options', story: 'member-created--conversation-options', path: '/messages/thread/options/', changed: 'D-407', note: 'Stuff shared first, then View program details (a program), then Report' },
       files: {
@@ -305,6 +305,7 @@ export const flows = [
       ['profile', 'points', 'Points'],
     ],
     changes: [
+      'D-408 — a conversation: photos are JPEG, PNG or from an iPhone, documents PDF or Word; paste either straight into the message box',
       'D-407 — Stuff shared (was Photos and documents): one flat list of photos, documents and links, who and when at the end, long names slide to their end, link previews from Pam\'s server',
       'D-403 — the tab bar is the same on every tab: the fade always there (Trips too), no line, no flicker when switching',
       'D-402 — a conversation\'s ⋯: Photos and documents, everything shared in it in one place (photos open full size and page through; documents and Google Docs as cards)',

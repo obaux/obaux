@@ -73,7 +73,9 @@ async function shoot(node, thumbPath) {
     await page.close();
     return { data: raw.toString('base64'), type: 'image/jpeg' };
   }
-  const page = await browser.newPage({ viewport: { width: W, height: H }, deviceScaleFactor: 0.5 });
+  // Reduced motion: a screen is photographed at rest, never mid-slide (D-407's
+  // sliding names would otherwise be caught half-way).
+  const page = await browser.newPage({ viewport: { width: W, height: H }, deviceScaleFactor: 0.5, reducedMotion: 'reduce' });
   await page.goto(`${base}/iframe.html?id=${node.story}&viewMode=story`);
   await page.waitForTimeout(2500);
   for (const step of node.actions ?? []) await act(page, step);
@@ -82,7 +84,7 @@ async function shoot(node, thumbPath) {
   // is size-limited); full size for the HTML page.
   writeFileSync(thumbPath, await page.screenshot({ type: 'jpeg', quality: 60 }));
   await page.setViewportSize({ width: W, height: H });
-  const full = await browser.newPage({ viewport: { width: W, height: H } });
+  const full = await browser.newPage({ viewport: { width: W, height: H }, reducedMotion: 'reduce' });
   await full.goto(page.url());
   await full.waitForTimeout(2500);
   for (const step of node.actions ?? []) await act(full, step);
