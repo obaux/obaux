@@ -11495,6 +11495,10 @@ looked at, so its first run would have failed on the whole backlog.
 - **What this baseline does not prove.** It was made in this sandbox. The workflow
   runs on GitHub's Ubuntu runner with its own fonts, so its first run may list a
   Chinese or Arabic defect that is not here; each is looked at the same way and added.
+  *(First run, 9 October: it reported 99 and 97 were already known; the other two
+  were the Russian and Simplified Chinese twins of one Arabic entry, the shared-files
+  title against the "You" column. Added; 121 entries. It took 55 of its 60 minutes,
+  so the job's limit is now 90.)*
   Entries for the pseudo-language mean "worse than any real language", not "fine":
   they matter on the day a language with longer words is added.
 

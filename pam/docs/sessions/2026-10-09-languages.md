@@ -307,3 +307,9 @@ minutes, 3,752 measurements, none unmeasurable): 137 defects new in a language.
   editing yours.
 - **Not known:** whether GitHub's runner (its own fonts) reports defects this sandbox did
   not; the first run of the job will say. Each would be looked at and added.
+- **First run on GitHub** (a pull request that touches `fit-known.json` runs the job, ~55
+  minutes): 99 defects, 97 already known, 2 not — the Russian and Simplified Chinese
+  twins of the Arabic shared-files entry (GitHub's fonts make that column slightly
+  wider). Looked at, added with the same reason (121 entries), and the job's timeout
+  raised from 60 to 90 minutes because it used 55. Re-run on the push after this.
+
