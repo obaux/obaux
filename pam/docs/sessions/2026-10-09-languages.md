@@ -89,9 +89,14 @@ added:
 
 ## Left undone
 
-- **Nothing was applied to the live Supabase project.** 0083 and 0084 are
-  files only; `translate-messages` is not deployed. Order and conditions are in
-  `docs/before-launch.md`.
+- **0083 and 0084 were applied to the live project** at the end of the
+  session (Will: "Migrate and proceed to merge"), after `list_migrations`
+  showed the one drift there was — `0082_admin_reaches_assigned_only`,
+  applied by the other session and committed on its branch — which touches
+  nothing these do. Read back afterwards: the language check lists all seven
+  codes; `message_translations` has RLS enabled and forced, one `select`
+  policy for the people in the conversation, and `authenticated: SELECT` as its
+  only grant. `translate-messages` is **not** deployed.
 - **No native speaker has read any of the six new bundles.** See
   `docs/before-launch.md`; start with the privacy page, the terms, the
   transparency screen and the seven "Switching to…" lines.
@@ -115,5 +120,6 @@ added:
   default left open, because a case manager may be a Russian speaker too).
 - Will: before translation is switched on — the provider's no-retention terms in
   writing, the wording that tells members first, a per-person cap.
-- Whoever applies migrations: `list_migrations` against the repo first;
-  0081 (link previews) must be live or deliberately held before 0083 goes in.
+- Whoever applies 0079–0081 next: `list_migrations` first. 0083 and 0084 are
+  already live ahead of them, so the ledger now reads 0078, 0082, 0083, 0084
+  and the three are still to come.

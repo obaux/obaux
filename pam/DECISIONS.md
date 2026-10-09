@@ -11065,6 +11065,12 @@ and resolve them using best UI/UX practices."
   merge also brought in 32 English strings from that session (the "your guide"
   wording, the account-limits sections, the short version of the transparency
   screen); all six other languages were written for them in the same merge.
+- **Applied live 9 October (Will: "Migrate and proceed to merge").** 0083 and
+  0084 went in through the connector after `list_migrations` was diffed against
+  the repo. 0084 guards its policy with a `do $$ … if not exists … $$` block
+  rather than `drop policy if exists`, because the connector stops at `drop`
+  for approval (D-387) and, on a table the migration has just created, there is
+  nothing to drop. Both are inert until `MESSAGE_TRANSLATION` is switched on.
 
 ### D-423 — Messages, read in the reader's own language (built, switched off)
 

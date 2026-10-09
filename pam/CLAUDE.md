@@ -86,6 +86,12 @@ Supabase is invisible to every other session and to Will reading the repo —
 it is the exact failure this rule exists to prevent, the same class as an
 unrecorded build session.
 
+**Numbers are shared too.** Decision (`D-nnn`), amendment (`Ann`), migration and
+changelog numbers are handed out by whichever session writes next, and each
+sees only its own branch. Claim yours in `docs/allocations.md` (fetch first, bump
+the row, push that line) before you write the entry; `packages/config/test/numbering.test.ts`
+fails on a duplicate that reaches one tree.
+
 **Session end-of-turn writes are shared files, not yours alone.** Before
 editing `STATUS.md`, `DECISIONS.md`, or `CHANGELOG.md` at the end of a
 session, `git pull`/fetch the branch you're pushing to first. If another

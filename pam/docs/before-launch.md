@@ -168,13 +168,14 @@ Will, 7 October 2026: "Add these to Before launch doc" (D-375).
 Will, 9 October 2026: Brazilian Portuguese, Chinese (Mandarin and Cantonese),
 Russian, Arabic (D-422); messages read in the reader's language (D-423).
 
-- [ ] **Deploy 0083 before the app that offers the languages ships.** It is
-  the one check (`profiles_language_supported`) that lets a profile hold
-  `pt-BR`, `zh-CN`, `zh-HK`, `ru` or `ar`. Until it is live, somebody who
-  picks one gets a failed save. It does not touch any other table. Check
-  `list_migrations` against `packages/db/migrations` first (CLAUDE.md): 0081
-  (link previews) is the one before it. **0084 (message translations) can
-  wait** until translation is switched on; it changes nothing a member sees.
+- [x] **Deploy 0083 before the app that offers the languages ships** — done
+  9 October 2026 (Will asked for the migration and the merge together; applied
+  after `list_migrations` against `packages/db/migrations`, checked by reading
+  `profiles_language_supported` back). It is the one check that lets a profile
+  hold `pt-BR`, `zh-CN`, `zh-HK`, `ru` or `ar`. **0084 (message translations)
+  went in with it** — it creates a table nothing reads or writes until
+  translation is switched on, so it changes nothing a member sees. 0079–0081
+  are still not live; neither migration touches what they create.
 
 - [ ] **Have a native speaker read every new language** — nobody has. The six
   new bundles were drafted by a model (Brazilian Portuguese; the other four in
@@ -199,7 +200,7 @@ Russian, Arabic (D-422); messages read in the reader's language (D-423).
   off (`MESSAGE_TRANSLATION` in `packages/config/src/translation.ts`; the
   function's own switch is the secret `MESSAGE_TRANSLATION=on`). Before
   either is turned on:
-  1. Deploy 0084, then `translate-messages` (`supabase functions deploy
+  1. 0084 is live (9 October); deploy `translate-messages` (`supabase functions deploy
      translate-messages`), and read `get_advisors`.
   2. Set `ANTHROPIC_API_KEY` as a function secret — never in this repo — on an
      account whose terms say what is sent is **not kept and not used to
