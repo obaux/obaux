@@ -10122,3 +10122,13 @@ only. Short and sweet."
   signed and for where, so the link needs no more; it still opens that
   program's policies.
 - Storybook's Foundations › Actions guide quotes the new label.
+
+### D-406 — Under a photo, the name is set like the time
+
+**Date:** 2026-10-09. Will, on the Photos and documents page (D-404):
+"Match name style to subtitle style."
+
+- Under each photo, who sent it is now the same 14px secondary grey,
+  regular weight, as the "Oct 8 · 7:47 AM" line under it (it was 16px
+  semibold black). The two lines read as one quiet caption, and the photo
+  stays the thing you look at. The document cards are unchanged.

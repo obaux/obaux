@@ -40,8 +40,9 @@ const styles = stylex.create({
   heading: { fontSize: '20px', lineHeight: 1.3 },
   slide: { width: '200px', flexShrink: 0 },
   photo: { width: '200px', height: '200px', borderRadius: '14px' },
-  who: { fontSize: '16px', lineHeight: 1.3, fontWeight: 600 },
-  when: { fontSize: '14px', lineHeight: 1.3 },
+  // Who and when under a photo read as one quiet caption (Will, 9 October,
+  // D-406): the name in the same 14px grey as the time under it.
+  caption: { fontSize: '14px', lineHeight: 1.3 },
   empty: { fontSize: '18px', lineHeight: 1.5 },
 });
 
@@ -117,8 +118,10 @@ function ThreadFiles() {
                         xstyle={styles.photo}
                       />
                       <VStack gap={0.5}>
-                        <Text xstyle={styles.who}>{sent.who}</Text>
-                        <Text type="supporting" xstyle={styles.when}>
+                        <Text type="supporting" xstyle={styles.caption}>
+                          {sent.who}
+                        </Text>
+                        <Text type="supporting" xstyle={styles.caption}>
                           {t('messages.files.when', { date: sent.date, time: sent.time })}
                         </Text>
                       </VStack>

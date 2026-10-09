@@ -860,7 +860,7 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ## Conversations, redrawn (8–9 October) — 0.45.5 to 0.48.2, on the branch
 
-D-389 to D-405 (D-405: Trips' policies banner action is just "Sign"), **on `claude/pam-storybook`, not merged to `main`.** A
+D-389 to D-406 (D-405: Trips' policies banner action is just "Sign"; D-406: a photo's name set like its time), **on `claude/pam-storybook`, not merged to `main`.** A
 conversation's header says who the person is on a line under the name —
 "Program lead at Example Food Pantry", "Case manager" (D-395). Each day opens
 with one divider ("Today", "Yesterday", a weekday, a date). Bubbles carry no name or time: mine are light green on the
@@ -909,7 +909,7 @@ an even 8px rim; document icons are `FileTypeIcon` in Google-Doc blue
 
 **Photos and documents page (D-402, D-404, 0.48.1).** From a conversation's
 ⋯: its photos as a swipeable row (Astryx `Carousel`, 200px, who and
-"date · time" under each; tap → viewer, paging), then one Documents list —
+"date · time" under each, both in the same 14px grey (D-406); tap → viewer, paging), then one Documents list —
 PDFs, Word files and Google Docs together, full-width cards with who on the
 second line and the date over the time at the end — newest first, 32px
 between the two. Read through `useThread`, so nothing new to query.

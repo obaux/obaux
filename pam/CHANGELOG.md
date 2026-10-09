@@ -3,7 +3,8 @@
 ## [0.48.2] — 2026-10-09 · Short and sweet
 
 On Trips, the yellow reminder to sign a program's policies now ends in
-just "Sign" (D-405).
+just "Sign" (D-405). On the Photos and documents page, the name under
+each photo is now the same soft grey as the time under it (D-406).
 
 ## [0.48.1] — 2026-10-09 · Easier to look through, steadier to move around
 
