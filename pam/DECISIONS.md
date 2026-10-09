@@ -9921,7 +9921,18 @@ copy of my data, a bin for Delete my account (`IconTile`, exported from
 `@pam/ui/Reading`), **grey for the copy and red for the deletion** (Will: "make
 those icons grey and red": muted grey tile with a secondary-text icon;
 `--color-background-red` tile with `--color-icon-red`). (3) The guide card has 20px padding all round (was 12px), on
-all three screens it appears on, since it is one component.
+all three screens it appears on, since it is one component. (4) The introduction
+under the page title on Privacy and Terms is 16px (was 18px): Will, "make privacy
+policy text under header smaller" — read as that line, not the section text, which
+stays 18px. The guide card's sentence and the grey detail lines are 16px too, so
+text below the SOP's 18px mobile body size is now a deliberate, listed set:
+the intro, the guide sentence, detail lines, and 15px chips and group labels.
+(5) The short version's lines are the size and weight of "Read the full privacy
+policy" under them (`--pam-link-size`, 17px, regular) — Will: "make the short version
+section text smaller … text matching 'Read the full privacy policy'" — and its card
+has no shadow (`box-shadow: none`). A white card with no shadow on a white page has
+no visible edge, so it now reads as a plain section; a hairline outline or dropping
+its side padding to line up with the page text are the next steps if wanted.
 
 **Tested.** `@pam/ui` 79 (copy: tick swap, "Copied", reset at 5 seconds,
 refusal, live region; the pieces have no structural axe violations),

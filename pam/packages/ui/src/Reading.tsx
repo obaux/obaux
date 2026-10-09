@@ -47,6 +47,12 @@ const styles = stylex.create({
   list: { width: '100%', listStyle: 'none', paddingInline: 0, marginBlock: 0 },
   row: { width: '100%', paddingBlock: '8px' },
   lead: { fontSize: '18px', lineHeight: 1.45, fontWeight: 600 },
+  // The short version's lines read like "Read the full privacy policy" under
+  // them (Will, D-417): the link's size and a regular weight, not the heavier
+  // 18px of the rows below.
+  summaryText: { fontSize: pam['--pam-link-size'], lineHeight: 1.45, fontWeight: 400 },
+  // No shadow: this card sits flat on the page.
+  flat: { boxShadow: 'none' },
   detail: { fontSize: '16px', lineHeight: 1.45, fontWeight: 400 },
   // The guide: smaller than the cards (Will, D-417), icon beside the title.
   guide: { backgroundColor: pam['--pam-secondary-fill'] },
@@ -232,7 +238,7 @@ export interface SummaryLine {
 
 export function SummaryCard({ title, lines }: { readonly title: string; readonly lines: readonly SummaryLine[] }) {
   return (
-    <Card padding={4}>
+    <Card padding={4} xstyle={styles.flat}>
       <VStack gap={2}>
         <Heading level={2} xstyle={styles.title}>
           {title}
@@ -243,7 +249,7 @@ export function SummaryCard({ title, lines }: { readonly title: string; readonly
               <Tile small no={line.mark === 'no'}>
                 {line.icon ?? (line.mark === 'no' ? <CrossIcon /> : <CheckIcon />)}
               </Tile>
-              <Text xstyle={styles.lead}>{line.text}</Text>
+              <Text xstyle={styles.summaryText}>{line.text}</Text>
             </HStack>
           ))}
         </VStack>

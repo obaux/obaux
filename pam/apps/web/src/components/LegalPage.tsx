@@ -49,7 +49,8 @@ import { goBack } from '@/lib/navigate';
  */
 
 const styles = stylex.create({
-  intro: { fontSize: '18px', lineHeight: 1.5 },
+  // 16px, under the 18px body size, by Will's word (D-417): the line under the title.
+  intro: { fontSize: '16px', lineHeight: 1.5 },
   updated: { fontSize: '15px' },
   // The jump row follows Explore's tabs (Will, 9 October, D-417): white 40px
   // pills with a soft lift, the one you are on outlined dark. The 48px a finger
