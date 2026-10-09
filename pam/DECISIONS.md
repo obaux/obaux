@@ -9649,3 +9649,37 @@ revert. It states what already happened, so nothing was widened in practice.
   `admin.seeing.body` must change in each when they land.
 - **No database change, no migration.** The DB suite was not run: nothing in
   `packages/db` changed.
+
+### D-414 — Members are told in the privacy policy; who may limit an account; p3 stays
+
+**Date:** 2026-10-09. **Decided by:** Will, answering the three things D-413
+left open: "Keep terms.s.limits.p3. We can tell members this in privacy policy.
+any Case manager with that person in their list (We'll need to enrich how case
+managers do this later on".
+
+- **Telling members.** D-413 weakened a promise and members must be told first.
+  Will's answer: the privacy policy. It now has a section, "When we limit an
+  account" (`privacy.s.limits.p1`–`p2`, en + es, in `legal.ts`): a person who
+  has you on their list can limit or pause an account that is hurting other
+  people and must write down why; a limited account can read messages but not
+  send them; a paused one cannot sign in; you can always call Pam. Both
+  documents' "last updated" moved to 9 October. The wording of that section is
+  Claude's draft of Will's decision, for Will to edit. Member copy says "a person
+  who has you on their list", not "case manager", for the reason
+  `transparency.ts` gives (the role is not named to a member). It is not yet
+  live: the branch is not merged. The before-launch item is now "ship it".
+- **Who may limit.** "Any case manager with that person in their list." That
+  is what the code already does: `admin_set_access_status` requires
+  `admin_covers()` — the caseload, or the same region — and the case manager's
+  Home list is built from the same function, so "in their list" and "covered"
+  are the same set. Nothing changed. If Will meant only people assigned to a
+  case manager (no region arm), that is a change to `admin_covers()` that also
+  narrows who can read points and badges; ask before doing it. Will added that
+  how case managers do this needs enriching later: there is no screen for it
+  at all (only the RPC), so that is the backlog item (STATUS).
+- **`terms.s.limits.p3` is kept.** Its before-launch item is now Will's, not
+  Claude's addition, and a precondition to anyone being limited.
+- **Points, again.** The set who may limit is the set who read points and
+  badges (D-412 item 2). Member copy still says "the person who invited you"
+  there. Left as it is; the privacy section above is the first line that says
+  "a person who has you on their list".

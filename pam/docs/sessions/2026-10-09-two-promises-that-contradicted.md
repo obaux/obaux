@@ -30,6 +30,12 @@ decided.
   now says "Your points, your level and your badges", and the privacy page and
   the case manager's "What you can see" were kept in step with it.
 
+- **Telling members (D-414).** Will: "We can tell members this in privacy
+  policy." The privacy policy has a new section, "When we limit an account"
+  (en + es); both documents are dated 9 October. Will also answered who may
+  limit someone ("any Case manager with that person in their list" — what the
+  code already does) and to keep `terms.s.limits.p3`.
+
 ## What was wrong, and what missed it
 
 Nothing in the code was wrong; the *copy* made promises the rest of the system
@@ -46,6 +52,8 @@ and side by side.
 - D-412 — points: the Points screen says who can see them.
 - D-413 — messages: the terms say a limited account cannot send and a paused
   one cannot sign in; badges named on the member's transparency line.
+- D-414 — members are told in the privacy policy; any case manager with the
+  person in their list may limit them (unchanged); p3 kept.
 
 ## Verified
 
@@ -56,23 +64,25 @@ and side by side.
 | Live: `open_direct_conversation` body | Contains `is_active_account` |
 | Live: `points_ledger` policies | `select_own`, `select_admin` (`admin_covers`) only |
 | Live: profiles by `access_status` | 3, all `active`; no `access_controls` rows |
-| `pnpm --filter @pam/config test` | 238 pass |
+| `pnpm --filter @pam/config test` | 238 pass (after the privacy section too) |
 | `pnpm -r typecheck` | 5/5 packages clean |
 
 ## Left undone
 
-- Tell members before the changed wording ships (`docs/before-launch.md`).
-  Nothing re-shows the terms or the transparency screen to an account that
-  already agreed; `transparency_ack_at` is set once.
 - `terms.s.limits.p3` is unkept for a limited account: nothing shows
   `account_limited`, and a refused send says "Your connection dropped"
-  (`messages.thread.failed.body`). Not built; on the before-launch list as
-  Claude's addition for Will to keep or strike.
+  (`messages.thread.failed.body`). Will: keep it. On `docs/before-launch.md`
+  as its own item; not built.
+- The privacy section's wording ("A person who has you on their list in Pam
+  can limit or pause…") is Claude's draft of Will's decision; he should read it.
+- If Will meant only people *assigned* to a case manager (no region arm),
+  `admin_covers()` has to change, which also narrows points and badges. Read
+  as "what the case manager's list already shows"; unchanged.
+- Nothing re-shows the privacy policy or the transparency screen to an account
+  that already agreed; `transparency_ack_at` is set once.
 - pt-BR, zh-CN, zh-HK, ru, ar are on no branch of this repository (checked on
-  every remote branch, including `claude/gallant-clarke-0dhizj`). The five
+  every remote branch, including `claude/gallant-clarke-0dhizj`). The six
   strings listed in STATUS row 32 must change in each when they land.
-- Any case manager in a member's city can set Limited or Paused, not only the
-  one who invited them. Unchanged, and now worth Will's eye.
 - This branch is at `main` (D-388); `claude/pam-storybook` (D-411) and
   `claude/gallant-clarke-0dhizj` (D-403) are far ahead and both edit
   `es.json`; expect conflicts on the strings changed here, and renumber the
@@ -80,5 +90,4 @@ and side by side.
 
 ## Needs a human
 
-- Will: whether to keep `terms.s.limits.p3` on the before-launch list, how an
-  account that already agreed is told, and where the five language bundles are.
+- Will: read the new privacy section; say where the five language bundles are.

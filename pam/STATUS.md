@@ -436,11 +436,13 @@ switch (0031, A6); a **limited** account cannot send or start a message
 (`is_active_account()` on `messages_insert_sender` and
 `open_direct_conversation`, live) and a **suspended** one cannot sign in. Will
 chose to change the promise, not the code: `terms.s.limits.p2` now says so
-(A6 clarified). The member's transparency line also names badges. Three
-things remain: members must be told before this ships (`docs/before-launch.md`),
-`terms.s.limits.p3` is not kept for a limited account (nothing shows the
-notice), and the pt-BR, zh-CN, zh-HK, ru and ar bundles are on no branch here
-so their five strings are unchanged. See "What needs a human" row 32.
+(A6 clarified). The member's transparency line also names badges. Members
+are told in the privacy policy, which has a new section for it (D-414: any
+case manager with the person in their list may limit them; Will wants how
+they do it enriched later). Two things remain: `terms.s.limits.p3` is not kept
+for a limited account (nothing shows the notice; Will: keep it), and the
+pt-BR, zh-CN, zh-HK, ru and ar bundles are on no branch here so their strings
+are unchanged. See "What needs a human" row 32.
 
 This is the handover document: what exists, what is proven, what is live, and
 what the next person needs to know before touching anything.
@@ -822,7 +824,7 @@ while the copy is unsigned, so it earned the first live test, not the last.*
 | 28 | **A Chromatic project token** | Storybook updating on every push | chromatic.com → sign in with GitHub → link `obaux/obaux` → add the token as the repository secret `CHROMATIC_PROJECT_TOKEN`. The workflow (`pam-storybook.yml`) skips itself until then. |
 | 29 | ~~Where the dock's People and My Plan lead~~ **Answered by the redesign (D-210)** | — | Will, 1 October: the bar is Explore, Saved, Trips, Messages, Profile; Help moves to each screen's header and Profile. Next: his reference screenshots for the other screens, then wiring the redesigned views to routes and data. Walk it in `Prototype/Redesign — member` (D-211). |
 | 30 | ~~Deploy `0071` and `0072`~~ **Done (Will, 4 October)** | — | `list_migrations` first: live ran to `0070`, no live-only drift; `can_message`, `messageable_people` and `open_direct_conversation` matched 0063 exactly, which 0072 was written against. Both applied; `get_advisors` (security) shows no new kind of finding (the definer functions are guarded inside, as every other one is; `invite_preview` and `request_invite_link` are anon on purpose). Spot-checked: `invite_emails` forced RLS with one policy and no anon access; `invites_log` and `staff_request_phone` not callable signed out. See D-264. |
-| 32 | **Tell members, wire the limited notice, and update five languages** | Launch (D-413) | Will decided on 9 October: the terms now say a limited account can read but not send and a paused one cannot sign in; the transparency line names badges. Left: (1) tell members first — `docs/before-launch.md`; (2) `terms.s.limits.p3` ("Pam tells you it is off and who to call") is unkept — nothing renders `account_limited` and a refused send says "Your connection dropped" (Claude's addition to before-launch, for Will to keep or strike); (3) the same five strings (`points.intro`, `terms.s.limits.p2`, `transparency.canSee.points`, `privacy.s.who-can-see.p1`, `admin.seeing.body`) in pt-BR, zh-CN, zh-HK, ru, ar, which are on no branch of this repository. |
+| 32 | **Wire the limited notice, ship the policy, update five languages** | Launch (D-413, D-414) | Will, 9 October: the terms say a limited account can read but not send and a paused one cannot sign in; the transparency line names badges; members are told in the privacy policy (new section "When we limit an account", written — ships when the branch is merged). Left: (1) `terms.s.limits.p3` ("Pam tells you it is off and who to call") is unkept — nothing renders `account_limited` and a refused send says "Your connection dropped"; Will: keep it, on `docs/before-launch.md`; (2) the privacy section's wording is a draft for Will to edit; (3) the six strings (`points.intro`, `terms.s.limits.p2`, `transparency.canSee.points`, `privacy.s.who-can-see.p1`, `admin.seeing.body`, and the new `privacy.s.limits.*`) in pt-BR, zh-CN, zh-HK, ru, ar, which are on no branch of this repository. |
 | 31 | **The before-launch list** | Launch | `docs/before-launch.md` — Will's list of what must be done before real people use PAM. First entry: the email provider for invite links. **0068/0069** are merged as 0075/0076 with 0072's arm kept (D-346); they wait for Will to apply them live. Program sign-up and Add a program are a one-question wizard with a review (D-347); Add a policy is a card (D-348); super admin → program lead message from a place (D-349). |
 
 ---
@@ -942,6 +944,12 @@ link (D-331) are part of it.
 
 Open items Will asked to keep (7 October), newest first. Read this before
 "Next" below, which is older.
+
+- **How a case manager limits or pauses someone** (Will, 9 October, D-414:
+  "We'll need to enrich how case managers do this later on"). Only the RPC
+  `admin_set_access_status` exists — no screen, no member-facing notice (see
+  `terms.s.limits.p3` in `docs/before-launch.md`), and any case manager with
+  the person in their list may use it.
 
 - **One account, both roles — follow-ups** (D-375): notifications by
   role (the bell shows the acting side's; a dot on the switch for the other);

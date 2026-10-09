@@ -51,6 +51,9 @@ export const PRIVACY: LegalDocument = {
     section('privacy', 'what-we-keep', 3),
     // The section that restates the transparency contract. Named in a test.
     section('privacy', 'who-can-see', 4),
+    // D-414 — where members are told what limiting an account does (the
+    // terms say it too, `terms.s.limits`): the policy is the page they re-read.
+    section('privacy', 'limits', 2),
     section('privacy', 'texts', 3),
     section('privacy', 'never-say', 2),
     section('privacy', 'sharing', 3),

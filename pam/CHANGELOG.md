@@ -12,6 +12,11 @@ one that is paused cannot sign in, and you can always call Pam for help. The
 screen that lists what the person who invited you can see now says badges as
 well as points and level (D-413).
 
+The privacy policy has a new section, "When we limit an account": who can
+limit or pause an account, what a limited account can and cannot do, and that
+you can always call Pam. The privacy policy and the terms both say they were
+last updated on 9 October 2026 (D-414).
+
 ## [0.45.4] — 2026-10-08 · Live
 
 The changes since 0.43 are live: invites name the person they're for, one

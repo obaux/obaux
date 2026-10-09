@@ -61,25 +61,29 @@ STATUS row too.
   10b). Members were promised they would hear first if what is visible
   changes; the super admin's Everyone list and invite log are visible now.
 
-- [ ] **Tell members about the two promises that changed on 9 October**
-  (D-413; members were promised they would hear first). Neither is in
-  anyone's hands yet: when this was written the live project had three
-  accounts. Before real people agree to the terms:
-  1. `terms.s.limits.p2` is weaker than before — it used to say messages are
-     never turned off; it now says a limited account can read but not send,
-     and a paused one cannot sign in.
-  2. The member's transparency line now names badges ("Your points, your
-     level and your badges"), as do the privacy page and the case manager's
-     "What you can see" — it states what a case manager could already read.
-  Decide how an account that agreed to the old wording is told (nothing
-  re-shows the terms or the transparency screen today; `transparency_ack_at`
-  is set once), or confirm that no account that did exists by launch.
-  *Added by Claude, for Will to keep or strike:* `terms.s.limits.p3` promises
-  "Pam tells you it is off and who to call", but nothing shows the
-  `account_limited` notice, and a refused send says "Your connection dropped"
+- [ ] **Ship the privacy policy that tells members what limiting an account
+  does** (Will, 9 October 2026, D-413, D-414: "We can tell members this in
+  privacy policy"). Members were promised they would hear first when a promise
+  changes. Written: a privacy section, "When we limit an account"
+  (`privacy.s.limits.*`, en + es), and both documents' dates moved to 9
+  October. It says a person with you on their list can limit or pause an
+  account that is hurting others, that a limited account can read messages but
+  not send them, and that a paused one cannot sign in. The badges now named on
+  the transparency line are in the privacy page's list too. Tick this when the
+  branch is live. When this was written the live project had three accounts,
+  so no one has agreed to the old wording who is not on the team. Nothing
+  re-shows the policy to an account that already agreed (`transparency_ack_at`
+  is set once); decide if that matters before the first real member.
+
+- [ ] **Make `terms.s.limits.p3` true** (Will, 9 October 2026: "Keep
+  terms.s.limits.p3"). The terms promise "When something is turned off, Pam
+  tells you it is off and who to call." Nothing shows the `account_limited`
+  notice, and a refused send says "Your connection dropped"
   (`messages.thread.failed.body`), which would be untrue for a limited
-  account. With p2 now saying sending can be turned off, p3 is the promise
-  that makes it bearable — it should be wired before anyone can be limited.
+  account. Show the notice (it already says what is off and offers the call
+  button) where a limited member meets it — Messages and a conversation at
+  least — and make a refused send for a limited account say why. Before any
+  case manager can limit anyone.
 
 - [ ] **Review the SMS copy** still waiting for a name in `reviewedBy`
   (STATUS row 2).
