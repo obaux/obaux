@@ -9985,3 +9985,9 @@ guide card, do this for privacy policy also"). `GuideCard` is one component, so
 it has no shadow on the sign-up step, Profile › What others can see and the
 privacy page alike; the pale-green fill is its edge now.
 
+**Real browser, after D-417 and D-418.** The whole Playwright suite ran against a
+fresh build with the 16px body: **588 passed, 0 failed** (6 minutes; 320px light
+and dark, and iPhone SE), including axe's contrast and 48px target-size rules on
+the legal, join and Profile screens and the changed "body text is at least 16px"
+check. (The build predates the guide card losing its shadow, a one-line style.)
+

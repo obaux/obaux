@@ -116,7 +116,8 @@ and side by side.
 | Copy button size in the browser | 48 × 48 px |
 | `pnpm -r typecheck` | 5/5 packages clean |
 | Playwright `legal`, `join`, `a11y` specs (fresh build; 320px light and dark, iPhone SE; axe incl. contrast and target size) | pass, after one fix (the hardcoded section count above): 39 legal tests pass, join and a11y pass |
-| Not run | The first-load budget check (`scripts/check-bundle-budget.mjs`); the rest of the Playwright suite |
+| Playwright, **full suite**, fresh build with the 16px body (D-418) | **588 passed, 0 failed** (light and dark 320px, iPhone SE) |
+| Not run | The first-load budget check (`scripts/check-bundle-budget.mjs`) |
 
 ## Left undone
 
@@ -133,8 +134,8 @@ and side by side.
   since 0082 a member with none is read by no case manager.
 - D-416/D-417: Will to read the short-version wording (STATUS row 34); the long
   phrase remains in Help, the report screens and two notices.
-- The Playwright a11y suite and the first-load budget check were not run after
-  D-416.
+- The first-load budget check (`node scripts/check-bundle-budget.mjs`) has not
+  been run since D-416; the Playwright suite passes in full (588).
 - Nothing re-shows the privacy policy or the transparency screen to an account
   that already agreed; `transparency_ack_at` is set once.
 - pt-BR, zh-CN, zh-HK, ru, ar are on no branch of this repository (checked on
