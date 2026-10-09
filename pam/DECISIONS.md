@@ -10110,3 +10110,15 @@ and timestamp under photo. Add more gap between doc list and photo list."
 - **32px** between the photos and the documents (was 16).
 - Storybook's example conversation has three photos now, not one, so the
   row has something to swipe (Storybook pictures only).
+
+### D-405 — The policies alert's action is one word: "Sign"
+
+**Date:** 2026-10-09. Will, on Trips' warning banner ("Sign 3 policies for
+Example Learning Center before you go · Sign now"): "Alert action 'Sign'
+only. Short and sweet."
+
+- `trips.added.policies.action` is "Sign" (was "Sign now", D-284's banner).
+  Spanish already said "Firmar". The banner's title before it says what is
+  signed and for where, so the link needs no more; it still opens that
+  program's policies.
+- Storybook's Foundations › Actions guide quotes the new label.

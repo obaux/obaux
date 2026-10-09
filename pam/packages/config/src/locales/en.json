@@ -1263,7 +1263,7 @@
   "trips.policies.needed": "Signatures needed",
   "trips.policies.signed": "Policies signed",
   "trips.added.policies.title": "Sign {count} policies for {place} before you go",
-  "trips.added.policies.action": "Sign now",
+  "trips.added.policies.action": "Sign",
   "nav.back.policiesToSign": "Back to policies",
   "sign.heading": "Your signature",
   "memberPolicy.clear": "Clear signature and sign again",

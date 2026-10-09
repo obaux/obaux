@@ -858,9 +858,9 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
-## Conversations, redrawn (8–9 October) — 0.45.5 to 0.48.1, on the branch
+## Conversations, redrawn (8–9 October) — 0.45.5 to 0.48.2, on the branch
 
-D-389 to D-404, **on `claude/pam-storybook`, not merged to `main`.** A
+D-389 to D-405 (D-405: Trips' policies banner action is just "Sign"), **on `claude/pam-storybook`, not merged to `main`.** A
 conversation's header says who the person is on a line under the name —
 "Program lead at Example Food Pantry", "Case manager" (D-395). Each day opens
 with one divider ("Today", "Yesterday", a weekday, a date). Bubbles carry no name or time: mine are light green on the

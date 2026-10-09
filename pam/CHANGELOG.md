@@ -1,5 +1,10 @@
 # Changelog
 
+## [0.48.2] — 2026-10-09 · Short and sweet
+
+On Trips, the yellow reminder to sign a program's policies now ends in
+just "Sign" (D-405).
+
 ## [0.48.1] — 2026-10-09 · Easier to look through, steadier to move around
 
 On the Photos and documents page, photos are now a row you swipe through,
