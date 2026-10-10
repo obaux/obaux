@@ -133,9 +133,10 @@ export const NOTICES: Readonly<Record<NoticeKey, NoticeDefinition>> = {
     status: 'warning',
     title: 'Some things are turned off',
     body:
-      'You can still look at places and your plan, and read your messages. ' +
-      'You cannot send messages or meet new people for now. ' +
-      'Call your guide or Pam if you have questions.',
+      'You cannot send messages right now. ' +
+      'Your guide turned this off for your account. ' +
+      'You can still read your messages. ' +
+      'Call Pam and we will help you reach your guide.',
     offersSupport: true,
     audience: 'member',
   }),

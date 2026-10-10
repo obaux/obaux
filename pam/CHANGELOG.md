@@ -1,14 +1,5 @@
 # Changelog
 
-## [Unreleased] — 2026-10-09 · A public website
-
-Pam has a public website with a Home page and a Support page, built from the same
-design system as the app and shown in light or dark to match your device. Support
-has its first post, "Case manager assignments": who can take on a member, hand
-one over, unassign, limit or pause, and that every change needs a written reason.
-On a phone the table becomes one card per action. Pam, the public site and Storybook now share one icon, a white "p" on Pam green, and installing Pam on a phone now has an icon to show. It is built and has a preview
-deployment; it is not on a public address yet (D-433, D-437).
-
 ## [0.51.0] — 2026-10-09 · Pam speaks seven languages
 
 Pam is now in Brazilian Portuguese, Simplified Chinese (for Mandarin
@@ -75,7 +66,22 @@ off", what you can still do (read your messages, look at places and your plan), 
 a button to call, in place of the New message button; a conversation keeps all of
 its messages and shows the same notice where you would type. A message that
 cannot be sent because your account is limited no longer says "Your connection
-dropped" (D-427).
+dropped" (D-427). The same goes for the New message sheet: if the account was
+limited while Messages was open, it says so instead of "Your connection dropped"
+(D-429). The notice itself now starts with what you cannot do and says why: "You
+cannot send messages right now. Your guide turned this off for your account. You can
+still read your messages. Call Pam and we will help you reach your guide." It sits in
+a calmer card — more room, smaller text — and "Call Pam for help" is a link rather
+than a big green button (D-432).
+
+**10 October (D-441):** when a guide or a program invites a **case manager or a program
+lead**, they now have to give that person's email. It is kept on the person's account,
+tied to the phone number they sign in with, and only the Pam team can see it; if the person
+asks Pam to delete their account, it is deleted with it. A member is never asked for an email.
+The privacy policy says so, in "What we keep", and carries a new date (10 October). Choosing
+"Invite a program" or "Invite a case manager" now opens a page of its own, with the round back
+button, instead of changing the page in place.
+
 
 ## [0.50.0] — 2026-10-09 · Buttons where you expect them
 

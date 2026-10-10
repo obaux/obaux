@@ -86,7 +86,7 @@ STATUS row too.
     accounts and look at both screens.
 
 - [ ] **Approve the Pam-team line on the transparency screen** (STATUS row
-  10b). Members were promised they would hear first if what is visible
+  10b; the Pam team can now also read staff emails, 0086 / D-441). Members were promised they would hear first if what is visible
   changes; the super admin's Everyone list and invite log are visible now.
 
 - [x] **Ship the privacy policy that tells members what limiting an account
@@ -131,6 +131,45 @@ STATUS row too.
   limits anyone yet (nothing calls `admin_set_access_status`, and the screen to
   assign a case manager is on the STATUS backlog), so a member only meets this
   once the database function is used by hand or that screen exists.
+
+- [ ] **Send privacy policy updates by email — to the people Pam has an email for**
+  (Will, 9 October 2026, D-429: "Moving forward, we'll send emails with privacy policy
+  updates"; refined 10 October, D-441: "we just don't ask members … not everyone has an
+  email. This will be typically just staff"). **What exists now (written and tested, not
+  live):** a staff invite carries a required email and the account keeps it, tied to the
+  phone (`0086`, D-441). **What is still needed:** (1) the email provider and a sender
+  (the first item on this list); (2) a decision on what a *member* — who is never asked for
+  an email — receives when the policy changes: the in-app notice, or a text a person has
+  signed off (`reviewedBy`); (3) a way for staff who already have accounts to add an email
+  (re-inviting is the only way today). Until then the policy and terms carry their dates
+  (privacy: 10 October) and only team accounts and two members exist.
+
+- [ ] **Make "Delete my account" work for everyone** (Will, 10 October, D-441: "if a user
+  chooses to delete all their data, the email goes along with it"). **Audit log decided and
+  built, not live (D-443):** Will, 10 October: "When account is deleted the account should sit
+  in audit log for 6 months before it disappears." Deleting a profile now writes an
+  `account.delete` row; a nightly purge removes every row that names the account six months
+  later; the privacy policy says so (`privacy.s.how-long.p3`). **Still blocked:** a member
+  who has **points** cannot be deleted — `points_ledger` cascades from the profile and is
+  append-only, so the cascade is refused (probed 10 October: the seeded member with points
+  fails; admins and providers delete). The same shape of fix works (the ledger lets a DELETE
+  through only once the member's profile is gone), but it is a decision about the points
+  history that Will has not been asked. **Then** write the routine for the Pam team (a
+  function, tested like the privacy promises: profile, email, invites, messages, photos,
+  points in one call). Until then a deletion on a call must remove the email by hand.
+
+- [x] **Apply the two audit-log migrations, in order** (D-443) — **done 10 October 2026 (Will: "Yes")**:
+  `list_migrations` first (no drift), the first through the connector (nightly job
+  `purge-erased-audit` confirmed in `cron.job`), the second (`drop constraint`) also through the
+  connector, then a one-line fix after `get_advisors` flagged the guard function's search path
+  (`20261010033722_pin_the_append_only_guard_search_path.sql`). The privacy sentence merges with them.
+
+- [x] **Apply 0086 to the live project, together with the app change that uses it** (D-441) —
+  **done 10 October 2026 (Will: "Apply and merge 0086")**: `list_migrations` checked (live ended
+  at 0081; 0085 still held), applied through the connector (no `drop`), advisors showed nothing
+  new (two tables with forced RLS and one policy each; `invite_create`, `keep_invite_email` and
+  the deletion trigger function are not executable by clients), then merged to main (`0220ae0`).
+  The live copy of the migration is the same statements without the explanatory comments.
 
 - [ ] **Review the SMS copy** still waiting for a name in `reviewedBy`
   (STATUS row 2).

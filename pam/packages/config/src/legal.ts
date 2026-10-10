@@ -50,7 +50,7 @@ export const PRIVACY: LegalDocument = {
   introKey: 'privacy.intro',
   updatedKey: 'privacy.updated',
   sections: [
-    section('privacy', 'what-we-keep', 6),
+    section('privacy', 'what-we-keep', 7),
     // The section that restates the transparency contract. Named in a test.
     section('privacy', 'who-can-see', 4),
     // D-414 — where members are told what limiting an account does (the
@@ -62,7 +62,7 @@ export const PRIVACY: LegalDocument = {
     // Only while messages are translated (D-423): the page says it exactly
     // when it is true, never before and never after.
     ...(MESSAGE_TRANSLATION.enabled ? [section('privacy', 'translation', 3)] : []),
-    section('privacy', 'how-long', 2),
+    section('privacy', 'how-long', 3),
     section('privacy', 'your-choices', 3),
     section('privacy', 'contact', 2),
   ],
