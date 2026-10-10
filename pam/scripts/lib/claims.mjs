@@ -71,15 +71,17 @@ export function isRealStamp(s) {
 }
 
 /** Words in, `kebab-case` out, short enough for a file name. */
-export function slugify(text, max = 48) {
-  const slug = String(text)
+export function slugify(text, max = 64) {
+  const full = String(text)
     .normalize('NFKD')
-    .replace(/[̀-ͯ]/g, '')
+    .replace(/[\u0300-\u036f]/g, '')
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-+|-+$/g, '')
-    .slice(0, max)
-    .replace(/-+$/g, '');
+    .replace(/^-+|-+$/g, '');
+  // Cut at a word, not in the middle of one.
+  let slug = full.slice(0, max);
+  if (full.length > max && full[max] !== '-' && slug.includes('-')) slug = slug.slice(0, slug.lastIndexOf('-'));
+  slug = slug.replace(/-+$/g, '');
   if (!slug) throw new Error(`Say what it is in a few words (got "${text}")`);
   return slug;
 }

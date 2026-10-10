@@ -549,6 +549,7 @@
   "privacy.s.contact.title": "Fale com uma pessoa",
   "privacy.s.how-long.p1": "Guardamos a sua conta e as suas mensagens, fotos e documentos enquanto você usar Pam. Peça para apagarmos e apagaremos.",
   "privacy.s.how-long.p2": "Alguns registros ficam por um tempo para que um programa possa provar que você compareceu. Guardamos o mínimo que podemos, pelo menor tempo possível.",
+  "privacy.s.how-long.p3": "Quando apagamos sua conta, guardamos por seis meses um breve registro de que ela existiu: o que ela fez em Pam e o que a equipe de Pam fez com ela. Ele não tem nome, número de telefone nem e-mail. Depois de seis meses, também o apagamos.",
   "privacy.s.how-long.title": "Por quanto tempo guardamos",
   "privacy.s.limits.p1": "O seu guia pode limitar ou pausar uma conta que esteja prejudicando outras pessoas. Ele precisa escrever o motivo.",
   "privacy.s.limits.p2": "Uma conta limitada pode ler mensagens, mas não pode enviá-las. Uma conta pausada não consegue entrar. Você sempre pode ligar para Pam para pedir ajuda.",

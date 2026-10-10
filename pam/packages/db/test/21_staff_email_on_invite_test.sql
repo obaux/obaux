@@ -293,10 +293,10 @@ select test.check('the audit log still never holds an address',
 -- Will, 10 October: "if a user chooses to delete all their data, the email goes
 -- along with it." Pam deletes an account when somebody calls and asks.
 --
--- Dee is built directly, without a redeem, because deleting a profile that has
--- ever acted is still refused by the audit log (append-only; see 0086 section 6
--- and docs/before-launch.md): this proves everything this migration is
--- responsible for, which is where its own rows hang.
+-- Dee is built directly, without a redeem, so that this section proves exactly
+-- where this migration's own rows hang. An account that really did redeem and act
+-- (Ivy, below) is deleted too: the audit log used to refuse that, and no longer does
+-- (D-443, 22_audit_erasure_test.sql).
 reset role;
 \set dee '55555555-0000-0000-0000-000000000511'
 \set zed '55555555-0000-0000-0000-000000000510'
@@ -338,9 +338,19 @@ select test.check('deleting an inviter deletes the invites they made, and the em
   (select count(*) from public.invites where code = 'ZEDYAN01')
   + (select count(*) from public.invite_contact_emails where email = 'yan@example.org'), 0);
 
+-- Ivy redeemed a real invite and acted (the audit log has her redeem). Deleting
+-- her works, and the email she was invited with goes with her.
+delete from auth.users where id = :'ivy';
+select test.check('Ivy, who redeemed and acted, is deleted too',
+  (select count(*) from public.profiles where id = :'ivy'), 0);
+select test.check('...and the email her account kept went with her',
+  (select count(*) from public.profile_emails where profile_id = :'ivy'), 0);
+select test.check('...what she did stays in the audit log for now, under her id',
+  (select count(*) from public.audit_log where actor_id = :'ivy' and action = 'invite.redeem'), 1);
+
 -- The email tables hang from the profile and the invite by cascade: whatever
--- finally deletes an account (including once the audit log allows it), the
--- email goes with it. Read from the catalogue so a changed rule is noticed.
+-- finally deletes an account, the email goes with it. Read from the catalogue so a
+-- changed rule is noticed.
 select test.check('profile_emails cascades from the profile',
   (select count(*) from pg_constraint where conrelid = 'public.profile_emails'::regclass
      and confrelid = 'public.profiles'::regclass and contype = 'f' and confdeltype = 'c'), 1);

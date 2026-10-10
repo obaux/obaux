@@ -61,7 +61,9 @@ describe('words in a file name', () => {
   it('makes a short kebab-case slug', () => {
     expect(slugify('  Staff: email on invites!  ')).toBe('staff-email-on-invites');
     expect(slugify('Café — près de l’église')).toBe('cafe-pres-de-l-eglise');
-    expect(slugify('x'.repeat(100)).length).toBeLessThanOrEqual(48);
+    expect(slugify('x'.repeat(100)).length).toBeLessThanOrEqual(64);
+    // ...and is cut between words, not through one.
+    expect(slugify('an erased account stays in the audit log for six months, then it goes', 47)).toBe('an-erased-account-stays-in-the-audit-log-for');
   });
 
   it('refuses a title with nothing to name it by', () => {

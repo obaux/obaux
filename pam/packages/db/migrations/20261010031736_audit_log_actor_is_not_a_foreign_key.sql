@@ -1,0 +1,31 @@
+-- audit_log_actor_is_not_a_foreign_key — an audit row keeps the id of an erased
+-- account instead of being nulled (D-443).
+--
+-- Claimed 2026-10-10 03:17:36 UTC on `claude/affectionate-goldberg-tvu4sz` with
+-- `pnpm claim migration`. Runs after audit_log_keeps_an_erased_account_six_months.
+--
+-- CONTRACT. It removes the foreign key from `audit_log.actor_id` to `profiles`.
+-- Nothing reads that constraint: no screen shows the audit log yet, no query
+-- embeds `profiles` through it, and the app that is live never touches it.
+--
+-- contract: no live release reads audit_log.actor_id through profiles (checked 10 October 2026: apps/web and supabase/functions never select audit_log)
+--
+-- Why. The constraint was `on delete set null`. Deleting a profile therefore had
+-- to UPDATE every audit row it had written, and the audit log refuses every
+-- UPDATE: so an account that had ever acted could not be deleted at all. Setting
+-- the id null would also have been the account vanishing from the log at once,
+-- where Will wants it to stay for six months (D-443). With no constraint the id
+-- stays on the row, and purge_erased_audit() removes the rows six months later.
+--
+-- What is lost: the database no longer checks that a new audit row's `actor_id`
+-- is a real profile. Clients can only write a row whose actor is themselves
+-- (policy `audit_log_insert`), and every function that writes one passes
+-- auth.uid() or a profile it just read, so nothing new can be mis-attributed that
+-- could not be before; a row can now outlive its profile, which is the point.
+--
+-- The connector hangs on a DROP statement (D-387). If applying this through it
+-- times out, run this one statement in the Supabase SQL editor. The previous
+-- migration is already in place and safe without it: deletions are still refused
+-- for anyone who has acted, exactly as before.
+
+alter table public.audit_log drop constraint audit_log_actor_id_fkey;

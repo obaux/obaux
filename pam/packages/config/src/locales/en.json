@@ -546,6 +546,7 @@
   "privacy.s.contact.title": "Talk to a person",
   "privacy.s.how-long.p1": "We keep your account, and your messages, photos and documents, while you use Pam. Ask us to delete it and we will.",
   "privacy.s.how-long.p2": "Some records stay for a while so a program can prove you attended. We keep as little as we can, for as short a time as we can.",
+  "privacy.s.how-long.p3": "When we delete your account, we keep a short record that it existed for six months: what it did in Pam, and what Pam's staff did to it. It has no name, phone number or email in it. After six months we delete that too.",
   "privacy.s.how-long.title": "How long we keep it",
   "privacy.s.limits.p1": "Your guide can limit or pause an account that is hurting other people. They have to write down why.",
   "privacy.s.limits.p2": "A limited account can read messages but cannot send them. A paused account cannot sign in. You can always call Pam for help.",
