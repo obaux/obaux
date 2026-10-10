@@ -13,8 +13,7 @@ import { SubPage } from '@pam/ui/SubPage';
 import { useI18n } from '@/lib/i18n';
 import { goBack, navigate } from '@/lib/navigate';
 import { useSession } from '@/lib/useSession';
-import { useSupportPhone } from '@/lib/useSupportPhone';
-import { reviewStaffRequest, useStaffRequests } from '@/lib/useStaffRequests';
+import { reviewStaffRequest, useStaffRequests, type ReviewFailure } from '@/lib/useStaffRequests';
 import { listRegions } from '@/lib/useCaseload';
 import { useRoleView } from '@/lib/useViewedRole';
 import { HelpButton } from './HelpButton';
@@ -49,7 +48,6 @@ function askedOn(iso: string, locale: string): string {
 
 export function RequestReviewScreen({ userId }: { readonly userId: string | null }) {
   const { t, locale } = useI18n();
-  const supportPhone = useSupportPhone();
   const { state: session } = useSession();
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
   const { viewedRole } = useRoleView(trueRole);
@@ -60,7 +58,8 @@ export function RequestReviewScreen({ userId }: { readonly userId: string | null
   const [regionId, setRegionId] = useState('');
   const [needsCity, setNeedsCity] = useState(false);
   const [busy, setBusy] = useState<'approved' | 'denied' | null>(null);
-  const [failed, setFailed] = useState(false);
+  const [failed, setFailed] = useState<ReviewFailure | null>(null);
+  const [addedAsLead, setAddedAsLead] = useState(false);
 
   useEffect(() => {
     if (!isSuperAdmin) return;
@@ -97,39 +96,48 @@ export function RequestReviewScreen({ userId }: { readonly userId: string | null
 
   const name = [row.firstName, row.lastName].filter(Boolean).join(' ') || t('invite.expired.someone');
 
+  const first = row.firstName ?? t('invite.expired.someone');
+
   const decide = async (decision: 'approved' | 'denied') => {
     if (decision === 'approved' && !regionId) {
       setNeedsCity(true);
       return;
     }
     setNeedsCity(false);
-    setFailed(false);
+    setFailed(null);
     setBusy(decision);
-    const ok = await reviewStaffRequest(row.userId, decision, regionId || undefined);
+    const result = await reviewStaffRequest(row.userId, decision, regionId || undefined);
     setBusy(null);
-    if (ok) navigate('/requests/');
-    else setFailed(true);
+    if (!result.ok) setFailed(result.reason);
+    else if (result.addedToExisting) setAddedAsLead(true);
+    else navigate('/requests/');
   };
 
   return (
     <SubPage
       title={name}
-      subtitle={t('requests.wants', { role: t(`role.${row.wantsRole}`) })}
+      subtitle={t(`requests.wants.${row.wantsRole}`)}
       {...back}
       actions={<HelpButton />}
       footer={
         <VStack gap={2} xstyle={styles.actions}>
-          <BigButton
-            label={busy === 'approved' ? t('requests.saving') : t('requests.approve')}
-            isDisabled={busy !== null}
-            onPress={() => void decide('approved')}
-          />
-          <BigButton
-            label={busy === 'denied' ? t('requests.saving') : t('requests.deny')}
-            variant="secondary"
-            isDisabled={busy !== null}
-            onPress={() => void decide('denied')}
-          />
+          {addedAsLead ? (
+            <BigButton label={t('nav.back.requests')} onPress={() => navigate('/requests/')} />
+          ) : (
+            <>
+              <BigButton
+                label={busy === 'approved' ? t('requests.saving') : t('requests.approve')}
+                isDisabled={busy !== null}
+                onPress={() => void decide('approved')}
+              />
+              <BigButton
+                label={busy === 'denied' ? t('requests.saving') : t('requests.deny')}
+                variant="secondary"
+                isDisabled={busy !== null}
+                onPress={() => void decide('denied')}
+              />
+            </>
+          )}
         </VStack>
       }
     >
@@ -184,13 +192,18 @@ export function RequestReviewScreen({ userId }: { readonly userId: string | null
         ]}
       />
 
-      {failed ? (
+      {addedAsLead ? (
+        <Notice notice="admin_out_of_region" title={t('requests.done.title', { name: first })} body={t('requests.done.body')} />
+      ) : null}
+
+      {/* The reader here is Pam's own super admin: say what is wrong and what to do, never "call Pam" (D-491). */}
+      {failed === 'other' ? (
+        <Notice notice="something_went_wrong" title={t('requests.failed.title')} body={t('requests.failed.body')} />
+      ) : failed ? (
         <Notice
-          notice="something_went_wrong"
-          title={t('requests.failed.title')}
-          body={t('requests.failed.body')}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          notice="admin_out_of_region"
+          title={t(`requests.failed.${failed === 'gone' ? 'decided' : failed}.title`, { name: first })}
+          body={t(`requests.failed.${failed === 'gone' ? 'decided' : failed}.body`, { name: first })}
         />
       ) : null}
     </SubPage>
