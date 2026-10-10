@@ -1357,6 +1357,13 @@ recorded once `sms-inbound` is deployed (D-460); nothing queues the check-in or 
 connect" yet. Samples file: nine texts. D-453. Text reminders' staff list (merged 10 October) names
 only the alert texts Will signed: no "introduced to your program", no "your account changes".
 
+## Design system & Storybook · secondary button edge (10 October)
+
+Branch `claude/pam-design-secondary-border`. A secondary Button has a light 1px ring (an inset shadow, so no
+size changes), so it shows on gray (Will, on the website). Not on icon-only buttons or the choice chips, which
+draw their own edge; the option-tag reference is unchanged. Fit: nothing new in 8 languages incl. zh-HK.
+D-493. Needs Will: look at before and after. The site can drop its local border.
+
 ## Design system & Storybook · phone bugs (10 October) — merged 10 October
 
 Merged by the merge desk from 02c9a9b (c04cdf6). On the merge: web 93, ui 117, typecheck, both builds, bundle budget 23.3 kB spare, the whole browser suite 1038 passed, 18 skipped, 0 failed (Chromium only).

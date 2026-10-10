@@ -64,6 +64,8 @@ export function ChoiceChips<V extends string>({ label, options, value, onChange 
             key={option.value}
             label={option.label}
             variant="secondary"
+            // The chip draws its own edge (below): no ring inside it.
+            hasEdge={false}
             aria-pressed={isOn}
             onClick={() => onChange(option.value)}
             xstyle={[styles.chip, isOn ? styles.on : styles.off]}
