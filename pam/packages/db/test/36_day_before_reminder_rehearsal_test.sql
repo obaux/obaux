@@ -98,8 +98,10 @@ select test.check('...and it belongs to that trip',
     where o.member_id = :'ana' and a.member_id = :'ana'), 1::bigint);
 select test.check_text('the time is the visit''s own, on the Philadelphia clock',
   (select vars->>'time' from public.outbound_messages where member_id = :'ana'), '10:00 AM');
-select test.check_text('the place is the street only, cut to the 34 characters the signed text has room for',
-  (select vars->>'address' from public.outbound_messages where member_id = :'ana'), '2600 Benjamin Franklin Parkway Bui');
+-- Since 20261010130831 (gap 3, Piper) the street is passed whole; the renderer cuts it at a word
+-- to fit the signed text (dispatch-sms.test.ts holds the limit).
+select test.check_text('the place is the street only, passed whole: the renderer cuts it at a word',
+  (select vars->>'address' from public.outbound_messages where member_id = :'ana'), '2600 Benjamin Franklin Parkway Building A');
 select test.check_text('the link is the Trips screen',
   (select vars->>'link' from public.outbound_messages where member_id = :'ana'),
   (select value from public.app_settings where key = 'app_url') || '/trips/');
@@ -110,9 +112,9 @@ select test.check('naming a program service adds nothing to the text: the signed
 set role authenticated;
 select public.book_trip(:'no_address', test.philly_at(4, 15, 30));
 reset role;
-select test.check_text('KNOWN GAP 3: a place with no address is named instead, but cut at 34 characters mid-word (the renderer would cut at a word)',
+select test.check_text('a place with no address is named instead, passed whole, not cut mid-word (gap 3, fixed)',
   (select vars->>'address' from public.outbound_messages o join public.appointments a on a.id = o.appointment_id
-    where o.member_id = :'ana' and a.service_id = :'no_address'), 'Center for Employment Opportunitie');
+    where o.member_id = :'ana' and a.service_id = :'no_address'), 'Center for Employment Opportunities Philadelphia');
 select test.check_text('...and a half-past time reads as one',
   (select vars->>'time' from public.outbound_messages o join public.appointments a on a.id = o.appointment_id
     where o.member_id = :'ana' and a.service_id = :'no_address'), '3:30 PM');
@@ -325,28 +327,47 @@ select test.check('a visit that is no longer scheduled has no reminder waiting',
 
 -- ===========================================================================
 \echo ''
-\echo '--- KNOWN GAPS, reported to the merge desk (they pass on today''s behaviour) ---'
+\echo '--- The gaps the rehearsal found (1, 2 and 3 fixed by Piper''s 20261010130831, flipped at merge) ---'
 -- ===========================================================================
--- 1. An evening visit (9 pm or later) has its reminder fall inside quiet hours,
---    so it is held until 7 am — which is the morning of the visit itself, and
---    the signed text says "tomorrow".
+-- 1. An evening visit (9 pm or later) has its 24-hour mark inside quiet hours. It used to be held
+--    until 7 am, the morning of the visit itself, while the signed text says "tomorrow". Fixed:
+--    it goes five minutes before quiet hours begin, the evening before.
+reset role;
+-- Ana's window was off for this suite; give her the default, 9 pm to 7 am, before she plans it.
+update public.notification_preferences set quiet_hours_start = 21, quiet_hours_end = 7 where member_id = :'ana';
 set role authenticated;
+select set_config('request.jwt.claim.sub', :'ana', false);
 select public.book_trip(:'long_place', test.philly_at(12, 21, 30));
 reset role;
--- Ana's window was off for this suite; give her the default, 9 pm to 7 am.
-update public.notification_preferences set quiet_hours_start = 21, quiet_hours_end = 7 where member_id = :'ana';
-select test.check_text('KNOWN GAP 1: ...so with the default window it is held until 7 am on the day of the visit, and says "tomorrow"',
-  (select public.in_quiet_hours(:'ana', o.send_at) and
-          (date_trunc('day', o.send_at at time zone 'America/New_York') + interval '1 day 7 hours') at time zone 'America/New_York' < a.starts_at
+select test.check_text('an evening visit (21:30) is reminded at 20:55 the evening before, outside quiet hours (gap 1, fixed)',
+  (select to_char(o.send_at at time zone 'America/New_York', 'YYYY-MM-DD HH24:MI')
      from public.outbound_messages o join public.appointments a on a.id = o.appointment_id
-    where a.starts_at = test.philly_at(12, 21, 30) and o.status = 'scheduled')::text, 'true');
+    where a.member_id = :'ana' and a.starts_at = test.philly_at(12, 21, 30) and o.status = 'scheduled'),
+  to_char(test.philly_at(11, 20, 55) at time zone 'America/New_York', 'YYYY-MM-DD HH24:MI'));
+select test.check_text('...and it is not in her quiet hours',
+  (select public.in_quiet_hours(:'ana', o.send_at)::text
+     from public.outbound_messages o join public.appointments a on a.id = o.appointment_id
+    where a.member_id = :'ana' and a.starts_at = test.philly_at(12, 21, 30) and o.status = 'scheduled'), 'false');
 
--- 2. Turning texts on after planning a trip does not queue reminders for trips
---    already planned; only a new or changed trip does.
+-- 1b. KNOWN GAP (Piper, 10 October): quiet hours changed AFTER a trip is planned do not re-time its
+--     reminder until the trip itself changes. Rare (the default window is everyone's), but it is the
+--     same wrong morning, so it is pinned here.
+update public.notification_preferences set quiet_hours_start = 0, quiet_hours_end = 0 where member_id = :'ana';
+set role authenticated;
+select public.book_trip(:'long_place', test.philly_at(13, 21, 30));
+reset role;
+update public.notification_preferences set quiet_hours_start = 21, quiet_hours_end = 7 where member_id = :'ana';
+select test.check_text('KNOWN GAP 1b: a window set after planning leaves the reminder at 21:30 the evening before, inside it',
+  (select to_char(o.send_at at time zone 'America/New_York', 'HH24:MI')
+     from public.outbound_messages o join public.appointments a on a.id = o.appointment_id
+    where a.member_id = :'ana' and a.starts_at = test.philly_at(13, 21, 30) and o.status = 'scheduled'), '21:30');
+
+-- 2. Turning texts on after planning a trip used to queue nothing for trips already planned.
+--    Fixed: a real turn-on queues the reminder for every future scheduled trip.
 reset role;
 insert into public.notification_preferences (member_id, sms_enabled) values (:'dee', true);
-select test.check('KNOWN GAP 2: a trip planned before the member said yes still has no reminder after they do',
-  (select count(*) from public.outbound_messages where member_id = :'dee' and status = 'scheduled'), 0::bigint);
+select test.check('a trip planned before the member said yes gets its reminder when they do (gap 2, fixed)',
+  (select count(*) from public.outbound_messages where member_id = :'dee' and status = 'scheduled'), 1::bigint);
 
 -- 4. Nothing stops a reminder that went overdue — the clock paused, an outage —
 --    from going out after the visit it is for has already happened.

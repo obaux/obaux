@@ -1177,6 +1177,10 @@ Merged to `main` by the merge desk, 10 October, from `claude/places-programs-can
 
 Merged to `main` by the merge desk, 10 October, from `claude/places-programs-call-points` (D-472). Migration `20261010122206`, expand only: `log_call` (10 points, once per place, five places a day, members only; a staff tap is ignored). **Applied live at merge**, read back (body identical to the file; signed-in only, not anon). The place page reports a tap on a phone link, fire and forget. Test `34_call_a_place_points_test.sql`. The Points screen's Call row now shows.
 
+## Places & programs · the day-before reminder gaps (10 October 2026) — merged 10 October
+
+Merged to `main` by the merge desk, 10 October, from `claude/places-programs-reminder-gaps`. Migration `20261010130831`, expand only: evening visits are texted on the day before (five minutes before the member's quiet hours begin, the merge desk's rule), texts turned on later queue the reminders for future trips, and the place name and street are passed whole (the renderer cuts at a word). **Applied live at merge** (recorded as 20261010131522), read back: all five bodies identical to the file, service role only, both triggers in place. Test `37_day_before_reminder_gaps_test.sql`; Nico's test 36 had its gap 1, 2 and 3 checks flipped at merge. Still open, both pinned or noted: quiet hours changed *after* planning do not re-time a reminder until the trip changes (KNOWN GAP 1b in test 36); and the dispatcher's `in_quiet_hours` (0039) reads New York time, so for a trip in another time zone it can hold a text this trigger placed just before quiet hours. Fine for the Philadelphia pilot; fix before a second city.
+
 ## Places & programs · review record, pending change, program services — the database half (10 October 2026)
 
 Merged to `main` by the merge desk, 10 October, from `claude/places-programs-submissions-and-services`
