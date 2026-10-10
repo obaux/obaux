@@ -47,8 +47,20 @@ export interface ProgramPolicy extends DummyPolicy {
   readonly isReal: true;
 }
 
-/** The policies a program asks now (not the archived), newest first, in the shape the screens read. */
-export function policiesFromRows(rows: readonly PolicyRow[]): ProgramPolicy[] {
+/** A row of `program_policy_signers()` (migration 20261010150922): a first name and a date, never the picture. */
+export interface SignerRow {
+  readonly policy_id: string;
+  readonly member_id: string;
+  readonly first_name: string | null;
+  readonly signed_at: string;
+}
+
+/**
+ * The policies a program asks now (not the archived), newest first, in the shape
+ * the screens read. `signers` (only a program's own lead can read them) fill in
+ * who has signed each, for the Signed tab and the verified tick.
+ */
+export function policiesFromRows(rows: readonly PolicyRow[], signers: readonly SignerRow[] = []): ProgramPolicy[] {
   return rows
     .filter((row) => row.archived_at === null)
     .sort((a, b) => b.created_at.localeCompare(a.created_at))
@@ -62,7 +74,9 @@ export function policiesFromRows(rows: readonly PolicyRow[]): ProgramPolicy[] {
         fileName: files[0]?.name ?? row.title,
         uploadedAt: row.created_at,
         body: [],
-        signedBy: [],
+        signedBy: signers
+          .filter((s) => s.policy_id === row.id)
+          .map((s) => ({ personId: s.member_id, firstName: s.first_name ?? '', signedAt: s.signed_at })),
         version: row.version,
         files,
         isReal: true as const,
