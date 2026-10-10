@@ -83,6 +83,11 @@ export function PlanningAVisit() {
           When a visit’s time has gone, it moves down to “Past visits” on Trips, with the most recent first.
           “Past visits” lists the visits you planned.
         </P>
+        <Screenshot
+          name="planning-a-visit/past-visits.png"
+          alt="The Trips screen, scrolled down. Under the visits coming up there is a heading, “Past visits”, and under it one earlier visit, to Riverside Job Center on Wednesday, October 7 at 10:00 AM."
+          caption="Trips, with a past visit."
+        />
       </Section>
 
       <Section title="Reminders">

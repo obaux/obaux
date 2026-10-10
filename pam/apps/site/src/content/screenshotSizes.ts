@@ -75,5 +75,9 @@ export const SHOT_SIZES: Record<string, { w: number; h: number }> = {
   "planning-a-visit/cancel.png": {
     "w": 390,
     "h": 600
+  },
+  "planning-a-visit/past-visits.png": {
+    "w": 390,
+    "h": 844
   }
 };
