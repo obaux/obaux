@@ -6,6 +6,14 @@
   "framework": null,
   "cleanUrls": true,
   "trailingSlash": true,
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "web-ten-umber-88.vercel.app" }],
+      "destination": "https://app.joinpam.org/:path*",
+      "permanent": true
+    }
+  ],
   "headers": [
     {
       "source": "/(.*)",

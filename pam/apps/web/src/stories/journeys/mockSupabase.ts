@@ -62,11 +62,39 @@ const PROJECT_REF = new URL(SUPABASE_URL).hostname.split('.')[0];
 export interface MockOptions {
   /** A limited account (0031): reads, but the database refuses a send (D-427). */
   readonly limited?: boolean;
+  /**
+   * A program lead who already has a program on file (D-447): waiting for
+   * review, or approved and live. Without it the lead has none — and a send
+   * from Add a program puts one on file, waiting, as the real database does.
+   */
+  readonly ownProgram?: 'review' | 'live';
+}
+
+/** The lead's organisation in the pretend database, once they have a program. */
+const OWN_ORG_ID = '22222222-0000-0000-0000-0000000000aa';
+
+/** The lead's program as the pretend database holds it (D-447). */
+function ownProgramRow(state: 'review' | 'live') {
+  return {
+    id: 'own-program',
+    name: 'Fresh Start Kitchen',
+    category: 'workforce',
+    subcategory: 'job_training',
+    description_plain: 'Hands-on cooking classes and a job-readiness workshop, Monday to Thursday.',
+    address: '1234 Market St, Philadelphia, PA 19107',
+    phone: '+12155550143',
+    website: 'https://example.org/fresh-start',
+    needs_review: state === 'review',
+    is_active: true,
+    created_at: new Date(Date.now() - 2 * 86_400_000).toISOString(),
+  };
 }
 
 function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[] {
   const profile = ROLES[journeyRole].profile;
   const role = profile?.role ?? null;
+  // A program sent from Add a program in this story is on file from then on.
+  let ownProgram: 'review' | 'live' | undefined = options.ownProgram;
   const has = (part: string) => (url: string) => url.includes(part);
   const on = (part: string, answer: (url: string, method: string, body: unknown) => Answer): Route => (url, method, body) =>
     has(part)(url) ? answer(url, method, body) : null;
@@ -106,6 +134,16 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
     on('/functions/v1/link-preview', () => ({ body: { made: 0 } })),
     on('/rpc/report_photos_for_review', () => ({ body: [] })),
     on('/rpc/report_files_for_review', () => ({ body: [] })),
+    // The lead's own program (D-447): sending one puts it on file; reading it
+    // answers the one row, by the organisation the profile names.
+    on('/rpc/submit_program', () => {
+      ownProgram = ownProgram ?? 'review';
+      return { body: ownProgramRow(ownProgram) };
+    }),
+    (url, method) =>
+      url.includes('/rest/v1/services') && url.includes('org_id=eq.') && method === 'GET'
+        ? { body: ownProgram ? [ownProgramRow(ownProgram)] : [] }
+        : null,
     on('/rest/v1/profiles', (url) =>
       url.includes('role=eq.member')
         ? { body: CASELOAD }
@@ -114,6 +152,7 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
               body: {
                 id: ME_ID,
                 ...profile,
+                org_id: ownProgram ? OWN_ORG_ID : null,
                 region_id: REGION_ID,
                 access_status: options.limited ? 'limited' : 'active',
                 onboarded_at: new Date().toISOString(),

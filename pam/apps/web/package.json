@@ -10,8 +10,8 @@
     "test": "vitest run --passWithNoTests",
     "test:a11y": "playwright test",
     "lint": "next lint",
-    "storybook": "storybook dev -p 6006 --no-open",
-    "build-storybook": "storybook build -o storybook-static",
+    "storybook": "PAM_STORIES=1 storybook dev -p 6006 --no-open",
+    "build-storybook": "PAM_STORIES=1 storybook build -o storybook-static",
     "audit:fit": "node scripts/audit-language-fit.mjs"
   },
   "dependencies": {

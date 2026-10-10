@@ -40,6 +40,27 @@ one.
   update Supabase. Links already sent keep working as long as the old URL
   redirects.
 
+## The public site (`apps/site`)
+
+Pam's public website (Home and Support, D-433) is a second, separate Vercel
+project from the same repository, so it can have its own address and nobody who
+reads a support page is ever near the app's sign-in code.
+
+1. Done once, 10 October (D-437): Vercel project **`pam-site`**, root
+   `pam/apps/site`, framework Other (`vercel.json` carries the build). New
+   project? **Add New → Project**, pick `obaux/obaux`, set the same.
+   **Turn Vercel Authentication off** (Settings → Deployment Protection): it is
+   on by default and puts a Vercel login in front of a public site.
+2. No required environment variables. It never talks to Supabase. When the site has its own domain, set `NEXT_PUBLIC_SITE_URL` (the social preview's absolute address, `apps/site/src/lib/links.ts`). Its "Sign in",
+   "Privacy" and "Terms" links point at the app (`apps/site/src/lib/links.ts`,
+   `NEXT_PUBLIC_APP_URL`, the same default as `apps/web/src/lib/project.ts` —
+   change both when the app's address changes).
+3. Locally: `pnpm --filter @pam/site dev` (port 3100), `pnpm --filter @pam/site build`.
+
+New support posts: add an entry to `apps/site/src/content/posts.ts` and a body
+component beside `CaseManagerAssignments.tsx`, then register it in
+`apps/site/src/app/support/[slug]/page.tsx`.
+
 ## What this does not cover
 
 Store submission. Capacitor wraps this same build; `cap add ios` and

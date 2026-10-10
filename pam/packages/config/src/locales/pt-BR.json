@@ -1013,6 +1013,7 @@
   "program.edit": "Editar",
   "program.save": "Salvar",
   "program.cancel": "Cancelar",
+  "program.locked": "A Pam confere o nome, o endereço e o tipo de ajuda antes de mudarem. Para mudá-los, ligue para a Pam.",
   "program.saved": "Salvo. Os membros veem as mudanças na página do seu programa.",
   "program.example": "Este é um programa de exemplo. Quando o seu programa estiver na lista, ele aparece aqui.",
   "program.name": "Nome do programa",

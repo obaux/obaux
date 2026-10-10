@@ -1,0 +1,36 @@
+<!doctype html>
+<!--
+  The site's social preview (1200×630), source. Rendered to public/og/social.png by
+  social/render.mjs. Pam's deep green (#0F5847, the wordmark's) and bright green
+  (#DCE068, the dark-mode accent), Figtree, the white wordmark, and the app's own
+  sign-in illustration.
+
+  Everything that must be read sits in the green 630×630 panel at the centre. Some
+  apps (small link cards, WhatsApp, Slack) crop the picture to its middle square;
+  that square is exactly this panel, so the logo and the tagline survive any crop
+  and the illustration is only ever a frame (Storybook › Website › Share and icon
+  shows both shapes).
+-->
+<html lang="en">
+<meta charset="utf-8" />
+<title>Pam — City services in your pocket</title>
+<style>
+  @font-face { font-family: 'Figtree'; font-weight: 300 900; src: url('figtree-latin.woff2') format('woff2'); }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { width: 1200px; height: 630px; }
+  body { display: flex; justify-content: center; font-family: 'Figtree', system-ui, sans-serif;
+         background: #0F5847 url('hero-city.webp') center / cover; overflow: hidden; }
+  .panel { width: 630px; height: 630px; background: #0F5847; padding: 64px 56px; text-align: center;
+           display: flex; flex-direction: column; align-items: center; justify-content: space-between; }
+  .logo { width: 250px; height: auto; display: block; }
+  h1 { font-size: 66px; line-height: 1.04; font-weight: 800; letter-spacing: -0.02em; color: #DCE068; text-wrap: balance; }
+  .line { font-size: 25px; line-height: 1.3; font-weight: 600; color: #ffffff; opacity: 0.9; text-wrap: balance; }
+</style>
+<body>
+  <section class="panel">
+    <img class="logo" src="pam-wordmark-white.svg" alt="Pam" />
+    <h1>City services in your pocket</h1>
+    <p class="line">Pam helps you find people and places that can help.</p>
+  </section>
+</body>
+</html>
