@@ -15,7 +15,7 @@ import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { ClockIcon, PlacesIcon } from './icons.js';
 import { CATEGORY_DEFINITIONS, type Category } from '@pam/config';
 import { pam } from './tokens.stylex.js';
-import { TextLink, textLinkLook } from './TextLink.js';
+import { textLinkLook } from './TextLink.js';
 import { CopyButton } from './CopyButton.js';
 import { AppleMapsAppIcon, GoogleMapsAppIcon } from './MapAppIcons.js';
 import { MenuList, type MenuItem } from './MenuList.js';
@@ -78,7 +78,7 @@ export interface PlaceDetailProps {
       readonly copied: string;
       /** "Could not copy. Press and hold the address to copy it." */
       readonly copyFailed: string;
-      /** "Open in…", the link under the address. */
+      /** "Open in…": said after the address, which is the link, so a screen reader hears what it does. */
       readonly openIn: string;
       /** "Open in", the drawer's title. */
       readonly openInTitle: string;
@@ -189,6 +189,23 @@ const styles = stylex.create({
   section: { fontSize: '17px' },
   body: { fontSize: '17px', lineHeight: 1.5 },
   addressText: { unicodeBidi: 'plaintext', userSelect: 'text', overflowWrap: 'anywhere' },
+  // The address as a link that opens the "Open in" drawer (Will, 10 October
+  // 2026: "make the address a hyperlink"). Underlined and in the accent colour
+  // always — a touch screen has no hover to say it can be tapped — and set
+  // like the plain address it replaces: left, wrapping, in its own direction.
+  addressLink: {
+    width: '100%',
+    justifyContent: 'flex-start',
+    textAlign: 'start',
+    fontSize: '17px',
+    lineHeight: 1.5,
+    fontWeight: 400,
+    minHeight: pam['--pam-touch-target-min'],
+    paddingInline: '0px',
+    unicodeBidi: 'plaintext',
+    color: colorVars['--color-text-accent'],
+    textDecorationLine: 'underline',
+  },
   meta: { fontSize: '16px' },
   open: { fontSize: '17px', fontWeight: 600, color: colorVars['--color-text-accent'] },
   shut: { fontSize: '17px', fontWeight: 600 },
@@ -280,18 +297,27 @@ export function PlaceDetail({
             </HStack>
             {/* The address reads in its own direction, not the screen's: in
                 Arabic an English street address was reordered, its number
-                jumping to the far end. Plain text, so it can also be selected
-                and copied by hand. */}
-            <Text type="supporting" xstyle={[styles.body, styles.addressText]}>
-              {address}
-            </Text>
+                jumping to the far end. */}
             {addressActions && (addressActions.googleMapsHref || addressActions.appleMapsHref) ? (
-              // In a row of its own so the link is as wide as its words and
-              // starts where the address does, not centred across the card.
-              <HStack justify="start">
-                <TextLink label={addressActions.labels.openIn} onClick={() => setMapsOpen(true)} />
-              </HStack>
-            ) : null}
+              // The address is itself the way to a maps app: it opens the
+              // "Open in" drawer. Its spoken name says so after the address.
+              <Button
+                variant="ghost"
+                label={address}
+                aria-label={`${address}. ${addressActions.labels.openIn}`}
+                aria-haspopup="dialog"
+                // Its own direction, from its own first letter: `unicode-bidi` on
+                // the button does not reach the label inside it, `dir` does.
+                dir="auto"
+                onClick={() => setMapsOpen(true)}
+                xstyle={[textLinkLook.link, styles.addressLink]}
+              />
+            ) : (
+              // Plain text, so it can be selected and copied by hand.
+              <Text type="supporting" xstyle={[styles.body, styles.addressText]}>
+                {address}
+              </Text>
+            )}
           </VStack>
         </TextSwap>
       </AutoHeight>

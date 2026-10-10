@@ -973,8 +973,8 @@ migrations is on the live project** — correction, 9 October, later: 0083, 0084
   is left for Will (before-launch). The job takes about an hour (limit 90 minutes).
 - **An address can be copied or opened in a maps app (D-439, 0.52.0).** On the
   address card of a place or program: a small 32px copy button (no ring: Will's rule for
-  copy actions inside a card), "Open in…" opening a drawer with Google Maps and Apple
-  Maps as Will's own app icons, one corner radius for both, and the address kept
+  copy actions inside a card), the address itself a link that opens a drawer with Google
+  Maps and Apple Maps as Will's own app icons, one corner radius for both, and the address kept
   in its own reading order in Arabic. The drawer's rows are flush with its title, each
   app says "Opens in app", and on a phone a tap opens the app or, failing that, the
   App Store / Play Store page (Android has no Apple Maps row). Eight strings in seven

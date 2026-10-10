@@ -63,11 +63,15 @@ describe('the address card', () => {
     </main>
   );
 
-  it('offers a small copy button and "Open in…" beside the address', () => {
+  it('offers a small copy button, and the address itself opens the maps drawer', () => {
     render(place({ addressActions }));
-    expect(screen.getByText('1231 N Broad St, North Philadelphia')).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Copy address' })).toBeTruthy();
-    expect(screen.getByRole('button', { name: 'Open in…' })).toBeTruthy();
+    // The address is the link: its words are what is shown, and its spoken name
+    // says what it does. There is no separate "Open in…" line.
+    const link = screen.getByRole('button', { name: '1231 N Broad St, North Philadelphia. Open in…' });
+    expect(link.textContent).toBe('1231 N Broad St, North Philadelphia');
+    expect(link.getAttribute('aria-haspopup')).toBe('dialog');
+    expect(screen.queryByText('Open in…')).toBeNull();
     // The apps are behind the drawer, not on the card.
     expect(screen.queryByRole('link', { name: /Google Maps/ })).toBeNull();
     expect(screen.queryByRole('link', { name: /Apple Maps/ })).toBeNull();
@@ -75,7 +79,7 @@ describe('the address card', () => {
 
   it('opens a drawer with Google Maps and Apple Maps, each a link to that app', async () => {
     render(place({ addressActions }));
-    fireEvent.click(screen.getByRole('button', { name: 'Open in…' }));
+    fireEvent.click(screen.getByRole('button', { name: /Open in…$/ }));
     const google = await screen.findByRole('link', { name: /^Google Maps/ });
     const apple = await screen.findByRole('link', { name: /^Apple Maps/ });
     expect(google.getAttribute('href')).toBe(addressActions.googleMapsHref);
@@ -94,7 +98,7 @@ describe('the address card', () => {
 
   it('says under each app\'s name that it opens in the app', async () => {
     render(place({ addressActions }));
-    fireEvent.click(screen.getByRole('button', { name: 'Open in…' }));
+    fireEvent.click(screen.getByRole('button', { name: /Open in…$/ }));
     await screen.findByRole('link', { name: /Google Maps/ });
     expect(screen.getAllByText('Opens in app')).toHaveLength(2);
   });
@@ -106,7 +110,7 @@ describe('the address card', () => {
     it('on Android, sends Google Maps through an intent that falls back to the Play Store, and has no Apple Maps', async () => {
       asDevice('Mozilla/5.0 (Linux; Android 14; Pixel 8) Chrome/126.0.0.0 Mobile Safari/537.36');
       render(place({ addressActions }));
-      fireEvent.click(screen.getByRole('button', { name: 'Open in…' }));
+      fireEvent.click(screen.getByRole('button', { name: /Open in…$/ }));
       const google = await screen.findByRole('link', { name: /Google Maps/ });
       await waitFor(() => expect(google.getAttribute('href')).toMatch(/^intent:\/\//));
       expect(google.getAttribute('href')).toContain('S.browser_fallback_url=');
@@ -125,7 +129,7 @@ describe('the address card', () => {
       });
       try {
         render(place({ addressActions }));
-        fireEvent.click(screen.getByRole('button', { name: 'Open in…' }));
+        fireEvent.click(screen.getByRole('button', { name: /Open in…$/ }));
         const apple = await screen.findByRole('link', { name: /Apple Maps/ });
         expect(apple.getAttribute('href')).toBe(addressActions.appleMapsHref);
         // Only script can tell whether the app is there, so this one is a button.
@@ -143,7 +147,7 @@ describe('the address card', () => {
 
   it('offers only the app it has a link for', async () => {
     render(place({ addressActions: { ...addressActions, googleMapsHref: null } }));
-    fireEvent.click(screen.getByRole('button', { name: 'Open in…' }));
+    fireEvent.click(screen.getByRole('button', { name: /Open in…$/ }));
     expect(await screen.findByRole('link', { name: /^Apple Maps/ })).toBeTruthy();
     expect(screen.queryByRole('link', { name: /Google Maps/ })).toBeNull();
   });
@@ -167,14 +171,15 @@ describe('the address card', () => {
   it('is only the words when nobody asks for the actions, or there is no address', () => {
     const { rerender } = render(place());
     expect(screen.queryByRole('button', { name: 'Copy address' })).toBeNull();
-    expect(screen.queryByRole('button', { name: 'Open in…' })).toBeNull();
+    expect(screen.queryByRole('button', { name: /Open in…/ })).toBeNull();
     rerender(place({ address: null, addressActions }));
     expect(screen.queryByRole('button', { name: 'Copy address' })).toBeNull();
   });
 
-  it('leaves "Open in…" out when there is no link to give, but keeps copy', () => {
+  it('leaves the address as plain words when there is no link to give, but keeps copy', () => {
     render(place({ addressActions: { ...addressActions, googleMapsHref: null, appleMapsHref: null } }));
     expect(screen.getByRole('button', { name: 'Copy address' })).toBeTruthy();
-    expect(screen.queryByRole('button', { name: 'Open in…' })).toBeNull();
+    expect(screen.getByText('1231 N Broad St, North Philadelphia').closest('button')).toBeNull();
+    expect(screen.queryByRole('button', { name: /Open in…/ })).toBeNull();
   });
 });

@@ -4,8 +4,8 @@
 
 On a place or a program, the address card now has a small copy button: tap it and
 the address is on your phone's clipboard, ready to paste into any maps app, a
-ride app or a note. Under the address, "Open in…" opens a drawer with Google Maps
-and Apple Maps, each with its own icon, and one tap hands the address to that app.
+ride app or a note. The address itself is a link: tap it and a drawer opens with Google
+Maps and Apple Maps, each with its own icon, and one tap hands the address to that app.
 In Arabic the address now keeps its own order instead of being turned around
 (D-439). The drawer's rows line up with its title, each app says "Opens in app",
 and on a phone a tap opens the app — or, if it is not installed, its page in the

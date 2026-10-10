@@ -10983,13 +10983,17 @@ and resolve them using best UI/UX practices."
   is missing or if a language that needs none carries dead ones.
 - **Right to left.** `<html dir>` follows the language; Astryx mirrors from
   it; logical CSS properties do the rest. What they cannot say lives in
-  `globals.css`: `--pam-flip` (a slide's direction), `[data-pam-directional]`
-  arrows, phone/email/code fields kept left-to-right, no letter-spacing in
+  `globals.css`: `--pam-flip` (a slide's direction), phone/email/code fields
+  kept left-to-right, no letter-spacing in
   Arabic (it breaks the joins), Latin digits in Arabic (`ar-u-nu-latn`: a
   phone number or a time is read the same in every language), and swipe
   gestures flipped. A name in the other direction (an English program in an
   Arabic screen) is set in its own direction where it ends in an ellipsis
   (`unicode-bidi: plaintext`), so it loses its end, not its beginning.
+  **Arrows and chevrons are not mirrored (Will, 10 October 2026: "the chevrons don't
+  need to be reversed. Only text and layout").** The back arrow in a sub-page header was
+  the one glyph Pam turned round for Arabic (`[data-pam-directional]`); that rule is gone,
+  so it points as it does in English. Astryx's own list chevrons never mirrored.
 - **Dignity holds in every language.** The §0 rule is a substring check
   against a per-language list (`language.ts`), run on all seven bundles.
   Known gap: Spanish has no list of its own yet (it is checked with the
@@ -11508,11 +11512,16 @@ looked at, so its first run would have failed on the whole backlog.
 Arabic sentence is reordered: "Let's ensure the address listed is easily copied into
 google maps or apple maps to help them navigate."
 
-- **What a person gets.** On the address card of a place or a program: the address as
-  plain, selectable words; a **small copy button** at the card's corner; and an
-  **"Open in…"** link under the address that opens a drawer with **Google Maps** and
-  **Apple Maps**, each an app symbol in a square frame, in full colour, with its name
-  (Will, same day: "the CTA just says Open in… then a drawer pops up"). Copy is the one
+- **What a person gets.** On the address card of a place or a program: a **small copy
+  button** at the card's corner, and **the address itself as a link** that opens a drawer
+  with **Google Maps** and **Apple Maps**, each an app symbol in a square frame, in full
+  colour, with its name (Will, 9 October: "the CTA just says Open in… then a drawer pops
+  up"; 10 October: "instead of the Open in… button, let's make the address a hyperlink that
+  opens drawer" — so there is no separate line under the address). The address is
+  underlined and in the accent colour, always (a touch screen has no hover to say it can be
+  tapped), wraps like the plain address it replaces and keeps its own reading order in
+  Arabic; its spoken name is "123 Main St. Open in…" and it is marked as opening a dialog.
+  Where there is no map link to give, it is plain, selectable words again. Copy is the one
   that reaches every other app (Waze, a ride app, a paper note); the drawer is for
   everyone who wants to tap and go. "Get directions" (Google) is still the page's
   primary button where it is shown.

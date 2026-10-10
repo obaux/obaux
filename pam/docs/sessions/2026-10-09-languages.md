@@ -399,3 +399,17 @@ android vs ios."
 - **Not tried on a phone.** Before-launch has a real-device check for the app-or-store
   hand-off, including the two store addresses, which were written from memory.
 
+- **The address is the link (10 October, later).** Will: "instead of Open in… button, let's
+  make the address a hyperlink that opens drawer." The "Open in…" line under the address is
+  gone; the address (underlined, accent colour) opens the drawer, named for a screen reader
+  "address. Open in…". The string `place.address.openIn` stays, now as the spoken hint.
+- **Why the text-fit job went red on `441ede8`.** Its four unaccepted defects were all the
+  Trips card's date: the example visits are "in 2 days" and "in 5 days", so the text a defect
+  is recorded under moved from "Wednesday, Oct 14" (the day I wrote the list) to "Thursday,
+  Oct 15" overnight. Nothing about the layout changed. The audit now runs every story with the
+  browser clock set to 9 October 2026 (`AUDIT_NOW` in `scripts/audit-language-fit.mjs`), so
+  dates in stories stop moving; the accepted list is unchanged.
+- **Arrows are not mirrored in Arabic (Will, 10 October).** "The chevrons don't need to be
+  reversed. Only text and layout." The one mirrored glyph was the sub-page back arrow
+  (`BackArrowIcon`, `[data-pam-directional]` in `globals.css`); the rule and the attribute are
+  removed. The list-row and place-header chevrons were never mirrored (checked in the browser).
