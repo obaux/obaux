@@ -1339,7 +1339,7 @@
   "memberPolicies.none": "Este programa no tiene políticas para firmar.",
   "memberPolicy.count": "Política {current} de {total}",
   "memberPolicy.sign": "Firmar",
-  "transparency.canSee.signed": "Las políticas que firmas para un programa y el día en que las firmaste. Un programa al que te uniste también lo ve.",
+  "transparency.canSee.signed": "Las políticas que firma para un programa y el día en que las firmó. Un programa donde se inscribió también lo ve.",
   "memberPolicy.record": "El programa guarda un registro de las políticas que firmas, con la fecha.",
   "memberPolicy.readPages": "Lee cada página y luego firma.",
   "memberPolicy.record.meaning": "Firmar aquí es un registro de que leíste y estuviste de acuerdo.",
