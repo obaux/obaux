@@ -926,6 +926,33 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
+## Languages & legal · English tags before each language name; the privacy wording (10 October) — on the branch, not merged
+
+Branch `claude/lena-english-language-tags`. Two jobs from Will via Mira (D-455, D-452).
+
+- **Every list of languages starts each name with an English tag** — EN, ES, PT-BR, ZH-CN, ZH-HK, RU, AR
+  (`LANGUAGE_TAGS` in `@pam/config`, constants, never bundle strings; a test fails if one is missing,
+  differs from its code, or turns up in a bundle). On the Language screen, the sign-in globe menu and
+  the current-language chip, the join screen's language chips, Profile's Language row (before the
+  current language) and Storybook's locale menu. Hidden from a screen reader; each name carries its own
+  `lang`, so it is spoken in its own voice. Left to right and isolated, at the start of the row (the
+  right in Arabic). Screenshots at 320px: `docs/languages/language-tags/`.
+- **Crossing into the design system, with Mira's OK:** `ChoiceChips` no longer turns a chip round with its
+  language (the Arabic chip on an English page read "العربية  AR"); `lang` stays on the button for the
+  spoken name, `dir` is on the words only. `@pam/ui` exports `./OptionTag` (`OptionTag`, `TaggedWords`),
+  which the sign-in menu now uses.
+- **The privacy page says what a guide can and cannot read**, as the transparency screen does: a guide
+  sees everything you send them directly, nothing you send to anyone else, and one message if someone
+  reports it. Seven languages; `legal.test.ts` pins the wording. The contract is unchanged. The six
+  translations are Claude's and are promises: they still need a native reader (`before-launch.md`).
+- **Verified:** `@pam/config` 815, `@pam/ui` 117, `@pam/web` 55 unit tests; typecheck; Storybook builds; the
+  browser suite on all three viewports, 900 passed; the full fit audit (480 stories × en, ru, ar, zh-CN,
+  pseudo): 85 new in a language, 81 accepted, 4 not accepted, all Explore's pseudo-language clamps (see the
+  session log).
+- **Not done:** hearing the tags with a screen reader (before-launch); `transparency.canSee.lastActive` and
+  "You can block anyone" are promises Pam does not keep yet (the first is a wording fix, the second waits
+  on Will: build the Block control or change the words).
+
 ## Places & programs · load a lead's own program (10 October) — on the branch, not merged
 
 D-447, on `claude/places-programs-load-own-program` (Piper). A program lead's program is

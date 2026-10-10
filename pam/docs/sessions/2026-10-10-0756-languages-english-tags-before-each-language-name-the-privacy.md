@@ -41,6 +41,11 @@ Will said: it becomes true for texts once the carrier filing is done.
   back to English after the `lang` check had passed. The checks now give the stub the language. And
   Profile cannot be reached in a browser test at all (its tab shell is Storybook-only), so Profile's row
   is covered by a Storybook screenshot and the account settings row by a browser check.
+- **Dot's chip turned itself round.** `ChoiceChips` put the language's `dir` on the whole button, so on an
+  English page the Arabic chip read "العربية  AR", the tag after the name for the reader who most needs it
+  first. The rows were right; the chips were wrong, and no test looked at where the tag sat. Found by looking
+  at the screenshot, not by a check. Fixed with Mira's OK (`lang` stays on the button for the spoken name,
+  `dir` on the words only) and pinned by a unit test and a browser check on an English and an Arabic page.
 - **A wait loop that never ended**, twice: `pgrep -f "next build"` inside the loop matched the loop's own
   command line. Wait on the build's log instead.
 
@@ -52,14 +57,39 @@ Will said: it becomes true for texts once the carrier filing is done.
 
 ## Verified
 
-Filled in when the long checks have finished (below).
+On head `572662c` plus this log (the chip fix, `b8c757b`, is in all of it); each long check was run again after the
+chip fix and the `OptionTag` export, because both change how a chip is laid out.
+
+| Check | Result |
+|---|---|
+| `@pam/config` unit tests | 815 pass (31 in `i18n.test.ts`, with the tag checks; `legal.test.ts` pins the privacy wording) |
+| `@pam/ui` unit tests | 117 pass (10 in `option-tag.test.tsx`; a chip or row with no tag draws exactly what it drew, by snapshot) |
+| `@pam/web` unit tests | 55 pass |
+| Typecheck, `@pam/web` and `@pam/ui` | clean |
+| Storybook build | completes |
+| Browser suite, all three projects (narrow 320, dark 320, iPhone SE) | 900 passed, 0 failed (10.6 minutes) |
+| New browser checks | the sign-in menu in all seven languages; the Language screen in en, ru and ar; the account settings row; the join chips on an English and on an Arabic page |
+| Fit audit, 480 stories × en, ru, ar, zh-CN, pseudo at 320px | 85 new in a language: 81 accepted, **4 not accepted**; see below |
+| Fit audit on the privacy, terms, legal and "what others can see" stories, before the chip fix | 0 defects |
+| Screenshots at 320px (light, dark, Arabic) | `docs/languages/language-tags/` |
+
+**The four not accepted** are all `pseudo clamp` on `member-created--explore` (three card descriptions and "Example
+Workforce Center", 65 > 44 and 70 > 47). They are not from this branch: a Storybook build of plain `main` at
+`5dd52b8` measured on its own gives the same four. Explore, its cards and its chips are untouched here. They are
+the four the merge desk reported as intermittent on `main`; here they were present on every run, so they are a
+property of the story in the pseudo-language, and what to do about them is the design system's and Will's
+(a line in `fit-known.json` needs a reason somebody looked at).
+
+**Not run:** hearing the tags with a screen reader; the database suite (no change in `packages/db`).
 
 ## Left undone
 
-- The Arabic chip on an English page reads "العربية  AR" (tag after the name for a left-to-right reader),
-  because `ChoiceChips` puts `lang` and `dir` on the whole chip. A finding for Dot (the design system),
-  sent to the merge desk. Rows are right.
-- `OptionTag` is not exported from `@pam/ui`, so the sign-in dropdown draws its own copy at the same size.
+- The four Explore pseudo-language clamps (above).
+- Two promises the merge desk found, for the next small branch: `transparency.canSee.lastActive` says a program
+  sees "the last day you used Pam" and the database does not hand it over (0062; wording fix, all seven
+  languages), and "You can block anyone, and they will not know" / "Block someone … from inside the chat" with
+  no Block control in the app (0076 is live; nothing calls it; and the blocked person's screen can learn they
+  were blocked). QUESTION sent to the merge desk: build the control, or change the words.
 - The six translations of the two privacy paragraphs are mine; they are promises and still need a native
   reader, like the rest.
 
