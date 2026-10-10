@@ -2,9 +2,11 @@ import { Body, Lead, P, ReadMore, Section } from '../components/Prose';
 import { Screenshot } from '../components/Screenshot';
 import { Steps } from '../components/Steps';
 import { VISIT_REMINDERS_LIVE } from './flags';
+import { RULES_SLUG, SIGNING_LIVE } from './rules';
 
 /**
- * Support post: Planning a visit (members). Written from main on 10 October (Piper's trips:
+ * Support post: Planning a visit (members). The paragraph about signing a policy shows only when
+ * `SIGNING_LIVE` (rules.ts): until members can really sign in Pam, no real place asks them to. Written from main on 10 October (Piper's trips:
  * D-454 saved trips, D-470 a trip names its service, cancel + past visits) in the app's own
  * words (en.json: trips.*, place.visit.*, place.services.pickFirst, place.schedule). The
  * reminder paragraph follows `VISIT_REMINDERS_LIVE`
@@ -41,10 +43,15 @@ export function PlanningAVisit() {
           alt="A place with two services to choose from, “Computer classes” and “Drop-in help”, and a “Plan a trip” button at the bottom."
           caption="A place that lists services: pick one, then “Plan a trip”."
         />
-        <P>
-          Some places ask you to sign a policy before you go. If so, you will see “Policies to sign” on the
-          place, and a “Sign” link on Trips.
-        </P>
+        {SIGNING_LIVE ? (
+          <>
+            <P>
+              Some places ask you to sign a policy before you go. If so, you will see “Policies to sign” on the
+              place, and a “Sign” link on Trips. Signing never stops you from booking.
+            </P>
+            <ReadMore label="Signing a program’s rules" href={`/support/${RULES_SLUG}/`} />
+          </>
+        ) : null}
       </Section>
 
       <Section title="Change a visit">
