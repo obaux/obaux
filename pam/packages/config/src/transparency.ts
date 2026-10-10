@@ -54,13 +54,16 @@ export const ADMIN_CAN_SEE = [
    */
   'badges',
   /**
-   * Since D-242 (Will, 3 October) this is true of a program the member joined
-   * as well as of their case manager: a program lead sees the last day a
+   * True of a case manager. D-242 (Will, 3 October) meant it to be true of a
+   * program the member joined as well: a program lead seeing the last day a
    * member used Pam, on the member's page, beside their visits with that
-   * program. Stated on the screen (`canSee.lastActive`), which no longer
-   * promises the opposite. The database does not hand it to a program yet
-   * (`04_transparency_contract_test.sql` part 3 still holds); that is a
-   * follow-up migration, so today the line is true only of example people.
+   * program. The database does not hand it to a program yet
+   * (`04_transparency_contract_test.sql` part 3 still holds; 0062 closed the
+   * route), so the member-facing line (`canSee.lastActive`) says only "the
+   * last day you used Pam" and makes no promise about a program (D-465). The
+   * follow-up migration is still open; when it is live the second sentence
+   * returns. Until then a program lead's page can show it for example people
+   * only.
    */
   'last_active_date',
   'active_connections_names_and_kind',
@@ -203,10 +206,13 @@ export const TRANSPARENCY_SCREEN: {
     },
     // D-413 — badges named, not left to "level": a case manager already reads them.
     { key: 'transparency.canSee.points', en: 'Your points, your level and your badges' },
-    // D-242 — a program you joined sees this too; said here, not implied.
+    // The case manager sees this. A program does NOT yet: D-242 (Will, 3 October) said it should, but the
+    // database never handed it over (0062; `provider_linked_members()` returns an id and a first name), so
+    // the line says only what is true. Put "A program you joined sees this too." back when that migration is
+    // live and `04_transparency_contract_test.sql` part 3 says so (D-465).
     {
       key: 'transparency.canSee.lastActive',
-      en: 'The last day you used Pam. A program you joined sees this too.',
+      en: 'The last day you used Pam.',
     },
     {
       key: 'transparency.canSee.connections',
