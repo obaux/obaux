@@ -1,12 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { VStack } from '@astryxdesign/core/VStack';
 import { SubPage } from '@pam/ui/SubPage';
 import { useI18n } from '@/lib/i18n';
 import { markSetupDone, readSentProgram, saveSentProgram } from '@/lib/programSetup';
-import { asksForOwnProgram, submitOwnProgram } from '@/lib/useOwnProgram';
+import { asksForOwnProgram, resendOwnProgram, submitOwnProgram, useOwnProgram } from '@/lib/useOwnProgram';
 import { useSession } from '@/lib/useSession';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { Notice } from '@pam/ui';
@@ -65,6 +65,17 @@ export function AddProgramView({ isTab = false }: { readonly isTab?: boolean } =
   const supportPhone = useSupportPhone();
   // A signed-in program lead, not a demo account: their send is saved for real.
   const isReal = asksForOwnProgram(session) !== null;
+  // Editing after Pam asked for changes sends the same submission again; it is
+  // not a second send (`submit_program` would refuse while this one is open).
+  const own = useOwnProgram(session);
+  const resendId = isEditing && own.status === 'ready' ? own.program.submissionId : null;
+  // On another phone nothing was kept in this tab: fill in what the database holds, once.
+  const [filled, setFilled] = useState(false);
+  useEffect(() => {
+    if (!isEditing || filled || own.status !== 'ready') return;
+    setFilled(true);
+    if (readSentProgram() === null) setProgram(own.program.details);
+  }, [isEditing, filled, own]);
   const wizard = useProgramWizard({
     value: program,
     onChange: setProgram,
@@ -72,7 +83,7 @@ export function AddProgramView({ isTab = false }: { readonly isTab?: boolean } =
       if (isReal) {
         setBusy(true);
         setFailed(false);
-        const ok = await submitOwnProgram(program);
+        const ok = resendId !== null ? await resendOwnProgram(resendId, program) : await submitOwnProgram(program);
         setBusy(false);
         // Not on file: stay on the last question with what was typed, and say so.
         if (!ok) {

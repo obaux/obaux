@@ -4,6 +4,7 @@ import {
   editColumns,
   phoneForDatabase,
   programFromRow,
+  resendArguments,
   submitArguments,
   type OwnProgramRow,
   type SubmissionRow,
@@ -145,5 +146,21 @@ describe('changeRequest (D-447)', () => {
       address: '12 Main St',
     });
     expect(changeRequest(live, { ...same, address: '' })?.address).toBeNull();
+  });
+});
+
+describe('resendArguments', () => {
+  it('is a send for the submission being corrected', () => {
+    const args = resendArguments('sub-1', {
+      name: ' Fresh Start ',
+      category: 'workforce',
+      subcategory: '',
+      description: 'Classes.',
+      address: '',
+      phone: '',
+      website: '',
+      services: [],
+    });
+    expect(args).toMatchObject({ p_id: 'sub-1', p_name: 'Fresh Start', p_category: 'workforce', p_subcategory: null, p_address: null });
   });
 });

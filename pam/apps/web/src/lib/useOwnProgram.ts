@@ -9,6 +9,7 @@ import {
   changeRequest,
   editColumns,
   programFromRow,
+  resendArguments,
   submitArguments,
   type EditableProgram,
   type OwnProgram,
@@ -127,12 +128,44 @@ export async function submitOwnProgram(details: ProgramDetails): Promise<boolean
 }
 
 /**
+ * Correct a program and send it again (`resend_program_submission`,
+ * 20261010135742): "Edit and send again" after Pam asked for changes, or a
+ * correction while it waits. The same submission goes back to review. Resolves
+ * false when it could not be saved.
+ */
+export async function resendOwnProgram(submissionId: string, details: ProgramDetails): Promise<boolean> {
+  try {
+    const { createClient } = await import('./supabase');
+    const { error } = await createClient().rpc('resend_program_submission', resendArguments(submissionId, details));
+    if (error) return false;
+    await refreshOwnProgram();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Save an edit of the lead's own program (D-447). The description, phone and
  * website of a live program apply at once; a changed name or address is not
  * written to the live listing but asked of Pam (`request_program_change`), and
  * waits beside it. A program still being checked changes in place.
  */
 export async function saveOwnProgram(program: OwnProgram, draft: EditableProgram): Promise<boolean> {
+  // A program still being checked is corrected through its submission, so the
+  // record Pam reads says the same as the listing (and a request for changes is
+  // answered by saving).
+  if (!program.isLive && program.submissionId !== null) {
+    return resendOwnProgram(program.submissionId, {
+      ...program.details,
+      name: draft.name,
+      category: draft.category,
+      description: draft.description,
+      address: draft.address,
+      phone: draft.phone,
+      website: draft.website,
+    });
+  }
   try {
     const { createClient } = await import('./supabase');
     const supabase = createClient();

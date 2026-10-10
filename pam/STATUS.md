@@ -1202,6 +1202,10 @@ Merged to `main` by the merge desk, 10 October, from `claude/places-programs-rem
 
 Merged to `main` by the merge desk, 10 October, from `claude/places-programs-quiet-hours-retime`. Migration `20261010133227`, expand only: changing quiet hours re-runs `queue_trip_reminder` for every future trip (consent still checked inside). **Applied live at merge** (recorded as 20261010133736), read back: body identical to the file, service role only, the trigger beside the turn-on one. Test `39_quiet_hours_change_retimes_texts_test.sql`; test 36's gap 1b flipped, so every gap the rehearsal found is closed. A story "Trips with a past visit" (for Wren's "Planning a visit").
 
+## Places & programs · a leader answers a request for changes (10 October 2026) — READY, not merged
+
+Branch `claude/places-programs-lead-reads-review`. Migration `20261010135742` (`resend_program_submission`), expand only; test `42_a_lead_sends_the_program_again_test.sql`. Edit and send again resends the same submission; a program being checked is corrected through it. Land after part 6.
+
 ## Places & programs · review record, pending change, program services — the database half (10 October 2026)
 
 Merged to `main` by the merge desk, 10 October, from `claude/places-programs-submissions-and-services`

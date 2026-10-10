@@ -129,6 +129,11 @@ export function submitArguments(details: ProgramDetails): Record<string, string 
   };
 }
 
+/** The arguments of `resend_program_submission` (20261010135742): the same words as a send, for the submission being corrected. */
+export function resendArguments(submissionId: string, details: ProgramDetails): Record<string, string | null> {
+  return { p_id: submissionId, ...submitArguments(details) };
+}
+
 /** What an edit may write. */
 export interface EditableProgram {
   readonly name: string;

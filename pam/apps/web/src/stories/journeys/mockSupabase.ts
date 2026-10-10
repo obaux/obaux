@@ -306,6 +306,11 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
       ];
       return { body: ownProgramRow(ownProgram) };
     }),
+    // Corrected and sent again: the same submission, back in review (20261010135742).
+    on('/rpc/resend_program_submission', () => {
+      submissions = submissions.map((s) => (s['kind'] === 'new' ? { ...s, status: 'in_review', changes_note: null } : s));
+      return { body: submissions[0] ?? null };
+    }),
     on('/rpc/request_program_change', (_url, _method, body) => {
       const args = (body ?? {}) as { p_name?: string; p_address?: string | null };
       const change = {
