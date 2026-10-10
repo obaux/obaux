@@ -60,13 +60,13 @@ export function TextsFromPam() {
           The Text reminders screen lists what Pam would send, and says which of those it sends today. The Text
           alerts screen says “Coming soon” beside the ones it does not send yet.
         </P>
-        <P>Messages and notes about new messages show up inside Pam, on the bell and on Home.</P>
+        <P>Messages and notes about new messages show up inside Pam, on the bell and on the Messages tab. A case manager or program lead also sees the number on Home.</P>
       </Section>
 
       <Section title="The rules">
         <Steps
           items={[
-            'Pam texts you reminders only if you said yes. You choose when you join (“Yes, text me reminders” or “Not now”), or later on the Text reminders screen (“Agree to receive texts” or “Not now”).',
+            'Pam texts you reminders only if you said yes. You choose when you join (“Yes, text me reminders” or “Not now”), or later, from the “Get text reminders” card on Profile (“Agree to receive texts” or “Not now”).',
             'No texts go out from 9 pm to 7 am, Philadelphia time. A text that is due in those hours waits until the morning.',
             'Reply STOP to any text and the texts stop. Nothing in the app can turn them back on. If you replied STOP by mistake, call Pam.',
             'A sign-in code is not a reminder. It comes when you ask for it.',
@@ -80,7 +80,7 @@ export function TextsFromPam() {
             VISIT_REMINDERS_LIVE
               ? 'Think about which text it was. Pam does not text you about new messages or when someone wants to connect.'
               : 'Think about which text it was. Pam does not send visit reminders or message alerts yet.',
-            'Check that you said yes. Tap Profile, then Settings, then “Text reminders”. If you chose “Not now”, you can change it there. If you replied STOP, the screen says “Texts are off”, and you need to call Pam.',
+            'Check that you said yes. Tap Profile. If you said yes, the list has a “Text reminders” row. If you chose “Not now”, you will see a “Get text reminders” card at the top instead: tap it to change your answer. If you replied STOP, that card opens a screen that says “Texts are off”, and you need to call Pam. (A case manager or program lead sees “Get text alerts” on that card.)',
             'Check the time. Nothing is sent from 9 pm to 7 am, Philadelphia time.',
             'Check that the phone number on your account is the right one.',
             'For a sign-in code, wait for the “Send it again” timer to finish, then ask for a new code. Use the newest one.',

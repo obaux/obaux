@@ -23,7 +23,7 @@ export function OnePhoneTwoSides() {
             'Tap Profile.',
             'Tap “Use Pam as”.',
             'Tap “Me” or “My program”. The side you are using has a tick.',
-            'Pam takes you to Home, on that side.',
+            'Pam opens that side. For “Me” it opens Explore. For “My program” it opens Home.',
           ]}
         />
         <P>You only see “Use Pam as” if your account has both sides.</P>

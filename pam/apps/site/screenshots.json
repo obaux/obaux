@@ -55,6 +55,12 @@
     "name": "Conversation"
   },
   {
+    "id": "member-created--conversation-options",
+    "out": "messages-in-pam/options.png",
+    "height": 330,
+    "name": "A conversation's Options: Stuff shared, Report suspicious activity, Block this person"
+  },
+  {
     "id": "member-created--report-message",
     "out": "messages-in-pam/report.png",
     "name": "Report a message"
@@ -62,8 +68,8 @@
   {
     "id": "member-created--points",
     "out": "points-and-badges/points.png",
-    "name": "Your points",
-    "height": 300
+    "name": "Your points: badge, level, bar and Ways to earn",
+    "height": 560
   },
   {
     "id": "member-created-states-texts-stopped--reminders",
