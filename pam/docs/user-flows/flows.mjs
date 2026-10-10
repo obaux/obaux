@@ -29,8 +29,14 @@
 
 export const UPDATED = '2026-10-10';
 
-/** Where each screen opens live — the branch's Storybook on Chromatic. */
-export const STORYBOOK_URL = 'https://claude-pam-storybook--6abea9193da46b88ce90890f.chromatic.com';
+/**
+ * Where each screen opens live: Chromatic's build of `main`, `https://main--<app id>.chromatic.com`.
+ * A screen's link is `<this>/?path=/story/<story id>`. The map used the old
+ * `claude-pam-storybook--…` build before, a branch that has merged and no longer updates. The app id is
+ * the same. NOT YET OPENED: the sandbox that wrote this cannot reach *.chromatic.com (10 October), so
+ * open one link from the map before relying on the `main--` form.
+ */
+export const STORYBOOK_URL = 'https://main--6abea9193da46b88ce90890f.chromatic.com';
 
 export const flows = [
   {
@@ -171,6 +177,7 @@ export const flows = [
   {
     key: 'member',
     title: 'Member',
+    note: 'The tab bar is live in the app (D-456).',
     intro:
       'Five tabs: Explore, Saved, Trips, Messages, Profile. A member finds a place, plans a visit, and talks to their case manager and programs.',
     roots: ['explore', 'saved', 'trips', 'messages', 'profile'],
@@ -355,6 +362,7 @@ export const flows = [
   {
     key: 'case-manager',
     title: 'Case manager',
+    note: 'The tab bar is live in the app (D-456). Home is still the old Home, with its people strip, until the strip\'s rings are on the redesigned Home (card a22).',
     intro:
       'Four tabs: Home (their members), Saved, Messages, Profile. A case manager invites people, keeps up with their members and connects them to programs.',
     roots: ['home', 'saved', 'messages', 'profile'],
@@ -437,6 +445,7 @@ export const flows = [
   {
     key: 'program-lead',
     title: 'Program lead',
+    note: 'The tab bar is live in the app (D-456). Home is still the old Home, with its people strip, until the strip\'s rings are on the redesigned Home (card a22).',
     intro:
       'Four tabs: Home (who is coming in), Program, Messages, Profile. A program lead looks after their listing, the policies participants sign, and the people booked in. A new lead\'s Home is getting started until somebody books.',
     roots: ['getStarted', 'home', 'program', 'messages', 'profile'],
@@ -597,6 +606,7 @@ export const flows = [
   {
     key: 'super-admin',
     title: 'Super admin',
+    note: 'The tab bar is live in the app (D-456).',
     intro:
       'Three tabs: Home (requests), Messages, Profile. The person running Pam decides who becomes staff, keeps an eye on every invite, and talks to staff — never to members.',
     roots: ['home', 'messages', 'profile'],
