@@ -32,7 +32,7 @@ export const SupportSearch: Story = {
   render: () => <WebsiteWalker start="/support/" />,
   play: async ({ canvasElement }) => {
     const box = await within(canvasElement).findByRole('textbox', { name: 'Search Support' });
-    await userEvent.type(box, 'unassigned');
+    await userEvent.type(box, 'reason');
     await expect(await within(canvasElement).findByText(/1 result for/)).toBeInTheDocument();
   },
 };

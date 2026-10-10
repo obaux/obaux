@@ -5,7 +5,7 @@ import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { VisuallyHidden } from '@astryxdesign/core/VisuallyHidden';
-import { ASSIGNMENT_ROWS, type Cell } from '../content/assignments';
+import { LIVE_ASSIGNMENT_ROWS as ROWS, type Cell } from '../content/assignments';
 
 /*
  * Three columns of sentences do not fit a phone, and a table that scrolls
@@ -45,7 +45,7 @@ export function AssignmentsTable() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {ASSIGNMENT_ROWS.map((row) => (
+            {ROWS.map((row) => (
               <TableRow key={row.action}>
                 <TableCell>
                   <Text weight="semibold">{row.action}</Text>
@@ -63,7 +63,7 @@ export function AssignmentsTable() {
       </VStack>
 
       <VStack gap={3} xstyle={styles.narrow}>
-        {ASSIGNMENT_ROWS.map((row) => (
+        {ROWS.map((row) => (
           <Card key={row.action} padding={4}>
             <VStack gap={2}>
               <Heading level={3}>{row.action}</Heading>

@@ -3,8 +3,8 @@
 Pam now has a public website with a Home page and a Support centre, built from the
 same design system as the app and shown in light or dark to match your device. Support
 has a search box, topics and articles; the first article, "Case manager assignments",
-explains who can take on a member, hand one over, limit or pause an account, and that
-every change needs a written reason. On a phone its table becomes one card per action.
+explains who your case manager is, that a case manager looks after only their own
+members, and that every change to an account has a reason that is kept.
 When the site is shared, it shows "City services in your pocket" with Pam's logo.
 
 Pam, the public site and Storybook now share one icon, a white "p" on Pam green, and

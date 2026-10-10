@@ -11,6 +11,11 @@ to learn how a complicated system works, so it is plain, short and true.
 
 ## 1. Before you write
 
+- **Say only what Pam does today (D-449).** A post about a half-built feature
+  describes the built part and nothing else. If Will's table or text includes things
+  that are not built, keep them in code behind a `live: false` flag (as
+  `content/assignments.ts` does) so they can be published when their screen ships;
+  a site test fails if the post names a held row.
 - **Check it is true of the app.** Read `pam/STATUS.md` and the relevant
   `DECISIONS.md` entries. If Will's information describes behaviour that is not
   built or not live, say so to Will *before* publishing, and add it to

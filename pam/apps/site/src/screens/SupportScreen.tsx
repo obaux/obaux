@@ -45,7 +45,9 @@ function PostList({ posts }: { readonly posts: readonly SupportPost[] }) {
         <ListItem
           key={post.slug}
           label={post.title}
-          description={post.summary}
+          // A node, not a string: Astryx trims a plain-string description to one line,
+          // which cut the summary off on a phone (language-fit audit, 320px).
+          description={<Text type="supporting" as="p">{post.summary}</Text>}
           href={`/support/${post.slug}/`}
         />
       ))}
@@ -73,7 +75,7 @@ export function SupportScreen() {
               <TextInput
                 label="Search Support"
                 isLabelHidden
-                placeholder="Search, for example “limit” or “unassigned”"
+                placeholder="Search, for example “limit” or “reason”"
                 size="lg"
                 value={query}
                 onChange={setQuery}

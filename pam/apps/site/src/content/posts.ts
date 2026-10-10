@@ -35,11 +35,11 @@ const ALL: readonly SupportPost[] = [
   {
     slug: 'case-manager-assignments',
     topic: 'case-managers',
-    keywords: ['assign', 'unassigned', 'hand over', 'limit', 'pause', 'suspend', 'reason', 'audit', 'super admin', 'turn back on'],
+    keywords: ['assign', 'assigned', 'guide', 'limit', 'limited', 'pause', 'paused', 'suspend', 'reason', 'log', 'audit', 'privacy'],
     title: 'Case manager assignments',
     summary:
-      'Who can take on a member, hand one over, or limit and pause an account, and what is always written down.',
-    updated: '2026-10-09',
+      'Who your case manager is, what a case manager can and can’t see, and what is always written down.',
+    updated: '2026-10-10',
   },
 ];
 

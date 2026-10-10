@@ -1,7 +1,7 @@
 import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
-import { ASSIGNMENT_ROWS } from '../src/content/assignments';
+import { ASSIGNMENT_ROWS, LIVE_ASSIGNMENT_ROWS } from '../src/content/assignments';
 import { ALL_POSTS, POSTS, anyPostBySlug, formatDate, postBySlug } from '../src/content/posts';
 
 // The data, and the words written straight into every post's component and page.
@@ -57,5 +57,21 @@ describe('public site content', () => {
     // Read as text: the bodies are StyleX components, which vitest does not compile.
     const bodies = readFileSync(join(SRC, 'content', 'bodies.tsx'), 'utf8');
     for (const p of ALL_POSTS) expect(bodies, p.slug).toContain(`'${p.slug}':`);
+  });
+
+  it('promises nothing Pam cannot do yet: held rows stay out of the live list and the post', () => {
+    const held = ASSIGNMENT_ROWS.filter((r) => !r.live);
+    for (const r of held) expect(LIVE_ASSIGNMENT_ROWS).not.toContain(r);
+    const post = readFileSync(join(SRC, 'content', 'CaseManagerAssignments.tsx'), 'utf8')
+      .replace(/\/\*[\s\S]*?\*\//g, '') // the comment above the post names what is held
+      .toLowerCase();
+    // Nothing the held rows describe may appear in what the reader sees.
+    // (Single words like "Reason" and "Undo" are too common to match; the phrases below cover them.)
+    for (const r of held.filter((r) => r.action.split(' ').length >= 3)) {
+      expect(post, r.action).not.toContain(r.action.toLowerCase());
+    }
+    for (const phrase of ['turn back on', 'unassign', 'hand a member', 'take on']) {
+      expect(post, phrase).not.toContain(phrase);
+    }
   });
 });

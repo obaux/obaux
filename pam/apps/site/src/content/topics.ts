@@ -13,6 +13,6 @@ export interface Topic {
 
 export const TOPICS: readonly Topic[] = [
   { id: 'members', title: 'Members', blurb: 'Finding a place, planning a visit, and keeping going.' },
-  { id: 'case-managers', title: 'Case managers', blurb: 'Your members, who can see what, and what you can change.' },
+  { id: 'case-managers', title: 'Case managers', blurb: 'Who looks after whom, and what is always written down.' },
   { id: 'programs', title: 'Programs', blurb: 'Who is coming, reminders, and getting people sent your way.' },
 ];

@@ -1,7 +1,8 @@
 import * as stylex from '@stylexjs/stylex';
 
 const styles = stylex.create({
-  logo: { height: '36px', width: 'auto', display: 'block' },
+  // Smaller on a narrow phone, so the header holds Home, Support and Sign in at 320px.
+  logo: { height: { default: '36px', '@media (max-width: 400px)': '26px' }, width: 'auto', display: 'block' },
 });
 
 /** Pam's wordmark: deep green on a light page, the coral one on a dark page. */
