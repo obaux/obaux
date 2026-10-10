@@ -928,6 +928,17 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
+## Languages & legal · the privacy page names the company that sends email (10 October) — merged 10 October
+
+Merged by the merge desk from 82160e9. The two gaps below are on Will's card a29 with a third sentence (signatures, policies P2); the merge desk decided a member's address is deleted once the link is sent (Nico building).
+
+Will approved a21 (10 October 14:37 UTC): "When Pam emails a case manager or a program, a company that sends email for us gets the email address and the email.
+It may not use them for anything else." It is `privacy.s.sharing.p4`, word for word, the last paragraph of "Who else gets your information", in all seven
+languages (six by Claude, no native reader), pinned by `test/legal.test.ts` (D-482). **It must be on the live page before the first email goes out.**
+Two things it does not cover are with Will: the expired-link email also goes to a **member** (so the sentence should say "When Pam sends an email…"), and
+`privacy.s.what-we-keep.p7` still says "Members are never asked for an email", which the expired-link page makes untrue. Proposed English for both is in D-482;
+nothing was widened without him.
+
 ## Languages & legal · Spanish says "visita", not "viaje" (10 October) — merged 10 October
 
 Merged to `main` by the merge desk, 10 October, from `claude/lena-es-visitas` (17e22db), after the sweep. 
@@ -1101,7 +1112,9 @@ drops signatures), then `20261010042108_a_program_lead_submits_their_own_program
 
 ---
 
-## Messages & notifications · the clocks send the shared secret (10 October 2026)
+## Messages & notifications · the clocks send the shared secret (10 October 2026) — merged 10 October
+
+Merged by the merge desk from 03d2338. Live: applied as 20261010145909; vault `dispatch_secret` made (64 hex, never read out); cron jobs 3 (`dispatch-sms`) and 4 (`send-invite-emails`) every five minutes with the header from the vault; 15:00 and 15:05 ticks: `dispatch-sms` 200 `{claimed:0,sent:0,failures:[]}`. `send-invite-emails` deployed from main as version 1 (verify_jwt on), answering `{enabled:false}` until Will sets the secrets (card a28).
 
 Branch `claude/messages-invite-email-clock`. One migration (`20261010144844_…`, **not yet applied to the live
 project**): the vault secret `dispatch_secret` (made in the database), `dispatch-sms` rescheduled with the
@@ -1271,10 +1284,15 @@ Merged to `main` by the merge desk, 10 October, from `claude/places-programs-lea
 Branch `claude/places-programs-policies-p3` (D-485). Migration `20261010150922`, expand only: `program_policy_signers` (first name and date, never the picture). The Signed tab and the verified tick read it. Test `47_a_program_reads_who_signed_by_first_name_and_test.sql`.
 
 ## Places & programs · policies, part 2 of 4: members sign (10 October 2026) — READY, not merged (on top of part 1)
+## Places & programs · policies, part 2 of 4: members sign (10 October 2026) — merged 10 October
+
+Merged by the merge desk from 10b3f0b. Live: applied as 20261010151152; read back: both tables RLS on and forced, own-row select only, `program_policies_select_signed`, `can_read_policy_file` / `sign_policy` / `forget_my_signature` match the file by md5, authenticated only, anon nothing. For P3: `archive_policy` checks `is_active_account()`, `add_policy` leaves `p_replaces` out of the 30 cap, pin `reminder_is_quiet`'s search_path (advisor).
 
 Branch `claude/places-programs-policies-p2` (D-485). Migration `20261010145337`, expand only: `policy_signatures`, `member_signatures`, `sign_policy`, `forget_my_signature`. A real place asks for what its program keeps in the database; a member reads each page and signs (draw or type); the program's record line is shown before signing; the transparency promise has its new line. Test `46_a_member_signs_a_program_s_policy_once_and_only_test.sql`. Wren's public post can go once this is merged.
 
-## Places & programs · policies, part 1 of 4: a lead's real policies (10 October 2026) — READY, not merged
+## Places & programs · policies, part 1 of 4: a lead's real policies (10 October 2026) — merged 10 October
+
+Merged by the merge desk from b928b2b. Live: applied as 20261010145952; read back: bucket `policies` private, 10 MB, five types; the three storage policies and four table policies; RLS forced; anon nothing; four function bodies match by md5.
 
 Branch `claude/places-programs-policies-p1` (D-485, Will's card a25). Migration `20261010144052`, expand only: `program_policies`, `program_policy_files`, `add_policy`, `archive_policy`, the private `policies` bucket. A lead adds, opens, replaces and removes real policies; members see nothing new until signing (part 2). Test `45_a_program_s_policies_are_private_to_its_lead_and_test.sql`.
 
