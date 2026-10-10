@@ -1119,7 +1119,7 @@ drops signatures), then `20261010042108_a_program_lead_submits_their_own_program
 
 ## Messages & notifications · why the email service refused (10 October 2026) — merged 10 October
 
-Merged by the merge desk from 0068bcf; deployed with the D-488 bundle.
+Merged by the merge desk from 0068bcf; deployed with the D-488 bundle. **Sending works (10 October, 17:15):** Resend had never verified `mail.joinpam.org` (its record said "not started" though the DNS was right); the merge desk started verification through the Resend connector, it turned Verified, and the test staff invite to Pam's own inbox was delivered at 17:15 (Resend: delivered). Will is checking the email (card a33).
 
 Branch `claude/messages-email-error-detail`. `send-invite-emails` now keeps Resend's `name` and `message` (addresses and keys
 redacted, about 200 characters) in a failed row's `failure_reason`, instead of only the status. Needs a redeploy of the function.
@@ -1877,6 +1877,8 @@ live project (it went live on 20 September — "What needs a human" row 24), and
 either session's migrations deployed — see the drift note under "What is
 live" and the "Live RLS fingerprint" row under "What is proven."
 
-## Places & programs · approving a request from someone who is already a member (10 October 2026) — READY, not merged
+## Places & programs · approving a request from someone who is already a member (10 October 2026) — merged 10 October
+
+Merged by the merge desk from b4534267 (713584b). Live: applied as 20261010171050; `review_staff_request`'s body matches the file by md5, search path pinned, anon cannot run it. The one waiting request (a program-lead request from someone who is now a member, the only city) can be approved; Will asked to tap Approve again (card a34).
 
 Branch `claude/places-programs-approve-existing-member` (D-491). Migration `20261010160818`: `review_staff_request` adds the provider role to an existing member's account (city kept; `ROLE_PAIR_NOT_ALLOWED` / `ACCOUNT_IN_OTHER_CITY` otherwise). The staff screen says what happened or why not, never "Call Pam". Test `50_approving_a_staff_request_for_an_existing_member_test.sql`; e2e `staff-request-approve.spec.ts`.
