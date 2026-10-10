@@ -1077,6 +1077,14 @@ drops signatures), then `20261010042108_a_program_lead_submits_their_own_program
 
 ---
 
+## Messages & notifications · the expired-link email has a sender (10 October 2026) — merged 10 October
+
+Merged to `main` by the merge desk, 10 October, from `claude/messages-expired-link-email` (ca4f683). `send-invite-emails`
+now also sends the fresh link to someone whose link ran out, under the same `INVITE_EMAILS` switch and secrets, in
+Will's 4 October wording. One migration (`20261010133313_…`, **applied live at merge**, recorded as 20261010133956;
+read back: the three bodies identical to the file, service role only, `invite_emails` still forced RLS, 0 rows waiting);
+DB test 40 (numbered 39 on its branch; Piper's quiet-hours test took 39 first); sender tests. Still not deployed or switched on: that waits for Will's email setup. D-476.
+
 ## Messages & notifications · overdue texts are cancelled (10 October 2026) — merged 10 October
 
 Merged to `main` by the merge desk, 10 October, from `claude/messages-overdue-cutoff` (4de80ab). One migration
