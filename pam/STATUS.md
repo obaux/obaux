@@ -1155,6 +1155,10 @@ Merged to `main` by the merge desk, 10 October, from `claude/places-programs-tri
 
 Merged to `main` by the merge desk, 10 October, from `claude/places-programs-points-promise` (4bf85c2). "Ways to earn" lists only what Pam pays today (save a place +5, finish setup +25), driven by `AWARDED_TODAY`. The proposal for making plan-a-trip and call-a-place real is in `docs/points-awarding.md`, waiting on Will. No migration.
 
+## Places & programs · cancel a visit, past visits (10 October 2026) — READY, not merged
+
+Branch `claude/places-programs-cancel-trip`. No migration: the database already cancels a cancelled trip's day-before text (`sync_trip_reminder`), now attacked by test `35_cancelling_a_trip_cancels_its_text_test.sql`. The place page offers "Cancel this visit"; Trips has a "Past visits" section.
+
 ## Places & programs · review record, pending change, program services — the database half (10 October 2026)
 
 Merged to `main` by the merge desk, 10 October, from `claude/places-programs-submissions-and-services`

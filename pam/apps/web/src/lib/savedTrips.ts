@@ -1,4 +1,4 @@
-import { addTrip, moveTrip, setSavedTrips, readAddedTrips, type AddedTrip } from './addedTrips';
+import { addTrip, cancelTripHere, moveTrip, setSavedTrips, readAddedTrips, type AddedTrip } from './addedTrips';
 import type { SessionState } from './useSession';
 
 /**
@@ -149,6 +149,27 @@ export async function moveSavedOrLocalTrip(id: string, startsAt: string): Promis
   try {
     const { createClient } = await import('./supabase');
     const { error } = await createClient().rpc('move_trip', { p_id: id, p_starts_at: startsAt });
+    if (error) return false;
+    await loadSavedTrips();
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Cancel a visit: in the database when it is a saved one (which also cancels
+ * its day-before text, `sync_trip_reminder`), in this tab when not. Resolves
+ * false when it could not be cancelled. Points already earned stay (D-468).
+ */
+export async function cancelSavedOrLocalTrip(id: string): Promise<boolean> {
+  if (!isSavedPlace(id)) {
+    cancelTripHere(id);
+    return true;
+  }
+  try {
+    const { createClient } = await import('./supabase');
+    const { error } = await createClient().rpc('cancel_trip', { p_id: id });
     if (error) return false;
     await loadSavedTrips();
     return true;

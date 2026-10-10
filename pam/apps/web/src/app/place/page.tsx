@@ -13,6 +13,7 @@ import {
   PlaceDetail,
   PlacesIcon,
   SignedIcon,
+  TextLink,
   directionsHref,
   googlePlaceHref,
 } from '@pam/ui';
@@ -38,7 +39,11 @@ import { countdown } from '@/lib/when';
 import { VisitCard } from '@pam/ui/VisitCard';
 import { VStack } from '@astryxdesign/core/VStack';
 import { DUMMY_TRIPS } from '@pam/config/dummy-trips';
-import { readAddedTrips, TRIPS_CHANGED, withMoves } from '@/lib/addedTrips';
+import { readAddedTrips, TRIPS_CHANGED, withMoves, withoutCancelled } from '@/lib/addedTrips';
+import { cancelSavedOrLocalTrip } from '@/lib/savedTrips';
+import { navigate } from '@/lib/navigate';
+import { ConfirmDialog } from '../../screens/ConfirmDialog';
+import { Banner } from '@astryxdesign/core/Banner';
 import { placeAsksForPolicies } from '@pam/config/dummy-policies';
 import { policiesHref } from '../../screens/MemberPoliciesView';
 import { StaffBadge } from '@pam/ui/StaffBadge';
@@ -235,6 +240,9 @@ function PlaceScreen() {
   // about that visit (D-273): its day and time instead of "Plan a trip".
   const [hasTrip, setHasTrip] = useState(false);
   const [visit, setVisit] = useState<{ id: string; startsAt: string; serviceId: string | null } | null>(null);
+  // Cancel this visit (asks first): the one thing here that takes a plan away.
+  const [askingCancel, setAskingCancel] = useState(false);
+  const [cancelFailed, setCancelFailed] = useState(false);
   // The service a member has picked from the cards (D-313): what Plan a
   // trip is for, and what the rows say. With a visit booked, the visit's.
   const [pickedService, setPickedService] = useState<string | null>(null);
@@ -247,7 +255,7 @@ function PlaceScreen() {
   useEffect(() => {
     if (!place) return;
     const read = () => {
-      const here = withMoves([...DUMMY_TRIPS, ...readAddedTrips()])
+      const here = withoutCancelled(withMoves([...DUMMY_TRIPS, ...readAddedTrips()]))
         .filter((trip) => trip.placeId === place.id)
         .sort((a, b) => a.startsAt.localeCompare(b.startsAt));
       setHasTrip(here.length > 0);
@@ -496,6 +504,12 @@ function PlaceScreen() {
                   changeHref={visitAhead ? changeHref : null}
                 />
               ) : null}
+              {visit && visitAhead ? (
+                <>
+                  {cancelFailed ? <Banner status="error" title={t('place.visit.cancel.failed')} /> : null}
+                  <TextLink label={t('place.visit.cancel')} onClick={() => setAskingCancel(true)} />
+                </>
+              ) : null}
               {policiesOnTop ? (
                 <PolicyStatusCard
                   isDone={allSigned}
@@ -639,6 +653,22 @@ function PlaceScreen() {
         }}
       />
 
+      <ConfirmDialog
+        isOpen={askingCancel}
+        title={t('place.visit.cancel.title', { place: place!.name })}
+        body={t('place.visit.cancel.body')}
+        confirmLabel={t('place.visit.cancel.yes')}
+        onConfirm={async () => {
+          setAskingCancel(false);
+          if (visit && (await cancelSavedOrLocalTrip(visit.id))) {
+            navigate('/trips/');
+          } else {
+            setCancelFailed(true);
+          }
+        }}
+        cancelLabel={t('place.visit.cancel.no')}
+        onCancel={() => setAskingCancel(false)}
+      />
     </Page>
   );
 }
