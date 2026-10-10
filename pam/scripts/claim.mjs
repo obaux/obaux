@@ -7,9 +7,10 @@
  *   pnpm claim migration "audit log keeps six months"  → packages/db/migrations/20261010031209_audit_log_keeps_six_months.sql
  *   pnpm claim changelog "Staff are asked for an email"→ docs/changelog/unreleased/20261010031209-staff-are-asked-for-an-email.md
  *   pnpm claim session   "staff email"                 → docs/sessions/2026-10-10-0312-staff-email.md
+ *   pnpm claim test      "a lead switches programs"    → packages/db/test/45_a_lead_switches_programs_test.sql
  *   pnpm claim status                                  → what is claimed where
  *
- * A decision or an amendment is numbered: the script fetches, reads the numbers
+ * A decision, an amendment or a database test is numbered: the script fetches, reads the numbers
  * already used on `main` and on every other pushed branch, takes the next one,
  * writes the file, commits only that file and pushes — so the claim is visible
  * to every other session within seconds. Then it looks again and tells you if
@@ -32,6 +33,10 @@ import {
   changelogFileName,
   changelogTemplate,
   claimedFromAllocationsRow,
+  DB_TEST_DIR,
+  dbTestFileName,
+  dbTestNumberFromFileName,
+  dbTestTemplate,
   decisionFileName,
   decisionTemplate,
   migrationFileName,
@@ -119,6 +124,29 @@ function claimed(ledger) {
   return found;
 }
 
+/** number → the refs that hold it, for the database tests (two digits, by file name). */
+function claimedDbTests() {
+  const found = new Map();
+  const add = (n, ref) => {
+    if (!found.has(n)) found.set(n, new Set());
+    found.get(n).add(ref);
+  };
+  for (const ref of refs()) {
+    for (const file of git(['ls-tree', '-r', '--name-only', ref, '--', DB_TEST_DIR], { allowFail: true }).split('\n')) {
+      const n = file ? dbTestNumberFromFileName(file) : null;
+      if (n) add(n, ref);
+    }
+  }
+  const here = join(PAM, DB_TEST_DIR);
+  if (existsSync(here)) {
+    for (const file of readdirSync(here)) {
+      const n = dbTestNumberFromFileName(file);
+      if (n) add(n, 'working tree');
+    }
+  }
+  return found;
+}
+
 function writeNew(relativePath, contents) {
   const full = join(PAM, relativePath);
   if (existsSync(full)) die(`${relativePath} already exists.`);
@@ -179,6 +207,52 @@ function claimNumbered(kind) {
   console.log(`Claimed ${label}: ${relativePath}\nPushed to origin/${current}. Write the entry in that file and cite it as ${label}.`);
 }
 
+/**
+ * A database test, numbered like a decision: fetch, take the next number after every
+ * pushed branch, write, commit only that file, push, and look again for a twin.
+ */
+function claimDbTest() {
+  needText('what it tests');
+  const current = branch();
+  if (current === 'main' || current === 'HEAD') {
+    die('Switch to your own branch first. Claims are pushed, and nothing is pushed to main from here.');
+  }
+  const online = flags.has('--no-push') ? false : fetchAll();
+  const number = nextNumber([...claimedDbTests().keys()]);
+  const relativePath = `${DB_TEST_DIR}/${dbTestFileName(number, text)}`;
+  writeNew(relativePath, dbTestTemplate({ number, title: text, date: new Date().toISOString().slice(0, 10), branch: current }));
+  const label = `test ${String(number).padStart(2, '0')}`;
+
+  if (flags.has('--no-push')) {
+    console.log(`Wrote ${relativePath}. NOT pushed: claim ${label} again online before relying on it.`);
+    return;
+  }
+
+  git(['add', '--', relativePath]);
+  git(['commit', '-m', `Claim ${label} — ${text}`, '--only', '--', relativePath]);
+  try {
+    execFileSync('git', ['push', '-u', 'origin', 'HEAD'], { cwd: PAM, stdio: 'inherit', timeout: 120_000 });
+  } catch {
+    die(
+      `Claimed ${label} in ${relativePath} and committed it, but the push failed.\n` +
+        `Until it is pushed another session can take ${label}. Push this branch (git push -u origin HEAD).`,
+      2,
+    );
+  }
+  if (online) {
+    fetchAll();
+    const holders = [...(claimedDbTests().get(number) ?? [])].filter((ref) => !['HEAD', current, `origin/${current}`, 'working tree'].includes(ref));
+    if (holders.length > 0) {
+      die(
+        `${label} was claimed by another branch at the same moment: ${holders.join(', ')}.\n` +
+          `Yours is ${relativePath}. Delete it and claim again, or the numbering check will fail on merge.`,
+        3,
+      );
+    }
+  }
+  console.log(`Claimed ${label}: ${relativePath}\nPushed to origin/${current}. Write the checks in that file.`);
+}
+
 function claimStamped(kind) {
   needText('a few words');
   const date = new Date();
@@ -222,6 +296,15 @@ function status() {
       if (holders.length > 0) console.log(`  ${ledger.prefix}${n}  in flight on ${holders.join(', ')}`);
     }
   }
+  const tests = claimedDbTests();
+  const testNumbers = [...tests.keys()].sort((a, b) => a - b);
+  console.log(`\nDatabase test: highest claimed ${String(testNumbers.at(-1) ?? 0).padStart(2, '0')}, next ${String(nextNumber(testNumbers)).padStart(2, '0')}`);
+  for (const n of testNumbers) {
+    const held = [...tests.get(n)];
+    if (held.some((r) => r === 'origin/main' || r === 'main')) continue;
+    const holders = held.filter((r) => r !== 'HEAD' && (r === 'working tree' || recent.has(r))).map((r) => r.replace(/^origin\//, ''));
+    if (holders.length > 0) console.log(`  ${String(n).padStart(2, '0')}  in flight on ${holders.join(', ')}`);
+  }
   const rel = relative(PAM, join(PAM, 'packages/db/migrations'));
   const ahead = git(['diff', '--name-only', 'origin/main...HEAD', '--', rel], { allowFail: true }).trim();
   console.log(`\nMigrations this branch adds to main:${ahead ? '\n  ' + ahead.split('\n').join('\n  ') : ' none'}`);
@@ -231,6 +314,9 @@ switch (command) {
   case 'decision':
   case 'amendment':
     claimNumbered(command);
+    break;
+  case 'test':
+    claimDbTest();
     break;
   case 'migration':
   case 'changelog':
@@ -248,6 +334,7 @@ switch (command) {
         '  pnpm claim migration "what it does"\n' +
         '  pnpm claim changelog "what a person notices"\n' +
         '  pnpm claim session   "short slug"\n' +
+        '  pnpm claim test      "what the database test checks"\n' +
         '  pnpm claim status\n' +
         'Add --no-push to write the file without committing or pushing (offline).',
     );

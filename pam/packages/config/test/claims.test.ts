@@ -3,6 +3,9 @@ import {
   amendmentFileName,
   changelogFileName,
   claimedFromAllocationsRow,
+  dbTestFileName,
+  dbTestNumberFromFileName,
+  dbTestTemplate,
   decisionFileName,
   decisionTemplate,
   foldFragments,
@@ -131,5 +134,31 @@ describe('folding unreleased changes into a release', () => {
     expect(() => foldFragments([{ name: 'c.md', text: '# Title\n\n<!-- todo -->\n' }], { version: '0.52.0', date: '2026-10-10' })).toThrow(/write what/);
     expect(() => foldFragments([{ name: 'd.md', text: 'no title\n' }], { version: '0.52.0', date: '2026-10-10' })).toThrow(/Title/);
     expect(() => foldFragments([], { version: '0.52.0', date: '2026-10-10' })).toThrow(/No unreleased/);
+  });
+});
+
+describe('database tests', () => {
+  // Four sessions took the same test number on 10 October 2026; the claim now numbers them.
+  it('reads the two-digit number from a test file, and nothing else', () => {
+    expect(dbTestNumberFromFileName('packages/db/test/43_texts_are_held_until_the_day_test.sql')).toBe(43);
+    expect(dbTestNumberFromFileName('04_rpc_test.sql')).toBe(4);
+    expect(dbTestNumberFromFileName('helpers.sql')).toBeNull();
+    expect(dbTestNumberFromFileName('100_too_long_test.sql')).toBeNull();
+    expect(dbTestNumberFromFileName('README.md')).toBeNull();
+  });
+
+  it('names a claimed test so the runner and the numbering check accept it', () => {
+    const name = dbTestFileName(45, 'A lead switches between programs');
+    expect(name).toBe('45_a_lead_switches_between_programs_test.sql');
+    expect(name).toMatch(/^\d{2}_[a-z0-9_]+\.sql$/);
+    expect(dbTestFileName(7, 'consent test')).toBe('07_consent_test.sql');
+    expect(() => dbTestFileName(100, 'one too many')).toThrow(/two digits/);
+  });
+
+  it('starts the file the way every test does, and says to pick ids nobody else uses', () => {
+    const body = dbTestTemplate({ number: 45, title: 'a lead switches', date: '2026-10-10', branch: 'claude/x' });
+    expect(body).toContain('\\set ON_ERROR_STOP on');
+    expect(body).toContain('pnpm claim test');
+    expect(body).toMatch(/ids and phone numbers no other file uses/);
   });
 });

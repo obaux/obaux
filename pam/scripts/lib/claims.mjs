@@ -98,6 +98,39 @@ export function numberFromFileName(name, prefix) {
   return m ? Number(m[1]) : null;
 }
 
+/**
+ * A database test: `packages/db/test/NN_words_test.sql`, two digits. The runner
+ * (packages/db/scripts/test-db.sh) takes them in name order on one database, so a
+ * number used twice runs in whatever order its words sort (10 October 2026: four
+ * collisions in one afternoon, each fixed by hand at merge).
+ */
+export const DB_TEST_DIR = 'packages/db/test';
+
+export function dbTestNumberFromFileName(name) {
+  const base = name.split('/').pop() ?? name;
+  const m = /^(\d{2})_[a-z0-9_]+\.sql$/.exec(base);
+  return m ? Number(m[1]) : null;
+}
+
+export function dbTestFileName(number, title) {
+  if (number > 99) throw new Error('Database tests are numbered with two digits; 99 is the last. Renumber before going on.');
+  const words = slugify(title, 48).replace(/-/g, '_').replace(/_test$/, '');
+  return `${String(number).padStart(2, '0')}_${words}_test.sql`;
+}
+
+export function dbTestTemplate({ number, title, date, branch }) {
+  return `-- ${asTitle(title)} (test ${String(number).padStart(2, '0')}).
+--
+-- Claimed ${date} on \`${branch}\` with \`pnpm claim test\`. The files run in name order
+-- on one database: choose ids and phone numbers no other file uses (grep this folder),
+-- and count only your own rows.
+
+\\set ON_ERROR_STOP on
+\\set QUIET on
+set client_min_messages to notice;
+`;
+}
+
 /** Every `D-nnn` heading in a document. */
 export function numbersFromHeadings(text, headingPattern) {
   const numbers = [];

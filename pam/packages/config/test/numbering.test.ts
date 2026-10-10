@@ -118,7 +118,8 @@ describe('migrations', () => {
     // packages/db/scripts/test-db.sh runs the files in name order, one after another on one
     // database; two files with one number run in whatever order their words sort. Two
     // sessions each took the next number twice on 10 October 2026 (26, then 30), caught by
-    // hand at merge. 04, 17 and 23 were doubled before this check, and are left as they run.
+    // hand at merge, then 37, 39, 42 and 43 the same day; since then `pnpm claim test` numbers them.
+    // 04, 17 and 23 were doubled before this check, and are left as they run.
     const numbers = dbTestFiles.map((f) => /^(\d{2})_/.exec(f)?.[1]).filter((n): n is string => Boolean(n));
     expect(duplicates(numbers).filter((n) => !['04', '17', '23'].includes(n))).toEqual([]);
   });

@@ -105,14 +105,20 @@ commits and touched every locale file, so every other branch waited on it
 
 ## Claiming a number
 
-Decisions and SOP amendments are numbered. The number is **a file**, and the
-file existing on any pushed branch is the claim.
+Decisions, SOP amendments and database tests are numbered. The number is **a
+file**, and the file existing on any pushed branch is the claim.
 
 ```
 pnpm claim decision  "Staff email on invites"   # docs/decisions/D-442-staff-email-on-invites.md
 pnpm claim amendment "Sessions read the record" # docs/amendments/A26-sessions-read-the-record.md
+pnpm claim test      "a lead switches programs" # packages/db/test/45_a_lead_switches_programs_test.sql
 pnpm claim status                                # what is claimed, and where
 ```
+
+A database test is claimed the same way (since 10 October 2026, when four sessions
+took the same number in one afternoon and each was renumbered by hand at merge).
+The files run in name order on one database, so also pick ids and phone numbers no
+other file uses (grep the folder), and count only your own rows.
 
 The script fetches, reads the numbers on `main` and on every other pushed
 branch (including branches that still bump the old table in
