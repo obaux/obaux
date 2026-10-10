@@ -66,6 +66,11 @@
     "name": "Report a message"
   },
   {
+    "id": "member-created-states-blocking--conversation-blocked-me",
+    "out": "messages-in-pam/blocked.png",
+    "name": "A conversation after the other person blocked: the box is replaced by \"You can't send messages here\""
+  },
+  {
     "id": "member-created--points",
     "out": "points-and-badges/points.png",
     "name": "Your points: badge, level, bar and Ways to earn",
