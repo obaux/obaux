@@ -31,7 +31,7 @@ HELP, YES/NO later), signature-checked, behind an off-by-default switch; she dep
 ## Verified
 
 - Config tests 959 pass; `tsc` clean in config. Database suite all pass with
-  `28_sms_stop_and_start_test.sql` (it fails if the functions are missing or callable by a client).
+  `29_sms_stop_and_start_test.sql` (it fails if the functions are missing or callable by a client).
 - Signature checked against Twilio's documented example and an independent implementation.
 - Not verified: anything against Twilio. No webhook is configured; whether Advanced Opt-Out
   forwards STOP messages here is Twilio's behaviour (`docs/sms-setup.md` step 5 is the test).
