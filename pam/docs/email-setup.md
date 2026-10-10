@@ -37,13 +37,35 @@ Set the function's secrets (names only here, values never):
 | `EMAIL_FROM` | for example `Pam <hello@mail.<domain>>`, on the verified domain |
 | `EMAIL_REPLY_TO` | optional: where replies go |
 | `APP_URL` | where Pam lives, `https://…`, for the link and the logo |
-| `DISPATCH_SECRET` | the shared secret the scheduler sends; without one the function will not run |
+| `DISPATCH_SECRET` | the shared secret the clocks send. Its value is the vault's `dispatch_secret` (made in the database; see below). Without it this function will not run |
 
-Then, in this order: apply `20261010063304_staff_invite_emails_wait_in_a_queue` and
-`20261010133313_the_expired_link_email_has_a_queue_the_sender_can_claim`
-(`list_migrations` first, `get_advisors` after); `supabase functions deploy
-send-invite-emails`; a schedule that calls it every five minutes with
-`x-dispatch-secret` (like 0039/0040); set `INVITE_EMAILS=on` last.
+Then, in this order:
+
+1. Apply `20261010063304_staff_invite_emails_wait_in_a_queue`,
+   `20261010133313_the_expired_link_email_has_a_queue_the_sender_can_claim` and
+   `…_the_clocks_send_the_shared_secret_from_the_vault_and_the` (`list_migrations` first,
+   `get_advisors` after). The last makes the shared secret in the vault and has both clocks
+   (`dispatch-sms` and `send-invite-emails`, every five minutes) send it. Check: `select jobname, active from
+   cron.job;` shows both, and the next `dispatch-sms` answers in `net._http_response` are still 200.
+2. `supabase functions deploy send-invite-emails`.
+3. **Will** copies the secret from the dashboard into the function secret `DISPATCH_SECRET` (below).
+   **This comes after step 1, never before:** the clock must already be sending the header, or
+   `dispatch-sms` refuses every call — sign-in codes included — until it does.
+4. Set `INVITE_EMAILS=on` last.
+
+### Will's steps in the dashboard (once)
+
+The secret is made by the database. Nobody types one, and it is never in a message or a file.
+
+1. Open the Supabase project → **Project Settings → Vault** (or **Integrations → Vault**).
+2. Find the secret named **`dispatch_secret`**. Click the eye to show it, then **copy** it.
+3. Open **Project Settings → Edge Functions → Secrets** and add a secret named exactly
+   **`DISPATCH_SECRET`**; paste the value; save.
+4. Tell the merge desk "secret set". They check that texts still go (a 200 from the next tick,
+   not a 401) and then switch the emails on.
+
+If a 401 ever shows up in `select status_code, content from net._http_response order by created desc limit 6;`,
+the two don't match (a stray space when pasting is the usual cause): copy it again.
 
 If the English ever loses its sign-off the sender answers "the wording is not signed" and claims
 nothing, so switching it on early is harmless.

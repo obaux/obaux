@@ -74,6 +74,8 @@ export interface MockOptions {
   readonly ownProgram?: 'review' | 'live';
   /** With `ownProgram: 'live'`: a change to its name or address already waiting for Pam (D-462). */
   readonly pendingChange?: boolean;
+  /** A lead with a second, live program (D-318), so there is one to switch to. */
+  readonly secondProgram?: boolean;
   /** The program of `SAVED_PLACE` offers services (D-462), for a member's view of it. */
   readonly placeServices?: boolean;
   /** A lead's program has two real policies on file (a25), so Policies for participants has something to show. */
@@ -177,6 +179,20 @@ const OWN_PROGRAM_ID = '4c0f6b64-3a0e-4b8e-9d6c-0a0a0a0a0a0a';
 /** The lead's organisation in the pretend database, once they have a program. */
 const OWN_ORG_ID = '22222222-0000-0000-0000-0000000000aa';
 
+/** A second, older, live program of the same lead (D-318), to switch to. */
+function otherProgramRow() {
+  return {
+    ...ownProgramRow('live'),
+    id: '4c0f6b64-3a0e-4b8e-9d6c-0b0b0b0b0b0b',
+    name: 'Riverside Community Pantry',
+    category: 'family_services',
+    subcategory: null,
+    description_plain: 'Groceries to take home, Tuesdays and Saturdays.',
+    address: '40 River Rd, Philadelphia, PA 19106',
+    created_at: new Date(Date.now() - 30 * 86_400_000).toISOString(),
+  };
+}
+
 /** The lead's program as the pretend database holds it (D-447). */
 function ownProgramRow(state: 'review' | 'live') {
   return {
@@ -203,12 +219,12 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
   let submissions: Array<Record<string, unknown>> = [];
   if (ownProgram === 'review') {
     submissions = [
-      { id: 'sub-new', kind: 'new', status: 'in_review', details: {}, sent_at: ownProgramRow('review').created_at, changes_note: null },
+      { id: 'sub-new', service_id: OWN_PROGRAM_ID, kind: 'new', status: 'in_review', details: {}, sent_at: ownProgramRow('review').created_at, changes_note: null },
     ];
   } else if (ownProgram === 'live' && options.pendingChange) {
     submissions = [
       {
-        id: 'sub-change',
+        id: 'sub-change', service_id: OWN_PROGRAM_ID,
         kind: 'change',
         status: 'in_review',
         details: { name: 'Fresh Start Community Kitchen', address: '2 Market St, Philadelphia, PA 19107' },
@@ -357,7 +373,7 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
     on('/rpc/submit_program', () => {
       ownProgram = ownProgram ?? 'review';
       submissions = [
-        { id: 'sub-new', kind: 'new', status: 'in_review', details: {}, sent_at: new Date().toISOString(), changes_note: null },
+        { id: 'sub-new', service_id: OWN_PROGRAM_ID, kind: 'new', status: 'in_review', details: {}, sent_at: new Date().toISOString(), changes_note: null },
       ];
       return { body: ownProgramRow(ownProgram) };
     }),
@@ -382,7 +398,7 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
     on('/rpc/request_program_change', (_url, _method, body) => {
       const args = (body ?? {}) as { p_name?: string; p_address?: string | null };
       const change = {
-        id: 'sub-change',
+        id: 'sub-change', service_id: OWN_PROGRAM_ID,
         kind: 'change',
         status: 'in_review',
         details: { name: args.p_name ?? null, address: args.p_address ?? null },
@@ -429,7 +445,7 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
       url.includes('/rest/v1/services') && url.includes('id=eq.') && method === 'PATCH' ? { body: [] } : null,
     (url, method) =>
       url.includes('/rest/v1/services') && url.includes('org_id=eq.') && method === 'GET'
-        ? { body: ownProgram ? [ownProgramRow(ownProgram)] : [] }
+        ? { body: ownProgram ? [ownProgramRow(ownProgram), ...(options.secondProgram ? [otherProgramRow()] : [])] : [] }
         : null,
     on('/rest/v1/profiles', (url) =>
       url.includes('role=eq.member')

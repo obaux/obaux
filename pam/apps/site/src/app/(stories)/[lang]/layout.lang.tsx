@@ -1,12 +1,13 @@
 import type { Viewport } from 'next';
 import { RootShell } from '../../../components/RootShell';
 import { ABOUT, builtLangs, type AboutLang } from '../../../content/about';
+import { rulesBuiltLangs } from '../../../content/rules';
 
 // A second root layout, for pages that are in one language: `<html lang dir>` comes
 // from the address. `dynamicParams = false` makes any other address a 404, and the
-// list is only the languages Will has signed (`content/about.ts`).
+// list is the languages built for any page in one language (`content/about.ts`, `content/rules.ts`).
 export function generateStaticParams() {
-  return builtLangs().map((lang) => ({ lang }));
+  return [...new Set([...builtLangs(), ...rulesBuiltLangs()])].map((lang) => ({ lang }));
 }
 
 export const dynamicParams = false;
