@@ -273,6 +273,21 @@ Russian, Arabic (D-422); messages read in the reader's language (D-423).
   seen it — and whether an English value in the middle of a sentence reads better
   isolated or flowing with the sentence.
 
+- [ ] **A native reader for the privacy page's "Who can see it" (10 October, D-452).**
+  `privacy.s.who-can-see.p2` and `.p3` were rewritten to say what a guide sees and does
+  not (what you send them directly; nothing you send to anyone else; one reported
+  message), so the page stops contradicting the transparency screen. The six
+  translations are Claude's, and this is a promise: a native reader of Spanish,
+  Brazilian Portuguese, Simplified and Traditional Chinese, Russian and Arabic should
+  confirm it says exactly that and no more.
+
+- [ ] **Hear the language tags with a screen reader (10 October, D-455).** Every list
+  of languages now starts each name with an English tag (EN, ES, PT-BR, ZH-CN, ZH-HK,
+  RU, AR). The tag is hidden from a screen reader on purpose and each name carries
+  its own `lang`, so "Русский" should be spoken in a Russian voice and the tag not at
+  all. Nothing has been heard yet: try the Language screen and the sign-in menu with
+  VoiceOver and TalkBack, in English and in Arabic.
+
 - [ ] **Run an Arabic screen reader pass** (VoiceOver and TalkBack on a phone, and
   NVDA if it can be had): that the labels on icon buttons, cards, photos and the
   role switch are spoken in order and whole. Nothing here has been tried with a

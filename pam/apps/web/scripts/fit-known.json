@@ -538,5 +538,33 @@
   {
     "key": "pseudo|overlap|member-created-states-blocking--conversation-blocked-me|⟦Çáášéé ɱáááñááĝééŕ⟧ ⟷ ⟦Óþééééñš íñ Ĝóóóóĝļéé⟧",
     "reason": "The thread scrolls under its opaque header; text that has scrolled up behind the header's title is measured against it. Nothing overlaps on screen. The same as the limited-account conversation entries; added at the merge of Block, 10 October 2026, after a look at 320px in Russian and the pseudo-language with screenshots."
+  },
+  {
+    "key": "ru|overlap|member-created--conversation-file-refused|Teresa ⟷ Документ Google",
+    "reason": "The thread scrolls under its opaque header; text that has scrolled up behind the header's title is measured against it. Nothing overlaps on screen. Which lines are behind the header varies from run to run on this story, so these come and go. The same as the limited-account and blocking conversation entries; added at the merge of the language tags, 10 October 2026, after a look at 320px in Russian and Arabic with screenshots."
+  },
+  {
+    "key": "ru|overlap|member-created--conversation-file-refused|Кейс-менеджер ⟷ Откроется в Google",
+    "reason": "The thread scrolls under its opaque header; text that has scrolled up behind the header's title is measured against it. Nothing overlaps on screen. Which lines are behind the header varies from run to run on this story, so these come and go. The same as the limited-account and blocking conversation entries; added at the merge of the language tags, 10 October 2026, after a look at 320px in Russian and Arabic with screenshots."
+  },
+  {
+    "key": "ar|overlap|member-created--conversation-file-refused|Teresa ⟷ And the class schedule: http",
+    "reason": "The thread scrolls under its opaque header; text that has scrolled up behind the header's title is measured against it. Nothing overlaps on screen. Which lines are behind the header varies from run to run on this story, so these come and go. The same as the limited-account and blocking conversation entries; added at the merge of the language tags, 10 October 2026, after a look at 320px in Russian and Arabic with screenshots."
+  },
+  {
+    "key": "ar|overlap|member-created--conversation-file-refused|مدير الحالة ⟷ And the class schedule: http",
+    "reason": "The thread scrolls under its opaque header; text that has scrolled up behind the header's title is measured against it. Nothing overlaps on screen. Which lines are behind the header varies from run to run on this story, so these come and go. The same as the limited-account and blocking conversation entries; added at the merge of the language tags, 10 October 2026, after a look at 320px in Russian and Arabic with screenshots."
+  },
+  {
+    "key": "zh-CN|overlap|member-created--conversation-file-refused|Teresa ⟷ And the class schedule: http",
+    "reason": "The thread scrolls under its opaque header; text that has scrolled up behind the header's title is measured against it. Nothing overlaps on screen. Which lines are behind the header varies from run to run on this story, so these come and go. The same as the limited-account and blocking conversation entries; added at the merge of the language tags, 10 October 2026, after a look at 320px in Russian and Arabic with screenshots."
+  },
+  {
+    "key": "pseudo|overlap|member-created--conversation-file-refused|Teresa ⟷ ⟦Ĝóóóóĝļéé Ðóóóç⟧",
+    "reason": "The thread scrolls under its opaque header; text that has scrolled up behind the header's title is measured against it. Nothing overlaps on screen. Which lines are behind the header varies from run to run on this story, so these come and go. The same as the limited-account and blocking conversation entries; added at the merge of the language tags, 10 October 2026, after a look at 320px in Russian and Arabic with screenshots."
+  },
+  {
+    "key": "pseudo|overlap|member-created--conversation-file-refused|⟦Çáášéé ɱáááñááĝééŕ⟧ ⟷ ⟦Óþééééñš íñ Ĝóóóóĝļéé⟧",
+    "reason": "The thread scrolls under its opaque header; text that has scrolled up behind the header's title is measured against it. Nothing overlaps on screen. Which lines are behind the header varies from run to run on this story, so these come and go. The same as the limited-account and blocking conversation entries; added at the merge of the language tags, 10 October 2026, after a look at 320px in Russian and Arabic with screenshots."
   }
 ]
