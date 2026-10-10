@@ -36,7 +36,8 @@ None: a review of drafts.
 
 ## Verified
 
-(see the READY note: head, browser suite, fit audit on the policy stories)
+On `bb18d8c` (main `c652a30` plus this): `@pam/config` 1047 tests, `copy:status` in step, the browser suite on all three viewports **984 passed, 18 skipped** (11.1 min),
+Storybook builds, and the fit audit on every story with "polic" in its id (14 stories, 7 languages and the pseudo-language, including the replace panel): **0 new defects**.
 
 ## Left undone
 
