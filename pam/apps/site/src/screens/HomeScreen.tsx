@@ -6,6 +6,7 @@ import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { HStack } from '@astryxdesign/core/HStack';
 import { Button } from '@pam/ui/Button';
+import { SecondaryButton } from '../components/SecondaryButton';
 import { Frame } from '../components/Frame';
 import { ABOUT, ABOUT_ART, ABOUT_ON_HOME, aboutPath } from '../content/about';
 import { VISIT_REMINDERS_LIVE } from '../content/flags';
@@ -75,7 +76,7 @@ export function HomeScreen({ showAbout = ABOUT_ON_HOME }: { readonly showAbout?:
         </Text>
         <HStack gap={3} xstyle={styles.actions}>
           <Button label="Sign in" variant="primary" size="lg" href={SIGN_IN_URL} />
-          <Button label="How Pam works" variant="secondary" size="lg" href="/support/" />
+          <SecondaryButton label="How Pam works" size="lg" href="/support/" />
         </HStack>
       </VStack>
 
@@ -128,7 +129,7 @@ export function HomeScreen({ showAbout = ABOUT_ON_HOME }: { readonly showAbout?:
             The Support page explains how it works in plain language, including who can do what.
           </Text>
           <HStack>
-            <Button label="Go to Support" variant="secondary" href="/support/" />
+            <SecondaryButton label="Go to Support" href="/support/" />
           </HStack>
         </VStack>
       </Card>

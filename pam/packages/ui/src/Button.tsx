@@ -2,7 +2,7 @@
 
 import * as stylex from '@stylexjs/stylex';
 import { Button as AstryxButton, type ButtonProps } from '@astryxdesign/core/Button';
-import { colorVars, sizeVars, spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
+import { sizeVars, spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
 
 /**
  * Astryx's `Button`, with a label that may take a second line (D-422).
@@ -31,9 +31,6 @@ const styles = stylex.create({
     overflowWrap: 'anywhere',
     textAlign: 'center',
   },
-  // A secondary button gets a light border (Will, 10 October 2026): its pale fill all but disappears on a gray
-  // card or page, and the border keeps it a button there.
-  secondary: { borderWidth: '1px', borderStyle: 'solid', borderColor: colorVars['--color-border'] },
   sm: { minHeight: sizeVars['--size-element-sm'] },
   md: { minHeight: sizeVars['--size-element-md'] },
   lg: { minHeight: sizeVars['--size-element-lg'] },
@@ -45,7 +42,7 @@ export function Button({ size = 'md', xstyle, isIconOnly = false, ...props }: Bu
       {...props}
       size={size}
       isIconOnly={isIconOnly}
-      xstyle={isIconOnly ? xstyle : [styles.wraps, styles[size], props.variant === 'secondary' && styles.secondary, xstyle]}
+      xstyle={isIconOnly ? xstyle : [styles.wraps, styles[size], xstyle]}
     />
   );
 }

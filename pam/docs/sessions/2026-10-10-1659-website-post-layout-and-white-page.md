@@ -19,8 +19,10 @@ from now on the website is updated once a week, on Friday (`docs/team.md`, "The 
 - **Colours were wrong twice**: the picture card was first blue (Will asked for gray), then a color-mix toward white that failed dark-mode
   contrast on the captions (18 axe problems), then the page-gray variable, which resolves to white inside the theme provider so the card
   disappeared. The final: `light-dark(muted, surface)` from the theme (light #f1f1f1, dark #262626), measured on the rendered pixels.
-- **Design system**: `packages/ui/src/Button.tsx`, a secondary Button has a 1px light border (Will, "adjust the ds"); the Still-stuck card has a
-  light outline. This reaches into the design-system lane; Mira has been told and offered the site-only alternative.
+- **Button border, scoped to the site** (Will, "adjust the ds"): I first put a 1px light border on every secondary `@pam/ui` Button; that failed
+  `@pam/ui`'s option-tag test (the app's language chips drew a border they never had) and was Dot's lane. Reverted to main; the site's four
+  secondary buttons use `SecondaryButton` (`apps/site/src/components/SecondaryButton.tsx`). Mira gave Dot the app-wide version. The
+  Still-stuck card has a light outline.
 - **Rules post live** (D-489, written up in `2026-10-10-1532-website-rules-post-signed.md`).
 
 ## What was wrong, and what missed it
@@ -47,4 +49,4 @@ None new (D-489 is the rules sign-off).
 
 ## Needs a human
 
-- Mira/Dot: the secondary-button border in `packages/ui` (every secondary button in the app).
+- Dot: the app-wide secondary-button border, with the option-tag test reference updated (Mira has it).

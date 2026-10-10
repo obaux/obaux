@@ -5,7 +5,7 @@ import { HStack } from '@astryxdesign/core/HStack';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
-import { Button } from '@pam/ui/Button';
+import { SecondaryButton } from './SecondaryButton';
 import { APP_URL } from '../lib/links';
 
 const styles = stylex.create({
@@ -32,7 +32,7 @@ export function StillStuck() {
           If we are closed, leave a message and we will call you back the next day we are open.
         </Text>
         <HStack>
-          <Button label="Open Pam" variant="secondary" href={APP_URL} />
+          <SecondaryButton label="Open Pam" href={APP_URL} />
         </HStack>
       </VStack>
     </Card>
