@@ -6,6 +6,7 @@ import { installSupabaseMock, type MockOptions } from './mockSupabase';
 import { markFreshAccount, markSetupDone, saveSentProgram, type SetupStep } from '../../lib/programSetup';
 import type { ProgramDetails } from '../../lib/useJoin';
 import { addTrip, type AddedTrip } from '../../lib/addedTrips';
+import { SavedTripsSync } from '../../lib/SavedTripsSync';
 
 /**
  * One screen, signed in as one kind of person. The loader runs before the
@@ -34,7 +35,11 @@ export function asRole(
     ],
     decorators: [
       (Story) => (
-        <PrototypeApp routes={REDESIGN_ROUTES} start={start} first={<Story />} chrome={redesignChrome(role)} />
+        <>
+          {/* What `Providers` mounts in the app: a member's saved trips (D-454). */}
+          <SavedTripsSync />
+          <PrototypeApp routes={REDESIGN_ROUTES} start={start} first={<Story />} chrome={redesignChrome(role)} />
+        </>
       ),
     ],
     parameters: {

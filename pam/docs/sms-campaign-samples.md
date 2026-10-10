@@ -46,7 +46,7 @@ failed once each.
 | Help | Reply **HELP**. |
 | Privacy policy URL | `https://app.joinpam.org/privacy/` |
 | Terms URL | `https://app.joinpam.org/terms/` |
-| Sample messages | All nine, below (6–9 are the Text alerts drafts, not yet sent: file them anyway, so the campaign is not filed twice), placeholders intact — and the appointment reminder in each added language (the form takes a few; send those five if all do not fit) |
+| Sample messages | All nine, below (6–9 are the Text alerts texts, approved by Will on 10 October and not yet sent: file them anyway, so the campaign is not filed twice), placeholders intact — and the appointment reminder in each added language (the form takes a few; send those five if all do not fit) |
 
 **Before submitting, open both URLs in a private window.** A reviewer fetches
 them signed out, from a machine that has never seen the site. A page behind a
@@ -193,34 +193,34 @@ changes with it. The templates stay in `sms-templates.ts`.
 >
 > _Spanish:_ Pam: Tiene una visita mañana a las {time}. {address}. Toque para llegar: {link}
 
-**6. Somebody wrote to you (a draft: not signed, not yet sent)**
+**6. Somebody wrote to you (approved by Will 10 October; not yet sent)**
 
 > Pam: You have a new message in Pam. Open it: {link}
 >
 > _Spanish:_ Pam: Tiene un mensaje nuevo en Pam. Abralo aqui: {link}
 
-**7. To a program: somebody booked a visit (a draft)**
+**7. To a program: somebody booked a visit (approved; not yet sent)**
 
 > Pam: Someone booked a visit with your program. Open Pam to see it: {link}
 >
 > _Spanish:_ Pam: Alguien reservo una visita en su programa. Abra Pam para verla: {link}
 
-**8. To a program: a booking was changed (a draft)**
+**8. To a program: a booking was changed (approved; not yet sent)**
 
 > Pam: A visit with your program was changed. Open Pam to see it: {link}
 >
 > _Spanish:_ Pam: Cambio una visita en su programa. Abra Pam para verla: {link}
 
-**9. To a case manager: somebody on their list planned a visit (a draft)**
+**9. To a case manager: somebody on their list planned a visit (approved; not yet sent)**
 
 > Pam: Someone on your list planned a visit. Open Pam to see it: {link}
 >
 > _Spanish:_ Pam: Alguien de su lista planeo una visita. Abra Pam para verla: {link}
 
 6–9 are the texts behind the **Text alerts** switches (Will, 10 October 2026). They say that
-something happened, never what or to whom: no name, no place, no day. Nobody has signed them,
-so none can send, and nothing queues them yet; the Text alerts screen says "coming soon" until
-they do. They are in `packages/config/src/sms-templates.ts` (`message_waiting`,
+something happened, never what or to whom: no name, no place, no day. Will approved them on
+10 October 2026 ("Text alerts: approved"), the other languages as drafts to learn from. Nothing
+queues them yet, so none sends, and the Text alerts screen says "coming soon" until one does. They are in `packages/config/src/sms-templates.ts` (`message_waiting`,
 `visit_booked`, `booking_changed`, `trip_planned`); each is one segment in every language, and
 the other languages' drafts are there too. 6 goes to anyone who has a message waiting; 7 and 8
 to a program lead; 9 to a case manager. Message 5 is built next (the day before only, sent

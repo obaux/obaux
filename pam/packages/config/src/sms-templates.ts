@@ -233,8 +233,19 @@ const approved = (body: string, maxVarLengths?: Readonly<Record<string, number>>
     ? { body, reviewedBy: APPROVED_TO_LEARN_FROM, maxVarLengths }
     : { body, reviewedBy: APPROVED_TO_LEARN_FROM };
 
-/** A wording in one of the later languages that nobody has signed: never sent, English goes instead. */
-const draft = (body: string): SmsDraft => ({ body, reviewedBy: '' });
+/**
+ * The same approval, for the four Text alerts texts (Will, 10 October 2026, through
+ * Mira: "Text alerts: approved"). The other languages follow the 9 October
+ * convention above and are dated for the day it was given.
+ */
+export const APPROVED_TO_LEARN_FROM_ALERTS =
+  'Will (Oba), 10 October 2026 — approved to learn from; no native reader yet';
+
+/** A wording of one of the four alert texts in a later language, under that approval. */
+const alertDraft = (body: string): SmsDraft => ({ body, reviewedBy: APPROVED_TO_LEARN_FROM_ALERTS });
+
+/** Who signed the four alert texts in English and Spanish: Will, in his own words. */
+const ALERTS_REVIEWED_BY = 'Will (Oba), 10 October 2026';
 
 /**
  * Who read this copy and signed it off.
@@ -524,10 +535,11 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
   },
   /**
    * The four texts behind the Text alerts switches (Will, 10 October 2026: "keep
-   * the promise: build these texts"). **Drafts nobody has signed**: every
-   * `reviewedBy` here is empty, so none can send, and nothing queues them yet
-   * (the screen says "coming soon"). A new template starts empty and stays empty
-   * until a person says otherwise.
+   * the promise: build these texts"). **Approved by Will the same day** ("Text
+   * alerts: approved"), wording unchanged from the drafts, in English and Spanish
+   * and, to learn from, in the other five. Nothing queues them yet, so none sends
+   * and the screen still says "coming soon"; when one is built it joins `LIVE` in
+   * `AlertsView.tsx`.
    *
    * They say that something happened and never what or to whom, as the
    * connection request does (§6.2): no name, no place, no day. A text is read on
@@ -539,14 +551,14 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
     en: 'Pam: You have a new message in Pam. Open it: {link}',
     es: 'Pam: Tiene un mensaje nuevo en Pam. Abralo aqui: {link}',
     more: {
-      'pt-BR': draft('Pam: Voce tem uma mensagem nova no Pam. Abra: {link}'),
-      'zh-CN': draft('Pam: 您在 Pam 有新消息。打开：{link}'),
-      'zh-HK': draft('Pam: 你在 Pam 有新訊息。打開：{link}'),
-      'ru': draft('Pam: У вас новое сообщение: {link}'),
-      'ar': draft('Pam: لديك رسالة جديدة: {link}'),
+      'pt-BR': alertDraft('Pam: Voce tem uma mensagem nova no Pam. Abra: {link}'),
+      'zh-CN': alertDraft('Pam: 您在 Pam 有新消息。打开：{link}'),
+      'zh-HK': alertDraft('Pam: 你在 Pam 有新訊息。打開：{link}'),
+      'ru': alertDraft('Pam: У вас новое сообщение: {link}'),
+      'ar': alertDraft('Pam: لديك رسالة جديدة: {link}'),
     },
     vars: ['link'],
-    reviewedBy: '',
+    reviewedBy: ALERTS_REVIEWED_BY,
     isFirstContact: false,
   },
   /** To a program: somebody booked a visit with it. */
@@ -555,14 +567,14 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
     en: 'Pam: Someone booked a visit with your program. Open Pam to see it: {link}',
     es: 'Pam: Alguien reservo una visita en su programa. Abra Pam para verla: {link}',
     more: {
-      'pt-BR': draft('Pam: Alguem marcou uma visita no seu programa. Abra o Pam: {link}'),
-      'zh-CN': draft('Pam: 有人预约了您的项目。打开：{link}'),
-      'zh-HK': draft('Pam: 有人預約了你的計劃。打開：{link}'),
-      'ru': draft('Pam: Новая запись: {link}'),
-      'ar': draft('Pam: حجز جديد في برنامجك: {link}'),
+      'pt-BR': alertDraft('Pam: Alguem marcou uma visita no seu programa. Abra o Pam: {link}'),
+      'zh-CN': alertDraft('Pam: 有人预约了您的项目。打开：{link}'),
+      'zh-HK': alertDraft('Pam: 有人預約了你的計劃。打開：{link}'),
+      'ru': alertDraft('Pam: Новая запись: {link}'),
+      'ar': alertDraft('Pam: حجز جديد في برنامجك: {link}'),
     },
     vars: ['link'],
-    reviewedBy: '',
+    reviewedBy: ALERTS_REVIEWED_BY,
     isFirstContact: false,
   },
   /** To a program: a booking was moved or cancelled. It does not say which. */
@@ -571,14 +583,14 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
     en: 'Pam: A visit with your program was changed. Open Pam to see it: {link}',
     es: 'Pam: Cambio una visita en su programa. Abra Pam para verla: {link}',
     more: {
-      'pt-BR': draft('Pam: Uma visita no seu programa mudou. Abra o Pam: {link}'),
-      'zh-CN': draft('Pam: 您项目的一次预约有变。打开：{link}'),
-      'zh-HK': draft('Pam: 你計劃的一個預約有變。打開：{link}'),
-      'ru': draft('Pam: Запись изменена: {link}'),
-      'ar': draft('Pam: تغير حجز في برنامجك: {link}'),
+      'pt-BR': alertDraft('Pam: Uma visita no seu programa mudou. Abra o Pam: {link}'),
+      'zh-CN': alertDraft('Pam: 您项目的一次预约有变。打开：{link}'),
+      'zh-HK': alertDraft('Pam: 你計劃的一個預約有變。打開：{link}'),
+      'ru': alertDraft('Pam: Запись изменена: {link}'),
+      'ar': alertDraft('Pam: تغير حجز في برنامجك: {link}'),
     },
     vars: ['link'],
-    reviewedBy: '',
+    reviewedBy: ALERTS_REVIEWED_BY,
     isFirstContact: false,
   },
   /** To a case manager: somebody on their list planned a visit. */
@@ -587,14 +599,14 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
     en: 'Pam: Someone on your list planned a visit. Open Pam to see it: {link}',
     es: 'Pam: Alguien de su lista planeo una visita. Abra Pam para verla: {link}',
     more: {
-      'pt-BR': draft('Pam: Alguem da sua lista planejou uma visita. Abra o Pam: {link}'),
-      'zh-CN': draft('Pam: 您名单上有人计划了到访。打开：{link}'),
-      'zh-HK': draft('Pam: 你名單上有人計劃了到訪。打開：{link}'),
-      'ru': draft('Pam: В списке новый визит: {link}'),
-      'ar': draft('Pam: أحدهم خطط لزيارة: {link}'),
+      'pt-BR': alertDraft('Pam: Alguem da sua lista planejou uma visita. Abra o Pam: {link}'),
+      'zh-CN': alertDraft('Pam: 您名单上有人计划了到访。打开：{link}'),
+      'zh-HK': alertDraft('Pam: 你名單上有人計劃了到訪。打開：{link}'),
+      'ru': alertDraft('Pam: В списке новый визит: {link}'),
+      'ar': alertDraft('Pam: أحدهم خطط لزيارة: {link}'),
     },
     vars: ['link'],
-    reviewedBy: '',
+    reviewedBy: ALERTS_REVIEWED_BY,
     isFirstContact: false,
   },
   access_limited_notice: {
