@@ -21,7 +21,7 @@ nothing until the steps below are done. Texts are set up separately (`docs/sms-s
 5. **Create an API key that can only send.** Give it to the merge desk, never to a
    session and never to the repository.
 6. **The words are signed.** English by Will (10 October 2026, D-461); the other six
-   are drafts "approved to learn from" until somebody who reads them says what is
+   are written but **not signed** (D-488): that language is sent the English until Will or somebody who reads it signs it, and nobody has said what is
    wrong. Only a person writes `reviewedBy`. Storybook: *Onboarding › First invite
    email (staff)*.
 7. **Send one to your own inbox** and look at it in Gmail, Apple Mail and Outlook.
@@ -81,7 +81,7 @@ nothing, so switching it on early is harmless.
   learn from", and an unsigned language gets the English). It goes to the address typed on
   the expired-link page, in the language that page was in, for any invited role — a member
   too. It carries the fresh invite's link, which works for 30 days. A request older than
-  seven days, or whose fresh link has been used or has itself run out, is not sent. When the
+  seven days, or whose fresh link has been used or has itself run out, is not sent. **The address typed on the expired-link page is deleted as soon as the link is sent** (D-487), and when a request can no longer be sent (too old, out of tries, or the fresh link used or run out); the row keeps that a link was sent and when, not where. The privacy page says so (Lena). When the
   sender is first switched on it sends the requests still inside those limits: people who
   were told to check their email.
-- To see what was sent: `select requested_at, sent_at, attempts, failure_reason from invite_emails order by requested_at desc limit 10;` (the address is in the row; do not paste it anywhere).
+- To see what was sent: `select requested_at, sent_at, address_removed_at, attempts, failure_reason from invite_emails order by requested_at desc limit 10;` (the address is deleted once sent, so this shows `sent_at` and `address_removed_at`, never where).

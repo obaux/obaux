@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { handle, type Deps } from '../../../supabase/functions/send-invite-emails/handler.ts';
-import { resendEmailer, type Emailer, type Outgoing } from '../../../supabase/functions/send-invite-emails/provider.ts';
+import { explain, resendEmailer, type Emailer, type Outgoing } from '../../../supabase/functions/send-invite-emails/provider.ts';
 import { renderFreshLink, renderStaffInvite, localeOf, type Bundle } from '../../../supabase/functions/send-invite-emails/render.ts';
 import bundleJson from '../../../supabase/functions/send-invite-emails/bundle.json';
 import {
@@ -136,7 +136,8 @@ describe('it sends nothing until a person has signed the words', () => {
     const shipped = bundleJson as unknown as Bundle;
     expect(shipped.locales.en.reviewedBy).toBe('Will, 10 October 2026');
     expect(shipped.locales.en.copy.button).toBe('Accept invite');
-    expect(shipped.locales.ru.reviewedBy).toContain('approved to learn from');
+    // The other six are not signed (D-488): the bundle the function ships sends them the English.
+    for (const l of SUPPORTED_LOCALES.filter((x) => x !== 'en')) expect(shipped.locales[l].reviewedBy, l).toBe('');
   });
 });
 
@@ -222,8 +223,79 @@ describe('the Resend emailer', () => {
     expect(seen[0]!.body).toMatchObject({ to: ['ivy@example.org'], from: 'Pam <a@b.example>', subject: 'S' });
     expect(seen[0]!.body).not.toHaveProperty('reply_to');
     const error = await emailer.send({ ...email, replyTo: 'r@b.example' }).then(() => null, (e: Error) => e.message);
-    expect(error).toBe('the email service answered 422');
+    // The refusal's message is kept, with the address taken out of it.
+    expect(error).toBe('the email service answered 422: [address] is not valid');
+    expect(error).not.toContain('ivy');
     expect(seen[1]!.body).toMatchObject({ reply_to: 'r@b.example' });
+  });
+});
+
+describe('what a refusal says (explain)', () => {
+  const refuse = async (status: number, body: string) => {
+    const emailer = resendEmailer('re_test_key_123456', (async () => new Response(body, { status })) as unknown as typeof fetch);
+    const email: Outgoing = { to: 'ivy@example.org', from: 'Pam <hello@mail.pam.example>', replyTo: null, subject: 'S', html: '<p>h</p>', text: 't', idempotencyKey: 'k' };
+    return emailer.send(email).then(() => null, (e: Error) => e.message);
+  };
+
+  it('keeps a domain message whole: it says what to fix', async () => {
+    const message = await refuse(403, '{"statusCode":403,"name":"validation_error","message":"The mail.pam.example domain is not verified. Please, add and verify your domain on https://resend.com/domains"}');
+    expect(message).toBe('the email service answered 403: validation_error: The mail.pam.example domain is not verified. Please, add and verify your domain on https://resend.com/domains');
+  });
+
+  it('takes an address out, wherever it is: the owner’s, the recipient’s, the sender’s', async () => {
+    const message = await refuse(403, '{"name":"validation_error","message":"You can only send testing emails to your own email address (owner@example.org). Sending to ivy@example.org or from Pam <hello@mail.pam.example> is not allowed."}');
+    expect(message).toContain('[address]');
+    for (const secret of ['owner@example.org', 'ivy@example.org', 'hello@mail.pam.example', 'ivy', 'owner@']) {
+      expect(message, secret).not.toContain(secret);
+    }
+    expect(message).toMatch(/^the email service answered 403: validation_error: You can only send testing emails to your own email address \(\[address\]\)/);
+  });
+
+  it('says nothing of a body that is not JSON, or has neither field, or is not an object', async () => {
+    expect(await refuse(502, '<html>Bad gateway for ivy@example.org</html>')).toBe('the email service answered 502');
+    expect(await refuse(500, '')).toBe('the email service answered 500');
+    expect(await refuse(401, '{"statusCode":401}')).toBe('the email service answered 401');
+    expect(await refuse(400, '"ivy@example.org"')).toBe('the email service answered 400');
+    expect(await refuse(400, 'null')).toBe('the email service answered 400');
+  });
+
+  it('keeps only name and message, nothing else the body echoes', async () => {
+    const message = await refuse(422, '{"name":"invalid_to","message":"Invalid `to` field.","to":["ivy@example.org"],"html":"<p>secret words</p>","subject":"Accept invite"}');
+    expect(message).toBe('the email service answered 422: invalid_to: Invalid `to` field.');
+  });
+
+  it('takes out anything shaped like an API key', async () => {
+    const message = await refuse(401, '{"name":"restricted_api_key","message":"The key re_AbCdEf123456_xyz can only send emails."}');
+    expect(message).not.toContain('re_AbCdEf');
+    expect(message).toContain('[key]');
+  });
+
+  it('is cut to about 200 characters of detail, on one line', async () => {
+    const message = await refuse(400, JSON.stringify({ name: 'validation_error', message: `${'word '.repeat(120)}\n\nmore` }));
+    const detail = message!.replace('the email service answered 400: ', '');
+    expect(detail.length).toBeLessThanOrEqual(200);
+    expect(detail.endsWith('…')).toBe(true);
+    expect(detail).not.toMatch(/\n/);
+  });
+
+  it('works on one field alone', () => {
+    expect(explain('{"message":"Only a message."}')).toBe('Only a message.');
+    expect(explain('{"name":"only_a_name"}')).toBe('only_a_name');
+    expect(explain('{"name":7,"message":{"a":1}}')).toBe('');
+  });
+
+  it('the handler records it on the row without an address', async () => {
+    const refusingEmailer: Emailer = {
+      name: 'fake',
+      async send() {
+        throw new Error(await refuse(403, '{"name":"validation_error","message":"The mail.pam.example domain is not verified; sent to ivy@example.org"}') as string);
+      },
+    };
+    const w = world();
+    const r = await handle(new Request('https://fn.example/send', { method: 'POST', headers: { 'x-dispatch-secret': 'shh' } }), { ...w.deps, emailer: refusingEmailer });
+    expect(await json(r)).toMatchObject({ claimed: 1, sent: 0 });
+    const failed = w.rpcs.find((c) => c.name === 'mark_staff_invite_email_failed')!;
+    expect(String(failed.args.p_reason)).toBe('the email service answered 403: validation_error: The mail.pam.example domain is not verified; sent to [address]');
   });
 });
 

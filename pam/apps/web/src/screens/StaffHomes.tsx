@@ -16,7 +16,7 @@ import { useProgramSetup, type ProgramSetup } from '@/lib/programSetup';
 import { FloatingAction } from '@pam/ui/FloatingAction';
 import { openConversation } from '@/lib/openConversation';
 import { DUMMY_SELF_ID, dummyConversationIdBetween } from '@pam/config/dummy-conversations';
-import { USE_DUMMY_PEOPLE } from '@pam/config/dummy-flag';
+import { useExamplePeople } from '@/lib/examplePeople';
 import { DUMMY_MEMBERS } from '@pam/config/dummy-people';
 import { DUMMY_APPOINTMENTS } from '@pam/config/dummy-appointments';
 import { ScheduleView, type Appointment } from './ScheduleView';
@@ -37,6 +37,7 @@ export function CaseloadHome() {
   const router = useRouter();
   const supportPhone = useSupportPhone();
   const { state: caseload, refresh } = useCaseload(true);
+  const examplePeople = useExamplePeople();
 
   // The real list when there is one; the example people otherwise, as on
   // `/admin/` (Will, 16 September — and kept for investor demos, 1 October).
@@ -65,7 +66,7 @@ export function CaseloadHome() {
             }
           : {
               status: 'ready',
-              people: USE_DUMMY_PEOPLE
+              people: examplePeople
                 ? DUMMY_MEMBERS.map(
                     (member): HomePerson => ({
                       id: member.id,
@@ -77,7 +78,7 @@ export function CaseloadHome() {
                   )
                 : [],
             };
-  const isExample = caseload.status === 'empty' && USE_DUMMY_PEOPLE;
+  const isExample = caseload.status === 'empty' && examplePeople;
 
   return (
     <PeopleHomeView

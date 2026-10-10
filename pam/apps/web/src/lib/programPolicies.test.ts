@@ -78,3 +78,25 @@ describe('policiesFromRows', () => {
     expect(current).toMatchObject({ version: 2, fileName: 'page one.pdf', signedBy: [], isReal: true });
   });
 });
+
+describe('policiesFromRows with who signed', () => {
+  const row: PolicyRow = {
+    id: 'p1', service_id: 'prog', title: 'Liability', version: 1, replaces_id: null,
+    created_at: '2026-10-07T10:00:00Z', archived_at: null, program_policy_files: [],
+  };
+
+  it('lists each policy\'s signers by first name and date', () => {
+    const [policy] = policiesFromRows(
+      [row],
+      [
+        { policy_id: 'p1', member_id: 'm1', first_name: 'Tanya', signed_at: '2026-10-08T10:00:00Z' },
+        { policy_id: 'other', member_id: 'm2', first_name: 'Luis', signed_at: '2026-10-08T11:00:00Z' },
+      ],
+    );
+    expect(policy?.signedBy).toEqual([{ personId: 'm1', firstName: 'Tanya', signedAt: '2026-10-08T10:00:00Z' }]);
+  });
+
+  it('is nobody signed when the signers could not be read', () => {
+    expect(policiesFromRows([row])[0]?.signedBy).toEqual([]);
+  });
+});
