@@ -1006,6 +1006,8 @@
   "book.wrote": "Escreveu {when}",
   "trips.booked.texted": "{place}, {day} às {time}. Pam enviou a {name} um link para ver.",
   "trips.booked.sms": "A mensagem (enviada em inglês por enquanto): “Pam: {place} booked you for {day} at {time}. Tap to see it in Pam: {link}”",
+  "trips.booked.example.title": "Reserva de exemplo para {name}",
+  "trips.booked.example.body": "{place}, {day} às {time}. Isto é só um exemplo: nada foi reservado com o programa e ninguém recebeu mensagem de texto.",
   "join.booked.title": "Sua visita está reservada",
   "join.booked.body": "{place}, {day} às {time}. Pam vai lembrar você antes de ir.",
   "join.booked.action": "Ver o lugar",

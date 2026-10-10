@@ -1006,6 +1006,8 @@
   "book.wrote": "Wrote {when}",
   "trips.booked.texted": "{place}, {day} at {time}. Pam texted {name} a link to see it.",
   "trips.booked.sms": "The text: “Pam: {place} booked you for {day} at {time}. Tap to see it in Pam: {link}”",
+  "trips.booked.example.title": "Example booking for {name}",
+  "trips.booked.example.body": "{place}, {day} at {time}. This is only an example: nothing was booked with the program, and nobody was texted.",
   "join.booked.title": "Your visit is booked",
   "join.booked.body": "{place}, {day} at {time}. Pam will remind you before you go.",
   "join.booked.action": "See the place",

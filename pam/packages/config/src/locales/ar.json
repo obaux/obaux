@@ -1096,6 +1096,8 @@
   "book.wrote": "تاريخ الرسالة: {when}",
   "trips.booked.texted": "الموعد في {place}، {day} الساعة {time}. أرسل Pam إلى {name} رابطا برسالة نصية لعرضها.",
   "trips.booked.sms": "الرسالة: «Pam: تم حجز موعد لك في {place}، {day} الساعة {time}. اضغط لرؤيته في Pam: {link}»",
+  "trips.booked.example.title": "حجز تجريبي لـ {name}",
+  "trips.booked.example.body": "{place}، {day} في {time}. هذا مثال فقط: لم يُحجز شيء لدى البرنامج ولم تُرسل رسالة نصية لأحد.",
   "join.booked.title": "تم حجز زيارتك",
   "join.booked.body": "الموعد في {place}، {day} الساعة {time}. سيذكرك Pam قبل الذهاب.",
   "join.booked.action": "عرض المكان",

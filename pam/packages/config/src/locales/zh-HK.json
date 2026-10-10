@@ -1006,6 +1006,8 @@
   "book.wrote": "傳訊息時間：{when}",
   "trips.booked.texted": "{place}，{day} {time}。Pam已傳短訊給{name}，附有連結可查看。",
   "trips.booked.sms": "短訊內容：「Pam：{place}已為您預約{day} {time}。點按即可在Pam中查看：{link}」",
+  "trips.booked.example.title": "為 {name} 預約嘅示範",
+  "trips.booked.example.body": "{place}，{day} {time}。呢個只係示範：冇向計劃預訂任何嘢，亦冇傳短訊畀任何人。",
   "join.booked.title": "您的到訪已預約",
   "join.booked.body": "{place}，{day} {time}。Pam會在您出發前提醒您。",
   "join.booked.action": "查看該地點",

@@ -1060,6 +1060,8 @@
   "book.wrote": "Написали: {when}",
   "trips.booked.texted": "{place}, {day}, {time}. SMS со ссылкой отправлено: {name}.",
   "trips.booked.sms": "Текст SMS: «Pam: вас записали. Место: {place}, день: {day}, время: {time}. Нажмите, чтобы посмотреть в Pam: {link}»",
+  "trips.booked.example.title": "Пример записи для {name}",
+  "trips.booked.example.body": "{place}, {day}, {time}. Это только пример: в программе ничего не забронировано, и никому не отправлено сообщение.",
   "join.booked.title": "Вас записали на визит",
   "join.booked.body": "{place}, {day}, {time}. Pam напомнит вам перед выходом.",
   "join.booked.action": "Посмотреть место",

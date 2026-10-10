@@ -26,7 +26,7 @@ import { useTrips } from '@/lib/useTrips';
 import { useSession } from '@/lib/useSession';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { DUMMY_TRIPS } from '@pam/config/dummy-trips';
-import { friendLink, inviteLink } from '@/lib/appUrl';
+import { friendLink } from '@/lib/appUrl';
 import { navigate } from '@/lib/navigate';
 import { countdown } from '@/lib/when';
 import { FRIEND_BANNER, FRIEND_BANNER_SRCSET } from '@/lib/friendBanner';
@@ -224,7 +224,6 @@ export function NewTripView({
   const [movedTo, setMovedTo] = useState<Date | null>(null);
   // Booked for a member (D-316): the moment, then the program's Home.
   const [bookedAt, setBookedAt] = useState<Date | null>(null);
-  const [bookedTripId, setBookedTripId] = useState<string | null>(null);
   // The member's own booking, confirmed (D-333): the booked screen.
   const [confirmed, setConfirmed] = useState<{ readonly id: string; readonly at: Date } | null>(
     bookedTrip ? { id: bookedTrip.trip.id, at: new Date(bookedTrip.trip.startsAt) } : null,
@@ -301,17 +300,16 @@ export function NewTripView({
 
   if (bookedAt && place && forMember) {
     const vars = { place: place.name, day: dayLong.format(bookedAt), time: timeFmt.format(bookedAt) };
-    // Somebody new to Pam (D-322): they are texted a link that opens on this
-    // visit. The text itself is shown, so the program knows what they got.
-    const texted = Boolean(forMember.phone);
+    // An example, and it says so (Lena's promise sweep, 10 October): a booking
+    // for a member is kept in this tab only. Nothing is saved with the program
+    // and nobody is texted, so the screen claims neither. The "booked" and
+    // "texted" words (trips.booked.title / .texted / .sms) come back when a
+    // booking for a member is saved for real and texts are live.
     return (
       <SuccessScreen
-        title={t('trips.booked.title', { name: forMember.name })}
-        body={texted ? t('trips.booked.texted', { ...vars, name: forMember.name }) : t('trips.booked.body', vars)}
+        title={t('trips.booked.example.title', { name: forMember.name })}
+        body={t('trips.booked.example.body', vars)}
         action={<Button label={t('trips.moved.home')} variant="secondary" href="/" xstyle={styles.home} />}
-        {...(texted
-          ? { note: t('trips.booked.sms', { ...vars, link: inviteLink('PAM-7Q4K', 'member', bookedTripId) }) }
-          : {})}
       />
     );
   }
@@ -504,7 +502,6 @@ export function NewTripView({
               if (forMember) {
                 // The program's moment (D-316), then its Home — not the
                 // member's Trips, which is theirs.
-                setBookedTripId(id);
                 setBookedAt(at(day, time));
                 return;
               }
