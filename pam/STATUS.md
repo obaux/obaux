@@ -950,7 +950,9 @@ Broad St, North Philadelphia` drew `… St, North Philadelphia 1231 بالقرب
   entries for the area chip's long address (`areachip--long-address` and the new
   `areachip--arabic`; reason: a long address ends in an ellipsis by design), and its
   `ar|spill|…long-address` entry becomes unused. This branch also moved off D-434
-  (see `docs/allocations.md`).
+  (see `docs/allocations.md`). **Done at the merge (10 October):** the `long-address` ellipsis is in
+  `fit-known.json` and the old `ar|spill` entry is gone; `areachip--arabic` needs none
+  (its ellipsis is the story's own in every column).
 
 ## Seven languages, messages in your own language, and text that fits (9 October) — 0.50.1 and 0.51.0, merged 9 October (PR #29)
 
