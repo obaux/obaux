@@ -76,6 +76,8 @@ export interface MockOptions {
   readonly pendingChange?: boolean;
   /** The program of `SAVED_PLACE` offers services (D-462), for a member's view of it. */
   readonly placeServices?: boolean;
+  /** A lead's program has two real policies on file (a25), so Policies for participants has something to show. */
+  readonly ownPolicies?: boolean;
   /**
    * A member who already has a trip saved (D-454). Without it they have none —
    * and a trip planned to a real place in the story is saved from then on, as
@@ -233,6 +235,24 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
         ]
       : []),
   ];
+  // The lead's policies (a25): two on file, each with its pages.
+  let ownPolicyRows: Array<Record<string, unknown>> = [
+    {
+      id: 'policy-1', service_id: OWN_PROGRAM_ID, title: 'Confidentiality and disclosure', version: 2, replaces_id: 'policy-0',
+      created_at: onTheHour(-6, 10), archived_at: null,
+      program_policy_files: [
+        { id: 'f1', path: `${OWN_PROGRAM_ID}/a.pdf`, name: 'confidentiality-and-disclosure.pdf', content_type: 'application/pdf', size_bytes: 120000, position: 0 },
+      ],
+    },
+    {
+      id: 'policy-2', service_id: OWN_PROGRAM_ID, title: 'Photo and media release', version: 1, replaces_id: null,
+      created_at: onTheHour(-9, 14), archived_at: null,
+      program_policy_files: [
+        { id: 'f2', path: `${OWN_PROGRAM_ID}/b1.jpg`, name: 'photo-release page 1.jpg', content_type: 'image/jpeg', size_bytes: 80000, position: 0 },
+        { id: 'f3', path: `${OWN_PROGRAM_ID}/b2.jpg`, name: 'photo-release page 2.jpg', content_type: 'image/jpeg', size_bytes: 82000, position: 1 },
+      ],
+    },
+  ];
   // Programs waiting for Pam (D-386): a first send that has waited four days, a change to a live
   // program, and one a leader deleted to start over (with the new one after it).
   let programsToCheck: Array<Record<string, unknown>> = [
@@ -341,6 +361,19 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
       ];
       return { body: ownProgramRow(ownProgram) };
     }),
+    // A lead's real policies (a25): read, added, taken off. Their pages open from a short-lived link.
+    (url, method) =>
+      url.includes('/rest/v1/program_policies') && method === 'GET'
+        ? { body: options.ownPolicies ? ownPolicyRows : [] }
+        : null,
+    on('/rpc/add_policy', () => ({ body: { id: 'policy-new' } })),
+    on('/rpc/archive_policy', (_url, _method, body) => {
+      const args = (body ?? {}) as { p_id: string };
+      ownPolicyRows = ownPolicyRows.filter((row) => row['id'] !== args.p_id);
+      return { body: { id: args.p_id } };
+    }),
+    (url) => (url.includes('/storage/v1/object/sign/policies/') ? { body: { signedURL: '/friend/bring-a-friend-800.webp' } } : null),
+    (url, method) => (url.includes('/storage/v1/object/policies/') && method !== 'GET' ? { body: { Key: 'policies/example.pdf' } } : null),
     // Corrected and sent again: the same submission, back in review (20261010135742).
     on('/rpc/resend_program_submission', () => {
       submissions = submissions.map((s) => (s['kind'] === 'new' ? { ...s, status: 'in_review', changes_note: null } : s));

@@ -13,13 +13,16 @@ import { Segment } from '@pam/ui/Segment';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
-import { BookIcon } from '@pam/ui';
+import { BookIcon, Notice } from '@pam/ui';
+import { useSupportPhone } from '@/lib/useSupportPhone';
 import { MenuList } from '@pam/ui/MenuList';
 import { PolicyUploadCard } from '@pam/ui/PolicyUploadCard';
 import { SubPage } from '@pam/ui/SubPage';
 import type { DummyPolicy } from '@pam/config/dummy-policies';
 import { useI18n } from '@/lib/i18n';
-import { usePolicies } from '@/lib/usePolicies';
+import { navigate } from '@/lib/navigate';
+import { openPolicyFile, usePolicies, type AddPolicyResult } from '@/lib/usePolicies';
+import { POLICY_ACCEPT, type ProgramPolicy } from '@/lib/programPolicies';
 import { servicesForPolicy } from '@pam/config/dummy-services';
 import { useServices } from '@/lib/useServices';
 import { ConfirmDialog } from './ConfirmDialog';
@@ -65,14 +68,28 @@ const styles = stylex.create({
   empty: { fontSize: '17px' },
 });
 
+/** A policy the database keeps (it has pages and a version), not an example. */
+const isReal = (policy: DummyPolicy): policy is ProgramPolicy => (policy as Partial<ProgramPolicy>).isReal === true;
+
 export function PoliciesScreen() {
   const { t, tPlain } = useI18n();
-  const { policies, add, remove } = usePolicies();
+  const { policies, add, remove, isLoading, programId } = usePolicies();
   const { forPlace } = useServices();
   const [isEditing, setIsEditing] = useState(false);
+  // A file that was wrong, or a policy that could not be saved: said, with what was chosen kept in mind.
+  const [problem, setProblem] = useState<AddPolicyResult>('ok');
+  const [busy, setBusy] = useState(false);
+  const supportPhone = useSupportPhone();
+  const addFiles = async (files: readonly File[]) => {
+    setBusy(true);
+    setProblem('ok');
+    const result = await add(files);
+    setBusy(false);
+    setProblem(result);
+  };
   const [asking, setAsking] = useState<DummyPolicy | null>(null);
   // Which services ask for it (D-313): named by none means everyone signs it.
-  const services = forPlace('dummy-place-learning');
+  const services = forPlace(programId ?? 'dummy-place-learning');
   const forWhom = (policy: DummyPolicy) => {
     const only = servicesForPolicy(policy.id, services);
     return services.length === 0
@@ -107,14 +124,27 @@ export function PoliciesScreen() {
         title={t('policies.upload.label')}
         hint={t('policies.upload.hint')}
         buttonLabel={t('policies.upload.button')}
-        onFiles={add}
+        onFiles={(files) => void addFiles(files)}
+        accept={POLICY_ACCEPT}
       />
+      {busy ? <Text type="supporting" xstyle={styles.empty}>{t('policies.upload.saving')}</Text> : null}
+      {problem !== 'ok' ? (
+        <Notice
+          notice="something_went_wrong"
+          title={t('policies.upload.problem.title')}
+          body={t(`policies.upload.problem.${problem}`)}
+          supportPhone={supportPhone}
+          callLabel={t('help.callSupport')}
+        />
+      ) : null}
 
       <Text xstyle={styles.heading}>{t('policies.list')}</Text>
       {policies.length === 0 ? (
-        <Text type="supporting" xstyle={styles.empty}>
-          {t('policies.empty')}
-        </Text>
+        isLoading ? null : (
+          <Text type="supporting" xstyle={styles.empty}>
+            {t('policies.empty')}
+          </Text>
+        )
       ) : isEditing ? (
         // Edit: each row with its own remove button, and no way in.
         <VStack gap={1}>
@@ -168,9 +198,12 @@ export function PoliciesScreen() {
 }
 
 export function PolicyScreen({ id }: { readonly id: string | null }) {
-  const { t, locale } = useI18n();
-  const { policies } = usePolicies();
+  const { t, tPlain, locale } = useI18n();
+  const { policies, replace } = usePolicies();
+  const supportPhone = useSupportPhone();
   const [tab, setTab] = useState<'preview' | 'signed'>('preview');
+  const [problem, setProblem] = useState<AddPolicyResult>('ok');
+  const [busy, setBusy] = useState(false);
   const policy = policies.find((p) => p.id === id) ?? null;
   const day = new Intl.DateTimeFormat(intlLocale(locale), { month: 'long', day: 'numeric' });
 
@@ -194,10 +227,65 @@ export function PolicyScreen({ id }: { readonly id: string | null }) {
             <Segment value="signed" label={`${t('policy.tab.signed')} · ${policy.signedBy.length}`} />
           </SegmentedControl>
 
+          {tab === 'preview' && isReal(policy) ? (
+            // Never edited, only replaced (a25): a new version, and people are asked again.
+            <VStack gap={2}>
+              <Text xstyle={styles.heading}>{t('policy.replace.title')}</Text>
+              <Text type="supporting" xstyle={styles.intro}>
+                {t('policy.replace.hint')}
+              </Text>
+              <PolicyUploadCard
+                title={t('policy.replace.label')}
+                hint={t('policies.upload.hint')}
+                buttonLabel={t('policies.upload.button')}
+                accept={POLICY_ACCEPT}
+                onFiles={(files) => {
+                  void (async () => {
+                    setBusy(true);
+                    setProblem('ok');
+                    const result = await replace(policy.id, files);
+                    setBusy(false);
+                    setProblem(result);
+                    // The old version is archived: back to the list, where the new one is.
+                    if (result === 'ok') navigate('/program/policies/');
+                  })();
+                }}
+              />
+              {busy ? <Text type="supporting" xstyle={styles.empty}>{t('policies.upload.saving')}</Text> : null}
+              {problem !== 'ok' ? (
+                <Notice
+                  notice="something_went_wrong"
+                  title={t('policies.upload.problem.title')}
+                  body={t(`policies.upload.problem.${problem}`)}
+                  supportPhone={supportPhone}
+                  callLabel={t('help.callSupport')}
+                />
+              ) : null}
+            </VStack>
+          ) : null}
+
           {tab === 'preview' ? (
             <Card padding={6}>
               <VStack gap={3}>
-                {policy.body.length > 0 ? (
+                {isReal(policy) ? (
+                  <>
+                    <Text type="supporting" xstyle={styles.empty}>
+                      {t('policy.version', { version: policy.version })}
+                    </Text>
+                    {policy.files.map((file) => (
+                      <HStack key={file.path} gap={3} align="center" wrap="nowrap" xstyle={styles.row}>
+                        <BookIcon {...ICON} />
+                        <Text xstyle={[styles.rowTitle, styles.rowWords]}>{file.name}</Text>
+                        <Button
+                          label={t('policy.file.open')}
+                          variant="secondary"
+                          aria-label={tPlain('policy.file.open.named', { name: file.name })}
+                          onClick={() => void openPolicyFile(file.path)}
+                        />
+                      </HStack>
+                    ))}
+                  </>
+                ) : policy.body.length > 0 ? (
                   policy.body.map((para, i) => (
                     <Text key={i} xstyle={styles.body}>
                       {para}

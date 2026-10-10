@@ -282,6 +282,12 @@ STATUS row too.
 
 ### Programs
 
+- [ ] **A lawyer reads what a signature in Pam means, and the upload disclaimer, before launch** (Will, 10 October 2026,
+  card a25: "Go for it", point 5). A signature in Pam is *a record that you read and agreed*, not a notarised or legal
+  signature; the sentence that says so (shown where someone signs, part 2) and the words next to a program's upload
+  (the program owns what its policies say; Pam only keeps them) need a lawyer's read. Add the final words in English
+  first, then the other six. Until then the signing screens must not promise more than "a record that you read and agreed".
+
 - [ ] **Load a program lead's own program** — *parts 1–3 are built on `claude/places-programs-load-own-program` (D-447, 10 October); live once it is merged and its two migrations are applied (0085 first). Parts 4–6 follow.* (Will, 7 October 2026: "still on
   backlog list for programs before production"; D-218's follow-up, D-352,
   D-361). Today the Program tab draws the example program, and Home's Get
