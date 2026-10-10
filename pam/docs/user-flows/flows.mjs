@@ -670,6 +670,20 @@ export const flows = [
         changed: 'D-189',
         note: 'A nested screen from Profile (and the bell): each reported place with Keep it or Take it off the list (which tells whoever saved it)',
       },
+      programsToCheck: {
+        title: 'Programs to check',
+        story: 'super-admin-screens--programs-to-check',
+        path: '/programs/review/',
+        changed: 'D-386',
+        note: 'What program leaders have sent, newest first: a new program, a change to a live one, or one deleted to start over',
+      },
+      programReview: {
+        title: 'A program to check',
+        story: 'super-admin-screens--program-to-check-new',
+        path: '/programs/review/item/',
+        changed: 'D-386',
+        note: 'What was sent, and Approve or Ask for changes (a note); a withdrawn one can only be discarded',
+      },
       place: {
         title: "A program's page",
         story: 'super-admin-screens--place',
@@ -698,8 +712,12 @@ export const flows = [
       ['everyone', 'person', 'A person'],
       ['profile', 'viewAs', 'See the app as'],
       ['profile', 'reported', 'Reported places'],
+      ['profile', 'programsToCheck', 'Programs to check'],
+      ['home', 'programsToCheck', 'Programs to check'],
+      ['programsToCheck', 'programReview', 'A program'],
     ],
     changes: [
+      'D-386 — Programs to check: what leaders sent for Pam to look at, with Approve, Ask for changes and Discard',
       'D-189 — Reported places is a screen of its own, from Profile and the bell\'s "a place was reported" row, no longer only a chip on the old Places page',
       'D-444 — Requests are rows, and a request is a page with Approve and Deny at the foot; an invite is a page per kind (the city is picked there); Everyone lost its card of invite buttons',
       "D-411 — a conversation: back and ⋯ where every nested screen has them, the name large, no fade; ⋯ outlined; Messages rows start at the page edge; dialogs open with no button chosen",

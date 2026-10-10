@@ -87,7 +87,8 @@ select test.check('a member does not see it', (select count(*) from public.progr
 select test.check_raises_like('...and cannot withdraw it',
   $$select public.withdraw_program_submission('00000000-0000-0000-0000-000000000000')$$, '%NOT_A_PROGRAM_LEAD%');
 select set_config('request.jwt.claim.sub', :'boss', false);
-select test.check('a super admin sees it', (select count(*) from public.program_submissions), 1);
+-- (Not a bare count: 20261010134146 gave every program on file before the record existed one, seed included.)
+select test.check('a super admin sees it', (select count(*) from public.program_submissions where details->>'name' = 'Fresh Start Kitchen'), 1);
 
 select set_config('request.jwt.claim.sub', :'lead', false);
 select test.check('the lead sees their own', (select count(*) from public.program_submissions), 1);

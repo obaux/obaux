@@ -115,6 +115,12 @@ export function RequestsScreen({ isHome = false }: { readonly isHome?: boolean }
     <Page gap={4}>
       {header(requests.status === 'ready' ? t('requests.count', { count: requests.requests.length }) : undefined)}
 
+      {/* The programs leaders have sent for Pam to check, beside the people asking to be staff (D-386). */}
+      <MenuList
+        label={t('review.title')}
+        items={[{ id: 'programs-to-check', label: t('review.title'), href: '/programs/review/', icon: <PlacesIcon {...ICON} /> }]}
+      />
+
       {requests.status === 'loading' ? <Loading label={t('common.loading')} variant="inline" /> : null}
 
       {requests.status === 'error' ? (

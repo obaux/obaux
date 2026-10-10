@@ -233,6 +233,34 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
         ]
       : []),
   ];
+  // Programs waiting for Pam (D-386): a first send that has waited four days, a change to a live
+  // program, and one a leader deleted to start over (with the new one after it).
+  let programsToCheck: Array<Record<string, unknown>> = [
+    {
+      id: 'check-1', service_id: 'p-1', kind: 'new', status: 'in_review', sent_at: onTheHour(-4, 10), days_waiting: 4,
+      program_name: 'Hearth Kitchen Training',
+      details: { name: 'Hearth Kitchen Training', category: 'workforce', subcategory: 'job_training', description: 'Cooking classes and a job-readiness workshop.', address: '1234 Market St, Philadelphia, PA 19107', phone: '+12155550143', website: 'https://example.org/hearth' },
+      lead_name: 'Lou', replaces_id: null, replaced_by: null, withdrawn_at: null,
+    },
+    {
+      id: 'check-2', service_id: 'p-2', kind: 'change', status: 'in_review', sent_at: onTheHour(-1, 12), days_waiting: 1,
+      program_name: 'Riverside Career Center',
+      details: { name: 'Riverside Career and Learning Center', category: 'education', subcategory: null, address: '2 River Rd, Philadelphia, PA 19106' },
+      lead_name: 'Rae', replaces_id: null, replaced_by: null, withdrawn_at: null,
+    },
+    {
+      id: 'check-3', service_id: 'p-3', kind: 'new', status: 'withdrawn', sent_at: onTheHour(-6, 9), days_waiting: 6,
+      program_name: 'Corner Pantry',
+      details: { name: 'Corner Pantry', category: 'family_services', description: 'Groceries to take home.', address: '9 Corner St, Philadelphia, PA 19103' },
+      lead_name: 'Cass', replaces_id: null, replaced_by: 'check-4', withdrawn_at: onTheHour(-5, 15),
+    },
+    {
+      id: 'check-4', service_id: 'p-4', kind: 'new', status: 'in_review', sent_at: onTheHour(-5, 15), days_waiting: 5,
+      program_name: 'Corner Pantry & Kitchen',
+      details: { name: 'Corner Pantry & Kitchen', category: 'family_services', description: 'Groceries to take home and a weekly hot meal.', address: '9 Corner St, Philadelphia, PA 19103' },
+      lead_name: 'Cass', replaces_id: 'check-3', replaced_by: null, withdrawn_at: null,
+    },
+  ];
   // The member's saved trips (D-454): planning one adds it, moving one changes it, and reading answers with them.
   const savedTrips: SavedTripRow[] = options.savedTrip
     ? [savedTripRow(1, onTheHour(4, 12), 'Bring my ID'), ...(options.pastTrip ? [savedTripRow(2, onTheHour(-3, 10))] : [])]
@@ -276,6 +304,13 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
     on('/functions/v1/link-preview', () => ({ body: { made: 0 } })),
     on('/rpc/report_photos_for_review', () => ({ body: [] })),
     on('/rpc/report_files_for_review', () => ({ body: [] })),
+    // The programs a super admin has still to check (D-386, part 6): a decision takes one off the list.
+    on('/rpc/programs_to_check', () => ({ body: programsToCheck })),
+    on('/rpc/review_program_submission', (_url, _method, body) => {
+      const args = (body ?? {}) as { p_id: string };
+      programsToCheck = programsToCheck.filter((row) => row.id !== args.p_id);
+      return { body: { id: args.p_id } };
+    }),
     on('/rpc/log_call', () => ({ body: true })),
     on('/rpc/my_trips', () => ({ body: savedTrips })),
     on('/rpc/my_trip_services', () => ({ body: [] })),
