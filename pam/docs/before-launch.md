@@ -166,7 +166,7 @@ STATUS row too.
 
 ### Programs
 
-- [ ] **Load a program lead's own program** (Will, 7 October 2026: "still on
+- [ ] **Load a program lead's own program** — *parts 1–3 are built on `claude/places-programs-load-own-program` (D-447, 10 October); live once it is merged and its two migrations are applied (0085 first). Parts 4–6 follow.* (Will, 7 October 2026: "still on
   backlog list for programs before production"; D-218's follow-up, D-352,
   D-361). Today the Program tab draws the example program, and Home's Get
   started only knows a lead "has a program" once one is sent from that

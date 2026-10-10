@@ -924,6 +924,31 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
+## Places & programs · load a lead's own program (10 October) — on the branch, not merged
+
+D-447, on `claude/places-programs-load-own-program` (Piper). A program lead's program is
+now read from, and saved to, the database instead of remembered by the tab. **Not on `main`;
+nothing applied to the live project.** Two migrations, in this order: **0085** (by hand, it
+drops signatures), then `20261010042108_a_program_lead_submits_their_own_program.sql`, then
+`20261010062347_an_approved_program_lead_gets_an_org.sql` (refuses without 0085).
+
+- **Built:** the Program tab, Home's getting-started cards and "Sent to Pam" follow the
+  lead's own program (waiting for review, or live) on any phone; Add a program sends it for
+  real; Edit saves it. A live program's name, address and kind of help are shown but not
+  editable (D-447); its description, phone and website save at once.
+- **Closed by the migrations:** a lead had no org, so could neither read nor edit their
+  program; a lead could approve their own listing by setting `needs_review = false`; editing a
+  live program's words hid it from members.
+- **Not built:** Delete and start over for a program on file; changing a live program's
+  name/address (part 5a); the review wait's real status and Pam's note (5b); the super
+  admin's queue (6); switching between programs (4). Approved leads from before the second
+  migration still have an org-less program.
+- **Proven:** database suite (both migrations, incl. the refusal without 0085), 55 web and 808
+  config tests, Storybook build and a browser look at the new states. Language fit on the one
+  new sentence is left to the PR check.
+
+---
+
 ## Arabic reads in the right order (9 October) — 0.51.1, merged 10 October
 
 D-435, on `claude/amazing-archimedes-qvgnt2` (`main` at `8dee5d4` plus this; merged
