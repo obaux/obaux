@@ -17,15 +17,26 @@ any session that takes over the merge desk can keep it running.
 
 ## What it shows
 
+**Two things that stay on screen** (Will, 10 October: "keep composer fixed at bottom of
+control room, not the thread … create sticky tabs when I scroll past the actions on top so I
+can return to 'needs approval' or 'ready for you' from anywhere"):
+- **The message box** to Mira is fixed to the bottom of the screen on every part of the page.
+  The conversation itself stays in Waiting on you. When Mira answers while the conversation
+  is off screen, a line above the box says so, with a button that goes to it.
+- **Section tabs** slide in at the top once the four numbers have scrolled away: Waiting on
+  you (with its count, green when it isn't 0), Ready for you (count), Conversation, What I'm
+  doing, Team. The Pam mark goes back to the top. The tab for the part you're reading is
+  underlined; on a phone the row scrolls sideways and keeps that tab in view.
+
 **Header.** Pam's app icon (the same drawing as `apps/web/src/app/icon.svg`), the name, and a status chip: *Live* (the session list is being read every
 minute), *Board connected* (my updates arrive, live status off), or *Offline copy*. When
 live status needs Will's one-time permission, the chip carries a **Show live status**
 button.
 
-**At a glance.** Four numbers: building now, waiting on you, ready for you to try,
-messages today. Each is a button that takes you to its section: the team, Waiting on
-you, Ready for you to try, What I'm doing (Will, 10 October: "I want to click on these
-and go to section").
+**At a glance.** Four numbers: waiting on you, ready for you, messages today, building now.
+Each is a button that takes you to its section (Will, 10 October: "I want to click on these
+and go to section"). The sections run in that order too: 01 Waiting on you, 02 Ready for
+you, 03 What I'm doing, 04 The team.
 
 **The team map** — the centre of the page.
 - Will at the top ("You, Founder"), Mira in the middle, every teammate around her.
@@ -66,8 +77,17 @@ Reply puts the card's question at the start of the message box.
 **What I'm doing.** Mira's one-line "Right now", then the message feed: time, coloured
 dot, who → who, and the message in plain words.
 
-**Ready for you to try.** One card per thing Will can open: what it fixes, how to try
-it, and buttons (the app, Storybook, the Figma flow map).
+**Ready for you.** Will, 10 October: it "needs to provide me with useful links (if
+available), and needs to be up to date."
+- **Always here:** a row of links that are useful on any day (`desk/links`): the app, the
+  website, Storybook, the Figma flow map, Supabase, Resend.
+- **One card per thing Will can open:** where it is (In the app, On the website, In
+  Storybook), when it went live, what it fixes, how to try it, and buttons that go straight
+  to it (a deep link to the screen, post or story, not just the home page). Today's cards
+  show; older ones fold under "Earlier".
+- **Up to date means:** a card is added the moment something goes live, and a card that no
+  longer says something new is hidden (`hidden: true`). The section heading says when it
+  last changed.
 
 **Who's on the team.** A card per teammate: avatar, first name, job title, lane, what
 they do, status, live state, *Doing now*, *Waiting on*, *Finished recently*, branch.
@@ -82,7 +102,8 @@ writes as Will with the artifact data tool.
 | `team/<key>` | teammate (`desk` is Mira) | `nick`, `title`, `avatar`, `name` (lane), `short`, `job`, `status`, `sessionId`, `doing[]`, `waitingOn[]`, `done[]`, `branch`, `links[]`, `order` |
 | `links/<from>-<to>` | teammate-to-teammate link | `from`, `to`, `label`, `active` |
 | `asks/<id>` | decision for Will | `question`, `why`, `advice`, `from[]`, `order`, `status` (`answered` hides it) |
-| `ready/<id>` | thing to try | `title`, `problem`, `how`, `links[]`, `from`, `at`, `hidden` |
+| `ready/<id>` | thing to try | `title`, `where`, `problem`, `how`, `links[]` (`label`, `url`), `from`, `at`, `hidden` |
+| `desk/links` | — | `items[]`: `{label, url}` (the Always here row), `updatedAt` |
 | `desk/now` | — | `doing`, `updatedAt` |
 | `events/feed` | — | `items[]`: `{at, from, to, kind, text}`, newest 40 kept |
 | `chat/<id>` | chat message | `from` (`will` or `mira`), `text`, `at`, `state` (Will's: `sending`, `delivered`, `failed`), `re` (Mira's: the message answered) |
@@ -101,8 +122,11 @@ private to Will unless he shares it.
   (`status`, `doing`, `waitingOn`, `done`) if it changed.
 - A question only Will can answer: an `asks/` card with Mira's advice. When he answers,
   `status: "answered"`, and the answer goes to the teammate.
-- Something Will can test: a `ready/` card in plain words — what it fixes, how to try
-  it, a link.
+- Something Will can test: a `ready/` card in plain words — where, what it fixes, how to
+  try it, and a link straight to it — the moment it is live. Hide the cards it replaces.
+- **Every answer to Will's chat message goes into `chat/` as well as the comment thread.**
+  The page shows only `chat/`; on 10 October, answers given only in comment threads left
+  his afternoon's messages looking unanswered until they were filled in at 18:00.
 - `desk/now` whenever Mira's own work changes.
 
 ## Checks before it ships (the double pass)
