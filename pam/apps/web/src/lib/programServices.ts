@@ -8,11 +8,12 @@ import { phoneForDatabase } from './ownProgram';
  * screens already use (`DummyService`, the example set's), and what a save
  * writes. `useServices` does the asking.
  *
- * A real program's services carry no policies yet: which policies are only for
- * a service is the next table (D-313's second step), so `policyIds` is empty and
- * every policy is the program's, as the example set says for one that names none.
+ * A real service's `policyIds` are the policies that are only for it
+ * (`program_policy_services`, D-313 step 2, migration 20261010151302); a policy
+ * no service names is the program's, asked of everyone, as the example set says.
  */
-export const PROGRAM_SERVICE_COLUMNS = 'id, service_id, name, description, phone, website, address, hours, sort_order';
+export const PROGRAM_SERVICE_COLUMNS =
+  'id, service_id, name, description, phone, website, address, hours, sort_order, program_policy_services(policy_id)';
 
 export interface ProgramServiceRow {
   readonly id: string;
@@ -24,6 +25,8 @@ export interface ProgramServiceRow {
   readonly address: string | null;
   readonly hours: unknown;
   readonly sort_order: number;
+  /** The policies that are only for this service (D-313 step 2); none named is none. */
+  readonly program_policy_services?: readonly { readonly policy_id: string }[] | null;
 }
 
 /** A row of `program_services` in the shape every screen that lists services reads. */
@@ -37,7 +40,7 @@ export function serviceFromRow(row: ProgramServiceRow): DummyService {
     website: row.website,
     address: row.address,
     hours: Array.isArray(row.hours) ? (row.hours as WeekHours) : null,
-    policyIds: [],
+    policyIds: (row.program_policy_services ?? []).map((link) => link.policy_id),
   };
 }
 

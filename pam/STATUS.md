@@ -1826,3 +1826,7 @@ undone: `0052_saved_places_say_what_they_are.sql` had not reached the
 live project (it went live on 20 September — "What needs a human" row 24), and the live RLS fingerprint has not been re-verified since
 either session's migrations deployed — see the drift note under "What is
 live" and the "Live RLS fingerprint" row under "What is proven."
+
+## Places & programs · policies, part 4 of 4: only for this service (10 October 2026) — READY, not merged (on top of part 3)
+
+Branch `claude/places-programs-policies-p4` (D-485). Migration `20261010151302`, expand only: `program_policy_services`, `set_policy_services`, `add_policy` keeps scope on a new version. The service editor now loads real services and saves the ticks. Test `49_a_policy_can_be_for_some_services_only_and_a_new_test.sql`.
