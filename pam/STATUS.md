@@ -1313,11 +1313,12 @@ Merged to `main` by the merge desk, 10 October, from `claude/places-programs-boo
 
 Merged to `main` by the merge desk, 10 October, from `claude/places-programs-lead-reads-review`. Migration `20261010135742` (`resend_program_submission`), expand only, **applied live at merge** (recorded as 20261010140904), read back: body identical to the file, for authenticated (checks inside for the program's own lead). With part 6 live too, "Ask for changes" is safe to use. Test `43_a_lead_sends_the_program_again_test.sql` (numbered 42 on its branch; Nico's alerts test took 42 first). Edit and send again resends the same submission; a program being checked is corrected through it. Land after part 6.
 
-## Places & programs · policies, part 3 of 4: a program sees who signed (10 October 2026) — READY, not merged (on top of part 2)
+## Places & programs · policies, part 3 of 4: a program sees who signed (10 October 2026) — merged 10 October
+
+Merged by the merge desk in the third stack of 10 October. Live: applied as 20261010153405.
 
 Branch `claude/places-programs-policies-p3` (D-485). Migration `20261010150922`, expand only: `program_policy_signers` (first name and date, never the picture). The Signed tab and the verified tick read it. Test `47_a_program_reads_who_signed_by_first_name_and_test.sql`.
 
-## Places & programs · policies, part 2 of 4: members sign (10 October 2026) — READY, not merged (on top of part 1)
 ## Places & programs · policies, part 2 of 4: members sign (10 October 2026) — merged 10 October
 
 Merged by the merge desk from 10b3f0b. Live: applied as 20261010151152; read back: both tables RLS on and forced, own-row select only, `program_policies_select_signed`, `can_read_policy_file` / `sign_policy` / `forget_my_signature` match the file by md5, authenticated only, anon nothing. For P3: `archive_policy` checks `is_active_account()`, `add_policy` leaves `p_replaces` out of the 30 cap, pin `reminder_is_quiet`'s search_path (advisor).
@@ -1924,6 +1925,8 @@ Merged by the merge desk from b4534267 (713584b). Live: applied as 2026101017105
 
 Branch `claude/places-programs-approve-existing-member` (D-491). Migration `20261010160818`: `review_staff_request` adds the provider role to an existing member's account (city kept; `ROLE_PAIR_NOT_ALLOWED` / `ACCOUNT_IN_OTHER_CITY` otherwise). The staff screen says what happened or why not, never "Call Pam". Test `50_approving_a_staff_request_for_an_existing_member_test.sql`; e2e `staff-request-approve.spec.ts`.
 
-## Places & programs · the approval text opens Add your program (10 October 2026) — READY, not merged
+## Places & programs · the approval text opens Add your program (10 October 2026) — merged 10 October
+
+Merged by the merge desk from 3953321. Live: applied as 20261010193915; `review_staff_request`'s body matches the file by md5, search path pinned, anon cannot run it, signed-in users can (the super-admin check is inside). Security advisors: nothing new.
 
 Branch `claude/places-programs-add-program-link` (D-496). Preview picture `public/og/add-program.jpg` and metadata for `/programs/new/`; migration `20261010192105` puts `<app_url>/programs/new/` in the approval text for a program lead with no program yet; `/programs/new/` is behind the tab gate (signed out → Sign in → Home). Test `51_the_approval_text_links_a_new_program_lead_to_test.sql`; e2e `add-program-link.spec.ts`.
