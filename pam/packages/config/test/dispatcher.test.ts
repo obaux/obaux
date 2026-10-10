@@ -47,7 +47,8 @@ const VARS: Record<string, string> = {
  * bundle on purpose — the dispatcher refuses them, which is the point — and
  * these tests hold them to exactly that. `sms.test.ts` keeps the list honest.
  */
-const AWAITING_SIGNATURE = ['message_waiting', 'visit_booked', 'booking_changed', 'trip_planned'];
+const AWAITING_SIGNATURE = [];
+// (Empty since Will approved the four Text alerts texts on 10 October 2026; kept so a template may be added unsigned on purpose.)
 const signedKeys = (templates: Record<string, unknown>) => Object.keys(templates).filter((k) => !AWAITING_SIGNATURE.includes(k));
 
 describe('the shipped bundle', () => {
@@ -168,7 +169,8 @@ describe('a language is used while it carries an approval, and English when it d
   it('carries Will’s approval on every draft in the shipped bundle', () => {
     for (const template of Object.values(REAL.templates).filter((t) => !AWAITING_SIGNATURE.includes(t.key))) {
       for (const [locale, draft] of Object.entries(template.more ?? {})) {
-        expect(draft.reviewedBy, `${template.key} ${locale}`).toContain('Will (Oba), 9 October 2026');
+        // 9 October for the first drafts; 10 October for the four Text alerts texts.
+        expect(draft.reviewedBy, `${template.key} ${locale}`).toMatch(/^Will \(Oba\), (9|10) October 2026/);
       }
     }
   });
@@ -188,8 +190,9 @@ describe('a language is used while it carries an approval, and English when it d
         }
       }
     }
-    // 53, plus the three appointment reminders in the four scripts (D-431) = 65.
-    expect(inTheirLanguage).toBe(65);
+    // 53, plus the three appointment reminders in the four scripts (D-431) = 65,
+    // plus the four Text alerts texts in all five later languages (10 October) = 85.
+    expect(inTheirLanguage).toBe(85);
   });
 
   it('writes every one in English once the approvals are emptied, for every template', () => {

@@ -26,4 +26,16 @@ export const roundAction = stylex.create({
     color: colorVars['--color-text-primary'],
     boxShadow: '0 1px 4px light-dark(oklch(0 0 0 / 12%), oklch(0 0 0 / 45%))',
   },
+  // The same white disc, with no outline and no shadow. A place's save and ⋯ sit beside the back arrow, which is the
+  // only grey one; Will (10 October) did not want these two to carry the outline and the shadow D-411 gave them.
+  plain: {
+    width: '48px',
+    height: '48px',
+    minWidth: '48px',
+    borderRadius: '50%',
+    paddingInline: '0px',
+    flexShrink: 0,
+    backgroundColor: colorVars['--color-background-body'],
+    color: colorVars['--color-text-primary'],
+  },
 });

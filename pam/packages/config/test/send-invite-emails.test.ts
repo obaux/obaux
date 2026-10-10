@@ -17,6 +17,7 @@ import { SUPPORTED_LOCALES, type Locale } from '../src/i18n';
  * fake email service; nothing leaves the test.
  */
 const SIGNED = 'a test reader';
+// The bundle the function really ships: Will signed the English on 10 October 2026.
 const bundle = (signed: Locale[]): Bundle => {
   const b = structuredClone(bundleJson) as unknown as Bundle;
   for (const l of SUPPORTED_LOCALES) b.locales[l].reviewedBy = signed.includes(l) ? SIGNED : '';
@@ -124,8 +125,11 @@ describe('it sends nothing until a person has signed the words', () => {
     expect(w.sentEmails).toEqual([]);
   });
 
-  it('the bundle the function ships is unsigned: nobody has read the words yet', () => {
-    expect(Object.values((bundleJson as unknown as Bundle).locales).every((l) => l.reviewedBy === '')).toBe(true);
+  it('the bundle the function ships carries Will’s sign-off on the English, so it can send', () => {
+    const shipped = bundleJson as unknown as Bundle;
+    expect(shipped.locales.en.reviewedBy).toBe('Will, 10 October 2026');
+    expect(shipped.locales.en.copy.button).toBe('Accept invite');
+    expect(shipped.locales.ru.reviewedBy).toContain('approved to learn from');
   });
 });
 
@@ -142,7 +146,7 @@ describe('what it sends', () => {
     expect(email.idempotencyKey).toBe(`staff-invite-${ROW.id}`);
     expect(email.html).toContain('https://pam.example/signin/?invite=ABCD2345&amp;as=case-manager');
     expect(email.html).toContain('src="https://pam.example/email/pam-logo.png"');
-    expect(email.html).toContain('Dana invited you to be a case manager');
+    expect(email.html).toContain('Dana would love for you to join Pam as a case manager');
     expect(w.rpcs.map((c) => c.name)).toEqual(['claim_staff_invite_emails', 'mark_staff_invite_email_sent']);
     expect(w.rpcs[1]!.args).toEqual({ p_id: ROW.id });
   });
@@ -152,7 +156,7 @@ describe('what it sends', () => {
     const w = world({ rows: [ROW, other] });
     await w.call();
     expect(w.sentEmails[1]!.html).toContain('invite=ZXCV6789&amp;as=program');
-    expect(w.sentEmails[1]!.html).toContain('program partner');
+    expect(w.sentEmails[1]!.html).toContain('would love for your program to be part of Pam');
     expect(w.sleeps).toEqual([600]);
   });
 
@@ -226,8 +230,9 @@ describe('the sender and the preview say the same thing', () => {
       fonts: FONT_STACK,
       rtl: RIGHT_TO_LEFT,
     });
-    // Sign everything for the length of the comparison, as a person would.
+    // Sign everything for the length of the comparison, and put each back as it was.
     const table = STAFF_INVITE_EMAIL as Record<string, { reviewedBy: string }>;
+    const before = SUPPORTED_LOCALES.map((l) => table[l]!.reviewedBy);
     SUPPORTED_LOCALES.forEach((l) => (table[l]!.reviewedBy = SIGNED));
     try {
       for (const locale of SUPPORTED_LOCALES) {
@@ -241,7 +246,7 @@ describe('the sender and the preview say the same thing', () => {
         }
       }
     } finally {
-      SUPPORTED_LOCALES.forEach((l) => (table[l]!.reviewedBy = ''));
+      SUPPORTED_LOCALES.forEach((l, i) => (table[l]!.reviewedBy = before[i]!));
     }
   });
 

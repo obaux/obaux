@@ -8,10 +8,11 @@ import { renderStaffInviteEmail, type StaffInviteEmailInput } from '@pam/config/
  * say a link ran out. A staff invite carries an email (0086); members are never
  * emailed.
  *
- * **Nobody has signed any of this yet**, in any of the seven languages, so
- * nothing sends: the sender waits for a person to write their name in
- * `reviewedBy`, and a language nobody has signed is sent in English. These are
- * drafts for Will and for native readers.
+ * **Will approved the English on 10 October 2026** ("No need to mention expiry
+ * days. ... Remember we're a human-touch company. Speak human please. Then
+ * approved."): no days anywhere, the button says Accept invite. The other six are
+ * drafts approved to learn from, for native readers; a language whose sign-off is
+ * emptied is sent in English.
  */
 const styles = stylex.create({
   frame: { width: '100%', height: '820px', borderWidth: 0 },
