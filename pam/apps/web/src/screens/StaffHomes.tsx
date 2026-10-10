@@ -28,6 +28,7 @@ import { useSession } from '@/lib/useSession';
 import { useCaseload } from '@/lib/useCaseload';
 import { dummyChip, statusChip } from '@/lib/caseloadLabels';
 import { HeaderActions } from './HeaderActions';
+import { StaffPeopleRow } from './StaffPeopleRow';
 import { PeopleHomeView, type HomePerson, type PeopleState } from './PeopleHomeView';
 
 /** A case manager's home: the people on their caseload. */
@@ -89,6 +90,7 @@ export function CaseloadHome() {
       }}
       state={state}
       note={isExample ? t('example.people.note') : null}
+      strip={<StaffPeopleRow role="admin" />}
       // §4.1: members agreed to this list at onboarding, and the case manager
       // reads the same words, so the promise is visible from both sides.
       footer={
@@ -171,6 +173,7 @@ export function ProgramHome() {
     return (
       <Page gap={4}>
         <LargeTitleHeader title={t('home.setup.title')} actions={<HeaderActions role="provider" hasHelp={false} />} />
+        <StaffPeopleRow role="provider" />
         <SetupCardList cards={[...cards, CALENDAR_CARD(t)]} />
         <ProgramActions canBook={setup.isLive} />
       </Page>
@@ -188,6 +191,7 @@ export function ProgramHome() {
         </>
       )}
       isCollapsed={cards.length > 0}
+      above={<StaffPeopleRow role="provider" />}
       below={
         cards.length > 0 ? (
           <VStack gap={3}>

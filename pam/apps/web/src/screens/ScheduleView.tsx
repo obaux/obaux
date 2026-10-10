@@ -85,6 +85,8 @@ export interface ScheduleViewProps {
   readonly canCheckIn?: boolean;
   /** Open folded, with a button to unfold it (D-352). */
   readonly isCollapsed?: boolean;
+  /** Under the header, above the calendar: Home's row of people with something new (D-198). */
+  readonly above?: ReactNode;
   /** Under the calendar, on the same page: Home's remaining cards. */
   readonly below?: ReactNode;
   /** The calendar alone, no page or header — for the preview page. */
@@ -400,6 +402,7 @@ export function ScheduleView({
   initialView = 'week',
   canCheckIn = false,
   isCollapsed = false,
+  above,
   below,
   isEmbedded = false,
 }: ScheduleViewProps) {
@@ -776,6 +779,8 @@ export function ScheduleView({
             }
           />
         )}
+
+        {!isSearching && !q ? above : null}
 
         {q ? (
           <VStack gap={2}>

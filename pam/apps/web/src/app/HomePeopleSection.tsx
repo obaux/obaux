@@ -7,7 +7,7 @@ import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import type { RankedPerson } from '@pam/config/people-activity';
 import { TextLink } from '@pam/ui';
-import { PeopleStrip } from '@pam/ui/PeopleStrip';
+import { PeopleStrip, type PeopleStripPerson } from '@pam/ui/PeopleStrip';
 import { useI18n } from '@/lib/i18n';
 
 /**
@@ -45,6 +45,23 @@ export const CONTENT: Record<
   provider: { titleKey: 'interested.title', seeAllHref: '/interested/' },
 };
 
+/** The tiles for a ranked list; where a tap goes is decided by the ring's reason (above). */
+export function toStripPeople(
+  ranked: readonly RankedPerson<HomePeopleSectionPerson>[],
+  t: (key: string) => string,
+): PeopleStripPerson[] {
+  return ranked.map(({ person, reason }) => ({
+    id: person.id,
+    firstName: person.firstName,
+    href:
+      reason === 'message' && person.conversationId
+        ? `/messages/thread/?id=${encodeURIComponent(person.conversationId)}`
+        : `/person/?id=${encodeURIComponent(person.id)}`,
+    hasActivity: reason !== null,
+    ...(reason ? { activityLabel: t(`people.new.${reason}`) } : {}),
+  }));
+}
+
 export function HomePeopleSection({
   role,
   ranked,
@@ -65,19 +82,7 @@ export function HomePeopleSection({
         </Heading>
         <TextLink label={t('saved.seeAll')} href={seeAllHref} size="quiet" />
       </HStack>
-      <PeopleStrip
-        label={t(titleKey)}
-        people={ranked.map(({ person, reason }) => ({
-          id: person.id,
-          firstName: person.firstName,
-          href:
-            reason === 'message' && person.conversationId
-              ? `/messages/thread/?id=${encodeURIComponent(person.conversationId)}`
-              : `/person/?id=${encodeURIComponent(person.id)}`,
-          hasActivity: reason !== null,
-          activityLabel: reason ? t(`people.new.${reason}`) : undefined,
-        }))}
-      />
+      <PeopleStrip label={t(titleKey)} people={toStripPeople(ranked, t)} />
       {isExample ? (
         <Text type="supporting" xstyle={styles.note}>
           {t('example.people.note')}

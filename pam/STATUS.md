@@ -1240,6 +1240,12 @@ recorded once `sms-inbound` is deployed (D-460); nothing queues the check-in or 
 connect" yet. Samples file: nine texts. D-453. Text reminders' staff list (merged 10 October) names
 only the alert texts Will signed: no "introduced to your program", no "your account changes".
 
+## Design system & Storybook · staff rings in Storybook (10 October) — merged 10 October
+
+Merged to `main` by the merge desk, 10 October, from `claude/pam-design-staff-rings` (db5e55f). The redesigned case manager and program lead Homes carry
+D-198's rings in their own row (everyone on the list, lit first, no heading), from the old Home's data, in
+Storybook only; staff still use the old Home. D-477. Fit: nothing new; axe clean. Needs Will: keep or drop (a22).
+
 ## Design system & Storybook · Points badge names (10 October) — merged 10 October
 
 Merged to `main` by the merge desk, 10 October, from `claude/pam-design-badge-names` (8c859ef). Badge names on the Points screen wrap instead of being
