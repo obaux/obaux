@@ -25,3 +25,35 @@ export function tabsFor(role: Role | null | undefined): readonly TabKey[] {
 export function firstTabIsHome(role: Role | null | undefined): boolean {
   return role === 'admin' || role === 'provider' || role === 'super_admin';
 }
+
+/**
+ * Which bottom-bar tab a path belongs to; `null` hides the bar.
+ *
+ * Only the five tab screens draw it (D-213): anything you tap into — a place,
+ * a person, a conversation, Legal, Get help — is a nested screen on the
+ * template, with its own way back and no bar, as in Will's references. The
+ * old addresses of a tab (`/places/`, `/interested/`, `/account/`) are the same
+ * tab. The path may or may not end in a slash (the app is exported with one).
+ */
+export function tabFor(pathname: string): TabKey | null {
+  const path = pathname.endsWith('/') ? pathname : `${pathname}/`;
+  switch (path) {
+    case '/':
+    case '/places/':
+    case '/interested/':
+      return 'explore';
+    case '/saved/':
+      return 'saved';
+    case '/trips/':
+      return 'trips';
+    case '/program/':
+      return 'program';
+    case '/messages/':
+      return 'messages';
+    case '/profile/':
+    case '/account/':
+      return 'profile';
+    default:
+      return null;
+  }
+}

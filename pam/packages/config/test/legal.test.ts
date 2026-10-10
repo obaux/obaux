@@ -198,3 +198,42 @@ describe('messages read in the reader’s language (D-423)', () => {
     }
   });
 });
+
+/**
+ * A promise on a screen is a promise Pam keeps (Will, 10 October 2026, via the merge desk: "every screen that
+ * promises something Pam doesn't do is built to keep the promise or rewritten", D-465). Two were found that
+ * were not true; these keep their wording true to what is built.
+ */
+describe('promises that are kept (D-465)', () => {
+  it('does not say a program sees the last day a member used Pam: the database does not give it to one (0062)', () => {
+    const line = TRANSPARENCY_SCREEN.canSee.find((l) => l.key === 'transparency.canSee.lastActive');
+    expect(line?.en).toBe('The last day you used Pam.');
+    expect(line?.en).not.toMatch(/program/i);
+    // In every language: the one sentence, and nothing about a program after it.
+    for (const [locale, bundle] of Object.entries(bundles)) {
+      const text = bundle['transparency.canSee.lastActive'] as string;
+      expect(text.split(/[.。]/).filter(Boolean), `${locale}: one sentence`).toHaveLength(1);
+    }
+    // A program does see when a member saved a new place, and the line that says so stays.
+    const saves = TRANSPARENCY_SCREEN.canSee.find((l) => l.key === 'transparency.canSee.saves');
+    expect(saves?.en).toMatch(/A program you joined sees this too/);
+  });
+
+  it('says where blocking is, and never that the other person will not know (they are told: D-463)', () => {
+    const privacy = en['privacy.s.your-choices.p3'] as string;
+    const terms = en['terms.s.being-decent.p3'] as string;
+    // The control is in a conversation's ⋯ menu ("Block this person", messages.block.*).
+    expect(privacy).toMatch(/⋯ menu/);
+    expect(terms).toMatch(/⋯ menu/);
+    // "anyone" was never true: you block a person you talk to.
+    expect(terms).not.toMatch(/block anyone/i);
+    // The blocked person sees that messages are blocked (messages.blocked.theirs.*).
+    expect(terms).not.toMatch(/will not know|won't know|not be told/i);
+    expect(terms).toMatch(/will see that messages are blocked/);
+    // Every language names the ⋯ menu too, so none keeps the old words.
+    for (const [locale, bundle] of Object.entries(bundles)) {
+      expect(bundle['privacy.s.your-choices.p3'], `${locale} privacy`).toContain('⋯');
+      expect(bundle['terms.s.being-decent.p3'], `${locale} terms`).toContain('⋯');
+    }
+  });
+});

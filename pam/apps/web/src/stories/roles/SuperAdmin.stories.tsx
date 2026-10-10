@@ -15,6 +15,10 @@ type Story = StoryObj;
 export const Home: Story = screen('super-admin', 'Home — Requests', '/');
 export const Messages: Story = screen('super-admin', 'Messages', '/messages/');
 export const Profile: Story = screen('super-admin', 'Profile', '/profile/');
+export const ReportedPlaces: Story = screen('super-admin', 'Reported places — Keep it or take it off', '/places/reported/');
+export const ReportedPlacesFromTheBell: Story = screen('super-admin', 'Reported places, from the bell', '/places/reported/', {
+  from: 'notifications',
+});
 export const Everyone: Story = screen('super-admin', 'Everyone', '/directory/');
 export const Requests: Story = screen('super-admin', 'Staff requests', '/requests/');
 export const RequestReview: Story = screen('super-admin', 'A request to review', '/requests/review/', { id: 'r-2' });

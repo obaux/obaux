@@ -12,6 +12,7 @@ import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import {
   BookmarkIcon,
+  CheckIcon,
   Page,
   PeopleIcon,
   PhoneIcon,
@@ -27,10 +28,12 @@ import {
   BADGES,
   CORE_BADGES,
   POINTS_RULES,
+  isAwardedToday,
   STREAK_POINTS_PER_WEEK,
   badgeForPoints,
   nextBadge,
   type BadgeDefinition,
+  type PointsReason,
 } from '@pam/config';
 import { USE_DUMMY_PEOPLE } from '@pam/config/dummy-flag';
 import { DUMMY_EARNED_BADGES } from '@pam/config/dummy-badges';
@@ -223,16 +226,20 @@ export default function PointsPage() {
   const newest = earnedOthers.at(-1) ?? null;
   const from = current?.minPoints ?? 0;
   const to = next?.minPoints ?? from;
-  const ways: { id: string; icon: ReactNode; label: string; worth: string }[] = [
+  // Only what Pam pays today (AWARDED_TODAY). The other ways stay written
+  // here and appear when their trigger ships, so the screen never promises more.
+  const allWays: { id: string; reason: PointsReason; icon: ReactNode; label: string; worth: string }[] = [
     {
       // The most one action earns (D-330): a friend who joins from your link.
       id: 'friend',
+      reason: 'refer_someone',
       icon: <PeopleIcon {...WAY_ICON} />,
       label: t('points.way.friend'),
       worth: t('points.way.plus', { count: POINTS_RULES.refer_someone.points }),
     },
     {
       id: 'attend',
+      reason: 'attend_appointment_verified',
       icon: <TripsIcon {...WAY_ICON} />,
       label: t('points.way.attend'),
       worth: t('points.way.plus', { count: POINTS_RULES.attend_appointment_verified.points }),
@@ -240,6 +247,7 @@ export default function PointsPage() {
     {
       // In the app's own words (Will): a trip is how a member signs up.
       id: 'plan',
+      reason: 'self_reported_signup',
       icon: <PlusIcon {...WAY_ICON} />,
       label: t('points.way.plan'),
       worth: t('points.way.plus', { count: POINTS_RULES.self_reported_signup.points }),
@@ -248,23 +256,34 @@ export default function PointsPage() {
       // A return, not a weekly streak (Will, 5 October): Pam cannot know how
       // each program runs its weeks, only that somebody went back.
       id: 'return',
+      reason: 'weekly_streak',
       icon: <StarIcon {...WAY_ICON} />,
       label: t('points.way.return'),
       worth: t('points.way.plus', { count: STREAK_POINTS_PER_WEEK }),
     },
     {
       id: 'call',
+      reason: 'call_service',
       icon: <PhoneIcon {...WAY_ICON} />,
       label: t('points.way.call'),
       worth: t('points.way.plus', { count: POINTS_RULES.call_service.points }),
     },
     {
       id: 'save',
+      reason: 'save_place',
       icon: <BookmarkIcon {...WAY_ICON} />,
       label: t('points.way.save'),
       worth: t('points.way.plus', { count: POINTS_RULES.save_place.points }),
     },
+    {
+      id: 'setup',
+      reason: 'finish_setup',
+      icon: <CheckIcon {...WAY_ICON} />,
+      label: t('points.way.setup'),
+      worth: t('points.way.plus', { count: POINTS_RULES.finish_setup.points }),
+    },
   ];
+  const ways = allWays.filter((way) => isAwardedToday(way.reason));
 
   return (
     <>

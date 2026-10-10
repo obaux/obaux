@@ -7,6 +7,8 @@ import {
   progressToNextLevel,
   streakPoints,
   STREAK_POINTS_CAP,
+  AWARDED_TODAY,
+  isAwardedToday,
   LEADERBOARDS_ENABLED,
   REWARDS_ENABLED,
 } from '../src/points.js';
@@ -45,6 +47,20 @@ describe('points rules (SOP §8)', () => {
     expect(POINTS_RULES.connect_with_mentor.points).toBe(30);
     // Raised from the SOP's 100 by Will (D-330).
     expect(POINTS_RULES.refer_someone.points).toBe(150);
+  });
+});
+
+describe('what the Points screen may promise', () => {
+  it('lists only what the database awards today: saving a place and finishing setup', () => {
+    // 0045 and 0047. Add a reason here only in the change that ships its trigger.
+    expect([...AWARDED_TODAY].sort()).toEqual(['finish_setup', 'save_place']);
+    expect(isAwardedToday('save_place')).toBe(true);
+    expect(isAwardedToday('self_reported_signup')).toBe(false);
+    expect(isAwardedToday('attend_appointment_verified')).toBe(false);
+  });
+
+  it('only names rules that exist', () => {
+    for (const reason of AWARDED_TODAY) expect(POINTS_RULES[reason].points).toBeGreaterThan(0);
   });
 });
 

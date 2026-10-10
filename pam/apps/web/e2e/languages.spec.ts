@@ -323,14 +323,18 @@ test.describe('the English tag on the Language screen and Profile', () => {
     });
   }
 
-  test('Account settings: the Language row shows the current language with its tag first', async ({ page }) => {
-    // (Profile's own row, `valueTag`, is Storybook-only until the tab shell ships: its screenshots are the proof.)
+  test('Profile: the Language row shows the current language with its tag first', async ({ page }) => {
+    // Profile is the account screen now (D-456); its Language row is a link carrying `valueTag`.
     await choose(page, 'ru');
     await signedInMember(page, 'ru');
-    await page.goto('/account/');
+    await page.goto('/profile/');
     await expect(page.locator('html')).toHaveAttribute('lang', 'ru');
     await settled(page);
-    const row = page.getByRole('button', { name: new RegExp(BUNDLES.ru['language.title']!) }).last();
+    // The row's link is a stretched overlay named for the label; the tag and value sit in its list item.
+    const row = page
+      .getByRole('listitem')
+      .filter({ has: page.getByRole('link', { name: new RegExp(BUNDLES.ru['language.title']!) }) })
+      .last();
     await expect(row).toContainText(LANGUAGE_TAGS.ru);
     await expect(row.locator('[aria-hidden="true"]', { hasText: LANGUAGE_TAGS.ru })).toHaveCount(1);
     await expect(row.locator('[lang="ru"]')).toHaveText(BUNDLES.ru['language.ru']!);

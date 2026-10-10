@@ -48,11 +48,11 @@ async function signedIn(page: import('@playwright/test').Page, points: number) {
 }
 
 test.describe('points and badges', () => {
-  test('the points chip on home opens this screen, not the saved list', async ({ page }) => {
+  test('the points on the Profile open this screen, not the saved list', async ({ page }) => {
     await signedIn(page, 400);
-    await page.goto('/');
+    await page.goto('/profile/');
 
-    await page.getByRole('link', { name: '400 points' }).click();
+    await page.getByText('Rooted', { exact: true }).first().click();
     await expect(page).toHaveURL(/\/points\//);
   });
 

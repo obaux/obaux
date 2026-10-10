@@ -124,7 +124,8 @@ export default function RemindersPage() {
     }
 
     setDone(true);
-    router.replace(isStaff ? '/' : '/places/');
+    // Everyone lands on the first tab: Explore for a member, their home for staff (D-212).
+    router.replace('/');
   };
 
   return (

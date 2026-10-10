@@ -928,6 +928,25 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
+## Languages & legal · the last-day line and the blocking words (10 October) — merged 10 October
+
+Merged to `main` by the merge desk, 10 October, from `claude/lena-honest-promises` (e82e815). Will's rule, via Mira: a screen that promises something Pam does not do is
+fixed or rewritten (D-465).
+
+- **"The last day you used Pam."** — the transparency screen no longer says a program sees it. A case manager does; a
+  program does not (0062), whatever D-242 intended; that half stays open. Seven languages, the contract's `en` and
+  comments, a test. The **public site's** "What others can see" row (`apps/site`) said a program does; changed with
+  Mira's OK, in Wren's lane, so the app and the page change in the same merge.
+- **Blocking, in its true form** now that the Block control is on `main` (D-463): privacy "Both are in a conversation's
+  ⋯ menu"; terms "You can block someone you talk to, from a conversation's ⋯ menu. Neither of you can send messages
+  there after that. They will see that messages are blocked." — not "anyone", not "they will not know". The Block
+  session's STATUS line that the terms were untrue can go at merge.
+- **Not here:** the mail-service paragraph on the privacy page (its English is with Will).
+- **Verified:** unit tests (`@pam/config` 995, `@pam/ui` 117, `@pam/web` 71, `@pam/site` 18), typecheck and the copy
+  ledger on the merged tree; the browser suite on all three viewports, 909 passed (on the tree one merge before the last);
+  the full fit audit: 92 new in a language, 84 accepted, 8 not, all in stories this branch does not touch (Explore's pseudo
+  clamps; the two Block conversation stories; the one-trip-saved date). See the session log.
+
 ## Languages & legal · English tags before each language name; the privacy wording (10 October) — merged 10 October
 
 From `claude/lena-english-language-tags` (1f59d62), merged to `main` by the merge desk, 10 October; no
@@ -973,6 +992,16 @@ the merge desk, 10 October. **No migration of its own** (`program_services` is l
   contract migration); policies per service; reordering.
 - **Proven:** 4 new web tests, Storybook build, a browser look at adding and reading a service,
   language fit in seven languages and the pseudo-language.
+
+---
+
+## Places & programs · no example policies for a real place (10 October) — merged 10 October
+
+D-313, from `claude/places-programs-no-example-policies` (Piper, 4bf27cb), merged to `main` by the
+merge desk, 10 October. **No migration.** A place from the catalogue (a uuid id) asks a member to sign
+nothing: `placeAsksForPolicies` says no, and the Trips list, which had bypassed it, goes through
+it. Example places keep the example policies (Storybook). **Not built:** real policies per program
+and per service; the leads' and staff's policy screens still show example data.
 
 ---
 
@@ -1103,6 +1132,14 @@ read back: both functions service-role only) adds `record_sms_stop` / `record_sm
 on and Twilio is pointed at it, Pam still does not learn a STOP. Setup: `docs/sms-setup.md` § 3.
 YES/NO replies are not built. D-460.
 
+## Places & programs · reported places screen (10 October 2026) — merged 10 October
+
+Merged to `main` by the merge desk, 10 October, from `claude/places-programs-reported-places` (dca16c6). A page at `/places/reported/` for admins and case managers, linked from the profile and the reported-place bell row. Only a super admin can keep or remove; case managers read. No database change. Shared files touched: `ProfileView.tsx`, `app/notifications/page.tsx`, `ReportedPlaces.tsx` (buttons only when allowed). Figma flow map not republished.
+
+## Places & programs · the Points promise (10 October 2026) — merged 10 October
+
+Merged to `main` by the merge desk, 10 October, from `claude/places-programs-points-promise` (4bf85c2). "Ways to earn" lists only what Pam pays today (save a place +5, finish setup +25), driven by `AWARDED_TODAY`. The proposal for making plan-a-trip and call-a-place real is in `docs/points-awarding.md`, waiting on Will. No migration.
+
 ## Places & programs · review record, pending change, program services — the database half (10 October 2026)
 
 Merged to `main` by the merge desk, 10 October, from `claude/places-programs-submissions-and-services`
@@ -1141,6 +1178,20 @@ recorded once `sms-inbound` is deployed (D-460); nothing queues the check-in or 
 connect" yet. Samples file: nine texts. D-453. Text reminders' staff list (merged 10 October) names
 only the alert texts Will signed: no "introduced to your program", no "your account changes".
 
+## Design system & Storybook · live app shell (10 October)
+
+Merged to `main` by the merge desk, 10 October, from `claude/pam-design-app-shell` (6318b48); live after the next production deploy. The redesigned tabs are the app (D-456): the role's tab bar
+from the root layout, a gate under every tab screen (Help bar on each state), and `/`, `/saved/`, `/trips/`,
+`/program/`, `/programs/`, `/profile/`, `/messages/` draw the redesigned screens. Kept on purpose: `/places/`,
+`/interested/`, Messages for case managers and super admins, and the old Home (+ `/admin/`) for case managers
+and program leads until the people strip's rings are on the new staff Homes (Mira). First-load **572.4 kB** gz of 600. A super
+admin's view switch now reaches the whole page; a case manager's Home keeps "What you can see".
+
+- Proven: web tests, build, Storybook build, e2e per file on three projects; whole suite narrow-320 279 pass.
+- Not proven: Playwright per role at phone size on the built app; 5 `audit:fit` entries not in the known
+  list (3 Block conversation stories, 2 saved-trips with a clock-minute key), none in a screen changed here.
+- Needs a human: Will's answer on the people strip's D-198 rings (asked by Mira); the five `people-strip` specs pass on the old Home.
+
 ## Design system & Storybook · language tag (10 October)
 
 Merged to `main` by the merge desk (5dd52b8), 10 October. Job from Will via Mira: a short English tag before a
@@ -1170,7 +1221,7 @@ route until Dot's shell merges; deleting it (and `DummyRowsLazy`) is a follow-up
 Merged to `main` by the merge desk, 10 October (no migration: 0076 is live). A conversation's ⋯ menu has
 Block this person (asks first) and, once blocked, Unblock; the composer gives way to a notice for both
 sides, and the person blocked is told. The database half was 0069/0076. D-463. Test:
-`31_block_in_conversation_test.sql` (renumbered at merge: 30 went to Places). The terms' "they will not know" is not true and Lena is changing it. Hidden-for-staff is Will's call.
+`31_block_in_conversation_test.sql` (renumbered at merge: 30 went to Places). The terms and privacy page say what Block does since D-465 (merged 10 October). Staff can block too: kept as built (the merge desk decided, under Will's delegation).
 
 ## Design system & Storybook · area chip, fit audit (10 October) — merged 10 October
 

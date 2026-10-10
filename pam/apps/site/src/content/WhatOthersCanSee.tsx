@@ -43,7 +43,7 @@ export function WhatOthersCanSee() {
               cells: ['Yes', 'Yes, but only visits to their own program', 'No'],
             },
             { label: 'Your points, your level and your badges', cells: ['Yes', 'No', 'No'] },
-            { label: 'The last day you used Pam', cells: ['Yes', 'Yes', 'No'] },
+            { label: 'The last day you used Pam', cells: ['Yes', 'No', 'No'] },
             {
               label: 'That you saved a new place (not which one)',
               cells: ['Yes', 'Yes', 'No'],

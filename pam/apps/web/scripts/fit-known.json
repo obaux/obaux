@@ -604,6 +604,14 @@
     "reason": "A service's description on the Program page is one line with an ellipsis by design (the row sets isDescriptionOneLine); the pseudo-language stretches it past the width. Nothing is lost: the whole text is one tap away, in the service's own page. Looked at 10 October 2026 at 320px."
   },
   {
+    "key": "pseudo|clamp|case-manager-screens--reported-places|Groceries to take home, no appointment. Bring a bag if you h",
+    "reason": "A place card clamps its description to two lines on purpose (the English story clamps the same sentence); the pseudo-language is about 40% longer, so it clamps a few words sooner. The full text is on the place page one tap away and nothing is lost. Looked at 10 October 2026 at 320px."
+  },
+  {
+    "key": "pseudo|clamp|super-admin-screens--reported-places|Groceries to take home, no appointment. Bring a bag if you h",
+    "reason": "A place card clamps its description to two lines on purpose (the English story clamps the same sentence); the pseudo-language is about 40% longer, so it clamps a few words sooner. The full text is on the place page one tap away and nothing is lost. Looked at 10 October 2026 at 320px."
+  },
+  {
     "key": "pseudo|ellipsis|program-lead-states-program-services--the-program-tab|Resumes, interviews and showing up ready.",
     "reason": "A service's description on the Program page is one line with an ellipsis by design (the row sets isDescriptionOneLine); the pseudo-language stretches it past the width. Nothing is lost: the whole text is one tap away, in the service's own editor. Looked at 10 October 2026 at 320px."
   },

@@ -5,8 +5,8 @@ build later." This is that document. The Points screen (D-278) already
 *shows* these rules to members; this says how the database should *award*
 them. When the two disagree, fix one of them in the same change.
 
-Status, as of writing: two rules are live (save a place, finish setup).
-Everything else here is to build.
+Status, as of writing: two rules are live (save a place, finish setup), and
+they are the only two the Points screen lists. Everything else here is to build.
 
 ## Decide before building (Will and whoever builds it)
 
@@ -31,6 +31,37 @@ And two things found while writing this, to fix as part of the build:
   (`BADGES` in config). Reseed it before any badge is awarded.
 - [ ] **`LEVELS` in config** is a second, unused ladder ("Getting Going", …).
   Delete it, or make it an alias of the core `BADGES`.
+
+---
+
+## Proposal (10 October 2026, Piper) — which to make real now trips are saved
+
+Trips are now rows in `appointments`, written only by `book_trip` (0085's
+successors), so rules 4 and 3 no longer wait on anything. Rules 5, 5b and 6 still
+wait on a program check-in and the follow-up text. Not built; for Will to decide.
+
+1. **Plan a trip, 25 points — make real next.** Award inside `book_trip` (one
+   `security definer` function, one transaction), members only, `reason =
+   'plan_trip'`, `subject_id` = the place's id, unique `(member_id, reason,
+   subject_id)`. **Once per place ever**, as written above, not once per trip: the
+   booking can be cancelled, and cancelling takes nothing back (principle 5), so
+   "plan, cancel, plan again" would otherwise pay each time. Keep the
+   three-a-day cap. A trip to a place that is not a program pays the same; the
+   function cannot tell and the member did a real thing. *Decide:* is that right,
+   or program places only?
+2. **Call a place, 10 points — make real after.** A small `log_call` RPC fired
+   from the Call button, once per place ever. Honour system, as the table says.
+3. **Leave off the screen until their trigger exists:** show up (100/60), go back
+   (50), bring a friend (150). They are the biggest numbers; promising them early
+   is the worst of the promises.
+4. **Rename** `self_reported_signup` → `plan_trip` in the same change (the doc's
+   build order step 1), with the config test that the screen and `POINTS_RULES`
+   agree.
+
+Needs: one expand migration (`book_trip` replaced, same signature, plus a ledger
+reason), a DB test (member earns, case manager does not, second booking pays
+nothing, cancel keeps the points, a direct ledger insert is refused), and the
+screen adds the row via `AWARDED_TODAY`.
 
 ---
 
@@ -71,20 +102,23 @@ And two things found while writing this, to fix as part of the build:
 
 ## The rules
 
-What the Points screen lists ("Ways to earn") is marked **on screen**. The
-values live in `packages/config/src/points.ts` (`POINTS_RULES`); the
+What the Points screen lists ("Ways to earn") is marked **on screen**. Since
+10 October 2026 it lists only what the database pays today (`AWARDED_TODAY` in
+`packages/config/src/points.ts`: save a place and finish setup). The other rows
+stay written in `points/page.tsx` and appear when their reason is added to
+`AWARDED_TODAY`, in the change that ships the trigger. The values live in `packages/config/src/points.ts` (`POINTS_RULES`); the
 database functions must use the same numbers. Add a config test that fails
 if they drift.
 
 | # | What the member does | Points | On screen | Proof | Once per | Status |
 |---|---|---|---|---|---|---|
-| 1 | Finishes setup | 25 | — | automatic | ever | **Live** (0047) |
+| 1 | Finishes setup | 25 | yes | automatic | ever | **Live** (0047) |
 | 2 | Saves a place | 5 | yes | automatic | place, ever | **Live** (0045) |
-| 3 | Calls a place | 10 | yes | honour (the tap) | place, ever | To build |
-| 4 | Plans a trip to a program | 25 | yes | honour (the booking) | program, ever | To build |
-| 5 | Shows up to a visit (checked in) | 100 | yes | program check-in or geofence | visit | To build |
+| 3 | Calls a place | 10 | when live | honour (the tap) | place, ever | To build |
+| 4 | Plans a trip to a program | 25 | when live | honour (the booking) | program, ever | To build |
+| 5 | Shows up to a visit (checked in) | 100 | when live | program check-in or geofence | visit | To build |
 | 5b | Shows up to a visit (said so by text) | 60 | (as 5) | SMS "YES" | visit | To build |
-| 6 | Goes back to a program again | 50 | yes | as 5 / 5b | program, per week | To build |
+| 6 | Goes back to a program again | 50 | when live | as 5 / 5b | program, per week | To build |
 | 7 | Program approves their enrollment | 50 | — | program action | enrollment | Later |
 | 8 | Completes a task | 10–50 | — | honour | task | Later |
 | 9 | Connects with a mentor | 30 | — | automatic | connection | Blocked: mentors |

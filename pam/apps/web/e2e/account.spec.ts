@@ -74,26 +74,28 @@ async function signedIn(page: import('@playwright/test').Page, profile: Profile)
 }
 
 test.describe('the way out', () => {
-  test('every signed-in screen has the same button to your account', async ({ page }) => {
+  test('every tab screen has the same way to your profile', async ({ page }) => {
     await signedIn(page, { role: 'member' });
-    // Points left this list at D-217: it is a nested screen now (round back,
-    // Help in the bar), reached from Profile, not a screen with the app header.
-    for (const path of ['/', '/places/', '/saved/']) {
+    // The account button in the old header is the bar's Profile tab now (D-217, D-456): the same link,
+    // in the same place, under every tab screen. Points left this list at D-217: it is a nested screen,
+    // reached from Profile, with no bar.
+    for (const path of ['/', '/saved/', '/messages/', '/places/']) {
       await page.goto(path);
-      const button = page.getByRole('link', { name: 'Your account' });
-      await expect(button, `${path} has no account button`).toBeVisible();
-      await expect(button).toHaveAttribute('href', '/account/');
+      const tab = page.getByRole('navigation', { name: 'Main' }).getByRole('link', { name: /Profile/ });
+      await expect(tab, `${path} has no Profile tab`).toBeVisible();
+      await expect(tab).toHaveAttribute('href', '/profile/');
     }
   });
 
   test('a member can sign out, and is told they did', async ({ page }) => {
     await signedIn(page, { role: 'member' });
+    // /account/ opens Profile for somebody signed in (D-217); /profile/ is the same screen.
     await page.goto('/account/');
 
-    await expect(page.getByRole('heading', { name: 'Your account' })).toBeVisible();
-    await expect(page.getByText('Will', { exact: true })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Profile' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Will' })).toBeVisible();
 
-    await page.getByRole('button', { name: 'Sign out' }).click();
+    await page.getByRole('button', { name: 'Sign out' }).or(page.getByRole('link', { name: 'Sign out' })).first().click();
 
     await expect(page).toHaveURL(/\/signin\/\?out=1/);
     await expect(page.getByText(/You are signed out/)).toBeVisible();
@@ -110,7 +112,9 @@ test.describe('the way out', () => {
     await signedIn(page, { role: 'member' });
     await page.goto('/signin/');
     await expect(page).toHaveURL(/\/$/);
-    await expect(page.getByRole('heading', { name: /Hi, Will/ })).toBeVisible();
+    // The front door is Explore under the bar now, not the old "Hi, Will" Home (D-212, D-456).
+    await expect(page.getByRole('navigation', { name: 'Main' }).getByRole('link', { name: /Explore/ })).toBeVisible();
+    await expect(page.getByRole('heading', { name: /Hi, Will/ })).toHaveCount(0);
   });
 
   test('a verified phone with no account is sent to finish signing up', async ({ page }) => {
@@ -196,8 +200,8 @@ test.describe('the way out', () => {
       switched.push(route.request().postDataJSON() as Record<string, unknown>);
       await route.fulfill(json({ id: WILL, role: 'provider' }));
     });
-    await page.goto('/account/');
-    await page.getByRole('link', { name: /Use Pam as: Me/ }).click();
+    await page.goto('/profile/');
+    await page.getByRole('link', { name: /Use Pam as/ }).click();
     await expect(page.getByRole('heading', { name: 'Use Pam as', level: 1 })).toBeVisible();
     await page.getByRole('button', { name: /My program/ }).click();
     await expect.poll(() => switched.length).toBe(1);
@@ -206,15 +210,15 @@ test.describe('the way out', () => {
 
   test('a one-role account has no "Use Pam as"', async ({ page }) => {
     await signedIn(page, { role: 'member' });
-    await page.goto('/account/');
-    await expect(page.getByRole('heading', { name: 'Your account' })).toBeVisible();
+    await page.goto('/profile/');
+    await expect(page.getByRole('heading', { name: 'Profile' })).toBeVisible();
     await expect(page.getByRole('link', { name: /Use Pam as/ })).toHaveCount(0);
   });
 
-  test('the account screen has no WCAG A/AA violations', async ({ page }) => {
+  test('the profile screen has no WCAG A/AA violations', async ({ page }) => {
     await signedIn(page, { role: 'member' });
     await page.goto('/account/');
-    await expect(page.getByRole('heading', { name: 'Your account' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Profile' })).toBeVisible();
     await settled(page);
 
     const results = await new AxeBuilder({ page })
