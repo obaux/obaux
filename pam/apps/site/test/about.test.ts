@@ -80,3 +80,15 @@ describe('the home page card about reminders', () => {
     expect(home).toContain('Texts that remind you are coming.');
   });
 });
+
+describe('the Points and badges post', () => {
+  it('lists every way Pam pays today, with the points the config pays', async () => {
+    const { AWARDED_TODAY, POINTS_RULES } = await import('../../../packages/config/src/points');
+    const post = readFileSync(join(__dirname, '..', 'src', 'content', 'PointsAndBadges.tsx'), 'utf8');
+    // One row per way Pam pays; a new way in AWARDED_TODAY fails here until the post says it.
+    expect(AWARDED_TODAY).toHaveLength(4);
+    for (const reason of AWARDED_TODAY) {
+      expect(post, reason).toContain(`${POINTS_RULES[reason].points} points`);
+    }
+  });
+});
