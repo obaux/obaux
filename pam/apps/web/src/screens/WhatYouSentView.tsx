@@ -12,7 +12,8 @@ import { roundAction } from '@pam/ui/roundAction';
 import { programSummary } from '../app/join/ProgramWizard';
 import { useI18n } from '@/lib/i18n';
 import { navigate } from '@/lib/navigate';
-import { readSentProgram, startOver, type SentProgram } from '@/lib/programSetup';
+import { readSentProgram, startOver, useProgramSetup, type SentProgram } from '@/lib/programSetup';
+import { useSession } from '@/lib/useSession';
 import { ConfirmDialog } from './ConfirmDialog';
 import { intlLocale } from '@pam/config';
 
@@ -32,7 +33,7 @@ const styles = stylex.create({
 
 const ICON = { width: 22, height: 22, 'aria-hidden': true } as const;
 
-function MoreMenu({ onStartOver }: { readonly onStartOver: () => void }) {
+function MoreMenu({ onStartOver }: { readonly onStartOver: (() => void) | null }) {
   const { t } = useI18n();
   return (
     <DropdownMenu
@@ -48,8 +49,15 @@ function MoreMenu({ onStartOver }: { readonly onStartOver: () => void }) {
       alignment="end"
       menuWidth={260}
       items={[
-        { id: 'start-over', label: t('programs.sent.startOver'), icon: <TrashIcon {...ICON} />, variant: 'destructive', onClick: onStartOver },
-        { type: 'divider' },
+        // A program on file with Pam cannot be deleted from here yet: starting
+        // over withdraws it from the review queue, which is a later step
+        // (D-385, D-386). Help is one tap away meanwhile.
+        ...(onStartOver
+          ? [
+              { id: 'start-over', label: t('programs.sent.startOver'), icon: <TrashIcon {...ICON} />, variant: 'destructive' as const, onClick: onStartOver },
+              { type: 'divider' as const },
+            ]
+          : []),
         { id: 'help', label: t('nav.help'), icon: <HelpIcon {...ICON} />, onClick: () => navigate('/help/') },
       ]}
     />
@@ -58,14 +66,17 @@ function MoreMenu({ onStartOver }: { readonly onStartOver: () => void }) {
 
 export function WhatYouSentView({ sent: given }: { readonly sent?: SentProgram | null } = {}) {
   const { t, locale } = useI18n();
-  const sent = given ?? readSentProgram();
+  const { state: session } = useSession();
+  const setup = useProgramSetup(session);
+  // The program on file, when there is one (D-447); what this tab remembers otherwise.
+  const sent = given ?? (setup.program ? setup.sent : readSentProgram());
   const [isAsking, setIsAsking] = useState(false);
   return (
     <SubPage
       title={t('programs.sent.title')}
       backHref="/program/"
       backLabel={t('nav.back.program')}
-      actions={<MoreMenu onStartOver={() => setIsAsking(true)} />}
+      actions={<MoreMenu onStartOver={setup.program ? null : () => setIsAsking(true)} />}
     >
       <ConfirmDialog
         isOpen={isAsking}

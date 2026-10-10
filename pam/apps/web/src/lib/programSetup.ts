@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react';
 import { USE_DUMMY_PEOPLE } from '@pam/config/dummy-flag';
 import type { SessionState } from './useSession';
 import type { ProgramDetails } from './useJoin';
+import type { OwnProgram } from './ownProgram';
+import { useOwnProgram } from './useOwnProgram';
 
 /**
  * What a program lead has set up, for Home's getting-started cards (D-352).
@@ -23,7 +25,9 @@ import type { ProgramDetails } from './useJoin';
  * A step done this visit is remembered the same way, so adding a photo in
  * the prototype — where nothing is really stored — still takes its card off
  * Home. A real account also counts what the database says: a photo on the
- * profile.
+ * profile, and — since D-447 — the lead's own program: a program lead who has
+ * one on file sees it, waiting for review or live, on any phone, whatever this
+ * tab remembers. Only when there is none do the tab's marks decide.
  */
 const FRESH = 'pam.setup.fresh';
 const DONE = 'pam.setup.done.';
@@ -142,21 +146,24 @@ export interface ProgramSetup {
   readonly hasProgram: boolean;
   /**
    * Sent to Pam and not approved yet (D-379): the Program tab is "Sent to
-   * Pam" until a super admin approves it. In the prototype nothing approves,
-   * so a sent program stays here; the real state comes with loading a lead's
-   * own program (before-launch, Programs).
+   * Pam" until a super admin approves it. Read from the lead's program when
+   * they have one on file (D-447); the tab's mark otherwise.
    */
   readonly isUnderReview: boolean;
   /**
-   * Approved and taking visits: there is a program to book into (D-384). In
-   * the prototype, only the example account's.
+   * Approved and taking visits: there is a program to book into (D-384). The
+   * lead's own program once it is approved; the example account's otherwise.
    */
   readonly isLive: boolean;
   /** While under review: still checking, taking longer, or changes asked for (D-381). */
   readonly reviewStatus: ReviewStatus;
-  /** What was sent, if this tab knows. */
+  /** What was sent, if this tab or the database knows. */
   readonly sent: SentProgram | null;
   readonly hasPhoto: boolean;
+  /** The lead's own program, loaded from the database (D-447); null when there is none to show. */
+  readonly program: OwnProgram | null;
+  /** The database is still being asked: screens that choose between Add and the program wait. */
+  readonly isLoading: boolean;
 }
 
 export function useProgramSetup(session: SessionState): ProgramSetup {
@@ -167,15 +174,22 @@ export function useProgramSetup(session: SessionState): ProgramSetup {
     return () => window.removeEventListener(SETUP_CHANGED, again);
   }, []);
   void tick;
-  const isExample = USE_DUMMY_PEOPLE && !read(FRESH);
+  const own = useOwnProgram(session);
+  const program = own.status === 'ready' ? own.program : null;
+  const isExample = USE_DUMMY_PEOPLE && !read(FRESH) && program === null;
   const photoUrl = session.status === 'signed-in' ? session.session.photoUrl : null;
+  const sent: SentProgram | null = program
+    ? { details: program.details, sentAt: program.sentAt, changes: null }
+    : readSentProgram();
   return {
     isExample,
-    hasProgram: isExample || read(DONE + 'program'),
-    isUnderReview: !isExample && read(DONE + 'program'),
-    isLive: isExample,
-    reviewStatus: reviewStatusOf(readSentProgram()),
-    sent: readSentProgram(),
+    hasProgram: isExample || program !== null || read(DONE + 'program'),
+    isUnderReview: program ? !program.isLive : !isExample && read(DONE + 'program'),
+    isLive: program ? program.isLive : isExample,
+    reviewStatus: reviewStatusOf(sent),
+    sent,
     hasPhoto: isExample || photoUrl !== null || read(DONE + 'photo'),
+    program,
+    isLoading: own.status === 'loading',
   };
 }
