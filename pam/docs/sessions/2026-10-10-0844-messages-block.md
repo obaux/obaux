@@ -29,7 +29,7 @@ no control existed. Build it; then tell Lena where it is.
   Storybook builds; fit audit on the blocking stories: three overlaps, all the known scroller artifact (a
   message line scrolled under the header, measured against the subtitle), the same class already accepted
   for the limited-account stories; nothing overlaps on screen (looked at 320px).
-- Playwright: the two new tests and the messages, back and consent specs: see the READY note.
+- Playwright: messages.spec (with the two new tests) on all three projects, 59 + 114 pass; back.spec on the narrow project.
 - Not run: the full Playwright suite; nothing against the live database.
 
 ## Left undone
