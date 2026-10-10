@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Lena"><defs><clipPath id="avc-lena"><circle cx="32" cy="32" r="32"/></clipPath></defs>
+<g clip-path="url(#avc-lena)">
+<rect width="64" height="64" fill="#7A55C8"/>
+<path d="M17 31c0-12 7-19 15-19s15 7 15 19c0 7 2 11 3 14-4 1-7-1-8-3V27H22v15c-1 2-4 4-8 3 2-3 3-7 3-14z" fill="#7A3B1E"/>
+<path d="M8 66c2-13 12-20 24-20s22 7 24 20z" fill="#F7E7B4"/>
+<rect x="28" y="38" width="8" height="10" rx="3" fill="#E0B48C"/>
+<rect x="28" y="40" width="8" height="4" fill="rgba(0,0,0,.12)"/>
+<ellipse cx="32" cy="29" rx="12.5" ry="13.5" fill="#E0B48C"/>
+<ellipse cx="19.8" cy="30" rx="2.2" ry="3" fill="#E0B48C"/><ellipse cx="44.2" cy="30" rx="2.2" ry="3" fill="#E0B48C"/>
+<path d="M19 28c1-9 6-15 13-15s12 6 13 15c-3-4-7-7-13-6-5 0-9 3-13 6z" fill="#7A3B1E"/>
+<circle cx="27.2" cy="29.5" r="1.5" fill="#1d2428"/><circle cx="36.8" cy="29.5" r="1.5" fill="#1d2428"/>
+<path d="M28 35.5c2.4 2 5.6 2 8 0" fill="none" stroke="#1d2428" stroke-width="1.5" stroke-linecap="round"/>
+<ellipse cx="24.5" cy="33.5" rx="2.2" ry="1.3" fill="#E57A6F" opacity=".25"/><ellipse cx="39.5" cy="33.5" rx="2.2" ry="1.3" fill="#E57A6F" opacity=".25"/>
+
+</g></svg>

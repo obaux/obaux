@@ -176,19 +176,21 @@ migration that needs one puts it alone so the rest can be applied without it.
 
 ## The board: where the sessions stand (the merge desk keeps it)
 
-As of 10 October 2026, 06:00 UTC. A session's id is where `send_message` reaches it;
-every session reports to the merge desk (`docs/team.md`). After a merge, every open
-branch below merges `main`.
+As of 10 October 2026, 06:30 UTC. A session's id is where `send_message` reaches it;
+every session reports to Mira, the merge desk (`docs/team.md`, which also has each
+teammate's name, title and avatar). Will watches the same board, live, on the Pam
+Control Room (`docs/control-room.md`). After a merge, every open branch below merges
+`main`.
 
-| Session | Id | Branch | Where it stands | Waiting on |
-|---|---|---|---|---|
-| PAM · Merge desk (Agent 1) | `session_018wn7LF7RMsHnXSAzvk6s1p` | works from `main` | merged languages and Arabic (10 October); set up this page and `docs/team.md` | — |
-| PAM · Accounts & invites · assign and limit | `session_01NPHYiBRyyv8F5L7o9KaMEd` | `claude/pam-assign-and-limit` (9 ahead) | guide assignment and limits built; two migrations on the branch (`20261010034711_…`, `20261010034713_…`) | Will: apply them; then READY |
-| PAM · Accounts & invites · staff email, audit log, branch system | `session_01SJKnwmNUb3uvgDhakVYTZo` | `claude/affectionate-goldberg-tvu4sz` (2 ahead, 33 behind) | job merged; one migration left on the branch (D-445, `20261010033917_points_history_is_deleted_with_the_member`) | Will: apply D-445; archive PAM Agent 2 or not |
-| PAM · Messages & notifications | `session_01CCHvVkYgXddhtq4DHvvETo` | none yet | not started | Will: SMS and translation — build only, or deploy too |
-| PAM · Places & programs | `session_01RmG6J2CCikoqM9H2fhbSPm` | `claude/places-programs-load-own-program` (3 ahead) | a program lead submits their own program (D-447); one migration ready, a second one planned | Will: how to build on `review_staff_request` (0085 is not live) |
-| PAM · Languages & legal · seven languages | `session_01Hjv2RQuz5PJmxQ7tLGb5sW` | none (its branch is merged) | idle | a next job from Will |
-| PAM · Languages & legal · Arabic | `session_01A44BM2WPMuZYKkspxsiQEG` | none (its branch is merged) | idle; native and screen-reader review still open (`STATUS.md`) | a next job from Will |
-| PAM · Design system & Storybook · area chip, fit audit | `session_01A3kdir46ErR2eyjDLFdzyW` | `claude/pam-design-areachip-long-address` (4 ahead) | fit-audit fix on the branch (D-448), not yet READY | Will: D-448; then READY |
-| PAM · Website | `session_012vS6F7CMTwFn3u5UG66JWz` | `claude/compassionate-bohr-mzrchf` (11 ahead) | site built; a draft post added | Will: the draft post; put the site on `main` or not yet |
-| PAM Agent 2 | `session_01NoLKA8RJRwhyDJUe8CAZVE` | — | idle since 8 October; its work moved to the merge desk; not messaged | Will: archive |
+| Who | Session | Id | Branch | Where it stands | Waiting on |
+|---|---|---|---|---|---|
+| **Mira**, CTO | PAM · Merge desk (Agent 1) | `session_018wn7LF7RMsHnXSAzvk6s1p` | works from `main` | merged languages and Arabic; set up the team, the names and the control room | — |
+| **Ava**, Accounts & Access Lead | PAM · Accounts & invites · assign and limit | `session_01NPHYiBRyyv8F5L7o9KaMEd` | `claude/pam-assign-and-limit` | guide assignment and limits built; two migrations on the branch | its first report; then Will on the migrations |
+| **Sam**, Accounts Engineer | PAM · Accounts & invites · staff email, audit log, branch system | `session_01SJKnwmNUb3uvgDhakVYTZo` | `claude/affectionate-goldberg-tvu4sz` | job merged; the points-history migration (D-445) left | Will: apply D-445 |
+| **Nico**, Messaging & Notifications Lead | PAM · Messages & notifications | `session_01CCHvVkYgXddhtq4DHvvETo` | none | reported in; no job yet | Will: first job (Mira suggests sending email) and who switches things on |
+| **Piper**, Places & Programs Lead | PAM · Places & programs | `session_01RmG6J2CCikoqM9H2fhbSPm` | `claude/places-programs-load-own-program` | a program lead loads their own program (D-447): database half done, app half next | Will: how to fix approved leads' access (0085 first, Mira suggests) |
+| **Lena**, Languages & Legal Lead | PAM · Languages & legal · seven languages | `session_01Hjv2RQuz5PJmxQ7tLGb5sW` | none (merged) | reported in; nothing open; 0085 noted as not live | a next job from Will |
+| **Remy**, Right-to-Left Language Specialist | PAM · Languages & legal · Arabic | `session_01A44BM2WPMuZYKkspxsiQEG` | none (merged) | Arabic isolates live | its first report |
+| **Dot**, Design Systems Lead | PAM · Design system & Storybook · area chip, fit audit | `session_01A3kdir46ErR2eyjDLFdzyW` | `claude/pam-design-areachip-long-address` | fit-audit fix on the branch (D-448) | its first report; Will on D-448 |
+| **Wren**, Website & Help Centre Lead | PAM · Website | `session_012vS6F7CMTwFn3u5UG66JWz` | `claude/compassionate-bohr-mzrchf` (12 ahead) | site built and previewed; a draft post held | Will: site live now or later; keep the draft |
+| **Gus**, retired | PAM Agent 2 | `session_01NoLKA8RJRwhyDJUe8CAZVE` | — | idle since 8 October; not messaged | Will: archive |
