@@ -63,5 +63,17 @@ export const SHOT_SIZES: Record<string, { w: number; h: number }> = {
   "messages-in-pam/blocked.png": {
     "w": 390,
     "h": 844
+  },
+  "planning-a-visit/pick-a-service.png": {
+    "w": 390,
+    "h": 844
+  },
+  "planning-a-visit/your-next-visit.png": {
+    "w": 390,
+    "h": 600
+  },
+  "planning-a-visit/cancel.png": {
+    "w": 390,
+    "h": 600
   }
 };
