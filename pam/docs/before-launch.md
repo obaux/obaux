@@ -161,6 +161,14 @@ STATUS row too.
   the deletion trigger function are not executable by clients), then merged to main (`0220ae0`).
   The live copy of the migration is the same statements without the explanatory comments.
 
+- [ ] **Texts: sign the four alert texts, decide the STOP receiver, file the carrier once**
+  (Will, 10 October 2026, D-453). `message_waiting`, `visit_booked`, `booking_changed` and
+  `trip_planned` are drafted in seven languages and unsigned; nothing queues them yet. A stored
+  STOP cannot be cleared from the app once `20261010071947_…` is applied, but nothing stores a
+  STOP: an Edge Function Twilio calls (STOP/START/HELP and the YES/NO replies) is not built —
+  Will to say yes. `docs/sms-campaign-samples.md` has the nine texts and the description
+  (981 of 1,024 characters) for the one filing.
+
 - [ ] **Review the SMS copy** still waiting for a name in `reviewedBy`
   (STATUS row 2).
 
