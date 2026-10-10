@@ -257,8 +257,13 @@ and checked against the live project on 10 October 2026 (09:40 UTC).
    `dispatch-sms` is version 15. `select jobname, schedule, command from cron.job`:
    the `dispatch-sms` job is as in `0040` (every five minutes, the publishable key,
    no `x-dispatch-secret`). Whether `DISPATCH_SECRET` is set on the function cannot
-   be read from here: if it is, the clock is already being refused and nothing has
-   been sent since it was set; say so, and fix the clock's call first. Run `pnpm --filter @pam/config test` on `main` and
+   be read from here, but the answers show it: `select status_code, content from
+   net._http_response order by created desc limit 6`. **Fine looks like** a 200 with
+   `{"claimed":0,"sent":0,"failures":[]}` (nothing is queued). **A 401 is the secret
+   trap**: the secret is set and the clock is being refused, so nothing has sent
+   since it was set; say so, and fix the clock's call first. (Checked by the merge
+   desk on 10 October: 72 responses in six hours, all 200; `outbound_messages` holds
+   one row ever, a denied staff request sent on 17 September.) Run `pnpm --filter @pam/config test` on `main` and
    check `git status` is clean (the first run regenerates
    `supabase/functions/dispatch-sms/templates.json`; a diff after it means a stale
    bundle, so stop).
