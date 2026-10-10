@@ -191,7 +191,7 @@ export default function GalleryPage() {
             {
               id: 'plan',
               image: '/onboarding/hero-sneakers.webp',
-              text: 'Pam reminds you before you go, so nothing gets missed.',
+              text: 'Pam keeps your planned visits in one place.',
             },
           ]}
         />
