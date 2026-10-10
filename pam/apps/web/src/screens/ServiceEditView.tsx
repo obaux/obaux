@@ -12,12 +12,16 @@ import { TextArea } from '@astryxdesign/core/TextArea';
 import { VStack } from '@astryxdesign/core/VStack';
 import type { DummyService } from '@pam/config/dummy-services';
 import type { WeekHours } from '@pam/config/hours';
-import { BigButton, TextField, TextLink } from '@pam/ui';
+import { BigButton, Notice, TextField, TextLink } from '@pam/ui';
 import { SubPage } from '@pam/ui/SubPage';
 import { useI18n } from '@/lib/i18n';
 import { navigate } from '@/lib/navigate';
 import { usePolicies } from '@/lib/usePolicies';
 import { useServices } from '@/lib/useServices';
+import { isSavedPlace } from '@/lib/savedTrips';
+import { useProgramSetup } from '@/lib/programSetup';
+import { useSession } from '@/lib/useSession';
+import { useSupportPhone } from '@/lib/useSupportPhone';
 import { ConfirmDialog } from './ConfirmDialog';
 import { HelpButton } from './HelpButton';
 import { intlLocale } from '@pam/config';
@@ -25,8 +29,11 @@ import { intlLocale } from '@pam/config';
 /**
  * A program lead adds or edits one service (D-313): its name, what it is,
  * and — only where they differ from the program's — a phone number and a
- * website, then which policies are only for this service. Saved for the
- * session (`useServices`); members see it on the program's page at once.
+ * website, then which policies are only for this service. A real program's is
+ * saved in the database (`useServices`, D-462) and members see it on the
+ * program's page at once; an example program's is kept for the session. The
+ * example policies are not offered for a real program: its own policies are the
+ * next step (D-313).
  *
  * Removing asks first: a service coming off is the one thing here that
  * loses something. Visits already booked for it stay booked.
@@ -50,7 +57,15 @@ export function ServiceEditView({ serviceId }: { readonly serviceId: string | nu
   const { t } = useI18n();
   const { services, save, remove } = useServices();
   const { policies } = usePolicies();
+  const { state: session } = useSession();
+  const setup = useProgramSetup(session);
+  const supportPhone = useSupportPhone();
   const existing = serviceId ? (services.find((s) => s.id === serviceId) ?? null) : null;
+  // The program this is for: the service's own, or — a new one — the lead's.
+  const programId = existing?.placeId ?? setup.program?.id ?? PROGRAM_PLACE_ID;
+  const isReal = isSavedPlace(programId);
+  const [isSaving, setIsSaving] = useState(false);
+  const [failed, setFailed] = useState(false);
   const [draft, setDraft] = useState<DummyService>(
     existing ?? {
       id: `service-added-${Date.now()}`,
@@ -82,11 +97,14 @@ export function ServiceEditView({ serviceId }: { readonly serviceId: string | nu
   const ORDER = [1, 2, 3, 4, 5, 6, 0];
   const invalid = tried && draft.name.trim() === '';
 
-  const submit = () => {
+  const submit = async () => {
     setTried(true);
-    if (draft.name.trim() === '') return;
-    save({
+    if (draft.name.trim() === '' || isSaving) return;
+    setFailed(false);
+    setIsSaving(true);
+    const ok = await save({
       ...draft,
+      placeId: programId,
       name: draft.name.trim(),
       description: draft.description.trim(),
       phone: draft.phone?.trim() || null,
@@ -94,6 +112,12 @@ export function ServiceEditView({ serviceId }: { readonly serviceId: string | nu
       address: draft.address?.trim() || null,
       hours: draft.hours ?? null,
     });
+    setIsSaving(false);
+    // Not saved: stay with what was typed, and say so.
+    if (!ok) {
+      setFailed(true);
+      return;
+    }
     navigate('/program/');
   };
 
@@ -108,6 +132,16 @@ export function ServiceEditView({ serviceId }: { readonly serviceId: string | nu
       <Text type="supporting" xstyle={styles.intro}>
         {t('program.service.intro')}
       </Text>
+
+      {failed ? (
+        <Notice
+          notice="something_went_wrong"
+          title={t('join.failed.title')}
+          body={t('join.failed.body')}
+          supportPhone={supportPhone}
+          callLabel={t('help.callSupport')}
+        />
+      ) : null}
 
       <Card padding={6}>
         <VStack gap={3}>
@@ -206,37 +240,39 @@ export function ServiceEditView({ serviceId }: { readonly serviceId: string | nu
         </VStack>
       </Card>
 
-      {/* Which policies are only for this service (D-313). */}
-      <Card padding={6}>
-        <VStack gap={3}>
-          <Heading level={2} xstyle={styles.heading}>
-            {t('program.service.policies')}
-          </Heading>
-          <Text type="supporting" xstyle={styles.hint}>
-            {policies.length === 0 ? t('program.service.policies.none') : t('program.service.policies.hint')}
-          </Text>
-          {policies.length > 0 ? (
-            <VStack gap={2} xstyle={styles.choices}>
-              {policies.map((policy) => (
-                <CheckboxInput
-                  key={policy.id}
-                  label={policy.title}
-                  value={draft.policyIds.includes(policy.id)}
-                  onChange={(on) =>
-                    set({
-                      policyIds: on
-                        ? [...draft.policyIds.filter((id) => id !== policy.id), policy.id]
-                        : draft.policyIds.filter((id) => id !== policy.id),
-                    })
-                  }
-                />
-              ))}
-            </VStack>
-          ) : null}
-        </VStack>
-      </Card>
+      {/* Which policies are only for this service (D-313): the example set, so not for a real program. */}
+      {isReal ? null : (
+        <Card padding={6}>
+          <VStack gap={3}>
+            <Heading level={2} xstyle={styles.heading}>
+              {t('program.service.policies')}
+            </Heading>
+            <Text type="supporting" xstyle={styles.hint}>
+              {policies.length === 0 ? t('program.service.policies.none') : t('program.service.policies.hint')}
+            </Text>
+            {policies.length > 0 ? (
+              <VStack gap={2} xstyle={styles.choices}>
+                {policies.map((policy) => (
+                  <CheckboxInput
+                    key={policy.id}
+                    label={policy.title}
+                    value={draft.policyIds.includes(policy.id)}
+                    onChange={(on) =>
+                      set({
+                        policyIds: on
+                          ? [...draft.policyIds.filter((id) => id !== policy.id), policy.id]
+                          : draft.policyIds.filter((id) => id !== policy.id),
+                      })
+                    }
+                  />
+                ))}
+              </VStack>
+            ) : null}
+          </VStack>
+        </Card>
+      )}
 
-      <BigButton label={t('program.service.save')} onPress={submit} />
+      <BigButton label={t('program.service.save')} isDisabled={isSaving} onPress={() => void submit()} />
 
       {existing ? (
         <TextLink label={t('program.service.remove')} onClick={() => setAsking(true)} />
@@ -248,9 +284,12 @@ export function ServiceEditView({ serviceId }: { readonly serviceId: string | nu
         body={t('program.service.remove.body')}
         confirmLabel={t('program.service.remove.yes')}
         onConfirm={() => {
-          if (existing) remove(existing.id);
-          setAsking(false);
-          navigate('/program/');
+          if (!existing) return;
+          void remove(existing.id).then((ok) => {
+            setAsking(false);
+            if (ok) navigate('/program/');
+            else setFailed(true);
+          });
         }}
         cancelLabel={t('program.service.remove.no')}
         onCancel={() => setAsking(false)}

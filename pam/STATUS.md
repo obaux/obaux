@@ -960,6 +960,22 @@ under the header, which comes and goes; looked at in Russian and Arabic at 320px
 
 ---
 
+## Places & programs · the services a program offers, on screens (10 October) — merged 10 October
+
+D-313 and D-462, from `claude/places-programs-services-list` (Piper, 0dba5bb), merged to `main` by
+the merge desk, 10 October. **No migration of its own** (`program_services` is live, `20261010083715`).
+
+- **Built:** a real program's services are read from and written to the database; the Program
+  tab's Services card, the service editor and a member's place page show them on any phone; an
+  example program keeps its services in the tab. The editor does not offer the example policies
+  for a real program.
+- **Not built:** a booking pointing at one service (changes `book_trip`'s signature: its own
+  contract migration); policies per service; reordering.
+- **Proven:** 4 new web tests, Storybook build, a browser look at adding and reading a service,
+  language fit in seven languages and the pseudo-language.
+
+---
+
 ## Places & programs · a live program's pending change (10 October) — merged 10 October
 
 D-447 and D-462, from `claude/places-programs-program-changes` (Piper, 24aad8b), merged to `main` by
