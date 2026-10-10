@@ -11690,9 +11690,13 @@ each removal is the grep that came back empty.)
   mounted and those are re-homed. `/admin/` still makes invites in place for the same reason.
 - **Also.** A super admin no longer sees the member's "Get text reminders" promotion on
   Profile (its link treated them as a member).
-- **Not decided here.** Whether the header's role-preview chip stays on ten screens now that
-  See the app as is a Profile row (D-217 says the chip stays; `ViewAsView` says it moved);
-  `CLAUDE.md` still says a conversation takes `SubPage variant="compact"` (gone since D-411).
+- **Decided (Will, 10 October: "You decide").** The header's role-preview chip **stays** on the
+  screens that have it, beside See the app as: D-217 says both — the full list is a Profile row
+  and a page, and "a super admin's role switch rides in the template's action slot wherever
+  the old header carried it" — so one is the quick switch while looking at a screen and the
+  other is the place to choose. `ViewAsView`'s comment only described where the list moved to.
+  `CLAUDE.md`'s line about `SubPage variant="compact"` for a conversation (gone since D-411)
+  is corrected.
 - **Checked.** Typecheck; unit suites (`@pam/ui` 102, `@pam/web` 48, `@pam/config` 764); the
   browser suite on all three viewports, including `invite.spec.ts` (the city travels; a case
   manager is never asked for one; a program cannot invite a case manager; Approve carries

@@ -434,9 +434,15 @@ grep before deleting and left some in on purpose (D-444 says which and why).
   floating action's dock are inset.
 - **Not removed:** `VoiceInput` (the voice half of §0), the older `AppHeader`/`PageTitle` screens
   (live app; the redesign is only mounted in Storybook), `/admin/`'s own in-place invite.
-- **Left alone because it is `CLAUDE.md`'s:** the `variant="compact"` line (Will's to correct).
+- **`CLAUDE.md`'s `variant="compact"` line:** corrected after Will said "You decide" (gone since
+  D-411). The header's role-preview chip stays (D-444 says why).
 - **User-flow map:** `docs/user-flows/flows.mjs` updated (new invite and request pages, the
-  Everyone rows); regenerate and publish with the `pam-user-flows` skill.
+  Everyone rows, the place's one layout) and **published to Figma** ("PAM — User flows"):
+  redrew **0 · Overview, 2 · Member, 3 · Case manager, 5 · Super admin** (Sign in and Program
+  lead did not change). Checked each by screenshot. The crossing "Everyone → Invite someone"
+  arrow is gone (that card no longer exists); the Profile → Invite arrow still passes behind the
+  Messages thread card, as it did before. Screens are still slots with Storybook links, not
+  pictures: Figma's upload host is blocked from here (Will's choice).
 - **Numbering, again.** I took D-442 from `main`'s "next free" while `affectionate-goldberg` had
   already claimed D-442 and D-443 on its branch (it had moved to a files-per-claim scheme, so its
   rows were not in the table I read). Mine is **D-444**; next free is D-445. Lesson recorded in

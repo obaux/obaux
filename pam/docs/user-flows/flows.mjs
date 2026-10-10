@@ -186,8 +186,8 @@ export const flows = [
         title: 'A place',
         story: 'member-created--place-profile',
         path: '/place/',
-        changed: 'D-333',
-        note: 'Pre-booking: grey service cards first, About, then rows; walk-ins say when they meet and plan a trip too. Post-booking: the visit card names the service',
+        changed: 'D-440',
+        note: 'One layout: the ways to reach it as rows, About, the address (tap it to open Google or Apple Maps; a small copy button); Plan a trip pinned to the foot. Pre-booking: grey service cards first; walk-ins say when they meet. Post-booking: the visit card names the service',
       },
       booked: {
         title: 'Your trip is booked',
@@ -330,6 +330,7 @@ export const flows = [
       ['profile', 'points', 'Points'],
     ],
     changes: [
+      'D-440 / D-439 — a place has one layout (rows to reach it, About, the address, one button pinned to the foot); the address opens Google or Apple Maps, with a copy button',
       'D-427 — a limited account reads Messages and its conversations but cannot send or start one; a notice says what is off and who to call, and a refused send says so',
       "D-411 — a conversation: back and ⋯ where every nested screen has them, the name large, no fade; ⋯ outlined; Messages rows start at the page edge; dialogs open with no button chosen",
       'D-410 — Stuff shared: a link shows its address under its title; who and when stay at the end',
@@ -667,7 +668,6 @@ export const flows = [
       ['invites', 'invite', '+ New invite'],
       ['profile', 'invite', 'Invite someone'],
       ['invite', 'inviteOne', 'A member / program / case manager row'],
-      ['everyone', 'invite', 'Invite someone'],
       ['messages', 'thread', 'Open'],
       ['profile', 'everyone', 'Everyone'],
       ['everyone', 'person', 'A person'],
