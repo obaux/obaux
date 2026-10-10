@@ -67,7 +67,7 @@ export function TextsFromPam() {
         <Steps
           items={[
             'Pam texts you reminders only if you said yes. You choose when you join (“Yes, text me reminders” or “Not now”), or later, from the “Get text reminders” card on Profile (“Agree to receive texts” or “Not now”).',
-            'No texts go out from 9 pm to 7 am, Philadelphia time. A text that is due in those hours waits until the morning.',
+            'No texts go out from 9 pm to 7 am, Philadelphia time. A text that is due in those hours waits until the morning. If a sign-in code is more than 12 hours late, Pam cancels it instead of sending it. Ask for a new one.',
             'Reply STOP to any text and the texts stop. Nothing in the app can turn them back on. If you replied STOP by mistake, call Pam.',
             'A sign-in code is not a reminder. It comes when you ask for it.',
           ]}

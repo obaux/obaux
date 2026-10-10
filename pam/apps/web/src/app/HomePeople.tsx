@@ -1,11 +1,7 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
-import { rankPeople } from '@pam/config/people-activity';
-import { useConversations } from '@/lib/useConversations';
-import { useMessageableMembers } from '@/lib/useMessageableMembers';
-import { usePeopleActivity } from '@/lib/usePeopleActivity';
-import { readPeopleSeen, writePeopleSeen } from '@/lib/peopleSeen';
+import { useEffect } from 'react';
+import { useRankedPeople } from '@/lib/useRankedPeople';
 import { HomePeopleSection } from './HomePeopleSection';
 
 /**
@@ -39,45 +35,10 @@ export function HomePeople({
   readonly accountId: string;
   readonly onUnreadCount: (count: number) => void;
 }) {
-  const { state: people } = useMessageableMembers(true);
-  const { state: conversations } = useConversations(true);
-  const activity = usePeopleActivity(true);
-
-  const [lastSeen, setLastSeen] = useState<string | null | undefined>(undefined);
-  useEffect(() => {
-    setLastSeen(readPeopleSeen(accountId));
-    writePeopleSeen(accountId);
-  }, [accountId]);
-
-  const unreadCount =
-    conversations.status === 'ready' ? conversations.conversations.filter((c) => c.unread).length : 0;
+  const { ranked, unreadCount } = useRankedPeople(accountId);
   useEffect(() => {
     onUnreadCount(unreadCount);
   }, [unreadCount, onUnreadCount]);
-
-  const ranked = useMemo(() => {
-    if (people.status !== 'ready' || lastSeen === undefined) return null;
-    const unreadBy = new Map<string, { at: string; conversationId: string }>();
-    if (conversations.status === 'ready') {
-      for (const c of conversations.conversations) {
-        if (c.unread && c.otherProfileId && c.lastMessageAt && !unreadBy.has(c.otherProfileId)) {
-          unreadBy.set(c.otherProfileId, { at: c.lastMessageAt, conversationId: c.id });
-        }
-      }
-    }
-    const savedBy = activity.status === 'ready' ? activity.lastSavedAt : new Map<string, string>();
-    return rankPeople(
-      people.people
-        .filter((p) => p.role === 'member')
-        .map((p) => ({
-          id: p.profileId,
-          firstName: p.firstName ?? '',
-          conversationId: unreadBy.get(p.profileId)?.conversationId ?? null,
-        })),
-      (p) => ({ unreadAt: unreadBy.get(p.id)?.at ?? null, lastSavedAt: savedBy.get(p.id) ?? null }),
-      lastSeen,
-    );
-  }, [people, conversations, activity, lastSeen]);
 
   if (!ranked || ranked.length === 0) return null;
   return <HomePeopleSection role={role} ranked={ranked} isExample={false} />;

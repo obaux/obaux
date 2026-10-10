@@ -5,8 +5,9 @@ import { Steps } from '../components/Steps';
 
 /**
  * Support post: Messages (everyone). Who can write to whom is a database rule (D-176,
- * migration 0063): a member may start a chat with their own case manager or a program
- * they joined, and staff with their own members; nobody else. A message never
+ * migration 0063, and 0072 / D-262): a member may start a chat with their own case manager or a
+ * program they joined, and staff with their own members; a super admin with case managers and
+ * program leads, never a member; nobody else. A message never
  * queues a text (migration 0064). Blocking is the ⋯ menu's "Block this person" (D-463, words from
  * en.json messages.block.* and messages.blocked.*). Left out on purpose: message translation
  * (switched off), voice notes.
@@ -26,12 +27,12 @@ export function MessagesInPam() {
           columns={['You can start a chat with']}
           rows={[
             { label: 'A member', cells: ['Your own case manager, or a program you joined.'] },
-            { label: 'A case manager', cells: ['The members who are assigned to you.'] },
-            { label: 'A program lead', cells: ['Members who joined your program.'] },
-            { label: 'A super admin', cells: ['Nobody. Messages are for members, case managers and programs.'] },
+            { label: 'A case manager', cells: ['The members who are assigned to you, and a super admin.'] },
+            { label: 'A program lead', cells: ['Members who joined your program, and a super admin.'] },
+            { label: 'A super admin', cells: ['Case managers and program leads. Never a member.'] },
           ]}
         />
-        <P>Members cannot message other members.</P>
+        <P>Members cannot message other members. A super admin is the person who runs Pam.</P>
       </Section>
 
       <Section title="Send a message">
@@ -82,6 +83,10 @@ export function MessagesInPam() {
           Pam and your guide see the last message that person sent you, and its photo or document if it has one.
           Nothing else from the chat. You can report only the other person’s messages.
         </P>
+        <P>
+          A case manager or a super admin sees reported messages on Messages, under “Reported”, next to
+          “Conversations”. It says: “A message shows here only because someone said it was not safe.”
+        </P>
         <Screenshot
           name="messages-in-pam/report.png"
           alt="The report screen. It asks what is wrong and lists reasons, with buttons “Send report” and “Never mind”."
@@ -122,8 +127,8 @@ export function MessagesInPam() {
           this person”, then tap “Unblock”. You will both be able to send messages again.
         </P>
         <P>
-          Anyone can block in a conversation: a member, a case manager or a program lead. Blocking does not
-          report anyone. To report a message, use “Report suspicious activity” above.
+          Anyone in a conversation can block: a member, a case manager, a program lead or a super admin.
+          Blocking does not report anyone. To report a message, use “Report suspicious activity” above.
         </P>
       </Section>
     </Body>

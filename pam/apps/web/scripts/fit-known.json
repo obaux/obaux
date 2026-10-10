@@ -48,26 +48,6 @@
     "reason": "A conversation row's second line (the program or the person's role) is one line with an ellipsis by design (ConversationRow); the 'overlap' is the clipped rest of that line measured against the time stamp, and nothing touches on screen. The program name is data, not a translated string. Looked at 9 October 2026 at 320px with screenshots."
   },
   {
-    "key": "es|overlap|member-created-states-limited-account--conversation|Teresa ⟷ Documento de Google",
-    "reason": "The thread scrolls under its opaque header; text that has scrolled up behind the header's title is measured against it. Nothing overlaps on screen. Looked at 9 October 2026 at 320px with screenshots."
-  },
-  {
-    "key": "es|overlap|member-created-states-limited-account--conversation|Gestor de casos ⟷ Documento de Google",
-    "reason": "The thread scrolls under its opaque header; text that has scrolled up behind the header's title is measured against it. Nothing overlaps on screen. Looked at 9 October 2026 at 320px with screenshots."
-  },
-  {
-    "key": "pt-BR|overlap|member-created-states-limited-account--conversation|Teresa ⟷ Documento do Google",
-    "reason": "The thread scrolls under its opaque header; text that has scrolled up behind the header's title is measured against it. Nothing overlaps on screen. Looked at 9 October 2026 at 320px with screenshots."
-  },
-  {
-    "key": "zh-HK|overlap|member-created-states-limited-account--conversation|Teresa ⟷ And the class schedule: http",
-    "reason": "The thread scrolls under its opaque header; text that has scrolled up behind the header's title is measured against it. Nothing overlaps on screen. Looked at 9 October 2026 at 320px with screenshots."
-  },
-  {
-    "key": "ru|overlap|member-created-states-limited-account--conversation|Кейс-менеджер ⟷ T",
-    "reason": "The thread scrolls under its opaque header; text that has scrolled up behind the header's title is measured against it. Nothing overlaps on screen. Looked at 9 October 2026 at 320px with screenshots."
-  },
-  {
     "key": "ru|overlap|member-created-states-messages--with-messages|Example Learning Center ⟷ Сегодня",
     "reason": "A conversation row's second line (the program or the person's role) is one line with an ellipsis by design (ConversationRow); the 'overlap' is the clipped rest of that line measured against the time stamp, and nothing touches on screen. The program name is data, not a translated string. Looked at 9 October 2026 at 320px with screenshots."
   },
@@ -216,38 +196,6 @@
     "reason": "Stat columns share one row, each a number over a one-word label, and a word is never broken. The pseudo-language's longest label is wider than its third; the real languages' labels fit. Looked at 9 October 2026 at 320px with screenshots."
   },
   {
-    "key": "pseudo|ellipsis|member-created--points|⟦Šçĥóóóļáááŕ⟧",
-    "reason": "A badge's name under its picture is one line with an ellipsis by design (four across at 320px); the pseudo-language is longer than any real language, and none of the real ones is flagged. Looked at 9 October 2026 at 320px with screenshots."
-  },
-  {
-    "key": "pseudo|ellipsis|member-created--points|⟦Çŕááááƒţšɱáááñ⟧",
-    "reason": "A badge's name under its picture is one line with an ellipsis by design (four across at 320px); the pseudo-language is longer than any real language, and none of the real ones is flagged. Looked at 9 October 2026 at 320px with screenshots."
-  },
-  {
-    "key": "pseudo|ellipsis|member-created--points|⟦Áñçĥóóóóŕ⟧",
-    "reason": "A badge's name under its picture is one line with an ellipsis by design (four across at 320px); the pseudo-language is longer than any real language, and none of the real ones is flagged. Looked at 9 October 2026 at 320px with screenshots."
-  },
-  {
-    "key": "pseudo|ellipsis|member-created--points|⟦Ƒííííŕšţƀóóóŕñ⟧",
-    "reason": "A badge's name under its picture is one line with an ellipsis by design (four across at 320px); the pseudo-language is longer than any real language, and none of the real ones is flagged. Looked at 9 October 2026 at 320px with screenshots."
-  },
-  {
-    "key": "pseudo|ellipsis|member-created--points|⟦Ŕáááííñɱááķééŕ⟧",
-    "reason": "A badge's name under its picture is one line with an ellipsis by design (four across at 320px); the pseudo-language is longer than any real language, and none of the real ones is flagged. Looked at 9 October 2026 at 320px with screenshots."
-  },
-  {
-    "key": "pseudo|ellipsis|member-created--points|⟦Šáááñķóóƒáá⟧",
-    "reason": "A badge's name under its picture is one line with an ellipsis by design (four across at 320px); the pseudo-language is longer than any real language, and none of the real ones is flagged. Looked at 9 October 2026 at 320px with screenshots."
-  },
-  {
-    "key": "pseudo|ellipsis|member-created--points|⟦Ķíííñķééééþééŕ⟧",
-    "reason": "A badge's name under its picture is one line with an ellipsis by design (four across at 320px); the pseudo-language is longer than any real language, and none of the real ones is flagged. Looked at 9 October 2026 at 320px with screenshots."
-  },
-  {
-    "key": "pseudo|overlap|member-created--points|⟦Áñçĥóóóóŕ⟧ ⟷ ⟦Ƒííííŕšţƀóóóŕñ⟧",
-    "reason": "A badge's name under its picture is one line with an ellipsis by design (four across at 320px); the pseudo-language is longer than any real language, and none of the real ones is flagged. Looked at 9 October 2026 at 320px with screenshots."
-  },
-  {
     "key": "pseudo|ellipsis|member-created-states-connections--people|⟦Çóóóññéééçţééð ƀý Teresa⟧",
     "reason": "'Connected by <name>' is one line with an ellipsis by design (ConnectionCard); the name is data. Looked at 9 October 2026 at 320px with screenshots."
   },
@@ -306,10 +254,6 @@
   {
     "key": "pseudo|overlap|member-created-states-limited-account--messages|⟦Çáášéé ɱáááñááĝééŕ⟧ ⟷ ⟦Ţóóóðááý⟧",
     "reason": "A conversation row's second line (the program or the person's role) is one line with an ellipsis by design (ConversationRow); the 'overlap' is the clipped rest of that line measured against the time stamp, and nothing touches on screen. The program name is data, not a translated string. Looked at 9 October 2026 at 320px with screenshots."
-  },
-  {
-    "key": "pseudo|overlap|member-created-states-limited-account--conversation|⟦Çáášéé ɱáááñááĝééŕ⟧ ⟷ T",
-    "reason": "The thread scrolls under its opaque header; text that has scrolled up behind the header's title is measured against it. Nothing overlaps on screen. Looked at 9 October 2026 at 320px with screenshots."
   },
   {
     "key": "pseudo|ellipsis|member-created-states-messages--with-messages|Example Food Pantry",
@@ -412,10 +356,6 @@
     "reason": "The Shared things list keeps a title to one line and, when it is cut, slides it sideways to show its end (MarqueeText, Will's D-407). With reduced motion, which the audit uses, it stays cut with an ellipsis. The 'spill' and 'overlap' are the clipped rest of that line. Looked at 9 October 2026 at 320px with screenshots."
   },
   {
-    "key": "pseudo|overlap|case-manager-screens--conversation-files|⟦Ĝóóóóĝļéé Ðóóóç⟧ ⟷ ⟦Ýóóúú⟧",
-    "reason": "The Shared things list keeps a title to one line and, when it is cut, slides it sideways to show its end (MarqueeText, Will's D-407). With reduced motion, which the audit uses, it stays cut with an ellipsis. The 'spill' and 'overlap' are the clipped rest of that line. Looked at 9 October 2026 at 320px with screenshots."
-  },
-  {
     "key": "pseudo|cut|program-lead-screens--home-folded|⟦Ƒííííŕšţ ṽíííšííţ⟧ · ⟦Ñóóóţ çĥéééçķéééð íñ⟧",
     "reason": "The folded week on Home shows a fixed height and fades the rest, with 'Show the whole calendar' under it. A longer line wraps to more lines, so less of the next row shows; the rest is one tap away. Looked at 9 October 2026 at 320px with screenshots."
   },
@@ -488,18 +428,6 @@
     "reason": "Looked at 10 October 2026 at 320px with screenshots. The file name reads in full in the screenshot, although the name's ellipsis box measures 4px narrower than its text (148 > 144); no letter is lost. Worth another look if the row's layout changes."
   },
   {
-    "key": "pt-BR|overlap|member-created-states-limited-account--conversation|Gestor de casos ⟷ Abre no Google",
-    "reason": "Looked at 10 October 2026 at 320px with screenshots. The thread is scrolled to its end, so the first line of an earlier message sits under the opaque header; the detector sees that line's box cover the header's title or subtitle. Nothing is drawn over anything, and the message is reached by scrolling."
-  },
-  {
-    "key": "zh-CN|overlap|member-created-states-limited-account--conversation|Teresa ⟷ And the class schedule: http",
-    "reason": "Looked at 10 October 2026 at 320px with screenshots. The thread is scrolled to its end, so the first line of an earlier message sits under the opaque header; the detector sees that line's box cover the header's title or subtitle. Nothing is drawn over anything, and the message is reached by scrolling."
-  },
-  {
-    "key": "ar|overlap|member-created-states-limited-account--conversation|Teresa ⟷ And the class schedule: http",
-    "reason": "Looked at 10 October 2026 at 320px with screenshots. The thread is scrolled to its end, so the first line of an earlier message sits under the opaque header; the detector sees that line's box cover the header's title or subtitle. Nothing is drawn over anything, and the message is reached by scrolling."
-  },
-  {
     "key": "zh-HK|ellipsis|case-manager-screens--conversation-files|ID office letter.pdf",
     "reason": "Looked at 10 October 2026 at 320px with screenshots. The file name reads in full in the screenshot, although the name's ellipsis box measures 4px narrower than its text (148 > 144); no letter is lost. Worth another look if the row's layout changes."
   },
@@ -530,42 +458,6 @@
   {
     "key": "ru|overlap|member-created-states-blocking--conversation-blocked-me|Кейс-менеджер ⟷ Документ Google",
     "reason": "The thread scrolls under its opaque header; text that has scrolled up behind the header's title is measured against it. Nothing overlaps on screen. The same as the limited-account conversation entries; added at the merge of Block, 10 October 2026, after a look at 320px in Russian and the pseudo-language with screenshots."
-  },
-  {
-    "key": "pseudo|overlap|member-created-states-blocking--conversation-blocked-by-me|⟦Çáášéé ɱáááñááĝééŕ⟧ ⟷ ⟦Ĝóóóóĝļéé Ðóóóç⟧",
-    "reason": "The thread scrolls under its opaque header; text that has scrolled up behind the header's title is measured against it. Nothing overlaps on screen. The same as the limited-account conversation entries; added at the merge of Block, 10 October 2026, after a look at 320px in Russian and the pseudo-language with screenshots."
-  },
-  {
-    "key": "pseudo|overlap|member-created-states-blocking--conversation-blocked-me|⟦Çáášéé ɱáááñááĝééŕ⟧ ⟷ ⟦Óþééééñš íñ Ĝóóóóĝļéé⟧",
-    "reason": "The thread scrolls under its opaque header; text that has scrolled up behind the header's title is measured against it. Nothing overlaps on screen. The same as the limited-account conversation entries; added at the merge of Block, 10 October 2026, after a look at 320px in Russian and the pseudo-language with screenshots."
-  },
-  {
-    "key": "ru|overlap|member-created--conversation-file-refused|Teresa ⟷ Документ Google",
-    "reason": "The thread scrolls under its opaque header; text that has scrolled up behind the header's title is measured against it. Nothing overlaps on screen. Which lines are behind the header varies from run to run on this story, so these come and go. The same as the limited-account and blocking conversation entries; added at the merge of the language tags, 10 October 2026, after a look at 320px in Russian and Arabic with screenshots."
-  },
-  {
-    "key": "ru|overlap|member-created--conversation-file-refused|Кейс-менеджер ⟷ Откроется в Google",
-    "reason": "The thread scrolls under its opaque header; text that has scrolled up behind the header's title is measured against it. Nothing overlaps on screen. Which lines are behind the header varies from run to run on this story, so these come and go. The same as the limited-account and blocking conversation entries; added at the merge of the language tags, 10 October 2026, after a look at 320px in Russian and Arabic with screenshots."
-  },
-  {
-    "key": "ar|overlap|member-created--conversation-file-refused|Teresa ⟷ And the class schedule: http",
-    "reason": "The thread scrolls under its opaque header; text that has scrolled up behind the header's title is measured against it. Nothing overlaps on screen. Which lines are behind the header varies from run to run on this story, so these come and go. The same as the limited-account and blocking conversation entries; added at the merge of the language tags, 10 October 2026, after a look at 320px in Russian and Arabic with screenshots."
-  },
-  {
-    "key": "ar|overlap|member-created--conversation-file-refused|مدير الحالة ⟷ And the class schedule: http",
-    "reason": "The thread scrolls under its opaque header; text that has scrolled up behind the header's title is measured against it. Nothing overlaps on screen. Which lines are behind the header varies from run to run on this story, so these come and go. The same as the limited-account and blocking conversation entries; added at the merge of the language tags, 10 October 2026, after a look at 320px in Russian and Arabic with screenshots."
-  },
-  {
-    "key": "zh-CN|overlap|member-created--conversation-file-refused|Teresa ⟷ And the class schedule: http",
-    "reason": "The thread scrolls under its opaque header; text that has scrolled up behind the header's title is measured against it. Nothing overlaps on screen. Which lines are behind the header varies from run to run on this story, so these come and go. The same as the limited-account and blocking conversation entries; added at the merge of the language tags, 10 October 2026, after a look at 320px in Russian and Arabic with screenshots."
-  },
-  {
-    "key": "pseudo|overlap|member-created--conversation-file-refused|Teresa ⟷ ⟦Ĝóóóóĝļéé Ðóóóç⟧",
-    "reason": "The thread scrolls under its opaque header; text that has scrolled up behind the header's title is measured against it. Nothing overlaps on screen. Which lines are behind the header varies from run to run on this story, so these come and go. The same as the limited-account and blocking conversation entries; added at the merge of the language tags, 10 October 2026, after a look at 320px in Russian and Arabic with screenshots."
-  },
-  {
-    "key": "pseudo|overlap|member-created--conversation-file-refused|⟦Çáášéé ɱáááñááĝééŕ⟧ ⟷ ⟦Óþééééñš íñ Ĝóóóóĝļéé⟧",
-    "reason": "The thread scrolls under its opaque header; text that has scrolled up behind the header's title is measured against it. Nothing overlaps on screen. Which lines are behind the header varies from run to run on this story, so these come and go. The same as the limited-account and blocking conversation entries; added at the merge of the language tags, 10 October 2026, after a look at 320px in Russian and Arabic with screenshots."
   },
   {
     "key": "pseudo|ellipsis|program-lead-states-program-on-file--live-with-a-change-waiting|Reading, writing and math toward the GED test, four mornings",
@@ -664,15 +556,71 @@
     "reason": "A trip card's place name is one line with an ellipsis by design (TripCard); the pseudo-language is about 40% longer so it trims; the full name is on the place page one tap away. Looked at 10 October 2026 at 320px."
   },
   {
-    "key": "pseudo|ellipsis|member-created-states-saved-trips--trips-with-a-past-visit|Riverside Job Center",
-    "reason": "A trip card's place name is one line with an ellipsis by design (TripCard); the pseudo-language is about 40% longer so it trims; the full name is on the place page one tap away. Looked at 10 October 2026 at 320px."
-  },
-  {
     "key": "pseudo|cut|member-created-states-saved-trips--trips-with-a-past-visit|⟦Þŕóóóƒííļéé⟧",
     "reason": "The Trips drawer scrolls and fades out at its foot; a card below the first sits under that fade, so the detector sees its text partly hidden (partial=true). It is reached by scrolling and nothing is lost. Looked at 10 October 2026 at 320px with screenshots."
   },
   {
-    "key": "pseudo|ellipsis|program-lead-states-program-more-than-one--the-program-tab|Resumes, interviews and showing up ready.",
-    "reason": "A service's sentence on the Program tab is one line with an ellipsis by design (isDescriptionOneLine); the pseudo-language is longer so it trims; the whole sentence is one tap away in the service. Looked at 10 October 2026 at 320px."
+    "key": "pseudo|clamp|member-created--explore|Free classes, a computer room and help getting a GED. Walk i",
+    "reason": "Explore's place card keeps to its designed line count; the pseudo-language (English 40% longer) is where it trims. The seven real languages fit. Looked at in a screenshot at 320px (10 October); the card is Piper's."
+  },
+  {
+    "key": "pseudo|clamp|member-created--explore|Example Workforce Center",
+    "reason": "Explore's place card keeps to its designed line count; the pseudo-language (English 40% longer) is where it trims. The seven real languages fit. Looked at in a screenshot at 320px (10 October); the card is Piper's."
+  },
+  {
+    "key": "pseudo|clamp|member-created--explore|Job training, help with a resume and openings posted every w",
+    "reason": "Explore's place card keeps to its designed line count; the pseudo-language (English 40% longer) is where it trims. The seven real languages fit. Looked at in a screenshot at 320px (10 October); the card is Piper's."
+  },
+  {
+    "key": "pseudo|clamp|member-created--explore|Groceries to take home, no appointment. Bring a bag if you h",
+    "reason": "Explore's place card keeps to its designed line count; the pseudo-language (English 40% longer) is where it trims. The seven real languages fit. Looked at in a screenshot at 320px (10 October); the card is Piper's."
+  },
+  {
+    "key": "pt-BR|cut|case-manager-screens--home|Trabalho e dinheiro",
+    "reason": "The saved places strip on the old Home (kept for staff, D-456): the next card peeks in at the right edge to say there are more, and the strip scrolls sideways. What is cut is the peek, seen in a screenshot at 320px (10 October)."
+  },
+  {
+    "key": "pseudo|cut|case-manager-screens--home|⟦Ŵóóóŕķ áñññð ɱóóóñééý⟧",
+    "reason": "The saved places strip on the old Home (kept for staff, D-456): the next card peeks in at the right edge to say there are more, and the strip scrolls sideways. What is cut is the peek, seen in a screenshot at 320px (10 October)."
+  },
+  {
+    "key": "pt-BR|cut|program-lead-screens--home|Trabalho e dinheiro",
+    "reason": "The saved places strip on the old Home (kept for staff, D-456): the next card peeks in at the right edge to say there are more, and the strip scrolls sideways. What is cut is the peek, seen in a screenshot at 320px (10 October)."
+  },
+  {
+    "key": "pt-BR|cut|program-lead-screens--home-get-started|Trabalho e dinheiro",
+    "reason": "The saved places strip on the old Home (kept for staff, D-456): the next card peeks in at the right edge to say there are more, and the strip scrolls sideways. What is cut is the peek, seen in a screenshot at 320px (10 October)."
+  },
+  {
+    "key": "pt-BR|cut|program-lead-screens--home-program-added|Trabalho e dinheiro",
+    "reason": "The saved places strip on the old Home (kept for staff, D-456): the next card peeks in at the right edge to say there are more, and the strip scrolls sideways. What is cut is the peek, seen in a screenshot at 320px (10 October)."
+  },
+  {
+    "key": "pseudo|cut|program-lead-screens--home|⟦Ŵóóóŕķ áñññð ɱóóóñééý⟧",
+    "reason": "The saved places strip on the old Home (kept for staff, D-456): the next card peeks in at the right edge to say there are more, and the strip scrolls sideways. What is cut is the peek, seen in a screenshot at 320px (10 October)."
+  },
+  {
+    "key": "pt-BR|cut|program-lead-screens--home-program-changes|Trabalho e dinheiro",
+    "reason": "The saved places strip on the old Home (kept for staff, D-456): the next card peeks in at the right edge to say there are more, and the strip scrolls sideways. What is cut is the peek, seen in a screenshot at 320px (10 October)."
+  },
+  {
+    "key": "pseudo|cut|program-lead-screens--home-get-started|⟦Ŵóóóŕķ áñññð ɱóóóñééý⟧",
+    "reason": "The saved places strip on the old Home (kept for staff, D-456): the next card peeks in at the right edge to say there are more, and the strip scrolls sideways. What is cut is the peek, seen in a screenshot at 320px (10 October)."
+  },
+  {
+    "key": "pseudo|cut|program-lead-screens--home-program-added|⟦Ŵóóóŕķ áñññð ɱóóóñééý⟧",
+    "reason": "The saved places strip on the old Home (kept for staff, D-456): the next card peeks in at the right edge to say there are more, and the strip scrolls sideways. What is cut is the peek, seen in a screenshot at 320px (10 October)."
+  },
+  {
+    "key": "pseudo|cut|program-lead-screens--home-program-changes|⟦Ŵóóóŕķ áñññð ɱóóóñééý⟧",
+    "reason": "The saved places strip on the old Home (kept for staff, D-456): the next card peeks in at the right edge to say there are more, and the strip scrolls sideways. What is cut is the peek, seen in a screenshot at 320px (10 October)."
+  },
+  {
+    "key": "pt-BR|cut|program-lead-screens--home-folded|Trabalho e dinheiro",
+    "reason": "The saved places strip on the old Home (kept for staff, D-456): the next card peeks in at the right edge to say there are more, and the strip scrolls sideways. What is cut is the peek, seen in a screenshot at 320px (10 October)."
+  },
+  {
+    "key": "pseudo|cut|program-lead-screens--home-folded|⟦Ŵóóóŕķ áñññð ɱóóóñééý⟧",
+    "reason": "The saved places strip on the old Home (kept for staff, D-456): the next card peeks in at the right edge to say there are more, and the strip scrolls sideways. What is cut is the peek, seen in a screenshot at 320px (10 October)."
   }
 ]

@@ -555,9 +555,23 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
     // A fictional 555 number: a requester's phone, read on "Text Andre" (D-262).
     on('/rpc/staff_request_phone', () => ({ body: '+12155550177' })),
     on('/rest/v1/enrollments', () => ({ body: [] })),
-    on('/rpc/messageable_people', () => ({ body: [] })),
+    // The people a case manager or a program lead may message are the caseload the list shows, so the row of
+    // rings above it (D-198) agrees with it (a member's and a super admin's own list is empty).
+    on('/rpc/messageable_people', () => ({
+      body:
+        role === 'admin' || role === 'provider'
+          ? CASELOAD.map((m) => ({ profile_id: m.id, first_name: m.first_name, role: 'member' }))
+          : [],
+    })),
     on('/rpc/reports_for_review', () => ({ body: [] })),
-    on('/rpc/people_activity', () => ({ body: [] })),
+    // Tanya saved a place a moment from now: always newer than the last time a story was opened, so the
+    // ring is on whenever the story is (D-198's "since you last looked" is kept per browser).
+    on('/rpc/people_activity', () => ({
+      body:
+        role === 'admin' || role === 'provider'
+          ? [{ profile_id: 'm2', last_saved_at: new Date(Date.now() + 60_000).toISOString() }]
+          : [],
+    })),
   ];
 }
 
