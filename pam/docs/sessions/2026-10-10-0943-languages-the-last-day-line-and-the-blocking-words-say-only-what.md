@@ -16,6 +16,7 @@ rewritten. Wren found two in my copy. One small branch after the tags (D-455) we
   someone you talk to, from a conversation's ⋯ menu. Neither of you can send messages there after that. They will see that
   messages are blocked." (Not "anyone", not "they will not know".)
 - **Tests:** `legal.test.ts` "promises that are kept (D-465)".
+- **The public site's table** (`apps/site`, Wren's lane, with Mira's OK): the last-day row says No for a program.
 - **Decision D-465;** changelog fragment; before-launch (native reader).
 
 ## What was wrong, and what missed it
@@ -27,8 +28,9 @@ rewritten. Wren found two in my copy. One small branch after the tags (D-455) we
   prove the database gives a program something, only that it does not: `04_transparency_contract_test.sql` part 3 holds
   the *opposite* and passed the whole time. The new test pins the wording to that fact.
 - **The same promise repeated where I did not look.** The public site's "What others can see" table
-  (`apps/site/src/content/WhatOthersCanSee.tsx`) still says "Yes" for a program; it is Wren's, reported to the merge
-  desk. `before-launch.md` already named it as a follow-up of any change to `transparency.ts`.
+  (`apps/site/src/content/WhatOthersCanSee.tsx`) said "Yes" for a program. It is Wren's file; I reported it, and Mira
+  OK'd the one-cell change on this branch (the row is now Yes / No / No), so the app and the public page change in the
+  same merge. `before-launch.md` had already named it as a follow-up of any change to `transparency.ts`.
 - **"They will not know" had never been true of the design:** `conversation_block_state` tells the blocked person
   (`blocked_me`), so the sentence was wrong even once a control existed.
 
@@ -43,8 +45,8 @@ Filled in when the long checks have finished (below).
 
 ## Left undone
 
-- The public site's table row (Wren's file) and the line in the Block session's STATUS section that said the terms'
-  "they will not know" was untrue (it is fixed here; drop it at merge).
+- The line in the Block session's STATUS section that said the terms' "they will not know" was untrue (it is fixed here;
+  the merge desk drops it at merge).
 - The mail-service paragraph on the privacy page: its English is with Will; translate only after he says yes.
 - The six translations of the new terms and privacy sentences are mine; promises, so a native reader still has to read them.
 

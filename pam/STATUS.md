@@ -935,8 +935,8 @@ fixed or rewritten (D-465).
 
 - **"The last day you used Pam."** — the transparency screen no longer says a program sees it. A case manager does; a
   program does not (0062), whatever D-242 intended; that half stays open. Seven languages, the contract's `en` and
-  comments, a test. The **public site's** "What others can see" row (`apps/site`) still says a program does: Wren's
-  file, reported.
+  comments, a test. The **public site's** "What others can see" row (`apps/site`) said a program does; changed with
+  Mira's OK, in Wren's lane, so the app and the page change in the same merge.
 - **Blocking, in its true form** now that the Block control is on `main` (D-463): privacy "Both are in a conversation's
   ⋯ menu"; terms "You can block someone you talk to, from a conversation's ⋯ menu. Neither of you can send messages
   there after that. They will see that messages are blocked." — not "anyone", not "they will not know". The Block
