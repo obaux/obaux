@@ -18,13 +18,23 @@ const input = {
 };
 
 describe('the first-invite email to a case manager or a program lead (D-450, D-461)', () => {
-  it('has Will’s sign-off on the English, in his words, and the others are drafts under the 9 October convention', () => {
+  it('has Will’s sign-off on the English, in his words, and the other six are not signed (D-488)', () => {
     expect(STAFF_INVITE_EMAIL.en.reviewedBy).toBe('Will, 10 October 2026');
+    // Will approved the English. The "approved to learn from" convention was applied to the others on the
+    // merge desk's instruction, not by Will, and was withdrawn: they are sent the English until a person signs them.
     for (const locale of SUPPORTED_LOCALES.filter((l) => l !== 'en')) {
-      expect(STAFF_INVITE_EMAIL[locale].reviewedBy, locale).toMatch(/^Will \(Oba\), 10 October 2026 — approved to learn from; no native reader yet$/);
+      expect(STAFF_INVITE_EMAIL[locale].reviewedBy, locale).toBe('');
     }
-    expect(unsignedStaffInviteEmailLocales()).toEqual([]);
+    expect(unsignedStaffInviteEmailLocales()).toEqual(SUPPORTED_LOCALES.filter((l) => l !== 'en'));
     expect(() => renderStaffInviteEmail(input)).not.toThrow();
+  });
+
+  it('sends every language that nobody has signed the English email', () => {
+    for (const locale of SUPPORTED_LOCALES.filter((l) => l !== 'en')) {
+      const email = renderStaffInviteEmail({ ...input, locale });
+      expect(email.locale, locale).toBe('en');
+      expect(email.html, locale).toBe(renderStaffInviteEmail({ ...input, locale: 'en' }).html);
+    }
   });
 
   it('says exactly what Will approved, in English', () => {
@@ -65,24 +75,31 @@ describe('the first-invite email to a case manager or a program lead (D-450, D-4
   });
 
   it('writes the email in the person’s language while it carries an approval, and English when it does not', () => {
-    expect(renderStaffInviteEmail({ ...input, locale: 'ru' }).html).toContain('Dana хочет, чтобы вы присоединились');
-    expect(renderStaffInviteEmail({ ...input, locale: 'ar' }).html).toContain('dir="rtl"');
     const table = STAFF_INVITE_EMAIL as Record<string, { reviewedBy: string }>;
-    const original = table['ru']!.reviewedBy;
-    table['ru']!.reviewedBy = '';
+    const before = { ru: table['ru']!.reviewedBy, ar: table['ar']!.reviewedBy };
+    // A reader signs two of them, for the length of this check.
+    table['ru']!.reviewedBy = 'a test reader';
+    table['ar']!.reviewedBy = 'a test reader';
     try {
+      expect(renderStaffInviteEmail({ ...input, locale: 'ru' }).html).toContain('Dana хочет, чтобы вы присоединились');
+      expect(renderStaffInviteEmail({ ...input, locale: 'ar' }).html).toContain('dir="rtl"');
+      table['ru']!.reviewedBy = '';
       const email = renderStaffInviteEmail({ ...input, locale: 'ru' });
       expect(email.locale).toBe('en');
       expect(email.html).toBe(renderStaffInviteEmail({ ...input, locale: 'en' }).html);
-      expect(unsignedStaffInviteEmailLocales()).toEqual(['ru']);
+      expect(unsignedStaffInviteEmailLocales()).toContain('ru');
+      expect(unsignedStaffInviteEmailLocales()).not.toContain('ar');
     } finally {
-      table['ru']!.reviewedBy = original;
+      table['ru']!.reviewedBy = before.ru;
+      table['ar']!.reviewedBy = before.ar;
     }
   });
 
   it('sends nothing at all if the English loses its sign-off, and a draft still previews', () => {
     const table = STAFF_INVITE_EMAIL as Record<string, { reviewedBy: string }>;
     const original = table['en']!.reviewedBy;
+    const ruBefore = table['ru']!.reviewedBy;
+    table['ru']!.reviewedBy = 'a test reader';
     table['en']!.reviewedBy = '';
     try {
       expect(usableStaffInviteEmailLocale('ru')).toBe('ru');
@@ -91,6 +108,7 @@ describe('the first-invite email to a case manager or a program lead (D-450, D-4
       expect(renderStaffInviteEmail({ ...input, draft: true }).locale).toBe('en');
     } finally {
       table['en']!.reviewedBy = original;
+      table['ru']!.reviewedBy = ruBefore;
     }
   });
 

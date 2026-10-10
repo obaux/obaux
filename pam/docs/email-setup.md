@@ -21,7 +21,7 @@ nothing until the steps below are done. Texts are set up separately (`docs/sms-s
 5. **Create an API key that can only send.** Give it to the merge desk, never to a
    session and never to the repository.
 6. **The words are signed.** English by Will (10 October 2026, D-461); the other six
-   are drafts "approved to learn from" until somebody who reads them says what is
+   are written but **not signed** (D-488): that language is sent the English until Will or somebody who reads it signs it, and nobody has said what is
    wrong. Only a person writes `reviewedBy`. Storybook: *Onboarding › First invite
    email (staff)*.
 7. **Send one to your own inbox** and look at it in Gmail, Apple Mail and Outlook.

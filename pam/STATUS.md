@@ -1107,6 +1107,8 @@ Branch `claude/messages-member-address-deleted`. One migration (`20261010151208_
 project**, no DROP): the address typed on the expired-link page is removed as soon as the fresh link is sent, and when a
 request can no longer be sent (older than seven days, out of tries, fresh link used or run out). The row keeps that it was
 sent and when. The invites log shows no address for a removed one. Staff's own address is untouched. DB test 48. D-487.
+Also on this branch: the staff invite email's six other languages are unsigned again (they go out in English until a person
+signs them; Will approved only the English) and the sender's bundle is regenerated. **Redeploy `send-invite-emails`.** D-488.
 
 ## Messages & notifications · the clocks send the shared secret (10 October 2026)
 
