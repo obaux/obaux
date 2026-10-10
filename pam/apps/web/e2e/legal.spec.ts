@@ -54,9 +54,10 @@ for (const [name, path, sections] of [
 
       // Reading to the bottom moves the mark with you. aria-current is what a
       // screen reader announces, so asserting it covers both the highlight and
-      // the thing that makes the highlight mean something without sight.
-      const lastHref = await last.getAttribute('href');
-      await page.locator(lastHref!).scrollIntoViewIfNeeded();
+      // the thing that makes the highlight mean something without sight. The mark
+      // is the section whose heading has reached the line under the bars (D-497),
+      // and at the very bottom of the page, the last one.
+      await page.evaluate(() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' }));
       await expect(last).toHaveAttribute('aria-current', 'true', { timeout: 5000 });
       await expect(first).not.toHaveAttribute('aria-current', 'true');
     });
