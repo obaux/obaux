@@ -22,6 +22,12 @@ export const ReportedPlacesFromTheBell: Story = screen('super-admin', 'Reported 
 export const Everyone: Story = screen('super-admin', 'Everyone', '/directory/');
 export const Requests: Story = screen('super-admin', 'Staff requests', '/requests/');
 export const RequestReview: Story = screen('super-admin', 'A request to review', '/requests/review/', { id: 'r-2' });
+// The programs leaders have sent for Pam to check (D-386, part 6).
+export const ProgramsToCheck: Story = screen('super-admin', 'Programs to check', '/programs/review/');
+export const ProgramToCheckNew: Story = screen('super-admin', 'A new program to check (waiting four days)', '/programs/review/item/', { id: 'check-1' });
+export const ProgramToCheckChange: Story = screen('super-admin', 'A change to a live program', '/programs/review/item/', { id: 'check-2' });
+export const ProgramToCheckWithdrawn: Story = screen('super-admin', 'A request the leader deleted to start over', '/programs/review/item/', { id: 'check-3' });
+export const ProgramToCheckSentAgain: Story = screen('super-admin', 'The request sent again', '/programs/review/item/', { id: 'check-4' });
 export const RequestProgram: Story = screen('super-admin', 'A requested program', '/requests/program/', { id: 'r-2' });
 export const Thread: Story = screen('super-admin', 'A conversation with a case manager', '/messages/thread/', {
   id: 'dummy-conv-dummy-a1-dummy-s1',

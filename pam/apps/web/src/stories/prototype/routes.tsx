@@ -38,6 +38,8 @@ import PlacePolicyPage from '../../app/place/policies/view/page';
 import ProgramServicePage from '../../app/program/service/page';
 import { PrototypeRequestProgram } from './PrototypeRequestProgram';
 import { PrototypeRequestReview } from './PrototypeRequestReview';
+import { PrototypeProgramReview } from './PrototypeProgramReview';
+import { ProgramsToCheckScreen } from '../../screens/ProgramsToCheckScreen';
 import { InvitesLogScreen } from '../../screens/InvitesLogScreen';
 import TermsPage from '../../app/terms/page';
 import { ProfileScreen } from '../../screens/ProfileScreen';
@@ -117,6 +119,8 @@ export const APP_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   '/requests/': screen(() => <RequestsPage />),
   '/requests/program/': screen(() => <PrototypeRequestProgram />),
   '/requests/review/': screen(() => <PrototypeRequestReview />),
+  '/programs/review/': screen(() => <ProgramsToCheckScreen />),
+  '/programs/review/item/': screen(() => <PrototypeProgramReview />),
   '/invites/': screen(() => <InvitesLogScreen />),
   '/interested/': screen(() => <InterestedPage />),
   '/person/': screen(() => <PersonPage />),

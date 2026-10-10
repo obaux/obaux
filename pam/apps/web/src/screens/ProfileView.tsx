@@ -113,6 +113,8 @@ export function ProfileView({
       ? [
           { id: 'everyone', label: t('profile.menu.everyone'), href: '/directory/', icon: <PeopleIcon {...ICON} /> },
           { id: 'requests', label: t('profile.menu.requests'), href: '/requests/', icon: <ShieldIcon {...ICON} /> },
+          // The programs leaders have sent for Pam to check (D-386).
+          { id: 'programs-to-check', label: t('review.title'), href: '/programs/review/', icon: <PlacesIcon {...ICON} /> },
         ]
       : []),
     // The places somebody reported, for the people who review them (D-189):
