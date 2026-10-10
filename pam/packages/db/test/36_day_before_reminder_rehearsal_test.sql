@@ -369,8 +369,8 @@ insert into public.notification_preferences (member_id, sms_enabled) values (:'d
 select test.check('a trip planned before the member said yes gets its reminder when they do (gap 2, fixed)',
   (select count(*) from public.outbound_messages where member_id = :'dee' and status = 'scheduled'), 1::bigint);
 
--- 4. Nothing stops a reminder that went overdue — the clock paused, an outage —
---    from going out after the visit it is for has already happened.
+-- (Gap 4, a late reminder going out after its visit, is fixed by 20261010130754 and
+-- tested below as a plain check; the full set of lateness rules is test 38.)
 reset role;
 insert into public.appointments (member_id, service_id, starts_at, timezone, status)
 values (:'ben', :'long_place', now() - interval '2 hours', 'America/New_York', 'scheduled');
@@ -378,7 +378,10 @@ insert into public.outbound_messages (member_id, template_key, vars, send_at, ap
 select :'ben', 'appointment_24h', '{"time":"1:00 PM","address":"1 Main St","link":"https://x.test/trips/"}', now() - interval '26 hours', id
 from public.appointments where member_id = :'ben' and starts_at < now();
 set role service_role;
-select test.check('KNOWN GAP 4: a reminder for a visit that has already started is still handed over, a day late',
-  (select count(*) from test.claim_all() where member_id = :'ben' and template_key = 'appointment_24h'), 1::bigint);
+select test.check('a reminder for a visit that has already started is not handed over, however late',
+  (select count(*) from test.claim_all() where member_id = :'ben' and template_key = 'appointment_24h'), 0::bigint);
+reset role;
+select test.check_text('...it is cancelled, and says why',
+  (select failure_reason from public.outbound_messages where member_id = :'ben' and appointment_id in (select id from public.appointments where starts_at < now())), 'the visit has already started');
 
 select 'rehearsal done' as done;

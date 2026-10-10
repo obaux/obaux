@@ -1077,6 +1077,14 @@ drops signatures), then `20261010042108_a_program_lead_submits_their_own_program
 
 ---
 
+## Messages & notifications · overdue texts are cancelled (10 October 2026) — merged 10 October
+
+Merged to `main` by the merge desk, 10 October, from `claude/messages-overdue-cutoff` (4de80ab). One migration
+(`20261010130754_…`, **applied live at merge**, recorded as 20261010131653; read back: body identical to the file, service role only): the claim cancels an appointment reminder whose visit
+has started, and a time-bound text more than 12 hours late (quiet hours allowed for); texts still useful late are
+unchanged. Test 38 (numbered 37 on its branch; Piper's reminder-gaps test took 37 first). Gap 4 of the rehearsal
+closed. D-475.
+
 ## Messages & notifications · day-before reminder rehearsal (10 October 2026) — merged 10 October
 
 Merged to `main` by the merge desk, 10 October, from `claude/messages-reminder-rehearsal` (81a6681). At merge, test 36's
@@ -1085,7 +1093,8 @@ ids and leaves a sent text on a cancelled trip on purpose. Tests and a runbook, 
 `dispatch-sms.test.ts` (18) rehearse trip → reminder → claim → Twilio (faked) in all seven languages;
 runbook at the top of `docs/sms-setup.md`. Four gaps found and pinned as KNOWN GAP (evening visits reminded
 on their own day, texts turned on later queue nothing for planned trips, place names cut mid-word, an
-overdue reminder not dropped). Cancel and move work. D-473.
+overdue reminder not dropped), all four since fixed: 1 to 3 by Piper's `20261010130831`, 4 by Nico's
+`20261010130754` (KNOWN GAP 1b, quiet hours changed after planning, stays pinned). Cancel and move work. D-473.
 
 ## Messages & notifications · legacy Messages page removed (10 October 2026)
 
