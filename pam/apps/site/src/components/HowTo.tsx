@@ -37,7 +37,7 @@ const styles = stylex.create({
     boxSizing: 'border-box',
     borderRadius: '20px',
     // A gray a tint lighter than the page, with a hairline, as on Figma Learn (the requirements banner is a deeper gray).
-    backgroundColor: 'color-mix(in srgb, var(--color-background-body) 45%, white)',
+    backgroundColor: 'color-mix(in srgb, var(--color-background-body) 45%, var(--color-background-card))',
     borderWidth: '1px',
     borderStyle: 'solid',
     borderColor: colorVars['--color-border'],
