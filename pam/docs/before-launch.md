@@ -148,13 +148,11 @@ STATUS row too.
   function, tested like the privacy promises: profile, email, invites, messages, photos,
   points in one call). Until then a deletion on a call must remove the email by hand.
 
-- [ ] **Apply the two audit-log migrations, in order** (D-443). `list_migrations` first.
-  (1) `20261010031734_audit_log_keeps_an_erased_account_six_months.sql` — no `drop`, so the
-  connector can apply it; it also schedules `purge-erased-audit` in pg_cron (check
-  `select * from cron.job` afterwards). (2) `20261010031736_audit_log_actor_is_not_a_foreign_key.sql`
-  — one `alter table … drop constraint`; if the connector hangs on it (D-387), run that
-  single statement in the Supabase SQL editor. Apply (1) before (2); (1) alone changes
-  nothing a person can see. Then `get_advisors`. Merge the privacy sentence at the same time.
+- [x] **Apply the two audit-log migrations, in order** (D-443) — **done 10 October 2026 (Will: "Yes")**:
+  `list_migrations` first (no drift), the first through the connector (nightly job
+  `purge-erased-audit` confirmed in `cron.job`), the second (`drop constraint`) also through the
+  connector, then a one-line fix after `get_advisors` flagged the guard function's search path
+  (`20261010033722_pin_the_append_only_guard_search_path.sql`). The privacy sentence merges with them.
 
 - [x] **Apply 0086 to the live project, together with the app change that uses it** (D-441) —
   **done 10 October 2026 (Will: "Apply and merge 0086")**: `list_migrations` checked (live ended

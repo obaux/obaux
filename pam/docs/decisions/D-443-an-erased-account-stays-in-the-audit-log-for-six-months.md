@@ -17,7 +17,7 @@ deleted because of the invite's own check).
 
 ## What was decided and built
 
-Two migrations, not yet live, in the order they must be applied:
+Two migrations, **live since 10 October 2026** (Will: "Yes" to applying them), in the order they were applied:
 
 1. `20261010031734_audit_log_keeps_an_erased_account_six_months.sql`
    - A `before delete` trigger on `profiles` writes one audit row, `account.delete`,
@@ -52,9 +52,28 @@ day exactly the rows naming it go and nobody else's; the guard still refuses a
 delete or update from the database owner and from a service-role session that sets
 the flag; the points ledger gets no exception; clients cannot call either function.
 
+## Applied live (10 October, after `list_migrations` showed no drift)
+
+1. The first migration through the connector (no `drop`). Read back: the nightly job
+   `purge-erased-audit` (`30 3 * * *`) is in `cron.job`; `record_account_deletion` and
+   `purge_erased_audit` are not executable by `anon` or `authenticated`; the deletion
+   trigger is on `profiles`; running the purge once as the owner removed 0 rows.
+2. The second (`drop constraint audit_log_actor_id_fkey`) **also went through the
+   connector** — D-387's hang was on `DROP TRIGGER` / `DROP POLICY`; a `drop constraint`
+   is not held. Read back: no foreign key from `audit_log` to `profiles`, primary key
+   intact.
+3. **`get_advisors` then flagged `function_search_path_mutable` on `reject_mutation`.**
+   0021 had pinned every public function's search path, and `create or replace function`
+   without a `set` clause (migration 1) silently resets it. Fixed forward with
+   `20261010033722_pin_the_append_only_guard_search_path.sql`
+   (`alter function … set search_path = public, extensions`); advisors are back to the
+   by-design list. The DB suite's invariant covers only SECURITY DEFINER functions, so it
+   did not catch this: the next time a trigger function is replaced, keep its `set`
+   clause (the migration check in `numbering.test.ts` is about removals, not this).
+
 ## Not done, and found on the way
 
-- **A member who has points still cannot be deleted.** `points_ledger.member_id`
+- **A member who has points still cannot be deleted** (Will said, 10 October, after reading this: yes, deleting a member should delete their points history — the next change, after this one is merged). `points_ledger.member_id`
   cascades from the profile, and the points ledger is append-only in the same way, so
   the cascade is refused. Probed on the seeded data: Marcus (a member with points)
   is blocked; the admins and providers are not. The same shape of fix would work (the
