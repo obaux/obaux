@@ -1078,7 +1078,7 @@ drops signatures), then `20261010042108_a_program_lead_submits_their_own_program
 Branch `claude/messages-remove-legacy`. Case managers and super admins now get the redesigned Messages
 screen with "Conversations | Reported"; `LegacyMessagesPage` and the old example-conversation half of
 `DummyRows` are deleted. `?show=reported` still works; every reported-message test kept and moved to the
-new switch. No database change. messages.spec passes on all three projects (174). D-468.
+new switch. No database change. messages.spec passes on all three projects (174). D-469.
 
 ## Messages & notifications · Will's sign-off (10 October 2026)
 

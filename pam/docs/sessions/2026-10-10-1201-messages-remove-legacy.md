@@ -18,7 +18,7 @@ Nothing wrong. Two tests had quietly relied on the legacy page showing examples 
 
 ## Decisions made
 
-D-468.
+D-469.
 
 ## Verified
 
