@@ -6,6 +6,8 @@
 set client_min_messages to notice;
 
 \set region_north '11111111-0000-0000-0000-000000000001'
+\set dana '33333333-0000-0000-0000-00000000000a'
+\set marcus '33333333-0000-0000-0000-00000000000c'
 \set tanya  '33333333-0000-0000-0000-00000000000d'
 \set luis   '33333333-0000-0000-0000-00000000000e'
 \set boss   'cccccccc-0000-0000-0000-000000004701'
@@ -58,6 +60,8 @@ select public.sign_policy((select id from public.program_policies where title = 
 select set_config('request.jwt.claim.sub', :'luis', false);
 select public.sign_policy((select id from public.program_policies where title = 'Who Policy'), 'data:image/png;base64,eQ==');
 select public.sign_policy((select id from public.program_policies where title = 'Other Policy'), 'data:image/png;base64,eQ==');
+select set_config('request.jwt.claim.sub', :'marcus', false);
+select public.sign_policy((select id from public.program_policies where title = 'Who Policy'), 'data:image/png;base64,eg==');
 
 -- ===========================================================================
 \echo ''
@@ -65,9 +69,9 @@ select public.sign_policy((select id from public.program_policies where title = 
 -- ===========================================================================
 select set_config('request.jwt.claim.sub', :'lead1', false);
 select test.check('two people signed the program''s policy',
-  (select count(*) from public.program_policy_signers(:'prog1')), 2::bigint);
+  (select count(*) from public.program_policy_signers(:'prog1')), 3::bigint);
 select test.check('...named by first name, with the day',
-  (select count(*) from public.program_policy_signers(:'prog1') where first_name in ('Tanya', 'Luis') and signed_at > now() - interval '1 minute'), 2::bigint);
+  (select count(*) from public.program_policy_signers(:'prog1') where first_name in ('Tanya', 'Luis', 'Marcus') and signed_at > now() - interval '1 minute'), 3::bigint);
 select test.check('...and the function has no picture, phone or last name to give',
   (select count(*) from information_schema.parameters p join information_schema.routines r on r.specific_name = p.specific_name
    where r.routine_name = 'program_policy_signers' and p.parameter_mode = 'OUT'
@@ -85,7 +89,31 @@ select test.check_raises_like('a member cannot ask',
   format($f$select * from public.program_policy_signers(%L)$f$, :'prog1'), '%PROGRAM_NOT_FOUND%');
 
 select set_config('request.jwt.claim.sub', :'boss', false);
-select test.check('a super admin can read any program''s', (select count(*) from public.program_policy_signers(:'prog1')), 2::bigint);
+select test.check('a super admin can read any program''s', (select count(*) from public.program_policy_signers(:'prog1')), 3::bigint);
+
+-- A case manager reaches assigned members only (0082): not a program's signers, even one who covers a signer.
+select set_config('request.jwt.claim.sub', :'dana', false);
+select test.check_raises_like('a case manager covering a signer cannot read the program''s signers',
+  format($f$select * from public.program_policy_signers(%L)$f$, :'prog1'), '%PROGRAM_NOT_FOUND%');
+reset role;
+update public.program_policies set archived_at = now() where title = 'Other Policy';
+set role authenticated;
+select set_config('request.jwt.claim.sub', :'dana', false);
+select test.check('...nor read a policy that is taken off',
+  (select count(*) from public.program_policies where title = 'Other Policy'), 0::bigint);
+select test.check('...nor its pages', (select count(*) from public.program_policy_files where path like '%/o.pdf'), 0::bigint);
+select set_config('request.jwt.claim.sub', :'boss', false);
+select test.check('a super admin still reads it', (select count(*) from public.program_policies where title = 'Other Policy'), 1::bigint);
+
+-- The merge desk's small fixes.
+reset role;
+update public.profiles set access_status = 'limited' where id = :'lead1';
+set role authenticated;
+select set_config('request.jwt.claim.sub', :'lead1', false);
+select test.check_raises_like('a limited lead cannot take a policy off',
+  format($f$select public.archive_policy(%L)$f$, (select id from public.program_policies where title = 'Who Policy')), '%ACCOUNT_NOT_ACTIVE%');
+select test.check('reminder_is_quiet pins its search path',
+  (select count(*) from pg_proc where proname = 'reminder_is_quiet' and coalesce(proconfig::text, '') like '%search_path%'), 1::bigint);
 
 reset role;
 set role anon;

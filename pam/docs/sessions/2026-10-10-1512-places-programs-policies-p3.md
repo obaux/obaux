@@ -25,3 +25,7 @@ P4, only for this service. The verified tick shows only for real people the prog
 ## Needs a human
 
 Mira: apply `20261010150922` after P2's.
+
+## Rework after the merge desk held it (15:25)
+
+`program_policy_signers` let in `is_admin()`, which on live includes case managers (0082: they reach assigned members only). Now the program's own lead or `is_super_admin()`; a case manager, even one covering a signer, gets PROGRAM_NOT_FOUND (test 47). Also: `program_policies_select_admin` and `can_read_policy_file` use `is_super_admin()` (case managers still read current policies of live programs like anyone signed in, not archived or not-yet-live ones); `archive_policy` checks `is_active_account()`; `add_policy` leaves `p_replaces` out of the 30 cap; `reminder_is_quiet` pins its search path. All create or replace / alter, no DROP.
