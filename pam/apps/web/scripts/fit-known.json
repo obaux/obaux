@@ -482,5 +482,29 @@
   {
     "key": "zh-CN|overlap|case-manager-screens--conversation-files|The way in is round the side ⟷ 您",
     "reason": "The Shared things list keeps a title to one line and, when it is cut, slides it sideways to show its end (MarqueeText, Will's D-407). With reduced motion, which the audit uses, it stays cut with an ellipsis. The 'spill' and 'overlap' are the clipped rest of that line. Looked at 9 October 2026 at 320px with screenshots. Found by the first run on GitHub (its fonts make the right-hand column a little wider than in the sandbox where the baseline was made)."
+  },
+  {
+    "key": "zh-HK|ellipsis|member-created--conversation-files|ID office letter.pdf",
+    "reason": "Looked at 10 October 2026 at 320px with screenshots. The file name reads in full in the screenshot, although the name's ellipsis box measures 4px narrower than its text (148 > 144); no letter is lost. Worth another look if the row's layout changes."
+  },
+  {
+    "key": "pt-BR|overlap|member-created-states-limited-account--conversation|Gestor de casos ⟷ Abre no Google",
+    "reason": "Looked at 10 October 2026 at 320px with screenshots. The thread is scrolled to its end, so the first line of an earlier message sits under the opaque header; the detector sees that line's box cover the header's title or subtitle. Nothing is drawn over anything, and the message is reached by scrolling."
+  },
+  {
+    "key": "zh-CN|overlap|member-created-states-limited-account--conversation|Teresa ⟷ And the class schedule: http",
+    "reason": "Looked at 10 October 2026 at 320px with screenshots. The thread is scrolled to its end, so the first line of an earlier message sits under the opaque header; the detector sees that line's box cover the header's title or subtitle. Nothing is drawn over anything, and the message is reached by scrolling."
+  },
+  {
+    "key": "ar|overlap|member-created-states-limited-account--conversation|Teresa ⟷ And the class schedule: http",
+    "reason": "Looked at 10 October 2026 at 320px with screenshots. The thread is scrolled to its end, so the first line of an earlier message sits under the opaque header; the detector sees that line's box cover the header's title or subtitle. Nothing is drawn over anything, and the message is reached by scrolling."
+  },
+  {
+    "key": "zh-HK|ellipsis|case-manager-screens--conversation-files|ID office letter.pdf",
+    "reason": "Looked at 10 October 2026 at 320px with screenshots. The file name reads in full in the screenshot, although the name's ellipsis box measures 4px narrower than its text (148 > 144); no letter is lost. Worth another look if the row's layout changes."
+  },
+  {
+    "key": "ar|ellipsis|components-inputs-areachip--long-address|1231 N Broad St, North Philadelphia",
+    "reason": "Looked at 10 October 2026 at 320px with screenshots. The address is its own box (D-435) and ends in its own ellipsis, as the English one does; the words keep their width and the pencil stays. The English baseline's box is a different element, so the key differs."
   }
 ]
