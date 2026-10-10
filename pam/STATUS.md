@@ -928,16 +928,12 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
-## Languages & legal · the privacy page names the company that sends email (10 October) — merged 10 October
+## Languages & legal · the privacy page on email and signatures (10 October) — on `claude/lena-privacy-three-sentences`, not merged
 
-Merged by the merge desk from 82160e9. The two gaps below are on Will's card a29 with a third sentence (signatures, policies P2); the merge desk decided a member's address is deleted once the link is sent (Nico building).
-
-Will approved a21 (10 October 14:37 UTC): "When Pam emails a case manager or a program, a company that sends email for us gets the email address and the email.
-It may not use them for anything else." It is `privacy.s.sharing.p4`, word for word, the last paragraph of "Who else gets your information", in all seven
-languages (six by Claude, no native reader), pinned by `test/legal.test.ts` (D-482). **It must be on the live page before the first email goes out.**
-Two things it does not cover are with Will: the expired-link email also goes to a **member** (so the sentence should say "When Pam sends an email…"), and
-`privacy.s.what-we-keep.p7` still says "Members are never asked for an email", which the expired-link page makes untrue. Proposed English for both is in D-482;
-nothing was widened without him.
+Will approved card a29 (10 October 15:15 UTC), three sentences word for word, pinned in `test/legal.test.ts` (D-490): `privacy.s.sharing.p4` now says a company that sends email for us gets the address
+and the email whenever **Pam sends an email** (it said "a case manager or a program"); the end of `privacy.s.what-we-keep.p7` says a member is asked for an email only if their invite link has run
+out, and that it is deleted once the link is sent (D-487); new `privacy.s.what-we-keep.p8`: when a program asks you to sign its rules, Pam keeps what you signed, the date and your signature,
+only you see the signature, the program sees your first name and the date. Six translations each, no native reader. **Must be on the live page before the first email goes out** and before tonight's deploy.
 
 ## Languages & legal · Spanish says "visita", not "viaje" (10 October) — merged 10 October
 

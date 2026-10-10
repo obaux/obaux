@@ -83,7 +83,7 @@ export const RULES: Readonly<Record<AboutLang, RulesText>> = {
     sections: [
       {
         title: 'Qué es una política',
-        paras: ['Una política son las reglas de un programa. Por ejemplo: “Traiga identificación”. Un programa puede tener una política o varias. Usted lee cada una antes de firmarla.'],
+        paras: ['Una política es el conjunto de reglas de un programa. Por ejemplo: “Traiga identificación”. Un programa puede tener una política o varias. Usted lee cada una antes de firmarla.'],
       },
       {
         title: 'Cómo se firma',
@@ -125,7 +125,7 @@ export const RULES: Readonly<Record<AboutLang, RulesText>> = {
     sections: [
       {
         title: 'O que é uma política',
-        paras: ['Uma política são as regras de um programa. Por exemplo: “Traga um documento de identidade”. Um programa pode ter uma política ou várias. Você lê cada uma antes de assiná-la.'],
+        paras: ['Uma política é o conjunto de regras de um programa. Por exemplo: “Traga um documento de identidade”. Um programa pode ter uma política ou várias. Você lê cada uma antes de assiná-la.'],
       },
       {
         title: 'Como assinar',
@@ -141,7 +141,7 @@ export const RULES: Readonly<Record<AboutLang, RulesText>> = {
         paras: ['Você pode planejar uma visita antes de assinar qualquer coisa. Assinar é para antes de ir, e nunca impede você de agendar.'],
       },
       {
-        title: 'O que um programa enxerga',
+        title: 'O que um programa vê',
         paras: ['Um programa vê o seu primeiro nome e a data em que você assinou. Nunca vê a imagem da sua assinatura.'],
       },
       {
@@ -155,7 +155,7 @@ export const RULES: Readonly<Record<AboutLang, RulesText>> = {
       {
         title: 'Para programas',
         paras: [
-          'Adicione as suas políticas no seu programa, em “Políticas para participantes”. Os membros as leem e assinam na Pam. De cada pessoa, você vê o primeiro nome e a data em que assinou. Você nunca vê a assinatura. Se você escrever uma versão nova, os membros são convidados a assinar de novo.',
+          'Adicione as suas políticas no seu programa, em “Políticas para participantes”. Os membros as leem e assinam na Pam. De cada pessoa, você vê o primeiro nome e a data em que assinou. Você nunca vê a assinatura. Se você escrever uma versão nova, os membros são solicitados a assinar de novo.',
         ],
       },
     ],
@@ -196,7 +196,7 @@ export const RULES: Readonly<Record<AboutLang, RulesText>> = {
       },
       {
         title: '给项目',
-        paras: ['请在您的项目里的“参与者规定”下添加规定。成员在 Pam 里阅读并签署。对每个人，您能看到他们的名字和签署日期，看不到他们的签名。如果您写了新版本，成员会被请求重新签署。'],
+        paras: ['请在您的项目里的“参与者规定”下添加规定。成员在 Pam 里阅读并签署。对每个人，您能看到他们的名字和签署日期，看不到他们的签名。如果您写了新版本，成员会被要求重新签署。'],
       },
     ],
   },
@@ -236,7 +236,7 @@ export const RULES: Readonly<Record<AboutLang, RulesText>> = {
       },
       {
         title: '給計劃',
-        paras: ['請在您的計劃裡的「參加者守則」下新增守則。成員在 Pam 裡閱讀並簽署。對每個人，您能看到他們的名字和簽署日期，看不到他們的簽名。如果您寫了新版本，成員會被請求重新簽署。'],
+        paras: ['請在您的計劃裡的「參加者守則」下新增守則。成員在 Pam 裡閱讀並簽署。對每個人，您能看到他們的名字和簽署日期，看不到他們的簽名。如果您寫了新版本，成員會被要求重新簽署。'],
       },
     ],
   },
