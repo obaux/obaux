@@ -25,6 +25,8 @@ export function LanguageSwitcher({
   readonly languages?: readonly AboutLang[];
   readonly hrefFor?: (lang: AboutLang) => string;
 }) {
+  // One language is nothing to switch between.
+  if (languages.length < 2) return null;
   return (
     <nav aria-label={ABOUT[current].switcherLabel} lang={current} dir={ABOUT[current].dir}>
       <HStack as="ul" gap={2} xstyle={styles.list}>

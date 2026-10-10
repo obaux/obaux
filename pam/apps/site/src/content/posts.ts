@@ -1,4 +1,5 @@
 import type { TopicId } from './topics';
+import { RULES_SLUG, isRulesSigned } from './rules';
 
 /** The support posts, newest first. Each has a page of its own at /support/<slug>/. */
 export interface SupportPost {
@@ -40,6 +41,17 @@ const ALL: readonly SupportPost[] = [
     summary: 'The few texts Pam sends today, the rules for them, and what to do when one does not come.',
     updated: '2026-10-10',
     keywords: ['text', 'sms', 'code', 'sign in', 'reminder', 'stop', 'quiet hours', 'not now', 'did not come', 'no text'],
+  },
+  {
+    slug: RULES_SLUG,
+    topic: 'members',
+    audience: 'members and programs',
+    title: 'Signing a program’s rules',
+    summary: 'What a program’s policy is, how you read and sign it in Pam, and what the program sees.',
+    updated: '2026-10-10',
+    keywords: ['policy', 'policies', 'rules', 'sign', 'signature', 'signing', 'bring id', 'program', 'before a visit', 'draw', 'type my name'],
+    // Held until the signing screens are really in the app AND Will signs the English (signed-off.json).
+    ...(isRulesSigned('en') ? {} : { status: 'draft' as const }),
   },
   {
     slug: 'planning-a-visit',

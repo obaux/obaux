@@ -1409,15 +1409,17 @@ phone and 320px: 70 scans, 0 problems on 10 October); screenshots from `scripts/
 user-flow map: it is not a screen of the app. Session logs: `docs/sessions/2026-10-09-a-public-website.md`,
 `2026-10-10-0423-…`, `2026-10-10-0631-…`, `2026-10-10-0807-website-help-posts.md`.
 
-**About Pam, in seven languages (D-466, 10 October; on `main`, held until Will signs).** One post at
+**About Pam, in seven languages (D-466, 10 October; English signed, D-483).** One post at
 `/<lang>/about-pam/` in English, Spanish, Brazilian Portuguese, Simplified and Traditional (Hong Kong)
 Chinese, Russian and Arabic: own `<html lang>` (Arabic `dir="rtl"`), a language list, `hreflang`,
 `x-default` English; not under a Support topic; one wordless illustration (header + 1200×630 share
-image, alt text in all seven; `social/about-art.mjs`); and a section on the home page. **Nothing is
-live until Will signs the English**: `apps/site/src/content/signed-off.json` is empty, so the pages
-and the home section are not built (a normal build has neither; CI also builds with
-`PAM_SITE_DRAFTS=1` and runs axe on all seven). The other six are drafts with no native reader (D-461).
+image, alt text in all seven; `social/about-art.mjs`); and a section on the home page. **Will signed the
+English on 10 October 2026, after the "human-touch company" line was taken out ("human-touch" is an internal
+principle, never public copy; D-483)**: `/en/about-pam/` and the home section are live with the deploy
+(`apps/site/src/content/signed-off.json` has `"en"`). The other six are drafts with no native reader (D-461),
+built only in a preview (`PAM_SITE_DRAFTS=1`; CI runs axe on all seven).
 Storybook › Website › Journey: **About Pam** per language (Draft banner) and **Home with About Pam**.
+**Signing a program's rules (10 October, draft, not live).** A post for members and programs in seven languages (English: Support post `signing-a-programs-rules`; the other six at `/<lang>/program-rules/`); says only what Pam will do once Piper's signing screens ship. Hidden until `program-rules-live` and the language are set in `signed-off.json`; Storybook › Website › Journey › Program rules ×7. One sentence ("What your signature means") goes to a lawyer before launch.
 Reminder texts are plainly "coming"; the home card "Keep going" now says the same and reads `VISIT_REMINDERS_LIVE` (`content/flags.ts`, 10 October).
 
 ## Seven languages, messages in your own language, and text that fits (9 October) — 0.50.1 and 0.51.0, merged 9 October (PR #29)
