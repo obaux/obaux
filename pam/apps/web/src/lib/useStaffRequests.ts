@@ -121,22 +121,48 @@ export function useStaffRequests(enabled: boolean): {
   return { state, refresh };
 }
 
-/** Approves or denies one request. Region only matters (and is required) on approval. */
+/** Why a decision did not go through, in the terms the screen explains (D-491). */
+export type ReviewFailure = 'pair' | 'city' | 'decided' | 'gone' | 'other';
+
+export type ReviewResult =
+  | { readonly ok: true; readonly addedToExisting: boolean }
+  | { readonly ok: false; readonly reason: ReviewFailure };
+
+function failureOf(message: string): ReviewFailure {
+  if (message.includes('ROLE_PAIR_NOT_ALLOWED')) return 'pair';
+  if (message.includes('ACCOUNT_IN_OTHER_CITY')) return 'city';
+  if (message.includes('REQUEST_ALREADY_DECIDED')) return 'decided';
+  if (message.includes('REQUEST_NOT_FOUND')) return 'gone';
+  return 'other';
+}
+
+/**
+ * Approves or denies one request. Region only matters (and is required) on
+ * approval. An approval for somebody who already has an account (a member who
+ * asked to lead a program while the request waited) adds the role to it; the
+ * result says so, so the screen can tell the super admin what happened.
+ */
 export async function reviewStaffRequest(
   userId: string,
   decision: 'approved' | 'denied',
   regionId?: string,
-): Promise<boolean> {
+): Promise<ReviewResult> {
   try {
     const { createClient } = await import('./supabase');
-    const { error } = await createClient().rpc('review_staff_request', {
+    const supabase = createClient();
+    const { error } = await supabase.rpc('review_staff_request', {
       p_user_id: userId,
       p_decision: decision,
       ...(regionId ? { p_region_id: regionId } : {}),
     });
-    return !error;
+    if (error) return { ok: false, reason: failureOf(error.message ?? '') };
+    if (decision === 'denied') return { ok: true, addedToExisting: false };
+    // A super admin reads any account's roles: member and provider together means the role was added to an account that existed.
+    const { data } = await supabase.from('profile_roles').select('role').eq('profile_id', userId);
+    const roles = Array.isArray(data) ? data.map((r) => (r as { role?: string }).role) : [];
+    return { ok: true, addedToExisting: roles.includes('member') && roles.includes('provider') };
   } catch {
-    return false;
+    return { ok: false, reason: 'other' };
   }
 }
 

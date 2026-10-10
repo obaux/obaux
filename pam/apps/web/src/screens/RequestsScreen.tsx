@@ -151,7 +151,7 @@ export function RequestsScreen({ isHome = false }: { readonly isHome?: boolean }
             id: row.userId,
             label: [row.firstName, row.lastName].filter(Boolean).join(' ') || t('invite.expired.someone'),
             description: [
-              t('requests.wants', { role: t(`role.${row.wantsRole}`) }),
+              t(`requests.wants.${row.wantsRole}`),
               ...(row.city ? [t('requests.city', { city: row.city })] : []),
               t('requests.requestedOn', { when: requestedWhen(row.createdAt, locale) }),
             ].join(' · '),

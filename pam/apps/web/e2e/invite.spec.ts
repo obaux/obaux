@@ -178,6 +178,8 @@ test.describe('who may be staff, one request to a page (D-444)', () => {
   test('a row opens the request; the decision is pinned to the foot and carries the city', async ({ page }) => {
     await signedInAs(page, 'super_admin', CITIES);
     await page.route(STAFF_REQUESTS, (route) => route.fulfill(json([REQUEST])));
+    // After an approval the screen reads the account's roles (D-491); a new account holds only the one.
+    await page.route('**/rest/v1/profile_roles*', (route) => route.fulfill(json([{ role: 'provider' }])));
     const decided: Record<string, unknown>[] = [];
     await page.route(REVIEW, async (route) => {
       decided.push(route.request().postDataJSON() as Record<string, unknown>);

@@ -1870,3 +1870,7 @@ undone: `0052_saved_places_say_what_they_are.sql` had not reached the
 live project (it went live on 20 September — "What needs a human" row 24), and the live RLS fingerprint has not been re-verified since
 either session's migrations deployed — see the drift note under "What is
 live" and the "Live RLS fingerprint" row under "What is proven."
+
+## Places & programs · approving a request from someone who is already a member (10 October 2026) — READY, not merged
+
+Branch `claude/places-programs-approve-existing-member` (D-491). Migration `20261010160818`: `review_staff_request` adds the provider role to an existing member's account (city kept; `ROLE_PAIR_NOT_ALLOWED` / `ACCOUNT_IN_OTHER_CITY` otherwise). The staff screen says what happened or why not, never "Call Pam". Test `50_approving_a_staff_request_for_an_existing_member_test.sql`; e2e `staff-request-approve.spec.ts`.
