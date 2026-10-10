@@ -61,6 +61,16 @@ New support posts: add an entry to `apps/site/src/content/posts.ts` and a body
 component beside `CaseManagerAssignments.tsx`, then register it in
 `apps/site/src/app/support/[slug]/page.tsx`.
 
+**joinpam.org (10 October).** Pam's domain: the site is `joinpam.org` (`www` redirects to
+it), the app is `app.joinpam.org`, email sends from `mail.joinpam.org`. The site's
+`vercel.json` forwards invite links `joinpam.org/j/<CODE>` (and with a trailing slash) to
+`https://app.joinpam.org/j/<CODE>` with a temporary redirect; `apps/site/test/redirects.test.ts`
+checks the rules, since a local build does not apply them. `NEXT_PUBLIC_SITE_URL` defaults to
+`https://joinpam.org` (the share preview's absolute address) and `NEXT_PUBLIC_APP_URL` to
+`https://app.joinpam.org`; set either at build time to point a preview elsewhere. Unverified
+from here: whether Vercel passes a query string through the invite redirect.
+CI builds the site and runs `apps/site/scripts/a11y.mjs` on it (axe, light/dark, desktop/phone/320px).
+
 ## What this does not cover
 
 Store submission. Capacitor wraps this same build; `cap add ios` and
