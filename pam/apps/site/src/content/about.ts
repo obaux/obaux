@@ -82,7 +82,7 @@ export const ABOUT: Readonly<Record<AboutLang, AboutText>> = {
     todayTitle: 'Lo que Pam hace hoy',
     today: [
       { title: 'Encontrar un lugar', body: 'Vea lo que su ciudad le ofrece: aprendizaje, empleo y apoyo familiar.' },
-      { title: 'Planear una visita', body: 'Guarde un viaje para encontrarlo fácilmente después.' },
+      { title: 'Planear una visita', body: 'Guarde una visita para encontrarla fácilmente después.' },
       { title: 'Hablar con una persona', body: 'Escríbale a su gestor de casos o a su programa desde la app.' },
     ],
     comingTitle: 'Lo que viene',
