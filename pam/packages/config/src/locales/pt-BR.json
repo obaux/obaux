@@ -1240,7 +1240,7 @@
   "policy.file.open": "Abrir",
   "policy.file.open.named": "Abrir {name}",
   "policy.replace.title": "Substituir esta política",
-  "policy.replace.hint": "Uma política não é editada depois que as pessoas podem assiná-la. Adicione a nova versão e ela toma o lugar desta: as pessoas serão convidadas a assiná-la de novo, e o que assinaram antes continua registrado.",
+  "policy.replace.hint": "Uma política não é editada depois que as pessoas podem assiná-la. Adicione a nova versão e ela toma o lugar desta: será pedido às pessoas que a assinem de novo, e o que assinaram antes continua registrado.",
   "policy.replace.label": "Escolha a nova versão",
   "policies.upload.button": "Escolher arquivos",
   "policies.list": "Suas políticas",
