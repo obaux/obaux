@@ -55,6 +55,9 @@ sale and has its own stack, database and CI.
 
 **If you are working in `pam/`, read `pam/CLAUDE.md` first.** It carries that
 project's rules, several of which are enforced by tests rather than convention.
+Pam is built by a team of sessions, one per lane, run by the merge desk
+(`session_018wn7LF7RMsHnXSAzvk6s1p`); how they work together and report to it is
+`pam/docs/team.md`.
 
 Two conventions there matter before you touch anything:
 
