@@ -183,6 +183,14 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
         role: (body as { p_role?: string } | null)?.p_role ?? 'member',
       },
     })),
+    // A case manager or a program lead is invited with an email (0086, D-435).
+    on('/rpc/create_staff_invite', (_url, _method, body) => ({
+      body: {
+        code: 'PAM-7Q4K',
+        expires_at: new Date(Date.now() + 7 * 86_400_000).toISOString(),
+        role: (body as { p_role?: string } | null)?.p_role ?? 'provider',
+      },
+    })),
     // Nobody is waiting on an invite in a story (0077); sign-in goes on as usual.
     on('/rpc/pending_invite_for_me', () => ({ body: [] })),
     // One account, two roles (0078): a story never really switches.

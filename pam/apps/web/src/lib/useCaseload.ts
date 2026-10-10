@@ -182,19 +182,33 @@ export interface CreatedInvite {
  */
 export async function createInvite(
   role: 'member' | 'provider' | 'admin',
-  /** Who it is for — both required (0077, D-373). */
-  who: { readonly firstName: string; readonly phone: string },
+  /** Who it is for — name and phone required (0077, D-373); staff also an email (0086, D-435). */
+  who: { readonly firstName: string; readonly phone: string; readonly email?: string },
   /** Which city, when the caller has none of their own — a super admin (0049). */
   regionId?: string,
 ): Promise<CreatedInvite | null> {
   try {
     const { createClient } = await import('./supabase');
-    const { data, error } = await createClient().rpc('create_invite', {
-      p_role: role,
-      p_first_name: who.firstName,
-      p_phone: who.phone,
-      ...(regionId ? { p_region_id: regionId } : {}),
-    });
+    const supabase = createClient();
+    const where = regionId ? { p_region_id: regionId } : {};
+    // A case manager or a program lead is invited with an email, through its own
+    // door (0086): the database refuses a staff invite without one, and a member
+    // invite with one. A member's never carries it.
+    const { data, error } =
+      role === 'member'
+        ? await supabase.rpc('create_invite', {
+            p_role: role,
+            p_first_name: who.firstName,
+            p_phone: who.phone,
+            ...where,
+          })
+        : await supabase.rpc('create_staff_invite', {
+            p_role: role,
+            p_email: who.email ?? '',
+            p_first_name: who.firstName,
+            p_phone: who.phone,
+            ...where,
+          });
     if (error || !data) return null;
 
     const invite = (Array.isArray(data) ? data[0] : data) as {

@@ -7,6 +7,7 @@ import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { BigButton, TextField, TextLink } from '@pam/ui';
 import { useI18n } from '@/lib/i18n';
+import { isEmailAddress } from '@/lib/useInviteLinks';
 
 /**
  * Who an invite is for (D-373, Will, 7 October: "required phone number and
@@ -15,12 +16,20 @@ import { useI18n } from '@/lib/i18n';
  * open the link — and the only number that can use it; the name is how
  * joining greets them.
  *
+ * **Staff also need an email** (D-435, Will, 10 October: "Not optional for
+ * staff"). A case manager or a program lead is asked for the address Pam will
+ * write to; it lands on their account when they sign in with this number. A
+ * member is never asked: not everyone has an email, and nobody should be turned
+ * away for lacking one.
+ *
  * Used wherever an invite is made: Invite someone, the case manager's admin
  * screen, the directory. No card (D-369); the kind of invite is the heading.
  */
 export interface InviteWho {
   readonly firstName: string;
   readonly phone: string;
+  /** Staff invites only; required for them. */
+  readonly email?: string;
 }
 
 const styles = stylex.create({
@@ -44,9 +53,20 @@ export function InviteForWho({
   const { t } = useI18n();
   const [firstName, setFirstName] = useState('');
   const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
   const [tried, setTried] = useState(false);
   const digits = phone.replace(/\D/g, '');
-  const missing = firstName.trim() === '' ? 'name' : digits.length < 10 ? 'phone' : null;
+  const staff = role !== 'member';
+  const missing =
+    firstName.trim() === ''
+      ? 'name'
+      : digits.length < 10
+        ? 'phone'
+        : staff && email.trim() === ''
+          ? 'email'
+          : staff && !isEmailAddress(email.trim())
+            ? 'emailInvalid'
+            : null;
 
   return (
     <VStack gap={4}>
@@ -72,6 +92,22 @@ export function InviteForWho({
         width="100%"
         xstyle={styles.field}
       />
+      {staff ? (
+        <>
+          <TextField
+            // Their address, not yours: no autofill of the inviter's own.
+            purpose="theirEmail"
+            label={t('invite.who.email')}
+            value={email}
+            onChange={setEmail}
+            width="100%"
+            xstyle={styles.field}
+          />
+          <Text type="supporting" xstyle={styles.note}>
+            {t('invite.who.emailNote')}
+          </Text>
+        </>
+      ) : null}
       <Text type="supporting" xstyle={styles.note}>
         {t('invite.who.note')}
       </Text>
@@ -86,7 +122,7 @@ export function InviteForWho({
         onPress={() => {
           setTried(true);
           if (missing) return;
-          onSubmit({ firstName: firstName.trim(), phone: phone.trim() });
+          onSubmit({ firstName: firstName.trim(), phone: phone.trim(), ...(staff ? { email: email.trim() } : {}) });
         }}
       />
       <TextLink label={t('invite.who.back')} onClick={onCancel} />
