@@ -1,32 +1,23 @@
 'use client';
 
 import * as stylex from '@stylexjs/stylex';
-import { List } from '@astryxdesign/core/List';
 import { VStack } from '@astryxdesign/core/VStack';
 import { Text } from '@astryxdesign/core/Text';
 import {
   DUMMY_REPORTS,
-  dummyConversationsFor,
   dummyPickerFor,
   type DummyMessagingRole,
 } from '@pam/config/dummy-conversations';
 import { DUMMY_ANYONE, type DummyPerson } from '@pam/config/dummy-people';
 import type { Role } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
-import { whenHappened } from '@/lib/when';
-import { ConversationRow } from './ConversationRow';
 import { ReportsList } from './ReportsList';
 import type { PickablePerson } from './NewMessagePicker';
 
 /**
- * Example conversations, example reports and the example picker — what
- * `/messages/` shows a super admin previewing a role, or a real account
- * whose own real list is genuinely empty (D-172, D-183, D-184, D-186).
- *
- * Every row here opens an example thread and only an example thread:
- * `/messages/thread/?id=dummy-conv-…`, answered from `DUMMY_THREADS` plus a
- * session-only store — never `useThread`, never a real insert (D-180). The
- * rows are the same `ConversationRow` the real list uses.
+ * Example reports, the example picker and the context lines — what
+ * `/messages/` shows a super admin previewing a role (D-184, D-186). The example
+ * conversations themselves come from `MessagesScreen`.
  *
  * Loaded only through `DummyRowsLazy` (`next/dynamic`).
  */
@@ -70,46 +61,6 @@ export function pickerContextFor(
 ): string {
   if (other.role === 'provider' && other.programName) return `${t('role.provider')} · ${other.programName}`;
   return t(`role.${other.role}`);
-}
-
-function dummyContext(viewer: Role, other: DummyPerson | null, t: (key: string) => string): string | null {
-  return contextFor(viewer, other ? { role: other.role, programName: other.orgName ?? null } : null, t);
-}
-
-export function DummyConversations({ role }: { readonly role: DummyMessagingRole }) {
-  const { t, locale } = useI18n();
-  const rows = dummyConversationsFor(role);
-
-  return (
-    <VStack gap={2}>
-      <List hasDividers density="spacious">
-        {rows.map((c) => {
-          const other = person(c.otherId);
-          return (
-            <ConversationRow
-              key={c.id}
-              name={other?.firstName ?? t('messages.thread.someone')}
-              context={dummyContext(role, other, t)}
-              preview={
-                c.preview === null
-                  ? t('messages.preview.none')
-                  : c.preview.mine
-                    ? t('messages.preview.you', { text: c.preview.body })
-                    : c.preview.body
-              }
-              when={c.lastMessageAt ? whenHappened(c.lastMessageAt, locale, t) : null}
-              unread={c.unread}
-              unreadLabel={t('notify.new')}
-              href={`/messages/thread/?id=${encodeURIComponent(c.id)}`}
-            />
-          );
-        })}
-      </List>
-      <Text type="supporting" xstyle={styles.note}>
-        {t('example.people.note')}
-      </Text>
-    </VStack>
-  );
 }
 
 /** Reported messages, for a case manager or super admin preview (D-184). */

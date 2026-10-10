@@ -1073,6 +1073,13 @@ drops signatures), then `20261010042108_a_program_lead_submits_their_own_program
 
 ---
 
+## Messages & notifications · legacy Messages page removed (10 October 2026)
+
+Merged to `main` by the merge desk, 10 October, from `claude/messages-remove-legacy` (5c3d6f1); live with the next deploy. Case managers and super admins now get the redesigned Messages
+screen with "Conversations | Reported"; `LegacyMessagesPage` and the old example-conversation half of
+`DummyRows` are deleted. `?show=reported` still works; every reported-message test kept and moved to the
+new switch. No database change. messages.spec passes on all three projects (174). D-469.
+
 ## Messages & notifications · Will's sign-off (10 October 2026)
 
 Merged to `main` by the merge desk, 10 October (no migration). Will approved the four Text alerts texts and the staff
@@ -1135,6 +1142,10 @@ YES/NO replies are not built. D-460.
 ## Places & programs · reported places screen (10 October 2026) — merged 10 October
 
 Merged to `main` by the merge desk, 10 October, from `claude/places-programs-reported-places` (dca16c6). A page at `/places/reported/` for admins and case managers, linked from the profile and the reported-place bell row. Only a super admin can keep or remove; case managers read. No database change. Shared files touched: `ProfileView.tsx`, `app/notifications/page.tsx`, `ReportedPlaces.tsx` (buttons only when allowed). Figma flow map not republished.
+
+## Places & programs · planning a trip earns points (10 October 2026) — merged 10 October
+
+Merged to `main` by the merge desk, 10 October, from `claude/places-programs-trip-points` (D-468). Migration `20261010115117` replaces `book_trip` (same signature): 25 points once per place ever, three a day, members only. Expand only; **applied live at merge**, read back (body identical to the file, grants unchanged). Test `32_plan_a_trip_points_test.sql`. The Points screen lists it as "Plan a trip to a place". Next: `program_service_id` (contract), then `log_call`.
 
 ## Places & programs · the Points promise (10 October 2026) — merged 10 October
 

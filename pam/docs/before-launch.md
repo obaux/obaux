@@ -29,22 +29,26 @@ STATUS row too.
   who reads it has been over it. The home card that promised reminders is fixed (10 October, it now reads `VISIT_REMINDERS_LIVE`).
   When visit reminders go live, flip `VISIT_REMINDERS_LIVE` in `TextsFromPam.tsx` and rewrite
   the "What is coming" paragraph in all seven.
-- [ ] **Public site: what the help posts need when visit reminders and Dot's new app layout go
-  live** (10 October 2026, a list only; nothing rewritten yet). *Reminders* — the day
-  `dispatch-sms` really sends the day-before reminder, flip `VISIT_REMINDERS_LIVE` in
-  `apps/site/src/content/flags.ts` (one line; it now drives the "Texts from Pam" table and
-  steps **and** the home page's "Keep going" card), then by hand: the "What is coming" paragraph in
-  all seven languages of About Pam (`about.ts`; the other six need a native reader again), the
-  "Joining Pam" step that offers "Yes, text me reminders" / "Not now" (check the wording and that it
-  is still the choice), the "Texts from Pam" screenshots `reminders.png` and `texts-off.png`, and the
-  limits in that post (quiet hours, 134 characters for appointment reminders, D-431). *The new app
-  layout* — every post that says "Tap Profile", "Home", "the Messages tab" or "Invite someone" in a
-  numbered step: Who is my guide, Joining as staff / Pam, One phone two sides, Sending an invite,
-  Messages in Pam, Points and badges, Staff requests (draft), Texts from Pam. Re-take the screenshots
-  in `public/help/*/` (`node apps/site/scripts/screenshots.mjs`): sign-in, about-you, add-your-program,
-  use-as, invite, invite-form, messages, conversation, report, points, what-others-can-see,
-  reminders, texts-off. Re-check the "Pam words" post for any renamed screen. When the layout
-  merges, grep `apps/site/src` for "Tap " and "tab" and walk each step on the new build.
+- [ ] **Public site: help posts after Dot's new app layout (D-456) and visit reminders** (10 October 2026).
+  *Layout, done 10 October* on a branch from main `522c808`, for the layout that goes live with that night's
+  deploy: Who is my guide and What others can see are reached from Profile → **Legal** → "What others can
+  see" (was Profile → "What others can see"); Points from the **badge tile** on Profile (was "your points");
+  One phone, two sides opens **Explore** (Me) or **Home** (My program); Messages: "New message" is the button
+  at the top right, **More options** opens an **Options** screen (new picture), new messages show on the bell
+  and a **dot on the Messages tab** (staff also see the number on their Home); Texts from Pam: Profile has a
+  "Text reminders" row once you said yes, or a **"Get text reminders"** card if not (staff: "Get text
+  alerts"); Points: the "Ways to earn" list now shows only the two real ways; the About-you picture shows the
+  language choice. Case managers and program leads keep the OLD Home (Dot, card a22), so their Home steps are
+  unchanged. *Still to do when they land:* when the staff Homes change (rings), the steps that say "Home"
+  for case managers and program leads (Joining as staff, Sending an invite, One phone two sides, Messages,
+  Texts) and `reminders`-adjacent screenshots; when a deploy actually carries a given screen, check it is
+  there. *Block* (D-463, "Block this person" in Options) is not in any post yet; add a short section when
+  it is live. *Reminders:* the day `dispatch-sms` really sends the day-before reminder, flip
+  `VISIT_REMINDERS_LIVE` in `apps/site/src/content/flags.ts` (drives the Texts post and the home card); then
+  by hand: About Pam's "What is coming" in all seven languages (the other six need a native reader again),
+  the Joining Pam reminder choice, the Texts screenshots and limits (quiet hours, 134 characters, D-431).
+  Seen, not mine: the app's own onboarding slide still says "Pam reminds you before you go, so nothing gets
+  missed" (`onboarding.3`, all seven languages): Languages & legal / Lena's promise sweep.
 - [ ] **Public site: publish the draft post "Keeping your program's listing up to
   date" only when the feature ships** (from PAM · Places & programs, 10 October
   2026, rule D-447, branch `claude/places-programs-load-own-program`, not on

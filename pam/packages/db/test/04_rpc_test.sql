@@ -586,6 +586,13 @@ begin
   update public.profiles set phone = null            where id = nia;
 
   -- Marcus is available now; Tanya replied STOP; Nia has no number.
+  -- Marcus has also agreed to texts: since 20261010072848 a reminder is claimed
+  -- only for somebody who did. Without this the check below failed whenever it
+  -- ran outside quiet hours (07:00-21:00 New York), and passed only because
+  -- every run earlier on 10 October happened at night there.
+  insert into public.notification_preferences (member_id, sms_enabled)
+  values (marcus, true)
+  on conflict (member_id) do update set sms_enabled = true;
   insert into public.notification_preferences (member_id, sms_stopped_at)
   values (tanya, now())
   on conflict (member_id) do update set sms_stopped_at = now();
