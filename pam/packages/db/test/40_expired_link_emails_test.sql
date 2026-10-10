@@ -48,6 +48,7 @@ select public.request_invite_link(:'three_code', 'lead@example.org', 'xx');
 reset role;
 
 select id as any_email_id from public.invite_emails limit 1 \gset
+select id as mem_row from public.invite_emails where email = 'mem@example.org' \gset
 select test.check('three requests, three queued emails',
   (select count(*) from public.invite_emails where expired_invite in (:'one_id', :'mem_id', :'three_id')), 3);
 
@@ -108,13 +109,13 @@ select test.check('...counting its tries and keeping why it failed',
 set role service_role;
 select public.mark_invite_link_email_sent((select id from claimed where email = 'mem@example.org'));
 reset role;
-update public.invite_emails set claimed_at = now() - interval '1 hour' where email = 'mem@example.org';
+update public.invite_emails set claimed_at = now() - interval '1 hour' where id = :'mem_row';
 set role service_role;
 select test.check('a sent email is not claimed again, even after its claim goes stale',
-  (select count(*) from public.claim_invite_link_emails(10) where email = 'mem@example.org'), 0::bigint);
+  (select count(*) from public.claim_invite_link_emails(10) where id = :'mem_row'), 0::bigint);
 reset role;
-select test.check('...and records when it went',
-  (select count(*) from public.invite_emails where email = 'mem@example.org' and sent_at is not null and failure_reason is null), 1::bigint);
+select test.check('...and records when it went (its address is deleted once sent: test 48)',
+  (select count(*) from public.invite_emails where id = :'mem_row' and sent_at is not null and failure_reason is null and address_removed_at is not null), 1::bigint);
 
 -- A claim whose sender died comes back after fifteen minutes.
 update public.invite_emails set claimed_at = now() - interval '16 minutes' where email = 'lead@example.org';
@@ -133,39 +134,36 @@ select test.check('after five tries it is not tried again',
 \echo ''
 \echo '--- What is not worth sending is not sent ---'
 -- ===========================================================================
+-- (The sent one's address is gone, so it is out of this part; ivy and lead are still waiting.)
 reset role;
 update public.invite_emails set attempts = 0, claimed_at = null, sent_at = null
-  where email in ('ivy@example.org', 'mem@example.org', 'lead@example.org');
-
--- An old request: nobody should get "here is your new link" a week and a day later.
-update public.invite_emails set requested_at = now() - interval '8 days' where email = 'ivy@example.org';
-set role service_role;
-select test.check('a request more than seven days old is not sent',
-  (select count(*) from public.claim_invite_link_emails(10) where email = 'ivy@example.org'), 0::bigint);
-reset role;
-update public.invite_emails set requested_at = now() - interval '6 days', claimed_at = null where email = 'ivy@example.org';
-set role service_role;
-select test.check('...but one made six days ago still is',
-  (select count(*) from public.claim_invite_link_emails(10) where email = 'ivy@example.org'), 1::bigint);
-
--- The fresh link has itself run out, or been used.
-reset role;
-update public.invite_emails set claimed_at = null where email in ('ivy@example.org', 'mem@example.org', 'lead@example.org');
-update public.invites set status = 'revoked' where id = (select new_invite from public.invite_emails where email = 'mem@example.org');
-update public.invites set expires_at = now() - interval '1 minute' where id = (select new_invite from public.invite_emails where email = 'lead@example.org');
-set role service_role;
-select test.check('a fresh link withdrawn, or already expired, is not worth emailing',
-  (select count(*) from public.claim_invite_link_emails(10) where email in ('mem@example.org', 'lead@example.org')), 0::bigint);
+  where email in ('ivy@example.org', 'lead@example.org');
 
 -- A limit is a limit.
-reset role;
-update public.invites set status = 'pending', expires_at = now() + interval '30 days'
-  where id in (select new_invite from public.invite_emails where email in ('ivy@example.org', 'mem@example.org', 'lead@example.org'));
-update public.invite_emails set attempts = 0, claimed_at = null, sent_at = null, requested_at = now()
-  where email in ('ivy@example.org', 'mem@example.org', 'lead@example.org');
 set role service_role;
 select test.check('a batch is no bigger than asked for',
-  (select count(*) from public.claim_invite_link_emails(2)), 2::bigint);
+  (select count(*) from public.claim_invite_link_emails(1) where email in ('ivy@example.org', 'lead@example.org')), 1::bigint);
+reset role;
+update public.invite_emails set claimed_at = null where email in ('ivy@example.org', 'lead@example.org');
+
+-- A request made six days ago still goes; one made eight days ago does not.
+update public.invite_emails set requested_at = now() - interval '6 days' where email = 'ivy@example.org';
+set role service_role;
+select test.check('a request made six days ago is still sent',
+  (select count(*) from public.claim_invite_link_emails(10) where email = 'ivy@example.org'), 1::bigint);
+reset role;
+update public.invite_emails set requested_at = now() - interval '8 days', claimed_at = null where email = 'ivy@example.org';
+set role service_role;
+select test.check('...but one made more than seven days ago is not (and its address goes, test 48)',
+  (select count(*) from public.claim_invite_link_emails(10) where email = 'ivy@example.org'), 0::bigint);
+
+-- The fresh link has itself run out.
+reset role;
+update public.invite_emails set claimed_at = null where email = 'lead@example.org';
+update public.invites set expires_at = now() - interval '1 minute' where id = (select new_invite from public.invite_emails where email = 'lead@example.org');
+set role service_role;
+select test.check('a fresh link that has already run out is not worth emailing',
+  (select count(*) from public.claim_invite_link_emails(10) where email = 'lead@example.org'), 0::bigint);
 
 -- ===========================================================================
 \echo ''

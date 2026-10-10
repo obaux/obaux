@@ -1112,6 +1112,17 @@ drops signatures), then `20261010042108_a_program_lead_submits_their_own_program
 
 ---
 
+## Messages & notifications · the expired-link address is deleted (10 October 2026) — merged 10 October
+
+Merged by the merge desk from 7a9b1d9. Live: applied as 20261010152709; the four function bodies match the file by md5 (purge, mark sent, claim, invites_log), the check constraint is in, `purge-invite-email-addresses` runs at 03:40 nightly; purge, mark and claim are service-role only. `send-invite-emails` redeployed from main with the D-488 bundle (see below).
+
+Branch `claude/messages-member-address-deleted`. One migration (`20261010151208_…`, **not yet applied to the live
+project**, no DROP): the address typed on the expired-link page is removed as soon as the fresh link is sent, and when a
+request can no longer be sent (older than seven days, out of tries, fresh link used or run out). The row keeps that it was
+sent and when. The invites log shows no address for a removed one. Staff's own address is untouched. DB test 48. D-487.
+Also on this branch: the staff invite email's six other languages are unsigned again (they go out in English until a person
+signs them; Will approved only the English) and the sender's bundle is regenerated. **Redeploy `send-invite-emails`.** D-488.
+
 ## Messages & notifications · the clocks send the shared secret (10 October 2026) — merged 10 October
 
 Merged by the merge desk from 03d2338. Live: applied as 20261010145909; vault `dispatch_secret` made (64 hex, never read out); cron jobs 3 (`dispatch-sms`) and 4 (`send-invite-emails`) every five minutes with the header from the vault; 15:00 and 15:05 ticks: `dispatch-sms` 200 `{claimed:0,sent:0,failures:[]}`. `send-invite-emails` deployed from main as version 1 (verify_jwt on), answering `{enabled:false}` until Will sets the secrets (card a28).
@@ -1279,6 +1290,11 @@ Merged to `main` by the merge desk, 10 October, from `claude/places-programs-boo
 
 Merged to `main` by the merge desk, 10 October, from `claude/places-programs-lead-reads-review`. Migration `20261010135742` (`resend_program_submission`), expand only, **applied live at merge** (recorded as 20261010140904), read back: body identical to the file, for authenticated (checks inside for the program's own lead). With part 6 live too, "Ask for changes" is safe to use. Test `43_a_lead_sends_the_program_again_test.sql` (numbered 42 on its branch; Nico's alerts test took 42 first). Edit and send again resends the same submission; a program being checked is corrected through it. Land after part 6.
 
+## Places & programs · policies, part 3 of 4: a program sees who signed (10 October 2026) — READY, not merged (on top of part 2)
+
+Branch `claude/places-programs-policies-p3` (D-485). Migration `20261010150922`, expand only: `program_policy_signers` (first name and date, never the picture). The Signed tab and the verified tick read it. Test `47_a_program_reads_who_signed_by_first_name_and_test.sql`.
+
+## Places & programs · policies, part 2 of 4: members sign (10 October 2026) — READY, not merged (on top of part 1)
 ## Places & programs · policies, part 2 of 4: members sign (10 October 2026) — merged 10 October
 
 Merged by the merge desk from 10b3f0b. Live: applied as 20261010151152; read back: both tables RLS on and forced, own-row select only, `program_policies_select_signed`, `can_read_policy_file` / `sign_policy` / `forget_my_signature` match the file by md5, authenticated only, anon nothing. For P3: `archive_policy` checks `is_active_account()`, `add_policy` leaves `p_replaces` out of the 30 cap, pin `reminder_is_quiet`'s search_path (advisor).

@@ -136,7 +136,8 @@ describe('it sends nothing until a person has signed the words', () => {
     const shipped = bundleJson as unknown as Bundle;
     expect(shipped.locales.en.reviewedBy).toBe('Will, 10 October 2026');
     expect(shipped.locales.en.copy.button).toBe('Accept invite');
-    expect(shipped.locales.ru.reviewedBy).toContain('approved to learn from');
+    // The other six are not signed (D-488): the bundle the function ships sends them the English.
+    for (const l of SUPPORTED_LOCALES.filter((x) => x !== 'en')) expect(shipped.locales[l].reviewedBy, l).toBe('');
   });
 });
 

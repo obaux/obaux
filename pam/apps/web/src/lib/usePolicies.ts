@@ -11,6 +11,7 @@ import {
   titleFromFileName,
   type PolicyRow,
   type ProgramPolicy,
+  type SignerRow,
 } from './programPolicies';
 import { useOwnProgram } from './useOwnProgram';
 import { useSession } from './useSession';
@@ -74,13 +75,19 @@ function publish(next: Readonly<Record<string, readonly ProgramPolicy[]>>): void
 async function loadPolicies(programId: string): Promise<void> {
   try {
     const { createClient } = await import('./supabase');
-    const { data, error } = await createClient()
+    const supabase = createClient();
+    const { data, error } = await supabase
       .from('program_policies')
       .select(POLICY_COLUMNS)
       .eq('service_id', programId)
       .is('archived_at', null);
     if (error) throw error;
-    publish({ ...real, [programId]: policiesFromRows((data ?? []) as PolicyRow[]) });
+    // Who signed each (the program's own lead only): a first name and a date. Without it, nobody has.
+    const signers = await supabase.rpc('program_policy_signers', { p_service_id: programId });
+    publish({
+      ...real,
+      [programId]: policiesFromRows((data ?? []) as PolicyRow[], signers.error ? [] : ((signers.data ?? []) as SignerRow[])),
+    });
   } catch {
     // Show none rather than a wrong list.
     if (!(programId in real)) publish({ ...real, [programId]: NONE });
