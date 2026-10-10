@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useEffect, useRef, useState, type ReactNode } from 'react';
+import { Suspense, useEffect, useRef, useState, type MouseEvent, type ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
@@ -140,6 +140,14 @@ const SECTION_ICONS: Record<string, ReactNode> = {
   changes: <ClockIcon />,
 };
 
+/** The two bars that stay on screen, and 16px of air: where a tapped section's heading lands (matches `section`'s scroll-margin). */
+const BARS_PX = 136;
+
+/** Smooth, unless the phone asks for less movement. */
+function scrollBehavior(): ScrollBehavior {
+  return window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth';
+}
+
 export function LegalPage({ doc }: { doc: LegalDocument }) {
   const { t } = useI18n();
   const [here, setHere] = useState<string | null>(doc.sections[0]?.id ?? null);
@@ -218,6 +226,26 @@ export function LegalPage({ doc }: { doc: LegalDocument }) {
     };
   }, [doc]);
 
+  /**
+   * A tab tap scrolls the section into place itself (Will, 10 October: Back did not
+   * return to Sign in, the tabs glitched, "Back to top" stopped short). A `#hash`
+   * link adds a history entry, so Back undid the tap instead of leaving the page, and
+   * the browser's own jump fought the sticky bars. Here nothing is added to history,
+   * the heading lands at a fixed place under the bars, and the mark moves at once.
+   * The anchor stays a real link for anyone without script.
+   */
+  const goToSection = (event: MouseEvent<HTMLAnchorElement>, id: string) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    event.preventDefault();
+    setHere(id);
+    window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - BARS_PX, behavior: scrollBehavior() });
+    // The row of tabs follows along sideways on its own scroller, so the page's scroll above is not interrupted.
+    const tab = event.currentTarget;
+    const row = tab.closest('ul');
+    row?.scrollTo({ left: tab.offsetLeft - (row.clientWidth - tab.offsetWidth) / 2, behavior: scrollBehavior() });
+  };
+
   // One copy icon, top right of the page, for the whole document (Will, D-417):
   // the title, when it was updated, who "your guide" is, every section, and where
   // it came from, so a pasted line can be traced.
@@ -264,6 +292,7 @@ export function LegalPage({ doc }: { doc: LegalDocument }) {
                 <li key={section.id} {...stylex.props(styles.tocItem)}>
                   <a
                     href={`#${section.id}`}
+                    onClick={(event) => goToSection(event, section.id)}
                     // Tells a screen reader what the highlight is saying to
                     // everybody else: this is the part you are reading.
                     aria-current={isHere ? 'true' : undefined}
@@ -296,7 +325,8 @@ export function LegalPage({ doc }: { doc: LegalDocument }) {
 
         {/* Never dead-end (§0): back up the page, a way on, and a way to a person. */}
         <VStack gap={1}>
-          <TextLink label={t('legal.backToTop')} href="#top" />
+          {/* A button, not a `#top` link: the title is in the sticky bar, always "in view", so the browser had nowhere to scroll to. */}
+          <TextLink label={t('legal.backToTop')} onClick={() => window.scrollTo({ top: 0, behavior: scrollBehavior() })} />
           <Suspense fallback={<OtherDocument doc={doc} door={null} />}>
             <OtherDocumentFromUrl doc={doc} />
           </Suspense>
