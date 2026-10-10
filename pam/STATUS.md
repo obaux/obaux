@@ -1093,6 +1093,13 @@ drops signatures), then `20261010042108_a_program_lead_submits_their_own_program
 
 ---
 
+## Messages & notifications · the clocks send the shared secret (10 October 2026)
+
+Branch `claude/messages-invite-email-clock`. One migration (`20261010144844_…`, **not yet applied to the live
+project**): the vault secret `dispatch_secret` (made in the database), `dispatch-sms` rescheduled with the
+`x-dispatch-secret` header, `send-invite-emails` scheduled every five minutes. This removes the DISPATCH_SECRET trap:
+clock header first, then the function secret. Will's dashboard steps are in `docs/email-setup.md`. D-484.
+
 ## Messages & notifications · texts held until the day (10 October 2026) — merged 10 October
 
 Merged to `main` by the merge desk, 10 October, from `claude/messages-alert-texts-wired` (0a011ee). Migration `20261010141859_…` (**applied live at merge**, before the night's deploy, recorded as 20261010142604; read back: body identical to the file, service role only, `texts_live` reads off):
