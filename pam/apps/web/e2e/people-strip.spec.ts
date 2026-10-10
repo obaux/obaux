@@ -180,6 +180,14 @@ test.describe('the people strip on Home', () => {
     // newer first; the other four in their written order.
     await page.addInitScript(() => sessionStorage.setItem('pam.view-as', 'admin'));
     await signedInAs(page, 'super_admin');
+    // Nobody on the list: the demo shows the example people (D-172).
+    await page.route(PEOPLE, (route) => route.fulfill(json([])));
+    await page.route(ACTIVITY, (route) => route.fulfill(json([])));
+    await page.route(PROFILES, (route) =>
+      route.request().url().includes('role=eq.member')
+        ? route.fulfill(json([]))
+        : route.fallback(),
+    );
     await page.goto('/');
 
     const links = strip(page).getByRole('link');

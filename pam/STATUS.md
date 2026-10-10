@@ -1308,6 +1308,14 @@ recorded once `sms-inbound` is deployed (D-460); nothing queues the check-in or 
 connect" yet. Samples file: nine texts. D-453. Text reminders' staff list (merged 10 October) names
 only the alert texts Will signed: no "introduced to your program", no "your account changes".
 
+## Design system & Storybook · staff Home is live (10 October)
+
+Branch `claude/pam-design-staff-home-live`. Case managers and program leads now land on the redesigned Home
+with D-198's rings in their own row; the old staff Home (`LegacyHome`, `HomePeople*`, `SavedStrip`) is gone and
+`/admin/` is the invite page again. With nobody on the list the row is faint circles with a (+) first, named
+"Invite someone", to each role's own invite flow. Accounts that just signed up see no example people (D-361),
+others keep the demo (D-172). No new strings. Fit: 8 languages incl. zh-HK, nothing new. D-486.
+
 ## Design system & Storybook · staff rings in Storybook (10 October) — merged 10 October
 
 Merged to `main` by the merge desk, 10 October, from `claude/pam-design-staff-rings` (db5e55f). The redesigned case manager and program lead Homes carry

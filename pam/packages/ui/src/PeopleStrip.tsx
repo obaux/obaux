@@ -6,6 +6,7 @@ import { VStack } from '@astryxdesign/core/VStack';
 import { Text } from '@astryxdesign/core/Text';
 import { Avatar } from '@astryxdesign/core/Avatar';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
+import { PlusIcon } from './icons.js';
 
 /**
  * A row of people, read at a glance rather than one row at a time (Will, 16
@@ -119,6 +120,83 @@ export function PeopleStrip({ people, label }: PeopleStripProps) {
               ) : null}
             </VStack>
           </a>
+        ))}
+      </Carousel>
+    </section>
+  );
+}
+
+/**
+ * The strip with nobody on it yet (Will, 10 October: "an empty state with faint
+ * circle slots and the first circle is a (+) to invite someone"). A row of
+ * faint dashed circles where people will appear, the first of them a (+) that
+ * starts an invite: the one thing to do with an empty list.
+ *
+ * The slots are decoration — `aria-hidden`, nothing is announced for an empty
+ * circle. The (+) is a link with a real name (`inviteLabel`, "Invite someone")
+ * and the 64px tile the strip's own avatars use, so it clears the 44px floor
+ * on every phone. It carries no words of its own: nothing to translate, and
+ * nothing to run out of room in Russian or Arabic. The row runs past the page
+ * gutter and fades at the edge, as the strip does.
+ */
+export interface PeopleStripEmptyProps {
+  /** Names the row for a screen reader, e.g. "Members". */
+  readonly label: string;
+  /** The (+)'s accessible name, e.g. "Invite someone". */
+  readonly inviteLabel: string;
+  /** Where the (+) goes: the role's own invite flow. */
+  readonly inviteHref: string;
+  /** How many circles, the (+) included. */
+  readonly slots?: number;
+}
+
+const empty = stylex.create({
+  slot: {
+    width: '64px',
+    height: '64px',
+    flexShrink: 0,
+    borderRadius: '50%',
+    borderWidth: '2px',
+    borderStyle: 'dashed',
+    borderColor: colorVars['--color-border'],
+    opacity: 0.55,
+    boxSizing: 'border-box',
+  },
+  invite: {
+    width: '72px',
+    flexShrink: 0,
+    display: 'flex',
+    justifyContent: 'center',
+    textDecoration: 'none',
+    color: colorVars['--color-icon-accent'],
+  },
+  plus: {
+    width: '64px',
+    height: '64px',
+    borderRadius: '50%',
+    borderWidth: '2px',
+    borderStyle: 'dashed',
+    borderColor: colorVars['--color-accent'],
+    boxSizing: 'border-box',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});
+
+export function PeopleStripEmpty({ label, inviteLabel, inviteHref, slots = 5 }: PeopleStripEmptyProps) {
+  return (
+    <section aria-label={label} {...stylex.props(styles.region)}>
+      <Carousel gap={2} hasButtons={false} hasEdgeFade={false} xstyle={styles.track}>
+        <a href={inviteHref} aria-label={inviteLabel} {...stylex.props(empty.invite)}>
+          <span {...stylex.props(empty.plus)}>
+            <PlusIcon width={28} height={28} aria-hidden />
+          </span>
+        </a>
+        {Array.from({ length: Math.max(0, slots - 1) }, (_, i) => (
+          <span key={i} aria-hidden="true" {...stylex.props(styles.tile)}>
+            <span {...stylex.props(styles.ring, empty.slot)} />
+          </span>
         ))}
       </Carousel>
     </section>
