@@ -36,7 +36,9 @@ None: this is a review of drafts, in the lane's usual way.
 
 ## Verified
 
-(see the READY note: head, browser suite, fit audit on the program stories)
+On `10d51f9` (main `64d0a1b` plus this): `@pam/config` 1041 tests, `copy:status` in step, the browser suite on all three viewports **969 passed, 18 skipped** (10.5 min),
+Storybook builds, and the fit audit on every story with "program" in its id (94 stories, 7 languages and the pseudo-language): 12 new in a language, **all 12
+already accepted in `fit-known.json`, 0 not**.
 
 ## Left undone
 
