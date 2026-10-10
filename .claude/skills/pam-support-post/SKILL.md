@@ -110,3 +110,10 @@ messaging), edit all seven together and tell the merge desk the other six need a
 `signing-a-programs-rules`, the others are pages at `/<lang>/program-rules/`. It is hidden until
 `signed-off.json` has `"program-rules-live": true` (the signing screens are really in the app) and the language
 in its `"program-rules"` list. The sentence "What your signature means" goes to a lawyer before launch.
+
+## Website rule: "human-touch" is never public copy (D-483, Will, 10 October 2026)
+
+"Pam is a human-touch company" is an internal principle for making decisions, to keep Pam human-centered. It is never
+said to the public: not on the site, in a post, a card, a share preview or an alt text, in any language (a site test fails
+if it appears). Describe what Pam does ("Pam helps people find services, get to them, and remember to go"), not the
+company's own principle.

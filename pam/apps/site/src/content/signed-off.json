@@ -1,5 +1,7 @@
 {
-  "about-pam": [],
+  "about-pam": [
+    "en"
+  ],
   "program-rules": [],
   "program-rules-live": false
 }

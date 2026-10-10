@@ -59,13 +59,11 @@ STATUS row too.
   (its "last day you used Pam" row now says No for a program, D-465; it returns to Yes when
   the database hands a program that day and the app's line says so again). The hidden draft "Staff requests" is published only if a way to ask to be staff
   comes back (D-369).
-- [ ] **Public site: Will signs "About Pam" (D-466, 10 October 2026).** English first: read
-  `apps/site/src/content/about.ts`, then put `"en"` in `apps/site/src/content/signed-off.json`
-  (`{"about-pam": ["en"]}`) — that builds `/en/about-pam/` and shows the home section. The other
-  six are drafts with no native reader (D-461): add each code to the same file only once someone
-  who reads it has been over it. The home card that promised reminders is fixed (10 October, it now reads `VISIT_REMINDERS_LIVE`).
-  When visit reminders go live, flip `VISIT_REMINDERS_LIVE` in `TextsFromPam.tsx` and rewrite
-  the "What is coming" paragraph in all seven.
+- [x] **Public site: Will signs "About Pam" (D-466, 10 October 2026): the English is signed (D-483, 10 October 2026,
+  after the "human-touch company" line was taken out; it is live with the deploy).** Still open: the other six languages
+  are drafts with no native reader (D-461): add each code to `apps/site/src/content/signed-off.json` (`about-pam`) only once
+  someone who reads it has been over it. When visit reminders go live, flip `VISIT_REMINDERS_LIVE` in
+  `apps/site/src/content/flags.ts` and rewrite the "What is coming" paragraph in all seven languages.
 - [ ] **Public site: help posts after Dot's new app layout (D-456) and visit reminders** (10 October 2026).
   *Layout, done 10 October* on a branch from main `522c808`, for the layout that goes live with that night's
   deploy: Who is my guide and What others can see are reached from Profile → **Legal** → "What others can
