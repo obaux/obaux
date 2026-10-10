@@ -40,8 +40,16 @@ export interface TripRow {
   readonly status: string;
 }
 
+/** A row of `my_trip_services()` (D-470): which program service a saved trip is for. */
+export interface TripServiceRow {
+  readonly appointment_id: string;
+  readonly program_service_id: string;
+  readonly service_name: string;
+}
+
 /** A saved trip, in the shape every trips screen already reads. Only scheduled ones. */
-export function tripsFromRows(rows: readonly TripRow[]): AddedTrip[] {
+export function tripsFromRows(rows: readonly TripRow[], services: readonly TripServiceRow[] = []): AddedTrip[] {
+  const serviceOf = new Map(services.map((s) => [s.appointment_id, s]));
   return rows
     .filter((row) => row.status === 'scheduled' && row.service_id !== null)
     .map((row) => ({
@@ -53,6 +61,9 @@ export function tripsFromRows(rows: readonly TripRow[]): AddedTrip[] {
       lon: row.lon ?? 0,
       startsAt: row.starts_at,
       note: row.note ?? '',
+      ...(serviceOf.has(row.id)
+        ? { serviceId: serviceOf.get(row.id)!.program_service_id, serviceName: serviceOf.get(row.id)!.service_name }
+        : {}),
     }));
 }
 
@@ -60,9 +71,13 @@ export function tripsFromRows(rows: readonly TripRow[]): AddedTrip[] {
 export async function loadSavedTrips(): Promise<void> {
   try {
     const { createClient } = await import('./supabase');
-    const { data, error } = await createClient().rpc('my_trips');
+    const supabase = createClient();
+    const { data, error } = await supabase.rpc('my_trips');
     if (error) throw error;
-    setSavedTrips(tripsFromRows((data ?? []) as TripRow[]));
+    // Which service each is for (D-470): a failed read leaves the trips without it, not hidden.
+    const named = await supabase.rpc('my_trip_services');
+    const services = named.error ? [] : ((named.data ?? []) as TripServiceRow[]);
+    setSavedTrips(tripsFromRows((data ?? []) as TripRow[], services));
   } catch {
     // Keep what is shown; the screens do not need to know the read failed.
     setSavedTrips(readSaved(), 'error');
@@ -94,12 +109,23 @@ export async function bookTrip(session: SessionState, trip: NewTrip): Promise<Ad
   if (userId !== null && isSavedPlace(trip.placeId) && !trip.forMemberId) {
     try {
       const { createClient } = await import('./supabase');
-      const { data, error } = await createClient().rpc('book_trip', {
-        p_service_id: trip.placeId,
-        p_starts_at: trip.startsAt,
-        p_note: trip.note.trim() === '' ? null : trip.note,
-        p_timezone: localTimeZone(),
-      });
+      const note = trip.note.trim() === '' ? null : trip.note;
+      // A service of a real program (a uuid) is named to the database (D-470); an example one stays on the phone.
+      const { data, error } =
+        trip.serviceId !== undefined && isSavedPlace(trip.serviceId)
+          ? await createClient().rpc('book_trip_at_service', {
+              p_service_id: trip.placeId,
+              p_starts_at: trip.startsAt,
+              p_program_service_id: trip.serviceId,
+              p_note: note,
+              p_timezone: localTimeZone(),
+            })
+          : await createClient().rpc('book_trip', {
+              p_service_id: trip.placeId,
+              p_starts_at: trip.startsAt,
+              p_note: note,
+              p_timezone: localTimeZone(),
+            });
       if (error || !data) return null;
       const row = data as { id: string; starts_at: string };
       await loadSavedTrips();
