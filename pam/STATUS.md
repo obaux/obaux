@@ -1045,6 +1045,12 @@ language's own name, so a person can see which language a row is before they can
   tree (471 stories × 7 languages: 26 new in a language, all 26 accepted, 0 not). Not run: the
   Playwright browser suite, which is what measures the tag's colour contrast.
 
+## Messages & notifications · Block (10 October 2026)
+
+On `claude/messages-block`. A conversation's ⋯ menu has Block this person (asks first) and, once blocked,
+Unblock; the composer gives way to a notice for both sides, and the person blocked is told. The database half
+was 0069/0076. D-463. The terms' "they will not know" is not true and Lena is changing it. Hidden-for-staff is Will's call.
+
 ## Design system & Storybook · area chip, fit audit (10 October) — merged 10 October
 
 Branch `claude/pam-design-areachip-long-address`, merged to `main` on 10 October; D-448 confirmed by Mira. Job: Will asked for the

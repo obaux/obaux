@@ -45,6 +45,7 @@ import { FileSummary, GoogleLinkCard, MessageFileCard } from './MessageFileCard'
 import { PhotoViewer } from './PhotoViewer';
 import { TranslatedBody, type MessageTranslation } from './TranslatedBody';
 import { intlLocale } from '@pam/config';
+import { BlockedNotice } from './BlockedNotice';
 import { LimitedNotice } from './LimitedNotice';
 
 /**
@@ -162,6 +163,12 @@ export interface ThreadViewProps {
    * D-427); the messages stay where they are.
    */
   readonly limited?: boolean;
+  /**
+   * Somebody blocked in this conversation (0076, D-463): `mine` when the reader did,
+   * `theirs` when the other person did. Reading and reporting stay; the composer
+   * gives way to a notice that says which.
+   */
+  readonly blocked?: 'mine' | 'theirs' | null;
   /** BCP-47 tag for dictation, e.g. "en-US" or "es-US". */
   readonly speechLanguage: string;
   readonly supportPhone: string;
@@ -555,6 +562,7 @@ export function ThreadView({
   sending,
   sendFailed,
   limited = false,
+  blocked = null,
   speechLanguage,
   supportPhone,
 }: ThreadViewProps) {
@@ -696,6 +704,8 @@ export function ThreadView({
 
   const composer = limited ? (
     <LimitedNotice supportPhone={supportPhone} />
+  ) : blocked ? (
+    <BlockedNotice by={blocked} supportPhone={supportPhone} />
   ) : (
     <ChatComposer
       value={draft}
@@ -976,7 +986,7 @@ export function ThreadView({
         </ChatMessageList>
       </RevealTimes>
 
-      {sendFailed && !limited ? (
+      {sendFailed && !limited && !blocked ? (
         <VStack xstyle={styles.notice}>
           <Notice
             notice="something_went_wrong"

@@ -64,6 +64,8 @@ export interface MockOptions {
   readonly limited?: boolean;
   /** The person replied STOP: stored, and nothing in the app can undo it (D-453). */
   readonly textsStopped?: boolean;
+  /** Somebody blocked in the example conversation (0076, D-463): the reader did, or the other person did. */
+  readonly blocked?: 'mine' | 'theirs';
   /**
    * A program lead who already has a program on file (D-447): waiting for
    * review, or approved and live. Without it the lead has none — and a send
@@ -266,7 +268,12 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
     // example conversation, so the tap lands in a thread instead of the list.
     on('/rpc/open_direct_conversation', () => ({ body: CONVO_ID })),
     on('/rpc/conversation_partners', () => ({ body: [partnerFor(role)] })),
-    on('/rpc/conversation_block_state', () => ({ body: [{ i_blocked: false, blocked_me: false }] })),
+    on('/rpc/conversation_block_state', () => ({
+      body: [{ i_blocked: options.blocked === 'mine', blocked_me: options.blocked === 'theirs' }],
+    })),
+    // Blocking and unblocking answer yes and change nothing: a story never writes (D-463).
+    on('/rpc/block_in_conversation', () => ({ body: null })),
+    on('/rpc/unblock_in_conversation', () => ({ body: null })),
     on('/rest/v1/messages', (_url, method) => {
       if (method !== 'POST') return { body: threadFor(role) };
       // What `messages_insert_sender` answers a limited account (0031).
