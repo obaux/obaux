@@ -193,25 +193,25 @@ changes with it. The templates stay in `sms-templates.ts`.
 >
 > _Spanish:_ Pam: Tiene una visita mañana a las {time}. {address}. Toque para llegar: {link}
 
-**6. Somebody wrote to you (approved by Will 10 October; not yet sent)**
+**6. Somebody wrote to you (approved by Will 10 October; queued from D-478, sent only to people who switch it on)**
 
 > Pam: You have a new message in Pam. Open it: {link}
 >
 > _Spanish:_ Pam: Tiene un mensaje nuevo en Pam. Abralo aqui: {link}
 
-**7. To a program: somebody booked a visit (approved; not yet sent)**
+**7. To a program: somebody booked a visit (approved; queued from D-478, sent only to people who switch it on)**
 
 > Pam: Someone booked a visit with your program. Open Pam to see it: {link}
 >
 > _Spanish:_ Pam: Alguien reservo una visita en su programa. Abra Pam para verla: {link}
 
-**8. To a program: a booking was changed (approved; not yet sent)**
+**8. To a program: a booking was changed (approved; queued from D-478, sent only to people who switch it on)**
 
 > Pam: A visit with your program was changed. Open Pam to see it: {link}
 >
 > _Spanish:_ Pam: Cambio una visita en su programa. Abra Pam para verla: {link}
 
-**9. To a case manager: somebody on their list planned a visit (approved; not yet sent)**
+**9. To a case manager: somebody on their list planned a visit (approved; queued from D-478, sent only to people who switch it on)**
 
 > Pam: Someone on your list planned a visit. Open Pam to see it: {link}
 >
@@ -219,8 +219,11 @@ changes with it. The templates stay in `sms-templates.ts`.
 
 6–9 are the texts behind the **Text alerts** switches (Will, 10 October 2026). They say that
 something happened, never what or to whom: no name, no place, no day. Will approved them on
-10 October 2026 ("Text alerts: approved"), the other languages as drafts to learn from. Nothing
-queues them yet, so none sends, and the Text alerts screen says "coming soon" until one does. They are in `packages/config/src/sms-templates.ts` (`message_waiting`,
+10 October 2026 ("Text alerts: approved"), the other languages as drafts to learn from. Since D-478
+they are queued when the thing happens — a message written, a visit booked, moved or cancelled, a
+visit planned by someone on a case manager's list — and only for a person who has turned that
+switch on (each starts off) and has not replied STOP; the Text alerts screen shows those four switches
+live. They are in `packages/config/src/sms-templates.ts` (`message_waiting`,
 `visit_booked`, `booking_changed`, `trip_planned`); each is one segment in every language, and
 the other languages' drafts are there too. 6 goes to anyone who has a message waiting; 7 and 8
 to a program lead; 9 to a case manager. Message 5 is built next (the day before only, sent

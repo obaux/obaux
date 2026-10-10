@@ -13,8 +13,12 @@ sections below; this page is only the order, who does it, and how to stop.
 ticked "Text reminders" and has not replied STOP, in their language, after 7 am and
 before 9 pm Philadelphia time (their quiet hours). It carries the time, the street
 (up to 34 characters) and a link to Trips. It does not carry the name of a program
-service the member picked. Nothing else queues a text to a member yet: the 2-hour and
-morning-of reminders, the check-in and "connect" texts are signed but nothing creates them.
+service the member picked. Four more texts are queued since D-478, each only for a person who
+switched that alert on on their Text alerts screen: "you have a new message" (anyone), "someone booked a
+visit" and "a visit was changed" (to the program), and "someone on your list planned a visit" (to a case
+manager). They say that something happened and nothing else. One waiting text covers the next change, and a
+message text is not repeated inside half an hour. Still not created by anything: the 2-hour and morning-of
+reminders, the check-in and "connect" texts.
 
 ### Before the day (merge desk)
 

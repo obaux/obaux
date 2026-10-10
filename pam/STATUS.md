@@ -1077,6 +1077,14 @@ drops signatures), then `20261010042108_a_program_lead_submits_their_own_program
 
 ---
 
+## Messages & notifications · the approved text alerts are wired (10 October 2026) — merged 10 October
+
+Merged to `main` by the merge desk, 10 October, from `claude/messages-alert-texts-wired` (2d27149). One migration
+(`20261010134429_…`, **applied live at merge**, recorded as 20261010135947; read back: the three bodies identical to
+the file, service role only, both triggers in place, every switch off for everyone): per-kind Text alerts switches, and triggers that queue the four approved texts (a message, a visit
+booked, moved/cancelled, planned) for people who switched them on. Screen: the four switches are live.
+DB test 42; `e2e/alerts.spec.ts`. D-478.
+
 ## Messages & notifications · the expired-link email has a sender (10 October 2026) — merged 10 October
 
 Merged to `main` by the merge desk, 10 October, from `claude/messages-expired-link-email` (ca4f683). `send-invite-emails`
