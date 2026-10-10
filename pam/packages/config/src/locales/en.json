@@ -588,7 +588,7 @@
   "reminders.signedOut": "Sign in first, then you can choose this.",
   "reminders.skip": "Not now",
   "reminders.stopped.title": "Texts are off",
-  "reminders.stopped.body": "You replied STOP, so Pam does not text you. Nothing in the app can turn texts back on.",
+  "reminders.stopped.body": "You replied STOP, so Pam does not text you. Nothing in the app can turn texts back on. To get texts again, reply START to a text from Pam.",
   "reminders.title": "Text reminders",
   "reminders.today.member": "Today Pam sends only one of these: a note when a place you saved closes or moves. The others are coming.",
   "reminders.today.staff": "Pam does not send any of these yet. They are coming.",

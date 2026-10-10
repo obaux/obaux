@@ -588,7 +588,7 @@
   "reminders.signedOut": "Entre primero, y después puede elegir esto.",
   "reminders.skip": "Ahora no",
   "reminders.stopped.title": "Los mensajes están apagados",
-  "reminders.stopped.body": "Usted respondió STOP, así que Pam no le envía mensajes de texto. Nada en la app puede volver a activarlos.",
+  "reminders.stopped.body": "Usted respondió STOP, así que Pam no le envía mensajes de texto. Nada en la app puede volver a activarlos. Para volver a recibirlos, responda START a un mensaje de Pam.",
   "reminders.title": "Recordatorios por mensaje",
   "reminders.today.member": "Hoy Pam solo envía uno de estos: un aviso cuando un lugar que guardó cierra o se muda. Los demás vienen pronto.",
   "reminders.today.staff": "Pam todavía no envía ninguno de estos. Vienen pronto.",

@@ -591,7 +591,7 @@
   "reminders.signedOut": "請先登入，然後您就可以選擇。",
   "reminders.skip": "暫時不用",
   "reminders.stopped.title": "短訊已關閉",
-  "reminders.stopped.body": "您回覆了 STOP，所以 Pam 不會再傳短訊給您。應用程式內沒有任何操作可以重新開啟短訊。",
+  "reminders.stopped.body": "您回覆了 STOP，所以 Pam 不會再傳短訊給您。應用程式內沒有任何操作可以重新開啟短訊。要重新收到短訊，請回覆 Pam 傳來的短訊 START。",
   "reminders.title": "短訊提醒",
   "reminders.today.member": "目前 Pam 只會發送其中一則：您儲存的地點結業或搬遷時的通知。其他的即將推出。",
   "reminders.today.staff": "Pam 目前還未會發送其中任何一則。它們即將推出。",

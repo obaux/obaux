@@ -591,7 +591,7 @@
   "reminders.signedOut": "Entre na sua conta primeiro e depois você pode escolher isto.",
   "reminders.skip": "Agora não",
   "reminders.stopped.title": "As mensagens estão desligadas",
-  "reminders.stopped.body": "Você respondeu STOP, então o Pam não envia mensagens de texto para você. Nada no app pode ligá-las de novo.",
+  "reminders.stopped.body": "Você respondeu STOP, então o Pam não envia mensagens de texto para você. Nada no app pode ligá-las de novo. Para voltar a recebê-las, responda START a uma mensagem do Pam.",
   "reminders.title": "Lembretes por mensagem",
   "reminders.today.member": "Hoje o Pam envia apenas um destes: um aviso quando um lugar que você salvou fecha ou muda de endereço. Os outros virão.",
   "reminders.today.staff": "O Pam ainda não envia nenhum destes. Eles virão.",

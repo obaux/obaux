@@ -591,7 +591,7 @@
   "reminders.signedOut": "请先登录，然后就可以选择了。",
   "reminders.skip": "暂时不用",
   "reminders.stopped.title": "短信已关闭",
-  "reminders.stopped.body": "您回复了 STOP，所以 Pam 不会再给您发短信。应用里的任何操作都无法重新开启短信。",
+  "reminders.stopped.body": "您回复了 STOP，所以 Pam 不会再给您发短信。应用里的任何操作都无法重新开启短信。要重新收到短信，请回复 Pam 发来的短信 START。",
   "reminders.title": "短信提醒",
   "reminders.today.member": "目前 Pam 只发送其中一条：您收藏的地点关闭或搬迁时的提醒。其他的即将推出。",
   "reminders.today.staff": "Pam 目前还不会发送其中任何一条。它们即将推出。",
