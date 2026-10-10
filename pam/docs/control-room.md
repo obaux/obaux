@@ -17,13 +17,15 @@ any session that takes over the merge desk can keep it running.
 
 ## What it shows
 
-**Header.** The name, and a status chip: *Live* (the session list is being read every
+**Header.** Pam's app icon (the same drawing as `apps/web/src/app/icon.svg`), the name, and a status chip: *Live* (the session list is being read every
 minute), *Board connected* (my updates arrive, live status off), or *Offline copy*. When
 live status needs Will's one-time permission, the chip carries a **Show live status**
 button.
 
 **At a glance.** Four numbers: building now, waiting on you, ready for you to try,
-messages today.
+messages today. Each is a button that takes you to its section: the team, Waiting on
+you, Ready for you to try, What I'm doing (Will, 10 October: "I want to click on these
+and go to section").
 
 **The team map** — the centre of the page.
 - Will at the top ("You, Founder"), Mira in the middle, every teammate around her.
@@ -46,8 +48,20 @@ messages today.
 - With "reduce motion" on, nothing moves; colours and badges still say everything.
 
 **Waiting on you.** One card per decision: the question in plain words, why it matters
-in a sentence or two, Mira's advice, who asked, and "Reply to me in our chat". Will
-answers in the chat; the page never takes answers itself.
+in a sentence or two, Mira's advice, who asked, and a **Reply** button. Under the cards,
+**Talk to Mira**: a chat, so Will can run the team from this page alone (Will, 10
+October: "Add a chat in … 'Waiting on you' so I can use that alone to manage you").
+Reply puts the card's question at the start of the message box.
+- Sending: the page keeps the message on the board (`chat/<id>`, `from: "will"`) and
+  sends it to Mira with Claude's own **Send to Claude** (`comments.sendToClaude`, a
+  comment anchored on the chat). That wakes the merge-desk session, which is subscribed
+  to this artifact. The first send asks Will's OK once.
+- Answering: Mira writes `chat/<id>` with `from: "mira"`, `text`, `at` and `re` (the id
+  of Will's message, which ends every sent comment as "(Control Room chat · <id>)"),
+  then replies in the comment thread too. A decision answered in the chat gets its card
+  marked `answered`.
+- The message shows "sending…", "sent to Mira", or "not sent" with Try again. While
+  Mira hasn't answered, a line says Mira is working on it.
 
 **What I'm doing.** Mira's one-line "Right now", then the message feed: time, coloured
 dot, who → who, and the message in plain words.
@@ -71,6 +85,7 @@ writes as Will with the artifact data tool.
 | `ready/<id>` | thing to try | `title`, `problem`, `how`, `links[]`, `from`, `at`, `hidden` |
 | `desk/now` | — | `doing`, `updatedAt` |
 | `events/feed` | — | `items[]`: `{at, from, to, kind, text}`, newest 40 kept |
+| `chat/<id>` | chat message | `from` (`will` or `mira`), `text`, `at`, `state` (Will's: `sending`, `delivered`, `failed`), `re` (Mira's: the message answered) |
 
 **Live layer (optional).** With Will's permission the page reads the Claude Code
 session list every minute (`list_sessions`, read only) and matches it to `sessionId`,

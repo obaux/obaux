@@ -185,15 +185,24 @@ teammate's name, title and avatar). Will watches the same board, live, on the Pa
 Control Room (`docs/control-room.md`). After a merge, every open branch below merges
 `main`.
 
+Will, 10 October: "Go ahead and decide, you're the CTO." The "Waiting on" column
+reflects the answers Mira gave each lane that morning.
+
 | Who | Session | Id | Branch | Where it stands | Waiting on |
 |---|---|---|---|---|---|
-| **Mira**, CTO | PAM · Mira · Chief Technology Officer | `session_018wn7LF7RMsHnXSAzvk6s1p` | works from `main` | merged languages and Arabic; set up the team, the names and the control room | — |
+| **Mira**, CTO | PAM · Mira · Chief Technology Officer | `session_018wn7LF7RMsHnXSAzvk6s1p` | works from `main` | merged languages, Arabic, D-445 and D-448; runs the team and the control room | — |
 | **Ava**, Accounts & Access Lead | PAM · Ava · Accounts & Access Lead | `session_01NPHYiBRyyv8F5L7o9KaMEd` | `claude/pam-assign-and-limit` | guide assignment and limits built; two migrations on the branch | its first report; then Will on the migrations |
-| **Sam**, Accounts Engineer | PAM · Sam · Accounts Engineer | `session_01SJKnwmNUb3uvgDhakVYTZo` | `claude/affectionate-goldberg-tvu4sz` | job merged; the points-history migration (D-445) is live (10 October) | a next job |
-| **Nico**, Messaging & Notifications Lead | PAM · Nico · Messaging & Notifications Lead | `session_01CCHvVkYgXddhtq4DHvvETo` | none | reported in; no job yet | Will: first job (Mira suggests sending email) and who switches things on |
-| **Piper**, Places & Programs Lead | PAM · Piper · Places & Programs Lead | `session_01RmG6J2CCikoqM9H2fhbSPm` | `claude/places-programs-load-own-program` | a program lead loads their own program (D-447): database half done, app half next | Will: how to fix approved leads' access (0085 first, Mira suggests) |
-| **Lena**, Languages & Legal Lead | PAM · Lena · Languages & Legal Lead | `session_01Hjv2RQuz5PJmxQ7tLGb5sW` | none (merged) | reported in; nothing open; 0085 noted as not live | a next job from Will |
-| **Remy**, Right-to-Left Language Specialist | PAM · Remy · Right-to-Left Language Specialist | `session_01A44BM2WPMuZYKkspxsiQEG` | none (merged) | Arabic isolates live | its first report |
-| **Dot**, Design Systems Lead | PAM · Dot · Design Systems Lead | `session_01A3kdir46ErR2eyjDLFdzyW` | `claude/pam-design-areachip-long-address` | fit-audit fix on the branch (D-448) | its first report; Will on D-448 |
-| **Wren**, Website & Help Centre Lead | PAM · Wren · Website & Help Centre Lead | `session_012vS6F7CMTwFn3u5UG66JWz` | `claude/compassionate-bohr-mzrchf` (12 ahead) | site built and previewed; a draft post held | Will: site live now or later; keep the draft |
-| **Gus**, retired | PAM · Gus · Former Platform Engineer (retired) | `session_01NoLKA8RJRwhyDJUe8CAZVE` | — | archived | — |
+| **Nico**, Messaging & Notifications Lead | PAM · Nico · Messaging & Notifications Lead | `session_01CCHvVkYgXddhtq4DHvvETo` | new, from `main` | job 1: the sender's name overlapping the first message (ru, ar, zh-CN); job 2: sending email, behind a switch | STARTED; Will's sending domain and keys before email goes on |
+| **Piper**, Places & Programs Lead | PAM · Piper · Places & Programs Lead | `session_01RmG6J2CCikoqM9H2fhbSPm` | `claude/places-programs-load-own-program` | a program lead loads their own program (D-447), app half; the approved-lead fix, built on 0085's body | 0085 live (Will pastes it in the SQL editor) |
+| **Lena**, Languages & Legal Lead (covers Arabic) | PAM · Lena · Languages & Legal Lead | `session_01Hjv2RQuz5PJmxQ7tLGb5sW` | new, from `main` | English tags (EN, ES, PT-BR, ZH-CN, ZH-HK, RU, AR) before every language name (Will, 10 October) | STARTED |
+| **Dot**, Design Systems Lead | PAM · Dot · Design Systems Lead | `session_01A3kdir46ErR2eyjDLFdzyW` | none (merged) | D-448 merged and confirmed | a next job from Will |
+| **Wren**, Website & Help Centre Lead | PAM · Wren · Website & Help Centre Lead | `session_012vS6F7CMTwFn3u5UG66JWz` | `claude/compassionate-bohr-mzrchf` | toning the case-manager post down to what is live, then READY; the draft post stays hidden | READY; the domain later, from Will |
+
+**Retired** (archived; their work and session logs stay in the records, and either can
+be brought back):
+
+| Who | Id | Why |
+|---|---|---|
+| **Sam**, Accounts Engineer | `session_01SJKnwmNUb3uvgDhakVYTZo` | job done (staff email, the six-month audit log, points history: all live); Ava covers accounts |
+| **Remy**, Right-to-Left Language Specialist | `session_01A44BM2WPMuZYKkspxsiQEG` | job done (Arabic reads the right way round: live); Lena covers Arabic |
+| **Gus**, Former Platform Engineer | `session_01NoLKA8RJRwhyDJUe8CAZVE` | its work moved to the merge desk |

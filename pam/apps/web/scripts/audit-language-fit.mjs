@@ -211,7 +211,14 @@ function measure() {
 
     // 3. Spill: text outside the control that holds it.
     const control = el.closest('button, a, [role="button"], [role="tab"], [role="radio"], [role="menuitem"], input, label, summary');
-    if (control && !hidden(control)) {
+    // A line an ellipsis trims inside the control still reports its full width, which can run past the
+    // control's edge although nothing is drawn there. Step 2 reports the trimming; it is not a spill.
+    let trimmed = false;
+    for (let n = el; control && n && n !== control.parentElement; n = n.parentElement) {
+      const s = style(n);
+      if (s.textOverflow === 'ellipsis' && s.overflowX === 'hidden') { trimmed = true; break; }
+    }
+    if (control && !trimmed && !hidden(control)) {
       const c = control.getBoundingClientRect();
       for (const r of rects) {
         if (r.left < c.left - 2 || r.right > c.right + 2 || r.top < c.top - 2 || r.bottom > c.bottom + 2) {

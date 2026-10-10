@@ -371,7 +371,7 @@ Russian, Arabic (D-422); messages read in the reader's language (D-423).
   pixels. Say "size the tabs by content" and Claude makes the change and re-runs the
   fit check; or leave it until a language with longer words is added.
 
-- [ ] **Apply 0085 whenever convenient — nothing waits on it** (D-424, D-428). It
+- [x] **Apply 0085** — **done 10 October** (Will, by hand; read back by the merge desk). (D-424, D-428). It
   keeps the language a person asked in, so a denial text and a fresh-link email
   are written in it and an approved account opens in it. It replaces two
   functions, so the live connector hangs on it (tried 9 October; nothing left
