@@ -142,9 +142,9 @@ STATUS row too.
   later; the privacy policy says so (`privacy.s.how-long.p3`). **Still blocked:** a member
   who has **points** cannot be deleted — `points_ledger` cascades from the profile and is
   append-only, so the cascade is refused (probed 10 October: the seeded member with points
-  fails; admins and providers delete). The same shape of fix works (the ledger lets a DELETE
-  through only once the member's profile is gone), but it is a decision about the points
-  history that Will has not been asked. **Then** write the routine for the Pam team (a
+  fails; admins and providers delete). Will said yes, delete the points history too (10 October): built as D-445 — the ledger lets a
+  DELETE through only once the member's profile is gone — and **not yet applied** (migration
+  `20261010033917_points_history_is_deleted_with_the_member.sql`; no `drop`). **Then** write the routine for the Pam team (a
   function, tested like the privacy promises: profile, email, invites, messages, photos,
   points in one call). Until then a deletion on a call must remove the email by hand.
 

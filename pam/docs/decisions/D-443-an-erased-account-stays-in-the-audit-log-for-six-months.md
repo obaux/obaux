@@ -73,7 +73,7 @@ the flag; the points ledger gets no exception; clients cannot call either functi
 
 ## Not done, and found on the way
 
-- **A member who has points still cannot be deleted** (Will said, 10 October, after reading this: yes, deleting a member should delete their points history — the next change, after this one is merged). `points_ledger.member_id`
+- **A member who has points still cannot be deleted** (Will said, 10 October, after reading this: yes, deleting a member should delete their points history — D-445). `points_ledger.member_id`
   cascades from the profile, and the points ledger is append-only in the same way, so
   the cascade is refused. Probed on the seeded data: Marcus (a member with points)
   is blocked; the admins and providers are not. The same shape of fix would work (the
