@@ -84,7 +84,12 @@ STATUS row too.
 
   **10 October (D-450):** the sender for *staff invites* is built, off, and waits for
   a signature (`docs/email-setup.md` is the plain-words list for Will; the function is
-  `send-invite-emails`). The expired-link email above still has no sender.
+  `send-invite-emails`). **10 October (D-476):** the expired-link email now has its sender
+  too — the same function, under the same `INVITE_EMAILS` switch and secrets, claims the
+  unsent `invite_emails` rows (migration `20261010133313_…`, **not yet applied to the live
+  project**) and sends `renderInviteEmail()`'s wording (Will, 4 October). Step 3 above is
+  done; steps 1, 2 and 4 are Will's email setup, the same one. Until then someone with an
+  expired link is still told "Check your email" and nothing arrives.
 
 - [x] **Merge and deploy 0068 and 0069** — done 8 October as 0075/0076 (D-388) (readiness fixes and blocking, on
   branch `claude/hopeful-thompson-07nj7n`, not yet on this one). 0068 is what
