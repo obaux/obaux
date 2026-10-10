@@ -1200,7 +1200,7 @@ Merged to `main` by the merge desk, 10 October, from `claude/places-programs-rem
 
 ## Places & programs · the super admin reviews programs (10 October 2026) — READY, not merged
 
-Branch `claude/places-programs-review-queue` (D-479). Migrations `20261010134145` (review function, list, closing trigger) and `20261010134146` (backfill), expand only; test `40_a_super_admin_reviews_a_program_test.sql`. App: Programs to check (list + a page per program) from Profile and Requests. No text and no bell row yet. Until 5b, a leader asked for changes cannot re-send.
+Branch `claude/places-programs-review-queue` (D-479). Migrations `20261010134145` (review function, list, closing trigger) and `20261010134146` (backfill), expand only; test `41_a_super_admin_reviews_a_program_test.sql`. App: Programs to check (list + a page per program) from Profile and Requests. No text and no bell row yet. Until 5b, a leader asked for changes cannot re-send.
 
 ## Places & programs · quiet hours re-time queued reminders (10 October 2026) — merged 10 October
 

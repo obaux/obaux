@@ -16,7 +16,7 @@ D-479.
 
 ## Verified
 
-Whole database suite passes (new test 40: only a super admin decides; approve from in review only; first listing live; a change applies exactly four fields and leaves description and phone; note required and short; discard only withdrawn; the list shows a first name and no contact column; a hand-written approval closes the submission; backfill writes one row each, none for a listing with no organisation, and is idempotent). Web 82 tests (+6), config 1015, tsc clean, Storybook builds, 5 stories checked in the browser, fit audit 0 new in seven languages and in pseudo. E2E: new programs-review spec (5 tests) and admin, account, a11y, directory: 180 passed on all three phones.
+Whole database suite passes (new test 41: only a super admin decides; approve from in review only; first listing live; a change applies exactly four fields and leaves description and phone; note required and short; discard only withdrawn; the list shows a first name and no contact column; a hand-written approval closes the submission; backfill writes one row each, none for a listing with no organisation, and is idempotent). Web 82 tests (+6), config 1015, tsc clean, Storybook builds, 5 stories checked in the browser, fit audit 0 new in seven languages and in pseudo. E2E: new programs-review spec (5 tests) and admin, account, a11y, directory: 180 passed on all three phones.
 
 ## Left undone
 
