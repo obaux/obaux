@@ -44,6 +44,7 @@ when there is something he can see or try.
 | <img src="team/remy.svg" width="40" alt=""> | **Remy** | Right-to-Left Language Specialist (retired) | — (job done; Lena covers Arabic) | `session_01A44BM2WPMuZYKkspxsiQEG` |
 | <img src="team/dot.svg" width="40" alt=""> | **Dot** | Design Systems Lead | Design system & Storybook | `session_01A3kdir46ErR2eyjDLFdzyW` |
 | <img src="team/wren.svg" width="40" alt=""> | **Wren** | Website & Help Centre Lead | Public website | `session_012vS6F7CMTwFn3u5UG66JWz` |
+| <img src="team/iris.svg" width="40" alt=""> | **Iris** | User Research & Testing Lead | User testing & research | `IRIS_SESSION` |
 | <img src="team/gus.svg" width="40" alt=""> | **Gus** | Former Platform Engineer (retired) | — | `session_01NoLKA8RJRwhyDJUe8CAZVE` |
 
 **One specialist per lane.** Will, 10 October, asked why accounts and languages each
@@ -80,8 +81,9 @@ current (`docs/control-room.md`).
 | **Messages & notifications** (Nico) | Conversations, attachments, translation, the bell, texts and emails going out, blocking and reporting | its lane |
 | **Places & programs** (Piper) | The catalogue, a place, programs and their onboarding, saved places, trips, points, Home | its lane |
 | **Languages & legal** (Lena, Arabic included) | The seven languages and the ledger, privacy, terms, transparency, native review. **Weekly, on Friday** (below) | its lane |
-| **Design system & Storybook** (Dot) | Components, tokens, illustrations, every screen's story, the fit and accessibility audits, the Figma flow map | its lane |
+| **Design system & Storybook** (Dot) | Components, tokens, illustrations, every screen's story, the fit and accessibility audits, the Figma flow map. **The map: once a day, at about 2am Pacific** (below) | its lane |
 | **Website** (Wren) | The public site and the support centre (`pam-site`). **Weekly, on Friday** (below) | its own project |
+| **User testing & research** (Iris) | Walks each flow as the person using it and reports what gets in their way; research Will asks for. Finds, never fixes. **A first pass over every flow, then weekly, on Thursday** (below) | `docs/research/` |
 
 Which session is in which lane today, its id, and what it is doing and waiting on
 are on **the board** at the end of `docs/lanes.md`. The merge desk keeps it.
@@ -120,6 +122,72 @@ chase new strings.
   mislead someone about their safety, privacy or a visit, it asks Will whether it
   can wait.
 
+## The flow map, once a day
+
+Will, 10 October 2026: "Let's also switch up the cadence for Figma flow updates once a day
+only, at 2am. Otherwise we run too many tokens, and changes may happen in a day that would
+require too many updates to flow."
+
+- **The design lane (Dot) redraws the map once a night**, at about 2am Pacific, from `main`.
+  A scheduled message starts it. It reads what merged since the commit in
+  `docs/user-flows/last-map.txt`; if no screen changed, it stops and sends nothing.
+  Otherwise it redraws only the pages that changed and sends one READY. How: the
+  `pam-user-flows` skill.
+- **Other lanes don't touch the map.** No edits to `docs/user-flows/flows.mjs`, no Figma.
+  A job that adds, removes or rewires a screen writes one line in its READY:
+  `Screens: added <screen> (<role>); removed …; <screen> now reached from …`. The merge
+  desk copies that line into the merge commit, which is where the nightly run reads it.
+- **When Will wants the map now**, he asks and the design lane runs it then.
+
+## User testing and research
+
+Will, 10 October 2026: "I'd also like to add a team member for user testing each flow and
+research." That is **Iris**, the User Research & Testing Lead.
+
+- **What Iris tests:** each flow, as the person using it: a member, a case manager, a
+  program lead, a super admin. Phone size (390 wide, and 320), light and dark, in English
+  and at least one other language. The measure is Pam's own: *can a person who hasn't used
+  a phone in 8 years enroll in a program, get to it, and keep going, without help?* So:
+  how many taps, every dead end, every word a member wouldn't use, anything small, faint
+  or hard to hit.
+- **Where Iris tests, safely:** the clickable prototype in Storybook, the app built locally
+  with stub data (`node scripts/journeys.mjs`, the Playwright harness), and the live app
+  **signed out only**. Iris never signs in to the live app, never makes an account or an
+  invite, never sends a text or an email, and never sees a member's data.
+- **What Iris writes:** one report per pass in `docs/research/` (`YYYY-MM-DD-<flow>.md`):
+  findings ranked *stops someone*, *slows someone*, *polish*, each with the screen, the
+  steps, what happened and what the person would expect. Then **one** FINDING note to the
+  merge desk for the whole pass. Iris finds; Iris never fixes. The merge desk turns
+  findings into jobs for Will to choose from.
+- **Research** (how people like Pam's members use phones and services, what similar
+  services do, accessibility guidance): only when Will asks, written up in
+  `docs/research/` with its sources.
+- **When:** a first pass over every flow, one flow per job (Member first). After that,
+  **one pass a week, on Thursday**, over the flows that changed that week (the nightly map
+  run's READY notes list them), so its findings are ready for Friday's language and
+  website batch. Anything Will asks for, when he asks.
+
+## Keeping the team light
+
+Will, 10 October 2026: "let's optimize some of our processes." Every message wakes a
+session, and every turn re-reads that session's whole conversation, so the cheapest
+message is the one not sent.
+
+- **Send a note only when the receiver must act or decide.** No "thanks", no "noted", no
+  FYI. The merge desk tells a lane its branch merged in that lane's next job note, not in a
+  note of its own; a lane learns it from `main` meanwhile.
+- **Lanes:** STARTED when you begin; QUESTION, BLOCKED, FINDING or MIGRATION as they come;
+  then READY **or** DONE, not both. A READY that ends your work says so ("stopping after
+  this") and needs no DONE.
+- **Checks:** a lane runs its unit tests, typecheck, build, the browser specs for the
+  screens it touched and the accessibility spec. **The whole browser suite runs once per
+  merge, on the merge desk**, not once per branch as well.
+- **The merge desk batches:** READY branches waiting together are merged together, with
+  one run of checks and one wait for CI. The Control Room is brought up to date with each
+  batch, and whenever Will has something to do, not after every teammate's note.
+- **Scheduled work is quiet when there is nothing to do:** the nightly map, the Friday
+  batch and the Thursday test pass end without a message if nothing changed.
+
 ## Where jobs come from
 
 - **Every job comes from Will.** He gives it in a session's own chat, or through the
@@ -151,11 +219,12 @@ works). The kinds:
 | **BLOCKED** | you cannot go on | what blocks you and what would unblock it |
 | **FINDING** | you find something outside your lane — a bug, a stale record, a risk | where; what; the evidence. You do not fix it |
 | **MIGRATION** | a migration file is ready | the file; expand or contract; what must be live first; the database tests you ran |
-| **READY** | a branch is ready to merge | branch and head commit; migration first or not; lanes touched; every check with its result (the language-fit check too if copy or UI changed); what to tell Will |
+| **READY** | a branch is ready to merge | branch and head commit; migration first or not; lanes touched; every check with its result (the language-fit check too if copy or UI changed); a `Screens:` line if a screen was added, removed or rewired; what to tell Will |
 | **DONE** | you stop work for now | what changed; branch and head; what is left; what you are waiting on |
 
-- **Don't go quiet.** A turn that pushed work ends with READY or DONE. A turn that
-  stops on a question ends with QUESTION or BLOCKED.
+- **Don't go quiet.** A turn that pushed work ends with READY or DONE (one of them, not
+  both). A turn that stops on a question ends with QUESTION or BLOCKED. Don't acknowledge
+  a note that asks nothing of you ("Keeping the team light", above).
 - **Ask Will in your own chat when he is there, and send the same QUESTION to the
   merge desk** so it is on the board. When Will answers you directly, put his answer
   in your next note.
@@ -180,6 +249,9 @@ works). The kinds:
 - **Cuts releases** from the changelog fragments.
 - **Keeps the weekly notes** for Lena and Wren in `docs/weekly/`, and sends them on
   Friday.
+- **Copies each READY's `Screens:` line into its merge commit**, for the nightly map.
+- **Runs the whole browser suite once per merge batch** before pushing, and messages a
+  lane only when it has something to do.
 - **Answers within its next turn.**
 
 Its messages arrive in your chat as a turn that starts **"From the merge desk"**.

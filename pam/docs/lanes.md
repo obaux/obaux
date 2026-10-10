@@ -30,8 +30,9 @@ The short version:
 | **Messages & notifications** | Conversations, photos, documents, link previews, message translation; the bell, texts and emails going out; blocking and reporting | `app/{messages,notifications,alerts,reminders}`, `supabase/functions`, `lib/useThread.ts`, the dispatcher |
 | **Places & programs** | The catalogue and its imports; a place's profile and the maps drawer; programs and their onboarding; saved places, trips, points and badges; Home | `app/{place,places,saved,trips,program,programs,flag,interested,home,points}`, `services`, `programs` |
 | **Languages & legal** | The seven languages and the ledger; privacy, terms and the transparency contract; texts and emails in each language; native review. Works in a weekly batch on Friday from the merge desk's notes (`docs/team.md`, "The weekly update") | `packages/config/src/{locales,legal.ts,transparency.ts,notices.ts}`, `app/{privacy,terms,legal,help,about,language}`, `docs/copy-changes.md` |
-| **Design system & Storybook** | Components and tokens; illustrations; the story for every screen; the fit and accessibility audits; the Figma flow map | `packages/ui`, `apps/web/src/stories`, `docs/user-flows` |
+| **Design system & Storybook** | Components and tokens; illustrations; the story for every screen; the fit and accessibility audits; the Figma flow map, redrawn once a night at about 2am Pacific from the day's merges (`docs/team.md`, "The flow map, once a day") | `packages/ui`, `apps/web/src/stories`, `docs/user-flows` |
 | **Public website** | The public site and the support centre (`pam-site` on Vercel). Works in a weekly batch on Friday from the merge desk's notes (`docs/team.md`, "The weekly update") | its own project; not the app |
+| **User testing & research** | Walking each flow as a member, case manager, program lead and super admin, and reporting what gets in their way; research Will asks for. Finds, never fixes: one FINDING note per pass. A first pass over every flow, then weekly on Thursday (`docs/team.md`, "User testing and research") | `docs/research/` |
 | **Merge desk & platform** | Merging to main; applying migrations to the live project; releases; CI and deploys; the records tooling and this page | `.github/workflows`, `packages/db`, `scripts`, `docs/` |
 
 `apps/native` has no lane yet; the first session to work there adds one.
@@ -155,7 +156,7 @@ real date, fails the numbering test.
 | An SOP amendment | its own file in `docs/amendments/` | nobody |
 | `STATUS.md` | one section per job, `## <Lane> · <job> (<date>)` | only that job's session edits it; the shared tables (what is live, what is proven, what needs a human) are the merge desk's, filled from READY notes |
 | Locale files and `ledger.json` | shared by every lane that changes words | merge main first; `pnpm --filter @pam/config copy:status` shows what is stale |
-| `docs/user-flows/flows.mjs` | one node per screen | add or change only your screen's node |
+| `docs/user-flows/flows.mjs` | one node per screen | only the design lane's nightly map run; other lanes write a `Screens:` line in READY instead |
 
 ## Database changes in two steps
 
@@ -185,24 +186,23 @@ migration that needs one puts it alone so the rest can be applied without it.
 
 ## The board: where the sessions stand (the merge desk keeps it)
 
-As of 10 October 2026, 06:30 UTC. A session's id is where `send_message` reaches it;
+As of 10 October 2026, 18:40 UTC. A session's id is where `send_message` reaches it;
 every session reports to Mira, the merge desk (`docs/team.md`, which also has each
 teammate's name, title and avatar). Will watches the same board, live, on the Pam
-Control Room (`docs/control-room.md`). After a merge, every open branch below merges
-`main`.
+Control Room (`docs/control-room.md`). A lane merges `main` before it starts its next job.
 
-Will, 10 October: "Go ahead and decide, you're the CTO." The "Waiting on" column
-reflects the answers Mira gave each lane that morning.
+Will, 10 October: "Go ahead and decide, you're the CTO."
 
 | Who | Session | Id | Branch | Where it stands | Waiting on |
 |---|---|---|---|---|---|
-| **Mira**, CTO | PAM · Mira · Chief Technology Officer | `session_018wn7LF7RMsHnXSAzvk6s1p` | works from `main` | merged languages, Arabic, D-445 and D-448; runs the team and the control room | — |
-| **Ava**, Accounts & Access Lead | PAM · Ava · Accounts & Access Lead | `session_01NPHYiBRyyv8F5L7o9KaMEd` | `claude/pam-assign-and-limit` | guide assignment and limits built; two migrations on the branch | its first report; then Will on the migrations |
-| **Nico**, Messaging & Notifications Lead | PAM · Nico · Messaging & Notifications Lead | `session_01CCHvVkYgXddhtq4DHvvETo` | new, from `main` | job 1: the sender's name overlapping the first message (ru, ar, zh-CN); job 2: sending email, behind a switch | STARTED; Will's sending domain and keys before email goes on |
-| **Piper**, Places & Programs Lead | PAM · Piper · Places & Programs Lead | `session_01RmG6J2CCikoqM9H2fhbSPm` | `claude/places-programs-load-own-program` | a program lead loads their own program (D-447), app half; the approved-lead fix, built on 0085's body | 0085 live (Will pastes it in the SQL editor) |
-| **Lena**, Languages & Legal Lead (covers Arabic) | PAM · Lena · Languages & Legal Lead | `session_01Hjv2RQuz5PJmxQ7tLGb5sW` | new, from `main` | English tags (EN, ES, PT-BR, ZH-CN, ZH-HK, RU, AR) before every language name (Will, 10 October) | STARTED |
-| **Dot**, Design Systems Lead | PAM · Dot · Design Systems Lead | `session_01A3kdir46ErR2eyjDLFdzyW` | none (merged) | D-448 merged and confirmed | a next job from Will |
-| **Wren**, Website & Help Centre Lead | PAM · Wren · Website & Help Centre Lead | `session_012vS6F7CMTwFn3u5UG66JWz` | `claude/compassionate-bohr-mzrchf` | toning the case-manager post down to what is live, then READY; the draft post stays hidden | READY; the domain later, from Will |
+| **Mira**, CTO | PAM · Mira · Chief Technology Officer | `session_018wn7LF7RMsHnXSAzvk6s1p` | works from `main` | runs the team, merges, the live project and the Control Room | — |
+| **Ava**, Accounts & Access Lead | PAM · Ava · Accounts & Access Lead | `session_01NPHYiBRyyv8F5L7o9KaMEd` | — | free | a next job from Will |
+| **Nico**, Messaging & Notifications Lead | PAM · Nico · Messaging & Notifications Lead | `session_01CCHvVkYgXddhtq4DHvvETo` | — | invite email sends; free | Will: email forwarding on joinpam.org, then his "go" on the invite email |
+| **Piper**, Places & Programs Lead | PAM · Piper · Places & Programs Lead | `session_01RmG6J2CCikoqM9H2fhbSPm` | `claude/places-programs-policies-p4` | policies part 4 ready; app code held off `main` | Will pastes part 4's migration (card a31) |
+| **Lena**, Languages & Legal Lead (covers Arabic) | PAM · Lena · Languages & Legal Lead | `session_01Hjv2RQuz5PJmxQ7tLGb5sW` | — | weekly; next batch Friday 16 October (`docs/weekly/2026-10-16.md`) | Friday |
+| **Dot**, Design Systems Lead | PAM · Dot · Design Systems Lead | `session_01A3kdir46ErR2eyjDLFdzyW` | `claude/pam-design-flow-map-3` | the Figma map: the staff Home card and a past visit on Trips; then the map once a night | — |
+| **Wren**, Website & Help Centre Lead | PAM · Wren · Website & Help Centre Lead | `session_012vS6F7CMTwFn3u5UG66JWz` | — | weekly; next batch Friday 16 October | Friday |
+| **Iris**, User Research & Testing Lead | PAM · Iris · User Research & Testing Lead | `IRIS_SESSION` | new, from `main` | first pass: the Member flow | — |
 
 **Retired** (archived; their work and session logs stay in the records, and either can
 be brought back):

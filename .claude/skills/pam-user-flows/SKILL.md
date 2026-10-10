@@ -1,15 +1,32 @@
 ---
 name: pam-user-flows
-description: Keep PAM's Figma user-flow map ("PAM — User flows") in step with the app. Use at the end of every PAM change that adds, removes, renames or rewires a screen, or changes what a screen is for — and whenever Will asks to see, create or update the user flows, the app map, or "how the app fits together". Also use when a DECISIONS entry (D-###) touches navigation, onboarding, invites, tabs or a role's screens.
+description: Keep PAM's Figma user-flow map ("PAM — User flows") in step with the app, once a day. Use for the design lane's nightly map run (about 2am Pacific, from the day's merges to main), and whenever Will asks to see, create or update the user flows, the app map, or "how the app fits together" right now. A lane job that adds or rewires a screen does NOT use this: it writes a `Screens:` line in its READY instead.
 ---
 
 # PAM user flows — the visual map of the whole app
 
 Will (4 October 2026): "document app changes by also updating user flows …
-so we have a visual map of how the entire app is designed." The map is a
-deliverable of every change that touches screens, like the DECISIONS entry
-and the session log. A change that moves a screen and leaves the map behind is
-not finished.
+so we have a visual map of how the entire app is designed."
+
+**Once a day, not per change** (Will, 10 October 2026: "switch up the cadence for
+Figma flow updates once a day only, at 2am. Otherwise we run too many tokens, and
+changes may happen in a day that would require too many updates to flow"). The
+design lane runs it at about 2am Pacific from `main`; nobody else touches
+`flows.mjs` or the Figma file. Outside the nightly run, only when Will asks.
+
+## The nightly run
+
+1. Merge `origin/main` into a fresh branch `claude/pam-flow-map-<YYYY-MM-DD>`.
+2. `cat docs/user-flows/last-map.txt` is the `main` commit the map was last drawn
+   from. `git log --merges <that>..origin/main` lists what merged since; read their
+   `Screens:` lines (the merge desk copies each READY's into its merge commit), and
+   `git diff --stat <that>..origin/main -- apps/web/src/app apps/web/src/screens
+   apps/web/src/stories/roles` for anything a line missed.
+3. **Nothing changed a screen → stop.** No commit, no message, no Figma call.
+4. Otherwise: the steps below for the pages that changed; write the new `main`
+   commit into `last-map.txt`; commit `flows.mjs` and `last-map.txt`; push the
+   branch; send the merge desk one READY: the pages redrawn and the Figma link.
+   Any screen the map could not show, as a FINDING in the same note.
 
 **The file:** Figma, team Oba Studio — "PAM — User flows"
 https://www.figma.com/design/DtlJg9Klx5BRfHbXBhkg98 (file key
@@ -21,9 +38,9 @@ https://www.figma.com/design/DtlJg9Klx5BRfHbXBhkg98 (file key
 Every screen is a Storybook story, so the map is drawn from the real screens.
 Never hand-edit the Figma pages — the next run replaces them.
 
-## When to update
+## What to change in `flows.mjs`
 
-After the change is built and Storybook builds:
+For each screen that changed (Storybook built from the branch):
 
 1. **A new screen** → add a node (title, `story` id, `path`, `changed: 'D-###'`,
    a short `note` if its point is not obvious) and the edge(s) that reach it.
