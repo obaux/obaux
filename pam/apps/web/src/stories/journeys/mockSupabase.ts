@@ -74,6 +74,8 @@ export interface MockOptions {
   readonly ownProgram?: 'review' | 'live';
   /** With `ownProgram: 'live'`: a change to its name or address already waiting for Pam (D-462). */
   readonly pendingChange?: boolean;
+  /** The program of `SAVED_PLACE` offers services (D-462), for a member's view of it. */
+  readonly placeServices?: boolean;
   /**
    * A member who already has a trip saved (D-454). Without it they have none —
    * and a trip planned to a real place in the story is saved from then on, as
@@ -90,6 +92,40 @@ export const SAVED_PLACE = {
   address: '1234 Market St, Philadelphia, PA 19107',
 } as const;
 
+interface ProgramServiceRow {
+  id: string;
+  service_id: string;
+  name: string;
+  description: string | null;
+  phone: string | null;
+  website: string | null;
+  address: string | null;
+  hours: unknown;
+  sort_order: number;
+}
+
+let serviceCounter = 0;
+function programServiceRow(
+  programId: string,
+  name: string,
+  description: string | null,
+  extra: Partial<ProgramServiceRow> = {},
+): ProgramServiceRow {
+  serviceCounter += 1;
+  return {
+    id: `5e5e5e5e-0000-4000-8000-${String(serviceCounter).padStart(12, '0')}`,
+    service_id: programId,
+    name,
+    description,
+    phone: null,
+    website: null,
+    address: null,
+    hours: null,
+    sort_order: serviceCounter,
+    ...extra,
+  };
+}
+
 interface SavedTripRow {
   id: string;
   service_id: string;
@@ -101,6 +137,19 @@ interface SavedTripRow {
   starts_at: string;
   note: string | null;
   status: 'scheduled';
+}
+
+/**
+ * A time `days` from today on the hour, like the example trips (`dummy-trips.ts`):
+ * the fit audit keeps the date the stories believe it is but not the minute, so
+ * a story that shows `now + 4 days` reads "12:04" one run and "12:00" the next,
+ * and its accepted entry (keyed by the text) stops matching.
+ */
+function onTheHour(days: number, hour: number): string {
+  const d = new Date();
+  d.setDate(d.getDate() + days);
+  d.setHours(hour, 0, 0, 0);
+  return d.toISOString();
 }
 
 function savedTripRow(n: number, startsAt: string, note: string | null = null): SavedTripRow {
@@ -118,13 +167,16 @@ function savedTripRow(n: number, startsAt: string, note: string | null = null): 
   };
 }
 
+/** The lead's program (a listing in the catalogue, so its id is a real one). */
+const OWN_PROGRAM_ID = '4c0f6b64-3a0e-4b8e-9d6c-0a0a0a0a0a0a';
+
 /** The lead's organisation in the pretend database, once they have a program. */
 const OWN_ORG_ID = '22222222-0000-0000-0000-0000000000aa';
 
 /** The lead's program as the pretend database holds it (D-447). */
 function ownProgramRow(state: 'review' | 'live') {
   return {
-    id: 'own-program',
+    id: OWN_PROGRAM_ID,
     name: 'Fresh Start Kitchen',
     category: 'workforce',
     subcategory: 'job_training',
@@ -161,9 +213,27 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
       },
     ];
   }
+  // The services programs offer (D-462): a lead's own program once it is on file,
+  // and the catalogue program a member plans a trip to.
+  const programServices: ProgramServiceRow[] = [
+    ...(options.ownProgram
+      ? [
+          programServiceRow(OWN_PROGRAM_ID, 'Knife skills', 'Two evenings a week.', { phone: '+12155550177' }),
+          programServiceRow(OWN_PROGRAM_ID, 'Job-readiness workshop', 'Resumes, interviews and showing up ready.'),
+        ]
+      : []),
+    ...(options.placeServices
+      ? [
+          programServiceRow(SAVED_PLACE.id, 'Resume help', 'One-to-one help with a resume.', { phone: '+12155550188' }),
+          programServiceRow(SAVED_PLACE.id, 'Computer lab', 'Open computers and printing.', {
+            address: '300 Chestnut St, Philadelphia, PA 19106',
+          }),
+        ]
+      : []),
+  ];
   // The member's saved trips (D-454): planning one adds it, moving one changes it, and reading answers with them.
   const savedTrips: SavedTripRow[] = options.savedTrip
-    ? [savedTripRow(1, new Date(Date.now() + 4 * 86_400_000).toISOString(), 'Bring my ID')]
+    ? [savedTripRow(1, onTheHour(4, 12), 'Bring my ID')]
     : [];
   const has = (part: string) => (url: string) => url.includes(part);
   const on = (part: string, answer: (url: string, method: string, body: unknown) => Answer): Route => (url, method, body) =>
@@ -248,6 +318,29 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
       return { body: gone ?? null };
     }),
     on('/rest/v1/program_submissions', () => ({ body: submissions })),
+    // A program's services (D-462): read by program, added, changed and removed by id.
+    (url, method, body) => {
+      if (!url.includes('/rest/v1/program_services')) return null;
+      const idIn = (name: string) => new RegExp(`${name}=eq\\.([^&]+)`).exec(url)?.[1];
+      if (method === 'POST') {
+        const args = (body ?? {}) as Partial<ProgramServiceRow> & { service_id: string; name: string };
+        programServices.push(programServiceRow(args.service_id, args.name, args.description ?? null, args));
+        return { body: [] };
+      }
+      const id = idIn('id');
+      if (method === 'PATCH') {
+        const row = programServices.find((r) => r.id === id);
+        if (row) Object.assign(row, body as object);
+        return { body: [] };
+      }
+      if (method === 'DELETE') {
+        const at = programServices.findIndex((r) => r.id === id);
+        if (at >= 0) programServices.splice(at, 1);
+        return { body: [] };
+      }
+      const program = idIn('service_id');
+      return { body: programServices.filter((r) => !program || r.service_id === program) };
+    },
     // A lead's edit of their own listing (D-447): accepted, answered with nothing.
     (url, method) =>
       url.includes('/rest/v1/services') && url.includes('id=eq.') && method === 'PATCH' ? { body: [] } : null,
@@ -320,6 +413,28 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
     }),
     on('/rpc/service_detail', (_url, _method, body) => {
       const id = ((body ?? {}) as { p_id?: string }).p_id;
+      // A real place of the catalogue, to plan a trip to or read the services of (D-454, D-462).
+      if (id === SAVED_PLACE.id) {
+        return {
+          body: [
+            {
+              id: SAVED_PLACE.id,
+              name: SAVED_PLACE.name,
+              lookup_name: SAVED_PLACE.name,
+              category: SAVED_PLACE.category,
+              address: SAVED_PLACE.address,
+              phone: '+12155550143',
+              website: null,
+              place_id: null,
+              lat: 39.9526,
+              lon: -75.1652,
+              description_plain: 'Help finding work, training and a way in.',
+              audience: null,
+              hours: null,
+            },
+          ],
+        };
+      }
       return { body: [PLACES.find((place) => place.id === id) ?? PLACES[0]] };
     }),
     on('/rpc/directory_people', () => ({ body: DIRECTORY_PEOPLE })),

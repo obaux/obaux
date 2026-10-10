@@ -80,6 +80,7 @@ const styles = stylex.create({
 export function ProgramView({
   program: initial,
   note,
+  programId = PROGRAM_PLACE_ID,
   isLive = false,
   pending = null,
   onCancelPending,
@@ -87,6 +88,8 @@ export function ProgramView({
 }: {
   readonly program: ProgramDetailsData;
   readonly note?: string | null;
+  /** The program's id: its services are read for it (a real program's, or the example's). */
+  readonly programId?: string;
   /** A live program: a new name or address is asked of Pam, not written (D-447). */
   readonly isLive?: boolean;
   /** A change to the name or address waiting for Pam (D-462). */
@@ -109,7 +112,7 @@ export function ProgramView({
   const set = (patch: Partial<ProgramDetailsData>) => setDraft((d) => ({ ...d, ...patch }));
   const { policies } = usePolicies();
   const { forPlace } = useServices();
-  const services = forPlace(PROGRAM_PLACE_ID);
+  const services = forPlace(programId);
 
   // The services (D-313), as rows: reading, each opens its editor; editing,
   // "Add a service" joins them on top. One list, so a lead learns one place.
@@ -378,6 +381,7 @@ export function ProgramScreen() {
     return (
       <ProgramView
         key={own.id}
+        programId={own.id}
         program={{
           name: own.details.name,
           category: own.details.category as Category,
