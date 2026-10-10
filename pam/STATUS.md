@@ -1112,6 +1112,13 @@ drops signatures), then `20261010042108_a_program_lead_submits_their_own_program
 
 ---
 
+## Messages & notifications · why the email service refused (10 October 2026) — merged 10 October
+
+Merged by the merge desk from 0068bcf; deployed with the D-488 bundle.
+
+Branch `claude/messages-email-error-detail`. `send-invite-emails` now keeps Resend's `name` and `message` (addresses and keys
+redacted, about 200 characters) in a failed row's `failure_reason`, instead of only the status. Needs a redeploy of the function.
+
 ## Messages & notifications · the expired-link address is deleted (10 October 2026) — merged 10 October
 
 Merged by the merge desk from 7a9b1d9. Live: applied as 20261010152709; the four function bodies match the file by md5 (purge, mark sent, claim, invites_log), the check constraint is in, `purge-invite-email-addresses` runs at 03:40 nightly; purge, mark and claim are service-role only. `send-invite-emails` redeployed from main with the D-488 bundle (see below).
