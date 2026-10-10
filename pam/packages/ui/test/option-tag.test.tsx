@@ -135,8 +135,23 @@ describe('a chip with a tag', () => {
     expect(russian).toHaveAttribute('aria-pressed', 'false');
     const arabic = screen.getByRole('button', { name: 'العربية' });
     expect(arabic).toHaveAttribute('lang', 'ar');
-    expect(arabic).toHaveAttribute('dir', 'rtl');
     expect(screen.getByRole('button', { name: 'English' })).toHaveAttribute('aria-pressed', 'true');
+  });
+
+  it('does not turn a chip round: `dir` is on the words, so the tag stays first in the page\'s direction (D-455)', () => {
+    render(<ChoiceChips label="Language" options={OPTIONS} value="en" onChange={() => undefined} />);
+    const arabic = screen.getByRole('button', { name: 'العربية' });
+    // Not on the button: that flipped the whole chip and put the tag after an Arabic name on an English page.
+    expect(arabic).not.toHaveAttribute('dir');
+    // On the words, so the Arabic name still reads right to left.
+    const words = arabic.querySelector('span[lang="ar"]');
+    expect(words).not.toBeNull();
+    expect(words).toHaveAttribute('dir', 'rtl');
+    expect(words).toHaveTextContent('العربية');
+    // The tag comes first in the chip's own order (the page's order decides which side that is).
+    const tag = arabic.querySelector('[aria-hidden="true"]');
+    expect(tag).not.toBeNull();
+    expect(tag!.compareDocumentPosition(words!) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
   it('has no accessibility violations (structure)', async () => {

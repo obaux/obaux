@@ -142,22 +142,37 @@ test.describe('signing up', () => {
     await expect(page.getByRole('progressbar')).toHaveCount(0);
   });
 
-  test('the language chips lead with their English tag, and read as the name alone (D-451)', async ({ page }) => {
-    // Will, 10 October 2026: the tag says which language a chip is before the
-    // chip says it in itself. Always English; hidden from a screen reader.
-    await newcomer(page);
-    await page.goto('/join/');
-    const group = page.getByRole('group', { name: en['onboarding.language.title'] });
-    await expect(group).toBeVisible();
-    for (const code of SUPPORTED_LOCALES) {
-      const name = en[`language.${code}` as keyof typeof en] as string;
-      const chip = group.getByRole('button', { name, exact: true });
-      await expect(chip, `${code} chip`).toHaveCount(1);
-      await expect(chip.locator('[aria-hidden="true"]', { hasText: LANGUAGE_TAGS[code] })).toHaveText(LANGUAGE_TAGS[code]);
-      // The chip is the language's own name, in its own voice: `lang` (and `dir`) on the chip itself.
-      await expect(chip).toHaveAttribute('lang', code);
-    }
-  });
+  for (const locale of ['en', 'ar'] as const) {
+    test(`${locale}: the language chips lead with their English tag, in the page's direction, and read as the name alone (D-451, D-455)`, async ({ page }) => {
+      // Will, 10 October 2026: the tag says which language a chip is before the chip says it in itself.
+      // Always English; hidden from a screen reader; first at the start of the chip, so on an English page
+      // the Arabic chip reads "AR  العربية" and on an Arabic page the English chip "EN  English".
+      await page.addInitScript((code) => localStorage.setItem('pam.locale', code), locale);
+      await newcomer(page);
+      await page.goto('/join/');
+      await expect(page.locator('html')).toHaveAttribute('lang', locale);
+      const group = page.getByRole('group').filter({ has: page.locator('[aria-pressed]') }).last();
+      await expect(group).toBeVisible();
+      for (const code of SUPPORTED_LOCALES) {
+        const name = en[`language.${code}` as keyof typeof en] as string;
+        const chip = group.getByRole('button', { name, exact: true });
+        await expect(chip, `${code} chip`).toHaveCount(1);
+        const tag = chip.locator('[aria-hidden="true"]', { hasText: LANGUAGE_TAGS[code] });
+        await expect(tag).toHaveText(LANGUAGE_TAGS[code]);
+        // The name is spoken in its own voice (`lang` on the chip) and is drawn in its own direction (on the words),
+        // while the chip itself is not turned round.
+        await expect(chip).toHaveAttribute('lang', code);
+        await expect(chip).not.toHaveAttribute('dir');
+        const words = chip.locator(`span[lang="${code}"]`);
+        await expect(words).toHaveText(name);
+        await expect(words).toHaveAttribute('dir', code === 'ar' ? 'rtl' : 'ltr');
+        const tagBox = (await tag.boundingBox())!;
+        const wordsBox = (await words.boundingBox())!;
+        if (locale === 'ar') expect(tagBox.x, `${code}: tag on the right of the name`).toBeGreaterThan(wordsBox.x);
+        else expect(tagBox.x, `${code}: tag on the left of the name`).toBeLessThan(wordsBox.x);
+      }
+    });
+  }
 
   test('never says "role" to the person filling it in', async ({ page }) => {
     // Role is a word this system uses about people, not one people use about
