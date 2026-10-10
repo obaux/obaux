@@ -36,13 +36,43 @@ export type OwnProgramState =
   | { readonly status: 'idle' }
   | { readonly status: 'loading' }
   | { readonly status: 'none' }
-  | { readonly status: 'ready'; readonly program: OwnProgram }
+  /** `program` is the one shown (the lead's pick, else the newest); `programs` is every one they have, newest first (D-318). */
+  | { readonly status: 'ready'; readonly program: OwnProgram; readonly programs: readonly OwnProgram[] }
   | { readonly status: 'error' };
 
 const IDLE: OwnProgramState = { status: 'idle' };
 const LOADING: OwnProgramState = { status: 'loading' };
 
 let store: { userId: string | null; state: OwnProgramState } = { userId: null, state: IDLE };
+
+/*
+ * Which of a lead's programs is shown (D-318). Kept on this phone, since it is a
+ * view, not a fact about the program; a pick that is gone (taken off, or another
+ * account) falls back to the newest.
+ */
+const PICK = 'pam.program.picked';
+let picked: string | null = null;
+try {
+  picked = localStorage.getItem(PICK);
+} catch {
+  // Storage off: the newest program is shown.
+}
+
+/** Choose which program the lead's screens show. */
+export function pickOwnProgram(id: string | null): void {
+  picked = id;
+  try {
+    if (id === null) localStorage.removeItem(PICK);
+    else localStorage.setItem(PICK, id);
+  } catch {
+    // Not remembered; harmless.
+  }
+  if (store.state.status === 'ready') {
+    const programs = store.state.programs;
+    const program = programs.find((p) => p.id === id) ?? programs[0]!;
+    publish(store.userId, { status: 'ready', program, programs });
+  }
+}
 const listeners = new Set<() => void>();
 let loadId = 0;
 
@@ -81,11 +111,11 @@ async function load(userId: string): Promise<void> {
       .eq('org_id', orgId)
       .eq('is_active', true)
       .order('created_at', { ascending: false })
-      .limit(1);
+      .limit(20);
     if (error) throw error;
     if (mine !== loadId) return;
-    const row = ((data ?? []) as OwnProgramRow[])[0];
-    if (!row) {
+    const rows = (data ?? []) as OwnProgramRow[];
+    if (rows.length === 0) {
       publish(userId, { status: 'none' });
       return;
     }
@@ -94,12 +124,14 @@ async function load(userId: string): Promise<void> {
     const { data: waiting, error: waitingError } = await supabase
       .from('program_submissions')
       .select(SUBMISSION_COLUMNS)
-      .eq('service_id', row.id)
+      .in('service_id', rows.map((row) => row.id))
       .in('status', ['in_review', 'changes_asked'])
       .order('sent_at', { ascending: false });
     if (waitingError) throw waitingError;
     if (mine !== loadId) return;
-    publish(userId, { status: 'ready', program: programFromRow(row, (waiting ?? []) as SubmissionRow[]) });
+    const open = (waiting ?? []) as Array<SubmissionRow & { service_id: string }>;
+    const programs = rows.map((row) => programFromRow(row, open.filter((s) => s.service_id === row.id || (s.service_id === undefined && rows.length === 1))));
+    publish(userId, { status: 'ready', program: programs.find((p) => p.id === picked) ?? programs[0]!, programs });
   } catch {
     if (mine === loadId) publish(userId, { status: 'error' });
   }
@@ -120,6 +152,8 @@ export async function submitOwnProgram(details: ProgramDetails): Promise<boolean
     const { createClient } = await import('./supabase');
     const { error } = await createClient().rpc('submit_program', submitArguments(details));
     if (error) return false;
+    // Add a program returns to the new one (D-318): the newest is shown.
+    pickOwnProgram(null);
     await refreshOwnProgram();
     return true;
   } catch {

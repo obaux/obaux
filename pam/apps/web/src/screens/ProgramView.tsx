@@ -85,6 +85,7 @@ export function ProgramView({
   pending = null,
   onCancelPending,
   onSave,
+  canSwitch = false,
 }: {
   readonly program: ProgramDetailsData;
   readonly note?: string | null;
@@ -98,6 +99,8 @@ export function ProgramView({
   readonly onCancelPending?: () => Promise<boolean>;
   /** A real program: write the edit; resolves false when it could not be saved. */
   readonly onSave?: (draft: ProgramDetailsData) => Promise<boolean>;
+  /** A real lead's program: the way to their other programs, and to add one (D-318). */
+  readonly canSwitch?: boolean;
 }) {
   const { t } = useI18n();
   const [program, setProgram] = useState(initial);
@@ -208,6 +211,21 @@ export function ProgramView({
           />
         }
       />
+
+      {canSwitch && !editing ? (
+        <MenuList
+          label={t('program.switch.title')}
+          items={[
+            {
+              id: 'switch',
+              label: t('program.switch.row'),
+              description: t('program.switch.row.body'),
+              href: '/program/switch/',
+              icon: <PlacesIcon width={26} height={26} aria-hidden />,
+            },
+          ]}
+        />
+      ) : null}
 
       {saved ? <Text xstyle={styles.saved}>{t(askedPam ? 'program.saved.change' : 'program.saved')}</Text> : null}
       {pending ? (
@@ -394,6 +412,7 @@ export function ProgramScreen() {
         pending={own.pendingChange}
         {...(own.pendingChange ? { onCancelPending: () => withdrawSubmission(own.pendingChange!.id) } : {})}
         onSave={(draft) => saveOwnProgram(own, draft)}
+        canSwitch
       />
     );
   }
