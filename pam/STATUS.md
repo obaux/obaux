@@ -1123,6 +1123,12 @@ language's own name, so a person can see which language a row is before they can
   tree (471 stories × 7 languages: 26 new in a language, all 26 accepted, 0 not). Not run: the
   Playwright browser suite, which is what measures the tag's colour contrast.
 
+## Messages & notifications · Reported in the new Messages (10 October 2026)
+
+Merged to `main` by the merge desk, 10 October (no migration). The redesigned Messages screen has "Conversations | Reported" for case managers and
+super admins, with `?show=reported` working, so the old `/messages/` page can go. The old page is still the live
+route until Dot's shell merges; deleting it (and `DummyRowsLazy`) is a follow-up after both. D-464.
+
 ## Messages & notifications · Block (10 October 2026)
 
 Merged to `main` by the merge desk, 10 October (no migration: 0076 is live). A conversation's ⋯ menu has
