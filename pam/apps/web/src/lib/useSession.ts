@@ -75,13 +75,24 @@ export type SessionState =
   | { status: 'suspended' }
   | { status: 'error'; offline: boolean };
 
+/**
+ * The last signed-in answer in this tab. Each screen asks `useSession` for itself,
+ * so without this every screen began at `loading` — and a screen that mounted
+ * after the tab gate had already let it through drew its "nobody yet" default for a
+ * moment: a super admin's Profile showed a member's, a Home its blank frame (D-492;
+ * Will, 10 October). A new screen now starts from what the last one learned and
+ * still asks again, so a change is picked up. Forgotten on sign-out, on a
+ * different person, and whenever the answer is anything but signed in.
+ */
+let lastSignedIn: SessionState | null = null;
+
 export function useSession(): { state: SessionState; refresh: () => void } {
-  const [state, setState] = useState<SessionState>({ status: 'loading' });
+  const [state, setState] = useState<SessionState>(lastSignedIn ?? { status: 'loading' });
   const [nonce, setNonce] = useState(0);
 
   const refresh = useCallback(() => setNonce((n) => n + 1), []);
   /** Whose screen this is, so a SIGNED_IN for the same person is not news. */
-  const knownUser = useRef<string | null>(null);
+  const knownUser = useRef<string | null>(lastSignedIn?.status === 'signed-in' ? lastSignedIn.session.userId : null);
 
   useEffect(() => {
     let cancelled = false;
@@ -95,6 +106,7 @@ export function useSession(): { state: SessionState; refresh: () => void } {
         if (cancelled) return;
 
         if (!auth.user) {
+          lastSignedIn = null;
           knownUser.current = null;
           setState({ status: 'signed-out' });
           return;
@@ -114,21 +126,24 @@ export function useSession(): { state: SessionState; refresh: () => void } {
 
         if (cancelled) return;
         if (error) {
+          lastSignedIn = null;
           setState({ status: 'error', offline: !navigator.onLine });
           return;
         }
         if (!profile) {
+          lastSignedIn = null;
           setState({ status: 'no-profile' });
           return;
         }
         if (profile.access_status === 'suspended') {
+          lastSignedIn = null;
           setState({ status: 'suspended' });
           return;
         }
 
         const region = profile.regions as { name: string } | { name: string }[] | null;
         const given = (profile.profile_roles as { role: Role }[] | null | undefined)?.map((r) => r.role) ?? [];
-        setState({
+        const next: SessionState = {
           status: 'signed-in',
           session: {
             userId: profile.id as string,
@@ -145,13 +160,21 @@ export function useSession(): { state: SessionState; refresh: () => void } {
             isDemo: Boolean(profile.is_demo),
             accessStatus: profile.access_status === 'limited' ? 'limited' : 'active',
           },
-        });
+        };
+        lastSignedIn = next;
+        setState(next);
       } catch {
+        lastSignedIn = null;
         if (!cancelled) setState({ status: 'error', offline: !navigator.onLine });
       }
     };
 
-    setState({ status: 'loading' });
+    // Asked again on purpose (a refresh, a role changed): start over. A first ask
+    // that already has an answer keeps showing it while it checks.
+    if (nonce > 0 || !lastSignedIn) {
+      if (nonce > 0) lastSignedIn = null;
+      setState({ status: 'loading' });
+    }
     void load();
     return () => {
       cancelled = true;
@@ -178,10 +201,12 @@ export function useSession(): { state: SessionState; refresh: () => void } {
       if (cancelled) return;
       const { data } = createClient().auth.onAuthStateChange((event, next) => {
         if (event === 'SIGNED_OUT') {
+          lastSignedIn = null;
           refresh();
           return;
         }
         if (event === 'SIGNED_IN' && next?.user.id && next.user.id !== knownUser.current) {
+          lastSignedIn = null;
           knownUser.current = next.user.id;
           refresh();
         }
@@ -210,5 +235,6 @@ export async function signOut(): Promise<void> {
   } catch {
     // Storage off, or private mode. Nothing to forget.
   }
+  lastSignedIn = null;
   await createClient().auth.signOut();
 }

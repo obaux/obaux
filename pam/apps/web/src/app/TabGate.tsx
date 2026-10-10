@@ -3,10 +3,12 @@
 import { useEffect, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
 import { AppHeader, HelpBar, Loading, Notice, Page } from '@pam/ui';
+import { LargeTitleHeader } from '@pam/ui/LargeTitleHeader';
 import { NOTICES } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { useSession } from '@/lib/useSession';
 import { useSupportPhone } from '@/lib/useSupportPhone';
+import { HeaderActions } from '@/screens/HeaderActions';
 import { NotIn } from './NotIn';
 
 /**
@@ -41,10 +43,12 @@ export function TabGate({ children }: { readonly children: ReactNode }) {
 
   if (session.status === 'loading' || session.status === 'signed-out') {
     return (
+      // The new layout's own bar, not the old page's logo and Help block (D-492; Will, 10
+      // October: "the loading screen shows the old page behind the new layout"): Help is
+      // the round button every screen has, so this is still never a dead end (§0).
       <Page gap={3}>
-        <AppHeader />
+        <LargeTitleHeader title={t('common.loading')} isTitleHidden actions={<HeaderActions enabled={false} />} />
         <Loading label={t('common.loading')} variant="screen" />
-        <HelpBar label={t('nav.help')} variant="block" />
       </Page>
     );
   }

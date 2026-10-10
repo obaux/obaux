@@ -227,7 +227,7 @@ export function LegalPage({ doc }: { doc: LegalDocument }) {
   }, [doc]);
 
   /**
-   * A tab tap scrolls the section into place itself (Will, 10 October: Back did not
+   * A tab tap scrolls the section into place itself (D-492; Will, 10 October: Back did not
    * return to Sign in, the tabs glitched, "Back to top" stopped short). A `#hash`
    * link adds a history entry, so Back undid the tap instead of leaving the page, and
    * the browser's own jump fought the sticky bars. Here nothing is added to history,

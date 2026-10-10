@@ -1352,6 +1352,13 @@ recorded once `sms-inbound` is deployed (D-460); nothing queues the check-in or 
 connect" yet. Samples file: nine texts. D-453. Text reminders' staff list (merged 10 October) names
 only the alert texts Will signed: no "introduced to your program", no "your account changes".
 
+## Design system & Storybook · phone bugs (10 October)
+
+Branch `claude/pam-design-phone-bugs`. Legal pages: the section tabs and Back to top no longer add history or
+leave the page short of the top, so Back returns to Sign in; the loading screen is the new layout's bar, not the
+old page; a super admin's Profile no longer flashes a member's (`useSession` starts from the last answer).
+D-492. Needs Will: try the legal tabs on the phone; not seen in WebKit.
+
 ## Design system & Storybook · staff Home is live (10 October)
 
 Branch `claude/pam-design-staff-home-live`. Case managers and program leads now land on the redesigned Home
