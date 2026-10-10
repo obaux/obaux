@@ -40,17 +40,16 @@ describe('Signing a program’s rules, in seven languages', () => {
     for (const word of ['prisoner', 'ex-offender', 'inmate', 'convict', 'justice']) expect(all).not.toContain(word);
   });
 
-  it('is hidden until the signing screens are live and a language is signed', () => {
+  it('is live with the English signed (D-489) and the other six still drafts', () => {
     const file = JSON.parse(readFileSync(join(__dirname, '..', 'src', 'content', 'signed-off.json'), 'utf8'));
     expect(SIGNING_LIVE).toBe(file['program-rules-live']);
-    // Today: nothing is live, nothing is signed.
-    expect(SIGNING_LIVE).toBe(false);
-    expect(file['program-rules']).toEqual([]);
-    expect(isRulesSigned('en')).toBe(false);
+    expect(SIGNING_LIVE).toBe(true);
+    expect(file['program-rules']).toEqual(['en']);
+    expect(isRulesSigned('en')).toBe(true);
+    // Six drafts: no page is built for them outside a preview.
     expect(rulesBuiltLangs()).toEqual([]);
-    expect(anyPostBySlug(RULES_SLUG)?.status).toBe('draft');
-    expect(POSTS.find((p) => p.slug === RULES_SLUG)).toBeUndefined();
-    expect(ALL_POSTS.find((p) => p.slug === RULES_SLUG)).toBeDefined();
+    expect(anyPostBySlug(RULES_SLUG)?.status).toBeUndefined();
+    expect(POSTS.find((p) => p.slug === RULES_SLUG)).toBeDefined();
   });
 
   it('puts English at the Support post and the others at /<lang>/program-rules/', () => {
@@ -60,11 +59,11 @@ describe('Signing a program’s rules, in seven languages', () => {
 });
 
 describe('what promises members can sign in Pam', () => {
-  it('shows nothing about signing in Planning a visit or Pam words until SIGNING_LIVE', () => {
+  it('ties the signing sentences in Planning a visit and Pam words to SIGNING_LIVE', () => {
     for (const file of ['PlanningAVisit.tsx', 'PamWords.tsx']) {
       const src = readFileSync(join(__dirname, '..', 'src', 'content', file), 'utf8');
       expect(src, file).toContain('SIGNING_LIVE');
     }
-    expect(SIGNING_LIVE).toBe(false);
+    expect(SIGNING_LIVE).toBe(true);
   });
 });
