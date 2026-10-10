@@ -1,4 +1,5 @@
 import { CompareTable } from "../components/CompareTable";
+import { SIGNING_LIVE } from './rules';
 import { Body, Lead, ReadMore, Section } from "../components/Prose";
 
 /**
@@ -75,7 +76,9 @@ export function PamWords() {
             {
               label: "Policy",
               cells: [
-                "A page a program asks you to read and sign before you take part. You sign it in Pam.",
+                SIGNING_LIVE
+                  ? "A page a program asks you to read and sign before you take part. You sign it in Pam."
+                  : "A document a program adds in Pam, to say what it asks of the people who take part.",
               ],
             },
             {

@@ -98,6 +98,15 @@ STATUS row too.
   them, D-461). Add pictures then, from main's Storybook. **A lawyer must read one sentence before launch, in all
   seven languages:** "Your signature in Pam is a record that you read the policy and agreed to it. It is not a legal
   signature." (section "What your signature means").
+  **Also behind `program-rules-live` (done 10 October, after Piper's Policies P1, D-485):** the "Policies to
+  sign" / "Sign" paragraph in Planning a visit (it links to the rules post when live) and the "You sign it in
+  Pam" half of the Policy word in Pam words (until then it says only that a program adds a document in Pam).
+  Why: until part 2, members see only example policies and a real place shows none, so a post that says a place
+  may ask you to sign would promise what does not happen. **When P2 lands, also write a short post for program
+  leads, "Adding your program's policies"** (PDF or a photo of each page, up to 10 MB each and 5 to a policy; a
+  policy is not edited, a new version replaces it and members are asked again; removing one: people who signed keep
+  their copy), from the real screens in main's Storybook; not before, because a lead adding policies nobody can
+  sign yet would be a how-to with nothing behind it. Check the rules post's "For programs" section against it.
 - [ ] **Public site: publish the draft post "Keeping your program's listing up to
   date" only when the feature ships** (from PAM · Places & programs, 10 October
   2026, rule D-447, branch `claude/places-programs-load-own-program`, not on

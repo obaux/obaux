@@ -58,3 +58,13 @@ describe('Signing a program’s rules, in seven languages', () => {
     expect(rulesPath('ar')).toBe('/ar/program-rules/');
   });
 });
+
+describe('what promises members can sign in Pam', () => {
+  it('shows nothing about signing in Planning a visit or Pam words until SIGNING_LIVE', () => {
+    for (const file of ['PlanningAVisit.tsx', 'PamWords.tsx']) {
+      const src = readFileSync(join(__dirname, '..', 'src', 'content', file), 'utf8');
+      expect(src, file).toContain('SIGNING_LIVE');
+    }
+    expect(SIGNING_LIVE).toBe(false);
+  });
+});
