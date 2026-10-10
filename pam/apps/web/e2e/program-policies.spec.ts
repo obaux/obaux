@@ -121,3 +121,25 @@ test('a policy shows its version and pages, and a new version replaces it', asyn
   expect(made[0]).toMatchObject({ p_service_id: PROGRAM, p_replaces: 'conf' });
   await expect(page).toHaveURL(/\/program\/policies\/$/);
 });
+
+test('the Signed tab lists who signed by first name and date, nothing more', async ({ page }) => {
+  await signedInLead(page, [policy('conf', 'Confidentiality')]);
+  await page.route('**/rest/v1/rpc/program_policy_signers*', (route) =>
+    route.fulfill(
+      json([
+        { policy_id: 'conf', member_id: 'm-1', first_name: 'Tanya', signed_at: '2026-10-08T15:00:00Z' },
+        { policy_id: 'conf', member_id: 'm-2', first_name: 'Luis', signed_at: '2026-10-09T15:00:00Z' },
+      ]),
+    ),
+  );
+  await page.goto('/program/policies/');
+  await settled(page);
+  await expect(page.getByRole('link', { name: /Confidentiality/ })).toContainText('Signed by 2');
+  await page.getByRole('link', { name: /Confidentiality/ }).click();
+  await page.getByRole('radio', { name: /Signed/ }).click();
+  await expect(page.getByText('Tanya')).toBeVisible();
+  await expect(page.getByText('Luis')).toBeVisible();
+  await expect(page.getByText(/Oct 8|October 8/)).toBeVisible();
+  const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
+  expect(results.violations).toEqual([]);
+});

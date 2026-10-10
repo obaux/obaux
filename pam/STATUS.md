@@ -1266,6 +1266,10 @@ Merged to `main` by the merge desk, 10 October, from `claude/places-programs-boo
 
 Merged to `main` by the merge desk, 10 October, from `claude/places-programs-lead-reads-review`. Migration `20261010135742` (`resend_program_submission`), expand only, **applied live at merge** (recorded as 20261010140904), read back: body identical to the file, for authenticated (checks inside for the program's own lead). With part 6 live too, "Ask for changes" is safe to use. Test `43_a_lead_sends_the_program_again_test.sql` (numbered 42 on its branch; Nico's alerts test took 42 first). Edit and send again resends the same submission; a program being checked is corrected through it. Land after part 6.
 
+## Places & programs · policies, part 3 of 4: a program sees who signed (10 October 2026) — READY, not merged (on top of part 2)
+
+Branch `claude/places-programs-policies-p3` (D-485). Migration `20261010150922`, expand only: `program_policy_signers` (first name and date, never the picture). The Signed tab and the verified tick read it. Test `47_a_program_reads_who_signed_by_first_name_and_test.sql`.
+
 ## Places & programs · policies, part 2 of 4: members sign (10 October 2026) — READY, not merged (on top of part 1)
 
 Branch `claude/places-programs-policies-p2` (D-485). Migration `20261010145337`, expand only: `policy_signatures`, `member_signatures`, `sign_policy`, `forget_my_signature`. A real place asks for what its program keeps in the database; a member reads each page and signs (draw or type); the program's record line is shown before signing; the transparency promise has its new line. Test `46_a_member_signs_a_program_s_policy_once_and_only_test.sql`. Wren's public post can go once this is merged.
