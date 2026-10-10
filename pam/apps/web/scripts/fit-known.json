@@ -646,5 +646,29 @@
   {
     "key": "pseudo|ellipsis|member-created--place-visit|Of course. Friday at 10. See you then.",
     "reason": "The place page shows a program's newest message as one line with an ellipsis by design (isDescriptionOneLine, D-306); the pseudo-language is longer so it trims; the whole message is one tap away in the conversation. Looked at 10 October 2026 at 320px."
+  },
+  {
+    "key": "pseudo|ellipsis|member-created-states-saved-trips--trips-with-a-past-visit|Example Learning Center",
+    "reason": "A trip card's place name is one line with an ellipsis by design (TripCard); the pseudo-language is about 40% longer so it trims; the full name is on the place page one tap away. Looked at 10 October 2026 at 320px."
+  },
+  {
+    "key": "pseudo|ellipsis|member-created-states-saved-trips--trips-with-a-past-visit|Riverside Job Center",
+    "reason": "A trip card's place name is one line with an ellipsis by design (TripCard); the pseudo-language is about 40% longer so it trims; the full name is on the place page one tap away. Looked at 10 October 2026 at 320px."
+  },
+  {
+    "key": "pseudo|cut|member-created-states-saved-trips--trips-with-a-past-visit|Tuesday, Oct 13 · 12:00 PM",
+    "reason": "The Trips drawer scrolls and fades out at its foot; a card below the first sits under that fade, so the detector sees its text partly hidden (partial=true). It is reached by scrolling and nothing is lost. Looked at 10 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|ellipsis|member-created-states-saved-trips--trips-with-a-past-visit|Example Workforce Center",
+    "reason": "A trip card's place name is one line with an ellipsis by design (TripCard); the pseudo-language is about 40% longer so it trims; the full name is on the place page one tap away. Looked at 10 October 2026 at 320px."
+  },
+  {
+    "key": "pseudo|ellipsis|member-created-states-saved-trips--trips-with-a-past-visit|Riverside Job Center",
+    "reason": "A trip card's place name is one line with an ellipsis by design (TripCard); the pseudo-language is about 40% longer so it trims; the full name is on the place page one tap away. Looked at 10 October 2026 at 320px."
+  },
+  {
+    "key": "pseudo|cut|member-created-states-saved-trips--trips-with-a-past-visit|⟦Þŕóóóƒííļéé⟧",
+    "reason": "The Trips drawer scrolls and fades out at its foot; a card below the first sits under that fade, so the detector sees its text partly hidden (partial=true). It is reached by scrolling and nothing is lost. Looked at 10 October 2026 at 320px with screenshots."
   }
 ]
