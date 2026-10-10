@@ -68,8 +68,11 @@ and contrast were looked at, not measured.
 ## Left undone
 
 - Production: `main` has no `apps/site` and was not merged (needs Will). The
-  Vercel builds were still queued when this was written, so **no deployed URL has
-  been seen working**. Another session's branch also queued a production build on
+  Vercel builds were still queued when this was written, so the preview (`pam-site-lkfumoaah-will-3199s-projects.vercel.app`, commit
+  e3587a4) went READY and **Will opened `/`, `/support/` and
+  `/support/case-manager-assignments/` in a private window: all work, no login
+  wall** (10 October). This sandbox cannot reach `vercel.app` (proxy 403), so
+  nothing here fetched it. Another session's branch also queued a production build on
   `pam-site`; it should fail and is not ours to cancel.
 
 - Not deployed. No Vercel project exists for it; no domain.
