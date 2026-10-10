@@ -27,7 +27,7 @@ const styles = stylex.create({
 });
 
 export function PastTripsView({ personId, name }: { readonly personId: string; readonly name: string }) {
-  const { t, locale } = useI18n();
+  const { t, tPlain, locale } = useI18n();
   const { state: session } = useSession();
   const { viewedRole } = useRoleView(session.status === 'signed-in' ? session.session.role : null);
   // A member's past trips are the case manager's to see, not a program's
@@ -45,7 +45,7 @@ export function PastTripsView({ personId, name }: { readonly personId: string; r
       <SubPageHeader
         title={t('person.trips.past')}
         backHref={`/person/?id=${encodeURIComponent(personId)}`}
-        backLabel={t('person.connect.back', { name })}
+        backLabel={tPlain('person.connect.back', { name })}
         actions={<HeaderActions hasHelp={false} />}
       />
       {past.length > 0 ? (

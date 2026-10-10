@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/nextjs';
-import { BellIcon, NavTile, Page, PeopleIcon, PlacesIcon, PlanIcon, type NavTileProps } from '@pam/ui';
+import { BellIcon, NavTile, Page, PeopleIcon, PlacesIcon, type NavTileProps } from '@pam/ui';
 import { useStoryText } from '../support/useStoryText';
 
 /**
@@ -9,17 +9,18 @@ import { useStoryText } from '../support/useStoryText';
  */
 function LocalisedTile({ label, description, alertLabel, ...rest }: NavTileProps) {
   const tr = useStoryText();
+  const plain = useStoryText({ plain: true });
   return (
     <NavTile
       {...rest}
       label={tr(label)}
       description={tr(description)}
-      {...(alertLabel ? { alertLabel: tr(alertLabel) } : {})}
+      {...(alertLabel ? { alertLabel: plain(alertLabel) } : {})}
     />
   );
 }
 
-const ICONS = { places: <PlacesIcon />, people: <PeopleIcon />, bell: <BellIcon />, plan: <PlanIcon /> };
+const ICONS = { places: <PlacesIcon />, people: <PeopleIcon />, bell: <BellIcon /> };
 
 const meta = {
   title: 'Components/Navigation/NavTile',

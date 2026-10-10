@@ -131,54 +131,85 @@ describe('rendering a reviewed message', () => {
   });
 });
 
-describe('a language nobody has signed gets English', () => {
-  // Texts are written in every language, signed one at a time. Until a person
-  // has put their name against a wording, the person it is meant for is texted
-  // in English: a text is the one place Pam cannot show a draft first, so a new
-  // language must not start receiving machine-drafted texts just because the
-  // app speaks it.
+describe('a language is used while it carries an approval, and English when it does not', () => {
+  // Will approved the later languages on 9 October 2026 to learn from (fail first,
+  // then fix on feedback). Emptying a language's approval is how it is pulled: the
+  // person is then texted in English, never in a draft.
   const keys = Object.keys(REAL.templates);
   const later = SUPPORTED_LOCALES.filter((l) => l !== 'en' && l !== 'es');
 
-  it('renders every unsigned language as the English text, for every template', () => {
-    for (const key of keys) {
-      for (const locale of later) {
-        expect(render(REAL, key, locale, VARS), `${key} ${locale}`).toBe(render(REAL, key, 'en', VARS));
+  /** The shipped bundle with every later-language approval emptied. */
+  const WITHDRAWN: Bundle = {
+    ...REAL,
+    templates: Object.fromEntries(
+      Object.entries(REAL.templates).map(([key, t]) => [
+        key,
+        { ...t, more: Object.fromEntries(Object.entries(t.more ?? {}).map(([l, d]) => [l, { ...d, reviewedBy: '' }])) },
+      ]),
+    ),
+  };
+  /** saved_place_closed asks for its reason by key, as the queue does. */
+  const varsFor = (key: string) => (key === 'saved_place_closed' ? { link: 'https://pam.to/a1b2c3d', reason_key: 'closed' } : VARS);
+
+  it('carries Will’s approval on every draft in the shipped bundle', () => {
+    for (const template of Object.values(REAL.templates)) {
+      for (const [locale, draft] of Object.entries(template.more ?? {})) {
+        expect(draft.reviewedBy, `${template.key} ${locale}`).toContain('Will (Oba), 9 October 2026');
       }
     }
   });
 
-  it('uses the wording once a person has signed it, in that language only', () => {
-    const signed: Bundle = {
+  it('writes the text in the person’s language wherever there is a wording, and in English where there is none', () => {
+    let inTheirLanguage = 0;
+    for (const key of keys) {
+      for (const locale of later) {
+        const body = render(REAL, key, locale, varsFor(key));
+        const english = render(REAL, key, 'en', varsFor(key));
+        if (REAL.templates[key]!.more?.[locale]) {
+          expect(body, `${key} ${locale}`).not.toBe(english);
+          expect(body.startsWith('Pam: ')).toBe(true);
+          inTheirLanguage += 1;
+        } else {
+          expect(body, `${key} ${locale}`).toBe(english);
+        }
+      }
+    }
+    // 53, plus the three appointment reminders in the four scripts (D-431) = 65.
+    expect(inTheirLanguage).toBe(65);
+  });
+
+  it('writes every one in English once the approvals are emptied, for every template', () => {
+    for (const key of keys) {
+      for (const locale of later) {
+        expect(render(WITHDRAWN, key, locale, varsFor(key)), `${key} ${locale}`).toBe(render(WITHDRAWN, key, 'en', varsFor(key)));
+      }
+    }
+  });
+
+  it('pulls one language and leaves the others', () => {
+    const pulled: Bundle = {
       ...REAL,
       templates: {
         ...REAL.templates,
         verify_code: {
           ...REAL.templates['verify_code']!,
-          more: { ...REAL.templates['verify_code']!.more, ru: { ...REAL.templates['verify_code']!.more!['ru']!, reviewedBy: 'a native reader' } },
+          more: { ...REAL.templates['verify_code']!.more, ru: { ...REAL.templates['verify_code']!.more!['ru']!, reviewedBy: '' } },
         },
       },
     };
-    expect(render(signed, 'verify_code', 'ru', VARS)).toContain('Ваш код');
-    expect(render(signed, 'verify_code', 'ar', VARS)).toBe(render(signed, 'verify_code', 'en', VARS));
+    expect(render(pulled, 'verify_code', 'ru', VARS)).toBe(render(pulled, 'verify_code', 'en', VARS));
+    expect(render(pulled, 'verify_code', 'ar', VARS)).toContain('رمزك');
   });
 
   it('falls back for the whole message when a reason has no phrase in the language', () => {
-    const signed: Bundle = {
+    const noPhrase: Bundle = {
       ...REAL,
       reasons: { ...REAL.reasons, closed: { en: REAL.reasons['closed']!['en']!, es: REAL.reasons['closed']!['es']! } },
-      templates: {
-        ...REAL.templates,
-        saved_place_closed: {
-          ...REAL.templates['saved_place_closed']!,
-          more: { 'zh-CN': { ...REAL.templates['saved_place_closed']!.more!['zh-CN']!, reviewedBy: 'a native reader' } },
-        },
-      },
     };
     const vars = { reason_key: 'closed', link: 'https://pam.to/a1b2c3d' };
-    expect(render(signed, 'saved_place_closed', 'zh-CN', vars)).toBe(render(signed, 'saved_place_closed', 'en', vars));
+    expect(render(noPhrase, 'saved_place_closed', 'zh-CN', vars)).toBe(render(noPhrase, 'saved_place_closed', 'en', vars));
     // And with the phrase present, the language is used.
-    expect(render({ ...signed, reasons: REAL.reasons }, 'saved_place_closed', 'zh-CN', vars)).toContain('已关闭');
+    expect(render(REAL, 'saved_place_closed', 'zh-CN', vars)).toContain('已关闭');
   });
 });
 
@@ -238,9 +269,44 @@ describe('the dispatcher and the config package say the same words', () => {
         },
       },
     };
-    expect(() => render(long, 'verify_code', 'ru', VARS)).toThrow(UnsendableError);
+    // Over 70 in Russian: the check catches it (and says why), and the person is texted
+    // in English instead of not at all.
+    const why: string[] = [];
+    expect(render(long, 'verify_code', 'ru', VARS, (r) => why.push(r))).toBe(render(long, 'verify_code', 'en', VARS));
+    expect(why[0]).toMatch(/over the 70 limit/);
     // The same length in English is one cheap message.
     expect(render(long, 'verify_code', 'en', VARS).length).toBeLessThanOrEqual(160);
+  });
+
+  it('lets a template with two segments run to 134 in a wide script, and no further', () => {
+    const withTwo = (body: string) => ({
+      ...SIGNED,
+      templates: {
+        ...SIGNED.templates,
+        verify_code: {
+          ...SIGNED.templates['verify_code']!,
+          ucs2Segments: 2 as const,
+          more: { ru: { body, reviewedBy: 'a native reader' } },
+        },
+      },
+    });
+    // 5 for "Pam: " and 129 more: exactly two segments, sent in Russian.
+    const exact = `Pam: ${'я'.repeat(129)}`;
+    expect(exact.length).toBe(134);
+    expect(render(withTwo(exact), 'verify_code', 'ru', VARS)).toBe(exact);
+    // One character over: the person is texted in English, and the log says why.
+    const why: string[] = [];
+    const over = `${exact}я`;
+    expect(render(withTwo(over), 'verify_code', 'ru', VARS, (r) => why.push(r))).toBe(
+      render(withTwo(over), 'verify_code', 'en', VARS),
+    );
+    expect(why[0]).toMatch(/over the 134 limit/);
+    // A template without the allowance stays at 70, however long its neighbour may run.
+    const one = { ...withTwo(exact) };
+    one.templates.verify_code = { ...one.templates.verify_code, ucs2Segments: undefined } as never;
+    const why2: string[] = [];
+    render(one, 'verify_code', 'ru', VARS, (r) => why2.push(r));
+    expect(why2[0]).toMatch(/over the 70 limit/);
   });
 
   it('applies the language’s own forbidden words as the last check', () => {
@@ -257,8 +323,15 @@ describe('the dispatcher and the config package say the same words', () => {
         },
       },
     };
-    expect(() => render(bad, 'verify_code', 'ru', VARS)).toThrow(UnsendableError);
-    expect(() => render(bad, 'verify_code', 'zh-CN', VARS)).toThrow('reveal justice involvement');
+    // Each is caught, named without quoting the word, and the person is texted in English.
+    for (const locale of ['ru', 'zh-CN'] as const) {
+      const why: string[] = [];
+      expect(render(bad, 'verify_code', locale, VARS, (r) => why.push(r)), locale).toBe(render(bad, 'verify_code', 'en', VARS));
+      expect(why, locale).toEqual(['message would reveal justice involvement']);
+    }
+    // And the check itself, on the words, still refuses them.
+    expect(() => assertSafe('Pam: Условно-досрочное 123456', 'ru', REAL.forbidden)).toThrow(UnsendableError);
+    expect(() => assertSafe('Pam: 假释 123456', 'zh-CN', REAL.forbidden)).toThrow('reveal justice involvement');
   });
 
   it('keeps a plain English reminder at 160 when the address has a curly apostrophe', () => {
@@ -288,5 +361,67 @@ describe('the last safety check', () => {
     expect(() => assertSafe('Pam: Nice work! \u{1F389}')).toThrow(UnsendableError);
     expect(() => assertSafe('You have a visit tomorrow.')).toThrow(UnsendableError);
     expect(() => assertSafe(`Pam: ${'a'.repeat(200)}`)).toThrow(UnsendableError);
+  });
+});
+
+describe('a signed language never stops a text from going out', () => {
+  // Signing a language off decides which language the person is texted in. It
+  // is never a reason for them not to be texted: if the wording in their
+  // language cannot be sent safely at the moment of sending, the English goes.
+  const sign = (bundle: Bundle, key: string, locale: Locale, body?: string): Bundle => ({
+    ...bundle,
+    templates: {
+      ...bundle.templates,
+      [key]: {
+        ...bundle.templates[key]!,
+        more: {
+          ...bundle.templates[key]!.more,
+          [locale]: { ...bundle.templates[key]!.more![locale]!, ...(body ? { body } : {}), reviewedBy: 'Will, a test' },
+        },
+      },
+    },
+  });
+
+  it('sends the English when the signed wording is too long for its segment', () => {
+    const signed = sign(REAL, 'staff_request_approved', 'zh-CN');
+    const why: string[] = [];
+    // A link much longer than the 36 characters the wording was written for.
+    const vars = { ...VARS, link: `https://pam.example.org/${'x'.repeat(60)}` };
+    const body = render(signed, 'staff_request_approved', 'zh-CN', vars, (r) => why.push(r));
+    expect(body).toBe(render(REAL, 'staff_request_approved', 'en', vars));
+    expect(why).toHaveLength(1);
+    expect(why[0]).toMatch(/characters, over the 70 limit/);
+  });
+
+  it('sends the English when the signed wording trips a word list, and does not quote the word', () => {
+    const signed = sign(REAL, 'verify_code', 'ru', 'Pam: Условно-досрочное {code}');
+    const why: string[] = [];
+    const body = render(signed, 'verify_code', 'ru', VARS, (r) => why.push(r));
+    expect(body).toBe(render(REAL, 'verify_code', 'en', VARS));
+    expect(why.join()).toBe('message would reveal justice involvement');
+  });
+
+  it('does the same for a signed Spanish text that has gone wrong', () => {
+    const broken: Bundle = {
+      ...REAL,
+      templates: { ...REAL.templates, verify_code: { ...REAL.templates['verify_code']!, es: `Pam: ${'a'.repeat(200)} {code}` } },
+    };
+    const why: string[] = [];
+    expect(render(broken, 'verify_code', 'es', VARS, (r) => why.push(r))).toBe(render(REAL, 'verify_code', 'en', VARS));
+    expect(why).toHaveLength(1);
+  });
+
+  it('says nothing when the person’s language worked, and when it was English to begin with', () => {
+    const signed = sign(REAL, 'verify_code', 'ru');
+    const why: string[] = [];
+    expect(render(signed, 'verify_code', 'ru', VARS, (r) => why.push(r))).toContain('Ваш код');
+    render(REAL, 'verify_code', 'en', VARS, (r) => why.push(r));
+    expect(why).toEqual([]);
+  });
+
+  it('still throws when English cannot be sent either: nothing to say is not a text', () => {
+    const signed = sign(REAL, 'appointment_24h', 'pt-BR');
+    expect(() => render(signed, 'appointment_24h', 'pt-BR', { time: '10:00 AM' })).toThrow(UnsendableError);
+    expect(() => render(REAL, 'no_such_template', 'ru', VARS)).toThrow(UnsendableError);
   });
 });

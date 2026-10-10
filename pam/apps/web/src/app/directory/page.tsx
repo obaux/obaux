@@ -1,18 +1,14 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { VStack } from '@astryxdesign/core/VStack';
-import { Card } from '@astryxdesign/core/Card';
-import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { Switch } from '@astryxdesign/core/Switch';
-import { RadioList, RadioListItem } from '@astryxdesign/core/RadioList';
-import { BigButton, Dropdown, Loading, Notice, Page, ScrollReveal, TextLink } from '@pam/ui';
+import { Dropdown, Loading, Notice, Page, PeopleIcon, ScrollReveal, ShieldIcon } from '@pam/ui';
+import { MenuList } from '@pam/ui/MenuList';
 import { SubPageHeader } from '@pam/ui/SubPage';
 import { HelpButton } from '../../screens/HelpButton';
-import { InviteReady } from '../../screens/InviteReady';
-import { InviteForWho, type InviteWho } from '../../screens/InviteForWho';
 import { PersonRowSkeletonList } from '@pam/ui/Skeletons';
 import { NOTICES, ROLES, type Role, intlLocale } from '@pam/config';
 import { USE_DUMMY_PEOPLE } from '@pam/config/dummy-flag';
@@ -23,7 +19,6 @@ import { PersonRow } from '../PersonRow';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
 import { useDirectory, setDemoView } from '@/lib/useDirectory';
-import { createInvite, listRegions, type CreatedInvite } from '@/lib/useCaseload';
 import { useRoleView } from '@/lib/useViewedRole';
 import { useDemoView } from '@/lib/useDemoView';
 import { useDirectoryGuides } from '@/lib/useGuides';
@@ -52,16 +47,10 @@ import { RoleSwitchControl } from '../RoleSwitchControl';
  * bound by §4.1 the same way the case manager's is.
  */
 
+const ICON = { width: 26, height: 26, 'aria-hidden': true } as const;
+
 const styles = stylex.create({
-  title: { fontSize: '28px', lineHeight: 1.2 },
-  count: { fontSize: '17px' },
-  meta: { fontSize: '15px' },
-  name: { fontSize: '18px' },
-  card: { width: '100%' },
-  // The header is a tight row: the filter gives way before the mark does.
-  code: { fontSize: '32px', fontWeight: 700, letterSpacing: '0.12em', fontVariantNumeric: 'tabular-nums' },
   note: { fontSize: '15px', lineHeight: 1.5 },
-  secondary: { minHeight: '48px' },
 });
 
 /**
@@ -120,67 +109,12 @@ export default function DirectoryPage() {
       ? DUMMY_EVERYONE
       : DUMMY_EVERYONE.filter((p) => p.role === (filter === 'unassigned' ? 'member' : filter));
 
-  /**
-   * Bringing somebody in.
-   *
-   * The person running Pam is the only one who can make a case manager (0049),
-   * and they have no city of their own, so the card asks which city first. The
-   * code is the product: read down the phone or texted, eight characters that
-   * survive being said out loud.
-   */
   const [demoBusyId, setDemoBusyId] = useState<string | null>(null);
   const toggleDemo = async (personId: string, next: boolean) => {
     setDemoBusyId(personId);
     await setDemoView(personId, next);
     setDemoBusyId(null);
     refreshDirectory();
-  };
-
-  const [regions, setRegions] = useState<{ id: string; name: string }[]>([]);
-  const [regionId, setRegionId] = useState<string>('');
-  const [invite, setInvite] = useState<CreatedInvite | null>(null);
-  const [inviteBusy, setInviteBusy] = useState(false);
-  const [inviteFailed, setInviteFailed] = useState<'city' | 'failed' | null>(null);
-
-  useEffect(() => {
-    if (!isSuperAdmin) return;
-    let cancelled = false;
-    void listRegions().then((list) => {
-      if (cancelled) return;
-      setRegions(list);
-      if (list.length === 1) setRegionId(list[0]!.id);
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [isSuperAdmin]);
-
-  // Who it is for, asked before the invite is made (D-373).
-  const [asking, setAsking] = useState<'member' | 'provider' | 'admin' | null>(null);
-  const ask = (role: 'member' | 'provider' | 'admin') => {
-    if (!regionId) {
-      setInviteFailed('city');
-      return;
-    }
-    setInviteFailed(null);
-    setAsking(role);
-  };
-
-  const makeInvite = async (role: 'member' | 'provider' | 'admin', who: InviteWho) => {
-    if (!regionId) {
-      setInviteFailed('city');
-      return;
-    }
-    setInviteBusy(true);
-    setInviteFailed(null);
-    const created = await createInvite(role, who, regionId);
-    setInviteBusy(false);
-    if (created) {
-      setAsking(null);
-      setInvite(created);
-    } else {
-      setInviteFailed('failed');
-    }
   };
 
   if (session.status === 'loading') {
@@ -282,38 +216,6 @@ export default function DirectoryPage() {
     );
   }
 
-  // Choosing a kind of invite is a step in: the form is a page of its own, on the
-  // nested template, the round back returning to Everyone (Will, 10 October).
-  if (asking && !invite) {
-    return (
-      <Page gap={4}>
-        <SubPageHeader
-          title={t(`invite.link.title.${asking}`)}
-          onBack={() => setAsking(null)}
-          backLabel={t('invite.who.back')}
-          actions={
-            <>
-              {trueRole === 'super_admin' ? (
-                <RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} />
-              ) : null}
-              <HelpButton />
-            </>
-          }
-        />
-        <InviteForWho role={asking} busy={inviteBusy} onSubmit={(who) => void makeInvite(asking, who)} />
-        {inviteFailed === 'failed' ? (
-          <Notice
-            notice="something_went_wrong"
-            title={t('admin.invite.failed.title')}
-            body={t('admin.invite.failed.body')}
-            supportPhone={supportPhone}
-            callLabel={t('help.callSupport')}
-          />
-        ) : null}
-      </Page>
-    );
-  }
-
   return (
     <Page gap={4}>
       <SubPageHeader
@@ -352,66 +254,20 @@ export default function DirectoryPage() {
       />
 
       {/*
-        Where a pending case-manager/program-lead claim actually gets decided
-        (0054) — the notification that one arrived only ever points here, it
-        is never a button on the notification itself (D-080).
+        Bringing somebody in, and deciding who may come in as staff (0054),
+        are pages of their own, the way Profile reaches them (D-444, Will, 10
+        October: "use the nested page method"). The card of buttons that made
+        invites here is gone. The notification that a claim arrived only ever
+        points at the second row, it is never a button on the notification
+        itself (D-080).
       */}
-      <TextLink label={t('requests.title')} href="/requests/" />
-
-      <Card xstyle={styles.card}>
-        <VStack gap={3}>
-          <Heading level={2} xstyle={styles.name}>
-            {t('directory.invite.title')}
-          </Heading>
-          {invite ? (
-            <InviteReady invite={invite} onAnother={() => setInvite(null)} isBare />
-          ) : (
-            <>
-              {regions.length > 1 ? (
-                <RadioList
-                  label={t('directory.invite.city')}
-                  value={regionId}
-                  onChange={(next) => setRegionId(String(next))}
-                >
-                  {regions.map((region) => (
-                    <RadioListItem key={region.id} value={region.id} label={region.name} />
-                  ))}
-                </RadioList>
-              ) : null}
-              {inviteFailed === 'city' ? (
-                <Text type="supporting" xstyle={styles.note}>
-                  {t('directory.invite.pickCity')}
-                </Text>
-              ) : null}
-              <VStack gap={2}>
-                <BigButton
-                  label={t('directory.invite.admin')}
-                  onPress={() => ask('admin')}
-                />
-                <BigButton
-                  label={t('directory.invite.provider')}
-                  variant="secondary"
-                  onPress={() => ask('provider')}
-                />
-                <BigButton
-                  label={t('directory.invite.member')}
-                  variant="secondary"
-                  onPress={() => ask('member')}
-                />
-              </VStack>
-            </>
-          )}
-          {inviteFailed === 'failed' ? (
-            <Notice
-              notice="something_went_wrong"
-              title={t('admin.invite.failed.title')}
-              body={t('admin.invite.failed.body')}
-              supportPhone={supportPhone}
-              callLabel={t('help.callSupport')}
-            />
-          ) : null}
-        </VStack>
-      </Card>
+      <MenuList
+        label={t('directory.title')}
+        items={[
+          { id: 'invite', label: t('profile.menu.invite'), href: '/invite/', icon: <PeopleIcon {...ICON} /> },
+          { id: 'requests', label: t('requests.title'), href: '/requests/', icon: <ShieldIcon {...ICON} /> },
+        ]}
+      />
 
       {directory.status === 'loading' ? <PersonRowSkeletonList label={t('common.loading')} /> : null}
 

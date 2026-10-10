@@ -230,29 +230,142 @@ Russian, Arabic (D-422); messages read in the reader's language (D-423).
   Cantonese readers: check `zh-HK` for Hong Kong wording (訊息, 電話號碼,
   傾談), not Taiwan's. Arabic: Modern Standard, and check that the
   right-to-left screens read naturally. Russian: "вы" throughout.
+  **Arabic, since 9 October (D-435):** an English name, address or date inside an
+  Arabic sentence is now laid out as a piece of its own. Check that it looks right
+  to a native reader — where a colon or a full stop lands beside an English word
+  (`:Pam`, `then.`) is correct by the bidi rules but nobody who reads Arabic has
+  seen it — and whether an English value in the middle of a sentence reads better
+  isolated or flowing with the sentence.
 
-- [ ] **Sign off the texts and the invite email, language by language, and
-  decide the two things only Will can** (D-424). Drafts now exist: **53 texts**
-  (Portuguese 15, Simplified Chinese 12, Traditional Chinese 12, Russian 7,
-  Arabic 7 — `unsignedSmsDrafts()` lists them) and the **invite email in all
-  five**. None is signed, so **everyone is still texted and emailed in English
-  (or Spanish) whatever their language**; the day a person writes their name in a
-  draft's `reviewedBy`, that language starts for that message and no other.
-  Needs:
-  1. A native reader for each language reads its texts and email against §9 (no
-     word that reveals justice involvement — each language has its own list now —
-     160 characters, or 70 in Chinese, Russian and Arabic, no emoji) and signs
-     them. **I never fill in `reviewedBy`.**
-  2. **Will: two segments or English for the reminders?** The three appointment
-     reminders (a time, an address, a link) cannot be said in 70 characters in
-     Chinese, Russian or Arabic, so those readers get them in English. Allowing
-     two segments doubles their cost and changes the carrier registration, which
-     says one. Also the shorter the link, the more fits: the live `app_url` is
-     36 characters.
-  3. **Re-file the campaign** with the carrier before the first text in a new
-     language: `docs/sms-campaign-samples.md` names English and Spanish only.
-  4. The email provider (the item at the top) is what sends the invite email at
-     all.
+- [ ] **Run an Arabic screen reader pass** (VoiceOver and TalkBack on a phone, and
+  NVDA if it can be had): that the labels on icon buttons, cards, photos and the
+  role switch are spoken in order and whole. Nothing here has been tried with a
+  screen reader. Pam keeps its invisible bidi isolates out of every accessible name
+  (`tPlain`, D-435) rather than trusting a reader to ignore them, so this is a check
+  that the labels *read well*, not that they are clean of characters.
+
+- [ ] **Arabic: names, addresses and other data inside a sentence are reordered**
+  (found 9 October 2026 by the text-fit audit; Will asked whether it is on this
+  list). An English street address, person's name, program name or file name placed
+  in the middle of an Arabic sentence is laid out by the right-to-left rules, so a
+  leading number jumps to the wrong end ("Near 1231 N Broad St" reads with the 1231
+  beside the Arabic words and the rest on the far side) and an ellipsis cuts the
+  start of the value instead of its end. **Done (D-439): the address card on a place
+  or program** keeps its own order. **Left: every other sentence that carries data**,
+  the area chip's "Near {area}" first (`places.near`, the `long-address` story), then
+  anything built from `{name}`, `{program}`, `{address}`. The fix is to wrap each
+  interpolated value in a first-strong isolate (U+2068 … U+2069) when the screen is
+  right-to-left, in the translate function (`packages/config/src/i18n.ts`,
+  `apps/web/src/lib/i18n.tsx`), keeping those marks out of texts, emails and
+  screen-reader labels. A suggested task with the full brief is queued in the app
+  (title "Isolate interpolated values in Arabic strings"); say "do the Arabic
+  isolates" and Claude does it here. A native Arabic reader should confirm the result
+  (the item below).
+
+- [ ] **Texts and the invite email in the new languages: approved to learn from;
+  deploy, and decide the rest** (D-424, D-430). **Will, 9 October: "approve new
+  languages for now ... fail first then fix ... adjust languages based on
+  feedback."** Done: his approval is on all 53 text drafts (Portuguese 15, Simplified
+  Chinese 12, Traditional Chinese 12, Russian 7, Arabic 7) and the five email
+  languages; a text always goes out (English if the person's language cannot be sent
+  safely); pull a language by emptying its `reviewedBy`. Left:
+  1. **Deploy `dispatch-sms`** (`supabase functions deploy dispatch-sms`, or the
+     connector). The live one is v15 from 17 September: it sends **"PAM:"** and only
+     English and Spanish; the repo says **"Pam:"** and has the new languages. Deploying
+     switches both on at once. Nothing is queued today, so it can go any time — but
+     do it together with the next item, because the prefix changes on the live number.
+  2. **Re-file the campaign** with the carrier — its own item, just below, with the
+     steps. This is the "fail" to watch: a text in an unregistered language may be
+     filtered.
+  3. ~~Two segments or English for the three appointment reminders~~ **Decided,
+     9 October 2026 (D-431): two segments** for those three in Chinese, Russian and
+     Arabic (134 characters), one for everything else. The reminders are written, in
+     the code and tested; what is left is the filing in item 2, which now has to say
+     it (`docs/sms-campaign-samples.md`: the description, the checklist row and the
+     sample).
+  4. The email provider (the item at the top) is what sends the invite email at all.
+  5. **Feedback loop:** when somebody who reads one of these languages says it is
+     wrong, tell Claude the language, where, and what it should say; it is fixed in
+     that language (docs/copy-changes.md).
+
+- [ ] **File the updated text-message registration with the carrier, then deploy
+  `dispatch-sms`** (Will, 9 October 2026: "add the file registration and
+  instructions to the do-before-launch list"; D-431, D-424). The campaign on file
+  says English and Spanish, one segment, and (unconfirmed, see the old line under
+  *Done*) maybe still the "PAM:" prefix. Pam now texts in seven languages, and
+  three reminders take two segments in Chinese, Russian and Arabic. A text that does
+  not match what was registered is how an approved campaign gets filtered or
+  suspended, so this goes first. **The filing is ready to paste:
+  `docs/sms-campaign-samples.md`** (its description is 1,018 of 1,024 characters).
+  Only Will can do the filing: the Twilio account and the brand (Oba) are his.
+  1. **Open the Twilio console and find the A2P 10DLC campaign for the Oba brand**
+     (Messaging → Regulatory Compliance → A2P 10DLC → Campaigns; Twilio moves its
+     menus, so search the console for "A2P" if that is not where it is). Before
+     changing anything, copy what is registered today (description, samples,
+     opt-in text) into a note, and write down its status. That is what Claude needs
+     to tell you whether the "PAM:" → "Pam:" change was ever filed.
+  2. **Open `docs/sms-campaign-samples.md`** and work down "The resubmission
+     checklist", in order. It says what to put in each field and why; the two marked
+     *rejected before* are where this campaign already failed once each.
+     - **Campaign description:** paste the block under "The campaign description, to
+       paste as written". Do not edit it without counting: the field caps at 1,024.
+     - **Sample messages:** the thirteen under "The messages", placeholders intact,
+       then the reminder in each added language under "The same messages in the
+       other languages". If the form takes only five samples, send the sign-in code,
+       a reminder, the check-in, and one Chinese and one Russian or Arabic reminder:
+       the point is that every script and the two-segment reminder appear.
+     - **Opt-in description:** paste the answer under "How do end-users consent…" and
+       attach the **Text reminders** screenshot, not the sign-in one.
+     - **Embedded links: Yes.** Rejected before when it said No.
+  3. **Open the privacy and terms URLs in a private window** first (listed in the
+     checklist). A reviewer fetches them signed out; a page behind a login or a
+     moved deployment is rejection 30921 or 30933 and costs another round.
+  4. **Submit it.** If the console will not let you edit an approved campaign, the
+     same fields go into a new campaign under the same brand, and the Messaging
+     Service is pointed at it once it is approved (the old one keeps working until
+     then). I did not check Twilio's current rules for this, so look before
+     deleting anything.
+  5. **Wait for the approval.** Do not deploy before it comes: deploying
+     `dispatch-sms` puts the "Pam:" prefix and the new languages on the live number
+     at once.
+  6. **Tell Claude "registered".** Claude then checks the live function
+     (`list_edge_functions`: it is v15 now), deploys the repo's `dispatch-sms`
+     (only on your say-so; the repo's `templates.json` is generated by the tests and
+     already carries the seven languages and the two-segment reminders), and reads
+     the function's log for lines starting "sent in English", which name a template
+     and why a person's language was not used (never the words).
+  7. **Read one text in each script on your own phone** (Claude arranges them to your
+     number, with your say-so) and look for texts that do not arrive: that is the
+     carrier filtering one.
+  8. **Tick this item**, and the old line under *Done* ("Text-message samples
+     re-filed … with the 'Pam:' prefix", D-321), and update STATUS row 34.
+  If a new language later changes what a text says materially, or another template
+  is given a second segment, the filing changes with it (`docs/copy-changes.md`).
+
+- [ ] **Tap "Open in…" on a real iPhone and a real Android phone** (Will,
+  10 October 2026, D-439: "if no app installed, redirect to app store, based on their
+  device"). A web page cannot ask a phone whether an app is installed, so Pam tries
+  the app and falls back (`packages/ui/src/mapsLaunch.ts`); the unit tests prove the
+  logic, not what a phone's browser does with it. On each phone, with the app
+  installed and without it, check: **Android** — Google Maps opens the route, or the
+  Play Store page for Google Maps; no Apple Maps row. **iPhone** — Google Maps opens
+  the route, or (after about 2 seconds) the App Store page for Google Maps, and
+  Safari does not leave an "address is invalid" alert behind or open the store *over*
+  an "Open in Google Maps?" prompt; Apple Maps opens the route. Also check the two
+  store addresses by opening them (Google Maps `id585027354`, package
+  `com.google.android.apps.maps`; both written from memory, no network to check them
+  from). If the iPhone path misbehaves, the safe fallback is to give Google Maps there
+  the plain web link (it opens the app when it can) and drop the store redirect.
+
+- [ ] **Decide how the tab bar behaves when a language has longer words than
+  Russian** (D-434; Will's design, so his call; not blocking while the seven
+  languages are the only ones). Five one-word labels share 320px and a tab does not
+  shrink below its longest word. Tested 9 October: equal tabs that wrap **break**
+  Russian, Portuguese and Spanish words mid-word (do not); tabs sized by their
+  content (`flex: 1 1 auto`, `min-width: 0`, wrapping, in `packages/ui/src/TabBar.tsx`)
+  fit all seven and wrap the pseudo-language, and move the English tabs by a few
+  pixels. Say "size the tabs by content" and Claude makes the change and re-runs the
+  fit check; or leave it until a language with longer words is added.
 
 - [ ] **Apply 0085 whenever convenient — nothing waits on it** (D-424, D-428). It
   keeps the language a person asked in, so a denial text and a fresh-link email

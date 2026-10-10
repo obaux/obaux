@@ -35,7 +35,8 @@ jobs:
   fit:
     name: Text fits at 320px
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    # The first run on GitHub took 55 of 60 minutes (five columns, two workers).
+    timeout-minutes: 90
     steps:
       - uses: actions/checkout@v4
 

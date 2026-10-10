@@ -67,6 +67,14 @@ onboarding instructions, and any merges will be done in the Merge desk session."
   refused by the permission check. Nothing was pushed there; the numbers are claimed as
   files on this branch now.
 
+- **Merging `main` brought D-435's rule** (`tPlain` for an accessible name, so Arabic's
+  isolates do not ride inside it). Two back buttons carrying a name moved to `tPlain`;
+  found by reading the new `CLAUDE.md` line after the merge, not by the audit (whose
+  run came after the fix).
+- **Merge conflicts** in STATUS, the case-manager stories, the flow map and
+  `ledger.json`: all were additions side by side; both kept. The ledger was taken from
+  `main` and this branch's keys re-recorded with `copy:ack`, not edited by hand.
+
 ## Decisions made
 
 - D-446 — the build, and the six answers to "You decide": case managers do not see the
@@ -89,6 +97,8 @@ onboarding instructions, and any merges will be done in the Merge desk session."
 | `pnpm --filter @pam/web build-storybook` | builds; the new stories photographed at 390px; no `[journey] no fixture` |
 | Playwright `e2e/assign-and-limit.spec.ts` (new) | 39 pass (13 tests × 320 light, 320 dark, iPhone SE): the filter asks for members and keeps the unguided; `assign_guide` gets exactly `{p_member, p_guide}` (and `null` for No guide); nothing is written before the dialog; Save waits for a change and a non-blank reason; the dialog opens on its question; axe clean on all three screens |
 | Playwright, **full suite**, fresh build | **876 passed, 0 failed** (8.3 minutes) |
+| **After merging `main`** (`d4f325e`: the languages and Arabic branches): DB / config / ui / web unit | 682 checks / 808 / 107 / 48 pass; typecheck clean; bundle 55.9 kB under budget; Storybook builds |
+| `audit:fit` on `screens--member` (11 stories) and `super-admin-screens--everyone`, all seven languages at 320px | 0 new defects; 9 already in English (ellipsis and clamp on the member page's trip cards), none from these screens |
 
 ## New strings (for the languages lane)
 

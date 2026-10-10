@@ -23,26 +23,26 @@ function LocalisedHeader({ roleLabel, accountLabel, ...rest }: AppHeaderProps) {
 
 /** The bell, as `HeaderBell` draws it. */
 function Bell({ unread }: { readonly unread: number }) {
-  const { t } = useI18n();
+  const { t, tPlain } = useI18n();
   return (
     <NotificationBell
       href="/notifications/"
       label={t('notify.title')}
       unreadCount={unread}
-      unreadLabel={t('notify.unread', { count: unread })}
+      unreadLabel={tPlain('notify.unread', { count: unread })}
     />
   );
 }
 
 /** A super admin's role preview, as `RoleSwitchControl` wires it. */
 function Switch({ viewing }: { readonly viewing: (typeof ROLES)[number] }) {
-  const { t } = useI18n();
+  const { t, tPlain } = useI18n();
   return (
     <RoleSwitch
       value={viewing}
       ownValue="super_admin"
       label={t('view.switch')}
-      viewingLabel={(role) => t('view.as', { role })}
+      viewingLabel={(role) => tPlain('view.as', { role })}
       options={ROLES.map((role) => ({ value: role, label: t(`role.${role}`) }))}
       onChange={() => {}}
     />

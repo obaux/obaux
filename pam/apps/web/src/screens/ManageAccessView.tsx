@@ -45,7 +45,7 @@ const styles = stylex.create({
 });
 
 export function ManageAccessView({ personId }: { readonly personId: string }) {
-  const { t } = useI18n();
+  const { t, tPlain } = useI18n();
   const supportPhone = useSupportPhone();
   const { loading, person } = useCaseloadPerson(personId);
   const [choice, setChoice] = useState<AccessStatus | null>(null);
@@ -59,7 +59,7 @@ export function ManageAccessView({ personId }: { readonly personId: string }) {
     <SubPageHeader
       title={person ? t('access.title', { name }) : t('person.title')}
       backHref={back}
-      backLabel={person ? t('access.back', { name }) : t('nav.back.home')}
+      backLabel={person ? tPlain('access.back', { name }) : t('nav.back.home')}
       actions={<HeaderActions role="admin" />}
     />
   );

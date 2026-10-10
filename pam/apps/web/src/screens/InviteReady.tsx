@@ -50,19 +50,22 @@ export function InviteReady({
   invite,
   onAnother,
   isBare = false,
+  hasHeading = true,
 }: {
   readonly invite: CreatedInvite;
   readonly onAnother: () => void;
   /** Inside a card already (the directory): the content without its own. */
   readonly isBare?: boolean;
+  /** Off on a page whose title already says it (D-444). */
+  readonly hasHeading?: boolean;
 }) {
-  const { t, locale } = useI18n();
+  const { t, tPlain, locale } = useI18n();
   const [copied, setCopied] = useState(false);
   const url = inviteLink(invite.code, invite.role);
   const date = new Intl.DateTimeFormat(intlLocale(locale), { month: 'long', day: 'numeric' }).format(new Date(invite.expiresAt));
 
   const send = async () => {
-    const text = t('invite.link.message', { url });
+    const text = tPlain('invite.link.message', { url });
     // The share sheet, in the app too (D-350); with none, copy instead.
     if (await shareText(text)) return;
     try {
@@ -75,9 +78,11 @@ export function InviteReady({
 
   const content = (
     <VStack gap={3}>
-      <Heading level={2} xstyle={styles.heading}>
-        {t(`invite.link.title.${invite.role}`)}
-      </Heading>
+      {hasHeading ? (
+        <Heading level={2} xstyle={styles.heading}>
+          {t(`invite.link.title.${invite.role}`)}
+        </Heading>
+      ) : null}
       <Text type="supporting" xstyle={styles.body}>
         {t('invite.link.body', { date })}
       </Text>

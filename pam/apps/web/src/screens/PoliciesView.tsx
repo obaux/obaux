@@ -66,7 +66,7 @@ const styles = stylex.create({
 });
 
 export function PoliciesScreen() {
-  const { t } = useI18n();
+  const { t, tPlain } = useI18n();
   const { policies, add, remove } = usePolicies();
   const { forPlace } = useServices();
   const [isEditing, setIsEditing] = useState(false);
@@ -128,7 +128,7 @@ export function PoliciesScreen() {
                 </Text>
               </VStack>
               <IconButton
-                label={t('policies.remove', { title: policy.title })}
+                label={tPlain('policies.remove', { title: policy.title })}
                 variant="ghost"
                 icon={<Icon icon="close" size="md" />}
                 onClick={() => setAsking(policy)}

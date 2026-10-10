@@ -15,7 +15,7 @@ import { ChooseGuideView } from '../../../screens/ChooseGuideView';
  * member's page. Only someone on your own caseload (or the example cast).
  */
 function HandOver() {
-  const { t } = useI18n();
+  const { t, tPlain } = useI18n();
   const supportPhone = useSupportPhone();
   const id = useSearchParams().get('id') ?? '';
   const { loading, person } = useCaseloadPerson(id);
@@ -50,7 +50,7 @@ function HandOver() {
       name={person.firstName}
       isExample={person.isExample}
       backHref={back}
-      backLabel={t('access.back', { name: person.firstName })}
+      backLabel={tPlain('access.back', { name: person.firstName })}
     />
   );
 }

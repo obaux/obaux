@@ -162,7 +162,7 @@ function whenLastActive(iso: string | null, locale: string): string | null {
 }
 
 function PersonScreen() {
-  const { t, locale } = useI18n();
+  const { t, tPlain, locale } = useI18n();
   const { policies } = usePolicies();
   const supportPhone = useSupportPhone();
   const params = useSearchParams();
@@ -390,7 +390,7 @@ function PersonScreen() {
           isMember && viewedRole === 'admin' ? (
             <StarToggle
               isOn={starred.ids.has(person.id)}
-              label={t(starred.ids.has(person.id) ? 'people.unstar' : 'people.star', { name: person.firstName })}
+              label={tPlain(starred.ids.has(person.id) ? 'people.unstar' : 'people.star', { name: person.firstName })}
               onToggle={() => starred.toggle(person.id)}
               name={person.firstName ?? ''}
             />
@@ -416,7 +416,7 @@ function PersonScreen() {
       */}
       {canMessage ? (
         <MenuList
-          label={t('person.actions.label', { name: person.firstName })}
+          label={tPlain('person.actions.label', { name: person.firstName })}
           items={[
             // Which policies they have signed, in plain sight (Will, D-324):
             // the badge by the name says all or not; this says which.
@@ -466,7 +466,7 @@ function PersonScreen() {
               label: t('person.message.action', { name: person.firstName }),
               icon: <MessagesIcon width={26} height={26} />,
               ...(exampleThread ? { href: exampleThread } : { onSelect: message }),
-              ...(unread ? { badge: unread, badgeLabel: t('person.message.unread', { count: unreadCount }) } : {}),
+              ...(unread ? { badge: unread, badgeLabel: tPlain('person.message.unread', { count: unreadCount }) } : {}),
             },
           ]}
         />

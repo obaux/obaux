@@ -66,7 +66,7 @@ export function connectionStats(person: Connection, t: (key: string) => string, 
 }
 
 export function ConnectionsView({ connections }: ConnectionsViewProps) {
-  const { t, locale } = useI18n();
+  const { t, tPlain, locale } = useI18n();
   return (
     <SubPage title={t('connections.title')} backHref="/profile/" backLabel={t('nav.back.profile')}>
       {connections.length === 0 ? (
@@ -100,7 +100,7 @@ export function ConnectionsView({ connections }: ConnectionsViewProps) {
                   help={person.help ?? ''}
                   stats={connectionStats(person, t, locale)}
                   messageHref={person.messageHref}
-                  messageLabel={t('connections.message', { name: person.firstName })}
+                  messageLabel={tPlain('connections.message', { name: person.firstName })}
                   connectedBy={
                     person.role === 'provider' && person.connectedBy
                       ? {

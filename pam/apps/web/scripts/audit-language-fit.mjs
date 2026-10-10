@@ -23,6 +23,10 @@
  *   spill    text runs past the edge of the button / link / field it sits in
  *   overlap  two different elements' text lines cover each other
  *   scroll   the page itself scrolls sideways
+ *   isolate  an invisible bidi isolate (U+2068/U+2069, which `t` puts round a value in
+ *            Arabic) in a place nobody reads it off the screen: an attribute such as
+ *            `aria-label` or `alt`, or text a screen reader speaks and no eye sees (D-435). A label
+ *            built with `tPlain` has none; this is what notices one that was not.
  *
  * English is the baseline: a defect that is already there in English is the
  * design's, not the translation's, and is listed apart. Only defects that are
@@ -51,6 +55,8 @@ const OUT = opt('out', '');
 const FROM = opt('from', '');
 const KNOWN = opt('known', '');
 const WRITE_KNOWN = opt('write-known', '');
+/** The day the stories believe it is (the day the accepted list was written), so dates in them do not drift. */
+const AUDIT_NOW = new Date('2026-10-09T12:00:00Z');
 const ROOT = path.resolve(process.env.SB_ROOT ?? path.join(here, '../storybook-static'));
 
 // ── a tiny static server: `python -m http.server` is one thread, and four workers queue on it ──
@@ -166,7 +172,9 @@ function measure() {
         // initial) loses no glyph: a cut is a fifth of the line or more.
         const hx = c.cx ? Math.max(0, c.left - b.left, b.right - c.right) / Math.max(1, b.right - b.left) : 0;
         const hy = c.cy ? Math.max(0, c.top - b.top, b.bottom - c.bottom) / Math.max(1, b.bottom - b.top) : 0;
-        if (Math.max(hx, hy) < 0.2) return;
+        // An ellipsis is not a sliver: whatever it hides is cut, and the line still reports its full width.
+        const trimming = c.n && style(c.n).textOverflow === 'ellipsis';
+        if (Math.max(hx, hy) < 0.2 && !trimming) return;
         // Fully gone (a carousel's other slides, an off-canvas drawer) is not a cut.
         const gone = (c.cx && (b.right <= c.left + 1 || b.left >= c.right - 1)) || (c.cy && (b.bottom <= c.top + 1 || b.top >= c.bottom - 1));
         if (gone) vis = false;
@@ -243,6 +251,28 @@ function measure() {
   if (document.documentElement.scrollWidth > vw + 1) {
     push('scroll', document.body, '(page)', `${document.documentElement.scrollWidth} > ${vw}`);
   }
+
+  // 6. An isolate where nobody is looking at the screen: an attribute a screen reader speaks
+  // (`aria-*`, `alt`), or text in the visually-hidden idiom. On screen they are zero width and
+  // wanted, which is why a `title` (a tooltip is drawn) or a `placeholder` is not looked at here;
+  // anywhere else they are an invisible character in a string.
+  const ISOLATE = /[\u2068\u2069]/;
+  const spoken = (el) => {
+    for (let n = el; n && n !== document.documentElement; n = n.parentElement) {
+      const s = style(n);
+      if (s.display !== 'none' && s.position === 'absolute' && n.clientWidth <= 1 && n.clientHeight <= 1) return true;
+    }
+    return false;
+  };
+  for (const el of document.body.querySelectorAll('*')) {
+    const attrs = [...el.attributes].filter((a) => /^(aria-|alt$)/.test(a.name) && ISOLATE.test(a.value));
+    if (attrs.length) push('isolate', el, attrs[0].value.replace(/[\u2068\u2069]/g, '⁋'), attrs.map((a) => a.name).join(', '));
+  }
+  const spokenWalker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+  for (let node = spokenWalker.nextNode(); node; node = spokenWalker.nextNode()) {
+    const el = node.parentElement;
+    if (el && ISOLATE.test(node.nodeValue ?? '') && spoken(el)) push('isolate', el, (node.nodeValue ?? '').replace(/[\u2068\u2069]/g, '⁋'), 'text only a screen reader reads');
+  }
   return out;
 }
 
@@ -259,6 +289,11 @@ async function run() {
   await Promise.all(
     Array.from({ length: WORKERS }, async () => {
       const ctx = await browser.newContext({ viewport: { width: WIDTH, height: 760 }, reducedMotion: 'reduce' });
+      // The example visits are "in 2 days", "in 5 days": their dates move with the calendar, and so
+      // did the text a defect is recorded under — the accepted list went stale overnight (10 October,
+      // "Wednesday, Oct 14" became "Thursday, Oct 15"). Every story sees the same day, which then
+      // runs on as normal.
+      await ctx.clock.install({ time: AUDIT_NOW });
       const page = await ctx.newPage();
       for (;;) {
         const i = next++;

@@ -228,8 +228,13 @@ test.describe('signing up', () => {
     await fillDetails(page, 'Scranton');
     await page.getByRole('button', { name: 'Next' }).click();
 
-    await expect(page.getByText('Pam is not in Scranton yet.')).toBeVisible();
+    // The second ask has answered once "Right now Pam is in …" is there; only
+    // then is it safe to say the city is still the one that was typed. Looking at
+    // the city first passed by catching the screen before the answer came back —
+    // when the answer replaced Scranton with Philadelphia (found 9 October 2026,
+    // a test that failed on a slow machine and passed on a fast one).
     await expect(page.getByText('Right now Pam is in Philadelphia.')).toBeVisible();
+    await expect(page.getByText('Pam is not in Scranton yet.')).toBeVisible();
 
     // Unticked, and it stays unticked unless somebody ticks it (A2P 30925).
     const optIn = page.getByRole('checkbox', { name: /Text me when Pam opens/ });

@@ -1,3 +1,5 @@
+import { stripIsolates } from '@pam/config';
+
 /**
  * Writing to the clipboard, and how long a status about it stays up.
  *
@@ -19,12 +21,14 @@ export const COPY_STATUS_MS = 5000;
 
 /**
  * Copies `text`; true when the clipboard took it. Call it inside a tap: that
- * is the only time Safari allows it.
+ * is the only time Safari allows it. What is copied is pasted somewhere else,
+ * so it carries none of the invisible isolates `t` puts round a value in
+ * Arabic (D-435).
  */
 export async function copyLink(text: string): Promise<boolean> {
   try {
     if (!navigator.clipboard) return false;
-    await navigator.clipboard.writeText(text);
+    await navigator.clipboard.writeText(stripIsolates(text));
     return true;
   } catch {
     // No clipboard: the text is on the screen, to copy by hand.

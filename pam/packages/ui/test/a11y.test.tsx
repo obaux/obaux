@@ -4,8 +4,6 @@ import axe from 'axe-core';
 import { BigButton } from '../src/BigButton.js';
 import { PlaceCard } from '../src/PlaceCard.js';
 import { PlaceDetail } from '../src/PlaceDetail.js';
-import { PersonCard } from '../src/PersonCard.js';
-import { StepHeader } from '../src/StepHeader.js';
 import { PointsBadge } from '../src/PointsBadge.js';
 import { HelpBar } from '../src/HelpBar.js';
 import { Loading } from '../src/Loading.js';
@@ -45,17 +43,10 @@ async function expectNoViolations(container: HTMLElement): Promise<void> {
 const placeLabels = { save: 'Save', saved: 'Saved' };
 
 const detailLabels = {
-  directions: 'How to get there',
-  call: 'Call this place',
-  website: 'Their website',
   hours: 'Opening hours',
   hoursOnGoogle: 'Check hours on Google',
   about: 'About program',
   address: 'Address',
-  save: 'Save this place',
-  saved: 'Saved',
-  share: 'Share this place',
-  flag: 'Something is wrong here',
 };
 
 describe('accessibility', () => {
@@ -99,10 +90,8 @@ describe('accessibility', () => {
           name="Riverside Learning Center"
           href="/place/?id=abc"
           description="GED classes and help with reading. Free to join."
-          distanceLabel="1.2 miles"
           status={{ isOpen: true, label: 'Open until 5:00pm' }}
           audienceLabel="In a school"
-          onSave={() => {}}
           labels={placeLabels}
         />
       </main>,
@@ -114,51 +103,38 @@ describe('accessibility', () => {
     const { container } = render(
       <main>
         <PlaceDetail
-          name="Riverside Learning Center"
           category="education"
           categoryLabel="School and training"
           description="GED classes and help with reading."
           address="123 Main St"
-          distanceLabel="1.2 miles"
+          addressActions={{
+            googleMapsHref: 'https://www.google.com/maps/dir/?api=1&destination=123%20Main%20St',
+            appleMapsHref: 'https://maps.apple.com/?daddr=123%20Main%20St',
+            labels: {
+              copy: 'Copy address',
+              copied: 'Address copied',
+              copyFailed: 'Could not copy. Press and hold the address to copy it.',
+              openIn: 'Open in…',
+              openInTitle: 'Open in',
+              googleMaps: 'Google Maps',
+              appleMaps: 'Apple Maps',
+              opensInApp: 'Opens in app',
+            },
+          }}
           status={{ isOpen: true, label: 'Open until 5:00pm' }}
           weekLines={[{ day: 'Monday', hours: '9:00am – 5:00pm' }]}
           hoursArePlaceholder
           placeholderNote="Sample hours. Call to check before you go."
           audienceLabel="In a school"
-          phone="+15555550100"
-          website="https://example.org"
-          directionsHref="https://maps.example/x"
           hoursHref="https://maps.example/y"
-          onSave={() => {}}
-          onShare={() => {}}
-          flagHref="/flag/?place=abc"
+          quickActionsLabel="Ways to reach this place"
+          quickActions={[
+            { id: 'directions', label: 'Get directions', description: 'Open in Google Maps', icon: <PlacesIcon />, href: 'https://maps.example/x', isExternal: true },
+            { id: 'call', label: 'Call', description: '(555) 555-0100', icon: <PlacesIcon />, href: 'tel:+15555550100' },
+          ]}
           labels={detailLabels}
         />
       </main>,
-    );
-    await expectNoViolations(container);
-  });
-
-  it('PersonCard', async () => {
-    const { container } = render(
-      <main>
-        <h1>People</h1>
-        <h2>Mentors</h2>
-        <PersonCard
-          firstName="Nia"
-          roleLine="I can help you get your GED."
-          sharedTags={['GED or high school', 'Computer skills']}
-          orgBadgeLabel="Riverside Learning Center"
-          messageLabel="Send a message"
-        />
-      </main>,
-    );
-    await expectNoViolations(container);
-  });
-
-  it('StepHeader', async () => {
-    const { container } = render(
-      <StepHeader current={2} total={4} title="What should we call you?" progressLabel="Step 2 of 4" />,
     );
     await expectNoViolations(container);
   });

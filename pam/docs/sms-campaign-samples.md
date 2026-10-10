@@ -46,7 +46,7 @@ failed once each.
 | Help | Reply **HELP**. |
 | Privacy policy URL | `https://web-ten-umber-88.vercel.app/privacy/` |
 | Terms URL | `https://web-ten-umber-88.vercel.app/terms/` |
-| Sample messages | All thirteen, below, placeholders intact |
+| Sample messages | All thirteen, below, placeholders intact — and the appointment reminder in each added language (the form takes a few; send those five if all do not fit) |
 
 **Before submitting, open both URLs in a private window.** A reviewer fetches
 them signed out, from a machine that has never seen the site. A page behind a
@@ -124,7 +124,7 @@ really on that screen.
 
 ## The campaign description, to paste as written
 
-The field caps at **1024 characters**. What follows is 1004, so it fits with a
+The field caps at **1024 characters**. What follows is 1018, so it fits with a
 little room — if you edit it, count before you paste. Every message type a person
 can receive is named on purpose: reviewers compare the description against the
 samples and, later, against real traffic, and a description narrower than what
@@ -132,9 +132,9 @@ actually sends is how an approved campaign gets suspended.
 
 > Pam is an app by Oba that connects people to community programs, services and the staff who support them. People receive messages only after entering their own phone number on Pam's sign-in screen, which states that Pam will text them and how to stop.
 >
-> Messages are account notifications and appointment reminders, at low volume and low throughput. A person first receives a one-time sign-in code, because Pam uses a phone number instead of a password. After that they may receive: reminders for appointments they scheduled in the app, a check-in asking whether they made it, a notice when a place they saved has closed or moved, a notice that someone wants to connect, and, for staff, a notice of an introduction or an account change.
+> Messages are account notifications and appointment reminders, at low volume. A person first receives a one-time sign-in code. After that they may receive reminders for appointments they scheduled in the app, a check-in asking whether they made it, a notice when a saved place has closed or moved, a notice that someone wants to connect, and, for staff, a notice of an introduction or an account change.
 >
-> Nothing is promotional. Pam sends no marketing, no advertising and no third-party content, and does not sell or share phone numbers. Every message names Pam and fits one segment, in English or Spanish. STOP ends all messages permanently; HELP returns support contact.
+> Nothing is promotional: no marketing, advertising or third-party content, and numbers are never sold or shared. Every message names Pam. Languages: English, Spanish, Portuguese, Chinese, Russian, Arabic. A message is one segment, except appointment reminders in Chinese, Russian and Arabic: two. STOP ends all messages permanently; HELP returns support contact.
 
 ### The shorter fields, if the form asks separately
 
@@ -231,16 +231,44 @@ actually sends is how an approved campaign gets suspended.
 >
 > _Spanish:_ Pam: Algunas partes de Pam estan apagadas por ahora. Llame al {supportPhone} si tiene preguntas.
 
+## The same messages in the other languages
+
+Pam is also written in Brazilian Portuguese, Simplified and Traditional Chinese,
+Russian and Arabic (A24), and a person is texted in the language they chose in the
+app (D-424). Every message above exists in them; the reminder is the one that
+changes the registration, so these are its samples. The Chinese, Russian and Arabic
+ones are two segments (a joined message of the wide encoding holds 67 characters a
+part, 134 for two), which is Will's decision of 9 October 2026 (D-431) and is why
+the description above says so. Portuguese is written without accents and stays one.
+
+**6, in the other languages. Appointment reminder, the day before** (`appointment_24h`)
+
+> _Brazilian Portuguese:_ Pam: Voce tem uma visita amanha as {time}. {address}. Toque para chegar: {link}
+>
+> _Simplified Chinese:_ Pam: 您明天{time}有预约。{address}。点按查看路线：{link}
+>
+> _Traditional Chinese:_ Pam: 你明天{time}有一次到訪。{address}。點按查看路線：{link}
+>
+> _Russian:_ Pam: Завтра в {time} у вас визит. {address}. Маршрут: {link}
+>
+> _Arabic:_ Pam: لديك زيارة غدا في {time}. {address}. الاتجاهات: {link}
+
+The two-hour and morning-of reminders, and every other message, are in
+`packages/config/src/sms-templates.ts` under `more`; a
+sample that does not match what goes out is what gets a campaign suspended, so
+paste from there, not from this page, if they differ.
+
 ## Notes a reviewer may ask about
 
-- **Two languages.** Pam sends in English or Spanish, whichever the person chose.
-  Both are listed above, and the Spanish is written without accents so every
-  message fits a single segment. (Pam is also written in Brazilian Portuguese,
-  Simplified and Traditional Chinese, Russian and Arabic — drafts of these texts
-  exist, none is signed off, and nobody is sent one: a person reading Pam in
-  those languages is still texted in English. **This registration must be
-  updated before the first text in another language goes out** —
-  docs/before-launch.md, D-424.)
+- **Seven languages.** Pam sends in the language the person chose: English,
+  Spanish, Brazilian Portuguese, Simplified and Traditional Chinese, Russian or
+  Arabic. The drafts in the five newer ones were approved by Will on 9 October 2026
+  to learn from, with no native reader yet (D-430), and are corrected as people who
+  read them say what is wrong. English, Spanish and Portuguese are written inside
+  the cheap encoding (160 characters, one segment). Chinese, Russian and Arabic are
+  the wide one (70 characters, one segment), except the three appointment reminders,
+  which take two (134 characters; D-431). **The carrier filing has to say so
+  before `dispatch-sms` is redeployed** — docs/before-launch.md.
 - **STOP on first contact.** The two invitations are the first message anybody
   receives from an unknown number, so they carry the opt-out instruction in the
   message itself. Later messages do not repeat it, because the number is by then

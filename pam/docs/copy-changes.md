@@ -39,22 +39,38 @@ wrong silently. (Why each piece exists: D-424, D-425.)
    the pseudo-language on a pull request that touches copy or UI.
    Text should wrap and grow (`@pam/ui` `Button`, `Badge`, `Segment`), never be
    trimmed; only a page title steps down in size (D-422).
+   **If the check names a defect:** look at it in Storybook in that language at 320px
+   first. A text that is really cut off or covered is fixed (let it wrap, or shorten
+   the string). A line that is one line with an ellipsis *by design*, a list that
+   scrolls under a fade, or a detector reading of text that is clipped on purpose
+   goes in `apps/web/scripts/fit-known.json` with the reason and the date, so it is
+   not looked at twice (D-434). `node scripts/audit-language-fit.mjs --write-known
+   out.json` writes the entries for you to give reasons to.
 
 ## In a text message
 
 Texts are written in `packages/config/src/sms-templates.ts`, one template at a
 time, in all seven languages — and **each language is signed on its own**
-(`reviewedBy` on the draft, by a person who reads it). Until a language is
-signed for a template, **the person is texted in English**: a text cannot be
-shown to someone for a second opinion first, so nothing a machine drafted is
-ever sent.
+(`reviewedBy` on the draft: a person's name, a date, and what they read it for).
+A language whose `reviewedBy` is empty is texted in English, and so is a signed
+text that fails a check when it is sent (too long, a forbidden word, a link that
+does not fit): **a text always goes out**, in the best language that is safe,
+and the dispatcher logs which template fell back and why — never the words.
+
+Since 9 October 2026 every language carries Will's approval *to learn from*
+(D-430): the texts go out in the person's language while no native reader has
+seen them, and what people say about them changes them. To pull one language back
+to English, empty its `reviewedBy`; the others are untouched.
 
 - A text in a script the cheap encoding cannot carry (Chinese, Russian, Arabic)
-  is held to **70 characters**, not 160, because Pam promised the carrier one
-  segment per message. A template that cannot be said that briefly in a language
-  — an appointment reminder has a time, an address and a link — has no text in
-  it, and the person is texted in English. Allowing two segments would double the
-  cost and change the registered campaign: Will's call (docs/before-launch.md).
+  is held to **70 characters**, not 160, because Pam told the carrier one segment
+  per message. The one exception is the three appointment reminders, which carry a
+  time, an address and a link and may take **two segments, 134 characters**
+  (`ucs2Segments: 2`; Will, 9 October 2026, D-431). A template that cannot be said
+  that briefly in a language has no text in it, and the person is texted in
+  English. Giving another template a second segment doubles its cost and changes
+  the registered campaign: Will's call, and `docs/sms-campaign-samples.md` changes
+  with it.
 - Every language has its own list of words a text may never contain (justice
   involvement), applied on top of the English list, and re-checked by the
   dispatcher as the last step before Twilio.
@@ -68,8 +84,8 @@ ever sent.
 
 `packages/config/src/invite-email.ts` has the invite email in all seven
 languages the same way: Arabic is set right to left, each script has a font
-stack its readers' devices carry, and a language nobody has signed gets the
-English email. Preview any of them in Storybook (*Onboarding / Invite email*).
+stack its readers' devices carry, and a language whose `reviewedBy` is empty
+gets the English email. Preview any of them in Storybook (*Onboarding / Invite email*).
 
 ## Whose language it is
 
@@ -78,6 +94,29 @@ their profile's `preferred_language`, so a member who switches language gets
 their next text in it. For the two cases with no profile — a staff request that
 is denied, a fresh invite link by email — the language they were reading Pam in
 when they asked travels with the request (migration 0085).
+
+## When somebody says a translation is wrong
+
+We shipped the new languages on a "fail first, then fix" footing (D-430), so
+feedback is the review. When a member, a case manager or a reader says a word is
+wrong:
+
+1. **Get three things:** which language, which screen or text, and what they
+   would write instead. One sentence is enough.
+2. **Fix that string** in the language file (or `sms-templates.ts` /
+   `invite-email.ts`). Leave the English alone: a better translation is not a
+   change of meaning, so `copy:status` lists it as *edited* and `copy:ack` records
+   the new wording against the same English. A fix that makes the wording say
+   more, or something new, goes back to Will first (D-430).
+3. **If the fix is in a text**, run the config tests (they check length,
+   forbidden words and the dispatcher bundle) and redeploy `dispatch-sms`.
+4. **If it is a pattern** — a word used wrongly everywhere — put the right word in
+   that language's brief (`LOCALE_BRIEFS` in `packages/config/src/copy-sync.ts`),
+   so the next `copy:draft` gets it right.
+5. **If a text is wrong in a way that matters** (offensive, misleading, a
+   promise), pull that language back to English at once: empty its `reviewedBy`
+   for that template (or for the language) and redeploy. A screen has no such
+   switch; fix the string.
 
 ## Numbers
 

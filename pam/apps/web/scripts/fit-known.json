@@ -1,0 +1,486 @@
+[
+  {
+    "key": "pt-BR|cut|member-created--trips|quarta-feira, 14 de out. · 13:00",
+    "reason": "The Trips drawer scrolls and fades out at its foot; a card below the first sits under that fade, so the detector sees its text partly hidden (partial=true). It is reached by scrolling and nothing is lost. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "zh-CN|cut|member-created--trips|需要签名",
+    "reason": "The Trips drawer scrolls and fades out at its foot; a card below the first sits under that fade, so the detector sees its text partly hidden (partial=true). It is reached by scrolling and nothing is lost. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "zh-HK|cut|member-created--trips|需要簽名",
+    "reason": "The Trips drawer scrolls and fades out at its foot; a card below the first sits under that fade, so the detector sees its text partly hidden (partial=true). It is reached by scrolling and nothing is lost. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "ru|cut|member-created--trips|среда, 14 окт. · 13:00",
+    "reason": "The Trips drawer scrolls and fades out at its foot; a card below the first sits under that fade, so the detector sees its text partly hidden (partial=true). It is reached by scrolling and nothing is lost. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "ru|overlap|member-created--messages|Example Learning Center ⟷ Сегодня",
+    "reason": "A conversation row's second line (the program or the person's role) is one line with an ellipsis by design (ConversationRow); the 'overlap' is the clipped rest of that line measured against the time stamp, and nothing touches on screen. The program name is data, not a translated string. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "es|ellipsis|member-created--conversation-files|Documento de Google",
+    "reason": "The Shared things list keeps a title to one line and, when it is cut, slides it sideways to show its end (MarqueeText, Will's D-407). With reduced motion, which the audit uses, it stays cut with an ellipsis. The 'spill' and 'overlap' are the clipped rest of that line. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "es|spill|member-created--conversation-files|Documento de Google",
+    "reason": "The Shared things list keeps a title to one line and, when it is cut, slides it sideways to show its end (MarqueeText, Will's D-407). With reduced motion, which the audit uses, it stays cut with an ellipsis. The 'spill' and 'overlap' are the clipped rest of that line. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "es|overlap|member-created--conversation-files|Documento de Google ⟷ Teresa",
+    "reason": "The Shared things list keeps a title to one line and, when it is cut, slides it sideways to show its end (MarqueeText, Will's D-407). With reduced motion, which the audit uses, it stays cut with an ellipsis. The 'spill' and 'overlap' are the clipped rest of that line. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pt-BR|ellipsis|member-created--conversation-files|Documento do Google",
+    "reason": "The Shared things list keeps a title to one line and, when it is cut, slides it sideways to show its end (MarqueeText, Will's D-407). With reduced motion, which the audit uses, it stays cut with an ellipsis. The 'spill' and 'overlap' are the clipped rest of that line. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pt-BR|spill|member-created--conversation-files|Documento do Google",
+    "reason": "The Shared things list keeps a title to one line and, when it is cut, slides it sideways to show its end (MarqueeText, Will's D-407). With reduced motion, which the audit uses, it stays cut with an ellipsis. The 'spill' and 'overlap' are the clipped rest of that line. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pt-BR|overlap|member-created--conversation-files|Documento do Google ⟷ Teresa",
+    "reason": "The Shared things list keeps a title to one line and, when it is cut, slides it sideways to show its end (MarqueeText, Will's D-407). With reduced motion, which the audit uses, it stays cut with an ellipsis. The 'spill' and 'overlap' are the clipped rest of that line. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "ru|overlap|member-created-states-limited-account--messages|Example Learning Center ⟷ Сегодня",
+    "reason": "A conversation row's second line (the program or the person's role) is one line with an ellipsis by design (ConversationRow); the 'overlap' is the clipped rest of that line measured against the time stamp, and nothing touches on screen. The program name is data, not a translated string. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "es|overlap|member-created-states-limited-account--conversation|Teresa ⟷ Documento de Google",
+    "reason": "The thread scrolls under its opaque header; text that has scrolled up behind the header's title is measured against it. Nothing overlaps on screen. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "es|overlap|member-created-states-limited-account--conversation|Gestor de casos ⟷ Documento de Google",
+    "reason": "The thread scrolls under its opaque header; text that has scrolled up behind the header's title is measured against it. Nothing overlaps on screen. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pt-BR|overlap|member-created-states-limited-account--conversation|Teresa ⟷ Documento do Google",
+    "reason": "The thread scrolls under its opaque header; text that has scrolled up behind the header's title is measured against it. Nothing overlaps on screen. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "zh-HK|overlap|member-created-states-limited-account--conversation|Teresa ⟷ And the class schedule: http",
+    "reason": "The thread scrolls under its opaque header; text that has scrolled up behind the header's title is measured against it. Nothing overlaps on screen. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "ru|overlap|member-created-states-limited-account--conversation|Кейс-менеджер ⟷ T",
+    "reason": "The thread scrolls under its opaque header; text that has scrolled up behind the header's title is measured against it. Nothing overlaps on screen. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "ru|overlap|member-created-states-messages--with-messages|Example Learning Center ⟷ Сегодня",
+    "reason": "A conversation row's second line (the program or the person's role) is one line with an ellipsis by design (ConversationRow); the 'overlap' is the clipped rest of that line measured against the time stamp, and nothing touches on screen. The program name is data, not a translated string. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pt-BR|cut|member-created-states-trips--upcoming|quarta-feira, 14 de out. · 13:00",
+    "reason": "The Trips drawer scrolls and fades out at its foot; a card below the first sits under that fade, so the detector sees its text partly hidden (partial=true). It is reached by scrolling and nothing is lost. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "zh-CN|cut|member-created-states-trips--upcoming|需要签名",
+    "reason": "The Trips drawer scrolls and fades out at its foot; a card below the first sits under that fade, so the detector sees its text partly hidden (partial=true). It is reached by scrolling and nothing is lost. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "ru|cut|member-created-states-trips--upcoming|среда, 14 окт. · 13:00",
+    "reason": "The Trips drawer scrolls and fades out at its foot; a card below the first sits under that fade, so the detector sees its text partly hidden (partial=true). It is reached by scrolling and nothing is lost. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "zh-HK|cut|member-created-states-trips--upcoming|需要簽名",
+    "reason": "The Trips drawer scrolls and fades out at its foot; a card below the first sits under that fade, so the detector sees its text partly hidden (partial=true). It is reached by scrolling and nothing is lost. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "es|ellipsis|case-manager-screens--conversation-files|Documento de Google",
+    "reason": "The Shared things list keeps a title to one line and, when it is cut, slides it sideways to show its end (MarqueeText, Will's D-407). With reduced motion, which the audit uses, it stays cut with an ellipsis. The 'spill' and 'overlap' are the clipped rest of that line. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "es|spill|case-manager-screens--conversation-files|Documento de Google",
+    "reason": "The Shared things list keeps a title to one line and, when it is cut, slides it sideways to show its end (MarqueeText, Will's D-407). With reduced motion, which the audit uses, it stays cut with an ellipsis. The 'spill' and 'overlap' are the clipped rest of that line. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "es|overlap|case-manager-screens--conversation-files|Documento de Google ⟷ Usted",
+    "reason": "The Shared things list keeps a title to one line and, when it is cut, slides it sideways to show its end (MarqueeText, Will's D-407). With reduced motion, which the audit uses, it stays cut with an ellipsis. The 'spill' and 'overlap' are the clipped rest of that line. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pt-BR|ellipsis|case-manager-screens--conversation-files|Documento do Google",
+    "reason": "The Shared things list keeps a title to one line and, when it is cut, slides it sideways to show its end (MarqueeText, Will's D-407). With reduced motion, which the audit uses, it stays cut with an ellipsis. The 'spill' and 'overlap' are the clipped rest of that line. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pt-BR|spill|case-manager-screens--conversation-files|Documento do Google",
+    "reason": "The Shared things list keeps a title to one line and, when it is cut, slides it sideways to show its end (MarqueeText, Will's D-407). With reduced motion, which the audit uses, it stays cut with an ellipsis. The 'spill' and 'overlap' are the clipped rest of that line. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "ar|overlap|case-manager-screens--conversation-files|The way in is round the side ⟷ أنت",
+    "reason": "The Shared things list keeps a title to one line and, when it is cut, slides it sideways to show its end (MarqueeText, Will's D-407). With reduced motion, which the audit uses, it stays cut with an ellipsis. The 'spill' and 'overlap' are the clipped rest of that line. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pt-BR|cut|program-lead-screens--home-folded|Primeira visita · Chegada não registrada",
+    "reason": "The folded week on Home shows a fixed height and fades the rest, with 'Show the whole calendar' under it. A longer line wraps to more lines, so less of the next row shows; the rest is one tap away. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "ru|cut|program-lead-screens--home-folded|Первый визит · Приход не отмечен",
+    "reason": "The folded week on Home shows a fixed height and fades the rest, with 'Show the whole calendar' under it. A longer line wraps to more lines, so less of the next row shows; the rest is one tap away. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "zh-HK|cut|program-lead-states-home--folded|D",
+    "reason": "The folded week on Home shows a fixed height and fades the rest, with 'Show the whole calendar' under it. A longer line wraps to more lines, so less of the next row shows; the rest is one tap away. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "es|spill|components-inputs-areachip--long-address|Cerca de 1231 N Broad St, North Philadelphia",
+    "reason": "An area chip is one line and ends a long address in an ellipsis (the story exists to show a long address). Only 'Near' is translated; the address is data. In Arabic the mixed-direction line also reads out of order, which is a separate finding about interpolated values (see before-launch). Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pt-BR|spill|components-inputs-areachip--long-address|Perto de 1231 N Broad St, North Philadelphia",
+    "reason": "An area chip is one line and ends a long address in an ellipsis (the story exists to show a long address). Only 'Near' is translated; the address is data. In Arabic the mixed-direction line also reads out of order, which is a separate finding about interpolated values (see before-launch). Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "ru|spill|components-inputs-areachip--long-address|Рядом: 1231 N Broad St, North Philadelphia",
+    "reason": "An area chip is one line and ends a long address in an ellipsis (the story exists to show a long address). Only 'Near' is translated; the address is data. In Arabic the mixed-direction line also reads out of order, which is a separate finding about interpolated values (see before-launch). Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "ar|spill|components-inputs-areachip--long-address|بالقرب من 1231 N Broad St, North Philadelphia",
+    "reason": "An area chip is one line and ends a long address in an ellipsis (the story exists to show a long address). Only 'Near' is translated; the address is data. In Arabic the mixed-direction line also reads out of order, which is a separate finding about interpolated values (see before-launch). Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|cut|member-created--explore|⟦Þŕóóóƒííļéé⟧",
+    "reason": "The fifth tab's label. Five one-word labels share a 320px bar and a tab does not shrink below its longest word, so the pseudo-language (English +45% with padding, longer than any real language) runs past the edge. All seven real languages fit (Russian, the tightest, fills the bar edge to edge). Tested and not shipped: tabs sized by content (flex 1 1 auto, min-width 0, wrapping) fit every language and wrap the pseudo-language, but move the English tabs a few pixels; the bar is Will's design, so it is his call (docs/before-launch.md). Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|cut|member-created--saved|⟦Þŕóóóƒííļéé⟧",
+    "reason": "The fifth tab's label. Five one-word labels share a 320px bar and a tab does not shrink below its longest word, so the pseudo-language (English +45% with padding, longer than any real language) runs past the edge. All seven real languages fit (Russian, the tightest, fills the bar edge to edge). Tested and not shipped: tabs sized by content (flex 1 1 auto, min-width 0, wrapping) fit every language and wrap the pseudo-language, but move the English tabs a few pixels; the bar is Will's design, so it is his call (docs/before-launch.md). Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|cut|member-created--trips|Wednesday, Oct 14 · 1:00 PM",
+    "reason": "The Trips drawer scrolls and fades out at its foot; a card below the first sits under that fade, so the detector sees its text partly hidden (partial=true). It is reached by scrolling and nothing is lost. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|cut|member-created--trips|⟦Þŕóóóƒííļéé⟧",
+    "reason": "The fifth tab's label. Five one-word labels share a 320px bar and a tab does not shrink below its longest word, so the pseudo-language (English +45% with padding, longer than any real language) runs past the edge. All seven real languages fit (Russian, the tightest, fills the bar edge to edge). Tested and not shipped: tabs sized by content (flex 1 1 auto, min-width 0, wrapping) fit every language and wrap the pseudo-language, but move the English tabs a few pixels; the bar is Will's design, so it is his call (docs/before-launch.md). Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|cut|member-created--trips-just-booked|⟦Þŕóóóƒííļéé⟧",
+    "reason": "The fifth tab's label. Five one-word labels share a 320px bar and a tab does not shrink below its longest word, so the pseudo-language (English +45% with padding, longer than any real language) runs past the edge. All seven real languages fit (Russian, the tightest, fills the bar edge to edge). Tested and not shipped: tabs sized by content (flex 1 1 auto, min-width 0, wrapping) fit every language and wrap the pseudo-language, but move the English tabs a few pixels; the bar is Will's design, so it is his call (docs/before-launch.md). Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|ellipsis|member-created--messages|Example Food Pantry",
+    "reason": "A conversation row's second line (the program or the person's role) is one line with an ellipsis by design (ConversationRow); the 'overlap' is the clipped rest of that line measured against the time stamp, and nothing touches on screen. The program name is data, not a translated string. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|spill|member-created--messages|Example Food Pantry",
+    "reason": "A conversation row's second line (the program or the person's role) is one line with an ellipsis by design (ConversationRow); the 'overlap' is the clipped rest of that line measured against the time stamp, and nothing touches on screen. The program name is data, not a translated string. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|ellipsis|member-created--messages|⟦Çáášéé ɱáááñááĝééŕ⟧",
+    "reason": "A conversation row's second line (the program or the person's role) is one line with an ellipsis by design (ConversationRow); the 'overlap' is the clipped rest of that line measured against the time stamp, and nothing touches on screen. The program name is data, not a translated string. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|spill|member-created--messages|⟦Çáášéé ɱáááñááĝééŕ⟧",
+    "reason": "A conversation row's second line (the program or the person's role) is one line with an ellipsis by design (ConversationRow); the 'overlap' is the clipped rest of that line measured against the time stamp, and nothing touches on screen. The program name is data, not a translated string. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|cut|member-created--messages|⟦Þŕóóóƒííļéé⟧",
+    "reason": "The fifth tab's label. Five one-word labels share a 320px bar and a tab does not shrink below its longest word, so the pseudo-language (English +45% with padding, longer than any real language) runs past the edge. All seven real languages fit (Russian, the tightest, fills the bar edge to edge). Tested and not shipped: tabs sized by content (flex 1 1 auto, min-width 0, wrapping) fit every language and wrap the pseudo-language, but move the English tabs a few pixels; the bar is Will's design, so it is his call (docs/before-launch.md). Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|overlap|member-created--messages|⟦Çáášéé ɱáááñááĝééŕ⟧ ⟷ ⟦Ţóóóðááý⟧",
+    "reason": "A conversation row's second line (the program or the person's role) is one line with an ellipsis by design (ConversationRow); the 'overlap' is the clipped rest of that line measured against the time stamp, and nothing touches on screen. The program name is data, not a translated string. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|cut|member-created--profile|⟦Þŕóóóƒííļéé⟧",
+    "reason": "The fifth tab's label. Five one-word labels share a 320px bar and a tab does not shrink below its longest word, so the pseudo-language (English +45% with padding, longer than any real language) runs past the edge. All seven real languages fit (Russian, the tightest, fills the bar edge to edge). Tested and not shipped: tabs sized by content (flex 1 1 auto, min-width 0, wrapping) fit every language and wrap the pseudo-language, but move the English tabs a few pixels; the bar is Will's design, so it is his call (docs/before-launch.md). Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|ellipsis|member-created--conversation-files|⟦Ĝóóóóĝļéé Ðóóóç⟧",
+    "reason": "The Shared things list keeps a title to one line and, when it is cut, slides it sideways to show its end (MarqueeText, Will's D-407). With reduced motion, which the audit uses, it stays cut with an ellipsis. The 'spill' and 'overlap' are the clipped rest of that line. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|spill|member-created--conversation-files|⟦Ĝóóóóĝļéé Ðóóóç⟧",
+    "reason": "The Shared things list keeps a title to one line and, when it is cut, slides it sideways to show its end (MarqueeText, Will's D-407). With reduced motion, which the audit uses, it stays cut with an ellipsis. The 'spill' and 'overlap' are the clipped rest of that line. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|ellipsis|member-created--conversation-files|⟦Ýéééšţéééŕðááý⟧",
+    "reason": "The right-hand column of a Shared things row (who sent it, over when) is at most 96px and each of its lines is one line with an ellipsis by design. The pseudo-language's 'Yesterday' is longer than any real word for it (Ayer, Вчера, أمس, 昨天, Ontem), and none of those is flagged. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|ellipsis|member-created--conversation-files|Is this the one?",
+    "reason": "The Shared things list keeps a title to one line and, when it is cut, slides it sideways to show its end (MarqueeText, Will's D-407). With reduced motion, which the audit uses, it stays cut with an ellipsis. The 'spill' and 'overlap' are the clipped rest of that line. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|spill|member-created--conversation-files|Is this the one?",
+    "reason": "The Shared things list keeps a title to one line and, when it is cut, slides it sideways to show its end (MarqueeText, Will's D-407). With reduced motion, which the audit uses, it stays cut with an ellipsis. The 'spill' and 'overlap' are the clipped rest of that line. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|ellipsis|member-created--connections|⟦Çóóóññéééçţééð ƀý Teresa⟧",
+    "reason": "'Connected by <name>' is one line with an ellipsis by design (ConnectionCard); the name is data. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|overlap|member-created--connections|⟦Þééóóþļéé ĥéééļþééð⟧ ⟷ ⟦Ļáááñĝúúááĝééš⟧",
+    "reason": "Stat columns share one row, each a number over a one-word label, and a word is never broken. The pseudo-language's longest label is wider than its third; the real languages' labels fit. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|ellipsis|member-created--points|⟦Šçĥóóóļáááŕ⟧",
+    "reason": "A badge's name under its picture is one line with an ellipsis by design (four across at 320px); the pseudo-language is longer than any real language, and none of the real ones is flagged. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|ellipsis|member-created--points|⟦Çŕááááƒţšɱáááñ⟧",
+    "reason": "A badge's name under its picture is one line with an ellipsis by design (four across at 320px); the pseudo-language is longer than any real language, and none of the real ones is flagged. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|ellipsis|member-created--points|⟦Áñçĥóóóóŕ⟧",
+    "reason": "A badge's name under its picture is one line with an ellipsis by design (four across at 320px); the pseudo-language is longer than any real language, and none of the real ones is flagged. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|ellipsis|member-created--points|⟦Ƒííííŕšţƀóóóŕñ⟧",
+    "reason": "A badge's name under its picture is one line with an ellipsis by design (four across at 320px); the pseudo-language is longer than any real language, and none of the real ones is flagged. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|ellipsis|member-created--points|⟦Ŕáááííñɱááķééŕ⟧",
+    "reason": "A badge's name under its picture is one line with an ellipsis by design (four across at 320px); the pseudo-language is longer than any real language, and none of the real ones is flagged. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|ellipsis|member-created--points|⟦Šáááñķóóƒáá⟧",
+    "reason": "A badge's name under its picture is one line with an ellipsis by design (four across at 320px); the pseudo-language is longer than any real language, and none of the real ones is flagged. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|ellipsis|member-created--points|⟦Ķíííñķééééþééŕ⟧",
+    "reason": "A badge's name under its picture is one line with an ellipsis by design (four across at 320px); the pseudo-language is longer than any real language, and none of the real ones is flagged. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|overlap|member-created--points|⟦Áñçĥóóóóŕ⟧ ⟷ ⟦Ƒííííŕšţƀóóóŕñ⟧",
+    "reason": "A badge's name under its picture is one line with an ellipsis by design (four across at 320px); the pseudo-language is longer than any real language, and none of the real ones is flagged. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|ellipsis|member-created-states-connections--people|⟦Çóóóññéééçţééð ƀý Teresa⟧",
+    "reason": "'Connected by <name>' is one line with an ellipsis by design (ConnectionCard); the name is data. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|overlap|member-created-states-connections--people|⟦Þééóóþļéé ĥéééļþééð⟧ ⟷ ⟦Ļáááñĝúúááĝééš⟧",
+    "reason": "Stat columns share one row, each a number over a one-word label, and a word is never broken. The pseudo-language's longest label is wider than its third; the real languages' labels fit. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|cut|member-created-states-explore--live|⟦Þŕóóóƒííļéé⟧",
+    "reason": "The fifth tab's label. Five one-word labels share a 320px bar and a tab does not shrink below its longest word, so the pseudo-language (English +45% with padding, longer than any real language) runs past the edge. All seven real languages fit (Russian, the tightest, fills the bar edge to edge). Tested and not shipped: tabs sized by content (flex 1 1 auto, min-width 0, wrapping) fit every language and wrap the pseudo-language, but move the English tabs a few pixels; the bar is Will's design, so it is his call (docs/before-launch.md). Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|cut|member-created-states-explore--places|⟦Þŕóóóƒííļéé⟧",
+    "reason": "The fifth tab's label. Five one-word labels share a 320px bar and a tab does not shrink below its longest word, so the pseudo-language (English +45% with padding, longer than any real language) runs past the edge. All seven real languages fit (Russian, the tightest, fills the bar edge to edge). Tested and not shipped: tabs sized by content (flex 1 1 auto, min-width 0, wrapping) fit every language and wrap the pseudo-language, but move the English tabs a few pixels; the bar is Will's design, so it is his call (docs/before-launch.md). Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|cut|member-created-states-explore--loading|⟦Þŕóóóƒííļéé⟧",
+    "reason": "The fifth tab's label. Five one-word labels share a 320px bar and a tab does not shrink below its longest word, so the pseudo-language (English +45% with padding, longer than any real language) runs past the edge. All seven real languages fit (Russian, the tightest, fills the bar edge to edge). Tested and not shipped: tabs sized by content (flex 1 1 auto, min-width 0, wrapping) fit every language and wrap the pseudo-language, but move the English tabs a few pixels; the bar is Will's design, so it is his call (docs/before-launch.md). Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|cut|member-created-states-explore--cant-connect|⟦Þŕóóóƒííļéé⟧",
+    "reason": "The fifth tab's label. Five one-word labels share a 320px bar and a tab does not shrink below its longest word, so the pseudo-language (English +45% with padding, longer than any real language) runs past the edge. All seven real languages fit (Russian, the tightest, fills the bar edge to edge). Tested and not shipped: tabs sized by content (flex 1 1 auto, min-width 0, wrapping) fit every language and wrap the pseudo-language, but move the English tabs a few pixels; the bar is Will's design, so it is his call (docs/before-launch.md). Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|cut|member-created-states-explore--something-went-wrong|⟦Þŕóóóƒííļéé⟧",
+    "reason": "The fifth tab's label. Five one-word labels share a 320px bar and a tab does not shrink below its longest word, so the pseudo-language (English +45% with padding, longer than any real language) runs past the edge. All seven real languages fit (Russian, the tightest, fills the bar edge to edge). Tested and not shipped: tabs sized by content (flex 1 1 auto, min-width 0, wrapping) fit every language and wrap the pseudo-language, but move the English tabs a few pixels; the bar is Will's design, so it is his call (docs/before-launch.md). Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|cut|member-created-states-explore--nothing-matches|⟦Þŕóóóƒííļéé⟧",
+    "reason": "The fifth tab's label. Five one-word labels share a 320px bar and a tab does not shrink below its longest word, so the pseudo-language (English +45% with padding, longer than any real language) runs past the edge. All seven real languages fit (Russian, the tightest, fills the bar edge to edge). Tested and not shipped: tabs sized by content (flex 1 1 auto, min-width 0, wrapping) fit every language and wrap the pseudo-language, but move the English tabs a few pixels; the bar is Will's design, so it is his call (docs/before-launch.md). Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|cut|member-created-states-explore--empty-category|⟦Þŕóóóƒííļéé⟧",
+    "reason": "The fifth tab's label. Five one-word labels share a 320px bar and a tab does not shrink below its longest word, so the pseudo-language (English +45% with padding, longer than any real language) runs past the edge. All seven real languages fit (Russian, the tightest, fills the bar edge to edge). Tested and not shipped: tabs sized by content (flex 1 1 auto, min-width 0, wrapping) fit every language and wrap the pseudo-language, but move the English tabs a few pixels; the bar is Will's design, so it is his call (docs/before-launch.md). Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|ellipsis|member-created-states-limited-account--messages|Example Food Pantry",
+    "reason": "A conversation row's second line (the program or the person's role) is one line with an ellipsis by design (ConversationRow); the 'overlap' is the clipped rest of that line measured against the time stamp, and nothing touches on screen. The program name is data, not a translated string. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|spill|member-created-states-limited-account--messages|Example Food Pantry",
+    "reason": "A conversation row's second line (the program or the person's role) is one line with an ellipsis by design (ConversationRow); the 'overlap' is the clipped rest of that line measured against the time stamp, and nothing touches on screen. The program name is data, not a translated string. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|ellipsis|member-created-states-limited-account--messages|⟦Çáášéé ɱáááñááĝééŕ⟧",
+    "reason": "A conversation row's second line (the program or the person's role) is one line with an ellipsis by design (ConversationRow); the 'overlap' is the clipped rest of that line measured against the time stamp, and nothing touches on screen. The program name is data, not a translated string. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|spill|member-created-states-limited-account--messages|⟦Çáášéé ɱáááñááĝééŕ⟧",
+    "reason": "A conversation row's second line (the program or the person's role) is one line with an ellipsis by design (ConversationRow); the 'overlap' is the clipped rest of that line measured against the time stamp, and nothing touches on screen. The program name is data, not a translated string. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|cut|member-created-states-limited-account--messages|⟦Þŕóóóƒííļéé⟧",
+    "reason": "The fifth tab's label. Five one-word labels share a 320px bar and a tab does not shrink below its longest word, so the pseudo-language (English +45% with padding, longer than any real language) runs past the edge. All seven real languages fit (Russian, the tightest, fills the bar edge to edge). Tested and not shipped: tabs sized by content (flex 1 1 auto, min-width 0, wrapping) fit every language and wrap the pseudo-language, but move the English tabs a few pixels; the bar is Will's design, so it is his call (docs/before-launch.md). Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|overlap|member-created-states-limited-account--messages|⟦Çáášéé ɱáááñááĝééŕ⟧ ⟷ ⟦Ţóóóðááý⟧",
+    "reason": "A conversation row's second line (the program or the person's role) is one line with an ellipsis by design (ConversationRow); the 'overlap' is the clipped rest of that line measured against the time stamp, and nothing touches on screen. The program name is data, not a translated string. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|overlap|member-created-states-limited-account--conversation|⟦Çáášéé ɱáááñááĝééŕ⟧ ⟷ T",
+    "reason": "The thread scrolls under its opaque header; text that has scrolled up behind the header's title is measured against it. Nothing overlaps on screen. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|ellipsis|member-created-states-messages--with-messages|Example Food Pantry",
+    "reason": "A conversation row's second line (the program or the person's role) is one line with an ellipsis by design (ConversationRow); the 'overlap' is the clipped rest of that line measured against the time stamp, and nothing touches on screen. The program name is data, not a translated string. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|spill|member-created-states-messages--with-messages|Example Food Pantry",
+    "reason": "A conversation row's second line (the program or the person's role) is one line with an ellipsis by design (ConversationRow); the 'overlap' is the clipped rest of that line measured against the time stamp, and nothing touches on screen. The program name is data, not a translated string. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|ellipsis|member-created-states-messages--with-messages|⟦Çáášéé ɱáááñááĝééŕ⟧",
+    "reason": "A conversation row's second line (the program or the person's role) is one line with an ellipsis by design (ConversationRow); the 'overlap' is the clipped rest of that line measured against the time stamp, and nothing touches on screen. The program name is data, not a translated string. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|spill|member-created-states-messages--with-messages|⟦Çáášéé ɱáááñááĝééŕ⟧",
+    "reason": "A conversation row's second line (the program or the person's role) is one line with an ellipsis by design (ConversationRow); the 'overlap' is the clipped rest of that line measured against the time stamp, and nothing touches on screen. The program name is data, not a translated string. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|cut|member-created-states-messages--with-messages|⟦Þŕóóóƒííļéé⟧",
+    "reason": "The fifth tab's label. Five one-word labels share a 320px bar and a tab does not shrink below its longest word, so the pseudo-language (English +45% with padding, longer than any real language) runs past the edge. All seven real languages fit (Russian, the tightest, fills the bar edge to edge). Tested and not shipped: tabs sized by content (flex 1 1 auto, min-width 0, wrapping) fit every language and wrap the pseudo-language, but move the English tabs a few pixels; the bar is Will's design, so it is his call (docs/before-launch.md). Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|overlap|member-created-states-messages--with-messages|⟦Çáášéé ɱáááñááĝééŕ⟧ ⟷ ⟦Ţóóóðááý⟧",
+    "reason": "A conversation row's second line (the program or the person's role) is one line with an ellipsis by design (ConversationRow); the 'overlap' is the clipped rest of that line measured against the time stamp, and nothing touches on screen. The program name is data, not a translated string. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|cut|member-created-states-messages--empty|⟦Þŕóóóƒííļéé⟧",
+    "reason": "The fifth tab's label. Five one-word labels share a 320px bar and a tab does not shrink below its longest word, so the pseudo-language (English +45% with padding, longer than any real language) runs past the edge. All seven real languages fit (Russian, the tightest, fills the bar edge to edge). Tested and not shipped: tabs sized by content (flex 1 1 auto, min-width 0, wrapping) fit every language and wrap the pseudo-language, but move the English tabs a few pixels; the bar is Will's design, so it is his call (docs/before-launch.md). Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|cut|member-created-states-messages--search-nothing-found|⟦Þŕóóóƒííļéé⟧",
+    "reason": "The fifth tab's label. Five one-word labels share a 320px bar and a tab does not shrink below its longest word, so the pseudo-language (English +45% with padding, longer than any real language) runs past the edge. All seven real languages fit (Russian, the tightest, fills the bar edge to edge). Tested and not shipped: tabs sized by content (flex 1 1 auto, min-width 0, wrapping) fit every language and wrap the pseudo-language, but move the English tabs a few pixels; the bar is Will's design, so it is his call (docs/before-launch.md). Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|cut|member-created-states-profile--member|⟦Þŕóóóƒííļéé⟧",
+    "reason": "The fifth tab's label. Five one-word labels share a 320px bar and a tab does not shrink below its longest word, so the pseudo-language (English +45% with padding, longer than any real language) runs past the edge. All seven real languages fit (Russian, the tightest, fills the bar edge to edge). Tested and not shipped: tabs sized by content (flex 1 1 auto, min-width 0, wrapping) fit every language and wrap the pseudo-language, but move the English tabs a few pixels; the bar is Will's design, so it is his call (docs/before-launch.md). Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|cut|member-created-states-profile--reminders-already-on|⟦Þŕóóóƒííļéé⟧",
+    "reason": "The fifth tab's label. Five one-word labels share a 320px bar and a tab does not shrink below its longest word, so the pseudo-language (English +45% with padding, longer than any real language) runs past the edge. All seven real languages fit (Russian, the tightest, fills the bar edge to edge). Tested and not shipped: tabs sized by content (flex 1 1 auto, min-width 0, wrapping) fit every language and wrap the pseudo-language, but move the English tabs a few pixels; the bar is Will's design, so it is his call (docs/before-launch.md). Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|cut|member-created-states-profile--new-member|⟦Þŕóóóƒííļéé⟧",
+    "reason": "The fifth tab's label. Five one-word labels share a 320px bar and a tab does not shrink below its longest word, so the pseudo-language (English +45% with padding, longer than any real language) runs past the edge. All seven real languages fit (Russian, the tightest, fills the bar edge to edge). Tested and not shipped: tabs sized by content (flex 1 1 auto, min-width 0, wrapping) fit every language and wrap the pseudo-language, but move the English tabs a few pixels; the bar is Will's design, so it is his call (docs/before-launch.md). Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|overlap|member-created-states-profile--new-member|⟦Ŕéééţúúŕñééð⟧ ⟷ ⟦Çóóóññéééçţííóóñš⟧",
+    "reason": "Stat columns share one row, each a number over a one-word label, and a word is never broken. The pseudo-language's longest label is wider than its third; the real languages' labels fit. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|cut|member-created-states-profile--long-name|⟦Þŕóóóƒííļéé⟧",
+    "reason": "The fifth tab's label. Five one-word labels share a 320px bar and a tab does not shrink below its longest word, so the pseudo-language (English +45% with padding, longer than any real language) runs past the edge. All seven real languages fit (Russian, the tightest, fills the bar edge to edge). Tested and not shipped: tabs sized by content (flex 1 1 auto, min-width 0, wrapping) fit every language and wrap the pseudo-language, but move the English tabs a few pixels; the bar is Will's design, so it is his call (docs/before-launch.md). Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|cut|member-created-states-profile--also-works-at-a-program|⟦Þŕóóóƒííļéé⟧",
+    "reason": "The fifth tab's label. Five one-word labels share a 320px bar and a tab does not shrink below its longest word, so the pseudo-language (English +45% with padding, longer than any real language) runs past the edge. All seven real languages fit (Russian, the tightest, fills the bar edge to edge). Tested and not shipped: tabs sized by content (flex 1 1 auto, min-width 0, wrapping) fit every language and wrap the pseudo-language, but move the English tabs a few pixels; the bar is Will's design, so it is his call (docs/before-launch.md). Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|cut|member-created-states-saved--places|⟦Þŕóóóƒííļéé⟧",
+    "reason": "The fifth tab's label. Five one-word labels share a 320px bar and a tab does not shrink below its longest word, so the pseudo-language (English +45% with padding, longer than any real language) runs past the edge. All seven real languages fit (Russian, the tightest, fills the bar edge to edge). Tested and not shipped: tabs sized by content (flex 1 1 auto, min-width 0, wrapping) fit every language and wrap the pseudo-language, but move the English tabs a few pixels; the bar is Will's design, so it is his call (docs/before-launch.md). Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|cut|member-created-states-saved--empty|⟦Þŕóóóƒííļéé⟧",
+    "reason": "The fifth tab's label. Five one-word labels share a 320px bar and a tab does not shrink below its longest word, so the pseudo-language (English +45% with padding, longer than any real language) runs past the edge. All seven real languages fit (Russian, the tightest, fills the bar edge to edge). Tested and not shipped: tabs sized by content (flex 1 1 auto, min-width 0, wrapping) fit every language and wrap the pseudo-language, but move the English tabs a few pixels; the bar is Will's design, so it is his call (docs/before-launch.md). Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|cut|member-created-states-saved--loading|⟦Þŕóóóƒííļéé⟧",
+    "reason": "The fifth tab's label. Five one-word labels share a 320px bar and a tab does not shrink below its longest word, so the pseudo-language (English +45% with padding, longer than any real language) runs past the edge. All seven real languages fit (Russian, the tightest, fills the bar edge to edge). Tested and not shipped: tabs sized by content (flex 1 1 auto, min-width 0, wrapping) fit every language and wrap the pseudo-language, but move the English tabs a few pixels; the bar is Will's design, so it is his call (docs/before-launch.md). Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|cut|member-created-states-trips--upcoming|Wednesday, Oct 14 · 1:00 PM",
+    "reason": "The Trips drawer scrolls and fades out at its foot; a card below the first sits under that fade, so the detector sees its text partly hidden (partial=true). It is reached by scrolling and nothing is lost. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|cut|member-created-states-trips--upcoming|⟦Þŕóóóƒííļéé⟧",
+    "reason": "The fifth tab's label. Five one-word labels share a 320px bar and a tab does not shrink below its longest word, so the pseudo-language (English +45% with padding, longer than any real language) runs past the edge. All seven real languages fit (Russian, the tightest, fills the bar edge to edge). Tested and not shipped: tabs sized by content (flex 1 1 auto, min-width 0, wrapping) fit every language and wrap the pseudo-language, but move the English tabs a few pixels; the bar is Will's design, so it is his call (docs/before-launch.md). Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|cut|member-created-states-trips--no-trips|⟦Þŕóóóƒííļéé⟧",
+    "reason": "The fifth tab's label. Five one-word labels share a 320px bar and a tab does not shrink below its longest word, so the pseudo-language (English +45% with padding, longer than any real language) runs past the edge. All seven real languages fit (Russian, the tightest, fills the bar edge to edge). Tested and not shipped: tabs sized by content (flex 1 1 auto, min-width 0, wrapping) fit every language and wrap the pseudo-language, but move the English tabs a few pixels; the bar is Will's design, so it is his call (docs/before-launch.md). Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|ellipsis|case-manager-screens--conversation-files|⟦Ĝóóóóĝļéé Ðóóóç⟧",
+    "reason": "The Shared things list keeps a title to one line and, when it is cut, slides it sideways to show its end (MarqueeText, Will's D-407). With reduced motion, which the audit uses, it stays cut with an ellipsis. The 'spill' and 'overlap' are the clipped rest of that line. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|spill|case-manager-screens--conversation-files|⟦Ĝóóóóĝļéé Ðóóóç⟧",
+    "reason": "The Shared things list keeps a title to one line and, when it is cut, slides it sideways to show its end (MarqueeText, Will's D-407). With reduced motion, which the audit uses, it stays cut with an ellipsis. The 'spill' and 'overlap' are the clipped rest of that line. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|ellipsis|case-manager-screens--conversation-files|⟦Ýéééšţéééŕðááý⟧",
+    "reason": "The right-hand column of a Shared things row (who sent it, over when) is at most 96px and each of its lines is one line with an ellipsis by design. The pseudo-language's 'Yesterday' is longer than any real word for it (Ayer, Вчера, أمس, 昨天, Ontem), and none of those is flagged. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|ellipsis|case-manager-screens--conversation-files|Is this the one?",
+    "reason": "The Shared things list keeps a title to one line and, when it is cut, slides it sideways to show its end (MarqueeText, Will's D-407). With reduced motion, which the audit uses, it stays cut with an ellipsis. The 'spill' and 'overlap' are the clipped rest of that line. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|spill|case-manager-screens--conversation-files|Is this the one?",
+    "reason": "The Shared things list keeps a title to one line and, when it is cut, slides it sideways to show its end (MarqueeText, Will's D-407). With reduced motion, which the audit uses, it stays cut with an ellipsis. The 'spill' and 'overlap' are the clipped rest of that line. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|overlap|case-manager-screens--conversation-files|⟦Ĝóóóóĝļéé Ðóóóç⟧ ⟷ ⟦Ýóóúú⟧",
+    "reason": "The Shared things list keeps a title to one line and, when it is cut, slides it sideways to show its end (MarqueeText, Will's D-407). With reduced motion, which the audit uses, it stays cut with an ellipsis. The 'spill' and 'overlap' are the clipped rest of that line. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|cut|program-lead-screens--home-folded|⟦Ƒííííŕšţ ṽíííšííţ⟧ · ⟦Ñóóóţ çĥéééçķéééð íñ⟧",
+    "reason": "The folded week on Home shows a fixed height and fades the rest, with 'Show the whole calendar' under it. A longer line wraps to more lines, so less of the next row shows; the rest is one tap away. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|ellipsis|super-admin-screens--messages|⟦Çáášéé ɱáááñááĝééŕ⟧",
+    "reason": "A conversation row's second line (the program or the person's role) is one line with an ellipsis by design (ConversationRow); the 'overlap' is the clipped rest of that line measured against the time stamp, and nothing touches on screen. The program name is data, not a translated string. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|spill|super-admin-screens--messages|⟦Çáášéé ɱáááñááĝééŕ⟧",
+    "reason": "A conversation row's second line (the program or the person's role) is one line with an ellipsis by design (ConversationRow); the 'overlap' is the clipped rest of that line measured against the time stamp, and nothing touches on screen. The program name is data, not a translated string. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|overlap|super-admin-screens--messages|⟦Çáášéé ɱáááñááĝééŕ⟧ ⟷ ⟦Ţóóóðááý⟧",
+    "reason": "A conversation row's second line (the program or the person's role) is one line with an ellipsis by design (ConversationRow); the 'overlap' is the clipped rest of that line measured against the time stamp, and nothing touches on screen. The program name is data, not a translated string. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|spill|components-inputs-areachip--long-address|⟦Ñééááŕ 1231 N Broad St, North Philadelphia⟧",
+    "reason": "An area chip is one line and ends a long address in an ellipsis (the story exists to show a long address). Only 'Near' is translated; the address is data. In Arabic the mixed-direction line also reads out of order, which is a separate finding about interpolated values (see before-launch). Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|cut|components-cards-savedstrip--default|⟦Ĥóóɱéé áñññð ƒáááɱííļý⟧",
+    "reason": "A strip of cards swiped sideways, with the half-card at the edge as the cue that there are more (Will, 14 September). Cards beyond the edge are partly hidden by design. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|cut|components-cards-savedstrip--many-saved-with-long-names|⟦Ĥóóɱéé áñññð ƒáááɱííļý⟧",
+    "reason": "A strip of cards swiped sideways, with the half-card at the edge as the cue that there are more (Will, 14 September). Cards beyond the edge are partly hidden by design. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|cut|components-navigation-tabbar--default|⟦Þŕóóóƒííļéé⟧",
+    "reason": "The fifth tab's label. Five one-word labels share a 320px bar and a tab does not shrink below its longest word, so the pseudo-language (English +45% with padding, longer than any real language) runs past the edge. All seven real languages fit (Russian, the tightest, fills the bar edge to edge). Tested and not shipped: tabs sized by content (flex 1 1 auto, min-width 0, wrapping) fit every language and wrap the pseudo-language, but move the English tabs a few pixels; the bar is Will's design, so it is his call (docs/before-launch.md). Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|cut|components-navigation-tabbar--on-saved|⟦Þŕóóóƒííļéé⟧",
+    "reason": "The fifth tab's label. Five one-word labels share a 320px bar and a tab does not shrink below its longest word, so the pseudo-language (English +45% with padding, longer than any real language) runs past the edge. All seven real languages fit (Russian, the tightest, fills the bar edge to edge). Tested and not shipped: tabs sized by content (flex 1 1 auto, min-width 0, wrapping) fit every language and wrap the pseudo-language, but move the English tabs a few pixels; the bar is Will's design, so it is his call (docs/before-launch.md). Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|cut|components-navigation-tabbar--on-trips|⟦Þŕóóóƒííļéé⟧",
+    "reason": "The fifth tab's label. Five one-word labels share a 320px bar and a tab does not shrink below its longest word, so the pseudo-language (English +45% with padding, longer than any real language) runs past the edge. All seven real languages fit (Russian, the tightest, fills the bar edge to edge). Tested and not shipped: tabs sized by content (flex 1 1 auto, min-width 0, wrapping) fit every language and wrap the pseudo-language, but move the English tabs a few pixels; the bar is Will's design, so it is his call (docs/before-launch.md). Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|cut|components-navigation-tabbar--on-messages|⟦Þŕóóóƒííļéé⟧",
+    "reason": "The fifth tab's label. Five one-word labels share a 320px bar and a tab does not shrink below its longest word, so the pseudo-language (English +45% with padding, longer than any real language) runs past the edge. All seven real languages fit (Russian, the tightest, fills the bar edge to edge). Tested and not shipped: tabs sized by content (flex 1 1 auto, min-width 0, wrapping) fit every language and wrap the pseudo-language, but move the English tabs a few pixels; the bar is Will's design, so it is his call (docs/before-launch.md). Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|cut|components-navigation-tabbar--on-profile|⟦Þŕóóóƒííļéé⟧",
+    "reason": "The fifth tab's label. Five one-word labels share a 320px bar and a tab does not shrink below its longest word, so the pseudo-language (English +45% with padding, longer than any real language) runs past the edge. All seven real languages fit (Russian, the tightest, fills the bar edge to edge). Tested and not shipped: tabs sized by content (flex 1 1 auto, min-width 0, wrapping) fit every language and wrap the pseudo-language, but move the English tabs a few pixels; the bar is Will's design, so it is his call (docs/before-launch.md). Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|cut|components-navigation-tabbar--nothing-unread|⟦Þŕóóóƒííļéé⟧",
+    "reason": "The fifth tab's label. Five one-word labels share a 320px bar and a tab does not shrink below its longest word, so the pseudo-language (English +45% with padding, longer than any real language) runs past the edge. All seven real languages fit (Russian, the tightest, fills the bar edge to edge). Tested and not shipped: tabs sized by content (flex 1 1 auto, min-width 0, wrapping) fit every language and wrap the pseudo-language, but move the English tabs a few pixels; the bar is Will's design, so it is his call (docs/before-launch.md). Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|cut|onboarding--about|⟦Þŕóóóĝŕáááɱš⟧",
+    "reason": "A segment of the control never breaks a word (D-422), and three share one row, so the pseudo-language's single long word is wider than a third of it. The longest word in each real language fits; a language with longer words would need two rows or a different control. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|scroll|onboarding--about|(page)",
+    "reason": "A segment of the control never breaks a word (D-422), and three share one row, so the pseudo-language's single long word is wider than a third of it. The longest word in each real language fits; a language with longer words would need two rows or a different control. Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "ru|overlap|case-manager-screens--conversation-files|The way in is round the side ⟷ Вы",
+    "reason": "The Shared things list keeps a title to one line and, when it is cut, slides it sideways to show its end (MarqueeText, Will's D-407). With reduced motion, which the audit uses, it stays cut with an ellipsis. The 'spill' and 'overlap' are the clipped rest of that line. Looked at 9 October 2026 at 320px with screenshots. Found by the first run on GitHub (its fonts make the right-hand column a little wider than in the sandbox where the baseline was made)."
+  },
+  {
+    "key": "zh-CN|overlap|case-manager-screens--conversation-files|The way in is round the side ⟷ 您",
+    "reason": "The Shared things list keeps a title to one line and, when it is cut, slides it sideways to show its end (MarqueeText, Will's D-407). With reduced motion, which the audit uses, it stays cut with an ellipsis. The 'spill' and 'overlap' are the clipped rest of that line. Looked at 9 October 2026 at 320px with screenshots. Found by the first run on GitHub (its fonts make the right-hand column a little wider than in the sandbox where the baseline was made)."
+  }
+]

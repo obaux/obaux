@@ -15,12 +15,13 @@ import { useStoryText } from '../support/useStoryText';
  */
 function LocalisedSwitch({ label, options, ...rest }: RoleSwitchProps) {
   const tr = useStoryText();
+  const plain = useStoryText({ plain: true });
   return (
     <HStack gap={2} align="center">
       <RoleSwitch
         {...rest}
         label={tr(label)}
-        viewingLabel={(role) => tr(`view.as?role=${role}`)}
+        viewingLabel={(role) => plain(`view.as?role=${role}`)}
         options={options.map((option) => ({ value: option.value, label: tr(option.label) }))}
       />
       <Text type="supporting">{tr(`role.${rest.value}`)}</Text>

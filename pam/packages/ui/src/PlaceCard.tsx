@@ -312,6 +312,27 @@ export function directionsHref(
 }
 
 /**
+ * Directions to a place, in Apple Maps (Will, 9 October 2026: "easily copied
+ * into Google Maps or Apple Maps to help them navigate").
+ *
+ * The same rule as `directionsHref`: coordinates beat the address when Pam has
+ * them, because a stale address routes somebody to the wrong building. On an
+ * iPhone or a Mac the link opens the Maps app; elsewhere it opens Apple's own
+ * page in the browser. No travel mode (`dirflg` left off), so Maps picks what
+ * the person last used. Returns undefined when there is nothing to route to.
+ */
+export function appleMapsHref(
+  address?: string | null,
+  lat?: number | null,
+  lon?: number | null,
+): string | undefined {
+  const hasPoint = Number.isFinite(lat) && Number.isFinite(lon);
+  const destination = hasPoint ? `${lat},${lon}` : (address ?? null);
+  if (!destination) return undefined;
+  return `https://maps.apple.com/?daddr=${encodeURIComponent(destination)}`;
+}
+
+/**
  * The place's own Google listing, where its opening hours and phone number are.
  *
  * `place_id` is null on every imported row until `enrich-places` runs, so this

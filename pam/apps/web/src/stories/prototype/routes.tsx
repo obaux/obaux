@@ -36,11 +36,13 @@ import PlacePoliciesPage from '../../app/place/policies/page';
 import PlacePolicyPage from '../../app/place/policies/view/page';
 import ProgramServicePage from '../../app/program/service/page';
 import { PrototypeRequestProgram } from './PrototypeRequestProgram';
+import { PrototypeRequestReview } from './PrototypeRequestReview';
 import { InvitesLogScreen } from '../../screens/InvitesLogScreen';
 import TermsPage from '../../app/terms/page';
 import { ProfileScreen } from '../../screens/ProfileScreen';
 import { ViewAsView } from '../../screens/ViewAsView';
 import { InviteView } from '../../screens/InviteView';
+import { PrototypeInviteNew } from './PrototypeInviteNew';
 import { BookForMemberView } from '../../screens/BookForMemberView';
 import { AddPersonView } from '../../screens/AddPersonView';
 import PersonPoliciesPage from '../../app/person/policies/page';
@@ -63,7 +65,6 @@ import { SavedScreen } from '../../screens/SavedView';
 import { ThreadOptionsView, ThreadReportView } from '../../screens/ThreadOptionsViews';
 import { ThreadFilesView } from '../../screens/ThreadFilesView';
 import { MessagesScreen } from '../../screens/MessagesScreen';
-import { HeaderActions } from '../shell/HeaderActions';
 import { LocalTabBar } from '../shell/LocalTabBar';
 import { isFreshAccount, isProgramLive } from '../../lib/programSetup';
 import type { Role } from '@pam/config';
@@ -119,6 +120,7 @@ export const APP_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   '/person/handover/': screen(() => <HandOverPage />),
   '/requests/': screen(() => <RequestsPage />),
   '/requests/program/': screen(() => <PrototypeRequestProgram />),
+  '/requests/review/': screen(() => <PrototypeRequestReview />),
   '/invites/': screen(() => <InvitesLogScreen />),
   '/interested/': screen(() => <InterestedPage />),
   '/person/': screen(() => <PersonPage />),
@@ -146,6 +148,7 @@ export const APP_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   // D-218: Invite someone, All programs and Add a program, and a program
   // lead's own Program tab.
   '/invite/': screen(() => <InviteView />),
+  '/invite/new/': screen(() => <PrototypeInviteNew />),
   '/program/book/': screen(() => <BookForMemberView />),
   '/program/book/new/': screen(() => <AddPersonView />),
   '/person/policies/': screen(() => <PersonPoliciesPage />),

@@ -84,11 +84,6 @@ export interface SubPageHeaderProps {
    * the title says what the page is.
    */
   readonly hero?: ReactNode;
-  /**
-   * The page's gap, in Astryx steps (4px each), so the hero can sit flush
-   * with the top of the screen. `SubPage` passes its own.
-   */
-  readonly heroGap?: 2 | 3 | 4;
 }
 
 const COLLAPSE_AT = 48;
@@ -155,13 +150,10 @@ const styles = stylex.create({
   // does (12px down), drawn clear until the page scrolls under it.
   barOverHero: { backgroundColor: 'transparent' },
   // Pulled up by the picture's height less the bar's usual 12px, plus the
-  // page gap between them; the title pushed down to 16px under the picture.
-  pull2: { marginTop: '-236px' },
-  pull3: { marginTop: '-240px' },
-  pull4: { marginTop: '-244px' },
-  push2: { paddingTop: '172px' },
-  push3: { paddingTop: '168px' },
-  push4: { paddingTop: '164px' },
+  // page gap (4 steps of 4px) between them; the title pushed down to 16px
+  // under the picture.
+  pull: { marginTop: '-244px' },
+  push: { paddingTop: '164px' },
   barOverHeroCollapsed: { backgroundColor: colorVars['--color-background-body'] },
   titleRow: { width: '100%' },
   subtitle: { fontSize: '17px', lineHeight: 1.4 },
@@ -183,7 +175,6 @@ export function SubPageHeader({
   backIcon = 'back',
   isBackFixed = false,
   hero,
-  heroGap = 4,
 }: SubPageHeaderProps) {
   const [collapsed, setCollapsed] = useState(false);
   const fit = useFitTitle<HTMLHeadingElement>(title);
@@ -203,10 +194,8 @@ export function SubPageHeader({
 
   // The hero's geometry (D-376): the picture runs from the top edge to
   // 240px; the bar is pulled back up over it to 12px from the top; the title
-  // starts 16px under the picture. Per page gap (Astryx steps of 4px).
+  // starts 16px under the picture.
   const isHero = hero !== undefined && hero !== null && hero !== false;
-  const pull = heroGap === 2 ? styles.pull2 : heroGap === 3 ? styles.pull3 : styles.pull4;
-  const push = heroGap === 2 ? styles.push2 : heroGap === 3 ? styles.push3 : styles.push4;
 
   return (
     <>
@@ -223,7 +212,7 @@ export function SubPageHeader({
           styles.bar,
           collapsed && styles.barCollapsed,
           isHero && styles.barOverHero,
-          isHero && pull,
+          isHero && styles.pull,
           isHero && collapsed && styles.barOverHeroCollapsed,
         ]}
       >
@@ -239,7 +228,7 @@ export function SubPageHeader({
           </HStack>
         ) : null}
       </HStack>
-      <VStack gap={1} xstyle={isHero ? push : undefined}>
+      <VStack gap={1} xstyle={isHero ? styles.push : undefined}>
         {titleAddon ? (
           // Something beside the title — an info tip (D-376).
           <HStack gap={1} align="center" wrap="nowrap" xstyle={styles.titleRow}>
@@ -306,13 +295,12 @@ export function BackButton({
 /** A nested screen: the template on top, the screen's own content under it. */
 export function SubPage({
   children,
-  gap = 4,
   footer,
   ...header
-}: SubPageHeaderProps & { readonly children: ReactNode; readonly gap?: 2 | 3 | 4; readonly footer?: ReactNode }) {
+}: SubPageHeaderProps & { readonly children: ReactNode; readonly footer?: ReactNode }) {
   return (
-    <Page gap={gap} footer={footer}>
-      <SubPageHeader heroGap={gap} {...header} />
+    <Page gap={4} footer={footer}>
+      <SubPageHeader {...header} />
       {children}
     </Page>
   );

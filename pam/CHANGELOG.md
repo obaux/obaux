@@ -1,5 +1,40 @@
 # Changelog
 
+## [0.52.0] — 2026-10-09 · Copy an address, or open it in a maps app
+
+On a place or a program, the address card now has a small copy button: tap it and
+the address is on your phone's clipboard, ready to paste into any maps app, a
+ride app or a note. The address itself is a link: tap it and a drawer opens with Google
+Maps and Apple Maps, each with its own icon, and one tap hands the address to that app.
+In Arabic the address now keeps its own order instead of being turned around
+(D-439). The drawer's rows line up with its title, each app says "Opens in app",
+and on a phone a tap opens the app — or, if it is not installed, its page in the
+App Store or Play Store (Apple Maps is offered on iPhones and iPads, not Android).
+
+A place now has one layout: its details and the ways to reach it, with the one
+button that matters — *Plan a trip* or *How to get there* — pinned to the foot of
+the screen. The older list of labelled rows (Call this place, Their website, Save
+this place, Share, Something is wrong here) is gone from every screen (D-440).
+
+For the person running Pam: inviting somebody is a page for each kind (a member, a
+program, a case manager), where you pick the city and give their name and number — it
+had been failing from Profile because no city was asked for. Requests are a list; tap
+one to read it, text them, pick the city and approve or deny from the bottom of the
+screen. Everyone no longer carries a card of invite buttons. Lists of rows across the
+app now start at the page edge, in line with the title above them (D-444).
+
+## [0.51.1] — 2026-10-09 · Arabic reads in the right order
+
+In Arabic, a name, an address or a date that Pam writes into a sentence now
+stays in one piece. Before, the Arabic words around it pulled it apart: an
+address like "1231 N Broad St, North Philadelphia" came out with its number
+beside "بالقرب من" and the rest on the far side, and the same thing happened
+to a date after "Pam:", to the signed-policy counts, to the points left to the
+next level, and to the full stop at the end of an English message. They now
+read in order. When an address is too long for the space at the top of Places,
+it loses its end, as in English, rather than its street number. Nothing
+changes in English or in the other five languages (D-435).
+
 ## [0.51.0] — 2026-10-09 · Pam speaks seven languages
 
 Pam is now in Brazilian Portuguese, Simplified Chinese (for Mandarin

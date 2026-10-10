@@ -199,7 +199,7 @@ by signing in on the live site. So:
   prototype can't follow that.
 - **Two screen templates (D-213).** A tab screen uses `LargeTitleHeader`; any
   screen you tap into uses `SubPage`/`SubPageHeader` from `@pam/ui` (round
-  back, large title; `variant="compact"` for a conversation). Don't hand-roll a
+  back, large title — the same on every one, a conversation too, D-411). Don't hand-roll a
   new header. Text cards take `padding={6}`.
 - What ships is still the branch, merged the usual way. Nothing is exported
   from Storybook.
@@ -214,7 +214,8 @@ These come from the build SOP and are enforced by tests, not convention:
 - **Never display** "prisoner", "ex-offender", "inmate", or conviction details
   anywhere a user can see — UI, notifications, or exports. CI checks this.
 - **No SMS may reveal justice involvement**, exceed 160 characters (70 in a
-  script GSM-7 cannot carry — Chinese, Russian, Arabic), carry emoji, or send
+  script GSM-7 cannot carry — Chinese, Russian, Arabic; 134 for the three
+  appointment reminders, D-431), carry emoji, or send
   without a human recorded in `reviewedBy` **for that language**. A language
   nobody has signed is texted in English, never in a draft (A25).
 - **Never dead-end.** Every screen has a visible way back and a visible way to
@@ -233,6 +234,14 @@ These come from the build SOP and are enforced by tests, not convention:
   audit:fit` checks it against a Storybook build, and Storybook's
   *Pseudo-language* shows a string 40% longer. How to change copy, in all
   seven languages and in texts and emails: `docs/copy-changes.md`.
+- **`t` for what is drawn, `tPlain` for what is not (D-435).** In Arabic `t` wraps
+  each text value it writes into a sentence in invisible bidi isolates, so an
+  English name or address is not pulled apart by the Arabic around it. Text that
+  is not read off the screen must not carry them: an `aria-label` or other
+  accessible name, an `alt`, `VisuallyHidden` text, and what is handed to a share
+  sheet or the clipboard all use `tPlain`, and build any sentence they contain from
+  `tPlain` all the way down. `audit:fit` fails on an isolate in one of those places.
+  Texts and emails fill their own templates and never see them.
 
 ## Verify, don't assume
 

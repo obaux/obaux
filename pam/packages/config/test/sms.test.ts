@@ -18,7 +18,9 @@ import {
   smsTermHits,
   STOP_SUFFIX,
   SMS_MAX_LENGTH_UCS2,
+  SMS_MAX_LENGTH_UCS2_TWO_SEGMENTS,
   SMS_WORST_CASE_LINK_LENGTH,
+  APPROVED_TO_LEARN_FROM,
   type MoreLocale,
   type SmsTemplate,
   type SmsTemplateKey,
@@ -290,39 +292,107 @@ describe('texts in the newer languages', () => {
     }
   });
 
-  it('sends none of them: a draft nobody has signed renders as English', () => {
-    // The point of the whole structure. If this fails, a machine-drafted text
-    // is on its way to somebody's phone.
-    const signed = drafts.filter((d) => d.draft.reviewedBy);
-    expect(signed, 'a person signs these in sms-templates.ts, with a date').toEqual([]);
-    for (const { key, locale } of drafts) {
-      expect(usableSmsLocale(key, locale), `${key} (${locale})`).toBe('en');
-      expect(() => renderSms({ key, locale, vars: varsFor(locale) })).toThrow(UnreviewedTemplateError);
+  it('carries Will’s approval on every draft, worded for what it is', () => {
+    // 9 October 2026: "approve new languages for now ... fail first then fix it ...
+    // adjust languages based on feedback." The wording says so plainly: approved to
+    // learn from, no native reader yet. Nothing else has signed them.
+    expect(APPROVED_TO_LEARN_FROM).toMatch(/^Will \(Oba\), 9 October 2026/);
+    expect(APPROVED_TO_LEARN_FROM).toContain('no native reader yet');
+    for (const { key, locale, draft } of drafts) {
+      expect(draft.reviewedBy, `${key} (${locale})`).toBe(APPROVED_TO_LEARN_FROM);
     }
-    expect(unsignedSmsDrafts().length).toBe(drafts.length);
+    expect(unsignedSmsDrafts()).toEqual([]);
   });
 
-  it('uses a draft once a person has signed it, and only that one', () => {
+  it('takes a language back to English the moment its approval is emptied — for every draft', () => {
+    // The brake. Emptying the approval is how a language is pulled after feedback.
+    const catalogue = SMS_TEMPLATES as Record<string, SmsTemplate>;
+    for (const { key, locale } of drafts) {
+      const original = catalogue[key]!;
+      catalogue[key] = { ...original, more: { ...original.more, [locale]: { ...original.more![locale]!, reviewedBy: '' } } };
+      try {
+        expect(usableSmsLocale(key, locale), `${key} (${locale})`).toBe('en');
+        expect(() => renderSms({ key, locale, vars: varsFor(locale) })).toThrow(UnreviewedTemplateError);
+      } finally {
+        catalogue[key] = original;
+      }
+    }
+  });
+
+  it('uses a language while it carries an approval, and only that one', () => {
     const catalogue = SMS_TEMPLATES as Record<string, SmsTemplate>;
     const original = catalogue['verify_code']!;
     catalogue['verify_code'] = {
       ...original,
-      more: { ...original.more, ru: { ...original.more!['ru']!, reviewedBy: 'a native reader, 1 January 2027' } },
+      more: { ...original.more, ru: { ...original.more!['ru']!, reviewedBy: '' } },
     };
     try {
-      expect(usableSmsLocale('verify_code', 'ru')).toBe('ru');
-      expect(usableSmsLocale('verify_code', 'ar')).toBe('en');
-      expect(renderSms({ key: 'verify_code', locale: 'ru', vars: varsFor('ru') })).toContain('Ваш код');
+      expect(usableSmsLocale('verify_code', 'ru')).toBe('en');
+      expect(usableSmsLocale('verify_code', 'ar')).toBe('ar');
     } finally {
       catalogue['verify_code'] = original;
     }
+    expect(usableSmsLocale('verify_code', 'ru')).toBe('ru');
+    expect(renderSms({ key: 'verify_code', locale: 'ru', vars: varsFor('ru') })).toContain('Ваш код');
   });
 
-  it('falls back to English for a template with no text in the language at all', () => {
-    // The appointment reminders carry an address and a link: more than 70
-    // characters in any script GSM-7 cannot carry.
-    expect(SMS_TEMPLATES.appointment_24h.more?.['ru']).toBeUndefined();
-    expect(usableSmsLocale('appointment_24h', 'ru')).toBe('en');
+  it('gives the three appointment reminders two segments, and nothing else', () => {
+    // Will, 9 October 2026 (D-431): "allow two segments for those three reminders
+    // only." Everything else in these scripts stays at one segment (70).
+    const twoSegments = keys.filter((k) => SMS_TEMPLATES[k].ucs2Segments === 2);
+    expect(twoSegments.sort()).toEqual(['appointment_24h', 'appointment_2h', 'appointment_morning_of']);
+    expect(SMS_MAX_LENGTH_UCS2_TWO_SEGMENTS).toBe(134);
+    // And each has a text in every script, now: nobody who reads one of them is
+    // texted a reminder in English for want of room.
+    for (const key of twoSegments) {
+      for (const locale of ['zh-CN', 'zh-HK', 'ru', 'ar'] as const) {
+        expect(SMS_TEMPLATES[key].more?.[locale], `${key} (${locale})`).toBeDefined();
+        expect(usableSmsLocale(key, locale), `${key} (${locale})`).toBe(locale);
+      }
+    }
+  });
+
+  it('keeps the cheap encoding at one segment even for a template that has two', () => {
+    // The allowance is for the wide encoding only: the English, Spanish and
+    // Portuguese reminders are one 160-character message, as registered.
+    expect(segmentLimitFor('Pam: Hello {time}', 2)).toBe(SMS_MAX_LENGTH);
+    expect(segmentLimitFor('Pam: 您好 {time}', 2)).toBe(134);
+    expect(segmentLimitFor('Pam: 您好 {time}', 1)).toBe(70);
+  });
+
+  it.each(['appointment_24h', 'appointment_2h', 'appointment_morning_of'] as const)(
+    '%s fits two segments in every script with the longest time, address and link it can be sent with',
+    (key) => {
+      const template = SMS_TEMPLATES[key];
+      for (const locale of ['zh-CN', 'zh-HK', 'ru', 'ar'] as const) {
+        const draft = template.more![locale]!;
+        // The variable budgets are the ceiling, not the typical value: an address
+        // clipped at its budget, a ten-character time, and the live 36-character link.
+        const budget = draft.maxVarLengths?.['address'] ?? template.maxVarLengths!['address']!;
+        const body = renderSms({
+          key,
+          locale,
+          vars: { time: '10:00 a.m.', address: 'x'.repeat(budget + 20), link: 'https://web-ten-umber-88.vercel.app/' },
+        });
+        expect(body.length, `${key} (${locale}): "${body}"`).toBeLessThanOrEqual(SMS_MAX_LENGTH_UCS2_TWO_SEGMENTS);
+        // A little room is left over for a longer time than ten characters.
+        expect(SMS_MAX_LENGTH_UCS2_TWO_SEGMENTS - body.length, `${key} (${locale})`).toBeGreaterThanOrEqual(8);
+      }
+    },
+  );
+
+  it('still falls back to English for a template with no text in the language at all', () => {
+    // Any template that is not allowed two segments and cannot be said in 70
+    // characters stays English on purpose. Removing a draft is how that is chosen.
+    const catalogue = SMS_TEMPLATES as Record<string, SmsTemplate>;
+    const original = catalogue['verify_code']!;
+    const { ru: _ru, ...rest } = original.more!;
+    catalogue['verify_code'] = { ...original, more: rest };
+    try {
+      expect(usableSmsLocale('verify_code', 'ru')).toBe('en');
+    } finally {
+      catalogue['verify_code'] = original;
+    }
   });
 
   describe.each(drafts)('$key in $locale', ({ key, locale, draft }) => {
@@ -344,15 +414,15 @@ describe('texts in the newer languages', () => {
       // In a script with only 70 characters it cannot ride on a message that
       // already carries a link — the reminder is a text of its own there — so
       // only the first-contact texts, which always carry it, are held to it.
-      if (segmentLimitFor(wording) === SMS_MAX_LENGTH || template.isFirstContact) {
+      if (segmentLimitFor(wording, template.ucs2Segments) === SMS_MAX_LENGTH || template.isFirstContact) {
         const withStop = renderSms({ key, locale, vars: varsFor(locale), allowUnreviewed: true, includeStop: true });
-        const limit = segmentLimitFor(wording + STOP_SUFFIX[locale]);
+        const limit = segmentLimitFor(wording + STOP_SUFFIX[locale], template.ucs2Segments);
         expect(withStop.length, `"${withStop}" is ${withStop.length} of ${limit}`).toBeLessThanOrEqual(limit);
       }
       // As sent, leave room: a link or a name a little longer than the one
       // measured must not turn a reminder into one that cannot send.
       const asSent = renderSms({ key, locale, vars: varsFor(locale), allowUnreviewed: true });
-      const room = segmentLimitFor(wording + (template.isFirstContact ? STOP_SUFFIX[locale] : '')) - asSent.length;
+      const room = segmentLimitFor(wording + (template.isFirstContact ? STOP_SUFFIX[locale] : ''), template.ucs2Segments) - asSent.length;
       expect(room, `"${asSent}"`).toBeGreaterThanOrEqual(4);
     });
   });
@@ -366,10 +436,12 @@ describe('texts in the newer languages', () => {
   );
 
   it.each(drafts.filter((d) => d.locale !== 'pt-BR'))(
-    '$locale $key is held to the 70 characters its script allows',
-    ({ draft }) => {
+    '$locale $key is held to what its script and its template allow',
+    ({ key, draft }) => {
       expect(isGsm7(draft.body.replace(/\{[a-zA-Z0-9_]+\}/g, '')), 'a script GSM-7 cannot carry').toBe(false);
-      expect(segmentLimitFor(draft.body)).toBe(SMS_MAX_LENGTH_UCS2);
+      // 70 characters, or 134 for the reminders that were given two segments (D-431).
+      const segments = SMS_TEMPLATES[key].ucs2Segments;
+      expect(segmentLimitFor(draft.body, segments)).toBe(segments === 2 ? SMS_MAX_LENGTH_UCS2_TWO_SEGMENTS : SMS_MAX_LENGTH_UCS2);
     },
   );
 
