@@ -12002,3 +12002,128 @@ every call site, and `t` returns a string. CSS `unicode-bidi: isolate` isolates 
 whole element, not a part of a string. Stripping isolates inside each
 `aria-label` component would be about forty places and no single one to test.
 Wrapping numbers: above.
+
+### D-433 — A public website: its own app, the app's own design system, Home and Support
+
+**Date:** 2026-10-09. Will: "Create a public facing website for PAM using our
+design system. Home page, and Support page. Under support, we list out who can
+do what … a public site that members can refer to to learn how the system works,
+since it's complex." First post: "Case manager assignments", an introduction and
+the table of who can do what.
+
+- **Its own app, `pam/apps/site`, not routes inside `apps/web`.** The app is a
+  member product with a sign-in session, a bottom tab bar, a help bar and a
+  bundle budget (§12). A page that anyone can read before they have an account
+  should not ship any of that, and should be deployable and re-addressable on
+  its own. Cost: a second set of build config (Babel + StyleX + PostCSS copied
+  from `apps/web`), kept deliberately thin.
+- **The design system, not a copy of it.** It uses `@pam/ui`'s theme, Figtree and
+  Button/TextLink, and Astryx's `TopNav`, `Table`, `Card`, `Grid`, `Breadcrumbs`.
+  It is "a website, not an app": a wide header with the wordmark, a 1080px
+  column, a footer, and light and dark that follow the device. No app chrome. The
+  wordmark switches to the coral version in dark mode (the app's own SVGs).
+  The three illustrations are the app's sign-in pictures.
+- **`@pam/ui/TextLink` is now a package export.** The barrel pulls in client-only
+  files that a server component cannot import; the subpath is what a static site
+  needs.
+- **The table is a table on a wide screen and stacked cards on a phone** (below
+  720px; one of the two is `display: none`, so a screen reader reads it once).
+  Three columns of sentences scroll sideways on a 390px phone, which is the
+  hardest thing to read on one, and members are the audience.
+- **Two cells of Will's table said "see question 2" and "see question 3"** —
+  pointers into the conversation it was drafted in. They are removed; each cell
+  stands on its own ("They can't see who is unassigned."; "Anyone."). "(as today)"
+  was dropped for the same reason. The privacy quote is verified against
+  `privacy.s.limits.p1` ("They have to write down why.").
+- **The post describes behaviour that is not all built.** Taking on, handing
+  over, unassigning, the Unassigned filter and Turn back on have no screen
+  (STATUS backlog, D-415). The site is not deployed, and
+  `docs/before-launch.md` says why it must not be until the post is true or
+  softened. This is the decision most worth questioning.
+- **Copy says "people coming home"**, as the app's About does; never the words
+  Pam never displays (a test in `apps/site/test` checks).
+- **Numbers.** D-433 rather than D-432: another branch
+  (`claude/gallant-clarke-0dhizj`) listed D-432 as its next free number when this
+  was claimed.
+- **Support's index follows Figma's help center (Will, 9 October).** A grey band
+  with "How can we help?" and a large search box; Browse by topic (one card per
+  audience — Members, Case managers, Programs; a topic with no posts says
+  "Articles coming soon" instead of linking nowhere); Popular articles; Still
+  need help. Search is an in-page filter over title, summary and `keywords`
+  (`SupportBrowser.tsx`); there is no server. Figma's site could not be fetched
+  from the sandbox, so this follows its known layout, not a reading of the page.
+  "Still need help" points at the person who invited you and the app's Help
+  button — no invented support email or phone.
+
+### D-437 — The website has a Storybook journey, a Vercel project of its own, and a skill for new posts
+
+**Date:** 2026-10-10. Will: "Deploy website, and prep it inside Storybook for each
+website page in Journeys (dedicated, website journey). I'll throw new info and you
+create new posts on my behalf."
+
+- **Storybook: `Website/Journey`** — Home, Support, Support search (a play
+  function types a query and checks the match), and **Post**, one story for every
+  post (choose it in the controls; a new post appears on its own, the same
+  pattern as the place story, D-305). Each is the whole site (header, page,
+  footer) and every link inside it works through `WebsiteWalker`, which catches
+  clicks in the capture phase (D-212: a story never navigates its frame). Links out
+  to the app (Sign in, Privacy, Terms) are named in the console and not followed.
+- **How Storybook reaches the site.** The site's pages are now components
+  (`apps/site/src/screens/*`) that the routes and Storybook both render, with
+  relative imports (the site's `@/` alias would have collided with the app's).
+  Storybook's Babel/StyleX pass and static dir include `apps/site`; the app's
+  PostCSS StyleX plugin includes it **only when `PAM_STORIES=1`** (set in the
+  `storybook` and `build-storybook` scripts), so the app's own stylesheet does not
+  grow for pages it never shows (§12). A hand-run `storybook build` without that
+  variable renders the site unstyled.
+- **Deploy: a second Vercel project, `pam-site`** (root `pam/apps/site`, team
+  will-3199's projects), created on the team the app lives in. **Vercel Auth was
+  on by default and is switched off**: a public site behind a Vercel login is not
+  public. Production is `main`; this branch gets previews. **Nothing was merged to
+  `main`** (pam/CLAUDE.md: not without Will asking), so the production address
+  serves nothing until he merges. Vercel also queued a *production* build from
+  `claude/gallant-clarke-0dhizj` (another session's branch, which has no
+  `apps/site`); it is expected to fail and is not this session's to cancel.
+- **The "before launch" hold still stands** (D-433): the assignments post
+  describes screens that are not built. Will asked for the deploy knowing that
+  (it was in the last summary); it is now a preview, not a production address.
+- **New posts are a skill**: `.claude/skills/pam-support-post/SKILL.md` — check
+  it is true of the app, write it plainly, three edits (`posts.ts`, a body
+  component, `bodies.tsx`), look at it in the Website journey, record, push.
+  The content test now also scans the words written into every component.
+- **Social preview and favicon (Will, 10 October).** Tagline: "City services in
+  your pocket". `apps/site/public/og/social.png` (1200×630) is drawn from
+  `apps/site/social/preview.html` — the white wordmark, deep green `#0F5847`, the
+  bright green `#DCE068` for the tagline, Figtree, and the app's sign-in city
+  illustration — and rendered by `social/render.mjs` (edit the HTML, re-render,
+  commit both). The favicon is the wordmark's **"p" alone** in white on the deep
+  green (`src/app/icon.svg`, `apple-icon.png`, `favicon.ico`): three letters are
+  an unreadable smudge at 16px. The page title became "Pam — City services in your
+  pocket" on the front page; other pages stay "<Page> — Pam". Open Graph and
+  Twitter tags use an absolute address: `SITE_URL` in `lib/links.ts`, the
+  `pam-site` Vercel alias until a real domain exists (`NEXT_PUBLIC_SITE_URL`).
+  The member app has no icons at all (its manifest points at `/icon-192.png` etc.,
+  which do not exist) — noted, not touched.
+- **One icon for every Pam website (Will, 10 October: "use this favicon for all
+  Pam websites").** The wordmark's "p" on Pam green is now the favicon of the
+  public site, the member app (`apps/web/src/app/icon.svg`, `apple-icon.png`,
+  `favicon.ico`) and Storybook (`.storybook/public/favicon.svg`, a new static
+  dir). `scripts/make-icons.mjs` generates all of them from the canonical
+  wordmark, so they cannot drift; re-run it and commit if the mark changes. It
+  also writes `icon-192.png`, `icon-512.png` and `icon-maskable-512.png`, which
+  the app's manifest already named and which **did not exist** — installing the
+  app had no icon until now. The maskable one is full bleed with the "p" inside
+  the 80% safe zone. The three PNGs are listed in Foundations › Imagery
+  (`imagery.ts`), as `imagery.test.ts` requires. Bundle budget unchanged (55.4 kB
+  to spare).
+- **The social image and favicon are previewed in Storybook (Will, 10 October),
+  and the preview changed the image.** `Website/Share and icon` has **Link
+  preview** (a large card and a compact card, chosen in the controls) and **Icon**
+  (a browser tab on light and dark, the 16/32/48 sizes, the Apple touch icon, the
+  app icon, and the maskable icon cropped to a circle). Its words come from
+  `apps/site/src/lib/share.ts`, which the page metadata also reads, and its
+  pictures are the files the site ships, so it cannot drift from the real thing.
+  The first image put the logo and tagline on the left; the compact card — a
+  square taken from the middle — cut the wordmark in half. **Redrawn:** the logo,
+  tagline and line sit in a centred 630×630 green panel, so any square crop is
+  that panel, and the illustration is only the frame either side.

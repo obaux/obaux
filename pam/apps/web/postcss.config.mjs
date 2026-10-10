@@ -25,6 +25,10 @@ const config = {
       include: [
         'src/**/*.{js,jsx,ts,tsx}',
         '../../packages/ui/src/**/*.{js,jsx,ts,tsx}',
+        // Storybook's Website journey renders the public site's own components
+        // (apps/site, D-437). Only there: the app's stylesheet must not carry
+        // rules for pages it never shows (§12 budget).
+        ...(process.env['PAM_STORIES'] ? ['../site/src/**/*.{js,jsx,ts,tsx}'] : []),
       ],
       babelConfig: {
         babelrc: false,

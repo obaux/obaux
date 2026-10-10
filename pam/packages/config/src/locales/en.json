@@ -1013,6 +1013,7 @@
   "program.edit": "Edit",
   "program.save": "Save",
   "program.cancel": "Cancel",
+  "program.locked": "Pam checks the name, address and kind of help before they change. To change them, call Pam.",
   "program.saved": "Saved. Members see the changes on your program's page.",
   "program.example": "This is an example program. Once your program is listed, it shows here.",
   "program.name": "Program name",
