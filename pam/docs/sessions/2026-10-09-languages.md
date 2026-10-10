@@ -364,3 +364,9 @@ later (it failed every time), then fixed:
   (`places.spec` "an empty area says so", narrow-320, no retry) passed 60 of 60 alone.
 - This is outside the address work; it is in this PR because it kept this PR's check red.
 
+- **Will supplied the two icons** (10 October) and the redrawn stand-ins are gone: the
+  Google pin on light grey, Apple's icon cropped so no corner shows grey, both 192px
+  squares in `apps/web/public/maps/`, both rounded by the same 22%. Found the crop by
+  testing, per crop size, that every pixel under the rounded frame is opaque (5% in, plus
+  2% margin). They are in Foundations › Imagery (the test requires it).
+

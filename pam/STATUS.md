@@ -974,7 +974,7 @@ migrations is on the live project** — correction, 9 October, later: 0083, 0084
 - **An address can be copied or opened in a maps app (D-435, 0.52.0).** On the
   address card of a place or program: a small 32px copy button (no ring: Will's rule for
   copy actions inside a card), "Open in…" opening a drawer with Google Maps and Apple
-  Maps as app symbols (drawn stand-ins, not the companies' files), and the address kept
+  Maps as Will's own app icons, one corner radius for both, and the address kept
   in its own reading order in Arabic. Seven strings in seven languages (the six are
   machine drafts).
 - **Migrations 0083 and 0084 are live** (applied 9 October after a

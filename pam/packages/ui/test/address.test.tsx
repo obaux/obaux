@@ -86,10 +86,16 @@ describe('the address card', () => {
     const apple = await screen.findByRole('link', { name: 'Apple Maps' });
     expect(google.getAttribute('href')).toBe(addressActions.googleMapsHref);
     expect(apple.getAttribute('href')).toBe(addressActions.appleMapsHref);
-    // Each row carries the app's symbol, drawn, not read out.
+    // Each row carries the app's own icon, as a picture with no words of its own
+    // (the row's name says which app), the pair drawn at one size.
     const rowOf = (link: HTMLElement) => link.closest('li') ?? link.parentElement!.parentElement!;
-    expect(rowOf(google).querySelector('svg[aria-hidden="true"]')).toBeTruthy();
-    expect(rowOf(apple).querySelector('svg[aria-hidden="true"]')).toBeTruthy();
+    const gIcon = rowOf(google).querySelector('img');
+    const aIcon = rowOf(apple).querySelector('img');
+    expect(gIcon?.getAttribute('src')).toBe('/maps/google-maps.webp');
+    expect(aIcon?.getAttribute('src')).toBe('/maps/apple-maps.webp');
+    expect(gIcon?.getAttribute('alt')).toBe('');
+    expect(aIcon?.getAttribute('alt')).toBe('');
+    expect(gIcon?.getAttribute('width')).toBe(aIcon?.getAttribute('width'));
   });
 
   it('offers only the app it has a link for', async () => {

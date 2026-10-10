@@ -11523,10 +11523,14 @@ google maps or apple maps to help them navigate."
   The page-level copy button stays the 48px circle with a thin edge (D-417). This is a
   deliberate exception to the 48px touch-target rule (§2.5) for this one kind of control;
   it is still above the 24px WCAG 2.2 minimum that axe checks.
-- **The two app symbols are drawn here** (`MapAppIcons.tsx`), as plain stand-ins that read
-  as the apps they name — Google's four-colour pin on white, Apple's map with a highway
-  and a blue arrow — not copied from either company's files, which I did not fetch. If
-  Will wants the companies' official artwork, only those two components change.
+- **The two app symbols are Will's artwork** (10 October: the Google Maps pin "light gray
+  background", and Apple's icon "crop to match the roundness, so no gray peeks from bg, and
+  have the corner radius be consistent across both icons"). Two 192px squares in
+  `public/maps/`, listed in Foundations › Imagery; `MapAppIcons.tsx` draws both at 1em with
+  **one radius, 22%** (`MAP_APP_ICON_RADIUS`). Google's pin is centred on `#f1f3f4`; Apple's
+  icon is cropped 5% in so its own corners and edge glow fall outside the frame (found by
+  testing each crop for a fully opaque picture under the rounded frame). They are third
+  parties' marks, used only to say which app a link opens.
 - **Same door in both.** `appleMapsHref` follows `directionsHref`: coordinates beat the
   address when Pam has them (a stale address routes to the wrong building), the address
   otherwise, nothing when there is nothing. A picked service has its own address and no
