@@ -156,13 +156,10 @@ export default function RemindersPage() {
               <>
                 {/* Staff: a message first — what a case manager waits on (D-256). */}
                 <Text xstyle={styles.item}>{t('reminders.what.messages')}</Text>
-                {role === 'provider' ? (
-                  <>
-                    <Text xstyle={styles.item}>{t('reminders.what.visits')}</Text>
-                    <Text xstyle={styles.item}>{t('reminders.what.staff1')}</Text>
-                  </>
-                ) : null}
-                <Text xstyle={styles.item}>{t('reminders.what.staff2')}</Text>
+                {/* Only the texts that have wording Will approved (10 October, D-461): a visit booked or changed for a
+                    program, a visit planned by somebody on a case manager's list. Not "introduced to your program" or
+                    "your account changes": nothing is built for either (D-453). */}
+                <Text xstyle={styles.item}>{t(role === 'provider' ? 'reminders.what.visits' : 'reminders.what.trips')}</Text>
               </>
             ) : (
               <>

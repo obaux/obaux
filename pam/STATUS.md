@@ -1054,6 +1054,18 @@ read back: both functions service-role only) adds `record_sms_stop` / `record_sm
 on and Twilio is pointed at it, Pam still does not learn a STOP. Setup: `docs/sms-setup.md` § 3.
 YES/NO replies are not built. D-460.
 
+## Places & programs · review record, pending change, program services — the database half (10 October 2026)
+
+Merged to `main` by the merge desk, 10 October, from `claude/places-programs-submissions-and-services`
+(071c781, Piper; D-462, part 5a). **Live:** `20261010083715_…` (expand only), applied at merge and read
+back: `program_submissions` and `program_services` (RLS on and forced; policies and client grants as
+written), `withdraw_program_submission` and `request_program_change` (authenticated only), and
+`submit_program` replaced with the same signature (live body identical to the file). It now also writes a
+submission, and a withdrawn program no longer blocks a new send. The live app calls none of the new
+pieces yet. Nothing here can approve a submission (part 6). Programs sent before this have no
+submission row, so the app part must handle a listing in review with no record. Test:
+`30_program_submissions_and_services_test.sql`.
+
 ## Places & programs · trips saved, the database half (10 October 2026)
 
 Merged to `main` by the merge desk, 10 October, from `claude/places-programs-trips-database`
@@ -1075,9 +1087,10 @@ Merged to `main` by the merge desk, 10 October. Two migrations, **both applied t
 10 October** and read back: `20261010071947_…` (a stored STOP
 cannot be cleared from the app: a person could clear their own at the API) and `20261010072848_…`
 (the claim texts a reminder only to somebody who agreed). Text alerts offers switches only for what
-is sent; the four alert texts are drafts, unsigned. A STOP shows as "Texts are off". Nothing records
-a STOP yet (no Twilio receiver) and nothing queues the appointment reminders, the check-in or
-"someone wants to connect". Samples file: nine texts. D-453.
+is sent; the four alert texts are signed by Will (D-461). A STOP shows as "Texts are off". A STOP is
+recorded once `sms-inbound` is deployed (D-460); nothing queues the check-in or "someone wants to
+connect" yet. Samples file: nine texts. D-453. Text reminders' staff list (merged 10 October) names
+only the alert texts Will signed: no "introduced to your program", no "your account changes".
 
 ## Design system & Storybook · language tag (10 October)
 
@@ -1096,6 +1109,13 @@ language's own name, so a person can see which language a row is before they can
 - Verified: 116 UI tests, 48 web tests, typecheck, Storybook build, and the full fit audit on the merged
   tree (471 stories × 7 languages: 26 new in a language, all 26 accepted, 0 not). Not run: the
   Playwright browser suite, which is what measures the tag's colour contrast.
+
+## Messages & notifications · Block (10 October 2026)
+
+Merged to `main` by the merge desk, 10 October (no migration: 0076 is live). A conversation's ⋯ menu has
+Block this person (asks first) and, once blocked, Unblock; the composer gives way to a notice for both
+sides, and the person blocked is told. The database half was 0069/0076. D-463. Test:
+`31_block_in_conversation_test.sql` (renumbered at merge: 30 went to Places). The terms' "they will not know" is not true and Lena is changing it. Hidden-for-staff is Will's call.
 
 ## Design system & Storybook · area chip, fit audit (10 October) — merged 10 October
 
