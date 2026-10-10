@@ -13,8 +13,8 @@ import { DUMMY_PROGRAM_LEADS } from '@pam/config/dummy-people';
 import { DUMMY_SELF_ID, dummyConversationIdBetween } from '@pam/config/dummy-conversations';
 import { useI18n } from '@/lib/i18n';
 
-// The bar's round buttons — save and ⋯ — are `roundAction` (D-411: white,
-// a grey edge and a soft shadow, as on every bar).
+// The bar's round buttons — save and ⋯ — are `roundAction.plain`: white, with no outline and no
+// shadow (Will, 10 October; D-411 had given them both). The back arrow beside them is the only grey one.
 const styles = stylex.create({
   saved: { color: colorVars['--color-icon-accent'] },
 });
@@ -93,7 +93,7 @@ export function PlaceBarActions({
               <BookmarkIcon {...ICON} isFilled={isSaved} />
             </HStack>
           }
-          xstyle={[roundAction.button, isSaved && styles.saved]}
+          xstyle={[roundAction.plain, isSaved && styles.saved]}
         />
       ) : null}
       <DropdownMenu
@@ -102,7 +102,7 @@ export function PlaceBarActions({
           isIconOnly: true,
           variant: 'ghost',
           icon: <Icon icon="moreHorizontal" size="md" />,
-          xstyle: roundAction.button,
+          xstyle: roundAction.plain,
         }}
         hasChevron={false}
         placement="below"

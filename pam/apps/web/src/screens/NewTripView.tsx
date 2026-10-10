@@ -13,14 +13,18 @@ import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { CATEGORY_DEFINITIONS, categoryLabelKey, type Category, intlLocale } from '@pam/config';
 import { DUMMY_PLACES_BY_ID, type DummySavedPlace } from '@pam/config/dummy-places';
-import { BigButton, BookIcon, ExploreIcon, SignedIcon, UserPlusIcon } from '@pam/ui';
+import { BigButton, BookIcon, ExploreIcon, Notice, SignedIcon, UserPlusIcon } from '@pam/ui';
 import { Icon } from '@astryxdesign/core/Icon';
 import { IconButton } from '@astryxdesign/core/IconButton';
 import { MenuList } from '@pam/ui/MenuList';
 import { SubPage } from '@pam/ui/SubPage';
 import { SuccessScreen } from '@pam/ui/SuccessScreen';
 import { useI18n } from '@/lib/i18n';
-import { addTrip, moveTrip, readAddedTrips, withMoves } from '@/lib/addedTrips';
+import { readAddedTrips, withMoves } from '@/lib/addedTrips';
+import { asksForSavedTrips, bookTrip, isSavedPlace, moveSavedOrLocalTrip } from '@/lib/savedTrips';
+import { useTrips } from '@/lib/useTrips';
+import { useSession } from '@/lib/useSession';
+import { useSupportPhone } from '@/lib/useSupportPhone';
 import { DUMMY_TRIPS } from '@pam/config/dummy-trips';
 import { friendLink, inviteLink } from '@/lib/appUrl';
 import { navigate } from '@/lib/navigate';
@@ -193,6 +197,11 @@ export function NewTripView({
     return trip && at ? { trip, place: at } : null;
   });
   const [place, setPlace] = useState<DummySavedPlace | null>(bookedTrip?.place ?? initial);
+  const { state: session } = useSession();
+  const supportPhone = useSupportPhone();
+  // The trip is being saved, or could not be (D-454): say so rather than show it booked.
+  const [isSaving, setIsSaving] = useState(false);
+  const [failed, setFailed] = useState(false);
   // The service picked on the place's page (D-313), carried in the link.
   const offered = place ? forPlace(place.id) : [];
   const serviceId = initialService ?? bookedTrip?.trip.serviceId ?? null;
@@ -220,6 +229,28 @@ export function NewTripView({
   const [confirmed, setConfirmed] = useState<{ readonly id: string; readonly at: Date } | null>(
     bookedTrip ? { id: bookedTrip.trip.id, at: new Date(bookedTrip.trip.startsAt) } : null,
   );
+  // Opened on a saved trip (D-454, `?booked=<id>`): it arrives from the database
+  // a moment after this screen does, so its place and slot are taken once it has.
+  const { all: tripsNow } = useTrips();
+  useEffect(() => {
+    if (!booked || confirmed) return;
+    const trip = tripsNow.find((x) => x.id === booked);
+    if (!trip) return;
+    setPlace(
+      DUMMY_PLACES_BY_ID[trip.placeId] ?? {
+        id: trip.placeId,
+        name: trip.placeName,
+        category: (trip.category in CATEGORY_DEFINITIONS ? trip.category : 'family_services') as Category,
+        address: '',
+        phone: null,
+        lat: trip.lat,
+        lon: trip.lon,
+        description: '',
+      },
+    );
+    setConfirmed({ id: trip.id, at: new Date(trip.startsAt) });
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- once, when the trip is known.
+  }, [tripsNow, booked]);
   useEffect(() => {
     if (!bookedAt) return;
     const timer = setTimeout(() => navigate('/'), MOVED_HOLD_MS);
@@ -434,16 +465,26 @@ export function NewTripView({
             label={
               forMember ? t('trips.new.addFor', { name: forMember.name }) : t(changing ? 'trips.new.saveChange' : 'trips.new.add')
             }
-            onPress={() => {
+            isDisabled={isSaving}
+            onPress={async () => {
+              if (isSaving) return;
+              setFailed(false);
               if (changing) {
                 const when = at(day, time);
-                moveTrip(changing, when.toISOString());
+                setIsSaving(true);
+                const moved = await moveSavedOrLocalTrip(changing, when.toISOString());
+                setIsSaving(false);
+                if (!moved) {
+                  setFailed(true);
+                  return;
+                }
                 setMovedTo(when);
                 return;
               }
-              const id = `added-${Date.now()}`;
-              addTrip({
-                id,
+              // Saved when it is a real place and a signed-in member (D-454), and
+              // kept in this tab when it is an example place or a program booking.
+              setIsSaving(true);
+              const trip = await bookTrip(session, {
                 placeId: place.id,
                 placeName: place.name,
                 category: place.category,
@@ -454,6 +495,12 @@ export function NewTripView({
                 ...(forMember ? { forMemberId: forMember.id, forName: forMember.name } : {}),
                 ...(chosenService ? { serviceId: chosenService.id, serviceName: chosenService.name } : {}),
               });
+              setIsSaving(false);
+              if (!trip) {
+                setFailed(true);
+                return;
+              }
+              const id = trip.id;
               if (forMember) {
                 // The program's moment (D-316), then its Home — not the
                 // member's Trips, which is theirs.
@@ -463,9 +510,9 @@ export function NewTripView({
               }
               // Booked (D-333): the confirmation with Bring a friend, then
               // Trips with its confetti (D-241) from Done.
-              setConfirmed({ id, at: at(day, time) });
-              // The booked screen takes this screen's place in history (Will,
-              // 7 October, D-337): Back from Policies to sign returns here,
+              setConfirmed({ id, at: new Date(trip.startsAt) });
+              // The booked screen takes this screen's place in history (Will, 7
+              // October, D-337): Back from Policies to sign returns here,
               // not to a fresh Plan a visit at its first step.
               router.replace(`/trips/new/?booked=${encodeURIComponent(id)}`, { scroll: false });
             }}
@@ -488,6 +535,16 @@ export function NewTripView({
         )
       }
     >
+      {failed ? (
+        // Not saved (D-454): nothing is shown as booked, and what was picked stays.
+        <Notice
+          notice="something_went_wrong"
+          title={t('join.failed.title')}
+          body={t('join.failed.body')}
+          supportPhone={supportPhone}
+          callLabel={t('help.callSupport')}
+        />
+      ) : null}
       {step === 'where' ? (
         <>
           <Text type="supporting" xstyle={styles.hint}>
@@ -591,9 +648,13 @@ export function NewTripView({
             countdown={countdown(at(day, time), t)}
           />
           <TextArea label={t('trips.new.note')} value={note} onChange={setNote} rows={2} width="100%" />
-          <Text type="supporting" xstyle={styles.note}>
-            {t('trips.new.example')}
-          </Text>
+          {/* True only for an example place or a program booking: a trip to a real
+              place is saved (D-454), and saying otherwise would be a lie. */}
+          {asksForSavedTrips(session) !== null && isSavedPlace(place.id) && !forMember ? null : (
+            <Text type="supporting" xstyle={styles.note}>
+              {t('trips.new.example')}
+            </Text>
+          )}
         </>
       ) : null}
 
