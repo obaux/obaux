@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { DUMMY_TRIPS } from '@pam/config/dummy-trips';
-import { readAddedTrips, savedTripsStatus, TRIPS_CHANGED, withMoves, type AddedTrip, type SavedTripsStatus } from './addedTrips';
+import { readAddedTrips, savedTripsStatus, TRIPS_CHANGED, withMoves, withoutCancelled, type AddedTrip, type SavedTripsStatus } from './addedTrips';
 
 /**
  * Every trip a member has, through one hook (D-454): the example trips, the
@@ -30,8 +30,8 @@ export function useTrips(): TripsNow {
   const [now, setNow] = useState<TripsNow>({ examples: [], added: [], all: [], status: 'idle' });
   useEffect(() => {
     const read = () => {
-      const examples = withMoves(DUMMY_TRIPS.map((trip): AddedTrip => ({ ...trip, note: '' }))).sort(bySoonest);
-      const added = withMoves(readAddedTrips()).sort(bySoonest);
+      const examples = withoutCancelled(withMoves(DUMMY_TRIPS.map((trip): AddedTrip => ({ ...trip, note: '' })))).sort(bySoonest);
+      const added = withoutCancelled(withMoves(readAddedTrips())).sort(bySoonest);
       setNow({ examples, added, all: [...examples, ...added].sort(bySoonest), status: savedTripsStatus() });
     };
     read();
