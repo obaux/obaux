@@ -1,5 +1,105 @@
 # Turning on text messages
 
+## Go-live runbook: the day-before reminder (D-473)
+
+Pam's north star is the text that reminds a person the day before a visit. This is the
+order for the day Will finishes the Twilio filing and says go. It is tested: the database
+half is `packages/db/test/36_day_before_reminder_rehearsal_test.sql`, and the dispatcher
+half (the words in seven languages, the length limit, the call to Twilio, with Twilio
+faked) is `packages/config/test/dispatch-sms.test.ts`. Detail for each step is in the
+sections below; this page is only the order, who does it, and how to stop.
+
+**What a member gets.** One text, 24 hours before a planned visit, to a member who
+ticked "Text reminders" and has not replied STOP, in their language, after 7 am and
+before 9 pm Philadelphia time (their quiet hours). It carries the time, the street
+(up to 34 characters) and a link to Trips. It does not carry the name of a program
+service the member picked. Nothing else queues a text to a member yet: the 2-hour and
+morning-of reminders, the check-in and "connect" texts are signed but nothing creates them.
+
+### Before the day (merge desk)
+
+1. `main` is what is deployed: run the three suites on `main` (`pnpm --filter @pam/db test`,
+   `pnpm --filter @pam/config test` twice, `pnpm --filter @pam/web build`).
+2. Redeploy `dispatch-sms` from `main` (§3 step 2). The deployed one still says "PAM:", in two
+   languages. Read its log after the next tick: `{claimed, sent, failures}` with nothing in
+   `failures`.
+3. Confirm the secret **names** are set on the project: `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`,
+   and `TWILIO_MESSAGING_SERVICE_SID` or `TWILIO_FROM_NUMBER`. Do not set `DISPATCH_SECRET`
+   (§3: the clock sends none).
+4. Confirm the clock is on: `select jobname, schedule, active from cron.job where jobname = 'dispatch-sms';`
+   (every five minutes, `active` true).
+5. Check the app's address: `select value from app_settings where key = 'app_url';`. The link in
+   the text is that plus `/trips/`. **Keep the address to 46 characters or fewer, with no trailing
+   slash.** Longer, and a Russian or Arabic reminder no longer fits its two segments, so it is
+   sent in English instead. (Russian has 11 characters to spare today; Arabic 12; the Latin
+   languages 18; Chinese 28 to 30.)
+6. Nothing queued by mistake: `select count(*) from outbound_messages where status = 'scheduled' and template_key = 'appointment_24h';` is only real members' trips.
+
+### The day
+
+| # | Who | Step |
+|---|---|---|
+| 1 | Will | Finish the Twilio filing; the campaign shows **approved** and the Pam number is in the messaging service. Tell the merge desk "go". |
+| 2 | Merge desk | Do §3's checklist through step 7, so a STOP reply works before the first reminder goes out. STOP working matters more than the reminder. |
+| 3 | Will | On his own phone, in Pam: Profile → Text reminders → turn on. Check his language is the one he wants. |
+| 4 | Will | Plan a test visit that starts **exactly one day and ten minutes from now**, at a time between 7:00 am and 9:00 pm. Its reminder is then due ten minutes from now. |
+| 5 | Will | Within about fifteen minutes his phone gets one text starting "Pam:" with the time, the street and a link. Open the link: it lands on Trips. |
+| 6 | Merge desk | Confirm (below). Then cancel the test visit in the app: its reminder, if still waiting, is cancelled with it. |
+| 7 | Merge desk | Merge `claude/messages-reply-start` (§3 step 8). That is all that opens it: members who tick the box get reminders; nobody else does. |
+
+### Checking the first real reminder
+
+```sql
+select o.status, o.template_key, o.send_at, o.sent_at, o.failure_reason, o.locale
+from outbound_messages o
+where o.template_key = 'appointment_24h'
+order by o.created_at desc limit 10;
+```
+
+**Fine** is `status = 'sent'`, a `sent_at` within five minutes of `send_at` (the clock ticks every five
+minutes) and no `failure_reason`. Then Twilio's own message log (Console → Monitor → Logs →
+Messages) shows it **delivered**. And the function's log shows `sent: 1, failures: []`.
+
+- `scheduled` after its time: the member is in quiet hours, or the clock is off. Check `cron.job`.
+- `cancelled`, `member stopped texts` or `never agreed to texts`: working as intended.
+- `failed`: `failure_reason` says why. `Twilio 4xx` is Twilio refusing (the filing, a wrong
+  sender, a number it will not text); the row is not retried, so fix the cause and plan the visit again.
+- `sent` here but Twilio shows nothing: the secrets point at a different account.
+
+Every day for the first week: `select status, count(*) from outbound_messages where template_key = 'appointment_24h' and created_at > now() - interval '2 days' group by 1;` and any `failed` read in full.
+
+### Switch it off at once
+
+Pick the smallest that fits. None needs a deploy.
+
+1. **Stop every text now** (merge desk): `select cron.alter_job((select jobid from cron.job where jobname = 'dispatch-sms'), active := false);`
+   Nothing is sent, nothing is lost: every message stays waiting. Turn it back on with `active := true`.
+   **Read this before turning it back on:** a reminder that was waiting is sent as soon as the clock
+   returns, even if its visit has passed (known gap 4 below). After a pause longer than a few hours,
+   first cancel the overdue ones (step 2).
+2. **Drop the waiting reminders** (merge desk): `update outbound_messages set status = 'cancelled', failure_reason = 'pulled by hand' where template_key = 'appointment_24h' and status = 'scheduled';`
+   (Sign-in codes are Supabase's and are not affected by either step.)
+3. **One person**: they reply STOP, or turn "Text reminders" off in the app. Either is honoured on the next tick.
+4. **Do not** remove the Twilio secrets to stop sending: the dispatcher marks each waiting message *failed*, and a failed message is not retried.
+
+### What the rehearsal found (reported to the merge desk, 10 October)
+
+Pinned in the database test as "KNOWN GAP", passing on today's behaviour so that fixing one turns its line red:
+
+1. **An evening visit is reminded on its own day.** A visit at 9 pm or later has its reminder due at
+   9 pm the day before, inside quiet hours, so it is held to 7 am — the morning of the visit — and
+   still says "tomorrow".
+2. **Texts turned on after a trip was planned.** A trip planned before the member said yes gets no
+   reminder when they do. Only a new or changed trip queues one.
+3. **A long place name is cut mid-word** by the trigger at 34 characters ("…Opportunitie") before the
+   renderer, which would cut at a word, sees it.
+4. **A late reminder is not dropped.** Nothing stops a reminder that went overdue (a pause, an outage)
+   from going out after the visit has started.
+
+Cancel and move work today: cancelling a trip cancels its reminder, moving it re-times it, and moving
+it to less than a day away cancels it.
+
+
 Pam cannot do anything without this. Sign-in is a code by text; there is no
 password. Until an SMS provider is configured, the admin account exists, the
 sign-in screen exists, and **nobody can complete a sign-in**.
