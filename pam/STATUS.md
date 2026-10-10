@@ -1077,6 +1077,16 @@ drops signatures), then `20261010042108_a_program_lead_submits_their_own_program
 
 ---
 
+## Messages & notifications · day-before reminder rehearsal (10 October 2026) — merged 10 October
+
+Merged to `main` by the merge desk, 10 October, from `claude/messages-reminder-rehearsal` (81a6681). At merge, test 36's
+ids moved to d0x and two checks were scoped to its own members, since 35 (written at the same time) used the same
+ids and leaves a sent text on a cancelled trip on purpose. Tests and a runbook, no app code. DB test 36 (44 checks) and
+`dispatch-sms.test.ts` (18) rehearse trip → reminder → claim → Twilio (faked) in all seven languages;
+runbook at the top of `docs/sms-setup.md`. Four gaps found and pinned as KNOWN GAP (evening visits reminded
+on their own day, texts turned on later queue nothing for planned trips, place names cut mid-word, an
+overdue reminder not dropped). Cancel and move work. D-473.
+
 ## Messages & notifications · legacy Messages page removed (10 October 2026)
 
 Merged to `main` by the merge desk, 10 October, from `claude/messages-remove-legacy` (5c3d6f1); live with the next deploy. Case managers and super admins now get the redesigned Messages
