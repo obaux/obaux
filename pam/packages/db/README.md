@@ -26,7 +26,7 @@ pnpm claim migration "what it does"
 ```
 
 makes `migrations/<day and time, UTC, to the second>_what_it_does.sql` with a header to
-fill in. The 86 migrations before this (`0001`–`0086`) keep their four-digit names; a
+fill in. The migrations before this (`0001`–`0086`) keep their four-digit names; a
 stamped name always sorts after them, so the file order is still the order they run in.
 A change that touches something the live app uses goes in two migrations — add, then
 (once the app has switched) remove, the second marked `-- contract: <release>`:

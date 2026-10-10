@@ -46,7 +46,7 @@ places every session writes to at the end, and from long branches:
    own versions and the Supabase CLI's expectation), changelog fragments
    `YYYYMMDDHHMMSS-title.md`, session logs `YYYY-MM-DD-HHMM-<lane>-<job>.md`. Two
    things made on one day sort in the order made; two made in the same second
-   differ by their words. The 86 earlier migrations keep four-digit names; a
+   differ by their words. The earlier migrations (0001–0086) keep four-digit names; a
    stamped name always sorts after them (`0` < `2`). Will's point was right: a
    date alone would have collided and sorted ambiguously.
 4. **Changelog entries are fragments** in `docs/changelog/unreleased/`, with no

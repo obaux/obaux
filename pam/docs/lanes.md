@@ -109,7 +109,7 @@ pnpm claim changelog "Staff are asked for an email" # docs/changelog/unreleased/
 pnpm claim session   "accounts staff email"        # docs/sessions/2026-10-10-0312-accounts-staff-email.md
 ```
 
-The 86 migrations before this keep their four-digit names; a stamped name always
+The migrations before this (`0001`–`0086`) keep their four-digit names; a stamped name always
 sorts after them. A stamp the clock says has not happened yet, or that is not a
 real date, fails the numbering test.
 
