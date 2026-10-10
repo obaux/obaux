@@ -48,5 +48,5 @@ export const SUPABASE_PUBLISHABLE_KEY =
  * end for the person who receives it.
  */
 export const APP_URL = (
-  process.env['NEXT_PUBLIC_APP_URL'] ?? 'https://web-ten-umber-88.vercel.app'
+  process.env['NEXT_PUBLIC_APP_URL'] ?? 'https://app.joinpam.org'
 ).replace(/\/+$/, '');
