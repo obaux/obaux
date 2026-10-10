@@ -63,8 +63,12 @@ test('Cancel this visit asks first, then takes the visit off Trips', async ({ pa
   await expect(page.getByText('Your next visit')).toBeVisible();
 
   await page.getByRole('button', { name: 'Cancel this visit' }).click();
+  // Watch for the move to Trips before tapping: this example visit belongs to nobody signed in, so
+  // Trips' gate sends the page on to Sign in a moment later. Reading the address after the tap
+  // raced that redirect and failed under load in CI (10 October); the move itself is what is tested.
+  const toTrips = page.waitForURL(/\/trips\/$/, { waitUntil: 'commit' });
   await page.getByRole('dialog').getByRole('button', { name: 'Yes, cancel it' }).click();
-  await expect(page).toHaveURL(/\/trips\/$/);
+  await toTrips;
   await settled(page);
   // The example visit is gone from the list.
   await page.goto(FROM_TRIP);
