@@ -97,9 +97,25 @@ const styles = stylex.create({
   tocLinkHere: { borderWidth: '2px', borderColor: colorVars['--color-text-primary'], fontWeight: 600 },
   // 24px more above each section on top of the page's own gap (Will, D-419: "more
   // gap between sections"), so a new heading starts a clear block.
-  section: { width: '100%', scrollMarginBlockStart: '16px', marginBlockStart: '24px' },
-  // 16px more between the guide card and the tabs (Will, D-419).
-  tocWrap: { marginBlockStart: '16px' },
+  //
+  // **scroll-margin: 136px** (Will, 10 October: "tabs to jump to text need offset so header isn't covering
+  // title"): a tapped tab scrolls its section to just under the two bars that stay on screen, the header bar
+  // (64px) and the tab row (56px: 6 above, the 40px pill, 10 below), and 16px of air. At the old 16px the
+  // section heading landed under the header.
+  section: { width: '100%', scrollMarginBlockStart: '136px', marginBlockStart: '24px' },
+  // 16px more between the guide card and the tabs (Will, D-419). The tabs stay on screen (Will, 10 October:
+  // "tabs sticky on top for easy navigation"): stuck at 64px, directly under the header bar (`SubPage`'s `bar`,
+  // 64px, z-index 5), in the page's colour so the text scrolling under them does not show through, and out
+  // to the screen's edges as the bar is.
+  tocWrap: {
+    marginBlockStart: '16px',
+    position: 'sticky',
+    top: '64px',
+    zIndex: 4,
+    marginInline: '-16px',
+    paddingInline: '16px',
+    backgroundColor: colorVars['--color-background-body'],
+  },
   // 16px, the body size (SOP A23), with a comfortable 1.6 line height (Will, D-419).
   body: { fontSize: '16px', lineHeight: 1.6 },
 });
