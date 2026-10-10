@@ -47,7 +47,8 @@ export const CardOfRows: Story = {
     <ReadCard title="Your guide can see" icon={<EyeIcon />}>
       <FactGroup title="Your progress">
         <FactRow lead="Your points, your level and your badges" mark="yes" />
-        <FactRow lead="The last day you used Pam." detail="A program you joined sees this too." mark="yes" />
+        <FactRow lead="The last day you used Pam." mark="yes" />
+        <FactRow lead="When you save a new place — not which one." detail="A program you joined sees this too." mark="yes" />
         <FactRow lead="What you say to someone else" mark="no" />
       </FactGroup>
     </ReadCard>

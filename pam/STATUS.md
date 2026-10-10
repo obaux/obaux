@@ -928,6 +928,25 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
+## Languages & legal · the last-day line and the blocking words (10 October) — merged 10 October
+
+Merged to `main` by the merge desk, 10 October, from `claude/lena-honest-promises` (e82e815). Will's rule, via Mira: a screen that promises something Pam does not do is
+fixed or rewritten (D-465).
+
+- **"The last day you used Pam."** — the transparency screen no longer says a program sees it. A case manager does; a
+  program does not (0062), whatever D-242 intended; that half stays open. Seven languages, the contract's `en` and
+  comments, a test. The **public site's** "What others can see" row (`apps/site`) said a program does; changed with
+  Mira's OK, in Wren's lane, so the app and the page change in the same merge.
+- **Blocking, in its true form** now that the Block control is on `main` (D-463): privacy "Both are in a conversation's
+  ⋯ menu"; terms "You can block someone you talk to, from a conversation's ⋯ menu. Neither of you can send messages
+  there after that. They will see that messages are blocked." — not "anyone", not "they will not know". The Block
+  session's STATUS line that the terms were untrue can go at merge.
+- **Not here:** the mail-service paragraph on the privacy page (its English is with Will).
+- **Verified:** unit tests (`@pam/config` 995, `@pam/ui` 117, `@pam/web` 71, `@pam/site` 18), typecheck and the copy
+  ledger on the merged tree; the browser suite on all three viewports, 909 passed (on the tree one merge before the last);
+  the full fit audit: 92 new in a language, 84 accepted, 8 not, all in stories this branch does not touch (Explore's pseudo
+  clamps; the two Block conversation stories; the one-trip-saved date). See the session log.
+
 ## Languages & legal · English tags before each language name; the privacy wording (10 October) — merged 10 October
 
 From `claude/lena-english-language-tags` (1f59d62), merged to `main` by the merge desk, 10 October; no
@@ -1198,7 +1217,7 @@ route until Dot's shell merges; deleting it (and `DummyRowsLazy`) is a follow-up
 Merged to `main` by the merge desk, 10 October (no migration: 0076 is live). A conversation's ⋯ menu has
 Block this person (asks first) and, once blocked, Unblock; the composer gives way to a notice for both
 sides, and the person blocked is told. The database half was 0069/0076. D-463. Test:
-`31_block_in_conversation_test.sql` (renumbered at merge: 30 went to Places). The terms' "they will not know" is not true and Lena is changing it. Hidden-for-staff is Will's call.
+`31_block_in_conversation_test.sql` (renumbered at merge: 30 went to Places). The terms and privacy page say what Block does since D-465 (merged 10 October). Staff can block too: kept as built (the merge desk decided, under Will's delegation).
 
 ## Design system & Storybook · area chip, fit audit (10 October) — merged 10 October
 

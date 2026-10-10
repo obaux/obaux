@@ -19,8 +19,8 @@ STATUS row too.
   it is merged and the live function queues it (Mira, 10 October); "Who is my guide?" when the
   assign-and-limit work merges; "Points and badges" when more point rules or any badge are
   awarded; "Messages" if blocking appears; "What others can see" if transparency.ts changes
-  (one row, "the last day you used Pam" for a program, repeats the app's promise ahead of the
-  database). The hidden draft "Staff requests" is published only if a way to ask to be staff
+  (its "last day you used Pam" row now says No for a program, D-465; it returns to Yes when
+  the database hands a program that day and the app's line says so again). The hidden draft "Staff requests" is published only if a way to ask to be staff
   comes back (D-369).
 - [ ] **Public site: Will signs "About Pam" (D-466, 10 October 2026).** English first: read
   `apps/site/src/content/about.ts`, then put `"en"` in `apps/site/src/content/signed-off.json`
@@ -306,6 +306,12 @@ Russian, Arabic (D-422); messages read in the reader's language (D-423).
   (`:Pam`, `then.`) is correct by the bidi rules but nobody who reads Arabic has
   seen it — and whether an English value in the middle of a sentence reads better
   isolated or flowing with the sentence.
+
+- [ ] **A native reader for what D-465 reworded (10 October).** The last-day line on the
+  transparency screen (`transparency.canSee.lastActive`), the privacy page's "What you can do"
+  blocking sentence and the terms' blocking sentence now say only what is true (a guide, not a
+  program, sees the last day; blocking is in a conversation's ⋯ menu and the other person is told).
+  Six translations each, written by Claude; promises, so the same native readers as below.
 
 - [ ] **A native reader for the privacy page's "Who can see it" (10 October, D-452).**
   `privacy.s.who-can-see.p2` and `.p3` were rewritten to say what a guide sees and does
