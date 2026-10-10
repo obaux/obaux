@@ -12,9 +12,15 @@ the language in their language. Always keep these abbreviations in english."
 | `signin-menu-en-light.png`, `-en-dark.png`, `-ar.png` | The globe menu on the sign-in screen | `member-created--sign-in`, menu opened |
 | `profile-row-ru.png` | Profile's Language row in Russian: "RU Русский" before the chevron | `member-created--profile`, locale ru |
 | `join-chips-en.png`, `join-chips-ar.png` | The language chips on the join screen's first step | `member-created--sign-up` |
+| `chips-story-en-page.png`, `chips-story-ar-page.png` | The chips alone, on an English and on an Arabic page | `components-inputs-choicechips--with-language-tags`, `…-arabic` |
 
 Open any of them live with `iframe.html?id=<story>&viewMode=story&globals=locale:ar;theme:dark`.
 
-In the join chips the Arabic chip on an English page reads "العربية  AR" (the tag after the name
-for somebody reading left to right): `ChoiceChips` puts the language's `dir` on the whole chip.
-Reported to the merge desk as a finding for the design system; the rows are not affected.
+## The chips (join screen, `ChoiceChips`)
+
+`chips-story-en-page.png` and `chips-story-ar-page.png` are Storybook's `Inputs › ChoiceChips › With language tags`
+(English page) and `… Arabic` (Arabic page). The chip is laid out the way the **page** is, the tag first at the
+page's start, and only the name keeps its own direction: on an English page the Arabic chip reads "AR  العربية",
+on an Arabic page the English chip "English  EN" with the tag at the right. Before the fix (D-455) `ChoiceChips`
+put the language's `dir` on the whole chip, so the Arabic chip on an English page read "العربية  AR", the tag
+after the name for a left-to-right reader. Rows are drawn by `MenuList` and were always right.
