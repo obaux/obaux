@@ -11637,6 +11637,10 @@ each removal is the grep that came back empty.)
   one step. The page's title says which kind; it asks their first name and mobile number
   (D-373) and then shows the link to send (D-254). A kind this person may not make (a program
   inviting a case manager) goes back to the list.
+  The same day, the staff-email work (D-441) made the form "a page of its own" by swapping it
+  in place on `/invite/`; merged together, the route won — Back is one step in history, the
+  page has an address a link or a story can reach, and `/invite/` stays a plain list. The
+  form itself (name, number, and for staff a required email) is D-441's, unchanged.
 - **A super admin could not make an invite from Profile.** `create_invite` needs a city for
   a super admin, who has none of their own (0077); Profile › Invite someone and Invited
   people › + New invite never sent one, so each answered "We could not make a code". Only
