@@ -292,6 +292,12 @@ Russian, Arabic (D-422); messages read in the reader's language (D-423).
   seen it — and whether an English value in the middle of a sentence reads better
   isolated or flowing with the sentence.
 
+- [ ] **A native reader for what D-465 reworded (10 October).** The last-day line on the
+  transparency screen (`transparency.canSee.lastActive`), the privacy page's "What you can do"
+  blocking sentence and the terms' blocking sentence now say only what is true (a guide, not a
+  program, sees the last day; blocking is in a conversation's ⋯ menu and the other person is told).
+  Six translations each, written by Claude; promises, so the same native readers as below.
+
 - [ ] **A native reader for the privacy page's "Who can see it" (10 October, D-452).**
   `privacy.s.who-can-see.p2` and `.p3` were rewritten to say what a guide sees and does
   not (what you send them directly; nothing you send to anyone else; one reported

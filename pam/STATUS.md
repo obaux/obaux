@@ -928,6 +928,22 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
+## Languages & legal · the last-day line and the blocking words (10 October) — on the branch, not merged
+
+Branch `claude/lena-honest-promises`. Will's rule, via Mira: a screen that promises something Pam does not do is
+fixed or rewritten (D-465).
+
+- **"The last day you used Pam."** — the transparency screen no longer says a program sees it. A case manager does; a
+  program does not (0062), whatever D-242 intended; that half stays open. Seven languages, the contract's `en` and
+  comments, a test. The **public site's** "What others can see" row (`apps/site`) still says a program does: Wren's
+  file, reported.
+- **Blocking, in its true form** now that the Block control is on `main` (D-463): privacy "Both are in a conversation's
+  ⋯ menu"; terms "You can block someone you talk to, from a conversation's ⋯ menu. Neither of you can send messages
+  there after that. They will see that messages are blocked." — not "anyone", not "they will not know". The Block
+  session's STATUS line that the terms were untrue can go at merge.
+- **Not here:** the mail-service paragraph on the privacy page (its English is with Will).
+- **Verified:** filled in with the session log when the long checks finish.
+
 ## Languages & legal · English tags before each language name; the privacy wording (10 October) — merged 10 October
 
 From `claude/lena-english-language-tags` (1f59d62), merged to `main` by the merge desk, 10 October; no
