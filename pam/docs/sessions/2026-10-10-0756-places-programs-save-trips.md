@@ -25,7 +25,7 @@
 
 ## Verified
 
-- `pnpm --filter @pam/db test`: passes with all migrations, including `26_saved_trips_and_reminders_test.sql` (consent on / never asked / off / STOP; under 24h; move re-times one text; move to under 24h cancels with the reason; cancel cancels; turned on later queues on the next change; nobody moves or cancels another member's trip; no direct write, no self-attended) and the whole earlier suite after the appointments policies changed.
+- `pnpm --filter @pam/db test`: passes with all migrations, including `28_saved_trips_and_reminders_test.sql` (consent on / never asked / off / STOP; under 24h; move re-times one text; move to under 24h cancels with the reason; cancel cancels; turned on later queues on the next change; nobody moves or cancels another member's trip; no direct write, no self-attended) and the whole earlier suite after the appointments policies changed.
 - `numbering.test.ts` passes (the second migration carries its `-- contract:` line). web 61 tests (6 new: `savedTrips.test.ts`), config 822 (14 new: the reminder fits in all seven languages on both domains), `tsc` clean, `copy:status` in step, Storybook builds.
 - In a browser (Chromium, 390px): Plan a visit to a real place → booked screen → Trips lists it; a saved trip shows on Trips; Change appointment saves the new time; no `[journey] no fixture` logs. Language fit on the saved-trips, program and trips stories at 320px in seven languages: no unaccepted defects.
 - **Not run:** anything against the live project; the real dispatcher sending a queued trip text (nothing queues one until the migrations are applied and a member turns reminders on); the iPhone.
