@@ -216,6 +216,14 @@ STATUS row too.
      says — a withdrawn request shown as "Withdrawn — started over" with only
      Discard, the new one approvable, and the database rules tested.
 
+### Trips and reminders
+
+- [ ] **Saved trips and the day-before text are built** (`claude/places-programs-save-trips`, D-454, 10 October): live once the two migrations are applied.
+- [ ] **Point `app_settings.app_url` at Pam's real address** before the first reminder: the text links to `/trips/` on it, and it still holds the address 0054 seeded.
+- [ ] **A program booking for a member (D-316)** is still a trip on the device only, so that member gets no reminder.
+- [ ] **A Cancel button on a trip** (`cancel_trip` exists and is tested; no screen calls it).
+- [ ] **Past trips** (attended, missed) are returned by `my_trips()` but not shown.
+
 ### Two roles (one account, member and program)
 
 Will, 7 October 2026: "Add these to Before launch doc" (D-375).

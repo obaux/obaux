@@ -8,7 +8,7 @@ import { StatusCard } from '@pam/ui/PolicyStatusCard';
 import { DUMMY_PLACES_BY_ID } from '@pam/config/dummy-places';
 import { DUMMY_TRIPS } from '@pam/config/dummy-trips';
 import { useI18n } from '@/lib/i18n';
-import { readAddedTrips, withMoves } from '@/lib/addedTrips';
+import { readAddedTrips, TRIPS_CHANGED, withMoves } from '@/lib/addedTrips';
 import { intlLocale } from '@pam/config';
 
 /**
@@ -45,18 +45,24 @@ export function ThreadVisit({
   const { t, tPlain, locale } = useI18n();
   const [visit, setVisit] = useState<{ id: string; placeId: string; startsAt: string } | null>(null);
 
-  // After mount: added trips live in this browser's storage.
+  // After mount: added trips live in this browser's storage, and a member's
+  // saved trips (D-454) arrive from the database a moment later.
   useEffect(() => {
-    const place = programName ? Object.values(DUMMY_PLACES_BY_ID).find((p) => p.name === programName) : undefined;
-    if (!place) {
-      setVisit(null);
-      return;
-    }
-    const now = Date.now();
-    const next = withMoves([...DUMMY_TRIPS, ...readAddedTrips()])
-      .filter((trip) => trip.placeId === place.id && new Date(trip.startsAt).getTime() >= now)
-      .sort((a, b) => a.startsAt.localeCompare(b.startsAt))[0];
-    setVisit(next ? { id: next.id, placeId: next.placeId, startsAt: next.startsAt } : null);
+    const read = () => {
+      const place = programName ? Object.values(DUMMY_PLACES_BY_ID).find((p) => p.name === programName) : undefined;
+      if (!place) {
+        setVisit(null);
+        return;
+      }
+      const now = Date.now();
+      const next = withMoves([...DUMMY_TRIPS, ...readAddedTrips()])
+        .filter((trip) => trip.placeId === place.id && new Date(trip.startsAt).getTime() >= now)
+        .sort((a, b) => a.startsAt.localeCompare(b.startsAt))[0];
+      setVisit(next ? { id: next.id, placeId: next.placeId, startsAt: next.startsAt } : null);
+    };
+    read();
+    window.addEventListener(TRIPS_CHANGED, read);
+    return () => window.removeEventListener(TRIPS_CHANGED, read);
   }, [programName]);
 
   if (!visit) return null;
