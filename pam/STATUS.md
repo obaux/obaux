@@ -542,8 +542,10 @@ calls it every five minutes. Twilio credentials are in place and proved with a
 real end-to-end test: a signed-off template queued to Will's own number came
 back `status: sent`, no failure reason, picked up by the very next scheduled
 run. Quiet hours, the STOP list and atomic claiming are enforced in the
-database, not in the function. All sixteen templates in the catalogue are now
-signed off — the original thirteen (13 September) plus the two built this
+database, not in the function. All fifteen templates in the catalogue were then
+("sixteen" was a miscount, corrected 10 October; since then four Text alerts texts
+were added and signed, so the catalogue has nineteen, and the deployed dispatcher
+carries the fifteen until it is redeployed) signed off — the original thirteen (13 September) plus the two built this
 week, `staff_request_approved` and `staff_request_denied` (17 September) —
 so nothing is currently held back at the `reviewedBy` gate; the next template
 anyone adds still starts blank and stays refused until it is read. See
