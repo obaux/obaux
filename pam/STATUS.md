@@ -1275,6 +1275,10 @@ Merged to `main` by the merge desk, 10 October, from `claude/places-programs-boo
 
 Merged to `main` by the merge desk, 10 October, from `claude/places-programs-lead-reads-review`. Migration `20261010135742` (`resend_program_submission`), expand only, **applied live at merge** (recorded as 20261010140904), read back: body identical to the file, for authenticated (checks inside for the program's own lead). With part 6 live too, "Ask for changes" is safe to use. Test `43_a_lead_sends_the_program_again_test.sql` (numbered 42 on its branch; Nico's alerts test took 42 first). Edit and send again resends the same submission; a program being checked is corrected through it. Land after part 6.
 
+## Places & programs · policies, part 2 of 4: members sign (10 October 2026) — READY, not merged (on top of part 1)
+
+Branch `claude/places-programs-policies-p2` (D-485). Migration `20261010145337`, expand only: `policy_signatures`, `member_signatures`, `sign_policy`, `forget_my_signature`. A real place asks for what its program keeps in the database; a member reads each page and signs (draw or type); the program's record line is shown before signing; the transparency promise has its new line. Test `46_a_member_signs_a_program_s_policy_once_and_only_test.sql`. Wren's public post can go once this is merged.
+
 ## Places & programs · policies, part 1 of 4: a lead's real policies (10 October 2026) — READY, not merged
 
 Branch `claude/places-programs-policies-p1` (D-485, Will's card a25). Migration `20261010144052`, expand only: `program_policies`, `program_policy_files`, `add_policy`, `archive_policy`, the private `policies` bucket. A lead adds, opens, replaces and removes real policies; members see nothing new until signing (part 2). Test `45_a_program_s_policies_are_private_to_its_lead_and_test.sql`.

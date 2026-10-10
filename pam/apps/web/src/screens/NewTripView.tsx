@@ -36,9 +36,8 @@ import { BigCategoryIcon, CategoryPicture } from './SavedView';
 import { ProgramVisitCard } from '@pam/ui/ProgramVisitCard';
 import { VisitCard } from '@pam/ui/VisitCard';
 import { BringFriend, copyLink } from '@pam/ui/BringFriend';
-import { placeAsksForPolicies } from '@pam/config/dummy-policies';
 import { policiesForService } from '@pam/config/dummy-services';
-import { usePolicies } from '@/lib/usePolicies';
+import { usePlacePolicies } from '@/lib/usePlacePolicies';
 import { useMySignatures } from '@/lib/useMySignatures';
 import { policiesHref } from './MemberPoliciesView';
 import { bookingFor, nextDropIns } from '@pam/config/dummy-booking';
@@ -186,7 +185,7 @@ export function NewTripView({
   const router = useRouter();
   const places = useMemo(() => Object.values(DUMMY_PLACES_BY_ID), []);
   const { forPlace } = useServices();
-  const { policies } = usePolicies();
+  const { forPlace: policiesAt } = usePlacePolicies();
   const { progress } = useMySignatures();
   const initial = useMemo(() => seedToPlace(initialPlace), [initialPlace]);
   // Opened on a booked trip (D-333): its place and slot, read once.
@@ -319,8 +318,9 @@ export function NewTripView({
     const done = `/trips/?added=${encodeURIComponent(confirmed.id)}`;
     // What is still to sign for this visit (D-334): the service's policies,
     // or the program's.
-    const forVisit = chosenService ? policiesForService(chosenService, policies, offered) : policies;
-    const toSign = placeAsksForPolicies(place.id) && forVisit.length > 0 ? progress(place.id, forVisit) : null;
+    const here = policiesAt(place.id);
+    const forVisit = chosenService ? policiesForService(chosenService, here.policies, offered) : here.policies;
+    const toSign = here.asks && forVisit.length > 0 ? progress(place.id, forVisit) : null;
     return (
       <SubPage
         title={t('trips.confirm.title')}
