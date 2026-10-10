@@ -152,7 +152,8 @@ begin
   if jsonb_array_length(p_files) > 5 then
     raise exception 'TOO_MANY_FILES';
   end if;
-  if (select count(*) from public.program_policies where service_id = p_service_id and archived_at is null) >= 30 then
+  if (select count(*) from public.program_policies where service_id = p_service_id and archived_at is null
+        and id is distinct from p_replaces) >= 30 then
     raise exception 'TOO_MANY_POLICIES';
   end if;
 
@@ -200,3 +201,59 @@ $$;
 
 revoke all on function public.add_policy(uuid, text, jsonb, uuid) from public, anon;
 grant execute on function public.add_policy(uuid, text, jsonb, uuid) to authenticated;
+
+-- ---------------------------------------------------------------------------
+-- Three small fixes the merge desk asked for after part 1 went live.
+
+-- (1) A lead whose access has been limited can no longer take a policy off,
+-- the same as add_policy.
+create or replace function public.archive_policy(p_id uuid)
+returns public.program_policies
+language plpgsql
+security definer
+set search_path = public, extensions
+as $$
+declare
+  caller uuid := auth.uid();
+  me     public.profiles;
+  policy public.program_policies;
+begin
+  if caller is null then
+    raise exception 'Sign in first';
+  end if;
+  select * into me from public.profiles where id = caller;
+  if me.id is null or public.my_role() is distinct from 'provider' then
+    raise exception 'NOT_A_PROGRAM_LEAD';
+  end if;
+  if not public.is_active_account() then
+    raise exception 'ACCOUNT_NOT_ACTIVE';
+  end if;
+
+  select p.* into policy
+  from public.program_policies p
+  join public.services s on s.id = p.service_id
+  where p.id = p_id and s.org_id is not null and s.org_id = me.org_id
+  for update of p;
+  if policy.id is null then
+    raise exception 'POLICY_NOT_FOUND';
+  end if;
+  if policy.archived_at is not null then
+    raise exception 'POLICY_ALREADY_REMOVED';
+  end if;
+
+  update public.program_policies set archived_at = now() where id = policy.id returning * into policy;
+
+  insert into public.audit_log (actor_id, action, target_type, target_id, meta)
+  values (caller, 'policy.archive', 'program_policy', policy.id, jsonb_build_object('version', policy.version));
+
+  return policy;
+end;
+$$;
+
+revoke all on function public.archive_policy(uuid) from public, anon;
+grant execute on function public.archive_policy(uuid) to authenticated;
+
+-- (2) The policy being replaced does not count toward the 30-policy cap (above).
+
+-- (3) The quiet-hours test pins its search path (security advisor).
+alter function public.reminder_is_quiet(timestamp, integer, integer) set search_path = public, extensions;
