@@ -257,7 +257,7 @@ test.describe('the English tag before each language name, in the sign-in menu', 
 const MEMBER = 'de3b9c2e-ec2f-403b-93e5-86e6ee75349b';
 const json = (body: unknown) => ({ status: 200, contentType: 'application/json', body: JSON.stringify(body) });
 
-async function signedInMember(page: Page) {
+async function signedInMember(page: Page, locale: Locale) {
   await page.addInitScript((userId: string) => {
     const session = {
       access_token: 'test-access-token',
@@ -285,6 +285,8 @@ async function signedInMember(page: Page) {
         regions: null,
         access_status: 'active',
         onboarded_at: '2026-09-12T00:00:00Z',
+        // A signed-in person's own language wins over the browser's (LocaleSync).
+        preferred_language: locale,
       }),
     ),
   );
@@ -294,7 +296,7 @@ test.describe('the English tag on the Language screen and Profile', () => {
   for (const locale of ['en', 'ru', 'ar'] as const) {
     test(`${locale}: every language row starts with its tag, the names line up, and a row reads as its name alone`, async ({ page }) => {
       await choose(page, locale);
-      await signedInMember(page);
+      await signedInMember(page, locale);
       await page.goto('/language/');
       await expect(page.locator('html')).toHaveAttribute('lang', locale);
       await settled(page);
@@ -321,17 +323,17 @@ test.describe('the English tag on the Language screen and Profile', () => {
     });
   }
 
-  test('Profile: the Language row says which language, in English, before it says it', async ({ page }) => {
+  test('Account settings: the Language row shows the current language with its tag first', async ({ page }) => {
+    // (Profile's own row, `valueTag`, is Storybook-only until the tab shell ships: its screenshots are the proof.)
     await choose(page, 'ru');
-    await signedInMember(page);
-    await page.goto('/profile/');
+    await signedInMember(page, 'ru');
+    await page.goto('/account/');
     await expect(page.locator('html')).toHaveAttribute('lang', 'ru');
     await settled(page);
-    const row = page.getByRole('link', { name: new RegExp(`${BUNDLES.ru['profile.menu.language']}`) });
+    const row = page.getByRole('button', { name: new RegExp(BUNDLES.ru['language.title']!) }).last();
     await expect(row).toContainText(LANGUAGE_TAGS.ru);
     await expect(row.locator('[aria-hidden="true"]', { hasText: LANGUAGE_TAGS.ru })).toHaveCount(1);
-    // Spoken, the row is its label and its value; the tag is for the eyes.
-    await expect(row).not.toHaveAccessibleName(new RegExp(`\\b${LANGUAGE_TAGS.ru}\\b`));
+    await expect(row.locator('[lang="ru"]')).toHaveText(BUNDLES.ru['language.ru']!);
   });
 });
 

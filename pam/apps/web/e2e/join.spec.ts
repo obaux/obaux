@@ -154,7 +154,8 @@ test.describe('signing up', () => {
       const chip = group.getByRole('button', { name, exact: true });
       await expect(chip, `${code} chip`).toHaveCount(1);
       await expect(chip.locator('[aria-hidden="true"]', { hasText: LANGUAGE_TAGS[code] })).toHaveText(LANGUAGE_TAGS[code]);
-      await expect(chip.locator(`[lang="${code}"]`)).toHaveText(name);
+      // The chip is the language's own name, in its own voice: `lang` (and `dir`) on the chip itself.
+      await expect(chip).toHaveAttribute('lang', code);
     }
   });
 

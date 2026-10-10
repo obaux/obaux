@@ -37,7 +37,7 @@ export function LanguageView() {
           id: code,
           label: t(`language.${code}`),
           // The English tag first, so a row says which language it is before it
-          // says it in itself (Will, 10 October 2026, D-451, D-453); the name is
+          // says it in itself (Will, 10 October 2026, D-451, D-455); the name is
           // spoken in its own voice.
           tag: LANGUAGE_TAGS[code],
           lang: code,
