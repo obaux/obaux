@@ -42,6 +42,15 @@ const ALL: readonly SupportPost[] = [
     keywords: ['text', 'sms', 'code', 'sign in', 'reminder', 'stop', 'quiet hours', 'not now', 'did not come', 'no text'],
   },
   {
+    slug: 'planning-a-visit',
+    topic: 'members',
+    audience: 'members',
+    title: 'Planning a visit',
+    summary: 'Plan a visit to a place, change it, cancel it, and where past visits go.',
+    updated: '2026-10-10',
+    keywords: ['visit', 'trip', 'plan', 'plan a trip', 'new trip', 'appointment', 'change', 'cancel', 'past visits', 'service', 'book', 'schedule'],
+  },
+  {
     slug: 'what-others-can-see',
     topic: 'members',
     audience: 'everyone',
