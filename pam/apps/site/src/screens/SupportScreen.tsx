@@ -11,7 +11,7 @@ import { Section } from '@astryxdesign/core/Section';
 import { Text } from '@astryxdesign/core/Text';
 import { TextInput } from '@astryxdesign/core/TextInput';
 import { VStack } from '@astryxdesign/core/VStack';
-import { Button } from '@pam/ui/Button';
+import { SecondaryButton } from '../components/SecondaryButton';
 import { Link } from '@astryxdesign/core/Link';
 import { POSTS, type SupportPost } from '../content/posts';
 import { TOPICS } from '../content/topics';
@@ -160,7 +160,7 @@ export function SupportScreen() {
               the Help button is always on screen.
             </Text>
             <HStack>
-              <Button label="Open Pam" variant="secondary" href={APP_URL} />
+              <SecondaryButton label="Open Pam" href={APP_URL} />
             </HStack>
           </VStack>
         </Card>

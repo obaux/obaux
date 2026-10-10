@@ -1,5 +1,6 @@
+import { HowTo } from './HowTo';
+import { Needs } from './Needs';
 import { Body, Lead, P, Section } from './Prose';
-import { Steps } from './Steps';
 import { RULES } from '../content/rules';
 import type { AboutLang } from '../content/about';
 
@@ -9,14 +10,20 @@ export function RulesBody({ lang }: { readonly lang: AboutLang }) {
   return (
     <Body>
       <Lead>{t.lead}</Lead>
-      {t.sections.map((section) => (
+      {t.sections.map((section) =>
+        section.note ? (
+          <Needs key={section.title} title={section.title}>
+            {section.paras.join(' ')}
+          </Needs>
+        ) : (
         <Section key={section.title} title={section.title}>
-          {section.steps ? <Steps items={section.steps} /> : null}
+          {section.steps ? <HowTo steps={section.steps} title={t.howTo} /> : null}
           {section.paras.map((para) => (
             <P key={para}>{para}</P>
           ))}
         </Section>
-      ))}
+        ),
+      )}
     </Body>
   );
 }

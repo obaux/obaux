@@ -1,7 +1,7 @@
 import { CompareTable } from '../components/CompareTable';
+import { Needs } from '../components/Needs';
 import { Body, Lead, P, ReadMore, Section } from '../components/Prose';
-import { Screenshot } from '../components/Screenshot';
-import { Steps } from '../components/Steps';
+import { HowTo } from '../components/HowTo';
 
 /**
  * Support post: Who is my guide? (members). Today's truth, kept short: a guide is
@@ -30,10 +30,10 @@ export function WhoIsMyGuide() {
             { label: 'You signed up on your own', cells: ['Not yet.'] },
           ]}
         />
-        <P>
-          You do not need a guide to use Pam. You can still find places, save them and earn points. If you would
-          like a guide, call Pam. We will help you reach someone.
-        </P>
+        <Needs title="You do not need a guide to use Pam.">
+          You can still find places, save them and earn points. If you would like a guide, call Pam. We will help
+          you reach someone.
+        </Needs>
       </Section>
 
       <Section title="What your guide can see">
@@ -46,18 +46,14 @@ export function WhoIsMyGuide() {
       </Section>
 
       <Section title="Find it in the app">
-        <Steps
-          items={[
+        <HowTo
+          steps={[
             'Tap Profile.',
             'Tap Legal.',
             'Tap “What others can see”.',
             'The first card says “Your guide”. It tells you who that is.',
           ]}
-        />
-        <Screenshot
-          name="who-is-my-guide/what-others-can-see.png"
-          alt="The “What others can see” screen in Pam. The first card is titled “Your guide” and explains who your guide is."
-          caption="“What others can see”, opened from Legal."
+          shots={[{ name: 'who-is-my-guide/what-others-can-see.png', alt: "The “What others can see” screen in Pam. The first card is titled “Your guide” and explains who your guide is.", caption: "“What others can see”, opened from Legal." }]}
         />
       </Section>
     </Body>

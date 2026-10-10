@@ -1,7 +1,6 @@
 import { CompareTable } from '../components/CompareTable';
 import { Body, Lead, P, ReadMore, Section } from '../components/Prose';
-import { Screenshot } from '../components/Screenshot';
-import { Steps } from '../components/Steps';
+import { HowTo, ShotCard } from '../components/HowTo';
 
 /**
  * Support post: Messages (everyone). Who can write to whom is a database rule (D-176,
@@ -36,23 +35,14 @@ export function MessagesInPam() {
       </Section>
 
       <Section title="Send a message">
-        <Steps
-          items={[
+        <HowTo
+          steps={[
             'Tap Messages.',
             'Tap a conversation. Or tap “New message”, the button at the top right, and pick who you want to message.',
             'Type in the box that says “Write a message”.',
             'Tap Send.',
           ]}
-        />
-        <Screenshot
-          name="messages-in-pam/messages.png"
-          alt="The Messages screen: a list of conversations, with a search button, the bell and the “New message” button at the top right."
-          caption="The Messages tab."
-        />
-        <Screenshot
-          name="messages-in-pam/conversation.png"
-          alt="A conversation. Messages go up the screen, and a box at the bottom says “Write a message”."
-          caption="A conversation."
+          shots={[{ name: 'messages-in-pam/messages.png', alt: "The Messages screen: a list of conversations, with a search button, the bell and the “New message” button at the top right.", caption: "The Messages tab." }, { name: 'messages-in-pam/conversation.png', alt: "A conversation. Messages go up the screen, and a box at the bottom says “Write a message”.", caption: "A conversation." }]}
         />
         <P>You can also send a photo or a document. Tap “Add a photo” or “Add a document”.</P>
       </Section>
@@ -66,18 +56,14 @@ export function MessagesInPam() {
       </Section>
 
       <Section title="If a message is not safe">
-        <Steps
-          items={[
+        <HowTo
+          steps={[
             'In the conversation, tap “More options”. A screen called Options opens.',
             'Tap “Report suspicious activity”.',
             'Pick what is wrong.',
             'Tap “Send report”.',
           ]}
-        />
-        <Screenshot
-          name="messages-in-pam/options.png"
-          alt="The Options screen of a conversation, with three rows: “Stuff shared”, “Report suspicious activity” and “Block this person”."
-          caption="A conversation’s Options."
+          shots={[{ name: 'messages-in-pam/options.png', alt: "The Options screen of a conversation, with three rows: “Stuff shared”, “Report suspicious activity” and “Block this person”.", caption: "A conversation’s Options." }, { name: 'messages-in-pam/report.png', alt: "The report screen. It asks what is wrong and lists reasons, with buttons “Send report” and “Never mind”.", caption: "Reporting a message." }]}
         />
         <P>
           Pam and your guide see the last message that person sent you, and its photo or document if it has one.
@@ -87,21 +73,17 @@ export function MessagesInPam() {
           A case manager or a super admin sees reported messages on Messages, under “Reported”, next to
           “Conversations”. It says: “A message shows here only because someone said it was not safe.”
         </P>
-        <Screenshot
-          name="messages-in-pam/report.png"
-          alt="The report screen. It asks what is wrong and lists reasons, with buttons “Send report” and “Never mind”."
-          caption="Reporting a message."
-        />
       </Section>
 
       <Section title="If you do not want messages from someone">
         <P>You can block a person from inside a conversation with them.</P>
-        <Steps
-          items={[
+        <HowTo
+          steps={[
             'In the conversation, tap “More options”. A screen called Options opens.',
             'Tap “Block this person”.',
             'Read what it says. Tap “Block”, or tap “Not now” if you change your mind.',
           ]}
+        shots={[{ name: 'messages-in-pam/blocked.png', alt: "A conversation after the other person blocked it. The box for writing a message is gone. In its place: “You can’t send messages here. This person has blocked messages in this conversation. You can still read it. Questions? Call Pam.” and a link, “Call Pam for help”.", caption: "What the other person sees." }]}
         />
         <P>
           Pam asks first. It says: “Neither of you will be able to send messages in this conversation or start
@@ -113,11 +95,6 @@ export function MessagesInPam() {
           here”. Under it: “This person has blocked messages in this conversation. You can still read it.
           Questions? Call Pam.”
         </P>
-        <Screenshot
-          name="messages-in-pam/blocked.png"
-          alt="A conversation after the other person blocked it. The box for writing a message is gone. In its place: “You can’t send messages here. This person has blocked messages in this conversation. You can still read it. Questions? Call Pam.” and a link, “Call Pam for help”."
-          caption="What the other person sees."
-        />
         <P>
           You see “You blocked this person”. It says neither of you can send messages there, and that to
           change that you open the ⋯ menu and choose Unblock.

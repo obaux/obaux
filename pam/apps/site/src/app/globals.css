@@ -28,4 +28,10 @@
     margin: 0;
     min-height: 100dvh;
   }
+
+  /* A support post is read on white (Will, 10 October 2026): the card colour, which is white in light mode
+     and the theme's own raised dark in dark mode, so contrast follows the theme. */
+  body:has([data-page='post']) {
+    background-color: var(--color-background-card);
+  }
 }

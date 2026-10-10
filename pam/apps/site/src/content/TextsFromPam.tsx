@@ -1,7 +1,6 @@
 import { CompareTable } from '../components/CompareTable';
 import { Body, Lead, P, Section } from '../components/Prose';
-import { Screenshot } from '../components/Screenshot';
-import { Steps } from '../components/Steps';
+import { HowTo } from '../components/HowTo';
 import { VISIT_REMINDERS_LIVE } from './flags';
 
 /**
@@ -64,8 +63,8 @@ export function TextsFromPam() {
       </Section>
 
       <Section title="The rules">
-        <Steps
-          items={[
+        <HowTo
+          steps={[
             'Pam texts you reminders only if you said yes. You choose when you join (“Yes, text me reminders” or “Not now”), or later, from the “Get text reminders” card on Profile (“Agree to receive texts” or “Not now”).',
             'No texts go out from 9 pm to 7 am, Philadelphia time. A text that is due in those hours waits until the morning. If a sign-in code is more than 12 hours late, Pam cancels it instead of sending it. Ask for a new one.',
             'Reply STOP to any text and the texts stop. Nothing in the app can turn them back on. If you replied STOP by mistake, call Pam.',
@@ -75,8 +74,8 @@ export function TextsFromPam() {
       </Section>
 
       <Section title="A text did not come">
-        <Steps
-          items={[
+        <HowTo
+          steps={[
             VISIT_REMINDERS_LIVE
               ? 'Think about which text it was. Pam does not text you about new messages or when someone wants to connect.'
               : 'Think about which text it was. Pam does not send visit reminders or message alerts yet.',
@@ -86,16 +85,7 @@ export function TextsFromPam() {
             'For a sign-in code, wait for the “Send it again” timer to finish, then ask for a new code. Use the newest one.',
             'Still no text? Call Pam.',
           ]}
-        />
-        <Screenshot
-          name="texts-from-pam/reminders.png"
-          alt="The “Text reminders” screen in Pam. A list headed “What we would send”, then a line that says today Pam sends only a note when a place you saved closes or moves, then two buttons: “Agree to receive texts” and “Not now”."
-          caption="The “Text reminders” screen."
-        />
-        <Screenshot
-          name="texts-from-pam/texts-off.png"
-          alt="The “Text reminders” screen after someone replied STOP. It says “Texts are off” and that Pam does not text you, and that nothing in the app can turn texts back on."
-          caption="After you reply STOP, the screen says “Texts are off”."
+          shots={[{ name: 'texts-from-pam/reminders.png', alt: "The “Text reminders” screen in Pam. A list headed “What we would send”, then a line that says today Pam sends only a note when a place you saved closes or moves, then two buttons: “Agree to receive texts” and “Not now”.", caption: "The “Text reminders” screen." }, { name: 'texts-from-pam/texts-off.png', alt: "The “Text reminders” screen after someone replied STOP. It says “Texts are off” and that Pam does not text you, and that nothing in the app can turn texts back on.", caption: "After you reply STOP, the screen says “Texts are off”." }]}
         />
       </Section>
     </Body>

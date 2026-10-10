@@ -1,10 +1,17 @@
+import * as stylex from '@stylexjs/stylex';
 import { Card } from '@astryxdesign/core/Card';
 import { Heading } from '@astryxdesign/core/Heading';
 import { HStack } from '@astryxdesign/core/HStack';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
-import { Button } from '@pam/ui/Button';
+import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
+import { SecondaryButton } from './SecondaryButton';
 import { APP_URL } from '../lib/links';
+
+const styles = stylex.create({
+  // A light outline, so the gray card reads as a card on the gray page.
+  card: { borderWidth: '1px', borderStyle: 'solid', borderColor: colorVars['--color-border'] },
+});
 
 /**
  * The end of every post: the way to a person. These are the words Pam's own Help
@@ -14,7 +21,7 @@ import { APP_URL } from '../lib/links';
  */
 export function StillStuck() {
   return (
-    <Card padding={6} variant="muted">
+    <Card padding={6} variant="muted" xstyle={styles.card}>
       <VStack gap={3} maxWidth={720}>
         <Heading level={2}>Still stuck?</Heading>
         <Text as="p">
@@ -25,7 +32,7 @@ export function StillStuck() {
           If we are closed, leave a message and we will call you back the next day we are open.
         </Text>
         <HStack>
-          <Button label="Open Pam" variant="secondary" href={APP_URL} />
+          <SecondaryButton label="Open Pam" href={APP_URL} />
         </HStack>
       </VStack>
     </Card>

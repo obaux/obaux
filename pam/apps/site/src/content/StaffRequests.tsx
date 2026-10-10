@@ -1,5 +1,5 @@
 import { Body, Lead, P, Section } from '../components/Prose';
-import { Steps } from '../components/Steps';
+import { HowTo } from '../components/HowTo';
 
 /**
  * Support post (DRAFT, held): Staff requests, for super admins. The review side is built
@@ -20,8 +20,8 @@ export function StaffRequests() {
       </Section>
 
       <Section title="Decide a request">
-        <Steps
-          items={[
+        <HowTo
+          steps={[
             'Tap a request in the list.',
             'Read the name and what they asked to be. If you need to ask them something, tap “Text” their name.',
             'Choose the city this account is for. If Pam is in only one city, it is chosen for you.',

@@ -2,6 +2,8 @@
   "about-pam": [
     "en"
   ],
-  "program-rules": [],
-  "program-rules-live": false
+  "program-rules": [
+    "en"
+  ],
+  "program-rules-live": true
 }

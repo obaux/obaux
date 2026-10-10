@@ -1,6 +1,6 @@
+import { Needs } from '../components/Needs';
 import { Body, Lead, P, Section } from '../components/Prose';
-import { Screenshot } from '../components/Screenshot';
-import { Steps } from '../components/Steps';
+import { HowTo } from '../components/HowTo';
 
 /**
  * Support post: Joining as a case manager or a program lead (staff). Staff join by an
@@ -19,19 +19,15 @@ export function JoiningAsStaff() {
       </Lead>
 
       <Section title="Join with your link">
-        <Steps
-          items={[
+        <HowTo
+          steps={[
             'Open the link you were sent. Open it on the phone it was sent to.',
             'Sign in with your phone number and the code Pam texts you. The top of the screen says you were invited, for example “You were invited to be a case manager in the Pam network.”',
             'On “About you”, check your first name. A green line shows what you were invited as: “Case manager” or “Program partner”.',
             'Read the next screen. A case manager sees “What you will see”. A program sees “What to expect”. Tap “I understand”.',
             'You land on Home.',
           ]}
-        />
-        <Screenshot
-          name="joining-as-staff/sign-in.png"
-          alt="Pam’s sign-in screen for a person invited to be a case manager. A line at the top says they were invited."
-          caption="Sign in, for someone invited as a case manager."
+          shots={[{ name: 'joining-as-staff/sign-in.png', alt: "Pam’s sign-in screen for a person invited to be a case manager. A line at the top says they were invited.", caption: "Sign in, for someone invited as a case manager." }]}
         />
       </Section>
 
@@ -40,10 +36,10 @@ export function JoiningAsStaff() {
           Ask the person at Pam who works with you to send you one. A case manager or a Pam super admin can send
           one. If you do not know who to ask, call Pam.
         </P>
-        <P>
-          A link works once and only on the phone number it was made for. It lasts 30 days. If it has expired,
-          ask for a new one.
-        </P>
+        <Needs title="A link works once, for one person.">
+          It only works on the phone number it was made for, and it lasts 30 days. If it has expired, ask for a
+          new one.
+        </Needs>
       </Section>
 
       <Section title="If your number is already in Pam">

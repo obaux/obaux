@@ -117,3 +117,11 @@ in its `"program-rules"` list. The sentence "What your signature means" goes to 
 said to the public: not on the site, in a post, a card, a share preview or an alt text, in any language (a site test fails
 if it appears). Describe what Pam does ("Pam helps people find services, get to them, and remember to go"), not the
 company's own principle.
+
+## How a post is laid out (Will, 10 October 2026: "better hierarchy, see how Figma does it")
+
+Posts are built from the pieces in `apps/site/src/components/`, in one centred 920px column like Figma Learn:
+- **Header** (`PostScreen`): the path as "Support → [page pill]", a large centred title, then a "Who this is for" box.
+- **What a person needs or does not need** (requirements) goes in `<Needs title="…">…</Needs>`: a gray banner with an info icon. Not in a paragraph.
+- **How to find it in the app** goes in `<HowTo steps={[…]} shots={[…]} />`: the numbered steps in a card with a black outline, and the screenshots in a light gray card (a tint lighter than the page, with a hairline) next to it, centred with room all round; side by side on a desktop, stacked on a phone, where the counters are smaller and the steps closer. A screenshot with no steps is a `<ShotCard shots={[…]} />`. Put the screenshots in the HowTo, not after a paragraph below it.
+- Text keeps a 760px line; cards use the full column. Do not use `<Steps>` or `<Screenshot>` directly in a post.
