@@ -41,7 +41,33 @@ rewritten. Wren found two in my copy. One small branch after the tags (D-455) we
 
 ## Verified
 
-Filled in when the long checks have finished (below).
+The long checks ran on `ca9a11a` (this branch with `main` at `3ddac79` merged). `main` then moved five more merges
+(legal tabs, the STOP/START release steps, services list, no example policies, the homepage card); I merged it
+(`96b2e70`, no conflicts) and re-ran the fast checks rather than start a fourth hour-long run; the merge desk measures the
+merged tree before it merges.
+
+| Check | Result |
+|---|---|
+| `@pam/config` unit tests, on `96b2e70` | 995 pass (the two new "promises that are kept" tests are in `legal.test.ts`) |
+| `@pam/ui` / `@pam/web` / `@pam/site` unit tests | 117 / 71 / 18 pass |
+| Typecheck `@pam/web`, `@pam/site`; `copy:status` | clean; all languages in step |
+| Storybook build, on `ca9a11a` | completes |
+| Browser suite, all three projects, on `ca9a11a` | **909 passed, 0 failed** (11.6 minutes) |
+| Fit audit, 480+ stories × en, ru, ar, zh-CN, pseudo at 320px, on `ca9a11a` | 92 new in a language: 84 accepted, **8 not accepted**; see below |
+
+**The eight not accepted** are in stories this branch does not touch:
+- four `pseudo clamp` on `member-created--explore` (the same four as on `main`, found in the tags job);
+- two `ru overlap` on `member-created-states-blocking--conversation-blocked-by-me` and `…-blocked-me` (a sender name
+  over the first message: the thread scrolling under the header, the class the merge desk added seven entries for on
+  `conversation-file-refused` and expects Dot's scroller job to retire) — Nico's new Block stories;
+- one `ru cut` and one `pseudo cut` on `member-created-states-saved-trips--one-trip-saved` (a date line in the card
+  that scrolls and fades at its foot, `partial=true`, like the Trips entries already accepted) — Piper's saved-trips
+  story.
+The merge desk adds entries at merge when it has looked; I did not add any.
+
+**The pages this branch changes**, privacy, terms, legal and the transparency reading, were clean in the fit audit.
+
+**Not run:** the database suite (no change in `packages/db`); a native reader or screen reader on any of it.
 
 ## Left undone
 

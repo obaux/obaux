@@ -942,7 +942,10 @@ fixed or rewritten (D-465).
   there after that. They will see that messages are blocked." — not "anyone", not "they will not know". The Block
   session's STATUS line that the terms were untrue can go at merge.
 - **Not here:** the mail-service paragraph on the privacy page (its English is with Will).
-- **Verified:** filled in with the session log when the long checks finish.
+- **Verified:** unit tests (`@pam/config` 995, `@pam/ui` 117, `@pam/web` 71, `@pam/site` 18), typecheck and the copy
+  ledger on the merged tree; the browser suite on all three viewports, 909 passed (on the tree one merge before the last);
+  the full fit audit: 92 new in a language, 84 accepted, 8 not, all in stories this branch does not touch (Explore's pseudo
+  clamps; the two Block conversation stories; the one-trip-saved date). See the session log.
 
 ## Languages & legal · English tags before each language name; the privacy wording (10 October) — merged 10 October
 
