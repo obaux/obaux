@@ -241,7 +241,12 @@ export function I18nProvider({ children, bundles, initialLocale }: I18nProviderP
       }, SHOW_AFTER_MS);
       return () => clearTimeout(timer);
     }
-    if (!switching) return;
+    // Settled. Take the loader down once it has been up long enough — whether or not it is up *in this render*:
+    // the "show" timer above can fire between the render that cleared `pendingLocale` and this effect (effects
+    // run after paint, a busy phone can wait a frame or two), which raises the loader after the language has
+    // already arrived. This render never saw it, so a check on `switching` here left it up for good, over a page
+    // already in the new language, covering every tap (a flaky browser test found it, 10 October). Clearing a
+    // loader that is not up changes nothing, and the minimum is counted from when it was shown.
     const timer = setTimeout(() => setSwitching(null), Math.max(0, MIN_VISIBLE_MS - (Date.now() - shownAt.current)));
     return () => clearTimeout(timer);
     // `switching` is read, not watched: only a change of the pending language restarts this.
