@@ -163,9 +163,10 @@ function card(id, node, p, shot, latest) {
   <div style="display:flex;align-items:center;gap:8px;height:28px;">
     <span style="font:700 17px/1.2 ${FONT};color:${INK};white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(node.title)}</span>
     ${node.changed ? `<span style="font:700 11px/1 ${FONT};color:#fff;background:${isNew ? NEW : '#9A9A9A'};border-radius:999px;padding:4px 8px;flex-shrink:0;">${esc(node.changed)}</span>` : ''}
+    ${node.proposed ? `<span style="font:700 11px/1 ${FONT};color:#fff;background:#2B6CD9;border-radius:999px;padding:4px 8px;flex-shrink:0;">Proposed (a22) · not in the app</span>` : ''}
   </div>
   <div style="font:500 12px/1.4 'SF Mono', Menlo, monospace;color:${MUTED};height:28px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(node.path ?? '')}</div>
-  <img src="data:${shot.type};base64,${shot.data}" width="${w}" height="${shotH(node)}" style="display:block;width:${w}px;height:${shotH(node)}px;border-radius:${node.wide ? 16 : 28}px;border:${isNew ? `3px solid ${NEW}` : '1px solid #D9D9D9'};box-sizing:border-box;object-fit:cover;background:#fff;box-shadow:0 6px 18px rgba(0,0,0,.10),0 1px 3px rgba(0,0,0,.06);">
+  <img src="data:${shot.type};base64,${shot.data}" width="${w}" height="${shotH(node)}" style="display:block;width:${w}px;height:${shotH(node)}px;border-radius:${node.wide ? 16 : 28}px;border:${node.proposed ? '3px dashed #2B6CD9' : isNew ? `3px solid ${NEW}` : '1px solid #D9D9D9'};box-sizing:border-box;object-fit:cover;background:#fff;box-shadow:0 6px 18px rgba(0,0,0,.10),0 1px 3px rgba(0,0,0,.06);">
   <div style="height:${LINK}px;display:flex;align-items:center;"><span style="font:600 12px/1 ${FONT};color:${node.story ? ACCENT : MUTED};background:#fff;border:1px solid #D9D9D9;border-radius:999px;padding:7px 12px;">${node.story ? 'Open in Storybook ↗' : 'no story yet'}</span></div>
   <div style="font:400 13px/1.35 ${FONT};color:${MUTED};height:${NOTE - 8}px;overflow:hidden;">${esc(node.note ?? '')}</div>
 </div>`;
@@ -317,7 +318,7 @@ for (const flow of flows) {
       nodes: Object.fromEntries(
         Object.entries(flow.nodes).map(([id, n]) => [
           id,
-          { ...pos[id], w: cardW(n), shotH: shotH(n), title: n.title, path: n.path ?? '', note: n.note ?? '', changed: n.changed ?? null, story: n.story ?? null, wide: !!n.wide },
+          { ...pos[id], w: cardW(n), shotH: shotH(n), title: n.title, path: n.path ?? '', note: n.note ?? '', changed: n.changed ?? null, story: n.story ?? null, wide: !!n.wide, proposed: !!n.proposed },
         ]),
       ),
       edges: flow.edges.map(([a, b, label, o]) => ({ from: a, to: b, label: label ?? '', dashed: !!o?.dashed, over: !!o?.over })),
