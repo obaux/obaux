@@ -6,7 +6,7 @@
 //   pnpm --filter @pam/site build && node apps/site/scripts/a11y.mjs   (from pam/)
 //
 // Needs Playwright's Chromium (or CHROMIUM_PATH). Exits 1 on any violation.
-import { readFileSync } from 'node:fs';
+import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { createServer } from 'node:http';
 import { createRequire } from 'node:module';
 import { dirname, extname, join, normalize } from 'node:path';
@@ -32,7 +32,11 @@ const server = createServer((req, res) => {
 }).listen(0);
 const base = `http://localhost:${server.address().port}`;
 
-const pages = ['/', '/support/', '/support/case-manager-assignments/'];
+// Every page the build made: Home, Support, and each published post (drafts are not built).
+const posts = readdirSync(join(out, 'support'), { withFileTypes: true })
+  .filter((d) => d.isDirectory() && existsSync(join(out, 'support', d.name, 'index.html')))
+  .map((d) => `/support/${d.name}/`);
+const pages = ['/', '/support/', ...posts];
 const views = [
   { name: 'desktop light', viewport: { width: 1280, height: 900 }, colorScheme: 'light' },
   { name: 'desktop dark', viewport: { width: 1280, height: 900 }, colorScheme: 'dark' },

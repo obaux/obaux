@@ -6,12 +6,13 @@ import { Card } from '@astryxdesign/core/Card';
 import { Grid } from '@astryxdesign/core/Grid';
 import { Heading } from '@astryxdesign/core/Heading';
 import { HStack } from '@astryxdesign/core/HStack';
-import { List, ListItem } from '@astryxdesign/core/List';
+import { Divider } from '@astryxdesign/core/Divider';
 import { Section } from '@astryxdesign/core/Section';
 import { Text } from '@astryxdesign/core/Text';
 import { TextInput } from '@astryxdesign/core/TextInput';
 import { VStack } from '@astryxdesign/core/VStack';
 import { Button } from '@pam/ui/Button';
+import { TextLink } from '@pam/ui/TextLink';
 import { POSTS, type SupportPost } from '../content/posts';
 import { TOPICS } from '../content/topics';
 import { APP_URL } from '../lib/links';
@@ -26,6 +27,9 @@ import { Frame } from '../components/Frame';
  * with a handful of posts none is needed. Typing replaces the sections below the
  * hero with the matches, as a help center does.
  */
+/** The first posts are the ones people get stuck on most (the help-centre audit, D-458), so they lead. */
+const START_HERE = 6;
+
 const styles = stylex.create({
   band: { paddingBlock: '56px' },
   title: { maxWidth: '20ch' },
@@ -38,20 +42,24 @@ function matches(post: SupportPost, query: string): boolean {
   return words.every((w) => hay.includes(w));
 }
 
+/**
+ * A list of posts: the title as a link and the summary under it, each wrapping to as many
+ * lines as it needs. (Astryx's list item trims a label to one line with "…", which cut
+ * the long titles off: language-fit audit, 10 October.)
+ */
 function PostList({ posts }: { readonly posts: readonly SupportPost[] }) {
   return (
-    <List hasDividers>
-      {posts.map((post) => (
-        <ListItem
-          key={post.slug}
-          label={post.title}
-          // A node, not a string: Astryx trims a plain-string description to one line,
-          // which cut the summary off on a phone (language-fit audit, 320px).
-          description={<Text type="supporting" as="p">{post.summary}</Text>}
-          href={`/support/${post.slug}/`}
-        />
+    <VStack gap={3}>
+      {posts.map((post, i) => (
+        <VStack key={post.slug} gap={1}>
+          {i > 0 ? <Divider /> : null}
+          <TextLink label={post.title} href={`/support/${post.slug}/`} />
+          <Text type="supporting" as="p">
+            {post.summary}
+          </Text>
+        </VStack>
       ))}
-    </List>
+    </VStack>
   );
 }
 
@@ -114,11 +122,11 @@ export function SupportScreen() {
                         <Heading level={3}>{topic.title}</Heading>
                         <Text as="p">{topic.blurb}</Text>
                         {posts.length ? (
-                          <List>
+                          <VStack gap={1}>
                             {posts.map((p) => (
-                              <ListItem key={p.slug} label={p.title} href={`/support/${p.slug}/`} />
+                              <TextLink key={p.slug} label={p.title} href={`/support/${p.slug}/`} />
                             ))}
-                          </List>
+                          </VStack>
                         ) : (
                           <Text type="supporting">Articles coming soon.</Text>
                         )}
@@ -130,8 +138,8 @@ export function SupportScreen() {
             </VStack>
 
             <VStack gap={3}>
-              <Heading level={2}>Popular articles</Heading>
-              <PostList posts={POSTS} />
+              <Heading level={2}>Start here</Heading>
+              <PostList posts={POSTS.slice(0, START_HERE)} />
             </VStack>
           </>
         )}

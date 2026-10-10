@@ -1018,6 +1018,28 @@ fine and the fit audit was over-counting (D-448).
 
 ## Seven languages, messages in your own language, and text that fits (9 October) — 0.50.1 and 0.51.0, merged 9 October (PR #29)
 
+## Website · public site and help centre (10 October) — `apps/site`, on `main`
+
+The public site, `joinpam.org` (Vercel project `pam-site`; the app is `app.joinpam.org`), is a static
+Next export on the app's theme (`pnpm --filter @pam/site dev|build|test`; no Supabase, no sign-in; D-433,
+D-437). **Home** and **Support**: a help-centre home with search, topics and "Start here". **Ten help
+posts** (D-458), most confusing first, each saying who it is for, with numbered steps in the screen's own
+words, tables, screenshots, and "Still stuck?" in the words of Pam's Help screen: who is my guide · texts
+from Pam · what your guide, a program and others can see · joining Pam · joining as staff · Pam words ·
+one phone, two sides · sending an invite · messages · points and badges, plus the earlier "Case manager
+assignments" (only what is live; the full table is held behind `live` flags, D-449). **Two hidden
+drafts** (`status: 'draft'`, not built into the site; Storybook only): "Keeping your program's listing up
+to date" (until listing editing ships) and "Staff requests" (no way to ask to be staff since D-369). The
+posts say only what is live, so they go stale as features ship: `docs/before-launch.md` lists which.
+`joinpam.org/j/<code>` forwards to the app's invite page (`vercel.json`, tested in `test/redirects.test.ts`).
+New posts: the `pam-support-post` skill. Storybook: **Website/Journey** (every post, drafts with a banner)
+and **Share and icon**. Checks: CI builds the site and runs `scripts/a11y.mjs` (axe, light and dark, desktop,
+phone and 320px: 70 scans, 0 problems on 10 October); screenshots from `scripts/screenshots.mjs`. Not on the
+user-flow map: it is not a screen of the app. Session logs: `docs/sessions/2026-10-09-a-public-website.md`,
+`2026-10-10-0423-…`, `2026-10-10-0631-…`, `2026-10-10-0807-website-help-posts.md`.
+
+## Seven languages, messages in your own language, and text that fits (9 October) — 0.50.1 and 0.51.0, merged 9 October (PR #29)
+
 ## Website · public site and support centre (10 October) — `apps/site`, preview only
 
 Home and Support, for anyone to read before they have an account (D-433). Support's index is a help-center home: search, topics, popular articles. A

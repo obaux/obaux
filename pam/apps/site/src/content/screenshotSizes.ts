@@ -1,0 +1,55 @@
+// Written by scripts/screenshots.mjs; do not edit by hand.
+export const SHOT_SIZES: Record<string, { w: number; h: number }> = {
+  "who-is-my-guide/what-others-can-see.png": {
+    "w": 390,
+    "h": 844
+  },
+  "texts-from-pam/reminders.png": {
+    "w": 390,
+    "h": 844
+  },
+  "joining-pam/sign-in.png": {
+    "w": 390,
+    "h": 844
+  },
+  "joining-pam/about-you.png": {
+    "w": 390,
+    "h": 844
+  },
+  "joining-as-staff/sign-in.png": {
+    "w": 390,
+    "h": 844
+  },
+  "one-phone-two-sides/use-as.png": {
+    "w": 390,
+    "h": 844
+  },
+  "one-phone-two-sides/add-your-program.png": {
+    "w": 390,
+    "h": 844
+  },
+  "sending-an-invite/invite.png": {
+    "w": 390,
+    "h": 844
+  },
+  "sending-an-invite/invite-form.png": {
+    "w": 390,
+    "h": 844
+  },
+  "messages-in-pam/messages.png": {
+    "w": 390,
+    "h": 844
+  },
+  "messages-in-pam/conversation.png": {
+    "w": 390,
+    "h": 844
+  },
+  "messages-in-pam/report.png": {
+    "w": 390,
+    "h": 844
+  },
+  "points-and-badges/points.png": {
+    "w": 390,
+    "h": 300
+  }
+};
