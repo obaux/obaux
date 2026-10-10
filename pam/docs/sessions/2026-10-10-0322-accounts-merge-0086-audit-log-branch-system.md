@@ -72,7 +72,7 @@ Supabase's per branch test for now."
   Run once for real on this repository (D-442, D-443 pushed).
 - The migration lint: a stamped migration with `drop column` and no `-- contract:`
   fails; with it passes; the word `drop` in a comment alone passes.
-- Full Playwright on the final tree: see the end of this log.
+- Full Playwright on the final tree (built after the privacy sentence was added): 837 passed in 8.4 minutes, at 320 light and dark and iPhone SE. Storybook green on the branch.
 
 ## Left undone
 
