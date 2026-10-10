@@ -27,14 +27,20 @@ when there is something he can see or try.
 |---|---|---|---|---|
 | <img src="team/mira.svg" width="40" alt=""> | **Mira** | Chief Technology Officer | Merge desk & platform | `session_018wn7LF7RMsHnXSAzvk6s1p` |
 | <img src="team/ava.svg" width="40" alt=""> | **Ava** | Accounts & Access Lead | Accounts & invites | `session_01NPHYiBRyyv8F5L7o9KaMEd` |
-| <img src="team/sam.svg" width="40" alt=""> | **Sam** | Accounts Engineer | Accounts & invites (staff email; job finished) | `session_01SJKnwmNUb3uvgDhakVYTZo` |
+| <img src="team/sam.svg" width="40" alt=""> | **Sam** | Accounts Engineer (retired) | — (job done; Ava covers accounts) | `session_01SJKnwmNUb3uvgDhakVYTZo` |
 | <img src="team/nico.svg" width="40" alt=""> | **Nico** | Messaging & Notifications Lead | Messages & notifications | `session_01CCHvVkYgXddhtq4DHvvETo` |
 | <img src="team/piper.svg" width="40" alt=""> | **Piper** | Places & Programs Lead | Places & programs | `session_01RmG6J2CCikoqM9H2fhbSPm` |
 | <img src="team/lena.svg" width="40" alt=""> | **Lena** | Languages & Legal Lead | Languages & legal | `session_01Hjv2RQuz5PJmxQ7tLGb5sW` |
-| <img src="team/remy.svg" width="40" alt=""> | **Remy** | Right-to-Left Language Specialist | Languages & legal (Arabic) | `session_01A44BM2WPMuZYKkspxsiQEG` |
+| <img src="team/remy.svg" width="40" alt=""> | **Remy** | Right-to-Left Language Specialist (retired) | — (job done; Lena covers Arabic) | `session_01A44BM2WPMuZYKkspxsiQEG` |
 | <img src="team/dot.svg" width="40" alt=""> | **Dot** | Design Systems Lead | Design system & Storybook | `session_01A3kdir46ErR2eyjDLFdzyW` |
 | <img src="team/wren.svg" width="40" alt=""> | **Wren** | Website & Help Centre Lead | Public website | `session_012vS6F7CMTwFn3u5UG66JWz` |
 | <img src="team/gus.svg" width="40" alt=""> | **Gus** | Former Platform Engineer (retired) | — | `session_01NoLKA8RJRwhyDJUe8CAZVE` |
+
+**One specialist per lane.** Will, 10 October, asked why accounts and languages each
+had two sessions. Each second session had been opened for one job, and both jobs were
+done, so Mira retired Sam and Remy (archived, not deleted: their notes and logs stay,
+and either can be brought back). A second session in a lane is opened only for a job
+that can't wait for the first, and retired when it merges.
 
 A new session gets a name, a title and an avatar from Mira when it joins: one line in
 `team/roster.json`, and `node docs/team/make-avatars.mjs` draws its portrait (the same
@@ -60,10 +66,10 @@ current (`docs/control-room.md`).
 | Session | Its expertise | It owns |
 |---|---|---|
 | **PAM · Mira · Chief Technology Officer** — the merge desk (`session_018wn7LF7RMsHnXSAzvk6s1p`) | Running the team; merging; the live project; releases; CI and deploys | `main`; every change to the live project (migrations, Edge Functions, secrets, schedules); `CHANGELOG.md` releases; this page, `docs/lanes.md` and the board; the shared tables in `STATUS.md` |
-| **Accounts & invites** (Ava, Sam) | Sign-in, invites, roles, caseloads, limits, deleting an account, the audit log | its lane in `docs/lanes.md` |
+| **Accounts & invites** (Ava) | Sign-in, invites, roles, caseloads, limits, deleting an account, the audit log | its lane in `docs/lanes.md` |
 | **Messages & notifications** (Nico) | Conversations, attachments, translation, the bell, texts and emails going out, blocking and reporting | its lane |
 | **Places & programs** (Piper) | The catalogue, a place, programs and their onboarding, saved places, trips, points, Home | its lane |
-| **Languages & legal** (Lena, Remy) | The seven languages and the ledger, privacy, terms, transparency, native review | its lane |
+| **Languages & legal** (Lena, Arabic included) | The seven languages and the ledger, privacy, terms, transparency, native review | its lane |
 | **Design system & Storybook** (Dot) | Components, tokens, illustrations, every screen's story, the fit and accessibility audits, the Figma flow map | its lane |
 | **Website** (Wren) | The public site and the support centre (`pam-site`) | its own project |
 
