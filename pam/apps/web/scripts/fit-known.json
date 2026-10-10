@@ -136,8 +136,8 @@
     "reason": "An area chip is one line and ends a long address in an ellipsis (the story exists to show a long address). Only 'Near' is translated; the address is data. In Arabic the mixed-direction line also reads out of order, which is a separate finding about interpolated values (see before-launch). Looked at 9 October 2026 at 320px with screenshots."
   },
   {
-    "key": "ar|spill|components-inputs-areachip--long-address|بالقرب من 1231 N Broad St, North Philadelphia",
-    "reason": "An area chip is one line and ends a long address in an ellipsis (the story exists to show a long address). Only 'Near' is translated; the address is data. In Arabic the mixed-direction line also reads out of order, which is a separate finding about interpolated values (see before-launch). Looked at 9 October 2026 at 320px with screenshots."
+    "key": "ar|ellipsis|components-inputs-areachip--long-address|1231 N Broad St, North Philadelphia",
+    "reason": "An area chip is one line and ends a long address in an ellipsis (the story exists to show a long address). Since D-435 the Arabic chip keeps the address in one isolated piece, so the designed ellipsis sits on the address's own box instead of the line spilling 4px past its button (the old ar|spill entry). Recorded at the Arabic merge, 10 October 2026, as the Arabic branch's STATUS section asked."
   },
   {
     "key": "pseudo|cut|member-created--explore|⟦Þŕóóóƒííļéé⟧",
