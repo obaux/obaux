@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { SUPPORTED_LOCALES, SWITCHING_LANGUAGE, directionOf, type Locale } from '@pam/config';
+import { LANGUAGE_TAGS, SUPPORTED_LOCALES, SWITCHING_LANGUAGE, directionOf, type Locale } from '@pam/config';
 import en from '@pam/config/locales/en.json';
 import es from '@pam/config/locales/es.json';
 import ptBR from '@pam/config/locales/pt-BR.json';
@@ -208,3 +208,44 @@ test.describe('choosing a language', () => {
     expect(await page.evaluate(() => localStorage.getItem('pam.locale'))).toBeNull();
   });
 });
+
+/**
+ * The English tag before each language's name (Will, 10 October 2026): "RU
+ * Русский", in every list of languages, the same seven tags whichever language
+ * the page is in. Checked here in the sign-in menu, in all seven languages.
+ */
+test.describe('the English tag before each language name, in the sign-in menu', () => {
+  for (const locale of SUPPORTED_LOCALES) {
+    test(`${locale}: every language has its tag before its name, drawn left to right, and read as its name alone`, async ({ page }) => {
+      await choose(page, locale);
+      await page.goto('/signin/');
+      await expect(page.locator('html')).toHaveAttribute('lang', locale);
+      await page.getByRole('button', { name: BUNDLES[locale]['language.title']! }).first().click();
+      await expect(page.getByRole('menuitemradio')).toHaveCount(SUPPORTED_LOCALES.length);
+
+      const rtl = directionOf(locale) === 'rtl';
+      const edges: number[] = [];
+      for (const code of SUPPORTED_LOCALES) {
+        const name = en[`language.${code}` as keyof typeof en] as string;
+        // The row's accessible name is the language's own name and nothing else: the tag is hidden from a screen reader.
+        const row = page.getByRole('menuitemradio', { name, exact: true });
+        await expect(row, `${code} row`).toBeVisible();
+        const tag = row.locator('[aria-hidden="true"]', { hasText: LANGUAGE_TAGS[code] }).first();
+        await expect(tag).toHaveText(LANGUAGE_TAGS[code]);
+        await expect(tag.locator('xpath=.//*[normalize-space()]').first()).toHaveCSS('direction', 'ltr');
+        // The name keeps its own language.
+        await expect(row.locator(`[lang="${code}"]`)).toHaveText(name);
+
+        // The tag comes first: on the left in English, on the right in Arabic.
+        const tagBox = (await tag.boundingBox())!;
+        const nameBox = (await row.locator(`[lang="${code}"]`).boundingBox())!;
+        if (rtl) expect(tagBox.x, `${code}: tag right of name`).toBeGreaterThan(nameBox.x);
+        else expect(tagBox.x, `${code}: tag left of name`).toBeLessThan(nameBox.x);
+        // And the names line up on one edge, whatever the tag's length.
+        edges.push(Math.round(rtl ? nameBox.x + nameBox.width : nameBox.x));
+      }
+      expect(new Set(edges).size, `names line up: ${edges.join(', ')}`).toBe(1);
+    });
+  }
+});
+

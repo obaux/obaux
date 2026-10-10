@@ -8,6 +8,8 @@ import {
   isSupportedLocale,
   matchLocale,
   pickTemplate,
+  LANGUAGE_TAGS,
+  LANGUAGE_TAG_WIDEST,
   SWITCHING_LANGUAGE,
   type Locale,
   speechLanguageFor,
@@ -44,6 +46,46 @@ describe('the language list', () => {
     expect(speechLanguageFor('zh-CN')).toBe('zh-CN');
     expect(speechLanguageFor('zh-HK')).toBe('zh-HK');
     expect(speechLanguageFor('ar')).toBe('ar-SA');
+  });
+});
+
+describe('the English tag before each language name', () => {
+  it('has one for every language, and none for a language Pam does not offer', () => {
+    expect(Object.keys(LANGUAGE_TAGS).sort()).toEqual([...SUPPORTED_LOCALES].sort());
+  });
+
+  it('is the language code in capitals — Will, 10 October, decided by Mira', () => {
+    for (const code of SUPPORTED_LOCALES) expect(LANGUAGE_TAGS[code]).toBe(code.toUpperCase());
+  });
+
+  it('is plain capital English letters and a hyphen, so it can never read as a word in a script', () => {
+    for (const code of SUPPORTED_LOCALES) expect(LANGUAGE_TAGS[code], code).toMatch(/^[A-Z]+(-[A-Z]+)?$/);
+  });
+
+  it('tells every row apart, the two Chinese ones too', () => {
+    const tags = SUPPORTED_LOCALES.map((code) => LANGUAGE_TAGS[code]);
+    expect(new Set(tags).size).toBe(tags.length);
+    expect(LANGUAGE_TAGS['zh-CN']).not.toBe(LANGUAGE_TAGS['zh-HK']);
+  });
+
+  it('is never a text bundle string, so no language can translate it or leave it out', () => {
+    for (const [locale, bundle] of Object.entries(BUNDLES)) {
+      const keys = Object.keys(bundle).filter((key) => /^language\.(tag|abbr)/i.test(key));
+      expect(keys, `${locale} has a translatable language tag`).toEqual([]);
+    }
+    // Nor is a tag written in front of a language's own name inside the name.
+    for (const code of SUPPORTED_LOCALES) {
+      for (const [locale, bundle] of Object.entries(BUNDLES)) {
+        const name = bundle[`language.${code}`] ?? '';
+        const written = new RegExp(`^${LANGUAGE_TAGS[code]}[\\s·:|–—-]`, 'i');
+        expect(name, `${locale}: language.${code} has its tag written into it`).not.toMatch(written);
+      }
+    }
+  });
+
+  it('knows its widest tag, which sizes the column the names line up on', () => {
+    expect(LANGUAGE_TAG_WIDEST).toBe(5);
+    for (const code of SUPPORTED_LOCALES) expect(LANGUAGE_TAGS[code].length).toBeLessThanOrEqual(LANGUAGE_TAG_WIDEST);
   });
 });
 

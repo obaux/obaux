@@ -2,6 +2,7 @@
 
 import * as stylex from '@stylexjs/stylex';
 import { Text } from '@astryxdesign/core/Text';
+import { HStack } from '@astryxdesign/core/HStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import type { StyleXStyles } from '@stylexjs/stylex';
 import {
@@ -10,7 +11,7 @@ import {
   DropdownMenuRadioItem,
 } from '@astryxdesign/core/DropdownMenu';
 import { GlobeIcon } from '@pam/ui';
-import { SUPPORTED_LOCALES, type Locale } from '@pam/config';
+import { LANGUAGE_TAGS, SUPPORTED_LOCALES, directionOf, type Locale } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { useChooseLanguage } from '@/lib/useChooseLanguage';
 
@@ -23,6 +24,13 @@ import { useChooseLanguage } from '@/lib/useChooseLanguage';
  * locale is currently active: "English", "Español" and "Português (Brasil)"
  * read the same to everybody looking for their own language in a list, which
  * is the point of a language switcher — see the `language.<code>` keys.
+ *
+ * Each name has its short English tag before it — "RU  Русский" — so somebody
+ * who cannot read the name still knows which row it is (Will, 10 October 2026).
+ * The tag is a constant (`LANGUAGE_TAGS`), never a bundle string, so it reads
+ * the same in all seven languages. It is drawn left to right and isolated, in a
+ * column as wide as the widest tag so the names line up, and hidden from a
+ * screen reader: the name, with its own `lang`, is the row's accessible name.
  *
  * Switching updates the active locale immediately either way. Signed in, it
  * also writes `profiles.preferred_language`, which is what a later sign-in
@@ -68,11 +76,48 @@ const styles = stylex.create({
     borderStyle: 'solid',
     borderColor: colorVars['--color-border'],
   },
+  // The English tag before a language's name: small, quiet, one fixed width in
+  // every row so the names line up, drawn left to right whichever way the page
+  // reads (an isolate, so "PT-BR" never flips beside Arabic), and flush with
+  // the row's own start edge.
+  tagCell: {
+    display: 'inline-block',
+    flexShrink: 0,
+    minWidth: '56px',
+    textAlign: 'start',
+  },
+  tagInline: { marginInlineEnd: '8px' },
+  tag: {
+    fontSize: '13px',
+    fontWeight: 600,
+    letterSpacing: '0.04em',
+    color: colorVars['--color-text-secondary'],
+    direction: 'ltr',
+    unicodeBidi: 'isolate',
+  },
   // The menu is drawn at the small size, so the radio dial is small (Will,
   // 6 October, D-311) — the rows keep the 48px floor and their 17px words,
   // and get as much room on the right as the dial has on the left.
   option: { minHeight: '48px', fontSize: '17px', paddingInlineEnd: '24px' },
 });
+
+/** The English tag for a language: never translated, left to right, invisible to a screen reader. */
+function LanguageTag({ code, isInline = false }: { readonly code: Locale; readonly isInline?: boolean }) {
+  return (
+    <Text aria-hidden="true" xstyle={isInline ? styles.tagInline : styles.tagCell}>
+      <Text xstyle={styles.tag}>{LANGUAGE_TAGS[code]}</Text>
+    </Text>
+  );
+}
+
+/** A language's own name, in its own voice and its own direction. */
+function LanguageName({ code, name }: { readonly code: Locale; readonly name: string }) {
+  return (
+    <span lang={code} dir={directionOf(code)}>
+      {name}
+    </span>
+  );
+}
 
 export function LanguageSwitcher({
   variant = 'icon',
@@ -92,7 +137,17 @@ export function LanguageSwitcher({
       onChange={(next) => choose(next as Locale)}
     >
       {OPTIONS.map((option) => (
-        <DropdownMenuRadioItem key={option.value} value={option.value} label={t(option.labelKey)} xstyle={styles.option} />
+        <DropdownMenuRadioItem
+          key={option.value}
+          value={option.value}
+          label={
+            <HStack gap={0} align="center" wrap="nowrap">
+              <LanguageTag code={option.value} />
+              <LanguageName code={option.value} name={t(option.labelKey)} />
+            </HStack>
+          }
+          xstyle={styles.option}
+        />
       ))}
     </DropdownMenuRadioGroup>
   );
@@ -124,7 +179,10 @@ export function LanguageSwitcher({
         variant: 'ghost',
         icon: <GlobeIcon />,
         endContent: (
-          <Text xstyle={styles.chip}>{t(`language.${locale}`)}</Text>
+          <Text xstyle={styles.chip}>
+            <LanguageTag code={locale} isInline />
+            <LanguageName code={locale} name={t(`language.${locale}`)} />
+          </Text>
         ),
         xstyle: rowStyle,
       }}
