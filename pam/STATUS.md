@@ -1101,6 +1101,13 @@ drops signatures), then `20261010042108_a_program_lead_submits_their_own_program
 
 ---
 
+## Messages & notifications · the expired-link address is deleted (10 October 2026)
+
+Branch `claude/messages-member-address-deleted`. One migration (`20261010151208_…`, **not yet applied to the live
+project**, no DROP): the address typed on the expired-link page is removed as soon as the fresh link is sent, and when a
+request can no longer be sent (older than seven days, out of tries, fresh link used or run out). The row keeps that it was
+sent and when. The invites log shows no address for a removed one. Staff's own address is untouched. DB test 48. D-487.
+
 ## Messages & notifications · the clocks send the shared secret (10 October 2026)
 
 Branch `claude/messages-invite-email-clock`. One migration (`20261010144844_…`, **not yet applied to the live

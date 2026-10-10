@@ -81,7 +81,7 @@ nothing, so switching it on early is harmless.
   learn from", and an unsigned language gets the English). It goes to the address typed on
   the expired-link page, in the language that page was in, for any invited role — a member
   too. It carries the fresh invite's link, which works for 30 days. A request older than
-  seven days, or whose fresh link has been used or has itself run out, is not sent. When the
+  seven days, or whose fresh link has been used or has itself run out, is not sent. **The address typed on the expired-link page is deleted as soon as the link is sent** (D-487), and when a request can no longer be sent (too old, out of tries, or the fresh link used or run out); the row keeps that a link was sent and when, not where. The privacy page says so (Lena). When the
   sender is first switched on it sends the requests still inside those limits: people who
   were told to check their email.
-- To see what was sent: `select requested_at, sent_at, attempts, failure_reason from invite_emails order by requested_at desc limit 10;` (the address is in the row; do not paste it anywhere).
+- To see what was sent: `select requested_at, sent_at, address_removed_at, attempts, failure_reason from invite_emails order by requested_at desc limit 10;` (the address is deleted once sent, so this shows `sent_at` and `address_removed_at`, never where).
