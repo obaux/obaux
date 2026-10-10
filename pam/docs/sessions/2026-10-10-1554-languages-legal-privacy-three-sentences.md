@@ -29,7 +29,8 @@ The third sentence fills a gap I found while reviewing D-485 part 2: the privacy
 
 ## Verified
 
-(see the READY note)
+On `7725a50` (main `673ccb0` plus this): `@pam/config` 1052 tests (the three sentences pinned, readability grade included), `copy:status` in step, the browser suite on all three viewports **996 passed, 18 skipped**
+(11.6 min), Storybook builds, the fit audit on the privacy page in all seven languages and the pseudo-language: 0 new defects. Merged with `main` again before pushing (below).
 
 ## Left undone
 
