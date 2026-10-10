@@ -1357,7 +1357,9 @@ recorded once `sms-inbound` is deployed (D-460); nothing queues the check-in or 
 connect" yet. Samples file: nine texts. D-453. Text reminders' staff list (merged 10 October) names
 only the alert texts Will signed: no "introduced to your program", no "your account changes".
 
-## Design system & Storybook · phone bugs (10 October)
+## Design system & Storybook · phone bugs (10 October) — merged 10 October
+
+Merged by the merge desk from 02c9a9b (c04cdf6). On the merge: web 93, ui 117, typecheck, both builds, bundle budget 23.3 kB spare, the whole browser suite 1038 passed, 18 skipped, 0 failed (Chromium only).
 
 Branch `claude/pam-design-phone-bugs`. Legal pages: the section tabs and Back to top no longer add history or
 leave the page short of the top, so Back returns to Sign in; the loading screen is the new layout's bar, not the
