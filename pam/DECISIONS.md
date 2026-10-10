@@ -6,6 +6,11 @@ is simpler for a first-time phone user.**
 
 Newest first within each section.
 
+**From D-442 on, each decision is its own file in `docs/decisions/`** (made with
+`pnpm claim decision "<title>"`), not an entry here — two sessions appending to one
+file at the same moment was the conflict this replaces. Everything up to D-441 stays
+below. `packages/config/test/numbering.test.ts` reads both.
+
 ---
 
 ## Open — need Will

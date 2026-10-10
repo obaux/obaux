@@ -135,22 +135,31 @@ STATUS row too.
   (privacy: 10 October) and only team accounts and two members exist.
 
 - [ ] **Make "Delete my account" work for everyone** (Will, 10 October, D-441: "if a user
-  chooses to delete all their data, the email goes along with it"). Found while testing: Pam's
-  deletion is a call and a manual delete, and a plain delete is **refused** for anyone who has
-  ever acted, because `audit_log.actor_id` is `on delete set null` and the audit log is
-  append-only. (The invite part of the same blocker is fixed in 0086: an invited account could
-  not be deleted at all.) Decide what happens to an erased person's audit rows — anonymised, kept
-  without a name, or removed — then write the routine (a function for the Pam team, tested like
-  the privacy promises: profile, email, invites, messages, photos, points). Until then a
-  deletion on a call must remove the email by hand. The privacy policy already says "If you ask
-  us to delete your account, we delete it too."
+  chooses to delete all their data, the email goes along with it"). **Audit log decided and
+  built, not live (D-443):** Will, 10 October: "When account is deleted the account should sit
+  in audit log for 6 months before it disappears." Deleting a profile now writes an
+  `account.delete` row; a nightly purge removes every row that names the account six months
+  later; the privacy policy says so (`privacy.s.how-long.p3`). **Still blocked:** a member
+  who has **points** cannot be deleted — `points_ledger` cascades from the profile and is
+  append-only, so the cascade is refused (probed 10 October: the seeded member with points
+  fails; admins and providers delete). The same shape of fix works (the ledger lets a DELETE
+  through only once the member's profile is gone), but it is a decision about the points
+  history that Will has not been asked. **Then** write the routine for the Pam team (a
+  function, tested like the privacy promises: profile, email, invites, messages, photos,
+  points in one call). Until then a deletion on a call must remove the email by hand.
 
-- [ ] **Apply 0086 to the live project, together with the app change that uses it** (D-441).
-  Run `list_migrations` first. The new app calls `create_staff_invite`; the old app's staff
-  invites are refused once 0086 is live, and the new app's fail until it is, so apply and
-  merge in the same sitting. No `drop`, so the connector can apply it (D-387). Then
-  `get_advisors` (two new tables, forced RLS; `invite_contact_emails` has a policy that
-  admits nobody on purpose).
+- [x] **Apply the two audit-log migrations, in order** (D-443) — **done 10 October 2026 (Will: "Yes")**:
+  `list_migrations` first (no drift), the first through the connector (nightly job
+  `purge-erased-audit` confirmed in `cron.job`), the second (`drop constraint`) also through the
+  connector, then a one-line fix after `get_advisors` flagged the guard function's search path
+  (`20261010033722_pin_the_append_only_guard_search_path.sql`). The privacy sentence merges with them.
+
+- [x] **Apply 0086 to the live project, together with the app change that uses it** (D-441) —
+  **done 10 October 2026 (Will: "Apply and merge 0086")**: `list_migrations` checked (live ended
+  at 0081; 0085 still held), applied through the connector (no `drop`), advisors showed nothing
+  new (two tables with forced RLS and one policy each; `invite_create`, `keep_invite_email` and
+  the deletion trigger function are not executable by clients), then merged to main (`0220ae0`).
+  The live copy of the migration is the same statements without the explanatory comments.
 
 - [ ] **Review the SMS copy** still waiting for a name in `reviewedBy`
   (STATUS row 2).

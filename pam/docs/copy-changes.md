@@ -81,5 +81,7 @@ when they asked travels with the request (migration 0085).
 
 ## Numbers
 
-Decisions, amendments, migrations and changelog versions are numbered by the
-session that writes them: claim yours in `docs/allocations.md` first.
+Decisions and amendments are numbered by file: `pnpm claim decision "<title>"`
+takes the next number after looking at every pushed branch. Migrations,
+changelog entries and session logs are named by the day and time. See
+`docs/lanes.md`, "Claiming a number".

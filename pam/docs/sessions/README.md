@@ -1,6 +1,8 @@
 # Session logs
 
-One file per build session, named `YYYY-MM-DD-<short-slug>.md`. Never edit an
+One file per build session, named `YYYY-MM-DD-HHMM-<lane>-<job>.md` (UTC; make it
+with `pnpm claim session "<lane> <job>"`, so two sessions on the same day sort in
+the order they were written and each lane's newest log is easy to find). Never edit an
 old one — they are a record of what was believed and done at the time, and their
 value comes from being immutable.
 
