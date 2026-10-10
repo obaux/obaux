@@ -11,16 +11,16 @@
 set client_min_messages to notice;
 
 \set region_north '11111111-0000-0000-0000-000000000001'
-\set org1  '55555555-0000-0000-0000-000000000f01'
-\set org2  '55555555-0000-0000-0000-000000000f02'
-\set mem   '99999999-0000-0000-0000-000000000f01'
-\set mem2  '99999999-0000-0000-0000-000000000f02'
-\set cm    '99999999-0000-0000-0000-000000000f03'
-\set lead1 '99999999-0000-0000-0000-000000000f04'
-\set lead2 '99999999-0000-0000-0000-000000000f05'
-\set other '99999999-0000-0000-0000-000000000f06'
-\set place '88888888-0000-0000-0000-000000000f01'
-\set place2 '88888888-0000-0000-0000-000000000f02'
+\set org1  '55555555-0000-0000-0000-0000000a7701'
+\set org2  '55555555-0000-0000-0000-0000000a7702'
+\set mem   '99999999-0000-0000-0000-0000000a7701'
+\set mem2  '99999999-0000-0000-0000-0000000a7702'
+\set cm    '99999999-0000-0000-0000-0000000a7703'
+\set lead1 '99999999-0000-0000-0000-0000000a7704'
+\set lead2 '99999999-0000-0000-0000-0000000a7705'
+\set other '99999999-0000-0000-0000-0000000a7706'
+\set place '88888888-0000-0000-0000-0000000a7701'
+\set place2 '88888888-0000-0000-0000-0000000a7702'
 
 create or replace function test.check_text(label text, actual text, expected text)
 returns void language plpgsql as $$
@@ -71,6 +71,9 @@ insert into public.notification_preferences
   (:'lead1', true, 0, 0, true,  true,  true,  false),
   (:'lead2', true, 0, 0, false, true,  false, false),
   (:'other', true, 0, 0, true,  true,  true,  false);
+
+-- Earlier tests leave their own queued texts behind; this one counts only its own.
+delete from public.outbound_messages;
 
 -- ===========================================================================
 \echo ''
@@ -251,16 +254,16 @@ select test.check('a case manager who plans the visit for their member is not te
 \echo '--- Somebody wrote to you ---'
 -- ===========================================================================
 delete from public.outbound_messages;
-insert into public.conversations (id, kind) values ('44444444-0000-0000-0000-000000000f01', 'direct');
+insert into public.conversations (id, kind) values ('44444444-0000-0000-0000-0000000a7701', 'direct');
 insert into public.conversation_members (conversation_id, profile_id) values
-  ('44444444-0000-0000-0000-000000000f01', :'mem'), ('44444444-0000-0000-0000-000000000f01', :'cm');
-insert into public.messages (conversation_id, sender_id, body) values ('44444444-0000-0000-0000-000000000f01', :'mem', 'one');
+  ('44444444-0000-0000-0000-0000000a7701', :'mem'), ('44444444-0000-0000-0000-0000000a7701', :'cm');
+insert into public.messages (conversation_id, sender_id, body) values ('44444444-0000-0000-0000-0000000a7701', :'mem', 'one');
 select test.check('the person written to, with "messages" on, is told',
   test.waiting(:'cm', 'message_waiting'), 1::bigint);
 select test.check('...the writer is not',
   test.waiting(:'mem', 'message_waiting'), 0::bigint);
 insert into public.messages (conversation_id, sender_id, body) values
-  ('44444444-0000-0000-0000-000000000f01', :'mem', 'two'), ('44444444-0000-0000-0000-000000000f01', :'mem', 'three');
+  ('44444444-0000-0000-0000-0000000a7701', :'mem', 'two'), ('44444444-0000-0000-0000-0000000a7701', :'mem', 'three');
 select test.check('three messages before it is sent: one text',
   test.waiting(:'cm', 'message_waiting'), 1::bigint);
 select test.check_text('the text names nobody and nothing: only the link',
@@ -269,22 +272,22 @@ select test.check_text('the text names nobody and nothing: only the link',
 set role service_role;
 select count(*) from public.claim_outbound_messages(100);
 reset role;
-insert into public.messages (conversation_id, sender_id, body) values ('44444444-0000-0000-0000-000000000f01', :'mem', 'four');
+insert into public.messages (conversation_id, sender_id, body) values ('44444444-0000-0000-0000-0000000a7701', :'mem', 'four');
 select test.check('a message soon after the text went adds none',
   test.waiting(:'cm', 'message_waiting'), 0::bigint);
 update public.outbound_messages set sent_at = now() - interval '31 minutes' where template_key = 'message_waiting';
-insert into public.messages (conversation_id, sender_id, body) values ('44444444-0000-0000-0000-000000000f01', :'mem', 'five');
+insert into public.messages (conversation_id, sender_id, body) values ('44444444-0000-0000-0000-0000000a7701', :'mem', 'five');
 select test.check('half an hour later the next message is another',
   test.waiting(:'cm', 'message_waiting'), 1::bigint);
 -- The other way: Mia has "messages" on; the case manager writes back.
-insert into public.messages (conversation_id, sender_id, body) values ('44444444-0000-0000-0000-000000000f01', :'cm', 'reply');
+insert into public.messages (conversation_id, sender_id, body) values ('44444444-0000-0000-0000-0000000a7701', :'cm', 'reply');
 select test.check('and the member with "messages" on is told of the reply',
   test.waiting(:'mem', 'message_waiting'), 1::bigint);
 -- Switch off: nothing.
 delete from public.outbound_messages;
 update public.notification_preferences set alert_message = false where member_id in (:'mem', :'cm');
-insert into public.messages (conversation_id, sender_id, body) values ('44444444-0000-0000-0000-000000000f01', :'cm', 'six');
-insert into public.messages (conversation_id, sender_id, body) values ('44444444-0000-0000-0000-000000000f01', :'mem', 'seven');
+insert into public.messages (conversation_id, sender_id, body) values ('44444444-0000-0000-0000-0000000a7701', :'cm', 'six');
+insert into public.messages (conversation_id, sender_id, body) values ('44444444-0000-0000-0000-0000000a7701', :'mem', 'seven');
 select test.check('with the switch off, a message texts nobody',
   (select count(*) from public.outbound_messages), 0::bigint);
 
@@ -300,6 +303,6 @@ select test.check('a person turns their own switch on',
 select test.check('...but cannot read or change anyone else''s',
   (select count(*) from public.notification_preferences where member_id <> :'mem'), 0::bigint);
 select test.check_raises('...nor reach the queue helper',
-  $$select public.queue_text_alert('99999999-0000-0000-0000-000000000f03', 'trip_planned', 'x')$$);
+  $$select public.queue_text_alert('99999999-0000-0000-0000-0000000a7703', 'trip_planned', 'x')$$);
 reset role;
 select 'done' as done;
