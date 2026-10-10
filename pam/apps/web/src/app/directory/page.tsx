@@ -21,7 +21,6 @@ import { useSession } from '@/lib/useSession';
 import { useDirectory, setDemoView } from '@/lib/useDirectory';
 import { useRoleView } from '@/lib/useViewedRole';
 import { useDemoView } from '@/lib/useDemoView';
-import { RoleSwitchControl } from '../RoleSwitchControl';
 
 /**
  * Everyone on Pam, for the person running it.
@@ -71,7 +70,7 @@ export default function DirectoryPage() {
   // shows what a program actually sees (D-108, useViewedRole) — the same
   // door everyone else meets — rather than the full directory regardless.
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
-  const { viewedRole, setViewAs } = useRoleView(trueRole);
+  const { viewedRole } = useRoleView(trueRole);
   const isSuperAdmin = viewedRole === 'super_admin';
   const isDemo = useDemoView(session);
   const [filter, setFilter] = useState<Filter>('all');
@@ -98,9 +97,6 @@ export default function DirectoryPage() {
           backLabel={t('nav.back.profile')}
           actions={
             <>
-              {trueRole === 'super_admin' ? (
-                <RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} />
-              ) : null}
               <HelpButton />
             </>
           }
@@ -119,9 +115,6 @@ export default function DirectoryPage() {
           backLabel={t('nav.back.profile')}
           actions={
             <>
-              {trueRole === 'super_admin' ? (
-                <RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} />
-              ) : null}
               <HelpButton />
             </>
           }
@@ -141,9 +134,6 @@ export default function DirectoryPage() {
           backLabel={t('nav.back.profile')}
           actions={
             <>
-              {trueRole === 'super_admin' ? (
-                <RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} />
-              ) : null}
               <HelpButton />
             </>
           }
@@ -170,9 +160,6 @@ export default function DirectoryPage() {
           backLabel={t('nav.back.profile')}
           actions={
             <>
-              {trueRole === 'super_admin' ? (
-                <RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} />
-              ) : null}
               <HelpButton />
             </>
           }
@@ -203,9 +190,6 @@ export default function DirectoryPage() {
         backLabel={t('nav.back.profile')}
         actions={
           <>
-            {trueRole === 'super_admin' ? (
-              <RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} />
-            ) : null}
             <HelpButton />
           </>
         }

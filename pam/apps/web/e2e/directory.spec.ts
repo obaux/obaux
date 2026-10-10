@@ -129,6 +129,20 @@ test.describe('everyone, for the person running Pam', () => {
     expect(asked, 'the filter never reached the query').toContain('provider');
   });
 
+  test('the header has no role-preview switch (Will, 10 October)', async ({ page }) => {
+    // Storybook's journeys show each role now; the super admin's header lost its
+    // preview icon. "See the app as" on Profile still sets a preview.
+    await signedInAs(page, 'super_admin');
+    await page.goto('/directory/');
+    await expect(page.getByRole('heading', { name: 'Everyone', exact: true })).toBeVisible();
+    // The switch was loaded lazily after the session: wait for the page to settle
+    // and for Help, which sat beside it, so the check cannot run too early.
+    await settled(page);
+    await expect(page.getByRole('link', { name: /Help/ }).or(page.getByRole('button', { name: /Help/ })).first()).toBeVisible();
+    await page.waitForTimeout(1500);
+    await expect(page.getByRole('button', { name: /Switch the view/ })).toHaveCount(0);
+  });
+
   test('says how many, so a filter that finds nothing is obviously that', async ({ page }) => {
     await signedInAs(page, 'super_admin');
     await page.goto('/directory/');

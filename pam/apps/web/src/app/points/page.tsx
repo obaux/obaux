@@ -42,7 +42,6 @@ import { NotIn } from '../NotIn';
 import { useSession } from '@/lib/useSession';
 import { usePoints } from '@/lib/usePoints';
 import { useRoleView } from '@/lib/useViewedRole';
-import { RoleSwitchControl } from '../RoleSwitchControl';
 
 /**
  * What the points are for — a journey, not a table (D-278, Will, 5 October:
@@ -191,7 +190,7 @@ export default function PointsPage() {
   const { t, tPlain } = useI18n();
   const { state: session } = useSession();
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
-  const { demoRole, setViewAs } = useRoleView(trueRole);
+  const { demoRole } = useRoleView(trueRole);
   const points = usePoints(session.status === 'signed-in' ? session.session.userId : null);
   // Nothing awards a badge yet; the example member has earned Scholar
   // (D-307), shown where the rest of the example data is.
@@ -298,9 +297,6 @@ export default function PointsPage() {
           backLabel={t('nav.back.profile')}
           actions={
             <>
-              {trueRole === 'super_admin' ? (
-                <RoleSwitchControl trueRole={trueRole} viewedRole={demoRole ?? trueRole} onChange={setViewAs} />
-              ) : null}
               <HelpButton />
             </>
           }

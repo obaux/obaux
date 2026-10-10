@@ -14,7 +14,6 @@ import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
 import { useStaffRequests } from '@/lib/useStaffRequests';
 import { useRoleView } from '@/lib/useViewedRole';
-import { RoleSwitchControl } from '../app/RoleSwitchControl';
 
 /**
  * Deciding who becomes a case manager or a program lead, for real (0054).
@@ -52,16 +51,13 @@ export function RequestsScreen({ isHome = false }: { readonly isHome?: boolean }
   const { state: session } = useSession();
 
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
-  const { viewedRole, setViewAs } = useRoleView(trueRole);
+  const { viewedRole } = useRoleView(trueRole);
   const isSuperAdmin = viewedRole === 'super_admin';
 
   const { state: requests } = useStaffRequests(isSuperAdmin);
 
   const tools = (
     <>
-      {trueRole === 'super_admin' ? (
-        <RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} />
-      ) : null}
       {isHome ? <HeaderActions role="super_admin" /> : <HelpButton />}
     </>
   );

@@ -30,7 +30,7 @@ import { isFreshAccount } from '@/lib/programSetup';
  * `@pam/config/dummy-notifications` instead, the same set that screen shows,
  * so the bell is never lit about something the list underneath it cannot
  * show. That import is dynamic, loaded only once the real list has actually
- * come back empty, the same way `SavedStripLazy` and `RoleSwitchLazy` defer —
+ * come back empty, the same way `SavedStripLazy` defers —
  * this component sits on every signed-in screen including Home, and the day
  * `@pam/config/dummy-notifications` loaded statically here cost the first
  * load 1.2 kB nobody using a real, populated caseload would ever need.

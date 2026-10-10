@@ -928,6 +928,15 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
+## Accounts & invites · no role switcher for the super admin (10 October) — local branch, not pushed
+
+`claude/pam-super-admin-no-switcher` (D-497). Will: the super admin no longer needs the role
+switcher icon, since Storybook has a prototype for each journey. The icon is gone from all ten
+screens that drew it; "See the app as" (Profile) and "Use Pam as" (two-role accounts, D-374)
+stay. No database change. Unit, typecheck, build and 11 browser specs (264 tests, plus the new
+regression test, which fails without the change) pass. Waiting on Will: where to push it, and
+whether "See the app as" should go too.
+
 ## Merge desk & platform · a failed in-app load opens the screen; texts link to app.joinpam.org (10 October)
 
 Will, from his phone: an invite link opened a page of raw code. Cause: Next 15.5.25, in static export,

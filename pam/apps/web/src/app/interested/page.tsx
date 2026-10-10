@@ -15,7 +15,6 @@ import { PersonRow } from '../PersonRow';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
 import { useRoleView } from '@/lib/useViewedRole';
-import { RoleSwitchControl } from '../RoleSwitchControl';
 import { whenHappened } from '@/lib/when';
 
 /**
@@ -41,7 +40,7 @@ export default function InterestedPage() {
   const { state: session } = useSession();
 
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
-  const { viewedRole, setViewAs } = useRoleView(trueRole);
+  const { viewedRole } = useRoleView(trueRole);
   const isProvider = viewedRole === 'provider';
 
   if (session.status === 'loading') {
@@ -53,9 +52,6 @@ export default function InterestedPage() {
           backLabel={t('nav.back.home')}
           actions={
             <>
-              {trueRole === 'super_admin' ? (
-                <RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} />
-              ) : null}
               <HelpButton />
             </>
           }
@@ -74,9 +70,6 @@ export default function InterestedPage() {
           backLabel={t('nav.back.home')}
           actions={
             <>
-              {trueRole === 'super_admin' ? (
-                <RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} />
-              ) : null}
               <HelpButton />
             </>
           }
@@ -96,9 +89,6 @@ export default function InterestedPage() {
           backLabel={t('nav.back.home')}
           actions={
             <>
-              {trueRole === 'super_admin' ? (
-                <RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} />
-              ) : null}
               <HelpButton />
             </>
           }
@@ -126,9 +116,6 @@ export default function InterestedPage() {
           backLabel={t('nav.back.home')}
           actions={
             <>
-              {trueRole === 'super_admin' ? (
-                <RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} />
-              ) : null}
               <HelpButton />
             </>
           }
@@ -153,9 +140,6 @@ export default function InterestedPage() {
         backLabel={t('nav.back.home')}
         actions={
           <>
-            {trueRole === 'super_admin' ? (
-              <RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} />
-            ) : null}
             <HelpButton />
           </>
         }
