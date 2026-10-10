@@ -1139,7 +1139,7 @@ phone and 320px: 70 scans, 0 problems on 10 October); screenshots from `scripts/
 user-flow map: it is not a screen of the app. Session logs: `docs/sessions/2026-10-09-a-public-website.md`,
 `2026-10-10-0423-…`, `2026-10-10-0631-…`, `2026-10-10-0807-website-help-posts.md`.
 
-**About Pam, in seven languages (D-464, 10 October, on a branch, not live).** One post at
+**About Pam, in seven languages (D-466, 10 October, on a branch, not live).** One post at
 `/<lang>/about-pam/` in English, Spanish, Brazilian Portuguese, Simplified and Traditional (Hong Kong)
 Chinese, Russian and Arabic: own `<html lang>` (Arabic `dir="rtl"`), a language list, `hreflang`,
 `x-default` English; not under a Support topic; one wordless illustration (header + 1200×630 share

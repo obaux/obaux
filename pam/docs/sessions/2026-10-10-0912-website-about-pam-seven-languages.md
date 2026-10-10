@@ -34,7 +34,7 @@
 
 ## Decisions made
 
-- D-464 — About Pam in seven languages, drafts until signed (in full: the file route, the sign-off
+- D-466 — About Pam in seven languages, drafts until signed (in full: the file route, the sign-off
   file, what was left alone).
 
 ## Verified
@@ -51,7 +51,7 @@
 ## Left undone
 
 - Not signed: `signed-off.json` is `{"about-pam": []}`. Nothing is live.
-- The picture is not in the illustration kit or Foundations › Imagery (D-464 says why).
+- The picture is not in the illustration kit or Foundations › Imagery (D-466 says why).
 - Pages' header/footer and the "Go to Support" link are English; the pages say so.
 - The home card "Pam reminds you before you go so nothing gets missed" promises reminders that are
   not live. Flagged, not changed.
