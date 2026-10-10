@@ -1112,6 +1112,11 @@ drops signatures), then `20261010042108_a_program_lead_submits_their_own_program
 
 ---
 
+## Messages & notifications · why the email service refused (10 October 2026)
+
+Branch `claude/messages-email-error-detail`. `send-invite-emails` now keeps Resend's `name` and `message` (addresses and keys
+redacted, about 200 characters) in a failed row's `failure_reason`, instead of only the status. Needs a redeploy of the function.
+
 ## Messages & notifications · the clocks send the shared secret (10 October 2026) — merged 10 October
 
 Merged by the merge desk from 03d2338. Live: applied as 20261010145909; vault `dispatch_secret` made (64 hex, never read out); cron jobs 3 (`dispatch-sms`) and 4 (`send-invite-emails`) every five minutes with the header from the vault; 15:00 and 15:05 ticks: `dispatch-sms` 200 `{claimed:0,sent:0,failures:[]}`. `send-invite-emails` deployed from main as version 1 (verify_jwt on), answering `{enabled:false}` until Will sets the secrets (card a28).
