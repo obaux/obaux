@@ -236,6 +236,14 @@ export const TRANSPARENCY_SCREEN: {
       key: 'transparency.canSee.saves',
       en: 'When you save a new place — not which one. A program you joined sees this too.',
     },
+    /**
+     * D-485 (Will, a25, point 2) — a program keeps a record of the policies a
+     * member signs: their first name and the date, never the signature picture.
+     */
+    {
+      key: 'transparency.canSee.signed',
+      en: 'The policies you sign for a program, and the day you signed. A program you joined sees this too.',
+    },
   ],
 
   cannotSeeHeadingKey: 'transparency.cannotSee.heading',
@@ -297,7 +305,12 @@ export const TRANSPARENCY_GROUPS: readonly {
   },
   {
     titleKey: 'transparency.group.progress',
-    keys: ['transparency.canSee.points', 'transparency.canSee.lastActive', 'transparency.canSee.saves'],
+    keys: [
+      'transparency.canSee.points',
+      'transparency.canSee.lastActive',
+      'transparency.canSee.saves',
+      'transparency.canSee.signed',
+    ],
   },
   {
     titleKey: 'transparency.group.people',

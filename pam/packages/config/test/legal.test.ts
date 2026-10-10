@@ -237,3 +237,23 @@ describe('promises that are kept (D-465)', () => {
     }
   });
 });
+
+describe('the mail service, said before the first email goes out (D-482, a21)', () => {
+  it('says what Will approved, word for word, on the privacy page', () => {
+    // Will approved this English on 10 October 2026, 14:37 UTC (a21). Change it only with him.
+    expect(en['privacy.s.sharing.p4']).toBe(
+      'When Pam emails a case manager or a program, a company that sends email for us gets the email address and the email. It may not use them for anything else.',
+    );
+  });
+
+  it('is the last paragraph of "Who else gets your information", in every language', () => {
+    const sharing = PRIVACY.sections.find((s) => s.id === 'sharing');
+    expect(sharing?.bodyKeys.at(-1)).toBe('privacy.s.sharing.p4');
+    for (const [locale, bundle] of Object.entries(bundles)) {
+      const text = bundle['privacy.s.sharing.p4'];
+      expect(text, `${locale} has it`).toBeTruthy();
+      // Not a copy of the English: a language that has not been translated would fall back to it.
+      if (locale !== 'en') expect(text, `${locale} is translated`).not.toBe(en['privacy.s.sharing.p4']);
+    }
+  });
+});
