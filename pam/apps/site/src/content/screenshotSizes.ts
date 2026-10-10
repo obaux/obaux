@@ -1,5 +1,9 @@
 // Written by scripts/screenshots.mjs; do not edit by hand.
 export const SHOT_SIZES: Record<string, { w: number; h: number }> = {
+  "texts-from-pam/texts-off.png": {
+    "w": 390,
+    "h": 330
+  },
   "who-is-my-guide/what-others-can-see.png": {
     "w": 390,
     "h": 844

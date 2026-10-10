@@ -64,5 +64,11 @@
     "out": "points-and-badges/points.png",
     "name": "Your points",
     "height": 300
+  },
+  {
+    "id": "member-created-states-texts-stopped--reminders",
+    "out": "texts-from-pam/texts-off.png",
+    "name": "Text reminders, texts are off",
+    "height": 330
   }
 ]

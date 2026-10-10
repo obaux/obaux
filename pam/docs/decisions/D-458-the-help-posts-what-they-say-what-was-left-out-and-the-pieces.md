@@ -48,6 +48,13 @@ Help screen shows; screenshots from Storybook at phone width, pretend people onl
   voice notes, the email for an expired link (queued, nothing sends it), the "text me when Pam opens in my city" box, the
   "dot on the switch" for two sides.
 
+- **Texts: kept public, and made a one-line edit (Mira, 10 October, for Will).** Mira's decision on Will's question: keep
+  "Texts from Pam" public, because it is true and Will asked for promises to be rewritten truthfully. Piper's trips work will make the
+  day-before visit reminder real (only for people who said yes), so the post has one switch, `VISIT_REMINDERS_LIVE` in
+  `TextsFromPam.tsx`: set it to `true` the day the reminder is merged **and the live `dispatch-sms` queues it** (check the
+  deployed function, not the repo). The post's words follow the Reminders screen, which `main` changed that morning (it now says
+  "Today Pam sends only one of these…" and has a "Texts are off" state after STOP).
+
 ## Why
 
 The Help screen is where a person with no one else to ask lands. A post that explains a promise Pam does not keep sends them

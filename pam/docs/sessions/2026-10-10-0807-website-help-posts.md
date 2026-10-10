@@ -16,7 +16,16 @@
   `Screenshot`, `CompareTable`, `StillStuck`, `Prose`; `scripts/screenshots.mjs` and `screenshots.json`; an audience line under each
   title; "Start here" on Support.
 
+- **Later: main changed the Reminders screen** (Nico, 491375e) and Mira asked me to merge `main` (145a01e) and retake it. I retook all 13
+  screenshots from main's Storybook and compared them pixel by pixel: only the Reminders screen changed (the other 12 are identical,
+  which also covers the screens Mira named elsewhere: none of them is in a post). The post now follows the new screen's words, has a second
+  screenshot ("Texts are off"), and a one-line switch (`VISIT_REMINDERS_LIVE`) for Piper's day-before reminder. Mira's decision on Will's
+  question: keep "Texts from Pam" public.
+
 ## What was wrong, and what missed it
+
+- **`screenshots.mjs` overwrote the size list when run for one picture**, leaving only that entry. Caught the same minute (a type check
+  still passed because missing sizes fall back to a default); fixed so a partial run merges, and a full run restores all 14.
 
 - **My audit was wrong in two places, and the fact-gathering caught both.** I said only staff can start a chat (D-176: a member may
   message their own case manager or a program), and I planned a post on "asking to be a case manager" (D-369: the request path is

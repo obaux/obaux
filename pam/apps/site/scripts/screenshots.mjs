@@ -70,9 +70,16 @@ for (const s of shots) {
   await ctx.close();
 }
 // The page reads these so a picture has its real shape before it loads (no jump).
-const record = Object.fromEntries(sizes.map((z) => [z.out, { w: z.w, h: z.h }]));
+// A run limited to one picture must not erase the others, so the old sizes are kept and updated.
+const sizesFile = join(site, 'src', 'content', 'screenshotSizes.ts');
+let record = {};
+if (existsSync(sizesFile)) {
+  const m = /= (\{[\s\S]*\});/.exec(readFileSync(sizesFile, 'utf8'));
+  if (m) record = JSON.parse(m[1]);
+}
+for (const z of sizes) record[z.out] = { w: z.w, h: z.h };
 writeFileSync(
-  join(site, 'src', 'content', 'screenshotSizes.ts'),
+  sizesFile,
   '// Written by scripts/screenshots.mjs; do not edit by hand.\nexport const SHOT_SIZES: Record<string, { w: number; h: number }> = ' + JSON.stringify(record, null, 2) + ';\n',
 );
 await browser.close();

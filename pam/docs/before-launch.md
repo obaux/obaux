@@ -14,7 +14,9 @@ STATUS row too.
 - [ ] **Public help posts: re-check them when what they describe changes** (Wren, 10 October
   2026, D-458). Each post says only what is live today, so these go stale as features ship:
   "Texts from Pam" when visit reminders, message alerts or connect texts go live (it says they
-  are not sent yet; check the live `dispatch-sms`, not the repo); "Who is my guide?" when the
+  are not sent yet; check the live `dispatch-sms`, not the repo). The day-before visit reminder is
+  **one line**: set `VISIT_REMINDERS_LIVE = true` in `apps/site/src/content/TextsFromPam.tsx` the day
+  it is merged and the live function queues it (Mira, 10 October); "Who is my guide?" when the
   assign-and-limit work merges; "Points and badges" when more point rules or any badge are
   awarded; "Messages" if blocking appears; "What others can see" if transparency.ts changes
   (one row, "the last day you used Pam" for a program, repeats the app's promise ahead of the
