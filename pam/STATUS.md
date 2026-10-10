@@ -1190,6 +1190,10 @@ Merged to `main` by the merge desk, 10 October, from `claude/places-programs-cal
 
 Merged to `main` by the merge desk, 10 October, from `claude/places-programs-reminder-gaps`. Migration `20261010130831`, expand only: evening visits are texted on the day before (five minutes before the member's quiet hours begin, the merge desk's rule), texts turned on later queue the reminders for future trips, and the place name and street are passed whole (the renderer cuts at a word). **Applied live at merge** (recorded as 20261010131522), read back: all five bodies identical to the file, service role only, both triggers in place. Test `37_day_before_reminder_gaps_test.sql`; Nico's test 36 had its gap 1, 2 and 3 checks flipped at merge. Still open, both pinned or noted: quiet hours changed *after* planning do not re-time a reminder until the trip changes (KNOWN GAP 1b in test 36); and the dispatcher's `in_quiet_hours` (0039) reads New York time, so for a trip in another time zone it can hold a text this trigger placed just before quiet hours. Fine for the Philadelphia pilot; fix before a second city.
 
+## Places & programs · quiet hours re-time queued reminders (10 October 2026) — READY, not merged
+
+Branch `claude/places-programs-quiet-hours-retime`. Migration `20261010133227`, expand only; test `39_quiet_hours_change_retimes_texts_test.sql`; test 36's gap 1b flipped. A story "Trips with a past visit". Not applied live.
+
 ## Places & programs · review record, pending change, program services — the database half (10 October 2026)
 
 Merged to `main` by the merge desk, 10 October, from `claude/places-programs-submissions-and-services`
