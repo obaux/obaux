@@ -33,7 +33,7 @@ import { usePlaceStatus, weekLines } from '@/lib/usePlaceStatus';
 import { useRoleView } from '@/lib/useViewedRole';
 import { RoleSwitchControl } from '../RoleSwitchControl';
 import { sharePlace } from '@/lib/sharePlace';
-import { usePolicies } from '@/lib/usePolicies';
+import { usePlacePolicies } from '@/lib/usePlacePolicies';
 import { useMySignatures } from '@/lib/useMySignatures';
 import { PolicyStatusCard } from '@pam/ui/PolicyStatusCard';
 import { countdown } from '@/lib/when';
@@ -45,7 +45,6 @@ import { cancelSavedOrLocalTrip } from '@/lib/savedTrips';
 import { navigate } from '@/lib/navigate';
 import { ConfirmDialog } from '../../screens/ConfirmDialog';
 import { Banner } from '@astryxdesign/core/Banner';
-import { placeAsksForPolicies } from '@pam/config/dummy-policies';
 import { policiesHref } from '../../screens/MemberPoliciesView';
 import { StaffBadge } from '@pam/ui/StaffBadge';
 import { programStaffFor } from '@pam/config/dummy-connections';
@@ -233,7 +232,7 @@ function PlaceScreen() {
   const { isSaved, save, unsave } = useSavedPlaces(signedIn, demoRole);
 
   const place = state.status === 'ready' ? state.place : null;
-  const { policies } = usePolicies();
+  const { forPlace: policiesAt } = usePlacePolicies();
   const { progress } = useMySignatures();
   const { forPlace } = useServices();
   // A visit booked here — from Trips, or anywhere — brings the policies up
@@ -367,10 +366,11 @@ function PlaceScreen() {
   };
   // The program's policies, for a member (D-270, D-271).
   const asksMember =
-    (demoRole ?? trueRole) === 'member' && placeAsksForPolicies(place!.id) && policies.length > 0;
+    (demoRole ?? trueRole) === 'member' && policiesAt(place!.id).asks;
   // Counted for the visit's or picked service once there is one (D-313).
   const servicesHere = forPlace(place!.id);
   const activeForPolicies = servicesHere.find((s) => s.id === (visit ? visit.serviceId : pickedService)) ?? null;
+  const policies = policiesAt(place!.id).policies;
   const signedSoFar = progress(place!.id, activeForPolicies ? policiesForService(activeForPolicies, policies, servicesHere) : policies);
   const allSigned = signedSoFar.signed === signedSoFar.total;
   // With a visit booked here (or arriving from Trips), the policies come up

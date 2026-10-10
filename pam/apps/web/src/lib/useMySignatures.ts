@@ -1,7 +1,9 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useSyncExternalStore } from 'react';
 import { placeAsksForPolicies, type DummyPolicy } from '@pam/config/dummy-policies';
+import { asksForSavedTrips, isSavedPlace } from './savedTrips';
+import { useSession } from './useSession';
 
 /**
  * A member's own signatures on programs' policies (D-270).
@@ -68,6 +70,88 @@ function entry(value: Signed | string | undefined): Signed | null {
   return typeof value === 'string' ? { at: value, image: null } : value;
 }
 
+/*
+ * A member's real signatures (D-485, migration 20261010145337): on a policy a
+ * program keeps in the database (its id is a uuid) a signature is a row only the
+ * member reads, and the saved picture is theirs, kept with the account. The
+ * example policies keep to the tab, below, as before. Signing here is optimistic:
+ * it shows at once and is written; if the database refuses, it is taken back.
+ */
+interface RealSigned {
+  readonly at: string;
+  readonly image: string | null;
+}
+const rs: { userId: string | null; signed: Readonly<Record<string, RealSigned>>; saved: string | null } = {
+  userId: null,
+  signed: {},
+  saved: null,
+};
+let rsView = { ...rs };
+const rsListeners = new Set<() => void>();
+const rsPublish = () => {
+  rsView = { ...rs };
+  rsListeners.forEach((listener) => listener());
+};
+const rsSubscribe = (listener: () => void) => {
+  rsListeners.add(listener);
+  return () => {
+    rsListeners.delete(listener);
+  };
+};
+
+async function rsLoad(userId: string): Promise<void> {
+  rs.userId = userId;
+  try {
+    const { createClient } = await import('./supabase');
+    const supabase = createClient();
+    const [signed, saved] = await Promise.all([
+      supabase.from('policy_signatures').select('policy_id, signed_at, image'),
+      supabase.from('member_signatures').select('image').maybeSingle(),
+    ]);
+    if (signed.error) throw signed.error;
+    rs.signed = Object.fromEntries(
+      ((signed.data ?? []) as { policy_id: string; signed_at: string; image: string }[]).map((row) => [
+        row.policy_id,
+        { at: row.signed_at, image: row.image },
+      ]),
+    );
+    rs.saved = (saved.data as { image: string } | null)?.image ?? null;
+  } catch {
+    // Nothing signed that we can see; the screens ask for signatures again, which is safe.
+  }
+  rsPublish();
+}
+
+async function rsSign(policyId: string, image: string | null): Promise<void> {
+  const before = rs.signed[policyId];
+  rs.signed = { ...rs.signed, [policyId]: { at: new Date().toISOString(), image: image ?? rs.saved } };
+  if (image) rs.saved = image;
+  rsPublish();
+  try {
+    const { createClient } = await import('./supabase');
+    const { error } = await createClient().rpc('sign_policy', { p_policy_id: policyId, ...(image ? { p_image: image } : {}) });
+    if (error) throw error;
+  } catch {
+    // Not recorded: take it back rather than show a signature that is not there.
+    const next = { ...rs.signed };
+    if (before) next[policyId] = before;
+    else delete next[policyId];
+    rs.signed = next;
+    rsPublish();
+  }
+}
+
+async function rsForget(): Promise<void> {
+  rs.saved = null;
+  rsPublish();
+  try {
+    const { createClient } = await import('./supabase');
+    await createClient().rpc('forget_my_signature');
+  } catch {
+    // The saved picture stays on the account; harmless.
+  }
+}
+
 export function useMySignatures(): {
   readonly signature: string | null;
   readonly signedAt: (placeId: string, policyId: string) => string | null;
@@ -80,6 +164,16 @@ export function useMySignatures(): {
   readonly forgetSignature: () => void;
 } {
   const [kept, setKept] = useState<Kept>(EMPTY);
+  const { state: session } = useSession();
+  const userId = asksForSavedTrips(session);
+  const realNow = useSyncExternalStore(
+    rsSubscribe,
+    () => rsView,
+    () => rsView,
+  );
+  useEffect(() => {
+    if (userId !== null && rs.userId !== userId) void rsLoad(userId);
+  }, [userId]);
 
   useEffect(() => {
     const sync = () => setKept(read());
@@ -89,30 +183,45 @@ export function useMySignatures(): {
   }, []);
 
   const signedAt = useCallback(
-    (placeId: string, policyId: string) => entry(kept.signed[`${placeId}:${policyId}`])?.at ?? null,
-    [kept],
+    (placeId: string, policyId: string) =>
+      isSavedPlace(policyId)
+        ? (realNow.signed[policyId]?.at ?? null)
+        : (entry(kept.signed[`${placeId}:${policyId}`])?.at ?? null),
+    [kept, realNow],
   );
 
   const signedWith = useCallback(
     (placeId: string, policyId: string) => {
+      if (isSavedPlace(policyId)) {
+        const found = realNow.signed[policyId];
+        return found ? (found.image ?? realNow.saved) : null;
+      }
       const found = entry(kept.signed[`${placeId}:${policyId}`]);
       return found ? (found.image ?? kept.signature) : null;
     },
-    [kept],
+    [kept, realNow],
   );
 
   const progress = useCallback(
     (placeId: string, policies: readonly DummyPolicy[]): PolicyProgress => {
+      // A real place asks for what its program put in the database; the caller passed those.
+      if (isSavedPlace(placeId)) {
+        return { total: policies.length, signed: policies.filter((p) => realNow.signed[p.id]).length };
+      }
       if (!placeAsksForPolicies(placeId)) return { total: 0, signed: 0 };
       return {
         total: policies.length,
         signed: policies.filter((p) => kept.signed[`${placeId}:${p.id}`]).length,
       };
     },
-    [kept],
+    [kept, realNow],
   );
 
   const sign = useCallback((placeId: string, policyId: string, signature?: string) => {
+    if (isSavedPlace(policyId)) {
+      void rsSign(policyId, signature ?? null);
+      return;
+    }
     const now = read();
     const image = signature ?? now.signature;
     write({
@@ -122,6 +231,14 @@ export function useMySignatures(): {
   }, []);
 
   const unsign = useCallback((placeId: string, policyId: string) => {
+    if (isSavedPlace(policyId)) {
+      // A record is not taken back: the screen draws a new signature, and signing again replaces this one.
+      const next = { ...rs.signed };
+      delete next[policyId];
+      rs.signed = next;
+      rsPublish();
+      return;
+    }
     const now = read();
     const signed = { ...now.signed };
     delete signed[`${placeId}:${policyId}`];
@@ -130,7 +247,8 @@ export function useMySignatures(): {
 
   const forgetSignature = useCallback(() => {
     write({ ...read(), signature: null });
+    void rsForget();
   }, []);
 
-  return { signature: kept.signature, signedAt, signedWith, progress, sign, unsign, forgetSignature };
+  return { signature: userId !== null && realNow.userId === userId ? realNow.saved : kept.signature, signedAt, signedWith, progress, sign, unsign, forgetSignature };
 }
