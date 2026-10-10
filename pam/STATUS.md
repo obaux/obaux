@@ -1904,6 +1904,12 @@ live project (it went live on 20 September — "What needs a human" row 24), and
 either session's migrations deployed — see the drift note under "What is
 live" and the "Live RLS fingerprint" row under "What is proven."
 
+## Places & programs · policies, part 4 of 4: only for this service (10 October 2026) — merged 10 October
+
+Merged by the merge desk from 803b80b. Live: Will pasted the migration in the SQL editor (10 October, 19:14; the connector's apply_migration timed out four times); `set_policy_services` and `add_policy` match the file by md5, `program_policy_services` has RLS forced, one select policy, select-only for signed-in users; recorded in the ledger as 20261010151302.
+
+Branch `claude/places-programs-policies-p4` (D-485). Migration `20261010151302`, expand only: `program_policy_services`, `set_policy_services`, `add_policy` keeps scope on a new version. The service editor now loads real services and saves the ticks. Test `49_a_policy_can_be_for_some_services_only_and_a_new_test.sql`.
+
 ## Places & programs · approving a request from someone who is already a member (10 October 2026) — merged 10 October
 
 Merged by the merge desk from b4534267 (713584b). Live: applied as 20261010171050; `review_staff_request`'s body matches the file by md5, search path pinned, anon cannot run it. The one waiting request (a program-lead request from someone who is now a member, the only city) can be approved; Will asked to tap Approve again (card a34).
