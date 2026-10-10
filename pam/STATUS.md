@@ -990,6 +990,24 @@ is sent; the four alert texts are drafts, unsigned. A STOP shows as "Texts are o
 a STOP yet (no Twilio receiver) and nothing queues the appointment reminders, the check-in or
 "someone wants to connect". Samples file: nine texts. D-453.
 
+## Design system & Storybook · language tag (10 October)
+
+Branch `claude/pam-design-language-tag`. Job from Will via Mira: a short English tag before a
+language's own name, so a person can see which language a row is before they can read it (D-451).
+
+- **`@pam/ui`:** `MenuItem` takes `tag?`, `lang?`, `valueTag?`; a `ChoiceChips` option takes `tag?` and
+  `lang?`. All optional; a row or chip without them draws exactly what it drew (checked against a
+  snapshot recorded from `main`).
+- **The tag** is a 43px cell (3.6em, the widest of EN, ES, PT-BR, ZH-CN, ZH-HK, RU, AR plus slack),
+  quiet, left to right, `aria-hidden`, at the start of the row (the right in Arabic). `lang` goes on a
+  span round a row's label and on the button of a chip, so a screen reader speaks the name in its own
+  voice. `valueTag` is the same tag at its natural width, before a row's value.
+- **Nothing uses it yet**; Lena's Language list, sign-up and Profile will. Stories: Components ›
+  Navigation › MenuList (Language tags, Arabic, Spanish, Value tag) and Inputs › ChoiceChips (new).
+- Verified: 116 UI tests, 48 web tests, typecheck, Storybook build, and the full fit audit on the merged
+  tree (471 stories × 7 languages: 26 new in a language, all 26 accepted, 0 not). Not run: the
+  Playwright browser suite, which is what measures the tag's colour contrast.
+
 ## Design system & Storybook · area chip, fit audit (10 October) — merged 10 October
 
 Branch `claude/pam-design-areachip-long-address`, merged to `main` on 10 October; D-448 confirmed by Mira. Job: Will asked for the
