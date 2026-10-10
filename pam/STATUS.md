@@ -1240,6 +1240,13 @@ recorded once `sms-inbound` is deployed (D-460); nothing queues the check-in or 
 connect" yet. Samples file: nine texts. D-453. Text reminders' staff list (merged 10 October) names
 only the alert texts Will signed: no "introduced to your program", no "your account changes".
 
+## Design system & Storybook · Points badge names (10 October) — merged 10 October
+
+Merged to `main` by the merge desk, 10 October, from `claude/pam-design-badge-names` (8c859ef). Badge names on the Points screen wrap instead of being
+trimmed with an ellipsis (Mira's call; four columns kept). Eight pseudo entries leave `fit-known.json`; the
+three English ones were never in it. Not seen: a syllable hyphen on a real phone (headless Chromium has no
+dictionaries).
+
 ## Design system & Storybook · live app shell (10 October)
 
 Merged to `main` by the merge desk, 10 October, from `claude/pam-design-app-shell` (6318b48); live after the next production deploy. The redesigned tabs are the app (D-456): the role's tab bar
