@@ -161,7 +161,7 @@ const LANGUAGE_ROWS = [
 ].map((row) => ({ ...row, onSelect: () => undefined, icon: GLOBE }));
 
 /**
- * A short tag before a row's words (`tag`, D-449): "EN", "PT-BR", "AR" before a
+ * A short tag before a row's words (`tag`, D-451): "EN", "PT-BR", "AR" before a
  * language's own name, so a person can see which language a row is before they
  * can read it. Always English, always left to right, in a cell as wide as the
  * widest tag so the names line up, quieter than the words, and hidden from a

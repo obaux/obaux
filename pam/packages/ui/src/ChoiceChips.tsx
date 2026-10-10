@@ -14,7 +14,7 @@ import { TaggedWords, langAttributes } from './OptionTag.js';
  * Each is a 48px button with `aria-pressed`; the group carries the question.
  *
  * An option may carry a `tag` ("EN", "PT-BR": a language's short name, always
- * in English, before its words, D-449) and the `lang` its label is written in.
+ * in English, before its words, D-451) and the `lang` its label is written in.
  * `lang` goes on the button itself, because Astryx names a button from its
  * `label` as an `aria-label` once it has children, and an `aria-label` takes
  * the language of the element it is on.

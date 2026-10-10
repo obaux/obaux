@@ -12,7 +12,7 @@ import { SUPPORTED_LOCALES, directionOf, type Locale } from '@pam/config';
  * Four things hold whatever the tag says:
  *
  * - **A fixed-width cell**, so the names in one list start at the same place
- *   (D-449). It is sized in `em`, so it follows the text size, for the widest
+ *   (D-451). It is sized in `em`, so it follows the text size, for the widest
  *   tag Pam has: PT-BR, ZH-CN and ZH-HK.
  * - **Quieter than the words**: small, in the supporting text colour.
  * - **Left to right, and a box of its own** (a `<bdi dir="ltr">`, which

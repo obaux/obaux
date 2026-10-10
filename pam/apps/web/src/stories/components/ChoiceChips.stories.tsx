@@ -8,7 +8,7 @@ import { ChoiceChips } from '@pam/ui/ChoiceChips';
  * secondary green, the rest white with a grey edge. Each is a 48px button with
  * `aria-pressed`; the group carries the question.
  *
- * An option may carry a `tag` and the `lang` its label is written in (D-449):
+ * An option may carry a `tag` and the `lang` its label is written in (D-451):
  * the tag is a short English name before the words ("EN", "PT-BR"), hidden from
  * a screen reader; `lang` makes the label speak in its own voice.
  */

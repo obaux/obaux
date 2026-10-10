@@ -54,7 +54,7 @@ export interface MenuItem {
   readonly isDescriptionOneLine?: boolean;
   /**
    * A short tag before the label, in a cell of its own: "EN", "PT-BR", "AR"
-   * before a language's own name (Will, 10 October 2026, D-449). Always English,
+   * before a language's own name (Will, 10 October 2026, D-451). Always English,
    * always left to right, hidden from a screen reader: the row's name stays its
    * label. Rows in one list line up whatever their tag.
    */
