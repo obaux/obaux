@@ -81,5 +81,23 @@
     "out": "texts-from-pam/texts-off.png",
     "name": "Text reminders, texts are off",
     "height": 330
+  },
+  {
+    "id": "member-created--place-profile",
+    "out": "planning-a-visit/pick-a-service.png",
+    "name": "A place that lists services: Pick a service, and the Plan a trip button"
+  },
+  {
+    "id": "member-created--place-visit",
+    "out": "planning-a-visit/your-next-visit.png",
+    "height": 600,
+    "name": "A place with a visit coming up: Your next visit, Change appointment, Cancel this visit"
+  },
+  {
+    "id": "member-created--place-visit",
+    "out": "planning-a-visit/cancel.png",
+    "click": "Cancel this visit",
+    "height": 600,
+    "name": "The cancel box: Yes, cancel it / Keep my visit"
   }
 ]

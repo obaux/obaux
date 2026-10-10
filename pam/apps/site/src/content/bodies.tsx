@@ -6,6 +6,7 @@ import { JoiningPam } from './JoiningPam';
 import { MessagesInPam } from './MessagesInPam';
 import { OnePhoneTwoSides } from './OnePhoneTwoSides';
 import { PamWords } from './PamWords';
+import { PlanningAVisit } from './PlanningAVisit';
 import { PointsAndBadges } from './PointsAndBadges';
 import { SendingAnInvite } from './SendingAnInvite';
 import { StaffRequests } from './StaffRequests';
@@ -25,6 +26,7 @@ export const BODIES: Record<string, () => JSX.Element> = {
   'keeping-your-listing-up-to-date': KeepingYourListing,
   'who-is-my-guide': WhoIsMyGuide,
   'texts-from-pam': TextsFromPam,
+  'planning-a-visit': PlanningAVisit,
   'what-others-can-see': WhatOthersCanSee,
   'joining-pam': JoiningPam,
   'joining-as-staff': JoiningAsStaff,
