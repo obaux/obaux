@@ -13,6 +13,16 @@ of them, and each reporting back to you."
 `docs/lanes.md` has the lanes, the numbering, the records and the database rules.
 This page is how the sessions talk to each other.
 
+## What Pam is for
+
+Will, 10 October 2026: "Pam is an app that conveniently messages people to make it easy
+to help them access and get reminded about services. Your job is to bring this vision
+to life."
+
+Every job is weighed against that sentence. A message that should arrive and doesn't,
+a reminder that can't be sent, or a screen that promises a text nobody sends works
+against it, so those come first.
+
 ## Who's who
 
 Will, 10 October: "give each session a nickname, short and easy to remember, with a
