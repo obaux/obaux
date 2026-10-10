@@ -46,9 +46,23 @@ invites* would both edit the invite screens, the same migrations and the same
 STATUS section. If a lane has two jobs queued, the second starts after the
 first has merged, from the new main.
 
-The merge desk is "PAM Agent 1" (`session_018wn7LF7RMsHnXSAzvk6s1p`), Will's
-long-running coordinating session. It does not build features. It merges what
+The merge desk is "PAM · Merge desk (Agent 1)" (`session_018wn7LF7RMsHnXSAzvk6s1p`),
+Will's long-running coordinating session. It does not build features. It merges what
 Will approves, applies migrations, cuts releases and keeps this page true.
+
+Builders never push to `main`, merge or close a pull request, or apply a migration
+to the live project; only the merge desk does, in the order Will gives in its chat.
+
+**Before the merge desk merges**, every check on the head has finished and is green.
+`PAM Language fit` runs only on pull requests and takes about an hour; a branch with
+no pull request gets the same measurement on the merged tree
+(`node scripts/audit-language-fit.mjs --locales en,ru,ar,zh-CN,pseudo --known
+scripts/fit-known.json` in `apps/web`, after `build-storybook`). A red check is
+traced before anything merges: a defect the branch brought goes back to its lane,
+one already on `main` goes to Will, and neither is added to `fit-known.json`
+without a reason somebody looked at. A line a branch leaves for the merge ("At
+merge: …" in its STATUS section) is done in the merge itself. (Added 10 October,
+after the languages and Arabic merges went in with the fit check unread.)
 
 ### Starting a session
 
@@ -66,8 +80,12 @@ Will approves, applies migrations, cuts releases and keeps this page true.
 2. Write the records as files (below). Edit only **your lane's section** of
    `STATUS.md`; never reformat or reorder the rest.
 3. Tell Will it is ready, in one line: what it is, whether a migration has to be
-   applied first, and which lane's branches it touches. Merge desk merges, in the
-   order Will says. After a merge, every other open branch merges main.
+   applied first, and which lane's branches it touches. Send the same line to the
+   merge desk (`send_message` to `session_018wn7LF7RMsHnXSAzvk6s1p`) with the
+   branch, its head commit and each check's result. From then the branch is
+   frozen: a later push needs a new note with the new head. Merge desk merges, in
+   the order Will says. After a merge, every other open branch merges main, and
+   the merged branch takes no more work; the next job starts a new branch.
 
 ### How long a branch lives
 
