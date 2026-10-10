@@ -1,9 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { DUMMY_MEMBERS, DUMMY_EVERYONE, DUMMY_INTERESTED } from '@pam/config/dummy-people';
-import { dummyConversationsFor } from '@pam/config/dummy-conversations';
-import { rankPeople } from '@pam/config/people-activity';
+import { exampleRankedPeople } from '@/lib/exampleRankedPeople';
 import { HomePeopleSection } from './HomePeopleSection';
 
 /**
@@ -36,31 +34,8 @@ import { HomePeopleSection } from './HomePeopleSection';
  * see it, so nobody else's first load should carry its weight.
  */
 
-const PEOPLE = {
-  admin: DUMMY_MEMBERS,
-  super_admin: DUMMY_EVERYONE.slice(0, 6),
-  provider: DUMMY_INTERESTED.map((interest) => interest.person),
-} as const;
-
 export function HomePeoplePreview({ role }: { readonly role: 'admin' | 'super_admin' | 'provider' }) {
-  const ranked = useMemo(() => {
-    const unreadBy = new Map<string, { at: string; conversationId: string }>();
-    if (role !== 'super_admin') {
-      for (const c of dummyConversationsFor(role)) {
-        if (c.unread && c.lastMessageAt) unreadBy.set(c.otherId, { at: c.lastMessageAt, conversationId: c.id });
-      }
-    }
-    return rankPeople(
-      PEOPLE[role].map((person) => ({
-        id: person.id,
-        firstName: person.firstName,
-        conversationId: unreadBy.get(person.id)?.conversationId ?? null,
-        lastSavedAt: person.lastSavedAt ?? null,
-      })),
-      (p) => ({ unreadAt: unreadBy.get(p.id)?.at ?? null, lastSavedAt: p.lastSavedAt }),
-      null,
-    );
-  }, [role]);
+  const ranked = useMemo(() => exampleRankedPeople(role), [role]);
 
   return <HomePeopleSection role={role} ranked={ranked} isExample />;
 }
