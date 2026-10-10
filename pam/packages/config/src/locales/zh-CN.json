@@ -1006,6 +1006,8 @@
   "book.wrote": "发来消息：{when}",
   "trips.booked.texted": "{place}，{day} {time}。Pam已给{name}发了短信，附有查看的链接。",
   "trips.booked.sms": "短信内容：“Pam：{place}已为您预约{day} {time}。点按在Pam中查看：{link}”",
+  "trips.booked.example.title": "为 {name} 预约的示例",
+  "trips.booked.example.body": "{place}，{day} {time}。这只是一个示例：没有向项目预订任何内容，也没有给任何人发短信。",
   "join.booked.title": "您的预约已安排好",
   "join.booked.body": "{place}，{day} {time}。出发前Pam会提醒您。",
   "join.booked.action": "查看地点",
