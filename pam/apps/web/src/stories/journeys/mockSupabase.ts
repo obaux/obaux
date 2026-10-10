@@ -60,6 +60,8 @@ const PROJECT_REF = new URL(SUPABASE_URL).hostname.split('.')[0];
 
 /** What a story can change about the pretend account. */
 export interface MockOptions {
+  /** A case manager or program lead with nobody on their list yet (D-486): no caseload, nobody to message, nothing saved. */
+  readonly noPeople?: boolean;
   /** A limited account (0031): reads, but the database refuses a send (D-427). */
   readonly limited?: boolean;
   /** The person replied STOP: stored, and nothing in the app can undo it (D-453). */
@@ -449,7 +451,7 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
         : null,
     on('/rest/v1/profiles', (url) =>
       url.includes('role=eq.member')
-        ? { body: CASELOAD }
+        ? { body: options.noPeople ? [] : CASELOAD }
         : profile
           ? {
               body: {
@@ -632,7 +634,7 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
     // rings above it (D-198) agrees with it (a member's and a super admin's own list is empty).
     on('/rpc/messageable_people', () => ({
       body:
-        role === 'admin' || role === 'provider'
+        (role === 'admin' || role === 'provider') && !options.noPeople
           ? CASELOAD.map((m) => ({ profile_id: m.id, first_name: m.first_name, role: 'member' }))
           : [],
     })),
@@ -641,7 +643,7 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
     // ring is on whenever the story is (D-198's "since you last looked" is kept per browser).
     on('/rpc/people_activity', () => ({
       body:
-        role === 'admin' || role === 'provider'
+        (role === 'admin' || role === 'provider') && !options.noPeople
           ? [{ profile_id: 'm2', last_saved_at: new Date(Date.now() + 60_000).toISOString() }]
           : [],
     })),

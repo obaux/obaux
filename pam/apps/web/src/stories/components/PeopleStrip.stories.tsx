@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/nextjs';
 import { Page } from '@pam/ui';
-import { PeopleStrip, type PeopleStripProps } from '@pam/ui/PeopleStrip';
+import { PeopleStrip, PeopleStripEmpty, type PeopleStripProps } from '@pam/ui/PeopleStrip';
 import { DUMMY_MEMBERS } from '@pam/config/dummy-people';
 import { useStoryText } from '../support/useStoryText';
 
@@ -76,3 +76,20 @@ export const LongNames: Story = {
 };
 
 export const Spanish: Story = { ...LongNames, globals: { locale: 'es' } };
+
+/**
+ * Nobody on the list yet (D-486): faint circles where people will appear, and a
+ * (+) first that starts an invite. The circles are decoration (hidden from a
+ * screen reader); the (+) is a link named "Invite someone".
+ */
+export const Empty: Story = {
+  render: () => <EmptyStrip />,
+};
+
+function EmptyStrip() {
+  const tr = useStoryText();
+  return <PeopleStripEmpty label={tr('admin.members.title')} inviteLabel={tr('profile.menu.invite')} inviteHref="#" />;
+}
+
+export const EmptyArabic: Story = { ...Empty, globals: { locale: 'ar' } };
+export const EmptyRussian: Story = { ...Empty, globals: { locale: 'ru' } };

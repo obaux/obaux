@@ -1108,6 +1108,13 @@ drops signatures), then `20261010042108_a_program_lead_submits_their_own_program
 
 ---
 
+## Messages & notifications · why the email service refused (10 October 2026) — merged 10 October
+
+Merged by the merge desk from 0068bcf; deployed with the D-488 bundle.
+
+Branch `claude/messages-email-error-detail`. `send-invite-emails` now keeps Resend's `name` and `message` (addresses and keys
+redacted, about 200 characters) in a failed row's `failure_reason`, instead of only the status. Needs a redeploy of the function.
+
 ## Messages & notifications · the expired-link address is deleted (10 October 2026) — merged 10 October
 
 Merged by the merge desk from 7a9b1d9. Live: applied as 20261010152709; the four function bodies match the file by md5 (purge, mark sent, claim, invites_log), the check constraint is in, `purge-invite-email-addresses` runs at 03:40 nightly; purge, mark and claim are service-role only. `send-invite-emails` redeployed from main with the D-488 bundle (see below).
@@ -1340,6 +1347,14 @@ is sent; the four alert texts are signed by Will (D-461). A STOP shows as "Texts
 recorded once `sms-inbound` is deployed (D-460); nothing queues the check-in or "someone wants to
 connect" yet. Samples file: nine texts. D-453. Text reminders' staff list (merged 10 October) names
 only the alert texts Will signed: no "introduced to your program", no "your account changes".
+
+## Design system & Storybook · staff Home is live (10 October)
+
+Branch `claude/pam-design-staff-home-live`. Case managers and program leads now land on the redesigned Home
+with D-198's rings in their own row; the old staff Home (`LegacyHome`, `HomePeople*`, `SavedStrip`) is gone and
+`/admin/` is the invite page again. With nobody on the list the row is faint circles with a (+) first, named
+"Invite someone", to each role's own invite flow. Accounts that just signed up see no example people (D-361),
+others keep the demo (D-172). No new strings. Fit: 8 languages incl. zh-HK, nothing new. D-486.
 
 ## Design system & Storybook · staff rings in Storybook (10 October) — merged 10 October
 
