@@ -60,6 +60,8 @@ export interface PeopleHomeViewProps {
   readonly empty: ReactNode;
   /** Under the list — "These are example people". */
   readonly note?: string | null;
+  /** Under the title and count, above the list: the row of people with something new (D-198). */
+  readonly strip?: ReactNode;
   /** After everything else on the page — a case manager's "What you can see". */
   readonly footer?: ReactNode;
   readonly actions?: ReactNode;
@@ -123,6 +125,7 @@ export function PeopleHomeView({
   state,
   empty,
   note,
+  strip,
   footer,
   actions,
   onRetry,
@@ -183,6 +186,8 @@ export function PeopleHomeView({
             </Text>
           ) : null}
         </VStack>
+
+        {!query.trim() ? strip : null}
 
         {state.status === 'loading' ? <PersonRowSkeletonList label={t('common.loading')} /> : null}
 
