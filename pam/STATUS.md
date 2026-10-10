@@ -960,6 +960,16 @@ under the header, which comes and goes; looked at in Russian and Arabic at 320px
 
 ---
 
+## Places & programs · no example policies for a real place (10 October) — on the branch, not merged
+
+D-313, on `claude/places-programs-no-example-policies` (Piper), from `main` at `3ddac79`.
+**Not on `main`; no migration.** A place from the catalogue (a uuid id) asks a member to sign
+nothing: `placeAsksForPolicies` says no, and the Trips list, which had bypassed it, goes through
+it. Example places keep the example policies (Storybook). **Not built:** real policies per program
+and per service; the leads' and staff's policy screens still show example data.
+
+---
+
 ## Places & programs · a live program's pending change (10 October) — merged 10 October
 
 D-447 and D-462, from `claude/places-programs-program-changes` (Piper, 24aad8b), merged to `main` by
