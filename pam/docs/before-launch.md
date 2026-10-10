@@ -386,14 +386,15 @@ Russian, Arabic (D-422); messages read in the reader's language (D-423).
   seen it — and whether an English value in the middle of a sentence reads better
   isolated or flowing with the sentence.
 
-- [ ] **The privacy page names the company that sends email (10 October, D-482, Will's a21).** The English is
-  Will's, word for word: "When Pam emails a case manager or a program, a company that sends email for us gets the
-  email address and the email. It may not use them for anything else." (`privacy.s.sharing.p4`). **It must be on the
-  live page before the first email goes out**: it ships with the next deploy, and the email sender stays off until
-  forwarding, a test and Will's go (D-450). Two things it does not cover are with Will: the expired-link email also
-  goes to a **member** who types their address (so the sentence should say "When Pam sends an email…"), and
-  `privacy.s.what-we-keep.p7` still ends "Members are never asked for an email", which is untrue on that page; the
-  proposed English for both is in D-482. Six translations by Claude; a promise, so the same native readers as below.
+- [ ] **The privacy page on email and signatures (10 October, D-482 and D-490, Will's a21 and a29).** Will's English, word
+  for word, pinned in `legal.test.ts`: "When Pam sends an email, a company that sends email for us gets the email address
+  and the email. It may not use them for anything else." (`privacy.s.sharing.p4`); the end of `privacy.s.what-we-keep.p7`
+  ("Members are asked for an email only if their invite link has run out and they want a new one by email. We use it only to
+  send that link, and delete it once it is sent."); and a new `privacy.s.what-we-keep.p8` ("If a program asks you to sign its
+  rules, we keep what you signed, the date, and your signature. Only you see your signature. The program sees only your first
+  name and the date."). **Must be on the live page before the first email goes out** (the email sender stays off until
+  forwarding, a test and Will's go, D-450). Six translations each by Claude, with no native reader: promises, so the same
+  native readers as below. The English says "rules" where the app says "policy"; the translations follow the app's word.
 
 - [ ] **A native reader for what D-465 reworded (10 October).** The last-day line on the
   transparency screen (`transparency.canSee.lastActive`), the privacy page's "What you can do"

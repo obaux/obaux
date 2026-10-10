@@ -50,7 +50,7 @@ export const PRIVACY: LegalDocument = {
   introKey: 'privacy.intro',
   updatedKey: 'privacy.updated',
   sections: [
-    section('privacy', 'what-we-keep', 7),
+    section('privacy', 'what-we-keep', 8),
     // The section that restates the transparency contract. Named in a test.
     section('privacy', 'who-can-see', 4),
     // D-414 — where members are told what limiting an account does (the
