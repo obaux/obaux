@@ -56,7 +56,7 @@ export function InviteReady({
   readonly onAnother: () => void;
   /** Inside a card already (the directory): the content without its own. */
   readonly isBare?: boolean;
-  /** Off on a page whose title already says it (D-442). */
+  /** Off on a page whose title already says it (D-444). */
   readonly hasHeading?: boolean;
 }) {
   const { t, locale } = useI18n();

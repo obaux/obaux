@@ -227,7 +227,7 @@ export default function DirectoryPage() {
 
       {/*
         Bringing somebody in, and deciding who may come in as staff (0054),
-        are pages of their own, the way Profile reaches them (D-442, Will, 10
+        are pages of their own, the way Profile reaches them (D-444, Will, 10
         October: "use the nested page method"). The card of buttons that made
         invites here is gone. The notification that a claim arrived only ever
         points at the second row, it is never a button on the notification

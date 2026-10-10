@@ -21,7 +21,7 @@ program, a case manager), where you pick the city and give their name and number
 had been failing from Profile because no city was asked for. Requests are a list; tap
 one to read it, text them, pick the city and approve or deny from the bottom of the
 screen. Everyone no longer carries a card of invite buttons. Lists of rows across the
-app now start at the page edge, in line with the title above them (D-442).
+app now start at the page edge, in line with the title above them (D-444).
 
 ## [0.51.0] — 2026-10-09 · Pam speaks seven languages
 

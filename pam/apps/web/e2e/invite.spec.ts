@@ -4,7 +4,7 @@ import { settled } from './settled';
 
 /**
  * Inviting somebody and deciding who may be staff, on pages of their own
- * (D-442): a list of kinds → one page per kind; a list of requests → one page
+ * (D-444): a list of kinds → one page per kind; a list of requests → one page
  * per request, with the decision pinned to the foot.
  *
  * Supabase is unreachable here, so the session and the queries are stubbed at
@@ -68,7 +68,7 @@ const CITIES = [
   { id: PITTSBURGH, name: 'Pittsburgh' },
 ];
 
-test.describe('inviting somebody, on a page of its own (D-442)', () => {
+test.describe('inviting somebody, on a page of its own (D-444)', () => {
   test('the list of kinds leads to one page per kind, and the city is the super admin\'s to pick', async ({ page }) => {
     await signedInAs(page, 'super_admin', CITIES);
     const asked: Record<string, unknown>[] = [];
@@ -174,7 +174,7 @@ const REQUEST = {
   program_website: null,
 };
 
-test.describe('who may be staff, one request to a page (D-442)', () => {
+test.describe('who may be staff, one request to a page (D-444)', () => {
   test('a row opens the request; the decision is pinned to the foot and carries the city', async ({ page }) => {
     await signedInAs(page, 'super_admin', CITIES);
     await page.route(STAFF_REQUESTS, (route) => route.fulfill(json([REQUEST])));

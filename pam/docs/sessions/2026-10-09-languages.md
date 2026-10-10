@@ -420,7 +420,7 @@ Will: "If there are any other layouts not being used, please remove it. Or if an
 admin not using our latest templates, please replace and update… Super admins still use the
 old invite method with buttons… we should use the nested page method." An Explore agent read
 every route a super admin reaches and listed the unused code; I re-checked each candidate with
-grep before deleting and left some in on purpose (D-442 says which and why).
+grep before deleting and left some in on purpose (D-444 says which and why).
 
 - **Invites:** `/invite/new/?role=` (`InviteNewView`), rows on `/invite/`, Everyone's card gone.
   Reading `0077_invites_know_who.sql` against `InviteView` showed a super admin could never
@@ -437,4 +437,9 @@ grep before deleting and left some in on purpose (D-442 says which and why).
 - **Left alone because it is `CLAUDE.md`'s:** the `variant="compact"` line (Will's to correct).
 - **User-flow map:** `docs/user-flows/flows.mjs` updated (new invite and request pages, the
   Everyone rows); regenerate and publish with the `pam-user-flows` skill.
+- **Numbering, again.** I took D-442 from `main`'s "next free" while `affectionate-goldberg` had
+  already claimed D-442 and D-443 on its branch (it had moved to a files-per-claim scheme, so its
+  rows were not in the table I read). Mine is **D-444**; next free is D-445. Lesson recorded in
+  `docs/allocations.md`: when another branch's allocations file stops being a table, read its
+  `docs/decisions/` folder and `git grep "D-4"` on that branch before taking a number.
 

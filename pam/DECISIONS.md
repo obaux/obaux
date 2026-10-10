@@ -11622,7 +11622,7 @@ This amends D-224 and D-291, and finishes what D-326 began for the footer.
   with quick actions); Storybook builds and *PlaceDetail* shows the list and the footer
   button; the place and flag browser specs.
 
-### D-442 — Super admin screens on the latest templates: an invite is a page, a request is a page, and unused layouts are gone
+### D-444 — Super admin screens on the latest templates: an invite is a page, a request is a page, and unused layouts are gone
 
 **Date:** 2026-10-10. Will: "If there are any other layouts not being used, please remove
 it. Or if any in super admin not using our latest templates, please replace and update. I

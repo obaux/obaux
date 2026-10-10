@@ -161,7 +161,7 @@ test.describe('the way out', () => {
       );
     });
 
-    // From Everyone, two rows lead on (D-442): Invite someone, then the kind.
+    // From Everyone, two rows lead on (D-444): Invite someone, then the kind.
     await page.goto('/directory/');
     await page.getByRole('link', { name: 'Invite someone' }).click();
     await page.getByRole('link', { name: /^Invite a case manager/ }).click();

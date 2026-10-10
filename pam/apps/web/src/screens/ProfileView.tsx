@@ -172,7 +172,7 @@ export function ProfileView({
         // theirs is an alert when somebody needs them (Will, 3 October, D-256).
         // The person running Pam has neither: Text alerts and Reminders are
         // for the roles that get them, and /alerts/ would treat them as a
-        // member (D-442).
+        // member (D-444).
         <PromoCard
           title={t(role === 'admin' || role === 'provider' ? 'profile.promo.alerts.title' : 'profile.promo.reminders.title')}
           body={t(

@@ -15,7 +15,7 @@ import { HelpButton } from './HelpButton';
  * `/admin/` showed under the buttons are gone; Home is the list.
  *
  * Tapping a row goes to a page of its own for that kind (`/invite/new/`,
- * D-442): who it is for — first name and mobile number, both required
+ * D-444): who it is for — first name and mobile number, both required
  * (D-373) — then the invite (`create_invite`) shown as a link to send
  * (`InviteReady`, D-254). A case manager, a program lead (0070, D-219 —
  * Will, 2 October) and the super admin can all make codes; a member a

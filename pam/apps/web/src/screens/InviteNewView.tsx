@@ -19,7 +19,7 @@ import { InviteForWho, type InviteWho } from './InviteForWho';
 import { InviteReady } from './InviteReady';
 
 /**
- * One invite, on a page of its own (D-442, Will, 10 October: "use the nested
+ * One invite, on a page of its own (D-444, Will, 10 October: "use the nested
  * page method"). Invite someone (`/invite/`) is a list of the kinds of invite;
  * each row comes here, the way "Add a person" goes to its own page
  * (`/program/book/new/`). The page's title says which kind, so the form
