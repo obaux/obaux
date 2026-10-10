@@ -37,7 +37,7 @@ None: a review of drafts.
 
 On `f015d05` (main `2aa5801` plus this): `@pam/config` 1060 tests, `copy:status` in step, the browser suite on all three viewports **1011 passed, 18 skipped** (11.9 min), Storybook builds, the fit audit
 (7 languages and the pseudo-language) on the 11 stories with "review" in their id: **0 new**; on the 5 with "booked": 1 new, **already accepted**. The example-booking end screen needs a booking made first, so
-the static audit does not draw it; its two lines are short and the longest (Russian) is a third shorter than the review queue's longest line, which fits.
+the static audit does not draw it and **I did not measure it**: its body is 50 to 118 characters (pt-BR longest), about the length of `trips.booked.texted` on the same success screen, which wraps.
 
 ## Left undone
 
