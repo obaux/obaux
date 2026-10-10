@@ -1101,6 +1101,13 @@ drops signatures), then `20261010042108_a_program_lead_submits_their_own_program
 
 ---
 
+## Messages & notifications · the clocks send the shared secret (10 October 2026)
+
+Branch `claude/messages-invite-email-clock`. One migration (`20261010144844_…`, **not yet applied to the live
+project**): the vault secret `dispatch_secret` (made in the database), `dispatch-sms` rescheduled with the
+`x-dispatch-secret` header, `send-invite-emails` scheduled every five minutes. This removes the DISPATCH_SECRET trap:
+clock header first, then the function secret. Will's dashboard steps are in `docs/email-setup.md`. D-484.
+
 ## Messages & notifications · texts held until the day (10 October 2026) — merged 10 October
 
 Merged to `main` by the merge desk, 10 October, from `claude/messages-alert-texts-wired` (0a011ee). Migration `20261010141859_…` (**applied live at merge**, before the night's deploy, recorded as 20261010142604; read back: body identical to the file, service role only, `texts_live` reads off):
@@ -1259,6 +1266,10 @@ Merged to `main` by the merge desk, 10 October, from `claude/places-programs-boo
 
 Merged to `main` by the merge desk, 10 October, from `claude/places-programs-lead-reads-review`. Migration `20261010135742` (`resend_program_submission`), expand only, **applied live at merge** (recorded as 20261010140904), read back: body identical to the file, for authenticated (checks inside for the program's own lead). With part 6 live too, "Ask for changes" is safe to use. Test `43_a_lead_sends_the_program_again_test.sql` (numbered 42 on its branch; Nico's alerts test took 42 first). Edit and send again resends the same submission; a program being checked is corrected through it. Land after part 6.
 
+## Places & programs · policies, part 1 of 4: a lead's real policies (10 October 2026) — READY, not merged
+
+Branch `claude/places-programs-policies-p1` (D-485, Will's card a25). Migration `20261010144052`, expand only: `program_policies`, `program_policy_files`, `add_policy`, `archive_policy`, the private `policies` bucket. A lead adds, opens, replaces and removes real policies; members see nothing new until signing (part 2). Test `45_a_program_s_policies_are_private_to_its_lead_and_test.sql`.
+
 ## Places & programs · review record, pending change, program services — the database half (10 October 2026)
 
 Merged to `main` by the merge desk, 10 October, from `claude/places-programs-submissions-and-services`
@@ -1402,15 +1413,17 @@ phone and 320px: 70 scans, 0 problems on 10 October); screenshots from `scripts/
 user-flow map: it is not a screen of the app. Session logs: `docs/sessions/2026-10-09-a-public-website.md`,
 `2026-10-10-0423-…`, `2026-10-10-0631-…`, `2026-10-10-0807-website-help-posts.md`.
 
-**About Pam, in seven languages (D-466, 10 October; on `main`, held until Will signs).** One post at
+**About Pam, in seven languages (D-466, 10 October; English signed, D-483).** One post at
 `/<lang>/about-pam/` in English, Spanish, Brazilian Portuguese, Simplified and Traditional (Hong Kong)
 Chinese, Russian and Arabic: own `<html lang>` (Arabic `dir="rtl"`), a language list, `hreflang`,
 `x-default` English; not under a Support topic; one wordless illustration (header + 1200×630 share
-image, alt text in all seven; `social/about-art.mjs`); and a section on the home page. **Nothing is
-live until Will signs the English**: `apps/site/src/content/signed-off.json` is empty, so the pages
-and the home section are not built (a normal build has neither; CI also builds with
-`PAM_SITE_DRAFTS=1` and runs axe on all seven). The other six are drafts with no native reader (D-461).
+image, alt text in all seven; `social/about-art.mjs`); and a section on the home page. **Will signed the
+English on 10 October 2026, after the "human-touch company" line was taken out ("human-touch" is an internal
+principle, never public copy; D-483)**: `/en/about-pam/` and the home section are live with the deploy
+(`apps/site/src/content/signed-off.json` has `"en"`). The other six are drafts with no native reader (D-461),
+built only in a preview (`PAM_SITE_DRAFTS=1`; CI runs axe on all seven).
 Storybook › Website › Journey: **About Pam** per language (Draft banner) and **Home with About Pam**.
+**Signing a program's rules (10 October, draft, not live).** A post for members and programs in seven languages (English: Support post `signing-a-programs-rules`; the other six at `/<lang>/program-rules/`); says only what Pam will do once Piper's signing screens ship. Hidden until `program-rules-live` and the language are set in `signed-off.json`; Storybook › Website › Journey › Program rules ×7. One sentence ("What your signature means") goes to a lawyer before launch.
 Reminder texts are plainly "coming"; the home card "Keep going" now says the same and reads `VISIT_REMINDERS_LIVE` (`content/flags.ts`, 10 October).
 
 ## Seven languages, messages in your own language, and text that fits (9 October) — 0.50.1 and 0.51.0, merged 9 October (PR #29)

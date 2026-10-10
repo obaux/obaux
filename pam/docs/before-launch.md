@@ -59,13 +59,11 @@ STATUS row too.
   (its "last day you used Pam" row now says No for a program, D-465; it returns to Yes when
   the database hands a program that day and the app's line says so again). The hidden draft "Staff requests" is published only if a way to ask to be staff
   comes back (D-369).
-- [ ] **Public site: Will signs "About Pam" (D-466, 10 October 2026).** English first: read
-  `apps/site/src/content/about.ts`, then put `"en"` in `apps/site/src/content/signed-off.json`
-  (`{"about-pam": ["en"]}`) — that builds `/en/about-pam/` and shows the home section. The other
-  six are drafts with no native reader (D-461): add each code to the same file only once someone
-  who reads it has been over it. The home card that promised reminders is fixed (10 October, it now reads `VISIT_REMINDERS_LIVE`).
-  When visit reminders go live, flip `VISIT_REMINDERS_LIVE` in `TextsFromPam.tsx` and rewrite
-  the "What is coming" paragraph in all seven.
+- [x] **Public site: Will signs "About Pam" (D-466, 10 October 2026): the English is signed (D-483, 10 October 2026,
+  after the "human-touch company" line was taken out; it is live with the deploy).** Still open: the other six languages
+  are drafts with no native reader (D-461): add each code to `apps/site/src/content/signed-off.json` (`about-pam`) only once
+  someone who reads it has been over it. When visit reminders go live, flip `VISIT_REMINDERS_LIVE` in
+  `apps/site/src/content/flags.ts` and rewrite the "What is coming" paragraph in all seven languages.
 - [ ] **Public site: help posts after Dot's new app layout (D-456) and visit reminders** (10 October 2026).
   *Layout, done 10 October* on a branch from main `522c808`, for the layout that goes live with that night's
   deploy: Who is my guide and What others can see are reached from Profile → **Legal** → "What others can
@@ -88,6 +86,18 @@ STATUS row too.
   The app's own lines that promised a reminder are fixed (D-474, 10 October): the onboarding slide that said "Pam reminds you
   before you go", and the Trip-added and booked screens that said "We will remind you the day before". The app's side of this
   switch is the item *Visit reminders go live* just above.
+- [ ] **Public site: "Signing a program's rules" (10 October 2026, draft; Will: "create a post about this for
+  the public").** A member-and-program post in seven languages (`apps/site/src/content/rules.ts`; English is the
+  Support post `signing-a-programs-rules`, the other six are pages at `/<lang>/program-rules/`). It says only what
+  Pam WILL do once Piper's signing screens (card a25, P2) are real, so nothing is live: it needs BOTH
+  `"program-rules-live": true` in `apps/site/src/content/signed-off.json` (flip it the day members can really sign,
+  and check the post against the real screens: the labels "Policies to sign", "Sign", "Type my name instead",
+  "Policies for participants", that the signature is kept for the next policy, that a program sees only a first
+  name and a date, that a policy is not changed after signing and a new version asks again) AND the language in
+  its `"program-rules"` list (Will signs the English; the other six are drafts until a native reader has been over
+  them, D-461). Add pictures then, from main's Storybook. **A lawyer must read one sentence before launch, in all
+  seven languages:** "Your signature in Pam is a record that you read the policy and agreed to it. It is not a legal
+  signature." (section "What your signature means").
 - [ ] **Public site: publish the draft post "Keeping your program's listing up to
   date" only when the feature ships** (from PAM · Places & programs, 10 October
   2026, rule D-447, branch `claude/places-programs-load-own-program`, not on
@@ -281,6 +291,12 @@ STATUS row too.
   (STATUS row 2).
 
 ### Programs
+
+- [ ] **A lawyer reads what a signature in Pam means, and the upload disclaimer, before launch** (Will, 10 October 2026,
+  card a25: "Go for it", point 5). A signature in Pam is *a record that you read and agreed*, not a notarised or legal
+  signature; the sentence that says so (shown where someone signs, part 2) and the words next to a program's upload
+  (the program owns what its policies say; Pam only keeps them) need a lawyer's read. Add the final words in English
+  first, then the other six. Until then the signing screens must not promise more than "a record that you read and agreed".
 
 - [ ] **Load a program lead's own program** — *parts 1–3 are built on `claude/places-programs-load-own-program` (D-447, 10 October); live once it is merged and its two migrations are applied (0085 first). Parts 4–6 follow.* (Will, 7 October 2026: "still on
   backlog list for programs before production"; D-218's follow-up, D-352,

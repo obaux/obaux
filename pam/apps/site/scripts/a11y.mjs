@@ -38,8 +38,8 @@ const posts = readdirSync(join(out, 'support'), { withFileTypes: true })
   .map((d) => `/support/${d.name}/`);
 // Every language page that was built (a preview build: PAM_SITE_DRAFTS=1).
 const about = readdirSync(out, { withFileTypes: true })
-  .filter((d) => d.isDirectory() && existsSync(join(out, d.name, 'about-pam', 'index.html')))
-  .map((d) => `/${d.name}/about-pam/`);
+  .filter((d) => d.isDirectory())
+  .flatMap((d) => ['about-pam', 'program-rules'].filter((p) => existsSync(join(out, d.name, p, 'index.html'))).map((p) => `/${d.name}/${p}/`));
 const pages = ['/', '/support/', ...posts, ...about];
 const views = [
   { name: 'desktop light', viewport: { width: 1280, height: 900 }, colorScheme: 'light' },

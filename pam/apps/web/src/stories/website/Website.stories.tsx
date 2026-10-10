@@ -55,9 +55,8 @@ export const Post: StoryObj<{ slug: string }> = {
 };
 
 /**
- * The front page with the "About Pam" section, as it will look once Will signs the
- * English. The live site hides the section until then (`signed-off.json` in
- * `apps/site/src/content/signed-off.json`), so **Home** above is what is live today.
+ * The front page with the "About Pam" section. Will signed the English (D-483), so the live site shows it too and
+ * **Home** above is the same page; this story shows the section whatever `signed-off.json` says.
  */
 export const HomeWithAboutPam: Story = { render: () => <WebsiteWalker start="/" showAbout /> };
 
@@ -74,3 +73,17 @@ export const AboutPamChineseSimplified: Story = { render: () => <WebsiteWalker s
 export const AboutPamChineseTraditionalHongKong: Story = { render: () => <WebsiteWalker start="/zh-HK/about-pam/" /> };
 export const AboutPamRussian: Story = { render: () => <WebsiteWalker start="/ru/about-pam/" /> };
 export const AboutPamArabic: Story = { render: () => <WebsiteWalker start="/ar/about-pam/" /> };
+
+/**
+ * Signing a program's rules (members and programs), a draft until the signing screens are really in the app
+ * and Will signs the English. English is the Support post (also **Post** above, by its title); the other six have
+ * pages of their own, each with a Draft banner and a language list that links back to the English post. None is on
+ * the site (`apps/site/src/content/signed-off.json`).
+ */
+export const ProgramRulesEnglish: Story = { render: () => <WebsiteWalker start="/support/signing-a-programs-rules/" /> };
+export const ProgramRulesSpanish: Story = { render: () => <WebsiteWalker start="/es/program-rules/" /> };
+export const ProgramRulesPortugueseBrazil: Story = { render: () => <WebsiteWalker start="/pt-BR/program-rules/" /> };
+export const ProgramRulesChineseSimplified: Story = { render: () => <WebsiteWalker start="/zh-CN/program-rules/" /> };
+export const ProgramRulesChineseTraditionalHongKong: Story = { render: () => <WebsiteWalker start="/zh-HK/program-rules/" /> };
+export const ProgramRulesRussian: Story = { render: () => <WebsiteWalker start="/ru/program-rules/" /> };
+export const ProgramRulesArabic: Story = { render: () => <WebsiteWalker start="/ar/program-rules/" /> };

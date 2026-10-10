@@ -61,14 +61,23 @@ describe('About Pam, in seven languages', () => {
     expect(aboutPath('ar')).toBe('/ar/about-pam/');
   });
 
-  it('publishes nothing until a language is signed, and the home section follows English', () => {
+  it('has the English signed (D-483) and the other six still drafts, and the home section follows English', () => {
     const file = JSON.parse(readFileSync(join(__dirname, '..', 'src', 'content', 'signed-off.json'), 'utf8'));
     expect(SIGNED_OFF).toEqual(file['about-pam']);
     expect(builtLangs()).toEqual(ABOUT_LANGS.filter(isSignedOff));
     expect(ABOUT_ON_HOME).toBe(isSignedOff('en'));
-    // Today: Will has not signed the English, so nothing is live.
-    expect(SIGNED_OFF).toEqual([]);
-    expect(ABOUT_ON_HOME).toBe(false);
+    // Will signed the English on 10 October 2026; nothing else is signed.
+    expect(SIGNED_OFF).toEqual(['en']);
+    expect(ABOUT_ON_HOME).toBe(true);
+  });
+
+  it('never says Pam is a "human-touch company" in public (D-483): internal principle only', () => {
+    const all = JSON.stringify(ABOUT) + readFileSync(join(__dirname, '..', 'src', 'screens', 'HomeScreen.tsx'), 'utf8');
+    for (const phrase of ['human-touch', 'human touch', 'trato humano', 'toque humano', '有人情味', 'человеческим подходом', 'اللمسة الإنسانية']) {
+      expect(all.toLowerCase(), phrase).not.toContain(phrase.toLowerCase());
+    }
+    expect(ABOUT.en.lead).toBe('Pam helps people find city services, get to them, and remember to go.');
+    expect(ABOUT.en.summary).toBe('Pam helps people find services, get to them, and remember to go.');
   });
 });
 

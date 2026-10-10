@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { SiteShell } from '../../../../site/src/components/SiteShell';
 import { anyPostBySlug } from '../../../../site/src/content/posts';
 import { ABOUT, ABOUT_LANGS, type AboutLang } from '../../../../site/src/content/about';
+import { RulesScreen } from '../../../../site/src/screens/RulesScreen';
 import { AboutScreen } from '../../../../site/src/screens/AboutScreen';
 import { HomeScreen } from '../../../../site/src/screens/HomeScreen';
 import { PostScreen } from '../../../../site/src/screens/PostScreen';
@@ -21,11 +22,13 @@ import { SupportScreen } from '../../../../site/src/screens/SupportScreen';
  * app) is named in the console and goes nowhere: the app is a different product
  * with its own journeys.
  */
-function resolve(path: string): { readonly nav: string; readonly page: 'home' | 'support' | 'post' | 'about'; readonly slug?: string } {
+function resolve(path: string): { readonly nav: string; readonly page: 'home' | 'support' | 'post' | 'about' | 'rules'; readonly slug?: string } {
   const clean = path.replace(/[?#].*$/, '');
   if (clean === '/' || clean === '') return { nav: '/', page: 'home' };
   const about = /^\/([A-Za-z-]+)\/about-pam\/?$/.exec(clean);
   if (about?.[1] && about[1] in ABOUT) return { nav: clean, page: 'about', slug: about[1] };
+  const rules = /^\/([A-Za-z-]+)\/program-rules\/?$/.exec(clean);
+  if (rules?.[1] && rules[1] in ABOUT) return { nav: clean, page: 'rules', slug: rules[1] };
   const post = /^\/support\/([^/]+)\/?$/.exec(clean);
   if (post?.[1] && anyPostBySlug(post[1])) return { nav: clean, page: 'post', slug: post[1] };
   return { nav: '/support/', page: 'support' };
@@ -65,6 +68,9 @@ export function WebsiteWalker({ start = '/', showAbout = false }: { readonly sta
       {here.page === 'post' && here.slug ? <PostScreen slug={here.slug} allowDraft /> : null}
       {here.page === 'about' && here.slug ? (
         <AboutScreen key={path} lang={here.slug as AboutLang} languages={ABOUT_LANGS} draft />
+      ) : null}
+      {here.page === 'rules' && here.slug ? (
+        <RulesScreen key={path} lang={here.slug as AboutLang} languages={ABOUT_LANGS} draft />
       ) : null}
     </SiteShell>
   );

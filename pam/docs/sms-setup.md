@@ -34,8 +34,8 @@ reminders, the check-in and "connect" texts.
    languages. Read its log after the next tick: `{claimed, sent, failures}` with nothing in
    `failures`.
 3. Confirm the secret **names** are set on the project: `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`,
-   and `TWILIO_MESSAGING_SERVICE_SID` or `TWILIO_FROM_NUMBER`. Do not set `DISPATCH_SECRET`
-   (§3: the clock sends none).
+   and `TWILIO_MESSAGING_SERVICE_SID` or `TWILIO_FROM_NUMBER`. `DISPATCH_SECRET` is the vault's
+   `dispatch_secret`, set once for the project (`docs/email-setup.md`); the clock sends it (D-484).
 4. Confirm the clock is on: `select jobname, schedule, active from cron.job where jobname = 'dispatch-sms';`
    (every five minutes, `active` true).
 5. Check the app's address: `select value from app_settings where key = 'app_url';`. The link in
@@ -367,16 +367,20 @@ and checked against the live project on 10 October 2026 (09:40 UTC).
   already refuses to hand it a text for somebody who never agreed, or who replied
   STOP (`claim_outbound_messages`), whichever version is running.
 - **The clock** (`cron` job `dispatch-sms`, every five minutes) calls the function
-  with the project's publishable key and **no** `x-dispatch-secret` header. So do
-  not set `DISPATCH_SECRET` on `dispatch-sms` without changing that call first, or
-  every run is refused with a 401.
+  with the project's publishable key and, since D-484, the header `x-dispatch-secret`, read at run
+  time from the vault's `dispatch_secret`. `DISPATCH_SECRET` is shared by every function in the
+  project: `dispatch-sms` refuses a call without the matching header **whenever it is set**, and
+  `send-invite-emails` will not run without it. So the order matters: the clock's header first
+  (migration `…the_clocks_send_the_shared_secret_from_the_vault…`), then the function secret.
+  Set it the other way round and every run is refused with a 401, sign-in codes included, until
+  the migration is applied. Will's steps for copying the secret are in `docs/email-setup.md`.
 
 ### The checklist
 
 1. **Look first.** `list_migrations`: the three above are there. `list_edge_functions`:
    `dispatch-sms` is version 15. `select jobname, schedule, command from cron.job`:
    the `dispatch-sms` job is as in `0040` (every five minutes, the publishable key,
-   no `x-dispatch-secret`). Whether `DISPATCH_SECRET` is set on the function cannot
+   the `x-dispatch-secret` header from D-484, or none before it). Whether `DISPATCH_SECRET` is set on the function cannot
    be read from here, but the answers show it: `select status_code, content from
    net._http_response order by created desc limit 6`. **Fine looks like** a 200 with
    `{"claimed":0,"sent":0,"failures":[]}` (nothing is queued). **A 401 is the secret

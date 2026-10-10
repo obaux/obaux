@@ -9,6 +9,7 @@ import { PamWords } from './PamWords';
 import { PlanningAVisit } from './PlanningAVisit';
 import { PointsAndBadges } from './PointsAndBadges';
 import { SendingAnInvite } from './SendingAnInvite';
+import { SigningProgramRules } from './SigningProgramRules';
 import { StaffRequests } from './StaffRequests';
 import { TextsFromPam } from './TextsFromPam';
 import { WhatOthersCanSee } from './WhatOthersCanSee';
@@ -27,6 +28,7 @@ export const BODIES: Record<string, () => JSX.Element> = {
   'who-is-my-guide': WhoIsMyGuide,
   'texts-from-pam': TextsFromPam,
   'planning-a-visit': PlanningAVisit,
+  'signing-a-programs-rules': SigningProgramRules,
   'what-others-can-see': WhatOthersCanSee,
   'joining-pam': JoiningPam,
   'joining-as-staff': JoiningAsStaff,
