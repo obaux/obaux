@@ -40,7 +40,9 @@ onboarding instructions, and any merges will be done in the Merge desk session."
    *3 · Case manager* (A member → Limit or pause, Hand over) and *5 · Super admin*
    (Everyone → A member's guide) redrawn and checked
    (https://www.figma.com/design/DtlJg9Klx5BRfHbXBhkg98). A "Hand over → Home" arrow
-   was dropped after the first render: it looped up the page onto the title.
+   was dropped after the first render: it looped up the page onto the title. Both
+   pages were drawn again after merging `main`, whose session had redrawn the super
+   admin page for D-444, so each now shows both sessions' changes.
 
 ## What was wrong, and what missed it
 
@@ -98,6 +100,7 @@ onboarding instructions, and any merges will be done in the Merge desk session."
 | Playwright `e2e/assign-and-limit.spec.ts` (new) | 39 pass (13 tests × 320 light, 320 dark, iPhone SE): the filter asks for members and keeps the unguided; `assign_guide` gets exactly `{p_member, p_guide}` (and `null` for No guide); nothing is written before the dialog; Save waits for a change and a non-blank reason; the dialog opens on its question; axe clean on all three screens |
 | Playwright, **full suite**, fresh build | **876 passed, 0 failed** (8.3 minutes) |
 | **After merging `main`** (`d4f325e`: the languages and Arabic branches): DB / config / ui / web unit | 682 checks / 808 / 107 / 48 pass; typecheck clean; bundle 55.9 kB under budget; Storybook builds |
+| Playwright, **full suite, after merging `main`**, fresh build | **900 passed, 0 failed** (8.6 minutes) |
 | `audit:fit` on `screens--member` (11 stories) and `super-admin-screens--everyone`, all seven languages at 320px | 0 new defects; 9 already in English (ellipsis and clamp on the member page's trip cards), none from these screens |
 
 ## New strings (for the languages lane)

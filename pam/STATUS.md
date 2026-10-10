@@ -941,7 +941,7 @@ Session log: `docs/sessions/2026-10-10-0405-accounts-assign-and-limit.md`.
   gap where any case manager could assign themselves any unassigned member straight
   from the client, unaudited). Either order with the app is safe.
 - **Proven:** DB suite 682 checks, 0 failures (the new test fails without the contract
-  step); Playwright full suite 876 passed (39 new); config 719, typecheck clean,
+  step); Playwright full suite 900 passed after merging `main` (39 new); config 719, typecheck clean,
   Storybook builds. Figma flow map pages 3 and 5 redrawn.
 - **Open:** what "Fold into the next build" meant; members are not told when their
   guide changes; five languages' 62 new strings are drafts for native review.
