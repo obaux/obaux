@@ -17,13 +17,15 @@ any session that takes over the merge desk can keep it running.
 
 ## What it shows
 
-**Header.** The name, and a status chip: *Live* (the session list is being read every
+**Header.** Pam's app icon (the same drawing as `apps/web/src/app/icon.svg`), the name, and a status chip: *Live* (the session list is being read every
 minute), *Board connected* (my updates arrive, live status off), or *Offline copy*. When
 live status needs Will's one-time permission, the chip carries a **Show live status**
 button.
 
 **At a glance.** Four numbers: building now, waiting on you, ready for you to try,
-messages today.
+messages today. Each is a button that takes you to its section: the team, Waiting on
+you, Ready for you to try, What I'm doing (Will, 10 October: "I want to click on these
+and go to section").
 
 **The team map** — the centre of the page.
 - Will at the top ("You, Founder"), Mira in the middle, every teammate around her.
