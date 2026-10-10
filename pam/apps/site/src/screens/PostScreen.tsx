@@ -76,7 +76,7 @@ export function PostScreen({ slug, allowDraft = false }: { readonly slug: string
   if (!post || !Body) return null;
   return (
     <Frame width="wide" gap={6}>
-      <VStack gap={10} xstyle={styles.column}>
+      <VStack as="article" gap={10} xstyle={styles.column} data-page="post">
         {post.status === 'draft' ? (
           <Banner status="warning" title="Draft, not published: held until the feature ships. Not on the site, in Support or in search." />
         ) : null}
