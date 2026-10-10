@@ -20,6 +20,7 @@
     "./MenuList": "./src/MenuList.tsx",
     "./Segment": "./src/Segment.tsx",
     "./Button": "./src/Button.tsx",
+    "./TextLink": "./src/TextLink.tsx",
     "./Badge": "./src/Badge.tsx",
     "./SearchPill": "./src/SearchPill.tsx",
     "./FloatingAction": "./src/FloatingAction.tsx",

@@ -11,6 +11,22 @@ STATUS row too.
 
 ## Open
 
+- [ ] **Public site: publish the draft post "Keeping your program's listing up to
+  date" only when the feature ships** (from PAM · Places & programs, 10 October
+  2026, rule D-447, branch `claude/places-programs-load-own-program`, not on
+  main). It is a draft in `apps/site/src/content/posts.ts` (`status: 'draft'`):
+  not built into the site, only reviewable in Storybook › Website › Journey › Post.
+  To publish, delete that line after the Places & programs session sends its
+  ready note. The sentence "we'll let you know when they're live" was left out
+  because the text-alert job behind it is not scheduled; restore it in
+  `KeepingYourListing.tsx` only if that job is live then.
+- [ ] **Public site: publish the held rows of "Case manager assignments" as their
+  screens ship** (D-449, 10 October 2026). The post now says only what is live; Will's
+  full table is in `apps/site/src/content/assignments.ts` with `live: false`. When
+  taking on, handing over, unassigning, the Unassigned filter, limiting, pausing and
+  turning back on have screens (Accounts & invites, assign-and-limit), flip each row's
+  flag and add the table back to the post. Then set a real domain
+  (`NEXT_PUBLIC_SITE_URL`; Will's to pick).
 - [ ] **Set up the email provider for invite links** (Will, 4 October 2026,
   D-263). The expired-link page already queues a fresh link in
   `public.invite_emails` (live since 0071); nothing sends it yet. Needs:
