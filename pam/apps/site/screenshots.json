@@ -99,5 +99,11 @@
     "click": "Cancel this visit",
     "height": 600,
     "name": "The cancel box: Yes, cancel it / Keep my visit"
+  },
+  {
+    "id": "member-created-states-saved-trips--trips-with-a-past-visit",
+    "out": "planning-a-visit/past-visits.png",
+    "name": "Trips with a past visit: a coming-up visit, and under it the heading Past visits",
+    "scrollTo": "Past visits"
   }
 ]
