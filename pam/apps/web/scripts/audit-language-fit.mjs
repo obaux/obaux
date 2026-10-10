@@ -118,11 +118,17 @@ function measure() {
     for (let n = el; n && n !== document.documentElement; n = n.parentElement) {
       const s = style(n);
       const ox = s.overflowX, oy = s.overflowY;
-      const cx = ox === 'hidden' || ox === 'clip';
-      const cy = oy === 'hidden' || oy === 'clip';
-      if (!cx && !cy) continue;
+      const hx = ox === 'hidden' || ox === 'clip';
+      const hy = oy === 'hidden' || oy === 'clip';
+      // A scroller (auto/scroll) with something to scroll to is a clip as well (D-467): what is wholly
+      // outside its box has been scrolled away, not laid out under whatever sits beside it.
+      const sx = (ox === 'auto' || ox === 'scroll') && n.scrollWidth > n.clientWidth + 1;
+      const sy = (oy === 'auto' || oy === 'scroll') && n.scrollHeight > n.clientHeight + 1;
+      const cx = hx;
+      const cy = hy;
+      if (!cx && !cy && !sx && !sy) continue;
       const r = n.getBoundingClientRect();
-      clips.push({ n, left: r.left + n.clientLeft, right: r.left + n.clientLeft + n.clientWidth, top: r.top + n.clientTop, bottom: r.top + n.clientTop + n.clientHeight, cx, cy });
+      clips.push({ n, left: r.left + n.clientLeft, right: r.left + n.clientLeft + n.clientWidth, top: r.top + n.clientTop, bottom: r.top + n.clientTop + n.clientHeight, cx, cy, scrollX: sx && !hx, scrollY: sy && !hy });
     }
     return clips;
   };
@@ -162,9 +168,12 @@ function measure() {
     let inside = 0, outside = 0, partial = false, handled = false;
     const visible = [];
     for (const r of rects) {
-      let vis = true, part = false;
+      let vis = true, part = false, scrolledAway = false;
       const b = box(r);
       const test = (c) => {
+        // A scroller shows a part of its content at a time: a line half in view is a scroll position, not
+        // a cut. Only a line wholly outside its box is out of the picture (and cannot collide with anything).
+        if ((c.scrollX && (b.right <= c.left + 1 || b.left >= c.right - 1)) || (c.scrollY && (b.bottom <= c.top + 1 || b.top >= c.bottom - 1))) scrolledAway = true;
         const xOut = c.cx && (b.left < c.left - 1 || b.right > c.right + 1);
         const yOut = c.cy && (b.top < c.top - 1 || b.bottom > c.bottom + 1);
         if (!xOut && !yOut) return;
@@ -183,6 +192,8 @@ function measure() {
         if (c.n && (style(c.n).textOverflow === 'ellipsis' || (style(c.n).webkitLineClamp ?? 'none') !== 'none')) handled = true;
       };
       for (const c of clips) test(c);
+      // Scrolled out of a scroller: not on the screen, so not inside, outside, cut or colliding.
+      if (scrolledAway) continue;
       // The viewport's side edges clip too, unless a scroller owns the text.
       if (!scroller) test({ cx: true, cy: false, left: 0, right: vw });
       if (vis && !part) inside += 1;

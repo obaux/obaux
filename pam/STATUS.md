@@ -1247,6 +1247,14 @@ trimmed with an ellipsis (Mira's call; four columns kept). Eight pseudo entries 
 three English ones were never in it. Not seen: a syllable hyphen on a real phone (headless Chromium has no
 dictionaries).
 
+## Design system & Storybook · scroller clip (10 October) — merged 10 October
+
+Merged to `main` by the merge desk, 10 October, from `claude/pam-design-scroller-clip` (612d696). `audit:fit` treats a scroller as a clip (D-467): a line
+wholly outside a scroller is not on screen, so the conversation threads' overlaps stop changing run to run.
+Same build, old rule against new: overlaps 22 to 0, cuts and ellipses identical. 19 known entries removed,
+16 added (the old Home's peeking saved card; four Explore pseudo clamps), all looked at. The Points badge
+names, trimmed in English too, were fixed in the section above. Full audit at merge: 95 findings, all accepted.
+
 ## Design system & Storybook · live app shell (10 October)
 
 Merged to `main` by the merge desk, 10 October, from `claude/pam-design-app-shell` (6318b48); live after the next production deploy. The redesigned tabs are the app (D-456): the role's tab bar
