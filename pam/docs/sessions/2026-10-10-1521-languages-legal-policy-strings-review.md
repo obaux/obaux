@@ -48,8 +48,9 @@ None: a review of drafts.
 
 ## Verified
 
-On `bb18d8c` (main `c652a30` plus this): `@pam/config` 1047 tests, `copy:status` in step, the browser suite on all three viewports **984 passed, 18 skipped** (11.1 min),
-Storybook builds, and the fit audit on every story with "polic" in its id (14 stories, 7 languages and the pseudo-language, including the replace panel): **0 new defects**.
+First batch on `bb18d8c` (main `c652a30` plus this): browser suite **984 passed, 18 skipped**, fit audit on the 14 stories with "polic" in their id: 0 new. Both batches on `b0fc4ba`
+(main `c8efcb7` plus this): `@pam/config` 1049 tests, `copy:status` in step, the browser suite on all three viewports **993 passed, 18 skipped** (11.3 min), Storybook builds, the fit audit on the
+policy stories (14 × 8 languages): 0 new, and on "What others can see" and its nested-page twin (2 × 8): 0 new.
 
 ## Found, not applied (a promise: Will's, through the merge desk)
 
