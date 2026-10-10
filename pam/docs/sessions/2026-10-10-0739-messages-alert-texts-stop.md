@@ -27,9 +27,9 @@ messages people to make it easy to help them access and get reminded about servi
 
 - A signed-in person could clear their own STOP at the API: `for all` RLS plus a table-wide
   grant. Every check passed because the tests attacked reading other people's rows, never a
-  person's own protected column. The new test (25) does, and fails without the migration.
+  person's own protected column. The new test (26) does, and fails without the migration.
 - The claim texted anyone with **no preferences row**: the two cancel rules only matched a row
-  that said no. Found by Piper's finding; test 26 covers never asked, opted in, STOP and no.
+  that said no. Found by Piper's finding; test 27 covers never asked, opted in, STOP and no.
 - The campaign samples and the consent screen listed texts nothing queues: only a saved place
   closing, and the staff request decision, are queued. Reminders have a template and a `reminders`
   table but no writer. Nothing missed it because the templates are tested for length and safety,
@@ -43,9 +43,9 @@ messages people to make it easy to help them access and get reminded about servi
 ## Verified
 
 - Config tests 920 pass (twice: the bundle regenerates on the first run), `tsc` clean in web and config.
-- Database suite passes with tests 25 and 26; each fails without its migration.
+- Database suite passes with tests 26 and 27; each fails without its migration.
 - Storybook builds; fit audit on the alert, reminder and texts-stopped stories: clean.
-- e2e: see the READY note (consent, join, back specs on the narrow project).
+- e2e: consent, join and back specs, all three viewport projects: 114 pass.
 - Not run: the full fit audit, the full Playwright suite, or anything against the live database.
 
 ## Left undone
