@@ -58,7 +58,7 @@ export const PRIVACY: LegalDocument = {
     section('privacy', 'limits', 2),
     section('privacy', 'texts', 3),
     section('privacy', 'never-say', 2),
-    section('privacy', 'sharing', 3),
+    section('privacy', 'sharing', 4),
     // Only while messages are translated (D-423): the page says it exactly
     // when it is true, never before and never after.
     ...(MESSAGE_TRANSLATION.enabled ? [section('privacy', 'translation', 3)] : []),

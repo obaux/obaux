@@ -17,12 +17,14 @@ import { BigButton, BookIcon, SignedIcon, TextField, TextLink } from '@pam/ui';
 import { MenuList } from '@pam/ui/MenuList';
 import { SignaturePad, type SignaturePadHandle } from '@pam/ui/SignaturePad';
 import { SubPage } from '@pam/ui/SubPage';
-import { placeAsksForPolicies, type DummyPolicy } from '@pam/config/dummy-policies';
+import type { DummyPolicy } from '@pam/config/dummy-policies';
 import { DUMMY_PLACES_BY_ID } from '@pam/config/dummy-places';
 import { policiesForService, servicesFor } from '@pam/config/dummy-services';
 import { useServices } from '@/lib/useServices';
 import { useI18n } from '@/lib/i18n';
-import { usePolicies } from '@/lib/usePolicies';
+import { usePlacePolicies } from '@/lib/usePlacePolicies';
+import { openPolicyFile } from '@/lib/usePolicies';
+import type { ProgramPolicy } from '@/lib/programPolicies';
 import { useMySignatures } from '@/lib/useMySignatures';
 import { leaveFlow } from '@/lib/navigate';
 import { intlLocale } from '@pam/config';
@@ -69,6 +71,9 @@ const styles = stylex.create({
     borderColor: colorVars['--color-border'],
   },
   yourSignature: { fontSize: '16px', lineHeight: 1.4 },
+  recordNote: { fontSize: '15px', lineHeight: 1.5 },
+  pageRow: { width: '100%' },
+  pageName: { fontSize: '17px', lineHeight: 1.4, flexGrow: 1, minWidth: 0, overflowWrap: 'anywhere' },
   savedImage: { height: '48px', width: 'auto', maxWidth: '60%', objectFit: 'contain', backgroundColor: 'white', borderRadius: '8px' },
   signedImage: { height: '72px', width: 'auto', maxWidth: '100%', objectFit: 'contain', backgroundColor: 'white', borderRadius: '12px', alignSelf: 'flex-start' },
   // Sign sits right under the signature it will use (Will, D-271).
@@ -181,11 +186,13 @@ function policyHref(
  * one of its services (D-313), the program's own plus that service's.
  */
 function useShownPolicies(placeId: string, serviceId: string | null) {
-  const { policies } = usePolicies();
+  // A real place asks for what its program keeps in the database, and nothing
+  // when it has put none (D-485); an example place keeps the example set.
+  const { policies, asks } = usePlacePolicies().forPlace(placeId);
   const { services } = useServices();
   const here = servicesFor(placeId, services);
   const service = serviceId ? (here.find((s) => s.id === serviceId) ?? null) : null;
-  const shown: readonly DummyPolicy[] = !placeAsksForPolicies(placeId)
+  const shown: readonly DummyPolicy[] = !asks
     ? []
     : service
       ? policiesForService(service, policies, here)
@@ -323,7 +330,7 @@ export function MemberPolicyScreen({
   /** From "Your trip is booked" (D-336): the last one closes into Trips. */
   readonly trip?: string | null;
 }) {
-  const { t, locale } = useI18n();
+  const { t, tPlain, locale } = useI18n();
   const { signature, signedAt, signedWith, sign, unsign, forgetSignature } = useMySignatures();
   // Moving to the next policy happens here, not by a new link: the same
   // screen with a different `?id=` would reload the app (D-269).
@@ -389,6 +396,10 @@ export function MemberPolicyScreen({
               )
             ) : (
               <>
+                {/* Before signing (a25): what the program keeps, and what a signature here means. */}
+                <Text type="supporting" xstyle={styles.recordNote}>
+                  {t('memberPolicy.record')} {t('memberPolicy.record.meaning')}
+                </Text>
                 {signature ? (
                   // Signed once already: Sign is one tap, right under the
                   // signature it will use; the corner × draws a new one.
@@ -432,6 +443,24 @@ export function MemberPolicyScreen({
                       {para}
                     </Text>
                   ))
+                ) : 'files' in policy && Array.isArray((policy as ProgramPolicy).files) ? (
+                  // A real policy is its program's own pages: read each before signing.
+                  <>
+                    <Text type="supporting" xstyle={styles.recordNote}>
+                      {t('memberPolicy.readPages')}
+                    </Text>
+                    {(policy as ProgramPolicy).files.map((file) => (
+                      <HStack key={file.path} gap={3} align="center" wrap="nowrap" xstyle={styles.pageRow}>
+                        <Text xstyle={styles.pageName}>{file.name}</Text>
+                        <Button
+                          label={t('policy.file.open')}
+                          variant="secondary"
+                          aria-label={tPlain('policy.file.open.named', { name: file.name })}
+                          onClick={() => void openPolicyFile(file.path)}
+                        />
+                      </HStack>
+                    ))}
+                  </>
                 ) : (
                   <Text type="supporting" xstyle={styles.body}>
                     {t('policy.preview.file', { file: policy.fileName })}

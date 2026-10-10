@@ -35,8 +35,12 @@ describe('placeAsksForPolicies', () => {
 describe('the member screens that show policies', () => {
   const web = join(__dirname, '../../../apps/web/src');
   for (const file of ['app/place/page.tsx', 'screens/NewTripView.tsx', 'screens/TripsView.tsx', 'screens/MemberPoliciesView.tsx']) {
-    it(`${file} asks placeAsksForPolicies before showing any`, () => {
-      expect(readFileSync(join(web, file), 'utf8')).toContain('placeAsksForPolicies(');
+    // Since D-485 the gate is `usePlacePolicies`: a real place asks for what its program keeps
+    // in the database (nothing when it has put none), an example place for the example set.
+    it(`${file} asks usePlacePolicies before showing any`, () => {
+      const source = readFileSync(join(web, file), 'utf8');
+      expect(source).toContain('usePlacePolicies()');
+      expect(source).not.toContain('usePolicies()');
     });
   }
 });
