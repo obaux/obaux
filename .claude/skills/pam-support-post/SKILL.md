@@ -103,3 +103,10 @@ the compact card — everything that must be read stays in the central square.
 `/<lang>/about-pam/`, not in `posts.ts`. A language goes live only when its code is in
 `apps/site/src/content/signed-off.json`. When a feature it names ships or changes (reminder texts,
 messaging), edit all seven together and tell the merge desk the other six need a native reader.
+
+## Signing a program's rules (seven languages, a draft)
+
+`apps/site/src/content/rules.ts` holds the post in all seven languages; English is the Support post
+`signing-a-programs-rules`, the others are pages at `/<lang>/program-rules/`. It is hidden until
+`signed-off.json` has `"program-rules-live": true` (the signing screens are really in the app) and the language
+in its `"program-rules"` list. The sentence "What your signature means" goes to a lawyer before launch.

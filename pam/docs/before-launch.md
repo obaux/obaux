@@ -88,6 +88,18 @@ STATUS row too.
   The app's own lines that promised a reminder are fixed (D-474, 10 October): the onboarding slide that said "Pam reminds you
   before you go", and the Trip-added and booked screens that said "We will remind you the day before". The app's side of this
   switch is the item *Visit reminders go live* just above.
+- [ ] **Public site: "Signing a program's rules" (10 October 2026, draft; Will: "create a post about this for
+  the public").** A member-and-program post in seven languages (`apps/site/src/content/rules.ts`; English is the
+  Support post `signing-a-programs-rules`, the other six are pages at `/<lang>/program-rules/`). It says only what
+  Pam WILL do once Piper's signing screens (card a25, P2) are real, so nothing is live: it needs BOTH
+  `"program-rules-live": true` in `apps/site/src/content/signed-off.json` (flip it the day members can really sign,
+  and check the post against the real screens: the labels "Policies to sign", "Sign", "Type my name instead",
+  "Policies for participants", that the signature is kept for the next policy, that a program sees only a first
+  name and a date, that a policy is not changed after signing and a new version asks again) AND the language in
+  its `"program-rules"` list (Will signs the English; the other six are drafts until a native reader has been over
+  them, D-461). Add pictures then, from main's Storybook. **A lawyer must read one sentence before launch, in all
+  seven languages:** "Your signature in Pam is a record that you read the policy and agreed to it. It is not a legal
+  signature." (section "What your signature means").
 - [ ] **Public site: publish the draft post "Keeping your program's listing up to
   date" only when the feature ships** (from PAM · Places & programs, 10 October
   2026, rule D-447, branch `claude/places-programs-load-own-program`, not on

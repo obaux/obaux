@@ -1399,6 +1399,7 @@ live until Will signs the English**: `apps/site/src/content/signed-off.json` is 
 and the home section are not built (a normal build has neither; CI also builds with
 `PAM_SITE_DRAFTS=1` and runs axe on all seven). The other six are drafts with no native reader (D-461).
 Storybook › Website › Journey: **About Pam** per language (Draft banner) and **Home with About Pam**.
+**Signing a program's rules (10 October, draft, not live).** A post for members and programs in seven languages (English: Support post `signing-a-programs-rules`; the other six at `/<lang>/program-rules/`); says only what Pam will do once Piper's signing screens ship. Hidden until `program-rules-live` and the language are set in `signed-off.json`; Storybook › Website › Journey › Program rules ×7. One sentence ("What your signature means") goes to a lawyer before launch.
 Reminder texts are plainly "coming"; the home card "Keep going" now says the same and reads `VISIT_REMINDERS_LIVE` (`content/flags.ts`, 10 October).
 
 ## Seven languages, messages in your own language, and text that fits (9 October) — 0.50.1 and 0.51.0, merged 9 October (PR #29)
