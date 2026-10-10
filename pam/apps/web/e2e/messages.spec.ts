@@ -135,6 +135,24 @@ test.describe('the conversation list', () => {
     await expect(page.getByRole('button', { name: 'New message' })).toBeVisible();
   });
 
+  test('a row has no padding on the left — its picture starts at the page\'s edge — and keeps it on the right (D-411)', async ({ page }) => {
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    await page.goto('/messages/');
+    await settled(page);
+    const row = page.getByRole('link', { name: /Marcus/ });
+    const pad = await row.evaluate((el) => {
+      const item = el.closest('li')!;
+      const s = getComputedStyle(item);
+      const picture = item.querySelector('.astryx-avatar')!.getBoundingClientRect();
+      return { left: s.paddingInlineStart, right: s.paddingInlineEnd, picture: picture.left };
+    });
+    expect(pad.left).toBe('0px');
+    expect(pad.right).toBe('12px');
+    // The page's own 16px gutter, and nothing added inside the row.
+    expect(pad.picture).toBe(16);
+  });
+
   test('a limited account reads its list, with no New message and a notice that says why (terms.s.limits.p3)', async ({
     page,
   }) => {
@@ -150,6 +168,56 @@ test.describe('the conversation list', () => {
 
     const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
     expect(results.violations).toEqual([]);
+  });
+
+  test('a New message the database refuses because the account was limited says so, and closes the sheet', async ({
+    page,
+  }) => {
+    // Active when the screen loads; limited by the time the pick is refused.
+    let limited = false;
+    await signedInAs(page, 'member', () => (limited ? 'limited' : 'active'));
+    await withOneConversation(page);
+    await page.route(PEOPLE, (route) =>
+      route.fulfill(json([{ profile_id: OTHER, first_name: 'Marcus', role: 'member' }])),
+    );
+    await page.route('**/rest/v1/rpc/open_direct_conversation*', (route) => {
+      limited = true;
+      return route.fulfill({
+        status: 403,
+        contentType: 'application/json',
+        body: JSON.stringify({ code: '42501', message: 'not allowed' }),
+      });
+    });
+    await page.goto('/messages/');
+    await settled(page);
+
+    await page.getByRole('button', { name: 'New message' }).click();
+    const sheet = page.getByRole('dialog', { name: 'New message' });
+    await sheet.getByRole('button', { name: /Marcus/ }).click();
+
+    await expect(page.getByRole('alert').getByText('Some things are turned off')).toBeVisible();
+    await expect(page.getByRole('dialog', { name: 'New message' })).toHaveCount(0);
+    await expect(page.getByText('Your connection dropped')).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'New message' })).toHaveCount(0);
+  });
+
+  test('a New message that fails for any other reason still says the connection dropped', async ({ page }) => {
+    await signedInAs(page, 'member');
+    await withOneConversation(page);
+    await page.route(PEOPLE, (route) =>
+      route.fulfill(json([{ profile_id: OTHER, first_name: 'Marcus', role: 'member' }])),
+    );
+    await page.route('**/rest/v1/rpc/open_direct_conversation*', (route) =>
+      route.fulfill({ status: 500, contentType: 'application/json', body: '{}' }),
+    );
+    await page.goto('/messages/');
+    await settled(page);
+
+    await page.getByRole('button', { name: 'New message' }).click();
+    await page.getByRole('dialog', { name: 'New message' }).getByRole('button', { name: /Marcus/ }).click();
+
+    await expect(page.getByText(/Your connection dropped/)).toBeVisible();
+    await expect(page.getByText('Some things are turned off')).toHaveCount(0);
   });
 
   test('has no help link (A15) — the logo is one tap back to Home, which always has one', async ({ page }) => {
@@ -343,6 +411,97 @@ test.describe('a conversation', () => {
     const composerBox = await composer.boundingBox();
     expect(composerBox).not.toBeNull();
     expect(composerBox!.y + composerBox!.height).toBeLessThanOrEqual(box!.y + box!.height);
+
+    // The room under the composer is inside the conversation's frosted dock
+    // (D-396), not a strip of bare page under it: the scroll region runs to
+    // the bottom edge, and the composer's box ends 40px above that edge (32px
+    // of its own and the dock's 8px; no home-indicator inset here).
+    const layout = await page.locator('.astryx-chat-layout').boundingBox();
+    expect(Math.round(layout!.y + layout!.height)).toBe(viewport!.height);
+    const field = await page.locator('.astryx-chat-composer > div').first().boundingBox();
+    expect(Math.round(viewport!.height - (field!.y + field!.height))).toBe(40);
+  });
+
+  test('the composer\'s buttons are quiet: mic, photo and an idle send share one grey (D-396)', async ({ page }) => {
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+
+    const colour = (name: string | RegExp) =>
+      page.getByRole('button', { name }).locator('svg').evaluate((svg) => getComputedStyle(svg).color);
+    const mic = await colour('Speak your message');
+    expect(await colour('Add a photo')).toBe(mic);
+    expect(await colour(/send/i)).toBe(mic);
+    // Quieter than the words around them.
+    const heading = await page.getByRole('heading', { name: 'Marcus', level: 1 }).evaluate((h) => getComputedStyle(h).color);
+    expect(mic).not.toBe(heading);
+  });
+
+  test('speaking a long message: the box grows to 8 lines, then keeps the newest words in view (D-397)', async ({ page }) => {
+    // A stand-in for the browser's speech recogniser: the test says the
+    // words, as final results, the way a phone's would arrive.
+    await page.addInitScript(() => {
+      type Handler = ((event?: unknown) => void) | null;
+      class FakeRecognition {
+        lang = '';
+        continuous = true;
+        interimResults = true;
+        onstart: Handler = null;
+        onend: Handler = null;
+        onresult: Handler = null;
+        onerror: Handler = null;
+        onnomatch: Handler = null;
+        onspeechstart: Handler = null;
+        onspeechend: Handler = null;
+        start() {
+          (window as unknown as { __speech: FakeRecognition }).__speech = this;
+          setTimeout(() => this.onstart?.(), 0);
+        }
+        stop() {
+          setTimeout(() => this.onend?.(), 0);
+        }
+        abort() {
+          this.onend?.();
+        }
+      }
+      const w = window as unknown as Record<string, unknown>;
+      w.SpeechRecognition = FakeRecognition;
+      w.webkitSpeechRecognition = FakeRecognition;
+      w.__say = (text: string, isFinal: boolean) => {
+        const result = Object.assign([{ transcript: text }], { isFinal });
+        (w.__speech as FakeRecognition).onresult?.({ resultIndex: 0, results: [result] });
+      };
+    });
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+
+    await page.getByRole('button', { name: 'Speak your message' }).click();
+    await expect(page.getByRole('button', { name: 'Stop listening' })).toBeVisible();
+    const editable = page.locator('.astryx-chat-composer-input [contenteditable="true"]');
+    const say = (text: string, isFinal: boolean) =>
+      page.evaluate(([words, final]) => (window as unknown as { __say: (t: string, f: boolean) => void }).__say(words, final), [text, isFinal] as const);
+
+    for (let i = 1; i <= 12; i++) {
+      await say(`This is sentence number ${i}, long enough to fill a line of the box.`, true);
+    }
+    await say('and these are the words still being heard', false);
+
+    const box = await editable.evaluate((el) => ({
+      height: el.clientHeight,
+      lineHeight: parseFloat(getComputedStyle(el).lineHeight),
+      gapBelow: el.scrollHeight - el.scrollTop - el.clientHeight,
+      overflowing: el.scrollHeight > el.clientHeight,
+    }));
+    // Grown past the old 4 lines, stopped at 8 (plus the box's own padding).
+    expect(box.overflowing).toBe(true);
+    expect(box.height).toBeGreaterThan(7 * box.lineHeight);
+    expect(box.height).toBeLessThanOrEqual(8 * box.lineHeight + 8);
+    // Scrolled to the newest words, not left on an old line.
+    expect(box.gapBelow).toBeLessThanOrEqual(1);
+    await expect(page.getByText('and these are the words still being heard')).toBeInViewport();
   });
 
   test('the send icon matches the mic icon\'s size (D-192 addendum)', async ({ page }) => {
@@ -466,8 +625,24 @@ test.describe('a conversation', () => {
     await expect(page.getByRole('button', { name: /send/i })).toHaveCount(0);
     // ...and Pam says so, with a way to reach a person.
     await expect(page.getByRole('alert').getByText('Some things are turned off')).toBeVisible();
-    await expect(page.getByRole('alert').getByText(/Call your guide or Pam/)).toBeVisible();
-    await expect(page.getByRole('alert').getByRole('link', { name: /Call/ })).toHaveAttribute('href', /^tel:/);
+    // It begins with what is off, says why, then points to Pam (Will, 9 October).
+    const notice = page.getByRole('alert');
+    await expect(notice.getByText(/^You cannot send messages right now\./)).toBeVisible();
+    await expect(notice.getByText(/Your guide turned this off for your account\./)).toBeVisible();
+    await expect(notice.getByText(/your plan/i)).toHaveCount(0);
+    const call = notice.getByRole('link', { name: /Call/ });
+    await expect(call).toHaveAttribute('href', /^tel:/);
+    // The quiet card: body text at the smallest size (16px), and the call is a
+    // link, not a filled primary button — still a 48px target.
+    expect(await notice.getByText(/^You cannot send messages/).evaluate((el) => getComputedStyle(el).fontSize)).toBe('16px');
+    const look = await call.evaluate((el) => {
+      const c = getComputedStyle(el);
+      return { size: c.fontSize, line: c.textDecorationLine, bg: c.backgroundColor, h: el.getBoundingClientRect().height };
+    });
+    expect(look.size).toBe('16px');
+    expect(look.line).toContain('underline');
+    expect(look.bg).toBe('rgba(0, 0, 0, 0)');
+    expect(look.h).toBeGreaterThanOrEqual(48);
 
     const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
     expect(results.violations).toEqual([]);
@@ -555,10 +730,17 @@ test.describe('a conversation', () => {
     await settled(page);
 
     await expect(page.getByRole('heading', { name: 'Teresa', level: 1 })).toBeVisible();
-    // Who they are to you sits beside the name, one row (D-193, D-187).
+    // Who they are to you sits on the line under the name (D-395, was a tag
+    // beside it — D-193, D-187): just below it, starting where it starts.
     const heading = await page.getByRole('heading', { name: 'Teresa', level: 1 }).boundingBox();
-    const tag = await page.getByText('Case manager', { exact: true }).last().boundingBox();
-    expect(Math.abs(tag!.y + tag!.height / 2 - (heading!.y + heading!.height / 2))).toBeLessThan(12);
+    const line = await page
+      .getByRole('heading', { name: 'Teresa', level: 1 })
+      .locator('xpath=../..')
+      .getByText('Case manager', { exact: true })
+      .boundingBox();
+    expect(line!.y).toBeGreaterThanOrEqual(heading!.y + heading!.height - 2);
+    expect(line!.y - (heading!.y + heading!.height)).toBeLessThan(8);
+    expect(Math.abs(line!.x - heading!.x)).toBeLessThan(2);
     await expect(page.getByRole('log')).toBeVisible();
     // The same thread Teresa's own preview reads, from Jordan's side (D-183).
     await expect(page.getByRole('log').getByText(/room 12/)).toBeVisible();
@@ -575,6 +757,849 @@ test.describe('a conversation', () => {
 
     const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
     expect(results.violations).toEqual([]);
+  });
+});
+
+test.describe('documents in a conversation (D-399)', () => {
+  const FILES = '**/storage/v1/object/message-files/**';
+  const PDF = { name: 'Lease 2026.pdf', mimeType: 'application/pdf', buffer: Buffer.from('%PDF-1.4\n%%EOF') };
+  const docInput = (page: import('@playwright/test').Page) => page.locator('input[type="file"][accept*=".pdf"]');
+
+  test('a picked document shows its name and size, and goes with the message', async ({ page }) => {
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    const uploads: string[] = [];
+    await page.route(FILES, (route) => {
+      uploads.push(route.request().url());
+      return route.fulfill(json({ Key: 'message-files/x.pdf' }));
+    });
+    let inserted: Record<string, unknown> | null = null;
+    await page.route(MESSAGES, (route) => {
+      if (route.request().method() === 'POST') {
+        inserted = route.request().postDataJSON() as Record<string, unknown>;
+        return route.fulfill(
+          json({
+            id: 'new-file',
+            sender_id: ME,
+            body: null,
+            attachment_url: inserted.attachment_url,
+            attachment_kind: 'file',
+            attachment_name: inserted.attachment_name,
+            attachment_bytes: inserted.attachment_bytes,
+            created_at: new Date().toISOString(),
+          }),
+        );
+      }
+      return route.fulfill(json([]));
+    });
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+
+    await expect(page.getByRole('button', { name: 'Add a document' })).toBeVisible();
+    await docInput(page).setInputFiles(PDF);
+    // Above the box, before it goes: what it is called and what it is.
+    await expect(page.getByText('Lease 2026.pdf')).toBeVisible();
+    // What it is, in a word — not its format or size (D-409).
+    await expect(page.locator('.astryx-chat-composer').getByText('Document', { exact: true })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Take this document out' })).toBeVisible();
+
+    await page.getByRole('button', { name: /send/i }).click();
+    await expect.poll(() => inserted).not.toBeNull();
+    expect(uploads).toHaveLength(1);
+    expect(uploads[0]).toContain(`/message-files/${CONVO}/`);
+    expect(inserted).toMatchObject({
+      conversation_id: CONVO,
+      body: null,
+      attachment_kind: 'file',
+      attachment_name: 'Lease 2026.pdf',
+      attachment_bytes: PDF.buffer.length,
+    });
+    expect(String(inserted!.attachment_url)).toMatch(new RegExp(`^${CONVO}/[0-9a-f-]+\\.pdf$`));
+    // In the conversation: a card that opens it.
+    await expect(page.getByRole('button', { name: 'Open Lease 2026.pdf, document' })).toBeVisible();
+  });
+
+  test('a file Pam does not take is refused in words, where it would have gone', async ({ page }) => {
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+
+    await docInput(page).setInputFiles({ name: 'notes.txt', mimeType: 'text/plain', buffer: Buffer.from('hello') });
+    const composer = page.locator('.astryx-chat-composer');
+    await expect(composer.getByRole('alert')).toContainText("Pam can't send that file");
+    await expect(composer.getByRole('alert')).toContainText('Send a photo, a PDF or a Word file.');
+
+    await docInput(page).setInputFiles({ ...PDF, buffer: Buffer.alloc(10 * 1024 * 1024 + 1) });
+    await expect(composer.getByRole('alert')).toContainText('That file is too big');
+    await expect(composer.getByRole('alert')).toContainText('Send one smaller than 10 MB.');
+    // Nothing was picked, so there is nothing to send.
+    await expect(page.getByRole('button', { name: /send/i })).toBeDisabled();
+  });
+
+  test('a document dropped on the conversation is picked, the same as from the button', async ({ page }) => {
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+
+    await page.evaluate(() => {
+      const target = document.querySelector('.astryx-chat-layout')!;
+      const data = new DataTransfer();
+      data.items.add(new File(['%PDF-1.4'], 'Dropped letter.pdf', { type: 'application/pdf' }));
+      target.dispatchEvent(new DragEvent('dragover', { bubbles: true, cancelable: true, dataTransfer: data }));
+      target.dispatchEvent(new DragEvent('drop', { bubbles: true, cancelable: true, dataTransfer: data }));
+    });
+    await expect(page.getByText('Dropped letter.pdf')).toBeVisible();
+    await expect(page.getByRole('button', { name: /send/i })).toBeEnabled();
+  });
+
+  test('a document someone sent is fetched only when tapped, with your own sign-in', async ({ page }) => {
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    const downloads: string[] = [];
+    await page.route(FILES, (route) => {
+      downloads.push(route.request().url());
+      return route.fulfill({ status: 200, contentType: 'application/pdf', body: '%PDF-1.4\n%%EOF' });
+    });
+    await page.route(MESSAGES, (route) =>
+      route.fulfill(
+        json([
+          {
+            id: 'their-file',
+            conversation_id: CONVO,
+            sender_id: OTHER,
+            body: 'My resume',
+            attachment_url: `${CONVO}/abc.docx`,
+            attachment_kind: 'file',
+            attachment_name: 'Resume.docx',
+            attachment_bytes: 1_258_291,
+            created_at: new Date().toISOString(),
+          },
+        ]),
+      ),
+    );
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+
+    const card = page.getByRole('button', { name: 'Open Resume.docx, document' });
+    await expect(card).toBeAttached();
+    expect(downloads).toHaveLength(0);
+    const saved = page.waitForEvent('download');
+    // A tap lands on the card itself (its button is for a screen reader and a keyboard).
+    await page.getByText('Resume.docx', { exact: true }).click();
+    expect((await saved).suggestedFilename()).toBe('Resume.docx');
+    expect(downloads).toHaveLength(1);
+    expect(downloads[0]).toContain(`/message-files/${CONVO}/abc.docx`);
+  });
+
+  test('a Google Docs link is a card that opens it in Google, in a new tab', async ({ page }) => {
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    await page.route(MESSAGES, (route) =>
+      route.fulfill(
+        json([
+          {
+            id: 'their-link',
+            conversation_id: CONVO,
+            sender_id: OTHER,
+            body: 'The schedule: https://docs.google.com/document/d/abc123/edit',
+            created_at: new Date().toISOString(),
+          },
+        ]),
+      ),
+    );
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+
+    const link = page.getByRole('link', { name: 'Google Doc: opens in Google, in a new tab' });
+    await expect(link).toHaveAttribute('href', 'https://docs.google.com/document/d/abc123/edit');
+    await expect(link).toHaveAttribute('target', '_blank');
+    // Its page icon is Google-Doc blue (D-401): #1a73e8 light, #8ab4f8 dark.
+    const blue = await link
+      .locator('xpath=ancestor::*[contains(@class,"astryx-clickable-card")][1]')
+      .locator('svg')
+      .first()
+      .evaluate((svg) => getComputedStyle(svg).color);
+    expect(['rgb(26, 115, 232)', 'rgb(138, 180, 248)']).toContain(blue);
+    // The words keep the link as it was sent.
+    await expect(page.getByText('The schedule: https://docs.google.com/document/d/abc123/edit')).toBeVisible();
+  });
+
+  test('a conversation still opens before the live database has the document columns (0080)', async ({ page }) => {
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    await page.route(MESSAGES, (route) =>
+      route.request().url().includes('attachment_name')
+        ? route.fulfill({
+            status: 400,
+            contentType: 'application/json',
+            body: JSON.stringify({ code: '42703', message: 'column messages.attachment_name does not exist' }),
+          })
+        : route.fulfill(
+            json([
+              {
+                id: MSG_THEIRS,
+                conversation_id: CONVO,
+                sender_id: OTHER,
+                body: 'Is the class still on Tuesday?',
+                created_at: new Date().toISOString(),
+              },
+            ]),
+          ),
+    );
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+    await expect(page.getByRole('log').getByText('Is the class still on Tuesday?')).toBeVisible();
+  });
+
+  test('a conversation whose last message is a document says so in the list', async ({ page }) => {
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    await page.route(MESSAGES, (route) =>
+      route.fulfill(
+        json([
+          {
+            conversation_id: CONVO,
+            sender_id: OTHER,
+            body: null,
+            attachment_kind: 'file',
+            created_at: new Date().toISOString(),
+          },
+        ]),
+      ),
+    );
+    await page.goto('/messages/');
+    await settled(page);
+    await expect(page.getByText('Document', { exact: true })).toBeVisible();
+  });
+});
+
+test.describe('photos and documents, picked or pasted (D-408)', () => {
+  // A one-pixel PNG, and the same bytes again under other names.
+  const PNG = Buffer.from(
+    'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+    'base64',
+  ).toString('base64');
+  const editable = (page: import('@playwright/test').Page) => page.locator('.astryx-chat-composer-input [contenteditable="true"]');
+  const composer = (page: import('@playwright/test').Page) => page.locator('.astryx-chat-composer');
+
+  /** Pastes one file (bytes as base64) into the message box, the way a phone's or computer's paste does. */
+  const paste = (page: import('@playwright/test').Page, file: { name: string; type: string; base64: string }) =>
+    editable(page).evaluate((el, f) => {
+      const bytes = Uint8Array.from(atob(f.base64), (c) => c.charCodeAt(0));
+      const data = new DataTransfer();
+      data.items.add(new File([bytes], f.name, { type: f.type }));
+      el.focus();
+      el.dispatchEvent(new ClipboardEvent('paste', { bubbles: true, cancelable: true, clipboardData: data }));
+    }, file);
+
+  test('the photo button asks for JPEG or PNG — so an iPhone hands its photos over as JPEGs — and the document button for PDF or Word', async ({ page }) => {
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+
+    const inputs = page.locator('.astryx-chat-composer input[type="file"]');
+    await expect(inputs).toHaveCount(2);
+    expect(await inputs.nth(0).getAttribute('accept')).toBe('image/jpeg,image/png');
+    const docs = (await inputs.nth(1).getAttribute('accept'))!.split(',');
+    expect(docs).toEqual(expect.arrayContaining(['.pdf', '.doc', '.docx', 'application/pdf']));
+    expect(docs.some((type) => type.startsWith('image/'))).toBe(false);
+  });
+
+  test('a pasted PNG is a photo: seen before it goes, and sent as a JPEG', async ({ page }) => {
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    const uploads: string[] = [];
+    await page.route('**/storage/v1/object/message-photos/**', (route) => {
+      uploads.push(route.request().url());
+      return route.fulfill(json({ Key: 'message-photos/x.jpg' }));
+    });
+    let inserted: Record<string, unknown> | null = null;
+    await page.route(MESSAGES, (route) => {
+      if (route.request().method() === 'POST') {
+        inserted = route.request().postDataJSON() as Record<string, unknown>;
+        return route.fulfill(
+          json({ id: 'new-photo', sender_id: ME, body: null, attachment_url: inserted.attachment_url, attachment_kind: 'photo', created_at: new Date().toISOString() }),
+        );
+      }
+      return route.fulfill(json([]));
+    });
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+
+    await paste(page, { name: 'image.png', type: 'image/png', base64: PNG });
+    await expect(composer(page).getByRole('img', { name: 'The photo you picked' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Take this photo out' })).toBeVisible();
+    // Nothing went into the box as words.
+    await expect(editable(page)).toHaveText('');
+
+    await page.getByRole('button', { name: /send/i }).click();
+    await expect.poll(() => inserted).not.toBeNull();
+    expect(uploads).toHaveLength(1);
+    expect(uploads[0]).toMatch(new RegExp(`/message-photos/${CONVO}/[0-9a-f-]+\\.jpg$`));
+    expect(inserted).toMatchObject({ conversation_id: CONVO, attachment_kind: 'photo' });
+  });
+
+  test('a pasted PDF or Word file is a document, the same as from the button; pasted words are still words', async ({ page }) => {
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+
+    await paste(page, { name: 'Pay stub.pdf', type: 'application/pdf', base64: Buffer.from('%PDF-1.4\n%%EOF').toString('base64') });
+    await expect(page.getByText('Pay stub.pdf')).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Take this document out' })).toBeVisible();
+
+    await paste(page, {
+      name: 'Resume.docx',
+      type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      base64: Buffer.from('PK').toString('base64'),
+    });
+    await expect(page.getByText('Resume.docx')).toBeVisible();
+    await expect(page.getByText('Pay stub.pdf')).toHaveCount(0);
+
+    await editable(page).evaluate((el) => {
+      const data = new DataTransfer();
+      data.setData('text/plain', 'See you at 3');
+      el.focus();
+      el.dispatchEvent(new ClipboardEvent('paste', { bubbles: true, cancelable: true, clipboardData: data }));
+    });
+    await expect(editable(page)).toHaveText('See you at 3');
+    await expect(page.getByText('Resume.docx')).toBeVisible();
+  });
+
+  test('anything else is refused in words: a GIF, a WebP, a photo that will not open, an iPhone photo this browser cannot read', async ({ page }) => {
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+    const alert = composer(page).getByRole('alert');
+    const says = async (title: string, hint: string) => {
+      await expect(alert).toContainText(title);
+      await expect(alert).toContainText(hint);
+    };
+
+    await paste(page, { name: 'dance.gif', type: 'image/gif', base64: PNG });
+    await says("Pam can't send that file", 'Send a photo, a PDF or a Word file.');
+    await paste(page, { name: 'photo.webp', type: 'image/webp', base64: PNG });
+    await says("Pam can't send that file", 'Send a photo, a PDF or a Word file.');
+    await paste(page, { name: 'notes.txt', type: 'text/plain', base64: Buffer.from('hello').toString('base64') });
+    await says("Pam can't send that file", 'Send a photo, a PDF or a Word file.');
+
+    await paste(page, { name: 'broken.jpg', type: 'image/jpeg', base64: Buffer.from('not a picture').toString('base64') });
+    await says("That photo couldn't be opened", 'Try another one.');
+
+    // Chromium has no HEIC decoder; Safari does, and would take it.
+    await paste(page, { name: 'IMG_0412.HEIC', type: 'image/heic', base64: Buffer.from('....ftypheic').toString('base64') });
+    await says("This browser can't open that iPhone photo", 'Try sending it from your phone.');
+
+    // Nothing was picked, so there is nothing to send.
+    await expect(page.getByRole('button', { name: /send/i })).toBeDisabled();
+    // And a good one after a refusal clears the words.
+    await paste(page, { name: 'image.png', type: 'image/png', base64: PNG });
+    await expect(composer(page).getByRole('img', { name: 'The photo you picked' })).toBeVisible();
+    await expect(alert).toHaveCount(0);
+  });
+});
+
+test.describe('a file Pam cannot take: the alert banner shakes (D-409)', () => {
+  const composer = (page: import('@playwright/test').Page) => page.locator('.astryx-chat-composer');
+  const pasteGif = (page: import('@playwright/test').Page, name = 'dance.gif') =>
+    page.locator('.astryx-chat-composer-input [contenteditable="true"]').evaluate((el, n) => {
+      const data = new DataTransfer();
+      data.items.add(new File(['GIF89a'], n, { type: 'image/gif' }));
+      el.focus();
+      el.dispatchEvent(new ClipboardEvent('paste', { bubbles: true, cancelable: true, clipboardData: data }));
+    }, name);
+  const motion = (page: import('@playwright/test').Page) =>
+    page.locator('[data-refusal]').evaluate((el) => {
+      const s = getComputedStyle(el);
+      return { name: s.animationName, ms: parseFloat(s.animationDuration) * 1000 };
+    });
+
+  test('it is the warning banner, in the box, with a 48px way to close it', async ({ page }) => {
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+
+    await pasteGif(page);
+    const banner = composer(page).locator('.astryx-banner');
+    await expect(banner).toHaveAttribute('data-status', 'warning');
+    // Announced as an alert, and only once: the banner is the alert.
+    await expect(composer(page).getByRole('alert')).toHaveCount(1);
+    await expect(composer(page).getByRole('alert')).toContainText("Pam can't send that file");
+    const close = composer(page).getByRole('button', { name: 'Close this message' });
+    const box = (await close.boundingBox())!;
+    expect(box.width).toBeGreaterThanOrEqual(48);
+    expect(box.height).toBeGreaterThanOrEqual(48);
+    // It fits the box: nothing sticks out at the sides.
+    const frame = (await composer(page).boundingBox())!;
+    const b = (await banner.boundingBox())!;
+    expect(b.x).toBeGreaterThanOrEqual(frame.x - 1);
+    expect(b.x + b.width).toBeLessThanOrEqual(frame.x + frame.width + 1);
+
+    await close.click();
+    await expect(composer(page).getByRole('alert')).toHaveCount(0);
+  });
+
+  test.describe('with motion allowed', () => {
+    test.use({ reducedMotion: 'no-preference' });
+
+    test('it shakes once, quickly — and again for the next wrong file', async ({ page }) => {
+      await signedInAs(page, 'admin');
+      await withOneConversation(page);
+      await page.goto(`/messages/thread/?id=${CONVO}`);
+      await settled(page);
+
+      await pasteGif(page);
+      const first = await motion(page);
+      expect(first.name).not.toBe('none');
+      expect(first.ms).toBeGreaterThan(0);
+      expect(first.ms).toBeLessThanOrEqual(500);
+      const before = await page.locator('[data-refusal]').elementHandle();
+
+      // A second wrong file is a new banner, so it shakes (and is announced) again.
+      await pasteGif(page, 'again.gif');
+      await expect.poll(() => before!.evaluate((el) => el.isConnected)).toBe(false);
+      expect((await motion(page)).name).not.toBe('none');
+    });
+  });
+
+  test('with reduced motion it does not shake', async ({ page }) => {
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+
+    await pasteGif(page);
+    await expect(composer(page).getByRole('alert')).toBeVisible();
+    expect((await motion(page)).name).toBe('none');
+  });
+});
+
+test.describe('the conversation, drawn closer (D-400, D-401)', () => {
+  // A one-pixel PNG: what a stored photo downloads as here.
+  const PNG = Buffer.from(
+    'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+    'base64',
+  );
+  const withAPhoto = async (page: import('@playwright/test').Page) => {
+    await page.route('**/storage/v1/object/message-photos/**', (route) =>
+      route.fulfill({ status: 200, contentType: 'image/png', body: PNG }),
+    );
+    await page.route(MESSAGES, (route) =>
+      route.fulfill(
+        json([
+          {
+            id: 'their-photo',
+            conversation_id: CONVO,
+            sender_id: OTHER,
+            body: 'Is this the one?',
+            attachment_url: `${CONVO}/stop.jpg`,
+            attachment_kind: 'photo',
+            created_at: new Date().toISOString(),
+          },
+        ]),
+      ),
+    );
+  };
+
+  test('who they are stays on one line under the name, however long the program', async ({ page }) => {
+    await signedInAs(page, 'member');
+    await withOneConversation(page);
+    await page.route(PARTNERS, (route) =>
+      route.fulfill(
+        json([
+          {
+            conversation_id: CONVO,
+            profile_id: OTHER,
+            first_name: 'Renee',
+            role: 'provider',
+            program_name: 'Example Food Pantry of North Philadelphia and the Neighborhoods Around It',
+          },
+        ]),
+      ),
+    );
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+    const line = page.getByText(/^Program lead at Example Food Pantry/);
+    const box = await line.boundingBox();
+    expect(box!.height).toBeLessThan(24);
+    expect(await line.evaluate((el) => getComputedStyle(el).textOverflow)).toBe('ellipsis');
+  });
+
+  test('the header is the one every nested screen has: back and ⋯ in the same places, the name large, no fade (D-411)', async ({ page }) => {
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    await page.goto('/legal/');
+    await settled(page);
+    const legalBack = (await page.getByRole('link', { name: /^Back/ }).first().boundingBox())!;
+    const legalTitle = (await page.getByRole('heading', { level: 1 }).boundingBox())!;
+
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+    const back = (await page.getByRole('link', { name: /^Back/ }).first().boundingBox())!;
+    expect(back).toEqual(legalBack);
+    const title = page.getByRole('heading', { level: 1 });
+    const titleBox = (await title.boundingBox())!;
+    expect(titleBox.x).toBe(legalTitle.x);
+    expect(titleBox.y).toBe(legalTitle.y);
+    expect(await title.evaluate((el) => getComputedStyle(el).fontSize)).toBe('34px');
+
+    // ⋯ at the bar's right edge, as on a place: outlined in a grey you can see, and lifted.
+    const more = page.getByRole('link', { name: 'More options' });
+    const moreBox = (await more.boundingBox())!;
+    expect(moreBox.y).toBe(back.y);
+    expect(moreBox.x + moreBox.width).toBe(page.viewportSize()!.width - 16);
+    const look = await more.evaluate((el) => {
+      const s = getComputedStyle(el);
+      return { border: s.borderTopWidth, colour: s.borderTopColor, shadow: s.boxShadow };
+    });
+    expect(look.border).toBe('1px');
+    expect(look.colour).not.toMatch(/rgba\(0, 0, 0, 0\.0\d+\)/);
+    expect(look.shadow).not.toBe('none');
+
+    // No blur or fade laid over the messages under the header.
+    const faded = await page.evaluate(() => {
+      const top = document.querySelector('main')!.firstElementChild!;
+      return [...top.querySelectorAll('*')].some((el) => {
+        const style = getComputedStyle(el);
+        return style.backdropFilter.includes('blur') || (style.maskImage || style.webkitMaskImage || '').includes('gradient');
+      });
+    });
+    expect(faded).toBe(false);
+  });
+
+  test('the send button hugs the box\'s rounder bottom corner; the mic sits nearer its own', async ({ page }) => {
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+    const box = page.locator('.astryx-chat-composer > div').first();
+    const shell = (await box.boundingBox())!;
+    const send = (await page.getByRole('button', { name: /send/i }).boundingBox())!;
+    const mic = (await page.getByRole('button', { name: 'Speak your message' }).boundingBox())!;
+    // 8px in from the box's outer edge, border included, on both sides.
+    expect(Math.round(shell.x + shell.width - (send.x + send.width))).toBe(8);
+    expect(Math.round(shell.y + shell.height - (send.y + send.height))).toBe(8);
+    expect(Math.round(mic.x - shell.x)).toBe(8);
+    expect(Math.round(shell.y + shell.height - (mic.y + mic.height))).toBe(8);
+    expect(await box.evaluate((el) => getComputedStyle(el).borderBottomRightRadius)).toBe('32px');
+    expect(await box.evaluate((el) => getComputedStyle(el).borderTopRightRadius)).not.toBe('32px');
+  });
+
+  test('a photo sits in an even rim, with room before the words under it', async ({ page }) => {
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    await withAPhoto(page);
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+    const photo = page.getByRole('button', { name: 'A photo from Marcus' });
+    await expect(photo).toBeVisible();
+    const p = (await photo.boundingBox())!;
+    const bubble = (await photo.locator('xpath=ancestor::*[contains(@class,"astryx-chat-message-bubble")][1]').boundingBox())!;
+    const words = (await page.getByText('Is this the one?').boundingBox())!;
+    expect(Math.round(p.y - bubble.y)).toBe(Math.round(p.x - bubble.x));
+    expect(Math.round(p.x - bubble.x)).toBe(8);
+    expect(Math.round(words.y - (p.y + p.height))).toBeGreaterThanOrEqual(12);
+  });
+
+  test('a photo opens on near-black, with a round close button you can see', async ({ page }) => {
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    await withAPhoto(page);
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+    await page.getByRole('button', { name: 'A photo from Marcus' }).click();
+    const dialog = page.locator('dialog.astryx-lightbox');
+    await expect(dialog).toBeVisible();
+    expect(await dialog.evaluate((el) => getComputedStyle(el).backgroundColor)).toBe('rgba(0, 0, 0, 0.9)');
+    // It opens on the photo, not on × (D-411): nothing looks chosen.
+    await expect.poll(() => dialog.evaluate((el) => document.activeElement === el)).toBe(true);
+    const close = dialog.locator('.astryx-button').first();
+    const look = await close.evaluate((el) => {
+      const style = getComputedStyle(el);
+      const svg = el.querySelector('svg')!;
+      return {
+        width: el.getBoundingClientRect().width,
+        radius: style.borderRadius,
+        border: style.borderTopWidth,
+        background: style.backgroundColor,
+        icon: svg.getBoundingClientRect().width,
+        iconColor: getComputedStyle(svg).color,
+      };
+    });
+    expect(look).toMatchObject({ width: 48, radius: '50%', border: '1px', background: 'rgb(43, 43, 43)', icon: 24 });
+    expect(look.iconColor).toBe('rgb(255, 255, 255)');
+  });
+
+});
+
+test.describe('stuff shared, in one list (D-402, D-407)', () => {
+  const PNG = Buffer.from(
+    'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+    'base64',
+  );
+  const at = (minutesAgo: number) => new Date(Date.now() - minutesAgo * 60_000).toISOString();
+  const LONG = 'Marcus Johnson resume for the warehouse job at the North Philadelphia distribution center.docx';
+
+  async function picturesServed(page: import('@playwright/test').Page) {
+    for (const bucket of ['message-photos', 'link-previews']) {
+      await page.route(`**/storage/v1/object/${bucket}/**`, (route) =>
+        route.fulfill({ status: 200, contentType: 'image/png', body: PNG }),
+      );
+    }
+  }
+
+  test('the ⋯ page leads to Stuff shared: one flat list, newest first, who and when at the end', async ({ page }) => {
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    await picturesServed(page);
+    await page.route('**/rest/v1/message_link_previews*', (route) =>
+      route.fulfill(
+        json([{ message_id: 'l1', title: 'Free resume workshop', site: 'Example Library', image_path: `${CONVO}/l1.png` }]),
+      ),
+    );
+    let asked = 0;
+    await page.route('**/functions/v1/link-preview', (route) => {
+      asked += 1;
+      return route.fulfill(json({ made: 0 }));
+    });
+    await page.route(MESSAGES, (route) =>
+      route.fulfill(
+        json([
+          { id: 'p1', conversation_id: CONVO, sender_id: OTHER, body: null, attachment_url: `${CONVO}/a.jpg`, attachment_kind: 'photo', created_at: at(50) },
+          { id: 't1', conversation_id: CONVO, sender_id: ME, body: 'Thanks', created_at: at(40) },
+          { id: 'f1', conversation_id: CONVO, sender_id: ME, body: null, attachment_url: `${CONVO}/b.pdf`, attachment_kind: 'file', attachment_name: 'Lease.pdf', attachment_bytes: 245_760, created_at: at(30) },
+          { id: 'g1', conversation_id: CONVO, sender_id: OTHER, body: 'https://docs.google.com/document/d/x/edit', created_at: at(20) },
+          { id: 'l1', conversation_id: CONVO, sender_id: OTHER, body: 'Saturday: https://example-library.org/workshop', created_at: at(15) },
+          { id: 'p2', conversation_id: CONVO, sender_id: ME, body: 'Mine', attachment_url: `${CONVO}/c.jpg`, attachment_kind: 'photo', created_at: at(10) },
+        ]),
+      ),
+    );
+    await page.goto(`/messages/thread/options/?id=${CONVO}`);
+    await settled(page);
+    await page.getByRole('link', { name: 'Stuff shared' }).click();
+    await expect(page).toHaveURL(new RegExp(`/messages/thread/files/\\?id=${CONVO}`));
+    await expect(page.getByRole('heading', { name: 'Stuff shared', level: 1 })).toBeVisible();
+
+    // One list — no sections, no carousel — newest first.
+    const list = page.getByRole('list', { name: 'Stuff shared' });
+    const rows = list.getByRole('listitem');
+    await expect(rows).toHaveCount(5);
+    await expect(page.getByRole('region')).toHaveCount(0);
+    await expect(rows.nth(0)).toContainText('Mine');
+    await expect(rows.nth(1)).toContainText('Free resume workshop');
+    await expect(rows.nth(2)).toContainText('Google Doc');
+    await expect(rows.nth(3)).toContainText('Lease.pdf');
+    await expect(rows.nth(4)).toContainText('Photo');
+
+    // Who over when, at the end of the row where a chevron would be.
+    await expect(rows.nth(0)).toContainText('You');
+    await expect(rows.nth(1)).toContainText('Marcus');
+    const name = (await rows.nth(3).getByText('Lease.pdf').boundingBox())!;
+    const who = (await rows.nth(3).getByText('You', { exact: true }).boundingBox())!;
+    expect(who.x).toBeGreaterThan(name.x + name.width);
+
+    // Each row says it all to a screen reader, who and when included.
+    await expect(page.getByRole('button', { name: /^Mine Photo, Sent by You, / })).toBeVisible();
+    // What each thing is, in a word — Photo or Document (D-409) — and for a
+    // link, where it goes: its real address, not the page's own name (D-410).
+    const link = page.getByRole('link', { name: /^Free resume workshop example-library\.org, Sent by Marcus, / });
+    await expect(link).toHaveAttribute('href', 'https://example-library.org/workshop');
+    await expect(link).toHaveAttribute('target', '_blank');
+    await expect(page.getByRole('link', { name: /^Google Doc Document, Sent by Marcus, / })).toBeVisible();
+    await expect(page.getByRole('button', { name: /^Lease\.pdf Document, Sent by You, / })).toBeVisible();
+    await expect(page.getByText(/kB|PDF ·|Example Library/)).toHaveCount(0);
+    await expect(page.getByRole('button', { name: /^Photo Sent by Marcus, / })).toBeVisible();
+
+    // The link's picture came from Pam's storage; nothing was asked of the server.
+    await expect(rows.nth(1).locator('img')).toHaveCount(1);
+    expect(asked).toBe(0);
+
+    await page.getByRole('button', { name: /Mine.*Photo/ }).click();
+    await expect(page.locator('dialog.astryx-lightbox')).toBeVisible();
+  });
+
+  test('an older link with no preview asks Pam\'s server once, then shows it', async ({ page }) => {
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    await picturesServed(page);
+    let made = false;
+    const bodies: unknown[] = [];
+    await page.route('**/rest/v1/message_link_previews*', (route) =>
+      route.fulfill(json(made ? [{ message_id: 'l1', title: 'Route 47 bus times', site: 'Example Transit', image_path: null }] : [])),
+    );
+    await page.route('**/functions/v1/link-preview', (route) => {
+      bodies.push(route.request().postDataJSON());
+      made = true;
+      return route.fulfill(json({ made: 1 }));
+    });
+    await page.route(MESSAGES, (route) =>
+      route.fulfill(json([{ id: 'l1', conversation_id: CONVO, sender_id: ME, body: 'https://example-transit.org/route-47', created_at: at(5) }])),
+    );
+    await page.goto(`/messages/thread/files/?id=${CONVO}`);
+    await settled(page);
+    await expect(page.getByText('Route 47 bus times')).toBeVisible();
+    expect(bodies).toEqual([{ message_ids: ['l1'] }]);
+  });
+
+  test('a link with no preview is its own address, and says it is a link (D-410)', async ({ page }) => {
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    await picturesServed(page);
+    await page.route('**/rest/v1/message_link_previews*', (route) => route.fulfill(json([])));
+    await page.route('**/functions/v1/link-preview', (route) => route.fulfill(json({ made: 0 })));
+    await page.route(MESSAGES, (route) =>
+      route.fulfill(json([{ id: 'l1', conversation_id: CONVO, sender_id: ME, body: 'https://www.example-transit.org/route-47', created_at: at(5) }])),
+    );
+    await page.goto(`/messages/thread/files/?id=${CONVO}`);
+    await settled(page);
+    await expect(page.getByRole('link', { name: /^example-transit\.org\/route-47 Link, Sent by You, / })).toBeVisible();
+  });
+
+  test.describe('with motion allowed', () => {
+    // The rest of the suite runs with reduced motion (playwright.config).
+    test.use({ reducedMotion: 'no-preference' });
+    test('a name too long for one line slides to show its end, once; a short one stays still', async ({ page }) => {
+      await signedInAs(page, 'admin');
+      await withOneConversation(page);
+      await page.route(MESSAGES, (route) =>
+        route.fulfill(
+          json([
+            { id: 'f1', conversation_id: CONVO, sender_id: ME, body: null, attachment_url: `${CONVO}/r.docx`, attachment_kind: 'file', attachment_name: LONG, attachment_bytes: 48_128, created_at: at(30) },
+            { id: 'f2', conversation_id: CONVO, sender_id: ME, body: null, attachment_url: `${CONVO}/b.pdf`, attachment_kind: 'file', attachment_name: 'Lease.pdf', attachment_bytes: 1000, created_at: at(20) },
+          ]),
+        ),
+      );
+      await page.goto(`/messages/thread/files/?id=${CONVO}`);
+      await settled(page);
+      const long = page.locator('[data-marquee]', { hasText: LONG });
+      const short = page.locator('[data-marquee]', { hasText: 'Lease.pdf' });
+      // One line, whatever the length.
+      const box = (await long.locator('xpath=..').boundingBox())!;
+      expect(box.height).toBeLessThan(30);
+      await expect(short).toHaveAttribute('data-marquee', 'fits');
+      await expect(long).toHaveAttribute('data-marquee', 'moving');
+      const animation = await long.evaluate((el) => {
+        const s = getComputedStyle(el);
+        return { name: s.animationName, ms: parseFloat(s.animationDuration) * 1000, shift: s.getPropertyValue('--pam-marquee-shift') };
+      });
+      expect(animation.name).not.toBe('none');
+      expect(animation.ms).toBeLessThanOrEqual(5000);
+      expect(parseFloat(animation.shift)).toBeLessThan(0);
+      // It plays once and stops, cut off again (WCAG 2.2.2: under five seconds, no loop).
+      await expect(long).toHaveAttribute('data-marquee', 'cut', { timeout: 8000 });
+    });
+  });
+
+  test('with reduced motion, a long name never moves', async ({ page }) => {
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    await page.route(MESSAGES, (route) =>
+      route.fulfill(
+        json([{ id: 'f1', conversation_id: CONVO, sender_id: ME, body: null, attachment_url: `${CONVO}/r.docx`, attachment_kind: 'file', attachment_name: LONG, attachment_bytes: 48_128, created_at: at(30) }]),
+      ),
+    );
+    await page.goto(`/messages/thread/files/?id=${CONVO}`);
+    await settled(page);
+    const long = page.locator('[data-marquee]', { hasText: LONG });
+    await expect(long).toHaveAttribute('data-marquee', 'cut');
+    await page.waitForTimeout(1500);
+    await expect(long).toHaveAttribute('data-marquee', 'cut');
+  });
+
+  test('a conversation with nothing shared says so', async ({ page }) => {
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    await page.goto(`/messages/thread/files/?id=${CONVO}`);
+    await settled(page);
+    await expect(page.getByText(/^Nothing yet\. Photos, documents and links sent in this conversation will be here/)).toBeVisible();
+  });
+});
+
+
+test.describe('the jump-to-newest button, with motion on (D-398)', () => {
+  // The rest of the suite runs with reduced motion; this is where the
+  // button's coming and going is seen at all.
+  test.use({ reducedMotion: 'no-preference' });
+
+  const LABEL = 'Jump to the newest message';
+  // Samples the button every frame for a while: its scale and opacity, or
+  // `gone` once it is out of the page.
+  const watch = (page: import('@playwright/test').Page, ms: number, tap = false) =>
+    page.evaluate(
+      async ([label, duration, shouldTap]) => {
+        const find = () => document.querySelector<HTMLElement>(`button[aria-label="${label}"]`);
+        if (shouldTap) find()!.click();
+        const frames: { gone: boolean; scale: number; opacity: number }[] = [];
+        const start = performance.now();
+        while (performance.now() - start < duration) {
+          await new Promise((done) => requestAnimationFrame(done));
+          const el = find();
+          if (!el) {
+            frames.push({ gone: true, scale: 0, opacity: 0 });
+            continue;
+          }
+          const style = getComputedStyle(el);
+          const matrix = new DOMMatrix(style.transform === 'none' ? undefined : style.transform);
+          frames.push({ gone: false, scale: matrix.a, opacity: Number(style.opacity) });
+        }
+        return frames;
+      },
+      [LABEL, ms, tap] as const,
+    );
+
+  test('it grows in as you scroll up, and swells then fades when tapped', async ({ page }) => {
+    await signedInAs(page, 'admin');
+    await withOneConversation(page);
+    await page.route(MESSAGES, (route) =>
+      route.fulfill(
+        json(
+          Array.from({ length: 30 }, (_, i) => ({
+            id: `m-${i}`,
+            conversation_id: CONVO,
+            sender_id: i % 2 ? ME : OTHER,
+            body: `Message number ${i + 1} in a long conversation.`,
+            created_at: new Date(Date.now() - (30 - i) * 60_000).toISOString(),
+          })),
+        ),
+      ),
+    );
+    await page.goto(`/messages/thread/?id=${CONVO}`);
+    await settled(page);
+    await expect(page.getByRole('button', { name: LABEL })).toHaveCount(0);
+
+    // Scroll up: it arrives smaller and see-through, and settles whole.
+    const log = page.getByRole('log');
+    await log.hover();
+    await page.mouse.wheel(0, -600);
+    const arriving = await watch(page, 500);
+    const seen = arriving.filter((f) => !f.gone);
+    expect(seen.some((f) => f.scale < 0.95 && f.opacity < 1)).toBe(true);
+    expect(seen.at(-1)).toMatchObject({ scale: 1, opacity: 1 });
+
+    // Tapped: bigger than itself first, then fading, then gone.
+    const leaving = await watch(page, 600, true);
+    const before = leaving.filter((f) => !f.gone);
+    expect(Math.max(...before.map((f) => f.scale))).toBeGreaterThan(1.05);
+    expect(before.some((f) => f.scale > 1 && f.opacity < 0.5)).toBe(true);
+    // Once it starts to fade it only fades: it never pops back in while the
+    // conversation runs down to the newest message.
+    const fading = before.slice(before.findIndex((f) => f.opacity < 1));
+    expect(fading.every((f, i) => i === 0 || f.opacity <= fading[i - 1]!.opacity + 0.01)).toBe(true);
+    expect(leaving.at(-1)!.gone).toBe(true);
+
+    // And the conversation is at its newest message.
+    await expect(log.getByText('Message number 30 in a long conversation.')).toBeInViewport();
+
+    // Scroll up again and it comes back.
+    await page.mouse.wheel(0, -600);
+    await expect(page.getByRole('button', { name: LABEL })).toBeVisible();
   });
 });
 

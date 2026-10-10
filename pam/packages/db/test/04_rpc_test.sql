@@ -52,7 +52,7 @@ do $$
 declare
   inv public.invites;
 begin
-  inv := public.create_invite('admin', '+15555550999', null, 'Cam');
+  inv := public.create_staff_invite('admin', 'cam@example.org', '+15555550999', null, 'Cam');
   if inv.role <> 'admin' then
     raise exception 'FAIL  the case manager invite came back as %', inv.role;
   end if;
@@ -1247,7 +1247,7 @@ do $$
 declare
   inv public.invites;
 begin
-  inv := public.create_invite('admin', '+15555550998', null, 'Sam');
+  inv := public.create_staff_invite('admin', 'sam@example.org', '+15555550998', null, 'Sam');
   if inv.region_id <> '11111111-0000-0000-0000-000000000001' then
     raise exception 'FAIL  a case manager''s case manager invite is for %', inv.region_id;
   end if;
@@ -1284,7 +1284,7 @@ begin
     raise notice 'ok    nobody is invited to be a super admin';
   end;
 
-  inv := public.create_invite('admin', '+15555550881', '11111111-0000-0000-0000-000000000002', 'Kim');
+  inv := public.create_staff_invite('admin', 'kim@example.org', '+15555550881', '11111111-0000-0000-0000-000000000002', 'Kim');
   if inv.role <> 'admin' or inv.region_id <> '11111111-0000-0000-0000-000000000002' then
     raise exception 'FAIL  the admin invite came back as % in %', inv.role, inv.region_id;
   end if;

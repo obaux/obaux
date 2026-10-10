@@ -9,6 +9,7 @@ import { SubPage } from '@pam/ui/SubPage';
 import { useI18n } from '@/lib/i18n';
 import { usePolicies } from '@/lib/usePolicies';
 import { HelpButton } from './HelpButton';
+import { intlLocale } from '@pam/config';
 
 /**
  * Which of the program's policies this member has signed (D-324, Will,
@@ -35,7 +36,7 @@ const ICON = { width: 26, height: 26, 'aria-hidden': true } as const;
 export function PersonPoliciesView({ personId, firstName }: { readonly personId: string; readonly firstName: string }) {
   const { t, locale } = useI18n();
   const { policies } = usePolicies();
-  const day = new Intl.DateTimeFormat(locale, { month: 'long', day: 'numeric' });
+  const day = new Intl.DateTimeFormat(intlLocale(locale), { month: 'long', day: 'numeric' });
   const rows = policies.map((policy) => ({
     policy,
     signedAt: policy.signedBy.find((s) => s.personId === personId)?.signedAt ?? null,

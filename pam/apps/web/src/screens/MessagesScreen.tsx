@@ -6,6 +6,7 @@ import { isFreshAccount } from '@/lib/programSetup';
 import { dummyConversationsFor } from '@pam/config/dummy-conversations';
 import { DUMMY_ANYONE } from '@pam/config/dummy-people';
 import { useI18n } from '@/lib/i18n';
+import { usePreloadThreadView } from '@/app/messages/ThreadViewLazy';
 import { useSession } from '@/lib/useSession';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useRoleView } from '@/lib/useViewedRole';
@@ -18,6 +19,7 @@ import { LimitedNotice } from '../app/messages/LimitedNotice';
 import type { PickablePerson } from '../app/messages/NewMessagePicker';
 import { useMessageableMembers } from '@/lib/useMessageableMembers';
 import { openConversation } from '@/lib/openConversation';
+import { readAccountLimited } from '@/lib/accountLimited';
 import { HeaderActions } from './HeaderActions';
 import { FloatingAction } from '@pam/ui/FloatingAction';
 import { ConnectionsIcon } from '@pam/ui';
@@ -30,13 +32,17 @@ import { MessagesView, type MessageRow } from './MessagesView';
  * kept for demos.
  */
 export function MessagesScreen() {
+  // A conversation opens ready, its composer and fades already loaded (D-400).
+  usePreloadThreadView();
   const { t, locale } = useI18n();
   const { state: session } = useSession();
   const supportPhone = useSupportPhone();
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
   // A limited account reads but cannot start a message (0031): no New message,
   // and the screen says what is off and who to call (terms.s.limits.p3, D-427).
-  const limited = session.status === 'signed-in' && session.session.accessStatus === 'limited';
+  // ...or found out part-way through: starting a conversation was refused (`pick`).
+  const [limitedNow, setLimitedNow] = useState(false);
+  const limited = limitedNow || (session.status === 'signed-in' && session.session.accessStatus === 'limited');
   const { viewedRole } = useRoleView(trueRole);
   // The super admin may message staff, to help them start (0072, D-262).
   const canMessage =
@@ -67,7 +73,13 @@ export function MessagesScreen() {
     async (id: string): Promise<string | null> => {
       if (useExamplePeople) return pickerExamples?.hrefFor(id) ?? null;
       const conversationId = await openConversation(id);
-      return conversationId ? `/messages/thread/?id=${encodeURIComponent(conversationId)}` : null;
+      if (conversationId) return `/messages/thread/?id=${encodeURIComponent(conversationId)}`;
+      // Refused because the account is limited: say so, not "Your connection dropped" (D-429).
+      if (await readAccountLimited()) {
+        setLimitedNow(true);
+        setPicking(false);
+      }
+      return null;
     },
     [useExamplePeople, pickerExamples],
   );
@@ -81,7 +93,13 @@ export function MessagesScreen() {
           id: c.id,
           name: c.otherName ?? t('messages.thread.someone'),
           context: contextFor(role, c.otherRole ? { role: c.otherRole, programName: c.otherProgramName } : null, t),
-          preview: preview(c.lastMessageBody, c.lastMessageMine),
+          // A photo with no words reads "Photo" (D-394).
+          preview: preview(c.lastMessageBody ??
+            (c.lastMessageAttachment === 'photo'
+              ? t('messages.preview.photo')
+              : c.lastMessageAttachment === 'file'
+                ? t('messages.preview.file')
+                : null), c.lastMessageMine),
           when: c.lastMessageAt ? whenHappened(c.lastMessageAt, locale, t) : null,
           unread: c.unread,
           href: `/messages/thread/?id=${encodeURIComponent(c.id)}`,

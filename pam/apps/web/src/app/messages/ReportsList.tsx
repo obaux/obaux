@@ -1,12 +1,17 @@
 'use client';
 
+import { useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { VStack } from '@astryxdesign/core/VStack';
 import { HStack } from '@astryxdesign/core/HStack';
 import { Card } from '@astryxdesign/core/Card';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
-import { Badge } from '@astryxdesign/core/Badge';
+import { Badge } from '@pam/ui/Badge';
+import { Thumbnail } from '@astryxdesign/core/Thumbnail';
+import type { MessageFile } from '@/lib/messageFile';
+import { MessageFileCard } from './MessageFileCard';
+import { PhotoViewer } from './PhotoViewer';
 import { MESSAGE_REPORT_REASONS, type Role } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { whenHappened } from '@/lib/when';
@@ -25,6 +30,10 @@ export interface ReportListItem {
   readonly id: string;
   readonly reason: string | null;
   readonly excerpt: string | null;
+  /** The reported message's photo (D-394), when it had one. */
+  readonly photoUrl?: string | null;
+  /** The reported message's document (D-399), when it had one; opened on a tap. */
+  readonly file?: MessageFile | null;
   readonly createdAt: string;
   readonly resolvedAt: string | null;
   readonly reporterName: string | null;
@@ -36,15 +45,21 @@ export interface ReportListItem {
 const styles = stylex.create({
   card: { width: '100%' },
   excerpt: { fontSize: '18px', lineHeight: 1.4, whiteSpace: 'pre-wrap' },
+  photo: { width: '160px', height: '160px', borderRadius: '14px' },
   meta: { fontSize: '16px' },
   name: { fontSize: '18px' },
 });
 
 export function ReportsList({ reports }: { readonly reports: readonly ReportListItem[] }) {
   const { t, locale } = useI18n();
+  const [viewing, setViewing] = useState<string | null>(null);
 
   return (
     <VStack gap={3}>
+      <PhotoViewer
+        media={viewing !== null ? { src: viewing, alt: t('reports.photo') } : null}
+        onClose={() => setViewing(null)}
+      />
       {reports.map((report) => {
         const reason =
           report.reason && (MESSAGE_REPORT_REASONS as readonly string[]).includes(report.reason)
@@ -62,6 +77,15 @@ export function ReportsList({ reports }: { readonly reports: readonly ReportList
                   {whenHappened(report.createdAt, locale, t)}
                 </Text>
               </HStack>
+              {report.photoUrl ? (
+                <Thumbnail
+                  src={report.photoUrl}
+                  alt={t('reports.photo')}
+                  onClick={() => setViewing(report.photoUrl ?? null)}
+                  xstyle={styles.photo}
+                />
+              ) : null}
+              {report.file ? <MessageFileCard file={report.file} /> : null}
               {report.excerpt ? <Text xstyle={styles.excerpt}>{report.excerpt}</Text> : null}
               <Heading level={3} xstyle={styles.name}>
                 {t('reports.about', { name: report.aboutName ?? t('messages.thread.someone') })}

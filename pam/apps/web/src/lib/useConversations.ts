@@ -47,6 +47,8 @@ export interface ConversationRow {
    * reach through this hook either.
    */
   readonly lastMessageBody: string | null;
+  /** What the last message carried (D-394, D-399); with no words, the row says "Photo" or "Document". */
+  readonly lastMessageAttachment: 'photo' | 'file' | null;
   readonly lastMessageMine: boolean;
   /** A message from the other person arrived since this was last opened. */
   readonly unread: boolean;
@@ -75,11 +77,15 @@ interface LatestMessageRow {
   conversation_id: string;
   sender_id: string;
   body: string | null;
+  attachment_kind: string | null;
   created_at: string;
 }
 
 /** How many of the most recent messages, across every conversation, to scan for recency. */
 const RECENCY_SCAN_LIMIT = 500;
+
+const attachmentOf = (kind: string | null | undefined): 'photo' | 'file' | null =>
+  kind === 'photo' || kind === 'file' ? kind : null;
 
 export function useConversations(enabled: boolean): {
   state: ConversationsState;
@@ -129,7 +135,7 @@ export function useConversations(enabled: boolean): {
             supabase.rpc('conversation_partners'),
             supabase
               .from('messages')
-              .select('conversation_id, sender_id, body, created_at')
+              .select('conversation_id, sender_id, body, attachment_kind, created_at')
               .in('conversation_id', ids)
               .order('created_at', { ascending: false })
               .limit(RECENCY_SCAN_LIMIT),
@@ -181,6 +187,7 @@ export function useConversations(enabled: boolean): {
               otherProgramName: other?.programName ?? null,
               lastMessageAt: latestMsg?.created_at ?? null,
               lastMessageBody: latestMsg?.body ?? null,
+              lastMessageAttachment: attachmentOf(latestMsg?.attachment_kind),
               lastMessageMine: latestMsg ? latestMsg.sender_id === me : false,
               unread,
             };

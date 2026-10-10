@@ -79,10 +79,15 @@ function fitFor(button: HTMLElement | null): Fit {
   const screen = document.documentElement.clientWidth;
   const width = Math.min(TIP_WIDTH, screen - GUTTER * 2);
   const middle = (left + right) / 2;
-  if (left + width <= screen - GUTTER) return { alignment: 'start', width };
-  if (right - width >= GUTTER) return { alignment: 'end', width };
+  // "Start" opens along the reading direction: rightwards, and leftwards when the page reads right to left.
+  const rtl = getComputedStyle(button).direction === 'rtl';
+  const roomRight = left + width <= screen - GUTTER;
+  const roomLeft = right - width >= GUTTER;
+  if (rtl ? roomLeft : roomRight) return { alignment: 'start', width };
+  if (rtl ? roomRight : roomLeft) return { alignment: 'end', width };
   if (middle - width / 2 >= GUTTER && middle + width / 2 <= screen - GUTTER) return { alignment: 'center', width };
-  return { alignment: right > screen - left ? 'end' : 'start' };
+  const moreRoomLeft = right > screen - left;
+  return { alignment: moreRoomLeft === rtl ? 'start' : 'end' };
 }
 
 export function InfoTip({ label, content, icon, placement = 'below', alignment }: InfoTipProps) {

@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { BottomSheet } from '@astryxdesign/core/BottomSheet';
 import { sheet } from '@pam/ui/sheet';
-import { Button } from '@astryxdesign/core/Button';
+import { Button } from '@pam/ui/Button';
 import { Heading } from '@astryxdesign/core/Heading';
 import { HStack } from '@astryxdesign/core/HStack';
 import { Text } from '@astryxdesign/core/Text';

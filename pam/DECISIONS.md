@@ -6,6 +6,11 @@ is simpler for a first-time phone user.**
 
 Newest first within each section.
 
+**From D-442 on, each decision is its own file in `docs/decisions/`** (made with
+`pnpm claim decision "<title>"`), not an entry here — two sessions appending to one
+file at the same moment was the conflict this replaces. Everything up to D-441 stays
+below. `packages/config/test/numbering.test.ts` reads both.
+
 ---
 
 ## Open — need Will
@@ -9538,6 +9543,842 @@ response key is unchanged. Rule for next time: any new table with two
 foreign keys to the same table needs its embeds hinted, and a test that
 reads the select string, not just the mock's answer.
 
+### D-389 — Conversations: one divider per day; one rounded composer, send turns green
+
+**Date:** 2026-10-08. Will: "Separating bubbles by date instead of listing
+dates under each box. This way it's cleaner. And redesigning the chat box
+like this, minus gif support. When text is entered the send button gets dark
+green." (A reference: one rounded box, placeholder on top, a row of icons
+under it, a round send button bottom right.)
+
+- **Days.** Each day opens with one centred divider — Astryx's own
+  `ChatSystemMessage variant="divider"`, made for date separators — reading
+  "Today", "Yesterday", the weekday within the last week, then "Mon, Sep 21"
+  (the year only when it isn't this year). `dayLabel()`/`dayKey()` in
+  `lib/when.ts` count local calendar days, as `daysUntil` does; tested,
+  English and Spanish. A bubble keeps only its time.
+- **Composer.** `ChatComposer elevation="none"`: flat with a border, the
+  text on top, the footer row under it — the mic on the left
+  (`footerActions`), the send button on the right. The send button is a 48px
+  circle: grey (`--color-background-muted`, secondary text colour) while
+  there's nothing to send — not the half-faded green a disabled primary
+  button draws by default — and Pam's dark green primary once there is.
+  Typed text is 18px, like the messages (a `globals.css` rule on
+  `.astryx-chat-composer-input > div`; Astryx draws it at the type scale's
+  14px, 16px on touch, with no prop to reach it).
+- **No attach button.** The reference has a paperclip; Pam has no storage
+  for message attachments (only `staff-photos`), and a button that does
+  nothing is worse than none (§1). `messages` already has
+  `attachment_url`/`attachment_kind ('voice','photo')` columns, so adding it
+  is a bucket, its policies, an upload, and rendering — Will's call.
+
+### D-390 — Conversations: drag to see the times; mine green, theirs grey; bolder icons; slimmer sides
+
+**Date:** 2026-10-08. Will, on D-389's screenshot: "The mic icon and attach
+icon need to be bolder. Less left and right padding on screen. The metadata
+you and timestamp should be something you drag to side to see, like
+iMessages. Light Green chat bubbles is me, and gray is them."
+
+- **Who and when, out of sight.** No "You"/name over a bubble and no time
+  under it. Side, colour and the photo say who. Dragging the conversation
+  sideways slides each time in at the right edge; letting go eases it back
+  (`RevealTimes` in `ThreadView.tsx`). As in iMessage, only my bubbles move
+  — theirs, the avatars and the day dividers stay put — so every bubble
+  leaves the 84px time column free (`min(max(80%, 280px), 100% - 84px)`,
+  Astryx's own cap otherwise), and a time never lands on a bubble.
+- **How the drag is built.** Pointer events on one wrapper with
+  `touch-action: pan-y`: a drag that starts sideways is ours (pointer
+  capture, clamped to 84px), one that starts up or down stays the browser's
+  scroll. The distance is a custom property (`--pam-reveal`) set on the
+  wrapper and read by the bubbles and times, so a pointer move restyles one
+  element and re-renders no messages. The times sit just past each row's
+  end, clipped by `overflow-x: clip` (not `hidden`, which would make a
+  second scroll box). Reduced motion: no ease, it snaps back.
+- **Screen readers lose nothing.** Each message's name and time are its
+  label — `ChatMessage`'s own `name` slot, visually hidden — so the article
+  reads "Teresa, 3:01 PM" (before this it was Astryx's fallback, "Message
+  from assistant"). The visible time is `aria-hidden`. A hidden name row
+  still brings Astryx's 4px gap; the bubble takes it back with a −4px
+  margin so it sits level with the avatar.
+- **Colours.** Mine `--color-background-green` (Astryx's light green, a
+  token in both modes); theirs the default `--color-neutral` grey.
+- **Bolder icons.** The composer's mic and send arrow are drawn at stroke
+  2.25 instead of 1.5, both together so they stay matched (D-192). The mic
+  is `ChatDictationButton`'s own with no icon prop, so it is one
+  `globals.css` rule, `.astryx-chat-composer svg`. There is no attach icon:
+  that is still Will's call (D-389).
+- **Slimmer sides.** The thread frame's 12px side padding moved onto the
+  header block (`ThreadTop`, which the demo thread now uses too), so the
+  conversation sits on Astryx's own 12px list padding and the composer on
+  its 8px dock: bubbles 12px from the screen edge (was 24), the composer 8px
+  (was 20).
+
+### D-391 — The composer sits at least 24px off the bottom of the screen
+
+**Date:** 2026-10-08. Will: "Add more bottom padding below text box."
+
+The thread frame's bottom padding was the device's safe-area inset alone,
+which is 0 on a phone with no home indicator (and in Storybook), so the
+composer sat 8px off the bottom edge — only its `ChatLayout` dock's own
+padding. It is now `max(env(safe-area-inset-bottom, 0px), 16px)`: 24px in
+all with the dock's 8px, and unchanged on an iPhone, whose 34px inset is
+already larger. In `ThreadFrame`, so a real thread and the example thread
+get it alike.
+
+### D-392 — Conversations: more room between days; messages at 16px
+
+**Date:** 2026-10-08. Will: "Add more gap between day sections in chat for
+better hierarchy, so things aren't so squished together. And drop font down
+to 16px."
+
+- **Days as sections.** A day's divider gets 24px above it and 8px below,
+  on top of the list's 8px row gap: 32px before a new day, 16px from the
+  divider to its first message, 8px between messages. The space says which
+  break is bigger before the label is read. The first day's divider has
+  nothing extra above it. (`xstyle` on `ChatSystemMessage`, which Astryx
+  passes to the divider's wrapper.)
+- **16px text.** Message text and the composer's typed text both drop from
+  18px to 16px, still matched (D-389). This is below §2.5's 18px body floor,
+  so it is an SOP amendment, A21, scoped to the conversation; the page's own
+  base size and its test are unchanged. 16px is the floor for the composer
+  in any case: iOS zooms into a field below it.
+
+### D-393 — Even more room under the composer; a white scroll-down button
+
+**Date:** 2026-10-08. Will, on a screenshot of the composer: "please add
+even more padding below text box. And make the arrow down white with larger
+stronger icon and shadow."
+
+- **Bottom.** The thread frame's minimum bottom padding goes from 16px
+  (D-391) to 32px: the composer sits 40px off the bottom edge with the dock's
+  own 8px. An iPhone's 34px home-indicator inset still wins where it is
+  larger, so there the composer sits nearly where it did.
+- **Scroll to the newest message.** The 48px round button is the popover
+  ground (`--color-background-popover`: white in light mode, Pam's dark
+  surface in dark, where a white disc would glare) instead of the pale green
+  secondary ground, with the dark text colour for its arrow and a 24px
+  chevron (was 16px). Its shadow stays the `low` elevation it had: the
+  `high` one shipped first and Will took it back the same hour ("ignore
+  stronger shadow").
+- **Stroke.** The arrow takes the composer icons' 2.25 stroke. The D-390
+  rule widened from `.astryx-chat-composer svg` to `.astryx-chat-layout svg`,
+  so the mic, the send arrow and this arrow stay matched; the thread header
+  sits outside `ChatLayout` and keeps 1.5.
+- **Not changed:** the faint blurred sliver of a message under the composer
+  while scrolled up is `ChatLayout`'s frosted-glass layer behind the dock,
+  Astryx's own design.
+
+### D-394 — Photos in conversations, and what everyone is told about them
+
+**Date:** 2026-10-08. Will: "let's build the photo storage and update the
+privacy policy and what we tell members and staff about it" (after asking
+why Pam didn't allow images — it never decided not to; nothing stored them).
+
+**Who can see a photo — the database decides (0079).**
+- A private bucket, `message-photos`, one folder per conversation
+  (`<conversation id>/<random>.jpg`), 5 MB cap, JPEG/PNG/WebP.
+- **Put one there:** a person in that conversation, active, chat allowed,
+  no block in the conversation — the same four tests a message insert makes
+  (0076).
+- **See one:** the two people in the conversation. Once the message holding
+  it is reported, also the people who see that report
+  (`report_visible_to_me`, 0065: the case manager responsible for either
+  person, and the super admins) — the same route a reported message's words
+  take, and the only one. There is no admin policy on the bucket, as there
+  is none on `messages`.
+- **Change or remove one:** nobody edits a photo. The uploader may delete it
+  only while no message uses it (a send that failed half way). A sent photo
+  stays with its message, like words do.
+- **A message's photo must be in its own conversation's folder** (a check
+  constraint), so a message can't point at somebody else's picture. Voice
+  notes stay unbuilt: until they have storage and rules, an attachment is a
+  photo.
+- The reviewer screen reads a reported photo's path from a new
+  `report_photos_for_review()` — a new function, not a column on
+  `reports_for_review()`, because changing its return type means dropping it.
+- `test/15_message_photos_test.sql`: 18 checks — private bucket; members in,
+  outsiders out; a case manager not in the conversation, and a super admin,
+  see nothing until a report; after it, the reporter's case manager and the
+  super admin do and an unrelated case manager still doesn't; a report opens
+  no other message; nobody deletes the other person's or a sent photo.
+
+**On the phone.**
+- A photo button (Pam's new `PhotoIcon` — a picture, not a camera: the
+  picker offers the photo library and the camera) beside the mic opens the
+  phone's picker. The picked photo waits above where you type
+  (`ChatComposerDrawer` + `Thumbnail`) with its own 48px "Take this photo
+  out" button — the thumbnail's built-in remove is under the 48px floor.
+  Send works with a photo and no words.
+- Before upload the photo is re-drawn at 1600px on its longest side as a
+  JPEG, turned upright first. Re-drawing drops what a phone writes into a
+  photo besides the picture: where it was taken, when, and on what.
+- **Photos are downloaded with the person's own sign-in and shown from
+  memory, never as signed links.** A signed link works for anyone holding
+  it until it expires; a photo here is nobody else's to open. (Also what
+  keeps Storybook off the live project: the mock answers a download with a
+  picture Storybook serves.)
+- In a bubble: a 240px square, tap for Astryx's `Lightbox` full size. A
+  photo on its own sits in a thin rim of the bubble colour; words follow it.
+  Each photo has alt text ("A photo from Teresa", "A photo you sent").
+- The conversation list says "Photo" for a last message with no words. Text
+  alerts and the bell never quote a message (0064), so a photo never
+  reaches a lock screen.
+- A reported photo shows on the report card in Reported, tap for full size.
+
+**What people are told** (en + es, the same day):
+- **Members, on the transparency screen** (shown at sign-up, and on What
+  others can see): "A message or photo only if someone says it is not
+  safe"; "Everything you say or send to them, if they message you
+  directly"; cannot see "What you say or send to someone else".
+  `ADMIN_CANNOT_SEE` gains `message_photos`; the
+  `flagged_messages_routed_through_reports` entry notes it carries a
+  reported photo. Not a widening — a photo is part of a message and reaches
+  nobody a message doesn't — but said in words rather than left to
+  "message" meaning both.
+- **Privacy notice:** what we keep (messages and photos), a new paragraph
+  that a photo is shrunk and stripped of where and when before it leaves
+  the phone and only the person it's sent to can see it; who can see it
+  (cannot see your photos; a reported message "and its photo if it has
+  one"); how long (kept with your account); other companies (the one that
+  stores our data). Updated date 8 October. A test now requires photos to
+  be named on both the page and the screen.
+- **Terms:** a fourth "being decent" line — only send photos that are yours
+  to share, and none of someone who didn't say yes.
+- **Staff:** the case manager's "What you will see" at sign-up ("Not their
+  chats or photos. A message or photo reaches you only if someone reports
+  it.") and the card on a member's page ("Not their messages or photos");
+  a program lead's "What to expect" ("…and send photos. You see only what
+  they choose to send you."). The report screens say the reviewer sees
+  "this one message, and its photo if it has one".
+- **"If this changes, we will tell you first."** Live has two member
+  accounts, both of which saw the old screen; if either is a real person
+  rather than a test account, they hear about photos before the branch is
+  merged (before-launch).
+- **Deploying 0079.** `list_migrations` was clean through 0078; live had no
+  message attachments, so the new check cannot trip on old rows. The
+  connector's `apply_migration` stopped at its approval step for the
+  `drop … if exists` guards, as 0075 did (D-388), and applied nothing
+  (checked: no bucket, policies, functions or constraint). It goes in
+  through the SQL editor as one transaction that records itself in
+  `schema_migrations` — the same route 0075–0078 took.
+
+### D-395 — A conversation's header: who they are on a line under the name
+
+**Date:** 2026-10-08. Will, on a phone screenshot ("Renee · Example
+Food …"): "On header instead of truncating program name in chip next to
+it, make the bottom row say role + place if they're a program."
+
+- The chip beside the name had room for a word: a program's name came out
+  "Example Food …". Who the person is now sits on a line under the name,
+  across the whole width beside back, and may take two lines before it is
+  cut. It says the role with the place: "Program lead at Example Food
+  Pantry" ("Program lead" when the program is not known). A case manager
+  reads "Case manager", the Pam team "Pam team" — the same line, so every
+  conversation header has one shape.
+- Who sees the line is unchanged (D-187, D-262): a member sees their case
+  manager's or program lead's; the super admin sees which kind of staff;
+  staff looking at a member see nothing. One helper,
+  `lib/threadLine.ts`, for the real thread and the example threads (the
+  real thread showed nothing for the super admin's staff threads before;
+  it now matches the example ones).
+- `SubPageHeader`'s compact form takes `subtitle` for this (it was the
+  large form's alone), with a story, *Compact with subtitle*.
+
+### D-396 — The room under the composer is inside its fade; quieter composer icons
+
+**Date:** 2026-10-08. Will, on a phone screenshot of a conversation scrolled
+up: "Bottom padding added in the wrong place, it should be inside the box
+with fade, not outside of it. Also make icons for button more greyed out,
+less emphasis."
+
+- The "box with fade" is `ChatLayout`'s dock: the composer sits in a sticky
+  strip whose lowest 80px is a frosted layer (a 12px backdrop blur that
+  fades in over its top 24px), so messages scrolling under it soften
+  instead of stopping at a line. D-391 and D-393 added the room under the
+  composer as the *frame's* bottom padding, which ended the scroll region —
+  and the frosted layer with it — 32px above the screen's edge: under the
+  fade, a strip of bare page that nothing scrolled through.
+- The frame has no bottom padding now; the room is the composer's own
+  bottom margin, `max(env(safe-area-inset-bottom, 0px), 32px)`, inside the
+  dock. Same distance as before — the composer's box ends 40px above the
+  edge with the dock's 8px, or the phone's home-indicator inset where that
+  is larger — but the conversation runs to the bottom edge and that room is
+  part of the fade. `ChatComposer`'s `xstyle` lands on its bordered box, so
+  the margin is inside the composer's root and the dock grows by it.
+- The mic, the photo button and the send arrow while there is nothing to
+  send are Astryx's secondary icon grey (`--color-icon-secondary`, #6a6a6a /
+  #9e9e9e dark) instead of black; the stroke stays the 2.25 Will asked for
+  in D-390. The send button keeps its white arrow on green once there is
+  something to send — that is the action. The photo icon takes
+  `color="secondary"`, the idle send a token; the mic is
+  `ChatDictationButton`'s own icon with no colour prop, so one rule in
+  `globals.css` beside the stroke rule reaches it. The scroll-to-bottom
+  arrow is unchanged (D-393 asked for it strong).
+- Seen while checking it: in headless Chromium the frosted layer barely
+  blurs the last few pixels at the very bottom edge, so a message passing
+  under the composer reads almost sharp there. Will's own screenshot shows
+  the blur working on the phone; if the strip under the composer should be
+  page colour rather than frosted, that is a tint on this same layer.
+
+### D-397 — Speaking a long message: the box follows the words, and grows to 8 lines
+
+**Date:** 2026-10-08. Will: "When voice is enabled, the text line should
+follow the words, rn after 4 lines it stays on 4th line even though I keep
+talking and new lines are added below out of sight. Scroll to track new
+lines, and allow up to 8 lines of text for box expansion so if they're
+type a lot the box grows taller."
+
+- The box grew to 4 lines (`maxRows={4}`), then scrolled inside itself.
+  Typing keeps the caret in view because the browser scrolls to it; the
+  mic does not type. `useChatDictation` writes into the box from script —
+  a grey span of the words still being heard at the end, then the settled
+  words through the input's `insertText` — and the browser follows none of
+  that. Measured with a stand-in recogniser on the old build: after twelve
+  spoken sentences the newest words sat 338px below the bottom of the box.
+- While the mic listens, a `MutationObserver` on the box scrolls it to its
+  last line after every change, so the words being heard are always the
+  line you see. Only while listening: somebody editing the middle of a long
+  message by hand is never pulled to the end. Settled words arrive before
+  the recogniser's end event, so the last of them is followed too.
+- `maxRows` 4 → 8, Astryx's own default: the box grows to 8 lines (176px of
+  text at the input's 22px line) before it scrolls, for typing as much as
+  for speaking. On a small phone with the keyboard up that leaves less of
+  the conversation showing while a long message is being written; it comes
+  back as soon as the message is sent.
+- e2e: a stand-in recogniser says twelve long sentences and a phrase still
+  being heard; the box is taller than 7 lines and no taller than 8, scrolled
+  to its end, and the heard phrase is in view. On the old build it fails on
+  both counts (88px tall; 338px of text below sight).
+
+### D-398 — The jump-to-newest button comes and goes gently
+
+**Date:** 2026-10-08. Will: "That button to scroll down if clicked should
+grow smoothly then fade out, if scroll up it fades back in growing in.
+Gentle micro interactions."
+
+- Scroll up and it fades in growing from 60% (240ms, Pam's `enter` curve).
+  Tap it and it swells to 115%, then fades out still growing (260ms) while
+  the conversation runs down to the newest message. Scroll back down by
+  hand and it leaves the way it came, shrinking as it fades (180ms, Pam's
+  `exit`). Opacity and transform only, under a quarter second — the tempo
+  every motion in Pam keeps (`motion-tempo.ts`).
+- CSS keyframes, not the motion runtime: no download, and nothing remounts.
+  The button stays on screen while it leaves (a phase: shown / sent /
+  leaving / hidden), taken out when its exit has had time to finish; it
+  takes no taps while leaving. Arriving fills backwards only, so the
+  button's own press is not held under the animation's last frame.
+- With reduced motion it appears and goes at once, as before.
+- Found while testing it: after a tap, Astryx reports the log as scrolled
+  up again for part of its run down, so the button popped back in halfway
+  through swelling away and shrank out a second time at the bottom. A tap
+  now starts a run that ignores that until the log reaches the bottom, or
+  until the reader scrolls up themselves.
+- e2e with motion on (`messages.spec`): frame by frame, it arrives smaller
+  and see-through and settles whole; tapped, it grows past full size, fades,
+  never comes back during the run, and is gone; scroll up again and it
+  returns.
+
+### D-399 — Documents in a conversation: PDF and Word files, and Google Docs as links
+
+**Date:** 2026-10-08. Will: "We should also allow files like pdf. Word doc.
+And Google Docs. To be dropped in."
+
+- **What goes in.** A PDF or a Word file (.doc, .docx), 10 MB at most, one
+  attachment a message (a photo or a document, with or without words). From
+  a new document button beside the photo button, by dropping a file onto
+  the conversation, or by pasting one into the box — all three through one
+  `take()`, so they behave alike: a picture is a photo, a PDF or Word file is
+  a document, anything else is refused in words above the box ("Pam can send
+  a photo, a PDF or a Word file."; "That file is bigger than 10 MB."). A
+  phone often hands over a Word file with no type, so the name's ending
+  decides then; a type that says otherwise wins over the name. Macro Word
+  files (.docm) and everything else are refused by type, in the app and by
+  the bucket.
+- **Google Docs are links, not files.** A Google Doc has no file to send —
+  it lives in Google, and who can open it is set there. So a Google Docs,
+  Sheets, Slides, Forms or Drive link in a message keeps its words as sent
+  and gets a card under them ("Google Doc — Opens in Google") that opens it
+  in a new tab. Only `https://docs.google.com/…` and `drive.google.com`
+  count (`googleLinkIn`, unit-tested against look-alike hosts). A link
+  dragged from another tab onto the conversation goes into the message.
+  Exporting a Google Doc as PDF or Word from the phone's file picker gives a
+  real file, which goes in as one.
+- **Storage (0080).** A second private bucket, `message-files`, with
+  exactly the photo bucket's rules (0079): one folder per conversation; put
+  there only by someone in it, active, with chat allowed and no block; seen
+  by the two people and, once the message is reported, by that report's
+  reviewers (`can_see_message_file`, `report_files_for_review()`); deleted
+  only by the uploader while no message uses it. The message carries the
+  file's name and size (`attachment_name`, `attachment_bytes`), checked: a
+  name, not a path, 200 characters at most; 10 MB at most; a photo has
+  neither. DB test 16, 23 checks.
+- **A CHECK that comes out NULL passes.** Writing 0080's rule, test 16
+  sent a document with no name and it went in: `char_length(NULL) between
+  1 and 200` is NULL, not false. 0079's photo rule had the same hole (a
+  message marked as a photo with no path at all). 0080's rule says every
+  required part `is not null` in so many words, and replaces 0079's.
+- **Fetched when tapped.** A photo is downloaded with the conversation; a
+  document is not. The other person sees the icon (PDF, or a page for Word),
+  the name in full (two lines, then cut) and "PDF · 180 kB", and the file is
+  downloaded with their own sign-in only when they tap it — a 6 MB lease is
+  not something to spend somebody's data plan on unasked. It is handed to
+  the phone under its own name (a link with `download`, not a new window,
+  which a phone blocks after the wait), kept for the visit, and "Could not
+  open it. Tap to try again." if the download fails.
+- **Sent as it is.** Unlike a photo, nothing is taken out of a document —
+  Pam cannot clean a PDF the way it redraws a photo. The privacy notice says
+  so, and says the Google part: "Pam sends it just as it is, so look at what
+  is in it first … A Google Docs link opens in Google, and Google decides
+  who can see that doc, not Pam." (what-we-keep, a fifth paragraph).
+- **What everyone is told.** Every line that named photos names documents:
+  the transparency screen ("A message, photo or document only if someone
+  says it is not safe"; `message_files` on ADMIN_CANNOT_SEE), privacy
+  (what we keep, how long, who can see), terms ("Only send photos and
+  documents that are yours to share"), staff sign-up and the member card
+  ("Not their messages, photos or documents"), the report screens ("and its
+  photo or document if it has one"). The conversation list says "Document"
+  for a document sent with no words. Members who saw the old wording hear
+  first (before-launch, with the photos item).
+- **Spanish.** The new strings, and five from D-394/D-395 that went in
+  without accents ("Lider", "eligio", "envio", "reporto"), are written with
+  them. Older strings across `es.json` still lack accents — a separate pass,
+  not this change.
+- **Deploying.** 0079 is still not on live (`list_migrations` ends at
+  0078), so 0080 ships with it: one SQL-editor file for both, one
+  transaction, recording both in `schema_migrations`; tested on a copy
+  built through 0078, run twice, with the whole DB suite after it.
+- **Safe if the app gets there first.** A conversation now reads the two
+  new columns, and asking for a column that is not there fails the whole
+  read — so if this branch reached production before 0080 (another session
+  merged this branch early once, D-387), every conversation would fail to
+  open. `useThread` falls back to the columns every conversation has had
+  since 0005 when the first read fails (e2e: "a conversation still opens
+  before the live database has the document columns"). Sending a document
+  before 0080 fails like any failed send, with the message saying so.
+
+### D-400 — A conversation's header: a smaller visit card, a blurred fade under it, one line under the name
+
+**Date:** 2026-10-09. Will, on two phone screenshots: "This pinned event
+banner should be smaller, and there should be a fade behind it not a harsh
+cut otherwise text gets cropped behind it", then "The header should have the
+blur and white fade (white fades and blurs should not load when page opens.
+Preload these when user goes to messages so they're ready by the time the
+thread opens to avoid any glitching. Also on header subtitle, please
+truncate at 1 line max."
+
+- **The visit card** (D-276) is `StatusCard`'s new compact size in a
+  conversation: a 32px circle, 16px and 14px lines, 8px above and below —
+  56px tall instead of 78, still one whole-card target over the 48px floor.
+  The place page keeps the full size. Story: *PolicyStatusCard › Visit
+  compact*; a member's conversation with a program is now a story of its
+  own (*Member › A conversation with a program*).
+- **The fade.** Messages used to stop at a hard line under the header, with
+  words sliced mid-line. Under the header — and the visit card when there is
+  one — a 32px layer now hangs over the top of the conversation: the page's
+  own colour fading out, with a 12px backdrop blur, the same treatment the
+  composer's dock has at the bottom. The conversation gets 32px at its top so
+  nothing sits under the fade when you are at the start. (A mask on the
+  scroll region's top edge was the first try; it faded the words but had no
+  blur, so the header's fade replaced it.)
+- **Ready before it opens.** The header is in the route; `ThreadView` — the
+  composer, its dock and blur — is a separate chunk, so a cold open drew the
+  header first and the rest a beat later. The Messages list now fetches that
+  chunk (and the example conversation's) once it is idle
+  (`usePreloadThreadView`); not with Data Saver on, where the code is paid
+  for only when a conversation is opened. The fades are StyleX in the global
+  sheet, so they never arrive late themselves.
+- **One line under the name**, cut with an ellipsis (it took two since
+  D-395). e2e: a very long program name stays one line.
+
+### D-401 — The composer's corner, an even rim around a photo, Google-Doc blue, a darker photo viewer
+
+**Date:** 2026-10-09. Will, on screenshots: "Mic and photo/attachment button
+should be tucked a bit closer to bottom and left edge. The bottom corner
+radius of text box could be larger so the send button hugs it nicely";
+"Padding around image inside text bubble (top padding) should match the left
+and right padding. Also the text is too close to image, any way to add 4px
+extra gap there"; "Document Icon should be bright blue like a google doc
+color"; and of the full-size photo: "Make background extra dark overlay so
+photo stands out. The X button on top should use our circle button
+convention. But a dark grey outline and white X icon (make X a bit larger
+and thicker for visibility)."
+
+- **Composer.** The bottom and right padding go from Astryx's 12px to 8px
+  (less the box's 1px border, as Astryx's own padding is), the mic shifts
+  4px left, and the bottom corners round to 32px — 8px out from the 48px
+  send circle, so the circle sits concentric in the corner. The top keeps
+  Astryx's 28px. Measured: send and mic 8px from the outer edge.
+- **Photos and documents in a bubble** sit in an even 8px rim — top the same
+  as the sides (it was Astryx's 12px above and 16px beside). Words under one
+  keep a text bubble's 16px from the edge, and 12px below the photo (was 8).
+  A photo on its own had a 4px rim (D-394); it is 8px now too, so a photo
+  looks the same with or without words.
+- **Document icons** are `FileTypeIcon` (@pam/ui): a red PDF, or a page in
+  the bright blue of a Google Doc for Word files and Google links. The
+  theme's blue (`--color-icon-blue`) is a navy, so the colour is a Pam token,
+  `--pam-document-blue` (#1a73e8 / #8ab4f8 dark; 4.6:1 and 7:1 on their
+  card). The composer's document button stays the quiet grey of D-396.
+- **The photo viewer** is `PhotoViewer`, one wrapper for the conversation,
+  the report screen and the new photos page: Astryx's `Lightbox` with the
+  dialog painted near-black (`--pam-viewer-backdrop`, 90% black over
+  Astryx's own 50%), and its round buttons — close, previous, next — as
+  Pam's circle buttons for a dark ground: 48px, `--pam-viewer-control`
+  (#2b2b2b) with a #5c5c5c rim, a 24px white mark at stroke 2.5 (was a 16px
+  ghost icon). Lightbox has no prop for its buttons, so that is one
+  `globals.css` rule scoped to `.astryx-lightbox`, beside the chat rules
+  that already reach inside Astryx.
+
+### D-402 — Photos and documents: everything shared in a conversation, in one place
+
+**Date:** 2026-10-09. Will: "Secondary buttons, add a nested page to view a
+list of images and documents in the chat, a summary. Almost like a file
+list. This will help users access files / photos shared easily."
+
+- A new first row on the conversation's ⋯ page, **Photos and documents**,
+  opens `/messages/thread/files/?id=…` on the nested-page template: the
+  photos as a three-across grid (newest first) that opens the viewer and
+  pages through all of them; the documents as the same cards the
+  conversation shows, full width; the Google Docs links as their cards —
+  each with who sent it and when ("You · Oct 9", "Teresa · Oct 8").
+  Nothing shared: "Nothing yet. Photos and documents sent in this
+  conversation will be here, so they are easy to find."
+- It reads exactly what the conversation reads (`useThread`: the same 200
+  messages, photos downloaded with the person's sign-in, documents fetched
+  only when tapped), so it shows nothing the conversation would not, and
+  needs no new query or policy. An example conversation has nothing shared,
+  and says so.
+- Stories: Member and Case manager › *Photos and documents*; the prototype
+  route; the flow map's options node gains the page.
+
+
+### D-403 — One tab bar on every tab: the fade everywhere, no line, nothing cross-faded
+
+**Date:** 2026-10-09. Will, of the member app: "notice how switching tabs
+doesn't always look the same. The white fade glitches, trips it doesn't
+always show. And the line appear in trips when it should look like explore,
+clean no line. Line is only for messages. And white fade should be loaded
+ahead of time before the person switches tab."
+
+Three causes, found by recording a switch frame by frame in Storybook (the
+tab bar exists only in the prototype, `LocalTabBar`):
+
+- **The line.** The bar had a 1px top border. On every tab but Trips the
+  last row of its own fade, the page colour, covered it; Trips turned the
+  fade off (D-285), so only Trips showed the line. The border is gone: the
+  fade is the bar's edge on every tab. The one line left on a tab screen is
+  a floating row's own (Messages' "People who offered help"), as Will wants.
+- **Trips without a fade.** The fade was off there because Trips' drawer
+  rests on the bar, and docked (100px) it would be washed out under a 96px
+  fade. Now the bar keeps its fade on every tab — it is the same element
+  everywhere, so a switch changes nothing but the lit tab — and the drawer
+  sits above it (z-index 11 over the bar's 10). The drawer draws the same
+  fade at the foot of its own list, `edgeFade.inScroll`: sticky to the
+  bottom of the list, so cards dissolve into the bar exactly as Explore's
+  do, and its own 96px at the end is the room the last card scrolls clear
+  into. (The list's bottom padding went: a sticky element stops short of
+  its scroller's padding, which first left the fade floating 96px above the
+  bar, over the middle of a card.) This supersedes D-285 for Trips; a strip
+  resting on the bar still draws its own fade above itself.
+- **The glitch.** The bar keeps still in a switch (D-269, its own
+  view-transition layer), but the browser still cross-faded its old and new
+  pictures: for the length of the switch two tabs were lit and the fade
+  thinned and came back. Its old picture is now hidden and the new one shown
+  at once (`globals.css`). And Astryx fades a tab's colour over 125ms, which
+  showed the new tab's filled icon dark for a beat before it turned pink; a
+  tab now lights at once (`transitionProperty: none` on the tab).
+
+"Loaded ahead of time": the fade is StyleX in the global stylesheet and the
+bar never unmounts in a switch, so with the fade on for every tab there is
+nothing left to arrive late. The page content keeps D-269's quick
+cross-fade.
+
+### D-404 — Photos and documents, laid out to read
+
+**Date:** 2026-10-09. Will, of the page from D-402: "let's just merge
+documents together. Also, we need timestamps on photos too. Let's clean up
+layout so it reads better with times on end. Also let's make doc container
+spread full width. Add timestamp and person's name inside it, and list them
+one on top of the other. Photos can be handled like a slider with carousel
+and timestamp under photo. Add more gap between doc list and photo list."
+
+- **Photos** are a row you swipe (Astryx's `Carousel`, snapping a photo at a
+  time, with its own next and previous buttons while there is more to
+  see), 200px square, so
+  the next photo shows at the edge and says there is more. Under each: who
+  sent it, then "Oct 9 · 2:14 PM". A screen reader hears the date and time
+  in the photo's name too. A tap still opens the viewer, paging through all
+  of them.
+- **Documents** are one list — PDFs, Word files and Google Docs together,
+  newest first — one card on top of the other, each the full width. Inside
+  each card: the name; "Teresa · PDF · 180 kB" (who first); and at its end
+  the date over the time. The conversation's own cards are unchanged.
+- **32px** between the photos and the documents (was 16).
+- Storybook's example conversation has three photos now, not one, so the
+  row has something to swipe (Storybook pictures only).
+
+### D-405 — The policies alert's action is one word: "Sign"
+
+**Date:** 2026-10-09. Will, on Trips' warning banner ("Sign 3 policies for
+Example Learning Center before you go · Sign now"): "Alert action 'Sign'
+only. Short and sweet."
+
+- `trips.added.policies.action` is "Sign" (was "Sign now", D-284's banner).
+  Spanish already said "Firmar". The banner's title before it says what is
+  signed and for where, so the link needs no more; it still opens that
+  program's policies.
+- Storybook's Foundations › Actions guide quotes the new label.
+
+### D-406 — Under a photo, the name is set like the time
+
+**Date:** 2026-10-09. Will, on the Photos and documents page (D-404):
+"Match name style to subtitle style."
+
+- Under each photo, who sent it is now the same 14px secondary grey,
+  regular weight, as the "Oct 8 · 7:47 AM" line under it (it was 16px
+  semibold black). The two lines read as one quiet caption, and the photo
+  stays the thing you look at. The document cards are unchanged.
+
+### D-407 — Stuff shared: one flat list, who and when at the end, titles that slide, and link previews from Pam's server
+
+**Date:** 2026-10-09. Will, after the carousel (D-404): "I don't like the
+image carousel. Scratch that idea. Instead let's just title page: Stuff
+shared, and create a flat list item, similar to policy item (not a card
+with shadow) … photo (tiny preview), docs (any kind) and also links … with
+social image previews. Let's mockup some versions … before you build."
+Four mockups went up (A one list, B by day, C filters, D bigger previews).
+He chose: "Go ahead and set up server function. Let's go with list A. But
+instead of chevron, add timestamp and person there, tucked at the end.
+Let's keep asset title labels max at 1 line, but animate text through
+horizontally when text truncates so they can see end of long named files."
+
+- **The page** is "Stuff shared" (es "Cosas compartidas"), the ⋯ page's
+  row too. One list, newest first, in the policy row's shape (`MenuList`,
+  D-210: 64px, 18px name, 14px grey line, dividers), no sections, no
+  carousel, no card. Where the icon goes, a 48px preview: the photo; a
+  document's icon on a tint of its colour (PDF red, Word and Google Docs
+  blue, Google Sheets green); a link's picture, or a globe. Then the name,
+  then what it is ("PDF · 180 kB", "Opens in Google", the site), and at the
+  end, where the chevron was, who sent it over when (the time today,
+  "Yesterday", or the day). A screen reader hears all of it on the row
+  ("… Sent by Teresa, Oct 8, 7:47 AM"). A photo opens the viewer and pages
+  through every photo; a document downloads with the person's sign-in; a
+  Google Doc or a link opens in a new tab. The mockup stories are gone —
+  Storybook shows what is built.
+- **One-line names that slide** (`MarqueeText`, @pam/ui). A name that fits
+  never moves. One that is cut off shows an ellipsis; when its row comes
+  into view it waits a beat, slides left until the last letter shows
+  ("…center.docx"), holds, and slides back — once, in five seconds at most,
+  replayed each time the row comes back into view. It never loops: moving
+  text that starts by itself must stop within five seconds or offer a pause
+  (WCAG 2.2.2), and a list of names sliding forever would be the busiest
+  thing in the app. Rows that arrive together are staggered. With reduced
+  motion it never moves. The whole name is always there for a screen reader.
+- **Link previews come from Pam's server** — the `link-preview` Edge
+  Function, deployed 9 October (verify_jwt on) — because a phone cannot read
+  another site's preview: browsers will not hand one site's page to
+  another. It is asked with the person's own sign-in when a link is sent,
+  and from Stuff shared for any older link without one. It asks the
+  database, as the person, which of the (at most ten) messages are in their
+  own conversations (`link_preview_targets`, 0081), opens each page once,
+  and keeps the title, site name and a *copy* of the picture in a private
+  bucket — so looking at the list contacts nobody else; only tapping the
+  link does. A page it cannot read is remembered ('none') so it is never
+  asked twice.
+- **What the server will open** is the security line (`preview.ts`, 17 unit
+  tests): https on the usual port only; no user name or password in the
+  address; never a local name (`localhost`, `.local`, `.internal`, …) or a
+  private, loopback, link-local, carrier-grade-NAT, documentation, multicast
+  or reserved address, however written (`::ffff:127.0.0.1`, `0x7f000001`,
+  `169.254.169.254`); every address a name resolves to must be public;
+  redirects followed by hand (three at most) and checked again; 5 seconds,
+  512 KB of page (only its head is read), 2 MB of picture, JPEG/PNG/WebP/GIF
+  only. Where the runtime cannot look names up, the name checks stand alone.
+  It logs counts, never addresses.
+- **0081** (`test/17_link_previews_test.sql`): `message_link_previews`
+  (forced RLS; the two people in the conversation read it; nobody signed in
+  writes it; a trigger files each preview under its message's
+  conversation), the private `link-previews` bucket (2 MB, pictures, read by
+  the same two), and `link_preview_targets`. No admin sees a preview,
+  reported or not — transparency `message_link_previews`; a report shows
+  the message, whose words carry the link. Privacy notice, what we keep:
+  "When you send a link, Pam's server opens the page once to get its title
+  and picture … Your phone does not visit the page until you tap the link."
+- **Not live yet:** 0081 joins 0079 and 0080 in one SQL-editor file for
+  Will (tested through 0078, twice, then the whole policy suite). Until it
+  runs the function answers "not allowed" and every link shows as its
+  address with a globe.
+- **Still open from Will's "docs (any kind)":** uploads stay PDF and Word
+  (0080's list), Google Docs/Sheets/Slides/Forms/Drive as links. Widening
+  the list (Excel, PowerPoint, text) is a change to 0080 before it ships.
+- The document card drops D-404's "who · …" line, stamp and wide size;
+  nothing else used them.
+
+### D-408 — What can be attached: JPEG, PNG or an iPhone photo; a PDF or a Word file; and all of it by pasting
+
+**Date:** 2026-10-09. Will, answering D-407's open question about "docs
+(any kind)": "Docs only word docs and pdfs for now. Images, any jpeg, png.
+Or iPhone photo. Also allow users to paste these things into chat composer."
+
+- **Documents stay PDF and Word** (`.pdf`, `.doc`, `.docx` — 0080's list,
+  unchanged). D-407's "widening the list is a change to 0080 before it
+  ships" is closed: it is not widened.
+- **Photos are JPEG, PNG or an iPhone's HEIC/HEIF** (`photoType` in
+  `lib/messagePhoto.ts`, by type, or by name when the phone gives no type).
+  Everything else that is a picture — GIF, WebP, SVG, BMP, TIFF, AVIF — is
+  refused in words, like any other file Pam does not take. Whatever comes
+  in, a JPEG goes out (shrunk to 1,600px, re-drawn so where and when it was
+  taken is gone — D-394); a PNG's see-through parts become white rather than
+  the black a JPEG would otherwise give them.
+- **iPhone photos without a converter.** The photo button asks for
+  `image/jpeg,image/png` only. That is deliberate: when a web page asks for
+  those, an iPhone hands over its HEIC photos already turned into JPEGs —
+  the phone does the work, and Pam ships no HEIC decoder (a large library,
+  for a case the phone already handles). A HEIC that arrives another way —
+  dropped or pasted, on a computer — is opened by the browser if it can
+  (Safari can); where it cannot (Chrome, Firefox), the person is told so:
+  "This browser can't open that iPhone photo. Try sending it from your
+  phone." A JPEG or PNG that will not open says "That photo couldn't be
+  opened. Try another one." Neither sends nothing silently.
+- **The photo is shrunk when it is picked, not when it is sent**, so the
+  preview above the box is the picture that will go, and a photo that cannot
+  be opened is caught at once, where the person is looking. The send then
+  uploads it as it is (`isReady`), without shrinking it twice.
+- **Pasting.** A photo or document pasted into the message box is taken the
+  same way as one picked with a button or dropped on the conversation — one
+  `take()` for all of them, with the same refusals. Astryx's composer hands
+  over pasted files; where a browser offers a pasted picture only as a
+  clipboard *item* (some do, after "Copy image"), the composer's `onPaste`
+  takes it from there instead of pasting nothing. Pasted words are still
+  words. Only the first file is taken, as with the buttons.
+- The refusal now says what *is* taken: "Pam can send a photo (JPEG, PNG or
+  from an iPhone), a PDF or a Word file." (es "Pam puede enviar una foto
+  (JPEG, PNG o de un iPhone), un PDF o un archivo de Word.")
+- No database change. The app only ever uploads the JPEG it makes; the
+  `message-photos` bucket's own list (0079: JPEG, PNG, WebP, 5 MB) is wider
+  than that and is left alone, since 0079 is already in the SQL-editor file
+  Will has. The documents bucket takes only PDF and Word (0080).
+
+### D-409 — Photo, Document or Link — never the format; a file Pam can't take shakes its alert
+
+**Date:** 2026-10-09. Will, looking at Stuff shared: "for our own backend
+classification of asset format is good. But for the end user, they only care
+if it's a link, doc, or photo. So the formats don't need to show. Also let's
+set up alerts banner when file not supported is pasted or tried to be
+attached into composer. Have the alert shake a bit so it communicates
+something off. Similar to industry standard micro interaction patterns."
+
+- **One word for what a thing is.** On Stuff shared the line under each name
+  is now "Photo", "Document" or "Link" (es "Foto", "Documento", "Enlace") —
+  never "PDF · 180 kB", "Word document · 47 kB", "Opens in Google" or the
+  site's name. A Google Doc, Sheet or Slides is a "Document" there. The
+  document card in a conversation, and above the box once one is picked,
+  says "Document" under its name the same way, and a screen reader hears
+  "Open Lease.pdf, document". Sizes go too: they are a format's detail, and
+  10 MB is the most anyone can send.
+- **Pam still tells formats apart underneath**, where that is its job, not
+  the person's: what it accepts (D-408), how it stores and opens each one,
+  and the preview's icon and colour (a red PDF, a blue page) — the icon is a
+  picture of the thing, not a label to read. The file's own name is left as
+  it was sent, ".pdf" and all: it is the sender's name for it.
+- **The Google card in a conversation keeps "Opens in Google".** That is
+  what tapping it does, not what format it is, and D-399's reason stands —
+  nobody should be surprised to leave Pam.
+- **A file Pam can't take gets Pam's alert banner**, in the box where the
+  file would have gone: Astryx `Banner`, status warning — the same yellow
+  alert as Trips' reminder to sign (D-405) — with a short title and what to
+  do: "Pam can't send that file / Send a photo, a PDF or a Word file."; "That
+  file is too big / Send one smaller than 10 MB."; "This browser can't open
+  that iPhone photo / Try sending it from your phone."; "That photo couldn't
+  be opened / Try another one." It is announced as an alert, and closes with
+  a 48px ×, or goes by itself when a file is taken or the message is sent.
+  The refusal is the one place that still names PDF and Word: it is where a
+  person needs to know which documents work.
+- **The shake.** Once, under half a second (450 ms), side to side and
+  settling — 8, 7, 5, 4, 2, 1 px — the wrong-passcode shake people already
+  read as "something's off". Each new refusal is a new banner, so a second
+  wrong file shakes again and is announced again rather than sitting
+  unchanged. With reduced motion it does not move. No vibration: it is not
+  available on iPhones, and a banner that buzzes on some phones and not
+  others says two different things.
+- Storybook: Member › Created › "A conversation — a file Pam can't send"
+  (pastes a GIF on load).
+
+### D-410 — A link shows where it goes; who and when stay
+
+**Date:** 2026-10-09. Will, after D-409: "Link makes sense to show. From who
+and when also makes sense."
+
+- **A link's line on Stuff shared is its address** — "example-library.org"
+  under the page's title — not the word "Link" (D-409) and not the name the
+  page gives itself ("Example Library", 0.49.0). The address, because it is
+  the one thing about a link a page cannot make up: any page can call itself
+  a library or a bank in its preview, but not change where it actually is.
+  "www." is dropped.
+- With no preview yet (0081 not run, a page that could not be read), the
+  row's name is already the address ("example-transit.org/route-47"), so the
+  line under it says "Link" rather than repeat it.
+- Photos and documents keep D-409: "Photo", "Document". Who sent it over when
+  stays at the end of every row, as D-407 put it.
+
+### D-411 — A conversation's header like every other; ⋯ outlined; Messages rows flush left; nothing chosen when a dialog opens
+
+**Date:** 2026-10-09. Will: "The messaging screen, the message item, let's
+remove left padding, and keep right padding. On message thread screen, I
+don't like the fade on top, keep the same header position, circle button, as
+the regular. The compact view is not great, because the top buttons aren't
+positioned in same place across other pages. The ellipsis more actions
+button needs a grey outline and shadow. It's getting missed. Also why are
+buttons automatically selected on modals etc? like uncheck confirmation
+modal. Or image preview full screen X button. Those should not be auto
+selected. Only input fields ready to type (except sign in)."
+
+- **A conversation uses the regular nested-page header** (`SubPageHeader`,
+  D-213): the round back at the top left and ⋯ at the top right, in exactly
+  the places they are on Legal or a place (measured the same to the pixel),
+  then the name, large, and who they are under it on one line (D-400's one
+  line kept, as `hasOneLineSubtitle`). The frame takes `Page`'s own padding
+  (24px top, 16px sides) so the bar lands where `Page` puts it. The compact
+  variant is gone from `SubPage` — the conversation was its only user — and
+  its stories with it. The header is taller than the one-row bar was — the
+  name is large now — which is the price of the buttons not moving between
+  screens.
+- **No fade under the header.** D-400's blur and white fade is removed; the
+  messages go under the header's edge. The composer's frosted dock at the
+  bottom stays (Will named the top).
+- **⋯ is outlined and lifted**, everywhere it appears in a bar — a
+  conversation, a place, What you sent — and a place's save button beside it:
+  `roundAction` (@pam/ui), 48px, the page's colour, Astryx's *emphasized*
+  border (#CCD3DB — the default border, 8% black, is what made it vanish) and
+  a soft shadow.
+- **Messages rows have no left padding**: the avatar starts at the page's
+  16px edge; the right keeps the list's 12px for the time. Done on both the
+  app's `ConversationRow` and the redesign's `MessagesView` (Storybook). Set
+  as `paddingInline`, the property Astryx's Item sets with doubled
+  specificity — a `paddingInlineStart` loses to it.
+- **Nothing is chosen when a dialog or sheet opens.** A modal must take focus
+  (or a screen reader stays on the page behind it), and the browser picks
+  the first button — which a phone draws as chosen and Enter presses; in an
+  "are you sure", that is the destructive one. Now focus lands on the
+  dialog's content, which is not a control: no ring, Enter does nothing, a
+  screen reader reads the question, Tab reaches the first button.
+  `landFocus` (@pam/ui) does it for Pam's `ConfirmDialog` (every "are you
+  sure", D-234), the Bring a friend sheet and a place's opening-hours sheet
+  (the native `autofocus` attribute, which `showModal()` honours inside a
+  dialog, plus Astryx's `data-autofocus`). The photo viewer (Astryx
+  Lightbox, which gives no say) moves focus to itself in a layout effect
+  right after it opens, before anything is painted — Chromium ignores
+  `autofocus` on the dialog element itself. The info popovers already
+  focused their panel, not a button; left as they are.
+- **Undo check-in** (the "uncheck" confirmation) was Astryx's
+  `AlertDialog`, which always opens with Cancel chosen and has no way to
+  change it. It is now Pam's `ConfirmDialog`, like every other question Pam
+  asks: "Undo Marcus's check-in?", Undo check-in as the big button, Keep it
+  under it.
+- **Fields still get focus** where typing is the point: the search boxes,
+  New message's search, the area picker, the first field of joining. Sign in
+  does not focus its field on arrival (it did not before either), so the
+  keyboard does not cover the page before it is read.
+
 ### D-412 — The Points screen says who can see points
 
 **Date:** 2026-10-09. **Decided by:** Will — "Case manager can see awards,
@@ -10035,6 +10876,388 @@ app now shows all of it. **Not merged, and now behind `main`:**
 next resolves those conflicts (and renumbers: their D-numbers and 0079–0081 do not
 collide with D-412–D-420 or 0082, but the changelog versions will need ordering).
 
+### D-421 — Spanish, spelled properly: accents, ñ and ¿ restored across `es.json`
+
+**Date:** 2026-10-09. Will: "Do a careful proofreading pass over `es.json`
+only … restore accents and ñ where standard Spanish requires them." The pass
+D-399 left for later.
+
+- **What changed.** 172 of 1,423 Spanish strings, nowhere else. "Todavia" →
+  "Todavía", "le invito" → "le invitó", "esta mal" → "está mal", "Olvidelo" →
+  "Olvídelo", "conexion" → "conexión", "revision" → "revisión", "aparecera
+  aqui" → "aparecerá aquí", "Companeros" → "Compañeros", "Ninos" → "Niños",
+  "contrasena" → "contraseña", "telefono" → "teléfono", "Lider" → "Líder".
+  By area: notices (25), privacy (17), terms (16), onboarding (12), admin
+  (10), sign-in (9), the transparency screen (8), and fewer elsewhere.
+  Strings that already had their accents were not touched.
+- **Accents only, checked by script.** Every changed string, with its
+  accents, ñ, ü and ¿¡ taken off, is identical to what it was. So no word,
+  key, `{placeholder}` or punctuation changed apart from those marks, and
+  meaning cannot have drifted.
+- **¿ added where the question had lost it.** Eight questions had only the
+  closing mark ("Le sirvio esto?" → "¿Le sirvió esto?"; "Cual es su numero
+  de telefono?" → "¿Cuál es su número de teléfono?"). The same cause as the
+  missing accents: typed without the Spanish keyboard. Standard Spanish
+  needs both marks, so they are in. Every `?` and `!` in `es.json` now has
+  its opening mark.
+- **The ones that depend on use were decided by use.** que/qué,
+  como/cómo, cuando/cuándo, donde/dónde, quien/quién, esta/está, si/sí,
+  tu/tú, el/él, mas/más. A question, said straight or reported, takes the
+  accent: "Elija qué está mal", "para que vea cómo se ve esto", "le puede
+  indicar cuál". A relative or a condition does not: "la persona que le
+  invitó", "Cuando alguien use su código", "Llame a Pam si tiene preguntas".
+  The privacy and transparency lines about saves were read against their
+  English ("when you save a new place — not which one" is *what* the person
+  sees, a reported question) and now say "cuándo guarda un lugar nuevo —
+  no cuál", matching `admin.seeing.body`, which already did. "Usó Pam"
+  (`admin.lastActive`) is the past tense the English says ("Last used
+  Pam"), not "Uso" (I use).
+- **"Solo" stays without an accent.** The RAE dropped it in 2010 and the
+  newer strings already write it that way.
+- **Register left alone.** No single string mixes tú and usted (checked
+  string by string; the hits were third-person verbs like "Pam revisa" and
+  the noun "un toque"). Some screens are tú (sign-in, account, join, the
+  member-side redesign) and most are usted; that is a choice between
+  strings, out of scope here, so nothing moved.
+- **Not a change to what anyone is promised.** The transparency screen and
+  the privacy and terms pages changed spelling only. The English, which
+  `transparency.ts` and the legal tests hold word for word, is untouched;
+  the "Actualizado el 8 de octubre" dates stay, because the terms did not
+  change; and no member needs telling first.
+- **Noticed, not changed, because they are wording, not spelling.**
+  `category.sub.resume_interview_help` says "resume", which is English
+  ("currículum"); a case manager is called four things ("gestor de casos"
+  almost everywhere, but "Gerentes de caso", "Un trabajador del caso",
+  "administrador de casos" in one string each); a trip is both "Visitas"
+  (the tab) and "Viajes" (`trips.booked.body`, `join.booked.trips`);
+  `transparency.canSee.goals` lacks its "en" ("quiere trabajar en");
+  `privacy.s.sharing.p2` wants the subjunctive ("se inscriba"). Listed in
+  STATUS's backlog for a wording pass that someone fluent signs off.
+- **Numbered D-421 (first D-403, written as D-400).** Another session's
+  D-400–D-402 reached `claude/pam-storybook` while this pass was being
+  checked, so it took D-403; that session then used D-403–D-411 as well, and
+  this was renumbered twice as the branches met (D-421, 0.50.1: the session on
+  `claude/affectionate-goldberg-tvu4sz` took D-412–D-420). Their seven new Spanish strings
+  (D-402's Photos and documents page) were already accented; none of the 172
+  strings here was one they had changed.
+
+### D-422 — Seven languages, and text that fits in every one of them
+
+**Date:** 2026-10-09. Will: "Let's also add a Brazilian portuguese language",
+then "…Chinese (including Mandarin and Cantonese), Russian, Arabic"; "Keep in
+mind this is not location based, per say, everyone in the city speaks
+different languages"; "If downloading language is needed in production app,
+then add a loader screen as language transitions. State what the system is
+doing in their selected language"; and, last, "Audit all screens across
+languages to ensure text fits in components when displaying other languages,
+and resolve them using best UI/UX practices."
+
+*The languages*
+
+- **Seven, and one registry.** `SUPPORTED_LOCALES` in
+  `packages/config/src/i18n.ts`: `en`, `es`, `pt-BR`, `zh-CN`, `zh-HK`, `ru`,
+  `ar` — BCP 47 tags, spelled exactly that way, because the app hands them
+  straight to `Intl`, to `<html lang>` and to the speech recogniser. The
+  database check (0083, `profiles_language_supported`) is case-sensitive on
+  purpose: `pt-br`, `pt`, `zh`, `ar-EG` are refused rather than stored as a
+  second spelling. **Chinese is two bundles, not one**, because Mandarin and
+  Cantonese readers read different scripts here: `zh-CN` (Simplified) and
+  `zh-HK` (Traditional, Hong Kong vocabulary). A script check (OpenCC) keeps
+  them apart. Astryx ships no `zh-HK` catalog, so its own few components use
+  its `zh-TW` one.
+- **Not location-based.** Nothing here reads where anybody is. The language
+  is the person's own choice, saved to their account; before they choose,
+  the phone's language is the *starting point* (`matchLocale`) and is never
+  saved as if it were a choice (a person who never picks keeps following
+  their phone).
+- **Loaded when needed.** English is in the first load; the other six are
+  lazy bundles, with a slim Astryx catalog each (`build-astryx-catalogs.mjs`).
+  The first load is 541.8 kB of the 600 kB budget (58.2 kB to spare, measured
+  on the merged build): the six bundles are not in it, they are fetched when
+  somebody picks one.
+- **The loader Will asked for.** When the words of a language have to be
+  downloaded, `LanguageSwitching` covers the window with a spinner and one
+  line *in the language being switched to* — "Cambiando a español…", "正在切换到简体中文…",
+  "جارٍ التبديل إلى العربية…" — appearing only if the wait passes 150 ms and,
+  once shown, staying 500 ms so it never flashes. If the download fails the
+  person stays in the language they had and is told. (Seven lines, in
+  `SWITCHING_LANGUAGE`.)
+- **Plurals the way each language does them.** Russian has four forms and
+  Arabic six. A `{count}` string carries every CLDR category its language
+  needs (`key.one`, `.few`, `.many`, `.zero`, `.two`), and a test fails if one
+  is missing or if a language that needs none carries dead ones.
+- **Right to left.** `<html dir>` follows the language; Astryx mirrors from
+  it; logical CSS properties do the rest. What they cannot say lives in
+  `globals.css`: `--pam-flip` (a slide's direction), `[data-pam-directional]`
+  arrows, phone/email/code fields kept left-to-right, no letter-spacing in
+  Arabic (it breaks the joins), Latin digits in Arabic (`ar-u-nu-latn`: a
+  phone number or a time is read the same in every language), and swipe
+  gestures flipped. A name in the other direction (an English program in an
+  Arabic screen) is set in its own direction where it ends in an ellipsis
+  (`unicode-bidi: plaintext`), so it loses its end, not its beginning.
+- **Dignity holds in every language.** The §0 rule is a substring check
+  against a per-language list (`language.ts`), run on all seven bundles.
+  Known gap: Spanish has no list of its own yet (it is checked with the
+  English terms only) — in STATUS's backlog.
+- **Texts and emails stay as they were.** SMS and invite emails are drafted
+  and signed off in English and Spanish only (`reviewedBy`, 160 characters,
+  no emoji). Somebody who reads Pam in another language still gets those two
+  in English until their copy is written and signed off; nothing is machine
+  translated into a text message. In `docs/before-launch.md`.
+- **Who translated.** Brazilian Portuguese by me; the other four by four
+  parallel agents against a frozen snapshot of the English, with a checking
+  tool (placeholders, plural forms, script, length, a re-read for the
+  dignity rule), then a second pass. **No native speaker has read any of it.**
+  That is the first item in `docs/before-launch.md`, loudest for the privacy
+  page, the terms and the transparency screen, which are promises.
+
+*Text that fits*
+
+- **The audit.** `pnpm --filter @pam/web build-storybook` then
+  `pnpm --filter @pam/web audit:fit` opens every story (455 on the merged
+  tree) in every language (3,185 pages) at 320px and measures the rendered page, text node by
+  text node: words half inside a box that hides overflow (`cut`), an ellipsis
+  or line clamp that is actually trimming (`ellipsis`, `clamp`), text outside
+  the control that holds it (`spill`), two elements' text on top of each other
+  (`overlap`), the page scrolling sideways (`scroll`). English is the
+  baseline: what is already in English is the design's, and only what is *new*
+  in a language counts. The first run (446 stories, before the merge) found 353 new defects (137
+  of them Russian); after the fixes below, 29 remain, each looked at by eye: four
+  are a date near the bottom of a sheet that fades out by design; four are
+  a Chinese line box a hair taller than its badge (the glyphs are whole, seen
+  at 4×); two are an ellipsized line's untrimmed width; twelve are the sliding
+  titles on Stuff shared (D-407), which overflow on purpose; two are the
+  folded calendar's second row, a teaser under a fade; four are an address
+  that ends in an ellipsis on purpose; one is an avatar initial. None is a
+  word somebody cannot read, and none needed a change.
+- **Wrap and grow; never trim a label.** An interface string — a button, a
+  tab, a status, a notification — takes another line and the box grows. An
+  ellipsis stays only on what somebody else wrote and Pam cannot shorten: a
+  program's name, an address, a file name. `Button` and `Badge` (Astryx's trim
+  to one line at a fixed height) are now `@pam/ui/Button` and
+  `@pam/ui/Badge`: same look, same height for one line, a second line when
+  needed; `Segment` does the same for a segmented control (the About tabs).
+  Anything that wants a taller target says `minHeight`, never `height`.
+- **Not smaller type.** The question came up (Will, "Chinese and Russian may
+  need smaller font sizes, no?"). Russian words are 30–40% longer, but body
+  text and labels stay at the sizes an older reader can see (§2.5), and Chinese
+  needs less width than English, not less size. The one place type does step
+  down is the large page title when it is a single word that cannot wrap
+  ("Конфиденциальность", 380px at 34px on a 320px screen): `useFitTitle`
+  measures the longest word once and picks 34, 30, 27 or 24px; past 24 the
+  word may break. Measured once, not searched for, because trying sizes in a
+  loop reads the old size under reduced motion.
+- **Superseded: D-274's "one row, always".** Explore's heading and the area
+  link no longer stay on one row at the price of "Все програ…": the link
+  goes under the heading when they do not both fit.
+- **Smaller changes.** Notifications show their whole sentence (it was
+  clamped to two lines) and their title wraps; a connection's description
+  holds six lines, not three; a visit tag wraps instead of ending in "…"; a
+  file or Google card puts its words under its icon when the bubble is
+  narrow; the month grid uses a single letter for a weekday in Arabic (the
+  whole word overlapped its neighbour); and `overflow-wrap: break-word`
+  everywhere, `hyphens: auto` for every language but English, `line-break:
+  strict` for Chinese.
+- **What the audit cannot see**: whether a translation is *good*, text in an
+  image, Chinese and Arabic in the fonts real phones have (the container has
+  fallbacks), and anything behind a sign-in the stories do not reproduce.
+  `e2e/languages.spec.ts` keeps the real pages honest: sign-in, About,
+  Privacy and Terms in every language, no word off the screen.
+- **Numbered D-422** (written first as D-404, then D-413, as the other
+  sessions took D-404–D-420); the migrations are 0083 and 0084 after the
+  other session's 0082 (`admin_reaches_assigned_only`, live), the amendment is
+  A24 after its A22 and A23, and the changelog entries 0.50.1 and 0.51.0. The
+  merge also brought in 32 English strings from that session (the "your guide"
+  wording, the account-limits sections, the short version of the transparency
+  screen); all six other languages were written for them in the same merge.
+- **Applied live 9 October (Will: "Migrate and proceed to merge").** 0083 and
+  0084 went in through the connector after `list_migrations` was diffed against
+  the repo. 0084 guards its policy with a `do $$ … if not exists … $$` block
+  rather than `drop policy if exists`, because the connector stops at `drop`
+  for approval (D-387) and, on a table the migration has just created, there is
+  nothing to drop. Both are inert until `MESSAGE_TRANSLATION` is switched on.
+
+### D-423 — Messages, read in the reader's own language (built, switched off)
+
+**Date:** 2026-10-09. Will: "For messaging, programs and case managers may use
+english or spanish, but let's use Uber's approach where the user sees the
+messenger's message in their language translated, labeled translated, but
+there's a link under it to show the original."
+
+- **Nothing is written in another language.** A message is stored exactly as
+  typed. What a reader sees is a translation made when they open the
+  conversation, into *their* language (`profiles.preferred_language`), from
+  whatever language the message turns out to be in — found by the
+  translation service, not assumed from the sender's role or place. Staff
+  write English or Spanish; a member who writes Arabic is read in English or
+  Spanish the same way.
+- **The reader sees** the translation, then "Translated" and a link, "Show
+  original"; tapping it swaps the words and the label ("Original",
+  "Show translation") with the way back. The original is set in its own
+  direction and marked with its language. Your own messages are never
+  translated for you; photos and documents are untouched; a caption is
+  translated like any words.
+- **The pieces.** Migration `0084`: `message_translations` (message, language
+  read in, language written in, words, provider), written *only* by the
+  function with the service role, read only by the people in the conversation,
+  **no admin policy** (as on `messages`), gone with the message. Function
+  `translate-messages`: reads the messages **as the reader** with their own
+  sign-in (so the database decides what may be translated), asks the service
+  only about messages it has no answer for, keeps the answers, never logs a
+  word. The service is behind a seam (`Translator`), today Anthropic's
+  Messages API with `claude-haiku-5-5`, its key a function secret. The
+  prompt calls the messages *data* and says never to follow instructions
+  inside them; what it sends is ids and words — no names, no phone numbers,
+  no conversation, nothing about who the people are (a test holds that to the
+  dignity rule too).
+- **Off, twice, and tied to what we tell people.** `MESSAGE_TRANSLATION` in
+  `packages/config` (the app) *and* `MESSAGE_TRANSLATION=on` on the function
+  must both be set before a word leaves Pam. The privacy page's section about
+  it (`privacy.s.translation`, written in all seven languages already) is in
+  the page **exactly when the app's switch is on** — a test fails if they
+  disagree either way, and another if the switch is flipped without someone
+  updating it.
+- **Why off.** It sends members' words to another company. What is owed
+  before it is switched on is in `docs/before-launch.md`: the service's terms
+  (no retention, no training), the key, a native read of the translations and
+  the privacy copy, members told first (the transparency promise), and a
+  per-person cap on how many translations a day (abuse and cost).
+- **Not done.** A report still shows reviewers the original, as written. No
+  translation of what a person types before they send it. No "always show
+  original" setting. Storybook shows the component (`TranslatedBody`), not
+  the thread, because the thread's switch is off.
+
+### D-424 — Texts and emails reach people in their own language, and nothing a machine drafted is ever sent
+
+**Date:** 2026-10-09. Will: "We want SMS and emails to show up on their
+desired language, what are best practices for handling this, and implement
+it."
+
+- **Rendered at send time, in the recipient's language.** A text is queued
+  against a member and worded when it is sent, from their
+  `preferred_language` (0039), so switching language changes their next text
+  with nothing more to do. What was missing was the two places with no profile
+  to read it from: a staff request that is *denied* (its text was queued with
+  `'en'` written in, 0055) and an invite link mailed to an address nothing is
+  known about (0071). And an *approved* request opened an English account
+  whatever it was asked in. **Migration 0085** keeps the language the person
+  was reading Pam in on `staff_requests` and `invite_emails`, copies it onto the
+  profile on approval and onto the denial text, and treats an unknown code as
+  English instead of refusing the request. The app passes it
+  (`p_language`, from the language screen they are on).
+- **Signed one language at a time, English until then.** Every template has a
+  draft in all seven languages where one fits; each draft has its own
+  `reviewedBy`, empty. `usableSmsLocale` / `usableInviteEmailLocale` (and the
+  dispatcher's `usableLocale`) return the person's language only when a person
+  has signed that wording, English otherwise. A text is the one place Pam
+  cannot show a draft to someone first; the old rule ("a new language must not
+  start receiving machine-drafted texts just because the app speaks it") now
+  holds per language and per template instead of by leaving them out. **I did
+  not fill in any `reviewedBy`**: that is a person's name, and mine is not one.
+- **One segment, so 70 characters in a script that needs it.** Spanish and
+  Portuguese are written without accents so they stay in the cheap encoding
+  (160 characters, as Spanish was; Portuguese keeps only `é`, which is free).
+  Chinese, Russian and Arabic cannot be, and a segment of the other encoding
+  holds 70 — Pam told the carrier every message fits one. So those drafts are
+  held to 70 with the live `app_url` (36 characters) as the link, and a template
+  that cannot be said in 70 characters with a time, an address and a link — the
+  three appointment reminders — has *no* text in those languages and is sent in
+  English. 53 drafts exist (pt-BR 15, zh-CN 12, zh-HK 12, ru 7, ar 7); the limit
+  follows the template's own words, not a street name with a curly apostrophe,
+  so an English reminder is never refused over how an address is spelled.
+  **Will's call, not made here:** allow two segments for the reminders (doubles
+  their cost, and the campaign registration says one) or keep them English.
+- **The last check is per language.** The justice-involvement word list was
+  English only: a Spanish text with "libertad condicional" passed everything.
+  Each language now has its own list (`sms-terms.ts`, built on the UI lists in
+  `language.ts`), folded for accents and marks, applied on top of the English
+  one and repeated in the dispatcher as the final step. The STOP sentence is
+  one table in the config package that the dispatcher reads; it had two
+  spellings ("mensajes" vs "mas"), and the registered one (docs/sms-campaign-
+  samples.md) is now the one both use.
+- **The dispatcher and the config renderer say the same words.** The
+  dispatcher cannot import the package, so it had a second renderer that had
+  already drifted (it never shortened a long address). A parity test renders
+  every template, in every language that has a wording, through both.
+- **The invite email** is in all seven languages (`INVITE_EMAIL_MORE`): Arabic
+  set right to left, a font stack per script (an email cannot load a font),
+  Russian in the present tense (the past tense must say whether the inviter is
+  a man or a woman, and the database does not know), terminology taken from the
+  sign-in screen's invitation sentences so the email and the page it opens
+  agree. Same signing rule; a Storybook story per language.
+- **Applying 0085 is by hand,** with 0079–0081: two functions change shape, so
+  the old signatures are dropped, and the connector stops at a `drop` (D-387).
+  Migration first, app second: the old app's calls still resolve through the
+  default. Held with the rest.
+- **Not done.** No email is sent (there is no provider yet, before-launch). No
+  language is signed. The carrier registration (docs/sms-campaign-samples.md)
+  names English and Spanish; it must be re-filed before the first text in
+  another language goes out. Phone-only invitations (`invite_member`) are sent
+  by the inviter and carry no language of the invitee; they follow the
+  inviter's choice.
+
+### D-425 — Keeping seven languages in step: a ledger, a draft script, a pseudo-language, and a fit job
+
+**Date:** 2026-10-09. Will: "What's the best approach to handle future copy
+changes, so that it shows up on their desired language, and that it fits within
+the component we're working on?" and, earlier, "Does this mean that every time
+we update copy, it will update automatically across all languages?" — it did
+not: a new key failed the tests, but a *reworded* one left six translations
+saying the old thing, with every check green.
+
+- **A ledger.** `locales/ledger.json` keeps, per language and key, two short
+  hashes: of the English a translation was made from and of the translation.
+  The tests fail on any translation whose English has changed and which has not
+  (*stale*), and on any change not yet recorded. `copy:ack` records what was
+  answered and **cannot acknowledge a stale key by accident** — a
+  meaning-preserving English fix is kept on purpose (`--keep key`). Plural
+  variants follow their base key. One line per entry, sorted, so two sessions'
+  edits merge instead of conflicting. The baseline is the merged tree as it is
+  (the 32 keys changed on 9 October were translated in the merge); whether
+  anything was already stale before the ledger cannot be reconstructed from
+  history, because merges make "which changed first" ambiguous — an attempt
+  flagged 66 keys that were all ordering artefacts.
+- **A draft script.** `copy:draft` asks a model for exactly the stale and
+  missing keys, with what the English *was*, what the translation says now, and
+  the same screen's other strings as terminology, per-language style notes
+  (formal address, Hong Kong wording, gender-neutral Russian), and checks the
+  answer (every key, the same placeholders, no markup, not absurdly long). It is
+  a draft: the dignity and parity tests still apply, and anything that is a
+  promise still needs a native reader. The key lives in the environment, never a
+  file. The network call is the only part not tested (there is no key here); the
+  prompt, the parsing and the batching are, against a fake provider. The
+  prompt names no word that labels a person by their past, and a test holds it
+  to that.
+- **A pseudo-language** in Storybook's switch: English with every letter an
+  accented look-alike and most words stretched (about 45% on real copy, which is
+  what Russian does), wrapped in ⟦ ⟧ so a cut-off string shows, and with
+  `{placeholders}` intact. It finds a screen that will not hold longer words
+  before there is a translation, and a string that never went through `t()`.
+- **A fit job** (`.github/workflows/pam-fit.yml`) on pull requests that touch
+  copy or UI: builds Storybook and measures every story at 320px in English,
+  Russian, Arabic, Simplified Chinese and the pseudo-language. A defect that is
+  new in a language fails it unless it is in `scripts/fit-known.json` with a
+  reason. Not run on every push (it is slow); the full seven-language run is the
+  session's.
+- **Web unit tests join CI.** `pnpm --filter @pam/web test` (44 tests) was never
+  in the workflow; it is now.
+- **What this does not do.** It cannot judge whether a translation is *good*,
+  or read text in an image, or see real phone fonts; and a native reader is
+  still owed for every language (docs/before-launch.md). A key whose translation
+  is "kept" is a person's statement, not a machine's.
+
+### D-426 — Numbers are claimed in one file, and a test fails on a duplicate
+
+**Date:** 2026-10-09. Will: "Ensure the other sessions align with this one."
+Three sessions had each taken D-404, two had taken migration 0082 and two had
+taken A22; each was found by a person at merge time and cost a renumbering that
+had to rewrite every cross-reference. `docs/allocations.md` holds the next free
+decision, amendment, migration and changelog number and the rule (fetch, bump
+the row, push that line before writing the entry; a conflict on that row *is*
+the collision). `packages/config/test/numbering.test.ts` fails on a duplicate in
+a tree and on a table that is behind the repo. It cannot see another branch;
+the rule is how a session does. The other two sessions were told what this
+branch changed (seven languages, the wrapping components, the numbers).
 
 ### D-427 — "Your guide" everywhere a member is told who to call; a limited account is told it is off, and who to call (p3 kept)
 
@@ -10114,3 +11337,229 @@ D-426, found free from this branch's side, and was renumbered on 9 October when 
 branch pushed its own D-426 ("Numbers are claimed in one file"); every reference on
 this branch moved with it. This branch has no allocations file: claim the row there
 when the two meet.
+
+### D-428 — Photos and documents follow the message rule; the held migrations are one file
+
+**Date:** 2026-10-09. Will: "Photo and messages are treated the same. Only
+reported if flagged."
+
+- **It is true in the database, checked.** A photo or a document (0079, 0080) is
+  read by the two people in the conversation, and by a guide or a super admin
+  only once someone reports the message it is in, through the same test the
+  message's own words pass (`report_visible_to_me`, 0065). There is no admin
+  policy on either bucket, as there is none on `messages` (0007). A link preview
+  (0081) is stricter still: only the two people, reported or not, because a
+  report already carries the link in the words. The privacy copy says the same
+  (`privacy.s.who-can-see.p3`, `transparency.canSee.flagged`), and
+  `privacy.s.what-we-keep.p6` says Pam's server opens a shared page once.
+- **So the promise does not change; photos join it.** That is how I read Will's
+  line, and it is why "tell members first" (D-394, D-399, D-407) is no longer a
+  gate on the merge: nothing that was private becomes visible. It is Will's call
+  whether the two member accounts on the live project get a courtesy heads-up
+  anyway; it blocks nothing.
+- **How the migrations went in.** The connector hangs on `drop` statements
+  (D-387; 60 s time-out, nothing left behind — verified). 0079, 0080 and 0081
+  contain `drop policy/trigger if exists` guards that do nothing where the objects
+  do not yet exist, so they went in through the connector one by one **without
+  those guards** (0080 keeps its two real constraint replacements) and were read
+  back. 0085 must really drop two function signatures; it still hangs. So it is one
+  short file for the SQL editor (`packages/db/manual/2026-10-09-language-where-
+  there-is-no-profile.sql`: pre-flight, self-check that rolls back, ledger row,
+  twice-safe; proved on a live-shaped database, refused/rolled back as it should),
+  guarded against drift by a test.
+- **Nothing waits on 0085.** The app asks with `p_language` and, if the database
+  has no such parameter (PGRST202, raised before anything runs), asks again
+  without it (`rpcLanguage.ts`). Remove that helper once 0085 has been live a while.
+
+### D-429 — Privacy changes go out by email; a refused New message says the account is limited; the unused key goes; the flow map shows the limited states
+
+**Date:** 2026-10-09. **Decided by:** Will, answering the list of what was left after
+D-427: "Moving forward, we'll send emails with privacy policy updates", "Delete",
+"Do that", "Yes update flow map".
+
+- **Privacy policy updates are sent by email.** Recorded as Will's rule going
+  forward; it replaces "re-show it in the app to anyone who agreed before"
+  (`transparency_ack_at` is set once and nothing re-asks) as the way members
+  hear first. **It cannot be done yet, and the reason matters:** Pam holds no
+  email address for a member. `profiles` has no email column *by design* —
+  auth is phone-only (`0002_identity.sql`, §9) — and the only addresses Pam
+  keeps are the ones typed on the expired-invite page (`invite_emails`, 0071),
+  for a different purpose. So sending a policy update by email needs, in order:
+  (1) the email provider that `docs/before-launch.md` already lists for invite
+  links; (2) a decision on how Pam comes to hold a member's email at all — a new
+  thing Pam keeps, so it must be asked for plainly, must be optional or have a
+  fallback, and must appear in the privacy policy's "what we keep" and in the
+  transparency screen before it is collected (those tests fail by design);
+  (3) what a member with no email gets — the app's own notice, or a text that a
+  person has signed off (`reviewedBy`). None of that is decided here: it is
+  Will's. Put on `docs/before-launch.md` as its own item. Until then the policy
+  and terms carry their date (9 October) and the two member accounts on the
+  live project are the only ones that exist outside the team.
+- **A New message the database refuses says why** (the "Do that"). D-427 covered
+  the composer, a refused send and Messages opened by a limited account; the
+  last gap was the New message sheet when the account was limited *after* Messages
+  loaded: it said "Your connection dropped". `pick` (`app/messages/page.tsx`,
+  `screens/MessagesScreen.tsx`) now asks `readAccountLimited()` when
+  `open_direct_conversation` fails; if the account is limited the sheet closes and
+  the notice replaces New message, otherwise the old words stay. Two e2e tests:
+  refused-because-limited (notice, sheet closed, no "connection dropped", no New
+  message) and a 500 for an account that is not limited (still "connection
+  dropped", no notice).
+- **`access.limitedNotice` is deleted** from all seven languages and the copy
+  ledger. It was never referenced by the app (before or after D-427), but it was
+  still being translated. It went from English and Spanish first (this branch); once
+  `main` carried the other five bundles (the languages branch merged), it went from
+  those and `copy:ack` dropped its six ledger entries; `copy:status` reads "in step".
+- **The flow map** (`docs/user-flows/flows.mjs`, "PAM — User flows", Member page)
+  gains *Messages — account limited*, *A conversation — account limited* and the
+  *Report a message* screen (which had a story only since D-427), with the edges
+  that reach them; `UPDATED` is 9 October.
+
+### D-432 — The limited notice says what is off, why, then Pam — in a calm card
+
+**Date:** 2026-10-09. **Decided by:** Will, looking at the limited Messages screen:
+"This wording 'your plan' doesn't make sense. Just start with You cannot send
+messages. And explain why. Then call PAM. Also let's add more padding on this card,
+and make text the smallest. Call Pam for help should be a link, not a primary button."
+
+- **The words.** `notice.account_limited.body` is now: "You cannot send messages
+  right now. Your guide turned this off for your account. You can still read your
+  messages. Call Pam and we will help you reach your guide." It starts with what is
+  off, gives the reason that is always true (a limit is set by the case manager the
+  person is assigned to: `admin_set_access_status` is gated by `admin_covers`, 0082
+  — so "your guide turned this off" is accurate, and it never states the internal
+  reason, §4.1), and ends on Pam, like the paused notice. "Look at places and your
+  plan" and "meet new people" are gone. Reworded in all seven languages and the
+  English source in `notices.ts`; `copy:status` reads in step.
+  **The five languages other than Spanish are Claude's drafts, not a native
+  reader's** (the same standing as the rest of them, `docs/before-launch.md`).
+- **The card.** `Notice` gains `quiet`: `padding={6}` (the text-card padding) instead
+  of 4; the title and the message at the body-text floor, 16px
+  (`--pam-body-text-mobile`, A23), instead of 19px and 17px; and the call is a
+  link — accent colour, underlined, phone icon, no fill, still a 48px target and
+  still a `tel:` anchor — instead of a primary button. Only the limited notice uses
+  it (`LimitedNotice`). Every other notice (offline, something went wrong, paused,
+  turned off) keeps the primary call button: those are faults where calling is the
+  one thing to do. If Will wants the calm look on all of them it is one prop.
+- **Checked in a browser** (`e2e/messages.spec.ts`): the notice begins "You cannot
+  send messages right now.", says "Your guide turned this off for your account.",
+  never mentions a plan, its text is 16px, and the call is an underlined link with
+  a transparent background at least 48px tall; axe clean at 320px and iPhone SE.
+  Storybook: *Components / Feedback / Notice / Some Things Turned Off Quiet*, and the
+  limited-account states.
+- **For the next session** (assign and limit): `admin_set_access_status`'s error
+  still reads "That person is not on your caseload or in your region" (0008); since
+  0082 there is no region, so the message should change when that screen is built.
+- **Numbering.** This entry first took D-430, then D-431 was free on the languages
+  branch's ledger; both were taken there by the time I read its message (it pushed
+  D-430 "The new languages are approved to learn from" and D-431 first), so this is
+  D-432 and every reference on this branch moved with it. Next free: D-433.
+
+### D-441 — A staff invite carries a required email; the account keeps it, tied to the phone
+
+**Date:** 2026-10-10. **Decided by:** Will: "Emails are collected when a guide or program
+invites someone … we don't ask [members] during account creation. But the phone number
+they use to sign in should map to their email if they were invited. Map these together in
+their account. We just don't ask members for this since not everyone has an email. This
+will be typically just staff." Shown the plan: "Yes" (only staff are asked), "Not optional
+for staff". His third answer was a question — "Which email are you talking about?" — see
+*Who can read it*, below.
+
+**What was true first.** The Invite someone journey asked for a **name and a phone and
+nothing else, for every role** (0077). It did not collect an email. The only emails Pam
+held were the ones a person types on the expired-link page (0071's `invite_emails`
+outbox), tied to a link and never to an account, and `profiles` has no email column by
+design (0002: sign-in is phone-only). So there was nothing to "map"; the email had to be
+asked for first.
+
+**What was built (migration `0086_staff_email_on_invite.sql`, written and tested, not applied).**
+- Inviting a **case manager or a program lead** asks for their email and refuses to
+  continue without one that looks like an email. Inviting a **member** never asks, and the
+  database refuses a member invite that carries one. `create_staff_invite(role, email, phone,
+  region, name)` is the staff door; `create_invite` (the member door) now refuses a staff
+  role. Both call `invite_create`, which no client role can call. **No `drop` anywhere**
+  (the connector times out on one, D-387).
+- The email waits in `invite_contact_emails`, apart from `invites`: forced RLS, a policy that
+  admits nobody, no grant to any client role. When the person signs in with the number the
+  invite named and finishes setup, `redeem_invite` (or `add_role_from_invite`, for a member
+  who also works at a program) moves it onto their account, in `profile_emails`, and deletes
+  it from the invite. An account keeps the first email it was given. A renewed invite (the
+  expired-link email) has none of its own, so the email is found by following the renewals
+  back to the original invite — which is why 0086 does not touch `request_invite_link`
+  (0085, still unapplied, replaces it). An invite made before 0086 redeems as before, with
+  no email.
+- **Who can read it — Will, 10 October: "Only super admins can view emails. But if a user
+  chooses to delete all their data, the email goes along with it."** A super admin can read
+  both the account's email (`profile_emails`) and one still waiting on an invite
+  (`invite_contact_emails`); nobody else can, from the app: not the person who invited them,
+  not another case manager, not a program, not a member, **not even the account's owner**
+  (they can ask Pam for a copy of their data, which is a call). No client role can write
+  either table. The audit log never holds an address. Pam's own sender will use the service
+  role. **No screen shows it yet**: the Everyone directory carries no contact details, ever
+  (an e2e test holds that), so putting staff emails there would be a decision of its own.
+  My earlier default (owner reads their own) was replaced by this.
+- **Deleting an account deletes the email.** `profile_emails` and `invite_contact_emails` hang
+  from the profile and the invite by cascade (a test reads the catalogue so a changed rule is
+  noticed). A `before delete` trigger on `profiles` also deletes the invites the person
+  redeemed, and the expired links those were renewed from, with what hangs off them: their
+  name, their phone and any address typed on the expired-link page (`invite_emails`). **Found
+  by the test that deletes an invited account the way Pam does when somebody calls: it was
+  refused** — `invites.redeemed_by` is `on delete set null`, which the invite's own check
+  (`invites_redeemed_consistently`) forbids, so nobody who joined by invite could be deleted.
+  The trigger fixes that (no `drop` needed). **Not fixed, and not mine to decide:** deleting a
+  profile that has ever acted is still refused, because `audit_log.actor_id` is `on delete set
+  null` and the audit log is append-only. Whether an erased person's audit rows are
+  anonymised, kept or removed is a decision about the audit promise; until it is made, a
+  deletion on a call has to remove the email (and the rest) by hand. On
+  `docs/before-launch.md`.
+- The app: `InviteForWho` shows the email field for staff only (new field purpose
+  `theirEmail`: the email keyboard, no autofill of the *inviter's* own address) and
+  `createInvite` sends staff through `create_staff_invite`. **Nothing on the form explains what
+  Pam does with the email** (Will: "that's only for us… not related to members, only staff";
+  the first draft said "Pam writes to them here", which was wrong from the invitee's side — the
+  system emails them the invitation link, when a sender exists). **The form is a page of its own
+  on the nested template** (Will: "This page should be using our nested page template"): the
+  kind of invite is the large title ("A link for a program"), the round back returns to the
+  choice, and the in-body heading and the "Choose a different invite" link are gone — on Invite
+  someone, the case manager's admin screen and the Everyone directory (where the form used to sit
+  inside a card). Storybook: Case manager › Invite a program.
+- The privacy policy's "What we keep" gains a seventh paragraph and its date moves to 10
+  October (all seven languages, five of them drafts; Will to read the English): "If you work
+  with Pam as a case manager or for a program, we also keep the email address you were invited
+  with. Pam uses it to write to you. Only the Pam team can see it. If you ask us to delete your
+  account, we delete it too. Members are never asked for an email." Every clause is enforced by
+  the database, except that deleting an account that has acted still needs the audit decision
+  above (until then a deletion removes the email by hand).
+- Tests: `21_staff_email_on_invite_test.sql` (staff invites need an email and members refuse
+  one; nobody reads it before sign-in, including the person who typed it; it lands on the
+  right account only, for the number the invite named; only its owner reads it, nobody writes
+  it; a member who also works at a program keeps the first email; a renewed invite still
+  delivers it; an old invite redeems with none; the audit log never holds an address). It
+  fails when the read rule is loosened. The suite passes (608 checks). The staff
+  invite calls in `04`, `08`, `13` and `14` now go through `create_staff_invite`. Browser
+  tests: a member is never asked, staff always are, the keyboard and autofill attributes,
+  axe clean.
+
+**Applying it is order-sensitive.** The app now calls `create_staff_invite`; the *old* app
+calls `create_invite` for staff, which 0086 refuses. So: before 0086 is live, the new app's
+staff invites fail (no such function); after it is live, the old app's do. Apply 0086 and
+merge this change to `main` in the same sitting (Vercel takes a few minutes; staff invites
+are unavailable in between). Run `list_migrations` first (`CLAUDE.md`); 0085 is unapplied
+and 0086 does not depend on it. Members are unaffected either way. On the live project there
+were one super admin and two members when last read, so no staff account has an email yet.
+
+**Not done.** Sending any email (the provider, the sender, the opt-in are the first item on
+`docs/before-launch.md`); an email for a staff account that already exists (there is no screen
+to add one; re-inviting is the only way today); showing a staff member their own email on
+Profile; using the address typed on the expired-link page as an account email (that would
+quietly collect member emails); the program-lead and super-admin pages of the flow map (the
+case manager's page shows the form; the others carry the same form).
+
+**Numbering.** Migration 0086 was claimed in `docs/allocations.md` first and is still
+free on every other branch. This entry first took D-435 and moved to D-441 on 10 October:
+`claude/amazing-archimedes-qvgnt2` had pushed its own D-435 (Arabic isolates) before
+that claim and the languages branch had also taken D-435 (it moved to D-439), so the
+highest number claimed anywhere was D-440. Every reference on this branch moved with it.
+Lesson, again: fetch and read every `origin/claude/*` allocations row *and* DECISIONS
+heading list before claiming, not only the one file on your own branch.
+

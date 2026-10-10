@@ -3,6 +3,7 @@
 import { useCallback } from 'react';
 import { useI18n } from '@/lib/i18n';
 import { formatTime } from '@/lib/usePlaceStatus';
+import { intlLocale } from '@pam/config';
 
 /**
  * Story text that follows the Language toolbar.
@@ -41,7 +42,7 @@ export function useStoryText(): StoryText {
         vars[name] = TIME.test(raw)
           ? formatTime(raw, locale)
           : NUMBER.test(raw)
-            ? new Intl.NumberFormat(locale).format(Number(raw))
+            ? new Intl.NumberFormat(intlLocale(locale)).format(Number(raw))
             : t(raw);
       }
       return t(key, vars);

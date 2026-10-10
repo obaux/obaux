@@ -9,6 +9,7 @@ import { DUMMY_PLACES_BY_ID } from '@pam/config/dummy-places';
 import { DUMMY_TRIPS } from '@pam/config/dummy-trips';
 import { useI18n } from '@/lib/i18n';
 import { readAddedTrips, withMoves } from '@/lib/addedTrips';
+import { intlLocale } from '@pam/config';
 
 /**
  * A booked visit, at the top of a conversation with the program it is at
@@ -20,6 +21,10 @@ import { readAddedTrips, withMoves } from '@/lib/addedTrips';
  * The same green card as the place page's (D-273) — calendar, the day, the
  * time — with a chevron here, because here it goes somewhere: the place,
  * which shows the visit too, and whose Back returns to this conversation.
+ *
+ * Pinned above every message, it is the compact card (D-400, Will, 9
+ * October: "should be smaller"), and the conversation fades out as it
+ * scrolls up under it rather than stopping at a line (ThreadView).
  *
  * Example trips only, as Trips itself is (D-213): the program is matched to
  * an example place by name, and the soonest visit there is shown. Nothing
@@ -56,8 +61,8 @@ export function ThreadVisit({
 
   if (!visit) return null;
   const at = new Date(visit.startsAt);
-  const day = new Intl.DateTimeFormat(locale, { weekday: 'long', month: 'long', day: 'numeric' }).format(at);
-  const time = new Intl.DateTimeFormat(locale, { hour: 'numeric', minute: '2-digit' }).format(at);
+  const day = new Intl.DateTimeFormat(intlLocale(locale), { weekday: 'long', month: 'long', day: 'numeric' }).format(at);
+  const time = new Intl.DateTimeFormat(intlLocale(locale), { hour: 'numeric', minute: '2-digit' }).format(at);
   const href = `/place/?${new URLSearchParams({
     id: visit.placeId,
     from: 'thread',
@@ -69,11 +74,12 @@ export function ThreadVisit({
     <VStack xstyle={styles.wrap}>
       <StatusCard
         tone="green"
-        icon={<Icon icon="calendar" size="md" />}
+        icon={<Icon icon="calendar" size="sm" />}
         title={day}
         body={t('place.visit.body', { time })}
         href={href}
         label={t('messages.visit.label', { day, time })}
+        isCompact
       />
     </VStack>
   );

@@ -2,9 +2,8 @@
 
 import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
-import { AlertDialog } from '@astryxdesign/core/AlertDialog';
 import { Avatar } from '@astryxdesign/core/Avatar';
-import { Button } from '@astryxdesign/core/Button';
+import { Button } from '@pam/ui/Button';
 import { EmptyState } from '@astryxdesign/core/EmptyState';
 import { Heading } from '@astryxdesign/core/Heading';
 import { HStack } from '@astryxdesign/core/HStack';
@@ -25,6 +24,8 @@ import { LargeTitleHeader } from '@pam/ui/LargeTitleHeader';
 import { useI18n } from '@/lib/i18n';
 import { isVerified, usePolicies } from '@/lib/usePolicies';
 import { checkIn, undoCheckIn, useCheckIns } from '@/lib/checkIns';
+import { intlLocale } from '@pam/config';
+import { ConfirmDialog } from './ConfirmDialog';
 
 /**
  * A program lead's Home (D-218, Will, 2 October): "a daily calendar view,
@@ -356,17 +357,22 @@ function CheckInButton({
           ))}
         </HStack>
       ) : null}
-      <AlertDialog
+      {/*
+        Pam's own "are you sure" (D-234), not Astryx's AlertDialog, which
+        always opens with Keep it chosen (D-411: nothing chosen until the
+        person chooses).
+      */}
+      <ConfirmDialog
         isOpen={isAsking}
-        onOpenChange={setAsking}
         title={t('schedule.checkin.undo.title', { name })}
-        description={t('schedule.checkin.undo.body')}
-        cancelLabel={t('schedule.checkin.undo.keep')}
-        actionLabel={t('schedule.checkin.undo.confirm')}
-        onAction={() => {
+        body={t('schedule.checkin.undo.body')}
+        confirmLabel={t('schedule.checkin.undo.confirm')}
+        onConfirm={() => {
           undoCheckIn(id);
           setAsking(false);
         }}
+        cancelLabel={t('schedule.checkin.undo.keep')}
+        onCancel={() => setAsking(false)}
       />
     </HStack>
   );
@@ -405,13 +411,17 @@ export function ScheduleView({
 
   const fmt = useMemo(
     () => ({
-      time: new Intl.DateTimeFormat(locale, { hour: 'numeric', minute: '2-digit' }),
-      weekdayLong: new Intl.DateTimeFormat(locale, { weekday: 'long' }),
-      day: new Intl.DateTimeFormat(locale, { weekday: 'short', month: 'short', day: 'numeric' }),
-      dayLong: new Intl.DateTimeFormat(locale, { weekday: 'long', month: 'long', day: 'numeric' }),
-      monthDay: new Intl.DateTimeFormat(locale, { month: 'short', day: 'numeric' }),
-      weekdayNarrow: new Intl.DateTimeFormat(locale, { weekday: 'short' }),
-      month: new Intl.DateTimeFormat(locale, { month: 'long', year: 'numeric' }),
+      time: new Intl.DateTimeFormat(intlLocale(locale), { hour: 'numeric', minute: '2-digit' }),
+      weekdayLong: new Intl.DateTimeFormat(intlLocale(locale), { weekday: 'long' }),
+      day: new Intl.DateTimeFormat(intlLocale(locale), { weekday: 'short', month: 'short', day: 'numeric' }),
+      dayLong: new Intl.DateTimeFormat(intlLocale(locale), { weekday: 'long', month: 'long', day: 'numeric' }),
+      monthDay: new Intl.DateTimeFormat(intlLocale(locale), { month: 'short', day: 'numeric' }),
+      // The month grid's seven columns are about 40px each at 320px. Arabic's
+      // short weekday is the whole word ("الخميس"), which overlaps its
+      // neighbour, so it is the single letter every Arabic calendar uses
+      // there (D-422); the day's full name is on its button for a screen reader.
+      weekdayNarrow: new Intl.DateTimeFormat(intlLocale(locale), { weekday: locale === 'ar' ? 'narrow' : 'short' }),
+      month: new Intl.DateTimeFormat(intlLocale(locale), { month: 'long', year: 'numeric' }),
     }),
     [locale],
   );
@@ -643,7 +653,7 @@ export function ScheduleView({
             onScroll={(e: React.UIEvent<HTMLElement>) => {
               const el = e.currentTarget;
               const room = el.scrollWidth - el.clientWidth;
-              setStripPage(room > 0 ? Math.round((el.scrollLeft / room) * (stripPages - 1)) : 0);
+              setStripPage(room > 0 ? Math.round((Math.abs(el.scrollLeft) / room) * (stripPages - 1)) : 0);
             }}
           >
             {monthDays.map(({ date, count }) => (

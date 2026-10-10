@@ -177,6 +177,74 @@
     outline: none;
   }
 
+  /*
+   * What you type in a conversation is the same 16px as what was said to you
+   * (D-389, D-392). Astryx sets the editor and its placeholder from the type
+   * scale (14px, 16px on touch) on the two children, with no prop to reach
+   * them; 16px is also the size below which iOS zooms into a field.
+   */
+  .astryx-chat-composer-input > div {
+    font-size: 16px;
+  }
+
+  /*
+   * Every icon in a conversation — the mic, the send arrow, the
+   * scroll-to-bottom arrow — is drawn heavier than Astryx's 1.5 (Will,
+   * 8 October: D-390 "need to be bolder", D-393 "larger stronger icon").
+   * The mic is `ChatDictationButton`'s own, with no icon prop to swap; the
+   * SVG's `stroke-width` attribute is the weakest rule there is, so this one
+   * line is enough, and all three stay matched (D-192). The thread header
+   * above the conversation is outside `ChatLayout` and keeps Pam's 1.5.
+   */
+  .astryx-chat-layout svg {
+    stroke-width: 2.25;
+  }
+
+  /*
+   * The mic in the composer is Astryx's secondary icon grey, like the photo
+   * button and the idle send arrow beside it (Will, 8 October, D-396: "more
+   * greyed out, less emphasis"). Those two take `color="secondary"` and a
+   * token in `ThreadView`; `ChatDictationButton` draws its own icon with no
+   * colour prop, so the mic is reached here.
+   */
+  .astryx-chat-dictation-button svg {
+    color: var(--color-icon-secondary);
+  }
+
+  /*
+   * The photo viewer's buttons — close, and previous / next in a gallery —
+   * are Pam's circle buttons for a dark ground (Will, 9 October, D-401): 48px,
+   * dark grey with a lighter rim, and a larger, heavier white mark, so they
+   * read against a near-black screen. Astryx's Lightbox draws them as ghost
+   * buttons with no prop to change, so this one rule reaches them
+   * (`PhotoViewer`).
+   */
+  /* The viewer itself takes focus when it opens (D-411); it is not a
+     control, so no ring around the whole screen. */
+  dialog.astryx-lightbox:focus {
+    outline: none;
+  }
+  .astryx-lightbox .astryx-button {
+    width: var(--pam-touch-target-min);
+    height: var(--pam-touch-target-min);
+    min-width: var(--pam-touch-target-min);
+    border-radius: 50%;
+    border: 1px solid var(--pam-viewer-control-rim);
+    background-color: var(--pam-viewer-control);
+    color: var(--color-on-dark);
+  }
+  .astryx-lightbox .astryx-button:hover {
+    background-color: var(--pam-viewer-control-rim);
+  }
+  .astryx-lightbox .astryx-button .astryx-icon {
+    width: 24px;
+    height: 24px;
+    font-size: 24px;
+  }
+  .astryx-lightbox .astryx-button svg {
+    stroke-width: 2.5;
+  }
+
   :has(> input:focus-visible),
   :has(> textarea:focus-visible) {
     outline: 3px solid currentColor;
@@ -383,6 +451,18 @@
   ::view-transition-group(pam-tabbar) {
     animation: none;
   }
+  /*
+   * Nor are its pictures cross-faded (Will, 9 October, D-403): with the
+   * default old-out / new-in fade, a tab switch showed two tabs lit at once
+   * and the fade above the bar dissolving and coming back. The new bar is
+   * shown at once, whole, for the length of the switch.
+   */
+  ::view-transition-old(pam-tabbar) {
+    display: none;
+  }
+  ::view-transition-new(pam-tabbar) {
+    animation: none;
+  }
 
   html[data-pam-nav='forward']::view-transition-old(root) {
     animation: 200ms cubic-bezier(0.4, 0, 1, 1) both pam-nav-out-left;
@@ -483,16 +563,16 @@
 
 /* Keyframes for D-269's moves between screens and the page body's rise. */
 @keyframes pam-nav-in-right {
-  from { opacity: 0; transform: translateX(24px); }
+  from { opacity: 0; transform: translateX(calc(24px * var(--pam-flip, 1))); }
 }
 @keyframes pam-nav-out-left {
-  to { opacity: 0; transform: translateX(-12px); }
+  to { opacity: 0; transform: translateX(calc(-12px * var(--pam-flip, 1))); }
 }
 @keyframes pam-nav-in-left {
-  from { opacity: 0; transform: translateX(-24px); }
+  from { opacity: 0; transform: translateX(calc(-24px * var(--pam-flip, 1))); }
 }
 @keyframes pam-nav-out-right {
-  to { opacity: 0; transform: translateX(12px); }
+  to { opacity: 0; transform: translateX(calc(12px * var(--pam-flip, 1))); }
 }
 @keyframes pam-nav-fade-in {
   from { opacity: 0; }
@@ -503,3 +583,57 @@
 @keyframes pam-rise {
   from { opacity: 0; transform: translateY(8px); }
 }
+
+/*
+ * Right to left (Arabic, D-422). `<html dir>` follows the language
+ * (`I18nProvider`); Astryx's own components mirror from it, and logical
+ * properties do the rest. What is left lives here.
+ *
+ * --pam-flip is +1 reading left to right and -1 right to left. It turns the
+ * few things CSS logical properties cannot say: a slide's direction, a fade's
+ * side, the way a swipe reveals the times.
+ */
+:root { --pam-flip: 1; }
+:root[dir='rtl'] { --pam-flip: -1; }
+
+/* An arrow that points "back" points the other way. */
+:root[dir='rtl'] [data-pam-directional] { transform: scaleX(-1); }
+
+/* Arabic joins its letters. Spacing them apart breaks the word. */
+:root[lang='ar'] * { letter-spacing: 0; }
+
+/*
+ * A phone number, an email address and a code are written left to right even
+ * on a right-to-left page, and sit at the end of the field where the eye
+ * expects them.
+ */
+:root[dir='rtl'] :is(
+  input[type='tel'],
+  input[type='email'],
+  input[type='url'],
+  input[inputmode='numeric'],
+  input[autocomplete='one-time-code']
+) {
+  direction: ltr;
+  text-align: right;
+}
+
+/*
+ * Longer words (D-422). English is the shortest of the seven languages Pam
+ * speaks, and every layout was first drawn around it: "Privacy" is 7 letters,
+ * "Конфиденциальность" is 18. A word wider than its box is cropped at the
+ * edge of the screen with nothing to say so, and the page does not scroll, so
+ * no overflow check ever notices.
+ *
+ * - Every language may break a word that cannot fit on a line of its own, as
+ *   a last resort (`break-word` — never mid-word while it fits).
+ * - Everything but English may hyphenate at the places its dictionary knows
+ *   ("Конфиден-циальность"), which keeps lines even and avoids the last-resort
+ *   break. English is left alone: its words are short, and a hyphen in a
+ *   button label is noise.
+ * - Chinese has no spaces, so the browser may break between any two
+ *   characters, but not in front of closing punctuation (`strict`).
+ */
+:root { overflow-wrap: break-word; }
+:root:not([lang='en']) { hyphens: auto; }
+:root:lang(zh-CN), :root:lang(zh-HK) { line-break: strict; }

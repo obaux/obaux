@@ -3,9 +3,10 @@
 import * as stylex from '@stylexjs/stylex';
 import { ListItem } from '@astryxdesign/core/List';
 import { Avatar } from '@astryxdesign/core/Avatar';
-import { Badge } from '@astryxdesign/core/Badge';
+import { Badge } from '@pam/ui/Badge';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
+import { spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
 
 /**
  * One conversation in the list — a row, not a card (D-186).
@@ -35,13 +36,17 @@ export interface ConversationRowProps {
 }
 
 const styles = stylex.create({
-  item: { minHeight: '48px' },
+  // No padding on the left, so the avatar lines up with the page title; the
+  // list's own 12px kept on the right (Will, 9 October, D-411). Set as
+  // `paddingInline`, the property Astryx's Item sets, so it replaces it.
+  item: { minHeight: '48px', paddingInline: `0px ${spacingVars['--spacing-3']}` },
   context: { fontSize: '15px', lineHeight: 1.3 },
   preview: {
     fontSize: '18px',
     lineHeight: 1.35,
     overflow: 'hidden',
     textOverflow: 'ellipsis',
+    unicodeBidi: 'plaintext', // its own direction, not the screen's (D-422)
     whiteSpace: 'nowrap',
   },
   previewUnread: { fontWeight: 600 },
@@ -77,6 +82,7 @@ export function ConversationRow({ name, context, preview, when, unread, unreadLa
           {unread ? <Badge variant="info" label={unreadLabel} /> : null}
         </VStack>
       }
+      xstyle={styles.item}
     />
   );
 }

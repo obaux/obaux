@@ -73,7 +73,9 @@ async function shoot(node, thumbPath) {
     await page.close();
     return { data: raw.toString('base64'), type: 'image/jpeg' };
   }
-  const page = await browser.newPage({ viewport: { width: W, height: H }, deviceScaleFactor: 0.5 });
+  // Reduced motion: a screen is photographed at rest, never mid-slide (D-407's
+  // sliding names would otherwise be caught half-way).
+  const page = await browser.newPage({ viewport: { width: W, height: H }, deviceScaleFactor: 0.5, reducedMotion: 'reduce' });
   await page.goto(`${base}/iframe.html?id=${node.story}&viewMode=story`);
   await page.waitForTimeout(2500);
   for (const step of node.actions ?? []) await act(page, step);
@@ -82,7 +84,7 @@ async function shoot(node, thumbPath) {
   // is size-limited); full size for the HTML page.
   writeFileSync(thumbPath, await page.screenshot({ type: 'jpeg', quality: 60 }));
   await page.setViewportSize({ width: W, height: H });
-  const full = await browser.newPage({ viewport: { width: W, height: H } });
+  const full = await browser.newPage({ viewport: { width: W, height: H }, reducedMotion: 'reduce' });
   await full.goto(page.url());
   await full.waitForTimeout(2500);
   for (const step of node.actions ?? []) await act(full, step);
@@ -217,6 +219,23 @@ function header(flow, width) {
 </div>`;
 }
 
+/**
+ * The latest-changes panel sits at the top right, 400px wide and 460px in
+ * from the edge. When the first screens already reach that edge it sat on
+ * the last of them (the member map, 8 October, once it had seven changes),
+ * so the page widens until the panel clears every screen beside it. Its
+ * height is estimated from the text: 13px at 145% in a 356px column, about
+ * 50 characters a line.
+ */
+function clearOfPanel(flow, pos, width) {
+  const changes = flow.changes ?? [];
+  if (!changes.length) return width;
+  const bottom = 56 + 58 + changes.reduce((h, c) => h + 8 + Math.ceil(c.length / 50) * 19, 0);
+  const beside = Object.entries(pos).filter(([, p]) => p.y < bottom);
+  const right = Math.max(0, ...beside.map(([id, p]) => p.x + cardW(flow.nodes[id])));
+  return Math.max(width, right + 40 + 460);
+}
+
 function changesPanel(flow, width) {
   if (!flow.changes?.length) return '';
   return `
@@ -241,12 +260,24 @@ ${body}
 </div></body></html>`;
 }
 
-const latestDecisions = (flow) => (flow.changes ?? []).slice(0, 2).map((c) => c.split(' ')[0]);
+// The D-numbers of the two newest change lines. A line can name a range
+// ("D-400–401 — …"), which stands for every decision in it, so a screen
+// changed by D-401 is tagged as new too.
+const latestDecisions = (flow) =>
+  (flow.changes ?? []).slice(0, 2).flatMap((c) => {
+    const head = c.split(' ')[0];
+    const range = /^D-(\d+)[–-](\d+)$/.exec(head);
+    if (!range) return [head];
+    const out = [];
+    for (let n = Number(range[1]); n <= Number(range[2]); n += 1) out.push(`D-${n}`);
+    return out;
+  });
 const homes = {};
 
 for (const flow of flows) {
   if (only && flow.key !== only) continue;
-  const { pos, width, height } = layout(flow);
+  const { pos, width: laidOut, height } = layout(flow);
+  const width = clearOfPanel(flow, pos, laidOut);
   const shots = {};
   for (const [id, node] of Object.entries(flow.nodes)) {
     shots[id] = await shoot(node, join(out, 'thumbs', `${flow.key}--${id}.jpg`));

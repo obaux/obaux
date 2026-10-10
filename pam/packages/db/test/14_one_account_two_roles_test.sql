@@ -48,11 +48,11 @@ select test.check_raises('only member and program go together',
 -- ===========================================================================
 set role authenticated;
 select test.as_user(:'alice');
-select (public.create_invite('provider', '267-555-0401', null, 'Jo')).code as jo_code \gset
+select (public.create_staff_invite('provider', 'jo@example.org', '267-555-0401', null, 'Jo')).code as jo_code \gset
 select test.as_user(:'admin_north');
-select (public.create_invite('admin', '267-555-0401', null, 'Jo')).code as jo_cm_code \gset
+select (public.create_staff_invite('admin', 'jo@example.org', '267-555-0401', null, 'Jo')).code as jo_cm_code \gset
 select test.as_user(:'southside');
-select (public.create_invite('provider', '267-555-0401', null, 'Jo')).code as jo_south_code \gset
+select (public.create_staff_invite('provider', 'jo@example.org', '267-555-0401', null, 'Jo')).code as jo_south_code \gset
 
 -- The newest waiting invite is the South one: another city, so not addable.
 select test.as_user(:'jo');

@@ -72,4 +72,14 @@ export const pam = stylex.defineVars({
   // than the avatar's own background (#f1f1f1 light, #1b1b1b dark).
   '--pam-photo-icon': 'light-dark(#b4b4b4, #5c5c5c)',
   '--pam-rule-dashed': 'light-dark(rgba(0, 0, 0, 0.05), rgba(255, 255, 255, 0.08))',
+  // A document's icon in a conversation (Will, 9 October, D-401): the bright
+  // blue of a Google Doc, for Word files and Google links alike. The theme's
+  // own blue (`--color-icon-blue`) is a navy. 4.6:1 on white, 7:1 on #1b1b1b.
+  '--pam-document-blue': 'light-dark(#1a73e8, #8ab4f8)',
+  // The photo viewer (Will, 9 October, D-401: "extra dark overlay so photo
+  // stands out"): near-black over the page, whatever the mode, and its round
+  // buttons dark grey with a lighter rim and a white mark.
+  '--pam-viewer-backdrop': 'rgba(0, 0, 0, 0.9)',
+  '--pam-viewer-control': '#2b2b2b',
+  '--pam-viewer-control-rim': '#5c5c5c',
 });

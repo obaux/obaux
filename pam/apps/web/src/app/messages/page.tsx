@@ -10,6 +10,7 @@ import { AppHeader, BigButton, Loading, Notice, Page, PageTitle } from '@pam/ui'
 import { NOTICES, type Role } from '@pam/config';
 import { USE_DUMMY_PEOPLE } from '@pam/config/dummy-flag';
 import { useI18n } from '@/lib/i18n';
+import { usePreloadThreadView } from './ThreadViewLazy';
 import { NotIn } from '../NotIn';
 import { HeaderBell } from '../HeaderBell';
 import { useSupportPhone } from '@/lib/useSupportPhone';
@@ -21,6 +22,7 @@ import { useConversations } from '@/lib/useConversations';
 import { useMessageableMembers } from '@/lib/useMessageableMembers';
 import { useReports } from '@/lib/useReports';
 import { openConversation } from '@/lib/openConversation';
+import { readAccountLimited } from '@/lib/accountLimited';
 import { whenHappened } from '@/lib/when';
 import { ConversationRow } from './ConversationRow';
 import { LimitedNotice } from './LimitedNotice';
@@ -78,6 +80,8 @@ function contextFor(
 }
 
 function MessagesScreen() {
+  // A conversation opens ready, its composer and fades already loaded (D-400).
+  usePreloadThreadView();
   const { t, locale } = useI18n();
   const supportPhone = useSupportPhone();
   const { state: session } = useSession();
@@ -87,7 +91,10 @@ function MessagesScreen() {
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
   // A limited account reads but cannot start a message (0031): the New
   // message button gives way to the notice that says so (terms.s.limits.p3, D-427).
-  const limited = session.status === 'signed-in' && session.session.accessStatus === 'limited';
+  // ...or found out part-way through: the account was limited after this screen
+  // loaded, and starting a conversation was refused (`pick`, below).
+  const [limitedNow, setLimitedNow] = useState(false);
+  const limited = limitedNow || (session.status === 'signed-in' && session.session.accessStatus === 'limited');
   const { viewedRole, demoRole, setViewAs } = useRoleView(trueRole);
   const isDemo = useDemoView(session);
   const previewing = demoRole !== null || isDemo;
@@ -149,7 +156,15 @@ function MessagesScreen() {
     async (id: string): Promise<string | null> => {
       if (previewing) return dummyPicker ? dummyPicker.hrefFor(id) : null;
       const conversationId = await openConversation(id);
-      return conversationId ? `/messages/thread/?id=${encodeURIComponent(conversationId)}` : null;
+      if (conversationId) return `/messages/thread/?id=${encodeURIComponent(conversationId)}`;
+      // A refusal and a dropped connection look alike from here; if the account
+      // is limited say so, and close the sheet, instead of "Your connection
+      // dropped" (terms.s.limits.p3, D-429).
+      if (await readAccountLimited()) {
+        setLimitedNow(true);
+        setPicking(false);
+      }
+      return null;
     },
     [previewing, dummyPicker],
   );
@@ -250,13 +265,17 @@ function MessagesScreen() {
               key={c.id}
               name={c.otherName ?? t('messages.thread.someone')}
               context={contextFor(trueRole, c.otherRole, c.otherProgramName, t)}
-              preview={
-                c.lastMessageBody === null
-                  ? t('messages.preview.none')
-                  : c.lastMessageMine
-                    ? t('messages.preview.you', { text: c.lastMessageBody })
-                    : c.lastMessageBody
-              }
+              preview={(() => {
+                // A photo with no words reads "Photo" (D-394).
+                const text = c.lastMessageBody ??
+            (c.lastMessageAttachment === 'photo'
+              ? t('messages.preview.photo')
+              : c.lastMessageAttachment === 'file'
+                ? t('messages.preview.file')
+                : null);
+                if (text === null) return t('messages.preview.none');
+                return c.lastMessageMine ? t('messages.preview.you', { text }) : text;
+              })()}
               when={c.lastMessageAt ? whenHappened(c.lastMessageAt, locale, t) : null}
               unread={c.unread}
               unreadLabel={t('notify.new')}

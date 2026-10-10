@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.51.0] — 2026-10-09 · Pam speaks seven languages
+
+Pam is now in Brazilian Portuguese, Simplified Chinese (for Mandarin
+readers), Traditional Chinese (for Cantonese readers), Russian and Arabic, as
+well as English and Spanish. Pick one on the sign-in screen, when you join, or
+under Language. If your phone is set to one of them, Pam starts there. The
+words are downloaded only when you choose a language, with a short screen
+that says in your language what is happening. Arabic reads from right to
+left. Every screen was checked in every language so the words fit: buttons,
+tabs and notifications take a second line instead of being cut off, and a long
+page title gets a little smaller instead of running off the screen (D-422).
+Texts and emails are still written in English and Spanish only.
+
+## [0.50.1] — 2026-10-09 · Spanish, spelled properly
+
+Pam in Spanish now has its accents, its ñ and its opening ¿ wherever
+Spanish needs them: "Todavía", "teléfono", "Compañeros", "¿Cuál es su número
+de teléfono?". 172 lines were fixed, from the sign-in screen and the notices
+to the privacy page and the terms. Only the spelling changed, so nothing
+says anything new (D-421).
+
 ## [Unreleased] — 2026-10-09 · Two promises, made true
 
 The Points screen no longer says "nobody else sees them". It now says what is
@@ -45,7 +66,178 @@ off", what you can still do (read your messages, look at places and your plan), 
 a button to call, in place of the New message button; a conversation keeps all of
 its messages and shows the same notice where you would type. A message that
 cannot be sent because your account is limited no longer says "Your connection
-dropped" (D-427).
+dropped" (D-427). The same goes for the New message sheet: if the account was
+limited while Messages was open, it says so instead of "Your connection dropped"
+(D-429). The notice itself now starts with what you cannot do and says why: "You
+cannot send messages right now. Your guide turned this off for your account. You can
+still read your messages. Call Pam and we will help you reach your guide." It sits in
+a calmer card — more room, smaller text — and "Call Pam for help" is a link rather
+than a big green button (D-432).
+
+**10 October (D-441):** when a guide or a program invites a **case manager or a program
+lead**, they now have to give that person's email. It is kept on the person's account,
+tied to the phone number they sign in with, and only the Pam team can see it; if the person
+asks Pam to delete their account, it is deleted with it. A member is never asked for an email.
+The privacy policy says so, in "What we keep", and carries a new date (10 October). Choosing
+"Invite a program" or "Invite a case manager" now opens a page of its own, with the round back
+button, instead of changing the page in place.
+
+
+## [0.50.0] — 2026-10-09 · Buttons where you expect them
+
+A conversation now starts like every other screen you tap into: the round
+back button and the ⋯ button sit in the same places as everywhere else,
+with the person's name large underneath. The fade over the top of the
+messages is gone. The ⋯ button has a grey outline and a soft shadow so it
+is easy to spot, on places too. In Messages, each conversation lines up with
+the left edge of the page. And when a question or a photo opens, no button
+is pre-selected any more — nothing is chosen until you choose it (D-411).
+
+## [0.49.3] — 2026-10-09 · Where a link goes
+
+On Stuff shared, a link now shows its web address under its title, so you
+can see where it goes before you tap it. Who sent it and when stay at the
+end of each row (D-410).
+
+## [0.49.2] — 2026-10-09 · Just what it is
+
+On Stuff shared, each thing now simply says what it is: Photo, Document or
+Link — no file types or sizes. Documents in a conversation say "Document"
+the same way. And if you try to send a file Pam can't take, a yellow alert
+appears above the box with a quick shake, saying what went wrong and what
+you can send instead (D-409).
+
+## [0.49.1] — 2026-10-09 · Paste a photo or a document
+
+You can now paste a photo, a PDF or a Word file straight into the message
+box, the same as picking it with a button. Pam takes JPEG and PNG photos and
+photos from an iPhone; documents stay PDF and Word. A photo is made ready
+as soon as you pick it, so the preview is exactly what will be sent — and if
+a photo can't be opened, Pam says so right away instead of sending nothing
+(D-408).
+
+## [0.49.0] — 2026-10-09 · Stuff shared
+
+The page behind a conversation's ⋯ is now called Stuff shared: one simple
+list of every photo, document and link sent in the conversation, newest
+first. Each row has a small preview, the name, what it is, and who sent it
+and when at the end. A long file name slides over to show its end. Links
+show the page's title and picture, which Pam's server fetches once so your
+phone doesn't visit the page until you tap it (D-407).
+
+## [0.48.2] — 2026-10-09 · Short and sweet
+
+On Trips, the yellow reminder to sign a program's policies now ends in
+just "Sign" (D-405). On the Photos and documents page, the name under
+each photo is now the same soft grey as the time under it (D-406).
+
+## [0.48.1] — 2026-10-09 · Easier to look through, steadier to move around
+
+On the Photos and documents page, photos are now a row you swipe through,
+each with who sent it and when underneath. Documents and Google Docs are
+one list, each card the full width of the screen with who sent it and, at
+its end, the date and time. There is more room between the two (D-404).
+
+In the prototype's member app, the tab bar looks the same on every tab:
+the soft fade above it is always there, Trips included, with no line along
+its top, and switching tabs no longer flickers the fade or lights two tabs
+at once (D-403).
+
+## [0.48.0] — 2026-10-09 · Everything shared, in one place
+
+A conversation's ⋯ page has a new first row, Photos and documents: every
+photo, document and Google Doc sent in that conversation, newest first,
+with who sent it and when. Tap a photo to see it full size and swipe
+through the rest (D-402).
+
+## [0.47.1] — 2026-10-09 · A calmer conversation
+
+The visit card at the top of a conversation with a program is smaller, and
+messages now blur and fade as they scroll up under the header instead of
+being cut off. The line under the name stays on one line. The message box's
+buttons sit closer to its corners, photos sit in an even frame with a
+little more room before their words, document icons are a bright blue, and
+a photo opens on a near-black screen with a bigger, clearer close button
+(D-400, D-401).
+
+## [0.47.0] — 2026-10-08 · Documents in messages
+
+You can send a PDF or a Word file in a conversation: tap the document
+button beside the photo button, or drop the file onto the conversation. The
+other person sees its name and size, and it downloads only when they tap
+it. A Google Docs link shows as a card that opens it in Google. The privacy
+notice, the terms, and what members and staff are told about who can see
+what now name documents too (D-399).
+
+## [0.46.4] — 2026-10-08 · A gentler way back down
+
+The button that takes you to the newest message now fades in as it grows
+when you scroll up, and when you tap it, it swells a little and fades away
+as the conversation slides down. With reduced motion on, it simply appears
+and goes (D-398).
+
+## [0.46.3] — 2026-10-08 · Talk as long as you like
+
+When you speak a message, the box now follows your words: the newest line
+stays in sight instead of disappearing below. The box also grows to eight
+lines before it starts to scroll, so a long message, spoken or typed, has
+room (D-397).
+
+## [0.46.2] — 2026-10-08 · A quieter message box
+
+The space under the message box is now part of the soft fade behind it,
+so the conversation runs all the way to the bottom of the screen instead of
+stopping above a blank strip. The microphone, photo and send buttons are a
+softer grey until there is something to send (D-396).
+
+## [0.46.1] — 2026-10-08 · Who you're talking to, in full
+
+At the top of a conversation, under the person's name, Pam now says who
+they are in full — "Program lead at Example Food Pantry" — instead of a
+small tag that cut the program's name short (D-395).
+
+## [0.46.0] — 2026-10-08 · Photos in messages
+
+You can send a photo in a conversation: tap the picture button beside the
+microphone, pick one or take one, add words if you like, and send. Pam makes
+it smaller and removes where and when it was taken before it leaves your
+phone. Only the person you send it to can see it — and if someone reports
+the message it is in, the people who check reports. Tap a photo to see it
+full size. The privacy notice, the terms, and what members and staff are
+told about who can see what all say so (D-394).
+
+## [0.45.9] — 2026-10-08 · A clearer way back to the newest message
+
+The message box sits higher still off the bottom of the screen. The button
+that jumps back to the newest message is white with a bigger, bolder
+arrow, so it stands out from the conversation behind it (D-393).
+
+## [0.45.8] — 2026-10-08 · Days you can tell apart
+
+In a conversation, each day has more room above it, so a new day stands
+out from the messages inside it. Messages and what you type are a little
+smaller, 16px, so more of a message fits on a line (D-392).
+
+## [0.45.7] — 2026-10-08 · Room under the message box
+
+The box you type a message in sits higher off the bottom of the screen, so
+it no longer crowds the edge on phones without a home bar (D-391).
+
+## [0.45.6] — 2026-10-08 · Drag to see the time
+
+In a conversation, your messages are light green and theirs grey, and
+neither has a name or time printed with it any more: drag the conversation
+sideways to see when each one was sent, and let go to put it back, as on an
+iPhone. The messages reach closer to the edges of the screen, and the
+microphone and send arrow are drawn heavier (D-390).
+
+## [0.45.5] — 2026-10-08 · Cleaner conversations
+
+A conversation is split by day — "Today", "Yesterday", the weekday, then the
+date — instead of a date under every message; each message keeps just its
+time. The box you type in is one rounded field with the microphone on the
+left and a round send button that turns dark green when there's something to
+send (D-389).
 
 ## [0.45.4] — 2026-10-08 · Live
 

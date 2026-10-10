@@ -8,7 +8,7 @@ import { Meta } from '@storybook/addon-docs/blocks';
 | --- | --- | --- |
 | The screen's one main action | `BigButton` (primary) | One per screen. Put it in the page `footer` so it stays in reach. |
 | A second, quieter action | `BigButton variant="secondary"` | Light green. Beside or under the primary, never instead of it. |
-| A small way out or alternative | `TextLink` | "Cancel", "Sign now", "Send again". Still 48px to hit. |
+| A small way out or alternative | `TextLink` | "Cancel", "Sign", "Send again". Still 48px to hit. |
 | Header actions (save, more, help, edit) | Round `IconButton` (ghost, 48px) in the header's `actions` | Icons need an accessible label. |
 | Go somewhere | A `MenuList` row | Icon, words, an optional second line, chevron. A row says what it does. |
 | Pick one of a few options | `SelectableCard` (grey, with a dial) | The picked card outlines in accent on light green. |
@@ -16,7 +16,7 @@ import { Meta } from '@storybook/addon-docs/blocks';
 | On/off setting | Astryx `Switch` | Text alerts and preferences. |
 | Destructive or irreversible | `ConfirmDialog` / Astryx `AlertDialog` | Ask first; say what will be lost and what stays. |
 | Something staff do often | `FloatingAction` | A single row pinned above the tab bar on staff Home. |
-| Something the member still has to do | Astryx `Banner` (warning) with a `TextLink` | One line: "Sign 4 policies for … before you go · Sign now". |
+| Something the member still has to do | Astryx `Banner` (warning) with a `TextLink` | One line: "Sign 4 policies for … before you go · Sign". |
 
 ## Touch targets — 48px, and the two exceptions
 
@@ -34,6 +34,6 @@ Anything that *does* something — saves, sends, books, navigates — stays at
 
 ## Wording
 
-- Verbs that say the outcome: **Plan a trip**, **Book for Jordan**, **Save service**, **Sign now**.
+- Verbs that say the outcome: **Plan a trip**, **Book for Jordan**, **Save service**, **Sign**.
 - Never "Submit", "OK", "Click here".
 - A disabled primary button needs a reason on screen (e.g. "Pick a service").

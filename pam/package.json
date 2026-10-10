@@ -14,7 +14,9 @@
     "test": "pnpm -r test",
     "test:a11y": "pnpm --filter @pam/web test:a11y",
     "lint": "pnpm -r lint",
-    "db:seed-admin": "pnpm --filter @pam/db seed:admin"
+    "db:seed-admin": "pnpm --filter @pam/db seed:admin",
+    "claim": "node scripts/claim.mjs",
+    "records:release": "node scripts/records-release.mjs"
   },
   "devDependencies": {
     "@types/node": "^22.10.2",

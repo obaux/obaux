@@ -63,16 +63,20 @@ export function InviteView() {
   };
 
   return (
-    <SubPage title={t('profile.menu.invite')} backHref="/" backLabel={t('nav.back.home')} actions={<HelpButton />}>
+    // Choosing a kind of invite is a step in: the form is a page of its own, on the
+    // nested template, with the kind of invite as its title and the round back
+    // returning to the choice (Will, 10 October).
+    <SubPage
+      title={asking && !invite ? t(`invite.link.title.${asking}`) : t('profile.menu.invite')}
+      {...(asking && !invite
+        ? { onBack: () => setAsking(null), backLabel: t('invite.who.back') }
+        : { backHref: '/', backLabel: t('nav.back.home') })}
+      actions={<HelpButton />}
+    >
       {invite ? (
         <InviteReady invite={invite} onAnother={() => setInvite(null)} />
       ) : asking ? (
-        <InviteForWho
-          role={asking}
-          busy={busy}
-          onSubmit={(who) => void make(asking, who)}
-          onCancel={() => setAsking(null)}
-        />
+        <InviteForWho role={asking} busy={busy} onSubmit={(who) => void make(asking, who)} />
       ) : (
         <>
           <Text type="supporting" xstyle={styles.intro}>

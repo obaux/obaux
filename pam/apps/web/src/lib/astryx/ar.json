@@ -1,0 +1,746 @@
+{
+ "@astryx.pagination.label": {
+  "defaultMessage": "التنقل بين الصفحات"
+ },
+ "@astryx.pagination.previous": {
+  "defaultMessage": "الانتقال إلى الصفحة السابقة"
+ },
+ "@astryx.pagination.next": {
+  "defaultMessage": "الانتقال إلى الصفحة التالية"
+ },
+ "@astryx.pagination.previousBy": {
+  "defaultMessage": "الرجوع {step, number} {step, plural, zero {صفحات} one {صفحة} two {صفحتان} few {صفحات} many {صفحةً} other {صفحة}}"
+ },
+ "@astryx.pagination.nextBy": {
+  "defaultMessage": "التقدّم {step, number} {step, plural, zero {صفحات} one {صفحة} two {صفحتان} few {صفحات} many {صفحةً} other {صفحة}}"
+ },
+ "@astryx.pagination.first": {
+  "defaultMessage": "الانتقال إلى الصفحة الأولى"
+ },
+ "@astryx.pagination.last": {
+  "defaultMessage": "الانتقال إلى الصفحة الأخيرة"
+ },
+ "@astryx.pagination.goToPage": {
+  "defaultMessage": "الانتقال إلى الصفحة {page, number}"
+ },
+ "@astryx.pagination.goToPageInput": {
+  "defaultMessage": "الانتقال إلى الصفحة"
+ },
+ "@astryx.pagination.pageLabel": {
+  "defaultMessage": "الصفحة"
+ },
+ "@astryx.pagination.pageIndicators": {
+  "defaultMessage": "مؤشرات الصفحات"
+ },
+ "@astryx.pagination.itemsPerPage": {
+  "defaultMessage": "العناصر في كل صفحة"
+ },
+ "@astryx.pagination.count": {
+  "defaultMessage": "{from, number}–{to, number} من {total, number}"
+ },
+ "@astryx.pagination.pageOfTotal": {
+  "defaultMessage": "الصفحة {current, number} من {total, number}"
+ },
+ "@astryx.pagination.pageAnnounce": {
+  "defaultMessage": "الصفحة {current, number}"
+ },
+ "@astryx.powersearch.editor.field": {
+  "defaultMessage": "الحقل"
+ },
+ "@astryx.powersearch.editor.operator": {
+  "defaultMessage": "العامل"
+ },
+ "@astryx.powersearch.editor.addFilter": {
+  "defaultMessage": "+ إضافة مُرشِّح"
+ },
+ "@astryx.powersearch.editor.removeFilter": {
+  "defaultMessage": "إزالة المُرشِّح"
+ },
+ "@astryx.powersearch.editor.groupOperator": {
+  "defaultMessage": "عامل المجموعة"
+ },
+ "@astryx.powersearch.editor.group": {
+  "defaultMessage": "المجموعة"
+ },
+ "@astryx.powersearch.editor.delete": {
+  "defaultMessage": "حذف"
+ },
+ "@astryx.powersearch.editor.cancel": {
+  "defaultMessage": "إلغاء"
+ },
+ "@astryx.powersearch.editor.apply": {
+  "defaultMessage": "تطبيق"
+ },
+ "@astryx.powersearch.valueEditor.value": {
+  "defaultMessage": "القيمة"
+ },
+ "@astryx.powersearch.valueEditor.values": {
+  "defaultMessage": "القيم"
+ },
+ "@astryx.powersearch.valueEditor.time": {
+  "defaultMessage": "الوقت"
+ },
+ "@astryx.powersearch.valueEditor.date": {
+  "defaultMessage": "التاريخ"
+ },
+ "@astryx.powersearch.valueEditor.relativeDate": {
+  "defaultMessage": "تاريخ نسبي"
+ },
+ "@astryx.powersearch.valueEditor.startDate": {
+  "defaultMessage": "تاريخ البدء"
+ },
+ "@astryx.powersearch.valueEditor.endDate": {
+  "defaultMessage": "تاريخ الانتهاء"
+ },
+ "@astryx.powersearch.valueEditor.entities": {
+  "defaultMessage": "الكيانات"
+ },
+ "@astryx.powersearch.valueEditor.searchPlaceholder": {
+  "defaultMessage": "بحث…"
+ },
+ "@astryx.powersearch.valueEditor.enterValuePlaceholder": {
+  "defaultMessage": "أدخل قيمة…"
+ },
+ "@astryx.powersearch.valueEditor.addValuesPlaceholder": {
+  "defaultMessage": "أضف قيمًا…"
+ },
+ "@astryx.powersearch.valueEditor.enterNumberPlaceholder": {
+  "defaultMessage": "أدخل رقمًا…"
+ },
+ "@astryx.powersearch.valueEditor.selectValuesPlaceholder": {
+  "defaultMessage": "حدّد قيمًا…"
+ },
+ "@astryx.powersearch.operator.contains": {
+  "defaultMessage": "يحتوي على"
+ },
+ "@astryx.powersearch.operator.notContains": {
+  "defaultMessage": "لا يحتوي على"
+ },
+ "@astryx.powersearch.operator.startsWith": {
+  "defaultMessage": "يبدأ بـ"
+ },
+ "@astryx.powersearch.operator.notStartsWith": {
+  "defaultMessage": "لا يبدأ بـ"
+ },
+ "@astryx.powersearch.operator.endsWith": {
+  "defaultMessage": "ينتهي بـ"
+ },
+ "@astryx.powersearch.operator.notEndsWith": {
+  "defaultMessage": "لا ينتهي بـ"
+ },
+ "@astryx.powersearch.operator.is": {
+  "defaultMessage": "يساوي"
+ },
+ "@astryx.powersearch.operator.isNot": {
+  "defaultMessage": "لا يساوي"
+ },
+ "@astryx.powersearch.operator.equals": {
+  "defaultMessage": "يساوي"
+ },
+ "@astryx.powersearch.operator.notEquals": {
+  "defaultMessage": "لا يساوي"
+ },
+ "@astryx.powersearch.operator.greaterThan": {
+  "defaultMessage": "أكبر من"
+ },
+ "@astryx.powersearch.operator.lessThan": {
+  "defaultMessage": "أصغر من"
+ },
+ "@astryx.powersearch.operator.greaterThanOrEqual": {
+  "defaultMessage": "أكبر من أو يساوي"
+ },
+ "@astryx.powersearch.operator.lessThanOrEqual": {
+  "defaultMessage": "أصغر من أو يساوي"
+ },
+ "@astryx.powersearch.operator.before": {
+  "defaultMessage": "قبل"
+ },
+ "@astryx.powersearch.operator.after": {
+  "defaultMessage": "بعد"
+ },
+ "@astryx.powersearch.operator.between": {
+  "defaultMessage": "بين"
+ },
+ "@astryx.powersearch.operator.isTrue": {
+  "defaultMessage": "صحيح"
+ },
+ "@astryx.powersearch.operator.isFalse": {
+  "defaultMessage": "خطأ"
+ },
+ "@astryx.powersearch.operator.isAnyOf": {
+  "defaultMessage": "أيّ من"
+ },
+ "@astryx.powersearch.operator.isNoneOf": {
+  "defaultMessage": "لا شيء من"
+ },
+ "@astryx.powersearch.valueEditor.itemsCount": {
+  "defaultMessage": "{count, number} {count, plural, zero {عناصر} one {عنصر} two {عنصران} few {عناصر} many {عنصرًا} other {عنصر}}"
+ },
+ "@astryx.powersearch.valueEditor.entitiesCount": {
+  "defaultMessage": "{count, number} {count, plural, zero {كيانات} one {كيان} two {كيانان} few {كيانات} many {كيانًا} other {كيان}}"
+ },
+ "@astryx.powersearch.valueEditor.dateRange": {
+  "defaultMessage": "نطاق التاريخ"
+ },
+ "@astryx.powersearch.valueEditor.filtersCount": {
+  "defaultMessage": "{count, number} {count, plural, zero {مُرشِّحات} one {مُرشِّح} two {مُرشِّحان} few {مُرشِّحات} many {مُرشِّحًا} other {مُرشِّح}}"
+ },
+ "@astryx.powersearch.resultCount": {
+  "defaultMessage": "{count, number} {count, plural, zero {نتائج} one {نتيجة} two {نتيجتان} few {نتائج} many {نتيجةً} other {نتيجة}}"
+ },
+ "@astryx.alertDialog.cancel": {
+  "defaultMessage": "إلغاء"
+ },
+ "@astryx.appShell.mobileNavigation": {
+  "defaultMessage": "التنقل عبر الجوّال"
+ },
+ "@astryx.appShell.skipToContent": {
+  "defaultMessage": "الانتقال إلى المحتوى"
+ },
+ "@astryx.avatar.nameWithStatus": {
+  "defaultMessage": "{name}، {status}"
+ },
+ "@astryx.avatarGroup.label": {
+  "defaultMessage": "الصور الرمزية"
+ },
+ "@astryx.avatarGroup.keyboardHint": {
+  "defaultMessage": "استخدم مفاتيح الأسهم للتنقل بين الصور الرمزية"
+ },
+ "@astryx.avatarGroup.overflow": {
+  "defaultMessage": "{count, number} إضافي"
+ },
+ "@astryx.banner.dismiss": {
+  "defaultMessage": "تجاهل"
+ },
+ "@astryx.calendar.previousMonth": {
+  "defaultMessage": "الشهر السابق"
+ },
+ "@astryx.calendar.nextMonth": {
+  "defaultMessage": "الشهر التالي"
+ },
+ "@astryx.calendar.daySelected": {
+  "defaultMessage": "{date}، محدَّد"
+ },
+ "@astryx.calendar.dayRangeStart": {
+  "defaultMessage": "{date}، بداية النطاق"
+ },
+ "@astryx.calendar.dayRangeEnd": {
+  "defaultMessage": "{date}، نهاية النطاق"
+ },
+ "@astryx.calendar.dayRangeStartAndEnd": {
+  "defaultMessage": "{date}، بداية النطاق ونهايته"
+ },
+ "@astryx.calendar.dayInRange": {
+  "defaultMessage": "{date}، ضمن النطاق"
+ },
+ "@astryx.calendar.rangeStartAnnounce": {
+  "defaultMessage": "تاريخ البدء {date}. حدّد تاريخ الانتهاء."
+ },
+ "@astryx.calendar.rangeCompleteAnnounce": {
+  "defaultMessage": "النطاق المحدَّد: من {start} إلى {end}."
+ },
+ "@astryx.carousel.label": {
+  "defaultMessage": "عارض الشرائح"
+ },
+ "@astryx.carousel.scrollLeft": {
+  "defaultMessage": "التمرير إلى اليسار"
+ },
+ "@astryx.carousel.scrollRight": {
+  "defaultMessage": "التمرير إلى اليمين"
+ },
+ "@astryx.carousel.slideLabel": {
+  "defaultMessage": "الشريحة {current, number} من {total, number}"
+ },
+ "@astryx.chat.status.sending": {
+  "defaultMessage": "جارٍ الإرسال"
+ },
+ "@astryx.chat.status.sent": {
+  "defaultMessage": "تم الإرسال"
+ },
+ "@astryx.chat.status.delivered": {
+  "defaultMessage": "تم التسليم"
+ },
+ "@astryx.chat.status.read": {
+  "defaultMessage": "تمت القراءة"
+ },
+ "@astryx.chat.status.failed": {
+  "defaultMessage": "فشل"
+ },
+ "@astryx.chat.messageAriaLabel": {
+  "defaultMessage": "رسالة {status}"
+ },
+ "@astryx.chat.pastedText.expand": {
+  "defaultMessage": "توسيع"
+ },
+ "@astryx.checkboxList.item.checkbox": {
+  "defaultMessage": "مربع اختيار"
+ },
+ "@astryx.commandPalette.emptySearch": {
+  "defaultMessage": "لا توجد نتائج"
+ },
+ "@astryx.commandPalette.emptyBootstrap": {
+  "defaultMessage": "اكتب للبحث"
+ },
+ "@astryx.commandPalette.resultCount": {
+  "defaultMessage": "{count, number} {count, plural, zero {نتائج} one {نتيجة} two {نتيجتان} few {نتائج} many {نتيجةً} other {نتيجة}}"
+ },
+ "@astryx.commandPalette.noResultsFor": {
+  "defaultMessage": "لا توجد نتائج لـ {query}"
+ },
+ "@astryx.commandPalette.loading": {
+  "defaultMessage": "جارٍ التحميل"
+ },
+ "@astryx.dateRangeInput.presetDateRanges": {
+  "defaultMessage": "نطاقات تاريخ محدَّدة مسبقًا"
+ },
+ "@astryx.dateTimeInput.timePlaceholder": {
+  "defaultMessage": "حدّد وقتًا"
+ },
+ "@astryx.dialog.close": {
+  "defaultMessage": "إغلاق"
+ },
+ "@astryx.dropdownMenu.label": {
+  "defaultMessage": "القائمة"
+ },
+ "@astryx.lightbox.close": {
+  "defaultMessage": "إغلاق"
+ },
+ "@astryx.lightbox.previous": {
+  "defaultMessage": "السابق"
+ },
+ "@astryx.lightbox.next": {
+  "defaultMessage": "التالي"
+ },
+ "@astryx.markdown.taskList": {
+  "defaultMessage": "قائمة المهام"
+ },
+ "@astryx.markdown.table": {
+  "defaultMessage": "جدول"
+ },
+ "@astryx.mobileNav.closeNavigation": {
+  "defaultMessage": "إغلاق التنقل"
+ },
+ "@astryx.multiSelector.selectAll": {
+  "defaultMessage": "تحديد الكل"
+ },
+ "@astryx.multiSelector.searchPlaceholder": {
+  "defaultMessage": "بحث…"
+ },
+ "@astryx.multiSelector.searchOptions": {
+  "defaultMessage": "خيارات البحث"
+ },
+ "@astryx.multiSelector.selectAllPartiallySelected": {
+  "defaultMessage": "{label}، محدَّد جزئيًا"
+ },
+ "@astryx.popover.close": {
+  "defaultMessage": "إغلاق النافذة المنبثقة"
+ },
+ "@astryx.selector.searchPlaceholder": {
+  "defaultMessage": "بحث…"
+ },
+ "@astryx.selector.searchOptions": {
+  "defaultMessage": "خيارات البحث"
+ },
+ "@astryx.sideNav.label": {
+  "defaultMessage": "التنقل الجانبي"
+ },
+ "@astryx.sideNav.resizeSidebar": {
+  "defaultMessage": "تغيير حجم الشريط الجانبي"
+ },
+ "@astryx.sideNav.heading.openMenu": {
+  "defaultMessage": "فتح القائمة"
+ },
+ "@astryx.tabList.label": {
+  "defaultMessage": "علامات التبويب"
+ },
+ "@astryx.table.label": {
+  "defaultMessage": "جدول"
+ },
+ "@astryx.table.noData": {
+  "defaultMessage": "لا توجد بيانات"
+ },
+ "@astryx.table.filter.allPlaceholder": {
+  "defaultMessage": "الكل"
+ },
+ "@astryx.table.filter.reset": {
+  "defaultMessage": "إعادة تعيين"
+ },
+ "@astryx.table.filter.apply": {
+  "defaultMessage": "تطبيق"
+ },
+ "@astryx.table.selection.selectAllRows": {
+  "defaultMessage": "تحديد جميع الصفوف"
+ },
+ "@astryx.table.selection.selectRow": {
+  "defaultMessage": "تحديد الصف"
+ },
+ "@astryx.table.selection.selectRowNamed": {
+  "defaultMessage": "تحديد {label}"
+ },
+ "@astryx.table.sort.ascending": {
+  "defaultMessage": "ترتيب تصاعدي"
+ },
+ "@astryx.table.sort.descending": {
+  "defaultMessage": "ترتيب تنازلي"
+ },
+ "@astryx.table.sort.clear": {
+  "defaultMessage": "مسح الترتيب"
+ },
+ "@astryx.table.sort.direction.ascending": {
+  "defaultMessage": "تصاعدي"
+ },
+ "@astryx.table.sort.direction.descending": {
+  "defaultMessage": "تنازلي"
+ },
+ "@astryx.table.sort.sortBy": {
+  "defaultMessage": "الترتيب حسب {label}"
+ },
+ "@astryx.table.sort.sortedBy": {
+  "defaultMessage": "الترتيب حسب {label}، مُرتَّب {direction}"
+ },
+ "@astryx.table.sort.sortedByWithPriority": {
+  "defaultMessage": "الترتيب حسب {label}، مُرتَّب {direction}، الأولوية {rank, number} من {total, number}"
+ },
+ "@astryx.toast.dismiss": {
+  "defaultMessage": "تجاهل الإشعار"
+ },
+ "@astryx.toast.viewport": {
+  "defaultMessage": "الإشعارات"
+ },
+ "@astryx.tokenizer.clearAll": {
+  "defaultMessage": "مسح الكل"
+ },
+ "@astryx.topNav.heading.openMenu": {
+  "defaultMessage": "فتح القائمة"
+ },
+ "@astryx.topNav.landmarkLabel": {
+  "defaultMessage": "التنقل العلوي"
+ },
+ "@astryx.treeList.toggleChildren": {
+  "defaultMessage": "تبديل العناصر الفرعية"
+ },
+ "@astryx.typeahead.emptySearchResults": {
+  "defaultMessage": "لم يُعثر على نتائج"
+ },
+ "@astryx.typeahead.loading": {
+  "defaultMessage": "جارٍ التحميل"
+ },
+ "@astryx.typeahead.searchResults": {
+  "defaultMessage": "نتائج البحث"
+ },
+ "@astryx.typeahead.clearSelection": {
+  "defaultMessage": "مسح التحديد"
+ },
+ "@astryx.breadcrumbs.label": {
+  "defaultMessage": "مسار التنقل"
+ },
+ "@astryx.chat.composer.placeholder": {
+  "defaultMessage": "اكتب رسالة…"
+ },
+ "@astryx.chat.composerDrawer.label": {
+  "defaultMessage": "العناصر"
+ },
+ "@astryx.chat.composerInput.label": {
+  "defaultMessage": "إدخال الرسالة"
+ },
+ "@astryx.chat.speechRecognition.noSpeechDetected": {
+  "defaultMessage": "لم يتم اكتشاف أي كلام."
+ },
+ "@astryx.commandPalette.label": {
+  "defaultMessage": "لوحة الأوامر"
+ },
+ "@astryx.commandPalette.input.placeholder": {
+  "defaultMessage": "بحث…"
+ },
+ "@astryx.commandPalette.list.label": {
+  "defaultMessage": "الأوامر"
+ },
+ "@astryx.contextMenu.label": {
+  "defaultMessage": "قائمة السياق"
+ },
+ "@astryx.dateInput.placeholder": {
+  "defaultMessage": "حدّد تاريخًا"
+ },
+ "@astryx.dateInput.dialogLabel": {
+  "defaultMessage": "اختر التاريخ"
+ },
+ "@astryx.dateInput.closeCalendar": {
+  "defaultMessage": "إغلاق التقويم"
+ },
+ "@astryx.dateInput.openCalendar": {
+  "defaultMessage": "فتح التقويم"
+ },
+ "@astryx.dateInput.toggleCalendarClose": {
+  "defaultMessage": "إغلاق التقويم"
+ },
+ "@astryx.dateInput.clear": {
+  "defaultMessage": "مسح {label}"
+ },
+ "@astryx.dateTimeInput.timeSuffix": {
+  "defaultMessage": "وقت {label}"
+ },
+ "@astryx.dateRangeInput.placeholder": {
+  "defaultMessage": "حدّد نطاق التاريخ"
+ },
+ "@astryx.dateRangeInput.dialogLabel": {
+  "defaultMessage": "اختر نطاق التاريخ"
+ },
+ "@astryx.dateTimeInput.placeholder": {
+  "defaultMessage": "حدّد تاريخًا"
+ },
+ "@astryx.link.newTab": {
+  "defaultMessage": "(يُفتح في علامة تبويب جديدة)"
+ },
+ "@astryx.mobileNav.toggle.open": {
+  "defaultMessage": "فتح التنقل"
+ },
+ "@astryx.moreMenu.label": {
+  "defaultMessage": "المزيد من الخيارات"
+ },
+ "@astryx.multiSelector.selectPlaceholder": {
+  "defaultMessage": "تحديد…"
+ },
+ "@astryx.outline.label": {
+  "defaultMessage": "جدول المحتويات"
+ },
+ "@astryx.powersearch.label": {
+  "defaultMessage": "بحث"
+ },
+ "@astryx.powersearch.placeholder": {
+  "defaultMessage": "بحث…"
+ },
+ "@astryx.resizable.collapsed": {
+  "defaultMessage": "مطوي"
+ },
+ "@astryx.resizable.handle.label": {
+  "defaultMessage": "مقبض تغيير الحجم"
+ },
+ "@astryx.selector.placeholder": {
+  "defaultMessage": "اختر…"
+ },
+ "@astryx.sideNav.heading.dialogLabel": {
+  "defaultMessage": "قائمة التنقل"
+ },
+ "@astryx.table.pagination.label": {
+  "defaultMessage": "تنقل الجدول بين الصفحات"
+ },
+ "@astryx.timeInput.placeholder": {
+  "defaultMessage": "حدّد وقتًا"
+ },
+ "@astryx.topNav.heading.dialogLabel": {
+  "defaultMessage": "قائمة التنقل"
+ },
+ "@astryx.typeahead.searchPlaceholder": {
+  "defaultMessage": "بحث…"
+ },
+ "@astryx.banner.collapse": {
+  "defaultMessage": "طيّ"
+ },
+ "@astryx.banner.expand": {
+  "defaultMessage": "توسيع"
+ },
+ "@astryx.button.loading": {
+  "defaultMessage": "جارٍ التحميل"
+ },
+ "@astryx.chatComposerDrawer.expand": {
+  "defaultMessage": "توسيع {label}"
+ },
+ "@astryx.chatComposerDrawer.collapse": {
+  "defaultMessage": "طيّ {label}"
+ },
+ "@astryx.chatDictationButton.startDictation": {
+  "defaultMessage": "بدء الإملاء"
+ },
+ "@astryx.chatDictationButton.stopDictation": {
+  "defaultMessage": "إيقاف الإملاء"
+ },
+ "@astryx.chatLayout.newMessages": {
+  "defaultMessage": "رسائل جديدة"
+ },
+ "@astryx.chatLayoutScrollButton.scrollToBottom": {
+  "defaultMessage": "التمرير إلى الأسفل"
+ },
+ "@astryx.chatMessage.messageFrom": {
+  "defaultMessage": "رسالة من {sender}"
+ },
+ "@astryx.chatSendButton.stop": {
+  "defaultMessage": "إيقاف"
+ },
+ "@astryx.chatSendButton.send": {
+  "defaultMessage": "إرسال"
+ },
+ "@astryx.chatToolCalls.error": {
+  "defaultMessage": "خطأ: {message}"
+ },
+ "@astryx.chatToolCalls.groupLabel": {
+  "defaultMessage": "{count} من استدعاءات الأدوات"
+ },
+ "@astryx.chatTriggerMenu.suggestions": {
+  "defaultMessage": "اقتراحات"
+ },
+ "@astryx.citation.label": {
+  "defaultMessage": "الاستشهاد {number}: {title}"
+ },
+ "@astryx.codeBlock.copied": {
+  "defaultMessage": "تم النسخ"
+ },
+ "@astryx.codeBlock.copyCode": {
+  "defaultMessage": "نسخ الكود"
+ },
+ "@astryx.codeBlock.code": {
+  "defaultMessage": "الكود"
+ },
+ "@astryx.field.optional": {
+  "defaultMessage": "اختياري"
+ },
+ "@astryx.field.required": {
+  "defaultMessage": "مطلوب"
+ },
+ "@astryx.fileInput.clearLabel": {
+  "defaultMessage": "مسح {label}"
+ },
+ "@astryx.fileInput.required": {
+  "defaultMessage": "مطلوب"
+ },
+ "@astryx.fileInput.triggerWithFiles": {
+  "defaultMessage": "{label}، {fileNames}"
+ },
+ "@astryx.keyboardHint.toNavigate": {
+  "defaultMessage": "للتنقل"
+ },
+ "@astryx.lightbox.mediaViewer": {
+  "defaultMessage": "عارض الوسائط"
+ },
+ "@astryx.lightbox.zoom": {
+  "defaultMessage": "تكبير"
+ },
+ "@astryx.lightbox.zoomedIn": {
+  "defaultMessage": "تم التكبير، استخدم مفاتيح الأسهم للتحريك"
+ },
+ "@astryx.lightbox.zoomedOut": {
+  "defaultMessage": "تم التصغير"
+ },
+ "@astryx.metadataList.showMore": {
+  "defaultMessage": "عرض المزيد"
+ },
+ "@astryx.metadataList.showLess": {
+  "defaultMessage": "عرض أقل"
+ },
+ "@astryx.mobileNav.navigation": {
+  "defaultMessage": "التنقل"
+ },
+ "@astryx.multiSelector.clearAll": {
+  "defaultMessage": "مسح كل {label}"
+ },
+ "@astryx.input.statusButton.error": {
+  "defaultMessage": "تفاصيل الخطأ"
+ },
+ "@astryx.input.statusButton.warning": {
+  "defaultMessage": "تفاصيل التحذير"
+ },
+ "@astryx.input.statusButton.success": {
+  "defaultMessage": "تفاصيل النجاح"
+ },
+ "@astryx.numberInput.clearLabel": {
+  "defaultMessage": "مسح {label}"
+ },
+ "@astryx.selector.clearLabel": {
+  "defaultMessage": "مسح {label}"
+ },
+ "@astryx.sideNavCollapseButton.expandSidebar": {
+  "defaultMessage": "توسيع الشريط الجانبي"
+ },
+ "@astryx.sideNavCollapseButton.collapseSidebar": {
+  "defaultMessage": "طيّ الشريط الجانبي"
+ },
+ "@astryx.sideNavItem.expand": {
+  "defaultMessage": "توسيع {label}"
+ },
+ "@astryx.sideNavItem.collapse": {
+  "defaultMessage": "طيّ {label}"
+ },
+ "@astryx.tableFiltering.filterByColumn": {
+  "defaultMessage": "تصفية {header}"
+ },
+ "@astryx.tableGroupedRows.expandGroup": {
+  "defaultMessage": "توسيع المجموعة {groupKey}"
+ },
+ "@astryx.tableGroupedRows.collapseGroup": {
+  "defaultMessage": "طيّ المجموعة {groupKey}"
+ },
+ "@astryx.tableRowExpansion.collapseRow": {
+  "defaultMessage": "طيّ الصف"
+ },
+ "@astryx.tableRowExpansion.expandRow": {
+  "defaultMessage": "توسيع الصف"
+ },
+ "@astryx.tableRowExpansion.collapseAllRows": {
+  "defaultMessage": "طيّ جميع الصفوف"
+ },
+ "@astryx.tableRowExpansion.expandAllRows": {
+  "defaultMessage": "توسيع جميع الصفوف"
+ },
+ "@astryx.step.goToStep": {
+  "defaultMessage": "الانتقال إلى الخطوة {stepNumber, number}: {label}"
+ },
+ "@astryx.step.goToStepWithStatus": {
+  "defaultMessage": "الانتقال إلى الخطوة {stepNumber, number}: {label}، {status}"
+ },
+ "@astryx.step.status.completed": {
+  "defaultMessage": "مكتملة"
+ },
+ "@astryx.step.status.warning": {
+  "defaultMessage": "تحذير"
+ },
+ "@astryx.step.status.error": {
+  "defaultMessage": "خطأ"
+ },
+ "@astryx.tableTree.collapseRow": {
+  "defaultMessage": "طيّ الصف"
+ },
+ "@astryx.tableTree.expandRow": {
+  "defaultMessage": "توسيع الصف"
+ },
+ "@astryx.tableTree.collapseAllRows": {
+  "defaultMessage": "طيّ جميع الصفوف"
+ },
+ "@astryx.tableTree.expandAllRows": {
+  "defaultMessage": "توسيع جميع الصفوف"
+ },
+ "@astryx.textArea.charactersRemaining": {
+  "defaultMessage": "تبقّى {count, number} {count, plural, zero {حرف} one {حرف} two {حرفان} few {أحرف} many {حرفًا} other {حرف}}"
+ },
+ "@astryx.textArea.charactersOverLimit": {
+  "defaultMessage": "تجاوز الحد بمقدار {count, number} {count, plural, zero {حرف} one {حرف} two {حرفان} few {أحرف} many {حرفًا} other {حرف}}"
+ },
+ "@astryx.textInput.clearLabel": {
+  "defaultMessage": "مسح {label}"
+ },
+ "@astryx.thumbnail.remove": {
+  "defaultMessage": "إزالة {accessibleName}"
+ },
+ "@astryx.thumbnail.open": {
+  "defaultMessage": "فتح {accessibleName}"
+ },
+ "@astryx.thumbnail.fallbackName": {
+  "defaultMessage": "صورة مصغّرة"
+ },
+ "@astryx.timeInput.clearLabel": {
+  "defaultMessage": "مسح {label}"
+ },
+ "@astryx.timestamp.copyValue": {
+  "defaultMessage": "نسخ {value}"
+ },
+ "@astryx.timestamp.copy": {
+  "defaultMessage": "نسخ"
+ },
+ "@astryx.timestamp.copied": {
+  "defaultMessage": "تم النسخ"
+ },
+ "@astryx.timestamp.detailsLabel": {
+  "defaultMessage": "تفاصيل الطابع الزمني"
+ },
+ "@astryx.token.remove": {
+  "defaultMessage": "إزالة {label}"
+ }
+}

@@ -83,7 +83,7 @@ const styles = stylex.create({
     paddingInline: '12px',
     paddingBlock: '4px',
   },
-  heroGlobe: { position: 'absolute', top: 0, right: 0 },
+  heroGlobe: { position: 'absolute', top: 0, insetInlineEnd: 0 },
   // Under the pictures, not over their edge (Will, 5 October, D-266: "move
   // it all on the part below … remove card shadow, so it looks like it's
   // part of the white bg"). The card is flat; this only centres it.

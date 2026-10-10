@@ -14,7 +14,7 @@ import { HelpButton } from '../../screens/HelpButton';
 import { InviteReady } from '../../screens/InviteReady';
 import { InviteForWho, type InviteWho } from '../../screens/InviteForWho';
 import { PersonRowSkeletonList } from '@pam/ui/Skeletons';
-import { NOTICES, ROLES, type Role } from '@pam/config';
+import { NOTICES, ROLES, type Role, intlLocale } from '@pam/config';
 import { USE_DUMMY_PEOPLE } from '@pam/config/dummy-flag';
 import { DUMMY_EVERYONE } from '@pam/config/dummy-people';
 import { useI18n } from '@/lib/i18n';
@@ -69,7 +69,7 @@ type Filter = (typeof FILTERS)[number];
 
 function whenLastActive(iso: string | null, locale: string): string | null {
   if (!iso) return null;
-  return new Intl.DateTimeFormat(locale, { month: 'short', day: 'numeric' }).format(new Date(iso));
+  return new Intl.DateTimeFormat(intlLocale(locale), { month: 'short', day: 'numeric' }).format(new Date(iso));
 }
 
 export default function DirectoryPage() {
@@ -254,6 +254,38 @@ export default function DirectoryPage() {
     );
   }
 
+  // Choosing a kind of invite is a step in: the form is a page of its own, on the
+  // nested template, the round back returning to Everyone (Will, 10 October).
+  if (asking && !invite) {
+    return (
+      <Page gap={4}>
+        <SubPageHeader
+          title={t(`invite.link.title.${asking}`)}
+          onBack={() => setAsking(null)}
+          backLabel={t('invite.who.back')}
+          actions={
+            <>
+              {trueRole === 'super_admin' ? (
+                <RoleSwitchControl trueRole={trueRole} viewedRole={viewedRole} onChange={setViewAs} />
+              ) : null}
+              <HelpButton />
+            </>
+          }
+        />
+        <InviteForWho role={asking} busy={inviteBusy} onSubmit={(who) => void makeInvite(asking, who)} />
+        {inviteFailed === 'failed' ? (
+          <Notice
+            notice="something_went_wrong"
+            title={t('admin.invite.failed.title')}
+            body={t('admin.invite.failed.body')}
+            supportPhone={supportPhone}
+            callLabel={t('help.callSupport')}
+          />
+        ) : null}
+      </Page>
+    );
+  }
+
   return (
     <Page gap={4}>
       <SubPageHeader
@@ -305,13 +337,6 @@ export default function DirectoryPage() {
           </Heading>
           {invite ? (
             <InviteReady invite={invite} onAnother={() => setInvite(null)} isBare />
-          ) : asking ? (
-            <InviteForWho
-              role={asking}
-              busy={inviteBusy}
-              onSubmit={(who) => void makeInvite(asking, who)}
-              onCancel={() => setAsking(null)}
-            />
           ) : (
             <>
               {regions.length > 1 ? (

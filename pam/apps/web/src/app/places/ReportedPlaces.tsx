@@ -4,7 +4,7 @@ import { useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { VStack } from '@astryxdesign/core/VStack';
 import { Text } from '@astryxdesign/core/Text';
-import { Button } from '@astryxdesign/core/Button';
+import { Button } from '@pam/ui/Button';
 import { Loading, Notice, PlaceCard } from '@pam/ui';
 import { NOTICES, type Category } from '@pam/config';
 import { DUMMY_FLAGS } from '@pam/config/dummy-places';

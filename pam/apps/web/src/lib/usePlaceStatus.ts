@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { hoursFor, openState, type PlaceHours } from '@pam/config/hours';
+import { intlLocale } from '@pam/config';
 
 /**
  * Open or closed, worded, for a screen.
@@ -36,7 +37,7 @@ export function formatTime(hhmm: string, locale: string): string {
   const [h, m] = hhmm.split(':').map(Number);
   // A date whose only job is to carry an hour and a minute.
   const at = new Date(2026, 0, 1, (h ?? 0) % 24, m ?? 0);
-  return new Intl.DateTimeFormat(locale, { hour: 'numeric', minute: '2-digit' }).format(at);
+  return new Intl.DateTimeFormat(intlLocale(locale), { hour: 'numeric', minute: '2-digit' }).format(at);
 }
 
 /**
@@ -102,7 +103,7 @@ export function weekLines(
   locale: string,
   closedLabel: string,
 ): { day: string; hours: string }[] {
-  const names = new Intl.DateTimeFormat(locale, { weekday: 'long' });
+  const names = new Intl.DateTimeFormat(intlLocale(locale), { weekday: 'long' });
   return hours.week.map((periods, index) => ({
     // 4 January 2026 was a Sunday, so index 0 lands on Sunday — the same
     // indexing `Date.getDay()` uses, which is the one mistake here that would

@@ -256,7 +256,8 @@ test.describe('arriving by an invite link (D-254)', () => {
     await page.getByRole('button', { name: en['invite.expired.action'] }).click();
     await expect(page.getByRole('heading', { name: en['invite.expired.sent.title'], level: 1 })).toBeVisible();
     await expect(page.getByText(/andre@example\.org/)).toBeVisible();
-    expect(asked[0]).toMatchObject({ p_code: 'PAM7Q4KX', p_email: 'andre@example.org' });
+    // The language the page was read in goes with it (0085): the email is written in it.
+    expect(asked[0]).toMatchObject({ p_code: 'PAM7Q4KX', p_email: 'andre@example.org', p_language: 'en' });
   });
 
   test('plain sign in has no invite line', async ({ page }) => {

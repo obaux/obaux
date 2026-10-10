@@ -10,6 +10,7 @@ import { emptyState } from '@pam/ui/emptyState';
 import { SubPage } from '@pam/ui/SubPage';
 import { ConnectionCard, type ConnectionStat } from '@pam/ui/ConnectionCard';
 import { useI18n } from '@/lib/i18n';
+import { intlLocale } from '@pam/config';
 
 /**
  * Connections — the case manager and program people on a member's side
@@ -56,7 +57,7 @@ export function connectionSubtitle(person: Connection, t: (key: string) => strin
 }
 
 export function connectionStats(person: Connection, t: (key: string) => string, locale: string): ConnectionStat[] {
-  const n = (v: number | undefined) => (v === undefined ? '—' : new Intl.NumberFormat(locale).format(v));
+  const n = (v: number | undefined) => (v === undefined ? '—' : new Intl.NumberFormat(intlLocale(locale)).format(v));
   return [
     { value: n(person.yearsHelping), label: t('connections.stat.years') },
     { value: n(person.peopleHelped), label: t('connections.stat.helped') },

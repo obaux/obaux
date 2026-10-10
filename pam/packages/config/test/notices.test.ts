@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import en from '../src/locales/en.json' with { type: 'json' };
-import es from '../src/locales/es.json' with { type: 'json' };
+import { BUNDLES } from './_bundles.js';
 import {
   NOTICES,
   NOTICE_LIST,
@@ -10,13 +9,15 @@ import {
 } from '../src/notices.js';
 import { findDignityViolations, fleschKincaidGrade } from '../src/language.js';
 
-const bundles = { en, es } as const satisfies Record<string, Record<string, string>>;
+const en = BUNDLES.en;
+const bundles = BUNDLES;
 
 describe('notices (SOP §0 — never dead-end)', () => {
   it('translates every notice in both languages', () => {
     for (const key of NOTICE_I18N_KEYS) {
-      expect(en, `en is missing ${key}`).toHaveProperty(key);
-      expect(es, `es is missing ${key}`).toHaveProperty(key);
+      for (const [locale, bundle] of Object.entries(bundles)) {
+        expect(bundle, `${locale} is missing ${key}`).toHaveProperty(key);
+      }
     }
   });
 

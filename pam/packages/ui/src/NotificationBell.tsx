@@ -90,7 +90,7 @@ const styles = stylex.create({
   dot: {
     position: 'absolute',
     top: '-2px',
-    right: '-2px',
+    insetInlineEnd: '-2px',
     width: '14px',
     height: '14px',
     borderRadius: '50%',

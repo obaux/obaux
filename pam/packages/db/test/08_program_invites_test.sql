@@ -36,7 +36,7 @@ do $$
 declare
   inv public.invites;
 begin
-  inv := public.create_invite('provider', '+15555550702', null, 'Bo');
+  inv := public.create_staff_invite('provider', 'bo@example.org', '+15555550702', null, 'Bo');
   if inv.role <> 'provider' then
     raise exception 'FAIL  a program''s program invite has role %', inv.role;
   end if;

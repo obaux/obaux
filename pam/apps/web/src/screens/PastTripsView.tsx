@@ -12,6 +12,7 @@ import { useSession } from '@/lib/useSession';
 import { useRoleView } from '@/lib/useViewedRole';
 import { CategoryPicture } from './SavedView';
 import { HeaderActions } from './HeaderActions';
+import { intlLocale } from '@pam/config';
 
 /**
  * Already went (D-234): the visits a member has made, newest first, on their
@@ -37,7 +38,7 @@ export function PastTripsView({ personId, name }: { readonly personId: string; r
     .filter((trip) => new Date(trip.startsAt).getTime() < now)
     .reverse();
   const when = (iso: string) =>
-    `${new Intl.DateTimeFormat(locale, { weekday: 'long', month: 'short', day: 'numeric' }).format(new Date(iso))} · ${new Intl.DateTimeFormat(locale, { hour: 'numeric', minute: '2-digit' }).format(new Date(iso))}`;
+    `${new Intl.DateTimeFormat(intlLocale(locale), { weekday: 'long', month: 'short', day: 'numeric' }).format(new Date(iso))} · ${new Intl.DateTimeFormat(intlLocale(locale), { hour: 'numeric', minute: '2-digit' }).format(new Date(iso))}`;
 
   return (
     <Page gap={4}>

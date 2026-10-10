@@ -39,7 +39,7 @@ import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
  * The list is split into New and Earlier, so what arrived since last time
  * comes first. Each row has a round icon saying what kind of thing it is, a
  * short bold title ("Place reported"), the full sentence under it in grey
- * (two lines at most), and the time on the right. A new row also has a
+ * (in full, however long the language makes it), and the time on the right. A new row also has a
  * small dot. The eye can run down the icons and titles and stop only where
  * it needs to read. Without a `title` a row falls back to its sentence
  * alone, as before.
@@ -86,14 +86,15 @@ const styles = stylex.create({
     backgroundColor: colorVars['--color-background-muted'],
   },
   icon: { width: '22px', height: '22px' },
-  // The sentence, clamped to two lines: enough to know what happened.
+  // The sentence, in full (D-422). It was clamped to two lines, which was
+  // enough in English; "Se reportó Example Learning Center: Está cerrado" is
+  // three in Spanish and four in Russian, and the end of the sentence is the
+  // part that says what to do. It is a phrase built from a key, never
+  // somebody's words, so it is short in every language and never runs away.
   detail: {
     fontSize: '15px',
     lineHeight: 1.35,
-    display: '-webkit-box',
-    WebkitLineClamp: 2,
-    WebkitBoxOrient: 'vertical',
-    overflow: 'hidden',
+    overflowWrap: 'anywhere',
   },
   end: { alignSelf: 'flex-start', paddingBlockStart: '2px' },
   when: { fontSize: '13px', whiteSpace: 'nowrap' },
@@ -114,7 +115,10 @@ function Rows({ items, newLabel }: { readonly items: readonly NotificationItem[]
       {items.map((item) => (
         <ListItem
           key={item.id}
-          label={item.title ?? item.text}
+          // Not a bare string: Astryx trims a string label to one line with an
+          // ellipsis, a node it lets wrap (D-422) — "Проблема с мес…" was the
+          // name of the event.
+          label={<>{item.title ?? item.text}</>}
           description={
             item.title ? (
               <Text type="supporting" xstyle={styles.detail}>

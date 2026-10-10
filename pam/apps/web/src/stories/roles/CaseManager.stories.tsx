@@ -31,9 +31,20 @@ export const ConnectMember: Story = screen('case-manager', 'Connect a member to 
   id: 'dummy-m1',
 });
 export const Invite: Story = screen('case-manager', 'Invite someone', '/invite/');
+/** Choosing "Invite a program": the form is a page of its own on the nested template (D-441). */
+export const InviteProgram: Story = {
+  ...screen('case-manager', 'Invite a program — who it is for', '/invite/'),
+  play: async ({ canvas, userEvent }) => {
+    await userEvent.click(await canvas.findByText('Invite a program'));
+  },
+};
 export const AllPrograms: Story = screen('case-manager', 'All programs', '/programs/');
 export const AddProgram: Story = screen('case-manager', 'Add a program', '/programs/new/');
 export const Conversation: Story = screen('case-manager', 'A conversation', '/messages/thread/', { id: CONVO_ID });
+/** Everything shared in a conversation, from its ⋯ (D-402). */
+export const ConversationFiles: Story = screen('case-manager', 'Stuff shared', '/messages/thread/files/', {
+  id: CONVO_ID,
+});
 export const Notifications: Story = screen('case-manager', 'Notifications', '/notifications/');
 export const Place: Story = screen('case-manager', 'A place', '/place/', { id: 'dummy-place-learning', from: 'explore' });
 export const TextAlerts: Story = screen('case-manager', 'Text alerts', '/alerts/');

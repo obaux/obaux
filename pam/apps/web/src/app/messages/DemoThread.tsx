@@ -4,12 +4,13 @@ import { useMemo, useState } from 'react';
 import type { Role } from '@pam/config';
 import { dummyOtherIdFor, dummyThreadFor } from '@pam/config/dummy-conversations';
 import { DUMMY_ANYONE } from '@pam/config/dummy-people';
-import { contextFor } from './DummyRows';
+import { threadLineFor } from '@/lib/threadLine';
 import { useI18n } from '@/lib/i18n';
 import { sendDemoThreadMessage, useDemoThread } from '@/lib/demoMessages';
+import { displayFileName, type MessageFile, type OutgoingAttachment } from '@/lib/messageFile';
 import { staffPhotoFor } from '@pam/config/dummy-connections';
 import { ThreadView } from './ThreadView';
-import { ThreadHeader } from './ThreadFrame';
+import { ThreadHeader, ThreadTop } from './ThreadFrame';
 import { ThreadVisit } from './ThreadVisit';
 
 /**
@@ -40,7 +41,9 @@ export function DemoThread({
 }) {
   const { t } = useI18n();
   const typed = useDemoThread(conversationId);
-  const [added, setAdded] = useState<{ id: string; body: string; at: string }[]>([]);
+  const [added, setAdded] = useState<
+    { id: string; body: string; at: string; photoUrl?: string; file?: MessageFile; fileUrl?: string }[]
+  >([]);
 
   const otherId = dummyOtherIdFor(conversationId, role);
   const other = DUMMY_ANYONE.find((p) => p.id === otherId) ?? null;
@@ -53,12 +56,41 @@ export function DemoThread({
         createdAt: m.at,
         mine: m.mine,
       })),
-      ...[...typed, ...added].map((m) => ({ id: m.id, body: m.body, createdAt: m.at, mine: true })),
+      ...[...typed, ...added].map((m) => ({
+        id: m.id,
+        body: m.body,
+        photoUrl: 'photoUrl' in m ? (m.photoUrl ?? null) : null,
+        file: 'file' in m ? (m.file ?? null) : null,
+        fileUrl: 'fileUrl' in m ? (m.fileUrl ?? null) : null,
+        createdAt: m.at,
+        mine: true,
+      })),
     ],
     [conversationId, role, typed, added],
   );
 
-  const send = async (body: string) => {
+  const send = async (body: string, attachment: OutgoingAttachment | null) => {
+    // A photo (D-394) or a document (D-399) in an example thread is shown
+    // from the phone and kept only while this page is open: nothing is
+    // uploaded from a preview.
+    if (attachment) {
+      const at = new Date().toISOString();
+      const url = URL.createObjectURL(attachment.file);
+      const file = attachment.file;
+      setAdded((prev) => [
+        ...prev,
+        attachment.kind === 'photo'
+          ? { id: `photo-${at}`, body: body.trim(), at, photoUrl: url }
+          : {
+              id: `file-${at}`,
+              body: body.trim(),
+              at,
+              file: { path: `example/${at}`, name: displayFileName(file instanceof File ? file.name : ''), bytes: file.size },
+              fileUrl: url,
+            },
+      ]);
+      return true;
+    }
     const message = sendDemoThreadMessage(conversationId, body);
     if (!message) return false;
     setAdded((prev) => [...prev, message]);
@@ -67,21 +99,23 @@ export function DemoThread({
 
   // D-187: a member sees who this is to them; staff see nothing beside a
   // member's name; the Pam team is named as such (D-262).
-  const context = contextFor(role, other ? { role: other.role, programName: other.orgName ?? null } : null, t);
+  const context = threadLineFor(role, other ? { role: other.role, programName: other.orgName ?? null } : null, t);
 
   return (
     <>
-      <ThreadHeader
-        name={other?.firstName ?? t('messages.thread.someone')}
-        context={context}
-        backHref={backHref}
-        backLabel={backLabel ?? t('nav.back.messages')}
-        menuHref={`/messages/thread/options/?id=${encodeURIComponent(conversationId)}`}
-      />
-      {/* A member's visit with this program, under the name (D-276). */}
-      {role === 'member' && other?.role === 'provider' ? (
-        <ThreadVisit programName={other.orgName ?? null} threadId={conversationId} />
-      ) : null}
+      <ThreadTop>
+        <ThreadHeader
+          name={other?.firstName ?? t('messages.thread.someone')}
+          context={context}
+          backHref={backHref}
+          backLabel={backLabel ?? t('nav.back.messages')}
+          menuHref={`/messages/thread/options/?id=${encodeURIComponent(conversationId)}`}
+        />
+        {/* A member's visit with this program, under the name (D-276). */}
+        {role === 'member' && other?.role === 'provider' ? (
+          <ThreadVisit programName={other.orgName ?? null} threadId={conversationId} />
+        ) : null}
+      </ThreadTop>
       <ThreadView
         messages={messages}
         otherName={other?.firstName ?? null}

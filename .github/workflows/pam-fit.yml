@@ -1,0 +1,83 @@
+name: PAM Language fit
+
+# Does the text fit, in every language? (A24, D-422, D-424)
+#
+# Words get longer in Russian and wider in Arabic; a layout tuned on English
+# quietly crops them, and nothing throws. This builds Storybook and measures
+# every story at 320px in the languages that stretch it most, plus the
+# pseudo-language (English +40%, which also catches a new string before it has
+# any translation). Only a defect that is *new in a language* and not already
+# looked at (apps/web/scripts/fit-known.json) fails.
+#
+# Heavy, so it runs when copy or UI changes on a pull request, or on request —
+# not on every push. Locally: `pnpm --filter @pam/web audit:fit`.
+on:
+  pull_request:
+    paths:
+      - 'pam/packages/config/src/locales/**'
+      - 'pam/packages/ui/src/**'
+      - 'pam/apps/web/src/**'
+      - 'pam/apps/web/.storybook/**'
+      - 'pam/apps/web/scripts/audit-language-fit.mjs'
+      - 'pam/apps/web/scripts/fit-known.json'
+      - '.github/workflows/pam-fit.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: pam-fit-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: pam
+
+jobs:
+  fit:
+    name: Text fits at 320px
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: pam/pnpm-lock.yaml
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Build Storybook
+        env:
+          STORYBOOK_DISABLE_TELEMETRY: '1'
+          # Stories stub every request; a placeholder is all the client needs.
+          NEXT_PUBLIC_SUPABASE_URL: https://stub.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: stub-anon-key-for-storybook
+        run: pnpm --filter @pam/web build-storybook
+
+      - name: Install Chromium
+        run: pnpm --filter @pam/web exec playwright install --with-deps chromium
+
+      # English is the baseline. Russian and Arabic are the stretch and the
+      # mirror; Simplified Chinese is the tall one; the pseudo-language is
+      # English made 40% longer. The other languages are checked by the full
+      # run in a session (docs/before-launch.md), which takes much longer.
+      - name: Measure every story
+        working-directory: pam/apps/web
+        run: >-
+          node scripts/audit-language-fit.mjs
+          --locales en,ru,ar,zh-CN,pseudo
+          --workers 2
+          --known scripts/fit-known.json
+          --out ${{ runner.temp }}/fit.json
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fit-report
+          path: ${{ runner.temp }}/fit.json
+          retention-days: 7

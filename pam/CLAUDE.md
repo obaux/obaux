@@ -17,13 +17,16 @@ help?**
 1. **`STATUS.md`** — what exists, what is proven and by which check, what is
    live, what is deliberately not done, and what needs a human. This is the
    fastest way to know where things actually stand.
-2. **`docs/sessions/`** — the most recent session log. It says what the last
-   session changed, what it got wrong, and what it left half-done.
-3. **`DECISIONS.md`** — only the entries relevant to what you are about to
-   touch. It is long by design; do not read it end to end every time.
-4. **`docs/sop-amendments.md`** — changes to the build SOP since it was handed
-   over, including the ones that contradict it. Read this before trusting a rule
-   you remember from the SOP itself.
+2. **`docs/sessions/`** — the most recent session log, and the newest one for
+   your lane (`docs/lanes.md`; file names are `YYYY-MM-DD-HHMM-<lane>-<job>.md`,
+   so the order is the order they were written). It says what the last session
+   changed, what it got wrong, and what it left half-done.
+3. **`DECISIONS.md`** and **`docs/decisions/`** — only the entries relevant to
+   what you are about to touch. Up to D-441 they are in `DECISIONS.md`, one long
+   file; from D-442 each is its own file. Do not read either end to end.
+4. **`docs/sop-amendments.md`** and **`docs/amendments/`** — changes to the build
+   SOP since it was handed over, including the ones that contradict it. Read
+   these before trusting a rule you remember from the SOP itself.
 
 **Every session except "PAM Agent 1" reads the record before it claims a
 number or drafts a plan** (Will, 9 October 2026). That means `STATUS.md`, the
@@ -43,34 +46,61 @@ you disagree with one, say so and change it deliberately, in writing.
 
 **Before you finish, always:**
 
-1. **Write a session log** at `docs/sessions/YYYY-MM-DD-<short-slug>.md`. The
-   template and the rules for what belongs in one are in
-   `docs/sessions/README.md`. One file per session; never edit an old one.
-2. **Update `STATUS.md`** so it describes the new state, not the old one. It is
-   the only document that is always current — everything else is history.
-3. **Add to `DECISIONS.md`** any decision you made that a future session could
-   reasonably question, with the reasoning, not just the choice.
-4. **Add to `CHANGELOG.md`** if the session produced a user-visible change.
-5. Commit and push.
+1. **Write a session log** with `pnpm claim session "<lane> <job>"`
+   (`docs/sessions/YYYY-MM-DD-HHMM-<slug>.md`). The template and the rules for
+   what belongs in one are in `docs/sessions/README.md`. One file per session;
+   never edit an old one.
+2. **Update `STATUS.md`** so it describes the new state, not the old one. Edit
+   **only your lane's section**; never reformat or reorder the rest. It is the
+   only document that is always current — everything else is history.
+3. **Write a decision file** (`pnpm claim decision "<title>"`) for any decision
+   you made that a future session could reasonably question, with the reasoning,
+   not just the choice. Do not append to `DECISIONS.md`.
+4. **Write a changelog fragment** (`pnpm claim changelog "<title>"`) if the
+   session produced a user-visible change. Do not edit `CHANGELOG.md`: the merge
+   desk folds the fragments into a release and chooses the version.
+5. Merge `origin/main`, run the checks, commit and push.
 
 A session that produced work but left no record has to be reconstructed by the
 next one, from a diff. That is the failure this rule exists to prevent.
 
 ---
 
-## Working alongside another PAM session
+## Working alongside other PAM sessions
 
-Will regularly runs two sessions on PAM at once. That's fine, but it means
-`STATUS.md`, the migration ledger, and the live Supabase project are all
-shared state that a session other than yours may change while you work.
-Found the hard way on 17 September: one session applied six migrations
-straight to the live project (`staff_review`, `staff_denied_sms`,
-`program_submission`, `demo_view`, `lock_notify_on_staff_request`,
-`staff_requests_indexes`) without ever committing the corresponding files, so
-a second session doing unrelated work nearly deployed on top of a live schema
-its own repo couldn't explain — and a separate local migration
-(`0052_saved_places_say_what_they_are.sql`) sat committed but never deployed,
-with nothing recording why.
+Will regularly runs two or three sessions on PAM at once. Read **`docs/lanes.md`**:
+it is the whole system, and these are its rules in one place.
+
+- **One builder per lane.** A lane is a topic with its own part of the code
+  (accounts and invites, messages, places and programs, languages and legal,
+  design system, public website, merge desk). Name your session
+  `PAM · <Lane> · <job>`. If the job reaches into another lane's files, stop and
+  say so.
+- **Short branches.** One job, merged within a day or two; merge `origin/main`
+  into yours before you start and before you finish. A branch waiting for Will
+  gets no new work.
+- **Numbers are files.** `pnpm claim decision "<title>"` (and `amendment`) takes
+  the next number after reading `main` and every pushed branch, and pushes the
+  claim. Migrations, changelog entries and session logs are named by the day and
+  time instead — `pnpm claim migration "<what it does>"` — so there is no number
+  to take. Never write a number by hand, and never reuse one a branch has pushed.
+- **Records are files.** A decision, a changelog entry, a session log: each its
+  own file. `STATUS.md` is edited only in your lane's section.
+- **Database changes go in two steps** — add (the live app keeps working), then
+  switch the app, then remove in its own migration marked `-- contract:`.
+- **The merge desk** (PAM Agent 1) merges to main, applies migrations to the live
+  project and cuts releases, in the order Will says. Nothing goes to `main` without
+  Will asking.
+
+`STATUS.md`, the migration ledger and the live Supabase project are shared state
+that a session other than yours may change while you work. Found the hard way on
+17 September: one session applied six migrations straight to the live project
+(`staff_review`, `staff_denied_sms`, `program_submission`, `demo_view`,
+`lock_notify_on_staff_request`, `staff_requests_indexes`) without ever committing
+the corresponding files, so a second session doing unrelated work nearly deployed
+on top of a live schema its own repo couldn't explain — and a separate local
+migration (`0052_saved_places_say_what_they_are.sql`) sat committed but never
+deployed, with nothing recording why.
 
 **Before deploying any migration to the live project**, run
 `mcp__Supabase__list_migrations` and diff it against
@@ -96,18 +126,10 @@ Supabase is invisible to every other session and to Will reading the repo —
 it is the exact failure this rule exists to prevent, the same class as an
 unrecorded build session.
 
-**Session end-of-turn writes are shared files, not yours alone.** Before
-editing `STATUS.md`, `DECISIONS.md`, or `CHANGELOG.md` at the end of a
-session, `git pull`/fetch the branch you're pushing to first. If another
-session's changes are already there, merge your update into what's current
-rather than overwriting it — both sessions' work needs to survive in the
-handover document, not just whichever one wrote last.
-
-**Prefer separate branches for concurrent sessions on the same feature area.**
-If you and another session might touch overlapping code or the same designated
-branch, check `git log --all` and the remote branch list before you start, and
-say so if you find another session's commits already there rather than
-assuming a clean base.
+**Before you start, look at what else is pushed.** `pnpm claim status`, and
+`git log origin/main..origin/<branch>` for a branch in your lane. If another
+session's commits are already in the area you are about to change, say so rather
+than assuming a clean base.
 
 ## Two standing lists Will asked to be kept
 
@@ -191,8 +213,10 @@ These come from the build SOP and are enforced by tests, not convention:
   `!important`, never a raw hex or px where a token exists.
 - **Never display** "prisoner", "ex-offender", "inmate", or conviction details
   anywhere a user can see — UI, notifications, or exports. CI checks this.
-- **No SMS may reveal justice involvement**, exceed 160 characters, carry emoji,
-  or send without a human recorded in `reviewedBy`.
+- **No SMS may reveal justice involvement**, exceed 160 characters (70 in a
+  script GSM-7 cannot carry — Chinese, Russian, Arabic), carry emoji, or send
+  without a human recorded in `reviewedBy` **for that language**. A language
+  nobody has signed is texted in English, never in a draft (A25).
 - **Never dead-end.** Every screen has a visible way back and a visible way to
   get help. (The hero template's screens keep the way back but carry no help —
   Will's exception, `docs/sop-amendments.md` A19.)
@@ -200,7 +224,15 @@ These come from the build SOP and are enforced by tests, not convention:
   is doing two things (a `variant="secondary"` one beside it is fine — D-239).
 - **48px minimum touch target, 56px primary buttons (secondary the same — D-239), 16px body text on mobile (A23).**
 - Every `security definer` function sets `search_path = public, extensions`.
-- Strings go through i18n from day one. English and Spanish stay key-for-key.
+- Strings go through i18n from day one. Every language Pam offers (English,
+  Spanish, Brazilian Portuguese, Simplified and Traditional Chinese, Russian,
+  Arabic — A24) stays key-for-key **and in step**: reword the English and the
+  other six go stale, which `copy:status` lists and the tests fail on
+  (`locales/ledger.json`, A25). Text on screen wraps and grows rather than
+  being cut (`@pam/ui/Button`, `Badge`, `Segment`); `pnpm --filter @pam/web
+  audit:fit` checks it against a Storybook build, and Storybook's
+  *Pseudo-language* shows a string 40% longer. How to change copy, in all
+  seven languages and in texts and emails: `docs/copy-changes.md`.
 
 ## Verify, don't assume
 

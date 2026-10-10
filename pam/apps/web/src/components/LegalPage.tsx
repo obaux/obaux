@@ -5,7 +5,7 @@ import * as stylex from '@stylexjs/stylex';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { Text } from '@astryxdesign/core/Text';
-import { Button } from '@astryxdesign/core/Button';
+import { Button } from '@pam/ui/Button';
 import {
   AwardIcon,
   BookIcon,
