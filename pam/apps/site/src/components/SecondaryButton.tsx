@@ -12,7 +12,11 @@ const styles = stylex.create({
 
 type Props = Omit<ComponentProps<typeof Button>, 'variant'>;
 
-/** The design system's secondary Button, with a light border, for the public site. */
+/**
+ * The design system's secondary Button, with a light border, for the public site.
+ * The design system now draws its own light edge on a secondary button (D-493); `hasEdge={false}`
+ * keeps the site to one edge, its own, until the website's Friday batch drops this border for that one.
+ */
 export function SecondaryButton({ xstyle, ...props }: Props) {
-  return <Button {...props} variant="secondary" xstyle={[styles.border, xstyle]} />;
+  return <Button {...props} variant="secondary" hasEdge={false} xstyle={[styles.border, xstyle]} />;
 }
