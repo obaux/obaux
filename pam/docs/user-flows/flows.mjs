@@ -485,6 +485,13 @@ export const flows = [
         changed: 'D-386',
         note: 'Hero with confetti; Sent → Pam checks (spinning, "1–2 days") → live; While you wait (text me first, until texts are on; photo; policies). No bottom bar. The Program tab until approved; Back is Home. After 3 days "Still checking" + Ask Pam; "needs changes" shows Pam\'s note + Edit and send again',
       },
+      switchPrograms: {
+        title: 'Your programs',
+        story: 'program-lead-states-program-more-than-one--your-programs',
+        path: '/program/switch/',
+        changed: 'D-318',
+        note: 'A lead who runs more than one: the one shown is ticked, tap another to show it, Add another program at the end (it waits while Pam checks one)',
+      },
       whatYouSent: {
         title: 'What you sent',
         story: 'program-lead-screens--what-you-sent',
@@ -586,6 +593,7 @@ export const flows = [
       ['home', 'invite', '+ Invite someone'],
       ['program', 'service', 'A service · Add a service'],
       ['program', 'policies', 'Policies for participants'],
+      ['program', 'switchPrograms', 'Your programs'],
       ['policies', 'policy', 'A policy'],
       ['profile', 'programs', 'Programs in Pam'],
       ['profile', 'alerts', 'Text alerts'],

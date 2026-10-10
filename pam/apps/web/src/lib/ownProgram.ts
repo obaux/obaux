@@ -28,10 +28,12 @@ export interface OwnProgramRow {
 }
 
 /** What a lead sent for checking (`program_submissions`, D-462). */
-export const SUBMISSION_COLUMNS = 'id, kind, status, details, sent_at, changes_note';
+export const SUBMISSION_COLUMNS = 'id, service_id, kind, status, details, sent_at, changes_note';
 
 export interface SubmissionRow {
   readonly id: string;
+  /** The program it is about (a lead can have several, D-318). */
+  readonly service_id?: string;
   readonly kind: 'new' | 'change';
   readonly status: 'in_review' | 'changes_asked' | 'approved' | 'withdrawn' | 'discarded';
   readonly details: Readonly<Record<string, unknown>>;

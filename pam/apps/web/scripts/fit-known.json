@@ -670,5 +670,9 @@
   {
     "key": "pseudo|cut|member-created-states-saved-trips--trips-with-a-past-visit|⟦Þŕóóóƒííļéé⟧",
     "reason": "The Trips drawer scrolls and fades out at its foot; a card below the first sits under that fade, so the detector sees its text partly hidden (partial=true). It is reached by scrolling and nothing is lost. Looked at 10 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|ellipsis|program-lead-states-program-more-than-one--the-program-tab|Resumes, interviews and showing up ready.",
+    "reason": "A service's sentence on the Program tab is one line with an ellipsis by design (isDescriptionOneLine); the pseudo-language is longer so it trims; the whole sentence is one tap away in the service. Looked at 10 October 2026 at 320px."
   }
 ]

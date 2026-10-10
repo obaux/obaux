@@ -162,6 +162,8 @@ export interface ProgramSetup {
   readonly hasPhoto: boolean;
   /** The lead's own program, loaded from the database (D-447); null when there is none to show. */
   readonly program: OwnProgram | null;
+  /** How many programs the lead has (D-318); 0 when none is on file. */
+  readonly programCount: number;
   /** The database is still being asked: screens that choose between Add and the program wait. */
   readonly isLoading: boolean;
 }
@@ -190,6 +192,7 @@ export function useProgramSetup(session: SessionState): ProgramSetup {
     sent,
     hasPhoto: isExample || photoUrl !== null || read(DONE + 'photo'),
     program,
+    programCount: own.status === 'ready' ? own.programs.length : 0,
     isLoading: own.status === 'loading',
   };
 }
