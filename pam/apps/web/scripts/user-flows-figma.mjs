@@ -34,7 +34,7 @@ const LIMIT = 48_000;
 
 // Shared helpers, prepended to every drawing script.
 const HELPERS = `
-const INK={r:0.067,g:0.067,b:0.067}, MUTED={r:0.4,g:0.4,b:0.4}, ACCENT={r:0.059,g:0.345,b:0.278}, NEW={r:0.91,g:0.349,b:0.047}, GREY={r:0.6,g:0.6,b:0.6}, LINE={r:0.85,g:0.85,b:0.85}, PANEL={r:0.965,g:0.965,b:0.957}, WHITE={r:1,g:1,b:1}, BG={r:0.925,g:0.925,b:0.918};
+const INK={r:0.067,g:0.067,b:0.067}, MUTED={r:0.4,g:0.4,b:0.4}, ACCENT={r:0.059,g:0.345,b:0.278}, NEW={r:0.91,g:0.349,b:0.047}, PROP={r:0.169,g:0.424,b:0.851}, GREY={r:0.6,g:0.6,b:0.6}, LINE={r:0.85,g:0.85,b:0.85}, PANEL={r:0.965,g:0.965,b:0.957}, WHITE={r:1,g:1,b:1}, BG={r:0.925,g:0.925,b:0.918};
 // Screens sit white on a light grey page, lifted by a soft shadow (Will, 8 October).
 const LIFT=[{type:'DROP_SHADOW',color:{r:0,g:0,b:0,a:0.10},offset:{x:0,y:6},radius:18,spread:0,visible:true,blendMode:'NORMAL'},{type:'DROP_SHADOW',color:{r:0,g:0,b:0,a:0.06},offset:{x:0,y:1},radius:3,spread:0,visible:true,blendMode:'NORMAL'}];
 await Promise.all([['Inter','Regular'],['Inter','Medium'],['Inter','Semi Bold'],['Inter','Bold'],['Inter','Extra Bold']].map(([family,style])=>figma.loadFontAsync({family,style})));
@@ -155,10 +155,11 @@ for(const [id,n] of Object.entries(L.nodes)){
   const row=figma.createAutoLayout('HORIZONTAL',{name:'Title',itemSpacing:8,counterAxisAlignItems:'CENTER'}); row.fills=[]; card.appendChild(row);
   text(row,n.title,{size:17,style:'Bold'});
   if(n.changed) pill(row,n.changed,{bg:isNew?NEW:GREY});
+  if(n.proposed) pill(row,'Proposed (a22) · not in the app',{bg:PROP});
   text(card,n.path,{size:12,style:'Medium',color:MUTED});
   const shot=figma.createRectangle(); shot.name='shot:'+L.key+'--'+id; shot.resize(n.w,n.shotH);
   shot.cornerRadius=n.wide?16:28; shot.fills=[];
-  shot.strokes=solid(isNew?NEW:LINE); shot.strokeWeight=isNew?3:1; shot.strokeAlign='INSIDE';
+  shot.strokes=solid(n.proposed?PROP:isNew?NEW:LINE); shot.strokeWeight=(n.proposed||isNew)?3:1; shot.strokeAlign='INSIDE'; if(n.proposed) shot.dashPattern=[10,8];
   card.appendChild(shot);
   placeholderBehind(card,shot,n.title);
   linkPill(card,n.url);
