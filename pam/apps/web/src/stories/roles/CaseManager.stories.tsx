@@ -17,6 +17,7 @@ export const Home: Story = screen('case-manager', 'Home — your members', '/');
 export const Saved: Story = screen('case-manager', 'Saved — starred people', '/saved/');
 export const Messages: Story = screen('case-manager', 'Messages', '/messages/');
 export const Profile: Story = screen('case-manager', 'Profile', '/profile/');
+export const ReportedPlaces: Story = screen('case-manager', 'Reported places — the list, no decisions', '/places/reported/');
 export const Member: Story = screen('case-manager', 'A member', '/person/', { id: 'dummy-m1' });
 export const MemberWithNewMessages: Story = screen('case-manager', 'A member with new messages', '/person/', {
   id: 'dummy-m2',

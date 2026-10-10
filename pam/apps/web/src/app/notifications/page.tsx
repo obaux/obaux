@@ -95,7 +95,7 @@ function describe(
 function hrefFor(kind: string, subjectId: string | null): string | undefined {
   if (kind === 'message_reported') return '/messages/?show=reported';
   if (kind === 'message_received' && subjectId) return `/messages/thread/?id=${encodeURIComponent(subjectId)}`;
-  if (kind === 'service_flagged') return '/places/?filter=reported';
+  if (kind === 'service_flagged') return '/places/reported/?from=notifications';
   if (kind === 'staff_request_pending') return '/requests/';
   return undefined;
 }

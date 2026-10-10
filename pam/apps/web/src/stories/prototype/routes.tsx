@@ -16,6 +16,7 @@ import PastTripsPage from '../../app/person/past/page';
 import SavedByPage from '../../app/person/saved/page';
 import PlacePage from '../../app/place/page';
 import PlacesPage from '../../app/places/page';
+import ReportedPlacesPage from '../../app/places/reported/page';
 import PointsPage from '../../app/points/page';
 import PrivacyPage from '../../app/privacy/page';
 import RemindersPage from '../../app/reminders/page';
@@ -156,6 +157,8 @@ export const APP_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   '/program/service/': screen(() => <ProgramServicePage />),
   // D-225: planning a visit, from the + on Trips.
   '/trips/new/': screen(() => <NewTripPage />),
+  // The places somebody reported, for the people who review them (D-189), from Profile or the bell.
+  '/places/reported/': screen(() => <ReportedPlacesPage />),
 };
 
 /**
