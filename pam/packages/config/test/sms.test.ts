@@ -21,6 +21,7 @@ import {
   SMS_MAX_LENGTH_UCS2_TWO_SEGMENTS,
   SMS_WORST_CASE_LINK_LENGTH,
   APPROVED_TO_LEARN_FROM,
+  APPROVED_TO_LEARN_FROM_ALERTS,
   type MoreLocale,
   type SmsTemplate,
   type SmsTemplateKey,
@@ -47,13 +48,16 @@ const WORST_CASE_VARS: Readonly<Record<string, string>> = {
 const keys = Object.keys(SMS_TEMPLATES) as SmsTemplateKey[];
 
 /**
- * The texts behind the Text alerts switches (10 October 2026): drafted, tested
- * and **not signed by anybody**, so none can send. Listing them here is the
- * only way a template may stand unsigned; a template that loses its name, or a
- * new one added without being listed, still fails the test below. Signing one
- * means removing it from this list in the same commit.
+ * Templates that may stand unsigned. The four Text alerts texts were here from
+ * 10 October 2026 until Will approved them the same day ("Text alerts:
+ * approved"). Listing a template here is the only way one may stand unsigned: a
+ * template that loses its name, or a new one added without being listed, fails
+ * the test below. Signing one means removing it from this list in the same
+ * commit.
  */
-const AWAITING_SIGNATURE: SmsTemplateKey[] = ['message_waiting', 'visit_booked', 'booking_changed', 'trip_planned'];
+const AWAITING_SIGNATURE: SmsTemplateKey[] = [];
+/** The four Text alerts texts, approved by Will on 10 October 2026. */
+const ALERT_KEYS: SmsTemplateKey[] = ['message_waiting', 'visit_booked', 'booking_changed', 'trip_planned'];
 
 describe('SMS templates', () => {
   it('has a human recorded against every template', () => {
@@ -313,10 +317,13 @@ describe('texts in the newer languages', () => {
     // learn from, no native reader yet. Nothing else has signed them.
     expect(APPROVED_TO_LEARN_FROM).toMatch(/^Will \(Oba\), 9 October 2026/);
     expect(APPROVED_TO_LEARN_FROM).toContain('no native reader yet');
-    // (Not the new alert texts: that approval was for the drafts it was given on.)
+    // The four Text alerts texts carry the same words, dated the day Will approved them.
     for (const { key, locale, draft } of drafts.filter((d) => !AWAITING_SIGNATURE.includes(d.key))) {
-      expect(draft.reviewedBy, `${key} (${locale})`).toBe(APPROVED_TO_LEARN_FROM);
+      expect(draft.reviewedBy, `${key} (${locale})`).toBe(ALERT_KEYS.includes(key) ? APPROVED_TO_LEARN_FROM_ALERTS : APPROVED_TO_LEARN_FROM);
     }
+    expect(APPROVED_TO_LEARN_FROM_ALERTS).toMatch(/^Will \(Oba\), 10 October 2026/);
+    expect(APPROVED_TO_LEARN_FROM_ALERTS).toContain('no native reader yet');
+    for (const key of ALERT_KEYS) expect(SMS_TEMPLATES[key].reviewedBy, key).toBe('Will (Oba), 10 October 2026');
     for (const { key, draft } of drafts.filter((d) => AWAITING_SIGNATURE.includes(d.key))) {
       expect(draft.reviewedBy, key).toBe('');
     }

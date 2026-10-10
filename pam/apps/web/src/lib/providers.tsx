@@ -40,8 +40,12 @@ export function Providers({ children }: { children: ReactNode }) {
    * sign-in redirect has already taken somebody to a new screen.
    */
   const [LocaleSync, setLocaleSync] = useState<ComponentType | null>(null);
+  // Loaded the same way, for the same reason: a member's saved trips (D-454)
+  // are read once they are known, and no route should pay for the code before.
+  const [SavedTripsSync, setSavedTripsSync] = useState<ComponentType | null>(null);
   useEffect(() => {
     void import('./LocaleSync').then((mod) => setLocaleSync(() => mod.LocaleSync));
+    void import('./SavedTripsSync').then((mod) => setSavedTripsSync(() => mod.SavedTripsSync));
   }, []);
 
   return (
@@ -54,6 +58,7 @@ export function Providers({ children }: { children: ReactNode }) {
       <MotionProvider>
         <I18nProvider>
           {LocaleSync ? <LocaleSync /> : null}
+          {SavedTripsSync ? <SavedTripsSync /> : null}
           {/* Screen to screen without a reload, inside a transition (D-269). */}
           <ClientNav />
           <AlertBannerProvider>{children}</AlertBannerProvider>
