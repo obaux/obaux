@@ -59,13 +59,13 @@ current (`docs/control-room.md`).
 
 | Session | Its expertise | It owns |
 |---|---|---|
-| **Mira · PAM · Merge desk** (`session_018wn7LF7RMsHnXSAzvk6s1p`) | Running the team; merging; the live project; releases; CI and deploys | `main`; every change to the live project (migrations, Edge Functions, secrets, schedules); `CHANGELOG.md` releases; this page, `docs/lanes.md` and the board; the shared tables in `STATUS.md` |
-| **PAM · Accounts & invites · …** | Sign-in, invites, roles, caseloads, limits, deleting an account, the audit log | its lane in `docs/lanes.md` |
-| **PAM · Messages & notifications · …** | Conversations, attachments, translation, the bell, texts and emails going out, blocking and reporting | its lane |
-| **PAM · Places & programs · …** | The catalogue, a place, programs and their onboarding, saved places, trips, points, Home | its lane |
-| **PAM · Languages & legal · …** | The seven languages and the ledger, privacy, terms, transparency, native review | its lane |
-| **PAM · Design system & Storybook · …** | Components, tokens, illustrations, every screen's story, the fit and accessibility audits, the Figma flow map | its lane |
-| **PAM · Website · …** | The public site and the support centre (`pam-site`) | its own project |
+| **PAM · Mira · Chief Technology Officer** — the merge desk (`session_018wn7LF7RMsHnXSAzvk6s1p`) | Running the team; merging; the live project; releases; CI and deploys | `main`; every change to the live project (migrations, Edge Functions, secrets, schedules); `CHANGELOG.md` releases; this page, `docs/lanes.md` and the board; the shared tables in `STATUS.md` |
+| **Accounts & invites** (Ava, Sam) | Sign-in, invites, roles, caseloads, limits, deleting an account, the audit log | its lane in `docs/lanes.md` |
+| **Messages & notifications** (Nico) | Conversations, attachments, translation, the bell, texts and emails going out, blocking and reporting | its lane |
+| **Places & programs** (Piper) | The catalogue, a place, programs and their onboarding, saved places, trips, points, Home | its lane |
+| **Languages & legal** (Lena, Remy) | The seven languages and the ledger, privacy, terms, transparency, native review | its lane |
+| **Design system & Storybook** (Dot) | Components, tokens, illustrations, every screen's story, the fit and accessibility audits, the Figma flow map | its lane |
+| **Website** (Wren) | The public site and the support centre (`pam-site`) | its own project |
 
 Which session is in which lane today, its id, and what it is doing and waiting on
 are on **the board** at the end of `docs/lanes.md`. The merge desk keeps it.

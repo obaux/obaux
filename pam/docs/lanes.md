@@ -72,8 +72,11 @@ after the languages and Arabic merges went in with the fit check unread.)
 2. `pnpm claim status` — what is claimed, and on which branch.
 3. Read `STATUS.md` (the section for your lane) and the newest session log whose
    name starts with your lane, then the decisions the job touches.
-4. Name the session **`PAM · <Lane> · <job>`** (for example *PAM · Accounts &
-   invites · staff email*), so the list of sessions reads as the list of lanes.
+4. The session is titled **`PAM · <Name> · <Job title>`** (for example *PAM · Ava ·
+   Accounts & Access Lead*; Will, 10 October: "Rename session labels to reflect Team
+   names and roles"), so the session list reads as the team. A new session gets its
+   name and title from Mira (`docs/team.md`); the job it is on goes in its STARTED
+   note and on the board, not in the title.
 5. Send the merge desk a **STARTED** note (`docs/team.md`).
 
 ### Finishing a session
@@ -184,13 +187,13 @@ Control Room (`docs/control-room.md`). After a merge, every open branch below me
 
 | Who | Session | Id | Branch | Where it stands | Waiting on |
 |---|---|---|---|---|---|
-| **Mira**, CTO | PAM · Merge desk (Agent 1) | `session_018wn7LF7RMsHnXSAzvk6s1p` | works from `main` | merged languages and Arabic; set up the team, the names and the control room | — |
-| **Ava**, Accounts & Access Lead | PAM · Accounts & invites · assign and limit | `session_01NPHYiBRyyv8F5L7o9KaMEd` | `claude/pam-assign-and-limit` | guide assignment and limits built; two migrations on the branch | its first report; then Will on the migrations |
-| **Sam**, Accounts Engineer | PAM · Accounts & invites · staff email, audit log, branch system | `session_01SJKnwmNUb3uvgDhakVYTZo` | `claude/affectionate-goldberg-tvu4sz` | job merged; the points-history migration (D-445) is live (10 October) | a next job |
-| **Nico**, Messaging & Notifications Lead | PAM · Messages & notifications | `session_01CCHvVkYgXddhtq4DHvvETo` | none | reported in; no job yet | Will: first job (Mira suggests sending email) and who switches things on |
-| **Piper**, Places & Programs Lead | PAM · Places & programs | `session_01RmG6J2CCikoqM9H2fhbSPm` | `claude/places-programs-load-own-program` | a program lead loads their own program (D-447): database half done, app half next | Will: how to fix approved leads' access (0085 first, Mira suggests) |
-| **Lena**, Languages & Legal Lead | PAM · Languages & legal · seven languages | `session_01Hjv2RQuz5PJmxQ7tLGb5sW` | none (merged) | reported in; nothing open; 0085 noted as not live | a next job from Will |
-| **Remy**, Right-to-Left Language Specialist | PAM · Languages & legal · Arabic | `session_01A44BM2WPMuZYKkspxsiQEG` | none (merged) | Arabic isolates live | its first report |
-| **Dot**, Design Systems Lead | PAM · Design system & Storybook · area chip, fit audit | `session_01A3kdir46ErR2eyjDLFdzyW` | `claude/pam-design-areachip-long-address` | fit-audit fix on the branch (D-448) | its first report; Will on D-448 |
-| **Wren**, Website & Help Centre Lead | PAM · Website | `session_012vS6F7CMTwFn3u5UG66JWz` | `claude/compassionate-bohr-mzrchf` (12 ahead) | site built and previewed; a draft post held | Will: site live now or later; keep the draft |
-| **Gus**, retired | PAM Agent 2 | `session_01NoLKA8RJRwhyDJUe8CAZVE` | — | idle since 8 October; not messaged | Will: archive |
+| **Mira**, CTO | PAM · Mira · Chief Technology Officer | `session_018wn7LF7RMsHnXSAzvk6s1p` | works from `main` | merged languages and Arabic; set up the team, the names and the control room | — |
+| **Ava**, Accounts & Access Lead | PAM · Ava · Accounts & Access Lead | `session_01NPHYiBRyyv8F5L7o9KaMEd` | `claude/pam-assign-and-limit` | guide assignment and limits built; two migrations on the branch | its first report; then Will on the migrations |
+| **Sam**, Accounts Engineer | PAM · Sam · Accounts Engineer | `session_01SJKnwmNUb3uvgDhakVYTZo` | `claude/affectionate-goldberg-tvu4sz` | job merged; the points-history migration (D-445) is live (10 October) | a next job |
+| **Nico**, Messaging & Notifications Lead | PAM · Nico · Messaging & Notifications Lead | `session_01CCHvVkYgXddhtq4DHvvETo` | none | reported in; no job yet | Will: first job (Mira suggests sending email) and who switches things on |
+| **Piper**, Places & Programs Lead | PAM · Piper · Places & Programs Lead | `session_01RmG6J2CCikoqM9H2fhbSPm` | `claude/places-programs-load-own-program` | a program lead loads their own program (D-447): database half done, app half next | Will: how to fix approved leads' access (0085 first, Mira suggests) |
+| **Lena**, Languages & Legal Lead | PAM · Lena · Languages & Legal Lead | `session_01Hjv2RQuz5PJmxQ7tLGb5sW` | none (merged) | reported in; nothing open; 0085 noted as not live | a next job from Will |
+| **Remy**, Right-to-Left Language Specialist | PAM · Remy · Right-to-Left Language Specialist | `session_01A44BM2WPMuZYKkspxsiQEG` | none (merged) | Arabic isolates live | its first report |
+| **Dot**, Design Systems Lead | PAM · Dot · Design Systems Lead | `session_01A3kdir46ErR2eyjDLFdzyW` | `claude/pam-design-areachip-long-address` | fit-audit fix on the branch (D-448) | its first report; Will on D-448 |
+| **Wren**, Website & Help Centre Lead | PAM · Wren · Website & Help Centre Lead | `session_012vS6F7CMTwFn3u5UG66JWz` | `claude/compassionate-bohr-mzrchf` (12 ahead) | site built and previewed; a draft post held | Will: site live now or later; keep the draft |
+| **Gus**, retired | PAM · Gus · Former Platform Engineer (retired) | `session_01NoLKA8RJRwhyDJUe8CAZVE` | — | archived | — |
