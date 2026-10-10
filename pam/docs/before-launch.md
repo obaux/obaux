@@ -11,6 +11,25 @@ STATUS row too.
 
 ## Open
 
+- [ ] **Public help posts: re-check them when what they describe changes** (Wren, 10 October
+  2026, D-458). Each post says only what is live today, so these go stale as features ship:
+  "Texts from Pam" when visit reminders, message alerts or connect texts go live (it says they
+  are not sent yet; check the live `dispatch-sms`, not the repo). The day-before visit reminder is
+  **one line**: set `VISIT_REMINDERS_LIVE = true` in `apps/site/src/content/TextsFromPam.tsx` the day
+  it is merged and the live function queues it (Mira, 10 October); "Who is my guide?" when the
+  assign-and-limit work merges; "Points and badges" when more point rules or any badge are
+  awarded; "Messages" if blocking appears; "What others can see" if transparency.ts changes
+  (one row, "the last day you used Pam" for a program, repeats the app's promise ahead of the
+  database). The hidden draft "Staff requests" is published only if a way to ask to be staff
+  comes back (D-369).
+- [ ] **Public site: Will signs "About Pam" (D-466, 10 October 2026).** English first: read
+  `apps/site/src/content/about.ts`, then put `"en"` in `apps/site/src/content/signed-off.json`
+  (`{"about-pam": ["en"]}`) — that builds `/en/about-pam/` and shows the home section. The other
+  six are drafts with no native reader (D-461): add each code to the same file only once someone
+  who reads it has been over it. Also decide the home card "Pam reminds you before you go so
+  nothing gets missed" (it promises reminders that are not live; the About text says "coming").
+  When visit reminders go live, flip `VISIT_REMINDERS_LIVE` in `TextsFromPam.tsx` and rewrite
+  the "What is coming" paragraph in all seven.
 - [ ] **Public site: publish the draft post "Keeping your program's listing up to
   date" only when the feature ships** (from PAM · Places & programs, 10 October
   2026, rule D-447, branch `claude/places-programs-load-own-program`, not on

@@ -1,17 +1,7 @@
 import type { Metadata, Viewport } from 'next';
-import { Providers } from '../components/Providers';
-import { SiteShell } from '../components/SiteShell';
-import { SITE_URL } from '../lib/links';
-import { SHARE_DESCRIPTION, SHARE_IMAGE, SHARE_TITLE } from '../lib/share';
-
-// Setup order is the app's (apps/web/src/app/layout.tsx): layers first, then the
-// three Astryx sheets as JS imports, then Pam's theme, fonts and own styles.
-import './layers.css';
-import '@astryxdesign/core/reset.css';
-import '@astryxdesign/core/astryx.css';
-import '@pam/ui/theme/pam.css';
-import '@pam/ui/fonts.css';
-import './globals.css';
+import { RootShell } from '../../components/RootShell';
+import { SITE_URL } from '../../lib/links';
+import { SHARE_DESCRIPTION, SHARE_IMAGE, SHARE_TITLE } from '../../lib/share';
 
 // The icons (`icon.svg`, `apple-icon.png`, `favicon.ico`) are picked up from this
 // folder by Next; the social preview is drawn from `social/preview.html`. The
@@ -45,13 +35,5 @@ export const viewport: Viewport = {
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <html lang="en" suppressHydrationWarning>
-      <body>
-        <Providers>
-          <SiteShell>{children}</SiteShell>
-        </Providers>
-      </body>
-    </html>
-  );
+  return <RootShell>{children}</RootShell>;
 }

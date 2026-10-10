@@ -1,5 +1,16 @@
+import { readFileSync } from 'node:fs';
+
+// "About Pam" is built only when a language is signed (src/content/signed-off.json),
+// or in a preview build (PAM_SITE_DRAFTS=1). `output: 'export'` refuses a dynamic
+// route with an empty `generateStaticParams`, so while nothing is signed the route's
+// files (`layout.about.tsx`, `page.about.tsx`) are not pages at all: the extension
+// `about.tsx` is added to `pageExtensions` only when there is something to build.
+const signed = JSON.parse(readFileSync(new URL('./src/content/signed-off.json', import.meta.url), 'utf8'));
+const buildAbout = process.env.PAM_SITE_DRAFTS === '1' || (signed['about-pam'] ?? []).length > 0;
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  pageExtensions: ['tsx', 'ts', 'jsx', 'js', ...(buildAbout ? ['about.tsx'] : [])],
   reactStrictMode: true,
 
   // The public site is a folder of static files, like the app: no Node runtime,
