@@ -123,6 +123,42 @@ select test.as_user(:'alice');
 select test.check_raises_like('...even when the row exists',
   $$update public.services set needs_review = false where id = '88888888-0000-0000-0000-000000000601'$$,
   '%REVIEW_IS_NOT_YOURS%');
+-- D-447: a live program's name, address and category are not edited in place.
+reset role;
+-- Nobody signed in while the fixture is written, or the guard treats the
+-- owner's insert as the last user's and holds it for review.
+select set_config('request.jwt.claim.sub', '', false);
+insert into public.services (id, org_id, name, category, address, source, needs_review, is_active)
+values ('88888888-0000-0000-0000-000000000602', '22222222-0000-0000-0000-000000000001',
+        'Riverside Live Program', 'education', '1 Water St', 'manual', false, true);
+set role authenticated;
+select test.as_user(:'alice');
+select test.check_raises_like('a lead cannot rename a live program in place',
+  $$update public.services set name = 'Other Name' where id = '88888888-0000-0000-0000-000000000602'$$,
+  '%LIVE_LISTING_NEEDS_REVIEW%');
+select test.check_raises_like('...nor change its address',
+  $$update public.services set address = '2 Water St' where id = '88888888-0000-0000-0000-000000000602'$$,
+  '%LIVE_LISTING_NEEDS_REVIEW%');
+select test.check_raises_like('...nor its category',
+  $$update public.services set category = 'workforce' where id = '88888888-0000-0000-0000-000000000602'$$,
+  '%LIVE_LISTING_NEEDS_REVIEW%');
+do $$
+declare n integer;
+begin
+  update public.services set phone = '+12675550104', website = 'https://example.org/live',
+    description_plain = 'New words.'
+  where id = '88888888-0000-0000-0000-000000000602';
+  get diagnostics n = row_count;
+  if n <> 1 then
+    raise exception 'FAIL  a lead could not change a live program''s phone, website and description';
+  end if;
+  raise notice 'ok    a lead changes a live program''s phone, website and description at once';
+end;
+$$;
+select test.check('...and it stays live for members',
+  (select count(*) from public.services
+   where id = '88888888-0000-0000-0000-000000000602' and not needs_review and is_active), 1);
+
 select test.check_raises_like('a lead cannot move their listing to another org',
   $$update public.services set org_id = '22222222-0000-0000-0000-000000000002'
     where id = '88888888-0000-0000-0000-000000000601'$$, '%REVIEW_IS_NOT_YOURS%');

@@ -111,7 +111,7 @@ grant execute on function public.submit_program(text, text, text, text, text, te
   to authenticated;
 
 -- ---------------------------------------------------------------------------
--- 2. A program lead cannot approve their own listing.
+-- 2. A program lead cannot approve their own listing, or move a live one.
 --
 -- 0016 granted insert/update on `services` to `authenticated`, and
 -- `services_write_provider` is `for all` over the lead's own org, so a lead
@@ -145,6 +145,19 @@ begin
      or new.removed_at is distinct from old.removed_at then
     raise exception 'REVIEW_IS_NOT_YOURS';
   end if;
+
+  -- D-447: once a program is live, who and where it is are not edited in
+  -- place. A change to its name, address or category goes back through review,
+  -- and the live row keeps serving members meanwhile (a pending change is held
+  -- beside it by the review queue, a later step). Description, phone and
+  -- website are the lead's to change at once.
+  if not old.needs_review and old.is_active
+     and (new.name is distinct from old.name
+          or new.category is distinct from old.category
+          or new.subcategory is distinct from old.subcategory
+          or new.address is distinct from old.address) then
+    raise exception 'LIVE_LISTING_NEEDS_REVIEW';
+  end if;
   return new;
 end;
 $$;
@@ -154,3 +167,44 @@ revoke all on function public.guard_provider_listing_review() from public, anon,
 create or replace trigger services_provider_review_guard
   before insert or update on public.services
   for each row execute function public.guard_provider_listing_review();
+
+-- ---------------------------------------------------------------------------
+-- 3. Changing the words on a live program does not take it off the map.
+--
+-- 0020 raises `needs_review` whenever a listing's plain-language text changes,
+-- so unreviewed *imported* prose can never reach a member. It cannot tell an
+-- importer from a program lead fixing their own description, so as written a
+-- lead who changed one sentence would hide their live program from members
+-- until Pam approved it again. D-447: description, phone and website apply at
+-- once. So a program lead editing a listing that is already live is let
+-- through; the import jobs, an admin, and anything not yet live behave exactly
+-- as before.
+create or replace function public.flag_unapproved_rewrite()
+returns trigger
+language plpgsql
+set search_path = public, extensions
+as $$
+begin
+  if tg_op = 'INSERT' then
+    if new.description_plain is not null
+       or new.eligibility_plain is not null
+       or new.how_to_enroll_plain is not null then
+      new.needs_review := true;
+    end if;
+  elsif new.description_plain is distinct from old.description_plain
+     or new.eligibility_plain is distinct from old.eligibility_plain
+     or new.how_to_enroll_plain is distinct from old.how_to_enroll_plain then
+    if not (
+      auth.uid() is not null
+      and not old.needs_review
+      and old.is_active
+      and public.my_role() = 'provider'
+      and not public.is_admin()
+      and old.org_id is not distinct from public.my_org()
+    ) then
+      new.needs_review := true;
+    end if;
+  end if;
+  return new;
+end;
+$$;
