@@ -1163,6 +1163,10 @@ Merged to `main` by the merge desk, 10 October, from `claude/places-programs-poi
 
 Merged to `main` by the merge desk, 10 October, from `claude/places-programs-call-points` (D-472). Migration `20261010122206`, expand only: `log_call` (10 points, once per place, five places a day, members only; a staff tap is ignored). **Applied live at merge**, read back (body identical to the file; signed-in only, not anon). The place page reports a tap on a phone link, fire and forget. Test `34_call_a_place_points_test.sql`. The Points screen's Call row now shows.
 
+## Places & programs · the day-before reminder gaps (10 October 2026) — READY, not merged
+
+Branch `claude/places-programs-reminder-gaps`. Migration `20261010130831`, expand only: evening visits are texted on the day before (outside quiet hours), texts turned on later queue the reminders for future trips, and the place name is no longer cut. Test `37_day_before_reminder_gaps_test.sql`. Not applied live.
+
 ## Places & programs · review record, pending change, program services — the database half (10 October 2026)
 
 Merged to `main` by the merge desk, 10 October, from `claude/places-programs-submissions-and-services`
