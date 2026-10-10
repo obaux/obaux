@@ -11,6 +11,7 @@ import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
 import { useRoleView } from '@/lib/useViewedRole';
 import { useThread } from '@/lib/useThread';
+import { useBlockState } from '@/lib/blocking';
 import { useMessageTranslations } from '@/lib/useMessageTranslations';
 import { ThreadViewLazy } from '../ThreadViewLazy';
 import { staffPhotoFor } from '@pam/config/dummy-connections';
@@ -86,6 +87,10 @@ function ThreadScreen() {
   const canMessage = demo ? viewedCanMessage : realCanMessage;
 
   const { state, send, sending, sendFailed, limited } = useThread(signedIn && realCanMessage && !demo ? conversationId : null);
+
+  // Somebody blocked in this conversation (0076, D-463): the composer says so.
+  const { state: blockState } = useBlockState(signedIn && realCanMessage && !demo ? conversationId : null);
+  const blocked = blockState?.iBlocked ? 'mine' : blockState?.blockedMe ? 'theirs' : null;
 
   const speechLanguage = speechLanguageFor(locale);
 
@@ -192,6 +197,7 @@ function ThreadScreen() {
           sending={sending}
           sendFailed={sendFailed}
           limited={limited || accountLimited}
+          blocked={blocked}
           speechLanguage={speechLanguage}
           supportPhone={supportPhone}
         />

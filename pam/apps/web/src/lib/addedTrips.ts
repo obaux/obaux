@@ -3,8 +3,15 @@
 /**
  * Trips a member added in this visit (D-225) — the example flow's output,
  * kept in the browser session so the new trip shows on the map and in the
- * drawer, as the real one would. Nothing books an appointment yet; the flow
- * is front end only, like every example set (D-172).
+ * drawer, as the real one would. For an example place that is all it is: the
+ * flow is front end only, like every example set (D-172).
+ *
+ * **A real place is saved (D-454).** A trip to a place in the catalogue is
+ * written to the database (`book_trip`) and read back with `my_trips()` by
+ * `SavedTripsSync` (`savedTrips.ts`), which hands it to `setSavedTrips`. From
+ * then on `readAddedTrips()` returns both — this tab's example trips and the
+ * member's saved ones — so every screen that lists trips, and listens for
+ * `TRIPS_CHANGED`, shows a saved trip with no change of its own.
  */
 export interface AddedTrip {
   readonly id: string;
@@ -25,7 +32,8 @@ export interface AddedTrip {
 
 const KEY = 'pam.trips.added';
 
-export function readAddedTrips(): AddedTrip[] {
+/** This tab's own trips: the example places', and a program's booking for a member (D-316). */
+function readLocalTrips(): AddedTrip[] {
   try {
     const raw = sessionStorage.getItem(KEY);
     return raw ? (JSON.parse(raw) as AddedTrip[]) : [];
@@ -34,9 +42,29 @@ export function readAddedTrips(): AddedTrip[] {
   }
 }
 
+/** The member's saved trips (D-454), set by `SavedTripsSync`; empty until they are read. */
+let saved: readonly AddedTrip[] = [];
+export type SavedTripsStatus = 'idle' | 'loading' | 'ready' | 'error';
+let savedStatus: SavedTripsStatus = 'idle';
+
+export function setSavedTrips(trips: readonly AddedTrip[], status: SavedTripsStatus = 'ready'): void {
+  saved = trips;
+  savedStatus = status;
+  window.dispatchEvent(new Event(TRIPS_CHANGED));
+}
+
+export function savedTripsStatus(): SavedTripsStatus {
+  return savedStatus;
+}
+
+/** Every trip added or saved: this tab's, then the member's own. */
+export function readAddedTrips(): AddedTrip[] {
+  return [...readLocalTrips(), ...saved];
+}
+
 export function addTrip(trip: AddedTrip): void {
   try {
-    sessionStorage.setItem(KEY, JSON.stringify([...readAddedTrips(), trip]));
+    sessionStorage.setItem(KEY, JSON.stringify([...readLocalTrips(), trip]));
   } catch {
     // Not kept is survivable in a demo.
   }
@@ -60,6 +88,7 @@ export function readMoves(): Record<string, string> {
   }
 }
 
+/** A trip of this tab, moved (an example place's). A saved trip is moved in the database (`moveSavedTrip`). */
 export function moveTrip(id: string, startsAt: string): void {
   try {
     sessionStorage.setItem(MOVED, JSON.stringify({ ...readMoves(), [id]: startsAt }));
