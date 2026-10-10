@@ -63,6 +63,9 @@ begin
   if me.id is null or public.my_role() is distinct from 'provider' then
     raise exception 'NOT_A_PROGRAM_LEAD';
   end if;
+  if not public.is_active_account() then
+    raise exception 'ACCOUNT_NOT_ACTIVE';
+  end if;
 
   select p.* into policy
   from public.program_policies p

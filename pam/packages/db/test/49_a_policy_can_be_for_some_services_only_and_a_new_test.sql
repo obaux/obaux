@@ -132,6 +132,14 @@ select test.check('at 30 a lead can still replace one with a new version',
   (select version from public.add_policy(:'prog2', 'Cap 1', jsonb_build_array(jsonb_build_object('path', :'prog2' || '/d.pdf', 'name', 'd.pdf', 'content_type', 'application/pdf', 'size_bytes', 100)),
     (select id from public.program_policies where title = 'Cap 1' and archived_at is null))), 2);
 
+-- A lead whose access is limited cannot change a policy's scope.
+reset role;
+update public.profiles set access_status = 'limited' where id = :'lead1';
+set role authenticated;
+select set_config('request.jwt.claim.sub', :'lead1', false);
+select test.check_raises_like('a limited lead cannot scope a policy',
+  format($f$select public.set_policy_services(%L, '{}')$f$, (select id from public.program_policies where title = 'Scope Everyone')), '%ACCOUNT_NOT_ACTIVE%');
+
 reset role;
 set role anon;
 select test.check_raises('nobody signed out reads it', $$select * from public.program_policy_services$$);
