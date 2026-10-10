@@ -33,7 +33,7 @@ Update the number in the second column when you claim it, and name the branch.
 
 | Ledger | Next free | Where it lives | Last claimed by |
 |---|---|---|---|
-| Decision | **D-434** | `DECISIONS.md` (`### D-nnn — …`) | `claude/gallant-clarke-0dhizj` (D-422–D-426, D-428); `claude/affectionate-goldberg-tvu4sz` (D-427); `claude/compassionate-bohr-mzrchf` (D-433 — the public site; D-429–D-432 are held by the two sessions above) |
+| Decision | **D-438** | `DECISIONS.md` (`### D-nnn — …`) | `claude/gallant-clarke-0dhizj` (D-422–D-426, D-428); `claude/affectionate-goldberg-tvu4sz` (D-427); `claude/compassionate-bohr-mzrchf` (D-433, D-437 — the public site; D-429–D-432 and D-434–D-436 are held by the two sessions above) |
 | SOP amendment | **A26** | `docs/sop-amendments.md` (`## Ann — …`) | `claude/gallant-clarke-0dhizj` (A24, A25) |
 | Migration | **0086** | `packages/db/migrations/nnnn_name.sql` | `claude/gallant-clarke-0dhizj` (0083, 0084 live; 0085 written, not applied — by hand, nothing waits on it) |
 | Changelog | **0.51.1** or **0.52.0** | `CHANGELOG.md` (`## [x.y.z] — …`) | `claude/gallant-clarke-0dhizj` (0.50.1, 0.51.0) |
