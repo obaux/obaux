@@ -12,7 +12,8 @@ import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useRoleView } from '@/lib/useViewedRole';
 import { useConversations } from '@/lib/useConversations';
 import { whenHappened } from '@/lib/when';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { contextFor, dummyPickerPeople, pickerContextFor } from '../app/messages/DummyRows';
 import { NewMessagePickerLazy } from '../app/messages/NewMessagePickerLazy';
 import { LimitedNotice } from '../app/messages/LimitedNotice';
@@ -20,6 +21,9 @@ import type { PickablePerson } from '../app/messages/NewMessagePicker';
 import { useMessageableMembers } from '@/lib/useMessageableMembers';
 import { openConversation } from '@/lib/openConversation';
 import { readAccountLimited } from '@/lib/accountLimited';
+import { useReports } from '@/lib/useReports';
+import { useDemoView } from '@/lib/useDemoView';
+import { ReportedSection } from '../app/messages/ReportedSection';
 import { HeaderActions } from './HeaderActions';
 import { FloatingAction } from '@pam/ui/FloatingAction';
 import { ConnectionsIcon } from '@pam/ui';
@@ -32,6 +36,16 @@ import { MessagesView, type MessageRow } from './MessagesView';
  * kept for demos.
  */
 export function MessagesScreen() {
+  // `?show=reported` is read from the address, which a static export only has
+  // after the first render, so the screen sits in its own boundary.
+  return (
+    <Suspense fallback={null}>
+      <MessagesScreenInner />
+    </Suspense>
+  );
+}
+
+function MessagesScreenInner() {
   // A conversation opens ready, its composer and fades already loaded (D-400).
   usePreloadThreadView();
   const { t, locale } = useI18n();
@@ -43,11 +57,25 @@ export function MessagesScreen() {
   // ...or found out part-way through: starting a conversation was refused (`pick`).
   const [limitedNow, setLimitedNow] = useState(false);
   const limited = limitedNow || (session.status === 'signed-in' && session.session.accessStatus === 'limited');
-  const { viewedRole } = useRoleView(trueRole);
+  const { viewedRole, demoRole } = useRoleView(trueRole);
+  const isDemo = useDemoView(session);
+  const previewing = demoRole !== null || isDemo;
   // The super admin may message staff, to help them start (0072, D-262).
   const canMessage =
     trueRole === 'member' || trueRole === 'admin' || trueRole === 'provider' || trueRole === 'super_admin';
   const { state } = useConversations(session.status === 'signed-in' && canMessage);
+  // Reported (D-171, D-184, D-464): a case manager and a super admin see the
+  // messages somebody said were not safe. What is drawn follows the previewed
+  // role; what is fetched follows the true one (D-172).
+  const canReview = viewedRole === 'admin' || viewedRole === 'super_admin';
+  const realCanReview = trueRole === 'admin' || trueRole === 'super_admin';
+  const { state: reports } = useReports(session.status === 'signed-in' && realCanReview);
+  const [section, setSection] = useState<'conversations' | 'reported'>('conversations');
+  // The bell's "a message was reported" lands on `?show=reported` (D-185).
+  const params = useSearchParams();
+  useEffect(() => {
+    if (params.get('show') === 'reported') setSection('reported');
+  }, [params]);
   const role =
     viewedRole === 'admin' || viewedRole === 'provider' || viewedRole === 'super_admin' ? viewedRole : 'member';
 
@@ -150,6 +178,15 @@ export function MessagesScreen() {
         )}
         headerActions={<HeaderActions role={viewedRole} enabled={session.status === 'signed-in'} hasHelp={false} />}
         note={useExamples ? t('example.people.note') : null}
+        {...(canReview
+          ? {
+              reported: {
+                section,
+                onSection: setSection,
+                content: <ReportedSection state={reports} previewing={previewing} supportPhone={supportPhone} />,
+              },
+            }
+          : {})}
         {...(limited ? { limited: <LimitedNotice supportPhone={supportPhone} /> } : {})}
         {...(canMessage && !limited ? { onNewMessage: () => setPicking(true) } : {})}
         // A member's people, one tap away (Will, 3 October, D-246): the same

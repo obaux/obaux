@@ -928,6 +928,56 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
+## Languages & legal · English tags before each language name; the privacy wording (10 October) — merged 10 October
+
+From `claude/lena-english-language-tags` (1f59d62), merged to `main` by the merge desk, 10 October; no
+migration. At merge, `fit-known.json` took seven overlaps on `conversation-file-refused` (the thread
+under the header, which comes and goes; looked at in Russian and Arabic at 320px). Two jobs from Will via Mira (D-455, D-452).
+
+- **Every list of languages starts each name with an English tag** — EN, ES, PT-BR, ZH-CN, ZH-HK, RU, AR
+  (`LANGUAGE_TAGS` in `@pam/config`, constants, never bundle strings; a test fails if one is missing,
+  differs from its code, or turns up in a bundle). On the Language screen, the sign-in globe menu and
+  the current-language chip, the join screen's language chips, Profile's Language row (before the
+  current language) and Storybook's locale menu. Hidden from a screen reader; each name carries its own
+  `lang`, so it is spoken in its own voice. Left to right and isolated, at the start of the row (the
+  right in Arabic). Screenshots at 320px: `docs/languages/language-tags/`.
+- **Crossing into the design system, with Mira's OK:** `ChoiceChips` no longer turns a chip round with its
+  language (the Arabic chip on an English page read "العربية  AR"); `lang` stays on the button for the
+  spoken name, `dir` is on the words only. `@pam/ui` exports `./OptionTag` (`OptionTag`, `TaggedWords`),
+  which the sign-in menu now uses.
+- **The privacy page says what a guide can and cannot read**, as the transparency screen does: a guide
+  sees everything you send them directly, nothing you send to anyone else, and one message if someone
+  reports it. Seven languages; `legal.test.ts` pins the wording. The contract is unchanged. The six
+  translations are Claude's and are promises: they still need a native reader (`before-launch.md`).
+- **Verified:** unit tests (`@pam/config` 986, `@pam/ui` 117, `@pam/web` 61), typecheck and the copy ledger on the
+  merged tree; the browser suite on all three viewports, 903 passed (on the tree one merge before the last); the
+  full fit audit (480 stories × en, ru, ar, zh-CN, pseudo): 93 new in a language, 81 accepted, 12 not accepted, all in
+  two stories this job does not touch (Explore's pseudo-language clamps; the file-refused conversation's overlaps,
+  which come and go between runs). See the session log.
+- **Not done:** hearing the tags with a screen reader (before-launch). Next, one small branch: the last-day line
+  (case manager only), the blocking words back in their true form (D-463), and a mail-service paragraph awaiting
+  Will's approval.
+
+---
+
+## Places & programs · a live program's pending change (10 October) — merged 10 October
+
+D-447 and D-462, from `claude/places-programs-program-changes` (Piper, 24aad8b), merged to `main` by
+the merge desk, 10 October. No migration of its own; it reads `20261010083715`, live since the
+merge of the database half. Programs sent before that migration have no submission row: the tab
+reads them as before and does not offer Delete and start over (the backfill goes with part 6).
+
+- **Built:** a live program's new name or address is asked of Pam and waits beside the live one
+  ("Waiting for Pam", with Cancel); the description, phone and website still change at once;
+  Delete and start over withdraws a first send and lands on Add a program; the Program tab reads
+  the open submission.
+- **Not built:** the services list (`program_services`) on screens; a lead resending after Pam
+  asks for changes; the super admin's side (part 6); the kind of help is not editable there.
+- **Proven:** web 67 tests, Storybook build, a browser look at the three flows, language fit
+  (seven languages and the pseudo-language).
+
+---
+
 ## Places & programs · save a member's trips (10 October) — merged 10 October
 
 D-454, from `claude/places-programs-save-trips` (Piper). A trip a member
@@ -1093,6 +1143,12 @@ language's own name, so a person can see which language a row is before they can
   tree (471 stories × 7 languages: 26 new in a language, all 26 accepted, 0 not). Not run: the
   Playwright browser suite, which is what measures the tag's colour contrast.
 
+## Messages & notifications · Reported in the new Messages (10 October 2026)
+
+Merged to `main` by the merge desk, 10 October (no migration). The redesigned Messages screen has "Conversations | Reported" for case managers and
+super admins, with `?show=reported` working, so the old `/messages/` page can go. The old page is still the live
+route until Dot's shell merges; deleting it (and `DummyRowsLazy`) is a follow-up after both. D-464.
+
 ## Messages & notifications · Block (10 October 2026)
 
 Merged to `main` by the merge desk, 10 October (no migration: 0076 is live). A conversation's ⋯ menu has
@@ -1116,6 +1172,40 @@ fine and the fit audit was over-counting (D-448).
   (8 on `d4f325e`, 0 on this branch: the full run, 464 stories × 7 languages, found 26 new in a language and all 26 are in the known list). The raw count the script prints is a different measure.
 - Outside this lane, seen and left: some English file names in the attachment lists are cut at the
   timestamp column with no ellipsis ("Free resume worksl").
+
+## Seven languages, messages in your own language, and text that fits (9 October) — 0.50.1 and 0.51.0, merged 9 October (PR #29)
+
+## Website · public site and help centre (10 October) — `apps/site`, on `main`
+
+The public site, `joinpam.org` (Vercel project `pam-site`; the app is `app.joinpam.org`), is a static
+Next export on the app's theme (`pnpm --filter @pam/site dev|build|test`; no Supabase, no sign-in; D-433,
+D-437). **Home** and **Support**: a help-centre home with search, topics and "Start here". **Ten help
+posts** (D-458), most confusing first, each saying who it is for, with numbered steps in the screen's own
+words, tables, screenshots, and "Still stuck?" in the words of Pam's Help screen: who is my guide · texts
+from Pam · what your guide, a program and others can see · joining Pam · joining as staff · Pam words ·
+one phone, two sides · sending an invite · messages · points and badges, plus the earlier "Case manager
+assignments" (only what is live; the full table is held behind `live` flags, D-449). **Two hidden
+drafts** (`status: 'draft'`, not built into the site; Storybook only): "Keeping your program's listing up
+to date" (until listing editing ships) and "Staff requests" (no way to ask to be staff since D-369). The
+posts say only what is live, so they go stale as features ship: `docs/before-launch.md` lists which.
+There is no `joinpam.org/j/<code>` short link: it was removed (the app has no `/j/` page); it returns when a text or email uses it, with its author.
+New posts: the `pam-support-post` skill. Storybook: **Website/Journey** (every post, drafts with a banner)
+and **Share and icon**. Checks: CI builds the site and runs `scripts/a11y.mjs` (axe, light and dark, desktop,
+phone and 320px: 70 scans, 0 problems on 10 October); screenshots from `scripts/screenshots.mjs`. Not on the
+user-flow map: it is not a screen of the app. Session logs: `docs/sessions/2026-10-09-a-public-website.md`,
+`2026-10-10-0423-…`, `2026-10-10-0631-…`, `2026-10-10-0807-website-help-posts.md`.
+
+**About Pam, in seven languages (D-466, 10 October; on `main`, held until Will signs).** One post at
+`/<lang>/about-pam/` in English, Spanish, Brazilian Portuguese, Simplified and Traditional (Hong Kong)
+Chinese, Russian and Arabic: own `<html lang>` (Arabic `dir="rtl"`), a language list, `hreflang`,
+`x-default` English; not under a Support topic; one wordless illustration (header + 1200×630 share
+image, alt text in all seven; `social/about-art.mjs`); and a section on the home page. **Nothing is
+live until Will signs the English**: `apps/site/src/content/signed-off.json` is empty, so the pages
+and the home section are not built (a normal build has neither; CI also builds with
+`PAM_SITE_DRAFTS=1` and runs axe on all seven). The other six are drafts with no native reader (D-461).
+Storybook › Website › Journey: **About Pam** per language (Draft banner) and **Home with About Pam**.
+Reminder texts are plainly "coming". The home card "Pam reminds you before you go so nothing gets
+missed" still promises reminders that are not live: flagged, not changed.
 
 ## Seven languages, messages in your own language, and text that fits (9 October) — 0.50.1 and 0.51.0, merged 9 October (PR #29)
 

@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { editColumns, phoneForDatabase, programFromRow, submitArguments, type OwnProgramRow } from './ownProgram';
+import {
+  changeRequest,
+  editColumns,
+  phoneForDatabase,
+  programFromRow,
+  submitArguments,
+  type OwnProgramRow,
+  type SubmissionRow,
+} from './ownProgram';
 
 const ROW: OwnProgramRow = {
   id: 's1',
@@ -73,5 +81,69 @@ describe('editColumns (D-447)', () => {
 
   it('lets one still waiting for review change everything', () => {
     expect(editColumns(draft, false)).toMatchObject({ name: 'New name', category: 'education', address: '1 A St' });
+  });
+});
+
+const SUB = (over: Partial<SubmissionRow>): SubmissionRow => ({
+  id: 'sub1',
+  kind: 'new',
+  status: 'in_review',
+  details: {},
+  sent_at: '2026-10-11T09:00:00Z',
+  changes_note: null,
+  ...over,
+});
+
+describe('programFromRow with what is waiting for Pam (D-462)', () => {
+  it('takes the first check from the open `new` send: its id, and when it was sent', () => {
+    const p = programFromRow(ROW, [SUB({})]);
+    expect(p.submissionId).toBe('sub1');
+    expect(p.sentAt).toBe('2026-10-11T09:00:00Z');
+    expect(p.changesNote).toBeNull();
+    expect(p.pendingChange).toBeNull();
+  });
+
+  it('carries Pam\'s note only when it asked for changes', () => {
+    expect(programFromRow(ROW, [SUB({ status: 'changes_asked', changes_note: 'Add the street address.' })]).changesNote).toBe(
+      'Add the street address.',
+    );
+    expect(programFromRow(ROW, [SUB({ status: 'in_review', changes_note: 'ignored' })]).changesNote).toBeNull();
+  });
+
+  it('shows a live program\'s change as waiting, beside the live details', () => {
+    const live = { ...ROW, needs_review: false };
+    const p = programFromRow(live, [
+      SUB({ id: 'chg', kind: 'change', details: { name: 'New Name', address: '2 Main St', category: 'workforce' } }),
+    ]);
+    expect(p.isLive).toBe(true);
+    expect(p.details.name).toBe('Fresh Start Kitchen');
+    expect(p.submissionId).toBeNull();
+    expect(p.pendingChange).toEqual({ id: 'chg', name: 'New Name', address: '2 Main St', sentAt: '2026-10-11T09:00:00Z' });
+  });
+
+  it('is the same as before for a program that predates the record', () => {
+    const p = programFromRow(ROW);
+    expect(p.submissionId).toBeNull();
+    expect(p.sentAt).toBe('2026-10-10T04:00:00Z');
+  });
+});
+
+describe('changeRequest (D-447)', () => {
+  const live = programFromRow({ ...ROW, needs_review: false });
+  const same = { name: 'Fresh Start Kitchen', category: 'workforce', description: 'Cooking classes.', address: '12 Main St', phone: '+12675550101', website: '' };
+
+  it('asks nothing when the name and address are as they were', () => {
+    expect(changeRequest(live, same)).toBeNull();
+    expect(changeRequest(live, { ...same, description: 'New words', phone: '267 555 0199' })).toBeNull();
+  });
+
+  it('asks for a new name, or a new address, keeping the kind of help', () => {
+    expect(changeRequest(live, { ...same, name: ' Fresh Start Community Kitchen ' })).toEqual({
+      name: 'Fresh Start Community Kitchen',
+      category: 'workforce',
+      subcategory: null,
+      address: '12 Main St',
+    });
+    expect(changeRequest(live, { ...same, address: '' })?.address).toBeNull();
   });
 });

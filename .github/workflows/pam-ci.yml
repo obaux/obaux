@@ -67,6 +67,24 @@ jobs:
       - name: Build public site
         run: pnpm --filter @pam/site build
 
+      # The public site is not covered by the app's Playwright suite (the
+      # `a11y` job below), so it has its own: axe on every page of the built
+      # site, light and dark, desktop and phone, plus no sideways scroll and no
+      # overlapping header controls at 320px (apps/site/scripts/a11y.mjs).
+      - name: Install Chromium for the public-site accessibility check
+        run: pnpm --filter @pam/web exec playwright install --with-deps chromium
+
+      - name: Accessibility (public site)
+        run: node apps/site/scripts/a11y.mjs
+
+      # The seven About Pam pages are not built until Will signs them
+      # (apps/site/src/content/signed-off.json), so check them in a preview build,
+      # drafts included, as they will be the day they are signed.
+      - name: Accessibility (public site, About Pam in seven languages)
+        run: |
+          PAM_SITE_DRAFTS=1 pnpm --filter @pam/site build
+          node apps/site/scripts/a11y.mjs
+
       - name: Check first-load JS against the §12 budget
         run: node scripts/check-bundle-budget.mjs
 

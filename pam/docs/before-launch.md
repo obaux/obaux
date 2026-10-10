@@ -11,6 +11,25 @@ STATUS row too.
 
 ## Open
 
+- [ ] **Public help posts: re-check them when what they describe changes** (Wren, 10 October
+  2026, D-458). Each post says only what is live today, so these go stale as features ship:
+  "Texts from Pam" when visit reminders, message alerts or connect texts go live (it says they
+  are not sent yet; check the live `dispatch-sms`, not the repo). The day-before visit reminder is
+  **one line**: set `VISIT_REMINDERS_LIVE = true` in `apps/site/src/content/TextsFromPam.tsx` the day
+  it is merged and the live function queues it (Mira, 10 October); "Who is my guide?" when the
+  assign-and-limit work merges; "Points and badges" when more point rules or any badge are
+  awarded; "Messages" if blocking appears; "What others can see" if transparency.ts changes
+  (one row, "the last day you used Pam" for a program, repeats the app's promise ahead of the
+  database). The hidden draft "Staff requests" is published only if a way to ask to be staff
+  comes back (D-369).
+- [ ] **Public site: Will signs "About Pam" (D-466, 10 October 2026).** English first: read
+  `apps/site/src/content/about.ts`, then put `"en"` in `apps/site/src/content/signed-off.json`
+  (`{"about-pam": ["en"]}`) — that builds `/en/about-pam/` and shows the home section. The other
+  six are drafts with no native reader (D-461): add each code to the same file only once someone
+  who reads it has been over it. Also decide the home card "Pam reminds you before you go so
+  nothing gets missed" (it promises reminders that are not live; the About text says "coming").
+  When visit reminders go live, flip `VISIT_REMINDERS_LIVE` in `TextsFromPam.tsx` and rewrite
+  the "What is coming" paragraph in all seven.
 - [ ] **Public site: publish the draft post "Keeping your program's listing up to
   date" only when the feature ships** (from PAM · Places & programs, 10 October
   2026, rule D-447, branch `claude/places-programs-load-own-program`, not on
@@ -272,6 +291,21 @@ Russian, Arabic (D-422); messages read in the reader's language (D-423).
   (`:Pam`, `then.`) is correct by the bidi rules but nobody who reads Arabic has
   seen it — and whether an English value in the middle of a sentence reads better
   isolated or flowing with the sentence.
+
+- [ ] **A native reader for the privacy page's "Who can see it" (10 October, D-452).**
+  `privacy.s.who-can-see.p2` and `.p3` were rewritten to say what a guide sees and does
+  not (what you send them directly; nothing you send to anyone else; one reported
+  message), so the page stops contradicting the transparency screen. The six
+  translations are Claude's, and this is a promise: a native reader of Spanish,
+  Brazilian Portuguese, Simplified and Traditional Chinese, Russian and Arabic should
+  confirm it says exactly that and no more.
+
+- [ ] **Hear the language tags with a screen reader (10 October, D-455).** Every list
+  of languages now starts each name with an English tag (EN, ES, PT-BR, ZH-CN, ZH-HK,
+  RU, AR). The tag is hidden from a screen reader on purpose and each name carries
+  its own `lang`, so "Русский" should be spoken in a Russian voice and the tag not at
+  all. Nothing has been heard yet: try the Language screen and the sign-in menu with
+  VoiceOver and TalkBack, in English and in Arabic.
 
 - [ ] **Run an Arabic screen reader pass** (VoiceOver and TalkBack on a phone, and
   NVDA if it can be had): that the labels on icon buttons, cards, photos and the

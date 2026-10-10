@@ -1,8 +1,8 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { BODIES } from '../../../content/bodies';
-import { POSTS, postBySlug } from '../../../content/posts';
-import { PostScreen } from '../../../screens/PostScreen';
+import { BODIES } from '../../../../content/bodies';
+import { POSTS, postBySlug } from '../../../../content/posts';
+import { PostScreen } from '../../../../screens/PostScreen';
 
 export function generateStaticParams() {
   return POSTS.map((p) => ({ slug: p.slug }));

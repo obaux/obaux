@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import { SiteShell } from '../../../../site/src/components/SiteShell';
 import { anyPostBySlug } from '../../../../site/src/content/posts';
+import { ABOUT, ABOUT_LANGS, type AboutLang } from '../../../../site/src/content/about';
+import { AboutScreen } from '../../../../site/src/screens/AboutScreen';
 import { HomeScreen } from '../../../../site/src/screens/HomeScreen';
 import { PostScreen } from '../../../../site/src/screens/PostScreen';
 import { SupportScreen } from '../../../../site/src/screens/SupportScreen';
@@ -19,15 +21,17 @@ import { SupportScreen } from '../../../../site/src/screens/SupportScreen';
  * app) is named in the console and goes nowhere: the app is a different product
  * with its own journeys.
  */
-function resolve(path: string): { readonly nav: string; readonly page: 'home' | 'support' | 'post'; readonly slug?: string } {
+function resolve(path: string): { readonly nav: string; readonly page: 'home' | 'support' | 'post' | 'about'; readonly slug?: string } {
   const clean = path.replace(/[?#].*$/, '');
   if (clean === '/' || clean === '') return { nav: '/', page: 'home' };
+  const about = /^\/([A-Za-z-]+)\/about-pam\/?$/.exec(clean);
+  if (about?.[1] && about[1] in ABOUT) return { nav: clean, page: 'about', slug: about[1] };
   const post = /^\/support\/([^/]+)\/?$/.exec(clean);
   if (post?.[1] && anyPostBySlug(post[1])) return { nav: clean, page: 'post', slug: post[1] };
   return { nav: '/support/', page: 'support' };
 }
 
-export function WebsiteWalker({ start = '/' }: { readonly start?: string }) {
+export function WebsiteWalker({ start = '/', showAbout = false }: { readonly start?: string; readonly showAbout?: boolean }) {
   const [path, setPath] = useState(start);
   // A control changed, or a story was picked: begin again from there.
   useEffect(() => setPath(start), [start]);
@@ -56,9 +60,12 @@ export function WebsiteWalker({ start = '/' }: { readonly start?: string }) {
   const here = resolve(path);
   return (
     <SiteShell path={here.nav}>
-      {here.page === 'home' ? <HomeScreen /> : null}
+      {here.page === 'home' ? <HomeScreen showAbout={showAbout} /> : null}
       {here.page === 'support' ? <SupportScreen key={path} /> : null}
       {here.page === 'post' && here.slug ? <PostScreen slug={here.slug} allowDraft /> : null}
+      {here.page === 'about' && here.slug ? (
+        <AboutScreen key={path} lang={here.slug as AboutLang} languages={ABOUT_LANGS} draft />
+      ) : null}
     </SiteShell>
   );
 }

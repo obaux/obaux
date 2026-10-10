@@ -1,8 +1,7 @@
 import { Heading } from '@astryxdesign/core/Heading';
-import { HStack } from '@astryxdesign/core/HStack';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
-import { TextLink } from '@pam/ui/TextLink';
+import { ReadMore } from '../components/Prose';
 import { PRIVACY_URL } from '../lib/links';
 
 /**
@@ -44,9 +43,7 @@ export function CaseManagerAssignments() {
           always tells you when something is turned off and who to call, and you can always call Pam for
           help.
         </Text>
-        <HStack>
-          <TextLink label="Read the privacy policy" href={PRIVACY_URL} />
-        </HStack>
+        <ReadMore label="Read the privacy policy" href={PRIVACY_URL} />
       </VStack>
     </VStack>
   );

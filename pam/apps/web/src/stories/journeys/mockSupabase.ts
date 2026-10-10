@@ -72,6 +72,8 @@ export interface MockOptions {
    * from Add a program puts one on file, waiting, as the real database does.
    */
   readonly ownProgram?: 'review' | 'live';
+  /** With `ownProgram: 'live'`: a change to its name or address already waiting for Pam (D-462). */
+  readonly pendingChange?: boolean;
   /**
    * A member who already has a trip saved (D-454). Without it they have none —
    * and a trip planned to a real place in the story is saved from then on, as
@@ -141,6 +143,24 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
   const role = profile?.role ?? null;
   // A program sent from Add a program in this story is on file from then on.
   let ownProgram: 'review' | 'live' | undefined = options.ownProgram;
+  // What is waiting for Pam on it (D-462): a first send, or a live program's change.
+  let submissions: Array<Record<string, unknown>> = [];
+  if (ownProgram === 'review') {
+    submissions = [
+      { id: 'sub-new', kind: 'new', status: 'in_review', details: {}, sent_at: ownProgramRow('review').created_at, changes_note: null },
+    ];
+  } else if (ownProgram === 'live' && options.pendingChange) {
+    submissions = [
+      {
+        id: 'sub-change',
+        kind: 'change',
+        status: 'in_review',
+        details: { name: 'Fresh Start Community Kitchen', address: '2 Market St, Philadelphia, PA 19107' },
+        sent_at: new Date().toISOString(),
+        changes_note: null,
+      },
+    ];
+  }
   // The member's saved trips (D-454): planning one adds it, moving one changes it, and reading answers with them.
   const savedTrips: SavedTripRow[] = options.savedTrip
     ? [savedTripRow(1, new Date(Date.now() + 4 * 86_400_000).toISOString(), 'Bring my ID')]
@@ -201,8 +221,36 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
     // answers the one row, by the organisation the profile names.
     on('/rpc/submit_program', () => {
       ownProgram = ownProgram ?? 'review';
+      submissions = [
+        { id: 'sub-new', kind: 'new', status: 'in_review', details: {}, sent_at: new Date().toISOString(), changes_note: null },
+      ];
       return { body: ownProgramRow(ownProgram) };
     }),
+    on('/rpc/request_program_change', (_url, _method, body) => {
+      const args = (body ?? {}) as { p_name?: string; p_address?: string | null };
+      const change = {
+        id: 'sub-change',
+        kind: 'change',
+        status: 'in_review',
+        details: { name: args.p_name ?? null, address: args.p_address ?? null },
+        sent_at: new Date().toISOString(),
+        changes_note: null,
+      };
+      submissions = [change];
+      return { body: change };
+    }),
+    on('/rpc/withdraw_program_submission', (_url, _method, body) => {
+      const id = ((body ?? {}) as { p_id?: string }).p_id;
+      const gone = submissions.find((sub) => sub['id'] === id);
+      submissions = submissions.filter((sub) => sub['id'] !== id);
+      // Starting over takes a first listing off the list; a change leaves the live one.
+      if (gone?.['kind'] === 'new') ownProgram = undefined;
+      return { body: gone ?? null };
+    }),
+    on('/rest/v1/program_submissions', () => ({ body: submissions })),
+    // A lead's edit of their own listing (D-447): accepted, answered with nothing.
+    (url, method) =>
+      url.includes('/rest/v1/services') && url.includes('id=eq.') && method === 'PATCH' ? { body: [] } : null,
     (url, method) =>
       url.includes('/rest/v1/services') && url.includes('org_id=eq.') && method === 'GET'
         ? { body: ownProgram ? [ownProgramRow(ownProgram)] : [] }

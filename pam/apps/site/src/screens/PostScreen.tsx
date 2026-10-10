@@ -4,6 +4,7 @@ import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { Frame } from '../components/Frame';
+import { StillStuck } from '../components/StillStuck';
 import { BODIES } from '../content/bodies';
 import { anyPostBySlug, formatDate, postBySlug } from '../content/posts';
 
@@ -27,9 +28,12 @@ export function PostScreen({ slug, allowDraft = false }: { readonly slug: string
           <BreadcrumbItem>{post.title}</BreadcrumbItem>
         </Breadcrumbs>
         <Heading level={1}>{post.title}</Heading>
-        <Text type="supporting">Updated {formatDate(post.updated)}</Text>
+        <Text type="supporting">
+          For {post.audience} · Updated {formatDate(post.updated)}
+        </Text>
       </VStack>
       <Body />
+      <StillStuck />
     </Frame>
   );
 }
