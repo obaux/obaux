@@ -28,11 +28,22 @@ what white with no outline is; it is the same "missed" risk D-411 was written to
 on Will's word. Over a place's photo the white disc still shows. If the icons are missed again, the
 options are a fill that is not the page's (but he said white) or putting the outline back.
 
-## Open question for Will
+## The test that encoded the old look
 
-The ⋯ on a conversation's header and on What you sent still has the outline and shadow, because
-D-411 asked for it there and today's screenshot was the place page. If he wants every ⋯ the same,
-it is one line in each place (`roundAction.button` to `roundAction.plain`).
+`e2e/place.spec.ts` ("the week drawer opens with nothing chosen, and the bar's ⋯ is white with no outline
+or shadow") asserted D-411's 1px border and shadow on the place bar's ⋯, and failed in CI on the first
+push (three projects). I had not run the browser suite for this change, calling it "nothing structural";
+a spec was checking the style itself, which is what a style change changes. It now asserts D-457: a 0px
+border, no shadow, the page's own colour (read from the `--color-background-body` token, so it holds in
+dark mode), and a target of at least 48px. 30 of 30 place tests pass in the three projects. Lesson: grep
+`e2e/` for the thing being restyled before saying no test is affected.
+
+## Settled question
+
+**Answered by the merge desk, 10 October:** leave them. The ⋯ on a conversation's header and on What you
+sent keeps the outline and shadow, because D-411 asked for it there on Will's own words and his screenshot
+was the place page only. If he wants every ⋯ the same it is one line in each place
+(`roundAction.button` to `roundAction.plain`).
 
 ## A first attempt that was wrong
 
