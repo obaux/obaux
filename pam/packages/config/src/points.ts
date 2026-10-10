@@ -122,6 +122,18 @@ export const POINTS_RULES: Readonly<Record<PointsReason, PointsRule>> = {
   finish_setup: { reason: 'finish_setup', points: 25, verification: 'automatic', dailyCap: 1 },
 };
 
+/**
+ * What the database actually awards today (docs/points-awarding.md, "The
+ * rules"): save a place (0045) and finish setup (0047). The Points screen lists
+ * only these under "Ways to earn" so it promises nothing Pam does not pay. When
+ * a rule's trigger ships, add its reason here in the same change.
+ */
+export const AWARDED_TODAY: readonly PointsReason[] = ['save_place', 'finish_setup'];
+
+export function isAwardedToday(reason: PointsReason): boolean {
+  return AWARDED_TODAY.includes(reason);
+}
+
 export const STREAK_POINTS_PER_WEEK = 50;
 export const STREAK_POINTS_CAP = 300;
 export const TASK_POINTS_MIN = 10;

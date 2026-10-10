@@ -1113,6 +1113,10 @@ read back: both functions service-role only) adds `record_sms_stop` / `record_sm
 on and Twilio is pointed at it, Pam still does not learn a STOP. Setup: `docs/sms-setup.md` § 3.
 YES/NO replies are not built. D-460.
 
+## Places & programs · the Points promise (10 October 2026) — READY, not merged
+
+Branch `claude/places-programs-points-promise`. "Ways to earn" lists only what Pam pays today (save a place +5, finish setup +25), driven by `AWARDED_TODAY`. The proposal for making plan-a-trip and call-a-place real is in `docs/points-awarding.md`, waiting on Will. No migration.
+
 ## Places & programs · review record, pending change, program services — the database half (10 October 2026)
 
 Merged to `main` by the merge desk, 10 October, from `claude/places-programs-submissions-and-services`
