@@ -317,6 +317,9 @@ export const flows = [
         story: 'member-created-states-saved-trips--trips-with-a-past-visit',
         path: '/trips/',
         changed: 'New',
+        // The list is in a drawer that opens halfway; the past visit is below, so drag the handle up (a generator
+        // `drag` action, which any screen with a drawer or sheet can use).
+        actions: [{ drag: 'Show more of your trips', dy: -450 }, { wait: 700 }],
         note: 'A visit whose day has gone moves down to Past visits, most recent first, with no policies to sign; coming up stays on the map',
       },
     },
@@ -383,18 +386,24 @@ export const flows = [
   {
     key: 'case-manager',
     title: 'Case manager',
-    note: 'The tab bar is live in the app (D-456). Home is the old Home; the redesigned one with rings is beside it as Proposed, not in the app (card a22).',
+    note: 'The tab bar and the redesigned Home are live in the app (D-456, D-486): Home has the row of rings, and an empty row with a (+) when nobody is on the list.',
     intro:
       'Four tabs: Home (their members), Saved, Messages, Profile. A case manager invites people, keeps up with their members and connects them to programs.',
     roots: ['home', 'saved', 'messages', 'profile'],
     nodes: {
-      home: { title: 'Home — your members', story: 'case-manager-screens--home', path: '/' },
-      homeRings: {
-        title: 'Home with rings',
-        story: 'case-manager-states-home--caseload',
-        path: '/ (redesigned, in Storybook only)',
-        proposed: true,
-        note: 'Under the title, a row of rings on the people with something new, those first (D-198, D-477). Staff use the old Home until Will says the rings stay (card a22)',
+      home: {
+        title: 'Home — your members',
+        story: 'case-manager-screens--home',
+        path: '/',
+        changed: 'D-486',
+        note: 'Under the title, a row of rings on the people with something new, those first (D-198, D-477); a tap opens the conversation or the person',
+      },
+      homeEmpty: {
+        title: 'Home — nobody yet',
+        story: 'case-manager-states-home--empty',
+        path: '/ (nobody on the list)',
+        changed: 'D-486',
+        note: 'Faint circles where people will be; the first is a (+), "Invite someone", and starts a member invite. Shown to an account that just signed up',
       },
       member: { title: 'A member', story: 'case-manager-screens--member', path: '/person/' },
       past: { title: 'Past trips', story: 'case-manager-screens--member-past-trips', path: '/person/past/' },
@@ -460,7 +469,8 @@ export const flows = [
       ['member', 'memberSaved', 'Saved programs'],
       ['member', 'connect', 'Connect'],
       ['home', 'invite', 'Invite someone (floating)'],
-      ['home', 'homeRings', 'If the rings stay (a22)', { dashed: true }],
+      ['home', 'homeEmpty', 'Nobody on the list yet', { dashed: true }],
+      ['homeEmpty', 'inviteReady', 'Tap the (+)'],
       ['invite', 'inviteWho', 'Invite a program / case manager'],
       ['invite', 'inviteReady', 'Invite a member'],
       ['messages', 'thread', 'Open'],
@@ -469,12 +479,12 @@ export const flows = [
       ['profile', 'alerts', 'Text alerts'],
       ['profile', 'reported', 'Reported places'],
     ],
-    changes: ['D-189 — Reported places is a screen of its own, from Profile and the bell\'s "a place was reported" row, no longer only a chip on the old Places page', 'D-464 — Messages: a case manager and a super admin see Conversations | Reported (reported messages), and the bell\'s reported-message row opens Reported', 'D-463 — a conversation: ⋯ has Block this person (asks first; Unblock once blocked); after a block the composer says who blocked, and everything said stays readable and reportable', 'D-441 — inviting a program or a case manager asks for their email, required: it lands on their account when they sign in with that number; a member is never asked', "D-411 — a conversation: back and ⋯ where every nested screen has them, the name large, no fade; ⋯ outlined; Messages rows start at the page edge; dialogs open with no button chosen", 'D-400–401 — a conversation: a smaller visit card and a blurred fade under the header; one line under the name; an even frame round photos; the send button tucked into a rounder corner; photos open on near-black', 'D-399 — a conversation: send a PDF or Word file (the document button, or drop it on), opened when tapped; a Google Docs link shows as a card that opens it in Google', 'D-395 — a conversation: under the name, who they are in full (Program lead at Example Food Pantry; Case manager), not a cut-off tag', 'D-394 — a conversation: send a photo (the picture button beside the mic), tap one to see it full size; only the two people see it, and whoever checks a report about it', 'D-390 — a conversation: mine light green, theirs grey, no name or time on a bubble; drag sideways to see the times; closer to the edges; bolder mic and send', "D-389 — a conversation: one divider per day (Today, Yesterday, a weekday, a date), each bubble just its time; the composer one rounded box, mic left, round send grey until there is text, then dark green", 'D-347 — Add a program asks one question a screen, then a review', 'D-315 — a case manager can invite a case manager', 'D-263 — Invite someone makes the link straight away', 'D-260 — text alert switches'],
+    changes: ['D-486 — Home is the redesigned one with the rings of people with something new; with nobody on the list, faint circles and a (+) that starts an invite (Will, card a22)', 'D-189 — Reported places is a screen of its own, from Profile and the bell\'s "a place was reported" row, no longer only a chip on the old Places page', 'D-464 — Messages: a case manager and a super admin see Conversations | Reported (reported messages), and the bell\'s reported-message row opens Reported', 'D-463 — a conversation: ⋯ has Block this person (asks first; Unblock once blocked); after a block the composer says who blocked, and everything said stays readable and reportable', 'D-441 — inviting a program or a case manager asks for their email, required: it lands on their account when they sign in with that number; a member is never asked', "D-411 — a conversation: back and ⋯ where every nested screen has them, the name large, no fade; ⋯ outlined; Messages rows start at the page edge; dialogs open with no button chosen", 'D-400–401 — a conversation: a smaller visit card and a blurred fade under the header; one line under the name; an even frame round photos; the send button tucked into a rounder corner; photos open on near-black', 'D-399 — a conversation: send a PDF or Word file (the document button, or drop it on), opened when tapped; a Google Docs link shows as a card that opens it in Google', 'D-395 — a conversation: under the name, who they are in full (Program lead at Example Food Pantry; Case manager), not a cut-off tag', 'D-394 — a conversation: send a photo (the picture button beside the mic), tap one to see it full size; only the two people see it, and whoever checks a report about it', 'D-390 — a conversation: mine light green, theirs grey, no name or time on a bubble; drag sideways to see the times; closer to the edges; bolder mic and send', "D-389 — a conversation: one divider per day (Today, Yesterday, a weekday, a date), each bubble just its time; the composer one rounded box, mic left, round send grey until there is text, then dark green", 'D-347 — Add a program asks one question a screen, then a review', 'D-315 — a case manager can invite a case manager', 'D-263 — Invite someone makes the link straight away', 'D-260 — text alert switches'],
   },
   {
     key: 'program-lead',
     title: 'Program lead',
-    note: 'The tab bar is live in the app (D-456). Home is the old Home; the redesigned one with rings is beside it as Proposed, not in the app (card a22).',
+    note: 'The tab bar and the redesigned Home are live in the app (D-456, D-486): Home has the row of rings, and an empty row with a (+) when nobody is on the list.',
     intro:
       'Four tabs: Home (who is coming in), Program, Messages, Profile. A program lead looks after their listing, the policies participants sign, and the people booked in. A new lead\'s Home is getting started until somebody books.',
     roots: ['getStarted', 'home', 'program', 'messages', 'profile'],
@@ -535,19 +545,19 @@ export const flows = [
         changed: 'D-385',
         note: 'Read-only: the date sent and every answer. ⋯ menu: Delete and start over (asks first), Help',
       },
-      homeRings: {
-        title: 'Home with rings',
-        story: 'program-lead-states-home-with-people--with-rings',
-        path: '/ (redesigned, in Storybook only)',
-        proposed: true,
-        note: 'Between the header and the calendar, a row of rings on the people with something new, those first (D-198, D-477). Staff use the old Home until Will says the rings stay (card a22)',
+      homeEmpty: {
+        title: 'Home — nobody yet',
+        story: 'program-lead-states-home-with-people--empty',
+        path: '/ (nobody on the list)',
+        changed: 'D-486',
+        note: 'Faint circles above the calendar; the first is a (+), "Invite someone", which opens the invite choice (a member, or a colleague\'s program)',
       },
       home: {
         title: 'Home — coming in',
         story: 'program-lead-screens--home',
         path: '/',
-        changed: 'D-352',
-        note: 'Day / Week / Month tabs; Search in the + past ten visits; month days scroll sideways in two rows, with dots',
+        changed: 'D-486',
+        note: 'Rings on the people with something new above the calendar (D-198, D-477). Day / Week / Month tabs; Search in the + past ten visits; month days scroll sideways in two rows, with dots',
       },
       book: {
         title: 'Book a visit for a member',
@@ -635,7 +645,8 @@ export const flows = [
       ['home', 'book', '+ Book a visit for a member'],
       ['book', 'addPerson', 'Add a person'],
       ['home', 'invite', '+ Invite someone'],
-      ['home', 'homeRings', 'If the rings stay (a22)', { dashed: true }],
+      ['home', 'homeEmpty', 'Nobody on the list yet', { dashed: true }],
+      ['homeEmpty', 'invite', 'Tap the (+)'],
       ['program', 'service', 'A service · Add a service'],
       ['program', 'policies', 'Policies for participants'],
       ['program', 'switchPrograms', 'Your programs'],
@@ -644,6 +655,7 @@ export const flows = [
       ['profile', 'alerts', 'Text alerts'],
     ],
     changes: [
+      'D-486 — Home has the rings of people with something new above the calendar; with nobody on the list, faint circles and a (+) that opens the invite choice (Will, card a22)',
       'New — Edit and send again: a lead answers Pam\'s request for changes and sends the program back for review (D-386 part 5b); the super admin\'s side is Programs to check',
       'D-386 — Sent to Pam: Text me when it\'s live first, gone once texts are on',
       'D-385 — What you sent: ⋯ Delete and start over (asks first) → Add a program; Back on the pre-approval tab is always Home',

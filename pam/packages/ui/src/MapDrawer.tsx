@@ -146,6 +146,8 @@ export function MapDrawer({
   const [stop, setStop] = useState<DrawerStop>(initialStop);
   const [dragHeight, setDragHeight] = useState<number | null>(null);
   const drag = useRef<{ y: number; h: number; moved: boolean } | null>(null);
+  /** A drag ends in a click with a mouse; set while one is going so that click is not read as a tap (D-494). */
+  const dragged = useRef(false);
 
   const nearest = useCallback(
     (h: number): DrawerStop =>
@@ -171,12 +173,16 @@ export function MapDrawer({
         xstyle={styles.handleButton}
         onPointerDown={(e: React.PointerEvent) => {
           (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+          dragged.current = false;
           drag.current = { y: e.clientY, h: heights[stop], moved: false };
         }}
         onPointerMove={(e: React.PointerEvent) => {
           if (!drag.current) return;
           const dy = e.clientY - drag.current.y;
-          if (Math.abs(dy) > 4) drag.current.moved = true;
+          if (Math.abs(dy) > 4) {
+            drag.current.moved = true;
+            dragged.current = true;
+          }
           if (drag.current.moved) {
             setDragHeight(Math.min(Math.max(drag.current.h - dy, DOCK), heights.full));
           }
@@ -188,8 +194,14 @@ export function MapDrawer({
           setDragHeight(null);
         }}
         onClick={() => {
-          // A drag ends in a click too; only a tap should step.
-          if (dragHeight === null) step();
+          // A drag ends in a click too (with a mouse); only a tap should step. `dragHeight` cannot say: the
+          // pointer-up has already cleared it by the time the click arrives, so a drag up to full
+          // stepped on to the dock again.
+          if (dragged.current) {
+            dragged.current = false;
+            return;
+          }
+          step();
         }}
       />
       <VStack xstyle={styles.header}>{header}</VStack>

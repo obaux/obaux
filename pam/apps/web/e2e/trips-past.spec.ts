@@ -73,6 +73,29 @@ test.describe('past visits and cancelling', () => {
     expect(results.violations).toEqual([]);
   });
 
+  test("dragging the drawer's handle up opens it, and a mouse's click after the drag does not step it on again (D-494)", async ({
+    page,
+  }) => {
+    await signedIn(page, [row(NEXT, daysFromNow(6)), row(LAST, daysFromNow(-3))]);
+    await page.goto('/trips/');
+    await settled(page);
+
+    // Half open: the handle offers more. Dragged to the top, it is open, and offers the map.
+    const handle = page.getByRole('button', { name: 'Show more of your trips' });
+    const box = (await handle.boundingBox())!;
+    const x = box.x + box.width / 2;
+    const y = box.y + box.height / 2;
+    await page.mouse.move(x, y);
+    await page.mouse.down();
+    await page.mouse.move(x, y - 450, { steps: 12 });
+    await page.mouse.up();
+
+    await expect(page.getByRole('button', { name: 'Show the map' })).toBeVisible();
+    // Still open a moment later: nothing stepped it on.
+    await page.waitForTimeout(500);
+    await expect(page.getByRole('button', { name: 'Show the map' })).toBeVisible();
+  });
+
   test('cancelling a saved visit asks the database, then leaves Trips without it', async ({ page }) => {
     let rows = [row(NEXT, daysFromNow(6))];
     await signedIn(page, rows);
