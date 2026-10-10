@@ -1,0 +1,30 @@
+<!doctype html>
+<!--
+  The site's social preview (1200×630), source. Rendered to public/og/social.png by
+  social/render.mjs. Pam's deep green (#0F5847, the wordmark's) and bright green
+  (#DCE068, the dark-mode accent), Figtree, the white wordmark, and the app's own
+  sign-in illustration. Edit here, re-render, commit both.
+-->
+<html lang="en">
+<meta charset="utf-8" />
+<title>Pam — City services in your pocket</title>
+<style>
+  @font-face { font-family: 'Figtree'; font-weight: 300 900; src: url('figtree-latin.woff2') format('woff2'); }
+  * { box-sizing: border-box; margin: 0; }
+  html, body { width: 1200px; height: 630px; }
+  body { display: flex; font-family: 'Figtree', system-ui, sans-serif; background: #0F5847; overflow: hidden; }
+  .copy { flex: 0 0 690px; padding: 72px 64px 72px 72px; display: flex; flex-direction: column; justify-content: space-between; }
+  .logo { width: 300px; height: auto; display: block; }
+  h1 { font-size: 80px; line-height: 1.04; font-weight: 800; letter-spacing: -0.02em; color: #DCE068; }
+  .url { font-size: 28px; font-weight: 600; color: #ffffff; opacity: 0.85; }
+  .pic { flex: 1; background: url('hero-city.webp') center / cover; }
+</style>
+<body>
+  <section class="copy">
+    <img class="logo" src="pam-wordmark-white.svg" alt="Pam" />
+    <h1>City services in your pocket</h1>
+    <p class="url">Pam helps you find people and places that can help.</p>
+  </section>
+  <section class="pic"></section>
+</body>
+</html>

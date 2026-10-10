@@ -11454,4 +11454,17 @@ create new posts on my behalf."
   it is true of the app, write it plainly, three edits (`posts.ts`, a body
   component, `bodies.tsx`), look at it in the Website journey, record, push.
   The content test now also scans the words written into every component.
+- **Social preview and favicon (Will, 10 October).** Tagline: "City services in
+  your pocket". `apps/site/public/og/social.png` (1200×630) is drawn from
+  `apps/site/social/preview.html` — the white wordmark, deep green `#0F5847`, the
+  bright green `#DCE068` for the tagline, Figtree, and the app's sign-in city
+  illustration — and rendered by `social/render.mjs` (edit the HTML, re-render,
+  commit both). The favicon is the wordmark's **"p" alone** in white on the deep
+  green (`src/app/icon.svg`, `apple-icon.png`, `favicon.ico`): three letters are
+  an unreadable smudge at 16px. The page title became "Pam — City services in your
+  pocket" on the front page; other pages stay "<Page> — Pam". Open Graph and
+  Twitter tags use an absolute address: `SITE_URL` in `lib/links.ts`, the
+  `pam-site` Vercel alias until a real domain exists (`NEXT_PUBLIC_SITE_URL`).
+  The member app has no icons at all (its manifest points at `/icon-192.png` etc.,
+  which do not exist) — noted, not touched.
 

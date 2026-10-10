@@ -30,6 +30,12 @@ manager's and a super admin's powers over assigning, limiting and pausing).
   both the routes and Storybook render. Vercel project `pam-site` created, Vercel
   Auth switched off, branch previews building. The `pam-support-post` skill.
 
+- **10 October: social preview and favicon** (D-437, last bullet): `og/social.png`
+  with the wordmark and "City services in your pocket"; a "p" favicon; Open Graph
+  and Twitter tags. Checked in the built HTML head and by looking at the images;
+  **not** checked in a real unfurl (Slack, iMessage), which needs the deployed
+  address.
+
 ## What was wrong, and what missed it
 
 - **First build failed** importing `TextLink` from the `@pam/ui` barrel in a

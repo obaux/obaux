@@ -51,7 +51,7 @@ reads a support page is ever near the app's sign-in code.
    project? **Add New → Project**, pick `obaux/obaux`, set the same.
    **Turn Vercel Authentication off** (Settings → Deployment Protection): it is
    on by default and puts a Vercel login in front of a public site.
-2. No environment variables. It never talks to Supabase. Its "Sign in",
+2. No required environment variables. It never talks to Supabase. When the site has its own domain, set `NEXT_PUBLIC_SITE_URL` (the social preview's absolute address, `apps/site/src/lib/links.ts`). Its "Sign in",
    "Privacy" and "Terms" links point at the app (`apps/site/src/lib/links.ts`,
    `NEXT_PUBLIC_APP_URL`, the same default as `apps/web/src/lib/project.ts` —
    change both when the app's address changes).
