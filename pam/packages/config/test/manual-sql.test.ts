@@ -42,3 +42,35 @@ describe('the SQL editor file for migration 0085', () => {
     expect(read('apps/web/src/lib/rpcLanguage.ts')).toContain("'PGRST202'");
   });
 });
+
+/**
+ * The file Will pastes for 20261010074241 (D-454): appointments written only
+ * through the trip functions. It replaces two policies, so it drops them first,
+ * and the connector hangs on a `drop` (D-387).
+ */
+const TRIPS_FILE = read('packages/db/manual/2026-10-10-appointments-written-only-through-the-trip-functions.sql');
+const TRIPS_MIGRATION = read(
+  'packages/db/migrations/20261010074241_appointments_are_written_only_through_the_trip_functions.sql',
+).trimEnd();
+
+describe('the SQL editor file for 20261010074241', () => {
+  it('contains the migration, whole', () => {
+    expect(TRIPS_FILE.includes(TRIPS_MIGRATION), '20261010074241 changed after the file was built — rebuild it and re-prove it').toBe(true);
+  });
+
+  it('is one transaction, and refuses a database without the trip functions', () => {
+    expect(TRIPS_FILE.match(/^begin;$/gm)).toHaveLength(1);
+    expect(TRIPS_FILE.match(/^commit;$/gm)).toHaveLength(1);
+    expect(TRIPS_FILE).toContain("to_regprocedure('public.book_trip(uuid,timestamptz,text,text)')");
+    expect(TRIPS_FILE.indexOf('STOP:')).toBeLessThan(TRIPS_FILE.indexOf(TRIPS_MIGRATION));
+  });
+
+  it('checks its own work before it commits, and records itself once', () => {
+    const checks = TRIPS_FILE.slice(TRIPS_FILE.indexOf(TRIPS_MIGRATION) + TRIPS_MIGRATION.length);
+    expect(checks).toContain('an old write policy is still there');
+    expect(checks).toContain('a read policy is missing');
+    expect(checks).toContain('the app can still write appointments directly');
+    expect(checks).toContain('where not exists');
+    expect(checks).toContain("'appointments_are_written_only_through_the_trip_functions'");
+  });
+});

@@ -42,6 +42,14 @@ const VARS: Record<string, string> = {
   reason: 'closed, so there is no need to go',
 };
 
+/**
+ * The four alert texts nobody has signed (10 October 2026). They are in the
+ * bundle on purpose — the dispatcher refuses them, which is the point — and
+ * these tests hold them to exactly that. `sms.test.ts` keeps the list honest.
+ */
+const AWAITING_SIGNATURE = ['message_waiting', 'visit_booked', 'booking_changed', 'trip_planned'];
+const signedKeys = (templates: Record<string, unknown>) => Object.keys(templates).filter((k) => !AWAITING_SIGNATURE.includes(k));
+
 describe('the shipped bundle', () => {
   it('carries exactly the templates and reasons the reviewed source defines', () => {
     // The bundle is generated. If it drifts, the dispatcher is sending words
@@ -65,11 +73,17 @@ describe('the shipped bundle', () => {
     // generated from the reviewed source, so a name missing here means the
     // bundle is stale — and a stale bundle is how words nobody read reach a
     // phone.
-    for (const template of Object.values(REAL.templates)) {
+    for (const template of Object.values(REAL.templates).filter((t) => !AWAITING_SIGNATURE.includes(t.key))) {
       expect(template.reviewedBy, `${template.key} has no name against it`).not.toBe('');
     }
-    for (const key of Object.keys(REAL.templates)) {
+    for (const key of signedKeys(REAL.templates)) {
       expect(() => render(REAL, key, 'en', VARS)).not.toThrow();
+    }
+    // The unsigned ones are refused, in every language, and say why.
+    for (const key of AWAITING_SIGNATURE) {
+      for (const locale of SUPPORTED_LOCALES) {
+        expect(() => render(REAL, key, locale, VARS), `${key} ${locale}`).toThrow(/reviewedBy|signed off/);
+      }
     }
   });
 
@@ -135,7 +149,7 @@ describe('a language is used while it carries an approval, and English when it d
   // Will approved the later languages on 9 October 2026 to learn from (fail first,
   // then fix on feedback). Emptying a language's approval is how it is pulled: the
   // person is then texted in English, never in a draft.
-  const keys = Object.keys(REAL.templates);
+  const keys = signedKeys(REAL.templates);
   const later = SUPPORTED_LOCALES.filter((l) => l !== 'en' && l !== 'es');
 
   /** The shipped bundle with every later-language approval emptied. */
@@ -152,7 +166,7 @@ describe('a language is used while it carries an approval, and English when it d
   const varsFor = (key: string) => (key === 'saved_place_closed' ? { link: 'https://pam.to/a1b2c3d', reason_key: 'closed' } : VARS);
 
   it('carries Will’s approval on every draft in the shipped bundle', () => {
-    for (const template of Object.values(REAL.templates)) {
+    for (const template of Object.values(REAL.templates).filter((t) => !AWAITING_SIGNATURE.includes(t.key))) {
       for (const [locale, draft] of Object.entries(template.more ?? {})) {
         expect(draft.reviewedBy, `${template.key} ${locale}`).toContain('Will (Oba), 9 October 2026');
       }
@@ -224,6 +238,8 @@ describe('the dispatcher and the config package say the same words', () => {
         key,
         {
           ...t,
+          // Signed here only so the two renderers can be compared on every text, the unsigned ones included.
+          reviewedBy: 'a test reader',
           more: Object.fromEntries(Object.entries(t.more ?? {}).map(([l, d]) => [l, { ...d, reviewedBy: 'a native reader' }])),
         },
       ]),

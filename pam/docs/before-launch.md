@@ -45,6 +45,10 @@ STATUS row too.
   Until this is done, someone with an expired link is told "Check your email"
   and nothing arrives.
 
+  **10 October (D-450):** the sender for *staff invites* is built, off, and waits for
+  a signature (`docs/email-setup.md` is the plain-words list for Will; the function is
+  `send-invite-emails`). The expired-link email above still has no sender.
+
 - [x] **Merge and deploy 0068 and 0069** — done 8 October as 0075/0076 (D-388) (readiness fixes and blocking, on
   branch `claude/hopeful-thompson-07nj7n`, not yet on this one). 0068 is what
   lets an invite be redeemed at all (phone format) and closes several live
@@ -176,6 +180,14 @@ STATUS row too.
   new (two tables with forced RLS and one policy each; `invite_create`, `keep_invite_email` and
   the deletion trigger function are not executable by clients), then merged to main (`0220ae0`).
   The live copy of the migration is the same statements without the explanatory comments.
+
+- [ ] **Texts: sign the four alert texts, decide the STOP receiver, file the carrier once**
+  (Will, 10 October 2026, D-453). `message_waiting`, `visit_booked`, `booking_changed` and
+  `trip_planned` are drafted in seven languages and unsigned; nothing queues them yet. A stored
+  STOP cannot be cleared from the app once `20261010071947_…` is applied, but nothing stores a
+  STOP: an Edge Function Twilio calls (STOP/START/HELP and the YES/NO replies) is not built —
+  Will to say yes. `docs/sms-campaign-samples.md` has the nine texts and the description
+  (981 of 1,024 characters) for the one filing.
 
 - [ ] **Review the SMS copy** still waiting for a name in `reviewedBy`
   (STATUS row 2).
