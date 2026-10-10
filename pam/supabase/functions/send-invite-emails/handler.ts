@@ -13,13 +13,28 @@
 //   3. It is not a send button: a call needs the shared secret
 //      (DISPATCH_SECRET), and without one set up it will not run at all.
 //   4. The database decides who is worth emailing (`claim_staff_invite_emails`,
-//      0 migration 20261010063304: the invite still open, staff role, not sent, under five
+//      migration 20261010063304: the invite still open, staff role, not sent, under five
 //      tries). This decides only how it is worded and sent.
+//
+// Two kinds of email go out under the one switch and the one set of secrets (D-476):
+// the first invite to a case manager or program lead, and the fresh link for
+// someone whose link ran out and who asked for another by email
+// (`claim_invite_link_emails`, migration 20261010133313). Each kind has its own
+// signed wording, its own queue and its own idempotency key.
 //   5. It never logs an address, a link or a word of an email: ids and counts.
 
 import bundleJson from './bundle.json' with { type: 'json' };
 import type { Emailer } from './provider.ts';
-import { canSend, localeOf, renderStaffInvite, UnsendableError, type Bundle, type StaffRole } from './render.ts';
+import {
+  canSend,
+  canSendLink,
+  localeOf,
+  renderFreshLink,
+  renderStaffInvite,
+  UnsendableError,
+  type Bundle,
+  type InviteRole,
+} from './render.ts';
 
 export const BUNDLE = bundleJson as unknown as Bundle;
 
@@ -43,13 +58,34 @@ interface Due {
   id: string;
   email: string;
   code: string;
-  role: StaffRole;
+  role: InviteRole;
   locale: string;
   inviter_first_name: string | null;
 }
 
 /** What the link says, in words a person could read; the real role is the code's (0077). */
-const ROLE_IN_LINK: Record<StaffRole, string> = { provider: 'program', admin: 'case-manager' };
+const ROLE_IN_LINK: Record<InviteRole, string> = { provider: 'program', admin: 'case-manager', member: 'member' };
+
+/** The two queues the sender serves: where to claim from, how to report, and how the email is made. */
+const KINDS = {
+  staff: {
+    claim: 'claim_staff_invite_emails',
+    sent: 'mark_staff_invite_email_sent',
+    failed: 'mark_staff_invite_email_failed',
+    key: 'staff-invite',
+    ready: canSend,
+    render: renderStaffInvite,
+  },
+  link: {
+    claim: 'claim_invite_link_emails',
+    sent: 'mark_invite_link_email_sent',
+    failed: 'mark_invite_link_email_failed',
+    key: 'invite-link',
+    ready: canSendLink,
+    render: renderFreshLink,
+  },
+} as const;
+type Kind = keyof typeof KINDS;
 
 async function rpc(deps: Deps, name: string, args: Record<string, unknown>): Promise<unknown> {
   const url = deps.get('SUPABASE_URL');
@@ -67,9 +103,9 @@ async function rpc(deps: Deps, name: string, args: Record<string, unknown>): Pro
 }
 
 /** Puts a row back for another try. Never throws: one that cannot be reported must not stop the rest. */
-async function reportFailure(deps: Deps, id: string, reason: string): Promise<void> {
+async function reportFailure(deps: Deps, kind: Kind, id: string, reason: string): Promise<void> {
   try {
-    await rpc(deps, 'mark_staff_invite_email_failed', { p_id: id, p_reason: reason });
+    await rpc(deps, KINDS[kind].failed, { p_id: id, p_reason: reason });
   } catch (error) {
     console.error('could not record a failure', id, error instanceof Error ? error.message : 'unknown');
   }
@@ -88,48 +124,68 @@ export async function handle(request: Request, deps: Deps): Promise<Response> {
     return reply(503, { error: 'not set up: the email service key, EMAIL_FROM and an https APP_URL are needed' });
   }
 
-  // Nobody has signed the words: wait, and claim nothing.
-  if (!canSend(deps.bundle)) return reply(200, { enabled: true, sent: 0, waiting: 'the wording is not signed' });
+  // Nobody has signed the words for either kind: wait, and claim nothing.
+  const ready = (Object.keys(KINDS) as Kind[]).filter((kind) => KINDS[kind].ready(deps.bundle));
+  if (ready.length === 0) return reply(200, { enabled: true, sent: 0, waiting: 'the wording is not signed' });
 
   const replyTo = deps.get('EMAIL_REPLY_TO') || null;
-  const due = (await rpc(deps, 'claim_staff_invite_emails', { p_limit: 20 })) as Due[];
+  const pace = { sent: 0 };
+  const staff = ready.includes('staff')
+    ? await sendBatch(deps, 'staff', { from, appUrl, replyTo, pace })
+    : { claimed: 0, sent: 0, failures: [] };
+  const links = ready.includes('link')
+    ? await sendBatch(deps, 'link', { from, appUrl, replyTo, pace })
+    : { claimed: 0, sent: 0, failures: [] };
+
+  return reply(200, { enabled: true, ...staff, links });
+}
+
+/** One kind's batch: claim, render, send, report. The first kind's fields are the reply's own; the second's sit under `links`. */
+async function sendBatch(
+  deps: Deps,
+  kind: Kind,
+  ctx: { from: string; appUrl: string; replyTo: string | null; pace: { sent: number } },
+): Promise<{ claimed: number; sent: number; failures: { id: string; reason: string }[] }> {
+  const k = KINDS[kind];
+  const due = ((await rpc(deps, k.claim, { p_limit: 20 })) as Due[] | null) ?? [];
   let sent = 0;
   const failures: { id: string; reason: string }[] = [];
 
-  for (const [index, row] of due.entries()) {
+  for (const row of due) {
     try {
-      const link = `${appUrl}/signin/?invite=${encodeURIComponent(row.code)}&as=${ROLE_IN_LINK[row.role]}`;
-      const email = renderStaffInvite(deps.bundle, {
+      const link = `${ctx.appUrl}/signin/?invite=${encodeURIComponent(row.code)}&as=${ROLE_IN_LINK[row.role]}`;
+      const email = k.render(deps.bundle, {
         link,
         role: row.role,
         inviterFirstName: row.inviter_first_name,
         locale: localeOf(row.locale),
-        appUrl,
+        appUrl: ctx.appUrl,
       });
       if (email.locale !== localeOf(row.locale)) {
         // Written in English because nobody has signed that language. Which message and why, never the words.
-        console.warn(`sent in English: invite ${row.id} (${row.locale}): that language is not signed`);
+        console.warn(`sent in English: ${kind} email ${row.id} (${row.locale}): that language is not signed`);
       }
-      if (index > 0) await deps.sleep(600);
-      await deps.emailer.send({
+      if (ctx.pace.sent > 0) await deps.sleep(600);
+      await deps.emailer!.send({
         to: row.email,
-        from,
-        replyTo,
+        from: ctx.from,
+        replyTo: ctx.replyTo,
         subject: email.subject,
         html: email.html,
         text: email.text,
-        idempotencyKey: `staff-invite-${row.id}`,
+        idempotencyKey: `${k.key}-${row.id}`,
       });
+      ctx.pace.sent += 1;
       // Sent. If this report is lost the row is claimed again after 15 minutes
       // and the same idempotency key makes the service ignore the second send.
-      await rpc(deps, 'mark_staff_invite_email_sent', { p_id: row.id });
+      await rpc(deps, k.sent, { p_id: row.id });
       sent += 1;
     } catch (error) {
       const reason = error instanceof UnsendableError || error instanceof Error ? error.message : 'unknown';
       failures.push({ id: row.id, reason });
-      await reportFailure(deps, row.id, reason);
+      await reportFailure(deps, kind, row.id, reason);
     }
   }
 
-  return reply(200, { enabled: true, claimed: due.length, sent, failures });
+  return { claimed: due.length, sent, failures };
 }

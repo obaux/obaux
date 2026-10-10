@@ -113,6 +113,127 @@
       }
     }
   },
+  "linkLocales": {
+    "en": {
+      "reviewedBy": "Will (Oba), 4 October 2026",
+      "copy": {
+        "subject": "Your new Pam link",
+        "preheader": "Here is a new link to join Pam. It works for 30 days.",
+        "title": "Here is your new link",
+        "body": {
+          "member": "{inviter} invited you to join the Pam network. Your last link ran out, so here is a new one. It works for 30 days.",
+          "provider": "{inviter} invited you to be a program partner in the Pam network. Your last link ran out, so here is a new one. It works for 30 days.",
+          "admin": "{inviter} invited you to be a case manager in the Pam network. Your last link ran out, so here is a new one. It works for 30 days."
+        },
+        "button": "Open Pam",
+        "fallback": "If the button does not work, copy this link into your browser:",
+        "footer": "You asked for this link on Pam. If it was not you, you can ignore this email.",
+        "someone": "Someone"
+      }
+    },
+    "es": {
+      "reviewedBy": "Will (Oba), 4 October 2026",
+      "copy": {
+        "subject": "Su nuevo enlace de Pam",
+        "preheader": "Aquí tiene un enlace nuevo para unirse a Pam. Sirve por 30 días.",
+        "title": "Aquí tiene su enlace nuevo",
+        "body": {
+          "member": "{inviter} le invitó a unirse a la red de Pam. Su enlace anterior se venció, así que aquí tiene uno nuevo. Sirve por 30 días.",
+          "provider": "{inviter} le invitó a ser un programa aliado en la red de Pam. Su enlace anterior se venció, así que aquí tiene uno nuevo. Sirve por 30 días.",
+          "admin": "{inviter} le invitó a ser gestor de casos en la red de Pam. Su enlace anterior se venció, así que aquí tiene uno nuevo. Sirve por 30 días."
+        },
+        "button": "Abrir Pam",
+        "fallback": "Si el botón no funciona, copie este enlace en su navegador:",
+        "footer": "Usted pidió este enlace en Pam. Si no fue usted, puede ignorar este correo.",
+        "someone": "Alguien"
+      }
+    },
+    "pt-BR": {
+      "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet",
+      "copy": {
+        "subject": "Seu novo link do Pam",
+        "preheader": "Aqui está um novo link para entrar no Pam. Ele vale por 30 dias.",
+        "title": "Aqui está o seu novo link",
+        "body": {
+          "member": "{inviter} convidou você para entrar na rede de Pam. Seu último link venceu, então aqui está um novo. Ele vale por 30 dias.",
+          "provider": "{inviter} convidou você para ser um programa parceiro na rede de Pam. Seu último link venceu, então aqui está um novo. Ele vale por 30 dias.",
+          "admin": "{inviter} convidou você para ser gestor de casos na rede de Pam. Seu último link venceu, então aqui está um novo. Ele vale por 30 dias."
+        },
+        "button": "Abrir o Pam",
+        "fallback": "Se o botão não funcionar, copie este link no seu navegador:",
+        "footer": "Você pediu este link no Pam. Se não foi você, pode ignorar este e-mail.",
+        "someone": "Alguém"
+      }
+    },
+    "zh-CN": {
+      "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet",
+      "copy": {
+        "subject": "您的新 Pam 链接",
+        "preheader": "这是加入 Pam 的新链接，有效期 30 天。",
+        "title": "这是您的新链接",
+        "body": {
+          "member": "{inviter}邀请您加入 Pam 网络。您之前的链接已过期，这里是一个新的，有效期 30 天。",
+          "provider": "{inviter}邀请您成为 Pam 网络中的项目合作方。您之前的链接已过期，这里是一个新的，有效期 30 天。",
+          "admin": "{inviter}邀请您成为 Pam 网络中的个案管理员。您之前的链接已过期，这里是一个新的，有效期 30 天。"
+        },
+        "button": "打开 Pam",
+        "fallback": "如果按钮无法使用，请将此链接复制到浏览器：",
+        "footer": "您在 Pam 上申请了这个链接。如果不是您本人，请忽略这封邮件。",
+        "someone": "有人"
+      }
+    },
+    "zh-HK": {
+      "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet",
+      "copy": {
+        "subject": "您的新 Pam 連結",
+        "preheader": "這是加入 Pam 的新連結，有效期 30 天。",
+        "title": "這是您的新連結",
+        "body": {
+          "member": "{inviter}邀請您加入 Pam 網絡。您之前的連結已過期，這裏是新的連結，有效期 30 天。",
+          "provider": "{inviter}邀請您成為 Pam 網絡中的計劃夥伴。您之前的連結已過期，這裏是新的連結，有效期 30 天。",
+          "admin": "{inviter}邀請您成為 Pam 網絡中的個案經理。您之前的連結已過期，這裏是新的連結，有效期 30 天。"
+        },
+        "button": "開啟 Pam",
+        "fallback": "如果按鈕無法使用，請把此連結複製到瀏覽器：",
+        "footer": "您曾在 Pam 要求這個連結。如果不是您本人，請忽略這封電郵。",
+        "someone": "某人"
+      }
+    },
+    "ru": {
+      "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet",
+      "copy": {
+        "subject": "Ваша новая ссылка Pam",
+        "preheader": "Вот новая ссылка, чтобы присоединиться к Pam. Она действует 30 дней.",
+        "title": "Вот ваша новая ссылка",
+        "body": {
+          "member": "{inviter} приглашает вас присоединиться к сети Pam. Срок действия прошлой ссылки истёк, поэтому вот новая. Она действует 30 дней.",
+          "provider": "{inviter} приглашает вас в сеть Pam как партнёрскую программу. Срок действия прошлой ссылки истёк, поэтому вот новая. Она действует 30 дней.",
+          "admin": "{inviter} приглашает вас стать кейс-менеджером в сети Pam. Срок действия прошлой ссылки истёк, поэтому вот новая. Она действует 30 дней."
+        },
+        "button": "Открыть Pam",
+        "fallback": "Если кнопка не работает, скопируйте эту ссылку в браузер:",
+        "footer": "Вы запросили эту ссылку в Pam. Если это были не вы, просто проигнорируйте это письмо.",
+        "someone": "Кто-то"
+      }
+    },
+    "ar": {
+      "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet",
+      "copy": {
+        "subject": "رابط Pam الجديد الخاص بك",
+        "preheader": "إليك رابطا جديدا للانضمام إلى Pam. يعمل لمدة 30 يوما.",
+        "title": "إليك رابطك الجديد",
+        "body": {
+          "member": "دعاك {inviter} للانضمام إلى شبكة Pam. انتهت صلاحية رابطك السابق، لذا إليك رابطا جديدا. يعمل لمدة 30 يوما.",
+          "provider": "دعاك {inviter} لتكون شريك برنامج في شبكة Pam. انتهت صلاحية رابطك السابق، لذا إليك رابطا جديدا. يعمل لمدة 30 يوما.",
+          "admin": "دعاك {inviter} لتكون مدير حالة في شبكة Pam. انتهت صلاحية رابطك السابق، لذا إليك رابطا جديدا. يعمل لمدة 30 يوما."
+        },
+        "button": "افتح Pam",
+        "fallback": "إذا لم يعمل الزر، انسخ هذا الرابط إلى متصفحك:",
+        "footer": "لقد طلبت هذا الرابط على Pam. إذا لم تكن أنت، يمكنك تجاهل هذه الرسالة.",
+        "someone": "شخص ما"
+      }
+    }
+  },
   "fonts": {
     "en": "Helvetica,Arial,sans-serif",
     "es": "Helvetica,Arial,sans-serif",

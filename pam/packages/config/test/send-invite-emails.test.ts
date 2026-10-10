@@ -1,12 +1,15 @@
 import { describe, expect, it } from 'vitest';
 import { handle, type Deps } from '../../../supabase/functions/send-invite-emails/handler.ts';
 import { resendEmailer, type Emailer, type Outgoing } from '../../../supabase/functions/send-invite-emails/provider.ts';
-import { renderStaffInvite, localeOf, type Bundle } from '../../../supabase/functions/send-invite-emails/render.ts';
+import { renderFreshLink, renderStaffInvite, localeOf, type Bundle } from '../../../supabase/functions/send-invite-emails/render.ts';
 import bundleJson from '../../../supabase/functions/send-invite-emails/bundle.json';
 import {
   FONT_STACK,
+  INVITE_EMAIL,
+  INVITE_EMAIL_MORE,
   RIGHT_TO_LEFT,
   STAFF_INVITE_EMAIL,
+  renderInviteEmail,
   renderStaffInviteEmail,
 } from '../src/invite-email';
 import { SUPPORTED_LOCALES, type Locale } from '../src/i18n';
@@ -20,7 +23,10 @@ const SIGNED = 'a test reader';
 // The bundle the function really ships: Will signed the English on 10 October 2026.
 const bundle = (signed: Locale[]): Bundle => {
   const b = structuredClone(bundleJson) as unknown as Bundle;
-  for (const l of SUPPORTED_LOCALES) b.locales[l].reviewedBy = signed.includes(l) ? SIGNED : '';
+  for (const l of SUPPORTED_LOCALES) {
+    b.locales[l].reviewedBy = signed.includes(l) ? SIGNED : '';
+    b.linkLocales[l].reviewedBy = signed.includes(l) ? SIGNED : '';
+  }
   return b;
 };
 
@@ -33,7 +39,7 @@ const ROW = {
   inviter_first_name: 'Dana',
 };
 
-function world(opts: { rows?: (typeof ROW)[]; signed?: Locale[]; sendFails?: boolean; env?: Record<string, string | undefined> } = {}) {
+function world(opts: { rows?: (typeof ROW)[]; linkRows?: (typeof ROW)[]; signed?: Locale[]; sendFails?: boolean; env?: Record<string, string | undefined> } = {}) {
   const sentEmails: Outgoing[] = [];
   const rpcs: { name: string; args: Record<string, unknown> }[] = [];
   const sleeps: number[] = [];
@@ -59,6 +65,7 @@ function world(opts: { rows?: (typeof ROW)[]; signed?: Locale[]; sendFails?: boo
     const args = JSON.parse(String(init?.body ?? '{}'));
     rpcs.push({ name, args });
     if (name === 'claim_staff_invite_emails') return new Response(JSON.stringify(opts.rows ?? [ROW]), { status: 200 });
+    if (name === 'claim_invite_link_emails') return new Response(JSON.stringify(opts.linkRows ?? []), { status: 200 });
     return new Response('', { status: 200 });
   }) as typeof fetch;
   const deps: Deps = {
@@ -147,7 +154,7 @@ describe('what it sends', () => {
     expect(email.html).toContain('https://pam.example/signin/?invite=ABCD2345&amp;as=case-manager');
     expect(email.html).toContain('src="https://pam.example/email/pam-logo.png"');
     expect(email.html).toContain('Dana would love for you to join Pam as a case manager');
-    expect(w.rpcs.map((c) => c.name)).toEqual(['claim_staff_invite_emails', 'mark_staff_invite_email_sent']);
+    expect(w.rpcs.map((c) => c.name)).toEqual(['claim_staff_invite_emails', 'mark_staff_invite_email_sent', 'claim_invite_link_emails']);
     expect(w.rpcs[1]!.args).toEqual({ p_id: ROW.id });
   });
 
@@ -178,7 +185,7 @@ describe('what it sends', () => {
     const w = world({ sendFails: true });
     const body = await json(await w.call());
     expect(body).toMatchObject({ claimed: 1, sent: 0 });
-    expect(w.rpcs.map((c) => c.name)).toEqual(['claim_staff_invite_emails', 'mark_staff_invite_email_failed']);
+    expect(w.rpcs.map((c) => c.name)).toEqual(['claim_staff_invite_emails', 'mark_staff_invite_email_failed', 'claim_invite_link_emails']);
     expect(w.rpcs[1]!.args).toEqual({ p_id: ROW.id, p_reason: 'the email service answered 503' });
   });
 
@@ -227,6 +234,18 @@ describe('the sender and the preview say the same thing', () => {
     // The generated bundle is the config's own tables.
     expect(JSON.parse(JSON.stringify(bundleJson))).toEqual({
       locales: JSON.parse(JSON.stringify(STAFF_INVITE_EMAIL)),
+      linkLocales: JSON.parse(
+        JSON.stringify(
+          Object.fromEntries(
+            SUPPORTED_LOCALES.map((l) => [
+              l,
+              l === 'en' || l === 'es'
+                ? { reviewedBy: INVITE_EMAIL.reviewedBy, copy: INVITE_EMAIL[l] }
+                : INVITE_EMAIL_MORE[l],
+            ]),
+          ),
+        ),
+      ),
       fonts: FONT_STACK,
       rtl: RIGHT_TO_LEFT,
     });
@@ -250,9 +269,139 @@ describe('the sender and the preview say the same thing', () => {
     }
   });
 
+  it('renders the fresh-link email byte for byte what packages/config renders, in every language and all three roles', () => {
+    const mine = bundle(SUPPORTED_LOCALES.slice());
+    for (const locale of SUPPORTED_LOCALES) {
+      for (const role of ['member', 'provider', 'admin'] as const) {
+        for (const inviterFirstName of ['Dana', null, '<b>Dana</b> & "Co"']) {
+          const input = { link: 'https://pam.example/signin/?invite=A&as=x', role, inviterFirstName, locale, appUrl: 'https://pam.example' };
+          // `draft` shows the language asked for whatever its sign-off; the sender's bundle above has every language signed.
+          expect(renderFreshLink(mine, input), `${locale} ${role} ${inviterFirstName}`).toEqual(
+            renderInviteEmail({ ...input, draft: true }),
+          );
+        }
+      }
+    }
+  });
+
   it('treats a language it does not know as English', () => {
     expect(localeOf('xx')).toBe('en');
     expect(localeOf(null)).toBe('en');
     expect(localeOf('zh-HK')).toBe('zh-HK');
+  });
+});
+
+describe('the email with a fresh link (D-476): someone whose link ran out asked for another', () => {
+  const LINK_ROW = {
+    id: '33333333-3333-4333-8333-333333333333',
+    email: 'mem@example.org',
+    code: 'NEWC0DE9',
+    role: 'member' as const,
+    locale: 'en',
+    inviter_first_name: 'Dana',
+  };
+
+  it('claims from its own queue, sends once with its own idempotency key, and reports it sent', async () => {
+    const w = world({ rows: [], linkRows: [LINK_ROW] });
+    const body = await json(await w.call());
+    expect(body).toMatchObject({ enabled: true, links: { claimed: 1, sent: 1, failures: [] } });
+    expect(w.sentEmails).toHaveLength(1);
+    const email = w.sentEmails[0]!;
+    expect(email.to).toBe('mem@example.org');
+    expect(email.idempotencyKey).toBe(`invite-link-${LINK_ROW.id}`);
+    expect(email.subject).toBe('Your new Pam link');
+    // The new invite's code, as a member's link.
+    expect(email.html).toContain('https://pam.example/signin/?invite=NEWC0DE9&amp;as=member');
+    expect(email.html).toContain('Dana invited you to join the Pam network. Your last link ran out');
+    expect(w.rpcs.map((c) => c.name)).toEqual(['claim_staff_invite_emails', 'claim_invite_link_emails', 'mark_invite_link_email_sent']);
+    expect(w.rpcs[2]!.args).toEqual({ p_id: LINK_ROW.id });
+  });
+
+  it('names each role the way the sign-in page does', async () => {
+    const rows = [
+      { ...LINK_ROW, id: 'a', role: 'admin' as const, code: 'CODEADM1' },
+      { ...LINK_ROW, id: 'b', role: 'provider' as const, code: 'CODEPRV1' },
+    ];
+    const w = world({ rows: [], linkRows: rows });
+    await w.call();
+    expect(w.sentEmails[0]!.html).toContain('invite=CODEADM1&amp;as=case-manager');
+    expect(w.sentEmails[0]!.html).toContain('to be a case manager in the Pam network');
+    expect(w.sentEmails[1]!.html).toContain('invite=CODEPRV1&amp;as=program');
+    expect(w.sentEmails[1]!.html).toContain('to be a program partner in the Pam network');
+  });
+
+  it('writes in the language it was asked for in when it is signed, and English when it is not', async () => {
+    const es = { ...LINK_ROW, locale: 'es' };
+    const signed = world({ rows: [], linkRows: [es], signed: ['en', 'es'] });
+    await signed.call();
+    expect(signed.sentEmails[0]!.html).toContain('lang="es"');
+    expect(signed.sentEmails[0]!.subject).toBe(INVITE_EMAIL.es.subject);
+    const ru = world({ rows: [], linkRows: [{ ...LINK_ROW, locale: 'ru' }], signed: ['en', 'es'] });
+    await ru.call();
+    expect(ru.sentEmails[0]!.html).toContain('lang="en"');
+  });
+
+  it('is on and off with the same switch, and needs the same secrets', async () => {
+    const off = world({ rows: [], linkRows: [LINK_ROW], env: { INVITE_EMAILS: undefined } });
+    expect(await json(await off.call())).toEqual({ enabled: false });
+    expect(off.rpcs).toEqual([]);
+    const noSecret = world({ rows: [], linkRows: [LINK_ROW] });
+    expect((await noSecret.call({})).status).toBe(401);
+    expect(noSecret.rpcs).toEqual([]);
+    const noFrom = world({ rows: [], linkRows: [LINK_ROW], env: { EMAIL_FROM: undefined } });
+    expect((await noFrom.call()).status).toBe(503);
+    expect(noFrom.sentEmails).toEqual([]);
+  });
+
+  it('sends nothing, and claims nothing, until a person has signed the words', async () => {
+    const w = world({ rows: [], linkRows: [LINK_ROW], signed: [] });
+    expect(await json(await w.call())).toMatchObject({ enabled: true, sent: 0, waiting: 'the wording is not signed' });
+    expect(w.rpcs).toEqual([]);
+    expect(w.sentEmails).toEqual([]);
+  });
+
+  it('puts a failure back for another try, with only what went wrong', async () => {
+    const w = world({ rows: [], linkRows: [LINK_ROW], sendFails: true });
+    const body = await json(await w.call());
+    expect(body).toMatchObject({ links: { claimed: 1, sent: 0 } });
+    expect(w.rpcs.map((c) => c.name)).toEqual(['claim_staff_invite_emails', 'claim_invite_link_emails', 'mark_invite_link_email_failed']);
+    expect(w.rpcs[2]!.args).toEqual({ p_id: LINK_ROW.id, p_reason: 'the email service answered 503' });
+  });
+
+  it('sends both kinds in one run and pauses between all of them', async () => {
+    const w = world({ rows: [ROW], linkRows: [LINK_ROW] });
+    const body = await json(await w.call());
+    expect(body).toMatchObject({ claimed: 1, sent: 1, links: { claimed: 1, sent: 1 } });
+    expect(w.sentEmails.map((e) => e.idempotencyKey)).toEqual([`staff-invite-${ROW.id}`, `invite-link-${LINK_ROW.id}`]);
+    expect(w.sleeps).toEqual([600]);
+  });
+
+  it('keeps the other kind going when one fails to render', async () => {
+    const bad = { ...LINK_ROW, role: 'wizard' as unknown as 'member' };
+    const w = world({ rows: [ROW], linkRows: [bad] });
+    const body = await json(await w.call());
+    expect(body).toMatchObject({ sent: 1, links: { claimed: 1, sent: 0 } });
+  });
+
+  it('never writes an address, a link or a word of the email to its logs', async () => {
+    const logged: string[] = [];
+    const orig = [console.log, console.warn, console.error];
+    console.log = console.warn = console.error = (...a: unknown[]) => void logged.push(a.map(String).join(' '));
+    try {
+      await world({ rows: [], linkRows: [{ ...LINK_ROW, locale: 'ru' }], signed: ['en'] }).call();
+      await world({ rows: [], linkRows: [LINK_ROW], sendFails: true }).call();
+    } finally {
+      [console.log, console.warn, console.error] = orig as typeof orig;
+    }
+    const all = logged.join('\n');
+    expect(all).not.toContain('mem@example.org');
+    expect(all).not.toContain('NEWC0DE9');
+    expect(all).not.toContain('Dana');
+  });
+
+  it('uses the signed wording of 4 October, in the bundle it ships', () => {
+    const shipped = bundleJson as unknown as Bundle;
+    expect(shipped.linkLocales.en.reviewedBy).toBe('Will (Oba), 4 October 2026');
+    expect(shipped.linkLocales.ru.reviewedBy).toContain('approved to learn from');
   });
 });
