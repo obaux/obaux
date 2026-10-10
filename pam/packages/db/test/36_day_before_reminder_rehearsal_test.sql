@@ -16,6 +16,9 @@
 \set QUIET on
 set client_min_messages to notice;
 
+-- Texts are held until the day (app_settings.texts_live, D-481); this test is about what is sent once they are on.
+update public.app_settings set value = 'on' where key = 'texts_live';
+
 \set region_north '11111111-0000-0000-0000-000000000001'
 -- Ids end in d0x (renamed at merge, 10 October): 35, written at the same time, took c0x for
 -- its own member and place, and the two files run one after the other on one database.

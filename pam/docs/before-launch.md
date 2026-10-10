@@ -93,6 +93,12 @@ STATUS row too.
   done; steps 1, 2 and 4 are Will's email setup, the same one. Until then someone with an
   expired link is still told "Check your email" and nothing arrives.
 
+- [ ] **Texts go live only when Will says go** (D-481, 10 October 2026). Until `app_settings.texts_live` is
+  `'on'`, nothing but account texts (sign-in code, a decision on a staff request, "parts of Pam are off",
+  the two invitations) can leave Pam: every reminder and alert stays scheduled. Only the merge desk sets it, on
+  the day Will finishes the Twilio filing and says go — together with `ALERT_TEXTS_LIVE` and
+  `claude/messages-reply-start`; the order is the runbook at the top of `docs/sms-setup.md`.
+
 - [x] **Merge and deploy 0068 and 0069** — done 8 October as 0075/0076 (D-388) (readiness fixes and blocking, on
   branch `claude/hopeful-thompson-07nj7n`, not yet on this one). 0068 is what
   lets an invite be redeemed at all (phone format) and closes several live

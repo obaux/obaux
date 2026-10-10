@@ -6,6 +6,9 @@
 \set QUIET on
 set client_min_messages to notice;
 
+-- Texts are held until the day (app_settings.texts_live, D-481); this test is about what is sent once they are on.
+update public.app_settings set value = 'on' where key = 'texts_live';
+
 \set marcus '33333333-0000-0000-0000-00000000000c'
 \set tanya  '33333333-0000-0000-0000-00000000000d'
 \set luis   '33333333-0000-0000-0000-00000000000e'

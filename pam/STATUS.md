@@ -1077,6 +1077,13 @@ drops signatures), then `20261010042108_a_program_lead_submits_their_own_program
 
 ---
 
+## Messages & notifications · texts held until the day (10 October 2026)
+
+Branch `claude/messages-alert-texts-wired`. Migration `20261010141859_…` (**not yet applied to the live project**):
+`app_settings.texts_live` ('off'); until it is 'on' the claim hands the dispatcher account texts only (sign-in code,
+request decisions, "parts of Pam are off", invitations), and every reminder and alert stays scheduled. Opened by the
+merge desk on the day Will says go, with `ALERT_TEXTS_LIVE` and reply-start (runbook, `docs/sms-setup.md`). DB test 43. D-481.
+
 ## Messages & notifications · the approved text alerts are wired (10 October 2026)
 
 Branch `claude/messages-alert-texts-wired`. One migration (`20261010134429_…`, **not yet applied to the live

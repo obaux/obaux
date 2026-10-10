@@ -10,6 +10,9 @@
 \set QUIET on
 set client_min_messages to notice;
 
+-- Texts are held until the day (app_settings.texts_live, D-481); this test is about what is sent once they are on.
+update public.app_settings set value = 'on' where key = 'texts_live';
+
 \set region_north '11111111-0000-0000-0000-000000000001'
 \set org1  '55555555-0000-0000-0000-0000000a7701'
 \set org2  '55555555-0000-0000-0000-0000000a7702'
