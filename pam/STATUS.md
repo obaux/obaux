@@ -928,6 +928,22 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
+## Languages & legal · the app says only what Pam texts today (10 October) — on `claude/lena-promise-sweep`, not merged
+
+Will's rule (a12): a line says only what Pam does. The first slide said "Pam reminds you before you go, so nothing gets
+missed"; no visit reminder is sent (the public site says "coming", `VISIT_REMINDERS_LIVE = false`). Ten lines, seven
+languages, no migration (D-474): the slide ("Pam keeps your planned visits in one place."), the program leads' slide
+("Members find your program and plan a visit."), the booked and trip-added screens, the member Profile card (the one text
+Pam sends: a saved place closes or moves), the two staff text-alert cards ("Coming soon: …"), the program form's "We will
+let you know when yours is live" (the Program tab shows where it is), the terms line about a new number, and the empty
+bell. `test/promises-of-texts.test.ts` fails if English says Pam reminds you while the site's flag is false, and if the
+site's flag and the app's copy of it disagree. `docs/before-launch.md` › *Visit reminders go live* lists, key by key, what
+to put back (and where the old six languages are in git).
+
+- **Not words, reported:** after a program books a visit for a member, the app says "Booked for … Pam texted … a link", but
+  nothing is saved or texted (`bookTrip` keeps it in the tab). Places & programs / Trips to build it or label it an example.
+- **Left on purpose:** `reminders.intro` (the carrier-reviewed screen's first line; the line under its list says what is sent).
+
 ## Languages & legal · the language loader comes down; the flaky sign-in menu test (10 October) — merged 10 October
 
 Merged to `main` by the merge desk, 10 October, from `claude/lena-steady-tag-test` (D-471). The "Switching to…" loader could go up a moment after the new language had already arrived and then stay up for good, covering every tap: the take-down now runs whether or not the loader was up in that render (`lib/i18n.tsx`). Found by the flaky `languages.spec` sign-in menu test (5 or 6 stalled clicks in 260 runs under load); after the fix 260 of 260, twice. The sign-in menu and join chip tests also wait for the settled page and read every row's position at once. No migration, no copy change.
