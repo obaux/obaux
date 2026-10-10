@@ -60,6 +60,8 @@ export interface PeopleHomeViewProps {
   readonly empty: ReactNode;
   /** Under the list — "These are example people". */
   readonly note?: string | null;
+  /** After everything else on the page — a case manager's "What you can see". */
+  readonly footer?: ReactNode;
   readonly actions?: ReactNode;
   readonly onRetry: () => void;
   readonly onPick: (person: HomePerson) => void;
@@ -121,6 +123,7 @@ export function PeopleHomeView({
   state,
   empty,
   note,
+  footer,
   actions,
   onRetry,
   onPick,
@@ -250,6 +253,7 @@ export function PeopleHomeView({
             ) : null}
           </VStack>
         ) : null}
+        {footer}
       </Page>
       {/* Outside the page: its motion wrapper would pin a fixed child to itself. */}
       {floating}

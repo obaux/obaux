@@ -146,3 +146,58 @@ export const ExternalLinks: Story = {
     ],
   },
 };
+
+const GLOBE = <GlobeIcon width={26} height={26} aria-hidden />;
+
+/** The seven languages as the Language list draws them: a short tag in English, then the name in its own language. */
+const LANGUAGE_ROWS = [
+  { id: 'en', tag: 'EN', lang: 'en', label: 'English', isSelected: true },
+  { id: 'es', tag: 'ES', lang: 'es', label: 'Español', isSelected: false },
+  { id: 'pt-BR', tag: 'PT-BR', lang: 'pt-BR', label: 'Português (Brasil)', isSelected: false },
+  { id: 'zh-CN', tag: 'ZH-CN', lang: 'zh-CN', label: '简体中文', isSelected: false },
+  { id: 'zh-HK', tag: 'ZH-HK', lang: 'zh-HK', label: '繁體中文', isSelected: false },
+  { id: 'ru', tag: 'RU', lang: 'ru', label: 'Русский', isSelected: false },
+  { id: 'ar', tag: 'AR', lang: 'ar', label: 'العربية', isSelected: false },
+].map((row) => ({ ...row, onSelect: () => undefined, icon: GLOBE }));
+
+/**
+ * A short tag before a row's words (`tag`, D-451): "EN", "PT-BR", "AR" before a
+ * language's own name, so a person can see which language a row is before they
+ * can read it. Always English, always left to right, in a cell as wide as the
+ * widest tag so the names line up, quieter than the words, and hidden from a
+ * screen reader — the row's name stays the language's own. `lang` on each row
+ * makes a screen reader speak "Русский" in a Russian voice.
+ */
+export const LanguageTags: Story = {
+  args: { label: 'Language', hasDividers: true, items: LANGUAGE_ROWS },
+};
+
+/**
+ * The same list read right to left. The tag sits at the start, which is the
+ * right, and "PT-BR" is still "PT-BR": the tag is a left-to-right box of its own.
+ */
+export const LanguageTagsArabic: Story = {
+  ...LanguageTags,
+  globals: { locale: 'ar' },
+};
+
+/** The same list in Spanish: the tags do not translate, the page words around them do. */
+export const LanguageTagsSpanish: Story = {
+  ...LanguageTags,
+  globals: { locale: 'es' },
+};
+
+/**
+ * Profile's Language row: the tag beside the current choice (`valueTag`), so
+ * somebody reviewing Profile in Russian can see which language it is in.
+ */
+export const ValueTag: Story = {
+  args: {
+    label: 'Profile',
+    hasDividers: true,
+    items: [
+      { id: 'language', label: 'Language', href: '/language/', value: 'English', valueTag: 'EN', icon: GLOBE },
+      { id: 'reminders', label: 'Reminders', href: '/reminders/', value: 'On', icon: <ClockIcon width={26} height={26} aria-hidden /> },
+    ],
+  },
+};

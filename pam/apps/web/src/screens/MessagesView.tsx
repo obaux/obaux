@@ -7,12 +7,14 @@ import { EmptyState } from '@astryxdesign/core/EmptyState';
 import { HStack } from '@astryxdesign/core/HStack';
 import { IconButton } from '@astryxdesign/core/IconButton';
 import { List } from '@astryxdesign/core/List';
+import { SegmentedControl } from '@astryxdesign/core/SegmentedControl';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars, spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { ExploreIcon, MessagesIcon, NewMessageIcon, NoResultsIcon, Page, textLinkLook } from '@pam/ui';
 import { emptyState } from '@pam/ui/emptyState';
 import { LargeTitleHeader } from '@pam/ui/LargeTitleHeader';
+import { Segment } from '@pam/ui/Segment';
 import { SearchField } from '@pam/ui/SearchPill';
 import { useI18n } from '@/lib/i18n';
 import { Avatar } from '@astryxdesign/core/Avatar';
@@ -72,6 +74,17 @@ export interface MessagesViewProps {
    * the page: its motion wrapper would pin a fixed child to itself.
    */
   readonly floating?: ReactNode;
+  /**
+   * Reported messages, for a case manager and a super admin (D-171, D-184,
+   * D-464): "Conversations | Reported" under the title, and the second section
+   * is `content` in place of the list. Without it the screen is only
+   * conversations, as it is for a member or a program.
+   */
+  readonly reported?: {
+    readonly section: 'conversations' | 'reported';
+    readonly onSection: (next: 'conversations' | 'reported') => void;
+    readonly content: ReactNode;
+  };
 }
 
 const styles = stylex.create({
@@ -171,11 +184,13 @@ export function MessagesView({
   initialSearch = null,
   onNewMessage,
   floating,
+  reported,
 }: MessagesViewProps) {
   const { t } = useI18n();
   const [query, setQuery] = useState<string | null>(initialSearch);
   const searching = query !== null;
   const shown = rows.filter((row) => matches(row, query ?? ''));
+  const onReported = reported?.section === 'reported';
 
   return (
     <>
@@ -203,6 +218,7 @@ export function MessagesView({
           title={t('messages.title')}
           actions={
             <>
+              {onReported ? null : (
               <IconButton
                 label={t('messages.search.open')}
                 variant="ghost"
@@ -214,8 +230,9 @@ export function MessagesView({
                 onClick={() => setQuery('')}
                 xstyle={styles.round}
               />
+              )}
               {headerActions}
-              {onNewMessage ? (
+              {onNewMessage && !onReported ? (
                 <IconButton
                   label={t('messages.new.action')}
                   variant="primary"
@@ -233,10 +250,25 @@ export function MessagesView({
         />
       )}
 
-      {/* Above the list, not below it: under a short list the notice would sit in the bottom edge fade. */}
-      {limited}
+      {reported && !searching ? (
+        <SegmentedControl
+          label={t('messages.sections')}
+          value={reported.section}
+          onChange={(next) => reported.onSection(next as 'conversations' | 'reported')}
+          layout="fill"
+        >
+          <Segment value="conversations" label={t('messages.section.conversations')} />
+          <Segment value="reported" label={t('messages.section.reported')} />
+        </SegmentedControl>
+      ) : null}
 
-      {rows.length === 0 && !searching ? (
+      {/* The Reported section stands in place of the conversations (D-464). */}
+      {onReported && !searching ? reported?.content : null}
+
+      {/* Above the list, not below it: under a short list the notice would sit in the bottom edge fade. */}
+      {onReported && !searching ? null : limited}
+
+      {rows.length === 0 && !searching && !onReported ? (
         <EmptyState
           headingLevel={2}
           xstyle={styles.state}
@@ -261,7 +293,7 @@ export function MessagesView({
         />
       ) : null}
 
-      {shown.length > 0 ? (
+      {shown.length > 0 && !(onReported && !searching) ? (
         <VStack gap={2}>
           <List hasDividers xstyle={styles.list}>
             {shown.map((row) => (

@@ -21,6 +21,7 @@ import {
   SMS_MAX_LENGTH_UCS2_TWO_SEGMENTS,
   SMS_WORST_CASE_LINK_LENGTH,
   APPROVED_TO_LEARN_FROM,
+  APPROVED_TO_LEARN_FROM_ALERTS,
   type MoreLocale,
   type SmsTemplate,
   type SmsTemplateKey,
@@ -46,14 +47,32 @@ const WORST_CASE_VARS: Readonly<Record<string, string>> = {
 
 const keys = Object.keys(SMS_TEMPLATES) as SmsTemplateKey[];
 
+/**
+ * Templates that may stand unsigned. The four Text alerts texts were here from
+ * 10 October 2026 until Will approved them the same day ("Text alerts:
+ * approved"). Listing a template here is the only way one may stand unsigned: a
+ * template that loses its name, or a new one added without being listed, fails
+ * the test below. Signing one means removing it from this list in the same
+ * commit.
+ */
+const AWAITING_SIGNATURE: SmsTemplateKey[] = [];
+/** The four Text alerts texts, approved by Will on 10 October 2026. */
+const ALERT_KEYS: SmsTemplateKey[] = ['message_waiting', 'visit_booked', 'booking_changed', 'trip_planned'];
+
 describe('SMS templates', () => {
   it('has a human recorded against every template', () => {
     // Flipped on 13 September 2026: Will read all thirteen and approved them.
     // The test stays, pointing the other way — a template that loses its name,
     // or a new one added without one, stops the whole catalogue from sending
     // and should fail here first.
-    expect(unreviewedTemplateKeys()).toEqual([]);
-    for (const key of keys) expect(SMS_TEMPLATES[key].reviewedBy).not.toBe('');
+    expect(unreviewedTemplateKeys().sort()).toEqual([...AWAITING_SIGNATURE].sort());
+    for (const key of keys.filter((k) => !AWAITING_SIGNATURE.includes(k))) expect(SMS_TEMPLATES[key].reviewedBy).not.toBe('');
+    // ...and while unsigned, none of them renders, in any language.
+    for (const key of AWAITING_SIGNATURE) {
+      for (const locale of SUPPORTED_LOCALES) {
+        expect(() => renderSms({ key, locale, vars: WORST_CASE_VARS }), `${key} ${locale}`).toThrow(UnreviewedTemplateError);
+      }
+    }
   });
 
   it('still refuses to render a template whose name has been taken off', () => {
@@ -67,7 +86,7 @@ describe('SMS templates', () => {
       expect(() =>
         renderSms({ key: 'invite_member', locale: 'en', vars: WORST_CASE_VARS }),
       ).toThrow(UnreviewedTemplateError);
-      expect(unreviewedTemplateKeys()).toEqual(['invite_member']);
+      expect(unreviewedTemplateKeys().sort()).toEqual(['invite_member', ...AWAITING_SIGNATURE].sort());
     } finally {
       catalogue['invite_member'] = signed;
     }
@@ -298,10 +317,17 @@ describe('texts in the newer languages', () => {
     // learn from, no native reader yet. Nothing else has signed them.
     expect(APPROVED_TO_LEARN_FROM).toMatch(/^Will \(Oba\), 9 October 2026/);
     expect(APPROVED_TO_LEARN_FROM).toContain('no native reader yet');
-    for (const { key, locale, draft } of drafts) {
-      expect(draft.reviewedBy, `${key} (${locale})`).toBe(APPROVED_TO_LEARN_FROM);
+    // The four Text alerts texts carry the same words, dated the day Will approved them.
+    for (const { key, locale, draft } of drafts.filter((d) => !AWAITING_SIGNATURE.includes(d.key))) {
+      expect(draft.reviewedBy, `${key} (${locale})`).toBe(ALERT_KEYS.includes(key) ? APPROVED_TO_LEARN_FROM_ALERTS : APPROVED_TO_LEARN_FROM);
     }
-    expect(unsignedSmsDrafts()).toEqual([]);
+    expect(APPROVED_TO_LEARN_FROM_ALERTS).toMatch(/^Will \(Oba\), 10 October 2026/);
+    expect(APPROVED_TO_LEARN_FROM_ALERTS).toContain('no native reader yet');
+    for (const key of ALERT_KEYS) expect(SMS_TEMPLATES[key].reviewedBy, key).toBe('Will (Oba), 10 October 2026');
+    for (const { key, draft } of drafts.filter((d) => AWAITING_SIGNATURE.includes(d.key))) {
+      expect(draft.reviewedBy, key).toBe('');
+    }
+    expect(unsignedSmsDrafts().every((d) => AWAITING_SIGNATURE.includes(d.key))).toBe(true);
   });
 
   it('takes a language back to English the moment its approval is emptied — for every draft', () => {

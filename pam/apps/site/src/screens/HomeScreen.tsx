@@ -7,6 +7,9 @@ import { VStack } from '@astryxdesign/core/VStack';
 import { HStack } from '@astryxdesign/core/HStack';
 import { Button } from '@pam/ui/Button';
 import { Frame } from '../components/Frame';
+import { ABOUT, ABOUT_ART, ABOUT_ON_HOME, aboutPath } from '../content/about';
+import { VISIT_REMINDERS_LIVE } from '../content/flags';
+import { ReadMore } from '../components/Prose';
 import { SIGN_IN_URL } from '../lib/links';
 
 const styles = stylex.create({
@@ -15,6 +18,7 @@ const styles = stylex.create({
   lede: { maxWidth: '56ch' },
   actions: { flexWrap: 'wrap' },
   // The pictures are the app's own sign-in illustrations, cropped to a banner.
+  about: { width: '100%', height: 'auto', display: 'block', borderRadius: '12px', aspectRatio: '8 / 3' },
   picture: { width: '100%', height: '180px', objectFit: 'cover', display: 'block', borderRadius: '12px' },
 });
 
@@ -32,7 +36,9 @@ const HOW = [
   {
     image: '/art/hero-sneakers.webp',
     title: 'Keep going',
-    body: 'Pam reminds you before you go, so nothing gets missed.',
+    body: VISIT_REMINDERS_LIVE
+      ? 'Pam keeps your planned visits in one place, and texts you a reminder before you go.'
+      : 'Pam keeps your planned visits in one place. Texts that remind you are coming.',
   },
 ] as const;
 
@@ -51,7 +57,12 @@ const WHO = [
   },
 ] as const;
 
-export function HomeScreen() {
+/**
+ * `showAbout` is the "About Pam" section. It follows the English post's sign-off
+ * (`content/about.ts`): hidden until Will signs it. Storybook's "Home with About Pam"
+ * story turns it on to show it.
+ */
+export function HomeScreen({ showAbout = ABOUT_ON_HOME }: { readonly showAbout?: boolean }) {
   return (
     <Frame gap={10}>
       <VStack gap={4} xstyle={styles.hero}>
@@ -82,6 +93,19 @@ export function HomeScreen() {
           ))}
         </Grid>
       </VStack>
+
+      {showAbout ? (
+        <Card padding={6} variant="muted">
+          <Grid columns={{ minWidth: 280 }} gap={6}>
+            <img src={ABOUT_ART.wide} alt={ABOUT.en.artAlt} width={1600} height={600} {...stylex.props(styles.about)} />
+            <VStack gap={2}>
+              <Heading level={2}>{ABOUT.en.title}</Heading>
+              <Text as="p">{ABOUT.en.lead}</Text>
+              <ReadMore label="Read more about Pam" href={aboutPath('en')} />
+            </VStack>
+          </Grid>
+        </Card>
+      ) : null}
 
       <VStack gap={4}>
         <Heading level={2}>Who Pam is for</Heading>

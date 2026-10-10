@@ -156,7 +156,7 @@ export function ReportedPlaces({
             status={placeStatus(row.id, row.hours, now, t, locale)}
             flagLabel={label}
             flagActions={
-              canResolve || showDummy ? (
+              canResolve ? (
                 <>
                   <Button
                     label={t('places.reported.keep')}

@@ -7,6 +7,8 @@ import {
   progressToNextLevel,
   streakPoints,
   STREAK_POINTS_CAP,
+  AWARDED_TODAY,
+  isAwardedToday,
   LEADERBOARDS_ENABLED,
   REWARDS_ENABLED,
 } from '../src/points.js';
@@ -31,20 +33,35 @@ describe('points rules (SOP §8)', () => {
   });
 
   it('caps self-reported signups so points cannot be farmed', () => {
-    expect(POINTS_RULES.self_reported_signup.dailyCap).toBe(3);
+    expect(POINTS_RULES.plan_trip.dailyCap).toBe(3);
     expect(POINTS_RULES.reach_out_to_buddy.dailyCap).toBe(1);
   });
 
   it('uses the exact values from the SOP table', () => {
     expect(POINTS_RULES.save_place.points).toBe(5);
     expect(POINTS_RULES.call_service.points).toBe(10);
-    expect(POINTS_RULES.self_reported_signup.points).toBe(25);
+    expect(POINTS_RULES.plan_trip.points).toBe(25);
     expect(POINTS_RULES.enrollment_approved.points).toBe(50);
     expect(POINTS_RULES.attend_appointment_verified.points).toBe(100);
     expect(POINTS_RULES.attend_appointment_sms.points).toBe(60);
     expect(POINTS_RULES.connect_with_mentor.points).toBe(30);
     // Raised from the SOP's 100 by Will (D-330).
     expect(POINTS_RULES.refer_someone.points).toBe(150);
+  });
+});
+
+describe('what the Points screen may promise', () => {
+  it('lists only what the database awards today: saving a place, finishing setup and planning a trip', () => {
+    // 0045, 0047 and 20261010115117. Add a reason here only in the change that ships its trigger.
+    expect([...AWARDED_TODAY].sort()).toEqual(['finish_setup', 'plan_trip', 'save_place']);
+    expect(isAwardedToday('save_place')).toBe(true);
+    expect(isAwardedToday('plan_trip')).toBe(true);
+    expect(isAwardedToday('call_service')).toBe(false);
+    expect(isAwardedToday('attend_appointment_verified')).toBe(false);
+  });
+
+  it('only names rules that exist', () => {
+    for (const reason of AWARDED_TODAY) expect(POINTS_RULES[reason].points).toBeGreaterThan(0);
   });
 });
 

@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import type { Decorator, Preview } from '@storybook/nextjs';
 import { Theme } from '@astryxdesign/core/theme';
 import { MotionProvider } from '@pam/ui';
-import { isSupportedLocale, type Locale, type TextBundle } from '@pam/config';
+import { LANGUAGE_TAGS, isSupportedLocale, type Locale, type TextBundle } from '@pam/config';
 import en from '@pam/config/locales/en.json';
 import es from '@pam/config/locales/es.json';
 import ptBR from '@pam/config/locales/pt-BR.json';
@@ -113,14 +113,16 @@ const preview: Preview = {
       toolbar: {
         title: 'Language',
         icon: 'globe',
+        // The English tag first, so the menu says which language a row is
+        // before it says it in itself (Will, 10 October 2026).
         items: [
-          { value: 'en', title: 'English' },
-          { value: 'es', title: 'Español' },
-          { value: 'pt-BR', title: 'Português (Brasil)' },
-          { value: 'zh-CN', title: '简体中文（普通话）' },
-          { value: 'zh-HK', title: '繁體中文（廣東話）' },
-          { value: 'ru', title: 'Русский' },
-          { value: 'ar', title: 'العربية' },
+          { value: 'en', title: `${LANGUAGE_TAGS.en} · English` },
+          { value: 'es', title: `${LANGUAGE_TAGS.es} · Español` },
+          { value: 'pt-BR', title: `${LANGUAGE_TAGS['pt-BR']} · Português (Brasil)` },
+          { value: 'zh-CN', title: `${LANGUAGE_TAGS['zh-CN']} · 简体中文（普通话）` },
+          { value: 'zh-HK', title: `${LANGUAGE_TAGS['zh-HK']} · 繁體中文（廣東話）` },
+          { value: 'ru', title: `${LANGUAGE_TAGS.ru} · Русский` },
+          { value: 'ar', title: `${LANGUAGE_TAGS.ar} · العربية` },
           { value: 'pseudo', title: 'Pseudo-language (English +40%)' },
         ],
         dynamicTitle: true,

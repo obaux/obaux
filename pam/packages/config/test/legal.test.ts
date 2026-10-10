@@ -80,12 +80,27 @@ describe('the privacy page and the transparency screen agree', () => {
     // Each promise the screen makes about what an admin CANNOT see has to be
     // restated here. These are the three that matter most to somebody deciding
     // whether to type their number in.
-    expect(text).toMatch(/cannot read your messages/);
+    // Whose messages is said in so many words: the messages to OTHER people.
+    // A guide does see what you send them (see below), so a bare "cannot read
+    // your messages" would promise something the screen does not (Will,
+    // 10 October 2026: the page and the screen read as a contradiction).
+    expect(text).toMatch(/cannot read your messages to other people/);
+    expect(text).not.toMatch(/cannot read your messages(?! to other people)/);
     expect(text).toMatch(/buddies/);
     expect(text).toMatch(/not on their list/);
 
-    // And the one exception, stated as an exception rather than buried.
+    // And the exceptions, stated as exceptions rather than buried: what you
+    // send the guide directly, and one reported message.
     expect(text).toMatch(/reports it as not safe/);
+  });
+
+  it('says a guide sees what you send them, as the screen does', () => {
+    const text = visibility!.bodyKeys.map((k) => (en[k as keyof typeof en] as string).toLowerCase()).join(' ');
+    expect(text).toMatch(/everything you say or send to them, when they message you directly/);
+    const direct = TRANSPARENCY_SCREEN.canSee.find((l) => l.key === 'transparency.canSee.directMessages');
+    expect(direct?.en).toMatch(/everything you say or send to them, if they message you directly/i);
+    const cannot = TRANSPARENCY_SCREEN.cannotSee.find((l) => l.key === 'transparency.cannotSee.messages');
+    expect(cannot?.en).toMatch(/to someone else/);
   });
 
   it('names photos wherever it names messages (D-394)', () => {
@@ -93,7 +108,7 @@ describe('the privacy page and the transparency screen agree', () => {
     // have to guess whether that includes the pictures. Both the page and the
     // screen say so in words.
     const text = visibility!.bodyKeys.map((k) => (en[k as keyof typeof en] as string).toLowerCase()).join(' ');
-    expect(text).toMatch(/cannot read your messages or see your photos/);
+    expect(text).toMatch(/cannot read your messages to other people, or see the photos/);
     expect(text).toMatch(/its photo/);
     const flagged = TRANSPARENCY_SCREEN.canSee.find((l) => l.key === 'transparency.canSee.flagged');
     expect(flagged?.en).toMatch(/message, photo/);
@@ -112,7 +127,7 @@ describe('the privacy page and the transparency screen agree', () => {
     expect(keep).toMatch(/sends it just as it is/);
     expect(keep).toMatch(/Google decides who can see that doc, not Pam/);
     const text = visibility!.bodyKeys.map((k) => (en[k as keyof typeof en] as string).toLowerCase()).join(' ');
-    expect(text).toMatch(/see your photos or documents/);
+    expect(text).toMatch(/photos or documents you send to other people/);
     expect(text).toMatch(/its photo or document/);
     const flagged = TRANSPARENCY_SCREEN.canSee.find((l) => l.key === 'transparency.canSee.flagged');
     expect(flagged?.en).toMatch(/message, photo or document/);
@@ -180,6 +195,45 @@ describe('messages read in the reader’s language (D-423)', () => {
     expect(findDignityViolations(strings)).toEqual([]);
     for (const k of TRANSLATION_KEYS.slice(1)) {
       expect(fleschKincaidGrade(en[k as keyof typeof en] as string), k).toBeLessThanOrEqual(9);
+    }
+  });
+});
+
+/**
+ * A promise on a screen is a promise Pam keeps (Will, 10 October 2026, via the merge desk: "every screen that
+ * promises something Pam doesn't do is built to keep the promise or rewritten", D-465). Two were found that
+ * were not true; these keep their wording true to what is built.
+ */
+describe('promises that are kept (D-465)', () => {
+  it('does not say a program sees the last day a member used Pam: the database does not give it to one (0062)', () => {
+    const line = TRANSPARENCY_SCREEN.canSee.find((l) => l.key === 'transparency.canSee.lastActive');
+    expect(line?.en).toBe('The last day you used Pam.');
+    expect(line?.en).not.toMatch(/program/i);
+    // In every language: the one sentence, and nothing about a program after it.
+    for (const [locale, bundle] of Object.entries(bundles)) {
+      const text = bundle['transparency.canSee.lastActive'] as string;
+      expect(text.split(/[.。]/).filter(Boolean), `${locale}: one sentence`).toHaveLength(1);
+    }
+    // A program does see when a member saved a new place, and the line that says so stays.
+    const saves = TRANSPARENCY_SCREEN.canSee.find((l) => l.key === 'transparency.canSee.saves');
+    expect(saves?.en).toMatch(/A program you joined sees this too/);
+  });
+
+  it('says where blocking is, and never that the other person will not know (they are told: D-463)', () => {
+    const privacy = en['privacy.s.your-choices.p3'] as string;
+    const terms = en['terms.s.being-decent.p3'] as string;
+    // The control is in a conversation's ⋯ menu ("Block this person", messages.block.*).
+    expect(privacy).toMatch(/⋯ menu/);
+    expect(terms).toMatch(/⋯ menu/);
+    // "anyone" was never true: you block a person you talk to.
+    expect(terms).not.toMatch(/block anyone/i);
+    // The blocked person sees that messages are blocked (messages.blocked.theirs.*).
+    expect(terms).not.toMatch(/will not know|won't know|not be told/i);
+    expect(terms).toMatch(/will see that messages are blocked/);
+    // Every language names the ⋯ menu too, so none keeps the old words.
+    for (const [locale, bundle] of Object.entries(bundles)) {
+      expect(bundle['privacy.s.your-choices.p3'], `${locale} privacy`).toContain('⋯');
+      expect(bundle['terms.s.being-decent.p3'], `${locale} terms`).toContain('⋯');
     }
   });
 });

@@ -53,3 +53,24 @@ export const Post: StoryObj<{ slug: string }> = {
   },
   render: ({ slug }) => <WebsiteWalker start={`/support/${slug}/`} />,
 };
+
+/**
+ * The front page with the "About Pam" section, as it will look once Will signs the
+ * English. The live site hides the section until then (`signed-off.json` in
+ * `apps/site/src/content/signed-off.json`), so **Home** above is what is live today.
+ */
+export const HomeWithAboutPam: Story = { render: () => <WebsiteWalker start="/" showAbout /> };
+
+/**
+ * About Pam, one language per story, each with its Draft banner. They are not on the
+ * site: Will signs the English, and the other six are drafts until a native reader
+ * has been over them (D-461). The language list at the top of each page links to the
+ * other six. The page is `/<lang>/about-pam/`; Arabic reads right to left.
+ */
+export const AboutPamEnglish: Story = { render: () => <WebsiteWalker start="/en/about-pam/" /> };
+export const AboutPamSpanish: Story = { render: () => <WebsiteWalker start="/es/about-pam/" /> };
+export const AboutPamPortugueseBrazil: Story = { render: () => <WebsiteWalker start="/pt-BR/about-pam/" /> };
+export const AboutPamChineseSimplified: Story = { render: () => <WebsiteWalker start="/zh-CN/about-pam/" /> };
+export const AboutPamChineseTraditionalHongKong: Story = { render: () => <WebsiteWalker start="/zh-HK/about-pam/" /> };
+export const AboutPamRussian: Story = { render: () => <WebsiteWalker start="/ru/about-pam/" /> };
+export const AboutPamArabic: Story = { render: () => <WebsiteWalker start="/ar/about-pam/" /> };

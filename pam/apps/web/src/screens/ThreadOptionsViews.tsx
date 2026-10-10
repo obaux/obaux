@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import * as stylex from '@stylexjs/stylex';
 import { RadioList, RadioListItem } from '@astryxdesign/core/RadioList';
 import { Text } from '@astryxdesign/core/Text';
-import { BigButton, FlagIcon, Notice, PhotoIcon, PlacesIcon } from '@pam/ui';
+import { BigButton, FlagIcon, Notice, PhotoIcon, PlacesIcon, ShieldIcon, TextLink } from '@pam/ui';
 import { SubPage } from '@pam/ui/SubPage';
 import { MenuList } from '@pam/ui/MenuList';
 import { MESSAGE_REPORT_REASONS, type MessageReportReason } from '@pam/config';
@@ -19,6 +19,7 @@ import { useSession } from '@/lib/useSession';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useThread } from '@/lib/useThread';
 import { reportMessage } from '@/lib/reportMessage';
+import { blockInConversation, unblockInConversation, useBlockState } from '@/lib/blocking';
 
 /**
  * A conversation's ⋯ page (D-213, Will, 1 October): the thread's secondary
@@ -61,6 +62,77 @@ function ThreadOptions() {
     : conversations.status === 'ready' &&
       conversations.conversations.find((c) => c.id === id)?.otherRole === 'provider';
 
+  // Block, or unblock (0076, D-463): a confirmation in place, one primary button, "Not now"
+  // beside it. An example conversation does it on the screen and nowhere else.
+  const signedIn = session.status === 'signed-in';
+  const { state: blockState, reload } = useBlockState(!pair && signedIn ? id : null);
+  const [exampleBlocked, setExampleBlocked] = useState(false);
+  const iBlocked = pair ? exampleBlocked : blockState?.iBlocked === true;
+  const [phase, setPhase] = useState<'menu' | 'confirm' | 'done' | 'failed'>('menu');
+  const [busy, setBusy] = useState(false);
+  const supportPhone = useSupportPhone();
+  // What the screen said when it was asked: the state flips once it is done, the words must not.
+  const [wasUnblock, setWasUnblock] = useState(false);
+
+  const confirm = async () => {
+    setBusy(true);
+    const unblocking = iBlocked;
+    setWasUnblock(unblocking);
+    let ok = true;
+    if (pair) {
+      setExampleBlocked(!unblocking);
+    } else {
+      ok = unblocking ? await unblockInConversation(id) : await blockInConversation(id);
+      if (ok) await reload();
+    }
+    setBusy(false);
+    setPhase(ok ? 'done' : 'failed');
+  };
+
+  if (phase !== 'menu') {
+    const unblocking = phase === 'done' ? wasUnblock : iBlocked;
+    const kind = unblocking ? 'unblock' : 'block';
+    return (
+      <SubPage
+        title={t(phase === 'done' ? `messages.${kind}.done.title` : `messages.${kind}.title`)}
+        backHref={threadHref}
+        backLabel={t('messages.options.back')}
+      >
+        {phase === 'done' ? (
+          <>
+            <Notice
+              notice="service_not_available"
+              title={t(`messages.${kind}.done.title`)}
+              body={t(`messages.${kind}.done.body`)}
+            />
+            <BigButton label={t('messages.options.back')} href={threadHref} />
+          </>
+        ) : (
+          <>
+            <Text type="supporting" xstyle={styles.body}>
+              {t(`messages.${kind}.body`)}
+            </Text>
+            {phase === 'failed' ? (
+              <Notice
+                notice="something_went_wrong"
+                title={t('notice.something_went_wrong.title')}
+                body={t('notice.something_went_wrong.body')}
+                supportPhone={supportPhone}
+                callLabel={t('help.callSupport')}
+              />
+            ) : null}
+            <BigButton
+              label={t(`messages.${kind}.confirm`)}
+              onPress={() => void confirm()}
+              isDisabled={busy}
+            />
+            <TextLink label={t('messages.block.cancel')} onClick={() => setPhase('menu')} isDisabled={busy} />
+          </>
+        )}
+      </SubPage>
+    );
+  }
+
   return (
     <SubPage title={t('messages.options.title')} backHref={threadHref} backLabel={t('messages.options.back')}>
       <MenuList
@@ -78,6 +150,12 @@ function ThreadOptions() {
             label: t('messages.options.report'),
             href: `/messages/thread/report/?id=${encodeURIComponent(id)}`,
             icon: <FlagIcon {...ICON} />,
+          },
+          {
+            id: 'block',
+            label: t(iBlocked ? 'messages.options.unblock' : 'messages.options.block'),
+            onSelect: () => setPhase('confirm'),
+            icon: <ShieldIcon {...ICON} />,
           },
           ...(otherIsProgram
             ? [{ id: 'program', label: t('messages.options.program'), href: programHref, icon: <PlacesIcon {...ICON} /> }]

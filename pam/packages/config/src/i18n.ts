@@ -85,6 +85,34 @@ export const SWITCHING_LANGUAGE: Readonly<Record<Locale, string>> = {
   ar: 'جارٍ التبديل إلى العربية…',
 };
 
+/**
+ * The short English tag drawn before each language's own name in every list of
+ * languages — "RU  Русский" (Will, 10 October 2026: "add Language abbreviation in
+ * english at front so we know what language before it says the language in their
+ * language. Always keep these abbreviations in english."). Whoever is looking
+ * at the list may not read most of the names; the tag tells them which row is
+ * which before the name does.
+ *
+ * Constants, not text bundle strings, on purpose: a bundle can be translated, and
+ * these must read the same in all seven languages. They are the codes above in
+ * capitals — the only short form that tells the two Chinese rows apart, and the
+ * one support staff see in the records. A tag is drawn left to right in its own
+ * isolate, whichever way the page reads, and hidden from a screen reader (the
+ * language's own name, spoken in its own voice, is already its accessible name).
+ */
+export const LANGUAGE_TAGS: Readonly<Record<Locale, string>> = {
+  en: 'EN',
+  es: 'ES',
+  'pt-BR': 'PT-BR',
+  'zh-CN': 'ZH-CN',
+  'zh-HK': 'ZH-HK',
+  ru: 'RU',
+  ar: 'AR',
+};
+
+/** The widest tag, in characters — a column sized from it keeps every name lined up. */
+export const LANGUAGE_TAG_WIDEST = Math.max(...Object.values(LANGUAGE_TAGS).map((tag) => tag.length));
+
 export type TextDirection = 'ltr' | 'rtl';
 
 interface LocaleInfo {

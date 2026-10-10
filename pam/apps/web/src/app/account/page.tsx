@@ -4,35 +4,26 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import * as stylex from '@stylexjs/stylex';
 import { VStack } from '@astryxdesign/core/VStack';
-import { HStack } from '@astryxdesign/core/HStack';
-import { Card } from '@astryxdesign/core/Card';
-import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
-import { Badge } from '@pam/ui/Badge';
-import { Button } from '@pam/ui/Button';
-import {
-  AppHeader,
-  BellIcon,
-  BigButton,
-  HelpBar,
-  Loading,
-  Notice,
-  Page,
-  PageTitle,
-  PeopleIcon,
-  ShieldIcon,
-} from '@pam/ui';
+import { AppHeader, BigButton, HelpBar, Loading, Notice, Page, PageTitle } from '@pam/ui';
 import { NOTICES } from '@pam/config';
-import { DUMMY_SELF } from '@pam/config/dummy-people';
 import { useI18n } from '@/lib/i18n';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession, signOut } from '@/lib/useSession';
-import { useRoleView } from '@/lib/useViewedRole';
-import { LanguageSwitcher } from '../LanguageSwitcher';
-import { RoleSwitchControl } from '../RoleSwitchControl';
+import { ProfileScreen } from '../../screens/ProfileScreen';
 
 /**
  * Your account — and the way out.
+ *
+ * **Profile is the signed-in view now (D-217, D-213)**: for somebody signed in
+ * this address opens the Profile tab, which has everything this screen's
+ * settings card had (Use Pam as, Reminders, Language, Privacy, Help) and the
+ * sign-out. What stays here is for everybody else, and it must: `NotIn` sends
+ * a paused account to `/account/` to sign out, and somebody half-way through
+ * sign-up on a borrowed phone needs the same, so the loading, signed-out, error,
+ * no-profile and paused answers below are this screen's still.
+ *
+ * What it was:
  *
  * Until the audit of the way in (14 September) the only sign-out in Pam was a
  * text link at the bottom of the case manager's screen. A member had none. On
@@ -64,26 +55,8 @@ import { RoleSwitchControl } from '../RoleSwitchControl';
  */
 
 const styles = stylex.create({
-  card: { width: '100%' },
-  label: { fontSize: '15px' },
-  value: { fontSize: '18px', lineHeight: 1.4 },
   note: { fontSize: '15px', lineHeight: 1.5 },
   intro: { fontSize: '18px', lineHeight: 1.5 },
-  /*
-   * One size, one alignment, for every row in Settings (Will, 16 September:
-   * "ensure all items in button areas are using a consistent font size...
-   * add icons... left align for easier readability"). The Language row used
-   * to be its own dropdown-menu button, sized and centred by Astryx's own
-   * default rather than by this file — that mismatch was the thing that made
-   * it read as inconsistent, not a difference in wording.
-   */
-  row: {
-    width: '100%',
-    minHeight: '48px',
-    fontSize: '17px',
-    justifyContent: 'flex-start',
-    textAlign: 'start',
-  },
 });
 
 export default function AccountPage() {
@@ -92,9 +65,6 @@ export default function AccountPage() {
   const supportPhone = useSupportPhone();
   const { state: session } = useSession();
   const [busy, setBusy] = useState(false);
-  const trueRole = session.status === 'signed-in' ? session.session.role : null;
-  const { demoRole, setViewAs } = useRoleView(trueRole);
-  const dummySelf = demoRole ? DUMMY_SELF[demoRole] : undefined;
 
   const leave = async () => {
     setBusy(true);
@@ -144,24 +114,17 @@ export default function AccountPage() {
     );
   }
 
+  // Signed in: the Profile tab (D-217).
+  if (session.status === 'signed-in') return <ProfileScreen />;
+
   /*
    * Two states that are still "you", with a way out. Somebody halfway through
    * sign-up on a borrowed phone needs sign-out more than anybody; somebody whose
    * account is paused is told so once, here, rather than by every screen.
    */
-  const partial = session.status === 'no-profile' || session.status === 'suspended';
-
   return (
     <Page gap={4}>
-      <AppHeader
-        roleLabel={session.status === 'signed-in' ? t(`role.${demoRole ?? session.session.role}`) : undefined}
-        roleControl={
-          trueRole === 'super_admin' ? (
-            <RoleSwitchControl trueRole={trueRole} viewedRole={demoRole ?? trueRole} onChange={setViewAs} />
-          ) : undefined
-        }
-        accountHref={null}
-      />
+      <AppHeader accountHref={null} />
       <PageTitle title={t('account.title')} backHref="/" backLabel={t('nav.back.home')} />
 
       {session.status === 'suspended' ? (
@@ -181,84 +144,12 @@ export default function AccountPage() {
         </>
       ) : null}
 
-      {session.status === 'signed-in' ? (
-        <Card padding={4} xstyle={styles.card}>
-          <VStack gap={3}>
-            <VStack gap={0.5}>
-              <Text type="supporting" xstyle={styles.label}>
-                {t('account.name')}
-              </Text>
-              <Text xstyle={styles.value}>{dummySelf?.firstName ?? session.session.firstName ?? '—'}</Text>
-            </VStack>
-            <VStack gap={0.5}>
-              <Text type="supporting" xstyle={styles.label}>
-                {t('account.kind')}
-              </Text>
-              <HStack gap={2} align="center">
-                <Badge variant="neutral" label={t(`role.${demoRole ?? session.session.role}`)} />
-                {dummySelf?.orgName ? <Badge variant="neutral" label={dummySelf.orgName} /> : null}
-              </HStack>
-            </VStack>
-            {(dummySelf?.regionName ?? session.session.regionName) ? (
-              <VStack gap={0.5}>
-                <Text type="supporting" xstyle={styles.label}>
-                  {t('account.city')}
-                </Text>
-                <Text xstyle={styles.value}>{dummySelf?.regionName ?? session.session.regionName}</Text>
-              </VStack>
-            ) : null}
-            <Text type="supporting" xstyle={styles.note}>
-              {dummySelf ? t('example.people.note') : t('account.change')}
-            </Text>
-          </VStack>
-        </Card>
-      ) : null}
-
-      {session.status === 'signed-in' ? (
-        <VStack gap={2}>
-          <Heading level={2} xstyle={styles.value}>
-            {t('account.settings')}
-          </Heading>
-          {/* A member who also works at a program (D-374): first, its own page. */}
-          {session.session.roles.includes('member') && session.session.roles.includes('provider') ? (
-            <Button
-              label={`${t('profile.menu.useAs')}: ${t(session.session.role === 'provider' ? 'useAs.provider' : 'useAs.member')}`}
-              variant="ghost"
-              icon={<PeopleIcon />}
-              href="/use-as/"
-              xstyle={styles.row}
-            />
-          ) : null}
-          <Button
-            label={t('reminders.settings')}
-            variant="ghost"
-            icon={<BellIcon />}
-            href="/reminders/"
-            xstyle={styles.row}
-          />
-          <Button
-            label={t('legal.privacy')}
-            variant="ghost"
-            icon={<ShieldIcon />}
-            href="/privacy/"
-            xstyle={styles.row}
-          />
-          <LanguageSwitcher variant="row" rowStyle={styles.row} />
-        </VStack>
-      ) : null}
-
-      {/*
-        Help sits among the other settings, and Sign Out is the last thing on
-        the screen (Will, 16 September) — it used to be the other way round,
-        which put the way out of the account above the way to get help with
-        it.
-      */}
       <HelpBar label={t('nav.help')} variant="block" />
 
       <VStack gap={2}>
         <BigButton
           label={busy ? t('account.signingOut') : t('signin.signout')}
-          variant={partial ? 'primary' : 'secondary'}
+          variant="primary"
           onPress={() => void leave()}
           isDisabled={busy}
         />

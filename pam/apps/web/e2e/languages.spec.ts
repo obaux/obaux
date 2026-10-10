@@ -1,5 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
-import { SUPPORTED_LOCALES, SWITCHING_LANGUAGE, directionOf, type Locale } from '@pam/config';
+import { LANGUAGE_TAGS, SUPPORTED_LOCALES, SWITCHING_LANGUAGE, directionOf, type Locale } from '@pam/config';
 import en from '@pam/config/locales/en.json';
 import es from '@pam/config/locales/es.json';
 import ptBR from '@pam/config/locales/pt-BR.json';
@@ -208,3 +208,136 @@ test.describe('choosing a language', () => {
     expect(await page.evaluate(() => localStorage.getItem('pam.locale'))).toBeNull();
   });
 });
+
+/**
+ * The English tag before each language's name (Will, 10 October 2026): "RU
+ * Русский", in every list of languages, the same seven tags whichever language
+ * the page is in. Checked here in the sign-in menu, in all seven languages.
+ */
+test.describe('the English tag before each language name, in the sign-in menu', () => {
+  for (const locale of SUPPORTED_LOCALES) {
+    test(`${locale}: every language has its tag before its name, drawn left to right, and read as its name alone`, async ({ page }) => {
+      await choose(page, locale);
+      await page.goto('/signin/');
+      await expect(page.locator('html')).toHaveAttribute('lang', locale);
+      await page.getByRole('button', { name: BUNDLES[locale]['language.title']! }).first().click();
+      await expect(page.getByRole('menuitemradio')).toHaveCount(SUPPORTED_LOCALES.length);
+
+      const rtl = directionOf(locale) === 'rtl';
+      const edges: number[] = [];
+      for (const code of SUPPORTED_LOCALES) {
+        const name = en[`language.${code}` as keyof typeof en] as string;
+        // The row's accessible name is the language's own name and nothing else: the tag is hidden from a screen reader.
+        const row = page.getByRole('menuitemradio', { name, exact: true });
+        await expect(row, `${code} row`).toBeVisible();
+        const tag = row.locator('[aria-hidden="true"]', { hasText: LANGUAGE_TAGS[code] }).first();
+        await expect(tag).toHaveText(LANGUAGE_TAGS[code]);
+        await expect(tag.locator('xpath=.//*[normalize-space()]').first()).toHaveCSS('direction', 'ltr');
+        // The name keeps its own language.
+        await expect(row.locator(`[lang="${code}"]`)).toHaveText(name);
+
+        // The tag comes first: on the left in English, on the right in Arabic.
+        const tagBox = (await tag.boundingBox())!;
+        const nameBox = (await row.locator(`[lang="${code}"]`).boundingBox())!;
+        if (rtl) expect(tagBox.x, `${code}: tag right of name`).toBeGreaterThan(nameBox.x);
+        else expect(tagBox.x, `${code}: tag left of name`).toBeLessThan(nameBox.x);
+        // And the names line up on one edge, whatever the tag's length.
+        edges.push(Math.round(rtl ? nameBox.x + nameBox.width : nameBox.x));
+      }
+      expect(new Set(edges).size, `names line up: ${edges.join(', ')}`).toBe(1);
+    });
+  }
+});
+
+/**
+ * The same tag on the Language screen, Profile's Language row and the join
+ * screen's language chips (D-451 gave rows and chips a `tag` and a `lang`).
+ * Signed in as a member, against a stubbed sign-in system.
+ */
+const MEMBER = 'de3b9c2e-ec2f-403b-93e5-86e6ee75349b';
+const json = (body: unknown) => ({ status: 200, contentType: 'application/json', body: JSON.stringify(body) });
+
+async function signedInMember(page: Page, locale: Locale) {
+  await page.addInitScript((userId: string) => {
+    const session = {
+      access_token: 'test-access-token',
+      refresh_token: 'test-refresh-token',
+      token_type: 'bearer',
+      expires_in: 3600,
+      expires_at: Math.floor(Date.now() / 1000) + 3600,
+      user: { id: userId, aud: 'authenticated', role: 'authenticated' },
+    };
+    for (const ref of ['stub', 'shobqzuhicoiymtumiaz']) {
+      window.localStorage.setItem(`sb-${ref}-auth-token`, JSON.stringify(session));
+    }
+  }, MEMBER);
+  await page.route('**/auth/v1/user*', (route) => route.fulfill(json({ id: MEMBER })));
+  await page.route('**/rest/v1/notifications*', (route) => route.fulfill(json([])));
+  await page.route('**/rest/v1/rpc/member_points*', (route) => route.fulfill(json(25)));
+  await page.route('**/rest/v1/rpc/saved_places_mine*', (route) => route.fulfill(json([])));
+  await page.route('**/rest/v1/profiles*', (route) =>
+    route.fulfill(
+      json({
+        id: MEMBER,
+        role: 'member',
+        first_name: 'Will',
+        region_id: null,
+        regions: null,
+        access_status: 'active',
+        onboarded_at: '2026-09-12T00:00:00Z',
+        // A signed-in person's own language wins over the browser's (LocaleSync).
+        preferred_language: locale,
+      }),
+    ),
+  );
+}
+
+test.describe('the English tag on the Language screen and Profile', () => {
+  for (const locale of ['en', 'ru', 'ar'] as const) {
+    test(`${locale}: every language row starts with its tag, the names line up, and a row reads as its name alone`, async ({ page }) => {
+      await choose(page, locale);
+      await signedInMember(page, locale);
+      await page.goto('/language/');
+      await expect(page.locator('html')).toHaveAttribute('lang', locale);
+      await settled(page);
+
+      const rtl = directionOf(locale) === 'rtl';
+      const edges: number[] = [];
+      for (const code of SUPPORTED_LOCALES) {
+        const name = en[`language.${code}` as keyof typeof en] as string;
+        const words = page.locator(`span[lang="${code}"]`).filter({ hasText: name }).first();
+        await expect(words, `${code} row`).toBeVisible();
+        // The language's own name keeps its own direction, so a screen reader speaks it in its own voice.
+        await expect(words).toHaveAttribute('dir', directionOf(code));
+        const row = page.getByRole('button', { name, exact: true });
+        await expect(row, `${code}: a row read as its name alone`).toHaveCount(1);
+        const tag = row.locator('[aria-hidden="true"]', { hasText: LANGUAGE_TAGS[code] }).first();
+        await expect(tag).toHaveText(LANGUAGE_TAGS[code]);
+        const tagBox = (await tag.boundingBox())!;
+        const nameBox = (await words.boundingBox())!;
+        if (rtl) expect(tagBox.x, `${code}: tag right of name`).toBeGreaterThan(nameBox.x);
+        else expect(tagBox.x, `${code}: tag left of name`).toBeLessThan(nameBox.x);
+        edges.push(Math.round(rtl ? nameBox.x + nameBox.width : nameBox.x));
+      }
+      expect(new Set(edges).size, `names line up: ${edges.join(', ')}`).toBe(1);
+    });
+  }
+
+  test('Profile: the Language row shows the current language with its tag first', async ({ page }) => {
+    // Profile is the account screen now (D-456); its Language row is a link carrying `valueTag`.
+    await choose(page, 'ru');
+    await signedInMember(page, 'ru');
+    await page.goto('/profile/');
+    await expect(page.locator('html')).toHaveAttribute('lang', 'ru');
+    await settled(page);
+    // The row's link is a stretched overlay named for the label; the tag and value sit in its list item.
+    const row = page
+      .getByRole('listitem')
+      .filter({ has: page.getByRole('link', { name: new RegExp(BUNDLES.ru['language.title']!) }) })
+      .last();
+    await expect(row).toContainText(LANGUAGE_TAGS.ru);
+    await expect(row.locator('[aria-hidden="true"]', { hasText: LANGUAGE_TAGS.ru })).toHaveCount(1);
+    await expect(row.locator('[lang="ru"]')).toHaveText(BUNDLES.ru['language.ru']!);
+  });
+});
+

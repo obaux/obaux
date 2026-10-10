@@ -12,7 +12,8 @@ import { PlusIcon, TextLink, TripsIcon } from '@pam/ui';
 import { emptyState } from '@pam/ui/emptyState';
 import { Button } from '@pam/ui/Button';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
-import { readAddedTrips, readMoves, withMoves } from '@/lib/addedTrips';
+import { readMoves } from '@/lib/addedTrips';
+import { useTrips } from '@/lib/useTrips';
 import { MapDrawer } from '@pam/ui/MapDrawer';
 import { Confetti } from '@pam/ui/SuccessScreen';
 import { useSearchParams } from 'next/navigation';
@@ -25,6 +26,7 @@ import { TripsMap } from './TripsMap';
 import { usePolicies } from '@/lib/usePolicies';
 import { useServices } from '@/lib/useServices';
 import { policiesForService } from '@pam/config/dummy-services';
+import { placeAsksForPolicies } from '@pam/config/dummy-policies';
 import { useMySignatures } from '@/lib/useMySignatures';
 import { policiesHref } from './MemberPoliciesView';
 import { intlLocale } from '@pam/config';
@@ -269,30 +271,30 @@ export function TripsView({ trips, headerActions, justAdded = null }: TripsViewP
   );
 }
 
-/** Trips, wired to the example set (D-213) — nothing writes a trip yet. */
+/**
+ * Trips, wired to the example set and the member's own (D-213, D-454). One
+ * read — `useTrips` — gives the examples, the trips added in this visit (D-225)
+ * and the member's saved ones, each at its moved time (D-281).
+ */
 export function TripsScreen({ headerActions }: { readonly headerActions?: ReactNode }) {
   // `?added=<id>` — the trip New trip just made (D-241).
   const justAdded = useSearchParams().get('added');
-  // Trips added in this visit (D-225), read after mount: storage is the
-  // browser's, and the first render has to match the server's.
-  const [added, setAdded] = useState<readonly Trip[]>([]);
-  // Visits moved with "Change appointment" (D-281), read with them.
+  const { examples: exampleTrips, added: addedTrips } = useTrips();
+  // An example visit moved with "Change appointment" (D-281).
   const [moves, setMoves] = useState<Readonly<Record<string, string>>>({});
   useEffect(() => {
     setMoves(readMoves());
-    setAdded(
-      withMoves(readAddedTrips()).map((trip) => ({
-        id: trip.id,
-        placeId: trip.placeId,
-        placeName: trip.placeName,
-        category: trip.category,
-        lat: trip.lat,
-        lon: trip.lon,
-        startsAt: trip.startsAt,
-        serviceId: trip.serviceId ?? null,
-      })),
-    );
-  }, []);
+  }, [exampleTrips]);
+  const added: readonly Trip[] = addedTrips.map((trip) => ({
+    id: trip.id,
+    placeId: trip.placeId,
+    placeName: trip.placeName,
+    category: trip.category,
+    lat: trip.lat,
+    lon: trip.lon,
+    startsAt: trip.startsAt,
+    serviceId: trip.serviceId ?? null,
+  }));
   const examples: Trip[] = DUMMY_TRIPS.map((trip) => {
     const person = dummyConnection(trip.withId);
     return {
@@ -316,6 +318,9 @@ export function TripsScreen({ headerActions }: { readonly headerActions?: ReactN
   // set the booked screen and the place ask for; signing them all now shows
   // "Policies signed" here (Will, D-336).
   const withPolicies = (trip: Trip): Trip => {
+    // A real place asks for none yet (`placeAsksForPolicies`): the example set
+    // is not its program's, so there is nothing to sign.
+    if (!placeAsksForPolicies(trip.placeId)) return { ...trip, policies: null };
     const services = forPlace(trip.placeId);
     const service = trip.serviceId ? services.find((s) => s.id === trip.serviceId) : undefined;
     const p = progress(trip.placeId, service ? policiesForService(service, policies, services) : policies);

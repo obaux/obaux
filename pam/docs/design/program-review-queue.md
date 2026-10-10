@@ -1,6 +1,9 @@
 # Program review queue: what a super admin sees (D-386)
 
-**Status:** specified, not built. Will, 7 October 2026: "If user deletes and
+**Status:** the table and the lead's side are built in the database (D-462,
+`20261010083715_…`: `program_submissions`, `withdraw_program_submission`,
+`request_program_change`); the super admin's side below (approve / ask for
+changes / discard, and the screen) is part 6 and is **not built**. Will, 7 October 2026: "If user deletes and
 starts over, make sure this is properly communicated in request for super
 admin. Timed out Request, then let super admin discard. And approve new
 program … Document this so it gets built properly."

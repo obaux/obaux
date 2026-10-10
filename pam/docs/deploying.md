@@ -61,6 +61,14 @@ New support posts: add an entry to `apps/site/src/content/posts.ts` and a body
 component beside `CaseManagerAssignments.tsx`, then register it in
 `apps/site/src/app/support/[slug]/page.tsx`.
 
+**joinpam.org (10 October).** Pam's domain: the site is `joinpam.org` (`www` redirects to
+it), the app is `app.joinpam.org`, email sends from `mail.joinpam.org`. The site has no
+invite short link: `joinpam.org/j/<CODE>` was tried and removed (10 October), because the app has no `/j/` page — a real invite link is `/signin/?invite=<CODE>&as=<member|program|case-manager>` (`apps/web/src/lib/appUrl.ts`). Short links come back when a text or email uses them, with whoever writes that message.
+`NEXT_PUBLIC_SITE_URL` defaults to
+`https://joinpam.org` (the share preview's absolute address) and `NEXT_PUBLIC_APP_URL` to
+`https://app.joinpam.org`; set either at build time to point a preview elsewhere. 
+CI builds the site and runs `apps/site/scripts/a11y.mjs` on it (axe, light/dark, desktop/phone/320px).
+
 ## What this does not cover
 
 Store submission. Capacitor wraps this same build; `cap add ios` and

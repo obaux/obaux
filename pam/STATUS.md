@@ -542,8 +542,10 @@ calls it every five minutes. Twilio credentials are in place and proved with a
 real end-to-end test: a signed-off template queued to Will's own number came
 back `status: sent`, no failure reason, picked up by the very next scheduled
 run. Quiet hours, the STOP list and atomic claiming are enforced in the
-database, not in the function. All sixteen templates in the catalogue are now
-signed off — the original thirteen (13 September) plus the two built this
+database, not in the function. All fifteen templates in the catalogue were then
+("sixteen" was a miscount, corrected 10 October; since then four Text alerts texts
+were added and signed, so the catalogue has nineteen, and the deployed dispatcher
+carries the fifteen until it is redeployed) signed off — the original thirteen (13 September) plus the two built this
 week, `staff_request_approved` and `staff_request_denied` (17 September) —
 so nothing is currently held back at the `reviewedBy` gate; the next template
 anyone adds still starts blank and stays refused until it is read. See
@@ -926,11 +928,131 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
-## Places & programs · load a lead's own program (10 October) — on the branch, not merged
+## Languages & legal · the last-day line and the blocking words (10 October) — merged 10 October
 
-D-447, on `claude/places-programs-load-own-program` (Piper). A program lead's program is
-now read from, and saved to, the database instead of remembered by the tab. **Not on `main`;
-nothing applied to the live project.** Two migrations, in this order: **0085** (by hand, it
+Merged to `main` by the merge desk, 10 October, from `claude/lena-honest-promises` (e82e815). Will's rule, via Mira: a screen that promises something Pam does not do is
+fixed or rewritten (D-465).
+
+- **"The last day you used Pam."** — the transparency screen no longer says a program sees it. A case manager does; a
+  program does not (0062), whatever D-242 intended; that half stays open. Seven languages, the contract's `en` and
+  comments, a test. The **public site's** "What others can see" row (`apps/site`) said a program does; changed with
+  Mira's OK, in Wren's lane, so the app and the page change in the same merge.
+- **Blocking, in its true form** now that the Block control is on `main` (D-463): privacy "Both are in a conversation's
+  ⋯ menu"; terms "You can block someone you talk to, from a conversation's ⋯ menu. Neither of you can send messages
+  there after that. They will see that messages are blocked." — not "anyone", not "they will not know". The Block
+  session's STATUS line that the terms were untrue can go at merge.
+- **Not here:** the mail-service paragraph on the privacy page (its English is with Will).
+- **Verified:** unit tests (`@pam/config` 995, `@pam/ui` 117, `@pam/web` 71, `@pam/site` 18), typecheck and the copy
+  ledger on the merged tree; the browser suite on all three viewports, 909 passed (on the tree one merge before the last);
+  the full fit audit: 92 new in a language, 84 accepted, 8 not, all in stories this branch does not touch (Explore's pseudo
+  clamps; the two Block conversation stories; the one-trip-saved date). See the session log.
+
+## Languages & legal · English tags before each language name; the privacy wording (10 October) — merged 10 October
+
+From `claude/lena-english-language-tags` (1f59d62), merged to `main` by the merge desk, 10 October; no
+migration. At merge, `fit-known.json` took seven overlaps on `conversation-file-refused` (the thread
+under the header, which comes and goes; looked at in Russian and Arabic at 320px). Two jobs from Will via Mira (D-455, D-452).
+
+- **Every list of languages starts each name with an English tag** — EN, ES, PT-BR, ZH-CN, ZH-HK, RU, AR
+  (`LANGUAGE_TAGS` in `@pam/config`, constants, never bundle strings; a test fails if one is missing,
+  differs from its code, or turns up in a bundle). On the Language screen, the sign-in globe menu and
+  the current-language chip, the join screen's language chips, Profile's Language row (before the
+  current language) and Storybook's locale menu. Hidden from a screen reader; each name carries its own
+  `lang`, so it is spoken in its own voice. Left to right and isolated, at the start of the row (the
+  right in Arabic). Screenshots at 320px: `docs/languages/language-tags/`.
+- **Crossing into the design system, with Mira's OK:** `ChoiceChips` no longer turns a chip round with its
+  language (the Arabic chip on an English page read "العربية  AR"); `lang` stays on the button for the
+  spoken name, `dir` is on the words only. `@pam/ui` exports `./OptionTag` (`OptionTag`, `TaggedWords`),
+  which the sign-in menu now uses.
+- **The privacy page says what a guide can and cannot read**, as the transparency screen does: a guide
+  sees everything you send them directly, nothing you send to anyone else, and one message if someone
+  reports it. Seven languages; `legal.test.ts` pins the wording. The contract is unchanged. The six
+  translations are Claude's and are promises: they still need a native reader (`before-launch.md`).
+- **Verified:** unit tests (`@pam/config` 986, `@pam/ui` 117, `@pam/web` 61), typecheck and the copy ledger on the
+  merged tree; the browser suite on all three viewports, 903 passed (on the tree one merge before the last); the
+  full fit audit (480 stories × en, ru, ar, zh-CN, pseudo): 93 new in a language, 81 accepted, 12 not accepted, all in
+  two stories this job does not touch (Explore's pseudo-language clamps; the file-refused conversation's overlaps,
+  which come and go between runs). See the session log.
+- **Not done:** hearing the tags with a screen reader (before-launch). Next, one small branch: the last-day line
+  (case manager only), the blocking words back in their true form (D-463), and a mail-service paragraph awaiting
+  Will's approval.
+
+---
+
+## Places & programs · the services a program offers, on screens (10 October) — merged 10 October
+
+D-313 and D-462, from `claude/places-programs-services-list` (Piper, 0dba5bb), merged to `main` by
+the merge desk, 10 October. **No migration of its own** (`program_services` is live, `20261010083715`).
+
+- **Built:** a real program's services are read from and written to the database; the Program
+  tab's Services card, the service editor and a member's place page show them on any phone; an
+  example program keeps its services in the tab. The editor does not offer the example policies
+  for a real program.
+- **Not built:** a booking pointing at one service (changes `book_trip`'s signature: its own
+  contract migration); policies per service; reordering.
+- **Proven:** 4 new web tests, Storybook build, a browser look at adding and reading a service,
+  language fit in seven languages and the pseudo-language.
+
+---
+
+## Places & programs · no example policies for a real place (10 October) — merged 10 October
+
+D-313, from `claude/places-programs-no-example-policies` (Piper, 4bf27cb), merged to `main` by the
+merge desk, 10 October. **No migration.** A place from the catalogue (a uuid id) asks a member to sign
+nothing: `placeAsksForPolicies` says no, and the Trips list, which had bypassed it, goes through
+it. Example places keep the example policies (Storybook). **Not built:** real policies per program
+and per service; the leads' and staff's policy screens still show example data.
+
+---
+
+## Places & programs · a live program's pending change (10 October) — merged 10 October
+
+D-447 and D-462, from `claude/places-programs-program-changes` (Piper, 24aad8b), merged to `main` by
+the merge desk, 10 October. No migration of its own; it reads `20261010083715`, live since the
+merge of the database half. Programs sent before that migration have no submission row: the tab
+reads them as before and does not offer Delete and start over (the backfill goes with part 6).
+
+- **Built:** a live program's new name or address is asked of Pam and waits beside the live one
+  ("Waiting for Pam", with Cancel); the description, phone and website still change at once;
+  Delete and start over withdraws a first send and lands on Add a program; the Program tab reads
+  the open submission.
+- **Not built:** the services list (`program_services`) on screens; a lead resending after Pam
+  asks for changes; the super admin's side (part 6); the kind of help is not editable there.
+- **Proven:** web 67 tests, Storybook build, a browser look at the three flows, language fit
+  (seven languages and the pseudo-language).
+
+---
+
+## Places & programs · save a member's trips (10 October) — merged 10 October
+
+D-454, from `claude/places-programs-save-trips` (Piper). A trip a member
+plans to a real place is saved, and the day-before reminder text is queued for a member who
+turned reminders on. **Merged to `main` by the merge desk, 10 October, after the database half.**
+Both migrations are live (see "trips saved, the database half" below):
+`20261010074045_a_planned_trip_is_saved_and_its_day_before_reminder_is.sql` (expand), then
+`20261010074241_appointments_are_written_only_through_the_trip_functions.sql` (contract).
+
+- **Built:** `book_trip` / `move_trip` / `cancel_trip` / `my_trips()`; a trigger that queues,
+  re-times or cancels one `appointment_24h` text, only when the member has reminders on; every
+  screen that lists trips shows saved ones (`SavedTripsSync`, `useTrips`); Plan a trip saves for
+  real and says so if it cannot. Wording: a sent program promises no time, `/interested` speaks
+  in a program's words, the review wait drops the "Text me" row.
+- **Closed:** any signed-in person could write an appointment for any member, and a member could
+  mark their own appointment attended.
+- **Not built:** a program booking for a member (D-316) and example places stay on the device;
+  no cancel button; the text links to Trips on `app_settings.app_url`, which still holds the old
+  address. (The dispatcher's claim now texts a reminder only to a member who agreed:
+  Messages' `20261010072848_…`, live.)
+- **Proven:** database suite (`28_` file, renumbered at merge), numbering test, 61 web and 822 config tests,
+  Storybook build, a browser look at planning, moving and reading a saved trip, language fit.
+
+---
+
+## Places & programs · load a lead's own program (10 October) — merged 10 October
+
+D-447, from `claude/places-programs-load-own-program` (Piper). A program lead's program is
+now read from, and saved to, the database instead of remembered by the tab. **Merged to `main`
+10 October (`aff402d`); 0085 and both migrations are live.** Two migrations, in this order: **0085** (by hand, it
 drops signatures), then `20261010042108_a_program_lead_submits_their_own_program.sql`, then
 `20261010062347_an_approved_program_lead_gets_an_org.sql` (refuses without 0085).
 
@@ -950,6 +1072,33 @@ drops signatures), then `20261010042108_a_program_lead_submits_their_own_program
   new sentence is left to the PR check.
 
 ---
+
+## Messages & notifications · legacy Messages page removed (10 October 2026)
+
+Merged to `main` by the merge desk, 10 October, from `claude/messages-remove-legacy` (5c3d6f1); live with the next deploy. Case managers and super admins now get the redesigned Messages
+screen with "Conversations | Reported"; `LegacyMessagesPage` and the old example-conversation half of
+`DummyRows` are deleted. `?show=reported` still works; every reported-message test kept and moved to the
+new switch. No database change. messages.spec passes on all three projects (174). D-469.
+
+## Messages & notifications · Will's sign-off (10 October 2026)
+
+Merged to `main` by the merge desk, 10 October (no migration). Will approved the four Text alerts texts and the staff
+invite email (English, in his words: no expiry days, "Accept invite", human). The alert texts and the email
+now carry his name; the other languages are drafts approved to learn from. Nothing sends yet: the alert texts
+are not queued by anything, and the email needs the function deployed, the mail domain and its secrets, and
+`INVITE_EMAILS=on`. D-461.
+
+## Messages & notifications · staff invite email (10 October 2026)
+
+Merged to `main` by the merge desk, 10 October. A staff invite's email now has a
+queue (`20261010063304_…`, expand only, **applied to the live project 10 October**; read back:
+forced RLS, no client grants, the sender's functions service-role only), a sender
+(`supabase/functions/send-invite-emails`, **not deployed**, off unless `INVITE_EMAILS=on`) and
+first-invite wording in seven languages (English signed by Will, D-461; the rest are drafts).
+D-450. What Will has to set up, in order: `docs/email-setup.md`. Checked: config 831, database
+suite passes (with `24_staff_invite_emails_test.sql`), Storybook builds, fit audit on the new
+page clean. Not done: the expired-link email, an email for staff who already have accounts,
+the privacy line about the mail service.
 
 ## Arabic reads in the right order (9 October) — 0.51.1, merged 10 October
 
@@ -981,6 +1130,114 @@ Broad St, North Philadelphia` drew `… St, North Philadelphia 1231 بالقرب
   `fit-known.json` and the old `ar|spill` entry is gone; `areachip--arabic` needs none
   (its ellipsis is the story's own in every column).
 
+## Messages & notifications · Twilio receiver (10 October 2026)
+
+Merged to `main` by the merge desk, 10 October. `sms-inbound` (**not deployed yet**: it is deployed
+together with Will's Twilio step and his go, and is off unless `SMS_INBOUND=on`) records a STOP or
+START reply, after checking Twilio's signature; migration `20261010081342_…` (**applied 10 October**,
+read back: both functions service-role only) adds `record_sms_stop` / `record_sms_start`. Until it is switched
+on and Twilio is pointed at it, Pam still does not learn a STOP. Setup: `docs/sms-setup.md` § 3.
+YES/NO replies are not built. D-460.
+
+## Places & programs · reported places screen (10 October 2026) — merged 10 October
+
+Merged to `main` by the merge desk, 10 October, from `claude/places-programs-reported-places` (dca16c6). A page at `/places/reported/` for admins and case managers, linked from the profile and the reported-place bell row. Only a super admin can keep or remove; case managers read. No database change. Shared files touched: `ProfileView.tsx`, `app/notifications/page.tsx`, `ReportedPlaces.tsx` (buttons only when allowed). Figma flow map not republished.
+
+## Places & programs · a trip names its service (10 October 2026) — merged 10 October
+
+Merged to `main` by the merge desk, 10 October, from `claude/places-programs-trip-service` (D-470). Migration `20261010121853`, expand only: `appointments.program_service_id`, a new door `book_trip_at_service`, `my_trip_services()`; `book_trip` keeps its signature and is now a one-line wrapper. **Applied live at merge**, read back (all three bodies identical to the file, grants unchanged). Test `33_a_trip_names_its_service_test.sql`. Later contract step: drop the old `book_trip` by a manual SQL file once no live app calls it. Next: `log_call`.
+
+## Places & programs · planning a trip earns points (10 October 2026) — merged 10 October
+
+Merged to `main` by the merge desk, 10 October, from `claude/places-programs-trip-points` (D-468). Migration `20261010115117` replaces `book_trip` (same signature): 25 points once per place ever, three a day, members only. Expand only; **applied live at merge**, read back (body identical to the file, grants unchanged). Test `32_plan_a_trip_points_test.sql`. The Points screen lists it as "Plan a trip to a place". Next: `program_service_id` (contract), then `log_call`.
+
+## Places & programs · the Points promise (10 October 2026) — merged 10 October
+
+Merged to `main` by the merge desk, 10 October, from `claude/places-programs-points-promise` (4bf85c2). "Ways to earn" lists only what Pam pays today (save a place +5, finish setup +25), driven by `AWARDED_TODAY`. The proposal for making plan-a-trip and call-a-place real is in `docs/points-awarding.md`, waiting on Will. No migration.
+
+## Places & programs · review record, pending change, program services — the database half (10 October 2026)
+
+Merged to `main` by the merge desk, 10 October, from `claude/places-programs-submissions-and-services`
+(071c781, Piper; D-462, part 5a). **Live:** `20261010083715_…` (expand only), applied at merge and read
+back: `program_submissions` and `program_services` (RLS on and forced; policies and client grants as
+written), `withdraw_program_submission` and `request_program_change` (authenticated only), and
+`submit_program` replaced with the same signature (live body identical to the file). It now also writes a
+submission, and a withdrawn program no longer blocks a new send. The live app calls none of the new
+pieces yet. Nothing here can approve a submission (part 6). Programs sent before this have no
+submission row, so the app part must handle a listing in review with no record. Test:
+`30_program_submissions_and_services_test.sql`.
+
+## Places & programs · trips saved, the database half (10 October 2026)
+
+Merged to `main` by the merge desk, 10 October, from `claude/places-programs-trips-database`
+(7713e69, Piper; D-454). The app half (`claude/places-programs-save-trips`) followed later the same day.
+
+- **Live:** `20261010074045_…` (expand): `book_trip`, `move_trip`, `cancel_trip`, `my_trips`, the
+  `appointments_keep_reminder` trigger that queues, re-times or cancels the day-before text, and
+  two columns. Read back 10 October; the app on `main` calls none of it yet.
+- **Live, run by Will from the SQL editor 10 October (D-387):** `20261010074241_…` (contract)
+  from `packages/db/manual/2026-10-10-appointments-written-only-through-the-trip-functions.sql`.
+  Read back: only the three read policies remain, no insert/update/delete for `anon` or
+  `authenticated`, one ledger row. Appointments are written only through the trip functions.
+- The trips database test is `28_saved_trips_and_reminders_test.sql` (renumbered at merge: 26 and
+  27 were taken by Messages).
+
+## Messages & notifications · alert texts, STOP, promises (10 October 2026)
+
+Merged to `main` by the merge desk, 10 October. Two migrations, **both applied to the live project
+10 October** and read back: `20261010071947_…` (a stored STOP
+cannot be cleared from the app: a person could clear their own at the API) and `20261010072848_…`
+(the claim texts a reminder only to somebody who agreed). Text alerts offers switches only for what
+is sent; the four alert texts are signed by Will (D-461). A STOP shows as "Texts are off". A STOP is
+recorded once `sms-inbound` is deployed (D-460); nothing queues the check-in or "someone wants to
+connect" yet. Samples file: nine texts. D-453. Text reminders' staff list (merged 10 October) names
+only the alert texts Will signed: no "introduced to your program", no "your account changes".
+
+## Design system & Storybook · live app shell (10 October)
+
+Merged to `main` by the merge desk, 10 October, from `claude/pam-design-app-shell` (6318b48); live after the next production deploy. The redesigned tabs are the app (D-456): the role's tab bar
+from the root layout, a gate under every tab screen (Help bar on each state), and `/`, `/saved/`, `/trips/`,
+`/program/`, `/programs/`, `/profile/`, `/messages/` draw the redesigned screens. Kept on purpose: `/places/`,
+`/interested/`, Messages for case managers and super admins, and the old Home (+ `/admin/`) for case managers
+and program leads until the people strip's rings are on the new staff Homes (Mira). First-load **572.4 kB** gz of 600. A super
+admin's view switch now reaches the whole page; a case manager's Home keeps "What you can see".
+
+- Proven: web tests, build, Storybook build, e2e per file on three projects; whole suite narrow-320 279 pass.
+- Not proven: Playwright per role at phone size on the built app; 5 `audit:fit` entries not in the known
+  list (3 Block conversation stories, 2 saved-trips with a clock-minute key), none in a screen changed here.
+- Needs a human: Will's answer on the people strip's D-198 rings (asked by Mira); the five `people-strip` specs pass on the old Home.
+
+## Design system & Storybook · language tag (10 October)
+
+Merged to `main` by the merge desk (5dd52b8), 10 October. Job from Will via Mira: a short English tag before a
+language's own name, so a person can see which language a row is before they can read it (D-451).
+
+- **`@pam/ui`:** `MenuItem` takes `tag?`, `lang?`, `valueTag?`; a `ChoiceChips` option takes `tag?` and
+  `lang?`. All optional; a row or chip without them draws exactly what it drew (checked against a
+  snapshot recorded from `main`).
+- **The tag** is a 43px cell (3.6em, the widest of EN, ES, PT-BR, ZH-CN, ZH-HK, RU, AR plus slack),
+  quiet, left to right, `aria-hidden`, at the start of the row (the right in Arabic). `lang` goes on a
+  span round a row's label and on the button of a chip, so a screen reader speaks the name in its own
+  voice. `valueTag` is the same tag at its natural width, before a row's value.
+- **Nothing uses it yet**; Lena's Language list, sign-up and Profile will. Stories: Components ›
+  Navigation › MenuList (Language tags, Arabic, Spanish, Value tag) and Inputs › ChoiceChips (new).
+- Verified: 116 UI tests, 48 web tests, typecheck, Storybook build, and the full fit audit on the merged
+  tree (471 stories × 7 languages: 26 new in a language, all 26 accepted, 0 not). Not run: the
+  Playwright browser suite, which is what measures the tag's colour contrast.
+
+## Messages & notifications · Reported in the new Messages (10 October 2026)
+
+Merged to `main` by the merge desk, 10 October (no migration). The redesigned Messages screen has "Conversations | Reported" for case managers and
+super admins, with `?show=reported` working, so the old `/messages/` page can go. The old page is still the live
+route until Dot's shell merges; deleting it (and `DummyRowsLazy`) is a follow-up after both. D-464.
+
+## Messages & notifications · Block (10 October 2026)
+
+Merged to `main` by the merge desk, 10 October (no migration: 0076 is live). A conversation's ⋯ menu has
+Block this person (asks first) and, once blocked, Unblock; the composer gives way to a notice for both
+sides, and the person blocked is told. The database half was 0069/0076. D-463. Test:
+`31_block_in_conversation_test.sql` (renumbered at merge: 30 went to Places). The terms and privacy page say what Block does since D-465 (merged 10 October). Staff can block too: kept as built (the merge desk decided, under Will's delegation).
+
 ## Design system & Storybook · area chip, fit audit (10 October) — merged 10 October
 
 Branch `claude/pam-design-areachip-long-address`, merged to `main` on 10 October; D-448 confirmed by Mira. Job: Will asked for the
@@ -997,6 +1254,39 @@ fine and the fit audit was over-counting (D-448).
   (8 on `d4f325e`, 0 on this branch: the full run, 464 stories × 7 languages, found 26 new in a language and all 26 are in the known list). The raw count the script prints is a different measure.
 - Outside this lane, seen and left: some English file names in the attachment lists are cut at the
   timestamp column with no ellipsis ("Free resume worksl").
+
+## Seven languages, messages in your own language, and text that fits (9 October) — 0.50.1 and 0.51.0, merged 9 October (PR #29)
+
+## Website · public site and help centre (10 October) — `apps/site`, on `main`
+
+The public site, `joinpam.org` (Vercel project `pam-site`; the app is `app.joinpam.org`), is a static
+Next export on the app's theme (`pnpm --filter @pam/site dev|build|test`; no Supabase, no sign-in; D-433,
+D-437). **Home** and **Support**: a help-centre home with search, topics and "Start here". **Ten help
+posts** (D-458), most confusing first, each saying who it is for, with numbered steps in the screen's own
+words, tables, screenshots, and "Still stuck?" in the words of Pam's Help screen: who is my guide · texts
+from Pam · what your guide, a program and others can see · joining Pam · joining as staff · Pam words ·
+one phone, two sides · sending an invite · messages · points and badges, plus the earlier "Case manager
+assignments" (only what is live; the full table is held behind `live` flags, D-449). **Two hidden
+drafts** (`status: 'draft'`, not built into the site; Storybook only): "Keeping your program's listing up
+to date" (until listing editing ships) and "Staff requests" (no way to ask to be staff since D-369). The
+posts say only what is live, so they go stale as features ship: `docs/before-launch.md` lists which.
+There is no `joinpam.org/j/<code>` short link: it was removed (the app has no `/j/` page); it returns when a text or email uses it, with its author.
+New posts: the `pam-support-post` skill. Storybook: **Website/Journey** (every post, drafts with a banner)
+and **Share and icon**. Checks: CI builds the site and runs `scripts/a11y.mjs` (axe, light and dark, desktop,
+phone and 320px: 70 scans, 0 problems on 10 October); screenshots from `scripts/screenshots.mjs`. Not on the
+user-flow map: it is not a screen of the app. Session logs: `docs/sessions/2026-10-09-a-public-website.md`,
+`2026-10-10-0423-…`, `2026-10-10-0631-…`, `2026-10-10-0807-website-help-posts.md`.
+
+**About Pam, in seven languages (D-466, 10 October; on `main`, held until Will signs).** One post at
+`/<lang>/about-pam/` in English, Spanish, Brazilian Portuguese, Simplified and Traditional (Hong Kong)
+Chinese, Russian and Arabic: own `<html lang>` (Arabic `dir="rtl"`), a language list, `hreflang`,
+`x-default` English; not under a Support topic; one wordless illustration (header + 1200×630 share
+image, alt text in all seven; `social/about-art.mjs`); and a section on the home page. **Nothing is
+live until Will signs the English**: `apps/site/src/content/signed-off.json` is empty, so the pages
+and the home section are not built (a normal build has neither; CI also builds with
+`PAM_SITE_DRAFTS=1` and runs axe on all seven). The other six are drafts with no native reader (D-461).
+Storybook › Website › Journey: **About Pam** per language (Draft banner) and **Home with About Pam**.
+Reminder texts are plainly "coming"; the home card "Keep going" now says the same and reads `VISIT_REMINDERS_LIVE` (`content/flags.ts`, 10 October).
 
 ## Seven languages, messages in your own language, and text that fits (9 October) — 0.50.1 and 0.51.0, merged 9 October (PR #29)
 

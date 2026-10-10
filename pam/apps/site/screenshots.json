@@ -1,0 +1,80 @@
+[
+  {
+    "id": "member-created--what-others-can-see",
+    "out": "who-is-my-guide/what-others-can-see.png",
+    "name": "What others can see"
+  },
+  {
+    "id": "member-created--reminders",
+    "out": "texts-from-pam/reminders.png",
+    "name": "Text reminders"
+  },
+  {
+    "id": "member-created--sign-in",
+    "out": "joining-pam/sign-in.png",
+    "name": "Sign in"
+  },
+  {
+    "id": "member-invited-by-case-manager--about-you",
+    "out": "joining-pam/about-you.png",
+    "name": "About you, invited"
+  },
+  {
+    "id": "onboarding--case-manager",
+    "out": "joining-as-staff/sign-in.png",
+    "name": "Sign in as a case manager"
+  },
+  {
+    "id": "member-created--use-as",
+    "out": "one-phone-two-sides/use-as.png",
+    "name": "Use Pam as"
+  },
+  {
+    "id": "onboarding--add-your-program",
+    "out": "one-phone-two-sides/add-your-program.png",
+    "name": "Add your program"
+  },
+  {
+    "id": "case-manager-screens--invite",
+    "out": "sending-an-invite/invite.png",
+    "name": "Invite someone"
+  },
+  {
+    "id": "case-manager-screens--invite-one",
+    "out": "sending-an-invite/invite-form.png",
+    "name": "Invite form"
+  },
+  {
+    "id": "member-created--messages",
+    "out": "messages-in-pam/messages.png",
+    "name": "Messages"
+  },
+  {
+    "id": "member-created--conversation",
+    "out": "messages-in-pam/conversation.png",
+    "name": "Conversation"
+  },
+  {
+    "id": "member-created--conversation-options",
+    "out": "messages-in-pam/options.png",
+    "height": 330,
+    "name": "A conversation's Options: Stuff shared, Report suspicious activity, Block this person"
+  },
+  {
+    "id": "member-created--report-message",
+    "out": "messages-in-pam/report.png",
+    "name": "Report a message"
+  },
+  {
+    "id": "member-created--points",
+    "out": "points-and-badges/points.png",
+    "name": "Your points: badge, level, bar and Ways to earn",
+    "height": 560
+  },
+  {
+    "id": "member-created-states-texts-stopped--reminders",
+    "out": "texts-from-pam/texts-off.png",
+    "name": "Text reminders, texts are off",
+    "height": 330
+  }
+]

@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import { Providers } from '@/lib/providers';
+import { AppTabBarLazy } from './AppTabBarLazy';
 
 /*
  * Setup order matters and is prescribed by Astryx's own agent docs
@@ -44,7 +45,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     // §2.2: default to system colour scheme, with a manual toggle in Settings.
     <html lang="en" suppressHydrationWarning>
       <body>
-        <Providers>{children}</Providers>
+        <Providers>
+          {children}
+          {/* The role's bottom bar under the five tab screens (D-212, D-218). */}
+          <AppTabBarLazy />
+        </Providers>
       </body>
     </html>
   );

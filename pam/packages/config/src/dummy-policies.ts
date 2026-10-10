@@ -97,14 +97,25 @@ export const DUMMY_POLICIES: readonly DummyPolicy[] = [
   },
 ];
 
+/** A place from the catalogue (a real listing) has a uuid for an id; the examples' ids are words. */
+const REAL_PLACE_ID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 /**
  * Whether a place asks a member to sign its policies before a visit (D-270).
  *
- * Example data has one program's set (`DUMMY_POLICIES`), so every place
- * borrows it — except the example food pantry, which asks for nothing, so
- * the screens can show a place with no policies too. The real rule is
- * simply "the program has added some", once policies are stored per program.
+ * Example data has one program's set (`DUMMY_POLICIES`), so every *example*
+ * place borrows it — except the example food pantry, which asks for nothing, so
+ * the screens can show a place with no policies too.
+ *
+ * **A real place asks for nothing yet.** Its program has not written any
+ * policies in Pam — they are not stored per program until D-313's second step —
+ * and showing the example set there would put rules in front of a person that
+ * the program never wrote ("Sign 4 policies for <place>"). So a place from the
+ * catalogue (a uuid id) says no, and every screen that asks this stops showing
+ * the row. The real rule is simply "the program has added some", once policies
+ * are stored per program.
  */
 export function placeAsksForPolicies(placeId: string): boolean {
+  if (REAL_PLACE_ID.test(placeId)) return false;
   return placeId !== 'dummy-place-food';
 }

@@ -192,14 +192,14 @@ export const INVITE_EMAIL_MORE: Readonly<
 };
 
 /** Languages written right to left. */
-const RIGHT_TO_LEFT: readonly Locale[] = ['ar'];
+export const RIGHT_TO_LEFT: readonly Locale[] = ['ar'];
 
 /**
  * A font stack for each script. An email cannot load a font, so each names the
  * ones that the readers' phones and mail apps already have, then falls back to
  * the generic family for the script rather than to a Latin face with no glyphs.
  */
-const FONT_STACK: Readonly<Record<Locale, string>> = {
+export const FONT_STACK: Readonly<Record<Locale, string>> = {
   en: 'Helvetica,Arial,sans-serif',
   es: 'Helvetica,Arial,sans-serif',
   'pt-BR': 'Helvetica,Arial,sans-serif',
@@ -263,10 +263,27 @@ export function renderInviteEmail(input: InviteEmailInput): RenderedEmail {
   // sends gets a language somebody has signed.
   const locale = input.draft ? input.locale : usableInviteEmailLocale(input.locale);
   const { copy } = wordingOf(locale);
+  const inviter = input.inviterFirstName?.trim() || copy.someone;
+  return layout({
+    locale,
+    copy,
+    body: copy.body[input.role].replace('{inviter}', inviter),
+    link: input.link,
+    appUrl: input.appUrl,
+  });
+}
+
+/** The one layout every Pam email shares: the logo, a title, a sentence, a button, the link written out, a footer. */
+function layout(input: {
+  readonly locale: Locale;
+  readonly copy: Omit<InviteEmailCopy, 'body'>;
+  readonly body: string;
+  readonly link: string;
+  readonly appUrl: string;
+}): RenderedEmail {
+  const { locale, copy, body } = input;
   const dir = RIGHT_TO_LEFT.includes(locale) ? 'rtl' : 'ltr';
   const font = FONT_STACK[locale];
-  const inviter = input.inviterFirstName?.trim() || copy.someone;
-  const body = copy.body[input.role].replace('{inviter}', inviter);
   const link = escape(input.link);
   const logo = `${input.appUrl}/email/pam-logo.png`;
 
@@ -311,4 +328,198 @@ ${escape(copy.footer)}
   const text = [copy.title, '', body, '', `${copy.button}: ${input.link}`, '', copy.footer].join('\n');
 
   return { subject: copy.subject, html, text, locale };
+}
+
+// ---------------------------------------------------------------------------
+// The first invite (D-450, D-461): a case manager or a program lead is invited,
+// with the email the inviter typed (0086). Not the expired-link email above —
+// that one says "your last link ran out", which is not true of a first invite.
+//
+// **English approved by Will, 10 October 2026**, in these words: "Staff email:
+// No need to mention expiry days. Invite CTA button should say Accept Invite.
+// Remember we're a human-touch company. Speak human please. Then approved." So:
+// no days anywhere, in any language; the button says Accept invite; it talks like
+// a person. The other six languages carry the same warmth and meaning and are
+// drafts under the 9 October convention (D-429): approved to learn from, no native
+// reader yet, and fixed when somebody who reads the language says so. Members are
+// never emailed: they are not asked for an address (D-441).
+//
+// The fallback line is this email's own, so the expired-link email is untouched.
+// Same dignity rules as every Pam email: the role is named; nothing says why
+// anyone might be joining Pam.
+
+export type StaffInviteEmailRole = 'provider' | 'admin';
+
+export interface StaffInviteEmailCopy extends Omit<InviteEmailCopy, 'body'> {
+  readonly body: Readonly<Record<StaffInviteEmailRole, string>>;
+}
+
+export interface StaffInviteEmailWording {
+  readonly copy: StaffInviteEmailCopy;
+  /** Who signed off on these words. Empty means not reviewed: this language is not sent. */
+  readonly reviewedBy: string;
+}
+
+/** Will's own sign-off, on the English words above. */
+const STAFF_INVITE_EMAIL_REVIEWED_BY = 'Will, 10 October 2026';
+
+/** The other six, on the 9 October convention, dated the day their words were written. */
+const STAFF_INVITE_EMAIL_LEARN_FROM = 'Will (Oba), 10 October 2026 — approved to learn from; no native reader yet';
+
+export const STAFF_INVITE_EMAIL: Readonly<Record<Locale, StaffInviteEmailWording>> = {
+  en: {
+    reviewedBy: STAFF_INVITE_EMAIL_REVIEWED_BY,
+    copy: {
+      subject: "You're invited to join Pam",
+      preheader: "We'd love to have you with us.",
+      title: "You're invited to Pam",
+      body: {
+        provider:
+          'Hi! {inviter} would love for your program to be part of Pam. Pam helps people find programs like yours and plan a visit. Accept your invite to set up your program.',
+        admin:
+          'Hi! {inviter} would love for you to join Pam as a case manager. Pam helps the people you support find services, plan visits and stay in touch with you. Accept your invite to get started.',
+      },
+      button: 'Accept invite',
+      fallback: "If the button doesn't work, copy this link into your browser:",
+      footer: "You're getting this because someone invited you to Pam. If it's not for you, you can just ignore it.",
+      someone: INVITE_EMAIL.en.someone,
+    },
+  },
+  es: {
+    reviewedBy: STAFF_INVITE_EMAIL_LEARN_FROM,
+    copy: {
+      subject: 'Le invitamos a unirse a Pam',
+      preheader: 'Nos encantaría contar con usted.',
+      title: 'Le invitaron a Pam',
+      body: {
+        provider:
+          '¡Hola! {inviter} quiere que su programa forme parte de Pam. Pam ayuda a las personas a encontrar programas como el suyo y a planear una visita. Acepte su invitación para configurar su programa.',
+        admin:
+          '¡Hola! {inviter} quiere que usted se una a Pam como gestor de casos. Pam ayuda a las personas a las que usted apoya a encontrar servicios, planear visitas y mantenerse en contacto con usted. Acepte su invitación para empezar.',
+      },
+      button: 'Aceptar invitación',
+      fallback: 'Si el botón no funciona, copie este enlace en su navegador:',
+      footer: 'Recibe este correo porque alguien le invitó a Pam. Si no es para usted, puede ignorarlo.',
+      someone: INVITE_EMAIL.es.someone,
+    },
+  },
+  'pt-BR': {
+    reviewedBy: STAFF_INVITE_EMAIL_LEARN_FROM,
+    copy: {
+      subject: 'Convite para entrar no Pam',
+      preheader: 'Adoraríamos ter você com a gente.',
+      title: 'Convite para o Pam',
+      body: {
+        provider:
+          'Oi! {inviter} adoraria que o seu programa fizesse parte do Pam. O Pam ajuda as pessoas a encontrar programas como o seu e a planejar uma visita. Aceite o convite para configurar o seu programa.',
+        admin:
+          'Oi! {inviter} adoraria que você entrasse no Pam como gestor de casos. O Pam ajuda as pessoas que você apoia a encontrar serviços, planejar visitas e manter contato com você. Aceite o convite para começar.',
+      },
+      button: 'Aceitar convite',
+      fallback: 'Se o botão não funcionar, copie este link no seu navegador:',
+      footer: 'Você recebeu este e-mail porque alguém convidou você para o Pam. Se não é para você, pode simplesmente ignorá-lo.',
+      someone: INVITE_EMAIL_MORE['pt-BR'].copy.someone,
+    },
+  },
+  'zh-CN': {
+    reviewedBy: STAFF_INVITE_EMAIL_LEARN_FROM,
+    copy: {
+      subject: '邀请您加入 Pam',
+      preheader: '我们很期待您的加入。',
+      title: '您收到了 Pam 的邀请',
+      body: {
+        provider: '您好！{inviter}希望您的项目能加入 Pam。Pam 帮助人们找到像您这样的项目，并安排到访。接受邀请，开始设置您的项目。',
+        admin: '您好！{inviter}希望您以个案管理员的身份加入 Pam。Pam 帮助您服务的人找到服务、安排到访，并与您保持联系。接受邀请，即可开始。',
+      },
+      button: '接受邀请',
+      fallback: '如果按钮无法使用，请将此链接复制到浏览器：',
+      footer: '您收到这封邮件，是因为有人邀请您加入 Pam。如果与您无关，直接忽略即可。',
+      someone: INVITE_EMAIL_MORE['zh-CN'].copy.someone,
+    },
+  },
+  'zh-HK': {
+    reviewedBy: STAFF_INVITE_EMAIL_LEARN_FROM,
+    copy: {
+      subject: '邀請您加入 Pam',
+      preheader: '我們很期待您的加入。',
+      title: '您收到 Pam 的邀請',
+      body: {
+        provider: '您好！{inviter}希望您的計劃加入 Pam。Pam 幫助大家找到像您這樣的計劃，並安排到訪。接受邀請，開始設定您的計劃。',
+        admin: '您好！{inviter}希望您以個案經理的身份加入 Pam。Pam 幫助您服務的人找到服務、安排到訪，並與您保持聯絡。接受邀請，即可開始。',
+      },
+      button: '接受邀請',
+      fallback: '如果按鈕無法使用，請把此連結複製到瀏覽器：',
+      footer: '您收到這封電郵，是因為有人邀請您加入 Pam。如果與您無關，直接忽略即可。',
+      someone: INVITE_EMAIL_MORE['zh-HK'].copy.someone,
+    },
+  },
+  ru: {
+    reviewedBy: STAFF_INVITE_EMAIL_LEARN_FROM,
+    copy: {
+      subject: 'Приглашение в Pam',
+      preheader: 'Мы будем рады видеть вас с нами.',
+      title: 'Вас приглашают в Pam',
+      body: {
+        provider:
+          'Здравствуйте! {inviter} хочет, чтобы ваша программа стала частью Pam. Pam помогает людям находить такие программы, как ваша, и планировать визит. Примите приглашение, чтобы настроить свою программу.',
+        admin:
+          'Здравствуйте! {inviter} хочет, чтобы вы присоединились к Pam как кейс-менеджер. Pam помогает людям, которых вы поддерживаете, находить услуги, планировать визиты и оставаться с вами на связи. Примите приглашение, чтобы начать.',
+      },
+      button: 'Принять приглашение',
+      fallback: 'Если кнопка не работает, скопируйте эту ссылку в браузер:',
+      footer: 'Вы получили это письмо, потому что кто-то пригласил вас в Pam. Если оно не для вас, просто проигнорируйте его.',
+      someone: INVITE_EMAIL_MORE.ru.copy.someone,
+    },
+  },
+  ar: {
+    reviewedBy: STAFF_INVITE_EMAIL_LEARN_FROM,
+    copy: {
+      subject: 'دعوة للانضمام إلى Pam',
+      preheader: 'يسعدنا أن تكون معنا.',
+      title: 'لقد تمت دعوتك إلى Pam',
+      body: {
+        provider: 'مرحبا! يتمنى {inviter} أن يكون برنامجك جزءا من Pam. يساعد Pam الناس على العثور على برامج مثل برنامجك وعلى التخطيط لزيارة. اقبل دعوتك لإعداد برنامجك.',
+        admin: 'مرحبا! يتمنى {inviter} أن تنضم إلى Pam بصفتك مدير حالة. يساعد Pam الأشخاص الذين تدعمهم على العثور على الخدمات والتخطيط للزيارات والبقاء على تواصل معك. اقبل دعوتك للبدء.',
+      },
+      button: 'اقبل الدعوة',
+      fallback: 'إذا لم يعمل الزر، انسخ هذا الرابط إلى متصفحك:',
+      footer: 'وصلتك هذه الرسالة لأن شخصا ما دعاك إلى Pam. إذا لم تكن الرسالة لك، يمكنك تجاهلها ببساطة.',
+      someone: INVITE_EMAIL_MORE.ar.copy.someone,
+    },
+  },
+};
+
+/**
+ * The language a first-invite email is written in: the one asked for when
+ * somebody who reads it has signed it, English when not, and `null` when not
+ * even English is signed — then nothing is sent.
+ */
+export function usableStaffInviteEmailLocale(wanted: Locale): Locale | null {
+  if (STAFF_INVITE_EMAIL[wanted].reviewedBy) return wanted;
+  return STAFF_INVITE_EMAIL.en.reviewedBy ? 'en' : null;
+}
+
+/** The languages whose first-invite wording nobody has signed: what is left to read. */
+export function unsignedStaffInviteEmailLocales(): Locale[] {
+  return (Object.keys(STAFF_INVITE_EMAIL) as Locale[]).filter((l) => !STAFF_INVITE_EMAIL[l].reviewedBy);
+}
+
+export interface StaffInviteEmailInput extends Omit<InviteEmailInput, 'role'> {
+  readonly role: StaffInviteEmailRole;
+}
+
+export function renderStaffInviteEmail(input: StaffInviteEmailInput): RenderedEmail {
+  const locale = input.draft ? input.locale : usableStaffInviteEmailLocale(input.locale);
+  if (!locale) {
+    throw new Error('The first-invite email has not been reviewed by a person yet (STAFF_INVITE_EMAIL.en.reviewedBy)');
+  }
+  const { copy } = STAFF_INVITE_EMAIL[locale];
+  const inviter = input.inviterFirstName?.trim() || copy.someone;
+  return layout({
+    locale,
+    copy,
+    body: copy.body[input.role].replace('{inviter}', inviter),
+    link: input.link,
+    appUrl: input.appUrl,
+  });
 }

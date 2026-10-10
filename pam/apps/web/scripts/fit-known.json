@@ -502,5 +502,145 @@
   {
     "key": "zh-HK|ellipsis|case-manager-screens--conversation-files|ID office letter.pdf",
     "reason": "Looked at 10 October 2026 at 320px with screenshots. The file name reads in full in the screenshot, although the name's ellipsis box measures 4px narrower than its text (148 > 144); no letter is lost. Worth another look if the row's layout changes."
+  },
+  {
+    "key": "es|cut|member-created-states-saved-trips--one-trip-saved|Faltan firmas",
+    "reason": "The Trips drawer scrolls and fades out at its foot; a card below the first sits under that fade, so the detector sees its text partly hidden (partial=true). It is reached by scrolling and nothing is lost. Looked at 10 October 2026 at 320px with a screenshot (the saved-trip card is the second one, below the first)."
+  },
+  {
+    "key": "pt-BR|cut|member-created-states-saved-trips--one-trip-saved|terça-feira, 13 de out. · 12:00",
+    "reason": "The Trips drawer scrolls and fades out at its foot; a card below the first sits under that fade, so the detector sees its text partly hidden (partial=true). It is reached by scrolling and nothing is lost. Looked at 10 October 2026 at 320px with a screenshot (the saved-trip card is the second one, below the first)."
+  },
+  {
+    "key": "ru|cut|member-created-states-saved-trips--one-trip-saved|вторник, 13 окт. · 12:00",
+    "reason": "The Trips drawer scrolls and fades out at its foot; a card below the first sits under that fade, so the detector sees its text partly hidden (partial=true). It is reached by scrolling and nothing is lost. Looked at 10 October 2026 at 320px with a screenshot (the saved-trip card is the second one, below the first)."
+  },
+  {
+    "key": "pseudo|cut|member-created-states-saved-trips--one-trip-saved|Tuesday, Oct 13 · 12:00 PM",
+    "reason": "The Trips drawer scrolls and fades out at its foot; a card below the first sits under that fade, so the detector sees its text partly hidden (partial=true). It is reached by scrolling and nothing is lost. The same card and fade as the es, pt-BR and ru entries for this story; added at the merge, 10 October 2026."
+  },
+  {
+    "key": "pseudo|cut|member-created-states-saved-trips--one-trip-saved|⟦Þŕóóóƒííļéé⟧",
+    "reason": "The fifth tab's label. Five one-word labels share a 320px bar and a tab does not shrink below its longest word, so the pseudo-language (English +45% with padding, longer than any real language) runs past the edge. All seven real languages fit (Russian, the tightest, fills the bar edge to edge). Tested and not shipped: tabs sized by content (flex 1 1 auto, min-width 0, wrapping) fit every language and wrap the pseudo-language, but move the English tabs a few pixels; the bar is Will's design, so it is his call (docs/before-launch.md). Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "ru|overlap|member-created-states-blocking--conversation-blocked-by-me|Кейс-менеджер ⟷ Документ Google",
+    "reason": "The thread scrolls under its opaque header; text that has scrolled up behind the header's title is measured against it. Nothing overlaps on screen. The same as the limited-account conversation entries; added at the merge of Block, 10 October 2026, after a look at 320px in Russian and the pseudo-language with screenshots."
+  },
+  {
+    "key": "ru|overlap|member-created-states-blocking--conversation-blocked-me|Кейс-менеджер ⟷ Документ Google",
+    "reason": "The thread scrolls under its opaque header; text that has scrolled up behind the header's title is measured against it. Nothing overlaps on screen. The same as the limited-account conversation entries; added at the merge of Block, 10 October 2026, after a look at 320px in Russian and the pseudo-language with screenshots."
+  },
+  {
+    "key": "pseudo|overlap|member-created-states-blocking--conversation-blocked-by-me|⟦Çáášéé ɱáááñááĝééŕ⟧ ⟷ ⟦Ĝóóóóĝļéé Ðóóóç⟧",
+    "reason": "The thread scrolls under its opaque header; text that has scrolled up behind the header's title is measured against it. Nothing overlaps on screen. The same as the limited-account conversation entries; added at the merge of Block, 10 October 2026, after a look at 320px in Russian and the pseudo-language with screenshots."
+  },
+  {
+    "key": "pseudo|overlap|member-created-states-blocking--conversation-blocked-me|⟦Çáášéé ɱáááñááĝééŕ⟧ ⟷ ⟦Óþééééñš íñ Ĝóóóóĝļéé⟧",
+    "reason": "The thread scrolls under its opaque header; text that has scrolled up behind the header's title is measured against it. Nothing overlaps on screen. The same as the limited-account conversation entries; added at the merge of Block, 10 October 2026, after a look at 320px in Russian and the pseudo-language with screenshots."
+  },
+  {
+    "key": "ru|overlap|member-created--conversation-file-refused|Teresa ⟷ Документ Google",
+    "reason": "The thread scrolls under its opaque header; text that has scrolled up behind the header's title is measured against it. Nothing overlaps on screen. Which lines are behind the header varies from run to run on this story, so these come and go. The same as the limited-account and blocking conversation entries; added at the merge of the language tags, 10 October 2026, after a look at 320px in Russian and Arabic with screenshots."
+  },
+  {
+    "key": "ru|overlap|member-created--conversation-file-refused|Кейс-менеджер ⟷ Откроется в Google",
+    "reason": "The thread scrolls under its opaque header; text that has scrolled up behind the header's title is measured against it. Nothing overlaps on screen. Which lines are behind the header varies from run to run on this story, so these come and go. The same as the limited-account and blocking conversation entries; added at the merge of the language tags, 10 October 2026, after a look at 320px in Russian and Arabic with screenshots."
+  },
+  {
+    "key": "ar|overlap|member-created--conversation-file-refused|Teresa ⟷ And the class schedule: http",
+    "reason": "The thread scrolls under its opaque header; text that has scrolled up behind the header's title is measured against it. Nothing overlaps on screen. Which lines are behind the header varies from run to run on this story, so these come and go. The same as the limited-account and blocking conversation entries; added at the merge of the language tags, 10 October 2026, after a look at 320px in Russian and Arabic with screenshots."
+  },
+  {
+    "key": "ar|overlap|member-created--conversation-file-refused|مدير الحالة ⟷ And the class schedule: http",
+    "reason": "The thread scrolls under its opaque header; text that has scrolled up behind the header's title is measured against it. Nothing overlaps on screen. Which lines are behind the header varies from run to run on this story, so these come and go. The same as the limited-account and blocking conversation entries; added at the merge of the language tags, 10 October 2026, after a look at 320px in Russian and Arabic with screenshots."
+  },
+  {
+    "key": "zh-CN|overlap|member-created--conversation-file-refused|Teresa ⟷ And the class schedule: http",
+    "reason": "The thread scrolls under its opaque header; text that has scrolled up behind the header's title is measured against it. Nothing overlaps on screen. Which lines are behind the header varies from run to run on this story, so these come and go. The same as the limited-account and blocking conversation entries; added at the merge of the language tags, 10 October 2026, after a look at 320px in Russian and Arabic with screenshots."
+  },
+  {
+    "key": "pseudo|overlap|member-created--conversation-file-refused|Teresa ⟷ ⟦Ĝóóóóĝļéé Ðóóóç⟧",
+    "reason": "The thread scrolls under its opaque header; text that has scrolled up behind the header's title is measured against it. Nothing overlaps on screen. Which lines are behind the header varies from run to run on this story, so these come and go. The same as the limited-account and blocking conversation entries; added at the merge of the language tags, 10 October 2026, after a look at 320px in Russian and Arabic with screenshots."
+  },
+  {
+    "key": "pseudo|overlap|member-created--conversation-file-refused|⟦Çáášéé ɱáááñááĝééŕ⟧ ⟷ ⟦Óþééééñš íñ Ĝóóóóĝļéé⟧",
+    "reason": "The thread scrolls under its opaque header; text that has scrolled up behind the header's title is measured against it. Nothing overlaps on screen. Which lines are behind the header varies from run to run on this story, so these come and go. The same as the limited-account and blocking conversation entries; added at the merge of the language tags, 10 October 2026, after a look at 320px in Russian and Arabic with screenshots."
+  },
+  {
+    "key": "pseudo|ellipsis|program-lead-states-program-on-file--live-with-a-change-waiting|Reading, writing and math toward the GED test, four mornings",
+    "reason": "A service's description on the Program page is one line with an ellipsis by design (the row sets isDescriptionOneLine); the pseudo-language stretches it past the width. Nothing is lost: the whole text is one tap away, in the service's own page. Looked at 10 October 2026 at 320px."
+  },
+  {
+    "key": "pseudo|ellipsis|program-lead-states-program-on-file--live-with-a-change-waiting|Open computers, printing and help with email, forms and job ",
+    "reason": "A service's description on the Program page is one line with an ellipsis by design (the row sets isDescriptionOneLine); the pseudo-language stretches it past the width. Nothing is lost: the whole text is one tap away, in the service's own page. Looked at 10 October 2026 at 320px."
+  },
+  {
+    "key": "pseudo|ellipsis|program-lead-states-program-on-file--live-with-a-change-waiting|Two weeks on resumes, interviews and showing up ready. A cer",
+    "reason": "A service's description on the Program page is one line with an ellipsis by design (the row sets isDescriptionOneLine); the pseudo-language stretches it past the width. Nothing is lost: the whole text is one tap away, in the service's own page. Looked at 10 October 2026 at 320px."
+  },
+  {
+    "key": "pseudo|ellipsis|program-lead-states-program-on-file--live|Reading, writing and math toward the GED test, four mornings",
+    "reason": "A service's description on the Program page is one line with an ellipsis by design (the row sets isDescriptionOneLine); the pseudo-language stretches it past the width. Nothing is lost: the whole text is one tap away, in the service's own page. Looked at 10 October 2026 at 320px."
+  },
+  {
+    "key": "pseudo|ellipsis|program-lead-states-program-on-file--live|Open computers, printing and help with email, forms and job ",
+    "reason": "A service's description on the Program page is one line with an ellipsis by design (the row sets isDescriptionOneLine); the pseudo-language stretches it past the width. Nothing is lost: the whole text is one tap away, in the service's own page. Looked at 10 October 2026 at 320px."
+  },
+  {
+    "key": "pseudo|ellipsis|program-lead-states-program-on-file--live|Two weeks on resumes, interviews and showing up ready. A cer",
+    "reason": "A service's description on the Program page is one line with an ellipsis by design (the row sets isDescriptionOneLine); the pseudo-language stretches it past the width. Nothing is lost: the whole text is one tap away, in the service's own page. Looked at 10 October 2026 at 320px."
+  },
+  {
+    "key": "pseudo|ellipsis|program-lead-states-program-on-file--live-spanish|Reading, writing and math toward the GED test, four mornings",
+    "reason": "A service's description on the Program page is one line with an ellipsis by design (the row sets isDescriptionOneLine); the pseudo-language stretches it past the width. Nothing is lost: the whole text is one tap away, in the service's own page. Looked at 10 October 2026 at 320px."
+  },
+  {
+    "key": "pseudo|ellipsis|program-lead-states-program-on-file--live-spanish|Open computers, printing and help with email, forms and job ",
+    "reason": "A service's description on the Program page is one line with an ellipsis by design (the row sets isDescriptionOneLine); the pseudo-language stretches it past the width. Nothing is lost: the whole text is one tap away, in the service's own page. Looked at 10 October 2026 at 320px."
+  },
+  {
+    "key": "pseudo|ellipsis|program-lead-states-program-on-file--live-spanish|Two weeks on resumes, interviews and showing up ready. A cer",
+    "reason": "A service's description on the Program page is one line with an ellipsis by design (the row sets isDescriptionOneLine); the pseudo-language stretches it past the width. Nothing is lost: the whole text is one tap away, in the service's own page. Looked at 10 October 2026 at 320px."
+  },
+  {
+    "key": "pseudo|clamp|case-manager-screens--reported-places|Groceries to take home, no appointment. Bring a bag if you h",
+    "reason": "A place card clamps its description to two lines on purpose (the English story clamps the same sentence); the pseudo-language is about 40% longer, so it clamps a few words sooner. The full text is on the place page one tap away and nothing is lost. Looked at 10 October 2026 at 320px."
+  },
+  {
+    "key": "pseudo|clamp|super-admin-screens--reported-places|Groceries to take home, no appointment. Bring a bag if you h",
+    "reason": "A place card clamps its description to two lines on purpose (the English story clamps the same sentence); the pseudo-language is about 40% longer, so it clamps a few words sooner. The full text is on the place page one tap away and nothing is lost. Looked at 10 October 2026 at 320px."
+  },
+  {
+    "key": "pseudo|ellipsis|program-lead-states-program-services--the-program-tab|Resumes, interviews and showing up ready.",
+    "reason": "A service's description on the Program page is one line with an ellipsis by design (the row sets isDescriptionOneLine); the pseudo-language stretches it past the width. Nothing is lost: the whole text is one tap away, in the service's own editor. Looked at 10 October 2026 at 320px."
+  },
+  {
+    "key": "pseudo|ellipsis|member-created-states-saved-trips--one-trip-saved-spanish|Example Learning Center",
+    "reason": "A trip card's place name is one line with an ellipsis by design (TripCard); the pseudo-language, longer than any real language, runs past the width. The full name is one tap away, on the place's page. Looked at 10 October 2026 at 320px with a screenshot."
+  },
+  {
+    "key": "pseudo|ellipsis|member-created-states-saved-trips--one-trip-saved-spanish|Riverside Job Center",
+    "reason": "A trip card's place name is one line with an ellipsis by design (TripCard); the pseudo-language, longer than any real language, runs past the width. The full name is one tap away, on the place's page. Looked at 10 October 2026 at 320px with a screenshot."
+  },
+  {
+    "key": "pseudo|cut|member-created-states-saved-trips--one-trip-saved-spanish|Faltan firmas",
+    "reason": "The Trips drawer scrolls and fades out at its foot; a card below the first sits under that fade, so the detector sees its text partly hidden (partial=true). It is reached by scrolling and nothing is lost. Looked at 10 October 2026 at 320px with a screenshot."
+  },
+  {
+    "key": "pseudo|ellipsis|member-created-states-saved-trips--one-trip-saved-spanish|Example Workforce Center",
+    "reason": "A trip card's place name is one line with an ellipsis by design (TripCard); the pseudo-language, longer than any real language, runs past the width. The full name is one tap away, on the place's page. Looked at 10 October 2026 at 320px with a screenshot."
+  },
+  {
+    "key": "pseudo|ellipsis|member-created-states-saved-trips--one-trip-saved|Example Learning Center",
+    "reason": "A trip card's place name is one line with an ellipsis by design (TripCard); the pseudo-language, longer than any real language, runs past the width. The full name is one tap away, on the place's page. Looked at 10 October 2026 at 320px with a screenshot."
+  },
+  {
+    "key": "pseudo|ellipsis|member-created-states-saved-trips--one-trip-saved|Riverside Job Center",
+    "reason": "A trip card's place name is one line with an ellipsis by design (TripCard); the pseudo-language, longer than any real language, runs past the width. The full name is one tap away, on the place's page. Looked at 10 October 2026 at 320px with a screenshot."
+  },
+  {
+    "key": "pseudo|ellipsis|member-created-states-saved-trips--one-trip-saved|Example Workforce Center",
+    "reason": "A trip card's place name is one line with an ellipsis by design (TripCard); the pseudo-language, longer than any real language, runs past the width. The full name is one tap away, on the place's page. Looked at 10 October 2026 at 320px with a screenshot."
   }
 ]

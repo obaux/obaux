@@ -11,6 +11,44 @@ STATUS row too.
 
 ## Open
 
+- [ ] **Public help posts: re-check them when what they describe changes** (Wren, 10 October
+  2026, D-458). Each post says only what is live today, so these go stale as features ship:
+  "Texts from Pam" when visit reminders, message alerts or connect texts go live (it says they
+  are not sent yet; check the live `dispatch-sms`, not the repo). The day-before visit reminder is
+  **one line**: set `VISIT_REMINDERS_LIVE = true` in `apps/site/src/content/TextsFromPam.tsx` the day
+  it is merged and the live function queues it (Mira, 10 October); "Who is my guide?" when the
+  assign-and-limit work merges; "Points and badges" when more point rules or any badge are
+  awarded; "Messages" if blocking appears; "What others can see" if transparency.ts changes
+  (its "last day you used Pam" row now says No for a program, D-465; it returns to Yes when
+  the database hands a program that day and the app's line says so again). The hidden draft "Staff requests" is published only if a way to ask to be staff
+  comes back (D-369).
+- [ ] **Public site: Will signs "About Pam" (D-466, 10 October 2026).** English first: read
+  `apps/site/src/content/about.ts`, then put `"en"` in `apps/site/src/content/signed-off.json`
+  (`{"about-pam": ["en"]}`) — that builds `/en/about-pam/` and shows the home section. The other
+  six are drafts with no native reader (D-461): add each code to the same file only once someone
+  who reads it has been over it. The home card that promised reminders is fixed (10 October, it now reads `VISIT_REMINDERS_LIVE`).
+  When visit reminders go live, flip `VISIT_REMINDERS_LIVE` in `TextsFromPam.tsx` and rewrite
+  the "What is coming" paragraph in all seven.
+- [ ] **Public site: help posts after Dot's new app layout (D-456) and visit reminders** (10 October 2026).
+  *Layout, done 10 October* on a branch from main `522c808`, for the layout that goes live with that night's
+  deploy: Who is my guide and What others can see are reached from Profile → **Legal** → "What others can
+  see" (was Profile → "What others can see"); Points from the **badge tile** on Profile (was "your points");
+  One phone, two sides opens **Explore** (Me) or **Home** (My program); Messages: "New message" is the button
+  at the top right, **More options** opens an **Options** screen (new picture), new messages show on the bell
+  and a **dot on the Messages tab** (staff also see the number on their Home); Texts from Pam: Profile has a
+  "Text reminders" row once you said yes, or a **"Get text reminders"** card if not (staff: "Get text
+  alerts"); Points: the "Ways to earn" list now shows only the two real ways; the About-you picture shows the
+  language choice. Case managers and program leads keep the OLD Home (Dot, card a22), so their Home steps are
+  unchanged. *Still to do when they land:* when the staff Homes change (rings), the steps that say "Home"
+  for case managers and program leads (Joining as staff, Sending an invite, One phone two sides, Messages,
+  Texts) and `reminders`-adjacent screenshots; when a deploy actually carries a given screen, check it is
+  there. *Block* (D-463, "Block this person" in Options) is not in any post yet; add a short section when
+  it is live. *Reminders:* the day `dispatch-sms` really sends the day-before reminder, flip
+  `VISIT_REMINDERS_LIVE` in `apps/site/src/content/flags.ts` (drives the Texts post and the home card); then
+  by hand: About Pam's "What is coming" in all seven languages (the other six need a native reader again),
+  the Joining Pam reminder choice, the Texts screenshots and limits (quiet hours, 134 characters, D-431).
+  Seen, not mine: the app's own onboarding slide still says "Pam reminds you before you go, so nothing gets
+  missed" (`onboarding.3`, all seven languages): Languages & legal / Lena's promise sweep.
 - [ ] **Public site: publish the draft post "Keeping your program's listing up to
   date" only when the feature ships** (from PAM · Places & programs, 10 October
   2026, rule D-447, branch `claude/places-programs-load-own-program`, not on
@@ -44,6 +82,10 @@ STATUS row too.
 
   Until this is done, someone with an expired link is told "Check your email"
   and nothing arrives.
+
+  **10 October (D-450):** the sender for *staff invites* is built, off, and waits for
+  a signature (`docs/email-setup.md` is the plain-words list for Will; the function is
+  `send-invite-emails`). The expired-link email above still has no sender.
 
 - [x] **Merge and deploy 0068 and 0069** — done 8 October as 0075/0076 (D-388) (readiness fixes and blocking, on
   branch `claude/hopeful-thompson-07nj7n`, not yet on this one). 0068 is what
@@ -177,6 +219,14 @@ STATUS row too.
   the deletion trigger function are not executable by clients), then merged to main (`0220ae0`).
   The live copy of the migration is the same statements without the explanatory comments.
 
+- [ ] **Texts: ~~sign the four alert texts~~ (done 10 October, D-461), the STOP receiver (built, D-460; Will pastes its address into Twilio), file the carrier once**
+  (Will, 10 October 2026, D-453). `message_waiting`, `visit_booked`, `booking_changed` and
+  `trip_planned` are signed by Will (10 October, D-461; the other languages as drafts to learn from); nothing queues them yet. A stored
+  STOP cannot be cleared from the app once `20261010071947_…` is applied, but nothing stores a
+  STOP: an Edge Function Twilio calls (STOP/START/HELP and the YES/NO replies) is not built —
+  Will to say yes. `docs/sms-campaign-samples.md` has the nine texts and the description
+  (981 of 1,024 characters) for the one filing.
+
 - [ ] **Review the SMS copy** still waiting for a name in `reviewedBy`
   (STATUS row 2).
 
@@ -203,6 +253,14 @@ STATUS row too.
      over (D-385, D-386): build it as `docs/design/program-review-queue.md`
      says — a withdrawn request shown as "Withdrawn — started over" with only
      Discard, the new one approvable, and the database rules tested.
+
+### Trips and reminders
+
+- [ ] **Saved trips and the day-before text are built** (`claude/places-programs-save-trips`, D-454, 10 October): live once the two migrations are applied.
+- [ ] **Point `app_settings.app_url` at Pam's real address** before the first reminder: the text links to `/trips/` on it, and it still holds the address 0054 seeded.
+- [ ] **A program booking for a member (D-316)** is still a trip on the device only, so that member gets no reminder.
+- [ ] **A Cancel button on a trip** (`cancel_trip` exists and is tested; no screen calls it).
+- [ ] **Past trips** (attended, missed) are returned by `my_trips()` but not shown.
 
 ### Two roles (one account, member and program)
 
@@ -252,6 +310,27 @@ Russian, Arabic (D-422); messages read in the reader's language (D-423).
   (`:Pam`, `then.`) is correct by the bidi rules but nobody who reads Arabic has
   seen it — and whether an English value in the middle of a sentence reads better
   isolated or flowing with the sentence.
+
+- [ ] **A native reader for what D-465 reworded (10 October).** The last-day line on the
+  transparency screen (`transparency.canSee.lastActive`), the privacy page's "What you can do"
+  blocking sentence and the terms' blocking sentence now say only what is true (a guide, not a
+  program, sees the last day; blocking is in a conversation's ⋯ menu and the other person is told).
+  Six translations each, written by Claude; promises, so the same native readers as below.
+
+- [ ] **A native reader for the privacy page's "Who can see it" (10 October, D-452).**
+  `privacy.s.who-can-see.p2` and `.p3` were rewritten to say what a guide sees and does
+  not (what you send them directly; nothing you send to anyone else; one reported
+  message), so the page stops contradicting the transparency screen. The six
+  translations are Claude's, and this is a promise: a native reader of Spanish,
+  Brazilian Portuguese, Simplified and Traditional Chinese, Russian and Arabic should
+  confirm it says exactly that and no more.
+
+- [ ] **Hear the language tags with a screen reader (10 October, D-455).** Every list
+  of languages now starts each name with an English tag (EN, ES, PT-BR, ZH-CN, ZH-HK,
+  RU, AR). The tag is hidden from a screen reader on purpose and each name carries
+  its own `lang`, so "Русский" should be spoken in a Russian voice and the tag not at
+  all. Nothing has been heard yet: try the Language screen and the sign-in menu with
+  VoiceOver and TalkBack, in English and in Arabic.
 
 - [ ] **Run an Arabic screen reader pass** (VoiceOver and TalkBack on a phone, and
   NVDA if it can be had): that the labels on icon buttons, cards, photos and the

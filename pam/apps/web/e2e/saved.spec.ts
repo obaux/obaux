@@ -106,35 +106,37 @@ test.describe('keeping a place', () => {
       .toBe(true);
   });
 
-  test('the home screen shows what was kept, and the full list is one tap away', async ({ page }) => {
+  test('the Saved tab lists what was kept, and Explore does not carry a second copy', async ({ page }) => {
     await signedIn(page, [PLACE]);
-    await page.goto('/');
+    await page.goto('/saved/');
 
-    const strip = page.getByRole('region', { name: 'Places you saved' });
-    await expect(strip).toBeVisible();
-    await expect(strip.getByText('Example Learning Center')).toBeVisible();
-    await expect(page.getByRole('link', { name: 'See all' })).toHaveAttribute('href', '/saved/');
+    const list = page.getByRole('list', { name: 'Places you saved' });
+    await expect(list).toBeVisible();
+    await expect(list.getByRole('link', { name: 'Example Learning Center' })).toHaveAttribute(
+      'href',
+      `/place/?id=${PLACE.id}&from=saved`,
+    );
+    await expect(page.getByRole('navigation', { name: 'Main' }).getByRole('link', { name: /Saved/ })).toBeVisible();
   });
 
-  test('the bookmark takes it out, and says whose place it is taking out', async ({ page }) => {
+  test('the bookmark takes it out', async ({ page }) => {
     const writes = await signedIn(page, [PLACE]);
-    await page.goto('/');
+    await page.goto('/saved/');
     // Hydrated and the saved list loaded before tapping: a tap on the
     // pre-rendered button before then was lost, a flake seen twice (D-299).
     await settled(page);
 
-    // Named per card, because "Remove" three times in a row tells a screen
-    // reader user nothing about which one they are on.
-    const remove = page.getByRole('button', {
-      name: 'Remove Example Learning Center from your saved places',
-    });
+    // Edit puts a × on each card, named for whose place it takes out; nothing
+    // is removed until Done (D-255).
+    await page.getByRole('button', { name: 'Edit' }).click();
+    const remove = page.getByRole('button', { name: 'Unsave Example Learning Center' });
     await expect(remove).toBeVisible();
     await remove.click();
+    await page.getByRole('button', { name: 'Done' }).click();
 
-    await expect(page.getByRole('region', { name: 'Places you saved' })).toHaveCount(0);
+    await expect(page.getByRole('list', { name: 'Places you saved' })).toHaveCount(0);
     // Polled, not read once: the list updates before the network does — on
-    // purpose, so a tap on a bad connection is acknowledged immediately — so
-    // the write lands a moment after the square has gone.
+    // purpose, so a tap on a bad connection is acknowledged immediately.
     await expect
       .poll(() => writes.some((w) => w.method === 'DELETE'), {
         message: 'the removal never reached the database',
@@ -142,41 +144,25 @@ test.describe('keeping a place', () => {
       .toBe(true);
   });
 
-  test('points show beside the name, and only once they are known', async ({ page }) => {
-    // Saving earns five points in the database (0045). The home screen shows
-    // the balance next to the greeting — absent, never "0", while unknown.
+  test('points show on the Profile, and only once they are known', async ({ page }) => {
+    // Saving earns five points in the database (0045). The Profile shows the
+    // balance — absent, never "0", while unknown.
     await signedIn(page, [PLACE]);
     await page.route('**/rest/v1/rpc/member_points*', (route) => route.fulfill(json(35)));
-    await page.goto('/');
+    await page.goto('/profile/');
 
-    await expect(page.getByRole('link', { name: '35 points' })).toBeVisible();
+    await expect(page.getByText(/35\s*Points/)).toBeVisible();
   });
 
   test('a balance Pam cannot read is shown as nothing, not as zero', async ({ page }) => {
     // member_points returns null to anybody not entitled to the number, and a
-    // "0 points" chip that becomes "35" a second later reads as losing points.
+    // "0 points" figure that becomes "35" a second later reads as losing points.
     await signedIn(page, [PLACE]);
     await page.route('**/rest/v1/rpc/member_points*', (route) => route.fulfill(json(null)));
-    await page.goto('/');
+    await page.goto('/profile/');
 
-    await expect(page.getByRole('heading', { name: 'Hi, Marcus' })).toBeVisible();
-    await expect(page.getByText(/points/)).toHaveCount(0);
-  });
-
-  test('the full list is the same card as the search, not a lesser one', async ({ page }) => {
-    await signedIn(page, [PLACE]);
-    await page.goto('/saved/');
-
-    // §5.1: a place looks the same wherever it appears. The saved list draws
-    // the search card — the sentence, the Save that is already on, and the
-    // whole card as one link into the place — rather than a name and an
-    // address, which is what it used to be.
-    await expect(page.getByText(/Free classes and a computer room/)).toBeVisible();
-    await expect(page.getByRole('button', { name: 'Saved' })).toBeVisible();
-    await expect(page.getByRole('link', { name: 'Example Learning Center' })).toHaveAttribute(
-      'href',
-      `/place/?id=${PLACE.id}&from=saved`,
-    );
+    await expect(page.getByRole('heading', { name: 'Profile', level: 1 })).toBeVisible();
+    await expect(page.getByText(/\d+ Points/)).toHaveCount(0);
   });
 
   test('an empty list teaches the button rather than apologising', async ({ page }) => {
@@ -184,17 +170,15 @@ test.describe('keeping a place', () => {
     await page.goto('/saved/');
 
     await expect(page.getByRole('heading', { name: 'Nothing saved yet' })).toBeVisible();
-    // Relabelled "Return" and shrunk to match Help's sizing, with the Call Pam
-    // button removed from this particular empty state (Will, 16 September) —
-    // there is nothing here support can solve.
-    await expect(page.getByRole('link', { name: 'Return' })).toBeVisible();
+    // A way to places, and no Call Pam button: there is nothing here support can solve.
+    await expect(page.getByRole('link', { name: 'Show all places' })).toHaveAttribute('href', '/');
     await expect(page.getByRole('link', { name: /Call Pam/ })).toHaveCount(0);
   });
 
   test('has no WCAG A/AA violations', async ({ page }) => {
     await signedIn(page, [PLACE]);
     await page.goto('/saved/');
-    await expect(page.getByRole('heading', { name: 'Example Learning Center' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Example Learning Center' })).toBeVisible();
 
     await settled(page);
 

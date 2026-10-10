@@ -62,13 +62,113 @@ const PROJECT_REF = new URL(SUPABASE_URL).hostname.split('.')[0];
 export interface MockOptions {
   /** A limited account (0031): reads, but the database refuses a send (D-427). */
   readonly limited?: boolean;
+  /** The person replied STOP: stored, and nothing in the app can undo it (D-453). */
+  readonly textsStopped?: boolean;
+  /** Somebody blocked in the example conversation (0076, D-463): the reader did, or the other person did. */
+  readonly blocked?: 'mine' | 'theirs';
   /**
    * A program lead who already has a program on file (D-447): waiting for
    * review, or approved and live. Without it the lead has none — and a send
    * from Add a program puts one on file, waiting, as the real database does.
    */
   readonly ownProgram?: 'review' | 'live';
+  /** With `ownProgram: 'live'`: a change to its name or address already waiting for Pam (D-462). */
+  readonly pendingChange?: boolean;
+  /** The program of `SAVED_PLACE` offers services (D-462), for a member's view of it. */
+  readonly placeServices?: boolean;
+  /**
+   * A member who already has a trip saved (D-454). Without it they have none —
+   * and a trip planned to a real place in the story is saved from then on, as
+   * the real database does (example places stay in the tab).
+   */
+  readonly savedTrip?: boolean;
 }
+
+/** A real place of the catalogue, to plan a trip to in a story (the examples' ids are not real). */
+export const SAVED_PLACE = {
+  id: '4c0f6b64-3a0e-4b8e-9d6c-7a1f0f3c2b11',
+  name: 'Riverside Job Center',
+  category: 'workforce',
+  address: '1234 Market St, Philadelphia, PA 19107',
+} as const;
+
+interface ProgramServiceRow {
+  id: string;
+  service_id: string;
+  name: string;
+  description: string | null;
+  phone: string | null;
+  website: string | null;
+  address: string | null;
+  hours: unknown;
+  sort_order: number;
+}
+
+let serviceCounter = 0;
+function programServiceRow(
+  programId: string,
+  name: string,
+  description: string | null,
+  extra: Partial<ProgramServiceRow> = {},
+): ProgramServiceRow {
+  serviceCounter += 1;
+  return {
+    id: `5e5e5e5e-0000-4000-8000-${String(serviceCounter).padStart(12, '0')}`,
+    service_id: programId,
+    name,
+    description,
+    phone: null,
+    website: null,
+    address: null,
+    hours: null,
+    sort_order: serviceCounter,
+    ...extra,
+  };
+}
+
+interface SavedTripRow {
+  id: string;
+  service_id: string;
+  place_name: string;
+  category: string;
+  address: string;
+  lat: number;
+  lon: number;
+  starts_at: string;
+  note: string | null;
+  status: 'scheduled';
+}
+
+/**
+ * A time `days` from today on the hour, like the example trips (`dummy-trips.ts`):
+ * the fit audit keeps the date the stories believe it is but not the minute, so
+ * a story that shows `now + 4 days` reads "12:04" one run and "12:00" the next,
+ * and its accepted entry (keyed by the text) stops matching.
+ */
+function onTheHour(days: number, hour: number): string {
+  const d = new Date();
+  d.setDate(d.getDate() + days);
+  d.setHours(hour, 0, 0, 0);
+  return d.toISOString();
+}
+
+function savedTripRow(n: number, startsAt: string, note: string | null = null): SavedTripRow {
+  return {
+    id: `7a1f0f3c-2b11-4c0f-8b64-${String(n).padStart(12, '0')}`,
+    service_id: SAVED_PLACE.id,
+    place_name: SAVED_PLACE.name,
+    category: SAVED_PLACE.category,
+    address: SAVED_PLACE.address,
+    lat: 39.9526,
+    lon: -75.1652,
+    starts_at: startsAt,
+    note,
+    status: 'scheduled',
+  };
+}
+
+/** The lead's program (a listing in the catalogue, so its id is a real one). */
+const OWN_PROGRAM_ID = '4c0f6b64-3a0e-4b8e-9d6c-0a0a0a0a0a0a';
 
 /** The lead's organisation in the pretend database, once they have a program. */
 const OWN_ORG_ID = '22222222-0000-0000-0000-0000000000aa';
@@ -76,7 +176,7 @@ const OWN_ORG_ID = '22222222-0000-0000-0000-0000000000aa';
 /** The lead's program as the pretend database holds it (D-447). */
 function ownProgramRow(state: 'review' | 'live') {
   return {
-    id: 'own-program',
+    id: OWN_PROGRAM_ID,
     name: 'Fresh Start Kitchen',
     category: 'workforce',
     subcategory: 'job_training',
@@ -95,6 +195,46 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
   const role = profile?.role ?? null;
   // A program sent from Add a program in this story is on file from then on.
   let ownProgram: 'review' | 'live' | undefined = options.ownProgram;
+  // What is waiting for Pam on it (D-462): a first send, or a live program's change.
+  let submissions: Array<Record<string, unknown>> = [];
+  if (ownProgram === 'review') {
+    submissions = [
+      { id: 'sub-new', kind: 'new', status: 'in_review', details: {}, sent_at: ownProgramRow('review').created_at, changes_note: null },
+    ];
+  } else if (ownProgram === 'live' && options.pendingChange) {
+    submissions = [
+      {
+        id: 'sub-change',
+        kind: 'change',
+        status: 'in_review',
+        details: { name: 'Fresh Start Community Kitchen', address: '2 Market St, Philadelphia, PA 19107' },
+        sent_at: new Date().toISOString(),
+        changes_note: null,
+      },
+    ];
+  }
+  // The services programs offer (D-462): a lead's own program once it is on file,
+  // and the catalogue program a member plans a trip to.
+  const programServices: ProgramServiceRow[] = [
+    ...(options.ownProgram
+      ? [
+          programServiceRow(OWN_PROGRAM_ID, 'Knife skills', 'Two evenings a week.', { phone: '+12155550177' }),
+          programServiceRow(OWN_PROGRAM_ID, 'Job-readiness workshop', 'Resumes, interviews and showing up ready.'),
+        ]
+      : []),
+    ...(options.placeServices
+      ? [
+          programServiceRow(SAVED_PLACE.id, 'Resume help', 'One-to-one help with a resume.', { phone: '+12155550188' }),
+          programServiceRow(SAVED_PLACE.id, 'Computer lab', 'Open computers and printing.', {
+            address: '300 Chestnut St, Philadelphia, PA 19106',
+          }),
+        ]
+      : []),
+  ];
+  // The member's saved trips (D-454): planning one adds it, moving one changes it, and reading answers with them.
+  const savedTrips: SavedTripRow[] = options.savedTrip
+    ? [savedTripRow(1, onTheHour(4, 12), 'Bring my ID')]
+    : [];
   const has = (part: string) => (url: string) => url.includes(part);
   const on = (part: string, answer: (url: string, method: string, body: unknown) => Answer): Route => (url, method, body) =>
     has(part)(url) ? answer(url, method, body) : null;
@@ -134,12 +274,83 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
     on('/functions/v1/link-preview', () => ({ body: { made: 0 } })),
     on('/rpc/report_photos_for_review', () => ({ body: [] })),
     on('/rpc/report_files_for_review', () => ({ body: [] })),
+    on('/rpc/my_trips', () => ({ body: savedTrips })),
+    on('/rpc/my_trip_services', () => ({ body: [] })),
+    on('/rpc/book_trip_at_service', (_url, _method, body) => {
+      const args = (body ?? {}) as { p_starts_at: string; p_note?: string | null };
+      const row = savedTripRow(savedTrips.length + 1, args.p_starts_at, args.p_note ?? null);
+      savedTrips.push(row);
+      return { body: row };
+    }),
+    on('/rpc/book_trip', (_url, _method, body) => {
+      const args = (body ?? {}) as { p_starts_at: string; p_note?: string | null };
+      const row = savedTripRow(savedTrips.length + 1, args.p_starts_at, args.p_note ?? null);
+      savedTrips.push(row);
+      return { body: row };
+    }),
+    on('/rpc/move_trip', (_url, _method, body) => {
+      const args = (body ?? {}) as { p_id: string; p_starts_at: string };
+      const row = savedTrips.find((trip) => trip.id === args.p_id);
+      if (row) row.starts_at = args.p_starts_at;
+      return { body: row ?? null };
+    }),
     // The lead's own program (D-447): sending one puts it on file; reading it
     // answers the one row, by the organisation the profile names.
     on('/rpc/submit_program', () => {
       ownProgram = ownProgram ?? 'review';
+      submissions = [
+        { id: 'sub-new', kind: 'new', status: 'in_review', details: {}, sent_at: new Date().toISOString(), changes_note: null },
+      ];
       return { body: ownProgramRow(ownProgram) };
     }),
+    on('/rpc/request_program_change', (_url, _method, body) => {
+      const args = (body ?? {}) as { p_name?: string; p_address?: string | null };
+      const change = {
+        id: 'sub-change',
+        kind: 'change',
+        status: 'in_review',
+        details: { name: args.p_name ?? null, address: args.p_address ?? null },
+        sent_at: new Date().toISOString(),
+        changes_note: null,
+      };
+      submissions = [change];
+      return { body: change };
+    }),
+    on('/rpc/withdraw_program_submission', (_url, _method, body) => {
+      const id = ((body ?? {}) as { p_id?: string }).p_id;
+      const gone = submissions.find((sub) => sub['id'] === id);
+      submissions = submissions.filter((sub) => sub['id'] !== id);
+      // Starting over takes a first listing off the list; a change leaves the live one.
+      if (gone?.['kind'] === 'new') ownProgram = undefined;
+      return { body: gone ?? null };
+    }),
+    on('/rest/v1/program_submissions', () => ({ body: submissions })),
+    // A program's services (D-462): read by program, added, changed and removed by id.
+    (url, method, body) => {
+      if (!url.includes('/rest/v1/program_services')) return null;
+      const idIn = (name: string) => new RegExp(`${name}=eq\\.([^&]+)`).exec(url)?.[1];
+      if (method === 'POST') {
+        const args = (body ?? {}) as Partial<ProgramServiceRow> & { service_id: string; name: string };
+        programServices.push(programServiceRow(args.service_id, args.name, args.description ?? null, args));
+        return { body: [] };
+      }
+      const id = idIn('id');
+      if (method === 'PATCH') {
+        const row = programServices.find((r) => r.id === id);
+        if (row) Object.assign(row, body as object);
+        return { body: [] };
+      }
+      if (method === 'DELETE') {
+        const at = programServices.findIndex((r) => r.id === id);
+        if (at >= 0) programServices.splice(at, 1);
+        return { body: [] };
+      }
+      const program = idIn('service_id');
+      return { body: programServices.filter((r) => !program || r.service_id === program) };
+    },
+    // A lead's edit of their own listing (D-447): accepted, answered with nothing.
+    (url, method) =>
+      url.includes('/rest/v1/services') && url.includes('id=eq.') && method === 'PATCH' ? { body: [] } : null,
     (url, method) =>
       url.includes('/rest/v1/services') && url.includes('org_id=eq.') && method === 'GET'
         ? { body: ownProgram ? [ownProgramRow(ownProgram)] : [] }
@@ -165,7 +376,9 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
     ),
     // A brand-new account has had nothing happen to it yet (D-361).
     on('/rest/v1/notifications', () => ({ body: isFreshAccount() ? [] : NOTIFICATIONS })),
-    on('/rest/v1/notification_preferences', () => ({ body: null })),
+    on('/rest/v1/notification_preferences', () => ({
+      body: options.textsStopped ? { sms_enabled: true, sms_stopped_at: '2026-10-08T15:00:00Z' } : null,
+    })),
     on('/rest/v1/access_controls', () => ({ body: [] })),
     on('/rpc/member_points', () => ({ body: 400 })),
     // The area drawer's suggestions (D-275): a few real Philadelphia ZIPs,
@@ -207,6 +420,28 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
     }),
     on('/rpc/service_detail', (_url, _method, body) => {
       const id = ((body ?? {}) as { p_id?: string }).p_id;
+      // A real place of the catalogue, to plan a trip to or read the services of (D-454, D-462).
+      if (id === SAVED_PLACE.id) {
+        return {
+          body: [
+            {
+              id: SAVED_PLACE.id,
+              name: SAVED_PLACE.name,
+              lookup_name: SAVED_PLACE.name,
+              category: SAVED_PLACE.category,
+              address: SAVED_PLACE.address,
+              phone: '+12155550143',
+              website: null,
+              place_id: null,
+              lat: 39.9526,
+              lon: -75.1652,
+              description_plain: 'Help finding work, training and a way in.',
+              audience: null,
+              hours: null,
+            },
+          ],
+        };
+      }
       return { body: [PLACES.find((place) => place.id === id) ?? PLACES[0]] };
     }),
     on('/rpc/directory_people', () => ({ body: DIRECTORY_PEOPLE })),
@@ -262,7 +497,12 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
     // example conversation, so the tap lands in a thread instead of the list.
     on('/rpc/open_direct_conversation', () => ({ body: CONVO_ID })),
     on('/rpc/conversation_partners', () => ({ body: [partnerFor(role)] })),
-    on('/rpc/conversation_block_state', () => ({ body: [{ i_blocked: false, blocked_me: false }] })),
+    on('/rpc/conversation_block_state', () => ({
+      body: [{ i_blocked: options.blocked === 'mine', blocked_me: options.blocked === 'theirs' }],
+    })),
+    // Blocking and unblocking answer yes and change nothing: a story never writes (D-463).
+    on('/rpc/block_in_conversation', () => ({ body: null })),
+    on('/rpc/unblock_in_conversation', () => ({ body: null })),
     on('/rest/v1/messages', (_url, method) => {
       if (method !== 'POST') return { body: threadFor(role) };
       // What `messages_insert_sender` answers a limited account (0031).
