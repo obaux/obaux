@@ -19,7 +19,9 @@
  *               marks it so the newest changes stand out
  *     actions — steps the capture script performs before the screenshot
  *               ({ fill: label, value } | { click: accessible name } |
- *                { press: key } | { wait: ms })
+ *                { press: key } | { wait: ms } |
+ *                { drag: name, dx?, dy? }  press on it, move by dx/dy px, let go: a drawer or sheet |
+ *                { scroll: name | 'page', by: px }  scroll that thing, or the page, down (up if negative))
  *     image   — a file instead of a story (the link preview picture)
  *   edge:    [from, to, label, { dashed? }] — dashed for a way back or a
  *            link that leaves the app (a text, an email)
