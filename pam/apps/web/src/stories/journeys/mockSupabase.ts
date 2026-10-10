@@ -183,7 +183,7 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
         role: (body as { p_role?: string } | null)?.p_role ?? 'member',
       },
     })),
-    // A case manager or a program lead is invited with an email (0086, D-435).
+    // A case manager or a program lead is invited with an email (0086, D-441).
     on('/rpc/create_staff_invite', (_url, _method, body) => ({
       body: {
         code: 'PAM-7Q4K',

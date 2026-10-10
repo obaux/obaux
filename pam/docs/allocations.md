@@ -33,7 +33,7 @@ Update the number in the second column when you claim it, and name the branch.
 
 | Ledger | Next free | Where it lives | Last claimed by |
 |---|---|---|---|
-| Decision | **D-436** | `DECISIONS.md` (`### D-nnn — …`) | `claude/gallant-clarke-0dhizj` (D-422–D-426, D-428, D-430, D-431, D-434); `claude/affectionate-goldberg-tvu4sz` (D-427, D-429, D-432, D-435); `claude/compassionate-bohr-mzrchf` (D-433) |
+| Decision | **D-442** | `DECISIONS.md` (`### D-nnn — …`) | `claude/gallant-clarke-0dhizj` (D-422–D-426, D-428, D-430, D-431, D-434, D-439, D-440); `claude/affectionate-goldberg-tvu4sz` (D-427, D-429, D-432, D-441); `claude/compassionate-bohr-mzrchf` (D-433, D-437; D-438 held); `claude/amazing-archimedes-qvgnt2` (D-435) |
 | SOP amendment | **A26** | `docs/sop-amendments.md` (`## Ann — …`) | `claude/gallant-clarke-0dhizj` (A24, A25) |
 | Migration | **0087** | `packages/db/migrations/nnnn_name.sql` | `claude/gallant-clarke-0dhizj` (0083, 0084 live; 0085 written, not applied — by hand, nothing waits on it); `claude/affectionate-goldberg-tvu4sz` (0086, staff email on invites — written, not applied) |
 | Changelog | **0.51.1** or **0.52.0** | `CHANGELOG.md` (`## [x.y.z] — …`) | `claude/gallant-clarke-0dhizj` (0.50.1, 0.51.0) |

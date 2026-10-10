@@ -124,17 +124,17 @@ STATUS row too.
 
 - [ ] **Send privacy policy updates by email — to the people Pam has an email for**
   (Will, 9 October 2026, D-429: "Moving forward, we'll send emails with privacy policy
-  updates"; refined 10 October, D-435: "we just don't ask members … not everyone has an
+  updates"; refined 10 October, D-441: "we just don't ask members … not everyone has an
   email. This will be typically just staff"). **What exists now (written and tested, not
   live):** a staff invite carries a required email and the account keeps it, tied to the
-  phone (`0086`, D-435). **What is still needed:** (1) the email provider and a sender
+  phone (`0086`, D-441). **What is still needed:** (1) the email provider and a sender
   (the first item on this list); (2) a decision on what a *member* — who is never asked for
   an email — receives when the policy changes: the in-app notice, or a text a person has
   signed off (`reviewedBy`); (3) a way for staff who already have accounts to add an email
   (re-inviting is the only way today). Until then the policy and terms carry their dates
   (privacy: 10 October) and only team accounts and two members exist.
 
-- [ ] **Apply 0086 to the live project, together with the app change that uses it** (D-435).
+- [ ] **Apply 0086 to the live project, together with the app change that uses it** (D-441).
   Run `list_migrations` first. The new app calls `create_staff_invite`; the old app's staff
   invites are refused once 0086 is live, and the new app's fail until it is, so apply and
   merge in the same sitting. No `drop`, so the connector can apply it (D-387). Then

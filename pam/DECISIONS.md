@@ -11450,7 +11450,7 @@ and make text the smallest. Call Pam for help should be a link, not a primary bu
   D-430 "The new languages are approved to learn from" and D-431 first), so this is
   D-432 and every reference on this branch moved with it. Next free: D-433.
 
-### D-435 — A staff invite carries a required email; the account keeps it, tied to the phone
+### D-441 — A staff invite carries a required email; the account keeps it, tied to the phone
 
 **Date:** 2026-10-10. **Decided by:** Will: "Emails are collected when a guide or program
 invites someone … we don't ask [members] during account creation. But the phone number
@@ -11523,5 +11523,11 @@ Profile; using the address typed on the expired-link page as an account email (t
 quietly collect member emails); the program-lead and super-admin pages of the flow map (the
 case manager's page shows the form; the others carry the same form).
 
-**Numbering.** D-435 and migration 0086 were claimed in `docs/allocations.md` first.
+**Numbering.** Migration 0086 was claimed in `docs/allocations.md` first and is still
+free on every other branch. This entry first took D-435 and moved to D-441 on 10 October:
+`claude/amazing-archimedes-qvgnt2` had pushed its own D-435 (Arabic isolates) before
+that claim and the languages branch had also taken D-435 (it moved to D-439), so the
+highest number claimed anywhere was D-440. Every reference on this branch moved with it.
+Lesson, again: fetch and read every `origin/claude/*` allocations row *and* DECISIONS
+heading list before claiming, not only the one file on your own branch.
 

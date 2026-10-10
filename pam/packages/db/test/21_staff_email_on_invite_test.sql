@@ -1,5 +1,5 @@
 -- A staff invite carries the person's email, and their account keeps it (0086,
--- D-435). Will, 9 October 2026: emails are collected when a guide or a program
+-- D-441). Will, 9 October 2026: emails are collected when a guide or a program
 -- invites someone, not when somebody creates their account; the phone they
 -- sign in with maps to the email they were invited with; members are not asked;
 -- and for staff it is not optional.

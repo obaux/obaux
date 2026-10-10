@@ -196,7 +196,7 @@ test.describe('the case manager screen', () => {
     await expect(page.getByText(/Works until/)).toBeVisible();
   });
 
-  test('a member is never asked for an email; staff always are (0086, D-435)', async ({ page }) => {
+  test('a member is never asked for an email; staff always are (0086, D-441)', async ({ page }) => {
     await signedInAs(page, 'admin', []);
     const member: Record<string, unknown>[] = [];
     const staff: Record<string, unknown>[] = [];

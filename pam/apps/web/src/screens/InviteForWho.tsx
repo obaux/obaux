@@ -16,7 +16,7 @@ import { isEmailAddress } from '@/lib/useInviteLinks';
  * open the link — and the only number that can use it; the name is how
  * joining greets them.
  *
- * **Staff also need an email** (D-435, Will, 10 October: "Not optional for
+ * **Staff also need an email** (D-441, Will, 10 October: "Not optional for
  * staff"). A case manager or a program lead is asked for the address Pam will
  * write to; it lands on their account when they sign in with this number. A
  * member is never asked: not everyone has an email, and nobody should be turned

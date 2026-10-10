@@ -101,7 +101,7 @@ const PURPOSES: Record<FieldPurpose, Record<string, string>> = {
     name: 'email',
   },
   /**
-   * Somebody else's email, typed by the person inviting them (D-435): the same
+   * Somebody else's email, typed by the person inviting them (D-441): the same
    * keyboard, but no autofill — the browser must not offer the inviter's own
    * address in a field that is for the invitee's.
    */

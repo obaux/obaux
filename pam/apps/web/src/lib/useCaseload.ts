@@ -182,7 +182,7 @@ export interface CreatedInvite {
  */
 export async function createInvite(
   role: 'member' | 'provider' | 'admin',
-  /** Who it is for — name and phone required (0077, D-373); staff also an email (0086, D-435). */
+  /** Who it is for — name and phone required (0077, D-373); staff also an email (0086, D-441). */
   who: { readonly firstName: string; readonly phone: string; readonly email?: string },
   /** Which city, when the caller has none of their own — a super admin (0049). */
   regionId?: string,

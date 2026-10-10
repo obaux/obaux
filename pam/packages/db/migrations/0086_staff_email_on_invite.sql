@@ -1,4 +1,4 @@
--- 0086 — A staff invite carries the person's email, and their account keeps it (D-435).
+-- 0086 — A staff invite carries the person's email, and their account keeps it (D-441).
 --
 -- Will, 9 October 2026: emails are collected when a guide or a program invites
 -- someone; Pam does not ask for one when somebody creates their account; "the
@@ -64,7 +64,7 @@ create policy invite_contact_emails_nobody on public.invite_contact_emails
   for all using (false) with check (false);
 
 comment on table public.invite_contact_emails is
-  'The email a staff invite was made with (0086, D-435). Forced RLS, a policy that admits nobody, '
+  'The email a staff invite was made with (0086, D-441). Forced RLS, a policy that admits nobody, '
   'no grant to any client role: only invite_create(), redeem_invite(), '
   'add_role_from_invite() and keep_invite_email() reach it. Removed when the '
   'invite is redeemed, because the account keeps it then (profile_emails).';
@@ -97,7 +97,7 @@ create policy profile_emails_own_select on public.profile_emails
 
 comment on table public.profile_emails is
   'The email an invite carried, tied to the verified phone it named (0086, '
-  'D-435). The owner reads their own row; no client role writes it.';
+  'D-441). The owner reads their own row; no client role writes it.';
 
 -- ---------------------------------------------------------------------------
 -- 3. Making the invite.
@@ -177,7 +177,7 @@ begin
   end if;
 
   -- A staff invite carries the person's email; a member's never does (0086,
-  -- D-435). Staff are the people Pam writes to; members are not asked, because
+  -- D-441). Staff are the people Pam writes to; members are not asked, because
   -- not everyone has an email and nobody should be turned away for lacking one.
   if v_staff then
     if v_email is null then
@@ -279,7 +279,7 @@ $$;
 
 comment on function public.create_staff_invite is
   'Makes an invite for a case manager or a program lead: name, phone and an '
-  'email, all required (0086, D-435). The email is held out of the invite and '
+  'email, all required (0086, D-441). The email is held out of the invite and '
   'lands on the account when the invite is redeemed.';
 
 revoke all on function public.create_staff_invite(public.user_role, text, text, uuid, text) from public, anon;
@@ -437,7 +437,7 @@ begin
   on conflict do nothing;
 
   -- The email a staff invite carried goes onto the account, tied to the number
-  -- that was just verified (0086, D-435). An old invite has none: nothing to do.
+  -- that was just verified (0086, D-441). An old invite has none: nothing to do.
   perform public.keep_invite_email(invite.id, caller);
 
   insert into public.audit_log (actor_id, action, target_type, target_id, meta)
