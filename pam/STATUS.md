@@ -1077,6 +1077,14 @@ drops signatures), then `20261010042108_a_program_lead_submits_their_own_program
 
 ---
 
+## Messages & notifications · the expired-link email has a sender (10 October 2026) — merged 10 October
+
+Merged to `main` by the merge desk, 10 October, from `claude/messages-expired-link-email` (ca4f683). `send-invite-emails`
+now also sends the fresh link to someone whose link ran out, under the same `INVITE_EMAILS` switch and secrets, in
+Will's 4 October wording. One migration (`20261010133313_…`, **applied live at merge**, recorded as 20261010133956;
+read back: the three bodies identical to the file, service role only, `invite_emails` still forced RLS, 0 rows waiting);
+DB test 40 (numbered 39 on its branch; Piper's quiet-hours test took 39 first); sender tests. Still not deployed or switched on: that waits for Will's email setup. D-476.
+
 ## Messages & notifications · overdue texts are cancelled (10 October 2026) — merged 10 October
 
 Merged to `main` by the merge desk, 10 October, from `claude/messages-overdue-cutoff` (4de80ab). One migration
@@ -1094,7 +1102,7 @@ ids and leaves a sent text on a cancelled trip on purpose. Tests and a runbook, 
 runbook at the top of `docs/sms-setup.md`. Four gaps found and pinned as KNOWN GAP (evening visits reminded
 on their own day, texts turned on later queue nothing for planned trips, place names cut mid-word, an
 overdue reminder not dropped), all four since fixed: 1 to 3 by Piper's `20261010130831`, 4 by Nico's
-`20261010130754` (KNOWN GAP 1b, quiet hours changed after planning, stays pinned). Cancel and move work. D-473.
+`20261010130754` (and 1b, quiet hours changed after planning, by Piper's `20261010133227`). Cancel and move work. D-473.
 
 ## Messages & notifications · legacy Messages page removed (10 October 2026)
 
@@ -1193,6 +1201,10 @@ Merged to `main` by the merge desk, 10 October, from `claude/places-programs-rem
 ## Places & programs · the super admin reviews programs (10 October 2026) — READY, not merged
 
 Branch `claude/places-programs-review-queue` (D-479). Migrations `20261010134145` (review function, list, closing trigger) and `20261010134146` (backfill), expand only; test `40_a_super_admin_reviews_a_program_test.sql`. App: Programs to check (list + a page per program) from Profile and Requests. No text and no bell row yet. Until 5b, a leader asked for changes cannot re-send.
+
+## Places & programs · quiet hours re-time queued reminders (10 October 2026) — merged 10 October
+
+Merged to `main` by the merge desk, 10 October, from `claude/places-programs-quiet-hours-retime`. Migration `20261010133227`, expand only: changing quiet hours re-runs `queue_trip_reminder` for every future trip (consent still checked inside). **Applied live at merge** (recorded as 20261010133736), read back: body identical to the file, service role only, the trigger beside the turn-on one. Test `39_quiet_hours_change_retimes_texts_test.sql`; test 36's gap 1b flipped, so every gap the rehearsal found is closed. A story "Trips with a past visit" (for Wren's "Planning a visit").
 
 ## Places & programs · review record, pending change, program services — the database half (10 October 2026)
 

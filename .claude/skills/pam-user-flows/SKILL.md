@@ -60,16 +60,32 @@ Then publish. Load `skill://figma/figma-use/SKILL.md` first; pass
 1. **Draw the pages that changed** with `use_figma`, one call per page,
    running `user-flows-out/figma/<n>-<key>.js`. Each script replaces its page
    and draws the title, the latest-changes panel, the arrows and labels, and
-   one card per screen. Every card has an empty `shot:<key>--<node>` slot with
-   the screen's name and an **Open in Storybook ↗** link to the live story.
-   They are 7–15 KB of plain code, which is safe to pass through a tool call.
-2. **Screenshots — only when `mcp.figma.com` is reachable.** Will chose on
-   4 October to keep it blocked for now (`curl -sI https://mcp.figma.com`
-   gives a proxy 403). When it is allowed:
-   - run `<n>-<key>.slots.js` to get the slot ids;
-   - call `upload_assets` with `nodeIds` = those ids;
-   - `curl -X POST` each `user-flows-out/thumbs/<key>--<node>.jpg` (or the
-     full-size HTML shot) to its URL.
+   one card per screen. A page is found by its **title, not its number**
+   (renumbering the pages once left a second Member page behind): the page is
+   reused and renamed, and any other page with that title is removed. Under
+   every screen sits a link to its story, `<STORYBOOK_URL>/?path=/story/<id>`,
+   or **no story yet** where it has none. Every card has an empty
+   `shot:<key>--<node>` slot with the screen's name on a card behind it; a
+   screenshot placed on the slot covers that card. They are 7–15 KB of plain
+   code, which is safe to pass through a tool call.
+
+   **Draw only pages whose `flows.mjs` is on `main`, or merged with the branch
+   that changed them.** Another session's branch can redraw a page from its own
+   unmerged `flows.mjs` (10 October: Case manager and Super admin showed
+   D-446's Limit or pause, Hand over and A member's guide before `main` had
+   them). Drawing from `main` then removes those screens. Compare the page's
+   screen names in Figma with the `flows.mjs` you are about to draw first.
+2. **Screenshots — only when `mcp.figma.com` is reachable.** Both
+   `mcp.figma.com` (where `upload_assets` URLs point) and `*.chromatic.com` are
+   denied by the sandbox's network policy until the environment's allowed
+   domains include them (`curl -sI https://mcp.figma.com` gives a proxy 403).
+   When they are allowed:
+   - `node scripts/user-flows.mjs` already saved the real screen at 390×844,
+     light, to `user-flows-out/shots/<key>--<node>.jpg`;
+   - run `<n>-<key>.slots.js` to get the slot ids (name → id);
+   - `<n>-<key>.shots.json` says which file fills which slot;
+   - call `upload_assets` with `nodeIds` = those ids, in the manifest's order;
+   - `curl -X POST` each file to its URL with `-F file=@<path>`.
 
    The bytes go from disk, never through a tool parameter.
    **Never paste base64 into a `use_figma` script.** A model cannot copy

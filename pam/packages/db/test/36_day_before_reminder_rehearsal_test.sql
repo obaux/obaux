@@ -180,6 +180,9 @@ select test.check('...and it is still waiting, not lost',
   (select count(*) from public.outbound_messages where member_id = :'ben' and status = 'scheduled'), 1::bigint);
 
 update public.notification_preferences set quiet_hours_start = 0, quiet_hours_end = 0 where member_id = :'ben';
+-- Changing the window re-times a queued text (20261010133227); this test is about the dispatcher, so it
+-- makes the text due again by hand, as it did above.
+update public.outbound_messages set send_at = now() - interval '1 minute' where member_id = :'ben';
 set role service_role;
 select test.check('once quiet hours are over it goes out',
   (select count(*) from test.claim_all() where member_id = :'ben' and template_key = 'appointment_24h'), 1::bigint);
@@ -349,18 +352,18 @@ select test.check_text('...and it is not in her quiet hours',
      from public.outbound_messages o join public.appointments a on a.id = o.appointment_id
     where a.member_id = :'ana' and a.starts_at = test.philly_at(12, 21, 30) and o.status = 'scheduled'), 'false');
 
--- 1b. KNOWN GAP (Piper, 10 October): quiet hours changed AFTER a trip is planned do not re-time its
---     reminder until the trip itself changes. Rare (the default window is everyone's), but it is the
---     same wrong morning, so it is pinned here.
+-- 1b. Quiet hours changed AFTER a trip is planned re-time its reminder (fixed by 20261010133227;
+--     was a KNOWN GAP): she plans the 21:30 visit with no quiet hours, then sets the usual window,
+--     and the text moves from 21:30 the evening before to 20:55.
 update public.notification_preferences set quiet_hours_start = 0, quiet_hours_end = 0 where member_id = :'ana';
 set role authenticated;
 select public.book_trip(:'long_place', test.philly_at(13, 21, 30));
 reset role;
 update public.notification_preferences set quiet_hours_start = 21, quiet_hours_end = 7 where member_id = :'ana';
-select test.check_text('KNOWN GAP 1b: a window set after planning leaves the reminder at 21:30 the evening before, inside it',
+select test.check_text('a window set after planning moves the reminder to 20:55 the evening before (gap 1b, fixed)',
   (select to_char(o.send_at at time zone 'America/New_York', 'HH24:MI')
      from public.outbound_messages o join public.appointments a on a.id = o.appointment_id
-    where a.member_id = :'ana' and a.starts_at = test.philly_at(13, 21, 30) and o.status = 'scheduled'), '21:30');
+    where a.member_id = :'ana' and a.starts_at = test.philly_at(13, 21, 30) and o.status = 'scheduled'), '20:55');
 
 -- 2. Turning texts on after planning a trip used to queue nothing for trips already planned.
 --    Fixed: a real turn-on queues the reminder for every future scheduled trip.

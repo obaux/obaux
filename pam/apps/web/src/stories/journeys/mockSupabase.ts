@@ -82,6 +82,8 @@ export interface MockOptions {
    * the real database does (example places stay in the tab).
    */
   readonly savedTrip?: boolean;
+  /** Also a saved trip whose day has passed, so Trips shows its Past visits section. */
+  readonly pastTrip?: boolean;
 }
 
 /** A real place of the catalogue, to plan a trip to in a story (the examples' ids are not real). */
@@ -261,7 +263,7 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
   ];
   // The member's saved trips (D-454): planning one adds it, moving one changes it, and reading answers with them.
   const savedTrips: SavedTripRow[] = options.savedTrip
-    ? [savedTripRow(1, onTheHour(4, 12), 'Bring my ID')]
+    ? [savedTripRow(1, onTheHour(4, 12), 'Bring my ID'), ...(options.pastTrip ? [savedTripRow(2, onTheHour(-3, 10))] : [])]
     : [];
   const has = (part: string) => (url: string) => url.includes(part);
   const on = (part: string, answer: (url: string, method: string, body: unknown) => Answer): Route => (url, method, body) =>
