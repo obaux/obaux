@@ -29,14 +29,18 @@ const styles = stylex.create({
     backgroundColor: colorVars['--color-background-card'],
   },
   stepsTitle: { fontWeight: 700 },
-  // The pictures: a tinted card (blue; the requirements banner is gray) as wide as the layout
+  // The pictures: a light gray card, a tint lighter than the page as wide as the layout
   // allows, the screenshots centred in it with room all round.
   shots: {
     flex: 1,
     minWidth: 0,
     boxSizing: 'border-box',
     borderRadius: '20px',
-    backgroundColor: colorVars['--color-background-blue'],
+    // A gray a tint lighter than the page, with a hairline, as on Figma Learn (the requirements banner is a deeper gray).
+    backgroundColor: 'color-mix(in srgb, var(--color-background-body) 45%, white)',
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    borderColor: colorVars['--color-border'],
     padding: { default: '28px 20px', [WIDE]: '48px 40px' },
     alignItems: 'center',
     justifyContent: 'center',
@@ -55,7 +59,7 @@ export interface Shot {
   readonly caption?: string;
 }
 
-/** One or more screenshots in the tinted card, centred. */
+/** One or more screenshots in the light gray card, centred. */
 export function ShotCard({ shots }: { readonly shots: readonly Shot[] }) {
   return (
     <HStack xstyle={styles.shots}>
@@ -75,7 +79,7 @@ export function ShotCard({ shots }: { readonly shots: readonly Shot[] }) {
 
 /**
  * How to find it in the app: the numbered steps in a card with a black outline, and, when there
- * are pictures, the tinted picture card next to it (stacked under it on a phone).
+ * are pictures, the light gray picture card next to it (stacked under it on a phone).
  */
 export function HowTo({
   steps,
