@@ -928,7 +928,16 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
-## Languages & legal · the privacy page on email and signatures (10 October) — on `claude/lena-privacy-three-sentences`, not merged
+## Languages & legal · 10 October in one place; from now on, one batch a week (Friday)
+
+Done and on `main` today (each has its own section below): the promise sweep (D-474), Spanish "visita" (D-480), the privacy page on email and signatures (D-482, D-490: Will's three sentences, live),
+the program switch and the 17 policy strings reviewed in six languages, and Wren's About Pam sentences and rules post reviewed. **Ready, not merged:** `claude/lena-review-queue-booking` (4c9c5a9): Piper's program review
+queue (38) and the example booking (2) reviewed in six languages; zh-HK's whole queue was written Cantonese, now the bundle's written Chinese; no code, no migration. **With Will:** card a32 (About Pam "remember to go").
+**Not built yet, for Friday 16 October** (`docs/weekly/2026-10-16.md`): the privacy guard (a list of every input that collects personal data with the privacy key that covers it, and a test that fails on one with no
+key: approved), the staff-request screen words, Dot's phone fixes. **Open:** a native reader for every translation I wrote (before-launch); Spanish mixes tú (members) and usted (staff) by design. Working rule from Will
+(`docs/team.md`, "The weekly update"): I update once a week from the merge desk's notes; the privacy page is never behind the app.
+
+## Languages & legal · the privacy page on email and signatures (10 October) — merged 10 October (0a918f1)
 
 Will approved card a29 (10 October 15:15 UTC), three sentences word for word, pinned in `test/legal.test.ts` (D-490): `privacy.s.sharing.p4` now says a company that sends email for us gets the address
 and the email whenever **Pam sends an email** (it said "a case manager or a program"); the end of `privacy.s.what-we-keep.p7` says a member is asked for an email only if their invite link has run
