@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { Button } from '@pam/ui/Button';
+import { Banner } from '@astryxdesign/core/Banner';
 import { Card } from '@astryxdesign/core/Card';
 import { Text } from '@astryxdesign/core/Text';
 import { TextArea } from '@astryxdesign/core/TextArea';
@@ -17,7 +18,7 @@ import { useI18n } from '@/lib/i18n';
 import { addressActionsFor } from '@/lib/addressActions';
 import { useSession } from '@/lib/useSession';
 import { useProgramSetup } from '@/lib/programSetup';
-import { saveOwnProgram } from '@/lib/useOwnProgram';
+import { saveOwnProgram, withdrawSubmission } from '@/lib/useOwnProgram';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { AddProgramView } from './AddProgramView';
 import { ProgramReviewView } from './ProgramReviewView';
@@ -38,10 +39,10 @@ import { BigCategoryIcon } from './SavedView';
  * **A real program writes back; the example does not.** A lead's own program
  * is read from the database and saved to it (`onSave`, D-447); the example
  * program (a demo account, a story) keeps its edits for the visit only.
- * Once a program is live its name, address and kind of help are not edited in
- * place — Pam checks a change to who and where it is (D-447) — so they show
- * but stay still (`isLocked`), while its description, phone and website are the
- * lead's to change at once.
+ * Once a program is live (`isLive`), its description, phone and website are the
+ * lead's to change at once, but a new name or address is asked of Pam (D-447):
+ * it waits beside the live one (`pending`), members keep seeing what they saw,
+ * and the lead can take it back (`onCancelPending`).
  */
 export interface ProgramDetailsData {
   readonly name: string;
@@ -79,13 +80,19 @@ const styles = stylex.create({
 export function ProgramView({
   program: initial,
   note,
-  isLocked = false,
+  isLive = false,
+  pending = null,
+  onCancelPending,
   onSave,
 }: {
   readonly program: ProgramDetailsData;
   readonly note?: string | null;
-  /** A live program: name, address and kind of help are read-only (D-447). */
-  readonly isLocked?: boolean;
+  /** A live program: a new name or address is asked of Pam, not written (D-447). */
+  readonly isLive?: boolean;
+  /** A change to the name or address waiting for Pam (D-462). */
+  readonly pending?: { readonly name: string | null; readonly address: string | null } | null;
+  /** Take the waiting change back; resolves false when it could not be. */
+  readonly onCancelPending?: () => Promise<boolean>;
   /** A real program: write the edit; resolves false when it could not be saved. */
   readonly onSave?: (draft: ProgramDetailsData) => Promise<boolean>;
 }) {
@@ -96,6 +103,8 @@ export function ProgramView({
   const [saved, setSaved] = useState(false);
   const [failed, setFailed] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  // What was asked of Pam, said once after saving (D-447).
+  const [askedPam, setAskedPam] = useState(false);
   const supportPhone = useSupportPhone();
   const set = (patch: Partial<ProgramDetailsData>) => setDraft((d) => ({ ...d, ...patch }));
   const { policies } = usePolicies();
@@ -163,7 +172,11 @@ export function ProgramView({
       }
     }
     setFailed(false);
-    setProgram(next);
+    // A live program's new name or address waits for Pam: the page keeps the
+    // ones members see (D-447).
+    const asks = isLive && (next.name !== program.name || next.address.trim() !== program.address.trim());
+    setAskedPam(asks);
+    setProgram(asks ? { ...next, name: program.name, address: program.address } : next);
     setEditing(false);
     setSaved(true);
   };
@@ -193,7 +206,21 @@ export function ProgramView({
         }
       />
 
-      {saved ? <Text xstyle={styles.saved}>{t('program.saved')}</Text> : null}
+      {saved ? <Text xstyle={styles.saved}>{t(askedPam ? 'program.saved.change' : 'program.saved')}</Text> : null}
+      {pending ? (
+        <Banner
+          status="info"
+          title={t('program.pending.title')}
+          description={[t('program.pending.body'), pending.name, pending.address].filter(Boolean).join(' · ')}
+          {...(onCancelPending
+            ? {
+                endContent: (
+                  <Button label={t('program.pending.cancel')} variant="ghost" onClick={() => void onCancelPending()} />
+                ),
+              }
+            : {})}
+        />
+      ) : null}
       {failed ? (
         <Notice
           notice="something_went_wrong"
@@ -210,8 +237,7 @@ export function ProgramView({
             <TextField
               label={t('program.name')}
               // Ready to type on arrival (Will, 7 October, D-365).
-              hasAutoFocus={!isLocked}
-              isDisabled={isLocked}
+              hasAutoFocus
               value={draft.name}
               onChange={(next) => set({ name: next })}
               width="100%"
@@ -227,7 +253,6 @@ export function ProgramView({
             <TextField
               purpose="address"
               label={t('join.program.address')}
-              isDisabled={isLocked}
               value={draft.address}
               onChange={(next) => set({ address: next })}
               width="100%"
@@ -248,7 +273,7 @@ export function ProgramView({
               width="100%"
               xstyle={styles.field}
             />
-            {isLocked ? (
+            {isLive ? (
               <Text type="supporting" xstyle={styles.note}>
                 {t('program.locked')}
               </Text>
@@ -361,7 +386,9 @@ export function ProgramScreen() {
           phone: own.details.phone,
           website: own.details.website,
         }}
-        isLocked={own.isLive}
+        isLive={own.isLive}
+        pending={own.pendingChange}
+        {...(own.pendingChange ? { onCancelPending: () => withdrawSubmission(own.pendingChange!.id) } : {})}
         onSave={(draft) => saveOwnProgram(own, draft)}
       />
     );

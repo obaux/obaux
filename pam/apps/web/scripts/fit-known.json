@@ -522,5 +522,41 @@
   {
     "key": "pseudo|cut|member-created-states-saved-trips--one-trip-saved|⟦Þŕóóóƒííļéé⟧",
     "reason": "The fifth tab's label. Five one-word labels share a 320px bar and a tab does not shrink below its longest word, so the pseudo-language (English +45% with padding, longer than any real language) runs past the edge. All seven real languages fit (Russian, the tightest, fills the bar edge to edge). Tested and not shipped: tabs sized by content (flex 1 1 auto, min-width 0, wrapping) fit every language and wrap the pseudo-language, but move the English tabs a few pixels; the bar is Will's design, so it is his call (docs/before-launch.md). Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "pseudo|ellipsis|program-lead-states-program-on-file--live-with-a-change-waiting|Reading, writing and math toward the GED test, four mornings",
+    "reason": "A service's description on the Program page is one line with an ellipsis by design (the row sets isDescriptionOneLine); the pseudo-language stretches it past the width. Nothing is lost: the whole text is one tap away, in the service's own page. Looked at 10 October 2026 at 320px."
+  },
+  {
+    "key": "pseudo|ellipsis|program-lead-states-program-on-file--live-with-a-change-waiting|Open computers, printing and help with email, forms and job ",
+    "reason": "A service's description on the Program page is one line with an ellipsis by design (the row sets isDescriptionOneLine); the pseudo-language stretches it past the width. Nothing is lost: the whole text is one tap away, in the service's own page. Looked at 10 October 2026 at 320px."
+  },
+  {
+    "key": "pseudo|ellipsis|program-lead-states-program-on-file--live-with-a-change-waiting|Two weeks on resumes, interviews and showing up ready. A cer",
+    "reason": "A service's description on the Program page is one line with an ellipsis by design (the row sets isDescriptionOneLine); the pseudo-language stretches it past the width. Nothing is lost: the whole text is one tap away, in the service's own page. Looked at 10 October 2026 at 320px."
+  },
+  {
+    "key": "pseudo|ellipsis|program-lead-states-program-on-file--live|Reading, writing and math toward the GED test, four mornings",
+    "reason": "A service's description on the Program page is one line with an ellipsis by design (the row sets isDescriptionOneLine); the pseudo-language stretches it past the width. Nothing is lost: the whole text is one tap away, in the service's own page. Looked at 10 October 2026 at 320px."
+  },
+  {
+    "key": "pseudo|ellipsis|program-lead-states-program-on-file--live|Open computers, printing and help with email, forms and job ",
+    "reason": "A service's description on the Program page is one line with an ellipsis by design (the row sets isDescriptionOneLine); the pseudo-language stretches it past the width. Nothing is lost: the whole text is one tap away, in the service's own page. Looked at 10 October 2026 at 320px."
+  },
+  {
+    "key": "pseudo|ellipsis|program-lead-states-program-on-file--live|Two weeks on resumes, interviews and showing up ready. A cer",
+    "reason": "A service's description on the Program page is one line with an ellipsis by design (the row sets isDescriptionOneLine); the pseudo-language stretches it past the width. Nothing is lost: the whole text is one tap away, in the service's own page. Looked at 10 October 2026 at 320px."
+  },
+  {
+    "key": "pseudo|ellipsis|program-lead-states-program-on-file--live-spanish|Reading, writing and math toward the GED test, four mornings",
+    "reason": "A service's description on the Program page is one line with an ellipsis by design (the row sets isDescriptionOneLine); the pseudo-language stretches it past the width. Nothing is lost: the whole text is one tap away, in the service's own page. Looked at 10 October 2026 at 320px."
+  },
+  {
+    "key": "pseudo|ellipsis|program-lead-states-program-on-file--live-spanish|Open computers, printing and help with email, forms and job ",
+    "reason": "A service's description on the Program page is one line with an ellipsis by design (the row sets isDescriptionOneLine); the pseudo-language stretches it past the width. Nothing is lost: the whole text is one tap away, in the service's own page. Looked at 10 October 2026 at 320px."
+  },
+  {
+    "key": "pseudo|ellipsis|program-lead-states-program-on-file--live-spanish|Two weeks on resumes, interviews and showing up ready. A cer",
+    "reason": "A service's description on the Program page is one line with an ellipsis by design (the row sets isDescriptionOneLine); the pseudo-language stretches it past the width. Nothing is lost: the whole text is one tap away, in the service's own page. Looked at 10 October 2026 at 320px."
   }
 ]

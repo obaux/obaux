@@ -928,6 +928,23 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
+## Places & programs · a live program's pending change (10 October) — on the branch, not merged
+
+D-447 and D-462, on `claude/places-programs-program-changes` (Piper), stacked on the database
+half `claude/places-programs-submissions-and-services`. **Not on `main`; needs migration
+`20261010083715` live first.**
+
+- **Built:** a live program's new name or address is asked of Pam and waits beside the live one
+  ("Waiting for Pam", with Cancel); the description, phone and website still change at once;
+  Delete and start over withdraws a first send and lands on Add a program; the Program tab reads
+  the open submission.
+- **Not built:** the services list (`program_services`) on screens; a lead resending after Pam
+  asks for changes; the super admin's side (part 6); the kind of help is not editable there.
+- **Proven:** web 67 tests, Storybook build, a browser look at the three flows, language fit
+  (seven languages and the pseudo-language). Nothing run against the live project.
+
+---
+
 ## Places & programs · save a member's trips (10 October) — merged 10 October
 
 D-454, from `claude/places-programs-save-trips` (Piper). A trip a member
