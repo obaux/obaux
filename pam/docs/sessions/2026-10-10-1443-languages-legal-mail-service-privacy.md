@@ -35,7 +35,10 @@ if it should also cover someone who asks for a new invite link, propose English,
 
 ## Verified
 
-(see the READY note: head, browser suite, privacy fit audit)
+On `e980fdc` (main `2ea542d` plus this change): `@pam/config` 1037 tests (readability grade included), `copy:status` in step, the browser suite on all three
+viewports **960 passed, 18 skipped** (10.9 min; the skips are the suite's own), Storybook builds, and the fit audit on the privacy page in all seven languages and
+the pseudo-language: 0 new defects. I also opened the page in en, ru, ar and zh-HK at 320px and looked at the new paragraph: it wraps inside the 288px column in each
+(the Arabic reads right to left under the paragraph about the company that sends texts).
 
 ## Left undone
 
