@@ -361,6 +361,15 @@ Russian, Arabic (D-422); messages read in the reader's language (D-423).
   seen it — and whether an English value in the middle of a sentence reads better
   isolated or flowing with the sentence.
 
+- [ ] **The privacy page names the company that sends email (10 October, D-482, Will's a21).** The English is
+  Will's, word for word: "When Pam emails a case manager or a program, a company that sends email for us gets the
+  email address and the email. It may not use them for anything else." (`privacy.s.sharing.p4`). **It must be on the
+  live page before the first email goes out**: it ships with the next deploy, and the email sender stays off until
+  forwarding, a test and Will's go (D-450). Two things it does not cover are with Will: the expired-link email also
+  goes to a **member** who types their address (so the sentence should say "When Pam sends an email…"), and
+  `privacy.s.what-we-keep.p7` still ends "Members are never asked for an email", which is untrue on that page; the
+  proposed English for both is in D-482. Six translations by Claude; a promise, so the same native readers as below.
+
 - [ ] **A native reader for what D-465 reworded (10 October).** The last-day line on the
   transparency screen (`transparency.canSee.lastActive`), the privacy page's "What you can do"
   blocking sentence and the terms' blocking sentence now say only what is true (a guide, not a

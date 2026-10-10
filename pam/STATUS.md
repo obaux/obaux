@@ -928,6 +928,15 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
+## Languages & legal · the privacy page names the company that sends email (10 October) — on `claude/lena-mail-service-privacy`, not merged
+
+Will approved a21 (10 October 14:37 UTC): "When Pam emails a case manager or a program, a company that sends email for us gets the email address and the email.
+It may not use them for anything else." It is `privacy.s.sharing.p4`, word for word, the last paragraph of "Who else gets your information", in all seven
+languages (six by Claude, no native reader), pinned by `test/legal.test.ts` (D-482). **It must be on the live page before the first email goes out.**
+Two things it does not cover are with Will: the expired-link email also goes to a **member** (so the sentence should say "When Pam sends an email…"), and
+`privacy.s.what-we-keep.p7` still says "Members are never asked for an email", which the expired-link page makes untrue. Proposed English for both is in D-482;
+nothing was widened without him.
+
 ## Languages & legal · the app says only what Pam texts today (10 October) — merged 10 October
 
 Merged to `main` by the merge desk, 10 October, from `claude/lena-promise-sweep` (481afaf), with Piper's Cancel-a-visit drafts reviewed. Will's rule (a12): a line says only what Pam does. The first slide said "Pam reminds you before you go, so nothing gets
