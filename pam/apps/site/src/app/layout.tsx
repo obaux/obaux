@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Providers } from '../components/Providers';
 import { SiteShell } from '../components/SiteShell';
 import { SITE_URL } from '../lib/links';
+import { SHARE_DESCRIPTION, SHARE_IMAGE, SHARE_TITLE } from '../lib/share';
 
 // Setup order is the app's (apps/web/src/app/layout.tsx): layers first, then the
 // three Astryx sheets as JS imports, then Pam's theme, fonts and own styles.
@@ -12,32 +13,25 @@ import '@pam/ui/theme/pam.css';
 import '@pam/ui/fonts.css';
 import './globals.css';
 
-const TAGLINE = 'City services in your pocket';
-const SHARE = {
-  url: '/og/social.png',
-  width: 1200,
-  height: 630,
-  alt: `Pam — ${TAGLINE}`,
-};
-
 // The icons (`icon.svg`, `apple-icon.png`, `favicon.ico`) are picked up from this
-// folder by Next; the social preview is drawn from `social/preview.html`.
+// folder by Next; the social preview is drawn from `social/preview.html`. The
+// words and the image are in `lib/share.ts`, which Storybook previews.
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: { default: `Pam — ${TAGLINE}`, template: '%s — Pam' },
-  description: 'Pam helps you find people and places that can help.',
+  title: { default: SHARE_TITLE, template: '%s — Pam' },
+  description: SHARE_DESCRIPTION,
   openGraph: {
     type: 'website',
     siteName: 'Pam',
-    title: `Pam — ${TAGLINE}`,
-    description: 'Pam helps you find people and places that can help.',
-    images: [SHARE],
+    title: SHARE_TITLE,
+    description: SHARE_DESCRIPTION,
+    images: [SHARE_IMAGE],
   },
   twitter: {
     card: 'summary_large_image',
-    title: `Pam — ${TAGLINE}`,
-    description: 'Pam helps you find people and places that can help.',
-    images: [SHARE],
+    title: SHARE_TITLE,
+    description: SHARE_DESCRIPTION,
+    images: [SHARE_IMAGE],
   },
 };
 

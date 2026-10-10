@@ -59,6 +59,11 @@ From `pam/`:
   `...--support`; look at 1280px and 390px, light and dark.
   Check the new post appears under its topic, in Popular articles, and in search.
 
+Changing the site's title, description, tagline or social image? Edit
+`apps/site/src/lib/share.ts` (words) or `apps/site/social/preview.html` (picture,
+then `node social/render.mjs`), and check **Website › Share and icon**, including
+the compact card — everything that must be read stays in the central square.
+
 ## 4. Record and ship
 
 - Extend `apps/site/test/content.test.ts` if the post has structured data.

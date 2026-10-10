@@ -11479,4 +11479,15 @@ create new posts on my behalf."
   the 80% safe zone. The three PNGs are listed in Foundations › Imagery
   (`imagery.ts`), as `imagery.test.ts` requires. Bundle budget unchanged (55.4 kB
   to spare).
+- **The social image and favicon are previewed in Storybook (Will, 10 October),
+  and the preview changed the image.** `Website/Share and icon` has **Link
+  preview** (a large card and a compact card, chosen in the controls) and **Icon**
+  (a browser tab on light and dark, the 16/32/48 sizes, the Apple touch icon, the
+  app icon, and the maskable icon cropped to a circle). Its words come from
+  `apps/site/src/lib/share.ts`, which the page metadata also reads, and its
+  pictures are the files the site ships, so it cannot drift from the real thing.
+  The first image put the logo and tagline on the left; the compact card — a
+  square taken from the middle — cut the wordmark in half. **Redrawn:** the logo,
+  tagline and line sit in a centred 630×630 green panel, so any square crop is
+  that panel, and the illustration is only the frame either side.
 

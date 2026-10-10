@@ -42,7 +42,16 @@ manager's and a super admin's powers over assigning, limiting and pausing).
   the built app and site, Storybook's `favicon.svg`, the web tests (48), the
   bundle budget. Not verified on a real phone's home screen.
 
+- **10 October: previewing the social image and favicon in Storybook** (D-437,
+  last bullet): `Website/Share and icon`, fed by `lib/share.ts`. Looked at light,
+  dark and both card shapes, no broken images.
+
 ## What was wrong, and what missed it
+
+- **The first social image lost its logo in a square crop.** It looked right at
+  1200×630 and nothing checked the crops chat apps make; the Storybook preview
+  (compact card) is what showed the wordmark cut in half. Redrawn so everything
+  that must be read is in the central square.
 
 - **First build failed** importing `TextLink` from the `@pam/ui` barrel in a
   server component: the barrel re-exports `VoiceInput`, which uses `useState`
