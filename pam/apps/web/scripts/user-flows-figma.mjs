@@ -134,7 +134,9 @@ const root=figma.createFrame(); root.name='Flow — '+L.title; root.resize(L.wid
 text(root,('PAM · User flows · '+L.title).toUpperCase(),{size:14,style:'Semi Bold',color:ACCENT,x:80,y:56});
 text(root,L.title,{size:44,style:'Extra Bold',x:80,y:82});
 text(root,L.intro,{size:18,color:{r:0.2,g:0.2,b:0.2},width:820,x:80,y:146,lh:150});
-text(root,'Updated '+L.updated+'   ·   orange tag = changed in the latest round   ·   solid arrow: a tap   ·   dashed: leaves the app, or a way back',{size:13,style:'Medium',color:MUTED,x:80,y:236});
+const legend=text(root,'Updated '+L.updated+'   ·   orange tag = changed in the latest round   ·   solid arrow: a tap   ·   dashed: leaves the app, or a way back',{size:13,style:'Medium',color:MUTED,width:700,x:480,y:57,lh:140});
+// What the app is doing now that the map is not (the shell, a22): beside the title, clear of the arrow lanes under it.
+if(L.note) text(root,L.note,{size:13,color:{r:0.2,g:0.2,b:0.2},width:620,x:480,y:Math.round(legend.y+legend.height+10),lh:145});
 if(L.changes.length){
   const p=figma.createAutoLayout('VERTICAL',{name:'Latest changes',itemSpacing:8,paddingLeft:22,paddingRight:22,paddingTop:20,paddingBottom:20,cornerRadius:20});
   p.fills=solid(WHITE); root.appendChild(p); p.x=L.width-460; p.y=56;

@@ -307,6 +307,7 @@ for (const flow of flows) {
       key: flow.key,
       title: flow.title,
       intro: flow.intro,
+      note: flow.note ?? '',
       changes: flow.changes ?? [],
       updated: UPDATED,
       width,

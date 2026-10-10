@@ -177,6 +177,7 @@ export const flows = [
   {
     key: 'member',
     title: 'Member',
+    note: 'The tab bar is live in the app (D-456).',
     intro:
       'Five tabs: Explore, Saved, Trips, Messages, Profile. A member finds a place, plans a visit, and talks to their case manager and programs.',
     roots: ['explore', 'saved', 'trips', 'messages', 'profile'],
@@ -361,6 +362,7 @@ export const flows = [
   {
     key: 'case-manager',
     title: 'Case manager',
+    note: 'The tab bar is live in the app (D-456). Home is still the old Home, with its people strip, until the strip\'s rings are on the redesigned Home (card a22).',
     intro:
       'Four tabs: Home (their members), Saved, Messages, Profile. A case manager invites people, keeps up with their members and connects them to programs.',
     roots: ['home', 'saved', 'messages', 'profile'],
@@ -443,6 +445,7 @@ export const flows = [
   {
     key: 'program-lead',
     title: 'Program lead',
+    note: 'The tab bar is live in the app (D-456). Home is still the old Home, with its people strip, until the strip\'s rings are on the redesigned Home (card a22).',
     intro:
       'Four tabs: Home (who is coming in), Program, Messages, Profile. A program lead looks after their listing, the policies participants sign, and the people booked in. A new lead\'s Home is getting started until somebody books.',
     roots: ['getStarted', 'home', 'program', 'messages', 'profile'],
@@ -603,6 +606,7 @@ export const flows = [
   {
     key: 'super-admin',
     title: 'Super admin',
+    note: 'The tab bar is live in the app (D-456).',
     intro:
       'Three tabs: Home (requests), Messages, Profile. The person running Pam decides who becomes staff, keeps an eye on every invite, and talks to staff — never to members.',
     roots: ['home', 'messages', 'profile'],
