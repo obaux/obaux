@@ -937,6 +937,14 @@ Two things it does not cover are with Will: the expired-link email also goes to 
 `privacy.s.what-we-keep.p7` still says "Members are never asked for an email", which the expired-link page makes untrue. Proposed English for both is in D-482;
 nothing was widened without him.
 
+## Languages & legal · Spanish says "visita", not "viaje" (10 October) — merged 10 October
+
+Merged to `main` by the merge desk, 10 October, from `claude/lena-es-visitas` (17e22db), after the sweep. 
+The Spanish tab said "Visitas" and sixteen strings around it said "viaje" (New trip, Trip added, Go to Trips, alerts, glossary); all say "visita" now,
+and one Simplified Chinese stray ("行程") says "预约". `test/one-word-for-a-visit.test.ts` keeps each language to the word on its tab (D-480). This branch
+contains the queued promise sweep below, so **merge that first**. Open: the public site's Spanish draft (`about.ts`, Wren) still says "viaje"; Piper's
+review-queue strings are reviewed when they are on `main`.
+
 ## Languages & legal · the app says only what Pam texts today (10 October) — merged 10 October
 
 Merged to `main` by the merge desk, 10 October, from `claude/lena-promise-sweep` (481afaf), with Piper's Cancel-a-visit drafts reviewed. Will's rule (a12): a line says only what Pam does. The first slide said "Pam reminds you before you go, so nothing gets
@@ -1247,6 +1255,10 @@ Merged to `main` by the merge desk, 10 October, from `claude/places-programs-rev
 ## Places & programs · quiet hours re-time queued reminders (10 October 2026) — merged 10 October
 
 Merged to `main` by the merge desk, 10 October, from `claude/places-programs-quiet-hours-retime`. Migration `20261010133227`, expand only: changing quiet hours re-runs `queue_trip_reminder` for every future trip (consent still checked inside). **Applied live at merge** (recorded as 20261010133736), read back: body identical to the file, service role only, the trigger beside the turn-on one. Test `39_quiet_hours_change_retimes_texts_test.sql`; test 36's gap 1b flipped, so every gap the rehearsal found is closed. A story "Trips with a past visit" (for Wren's "Planning a visit").
+
+## Places & programs · a leader switches between their programs (10 October 2026) — merged 10 October
+
+Merged to `main` by the merge desk, 10 October, from `claude/places-programs-switch-programs` (D-318). No migration. `/program/switch/` and a Your programs row; the lead's pick is kept on that phone.
 
 ## Places & programs · booking for a member says it is an example (10 October 2026) — merged 10 October
 

@@ -130,6 +130,10 @@ export function ProgramReviewView({ isCelebrating = false, ...given }: ProgramRe
 
   const moreRows = [
     { id: 'sent', label: t('programs.review.seeSent'), href: '/program/sent/', icon: <PlacesIcon {...ICON} /> },
+    // Another program of theirs is live: a way to it from here (D-318).
+    ...(setup.programCount > 1
+      ? [{ id: 'switch', label: t('program.switch.row'), description: t('program.switch.row.body'), href: '/program/switch/', icon: <PlacesIcon {...ICON} /> }]
+      : []),
     ...(status === 'late'
       ? [{ id: 'ask', label: t('programs.review.ask'), description: t('programs.review.ask.body'), href: '/help/', icon: <HelpIcon {...ICON} /> }]
       : []),
