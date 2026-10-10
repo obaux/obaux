@@ -35,7 +35,7 @@ failed once each.
 |---|---|
 | Brand | **Oba** — the registered LLC, matching the EIN letter exactly. Pam is the campaign beneath it, not the brand. |
 | Use case | **Low Volume Mixed** — account notifications (sign-in codes) and appointment reminders |
-| Embedded links | **Yes** ← *rejected before.* Nine of the thirteen messages carry `{link}`. |
+| Embedded links | **Yes** ← *rejected before.* Fourteen of the seventeen messages carry `{link}` (counted again 10 October; it said nine of thirteen, and ten of the thirteen do). |
 | Embedded phone numbers | **Yes** — `access_limited_notice` ends "Call {supportPhone} with questions" |
 | Age-gated content | No |
 | Direct lending or loan arrangement | No |
@@ -46,7 +46,7 @@ failed once each.
 | Help | Reply **HELP**. |
 | Privacy policy URL | `https://web-ten-umber-88.vercel.app/privacy/` |
 | Terms URL | `https://web-ten-umber-88.vercel.app/terms/` |
-| Sample messages | All thirteen, below, placeholders intact — and the appointment reminder in each added language (the form takes a few; send those five if all do not fit) |
+| Sample messages | All seventeen, below (the four alert texts, 14–17, are drafts not yet sent: file them anyway, so the campaign is not filed twice), placeholders intact — and the appointment reminder in each added language (the form takes a few; send those five if all do not fit) |
 
 **Before submitting, open both URLs in a private window.** A reviewer fetches
 them signed out, from a machine that has never seen the site. A page behind a
@@ -124,17 +124,17 @@ really on that screen.
 
 ## The campaign description, to paste as written
 
-The field caps at **1024 characters**. What follows is 1018, so it fits with a
+The field caps at **1024 characters**. What follows is 1021, so it fits with a
 little room — if you edit it, count before you paste. Every message type a person
 can receive is named on purpose: reviewers compare the description against the
 samples and, later, against real traffic, and a description narrower than what
 actually sends is how an approved campaign gets suspended.
 
-> Pam is an app by Oba that connects people to community programs, services and the staff who support them. People receive messages only after entering their own phone number on Pam's sign-in screen, which states that Pam will text them and how to stop.
+> Pam is an app by Oba that connects people to community programs, services and the staff who support them. People get messages only after entering their own phone number on Pam's sign-in screen, which says Pam will text them and how to stop.
 >
-> Messages are account notifications and appointment reminders, at low volume. A person first receives a one-time sign-in code. After that they may receive reminders for appointments they scheduled in the app, a check-in asking whether they made it, a notice when a saved place has closed or moved, a notice that someone wants to connect, and, for staff, a notice of an introduction or an account change.
+> Messages are account notifications and appointment reminders, at low volume. First comes a one-time sign-in code. After that a person may receive reminders for appointments they scheduled in the app, a check-in on whether they made it, a notice when a saved place has closed or moved, a notice that someone wants to connect or that a message is waiting, and, for staff, a notice of an introduction, account change, or visit booked, changed or planned.
 >
-> Nothing is promotional: no marketing, advertising or third-party content, and numbers are never sold or shared. Every message names Pam. Languages: English, Spanish, Portuguese, Chinese, Russian, Arabic. A message is one segment, except appointment reminders in Chinese, Russian and Arabic: two. STOP ends all messages permanently; HELP returns support contact.
+> Nothing is promotional or third-party, and numbers are never sold or shared. Every message names Pam. Languages: English, Spanish, Portuguese, Chinese, Russian, Arabic. A message is one segment, except appointment reminders in Chinese, Russian and Arabic: two. STOP ends all messages permanently; HELP returns support contact.
 
 ### The shorter fields, if the form asks separately
 
@@ -230,6 +230,39 @@ actually sends is how an approved campaign gets suspended.
 > Pam: Some parts of Pam are turned off for now. Call {supportPhone} with questions.
 >
 > _Spanish:_ Pam: Algunas partes de Pam estan apagadas por ahora. Llame al {supportPhone} si tiene preguntas.
+
+**14. Somebody wrote to you (a draft: not signed, not yet sent)**
+
+> Pam: You have a new message in Pam. Open it: {link}
+>
+> _Spanish:_ Pam: Tiene un mensaje nuevo en Pam. Abralo aqui: {link}
+
+**15. To a program: somebody booked a visit (a draft)**
+
+> Pam: Someone booked a visit with your program. Open Pam to see it: {link}
+>
+> _Spanish:_ Pam: Alguien reservo una visita en su programa. Abra Pam para verla: {link}
+
+**16. To a program: a booking was changed (a draft)**
+
+> Pam: A visit with your program was changed. Open Pam to see it: {link}
+>
+> _Spanish:_ Pam: Cambio una visita en su programa. Abra Pam para verla: {link}
+
+**17. To a case manager: somebody on their list planned a visit (a draft)**
+
+> Pam: Someone on your list planned a visit. Open Pam to see it: {link}
+>
+> _Spanish:_ Pam: Alguien de su lista planeo una visita. Abra Pam para verla: {link}
+
+14–17 are the texts behind the **Text alerts** switches (Will, 10 October 2026). They
+say that something happened, never what or to whom: no name, no place, no day, as
+message 11 does. Nobody has signed them, so none can send, and nothing queues them
+yet; the Text alerts screen says "coming soon" until they do. They are written in
+`packages/config/src/sms-templates.ts` (`message_waiting`, `visit_booked`,
+`booking_changed`, `trip_planned`); each is one segment in every language, and the
+other languages' drafts are there too. Message 14 goes to anyone who has a message
+waiting; 15 and 16 to a program lead; 17 to a case manager.
 
 ## The same messages in the other languages
 

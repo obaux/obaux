@@ -54,6 +54,19 @@ const KINDS_FOR: Record<'member' | 'admin' | 'provider', readonly Kind[]> = {
 /** A word in a switch's label that the glossary explains (D-260). */
 const TERM_FOR: Partial<Record<Kind, GlossaryTerm>> = { trip: 'trip' };
 
+/**
+ * The kinds Pam really sends a text for today (Will, 10 October 2026: "keep the
+ * promise" — build them, and until they are built, do not offer them).
+ *
+ * Only a saved place closing or moving is queued for a text (0035–0037). The
+ * rest — a visit reminder, someone wanting to connect, a message waiting, a
+ * visit booked, changed or planned — have templates (drafts nobody has signed,
+ * `sms-templates.ts`) and nothing that queues them, so their switches say
+ * "coming soon" and cannot be turned on. When a text is built and signed, its
+ * kind joins this list in the same change.
+ */
+const LIVE: ReadonlySet<Kind> = new Set<Kind>(['closed']);
+
 const keyFor = (who: string) => `pam.alerts.${who}`;
 
 function readChoices(who: string): Partial<Record<Kind, boolean>> | null {
@@ -84,6 +97,7 @@ function writeChoices(who: string, choices: Partial<Record<Kind, boolean>>): voi
 const styles = stylex.create({
   intro: { fontSize: '18px', lineHeight: 1.5 },
   small: { fontSize: '15px', lineHeight: 1.5 },
+  soon: { fontSize: '15px', lineHeight: 1.5, fontWeight: 600 },
   label: { fontSize: '17px', lineHeight: 1.35, fontWeight: 600 },
   words: { flexGrow: 1, minWidth: 0 },
 });
@@ -121,8 +135,9 @@ export function AlertsView() {
 
   const change = async (kind: Kind, on: boolean) => {
     const next = { ...choices, [kind]: on };
-    const wasAny = KINDS.some((k) => choices[k]);
-    const isAny = KINDS.some((k) => next[k]);
+    const sending = KINDS.filter((k) => LIVE.has(k));
+    const wasAny = sending.some((k) => choices[k]);
+    const isAny = sending.some((k) => next[k]);
     setChoices(next);
     writeChoices(who, next);
     if (userId && wasAny !== isAny) {
@@ -136,7 +151,9 @@ export function AlertsView() {
       <Text xstyle={styles.intro}>{t('alerts.intro')}</Text>
       <Card padding={6}>
         <VStack gap={5}>
-          {KINDS.map((kind) => (
+          {KINDS.map((kind) => {
+            const live = LIVE.has(kind);
+            return (
             // Pam's own sizes for the words (17px, 15px under it): Astryx's
             // switch label is set smaller than §12 allows on a phone. The
             // switch keeps its label, hidden, so it is still named.
@@ -149,16 +166,20 @@ export function AlertsView() {
                 <Text type="supporting" xstyle={styles.small}>
                   {t(`alerts.${kind}.body`)}
                 </Text>
+                {live ? null : (
+                  <Text xstyle={styles.soon}>{t('alerts.comingSoon')}</Text>
+                )}
               </VStack>
               <Switch
                 label={t(`alerts.${kind}`)}
                 isLabelHidden
-                value={!!choices[kind]}
+                value={live && !!choices[kind]}
                 changeAction={(on) => change(kind, on)}
-                isDisabled={!userId}
+                isDisabled={!userId || !live}
               />
             </HStack>
-          ))}
+            );
+          })}
         </VStack>
       </Card>
       <Text type="supporting" xstyle={styles.small}>
