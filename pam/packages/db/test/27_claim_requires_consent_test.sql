@@ -21,7 +21,15 @@ insert into public.notification_preferences (member_id, sms_enabled, quiet_hours
 insert into public.notification_preferences (member_id, sms_enabled, sms_stopped_at, quiet_hours_start, quiet_hours_end)
   values (:'bob', true, now(), 0, 0);   -- replied STOP
 -- tanya has no row at all: never asked.
-update public.profiles set phone = coalesce(phone, '+1267555' || right(id::text, 4)) where id in (:'marcus', :'tanya', :'luis', :'bob');
+-- Digits only: the ids end in hex (000c, 000d, 000e), and a number built from
+-- them read as one number for three people once the letters were dropped, so
+-- this file failed whenever an earlier one had not already given them phones.
+update public.profiles set phone = coalesce(phone, case id
+    when :'marcus'::uuid then '+12675550701'
+    when :'tanya'::uuid  then '+12675550702'
+    when :'luis'::uuid   then '+12675550703'
+    when :'bob'::uuid    then '+12675550704'
+  end) where id in (:'marcus', :'tanya', :'luis', :'bob');
 
 insert into public.outbound_messages (id, member_id, template_key, vars, send_at) values
   ('bbbbbbb1-0000-0000-0000-000000000001', :'marcus', 'appointment_24h', '{}', now() - interval '1 minute'),
