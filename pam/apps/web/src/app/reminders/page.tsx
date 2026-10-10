@@ -75,6 +75,8 @@ export default function RemindersPage() {
 
   /** What was chosen last time, when there is a last time. */
   const [already, setAlready] = useState<boolean | null>(null);
+  /** They replied STOP (D-453): no question is asked, and nothing here can undo it. */
+  const [stopped, setStopped] = useState(false);
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -85,9 +87,12 @@ export default function RemindersPage() {
     if (session.status !== 'signed-in') return;
     let cancelled = false;
     void (async () => {
-      const { getReminderConsent } = await import('@/lib/useReminderConsent');
-      const current = await getReminderConsent(session.session.userId);
-      if (!cancelled) setAlready(current);
+      const { getTextStatus } = await import('@/lib/useReminderConsent');
+      const current = await getTextStatus(session.session.userId);
+      if (!cancelled) {
+        setAlready(current.consent);
+        setStopped(current.stopped);
+      }
     })();
     return () => {
       cancelled = true;
@@ -131,37 +136,50 @@ export default function RemindersPage() {
         backLabel={t('nav.back.profile')}
         actions={<HelpButton />}
       />
-      <Text xstyle={styles.intro}>{t(isStaff ? 'reminders.introStaff' : 'reminders.intro')}</Text>
+      {stopped ? (
+        // Somebody who replied STOP is told so, once, and asked nothing: the
+        // promise is "Nothing in the app can turn them back on" (privacy).
+        <Card padding={6} xstyle={styles.card}>
+          <VStack gap={2}>
+            <Text xstyle={styles.heading}>{t('reminders.stopped.title')}</Text>
+            <Text xstyle={styles.item}>{t('reminders.stopped.body')}</Text>
+          </VStack>
+        </Card>
+      ) : null}
+      {stopped ? null : <Text xstyle={styles.intro}>{t(isStaff ? 'reminders.introStaff' : 'reminders.intro')}</Text>}
 
-      <Card padding={6} xstyle={styles.card}>
-        <VStack gap={2}>
-          <Text xstyle={styles.heading}>{t('reminders.what')}</Text>
-          {isStaff ? (
-            <>
-              {/* Staff: a message first — what a case manager waits on (D-256). */}
-              <Text xstyle={styles.item}>{t('reminders.what.messages')}</Text>
-              {role === 'provider' ? (
-                <>
-                  <Text xstyle={styles.item}>{t('reminders.what.visits')}</Text>
-                  <Text xstyle={styles.item}>{t('reminders.what.staff1')}</Text>
-                </>
-              ) : null}
-              <Text xstyle={styles.item}>{t('reminders.what.staff2')}</Text>
-            </>
-          ) : (
-            <>
-              <Text xstyle={styles.item}>{t('reminders.what.1')}</Text>
-              <Text xstyle={styles.item}>{t('reminders.what.2')}</Text>
-              <Text xstyle={styles.item}>{t('reminders.what.3')}</Text>
-            </>
-          )}
-          <Text type="supporting" xstyle={styles.small}>
-            {t('reminders.how')}
-          </Text>
-        </VStack>
-      </Card>
+      {stopped ? null : (
+        <Card padding={6} xstyle={styles.card}>
+          <VStack gap={2}>
+            <Text xstyle={styles.heading}>{t('reminders.what')}</Text>
+            {isStaff ? (
+              <>
+                {/* Staff: a message first — what a case manager waits on (D-256). */}
+                <Text xstyle={styles.item}>{t('reminders.what.messages')}</Text>
+                {role === 'provider' ? (
+                  <>
+                    <Text xstyle={styles.item}>{t('reminders.what.visits')}</Text>
+                    <Text xstyle={styles.item}>{t('reminders.what.staff1')}</Text>
+                  </>
+                ) : null}
+                <Text xstyle={styles.item}>{t('reminders.what.staff2')}</Text>
+              </>
+            ) : (
+              <>
+                <Text xstyle={styles.item}>{t('reminders.what.1')}</Text>
+                <Text xstyle={styles.item}>{t('reminders.what.2')}</Text>
+              </>
+            )}
+            {/* Said plainly: what is sent today, and what is not yet (D-453). */}
+            <Text xstyle={styles.small}>{t(isStaff ? 'reminders.today.staff' : 'reminders.today.member')}</Text>
+            <Text type="supporting" xstyle={styles.small}>
+              {t('reminders.how')}
+            </Text>
+          </VStack>
+        </Card>
+      )}
 
-      {done || already === true ? (
+      {!stopped && (done || already === true) ? (
         <Text type="supporting" xstyle={styles.small}>
           {t('reminders.saved')}
         </Text>
@@ -182,7 +200,7 @@ export default function RemindersPage() {
           asked, and hiding it behind a sign-in explains nothing — but the thing
           to do next is sign in, so that is the button.
         */}
-      {session.status === 'signed-in' ? (
+      {session.status === 'signed-in' && stopped ? null : session.status === 'signed-in' ? (
         <>
           {/*
               The button is the consent, and it says so.

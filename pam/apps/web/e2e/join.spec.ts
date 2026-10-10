@@ -259,7 +259,7 @@ test.describe('signing up', () => {
 
     await expect.poll(() => calls.waiting.length).toBe(1);
     expect(calls.waiting[0]!['p_wants_updates']).toBe(true);
-    await expect(page.getByText(/We will text you when Pam opens/)).toBeVisible();
+    await expect(page.getByText(/We saved your city and that you want to hear when Pam opens there/)).toBeVisible();
   });
 
   test('a name is asked for before anything is sent', async ({ page }) => {

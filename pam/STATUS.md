@@ -951,6 +951,18 @@ drops signatures), then `20261010042108_a_program_lead_submits_their_own_program
 
 ---
 
+## Messages & notifications · staff invite email (10 October 2026)
+
+Merged to `main` by the merge desk, 10 October. A staff invite's email now has a
+queue (`20261010063304_…`, expand only, **applied to the live project 10 October**; read back:
+forced RLS, no client grants, the sender's functions service-role only), a sender
+(`supabase/functions/send-invite-emails`, **not deployed**, off unless `INVITE_EMAILS=on`) and
+first-invite wording in seven languages that **nobody has signed**, so nothing can send.
+D-450. What Will has to set up, in order: `docs/email-setup.md`. Checked: config 831, database
+suite passes (with `24_staff_invite_emails_test.sql`), Storybook builds, fit audit on the new
+page clean. Not done: the expired-link email, an email for staff who already have accounts,
+the privacy line about the mail service.
+
 ## Arabic reads in the right order (9 October) — 0.51.1, merged 10 October
 
 D-435, on `claude/amazing-archimedes-qvgnt2` (`main` at `8dee5d4` plus this; merged
@@ -981,9 +993,19 @@ Broad St, North Philadelphia` drew `… St, North Philadelphia 1231 بالقرب
   `fit-known.json` and the old `ar|spill` entry is gone; `areachip--arabic` needs none
   (its ellipsis is the story's own in every column).
 
+## Messages & notifications · alert texts, STOP, promises (10 October 2026)
+
+Merged to `main` by the merge desk, 10 October. Two migrations, **both applied to the live project
+10 October** and read back: `20261010071947_…` (a stored STOP
+cannot be cleared from the app: a person could clear their own at the API) and `20261010072848_…`
+(the claim texts a reminder only to somebody who agreed). Text alerts offers switches only for what
+is sent; the four alert texts are drafts, unsigned. A STOP shows as "Texts are off". Nothing records
+a STOP yet (no Twilio receiver) and nothing queues the appointment reminders, the check-in or
+"someone wants to connect". Samples file: nine texts. D-453.
+
 ## Design system & Storybook · language tag (10 October)
 
-Branch `claude/pam-design-language-tag`. Job from Will via Mira: a short English tag before a
+Merged to `main` by the merge desk (5dd52b8), 10 October. Job from Will via Mira: a short English tag before a
 language's own name, so a person can see which language a row is before they can read it (D-451).
 
 - **`@pam/ui`:** `MenuItem` takes `tag?`, `lang?`, `valueTag?`; a `ChoiceChips` option takes `tag?` and
