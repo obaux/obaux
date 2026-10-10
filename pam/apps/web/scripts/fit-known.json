@@ -566,5 +566,69 @@
   {
     "key": "pseudo|ellipsis|member-created-states-saved-trips--one-trip-saved|Example Workforce Center",
     "reason": "A trip card's place name is one line with an ellipsis by design (TripCard); the pseudo-language, longer than any real language, runs past the width. The full name is one tap away, on the place's page. Looked at 10 October 2026 at 320px with a screenshot."
+  },
+  {
+    "key": "pseudo|clamp|member-created--explore|Free classes, a computer room and help getting a GED. Walk i",
+    "reason": "Explore's place card keeps to its designed line count; the pseudo-language (English 40% longer) is where it trims. The seven real languages fit. Looked at in a screenshot at 320px (10 October); the card is Piper's."
+  },
+  {
+    "key": "pseudo|clamp|member-created--explore|Example Workforce Center",
+    "reason": "Explore's place card keeps to its designed line count; the pseudo-language (English 40% longer) is where it trims. The seven real languages fit. Looked at in a screenshot at 320px (10 October); the card is Piper's."
+  },
+  {
+    "key": "pseudo|clamp|member-created--explore|Job training, help with a resume and openings posted every w",
+    "reason": "Explore's place card keeps to its designed line count; the pseudo-language (English 40% longer) is where it trims. The seven real languages fit. Looked at in a screenshot at 320px (10 October); the card is Piper's."
+  },
+  {
+    "key": "pseudo|clamp|member-created--explore|Groceries to take home, no appointment. Bring a bag if you h",
+    "reason": "Explore's place card keeps to its designed line count; the pseudo-language (English 40% longer) is where it trims. The seven real languages fit. Looked at in a screenshot at 320px (10 October); the card is Piper's."
+  },
+  {
+    "key": "pt-BR|cut|case-manager-screens--home|Trabalho e dinheiro",
+    "reason": "The saved places strip on the old Home (kept for staff, D-456): the next card peeks in at the right edge to say there are more, and the strip scrolls sideways. What is cut is the peek, seen in a screenshot at 320px (10 October)."
+  },
+  {
+    "key": "pseudo|cut|case-manager-screens--home|⟦Ŵóóóŕķ áñññð ɱóóóñééý⟧",
+    "reason": "The saved places strip on the old Home (kept for staff, D-456): the next card peeks in at the right edge to say there are more, and the strip scrolls sideways. What is cut is the peek, seen in a screenshot at 320px (10 October)."
+  },
+  {
+    "key": "pt-BR|cut|program-lead-screens--home|Trabalho e dinheiro",
+    "reason": "The saved places strip on the old Home (kept for staff, D-456): the next card peeks in at the right edge to say there are more, and the strip scrolls sideways. What is cut is the peek, seen in a screenshot at 320px (10 October)."
+  },
+  {
+    "key": "pt-BR|cut|program-lead-screens--home-get-started|Trabalho e dinheiro",
+    "reason": "The saved places strip on the old Home (kept for staff, D-456): the next card peeks in at the right edge to say there are more, and the strip scrolls sideways. What is cut is the peek, seen in a screenshot at 320px (10 October)."
+  },
+  {
+    "key": "pt-BR|cut|program-lead-screens--home-program-added|Trabalho e dinheiro",
+    "reason": "The saved places strip on the old Home (kept for staff, D-456): the next card peeks in at the right edge to say there are more, and the strip scrolls sideways. What is cut is the peek, seen in a screenshot at 320px (10 October)."
+  },
+  {
+    "key": "pseudo|cut|program-lead-screens--home|⟦Ŵóóóŕķ áñññð ɱóóóñééý⟧",
+    "reason": "The saved places strip on the old Home (kept for staff, D-456): the next card peeks in at the right edge to say there are more, and the strip scrolls sideways. What is cut is the peek, seen in a screenshot at 320px (10 October)."
+  },
+  {
+    "key": "pt-BR|cut|program-lead-screens--home-program-changes|Trabalho e dinheiro",
+    "reason": "The saved places strip on the old Home (kept for staff, D-456): the next card peeks in at the right edge to say there are more, and the strip scrolls sideways. What is cut is the peek, seen in a screenshot at 320px (10 October)."
+  },
+  {
+    "key": "pseudo|cut|program-lead-screens--home-get-started|⟦Ŵóóóŕķ áñññð ɱóóóñééý⟧",
+    "reason": "The saved places strip on the old Home (kept for staff, D-456): the next card peeks in at the right edge to say there are more, and the strip scrolls sideways. What is cut is the peek, seen in a screenshot at 320px (10 October)."
+  },
+  {
+    "key": "pseudo|cut|program-lead-screens--home-program-added|⟦Ŵóóóŕķ áñññð ɱóóóñééý⟧",
+    "reason": "The saved places strip on the old Home (kept for staff, D-456): the next card peeks in at the right edge to say there are more, and the strip scrolls sideways. What is cut is the peek, seen in a screenshot at 320px (10 October)."
+  },
+  {
+    "key": "pseudo|cut|program-lead-screens--home-program-changes|⟦Ŵóóóŕķ áñññð ɱóóóñééý⟧",
+    "reason": "The saved places strip on the old Home (kept for staff, D-456): the next card peeks in at the right edge to say there are more, and the strip scrolls sideways. What is cut is the peek, seen in a screenshot at 320px (10 October)."
+  },
+  {
+    "key": "pt-BR|cut|program-lead-screens--home-folded|Trabalho e dinheiro",
+    "reason": "The saved places strip on the old Home (kept for staff, D-456): the next card peeks in at the right edge to say there are more, and the strip scrolls sideways. What is cut is the peek, seen in a screenshot at 320px (10 October)."
+  },
+  {
+    "key": "pseudo|cut|program-lead-screens--home-folded|⟦Ŵóóóŕķ áñññð ɱóóóñééý⟧",
+    "reason": "The saved places strip on the old Home (kept for staff, D-456): the next card peeks in at the right edge to say there are more, and the strip scrolls sideways. What is cut is the peek, seen in a screenshot at 320px (10 October)."
   }
 ]

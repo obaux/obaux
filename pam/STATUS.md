@@ -1178,6 +1178,14 @@ recorded once `sms-inbound` is deployed (D-460); nothing queues the check-in or 
 connect" yet. Samples file: nine texts. D-453. Text reminders' staff list (merged 10 October) names
 only the alert texts Will signed: no "introduced to your program", no "your account changes".
 
+## Design system & Storybook · scroller clip (10 October)
+
+Branch `claude/pam-design-scroller-clip`, not merged. `audit:fit` treats a scroller as a clip (D-467): a line
+wholly outside a scroller is not on screen, so the conversation threads' overlaps stop changing run to run.
+Same build, old rule against new: overlaps 22 to 0, cuts and ellipses identical. 19 known entries removed,
+16 added (the old Home's peeking saved card; four Explore pseudo clamps), all looked at. Open: the Points
+badge names are trimmed in English too (Piper's grid).
+
 ## Design system & Storybook · live app shell (10 October)
 
 Merged to `main` by the merge desk, 10 October, from `claude/pam-design-app-shell` (6318b48); live after the next production deploy. The redesigned tabs are the app (D-456): the role's tab bar
