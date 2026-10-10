@@ -2,6 +2,7 @@ import { CompareTable } from '../components/CompareTable';
 import { Body, Lead, P, Section } from '../components/Prose';
 import { Screenshot } from '../components/Screenshot';
 import { Steps } from '../components/Steps';
+import { VISIT_REMINDERS_LIVE } from './flags';
 
 /**
  * Support post: Texts from Pam (everyone). Written against the LIVE `dispatch-sms`
@@ -14,14 +15,7 @@ import { Steps } from '../components/Steps';
  * no screen creates a request any more (D-369). Re-check the live function before
  * changing this, and before any more kinds go live.
  */
-/**
- * THE ONE LINE TO EDIT when the day-before visit reminder goes live (Piper's trips work, 10 October;
- * Mira: "write the post so that change is a one-line edit, and make that edit the day it lands").
- * Set it to `true` only when the reminder is merged AND the LIVE `dispatch-sms` queues it — check the
- * deployed function and the live database, not the repo (the repo is ahead of what is live). It adds the
- * reminder to the table and takes it out of "does not send yet" and out of the first "did not come" step.
- */
-const VISIT_REMINDERS_LIVE = false;
+// The switch is `VISIT_REMINDERS_LIVE` in `./flags.ts`; the home page's "Keep going" card reads it too.
 
 export function TextsFromPam() {
   return (

@@ -26,10 +26,25 @@ STATUS row too.
   `apps/site/src/content/about.ts`, then put `"en"` in `apps/site/src/content/signed-off.json`
   (`{"about-pam": ["en"]}`) — that builds `/en/about-pam/` and shows the home section. The other
   six are drafts with no native reader (D-461): add each code to the same file only once someone
-  who reads it has been over it. Also decide the home card "Pam reminds you before you go so
-  nothing gets missed" (it promises reminders that are not live; the About text says "coming").
+  who reads it has been over it. The home card that promised reminders is fixed (10 October, it now reads `VISIT_REMINDERS_LIVE`).
   When visit reminders go live, flip `VISIT_REMINDERS_LIVE` in `TextsFromPam.tsx` and rewrite
   the "What is coming" paragraph in all seven.
+- [ ] **Public site: what the help posts need when visit reminders and Dot's new app layout go
+  live** (10 October 2026, a list only; nothing rewritten yet). *Reminders* — the day
+  `dispatch-sms` really sends the day-before reminder, flip `VISIT_REMINDERS_LIVE` in
+  `apps/site/src/content/flags.ts` (one line; it now drives the "Texts from Pam" table and
+  steps **and** the home page's "Keep going" card), then by hand: the "What is coming" paragraph in
+  all seven languages of About Pam (`about.ts`; the other six need a native reader again), the
+  "Joining Pam" step that offers "Yes, text me reminders" / "Not now" (check the wording and that it
+  is still the choice), the "Texts from Pam" screenshots `reminders.png` and `texts-off.png`, and the
+  limits in that post (quiet hours, 134 characters for appointment reminders, D-431). *The new app
+  layout* — every post that says "Tap Profile", "Home", "the Messages tab" or "Invite someone" in a
+  numbered step: Who is my guide, Joining as staff / Pam, One phone two sides, Sending an invite,
+  Messages in Pam, Points and badges, Staff requests (draft), Texts from Pam. Re-take the screenshots
+  in `public/help/*/` (`node apps/site/scripts/screenshots.mjs`): sign-in, about-you, add-your-program,
+  use-as, invite, invite-form, messages, conversation, report, points, what-others-can-see,
+  reminders, texts-off. Re-check the "Pam words" post for any renamed screen. When the layout
+  merges, grep `apps/site/src` for "Tap " and "tab" and walk each step on the new build.
 - [ ] **Public site: publish the draft post "Keeping your program's listing up to
   date" only when the feature ships** (from PAM · Places & programs, 10 October
   2026, rule D-447, branch `claude/places-programs-load-own-program`, not on

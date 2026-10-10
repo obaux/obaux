@@ -602,5 +602,37 @@
   {
     "key": "pseudo|ellipsis|program-lead-states-program-on-file--live-spanish|Two weeks on resumes, interviews and showing up ready. A cer",
     "reason": "A service's description on the Program page is one line with an ellipsis by design (the row sets isDescriptionOneLine); the pseudo-language stretches it past the width. Nothing is lost: the whole text is one tap away, in the service's own page. Looked at 10 October 2026 at 320px."
+  },
+  {
+    "key": "pseudo|ellipsis|program-lead-states-program-services--the-program-tab|Resumes, interviews and showing up ready.",
+    "reason": "A service's description on the Program page is one line with an ellipsis by design (the row sets isDescriptionOneLine); the pseudo-language stretches it past the width. Nothing is lost: the whole text is one tap away, in the service's own editor. Looked at 10 October 2026 at 320px."
+  },
+  {
+    "key": "pseudo|ellipsis|member-created-states-saved-trips--one-trip-saved-spanish|Example Learning Center",
+    "reason": "A trip card's place name is one line with an ellipsis by design (TripCard); the pseudo-language, longer than any real language, runs past the width. The full name is one tap away, on the place's page. Looked at 10 October 2026 at 320px with a screenshot."
+  },
+  {
+    "key": "pseudo|ellipsis|member-created-states-saved-trips--one-trip-saved-spanish|Riverside Job Center",
+    "reason": "A trip card's place name is one line with an ellipsis by design (TripCard); the pseudo-language, longer than any real language, runs past the width. The full name is one tap away, on the place's page. Looked at 10 October 2026 at 320px with a screenshot."
+  },
+  {
+    "key": "pseudo|cut|member-created-states-saved-trips--one-trip-saved-spanish|Faltan firmas",
+    "reason": "The Trips drawer scrolls and fades out at its foot; a card below the first sits under that fade, so the detector sees its text partly hidden (partial=true). It is reached by scrolling and nothing is lost. Looked at 10 October 2026 at 320px with a screenshot."
+  },
+  {
+    "key": "pseudo|ellipsis|member-created-states-saved-trips--one-trip-saved-spanish|Example Workforce Center",
+    "reason": "A trip card's place name is one line with an ellipsis by design (TripCard); the pseudo-language, longer than any real language, runs past the width. The full name is one tap away, on the place's page. Looked at 10 October 2026 at 320px with a screenshot."
+  },
+  {
+    "key": "pseudo|ellipsis|member-created-states-saved-trips--one-trip-saved|Example Learning Center",
+    "reason": "A trip card's place name is one line with an ellipsis by design (TripCard); the pseudo-language, longer than any real language, runs past the width. The full name is one tap away, on the place's page. Looked at 10 October 2026 at 320px with a screenshot."
+  },
+  {
+    "key": "pseudo|ellipsis|member-created-states-saved-trips--one-trip-saved|Riverside Job Center",
+    "reason": "A trip card's place name is one line with an ellipsis by design (TripCard); the pseudo-language, longer than any real language, runs past the width. The full name is one tap away, on the place's page. Looked at 10 October 2026 at 320px with a screenshot."
+  },
+  {
+    "key": "pseudo|ellipsis|member-created-states-saved-trips--one-trip-saved|Example Workforce Center",
+    "reason": "A trip card's place name is one line with an ellipsis by design (TripCard); the pseudo-language, longer than any real language, runs past the width. The full name is one tap away, on the place's page. Looked at 10 October 2026 at 320px with a screenshot."
   }
 ]

@@ -214,7 +214,7 @@ side, but **Supabase has not been pointed at it yet**. That is the single
 setting in step 1 above, and it is the one thing standing between the app and
 its first real user. No text was sent by that check and nothing was charged.
 
-## 3. Replies — STOP and START (the `sms-inbound` function, D-460)
+## 3. Replies — STOP and START, the release checklist (D-460)
 
 Twilio already stops texting a number that replied STOP, and its Advanced Opt-Out
 answers STOP and HELP itself. What Pam never did was **learn** it, so the app
@@ -223,32 +223,109 @@ could not say "Texts are off" and a START could not bring texts back. The
 records a STOP or a START against the person with that number and answers with
 nothing (so nobody gets two replies). It is off until switched on.
 
-What the merge desk does:
+This is one release: the database half, the dispatcher, the receiver, Will's
+Twilio step, and the one sentence on the screens. Work down it in order. Written
+and checked against the live project on 10 October 2026 (09:40 UTC).
 
-1. Apply migration `20261010081342_a_stop_or_start_reply_is_recorded_by_the_number`
-   (`list_migrations` first, `get_advisors` after).
-2. `supabase functions deploy sms-inbound --no-verify-jwt` — no JWT, because
-   Twilio sends no Supabase login; the signature is the check.
-3. Secrets on the function: `TWILIO_AUTH_TOKEN` (the dispatcher already has it),
-   `SMS_INBOUND_URL` (exactly the address from step 4, nothing added or removed:
-   the signature covers it), and last, `SMS_INBOUND=on`.
+### What was true when this was written
 
-What Will does in the Twilio console:
+- **Live database:** the three migrations are applied — `…a_stored_stop_cannot_be_cleared_from_the_app`,
+  `…reminders_go_only_to_people_who_agreed_to_texts` and
+  `…a_stop_or_start_reply_is_recorded_by_the_number` (`list_migrations`). Nothing
+  to apply.
+- **Live functions:** only `dispatch-sms` (version 15, last deployed 17 September)
+  and `link-preview`. `sms-inbound`, `send-invite-emails` and `translate-messages`
+  are not deployed.
+- **`dispatch-sms` is old.** The deployed one still carries the 13 September
+  templates in English and Spanish only, with "PAM:" at the front, fifteen
+  templates, none of the seven-language logic, and none of the four alert texts.
+  `main` has the "Pam:" wording, all seven languages, the two-segment reminders,
+  "a text always goes out", nineteen templates (the four alert texts signed by Will
+  on 10 October). The code around the templates differs in the language it picks
+  and in what it logs when a text falls back to English; the schedule, the way it
+  claims, the way it sends and the secrets it reads are the same. The database
+  already refuses to hand it a text for somebody who never agreed, or who replied
+  STOP (`claim_outbound_messages`), whichever version is running.
+- **The clock** (`cron` job `dispatch-sms`, every five minutes) calls the function
+  with the project's publishable key and **no** `x-dispatch-secret` header. So do
+  not set `DISPATCH_SECRET` on `dispatch-sms` without changing that call first, or
+  every run is refused with a 401.
 
-4. Messaging → Services → the Pam service → **Integration** → *Incoming messages*:
-   "Send a webhook", method **POST**, the request URL
-   `https://<project>.supabase.co/functions/v1/sms-inbound`. Leave **Advanced
-   Opt-Out** on with its default keywords and the confirmation and HELP messages
-   the campaign registered (`docs/sms-campaign-samples.md`).
-5. Reply STOP to a text from Pam on his own phone; check that his Text reminders
-   screen says "Texts are off" and that the audit log has an `sms.stop` row naming
-   his profile (not his number). Reply START to turn it round.
+### The checklist
 
-What it does **not** do yet: answer YES or NO to "did you make it". YES is also
-Twilio's own opt-in keyword, so that job starts with changing the opt-in keywords
-in Twilio; the check-in is not sent until then anyway.
+1. **Look first.** `list_migrations`: the three above are there. `list_edge_functions`:
+   `dispatch-sms` is version 15. `select jobname, schedule, command from cron.job`:
+   the `dispatch-sms` job is as in `0040` (every five minutes, the publishable key,
+   no `x-dispatch-secret`). Whether `DISPATCH_SECRET` is set on the function cannot
+   be read from here, but the answers show it: `select status_code, content from
+   net._http_response order by created desc limit 6`. **Fine looks like** a 200 with
+   `{"claimed":0,"sent":0,"failures":[]}` (nothing is queued). **A 401 is the secret
+   trap**: the secret is set and the clock is being refused, so nothing has sent
+   since it was set; say so, and fix the clock's call first. (Checked by the merge
+   desk on 10 October: 72 responses in six hours, all 200; `outbound_messages` holds
+   one row ever, a denied staff request sent on 17 September.) Run `pnpm --filter @pam/config test` on `main` and
+   check `git status` is clean (the first run regenerates
+   `supabase/functions/dispatch-sms/templates.json`; a diff after it means a stale
+   bundle, so stop).
+2. **Redeploy `dispatch-sms` from `main`**, with JWT checking left as it is
+   (`supabase functions deploy dispatch-sms`; the clock sends the publishable key as
+   its login). Secrets stay as they are:
+   `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_MESSAGING_SERVICE_SID` or
+   `TWILIO_FROM_NUMBER`. Wait for the next five-minute tick and read the function's
+   log: the answer is `{ claimed, sent, failures }` and nothing in `failures` says
+   "not signed off". (A text that falls back to English logs
+   `sent in English: <template> (<language>): <why>` and never the words.)
+3. **Deploy `sms-inbound`**: `supabase functions deploy sms-inbound --no-verify-jwt`
+   (no JWT, because Twilio sends no Supabase login; the signature is the check).
+   Leave it **off**.
+4. **Set its secrets** (names only; none is ever in the repo or a chat):
+   - `SMS_INBOUND_URL` — exactly `https://shobqzuhicoiymtumiaz.supabase.co/functions/v1/sms-inbound`
+     (the signature covers the address, so nothing added or removed: no trailing
+     slash, no query);
+   - `TWILIO_AUTH_TOKEN` — the dispatcher's own, already set; Supabase function
+     secrets are shared by every function in the project, so there is nothing to
+     add. Confirm it is there.
+5. **Try it signed out, before Twilio is pointed at it.** Set `SMS_INBOUND=on`,
+   then, from a terminal:
+   `curl -i -X POST "$SMS_INBOUND_URL" -d 'From=%2B15555550100' -d 'Body=STOP'`
+   Expect **403 "not Twilio"**, and nothing written. A 200 here means the switch is
+   off; a 503 means the token or the address is missing; a 500 is a bug, so switch
+   `SMS_INBOUND` off again and tell Nico.
+6. **Will's Twilio step.** Console → Messaging → Services → the Pam service →
+   **Integration** → *Incoming messages* → "Send a webhook", method **POST**, request
+   URL = the address in step 4. Leave **Advanced Opt-Out** on with its default
+   keywords and the confirmation and HELP messages the campaign registered
+   (`docs/sms-campaign-samples.md`). Save.
+7. **Will's test, from his own phone** (the number on his Pam profile; it must be
+   the number he signs in with, because that is how the reply is matched):
+   1. Text **STOP** to Pam's number. Twilio answers with its own confirmation.
+   2. Within a few seconds his **Text reminders** screen (Profile → Text reminders)
+      says **"Texts are off"** and asks nothing. The merge desk can see it too:
+      `select action, target_type, created_at from audit_log where action in ('sms.stop','sms.start') order by created_at desc limit 5;`
+      — one `sms.stop` row naming his profile, and no number and no words.
+   3. Text **START**. Twilio confirms; the screen is back to its question, and there
+      is one `sms.start` row.
+   4. If step 2 shows nothing: the likely cause is that Twilio does not forward
+      opt-out keywords to the webhook on this account. Say so; do not guess. Texts
+      are still stopped at Twilio, so nobody is harmed while it is looked at.
+8. **Merge `claude/messages-reply-start` last**, once step 7 has worked. It adds one
+   sentence under "Texts are off" on Text reminders and Text alerts — "To get texts
+   again, reply START to a text from Pam." — in all seven languages. It is true only
+   when steps 2–7 are done, which is why it goes after them. (It is strings only: a
+   new Vercel build, nothing in the database.)
+9. **Tell Nico "done"** and he updates STATUS and `before-launch.md`.
 
-When it is on, one sentence on Text reminders and Text alerts becomes true and
-should be added in the same release: "To get texts again, reply START to a text
-from Pam." (`reminders.stopped.body`.) It is not there yet because it would be
-false while the function is off.
+### Turning it back off
+
+- `SMS_INBOUND` back to anything but `on` (or removing the secret): the function
+  answers an empty reply and touches nothing. Twilio keeps stopping texts to a number
+  that replied STOP either way.
+- Removing the webhook in Twilio: nothing reaches the function.
+- Nothing in the database needs undoing: a stored STOP is only ever cleared by a
+  START or by the service role, never by the app (D-453).
+
+### What it does **not** do yet
+
+Answer YES or NO to "did you make it". "YES" is also Twilio's own opt-in keyword, so
+that job starts with changing the opt-in keywords in Twilio; nothing sends the
+check-in yet anyway.
