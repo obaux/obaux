@@ -13,7 +13,8 @@ help?**
 ## You are one session on a team
 
 Will runs several sessions on Pam at once, each a specialist in one lane, and one
-of them — **the merge desk** (`session_018wn7LF7RMsHnXSAzvk6s1p`) — runs the team.
+of them — **the merge desk, Mira, the CTO** (`session_018wn7LF7RMsHnXSAzvk6s1p`) — runs the
+team.
 Before anything else, read **`docs/team.md`** (who does what, and how you report)
 and **`docs/lanes.md`** (the lanes, numbers, records and the board). In short:
 

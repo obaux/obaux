@@ -142,9 +142,9 @@ STATUS row too.
   later; the privacy policy says so (`privacy.s.how-long.p3`). **Still blocked:** a member
   who has **points** cannot be deleted — `points_ledger` cascades from the profile and is
   append-only, so the cascade is refused (probed 10 October: the seeded member with points
-  fails; admins and providers delete). The same shape of fix works (the ledger lets a DELETE
-  through only once the member's profile is gone), but it is a decision about the points
-  history that Will has not been asked. **Then** write the routine for the Pam team (a
+  fails; admins and providers delete). Will said yes, delete the points history too (10 October): built as D-445 — the ledger lets a
+  DELETE through only once the member's profile is gone — and **not yet applied** (migration
+  `20261010033917_points_history_is_deleted_with_the_member.sql`; no `drop`). **Then** write the routine for the Pam team (a
   function, tested like the privacy promises: profile, email, invites, messages, photos,
   points in one call). Until then a deletion on a call must remove the email by hand.
 
@@ -367,7 +367,7 @@ Russian, Arabic (D-422); messages read in the reader's language (D-423).
   pixels. Say "size the tabs by content" and Claude makes the change and re-runs the
   fit check; or leave it until a language with longer words is added.
 
-- [ ] **Apply 0085 whenever convenient — nothing waits on it** (D-424, D-428). It
+- [x] **Apply 0085** — **done 10 October** (Will, by hand; read back by the merge desk). (D-424, D-428). It
   keeps the language a person asked in, so a denial text and a fresh-link email
   are written in it and an approved account opens in it. It replaces two
   functions, so the live connector hangs on it (tried 9 October; nothing left
