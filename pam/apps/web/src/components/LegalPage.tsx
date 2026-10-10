@@ -175,7 +175,11 @@ export function LegalPage({ doc }: { doc: LegalDocument }) {
       // says.
       const atBottom =
         window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 8;
-      if (atBottom) active = ids[ids.length - 1] ?? active;
+      // Or the end of the text is on screen: on a short phone the last section
+      // can be wholly in view, under the two bars, without the page being at its
+      // very bottom or the section's heading being above the middle line.
+      const endShown = (endRef.current?.getBoundingClientRect().top ?? Infinity) <= window.innerHeight;
+      if (atBottom || endShown) active = ids[ids.length - 1] ?? active;
 
       setHere(active);
     };
