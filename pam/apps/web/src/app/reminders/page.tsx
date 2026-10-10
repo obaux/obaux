@@ -168,7 +168,6 @@ export default function RemindersPage() {
               <>
                 <Text xstyle={styles.item}>{t('reminders.what.1')}</Text>
                 <Text xstyle={styles.item}>{t('reminders.what.2')}</Text>
-                <Text xstyle={styles.item}>{t('reminders.what.3')}</Text>
               </>
             )}
             {/* Said plainly: what is sent today, and what is not yet (D-453). */}

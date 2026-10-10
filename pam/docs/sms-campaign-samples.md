@@ -22,8 +22,8 @@ edited there, regenerate this list rather than editing it here.
   that screen.
 - **How people opt out:** STOP, which is honoured immediately and permanently
   and is never overridden by a setting inside the app.
-- **Message volume:** low. A sign-in code when somebody signs in, and at most a
-  few reminders a week per person.
+- **Message volume:** low. A sign-in code when somebody signs in, and a reminder
+  the day before each visit they plan.
 
 ## The resubmission checklist
 
@@ -35,8 +35,8 @@ failed once each.
 |---|---|
 | Brand | **Oba** — the registered LLC, matching the EIN letter exactly. Pam is the campaign beneath it, not the brand. |
 | Use case | **Low Volume Mixed** — account notifications (sign-in codes) and appointment reminders |
-| Embedded links | **Yes** ← *rejected before.* Fourteen of the seventeen messages carry `{link}` (counted again 10 October; it said nine of thirteen, and ten of the thirteen do). |
-| Embedded phone numbers | **Yes** — `access_limited_notice` ends "Call {supportPhone} with questions" |
+| Embedded links | **Yes** ← *rejected before.* Seven of the nine messages carry `{link}`, which opens Pam at `https://app.joinpam.org/` (a short link, about 22 characters, once Twilio shortens it). |
+| Embedded phone numbers | **Yes** — `staff_request_denied` ends "Call {supportPhone}" |
 | Age-gated content | No |
 | Direct lending or loan arrangement | No |
 | Affiliate marketing | No |
@@ -44,9 +44,9 @@ failed once each.
 | Opt-in description | ← *rejected before (30925).* Paste the answer below, attach the **Text reminders** screenshot. |
 | Opt-out | Reply **STOP**. Honoured immediately and permanently; no in-app setting can override it. |
 | Help | Reply **HELP**. |
-| Privacy policy URL | `https://web-ten-umber-88.vercel.app/privacy/` |
-| Terms URL | `https://web-ten-umber-88.vercel.app/terms/` |
-| Sample messages | All seventeen, below (the four alert texts, 14–17, are drafts not yet sent: file them anyway, so the campaign is not filed twice), placeholders intact — and the appointment reminder in each added language (the form takes a few; send those five if all do not fit) |
+| Privacy policy URL | `https://app.joinpam.org/privacy/` |
+| Terms URL | `https://app.joinpam.org/terms/` |
+| Sample messages | All nine, below (6–9 are the Text alerts drafts, not yet sent: file them anyway, so the campaign is not filed twice), placeholders intact — and the appointment reminder in each added language (the form takes a few; send those five if all do not fit) |
 
 **Before submitting, open both URLs in a private window.** A reviewer fetches
 them signed out, from a machine that has never seen the site. A page behind a
@@ -84,7 +84,7 @@ Two consequences worth knowing before submitting:
 
 ## "How do end-users consent to receive messages?", to paste as written
 
-1022 characters, so it clears a 1024 cap — count before editing it.
+990 characters, so it clears a 1024 cap — count before editing it.
 
 **This is the third version, and the app changed twice under it.** The first
 described consent as implied by typing a number; rejected with **30925,
@@ -116,7 +116,7 @@ to the reminders screen below (D-139, 17 September) — sign-in codes are not
 optional the way reminders are, so the room to be honest about STOP, HELP and
 rates belongs on the screen where a member is actually choosing something.
 
-> End users opt in inside the Pam app, on a screen dedicated to that choice, and nothing is pre-selected. A person is invited by a staff member and enters their own mobile number on the sign-in screen to request a one-time code; Pam has no passwords, so requesting the code is the request to be texted it. After signing in, the person is shown a "Text reminders" screen listing what would be sent (for a member: a reminder before a planned visit, a note if a saved place closes or moves, a note when someone wants to connect), how often (a few messages a week at most), and that STOP stops them permanently, HELP reaches a person, and rates may apply. Consent is a button labelled "Agree to receive texts": pressing it is the affirmative act, and the words agreed to are on the control itself. There is no checkbox, so nothing can arrive pre-selected. A "Not now" button records the decline, and Pam works either way, so consent is never required to use Pam. Numbers are never bought, rented, or entered by staff for anyone.
+> End users opt in inside the Pam app, on a screen dedicated to that choice, and nothing is pre-selected. A person is invited by a staff member and enters their own mobile number on the sign-in screen to request a one-time code; Pam has no passwords, so requesting the code is the request to be texted it. After signing in, the person is shown a "Text reminders" screen listing what would be sent (for a member: a reminder before a planned visit and a note if a saved place closes or moves), saying plainly which of them Pam sends today, and that STOP stops them permanently, HELP reaches a person, and rates may apply. Consent is a button labelled "Agree to receive texts": pressing it is the affirmative act, and the words agreed to are on the control itself. There is no checkbox, so nothing can arrive pre-selected. A "Not now" button records the decline, and Pam works either way, so consent is never required to use Pam. Numbers are never bought, rented, or entered by staff for anyone.
 
 Attach the **Text reminders** screenshot, not the sign-in one. The reviewer is
 checking that the box is really unticked and that the wording quoted here is
@@ -124,7 +124,7 @@ really on that screen.
 
 ## The campaign description, to paste as written
 
-The field caps at **1024 characters**. What follows is 1021, so it fits with a
+The field caps at **1024 characters**. What follows is 981, so it fits with a
 little room — if you edit it, count before you paste. Every message type a person
 can receive is named on purpose: reviewers compare the description against the
 samples and, later, against real traffic, and a description narrower than what
@@ -132,7 +132,7 @@ actually sends is how an approved campaign gets suspended.
 
 > Pam is an app by Oba that connects people to community programs, services and the staff who support them. People get messages only after entering their own phone number on Pam's sign-in screen, which says Pam will text them and how to stop.
 >
-> Messages are account notifications and appointment reminders, at low volume. First comes a one-time sign-in code. After that a person may receive reminders for appointments they scheduled in the app, a check-in on whether they made it, a notice when a saved place has closed or moved, a notice that someone wants to connect or that a message is waiting, and, for staff, a notice of an introduction, account change, or visit booked, changed or planned.
+> Messages are account notifications and appointment reminders, at low volume. First comes a one-time sign-in code. After that a person who agreed may receive a reminder the day before an appointment they scheduled in the app, a notice when a saved place has closed or moved, and a notice that a message is waiting; staff may receive a decision on their request, or a notice of a visit booked, changed or planned.
 >
 > Nothing is promotional or third-party, and numbers are never sold or shared. Every message names Pam. Languages: English, Spanish, Portuguese, Chinese, Russian, Arabic. A message is one segment, except appointment reminders in Chinese, Russian and Arabic: two. STOP ends all messages permanently; HELP returns support contact.
 
@@ -153,116 +153,78 @@ actually sends is how an approved campaign gets suspended.
 
 ## The messages
 
+Nine, which is what Pam sends today or has been told to send. **Taken out on 10 October
+2026** (they had a template and no builder and no plan, and a sample that does not match
+what goes out is what gets a campaign suspended): the invitations (2, 3 in the old list; a
+case manager shares the link from their own phone, so Pam's number never sends it), the two
+introductions, the two-hours-before and morning-of reminders (the first reminder built is the
+day before only), "did you make it" and the missed-appointment follow-up (they need a
+receiver for replies that does not exist), "someone wants to connect", and "some parts of the
+app are switched off". Each comes back with the job that builds it, and the description
+changes with it. The templates stay in `sms-templates.ts`.
+
 **1. Sign-in code (the one carriers care most about)**
 
 > Pam: Your code is {code}. It works for 10 minutes.
 >
 > _Spanish:_ Pam: Su codigo es {code}. Sirve por 10 minutos.
 
-**2. Invitation to join, sent by a case manager**
+**2. Request approved (a person who asked to be a case manager or program lead)**
 
-> Pam: You've been invited to Pam, an app for finding help and people near you. Tap to join: {link} Reply STOP to stop texts.
+> Pam: Your request was approved. Open Pam to get started: {link}
 >
-> _Spanish:_ Pam: Le invitaron a Pam, una app para encontrar ayuda y personas cerca. Toque para entrar: {link} Responda STOP para no recibir mas.
+> _Spanish:_ Pam: Su solicitud fue aprobada. Abra Pam para empezar: {link}
 
-**3. Invitation to an organisation to list its services**
+**3. Request not approved**
 
-> Pam: You have been invited to list your services on Pam. Tap to set up your page: {link} Reply STOP to stop texts.
+> Pam: Your request was not approved. Questions? Call {supportPhone}.
 >
-> _Spanish:_ Pam: Le invitaron a publicar sus servicios en Pam. Toque para crear su pagina: {link} Responda STOP para no recibir mas.
+> _Spanish:_ Pam: Su solicitud no fue aprobada. Preguntas? Llame al {supportPhone}.
 
-**4. A case manager introduced someone to a program**
-
-> Pam: {adminFirstName} connected you with a program that can help. Open Pam to say hi: {link}
->
-> _Spanish:_ Pam: {adminFirstName} le conecto con un programa que puede ayudar. Abra Pam para saludar: {link}
-
-**5. A program is told someone was introduced to them**
-
-> Pam: Someone was introduced to your program. Open Pam to reply: {link}
->
-> _Spanish:_ Pam: Alguien fue presentado a su programa. Abra Pam para responder: {link}
-
-**6. Appointment reminder, the day before**
-
-> Pam: You have a visit tomorrow at {time}. {address}. Tap for directions: {link}
->
-> _Spanish:_ Pam: Tiene una visita mañana a las {time}. {address}. Toque para llegar: {link}
-
-**7. Appointment reminder, two hours before**
-
-> Pam: Your visit is at {time} today. {address}. Tap for directions: {link}
->
-> _Spanish:_ Pam: Su visita es hoy a las {time}. {address}. Toque para llegar: {link}
-
-**8. Appointment reminder, the morning of**
-
-> Pam: Today at {time} you have a visit. {address}. Tap for directions: {link}
->
-> _Spanish:_ Pam: Hoy a las {time} tiene una visita. {address}. Toque para llegar: {link}
-
-**9. Did you make it? (the only message expecting a reply)**
-
-> Pam: Did you make it today? Reply YES or NO.
->
-> _Spanish:_ Pam: Pudo ir hoy? Responda YES o NO.
-
-**10. After a missed appointment**
-
-> Pam: No problem. We saved a step to set up a new time. Open Pam when you are ready: {link}
->
-> _Spanish:_ Pam: No hay problema. Guardamos un paso para buscar otra fecha. Abra Pam cuando pueda: {link}
-
-**11. Somebody wants to connect**
-
-> Pam: Someone on Pam wants to connect. Open Pam to reply: {link}
->
-> _Spanish:_ Pam: Alguien en Pam quiere conectar. Abra Pam para responder: {link}
-
-**12. A saved place is no longer worth a trip**
+**4. A saved place is no longer worth a trip**
 
 > Pam: A place you saved is {reason}. Find others in Pam: {link}
 >
 > _Spanish:_ Pam: Un lugar que guardo {reason}. Vea otros en Pam: {link}
 
-**13. Some parts of the app are switched off**
+**5. Appointment reminder, the day before**
 
-> Pam: Some parts of Pam are turned off for now. Call {supportPhone} with questions.
+> Pam: You have a visit tomorrow at {time}. {address}. Tap for directions: {link}
 >
-> _Spanish:_ Pam: Algunas partes de Pam estan apagadas por ahora. Llame al {supportPhone} si tiene preguntas.
+> _Spanish:_ Pam: Tiene una visita mañana a las {time}. {address}. Toque para llegar: {link}
 
-**14. Somebody wrote to you (a draft: not signed, not yet sent)**
+**6. Somebody wrote to you (a draft: not signed, not yet sent)**
 
 > Pam: You have a new message in Pam. Open it: {link}
 >
 > _Spanish:_ Pam: Tiene un mensaje nuevo en Pam. Abralo aqui: {link}
 
-**15. To a program: somebody booked a visit (a draft)**
+**7. To a program: somebody booked a visit (a draft)**
 
 > Pam: Someone booked a visit with your program. Open Pam to see it: {link}
 >
 > _Spanish:_ Pam: Alguien reservo una visita en su programa. Abra Pam para verla: {link}
 
-**16. To a program: a booking was changed (a draft)**
+**8. To a program: a booking was changed (a draft)**
 
 > Pam: A visit with your program was changed. Open Pam to see it: {link}
 >
 > _Spanish:_ Pam: Cambio una visita en su programa. Abra Pam para verla: {link}
 
-**17. To a case manager: somebody on their list planned a visit (a draft)**
+**9. To a case manager: somebody on their list planned a visit (a draft)**
 
 > Pam: Someone on your list planned a visit. Open Pam to see it: {link}
 >
 > _Spanish:_ Pam: Alguien de su lista planeo una visita. Abra Pam para verla: {link}
 
-14–17 are the texts behind the **Text alerts** switches (Will, 10 October 2026). They
-say that something happened, never what or to whom: no name, no place, no day, as
-message 11 does. Nobody has signed them, so none can send, and nothing queues them
-yet; the Text alerts screen says "coming soon" until they do. They are written in
-`packages/config/src/sms-templates.ts` (`message_waiting`, `visit_booked`,
-`booking_changed`, `trip_planned`); each is one segment in every language, and the
-other languages' drafts are there too. Message 14 goes to anyone who has a message
-waiting; 15 and 16 to a program lead; 17 to a case manager.
+6–9 are the texts behind the **Text alerts** switches (Will, 10 October 2026). They say that
+something happened, never what or to whom: no name, no place, no day. Nobody has signed them,
+so none can send, and nothing queues them yet; the Text alerts screen says "coming soon" until
+they do. They are in `packages/config/src/sms-templates.ts` (`message_waiting`,
+`visit_booked`, `booking_changed`, `trip_planned`); each is one segment in every language, and
+the other languages' drafts are there too. 6 goes to anyone who has a message waiting; 7 and 8
+to a program lead; 9 to a case manager. Message 5 is built next (the day before only, sent
+only to somebody who agreed to texts).
 
 ## The same messages in the other languages
 
