@@ -4,11 +4,12 @@ import { Screenshot } from '../components/Screenshot';
 import { Steps } from '../components/Steps';
 
 /**
- * Support post: Points and badges today (members). Only what is live: two ways to earn
- * points (docs/points-awarding.md; migrations 0045 and 0047), the ladder by points, and
- * that nothing is bought with points (REWARDS_ENABLED false). The Points screen's own
- * "Ways to earn" list shows more rows than are awarded; the post says only two add points
- * now. Category badges (Scholar, Griot, ...) are not awarded to real members yet, so they
+ * Support post: Points and badges today (members). Only what is live: four ways to earn
+ * points, the same four as `AWARDED_TODAY` in packages/config/src/points.ts and the Points
+ * screen's "Ways to earn" list (docs/points-awarding.md; save a place and finish setup, plus
+ * plan a trip, D-468, and call a place, D-472), the ladder by points, and that nothing is
+ * bought with points (REWARDS_ENABLED false). When a rule ships, add it here and to
+ * AWARDED_TODAY in the same change. Category badges (Scholar, Griot, ...) are not awarded to real members yet, so they
  * are not named here.
  */
 export function PointsAndBadges() {
@@ -25,11 +26,16 @@ export function PointsAndBadges() {
           rowHeading="What you do"
           columns={['Points']}
           rows={[
+            { label: 'Plan a trip to a place', cells: ['25 points, once for each place. Up to three new places a day.'] },
+            { label: 'Call a place', cells: ['10 points, the first time you tap Call on that place. Up to five new places a day.'] },
             { label: 'Save a place', cells: ['5 points, once for each place.'] },
             { label: 'Finish setting up', cells: ['25 points, once.'] },
           ]}
         />
-        <P>The “Ways to earn” list on the Points screen shows these same two.</P>
+        <P>
+          The “Ways to earn” list on the Points screen shows these four. Pam cannot tell whether a call
+          connected, so it counts the tap on Call.
+        </P>
       </Section>
 
       <Section title="Levels">
@@ -69,7 +75,7 @@ export function PointsAndBadges() {
         <Steps items={['Tap Profile.', 'Tap the badge with your level on it. It says “Your badge”.', 'Scroll to see the ladder and your badges.']} />
         <Screenshot
           name="points-and-badges/points.png"
-          alt="The top of the “Your points” screen: your badge, the level name, the number of points and a bar showing how many more points to the next level. Under it, the “Ways to earn” list: Save a place and Finish setting up Pam."
+          alt="The top of the “Your points” screen: your badge, the level name, the number of points and a bar showing how many more points to the next level. Under it, the “Ways to earn” list: Plan a trip to a place, Call a place, Save a place and Finish setting up Pam."
           caption="“Your points”, for an example person."
         />
       </Section>

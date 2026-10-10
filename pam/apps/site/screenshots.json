@@ -73,8 +73,8 @@
   {
     "id": "member-created--points",
     "out": "points-and-badges/points.png",
-    "name": "Your points: badge, level, bar and Ways to earn",
-    "height": 560
+    "name": "Your points: badge, level, bar and the four Ways to earn",
+    "height": 655
   },
   {
     "id": "member-created-states-texts-stopped--reminders",
