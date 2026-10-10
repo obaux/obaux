@@ -1037,6 +1037,18 @@ read back: both functions service-role only) adds `record_sms_stop` / `record_sm
 on and Twilio is pointed at it, Pam still does not learn a STOP. Setup: `docs/sms-setup.md` § 3.
 YES/NO replies are not built. D-460.
 
+## Places & programs · review record, pending change, program services — the database half (10 October 2026)
+
+Merged to `main` by the merge desk, 10 October, from `claude/places-programs-submissions-and-services`
+(071c781, Piper; D-462, part 5a). **Live:** `20261010083715_…` (expand only), applied at merge and read
+back: `program_submissions` and `program_services` (RLS on and forced; policies and client grants as
+written), `withdraw_program_submission` and `request_program_change` (authenticated only), and
+`submit_program` replaced with the same signature (live body identical to the file). It now also writes a
+submission, and a withdrawn program no longer blocks a new send. The live app calls none of the new
+pieces yet. Nothing here can approve a submission (part 6). Programs sent before this have no
+submission row, so the app part must handle a listing in review with no record. Test:
+`30_program_submissions_and_services_test.sql`.
+
 ## Places & programs · trips saved, the database half (10 October 2026)
 
 Merged to `main` by the merge desk, 10 October, from `claude/places-programs-trips-database`
