@@ -1777,7 +1777,7 @@ test.describe('reported messages', () => {
 });
 
 test.describe('reported places (D-189)', () => {
-  test('a case manager preview sees the example reported places, and a decision clears one', async ({ page }) => {
+  test('a case manager preview sees the example reported places and cannot decide', async ({ page }) => {
     await page.addInitScript(() => sessionStorage.setItem('pam.view-as', 'admin'));
     await signedInAs(page, 'super_admin');
     await page.route('**/rest/v1/rpc/services_near*', (route) => route.fulfill(json([])));
@@ -1788,6 +1788,22 @@ test.describe('reported places (D-189)', () => {
     await expect(page.getByRole('button', { name: 'Reported' })).toHaveAttribute('aria-pressed', 'true');
     await expect(page.getByRole('heading', { name: 'Example Workforce Center' })).toBeVisible();
     await expect(page.getByText(/Something here is wrong/)).toBeVisible();
+    // resolve_service_flag() refuses anyone but a super admin (0036), so no buttons are drawn.
+    await expect(page.getByRole('button', { name: 'Keep it' })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Take it off the list' })).toHaveCount(0);
+
+    const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
+    expect(results.violations).toEqual([]);
+  });
+
+  test('a super admin, not previewing, sees the buttons, and a decision clears one', async ({ page }) => {
+    await signedInAs(page, 'super_admin');
+    await page.route('**/rest/v1/rpc/flagged_services*', (route) => route.fulfill(json([])));
+    await page.goto('/places/reported/');
+    await settled(page);
+
+    await expect(page.getByRole('heading', { name: 'Example Workforce Center' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Take it off the list' }).first()).toBeVisible();
     await page.getByRole('button', { name: 'Keep it' }).first().click();
     await expect(page.getByRole('heading', { name: 'Example Workforce Center' })).toHaveCount(0);
     await expect(page.getByRole('heading', { name: 'Example Food Pantry' })).toBeVisible();
