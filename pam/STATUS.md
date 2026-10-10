@@ -542,8 +542,10 @@ calls it every five minutes. Twilio credentials are in place and proved with a
 real end-to-end test: a signed-off template queued to Will's own number came
 back `status: sent`, no failure reason, picked up by the very next scheduled
 run. Quiet hours, the STOP list and atomic claiming are enforced in the
-database, not in the function. All sixteen templates in the catalogue are now
-signed off — the original thirteen (13 September) plus the two built this
+database, not in the function. All fifteen templates in the catalogue were then
+("sixteen" was a miscount, corrected 10 October; since then four Text alerts texts
+were added and signed, so the catalogue has nineteen, and the deployed dispatcher
+carries the fifteen until it is redeployed) signed off — the original thirteen (13 September) plus the two built this
 week, `staff_request_approved` and `staff_request_denied` (17 September) —
 so nothing is currently held back at the `reviewedBy` gate; the next template
 anyone adds still starts blank and stays refused until it is read. See
@@ -926,11 +928,36 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
-## Places & programs · load a lead's own program (10 October) — on the branch, not merged
+## Places & programs · save a member's trips (10 October) — merged 10 October
 
-D-447, on `claude/places-programs-load-own-program` (Piper). A program lead's program is
-now read from, and saved to, the database instead of remembered by the tab. **Not on `main`;
-nothing applied to the live project.** Two migrations, in this order: **0085** (by hand, it
+D-454, from `claude/places-programs-save-trips` (Piper). A trip a member
+plans to a real place is saved, and the day-before reminder text is queued for a member who
+turned reminders on. **Merged to `main` by the merge desk, 10 October, after the database half.**
+Both migrations are live (see "trips saved, the database half" below):
+`20261010074045_a_planned_trip_is_saved_and_its_day_before_reminder_is.sql` (expand), then
+`20261010074241_appointments_are_written_only_through_the_trip_functions.sql` (contract).
+
+- **Built:** `book_trip` / `move_trip` / `cancel_trip` / `my_trips()`; a trigger that queues,
+  re-times or cancels one `appointment_24h` text, only when the member has reminders on; every
+  screen that lists trips shows saved ones (`SavedTripsSync`, `useTrips`); Plan a trip saves for
+  real and says so if it cannot. Wording: a sent program promises no time, `/interested` speaks
+  in a program's words, the review wait drops the "Text me" row.
+- **Closed:** any signed-in person could write an appointment for any member, and a member could
+  mark their own appointment attended.
+- **Not built:** a program booking for a member (D-316) and example places stay on the device;
+  no cancel button; the text links to Trips on `app_settings.app_url`, which still holds the old
+  address. (The dispatcher's claim now texts a reminder only to a member who agreed:
+  Messages' `20261010072848_…`, live.)
+- **Proven:** database suite (`28_` file, renumbered at merge), numbering test, 61 web and 822 config tests,
+  Storybook build, a browser look at planning, moving and reading a saved trip, language fit.
+
+---
+
+## Places & programs · load a lead's own program (10 October) — merged 10 October
+
+D-447, from `claude/places-programs-load-own-program` (Piper). A program lead's program is
+now read from, and saved to, the database instead of remembered by the tab. **Merged to `main`
+10 October (`aff402d`); 0085 and both migrations are live.** Two migrations, in this order: **0085** (by hand, it
 drops signatures), then `20261010042108_a_program_lead_submits_their_own_program.sql`, then
 `20261010062347_an_approved_program_lead_gets_an_org.sql` (refuses without 0085).
 
@@ -951,13 +978,21 @@ drops signatures), then `20261010042108_a_program_lead_submits_their_own_program
 
 ---
 
+## Messages & notifications · Will's sign-off (10 October 2026)
+
+Merged to `main` by the merge desk, 10 October (no migration). Will approved the four Text alerts texts and the staff
+invite email (English, in his words: no expiry days, "Accept invite", human). The alert texts and the email
+now carry his name; the other languages are drafts approved to learn from. Nothing sends yet: the alert texts
+are not queued by anything, and the email needs the function deployed, the mail domain and its secrets, and
+`INVITE_EMAILS=on`. D-461.
+
 ## Messages & notifications · staff invite email (10 October 2026)
 
 Merged to `main` by the merge desk, 10 October. A staff invite's email now has a
 queue (`20261010063304_…`, expand only, **applied to the live project 10 October**; read back:
 forced RLS, no client grants, the sender's functions service-role only), a sender
 (`supabase/functions/send-invite-emails`, **not deployed**, off unless `INVITE_EMAILS=on`) and
-first-invite wording in seven languages that **nobody has signed**, so nothing can send.
+first-invite wording in seven languages (English signed by Will, D-461; the rest are drafts).
 D-450. What Will has to set up, in order: `docs/email-setup.md`. Checked: config 831, database
 suite passes (with `24_staff_invite_emails_test.sql`), Storybook builds, fit audit on the new
 page clean. Not done: the expired-link email, an email for staff who already have accounts,
@@ -993,15 +1028,52 @@ Broad St, North Philadelphia` drew `… St, North Philadelphia 1231 بالقرب
   `fit-known.json` and the old `ar|spill` entry is gone; `areachip--arabic` needs none
   (its ellipsis is the story's own in every column).
 
+## Messages & notifications · Twilio receiver (10 October 2026)
+
+Merged to `main` by the merge desk, 10 October. `sms-inbound` (**not deployed yet**: it is deployed
+together with Will's Twilio step and his go, and is off unless `SMS_INBOUND=on`) records a STOP or
+START reply, after checking Twilio's signature; migration `20261010081342_…` (**applied 10 October**,
+read back: both functions service-role only) adds `record_sms_stop` / `record_sms_start`. Until it is switched
+on and Twilio is pointed at it, Pam still does not learn a STOP. Setup: `docs/sms-setup.md` § 3.
+YES/NO replies are not built. D-460.
+
+## Places & programs · review record, pending change, program services — the database half (10 October 2026)
+
+Merged to `main` by the merge desk, 10 October, from `claude/places-programs-submissions-and-services`
+(071c781, Piper; D-462, part 5a). **Live:** `20261010083715_…` (expand only), applied at merge and read
+back: `program_submissions` and `program_services` (RLS on and forced; policies and client grants as
+written), `withdraw_program_submission` and `request_program_change` (authenticated only), and
+`submit_program` replaced with the same signature (live body identical to the file). It now also writes a
+submission, and a withdrawn program no longer blocks a new send. The live app calls none of the new
+pieces yet. Nothing here can approve a submission (part 6). Programs sent before this have no
+submission row, so the app part must handle a listing in review with no record. Test:
+`30_program_submissions_and_services_test.sql`.
+
+## Places & programs · trips saved, the database half (10 October 2026)
+
+Merged to `main` by the merge desk, 10 October, from `claude/places-programs-trips-database`
+(7713e69, Piper; D-454). The app half (`claude/places-programs-save-trips`) followed later the same day.
+
+- **Live:** `20261010074045_…` (expand): `book_trip`, `move_trip`, `cancel_trip`, `my_trips`, the
+  `appointments_keep_reminder` trigger that queues, re-times or cancels the day-before text, and
+  two columns. Read back 10 October; the app on `main` calls none of it yet.
+- **Live, run by Will from the SQL editor 10 October (D-387):** `20261010074241_…` (contract)
+  from `packages/db/manual/2026-10-10-appointments-written-only-through-the-trip-functions.sql`.
+  Read back: only the three read policies remain, no insert/update/delete for `anon` or
+  `authenticated`, one ledger row. Appointments are written only through the trip functions.
+- The trips database test is `28_saved_trips_and_reminders_test.sql` (renumbered at merge: 26 and
+  27 were taken by Messages).
+
 ## Messages & notifications · alert texts, STOP, promises (10 October 2026)
 
 Merged to `main` by the merge desk, 10 October. Two migrations, **both applied to the live project
 10 October** and read back: `20261010071947_…` (a stored STOP
 cannot be cleared from the app: a person could clear their own at the API) and `20261010072848_…`
 (the claim texts a reminder only to somebody who agreed). Text alerts offers switches only for what
-is sent; the four alert texts are drafts, unsigned. A STOP shows as "Texts are off". Nothing records
-a STOP yet (no Twilio receiver) and nothing queues the appointment reminders, the check-in or
-"someone wants to connect". Samples file: nine texts. D-453.
+is sent; the four alert texts are signed by Will (D-461). A STOP shows as "Texts are off". A STOP is
+recorded once `sms-inbound` is deployed (D-460); nothing queues the check-in or "someone wants to
+connect" yet. Samples file: nine texts. D-453. Text reminders' staff list (merged 10 October) names
+only the alert texts Will signed: no "introduced to your program", no "your account changes".
 
 ## Design system & Storybook · language tag (10 October)
 
@@ -1020,6 +1092,13 @@ language's own name, so a person can see which language a row is before they can
 - Verified: 116 UI tests, 48 web tests, typecheck, Storybook build, and the full fit audit on the merged
   tree (471 stories × 7 languages: 26 new in a language, all 26 accepted, 0 not). Not run: the
   Playwright browser suite, which is what measures the tag's colour contrast.
+
+## Messages & notifications · Block (10 October 2026)
+
+Merged to `main` by the merge desk, 10 October (no migration: 0076 is live). A conversation's ⋯ menu has
+Block this person (asks first) and, once blocked, Unblock; the composer gives way to a notice for both
+sides, and the person blocked is told. The database half was 0069/0076. D-463. Test:
+`31_block_in_conversation_test.sql` (renumbered at merge: 30 went to Places). The terms' "they will not know" is not true and Lena is changing it. Hidden-for-staff is Will's call.
 
 ## Design system & Storybook · area chip, fit audit (10 October) — merged 10 October
 

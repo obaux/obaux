@@ -64,12 +64,56 @@ export interface MockOptions {
   readonly limited?: boolean;
   /** The person replied STOP: stored, and nothing in the app can undo it (D-453). */
   readonly textsStopped?: boolean;
+  /** Somebody blocked in the example conversation (0076, D-463): the reader did, or the other person did. */
+  readonly blocked?: 'mine' | 'theirs';
   /**
    * A program lead who already has a program on file (D-447): waiting for
    * review, or approved and live. Without it the lead has none — and a send
    * from Add a program puts one on file, waiting, as the real database does.
    */
   readonly ownProgram?: 'review' | 'live';
+  /**
+   * A member who already has a trip saved (D-454). Without it they have none —
+   * and a trip planned to a real place in the story is saved from then on, as
+   * the real database does (example places stay in the tab).
+   */
+  readonly savedTrip?: boolean;
+}
+
+/** A real place of the catalogue, to plan a trip to in a story (the examples' ids are not real). */
+export const SAVED_PLACE = {
+  id: '4c0f6b64-3a0e-4b8e-9d6c-7a1f0f3c2b11',
+  name: 'Riverside Job Center',
+  category: 'workforce',
+  address: '1234 Market St, Philadelphia, PA 19107',
+} as const;
+
+interface SavedTripRow {
+  id: string;
+  service_id: string;
+  place_name: string;
+  category: string;
+  address: string;
+  lat: number;
+  lon: number;
+  starts_at: string;
+  note: string | null;
+  status: 'scheduled';
+}
+
+function savedTripRow(n: number, startsAt: string, note: string | null = null): SavedTripRow {
+  return {
+    id: `7a1f0f3c-2b11-4c0f-8b64-${String(n).padStart(12, '0')}`,
+    service_id: SAVED_PLACE.id,
+    place_name: SAVED_PLACE.name,
+    category: SAVED_PLACE.category,
+    address: SAVED_PLACE.address,
+    lat: 39.9526,
+    lon: -75.1652,
+    starts_at: startsAt,
+    note,
+    status: 'scheduled',
+  };
 }
 
 /** The lead's organisation in the pretend database, once they have a program. */
@@ -97,6 +141,10 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
   const role = profile?.role ?? null;
   // A program sent from Add a program in this story is on file from then on.
   let ownProgram: 'review' | 'live' | undefined = options.ownProgram;
+  // The member's saved trips (D-454): planning one adds it, moving one changes it, and reading answers with them.
+  const savedTrips: SavedTripRow[] = options.savedTrip
+    ? [savedTripRow(1, new Date(Date.now() + 4 * 86_400_000).toISOString(), 'Bring my ID')]
+    : [];
   const has = (part: string) => (url: string) => url.includes(part);
   const on = (part: string, answer: (url: string, method: string, body: unknown) => Answer): Route => (url, method, body) =>
     has(part)(url) ? answer(url, method, body) : null;
@@ -136,6 +184,19 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
     on('/functions/v1/link-preview', () => ({ body: { made: 0 } })),
     on('/rpc/report_photos_for_review', () => ({ body: [] })),
     on('/rpc/report_files_for_review', () => ({ body: [] })),
+    on('/rpc/my_trips', () => ({ body: savedTrips })),
+    on('/rpc/book_trip', (_url, _method, body) => {
+      const args = (body ?? {}) as { p_starts_at: string; p_note?: string | null };
+      const row = savedTripRow(savedTrips.length + 1, args.p_starts_at, args.p_note ?? null);
+      savedTrips.push(row);
+      return { body: row };
+    }),
+    on('/rpc/move_trip', (_url, _method, body) => {
+      const args = (body ?? {}) as { p_id: string; p_starts_at: string };
+      const row = savedTrips.find((trip) => trip.id === args.p_id);
+      if (row) row.starts_at = args.p_starts_at;
+      return { body: row ?? null };
+    }),
     // The lead's own program (D-447): sending one puts it on file; reading it
     // answers the one row, by the organisation the profile names.
     on('/rpc/submit_program', () => {
@@ -266,7 +327,12 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
     // example conversation, so the tap lands in a thread instead of the list.
     on('/rpc/open_direct_conversation', () => ({ body: CONVO_ID })),
     on('/rpc/conversation_partners', () => ({ body: [partnerFor(role)] })),
-    on('/rpc/conversation_block_state', () => ({ body: [{ i_blocked: false, blocked_me: false }] })),
+    on('/rpc/conversation_block_state', () => ({
+      body: [{ i_blocked: options.blocked === 'mine', blocked_me: options.blocked === 'theirs' }],
+    })),
+    // Blocking and unblocking answer yes and change nothing: a story never writes (D-463).
+    on('/rpc/block_in_conversation', () => ({ body: null })),
+    on('/rpc/unblock_in_conversation', () => ({ body: null })),
     on('/rest/v1/messages', (_url, method) => {
       if (method !== 'POST') return { body: threadFor(role) };
       // What `messages_insert_sender` answers a limited account (0031).

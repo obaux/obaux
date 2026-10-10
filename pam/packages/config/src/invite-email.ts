@@ -331,17 +331,20 @@ ${escape(copy.footer)}
 }
 
 // ---------------------------------------------------------------------------
-// The first invite (D-450): a case manager or a program lead is invited, with
-// the email the inviter typed (0086). Not the expired-link email above — that
-// one says "your last link ran out", which is not true of a first invite.
+// The first invite (D-450, D-461): a case manager or a program lead is invited,
+// with the email the inviter typed (0086). Not the expired-link email above —
+// that one says "your last link ran out", which is not true of a first invite.
 //
-// **Nobody has signed any of this yet** (`reviewedBy` is empty in all seven
-// languages), so `renderStaffInviteEmail` refuses to render for sending in
-// every one of them, English included, until a person writes their name. I
-// never fill it in. When English is signed and a language is not, that person
-// gets the English email, as with the texts. Members are never emailed: they
-// are not asked for an address (D-441).
+// **English approved by Will, 10 October 2026**, in these words: "Staff email:
+// No need to mention expiry days. Invite CTA button should say Accept Invite.
+// Remember we're a human-touch company. Speak human please. Then approved." So:
+// no days anywhere, in any language; the button says Accept invite; it talks like
+// a person. The other six languages carry the same warmth and meaning and are
+// drafts under the 9 October convention (D-429): approved to learn from, no native
+// reader yet, and fixed when somebody who reads the language says so. Members are
+// never emailed: they are not asked for an address (D-441).
 //
+// The fallback line is this email's own, so the expired-link email is untouched.
 // Same dignity rules as every Pam email: the role is named; nothing says why
 // anyone might be joining Pam.
 
@@ -357,116 +360,130 @@ export interface StaffInviteEmailWording {
   readonly reviewedBy: string;
 }
 
+/** Will's own sign-off, on the English words above. */
+const STAFF_INVITE_EMAIL_REVIEWED_BY = 'Will, 10 October 2026';
+
+/** The other six, on the 9 October convention, dated the day their words were written. */
+const STAFF_INVITE_EMAIL_LEARN_FROM = 'Will (Oba), 10 October 2026 — approved to learn from; no native reader yet';
+
 export const STAFF_INVITE_EMAIL: Readonly<Record<Locale, StaffInviteEmailWording>> = {
   en: {
-    reviewedBy: '',
+    reviewedBy: STAFF_INVITE_EMAIL_REVIEWED_BY,
     copy: {
-      subject: 'You are invited to join Pam',
-      preheader: 'Your link to join Pam. It works for 30 days.',
-      title: 'You are invited to Pam',
+      subject: "You're invited to join Pam",
+      preheader: "We'd love to have you with us.",
+      title: "You're invited to Pam",
       body: {
-        provider: '{inviter} invited you to be a program partner in the Pam network. Open the link below to get started. It works for 30 days.',
-        admin: '{inviter} invited you to be a case manager in the Pam network. Open the link below to get started. It works for 30 days.',
+        provider:
+          'Hi! {inviter} would love for your program to be part of Pam. Pam helps people find programs like yours and plan a visit. Accept your invite to set up your program.',
+        admin:
+          'Hi! {inviter} would love for you to join Pam as a case manager. Pam helps the people you support find services, plan visits and stay in touch with you. Accept your invite to get started.',
       },
-      button: 'Open Pam',
-      fallback: INVITE_EMAIL.en.fallback,
-      footer: 'You are getting this because someone invited you to Pam. If it is not for you, you can ignore this email.',
+      button: 'Accept invite',
+      fallback: "If the button doesn't work, copy this link into your browser:",
+      footer: "You're getting this because someone invited you to Pam. If it's not for you, you can just ignore it.",
       someone: INVITE_EMAIL.en.someone,
     },
   },
   es: {
-    reviewedBy: '',
+    reviewedBy: STAFF_INVITE_EMAIL_LEARN_FROM,
     copy: {
-      subject: 'Le invitaron a unirse a Pam',
-      preheader: 'Su enlace para unirse a Pam. Sirve por 30 días.',
+      subject: 'Le invitamos a unirse a Pam',
+      preheader: 'Nos encantaría contar con usted.',
       title: 'Le invitaron a Pam',
       body: {
-        provider: '{inviter} le invitó a ser un programa aliado en la red de Pam. Abra el enlace de abajo para empezar. Sirve por 30 días.',
-        admin: '{inviter} le invitó a ser gestor de casos en la red de Pam. Abra el enlace de abajo para empezar. Sirve por 30 días.',
+        provider:
+          '¡Hola! {inviter} quiere que su programa forme parte de Pam. Pam ayuda a las personas a encontrar programas como el suyo y a planear una visita. Acepte su invitación para configurar su programa.',
+        admin:
+          '¡Hola! {inviter} quiere que usted se una a Pam como gestor de casos. Pam ayuda a las personas a las que usted apoya a encontrar servicios, planear visitas y mantenerse en contacto con usted. Acepte su invitación para empezar.',
       },
-      button: 'Abrir Pam',
-      fallback: INVITE_EMAIL.es.fallback,
+      button: 'Aceptar invitación',
+      fallback: 'Si el botón no funciona, copie este enlace en su navegador:',
       footer: 'Recibe este correo porque alguien le invitó a Pam. Si no es para usted, puede ignorarlo.',
       someone: INVITE_EMAIL.es.someone,
     },
   },
   'pt-BR': {
-    reviewedBy: '',
+    reviewedBy: STAFF_INVITE_EMAIL_LEARN_FROM,
     copy: {
       subject: 'Convite para entrar no Pam',
-      preheader: 'Seu link para entrar no Pam. Ele vale por 30 dias.',
+      preheader: 'Adoraríamos ter você com a gente.',
       title: 'Convite para o Pam',
       body: {
-        provider: '{inviter} convidou você para ser um programa parceiro na rede de Pam. Abra o link abaixo para começar. Ele vale por 30 dias.',
-        admin: '{inviter} convidou você para ser gestor de casos na rede de Pam. Abra o link abaixo para começar. Ele vale por 30 dias.',
+        provider:
+          'Oi! {inviter} adoraria que o seu programa fizesse parte do Pam. O Pam ajuda as pessoas a encontrar programas como o seu e a planejar uma visita. Aceite o convite para configurar o seu programa.',
+        admin:
+          'Oi! {inviter} adoraria que você entrasse no Pam como gestor de casos. O Pam ajuda as pessoas que você apoia a encontrar serviços, planejar visitas e manter contato com você. Aceite o convite para começar.',
       },
-      button: INVITE_EMAIL_MORE['pt-BR'].copy.button,
-      fallback: INVITE_EMAIL_MORE['pt-BR'].copy.fallback,
-      footer: 'Você recebeu este e-mail porque alguém convidou você para o Pam. Se não é para você, pode ignorá-lo.',
+      button: 'Aceitar convite',
+      fallback: 'Se o botão não funcionar, copie este link no seu navegador:',
+      footer: 'Você recebeu este e-mail porque alguém convidou você para o Pam. Se não é para você, pode simplesmente ignorá-lo.',
       someone: INVITE_EMAIL_MORE['pt-BR'].copy.someone,
     },
   },
   'zh-CN': {
-    reviewedBy: '',
+    reviewedBy: STAFF_INVITE_EMAIL_LEARN_FROM,
     copy: {
       subject: '邀请您加入 Pam',
-      preheader: '加入 Pam 的链接，有效期 30 天。',
+      preheader: '我们很期待您的加入。',
       title: '您收到了 Pam 的邀请',
       body: {
-        provider: '{inviter}邀请您成为 Pam 网络中的项目合作方。请打开下面的链接开始，有效期 30 天。',
-        admin: '{inviter}邀请您成为 Pam 网络中的个案管理员。请打开下面的链接开始，有效期 30 天。',
+        provider: '您好！{inviter}希望您的项目能加入 Pam。Pam 帮助人们找到像您这样的项目，并安排到访。接受邀请，开始设置您的项目。',
+        admin: '您好！{inviter}希望您以个案管理员的身份加入 Pam。Pam 帮助您服务的人找到服务、安排到访，并与您保持联系。接受邀请，即可开始。',
       },
-      button: INVITE_EMAIL_MORE['zh-CN'].copy.button,
-      fallback: INVITE_EMAIL_MORE['zh-CN'].copy.fallback,
-      footer: '您收到这封邮件，是因为有人邀请您加入 Pam。如果与您无关，请忽略这封邮件。',
+      button: '接受邀请',
+      fallback: '如果按钮无法使用，请将此链接复制到浏览器：',
+      footer: '您收到这封邮件，是因为有人邀请您加入 Pam。如果与您无关，直接忽略即可。',
       someone: INVITE_EMAIL_MORE['zh-CN'].copy.someone,
     },
   },
   'zh-HK': {
-    reviewedBy: '',
+    reviewedBy: STAFF_INVITE_EMAIL_LEARN_FROM,
     copy: {
       subject: '邀請您加入 Pam',
-      preheader: '加入 Pam 的連結，有效期 30 天。',
+      preheader: '我們很期待您的加入。',
       title: '您收到 Pam 的邀請',
       body: {
-        provider: '{inviter}邀請您成為 Pam 網絡中的計劃夥伴。請開啟下面的連結開始，有效期 30 天。',
-        admin: '{inviter}邀請您成為 Pam 網絡中的個案經理。請開啟下面的連結開始，有效期 30 天。',
+        provider: '您好！{inviter}希望您的計劃加入 Pam。Pam 幫助大家找到像您這樣的計劃，並安排到訪。接受邀請，開始設定您的計劃。',
+        admin: '您好！{inviter}希望您以個案經理的身份加入 Pam。Pam 幫助您服務的人找到服務、安排到訪，並與您保持聯絡。接受邀請，即可開始。',
       },
-      button: INVITE_EMAIL_MORE['zh-HK'].copy.button,
-      fallback: INVITE_EMAIL_MORE['zh-HK'].copy.fallback,
-      footer: '您收到這封電郵，是因為有人邀請您加入 Pam。如果與您無關，請忽略這封電郵。',
+      button: '接受邀請',
+      fallback: '如果按鈕無法使用，請把此連結複製到瀏覽器：',
+      footer: '您收到這封電郵，是因為有人邀請您加入 Pam。如果與您無關，直接忽略即可。',
       someone: INVITE_EMAIL_MORE['zh-HK'].copy.someone,
     },
   },
   ru: {
-    reviewedBy: '',
+    reviewedBy: STAFF_INVITE_EMAIL_LEARN_FROM,
     copy: {
       subject: 'Приглашение в Pam',
-      preheader: 'Ваша ссылка, чтобы присоединиться к Pam. Она действует 30 дней.',
+      preheader: 'Мы будем рады видеть вас с нами.',
       title: 'Вас приглашают в Pam',
       body: {
-        provider: '{inviter} приглашает вас в сеть Pam как партнёрскую программу. Откройте ссылку ниже, чтобы начать. Она действует 30 дней.',
-        admin: '{inviter} приглашает вас стать кейс-менеджером в сети Pam. Откройте ссылку ниже, чтобы начать. Она действует 30 дней.',
+        provider:
+          'Здравствуйте! {inviter} хочет, чтобы ваша программа стала частью Pam. Pam помогает людям находить такие программы, как ваша, и планировать визит. Примите приглашение, чтобы настроить свою программу.',
+        admin:
+          'Здравствуйте! {inviter} хочет, чтобы вы присоединились к Pam как кейс-менеджер. Pam помогает людям, которых вы поддерживаете, находить услуги, планировать визиты и оставаться с вами на связи. Примите приглашение, чтобы начать.',
       },
-      button: INVITE_EMAIL_MORE.ru.copy.button,
-      fallback: INVITE_EMAIL_MORE.ru.copy.fallback,
+      button: 'Принять приглашение',
+      fallback: 'Если кнопка не работает, скопируйте эту ссылку в браузер:',
       footer: 'Вы получили это письмо, потому что кто-то пригласил вас в Pam. Если оно не для вас, просто проигнорируйте его.',
       someone: INVITE_EMAIL_MORE.ru.copy.someone,
     },
   },
   ar: {
-    reviewedBy: '',
+    reviewedBy: STAFF_INVITE_EMAIL_LEARN_FROM,
     copy: {
       subject: 'دعوة للانضمام إلى Pam',
-      preheader: 'رابطك للانضمام إلى Pam. يعمل لمدة 30 يوما.',
+      preheader: 'يسعدنا أن تكون معنا.',
       title: 'لقد تمت دعوتك إلى Pam',
       body: {
-        provider: 'دعاك {inviter} لتكون شريك برنامج في شبكة Pam. افتح الرابط أدناه للبدء. يعمل لمدة 30 يوما.',
-        admin: 'دعاك {inviter} لتكون مدير حالة في شبكة Pam. افتح الرابط أدناه للبدء. يعمل لمدة 30 يوما.',
+        provider: 'مرحبا! يتمنى {inviter} أن يكون برنامجك جزءا من Pam. يساعد Pam الناس على العثور على برامج مثل برنامجك وعلى التخطيط لزيارة. اقبل دعوتك لإعداد برنامجك.',
+        admin: 'مرحبا! يتمنى {inviter} أن تنضم إلى Pam بصفتك مدير حالة. يساعد Pam الأشخاص الذين تدعمهم على العثور على الخدمات والتخطيط للزيارات والبقاء على تواصل معك. اقبل دعوتك للبدء.',
       },
-      button: INVITE_EMAIL_MORE.ar.copy.button,
-      fallback: INVITE_EMAIL_MORE.ar.copy.fallback,
-      footer: 'وصلتك هذه الرسالة لأن شخصا ما دعاك إلى Pam. إذا لم تكن الرسالة لك، يمكنك تجاهلها.',
+      button: 'اقبل الدعوة',
+      fallback: 'إذا لم يعمل الزر، انسخ هذا الرابط إلى متصفحك:',
+      footer: 'وصلتك هذه الرسالة لأن شخصا ما دعاك إلى Pam. إذا لم تكن الرسالة لك، يمكنك تجاهلها ببساطة.',
       someone: INVITE_EMAIL_MORE.ar.copy.someone,
     },
   },

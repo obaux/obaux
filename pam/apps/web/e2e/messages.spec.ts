@@ -718,6 +718,69 @@ test.describe('a conversation', () => {
     await expect(page.getByRole('link', { name: 'Back to the conversation' }).first()).toBeVisible();
   });
 
+  test('blocking asks first, calls the database once, and can be undone from the same menu (0076, D-463)', async ({ page }) => {
+    await signedInAs(page, 'member');
+    await withOneConversation(page);
+    let blocked = false;
+    const calls: string[] = [];
+    await page.route('**/rest/v1/rpc/conversation_block_state*', (route) =>
+      route.fulfill(json([{ i_blocked: blocked, blocked_me: false }])),
+    );
+    await page.route('**/rest/v1/rpc/block_in_conversation*', (route) => {
+      blocked = true;
+      calls.push('block');
+      return route.fulfill({ status: 204, body: '' });
+    });
+    await page.route('**/rest/v1/rpc/unblock_in_conversation*', (route) => {
+      blocked = false;
+      calls.push('unblock');
+      return route.fulfill({ status: 204, body: '' });
+    });
+    await page.goto(`/messages/thread/options/?id=${CONVO}`);
+    await settled(page);
+
+    // Asked first: nothing is called by tapping the row.
+    await page.getByRole('button', { name: 'Block this person' }).click();
+    await expect(page.getByRole('heading', { name: 'Block this person?' })).toBeVisible();
+    await expect(page.getByText(/They will see that messages are blocked/)).toBeVisible();
+    await expect(page.getByText(/unblock them any time from this menu/)).toBeVisible();
+    expect(calls).toEqual([]);
+    // "Not now" goes back to the menu and still calls nothing.
+    await page.getByRole('button', { name: 'Not now' }).click();
+    await expect(page.getByRole('button', { name: 'Block this person' })).toBeVisible();
+    expect(calls).toEqual([]);
+
+    await page.getByRole('button', { name: 'Block this person' }).click();
+    await page.getByRole('button', { name: 'Block', exact: true }).click();
+    await expect(page.getByRole('heading', { name: 'Blocked' }).first()).toBeVisible();
+    expect(calls).toEqual(['block']);
+    await expect(page.getByRole('link', { name: 'Back to the conversation' }).first()).toBeVisible();
+
+    // The menu now offers the way back.
+    await page.goto(`/messages/thread/options/?id=${CONVO}`);
+    await settled(page);
+    await page.getByRole('button', { name: 'Unblock this person' }).click();
+    await page.getByRole('button', { name: 'Unblock', exact: true }).click();
+    await expect(page.getByRole('heading', { name: 'Unblocked' }).first()).toBeVisible();
+    expect(calls).toEqual(['block', 'unblock']);
+  });
+
+  test('in a blocked conversation the composer gives way to a notice, and the messages stay', async ({ page }) => {
+    for (const [who, state, title] of [
+      ['I blocked them', { i_blocked: true, blocked_me: false }, 'You blocked this person'],
+      ['they blocked me', { i_blocked: false, blocked_me: true }, "You can't send messages here"],
+    ] as const) {
+      await signedInAs(page, 'member');
+      await withOneConversation(page);
+      await page.route('**/rest/v1/rpc/conversation_block_state*', (route) => route.fulfill(json([state])));
+      await page.goto(`/messages/thread/?id=${CONVO}`);
+      await settled(page);
+      await expect(page.getByRole('log').getByText('Is the class still on Tuesday?'), who).toBeVisible();
+      await expect(page.getByRole('textbox'), who).toHaveCount(0);
+      await expect(page.getByText(title, { exact: true }), who).toBeVisible();
+    }
+  });
+
   test('an example conversation renders through the same chat log, and sends nowhere', async ({ page }) => {
     await page.addInitScript(() => sessionStorage.setItem('pam.view-as', 'member'));
     await signedInAs(page, 'super_admin');
