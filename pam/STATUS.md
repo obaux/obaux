@@ -993,6 +993,15 @@ Broad St, North Philadelphia` drew `… St, North Philadelphia 1231 بالقرب
   `fit-known.json` and the old `ar|spill` entry is gone; `areachip--arabic` needs none
   (its ellipsis is the story's own in every column).
 
+## Messages & notifications · Twilio receiver (10 October 2026)
+
+Merged to `main` by the merge desk, 10 October. `sms-inbound` (**not deployed yet**: it is deployed
+together with Will's Twilio step and his go, and is off unless `SMS_INBOUND=on`) records a STOP or
+START reply, after checking Twilio's signature; migration `20261010081342_…` (**applied 10 October**,
+read back: both functions service-role only) adds `record_sms_stop` / `record_sms_start`. Until it is switched
+on and Twilio is pointed at it, Pam still does not learn a STOP. Setup: `docs/sms-setup.md` § 3.
+YES/NO replies are not built. D-460.
+
 ## Places & programs · trips saved, the database half (10 October 2026)
 
 Merged to `main` by the merge desk, 10 October, from `claude/places-programs-trips-database`
@@ -1001,11 +1010,10 @@ Merged to `main` by the merge desk, 10 October, from `claude/places-programs-tri
 - **Live:** `20261010074045_…` (expand): `book_trip`, `move_trip`, `cancel_trip`, `my_trips`, the
   `appointments_keep_reminder` trigger that queues, re-times or cancels the day-before text, and
   two columns. Read back 10 October; the app on `main` calls none of it yet.
-- **Waiting on Will (SQL editor, D-387):** `20261010074241_…` (contract) drops the two `for all`
-  policies on `appointments`, so it is run by hand from
-  `packages/db/manual/2026-10-10-appointments-written-only-through-the-trip-functions.sql`
-  (proved on a database shaped like live; drift test in `manual-sql.test.ts`). Until then a
-  signed-in person can still write `appointments` directly; the table has no rows.
+- **Live, run by Will from the SQL editor 10 October (D-387):** `20261010074241_…` (contract)
+  from `packages/db/manual/2026-10-10-appointments-written-only-through-the-trip-functions.sql`.
+  Read back: only the three read policies remain, no insert/update/delete for `anon` or
+  `authenticated`, one ledger row. Appointments are written only through the trip functions.
 - The trips database test is `28_saved_trips_and_reminders_test.sql` (renumbered at merge: 26 and
   27 were taken by Messages).
 
