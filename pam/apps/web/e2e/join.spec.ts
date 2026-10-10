@@ -153,6 +153,8 @@ test.describe('signing up', () => {
       await expect(page.locator('html')).toHaveAttribute('lang', locale);
       const group = page.getByRole('group').filter({ has: page.locator('[aria-pressed]') }).last();
       await expect(group).toBeVisible();
+      // Positions are read below: wait for the page a member reads, with its fonts, not the load (`settled.ts`).
+      await settled(page);
       for (const code of SUPPORTED_LOCALES) {
         const name = en[`language.${code}` as keyof typeof en] as string;
         const chip = group.getByRole('button', { name, exact: true });
