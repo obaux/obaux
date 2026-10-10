@@ -13,7 +13,8 @@ sections below; this page is only the order, who does it, and how to stop.
 ticked "Text reminders" and has not replied STOP, in their language, after 7 am and
 before 9 pm Philadelphia time (their quiet hours). It carries the time, the street
 (up to 34 characters) and a link to Trips. It does not carry the name of a program
-service the member picked. Four more texts are queued since D-478, each only for a person who
+service the member picked. Four more texts are queued since D-478 (the database side is live and every switch is off for everyone; the
+switches in the app stay "Coming soon" until `ALERT_TEXTS_LIVE` is flipped on the day), each only for a person who
 switched that alert on on their Text alerts screen: "you have a new message" (anyone), "someone booked a
 visit" and "a visit was changed" (to the program), and "someone on your list planned a visit" (to a case
 manager). They say that something happened and nothing else. One waiting text covers the next change, and a
@@ -49,7 +50,7 @@ reminders, the check-in and "connect" texts.
 | 4 | Will | Plan a test visit that starts **exactly one day and ten minutes from now**, at a time between 7:00 am and 9:00 pm. Its reminder is then due ten minutes from now. |
 | 5 | Will | Within about fifteen minutes his phone gets one text starting "Pam:" with the time, the street and a link. Open the link: it lands on Trips. |
 | 6 | Merge desk | Confirm (below). Then cancel the test visit in the app: its reminder, if still waiting, is cancelled with it. |
-| 7 | Merge desk | Merge `claude/messages-reply-start` (§3 step 8). That is all that opens it: members who tick the box get reminders; nobody else does. |
+| 7 | Merge desk | In one change: merge `claude/messages-reply-start` (§3 step 8) **and** set `ALERT_TEXTS_LIVE = true` in `apps/web/src/lib/alertTextsLive.ts` (with the site's and app's `VISIT_REMINDERS_LIVE`, `docs/before-launch.md` › *Visit reminders go live*), then deploy. That is what opens it: members who tick the box get reminders, and a case manager or program lead can turn on a Text alert. Until `ALERT_TEXTS_LIVE` is flipped the four alert switches say "Coming soon" and nothing writes them, so no alert text can be switched on before this day. |
 
 ### Checking the first real reminder
 

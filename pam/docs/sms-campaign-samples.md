@@ -222,8 +222,9 @@ something happened, never what or to whom: no name, no place, no day. Will appro
 10 October 2026 ("Text alerts: approved"), the other languages as drafts to learn from. Since D-478
 they are queued when the thing happens — a message written, a visit booked, moved or cancelled, a
 visit planned by someone on a case manager's list — and only for a person who has turned that
-switch on (each starts off) and has not replied STOP; the Text alerts screen shows those four switches
-live. They are in `packages/config/src/sms-templates.ts` (`message_waiting`,
+switch on (each starts off) and has not replied STOP. The Text alerts screen's four switches say
+"Coming soon" until `ALERT_TEXTS_LIVE` is flipped on the day Will says go
+(`apps/web/src/lib/alertTextsLive.ts`), so none can be switched on before then. They are in `packages/config/src/sms-templates.ts` (`message_waiting`,
 `visit_booked`, `booking_changed`, `trip_planned`); each is one segment in every language, and
 the other languages' drafts are there too. 6 goes to anyone who has a message waiting; 7 and 8
 to a program lead; 9 to a case manager. Message 5 is built next (the day before only, sent
