@@ -20,9 +20,9 @@
       "permanent": false
     },
     {
-      "source": "/:path*",
+      "source": "/:path((?!_next/|.*index\\.txt$).*)",
       "has": [{ "type": "host", "value": "web-ten-umber-88.vercel.app" }],
-      "destination": "https://app.joinpam.org/:path*",
+      "destination": "https://app.joinpam.org/:path",
       "permanent": true
     }
   ],
