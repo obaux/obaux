@@ -1073,6 +1073,13 @@ drops signatures), then `20261010042108_a_program_lead_submits_their_own_program
 
 ---
 
+## Messages & notifications · legacy Messages page removed (10 October 2026)
+
+Merged to `main` by the merge desk, 10 October, from `claude/messages-remove-legacy` (5c3d6f1); live with the next deploy. Case managers and super admins now get the redesigned Messages
+screen with "Conversations | Reported"; `LegacyMessagesPage` and the old example-conversation half of
+`DummyRows` are deleted. `?show=reported` still works; every reported-message test kept and moved to the
+new switch. No database change. messages.spec passes on all three projects (174). D-469.
+
 ## Messages & notifications · Will's sign-off (10 October 2026)
 
 Merged to `main` by the merge desk, 10 October (no migration). Will approved the four Text alerts texts and the staff

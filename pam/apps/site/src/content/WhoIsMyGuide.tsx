@@ -49,6 +49,7 @@ export function WhoIsMyGuide() {
         <Steps
           items={[
             'Tap Profile.',
+            'Tap Legal.',
             'Tap “What others can see”.',
             'The first card says “Your guide”. It tells you who that is.',
           ]}
@@ -56,7 +57,7 @@ export function WhoIsMyGuide() {
         <Screenshot
           name="who-is-my-guide/what-others-can-see.png"
           alt="The “What others can see” screen in Pam. The first card is titled “Your guide” and explains who your guide is."
-          caption="“What others can see”, opened from Profile."
+          caption="“What others can see”, opened from Legal."
         />
       </Section>
     </Body>
