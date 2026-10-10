@@ -275,6 +275,13 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
     on('/rpc/report_photos_for_review', () => ({ body: [] })),
     on('/rpc/report_files_for_review', () => ({ body: [] })),
     on('/rpc/my_trips', () => ({ body: savedTrips })),
+    on('/rpc/my_trip_services', () => ({ body: [] })),
+    on('/rpc/book_trip_at_service', (_url, _method, body) => {
+      const args = (body ?? {}) as { p_starts_at: string; p_note?: string | null };
+      const row = savedTripRow(savedTrips.length + 1, args.p_starts_at, args.p_note ?? null);
+      savedTrips.push(row);
+      return { body: row };
+    }),
     on('/rpc/book_trip', (_url, _method, body) => {
       const args = (body ?? {}) as { p_starts_at: string; p_note?: string | null };
       const row = savedTripRow(savedTrips.length + 1, args.p_starts_at, args.p_note ?? null);

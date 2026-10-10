@@ -37,14 +37,14 @@ export function MessagesInPam() {
         <Steps
           items={[
             'Tap Messages.',
-            'Tap a conversation. Or tap “New message” and pick who you want to message.',
+            'Tap a conversation. Or tap “New message”, the button at the top right, and pick who you want to message.',
             'Type in the box that says “Write a message”.',
             'Tap Send.',
           ]}
         />
         <Screenshot
           name="messages-in-pam/messages.png"
-          alt="The Messages screen, with a list of conversations and a “New message” button."
+          alt="The Messages screen: a list of conversations, with a search button, the bell and the “New message” button at the top right."
           caption="The Messages tab."
         />
         <Screenshot
@@ -57,7 +57,7 @@ export function MessagesInPam() {
 
       <Section title="A new message does not come by text">
         <P>
-          When someone messages you, the bell and the number on Home show it. Pam does not send a text for a
+          When someone messages you, the bell at the top and a dot on the Messages tab show it. A case manager or program lead also sees the number on Home. Pam does not send a text for a
           message, so open Pam to read it.
         </P>
         <ReadMore label="Texts from Pam: which ones, and why one didn’t come" href="/support/texts-from-pam/" />
@@ -66,11 +66,16 @@ export function MessagesInPam() {
       <Section title="If a message is not safe">
         <Steps
           items={[
-            'In the conversation, tap “More options”.',
+            'In the conversation, tap “More options”. A screen called Options opens.',
             'Tap “Report suspicious activity”.',
             'Pick what is wrong.',
             'Tap “Send report”.',
           ]}
+        />
+        <Screenshot
+          name="messages-in-pam/options.png"
+          alt="The Options screen of a conversation, with three rows: “Stuff shared”, “Report suspicious activity” and “Block this person”."
+          caption="A conversation’s Options."
         />
         <P>
           Pam and your guide see the last message that person sent you, and its photo or document if it has one.

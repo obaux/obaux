@@ -247,10 +247,10 @@ export default function PointsPage() {
     {
       // In the app's own words (Will): a trip is how a member signs up.
       id: 'plan',
-      reason: 'self_reported_signup',
+      reason: 'plan_trip',
       icon: <PlusIcon {...WAY_ICON} />,
       label: t('points.way.plan'),
-      worth: t('points.way.plus', { count: POINTS_RULES.self_reported_signup.points }),
+      worth: t('points.way.plus', { count: POINTS_RULES.plan_trip.points }),
     },
     {
       // A return, not a weekly streak (Will, 5 October): Pam cannot know how

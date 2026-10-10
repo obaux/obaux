@@ -232,7 +232,7 @@ export function MessagesView({
               />
               )}
               {headerActions}
-              {onNewMessage ? (
+              {onNewMessage && !onReported ? (
                 <IconButton
                   label={t('messages.new.action')}
                   variant="primary"

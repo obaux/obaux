@@ -115,7 +115,7 @@ if they drift.
 | 1 | Finishes setup | 25 | yes | automatic | ever | **Live** (0047) |
 | 2 | Saves a place | 5 | yes | automatic | place, ever | **Live** (0045) |
 | 3 | Calls a place | 10 | when live | honour (the tap) | place, ever | To build |
-| 4 | Plans a trip to a program | 25 | when live | honour (the booking) | program, ever | To build |
+| 4 | Plans a trip to a place | 25 | yes | honour (the booking) | place, ever | **Live** (20261010115117) |
 | 5 | Shows up to a visit (checked in) | 100 | when live | program check-in or geofence | visit | To build |
 | 5b | Shows up to a visit (said so by text) | 60 | (as 5) | SMS "YES" | visit | To build |
 | 6 | Goes back to a program again | 50 | when live | as 5 / 5b | program, per week | To build |
@@ -149,7 +149,16 @@ again pays nothing.
 - **Once per place ever.** Calling the same place again pays nothing, so
   there is no reason to call to farm.
 
-### 4. Plan a trip to a program
+### 4. Plan a trip to a place — live
+
+**Decided 10 October 2026** (the CTO, under Will's delegation): 25 points, once
+per **place** ever, any place (program or not), members only, three a day. Paid
+inside `book_trip` (`20261010115117`); the original design below (a trigger on
+`appointments`, once per program) is superseded. Cancelling takes nothing back
+and re-planning the same place pays nothing; trips planned before it earned
+nothing.
+
+The original design, for the record:
 
 "Sign up" in the old wording; in Pam's language a member signs up by
 planning a trip (Will, 5 October).

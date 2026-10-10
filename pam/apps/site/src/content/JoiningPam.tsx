@@ -79,7 +79,7 @@ export function JoiningPam() {
         </P>
         <Screenshot
           name="joining-pam/about-you.png"
-          alt="The “About you” screen. A green line at the top says “You were invited as: Member”. Below it are boxes for first name, last name and city."
+          alt="The “About you” screen. A green line at the top says “You were invited as: Member”. Below it are boxes for first name, last name and city, a choice of language, and a Next button."
           caption="“About you”, for someone who joined with a link."
         />
       </Section>
