@@ -100,6 +100,37 @@ export function moveTrip(id: string, startsAt: string): void {
   window.dispatchEvent(new Event(TRIPS_CHANGED));
 }
 
+/*
+ * A visit cancelled in this tab: an example place's, or one added here. A saved
+ * trip is cancelled in the database (`cancelSavedOrLocalTrip`) and leaves
+ * `my_trips()`. Every screen that lists trips reads through `withoutCancelled`.
+ */
+const CANCELLED = 'pam.trips.cancelled';
+
+function readCancelled(): string[] {
+  try {
+    const raw = sessionStorage.getItem(CANCELLED);
+    return raw ? (JSON.parse(raw) as string[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function cancelTripHere(id: string): void {
+  try {
+    sessionStorage.setItem(CANCELLED, JSON.stringify([...readCancelled(), id]));
+  } catch {
+    // Not kept is survivable in a demo.
+  }
+  window.dispatchEvent(new Event(TRIPS_CHANGED));
+}
+
+/** The same trips without the ones cancelled in this tab. */
+export function withoutCancelled<T extends { readonly id: string }>(trips: readonly T[]): T[] {
+  const gone = readCancelled();
+  return gone.length === 0 ? [...trips] : trips.filter((trip) => !gone.includes(trip.id));
+}
+
 /** The same trips, each at its moved time if it was moved. */
 export function withMoves<T extends { readonly id: string; readonly startsAt: string }>(trips: readonly T[]): T[] {
   const moves = readMoves();

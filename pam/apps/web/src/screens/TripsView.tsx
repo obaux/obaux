@@ -12,7 +12,7 @@ import { PlusIcon, TextLink, TripsIcon } from '@pam/ui';
 import { emptyState } from '@pam/ui/emptyState';
 import { Button } from '@pam/ui/Button';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
-import { readMoves } from '@/lib/addedTrips';
+import { readMoves, withoutCancelled } from '@/lib/addedTrips';
 import { useTrips } from '@/lib/useTrips';
 import { MapDrawer } from '@pam/ui/MapDrawer';
 import { Confetti } from '@pam/ui/SuccessScreen';
@@ -111,6 +111,7 @@ const styles = stylex.create({
   title: { fontSize: '26px', lineHeight: 1.2, fontWeight: 700, textAlign: 'center' },
   count: { fontSize: '15px', textAlign: 'center' },
   signBanner: { position: 'relative', zIndex: 2 },
+  pastTitle: { fontSize: '18px', lineHeight: 1.3, paddingBlockStart: '8px' },
   state: { paddingBlock: '24px' },
   // The new trip's card rises into place after the drawer opens (D-241).
   arrive: {
@@ -126,7 +127,11 @@ const PIN_ART = { width: 20, height: 20, 'aria-hidden': true } as const;
 
 export function TripsView({ trips, headerActions, justAdded = null }: TripsViewProps) {
   const { t, tPlain, locale } = useI18n();
-  const shown = trips;
+  // Coming up stays on the map and in the count; a visit whose time has gone
+  // moves down to Past visits, most recent first, with no policies to sign.
+  const nowAt = new Date().toISOString();
+  const shown = trips.filter((trip) => trip.startsAt >= nowAt);
+  const past = trips.filter((trip) => trip.startsAt < nowAt).sort((a, b) => b.startsAt.localeCompare(a.startsAt));
   // Bring the new trip into view once the drawer has opened.
   const arrive = (el: HTMLElement | null) => {
     if (el) setTimeout(() => el.scrollIntoView({ block: 'center', behavior: 'smooth' }), 250);
@@ -148,8 +153,42 @@ export function TripsView({ trips, headerActions, justAdded = null }: TripsViewP
   const nowIso = new Date().toISOString();
   const toSign =
     (added && needsSigning(added) ? added : null) ??
-    trips.find((trip) => trip.startsAt >= nowIso && needsSigning(trip)) ??
+    shown.find((trip) => trip.startsAt >= nowIso && needsSigning(trip)) ??
     null;
+
+  const card = (trip: Trip, isPast: boolean) => {
+    const element = (
+      <TripCard
+        key={trip.id}
+        placeName={trip.placeName}
+        when={when(trip.startsAt)}
+        href={href(trip)}
+        // Colour-coded by category, with the soft glow (D-293).
+        art={<CategoryPicture category={trip.category} />}
+        withName={trip.withName ?? null}
+        withPhotoUrl={trip.withPhotoUrl ?? null}
+        policies={
+          !isPast && trip.policies && trip.policies.total > 0
+            ? trip.policies.signed === trip.policies.total
+              ? { label: t('trips.policies.signed'), isDone: true }
+              : { label: t('trips.policies.needed'), isDone: false }
+            : null
+        }
+        label={tPlain('trips.card.label', {
+          place: trip.placeName,
+          when: when(trip.startsAt),
+          name: trip.withName ?? '',
+        })}
+      />
+    );
+    return trip.id === justAdded ? (
+      <VStack key={trip.id} ref={arrive as never} xstyle={styles.arrive}>
+        {element}
+      </VStack>
+    ) : (
+      element
+    );
+  };
 
   return (
     // What a tapped next-trip card grows into (D-269): Trips has no `Page`.
@@ -188,7 +227,7 @@ export function TripsView({ trips, headerActions, justAdded = null }: TripsViewP
             <Heading level={1} xstyle={styles.title}>
               {t('trips.title')}
             </Heading>
-            {trips.length > 0 ? (
+            {shown.length > 0 ? (
               <Text type="supporting" xstyle={styles.count}>
                 {t('trips.count', { count: shown.length })}
               </Text>
@@ -196,7 +235,7 @@ export function TripsView({ trips, headerActions, justAdded = null }: TripsViewP
           </VStack>
         }
       >
-        {trips.length === 0 ? (
+        {shown.length === 0 && past.length === 0 ? (
           <EmptyState
             headingLevel={2}
             xstyle={styles.state}
@@ -231,39 +270,15 @@ export function TripsView({ trips, headerActions, justAdded = null }: TripsViewP
                 />
               </VStack>
             ) : null}
-            {shown.map((trip) => {
-              const card = (
-              <TripCard
-                key={trip.id}
-                placeName={trip.placeName}
-                when={when(trip.startsAt)}
-                href={href(trip)}
-                // Colour-coded by category, with the soft glow (D-293).
-                art={<CategoryPicture category={trip.category} />}
-                withName={trip.withName ?? null}
-                withPhotoUrl={trip.withPhotoUrl ?? null}
-                policies={
-                  trip.policies && trip.policies.total > 0
-                    ? trip.policies.signed === trip.policies.total
-                      ? { label: t('trips.policies.signed'), isDone: true }
-                      : { label: t('trips.policies.needed'), isDone: false }
-                    : null
-                }
-                label={tPlain('trips.card.label', {
-                  place: trip.placeName,
-                  when: when(trip.startsAt),
-                  name: trip.withName ?? '',
-                })}
-              />
-              );
-              return trip.id === justAdded ? (
-                <VStack key={trip.id} ref={arrive as never} xstyle={styles.arrive}>
-                  {card}
-                </VStack>
-              ) : (
-                card
-              );
-            })}
+            {shown.map((trip) => card(trip, false))}
+            {past.length > 0 ? (
+              <VStack gap={3}>
+                <Heading level={2} xstyle={styles.pastTitle}>
+                  {t('trips.past.title')}
+                </Heading>
+                {past.map((trip) => card(trip, true))}
+              </VStack>
+            ) : null}
           </VStack>
         )}
       </MapDrawer>
@@ -295,7 +310,8 @@ export function TripsScreen({ headerActions }: { readonly headerActions?: ReactN
     startsAt: trip.startsAt,
     serviceId: trip.serviceId ?? null,
   }));
-  const examples: Trip[] = DUMMY_TRIPS.map((trip) => {
+  // `exampleTrips` changes whenever a trip is cancelled, so this reads again then.
+  const examples: Trip[] = withoutCancelled(DUMMY_TRIPS).map((trip) => {
     const person = dummyConnection(trip.withId);
     return {
       id: trip.id,

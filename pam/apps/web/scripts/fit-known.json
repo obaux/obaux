@@ -642,5 +642,9 @@
   {
     "key": "pseudo|ellipsis|member-created-states-saved-trips--one-trip-saved|Example Workforce Center",
     "reason": "A trip card's place name is one line with an ellipsis by design (TripCard); the pseudo-language, longer than any real language, runs past the width. The full name is one tap away, on the place's page. Looked at 10 October 2026 at 320px with a screenshot."
+  },
+  {
+    "key": "pseudo|ellipsis|member-created--place-visit|Of course. Friday at 10. See you then.",
+    "reason": "The place page shows a program's newest message as one line with an ellipsis by design (isDescriptionOneLine, D-306); the pseudo-language is longer so it trims; the whole message is one tap away in the conversation. Looked at 10 October 2026 at 320px."
   }
 ]

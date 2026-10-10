@@ -81,10 +81,13 @@ STATUS row too.
   Texts) and `reminders`-adjacent screenshots; when a deploy actually carries a given screen, check it is
   there. *Block* (D-463) has its own section in Messages in Pam (added 10 October; it is on main, so it ships with the same deploy). *Reminders:* the day `dispatch-sms` really sends the day-before reminder, flip
   `VISIT_REMINDERS_LIVE` in `apps/site/src/content/flags.ts` (drives the Texts post and the home card); then
-  by hand: About Pam's "What is coming" in all seven languages (the other six need a native reader again),
+  by hand: **Planning a visit** follows the flag by itself, but add ONE plain sentence to its Reminders
+  section about timing: a visit at 9 pm or later gets its reminder the evening before, just before quiet
+  hours (Piper, 10 October); About Pam's "What is coming" in all seven languages (the other six need a native reader again),
   the Joining Pam reminder choice, the Texts screenshots and limits (quiet hours, 134 characters, D-431).
-  The app's own onboarding slide that said "Pam reminds you before you go" is fixed (D-474, 10 October);
-  the app's side of this switch is the item *Visit reminders go live* just above.
+  The app's own lines that promised a reminder are fixed (D-474, 10 October): the onboarding slide that said "Pam reminds you
+  before you go", and the Trip-added and booked screens that said "We will remind you the day before". The app's side of this
+  switch is the item *Visit reminders go live* just above.
 - [ ] **Public site: publish the draft post "Keeping your program's listing up to
   date" only when the feature ships** (from PAM · Places & programs, 10 October
   2026, rule D-447, branch `claude/places-programs-load-own-program`, not on
