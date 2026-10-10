@@ -24,6 +24,18 @@ pt-BR except one phrase. **Changed:**
 
 Re-acked (`copy:ack`); config 1047 green; English untouched.
 
+### Second batch, after merging `main` (D-485 part 2: members sign)
+
+Five more strings came in with part 2: the new transparency line `transparency.canSee.signed` ("The policies you sign for a program, and the day you signed. A program you joined
+sees this too.") and the member's signing screen, `memberPolicy.record`, `.readPages`, `.record.meaning`. Kept as written: pt-BR; es on the member's own signing screen (tú, like
+`memberPolicy.yourSignature`: "Tu firma"). Changed:
+
+- **es** `transparency.canSee.signed` — tú → usted: the transparency screen is usted all the way down ("Sus puntos", "Cuándo guarda un lugar nuevo… Un programa donde se inscribió también lo ve."), and the
+  line copies the sentence before it.
+- **zh-CN / zh-HK** — 你 → 您, 政策 → 规定 / 守則, Cantonese → written Chinese ("您為某個計劃簽署的守則，以及簽署的日期。您加入的計劃也會看到這項。"), "在這裏簽名，就是您已閱讀並同意的記錄。"
+- **ru** — "политики" → "правила".
+- **ar** — "السياسات التي توقّعها" can be read as "the policies you expect" (the present tense of "to sign" and of "to expect" are the same letters); now "التي توقع عليها … مع التاريخ", which only means signing.
+
 ## What was wrong, and what missed it
 
 The same as the program switch: a draft follows the English and the neighbouring keys of the same *file*, so it can use a different word for the same thing in the same screen
@@ -38,6 +50,14 @@ None: a review of drafts.
 
 On `bb18d8c` (main `c652a30` plus this): `@pam/config` 1047 tests, `copy:status` in step, the browser suite on all three viewports **984 passed, 18 skipped** (11.1 min),
 Storybook builds, and the fit audit on every story with "polic" in its id (14 stories, 7 languages and the pseudo-language, including the replace panel): **0 new defects**.
+
+## Found, not applied (a promise: Will's, through the merge desk)
+
+**The privacy page does not say Pam keeps the signed policies and the signature.** `privacy.s.what-we-keep.p2` lists "What you sign up for, the visits you plan, whether you went,
+and the points you earn." D-485 keeps, per member, each policy they signed with the day, and their **signature picture**, privately: only the member sees the picture; a program
+sees the first name and the date. The transparency screen now says the program sees the policy and the day; the privacy page says nothing about keeping either. Proposed English
+(a new last paragraph of "What we keep", or an addition to p2): *"When you sign a program's policy, we keep it with the day you signed and your signature. Only you can see your
+signature. The program sees that you signed, and the day."* Not applied.
 
 ## Left undone
 
