@@ -15,7 +15,7 @@ It is generated, never drawn by hand:
 | `apps/web/scripts/user-flows.mjs` | Photographs each story and lays each flow out → `apps/web/user-flows-out/<flow>.html` and `.layout.json` |
 | `apps/web/scripts/user-flows-figma.mjs` | Turns the layouts into Figma Plugin API scripts → `user-flows-out/figma/` |
 
-**Updated once a day, at about 2am Pacific**, by the design lane's nightly run, from
+**Updated once a day, at about 2am Eastern**, by the design lane's nightly run, from
 the day's merges to `main` (Will, 10 October 2026: "once a day only, at 2am. Otherwise
 we run too many tokens"). It replaces the old rule that every change updated the map in
 its own session (D-264). A lane job that adds, removes or rewires a screen writes one

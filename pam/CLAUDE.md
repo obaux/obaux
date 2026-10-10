@@ -138,7 +138,7 @@ than assuming a clean base.
 ## Two standing lists Will asked to be kept
 
 - **The user-flow map**, Figma "PAM — User flows", **updated once a day, at about
-  2am Pacific**, by the design lane's nightly run from that day's merges (Will,
+  2am Eastern**, by the design lane's nightly run from that day's merges (Will,
   10 October: "once a day only, at 2am. Otherwise we run too many tokens, and changes
   may happen in a day that would require too many updates to flow"). A lane job no
   longer edits `docs/user-flows/flows.mjs` or publishes to Figma: if it adds, removes

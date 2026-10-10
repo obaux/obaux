@@ -928,6 +928,17 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
+## Merge desk & platform · a failed in-app load opens the screen; texts link to app.joinpam.org (10 October)
+
+Will, from his phone: an invite link opened a page of raw code. Cause: Next 15.5.25, in static export,
+reloads `<screen>/index.txt` instead of the screen when an in-app load throws (D-495). Fixed with a pnpm
+patch to Next (`patches/next@15.5.25.patch`), the patches in the webpack cache key (`next.config.mjs`;
+without it the cached, unpatched Next shipped), a Vercel redirect for document requests to `…/index.txt`
+(tabs on older builds), and `e2e/failed-load.spec.ts` (fails before the fix, passes after). Texts link to https://app.joinpam.org:
+`app_settings.app_url`, migration `20261010190831_texts_link_to_app_joinpam_org` (data only), **applied live**
+10 October. Emails still build their link from the Edge Function setting `APP_URL`, which Will changes
+in Supabase (card in the Control Room); until then they go through the old address's redirect.
+
 ## Languages & legal · 10 October in one place; from now on, one batch a week (Friday)
 
 Done and on `main` today (each has its own section below): the promise sweep (D-474), Spanish "visita" (D-480), the privacy page on email and signatures (D-482, D-490: Will's three sentences, live),

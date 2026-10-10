@@ -8,6 +8,18 @@
   "trailingSlash": true,
   "redirects": [
     {
+      "source": "/index.txt",
+      "has": [{ "type": "header", "key": "sec-fetch-dest", "value": "document" }],
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/:path*/index.txt",
+      "has": [{ "type": "header", "key": "sec-fetch-dest", "value": "document" }],
+      "destination": "/:path*/",
+      "permanent": false
+    },
+    {
       "source": "/:path*",
       "has": [{ "type": "host", "value": "web-ten-umber-88.vercel.app" }],
       "destination": "https://app.joinpam.org/:path*",

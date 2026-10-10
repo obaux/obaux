@@ -1,3 +1,21 @@
+import { createHash } from 'node:crypto';
+import { readdirSync, readFileSync } from 'node:fs';
+
+// Pam patches a few packages in place (`pam/patches`, `pnpm-workspace.yaml`; D-495).
+// Webpack's build cache trusts a package not to change until its version does, so a
+// patched package kept being served from the cache unpatched, here and on Vercel, which
+// restores the cache between deploys. The patches' contents are part of the cache's key.
+const PATCHES = new URL('../../patches/', import.meta.url);
+const PATCHES_KEY = createHash('sha256')
+  .update(
+    readdirSync(PATCHES)
+      .sort()
+      .map((name) => name + readFileSync(new URL(name, PATCHES), 'utf8'))
+      .join('\n'),
+  )
+  .digest('hex')
+  .slice(0, 16);
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
@@ -32,6 +50,9 @@ const nextConfig = {
   typescript: { ignoreBuildErrors: false },
 
   webpack: (config) => {
+    if (config.cache && typeof config.cache === 'object') {
+      config.cache.version = `${config.cache.version ?? ''}|patches:${PATCHES_KEY}`;
+    }
     // Workspace packages are TypeScript source that imports siblings with an
     // explicit `.js` extension (the form Node ESM requires). Webpack does not
     // map those back to `.ts` on its own the way Vite does, so it is spelled

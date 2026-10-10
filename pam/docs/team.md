@@ -81,7 +81,7 @@ current (`docs/control-room.md`).
 | **Messages & notifications** (Nico) | Conversations, attachments, translation, the bell, texts and emails going out, blocking and reporting | its lane |
 | **Places & programs** (Piper) | The catalogue, a place, programs and their onboarding, saved places, trips, points, Home | its lane |
 | **Languages & legal** (Lena, Arabic included) | The seven languages and the ledger, privacy, terms, transparency, native review. **Weekly, on Friday** (below) | its lane |
-| **Design system & Storybook** (Dot) | Components, tokens, illustrations, every screen's story, the fit and accessibility audits, the Figma flow map. **The map: once a day, at about 2am Pacific** (below) | its lane |
+| **Design system & Storybook** (Dot) | Components, tokens, illustrations, every screen's story, the fit and accessibility audits, the Figma flow map. **The map: once a day, at about 2am Eastern** (below) | its lane |
 | **Website** (Wren) | The public site and the support centre (`pam-site`). **Weekly, on Friday** (below) | its own project |
 | **User testing & research** (Iris) | Walks each flow as the person using it and reports what gets in their way; research Will asks for. Finds, never fixes. **A first pass over every flow, then weekly, on Thursday** (below) | `docs/research/` |
 
@@ -128,7 +128,7 @@ Will, 10 October 2026: "Let's also switch up the cadence for Figma flow updates 
 only, at 2am. Otherwise we run too many tokens, and changes may happen in a day that would
 require too many updates to flow."
 
-- **The design lane (Dot) redraws the map once a night**, at about 2am Pacific, from `main`.
+- **The design lane (Dot) redraws the map once a night**, at about 2am Eastern, from `main`.
   A scheduled message starts it. It reads what merged since the commit in
   `docs/user-flows/last-map.txt`; if no screen changed, it stops and sends nothing.
   Otherwise it redraws only the pages that changed and sends one READY. How: the

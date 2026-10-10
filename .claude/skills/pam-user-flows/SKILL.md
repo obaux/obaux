@@ -1,6 +1,6 @@
 ---
 name: pam-user-flows
-description: Keep PAM's Figma user-flow map ("PAM — User flows") in step with the app, once a day. Use for the design lane's nightly map run (about 2am Pacific, from the day's merges to main), and whenever Will asks to see, create or update the user flows, the app map, or "how the app fits together" right now. A lane job that adds or rewires a screen does NOT use this: it writes a `Screens:` line in its READY instead.
+description: Keep PAM's Figma user-flow map ("PAM — User flows") in step with the app, once a day. Use for the design lane's nightly map run (about 2am Eastern, from the day's merges to main), and whenever Will asks to see, create or update the user flows, the app map, or "how the app fits together" right now. A lane job that adds or rewires a screen does NOT use this: it writes a `Screens:` line in its READY instead.
 ---
 
 # PAM user flows — the visual map of the whole app
@@ -11,7 +11,7 @@ so we have a visual map of how the entire app is designed."
 **Once a day, not per change** (Will, 10 October 2026: "switch up the cadence for
 Figma flow updates once a day only, at 2am. Otherwise we run too many tokens, and
 changes may happen in a day that would require too many updates to flow"). The
-design lane runs it at about 2am Pacific from `main`; nobody else touches
+design lane runs it at about 2am Eastern from `main`; nobody else touches
 `flows.mjs` or the Figma file. Outside the nightly run, only when Will asks.
 
 ## The nightly run
