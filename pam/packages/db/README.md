@@ -19,6 +19,20 @@ expressible as a client write.
 RLS lives in one file on purpose. It is what a reviewer reads during the
 Phase 7 penetration pass, and a policy set is only reviewable as a set.
 
+## Adding a migration
+
+```bash
+pnpm claim migration "what it does"
+```
+
+makes `migrations/<day and time, UTC, to the second>_what_it_does.sql` with a header to
+fill in. The 86 migrations before this (`0001`–`0086`) keep their four-digit names; a
+stamped name always sorts after them, so the file order is still the order they run in.
+A change that touches something the live app uses goes in two migrations — add, then
+(once the app has switched) remove, the second marked `-- contract: <release>`:
+`docs/lanes.md`, "Database changes in two steps". The connector hangs on a `DROP`
+statement (D-387), so a migration that needs one puts it alone.
+
 ## Running the tests
 
 ```bash
