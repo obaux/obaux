@@ -12,7 +12,7 @@ import { SubPage } from '@pam/ui/SubPage';
 import { useI18n } from '@/lib/i18n';
 import { useSession } from '@/lib/useSession';
 import { useSupportPhone } from '@/lib/useSupportPhone';
-import { setReminderConsent } from '@/lib/useReminderConsent';
+import { setReminderConsent, setTextAlert, type AlertFlags, type AlertKind } from '@/lib/useReminderConsent';
 import { HelpButton } from './HelpButton';
 import { TermInfo } from './TermInfo';
 import type { GlossaryTerm } from '@pam/config';
@@ -31,13 +31,12 @@ import type { GlossaryTerm } from '@pam/config';
  * Turning any switch on records consent (`setReminderConsent(true)`); turning
  * the last one off withdraws it.
  *
- * **What is on is kept on the account (D-453).** It used to be kept in this
- * phone's `localStorage`, so a person's choice did not follow them to another
- * phone and a stale one could disagree with the database. Today exactly one
- * kind is really sent (a saved place closing or moving, `LIVE` below), and for
- * it the one yes/no in `notification_preferences` is the whole answer, so the
- * switch simply shows that. A yes per kind is a column and a migration for the
- * day a second kind is built; until then there is nothing else to remember.
+ * **What is on is kept on the account (D-453, D-478).** Not on this phone: a
+ * person's choice follows them. A saved place closing is the account's one
+ * yes/no (`sms_enabled`); the four texts that say something happened — a new
+ * message, a visit booked, a visit changed, a visit planned — each have their own
+ * switch (`alert_message`, `alert_booked`, `alert_changed`, `alert_trip`), which
+ * start off. Turning one on records the yes to texts as well.
  */
 type Kind = 'booked' | 'changed' | 'message' | 'trip' | 'visit' | 'closed' | 'connect';
 
@@ -58,16 +57,15 @@ const TERM_FOR: Partial<Record<Kind, GlossaryTerm>> = { trip: 'trip' };
 
 /**
  * The kinds Pam really sends a text for today (Will, 10 October 2026: "keep the
- * promise" — build them, and until they are built, do not offer them).
- *
- * Only a saved place closing or moving is queued for a text (0035–0037). The
- * rest — a visit reminder, someone wanting to connect, a message waiting, a
- * visit booked, changed or planned — have templates (drafts nobody has signed,
- * `sms-templates.ts`) and nothing that queues them, so their switches say
- * "coming soon" and cannot be turned on. When a text is built and signed, its
- * kind joins this list in the same change.
+ * promise" — build them, and until they are built, do not offer them). A saved
+ * place closing or moving (0035–0037), and the four alerts that say something
+ * happened (D-478). A visit reminder for a member has its own screen; someone
+ * wanting to connect has no text yet, so those two say "coming soon".
  */
-const LIVE: ReadonlySet<Kind> = new Set<Kind>(['closed']);
+const LIVE: ReadonlySet<Kind> = new Set<Kind>(['closed', 'message', 'booked', 'changed', 'trip']);
+
+/** The kinds with a switch of their own (`alert_*`). */
+const ALERT_KINDS: ReadonlySet<Kind> = new Set<Kind>(['message', 'booked', 'changed', 'trip']);
 
 /**
  * Whether any text alert is on for this kind of account, so a screen can stop
@@ -98,6 +96,8 @@ export function AlertsView() {
   const KINDS = KINDS_FOR[who];
   /** The account's one yes/no for texts (`notification_preferences`), which every sent kind shares. */
   const [consent, setConsent] = useState(false);
+  /** The four alert switches, each its own yes (D-478). */
+  const [alerts, setAlerts] = useState<AlertFlags>({ message: false, booked: false, changed: false, trip: false });
   const [saved, setSaved] = useState(false);
   const [failed, setFailed] = useState(false);
   /** They replied STOP (D-453): the switches are off and cannot be turned on from here. */
@@ -113,6 +113,7 @@ export function AlertsView() {
       if (cancelled) return;
       setStopped(status.stopped);
       setConsent(status.consent === true);
+      setAlerts(status.alerts);
     })();
     return () => {
       cancelled = true;
@@ -123,12 +124,32 @@ export function AlertsView() {
     if (!LIVE.has(kind) || !userId || stopped) return;
     setSaved(false);
     setFailed(false);
+    if (ALERT_KINDS.has(kind)) {
+      const key = kind as AlertKind;
+      const before = alerts;
+      setAlerts({ ...alerts, [key]: on });
+      if (on) setConsent(true);
+      const ok = await setTextAlert(userId, key, on, before, who !== 'member');
+      setFailed(!ok);
+      setSaved(ok);
+      if (!ok) {
+        setAlerts(before);
+        setConsent(consent);
+      } else if (!on && who !== 'member' && !Object.entries({ ...before, [key]: false }).some(([, v]) => v)) {
+        setConsent(false);
+      }
+      return;
+    }
     setConsent(on);
     const ok = await setReminderConsent(userId, on);
     setFailed(!ok);
     setSaved(ok);
     if (!ok) setConsent(!on);
   };
+
+  /** A switch shows on only while the account says yes to texts and it has not been stopped. */
+  const isOn = (kind: Kind) =>
+    !stopped && consent && (ALERT_KINDS.has(kind) ? alerts[kind as AlertKind] : kind === 'closed');
 
   return (
     <SubPage title={t('alerts.title')} backHref="/profile/" backLabel={t('nav.back.profile')} actions={<HelpButton />}>
@@ -166,7 +187,7 @@ export function AlertsView() {
               <Switch
                 label={t(`alerts.${kind}`)}
                 isLabelHidden
-                value={live && !stopped && consent}
+                value={live && isOn(kind)}
                 changeAction={(on) => change(kind, on)}
                 isDisabled={!userId || !live || stopped}
               />
