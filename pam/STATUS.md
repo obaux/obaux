@@ -1077,6 +1077,13 @@ drops signatures), then `20261010042108_a_program_lead_submits_their_own_program
 
 ---
 
+## Messages & notifications · texts held until the day (10 October 2026) — merged 10 October
+
+Merged to `main` by the merge desk, 10 October, from `claude/messages-alert-texts-wired` (0a011ee). Migration `20261010141859_…` (**applied live at merge**, before the night's deploy, recorded as 20261010142604; read back: body identical to the file, service role only, `texts_live` reads off):
+`app_settings.texts_live` ('off'); until it is 'on' the claim hands the dispatcher account texts only (sign-in code,
+request decisions, "parts of Pam are off", invitations), and every reminder and alert stays scheduled. Opened by the
+merge desk on the day Will says go, with `ALERT_TEXTS_LIVE` and reply-start (runbook, `docs/sms-setup.md`). DB test 44 (numbered 43 on its branch; Piper's resend test took 43 first). D-481.
+
 ## Messages & notifications · the approved text alerts are wired (10 October 2026) — merged 10 October
 
 Merged to `main` by the merge desk, 10 October, from `claude/messages-alert-texts-wired` (2d27149). One migration

@@ -2,6 +2,11 @@
 
 ## Go-live runbook: the day-before reminder (D-473)
 
+**Nothing but account texts can leave Pam until `texts_live` is on (D-481).** The sign-in code, a decision on a staff
+request, the notice that parts of Pam are off and the two invitations go as they always have. Every reminder and
+every alert stays scheduled in the database until `app_settings.texts_live` is `'on'` — whatever anyone has
+switched on in the app, and whatever the app's own flags say. Only the merge desk sets it, on the day Will says go.
+
 Pam's north star is the text that reminds a person the day before a visit. This is the
 order for the day Will finishes the Twilio filing and says go. It is tested: the database
 half is `packages/db/test/36_day_before_reminder_rehearsal_test.sql`, and the dispatcher
@@ -38,7 +43,8 @@ reminders, the check-in and "connect" texts.
    slash.** Longer, and a Russian or Arabic reminder no longer fits its two segments, so it is
    sent in English instead. (Russian has 11 characters to spare today; Arabic 12; the Latin
    languages 18; Chinese 28 to 30.)
-6. Nothing queued by mistake: `select count(*) from outbound_messages where status = 'scheduled' and template_key = 'appointment_24h';` is only real members' trips.
+6. `select value from app_settings where key = 'texts_live';` is `off`, and stays off until step 7 of the day.
+7. Nothing queued by mistake: `select count(*) from outbound_messages where status = 'scheduled' and template_key = 'appointment_24h';` is only real members' trips.
 
 ### The day
 
@@ -50,7 +56,7 @@ reminders, the check-in and "connect" texts.
 | 4 | Will | Plan a test visit that starts **exactly one day and ten minutes from now**, at a time between 7:00 am and 9:00 pm. Its reminder is then due ten minutes from now. |
 | 5 | Will | Within about fifteen minutes his phone gets one text starting "Pam:" with the time, the street and a link. Open the link: it lands on Trips. |
 | 6 | Merge desk | Confirm (below). Then cancel the test visit in the app: its reminder, if still waiting, is cancelled with it. |
-| 7 | Merge desk | In one change: merge `claude/messages-reply-start` (§3 step 8) **and** set `ALERT_TEXTS_LIVE = true` in `apps/web/src/lib/alertTextsLive.ts` (with the site's and app's `VISIT_REMINDERS_LIVE`, `docs/before-launch.md` › *Visit reminders go live*), then deploy. That is what opens it: members who tick the box get reminders, and a case manager or program lead can turn on a Text alert. Until `ALERT_TEXTS_LIVE` is flipped the four alert switches say "Coming soon" and nothing writes them, so no alert text can be switched on before this day. |
+| 7 | Merge desk | **Set `texts_live` to `'on'`** (`update app_settings set value = 'on' where key = 'texts_live';`; the migration ships it `'off'`) and, in one change: merge `claude/messages-reply-start` (§3 step 8) **and** set `ALERT_TEXTS_LIVE = true` in `apps/web/src/lib/alertTextsLive.ts` (with the site's and app's `VISIT_REMINDERS_LIVE`, `docs/before-launch.md` › *Visit reminders go live*), then deploy. That is what opens it: members who tick the box get reminders, and a case manager or program lead can turn on a Text alert. Until `ALERT_TEXTS_LIVE` is flipped the four alert switches say "Coming soon" and nothing writes them, so no alert text can be switched on before this day. Held reminders that are by then stale are cancelled by the claim's 12-hour and visit-started rules, not sent. |
 
 ### Checking the first real reminder
 
@@ -77,7 +83,12 @@ Every day for the first week: `select status, count(*) from outbound_messages wh
 
 Pick the smallest that fits. None needs a deploy.
 
-1. **Stop every text now** (merge desk): `select cron.alter_job((select jobid from cron.job where jobname = 'dispatch-sms'), active := false);`
+0. **Hold every reminder and alert, the gentlest stop** (merge desk): `update app_settings set value = 'off' where key = 'texts_live';`
+   Within the next tick (five minutes) the dispatcher is handed account texts only; the sign-in code, request decisions and
+   invitations keep going, and every reminder and alert stays scheduled. Turn it back on with `'on'`. Nothing else
+   changes and the clock keeps running. Use this first; the steps below are for more than this.
+
+1. **Stop every text now, account texts too** (merge desk): `select cron.alter_job((select jobid from cron.job where jobname = 'dispatch-sms'), active := false);`
    Nothing is sent, nothing is lost: every message stays waiting. Turn it back on with `active := true`.
    (Verified on the live project, 10 October 2026: set inactive and read back, set active and read
    back, schedule unchanged at every five minutes.) Resuming after a pause is safe: the claim
