@@ -9,12 +9,15 @@
 
 export type Locale = 'en' | 'es' | 'pt-BR' | 'zh-CN' | 'zh-HK' | 'ru' | 'ar';
 export type StaffRole = 'provider' | 'admin';
+/** The expired-link email also goes to a member who was invited (their invite expired too). */
+export type InviteRole = StaffRole | 'member';
 
 export interface Copy {
   subject: string;
   preheader: string;
   title: string;
-  body: Record<StaffRole, string>;
+  /** The staff first-invite wording has no member body (members are never emailed first); the expired-link one has all three. */
+  body: Partial<Record<InviteRole, string>>;
   button: string;
   fallback: string;
   footer: string;
@@ -22,15 +25,17 @@ export interface Copy {
 }
 
 export interface Bundle {
-  /** Each language's wording and who signed it. Empty `reviewedBy`: that language is not sent. */
+  /** The first email to a staff invite: each language's wording and who signed it. Empty `reviewedBy`: that language is not sent. */
   locales: Record<Locale, { reviewedBy: string; copy: Copy }>;
+  /** The email with a fresh link, for someone whose link ran out (D-263, signed by Will on 4 October). Same shape. */
+  linkLocales: Record<Locale, { reviewedBy: string; copy: Copy }>;
   fonts: Record<Locale, string>;
   rtl: Locale[];
 }
 
 export interface Input {
   link: string;
-  role: StaffRole;
+  role: InviteRole;
   inviterFirstName: string | null;
   locale: string;
   appUrl: string;
@@ -59,18 +64,39 @@ export function canSend(bundle: Bundle): boolean {
   return bundle.locales.en.reviewedBy.trim() !== '';
 }
 
+/** The same for the expired-link email. */
+export function canSendLink(bundle: Bundle): boolean {
+  return bundle.linkLocales.en.reviewedBy.trim() !== '';
+}
+
 const escape = (value: string) =>
   value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
 export function renderStaffInvite(bundle: Bundle, input: Input): Rendered {
-  if (!canSend(bundle)) throw new UnsendableError('the invite email has not been reviewed by a person yet');
+  return renderFrom(bundle, bundle.locales, 'the invite email', input);
+}
+
+/** The email with a fresh link, for somebody whose first one ran out. */
+export function renderFreshLink(bundle: Bundle, input: Input): Rendered {
+  return renderFrom(bundle, bundle.linkLocales, 'the new-link email', input);
+}
+
+function renderFrom(
+  bundle: Bundle,
+  locales: Bundle['locales'],
+  what: string,
+  input: Input,
+): Rendered {
+  if (locales.en.reviewedBy.trim() === '') throw new UnsendableError(`${what} has not been reviewed by a person yet`);
   const wanted = localeOf(input.locale);
-  const locale: Locale = bundle.locales[wanted].reviewedBy.trim() ? wanted : 'en';
-  const { copy } = bundle.locales[locale];
+  const locale: Locale = locales[wanted].reviewedBy.trim() ? wanted : 'en';
+  const { copy } = locales[locale];
   const dir = bundle.rtl.includes(locale) ? 'rtl' : 'ltr';
   const font = bundle.fonts[locale];
   const inviter = input.inviterFirstName?.trim() || copy.someone;
-  const body = copy.body[input.role].replace('{inviter}', inviter);
+  const wording = copy.body[input.role];
+  if (!wording) throw new UnsendableError(`${what} has no wording for a ${input.role}`);
+  const body = wording.replace('{inviter}', inviter);
   const link = escape(input.link);
   const logo = `${input.appUrl}/email/pam-logo.png`;
 

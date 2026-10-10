@@ -29,3 +29,10 @@ the case manager on record at the time. No text goes to a member when their own 
 ## Needs a human
 
 Nothing.
+
+## Addendum: held behind a flag
+
+The merge desk held the branch: the switches would have let staff turn on real texts before go-live.
+`ALERT_TEXTS_LIVE = false` in `apps/web/src/lib/alertTextsLive.ts`; held-state e2e tests pass, live-path tests
+pass with the flag temporarily true (18/18, twice) and are skipped while it is false; `alert-texts-live.test.ts`
+ties it to the site's `VISIT_REMINDERS_LIVE`; runbook step 7 flips it with reply-start.

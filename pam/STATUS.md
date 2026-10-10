@@ -1081,8 +1081,18 @@ drops signatures), then `20261010042108_a_program_lead_submits_their_own_program
 
 Branch `claude/messages-alert-texts-wired`. One migration (`20261010134429_…`, **not yet applied to the live
 project**): per-kind Text alerts switches, and triggers that queue the four approved texts (a message, a visit
-booked, moved/cancelled, planned) for people who switched them on. Screen: the four switches are live.
-DB test 42; `e2e/alerts.spec.ts`. D-478.
+booked, moved/cancelled, planned) for people who switched them on. **Held behind `ALERT_TEXTS_LIVE = false`
+(`apps/web/src/lib/alertTextsLive.ts`)**: the four switches say "Coming soon" and nothing writes `alert_*` until
+the day Will says go (flip it with `claude/messages-reply-start`; runbook, `docs/sms-setup.md`). DB test 42;
+`e2e/alerts.spec.ts`. D-478.
+
+## Messages & notifications · the expired-link email has a sender (10 October 2026) — merged 10 October
+
+Merged to `main` by the merge desk, 10 October, from `claude/messages-expired-link-email` (ca4f683). `send-invite-emails`
+now also sends the fresh link to someone whose link ran out, under the same `INVITE_EMAILS` switch and secrets, in
+Will's 4 October wording. One migration (`20261010133313_…`, **applied live at merge**, recorded as 20261010133956;
+read back: the three bodies identical to the file, service role only, `invite_emails` still forced RLS, 0 rows waiting);
+DB test 40 (numbered 39 on its branch; Piper's quiet-hours test took 39 first); sender tests. Still not deployed or switched on: that waits for Will's email setup. D-476.
 
 ## Messages & notifications · overdue texts are cancelled (10 October 2026) — merged 10 October
 
@@ -1101,7 +1111,7 @@ ids and leaves a sent text on a cancelled trip on purpose. Tests and a runbook, 
 runbook at the top of `docs/sms-setup.md`. Four gaps found and pinned as KNOWN GAP (evening visits reminded
 on their own day, texts turned on later queue nothing for planned trips, place names cut mid-word, an
 overdue reminder not dropped), all four since fixed: 1 to 3 by Piper's `20261010130831`, 4 by Nico's
-`20261010130754` (KNOWN GAP 1b, quiet hours changed after planning, stays pinned). Cancel and move work. D-473.
+`20261010130754` (and 1b, quiet hours changed after planning, by Piper's `20261010133227`). Cancel and move work. D-473.
 
 ## Messages & notifications · legacy Messages page removed (10 October 2026)
 
@@ -1196,6 +1206,10 @@ Merged to `main` by the merge desk, 10 October, from `claude/places-programs-cal
 ## Places & programs · the day-before reminder gaps (10 October 2026) — merged 10 October
 
 Merged to `main` by the merge desk, 10 October, from `claude/places-programs-reminder-gaps`. Migration `20261010130831`, expand only: evening visits are texted on the day before (five minutes before the member's quiet hours begin, the merge desk's rule), texts turned on later queue the reminders for future trips, and the place name and street are passed whole (the renderer cuts at a word). **Applied live at merge** (recorded as 20261010131522), read back: all five bodies identical to the file, service role only, both triggers in place. Test `37_day_before_reminder_gaps_test.sql`; Nico's test 36 had its gap 1, 2 and 3 checks flipped at merge. Still open, both pinned or noted: quiet hours changed *after* planning do not re-time a reminder until the trip changes (KNOWN GAP 1b in test 36); and the dispatcher's `in_quiet_hours` (0039) reads New York time, so for a trip in another time zone it can hold a text this trigger placed just before quiet hours. Fine for the Philadelphia pilot; fix before a second city.
+
+## Places & programs · quiet hours re-time queued reminders (10 October 2026) — merged 10 October
+
+Merged to `main` by the merge desk, 10 October, from `claude/places-programs-quiet-hours-retime`. Migration `20261010133227`, expand only: changing quiet hours re-runs `queue_trip_reminder` for every future trip (consent still checked inside). **Applied live at merge** (recorded as 20261010133736), read back: body identical to the file, service role only, the trigger beside the turn-on one. Test `39_quiet_hours_change_retimes_texts_test.sql`; test 36's gap 1b flipped, so every gap the rehearsal found is closed. A story "Trips with a past visit" (for Wren's "Planning a visit").
 
 ## Places & programs · review record, pending change, program services — the database half (10 October 2026)
 

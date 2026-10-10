@@ -29,3 +29,13 @@ nothing; a message text is not repeated inside 30 minutes of the last one going.
 12-hour lateness rule for message texts (D-475). The three visit texts are still useful late.
 
 **Reverse** by dropping the three triggers; the columns are harmless.
+
+**Held until the day (the merge desk, 10 October, later the same day).** The switches are the only way to
+turn an alert on, and the dispatcher runs every five minutes, so once they were live in the app a case
+manager or program lead could have been texted before Will said go and before the carrier registration is
+approved. `ALERT_TEXTS_LIVE = false` (`apps/web/src/lib/alertTextsLive.ts`) keeps the four switches at "Coming
+soon" (exactly the words already there) and nothing in the app writes `alert_*`; the database side stays live
+and harmless, every switch off. It is flipped in the same change as `claude/messages-reply-start`
+(runbook, "The day", step 7). `alert-texts-live.test.ts` fails if it is `true` while `VISIT_REMINDERS_LIVE`
+(the site's flag, from the promise sweep) is not. The live-path e2e tests are skipped while it is `false` and
+run the day it is flipped (checked both ways before this commit).

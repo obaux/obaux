@@ -25,7 +25,7 @@ function onRoute(
   name: string,
   pathname: string,
   query: Record<string, string>,
-  options: { readonly savedTrip?: boolean } = {},
+  options: { readonly savedTrip?: boolean; readonly pastTrip?: boolean } = {},
 ): Story {
   const route = REDESIGN_ROUTES[pathname];
   if (!route) throw new Error(`No prototype route for ${pathname} — add it to src/stories/prototype/routes.tsx`);
@@ -39,6 +39,13 @@ export const PlanToARealPlace: Story = onRoute('Plan a visit to a place in the c
   address: SAVED_PLACE.address,
 });
 export const OneTripSaved: Story = onRoute('One trip already saved', '/trips/', {}, { savedTrip: true });
+// A visit whose day has gone moves down to "Past visits" (Wren's help post shows this).
+export const TripsWithAPastVisit: Story = onRoute(
+  'Trips with a past visit',
+  '/trips/',
+  {},
+  { savedTrip: true, pastTrip: true },
+);
 export const MoveASavedTrip: Story = onRoute(
   'Change the time of a saved trip',
   '/trips/new/',

@@ -1,6 +1,7 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { settled } from './settled';
+import { ALERT_TEXTS_LIVE } from '../src/lib/alertTextsLive';
 
 /**
  * Text alerts, one switch per kind (D-256, D-478). Each switch is its own yes,
@@ -52,7 +53,35 @@ async function signedInAs(page: import('@playwright/test').Page, role: 'provider
   return writes;
 }
 
+test.describe('Text alerts, held until the day (D-478)', () => {
+  test.skip(ALERT_TEXTS_LIVE, 'the alerts are live: the held-state checks do not apply');
+
+  test('while held, each of the four switches says "Coming soon", cannot be turned on, and writes nothing', async ({ page }) => {
+    const writes = await signedInAs(page, 'provider', null);
+    await page.goto('/alerts/');
+    await settled(page);
+    for (const name of ['Someone books a visit', 'Someone changes a booking', 'Someone messages you']) {
+      const toggle = page.getByRole('switch', { name });
+      await expect(toggle).not.toBeChecked();
+      await expect(toggle).toBeDisabled();
+    }
+    await expect(page.getByText('Coming soon. Pam does not send this text yet.')).toHaveCount(3);
+    expect(writes).toHaveLength(0);
+  });
+
+  test('...even for a case manager and a member', async ({ page }) => {
+    const writes = await signedInAs(page, 'admin', null);
+    await page.goto('/alerts/');
+    await settled(page);
+    await expect(page.getByRole('switch', { name: 'Someone plans a trip' })).toBeDisabled();
+    await expect(page.getByRole('switch', { name: 'Someone messages you' })).toBeDisabled();
+    expect(writes).toHaveLength(0);
+  });
+});
+
 test.describe('Text alerts', () => {
+  test.skip(!ALERT_TEXTS_LIVE, 'held until the day: ALERT_TEXTS_LIVE is false (apps/web/src/lib/alertTextsLive.ts)');
+
   test('a program turns on "someone books a visit": that switch, and the yes to texts', async ({ page }) => {
     const writes = await signedInAs(page, 'provider', null);
     await page.goto('/alerts/');
@@ -63,7 +92,7 @@ test.describe('Text alerts', () => {
     await expect(page.getByRole('switch', { name: 'Someone changes a booking' })).not.toBeChecked();
     await booked.click();
     await expect(booked).toBeChecked();
-    expect(writes).toHaveLength(1);
+    await expect.poll(() => writes.length).toBe(1);
     expect(writes[0]).toMatchObject({ member_id: ME, alert_booked: true, sms_enabled: true });
     // The other switches are untouched: each is its own yes.
     expect(writes[0]).not.toHaveProperty('alert_changed');
@@ -81,6 +110,7 @@ test.describe('Text alerts', () => {
     await expect(booked).toBeChecked();
     await booked.click();
     await expect(booked).not.toBeChecked();
+    await expect.poll(() => writes.length).toBe(1);
     expect(writes[0]).toMatchObject({ alert_booked: false, sms_enabled: false });
   });
 
@@ -89,6 +119,7 @@ test.describe('Text alerts', () => {
     await page.goto('/alerts/');
     await settled(page);
     await page.getByRole('switch', { name: 'Someone books a visit' }).click();
+    await expect.poll(() => writes.length).toBe(1);
     expect(writes[0]).toMatchObject({ alert_booked: false });
     expect(writes[0]).not.toHaveProperty('sms_enabled');
   });
@@ -100,6 +131,7 @@ test.describe('Text alerts', () => {
     const message = page.getByRole('switch', { name: 'Someone messages you' });
     await expect(message).toBeChecked();
     await message.click();
+    await expect.poll(() => writes.length).toBe(1);
     expect(writes[0]).toMatchObject({ alert_message: false });
     expect(writes[0]).not.toHaveProperty('sms_enabled');
   });

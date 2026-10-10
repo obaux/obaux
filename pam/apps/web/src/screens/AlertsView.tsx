@@ -12,6 +12,7 @@ import { SubPage } from '@pam/ui/SubPage';
 import { useI18n } from '@/lib/i18n';
 import { useSession } from '@/lib/useSession';
 import { useSupportPhone } from '@/lib/useSupportPhone';
+import { ALERT_TEXTS_LIVE } from '@/lib/alertTextsLive';
 import { setReminderConsent, setTextAlert, type AlertFlags, type AlertKind } from '@/lib/useReminderConsent';
 import { HelpButton } from './HelpButton';
 import { TermInfo } from './TermInfo';
@@ -59,10 +60,13 @@ const TERM_FOR: Partial<Record<Kind, GlossaryTerm>> = { trip: 'trip' };
  * The kinds Pam really sends a text for today (Will, 10 October 2026: "keep the
  * promise" — build them, and until they are built, do not offer them). A saved
  * place closing or moving (0035–0037), and the four alerts that say something
- * happened (D-478). A visit reminder for a member has its own screen; someone
+ * happened (D-478), the latter only once `ALERT_TEXTS_LIVE` is flipped on the day Will says go
+ * (`lib/alertTextsLive.ts`); until then they say "coming soon" and nothing is written. A visit reminder for a member has its own screen; someone
  * wanting to connect has no text yet, so those two say "coming soon".
  */
-const LIVE: ReadonlySet<Kind> = new Set<Kind>(['closed', 'message', 'booked', 'changed', 'trip']);
+const LIVE: ReadonlySet<Kind> = new Set<Kind>(
+  ALERT_TEXTS_LIVE ? ['closed', 'message', 'booked', 'changed', 'trip'] : ['closed'],
+);
 
 /** The kinds with a switch of their own (`alert_*`). */
 const ALERT_KINDS: ReadonlySet<Kind> = new Set<Kind>(['message', 'booked', 'changed', 'trip']);
