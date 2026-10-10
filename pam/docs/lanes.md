@@ -153,15 +153,19 @@ migration that needs one puts it alone so the rest can be applied without it.
 
 ## Where the sessions stand (a snapshot — the merge desk keeps it)
 
-As of 10 October 2026. Sessions are listed in Claude's session list by the title
-in the second column; the third is the title they would have under this system.
+As of 10 October 2026, after Will renamed and tagged them (tag `pam-lane:<lane>` on each
+session). The title is what the session list shows.
 
-| Session today | Branch | Lane | Would be titled |
+| Session title | Branch | Lane | State |
 |---|---|---|---|
-| PAM Agent 1 | `claude/pam-storybook` (old) | Merge desk & platform | PAM · Merge desk |
-| PAM Agent 2 | `main` (idle since 8 October) | Merge desk & platform | retire — its work moved to Agent 1 |
-| Fix two contradictory promises in PAM's English copy | `claude/affectionate-goldberg-tvu4sz` | Accounts & invites (+ this tooling, which is platform) | PAM · Accounts & invites · staff email, audit log |
-| Pam: Assign a case manager; limit or pause a member | `claude/pam-assign-and-limit` (held) | Accounts & invites | PAM · Accounts & invites · assign and limit — starts after the session above has merged |
-| Restore missing Spanish accents in Pam es.json | `claude/gallant-clarke-0dhizj` | Languages & legal, and Places & programs (the place profile and maps drawer) | PAM · Languages · seven languages; the place work is a second job |
-| Isolate interpolated values in Arabic strings | `claude/amazing-archimedes-qvgnt2` | Languages & legal | PAM · Languages · Arabic |
-| PAM public website | `claude/compassionate-bohr-mzrchf` | Public website | PAM · Website |
+| PAM · Merge desk (Agent 1) | `claude/pam-storybook` (old) | Merge desk & platform | idle; merges and applies migrations in Will's order |
+| PAM · Accounts & invites · staff email, audit log, branch system | `claude/affectionate-goldberg-tvu4sz` | Accounts & invites | 0086, the audit-log retention and this system are on `main`; D-445 (points history) is built, waiting for Will's word to apply |
+| PAM · Accounts & invites · assign and limit | `claude/pam-assign-and-limit` (held) | Accounts & invites | waits for Will's go; starts from today's `main` |
+| PAM · Languages · seven languages (place profile work to move) | `claude/gallant-clarke-0dhizj` | Languages & legal (and, for now, Places & programs) | running; the place profile and maps drawer (D-439, D-440) move to Places & programs after it merges |
+| PAM · Languages · Arabic | `claude/amazing-archimedes-qvgnt2` | Languages & legal | idle; D-435 unmerged |
+| PAM · Website | `claude/compassionate-bohr-mzrchf` | Public website | waiting for Will: should `main` contain the site? |
+| PAM · Messages & notifications | — | Messages & notifications | new 10 October, onboarded, no job yet |
+| PAM · Places & programs | — | Places & programs | new 10 October, onboarded, no job yet |
+| PAM · Design system & Storybook | — | Design system & Storybook | new 10 October, onboarded, no job yet |
+
+PAM Agent 2 (idle since 8 October) is not part of this: its work moved to Agent 1.
