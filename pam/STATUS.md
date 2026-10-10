@@ -1204,8 +1204,7 @@ live until Will signs the English**: `apps/site/src/content/signed-off.json` is 
 and the home section are not built (a normal build has neither; CI also builds with
 `PAM_SITE_DRAFTS=1` and runs axe on all seven). The other six are drafts with no native reader (D-461).
 Storybook › Website › Journey: **About Pam** per language (Draft banner) and **Home with About Pam**.
-Reminder texts are plainly "coming". The home card "Pam reminds you before you go so nothing gets
-missed" still promises reminders that are not live: flagged, not changed.
+Reminder texts are plainly "coming"; the home card "Keep going" now says the same and reads `VISIT_REMINDERS_LIVE` (`content/flags.ts`, 10 October).
 
 ## Seven languages, messages in your own language, and text that fits (9 October) — 0.50.1 and 0.51.0, merged 9 October (PR #29)
 
