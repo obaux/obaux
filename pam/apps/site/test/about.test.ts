@@ -45,9 +45,9 @@ describe('About Pam, in seven languages', () => {
   });
 
   it('says reminder texts are coming, not here, in every language', () => {
-    // The one thing the post must not promise as live (TextsFromPam.tsx: VISIT_REMINDERS_LIVE).
+    // The one thing the post must not promise as live (content/flags.ts: VISIT_REMINDERS_LIVE).
     expect(ABOUT.en.coming).toMatch(/does not send them yet/);
-    const post = readFileSync(join(__dirname, '..', 'src', 'content', 'TextsFromPam.tsx'), 'utf8');
+    const post = readFileSync(join(__dirname, '..', 'src', 'content', 'flags.ts'), 'utf8');
     expect(post).toMatch(/VISIT_REMINDERS_LIVE = false/);
   });
 
@@ -69,5 +69,14 @@ describe('About Pam, in seven languages', () => {
     // Today: Will has not signed the English, so nothing is live.
     expect(SIGNED_OFF).toEqual([]);
     expect(ABOUT_ON_HOME).toBe(false);
+  });
+});
+
+describe('the home page card about reminders', () => {
+  it('promises no reminder text while the switch is off, and reads the switch', () => {
+    const home = readFileSync(join(__dirname, '..', 'src', 'screens', 'HomeScreen.tsx'), 'utf8');
+    expect(home).toContain('VISIT_REMINDERS_LIVE');
+    expect(home).not.toContain('Pam reminds you before you go, so nothing gets missed');
+    expect(home).toContain('Texts that remind you are coming.');
   });
 });
