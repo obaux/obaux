@@ -967,7 +967,7 @@ fine and the fit audit was over-counting (D-448).
   defects, all `spill`; no `cut`, `overlap` or `ellipsis` went. Five defects were looked at and accepted in
   `scripts/fit-known.json`, each with its reason.
 - **How to read the audit's numbers:** the figure that matters is defects **not in the known list**
-  (8 on `d4f325e`; 0 on the stories this branch changed; the full run against the known list was still going when this was written). The raw count the script prints is a different measure.
+  (8 on `d4f325e`, 0 on this branch: the full run, 464 stories × 7 languages, found 26 new in a language and all 26 are in the known list). The raw count the script prints is a different measure.
 - Outside this lane, seen and left: some English file names in the attachment lists are cut at the
   timestamp column with no ellipsis ("Free resume worksl").
 
