@@ -502,5 +502,41 @@
   {
     "key": "zh-HK|ellipsis|case-manager-screens--conversation-files|ID office letter.pdf",
     "reason": "Looked at 10 October 2026 at 320px with screenshots. The file name reads in full in the screenshot, although the name's ellipsis box measures 4px narrower than its text (148 > 144); no letter is lost. Worth another look if the row's layout changes."
+  },
+  {
+    "key": "es|cut|member-created-states-saved-trips--one-trip-saved|Faltan firmas",
+    "reason": "The Trips drawer scrolls and fades out at its foot; a card below the first sits under that fade, so the detector sees its text partly hidden (partial=true). It is reached by scrolling and nothing is lost. Looked at 10 October 2026 at 320px with a screenshot (the saved-trip card is the second one, below the first)."
+  },
+  {
+    "key": "pt-BR|cut|member-created-states-saved-trips--one-trip-saved|terça-feira, 13 de out. · 12:00",
+    "reason": "The Trips drawer scrolls and fades out at its foot; a card below the first sits under that fade, so the detector sees its text partly hidden (partial=true). It is reached by scrolling and nothing is lost. Looked at 10 October 2026 at 320px with a screenshot (the saved-trip card is the second one, below the first)."
+  },
+  {
+    "key": "ru|cut|member-created-states-saved-trips--one-trip-saved|вторник, 13 окт. · 12:00",
+    "reason": "The Trips drawer scrolls and fades out at its foot; a card below the first sits under that fade, so the detector sees its text partly hidden (partial=true). It is reached by scrolling and nothing is lost. Looked at 10 October 2026 at 320px with a screenshot (the saved-trip card is the second one, below the first)."
+  },
+  {
+    "key": "pseudo|cut|member-created-states-saved-trips--one-trip-saved|Tuesday, Oct 13 · 12:00 PM",
+    "reason": "The Trips drawer scrolls and fades out at its foot; a card below the first sits under that fade, so the detector sees its text partly hidden (partial=true). It is reached by scrolling and nothing is lost. The same card and fade as the es, pt-BR and ru entries for this story; added at the merge, 10 October 2026."
+  },
+  {
+    "key": "pseudo|cut|member-created-states-saved-trips--one-trip-saved|⟦Þŕóóóƒííļéé⟧",
+    "reason": "The fifth tab's label. Five one-word labels share a 320px bar and a tab does not shrink below its longest word, so the pseudo-language (English +45% with padding, longer than any real language) runs past the edge. All seven real languages fit (Russian, the tightest, fills the bar edge to edge). Tested and not shipped: tabs sized by content (flex 1 1 auto, min-width 0, wrapping) fit every language and wrap the pseudo-language, but move the English tabs a few pixels; the bar is Will's design, so it is his call (docs/before-launch.md). Looked at 9 October 2026 at 320px with screenshots."
+  },
+  {
+    "key": "ru|overlap|member-created-states-blocking--conversation-blocked-by-me|Кейс-менеджер ⟷ Документ Google",
+    "reason": "The thread scrolls under its opaque header; text that has scrolled up behind the header's title is measured against it. Nothing overlaps on screen. The same as the limited-account conversation entries; added at the merge of Block, 10 October 2026, after a look at 320px in Russian and the pseudo-language with screenshots."
+  },
+  {
+    "key": "ru|overlap|member-created-states-blocking--conversation-blocked-me|Кейс-менеджер ⟷ Документ Google",
+    "reason": "The thread scrolls under its opaque header; text that has scrolled up behind the header's title is measured against it. Nothing overlaps on screen. The same as the limited-account conversation entries; added at the merge of Block, 10 October 2026, after a look at 320px in Russian and the pseudo-language with screenshots."
+  },
+  {
+    "key": "pseudo|overlap|member-created-states-blocking--conversation-blocked-by-me|⟦Çáášéé ɱáááñááĝééŕ⟧ ⟷ ⟦Ĝóóóóĝļéé Ðóóóç⟧",
+    "reason": "The thread scrolls under its opaque header; text that has scrolled up behind the header's title is measured against it. Nothing overlaps on screen. The same as the limited-account conversation entries; added at the merge of Block, 10 October 2026, after a look at 320px in Russian and the pseudo-language with screenshots."
+  },
+  {
+    "key": "pseudo|overlap|member-created-states-blocking--conversation-blocked-me|⟦Çáášéé ɱáááñááĝééŕ⟧ ⟷ ⟦Óþééééñš íñ Ĝóóóóĝļéé⟧",
+    "reason": "The thread scrolls under its opaque header; text that has scrolled up behind the header's title is measured against it. Nothing overlaps on screen. The same as the limited-account conversation entries; added at the merge of Block, 10 October 2026, after a look at 320px in Russian and the pseudo-language with screenshots."
   }
 ]

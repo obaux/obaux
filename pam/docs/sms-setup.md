@@ -213,3 +213,42 @@ answers `Unsupported phone provider` — Twilio is paid for and working on your
 side, but **Supabase has not been pointed at it yet**. That is the single
 setting in step 1 above, and it is the one thing standing between the app and
 its first real user. No text was sent by that check and nothing was charged.
+
+## 3. Replies — STOP and START (the `sms-inbound` function, D-460)
+
+Twilio already stops texting a number that replied STOP, and its Advanced Opt-Out
+answers STOP and HELP itself. What Pam never did was **learn** it, so the app
+could not say "Texts are off" and a START could not bring texts back. The
+`sms-inbound` function is the address Twilio tells when somebody replies; it
+records a STOP or a START against the person with that number and answers with
+nothing (so nobody gets two replies). It is off until switched on.
+
+What the merge desk does:
+
+1. Apply migration `20261010081342_a_stop_or_start_reply_is_recorded_by_the_number`
+   (`list_migrations` first, `get_advisors` after).
+2. `supabase functions deploy sms-inbound --no-verify-jwt` — no JWT, because
+   Twilio sends no Supabase login; the signature is the check.
+3. Secrets on the function: `TWILIO_AUTH_TOKEN` (the dispatcher already has it),
+   `SMS_INBOUND_URL` (exactly the address from step 4, nothing added or removed:
+   the signature covers it), and last, `SMS_INBOUND=on`.
+
+What Will does in the Twilio console:
+
+4. Messaging → Services → the Pam service → **Integration** → *Incoming messages*:
+   "Send a webhook", method **POST**, the request URL
+   `https://<project>.supabase.co/functions/v1/sms-inbound`. Leave **Advanced
+   Opt-Out** on with its default keywords and the confirmation and HELP messages
+   the campaign registered (`docs/sms-campaign-samples.md`).
+5. Reply STOP to a text from Pam on his own phone; check that his Text reminders
+   screen says "Texts are off" and that the audit log has an `sms.stop` row naming
+   his profile (not his number). Reply START to turn it round.
+
+What it does **not** do yet: answer YES or NO to "did you make it". YES is also
+Twilio's own opt-in keyword, so that job starts with changing the opt-in keywords
+in Twilio; the check-in is not sent until then anyway.
+
+When it is on, one sentence on Text reminders and Text alerts becomes true and
+should be added in the same release: "To get texts again, reply START to a text
+from Pam." (`reminders.stopped.body`.) It is not there yet because it would be
+false while the function is off.
