@@ -15,7 +15,7 @@ import type { Category } from './categories.js';
 export type PointsReason =
   | 'save_place'
   | 'call_service'
-  | 'self_reported_signup'
+  | 'plan_trip'
   | 'enrollment_approved'
   | 'attend_appointment_verified'
   | 'attend_appointment_sms'
@@ -54,11 +54,12 @@ export const POINTS_RULES: Readonly<Record<PointsReason, PointsRule>> = {
     dailyCap: null,
     note: 'Logged on tel: tap. We cannot verify the call connected.',
   },
-  self_reported_signup: {
-    reason: 'self_reported_signup',
+  plan_trip: {
+    reason: 'plan_trip',
     points: 25,
     verification: 'honor_system',
     dailyCap: 3,
+    note: 'Paid inside book_trip, once per place ever, any place. Cancelling takes nothing back.',
   },
   enrollment_approved: {
     reason: 'enrollment_approved',
@@ -124,11 +125,11 @@ export const POINTS_RULES: Readonly<Record<PointsReason, PointsRule>> = {
 
 /**
  * What the database actually awards today (docs/points-awarding.md, "The
- * rules"): save a place (0045) and finish setup (0047). The Points screen lists
+ * rules"): save a place (0045), finish setup (0047) and plan a trip (20261010115117). The Points screen lists
  * only these under "Ways to earn" so it promises nothing Pam does not pay. When
  * a rule's trigger ships, add its reason here in the same change.
  */
-export const AWARDED_TODAY: readonly PointsReason[] = ['save_place', 'finish_setup'];
+export const AWARDED_TODAY: readonly PointsReason[] = ['save_place', 'finish_setup', 'plan_trip'];
 
 export function isAwardedToday(reason: PointsReason): boolean {
   return AWARDED_TODAY.includes(reason);

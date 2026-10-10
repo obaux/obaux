@@ -1136,6 +1136,10 @@ YES/NO replies are not built. D-460.
 
 Merged to `main` by the merge desk, 10 October, from `claude/places-programs-reported-places` (dca16c6). A page at `/places/reported/` for admins and case managers, linked from the profile and the reported-place bell row. Only a super admin can keep or remove; case managers read. No database change. Shared files touched: `ProfileView.tsx`, `app/notifications/page.tsx`, `ReportedPlaces.tsx` (buttons only when allowed). Figma flow map not republished.
 
+## Places & programs · planning a trip earns points (10 October 2026) — merged 10 October
+
+Merged to `main` by the merge desk, 10 October, from `claude/places-programs-trip-points` (D-468). Migration `20261010115117` replaces `book_trip` (same signature): 25 points once per place ever, three a day, members only. Expand only; **applied live at merge**, read back (body identical to the file, grants unchanged). Test `32_plan_a_trip_points_test.sql`. The Points screen lists it as "Plan a trip to a place". Next: `program_service_id` (contract), then `log_call`.
+
 ## Places & programs · the Points promise (10 October 2026) — merged 10 October
 
 Merged to `main` by the merge desk, 10 October, from `claude/places-programs-points-promise` (4bf85c2). "Ways to earn" lists only what Pam pays today (save a place +5, finish setup +25), driven by `AWARDED_TODAY`. The proposal for making plan-a-trip and call-a-place real is in `docs/points-awarding.md`, waiting on Will. No migration.
