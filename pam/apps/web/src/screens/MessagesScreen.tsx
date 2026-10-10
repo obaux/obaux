@@ -19,6 +19,7 @@ import { LimitedNotice } from '../app/messages/LimitedNotice';
 import type { PickablePerson } from '../app/messages/NewMessagePicker';
 import { useMessageableMembers } from '@/lib/useMessageableMembers';
 import { openConversation } from '@/lib/openConversation';
+import { readAccountLimited } from '@/lib/accountLimited';
 import { HeaderActions } from './HeaderActions';
 import { FloatingAction } from '@pam/ui/FloatingAction';
 import { ConnectionsIcon } from '@pam/ui';
@@ -39,7 +40,9 @@ export function MessagesScreen() {
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
   // A limited account reads but cannot start a message (0031): no New message,
   // and the screen says what is off and who to call (terms.s.limits.p3, D-427).
-  const limited = session.status === 'signed-in' && session.session.accessStatus === 'limited';
+  // ...or found out part-way through: starting a conversation was refused (`pick`).
+  const [limitedNow, setLimitedNow] = useState(false);
+  const limited = limitedNow || (session.status === 'signed-in' && session.session.accessStatus === 'limited');
   const { viewedRole } = useRoleView(trueRole);
   // The super admin may message staff, to help them start (0072, D-262).
   const canMessage =
@@ -70,7 +73,13 @@ export function MessagesScreen() {
     async (id: string): Promise<string | null> => {
       if (useExamplePeople) return pickerExamples?.hrefFor(id) ?? null;
       const conversationId = await openConversation(id);
-      return conversationId ? `/messages/thread/?id=${encodeURIComponent(conversationId)}` : null;
+      if (conversationId) return `/messages/thread/?id=${encodeURIComponent(conversationId)}`;
+      // Refused because the account is limited: say so, not "Your connection dropped" (D-429).
+      if (await readAccountLimited()) {
+        setLimitedNow(true);
+        setPicking(false);
+      }
+      return null;
     },
     [useExamplePeople, pickerExamples],
   );
