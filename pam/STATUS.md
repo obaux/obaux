@@ -993,9 +993,19 @@ Broad St, North Philadelphia` drew `… St, North Philadelphia 1231 بالقرب
   `fit-known.json` and the old `ar|spill` entry is gone; `areachip--arabic` needs none
   (its ellipsis is the story's own in every column).
 
+## Messages & notifications · alert texts, STOP, promises (10 October 2026)
+
+Merged to `main` by the merge desk, 10 October. Two migrations, **both applied to the live project
+10 October** and read back: `20261010071947_…` (a stored STOP
+cannot be cleared from the app: a person could clear their own at the API) and `20261010072848_…`
+(the claim texts a reminder only to somebody who agreed). Text alerts offers switches only for what
+is sent; the four alert texts are drafts, unsigned. A STOP shows as "Texts are off". Nothing records
+a STOP yet (no Twilio receiver) and nothing queues the appointment reminders, the check-in or
+"someone wants to connect". Samples file: nine texts. D-453.
+
 ## Design system & Storybook · language tag (10 October)
 
-Branch `claude/pam-design-language-tag`. Job from Will via Mira: a short English tag before a
+Merged to `main` by the merge desk (5dd52b8), 10 October. Job from Will via Mira: a short English tag before a
 language's own name, so a person can see which language a row is before they can read it (D-451).
 
 - **`@pam/ui`:** `MenuItem` takes `tag?`, `lang?`, `valueTag?`; a `ChoiceChips` option takes `tag?` and

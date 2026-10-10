@@ -432,6 +432,134 @@
       "reviewedBy": "Will (Oba), 13 September 2026",
       "isFirstContact": false
     },
+    "message_waiting": {
+      "key": "message_waiting",
+      "en": "Pam: You have a new message in Pam. Open it: {link}",
+      "es": "Pam: Tiene un mensaje nuevo en Pam. Abralo aqui: {link}",
+      "more": {
+        "pt-BR": {
+          "body": "Pam: Voce tem uma mensagem nova no Pam. Abra: {link}",
+          "reviewedBy": ""
+        },
+        "zh-CN": {
+          "body": "Pam: 您在 Pam 有新消息。打开：{link}",
+          "reviewedBy": ""
+        },
+        "zh-HK": {
+          "body": "Pam: 你在 Pam 有新訊息。打開：{link}",
+          "reviewedBy": ""
+        },
+        "ru": {
+          "body": "Pam: У вас новое сообщение: {link}",
+          "reviewedBy": ""
+        },
+        "ar": {
+          "body": "Pam: لديك رسالة جديدة: {link}",
+          "reviewedBy": ""
+        }
+      },
+      "vars": [
+        "link"
+      ],
+      "reviewedBy": "",
+      "isFirstContact": false
+    },
+    "visit_booked": {
+      "key": "visit_booked",
+      "en": "Pam: Someone booked a visit with your program. Open Pam to see it: {link}",
+      "es": "Pam: Alguien reservo una visita en su programa. Abra Pam para verla: {link}",
+      "more": {
+        "pt-BR": {
+          "body": "Pam: Alguem marcou uma visita no seu programa. Abra o Pam: {link}",
+          "reviewedBy": ""
+        },
+        "zh-CN": {
+          "body": "Pam: 有人预约了您的项目。打开：{link}",
+          "reviewedBy": ""
+        },
+        "zh-HK": {
+          "body": "Pam: 有人預約了你的計劃。打開：{link}",
+          "reviewedBy": ""
+        },
+        "ru": {
+          "body": "Pam: Новая запись: {link}",
+          "reviewedBy": ""
+        },
+        "ar": {
+          "body": "Pam: حجز جديد في برنامجك: {link}",
+          "reviewedBy": ""
+        }
+      },
+      "vars": [
+        "link"
+      ],
+      "reviewedBy": "",
+      "isFirstContact": false
+    },
+    "booking_changed": {
+      "key": "booking_changed",
+      "en": "Pam: A visit with your program was changed. Open Pam to see it: {link}",
+      "es": "Pam: Cambio una visita en su programa. Abra Pam para verla: {link}",
+      "more": {
+        "pt-BR": {
+          "body": "Pam: Uma visita no seu programa mudou. Abra o Pam: {link}",
+          "reviewedBy": ""
+        },
+        "zh-CN": {
+          "body": "Pam: 您项目的一次预约有变。打开：{link}",
+          "reviewedBy": ""
+        },
+        "zh-HK": {
+          "body": "Pam: 你計劃的一個預約有變。打開：{link}",
+          "reviewedBy": ""
+        },
+        "ru": {
+          "body": "Pam: Запись изменена: {link}",
+          "reviewedBy": ""
+        },
+        "ar": {
+          "body": "Pam: تغير حجز في برنامجك: {link}",
+          "reviewedBy": ""
+        }
+      },
+      "vars": [
+        "link"
+      ],
+      "reviewedBy": "",
+      "isFirstContact": false
+    },
+    "trip_planned": {
+      "key": "trip_planned",
+      "en": "Pam: Someone on your list planned a visit. Open Pam to see it: {link}",
+      "es": "Pam: Alguien de su lista planeo una visita. Abra Pam para verla: {link}",
+      "more": {
+        "pt-BR": {
+          "body": "Pam: Alguem da sua lista planejou uma visita. Abra o Pam: {link}",
+          "reviewedBy": ""
+        },
+        "zh-CN": {
+          "body": "Pam: 您名单上有人计划了到访。打开：{link}",
+          "reviewedBy": ""
+        },
+        "zh-HK": {
+          "body": "Pam: 你名單上有人計劃了到訪。打開：{link}",
+          "reviewedBy": ""
+        },
+        "ru": {
+          "body": "Pam: В списке новый визит: {link}",
+          "reviewedBy": ""
+        },
+        "ar": {
+          "body": "Pam: أحدهم خطط لزيارة: {link}",
+          "reviewedBy": ""
+        }
+      },
+      "vars": [
+        "link"
+      ],
+      "reviewedBy": "",
+      "isFirstContact": false
+    },
     "access_limited_notice": {
       "key": "access_limited_notice",
       "en": "Pam: Some parts of Pam are turned off for now. Call {supportPhone} with questions.",
