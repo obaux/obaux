@@ -26,7 +26,7 @@ D-493.
 `@pam/ui` 117 tests, option-tag snapshot unchanged; tsc; build-storybook; bundle budget 23.5 kB spare;
 `audit:fit` (en, es, pt-BR, zh-CN, zh-HK, ru, ar, pseudo) on the component stories and about 74 screen
 stories with secondary buttons: nothing new; full Playwright suite (see the READY). Before and after
-screenshots made from the story (light and dark).
+screenshots made from the story (light only: Storybook does not follow the system dark setting, so dark is not seen).
 
 ## Left undone
 
