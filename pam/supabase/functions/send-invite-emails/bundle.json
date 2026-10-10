@@ -1,0 +1,128 @@
+{
+  "locales": {
+    "en": {
+      "reviewedBy": "",
+      "copy": {
+        "subject": "You are invited to join Pam",
+        "preheader": "Your link to join Pam. It works for 30 days.",
+        "title": "You are invited to Pam",
+        "body": {
+          "provider": "{inviter} invited you to be a program partner in the Pam network. Open the link below to get started. It works for 30 days.",
+          "admin": "{inviter} invited you to be a case manager in the Pam network. Open the link below to get started. It works for 30 days."
+        },
+        "button": "Open Pam",
+        "fallback": "If the button does not work, copy this link into your browser:",
+        "footer": "You are getting this because someone invited you to Pam. If it is not for you, you can ignore this email.",
+        "someone": "Someone"
+      }
+    },
+    "es": {
+      "reviewedBy": "",
+      "copy": {
+        "subject": "Le invitaron a unirse a Pam",
+        "preheader": "Su enlace para unirse a Pam. Sirve por 30 días.",
+        "title": "Le invitaron a Pam",
+        "body": {
+          "provider": "{inviter} le invitó a ser un programa aliado en la red de Pam. Abra el enlace de abajo para empezar. Sirve por 30 días.",
+          "admin": "{inviter} le invitó a ser gestor de casos en la red de Pam. Abra el enlace de abajo para empezar. Sirve por 30 días."
+        },
+        "button": "Abrir Pam",
+        "fallback": "Si el botón no funciona, copie este enlace en su navegador:",
+        "footer": "Recibe este correo porque alguien le invitó a Pam. Si no es para usted, puede ignorarlo.",
+        "someone": "Alguien"
+      }
+    },
+    "pt-BR": {
+      "reviewedBy": "",
+      "copy": {
+        "subject": "Convite para entrar no Pam",
+        "preheader": "Seu link para entrar no Pam. Ele vale por 30 dias.",
+        "title": "Convite para o Pam",
+        "body": {
+          "provider": "{inviter} convidou você para ser um programa parceiro na rede de Pam. Abra o link abaixo para começar. Ele vale por 30 dias.",
+          "admin": "{inviter} convidou você para ser gestor de casos na rede de Pam. Abra o link abaixo para começar. Ele vale por 30 dias."
+        },
+        "button": "Abrir o Pam",
+        "fallback": "Se o botão não funcionar, copie este link no seu navegador:",
+        "footer": "Você recebeu este e-mail porque alguém convidou você para o Pam. Se não é para você, pode ignorá-lo.",
+        "someone": "Alguém"
+      }
+    },
+    "zh-CN": {
+      "reviewedBy": "",
+      "copy": {
+        "subject": "邀请您加入 Pam",
+        "preheader": "加入 Pam 的链接，有效期 30 天。",
+        "title": "您收到了 Pam 的邀请",
+        "body": {
+          "provider": "{inviter}邀请您成为 Pam 网络中的项目合作方。请打开下面的链接开始，有效期 30 天。",
+          "admin": "{inviter}邀请您成为 Pam 网络中的个案管理员。请打开下面的链接开始，有效期 30 天。"
+        },
+        "button": "打开 Pam",
+        "fallback": "如果按钮无法使用，请将此链接复制到浏览器：",
+        "footer": "您收到这封邮件，是因为有人邀请您加入 Pam。如果与您无关，请忽略这封邮件。",
+        "someone": "有人"
+      }
+    },
+    "zh-HK": {
+      "reviewedBy": "",
+      "copy": {
+        "subject": "邀請您加入 Pam",
+        "preheader": "加入 Pam 的連結，有效期 30 天。",
+        "title": "您收到 Pam 的邀請",
+        "body": {
+          "provider": "{inviter}邀請您成為 Pam 網絡中的計劃夥伴。請開啟下面的連結開始，有效期 30 天。",
+          "admin": "{inviter}邀請您成為 Pam 網絡中的個案經理。請開啟下面的連結開始，有效期 30 天。"
+        },
+        "button": "開啟 Pam",
+        "fallback": "如果按鈕無法使用，請把此連結複製到瀏覽器：",
+        "footer": "您收到這封電郵，是因為有人邀請您加入 Pam。如果與您無關，請忽略這封電郵。",
+        "someone": "某人"
+      }
+    },
+    "ru": {
+      "reviewedBy": "",
+      "copy": {
+        "subject": "Приглашение в Pam",
+        "preheader": "Ваша ссылка, чтобы присоединиться к Pam. Она действует 30 дней.",
+        "title": "Вас приглашают в Pam",
+        "body": {
+          "provider": "{inviter} приглашает вас в сеть Pam как партнёрскую программу. Откройте ссылку ниже, чтобы начать. Она действует 30 дней.",
+          "admin": "{inviter} приглашает вас стать кейс-менеджером в сети Pam. Откройте ссылку ниже, чтобы начать. Она действует 30 дней."
+        },
+        "button": "Открыть Pam",
+        "fallback": "Если кнопка не работает, скопируйте эту ссылку в браузер:",
+        "footer": "Вы получили это письмо, потому что кто-то пригласил вас в Pam. Если оно не для вас, просто проигнорируйте его.",
+        "someone": "Кто-то"
+      }
+    },
+    "ar": {
+      "reviewedBy": "",
+      "copy": {
+        "subject": "دعوة للانضمام إلى Pam",
+        "preheader": "رابطك للانضمام إلى Pam. يعمل لمدة 30 يوما.",
+        "title": "لقد تمت دعوتك إلى Pam",
+        "body": {
+          "provider": "دعاك {inviter} لتكون شريك برنامج في شبكة Pam. افتح الرابط أدناه للبدء. يعمل لمدة 30 يوما.",
+          "admin": "دعاك {inviter} لتكون مدير حالة في شبكة Pam. افتح الرابط أدناه للبدء. يعمل لمدة 30 يوما."
+        },
+        "button": "افتح Pam",
+        "fallback": "إذا لم يعمل الزر، انسخ هذا الرابط إلى متصفحك:",
+        "footer": "وصلتك هذه الرسالة لأن شخصا ما دعاك إلى Pam. إذا لم تكن الرسالة لك، يمكنك تجاهلها.",
+        "someone": "شخص ما"
+      }
+    }
+  },
+  "fonts": {
+    "en": "Helvetica,Arial,sans-serif",
+    "es": "Helvetica,Arial,sans-serif",
+    "pt-BR": "Helvetica,Arial,sans-serif",
+    "ru": "Helvetica,Arial,sans-serif",
+    "zh-CN": "'PingFang SC','Microsoft YaHei','Noto Sans SC','Hiragino Sans GB',Helvetica,Arial,sans-serif",
+    "zh-HK": "'PingFang HK','PingFang TC','Microsoft JhengHei','Noto Sans TC',Helvetica,Arial,sans-serif",
+    "ar": "'Segoe UI','Noto Sans Arabic','Geeza Pro',Tahoma,Arial,sans-serif"
+  },
+  "rtl": [
+    "ar"
+  ]
+}
