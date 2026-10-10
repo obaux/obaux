@@ -79,15 +79,46 @@ current (`docs/control-room.md`).
 | **Accounts & invites** (Ava) | Sign-in, invites, roles, caseloads, limits, deleting an account, the audit log | its lane in `docs/lanes.md` |
 | **Messages & notifications** (Nico) | Conversations, attachments, translation, the bell, texts and emails going out, blocking and reporting | its lane |
 | **Places & programs** (Piper) | The catalogue, a place, programs and their onboarding, saved places, trips, points, Home | its lane |
-| **Languages & legal** (Lena, Arabic included) | The seven languages and the ledger, privacy, terms, transparency, native review | its lane |
+| **Languages & legal** (Lena, Arabic included) | The seven languages and the ledger, privacy, terms, transparency, native review. **Weekly, on Friday** (below) | its lane |
 | **Design system & Storybook** (Dot) | Components, tokens, illustrations, every screen's story, the fit and accessibility audits, the Figma flow map | its lane |
-| **Website** (Wren) | The public site and the support centre (`pam-site`) | its own project |
+| **Website** (Wren) | The public site and the support centre (`pam-site`). **Weekly, on Friday** (below) | its own project |
 
 Which session is in which lane today, its id, and what it is doing and waiting on
 are on **the board** at the end of `docs/lanes.md`. The merge desk keeps it.
 
 Lane sessions build. The merge desk does not build features: it merges, applies,
 releases, checks and coordinates.
+
+## The weekly update: languages and the website
+
+Will, 10 October 2026: "Tell Lena she only needs to make updates once a week. And that
+you'd send her notes on updates. … We don't need the website to be updated every time a
+change is made. Especially since we change a lot during one week."
+
+So **Lena (languages & legal) and Wren (website) work in one batch a week, on Friday.**
+Between batches they don't review each merge, re-check the posts after each change or
+chase new strings.
+
+- **The merge desk keeps the notes.** As it merges, it adds what touches their lanes
+  to `docs/weekly/<Friday's date>.md`: new or changed strings and where they show,
+  screens whose words changed, posts that no longer match the app, and anything for
+  privacy or terms. On Friday it sends each of them their notes. The batch is that list
+  and nothing else, unless Will adds to it.
+- **Other lanes don't ask them directly.** A change that needs a translation review, a
+  post or a privacy line goes in your READY note ("For Lena's week: …", "For Wren's
+  week: …"); the merge desk carries it to the notes.
+- **What still happens every time, without waiting for Friday:**
+  - Every lane writes its new words in all seven languages, as now: the English, plus
+    its own drafts in the other six marked as drafts in the ledger, so `copy:status`
+    stays in step and no screen shows a missing word. Lena reviews the drafts on Friday.
+  - **The privacy page is never behind the app.** A change that starts keeping or
+    showing personal data waits for its English privacy line, which Will approves and
+    the merge desk merges with the change. Only the translations wait for Friday.
+  - Anything Will asks Lena or Wren for himself.
+- **A post may lag the app by up to a week.** If a merge makes a live post say
+  something Pam no longer does, the merge desk notes it for Friday. If it could
+  mislead someone about their safety, privacy or a visit, it asks Will whether it
+  can wait.
 
 ## Where jobs come from
 
@@ -147,6 +178,8 @@ works). The kinds:
 - **Keeps the shared parts of `STATUS.md`** — "What is live", "What is proven",
   "What needs a human" — from READY notes and its own checks.
 - **Cuts releases** from the changelog fragments.
+- **Keeps the weekly notes** for Lena and Wren in `docs/weekly/`, and sends them on
+  Friday.
 - **Answers within its next turn.**
 
 Its messages arrive in your chat as a turn that starts **"From the merge desk"**.
