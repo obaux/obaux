@@ -48,3 +48,25 @@ test('Change appointment moves the visit, celebrates, then goes home', async ({ 
   await expect(page.getByText('3:30 PM')).toBeVisible();
   await expect(page.getByText(new RegExp(`Monday, \\w+ ${date}$`))).toBeVisible();
 });
+
+test('Cancel this visit asks first, then takes the visit off Trips', async ({ page }) => {
+  await page.goto(FROM_TRIP);
+  await settled(page);
+  await page.getByRole('button', { name: 'Cancel this visit' }).click();
+  const dialog = page.getByRole('dialog');
+  await expect(dialog.getByText('Cancel your visit to Example Learning Center?')).toBeVisible();
+  const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
+  expect(results.violations).toEqual([]);
+
+  // Keeping it changes nothing.
+  await dialog.getByRole('button', { name: 'Keep my visit' }).click();
+  await expect(page.getByText('Your next visit')).toBeVisible();
+
+  await page.getByRole('button', { name: 'Cancel this visit' }).click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Yes, cancel it' }).click();
+  await expect(page).toHaveURL(/\/trips\/$/);
+  await settled(page);
+  // The example visit is gone from the list.
+  await page.goto(FROM_TRIP);
+  await expect(page.getByText('Your next visit')).toHaveCount(0);
+});

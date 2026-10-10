@@ -73,6 +73,12 @@ export const PlaceProfile: Story = screenWithControls<PlaceProfileArgs>(
 );
 // Booked (D-333): the trip, and Bring a friend folded under it.
 export const TripBooked: Story = screen('member', 'Trip booked', '/trips/new/', { booked: 'dummy-trip-1' });
+// The place, opened from a coming-up visit: its card, Change appointment, and Cancel this visit.
+export const PlaceVisit: Story = screen('member', 'A place with a visit', '/place/', {
+  id: 'dummy-place-learning',
+  from: 'trips',
+  trip: 'dummy-trip-1',
+});
 // A program's policies, read and signed by a member (D-270).
 export const PlacePolicies: Story = screen('member', 'Policies to sign', '/place/policies/', {
   id: 'dummy-place-learning',
