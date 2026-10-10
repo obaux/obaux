@@ -951,6 +951,18 @@ drops signatures), then `20261010042108_a_program_lead_submits_their_own_program
 
 ---
 
+## Messages & notifications · staff invite email (10 October 2026)
+
+Merged to `main` by the merge desk, 10 October. A staff invite's email now has a
+queue (`20261010063304_…`, expand only, **applied to the live project 10 October**; read back:
+forced RLS, no client grants, the sender's functions service-role only), a sender
+(`supabase/functions/send-invite-emails`, **not deployed**, off unless `INVITE_EMAILS=on`) and
+first-invite wording in seven languages that **nobody has signed**, so nothing can send.
+D-450. What Will has to set up, in order: `docs/email-setup.md`. Checked: config 831, database
+suite passes (with `24_staff_invite_emails_test.sql`), Storybook builds, fit audit on the new
+page clean. Not done: the expired-link email, an email for staff who already have accounts,
+the privacy line about the mail service.
+
 ## Arabic reads in the right order (9 October) — 0.51.1, merged 10 October
 
 D-435, on `claude/amazing-archimedes-qvgnt2` (`main` at `8dee5d4` plus this; merged
