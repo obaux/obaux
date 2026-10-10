@@ -132,20 +132,6 @@ select test.check('at 30 a lead can still replace one with a new version',
   (select version from public.add_policy(:'prog2', 'Cap 1', jsonb_build_array(jsonb_build_object('path', :'prog2' || '/d.pdf', 'name', 'd.pdf', 'content_type', 'application/pdf', 'size_bytes', 100)),
     (select id from public.program_policies where title = 'Cap 1' and archived_at is null))), 2);
 
--- A lead whose access is limited cannot take a policy off.
-reset role;
-update public.profiles set access_status = 'limited' where id = :'lead2';
-set role authenticated;
-select set_config('request.jwt.claim.sub', :'lead2', false);
-select test.check_raises_like('a limited lead cannot archive',
-  format($f$select public.archive_policy(%L)$f$, (select id from public.program_policies where title = 'Cap 2' and archived_at is null)),
-  '%ACCOUNT_NOT_ACTIVE%');
-
--- The quiet-hours test pins its search path.
-reset role;
-select test.check('reminder_is_quiet pins its search path',
-  (select count(*) from pg_proc where proname = 'reminder_is_quiet' and coalesce(proconfig::text, '') like '%search_path%'), 1::bigint);
-
 reset role;
 set role anon;
 select test.check_raises('nobody signed out reads it', $$select * from public.program_policy_services$$);

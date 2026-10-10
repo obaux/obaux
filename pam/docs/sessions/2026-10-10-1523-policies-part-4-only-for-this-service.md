@@ -24,4 +24,4 @@ Real "booked for member" (a Will card). Lawyer review (docs/before-launch.md). L
 
 ## Needs a human
 
-Mira: apply `20261010151302` after P3's. It also carries your three fixes (archive_policy checks is_active_account; add_policy leaves p_replaces out of the 30 cap; reminder_is_quiet pins search_path), tested in 49.
+Mira: apply `20261010151302` after P3's. Your three small fixes are in part 3 (the cap fix is kept here, in add_policy).
