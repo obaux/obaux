@@ -340,8 +340,8 @@ ${escape(copy.footer)}
 // Remember we're a human-touch company. Speak human please. Then approved." So:
 // no days anywhere, in any language; the button says Accept invite; it talks like
 // a person. The other six languages carry the same warmth and meaning and are
-// drafts under the 9 October convention (D-429): approved to learn from, no native
-// reader yet, and fixed when somebody who reads the language says so. Members are
+// drafts that nobody has signed (D-488): that language is sent the English email until Will
+// or somebody who reads it signs it. Members are
 // never emailed: they are not asked for an address (D-441).
 //
 // The fallback line is this email's own, so the expired-link email is untouched.
@@ -363,8 +363,14 @@ export interface StaffInviteEmailWording {
 /** Will's own sign-off, on the English words above. */
 const STAFF_INVITE_EMAIL_REVIEWED_BY = 'Will, 10 October 2026';
 
-/** The other six, on the 9 October convention, dated the day their words were written. */
-const STAFF_INVITE_EMAIL_LEARN_FROM = 'Will (Oba), 10 October 2026 — approved to learn from; no native reader yet';
+/**
+ * The other six are NOT signed (D-488). Will's words approve the English email; the 9 October
+ * "approved to learn from" convention (D-429) was applied to these six on the merge desk's
+ * instruction, not by Will, and was withdrawn the same day. An empty `reviewedBy` sends that
+ * language the English email (A25) until Will or somebody who reads the language signs it. Only
+ * a person fills it in; to sign one, set it to who read it and on what day.
+ */
+const NOT_SIGNED = '';
 
 export const STAFF_INVITE_EMAIL: Readonly<Record<Locale, StaffInviteEmailWording>> = {
   en: {
@@ -386,7 +392,7 @@ export const STAFF_INVITE_EMAIL: Readonly<Record<Locale, StaffInviteEmailWording
     },
   },
   es: {
-    reviewedBy: STAFF_INVITE_EMAIL_LEARN_FROM,
+    reviewedBy: NOT_SIGNED,
     copy: {
       subject: 'Le invitamos a unirse a Pam',
       preheader: 'Nos encantaría contar con usted.',
@@ -404,7 +410,7 @@ export const STAFF_INVITE_EMAIL: Readonly<Record<Locale, StaffInviteEmailWording
     },
   },
   'pt-BR': {
-    reviewedBy: STAFF_INVITE_EMAIL_LEARN_FROM,
+    reviewedBy: NOT_SIGNED,
     copy: {
       subject: 'Convite para entrar no Pam',
       preheader: 'Adoraríamos ter você com a gente.',
@@ -422,7 +428,7 @@ export const STAFF_INVITE_EMAIL: Readonly<Record<Locale, StaffInviteEmailWording
     },
   },
   'zh-CN': {
-    reviewedBy: STAFF_INVITE_EMAIL_LEARN_FROM,
+    reviewedBy: NOT_SIGNED,
     copy: {
       subject: '邀请您加入 Pam',
       preheader: '我们很期待您的加入。',
@@ -438,7 +444,7 @@ export const STAFF_INVITE_EMAIL: Readonly<Record<Locale, StaffInviteEmailWording
     },
   },
   'zh-HK': {
-    reviewedBy: STAFF_INVITE_EMAIL_LEARN_FROM,
+    reviewedBy: NOT_SIGNED,
     copy: {
       subject: '邀請您加入 Pam',
       preheader: '我們很期待您的加入。',
@@ -454,7 +460,7 @@ export const STAFF_INVITE_EMAIL: Readonly<Record<Locale, StaffInviteEmailWording
     },
   },
   ru: {
-    reviewedBy: STAFF_INVITE_EMAIL_LEARN_FROM,
+    reviewedBy: NOT_SIGNED,
     copy: {
       subject: 'Приглашение в Pam',
       preheader: 'Мы будем рады видеть вас с нами.',
@@ -472,7 +478,7 @@ export const STAFF_INVITE_EMAIL: Readonly<Record<Locale, StaffInviteEmailWording
     },
   },
   ar: {
-    reviewedBy: STAFF_INVITE_EMAIL_LEARN_FROM,
+    reviewedBy: NOT_SIGNED,
     copy: {
       subject: 'دعوة للانضمام إلى Pam',
       preheader: 'يسعدنا أن تكون معنا.',

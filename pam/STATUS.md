@@ -1112,6 +1112,17 @@ drops signatures), then `20261010042108_a_program_lead_submits_their_own_program
 
 ---
 
+## Messages & notifications · the expired-link address is deleted (10 October 2026) — merged 10 October
+
+Merged by the merge desk from 7a9b1d9; live apply and the function redeploy noted below when done.
+
+Branch `claude/messages-member-address-deleted`. One migration (`20261010151208_…`, **not yet applied to the live
+project**, no DROP): the address typed on the expired-link page is removed as soon as the fresh link is sent, and when a
+request can no longer be sent (older than seven days, out of tries, fresh link used or run out). The row keeps that it was
+sent and when. The invites log shows no address for a removed one. Staff's own address is untouched. DB test 48. D-487.
+Also on this branch: the staff invite email's six other languages are unsigned again (they go out in English until a person
+signs them; Will approved only the English) and the sender's bundle is regenerated. **Redeploy `send-invite-emails`.** D-488.
+
 ## Messages & notifications · the clocks send the shared secret (10 October 2026) — merged 10 October
 
 Merged by the merge desk from 03d2338. Live: applied as 20261010145909; vault `dispatch_secret` made (64 hex, never read out); cron jobs 3 (`dispatch-sms`) and 4 (`send-invite-emails`) every five minutes with the header from the vault; 15:00 and 15:05 ticks: `dispatch-sms` 200 `{claimed:0,sent:0,failures:[]}`. `send-invite-emails` deployed from main as version 1 (verify_jwt on), answering `{enabled:false}` until Will sets the secrets (card a28).
