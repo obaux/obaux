@@ -550,6 +550,7 @@
   "privacy.s.sharing.p1": "We do not sell it. We do not trade it. We do not run ads.",
   "privacy.s.sharing.p2": "A program sees you only after you sign up with them, and only what they need to help you.",
   "privacy.s.sharing.p3": "We use other companies to run Pam, like the one that sends our texts and the one that stores our data. They handle your information for us and may not use it for anything else.",
+  "privacy.s.sharing.p4": "When Pam emails a case manager or a program, a company that sends email for us gets the email address and the email. It may not use them for anything else.",
   "privacy.s.sharing.title": "Who else gets your information",
   "privacy.s.texts.p1": "We text you a code when you sign in. Later we may text reminders and updates about your account.",
   "privacy.s.texts.p2": "Reply STOP any time and the texts stop. Nothing in the app can turn them back on.",
