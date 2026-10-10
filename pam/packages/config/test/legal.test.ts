@@ -238,11 +238,11 @@ describe('promises that are kept (D-465)', () => {
   });
 });
 
-describe('the mail service, said before the first email goes out (D-482, a21)', () => {
-  it('says what Will approved, word for word, on the privacy page', () => {
-    // Will approved this English on 10 October 2026, 14:37 UTC (a21). Change it only with him.
+describe('what the privacy page says about email and signatures, as Will approved it (D-482, D-490)', () => {
+  // Will approved card a29 on 10 October 2026, 15:15 UTC ("approved"): these three sentences, word for word. Change them only with him.
+  it('says that a company that sends email for us gets the address and the email, whoever Pam emails (a21, widened by a29)', () => {
     expect(en['privacy.s.sharing.p4']).toBe(
-      'When Pam emails a case manager or a program, a company that sends email for us gets the email address and the email. It may not use them for anything else.',
+      'When Pam sends an email, a company that sends email for us gets the email address and the email. It may not use them for anything else.',
     );
   });
 
@@ -254,6 +254,28 @@ describe('the mail service, said before the first email goes out (D-482, a21)', 
       expect(text, `${locale} has it`).toBeTruthy();
       // Not a copy of the English: a language that has not been translated would fall back to it.
       if (locale !== 'en') expect(text, `${locale} is translated`).not.toBe(en['privacy.s.sharing.p4']);
+    }
+  });
+
+  it('says a member is asked for an email only when their invite link has run out, and that it is deleted once the link is sent (D-487)', () => {
+    expect(en['privacy.s.what-we-keep.p7']).toMatch(
+      /Members are asked for an email only if their invite link has run out and they want a new one by email\. We use it only to send that link, and delete it once it is sent\.$/,
+    );
+    // The old promise is untrue now that the expired-link page asks a member for an address.
+    expect(en['privacy.s.what-we-keep.p7']).not.toMatch(/never asked/i);
+  });
+
+  it('says what Pam keeps when a program asks a member to sign its rules, and who sees it', () => {
+    expect(en['privacy.s.what-we-keep.p8']).toBe(
+      'If a program asks you to sign its rules, we keep what you signed, the date, and your signature. Only you see your signature. The program sees only your first name and the date.',
+    );
+    const keep = PRIVACY.sections.find((s) => s.id === 'what-we-keep');
+    expect(keep?.bodyKeys).toContain('privacy.s.what-we-keep.p8');
+    for (const [locale, bundle] of Object.entries(bundles)) {
+      if (locale === 'en') continue;
+      expect(bundle['privacy.s.what-we-keep.p8'], `${locale} has the signature paragraph`).toBeTruthy();
+      expect(bundle['privacy.s.what-we-keep.p8'], `${locale} is translated`).not.toBe(en['privacy.s.what-we-keep.p8']);
+      expect(bundle['privacy.s.what-we-keep.p7'], `${locale} no longer says members are never asked`).not.toBe(en['privacy.s.what-we-keep.p7']);
     }
   });
 });
