@@ -63,6 +63,7 @@ import { ThreadOptionsView, ThreadReportView } from '../../screens/ThreadOptions
 import { ThreadFilesView } from '../../screens/ThreadFilesView';
 import { MessagesScreen } from '../../screens/MessagesScreen';
 import { LocalTabBar } from '../shell/LocalTabBar';
+import { tabFor } from '../../lib/tabs';
 import { isFreshAccount, isProgramLive } from '../../lib/programSetup';
 import type { Role } from '@pam/config';
 import { ROLES, type JourneyRole } from '../journeys/fixtures';
@@ -183,34 +184,6 @@ export const REDESIGN_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   // The old caseload-and-invites page is Invite someone now (D-218).
   '/admin/': screen(() => <InviteView />),
 };
-
-/**
- * Which bottom-bar tab a redesigned path belongs to; `null` hides the bar.
- * Only the five tab screens draw it (D-213): anything you tap into — a
- * place, a person, a conversation, Legal, Get help — is a nested screen on
- * the template, with its own way back and no bar, as in Will's references.
- */
-export function tabFor(pathname: string) {
-  switch (pathname) {
-    case '/':
-    case '/places/':
-    case '/interested/':
-      return 'explore' as const;
-    case '/saved/':
-      return 'saved' as const;
-    case '/trips/':
-      return 'trips' as const;
-    case '/program/':
-      return 'program' as const;
-    case '/messages/':
-      return 'messages' as const;
-    case '/profile/':
-    case '/account/':
-      return 'profile' as const;
-    default:
-      return null;
-  }
-}
 
 /**
  * The redesign's bottom bar, for whoever is signed in (D-212, D-218): each

@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/nextjs';
-import { CaseloadHome } from '../../../screens/HomeScreen';
+import { CaseloadHome } from '../../../screens/StaffHomes';
 import { asRole } from '../../journeys/journey';
 
 /**

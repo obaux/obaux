@@ -2,6 +2,7 @@
 
 import { Suspense } from 'react';
 import { TripsScreen } from '../../screens/TripsView';
+import { TabGate } from '../TabGate';
 
 /**
  * Trips (D-210, D-213): the map of the visits somebody has agreed to make,
@@ -12,8 +13,10 @@ import { TripsScreen } from '../../screens/TripsView';
 export default function TripsPage() {
   // Suspense: TripsScreen reads `?added=` (D-241).
   return (
-    <Suspense fallback={null}>
-      <TripsScreen />
-    </Suspense>
+    <TabGate>
+      <Suspense fallback={null}>
+        <TripsScreen />
+      </Suspense>
+    </TabGate>
   );
 }

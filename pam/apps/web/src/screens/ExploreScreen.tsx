@@ -8,7 +8,7 @@ import { NextTripCard } from '@pam/ui/NextTripCard';
 import { DUMMY_TRIPS } from '@pam/config/dummy-trips';
 import { readMoves } from '@/lib/addedTrips';
 import { useNextVisits, visitTagLabel } from '@/lib/useNextVisits';
-import { CategoryPicture } from './SavedView';
+import { CategoryPicture } from './CategoryPicture';
 import { USE_DUMMY_PEOPLE } from '@pam/config/dummy-flag';
 import { categoryLabelKey, distanceLabel, intlLocale } from '@pam/config';
 import type { SearchSource } from '@astryxdesign/core/Typeahead';

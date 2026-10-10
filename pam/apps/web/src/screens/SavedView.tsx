@@ -5,17 +5,7 @@ import * as stylex from '@stylexjs/stylex';
 import { Button } from '@pam/ui/Button';
 import { EmptyState } from '@astryxdesign/core/EmptyState';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
-import {
-  AllPlacesIcon,
-  BookmarkIcon,
-  EducationIcon,
-  FamilyServicesIcon,
-  Notice,
-  OfflineIcon,
-  Page,
-  StarIcon,
-  WorkforceIcon,
-} from '@pam/ui';
+import { BookmarkIcon, Notice, OfflineIcon, Page, StarIcon } from '@pam/ui';
 import { SegmentedControl } from '@astryxdesign/core/SegmentedControl';
 import { Segment } from '@pam/ui/Segment';
 import { Text } from '@astryxdesign/core/Text';
@@ -30,8 +20,10 @@ import { LargeTitleHeader } from '@pam/ui/LargeTitleHeader';
 import { emptyState } from '@pam/ui/emptyState';
 import { SavedGrid } from '@pam/ui/SavedGrid';
 import { PlaceCardSkeletonList } from '@pam/ui/Skeletons';
-import { CATEGORY_DEFINITIONS, categoryLabelKey, NOTICES, type Category, intlLocale } from '@pam/config';
-import { CategoryArt } from '@pam/ui/CategoryArt';
+import { categoryLabelKey, NOTICES, intlLocale } from '@pam/config';
+import { BigCategoryIcon, CategoryPicture } from './CategoryPicture';
+
+export { BigCategoryIcon, CategoryPicture };
 import { useNextVisits, visitTagLabel, type NextVisit } from '@/lib/useNextVisits';
 import { useI18n } from '@/lib/i18n';
 import { useSession } from '@/lib/useSession';
@@ -78,7 +70,6 @@ export interface SavedViewProps {
   readonly visits?: Readonly<Record<string, NextVisit>>;
 }
 
-const ART = { width: 52, height: 52, 'aria-hidden': true } as const;
 
 const styles = stylex.create({
   // The People / Programs switch as one round pill, like the search bar and
@@ -212,37 +203,6 @@ export function SavedView({
       ) : null}
     </Page>
   );
-}
-
-/**
- * A category's illustration, edge to edge in the box it sits in (Will,
- * 7 October, D-337: "just use the illustrations by category"): Saved's
- * tiles, every trip card, Explore's next visit and Check. The pale ground
- * with shards and grain behind an icon (D-297) is gone; only the chips keep
- * their shaded dot.
- */
-export function CategoryPicture({ category, seed }: { readonly category: string; readonly seed?: string }) {
-  return <CategoryArt category={(category in CATEGORY_DEFINITIONS ? category : 'education') as Category} size="fill" {...(seed ? { seed } : {})} />;
-}
-
-/** The chips' icon for a category, drawn large for the placeholder picture. */
-export function BigCategoryIcon({
-  category,
-  size = ART,
-}: {
-  readonly category: string;
-  readonly size?: { readonly width: number; readonly height: number; readonly 'aria-hidden': true };
-}) {
-  switch (category) {
-    case 'education':
-      return <EducationIcon {...size} />;
-    case 'workforce':
-      return <WorkforceIcon {...size} />;
-    case 'family_services':
-      return <FamilyServicesIcon {...size} />;
-    default:
-      return <AllPlacesIcon {...size} />;
-  }
 }
 
 /**

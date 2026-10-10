@@ -158,7 +158,7 @@ test.describe('agreeing to reminders', () => {
 
     await page.goto('/reminders/');
     await page.getByRole('button', { name: 'Agree to receive texts' }).click();
-    await expect(page).toHaveURL(/\/places\//);
+    await expect(page).toHaveURL(/\/$/);
   });
 
   test('declining moves on too, rather than sitting there', async ({ page }) => {
@@ -190,7 +190,7 @@ test.describe('agreeing to reminders', () => {
 
     await page.goto('/reminders/');
     await page.getByRole('button', { name: 'Not now' }).click();
-    await expect(page).toHaveURL(/\/places\//);
+    await expect(page).toHaveURL(/\/$/);
   });
 
   test('has no WCAG A/AA violations', async ({ page }) => {

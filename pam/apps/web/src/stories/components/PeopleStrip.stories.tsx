@@ -23,7 +23,7 @@ function LocalisedStrip({ people, label }: PeopleStripProps) {
   );
 }
 
-/** The example caseload, with a ring on whoever has something new — as `HomePeopleSection` ranks it. */
+/** The example caseload, with a ring on whoever has something new — the order the caseload lists them in. */
 const caseload: PeopleStripProps['people'] = DUMMY_MEMBERS.map((person, index) => {
   const reason = index === 0 ? 'message' : person.lastSavedAt ? 'save' : null;
   return {

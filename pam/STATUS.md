@@ -1151,6 +1151,20 @@ recorded once `sms-inbound` is deployed (D-460); nothing queues the check-in or 
 connect" yet. Samples file: nine texts. D-453. Text reminders' staff list (merged 10 October) names
 only the alert texts Will signed: no "introduced to your program", no "your account changes".
 
+## Design system & Storybook · live app shell (10 October)
+
+Merged to `main` by the merge desk, 10 October, from `claude/pam-design-app-shell` (6318b48); live after the next production deploy. The redesigned tabs are the app (D-456): the role's tab bar
+from the root layout, a gate under every tab screen (Help bar on each state), and `/`, `/saved/`, `/trips/`,
+`/program/`, `/programs/`, `/profile/`, `/messages/` draw the redesigned screens. Kept on purpose: `/places/`,
+`/interested/`, Messages for case managers and super admins, and the old Home (+ `/admin/`) for case managers
+and program leads until the people strip's rings are on the new staff Homes (Mira). First-load **572.4 kB** gz of 600. A super
+admin's view switch now reaches the whole page; a case manager's Home keeps "What you can see".
+
+- Proven: web tests, build, Storybook build, e2e per file on three projects; whole suite narrow-320 279 pass.
+- Not proven: Playwright per role at phone size on the built app; 5 `audit:fit` entries not in the known
+  list (3 Block conversation stories, 2 saved-trips with a clock-minute key), none in a screen changed here.
+- Needs a human: Will's answer on the people strip's D-198 rings (asked by Mira); the five `people-strip` specs pass on the old Home.
+
 ## Design system & Storybook · language tag (10 October)
 
 Merged to `main` by the merge desk (5dd52b8), 10 October. Job from Will via Mira: a short English tag before a
