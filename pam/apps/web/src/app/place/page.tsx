@@ -26,6 +26,7 @@ import { useI18n } from '@/lib/i18n';
 import { addressActionsFor } from '@/lib/addressActions';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
+import { logCall } from '@/lib/logCall';
 import { useSavedPlaces } from '@/lib/useSavedPlaces';
 import { usePlaceStatus, weekLines } from '@/lib/usePlaceStatus';
 import { useRoleView } from '@/lib/useViewedRole';
@@ -259,6 +260,21 @@ function PlaceScreen() {
     window.addEventListener(TRIPS_CHANGED, read);
     return () => window.removeEventListener(TRIPS_CHANGED, read);
   }, [place, tripId, fromTrips]);
+
+  // Tapping Call earns points for a first call to a place (rule 3, honour
+  // system). The row is a plain `tel:` link whose own click Astryx's list item
+  // does not pass on, so the tap is heard here, on the document, and only for
+  // a phone link. Nothing waits on it: the dialler opens regardless.
+  const placeIdForCalls = place?.id ?? null;
+  useEffect(() => {
+    if (placeIdForCalls === null) return;
+    const onClick = (event: MouseEvent) => {
+      const target = event.target instanceof Element ? event.target : null;
+      if (target?.closest('a[href^="tel:"]')) logCall(session, placeIdForCalls);
+    };
+    document.addEventListener('click', onClick, true);
+    return () => document.removeEventListener('click', onClick, true);
+  }, [session, placeIdForCalls]);
   // A service with its own hours (D-313): the open/closed line and the
   // hours row are its, once picked or booked.
   const hoursService =

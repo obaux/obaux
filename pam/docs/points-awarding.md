@@ -114,7 +114,7 @@ if they drift.
 |---|---|---|---|---|---|---|
 | 1 | Finishes setup | 25 | yes | automatic | ever | **Live** (0047) |
 | 2 | Saves a place | 5 | yes | automatic | place, ever | **Live** (0045) |
-| 3 | Calls a place | 10 | when live | honour (the tap) | place, ever | To build |
+| 3 | Calls a place | 10 | yes | honour (the tap) | place, ever | **Live** (20261010122206) |
 | 4 | Plans a trip to a place | 25 | yes | honour (the booking) | place, ever | **Live** (20261010115117) |
 | 5 | Shows up to a visit (checked in) | 100 | when live | program check-in or geofence | visit | To build |
 | 5b | Shows up to a visit (said so by text) | 60 | (as 5) | SMS "YES" | visit | To build |
@@ -138,7 +138,9 @@ members only, once per place ever (`subject_id = service_id`, unique
 `(member_id, reason, subject_id)`). Unsaving takes nothing back; saving
 again pays nothing.
 
-### 3. Call a place
+### 3. Call a place — live
+
+**Built 10 October 2026** as `log_call(p_service_id, p_timezone)` (`20261010122206`), fired from the place page's Call row. One addition to the spec below: at most **five new places a day** (config `dailyCap: 5`), so a script cannot call every place in the catalogue; a sixth pays nothing and is not refused. Staff taps are ignored without an error.
 
 - **Trigger:** the member taps a place's Call button (a `tel:` link). The app
   cannot know whether the call connected, so this is honour system.

@@ -51,8 +51,8 @@ export const POINTS_RULES: Readonly<Record<PointsReason, PointsRule>> = {
     reason: 'call_service',
     points: 10,
     verification: 'honor_system',
-    dailyCap: null,
-    note: 'Logged on tel: tap. We cannot verify the call connected.',
+    dailyCap: 5,
+    note: 'Logged on the Call tap, once per place ever, five places a day. We cannot verify the call connected.',
   },
   plan_trip: {
     reason: 'plan_trip',
@@ -125,11 +125,11 @@ export const POINTS_RULES: Readonly<Record<PointsReason, PointsRule>> = {
 
 /**
  * What the database actually awards today (docs/points-awarding.md, "The
- * rules"): save a place (0045), finish setup (0047) and plan a trip (20261010115117). The Points screen lists
+ * rules"): save a place (0045), finish setup (0047), plan a trip (20261010115117) and call a place (20261010122206). The Points screen lists
  * only these under "Ways to earn" so it promises nothing Pam does not pay. When
  * a rule's trigger ships, add its reason here in the same change.
  */
-export const AWARDED_TODAY: readonly PointsReason[] = ['save_place', 'finish_setup', 'plan_trip'];
+export const AWARDED_TODAY: readonly PointsReason[] = ['save_place', 'finish_setup', 'plan_trip', 'call_service'];
 
 export function isAwardedToday(reason: PointsReason): boolean {
   return AWARDED_TODAY.includes(reason);
