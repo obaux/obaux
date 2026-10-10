@@ -1815,3 +1815,62 @@ test.describe('reported places (D-189)', () => {
     expect(results.violations).toEqual([]);
   });
 });
+
+test.describe("the bell's rows land on real screens in the new layout", () => {
+  async function bellRow(
+    page: import('@playwright/test').Page,
+    row: { kind: string; subject_type: string; subject_id: string; body_vars?: Record<string, string> },
+    name: RegExp,
+  ) {
+    await page.route(NOTIFICATIONS, (route) =>
+      route.fulfill(
+        json([
+          {
+            id: 'n-bell',
+            body_key: `notify.${row.kind}`,
+            body_vars: row.body_vars ?? {},
+            created_at: new Date().toISOString(),
+            read_at: null,
+            ...row,
+          },
+        ]),
+      ),
+    );
+    await page.goto('/notifications/');
+    await settled(page);
+    await page.getByRole('link', { name }).click();
+  }
+
+  test('a new message opens its conversation', async ({ page }) => {
+    await signedInAs(page, 'member');
+    await withOneConversation(page);
+    await bellRow(page, { kind: 'message_received', subject_type: 'conversation', subject_id: CONVO, body_vars: { name: 'Marcus' } }, /Marcus/);
+    await expect(page).toHaveURL(new RegExp(`/messages/thread/\\?id=${CONVO}`));
+    await expect(page.getByRole('heading', { name: 'Marcus', level: 1 })).toBeVisible();
+  });
+
+  test('a reported message opens the Reported section of Messages', async ({ page }) => {
+    await signedInAs(page, 'admin');
+    await page.route(REPORTS, (route) => route.fulfill(json([])));
+    await bellRow(page, { kind: 'message_reported', subject_type: 'report', subject_id: 'r1', body_vars: { name: 'Marcus' } }, /was reported/);
+    await expect(page).toHaveURL(/\/messages\/\?show=reported/);
+    await expect(page.getByRole('radio', { name: 'Reported' })).toBeChecked();
+  });
+
+  test('a reported place opens the reported places', async ({ page }) => {
+    await signedInAs(page, 'super_admin');
+    await page.route('**/rest/v1/rpc/flagged_services*', (route) => route.fulfill(json([])));
+    await bellRow(page, { kind: 'service_flagged', subject_type: 'service', subject_id: 'p1', body_vars: { place: 'Example Pantry', reason: 'closed' } }, /Example Pantry/);
+    await expect(page).toHaveURL(/\/places\/reported\//);
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+    await expect(page.getByText(/Example Workforce Center|Example Food Pantry/).first()).toBeVisible();
+  });
+
+  test('a staff request opens the requests list', async ({ page }) => {
+    await signedInAs(page, 'super_admin');
+    await page.route('**/rest/v1/staff_requests*', (route) => route.fulfill(json([])));
+    await bellRow(page, { kind: 'staff_request_pending', subject_type: 'staff_request', subject_id: 'q1', body_vars: { name: 'Andre' } }, /Andre/);
+    await expect(page).toHaveURL(/\/requests\//);
+    await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+  });
+});

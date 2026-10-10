@@ -220,11 +220,17 @@ test.describe('the English tag before each language name, in the sign-in menu', 
       await choose(page, locale);
       await page.goto('/signin/');
       await expect(page.locator('html')).toHaveAttribute('lang', locale);
+      // The page a member reads, not the load: a menu opened (or measured) while the theme sheet, the fonts or the
+      // session check are still arriving is a layout nobody sees (`settled.ts`).
+      await settled(page);
       await page.getByRole('button', { name: BUNDLES[locale]['language.title']! }).first().click();
-      await expect(page.getByRole('menuitemradio')).toHaveCount(SUPPORTED_LOCALES.length);
+      const rows = page.getByRole('menuitemradio');
+      await expect(rows).toHaveCount(SUPPORTED_LOCALES.length);
+      // The menu is the first place the other six scripts appear on this page, so their fonts are fetched when it
+      // opens: wait for them before any width or position is read.
+      await settled(page);
 
-      const rtl = directionOf(locale) === 'rtl';
-      const edges: number[] = [];
+      // What a screen reader hears, and what each row says: nothing here depends on where anything is.
       for (const code of SUPPORTED_LOCALES) {
         const name = en[`language.${code}` as keyof typeof en] as string;
         // The row's accessible name is the language's own name and nothing else: the tag is hidden from a screen reader.
@@ -235,15 +241,28 @@ test.describe('the English tag before each language name, in the sign-in menu', 
         await expect(tag.locator('xpath=.//*[normalize-space()]').first()).toHaveCSS('direction', 'ltr');
         // The name keeps its own language.
         await expect(row.locator(`[lang="${code}"]`)).toHaveText(name);
-
-        // The tag comes first: on the left in English, on the right in Arabic.
-        const tagBox = (await tag.boundingBox())!;
-        const nameBox = (await row.locator(`[lang="${code}"]`).boundingBox())!;
-        if (rtl) expect(tagBox.x, `${code}: tag right of name`).toBeGreaterThan(nameBox.x);
-        else expect(tagBox.x, `${code}: tag left of name`).toBeLessThan(nameBox.x);
-        // And the names line up on one edge, whatever the tag's length.
-        edges.push(Math.round(rtl ? nameBox.x + nameBox.width : nameBox.x));
       }
+
+      // Where things are, read in one go so every row is measured at the same instant: seven awaited reads in a
+      // row are seven moments, and a layout that moves between two of them looks like rows that do not line up.
+      const rtl = directionOf(locale) === 'rtl';
+      const placed = await rows.evaluateAll((els) =>
+        els.map((row) => {
+          const tag = [...row.querySelectorAll('[aria-hidden="true"]')].find((el) => el.textContent?.trim());
+          const name = row.querySelector('span[lang]');
+          const t = tag!.getBoundingClientRect();
+          const n = name!.getBoundingClientRect();
+          return { tagX: t.x, nameX: n.x, nameEnd: n.x + n.width };
+        }),
+      );
+      expect(placed).toHaveLength(SUPPORTED_LOCALES.length);
+      const edges = placed.map((box, i) => {
+        // The tag comes first: on the left in English, on the right in Arabic.
+        if (rtl) expect(box.tagX, `${SUPPORTED_LOCALES[i]}: tag right of name`).toBeGreaterThan(box.nameX);
+        else expect(box.tagX, `${SUPPORTED_LOCALES[i]}: tag left of name`).toBeLessThan(box.nameX);
+        return Math.round(rtl ? box.nameEnd : box.nameX);
+      });
+      // And the names line up on one edge, whatever the tag's length.
       expect(new Set(edges).size, `names line up: ${edges.join(', ')}`).toBe(1);
     });
   }

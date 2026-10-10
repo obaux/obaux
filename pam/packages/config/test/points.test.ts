@@ -51,12 +51,12 @@ describe('points rules (SOP §8)', () => {
 });
 
 describe('what the Points screen may promise', () => {
-  it('lists only what the database awards today: saving a place, finishing setup and planning a trip', () => {
-    // 0045, 0047 and 20261010115117. Add a reason here only in the change that ships its trigger.
-    expect([...AWARDED_TODAY].sort()).toEqual(['finish_setup', 'plan_trip', 'save_place']);
+  it('lists only what the database awards today: saving a place, finishing setup, planning a trip and calling a place', () => {
+    // 0045, 0047, 20261010115117 and 20261010122206. Add a reason here only in the change that ships its trigger.
+    expect([...AWARDED_TODAY].sort()).toEqual(['call_service', 'finish_setup', 'plan_trip', 'save_place']);
     expect(isAwardedToday('save_place')).toBe(true);
     expect(isAwardedToday('plan_trip')).toBe(true);
-    expect(isAwardedToday('call_service')).toBe(false);
+    expect(isAwardedToday('weekly_streak')).toBe(false);
     expect(isAwardedToday('attend_appointment_verified')).toBe(false);
   });
 
