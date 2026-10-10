@@ -1407,6 +1407,7 @@
   "place.address.openInTitle": "打开方式",
   "place.address.app.google": "Google 地图",
   "place.address.app.apple": "Apple 地图",
+  "place.address.opensInApp": "在应用中打开",
   "program.service.hours": "这项服务的开放时间",
   "program.service.hours.hint": "勾选它开放的日子。如果一天都不勾选，就使用项目的开放时间。",
   "program.service.hours.from": "{day}开始时间",

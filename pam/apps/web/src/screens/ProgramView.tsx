@@ -219,8 +219,6 @@ export function ProgramView({
           description={program.description}
           address={program.address}
           addressActions={addressActionsFor(t, program.address)}
-          phone={program.phone || null}
-          website={program.website || null}
           extra={servicesCard}
           // The same round actions a member sees under the name (D-224).
           quickActionsLabel={t('place.quick.label')}
@@ -271,17 +269,10 @@ export function ProgramView({
             },
           ]}
           labels={{
-            directions: t('place.directions'),
-            call: t('place.call'),
-            website: t('place.website'),
             hours: t('place.hours'),
             hoursOnGoogle: t('place.hoursOnGoogle'),
             about: t('place.about'),
             address: t('place.address'),
-            save: t('place.save'),
-            saved: t('places.saved'),
-            share: t('place.share'),
-            flag: t('place.flag'),
           }}
         />
       )}

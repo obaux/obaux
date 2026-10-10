@@ -198,7 +198,7 @@ Russian, Arabic (D-422); messages read in the reader's language (D-423).
   in the middle of an Arabic sentence is laid out by the right-to-left rules, so a
   leading number jumps to the wrong end ("Near 1231 N Broad St" reads with the 1231
   beside the Arabic words and the rest on the far side) and an ellipsis cuts the
-  start of the value instead of its end. **Done (D-435): the address card on a place
+  start of the value instead of its end. **Done (D-439): the address card on a place
   or program** keeps its own order. **Left: every other sentence that carries data**,
   the area chip's "Near {area}" first (`places.near`, the `long-address` story), then
   anything built from `{name}`, `{program}`, `{address}`. The fix is to wrap each
@@ -289,6 +289,21 @@ Russian, Arabic (D-422); messages read in the reader's language (D-423).
      re-filed … with the 'Pam:' prefix", D-321), and update STATUS row 34.
   If a new language later changes what a text says materially, or another template
   is given a second segment, the filing changes with it (`docs/copy-changes.md`).
+
+- [ ] **Tap "Open in…" on a real iPhone and a real Android phone** (Will,
+  10 October 2026, D-439: "if no app installed, redirect to app store, based on their
+  device"). A web page cannot ask a phone whether an app is installed, so Pam tries
+  the app and falls back (`packages/ui/src/mapsLaunch.ts`); the unit tests prove the
+  logic, not what a phone's browser does with it. On each phone, with the app
+  installed and without it, check: **Android** — Google Maps opens the route, or the
+  Play Store page for Google Maps; no Apple Maps row. **iPhone** — Google Maps opens
+  the route, or (after about 2 seconds) the App Store page for Google Maps, and
+  Safari does not leave an "address is invalid" alert behind or open the store *over*
+  an "Open in Google Maps?" prompt; Apple Maps opens the route. Also check the two
+  store addresses by opening them (Google Maps `id585027354`, package
+  `com.google.android.apps.maps`; both written from memory, no network to check them
+  from). If the iPhone path misbehaves, the safe fallback is to give Google Maps there
+  the plain web link (it opens the app when it can) and drop the store redirect.
 
 - [ ] **Decide how the tab bar behaves when a language has longer words than
   Russian** (D-434; Will's design, so his call; not blocking while the seven

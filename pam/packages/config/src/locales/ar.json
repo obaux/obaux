@@ -1542,6 +1542,7 @@
   "place.address.openInTitle": "فتح في",
   "place.address.app.google": "خرائط Google",
   "place.address.app.apple": "خرائط Apple",
+  "place.address.opensInApp": "يفتح في التطبيق",
   "program.service.hours": "ساعات عمل هذه الخدمة",
   "program.service.hours.hint": "حدد الأيام التي تعمل فيها. اترك كل الأيام دون تحديد لاستخدام ساعات عمل البرنامج.",
   "program.service.hours.from": "{day}: من الساعة",

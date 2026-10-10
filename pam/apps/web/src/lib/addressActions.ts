@@ -29,6 +29,7 @@ export function addressActionsFor(
       openInTitle: t('place.address.openInTitle'),
       googleMaps: t('place.address.app.google'),
       appleMaps: t('place.address.app.apple'),
+      opensInApp: t('place.address.opensInApp'),
     },
   };
 }

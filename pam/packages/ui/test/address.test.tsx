@@ -4,17 +4,10 @@ import { PlaceDetail } from '../src/PlaceDetail.js';
 import { appleMapsHref, directionsHref } from '../src/PlaceCard.js';
 
 const labels = {
-  directions: 'How to get there',
-  call: 'Call',
-  website: 'Website',
   hours: 'Hours',
   hoursOnGoogle: 'Check hours on Google',
   about: 'About',
   address: 'Address',
-  save: 'Save',
-  saved: 'Saved',
-  share: 'Share',
-  flag: 'Report',
 };
 
 const addressActions = {
@@ -28,6 +21,7 @@ const addressActions = {
     openInTitle: 'Open in',
     googleMaps: 'Google Maps',
     appleMaps: 'Apple Maps',
+    opensInApp: 'Opens in app',
   },
 };
 
@@ -75,15 +69,15 @@ describe('the address card', () => {
     expect(screen.getByRole('button', { name: 'Copy address' })).toBeTruthy();
     expect(screen.getByRole('button', { name: 'Open in…' })).toBeTruthy();
     // The apps are behind the drawer, not on the card.
-    expect(screen.queryByRole('link', { name: 'Google Maps' })).toBeNull();
-    expect(screen.queryByRole('link', { name: 'Apple Maps' })).toBeNull();
+    expect(screen.queryByRole('link', { name: /Google Maps/ })).toBeNull();
+    expect(screen.queryByRole('link', { name: /Apple Maps/ })).toBeNull();
   });
 
   it('opens a drawer with Google Maps and Apple Maps, each a link to that app', async () => {
     render(place({ addressActions }));
     fireEvent.click(screen.getByRole('button', { name: 'Open in…' }));
-    const google = await screen.findByRole('link', { name: 'Google Maps' });
-    const apple = await screen.findByRole('link', { name: 'Apple Maps' });
+    const google = await screen.findByRole('link', { name: /^Google Maps/ });
+    const apple = await screen.findByRole('link', { name: /^Apple Maps/ });
     expect(google.getAttribute('href')).toBe(addressActions.googleMapsHref);
     expect(apple.getAttribute('href')).toBe(addressActions.appleMapsHref);
     // Each row carries the app's own icon, as a picture with no words of its own
@@ -98,11 +92,60 @@ describe('the address card', () => {
     expect(gIcon?.getAttribute('width')).toBe(aIcon?.getAttribute('width'));
   });
 
+  it('says under each app\'s name that it opens in the app', async () => {
+    render(place({ addressActions }));
+    fireEvent.click(screen.getByRole('button', { name: 'Open in…' }));
+    await screen.findByRole('link', { name: /Google Maps/ });
+    expect(screen.getAllByText('Opens in app')).toHaveLength(2);
+  });
+
+  describe('on a phone', () => {
+    const asDevice = (userAgent: string) =>
+      vi.spyOn(window.navigator, 'userAgent', 'get').mockReturnValue(userAgent);
+
+    it('on Android, sends Google Maps through an intent that falls back to the Play Store, and has no Apple Maps', async () => {
+      asDevice('Mozilla/5.0 (Linux; Android 14; Pixel 8) Chrome/126.0.0.0 Mobile Safari/537.36');
+      render(place({ addressActions }));
+      fireEvent.click(screen.getByRole('button', { name: 'Open in…' }));
+      const google = await screen.findByRole('link', { name: /Google Maps/ });
+      await waitFor(() => expect(google.getAttribute('href')).toMatch(/^intent:\/\//));
+      expect(google.getAttribute('href')).toContain('S.browser_fallback_url=');
+      expect(google.getAttribute('href')).toContain('play.google.com');
+      expect(screen.queryByRole('link', { name: /Apple Maps/ })).toBeNull();
+    });
+
+    it('on an iPhone, tries the Google Maps app and then the App Store, and keeps Apple Maps', async () => {
+      vi.useFakeTimers({ shouldAdvanceTime: true });
+      asDevice('Mozilla/5.0 (iPhone; CPU iPhone OS 17_5 like Mac OS X) Mobile/15E148 Safari/604.1');
+      const assign = vi.fn();
+      const original = window.location;
+      Object.defineProperty(window, 'location', {
+        configurable: true,
+        value: Object.defineProperty({ ...original }, 'href', { set: assign, get: () => original.href }),
+      });
+      try {
+        render(place({ addressActions }));
+        fireEvent.click(screen.getByRole('button', { name: 'Open in…' }));
+        const apple = await screen.findByRole('link', { name: /Apple Maps/ });
+        expect(apple.getAttribute('href')).toBe(addressActions.appleMapsHref);
+        // Only script can tell whether the app is there, so this one is a button.
+        const google = await screen.findByRole('button', { name: /Google Maps/ });
+        fireEvent.click(google);
+        expect(assign).toHaveBeenCalledWith(expect.stringMatching(/^comgooglemaps:\/\/\?daddr=/));
+        vi.advanceTimersByTime(2100);
+        expect(assign).toHaveBeenLastCalledWith(expect.stringContaining('apps.apple.com'));
+      } finally {
+        Object.defineProperty(window, 'location', { configurable: true, value: original });
+        vi.useRealTimers();
+      }
+    });
+  });
+
   it('offers only the app it has a link for', async () => {
     render(place({ addressActions: { ...addressActions, googleMapsHref: null } }));
     fireEvent.click(screen.getByRole('button', { name: 'Open in…' }));
-    expect(await screen.findByRole('link', { name: 'Apple Maps' })).toBeTruthy();
-    expect(screen.queryByRole('link', { name: 'Google Maps' })).toBeNull();
+    expect(await screen.findByRole('link', { name: /^Apple Maps/ })).toBeTruthy();
+    expect(screen.queryByRole('link', { name: /Google Maps/ })).toBeNull();
   });
 
   it('puts exactly the address on the clipboard — plain words, nothing hidden', async () => {

@@ -62,20 +62,11 @@ export function ProgramEmptyView() {
           categoryLabel={t('program.empty.preview.kind')}
           description={t('program.empty.preview.about')}
           address={t('program.empty.preview.address')}
-          phone={null}
-          website={null}
           labels={{
-            directions: t('place.directions'),
-            call: t('place.call'),
-            website: t('place.website'),
             hours: t('place.hours'),
             hoursOnGoogle: t('place.hoursOnGoogle'),
             about: t('place.about'),
             address: t('place.address'),
-            save: t('place.save'),
-            saved: t('places.saved'),
-            share: t('place.share'),
-            flag: t('place.flag'),
           }}
         />
       </VStack>

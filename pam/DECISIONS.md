@@ -11502,7 +11502,7 @@ looked at, so its first run would have failed on the whole backlog.
   Entries for the pseudo-language mean "worse than any real language", not "fine":
   they matter on the day a language with longer words is added.
 
-### D-435 — An address can be copied, or opened in Google Maps or Apple Maps, from the place and program pages
+### D-439 — An address can be copied, or opened in Google Maps or Apple Maps, from the place and program pages
 
 **Date:** 2026-10-09. Will, on my finding that an English street address inside an
 Arabic sentence is reordered: "Let's ensure the address listed is easily copied into
@@ -11531,6 +11531,31 @@ google maps or apple maps to help them navigate."
   icon is cropped 5% in so its own corners and edge glow fall outside the frame (found by
   testing each crop for a fully opaque picture under the rounded frame). They are third
   parties' marks, used only to say which app a link opens.
+- **The drawer, as Will refined it (10 October: "icon based items… should not have left
+  padding, so it's flush with header and page layout… make Open in much smaller… tiny
+  subtitles under App name saying 'Opens in app'… if no app installed, redirect to app
+  store, based on their device").** The rows are **flush**: no padding before the app
+  symbol or after the chevron (`MenuList isFlush`), so the symbols line up with the title
+  and the sheet's own margin. The title is a quiet 15px label, not a 22px heading (it is
+  still a level-2 heading for a screen reader). Under each app's name is a 14px line,
+  **"Opens in app"** (`place.address.opensInApp`).
+- **Getting to the app, or the store (`mapsLaunch.ts`).** A web page cannot ask a phone
+  whether an app is installed, so each platform gets the way that is reliable for it.
+  **Android, Google Maps:** an `intent://` link with the Play Store as its fallback —
+  the browser opens the app, or the store, with no script. **iPhone and iPad, Google
+  Maps:** Google's `comgooglemaps://` address is tried; if the page is still in front 2
+  seconds later (and was never hidden or blurred) the App Store page opens instead. **iPhone
+  and iPad, Apple Maps:** Apple's own link; Maps comes with the phone, so there is no
+  store to send anyone to. **Android, Apple Maps: no row** — Apple has no Android app,
+  and a row that opened a web page under "Opens in app" would be untrue (to show it
+  anyway is one line in `mapsLaunchFor`). **A computer:** each map's web page, in a new
+  tab. The platform is read in the browser after the page loads (an iPad that calls itself
+  a Mac is told by its touch screen), so the first paint is the computer's.
+  "Opens in app" shows on every device; on a computer the link opens the web version.
+  **Not tested on a real phone** — see before-launch: the iPhone try-then-store path in
+  particular depends on how Safari treats an app address, and the store addresses
+  (Google Maps `id585027354`, package `com.google.android.apps.maps`) were written from
+  memory.
 - **Same door in both.** `appleMapsHref` follows `directionsHref`: coordinates beat the
   address when Pam has them (a stale address routes to the wrong building), the address
   otherwise, nothing when there is nothing. A picked service has its own address and no
@@ -11546,8 +11571,8 @@ google maps or apple maps to help them navigate."
   request-a-program screen: everywhere `PlaceDetail` draws an address. Not on the sample
   address of the empty-program preview. The texts are unchanged: a reminder already
   carries the address and a link.
-- **Seven new strings** (`place.address.copy`, `.copied`, `.copyFailed`, `.openIn`,
-  `.openInTitle`, `.app.google`, `.app.apple`) in seven languages. The six that are not
+- **Eight new strings** (`place.address.copy`, `.copied`, `.copyFailed`, `.openIn`,
+  `.openInTitle`, `.app.google`, `.app.apple`, `.opensInApp`) in seven languages. The six that are not
   English are machine drafts like the rest and have no native reader yet. The app names
   are the ones a phone in that language shows (Google 地图, Google Карты, خرائط Google).
 - **Checked.** `appleMapsHref` (address, coordinates, nothing); the card with and without
@@ -11558,3 +11583,32 @@ google maps or apple maps to help them navigate."
   its address, so they have nothing to copy; if Will wants an address there it is the same
   card. Google Maps itself still only has the one link.
 
+### D-440 — A place has one layout: the profile, with its one button pinned to the foot
+
+**Date:** 2026-10-10. Will, shown a Storybook story that drew a place as labelled rows
+(Call this place, Their website, Save, Share, Something is wrong here) under a big button:
+"Please retire the rows layout, only use place profiles with sticky footer buttons."
+This amends D-224 and D-291, and finishes what D-326 began for the footer.
+
+- **What a place is now.** Its name and who it is for, then **a list of ways to reach it**
+  (`quickActions`: directions, a message, call, website — each a row with a line under it),
+  the address card (copy, Open in…, D-439), the hours (a row, the week in a drawer, D-309),
+  and the description. **One primary button, in the sticky footer** (`Page footer`, D-326):
+  *Plan a trip* for a member who has not booked, otherwise *How to get there*; nothing once
+  a visit is booked, because the row of ways to reach it carries directions. Save, Share and
+  Flag stay in the bar above the title and its ⋯ menu, as they have since D-237.
+- **Gone from `PlaceDetail`:** the fallback layout of labelled rows and everything only it
+  used — the props `phone`, `website`, `directionsHref`, `isSaved`, `onSave`, `onCall`,
+  `onShare`, `flagHref`, the labels `directions`, `call`, `website`, `save`, `saved`,
+  `share`, `flag`, and the in-page directions button. The live place and program pages
+  already used the profile; the rows survived in Storybook (the story Will saw), the
+  components gallery and the program-request screen.
+- **Directions are said once.** Where the footer's button is directions, the *Get
+  directions* row is left out of the list rather than repeated above it.
+- **The program-request screen** (`RequestProgramScreen`) now has the profile's list too:
+  directions to the address typed, a call, the website, instead of the rows.
+- **Not changed.** Every string stays (the footer and rows reuse `place.directions`,
+  `place.quick.*`); the trip, flag and save flows are as they were.
+- **Checked.** Typecheck; the `@pam/ui` suite (the address card and drawer, axe on a profile
+  with quick actions); Storybook builds and *PlaceDetail* shows the list and the footer
+  button; the place and flag browser specs.

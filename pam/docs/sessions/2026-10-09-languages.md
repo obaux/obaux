@@ -313,7 +313,7 @@ minutes, 3,752 measurements, none unmeasurable): 137 defects new in a language.
   wider). Looked at, added with the same reason (121 entries), and the job's timeout
   raised from 60 to 90 minutes because it used 55. Re-run on the push after this.
 
-## Part 7 — an address can be copied, or opened in Apple Maps (D-435)
+## Part 7 — an address can be copied, or opened in Apple Maps (D-439)
 
 Will, on the Arabic address finding: "Let's ensure the address listed is easily copied
 into google maps or apple maps to help them navigate."
@@ -369,4 +369,33 @@ later (it failed every time), then fixed:
   squares in `apps/web/public/maps/`, both rounded by the same 22%. Found the crop by
   testing, per crop size, that every pixel under the rounded frame is opaque (5% in, plus
   2% margin). They are in Foundations › Imagery (the test requires it).
+
+## Part 9 — the rows layout retired, the drawer refined (10 October)
+
+Will, shown the older rows layout in Storybook: "Please retire the rows layout, only use
+place profiles with sticky footer buttons." Then, looking at the drawer: icons "flush with
+header and page layout", "make Open in much smaller", "tiny subtitles under App name saying
+'Opens in app'", and "if no app installed, redirect to app store, based on their device,
+android vs ios."
+
+- **Rows retired (D-440).** `PlaceDetail` lost the labelled-rows fallback and the props
+  only it used; the place page's footer now carries *How to get there* for anyone who is
+  not planning or booked, and the directions *row* is left out in that case so it is not
+  said twice. `RequestProgramScreen` got the profile's list; the gallery and the Storybook
+  story draw a profile with its footer button. The e2e specs already spoke the profile's
+  words ("Get directions" row, "Plan a trip").
+- **Drawer (D-439 amended).** `MenuList isFlush`; the title 15px; `place.address.opensInApp`
+  ("Opens in app", seven languages, machine drafts); `mapsLaunch.ts` with the Android
+  intent, the iPhone try-then-store, no Apple Maps on Android. I read "make Open in much
+  smaller" as the drawer's title (the big word in the screenshot), not the "Open in…" link
+  on the card.
+- **Found while testing:** Astryx's `ListItem` ignores `onClick` when it has an `href`, so the
+  drawer's earlier "close when chosen" never ran. A row that must run script (the iPhone's
+  Google Maps) is therefore a button, and the link rows simply leave the drawer open.
+- **Numbering.** My address decision was D-435; `amazing-archimedes` had pushed its own D-435
+  (Arabic isolates) first, and `affectionate-goldberg` claimed D-435 on 10 October at 01:19.
+  Mine is now **D-439** and the rows retirement **D-440**; D-438 is left for `bohr`. Goldberg's
+  D-435 claim still has to move (their row, not mine, to change).
+- **Not tried on a phone.** Before-launch has a real-device check for the app-or-store
+  hand-off, including the two store addresses, which were written from memory.
 

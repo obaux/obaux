@@ -45,17 +45,10 @@ async function expectNoViolations(container: HTMLElement): Promise<void> {
 const placeLabels = { save: 'Save', saved: 'Saved' };
 
 const detailLabels = {
-  directions: 'How to get there',
-  call: 'Call this place',
-  website: 'Their website',
   hours: 'Opening hours',
   hoursOnGoogle: 'Check hours on Google',
   about: 'About program',
   address: 'Address',
-  save: 'Save this place',
-  saved: 'Saved',
-  share: 'Share this place',
-  flag: 'Something is wrong here',
 };
 
 describe('accessibility', () => {
@@ -102,7 +95,6 @@ describe('accessibility', () => {
           distanceLabel="1.2 miles"
           status={{ isOpen: true, label: 'Open until 5:00pm' }}
           audienceLabel="In a school"
-          onSave={() => {}}
           labels={placeLabels}
         />
       </main>,
@@ -130,6 +122,7 @@ describe('accessibility', () => {
               openInTitle: 'Open in',
               googleMaps: 'Google Maps',
               appleMaps: 'Apple Maps',
+              opensInApp: 'Opens in app',
             },
           }}
           distanceLabel="1.2 miles"
@@ -138,13 +131,12 @@ describe('accessibility', () => {
           hoursArePlaceholder
           placeholderNote="Sample hours. Call to check before you go."
           audienceLabel="In a school"
-          phone="+15555550100"
-          website="https://example.org"
-          directionsHref="https://maps.example/x"
           hoursHref="https://maps.example/y"
-          onSave={() => {}}
-          onShare={() => {}}
-          flagHref="/flag/?place=abc"
+          quickActionsLabel="Ways to reach this place"
+          quickActions={[
+            { id: 'directions', label: 'Get directions', description: 'Open in Google Maps', icon: <PlacesIcon />, href: 'https://maps.example/x', isExternal: true },
+            { id: 'call', label: 'Call', description: '(555) 555-0100', icon: <PlacesIcon />, href: 'tel:+15555550100' },
+          ]}
           labels={detailLabels}
         />
       </main>,

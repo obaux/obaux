@@ -1407,6 +1407,7 @@
   "place.address.openInTitle": "Abrir en",
   "place.address.app.google": "Google Maps",
   "place.address.app.apple": "Apple Maps",
+  "place.address.opensInApp": "Se abre en la app",
   "program.service.hours": "Horario de este servicio",
   "program.service.hours.hint": "Marca los días en que funciona. Si no marcas ninguno, se usa el horario del programa.",
   "program.service.hours.from": "{day} desde",

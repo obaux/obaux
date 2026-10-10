@@ -403,6 +403,9 @@ function PlaceScreen() {
     ? googlePlaceHref(place!.name, service.address, null)
     : googlePlaceHref(place!.lookupName || place!.name, place!.address, place!.placeId);
   const lines = status ? weekLines(status.hours, locale, t('place.hours.closed')) : undefined;
+  // Directions are the footer's one button for anybody who is neither planning
+  // a visit nor already booked (D-440); a row of the same name would say it twice.
+  const footerIsDirections = !plansVisit && !visitWhen && Boolean(directions);
 
   return (
     <Page
@@ -425,6 +428,11 @@ function PlaceScreen() {
               ...(service ? { service: service.id } : {}),
             }).toString()}`}
           />
+        ) : footerIsDirections ? (
+          // Everybody else's one action (§2.5) is how to get there, in the same
+          // sticky footer rather than in the page (Will, 10 October 2026, D-440).
+          // Once a visit is booked the row of ways to reach it has directions.
+          <BigButton label={t('place.directions')} href={directions ?? undefined} />
         ) : null
       }
     >
@@ -467,14 +475,8 @@ function PlaceScreen() {
         hoursArePlaceholder={status ? !status.isReal : false}
         placeholderNote={t('place.hours.sample')}
         audienceLabel={place!.audience ? t(`place.audience.${place!.audience}`) : null}
-        phone={phone}
-        website={website}
-        // Nothing asks for directions as a button when the one action is
-        // planning a visit, or a visit is booked (D-273); the row has them.
-        directionsHref={visitWhen || plansVisit ? null : directions}
         addressFirst={visitWhen !== null}
         hoursHref={googleHref}
-        isSaved={saved}
         notice={
           visitWhen || policiesOnTop ? (
             <VStack gap={3}>
@@ -526,7 +528,7 @@ function PlaceScreen() {
         // Rows, most important first (Will, 5 October, D-291): getting
         // there, then asking a question, then calling, then the website.
         quickActions={[
-          ...(directions || googleHref
+          ...(!footerIsDirections && (directions || googleHref)
             ? [
                 {
                   id: 'directions',
@@ -622,9 +624,6 @@ function PlaceScreen() {
             : []),
         ]}
         labels={{
-          directions: t('place.directions'),
-          call: t('place.call'),
-          website: t('place.website'),
           hours: t('place.hours'),
           today: t('place.hours.today'),
           hoursOnGoogle: t('place.hoursOnGoogle'),
@@ -637,10 +636,6 @@ function PlaceScreen() {
             : services.some((s) => s.address)
               ? t('place.address.main')
               : t('place.address'),
-          save: t('place.save'),
-          saved: t('places.saved'),
-          share: t('place.share'),
-          flag: t('place.flag'),
         }}
       />
 

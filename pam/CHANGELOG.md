@@ -7,7 +7,14 @@ the address is on your phone's clipboard, ready to paste into any maps app, a
 ride app or a note. Under the address, "Open in…" opens a drawer with Google Maps
 and Apple Maps, each with its own icon, and one tap hands the address to that app.
 In Arabic the address now keeps its own order instead of being turned around
-(D-435).
+(D-439). The drawer's rows line up with its title, each app says "Opens in app",
+and on a phone a tap opens the app — or, if it is not installed, its page in the
+App Store or Play Store (Apple Maps is offered on iPhones and iPads, not Android).
+
+A place now has one layout: its details and the ways to reach it, with the one
+button that matters — *Plan a trip* or *How to get there* — pinned to the foot of
+the screen. The older list of labelled rows (Call this place, Their website, Save
+this place, Share, Something is wrong here) is gone from every screen (D-440).
 
 ## [0.51.0] — 2026-10-09 · Pam speaks seven languages
 

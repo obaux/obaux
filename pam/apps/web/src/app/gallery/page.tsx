@@ -11,6 +11,7 @@ import {
   AreaChip,
   BellIcon,
   BigButton,
+  GlobeIcon,
   HelpBar,
   Loading,
   NavTile,
@@ -20,6 +21,7 @@ import {
   Page,
   PeopleIcon,
   PersonCard,
+  PhoneIcon,
   PlaceCard,
   PlaceDetail,
   PlacesIcon,
@@ -61,17 +63,25 @@ const styles = stylex.create({
 });
 
 const DETAIL_LABELS = {
-  directions: 'How to get there',
-  call: 'Call this place',
-  website: 'Their website',
   hours: 'Opening hours',
   hoursOnGoogle: 'Check hours on Google',
   about: 'About program',
   address: 'Address',
-  save: 'Save this place',
-  saved: 'Saved',
-  share: 'Share this place',
-  flag: 'Something is wrong here',
+};
+
+const ADDRESS_ACTIONS = {
+  googleMapsHref: 'https://www.google.com/maps/dir/?api=1&destination=1234%20Market%20St',
+  appleMapsHref: 'https://maps.apple.com/?daddr=1234%20Market%20St',
+  labels: {
+    copy: 'Copy address',
+    copied: 'Address copied',
+    copyFailed: 'Could not copy. Press and hold the address to copy it.',
+    openIn: 'Open in…',
+    openInTitle: 'Open in',
+    googleMaps: 'Google Maps',
+    appleMaps: 'Apple Maps',
+    opensInApp: 'Opens in app',
+  },
 };
 
 const PLACE_LABELS = { save: 'Save', saved: 'Saved' };
@@ -270,7 +280,7 @@ export default function GalleryPage() {
 
       <Section
         title="A place, on its own screen"
-        note="Where the actions that left the card went: labelled rows, not icons behind a menu."
+        note="A place's profile: quick actions under the name, the address with copy and Open in…, and the one button that matters pinned to the foot of the screen."
       >
         <PlaceDetail
           name="Riverside Learning Center"
@@ -287,13 +297,14 @@ export default function GalleryPage() {
           ]}
           hoursArePlaceholder
           placeholderNote="These are sample hours while Pam checks the real ones. Call before you go."
-          phone="+12155550100"
-          website="https://example.org"
-          directionsHref="https://www.google.com/maps/dir/?api=1&destination=1234%20Market%20St"
+          addressActions={ADDRESS_ACTIONS}
           hoursHref="https://www.google.com/maps/search/?api=1&query=Riverside"
-          onSave={() => {}}
-          onShare={() => {}}
-          flagHref="/flag/"
+          quickActionsLabel="Ways to reach this place"
+          quickActions={[
+            { id: 'directions', label: 'How to get there', description: 'Open in Google Maps', icon: <PlacesIcon />, href: ADDRESS_ACTIONS.googleMapsHref, isExternal: true },
+            { id: 'call', label: 'Call this place', description: '(215) 555-0100', icon: <PhoneIcon />, href: 'tel:+12155550100' },
+            { id: 'website', label: 'Their website', description: 'example.org', icon: <GlobeIcon />, href: 'https://example.org', isExternal: true },
+          ]}
           labels={DETAIL_LABELS}
         />
       </Section>

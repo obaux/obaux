@@ -40,11 +40,11 @@ export const BRAND: readonly ImageryItem[] = [
   {
     src: '/maps/google-maps.webp',
     name: 'Google Maps',
-    note: "Google's pin on its light grey, in the Open in… drawer on an address (D-435). A third party's mark, there only to say which app a link opens.",
+    note: "Google's pin on its light grey, in the Open in… drawer on an address (D-439). A third party's mark, there only to say which app a link opens.",
   },
   {
     src: '/maps/apple-maps.webp',
     name: 'Apple Maps',
-    note: "Apple's icon, cropped 5% in so its corners and edge glow are outside a 22% rounded frame (the same radius as Google's), in the Open in… drawer (D-435). Also a third party's mark.",
+    note: "Apple's icon, cropped 5% in so its corners and edge glow are outside a 22% rounded frame (the same radius as Google's), in the Open in… drawer (D-439). Also a third party's mark.",
   },
 ];
