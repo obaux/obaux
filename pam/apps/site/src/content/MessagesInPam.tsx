@@ -7,8 +7,9 @@ import { Steps } from '../components/Steps';
  * Support post: Messages (everyone). Who can write to whom is a database rule (D-176,
  * migration 0063): a member may start a chat with their own case manager or a program
  * they joined, and staff with their own members; nobody else. A message never
- * queues a text (migration 0064). Left out on purpose: blocking (the terms mention it
- * but no screen has it), message translation (switched off), voice notes.
+ * queues a text (migration 0064). Blocking is the ⋯ menu's "Block this person" (D-463, words from
+ * en.json messages.block.* and messages.blocked.*). Left out on purpose: message translation
+ * (switched off), voice notes.
  */
 export function MessagesInPam() {
   return (
@@ -86,6 +87,44 @@ export function MessagesInPam() {
           alt="The report screen. It asks what is wrong and lists reasons, with buttons “Send report” and “Never mind”."
           caption="Reporting a message."
         />
+      </Section>
+
+      <Section title="If you do not want messages from someone">
+        <P>You can block a person from inside a conversation with them.</P>
+        <Steps
+          items={[
+            'In the conversation, tap “More options”. A screen called Options opens.',
+            'Tap “Block this person”.',
+            'Read what it says. Tap “Block”, or tap “Not now” if you change your mind.',
+          ]}
+        />
+        <P>
+          Pam asks first. It says: “Neither of you will be able to send messages in this conversation or start
+          a new one. What has already been said stays here, and you can still report it. They will see that
+          messages are blocked. You can unblock them any time from this menu.”
+        </P>
+        <P>
+          The other person is told. Where the box for writing a message was, they see “You can’t send messages
+          here”. Under it: “This person has blocked messages in this conversation. You can still read it.
+          Questions? Call Pam.”
+        </P>
+        <Screenshot
+          name="messages-in-pam/blocked.png"
+          alt="A conversation after the other person blocked it. The box for writing a message is gone. In its place: “You can’t send messages here. This person has blocked messages in this conversation. You can still read it. Questions? Call Pam.” and a link, “Call Pam for help”."
+          caption="What the other person sees."
+        />
+        <P>
+          You see “You blocked this person”. It says neither of you can send messages there, and that to
+          change that you open the ⋯ menu and choose Unblock.
+        </P>
+        <P>
+          Only the person who blocked can undo it. Open More options in the same conversation, tap “Unblock
+          this person”, then tap “Unblock”. You will both be able to send messages again.
+        </P>
+        <P>
+          Anyone can block in a conversation: a member, a case manager or a program lead. Blocking does not
+          report anyone. To report a message, use “Report suspicious activity” above.
+        </P>
       </Section>
     </Body>
   );

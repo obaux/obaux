@@ -42,8 +42,7 @@ STATUS row too.
   unchanged. *Still to do when they land:* when the staff Homes change (rings), the steps that say "Home"
   for case managers and program leads (Joining as staff, Sending an invite, One phone two sides, Messages,
   Texts) and `reminders`-adjacent screenshots; when a deploy actually carries a given screen, check it is
-  there. *Block* (D-463, "Block this person" in Options) is not in any post yet; add a short section when
-  it is live. *Reminders:* the day `dispatch-sms` really sends the day-before reminder, flip
+  there. *Block* (D-463) has its own section in Messages in Pam (added 10 October; it is on main, so it ships with the same deploy). *Reminders:* the day `dispatch-sms` really sends the day-before reminder, flip
   `VISIT_REMINDERS_LIVE` in `apps/site/src/content/flags.ts` (drives the Texts post and the home card); then
   by hand: About Pam's "What is coming" in all seven languages (the other six need a native reader again),
   the Joining Pam reminder choice, the Texts screenshots and limits (quiet hours, 134 characters, D-431).

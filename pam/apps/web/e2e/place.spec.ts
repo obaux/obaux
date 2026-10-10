@@ -138,6 +138,26 @@ test.describe("a place's own screen", () => {
     await expect(page.getByText('Bring a friend')).toHaveCount(0);
   });
 
+  test('tapping Call tells the database once, and does not hold up the call', async ({ page }) => {
+    // Points for a first call to a place (log_call, honour system). The real
+    // place has a catalogue id; the dialler's own link is left to open.
+    const real = { ...PLACE, id: '4c0f6b64-3a0e-4b8e-9d6c-7a1f0f3c2b11' };
+    await signedIn(page);
+    await page.route(DETAIL, (route) => route.fulfill(json([real])));
+    const logged: unknown[] = [];
+    await page.route('**/rest/v1/rpc/log_call*', (route) => {
+      logged.push(route.request().postDataJSON());
+      return route.fulfill(json(true));
+    });
+    await page.goto(`/place/?id=${real.id}`);
+    await page.evaluate(() => document.addEventListener('click', (e) => (e.target as HTMLElement).closest('a[href^="tel:"]') && e.preventDefault(), true));
+    const call = page.getByRole('link', { name: /^Call/ });
+    await expect(call).toHaveAttribute('href', 'tel:+12155550100');
+    await call.click();
+    await expect.poll(() => logged.length).toBe(1);
+    expect(logged[0]).toMatchObject({ p_service_id: real.id });
+  });
+
   test('the actions are rows, directions first, and the rest is in the bar', async ({ page }) => {
     // D-291: Get directions, Send a message, Call and Website under the name,
     // as rows with a line each (they were labelled circles, D-224); the hours a row too, the week in a drawer (D-309);

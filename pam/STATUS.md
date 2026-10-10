@@ -928,6 +928,10 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
+## Languages & legal · the language loader comes down; the flaky sign-in menu test (10 October) — merged 10 October
+
+Merged to `main` by the merge desk, 10 October, from `claude/lena-steady-tag-test` (D-471). The "Switching to…" loader could go up a moment after the new language had already arrived and then stay up for good, covering every tap: the take-down now runs whether or not the loader was up in that render (`lib/i18n.tsx`). Found by the flaky `languages.spec` sign-in menu test (5 or 6 stalled clicks in 260 runs under load); after the fix 260 of 260, twice. The sign-in menu and join chip tests also wait for the settled page and read every row's position at once. No migration, no copy change.
+
 ## Languages & legal · the last-day line and the blocking words (10 October) — merged 10 October
 
 Merged to `main` by the merge desk, 10 October, from `claude/lena-honest-promises` (e82e815). Will's rule, via Mira: a screen that promises something Pam does not do is
@@ -1158,6 +1162,10 @@ Merged to `main` by the merge desk, 10 October, from `claude/places-programs-poi
 ## Places & programs · cancel a visit, past visits (10 October 2026) — READY, not merged
 
 Branch `claude/places-programs-cancel-trip`. No migration: the database already cancels a cancelled trip's day-before text (`sync_trip_reminder`), now attacked by test `35_cancelling_a_trip_cancels_its_text_test.sql`. The place page offers "Cancel this visit"; Trips has a "Past visits" section.
+
+## Places & programs · calling a place earns points (10 October 2026) — merged 10 October
+
+Merged to `main` by the merge desk, 10 October, from `claude/places-programs-call-points` (D-472). Migration `20261010122206`, expand only: `log_call` (10 points, once per place, five places a day, members only; a staff tap is ignored). **Applied live at merge**, read back (body identical to the file; signed-in only, not anon). The place page reports a tap on a phone link, fire and forget. Test `34_call_a_place_points_test.sql`. The Points screen's Call row now shows.
 
 ## Places & programs · review record, pending change, program services — the database half (10 October 2026)
 
