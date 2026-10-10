@@ -34,7 +34,7 @@ const styles = stylex.create({
 const ICON = { width: 26, height: 26, 'aria-hidden': true } as const;
 
 export function PersonPoliciesView({ personId, firstName }: { readonly personId: string; readonly firstName: string }) {
-  const { t, locale } = useI18n();
+  const { t, tPlain, locale } = useI18n();
   const { policies } = usePolicies();
   const day = new Intl.DateTimeFormat(intlLocale(locale), { month: 'long', day: 'numeric' });
   const rows = policies.map((policy) => ({
@@ -49,7 +49,7 @@ export function PersonPoliciesView({ personId, firstName }: { readonly personId:
       title={t('person.policies.title')}
       subtitle={firstName}
       backHref={`/person/?id=${encodeURIComponent(personId)}`}
-      backLabel={t('nav.back.person', { name: firstName })}
+      backLabel={tPlain('nav.back.person', { name: firstName })}
       actions={<HelpButton />}
     >
       {total === 0 ? (

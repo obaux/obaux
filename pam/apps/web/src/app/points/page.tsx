@@ -182,7 +182,7 @@ function Rung({ badge, points, t }: { badge: BadgeDefinition; points: number | n
 }
 
 export default function PointsPage() {
-  const { t } = useI18n();
+  const { t, tPlain } = useI18n();
   const { state: session } = useSession();
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
   const { demoRole, setViewAs } = useRoleView(trueRole);
@@ -302,7 +302,7 @@ export default function PointsPage() {
               {next ? (
                 <VStack gap={2}>
                   <ProgressBar
-                    label={t('points.hero.toNext', { count: to - points, next: t(next.labelKey) })}
+                    label={tPlain('points.hero.toNext', { count: to - points, next: t(next.labelKey) })}
                     isLabelHidden
                     value={points - from}
                     max={Math.max(1, to - from)}

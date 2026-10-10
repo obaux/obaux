@@ -9,12 +9,13 @@ import { useStoryText } from '../support/useStoryText';
  */
 function LocalisedTile({ label, description, alertLabel, ...rest }: NavTileProps) {
   const tr = useStoryText();
+  const plain = useStoryText({ plain: true });
   return (
     <NavTile
       {...rest}
       label={tr(label)}
       description={tr(description)}
-      {...(alertLabel ? { alertLabel: tr(alertLabel) } : {})}
+      {...(alertLabel ? { alertLabel: plain(alertLabel) } : {})}
     />
   );
 }

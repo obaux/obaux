@@ -498,7 +498,7 @@ function SignSheet({
   readonly onClose: () => void;
   readonly onSign: (signature: string) => void;
 }) {
-  const { t } = useI18n();
+  const { t, tPlain } = useI18n();
   const pad = useRef<SignaturePadHandle | null>(null);
   const [hasInk, setHasInk] = useState(false);
   // While a finger is drawing, the sheet holds still (D-333).
@@ -510,7 +510,7 @@ function SignSheet({
     <BottomSheet
       isOpen={isOpen}
       onOpenChange={(open) => (open ? undefined : onClose())}
-      label={t('sign.title', { title })}
+      label={tPlain('sign.title', { title })}
       xstyle={sheet.panel}
       // Drags and dismisses like any sheet from its handle, header and copy
       // (Will, D-333), but not while a stroke is in progress: "form" blocks

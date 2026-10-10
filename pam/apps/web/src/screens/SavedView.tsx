@@ -118,7 +118,7 @@ export function SavedView({
   hidden,
   visits = {},
 }: SavedViewProps) {
-  const { t, locale } = useI18n();
+  const { t, tPlain, locale } = useI18n();
   // "Wed, Oct 7 · 10:00 AM", the trip card's own form.
   const all = state.status === 'ready' && !replace ? state.places : [];
   const places = hidden ? all.filter((place) => !hidden.has(place.id)) : all;
@@ -186,7 +186,7 @@ export function SavedView({
           label={t('saved.title')}
           isEditing={editing}
           onRemove={onUnsave}
-          removeLabel={(name) => t('saved.unsave', { name })}
+          removeLabel={(name) => tPlain('saved.unsave', { name })}
           tiles={places.map((place) => {
             // A visit booked here (Will, 5 October, D-292): its day and time
             // on the picture, and the place opens about that visit — Back
@@ -205,7 +205,7 @@ export function SavedView({
               // The category's illustration fills the picture (D-337).
               art: <CategoryPicture category={place.category} seed={place.id} />,
               tag,
-              ...(tag ? { label: t('saved.visitLabel', { name: place.name, when: tag }) } : {}),
+              ...(tag ? { label: tPlain('saved.visitLabel', { name: place.name, when: tag }) } : {}),
             };
           })}
         />
@@ -442,7 +442,7 @@ function StarredPeople({
   readonly onStage: (id: string) => void;
   readonly onUnstar: (id: string) => void;
 }) {
-  const { t, locale } = useI18n();
+  const { t, tPlain, locale } = useI18n();
 
   if (people.length === 0) {
     return (
@@ -480,14 +480,14 @@ function StarredPeople({
                   <StarToggle
                     isOn={!isOff}
                     isRinged
-                    label={t(isOff ? 'people.star' : 'people.unstar', { name: member.firstName })}
+                    label={tPlain(isOff ? 'people.star' : 'people.unstar', { name: member.firstName })}
                     onToggle={() => onStage(member.id)}
                   />
                 ) : (
                   <StarToggle
                     isOn
                     name={member.firstName}
-                    label={t('people.unstar', { name: member.firstName })}
+                    label={tPlain('people.unstar', { name: member.firstName })}
                     onToggle={() => onUnstar(member.id)}
                   />
                 )

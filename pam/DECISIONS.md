@@ -11891,3 +11891,110 @@ highest number claimed anywhere was D-440. Every reference on this branch moved 
 Lesson, again: fetch and read every `origin/claude/*` allocations row *and* DECISIONS
 heading list before claiming, not only the one file on your own branch.
 
+
+### D-435 — A value written into an Arabic sentence is laid out as a piece of its own
+
+**Date:** 2026-10-09. Found by the text-fit audit of that day (D-422): in
+Arabic, `places.near` ("بالقرب من {area}") with the address `1231 N Broad St,
+North Philadelphia` read, on screen, `… St, North Philadelphia 1231 بالقرب من`.
+The browser lays a line of mixed-direction text out as one stream, so the
+number jumped beside the Arabic words and the rest of the address went to the
+far side. Asked for by Will; **numbered D-435 — I took D-434 first (16:54 UTC)
+and `claude/gallant-clarke-0dhizj` took it at 17:13, so I moved rather than touch
+their branch** (`docs/allocations.md`).
+
+**What it is.** `fillTemplate(template, vars, dir)` (`packages/config/src/i18n.ts`)
+takes the direction of the language; when it is `rtl` — Arabic today — each
+**text** value is wrapped in U+2068 FIRST STRONG ISOLATE … U+2069 POP
+DIRECTIONAL ISOLATE (`isolate`). The value is then laid out on its own, in
+whichever direction its own first letter reads, and placed in the sentence as one
+piece. In every left-to-right language the result is byte for byte what it was
+(`test/isolates.test.ts` proves it against a copy of the old function, over every
+template in all six bundles and nine kinds of value). The React `t` passes the
+active direction; **`tPlain`**, new beside it, is the same lookup with nothing
+added, in every language.
+
+**Decisions a later session could question:**
+
+- **Text is wrapped; numbers are not.** A number has no direction of its own to
+  disagree with the sentence, so it is never reordered, and wrapping it changes
+  how the punctuation beside it resolves (`{a}/{b}`, `{n}%`) for nothing gained.
+  165 of Arabic's 304 templates have a `{count}`, so this also keeps
+  hundreds of strings free of invisible characters. A number passed *as a string*
+  ("1,5", a formatted distance; the story helper does it) is text, and is wrapped,
+  which is harmless and does help a phone number or a date. Reverse it by
+  changing one condition in `fillTemplate`.
+- **An empty value stays empty** (an optional piece leaves no trace), and **a value
+  cannot close or leave open an isolate of its own**: a stray close in a pasted
+  name would pair with ours and release the rest of the sentence, so isolates in a
+  value are balanced first. A balanced isolate inside a value (a sentence built
+  from another `t`) is kept.
+- **Only drawn text is isolated.** The invisible characters are in the string, so
+  anything read by something other than an eye must not carry them. Switched to
+  `tPlain`, each one found by scanning every story in Arabic rather than by
+  reading call sites: **accessible names** (`aria-label` on icon buttons, cards,
+  the role switch, sheets, the bell, back buttons, star toggles), **`alt`** on
+  photos, **text only a screen reader reads** (`VisuallyHidden`: who sent a message
+  and when; who sent a file; the progress bar's label), and **the text handed to a
+  share sheet** (the invite link, "bring a friend"). Left on `t`: everything drawn,
+  including dialog titles, menu-item labels, a `title` tooltip (it is drawn on
+  hover) and the on-screen preview of the text message Pam sends
+  (`trips.booked.sms`; the real text is rendered elsewhere). The nested case is the
+  one to remember: `places.changeArea` was built from the visible `near`, which
+  would have put isolates inside an `aria-label`; it is now built from plain pieces
+  all the way down.
+- **A backstop where text leaves the app.** `shareText` and `copyLink`
+  (`@pam/ui`) strip U+2068/U+2069 whoever built the string, so a link in a share
+  sheet never has a character stuck to it.
+- **Texts and emails are untouched by construction** — they fill their own
+  templates (`renderSms`, `render.ts` of the dispatcher, `renderInviteEmail`) and
+  never call `fillTemplate`; `test/isolates.test.ts` renders every SMS template
+  and the Arabic invite email with an English street and name and finds none.
+  Left alone, noticed: in an Arabic email the inviter's name, when English and
+  more than one word, has the same problem, and the fix there is an HTML `<bdi>`
+  (not an invisible character); Arabic email is not signed off or sent, so it
+  waits.
+- **The area chip gives the value its own box** (`splitIsolated`, `AreaChip`). The
+  isolate fixes the *order*, but a line too long for the chip is cut at its edge,
+  which in a right-to-left line is the left — and the left of an English address
+  is its street number ("…road St, North Philadelphia"). So when the label has a
+  value in it, the words keep their width and the value takes the rest and ends
+  in its own ellipsis: the end of the address is what is lost, as in English. A
+  label with no isolates (every other language) is drawn as it was; the English
+  screenshot is byte-identical. Other one-line rows still cut at the left edge,
+  which in Arabic is the end of the sentence; I did not change them.
+- **A guard in the fit audit.** `audit:fit` has a sixth detector, `isolate`: an
+  isolate in an `aria-*` attribute, `alt`, or visually-hidden text. English has
+  none, so any hit is "new in a language" and fails the run; `ar` is in the CI
+  job. `title` and `placeholder` are drawn, so they are not looked at. Before the
+  call sites were fixed it found **240** (143 `aria-label`, 92 hidden text, 4
+  `alt`, one tooltip, which it no longer looks at); it finds 0 now, across 470 stories.
+
+**What it changed on screen** (320px, Arabic stories diffed before/after: 74 have
+a value on screen; 58 are pixel-identical, 5 differed only because a story was
+still loading and are identical on a calm re-capture, 11 differ). Seven of the
+eleven change the order words are drawn in, each for the better: the address above
+reads in order and loses its end, not its number; "آخر استخدام لـ Pam: 9 أكتوبر"
+had its `9` thrown before "Pam:", away from its month; the policy counts
+("توقيعات Jordan: 4 من 4"), "المتبقي للوصول إلى Builder: 350" and the full stop at
+the end of an English message in a preview had the same fault. The other four draw
+the same order a pixel or two apart. None got worse. The order was measured from
+where each character was drawn, not read off a screenshot. The audit's layout
+defects for Arabic are 153 before and 153 after; the one difference is the area
+chip's long address, whose `spill` (text running 4px past its button) is gone and
+whose designed ellipsis moved onto the address's own box.
+
+**What I could not judge, and a native Arabic reader must.** Nobody who reads
+Arabic has seen any of this. In particular: where a colon or full stop lands
+beside an English word (`:Pam`, `then.`) — correct by the bidi rules, and it is
+what a native reader should confirm looks right; whether an English value in the
+middle of a sentence should be isolated at all or read better flowing with it;
+and **how a screen reader speaks any of it** — none (VoiceOver, TalkBack, NVDA,
+JAWS) was run here, which is exactly why isolates are kept out of every
+accessible name instead of being trusted to be ignored.
+
+**Alternatives, and why not.** `<bdi>` around each value needs a React node at
+every call site, and `t` returns a string. CSS `unicode-bidi: isolate` isolates a
+whole element, not a part of a string. Stripping isolates inside each
+`aria-label` component would be about forty places and no single one to test.
+Wrapping numbers: above.

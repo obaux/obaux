@@ -230,6 +230,19 @@ Russian, Arabic (D-422); messages read in the reader's language (D-423).
   Cantonese readers: check `zh-HK` for Hong Kong wording (訊息, 電話號碼,
   傾談), not Taiwan's. Arabic: Modern Standard, and check that the
   right-to-left screens read naturally. Russian: "вы" throughout.
+  **Arabic, since 9 October (D-435):** an English name, address or date inside an
+  Arabic sentence is now laid out as a piece of its own. Check that it looks right
+  to a native reader — where a colon or a full stop lands beside an English word
+  (`:Pam`, `then.`) is correct by the bidi rules but nobody who reads Arabic has
+  seen it — and whether an English value in the middle of a sentence reads better
+  isolated or flowing with the sentence.
+
+- [ ] **Run an Arabic screen reader pass** (VoiceOver and TalkBack on a phone, and
+  NVDA if it can be had): that the labels on icon buttons, cards, photos and the
+  role switch are spoken in order and whole. Nothing here has been tried with a
+  screen reader. Pam keeps its invisible bidi isolates out of every accessible name
+  (`tPlain`, D-435) rather than trusting a reader to ignore them, so this is a check
+  that the labels *read well*, not that they are clean of characters.
 
 - [ ] **Arabic: names, addresses and other data inside a sentence are reordered**
   (found 9 October 2026 by the text-fit audit; Will asked whether it is on this

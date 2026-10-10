@@ -23,7 +23,7 @@ const styles = stylex.create({
 });
 
 export function TermInfo({ term }: { readonly term: GlossaryTerm }) {
-  const { t } = useI18n();
+  const { t, tPlain } = useI18n();
   const entry = GLOSSARY[term];
   const name = t(entry.termKey);
   return (
@@ -38,7 +38,7 @@ export function TermInfo({ term }: { readonly term: GlossaryTerm }) {
       }
     >
       <IconButton
-        label={t('glossary.whatIs', { term: name.toLowerCase() })}
+        label={tPlain('glossary.whatIs', { term: name.toLowerCase() })}
         variant="ghost"
         icon={<Icon icon="info" size="sm" />}
         xstyle={styles.button}

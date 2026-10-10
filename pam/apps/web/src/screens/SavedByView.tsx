@@ -24,7 +24,7 @@ const styles = stylex.create({
 });
 
 export function SavedByView({ personId, name }: { readonly personId: string; readonly name: string }) {
-  const { t } = useI18n();
+  const { t, tPlain } = useI18n();
   const { state: session } = useSession();
   const { viewedRole } = useRoleView(session.status === 'signed-in' ? session.session.role : null);
   const places = viewedRole === 'provider' ? [] : (DUMMY_SAVED_BY_PERSON[personId] ?? []);
@@ -34,7 +34,7 @@ export function SavedByView({ personId, name }: { readonly personId: string; rea
       <SubPageHeader
         title={t('person.savedPlaces.link', { name })}
         backHref={`/person/?id=${encodeURIComponent(personId)}`}
-        backLabel={t('person.connect.back', { name })}
+        backLabel={tPlain('person.connect.back', { name })}
         actions={<HeaderActions hasHelp={false} />}
       />
       {places.length > 0 ? (

@@ -23,7 +23,7 @@ export function RoleSwitchControl({
   readonly viewedRole: Role | null;
   readonly onChange: (role: Role) => void;
 }) {
-  const { t } = useI18n();
+  const { t, tPlain } = useI18n();
   if (trueRole !== 'super_admin' || !viewedRole) return null;
 
   return (
@@ -31,7 +31,7 @@ export function RoleSwitchControl({
       value={viewedRole}
       ownValue={trueRole}
       label={t('view.switch')}
-      viewingLabel={(roleLabel) => t('view.as', { role: roleLabel })}
+      viewingLabel={(roleLabel) => tPlain('view.as', { role: roleLabel })}
       options={ROLES.map((role) => ({ value: role, label: t(`role.${role}`) }))}
       onChange={(next) => onChange(next as Role)}
     />
