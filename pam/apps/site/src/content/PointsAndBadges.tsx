@@ -26,10 +26,10 @@ export function PointsAndBadges() {
           rowHeading="What you do"
           columns={['Points']}
           rows={[
-            { label: 'Save a place', cells: ['5 points, once for each place.'] },
-            { label: 'Finish setting up', cells: ['25 points, once.'] },
             { label: 'Plan a trip to a place', cells: ['25 points, once for each place. Up to three new places a day.'] },
             { label: 'Call a place', cells: ['10 points, the first time you tap Call on that place. Up to five new places a day.'] },
+            { label: 'Save a place', cells: ['5 points, once for each place.'] },
+            { label: 'Finish setting up', cells: ['25 points, once.'] },
           ]}
         />
         <P>
@@ -75,7 +75,7 @@ export function PointsAndBadges() {
         <Steps items={['Tap Profile.', 'Tap the badge with your level on it. It says “Your badge”.', 'Scroll to see the ladder and your badges.']} />
         <Screenshot
           name="points-and-badges/points.png"
-          alt="The top of the “Your points” screen: your badge, the level name, the number of points and a bar showing how many more points to the next level. Under it, the “Ways to earn” list: Save a place, Plan a trip to a place, Call a place and Finish setting up Pam."
+          alt="The top of the “Your points” screen: your badge, the level name, the number of points and a bar showing how many more points to the next level. Under it, the “Ways to earn” list: Plan a trip to a place, Call a place, Save a place and Finish setting up Pam."
           caption="“Your points”, for an example person."
         />
       </Section>
