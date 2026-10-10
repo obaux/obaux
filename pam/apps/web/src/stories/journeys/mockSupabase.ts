@@ -274,6 +274,7 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
     on('/functions/v1/link-preview', () => ({ body: { made: 0 } })),
     on('/rpc/report_photos_for_review', () => ({ body: [] })),
     on('/rpc/report_files_for_review', () => ({ body: [] })),
+    on('/rpc/log_call', () => ({ body: true })),
     on('/rpc/my_trips', () => ({ body: savedTrips })),
     on('/rpc/my_trip_services', () => ({ body: [] })),
     on('/rpc/book_trip_at_service', (_url, _method, body) => {

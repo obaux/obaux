@@ -1159,6 +1159,10 @@ Merged to `main` by the merge desk, 10 October, from `claude/places-programs-tri
 
 Merged to `main` by the merge desk, 10 October, from `claude/places-programs-points-promise` (4bf85c2). "Ways to earn" lists only what Pam pays today (save a place +5, finish setup +25), driven by `AWARDED_TODAY`. The proposal for making plan-a-trip and call-a-place real is in `docs/points-awarding.md`, waiting on Will. No migration.
 
+## Places & programs · calling a place earns points (10 October 2026) — merged 10 October
+
+Merged to `main` by the merge desk, 10 October, from `claude/places-programs-call-points` (D-472). Migration `20261010122206`, expand only: `log_call` (10 points, once per place, five places a day, members only; a staff tap is ignored). **Applied live at merge**, read back (body identical to the file; signed-in only, not anon). The place page reports a tap on a phone link, fire and forget. Test `34_call_a_place_points_test.sql`. The Points screen's Call row now shows.
+
 ## Places & programs · review record, pending change, program services — the database half (10 October 2026)
 
 Merged to `main` by the merge desk, 10 October, from `claude/places-programs-submissions-and-services`
