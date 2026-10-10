@@ -1923,3 +1923,7 @@ Branch `claude/places-programs-policies-p4` (D-485). Migration `20261010151302`,
 Merged by the merge desk from b4534267 (713584b). Live: applied as 20261010171050; `review_staff_request`'s body matches the file by md5, search path pinned, anon cannot run it. The one waiting request (a program-lead request from someone who is now a member, the only city) can be approved; Will asked to tap Approve again (card a34).
 
 Branch `claude/places-programs-approve-existing-member` (D-491). Migration `20261010160818`: `review_staff_request` adds the provider role to an existing member's account (city kept; `ROLE_PAIR_NOT_ALLOWED` / `ACCOUNT_IN_OTHER_CITY` otherwise). The staff screen says what happened or why not, never "Call Pam". Test `50_approving_a_staff_request_for_an_existing_member_test.sql`; e2e `staff-request-approve.spec.ts`.
+
+## Places & programs · the approval text opens Add your program (10 October 2026) — READY, not merged
+
+Branch `claude/places-programs-add-program-link` (D-496). Preview picture `public/og/add-program.jpg` and metadata for `/programs/new/`; migration `20261010192105` puts `<app_url>/programs/new/` in the approval text for a program lead with no program yet; `/programs/new/` is behind the tab gate (signed out → Sign in → Home). Test `51_the_approval_text_links_a_new_program_lead_to_test.sql`; e2e `add-program-link.spec.ts`.
