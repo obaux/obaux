@@ -80,12 +80,27 @@ describe('the privacy page and the transparency screen agree', () => {
     // Each promise the screen makes about what an admin CANNOT see has to be
     // restated here. These are the three that matter most to somebody deciding
     // whether to type their number in.
-    expect(text).toMatch(/cannot read your messages/);
+    // Whose messages is said in so many words: the messages to OTHER people.
+    // A guide does see what you send them (see below), so a bare "cannot read
+    // your messages" would promise something the screen does not (Will,
+    // 10 October 2026: the page and the screen read as a contradiction).
+    expect(text).toMatch(/cannot read your messages to other people/);
+    expect(text).not.toMatch(/cannot read your messages(?! to other people)/);
     expect(text).toMatch(/buddies/);
     expect(text).toMatch(/not on their list/);
 
-    // And the one exception, stated as an exception rather than buried.
+    // And the exceptions, stated as exceptions rather than buried: what you
+    // send the guide directly, and one reported message.
     expect(text).toMatch(/reports it as not safe/);
+  });
+
+  it('says a guide sees what you send them, as the screen does', () => {
+    const text = visibility!.bodyKeys.map((k) => (en[k as keyof typeof en] as string).toLowerCase()).join(' ');
+    expect(text).toMatch(/everything you say or send to them, when they message you directly/);
+    const direct = TRANSPARENCY_SCREEN.canSee.find((l) => l.key === 'transparency.canSee.directMessages');
+    expect(direct?.en).toMatch(/everything you say or send to them, if they message you directly/i);
+    const cannot = TRANSPARENCY_SCREEN.cannotSee.find((l) => l.key === 'transparency.cannotSee.messages');
+    expect(cannot?.en).toMatch(/to someone else/);
   });
 
   it('names photos wherever it names messages (D-394)', () => {
@@ -93,7 +108,7 @@ describe('the privacy page and the transparency screen agree', () => {
     // have to guess whether that includes the pictures. Both the page and the
     // screen say so in words.
     const text = visibility!.bodyKeys.map((k) => (en[k as keyof typeof en] as string).toLowerCase()).join(' ');
-    expect(text).toMatch(/cannot read your messages or see your photos/);
+    expect(text).toMatch(/cannot read your messages to other people, or see the photos/);
     expect(text).toMatch(/its photo/);
     const flagged = TRANSPARENCY_SCREEN.canSee.find((l) => l.key === 'transparency.canSee.flagged');
     expect(flagged?.en).toMatch(/message, photo/);
@@ -112,7 +127,7 @@ describe('the privacy page and the transparency screen agree', () => {
     expect(keep).toMatch(/sends it just as it is/);
     expect(keep).toMatch(/Google decides who can see that doc, not Pam/);
     const text = visibility!.bodyKeys.map((k) => (en[k as keyof typeof en] as string).toLowerCase()).join(' ');
-    expect(text).toMatch(/see your photos or documents/);
+    expect(text).toMatch(/photos or documents you send to other people/);
     expect(text).toMatch(/its photo or document/);
     const flagged = TRANSPARENCY_SCREEN.canSee.find((l) => l.key === 'transparency.canSee.flagged');
     expect(flagged?.en).toMatch(/message, photo or document/);

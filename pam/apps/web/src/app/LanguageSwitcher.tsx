@@ -10,7 +10,8 @@ import {
   DropdownMenuRadioItem,
 } from '@astryxdesign/core/DropdownMenu';
 import { GlobeIcon } from '@pam/ui';
-import { SUPPORTED_LOCALES, type Locale } from '@pam/config';
+import { OptionTag, TaggedWords, langAttributes } from '@pam/ui/OptionTag';
+import { LANGUAGE_TAGS, SUPPORTED_LOCALES, type Locale } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { useChooseLanguage } from '@/lib/useChooseLanguage';
 
@@ -23,6 +24,14 @@ import { useChooseLanguage } from '@/lib/useChooseLanguage';
  * locale is currently active: "English", "Español" and "Português (Brasil)"
  * read the same to everybody looking for their own language in a list, which
  * is the point of a language switcher — see the `language.<code>` keys.
+ *
+ * Each name has its short English tag before it — "RU  Русский" — so somebody
+ * who cannot read the name still knows which row it is (Will, 10 October 2026,
+ * D-455). The tag is a constant (`LANGUAGE_TAGS`), never a bundle string, so it
+ * reads the same in all seven languages. `OptionTag` and `TaggedWords` from
+ * `@pam/ui` draw it — the one source every language list uses (D-451): left to
+ * right and isolated, in a column as wide as the widest tag so the names line up,
+ * hidden from a screen reader; the name, with its own `lang`, is the row's name.
  *
  * Switching updates the active locale immediately either way. Signed in, it
  * also writes `profiles.preferred_language`, which is what a later sign-in
@@ -68,6 +77,8 @@ const styles = stylex.create({
     borderStyle: 'solid',
     borderColor: colorVars['--color-border'],
   },
+  // The tag beside the chip's one value ("RU Русский") takes the room its letters need, then a gap.
+  chipTag: { display: 'inline-block', marginInlineEnd: '8px' },
   // The menu is drawn at the small size, so the radio dial is small (Will,
   // 6 October, D-311) — the rows keep the 48px floor and their 17px words,
   // and get as much room on the right as the dial has on the left.
@@ -92,7 +103,16 @@ export function LanguageSwitcher({
       onChange={(next) => choose(next as Locale)}
     >
       {OPTIONS.map((option) => (
-        <DropdownMenuRadioItem key={option.value} value={option.value} label={t(option.labelKey)} xstyle={styles.option} />
+        <DropdownMenuRadioItem
+          key={option.value}
+          value={option.value}
+          label={
+            <TaggedWords tag={LANGUAGE_TAGS[option.value]} lang={option.value}>
+              {t(option.labelKey)}
+            </TaggedWords>
+          }
+          xstyle={styles.option}
+        />
       ))}
     </DropdownMenuRadioGroup>
   );
@@ -124,7 +144,12 @@ export function LanguageSwitcher({
         variant: 'ghost',
         icon: <GlobeIcon />,
         endContent: (
-          <Text xstyle={styles.chip}>{t(`language.${locale}`)}</Text>
+          <Text xstyle={styles.chip}>
+            <span {...stylex.props(styles.chipTag)}>
+              <OptionTag tag={LANGUAGE_TAGS[locale]} isFixedWidth={false} />
+            </span>
+            <span {...langAttributes(locale)}>{t(`language.${locale}`)}</span>
+          </Text>
         ),
         xstyle: rowStyle,
       }}

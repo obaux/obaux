@@ -3,7 +3,7 @@
 import type { ReactNode } from 'react';
 import { VStack } from '@astryxdesign/core/VStack';
 import { Divider } from '@astryxdesign/core/Divider';
-import { badgeForPoints, type Role, intlLocale } from '@pam/config';
+import { LANGUAGE_TAGS, badgeForPoints, type Role, intlLocale } from '@pam/config';
 import {
   BellIcon,
   GlobeIcon,
@@ -225,6 +225,7 @@ export function ProfileView({
               id: 'language',
               label: t('profile.menu.language'),
               value: t(`language.${locale}`),
+              valueTag: LANGUAGE_TAGS[locale],
               href: '/language/',
               icon: <GlobeIcon {...ICON} />,
             },

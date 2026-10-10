@@ -12,7 +12,7 @@ import { CheckboxInput } from '@astryxdesign/core/CheckboxInput';
 import { colorVars, spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { BellIcon, BigButton, Loading, Notice, Page, PointsBadge, StarIcon, TextField, TextLink, TripsIcon } from '@pam/ui';
 import { SubPageHeader } from '@pam/ui/SubPage';
-import { SUPPORTED_LOCALES, TRANSPARENCY_SCREEN, badgeForPoints, type Locale, intlLocale } from '@pam/config';
+import { LANGUAGE_TAGS, SUPPORTED_LOCALES, TRANSPARENCY_SCREEN, badgeForPoints, type Locale, intlLocale } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { navigate } from '@/lib/navigate';
 import { forgetInvite, recallInvite, type Invite } from '@/lib/appUrl';
@@ -619,7 +619,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
                 <Text xstyle={styles.chipsLabel}>{t('onboarding.language.title')}</Text>
                 <ChoiceChips
                   label={t('onboarding.language.title')}
-                  options={SUPPORTED_LOCALES.map((code) => ({ value: code, label: t(`language.${code}`) }))}
+                  options={SUPPORTED_LOCALES.map((code) => ({ value: code, label: t(`language.${code}`), tag: LANGUAGE_TAGS[code], lang: code }))}
                   value={pendingLocale ?? locale}
                   onChange={(code) => setLocale(code as Locale)}
                 />

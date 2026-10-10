@@ -5,14 +5,16 @@ import * as stylex from '@stylexjs/stylex';
 import { DropdownMenu } from '@astryxdesign/core/DropdownMenu';
 import { Icon } from '@astryxdesign/core/Icon';
 import { Text } from '@astryxdesign/core/Text';
-import { HelpIcon, TrashIcon } from '@pam/ui';
+import { HelpIcon, Notice, TrashIcon } from '@pam/ui';
 import { MenuList } from '@pam/ui/MenuList';
 import { SubPage } from '@pam/ui/SubPage';
 import { roundAction } from '@pam/ui/roundAction';
 import { programSummary } from '../app/join/ProgramWizard';
 import { useI18n } from '@/lib/i18n';
 import { navigate } from '@/lib/navigate';
-import { readSentProgram, startOver, useProgramSetup, type SentProgram } from '@/lib/programSetup';
+import { markFreshAccount, readSentProgram, startOver, useProgramSetup, type SentProgram } from '@/lib/programSetup';
+import { withdrawSubmission } from '@/lib/useOwnProgram';
+import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
 import { ConfirmDialog } from './ConfirmDialog';
 import { intlLocale } from '@pam/config';
@@ -49,9 +51,9 @@ function MoreMenu({ onStartOver }: { readonly onStartOver: (() => void) | null }
       alignment="end"
       menuWidth={260}
       items={[
-        // A program on file with Pam cannot be deleted from here yet: starting
-        // over withdraws it from the review queue, which is a later step
-        // (D-385, D-386). Help is one tap away meanwhile.
+        // Starting over withdraws the send from Pam's queue and keeps the
+        // record (D-385, D-462); a program with no send on file has nothing to
+        // withdraw. Help is one tap away either way.
         ...(onStartOver
           ? [
               { id: 'start-over', label: t('programs.sent.startOver'), icon: <TrashIcon {...ICON} />, variant: 'destructive' as const, onClick: onStartOver },
@@ -71,12 +73,18 @@ export function WhatYouSentView({ sent: given }: { readonly sent?: SentProgram |
   // The program on file, when there is one (D-447); what this tab remembers otherwise.
   const sent = given ?? (setup.program ? setup.sent : readSentProgram());
   const [isAsking, setIsAsking] = useState(false);
+  const [failed, setFailed] = useState(false);
+  const supportPhone = useSupportPhone();
+  // Delete and start over on a program on file withdraws its send (D-462); the
+  // menu offers it only when there is a send to withdraw.
+  const submissionId = setup.program?.submissionId ?? null;
+  const canStartOver = !setup.program || submissionId !== null;
   return (
     <SubPage
       title={t('programs.sent.title')}
       backHref="/program/"
       backLabel={t('nav.back.program')}
-      actions={<MoreMenu onStartOver={setup.program ? null : () => setIsAsking(true)} />}
+      actions={<MoreMenu onStartOver={canStartOver ? () => setIsAsking(true) : null} />}
     >
       <ConfirmDialog
         isOpen={isAsking}
@@ -84,12 +92,33 @@ export function WhatYouSentView({ sent: given }: { readonly sent?: SentProgram |
         body={t('programs.sent.startOver.body')}
         confirmLabel={t('programs.sent.startOver')}
         onConfirm={() => {
-          startOver();
-          navigate('/program/');
+          if (submissionId === null) {
+            startOver();
+            navigate('/program/');
+            return;
+          }
+          void withdrawSubmission(submissionId).then((ok) => {
+            setIsAsking(false);
+            if (ok) {
+              // Nothing is on file again: Add a program, not the example (D-385).
+              markFreshAccount();
+              navigate('/program/');
+            }
+            else setFailed(true);
+          });
         }}
         cancelLabel={t('programs.sent.startOver.keep')}
         onCancel={() => setIsAsking(false)}
       />
+      {failed ? (
+        <Notice
+          notice="something_went_wrong"
+          title={t('join.failed.title')}
+          body={t('join.failed.body')}
+          supportPhone={supportPhone}
+          callLabel={t('help.callSupport')}
+        />
+      ) : null}
       {sent ? (
         <>
           <Text type="supporting" xstyle={styles.when}>

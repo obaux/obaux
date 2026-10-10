@@ -5,7 +5,7 @@ import { Button } from './Button.js';
 import { HStack } from '@astryxdesign/core/HStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { pam } from './tokens.stylex.js';
-import { TaggedWords, langAttributes } from './OptionTag.js';
+import { TaggedWords } from './OptionTag.js';
 
 /**
  * One choice from a few, as pills (Will, 7 October, D-359, D-366): the
@@ -17,7 +17,10 @@ import { TaggedWords, langAttributes } from './OptionTag.js';
  * in English, before its words, D-451) and the `lang` its label is written in.
  * `lang` goes on the button itself, because Astryx names a button from its
  * `label` as an `aria-label` once it has children, and an `aria-label` takes
- * the language of the element it is on.
+ * the language of the element it is on. `dir` does not: it goes on the words
+ * only (`TaggedWords`), so the chip lays out the way the page does and the tag
+ * stays first, at the page's start — an Arabic chip on an English page reads
+ * "AR  العربية", an English one on an Arabic page "EN  English" (D-455).
  */
 export interface ChoiceChipsProps<V extends string> {
   /** The question, read out for the group (shown elsewhere, as a heading). */
@@ -64,9 +67,17 @@ export function ChoiceChips<V extends string>({ label, options, value, onChange 
             aria-pressed={isOn}
             onClick={() => onChange(option.value)}
             xstyle={[styles.chip, isOn ? styles.on : styles.off]}
-            {...langAttributes(option.lang)}
+            // The spoken name is the button's aria-label, which takes the language of the element it is on,
+            // so `lang` is on the button. `dir` is NOT: it would turn the whole chip round, and the tag would
+            // sit after the name for a reader of the page ("العربية  AR" on an English page). The words
+            // carry their own `dir`; the chip lays out the way the page does, the tag first (D-455).
+            {...(option.lang ? { lang: option.lang } : {})}
           >
-            {option.tag ? <TaggedWords tag={option.tag}>{option.label}</TaggedWords> : undefined}
+            {option.tag || option.lang ? (
+              <TaggedWords tag={option.tag} lang={option.lang}>
+                {option.label}
+              </TaggedWords>
+            ) : undefined}
           </Button>
         );
       })}

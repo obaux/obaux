@@ -54,8 +54,16 @@ const LANGUAGES = [
   { value: 'ar', tag: 'AR', lang: 'ar', label: 'العربية' },
 ];
 
-/** Sign-up's language choice with a tag before each name. */
+/**
+ * Sign-up's language choice with a tag before each name, on an English page. Look at the last chip:
+ * the Arabic name is drawn right to left but the chip is not turned round, so it reads "AR  العربية",
+ * the tag first at the page's start, like every other chip (D-455).
+ */
 export const WithLanguageTags: Story = { args: { initial: 'ru', options: LANGUAGES } };
 
-/** Right to left: the tag is still at the start of each chip, still left to right. */
+/**
+ * The same on an Arabic page: the chips lay out right to left and the tag is first at the right. Look at the
+ * first chip: the English name keeps its own direction, and the chip reads "English  EN" from the right, the tag
+ * first, not "EN English" with the tag stranded at the far end (D-455).
+ */
 export const WithLanguageTagsArabic: Story = { ...WithLanguageTags, globals: { locale: 'ar' } };
