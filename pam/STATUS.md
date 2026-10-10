@@ -958,6 +958,26 @@ under the header, which comes and goes; looked at in Russian and Arabic at 320px
   (case manager only), the blocking words back in their true form (D-463), and a mail-service paragraph awaiting
   Will's approval.
 
+---
+
+## Places & programs · a live program's pending change (10 October) — merged 10 October
+
+D-447 and D-462, from `claude/places-programs-program-changes` (Piper, 24aad8b), merged to `main` by
+the merge desk, 10 October. No migration of its own; it reads `20261010083715`, live since the
+merge of the database half. Programs sent before that migration have no submission row: the tab
+reads them as before and does not offer Delete and start over (the backfill goes with part 6).
+
+- **Built:** a live program's new name or address is asked of Pam and waits beside the live one
+  ("Waiting for Pam", with Cancel); the description, phone and website still change at once;
+  Delete and start over withdraws a first send and lands on Add a program; the Program tab reads
+  the open submission.
+- **Not built:** the services list (`program_services`) on screens; a lead resending after Pam
+  asks for changes; the super admin's side (part 6); the kind of help is not editable there.
+- **Proven:** web 67 tests, Storybook build, a browser look at the three flows, language fit
+  (seven languages and the pseudo-language).
+
+---
+
 ## Places & programs · save a member's trips (10 October) — merged 10 October
 
 D-454, from `claude/places-programs-save-trips` (Piper). A trip a member

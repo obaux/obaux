@@ -566,5 +566,41 @@
   {
     "key": "pseudo|overlap|member-created--conversation-file-refused|⟦Çáášéé ɱáááñááĝééŕ⟧ ⟷ ⟦Óþééééñš íñ Ĝóóóóĝļéé⟧",
     "reason": "The thread scrolls under its opaque header; text that has scrolled up behind the header's title is measured against it. Nothing overlaps on screen. Which lines are behind the header varies from run to run on this story, so these come and go. The same as the limited-account and blocking conversation entries; added at the merge of the language tags, 10 October 2026, after a look at 320px in Russian and Arabic with screenshots."
+  },
+  {
+    "key": "pseudo|ellipsis|program-lead-states-program-on-file--live-with-a-change-waiting|Reading, writing and math toward the GED test, four mornings",
+    "reason": "A service's description on the Program page is one line with an ellipsis by design (the row sets isDescriptionOneLine); the pseudo-language stretches it past the width. Nothing is lost: the whole text is one tap away, in the service's own page. Looked at 10 October 2026 at 320px."
+  },
+  {
+    "key": "pseudo|ellipsis|program-lead-states-program-on-file--live-with-a-change-waiting|Open computers, printing and help with email, forms and job ",
+    "reason": "A service's description on the Program page is one line with an ellipsis by design (the row sets isDescriptionOneLine); the pseudo-language stretches it past the width. Nothing is lost: the whole text is one tap away, in the service's own page. Looked at 10 October 2026 at 320px."
+  },
+  {
+    "key": "pseudo|ellipsis|program-lead-states-program-on-file--live-with-a-change-waiting|Two weeks on resumes, interviews and showing up ready. A cer",
+    "reason": "A service's description on the Program page is one line with an ellipsis by design (the row sets isDescriptionOneLine); the pseudo-language stretches it past the width. Nothing is lost: the whole text is one tap away, in the service's own page. Looked at 10 October 2026 at 320px."
+  },
+  {
+    "key": "pseudo|ellipsis|program-lead-states-program-on-file--live|Reading, writing and math toward the GED test, four mornings",
+    "reason": "A service's description on the Program page is one line with an ellipsis by design (the row sets isDescriptionOneLine); the pseudo-language stretches it past the width. Nothing is lost: the whole text is one tap away, in the service's own page. Looked at 10 October 2026 at 320px."
+  },
+  {
+    "key": "pseudo|ellipsis|program-lead-states-program-on-file--live|Open computers, printing and help with email, forms and job ",
+    "reason": "A service's description on the Program page is one line with an ellipsis by design (the row sets isDescriptionOneLine); the pseudo-language stretches it past the width. Nothing is lost: the whole text is one tap away, in the service's own page. Looked at 10 October 2026 at 320px."
+  },
+  {
+    "key": "pseudo|ellipsis|program-lead-states-program-on-file--live|Two weeks on resumes, interviews and showing up ready. A cer",
+    "reason": "A service's description on the Program page is one line with an ellipsis by design (the row sets isDescriptionOneLine); the pseudo-language stretches it past the width. Nothing is lost: the whole text is one tap away, in the service's own page. Looked at 10 October 2026 at 320px."
+  },
+  {
+    "key": "pseudo|ellipsis|program-lead-states-program-on-file--live-spanish|Reading, writing and math toward the GED test, four mornings",
+    "reason": "A service's description on the Program page is one line with an ellipsis by design (the row sets isDescriptionOneLine); the pseudo-language stretches it past the width. Nothing is lost: the whole text is one tap away, in the service's own page. Looked at 10 October 2026 at 320px."
+  },
+  {
+    "key": "pseudo|ellipsis|program-lead-states-program-on-file--live-spanish|Open computers, printing and help with email, forms and job ",
+    "reason": "A service's description on the Program page is one line with an ellipsis by design (the row sets isDescriptionOneLine); the pseudo-language stretches it past the width. Nothing is lost: the whole text is one tap away, in the service's own page. Looked at 10 October 2026 at 320px."
+  },
+  {
+    "key": "pseudo|ellipsis|program-lead-states-program-on-file--live-spanish|Two weeks on resumes, interviews and showing up ready. A cer",
+    "reason": "A service's description on the Program page is one line with an ellipsis by design (the row sets isDescriptionOneLine); the pseudo-language stretches it past the width. Nothing is lost: the whole text is one tap away, in the service's own page. Looked at 10 October 2026 at 320px."
   }
 ]

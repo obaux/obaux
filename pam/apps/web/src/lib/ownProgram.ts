@@ -27,19 +27,62 @@ export interface OwnProgramRow {
   readonly created_at: string;
 }
 
+/** What a lead sent for checking (`program_submissions`, D-462). */
+export const SUBMISSION_COLUMNS = 'id, kind, status, details, sent_at, changes_note';
+
+export interface SubmissionRow {
+  readonly id: string;
+  readonly kind: 'new' | 'change';
+  readonly status: 'in_review' | 'changes_asked' | 'approved' | 'withdrawn' | 'discarded';
+  readonly details: Readonly<Record<string, unknown>>;
+  readonly sent_at: string;
+  readonly changes_note: string | null;
+}
+
+/** A live program's new name or address, waiting for Pam beside the live one (D-447). */
+export interface PendingChange {
+  readonly id: string;
+  readonly name: string | null;
+  readonly address: string | null;
+  readonly sentAt: string;
+}
+
 export interface OwnProgram {
   readonly id: string;
   /** In the shape the wizard, "What you sent" and the Program tab already use. */
   readonly details: ProgramDetails;
   /** Approved and visible to members: not waiting on Pam. */
   readonly isLive: boolean;
-  /** When it was sent for review (the row's creation), for "taking longer". */
+  /** When it was sent for review (the submission's, else the row's creation), for "taking longer". */
   readonly sentAt: string;
+  /**
+   * The first check, while it is open: its id (to withdraw — "Delete and start
+   * over", D-385) and Pam's note when it asked for changes. Null for a program
+   * that predates the review record, or one already live.
+   */
+  readonly submissionId: string | null;
+  readonly changesNote: string | null;
+  /** A live program's change waiting for Pam, if there is one. */
+  readonly pendingChange: PendingChange | null;
 }
 
-export function programFromRow(row: OwnProgramRow): OwnProgram {
+const text = (value: unknown): string | null => (typeof value === 'string' && value !== '' ? value : null);
+
+/**
+ * A program as the database holds it. `submissions` are the open ones for it
+ * (`in_review` / `changes_asked`): a `new` one is the first check, a `change`
+ * one is a live program's change waiting beside it.
+ */
+export function programFromRow(row: OwnProgramRow, submissions: readonly SubmissionRow[] = []): OwnProgram {
+  const first = submissions.find((s) => s.kind === 'new') ?? null;
+  const change = submissions.find((s) => s.kind === 'change') ?? null;
   return {
     id: row.id,
+    submissionId: first?.id ?? null,
+    changesNote: first?.status === 'changes_asked' ? first.changes_note : null,
+    pendingChange: change
+      ? { id: change.id, name: text(change.details['name']), address: text(change.details['address']), sentAt: change.sent_at }
+      : null,
     details: {
       name: row.name,
       category: row.category,
@@ -53,7 +96,7 @@ export function programFromRow(row: OwnProgramRow): OwnProgram {
       services: [],
     },
     isLive: !row.needs_review && row.is_active,
-    sentAt: row.created_at,
+    sentAt: first?.sent_at ?? row.created_at,
   };
 }
 
@@ -111,4 +154,20 @@ export function editColumns(draft: EditableProgram, isLive: boolean): Record<str
       ? {}
       : { name: draft.name.trim(), category: draft.category, address: blank(draft.address) }),
   };
+}
+
+/**
+ * What to ask Pam to change on a live program (`request_program_change`,
+ * D-447): its name or address, when they differ from the live ones. Null when
+ * neither does — then nothing waits for Pam and the edit is only the words,
+ * phone and website, which apply at once.
+ */
+export function changeRequest(
+  program: OwnProgram,
+  draft: EditableProgram,
+): { readonly name: string; readonly category: string; readonly subcategory: string | null; readonly address: string | null } | null {
+  const name = draft.name.trim();
+  const address = blank(draft.address);
+  if (name === program.details.name && address === blank(program.details.address)) return null;
+  return { name, category: program.details.category, subcategory: blank(program.details.subcategory), address };
 }

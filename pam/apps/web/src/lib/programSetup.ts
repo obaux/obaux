@@ -179,7 +179,7 @@ export function useProgramSetup(session: SessionState): ProgramSetup {
   const isExample = USE_DUMMY_PEOPLE && !read(FRESH) && program === null;
   const photoUrl = session.status === 'signed-in' ? session.session.photoUrl : null;
   const sent: SentProgram | null = program
-    ? { details: program.details, sentAt: program.sentAt, changes: null }
+    ? { details: program.details, sentAt: program.sentAt, changes: program.changesNote }
     : readSentProgram();
   return {
     isExample,
