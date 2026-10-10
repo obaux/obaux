@@ -82,7 +82,7 @@ async function pageNamed(name,index){
   // A page is found by its title, not its number: when the pages were renumbered, matching "2 · Member" exactly
   // found nothing, drew a second Member page, and left "1 · Member" behind. Now the page is reused and renamed,
   // and any other page with the same title is removed.
-  const title=s=>s.replace(/^\d+\s*·\s*/,'').trim().toLowerCase();
+  const title=s=>s.replace(/^\\d+\\s*·\\s*/,'').trim().toLowerCase();
   const same=figma.root.children.filter(p=>title(p.name)===title(name));
   let page=same.find(p=>p.name===name)||same[0];
   if(!page){ page = (index===0 && figma.root.children.length===1 && figma.root.children[0].children.length===0) ? figma.root.children[0] : figma.createPage(); page.name=name; }
