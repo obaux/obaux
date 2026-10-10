@@ -143,8 +143,9 @@ export const ADMIN_CANNOT_SEE = [
    * Narrowed by exactly one fact on 21 September (D-199): a program now
    * learns *that* a member saved a new place, and when — see
    * `new_save_without_the_place` above. Narrowed again on 3 October
-   * (D-242): a program now sees the last day a member used Pam. What this
-   * entry still covers: which places a member saved, their trips to other
+   * (D-242): the intent was that a program sees the last day a member used
+   * Pam; the database does not give it yet, so nothing member-facing says so
+   * (D-465, `last_active_date` above). What this entry still covers: which places a member saved, their trips to other
    * programs, and their points — none of it shown to a program.
    */
   'member_activity_for_a_program',
