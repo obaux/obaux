@@ -1136,6 +1136,10 @@ YES/NO replies are not built. D-460.
 
 Merged to `main` by the merge desk, 10 October, from `claude/places-programs-reported-places` (dca16c6). A page at `/places/reported/` for admins and case managers, linked from the profile and the reported-place bell row. Only a super admin can keep or remove; case managers read. No database change. Shared files touched: `ProfileView.tsx`, `app/notifications/page.tsx`, `ReportedPlaces.tsx` (buttons only when allowed). Figma flow map not republished.
 
+## Places & programs · a trip names its service (10 October 2026) — READY, not merged
+
+Branch `claude/places-programs-trip-service` (D-470). Migration `20261010121853`, expand only: `appointments.program_service_id`, `book_trip_at_service`, `my_trip_services()`; `book_trip` unchanged in signature. Test `33_a_trip_names_its_service_test.sql`. Next: `log_call`.
+
 ## Places & programs · planning a trip earns points (10 October 2026) — merged 10 October
 
 Merged to `main` by the merge desk, 10 October, from `claude/places-programs-trip-points` (D-468). Migration `20261010115117` replaces `book_trip` (same signature): 25 points once per place ever, three a day, members only. Expand only; **applied live at merge**, read back (body identical to the file, grants unchanged). Test `32_plan_a_trip_points_test.sql`. The Points screen lists it as "Plan a trip to a place". Next: `program_service_id` (contract), then `log_call`.

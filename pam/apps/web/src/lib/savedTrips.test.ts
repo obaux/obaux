@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { asksForSavedTrips, isSavedPlace, tripsFromRows, type TripRow } from './savedTrips';
+import { asksForSavedTrips, isSavedPlace, tripsFromRows, type TripRow, type TripServiceRow } from './savedTrips';
 import type { SessionState } from './useSession';
 
 const ROW: TripRow = {
@@ -62,5 +62,28 @@ describe('tripsFromRows', () => {
 
   it('keeps a trip whose place has no coordinates, at nowhere rather than lost', () => {
     expect(tripsFromRows([{ ...ROW, lat: null, lon: null }])[0]).toMatchObject({ lat: 0, lon: 0 });
+  });
+});
+
+describe('tripsFromRows with the service a trip is for (D-470)', () => {
+  const named: TripServiceRow = {
+    appointment_id: ROW.id,
+    program_service_id: '5d2a1b64-3a0e-4b8e-9d6c-7a1f0f3c2b99',
+    service_name: 'GED class',
+  };
+
+  it('carries the service onto the trip it is for', () => {
+    const [trip] = tripsFromRows([ROW], [named]);
+    expect(trip?.serviceId).toBe(named.program_service_id);
+    expect(trip?.serviceName).toBe('GED class');
+  });
+
+  it('leaves a trip that names none, and one whose service list failed, as it was', () => {
+    expect(tripsFromRows([ROW], [])[0]).not.toHaveProperty('serviceId');
+    expect(tripsFromRows([ROW])[0]).not.toHaveProperty('serviceId');
+  });
+
+  it('ignores a service row for some other trip', () => {
+    expect(tripsFromRows([ROW], [{ ...named, appointment_id: 'other' }])[0]).not.toHaveProperty('serviceId');
   });
 });
