@@ -993,6 +993,14 @@ Broad St, North Philadelphia` drew `… St, North Philadelphia 1231 بالقرب
   `fit-known.json` and the old `ar|spill` entry is gone; `areachip--arabic` needs none
   (its ellipsis is the story's own in every column).
 
+## Messages & notifications · Twilio receiver (10 October 2026)
+
+On `claude/messages-sms-inbound`, not merged. `sms-inbound` (not deployed, off unless
+`SMS_INBOUND=on`) records a STOP or START reply, after checking Twilio's signature; migration
+`20261010081342_…` (not applied) adds `record_sms_stop` / `record_sms_start`. Until it is switched
+on and Twilio is pointed at it, Pam still does not learn a STOP. Setup: `docs/sms-setup.md` § 3.
+YES/NO replies are not built. D-460.
+
 ## Messages & notifications · alert texts, STOP, promises (10 October 2026)
 
 Merged to `main` by the merge desk, 10 October. Two migrations, **both applied to the live project
