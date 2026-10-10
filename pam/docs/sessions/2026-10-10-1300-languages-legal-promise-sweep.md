@@ -43,9 +43,18 @@ Ten English lines and their six translations (`copy:ack`ed), no migration. Full 
 
 ## Verified
 
-On the tree merged with `main` at `717ed79` (main had not moved): `@pam/config` 1000 tests, `@pam/web` 76, typecheck (web, site, native)
-clean, `copy:status` "in step". The browser suite on all three viewports: **924 passed** (10.4 min). Fit audit and Storybook build: see the
-READY note to the merge desk (the audit runs after this log is written).
+First on `main` at `717ed79` plus this change: `@pam/config` 1000 tests, `@pam/web` 76, typecheck (web, site, native) clean, `copy:status`
+"in step"; the browser suite on all three viewports **924 passed** (10.4 min); Storybook builds; the fit audit (`--locales
+en,ru,ar,zh-CN,pseudo --known scripts/fit-known.json`, 517 stories): 94 new in a language, 82 accepted, **12 not, none from this change**.
+Six of the twelve were in this morning's audit too (Explore's four pseudo clamps, the two Block ru overlaps). The other six
+(pseudo `cut` of "Work and money" on the case manager's and program lead's Homes) came in with main since this morning; to prove they
+are not mine I built Storybook again with the old wording of all ten lines and audited the same stories (`--match screens--home`):
+the same six, so they are the Homes', not the copy's. I did not add them to `fit-known.json` (Mira does at merge).
+
+Then merged with `main` at `296a6f3` (24 commits; one conflict in `docs/before-launch.md`, kept both sides' facts): `@pam/config` 1018
+tests, `@pam/web` 76, `@pam/site` 19, typecheck clean, `copy:status` in step; the browser suite again on that merge, `b30a74a`: **933 passed** (10.5 min) (also in the
+READY note). Main's new English added one more reminder line, `place.visit.cancel.body` ("Any reminder for it is cancelled too."): an
+"any", true whether or not one was queued; left.
 
 ## Left undone
 
