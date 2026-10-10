@@ -914,6 +914,28 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
+## Accounts & invites — assigning a guide, limiting or pausing (10 October) — D-446, on a branch
+
+`claude/pam-assign-and-limit`. **Not merged; two migrations not applied** (merge desk).
+Session log: `docs/sessions/2026-10-10-0405-accounts-assign-and-limit.md`.
+
+- **A case manager** has two new rows on a member's page: *Limit or pause*
+  (Everything / Limited / Paused, a required reason only staff read, a confirm dialog
+  that says what the member will see) and *Hand over to another case manager* (in
+  their city). This is the first thing in the app that limits anyone, so the D-427
+  notice can now fire.
+- **The super admin** sees each member's guide on Everyone, can list *Members with no
+  guide*, and chooses anyone's guide (a case manager, themselves, or none).
+- **Database:** `20261010034711_…` (expand: `assign_guide`, `hand_over_member`,
+  `guides_i_can_choose`, `directory_guides`) and `20261010034713_…` (contract: closes a
+  gap where any case manager could assign themselves any unassigned member straight
+  from the client, unaudited). Either order with the app is safe.
+- **Proven:** DB suite 682 checks, 0 failures (the new test fails without the contract
+  step); Playwright full suite 876 passed (39 new); config 719, typecheck clean,
+  Storybook builds. Figma flow map pages 3 and 5 redrawn.
+- **Open:** what "Fold into the next build" meant; members are not told when their
+  guide changes; five languages' 62 new strings are drafts for native review.
+
 ## Seven languages, messages in your own language, and text that fits (9 October) — 0.50.1 and 0.51.0, on a branch
 
 D-421 to D-423, **on `claude/gallant-clarke-0dhizj`, which is
@@ -1146,13 +1168,16 @@ Open items Will asked to keep (7 October), newest first. Read this before
   screens) should be usted like the rest.
 - **Voice notes** (D-394): `attachment_kind 'voice'` is refused by 0079
   until voice notes get storage and rules of their own. Photos are built.
-- **Assigning a case manager** (D-415). Only the inviting case manager is
+- **Assigning a case manager** (D-415) — **built on `claude/pam-assign-and-limit`
+  (D-446), not merged, migrations not applied**; see "Accounts & invites" above.
+  Was: only the inviting case manager is
   assigned, when the invite names one. A member who signed up alone, or was
   invited by a program lead or a super admin, has none and is read by no case
   manager since 0082. Needs a way for a case manager (or a super admin) to
   take a member on, hand one over, and see who is unassigned; the schema
   already allows one active case manager per member (`admin_assignments`).
-- **How a case manager limits or pauses someone** (Will, 9 October, D-414:
+- **How a case manager limits or pauses someone** — **built on
+  `claude/pam-assign-and-limit` (D-446), not merged.** Was (Will, 9 October, D-414:
   "We'll need to enrich how case managers do this later on"). Only the RPC
   `admin_set_access_status` exists — **no screen** (nothing in the app calls
   it), and it works for a case manager the person is assigned to (0082). What a

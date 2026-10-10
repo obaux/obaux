@@ -1,7 +1,7 @@
 -- Case managers no longer write `admin_assignments` straight from the client
 -- (D-446). Contract step for the migration before this one.
 --
--- contract: no release of the app ever wrote admin_assignments from the client — redeem_invite, start_membership and the new assign_guide / hand_over_member write it as definer
+-- contract: no release of the app ever wrote admin_assignments from the client — redeem_invite and the new assign_guide / hand_over_member write it as definer
 --
 -- 0007's `admin_assignments_admin` policy was `for all`, checked only that the
 -- row named the caller as the admin, and nothing revoked the table grants.
