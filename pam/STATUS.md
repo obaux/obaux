@@ -926,6 +926,29 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
+## Places & programs · save a member's trips (10 October) — on the branch, not merged
+
+D-454, on `claude/places-programs-save-trips` (Piper), from `main` at `189d314`. A trip a member
+plans to a real place is saved, and the day-before reminder text is queued for a member who
+turned reminders on. **Not on `main`; nothing applied to the live project.** Two migrations:
+`20261010074045_a_planned_trip_is_saved_and_its_day_before_reminder_is.sql` (expand), then
+`20261010074241_appointments_are_written_only_through_the_trip_functions.sql` (contract).
+
+- **Built:** `book_trip` / `move_trip` / `cancel_trip` / `my_trips()`; a trigger that queues,
+  re-times or cancels one `appointment_24h` text, only when the member has reminders on; every
+  screen that lists trips shows saved ones (`SavedTripsSync`, `useTrips`); Plan a trip saves for
+  real and says so if it cannot. Wording: a sent program promises no time, `/interested` speaks
+  in a program's words, the review wait drops the "Text me" row.
+- **Closed:** any signed-in person could write an appointment for any member, and a member could
+  mark their own appointment attended.
+- **Not built:** a program booking for a member (D-316) and example places stay on the device;
+  no cancel button; the text links to Trips on `app_settings.app_url`, which still holds the old
+  address; the dispatcher's claim does not stop a member who was never asked (Messages').
+- **Proven:** database suite (new `26_` file), numbering test, 61 web and 822 config tests,
+  Storybook build, a browser look at planning, moving and reading a saved trip, language fit.
+
+---
+
 ## Places & programs · load a lead's own program (10 October) — on the branch, not merged
 
 D-447, on `claude/places-programs-load-own-program` (Piper). A program lead's program is

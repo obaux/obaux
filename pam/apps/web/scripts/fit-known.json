@@ -502,5 +502,17 @@
   {
     "key": "zh-HK|ellipsis|case-manager-screens--conversation-files|ID office letter.pdf",
     "reason": "Looked at 10 October 2026 at 320px with screenshots. The file name reads in full in the screenshot, although the name's ellipsis box measures 4px narrower than its text (148 > 144); no letter is lost. Worth another look if the row's layout changes."
+  },
+  {
+    "key": "es|cut|member-created-states-saved-trips--one-trip-saved|Faltan firmas",
+    "reason": "The Trips drawer scrolls and fades out at its foot; a card below the first sits under that fade, so the detector sees its text partly hidden (partial=true). It is reached by scrolling and nothing is lost. Looked at 10 October 2026 at 320px with a screenshot (the saved-trip card is the second one, below the first)."
+  },
+  {
+    "key": "pt-BR|cut|member-created-states-saved-trips--one-trip-saved|terça-feira, 13 de out. · 12:00",
+    "reason": "The Trips drawer scrolls and fades out at its foot; a card below the first sits under that fade, so the detector sees its text partly hidden (partial=true). It is reached by scrolling and nothing is lost. Looked at 10 October 2026 at 320px with a screenshot (the saved-trip card is the second one, below the first)."
+  },
+  {
+    "key": "ru|cut|member-created-states-saved-trips--one-trip-saved|вторник, 13 окт. · 12:00",
+    "reason": "The Trips drawer scrolls and fades out at its foot; a card below the first sits under that fade, so the detector sees its text partly hidden (partial=true). It is reached by scrolling and nothing is lost. Looked at 10 October 2026 at 320px with a screenshot (the saved-trip card is the second one, below the first)."
   }
 ]
