@@ -11,9 +11,15 @@
  *                          an empty rectangle named `shot:<key>--<node>` where
  *                          each screen goes. Replaces the page if it exists.
  *   <n>-<key>.slots.js     lists that page's screenshot slots (name → node
- *                          id), for upload_assets to fill from
- *                          user-flows-out/thumbs/<key>--<node>.jpg.
+ *                          id), for upload_assets to fill.
+ *   <n>-<key>.shots.json   which file fills which slot: { slot, file } for each
+ *                          screen, the real screen at 390×844, light, from
+ *                          user-flows-out/shots/<key>--<node>.jpg.
  *   order.txt              the order to run them in.
+ *
+ * Under every screen: a link to its story (or "no story yet"). The empty slot
+ * shows the screen's name on a card behind it; a screenshot placed on the slot
+ * covers that card, so nothing has to be removed afterwards.
  */
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
@@ -45,20 +51,25 @@ function pill(parent,str,{bg=NEW,color=WHITE,size=11}={}){
   const f=figma.createAutoLayout('HORIZONTAL',{name:'Tag '+str,paddingLeft:8,paddingRight:8,paddingTop:4,paddingBottom:4,cornerRadius:999});
   f.fills=solid(bg); parent.appendChild(f); text(f,str,{size,style:'Bold',color}); return f;
 }
-function slotLabel(card,shot,title,url){
-  // Centred in the screen slot: the screen's name, and a link to it live in
-  // Storybook. Stays useful once a screenshot fills the slot.
-  const box=figma.createAutoLayout('VERTICAL',{name:'Open '+title,itemSpacing:10,counterAxisAlignItems:'CENTER'});
-  box.fills=[]; card.appendChild(box); box.layoutPositioning='ABSOLUTE';
-  text(box,title,{size:16,style:'Semi Bold',color:MUTED});
-  if(url){
-    const p=figma.createAutoLayout('HORIZONTAL',{name:'Link',paddingLeft:12,paddingRight:12,paddingTop:7,paddingBottom:7,cornerRadius:999});
-    p.fills=solid(WHITE); p.strokes=solid(LINE); p.strokeWeight=1; box.appendChild(p);
-    const t=text(p,'Open in Storybook ↗',{size:12,style:'Semi Bold',color:ACCENT});
-    t.hyperlink={type:'URL',value:url};
-  }
-  box.x=Math.round(shot.x+(shot.width-box.width)/2); box.y=Math.round(shot.y+(shot.height-box.height)/2);
-  return box;
+function placeholderBehind(parent,shot,title){
+  // The screen's name on a white card, drawn BEHIND the slot: the slot itself has no fill, so while it is
+  // empty the card shows through, and a screenshot placed on the slot covers it entirely.
+  const b=figma.createAutoLayout('VERTICAL',{name:'Placeholder',primaryAxisAlignItems:'CENTER',counterAxisAlignItems:'CENTER'});
+  b.fills=solid(WHITE); b.effects=LIFT; b.cornerRadius=shot.cornerRadius;
+  parent.appendChild(b); b.layoutPositioning='ABSOLUTE';
+  b.primaryAxisSizingMode='FIXED'; b.counterAxisSizingMode='FIXED'; b.resize(shot.width,shot.height);
+  text(b,title,{size:16,style:'Semi Bold',color:MUTED});
+  parent.insertChild(parent.children.indexOf(shot),b);
+  b.x=shot.x; b.y=shot.y;
+  return b;
+}
+function linkPill(parent,url){
+  // Under the screen: where it lives in Storybook, or that it has no story yet.
+  const p=figma.createAutoLayout('HORIZONTAL',{name:url?'Open in Storybook':'No story yet',paddingLeft:12,paddingRight:12,paddingTop:7,paddingBottom:7,cornerRadius:999});
+  p.fills=solid(WHITE); p.strokes=solid(LINE); p.strokeWeight=1; parent.appendChild(p);
+  if(url){ const t=text(p,'Open in Storybook ↗',{size:12,style:'Semi Bold',color:ACCENT}); t.hyperlink={type:'URL',value:url}; }
+  else { text(p,'no story yet',{size:12,style:'Semi Bold',color:MUTED}); }
+  return p;
 }
 async function arrow(parent,d,dashed){
   const v=figma.createVector(); parent.appendChild(v);
@@ -68,9 +79,16 @@ async function arrow(parent,d,dashed){
   v.name='Arrow'; return v;
 }
 async function pageNamed(name,index){
-  let page=figma.root.children.find(p=>p.name===name);
+  // A page is found by its title, not its number: when the pages were renumbered, matching "2 · Member" exactly
+  // found nothing, drew a second Member page, and left "1 · Member" behind. Now the page is reused and renamed,
+  // and any other page with the same title is removed.
+  const title=s=>s.replace(/^\d+\s*·\s*/,'').trim().toLowerCase();
+  const same=figma.root.children.filter(p=>title(p.name)===title(name));
+  let page=same.find(p=>p.name===name)||same[0];
   if(!page){ page = (index===0 && figma.root.children.length===1 && figma.root.children[0].children.length===0) ? figma.root.children[0] : figma.createPage(); page.name=name; }
   await figma.setCurrentPageAsync(page);
+  for(const extra of same) if(extra!==page) extra.remove();
+  if(page.name!==name) page.name=name;
   for(const c of [...page.children]) c.remove();
   return page;
 }
@@ -98,7 +116,8 @@ function edgeGeometry(L, e, index) {
   return { d: [sx, sy, sx, lift, tx, lift, tx, ty], lx: (sx + tx) / 2, ly: lift + 18 };
 }
 
-const storyUrl = (story) => (story ? `${STORYBOOK_URL}/iframe.html?id=${story}&viewMode=story` : null);
+// The story's permalink on the published Storybook (Chromatic's build of main): STORYBOOK_URL/?path=/story/<id>.
+const storyUrl = (story) => (story ? `${STORYBOOK_URL}/?path=/story/${story}` : null);
 
 function flowScript(L, pageName, index) {
   L = { ...L, nodes: Object.fromEntries(Object.entries(L.nodes).map(([id, n]) => [id, { ...n, url: storyUrl(n.story) }])) };
@@ -136,11 +155,12 @@ for(const [id,n] of Object.entries(L.nodes)){
   if(n.changed) pill(row,n.changed,{bg:isNew?NEW:GREY});
   text(card,n.path,{size:12,style:'Medium',color:MUTED});
   const shot=figma.createRectangle(); shot.name='shot:'+L.key+'--'+id; shot.resize(n.w,n.shotH);
-  shot.cornerRadius=n.wide?16:28; shot.fills=solid(WHITE); shot.effects=LIFT;
+  shot.cornerRadius=n.wide?16:28; shot.fills=[];
   shot.strokes=solid(isNew?NEW:LINE); shot.strokeWeight=isNew?3:1; shot.strokeAlign='INSIDE';
   card.appendChild(shot);
+  placeholderBehind(card,shot,n.title);
+  linkPill(card,n.url);
   if(n.note){ text(card,n.note,{size:13,color:MUTED,width:n.w,lh:135}); }
-  slotLabel(card,shot,n.title,n.url);
   ids[id]=card.id;
 }
 // Labels on the arrows
@@ -176,9 +196,10 @@ cols.forEach((c,i)=>{
   const col=figma.createAutoLayout('VERTICAL',{name:c.title,itemSpacing:10}); col.fills=[]; root.appendChild(col); col.x=x; col.y=TOPC;
   text(col,c.title,{size:24,style:'Extra Bold'});
   text(col,c.intro,{size:14,color:{r:0.27,g:0.27,b:0.27},width:OW,lh:145});
-  const r=figma.createRectangle(); r.name='shot:overview--'+c.key; r.resize(OW,c.wide?Math.round(OW*630/1200):Math.round(OW*844/390)); r.cornerRadius=c.wide?16:28; r.fills=solid(WHITE); r.effects=LIFT; r.strokes=solid(LINE); r.strokeWeight=1; r.strokeAlign='INSIDE'; col.appendChild(r);
+  const r=figma.createRectangle(); r.name='shot:overview--'+c.key; r.resize(OW,c.wide?Math.round(OW*630/1200):Math.round(OW*844/390)); r.cornerRadius=c.wide?16:28; r.fills=[]; r.strokes=solid(LINE); r.strokeWeight=1; r.strokeAlign='INSIDE'; col.appendChild(r);
+  placeholderBehind(col,r,c.title);
+  linkPill(col,c.url);
   text(col,c.count+' screens · page “'+c.title+'”',{size:13,style:'Semi Bold',color:ACCENT});
-  slotLabel(col,r,c.title,c.url);
 });
 return {page:page.id,root:root.id};
 `;
@@ -201,6 +222,8 @@ const layouts = flows
   .filter(existsSync)
   .map((p) => JSON.parse(readFileSync(p, 'utf8')));
 
+/** Which file fills which slot: the real screen, 390×844, light. The overview's slots take each flow's first screen. */
+const shotsFor = (L) => Object.keys(L.nodes).map((id) => ({ slot: `shot:${L.key}--${id}`, file: `user-flows-out/shots/${L.key}--${id}.jpg` }));
 const write = (name, code) => {
   if (code.length > 50_000) throw new Error(`${name} is ${code.length} characters`);
   writeFileSync(join(dir, name), code);
@@ -209,10 +232,15 @@ const write = (name, code) => {
 
 write('0-overview.js', overviewScript(layouts));
 write('0-overview.slots.js', SLOTS('0 · Overview'));
+write(
+  '0-overview.shots.json',
+  JSON.stringify(layouts.map((L) => ({ slot: `shot:overview--${L.key}`, file: `user-flows-out/shots/${L.key}--${flows.find((f) => f.key === L.key).roots[0]}.jpg` })), null, 1),
+);
 layouts.forEach((L, i) => {
   const pageName = `${i + 1} · ${L.title}`;
   write(`${i + 1}-${L.key}.js`, flowScript(L, pageName, i + 1));
   write(`${i + 1}-${L.key}.slots.js`, SLOTS(pageName));
+  write(`${i + 1}-${L.key}.shots.json`, JSON.stringify(shotsFor(L), null, 1));
 });
 writeFileSync(join(dir, 'order.txt'), order.join('\n') + '\n');
 console.log(order.join('\n'));

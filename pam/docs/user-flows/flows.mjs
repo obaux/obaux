@@ -29,8 +29,14 @@
 
 export const UPDATED = '2026-10-10';
 
-/** Where each screen opens live — the branch's Storybook on Chromatic. */
-export const STORYBOOK_URL = 'https://claude-pam-storybook--6abea9193da46b88ce90890f.chromatic.com';
+/**
+ * Where each screen opens live: Chromatic's build of `main`, `https://main--<app id>.chromatic.com`.
+ * A screen's link is `<this>/?path=/story/<story id>`. The map used the old
+ * `claude-pam-storybook--…` build before, a branch that has merged and no longer updates. The app id is
+ * the same. NOT YET OPENED: the sandbox that wrote this cannot reach *.chromatic.com (10 October), so
+ * open one link from the map before relying on the `main--` form.
+ */
+export const STORYBOOK_URL = 'https://main--6abea9193da46b88ce90890f.chromatic.com';
 
 export const flows = [
   {

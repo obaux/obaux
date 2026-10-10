@@ -31,6 +31,7 @@ if (!existsSync(join(staticDir, 'iframe.html'))) {
   process.exit(1);
 }
 mkdirSync(join(out, 'thumbs'), { recursive: true });
+mkdirSync(join(out, 'shots'), { recursive: true });
 
 // --- A tiny static server for storybook-static (keeps the query string). ---
 const TYPES = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.webp': 'image/webp', '.woff2': 'font/woff2' };
@@ -64,9 +65,10 @@ async function act(page, step) {
   }
 }
 
-async function shoot(node, thumbPath) {
+async function shoot(node, thumbPath, shotPath) {
   if (node.image) {
     const raw = readFileSync(join(repo, node.image));
+    writeFileSync(shotPath, raw);
     const page = await browser.newPage({ viewport: { width: 600, height: 315 } });
     await page.setContent(`<body style="margin:0"><img style="width:600px;height:315px;display:block" src="data:image/jpeg;base64,${raw.toString('base64')}"></body>`);
     writeFileSync(thumbPath, await page.screenshot({ type: 'jpeg', quality: 60 }));
@@ -90,6 +92,8 @@ async function shoot(node, thumbPath) {
   for (const step of node.actions ?? []) await act(full, step);
   await full.waitForTimeout(400);
   const buf = await full.screenshot({ type: 'jpeg', quality: 78 });
+  // The real screen at phone width (390×844, light), for the Figma frame: shots/<flow>--<node>.jpg.
+  writeFileSync(shotPath, buf);
   await full.close();
   await page.close();
   return { data: buf.toString('base64'), type: 'image/jpeg' };
@@ -101,14 +105,15 @@ const SHOT = Math.round((CARD * H) / W);
 const WIDE = 420;
 const WIDE_SHOT = Math.round((WIDE * 630) / 1200);
 const HEAD = 64; // title + route above the screen
-const NOTE = 44; // note under the screen
+const LINK = 38; // the Storybook link (or "no story yet") under the screen
+const NOTE = 44; // note under the link
 const GAP_X = 190;
 const GAP_Y = 64;
 const TOP = 300; // room for the title block
 
 const cardW = (n) => (n.wide ? WIDE : CARD);
 const shotH = (n) => (n.wide ? WIDE_SHOT : SHOT);
-const cardH = (n) => HEAD + shotH(n) + NOTE;
+const cardH = (n) => HEAD + shotH(n) + LINK + NOTE;
 
 function layout(flow) {
   const pos = {};
@@ -161,7 +166,8 @@ function card(id, node, p, shot, latest) {
   </div>
   <div style="font:500 12px/1.4 'SF Mono', Menlo, monospace;color:${MUTED};height:28px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(node.path ?? '')}</div>
   <img src="data:${shot.type};base64,${shot.data}" width="${w}" height="${shotH(node)}" style="display:block;width:${w}px;height:${shotH(node)}px;border-radius:${node.wide ? 16 : 28}px;border:${isNew ? `3px solid ${NEW}` : '1px solid #D9D9D9'};box-sizing:border-box;object-fit:cover;background:#fff;box-shadow:0 6px 18px rgba(0,0,0,.10),0 1px 3px rgba(0,0,0,.06);">
-  <div style="font:400 13px/1.35 ${FONT};color:${MUTED};margin-top:8px;height:${NOTE - 8}px;overflow:hidden;">${esc(node.note ?? '')}</div>
+  <div style="height:${LINK}px;display:flex;align-items:center;"><span style="font:600 12px/1 ${FONT};color:${node.story ? ACCENT : MUTED};background:#fff;border:1px solid #D9D9D9;border-radius:999px;padding:7px 12px;">${node.story ? 'Open in Storybook ↗' : 'no story yet'}</span></div>
+  <div style="font:400 13px/1.35 ${FONT};color:${MUTED};height:${NOTE - 8}px;overflow:hidden;">${esc(node.note ?? '')}</div>
 </div>`;
 }
 
@@ -280,7 +286,7 @@ for (const flow of flows) {
   const width = clearOfPanel(flow, pos, laidOut);
   const shots = {};
   for (const [id, node] of Object.entries(flow.nodes)) {
-    shots[id] = await shoot(node, join(out, 'thumbs', `${flow.key}--${id}.jpg`));
+    shots[id] = await shoot(node, join(out, 'thumbs', `${flow.key}--${id}.jpg`), join(out, 'shots', `${flow.key}--${id}.jpg`));
     process.stdout.write('.');
   }
   homes[flow.key] = shots[flow.roots[0]];
@@ -306,7 +312,7 @@ for (const flow of flows) {
       width,
       height,
       latest,
-      card: { width: CARD, shot: SHOT, wide: WIDE, wideShot: WIDE_SHOT, head: HEAD, note: NOTE },
+      card: { width: CARD, shot: SHOT, wide: WIDE, wideShot: WIDE_SHOT, head: HEAD, link: LINK, note: NOTE },
       nodes: Object.fromEntries(
         Object.entries(flow.nodes).map(([id, n]) => [
           id,
