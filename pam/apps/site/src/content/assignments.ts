@@ -2,9 +2,9 @@
  * Case manager assignments — who can do what.
  *
  * The rules come from Will's table (9 October 2026). Two cells there pointed at
- * numbered questions from the conversation they were drafted in ("see
- * question 2"); a reader of the public site has no question 2, so those
- * pointers are gone and the sentence stands on its own.
+ * numbered open questions from the conversation they were drafted in; a reader
+ * of the public site was not in it, so those pointers are gone and each
+ * sentence stands on its own.
  *
  * `answer` is the Yes / No a reader scans for; `note` is everything after it.
  * A cell with only a note ("Same") has no yes or no to give.

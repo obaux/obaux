@@ -46,9 +46,11 @@ Pam's public website (Home and Support, D-433) is a second, separate Vercel
 project from the same repository, so it can have its own address and nobody who
 reads a support page is ever near the app's sign-in code.
 
-1. **Add New → Project**, pick `obaux/obaux` again, and set **Root Directory**
-   to `pam/apps/site`, **Framework Preset** to Other. Its `vercel.json` carries
-   the build.
+1. Done once, 10 October (D-437): Vercel project **`pam-site`**, root
+   `pam/apps/site`, framework Other (`vercel.json` carries the build). New
+   project? **Add New → Project**, pick `obaux/obaux`, set the same.
+   **Turn Vercel Authentication off** (Settings → Deployment Protection): it is
+   on by default and puts a Vercel login in front of a public site.
 2. No environment variables. It never talks to Supabase. Its "Sign in",
    "Privacy" and "Terms" links point at the app (`apps/site/src/lib/links.ts`,
    `NEXT_PUBLIC_APP_URL`, the same default as `apps/web/src/lib/project.ts` —

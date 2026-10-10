@@ -3,8 +3,8 @@ import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { HStack } from '@astryxdesign/core/HStack';
 import { TextLink } from '@pam/ui/TextLink';
-import { AssignmentsTable } from '@/components/AssignmentsTable';
-import { PRIVACY_URL } from '@/lib/links';
+import { AssignmentsTable } from '../components/AssignmentsTable';
+import { PRIVACY_URL } from '../lib/links';
 
 /** Support post: Case manager assignments. */
 export function CaseManagerAssignments() {

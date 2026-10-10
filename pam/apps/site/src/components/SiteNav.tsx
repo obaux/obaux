@@ -3,7 +3,7 @@
 import { usePathname } from 'next/navigation';
 import { TopNav, TopNavItem } from '@astryxdesign/core/TopNav';
 import { Button } from '@pam/ui/Button';
-import { SIGN_IN_URL } from '@/lib/links';
+import { SIGN_IN_URL } from '../lib/links';
 import { Frame } from './Frame';
 import { Wordmark } from './Wordmark';
 
@@ -11,8 +11,13 @@ import { Wordmark } from './Wordmark';
  * The header: the wordmark, two places to go, and the way into the app.
  * Sign in is the one action, so it is the only filled button.
  */
-export function SiteNav() {
-  const path = usePathname() ?? '/';
+/**
+ * `path` is for Storybook's website journey, which walks the site without a
+ * router; on the real site the address bar decides.
+ */
+export function SiteNav({ path: given }: { readonly path?: string }) {
+  const real = usePathname();
+  const path = given ?? real ?? '/';
   return (
     <Frame gap={2}>
     <TopNav

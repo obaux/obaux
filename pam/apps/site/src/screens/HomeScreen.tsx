@@ -6,8 +6,8 @@ import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { HStack } from '@astryxdesign/core/HStack';
 import { Button } from '@pam/ui/Button';
-import { Frame } from '@/components/Frame';
-import { SIGN_IN_URL } from '@/lib/links';
+import { Frame } from '../components/Frame';
+import { SIGN_IN_URL } from '../lib/links';
 
 const styles = stylex.create({
   hero: { paddingBlock: '48px 16px' },
@@ -51,7 +51,7 @@ const WHO = [
   },
 ] as const;
 
-export default function HomePage() {
+export function HomeScreen() {
   return (
     <Frame gap={10}>
       <VStack gap={4} xstyle={styles.hero}>

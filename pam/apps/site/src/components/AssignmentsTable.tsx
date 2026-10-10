@@ -5,7 +5,7 @@ import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { VisuallyHidden } from '@astryxdesign/core/VisuallyHidden';
-import { ASSIGNMENT_ROWS, type Cell } from '@/content/assignments';
+import { ASSIGNMENT_ROWS, type Cell } from '../content/assignments';
 
 /*
  * Three columns of sentences do not fit a phone, and a table that scrolls

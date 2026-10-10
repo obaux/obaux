@@ -4,7 +4,7 @@ import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { HStack } from '@astryxdesign/core/Stack';
 import { TextLink } from '@pam/ui/TextLink';
-import { PRIVACY_URL, TERMS_URL } from '@/lib/links';
+import { PRIVACY_URL, TERMS_URL } from '../lib/links';
 import { Frame } from './Frame';
 
 const styles = stylex.create({

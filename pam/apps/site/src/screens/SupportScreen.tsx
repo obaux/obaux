@@ -12,10 +12,10 @@ import { Text } from '@astryxdesign/core/Text';
 import { TextInput } from '@astryxdesign/core/TextInput';
 import { VStack } from '@astryxdesign/core/VStack';
 import { Button } from '@pam/ui/Button';
-import { POSTS, type SupportPost } from '@/content/posts';
-import { TOPICS } from '@/content/topics';
-import { APP_URL } from '@/lib/links';
-import { Frame } from './Frame';
+import { POSTS, type SupportPost } from '../content/posts';
+import { TOPICS } from '../content/topics';
+import { APP_URL } from '../lib/links';
+import { Frame } from '../components/Frame';
 
 /**
  * The Support home, after the shape of Figma's help center: a banded hero with
@@ -53,7 +53,7 @@ function PostList({ posts }: { readonly posts: readonly SupportPost[] }) {
   );
 }
 
-export function SupportBrowser() {
+export function SupportScreen() {
   const [query, setQuery] = useState('');
   const q = query.trim();
   const found = useMemo(() => (q ? POSTS.filter((p) => matches(p, q)) : []), [q]);

@@ -920,10 +920,10 @@ app's theme, Figtree and Astryx components; no Supabase, no sign-in. Support's
 first post, **Case manager assignments** (`src/content/`), has an introduction
 and the "who can do what" table (a real table from 720px up, stacked cards
 below). Built in CI (`pam-ci.yml`) and covered by `test/content.test.ts`;
-looked at in light, dark and a 390px phone. **Not deployed**, and it should not
-be until the post is true: taking on, handing over and unassigning a member, the
+looked at in light, dark and a 390px phone. **Preview-only**: deployed as a preview from the branch (D-437), and it should not
+reach production until the post is true: taking on, handing over and unassigning a member, the
 Unassigned filter and "Turn back on" are not built (backlog, D-415) —
-`docs/before-launch.md`. Deploy steps: `docs/deploying.md`. Not on the user-flow
+`docs/before-launch.md`. Deploy steps: `docs/deploying.md`. Storybook has a **Website/Journey** group (Home, Support, Support search, Post — every link works; D-437). It has its own Vercel project, **`pam-site`** (Vercel Auth off; previews from this branch; production is `main`, not merged). New posts: the `pam-support-post` skill. Not on the user-flow
 map: it is not a screen of the app. Session log:
 `docs/sessions/2026-10-09-a-public-website.md`.
 

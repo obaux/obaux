@@ -11418,3 +11418,40 @@ the table of who can do what.
   "Still need help" points at the person who invited you and the app's Help
   button — no invented support email or phone.
 
+### D-437 — The website has a Storybook journey, a Vercel project of its own, and a skill for new posts
+
+**Date:** 2026-10-10. Will: "Deploy website, and prep it inside Storybook for each
+website page in Journeys (dedicated, website journey). I'll throw new info and you
+create new posts on my behalf."
+
+- **Storybook: `Website/Journey`** — Home, Support, Support search (a play
+  function types a query and checks the match), and **Post**, one story for every
+  post (choose it in the controls; a new post appears on its own, the same
+  pattern as the place story, D-305). Each is the whole site (header, page,
+  footer) and every link inside it works through `WebsiteWalker`, which catches
+  clicks in the capture phase (D-212: a story never navigates its frame). Links out
+  to the app (Sign in, Privacy, Terms) are named in the console and not followed.
+- **How Storybook reaches the site.** The site's pages are now components
+  (`apps/site/src/screens/*`) that the routes and Storybook both render, with
+  relative imports (the site's `@/` alias would have collided with the app's).
+  Storybook's Babel/StyleX pass and static dir include `apps/site`; the app's
+  PostCSS StyleX plugin includes it **only when `PAM_STORIES=1`** (set in the
+  `storybook` and `build-storybook` scripts), so the app's own stylesheet does not
+  grow for pages it never shows (§12). A hand-run `storybook build` without that
+  variable renders the site unstyled.
+- **Deploy: a second Vercel project, `pam-site`** (root `pam/apps/site`, team
+  will-3199's projects), created on the team the app lives in. **Vercel Auth was
+  on by default and is switched off**: a public site behind a Vercel login is not
+  public. Production is `main`; this branch gets previews. **Nothing was merged to
+  `main`** (pam/CLAUDE.md: not without Will asking), so the production address
+  serves nothing until he merges. Vercel also queued a *production* build from
+  `claude/gallant-clarke-0dhizj` (another session's branch, which has no
+  `apps/site`); it is expected to fail and is not this session's to cancel.
+- **The "before launch" hold still stands** (D-433): the assignments post
+  describes screens that are not built. Will asked for the deploy knowing that
+  (it was in the last summary); it is now a preview, not a production address.
+- **New posts are a skill**: `.claude/skills/pam-support-post/SKILL.md` — check
+  it is true of the app, write it plainly, three edits (`posts.ts`, a body
+  component, `bodies.tsx`), look at it in the Website journey, record, push.
+  The content test now also scans the words written into every component.
+

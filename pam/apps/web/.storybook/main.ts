@@ -32,7 +32,8 @@ const config: StorybookConfig = {
     name: '@storybook/nextjs',
     options: { nextConfigPath: '../next.config.mjs' },
   },
-  staticDirs: ['../public'],
+  // The public site's own pictures (/art/…) sit beside the app's (D-437).
+  staticDirs: ['../public', '../../site/public'],
   docs: { defaultName: 'About' },
   // Storybook reads next.config but not its `webpack()` hook, so the same
   // `.js` -> `.ts` alias the workspace packages need is repeated here.
@@ -49,7 +50,7 @@ const config: StorybookConfig = {
       {
         test: /\.[jt]sx?$/,
         enforce: 'pre',
-        include: [join(app, 'src'), join(app, '.storybook'), join(app, '../../packages/ui/src')],
+        include: [join(app, 'src'), join(app, '.storybook'), join(app, '../../packages/ui/src'), join(app, '../site/src')],
         use: {
           loader: require.resolve('babel-loader'),
           options: {

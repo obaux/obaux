@@ -25,6 +25,11 @@ manager's and a super admin's powers over assigning, limiting and pausing).
   still-need-help. Looked at in Chromium at 1280px and 390px, and the search
   checked with a hit and a miss. No test covers the search yet.
 
+- **10 October: Storybook and deploy (D-437).** `Website/Journey` (Home, Support,
+  Support search, Post) with working links; the site's pages became components
+  both the routes and Storybook render. Vercel project `pam-site` created, Vercel
+  Auth switched off, branch previews building. The `pam-support-post` skill.
+
 ## What was wrong, and what missed it
 
 - **First build failed** importing `TextLink` from the `@pam/ui` barrel in a
@@ -61,6 +66,11 @@ Playwright a11y suite (it does not cover `apps/site`). The site's touch targets
 and contrast were looked at, not measured.
 
 ## Left undone
+
+- Production: `main` has no `apps/site` and was not merged (needs Will). The
+  Vercel builds were still queued when this was written, so **no deployed URL has
+  been seen working**. Another session's branch also queued a production build on
+  `pam-site`; it should fail and is not ours to cancel.
 
 - Not deployed. No Vercel project exists for it; no domain.
 - Not measured against §12's first-load budget: the post page is 535 kB

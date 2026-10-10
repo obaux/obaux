@@ -1,8 +1,15 @@
+import { readFileSync, readdirSync } from 'node:fs';
+import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { ASSIGNMENT_ROWS } from '../src/content/assignments';
 import { POSTS, formatDate, postBySlug } from '../src/content/posts';
 
-const everyWord = JSON.stringify([ASSIGNMENT_ROWS, POSTS]).toLowerCase();
+// The data, and the words written straight into every post's component and page.
+const SRC = join(__dirname, '..', 'src');
+const written = ['content', 'screens', 'components']
+  .flatMap((d) => readdirSync(join(SRC, d)).map((f) => readFileSync(join(SRC, d, f), 'utf8')))
+  .join('\n');
+const everyWord = (JSON.stringify([ASSIGNMENT_ROWS, POSTS]) + written).toLowerCase();
 
 describe('public site content', () => {
   it('never uses the words Pam never displays (pam/CLAUDE.md)', () => {

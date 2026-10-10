@@ -1,8 +1,6 @@
 import type { Metadata, Viewport } from 'next';
-import { Providers } from '@/components/Providers';
-import { SiteNav } from '@/components/SiteNav';
-import { Frame } from '@/components/Frame';
-import { SiteFooter } from '@/components/SiteFooter';
+import { Providers } from '../components/Providers';
+import { SiteShell } from '../components/SiteShell';
 
 // Setup order is the app's (apps/web/src/app/layout.tsx): layers first, then the
 // three Astryx sheets as JS imports, then Pam's theme, fonts and own styles.
@@ -32,9 +30,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" suppressHydrationWarning>
       <body>
         <Providers>
-          <SiteNav />
-          <main>{children}</main>
-          <SiteFooter />
+          <SiteShell>{children}</SiteShell>
         </Providers>
       </body>
     </html>

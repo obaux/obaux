@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { SupportBrowser } from '@/components/SupportBrowser';
+import { SupportScreen } from '../../screens/SupportScreen';
 
 export const metadata: Metadata = {
   title: 'Support',
@@ -7,5 +7,5 @@ export const metadata: Metadata = {
 };
 
 export default function SupportPage() {
-  return <SupportBrowser />;
+  return <SupportScreen />;
 }
