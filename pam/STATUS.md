@@ -1368,6 +1368,14 @@ recorded once `sms-inbound` is deployed (D-460); nothing queues the check-in or 
 connect" yet. Samples file: nine texts. D-453. Text reminders' staff list (merged 10 October) names
 only the alert texts Will signed: no "introduced to your program", no "your account changes".
 
+## Design system & Storybook · map: staff Home is live (10 October)
+
+Branch `claude/pam-design-flow-map-3`. The user-flow map shows the live staff Home (rings, and the empty
+state with a (+)) instead of the "Proposed (a22)" cards; the generator gets `drag` and `scroll` actions, and
+"Trips with a past visit" shows the past visit. Found on the way: dragging the Trips drawer's handle with a
+mouse stepped it on again (D-494, fixed; phones were not affected). Figma: Case manager, Program lead and
+Overview redrawn, one image replaced on Member; drawn from the branch, so redraw from `main` only after it merges.
+
 ## Design system & Storybook · secondary button edge (10 October)
 
 Branch `claude/pam-design-secondary-border`. A secondary Button has a light 1px ring (an inset shadow, so no
