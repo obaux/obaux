@@ -23,7 +23,7 @@ function EmailPreview(props: Omit<StaffInviteEmailInput, 'appUrl' | 'draft' | 'l
   const { html } = renderStaffInviteEmail({
     ...props,
     appUrl,
-    link: `https://web-ten-umber-88.vercel.app/signin/?invite=ABCD2345&as=${role}`,
+    link: `${appUrl}/signin/?invite=ABCD2345&as=${role}`,
     draft: true,
   });
   return <iframe title="First invite email" srcDoc={html} {...stylex.props(styles.frame)} />;
