@@ -192,9 +192,9 @@ STATUS row too.
   the deletion trigger function are not executable by clients), then merged to main (`0220ae0`).
   The live copy of the migration is the same statements without the explanatory comments.
 
-- [ ] **Texts: sign the four alert texts, decide the STOP receiver, file the carrier once**
+- [ ] **Texts: ~~sign the four alert texts~~ (done 10 October, D-461), the STOP receiver (built, D-460; Will pastes its address into Twilio), file the carrier once**
   (Will, 10 October 2026, D-453). `message_waiting`, `visit_booked`, `booking_changed` and
-  `trip_planned` are drafted in seven languages and unsigned; nothing queues them yet. A stored
+  `trip_planned` are signed by Will (10 October, D-461; the other languages as drafts to learn from); nothing queues them yet. A stored
   STOP cannot be cleared from the app once `20261010071947_…` is applied, but nothing stores a
   STOP: an Edge Function Twilio calls (STOP/START/HELP and the YES/NO replies) is not built —
   Will to say yes. `docs/sms-campaign-samples.md` has the nine texts and the description
@@ -226,6 +226,14 @@ STATUS row too.
      over (D-385, D-386): build it as `docs/design/program-review-queue.md`
      says — a withdrawn request shown as "Withdrawn — started over" with only
      Discard, the new one approvable, and the database rules tested.
+
+### Trips and reminders
+
+- [ ] **Saved trips and the day-before text are built** (`claude/places-programs-save-trips`, D-454, 10 October): live once the two migrations are applied.
+- [ ] **Point `app_settings.app_url` at Pam's real address** before the first reminder: the text links to `/trips/` on it, and it still holds the address 0054 seeded.
+- [ ] **A program booking for a member (D-316)** is still a trip on the device only, so that member gets no reminder.
+- [ ] **A Cancel button on a trip** (`cancel_trip` exists and is tested; no screen calls it).
+- [ ] **Past trips** (attended, missed) are returned by `my_trips()` but not shown.
 
 ### Two roles (one account, member and program)
 

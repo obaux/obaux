@@ -1,8 +1,8 @@
 # Turning on email
 
 Pam can already write the first email to a case manager or a program lead who has
-been invited (D-450). It sends nothing until the steps below are done and a person
-has signed the words. Texts are set up separately (`docs/sms-setup.md`).
+been invited (D-450). Will approved the English on 10 October 2026 (D-461). It sends
+nothing until the steps below are done. Texts are set up separately (`docs/sms-setup.md`).
 
 ## What Will does, in order
 
@@ -19,10 +19,10 @@ has signed the words. Texts are set up separately (`docs/sms-setup.md`).
    person reads. Staff may answer an invite with a question.
 5. **Create an API key that can only send.** Give it to the merge desk, never to a
    session and never to the repository.
-6. **Read and sign the words.** `STAFF_INVITE_EMAIL` in
-   `packages/config/src/invite-email.ts` — English first (nothing sends without it),
-   then each language by somebody who reads it. Only a person writes `reviewedBy`.
-   Storybook: *Onboarding › First invite email (staff)*.
+6. **The words are signed.** English by Will (10 October 2026, D-461); the other six
+   are drafts "approved to learn from" until somebody who reads them says what is
+   wrong. Only a person writes `reviewedBy`. Storybook: *Onboarding › First invite
+   email (staff)*.
 7. **Send one to your own inbox** and look at it in Gmail, Apple Mail and Outlook.
 
 ## What the merge desk does with them
@@ -43,7 +43,7 @@ Then, in this order: apply `20261010063304_staff_invite_emails_wait_in_a_queue`
 send-invite-emails`; a schedule that calls it every five minutes with
 `x-dispatch-secret` (like 0039/0040); set `INVITE_EMAILS=on` last.
 
-Until the wording is signed the sender answers "the wording is not signed" and claims
+If the English ever loses its sign-off the sender answers "the wording is not signed" and claims
 nothing, so switching it on early is harmless.
 
 ## What to know

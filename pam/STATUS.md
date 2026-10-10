@@ -542,8 +542,10 @@ calls it every five minutes. Twilio credentials are in place and proved with a
 real end-to-end test: a signed-off template queued to Will's own number came
 back `status: sent`, no failure reason, picked up by the very next scheduled
 run. Quiet hours, the STOP list and atomic claiming are enforced in the
-database, not in the function. All sixteen templates in the catalogue are now
-signed off — the original thirteen (13 September) plus the two built this
+database, not in the function. All fifteen templates in the catalogue were then
+("sixteen" was a miscount, corrected 10 October; since then four Text alerts texts
+were added and signed, so the catalogue has nineteen, and the deployed dispatcher
+carries the fifteen until it is redeployed) signed off — the original thirteen (13 September) plus the two built this
 week, `staff_request_approved` and `staff_request_denied` (17 September) —
 so nothing is currently held back at the `reviewedBy` gate; the next template
 anyone adds still starts blank and stays refused until it is read. See
@@ -926,11 +928,36 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
-## Places & programs · load a lead's own program (10 October) — on the branch, not merged
+## Places & programs · save a member's trips (10 October) — merged 10 October
 
-D-447, on `claude/places-programs-load-own-program` (Piper). A program lead's program is
-now read from, and saved to, the database instead of remembered by the tab. **Not on `main`;
-nothing applied to the live project.** Two migrations, in this order: **0085** (by hand, it
+D-454, from `claude/places-programs-save-trips` (Piper). A trip a member
+plans to a real place is saved, and the day-before reminder text is queued for a member who
+turned reminders on. **Merged to `main` by the merge desk, 10 October, after the database half.**
+Both migrations are live (see "trips saved, the database half" below):
+`20261010074045_a_planned_trip_is_saved_and_its_day_before_reminder_is.sql` (expand), then
+`20261010074241_appointments_are_written_only_through_the_trip_functions.sql` (contract).
+
+- **Built:** `book_trip` / `move_trip` / `cancel_trip` / `my_trips()`; a trigger that queues,
+  re-times or cancels one `appointment_24h` text, only when the member has reminders on; every
+  screen that lists trips shows saved ones (`SavedTripsSync`, `useTrips`); Plan a trip saves for
+  real and says so if it cannot. Wording: a sent program promises no time, `/interested` speaks
+  in a program's words, the review wait drops the "Text me" row.
+- **Closed:** any signed-in person could write an appointment for any member, and a member could
+  mark their own appointment attended.
+- **Not built:** a program booking for a member (D-316) and example places stay on the device;
+  no cancel button; the text links to Trips on `app_settings.app_url`, which still holds the old
+  address. (The dispatcher's claim now texts a reminder only to a member who agreed:
+  Messages' `20261010072848_…`, live.)
+- **Proven:** database suite (`28_` file, renumbered at merge), numbering test, 61 web and 822 config tests,
+  Storybook build, a browser look at planning, moving and reading a saved trip, language fit.
+
+---
+
+## Places & programs · load a lead's own program (10 October) — merged 10 October
+
+D-447, from `claude/places-programs-load-own-program` (Piper). A program lead's program is
+now read from, and saved to, the database instead of remembered by the tab. **Merged to `main`
+10 October (`aff402d`); 0085 and both migrations are live.** Two migrations, in this order: **0085** (by hand, it
 drops signatures), then `20261010042108_a_program_lead_submits_their_own_program.sql`, then
 `20261010062347_an_approved_program_lead_gets_an_org.sql` (refuses without 0085).
 
@@ -951,13 +978,21 @@ drops signatures), then `20261010042108_a_program_lead_submits_their_own_program
 
 ---
 
+## Messages & notifications · Will's sign-off (10 October 2026)
+
+Merged to `main` by the merge desk, 10 October (no migration). Will approved the four Text alerts texts and the staff
+invite email (English, in his words: no expiry days, "Accept invite", human). The alert texts and the email
+now carry his name; the other languages are drafts approved to learn from. Nothing sends yet: the alert texts
+are not queued by anything, and the email needs the function deployed, the mail domain and its secrets, and
+`INVITE_EMAILS=on`. D-461.
+
 ## Messages & notifications · staff invite email (10 October 2026)
 
 Merged to `main` by the merge desk, 10 October. A staff invite's email now has a
 queue (`20261010063304_…`, expand only, **applied to the live project 10 October**; read back:
 forced RLS, no client grants, the sender's functions service-role only), a sender
 (`supabase/functions/send-invite-emails`, **not deployed**, off unless `INVITE_EMAILS=on`) and
-first-invite wording in seven languages that **nobody has signed**, so nothing can send.
+first-invite wording in seven languages (English signed by Will, D-461; the rest are drafts).
 D-450. What Will has to set up, in order: `docs/email-setup.md`. Checked: config 831, database
 suite passes (with `24_staff_invite_emails_test.sql`), Storybook builds, fit audit on the new
 page clean. Not done: the expired-link email, an email for staff who already have accounts,
@@ -1005,7 +1040,7 @@ YES/NO replies are not built. D-460.
 ## Places & programs · trips saved, the database half (10 October 2026)
 
 Merged to `main` by the merge desk, 10 October, from `claude/places-programs-trips-database`
-(7713e69, Piper; D-454). The app half (`claude/places-programs-save-trips`) is not merged yet.
+(7713e69, Piper; D-454). The app half (`claude/places-programs-save-trips`) followed later the same day.
 
 - **Live:** `20261010074045_…` (expand): `book_trip`, `move_trip`, `cancel_trip`, `my_trips`, the
   `appointments_keep_reminder` trigger that queues, re-times or cancels the day-before text, and
