@@ -74,6 +74,13 @@ still read your messages. Call Pam and we will help you reach your guide." It si
 a calmer card — more room, smaller text — and "Call Pam for help" is a link rather
 than a big green button (D-432).
 
+**10 October (D-435):** when a guide or a program invites a **case manager or a program
+lead**, they now have to give that person's email. It is kept on the person's account,
+tied to the phone number they sign in with, and only they and Pam can see it. A member is
+never asked for an email. The privacy policy says so, in "What we keep", and carries a new
+date (10 October).
+
+
 ## [0.50.0] — 2026-10-09 · Buttons where you expect them
 
 A conversation now starts like every other screen you tap into: the round

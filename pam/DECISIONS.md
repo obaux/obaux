@@ -11450,3 +11450,78 @@ and make text the smallest. Call Pam for help should be a link, not a primary bu
   D-430 "The new languages are approved to learn from" and D-431 first), so this is
   D-432 and every reference on this branch moved with it. Next free: D-433.
 
+### D-435 — A staff invite carries a required email; the account keeps it, tied to the phone
+
+**Date:** 2026-10-10. **Decided by:** Will: "Emails are collected when a guide or program
+invites someone … we don't ask [members] during account creation. But the phone number
+they use to sign in should map to their email if they were invited. Map these together in
+their account. We just don't ask members for this since not everyone has an email. This
+will be typically just staff." Shown the plan: "Yes" (only staff are asked), "Not optional
+for staff". His third answer was a question — "Which email are you talking about?" — see
+*Who can read it*, below.
+
+**What was true first.** The Invite someone journey asked for a **name and a phone and
+nothing else, for every role** (0077). It did not collect an email. The only emails Pam
+held were the ones a person types on the expired-link page (0071's `invite_emails`
+outbox), tied to a link and never to an account, and `profiles` has no email column by
+design (0002: sign-in is phone-only). So there was nothing to "map"; the email had to be
+asked for first.
+
+**What was built (migration `0086_staff_email_on_invite.sql`, written and tested, not applied).**
+- Inviting a **case manager or a program lead** asks for their email and refuses to
+  continue without one that looks like an email. Inviting a **member** never asks, and the
+  database refuses a member invite that carries one. `create_staff_invite(role, email, phone,
+  region, name)` is the staff door; `create_invite` (the member door) now refuses a staff
+  role. Both call `invite_create`, which no client role can call. **No `drop` anywhere**
+  (the connector times out on one, D-387).
+- The email waits in `invite_contact_emails`, apart from `invites`: forced RLS, a policy that
+  admits nobody, no grant to any client role. When the person signs in with the number the
+  invite named and finishes setup, `redeem_invite` (or `add_role_from_invite`, for a member
+  who also works at a program) moves it onto their account, in `profile_emails`, and deletes
+  it from the invite. An account keeps the first email it was given. A renewed invite (the
+  expired-link email) has none of its own, so the email is found by following the renewals
+  back to the original invite — which is why 0086 does not touch `request_invite_link`
+  (0085, still unapplied, replaces it). An invite made before 0086 redeems as before, with
+  no email.
+- **Who can read it.** `profile_emails`: its owner reads their own row; nobody else, from the
+  app, ever — not the person who invited them, not another case manager, not a program, not
+  a member, not the super admin; and no client role can write it. The audit log never holds
+  an address. Pam's own sender will use the service role. **Will asked "which email?" and has
+  not confirmed this default**; it is the most private choice and can be widened later, never
+  the other way round without telling people first.
+- The app: `InviteForWho` shows the email field for staff only (new field purpose
+  `theirEmail`: the email keyboard, no autofill of the *inviter's* own address) and
+  `createInvite` sends staff through `create_staff_invite`. Four strings in seven languages
+  (five are drafts).
+- The privacy policy's "What we keep" gains a seventh paragraph and its date moves to 10
+  October (all seven languages, five of them drafts; Will to read the English): "If you work
+  with Pam as a case manager or for a program, we also keep the email address you were
+  invited with. Pam uses it to write to you. Only you and Pam can see it. Members are never
+  asked for an email." Every clause is enforced by the database.
+- Tests: `21_staff_email_on_invite_test.sql` (staff invites need an email and members refuse
+  one; nobody reads it before sign-in, including the person who typed it; it lands on the
+  right account only, for the number the invite named; only its owner reads it, nobody writes
+  it; a member who also works at a program keeps the first email; a renewed invite still
+  delivers it; an old invite redeems with none; the audit log never holds an address). It
+  fails when the owner-only rule is loosened. The suite passes (596 checks). The staff
+  invite calls in `04`, `08`, `13` and `14` now go through `create_staff_invite`. Browser
+  tests: a member is never asked, staff always are, the keyboard and autofill attributes,
+  axe clean.
+
+**Applying it is order-sensitive.** The app now calls `create_staff_invite`; the *old* app
+calls `create_invite` for staff, which 0086 refuses. So: before 0086 is live, the new app's
+staff invites fail (no such function); after it is live, the old app's do. Apply 0086 and
+merge this change to `main` in the same sitting (Vercel takes a few minutes; staff invites
+are unavailable in between). Run `list_migrations` first (`CLAUDE.md`); 0085 is unapplied
+and 0086 does not depend on it. Members are unaffected either way. On the live project there
+were one super admin and two members when last read, so no staff account has an email yet.
+
+**Not done.** Sending any email (the provider, the sender, the opt-in are the first item on
+`docs/before-launch.md`); an email for a staff account that already exists (there is no screen
+to add one; re-inviting is the only way today); showing a staff member their own email on
+Profile; using the address typed on the expired-link page as an account email (that would
+quietly collect member emails); the program-lead and super-admin pages of the flow map (the
+case manager's page shows the form; the others carry the same form).
+
+**Numbering.** D-435 and migration 0086 were claimed in `docs/allocations.md` first.
+

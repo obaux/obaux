@@ -103,6 +103,17 @@ decided.
   the Figma flow map was redrawn from the merged `flows.mjs` (26 screens, 29 arrows,
   including the other session's Stuff shared).
 
+- **Staff email on invites (D-435, 10 October).** Will: emails come in when a guide or
+  program invites someone, the phone should map to the email, members are not asked, and for
+  staff it is required. Checked first: the invite journey asked for **no** email (name and
+  phone only), so there was nothing to map; the plan (shown through the
+  `scope-my-instructions` skill) was confirmed. Built on the branch, not applied: migration
+  0086, test 21, the staff form with a required email, privacy "What we keep" p7 and its date
+  (seven languages, five drafts), the case manager's page of the flow map (not republished
+  to Figma: not yet merged, and the program-lead and super-admin pages carry the same form).
+  **Needs Will:** read the new privacy sentence; confirm who may read the email (default:
+  only its owner); say when to apply 0086 and merge (order-sensitive, in D-435).
+
 ## What was wrong, and what missed it
 
 **A test hardcoded a count and broke without anyone seeing.** `e2e/legal.spec.ts`

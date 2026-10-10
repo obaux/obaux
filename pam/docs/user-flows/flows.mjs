@@ -27,7 +27,7 @@
  *   changes  — the newest decisions this flow shows, newest first
  */
 
-export const UPDATED = '2026-10-09';
+export const UPDATED = '2026-10-10';
 
 /** Where each screen opens live — the branch's Storybook on Chromatic. */
 export const STORYBOOK_URL = 'https://claude-pam-storybook--6abea9193da46b88ce90890f.chromatic.com';
@@ -370,6 +370,14 @@ export const flows = [
         changed: 'D-315',
         note: 'A member, a program, or a case manager (D-315)',
       },
+      inviteWho: {
+        title: 'Who it is for',
+        story: 'case-manager-screens--invite',
+        path: '/invite/ (a program)',
+        changed: 'D-435',
+        note: 'Name, mobile number and, for a program or a case manager, an email: required. A member is never asked',
+        actions: [{ click: 'Invite a program' }, { wait: 800 }],
+      },
       inviteReady: {
         title: 'The link to send',
         story: 'case-manager-screens--invite',
@@ -409,13 +417,14 @@ export const flows = [
       ['member', 'memberSaved', 'Saved programs'],
       ['member', 'connect', 'Connect'],
       ['home', 'invite', 'Invite someone (floating)'],
+      ['invite', 'inviteWho', 'Invite a program / case manager'],
       ['invite', 'inviteReady', 'Invite a member / program / case manager'],
       ['messages', 'thread', 'Open'],
       ['profile', 'programs', 'All programs'],
       ['programs', 'addProgram', 'Add'],
       ['profile', 'alerts', 'Text alerts'],
     ],
-    changes: ["D-411 — a conversation: back and ⋯ where every nested screen has them, the name large, no fade; ⋯ outlined; Messages rows start at the page edge; dialogs open with no button chosen", 'D-400–401 — a conversation: a smaller visit card and a blurred fade under the header; one line under the name; an even frame round photos; the send button tucked into a rounder corner; photos open on near-black', 'D-399 — a conversation: send a PDF or Word file (the document button, or drop it on), opened when tapped; a Google Docs link shows as a card that opens it in Google', 'D-395 — a conversation: under the name, who they are in full (Program lead at Example Food Pantry; Case manager), not a cut-off tag', 'D-394 — a conversation: send a photo (the picture button beside the mic), tap one to see it full size; only the two people see it, and whoever checks a report about it', 'D-390 — a conversation: mine light green, theirs grey, no name or time on a bubble; drag sideways to see the times; closer to the edges; bolder mic and send', "D-389 — a conversation: one divider per day (Today, Yesterday, a weekday, a date), each bubble just its time; the composer one rounded box, mic left, round send grey until there is text, then dark green", 'D-347 — Add a program asks one question a screen, then a review', 'D-315 — a case manager can invite a case manager', 'D-263 — Invite someone makes the link straight away', 'D-260 — text alert switches'],
+    changes: ['D-435 — inviting a program or a case manager asks for their email, required: it lands on their account when they sign in with that number; a member is never asked', "D-411 — a conversation: back and ⋯ where every nested screen has them, the name large, no fade; ⋯ outlined; Messages rows start at the page edge; dialogs open with no button chosen", 'D-400–401 — a conversation: a smaller visit card and a blurred fade under the header; one line under the name; an even frame round photos; the send button tucked into a rounder corner; photos open on near-black', 'D-399 — a conversation: send a PDF or Word file (the document button, or drop it on), opened when tapped; a Google Docs link shows as a card that opens it in Google', 'D-395 — a conversation: under the name, who they are in full (Program lead at Example Food Pantry; Case manager), not a cut-off tag', 'D-394 — a conversation: send a photo (the picture button beside the mic), tap one to see it full size; only the two people see it, and whoever checks a report about it', 'D-390 — a conversation: mine light green, theirs grey, no name or time on a bubble; drag sideways to see the times; closer to the edges; bolder mic and send', "D-389 — a conversation: one divider per day (Today, Yesterday, a weekday, a date), each bubble just its time; the composer one rounded box, mic left, round send grey until there is text, then dark green", 'D-347 — Add a program asks one question a screen, then a review', 'D-315 — a case manager can invite a case manager', 'D-263 — Invite someone makes the link straight away', 'D-260 — text alert switches'],
   },
   {
     key: 'program-lead',
