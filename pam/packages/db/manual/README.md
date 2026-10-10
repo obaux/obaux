@@ -31,6 +31,29 @@ no ledger row.
 the pre-flight check and the self-check) **and re-prove it.**
 `packages/config/test/manual-sql.test.ts` fails until you do.
 
+## `2026-10-10-appointments-written-only-through-the-trip-functions.sql`
+
+Migration 20261010074241 (D-454): appointments are written only through
+`book_trip`, `move_trip` and `cancel_trip`. It closes two holes found by the trip
+tests: any signed-in person could write an appointment for any member, and a
+member could mark their own visit attended (what earns points). It replaces the
+two `for all` policies with read-only ones, so it drops them first.
+
+**Nothing in the app waits on it,** and nothing the app does changes: nothing
+writes `appointments` directly.
+
+- It refuses to run unless the trip functions (20261010074045) are there.
+- It checks its own work (old write policies gone, both read policies there, no
+  insert/update/delete for `anon` or `authenticated`) and rolls back if anything
+  is off.
+- It records 20261010074241 in `supabase_migrations.schema_migrations`.
+- A second run stops at "policy ... already exists" and changes nothing.
+
+Proved on 10 October on a database built from every migration except this one
+(first run: Success, one ledger row, reads kept, writes gone; second run:
+error, still one ledger row) and on one without 20261010074045 (refused, nothing
+changed).
+
 ## History
 
 The first version of this folder held a four-in-one file (0079 + 0080 + 0081 +

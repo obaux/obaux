@@ -29,6 +29,10 @@ export type SmsTemplateKey =
   | 'connection_request'
   | 'access_limited_notice'
   | 'saved_place_closed'
+  | 'message_waiting'
+  | 'visit_booked'
+  | 'booking_changed'
+  | 'trip_planned'
   | 'staff_request_approved'
   | 'staff_request_denied';
 
@@ -228,6 +232,9 @@ const approved = (body: string, maxVarLengths?: Readonly<Record<string, number>>
   maxVarLengths
     ? { body, reviewedBy: APPROVED_TO_LEARN_FROM, maxVarLengths }
     : { body, reviewedBy: APPROVED_TO_LEARN_FROM };
+
+/** A wording in one of the later languages that nobody has signed: never sent, English goes instead. */
+const draft = (body: string): SmsDraft => ({ body, reviewedBy: '' });
 
 /**
  * Who read this copy and signed it off.
@@ -513,6 +520,81 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
     },
     vars: ['reason', 'link'],
     reviewedBy: REVIEWED_BY,
+    isFirstContact: false,
+  },
+  /**
+   * The four texts behind the Text alerts switches (Will, 10 October 2026: "keep
+   * the promise: build these texts"). **Drafts nobody has signed**: every
+   * `reviewedBy` here is empty, so none can send, and nothing queues them yet
+   * (the screen says "coming soon"). A new template starts empty and stays empty
+   * until a person says otherwise.
+   *
+   * They say that something happened and never what or to whom, as the
+   * connection request does (§6.2): no name, no place, no day. A text is read on
+   * a lock screen a roommate can see.
+   */
+  /** Somebody wrote to you. Never what it says, never who. */
+  message_waiting: {
+    key: 'message_waiting',
+    en: 'Pam: You have a new message in Pam. Open it: {link}',
+    es: 'Pam: Tiene un mensaje nuevo en Pam. Abralo aqui: {link}',
+    more: {
+      'pt-BR': draft('Pam: Voce tem uma mensagem nova no Pam. Abra: {link}'),
+      'zh-CN': draft('Pam: 您在 Pam 有新消息。打开：{link}'),
+      'zh-HK': draft('Pam: 你在 Pam 有新訊息。打開：{link}'),
+      'ru': draft('Pam: У вас новое сообщение: {link}'),
+      'ar': draft('Pam: لديك رسالة جديدة: {link}'),
+    },
+    vars: ['link'],
+    reviewedBy: '',
+    isFirstContact: false,
+  },
+  /** To a program: somebody booked a visit with it. */
+  visit_booked: {
+    key: 'visit_booked',
+    en: 'Pam: Someone booked a visit with your program. Open Pam to see it: {link}',
+    es: 'Pam: Alguien reservo una visita en su programa. Abra Pam para verla: {link}',
+    more: {
+      'pt-BR': draft('Pam: Alguem marcou uma visita no seu programa. Abra o Pam: {link}'),
+      'zh-CN': draft('Pam: 有人预约了您的项目。打开：{link}'),
+      'zh-HK': draft('Pam: 有人預約了你的計劃。打開：{link}'),
+      'ru': draft('Pam: Новая запись: {link}'),
+      'ar': draft('Pam: حجز جديد في برنامجك: {link}'),
+    },
+    vars: ['link'],
+    reviewedBy: '',
+    isFirstContact: false,
+  },
+  /** To a program: a booking was moved or cancelled. It does not say which. */
+  booking_changed: {
+    key: 'booking_changed',
+    en: 'Pam: A visit with your program was changed. Open Pam to see it: {link}',
+    es: 'Pam: Cambio una visita en su programa. Abra Pam para verla: {link}',
+    more: {
+      'pt-BR': draft('Pam: Uma visita no seu programa mudou. Abra o Pam: {link}'),
+      'zh-CN': draft('Pam: 您项目的一次预约有变。打开：{link}'),
+      'zh-HK': draft('Pam: 你計劃的一個預約有變。打開：{link}'),
+      'ru': draft('Pam: Запись изменена: {link}'),
+      'ar': draft('Pam: تغير حجز في برنامجك: {link}'),
+    },
+    vars: ['link'],
+    reviewedBy: '',
+    isFirstContact: false,
+  },
+  /** To a case manager: somebody on their list planned a visit. */
+  trip_planned: {
+    key: 'trip_planned',
+    en: 'Pam: Someone on your list planned a visit. Open Pam to see it: {link}',
+    es: 'Pam: Alguien de su lista planeo una visita. Abra Pam para verla: {link}',
+    more: {
+      'pt-BR': draft('Pam: Alguem da sua lista planejou uma visita. Abra o Pam: {link}'),
+      'zh-CN': draft('Pam: 您名单上有人计划了到访。打开：{link}'),
+      'zh-HK': draft('Pam: 你名單上有人計劃了到訪。打開：{link}'),
+      'ru': draft('Pam: В списке новый визит: {link}'),
+      'ar': draft('Pam: أحدهم خطط لزيارة: {link}'),
+    },
+    vars: ['link'],
+    reviewedBy: '',
     isFirstContact: false,
   },
   access_limited_notice: {

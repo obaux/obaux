@@ -1,6 +1,5 @@
 'use client';
 
-import { useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { Banner } from '@astryxdesign/core/Banner';
 import { Heading } from '@astryxdesign/core/Heading';
@@ -9,7 +8,7 @@ import { Spinner } from '@astryxdesign/core/Spinner';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
-import { BellOutlineIcon, BigButton, HelpIcon, LegalIcon, MeIcon, PlacesIcon } from '@pam/ui';
+import { BigButton, HelpIcon, LegalIcon, MeIcon, PlacesIcon } from '@pam/ui';
 import { MenuList } from '@pam/ui/MenuList';
 import { SetupArt } from '@pam/ui/SetupArt';
 import { SubPage } from '@pam/ui/SubPage';
@@ -17,7 +16,6 @@ import { Confetti } from '@pam/ui/SuccessScreen';
 import { useI18n } from '@/lib/i18n';
 import { useProgramSetup, type ReviewStatus } from '@/lib/programSetup';
 import { useSession } from '@/lib/useSession';
-import { hasTextAlerts } from './AlertsView';
 
 /**
  * Sent to Pam (Will, 7 October, D-379, D-380, D-381): a program a lead has
@@ -26,14 +24,14 @@ import { hasTextAlerts } from './AlertsView';
  * three steps, sent → Pam checks → live.
  *
  * D-381, from the suggestions Will took up:
- * - **Something to do while waiting** — add your photo (until there is one),
- *   your policies, a text when it's live. A lead who sets up during review
- *   is ready on day one.
+ * - **Something to do while waiting** — add your photo (until there is one)
+ *   and your policies. A lead who sets up during review is ready on day one.
+ *   ("Text me when it's live" waits until something sends that text.)
  * - **"Needs changes"** — the middle step turns amber, Pam's note says what,
  *   and one button edits what was sent and sends it again.
  * - **What you sent** — read-only, one row away.
- * - **An honest wait** — after three days the page says it is taking longer
- *   (no promise of a text: that only comes with alerts on)
+ * - **An honest wait** — no promised time while Pam checks by hand; after
+ *   three days the page says it is taking longer
  *   and offers a way to ask Pam (the one help link a hero page carries,
  *   because here something may have gone wrong — sop-amendments A19).
  *
@@ -103,8 +101,6 @@ export interface ProgramReviewViewProps {
   /** Pam's note when it asks for changes. */
   readonly changes?: string | null;
   readonly hasPhoto?: boolean;
-  /** Text alerts already on: no "Text me when it's live" row. */
-  readonly hasAlerts?: boolean;
 }
 
 export function ProgramReviewView({ isCelebrating = false, ...given }: ProgramReviewViewProps = {}) {
@@ -114,14 +110,12 @@ export function ProgramReviewView({ isCelebrating = false, ...given }: ProgramRe
   const status = given.status ?? setup.reviewStatus;
   const changes = given.changes ?? setup.sent?.changes ?? null;
   const hasPhoto = given.hasPhoto ?? setup.hasPhoto;
-  const [hasAlerts] = useState(() => given.hasAlerts ?? hasTextAlerts('provider'));
 
-  // "Text me" first — the one that answers "when?" — and gone once texts
-  // are on (Will, 7 October, D-386).
+  // No "Text me when it's live" row (D-386 put it first): nothing sends that
+  // text yet, and its link led to switches marked "Coming soon". It comes back
+  // with the text itself (a signed SMS template, and the review queue that
+  // knows when a program is approved).
   const waitRows = [
-    ...(hasAlerts
-      ? []
-      : [{ id: 'text-me', label: t('programs.review.text'), description: t('programs.review.text.body'), href: '/alerts/', icon: <BellOutlineIcon {...ICON} /> }]),
     ...(hasPhoto
       ? []
       : [{ id: 'photo', label: t('programs.review.photo'), description: t('programs.review.photo.body'), href: '/profile/', icon: <MeIcon {...ICON} /> }]),
