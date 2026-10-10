@@ -89,6 +89,14 @@ export function CaseloadHome() {
       }}
       state={state}
       note={isExample ? t('example.people.note') : null}
+      // §4.1: members agreed to this list at onboarding, and the case manager
+      // reads the same words, so the promise is visible from both sides.
+      footer={
+        <VStack gap={2}>
+          <Heading level={2}>{t('admin.seeing.title')}</Heading>
+          <Text type="supporting">{t('admin.seeing.body')}</Text>
+        </VStack>
+      }
       actions={<HeaderActions role="admin" />}
       // Message, the shortcut on each card (D-227): the example conversation
       // for an example person, a real one opened for a real member.

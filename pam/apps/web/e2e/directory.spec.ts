@@ -191,24 +191,18 @@ test.describe('everyone, for the person running Pam', () => {
     await signedInAs(page, 'super_admin');
     await page.route('**/rest/v1/rpc/member_points*', (route) => route.fulfill(json(400)));
     await page.route('**/rest/v1/rpc/saved_places_mine*', (route) => route.fulfill(json([])));
+    // Their own Home is the requests to approve; Everyone is on their Profile.
+    await page.goto('/profile/');
+    await expect(page.getByRole('link', { name: /Everyone/ })).toHaveAttribute('href', '/directory/');
     await page.goto('/');
+    await expect(page.getByRole('heading', { name: 'Requests', level: 1 })).toBeVisible();
 
-    // Their own screen first: the directory tile, no caseload tile.
-    await expect(page.getByRole('link', { name: /Everyone/ })).toBeVisible();
-
-    await page.getByRole('button', { name: 'Super admin' }).click();
-    await page
-      .getByRole('menuitem', { name: 'Case manager' })
-      .or(page.getByRole('button', { name: 'Case manager' }))
-      .first()
-      .click();
-
-    // Now the case manager's arrangement. The switcher's own chip is the
-    // telling — "Viewing as Case manager" — rather than a second, separate
-    // sentence repeating it underneath (Will, 16 September: "no need to show
-    // text saying which user, since the top bar does the communicating").
-    await expect(page.getByRole('link', { name: /Your people/ })).toBeVisible();
-    await expect(page.getByRole('button', { name: /Viewing as Case manager/ })).toBeVisible();
+    // The switch lives on Profile › See the app as (D-217); the Home it chooses is drawn at once.
+    await page.goto('/view-as/');
+    await page.getByRole('button', { name: 'Case manager' }).click();
+    await page.goto('/');
+    await expect(page.getByRole('heading', { name: 'Your members', level: 1 })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Requests', level: 1 })).toHaveCount(0);
   });
 
   test('switching the view never changes whose data is asked for', async ({ page }) => {
@@ -223,14 +217,10 @@ test.describe('everyone, for the person running Pam', () => {
     });
     await page.route('**/rest/v1/rpc/saved_places_mine*', (route) => route.fulfill(json([])));
 
-    await page.goto('/');
-    await page.getByRole('button', { name: 'Super admin' }).click();
-    await page
-      .getByRole('menuitem', { name: 'Member' })
-      .or(page.getByRole('button', { name: 'Member' }))
-      .first()
-      .click();
-    await expect(page.getByRole('button', { name: /Viewing as Member/ })).toBeVisible();
+    await page.goto('/view-as/');
+    await page.getByRole('button', { name: 'Member' }).click();
+    await page.goto('/profile/');
+    await expect(page.getByText(/400\s*Points/)).toBeVisible();
 
     // Every id asked for is the signed-in person's own.
     expect(new Set(asked)).toEqual(new Set([WILL]));

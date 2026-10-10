@@ -21,6 +21,23 @@ import { ROLES, type Role } from '@pam/config';
  * Ignored for everybody who is not a super admin, at the point of use.
  */
 const KEY = 'pam.view-as';
+/**
+ * Said on `window` when a view is chosen, so every screen part that asked the
+ * question follows. Several parts of one page call this hook (Home picks its
+ * arrangement, the switcher sits in a header inside it): without this the one
+ * that was changed drew the new role and the rest kept drawing the old.
+ */
+const CHANGED = 'pam:view-as';
+
+function readStored(): Role | null {
+  try {
+    const saved = sessionStorage.getItem(KEY);
+    return saved && (ROLES as readonly string[]).includes(saved) ? (saved as Role) : null;
+  } catch {
+    // Private mode, or storage turned off. The default view is the right one.
+    return null;
+  }
+}
 
 export function useViewAs(ownRole: Role | null): {
   viewAs: Role | null;
@@ -30,12 +47,10 @@ export function useViewAs(ownRole: Role | null): {
 
   useEffect(() => {
     if (ownRole !== 'super_admin') return;
-    try {
-      const saved = sessionStorage.getItem(KEY);
-      if (saved && (ROLES as readonly string[]).includes(saved)) setStored(saved as Role);
-    } catch {
-      // Private mode, or storage turned off. The default view is the right one.
-    }
+    setStored(readStored());
+    const follow = (event: Event) => setStored((event as CustomEvent<Role>).detail);
+    window.addEventListener(CHANGED, follow);
+    return () => window.removeEventListener(CHANGED, follow);
   }, [ownRole]);
 
   const setViewAs = (role: Role) => {
@@ -45,6 +60,7 @@ export function useViewAs(ownRole: Role | null): {
     } catch {
       // Not persisting is survivable; not switching would not be.
     }
+    window.dispatchEvent(new CustomEvent<Role>(CHANGED, { detail: role }));
   };
 
   return { viewAs: ownRole === 'super_admin' ? viewAs : null, setViewAs };
