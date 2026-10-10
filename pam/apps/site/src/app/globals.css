@@ -1,0 +1,31 @@
+/*
+ * The public site's own styles. Layer order is declared in layers.css, which is
+ * imported before the Astryx sheets (see apps/web/src/app/layers.css for why).
+ * Figtree comes from the design system: `@pam/ui/fonts.css`, in layout.tsx.
+ */
+
+@layer stylex {
+  @stylex;
+}
+
+@layer pam {
+  :root {
+    /* Theme colours are `light-dark()` pairs; resolve them from the first paint. */
+    color-scheme: light dark;
+  }
+
+  html {
+    font-size: 100%;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--color-background-body);
+    color: var(--color-text-primary);
+    font-family: var(--font-family-body);
+    font-size: 16px;
+    line-height: 1.55;
+    margin: 0;
+    min-height: 100dvh;
+  }
+}

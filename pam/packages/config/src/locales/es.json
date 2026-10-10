@@ -1017,6 +1017,7 @@
   "program.edit": "Editar",
   "program.save": "Guardar",
   "program.cancel": "Cancelar",
+  "program.locked": "Pam revisa el nombre, la dirección y el tipo de ayuda antes de que cambien. Para cambiarlos, llama a Pam.",
   "program.saved": "Guardado. Los miembros ven los cambios en la página de tu programa.",
   "program.example": "Este es un programa de ejemplo. Cuando tu programa esté en la lista, aparecerá aquí.",
   "program.name": "Nombre del programa",

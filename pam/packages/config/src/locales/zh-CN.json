@@ -1017,6 +1017,7 @@
   "program.edit": "编辑",
   "program.save": "保存",
   "program.cancel": "取消",
+  "program.locked": "名称、地址和帮助类型的更改需先经Pam核对。如需更改，请给Pam打电话。",
   "program.saved": "已保存。成员会在您项目的页面上看到这些更改。",
   "program.example": "这是一个示例项目。您的项目列入名单后，会显示在这里。",
   "program.name": "项目名称",

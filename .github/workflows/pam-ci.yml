@@ -44,7 +44,7 @@ jobs:
       # not answered fails here), the transparency contract, and the a11y
       # structure of every component. The web app's own unit tests ride along.
       - name: Unit tests
-        run: pnpm --filter @pam/config --filter @pam/ui --filter @pam/web test
+        run: pnpm --filter @pam/config --filter @pam/ui --filter @pam/web --filter @pam/site test
 
       # The design system as a package (dist/): tokens.css, fonts, compiled
       # components and types. Also fails if tokens.css has drifted from its
@@ -61,6 +61,11 @@ jobs:
           NEXT_PUBLIC_SUPABASE_URL: https://stub.supabase.co
           NEXT_PUBLIC_SUPABASE_ANON_KEY: stub-anon-key-for-ci
         run: pnpm --filter @pam/web build
+
+      # The public site (D-433): a static export with no Supabase client, so it
+      # needs no stub environment.
+      - name: Build public site
+        run: pnpm --filter @pam/site build
 
       - name: Check first-load JS against the §12 budget
         run: node scripts/check-bundle-budget.mjs

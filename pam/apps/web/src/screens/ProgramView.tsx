@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { Button } from '@pam/ui/Button';
 import { Card } from '@astryxdesign/core/Card';
@@ -10,13 +10,15 @@ import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { categoryLabelKey, type Category, displayPhone } from '@pam/config';
 import { DUMMY_SAVED_BY_ROLE } from '@pam/config/dummy-places';
-import { BookIcon, GlobeIcon, Page, PhoneIcon, PlaceDetail, PlacesIcon, PlusIcon, TextField, TextLink, googlePlaceHref } from '@pam/ui';
+import { BookIcon, GlobeIcon, Loading, Notice, Page, PhoneIcon, PlaceDetail, PlacesIcon, PlusIcon, TextField, TextLink, googlePlaceHref } from '@pam/ui';
 import { LargeTitleHeader } from '@pam/ui/LargeTitleHeader';
 import { MenuList } from '@pam/ui/MenuList';
 import { useI18n } from '@/lib/i18n';
 import { addressActionsFor } from '@/lib/addressActions';
 import { useSession } from '@/lib/useSession';
 import { useProgramSetup } from '@/lib/programSetup';
+import { saveOwnProgram } from '@/lib/useOwnProgram';
+import { useSupportPhone } from '@/lib/useSupportPhone';
 import { AddProgramView } from './AddProgramView';
 import { ProgramReviewView } from './ProgramReviewView';
 import { usePolicies } from '@/lib/usePolicies';
@@ -33,10 +35,13 @@ import { BigCategoryIcon } from './SavedView';
  * program's. Edit, top right and alone, turns the same details into fields;
  * the button becomes Save, with Cancel under the form.
  *
- * **Example program, saved in the page only, for now.** A program lead may
- * already update their own organisation's listing (`services_write_provider`,
- * 0007); loading it and writing the edit back is the follow-up. Until then
- * the screen draws the example program and keeps edits for the visit.
+ * **A real program writes back; the example does not.** A lead's own program
+ * is read from the database and saved to it (`onSave`, D-447); the example
+ * program (a demo account, a story) keeps its edits for the visit only.
+ * Once a program is live its name, address and kind of help are not edited in
+ * place — Pam checks a change to who and where it is (D-447) — so they show
+ * but stay still (`isLocked`), while its description, phone and website are the
+ * lead's to change at once.
  */
 export interface ProgramDetailsData {
   readonly name: string;
@@ -74,15 +79,24 @@ const styles = stylex.create({
 export function ProgramView({
   program: initial,
   note,
+  isLocked = false,
+  onSave,
 }: {
   readonly program: ProgramDetailsData;
   readonly note?: string | null;
+  /** A live program: name, address and kind of help are read-only (D-447). */
+  readonly isLocked?: boolean;
+  /** A real program: write the edit; resolves false when it could not be saved. */
+  readonly onSave?: (draft: ProgramDetailsData) => Promise<boolean>;
 }) {
   const { t } = useI18n();
   const [program, setProgram] = useState(initial);
   const [draft, setDraft] = useState(initial);
   const [editing, setEditing] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [failed, setFailed] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const supportPhone = useSupportPhone();
   const set = (patch: Partial<ProgramDetailsData>) => setDraft((d) => ({ ...d, ...patch }));
   const { policies } = usePolicies();
   const { forPlace } = useServices();
@@ -135,9 +149,21 @@ export function ProgramView({
     </Card>
   );
 
-  const save = () => {
-    if (draft.name.trim() === '') return;
-    setProgram({ ...draft, name: draft.name.trim() });
+  const save = async () => {
+    if (draft.name.trim() === '' || isSaving) return;
+    const next = { ...draft, name: draft.name.trim() };
+    if (onSave) {
+      setIsSaving(true);
+      const ok = await onSave(next);
+      setIsSaving(false);
+      // Not saved: stay in the form with what was typed, and say so.
+      if (!ok) {
+        setFailed(true);
+        return;
+      }
+    }
+    setFailed(false);
+    setProgram(next);
     setEditing(false);
     setSaved(true);
   };
@@ -150,13 +176,16 @@ export function ProgramView({
           <Button
             label={editing ? t('program.save') : t('program.edit')}
             variant="ghost"
+            isDisabled={isSaving}
             onClick={() => {
               if (editing) {
-                save();
+                void save();
                 return;
               }
-              setDraft(program);
+              // The number as people read it, not as the database keeps it.
+              setDraft({ ...program, phone: displayPhone(program.phone) });
               setSaved(false);
+              setFailed(false);
               setEditing(true);
             }}
             xstyle={styles.edit}
@@ -165,6 +194,15 @@ export function ProgramView({
       />
 
       {saved ? <Text xstyle={styles.saved}>{t('program.saved')}</Text> : null}
+      {failed ? (
+        <Notice
+          notice="something_went_wrong"
+          title={t('join.failed.title')}
+          body={t('join.failed.body')}
+          supportPhone={supportPhone}
+          callLabel={t('help.callSupport')}
+        />
+      ) : null}
 
       {editing ? (
         <Card padding={6}>
@@ -172,7 +210,8 @@ export function ProgramView({
             <TextField
               label={t('program.name')}
               // Ready to type on arrival (Will, 7 October, D-365).
-              hasAutoFocus
+              hasAutoFocus={!isLocked}
+              isDisabled={isLocked}
               value={draft.name}
               onChange={(next) => set({ name: next })}
               width="100%"
@@ -188,6 +227,7 @@ export function ProgramView({
             <TextField
               purpose="address"
               label={t('join.program.address')}
+              isDisabled={isLocked}
               value={draft.address}
               onChange={(next) => set({ address: next })}
               width="100%"
@@ -208,6 +248,11 @@ export function ProgramView({
               width="100%"
               xstyle={styles.field}
             />
+            {isLocked ? (
+              <Text type="supporting" xstyle={styles.note}>
+                {t('program.locked')}
+              </Text>
+            ) : null}
             <TextLink label={t('program.cancel')} onClick={() => setEditing(false)} />
           </VStack>
         </Card>
@@ -287,17 +332,40 @@ export function ProgramView({
   );
 }
 
-/** The Program tab, with the example program until the real listing is loaded (D-218). */
+/** The Program tab: the lead's own program, or the example one on a demo account (D-218, D-447). */
 export function ProgramScreen() {
   const { t } = useI18n();
   const { state: session } = useSession();
   const setup = useProgramSetup(session);
   // No program yet (a fresh account, D-361): the tab is Add a program. Decided
-  // once, so sending one shows its "sent" screen rather than swapping away.
-  const [isAdding] = useState(() => !setup.hasProgram);
+  // once the database has answered, so sending one shows its "sent" screen
+  // rather than swapping away.
+  const [isAdding, setIsAdding] = useState<boolean | null>(null);
+  useEffect(() => {
+    if (isAdding === null && !setup.isLoading) setIsAdding(!setup.hasProgram);
+  }, [isAdding, setup.isLoading, setup.hasProgram]);
+  if (isAdding === null) return <Loading label="" variant="screen" />;
   if (isAdding) return <AddProgramView isTab />;
   // Sent, not approved yet: the tab is "Sent to Pam" until it is (D-379).
   if (setup.isUnderReview) return <ProgramReviewView />;
+  const own = setup.program;
+  if (own) {
+    return (
+      <ProgramView
+        key={own.id}
+        program={{
+          name: own.details.name,
+          category: own.details.category as Category,
+          description: own.details.description,
+          address: own.details.address,
+          phone: own.details.phone,
+          website: own.details.website,
+        }}
+        isLocked={own.isLive}
+        onSave={(draft) => saveOwnProgram(own, draft)}
+      />
+    );
+  }
   const example = DUMMY_SAVED_BY_ROLE.member?.[0];
   return (
     <ProgramView

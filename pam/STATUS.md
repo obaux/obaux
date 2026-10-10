@@ -877,6 +877,8 @@ while the copy is unsigned, so it earned the first live test, not the last.*
 | 37 | ~~Apply `0086` (staff email on invites) with the app change that uses it~~ **Done (10 October, D-441)** | Launch (D-441) | Will, 10 October: a staff invite carries a required email, the account keeps it tied to the phone, members are never asked; only super admins read it; it is deleted with the account. **0086 is live** (applied after `list_migrations` showed no drift; advisors unchanged in kind) and the app change is on `main` (`0220ae0`; CI and Storybook green). Open: a native read of the new-language privacy lines (the `What we keep` paragraph and `how-long.p3`); staff who already have accounts have no email and no screen to add one; sending any email needs the provider (first item on `docs/before-launch.md`). |
 | 38 | ~~Apply the two audit-log migrations, in order~~ **Done (10 October, D-443)** | Launch (D-443) | Will, 10 October: "When account is deleted the account should sit in audit log for 6 months before it disappears." **Live:** a deleted profile leaves an `account.delete` audit row; a nightly job (`purge-erased-audit`, 03:30 UTC) deletes every row naming the account six months later; the foreign key from `audit_log.actor_id` to `profiles` is gone so an account that acted can be deleted; the privacy page says it (`privacy.s.how-long.p3`). A member who has points can now be deleted too: **D-445 is live (10 October)** — `points_history_is_deleted_with_the_member` applied after `list_migrations` showed no drift (read back: the guard lets a ledger row go only once its account is gone; the helper is not callable by `anon` or `authenticated`; advisors unchanged in kind). Then the one routine for the Pam team that deletes everything (`docs/before-launch.md`). |
 | 39 | **Arabic: a native reader and a screen reader** | D-435 | Nobody who reads Arabic has seen where an English name, address or date now sits in a sentence — in particular a colon or full stop beside an English word (`:Pam`, `then.`), correct by the bidi rules — and no screen reader (VoiceOver, TalkBack, NVDA, JAWS) has been run over the Arabic labels. `docs/before-launch.md`, under "Have a native speaker read every new language" and the new screen-reader item. |
+| 40 | ~~A domain for Pam~~ **Done (10 October)** | — | Will bought **joinpam.org** (DNS at GoDaddy). The website (pam-site) is at `joinpam.org` (`www` 308s to it); the app is at `app.joinpam.org`, and the old `web-ten-umber-88.vercel.app` 308s there, same path (`apps/web/vercel.json`). Still to move: email from `mail.joinpam.org` (Nico's sender + Will's mail-service setup) and the database's `app_url` (links in texts), which moves with the updated carrier filing. |
+| 41 | ~~Apply D-447's two migrations~~ **Done (10 October)** | — | `a_program_lead_submits_their_own_program` (042108) and `an_approved_program_lead_gets_an_org` (062347, on 0085's body) are live: `list_migrations` first (no drift), read back (`submit_program` for `authenticated` only; the review guard trigger on `services`; `flag_unapproved_rewrite` lets a lead edit a live listing's words; `review_staff_request` gives an approved lead an org and keeps 0085's language), advisors unchanged in kind. Approved leads from before today have no org until their first Add a program. |
 
 ---
 
@@ -921,6 +923,31 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
   which contradict it. Read before trusting a rule you remember from the SOP.
   A8 and A9 are the two screens that deliberately carry no help link; A10 is why
   the waiting state carries no words.
+
+---
+
+## Places & programs · load a lead's own program (10 October) — on the branch, not merged
+
+D-447, on `claude/places-programs-load-own-program` (Piper). A program lead's program is
+now read from, and saved to, the database instead of remembered by the tab. **Not on `main`;
+nothing applied to the live project.** Two migrations, in this order: **0085** (by hand, it
+drops signatures), then `20261010042108_a_program_lead_submits_their_own_program.sql`, then
+`20261010062347_an_approved_program_lead_gets_an_org.sql` (refuses without 0085).
+
+- **Built:** the Program tab, Home's getting-started cards and "Sent to Pam" follow the
+  lead's own program (waiting for review, or live) on any phone; Add a program sends it for
+  real; Edit saves it. A live program's name, address and kind of help are shown but not
+  editable (D-447); its description, phone and website save at once.
+- **Closed by the migrations:** a lead had no org, so could neither read nor edit their
+  program; a lead could approve their own listing by setting `needs_review = false`; editing a
+  live program's words hid it from members.
+- **Not built:** Delete and start over for a program on file; changing a live program's
+  name/address (part 5a); the review wait's real status and Pam's note (5b); the super
+  admin's queue (6); switching between programs (4). Approved leads from before the second
+  migration still have an org-less program.
+- **Proven:** database suite (both migrations, incl. the refusal without 0085), 55 web and 808
+  config tests, Storybook build and a browser look at the new states. Language fit on the one
+  new sentence is left to the PR check.
 
 ---
 
@@ -981,6 +1008,24 @@ fine and the fit audit was over-counting (D-448).
   timestamp column with no ellipsis ("Free resume worksl").
 
 ## Seven languages, messages in your own language, and text that fits (9 October) — 0.50.1 and 0.51.0, merged 9 October (PR #29)
+
+## Website · public site and support centre (10 October) — `apps/site`, preview only
+
+Home and Support, for anyone to read before they have an account (D-433). Support's index is a help-center home: search, topics, popular articles. A
+separate Next static export (`pnpm --filter @pam/site dev|build|test`) on the
+app's theme, Figtree and Astryx components; no Supabase, no sign-in. Support's
+first post, **Case manager assignments** (`src/content/`), has an introduction
+and the "who can do what" table (a real table from 720px up, stacked cards
+below). Built in CI (`pam-ci.yml`) and covered by `test/content.test.ts`;
+looked at in light, dark and a 390px phone. **Preview-only**: deployed as a preview from the branch (D-437), and it should not
+reach production until the post is true: taking on, handing over and unassigning a member, the
+Unassigned filter and "Turn back on" are not built (backlog, D-415) —
+`docs/before-launch.md`. Deploy steps: `docs/deploying.md`. Storybook has a **Website/Journey** group (Home, Support, Support search, Post — every link works; D-437). It has its own Vercel project, **`pam-site`** (Vercel Auth off; previews from this branch; production is `main`, not merged). The site has a social preview ("City services in your pocket") and a favicon, both previewed in Storybook › Website › Share and icon (D-437). Every Pam website — the site, the app, Storybook — has the same "p" favicon, generated by `scripts/make-icons.mjs`. New posts: the `pam-support-post` skill. A post can be a **draft** (`status: 'draft'`): not built into the site, shown in Storybook only. One is held: "Keeping your program's listing up to date", until the listing-edit feature ships (before-launch). **The first post now says only what is live** (D-449); the full table is held behind `live` flags until its screens ship. Checked 10 October: axe on the built site (20 scans, 0), the language-fit audit on the Website stories (0). Not on the user-flow
+map: it is not a screen of the app. Session log:
+`docs/sessions/2026-10-09-a-public-website.md`.
+
+## Seven languages, messages in your own language, and text that fits (9 October) — 0.50.1 and 0.51.0, on a branch
+
 
 D-421 to D-423, **on `claude/gallant-clarke-0dhizj`, which is
 `claude/pam-storybook` (through D-411, `1a89000`) plus `main` (through D-420,
