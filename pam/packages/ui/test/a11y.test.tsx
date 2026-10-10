@@ -4,8 +4,6 @@ import axe from 'axe-core';
 import { BigButton } from '../src/BigButton.js';
 import { PlaceCard } from '../src/PlaceCard.js';
 import { PlaceDetail } from '../src/PlaceDetail.js';
-import { PersonCard } from '../src/PersonCard.js';
-import { StepHeader } from '../src/StepHeader.js';
 import { PointsBadge } from '../src/PointsBadge.js';
 import { HelpBar } from '../src/HelpBar.js';
 import { Loading } from '../src/Loading.js';
@@ -92,7 +90,6 @@ describe('accessibility', () => {
           name="Riverside Learning Center"
           href="/place/?id=abc"
           description="GED classes and help with reading. Free to join."
-          distanceLabel="1.2 miles"
           status={{ isOpen: true, label: 'Open until 5:00pm' }}
           audienceLabel="In a school"
           labels={placeLabels}
@@ -106,7 +103,6 @@ describe('accessibility', () => {
     const { container } = render(
       <main>
         <PlaceDetail
-          name="Riverside Learning Center"
           category="education"
           categoryLabel="School and training"
           description="GED classes and help with reading."
@@ -125,7 +121,6 @@ describe('accessibility', () => {
               opensInApp: 'Opens in app',
             },
           }}
-          distanceLabel="1.2 miles"
           status={{ isOpen: true, label: 'Open until 5:00pm' }}
           weekLines={[{ day: 'Monday', hours: '9:00am – 5:00pm' }]}
           hoursArePlaceholder
@@ -140,30 +135,6 @@ describe('accessibility', () => {
           labels={detailLabels}
         />
       </main>,
-    );
-    await expectNoViolations(container);
-  });
-
-  it('PersonCard', async () => {
-    const { container } = render(
-      <main>
-        <h1>People</h1>
-        <h2>Mentors</h2>
-        <PersonCard
-          firstName="Nia"
-          roleLine="I can help you get your GED."
-          sharedTags={['GED or high school', 'Computer skills']}
-          orgBadgeLabel="Riverside Learning Center"
-          messageLabel="Send a message"
-        />
-      </main>,
-    );
-    await expectNoViolations(container);
-  });
-
-  it('StepHeader', async () => {
-    const { container } = render(
-      <StepHeader current={2} total={4} title="What should we call you?" progressLabel="Step 2 of 4" />,
     );
     await expectNoViolations(container);
   });

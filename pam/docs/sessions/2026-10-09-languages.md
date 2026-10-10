@@ -413,3 +413,28 @@ android vs ios."
   reversed. Only text and layout." The one mirrored glyph was the sub-page back arrow
   (`BackArrowIcon`, `[data-pam-directional]` in `globals.css`); the rule and the attribute are
   removed. The list-row and place-header chevrons were never mirrored (checked in the browser).
+
+## Part 10 — super admin screens, invites and requests as pages, unused layouts removed (10 October)
+
+Will: "If there are any other layouts not being used, please remove it. Or if any in super
+admin not using our latest templates, please replace and update… Super admins still use the
+old invite method with buttons… we should use the nested page method." An Explore agent read
+every route a super admin reaches and listed the unused code; I re-checked each candidate with
+grep before deleting and left some in on purpose (D-442 says which and why).
+
+- **Invites:** `/invite/new/?role=` (`InviteNewView`), rows on `/invite/`, Everyone's card gone.
+  Reading `0077_invites_know_who.sql` against `InviteView` showed a super admin could never
+  make an invite from Profile (no `p_region_id`); the Everyone card was the only caller that
+  sent one. `InviteForWho` and `InviteReady` keep working for `/admin/` (heading and cancel are
+  optional now).
+- **Requests:** rows, then `/requests/review/` (`RequestReviewScreen`) with Approve and Deny in
+  the sticky footer. No e2e spec had touched the old card, so `invite.spec.ts` covers both.
+- **Flush lists** (Will's earlier line about the drawer's icons, taken to mean every list of
+  rows on a page): `MenuList` is flush unless `isInset`; the three lists inside cards and the
+  floating action's dock are inset.
+- **Not removed:** `VoiceInput` (the voice half of §0), the older `AppHeader`/`PageTitle` screens
+  (live app; the redesign is only mounted in Storybook), `/admin/`'s own in-place invite.
+- **Left alone because it is `CLAUDE.md`'s:** the `variant="compact"` line (Will's to correct).
+- **User-flow map:** `docs/user-flows/flows.mjs` updated (new invite and request pages, the
+  Everyone rows); regenerate and publish with the `pam-user-flows` skill.
+

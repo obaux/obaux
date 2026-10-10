@@ -31,17 +31,6 @@ export function useViewedRole(trueRole: Role | null): Role | null {
 }
 
 /**
- * Whether a preview is actually active, and which role it is previewing —
- * `null` for real, ordinary use. `useSavedPlaces` takes this as `demoRole`:
- * see that file for why saving has to stay local while somebody is looking
- * through a role that is not their own.
- */
-export function useDemoRole(trueRole: Role | null): Role | null {
-  const viewed = useViewedRole(trueRole);
-  return viewed && viewed !== trueRole ? viewed : null;
-}
-
-/**
  * Everything a screen needs to both *read* the preview and let a super admin
  * *change* it from that same screen (Will, 16 September: the switcher
  * "should be present on all views", not only Home). `useViewedRole` and

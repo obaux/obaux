@@ -141,7 +141,7 @@ test.describe('the way out', () => {
     await expect(page.getByText('Something went wrong')).toHaveCount(0);
   });
 
-  test('a super admin can make a code for a case manager, in a named city', async ({ page }) => {
+  test('a super admin can make a link for a case manager, in a named city', async ({ page }) => {
     const asked: Record<string, unknown>[] = [];
     await signedIn(page, { role: 'super_admin' });
     await page.route('**/rest/v1/rpc/directory_people*', (route) => route.fulfill(json([])));
@@ -160,18 +160,20 @@ test.describe('the way out', () => {
       );
     });
 
+    // From Everyone, two rows lead on (D-442): Invite someone, then the kind.
     await page.goto('/directory/');
-    await expect(page.getByRole('heading', { name: 'Invite someone' })).toBeVisible();
+    await page.getByRole('link', { name: 'Invite someone' }).click();
+    await page.getByRole('link', { name: /^Invite a case manager/ }).click();
+    await expect(page.getByRole('heading', { name: 'A link for a case manager', level: 1 })).toBeVisible();
 
-    // No city picked: nothing is sent, and the screen says why.
-    await page.getByRole('button', { name: 'A case manager' }).click();
+    // No city picked: nothing is sent, and the page says why.
+    await page.getByLabel('Their first name').fill('Kim');
+    await page.getByLabel('Their mobile number').fill('412 555 0199');
+    await page.getByRole('button', { name: 'Create link' }).click();
     await expect(page.getByText('Pick a city first.')).toBeVisible();
     expect(asked).toHaveLength(0);
 
     await page.getByRole('radio', { name: 'Pittsburgh' }).click();
-    await page.getByRole('button', { name: 'A case manager' }).click();
-    await page.getByLabel('Their first name').fill('Kim');
-    await page.getByLabel('Their mobile number').fill('412 555 0199');
     await page.getByRole('button', { name: 'Create link' }).click();
 
     // A link to the invite Sign in, for a case manager (D-254).

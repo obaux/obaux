@@ -50,11 +50,14 @@ export function InviteReady({
   invite,
   onAnother,
   isBare = false,
+  hasHeading = true,
 }: {
   readonly invite: CreatedInvite;
   readonly onAnother: () => void;
   /** Inside a card already (the directory): the content without its own. */
   readonly isBare?: boolean;
+  /** Off on a page whose title already says it (D-442). */
+  readonly hasHeading?: boolean;
 }) {
   const { t, locale } = useI18n();
   const [copied, setCopied] = useState(false);
@@ -75,9 +78,11 @@ export function InviteReady({
 
   const content = (
     <VStack gap={3}>
-      <Heading level={2} xstyle={styles.heading}>
-        {t(`invite.link.title.${invite.role}`)}
-      </Heading>
+      {hasHeading ? (
+        <Heading level={2} xstyle={styles.heading}>
+          {t(`invite.link.title.${invite.role}`)}
+        </Heading>
+      ) : null}
       <Text type="supporting" xstyle={styles.body}>
         {t('invite.link.body', { date })}
       </Text>

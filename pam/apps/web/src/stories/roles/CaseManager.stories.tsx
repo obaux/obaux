@@ -31,6 +31,7 @@ export const ConnectMember: Story = screen('case-manager', 'Connect a member to 
   id: 'dummy-m1',
 });
 export const Invite: Story = screen('case-manager', 'Invite someone', '/invite/');
+export const InviteOne: Story = screen('case-manager', 'A link for a member', '/invite/new/', { role: 'member' });
 export const AllPrograms: Story = screen('case-manager', 'All programs', '/programs/');
 export const AddProgram: Story = screen('case-manager', 'Add a program', '/programs/new/');
 export const Conversation: Story = screen('case-manager', 'A conversation', '/messages/thread/', { id: CONVO_ID });

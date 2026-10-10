@@ -115,6 +115,7 @@ export function ProgramView({
         <MenuList
           label={t('program.services')}
           hasDividers
+          isInset
           items={[
             ...(editing
               ? [

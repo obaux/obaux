@@ -19,16 +19,12 @@ import {
   NotificationBell,
   NotificationList,
   Page,
-  PeopleIcon,
-  PersonCard,
   PhoneIcon,
   PlaceCard,
   PlaceDetail,
   PlacesIcon,
-  PlanIcon,
   PointsBadge,
   RoleSwitch,
-  StepHeader,
   TextField,
   TextLink,
 } from '@pam/ui';
@@ -283,12 +279,10 @@ export default function GalleryPage() {
         note="A place's profile: quick actions under the name, the address with copy and Open in…, and the one button that matters pinned to the foot of the screen."
       >
         <PlaceDetail
-          name="Riverside Learning Center"
           category="education"
           categoryLabel="School and training"
           description="GED classes and help with reading. Free, and you can start any Monday."
           address="1234 Market St, Philadelphia"
-          distanceLabel="1.2 miles"
           status={{ isOpen: true, label: 'Open until 5:00pm' }}
           weekLines={[
             { day: 'Monday', hours: '9:00 AM – 5:00 PM' },
@@ -307,24 +301,6 @@ export default function GalleryPage() {
           ]}
           labels={DETAIL_LABELS}
         />
-      </Section>
-
-      <Section title="A person">
-        <VStack gap={3}>
-          <PersonCard
-            firstName="Nia"
-            roleLine="I went back to school at 40. Ask me anything."
-            sharedTags={['Same neighbourhood', 'Parent']}
-            messageLabel="Message"
-            onMessage={() => {}}
-          />
-          <PersonCard
-            firstName="Alice"
-            orgBadgeLabel="Verified program"
-            messageLabel="Message"
-            onMessage={() => {}}
-          />
-        </VStack>
       </Section>
 
       <Section
@@ -351,10 +327,9 @@ export default function GalleryPage() {
         <Loading label="Loading" variant="inline" />
       </Section>
 
-      <Section title="Points and steps">
+      <Section title="Points">
         <VStack gap={3}>
           <PointsBadge points={250} label="points" />
-          <StepHeader current={2} total={5} title="Where do you want help?" progressLabel="Step 2 of 5" />
         </VStack>
       </Section>
 

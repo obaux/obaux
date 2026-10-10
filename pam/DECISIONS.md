@@ -11621,3 +11621,71 @@ This amends D-224 and D-291, and finishes what D-326 began for the footer.
 - **Checked.** Typecheck; the `@pam/ui` suite (the address card and drawer, axe on a profile
   with quick actions); Storybook builds and *PlaceDetail* shows the list and the footer
   button; the place and flag browser specs.
+
+### D-442 — Super admin screens on the latest templates: an invite is a page, a request is a page, and unused layouts are gone
+
+**Date:** 2026-10-10. Will: "If there are any other layouts not being used, please remove
+it. Or if any in super admin not using our latest templates, please replace and update. I
+know Super admins still use the old invite method with buttons for inviting them in
+profiles or something, we should use the nested page method like we use in staff programs
+accounts." (Found by reading every route a super admin reaches; the audit's evidence for
+each removal is the grep that came back empty.)
+
+- **Inviting is one page per kind (`/invite/new/?role=member|provider|admin`).** Invite
+  someone (`/invite/`) is a list of three rows that are links, the way Add a person
+  (`/program/book/`) leads to `/program/book/new/`: no form swapped in beneath it, Back goes
+  one step. The page's title says which kind; it asks their first name and mobile number
+  (D-373) and then shows the link to send (D-254). A kind this person may not make (a program
+  inviting a case manager) goes back to the list.
+- **A super admin could not make an invite from Profile.** `create_invite` needs a city for
+  a super admin, who has none of their own (0077); Profile › Invite someone and Invited
+  people › + New invite never sent one, so each answered "We could not make a code". Only
+  the card on Everyone asked for a city, so it looked like it worked. Storybook's mock
+  always succeeds and hid it. The new page asks for the city — nothing to pick with one
+  city, a list with several, and "Pick a city first." before anything is sent — and a
+  browser test (`e2e/invite.spec.ts`) checks the city travels in the request.
+- **Everyone lost its card of invite buttons.** Two rows replace it and the bare link:
+  **Invite someone** and **Requests**, both pages. It is the only place a super admin on the
+  live app (which has no Profile tab yet) reaches either.
+- **A request is a page.** Requests (Home for a super admin, and `/requests/`) is a list of
+  rows — name, "Wants to be a program lead · Typed: city · Asked Oct 8" — not a card per
+  person with three buttons and a city picker above the lot. A row opens
+  `/requests/review/?id=`: who asked, the program they described, a row to text them, the
+  city (only when there are several), and **Approve** (primary) with **Deny** beside it
+  pinned to the foot of the screen, as on every profile (D-440). Deciding goes back to the
+  list. The city moved from "one per sitting" to one per request: the old reasoning was
+  that a super admin reviewing several is reviewing them for one city, which a default of
+  the only city already covers.
+- **Lists of rows are flush with the page.** `MenuList` rows no longer carry Astryx's own
+  padding before the icon and after the chevron (Will, 10 October: "icon based items …
+  should not have left padding, so it's flush with header and page layout"), so icons line
+  up with the title above and the page margin. `isInset` keeps the padding for the three
+  lists inside a card and the floating action's dock. This changes every list of rows in
+  the app.
+- **Removed, because nothing draws them.** `ProgramEmptyView` (the "approved mockup, not in
+  use", D-352/D-363) and its 7 strings; `PersonCard`, `StepHeader`, `CameraIcon`, `PlanIcon`
+  (only the components gallery drew them); `LargeTitleHeader`'s inline-accessory layout
+  (D-320, replaced by D-355); `SubPage`'s `gap`/`heroGap` and the hero offsets for gaps 2
+  and 3, `Page`'s gaps 0–2 (every caller passes 3 or 4); `PlaceDetail`'s in-page hours card
+  (only drawn when no list of ways to reach the place was passed, and every caller passes
+  one), its own heading and its distance line; the dead exports `useDemoRole`,
+  `readServices`, `categoryTone`; and 13 invite strings nothing reads (`directory.invite.
+  admin|member|provider|title`, `admin.invite.action|copied|copy|expires|ready|title`,
+  `invite.ready.member|program`, `invite.link.copy`).
+- **Kept, deliberately.** `VoiceInput`: nothing uses it yet, but it is the voice half of §0's
+  "voice and tap" and has its own behaviour test; Will decides. **The older screens with
+  `AppHeader` and `PageTitle`** — `/`, `/places/`, `/saved/`, `/messages/`, `/account/`,
+  `/interested/`, `/admin/` — are the live app: the tab shell is drawn only in Storybook
+  (STATUS), and they hold what the redesign does not yet carry (the Reported places and
+  Reported messages review, a case manager's caseload). They go together once the shell is
+  mounted and those are re-homed. `/admin/` still makes invites in place for the same reason.
+- **Also.** A super admin no longer sees the member's "Get text reminders" promotion on
+  Profile (its link treated them as a member).
+- **Not decided here.** Whether the header's role-preview chip stays on ten screens now that
+  See the app as is a Profile row (D-217 says the chip stays; `ViewAsView` says it moved);
+  `CLAUDE.md` still says a conversation takes `SubPage variant="compact"` (gone since D-411).
+- **Checked.** Typecheck; unit suites (`@pam/ui` 102, `@pam/web` 48, `@pam/config` 764); the
+  browser suite on all three viewports, including `invite.spec.ts` (the city travels; a case
+  manager is never asked for one; a program cannot invite a case manager; Approve carries
+  the city, Deny none; both pages have no axe violations); Storybook shows *Super admin ›
+  Screens* (Invite someone, A link for a member, A request to review, Requests, Everyone).

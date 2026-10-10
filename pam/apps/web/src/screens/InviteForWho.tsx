@@ -35,11 +35,15 @@ export function InviteForWho({
   busy,
   onSubmit,
   onCancel,
+  hasHeading = true,
 }: {
   readonly role: 'member' | 'provider' | 'admin';
   readonly busy: boolean;
   readonly onSubmit: (who: InviteWho) => void;
-  readonly onCancel: () => void;
+  /** A way to choose a different kind of invite, where this form sits on a page of choices. */
+  readonly onCancel?: () => void;
+  /** Off on a page whose title already says it (Invite someone › the nested page, D-442). */
+  readonly hasHeading?: boolean;
 }) {
   const { t } = useI18n();
   const [firstName, setFirstName] = useState('');
@@ -50,9 +54,11 @@ export function InviteForWho({
 
   return (
     <VStack gap={4}>
-      <Heading level={2} xstyle={styles.heading}>
-        {t(`invite.link.title.${role}`)}
-      </Heading>
+      {hasHeading ? (
+        <Heading level={2} xstyle={styles.heading}>
+          {t(`invite.link.title.${role}`)}
+        </Heading>
+      ) : null}
       <TextField
         label={t('invite.who.name')}
         // Ready to type on arrival (D-365).
@@ -89,7 +95,7 @@ export function InviteForWho({
           onSubmit({ firstName: firstName.trim(), phone: phone.trim() });
         }}
       />
-      <TextLink label={t('invite.who.back')} onClick={onCancel} />
+      {onCancel ? <TextLink label={t('invite.who.back')} onClick={onCancel} /> : null}
     </VStack>
   );
 }

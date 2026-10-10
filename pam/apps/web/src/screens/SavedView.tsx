@@ -31,7 +31,6 @@ import { emptyState } from '@pam/ui/emptyState';
 import { SavedGrid } from '@pam/ui/SavedGrid';
 import { PlaceCardSkeletonList } from '@pam/ui/Skeletons';
 import { CATEGORY_DEFINITIONS, categoryLabelKey, NOTICES, type Category, intlLocale } from '@pam/config';
-import { type Tone } from '@pam/ui/Tone';
 import { CategoryArt } from '@pam/ui/CategoryArt';
 import { useNextVisits, visitTagLabel, type NextVisit } from '@/lib/useNextVisits';
 import { useI18n } from '@/lib/i18n';
@@ -80,11 +79,6 @@ export interface SavedViewProps {
 }
 
 const ART = { width: 52, height: 52, 'aria-hidden': true } as const;
-
-/** A category's colour, as the chips use it (D-288, D-297). */
-export function categoryTone(category: string): Tone | null {
-  return (CATEGORY_DEFINITIONS[category as Category]?.colorToken as Tone | undefined) ?? null;
-}
 
 const styles = stylex.create({
   // The People / Programs switch as one round pill, like the search bar and

@@ -19,8 +19,6 @@ export {
   googlePlaceHref,
 } from './PlaceCard.js';
 export { PlaceDetail, type PlaceDetailProps } from './PlaceDetail.js';
-export { PersonCard, type PersonCardProps } from './PersonCard.js';
-export { StepHeader, type StepHeaderProps } from './StepHeader.js';
 export { PointsBadge, type PointsBadgeProps } from './PointsBadge.js';
 export { HelpBar, type HelpBarProps } from './HelpBar.js';
 export { Loading, type LoadingProps } from './Loading.js';
@@ -73,13 +71,11 @@ export {
   MeIconFilled,
   PeopleIcon,
   UserPlusIcon,
-  CameraIcon,
   CameraFilledIcon,
   InfoIcon,
   PdfIcon,
   PhoneIcon,
   PlacesIcon,
-  PlanIcon,
   ExploreIcon,
   MessagesIcon,
   TripsIcon,

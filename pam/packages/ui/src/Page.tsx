@@ -51,7 +51,7 @@ export interface PageProps {
   /** Centres everything, for a screen that is one thought (sign-in). */
   readonly align?: 'start' | 'center';
   /** Space between the things stacked inside. */
-  readonly gap?: 0 | 1 | 2 | 3 | 4;
+  readonly gap?: 3 | 4;
   /**
    * The screen's one action, kept at the foot of the screen (D-326): a
    * `BigButton`, usually. Rendered last, sticky to the bottom edge, with the

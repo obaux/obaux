@@ -25,7 +25,6 @@ const meta = {
     title: 'Get help',
     backHref: '/profile/',
     backLabel: 'Back to Profile',
-    gap: 4,
     children: (
       <VStack gap={3}>
         <Text>Talk to someone at Pam about anything — a ride, a program, or getting set up.</Text>
@@ -35,7 +34,6 @@ const meta = {
     ),
   },
   argTypes: {
-    gap: { control: 'inline-radio', options: [2, 3, 4] },
     children: { control: false },
     footer: { control: false },
     actions: { control: false },

@@ -278,7 +278,6 @@ function ThreadFiles() {
       title={t('messages.files.title')}
       backHref={`/messages/thread/options/?id=${encodeURIComponent(id)}`}
       backLabel={t('nav.back.options')}
-      gap={4}
     >
       {loading ? (
         <Loading label={t('common.loading')} variant="inline" />

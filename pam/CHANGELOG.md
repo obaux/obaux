@@ -16,6 +16,13 @@ button that matters — *Plan a trip* or *How to get there* — pinned to the fo
 the screen. The older list of labelled rows (Call this place, Their website, Save
 this place, Share, Something is wrong here) is gone from every screen (D-440).
 
+For the person running Pam: inviting somebody is a page for each kind (a member, a
+program, a case manager), where you pick the city and give their name and number — it
+had been failing from Profile because no city was asked for. Requests are a list; tap
+one to read it, text them, pick the city and approve or deny from the bottom of the
+screen. Everyone no longer carries a card of invite buttons. Lists of rows across the
+app now start at the page edge, in line with the title above them (D-442).
+
 ## [0.51.0] — 2026-10-09 · Pam speaks seven languages
 
 Pam is now in Brazilian Portuguese, Simplified Chinese (for Mandarin

@@ -44,7 +44,6 @@ const meta = {
   ],
   args: {
     title: 'Profile',
-    isAccessoryInline: false,
   },
   argTypes: {
     actions: { control: false },
@@ -90,23 +89,3 @@ export const WithTitleAccessory: Story = {
   },
 };
 
-/** The accessory right after the words, read as one phrase. */
-export const InlineAccessory: Story = {
-  args: {
-    title: 'Coming in',
-    titleAccessory: <Text type="supporting">this week</Text>,
-    isAccessoryInline: true,
-    actions: (
-      <IconButton
-        label="New trip"
-        variant="ghost"
-        href="/trips/new/"
-        icon={
-          <HStack>
-            <PlusIcon width={26} height={26} aria-hidden />
-          </HStack>
-        }
-      />
-    ),
-  },
-};

@@ -47,11 +47,6 @@ function current(kept: Kept): readonly DummyService[] {
   return [...base, ...added].filter((s) => !kept.removed.includes(s.id));
 }
 
-/** All services, as they stand this session. Empty until the browser has run. */
-export function readServices(): readonly DummyService[] {
-  return current(read());
-}
-
 export function useServices(): {
   readonly services: readonly DummyService[];
   readonly forPlace: (placeId: string) => readonly DummyService[];

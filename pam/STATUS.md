@@ -980,6 +980,15 @@ migrations is on the live project** — correction, 9 October, later: 0083, 0084
   App Store / Play Store page (Android has no Apple Maps row). Eight strings in seven
   languages (the six are machine drafts). **The app-or-store hand-off has not been tried
   on a real phone** (before-launch).
+- **Super admin screens on the latest templates (D-442).** Inviting is a page per kind
+  (`/invite/new/?role=`), with the city asked there — Profile › Invite someone had been
+  failing for a super admin because no city was sent. Requests are rows, and a request is
+  a page with Approve and Deny pinned to the foot (`/requests/review/`). Everyone has two
+  rows instead of a card of buttons. Every list of rows is flush with the page margin
+  (`MenuList isInset` is the exception). Unused layouts and components were removed (see
+  D-442 for the list and for what was kept on purpose: `VoiceInput`, the older
+  `AppHeader`/`PageTitle` screens that are still the live app, and `/admin/`'s in-place
+  invite). Browser test: `e2e/invite.spec.ts`.
 - **A place has one layout (D-440).** The labelled-rows layout (Call this place,
   Their website, Save, Share, Flag) is retired everywhere, including Storybook, the
   components gallery and the program-request screen: a place is its details, a list of

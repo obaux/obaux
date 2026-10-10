@@ -51,12 +51,6 @@ import { landFocus, landFocusStyle } from './landFocus.js';
  * same shape whether the row came from the places search or a saved list.
  */
 export interface PlaceDetailProps {
-  /**
-   * Only rendered when the screen has no title of its own. The place page puts
-   * the name in `PageTitle`, beside the way back — two headings saying the same
-   * thing is two headings a screen reader reads out.
-   */
-  readonly name?: string;
   readonly category: Category;
   readonly categoryLabel: string;
   readonly description?: string | null;
@@ -89,7 +83,6 @@ export interface PlaceDetailProps {
       readonly opensInApp: string;
     };
   };
-  readonly distanceLabel?: string | null;
   /** Already worded: "Open until 5:00pm", "Closed · opens 9:00am". */
   readonly status?: { readonly isOpen: boolean; readonly label: string } | null;
   /**
@@ -185,7 +178,6 @@ const styles = stylex.create({
   // ends, and what it offers begins.
   statusWords: { flexGrow: 1, minWidth: 0 },
   rule: { width: '100%', height: '1px', backgroundColor: colorVars['--color-border'], flexShrink: 0 },
-  name: { fontSize: '26px', lineHeight: 1.2 },
   section: { fontSize: '17px' },
   body: { fontSize: '17px', lineHeight: 1.5 },
   addressText: { unicodeBidi: 'plaintext', userSelect: 'text', overflowWrap: 'anywhere' },
@@ -228,13 +220,11 @@ const styles = stylex.create({
 });
 
 export function PlaceDetail({
-  name,
   category,
   categoryLabel,
   description,
   address,
   addressActions,
-  distanceLabel,
   status,
   statusAside,
   weekLines,
@@ -321,51 +311,6 @@ export function PlaceDetail({
           </VStack>
         </TextSwap>
       </AutoHeight>
-    </Card>
-  ) : null;
-
-  const hoursCard =
-    weekLines && weekLines.length > 0 ? (
-    <Card padding={4} xstyle={styles.card}>
-      <VStack gap={2}>
-        <Heading level={2} xstyle={styles.section}>
-          {labels.hours}
-        </Heading>
-        <VStack gap={1}>
-          {weekLines.map((line) => (
-            <HStack key={line.day} gap={3} justify="between" wrap="nowrap">
-              <Text xstyle={styles.dayRow}>{line.day}</Text>
-              <Text type="supporting" xstyle={styles.dayRow}>
-                {line.hours}
-              </Text>
-            </HStack>
-          ))}
-        </VStack>
-        {/*
-          Said out loud, on the screen, whenever the hours are a stand-in.
-          A demo that looks exactly like the real thing is how a partner
-          ends up reading their own opening times off a screen that made
-          them up.
-        */}
-        {hoursArePlaceholder && placeholderNote ? (
-          <Text type="supporting" xstyle={styles.note}>
-            {placeholderNote}
-          </Text>
-        ) : null}
-        {/* Where to check them, under the hours themselves (D-224). */}
-        {quickActions && hoursHref ? (
-          <Button
-            label={labels.hoursOnGoogle}
-            variant="ghost"
-            href={hoursHref}
-            target="_blank"
-            rel="noreferrer"
-            icon={<PlacesIcon />}
-            // A link, not a pill (Will, 5 October, D-280).
-            xstyle={[styles.hoursLink, textLinkLook.link]}
-          />
-        ) : null}
-      </VStack>
     </Card>
   ) : null;
 
@@ -481,7 +426,6 @@ export function PlaceDetail({
             </Heading>
             <MenuList
               label={addressActions.labels.openInTitle}
-              isFlush
               items={mapApps.map((app) => {
                 const { launch } = app;
                 const row = {
@@ -512,11 +456,6 @@ export function PlaceDetail({
   return (
     <VStack gap={4}>
       <VStack gap={2}>
-        {name ? (
-          <Heading level={1} xstyle={styles.name}>
-            {name}
-          </Heading>
-        ) : null}
         {/*
           Who it is for comes before anything else on the screen. A member who
           cannot use this place should learn that here, not after they have
@@ -528,11 +467,6 @@ export function PlaceDetail({
         </HStack>
         <HStack gap={2} align="center" wrap="nowrap">
           <HStack gap={2} align="center" wrap="wrap" xstyle={styles.statusWords}>
-          {distanceLabel ? (
-            <Text type="supporting" xstyle={styles.meta}>
-              {distanceLabel}
-            </Text>
-          ) : null}
           {status ? (
             <Text type={status.isOpen ? 'body' : 'supporting'} xstyle={status.isOpen ? styles.open : styles.shut}>
               {status.label}
@@ -560,7 +494,7 @@ export function PlaceDetail({
           {addressCard}
           {quickActions && quickActions.length > 0 ? (
             <Card padding={1} xstyle={styles.card}>
-              <MenuList label={quickActionsLabel ?? ''} hasDividers items={quickItems} />
+              <MenuList label={quickActionsLabel ?? ''} hasDividers isInset items={quickItems} />
             </Card>
           ) : null}
           {weekSheet}
@@ -569,7 +503,7 @@ export function PlaceDetail({
         <>
           {quickActions && quickActions.length > 0 ? (
             <Card padding={1} xstyle={styles.card}>
-              <MenuList label={quickActionsLabel ?? ''} hasDividers items={quickItems} />
+              <MenuList label={quickActionsLabel ?? ''} hasDividers isInset items={quickItems} />
             </Card>
           ) : null}
           {weekSheet}
@@ -577,14 +511,11 @@ export function PlaceDetail({
 
           {/* With a visit booked, where and when come before what it is (D-273, D-281). */}
           {addressFirst ? addressCard : null}
-          {addressFirst && !hasWeek ? hoursCard : null}
           {aboutCard}
         </>
       )}
 
       {addressFirst || layout === 'chooseFirst' ? null : addressCard}
-
-      {addressFirst || hasWeek ? null : hoursCard}
 
       {mapsSheet}
     </VStack>

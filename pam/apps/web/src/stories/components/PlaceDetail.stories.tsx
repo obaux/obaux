@@ -30,7 +30,7 @@ import { useStoryText } from '../support/useStoryText';
  * Wired the way `/place/` wires it: the category label, the labels and the week
  * all come from i18n, so the Language toolbar changes everything but the
  * catalogue's own words. The name is passed to `PageTitle` above it, as on the
- * real screen; the `WithOwnHeading` story shows the component's own heading.
+ * real screen.
  */
 const NINE_TO_FIVE = [{ open: '09:00', close: '17:00' }];
 const LATE = [{ open: '09:00', close: '20:00' }];
@@ -86,7 +86,6 @@ function LocalisedPlaceDetail({
       categoryLabel={tr(rest.categoryLabel)}
       status={status ? { isOpen: status.isOpen, label: tr(status.label) } : null}
       audienceLabel={tr(audienceLabel)}
-      distanceLabel={tr(rest.distanceLabel)}
       placeholderNote={tr(rest.placeholderNote ?? 'place.hours.sample')}
       labels={Object.fromEntries(
         Object.entries(labels).map(([name, key]) => [name, tr(key)]),
@@ -171,7 +170,6 @@ const meta = {
     categoryLabel: categoryLabelKey(learning.category),
     description: learning.description,
     address: learning.address,
-    distanceLabel: null,
     status: { isOpen: true, label: 'place.openUntil?time=17:00' },
     quickActionsLabel: 'place.quick.label',
     quickActions: QUICK_ACTIONS,
@@ -268,13 +266,3 @@ export const Spanish: Story = { ...LongName, globals: { locale: 'es' } };
  * right-to-left page, and the copy button and Apple Maps link sit beside it.
  */
 export const ArabicAddress: Story = { globals: { locale: 'ar' } };
-
-/** Without `PageTitle` above it, the component draws the name itself. */
-export const WithOwnHeading: Story = {
-  args: { name: learning.name, distanceLabel: 'places.miles?count=1.2' },
-  render: ({ footerLabel, footerHref, ...args }) => (
-    <Page gap={4} footer={<PlaceFooter footerLabel={footerLabel} footerHref={footerHref} />}>
-      <LocalisedPlaceDetail {...args} />
-    </Page>
-  ),
-};
