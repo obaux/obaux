@@ -30,6 +30,7 @@ export const PHOTOGRAPHS: readonly ImageryItem[] = [
     alsoAt: ['/friend/bring-a-friend-1200.webp'],
   },
   { src: '/og/invite.jpg', name: 'Invite link preview', note: 'Shown when a link is pasted into a text (D-263)' },
+  { src: '/og/add-program.jpg', name: 'Add your program link preview', note: 'Shown when the link in the approval text is pasted or opened (D-496)' },
 ];
 
 export const BRAND: readonly ImageryItem[] = [

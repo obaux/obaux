@@ -1313,11 +1313,12 @@ Merged to `main` by the merge desk, 10 October, from `claude/places-programs-boo
 
 Merged to `main` by the merge desk, 10 October, from `claude/places-programs-lead-reads-review`. Migration `20261010135742` (`resend_program_submission`), expand only, **applied live at merge** (recorded as 20261010140904), read back: body identical to the file, for authenticated (checks inside for the program's own lead). With part 6 live too, "Ask for changes" is safe to use. Test `43_a_lead_sends_the_program_again_test.sql` (numbered 42 on its branch; Nico's alerts test took 42 first). Edit and send again resends the same submission; a program being checked is corrected through it. Land after part 6.
 
-## Places & programs · policies, part 3 of 4: a program sees who signed (10 October 2026) — READY, not merged (on top of part 2)
+## Places & programs · policies, part 3 of 4: a program sees who signed (10 October 2026) — merged 10 October
+
+Merged by the merge desk in the third stack of 10 October. Live: applied as 20261010153405.
 
 Branch `claude/places-programs-policies-p3` (D-485). Migration `20261010150922`, expand only: `program_policy_signers` (first name and date, never the picture). The Signed tab and the verified tick read it. Test `47_a_program_reads_who_signed_by_first_name_and_test.sql`.
 
-## Places & programs · policies, part 2 of 4: members sign (10 October 2026) — READY, not merged (on top of part 1)
 ## Places & programs · policies, part 2 of 4: members sign (10 October 2026) — merged 10 October
 
 Merged by the merge desk from 10b3f0b. Live: applied as 20261010151152; read back: both tables RLS on and forced, own-row select only, `program_policies_select_signed`, `can_read_policy_file` / `sign_policy` / `forget_my_signature` match the file by md5, authenticated only, anon nothing. For P3: `archive_policy` checks `is_active_account()`, `add_policy` leaves `p_replaces` out of the 30 cap, pin `reminder_is_quiet`'s search_path (advisor).
@@ -1367,6 +1368,14 @@ is sent; the four alert texts are signed by Will (D-461). A STOP shows as "Texts
 recorded once `sms-inbound` is deployed (D-460); nothing queues the check-in or "someone wants to
 connect" yet. Samples file: nine texts. D-453. Text reminders' staff list (merged 10 October) names
 only the alert texts Will signed: no "introduced to your program", no "your account changes".
+
+## Design system & Storybook · map: staff Home is live (10 October)
+
+Branch `claude/pam-design-flow-map-3`. The user-flow map shows the live staff Home (rings, and the empty
+state with a (+)) instead of the "Proposed (a22)" cards; the generator gets `drag` and `scroll` actions, and
+"Trips with a past visit" shows the past visit. Found on the way: dragging the Trips drawer's handle with a
+mouse stepped it on again (D-494, fixed; phones were not affected). Figma: Case manager, Program lead and
+Overview redrawn, one image replaced on Member; drawn from the branch, so redraw from `main` only after it merges.
 
 ## Design system & Storybook · secondary button edge (10 October)
 
@@ -1904,8 +1913,20 @@ live project (it went live on 20 September — "What needs a human" row 24), and
 either session's migrations deployed — see the drift note under "What is
 live" and the "Live RLS fingerprint" row under "What is proven."
 
+## Places & programs · policies, part 4 of 4: only for this service (10 October 2026) — merged 10 October
+
+Merged by the merge desk from 803b80b. Live: Will pasted the migration in the SQL editor (10 October, 19:14; the connector's apply_migration timed out four times); `set_policy_services` and `add_policy` match the file by md5, `program_policy_services` has RLS forced, one select policy, select-only for signed-in users; recorded in the ledger as 20261010151302.
+
+Branch `claude/places-programs-policies-p4` (D-485). Migration `20261010151302`, expand only: `program_policy_services`, `set_policy_services`, `add_policy` keeps scope on a new version. The service editor now loads real services and saves the ticks. Test `49_a_policy_can_be_for_some_services_only_and_a_new_test.sql`.
+
 ## Places & programs · approving a request from someone who is already a member (10 October 2026) — merged 10 October
 
 Merged by the merge desk from b4534267 (713584b). Live: applied as 20261010171050; `review_staff_request`'s body matches the file by md5, search path pinned, anon cannot run it. The one waiting request (a program-lead request from someone who is now a member, the only city) can be approved; Will asked to tap Approve again (card a34).
 
 Branch `claude/places-programs-approve-existing-member` (D-491). Migration `20261010160818`: `review_staff_request` adds the provider role to an existing member's account (city kept; `ROLE_PAIR_NOT_ALLOWED` / `ACCOUNT_IN_OTHER_CITY` otherwise). The staff screen says what happened or why not, never "Call Pam". Test `50_approving_a_staff_request_for_an_existing_member_test.sql`; e2e `staff-request-approve.spec.ts`.
+
+## Places & programs · the approval text opens Add your program (10 October 2026) — merged 10 October
+
+Merged by the merge desk from 3953321. Live: applied as 20261010193915; `review_staff_request`'s body matches the file by md5, search path pinned, anon cannot run it, signed-in users can (the super-admin check is inside). Security advisors: nothing new.
+
+Branch `claude/places-programs-add-program-link` (D-496). Preview picture `public/og/add-program.jpg` and metadata for `/programs/new/`; migration `20261010192105` puts `<app_url>/programs/new/` in the approval text for a program lead with no program yet; `/programs/new/` is behind the tab gate (signed out → Sign in → Home). Test `51_the_approval_text_links_a_new_program_lead_to_test.sql`; e2e `add-program-link.spec.ts`.
