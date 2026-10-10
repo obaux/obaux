@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { SupportScreen } from '../../screens/SupportScreen';
+import { SupportScreen } from '../../../screens/SupportScreen';
 
 export const metadata: Metadata = {
   title: 'Support',

@@ -22,6 +22,14 @@ STATUS row too.
   (one row, "the last day you used Pam" for a program, repeats the app's promise ahead of the
   database). The hidden draft "Staff requests" is published only if a way to ask to be staff
   comes back (D-369).
+- [ ] **Public site: Will signs "About Pam" (D-464, 10 October 2026).** English first: read
+  `apps/site/src/content/about.ts`, then put `"en"` in `apps/site/src/content/signed-off.json`
+  (`{"about-pam": ["en"]}`) — that builds `/en/about-pam/` and shows the home section. The other
+  six are drafts with no native reader (D-461): add each code to the same file only once someone
+  who reads it has been over it. Also decide the home card "Pam reminds you before you go so
+  nothing gets missed" (it promises reminders that are not live; the About text says "coming").
+  When visit reminders go live, flip `VISIT_REMINDERS_LIVE` in `TextsFromPam.tsx` and rewrite
+  the "What is coming" paragraph in all seven.
 - [ ] **Public site: publish the draft post "Keeping your program's listing up to
   date" only when the feature ships** (from PAM · Places & programs, 10 October
   2026, rule D-447, branch `claude/places-programs-load-own-program`, not on

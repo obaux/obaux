@@ -96,3 +96,10 @@ the compact card — everything that must be read stays in the central square.
 - Commit and push to the working branch. The `pam-site` Vercel project builds a
   preview for the branch. **Production is `main`; do not merge to `main`
   unless Will asks.**
+
+## About Pam (seven languages) is not a support post
+
+"About Pam" (D-464) is `apps/site/src/content/about.ts`, one page per language at
+`/<lang>/about-pam/`, not in `posts.ts`. A language goes live only when its code is in
+`apps/site/src/content/signed-off.json`. When a feature it names ships or changes (reminder texts,
+messaging), edit all seven together and tell the merge desk the other six need a native reader.

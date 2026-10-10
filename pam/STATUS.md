@@ -1119,6 +1119,18 @@ phone and 320px: 70 scans, 0 problems on 10 October); screenshots from `scripts/
 user-flow map: it is not a screen of the app. Session logs: `docs/sessions/2026-10-09-a-public-website.md`,
 `2026-10-10-0423-…`, `2026-10-10-0631-…`, `2026-10-10-0807-website-help-posts.md`.
 
+**About Pam, in seven languages (D-464, 10 October, on a branch, not live).** One post at
+`/<lang>/about-pam/` in English, Spanish, Brazilian Portuguese, Simplified and Traditional (Hong Kong)
+Chinese, Russian and Arabic: own `<html lang>` (Arabic `dir="rtl"`), a language list, `hreflang`,
+`x-default` English; not under a Support topic; one wordless illustration (header + 1200×630 share
+image, alt text in all seven; `social/about-art.mjs`); and a section on the home page. **Nothing is
+live until Will signs the English**: `apps/site/src/content/signed-off.json` is empty, so the pages
+and the home section are not built (a normal build has neither; CI also builds with
+`PAM_SITE_DRAFTS=1` and runs axe on all seven). The other six are drafts with no native reader (D-461).
+Storybook › Website › Journey: **About Pam** per language (Draft banner) and **Home with About Pam**.
+Reminder texts are plainly "coming". The home card "Pam reminds you before you go so nothing gets
+missed" still promises reminders that are not live: flagged, not changed.
+
 ## Seven languages, messages in your own language, and text that fits (9 October) — 0.50.1 and 0.51.0, merged 9 October (PR #29)
 
 ## Website · public site and support centre (10 October) — `apps/site`, preview only
