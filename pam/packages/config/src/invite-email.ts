@@ -33,6 +33,7 @@
  */
 
 import type { Locale } from './i18n.js';
+import { APPROVED_TO_LEARN_FROM } from './sms-templates.js';
 
 export type InviteEmailRole = 'member' | 'provider' | 'admin';
 export type InviteEmailLocale = Locale;
@@ -88,10 +89,11 @@ export const INVITE_EMAIL: {
 };
 
 /**
- * The same email in the languages added on 9 October 2026 (A24). **Drafts:**
- * nobody who reads these languages has signed any of them, so none is sent —
- * the person gets the English email until `reviewedBy` carries a name. Only a
- * person fills that in, for their language, after reading all of it.
+ * The same email in the languages added on 9 October 2026 (A24). Drafted by a
+ * model; **approved by Will to learn from** the same day (`APPROVED_TO_LEARN_FROM`:
+ * no native reader yet), so the person gets the email in their language and it is
+ * fixed when somebody who reads it says it is wrong. Empty `reviewedBy` for a
+ * language sends that language the English email again. Only a person fills it in.
  *
  * The words for the roles are the ones the sign-in screen already uses for the
  * same invitation (`signin.invited.*`), so the email and the page it opens
@@ -103,7 +105,7 @@ export const INVITE_EMAIL_MORE: Readonly<
   Record<MoreInviteEmailLocale, { readonly copy: InviteEmailCopy; readonly reviewedBy: string }>
 > = {
   'pt-BR': {
-    reviewedBy: '',
+    reviewedBy: APPROVED_TO_LEARN_FROM,
     copy: {
       subject: 'Seu novo link do Pam',
       preheader: 'Aqui está um novo link para entrar no Pam. Ele vale por 30 dias.',
@@ -120,7 +122,7 @@ export const INVITE_EMAIL_MORE: Readonly<
     },
   },
   'zh-CN': {
-    reviewedBy: '',
+    reviewedBy: APPROVED_TO_LEARN_FROM,
     copy: {
       subject: '您的新 Pam 链接',
       preheader: '这是加入 Pam 的新链接，有效期 30 天。',
@@ -137,7 +139,7 @@ export const INVITE_EMAIL_MORE: Readonly<
     },
   },
   'zh-HK': {
-    reviewedBy: '',
+    reviewedBy: APPROVED_TO_LEARN_FROM,
     copy: {
       subject: '您的新 Pam 連結',
       preheader: '這是加入 Pam 的新連結，有效期 30 天。',
@@ -154,7 +156,7 @@ export const INVITE_EMAIL_MORE: Readonly<
     },
   },
   ru: {
-    reviewedBy: '',
+    reviewedBy: APPROVED_TO_LEARN_FROM,
     copy: {
       subject: 'Ваша новая ссылка Pam',
       preheader: 'Вот новая ссылка, чтобы присоединиться к Pam. Она действует 30 дней.',
@@ -171,7 +173,7 @@ export const INVITE_EMAIL_MORE: Readonly<
     },
   },
   ar: {
-    reviewedBy: '',
+    reviewedBy: APPROVED_TO_LEARN_FROM,
     copy: {
       subject: 'رابط Pam الجديد الخاص بك',
       preheader: 'إليك رابطا جديدا للانضمام إلى Pam. يعمل لمدة 30 يوما.',

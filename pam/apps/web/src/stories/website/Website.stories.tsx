@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/nextjs';
 import { expect, userEvent, within } from 'storybook/test';
-import { POSTS } from '../../../../site/src/content/posts';
+import { ALL_POSTS } from '../../../../site/src/content/posts';
 import { WebsiteWalker } from './WebsiteWalker';
 
 /**
@@ -37,14 +37,18 @@ export const SupportSearch: Story = {
   },
 };
 
-/** A support post. One story for all of them: choose which in the controls. */
+/**
+ * A support post. One story for all of them: choose which in the controls.
+ * **Drafts are here too**, with a banner, so they can be reviewed before they
+ * are published; the site itself never builds them.
+ */
 export const Post: StoryObj<{ slug: string }> = {
-  args: { slug: POSTS[0]?.slug ?? '' },
+  args: { slug: ALL_POSTS.find((p) => p.status !== 'draft')?.slug ?? '' },
   argTypes: {
     slug: {
       control: 'select',
-      options: POSTS.map((p) => p.slug),
-      labels: Object.fromEntries(POSTS.map((p) => [p.slug, p.title])),
+      options: ALL_POSTS.map((p) => p.slug),
+      labels: Object.fromEntries(ALL_POSTS.map((p) => [p.slug, p.status === 'draft' ? `${p.title} (draft)` : p.title])),
     },
   },
   render: ({ slug }) => <WebsiteWalker start={`/support/${slug}/`} />,

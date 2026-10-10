@@ -14,6 +14,7 @@ import { BookIcon, GlobeIcon, Page, PhoneIcon, PlaceDetail, PlacesIcon, PlusIcon
 import { LargeTitleHeader } from '@pam/ui/LargeTitleHeader';
 import { MenuList } from '@pam/ui/MenuList';
 import { useI18n } from '@/lib/i18n';
+import { addressActionsFor } from '@/lib/addressActions';
 import { useSession } from '@/lib/useSession';
 import { useProgramSetup } from '@/lib/programSetup';
 import { AddProgramView } from './AddProgramView';
@@ -114,6 +115,7 @@ export function ProgramView({
         <MenuList
           label={t('program.services')}
           hasDividers
+          isInset
           items={[
             ...(editing
               ? [
@@ -217,8 +219,7 @@ export function ProgramView({
           categoryLabel={t(categoryLabelKey(program.category))}
           description={program.description}
           address={program.address}
-          phone={program.phone || null}
-          website={program.website || null}
+          addressActions={addressActionsFor(t, program.address)}
           extra={servicesCard}
           // The same round actions a member sees under the name (D-224).
           quickActionsLabel={t('place.quick.label')}
@@ -269,17 +270,10 @@ export function ProgramView({
             },
           ]}
           labels={{
-            directions: t('place.directions'),
-            call: t('place.call'),
-            website: t('place.website'),
             hours: t('place.hours'),
             hoursOnGoogle: t('place.hoursOnGoogle'),
             about: t('place.about'),
             address: t('place.address'),
-            save: t('place.save'),
-            saved: t('places.saved'),
-            share: t('place.share'),
-            flag: t('place.flag'),
           }}
         />
       )}

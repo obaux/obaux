@@ -1,3 +1,5 @@
+import { stripIsolates } from '@pam/config';
+
 /**
  * The phone's own share sheet, wherever Pam runs (D-350).
  *
@@ -33,8 +35,15 @@ export function canShareSheet(): boolean {
   return typeof navigator !== 'undefined' && typeof navigator.share === 'function';
 }
 
-/** Opens the share sheet with `text`; false when there is no sheet. */
-export async function shareText(text: string, title?: string): Promise<boolean> {
+/**
+ * Opens the share sheet with `text`; false when there is no sheet.
+ *
+ * What is shared goes to somebody else's phone, which draws it its own way and
+ * turns a link in it into a link: the invisible isolates `t` puts round a value
+ * in Arabic (D-435) have no business there, whoever built the string.
+ */
+export async function shareText(rawText: string, title?: string): Promise<boolean> {
+  const text = stripIsolates(rawText);
   const native = nativeShare();
   try {
     if (native) {

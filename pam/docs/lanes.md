@@ -75,7 +75,8 @@ One job and one to two days. A branch that has to wait for Will's decision waits
 *without* new work on it; a different job gets a different branch. If a branch
 is more than ten commits ahead of main, say so to Will and merge what is ready.
 Long branches are where the conflicts were: the languages branch reached 19
-commits and touches every locale file, so every other branch now waits on it.
+commits and touched every locale file, so every other branch waited on it
+(merged 10 October).
 
 ## Claiming a number
 
@@ -153,15 +154,18 @@ migration that needs one puts it alone so the rest can be applied without it.
 
 ## Where the sessions stand (a snapshot — the merge desk keeps it)
 
-As of 10 October 2026. Sessions are listed in Claude's session list by the title
-in the second column; the third is the title they would have under this system.
+As of 10 October 2026, after the Arabic merge, by the title each session has in Claude's
+session list. After a merge, every open branch below merges `main`.
 
-| Session today | Branch | Lane | Would be titled |
+| Session | Branch | Lane | Where it stands |
 |---|---|---|---|
-| PAM Agent 1 | `claude/pam-storybook` (old) | Merge desk & platform | PAM · Merge desk |
-| PAM Agent 2 | `main` (idle since 8 October) | Merge desk & platform | retire — its work moved to Agent 1 |
-| Fix two contradictory promises in PAM's English copy | `claude/affectionate-goldberg-tvu4sz` | Accounts & invites (+ this tooling, which is platform) | PAM · Accounts & invites · staff email, audit log |
-| Pam: Assign a case manager; limit or pause a member | `claude/pam-assign-and-limit` (held) | Accounts & invites | PAM · Accounts & invites · assign and limit — starts after the session above has merged |
-| Restore missing Spanish accents in Pam es.json | `claude/gallant-clarke-0dhizj` | Languages & legal, and Places & programs (the place profile and maps drawer) | PAM · Languages · seven languages; the place work is a second job |
-| Isolate interpolated values in Arabic strings | `claude/amazing-archimedes-qvgnt2` | Languages & legal | PAM · Languages · Arabic |
-| PAM public website | `claude/compassionate-bohr-mzrchf` | Public website | PAM · Website |
+| PAM · Merge desk (Agent 1) | merges are made from `main`; its old branch `claude/pam-storybook` takes no new work | Merge desk & platform | merged the languages branch and Arabic, 10 October |
+| PAM Agent 2 | `main` (idle since 8 October) | Merge desk & platform | retire — its work moved to the merge desk |
+| PAM · Accounts & invites · staff email, audit log, branch system | `claude/affectionate-goldberg-tvu4sz` | Accounts & invites (+ the lanes tooling, which is platform) | on `main` through `16cd437`; the points-history migration (D-445) waits on Will's word |
+| PAM · Accounts & invites · assign and limit | `claude/pam-assign-and-limit` | Accounts & invites | building |
+| PAM · Languages · seven languages (place profile work to move) | `claude/gallant-clarke-0dhizj` | Languages & legal, and Places & programs (the place profile and maps drawer) | merged to `main` 10 October (PR #30, through `d0b05a9`) |
+| PAM · Languages · Arabic | `claude/amazing-archimedes-qvgnt2` | Languages & legal | merged to `main` 10 October (D-435) |
+| PAM · Website | `claude/compassionate-bohr-mzrchf` | Public website | waits on Will: put the site on `main`, or not yet |
+| PAM · Messages & notifications | none yet (from `main` at `16cd437`) | Messages & notifications | waits on Will's answer; merges `main` before its first change |
+| PAM · Places & programs | none yet (from `main` at `16cd437`) | Places & programs | told to merge `main` once Arabic lands (the place profile and maps drawer are there now); `0052` is live since 20 September, nothing held |
+| PAM · Design system & Storybook · Chromatic live, baseline | `claude/pam-design-chromatic-live` | Design system & Storybook | Chromatic live and the fit baseline measured on `16cd437`; next, the AreaChip long-address job, after Arabic lands |

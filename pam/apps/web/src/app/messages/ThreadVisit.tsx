@@ -42,7 +42,7 @@ export function ThreadVisit({
   readonly programName: string | null;
   readonly threadId: string;
 }) {
-  const { t, locale } = useI18n();
+  const { t, tPlain, locale } = useI18n();
   const [visit, setVisit] = useState<{ id: string; placeId: string; startsAt: string } | null>(null);
 
   // After mount: added trips live in this browser's storage.
@@ -78,7 +78,7 @@ export function ThreadVisit({
         title={day}
         body={t('place.visit.body', { time })}
         href={href}
-        label={t('messages.visit.label', { day, time })}
+        label={tPlain('messages.visit.label', { day, time })}
         isCompact
       />
     </VStack>

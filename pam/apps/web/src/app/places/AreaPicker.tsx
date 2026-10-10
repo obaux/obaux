@@ -61,16 +61,17 @@ const ICON = { width: 24, height: 24, 'aria-hidden': true } as const;
 
 /** The header piece: where we are measuring from, and the way to change it. */
 export function AreaTrigger({ area, onOpen }: { area: AreaOption; onOpen: () => void }) {
-  const { t } = useI18n();
-  const near = t('places.near', { area: area.label });
+  const { t, tPlain } = useI18n();
 
   return (
     <AreaChip
-      label={near}
+      label={t('places.near', { area: area.label })}
       // The same formatted string the visible text uses ("Near City Hall"),
       // not the bare area name — so the accessible name actually contains
-      // what a sighted person reads on the chip, word for word.
-      changeLabel={t('places.changeArea', { area: near })}
+      // what a sighted person reads on the chip, word for word. Built from
+      // the plain form all the way down: a sentence taken from `t` would carry
+      // its isolates into what a screen reader is given (D-435).
+      changeLabel={tPlain('places.changeArea', { area: tPlain('places.near', { area: area.label }) })}
       onChange={onOpen}
     />
   );

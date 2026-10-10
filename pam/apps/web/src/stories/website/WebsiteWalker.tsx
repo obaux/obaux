@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { SiteShell } from '../../../../site/src/components/SiteShell';
-import { postBySlug } from '../../../../site/src/content/posts';
+import { anyPostBySlug } from '../../../../site/src/content/posts';
 import { HomeScreen } from '../../../../site/src/screens/HomeScreen';
 import { PostScreen } from '../../../../site/src/screens/PostScreen';
 import { SupportScreen } from '../../../../site/src/screens/SupportScreen';
@@ -23,7 +23,7 @@ function resolve(path: string): { readonly nav: string; readonly page: 'home' | 
   const clean = path.replace(/[?#].*$/, '');
   if (clean === '/' || clean === '') return { nav: '/', page: 'home' };
   const post = /^\/support\/([^/]+)\/?$/.exec(clean);
-  if (post?.[1] && postBySlug(post[1])) return { nav: clean, page: 'post', slug: post[1] };
+  if (post?.[1] && anyPostBySlug(post[1])) return { nav: clean, page: 'post', slug: post[1] };
   return { nav: '/support/', page: 'support' };
 }
 
@@ -58,7 +58,7 @@ export function WebsiteWalker({ start = '/' }: { readonly start?: string }) {
     <SiteShell path={here.nav}>
       {here.page === 'home' ? <HomeScreen /> : null}
       {here.page === 'support' ? <SupportScreen key={path} /> : null}
-      {here.page === 'post' && here.slug ? <PostScreen slug={here.slug} /> : null}
+      {here.page === 'post' && here.slug ? <PostScreen slug={here.slug} allowDraft /> : null}
     </SiteShell>
   );
 }

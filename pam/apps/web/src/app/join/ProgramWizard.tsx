@@ -120,7 +120,7 @@ export function programSummary(
 }
 
 export function useProgramWizard({ value, onChange, onSubmit, busy, submitLabel, step, onStep }: ProgramWizardProps) {
-  const { t } = useI18n();
+  const { t, tPlain } = useI18n();
   // Next is always tappable (D-334): without a name it says what is missing.
   const [triedName, setTriedName] = useState(false);
   const category = (value.category || 'education') as Category;
@@ -272,7 +272,7 @@ export function useProgramWizard({ value, onChange, onSubmit, busy, submitLabel,
               />
               {value.services.length > 1 ? (
                 <IconButton
-                  label={t('join.program.services.remove', { n: i + 1 })}
+                  label={tPlain('join.program.services.remove', { n: i + 1 })}
                   icon={<Icon icon="close" size="md" />}
                   variant="ghost"
                   onClick={() => set({ services: value.services.filter((_, j) => j !== i) })}

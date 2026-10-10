@@ -60,7 +60,7 @@ export function HomeScreen() {
 
 /** A case manager's home: the people on their caseload. */
 export function CaseloadHome() {
-  const { t } = useI18n();
+  const { t, tPlain } = useI18n();
   const router = useRouter();
   const supportPhone = useSupportPhone();
   const { state: caseload, refresh } = useCaseload(true);
@@ -121,7 +121,7 @@ export function CaseloadHome() {
       // Message, the shortcut on each card (D-227): the example conversation
       // for an example person, a real one opened for a real member.
       message={{
-        label: (person) => t('person.message.action', { name: person.firstName ?? '' }),
+        label: (person) => tPlain('person.message.action', { name: person.firstName ?? '' }),
         onMessage: (person) => {
           if (person.id.startsWith('dummy-')) {
             router.push(

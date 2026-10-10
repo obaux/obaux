@@ -33,11 +33,6 @@ export interface LargeTitleHeaderProps {
    */
   readonly titleAccessory?: ReactNode;
   /**
-   * The accessory right after the words instead of at the line's end —
-   * "Coming in  this week ▾" (D-320), one phrase.
-   */
-  readonly isAccessoryInline?: boolean;
-  /**
    * The title centred on the page, the accessory centred under it — a
    * program lead's "Coming in / this week ▾" (Will, 7 October, D-352).
    */
@@ -75,6 +70,15 @@ const styles = stylex.create({
   small: {
     fontSize: '20px',
     fontWeight: 700,
+    // The compact title shares a row with the buttons. It may be shortened
+    // there (the large title above already says it whole), but it may not push
+    // the buttons off the screen: in a language with a longer word than
+    // English's, the row came out wider than the phone and the page scrolled
+    // sideways (text-fit audit, 9 October 2026). In English nothing moves.
+    minWidth: 0,
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
     opacity: 0,
     transitionProperty: 'opacity',
     transitionDuration: '150ms',
@@ -105,14 +109,12 @@ const styles = stylex.create({
     clipPath: 'inset(50%)',
     whiteSpace: 'nowrap',
   },
-  titleRowInline: { flexWrap: 'wrap', justifyContent: 'flex-start', alignItems: 'baseline', columnGap: '8px', rowGap: '0px' },
 });
 
 export function LargeTitleHeader({
   title,
   actions,
   titleAccessory,
-  isAccessoryInline = false,
   isCentered = false,
   isTitleHidden = false,
 }: LargeTitleHeaderProps) {
@@ -156,7 +158,7 @@ export function LargeTitleHeader({
           justify="between"
           wrap="nowrap"
           gap={4}
-          xstyle={[styles.titleRow, isAccessoryInline && styles.titleRowInline]}
+          xstyle={styles.titleRow}
         >
           <Heading level={1} ref={fit.ref} xstyle={[styles.large, ...fitted, styles.largeInRow]}>
             {title}

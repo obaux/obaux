@@ -161,7 +161,7 @@ function Preview({ item, image }: { readonly item: Shared; readonly image: strin
 }
 
 function ThreadFiles() {
-  const { t, locale } = useI18n();
+  const { t, tPlain, locale } = useI18n();
   const id = useSearchParams().get('id') ?? '';
   const example = isExample(id);
   const { state: session } = useSession();
@@ -278,7 +278,6 @@ function ThreadFiles() {
       title={t('messages.files.title')}
       backHref={`/messages/thread/options/?id=${encodeURIComponent(id)}`}
       backLabel={t('nav.back.options')}
-      gap={4}
     >
       {loading ? (
         <Loading label={t('common.loading')} variant="inline" />
@@ -290,7 +289,7 @@ function ThreadFiles() {
         <List aria-label={t('messages.files.title')} hasDividers xstyle={styles.list}>
           {shared.map((item, index) => {
             const what = whatOf(item);
-            const sentBy = t('messages.files.sentBy', { who: who(item.message), when: `${day(at(item.message))}, ${time(at(item.message))}` });
+            const sentBy = tPlain('messages.files.sentBy', { who: who(item.message), when: `${day(at(item.message))}, ${time(at(item.message))}` });
             const image = item.kind === 'link' ? (images[previews[item.message.id]?.imagePath ?? ''] ?? null) : null;
             const action =
               item.kind === 'photo'
@@ -342,7 +341,7 @@ function ThreadFiles() {
             ? null
             : photos.map((p) => ({
                 src: p.message.photoUrl!,
-                alt: p.message.mine ? t('messages.thread.photo.yours') : t('messages.thread.photo.theirs', { name: otherName }),
+                alt: p.message.mine ? tPlain('messages.thread.photo.yours') : tPlain('messages.thread.photo.theirs', { name: otherName }),
               }))
         }
         {...(viewing !== null ? { index: viewing } : {})}

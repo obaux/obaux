@@ -78,8 +78,12 @@ function gitShow(rev, file) {
   }
 }
 
+// ANTHROPIC_BASE_URL exists so the request can be pointed at a stand-in server in a
+// test (packages/config/test/copy-sync-cli.test.ts); in real use it is not set.
+const API = (process.env.ANTHROPIC_BASE_URL ?? 'https://api.anthropic.com').replace(/\/$/, '');
+
 async function ask(model, key, system, user) {
-  const response = await fetch('https://api.anthropic.com/v1/messages', {
+  const response = await fetch(`${API}/v1/messages`, {
     method: 'POST',
     headers: { 'x-api-key': key, 'anthropic-version': '2023-06-01', 'content-type': 'application/json' },
     body: JSON.stringify({ model, max_tokens: 8000, system, messages: [{ role: 'user', content: user }] }),
@@ -116,25 +120,31 @@ if (command === 'status') {
   const result = driftOf(english, bundles, ledger);
   const todo = new Map();
   for (const { locale, key: k } of result.missing) (todo.get(locale) ?? todo.set(locale, new Set()).get(locale)).add(k);
+  // The keys that are stale themselves — a plural form (`key.few`) is its own key, answered
+  // in its own words, not something the base sentence's translation covers.
   for (const { locale, key: k, kind } of result.drift) {
-    if (kind === 'stale') (todo.get(locale) ?? todo.set(locale, new Set()).get(locale)).add(sourceKeyOf(k, english));
+    if (kind === 'stale') (todo.get(locale) ?? todo.set(locale, new Set()).get(locale)).add(k);
   }
   for (const [locale, keys] of todo) {
     if (only?.length && !only.includes(locale)) continue;
     if (!LOCALE_BRIEFS[locale]) continue;
     const before = gitShow(rev, path.join(dir, 'en.json'));
-    const items = [...keys].sort().map((k) => ({
-      key: k,
-      english: english[k],
-      was: before && before[k] !== undefined && before[k] !== english[k] ? before[k] : undefined,
-      current: bundles[locale][k],
-    }));
+    const items = [...keys].sort().map((k) => {
+      const source = sourceKeyOf(k, english);
+      return {
+        key: k,
+        english: english[source],
+        form: source === k ? undefined : k.slice(source.length + 1),
+        was: before && before[source] !== undefined && before[source] !== english[source] ? before[source] : undefined,
+        current: bundles[locale][k],
+      };
+    });
     const screens = new Set(items.map((i) => i.key.split('.').slice(0, 2).join('.')));
     const examples = Object.keys(english)
       .filter((k) => !keys.has(k) && screens.has(k.split('.').slice(0, 2).join('.')) && bundles[locale][k])
       .slice(0, 12)
       .map((k) => ({ key: k, english: english[k], translation: bundles[locale][k] }));
-    console.log(`${locale}: ${items.length} to draft`);
+    console.log(`${locale}: ${items.length} to draft${flag('dry-run') ? ` (${items.slice(0, 4).map((i) => i.key).join(', ')}${items.length > 4 ? ', …' : ''})` : ''}`);
     if (flag('dry-run') || items.length === 0) continue;
     const { accepted, rejected } = await draftLocale((s, u) => ask(model, key, s, u), { locale, items, examples });
     Object.assign(bundles[locale], accepted);
@@ -143,7 +153,11 @@ if (command === 'status') {
     console.log(`  wrote ${Object.keys(accepted).length}; rejected ${rejected.length}`);
     for (const r of rejected) console.log(`    ${r.key}: ${r.reason}`);
   }
-  console.log('\nDrafts are written. Read them, run the tests, then `copy:ack`.');
+  console.log(
+    flag('dry-run')
+      ? '\nDry run: nothing was sent and nothing was written.'
+      : '\nDrafts are written. Read them, run the tests, then `copy:ack`.',
+  );
 } else {
   console.error(`Unknown command "${command}". Use status, draft or ack.`);
   process.exit(2);

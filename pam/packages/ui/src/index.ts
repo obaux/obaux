@@ -15,11 +15,10 @@ export {
   PlaceCard,
   type PlaceCardProps,
   directionsHref,
+  appleMapsHref,
   googlePlaceHref,
 } from './PlaceCard.js';
 export { PlaceDetail, type PlaceDetailProps } from './PlaceDetail.js';
-export { PersonCard, type PersonCardProps } from './PersonCard.js';
-export { StepHeader, type StepHeaderProps } from './StepHeader.js';
 export { PointsBadge, type PointsBadgeProps } from './PointsBadge.js';
 export { HelpBar, type HelpBarProps } from './HelpBar.js';
 export { Loading, type LoadingProps } from './Loading.js';
@@ -72,13 +71,11 @@ export {
   MeIconFilled,
   PeopleIcon,
   UserPlusIcon,
-  CameraIcon,
   CameraFilledIcon,
   InfoIcon,
   PdfIcon,
   PhoneIcon,
   PlacesIcon,
-  PlanIcon,
   ExploreIcon,
   MessagesIcon,
   TripsIcon,
@@ -135,3 +132,12 @@ export { MarqueeText, type MarqueeTextProps } from './MarqueeText.js';
 export { Dropdown, type DropdownProps } from './Dropdown.js';
 export { InfoTip, type InfoTipProps } from './InfoTip.js';
 export { FileTypeIcon, type FileTypeIconKind } from './FileTypeIcon.js';
+export { AppleMapsAppIcon, GoogleMapsAppIcon } from './MapAppIcons.js';
+export {
+  devicePlatform,
+  mapsLaunchFor,
+  openAppOrStore,
+  type DevicePlatform,
+  type MapsApp,
+  type MapsLaunch,
+} from './mapsLaunch.js';

@@ -172,8 +172,107 @@ export function pickTemplate(
   return bundle[key] ?? fallback[key] ?? key;
 }
 
-/** Fills `{named}` placeholders. A placeholder with no value stays visible. */
-export function fillTemplate(template: string, vars?: TextVars): string {
+/** FIRST STRONG ISOLATE and POP DIRECTIONAL ISOLATE (UAX #9): the pair that makes a run of text its own. */
+const FSI = '⁨';
+const PDI = '⁩';
+const ISOLATE_OPENERS: ReadonlySet<string> = new Set(['⁦', '⁧', FSI]);
+
+/**
+ * Lays `value` out as a run of its own inside whatever sentence it is written
+ * into (D-435). The browser reads a line of mixed text as one stream and
+ * reorders it by each character's direction, so an English address inside an
+ * Arabic sentence is pulled apart: "Near 1231 N Broad St" came out as
+ * "N Broad St 1231 near", with the number beside the Arabic words. An isolate
+ * lays the value out first, on its own, in whichever direction its own first
+ * letter reads, and then places it in the sentence as one piece. "1231" is
+ * not a letter, so the address reads left to right from "N", and an Arabic
+ * name reads right to left, with no one deciding which is which.
+ *
+ * Nothing shows: both characters are zero width. They are in the string,
+ * though, which is why this is done only for text that is drawn on a screen
+ * (see `fillTemplate`) and never for text that is read by something else.
+ *
+ * A value that opens an isolate of its own and does not close it, or closes one
+ * it never opened, would pair with ours instead and let the rest of the
+ * sentence be pulled apart after all; those are balanced first. An empty value
+ * stays empty, so an optional piece that is not there leaves no trace.
+ */
+export function isolate(value: string): string {
+  if (value === '') return value;
+  let open = 0;
+  let inside = '';
+  for (const char of value) {
+    if (char === PDI) {
+      if (open === 0) continue;
+      open--;
+    } else if (ISOLATE_OPENERS.has(char)) {
+      open++;
+    }
+    inside += char;
+  }
+  return FSI + inside + PDI.repeat(open + 1);
+}
+
+/**
+ * `text` cut where `isolate` wrapped values in it: the words the sentence was
+ * written in, and the values written into it, in order. For a component that
+ * has to treat a value as a thing of its own — the area chip gives a long
+ * address a box of its own, so that if something is cut it is the end of the
+ * address, not whatever is at the edge of the line. Only the outermost pieces
+ * are returned: an isolate inside a value stays in the value's text. A text
+ * with no isolates comes back as one piece of words.
+ */
+export function splitIsolated(text: string): { readonly text: string; readonly isValue: boolean }[] {
+  const pieces: { text: string; isValue: boolean }[] = [];
+  let depth = 0;
+  let current = '';
+  const flush = (isValue: boolean) => {
+    if (current !== '') pieces.push({ text: current, isValue });
+    current = '';
+  };
+  for (const char of text) {
+    if (char === FSI && depth === 0) {
+      flush(false);
+      depth = 1;
+    } else if (char === PDI && depth > 0) {
+      depth--;
+      if (depth === 0) flush(true);
+      else current += char;
+    } else if (char === PDI) {
+      // A close that closes nothing: not text, as in `isolate`.
+    } else {
+      if (depth > 0 && ISOLATE_OPENERS.has(char)) depth++;
+      current += char;
+    }
+  }
+  flush(depth > 0);
+  return pieces;
+}
+
+/** `text` without the isolates `isolate` adds, for anything that leaves the screen. */
+export function stripIsolates(text: string): string {
+  return text.replace(/[⁨⁩]/g, '');
+}
+
+/**
+ * Fills `{named}` placeholders. A placeholder with no value stays visible.
+ *
+ * `dir` is which way the language being written in reads. In a left-to-right
+ * language nothing changes, byte for byte. In a right-to-left one each text
+ * value is isolated (`isolate`), because a name, an address or a file name in
+ * another script is exactly what the sentence around it would otherwise
+ * reorder. A number is left alone: it has no direction of its own to
+ * disagree with the sentence, and wrapping it would only change how the
+ * punctuation beside it resolves.
+ *
+ * Only for text that is drawn. A label a screen reader speaks, the text of a
+ * share sheet, a message, an email, a comparison in code: leave `dir` out, so
+ * no invisible character goes with it.
+ */
+export function fillTemplate(template: string, vars?: TextVars, dir: TextDirection = 'ltr'): string {
   if (!vars) return template;
-  return Object.entries(vars).reduce((out, [name, v]) => out.split(`{${name}}`).join(String(v)), template);
+  return Object.entries(vars).reduce((out, [name, v]) => {
+    const text = dir === 'rtl' && typeof v === 'string' ? isolate(v) : String(v);
+    return out.split(`{${name}}`).join(text);
+  }, template);
 }

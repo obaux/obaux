@@ -2,14 +2,14 @@ import { readFileSync, readdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
 import { ASSIGNMENT_ROWS } from '../src/content/assignments';
-import { POSTS, formatDate, postBySlug } from '../src/content/posts';
+import { ALL_POSTS, POSTS, anyPostBySlug, formatDate, postBySlug } from '../src/content/posts';
 
 // The data, and the words written straight into every post's component and page.
 const SRC = join(__dirname, '..', 'src');
 const written = ['content', 'screens', 'components']
   .flatMap((d) => readdirSync(join(SRC, d)).map((f) => readFileSync(join(SRC, d, f), 'utf8')))
   .join('\n');
-const everyWord = (JSON.stringify([ASSIGNMENT_ROWS, POSTS]) + written).toLowerCase();
+const everyWord = (JSON.stringify([ASSIGNMENT_ROWS, ALL_POSTS]) + written).toLowerCase();
 
 describe('public site content', () => {
   it('never uses the words Pam never displays (pam/CLAUDE.md)', () => {
@@ -40,5 +40,22 @@ describe('public site content', () => {
     expect(postBySlug('case-manager-assignments')?.title).toBe('Case manager assignments');
     expect(postBySlug('nope')).toBeUndefined();
     expect(formatDate('2026-10-09')).toBe('October 9, 2026');
+  });
+
+  it('keeps a draft off the site: not in the published list, not found by slug', () => {
+    const drafts = ALL_POSTS.filter((p) => p.status === 'draft');
+    expect(drafts.length).toBeGreaterThan(0);
+    for (const d of drafts) {
+      expect(POSTS).not.toContain(d);
+      expect(postBySlug(d.slug)).toBeUndefined();
+      expect(anyPostBySlug(d.slug)).toBe(d); // Storybook can still review it
+    }
+  });
+
+  it('has a body for every post, draft or not, and a unique slug', () => {
+    expect(new Set(ALL_POSTS.map((p) => p.slug)).size).toBe(ALL_POSTS.length);
+    // Read as text: the bodies are StyleX components, which vitest does not compile.
+    const bodies = readFileSync(join(SRC, 'content', 'bodies.tsx'), 'utf8');
+    for (const p of ALL_POSTS) expect(bodies, p.slug).toContain(`'${p.slug}':`);
   });
 });

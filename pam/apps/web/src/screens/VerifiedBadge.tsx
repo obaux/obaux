@@ -56,13 +56,13 @@ const styles = stylex.create({
 });
 
 export function VerifiedBadge({ personId, name }: { readonly personId: string; readonly name: string }) {
-  const { t } = useI18n();
+  const { t, tPlain } = useI18n();
   const { policies } = usePolicies();
   if (!isVerified(personId, policies)) return null;
   return (
     // An info tip (D-368): 36px, a true circle, the popover with room.
     <InfoTip
-      label={t('verified.label', { name })}
+      label={tPlain('verified.label', { name })}
       icon={<SignedMark />}
       content={
         <>

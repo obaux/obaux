@@ -316,11 +316,14 @@ function CheckInButton({
   name,
   isChecked,
   t,
+  tPlain,
 }: {
   id: string;
   name: string;
   isChecked: boolean;
   t: (key: string, vars?: Record<string, string | number>) => string;
+  /** For the button's accessible name, which a screen reader speaks: no isolates (D-435). */
+  tPlain: (key: string, vars?: Record<string, string | number>) => string;
 }) {
   const [burst, setBurst] = useState(0);
   const [isTipOpen, setTipOpen] = useState(false);
@@ -334,7 +337,7 @@ function CheckInButton({
     <HStack xstyle={styles.checkWrap}>
       <Tooltip content={t('schedule.checkedIn')} isOpen={isTipOpen} placement="above">
         <IconButton
-          label={t(isChecked ? 'schedule.checkin.undo' : 'schedule.checkin.do', { name })}
+          label={tPlain(isChecked ? 'schedule.checkin.undo' : 'schedule.checkin.do', { name })}
           variant="ghost"
           aria-pressed={isChecked}
           icon={<CheckIcon width={24} height={24} aria-hidden />}
@@ -403,7 +406,7 @@ export function ScheduleView({
   const [isFolded, setFolded] = useState(isCollapsed);
   const [stripPage, setStripPage] = useState(0);
   const checkIns = useCheckIns();
-  const { t, locale } = useI18n();
+  const { t, tPlain, locale } = useI18n();
   const [view, setView] = useState<View>(initialView);
   const [anchor, setAnchor] = useState(() => startOfDay(today));
   const [query, setQuery] = useState('');
@@ -494,7 +497,7 @@ export function ScheduleView({
         }
         endContent={
           canCheckIn ? (
-            <CheckInButton id={a.id} name={a.firstName} isChecked={isChecked} t={t} />
+            <CheckInButton id={a.id} name={a.firstName} isChecked={isChecked} t={t} tPlain={tPlain} />
           ) : (
             <Avatar size="md" name={a.firstName} tooltip={false} alt="" />
           )

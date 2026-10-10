@@ -596,8 +596,11 @@
 :root { --pam-flip: 1; }
 :root[dir='rtl'] { --pam-flip: -1; }
 
-/* An arrow that points "back" points the other way. */
-:root[dir='rtl'] [data-pam-directional] { transform: scaleX(-1); }
+/*
+ * Arrows and chevrons are NOT turned round in Arabic (Will, 10 October 2026: "the
+ * chevrons don't need to be reversed. Only text and layout."). The back arrow
+ * points the way it does in English; the page's text and layout are what mirror.
+ */
 
 /* Arabic joins its letters. Spacing them apart breaks the word. */
 :root[lang='ar'] * { letter-spacing: 0; }

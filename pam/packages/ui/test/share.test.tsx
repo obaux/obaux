@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { canShareSheet, shareText } from '../src/share.js';
+import { copyLink } from '../src/clipboard.js';
 
 type G = { Capacitor?: unknown };
 
@@ -40,5 +41,41 @@ describe('shareText (D-350)', () => {
   it('ignores the plugin on the web build, where Capacitor is not native', () => {
     (globalThis as G).Capacitor = { isNativePlatform: () => false, Plugins: { Share: { share: vi.fn() } } };
     expect(canShareSheet()).toBe(false);
+  });
+});
+
+describe('what leaves the app carries no isolates (D-435)', () => {
+  // In Arabic `t` puts invisible first-strong isolates round each value, so a
+  // sentence that mentions a link would hand somebody else's phone a link with
+  // a character stuck to it. Whoever built the string, it is scrubbed here.
+  const ISOLATED = 'تعال معي: \u2068https://pam.example/p?id=1\u2069';
+  const PLAIN = 'تعال معي: https://pam.example/p?id=1';
+
+  it('is taken out of the text given to the share sheet, native and browser', async () => {
+    const share = vi.fn().mockResolvedValue(undefined);
+    (globalThis as G).Capacitor = { isNativePlatform: () => true, Plugins: { Share: { share } } };
+    await shareText(ISOLATED);
+    expect(share).toHaveBeenCalledWith({ text: PLAIN });
+
+    delete (globalThis as G).Capacitor;
+    const browserShare = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'share', { value: browserShare, configurable: true });
+    await shareText(ISOLATED);
+    expect(browserShare).toHaveBeenCalledWith({ text: PLAIN });
+  });
+
+  it('is taken out of what is copied', async () => {
+    const writeText = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'clipboard', { value: { writeText }, configurable: true });
+    expect(await copyLink(ISOLATED)).toBe(true);
+    expect(writeText).toHaveBeenCalledWith(PLAIN);
+    delete (navigator as { clipboard?: unknown }).clipboard;
+  });
+
+  it('leaves marks a name may carry on purpose, and all other text, as it was', async () => {
+    const share = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'share', { value: share, configurable: true });
+    await shareText('a\u200Eb \u061C c');
+    expect(share).toHaveBeenCalledWith({ text: 'a\u200Eb \u061C c' });
   });
 });

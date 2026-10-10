@@ -31,6 +31,7 @@ export const ConnectMember: Story = screen('case-manager', 'Connect a member to 
   id: 'dummy-m1',
 });
 export const Invite: Story = screen('case-manager', 'Invite someone', '/invite/');
+export const InviteOne: Story = screen('case-manager', 'A link for a member', '/invite/new/', { role: 'member' });
 /** Choosing "Invite a program": the form is a page of its own on the nested template (D-441). */
 export const InviteProgram: Story = {
   ...screen('case-manager', 'Invite a program — who it is for', '/invite/'),

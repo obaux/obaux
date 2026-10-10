@@ -132,7 +132,7 @@ const styles = stylex.create({
 });
 
 export function ConnectView({ personId, name }: { readonly personId: string; readonly name: string }) {
-  const { t, locale } = useI18n();
+  const { t, tPlain, locale } = useI18n();
   const now = useNow();
   const [isSearching, setIsSearching] = useState(false);
   const [query, setQuery] = useState('');
@@ -185,7 +185,7 @@ export function ConnectView({ personId, name }: { readonly personId: string; rea
     <SubPageHeader
       title={t('person.connect.title', { name })}
       backHref={back}
-      backLabel={t('person.connect.back', { name })}
+      backLabel={tPlain('person.connect.back', { name })}
       actions={
         <>
           {withSearch ? (
@@ -274,7 +274,7 @@ export function ConnectView({ personId, name }: { readonly personId: string; rea
                 status={placeStatus(program.id, program.hours, now, t, locale)}
                 action={
                   <IconButton
-                    label={t('person.connect.check', { program: program.name })}
+                    label={tPlain('person.connect.check', { program: program.name })}
                     icon={<Icon icon="check" size="md" />}
                     variant="ghost"
                     onClick={() => setAsking(program)}

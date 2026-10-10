@@ -48,4 +48,14 @@ export const BRAND: readonly ImageryItem[] = [
     name: 'App icon, maskable',
     note: 'The same "p", full bleed and smaller, so an Android launcher can crop it to any shape (D-437)',
   },
+  {
+    src: '/maps/google-maps.webp',
+    name: 'Google Maps',
+    note: "Google's pin on its light grey, in the Open in… drawer on an address (D-439). A third party's mark, there only to say which app a link opens.",
+  },
+  {
+    src: '/maps/apple-maps.webp',
+    name: 'Apple Maps',
+    note: "Apple's icon, cropped 5% in so its corners and edge glow are outside a 22% rounded frame (the same radius as Google's), in the Open in… drawer (D-439). Also a third party's mark.",
+  },
 ];

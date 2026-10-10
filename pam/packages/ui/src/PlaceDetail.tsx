@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { Card } from '@astryxdesign/core/Card';
 import { VStack } from '@astryxdesign/core/VStack';
@@ -11,52 +11,78 @@ import { Badge, type BadgeVariant } from './Badge.js';
 import { BottomSheet } from '@astryxdesign/core/BottomSheet';
 import { sheet } from './sheet.js';
 import { Button } from './Button.js';
-import { colorVars, spacingVars } from '@astryxdesign/core/theme/tokens.stylex';
-import { BookmarkIcon, ClockIcon, FlagIcon, PhoneIcon, PlacesIcon, ShareIcon } from './icons.js';
-import { BigButton } from './BigButton.js';
+import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
+import { ClockIcon, PlacesIcon } from './icons.js';
 import { CATEGORY_DEFINITIONS, type Category } from '@pam/config';
 import { pam } from './tokens.stylex.js';
 import { textLinkLook } from './TextLink.js';
+import { CopyButton } from './CopyButton.js';
+import { AppleMapsAppIcon, GoogleMapsAppIcon } from './MapAppIcons.js';
 import { MenuList, type MenuItem } from './MenuList.js';
+import { devicePlatform, mapsLaunchFor, openAppOrStore, type DevicePlatform } from './mapsLaunch.js';
 import { AutoHeight, TextSwap } from './Swap.js';
 import { landFocus, landFocusStyle } from './landFocus.js';
 
 /**
- * One place, on its own screen.
+ * One place, on its own screen: the place profile.
  *
  * The card in the list answers "is this worth my time". This answers the
  * question that follows — *how do I actually get there and get in* — which is
- * the one Pam exists for, and which was previously squeezed into three
- * equal-width buttons and a corner menu.
+ * the one Pam exists for.
  *
  * The order is the order somebody needs it in:
  *
- *   1. What it is, and who it is for. A badge saying "In a school" belongs
- *      above the phone number, not below it: it decides whether the rest of
+ *   1. What it is, and who it is for, and whether it is open. A badge saying "In
+ *      a school" belongs before the phone number: it decides whether the rest of
  *      the screen is relevant at all.
- *   2. **Getting there** — the primary action, and the only primary one (§2.5).
- *      Directions, because the distance is why they opened this.
- *   3. Calling, the hours, the website: the things you check before setting off.
- *   4. Share and report, as full-width rows with words on them rather than
- *      icons behind a menu (Will, 16 September). Reporting a place that has
- *      closed is how the catalogue stays true, and hiding it behind a "⋯"
- *      guaranteed nobody would.
+ *   2. The list of ways to reach it (`quickActions`): directions, the hours,
+ *      a message, a call, the website.
+ *   3. The address, with a small copy button and "Open in…" (D-439), and the hours.
+ *
+ * **The one primary action is not drawn here: it is the page's sticky footer**
+ * ("Schedule a visit" for a member, "How to get there" for everybody else), so it
+ * stays under the thumb however far the page is read. Save, share and report are
+ * in the screen's bar (D-224). The older column of labelled action rows that sat
+ * under the hours, and the in-page "How to get there" button, are gone (Will, 10
+ * October 2026: "retire the rows layout, only use place profiles with sticky
+ * footer buttons", D-440).
  *
  * The component takes rendered strings and callbacks, no data layer: it is the
  * same shape whether the row came from the places search or a saved list.
  */
 export interface PlaceDetailProps {
-  /**
-   * Only rendered when the screen has no title of its own. The place page puts
-   * the name in `PageTitle`, beside the way back — two headings saying the same
-   * thing is two headings a screen reader reads out.
-   */
-  readonly name?: string;
   readonly category: Category;
   readonly categoryLabel: string;
   readonly description?: string | null;
   readonly address?: string | null;
-  readonly distanceLabel?: string | null;
+  /**
+   * Ways to take the address somewhere (Will, 9 October 2026: "easily copied
+   * into Google Maps or Apple Maps to help them navigate"): a small copy button
+   * beside the heading, and "Open in…", which opens a drawer to choose Google
+   * Maps or Apple Maps. Left out, the card is only the words.
+   */
+  readonly addressActions?: {
+    /** Google Maps and Apple Maps, behind "Open in…". Either may be absent; with neither, no link. */
+    readonly googleMapsHref?: string | null;
+    readonly appleMapsHref?: string | null;
+    readonly labels: {
+      /** "Copy address", the button's name. */
+      readonly copy: string;
+      /** "Address copied". */
+      readonly copied: string;
+      /** "Could not copy. Press and hold the address to copy it." */
+      readonly copyFailed: string;
+      /** "Open in…": said after the address, which is the link, so a screen reader hears what it does. */
+      readonly openIn: string;
+      /** "Open in", the drawer's title. */
+      readonly openInTitle: string;
+      /** "Google Maps" and "Apple Maps": the apps' names in the person's language. */
+      readonly googleMaps: string;
+      readonly appleMaps: string;
+      /** "Opens in app", the small line under each app's name. */
+      readonly opensInApp: string;
+    };
+  };
   /** Already worded: "Open until 5:00pm", "Closed · opens 9:00am". */
   readonly status?: { readonly isOpen: boolean; readonly label: string } | null;
   /**
@@ -79,20 +105,12 @@ export interface PlaceDetailProps {
   readonly hoursArePlaceholder?: boolean;
   readonly placeholderNote?: string;
   readonly audienceLabel?: string | null;
-  readonly phone?: string | null;
-  readonly website?: string | null;
-  readonly directionsHref?: string | null;
   readonly hoursHref?: string | null;
-  readonly isSaved?: boolean;
-  readonly onSave?: () => void;
-  readonly onCall?: () => void;
-  readonly onShare?: () => void;
-  readonly flagHref?: string;
   /**
-   * Round buttons under the name (D-224, Will, 2 October): Website, Message,
-   * Call, Open in Google — each an icon in a circle with a word under it.
-   * Given, they replace the long column of action rows; save, share and
-   * report move to the screen's bar.
+   * The list under the name (D-224, Will, 2 October): Get directions, the hours,
+   * Message, Call, Website — an icon, a word and a note, each one a link. Save,
+   * share and report are in the screen's bar. Left out (a decorative preview),
+   * there is no list.
    */
   readonly quickActions?: readonly QuickAction[];
   /** Shown at the foot of the hours card — "Check hours on Google" (D-224). */
@@ -126,19 +144,12 @@ export interface PlaceDetailProps {
    */
   readonly addressFirst?: boolean;
   readonly labels: {
-    readonly directions: string;
-    readonly call: string;
-    readonly website: string;
     readonly hours: string;
     /** "Today", beside today's line in the week (D-309). */
     readonly today?: string;
     readonly hoursOnGoogle: string;
     readonly about: string;
     readonly address: string;
-    readonly save: string;
-    readonly saved: string;
-    readonly share: string;
-    readonly flag: string;
   };
 }
 
@@ -167,9 +178,26 @@ const styles = stylex.create({
   // ends, and what it offers begins.
   statusWords: { flexGrow: 1, minWidth: 0 },
   rule: { width: '100%', height: '1px', backgroundColor: colorVars['--color-border'], flexShrink: 0 },
-  name: { fontSize: '26px', lineHeight: 1.2 },
   section: { fontSize: '17px' },
   body: { fontSize: '17px', lineHeight: 1.5 },
+  addressText: { unicodeBidi: 'plaintext', userSelect: 'text', overflowWrap: 'anywhere' },
+  // The address as a link that opens the "Open in" drawer (Will, 10 October
+  // 2026: "make the address a hyperlink"). Underlined and in the accent colour
+  // always — a touch screen has no hover to say it can be tapped — and set
+  // like the plain address it replaces: left, wrapping, in its own direction.
+  addressLink: {
+    width: '100%',
+    justifyContent: 'flex-start',
+    textAlign: 'start',
+    fontSize: '17px',
+    lineHeight: 1.5,
+    fontWeight: 400,
+    minHeight: pam['--pam-touch-target-min'],
+    paddingInline: '0px',
+    unicodeBidi: 'plaintext',
+    color: colorVars['--color-text-accent'],
+    textDecorationLine: 'underline',
+  },
   meta: { fontSize: '16px' },
   open: { fontSize: '17px', fontWeight: 600, color: colorVars['--color-text-accent'] },
   shut: { fontSize: '17px', fontWeight: 600 },
@@ -177,63 +205,26 @@ const styles = stylex.create({
   /** A row of the week. Tabular so the times line up down the column. */
   dayRow: { fontSize: '16px', fontVariantNumeric: 'tabular-nums' },
   today: { fontWeight: 700 },
-  /*
-   * The quieter actions. Full width and labelled, in a column — not a row of
-   * three, which is what made them shrink until only an icon fitted.
-   */
-  row: {
-    width: '100%',
-    minHeight: pam['--pam-touch-target-min'],
-    justifyContent: 'flex-start',
-    fontSize: '17px',
-  },
-  rows: { rowGap: spacingVars['--spacing-2'] },
   hoursLink: { alignSelf: 'flex-start', minHeight: pam['--pam-touch-target-min'], fontSize: '16px', paddingInline: '0px' },
+  // The "Open in…" drawer: a 48px app symbol, then the app's name, the whole row a link.
+  appIcon: { width: '48px', height: '48px', fontSize: '48px', flexShrink: 0 },
   // The week drawer (D-309).
   // Clear of the sheet's handle above the title.
   sheet: { paddingInline: '24px', paddingBlock: '20px 24px' },
-  sheetTitle: { fontSize: '22px', lineHeight: 1.25 },
+  // "Open in": a quiet label above the apps, not a heading to read first
+  // (Will, 10 October 2026: "much smaller").
+  sheetTitle: { fontSize: '15px', lineHeight: 1.3, fontWeight: 600, color: colorVars['--color-text-secondary'] },
   dayLine: { minHeight: '44px', paddingInline: '12px', borderRadius: '12px' },
   todayLine: { backgroundColor: colorVars['--color-background-muted'] },
   todayTag: { fontSize: '13px', fontWeight: 600, color: colorVars['--color-text-accent'] },
 });
 
-/** One labelled row in the "more" column, so the four of them cannot drift. */
-function ActionRow({
-  label,
-  icon,
-  href,
-  onClick,
-  target,
-}: {
-  label: string;
-  icon: ReactNode;
-  href?: string;
-  onClick?: () => void;
-  target?: string;
-}) {
-  return (
-    <Button
-      label={label}
-      icon={icon}
-      variant="secondary"
-      href={href}
-      clickAction={onClick}
-      onClick={href ? undefined : onClick}
-      target={target}
-      rel={target === '_blank' ? 'noreferrer' : undefined}
-      xstyle={styles.row}
-    />
-  );
-}
-
 export function PlaceDetail({
-  name,
   category,
   categoryLabel,
   description,
   address,
-  distanceLabel,
+  addressActions,
   status,
   statusAside,
   weekLines,
@@ -242,15 +233,7 @@ export function PlaceDetail({
   hoursArePlaceholder = false,
   placeholderNote,
   audienceLabel,
-  phone,
-  website,
-  directionsHref,
   hoursHref,
-  isSaved = false,
-  onSave,
-  onCall,
-  onShare,
-  flagHref,
   quickActions,
   quickActionsLabel,
   notice,
@@ -260,6 +243,13 @@ export function PlaceDetail({
   labels,
 }: PlaceDetailProps) {
   const [isWeekOpen, setWeekOpen] = useState(false);
+  const [isMapsOpen, setMapsOpen] = useState(false);
+  // Which phone this is decides how an app is opened, and whether there is one
+  // (D-439). Known only in the browser, so the first paint is the computer's.
+  const [platform, setPlatform] = useState<DevicePlatform>('other');
+  useEffect(() => {
+    setPlatform(devicePlatform(navigator.userAgent, navigator.maxTouchPoints));
+  }, []);
   const aboutCard = description ? (
     <Card padding={4} xstyle={styles.card}>
       <AutoHeight>
@@ -281,60 +271,46 @@ export function PlaceDetail({
       <AutoHeight>
         <TextSwap token={`${labels.address}|${address}`}>
           <VStack gap={1}>
-            <Heading level={2} xstyle={styles.section}>
-              {labels.address}
-            </Heading>
-            <Text type="supporting" xstyle={styles.body}>
-              {address}
-            </Text>
+            <HStack align="center" justify="between" wrap="nowrap" gap={2}>
+              <Heading level={2} xstyle={styles.section}>
+                {labels.address}
+              </Heading>
+              {addressActions ? (
+                <CopyButton
+                  placement="inCard"
+                  text={address}
+                  label={addressActions.labels.copy}
+                  copiedLabel={addressActions.labels.copied}
+                  failedLabel={addressActions.labels.copyFailed}
+                />
+              ) : null}
+            </HStack>
+            {/* The address reads in its own direction, not the screen's: in
+                Arabic an English street address was reordered, its number
+                jumping to the far end. */}
+            {addressActions && (addressActions.googleMapsHref || addressActions.appleMapsHref) ? (
+              // The address is itself the way to a maps app: it opens the
+              // "Open in" drawer. Its spoken name says so after the address.
+              <Button
+                variant="ghost"
+                label={address}
+                aria-label={`${address}. ${addressActions.labels.openIn}`}
+                aria-haspopup="dialog"
+                // Its own direction, from its own first letter: `unicode-bidi` on
+                // the button does not reach the label inside it, `dir` does.
+                dir="auto"
+                onClick={() => setMapsOpen(true)}
+                xstyle={[textLinkLook.link, styles.addressLink]}
+              />
+            ) : (
+              // Plain text, so it can be selected and copied by hand.
+              <Text type="supporting" xstyle={[styles.body, styles.addressText]}>
+                {address}
+              </Text>
+            )}
           </VStack>
         </TextSwap>
       </AutoHeight>
-    </Card>
-  ) : null;
-
-  const hoursCard =
-    weekLines && weekLines.length > 0 ? (
-    <Card padding={4} xstyle={styles.card}>
-      <VStack gap={2}>
-        <Heading level={2} xstyle={styles.section}>
-          {labels.hours}
-        </Heading>
-        <VStack gap={1}>
-          {weekLines.map((line) => (
-            <HStack key={line.day} gap={3} justify="between" wrap="nowrap">
-              <Text xstyle={styles.dayRow}>{line.day}</Text>
-              <Text type="supporting" xstyle={styles.dayRow}>
-                {line.hours}
-              </Text>
-            </HStack>
-          ))}
-        </VStack>
-        {/*
-          Said out loud, on the screen, whenever the hours are a stand-in.
-          A demo that looks exactly like the real thing is how a partner
-          ends up reading their own opening times off a screen that made
-          them up.
-        */}
-        {hoursArePlaceholder && placeholderNote ? (
-          <Text type="supporting" xstyle={styles.note}>
-            {placeholderNote}
-          </Text>
-        ) : null}
-        {/* Where to check them, under the hours themselves (D-224). */}
-        {quickActions && hoursHref ? (
-          <Button
-            label={labels.hoursOnGoogle}
-            variant="ghost"
-            href={hoursHref}
-            target="_blank"
-            rel="noreferrer"
-            icon={<PlacesIcon />}
-            // A link, not a pill (Will, 5 October, D-280).
-            xstyle={[styles.hoursLink, textLinkLook.link]}
-          />
-        ) : null}
-      </VStack>
     </Card>
   ) : null;
 
@@ -422,14 +398,64 @@ export function PlaceDetail({
     </BottomSheet>
   ) : null;
 
+  // "Open in…" (Will, 9 October 2026): the two maps apps as app symbols in
+  // square frames, each a plain link that hands the address to that app.
+  // An app a phone has no version of (Apple Maps on Android) is not offered.
+  const mapApps = addressActions
+    ? [
+        { id: 'google' as const, href: addressActions.googleMapsHref, name: addressActions.labels.googleMaps, icon: <GoogleMapsAppIcon /> },
+        { id: 'apple' as const, href: addressActions.appleMapsHref, name: addressActions.labels.appleMaps, icon: <AppleMapsAppIcon /> },
+      ].flatMap((app) => {
+        const launch = app.href ? mapsLaunchFor(app.id, app.href, platform) : null;
+        return launch ? [{ ...app, launch }] : [];
+      })
+    : [];
+  const mapsSheet =
+    addressActions && mapApps.length > 0 ? (
+      <BottomSheet
+        isOpen={isMapsOpen}
+        onOpenChange={setMapsOpen}
+        label={addressActions.labels.openInTitle}
+        height="hug"
+        xstyle={sheet.panel}
+      >
+        {isMapsOpen ? (
+          <VStack gap={2} {...landFocus} xstyle={[styles.sheet, landFocusStyle.quiet]}>
+            <Heading level={2} xstyle={styles.sheetTitle}>
+              {addressActions.labels.openInTitle}
+            </Heading>
+            <MenuList
+              label={addressActions.labels.openInTitle}
+              items={mapApps.map((app) => {
+                const { launch } = app;
+                const row = {
+                  id: app.id,
+                  label: app.name,
+                  description: addressActions.labels.opensInApp,
+                  icon: <HStack xstyle={styles.appIcon}>{app.icon}</HStack>,
+                };
+                // A phone that may not have the app tries it and, failing that,
+                // opens the store (mapsLaunch.ts): a button, because only script
+                // can tell. Every other row is a plain link.
+                return launch.tryApp
+                  ? {
+                      ...row,
+                      onSelect: () => {
+                        openAppOrStore(launch.tryApp!.appUrl, launch.tryApp!.storeUrl);
+                        setMapsOpen(false);
+                      },
+                    }
+                  : { ...row, href: launch.href, isExternal: launch.isExternal };
+              })}
+            />
+          </VStack>
+        ) : null}
+      </BottomSheet>
+    ) : null;
+
   return (
     <VStack gap={4}>
       <VStack gap={2}>
-        {name ? (
-          <Heading level={1} xstyle={styles.name}>
-            {name}
-          </Heading>
-        ) : null}
         {/*
           Who it is for comes before anything else on the screen. A member who
           cannot use this place should learn that here, not after they have
@@ -441,11 +467,6 @@ export function PlaceDetail({
         </HStack>
         <HStack gap={2} align="center" wrap="nowrap">
           <HStack gap={2} align="center" wrap="wrap" xstyle={styles.statusWords}>
-          {distanceLabel ? (
-            <Text type="supporting" xstyle={styles.meta}>
-              {distanceLabel}
-            </Text>
-          ) : null}
           {status ? (
             <Text type={status.isOpen ? 'body' : 'supporting'} xstyle={status.isOpen ? styles.open : styles.shut}>
               {status.label}
@@ -473,7 +494,7 @@ export function PlaceDetail({
           {addressCard}
           {quickActions && quickActions.length > 0 ? (
             <Card padding={1} xstyle={styles.card}>
-              <MenuList label={quickActionsLabel ?? ''} hasDividers items={quickItems} />
+              <MenuList label={quickActionsLabel ?? ''} hasDividers isInset items={quickItems} />
             </Card>
           ) : null}
           {weekSheet}
@@ -482,7 +503,7 @@ export function PlaceDetail({
         <>
           {quickActions && quickActions.length > 0 ? (
             <Card padding={1} xstyle={styles.card}>
-              <MenuList label={quickActionsLabel ?? ''} hasDividers items={quickItems} />
+              <MenuList label={quickActionsLabel ?? ''} hasDividers isInset items={quickItems} />
             </Card>
           ) : null}
           {weekSheet}
@@ -490,46 +511,13 @@ export function PlaceDetail({
 
           {/* With a visit booked, where and when come before what it is (D-273, D-281). */}
           {addressFirst ? addressCard : null}
-          {addressFirst && !hasWeek ? hoursCard : null}
           {aboutCard}
         </>
       )}
 
-      {/*
-        How to get there, the one primary action on a screen whose reader is
-        not a member (§2.5). A member's "Plan a trip" is the page's footer
-        now (D-326), not drawn here, and directions sit among the rows.
-      */}
-      {directionsHref ? <BigButton label={labels.directions} href={directionsHref} /> : null}
-
       {addressFirst || layout === 'chooseFirst' ? null : addressCard}
 
-      {addressFirst || hasWeek ? null : hoursCard}
-
-      {quickActions ? null : (
-        <VStack gap={2} xstyle={styles.rows}>
-          {phone ? <ActionRow label={labels.call} icon={<PhoneIcon />} href={`tel:${phone}`} onClick={onCall} /> : null}
-          {hoursHref ? (
-            <ActionRow label={labels.hoursOnGoogle} icon={<PlacesIcon />} href={hoursHref} target="_blank" />
-          ) : null}
-          {website ? <ActionRow label={labels.website} icon={<PlacesIcon />} href={website} target="_blank" /> : null}
-          {onSave ? (
-            <ActionRow
-              label={isSaved ? labels.saved : labels.save}
-              icon={<BookmarkIcon isFilled={isSaved} />}
-              onClick={onSave}
-            />
-          ) : null}
-          {onShare ? <ActionRow label={labels.share} icon={<ShareIcon />} onClick={onShare} /> : null}
-          {/*
-          Reporting a place is how the catalogue stays true — a place that has
-          closed or moved is the single most expensive error Pam can make, and
-          the member standing outside it is the only one who knows. Behind a
-          "⋯" it was never going to be used.
-        */}
-          {flagHref ? <ActionRow label={labels.flag} icon={<FlagIcon />} href={flagHref} /> : null}
-        </VStack>
-      )}
+      {mapsSheet}
     </VStack>
   );
 }

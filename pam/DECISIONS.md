@@ -10988,13 +10988,17 @@ and resolve them using best UI/UX practices."
   is missing or if a language that needs none carries dead ones.
 - **Right to left.** `<html dir>` follows the language; Astryx mirrors from
   it; logical CSS properties do the rest. What they cannot say lives in
-  `globals.css`: `--pam-flip` (a slide's direction), `[data-pam-directional]`
-  arrows, phone/email/code fields kept left-to-right, no letter-spacing in
+  `globals.css`: `--pam-flip` (a slide's direction), phone/email/code fields
+  kept left-to-right, no letter-spacing in
   Arabic (it breaks the joins), Latin digits in Arabic (`ar-u-nu-latn`: a
   phone number or a time is read the same in every language), and swipe
   gestures flipped. A name in the other direction (an English program in an
   Arabic screen) is set in its own direction where it ends in an ellipsis
   (`unicode-bidi: plaintext`), so it loses its end, not its beginning.
+  **Arrows and chevrons are not mirrored (Will, 10 October 2026: "the chevrons don't
+  need to be reversed. Only text and layout").** The back arrow in a sub-page header was
+  the one glyph Pam turned round for Arabic (`[data-pam-directional]`); that rule is gone,
+  so it points as it does in English. Astryx's own list chevrons never mirrored.
 - **Dignity holds in every language.** The §0 rule is a substring check
   against a per-language list (`language.ts`), run on all seven bundles.
   Known gap: Spanish has no list of its own yet (it is checked with the
@@ -11167,6 +11171,7 @@ it."
   so an English reminder is never refused over how an address is spelled.
   **Will's call, not made here:** allow two segments for the reminders (doubles
   their cost, and the campaign registration says one) or keep them English.
+  *(Made the same day: two segments, D-431.)*
 - **The last check is per language.** The justice-involvement word list was
   English only: a Spanish text with "libertad condicional" passed everything.
   Each language now has its own list (`sms-terms.ts`, built on the UI lists in
@@ -11190,7 +11195,9 @@ it."
   Migration first, app second: the old app's calls still resolve through the
   default. Held with the rest.
 - **Not done.** No email is sent (there is no provider yet, before-launch). No
-  language is signed. The carrier registration (docs/sms-campaign-samples.md)
+  language is signed *(superseded the same day: Will approved all of them to learn
+  from, D-430; an unsigned language is still English, and so is a signed text that
+  fails a check at send time)*. The carrier registration (docs/sms-campaign-samples.md)
   names English and Spanish; it must be re-filed before the first text in
   another language goes out. Phone-only invitations (`invite_member`) are sent
   by the inviter and carry no language of the invitee; they follow the
@@ -11370,6 +11377,331 @@ reported if flagged."
 - **Nothing waits on 0085.** The app asks with `p_language` and, if the database
   has no such parameter (PGRST202, raised before anything runs), asks again
   without it (`rpcLanguage.ts`). Remove that helper once 0085 has been live a while.
+
+### D-430 — The new languages are approved to learn from: fail first, then fix on feedback
+
+**Date:** 2026-10-09. Will: "Let's approve new languages for now. We'll take a fail
+first then fix it approach. We'll adjust languages based on feedback." And, when I
+described how a sign-off works: "signing off shouldn't have anything to do with
+preventing them from receiving texts, right?"
+
+*(Numbered D-430: the affectionate-goldberg session pushed its own D-429 first, and this one moved, by `sed` over its own lines only — allocations rule 3.)*
+
+- **What was signed.** `reviewedBy` on the 53 text drafts and the five invite-email
+  languages now reads `APPROVED_TO_LEARN_FROM`: "Will (Oba), 9 October 2026 —
+  approved to learn from; no native reader yet". It says what it is. It is Will's,
+  given in so many words, which is the only authority that field accepts (D-424
+  said an agent never writes it on its own). The screens in the five languages
+  (privacy, terms, transparency and notices included) went live with the merge on
+  the same footing: machine-drafted, no native reader yet.
+- **Signing decides the language, never whether a person is texted.** That was
+  already how an unsigned language worked (English instead, never nothing). Reading
+  the dispatcher with Will's question in mind found one place it was not true: a
+  *signed* text that failed a check at the moment of sending — a link a few
+  characters longer than the wording was written for, a word list that caught
+  something — was refused and the person got nothing. It now falls back to the
+  English text, says why in the log (never quoting the words), and throws only when
+  English cannot be sent either (a missing variable, an unknown template). Tests:
+  signed → their language; approval emptied → English; signed but failing → English;
+  English failing too → throws. The same rule covers Spanish.
+- **How feedback is handled.** Somebody who reads a language says what is wrong → the
+  string is fixed in that language only (screens: edit the string, `copy:ack`; texts
+  and email: edit the draft). A fix that brings a draft closer to the English
+  meaning keeps the approval; anything that says more, or says something new, goes
+  back to Will. **Pulling a language** from texts and email is emptying its
+  `reviewedBy` (English from the next deploy). There is no equivalent switch for the
+  screens: a bad translation is fixed, not hidden. (A reader's report has nowhere to
+  go in the app yet: it reaches Will, who tells Claude.)
+- **Not deployed, and why.** The live `dispatch-sms` (v15, 17 September) is older than
+  the repo: it sends the **"PAM:"** prefix and only English and Spanish; the repo says
+  **"Pam:"** (D-321), and the carrier re-filing for that prefix is still an unticked
+  item. Redeploying to switch the languages on would also silently change the live
+  prefix, so it is a decision of its own (docs/before-launch.md). Nothing is lost by
+  waiting: one test text has ever been queued (17 September), the dispatcher runs
+  every five minutes with an empty queue, and all three accounts are English.
+- **The risk accepted** (Will's "fail first"): machine-drafted words for the promise
+  pages in five languages are live; and the carrier registration names English and
+  Spanish only, so the first text in another language may be filtered — which,
+  depending on how sign-in codes are sent, could touch more than that one text.
+  That is the "fail", to be learned from; the brake above is one line.
+
+### D-431 — The three appointment reminders may take two segments in Chinese, Russian and Arabic
+
+**Date:** 2026-10-09. Will, asked why SMS has a length limit at all and whether the
+person should simply get the text in the language they chose: "allow two segments
+for those three reminders only and update the registration. The extra cost is small,
+and these readers would get the reminder in their own language."
+
+- **Why there was a limit.** A text in a script the cheap encoding cannot carry is
+  70 characters a segment, not 160; a longer one is split, each part is billed, and
+  Pam told the carrier every message is one segment (D-424). The three reminders
+  (a day before, two hours before, the morning of) carry a time, an address and a
+  36-character link, and could not be said in 70, so those readers were texted them
+  in English — the opposite of the point of choosing a language.
+- **What changed.** `ucs2Segments: 2` on exactly those three templates
+  (`sms-templates.ts`, mirrored in the dispatcher's `render.ts`; the bundle carries
+  it). In a wide script they may run to **134** characters (two joined parts of 67);
+  English, Spanish and Portuguese stay inside the cheap encoding at 160 and one
+  segment, and every other template in every script stays at 70. Twelve new drafts
+  (3 reminders × zh-CN, zh-HK, ru, ar), in the words the screens already use for a
+  visit (预约, 到訪, визит, زيارة). They fit with the longest link (36), a clipped
+  address (34) and a ten-character time with at least eight characters to spare —
+  tested at the budgets rather than at a typical address — and the dispatcher and
+  the config renderer agree on all of them (the parity test caught the dispatcher
+  when I broke it on purpose).
+- **The twelve carry Will's approval to learn from** (D-430), on the strength of his
+  word that these readers get the reminder in their own language. They are
+  machine-drafted and nobody who reads those languages has seen them; emptying a
+  `reviewedBy` sends that one back to English.
+- **The registration.** `docs/sms-campaign-samples.md` now says it: the campaign
+  description (rewritten to 1,018 of 1,024 characters, so it dropped "low
+  throughput" and why Pam uses a code instead of a password to make room), the
+  seven languages, the two-segment exception, a sample of the reminder in each added
+  language, and the checklist row. **Filing it with the carrier is Will's step** — the
+  form is his account and his brand — and it has to come before `dispatch-sms` is
+  redeployed.
+- **Not changed.** Nothing is deployed: the live `dispatch-sms` is still v15 (English
+  and Spanish, "PAM:"). Nothing queues these reminders yet; the cost is two segments
+  each only once something does, and only for readers of three scripts.
+
+### D-434 — The text-fit baseline: what was looked at, what was fixed, what is left
+
+**Date:** 2026-10-09. Will asked for "the full text-fit audit (fills the fit check's
+accepted list)". The `PAM Language fit` check fails only on a defect that is **new in
+a language and not already looked at**; until now nothing had been written down as
+looked at, so its first run would have failed on the whole backlog.
+
+- **The audit.** Every story (469) in all seven languages and the pseudo-language at
+  320px: 3,752 measurements, none that could not be measured. **137 defects were new
+  in a language** (English's own 159 are the design's and are not counted): 35 in real
+  languages (Spanish 9, Portuguese 10, Russian 8, Traditional Chinese 4, Simplified
+  Chinese 2, Arabic 2) and 102 in the pseudo-language, which is English made about 45%
+  longer and padded, longer than any real one.
+- **Looked at, each in a screenshot.** None of the 35 in real languages is a text cut
+  off on a screen that should have shown it. They are: the Trips drawer and the folded
+  Home week scrolling or fading by design (the detector sees text "partly hidden"); a
+  conversation row's program line, and a Shared-things title, kept to one line with an
+  ellipsis by design (the title slides to show its end, D-407); a thread scrolling
+  under its opaque header; an area chip ending a long address in an ellipsis. The 119
+  that are recorded (some repeat) are in `apps/web/scripts/fit-known.json`, each with
+  the reason and the date.
+- **One real fault, fixed.** In the pseudo-language, nine screens scrolled sideways:
+  the invisible compact title in the header (`LargeTitleHeader`) sat beside the three
+  buttons, did not shrink, and pushed the buttons 12px past the edge. It now shortens
+  with an ellipsis when it must (`minWidth: 0`, one line); where it fits, nothing moves. Nine screens down to one in the pseudo-language; English is unchanged
+  (159 before and after).
+- **Left, and why.** (1) **The tab bar:** five one-word labels share 320px and a tab
+  does not shrink below its longest word, so a language with longer words than
+  Russian's runs off the edge (Russian already fills the bar). I tried the obvious fix
+  (equal tabs that wrap) and it **broke** Russian, Portuguese and Spanish words
+  mid-word, so I did not ship it; tabs sized by their content (`flex: 1 1 auto`,
+  `min-width: 0`) fit all seven languages and wrap the pseudo-language, but move the
+  English tabs a few pixels. It is Will's design, so it is on the before-launch list
+  as his call. (2) **The About segments** never break a word (D-422), so a long word
+  overflows; fine in all seven. (3) **Arabic and interpolated values:** an English
+  address in an Arabic sentence is reordered (the number jumps); found because the
+  audit flagged it, but it is a bidi fault, not a fit one, and is a separate task.
+- **What this baseline does not prove.** It was made in this sandbox. The workflow
+  runs on GitHub's Ubuntu runner with its own fonts, so its first run may list a
+  Chinese or Arabic defect that is not here; each is looked at the same way and added.
+  *(First run, 9 October: it reported 99 and 97 were already known; the other two
+  were the Russian and Simplified Chinese twins of one Arabic entry, the shared-files
+  title against the "You" column. Added; 121 entries. It took 55 of its 60 minutes,
+  so the job's limit is now 90.)*
+  Entries for the pseudo-language mean "worse than any real language", not "fine":
+  they matter on the day a language with longer words is added.
+
+### D-439 — An address can be copied, or opened in Google Maps or Apple Maps, from the place and program pages
+
+**Date:** 2026-10-09. Will, on my finding that an English street address inside an
+Arabic sentence is reordered: "Let's ensure the address listed is easily copied into
+google maps or apple maps to help them navigate."
+
+- **What a person gets.** On the address card of a place or a program: a **small copy
+  button** at the card's corner, and **the address itself as a link** that opens a drawer
+  with **Google Maps** and **Apple Maps**, each an app symbol in a square frame, in full
+  colour, with its name (Will, 9 October: "the CTA just says Open in… then a drawer pops
+  up"; 10 October: "instead of the Open in… button, let's make the address a hyperlink that
+  opens drawer" — so there is no separate line under the address). The address is
+  underlined and in the accent colour, always (a touch screen has no hover to say it can be
+  tapped), wraps like the plain address it replaces and keeps its own reading order in
+  Arabic; its spoken name is "123 Main St. Open in…" and it is marked as opening a dialog.
+  Where there is no map link to give, it is plain, selectable words again. Copy is the one
+  that reaches every other app (Waze, a ride app, a paper note); the drawer is for
+  everyone who wants to tap and go. "Get directions" (Google) is still the page's
+  primary button where it is shown.
+- **In-card copy actions are 32px, with no ring (Will, same day: "much smaller, 32px
+  touch target… this applies to in-card copy actions… no grey border in the circle when
+  inside a card").** `CopyButton placement="inCard"`: a 32px target, an 18px glyph,
+  nothing round it; its tick and "Address copied" tooltip (five seconds) are unchanged.
+  The page-level copy button stays the 48px circle with a thin edge (D-417). This is a
+  deliberate exception to the 48px touch-target rule (§2.5) for this one kind of control;
+  it is still above the 24px WCAG 2.2 minimum that axe checks.
+- **The two app symbols are Will's artwork** (10 October: the Google Maps pin "light gray
+  background", and Apple's icon "crop to match the roundness, so no gray peeks from bg, and
+  have the corner radius be consistent across both icons"). Two 192px squares in
+  `public/maps/`, listed in Foundations › Imagery; `MapAppIcons.tsx` draws both at 1em with
+  **one radius, 22%** (`MAP_APP_ICON_RADIUS`). Google's pin is centred on `#f1f3f4`; Apple's
+  icon is cropped 5% in so its own corners and edge glow fall outside the frame (found by
+  testing each crop for a fully opaque picture under the rounded frame). They are third
+  parties' marks, used only to say which app a link opens.
+- **The drawer, as Will refined it (10 October: "icon based items… should not have left
+  padding, so it's flush with header and page layout… make Open in much smaller… tiny
+  subtitles under App name saying 'Opens in app'… if no app installed, redirect to app
+  store, based on their device").** The rows are **flush**: no padding before the app
+  symbol or after the chevron (`MenuList isFlush`), so the symbols line up with the title
+  and the sheet's own margin. The title is a quiet 15px label, not a 22px heading (it is
+  still a level-2 heading for a screen reader). Under each app's name is a 14px line,
+  **"Opens in app"** (`place.address.opensInApp`).
+- **Getting to the app, or the store (`mapsLaunch.ts`).** A web page cannot ask a phone
+  whether an app is installed, so each platform gets the way that is reliable for it.
+  **Android, Google Maps:** an `intent://` link with the Play Store as its fallback —
+  the browser opens the app, or the store, with no script. **iPhone and iPad, Google
+  Maps:** Google's `comgooglemaps://` address is tried; if the page is still in front 2
+  seconds later (and was never hidden or blurred) the App Store page opens instead. **iPhone
+  and iPad, Apple Maps:** Apple's own link; Maps comes with the phone, so there is no
+  store to send anyone to. **Android, Apple Maps: no row** — Apple has no Android app,
+  and a row that opened a web page under "Opens in app" would be untrue (to show it
+  anyway is one line in `mapsLaunchFor`). **A computer:** each map's web page, in a new
+  tab. The platform is read in the browser after the page loads (an iPad that calls itself
+  a Mac is told by its touch screen), so the first paint is the computer's.
+  "Opens in app" shows on every device; on a computer the link opens the web version.
+  **Not tested on a real phone** — see before-launch: the iPhone try-then-store path in
+  particular depends on how Safari treats an app address, and the store addresses
+  (Google Maps `id585027354`, package `com.google.android.apps.maps`) were written from
+  memory.
+- **Same door in both.** `appleMapsHref` follows `directionsHref`: coordinates beat the
+  address when Pam has them (a stale address routes to the wrong building), the address
+  otherwise, nothing when there is nothing. A picked service has its own address and no
+  point of its own, so it sends both apps to the address. On an iPhone or Mac the link
+  opens the Maps app; elsewhere Apple's page in the browser. No travel mode, so Maps
+  picks what the person last used.
+- **What is copied is exactly the address**, as written: no hidden direction marks. The
+  *display* is what is isolated (`unicode-bidi: plaintext`): in Arabic the address keeps
+  its own order, number first, instead of being reordered by the right-to-left page.
+  That fixes the address card; the same fault in other sentences that carry data (an area
+  chip's "Near {area}") is the separate task queued from the text-fit audit.
+- **Where.** The place page, the program page (member's and program lead's view), and the
+  request-a-program screen: everywhere `PlaceDetail` draws an address. Not on the sample
+  address of the empty-program preview. The texts are unchanged: a reminder already
+  carries the address and a link.
+- **Eight new strings** (`place.address.copy`, `.copied`, `.copyFailed`, `.openIn`,
+  `.openInTitle`, `.app.google`, `.app.apple`, `.opensInApp`) in seven languages. The six that are not
+  English are machine drafts like the rest and have no native reader yet. The app names
+  are the ones a phone in that language shows (Google 地图, Google Карты, خرائط Google).
+- **Checked.** `appleMapsHref` (address, coordinates, nothing); the card with and without
+  the actions; the exact clipboard text; the refusal message; axe on the new controls.
+  The drawer opens with both apps, with one, and with none (no link). Storybook: *PlaceDetail* (every language) and *ArabicAddress*. The browser run (contrast,
+  target size) is CI's.
+- **Not done.** The Trips visit cards and booking confirmation show the place's name, not
+  its address, so they have nothing to copy; if Will wants an address there it is the same
+  card. Google Maps itself still only has the one link.
+
+### D-440 — A place has one layout: the profile, with its one button pinned to the foot
+
+**Date:** 2026-10-10. Will, shown a Storybook story that drew a place as labelled rows
+(Call this place, Their website, Save, Share, Something is wrong here) under a big button:
+"Please retire the rows layout, only use place profiles with sticky footer buttons."
+This amends D-224 and D-291, and finishes what D-326 began for the footer.
+
+- **What a place is now.** Its name and who it is for, then **a list of ways to reach it**
+  (`quickActions`: directions, a message, call, website — each a row with a line under it),
+  the address card (copy, Open in…, D-439), the hours (a row, the week in a drawer, D-309),
+  and the description. **One primary button, in the sticky footer** (`Page footer`, D-326):
+  *Plan a trip* for a member who has not booked, otherwise *How to get there*; nothing once
+  a visit is booked, because the row of ways to reach it carries directions. Save, Share and
+  Flag stay in the bar above the title and its ⋯ menu, as they have since D-237.
+- **Gone from `PlaceDetail`:** the fallback layout of labelled rows and everything only it
+  used — the props `phone`, `website`, `directionsHref`, `isSaved`, `onSave`, `onCall`,
+  `onShare`, `flagHref`, the labels `directions`, `call`, `website`, `save`, `saved`,
+  `share`, `flag`, and the in-page directions button. The live place and program pages
+  already used the profile; the rows survived in Storybook (the story Will saw), the
+  components gallery and the program-request screen.
+- **Directions are said once.** Where the footer's button is directions, the *Get
+  directions* row is left out of the list rather than repeated above it.
+- **The program-request screen** (`RequestProgramScreen`) now has the profile's list too:
+  directions to the address typed, a call, the website, instead of the rows.
+- **Not changed.** Every string stays (the footer and rows reuse `place.directions`,
+  `place.quick.*`); the trip, flag and save flows are as they were.
+- **Checked.** Typecheck; the `@pam/ui` suite (the address card and drawer, axe on a profile
+  with quick actions); Storybook builds and *PlaceDetail* shows the list and the footer
+  button; the place and flag browser specs.
+
+### D-444 — Super admin screens on the latest templates: an invite is a page, a request is a page, and unused layouts are gone
+
+**Date:** 2026-10-10. Will: "If there are any other layouts not being used, please remove
+it. Or if any in super admin not using our latest templates, please replace and update. I
+know Super admins still use the old invite method with buttons for inviting them in
+profiles or something, we should use the nested page method like we use in staff programs
+accounts." (Found by reading every route a super admin reaches; the audit's evidence for
+each removal is the grep that came back empty.)
+
+- **Inviting is one page per kind (`/invite/new/?role=member|provider|admin`).** Invite
+  someone (`/invite/`) is a list of three rows that are links, the way Add a person
+  (`/program/book/`) leads to `/program/book/new/`: no form swapped in beneath it, Back goes
+  one step. The page's title says which kind; it asks their first name and mobile number
+  (D-373) and then shows the link to send (D-254). A kind this person may not make (a program
+  inviting a case manager) goes back to the list.
+  The same day, the staff-email work (D-441) made the form "a page of its own" by swapping it
+  in place on `/invite/`; merged together, the route won — Back is one step in history, the
+  page has an address a link or a story can reach, and `/invite/` stays a plain list. The
+  form itself (name, number, and for staff a required email) is D-441's, unchanged.
+- **A super admin could not make an invite from Profile.** `create_invite` needs a city for
+  a super admin, who has none of their own (0077); Profile › Invite someone and Invited
+  people › + New invite never sent one, so each answered "We could not make a code". Only
+  the card on Everyone asked for a city, so it looked like it worked. Storybook's mock
+  always succeeds and hid it. The new page asks for the city — nothing to pick with one
+  city, a list with several, and "Pick a city first." before anything is sent — and a
+  browser test (`e2e/invite.spec.ts`) checks the city travels in the request.
+- **Everyone lost its card of invite buttons.** Two rows replace it and the bare link:
+  **Invite someone** and **Requests**, both pages. It is the only place a super admin on the
+  live app (which has no Profile tab yet) reaches either.
+- **A request is a page.** Requests (Home for a super admin, and `/requests/`) is a list of
+  rows — name, "Wants to be a program lead · Typed: city · Asked Oct 8" — not a card per
+  person with three buttons and a city picker above the lot. A row opens
+  `/requests/review/?id=`: who asked, the program they described, a row to text them, the
+  city (only when there are several), and **Approve** (primary) with **Deny** beside it
+  pinned to the foot of the screen, as on every profile (D-440). Deciding goes back to the
+  list. The city moved from "one per sitting" to one per request: the old reasoning was
+  that a super admin reviewing several is reviewing them for one city, which a default of
+  the only city already covers.
+- **Lists of rows are flush with the page.** `MenuList` rows no longer carry Astryx's own
+  padding before the icon and after the chevron (Will, 10 October: "icon based items …
+  should not have left padding, so it's flush with header and page layout"), so icons line
+  up with the title above and the page margin. `isInset` keeps the padding for the three
+  lists inside a card and the floating action's dock. This changes every list of rows in
+  the app.
+- **Removed, because nothing draws them.** `ProgramEmptyView` (the "approved mockup, not in
+  use", D-352/D-363) and its 7 strings; `PersonCard`, `StepHeader`, `CameraIcon`, `PlanIcon`
+  (only the components gallery drew them); `LargeTitleHeader`'s inline-accessory layout
+  (D-320, replaced by D-355); `SubPage`'s `gap`/`heroGap` and the hero offsets for gaps 2
+  and 3, `Page`'s gaps 0–2 (every caller passes 3 or 4); `PlaceDetail`'s in-page hours card
+  (only drawn when no list of ways to reach the place was passed, and every caller passes
+  one), its own heading and its distance line; the dead exports `useDemoRole`,
+  `readServices`, `categoryTone`; and 13 invite strings nothing reads (`directory.invite.
+  admin|member|provider|title`, `admin.invite.action|copied|copy|expires|ready|title`,
+  `invite.ready.member|program`, `invite.link.copy`).
+- **Kept, deliberately.** `VoiceInput`: nothing uses it yet, but it is the voice half of §0's
+  "voice and tap" and has its own behaviour test; Will decides. **The older screens with
+  `AppHeader` and `PageTitle`** — `/`, `/places/`, `/saved/`, `/messages/`, `/account/`,
+  `/interested/`, `/admin/` — are the live app: the tab shell is drawn only in Storybook
+  (STATUS), and they hold what the redesign does not yet carry (the Reported places and
+  Reported messages review, a case manager's caseload). They go together once the shell is
+  mounted and those are re-homed. `/admin/` still makes invites in place for the same reason.
+- **Also.** A super admin no longer sees the member's "Get text reminders" promotion on
+  Profile (its link treated them as a member).
+- **Decided (Will, 10 October: "You decide").** The header's role-preview chip **stays** on the
+  screens that have it, beside See the app as: D-217 says both — the full list is a Profile row
+  and a page, and "a super admin's role switch rides in the template's action slot wherever
+  the old header carried it" — so one is the quick switch while looking at a screen and the
+  other is the place to choose. `ViewAsView`'s comment only described where the list moved to.
+  `CLAUDE.md`'s line about `SubPage variant="compact"` for a conversation (gone since D-411)
+  is corrected.
+- **Checked.** Typecheck; unit suites (`@pam/ui` 102, `@pam/web` 48, `@pam/config` 764); the
+  browser suite on all three viewports, including `invite.spec.ts` (the city travels; a case
+  manager is never asked for one; a program cannot invite a case manager; Approve carries
+  the city, Deny none; both pages have no axe violations); Storybook shows *Super admin ›
+  Screens* (Invite someone, A link for a member, A request to review, Requests, Everyone).
 
 ### D-429 — Privacy changes go out by email; a refused New message says the account is limited; the unused key goes; the flow map shows the limited states
 
@@ -11563,6 +11895,114 @@ highest number claimed anywhere was D-440. Every reference on this branch moved 
 Lesson, again: fetch and read every `origin/claude/*` allocations row *and* DECISIONS
 heading list before claiming, not only the one file on your own branch.
 
+
+### D-435 — A value written into an Arabic sentence is laid out as a piece of its own
+
+**Date:** 2026-10-09. Found by the text-fit audit of that day (D-422): in
+Arabic, `places.near` ("بالقرب من {area}") with the address `1231 N Broad St,
+North Philadelphia` read, on screen, `… St, North Philadelphia 1231 بالقرب من`.
+The browser lays a line of mixed-direction text out as one stream, so the
+number jumped beside the Arabic words and the rest of the address went to the
+far side. Asked for by Will; **numbered D-435 — I took D-434 first (16:54 UTC)
+and `claude/gallant-clarke-0dhizj` took it at 17:13, so I moved rather than touch
+their branch** (`docs/allocations.md`).
+
+**What it is.** `fillTemplate(template, vars, dir)` (`packages/config/src/i18n.ts`)
+takes the direction of the language; when it is `rtl` — Arabic today — each
+**text** value is wrapped in U+2068 FIRST STRONG ISOLATE … U+2069 POP
+DIRECTIONAL ISOLATE (`isolate`). The value is then laid out on its own, in
+whichever direction its own first letter reads, and placed in the sentence as one
+piece. In every left-to-right language the result is byte for byte what it was
+(`test/isolates.test.ts` proves it against a copy of the old function, over every
+template in all six bundles and nine kinds of value). The React `t` passes the
+active direction; **`tPlain`**, new beside it, is the same lookup with nothing
+added, in every language.
+
+**Decisions a later session could question:**
+
+- **Text is wrapped; numbers are not.** A number has no direction of its own to
+  disagree with the sentence, so it is never reordered, and wrapping it changes
+  how the punctuation beside it resolves (`{a}/{b}`, `{n}%`) for nothing gained.
+  165 of Arabic's 304 templates have a `{count}`, so this also keeps
+  hundreds of strings free of invisible characters. A number passed *as a string*
+  ("1,5", a formatted distance; the story helper does it) is text, and is wrapped,
+  which is harmless and does help a phone number or a date. Reverse it by
+  changing one condition in `fillTemplate`.
+- **An empty value stays empty** (an optional piece leaves no trace), and **a value
+  cannot close or leave open an isolate of its own**: a stray close in a pasted
+  name would pair with ours and release the rest of the sentence, so isolates in a
+  value are balanced first. A balanced isolate inside a value (a sentence built
+  from another `t`) is kept.
+- **Only drawn text is isolated.** The invisible characters are in the string, so
+  anything read by something other than an eye must not carry them. Switched to
+  `tPlain`, each one found by scanning every story in Arabic rather than by
+  reading call sites: **accessible names** (`aria-label` on icon buttons, cards,
+  the role switch, sheets, the bell, back buttons, star toggles), **`alt`** on
+  photos, **text only a screen reader reads** (`VisuallyHidden`: who sent a message
+  and when; who sent a file; the progress bar's label), and **the text handed to a
+  share sheet** (the invite link, "bring a friend"). Left on `t`: everything drawn,
+  including dialog titles, menu-item labels, a `title` tooltip (it is drawn on
+  hover) and the on-screen preview of the text message Pam sends
+  (`trips.booked.sms`; the real text is rendered elsewhere). The nested case is the
+  one to remember: `places.changeArea` was built from the visible `near`, which
+  would have put isolates inside an `aria-label`; it is now built from plain pieces
+  all the way down.
+- **A backstop where text leaves the app.** `shareText` and `copyLink`
+  (`@pam/ui`) strip U+2068/U+2069 whoever built the string, so a link in a share
+  sheet never has a character stuck to it.
+- **Texts and emails are untouched by construction** — they fill their own
+  templates (`renderSms`, `render.ts` of the dispatcher, `renderInviteEmail`) and
+  never call `fillTemplate`; `test/isolates.test.ts` renders every SMS template
+  and the Arabic invite email with an English street and name and finds none.
+  Left alone, noticed: in an Arabic email the inviter's name, when English and
+  more than one word, has the same problem, and the fix there is an HTML `<bdi>`
+  (not an invisible character); Arabic email is not signed off or sent, so it
+  waits.
+- **The area chip gives the value its own box** (`splitIsolated`, `AreaChip`). The
+  isolate fixes the *order*, but a line too long for the chip is cut at its edge,
+  which in a right-to-left line is the left — and the left of an English address
+  is its street number ("…road St, North Philadelphia"). So when the label has a
+  value in it, the words keep their width and the value takes the rest and ends
+  in its own ellipsis: the end of the address is what is lost, as in English. A
+  label with no isolates (every other language) is drawn as it was; the English
+  screenshot is byte-identical. Other one-line rows still cut at the left edge,
+  which in Arabic is the end of the sentence; I did not change them.
+- **A guard in the fit audit.** `audit:fit` has a sixth detector, `isolate`: an
+  isolate in an `aria-*` attribute, `alt`, or visually-hidden text. English has
+  none, so any hit is "new in a language" and fails the run; `ar` is in the CI
+  job. `title` and `placeholder` are drawn, so they are not looked at. Before the
+  call sites were fixed it found **240** (143 `aria-label`, 92 hidden text, 4
+  `alt`, one tooltip, which it no longer looks at); it finds 0 now, across 470 stories.
+
+**What it changed on screen** (320px, Arabic stories diffed before/after: 74 have
+a value on screen; 58 are pixel-identical, 5 differed only because a story was
+still loading and are identical on a calm re-capture, 11 differ). Seven of the
+eleven change the order words are drawn in, each for the better: the address above
+reads in order and loses its end, not its number; "آخر استخدام لـ Pam: 9 أكتوبر"
+had its `9` thrown before "Pam:", away from its month; the policy counts
+("توقيعات Jordan: 4 من 4"), "المتبقي للوصول إلى Builder: 350" and the full stop at
+the end of an English message in a preview had the same fault. The other four draw
+the same order a pixel or two apart. None got worse. The order was measured from
+where each character was drawn, not read off a screenshot. The audit's layout
+defects for Arabic are 153 before and 153 after; the one difference is the area
+chip's long address, whose `spill` (text running 4px past its button) is gone and
+whose designed ellipsis moved onto the address's own box.
+
+**What I could not judge, and a native Arabic reader must.** Nobody who reads
+Arabic has seen any of this. In particular: where a colon or full stop lands
+beside an English word (`:Pam`, `then.`) — correct by the bidi rules, and it is
+what a native reader should confirm looks right; whether an English value in the
+middle of a sentence should be isolated at all or read better flowing with it;
+and **how a screen reader speaks any of it** — none (VoiceOver, TalkBack, NVDA,
+JAWS) was run here, which is exactly why isolates are kept out of every
+accessible name instead of being trusted to be ignored.
+
+**Alternatives, and why not.** `<bdi>` around each value needs a React node at
+every call site, and `t` returns a string. CSS `unicode-bidi: isolate` isolates a
+whole element, not a part of a string. Stripping isolates inside each
+`aria-label` component would be about forty places and no single one to test.
+Wrapping numbers: above.
+
 ### D-433 — A public website: its own app, the app's own design system, Home and Support
 
 **Date:** 2026-10-09. Will: "Create a public facing website for PAM using our
@@ -11687,4 +12127,3 @@ create new posts on my behalf."
   square taken from the middle — cut the wordmark in half. **Redrawn:** the logo,
   tagline and line sit in a centred 630×630 green panel, so any square crop is
   that panel, and the illustration is only the frame either side.
-
