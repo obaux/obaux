@@ -2,7 +2,7 @@
 
 import { useEffect, type ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
-import { AppHeader, Loading, Notice, Page } from '@pam/ui';
+import { AppHeader, HelpBar, Loading, Notice, Page } from '@pam/ui';
 import { NOTICES } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { useSession } from '@/lib/useSession';
@@ -20,8 +20,10 @@ import { NotIn } from './NotIn';
  * and a sixth tab cannot forget one:
  *
  * - **Loading**: the screen's frame and the way to get help, never a bare
- *   "loading" (§0: a dying connection shows this state, and it must not be a
- *   dead end).
+ *   "loading" (§0: a dying connection, or no JavaScript at all, shows this
+ *   state, and it must not be a dead end). Every state here that is not the
+ *   screen carries the Help bar, as the old Home did; the first version of
+ *   this gate left it out and `e2e/a11y.spec.ts` caught it.
  * - **Signed out**: straight to Sign in, as the old Home did (Will, 17
  *   September: "kill this screen... just go straight to login screen").
  * - **No profile / paused**: what `NotIn` says for each, never a redirect.
@@ -42,6 +44,7 @@ export function TabGate({ children }: { readonly children: ReactNode }) {
       <Page gap={3}>
         <AppHeader />
         <Loading label={t('common.loading')} variant="screen" />
+        <HelpBar label={t('nav.help')} variant="block" />
       </Page>
     );
   }
@@ -51,6 +54,7 @@ export function TabGate({ children }: { readonly children: ReactNode }) {
       <Page gap={4}>
         <AppHeader />
         <NotIn status={session.status} title={t('directory.signedOut.title')} body={t('reminders.signedOut')} />
+        <HelpBar label={t('nav.help')} variant="block" />
       </Page>
     );
   }
@@ -67,6 +71,7 @@ export function TabGate({ children }: { readonly children: ReactNode }) {
           supportPhone={supportPhone}
           callLabel={t('help.callSupport')}
         />
+        <HelpBar label={t('nav.help')} variant="block" />
       </Page>
     );
   }
