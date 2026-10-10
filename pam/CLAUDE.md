@@ -10,6 +10,19 @@ help?**
 
 ---
 
+## You are one session on a team
+
+Will runs several sessions on Pam at once, each a specialist in one lane, and one
+of them — **the merge desk** (`session_018wn7LF7RMsHnXSAzvk6s1p`) — runs the team.
+Before anything else, read **`docs/team.md`** (who does what, and how you report)
+and **`docs/lanes.md`** (the lanes, numbers, records and the board). In short:
+
+- Only the merge desk pushes to `main`, merges or closes a pull request, changes the
+  live project or cuts a release. You build on your own branch, in your own lane.
+- Report to the merge desk with `send_message`: STARTED when you begin, QUESTION,
+  BLOCKED, FINDING or MIGRATION as they come up, READY or DONE when you stop.
+- Jobs come from Will — in your chat, or relayed by the merge desk quoting him.
+
 ## Start every session by reading the record
 
 **Before writing any code, read, in this order:**

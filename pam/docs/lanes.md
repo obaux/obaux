@@ -19,6 +19,8 @@ The short version:
    a migration and the app never have to ship in the same minute.
 6. **One merge desk.** Merging to main, applying to the live project and cutting
    a release are done by one session, in the order Will says.
+7. **Everyone reports to the merge desk.** STARTED, QUESTION, BLOCKED, FINDING,
+   MIGRATION, READY, DONE — how and when is in `docs/team.md`.
 
 ## The lanes
 
@@ -72,20 +74,22 @@ after the languages and Arabic merges went in with the fit check unread.)
    name starts with your lane, then the decisions the job touches.
 4. Name the session **`PAM · <Lane> · <job>`** (for example *PAM · Accounts &
    invites · staff email*), so the list of sessions reads as the list of lanes.
+5. Send the merge desk a **STARTED** note (`docs/team.md`).
 
 ### Finishing a session
 
 1. `git merge origin/main`, run the checks (`CLAUDE.md`, "Verify, don't assume"),
    push.
-2. Write the records as files (below). Edit only **your lane's section** of
-   `STATUS.md`; never reformat or reorder the rest.
+2. Write the records as files (below). In `STATUS.md` write only **your job's own
+   section** (`docs/team.md`, "Your part of STATUS.md"); never reformat or reorder
+   the rest.
 3. Tell Will it is ready, in one line: what it is, whether a migration has to be
-   applied first, and which lane's branches it touches. Send the same line to the
-   merge desk (`send_message` to `session_018wn7LF7RMsHnXSAzvk6s1p`) with the
-   branch, its head commit and each check's result. From then the branch is
-   frozen: a later push needs a new note with the new head. Merge desk merges, in
-   the order Will says. After a merge, every other open branch merges main, and
-   the merged branch takes no more work; the next job starts a new branch.
+   applied first, and which lane's branches it touches. Send the merge desk a
+   **READY** note (`send_message` to `session_018wn7LF7RMsHnXSAzvk6s1p`; what it
+   carries is in `docs/team.md`). From then the branch is frozen: a later push
+   needs a new READY with the new head. Merge desk merges, in the order Will says.
+   After a merge, every other open branch merges main, and the merged branch takes
+   no more work; the next job starts a new branch.
 
 ### How long a branch lives
 
@@ -140,7 +144,7 @@ real date, fails the numbering test.
 | A changelog entry | its own file in `docs/changelog/unreleased/`, no version number | nobody; the **merge desk** runs `pnpm records:release <version>` to fold them into `CHANGELOG.md` and chooses the version |
 | A session log | its own file in `docs/sessions/` | nobody |
 | An SOP amendment | its own file in `docs/amendments/` | nobody |
-| `STATUS.md` | one section per lane | only that lane's session edits its section |
+| `STATUS.md` | one section per job, `## <Lane> · <job> (<date>)` | only that job's session edits it; the shared tables (what is live, what is proven, what needs a human) are the merge desk's, filled from READY notes |
 | Locale files and `ledger.json` | shared by every lane that changes words | merge main first; `pnpm --filter @pam/config copy:status` shows what is stale |
 | `docs/user-flows/flows.mjs` | one node per screen | add or change only your screen's node |
 
@@ -170,20 +174,21 @@ folder (`CLAUDE.md`), commit the file in the same session, and run
 `get_advisors` after. The connector hangs on `DROP` statements (D-387); a
 migration that needs one puts it alone so the rest can be applied without it.
 
-## Where the sessions stand (a snapshot — the merge desk keeps it)
+## The board: where the sessions stand (the merge desk keeps it)
 
-As of 10 October 2026, after the Arabic merge, by the title each session has in Claude's
-session list. After a merge, every open branch below merges `main`.
+As of 10 October 2026, 06:00 UTC. A session's id is where `send_message` reaches it;
+every session reports to the merge desk (`docs/team.md`). After a merge, every open
+branch below merges `main`.
 
-| Session | Branch | Lane | Where it stands |
-|---|---|---|---|
-| PAM · Merge desk (Agent 1) | merges are made from `main`; its old branch `claude/pam-storybook` takes no new work | Merge desk & platform | merged the languages branch and Arabic, 10 October |
-| PAM Agent 2 | `main` (idle since 8 October) | Merge desk & platform | retire — its work moved to the merge desk |
-| PAM · Accounts & invites · staff email, audit log, branch system | `claude/affectionate-goldberg-tvu4sz` | Accounts & invites (+ the lanes tooling, which is platform) | on `main` through `16cd437`; the points-history migration (D-445) waits on Will's word |
-| PAM · Accounts & invites · assign and limit | `claude/pam-assign-and-limit` | Accounts & invites | building |
-| PAM · Languages · seven languages (place profile work to move) | `claude/gallant-clarke-0dhizj` | Languages & legal, and Places & programs (the place profile and maps drawer) | merged to `main` 10 October (PR #30, through `d0b05a9`) |
-| PAM · Languages · Arabic | `claude/amazing-archimedes-qvgnt2` | Languages & legal | merged to `main` 10 October (D-435) |
-| PAM · Website | `claude/compassionate-bohr-mzrchf` | Public website | waits on Will: put the site on `main`, or not yet |
-| PAM · Messages & notifications | none yet (from `main` at `16cd437`) | Messages & notifications | waits on Will's answer; merges `main` before its first change |
-| PAM · Places & programs | none yet (from `main` at `16cd437`) | Places & programs | told to merge `main` once Arabic lands (the place profile and maps drawer are there now); `0052` is live since 20 September, nothing held |
-| PAM · Design system & Storybook · Chromatic live, baseline | `claude/pam-design-chromatic-live` | Design system & Storybook | Chromatic live and the fit baseline measured on `16cd437`; next, the AreaChip long-address job, after Arabic lands |
+| Session | Id | Branch | Where it stands | Waiting on |
+|---|---|---|---|---|
+| PAM · Merge desk (Agent 1) | `session_018wn7LF7RMsHnXSAzvk6s1p` | works from `main` | merged languages and Arabic (10 October); set up this page and `docs/team.md` | — |
+| PAM · Accounts & invites · assign and limit | `session_01NPHYiBRyyv8F5L7o9KaMEd` | `claude/pam-assign-and-limit` (9 ahead) | guide assignment and limits built; two migrations on the branch (`20261010034711_…`, `20261010034713_…`) | Will: apply them; then READY |
+| PAM · Accounts & invites · staff email, audit log, branch system | `session_01SJKnwmNUb3uvgDhakVYTZo` | `claude/affectionate-goldberg-tvu4sz` (2 ahead, 33 behind) | job merged; one migration left on the branch (D-445, `20261010033917_points_history_is_deleted_with_the_member`) | Will: apply D-445; archive PAM Agent 2 or not |
+| PAM · Messages & notifications | `session_01CCHvVkYgXddhtq4DHvvETo` | none yet | not started | Will: SMS and translation — build only, or deploy too |
+| PAM · Places & programs | `session_01RmG6J2CCikoqM9H2fhbSPm` | `claude/places-programs-load-own-program` (3 ahead) | a program lead submits their own program (D-447); one migration ready, a second one planned | Will: how to build on `review_staff_request` (0085 is not live) |
+| PAM · Languages & legal · seven languages | `session_01Hjv2RQuz5PJmxQ7tLGb5sW` | none (its branch is merged) | idle | a next job from Will |
+| PAM · Languages & legal · Arabic | `session_01A44BM2WPMuZYKkspxsiQEG` | none (its branch is merged) | idle; native and screen-reader review still open (`STATUS.md`) | a next job from Will |
+| PAM · Design system & Storybook · area chip, fit audit | `session_01A3kdir46ErR2eyjDLFdzyW` | `claude/pam-design-areachip-long-address` (4 ahead) | fit-audit fix on the branch (D-448), not yet READY | Will: D-448; then READY |
+| PAM · Website | `session_012vS6F7CMTwFn3u5UG66JWz` | `claude/compassionate-bohr-mzrchf` (11 ahead) | site built; a draft post added | Will: the draft post; put the site on `main` or not yet |
+| PAM Agent 2 | `session_01NoLKA8RJRwhyDJUe8CAZVE` | — | idle since 8 October; its work moved to the merge desk; not messaged | Will: archive |
