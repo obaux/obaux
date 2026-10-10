@@ -1058,9 +1058,10 @@ Merged to `main` by the merge desk, 10 October. Two migrations, **both applied t
 10 October** and read back: `20261010071947_…` (a stored STOP
 cannot be cleared from the app: a person could clear their own at the API) and `20261010072848_…`
 (the claim texts a reminder only to somebody who agreed). Text alerts offers switches only for what
-is sent; the four alert texts are drafts, unsigned. A STOP shows as "Texts are off". Nothing records
-a STOP yet (no Twilio receiver) and nothing queues the appointment reminders, the check-in or
-"someone wants to connect". Samples file: nine texts. D-453.
+is sent; the four alert texts are signed by Will (D-461). A STOP shows as "Texts are off". A STOP is
+recorded once `sms-inbound` is deployed (D-460); nothing queues the check-in or "someone wants to
+connect" yet. Samples file: nine texts. D-453. Text reminders' staff list (merged 10 October) names
+only the alert texts Will signed: no "introduced to your program", no "your account changes".
 
 ## Design system & Storybook · language tag (10 October)
 
