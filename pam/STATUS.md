@@ -947,13 +947,14 @@ Branch `claude/lena-english-language-tags`. Two jobs from Will via Mira (D-455, 
   sees everything you send them directly, nothing you send to anyone else, and one message if someone
   reports it. Seven languages; `legal.test.ts` pins the wording. The contract is unchanged. The six
   translations are Claude's and are promises: they still need a native reader (`before-launch.md`).
-- **Verified:** `@pam/config` 815, `@pam/ui` 117, `@pam/web` 55 unit tests; typecheck; Storybook builds; the
-  browser suite on all three viewports, 900 passed; the full fit audit (480 stories × en, ru, ar, zh-CN,
-  pseudo): 85 new in a language, 81 accepted, 4 not accepted, all Explore's pseudo-language clamps (see the
-  session log).
-- **Not done:** hearing the tags with a screen reader (before-launch); `transparency.canSee.lastActive` and
-  "You can block anyone" are promises Pam does not keep yet (the first is a wording fix, the second waits
-  on Will: build the Block control or change the words).
+- **Verified:** unit tests (`@pam/config` 986, `@pam/ui` 117, `@pam/web` 61), typecheck and the copy ledger on the
+  merged tree; the browser suite on all three viewports, 903 passed (on the tree one merge before the last); the
+  full fit audit (480 stories × en, ru, ar, zh-CN, pseudo): 93 new in a language, 81 accepted, 12 not accepted, all in
+  two stories this job does not touch (Explore's pseudo-language clamps; the file-refused conversation's overlaps,
+  which come and go between runs). See the session log.
+- **Not done:** hearing the tags with a screen reader (before-launch). Next, one small branch: the last-day line
+  (case manager only), the blocking words back in their true form (D-463), and a mail-service paragraph awaiting
+  Will's approval.
 
 ## Places & programs · save a member's trips (10 October) — merged 10 October
 

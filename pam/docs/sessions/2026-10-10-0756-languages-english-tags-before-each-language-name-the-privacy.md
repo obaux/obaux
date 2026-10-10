@@ -57,39 +57,42 @@ Will said: it becomes true for texts once the carrier filing is done.
 
 ## Verified
 
-On head `572662c` plus this log (the chip fix, `b8c757b`, is in all of it); each long check was run again after the
-chip fix and the `OptionTag` export, because both change how a chip is laid out.
+The long checks were run on the tree at `9873c5c` (this branch merged with `main` at `698c7cf`), after the chip fix
+and the `OptionTag` export. `main` then moved four more merges (Block, saved trips, staff text list, the database
+test numbering); I merged it (`1c01741`, one conflict, in STATUS.md, kept both) and ran the fast checks again
+rather than chase it with a fourth hour-long run. The merge desk measures the merged tree before it merges.
 
 | Check | Result |
 |---|---|
-| `@pam/config` unit tests | 815 pass (31 in `i18n.test.ts`, with the tag checks; `legal.test.ts` pins the privacy wording) |
-| `@pam/ui` unit tests | 117 pass (10 in `option-tag.test.tsx`; a chip or row with no tag draws exactly what it drew, by snapshot) |
-| `@pam/web` unit tests | 55 pass |
-| Typecheck, `@pam/web` and `@pam/ui` | clean |
-| Storybook build | completes |
-| Browser suite, all three projects (narrow 320, dark 320, iPhone SE) | 900 passed, 0 failed (10.6 minutes) |
-| New browser checks | the sign-in menu in all seven languages; the Language screen in en, ru and ar; the account settings row; the join chips on an English and on an Arabic page |
-| Fit audit, 480 stories × en, ru, ar, zh-CN, pseudo at 320px | 85 new in a language: 81 accepted, **4 not accepted**; see below |
-| Fit audit on the privacy, terms, legal and "what others can see" stories, before the chip fix | 0 defects |
+| `@pam/config` unit tests, on `1c01741` | 986 pass (the tag tests are in `i18n.test.ts`; `legal.test.ts` pins the privacy wording) |
+| `@pam/ui` unit tests, on `1c01741` | 117 pass (10 in `option-tag.test.tsx`; a chip or row with no tag draws exactly what it drew, by snapshot) |
+| `@pam/web` unit tests, on `1c01741` | 61 pass |
+| Typecheck `@pam/web`, `@pam/ui`; `copy:status`, on `1c01741` | clean; all languages in step |
+| Storybook build, on `9873c5c` | completes |
+| Browser suite, all three projects (narrow 320, dark 320, iPhone SE), on `9873c5c` | **903 passed, 0 failed** (10.5 minutes) |
+| New browser checks | the sign-in menu in all seven languages; the Language screen in en, ru and ar; the account settings row; the join chips on an English and an Arabic page |
+| Fit audit, 480 stories × en, ru, ar, zh-CN, pseudo at 320px, on `9873c5c` | 93 new in a language: 81 accepted, **12 not accepted**; see below |
 | Screenshots at 320px (light, dark, Arabic) | `docs/languages/language-tags/` |
 
-**The four not accepted** are all `pseudo clamp` on `member-created--explore` (three card descriptions and "Example
-Workforce Center", 65 > 44 and 70 > 47). They are not from this branch: a Storybook build of plain `main` at
-`5dd52b8` measured on its own gives the same four. Explore, its cards and its chips are untouched here. They are
-the four the merge desk reported as intermittent on `main`; here they were present on every run, so they are a
-property of the story in the pseudo-language, and what to do about them is the design system's and Will's
-(a line in `fit-known.json` needs a reason somebody looked at).
+**The twelve not accepted** are in two stories this branch does not touch.
+- Four `pseudo clamp` on `member-created--explore` (three card descriptions and "Example Workforce Center"). A Storybook
+  build of plain `main` at `5dd52b8` gives the same four on every run, so they are not from this branch.
+- Eight `overlap` on `member-created--conversation-file-refused` (a sender name over the first message, in ru, ar,
+  zh-CN and pseudo). The story measured alone twice in a row on this tree gave 0 defects, then 6: they come and go
+  between runs of the same code, as the merge desk found on `main`.
+Both are the merge desk's and Will's to rule on (a line in `fit-known.json` needs a reason somebody looked at); neither is a
+layout this job changed.
 
 **Not run:** hearing the tags with a screen reader; the database suite (no change in `packages/db`).
 
 ## Left undone
 
-- The four Explore pseudo-language clamps (above).
-- Two promises the merge desk found, for the next small branch: `transparency.canSee.lastActive` says a program
-  sees "the last day you used Pam" and the database does not hand it over (0062; wording fix, all seven
-  languages), and "You can block anyone, and they will not know" / "Block someone … from inside the chat" with
-  no Block control in the app (0076 is live; nothing calls it; and the blocked person's screen can learn they
-  were blocked). QUESTION sent to the merge desk: build the control, or change the words.
+- The twelve fit defects above (Explore's four pseudo-language clamps; the file-refused conversation's overlaps).
+- Three pieces of wording for the next small branch, all decided by the merge desk: `transparency.canSee.lastActive`
+  becomes "The last day you used Pam." (a program does not get it: 0062; D-242's program half stays open); the
+  blocking sentences come back in their true form now that the Block control has landed (D-463: "Block this
+  person" in a conversation's ⋯; the other person is told); and a mail-service paragraph on the privacy page,
+  whose English Will is being asked to approve.
 - The six translations of the two privacy paragraphs are mine; they are promises and still need a native
   reader, like the rest.
 
