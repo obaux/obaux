@@ -1,5 +1,7 @@
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
+import { LANGUAGE_TAGS, SUPPORTED_LOCALES } from '@pam/config';
+import en from '@pam/config/locales/en.json';
 import { settled } from './settled';
 
 /**
@@ -138,6 +140,22 @@ test.describe('signing up', () => {
     // you is step 1 of a member's 3. Still no bar.
     await expect(page.getByText('1 of 3', { exact: true })).toBeVisible();
     await expect(page.getByRole('progressbar')).toHaveCount(0);
+  });
+
+  test('the language chips lead with their English tag, and read as the name alone (D-451)', async ({ page }) => {
+    // Will, 10 October 2026: the tag says which language a chip is before the
+    // chip says it in itself. Always English; hidden from a screen reader.
+    await newcomer(page);
+    await page.goto('/join/');
+    const group = page.getByRole('group', { name: en['onboarding.language.title'] });
+    await expect(group).toBeVisible();
+    for (const code of SUPPORTED_LOCALES) {
+      const name = en[`language.${code}` as keyof typeof en] as string;
+      const chip = group.getByRole('button', { name, exact: true });
+      await expect(chip, `${code} chip`).toHaveCount(1);
+      await expect(chip.locator('[aria-hidden="true"]', { hasText: LANGUAGE_TAGS[code] })).toHaveText(LANGUAGE_TAGS[code]);
+      await expect(chip.locator(`[lang="${code}"]`)).toHaveText(name);
+    }
   });
 
   test('never says "role" to the person filling it in', async ({ page }) => {

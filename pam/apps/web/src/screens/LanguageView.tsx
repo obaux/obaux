@@ -2,7 +2,7 @@
 
 import * as stylex from '@stylexjs/stylex';
 import { Text } from '@astryxdesign/core/Text';
-import { SUPPORTED_LOCALES } from '@pam/config';
+import { LANGUAGE_TAGS, SUPPORTED_LOCALES } from '@pam/config';
 import { GlobeIcon } from '@pam/ui';
 import { SubPage } from '@pam/ui/SubPage';
 import { MenuList } from '@pam/ui/MenuList';
@@ -15,7 +15,8 @@ import { useChooseLanguage } from '@/lib/useChooseLanguage';
  * "English", "Español", "Português (Brasil)" — so somebody looking for theirs
  * finds it whatever the screen is in now. The tick moves at once; nothing to
  * save. One row for each of `SUPPORTED_LOCALES`, so a new language appears
- * here by being added there.
+ * here by being added there. Each row starts with the language's English tag
+ * ("RU  Русский"): always English, never translated (`LANGUAGE_TAGS`).
  */
 const ICON = { width: 26, height: 26, 'aria-hidden': true } as const;
 
@@ -35,6 +36,11 @@ export function LanguageView() {
         items={SUPPORTED_LOCALES.map((code) => ({
           id: code,
           label: t(`language.${code}`),
+          // The English tag first, so a row says which language it is before it
+          // says it in itself (Will, 10 October 2026, D-451, D-453); the name is
+          // spoken in its own voice.
+          tag: LANGUAGE_TAGS[code],
+          lang: code,
           icon: <GlobeIcon {...ICON} />,
           isSelected: shown === code,
           onSelect: () => choose(code),
