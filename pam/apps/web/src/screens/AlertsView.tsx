@@ -31,11 +31,13 @@ import type { GlossaryTerm } from '@pam/config';
  * Turning any switch on records consent (`setReminderConsent(true)`); turning
  * the last one off withdraws it.
  *
- * **Which switches are on is kept on this phone for now.** The database has
- * one yes/no for texts; a yes per kind is a new column and a migration, for
- * Will to approve. Until then the per-kind choice is a preference here, and
- * the consent itself is the real, stored one. Nothing sends these yet either:
- * each needs an SMS template a person has reviewed (`sms-templates.ts`).
+ * **What is on is kept on the account (D-453).** It used to be kept in this
+ * phone's `localStorage`, so a person's choice did not follow them to another
+ * phone and a stale one could disagree with the database. Today exactly one
+ * kind is really sent (a saved place closing or moving, `LIVE` below), and for
+ * it the one yes/no in `notification_preferences` is the whole answer, so the
+ * switch simply shows that. A yes per kind is a column and a migration for the
+ * day a second kind is built; until then there is nothing else to remember.
  */
 type Kind = 'booked' | 'changed' | 'message' | 'trip' | 'visit' | 'closed' | 'connect';
 
@@ -54,36 +56,34 @@ const KINDS_FOR: Record<'member' | 'admin' | 'provider', readonly Kind[]> = {
 /** A word in a switch's label that the glossary explains (D-260). */
 const TERM_FOR: Partial<Record<Kind, GlossaryTerm>> = { trip: 'trip' };
 
-const keyFor = (who: string) => `pam.alerts.${who}`;
-
-function readChoices(who: string): Partial<Record<Kind, boolean>> | null {
-  try {
-    const raw = window.localStorage.getItem(keyFor(who));
-    return raw ? (JSON.parse(raw) as Partial<Record<Kind, boolean>>) : null;
-  } catch {
-    return null;
-  }
-}
+/**
+ * The kinds Pam really sends a text for today (Will, 10 October 2026: "keep the
+ * promise" — build them, and until they are built, do not offer them).
+ *
+ * Only a saved place closing or moving is queued for a text (0035–0037). The
+ * rest — a visit reminder, someone wanting to connect, a message waiting, a
+ * visit booked, changed or planned — have templates (drafts nobody has signed,
+ * `sms-templates.ts`) and nothing that queues them, so their switches say
+ * "coming soon" and cannot be turned on. When a text is built and signed, its
+ * kind joins this list in the same change.
+ */
+const LIVE: ReadonlySet<Kind> = new Set<Kind>(['closed']);
 
 /**
- * Whether any text alert is on for this kind of account, on this phone —
- * so a screen can stop offering to turn them on (D-386).
+ * Whether any text alert is on for this kind of account, so a screen can stop
+ * offering to turn them on (D-386). Nothing is sent to a program lead or a case
+ * manager yet, so for them it is always no; a member's answer is the account's
+ * own consent, which a synchronous call cannot read, so it is not asked here.
  */
 export function hasTextAlerts(who: 'member' | 'admin' | 'provider'): boolean {
-  return Object.values(readChoices(who) ?? {}).some(Boolean);
-}
-
-function writeChoices(who: string, choices: Partial<Record<Kind, boolean>>): void {
-  try {
-    window.localStorage.setItem(keyFor(who), JSON.stringify(choices));
-  } catch {
-    // Not kept between visits; the consent itself still is.
-  }
+  void who;
+  return false;
 }
 
 const styles = stylex.create({
   intro: { fontSize: '18px', lineHeight: 1.5 },
   small: { fontSize: '15px', lineHeight: 1.5 },
+  soon: { fontSize: '15px', lineHeight: 1.5, fontWeight: 600 },
   label: { fontSize: '17px', lineHeight: 1.35, fontWeight: 600 },
   words: { flexGrow: 1, minWidth: 0 },
 });
@@ -96,47 +96,57 @@ export function AlertsView() {
   const role = session.status === 'signed-in' ? session.session.role : null;
   const who = role === 'provider' ? 'provider' : role === 'admin' ? 'admin' : 'member';
   const KINDS = KINDS_FOR[who];
-  const [choices, setChoices] = useState<Partial<Record<Kind, boolean>>>({});
+  /** The account's one yes/no for texts (`notification_preferences`), which every sent kind shares. */
+  const [consent, setConsent] = useState(false);
+  const [saved, setSaved] = useState(false);
   const [failed, setFailed] = useState(false);
+  /** They replied STOP (D-453): the switches are off and cannot be turned on from here. */
+  const [stopped, setStopped] = useState(false);
 
-  // Last time's choices; or, with texts already agreed to and nothing kept
-  // here, all three — that yes covered everything before there were switches.
+  // What the account says: yes, no, nobody asked, or a STOP.
   useEffect(() => {
     if (!userId) return;
     let cancelled = false;
     void (async () => {
-      const kept = readChoices(who);
-      if (kept) {
-        if (!cancelled) setChoices(kept);
-        return;
-      }
-      const { getReminderConsent } = await import('@/lib/useReminderConsent');
-      const agreed = await getReminderConsent(userId);
-      if (!cancelled && agreed) setChoices(Object.fromEntries(KINDS_FOR[who].map((k) => [k, true])));
+      const { getTextStatus } = await import('@/lib/useReminderConsent');
+      const status = await getTextStatus(userId);
+      if (cancelled) return;
+      setStopped(status.stopped);
+      setConsent(status.consent === true);
     })();
     return () => {
       cancelled = true;
     };
-  }, [userId, who]);
+  }, [userId]);
 
   const change = async (kind: Kind, on: boolean) => {
-    const next = { ...choices, [kind]: on };
-    const wasAny = KINDS.some((k) => choices[k]);
-    const isAny = KINDS.some((k) => next[k]);
-    setChoices(next);
-    writeChoices(who, next);
-    if (userId && wasAny !== isAny) {
-      const saved = await setReminderConsent(userId, isAny);
-      setFailed(!saved);
-    }
+    if (!LIVE.has(kind) || !userId || stopped) return;
+    setSaved(false);
+    setFailed(false);
+    setConsent(on);
+    const ok = await setReminderConsent(userId, on);
+    setFailed(!ok);
+    setSaved(ok);
+    if (!ok) setConsent(!on);
   };
 
   return (
     <SubPage title={t('alerts.title')} backHref="/profile/" backLabel={t('nav.back.profile')} actions={<HelpButton />}>
-      <Text xstyle={styles.intro}>{t('alerts.intro')}</Text>
+      {stopped ? (
+        <Card padding={6}>
+          <VStack gap={2}>
+            <Text xstyle={styles.label}>{t('reminders.stopped.title')}</Text>
+            <Text xstyle={styles.small}>{t('reminders.stopped.body')}</Text>
+          </VStack>
+        </Card>
+      ) : (
+        <Text xstyle={styles.intro}>{t('alerts.intro')}</Text>
+      )}
       <Card padding={6}>
         <VStack gap={5}>
-          {KINDS.map((kind) => (
+          {KINDS.map((kind) => {
+            const live = LIVE.has(kind);
+            return (
             // Pam's own sizes for the words (17px, 15px under it): Astryx's
             // switch label is set smaller than §12 allows on a phone. The
             // switch keeps its label, hidden, so it is still named.
@@ -149,22 +159,31 @@ export function AlertsView() {
                 <Text type="supporting" xstyle={styles.small}>
                   {t(`alerts.${kind}.body`)}
                 </Text>
+                {live ? null : (
+                  <Text xstyle={styles.soon}>{t('alerts.comingSoon')}</Text>
+                )}
               </VStack>
               <Switch
                 label={t(`alerts.${kind}`)}
                 isLabelHidden
-                value={!!choices[kind]}
+                value={live && !stopped && consent}
                 changeAction={(on) => change(kind, on)}
-                isDisabled={!userId}
+                isDisabled={!userId || !live || stopped}
               />
             </HStack>
-          ))}
+            );
+          })}
         </VStack>
       </Card>
       <Text type="supporting" xstyle={styles.small}>
         {/* Not "a few a week": a busy program hears more than that (D-256). */}
         {t('alerts.how')}
       </Text>
+      {saved && !failed ? (
+        <Text type="supporting" xstyle={styles.small}>
+          {t('alerts.saved')}
+        </Text>
+      ) : null}
       {failed ? (
         <Notice
           notice="something_went_wrong"

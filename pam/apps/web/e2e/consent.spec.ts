@@ -72,10 +72,12 @@ test.describe('agreeing to reminders', () => {
     await expect(page.getByRole('checkbox')).toHaveCount(0);
   });
 
-  test('says what is sent, how often, and how to stop', async ({ page }) => {
+  test('says what is sent, what is sent today, and how to stop', async ({ page }) => {
     await page.goto('/reminders/');
     await expect(page.getByText(/reminder before a visit/i)).toBeVisible();
-    await expect(page.getByText(/few messages a week at most/i)).toBeVisible();
+    // No promise about how often: only what really goes out today (10 October 2026, D-453).
+    await expect(page.getByText(/Today Pam sends only one of these/i)).toBeVisible();
+    await expect(page.getByText(/few messages a week/i)).toHaveCount(0);
     await expect(page.getByText(/Reply STOP/)).toBeVisible();
     await expect(page.getByText(/rates may apply/i)).toBeVisible();
   });
@@ -455,5 +457,46 @@ test.describe('the way in explains itself', () => {
       'href',
       /^tel:/,
     );
+  });
+});
+
+
+/**
+ * Somebody who replied STOP (D-453). The privacy page promises "Nothing in the
+ * app can turn them back on", so the Reminders screen tells them texts are off
+ * and offers no way to agree, whatever is stored beside it.
+ */
+test.describe('after STOP', () => {
+  test('the reminders screen says texts are off and asks nothing', async ({ page }) => {
+    const id = 'de3b9c2e-ec2f-403b-93e5-86e6ee75349b';
+    await page.addInitScript((userId: string) => {
+      const session = {
+        access_token: 'test-access-token',
+        refresh_token: 'test-refresh-token',
+        token_type: 'bearer',
+        expires_in: 3600,
+        expires_at: Math.floor(Date.now() / 1000) + 3600,
+        user: { id: userId, aud: 'authenticated', role: 'authenticated' },
+      };
+      for (const ref of ['stub', 'shobqzuhicoiymtumiaz']) {
+        window.localStorage.setItem(`sb-${ref}-auth-token`, JSON.stringify(session));
+      }
+    }, id);
+    const json = (body: unknown) => ({ status: 200, contentType: 'application/json', body: JSON.stringify(body) });
+    await page.route('**/auth/v1/user*', (route) => route.fulfill(json({ id })));
+    await page.route('**/rest/v1/profiles*', (route) =>
+      route.fulfill(json({ id, role: 'member', first_name: 'Marcus', region_id: null, regions: null })),
+    );
+    // Texts were agreed to once, and then the person replied STOP.
+    await page.route('**/rest/v1/notification_preferences*', (route) =>
+      route.fulfill(json({ sms_enabled: true, sms_stopped_at: '2026-10-08T15:00:00Z' })),
+    );
+
+    await page.goto('/reminders/');
+    await expect(page.getByText('Texts are off')).toBeVisible();
+    await expect(page.getByText(/Nothing in the app can turn texts back on/)).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Agree to receive texts' })).toHaveCount(0);
+    await expect(page.getByRole('button', { name: 'Not now' })).toHaveCount(0);
+    await expect(page.getByText(/You can change this whenever you want/)).toHaveCount(0);
   });
 });

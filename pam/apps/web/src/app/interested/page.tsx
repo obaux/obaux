@@ -163,13 +163,14 @@ export default function InterestedPage() {
 
       {!USE_DUMMY_PEOPLE ? (
         // No real "who is interested" query exists yet (see the file comment),
-        // so there is nothing to say about an empty one either — this state is
-        // only reachable at all once somebody has already turned the example
-        // set off ahead of the real feature landing.
+        // so this is what an empty one says — in a program's words, not a
+        // case manager's ("When someone uses an invite code from you…"). It
+        // is only reachable once somebody has turned the example set off
+        // ahead of the real feature landing.
         <Notice
           notice="no_caseload_members"
-          title={t('admin.caseload.empty.title')}
-          body={t('admin.caseload.empty.body')}
+          title={t('interested.empty.title')}
+          body={t('interested.empty.body')}
           supportPhone={supportPhone}
           callLabel={t('help.callSupport')}
         />

@@ -25,13 +25,7 @@ export const JustSent: Story = {
 export const UnderReview: Story = {
   ...withSetup(asRole('provider', '/program/'), { done: ['program'] }),
   name: 'Under review (the Program tab)',
-  render: () => <ProgramReviewView status="review" hasPhoto={false} hasAlerts={false} />,
-};
-/** Text alerts already on: no "Text me when it's live" row (D-386). */
-export const AlertsAlreadyOn: Story = {
-  ...withSetup(asRole('provider', '/program/'), { done: ['program'] }),
-  name: 'Under review, texts already on',
-  render: () => <ProgramReviewView status="review" hasPhoto={false} hasAlerts />,
+  render: () => <ProgramReviewView status="review" hasPhoto={false} />,
 };
 /** After three days: honest about the wait, with a way to ask Pam (D-381). */
 export const TakingLonger: Story = {

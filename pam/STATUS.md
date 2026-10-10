@@ -993,9 +993,35 @@ Broad St, North Philadelphia` drew `… St, North Philadelphia 1231 بالقرب
   `fit-known.json` and the old `ar|spill` entry is gone; `areachip--arabic` needs none
   (its ellipsis is the story's own in every column).
 
+## Places & programs · trips saved, the database half (10 October 2026)
+
+Merged to `main` by the merge desk, 10 October, from `claude/places-programs-trips-database`
+(7713e69, Piper; D-454). The app half (`claude/places-programs-save-trips`) is not merged yet.
+
+- **Live:** `20261010074045_…` (expand): `book_trip`, `move_trip`, `cancel_trip`, `my_trips`, the
+  `appointments_keep_reminder` trigger that queues, re-times or cancels the day-before text, and
+  two columns. Read back 10 October; the app on `main` calls none of it yet.
+- **Waiting on Will (SQL editor, D-387):** `20261010074241_…` (contract) drops the two `for all`
+  policies on `appointments`, so it is run by hand from
+  `packages/db/manual/2026-10-10-appointments-written-only-through-the-trip-functions.sql`
+  (proved on a database shaped like live; drift test in `manual-sql.test.ts`). Until then a
+  signed-in person can still write `appointments` directly; the table has no rows.
+- The trips database test is `28_saved_trips_and_reminders_test.sql` (renumbered at merge: 26 and
+  27 were taken by Messages).
+
+## Messages & notifications · alert texts, STOP, promises (10 October 2026)
+
+Merged to `main` by the merge desk, 10 October. Two migrations, **both applied to the live project
+10 October** and read back: `20261010071947_…` (a stored STOP
+cannot be cleared from the app: a person could clear their own at the API) and `20261010072848_…`
+(the claim texts a reminder only to somebody who agreed). Text alerts offers switches only for what
+is sent; the four alert texts are drafts, unsigned. A STOP shows as "Texts are off". Nothing records
+a STOP yet (no Twilio receiver) and nothing queues the appointment reminders, the check-in or
+"someone wants to connect". Samples file: nine texts. D-453.
+
 ## Design system & Storybook · language tag (10 October)
 
-Branch `claude/pam-design-language-tag`. Job from Will via Mira: a short English tag before a
+Merged to `main` by the merge desk (5dd52b8), 10 October. Job from Will via Mira: a short English tag before a
 language's own name, so a person can see which language a row is before they can read it (D-451).
 
 - **`@pam/ui`:** `MenuItem` takes `tag?`, `lang?`, `valueTag?`; a `ChoiceChips` option takes `tag?` and

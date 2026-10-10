@@ -62,6 +62,8 @@ const PROJECT_REF = new URL(SUPABASE_URL).hostname.split('.')[0];
 export interface MockOptions {
   /** A limited account (0031): reads, but the database refuses a send (D-427). */
   readonly limited?: boolean;
+  /** The person replied STOP: stored, and nothing in the app can undo it (D-453). */
+  readonly textsStopped?: boolean;
   /**
    * A program lead who already has a program on file (D-447): waiting for
    * review, or approved and live. Without it the lead has none — and a send
@@ -165,7 +167,9 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
     ),
     // A brand-new account has had nothing happen to it yet (D-361).
     on('/rest/v1/notifications', () => ({ body: isFreshAccount() ? [] : NOTIFICATIONS })),
-    on('/rest/v1/notification_preferences', () => ({ body: null })),
+    on('/rest/v1/notification_preferences', () => ({
+      body: options.textsStopped ? { sms_enabled: true, sms_stopped_at: '2026-10-08T15:00:00Z' } : null,
+    })),
     on('/rest/v1/access_controls', () => ({ body: [] })),
     on('/rpc/member_points', () => ({ body: 400 })),
     // The area drawer's suggestions (D-275): a few real Philadelphia ZIPs,
