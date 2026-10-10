@@ -954,6 +954,23 @@ Broad St, North Philadelphia` drew `… St, North Philadelphia 1231 بالقرب
   `fit-known.json` and the old `ar|spill` entry is gone; `areachip--arabic` needs none
   (its ellipsis is the story's own in every column).
 
+## Design system & Storybook · area chip, fit audit (10 October)
+
+Branch `claude/pam-design-areachip-long-address`, not merged. Job: Will asked for the
+`AreaChip` long address in Spanish, Portuguese and Russian to be fixed; it turned out the chip was
+fine and the fit audit was over-counting (D-448).
+
+- **The chip needs no change.** At 320px it reads "Cerca de 1231 N Broad St, North Phila…" and keeps its
+  pencil: Astryx's `Button` already trims its label with an ellipsis. `packages/ui` is untouched.
+- **`audit:fit` no longer calls an ellipsis-trimmed line a spill** (`scripts/audit-language-fit.mjs`).
+  The trimming is still reported by the ellipsis check. On `d4f325e` it dropped 9 of 35 new-in-a-language
+  defects, all `spill`; no `cut`, `overlap` or `ellipsis` went. Five defects were looked at and accepted in
+  `scripts/fit-known.json`, each with its reason.
+- **How to read the audit's numbers:** the figure that matters is defects **not in the known list**
+  (8 on `d4f325e`; 0 on the stories this branch changed; the full run against the known list was still going when this was written). The raw count the script prints is a different measure.
+- Outside this lane, seen and left: some English file names in the attachment lists are cut at the
+  timestamp column with no ellipsis ("Free resume worksl").
+
 ## Seven languages, messages in your own language, and text that fits (9 October) — 0.50.1 and 0.51.0, merged 9 October (PR #29)
 
 D-421 to D-423, **on `claude/gallant-clarke-0dhizj`, which is

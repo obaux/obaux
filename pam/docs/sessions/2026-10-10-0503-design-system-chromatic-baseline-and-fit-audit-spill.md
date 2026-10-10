@@ -7,7 +7,7 @@ The first session in this lane under `docs/lanes.md`. Will told it Chromatic is 
 ## What changed
 
 - **`scripts/audit-language-fit.mjs`:** a line an ellipsis trims inside its control is no longer also reported as a `spill` (D-448).
-- **`scripts/fit-known.json`:** six defects looked at with screenshots and accepted, each with its reason.
+- **`scripts/fit-known.json`:** five defects looked at with screenshots and accepted, each with its reason (a sixth, the Arabic address, was recorded on `main` at the same time and `main`'s entry stands).
 - **`docs/decisions/D-448-…`:** the above, with the numbers.
 - Nothing in `packages/ui` or the stories. A first attempt at `AreaChip` (wrap the plain label in the same shrinkable box the Arabic path has) was reverted: it changed no measurement because Astryx's `Button` already trims its label.
 
@@ -33,7 +33,7 @@ The first session in this lane under `docs/lanes.md`. Will told it Chromatic is 
 | `audit:fit --match` on the three affected stories with `--known` | 0 not accepted (limited-account 8/8, conversation-files 6/6, areachip 1/1) |
 | `pnpm --filter @pam/ui test` / `typecheck` | 107 pass / clean (run before the component change was reverted; no component differs from `main` now) |
 | `pnpm --filter @pam/web test` | 48 pass |
-| Full `audit:fit --known` run after adding the six | **not re-run end to end** (three `--match` runs cover the stories that changed) |
+| Full `audit:fit --known` run after adding the five | **not re-run end to end** (three `--match` runs cover the stories that changed) |
 
 ## Left undone
 

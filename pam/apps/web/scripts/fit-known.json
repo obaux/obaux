@@ -502,9 +502,5 @@
   {
     "key": "zh-HK|ellipsis|case-manager-screens--conversation-files|ID office letter.pdf",
     "reason": "Looked at 10 October 2026 at 320px with screenshots. The file name reads in full in the screenshot, although the name's ellipsis box measures 4px narrower than its text (148 > 144); no letter is lost. Worth another look if the row's layout changes."
-  },
-  {
-    "key": "ar|ellipsis|components-inputs-areachip--long-address|1231 N Broad St, North Philadelphia",
-    "reason": "Looked at 10 October 2026 at 320px with screenshots. The address is its own box (D-435) and ends in its own ellipsis, as the English one does; the words keep their width and the pencil stays. The English baseline's box is a different element, so the key differs."
   }
 ]
