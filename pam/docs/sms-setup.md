@@ -74,17 +74,21 @@ Pick the smallest that fits. None needs a deploy.
 
 1. **Stop every text now** (merge desk): `select cron.alter_job((select jobid from cron.job where jobname = 'dispatch-sms'), active := false);`
    Nothing is sent, nothing is lost: every message stays waiting. Turn it back on with `active := true`.
-   **Read this before turning it back on:** a reminder that was waiting is sent as soon as the clock
-   returns, even if its visit has passed (known gap 4 below). After a pause longer than a few hours,
-   first cancel the overdue ones (step 2).
-2. **Drop the waiting reminders** (merge desk): `update outbound_messages set status = 'cancelled', failure_reason = 'pulled by hand' where template_key = 'appointment_24h' and status = 'scheduled';`
+   (Verified on the live project, 10 October 2026: set inactive and read back, set active and read
+   back, schedule unchanged at every five minutes.) Resuming after a pause is safe: the claim
+   cancels, rather than sends, a reminder whose visit has already started, and any time-bound text
+   (sign-in code, the three appointment reminders, "did you make it", "new message") that is more than
+   12 hours late (D-475). Texts that are still useful late — an invitation, a decision on a request, a
+   closed saved place and the like — are still sent.
+2. **Drop the waiting reminders** (merge desk), a backstop if you would rather none go out after a
+   pause: `update outbound_messages set status = 'cancelled', failure_reason = 'pulled by hand' where template_key = 'appointment_24h' and status = 'scheduled';`
    (Sign-in codes are Supabase's and are not affected by either step.)
 3. **One person**: they reply STOP, or turn "Text reminders" off in the app. Either is honoured on the next tick.
 4. **Do not** remove the Twilio secrets to stop sending: the dispatcher marks each waiting message *failed*, and a failed message is not retried.
 
 ### What the rehearsal found (reported to the merge desk, 10 October)
 
-Pinned in the database test as "KNOWN GAP", passing on today's behaviour so that fixing one turns its line red:
+Gaps 1 to 3 are pinned in the database test as "KNOWN GAP", passing on today's behaviour so that fixing one turns its line red (they belong to the appointment trigger):
 
 1. **An evening visit is reminded on its own day.** A visit at 9 pm or later has its reminder due at
    9 pm the day before, inside quiet hours, so it is held to 7 am — the morning of the visit — and
@@ -93,8 +97,8 @@ Pinned in the database test as "KNOWN GAP", passing on today's behaviour so that
    reminder when they do. Only a new or changed trip queues one.
 3. **A long place name is cut mid-word** by the trigger at 34 characters ("…Opportunitie") before the
    renderer, which would cut at a word, sees it.
-4. **A late reminder is not dropped.** Nothing stops a reminder that went overdue (a pause, an outage)
-   from going out after the visit has started.
+4. ~~A late reminder is not dropped.~~ **Fixed (D-475):** the claim now cancels a reminder whose visit
+   has started and any time-bound text more than 12 hours late.
 
 Cancel and move work today: cancelling a trip cancels its reminder, moving it re-times it, and moving
 it to less than a day away cancels it.

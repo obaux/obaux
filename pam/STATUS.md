@@ -1077,6 +1077,13 @@ drops signatures), then `20261010042108_a_program_lead_submits_their_own_program
 
 ---
 
+## Messages & notifications · overdue texts are cancelled (10 October 2026)
+
+Branch `claude/messages-overdue-cutoff`. One migration (`20261010130754_…`, **not yet applied to the live
+project**): the claim cancels an appointment reminder whose visit has started, and a time-bound text more
+than 12 hours late (quiet hours allowed for); texts still useful late are unchanged. Test 37; gap 4 of the
+rehearsal closed. D-475.
+
 ## Messages & notifications · day-before reminder rehearsal (10 October 2026)
 
 Branch `claude/messages-reminder-rehearsal`. Tests and a runbook, no app code. DB test 36 (44 checks) and
