@@ -185,20 +185,30 @@ test.describe("a place's own screen", () => {
     await expect(page.getByText(/sample hours while Pam checks the real ones/)).toBeVisible();
   });
 
-  test('the week drawer opens with nothing chosen, and the bar\'s ⋯ is outlined and lifted (D-411)', async ({ page }) => {
+  test('the week drawer opens with nothing chosen, and the bar\'s ⋯ is white with no outline or shadow (D-457)', async ({ page }) => {
     await signedIn(page);
     await page.route(DETAIL, (route) => route.fulfill(json([PLACE])));
     await page.goto(`/place/?id=${PLACE.id}`);
 
-    // ⋯ reads as a button on a plain page: a grey outline you can see, and a shadow.
+    // ⋯ and Save are the page's own colour with no grey outline and no shadow (Will, 10 October, D-457:
+    // "these are meant to be white buttons"; only the back arrow is grey). They keep the 48px a finger needs.
     const more = page.getByRole('button', { name: 'More' });
     const look = await more.evaluate((el) => {
       const s = getComputedStyle(el);
-      return { border: s.borderTopWidth, colour: s.borderTopColor, shadow: s.boxShadow };
+      // The page's colour, read from the same token the button uses, so this holds in dark mode too.
+      const probe = document.createElement('div');
+      probe.style.backgroundColor = 'var(--color-background-body)';
+      document.body.appendChild(probe);
+      const page = getComputedStyle(probe).backgroundColor;
+      probe.remove();
+      return { border: s.borderTopWidth, shadow: s.boxShadow, background: s.backgroundColor, page };
     });
-    expect(look.border).toBe('1px');
-    expect(look.colour).not.toMatch(/rgba\(0, 0, 0, 0\.0\d+\)/);
-    expect(look.shadow).not.toBe('none');
+    expect(look.border).toBe('0px');
+    expect(look.shadow).toBe('none');
+    expect(look.background).toBe(look.page);
+    const box = await more.boundingBox();
+    expect(box!.width).toBeGreaterThanOrEqual(48);
+    expect(box!.height).toBeGreaterThanOrEqual(48);
 
     await page.getByRole('button', { name: /^Hours: / }).click();
     await expect(page.getByRole('heading', { name: 'Opening hours' })).toBeVisible();
