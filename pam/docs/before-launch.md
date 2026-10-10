@@ -29,6 +29,10 @@ STATUS row too.
   Until this is done, someone with an expired link is told "Check your email"
   and nothing arrives.
 
+  **10 October (D-450):** the sender for *staff invites* is built, off, and waits for
+  a signature (`docs/email-setup.md` is the plain-words list for Will; the function is
+  `send-invite-emails`). The expired-link email above still has no sender.
+
 - [x] **Merge and deploy 0068 and 0069** — done 8 October as 0075/0076 (D-388) (readiness fixes and blocking, on
   branch `claude/hopeful-thompson-07nj7n`, not yet on this one). 0068 is what
   lets an invite be redeemed at all (phone format) and closes several live
