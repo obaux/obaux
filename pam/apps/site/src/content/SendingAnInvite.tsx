@@ -36,7 +36,7 @@ export function SendingAnInvite() {
       <Section title="Make an invite">
         <Steps
           items={[
-            'Tap “Invite someone”. A case manager finds it on Home and in Profile. A program lead finds it in the + menu. A super admin finds it in Profile.',
+            'Tap “Invite someone”. A case manager finds it on Home and in Profile. A program lead finds it in the + menu, where it reads “Invite someone to Pam”. A super admin finds it in Profile.',
             'Choose who you are inviting: a member, a program or a case manager.',
             'Type their first name.',
             'Type their mobile number, with the area code.',
