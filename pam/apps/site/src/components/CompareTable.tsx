@@ -14,8 +14,8 @@ import { VisuallyHidden } from '@astryxdesign/core/VisuallyHidden';
  * `display: none`, so a screen reader reads it once.
  */
 const styles = stylex.create({
-  wide: { display: { default: 'block', '@media (max-width: 719px)': 'none' } },
-  narrow: { display: { default: 'none', '@media (max-width: 719px)': 'flex' } },
+  wide: { display: { default: 'block', '@media (max-width: 719px)': 'none' }, maxWidth: '760px' },
+  narrow: { display: { default: 'none', '@media (max-width: 719px)': 'flex' }, maxWidth: '760px' },
   yes: { fontWeight: 700 },
 });
 

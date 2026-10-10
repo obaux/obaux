@@ -1,7 +1,7 @@
 import { CompareTable } from '../components/CompareTable';
+import { Needs } from '../components/Needs';
 import { Body, Lead, P, Section } from '../components/Prose';
-import { Screenshot } from '../components/Screenshot';
-import { Steps } from '../components/Steps';
+import { HowTo } from '../components/HowTo';
 
 /**
  * Support post: Sending an invite (case managers, program leads, super admins). Facts
@@ -34,8 +34,8 @@ export function SendingAnInvite() {
       </Section>
 
       <Section title="Make an invite">
-        <Steps
-          items={[
+        <HowTo
+          steps={[
             'Tap “Invite someone”. A case manager finds it on Home and in Profile. A program lead finds it in the + menu, where it reads “Invite someone to Pam”. A super admin finds it in Profile.',
             'Choose who you are inviting: a member, a program or a case manager.',
             'Type their first name.',
@@ -44,16 +44,7 @@ export function SendingAnInvite() {
             'Tap “Create link”.',
             'Tap “Send the link”. Pick how to send it, or it copies the link for you to paste.',
           ]}
-        />
-        <Screenshot
-          name="sending-an-invite/invite.png"
-          alt="The invite screen. Three rows: “Invite a member”, “Invite a program” and “Invite a case manager”."
-          caption="Choose who you are inviting."
-        />
-        <Screenshot
-          name="sending-an-invite/invite-form.png"
-          alt="The invite form with boxes for their first name and their mobile number, and a button that says “Create link”."
-          caption="First name and mobile number."
+          shots={[{ name: 'sending-an-invite/invite.png', alt: "The invite screen. Three rows: “Invite a member”, “Invite a program” and “Invite a case manager”.", caption: "Choose who you are inviting." }, { name: 'sending-an-invite/invite-form.png', alt: "The invite form with boxes for their first name and their mobile number, and a button that says “Create link”.", caption: "First name and mobile number." }]}
         />
         <P>
           Pam does not text the link for you. You send it. The screen also gives a code, in case the person is on
@@ -62,10 +53,10 @@ export function SendingAnInvite() {
       </Section>
 
       <Section title="What to know about a link">
-        <P>
-          Only the phone number you typed can use the link. If the person signs in to Pam with that number, Pam
-          finds the invite even without the link. A link works once, for one person, and it lasts 30 days.
-        </P>
+        <Needs title="Only the phone number you typed can use the link.">
+          If the person signs in to Pam with that number, Pam finds the invite even without the link. A link
+          works once, for one person, and it lasts 30 days.
+        </Needs>
         <P>If a link has expired, make a new invite. Tap “Make another”.</P>
         <P>
           A phone number that already has a staff account cannot take a staff invite. The person will see “This

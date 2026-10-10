@@ -23,6 +23,8 @@ export const RULES_SLUG = 'signing-a-programs-rules';
 export interface RulesSection {
   readonly title: string;
   readonly steps?: readonly string[];
+  /** Shown as a gray "what you need / do not need" banner (title + the paragraph) instead of a plain section. */
+  readonly note?: true;
   readonly paras: readonly string[];
 }
 
@@ -30,6 +32,8 @@ export interface RulesText {
   readonly title: string;
   readonly summary: string;
   readonly lead: string;
+  /** The label on the "how to find it in the app" card. */
+  readonly howTo: string;
   readonly sections: readonly RulesSection[];
 }
 
@@ -38,6 +42,7 @@ export const RULES: Readonly<Record<AboutLang, RulesText>> = {
     title: 'Signing a program’s rules',
     summary: 'What a program’s policy is, how you read and sign it in Pam, and what the program sees.',
     lead: 'Some programs ask you to read and sign their rules before you visit. In Pam, you do it on your phone. You sign your name once, and after that signing the next one takes one tap.',
+    howTo: 'In the app',
     sections: [
       {
         title: 'What a policy is',
@@ -54,6 +59,7 @@ export const RULES: Readonly<Record<AboutLang, RulesText>> = {
       },
       {
         title: 'Signing never stops you booking a visit',
+        note: true,
         paras: ['You can plan a visit before you have signed anything. Signing is for before you go, and it never stops you from booking.'],
       },
       {
@@ -80,6 +86,7 @@ export const RULES: Readonly<Record<AboutLang, RulesText>> = {
     title: 'Firmar las políticas de un programa',
     summary: 'Algunos programas le piden que lea y firme sus políticas antes de su visita. Esto es lo que significa y lo que ve el programa.',
     lead: 'Algunos programas le piden que lea y firme sus políticas, que son sus reglas, antes de visitarlos. En Pam lo hace desde su teléfono. Firma su nombre una vez y, después, firmar la siguiente toma un solo toque.',
+    howTo: 'En la app',
     sections: [
       {
         title: 'Qué es una política',
@@ -96,6 +103,7 @@ export const RULES: Readonly<Record<AboutLang, RulesText>> = {
       },
       {
         title: 'Firmar nunca le impide reservar una visita',
+        note: true,
         paras: ['Puede planear una visita antes de haber firmado nada. Firmar es para antes de ir, y nunca le impide reservar.'],
       },
       {
@@ -122,6 +130,7 @@ export const RULES: Readonly<Record<AboutLang, RulesText>> = {
     title: 'Assinar as políticas de um programa',
     summary: 'Alguns programas pedem que você leia e assine as políticas deles antes da sua visita. Veja o que isso significa e o que o programa enxerga.',
     lead: 'Alguns programas pedem que você leia e assine as políticas deles, que são as regras, antes de visitá-los. Na Pam, você faz isso no celular. Você assina o seu nome uma vez e, depois, assinar a próxima leva um toque.',
+    howTo: 'No app',
     sections: [
       {
         title: 'O que é uma política',
@@ -138,6 +147,7 @@ export const RULES: Readonly<Record<AboutLang, RulesText>> = {
       },
       {
         title: 'Assinar nunca impede você de agendar uma visita',
+        note: true,
         paras: ['Você pode planejar uma visita antes de assinar qualquer coisa. Assinar é para antes de ir, e nunca impede você de agendar.'],
       },
       {
@@ -164,6 +174,7 @@ export const RULES: Readonly<Record<AboutLang, RulesText>> = {
     title: '签署项目的规定',
     summary: '有些项目会请您在到访前阅读并签署他们的规定。这里说明这是什么，以及项目能看到什么。',
     lead: '有些项目会请您在到访前阅读并签署他们的规定。在 Pam 里，您用手机就能完成。您只需签一次名，之后签署下一份只需轻点一下。',
+    howTo: '在应用里',
     sections: [
       {
         title: '什么是规定',
@@ -180,6 +191,7 @@ export const RULES: Readonly<Record<AboutLang, RulesText>> = {
       },
       {
         title: '签署从不妨碍您预约到访',
+        note: true,
         paras: ['您可以先安排到访，不必先签任何东西。签署是到访之前要做的事，它从不妨碍您预约。'],
       },
       {
@@ -204,6 +216,7 @@ export const RULES: Readonly<Record<AboutLang, RulesText>> = {
     title: '簽署計劃的守則',
     summary: '有些計劃會請您在到訪前閱讀並簽署他們的守則。這裡說明這是什麼，以及計劃能看到什麼。',
     lead: '有些計劃會請您在到訪前閱讀並簽署他們的守則。在 Pam 裡，您用手機就能完成。您只需簽一次名，之後簽署下一份只需輕按一下。',
+    howTo: '在應用程式裡',
     sections: [
       {
         title: '什麼是守則',
@@ -220,6 +233,7 @@ export const RULES: Readonly<Record<AboutLang, RulesText>> = {
       },
       {
         title: '簽署從不妨礙您預約到訪',
+        note: true,
         paras: ['您可以先安排到訪，不必先簽任何東西。簽署是到訪之前要做的事，它從不妨礙您預約。'],
       },
       {
@@ -244,6 +258,7 @@ export const RULES: Readonly<Record<AboutLang, RulesText>> = {
     title: 'Подпись под правилами программы',
     summary: 'Некоторые программы просят вас прочитать и подписать их правила до визита. Здесь — что это значит и что видит программа.',
     lead: 'Некоторые программы просят вас прочитать и подписать их правила до визита. В Pam это делается в телефоне. Вы подписываетесь один раз, а потом следующие правила подписываются одним касанием.',
+    howTo: 'В приложении',
     sections: [
       {
         title: 'Что такое правила',
@@ -260,6 +275,7 @@ export const RULES: Readonly<Record<AboutLang, RulesText>> = {
       },
       {
         title: 'Подпись никогда не мешает записаться на визит',
+        note: true,
         paras: ['Вы можете запланировать визит, ничего не подписав. Подписывать нужно до того, как вы придёте, и это никогда не мешает записаться.'],
       },
       {
@@ -284,6 +300,7 @@ export const RULES: Readonly<Record<AboutLang, RulesText>> = {
     title: 'التوقيع على سياسات البرنامج',
     summary: 'تطلب بعض البرامج أن تقرأ سياساتها وتوقّع عليها قبل زيارتك. إليك معنى ذلك وما يراه البرنامج.',
     lead: 'تطلب بعض البرامج أن تقرأ سياساتها، وهي قواعدها، وتوقّع عليها قبل أن تزورها. في Pam تفعل ذلك على هاتفك. توقّع باسمك مرة واحدة، وبعدها يحتاج التوقيع التالي إلى لمسة واحدة.',
+    howTo: 'في التطبيق',
     sections: [
       {
         title: 'ما هي السياسة',
@@ -300,6 +317,7 @@ export const RULES: Readonly<Record<AboutLang, RulesText>> = {
       },
       {
         title: 'التوقيع لا يمنعك أبدا من حجز زيارة',
+        note: true,
         paras: ['يمكنك تخطيط زيارة قبل أن توقّع على أي شيء. التوقيع يكون قبل الذهاب، ولا يمنعك أبدا من الحجز.'],
       },
       {

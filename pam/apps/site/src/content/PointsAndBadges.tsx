@@ -1,7 +1,6 @@
 import { CompareTable } from '../components/CompareTable';
 import { Body, Lead, P, Section } from '../components/Prose';
-import { Screenshot } from '../components/Screenshot';
-import { Steps } from '../components/Steps';
+import { HowTo } from '../components/HowTo';
 
 /**
  * Support post: Points and badges today (members). Only what is live: four ways to earn
@@ -72,11 +71,9 @@ export function PointsAndBadges() {
       </Section>
 
       <Section title="See your points">
-        <Steps items={['Tap Profile.', 'Tap the badge with your level on it. It says “Your badge”.', 'Scroll to see the ladder and your badges.']} />
-        <Screenshot
-          name="points-and-badges/points.png"
-          alt="The top of the “Your points” screen: your badge, the level name, the number of points and a bar showing how many more points to the next level. Under it, the “Ways to earn” list: Plan a trip to a place, Call a place, Save a place and Finish setting up Pam."
-          caption="“Your points”, for an example person."
+        <HowTo
+          steps={['Tap Profile.', 'Tap the badge with your level on it. It says “Your badge”.', 'Scroll to see the ladder and your badges.']}
+          shots={[{ name: 'points-and-badges/points.png', alt: "The top of the “Your points” screen: your badge, the level name, the number of points and a bar showing how many more points to the next level. Under it, the “Ways to earn” list: Plan a trip to a place, Call a place, Save a place and Finish setting up Pam.", caption: "“Your points”, for an example person." }]}
         />
       </Section>
     </Body>

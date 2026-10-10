@@ -17,7 +17,7 @@ const styles = stylex.create({
     borderStyle: 'solid',
     borderColor: colorVars['--color-border'],
   },
-  frame: { alignItems: 'flex-start' },
+  frame: { alignItems: 'center' },
 });
 
 /**

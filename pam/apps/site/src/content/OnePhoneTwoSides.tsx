@@ -1,7 +1,6 @@
 import { CompareTable } from '../components/CompareTable';
 import { Body, Lead, P, Section } from '../components/Prose';
-import { Screenshot } from '../components/Screenshot';
-import { Steps } from '../components/Steps';
+import { HowTo, ShotCard } from '../components/HowTo';
 
 /**
  * Support post: One phone, two sides (program leads who are also members). The two-roles
@@ -18,20 +17,16 @@ export function OnePhoneTwoSides() {
       </Lead>
 
       <Section title="Switch sides">
-        <Steps
-          items={[
+        <HowTo
+          steps={[
             'Tap Profile.',
             'Tap “Use Pam as”.',
             'Tap “Me” or “My program”. The side you are using has a tick.',
             'Pam opens that side. For “Me” it opens Explore. For “My program” it opens Home.',
           ]}
+        shots={[{ name: 'one-phone-two-sides/use-as.png', alt: "The “Use Pam as” screen. Two rows: “Me”, with your visits, saved places and points, and “My program”, with who is coming in, your program and its messages.", caption: "“Use Pam as”." }]}
         />
         <P>You only see “Use Pam as” if your account has both sides.</P>
-        <Screenshot
-          name="one-phone-two-sides/use-as.png"
-          alt="The “Use Pam as” screen. Two rows: “Me”, with your visits, saved places and points, and “My program”, with who is coming in, your program and its messages."
-          caption="“Use Pam as”."
-        />
         <CompareTable
           label="What each side is for"
           rowHeading="Side"
@@ -53,20 +48,16 @@ export function OnePhoneTwoSides() {
       </Section>
 
       <Section title="Add your program to an account you already have">
-        <Steps
-          items={[
+        <HowTo
+          steps={[
             'Ask to be invited to your program, using the phone number you already use for Pam. The invite is made for that number.',
             'Open the link and sign in with the code Pam texts you.',
             'Pam shows “Add your program to your account”. It says you can keep one account for both.',
             'Tap “Add my program”. Tap “Not now” if you would rather wait.',
           ]}
+        shots={[{ name: 'one-phone-two-sides/add-your-program.png', alt: "The “Add your program to your account” screen, with a short list of what changes and a button that says “Add my program”.", caption: "“Add your program to your account”." }]}
         />
         <P>Your program has to be in the same city as your account.</P>
-        <Screenshot
-          name="one-phone-two-sides/add-your-program.png"
-          alt="The “Add your program to your account” screen, with a short list of what changes and a button that says “Add my program”."
-          caption="“Add your program to your account”."
-        />
       </Section>
     </Body>
   );
