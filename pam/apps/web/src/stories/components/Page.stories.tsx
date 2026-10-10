@@ -49,6 +49,6 @@ export const Read: Story = { args: { width: 'read' }, globals: { viewport: { val
 /** Centred, as sign-in is. */
 export const Centred: Story = { args: { align: 'center' } };
 
-export const Tight: Story = { args: { gap: 2 } };
+export const Tight: Story = { args: { gap: 3 } };
 
 export const Spanish: Story = { globals: { locale: 'es' } };

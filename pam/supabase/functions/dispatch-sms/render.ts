@@ -24,6 +24,8 @@ export interface Template {
   reviewedBy: string;
   isFirstContact?: boolean;
   maxVarLengths?: Record<string, number>;
+  /** Segments allowed in a script GSM-7 cannot carry: absent means one (D-431 gives the reminders two). */
+  ucs2Segments?: 1 | 2;
   more?: Partial<Record<Locale, Draft>>;
 }
 
@@ -47,6 +49,8 @@ export interface Bundle {
 export const SMS_MAX_LENGTH = 160;
 /** One segment of a script GSM-7 cannot carry (Chinese, Russian, Arabic). */
 export const SMS_MAX_LENGTH_UCS2 = 70;
+/** One part of a joined UCS-2 message: a template allowed two segments holds 2 × 67 = 134. */
+export const SMS_MAX_LENGTH_UCS2_PART = 67;
 
 // §9, in English. The same list the config package tests against; repeated here
 // because this is the last point before the words leave Pam, and a last check
@@ -142,8 +146,37 @@ export function usableLocale(bundle: Bundle, key: string, wanted: Locale): Local
   return wanted;
 }
 
-/** Renders a queued message, or explains why it must not be sent. */
+/**
+ * Renders a queued message in the person's language, and — if that cannot be
+ * done safely — in English, so the person still gets it.
+ *
+ * A language being signed off decides which language a text is written in,
+ * never whether the person is texted. So when the words in their language fail
+ * a check at the moment of sending (a link a few characters longer than the
+ * wording was written for, a word list that has caught something), the English
+ * text goes instead, and `onFallback` says why (never quoting the words). Only
+ * when English cannot be sent either — a missing variable, an unknown template —
+ * does this throw.
+ */
 export function render(
+  bundle: Bundle,
+  key: string,
+  wanted: Locale,
+  vars: Record<string, string>,
+  onFallback?: (reason: string) => void,
+): string {
+  if (usableLocale(bundle, key, wanted) === 'en') return renderIn(bundle, key, 'en', vars);
+  try {
+    return renderIn(bundle, key, wanted, vars);
+  } catch (error) {
+    if (!(error instanceof UnsendableError)) throw error;
+    onFallback?.(error.message);
+    return renderIn(bundle, key, 'en', vars);
+  }
+}
+
+/** Renders a queued message in one language, or explains why it must not be sent. */
+function renderIn(
   bundle: Bundle,
   key: string,
   wanted: Locale,
@@ -193,9 +226,12 @@ export function render(
   // Twilio compliance: the way out travels with the first message somebody gets
   // from a number they do not recognise.
   const stop = template.isFirstContact ? bundle.stop[locale] : '';
+  const segments = template.ucs2Segments ?? 1;
   const limit = isGsm7(bundle, wording.body.replace(/\{[a-zA-Z0-9_]+\}/g, '') + stop)
     ? SMS_MAX_LENGTH
-    : SMS_MAX_LENGTH_UCS2;
+    : segments === 1
+      ? SMS_MAX_LENGTH_UCS2
+      : segments * SMS_MAX_LENGTH_UCS2_PART;
   body += stop;
 
   assertSafe(body, locale, bundle.forbidden, limit);

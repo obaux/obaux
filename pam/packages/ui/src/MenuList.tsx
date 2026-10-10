@@ -59,6 +59,15 @@ export interface MenuListProps {
   readonly items: readonly MenuItem[];
   /** Subtle lines between rows — a list of places to pick from (D-235). */
   readonly hasDividers?: boolean;
+  /**
+   * Rows keep Astryx's own padding before the icon and after the chevron. Only
+   * for a list inside something with no padding of its own — a card with a
+   * thin edge, the floating action's dock. Every other list is flush: its icons
+   * and chevrons line up with the title above and the page's own margin (Will,
+   * 10 October 2026, D-439: "icon based items … should not have left padding,
+   * so it's flush with header and page layout").
+   */
+  readonly isInset?: boolean;
 }
 
 const styles = stylex.create({
@@ -69,6 +78,7 @@ const styles = stylex.create({
   // is a shorthand, which loses to its longhand width, so the line stayed —
   // a stray rule at the foot of every card that holds a list.
   lastRow: { borderBlockEndWidth: '0px' },
+  flush: { paddingInlineStart: '0px', paddingInlineEnd: '0px' },
   value: { fontSize: '16px' },
   // The label at 18px (§2.5): ListItem's own label size is smaller.
   label: { fontSize: '18px', lineHeight: 1.35 },
@@ -83,7 +93,7 @@ const styles = stylex.create({
   check: { width: '24px', height: '24px', color: colorVars['--color-icon-accent'], flexShrink: 0 },
 });
 
-export function MenuList({ label, items, hasDividers = false }: MenuListProps) {
+export function MenuList({ label, items, hasDividers = false, isInset = false }: MenuListProps) {
   return (
     <List aria-label={label} hasDividers={hasDividers} xstyle={styles.list}>
       {items.map((item, index) => (
@@ -120,7 +130,7 @@ export function MenuList({ label, items, hasDividers = false }: MenuListProps) {
               </HStack>
             ) : undefined
           }
-          xstyle={[styles.row, index === items.length - 1 && styles.lastRow]}
+          xstyle={[styles.row, !isInset && styles.flush, index === items.length - 1 && styles.lastRow]}
         />
       ))}
     </List>

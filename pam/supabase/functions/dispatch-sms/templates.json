@@ -7,15 +7,15 @@
       "more": {
         "pt-BR": {
           "body": "Pam: Convidaram voce para o Pam, um app para achar ajuda e pessoas por perto. Toque para entrar: {link}",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         },
         "zh-CN": {
           "body": "Pam: 您受邀加入 Pam：{link}",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         },
         "zh-HK": {
           "body": "Pam: 你獲邀加入 Pam：{link}",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         }
       },
       "vars": [
@@ -31,15 +31,15 @@
       "more": {
         "pt-BR": {
           "body": "Pam: Voce recebeu um convite para anunciar seus servicos no Pam. Toque para criar sua pagina: {link}",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         },
         "zh-CN": {
           "body": "Pam: 邀请您发布服务：{link}",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         },
         "zh-HK": {
           "body": "Pam: 邀請你發佈服務：{link}",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         }
       },
       "vars": [
@@ -55,23 +55,23 @@
       "more": {
         "pt-BR": {
           "body": "Pam: Seu codigo é {code}. Vale por 10 minutos.",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         },
         "zh-CN": {
           "body": "Pam: 您的验证码是 {code}，10 分钟内有效。",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         },
         "zh-HK": {
           "body": "Pam: 你的驗證碼是 {code}，10 分鐘內有效。",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         },
         "ru": {
           "body": "Pam: Ваш код {code}. Действует 10 минут.",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         },
         "ar": {
           "body": "Pam: رمزك {code}. صالح لمدة 10 دقائق.",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         }
       },
       "vars": [
@@ -87,18 +87,18 @@
       "more": {
         "pt-BR": {
           "body": "Pam: {adminFirstName} conectou voce a um programa que pode ajudar. Abra o Pam para dizer oi: {link}",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         },
         "zh-CN": {
           "body": "Pam: {adminFirstName} 帮您联系了项目：{link}",
-          "reviewedBy": "",
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet",
           "maxVarLengths": {
             "adminFirstName": 14
           }
         },
         "zh-HK": {
           "body": "Pam: {adminFirstName} 幫你聯絡了計劃：{link}",
-          "reviewedBy": "",
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet",
           "maxVarLengths": {
             "adminFirstName": 14
           }
@@ -118,15 +118,15 @@
       "more": {
         "pt-BR": {
           "body": "Pam: Alguem foi apresentado ao seu programa. Abra o Pam para responder: {link}",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         },
         "zh-CN": {
           "body": "Pam: 有人被介绍到您的项目。打开 Pam 回复：{link}",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         },
         "zh-HK": {
           "body": "Pam: 有人獲介紹到你的計劃。打開 Pam 回覆：{link}",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         }
       },
       "vars": [
@@ -142,9 +142,26 @@
       "more": {
         "pt-BR": {
           "body": "Pam: Voce tem uma visita amanha as {time}. {address}. Toque para chegar: {link}",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
+        },
+        "zh-CN": {
+          "body": "Pam: 您明天{time}有预约。{address}。点按查看路线：{link}",
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
+        },
+        "zh-HK": {
+          "body": "Pam: 你明天{time}有一次到訪。{address}。點按查看路線：{link}",
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
+        },
+        "ru": {
+          "body": "Pam: Завтра в {time} у вас визит. {address}. Маршрут: {link}",
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
+        },
+        "ar": {
+          "body": "Pam: لديك زيارة غدا في {time}. {address}. الاتجاهات: {link}",
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         }
       },
+      "ucs2Segments": 2,
       "vars": [
         "time",
         "address",
@@ -163,9 +180,26 @@
       "more": {
         "pt-BR": {
           "body": "Pam: Sua visita é hoje as {time}. {address}. Toque para chegar: {link}",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
+        },
+        "zh-CN": {
+          "body": "Pam: 您今天{time}有预约。{address}。点按查看路线：{link}",
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
+        },
+        "zh-HK": {
+          "body": "Pam: 你今天{time}有一次到訪。{address}。點按查看路線：{link}",
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
+        },
+        "ru": {
+          "body": "Pam: Ваш визит сегодня в {time}. {address}. Маршрут: {link}",
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
+        },
+        "ar": {
+          "body": "Pam: زيارتك اليوم في {time}. {address}. الاتجاهات: {link}",
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         }
       },
+      "ucs2Segments": 2,
       "vars": [
         "time",
         "address",
@@ -184,9 +218,26 @@
       "more": {
         "pt-BR": {
           "body": "Pam: Hoje as {time} voce tem uma visita. {address}. Toque para chegar: {link}",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
+        },
+        "zh-CN": {
+          "body": "Pam: 今天{time}您有预约。{address}。点按查看路线：{link}",
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
+        },
+        "zh-HK": {
+          "body": "Pam: 今天{time}你有一次到訪。{address}。點按查看路線：{link}",
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
+        },
+        "ru": {
+          "body": "Pam: Сегодня в {time} у вас визит. {address}. Маршрут: {link}",
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
+        },
+        "ar": {
+          "body": "Pam: اليوم في {time} لديك زيارة. {address}. الاتجاهات: {link}",
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         }
       },
+      "ucs2Segments": 2,
       "vars": [
         "time",
         "address",
@@ -205,23 +256,23 @@
       "more": {
         "pt-BR": {
           "body": "Pam: Voce conseguiu ir hoje? Responda YES ou NO.",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         },
         "zh-CN": {
           "body": "Pam: 您今天到了吗？回复 YES 或 NO。",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         },
         "zh-HK": {
           "body": "Pam: 你今日到了嗎？回覆 YES 或 NO。",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         },
         "ru": {
           "body": "Pam: Вы сегодня дошли? Ответьте YES или NO.",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         },
         "ar": {
           "body": "Pam: هل وصلت اليوم؟ رد بـ YES أو NO.",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         }
       },
       "vars": [],
@@ -235,23 +286,23 @@
       "more": {
         "pt-BR": {
           "body": "Pam: Sem problema. Guardamos um passo para marcar outra data. Abra o Pam quando puder: {link}",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         },
         "zh-CN": {
           "body": "Pam: 没关系。打开 Pam 重新约时间：{link}",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         },
         "zh-HK": {
           "body": "Pam: 不要緊。打開 Pam 重新約時間：{link}",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         },
         "ru": {
           "body": "Pam: Не страшно. Новое время: {link}",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         },
         "ar": {
           "body": "Pam: لا بأس. موعد جديد: {link}",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         }
       },
       "vars": [
@@ -267,23 +318,23 @@
       "more": {
         "pt-BR": {
           "body": "Pam: Seu pedido foi aprovado. Abra o Pam para comecar: {link}",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         },
         "zh-CN": {
           "body": "Pam: 您的申请已获批准。打开 Pam 开始：{link}",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         },
         "zh-HK": {
           "body": "Pam: 你的申請已獲批准。打開 Pam 開始：{link}",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         },
         "ru": {
           "body": "Pam: Заявка одобрена: {link}",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         },
         "ar": {
           "body": "Pam: تمت الموافقة على طلبك: {link}",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         }
       },
       "vars": [
@@ -299,23 +350,23 @@
       "more": {
         "pt-BR": {
           "body": "Pam: Seu pedido nao foi aprovado. Duvidas? Ligue para {supportPhone}.",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         },
         "zh-CN": {
           "body": "Pam: 您的申请未获批准。有疑问请拨打 {supportPhone}。",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         },
         "zh-HK": {
           "body": "Pam: 你的申請未獲批准。如有疑問請致電 {supportPhone}。",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         },
         "ru": {
           "body": "Pam: Заявку не одобрили. Вопросы? Звоните {supportPhone}",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         },
         "ar": {
           "body": "Pam: لم تتم الموافقة على طلبك. للاستفسار: {supportPhone}",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         }
       },
       "vars": [
@@ -331,23 +382,23 @@
       "more": {
         "pt-BR": {
           "body": "Pam: Alguem no Pam quer se conectar. Abra o Pam para responder: {link}",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         },
         "zh-CN": {
           "body": "Pam: 有人想在 Pam 联系您。打开 Pam 回复：{link}",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         },
         "zh-HK": {
           "body": "Pam: 有人想在 Pam 與你聯絡。打開 Pam 回覆：{link}",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         },
         "ru": {
           "body": "Pam: С вами хотят связаться: {link}",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         },
         "ar": {
           "body": "Pam: شخص يريد التواصل: {link}",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         }
       },
       "vars": [
@@ -363,15 +414,15 @@
       "more": {
         "pt-BR": {
           "body": "Pam: Um lugar que voce salvou {reason}. Veja outros no Pam: {link}",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         },
         "zh-CN": {
           "body": "Pam: 您收藏的地点{reason}。看其他：{link}",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         },
         "zh-HK": {
           "body": "Pam: 你儲存的地點{reason}。看其他：{link}",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         }
       },
       "vars": [
@@ -388,23 +439,23 @@
       "more": {
         "pt-BR": {
           "body": "Pam: Algumas partes do Pam estao desligadas por enquanto. Ligue para {supportPhone} se tiver duvidas.",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         },
         "zh-CN": {
           "body": "Pam: Pam 的部分功能暂时关闭。有疑问请拨打 {supportPhone}。",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         },
         "zh-HK": {
           "body": "Pam: Pam 部分功能暫時關閉。如有疑問請致電 {supportPhone}。",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         },
         "ru": {
           "body": "Pam: Часть функций Pam пока отключена. Звоните {supportPhone}",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         },
         "ar": {
           "body": "Pam: بعض ميزات Pam متوقفة الآن. اتصل بـ {supportPhone}",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 9 October 2026 — approved to learn from; no native reader yet"
         }
       },
       "vars": [

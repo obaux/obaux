@@ -21,8 +21,12 @@ const styles = stylex.create({
   note: { fontSize: '15px', lineHeight: 1.5 },
 });
 
-export function TextRequesterButton({ userId, firstName }: { readonly userId: string; readonly firstName: string | null }) {
-  const { t } = useI18n();
+/**
+ * Opens the super admin's texting app on a request's number. The number is read
+ * on the tap, not when the list loads (see above), and a missing one is said
+ * rather than failing quietly.
+ */
+export function useTextRequester(userId: string) {
   const [busy, setBusy] = useState(false);
   const [missing, setMissing] = useState(false);
 
@@ -38,6 +42,13 @@ export function TextRequesterButton({ userId, firstName }: { readonly userId: st
     // A phone scheme, not a screen: the app has nothing to show for it.
     window.location.assign(`sms:${phone}`);
   };
+
+  return { open, busy, missing };
+}
+
+export function TextRequesterButton({ userId, firstName }: { readonly userId: string; readonly firstName: string | null }) {
+  const { t } = useI18n();
+  const { open, busy, missing } = useTextRequester(userId);
 
   return (
     <VStack gap={1}>

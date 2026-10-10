@@ -210,3 +210,236 @@ Will: "Photo and messages are treated the same. Only reported if flagged." Then:
   twice-safe.
 - **Left:** Will's word to merge; one photo, document and link between two test
   accounts; 0085 whenever convenient.
+
+## Part 4 — merged; the languages approved to learn from; the draft script run end to end
+
+After the merge (PR #29, `8dee5d4`, Vercel READY) Will answered the open
+question about the new languages: "Let's approve new languages for now. We'll take
+a fail first then fix it approach. We'll adjust languages based on feedback."
+
+- **The sign-off is recorded in so many words** (D-430): `reviewedBy` on the 53 text
+  drafts and the five invite-email languages reads `APPROVED_TO_LEARN_FROM` ("Will
+  (Oba), 9 October 2026 — approved to learn from; no native reader yet"). Tests
+  rewritten for the approved state; a new one empties the approvals and asserts
+  everyone is texted in English again, and one pulls a single language and leaves the
+  rest.
+- **Will asked whether signing could ever stop someone getting a text. It could, in
+  one place.** An unsigned language already meant English, never nothing. But a
+  *signed* text that failed a check at send time (a link longer than the wording
+  was written for, a forbidden word) was refused and the person got nothing. The
+  dispatcher now falls back to English, logs the template, language and reason (never
+  the words), and throws only when English cannot be sent either.
+- **The draft script (`copy:draft`) was run end to end** against a stand-in
+  Anthropic API (`ANTHROPIC_BASE_URL`), which found a real bug: plural forms in
+  Russian and Arabic were left stale because the script drafted the base key. It
+  now drafts the actual stale keys with a `form` hint. `test/copy-sync-cli.test.ts`
+  covers the dry run (sends nothing), the six requests, the plural forms and the
+  refusal without a key; a mutation check confirmed the test catches the bug. It
+  has still not talked to the real API (no key here).
+- **Not redeployed.** The live `dispatch-sms` (v15) is the old one: "PAM:" prefix,
+  English and Spanish only. Redeploying switches the prefix to "Pam:" and starts
+  texting in the new languages, so it goes together with re-filing the carrier
+  campaign — Will's call.
+- **Left:** the redeploy and the carrier filing; two segments for the three
+  appointment reminders in Chinese, Russian and Arabic; an email provider and a
+  domain; native readers for the privacy, terms and transparency screens; the full
+  text-fit audit baseline (`apps/web/scripts/fit-known.json`).
+- **A note for the next session:** the Python I used to edit these records asserted
+  on text that wrapped differently than I had assumed and stopped half way. Edits
+  before the assertion were applied, the ones after were not; check `git diff` after
+  a scripted edit, not the script's last line.
+
+## Part 5 — two segments for the three reminders (D-431)
+
+Will asked why SMS has a length limit and whether people should simply get the text in
+the language they chose. The limit is the encoding (70 characters a segment in
+Chinese, Russian and Arabic) plus the carrier registration that says one segment;
+the three appointment reminders could not be said in 70, so those readers were
+being texted them in English. Will: "allow two segments for those three reminders
+only and update the registration."
+
+- **Code:** `ucs2Segments: 2` on `appointment_24h`, `appointment_2h`,
+  `appointment_morning_of`; a wide script may run to 134 (two parts of 67),
+  everything else is unchanged. Mirrored in the dispatcher's `render.ts`; the
+  generated bundle carries it. Twelve new drafts (3 reminders × zh-CN, zh-HK, ru, ar)
+  carrying Will's approval to learn from.
+- **Tests:** the limit per template; the cheap encoding never gets two; each reminder
+  rendered at its variable budgets with the 36-character link has ≥ 8 characters to
+  spare; the dispatcher accepts 134 and falls back to English at 135; the parity
+  test fails if the dispatcher is stuck at 70 (checked by breaking it, then restoring).
+- **Registration:** `docs/sms-campaign-samples.md` — the description rewritten to
+  1,018 of 1,024 characters, seven languages, the two-segment exception, a sample of
+  the reminder in each added language. **Will files it with the carrier**, before
+  `dispatch-sms` is redeployed. I did not touch the Twilio account.
+- **Found, not fixed:** nothing queues any appointment reminder yet (no function,
+  trigger or screen references them), so the time format a reminder carries in each
+  language is not decided; the tests assume up to ten characters.
+- **Will asked for the carrier filing and its instructions on the before-launch
+  list** ("no need for my approval on wording added"): a new item, *File the updated
+  text-message registration with the carrier, then deploy `dispatch-sms`*, with eight
+  steps from "copy what is registered today" to "read one text in each script on
+  your phone". It points at `docs/sms-campaign-samples.md` rather than repeating it.
+  Two things in it are unverified and say so: the Twilio menu path, and whether an
+  approved campaign can be edited or has to be replaced.
+
+## Part 6 — the text-fit baseline (D-434)
+
+Will: "do the full text-fit audit (fills the fit check's accepted list)". The audit ran
+over every story, all seven languages and the pseudo-language, at 320px (about 37
+minutes, 3,752 measurements, none unmeasurable): 137 defects new in a language.
+
+- **Looked at, in screenshots.** The 35 in real languages are not text cut off where it
+  should show; they are scrolling or fading areas, lines that are one line with an
+  ellipsis by design (a Shared-things title slides to show its end, D-407), a thread
+  scrolling under its header. All 119 distinct ones are in
+  `apps/web/scripts/fit-known.json` with a reason each, so the `PAM Language fit` job
+  has its baseline. A first slice run with `--known` exits 0.
+- **One real fault fixed:** `LargeTitleHeader`'s invisible compact title pushed the
+  header buttons past the edge in the pseudo-language (nine screens scrolled
+  sideways); it now shortens. Re-audited English and pseudo on a rebuilt Storybook:
+  pseudo 102 → 94, sideways scroll 9 screens → 1, English unchanged at 159.
+- **A fix I tried and did not ship:** letting tab labels wrap. It broke Russian,
+  Portuguese and Spanish words mid-word, which the first screenshot showed at once.
+  Tabs sized by content work but move the English tabs; Will's call (before-launch).
+- **Numbers:** I pushed a claim for D-432 that the goldberg branch had already taken,
+  because I read their allocations row after bumping mine; corrected within minutes to
+  D-434 (goldberg D-429, D-432; bohr D-433). Read the other branches' rows *before*
+  editing yours.
+- **Not known:** whether GitHub's runner (its own fonts) reports defects this sandbox did
+  not; the first run of the job will say. Each would be looked at and added.
+- **First run on GitHub** (a pull request that touches `fit-known.json` runs the job, ~55
+  minutes): 99 defects, 97 already known, 2 not — the Russian and Simplified Chinese
+  twins of the Arabic shared-files entry (GitHub's fonts make that column slightly
+  wider). Looked at, added with the same reason (121 entries), and the job's timeout
+  raised from 60 to 90 minutes because it used 55. Re-run on the push after this.
+
+## Part 7 — an address can be copied, or opened in Apple Maps (D-439)
+
+Will, on the Arabic address finding: "Let's ensure the address listed is easily copied
+into google maps or apple maps to help them navigate."
+
+- **Code:** `PlaceDetail`'s address card gets `addressActions`: a copy button (the D-417
+  `CopyButton`, copying exactly the address), an "Open in Apple Maps" link, and the
+  address text isolated for reading direction (`unicode-bidi: plaintext`) and selectable.
+  `appleMapsHref` beside `directionsHref` (coordinates beat the address, as for Google).
+  Wired in the place page, the program page and the request-a-program screen through
+  `lib/addressActions.ts`. Four strings in seven languages (`copy:ack`). Eight new UI
+  tests and the axe test covers the controls; stories *PlaceDetail* and *ArabicAddress*.
+- **Looked at** in Storybook, English and Arabic: the Arabic address keeps its order
+  (123 Main St first), the copy button mirrors to the left, "فتح في خرائط Apple" reads
+  right. A first screenshot showed the Apple Maps link centred across the card; it now
+  starts where the address does.
+- **Not run:** the browser (Playwright/axe) suite for contrast and target size; CI does.
+- **Not done:** Trips cards and booking confirmations show the place name, not an address.
+
+- **Will's changes the same day:** the copy button inside a card is 32px with no ring
+  (`CopyButton placement="inCard"`; the page-level one stays 48px), and the link just
+  says "Open in…" and opens a drawer with Google Maps and Apple Maps as full-colour app
+  symbols in square frames (`MapAppIcons.tsx`). The symbols are my redrawn stand-ins,
+  not the companies' artwork. The UI tests now stub `matchMedia` and the `<dialog>`
+  methods in `test/setup.ts`, because jsdom lacks both and Astryx's drawer needs them.
+  The first Storybook screenshot of the *Components/Places/PlaceDetail* story showed
+  the older action-rows layout, which is only what that story draws (it passes no
+  `quickActions`); the live place page uses the round quick actions (D-224).
+
+## Part 8 — a flaky join test that was a real bug
+
+CI's *Accessibility (browser)* failed on the push run of the drawer commit — one test,
+`join.spec.ts` "a city Pam does not serve is an offer", on a different viewport each
+time, failing on the retry and on a re-run — while the pull-request run of the *same
+commit* passed. Not reproducible locally (165 runs, up to 16 workers). Reading the join
+screen: on the waiting screen the second "which cities is Pam in" answer replaced the
+city the person had typed with the first one on the list, so a person in Scranton was
+told "Pam is not in Philadelphia yet" and would have been put on the waiting list *for
+Philadelphia*. The test only passed by looking within the few milliseconds before that
+answer came back; a loaded runner looks later. Proved by making the test look 400ms
+later (it failed every time), then fixed:
+
+- **App** (`JoinScreen.tsx`): on the waiting screen the answer fills the list for "Right
+  now Pam is in …" and leaves the city alone. Only reachable when the first ask for the
+  list failed (the box came back) and the second succeeded.
+- **Test**: waits for "Right now Pam is in Philadelphia." (the answer has landed) *then*
+  checks the city is still Scranton, so it fails the same way every time on the old code.
+- Full browser suite on the fixed build: 827 of 828 first time, the one failure
+  (`places.spec` "an empty area says so", narrow-320, no retry) passed 60 of 60 alone.
+- This is outside the address work; it is in this PR because it kept this PR's check red.
+
+- **Will supplied the two icons** (10 October) and the redrawn stand-ins are gone: the
+  Google pin on light grey, Apple's icon cropped so no corner shows grey, both 192px
+  squares in `apps/web/public/maps/`, both rounded by the same 22%. Found the crop by
+  testing, per crop size, that every pixel under the rounded frame is opaque (5% in, plus
+  2% margin). They are in Foundations › Imagery (the test requires it).
+
+## Part 9 — the rows layout retired, the drawer refined (10 October)
+
+Will, shown the older rows layout in Storybook: "Please retire the rows layout, only use
+place profiles with sticky footer buttons." Then, looking at the drawer: icons "flush with
+header and page layout", "make Open in much smaller", "tiny subtitles under App name saying
+'Opens in app'", and "if no app installed, redirect to app store, based on their device,
+android vs ios."
+
+- **Rows retired (D-440).** `PlaceDetail` lost the labelled-rows fallback and the props
+  only it used; the place page's footer now carries *How to get there* for anyone who is
+  not planning or booked, and the directions *row* is left out in that case so it is not
+  said twice. `RequestProgramScreen` got the profile's list; the gallery and the Storybook
+  story draw a profile with its footer button. The e2e specs already spoke the profile's
+  words ("Get directions" row, "Plan a trip").
+- **Drawer (D-439 amended).** `MenuList isFlush`; the title 15px; `place.address.opensInApp`
+  ("Opens in app", seven languages, machine drafts); `mapsLaunch.ts` with the Android
+  intent, the iPhone try-then-store, no Apple Maps on Android. I read "make Open in much
+  smaller" as the drawer's title (the big word in the screenshot), not the "Open in…" link
+  on the card.
+- **Found while testing:** Astryx's `ListItem` ignores `onClick` when it has an `href`, so the
+  drawer's earlier "close when chosen" never ran. A row that must run script (the iPhone's
+  Google Maps) is therefore a button, and the link rows simply leave the drawer open.
+- **Numbering.** My address decision was D-435; `amazing-archimedes` had pushed its own D-435
+  (Arabic isolates) first, and `affectionate-goldberg` claimed D-435 on 10 October at 01:19.
+  Mine is now **D-439** and the rows retirement **D-440**; D-438 is left for `bohr`. Goldberg's
+  D-435 claim still has to move (their row, not mine, to change).
+- **Not tried on a phone.** Before-launch has a real-device check for the app-or-store
+  hand-off, including the two store addresses, which were written from memory.
+
+- **The address is the link (10 October, later).** Will: "instead of Open in… button, let's
+  make the address a hyperlink that opens drawer." The "Open in…" line under the address is
+  gone; the address (underlined, accent colour) opens the drawer, named for a screen reader
+  "address. Open in…". The string `place.address.openIn` stays, now as the spoken hint.
+- **Why the text-fit job went red on `441ede8`.** Its four unaccepted defects were all the
+  Trips card's date: the example visits are "in 2 days" and "in 5 days", so the text a defect
+  is recorded under moved from "Wednesday, Oct 14" (the day I wrote the list) to "Thursday,
+  Oct 15" overnight. Nothing about the layout changed. The audit now runs every story with the
+  browser clock set to 9 October 2026 (`AUDIT_NOW` in `scripts/audit-language-fit.mjs`), so
+  dates in stories stop moving; the accepted list is unchanged.
+- **Arrows are not mirrored in Arabic (Will, 10 October).** "The chevrons don't need to be
+  reversed. Only text and layout." The one mirrored glyph was the sub-page back arrow
+  (`BackArrowIcon`, `[data-pam-directional]` in `globals.css`); the rule and the attribute are
+  removed. The list-row and place-header chevrons were never mirrored (checked in the browser).
+
+## Part 10 — super admin screens, invites and requests as pages, unused layouts removed (10 October)
+
+Will: "If there are any other layouts not being used, please remove it. Or if any in super
+admin not using our latest templates, please replace and update… Super admins still use the
+old invite method with buttons… we should use the nested page method." An Explore agent read
+every route a super admin reaches and listed the unused code; I re-checked each candidate with
+grep before deleting and left some in on purpose (D-444 says which and why).
+
+- **Invites:** `/invite/new/?role=` (`InviteNewView`), rows on `/invite/`, Everyone's card gone.
+  Reading `0077_invites_know_who.sql` against `InviteView` showed a super admin could never
+  make an invite from Profile (no `p_region_id`); the Everyone card was the only caller that
+  sent one. `InviteForWho` and `InviteReady` keep working for `/admin/` (heading and cancel are
+  optional now).
+- **Requests:** rows, then `/requests/review/` (`RequestReviewScreen`) with Approve and Deny in
+  the sticky footer. No e2e spec had touched the old card, so `invite.spec.ts` covers both.
+- **Flush lists** (Will's earlier line about the drawer's icons, taken to mean every list of
+  rows on a page): `MenuList` is flush unless `isInset`; the three lists inside cards and the
+  floating action's dock are inset.
+- **Not removed:** `VoiceInput` (the voice half of §0), the older `AppHeader`/`PageTitle` screens
+  (live app; the redesign is only mounted in Storybook), `/admin/`'s own in-place invite.
+- **Left alone because it is `CLAUDE.md`'s:** the `variant="compact"` line (Will's to correct).
+- **User-flow map:** `docs/user-flows/flows.mjs` updated (new invite and request pages, the
+  Everyone rows); regenerate and publish with the `pam-user-flows` skill.
+- **Numbering, again.** I took D-442 from `main`'s "next free" while `affectionate-goldberg` had
+  already claimed D-442 and D-443 on its branch (it had moved to a files-per-claim scheme, so its
+  rows were not in the table I read). Mine is **D-444**; next free is D-445. Lesson recorded in
+  `docs/allocations.md`: when another branch's allocations file stops being a table, read its
+  `docs/decisions/` folder and `git grep "D-4"` on that branch before taking a number.
+

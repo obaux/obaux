@@ -51,6 +51,8 @@ const OUT = opt('out', '');
 const FROM = opt('from', '');
 const KNOWN = opt('known', '');
 const WRITE_KNOWN = opt('write-known', '');
+/** The day the stories believe it is (the day the accepted list was written), so dates in them do not drift. */
+const AUDIT_NOW = new Date('2026-10-09T12:00:00Z');
 const ROOT = path.resolve(process.env.SB_ROOT ?? path.join(here, '../storybook-static'));
 
 // ── a tiny static server: `python -m http.server` is one thread, and four workers queue on it ──
@@ -259,6 +261,11 @@ async function run() {
   await Promise.all(
     Array.from({ length: WORKERS }, async () => {
       const ctx = await browser.newContext({ viewport: { width: WIDTH, height: 760 }, reducedMotion: 'reduce' });
+      // The example visits are "in 2 days", "in 5 days": their dates move with the calendar, and so
+      // did the text a defect is recorded under — the accepted list went stale overnight (10 October,
+      // "Wednesday, Oct 14" became "Thursday, Oct 15"). Every story sees the same day, which then
+      // runs on as normal.
+      await ctx.clock.install({ time: AUDIT_NOW });
       const page = await ctx.newPage();
       for (;;) {
         const i = next++;

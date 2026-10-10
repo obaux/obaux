@@ -10,16 +10,13 @@ import { Button } from '@pam/ui/Button';
 import * as stylex from '@stylexjs/stylex';
 import {
   AppHeader,
-  CardEnter,
   HelpBar,
   Loading,
   NavTile,
   Notice,
   Page,
-  PageEnter,
   PeopleIcon,
   PlacesIcon,
-  Press,
   StarIcon,
   TextLink,
 } from '@pam/ui';

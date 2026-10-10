@@ -208,7 +208,7 @@ export const LOCALE_BRIEFS: Readonly<Record<string, LocaleBrief>> = {
 export interface DraftRequest {
   readonly locale: string;
   /** The keys to translate, with the English now and, if it changed, the English before. */
-  readonly items: readonly { key: string; english: string; was?: string; current?: string }[];
+  readonly items: readonly { key: string; english: string; was?: string; current?: string; form?: string }[];
   /** Already-translated neighbours (same screen), for terminology and tone. */
   readonly examples: readonly { key: string; english: string; translation: string }[];
 }
@@ -232,6 +232,11 @@ export function draftPrompt(request: DraftRequest): { system: string; user: stri
   lines.push('Translate these:');
   for (const item of request.items) {
     lines.push(`${item.key}\n  EN: ${item.english}`);
+    if (item.form) {
+      lines.push(
+        `  (this is the "${item.form}" plural form for ${brief.name}: write the sentence the way ${brief.name} says it for numbers in that grammatical category, and keep {count} as written)`,
+      );
+    }
     if (item.was !== undefined) lines.push(`  (the English used to be: ${item.was})`);
     if (item.current !== undefined) lines.push(`  (the current ${request.locale} says: ${item.current} — update it to match the new English)`);
   }

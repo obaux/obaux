@@ -4,10 +4,11 @@ import * as stylex from '@stylexjs/stylex';
 import { Card } from '@astryxdesign/core/Card';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
-import { categoryLabelKey, type Category } from '@pam/config';
-import { Loading, PlaceDetail } from '@pam/ui';
+import { categoryLabelKey, displayPhone, type Category } from '@pam/config';
+import { GlobeIcon, Loading, PhoneIcon, PlaceDetail, PlacesIcon, directionsHref } from '@pam/ui';
 import { SubPage } from '@pam/ui/SubPage';
 import { useI18n } from '@/lib/i18n';
+import { addressActionsFor } from '@/lib/addressActions';
 import { goBack } from '@/lib/navigate';
 import { useSession } from '@/lib/useSession';
 import { useStaffRequests } from '@/lib/useStaffRequests';
@@ -23,6 +24,8 @@ import { TextRequesterButton } from './TextRequesterButton';
  * asked and a way to text them. Approve and Deny stay on the request card,
  * where the city is picked; this page is for looking before deciding.
  */
+const QUICK = { width: 24, height: 24, 'aria-hidden': true } as const;
+
 const styles = stylex.create({
   who: { fontSize: '17px', lineHeight: 1.45 },
   card: { width: '100%' },
@@ -70,20 +73,51 @@ export function RequestProgramScreen({ userId }: { readonly userId: string | nul
         categoryLabel={t(categoryLabelKey(program.category ?? ''))}
         description={program.description}
         address={program.address}
-        phone={program.phone}
-        website={program.website}
+        addressActions={addressActionsFor(t, program.address)}
+        // The same list a member sees under a place (D-224), from what the
+        // person typed at sign-up; the old column of rows is gone (D-440).
+        quickActionsLabel={t('place.quick.label')}
+        quickActions={[
+          ...(directionsHref(program.address)
+            ? [
+                {
+                  id: 'directions',
+                  label: t('place.quick.directions'),
+                  description: t('place.quick.directions.body'),
+                  icon: <PlacesIcon {...QUICK} />,
+                  href: directionsHref(program.address)!,
+                  isExternal: true,
+                },
+              ]
+            : []),
+          ...(program.phone
+            ? [
+                {
+                  id: 'call',
+                  label: t('place.quick.call'),
+                  description: displayPhone(program.phone),
+                  icon: <PhoneIcon {...QUICK} />,
+                  href: `tel:${program.phone}`,
+                },
+              ]
+            : []),
+          ...(program.website
+            ? [
+                {
+                  id: 'website',
+                  label: t('place.quick.website'),
+                  icon: <GlobeIcon {...QUICK} />,
+                  href: program.website,
+                  isExternal: true,
+                },
+              ]
+            : []),
+        ]}
         labels={{
-          directions: t('place.directions'),
-          call: t('place.call'),
-          website: t('place.website'),
           hours: t('place.hours'),
           hoursOnGoogle: t('place.hoursOnGoogle'),
           about: t('place.about'),
           address: t('place.address'),
-          save: t('place.save'),
-          saved: t('places.saved'),
-          share: t('place.share'),
-          flag: t('place.flag'),
         }}
       />
     </SubPage>

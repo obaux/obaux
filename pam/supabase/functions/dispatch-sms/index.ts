@@ -110,7 +110,11 @@ export async function dispatch(limit = 50) {
   for (const row of due) {
     let body: string;
     try {
-      body = render(BUNDLE, row.template_key, localeOf(row.locale), row.vars ?? {});
+      body = render(BUNDLE, row.template_key, localeOf(row.locale), row.vars ?? {}, (why) =>
+        // The person is texted in English instead. Says which message and why,
+        // never the words themselves.
+        console.warn(`sent in English: ${row.template_key} (${row.locale}): ${why}`),
+      );
     } catch (error) {
       // Rendering failed, so nothing went out. The row is put back as failed
       // with the reason, which is how an unreviewed template becomes visible in

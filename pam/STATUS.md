@@ -862,9 +862,9 @@ while the copy is unsigned, so it earned the first live test, not the last.*
 | 33 | ~~Apply `0082`~~ **Done (9 October, D-420)**; **update the language bundles for D-415's wording — done on `claude/gallant-clarke-0dhizj` (drafts for native review)** | Launch (D-415) | `0082_admin_reaches_assigned_only.sql` is live (`list_migrations` first, no drift; function checked; `get_advisors` unchanged in kind). The five other bundles carry D-415's wording on the languages branch. D-415 lists every changed string. |
 | 32 | **Ship the policy, update five languages** (the limited notice is wired — D-427) | Launch (D-413, D-414, D-427) | Will, 9 October: the terms say a limited account can read but not send and a paused one cannot sign in; the transparency line names badges; members are told in the privacy policy (new section "When we limit an account", live since the merge, D-420). **Done (D-427):** `terms.s.limits.p3` ("Pam tells you it is off and who to call") is kept — a limited account sees the `account_limited` notice on Messages and where the composer was, and a refused send no longer says "Your connection dropped". Will has read and approved the privacy section's wording (9 October). Left: (1) the strings changed in D-412–D-415 and D-427 in pt-BR, zh-CN, zh-HK, ru, ar — **done** on `claude/gallant-clarke-0dhizj` once the two branches met (drafts for native review). |
 | 31 | **The before-launch list** | Launch | `docs/before-launch.md` — Will's list of what must be done before real people use PAM. First entry: the email provider for invite links. **0068/0069** are merged as 0075/0076 with 0072's arm kept (D-346); they wait for Will to apply them live. Program sign-up and Add a program are a one-question wizard with a review (D-347); Add a policy is a card (D-348); super admin → program lead message from a place (D-349). |
-| 34 | **Languages: native readers, the texts and emails, deploy 0083** | The new languages going to real people (D-422, A24) | Nobody who speaks Portuguese, Chinese, Russian or Arabic has read the six new bundles; start with the privacy page, the terms, the transparency screen, the notices and the seven "Switching to…" lines. Texts and the invite email have drafts in all five (53 texts) and are **sent in English until a person signs each** — `docs/before-launch.md` has what only Will can decide (two segments for reminders; re-filing the carrier campaign). **0083 is live** (applied 9 October, with the merge to `main`). Open question left at its default (no restriction): should staff be able to pick any language? In `docs/before-launch.md`. |
+| 34 | **Languages: native readers, the texts and emails, redeploy `dispatch-sms`** | The new languages going to real people (D-422, A24, D-430) | Will approved every new language **to learn from** (9 October, D-430): the five languages' screens are live, and the 53 texts and the five invite emails are signed `Will (Oba) … approved to learn from; no native reader yet`. Nobody who speaks Portuguese, Chinese, Russian or Arabic has read the six new bundles; start with the privacy page, the terms, the transparency screen, the notices and the seven "Switching to…" lines, and fix what they say (`docs/copy-changes.md` › *When somebody says a translation is wrong*). **The live `dispatch-sms` (v15) is still the old one** — "PAM:" prefix, English and Spanish only — so no one is texted in a new language until Will says to redeploy it, together with re-filing the carrier campaign; `docs/before-launch.md` has the rest (the three reminders now take two segments in Chinese, Russian and Arabic, D-431 — the carrier filing has to say so first — the steps, ready to paste, are in `docs/before-launch.md` › *File the updated text-message registration*; an email provider). **0083 is live.** Open question left at its default (no restriction): should staff be able to pick any language? |
 | 35 | **Messages in your own language: switching it on** | D-423 | Built and off. Needs the provider's no-retention terms in writing, the key as a function secret, a native read of `privacy.s.translation.*`, a way to tell members first, a per-person daily cap, then both switches. `docs/before-launch.md`. |
-| 36 | **Merge of `claude/gallant-clarke-0dhizj` to `main`: ready, waiting for Will's word** | Will, 9 October 2026 (hold until 0079–0081 are live — they now are; "Photo and messages are treated the same. Only reported if flagged.", D-428) | The branch is `main` plus `claude/pam-storybook` plus the seven languages and the other session's D-427, pushed and checked (e2e 828, Storybook, first load 544.6 kB, DB suite 546). **0079–0081 are live** (9 October, read back; advisors show nothing new for `anon`), so the photo, document and link buttons will work. Photos follow the message rule (checked), so "tell members first" does not gate the merge. 0085 is not applied and nothing waits on it (the app falls back; `packages/db/manual/…language-where-there-is-no-profile.sql` applies it when convenient). Left: Will says "merge"; Claude merges, watches the Vercel deploy, and Will sends one photo, one document and one link between two test accounts. If `main` moves first, merge it into the branch again (`list_migrations` first). |
+| 36 | ~~Merge of `claude/gallant-clarke-0dhizj` to `main`~~ **Done** — PR #29, merged as `8dee5d4` on 9 October 2026 at Will's word; Vercel production READY and smoke-checked | Will, 9 October 2026 (D-428) | 0079–0081 were live first (read back; advisors show nothing new for `anon`). Left for Will: send one photo, one document and one link between two test accounts. 0085 is not applied and nothing waits on it (`packages/db/manual/…language-where-there-is-no-profile.sql` applies it when convenient). |
 | 37 | ~~Apply `0086` (staff email on invites) with the app change that uses it~~ **Done (10 October, D-441)** | Launch (D-441) | Will, 10 October: a staff invite carries a required email, the account keeps it tied to the phone, members are never asked; only super admins read it; it is deleted with the account. **0086 is live** (applied after `list_migrations` showed no drift; advisors unchanged in kind) and the app change is on `main` (`0220ae0`; CI and Storybook green). Open: a native read of the new-language privacy lines (the `What we keep` paragraph and `how-long.p3`); staff who already have accounts have no email and no screen to add one; sending any email needs the provider (first item on `docs/before-launch.md`). |
 | 38 | ~~Apply the two audit-log migrations, in order~~ **Done (10 October, D-443)** | Launch (D-443) | Will, 10 October: "When account is deleted the account should sit in audit log for 6 months before it disappears." **Live:** a deleted profile leaves an `account.delete` audit row; a nightly job (`purge-erased-audit`, 03:30 UTC) deletes every row naming the account six months later; the foreign key from `audit_log.actor_id` to `profiles` is gone so an account that acted can be deleted; the privacy page says it (`privacy.s.how-long.p3`). **Still blocked:** a member who has points cannot be deleted (the append-only points ledger refuses the cascade) — Will said yes, delete the points history too (the next change, after this merge). Then the one routine for the Pam team that deletes everything (`docs/before-launch.md`). |
 
@@ -947,12 +947,16 @@ migrations is on the live project** — correction, 9 October, later: 0083, 0084
   is in `docs/before-launch.md`.
 - **Spanish, spelled properly (D-421, 0.50.1).** 172 strings got their
   accents, ñ and ¿ back; spelling only, checked by script.
-- **Texts and emails in every language (D-424) — drafts, none signed.** 53 text
-  drafts (pt-BR 15, zh-CN 12, zh-HK 12, ru 7, ar 7) and the invite email in all
-  five, each language with its own empty `reviewedBy`; until a person signs a
-  wording the recipient is texted or emailed in English. 160 characters, or 70
-  where the script needs the other encoding (the appointment reminders have no
-  text there); a justice-word list per language, applied again in the
+- **Texts and emails in every language (D-424, D-430) — approved by Will to learn
+  from; not yet deployed.** 53 text drafts (pt-BR 15, zh-CN 12, zh-HK 12, ru 7, ar 7)
+  and the invite email in all five carry Will's approval of 9 October ("no native
+  reader yet"); pull a language by emptying its `reviewedBy`. A text always goes out:
+  English if the person's language is not signed or cannot be sent safely. The live
+  `dispatch-sms` (v15) is older than the repo ("PAM:" prefix, English/Spanish) and is
+  **not redeployed** — see before-launch (the carrier filing comes first). 160
+  characters, or 70 where the script needs the other encoding, **except the three
+  appointment reminders, which may take two segments (134) in Chinese, Russian and
+  Arabic (D-431, Will)**; a justice-word list per language, applied again in the
   dispatcher; one STOP table the dispatcher and the config package share; a
   parity test renders both. **Migration 0085 (not applied; by hand, and nothing waits on it)**
   keeps the language a person asked in on staff requests and invite emails. The
@@ -964,7 +968,36 @@ migrations is on the live project** — correction, 9 October, later: 0083, 0084
   six translations are answered or kept on purpose. Storybook's *Pseudo-language*
   (English +45%), a `PAM Language fit` workflow on pull requests, web unit tests
   now in CI. How: `docs/copy-changes.md`. Numbers (D-, A, migrations) are claimed
-  in `docs/allocations.md` (D-426).
+  in `docs/allocations.md` (D-426). **The fit check has its baseline (D-434):**
+  the full audit's 137 defects were looked at and 121 distinct ones are in
+  `apps/web/scripts/fit-known.json` with reasons; one real fault was fixed (the
+  header's invisible compact title pushed its buttons off the screen); the tab bar
+  is left for Will (before-launch). The job takes about an hour (limit 90 minutes).
+- **An address can be copied or opened in a maps app (D-439, 0.52.0).** On the
+  address card of a place or program: a small 32px copy button (no ring: Will's rule for
+  copy actions inside a card), the address itself a link that opens a drawer with Google
+  Maps and Apple Maps as Will's own app icons, one corner radius for both, and the address kept
+  in its own reading order in Arabic. The drawer's rows are flush with its title, each
+  app says "Opens in app", and on a phone a tap opens the app or, failing that, the
+  App Store / Play Store page (Android has no Apple Maps row). Eight strings in seven
+  languages (the six are machine drafts). **The app-or-store hand-off has not been tried
+  on a real phone** (before-launch).
+- **Super admin screens on the latest templates (D-444).** Inviting is a page per kind
+  (`/invite/new/?role=`), with the city asked there — Profile › Invite someone had been
+  failing for a super admin because no city was sent. Requests are rows, and a request is
+  a page with Approve and Deny pinned to the foot (`/requests/review/`). Everyone has two
+  rows instead of a card of buttons. Every list of rows is flush with the page margin
+  (`MenuList isInset` is the exception). Unused layouts and components were removed (see
+  D-444 for the list and for what was kept on purpose: `VoiceInput`, the older
+  `AppHeader`/`PageTitle` screens that are still the live app, and `/admin/`'s in-place
+  invite). Browser test: `e2e/invite.spec.ts`.
+- **A place has one layout (D-440).** The labelled-rows layout (Call this place,
+  Their website, Save, Share, Flag) is retired everywhere, including Storybook, the
+  components gallery and the program-request screen: a place is its details, a list of
+  ways to reach it, and one button in the sticky footer (*Plan a trip* for a member,
+  *How to get there* otherwise; nothing once a visit is booked). `PlaceDetail` lost its
+  `phone`, `website`, `directionsHref`, `isSaved`, `onSave`, `onShare`, `onCall`,
+  `flagHref` props.
 - **Migrations 0083 and 0084 are live** (applied 9 October after a
   `list_migrations` check; `get_advisors` clean). 0083 is
   `profiles_language_supported` taking the five new codes; 0084 is

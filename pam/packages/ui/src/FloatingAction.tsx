@@ -58,7 +58,7 @@ export function FloatingAction({ label, href, icon, description }: FloatingActio
       <HStack xstyle={styles.dock}>
         <VStack aria-hidden xstyle={edgeFade.above} />
         <VStack xstyle={styles.inner}>
-          <MenuList label={label} items={[{ id: 'action', label, href, icon, ...(description ? { description } : {}) }]} />
+          <MenuList label={label} isInset items={[{ id: 'action', label, href, icon, ...(description ? { description } : {}) }]} />
         </VStack>
       </HStack>
     </>

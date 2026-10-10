@@ -123,7 +123,7 @@ export function HelpSafetyView() {
   const { t } = useI18n();
   const supportPhone = useSupportPhone();
   return (
-    <SubPage title={t('help.safety.title')} backHref="/help/" backLabel={t('nav.back.help')} gap={4}>
+    <SubPage title={t('help.safety.title')} backHref="/help/" backLabel={t('nav.back.help')}>
       <Card padding={6}>
         <VStack gap={3}>
           <VStack gap={1}>

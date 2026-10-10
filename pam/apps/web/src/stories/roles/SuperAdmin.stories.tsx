@@ -17,6 +17,7 @@ export const Messages: Story = screen('super-admin', 'Messages', '/messages/');
 export const Profile: Story = screen('super-admin', 'Profile', '/profile/');
 export const Everyone: Story = screen('super-admin', 'Everyone', '/directory/');
 export const Requests: Story = screen('super-admin', 'Staff requests', '/requests/');
+export const RequestReview: Story = screen('super-admin', 'A request to review', '/requests/review/', { id: 'r-2' });
 export const RequestProgram: Story = screen('super-admin', 'A requested program', '/requests/program/', { id: 'r-2' });
 export const Thread: Story = screen('super-admin', 'A conversation with a case manager', '/messages/thread/', {
   id: 'dummy-conv-dummy-a1-dummy-s1',
@@ -29,6 +30,8 @@ export const ThreadWithProgramLead: Story = screen('super-admin', 'A conversatio
 });
 export const InvitesLog: Story = screen('super-admin', 'Invited people', '/invites/');
 export const Invite: Story = screen('super-admin', 'Invite someone', '/invite/');
+export const InviteOne: Story = screen('super-admin', 'A link for a member', '/invite/new/', { role: 'member' });
+export const InviteCaseManager: Story = screen('super-admin', 'A link for a case manager', '/invite/new/', { role: 'admin' });
 export const ViewAs: Story = screen('super-admin', 'See the app as', '/view-as/');
 export const Person: Story = screen('super-admin', 'A person', '/person/', { id: 'dummy-m1' });
 export const Notifications: Story = screen('super-admin', 'Notifications', '/notifications/');
