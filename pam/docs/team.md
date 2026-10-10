@@ -44,7 +44,7 @@ when there is something he can see or try.
 | <img src="team/remy.svg" width="40" alt=""> | **Remy** | Right-to-Left Language Specialist (retired) | — (job done; Lena covers Arabic) | `session_01A44BM2WPMuZYKkspxsiQEG` |
 | <img src="team/dot.svg" width="40" alt=""> | **Dot** | Design Systems Lead | Design system & Storybook | `session_01A3kdir46ErR2eyjDLFdzyW` |
 | <img src="team/wren.svg" width="40" alt=""> | **Wren** | Website & Help Centre Lead | Public website | `session_012vS6F7CMTwFn3u5UG66JWz` |
-| <img src="team/iris.svg" width="40" alt=""> | **Iris** | User Research & Testing Lead | User testing & research | `IRIS_SESSION` |
+| <img src="team/iris.svg" width="40" alt=""> | **Iris** | User Research & Testing Lead | User testing & research | `session_015bSW8g1AzsnhL9F4FXvcN1` |
 | <img src="team/gus.svg" width="40" alt=""> | **Gus** | Former Platform Engineer (retired) | — | `session_01NoLKA8RJRwhyDJUe8CAZVE` |
 
 **One specialist per lane.** Will, 10 October, asked why accounts and languages each

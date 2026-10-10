@@ -202,7 +202,7 @@ Will, 10 October: "Go ahead and decide, you're the CTO."
 | **Lena**, Languages & Legal Lead (covers Arabic) | PAM · Lena · Languages & Legal Lead | `session_01Hjv2RQuz5PJmxQ7tLGb5sW` | — | weekly; next batch Friday 16 October (`docs/weekly/2026-10-16.md`) | Friday |
 | **Dot**, Design Systems Lead | PAM · Dot · Design Systems Lead | `session_01A3kdir46ErR2eyjDLFdzyW` | `claude/pam-design-flow-map-3` | the Figma map: the staff Home card and a past visit on Trips; then the map once a night | — |
 | **Wren**, Website & Help Centre Lead | PAM · Wren · Website & Help Centre Lead | `session_012vS6F7CMTwFn3u5UG66JWz` | — | weekly; next batch Friday 16 October | Friday |
-| **Iris**, User Research & Testing Lead | PAM · Iris · User Research & Testing Lead | `IRIS_SESSION` | new, from `main` | first pass: the Member flow | — |
+| **Iris**, User Research & Testing Lead | PAM · Iris · User Research & Testing Lead | `session_015bSW8g1AzsnhL9F4FXvcN1` | new, from `main` | first pass: the Member flow | — |
 
 **Retired** (archived; their work and session logs stay in the records, and either can
 be brought back):
