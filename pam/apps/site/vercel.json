@@ -6,18 +6,6 @@
   "framework": null,
   "cleanUrls": true,
   "trailingSlash": true,
-  "redirects": [
-    {
-      "source": "/j/:code",
-      "destination": "https://app.joinpam.org/j/:code",
-      "permanent": false
-    },
-    {
-      "source": "/j/:code/",
-      "destination": "https://app.joinpam.org/j/:code",
-      "permanent": false
-    }
-  ],
   "headers": [
     {
       "source": "/(.*)",

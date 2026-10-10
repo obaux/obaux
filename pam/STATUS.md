@@ -1112,7 +1112,7 @@ assignments" (only what is live; the full table is held behind `live` flags, D-4
 drafts** (`status: 'draft'`, not built into the site; Storybook only): "Keeping your program's listing up
 to date" (until listing editing ships) and "Staff requests" (no way to ask to be staff since D-369). The
 posts say only what is live, so they go stale as features ship: `docs/before-launch.md` lists which.
-`joinpam.org/j/<code>` forwards to the app's invite page (`vercel.json`, tested in `test/redirects.test.ts`).
+There is no `joinpam.org/j/<code>` short link: it was removed (the app has no `/j/` page); it returns when a text or email uses it, with its author.
 New posts: the `pam-support-post` skill. Storybook: **Website/Journey** (every post, drafts with a banner)
 and **Share and icon**. Checks: CI builds the site and runs `scripts/a11y.mjs` (axe, light and dark, desktop,
 phone and 320px: 70 scans, 0 problems on 10 October); screenshots from `scripts/screenshots.mjs`. Not on the
