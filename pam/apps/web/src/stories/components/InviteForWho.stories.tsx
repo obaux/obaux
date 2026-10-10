@@ -6,13 +6,15 @@ import { InviteForWho } from '../../screens/InviteForWho';
  * The number is the only one that can use the link, and how Pam finds the
  * invite when the person signs in without it. Staff — a program lead or a case
  * manager — also need an email, which lands on their account when they sign in
- * with that number (D-441); a member is never asked for one.
+ * with that number (D-441); a member is never asked for one. This is the body
+ * only: on the app's screens it sits under the nested page template, the kind of
+ * invite as the large title (see Case manager › Invite a program).
  */
 const meta = {
   title: 'Components/Forms/InviteForWho',
   tags: ['autodocs'],
   component: InviteForWho,
-  args: { role: 'provider', busy: false, onSubmit: () => {}, onCancel: () => {} },
+  args: { role: 'provider', busy: false, onSubmit: () => {} },
 } satisfies Meta<typeof InviteForWho>;
 
 export default meta;

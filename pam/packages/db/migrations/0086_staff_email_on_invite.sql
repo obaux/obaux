@@ -15,11 +15,18 @@
 --
 --   1. `invite_contact_emails` — the email a staff invite was made with, held
 --      apart from `invites` so that the person who typed it, other case
---      managers, programs and members cannot read it back. No client role has
---      any grant on it and it has no policy: only the functions below reach it.
+--      managers, programs and members cannot read it back. Only a super admin
+--      can read it (Will, 10 October: "Only super admins can view emails"); no
+--      client role can write it; the functions below are the only way in.
 --   2. `profile_emails` — the account's email, tied to the verified phone by the
---      invite that named both. The person can read their own row; nobody else
---      can, and no client role can write it.
+--      invite that named both. Only a super admin can read it; not the person
+--      who invited them, not a case manager, a program or a member, and not the
+--      person themselves in the app (they can ask Pam for a copy of their data).
+--      No client role can write it. **It goes with the account:** deleting a
+--      person's account (Will: "if a user chooses to delete all their data, the
+--      email goes along with it") deletes the row, because it cascades from the
+--      profile; and an inviter's pending invites, with the emails waiting on
+--      them, cascade from theirs.
 --   3. `create_staff_invite(role, email, phone, region, name)` — the way to
 --      invite a case manager or a program lead; the email is required and must
 --      look like one. `create_invite` (the 4-argument form every member invite
@@ -36,8 +43,8 @@
 --      redeems exactly as before.
 --
 -- What it deliberately does not do: send anything (the provider is a separate
--- item in docs/before-launch.md), show the email to anyone but its owner, put
--- it in the audit log, or ask a member for one.
+-- item in docs/before-launch.md), show the email on any screen (no screen reads
+-- it yet), put it in the audit log, or ask a member for one.
 
 -- ---------------------------------------------------------------------------
 -- 1. The email a staff invite was made with.
@@ -56,16 +63,16 @@ alter table public.invite_contact_emails enable row level security;
 alter table public.invite_contact_emails force row level security;
 revoke all on public.invite_contact_emails from public, anon, authenticated;
 
--- A policy that admits nobody, so "no one" is written down rather than implied
--- by a missing grant (03_invariants.sql wants every RLS table to have one). The
--- functions below run as the table's owner and the sender uses the service role;
--- neither is a client role.
-create policy invite_contact_emails_nobody on public.invite_contact_emails
-  for all using (false) with check (false);
+-- A super admin reads it (Will, 10 October); nobody else, and nothing writes it
+-- from the app. The functions below run as the table's owner and Pam's sender
+-- uses the service role; neither is a client role.
+grant select on public.invite_contact_emails to authenticated;
+create policy invite_contact_emails_super_admin_select on public.invite_contact_emails
+  for select to authenticated using (public.is_super_admin());
 
 comment on table public.invite_contact_emails is
-  'The email a staff invite was made with (0086, D-441). Forced RLS, a policy that admits nobody, '
-  'no grant to any client role: only invite_create(), redeem_invite(), '
+  'The email a staff invite was made with (0086, D-441). Forced RLS; a super admin '
+  'reads it, nobody else; no client role writes it: only invite_create(), redeem_invite(), '
   'add_role_from_invite() and keep_invite_email() reach it. Removed when the '
   'invite is redeemed, because the account keeps it then (profile_emails).';
 
@@ -89,15 +96,18 @@ alter table public.profile_emails force row level security;
 revoke all on public.profile_emails from public, anon, authenticated;
 grant select on public.profile_emails to authenticated;
 
--- Their own, and nobody's else: not the person who invited them, not a case
--- manager, not a program, not a member, not the super admin through the app.
--- Pam's own sender reads it with the service role.
-create policy profile_emails_own_select on public.profile_emails
-  for select to authenticated using (profile_id = auth.uid());
+-- A super admin reads it (Will, 10 October: "Only super admins can view
+-- emails"); nobody else from the app: not the person who invited them, not a
+-- case manager, not a program, not a member, not even its owner. Pam's own
+-- sender reads it with the service role. It cascades from the profile, so an
+-- account that is deleted takes its email with it.
+create policy profile_emails_super_admin_select on public.profile_emails
+  for select to authenticated using (public.is_super_admin());
 
 comment on table public.profile_emails is
   'The email an invite carried, tied to the verified phone it named (0086, '
-  'D-441). The owner reads their own row; no client role writes it.';
+  'D-441). A super admin reads it, nobody else; no client role writes it. Deleted with the '
+  'account (cascade from profiles).';
 
 -- ---------------------------------------------------------------------------
 -- 3. Making the invite.
@@ -513,3 +523,63 @@ begin
   return account;
 end;
 $$;
+
+-- ---------------------------------------------------------------------------
+-- 6. Deleting an account deletes the invites it redeemed, and what they hold.
+--
+-- Found by 21_staff_email_on_invite_test.sql, which deletes an invited account
+-- the way Pam does when somebody calls and asks ("Delete my account"): it
+-- FAILED. `invites.redeemed_by` is `on delete set null`, and the invite's own
+-- check (`invites_redeemed_consistently`) says a redeemed invite has a
+-- redeemer — so the row cannot be updated, and the delete is refused. Nobody
+-- who joined by invite could be deleted. (Fixing it with a `drop constraint`
+-- would hang the connector, D-387; this needs none.)
+--
+-- Will, 10 October: "if a user chooses to delete all their data, the email goes
+-- along with it." The invite a person redeemed holds their first name, their
+-- phone and, for a renewed link, the address typed on the expired-link page
+-- (`invite_emails`) — personal data that would otherwise outlive the account. So
+-- the invites they redeemed go first (and the expired links those were renewed
+-- from), and everything that hangs off them (`invite_emails`,
+-- `invite_contact_emails`) with them. The audit log keeps the fact of it, with no
+-- name, phone or address in it.
+--
+-- NOT fixed here, and found by the same test: deleting a profile that has ever
+-- acted is still refused, because `audit_log.actor_id` is `on delete set null`
+-- and the audit log is append-only (an UPDATE is not permitted). Whether an
+-- erased person's audit rows are anonymised, kept, or removed is a decision about
+-- the audit promise, not about email; it is on docs/before-launch.md.
+
+create or replace function public.forget_invites_of_deleted_profile()
+returns trigger
+language plpgsql
+security definer
+set search_path = public, extensions
+as $$
+begin
+  -- The invites this person redeemed, and every invite those were renewed from
+  -- (an expired link asks for a fresh one, 0071: the expired one was made for
+  -- the same name and phone).
+  with recursive chain(id) as (
+    select i.id from public.invites i where i.redeemed_by = old.id
+    union
+    select e.expired_invite
+    from public.invite_emails e
+    join chain c on c.id = e.new_invite
+  )
+  delete from public.invites where id in (select id from chain);
+  return old;
+end;
+$$;
+
+comment on function public.forget_invites_of_deleted_profile is
+  'Before a profile is deleted: deletes the invites it redeemed (their name, '
+  'phone and any email typed on an expired-link page) and the expired links they '
+  'were renewed from, so no personal data outlives the account (0086, D-441). Not '
+  'callable by a client role.';
+
+revoke all on function public.forget_invites_of_deleted_profile() from public, anon, authenticated;
+
+create trigger profiles_forget_invites
+  before delete on public.profiles
+  for each row execute function public.forget_invites_of_deleted_profile();

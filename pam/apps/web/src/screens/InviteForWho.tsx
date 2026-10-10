@@ -2,10 +2,9 @@
 
 import { useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
-import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
-import { BigButton, TextField, TextLink } from '@pam/ui';
+import { BigButton, TextField } from '@pam/ui';
 import { useI18n } from '@/lib/i18n';
 import { isEmailAddress } from '@/lib/useInviteLinks';
 
@@ -23,7 +22,10 @@ import { isEmailAddress } from '@/lib/useInviteLinks';
  * away for lacking one.
  *
  * Used wherever an invite is made: Invite someone, the case manager's admin
- * screen, the directory. No card (D-369); the kind of invite is the heading.
+ * screen, the directory. No card (D-369). It is a page of its own, on the nested
+ * template (Will, 10 October): the caller draws the header — the kind of invite
+ * is the large title (`invite.link.title.*`), the round back goes to the choice
+ * — and this is the body.
  */
 export interface InviteWho {
   readonly firstName: string;
@@ -33,7 +35,6 @@ export interface InviteWho {
 }
 
 const styles = stylex.create({
-  heading: { fontSize: '20px', lineHeight: 1.3 },
   field: { width: '100%' },
   note: { fontSize: '15px', lineHeight: 1.5 },
   error: { fontSize: '16px', lineHeight: 1.5 },
@@ -43,12 +44,10 @@ export function InviteForWho({
   role,
   busy,
   onSubmit,
-  onCancel,
 }: {
   readonly role: 'member' | 'provider' | 'admin';
   readonly busy: boolean;
   readonly onSubmit: (who: InviteWho) => void;
-  readonly onCancel: () => void;
 }) {
   const { t } = useI18n();
   const [firstName, setFirstName] = useState('');
@@ -70,9 +69,6 @@ export function InviteForWho({
 
   return (
     <VStack gap={4}>
-      <Heading level={2} xstyle={styles.heading}>
-        {t(`invite.link.title.${role}`)}
-      </Heading>
       <TextField
         label={t('invite.who.name')}
         // Ready to type on arrival (D-365).
@@ -95,7 +91,9 @@ export function InviteForWho({
       {staff ? (
         <>
           <TextField
-            // Their address, not yours: no autofill of the inviter's own.
+            // Their address, not yours: no autofill of the inviter's own. Nothing
+            // here says what Pam does with it: that is for us, and a staff
+            // invite is not about members (Will, 10 October).
             purpose="theirEmail"
             label={t('invite.who.email')}
             value={email}
@@ -103,9 +101,6 @@ export function InviteForWho({
             width="100%"
             xstyle={styles.field}
           />
-          <Text type="supporting" xstyle={styles.note}>
-            {t('invite.who.emailNote')}
-          </Text>
         </>
       ) : null}
       <Text type="supporting" xstyle={styles.note}>
@@ -125,7 +120,6 @@ export function InviteForWho({
           onSubmit({ firstName: firstName.trim(), phone: phone.trim(), ...(staff ? { email: email.trim() } : {}) });
         }}
       />
-      <TextLink label={t('invite.who.back')} onClick={onCancel} />
     </VStack>
   );
 }

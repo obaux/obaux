@@ -222,11 +222,14 @@ export default function AdminPage() {
           flagged, or a message in their caseload was reported. Nothing else,
           and no row carries anybody's words (A7 / D-080).
         */}
+      {/* Choosing a kind of invite is a step in: the form is a page of its own, on the
+          nested template, the round back returning to the choice (Will, 10 October). */}
       <SubPageHeader
-        title={t('profile.menu.invite')}
-        subtitle={me.regionName ? t('admin.subtitle', { region: me.regionName }) : undefined}
-        backHref="/profile/"
-        backLabel={t('nav.back.profile')}
+        title={asking && !invite ? t(`invite.link.title.${asking}`) : t('profile.menu.invite')}
+        subtitle={!asking && me.regionName ? t('admin.subtitle', { region: me.regionName }) : undefined}
+        {...(asking && !invite
+          ? { onBack: () => setAsking(null), backLabel: t('invite.who.back') }
+          : { backHref: '/profile/', backLabel: t('nav.back.profile') })}
         actions={
           <>
             {trueRole === 'super_admin' ? (
@@ -240,12 +243,7 @@ export default function AdminPage() {
       {invite ? (
         <InviteReady invite={invite} onAnother={() => setInvite(null)} />
       ) : asking ? (
-        <InviteForWho
-          role={asking}
-          busy={inviteBusy}
-          onSubmit={(who) => void makeInvite(asking, who)}
-          onCancel={() => setAsking(null)}
-        />
+        <InviteForWho role={asking} busy={inviteBusy} onSubmit={(who) => void makeInvite(asking, who)} />
       ) : (
         <VStack gap={2}>
           <BigButton

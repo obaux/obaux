@@ -76,7 +76,7 @@ STATUS row too.
     accounts and look at both screens.
 
 - [ ] **Approve the Pam-team line on the transparency screen** (STATUS row
-  10b). Members were promised they would hear first if what is visible
+  10b; the Pam team can now also read staff emails, 0086 / D-441). Members were promised they would hear first if what is visible
   changes; the super admin's Everyone list and invite log are visible now.
 
 - [x] **Ship the privacy policy that tells members what limiting an account
@@ -133,6 +133,17 @@ STATUS row too.
   signed off (`reviewedBy`); (3) a way for staff who already have accounts to add an email
   (re-inviting is the only way today). Until then the policy and terms carry their dates
   (privacy: 10 October) and only team accounts and two members exist.
+
+- [ ] **Make "Delete my account" work for everyone** (Will, 10 October, D-441: "if a user
+  chooses to delete all their data, the email goes along with it"). Found while testing: Pam's
+  deletion is a call and a manual delete, and a plain delete is **refused** for anyone who has
+  ever acted, because `audit_log.actor_id` is `on delete set null` and the audit log is
+  append-only. (The invite part of the same blocker is fixed in 0086: an invited account could
+  not be deleted at all.) Decide what happens to an erased person's audit rows — anonymised, kept
+  without a name, or removed — then write the routine (a function for the Pam team, tested like
+  the privacy promises: profile, email, invites, messages, photos, points). Until then a
+  deletion on a call must remove the email by hand. The privacy policy already says "If you ask
+  us to delete your account, we delete it too."
 
 - [ ] **Apply 0086 to the live project, together with the app change that uses it** (D-441).
   Run `list_migrations` first. The new app calls `create_staff_invite`; the old app's staff

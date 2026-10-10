@@ -76,9 +76,11 @@ than a big green button (D-432).
 
 **10 October (D-441):** when a guide or a program invites a **case manager or a program
 lead**, they now have to give that person's email. It is kept on the person's account,
-tied to the phone number they sign in with, and only they and Pam can see it. A member is
-never asked for an email. The privacy policy says so, in "What we keep", and carries a new
-date (10 October).
+tied to the phone number they sign in with, and only the Pam team can see it; if the person
+asks Pam to delete their account, it is deleted with it. A member is never asked for an email.
+The privacy policy says so, in "What we keep", and carries a new date (10 October). Choosing
+"Invite a program" or "Invite a case manager" now opens a page of its own, with the round back
+button, instead of changing the page in place.
 
 
 ## [0.50.0] — 2026-10-09 · Buttons where you expect them

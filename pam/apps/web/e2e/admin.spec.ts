@@ -212,18 +212,24 @@ test.describe('the case manager screen', () => {
 
     // A member: name and number, and no email field at all.
     await page.getByRole('button', { name: 'Someone coming home' }).click();
+    // The form is a page of its own on the nested template: the kind of invite is
+    // the large title, and the round back returns to the choice.
+    await expect(page.getByRole('heading', { level: 1, name: 'A link for a member' })).toBeVisible();
     await expect(page.getByLabel('Their first name')).toBeVisible();
     await expect(page.getByLabel('Their email')).toHaveCount(0);
     await page.getByRole('button', { name: 'Choose a different invite' }).click();
+    await expect(page.getByRole('heading', { level: 1, name: 'Invite someone' })).toBeVisible();
 
     // A program lead: an email, and it is not optional.
     await page.getByRole('button', { name: /program/i }).click();
+    await expect(page.getByRole('heading', { level: 1, name: 'A link for a program' })).toBeVisible();
     const email = page.getByLabel('Their email');
     await expect(email).toBeVisible();
     // The keyboard for an address, and no autofill of the inviter's own.
     await expect(email).toHaveAttribute('type', 'email');
     await expect(email).toHaveAttribute('autocomplete', 'off');
-    await expect(page.getByText('Pam writes to them here. Only they and Pam can see it.')).toBeVisible();
+    // Nothing on the page explains what Pam does with it: that is for us, not for the inviter.
+    await expect(page.getByText(/Only they and Pam can see it/)).toHaveCount(0);
     const axe = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
     expect(axe.violations).toEqual([]);
     await page.getByLabel('Their first name').fill('Bo');

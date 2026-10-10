@@ -372,11 +372,10 @@ export const flows = [
       },
       inviteWho: {
         title: 'Who it is for',
-        story: 'case-manager-screens--invite',
+        story: 'case-manager-screens--invite-program',
         path: '/invite/ (a program)',
         changed: 'D-441',
-        note: 'Name, mobile number and, for a program or a case manager, an email: required. A member is never asked',
-        actions: [{ click: 'Invite a program' }, { wait: 800 }],
+        note: 'A page of its own: the kind of invite is the title, back returns to the choice. Name, mobile number and, for a program or a case manager, an email: required. A member is never asked',
       },
       inviteReady: {
         title: 'The link to send',

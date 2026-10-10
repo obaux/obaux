@@ -111,8 +111,13 @@ decided.
   0086, test 21, the staff form with a required email, privacy "What we keep" p7 and its date
   (seven languages, five drafts), the case manager's page of the flow map (not republished
   to Figma: not yet merged, and the program-lead and super-admin pages carry the same form).
-  **Needs Will:** read the new privacy sentence; confirm who may read the email (default:
-  only its owner); say when to apply 0086 and merge (order-sensitive, in D-441).
+  Will's answers: **only super admins can read the emails; deleted with the account**; the form
+  must be on the nested page template (done, on three screens) and must not explain what Pam does
+  with the email (done). **A bug found by the new deletion test:** an invited account could not
+  be deleted at all (fixed in 0086), and any account that has ever acted still cannot (the audit
+  log is append-only) — a decision for Will, on the before-launch list.
+  **Needs Will:** read the new privacy sentence; decide the audit-rows question; say when to apply
+  0086 and merge (order-sensitive, in D-441).
 
 ## What was wrong, and what missed it
 

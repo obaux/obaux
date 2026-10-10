@@ -11483,27 +11483,54 @@ asked for first.
   back to the original invite — which is why 0086 does not touch `request_invite_link`
   (0085, still unapplied, replaces it). An invite made before 0086 redeems as before, with
   no email.
-- **Who can read it.** `profile_emails`: its owner reads their own row; nobody else, from the
-  app, ever — not the person who invited them, not another case manager, not a program, not
-  a member, not the super admin; and no client role can write it. The audit log never holds
-  an address. Pam's own sender will use the service role. **Will asked "which email?" and has
-  not confirmed this default**; it is the most private choice and can be widened later, never
-  the other way round without telling people first.
+- **Who can read it — Will, 10 October: "Only super admins can view emails. But if a user
+  chooses to delete all their data, the email goes along with it."** A super admin can read
+  both the account's email (`profile_emails`) and one still waiting on an invite
+  (`invite_contact_emails`); nobody else can, from the app: not the person who invited them,
+  not another case manager, not a program, not a member, **not even the account's owner**
+  (they can ask Pam for a copy of their data, which is a call). No client role can write
+  either table. The audit log never holds an address. Pam's own sender will use the service
+  role. **No screen shows it yet**: the Everyone directory carries no contact details, ever
+  (an e2e test holds that), so putting staff emails there would be a decision of its own.
+  My earlier default (owner reads their own) was replaced by this.
+- **Deleting an account deletes the email.** `profile_emails` and `invite_contact_emails` hang
+  from the profile and the invite by cascade (a test reads the catalogue so a changed rule is
+  noticed). A `before delete` trigger on `profiles` also deletes the invites the person
+  redeemed, and the expired links those were renewed from, with what hangs off them: their
+  name, their phone and any address typed on the expired-link page (`invite_emails`). **Found
+  by the test that deletes an invited account the way Pam does when somebody calls: it was
+  refused** — `invites.redeemed_by` is `on delete set null`, which the invite's own check
+  (`invites_redeemed_consistently`) forbids, so nobody who joined by invite could be deleted.
+  The trigger fixes that (no `drop` needed). **Not fixed, and not mine to decide:** deleting a
+  profile that has ever acted is still refused, because `audit_log.actor_id` is `on delete set
+  null` and the audit log is append-only. Whether an erased person's audit rows are
+  anonymised, kept or removed is a decision about the audit promise; until it is made, a
+  deletion on a call has to remove the email (and the rest) by hand. On
+  `docs/before-launch.md`.
 - The app: `InviteForWho` shows the email field for staff only (new field purpose
   `theirEmail`: the email keyboard, no autofill of the *inviter's* own address) and
-  `createInvite` sends staff through `create_staff_invite`. Four strings in seven languages
-  (five are drafts).
+  `createInvite` sends staff through `create_staff_invite`. **Nothing on the form explains what
+  Pam does with the email** (Will: "that's only for us… not related to members, only staff";
+  the first draft said "Pam writes to them here", which was wrong from the invitee's side — the
+  system emails them the invitation link, when a sender exists). **The form is a page of its own
+  on the nested template** (Will: "This page should be using our nested page template"): the
+  kind of invite is the large title ("A link for a program"), the round back returns to the
+  choice, and the in-body heading and the "Choose a different invite" link are gone — on Invite
+  someone, the case manager's admin screen and the Everyone directory (where the form used to sit
+  inside a card). Storybook: Case manager › Invite a program.
 - The privacy policy's "What we keep" gains a seventh paragraph and its date moves to 10
   October (all seven languages, five of them drafts; Will to read the English): "If you work
-  with Pam as a case manager or for a program, we also keep the email address you were
-  invited with. Pam uses it to write to you. Only you and Pam can see it. Members are never
-  asked for an email." Every clause is enforced by the database.
+  with Pam as a case manager or for a program, we also keep the email address you were invited
+  with. Pam uses it to write to you. Only the Pam team can see it. If you ask us to delete your
+  account, we delete it too. Members are never asked for an email." Every clause is enforced by
+  the database, except that deleting an account that has acted still needs the audit decision
+  above (until then a deletion removes the email by hand).
 - Tests: `21_staff_email_on_invite_test.sql` (staff invites need an email and members refuse
   one; nobody reads it before sign-in, including the person who typed it; it lands on the
   right account only, for the number the invite named; only its owner reads it, nobody writes
   it; a member who also works at a program keeps the first email; a renewed invite still
   delivers it; an old invite redeems with none; the audit log never holds an address). It
-  fails when the owner-only rule is loosened. The suite passes (596 checks). The staff
+  fails when the read rule is loosened. The suite passes (608 checks). The staff
   invite calls in `04`, `08`, `13` and `14` now go through `create_staff_invite`. Browser
   tests: a member is never asked, staff always are, the keyboard and autofill attributes,
   axe clean.

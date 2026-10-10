@@ -6,10 +6,13 @@
 --
 -- These attack the promises the design makes: a staff invite cannot be made
 -- without an email, a member invite cannot carry one; the email waits where
--- nobody (not even the person who typed it) can read it; it lands on the account
--- only for the number the invite named; nobody but its owner reads it from the
--- account; nobody writes it from the app; a renewed invite keeps it; an invite
--- made before 0086 redeems as it always did; the audit log never holds it.
+-- only a super admin can read it (Will, 10 October: "Only super admins can view
+-- emails"), not even the person who typed it; it lands on the account only for
+-- the number the invite named; only a super admin reads it from the account,
+-- not even its owner; nobody writes it from the app; a renewed invite keeps it;
+-- an invite made before 0086 redeems as it always did; the audit log never holds
+-- it; and an account that is deleted takes its email with it ("if a user chooses
+-- to delete all their data, the email goes along with it").
 
 \set ON_ERROR_STOP on
 \set QUIET on
@@ -28,6 +31,7 @@ set client_min_messages to notice;
 \set olly          '55555555-0000-0000-0000-000000000507'
 \set stranger      '55555555-0000-0000-0000-000000000508'
 \set sup           '55555555-0000-0000-0000-000000000509'
+\set zed           '55555555-0000-0000-0000-000000000510'
 \set region_north  '11111111-0000-0000-0000-000000000001'
 
 -- A check that the statement fails *with this reason*, not just that it fails.
@@ -129,22 +133,26 @@ select test.check('the audit log never holds an address',
 -- ===========================================================================
 set role authenticated;
 select test.as_user(:'dana');
-select test.check_raises('the case manager who typed it cannot read it back',
-  $$select count(*) from public.invite_contact_emails$$);
+select test.check('the case manager who typed it cannot read it back',
+  (select count(*) from public.invite_contact_emails where email = 'ivy@example.org'), 0);
 select test.as_user(:'alice');
-select test.check_raises('the program that typed theirs cannot either',
-  $$select count(*) from public.invite_contact_emails$$);
+select test.check('the program that typed theirs cannot either',
+  (select count(*) from public.invite_contact_emails where email = 'pat@example.org'), 0);
 select test.as_user(:'ray');
-select test.check_raises('another case manager cannot',
-  $$select count(*) from public.invite_contact_emails$$);
+select test.check('another case manager cannot',
+  (select count(*) from public.invite_contact_emails where email = 'ivy@example.org'), 0);
 select test.as_user(:'marcus');
-select test.check_raises('a member cannot',
-  $$select count(*) from public.invite_contact_emails$$);
+select test.check('a member cannot',
+  (select count(*) from public.invite_contact_emails where email = 'ivy@example.org'), 0);
 select test.as_user(:'sup');
-select test.check_raises('not even the super admin, through the app',
-  $$select count(*) from public.invite_contact_emails$$);
-select test.check_raises('and nobody writes to it',
+select test.check('a super admin can',
+  (select count(*) from public.invite_contact_emails where email = 'ivy@example.org'), 1);
+select test.check_raises('...but nobody writes to it, a super admin included',
   $$insert into public.invite_contact_emails (invite_id, email) select id, 'x@example.org' from public.invites limit 1$$);
+select test.check_raises('...or changes it',
+  $$update public.invite_contact_emails set email = 'x@example.org'$$);
+select test.check_raises('...or deletes it',
+  $$delete from public.invite_contact_emails$$);
 set role anon;
 select test.check_raises('a signed-out visitor cannot',
   $$select count(*) from public.invite_contact_emails$$);
@@ -177,11 +185,12 @@ select test.check('the invite no longer holds it once the account does',
 
 -- ===========================================================================
 \echo ''
-\echo '--- ...and only its owner can read it ---'
+\echo '--- ...and only a super admin can read it ---'
 -- ===========================================================================
 set role authenticated;
 select test.as_user(:'ivy');
-select test.check('Ivy reads her own', (select count(*) from public.profile_emails), 1);
+select test.check('Ivy herself reads nothing in the app (she can ask Pam for a copy)',
+  (select count(*) from public.profile_emails), 0);
 select test.as_user(:'dana');
 select test.check('the case manager who invited her reads nothing', (select count(*) from public.profile_emails where profile_id = :'ivy'), 0);
 select test.as_user(:'ray');
@@ -191,9 +200,9 @@ select test.check('a program reads nothing', (select count(*) from public.profil
 select test.as_user(:'marcus');
 select test.check('a member reads nothing', (select count(*) from public.profile_emails where profile_id = :'ivy'), 0);
 select test.as_user(:'sup');
-select test.check('the super admin reads nothing through the app', (select count(*) from public.profile_emails where profile_id = :'ivy'), 0);
-select test.as_user(:'ivy');
-select test.check_raises('nobody writes an email from the app: insert',
+select test.check('a super admin reads it', (select count(*) from public.profile_emails where profile_id = :'ivy' and email = 'ivy@example.org'), 1);
+select test.check('...and Pat''s', (select count(*) from public.profile_emails where profile_id = :'pat' and email = 'pat@example.org'), 1);
+select test.check_raises('nobody writes an email from the app: insert, a super admin included',
   format($$insert into public.profile_emails (profile_id, email) values (%L, 'x@example.org')$$, :'marcus'));
 select test.check_raises('...update',
   $$update public.profile_emails set email = 'x@example.org'$$);
@@ -223,15 +232,16 @@ select test.check('...and it still waits on the invite',
 set role authenticated;
 select test.as_user(:'hal');
 select public.add_role_from_invite(:'hal_code');
-select test.check('Hal had none, so the program invite''s email lands on the account',
-  (select count(*) from public.profile_emails where profile_id = :'hal' and email = 'hal@example.org'), 1);
 select test.as_user(:'kay');
 select public.add_role_from_invite(:'kay_code');
+-- Read as the database owner: from the app only a super admin can.
+reset role;
+select test.check('Hal had none, so the program invite''s email lands on the account',
+  (select count(*) from public.profile_emails where profile_id = :'hal' and email = 'hal@example.org'), 1);
 select test.check('Kay had one already: the first stays',
   (select count(*) from public.profile_emails where profile_id = :'kay' and email = 'kay@old.example'), 1);
 select test.check('...and the new one is not kept beside it',
   (select count(*) from public.profile_emails where profile_id = :'kay'), 1);
-reset role;
 select test.check('both program invites let go of their email',
   (select count(*) from public.invite_contact_emails c join public.invites i on i.id = c.invite_id
     where i.code in (:'hal_code', :'kay_code')), 0);
@@ -275,3 +285,65 @@ select test.check('...and no email, because none was asked then',
   (select count(*) from public.profile_emails where profile_id = :'olly'), 0);
 select test.check('the audit log still never holds an address',
   (select count(*) from public.audit_log where action like 'invite.%' and meta::text like '%@%'), 0);
+
+-- ===========================================================================
+\echo ''
+\echo '--- Deleting an account deletes its email ---'
+-- ===========================================================================
+-- Will, 10 October: "if a user chooses to delete all their data, the email goes
+-- along with it." Pam deletes an account when somebody calls and asks.
+--
+-- Dee is built directly, without a redeem, because deleting a profile that has
+-- ever acted is still refused by the audit log (append-only; see 0086 section 6
+-- and docs/before-launch.md): this proves everything this migration is
+-- responsible for, which is where its own rows hang.
+reset role;
+\set dee '55555555-0000-0000-0000-000000000511'
+\set zed '55555555-0000-0000-0000-000000000510'
+insert into auth.users (id, phone) values (:'dee', '12675559512'), (:'zed', '12675559510');
+insert into public.profiles (id, role, first_name, region_id, phone, access_status) values
+  (:'dee', 'provider', 'Dee', :'region_north', '+12675559512', 'active'),
+  (:'zed', 'admin', 'Zed', :'region_north', '+12675559510', 'active');
+-- Dee's invite expired and she asked for a fresh one by email (0071); she
+-- redeemed the fresh one; her account keeps the email it was made with.
+insert into public.invites (code, created_by, role, region_id, phone, first_name, status, expires_at)
+values ('DEEOLD01', :'alice', 'provider', :'region_north', '+12675559512', 'Dee', 'expired', now() - interval '1 day');
+insert into public.invites (code, created_by, role, region_id, phone, first_name, status, redeemed_by, redeemed_at)
+values ('DEENEW01', :'alice', 'provider', :'region_north', '+12675559512', 'Dee', 'redeemed', :'dee', now());
+insert into public.invite_emails (expired_invite, new_invite, email)
+select o.id, n.id, 'dee@personal.example'
+from public.invites o, public.invites n where o.code = 'DEEOLD01' and n.code = 'DEENEW01';
+insert into public.profile_emails (profile_id, email) values (:'dee', 'dee@example.org');
+-- Zed invited somebody, whose email is waiting on the invite.
+insert into public.invites (code, created_by, role, region_id, phone, first_name)
+values ('ZEDYAN01', :'zed', 'provider', :'region_north', '+12675559511', 'Yan');
+insert into public.invite_contact_emails (invite_id, email)
+select id, 'yan@example.org' from public.invites where code = 'ZEDYAN01';
+
+delete from auth.users where id = :'dee';
+select test.check('Dee''s account is gone', (select count(*) from public.profiles where id = :'dee'), 0);
+select test.check('...and so is the email her account kept',
+  (select count(*) from public.profile_emails where email = 'dee@example.org'), 0);
+select test.check('...the invite she redeemed, with her name and number on it',
+  (select count(*) from public.invites where code = 'DEENEW01'), 0);
+select test.check('...and the expired link it was renewed from',
+  (select count(*) from public.invites where code = 'DEEOLD01'), 0);
+select test.check('...and the address she typed to get the fresh one',
+  (select count(*) from public.invite_emails where email = 'dee@personal.example'), 0);
+select test.check('Ivy''s email is untouched by it',
+  (select count(*) from public.profile_emails where profile_id = :'ivy'), 1);
+
+delete from auth.users where id = :'zed';
+select test.check('deleting an inviter deletes the invites they made, and the emails waiting on them',
+  (select count(*) from public.invites where code = 'ZEDYAN01')
+  + (select count(*) from public.invite_contact_emails where email = 'yan@example.org'), 0);
+
+-- The email tables hang from the profile and the invite by cascade: whatever
+-- finally deletes an account (including once the audit log allows it), the
+-- email goes with it. Read from the catalogue so a changed rule is noticed.
+select test.check('profile_emails cascades from the profile',
+  (select count(*) from pg_constraint where conrelid = 'public.profile_emails'::regclass
+     and confrelid = 'public.profiles'::regclass and contype = 'f' and confdeltype = 'c'), 1);
+select test.check('invite_contact_emails cascades from the invite',
+  (select count(*) from pg_constraint where conrelid = 'public.invite_contact_emails'::regclass
+     and confrelid = 'public.invites'::regclass and contype = 'f' and confdeltype = 'c'), 1);
