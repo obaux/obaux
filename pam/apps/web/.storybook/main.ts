@@ -33,7 +33,7 @@ const config: StorybookConfig = {
     options: { nextConfigPath: '../next.config.mjs' },
   },
   // The public site's own pictures (/art/…) sit beside the app's (D-437).
-  staticDirs: ['../public', '../../site/public'],
+  staticDirs: ['../public', '../../site/public', './public'],
   docs: { defaultName: 'About' },
   // Storybook reads next.config but not its `webpack()` hook, so the same
   // `.js` -> `.ts` alias the workspace packages need is repeated here.

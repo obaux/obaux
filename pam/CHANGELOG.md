@@ -6,7 +6,7 @@ Pam has a public website with a Home page and a Support page, built from the sam
 design system as the app and shown in light or dark to match your device. Support
 has its first post, "Case manager assignments": who can take on a member, hand
 one over, unassign, limit or pause, and that every change needs a written reason.
-On a phone the table becomes one card per action. It is built and has a preview
+On a phone the table becomes one card per action. Pam, the public site and Storybook now share one icon, a white "p" on Pam green, and installing Pam on a phone now has an icon to show. It is built and has a preview
 deployment; it is not on a public address yet (D-433, D-437).
 
 ## [0.51.0] — 2026-10-09 · Pam speaks seven languages

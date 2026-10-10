@@ -36,6 +36,12 @@ manager's and a super admin's powers over assigning, limiting and pausing).
   **not** checked in a real unfurl (Slack, iMessage), which needs the deployed
   address.
 
+- **10 October: the favicon for every Pam website** (D-437, last bullet): the
+  site, the member app and Storybook, from `scripts/make-icons.mjs`; the app's
+  never-created manifest icons now exist. Verified: the `<link rel=icon>` tags in
+  the built app and site, Storybook's `favicon.svg`, the web tests (48), the
+  bundle budget. Not verified on a real phone's home screen.
+
 ## What was wrong, and what missed it
 
 - **First build failed** importing `TextLink` from the `@pam/ui` barrel in a

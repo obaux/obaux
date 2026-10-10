@@ -11467,4 +11467,16 @@ create new posts on my behalf."
   `pam-site` Vercel alias until a real domain exists (`NEXT_PUBLIC_SITE_URL`).
   The member app has no icons at all (its manifest points at `/icon-192.png` etc.,
   which do not exist) — noted, not touched.
+- **One icon for every Pam website (Will, 10 October: "use this favicon for all
+  Pam websites").** The wordmark's "p" on Pam green is now the favicon of the
+  public site, the member app (`apps/web/src/app/icon.svg`, `apple-icon.png`,
+  `favicon.ico`) and Storybook (`.storybook/public/favicon.svg`, a new static
+  dir). `scripts/make-icons.mjs` generates all of them from the canonical
+  wordmark, so they cannot drift; re-run it and commit if the mark changes. It
+  also writes `icon-192.png`, `icon-512.png` and `icon-maskable-512.png`, which
+  the app's manifest already named and which **did not exist** — installing the
+  app had no icon until now. The maskable one is full bleed with the "p" inside
+  the 80% safe zone. The three PNGs are listed in Foundations › Imagery
+  (`imagery.ts`), as `imagery.test.ts` requires. Bundle budget unchanged (55.4 kB
+  to spare).
 

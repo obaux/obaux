@@ -37,4 +37,15 @@ export const BRAND: readonly ImageryItem[] = [
   { src: '/pam-wordmark-dark.svg', name: 'Wordmark, for dark grounds', note: 'Dark mode', isOnDark: true },
   { src: '/pam-wordmark-white.svg', name: 'Wordmark, white', note: 'Over pictures (the sign-in carousel)', isOnDark: true },
   { src: '/email/pam-logo.png', name: 'Email logo', note: 'Invite and renewal emails (D-263)' },
+  {
+    src: '/icon-512.png',
+    name: 'App icon',
+    note: 'The wordmark\'s "p" on Pam green: the icon of every Pam website — this app, the public site, Storybook (D-437). Made by scripts/make-icons.mjs; the favicon and Apple touch icon are drawn from the same source',
+    alsoAt: ['/icon-192.png'],
+  },
+  {
+    src: '/icon-maskable-512.png',
+    name: 'App icon, maskable',
+    note: 'The same "p", full bleed and smaller, so an Android launcher can crop it to any shape (D-437)',
+  },
 ];
