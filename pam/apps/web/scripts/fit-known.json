@@ -216,38 +216,6 @@
     "reason": "Stat columns share one row, each a number over a one-word label, and a word is never broken. The pseudo-language's longest label is wider than its third; the real languages' labels fit. Looked at 9 October 2026 at 320px with screenshots."
   },
   {
-    "key": "pseudo|ellipsis|member-created--points|⟦Šçĥóóóļáááŕ⟧",
-    "reason": "A badge's name under its picture is one line with an ellipsis by design (four across at 320px); the pseudo-language is longer than any real language, and none of the real ones is flagged. Looked at 9 October 2026 at 320px with screenshots."
-  },
-  {
-    "key": "pseudo|ellipsis|member-created--points|⟦Çŕááááƒţšɱáááñ⟧",
-    "reason": "A badge's name under its picture is one line with an ellipsis by design (four across at 320px); the pseudo-language is longer than any real language, and none of the real ones is flagged. Looked at 9 October 2026 at 320px with screenshots."
-  },
-  {
-    "key": "pseudo|ellipsis|member-created--points|⟦Áñçĥóóóóŕ⟧",
-    "reason": "A badge's name under its picture is one line with an ellipsis by design (four across at 320px); the pseudo-language is longer than any real language, and none of the real ones is flagged. Looked at 9 October 2026 at 320px with screenshots."
-  },
-  {
-    "key": "pseudo|ellipsis|member-created--points|⟦Ƒííííŕšţƀóóóŕñ⟧",
-    "reason": "A badge's name under its picture is one line with an ellipsis by design (four across at 320px); the pseudo-language is longer than any real language, and none of the real ones is flagged. Looked at 9 October 2026 at 320px with screenshots."
-  },
-  {
-    "key": "pseudo|ellipsis|member-created--points|⟦Ŕáááííñɱááķééŕ⟧",
-    "reason": "A badge's name under its picture is one line with an ellipsis by design (four across at 320px); the pseudo-language is longer than any real language, and none of the real ones is flagged. Looked at 9 October 2026 at 320px with screenshots."
-  },
-  {
-    "key": "pseudo|ellipsis|member-created--points|⟦Šáááñķóóƒáá⟧",
-    "reason": "A badge's name under its picture is one line with an ellipsis by design (four across at 320px); the pseudo-language is longer than any real language, and none of the real ones is flagged. Looked at 9 October 2026 at 320px with screenshots."
-  },
-  {
-    "key": "pseudo|ellipsis|member-created--points|⟦Ķíííñķééééþééŕ⟧",
-    "reason": "A badge's name under its picture is one line with an ellipsis by design (four across at 320px); the pseudo-language is longer than any real language, and none of the real ones is flagged. Looked at 9 October 2026 at 320px with screenshots."
-  },
-  {
-    "key": "pseudo|overlap|member-created--points|⟦Áñçĥóóóóŕ⟧ ⟷ ⟦Ƒííííŕšţƀóóóŕñ⟧",
-    "reason": "A badge's name under its picture is one line with an ellipsis by design (four across at 320px); the pseudo-language is longer than any real language, and none of the real ones is flagged. Looked at 9 October 2026 at 320px with screenshots."
-  },
-  {
     "key": "pseudo|ellipsis|member-created-states-connections--people|⟦Çóóóññéééçţééð ƀý Teresa⟧",
     "reason": "'Connected by <name>' is one line with an ellipsis by design (ConnectionCard); the name is data. Looked at 9 October 2026 at 320px with screenshots."
   },

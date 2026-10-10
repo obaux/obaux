@@ -135,7 +135,10 @@ const styles = stylex.create({
   grid: { width: '100%', display: 'grid', gridTemplateColumns: 'repeat(4, minmax(0, 1fr))', columnGap: '0px', rowGap: '4px' },
   badge: { minWidth: 0, paddingBlock: '8px' },
   badgeMark: { width: '52px', height: '52px' },
-  badgeName: { fontSize: '13px', lineHeight: 1.25, fontWeight: 600, textAlign: 'center', maxWidth: '100%', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' },
+  // A name wraps and the row grows to fit, never an ellipsis (Mira, 10 October: the design system's
+  // "wrap, don't cut"). "Cornerstone" is 74px in a 67px column; `anywhere` is the backstop for a word
+  // that fits no way, `hyphens: auto` breaks it at a syllable where the language has the rules.
+  badgeName: { fontSize: '13px', lineHeight: 1.25, fontWeight: 600, textAlign: 'center', maxWidth: '100%', overflowWrap: 'anywhere', hyphens: 'auto' },
   badgeNote: { fontSize: '12px', lineHeight: 1.25, textAlign: 'center' },
   badgeNoteEarned: { color: colorVars['--color-text-accent'], fontWeight: 600 },
   live: { position: 'absolute', width: '1px', height: '1px', overflow: 'hidden', clipPath: 'inset(50%)' },
