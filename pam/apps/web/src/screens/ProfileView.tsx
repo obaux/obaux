@@ -6,6 +6,7 @@ import { Divider } from '@astryxdesign/core/Divider';
 import { LANGUAGE_TAGS, badgeForPoints, type Role, intlLocale } from '@pam/config';
 import {
   BellIcon,
+  FlagIcon,
   GlobeIcon,
   HelpIcon,
   LegalIcon,
@@ -113,6 +114,11 @@ export function ProfileView({
           { id: 'everyone', label: t('profile.menu.everyone'), href: '/directory/', icon: <PeopleIcon {...ICON} /> },
           { id: 'requests', label: t('profile.menu.requests'), href: '/requests/', icon: <ShieldIcon {...ICON} /> },
         ]
+      : []),
+    // The places somebody reported, for the people who review them (D-189):
+    // a nested screen, also reached from the bell's "a place was reported" row.
+    ...(role === 'admin' || role === 'super_admin'
+      ? [{ id: 'reported', label: t('places.reported.title'), href: '/places/reported/', icon: <FlagIcon {...ICON} /> }]
       : []),
     ...(canViewAs
       ? [{ id: 'view-as', label: t('profile.menu.viewAs'), href: '/view-as/', icon: <GlobeIcon {...ICON} /> }]

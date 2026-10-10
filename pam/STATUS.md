@@ -1113,6 +1113,10 @@ read back: both functions service-role only) adds `record_sms_stop` / `record_sm
 on and Twilio is pointed at it, Pam still does not learn a STOP. Setup: `docs/sms-setup.md` § 3.
 YES/NO replies are not built. D-460.
 
+## Places & programs · reported places screen (10 October 2026) — merged 10 October
+
+Merged to `main` by the merge desk, 10 October, from `claude/places-programs-reported-places` (dca16c6). A page at `/places/reported/` for admins and case managers, linked from the profile and the reported-place bell row. Only a super admin can keep or remove; case managers read. No database change. Shared files touched: `ProfileView.tsx`, `app/notifications/page.tsx`, `ReportedPlaces.tsx` (buttons only when allowed). Figma flow map not republished.
+
 ## Places & programs · review record, pending change, program services — the database half (10 October 2026)
 
 Merged to `main` by the merge desk, 10 October, from `claude/places-programs-submissions-and-services`
