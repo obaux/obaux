@@ -45,7 +45,7 @@ export function HomeScreen() {
   }
   // Case managers and program leads keep the old Home, with its people strip, until the
   // strip's rings (D-198) are on the redesigned staff Homes and Will has said they stay
-  // (Mira, 10 October). `StaffHomes` is built and waiting.
+  // (Mira, 10 October; D-198 rings, Will asked 10 October, card a22). `StaffHomes` is built and waiting.
   if (viewedRole === 'admin' || viewedRole === 'provider') return <LegacyHome />;
   if (viewedRole === 'super_admin') return <RequestsHome isHome />;
   return <ExploreScreen />;
