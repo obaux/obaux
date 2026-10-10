@@ -12,7 +12,7 @@ import { Text } from '@astryxdesign/core/Text';
 import { TextInput } from '@astryxdesign/core/TextInput';
 import { VStack } from '@astryxdesign/core/VStack';
 import { Button } from '@pam/ui/Button';
-import { TextLink } from '@pam/ui/TextLink';
+import { Link } from '@astryxdesign/core/Link';
 import { POSTS, type SupportPost } from '../content/posts';
 import { TOPICS } from '../content/topics';
 import { APP_URL } from '../lib/links';
@@ -53,7 +53,11 @@ function PostList({ posts }: { readonly posts: readonly SupportPost[] }) {
       {posts.map((post, i) => (
         <VStack key={post.slug} gap={1}>
           {i > 0 ? <Divider /> : null}
-          <TextLink label={post.title} href={`/support/${post.slug}/`} />
+          <VStack paddingBlock={1}>
+            <Link href={`/support/${post.slug}/`} hasUnderline isStandalone>
+              {post.title}
+            </Link>
+          </VStack>
           <Text type="supporting" as="p">
             {post.summary}
           </Text>
@@ -124,7 +128,11 @@ export function SupportScreen() {
                         {posts.length ? (
                           <VStack gap={1}>
                             {posts.map((p) => (
-                              <TextLink key={p.slug} label={p.title} href={`/support/${p.slug}/`} />
+                              <VStack key={p.slug} paddingBlock={1}>
+                                <Link href={`/support/${p.slug}/`} hasUnderline isStandalone>
+                                  {p.title}
+                                </Link>
+                              </VStack>
                             ))}
                           </VStack>
                         ) : (

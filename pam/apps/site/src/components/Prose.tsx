@@ -3,7 +3,7 @@ import { Heading } from '@astryxdesign/core/Heading';
 import { HStack } from '@astryxdesign/core/HStack';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
-import { TextLink } from '@pam/ui/TextLink';
+import { Link } from '@astryxdesign/core/Link';
 
 /**
  * The small set of pieces a help post is made of, so every post has the same
@@ -40,11 +40,19 @@ export function P({ children }: { readonly children: ReactNode }) {
   return <Text as="p">{children}</Text>;
 }
 
-/** A link to another post or page, on a line of its own. */
+/**
+ * A link to another post or page, on a line of its own. Always underlined, so a person can
+ * see it is a link (a quiet text link read as plain text on a phone), with room above and
+ * below to tap.
+ */
 export function ReadMore({ label, href }: { readonly label: string; readonly href: string }) {
   return (
-    <HStack>
-      <TextLink label={label} href={href} />
-    </HStack>
+    <VStack paddingBlock={2}>
+      <HStack>
+        <Link href={href} hasUnderline isStandalone>
+          {label}
+        </Link>
+      </HStack>
+    </VStack>
   );
 }

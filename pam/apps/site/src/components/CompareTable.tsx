@@ -86,7 +86,8 @@ export function CompareTable({
               <Heading level={3}>{row.label}</Heading>
               {row.cells.map((cell, i) => (
                 <Text as="p" key={columns[i]}>
-                  <Text weight="semibold">{columns[i]}: </Text>
+                  {/* With one column the card's heading already says what it is: no repeated label. */}
+                  {columns.length > 1 ? <Text weight="semibold">{columns[i]}: </Text> : null}
                   <Cell text={cell} />
                 </Text>
               ))}
