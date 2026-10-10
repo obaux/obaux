@@ -25,8 +25,8 @@ update auth.users set phone = '12675550304' where id = :'marcus';
 
 set role authenticated;
 select test.as_user(:'alice');
-select (public.create_invite('provider', '267-555-0301', null, 'Nia')).code as nia_code \gset
-select (public.create_invite('provider', '(267) 555-0304', null, 'Marcus')).code as marcus_code \gset
+select (public.create_staff_invite('provider', 'nia@example.org', '267-555-0301', null, 'Nia')).code as nia_code \gset
+select (public.create_staff_invite('provider', 'marcus@example.org', '(267) 555-0304', null, 'Marcus')).code as marcus_code \gset
 
 reset role;
 select test.check('the invite keeps the name and the number, as E.164',

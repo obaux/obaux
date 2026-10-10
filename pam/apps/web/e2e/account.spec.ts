@@ -153,7 +153,8 @@ test.describe('the way out', () => {
         ]),
       ),
     );
-    await page.route('**/rest/v1/rpc/create_invite*', async (route) => {
+    // A case manager is staff: invited with an email, through its own door (0086).
+    await page.route('**/rest/v1/rpc/create_staff_invite*', async (route) => {
       asked.push(route.request().postDataJSON() as Record<string, unknown>);
       await route.fulfill(
         json({ code: 'P3TWVWTW', expires_at: '2026-10-14T00:00:00Z', role: 'admin' }),
@@ -169,6 +170,7 @@ test.describe('the way out', () => {
     // No city picked: nothing is sent, and the page says why.
     await page.getByLabel('Their first name').fill('Kim');
     await page.getByLabel('Their mobile number').fill('412 555 0199');
+    await page.getByLabel('Their email').fill('kim@example.org');
     await page.getByRole('button', { name: 'Create link' }).click();
     await expect(page.getByText('Pick a city first.')).toBeVisible();
     expect(asked).toHaveLength(0);
@@ -178,7 +180,13 @@ test.describe('the way out', () => {
 
     // A link to the invite Sign in, for a case manager (D-254).
     await expect(page.getByText(/\/signin\/\?invite=P3TWVWTW&as=case-manager/)).toBeVisible();
-    expect(asked[0]).toMatchObject({ p_role: 'admin', p_region_id: 'r-pit', p_first_name: 'Kim', p_phone: '412 555 0199' });
+    expect(asked[0]).toMatchObject({
+      p_role: 'admin',
+      p_region_id: 'r-pit',
+      p_first_name: 'Kim',
+      p_phone: '412 555 0199',
+      p_email: 'kim@example.org',
+    });
   });
 
   test('a member who also works at a program picks a side on Profile (D-374)', async ({ page }) => {

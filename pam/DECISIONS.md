@@ -11689,3 +11689,196 @@ each removal is the grep that came back empty.)
   manager is never asked for one; a program cannot invite a case manager; Approve carries
   the city, Deny none; both pages have no axe violations); Storybook shows *Super admin ›
   Screens* (Invite someone, A link for a member, A request to review, Requests, Everyone).
+
+### D-429 — Privacy changes go out by email; a refused New message says the account is limited; the unused key goes; the flow map shows the limited states
+
+**Date:** 2026-10-09. **Decided by:** Will, answering the list of what was left after
+D-427: "Moving forward, we'll send emails with privacy policy updates", "Delete",
+"Do that", "Yes update flow map".
+
+- **Privacy policy updates are sent by email.** Recorded as Will's rule going
+  forward; it replaces "re-show it in the app to anyone who agreed before"
+  (`transparency_ack_at` is set once and nothing re-asks) as the way members
+  hear first. **It cannot be done yet, and the reason matters:** Pam holds no
+  email address for a member. `profiles` has no email column *by design* —
+  auth is phone-only (`0002_identity.sql`, §9) — and the only addresses Pam
+  keeps are the ones typed on the expired-invite page (`invite_emails`, 0071),
+  for a different purpose. So sending a policy update by email needs, in order:
+  (1) the email provider that `docs/before-launch.md` already lists for invite
+  links; (2) a decision on how Pam comes to hold a member's email at all — a new
+  thing Pam keeps, so it must be asked for plainly, must be optional or have a
+  fallback, and must appear in the privacy policy's "what we keep" and in the
+  transparency screen before it is collected (those tests fail by design);
+  (3) what a member with no email gets — the app's own notice, or a text that a
+  person has signed off (`reviewedBy`). None of that is decided here: it is
+  Will's. Put on `docs/before-launch.md` as its own item. Until then the policy
+  and terms carry their date (9 October) and the two member accounts on the
+  live project are the only ones that exist outside the team.
+- **A New message the database refuses says why** (the "Do that"). D-427 covered
+  the composer, a refused send and Messages opened by a limited account; the
+  last gap was the New message sheet when the account was limited *after* Messages
+  loaded: it said "Your connection dropped". `pick` (`app/messages/page.tsx`,
+  `screens/MessagesScreen.tsx`) now asks `readAccountLimited()` when
+  `open_direct_conversation` fails; if the account is limited the sheet closes and
+  the notice replaces New message, otherwise the old words stay. Two e2e tests:
+  refused-because-limited (notice, sheet closed, no "connection dropped", no New
+  message) and a 500 for an account that is not limited (still "connection
+  dropped", no notice).
+- **`access.limitedNotice` is deleted** from all seven languages and the copy
+  ledger. It was never referenced by the app (before or after D-427), but it was
+  still being translated. It went from English and Spanish first (this branch); once
+  `main` carried the other five bundles (the languages branch merged), it went from
+  those and `copy:ack` dropped its six ledger entries; `copy:status` reads "in step".
+- **The flow map** (`docs/user-flows/flows.mjs`, "PAM — User flows", Member page)
+  gains *Messages — account limited*, *A conversation — account limited* and the
+  *Report a message* screen (which had a story only since D-427), with the edges
+  that reach them; `UPDATED` is 9 October.
+
+### D-432 — The limited notice says what is off, why, then Pam — in a calm card
+
+**Date:** 2026-10-09. **Decided by:** Will, looking at the limited Messages screen:
+"This wording 'your plan' doesn't make sense. Just start with You cannot send
+messages. And explain why. Then call PAM. Also let's add more padding on this card,
+and make text the smallest. Call Pam for help should be a link, not a primary button."
+
+- **The words.** `notice.account_limited.body` is now: "You cannot send messages
+  right now. Your guide turned this off for your account. You can still read your
+  messages. Call Pam and we will help you reach your guide." It starts with what is
+  off, gives the reason that is always true (a limit is set by the case manager the
+  person is assigned to: `admin_set_access_status` is gated by `admin_covers`, 0082
+  — so "your guide turned this off" is accurate, and it never states the internal
+  reason, §4.1), and ends on Pam, like the paused notice. "Look at places and your
+  plan" and "meet new people" are gone. Reworded in all seven languages and the
+  English source in `notices.ts`; `copy:status` reads in step.
+  **The five languages other than Spanish are Claude's drafts, not a native
+  reader's** (the same standing as the rest of them, `docs/before-launch.md`).
+- **The card.** `Notice` gains `quiet`: `padding={6}` (the text-card padding) instead
+  of 4; the title and the message at the body-text floor, 16px
+  (`--pam-body-text-mobile`, A23), instead of 19px and 17px; and the call is a
+  link — accent colour, underlined, phone icon, no fill, still a 48px target and
+  still a `tel:` anchor — instead of a primary button. Only the limited notice uses
+  it (`LimitedNotice`). Every other notice (offline, something went wrong, paused,
+  turned off) keeps the primary call button: those are faults where calling is the
+  one thing to do. If Will wants the calm look on all of them it is one prop.
+- **Checked in a browser** (`e2e/messages.spec.ts`): the notice begins "You cannot
+  send messages right now.", says "Your guide turned this off for your account.",
+  never mentions a plan, its text is 16px, and the call is an underlined link with
+  a transparent background at least 48px tall; axe clean at 320px and iPhone SE.
+  Storybook: *Components / Feedback / Notice / Some Things Turned Off Quiet*, and the
+  limited-account states.
+- **For the next session** (assign and limit): `admin_set_access_status`'s error
+  still reads "That person is not on your caseload or in your region" (0008); since
+  0082 there is no region, so the message should change when that screen is built.
+- **Numbering.** This entry first took D-430, then D-431 was free on the languages
+  branch's ledger; both were taken there by the time I read its message (it pushed
+  D-430 "The new languages are approved to learn from" and D-431 first), so this is
+  D-432 and every reference on this branch moved with it. Next free: D-433.
+
+### D-441 — A staff invite carries a required email; the account keeps it, tied to the phone
+
+**Date:** 2026-10-10. **Decided by:** Will: "Emails are collected when a guide or program
+invites someone … we don't ask [members] during account creation. But the phone number
+they use to sign in should map to their email if they were invited. Map these together in
+their account. We just don't ask members for this since not everyone has an email. This
+will be typically just staff." Shown the plan: "Yes" (only staff are asked), "Not optional
+for staff". His third answer was a question — "Which email are you talking about?" — see
+*Who can read it*, below.
+
+**What was true first.** The Invite someone journey asked for a **name and a phone and
+nothing else, for every role** (0077). It did not collect an email. The only emails Pam
+held were the ones a person types on the expired-link page (0071's `invite_emails`
+outbox), tied to a link and never to an account, and `profiles` has no email column by
+design (0002: sign-in is phone-only). So there was nothing to "map"; the email had to be
+asked for first.
+
+**What was built (migration `0086_staff_email_on_invite.sql`, written and tested, not applied).**
+- Inviting a **case manager or a program lead** asks for their email and refuses to
+  continue without one that looks like an email. Inviting a **member** never asks, and the
+  database refuses a member invite that carries one. `create_staff_invite(role, email, phone,
+  region, name)` is the staff door; `create_invite` (the member door) now refuses a staff
+  role. Both call `invite_create`, which no client role can call. **No `drop` anywhere**
+  (the connector times out on one, D-387).
+- The email waits in `invite_contact_emails`, apart from `invites`: forced RLS, a policy that
+  admits nobody, no grant to any client role. When the person signs in with the number the
+  invite named and finishes setup, `redeem_invite` (or `add_role_from_invite`, for a member
+  who also works at a program) moves it onto their account, in `profile_emails`, and deletes
+  it from the invite. An account keeps the first email it was given. A renewed invite (the
+  expired-link email) has none of its own, so the email is found by following the renewals
+  back to the original invite — which is why 0086 does not touch `request_invite_link`
+  (0085, still unapplied, replaces it). An invite made before 0086 redeems as before, with
+  no email.
+- **Who can read it — Will, 10 October: "Only super admins can view emails. But if a user
+  chooses to delete all their data, the email goes along with it."** A super admin can read
+  both the account's email (`profile_emails`) and one still waiting on an invite
+  (`invite_contact_emails`); nobody else can, from the app: not the person who invited them,
+  not another case manager, not a program, not a member, **not even the account's owner**
+  (they can ask Pam for a copy of their data, which is a call). No client role can write
+  either table. The audit log never holds an address. Pam's own sender will use the service
+  role. **No screen shows it yet**: the Everyone directory carries no contact details, ever
+  (an e2e test holds that), so putting staff emails there would be a decision of its own.
+  My earlier default (owner reads their own) was replaced by this.
+- **Deleting an account deletes the email.** `profile_emails` and `invite_contact_emails` hang
+  from the profile and the invite by cascade (a test reads the catalogue so a changed rule is
+  noticed). A `before delete` trigger on `profiles` also deletes the invites the person
+  redeemed, and the expired links those were renewed from, with what hangs off them: their
+  name, their phone and any address typed on the expired-link page (`invite_emails`). **Found
+  by the test that deletes an invited account the way Pam does when somebody calls: it was
+  refused** — `invites.redeemed_by` is `on delete set null`, which the invite's own check
+  (`invites_redeemed_consistently`) forbids, so nobody who joined by invite could be deleted.
+  The trigger fixes that (no `drop` needed). **Not fixed, and not mine to decide:** deleting a
+  profile that has ever acted is still refused, because `audit_log.actor_id` is `on delete set
+  null` and the audit log is append-only. Whether an erased person's audit rows are
+  anonymised, kept or removed is a decision about the audit promise; until it is made, a
+  deletion on a call has to remove the email (and the rest) by hand. On
+  `docs/before-launch.md`.
+- The app: `InviteForWho` shows the email field for staff only (new field purpose
+  `theirEmail`: the email keyboard, no autofill of the *inviter's* own address) and
+  `createInvite` sends staff through `create_staff_invite`. **Nothing on the form explains what
+  Pam does with the email** (Will: "that's only for us… not related to members, only staff";
+  the first draft said "Pam writes to them here", which was wrong from the invitee's side — the
+  system emails them the invitation link, when a sender exists). **The form is a page of its own
+  on the nested template** (Will: "This page should be using our nested page template"): the
+  kind of invite is the large title ("A link for a program"), the round back returns to the
+  choice, and the in-body heading and the "Choose a different invite" link are gone — on Invite
+  someone, the case manager's admin screen and the Everyone directory (where the form used to sit
+  inside a card). Storybook: Case manager › Invite a program.
+- The privacy policy's "What we keep" gains a seventh paragraph and its date moves to 10
+  October (all seven languages, five of them drafts; Will to read the English): "If you work
+  with Pam as a case manager or for a program, we also keep the email address you were invited
+  with. Pam uses it to write to you. Only the Pam team can see it. If you ask us to delete your
+  account, we delete it too. Members are never asked for an email." Every clause is enforced by
+  the database, except that deleting an account that has acted still needs the audit decision
+  above (until then a deletion removes the email by hand).
+- Tests: `21_staff_email_on_invite_test.sql` (staff invites need an email and members refuse
+  one; nobody reads it before sign-in, including the person who typed it; it lands on the
+  right account only, for the number the invite named; only its owner reads it, nobody writes
+  it; a member who also works at a program keeps the first email; a renewed invite still
+  delivers it; an old invite redeems with none; the audit log never holds an address). It
+  fails when the read rule is loosened. The suite passes (608 checks). The staff
+  invite calls in `04`, `08`, `13` and `14` now go through `create_staff_invite`. Browser
+  tests: a member is never asked, staff always are, the keyboard and autofill attributes,
+  axe clean.
+
+**Applying it is order-sensitive.** The app now calls `create_staff_invite`; the *old* app
+calls `create_invite` for staff, which 0086 refuses. So: before 0086 is live, the new app's
+staff invites fail (no such function); after it is live, the old app's do. Apply 0086 and
+merge this change to `main` in the same sitting (Vercel takes a few minutes; staff invites
+are unavailable in between). Run `list_migrations` first (`CLAUDE.md`); 0085 is unapplied
+and 0086 does not depend on it. Members are unaffected either way. On the live project there
+were one super admin and two members when last read, so no staff account has an email yet.
+
+**Not done.** Sending any email (the provider, the sender, the opt-in are the first item on
+`docs/before-launch.md`); an email for a staff account that already exists (there is no screen
+to add one; re-inviting is the only way today); showing a staff member their own email on
+Profile; using the address typed on the expired-link page as an account email (that would
+quietly collect member emails); the program-lead and super-admin pages of the flow map (the
+case manager's page shows the form; the others carry the same form).
+
+**Numbering.** Migration 0086 was claimed in `docs/allocations.md` first and is still
+free on every other branch. This entry first took D-435 and moved to D-441 on 10 October:
+`claude/amazing-archimedes-qvgnt2` had pushed its own D-435 (Arabic isolates) before
+that claim and the languages branch had also taken D-435 (it moved to D-439), so the
+highest number claimed anywhere was D-440. Every reference on this branch moved with it.
+Lesson, again: fetch and read every `origin/claude/*` allocations row *and* DECISIONS
+heading list before claiming, not only the one file on your own branch.
+

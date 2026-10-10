@@ -15,6 +15,7 @@ const USER = '**/auth/v1/user*';
 const PROFILES = '**/rest/v1/profiles*';
 const POINTS = '**/rest/v1/rpc/member_points*';
 const INVITE = '**/rest/v1/rpc/create_invite*';
+const STAFF_INVITE = '**/rest/v1/rpc/create_staff_invite*';
 const CONTROLS = '**/rest/v1/access_controls*';
 const NOTIFICATIONS = '**/rest/v1/notifications*';
 // The program badge's enrollment lookup (D-175) — nobody enrolled, in these tests.
@@ -193,6 +194,67 @@ test.describe('the case manager screen', () => {
     // Made during a call, the code can still be read out.
     await expect(page.getByText('On the phone? Read them this code instead: 9T3YTVMT')).toBeVisible();
     await expect(page.getByText(/Works until/)).toBeVisible();
+  });
+
+  test('a member is never asked for an email; staff always are (0086, D-441)', async ({ page }) => {
+    await signedInAs(page, 'admin', []);
+    const member: Record<string, unknown>[] = [];
+    const staff: Record<string, unknown>[] = [];
+    await page.route(INVITE, async (route) => {
+      member.push(route.request().postDataJSON() as Record<string, unknown>);
+      await route.fulfill(json({ code: '9T3YTVMT', expires_at: '2026-10-12T21:09:28Z', role: 'member' }));
+    });
+    await page.route(STAFF_INVITE, async (route) => {
+      staff.push(route.request().postDataJSON() as Record<string, unknown>);
+      await route.fulfill(json({ code: 'K4RZ7W2H', expires_at: '2026-10-12T21:09:28Z', role: 'provider' }));
+    });
+    await page.goto('/admin/');
+
+    // A member: name and number, and no email field at all.
+    await page.getByRole('button', { name: 'Someone coming home' }).click();
+    // The form is a page of its own on the nested template: the kind of invite is
+    // the large title, and the round back returns to the choice.
+    await expect(page.getByRole('heading', { level: 1, name: 'A link for a member' })).toBeVisible();
+    await expect(page.getByLabel('Their first name')).toBeVisible();
+    await expect(page.getByLabel('Their email')).toHaveCount(0);
+    await page.getByRole('button', { name: 'Choose a different invite' }).click();
+    await expect(page.getByRole('heading', { level: 1, name: 'Invite someone' })).toBeVisible();
+
+    // A program lead: an email, and it is not optional.
+    await page.getByRole('button', { name: /program/i }).click();
+    await expect(page.getByRole('heading', { level: 1, name: 'A link for a program' })).toBeVisible();
+    const email = page.getByLabel('Their email');
+    await expect(email).toBeVisible();
+    // The keyboard for an address, and no autofill of the inviter's own.
+    await expect(email).toHaveAttribute('type', 'email');
+    await expect(email).toHaveAttribute('autocomplete', 'off');
+    // Nothing on the page explains what Pam does with it: that is for us, not for the inviter.
+    await expect(page.getByText(/Only they and Pam can see it/)).toHaveCount(0);
+    const axe = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
+    expect(axe.violations).toEqual([]);
+    await page.getByLabel('Their first name').fill('Bo');
+    await page.getByLabel('Their mobile number').fill('215 555 0112');
+    await page.getByRole('button', { name: 'Create link' }).click();
+    await expect(page.getByText('Add their email address.')).toBeVisible();
+    expect(staff).toHaveLength(0);
+
+    await email.fill('not an email');
+    await page.getByRole('button', { name: 'Create link' }).click();
+    await expect(page.getByText('That does not look like an email address. Check it and try again.')).toBeVisible();
+    expect(staff).toHaveLength(0);
+
+    await email.fill('bo@example.org');
+    await page.getByRole('button', { name: 'Create link' }).click();
+    await expect.poll(() => staff.length).toBe(1);
+    expect(staff[0]).toMatchObject({
+      p_role: 'provider',
+      p_email: 'bo@example.org',
+      p_first_name: 'Bo',
+      p_phone: '215 555 0112',
+    });
+    // The member door was never used for staff.
+    expect(member).toHaveLength(0);
+    await expect(page.getByText(/\/signin\/\?invite=K4RZ7W2H/)).toBeVisible();
   });
 
   test('a failed invite is explained, not swallowed', async ({ page }) => {

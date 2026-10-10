@@ -27,7 +27,7 @@
  *   changes  — the newest decisions this flow shows, newest first
  */
 
-export const UPDATED = '2026-10-09';
+export const UPDATED = '2026-10-10';
 
 /** Where each screen opens live — the branch's Storybook on Chromatic. */
 export const STORYBOOK_URL = 'https://claude-pam-storybook--6abea9193da46b88ce90890f.chromatic.com';
@@ -242,6 +242,27 @@ export const flows = [
         changed: 'D-410',
         note: 'One flat list, newest first: photos, documents and links with a small preview, the name on one line (slides to show a long name\'s end), then Photo, Document or the link\'s address, and who over when at the end. Links show their page\'s title and picture, fetched by Pam\'s server',
       },
+      reportMessage: {
+        title: 'Report a message',
+        story: 'member-created--report-message',
+        path: '/messages/thread/report/',
+        changed: 'D-427',
+        note: 'Says who sees the one message: Pam and your guide',
+      },
+      messagesLimited: {
+        title: 'Limited Messages',
+        story: 'member-created-states-limited-account--messages',
+        path: '/messages/',
+        changed: 'D-427',
+        note: 'No New message; a notice says what is off and who to call',
+      },
+      threadLimited: {
+        title: 'Limited chat',
+        story: 'member-created-states-limited-account--conversation',
+        path: '/messages/thread/',
+        changed: 'D-427',
+        note: 'Messages stay; the notice stands where the composer was',
+      },
       profile: {
         title: 'Profile',
         story: 'member-created--profile',
@@ -293,6 +314,10 @@ export const flows = [
       ['messages', 'thread', 'Open'],
       ['thread', 'options', '⋯'],
       ['options', 'files', 'Stuff shared'],
+      ['options', 'reportMessage', 'Report'],
+      ['messages', 'messagesLimited', 'Account limited (or New message refused)', { dashed: true }],
+      ['messagesLimited', 'threadLimited', 'Open'],
+      ['thread', 'threadLimited', 'Account limited (or a send refused)', { dashed: true }],
       ['profile', 'connections', 'Connections'],
       ['connections', 'thread', 'Message (round button)', { dashed: true }],
       ['profile', 'reminders', 'Get text reminders'],
@@ -305,6 +330,7 @@ export const flows = [
       ['profile', 'points', 'Points'],
     ],
     changes: [
+      'D-427 — a limited account reads Messages and its conversations but cannot send or start one; a notice says what is off and who to call, and a refused send says so',
       "D-411 — a conversation: back and ⋯ where every nested screen has them, the name large, no fade; ⋯ outlined; Messages rows start at the page edge; dialogs open with no button chosen",
       'D-410 — Stuff shared: a link shows its address under its title; who and when stay at the end',
       "D-409 — Stuff shared and documents say just Photo, Document or Link; a file Pam can't take gets a yellow alert in the box that shakes",
@@ -343,6 +369,13 @@ export const flows = [
         path: '/invite/',
         changed: 'D-315',
         note: 'A member, a program, or a case manager (D-315)',
+      },
+      inviteWho: {
+        title: 'Who it is for',
+        story: 'case-manager-screens--invite-program',
+        path: '/invite/new/?role=provider',
+        changed: 'D-441',
+        note: 'A page of its own: the kind of invite is the title, back returns to the choice. Name, mobile number and, for a program or a case manager, an email: required. A member is never asked',
       },
       inviteReady: {
         title: 'A link for a member',
@@ -383,13 +416,14 @@ export const flows = [
       ['member', 'memberSaved', 'Saved programs'],
       ['member', 'connect', 'Connect'],
       ['home', 'invite', 'Invite someone (floating)'],
-      ['invite', 'inviteReady', 'A member / program / case manager row'],
+      ['invite', 'inviteWho', 'Invite a program / case manager'],
+      ['invite', 'inviteReady', 'Invite a member'],
       ['messages', 'thread', 'Open'],
       ['profile', 'programs', 'All programs'],
       ['programs', 'addProgram', 'Add'],
       ['profile', 'alerts', 'Text alerts'],
     ],
-    changes: ["D-411 — a conversation: back and ⋯ where every nested screen has them, the name large, no fade; ⋯ outlined; Messages rows start at the page edge; dialogs open with no button chosen", 'D-400–401 — a conversation: a smaller visit card and a blurred fade under the header; one line under the name; an even frame round photos; the send button tucked into a rounder corner; photos open on near-black', 'D-399 — a conversation: send a PDF or Word file (the document button, or drop it on), opened when tapped; a Google Docs link shows as a card that opens it in Google', 'D-395 — a conversation: under the name, who they are in full (Program lead at Example Food Pantry; Case manager), not a cut-off tag', 'D-394 — a conversation: send a photo (the picture button beside the mic), tap one to see it full size; only the two people see it, and whoever checks a report about it', 'D-390 — a conversation: mine light green, theirs grey, no name or time on a bubble; drag sideways to see the times; closer to the edges; bolder mic and send', "D-389 — a conversation: one divider per day (Today, Yesterday, a weekday, a date), each bubble just its time; the composer one rounded box, mic left, round send grey until there is text, then dark green", 'D-347 — Add a program asks one question a screen, then a review', 'D-315 — a case manager can invite a case manager', 'D-263 — Invite someone makes the link straight away', 'D-260 — text alert switches'],
+    changes: ['D-441 — inviting a program or a case manager asks for their email, required: it lands on their account when they sign in with that number; a member is never asked', "D-411 — a conversation: back and ⋯ where every nested screen has them, the name large, no fade; ⋯ outlined; Messages rows start at the page edge; dialogs open with no button chosen", 'D-400–401 — a conversation: a smaller visit card and a blurred fade under the header; one line under the name; an even frame round photos; the send button tucked into a rounder corner; photos open on near-black', 'D-399 — a conversation: send a PDF or Word file (the document button, or drop it on), opened when tapped; a Google Docs link shows as a card that opens it in Google', 'D-395 — a conversation: under the name, who they are in full (Program lead at Example Food Pantry; Case manager), not a cut-off tag', 'D-394 — a conversation: send a photo (the picture button beside the mic), tap one to see it full size; only the two people see it, and whoever checks a report about it', 'D-390 — a conversation: mine light green, theirs grey, no name or time on a bubble; drag sideways to see the times; closer to the edges; bolder mic and send', "D-389 — a conversation: one divider per day (Today, Yesterday, a weekday, a date), each bubble just its time; the composer one rounded box, mic left, round send grey until there is text, then dark green", 'D-347 — Add a program asks one question a screen, then a review', 'D-315 — a case manager can invite a case manager', 'D-263 — Invite someone makes the link straight away', 'D-260 — text alert switches'],
   },
   {
     key: 'program-lead',

@@ -146,7 +146,7 @@ export function InviteNewView({ role }: { readonly role: string | null }) {
               </VStack>
             </Card>
           ) : null}
-          <InviteForWho role={allowed!} busy={busy} hasHeading={false} onSubmit={(who) => void make(who)} />
+          <InviteForWho role={allowed!} busy={busy} onSubmit={(who) => void make(who)} />
         </>
       )}
 

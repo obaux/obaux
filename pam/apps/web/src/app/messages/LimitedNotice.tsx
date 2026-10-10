@@ -22,6 +22,7 @@ export function LimitedNotice({ supportPhone }: { readonly supportPhone: string 
       body={t(NOTICES.account_limited.bodyKey)}
       supportPhone={supportPhone}
       callLabel={t('help.callSupport')}
+      quiet
     />
   );
 }

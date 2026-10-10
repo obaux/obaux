@@ -74,6 +74,51 @@ decided.
   (`lib/accountLimited.ts`). `Session` gained `accessStatus`. (3) The first-load
   budget check ran. (4) The translation session was sent the eight changed keys.
 
+- **After the merge (D-429).** Will's answers to what was left: the big branch
+  "go for it", privacy updates by email going forward, he will ask the other
+  session about the native read, the assign-and-limit build in a new session
+  (handoff in STATUS's Backlog), delete the unused key, make a refused New
+  message say the account is limited, update the flow map. Done: the last four and
+  the handoff. **Not merged: the big branch.** The ledger shows 0079–0081 live
+  (the other session applied them, D-428) so the hold Will set is met; but the
+  branch also publishes five machine-translated languages, privacy page, terms
+  and transparency screen included, which its own record says no native speaker
+  has read, and Will's answer on that is still to come. Privacy-by-email is not
+  yet possible: Pam holds no member email address (D-429). The flow map: `flows.mjs` gained Limited
+  Messages, Limited chat and Report a message (and three edges); the Figma page
+  `1 · Member` of "PAM — User flows" was redrawn from it (25 screens, 28 arrows,
+  checked in a Figma screenshot). Left as it was: the `0 · Overview` page (a
+  one-flow run would have replaced all five columns with one; it needs a full run
+  of every flow) and the screenshots in the slots (mcp.figma.com is blocked here,
+  D-264). The "Open in Storybook" links on the three new cards use the old
+  `claude-pam-storybook` Chromatic address in `STORYBOOK_URL`, which does not have
+  these stories; change it when this branch's Storybook has an address.
+
+- **Will's note on the limited screen (D-432).** "Your plan" made no sense; the
+  notice now starts "You cannot send messages right now", says why, then Pam, in a
+  calm card (`Notice quiet`: more padding, 16px text, the call as a link). All seven
+  languages reworded (five are Claude's drafts). Merged `main` (the languages branch,
+  D-422–D-428) into this branch first; the full browser suite passes on the merged
+  tree (834) and again after this change (834, fresh build); the `Member` page of
+  the Figma flow map was redrawn from the merged `flows.mjs` (26 screens, 29 arrows,
+  including the other session's Stuff shared).
+
+- **Staff email on invites (D-441, 10 October).** Will: emails come in when a guide or
+  program invites someone, the phone should map to the email, members are not asked, and for
+  staff it is required. Checked first: the invite journey asked for **no** email (name and
+  phone only), so there was nothing to map; the plan (shown through the
+  `scope-my-instructions` skill) was confirmed. Built on the branch, not applied: migration
+  0086, test 21, the staff form with a required email, privacy "What we keep" p7 and its date
+  (seven languages, five drafts), the case manager's page of the flow map (not republished
+  to Figma: not yet merged, and the program-lead and super-admin pages carry the same form).
+  Will's answers: **only super admins can read the emails; deleted with the account**; the form
+  must be on the nested page template (done, on three screens) and must not explain what Pam does
+  with the email (done). **A bug found by the new deletion test:** an invited account could not
+  be deleted at all (fixed in 0086), and any account that has ever acted still cannot (the audit
+  log is append-only) — a decision for Will, on the before-launch list.
+  **Needs Will:** read the new privacy sentence; decide the audit-rows question; say when to apply
+  0086 and merge (order-sensitive, in D-441).
+
 ## What was wrong, and what missed it
 
 **A test hardcoded a count and broke without anyone seeing.** `e2e/legal.spec.ts`

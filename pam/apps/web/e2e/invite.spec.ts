@@ -15,6 +15,7 @@ const USER = '**/auth/v1/user*';
 const PROFILES = '**/rest/v1/profiles*';
 const REGIONS = '**/rest/v1/regions*';
 const INVITE = '**/rest/v1/rpc/create_invite*';
+const STAFF_INVITE = '**/rest/v1/rpc/create_staff_invite*';
 const REVIEW = '**/rest/v1/rpc/review_staff_request*';
 const STAFF_REQUESTS = '**/rest/v1/staff_requests*';
 const CONTROLS = '**/rest/v1/access_controls*';
@@ -71,7 +72,8 @@ test.describe('inviting somebody, on a page of its own (D-442)', () => {
   test('the list of kinds leads to one page per kind, and the city is the super admin\'s to pick', async ({ page }) => {
     await signedInAs(page, 'super_admin', CITIES);
     const asked: Record<string, unknown>[] = [];
-    await page.route(INVITE, async (route) => {
+    // A program is staff: invited with an email, through its own door (0086, D-441).
+    await page.route(STAFF_INVITE, async (route) => {
       asked.push(route.request().postDataJSON() as Record<string, unknown>);
       await route.fulfill(json({ code: '9T3YTVMT', expires_at: '2026-10-12T21:09:28Z', role: 'provider' }));
     });
@@ -86,6 +88,7 @@ test.describe('inviting somebody, on a page of its own (D-442)', () => {
     await expect(page.getByRole('radio', { name: 'Pittsburgh' })).toBeVisible();
     await page.getByLabel('Their first name').fill('Dana');
     await page.getByLabel('Their mobile number').fill('215 555 0111');
+    await page.getByLabel('Their email').fill('dana@example.org');
     await page.getByRole('button', { name: 'Create link' }).click();
     await expect(page.getByText('Pick a city first.')).toBeVisible();
     expect(asked).toHaveLength(0);
@@ -93,7 +96,7 @@ test.describe('inviting somebody, on a page of its own (D-442)', () => {
     await page.getByRole('radio', { name: 'Pittsburgh' }).check();
     await page.getByRole('button', { name: 'Create link' }).click();
     await expect.poll(() => asked.length).toBe(1);
-    expect(asked[0]).toMatchObject({ p_role: 'provider', p_first_name: 'Dana', p_region_id: PITTSBURGH });
+    expect(asked[0]).toMatchObject({ p_role: 'provider', p_first_name: 'Dana', p_email: 'dana@example.org', p_region_id: PITTSBURGH });
     await expect(page.getByText(/\/signin\/\?invite=9T3YTVMT&as=program/)).toBeVisible();
     await expect(page.getByRole('button', { name: 'Send the link' })).toBeVisible();
   });
