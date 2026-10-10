@@ -864,7 +864,7 @@ while the copy is unsigned, so it earned the first live test, not the last.*
 | 25 | **D-178's audience** | Who reads a reported message | The reporter's case manager is included alongside the sender's. Say if it should be the sender's only. |
 | 27 | ~~Approve the new transparency line, then deploy `0067`~~ **Done (Will, 21 September)** | — | Wording approved as proposed. `list_migrations` first: no drift since the 20th. `0067_people_activity.sql` applied; `get_advisors` (security) clean — `people_activity()` is `authenticated`-only. The ring for a new save now lights for real. Also fixed in the same push: `privacy.s.who-can-see.p1` (the long privacy page, not the short transparency screen) still carried "and that a chat exists" — a claim D-167 removed from the short screen on the 17th but missed here. Removed, en/es. |
 | 26 | ~~Deploy `0066`~~ **Done (Will, 21 September)** | — | `list_migrations` first: no drift since the 20th. Applied; `get_advisors` (security) clean — `flagged_services()` and the recreated `conversation_partners()` are `authenticated`-only, `services_search()` is security invoker and so not even listed. `pg_trgm` now lives in `extensions`. Case managers keep the Reported places list read-only — Will's call, recorded as D-190. |
-| 28 | **A Chromatic project token** | Storybook updating on every push | chromatic.com → sign in with GitHub → link `obaux/obaux` → add the token as the repository secret `CHROMATIC_PROJECT_TOKEN`. The workflow (`pam-storybook.yml`) skips itself until then. |
+| 28 | ~~A Chromatic project token~~ **Done** | — | The token is the repository secret `CHROMATIC_PROJECT_TOKEN`, and `pam-storybook.yml` publishes Storybook to Chromatic on every push: checked 10 October on `main` (`bf08d60`), where "Publish to Chromatic" ran and passed. |
 | 29 | ~~Where the dock's People and My Plan lead~~ **Answered by the redesign (D-210)** | — | Will, 1 October: the bar is Explore, Saved, Trips, Messages, Profile; Help moves to each screen's header and Profile. Next: his reference screenshots for the other screens, then wiring the redesigned views to routes and data. Walk it in `Prototype/Redesign — member` (D-211). |
 | 30 | ~~Deploy `0071` and `0072`~~ **Done (Will, 4 October)** | — | `list_migrations` first: live ran to `0070`, no live-only drift; `can_message`, `messageable_people` and `open_direct_conversation` matched 0063 exactly, which 0072 was written against. Both applied; `get_advisors` (security) shows no new kind of finding (the definer functions are guarded inside, as every other one is; `invite_preview` and `request_invite_link` are anon on purpose). Spot-checked: `invite_emails` forced RLS with one policy and no anon access; `invites_log` and `staff_request_phone` not callable signed out. See D-264. |
 | 34 | **Read the short version; translate the new strings** | D-416, D-417, D-427 | The look is chosen (icons) and built, and "your guide" is settled as the short word (Will, 9 October, D-427): the long phrase now appears only where it defines the word, and Help, the report screens and the paused / turned-off / limited notices say "your guide". Will has read and approved the four short-version lines (`transparency.summary.*`, 9 October, D-427). **Translated into the five other languages** on `claude/gallant-clarke-0dhizj` — D-412–D-417 in the first merge, D-427's eight (`access.limitedNotice`, `help.what.person`, `messages.report.*`, `notice.account_*`, `notice.feature_turned_off.body`) when the two branches met (all drafts for native review; `locales/ledger.json` records them). |
@@ -953,6 +953,23 @@ Broad St, North Philadelphia` drew `… St, North Philadelphia 1231 بالقرب
   (see `docs/allocations.md`). **Done at the merge (10 October):** the `long-address` ellipsis is in
   `fit-known.json` and the old `ar|spill` entry is gone; `areachip--arabic` needs none
   (its ellipsis is the story's own in every column).
+
+## Design system & Storybook · area chip, fit audit (10 October) — merged 10 October
+
+Branch `claude/pam-design-areachip-long-address`, merged to `main` on 10 October; D-448 confirmed by Mira. Job: Will asked for the
+`AreaChip` long address in Spanish, Portuguese and Russian to be fixed; it turned out the chip was
+fine and the fit audit was over-counting (D-448).
+
+- **The chip needs no change.** At 320px it reads "Cerca de 1231 N Broad St, North Phila…" and keeps its
+  pencil: Astryx's `Button` already trims its label with an ellipsis. `packages/ui` is untouched.
+- **`audit:fit` no longer calls an ellipsis-trimmed line a spill** (`scripts/audit-language-fit.mjs`).
+  The trimming is still reported by the ellipsis check. On `d4f325e` it dropped 9 of 35 new-in-a-language
+  defects, all `spill`; no `cut`, `overlap` or `ellipsis` went. Five defects were looked at and accepted in
+  `scripts/fit-known.json`, each with its reason.
+- **How to read the audit's numbers:** the figure that matters is defects **not in the known list**
+  (8 on `d4f325e`, 0 on this branch: the full run, 464 stories × 7 languages, found 26 new in a language and all 26 are in the known list). The raw count the script prints is a different measure.
+- Outside this lane, seen and left: some English file names in the attachment lists are cut at the
+  timestamp column with no ellipsis ("Free resume worksl").
 
 ## Seven languages, messages in your own language, and text that fits (9 October) — 0.50.1 and 0.51.0, merged 9 October (PR #29)
 
