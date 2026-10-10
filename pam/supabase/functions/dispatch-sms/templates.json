@@ -439,29 +439,29 @@
       "more": {
         "pt-BR": {
           "body": "Pam: Voce tem uma mensagem nova no Pam. Abra: {link}",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 10 October 2026 — approved to learn from; no native reader yet"
         },
         "zh-CN": {
           "body": "Pam: 您在 Pam 有新消息。打开：{link}",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 10 October 2026 — approved to learn from; no native reader yet"
         },
         "zh-HK": {
           "body": "Pam: 你在 Pam 有新訊息。打開：{link}",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 10 October 2026 — approved to learn from; no native reader yet"
         },
         "ru": {
           "body": "Pam: У вас новое сообщение: {link}",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 10 October 2026 — approved to learn from; no native reader yet"
         },
         "ar": {
           "body": "Pam: لديك رسالة جديدة: {link}",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 10 October 2026 — approved to learn from; no native reader yet"
         }
       },
       "vars": [
         "link"
       ],
-      "reviewedBy": "",
+      "reviewedBy": "Will (Oba), 10 October 2026",
       "isFirstContact": false
     },
     "visit_booked": {
@@ -471,29 +471,29 @@
       "more": {
         "pt-BR": {
           "body": "Pam: Alguem marcou uma visita no seu programa. Abra o Pam: {link}",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 10 October 2026 — approved to learn from; no native reader yet"
         },
         "zh-CN": {
           "body": "Pam: 有人预约了您的项目。打开：{link}",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 10 October 2026 — approved to learn from; no native reader yet"
         },
         "zh-HK": {
           "body": "Pam: 有人預約了你的計劃。打開：{link}",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 10 October 2026 — approved to learn from; no native reader yet"
         },
         "ru": {
           "body": "Pam: Новая запись: {link}",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 10 October 2026 — approved to learn from; no native reader yet"
         },
         "ar": {
           "body": "Pam: حجز جديد في برنامجك: {link}",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 10 October 2026 — approved to learn from; no native reader yet"
         }
       },
       "vars": [
         "link"
       ],
-      "reviewedBy": "",
+      "reviewedBy": "Will (Oba), 10 October 2026",
       "isFirstContact": false
     },
     "booking_changed": {
@@ -503,29 +503,29 @@
       "more": {
         "pt-BR": {
           "body": "Pam: Uma visita no seu programa mudou. Abra o Pam: {link}",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 10 October 2026 — approved to learn from; no native reader yet"
         },
         "zh-CN": {
           "body": "Pam: 您项目的一次预约有变。打开：{link}",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 10 October 2026 — approved to learn from; no native reader yet"
         },
         "zh-HK": {
           "body": "Pam: 你計劃的一個預約有變。打開：{link}",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 10 October 2026 — approved to learn from; no native reader yet"
         },
         "ru": {
           "body": "Pam: Запись изменена: {link}",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 10 October 2026 — approved to learn from; no native reader yet"
         },
         "ar": {
           "body": "Pam: تغير حجز في برنامجك: {link}",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 10 October 2026 — approved to learn from; no native reader yet"
         }
       },
       "vars": [
         "link"
       ],
-      "reviewedBy": "",
+      "reviewedBy": "Will (Oba), 10 October 2026",
       "isFirstContact": false
     },
     "trip_planned": {
@@ -535,29 +535,29 @@
       "more": {
         "pt-BR": {
           "body": "Pam: Alguem da sua lista planejou uma visita. Abra o Pam: {link}",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 10 October 2026 — approved to learn from; no native reader yet"
         },
         "zh-CN": {
           "body": "Pam: 您名单上有人计划了到访。打开：{link}",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 10 October 2026 — approved to learn from; no native reader yet"
         },
         "zh-HK": {
           "body": "Pam: 你名單上有人計劃了到訪。打開：{link}",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 10 October 2026 — approved to learn from; no native reader yet"
         },
         "ru": {
           "body": "Pam: В списке новый визит: {link}",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 10 October 2026 — approved to learn from; no native reader yet"
         },
         "ar": {
           "body": "Pam: أحدهم خطط لزيارة: {link}",
-          "reviewedBy": ""
+          "reviewedBy": "Will (Oba), 10 October 2026 — approved to learn from; no native reader yet"
         }
       },
       "vars": [
         "link"
       ],
-      "reviewedBy": "",
+      "reviewedBy": "Will (Oba), 10 October 2026",
       "isFirstContact": false
     },
     "access_limited_notice": {
