@@ -8,6 +8,7 @@ import { Text } from '@astryxdesign/core/Text';
 import { Badge } from './Badge.js';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { CheckIcon } from './icons.js';
+import { OptionTag, TaggedWords } from './OptionTag.js';
 
 /**
  * A plain list of places to go, one per row: icon, words, chevron (D-210).
@@ -51,6 +52,26 @@ export interface MenuItem {
   readonly hasDot?: boolean;
   /** One line, then "…" — a message's preview (Will, D-306). */
   readonly isDescriptionOneLine?: boolean;
+  /**
+   * A short tag before the label, in a cell of its own: "EN", "PT-BR", "AR"
+   * before a language's own name (Will, 10 October 2026, D-451). Always English,
+   * always left to right, hidden from a screen reader: the row's name stays its
+   * label. Rows in one list line up whatever their tag.
+   */
+  readonly tag?: string;
+  /**
+   * The language the label is written in ("ru", "ar"), so a screen reader
+   * speaks "Русский" in a Russian voice and the word reads the way its own
+   * script does. Astryx's rows take no `lang`, so it goes on a span round the
+   * label. Without it nothing changes.
+   */
+  readonly lang?: string;
+  /**
+   * The same tag, before the `value` at the right — Profile's Language row,
+   * "EN English". It takes only the room its letters need. Shown with `value`;
+   * hidden from a screen reader.
+   */
+  readonly valueTag?: string;
 }
 
 export interface MenuListProps {
@@ -99,7 +120,13 @@ export function MenuList({ label, items, hasDividers = false, isInset = false }:
       {items.map((item, index) => (
         <ListItem
           key={item.id}
-          label={<Text xstyle={[styles.label, item.isSelected === true && styles.labelSelected]}>{item.label}</Text>}
+          label={
+            <Text xstyle={[styles.label, item.isSelected === true && styles.labelSelected]}>
+              <TaggedWords tag={item.tag} lang={item.lang}>
+                {item.label}
+              </TaggedWords>
+            </Text>
+          }
           description={
             item.description ? (
               <Text type="supporting" xstyle={[styles.description, item.isDescriptionOneLine === true && styles.oneLine]}>
@@ -121,6 +148,7 @@ export function MenuList({ label, items, hasDividers = false, isInset = false }:
               <HStack gap={2} align="center" wrap="nowrap">
                 {item.hasDot ? <HStack aria-hidden xstyle={styles.dot} /> : null}
                 {item.badge ? <Badge variant="error" label={item.badge} aria-label={item.badgeLabel} /> : null}
+                {item.value && item.valueTag ? <OptionTag tag={item.valueTag} isFixedWidth={false} /> : null}
                 {item.value ? (
                   <Text type="supporting" xstyle={styles.value}>
                     {item.value}
