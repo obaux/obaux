@@ -16,6 +16,17 @@ export const Home: Story = screen('super-admin', 'Home — Requests', '/');
 export const Messages: Story = screen('super-admin', 'Messages', '/messages/');
 export const Profile: Story = screen('super-admin', 'Profile', '/profile/');
 export const Everyone: Story = screen('super-admin', 'Everyone', '/directory/');
+/** A member's guide (D-446), from Marcus's row on Everyone: Dana now. */
+export const MemberGuide: Story = screen('super-admin', 'A member’s guide', '/directory/guide/', {
+  id: 'd1',
+  name: 'Marcus',
+  guide: 'd3',
+});
+/** A member with no guide (D-446): Tanya, from "Members with no guide". */
+export const MemberWithNoGuide: Story = screen('super-admin', 'A member with no guide', '/directory/guide/', {
+  id: 'd4',
+  name: 'Tanya',
+});
 export const Requests: Story = screen('super-admin', 'Staff requests', '/requests/');
 export const RequestProgram: Story = screen('super-admin', 'A requested program', '/requests/program/', { id: 'r-2' });
 export const Thread: Story = screen('super-admin', 'A conversation with a case manager', '/messages/thread/', {

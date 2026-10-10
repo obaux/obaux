@@ -26,6 +26,7 @@ import { useDirectory, setDemoView } from '@/lib/useDirectory';
 import { createInvite, listRegions, type CreatedInvite } from '@/lib/useCaseload';
 import { useRoleView } from '@/lib/useViewedRole';
 import { useDemoView } from '@/lib/useDemoView';
+import { useDirectoryGuides } from '@/lib/useGuides';
 import { RoleSwitchControl } from '../RoleSwitchControl';
 
 /**
@@ -63,8 +64,11 @@ const styles = stylex.create({
   secondary: { minHeight: '48px' },
 });
 
-/** "All", then one option per role, in the order somebody thinks of them. */
-const FILTERS = ['all', ...ROLES] as const;
+/**
+ * "All", then one option per role, in the order somebody thinks of them, then
+ * the members nobody guides yet (D-446): since 0082 no case manager reads them.
+ */
+const FILTERS = ['all', ...ROLES, 'unassigned'] as const;
 type Filter = (typeof FILTERS)[number];
 
 function whenLastActive(iso: string | null, locale: string): string | null {
@@ -86,11 +90,35 @@ export default function DirectoryPage() {
   const isSuperAdmin = viewedRole === 'super_admin';
   const isDemo = useDemoView(session);
   const [filter, setFilter] = useState<Filter>('all');
-  const { state: directory, refresh: refreshDirectory } = useDirectory(isSuperAdmin, filter as Role | 'all');
+  const { state: directory, refresh: refreshDirectory } = useDirectory(
+    isSuperAdmin,
+    filter === 'unassigned' ? 'member' : (filter as Role | 'all'),
+  );
+  // Who guides each member (D-446), for the line on their row and the filter.
+  const guides = useDirectoryGuides(isSuperAdmin);
+  const guideLine = (personId: string) => {
+    const guide = guides?.get(personId);
+    return guide ? t('assignGuide.row', { name: guide.guideFirstName ?? '—' }) : t('assignGuide.row.none');
+  };
+  const guideHref = (personId: string, firstName: string | null) =>
+    `/directory/guide/?${new URLSearchParams({
+      id: personId,
+      name: firstName ?? '',
+      guide: guides?.get(personId)?.guideId ?? '',
+    }).toString()}`;
+  const realPeople =
+    directory.status === 'ready'
+      ? filter === 'unassigned'
+        ? directory.people.filter((p) => !guides?.has(p.id))
+        : directory.people
+      : [];
   // The filter is real: it asks the same question of the example set that it
   // asks the database, so switching it while the real directory is empty
   // still demonstrates what it does.
-  const dummyPeople = filter === 'all' ? DUMMY_EVERYONE : DUMMY_EVERYONE.filter((p) => p.role === filter);
+  const dummyPeople =
+    filter === 'all'
+      ? DUMMY_EVERYONE
+      : DUMMY_EVERYONE.filter((p) => p.role === (filter === 'unassigned' ? 'member' : filter));
 
   /**
    * Bringing somebody in.
@@ -292,7 +320,7 @@ export default function DirectoryPage() {
         title={t('directory.title')}
         subtitle={
           directory.status === 'ready' && !isDemo
-            ? t('directory.count', { count: directory.people.length })
+            ? t('directory.count', { count: realPeople.length })
             : (directory.status === 'empty' || isDemo) && USE_DUMMY_PEOPLE
               ? t('directory.count', { count: dummyPeople.length })
               : undefined
@@ -407,9 +435,15 @@ export default function DirectoryPage() {
         />
       ) : null}
 
+      {directory.status === 'ready' && !isDemo && filter === 'unassigned' && realPeople.length === 0 ? (
+        <Text type="supporting" xstyle={styles.note}>
+          {t('assignGuide.allAssigned')}
+        </Text>
+      ) : null}
+
       {directory.status === 'ready' && !isDemo ? (
         <VStack gap={3}>
-          {directory.people.map((person, index) => {
+          {realPeople.map((person, index) => {
             const when = whenLastActive(person.lastActiveAt, locale);
             return (
               <ScrollReveal key={person.id} index={index}>
@@ -424,8 +458,10 @@ export default function DirectoryPage() {
                   }
                   meta={[
                     person.regionName ? `${t(`role.${person.role}`)} · ${person.regionName}` : t(`role.${person.role}`),
+                    ...(person.role === 'member' && guides ? [guideLine(person.id)] : []),
                     when ? t('admin.lastActive', { when }) : t('admin.lastActive.never'),
                   ]}
+                  {...(person.role === 'member' ? { href: guideHref(person.id, person.firstName) } : {})}
                   trailing={
                     <Switch
                       label={t('directory.demoView')}

@@ -208,6 +208,17 @@ export const DIRECTORY_PEOPLE = [
   { id: 'd1', first_name: 'Marcus', role: 'member', region_name: 'Philadelphia', access_status: 'active', last_active_at: hoursAgo(0), is_demo: false },
   { id: 'd2', first_name: 'Alice', role: 'provider', region_name: 'Philadelphia', access_status: 'active', last_active_at: null, is_demo: false },
   { id: 'd3', first_name: 'Dana', role: 'admin', region_name: 'Philadelphia', access_status: 'limited', last_active_at: hoursAgo(24), is_demo: false },
+  // A member nobody guides yet (D-446): "No guide" on Everyone.
+  { id: 'd4', first_name: 'Tanya', role: 'member', region_name: 'Philadelphia', access_status: 'active', last_active_at: hoursAgo(48), is_demo: false },
+];
+
+/** Who guides whom, for the super admin's Everyone (D-446): Dana guides Marcus; Tanya has none. */
+export const DIRECTORY_GUIDES = [{ member_id: 'd1', guide_id: 'd3', guide_first_name: 'Dana' }];
+
+/** Who a picker lists (D-446): for a case manager, colleagues in their city; for the super admin, all. */
+export const GUIDE_CHOICES = [
+  { id: 'd3', first_name: 'Dana', region_name: 'Philadelphia' },
+  { id: 'g2', first_name: 'Chris', region_name: 'Philadelphia' },
 ];
 
 /** Two people waiting for a super admin's decision on /requests/; Andre described his program. */

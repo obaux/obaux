@@ -9,7 +9,19 @@ import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { Badge } from '@pam/ui/Badge';
 import { Avatar } from '@astryxdesign/core/Avatar';
-import { BigButton, BookmarkIcon, ConnectionsIcon, Loading, MessagesIcon, Notice, Page, SignIcon, TripsIcon } from '@pam/ui';
+import {
+  BigButton,
+  BookmarkIcon,
+  ConnectionsIcon,
+  Loading,
+  MessagesIcon,
+  Notice,
+  Page,
+  PeopleIcon,
+  ShieldIcon,
+  SignIcon,
+  TripsIcon,
+} from '@pam/ui';
 import { MenuList } from '@pam/ui/MenuList';
 import { signedBy, usePolicies } from '@/lib/usePolicies';
 import { ProfileSummary } from '@pam/ui/ProfileCards';
@@ -431,6 +443,21 @@ function PersonScreen() {
                     label: t('person.connect.action', { name: person.firstName }),
                     icon: <ConnectionsIcon width={26} height={26} />,
                     href: `/person/connect/?id=${encodeURIComponent(person.id)}`,
+                  },
+                  // Limit or pause them, and hand them to a colleague (D-446).
+                  // The database lets only their own case manager do either.
+                  {
+                    id: 'access',
+                    label: t('access.row'),
+                    icon: <ShieldIcon width={26} height={26} />,
+                    href: `/person/access/?id=${encodeURIComponent(person.id)}`,
+                    value: t(`access.state.${person.accessStatus}`),
+                  },
+                  {
+                    id: 'handover',
+                    label: t('handover.row'),
+                    icon: <PeopleIcon width={26} height={26} />,
+                    href: `/person/handover/?id=${encodeURIComponent(person.id)}`,
                   },
                 ]
               : []),

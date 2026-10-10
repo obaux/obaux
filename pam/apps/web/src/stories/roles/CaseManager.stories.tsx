@@ -31,6 +31,14 @@ export const ConnectMember: Story = screen('case-manager', 'Connect a member to 
   id: 'dummy-m1',
 });
 export const Invite: Story = screen('case-manager', 'Invite someone', '/invite/');
+/** Limit or pause a member, or turn them back on (D-446). */
+export const MemberAccess: Story = screen('case-manager', 'Limit or pause a member', '/person/access/', { id: 'dummy-m1' });
+/** The same, for a real member on the caseload: the write goes to the (mocked) database. */
+export const MemberAccessReal: Story = screen('case-manager', 'Limit or pause a member on your caseload', '/person/access/', {
+  id: 'm1',
+});
+/** Hand a member to a colleague in your city (D-446). */
+export const MemberHandOver: Story = screen('case-manager', 'Hand a member over', '/person/handover/', { id: 'm1' });
 /** Choosing "Invite a program": the form is a page of its own on the nested template (D-441). */
 export const InviteProgram: Story = {
   ...screen('case-manager', 'Invite a program — who it is for', '/invite/'),

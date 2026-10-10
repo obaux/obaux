@@ -44,6 +44,9 @@ import { InviteView } from '../../screens/InviteView';
 import { BookForMemberView } from '../../screens/BookForMemberView';
 import { AddPersonView } from '../../screens/AddPersonView';
 import PersonPoliciesPage from '../../app/person/policies/page';
+import ManageAccessPage from '../../app/person/access/page';
+import HandOverPage from '../../app/person/handover/page';
+import GuidePage from '../../app/directory/guide/page';
 import { AddProgramView } from '../../screens/AddProgramView';
 import CalendarPreviewPage from '../../app/home/calendar/page';
 import { ProgramScreen } from '../../screens/ProgramView';
@@ -111,6 +114,9 @@ export const APP_ROUTES: Readonly<Record<string, PrototypeRoute>> = {
   '/messages/thread/': screen(() => <MessageThreadPage />),
   '/admin/': screen(() => <AdminPage />),
   '/directory/': screen(() => <DirectoryPage />),
+  '/directory/guide/': screen(() => <GuidePage />),
+  '/person/access/': screen(() => <ManageAccessPage />),
+  '/person/handover/': screen(() => <HandOverPage />),
   '/requests/': screen(() => <RequestsPage />),
   '/requests/program/': screen(() => <PrototypeRequestProgram />),
   '/invites/': screen(() => <InvitesLogScreen />),

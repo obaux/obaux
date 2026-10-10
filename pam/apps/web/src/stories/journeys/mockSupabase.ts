@@ -14,6 +14,8 @@ import {
   CASELOAD,
   CONVO_ID,
   DIRECTORY_PEOPLE,
+  DIRECTORY_GUIDES,
+  GUIDE_CHOICES,
   ME_ID,
   NOTIFICATIONS,
   OTHER_ID,
@@ -171,6 +173,12 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
       return { body: [PLACES.find((place) => place.id === id) ?? PLACES[0]] };
     }),
     on('/rpc/directory_people', () => ({ body: DIRECTORY_PEOPLE })),
+    // Assigning a guide, handing over, limiting (D-446): the writes succeed and change nothing.
+    on('/rpc/directory_guides', () => ({ body: DIRECTORY_GUIDES })),
+    on('/rpc/guides_i_can_choose', () => ({ body: GUIDE_CHOICES })),
+    on('/rpc/assign_guide', () => ({ body: null })),
+    on('/rpc/hand_over_member', () => ({ body: null })),
+    on('/rpc/admin_set_access_status', () => ({ body: null })),
     // The member's three (D-304): the rest of Explore is not saved.
     on('/rpc/saved_places_mine', () => ({ body: PLACES.slice(0, 3) })),
     on('/rest/v1/saved_places', () => ({ body: [] })),
