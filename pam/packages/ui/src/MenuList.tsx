@@ -8,7 +8,7 @@ import { Text } from '@astryxdesign/core/Text';
 import { Badge } from './Badge.js';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { CheckIcon } from './icons.js';
-import { OptionTag, TaggedWords } from './OptionTag.js';
+import { OptionTag, TaggedWords, langAttributes } from './OptionTag.js';
 
 /**
  * A plain list of places to go, one per row: icon, words, chevron (D-210).
@@ -72,6 +72,12 @@ export interface MenuItem {
    * hidden from a screen reader.
    */
   readonly valueTag?: string;
+  /**
+   * The language the `value` is written in ("ru"), so it is spoken in its own
+   * voice and set the way it reads: the Language row's value is a language's
+   * own name. Without it nothing changes.
+   */
+  readonly valueLang?: string;
 }
 
 export interface MenuListProps {
@@ -151,7 +157,7 @@ export function MenuList({ label, items, hasDividers = false, isInset = false }:
                 {item.value && item.valueTag ? <OptionTag tag={item.valueTag} isFixedWidth={false} /> : null}
                 {item.value ? (
                   <Text type="supporting" xstyle={styles.value}>
-                    {item.value}
+                    {item.valueLang ? <span {...langAttributes(item.valueLang)}>{item.value}</span> : item.value}
                   </Text>
                 ) : null}
                 <Icon icon="chevronRight" size="md" />

@@ -197,11 +197,19 @@ test.describe('everyone, for the person running Pam', () => {
     await page.goto('/');
     await expect(page.getByRole('heading', { name: 'Requests', level: 1 })).toBeVisible();
 
-    // The switch lives on Profile › See the app as (D-217); the Home it chooses is drawn at once.
-    await page.goto('/view-as/');
-    await page.getByRole('button', { name: 'Case manager' }).click();
-    await page.goto('/');
-    await expect(page.getByRole('heading', { name: 'Your members', level: 1 })).toBeVisible();
+    // Their Home is the Requests screen, with the view switch in its header.
+    await page.getByRole('button', { name: 'Super admin' }).click();
+    await page
+      .getByRole('menuitem', { name: 'Case manager' })
+      .or(page.getByRole('button', { name: 'Case manager' }))
+      .first()
+      .click();
+
+    // Now the case manager's Home (the old one, with its people strip, until the
+    // rings are on the new staff Homes — D-456). The switcher's own chip says
+    // who it is — "Viewing as Case manager" (Will, 16 September).
+    await expect(page.getByRole('link', { name: /Your people/ })).toBeVisible();
+    await expect(page.getByRole('button', { name: /Viewing as Case manager/ })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Requests', level: 1 })).toHaveCount(0);
   });
 

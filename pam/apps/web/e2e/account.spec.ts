@@ -93,7 +93,7 @@ test.describe('the way out', () => {
     await page.goto('/account/');
 
     await expect(page.getByRole('heading', { name: 'Profile' })).toBeVisible();
-    await expect(page.getByText('Will', { exact: true })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Will' })).toBeVisible();
 
     await page.getByRole('button', { name: 'Sign out' }).or(page.getByRole('link', { name: 'Sign out' })).first().click();
 

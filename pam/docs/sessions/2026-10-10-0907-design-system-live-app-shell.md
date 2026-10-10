@@ -11,7 +11,7 @@ the 600 kB first-load budget, READY in parts. D-456.
 - **The bar and the gate.** `RoleTabBar` (was the stories' `LocalTabBar`, which now re-exports it),
   `AppTabBar` + `AppTabBarLazy` in the root layout, `TabGate` under every tab screen, `tabFor(pathname)`.
 - **Routes.** `/`, `/saved/`, `/trips/`, `/program/`, `/programs/`, `/profile/` (new), `/messages/`
-  draw the redesigned screens; `/admin/` is Invite someone; `/account/` is Profile when signed in and keeps
+  draw the redesigned screens; `/account/` is Profile when signed in and keeps
   its own words for the other states; `/reminders/` lands on Explore.
 - **Kept on purpose:** `/places/` (the `?filter=reported` notification link), `/interested/` (main's wording
   fix), and Messages for case managers and super admins (`LegacyMessagesPage`, because the new list has no
@@ -22,6 +22,9 @@ the 600 kB first-load budget, READY in parts. D-456.
   chose Case manager kept seeing Requests; it now broadcasts on `window`. A case manager's Home had lost
   "What you can see" (§4.1) with the old `/admin/`; it is back, same words. A tab bar whose chunk cannot load
   took the page down (`languages.spec.ts`); it is now simply not drawn.
+- **Mira's decision, after the first READY draft: case managers and program leads keep the OLD Home**
+  (`LegacyHome`, restored from `main`, with `/admin/` and the `HomePeople*` files) until the rings are on
+  the new staff Homes. The five people-strip specs pass untouched; `admin.spec` is `main`'s again.
 - **Specs rewritten** for the screens that now do the job: `account`, `saved`, `points`, `directory`,
   `admin` (the invite flows moved to `/invite/new/`), `consent`.
 
@@ -57,8 +60,8 @@ the 600 kB first-load budget, READY in parts. D-456.
 
 ## Left undone
 
-- **People strip.** D-198's rings are not on the new caseload and program Homes; Will has to say whether
-  they come back. The five `people-strip.spec.ts` tests fail until he does and are untouched.
+- **People strip.** D-198's rings are not on the new caseload and program Homes; Mira has asked Will. Until
+  then staff keep the old Home (above) and the five `people-strip.spec.ts` tests pass untouched.
 - The 5 fit entries above: not mine, not accepted.
 - Reported places (Piper) and Reported conversations (Nico) need a home in the new screens before
   `/places/`, `/interested/` and the legacy Messages can go.
@@ -66,5 +69,5 @@ the 600 kB first-load budget, READY in parts. D-456.
 
 ## Needs a human
 
-- Will: rings on the people strip, yes or no.
+- Will: rings on the people strip, yes or no (asked by Mira).
 - Mira: READY in parts, starting with the bar, gate and routes.

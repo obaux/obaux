@@ -17,10 +17,15 @@ the routes behind each tab.
   no-profile are each answered, and each carries the Help bar (§0). The first version had none and the
   loading and a11y specs caught it.
 - **Routes.** `/`, `/saved/`, `/trips/`, `/program/`, `/programs/`, `/profile/` (new) and `/messages/`
-  draw the redesigned screens; `/admin/` is Invite someone (D-218); `/reminders/` lands on `/`;
+  draw the redesigned screens; `/reminders/` lands on `/`;
   `/account/` is Profile for a signed-in person and keeps its own words for loading, signed-out, error,
   paused and no-profile (a paused account must still be told so and be able to sign out).
 - **Old pages kept, on purpose:**
+  - **The old Home, for case managers and program leads** (`LegacyHome`, with `/admin/`, the caseload page
+    it links to). Mira's call, 10 October: until the people strip's D-198 rings exist on the redesigned staff
+    Homes and Will has said they stay (Mira recommends keeping them), those two roles keep the Home that has
+    the strip. Members and the Pam team get the new Home. `StaffHomes` is built and waits; its Storybook
+    stories stay. Delete `LegacyHome`, `HomePeople*`, `SavedStripLazy` and the old `/admin/` together.
   - `/places/` — `?filter=reported` is a notification's deep link and the new Explore has no Reported.
   - `/interested/` — main's wording fix landed there; nothing replaces it yet.
   - **Messages for case managers and super admins** (`LegacyMessagesPage`) — the redesigned list has no
@@ -28,7 +33,7 @@ the routes behind each tab.
 - **The view switch reaches the whole page.** `useViewAs` told only the hook that was changed; Home picks
   its arrangement in one hook and the switcher sat in another, so a super admin who chose Case manager
   kept seeing Requests under a "Viewing as Case manager" chip. It now says so on `window`.
-- **A case manager's Home keeps "What you can see"** (§4.1), which only the retired `/admin/` page carried.
+- **The new case manager Home carries "What you can see"** (§4.1) too, for when it is switched on.
 - **First-load stays inside §12** (600 kB gzipped): 572.4 kB. To get there the staff Homes
   (`StaffHomes`) and `RequestsScreen` load only for the people who see them, and `CategoryPicture` was
   pulled out of `SavedView`.
@@ -37,5 +42,4 @@ the routes behind each tab.
 
 - Retiring `/places/`, `/interested/` and the legacy Messages once the new screens have Reported
   (Piper: reported places; Nico: Messages).
-- The people strip (D-198 rings) is not on the new caseload and program Homes. That is a question for
-  Will, not settled here; its five e2e tests are left as they are until he answers.
+- Switching staff to `StaffHomes` once the rings are on them (the five `people-strip` specs then move with it).

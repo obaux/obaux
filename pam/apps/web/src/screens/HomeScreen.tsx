@@ -19,8 +19,7 @@ const staffFallback = () => (
     <Loading label="" variant="screen" />
   </Page>
 );
-const CaseloadHome = dynamic(() => import('./StaffHomes').then((mod) => mod.CaseloadHome), { loading: staffFallback });
-const ProgramHome = dynamic(() => import('./StaffHomes').then((mod) => mod.ProgramHome), { loading: staffFallback });
+const LegacyHome = dynamic(() => import('../app/LegacyHome').then((mod) => mod.LegacyHome), { loading: staffFallback });
 const RequestsHome = dynamic(() => import('./RequestsScreen').then((mod) => mod.RequestsScreen), {
   loading: staffFallback,
 });
@@ -44,8 +43,10 @@ export function HomeScreen() {
       </Page>
     );
   }
-  if (viewedRole === 'admin') return <CaseloadHome />;
-  if (viewedRole === 'provider') return <ProgramHome />;
+  // Case managers and program leads keep the old Home, with its people strip, until the
+  // strip's rings (D-198) are on the redesigned staff Homes and Will has said they stay
+  // (Mira, 10 October). `StaffHomes` is built and waiting.
+  if (viewedRole === 'admin' || viewedRole === 'provider') return <LegacyHome />;
   if (viewedRole === 'super_admin') return <RequestsHome isHome />;
   return <ExploreScreen />;
 }

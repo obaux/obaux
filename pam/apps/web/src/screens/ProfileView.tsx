@@ -226,6 +226,7 @@ export function ProfileView({
               label: t('profile.menu.language'),
               value: t(`language.${locale}`),
               valueTag: LANGUAGE_TAGS[locale],
+              valueLang: locale,
               href: '/language/',
               icon: <GlobeIcon {...ICON} />,
             },

@@ -85,28 +85,29 @@ test.describe('the case manager screen', () => {
     await page.route(USER, (route) => route.fulfill({ status: 401, body: '{}' }));
     await page.goto('/admin/');
 
-    // The tab gate sends a signed-out visitor to Sign in rather than showing a closed page.
-    await expect(page).toHaveURL(/\/signin\//);
+    await expect(page.getByRole('heading', { name: 'Sign in to see your people' })).toBeVisible();
+    await expect(page.getByRole('link', { name: 'Sign in' })).toBeVisible();
   });
 
-  test('a member who opens the invite form is not scolded', async ({ page }) => {
+  test('a member who lands here is not scolded', async ({ page }) => {
     await signedInAs(page, 'member');
-    await page.goto('/invite/new/?role=member');
+    await page.goto('/admin/');
 
-    // Making an invite is for case managers, programs and the Pam team. A member
-    // who opens the form is taken back to the list, not told they did wrong.
-    await expect(page).toHaveURL(/\/invite\/$/);
-    await expect(page.getByText(/permission|denied|forbidden/i)).toHaveCount(0);
+    // Plain statement of what the screen is, plus a way to fix it if wrong —
+    // never "permission denied", which tells somebody they did something wrong.
+    await expect(page.getByRole('heading', { name: 'This screen is for case managers' })).toBeVisible();
+    await expect(page.getByText(/does not open this/)).toBeVisible();
+    await expect(page.getByRole('link', { name: /Call Pam/ })).toBeVisible();
   });
 
   test('a super admin previewing "Case manager" sees this screen, not a closed door', async ({ page }) => {
-    // Profile › See the app as writes the choice to sessionStorage (D-108); any
+    // Home's role switcher writes the choice to sessionStorage (D-108); any
     // screen that reads it should agree with the header about who it is
     // drawing for (Will, 16 September — "make sure all pages are properly
     // showing based on the user's permissions").
     await page.addInitScript(() => sessionStorage.setItem('pam.view-as', 'admin'));
     await signedInAs(page, 'super_admin');
-    await page.goto('/');
+    await page.goto('/admin/');
 
     // An empty real caseload shows the example roster (Will, 16 September)
     // rather than the real "Nobody on your list yet" notice — either way,
@@ -117,14 +118,13 @@ test.describe('the case manager screen', () => {
 
   test('without a preview, a super admin meets the same closed door as anybody else', async ({ page }) => {
     await signedInAs(page, 'super_admin');
-    await page.goto('/');
+    await page.goto('/admin/');
 
-    // Their own Home is the requests to approve; the caseload is not theirs.
-    await expect(page.getByRole('heading', { name: 'Requests', level: 1 })).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Jordan' })).toHaveCount(0);
-    // Their real list is one tap away rather than a dead end (§0): Profile › Everyone.
-    await page.goto('/profile/');
-    await expect(page.getByRole('link', { name: /Everyone/ })).toHaveAttribute('href', '/directory/');
+    await expect(page.getByRole('heading', { name: 'This screen is for case managers' })).toBeVisible();
+    // Their real list is one tap away rather than a dead end (§0) — this is
+    // the one thing this branch still asks about the *real* role, not the
+    // previewed one.
+    await expect(page.getByRole('link', { name: 'Everyone' })).toBeVisible();
   });
 
   test('an admin sees their caseload', async ({ page }) => {
@@ -140,11 +140,14 @@ test.describe('the case manager screen', () => {
       ],
       [{ subject_id: 'm2', feature: 'chat' }],
     );
-    await page.goto('/');
+    await page.goto('/admin/');
 
     await expect(page.getByRole('heading', { name: 'Dante' })).toBeVisible();
     await expect(page.getByRole('heading', { name: 'Tanya' })).toBeVisible();
-    // When they last used Pam is on the member's own page, not on the list (Will, 2 October).
+    // "Has not opened Pam yet" can also land on a dummy program lead further
+    // down the same screen (Will, 16 September) — .first() keeps this test
+    // about the real caseload row, not the example roster below it.
+    await expect(page.getByText('Has not opened Pam yet').first()).toBeVisible();
 
     // An avatar per person, so the caseload reads as people rather than rows.
     // No photo is fetched: a member's picture is not on the §4.1 list, so the
@@ -155,7 +158,7 @@ test.describe('the case manager screen', () => {
 
   test('an empty caseload explains itself', async ({ page }) => {
     await signedInAs(page, 'admin', []);
-    await page.goto('/');
+    await page.goto('/admin/');
     // The real "Nobody on your list yet" notice is replaced by the example
     // roster while `USE_DUMMY_PEOPLE` is on (Will, 16 September) — labelled
     // as an example, not left blank.
@@ -172,7 +175,8 @@ test.describe('the case manager screen', () => {
         json({ code: '9T3YTVMT', expires_at: '2026-10-12T21:09:28Z', role: 'member' }),
       );
     });
-    await page.goto('/invite/new/?role=member');
+    await page.goto('/admin/');
+    await page.getByRole('button', { name: 'Someone coming home' }).click();
 
     // Who it is for, both required (D-373): nothing is sent without them.
     await page.getByRole('button', { name: 'Create link' }).click();
@@ -204,15 +208,20 @@ test.describe('the case manager screen', () => {
       staff.push(route.request().postDataJSON() as Record<string, unknown>);
       await route.fulfill(json({ code: 'K4RZ7W2H', expires_at: '2026-10-12T21:09:28Z', role: 'provider' }));
     });
+    await page.goto('/admin/');
+
     // A member: name and number, and no email field at all.
-    await page.goto('/invite/new/?role=member');
-    // The form is a page of its own on the nested template: the kind of invite is the large title.
+    await page.getByRole('button', { name: 'Someone coming home' }).click();
+    // The form is a page of its own on the nested template: the kind of invite is
+    // the large title, and the round back returns to the choice.
     await expect(page.getByRole('heading', { level: 1, name: 'A link for a member' })).toBeVisible();
     await expect(page.getByLabel('Their first name')).toBeVisible();
     await expect(page.getByLabel('Their email')).toHaveCount(0);
+    await page.getByRole('button', { name: 'Choose a different invite' }).click();
+    await expect(page.getByRole('heading', { level: 1, name: 'Invite someone' })).toBeVisible();
 
     // A program lead: an email, and it is not optional.
-    await page.goto('/invite/new/?role=provider');
+    await page.getByRole('button', { name: /program/i }).click();
     await expect(page.getByRole('heading', { level: 1, name: 'A link for a program' })).toBeVisible();
     const email = page.getByLabel('Their email');
     await expect(email).toBeVisible();
@@ -251,7 +260,8 @@ test.describe('the case manager screen', () => {
   test('a failed invite is explained, not swallowed', async ({ page }) => {
     await signedInAs(page, 'admin', []);
     await page.route(INVITE, (route) => route.fulfill({ status: 500, body: '{}' }));
-    await page.goto('/invite/new/?role=member');
+    await page.goto('/admin/');
+    await page.getByRole('button', { name: 'Someone coming home' }).click();
     await page.getByLabel('Their first name').fill('Rosa');
     await page.getByLabel('Their mobile number').fill('215 555 0111');
     await page.getByRole('button', { name: 'Create link' }).click();
@@ -278,7 +288,7 @@ test.describe('the case manager screen', () => {
         { subject_id: 'm2', feature: 'points' },
       ],
     );
-    await page.goto('/');
+    await page.goto('/admin/');
     await expect(page.getByRole('heading', { name: 'Dante' })).toBeVisible();
 
     await expect(page.getByText('Messages off')).toBeVisible();
@@ -291,7 +301,7 @@ test.describe('the case manager screen', () => {
 
   test('the transparency promise is shown to the admin, not only to members', async ({ page }) => {
     await signedInAs(page, 'admin', []);
-    await page.goto('/');
+    await page.goto('/admin/');
 
     // §4.1: members agree to this list at onboarding. An admin should be looking
     // at the same words, so the promise is visible from both sides.
@@ -303,7 +313,7 @@ test.describe('the case manager screen', () => {
     await signedInAs(page, 'admin', [
       { id: 'm1', first_name: 'Dante', access_status: 'active', last_active_at: '2026-09-10T14:00:00Z' },
     ]);
-    await page.goto('/');
+    await page.goto('/admin/');
     await expect(page.getByRole('heading', { name: 'Dante' })).toBeVisible();
 
     // Scoped to the member's own card, because the page also carries the
@@ -325,7 +335,7 @@ test.describe('the case manager screen', () => {
       [{ id: 'm1', first_name: 'Dante', access_status: 'limited', last_active_at: null }],
       [{ subject_id: 'm1', feature: 'chat' }],
     );
-    await page.goto('/');
+    await page.goto('/admin/');
     await expect(page.getByRole('heading', { name: 'Dante' })).toBeVisible();
 
     await settled(page);
