@@ -45,6 +45,7 @@ const versions = [...read('CHANGELOG.md').matchAll(/^## \[(\d+\.\d+\.\d+)\]/gm)]
 const migrationFiles = list('packages/db/migrations/', '.sql');
 const numbered = migrationFiles.map((f) => /^(\d{4})_.+\.sql$/.exec(f)?.[1]).filter((n): n is string => Boolean(n));
 const stamped = migrationFiles.filter((f) => /^\d{14}_/.test(f));
+const dbTestFiles = list('packages/db/test/', '.sql');
 
 describe('numbers that more than one session hands out', () => {
   it('no decision number is used twice', () => {
@@ -111,6 +112,20 @@ describe('migrations', () => {
 
   it('every migration is either four digits or a stamp, so the order is the file order', () => {
     for (const file of migrationFiles) expect(file, file).toMatch(/^(\d{4}|\d{14})_[a-z0-9_]+\.sql$/);
+  });
+
+  it('no database test number is used twice', () => {
+    // packages/db/scripts/test-db.sh runs the files in name order, one after another on one
+    // database; two files with one number run in whatever order their words sort. Two
+    // sessions each took the next number twice on 10 October 2026 (26, then 30), caught by
+    // hand at merge. 04, 17 and 23 were doubled before this check, and are left as they run.
+    const numbers = dbTestFiles.map((f) => /^(\d{2})_/.exec(f)?.[1]).filter((n): n is string => Boolean(n));
+    expect(duplicates(numbers).filter((n) => !['04', '17', '23'].includes(n))).toEqual([]);
+  });
+
+  it('every database test is named <two digits>_<words>.sql, so the runner picks it up', () => {
+    // test-db.sh only globs 0[2-9]_*.sql and [1-9][0-9]_*.sql: a 3_ or 100_ file would never run.
+    for (const file of dbTestFiles) expect(file, file).toMatch(/^\d{2}_[a-z0-9_]+\.sql$/);
   });
 
   it('a stamped migration that removes or tightens something says "-- contract:" and why', () => {
