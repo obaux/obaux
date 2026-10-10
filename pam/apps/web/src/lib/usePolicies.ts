@@ -1,7 +1,19 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useState, useSyncExternalStore } from 'react';
 import { DUMMY_POLICIES, type DummyPolicy } from '@pam/config/dummy-policies';
+import {
+  POLICY_COLUMNS,
+  checkPolicyFiles,
+  contentTypeOf,
+  policiesFromRows,
+  safeFileName,
+  titleFromFileName,
+  type PolicyRow,
+  type ProgramPolicy,
+} from './programPolicies';
+import { useOwnProgram } from './useOwnProgram';
+import { useSession } from './useSession';
 
 /**
  * A program's policies for participants (D-261), and who has signed them.
@@ -42,17 +54,111 @@ function current(kept: Kept): readonly DummyPolicy[] {
   return [...DUMMY_POLICIES, ...kept.added].filter((p) => !kept.removed.includes(p.id));
 }
 
-/** A title from a file name: "code-of-conduct.pdf" → "Code of conduct". */
-function titleFrom(fileName: string): string {
-  const base = fileName.replace(/\.[a-z0-9]+$/i, '').replace(/[-_]+/g, ' ').trim();
-  return base ? base.charAt(0).toUpperCase() + base.slice(1) : fileName;
+/*
+ * A real program's policies (D-261, migration 20261010144052): a program lead
+ * with a program on file reads and writes them in the database, on any phone.
+ * Everyone else — a demo account, a story, a member — still sees the example
+ * set above, as before. One store for the page, read once per program and again
+ * after a change.
+ */
+const NONE: readonly ProgramPolicy[] = [];
+let real: Readonly<Record<string, readonly ProgramPolicy[]>> = {};
+const asked = new Set<string>();
+const listeners = new Set<() => void>();
+
+function publish(next: Readonly<Record<string, readonly ProgramPolicy[]>>): void {
+  real = next;
+  listeners.forEach((listener) => listener());
+}
+
+async function loadPolicies(programId: string): Promise<void> {
+  try {
+    const { createClient } = await import('./supabase');
+    const { data, error } = await createClient()
+      .from('program_policies')
+      .select(POLICY_COLUMNS)
+      .eq('service_id', programId)
+      .is('archived_at', null);
+    if (error) throw error;
+    publish({ ...real, [programId]: policiesFromRows((data ?? []) as PolicyRow[]) });
+  } catch {
+    // Show none rather than a wrong list.
+    if (!(programId in real)) publish({ ...real, [programId]: NONE });
+  }
+}
+
+function subscribe(listener: () => void): () => void {
+  listeners.add(listener);
+  return () => {
+    listeners.delete(listener);
+  };
+}
+
+/** What adding a policy came to: it worked, a file was wrong (before anything was sent), or it could not be saved. */
+export type AddPolicyResult = 'ok' | 'too_many' | 'too_big' | 'bad_type' | 'failed';
+
+/** Put the files in the program's folder of the private bucket, then make the policy from them. */
+async function savePolicy(programId: string, files: readonly File[], replaces: string | null): Promise<AddPolicyResult> {
+  const problem = checkPolicyFiles(files);
+  if (problem !== 'none') return problem;
+  if (files.length === 0) return 'ok';
+  const uploaded: string[] = [];
+  try {
+    const { createClient } = await import('./supabase');
+    const supabase = createClient();
+    const bucket = supabase.storage.from('policies');
+    const sent: { path: string; name: string; content_type: string; size_bytes: number }[] = [];
+    for (const file of files) {
+      const type = contentTypeOf(file);
+      const ext = file.name.split('.').pop()?.toLowerCase().replace(/[^a-z0-9]/g, '') || 'pdf';
+      const path = `${programId}/${crypto.randomUUID()}.${ext}`;
+      const { error } = await bucket.upload(path, file, { contentType: type, upsert: false });
+      if (error) throw error;
+      uploaded.push(path);
+      sent.push({ path, name: safeFileName(file.name), content_type: type, size_bytes: file.size });
+    }
+    const { error } = await supabase.rpc('add_policy', {
+      p_service_id: programId,
+      p_title: titleFromFileName(files[0]!.name),
+      p_files: sent,
+      ...(replaces ? { p_replaces: replaces } : {}),
+    });
+    if (error) throw error;
+    await loadPolicies(programId);
+    return 'ok';
+  } catch {
+    // Files that never made it into a policy are taken back (the database allows this).
+    try {
+      const { createClient } = await import('./supabase');
+      if (uploaded.length > 0) await createClient().storage.from('policies').remove(uploaded);
+    } catch {
+      // Left behind, still private and still the program's.
+    }
+    return 'failed';
+  }
 }
 
 export function usePolicies(): {
   readonly policies: readonly DummyPolicy[];
-  readonly add: (files: readonly File[]) => void;
-  readonly remove: (ids: readonly string[]) => void;
+  /** Resolves with how it went; a real program's can fail where the example set cannot. */
+  readonly add: (files: readonly File[]) => Promise<AddPolicyResult>;
+  /** Resolves false when a real program's policy could not be taken off. */
+  readonly remove: (ids: readonly string[]) => Promise<boolean>;
+  /** A new version of a real policy (the old one is archived and kept). */
+  readonly replace: (id: string, files: readonly File[]) => Promise<AddPolicyResult>;
+  /** The database is still being asked: screens hold their "none yet" back. */
+  readonly isLoading: boolean;
+  /** The real program these belong to; null for the example set. */
+  readonly programId: string | null;
 } {
+  const { state: session } = useSession();
+  const own = useOwnProgram(session);
+  const programId = own.status === 'ready' ? own.program.id : null;
+  const realNow = useSyncExternalStore(
+    subscribe,
+    () => real,
+    () => real,
+  );
   const [policies, setPolicies] = useState<readonly DummyPolicy[]>(DUMMY_POLICIES);
 
   useEffect(() => {
@@ -62,26 +168,88 @@ export function usePolicies(): {
     return () => window.removeEventListener(EVENT, sync);
   }, []);
 
-  const add = useCallback((files: readonly File[]) => {
-    const kept = read();
-    const now = new Date().toISOString();
-    const added = files.map((file, i) => ({
-      id: `policy-added-${Date.now()}-${i}`,
-      title: titleFrom(file.name),
-      fileName: file.name,
-      uploadedAt: now,
-      body: [],
-      signedBy: [],
-    }));
-    write({ ...kept, added: [...kept.added, ...added] });
-  }, []);
+  useEffect(() => {
+    if (programId !== null && !asked.has(programId)) {
+      asked.add(programId);
+      void loadPolicies(programId);
+    }
+  }, [programId]);
 
-  const remove = useCallback((ids: readonly string[]) => {
-    const kept = read();
-    write({ added: kept.added.filter((p) => !ids.includes(p.id)), removed: [...kept.removed, ...ids] });
-  }, []);
+  const add = useCallback(
+    async (files: readonly File[]): Promise<AddPolicyResult> => {
+      if (programId !== null) return savePolicy(programId, files, null);
+      const kept = read();
+      const now = new Date().toISOString();
+      const added = files.map((file, i) => ({
+        id: `policy-added-${Date.now()}-${i}`,
+        title: titleFromFileName(file.name),
+        fileName: file.name,
+        uploadedAt: now,
+        body: [],
+        signedBy: [],
+      }));
+      write({ ...kept, added: [...kept.added, ...added] });
+      return 'ok';
+    },
+    [programId],
+  );
 
-  return { policies, add, remove };
+  const remove = useCallback(
+    async (ids: readonly string[]): Promise<boolean> => {
+      if (programId !== null) {
+        try {
+          const { createClient } = await import('./supabase');
+          const supabase = createClient();
+          for (const id of ids) {
+            const { error } = await supabase.rpc('archive_policy', { p_id: id });
+            if (error) throw error;
+          }
+          await loadPolicies(programId);
+          return true;
+        } catch {
+          await loadPolicies(programId);
+          return false;
+        }
+      }
+      const kept = read();
+      write({ added: kept.added.filter((p) => !ids.includes(p.id)), removed: [...kept.removed, ...ids] });
+      return true;
+    },
+    [programId],
+  );
+
+  const replace = useCallback(
+    async (id: string, files: readonly File[]): Promise<AddPolicyResult> => {
+      if (programId !== null) return savePolicy(programId, files, id);
+      const result = await add(files);
+      if (result === 'ok') await remove([id]);
+      return result;
+    },
+    [programId, add, remove],
+  );
+
+  if (programId !== null) {
+    const mine = realNow[programId];
+    return { policies: mine ?? NONE, add, remove, replace, isLoading: mine === undefined, programId };
+  }
+  return { policies, add, remove, replace, isLoading: false, programId: null };
+}
+
+/** Open one page of a real policy: a short-lived link, made with the person's sign-in. */
+export async function openPolicyFile(path: string): Promise<boolean> {
+  try {
+    const { createClient } = await import('./supabase');
+    const { data, error } = await createClient().storage.from('policies').createSignedUrl(path, 300);
+    if (error || !data?.signedUrl) return false;
+    const link = document.createElement('a');
+    link.href = data.signedUrl;
+    link.target = '_blank';
+    link.rel = 'noreferrer';
+    link.click();
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 /** The policies this person has signed, of the ones the program has now. */
