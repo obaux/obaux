@@ -951,6 +951,14 @@ drops signatures), then `20261010042108_a_program_lead_submits_their_own_program
 
 ---
 
+## Messages & notifications · Will's sign-off (10 October 2026)
+
+On `claude/messages-signoff-alert-texts-staff-email`. Will approved the four Text alerts texts and the staff
+invite email (English, in his words: no expiry days, "Accept invite", human). The alert texts and the email
+now carry his name; the other languages are drafts approved to learn from. Nothing sends yet: the alert texts
+are not queued by anything, and the email needs the function deployed, the mail domain and its secrets, and
+`INVITE_EMAILS=on`. D-461.
+
 ## Messages & notifications · staff invite email (10 October 2026)
 
 Merged to `main` by the merge desk, 10 October. A staff invite's email now has a
