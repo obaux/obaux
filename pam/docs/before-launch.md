@@ -11,6 +11,43 @@ STATUS row too.
 
 ## Open
 
+- [ ] **Visit reminders go live: put back the lines the app stopped saying** (Lena, 10 October 2026, D-474).
+  Will's rule (a12): a line says only what Pam does. Until `dispatch-sms` really sends the day-before visit
+  reminder, ten lines in the app say what Pam does today. The day it does (check the *live* function and
+  database, as for the site's `VISIT_REMINDERS_LIVE`, D-458), do these together, then say so to the merge desk:
+  1. Flip `VISIT_REMINDERS_LIVE` in `apps/site/src/content/flags.ts` **and** `VISIT_REMINDERS_LIVE_IN_APP` in
+     `packages/config/test/promises-of-texts.test.ts`. The test fails if only one is flipped.
+  2. Put these back in `en.json` (English first; Will reads it, because it is a promise), then the other six.
+     The six as they were before D-474 are in git: `git show 717ed79:pam/packages/config/src/locales/<locale>.json`
+     (that is `main` just before this change). Take the key's value from there, or write it again and
+     `copy:ack`. None of the six has had a native reader.
+
+     | Key | Today | When reminders are sent |
+     |---|---|---|
+     | `onboarding.3` (members' slide; also on the About screen) | Pam keeps your planned visits in one place. | Pam keeps your planned visits in one place, and texts you a reminder before you go if you say yes. |
+     | `onboarding.provider.2` | Members find your program and plan a visit. | Fewer no-shows. Pam can remind people for you. |
+     | `join.booked.body` | …It is on your Trips now. | {place}, {day} at {time}. Pam will remind you the day before if you said yes to texts. |
+     | `trips.new.done.body` | It is on your map. | It is on your map. We will remind you the day before if text reminders are on. |
+     | `profile.promo.reminders.body` | We can text you if a place you saved closes or moves. | We can text you the day before a visit, or if a place you saved closes or moves. |
+
+     The original `onboarding.3` and `onboarding.provider.2` said it for everybody; a reminder goes only to
+     someone who said yes, so the English above says so. The other three lines wait on their own texts, not on
+     this one:
+     `profile.promo.alerts.body.providerList` / `.adminList` ("Coming soon: …" → "Bookings, changes and messages.
+     Choose which." / "Messages and trips. Choose which.") as the staff alert texts are sent (`LIVE` in
+     `AlertsView.tsx` says which are); `join.program.review.note` ("…We will let you know when yours is live.")
+     when a text or a bell row is made on approval; `notify.empty.body` ("When someone books a visit, writes
+     to you or needs you…") when a booked visit makes a bell row; `terms.s.your-account.p3` may say "so your
+     reminders follow you" again when reminders are sent.
+  3. Also in the app's own samples: `apps/web/src/app/gallery/page.tsx` (the slide's copy) and
+     `ProfileCards.stories.tsx` (the Profile card's body).
+  4. Then the site's own list (the item below): About Pam's "What is coming" in seven languages, the Texts post,
+     the screenshots, quiet hours and the 134 characters (D-431). The carrier registration is re-filed first
+     (`dispatch-sms` must not be redeployed until it is approved).
+
+  Also open from the same sweep, not words: after a program books a visit for a member (`/program/book/`),
+  the app says "Booked for …" and "Pam texted … a link", but nothing is saved or texted (`bookTrip` keeps a
+  `forMemberId` booking in the tab). Either build it or say it is an example (Places & programs / Trips).
 - [ ] **Public help posts: re-check them when what they describe changes** (Wren, 10 October
   2026, D-458). Each post says only what is live today, so these go stale as features ship:
   "Texts from Pam" when visit reminders, message alerts or connect texts go live (it says they
@@ -46,8 +83,8 @@ STATUS row too.
   `VISIT_REMINDERS_LIVE` in `apps/site/src/content/flags.ts` (drives the Texts post and the home card); then
   by hand: About Pam's "What is coming" in all seven languages (the other six need a native reader again),
   the Joining Pam reminder choice, the Texts screenshots and limits (quiet hours, 134 characters, D-431).
-  Seen, not mine: the app's own onboarding slide still says "Pam reminds you before you go, so nothing gets
-  missed" (`onboarding.3`, all seven languages): Languages & legal / Lena's promise sweep.
+  The app's own onboarding slide that said "Pam reminds you before you go" is fixed (D-474, 10 October);
+  the app's side of this switch is the item *Visit reminders go live* just above.
 - [ ] **Public site: publish the draft post "Keeping your program's listing up to
   date" only when the feature ships** (from PAM · Places & programs, 10 October
   2026, rule D-447, branch `claude/places-programs-load-own-program`, not on

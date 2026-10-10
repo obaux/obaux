@@ -57,7 +57,7 @@ export const Promo: Story = {
   render: () => (
     <PromoCard
       title="Get text reminders"
-      body="We can text you the day before a visit."
+      body="We can text you if a place you saved closes or moves."
       href="/reminders/"
       art={<SetupArt kind="alerts" size={72} />}
     />
@@ -75,7 +75,7 @@ export const FullProfile: Story = {
       </FeatureTileRow>
       <PromoCard
         title="Get text reminders"
-        body="We can text you the day before a visit."
+        body="We can text you if a place you saved closes or moves."
         href="/reminders/"
         art={<BellIcon width={36} height={36} aria-hidden />}
       />
