@@ -928,7 +928,14 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
-## Languages & legal · the app says only what Pam texts today (10 October) — on `claude/lena-promise-sweep`, not merged
+## Languages & legal · Spanish says "visita", not "viaje" (10 October) — on `claude/lena-es-visitas`, not merged
+
+The Spanish tab said "Visitas" and sixteen strings around it said "viaje" (New trip, Trip added, Go to Trips, alerts, glossary); all say "visita" now,
+and one Simplified Chinese stray ("行程") says "预约". `test/one-word-for-a-visit.test.ts` keeps each language to the word on its tab (D-480). This branch
+contains the queued promise sweep below, so **merge that first**. Open: the public site's Spanish draft (`about.ts`, Wren) still says "viaje"; Piper's
+review-queue strings are reviewed when they are on `main`.
+
+## Languages & legal · the app says only what Pam texts today (10 October) — on `claude/lena-promise-sweep`, queued
 
 Will's rule (a12): a line says only what Pam does. The first slide said "Pam reminds you before you go, so nothing gets
 missed"; no visit reminder is sent (the public site says "coming", `VISIT_REMINDERS_LIVE = false`). Ten lines, seven
