@@ -8,6 +8,7 @@ import { HStack } from '@astryxdesign/core/HStack';
 import { Button } from '@pam/ui/Button';
 import { Frame } from '../components/Frame';
 import { ABOUT, ABOUT_ART, ABOUT_ON_HOME, aboutPath } from '../content/about';
+import { VISIT_REMINDERS_LIVE } from '../content/flags';
 import { ReadMore } from '../components/Prose';
 import { SIGN_IN_URL } from '../lib/links';
 
@@ -35,7 +36,9 @@ const HOW = [
   {
     image: '/art/hero-sneakers.webp',
     title: 'Keep going',
-    body: 'Pam reminds you before you go, so nothing gets missed.',
+    body: VISIT_REMINDERS_LIVE
+      ? 'Pam keeps your planned visits in one place, and texts you a reminder before you go.'
+      : 'Pam keeps your planned visits in one place. Texts that remind you are coming.',
   },
 ] as const;
 
