@@ -8,7 +8,7 @@ import { VStack } from '@astryxdesign/core/VStack';
 import { DUMMY_PLACES_BY_ID } from '@pam/config/dummy-places';
 import { BigButton, TextField } from '@pam/ui';
 import { SubPage } from '@pam/ui/SubPage';
-import { showsExamples } from '@/lib/exampleMode';
+import { examplesOn } from '@/lib/examples';
 import { useI18n } from '@/lib/i18n';
 import { useProgramSetup } from '@/lib/programSetup';
 import { useSession } from '@/lib/useSession';
@@ -41,7 +41,7 @@ export function AddPersonView() {
   const { state: session } = useSession();
   const own = useProgramSetup(session).program;
   const [examples, setExamples] = useState(false);
-  useEffect(() => setExamples(showsExamples()), []);
+  useEffect(() => setExamples(examplesOn()), []);
   const programId = own ? own.id : EXAMPLE_PROGRAM_ID;
   const place = own
     ? { name: own.details.name, category: own.details.category, address: own.details.address }

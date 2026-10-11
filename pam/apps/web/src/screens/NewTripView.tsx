@@ -25,7 +25,8 @@ import { asksForSavedTrips, bookTrip, isSavedPlace, moveSavedOrLocalTrip } from 
 import { useTrips } from '@/lib/useTrips';
 import { useSession } from '@/lib/useSession';
 import { useSupportPhone } from '@/lib/useSupportPhone';
-import { exampleTrips, showsExamples } from '@/lib/exampleMode';
+import { examplesOn } from '@/lib/examples';
+import { exampleTrips } from '@/lib/exampleTrips';
 import { useSavedPlaces } from '@/lib/useSavedPlaces';
 import { friendLink } from '@/lib/appUrl';
 import { navigate } from '@/lib/navigate';
@@ -188,7 +189,7 @@ export function NewTripView({
   // The places to pick from (D-509): the member's own saved ones; the example set only in a demo or
   // Storybook. A real account never plans a trip to a place that is only an example.
   const [examples, setExamples] = useState(false);
-  useEffect(() => setExamples(showsExamples()), []);
+  useEffect(() => setExamples(examplesOn()), []);
   const { state: savedState } = useSavedPlaces(true);
   const places = useMemo<readonly DummySavedPlace[]>(
     () =>

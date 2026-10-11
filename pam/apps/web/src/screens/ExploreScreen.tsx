@@ -8,7 +8,6 @@ import { NextTripCard } from '@pam/ui/NextTripCard';
 import { useTrips } from '@/lib/useTrips';
 import { useNextVisits, visitTagLabel } from '@/lib/useNextVisits';
 import { CategoryPicture } from './CategoryPicture';
-import { USE_DUMMY_PEOPLE } from '@pam/config/dummy-flag';
 import { categoryLabelKey, distanceLabel, intlLocale } from '@pam/config';
 import type { SearchSource } from '@astryxdesign/core/Typeahead';
 import { useI18n } from '@/lib/i18n';
@@ -170,7 +169,7 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
   const nextTrip = isMember ? (allTrips.find((trip) => new Date(trip.startsAt).getTime() > Date.now()) ?? null) : null;
   // A member's visits, so a place with one carries Saved's chip and opens as
   // the Visit profile (D-305) — the same wherever the place appears.
-  const visits = useNextVisits(isMember && USE_DUMMY_PEOPLE);
+  const visits = useNextVisits(isMember);
 
   return (
     <ExploreView

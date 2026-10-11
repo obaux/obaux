@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useState, useSyncExternalStore } from 'react';
 import { DUMMY_SERVICES, servicesFor, type DummyService } from '@pam/config/dummy-services';
 import { PROGRAM_SERVICE_COLUMNS, serviceColumns, serviceFromRow, type ProgramServiceRow } from './programServices';
-import { showsExamples } from './exampleMode';
+import { examplesOn } from './examples';
 import { isSavedPlace } from './savedTrips';
 
 /**
@@ -50,7 +50,7 @@ function write(kept: Kept): void {
 
 function current(kept: Kept): readonly DummyService[] {
   // Example services are for a demo or Storybook; a real account has only its program's (D-509).
-  if (!showsExamples()) return [];
+  if (!examplesOn()) return [];
   const base = DUMMY_SERVICES.map((s) => kept.changed[s.id] ?? s);
   const known = new Set(DUMMY_SERVICES.map((s) => s.id));
   const added = Object.values(kept.changed).filter((s) => !known.has(s.id));

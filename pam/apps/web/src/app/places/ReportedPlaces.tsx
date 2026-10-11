@@ -7,7 +7,7 @@ import { Text } from '@astryxdesign/core/Text';
 import { Button } from '@pam/ui/Button';
 import { Loading, Notice, PlaceCard } from '@pam/ui';
 import { NOTICES, type Category } from '@pam/config';
-import { showsExamples } from '@/lib/exampleMode';
+import { examplesOn } from '@/lib/examples';
 import { DUMMY_FLAGS } from '@pam/config/dummy-places';
 import { useI18n } from '@/lib/i18n';
 import { placeStatus } from '@/lib/usePlaceStatus';
@@ -67,7 +67,7 @@ export function ReportedPlaces({
   const [decidedDummies, setDecidedDummies] = useState<readonly string[]>([]);
 
   // Example reports for a demo or Storybook only: a real super admin with nothing reported sees none (D-509).
-  const showDummy = useDummy && showsExamples() && (previewing || state.status === 'empty');
+  const showDummy = useDummy && examplesOn() && (previewing || state.status === 'empty');
 
   const rows: readonly Row[] = showDummy
     ? DUMMY_FLAGS.filter((f) => !decidedDummies.includes(f.id)).map((f) => ({

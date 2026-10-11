@@ -13,7 +13,7 @@ import { VStack } from '@astryxdesign/core/VStack';
 import { DUMMY_MEMBERS } from '@pam/config/dummy-people';
 import { whenLastActive } from '@/lib/caseloadLabels';
 import { useStarredPeople } from '@/lib/useStarredPeople';
-import { showsExamples } from '@/lib/exampleMode';
+import { examplesOn } from '@/lib/examples';
 import { useCaseload } from '@/lib/useCaseload';
 import { PersonRow } from '../app/PersonRow';
 import { StarToggle } from './PeopleHomeView';
@@ -374,7 +374,7 @@ function useStarredRows(ids: ReadonlySet<string>): readonly StarredRow[] {
           href: undefined,
         }))
       : []),
-    ...(showsExamples() ? DUMMY_MEMBERS : []).map((m) => ({
+    ...(examplesOn() ? DUMMY_MEMBERS : []).map((m) => ({
       id: m.id,
       firstName: m.firstName,
       points: m.points,

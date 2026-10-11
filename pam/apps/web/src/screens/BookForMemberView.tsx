@@ -18,7 +18,7 @@ import { PlusIcon } from '@pam/ui';
 import { MenuList } from '@pam/ui/MenuList';
 import { SubPage } from '@pam/ui/SubPage';
 import { readAddedTrips, TRIPS_CHANGED, withMoves } from '@/lib/addedTrips';
-import { showsExamples } from '@/lib/exampleMode';
+import { examplesOn } from '@/lib/examples';
 import { useI18n } from '@/lib/i18n';
 import { useProgramSetup } from '@/lib/programSetup';
 import { useSession } from '@/lib/useSession';
@@ -75,7 +75,7 @@ function useNextVisitHere(programId: string): Readonly<Record<string, string>> {
         if (new Date(startsAt).getTime() <= now) return;
         if (!out[personId] || startsAt < out[personId]!) out[personId] = startsAt;
       };
-      if (showsExamples()) for (const a of DUMMY_APPOINTMENTS) consider(a.personId, a.startsAt);
+      if (examplesOn()) for (const a of DUMMY_APPOINTMENTS) consider(a.personId, a.startsAt);
       for (const trip of withMoves(readAddedTrips())) {
         if (trip.forMemberId && trip.placeId === programId) consider(trip.forMemberId, trip.startsAt);
       }
@@ -94,7 +94,7 @@ export function BookForMemberView() {
   const { state: session } = useSession();
   const setup = useProgramSetup(session);
   const [examples, setExamples] = useState(false);
-  useEffect(() => setExamples(showsExamples()), []);
+  useEffect(() => setExamples(examplesOn()), []);
   const own = setup.program;
   const programId = own ? own.id : EXAMPLE_PROGRAM_ID;
   const place = own
