@@ -17,6 +17,7 @@ import { SearchField } from '@pam/ui/SearchPill';
 import { SubPageHeader } from '@pam/ui/SubPage';
 import { SuccessScreen } from '@pam/ui/SuccessScreen';
 import { CATEGORY_LIST, distanceLabel, type Category } from '@pam/config';
+import { showsExamples } from '@/lib/exampleMode';
 import { DUMMY_PLACES_BY_ID } from '@pam/config/dummy-places';
 import { useI18n } from '@/lib/i18n';
 import { usePlaces, METRES_PER_MILE } from '@/lib/usePlaces';
@@ -164,6 +165,8 @@ export function ConnectView({ personId, name }: { readonly personId: string; rea
     if (state.status === 'empty') return [];
     if (state.status === 'error') {
       const q = fold(settled.trim());
+      // Example programs only in a demo or Storybook (D-509); a real account that cannot load sees none.
+      if (!showsExamples()) return [];
       return EXAMPLES.filter(
         (p) => (category === 'all' || p.category === category) && (!q || fold(p.name).includes(q)),
       );

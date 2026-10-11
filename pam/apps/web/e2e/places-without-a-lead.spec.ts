@@ -13,6 +13,11 @@ const REAL = 'a1b2c3d4-0000-4000-8000-0000000000e1';
 const json = (body: unknown) => ({ status: 200, contentType: 'application/json', body: JSON.stringify(body) });
 const NO_LEAD = 'This is only to help you plan. Pam does not tell Example Library Tech Lab you are coming.';
 
+// These walk the example places, which a demo asks for outright; a real account has none (D-509).
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => window.sessionStorage.setItem('pam.examples', '1'));
+});
+
 async function signedIn(page: Page, role: 'member' | 'provider') {
   await page.addInitScript((userId: string) => {
     const session = {

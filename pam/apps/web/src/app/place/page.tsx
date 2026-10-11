@@ -41,7 +41,7 @@ import { countdown } from '@/lib/when';
 import { VisitCard } from '@pam/ui/VisitCard';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
-import { exampleTrips } from '@/lib/exampleMode';
+import { exampleTrips, showsExamples } from '@/lib/exampleMode';
 import { readAddedTrips, TRIPS_CHANGED, withMoves, withoutCancelled } from '@/lib/addedTrips';
 import { cancelSavedOrLocalTrip } from '@/lib/savedTrips';
 import { navigate } from '@/lib/navigate';
@@ -145,7 +145,7 @@ function useServiceDetail(id: string | null): State {
     // A dummy saved place never lived in `services` — see
     // `DUMMY_PLACES_BY_ID`'s own comment for what asking the network for it
     // used to do instead.
-    if (isDummyPlaceId(id)) {
+    if (isDummyPlaceId(id) && showsExamples()) {
       const dummy = DUMMY_PLACES_BY_ID[id];
       setState(
         dummy
