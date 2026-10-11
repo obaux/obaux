@@ -23,7 +23,8 @@ the city's own pages.
 - Pam does not tell the place you are coming. Your visit is only there to help you plan. (`place.noLead`)
 - When you plan the visit, Pam says so: "{place} is not on Pam as a program, so it is not told about this visit."
   (`trips.booked.noLead`)
-- If you need an appointment, call the place. Its phone number is on its page.
+- If you need an appointment, call the place. Open its page and tap "Call this place". (`place.call`)
+- No Call button? Tap "Check hours on Google". It usually shows a phone number too. (`place.hoursOnGoogle`)
 
 ## For providers: why you weren't told
 - You see visits on your calendar only for a program you added to Pam. (D-498)
@@ -35,8 +36,8 @@ the city's own pages.
 ---
 
 **Check before it ships:**
-- "Its phone number is on its page" assumes every public place has a phone number listed. Most do; Wren or Piper can
-  check whether the page always shows one.
+- Not every place has a phone number on file (Wren checked `place/page.tsx`: the Call row shows only when there is
+  one). Every place links to Google, so the post offers that as the fallback.
 - The providers section links to the listing post, which is still a draft. Until it's published, the link should
   go to "Joining Pam as a case manager or program lead".
 - "Pam doesn't send the place a text or an email" is true today (D-474, D-481: no visit texts are live).
