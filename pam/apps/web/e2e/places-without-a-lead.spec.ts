@@ -105,6 +105,10 @@ test.describe('a member plans a visit', () => {
 });
 
 test.describe('a program lead with no program of their own', () => {
+  // A real lead: no examples (the file's default opts in for the member walks above).
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => window.sessionStorage.removeItem('pam.examples'));
+  });
   test('Home leads with Add your program and has no calendar of visits', async ({ page }) => {
     await signedIn(page, 'provider');
     await page.route('**/rest/v1/services*', (route) => route.fulfill(json([])));
