@@ -9,7 +9,7 @@ import { BigButton, FlagIcon, GlobeIcon, HelpIcon, PhoneIcon, ShieldIcon } from 
 import { SubPage } from '@pam/ui/SubPage';
 import { MenuList } from '@pam/ui/MenuList';
 import { useI18n } from '@/lib/i18n';
-import { HELP_DESK_URL } from '@/lib/helpDesk';
+import { HELP_SAFETY_URL } from '@/lib/helpDesk';
 import { HelpDeskRow, useHelpDeskItem } from '@/screens/HelpDeskRow';
 
 /**
@@ -95,7 +95,7 @@ export function HelpTopicsView() {
  * call 911, the page's only big button. Under it, the other ways as plain
  * rows, each a short line and one tap: call or text 988 (the dialler), a
  * message that feels unsafe (to Messages, where ⋯ › Report is), and someone to
- * talk to (the help desk). Then one quiet sentence on what reporting shares.
+ * talk to (the "Your safety" post on the help desk). Then one quiet sentence on what reporting shares.
  * No row dials Pam: Pam has no phone line (A28).
  */
 export function HelpSafetyView() {
@@ -143,7 +143,7 @@ export function HelpSafetyView() {
               id: 'desk',
               label: t('help.safety.talk.heading'),
               description: t('help.safety.talk.body'),
-              href: HELP_DESK_URL,
+              href: HELP_SAFETY_URL,
               isExternal: true,
               icon: <GlobeIcon {...ICON} />,
             },

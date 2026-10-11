@@ -1,6 +1,6 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
-import { HELP_DESK_URL } from './helpDesk';
+import { HELP_DESK_URL, HELP_SAFETY_URL } from './helpDesk';
 import { APP_URL, SITE_URL } from './project';
 
 /**
@@ -14,6 +14,10 @@ describe('the help desk address', () => {
     expect(HELP_DESK_URL).toBe(`${SITE_URL}/support/`);
     expect(HELP_DESK_URL.startsWith(APP_URL)).toBe(false);
     expect(HELP_DESK_URL).toMatch(/^https:\/\/.+\/support\/$/);
+  });
+
+  it('has a Your safety post under it, which Talk to someone now opens', () => {
+    expect(HELP_SAFETY_URL).toBe(`${HELP_DESK_URL}your-safety/`);
   });
 
   it('is a page the website builds', () => {

@@ -8,3 +8,10 @@ import { SITE_URL } from './project';
  * privacy Copy and Delete pages and the Your safety row all lead here.
  */
 export const HELP_DESK_URL = `${SITE_URL}/support/`;
+
+/**
+ * The "Your safety" post on the help desk (Wren, 11 October 2026): it opens with 911, says Pam is not an
+ * emergency service, and offers the write-in straight away. "Talk to someone now" on Your safety opens it.
+ * The website's own test guards that a post with this address exists.
+ */
+export const HELP_SAFETY_URL = `${HELP_DESK_URL}your-safety/`;
