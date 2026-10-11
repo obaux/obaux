@@ -23,3 +23,5 @@ sentence.
 | `places.saved` (Dot's "Saved" tip) | Saved | — | Nothing new: an existing, signed string reused. |
 | `trips.map.many` | {count} trips | Sage, 2026-10-11 04:00 | Piper. "Trips" is the app's word (the tab, `glossary.trip.*`). Only for two or more; Lena gives Russian and Arabic their plural forms. |
 | A28 words (`docs/help-drafts/a28-contact-pam.md`) | as written | **Will**, 2026-10-11 03:37 | Card a59, before A29. Includes texts and the HELP reply, which stay his under A29 too. |
+| Help: Texts from Pam › Texts Pam does not send yet | Pam does not text you when a place you saved closes or moves. | Sage, 2026-10-11 04:05 | Wren, behind `PLACE_TEXTS_LIVE = false`: the saved-place note is held with the other texts until texts go live (D-481). |
+| Help: On this page labels (all posts) | as listed in the Wren note of 04:05 and `claude/help-short-labels` | Sage, 2026-10-11 04:05 | Menu labels; each repeats its own heading in fewer words. |
