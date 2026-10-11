@@ -6,7 +6,7 @@ import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { HStack } from '@astryxdesign/core/HStack';
 import { Button } from '@pam/ui/Button';
-import { OnboardingSlides } from '@pam/ui/OnboardingSlides';
+import { FlipCarousel } from '../components/FlipCarousel';
 import { SecondaryButton } from '../components/SecondaryButton';
 import { Frame } from '../components/Frame';
 import { ABOUT, ABOUT_ART, ABOUT_ON_HOME, aboutPath } from '../content/about';
@@ -91,15 +91,9 @@ export function HomeScreen({ showAbout = ABOUT_ON_HOME }: { readonly showAbout?:
             <SecondaryButton label="How Pam works" size="lg" href="/support/" />
           </HStack>
         </VStack>
-        {/* The app's own About Pam carousel: three pictures, no words on them. Each picture is named by the
-            same line the cards below show, so a screen reader loses nothing. */}
-        <OnboardingSlides
-          slides={HOW.map((item, i) => ({ id: `hero-${i + 1}`, image: item.image, text: `${item.title}. ${item.body}` }))}
+        <FlipCarousel
+          slides={HOW.map((item, i) => ({ id: `hero-${i + 1}`, src: item.image, alt: `${item.title}. ${item.body}`, width: 900, height: 1102 }))}
           label="Pam in pictures"
-          pauseLabel="Pause"
-          playLabel="Play"
-          variant="inline"
-          showLines={false}
         />
       </div>
 
