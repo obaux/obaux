@@ -5,8 +5,9 @@ import { HStack } from '@astryxdesign/core/HStack';
 import { Link } from '@astryxdesign/core/Link';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
-import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { tap } from '../lib/tap';
+import { website } from '../lib/website.stylex';
+import { type } from '../lib/website-type.stylex';
 import { Frame } from '../components/Frame';
 import { PostNav } from '../components/PostNav';
 import { StillStuck } from '../components/StillStuck';
@@ -35,13 +36,14 @@ const styles = stylex.create({
     paddingBlock: '4px',
     paddingInline: '10px',
     borderRadius: '8px',
-    backgroundColor: colorVars['--color-background-gray'],
+    backgroundColor: website['--website-surface-gray'],
+    color: website['--website-text-primary'],
     fontWeight: 600,
     // On a phone the title is right below, so the path stops at "Support" (it read three times at 320px).
     display: { default: 'inline-block', '@media (max-width: 519px)': 'none' },
   },
   arrow: { display: { default: 'inline-block', '@media (max-width: 519px)': 'none' } },
-  title: { maxWidth: '24ch' },
+  title: { maxWidth: '24ch', color: website['--website-text-primary'], margin: 0 },
   // "Who this is for": an outlined box under the title, like Figma's "Who can use this feature".
   meta: {
     width: '100%',
@@ -50,12 +52,12 @@ const styles = stylex.create({
     borderRadius: '12px',
     borderWidth: '1px',
     borderStyle: 'solid',
-    borderColor: colorVars['--color-border-emphasized'],
-    backgroundColor: colorVars['--color-background-card'],
+    borderColor: website['--website-border-strong'],
+    backgroundColor: website['--website-surface-page'],
   },
   audience: { alignItems: 'center' },
   metaTitle: { fontWeight: 700 },
-  icon: { flexShrink: 0, width: '20px', height: '20px', color: colorVars['--color-icon-gray'] },
+  icon: { flexShrink: 0, width: '20px', height: '20px', color: website['--website-icon-primary'] },
 });
 
 function PeopleGlyph() {
@@ -115,7 +117,7 @@ export function PostScreen({ slug, allowDraft = false }: { readonly slug: string
                 {post.title}
               </Text>
             </HStack>
-            <Heading level={1} type="display-3" xstyle={styles.title}>
+            <Heading level={1} xstyle={[type.heading_title35, styles.title]}>
               {post.title}
             </Heading>
           </VStack>

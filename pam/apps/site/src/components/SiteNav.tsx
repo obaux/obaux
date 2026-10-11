@@ -2,48 +2,60 @@
 
 import * as stylex from '@stylexjs/stylex';
 import { usePathname } from 'next/navigation';
-import { TopNav, TopNavItem } from '@astryxdesign/core/TopNav';
+import { HStack } from '@astryxdesign/core/HStack';
+import { Link } from '@astryxdesign/core/Link';
+import { VStack } from '@astryxdesign/core/VStack';
 import { Button } from '@pam/ui/Button';
+import { HOME } from '../content/home-copy';
+import { website } from '../lib/website.stylex';
+import { type } from '../lib/website-type.stylex';
 import { SIGN_IN_URL } from '../lib/links';
 import { tap } from '../lib/tap';
-import { Frame } from './Frame';
+import { WebFrame } from './WebFrame';
 import { Wordmark } from './Wordmark';
 
 const styles = stylex.create({
-  // On a very narrow phone the wordmark (which goes home) and Support and Sign in
-  // are all the header holds: "Home" is dropped below 400px, or Sign in lands on
-  // top of Support at 320px.
-  homeLink: { display: { default: 'flex', '@media (max-width: 400px)': 'none' } },
+  header: { minHeight: '78px', justifyContent: 'center', paddingBlock: '12px' },
+  row: { justifyContent: 'space-between', alignItems: 'center', width: '100%' },
+  right: { alignItems: 'center' },
+  link: {
+    color: website['--website-text-primary'],
+    textDecorationLine: 'none',
+    paddingInline: '12px',
+    borderRadius: '10px',
+    backgroundColor: { default: 'transparent', ':hover': website['--website-surface-tint'] },
+    transitionProperty: 'background-color',
+    transitionDuration: '125ms',
+  },
+  here: { backgroundColor: website['--website-surface-tint'] },
 });
 
 /**
- * The header: the wordmark, two places to go, and the way into the app.
- * Sign in is the one action, so it is the only filled button.
- */
-/**
- * `path` is for Storybook's website journey, which walks the site without a
- * router; on the real site the address bar decides.
+ * The header of the new site (Figma "Pam — Website": wordmark, Get help, Sign in; 78px high, a 1200 column).
+ * The language button in the design (a globe) is left out until a second language is signed off: with only English
+ * live it would be a control that goes nowhere (`content/signed-off.json`, `LanguageSwitcher`).
+ * `path` is Storybook's, where there is no router.
  */
 export function SiteNav({ path: given }: { readonly path?: string }) {
   const real = usePathname();
   const path = given ?? real ?? '/';
   return (
-    <Frame gap={2}>
-    <TopNav
-      label="Pam"
-      heading={
-        <a href="/" aria-label="Pam, home" {...stylex.props(tap.link)}>
-          <Wordmark />
-        </a>
-      }
-      startContent={
-        <>
-          <TopNavItem label="Home" href="/" isSelected={path === '/'} xstyle={[styles.homeLink, tap.target]} />
-          <TopNavItem label="Support" href="/support/" isSelected={path.startsWith('/support')} xstyle={tap.target} />
-        </>
-      }
-      endContent={<Button label="Sign in" variant="primary" href={SIGN_IN_URL} xstyle={tap.target} />}
-    />
-    </Frame>
+    <VStack as="header" xstyle={styles.header}>
+      <WebFrame>
+        <HStack xstyle={styles.row} gap={4}>
+          <a href="/" aria-label="Pam, home" {...stylex.props(tap.link)}>
+            <Wordmark />
+          </a>
+          <HStack gap={4} xstyle={styles.right}>
+            <nav aria-label="Pam">
+              <Link href="/support/" xstyle={[type.label_strong17, styles.link, tap.link, path.startsWith('/support') && styles.here]}>
+                {HOME.nav.support}
+              </Link>
+            </nav>
+            <Button label={HOME.nav.signIn} variant="primary" size="lg" href={SIGN_IN_URL} xstyle={tap.target} />
+          </HStack>
+        </HStack>
+      </WebFrame>
+    </VStack>
   );
 }

@@ -21,6 +21,7 @@
     "./MenuList": "./src/MenuList.tsx",
     "./Segment": "./src/Segment.tsx",
     "./Button": "./src/Button.tsx",
+    "./icons": "./src/icons.tsx",
     "./TextLink": "./src/TextLink.tsx",
     "./Badge": "./src/Badge.tsx",
     "./SearchPill": "./src/SearchPill.tsx",
