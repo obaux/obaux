@@ -1,13 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { Text } from '@astryxdesign/core/Text';
 import { TextArea } from '@astryxdesign/core/TextArea';
 import { TextInput } from '@astryxdesign/core/TextInput';
 import { VStack } from '@astryxdesign/core/VStack';
 import { Button } from '@pam/ui/Button';
-import { HELP_REQUEST_URL } from '../lib/links';
+import { HELP_REQUEST_ORIGINS, HELP_REQUEST_URL } from '../lib/links';
 import { HelpAddress } from './HelpAddress';
 import { tap } from '../lib/tap';
 
@@ -39,21 +39,56 @@ export function HelpRequest() {
   const [email, setEmail] = useState('');
   const [bad, setBad] = useState<{ message?: string; email?: string }>({});
 
+  // The probe costs the function an invocation (and the free plan counts them), so it is made rarely: only from the real
+  // site's origin (CI, local builds and previews never call it), only when this box comes near the screen, and once a
+  // visit (the answer is kept in sessionStorage, so moving between posts does not ask again).
+  const sentinel = useRef<HTMLSpanElement>(null);
   useEffect(() => {
+    if (!HELP_REQUEST_ORIGINS.includes(window.location.origin)) return;
+    const KEY = 'pam-help-request-live';
+    let known: string | null = null;
+    try {
+      known = window.sessionStorage.getItem(KEY);
+    } catch {
+      // storage can be off: then it asks once per page
+    }
+    if (known === '0') return;
+    if (known === '1') {
+      setPhase('form');
+      return;
+    }
+    const el = sentinel.current;
+    if (!el || typeof IntersectionObserver === 'undefined') return;
     let alive = true;
-    fetch(HELP_REQUEST_URL, { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}' })
-      .then((r) => {
-        if (alive && r.status === 400) setPhase('form');
-      })
-      .catch(() => undefined);
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry?.isIntersecting) return;
+        io.disconnect();
+        fetch(HELP_REQUEST_URL, { method: 'POST', headers: { 'content-type': 'application/json' }, body: '{}' })
+          .then((r) => {
+            const live = r.status === 400;
+            try {
+              if (r.status === 400 || r.status === 503) window.sessionStorage.setItem(KEY, live ? '1' : '0');
+            } catch {
+              // ignore
+            }
+            if (alive && live) setPhase('form');
+          })
+          .catch(() => undefined);
+      },
+      { rootMargin: '800px 0px' },
+    );
+    io.observe(el);
     return () => {
       alive = false;
+      io.disconnect();
     };
   }, []);
 
   if (phase === 'address') {
     return (
       <Text as="p">
+        <span ref={sentinel} aria-hidden="true" />
         Write to us at <HelpAddress />. Tell us what happened and what you see on the screen. A person at Pam reads
         every message.
       </Text>

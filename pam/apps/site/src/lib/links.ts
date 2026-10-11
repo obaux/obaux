@@ -47,3 +47,6 @@ export const HELP_EMAIL = 'hello@joinpam.org';
 export const HELP_REQUEST_URL = `${(
   process.env['NEXT_PUBLIC_SUPABASE_URL'] ?? 'https://shobqzuhicoiymtumiaz.supabase.co'
 ).replace(/\/$/, '')}/functions/v1/help-request`;
+
+/** The only places the help-request function answers (its ALLOWED_ORIGINS). The form never asks it from anywhere else. */
+export const HELP_REQUEST_ORIGINS: readonly string[] = ['https://joinpam.org', 'https://www.joinpam.org'];
