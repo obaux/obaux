@@ -2,7 +2,7 @@
   "version": 1,
   "locales": {
     "ar": {
-      "about.how.admin": "25f509.e5919b",
+      "about.how.admin": "f96d8c.08d7e2",
       "about.how.member": "2ae6c4.490d72",
       "about.how.provider": "d7606f.be4abb",
       "about.intro": "394795.c41105",
@@ -1712,7 +1712,7 @@
       "when.yesterday": "566181.ba2318"
     },
     "es": {
-      "about.how.admin": "25f509.a7ef9c",
+      "about.how.admin": "f96d8c.fe8f8e",
       "about.how.member": "2ae6c4.5cb645",
       "about.how.provider": "d7606f.779ef8",
       "about.intro": "394795.3b4e71",
@@ -3287,7 +3287,7 @@
       "when.yesterday": "566181.90d325"
     },
     "pt-BR": {
-      "about.how.admin": "25f509.295188",
+      "about.how.admin": "f96d8c.2bc311",
       "about.how.member": "2ae6c4.53d129",
       "about.how.provider": "d7606f.b87fe3",
       "about.intro": "394795.a48a0a",
@@ -4862,7 +4862,7 @@
       "when.yesterday": "566181.358ce4"
     },
     "ru": {
-      "about.how.admin": "25f509.ee947c",
+      "about.how.admin": "f96d8c.835b1a",
       "about.how.member": "2ae6c4.2ce8f2",
       "about.how.provider": "d7606f.553274",
       "about.intro": "394795.7b997a",
@@ -6518,7 +6518,7 @@
       "when.yesterday": "566181.6bc621"
     },
     "zh-CN": {
-      "about.how.admin": "25f509.ea518b",
+      "about.how.admin": "f96d8c.11318b",
       "about.how.member": "2ae6c4.efb017",
       "about.how.provider": "d7606f.67f2f3",
       "about.intro": "394795.3c37b8",
@@ -8093,7 +8093,7 @@
       "when.yesterday": "566181.0c1848"
     },
     "zh-HK": {
-      "about.how.admin": "25f509.962cf3",
+      "about.how.admin": "f96d8c.101d61",
       "about.how.member": "2ae6c4.0b12d3",
       "about.how.provider": "d7606f.10e712",
       "about.intro": "394795.c20374",

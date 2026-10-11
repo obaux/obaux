@@ -928,6 +928,13 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
+## Voice & UX copy · marketing may reach, help stays true; help-post drafts (11 October)
+
+Will: the marketing pages may say what Pam is working towards; help posts, the app and anything legal say only what's
+true today (`docs/voice.md`). Help-post drafts are in `docs/help-drafts/` on one branch each: start-here, talking-to-pam
+and your-language are approved, and Wren builds them; is-the-place-told is waiting on Will. Open FINDINGs for Lena:
+attendance isn't recorded, though the transparency screen says it is, and `language.intro` promises texts.
+
 ## Voice & UX copy · the website's own words; first copy pass in Will's component (11 October)
 
 Will chose the website's words: Residents / people looking for help, Providers / social services, Case
@@ -1158,6 +1165,12 @@ drops signatures), then `20261010042108_a_program_lead_submits_their_own_program
   new sentence is left to the PR check.
 
 ---
+
+## Messages & notifications · the invite email in Spam (11 October 2026)
+
+Branch `claude/messages-email-deliverability`. Docs only. The email itself has nothing a filter dislikes; the cause is the
+domain's standing (probably no DMARC record, a new sending domain, a test sent through the forwarding address), which is Will's
+to fix at DNS. Steps are in `docs/email-setup.md` › "If the email lands in Spam".
 
 ## Messages & notifications · why the email service refused (10 October 2026) — merged 10 October
 
@@ -1399,6 +1412,17 @@ is sent; the four alert texts are signed by Will (D-461). A STOP shows as "Texts
 recorded once `sms-inbound` is deployed (D-460); nothing queues the check-in or "someone wants to
 connect" yet. Samples file: nine texts. D-453. Text reminders' staff list (merged 10 October) names
 only the alert texts Will signed: no "introduced to your program", no "your account changes".
+
+## Design system & Storybook · badge caption 12px (11 October) — on `main`
+
+Merged from `claude/pam-design-badge-caption` (3472970). The "Your badge" caption on the Profile badge tile is 12px, not 11px, following A27 (nothing under
+12px). Fit audit in 8 languages: nothing new.
+
+## Design system & Storybook · A27: legal and consent text (11 October) — on `main`
+
+Merged from `claude/pam-design-a27-legal` (b86562e). Will (a52): "leave it. Legal texts should always run smaller and less emphatic." A27 and Typography now
+say legal and consent text (the consent sentence, the footer's legal links, legal notes) runs smaller and quieter than the screen's
+content; Sign in's two 14px lines are decided, not a gap. Docs only.
 
 ## Design system & Storybook · map: staff Home is live (10 October)
 

@@ -33,8 +33,17 @@ iPhone zooms the page).
 - titles and headings;
 - anything a member reads in order to decide or to sign: policies, the legal pages, a notice that says what went wrong
   and what to do;
-- Sign in and joining: the title, the number field and the button are 16px or more. (Two lines there are 14px today, the
-  field's label and the consent sentence; see "As built" below.)
+- Sign in and joining: what a person acts on, the title, the number field and the button, is 16px or more. (The field's
+  label stays 14px as built: see "Legal and consent text" below.)
+
+**Legal and consent text runs smaller and quieter than the screen's content** (Will, 11 October, Control Room, a52: "leave it.
+Legal texts should always run smaller and less emphatic."). That covers the consent sentence on Sign in and joining ("Pam texts you
+a code to sign in…", 14px), the Privacy, Terms and About links in the footer (15px, the quiet link style), and legal notes
+under a form. They are never raised to match the reading text around them, and they never carry the screen's one action. This
+is an exception to "Sign in and joining stay larger", which is about what a person acts on. It is a rule about size, not
+wording: the consent text is the carriers' reviewed words and does not change. (The *legal pages themselves*, Privacy and Terms,
+are reading text and stay 16px.) Will's answer came to a question about raising Sign in's field label and the consent sentence to
+16px; he left both as they are, so the label ("Your phone number", 14px) is also kept as built.
 
 **Where smaller is allowed:** metadata and captions (12–13px), and component labels and meta lines (14px), **as long as
 nothing a member needs in order to act is carried by a small line alone**: the next step is a heading, a button or a reading
@@ -59,10 +68,8 @@ the page's base size, not the size of every component.
 ## As built, and not changed here
 
 Noted so a later job can decide; nothing is done in this amendment (it is docs only):
-- One caption is **11px**, the "Your badge" label on the Profile badge tile (`ProfileCards.tsx`). The rule says nothing under
-  12px, so it should be 12px. A one-line change.
-- On Sign in, the number field's label ("Your phone number") and the consent sentence ("Pam texts you a code…") are 14px, under
-  the rule that Sign in and joining stay larger. Raising both to 16px is the next thing a text-size job should do. The consent
-  wording is the carriers' reviewed text; its size can change, its words cannot.
+- One caption was **11px**, the "Your badge" label on the Profile badge tile (`ProfileCards.tsx`). The rule says nothing under
+  12px, so it is 12px (11 October).
+- On Sign in, the number field's label and the consent sentence are 14px. Decided, not a gap: Will left both (a52, above).
 - Some links a member acts on ("Ask a question before you go", a program's phone number) are 14px. They are 48px targets
   (§2.5), which is the rule that protects acting on them.
