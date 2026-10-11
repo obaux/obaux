@@ -77,6 +77,19 @@
   that on card a52, together with Sign in's label and consent line at 16px.
 - **Card a50, yes:** Wren changes the website's case-manager card, and Lena changes About Pam in seven
   languages, both to Will's line "Their plans, your guidance, in one place."
+- **Batch b7:**
+  - Will's line "Their plans, your guidance, in one place." replaces "Know where your people are going" on the
+    website (Wren) and in About Pam in seven languages (Lena; "guidance" is not "guía" in Spanish, since that
+    word names the guide).
+  - The badge caption is 12px (Dot).
+  - Piper accepted the four pseudo-language Explore clamps; they were never accepted under that story id.
+  - A27 records Will's "legal texts should always run smaller and less emphatic".
+  - Sage's voice rule: marketing may reach, everything else says only what's true today.
+  - Nico's Spam notes: the email itself is clean; it's a new domain, probably with no DMARC.
+  - Control Room v12: the map's legend sits behind an (i).
+- **Will's answers 02:16–02:28:** a50 yes; a51 approved (help posts); a52 "leave it"; marketing may reach;
+  the help desk should infer what people mean (Wren and Sage: everyday words, typos, suggestions, "did you
+  mean"; "Ask Pam" still waits); the Spam email; the sample's Accept button, which had no invite code by design.
 - **Figma:** Sage wrote her lines into Will's Callout card (18:517). Will reworked them with her directly.
 - **Card a50:** "Know where your people are going" is live on the website and in About Pam, and Will
   told Sage it sounds like surveillance. The card proposes his own Figma line.
@@ -136,6 +149,8 @@
 | Batch 506: site a11y (needs `CHROMIUM_PATH` here; without it the script exits before scanning) | 90 scans, 0 problems, the nothing-found state included |
 | Batch a27: ui / web tsc / web unit / web build / budget | 120 / 0 / 97 / 0 / 23.0 kB spare |
 | Batch a27: e2e a11y + theme (all projects, dark included) / site build / site a11y / storybook | 54 passed / 0 / 90 scans, 0 problems / builds |
+| Batch b7: ui / web unit / web build / e2e a11y + profile / site tests / site a11y / storybook | 120 / 97 / 0 / 45 passed / 38 / 90 scans, 0 problems / builds |
+| Batch b7 + Lena: config / copy:status / web build / e2e a11y | 1067 / in step / 0 / 45 passed |
 | D-502 + D-501 together, Sign in 320×568 invited, en/ar × light/dark, scrolled 0–300px | the pause disc is on top only when unscrolled; from 40px the pinned invite line is on top of it, and from 120px it is off screen; compact bar shows with the mark at the start (right in Arabic) |
 
 ## Left undone
@@ -150,7 +165,8 @@
 
 ## Needs a human
 
-- Will: card a51 (three help posts) and card a52 (Sign in's label and consent line at 16px).
+- Will: card a53 (help post "Is the place told about my visit?").
+- Will: the DMARC record at joinpam.org's DNS, then "test it" for Nico.
 - Will: in Ava's session (the Control Room's "Waiting for you to unblock" strip opens it), type "push the
   switcher branch".
 - Will: "go on Ask Pam" if he wants the AI answer box over the Support posts scoped (an API key he enters,
