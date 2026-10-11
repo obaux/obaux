@@ -20,8 +20,8 @@
   }
 
   body {
-    background-color: var(--color-background-body);
-    color: var(--color-text-primary);
+    background-color: var(--website-surface-page, var(--color-background-body));
+    color: var(--website-text-primary, var(--color-text-primary));
     font-family: var(--font-family-body);
     font-size: 16px;
     line-height: 1.55;
@@ -32,7 +32,7 @@
   /* A support post is read on white (Will, 10 October 2026): the card colour, which is white in light mode
      and the theme's own raised dark in dark mode, so contrast follows the theme. */
   body:has([data-page='post']) {
-    background-color: var(--color-background-card);
+    background-color: var(--website-surface-page, var(--color-background-card));
   }
 
   /* Support's search suggestions (the app's search bar): the list never runs past the screen, and a long question or

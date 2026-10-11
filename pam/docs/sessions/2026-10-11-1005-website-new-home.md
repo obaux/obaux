@@ -32,3 +32,7 @@ Stages 2–4 (Support index and post template, About Pam, Still stuck). Held lin
 ## Needs a human
 
 Will: the five held lines (`HELD`).
+
+## Stage 2 (same day): the Support index and the post template
+
+`SupportScreen` (purple band, topic cards, `PostRow`), `PostScreen` and `Prose` on Website tokens and type; page background is the Website page token. Search and the form are unchanged. See D-531, "Stage 2". Screens: `docs/screens/website-new/support/` and `docs/screens/website-new/post/` (390 and 1440, light and dark).

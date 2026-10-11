@@ -13,7 +13,9 @@ import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { SearchPill } from '@pam/ui/SearchPill';
 import type { SearchSource } from '@astryxdesign/core/Typeahead';
-import { tap } from '../lib/tap';
+import { website } from '../lib/website.stylex';
+import { type } from '../lib/website-type.stylex';
+import { PostRow } from '../components/PostRow';
 import { SecondaryButton } from '../components/SecondaryButton';
 import { Link } from '@astryxdesign/core/Link';
 import { POSTS, type SupportPost } from '../content/posts';
@@ -39,10 +41,39 @@ import { asQuestion, didYouMean, search, suggest, type Suggestion } from '../lib
 const START_HERE = 6;
 
 const styles = stylex.create({
-  band: { paddingBlock: '56px' },
-  title: { maxWidth: '20ch' },
+  // The purple band with the question and the search (Figma "Support"): 80px above and below on a desktop.
+  band: { backgroundColor: website['--website-surface-purple'], width: '100%' },
+  bandInner: { alignItems: 'center', textAlign: 'center', paddingBlock: { default: '48px', '@media (min-width: 900px)': '80px' } },
+  title: { maxWidth: '20ch', color: website['--website-text-primary'], margin: 0 },
+  lede: { color: website['--website-text-primary'], display: { default: 'block', '@media (min-width: 900px)': 'none' }, margin: 0, maxWidth: '40ch' },
   search: { maxWidth: '640px', width: '100%' },
   meant: { flexWrap: 'wrap' },
+  page: { backgroundColor: website['--website-surface-page'], color: website['--website-text-primary'] },
+  // A topic card: white, rounded, soft shadow, a dashed green line under its title block.
+  topic: {
+    overflow: 'hidden',
+    borderRadius: '24px',
+    backgroundColor: website['--website-surface-page'],
+    boxShadow: '0 1px 2px rgba(0, 0, 0, 0.06), 0 6px 20px rgba(0, 0, 0, 0.09)',
+    transitionProperty: 'transform, box-shadow',
+    transitionDuration: '240ms',
+    transitionTimingFunction: 'cubic-bezier(0.2, 0, 0, 1)',
+    ':hover': { transform: 'translateY(-2px)' },
+  },
+  topicHead: {
+    gap: '12px',
+    minHeight: '120px',
+    padding: '24px',
+    boxSizing: 'border-box',
+    borderBlockEndWidth: '1px',
+    borderBlockEndStyle: 'dashed',
+    borderBlockEndColor: website['--website-accent-success'],
+  },
+  topicTitle: { color: website['--website-text-primary'], margin: 0 },
+  topicBlurb: { color: website['--website-text-secondary'], margin: 0, maxWidth: '240px' },
+  soon: { padding: '24px', color: website['--website-text-muted-strong'] },
+  sectionTitle: { color: website['--website-text-primary'], margin: 0 },
+  summary: { color: website['--website-text-secondary'], margin: 0, paddingInline: { default: '8px', '@media (min-width: 900px)': '24px' }, paddingBlockEnd: '12px' },
 });
 
 /**
@@ -52,16 +83,11 @@ const styles = stylex.create({
  */
 function PostList({ posts }: { readonly posts: readonly SupportPost[] }) {
   return (
-    <VStack gap={3}>
-      {posts.map((post, i) => (
-        <VStack key={post.slug} gap={1}>
-          {i > 0 ? <Divider /> : null}
-          <VStack>
-            <Link href={`/support/${post.slug}/`} hasUnderline isStandalone xstyle={tap.link}>
-              {post.title}
-            </Link>
-          </VStack>
-          <Text type="supporting" as="p">
+    <VStack>
+      {posts.map((post) => (
+        <VStack key={post.slug}>
+          <PostRow href={`/support/${post.slug}/`} title={post.title} />
+          <Text as="p" xstyle={[type.body_14, styles.summary]}>
             {post.summary}
           </Text>
         </VStack>
@@ -73,35 +99,39 @@ function PostList({ posts }: { readonly posts: readonly SupportPost[] }) {
 /** Browse by topic: one card per kind of person, each with its posts. Shown on the Support home and under a search that found nothing. */
 function Topics() {
   return (
-      <VStack gap={4} paddingBlockStart={6}>
-        <Heading level={2}>Browse by topic</Heading>
-        <Grid columns={{ minWidth: 260 }} gap={4}>
-          {TOPICS.map((topic) => {
-            const posts = POSTS.filter((p) => p.topic === topic.id);
-            return (
-              <Card key={topic.id} id={`topic-${topic.id}`} padding={6} variant={posts.length ? 'default' : 'muted'}>
-                <VStack gap={2}>
-                  <Heading level={3}>{topic.title}</Heading>
-                  <Text as="p">{topic.blurb}</Text>
-                  {posts.length ? (
-                    <VStack gap={1}>
-                      {posts.map((p) => (
-                        <VStack key={p.slug}>
-                          <Link href={`/support/${p.slug}/`} hasUnderline isStandalone xstyle={tap.link}>
-                            {p.title}
-                          </Link>
-                        </VStack>
-                      ))}
-                    </VStack>
-                  ) : (
-                    <Text type="supporting">Articles coming soon.</Text>
-                  )}
+    <VStack gap={4} paddingBlockStart={6}>
+      <Heading level={2} xstyle={[type.heading_small17, styles.sectionTitle]}>
+        Browse by topic
+      </Heading>
+      <Grid columns={{ minWidth: 280 }} gap={4}>
+        {TOPICS.map((topic) => {
+          const posts = POSTS.filter((p) => p.topic === topic.id);
+          return (
+            <VStack key={topic.id} id={`topic-${topic.id}`} xstyle={styles.topic}>
+              <VStack xstyle={styles.topicHead}>
+                <Heading level={3} xstyle={[type.heading_title29, styles.topicTitle]}>
+                  {topic.title}
+                </Heading>
+                <Text as="p" xstyle={[type.body_14, styles.topicBlurb]}>
+                  {topic.blurb}
+                </Text>
+              </VStack>
+              {posts.length ? (
+                <VStack paddingBlock={2}>
+                  {posts.map((p) => (
+                    <PostRow key={p.slug} href={`/support/${p.slug}/`} title={p.title} />
+                  ))}
                 </VStack>
-              </Card>
-            );
-          })}
-        </Grid>
-      </VStack>
+              ) : (
+                <Text as="p" xstyle={[type.body_14, styles.soon]}>
+                  Articles coming soon.
+                </Text>
+              )}
+            </VStack>
+          );
+        })}
+      </Grid>
+    </VStack>
   );
 }
 
@@ -131,14 +161,12 @@ function MostAsked() {
   if (!rows.length) return null;
   return (
     <VStack gap={3}>
-      <Heading level={2}>Most asked</Heading>
-      <VStack gap={1}>
+      <Heading level={2} xstyle={[type.heading_small17, styles.sectionTitle]}>
+        Most asked
+      </Heading>
+      <VStack>
         {rows.map(({ phrase, post }) => (
-          <VStack key={phrase}>
-            <Link href={`/support/${post.slug}/`} hasUnderline isStandalone xstyle={tap.link}>
-              {asQuestion(phrase)}
-            </Link>
-          </VStack>
+          <PostRow key={phrase} href={`/support/${post.slug}/`} title={asQuestion(phrase)} />
         ))}
       </VStack>
     </VStack>
@@ -186,13 +214,14 @@ export function SupportScreen() {
 
   return (
     <>
-      <Section variant="muted">
+      <VStack xstyle={styles.page}>
+      <VStack xstyle={styles.band}>
         <Frame gap={4}>
-          <VStack gap={4} xstyle={styles.band}>
-            <Heading level={1} type="display-2" xstyle={styles.title}>
+          <VStack gap={4} xstyle={styles.bandInner}>
+            <Heading level={1} xstyle={[type.heading_title35, styles.title]}>
               How can we help?
             </Heading>
-            <Text type="large" color="secondary">
+            <Text as="p" xstyle={[type.lead_17, styles.lede]}>
               How Pam works, in plain language: who can do what, and why.
             </Text>
             <VStack
@@ -222,8 +251,9 @@ export function SupportScreen() {
             </VStack>
           </VStack>
         </Frame>
-      </Section>
+      </VStack>
 
+      <VStack paddingBlockStart={8}>
       <Frame gap={8}>
         <VisuallyHidden role="status" aria-live="polite">
           {heard}
@@ -256,7 +286,7 @@ export function SupportScreen() {
             <Topics />
 
             <VStack gap={3}>
-              <Heading level={2}>Start here</Heading>
+              <Heading level={2} xstyle={[type.heading_small17, styles.sectionTitle]}>Start here</Heading>
               <PostList posts={POSTS.slice(0, START_HERE)} />
             </VStack>
           </>
@@ -264,6 +294,8 @@ export function SupportScreen() {
 
         <StillStuck />
       </Frame>
+      </VStack>
+      </VStack>
     </>
   );
 }

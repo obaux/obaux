@@ -1,4 +1,4 @@
-# D-531 — The new website, stage 1: Home, header and footer, the flipping hero pictures
+# D-531 — The new website: Home, header and footer, the flipping hero pictures (stage 1); Support index and post template (stage 2)
 
 **Date:** 2026-10-11 · **Branch:** `claude/compassionate-bohr-mzrchf`
 
@@ -17,3 +17,9 @@
 **Not done / later stages.** Support index, post template, About Pam, Still stuck (stages 2–4). The Home has no link to About Pam (the design has none); the live About section on Home is gone with the old design.
 
 **What a later session might reverse.** The `!important` focus ring (D-522) still stands. The 53px / 40px headline sizes are typed in HomeScreen because the type tokens have no responsive pair.
+
+## Stage 2: the Support index and the post template
+
+- **Support index** (Figma "Support", 8:3 / 9:3): the purple band (`surface-purple`) with the question and the search pill, topic cards (white, radius 24, soft shadow, a dashed success-green line under the title block, a 2px lift on hover), post rows (`PostRow`: newspaper mark, title, chevron, hairline, 48px tall), "Most asked" and "Start here" as the same rows with the summary under each. Search, suggestions, did-you-mean, `?q=`, the count announcement, Esc, the Still stuck? form: unchanged. The Figma frame's "Still need help? Open Pam" card and "Help Desk" nav are not built (A28): the end of the page is Still stuck?.
+- **Post template** (Figma "Post", 10:3 / 11:3): title `heading_title35`, section headings `heading_title24`, lead `lead_large20`, the breadcrumb pill and the "Who this is for" box on Website tokens, the page on `surface-page` (body background is now `--website-surface-page` everywhere). The menu stays first in the page (SP4) in the right column, "On this page" and scrollspy unchanged. Body text stays 16px (the Figma shows 15px; A27 sets reading text at 16).
+- Reading text colours use the AA tokens (`text-muted-strong`) wherever muted text sits on a grey, green or purple surface.
