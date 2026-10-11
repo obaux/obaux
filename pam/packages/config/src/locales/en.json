@@ -549,7 +549,7 @@
   "privacy.s.sharing.p2": "A program sees you only after you sign up with them, and only what they need to help you.",
   "privacy.s.sharing.p3": "We use other companies to run Pam, like the one that sends our texts and the one that stores our data. They handle your information for us and may not use it for anything else.",
   "privacy.s.sharing.p4": "When Pam sends an email, a company that sends email for us gets the email address and the email. It may not use them for anything else.",
-  "privacy.s.sharing.p5": "The map in Trips comes from Google. Google gets your phone’s IP address and the part of the map you look at. The map opens on the area around your trips, so Google can tell roughly where they are, but not their names or times. The map is the only part of Pam that loads anything from Google.",
+  "privacy.s.sharing.p5": "The map in Trips comes from Google. Google gets your phone’s IP address and the part of the map you look at. The map is the only part of Pam that loads anything from Google.",
   "privacy.s.sharing.title": "Who else gets your information",
   "privacy.s.texts.p1": "We text you a code when you sign in. Later we may text reminders and updates about your account.",
   "privacy.s.texts.p2": "Reply STOP any time and the texts stop. Nothing in the app can turn them back on.",
