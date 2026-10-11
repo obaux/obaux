@@ -74,6 +74,25 @@ describe('website colours: AA in both themes', () => {
   });
 });
 
+describe('Support search pill (Iris H2)', () => {
+  // Placeholder colours as the built /support/ page computes them (measured in Chromium, 11 October):
+  // the theme's secondary text on SearchPill's own fill (`light-dark(#FFFFFF, #262626)`). The scan
+  // misses a placeholder when it is not on screen, so the pairing is pinned here.
+  const flat = (fg: string, bg: string) => {
+    const hi = Math.max(lum(parse(fg).slice(0, 3)), lum(parse(bg).slice(0, 3)));
+    const lo = Math.min(lum(parse(fg).slice(0, 3)), lum(parse(bg).slice(0, 3)));
+    return (hi + 0.05) / (lo + 0.05);
+  };
+  it('light: placeholder and icon on the white pill', () => {
+    expect(flat('#474747', '#FFFFFF')).toBeGreaterThanOrEqual(4.5);
+    expect(flat('#6A6A6A', '#FFFFFF')).toBeGreaterThanOrEqual(3);
+  });
+  it('dark: placeholder and icon on the #262626 pill, and on the page behind it', () => {
+    expect(flat('#9E9E9E', '#262626')).toBeGreaterThanOrEqual(4.5);
+    expect(flat('#9E9E9E', c['surface-page'].dark)).toBeGreaterThanOrEqual(4.5);
+  });
+});
+
 describe('website tokens: files agree', () => {
   const css = readFileSync(new URL('../src/lib/website.stylex.ts', import.meta.url), 'utf8');
   it('every palette entry is in website.stylex.ts with the same values', () => {
