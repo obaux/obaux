@@ -88,4 +88,9 @@
       transform: translateY(16px);
     }
   }
+
+  /* About Pam is a grey page that runs down to the footer: no white strip between them. */
+  body:has([data-page='about']) footer {
+    margin-block-start: 0;
+  }
 }

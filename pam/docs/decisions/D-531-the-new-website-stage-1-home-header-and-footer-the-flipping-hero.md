@@ -1,4 +1,4 @@
-# D-531 — The new website: Home, header and footer, the flipping hero pictures (stage 1); Support index and post template (stage 2)
+# D-531 — The new website: Home, header and footer, the flipping hero pictures (stage 1); Support index and post template (stage 2); About Pam and Still stuck (stages 3, 4)
 
 **Date:** 2026-10-11 · **Branch:** `claude/compassionate-bohr-mzrchf`
 
@@ -23,3 +23,8 @@
 - **Support index** (Figma "Support", 8:3 / 9:3): the purple band (`surface-purple`) with the question and the search pill, topic cards (white, radius 24, soft shadow, a dashed success-green line under the title block, a 2px lift on hover), post rows (`PostRow`: newspaper mark, title, chevron, hairline, 48px tall), "Most asked" and "Start here" as the same rows with the summary under each. Search, suggestions, did-you-mean, `?q=`, the count announcement, Esc, the Still stuck? form: unchanged. The Figma frame's "Still need help? Open Pam" card and "Help Desk" nav are not built (A28): the end of the page is Still stuck?.
 - **Post template** (Figma "Post", 10:3 / 11:3): title `heading_title35`, section headings `heading_title24`, lead `lead_large20`, the breadcrumb pill and the "Who this is for" box on Website tokens, the page on `surface-page` (body background is now `--website-surface-page` everywhere). The menu stays first in the page (SP4) in the right column, "On this page" and scrollspy unchanged. Body text stays 16px (the Figma shows 15px; A27 sets reading text at 16).
 - Reading text colours use the AA tokens (`text-muted-strong`) wherever muted text sits on a grey, green or purple surface.
+
+## Stages 3 and 4: About Pam and Still stuck
+
+- **About Pam** (Figma 12:3 / 13:3): the grey page (`surface-muted`) with the title, the picture (radius 24), the lead and headed sections on Website type, "What Pam does today" as hairline rows (not cards), the 720 text column. English, and every language once signed off (`lang`/`dir` on the section, logical properties, so Arabic flips). The page runs down to the footer with no white strip. The footer links to it (About Pam) while English is signed off (Mira, 10:12).
+- **Still stuck** (Figma Components "Still stuck block"): a soft grey card, radius 24, 32px inside, a hairline, the heading on `heading_title24`. The words are the live A28 ones; the form (Nico's switch) and its error words are unchanged. Dark mode checked.
