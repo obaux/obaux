@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs';
+import { readdirSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
@@ -19,6 +19,11 @@ import { PRIVACY } from '../src/legal.js';
  */
 const ROOT = fileURLToPath(new URL('../../../', import.meta.url));
 const fn = (file: string) => readFileSync(join(ROOT, 'supabase/functions/google-calendar', file), 'utf8');
+const migrations = () =>
+  readdirSync(join(ROOT, 'packages/db/migrations'))
+    .filter((f) => /google_calendar/.test(f))
+    .map((f) => readFileSync(join(ROOT, 'packages/db/migrations', f), 'utf8'))
+    .join('\n');
 
 describe('Privacy on the Google Calendar sync (D-539)', () => {
   const p7 = EN['privacy.s.sharing.p7'] ?? '';
@@ -52,6 +57,14 @@ describe('Privacy on the Google Calendar sync (D-539)', () => {
     // Pam's own record is deleted whatever Google says; the calendar and the token are tried and the result told.
     expect(handler).toMatch(/the row goes whatever Google says/);
     expect(handler).toMatch(/calendarRemoved, revoked/);
+  });
+
+  it('says what erasing an account does, and that Pam tries: the cleanup is let go after five runs', () => {
+    expect(p7).toMatch(/If you delete your Pam account, Pam tries to delete the calendar and its access too\. What Google keeps/);
+    const sql = migrations();
+    expect(sql, 'erasing an account queues a cleanup before the profile goes').toMatch(/google_cleanups/);
+    expect(sql).toMatch(/before delete on public\.profiles/i);
+    expect(sql, 'a cleanup is let go after trying, so the line says “tries”').toMatch(/gave_up/);
   });
 
   it('says what Google keeps is Google’s, and makes no promise about it', () => {
