@@ -65,6 +65,15 @@
   - Lena's review of Piper's D-498 lines: 13 strings in 5 languages. A place's name is a variable, so no
     sentence agrees with it in gender. The meaning stays a hard "Pam does not tell this place". Lena also
     reviewed the pick-a-service drafts and kept them as written.
+- **Batch D-505 + D-506:**
+  - Wren's help-centre search (D-506): small words dropped, phrase > title > keyword > summary ranking,
+    and Sage's 69 phrases, 48 answered and 21 gaps. A test runs every phrase through the real search, and
+    `docs/help-centre-gaps.md` lists the gaps. An empty result shows the topics and Call Pam.
+  - Sage's voice-guide update (D-505): Will's marketing words, how she works on his Figma components,
+    and his "people are guided, never watched".
+- **Figma:** Sage wrote her lines into Will's Callout card (18:517). Will reworked them with her directly.
+- **Card a50:** "Know where your people are going" is live on the website and in About Pam, and Will
+  told Sage it sounds like surveillance. The card proposes his own Figma line.
 - **Will's answers after 01:20** (Control Room chat):
   - Copy: Sage owns the copy pass. When Will asks in Figma, she writes into his component, only that
     component. On the marketing site: Residents / people looking for help, Providers / social services,
@@ -116,6 +125,9 @@
 | Batch 502 (c6b928a): db / web unit / config / ui / e2e (full) / storybook | 1255 ok / 94 / 1067 / 0 / 1173 passed, 18 skipped / builds |
 | Batch 504 (on top): web tsc, web unit, config, copy:status, web build, budget | 0 / 97 passed / 1067 / in step / 0 / 23.0 kB spare |
 | Batch 504: e2e places-without-a-lead, place-pick-a-service, trip-booked, visit-change, place, a11y (all projects); storybook | 114 passed; builds |
+| Vercel on 1634541 | web and pam-site production READY |
+| Batch 506: site tests / site tsc / web tsc / site build / config / copy:status / storybook | 38 passed / 0 / 0 / 0 / 0 / in step / builds |
+| Batch 506: site a11y (needs `CHROMIUM_PATH` here; without it the script exits before scanning) | 90 scans, 0 problems, the nothing-found state included |
 | D-502 + D-501 together, Sign in 320×568 invited, en/ar × light/dark, scrolled 0–300px | the pause disc is on top only when unscrolled; from 40px the pinned invite line is on top of it, and from 120px it is off screen; compact bar shows with the mark at the start (right in Arabic) |
 
 ## Left undone
@@ -124,13 +136,13 @@
   online when Will gives the word. Next, the Join Pam wording (W6) as a question for Will.
 - **Dot:** A27, the text-size rule with its exceptions; then dark muted #262626 with a before-and-after story.
 - **Piper:** Iris's W3, on a fresh branch.
-- **Wren and Sage:** help-centre search (phrases, ranking, gaps list). Sage: write her lines into Will's
-  Callout card and add his marketing words to the voice guide.
+- **Wren and Sage:** write the 21 gap posts in `docs/help-centre-gaps.md`. The words go to Will first.
 - **Lena, Friday:** two welcome slides promise example-only features (`onboarding.provider.3`,
   `onboarding.admin.2`; Sage's finding).
 
 ## Needs a human
 
+- Will: card a50, the surveillance line on the website and in About Pam.
 - Will: in Ava's session (the Control Room's "Waiting for you to unblock" strip opens it), type "push the
   switcher branch".
 - Will: "go on Ask Pam" if he wants the AI answer box over the Support posts scoped (an API key he enters,
