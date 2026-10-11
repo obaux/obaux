@@ -979,6 +979,13 @@ without it the cached, unpatched Next shipped), a Vercel redirect for document r
 
 ## Languages & legal · privacy lines waiting for Will, the calendar strings and the fit audit (11 October, afternoon)
 
+**What a program sees before a visit (D-543, later the same evening)** — branch `claude/lena-program-sees-before-a-visit`, stacked on a63: line 1 of `privacy.s.sharing.p2` now names the four ways a
+program comes to see a member (write to them, sign their rules, sign up, plan a visit) and what it sees before a visit; a new "A program can see:" card and one short-version line on the transparency
+screen; `transparency.canSee.signed` moves into the card (no case manager reads a signature); the contract lists two new things seen and keeps two gaps hidden; the site's What others can see post says the same
+words. English signed by Sage 20:42; Will signs, then seven languages. Also: DB test 68 (`claude/lena-a-message-is-not-a-link`, safe to merge now: a message is a conversation, not a link) and the City data
+licence record (`docs/data-licences.md`, `claude/lena-city-data-licence`; the licence text itself is unread, a before-launch item). Open: the one-sentence "a program can start a chat with you only if you are signed up
+or have a visit planned" is a new promise for Will, not written yet; the site post Messages in Pam goes false the day D-541 part 2 ships (Wren, same deploy).
+
 Six cards for Will, each a branch that merges only after its predecessor (a70 and the Google card stand alone) and is red only on its own missing translations until he signs: **a70**
 `claude/lena-translation-retention` (`translation.p2` names Claude, an AI made by Anthropic, and says what Anthropic's published terms say: words deleted within 30 days and not used to train, a flagged
 message may be kept up to two years, anything the law requires may be kept; all seven languages are done, so a70 is the one card that is only a signature; it shows on the page only when `MESSAGE_TRANSLATION` is
