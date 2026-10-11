@@ -1375,6 +1375,36 @@ test.describe('the conversation, drawn closer (D-400, D-401)', () => {
     expect(Math.round(words.y - (p.y + p.height))).toBeGreaterThanOrEqual(12);
   });
 
+  for (const byKeyboard of [false, true]) {
+    test(`the photo viewer shows no ring on what it focuses (${byKeyboard ? 'keyboard' : 'mouse'}); Tab rings the close button (D-523)`, async ({ page }) => {
+      await signedInAs(page, 'admin');
+      await withOneConversation(page);
+      await withAPhoto(page);
+      await page.goto(`/messages/thread/?id=${CONVO}`);
+      await settled(page);
+      const photo = page.getByRole('button', { name: 'A photo from Marcus' });
+      if (byKeyboard) {
+        await photo.focus();
+        await page.keyboard.press('Enter');
+      } else {
+        await photo.click();
+      }
+      const dialog = page.locator('dialog.astryx-lightbox');
+      await expect(dialog).toBeVisible();
+      await expect.poll(() => dialog.evaluate((el) => document.activeElement === el)).toBe(true);
+      // Focus is put on the viewer so a screen reader lands in it; it is not a control and shows no ring.
+      expect(await dialog.evaluate((el) => getComputedStyle(el).outlineStyle)).toBe('none');
+      await page.keyboard.press('Tab');
+      const ring = await page.evaluate(() => {
+        const s = getComputedStyle(document.activeElement!);
+        return { tag: document.activeElement!.tagName.toLowerCase(), style: s.outlineStyle, width: parseFloat(s.outlineWidth) };
+      });
+      expect(ring.tag).toBe('button');
+      expect(ring.style).not.toBe('none');
+      expect(ring.width).toBeGreaterThan(0);
+    });
+  }
+
   test('a photo opens on near-black, with a round close button you can see', async ({ page }) => {
     await signedInAs(page, 'admin');
     await withOneConversation(page);
