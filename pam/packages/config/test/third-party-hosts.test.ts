@@ -127,10 +127,6 @@ const HOSTS: Record<string, HostEntry> = {
   'www.w3.org': { kind: 'text', why: 'SVG xmlns' },
   'example.org': { kind: 'text', why: 'placeholder address in examples' },
   'www.example.org': { kind: 'text', why: 'placeholder address in examples' },
-  'web-ten-umber-88.vercel.app': {
-    kind: 'text',
-    why: 'the link-preview bot’s User-Agent (link-preview/index.ts): the address every linked site sees; an old deployment URL, not app.joinpam.org',
-  },
   'openapi.vercel.sh': { kind: 'text', why: 'the $schema line of vercel.json' },
   'fonts.googleapis.com': { kind: 'text', why: 'in theme.template.ts’s comment only: the fonts are self-hosted (packages/ui/src/styles/fonts.css)' },
   'fonts.gstatic.com': { kind: 'text', why: 'in theme.template.ts’s comment only: the fonts are self-hosted (packages/ui/src/styles/fonts.css)' },
