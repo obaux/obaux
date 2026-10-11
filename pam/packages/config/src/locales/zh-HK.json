@@ -1602,5 +1602,6 @@
   "supportReply.send": "傳送短訊",
   "supportReply.sent": "已排隊，五分鐘內傳送。",
   "supportReply.noNumber": "沒有可傳短訊的號碼。",
-  "supportReply.failed": "未能傳送。請再試一次。"
+  "supportReply.failed": "未能傳送。請再試一次。",
+  "person.card.note": "You see their first name and the visits planned at your program, and you can message them. Nothing else about them."
 }

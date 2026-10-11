@@ -90,6 +90,8 @@ describe('every other language is actually translated', () => {
   MAY_MATCH_ENGLISH.add('trips.moved.body.self');
   // English in every language until Will signs the line (D-526); then it is translated.
   MAY_MATCH_ENGLISH.add('place.lead.sees');
+  // The program's small card note (D-542): English until Sage signs it and Lena translates it.
+  MAY_MATCH_ENGLISH.add('person.card.note');
   MAY_MATCH_ENGLISH.add('trips.notMarked');
   MAY_MATCH_ENGLISH.add('trips.booked.hasLead');
   // The "I'm here" sheet: English in every language until Will signs the location line (D-535).

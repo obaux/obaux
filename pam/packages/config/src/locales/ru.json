@@ -1686,5 +1686,6 @@
   "supportReply.send": "Отправить SMS",
   "supportReply.sent": "В очереди. Уйдёт в течение пяти минут.",
   "supportReply.noNumber": "Нет номера для SMS.",
-  "supportReply.failed": "Не отправлено. Попробуйте ещё раз."
+  "supportReply.failed": "Не отправлено. Попробуйте ещё раз.",
+  "person.card.note": "You see their first name and the visits planned at your program, and you can message them. Nothing else about them."
 }

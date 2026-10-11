@@ -1602,5 +1602,6 @@
   "supportReply.send": "Send text",
   "supportReply.sent": "Queued. It goes out within five minutes.",
   "supportReply.noNumber": "No number to text.",
-  "supportReply.failed": "It did not go. Try again."
+  "supportReply.failed": "It did not go. Try again.",
+  "person.card.note": "You see their first name and the visits planned at your program, and you can message them. Nothing else about them."
 }

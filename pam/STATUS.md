@@ -2183,3 +2183,7 @@ Branch `claude/places-programs-im-here` (D-535). `i_am_here` (150 m, 100 points)
 ## Places & programs · no street-address call to the city (11 October 2026) — on `main` (b18)
 
 Branch `claude/places-programs-no-city-call` (D-536). The browser no longer asks the City of Philadelphia about a typed address; the picker says ZIP code or neighborhood; a member's first name is out of the policies address; the Google map in Trips opens on the whole city, never fitted to the pins. No migration.
+
+## Places & programs · the program's small card for a member, and no direct read of a visit (11 October 2026)
+
+D-542, on `claude/places-programs-im-here` (held with "I'm here" and attendance until Will signs a63 line 1): a lead reads no appointment row directly (`…060000`, test 65), and opens a linked member (enrolled, a visit there, or a conversation with the program's staff) to a card of first name, this program's visits and Message (`program_member_card`, `…203852`, test 66). Log: `docs/sessions/2026-10-11-2045-places-programs-program-card.md`.

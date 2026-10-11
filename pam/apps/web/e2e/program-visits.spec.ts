@@ -49,8 +49,8 @@ test('Home lists the visits planned at the lead\'s own program, by first name, w
   await expect(page.getByText('Tanya').first()).toBeVisible();
   await expect(page.getByText('GED class').first()).toBeVisible();
   await expect(page.getByText(/Example /)).toHaveCount(0);
-  // A member's page is not the program's to open: no link on the name.
-  await expect(page.getByRole('link', { name: 'Tanya' })).toHaveCount(0);
+  // The name opens the program's small card for that member (D-542).
+  await expect(page.getByRole('link', { name: /Tanya/ }).first()).toHaveAttribute('href', /\/person\/\?id=m1/);
 });
 
 const VISIT = 'aaaaaaaa-0000-4000-8000-000000005701';
@@ -119,4 +119,30 @@ test('a visit the member marked themselves looks like any marked visit: undo ask
   await expect(page.getByRole('button', { name: /Tanya is checked in/ })).toBeVisible();
   // Nothing on the screen says who marked it.
   await expect(page.getByText(/themselves|marked it/i)).toHaveCount(0);
+});
+
+test('a program lead opening a linked member sees a small card: first name, this program\'s visits, Message, nothing else (D-542)', async ({ page }) => {
+  await signedInLead(page, []);
+  await page.route('**/rest/v1/rpc/program_member_card*', (route) =>
+    route.fulfill(json({ member_id: 'm1', first_name: 'Tanya', visits: [
+      { appointment_id: 'a1', starts_at: soon(2), ends_at: null, status: 'scheduled', service_name: 'GED class', checked_in_at: null },
+    ] })),
+  );
+  await page.goto('/person/?id=m1');
+  await settled(page);
+  await expect(page.getByRole('heading', { name: 'Tanya', level: 1 })).toBeVisible();
+  await expect(page.getByText('GED class')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Message Tanya' })).toBeVisible();
+  // Nothing else of the member: no points, last active, policies, trips or saved places.
+  for (const word of [/points/i, /last active/i, /policies/i, /saved/i, /Example /]) await expect(page.getByText(word)).toHaveCount(0);
+});
+
+test('a member who is not linked to the program is "not found" to its lead (D-542)', async ({ page }) => {
+  await signedInLead(page, []);
+  await page.route('**/rest/v1/rpc/program_member_card*', (route) =>
+    route.fulfill({ status: 400, contentType: 'application/json', body: JSON.stringify({ message: 'MEMBER_NOT_LINKED' }) }),
+  );
+  await page.goto('/person/?id=m9');
+  await settled(page);
+  await expect(page.getByText('We could not find that person').first()).toBeVisible();
 });

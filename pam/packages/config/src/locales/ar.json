@@ -1742,5 +1742,6 @@
   "supportReply.send": "إرسال رسالة نصية",
   "supportReply.sent": "في قائمة الانتظار. تُرسل خلال خمس دقائق.",
   "supportReply.noNumber": "لا يوجد رقم لإرسال رسالة نصية إليه.",
-  "supportReply.failed": "لم تُرسل. حاول مرة أخرى."
+  "supportReply.failed": "لم تُرسل. حاول مرة أخرى.",
+  "person.card.note": "You see their first name and the visits planned at your program, and you can message them. Nothing else about them."
 }

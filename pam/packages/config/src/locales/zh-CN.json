@@ -1602,5 +1602,6 @@
   "supportReply.send": "发送短信",
   "supportReply.sent": "已排队，五分钟内发出。",
   "supportReply.noNumber": "没有可发短信的号码。",
-  "supportReply.failed": "没有发出。请重试。"
+  "supportReply.failed": "没有发出。请重试。",
+  "person.card.note": "You see their first name and the visits planned at your program, and you can message them. Nothing else about them."
 }

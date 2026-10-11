@@ -1602,5 +1602,6 @@
   "supportReply.send": "Enviar texto",
   "supportReply.sent": "En cola. Sale en un máximo de cinco minutos.",
   "supportReply.noNumber": "No hay número al que enviar el texto.",
-  "supportReply.failed": "No salió. Inténtelo de nuevo."
+  "supportReply.failed": "No salió. Inténtelo de nuevo.",
+  "person.card.note": "You see their first name and the visits planned at your program, and you can message them. Nothing else about them."
 }

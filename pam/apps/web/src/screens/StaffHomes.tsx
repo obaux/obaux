@@ -169,6 +169,8 @@ export function ProgramHome() {
       startsAt: v.startsAt,
       minutes: v.endsAt ? Math.max(15, Math.round((new Date(v.endsAt).getTime() - new Date(v.startsAt).getTime()) / 60000)) : 60,
       kindLabel: v.serviceName ?? t('schedule.kind.visit'),
+      // The small card for a member linked to the program (D-542): first name and this program's visits, nothing else.
+      href: `/person/?id=${encodeURIComponent(v.memberId)}`,
     })),
     ...booked.map((b) => ({
       id: b.id,
