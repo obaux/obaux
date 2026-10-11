@@ -83,8 +83,7 @@ export function MessagesInPam() {
             'Tap “Block this person”.',
             'Read what it says. Tap “Block”, or tap “Not now” if you change your mind.',
           ]}
-        // The picture of what the other person sees (messages-in-pam/blocked.png) is held: the app's
-        // `messages.blocked.theirs.body` still says "Questions? Call Pam." (A28). Retake it when that line is Contact Pam.
+        shots={[{ name: 'messages-in-pam/blocked.png', alt: "A conversation after the other person blocked it. The box for writing a message is gone. In its place: “You can’t send messages here. This person has blocked messages in this conversation. You can still read it. Questions? Contact Pam.” and a link, “Contact Pam”.", caption: "What the other person sees." }]}
         />
         <P>
           Pam asks first. It says: “Neither of you will be able to send messages in this conversation or start
