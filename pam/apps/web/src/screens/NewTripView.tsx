@@ -30,6 +30,7 @@ import { friendLink } from '@/lib/appUrl';
 import { navigate } from '@/lib/navigate';
 import { countdown } from '@/lib/when';
 import { FRIEND_BANNER, FRIEND_BANNER_SRCSET } from '@/lib/friendBanner';
+import { usePlaceHasLead } from '@/lib/usePlaceHasLead';
 import { useServices } from '@/lib/useServices';
 import { HelpButton } from './HelpButton';
 import { BigCategoryIcon, CategoryPicture } from './SavedView';
@@ -196,6 +197,8 @@ export function NewTripView({
     return trip && at ? { trip, place: at } : null;
   });
   const [place, setPlace] = useState<DummySavedPlace | null>(bookedTrip?.place ?? initial);
+  // A place with no program lead on Pam is not told about the visit, so the wording stops saying it is (D-498).
+  const hasLead = usePlaceHasLead(place?.id, place?.name);
   const { state: session } = useSession();
   const supportPhone = useSupportPhone();
   // The trip is being saved, or could not be (D-454): say so rather than show it booked.
@@ -290,7 +293,7 @@ export function NewTripView({
     return (
       <SuccessScreen
         title={t('trips.moved.title')}
-        body={t('trips.moved.body', { place: place.name, day: dayLong.format(movedTo), time: timeFmt.format(movedTo) })}
+        body={t(hasLead ? 'trips.moved.body' : 'trips.moved.body.self', { place: place.name, day: dayLong.format(movedTo), time: timeFmt.format(movedTo) })}
         action={<Button label={t('trips.moved.home')} variant="secondary" href="/" xstyle={styles.home} />}
         note={t('trips.moved.note')}
       />
@@ -323,7 +326,7 @@ export function NewTripView({
     const toSign = here.asks && forVisit.length > 0 ? progress(place.id, forVisit) : null;
     return (
       <SubPage
-        title={t('trips.confirm.title')}
+        title={t(hasLead ? 'trips.confirm.title' : 'trips.confirm.title.self')}
         // The end of the flow (Will, D-334): an × that closes to Trips, not
         // a way back into booking.
         backIcon="close"
@@ -351,6 +354,7 @@ export function NewTripView({
             change: confirmed.id,
           }).toString()}`}
         />
+        {hasLead ? null : <Banner status="info" title={t('place.noLead', { place: place.name })} />}
         {/* Plain rows on the page, like a place's (D-337): no card around them. */}
         <MenuList
           label={t('trips.confirm.next')}
@@ -644,7 +648,12 @@ export function NewTripView({
             ]}
             countdown={countdown(at(day, time), t)}
           />
-          <TextArea label={t('trips.new.note')} value={note} onChange={setNote} rows={2} width="100%" />
+          <TextArea label={t(hasLead ? 'trips.new.note' : 'trips.new.note.self')} value={note} onChange={setNote} rows={2} width="100%" />
+          {hasLead || forMember ? null : (
+            <Text type="supporting" xstyle={styles.note}>
+              {t('place.noLead', { place: place.name })}
+            </Text>
+          )}
           {/* True only for an example place or a program booking: a trip to a real
               place is saved (D-454), and saying otherwise would be a lie. */}
           {asksForSavedTrips(session) !== null && isSavedPlace(place.id) && !forMember ? null : (

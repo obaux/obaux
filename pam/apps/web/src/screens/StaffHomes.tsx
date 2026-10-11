@@ -169,13 +169,16 @@ export function ProgramHome() {
     })),
   ];
   const cards = setupCards(setup, t);
+  // A lead with no program of their own has only one thing to do (D-498): add it.
+  // Who is coming in, and a calendar of it, are the program's, so they wait for it.
+  const hasNoProgram = !setup.isLoading && !setup.isExample && !setup.hasProgram;
 
   if (appointments.length === 0) {
     return (
       <Page gap={4}>
         <LargeTitleHeader title={t('home.setup.title')} actions={<HeaderActions role="provider" hasHelp={false} />} />
-        <StaffPeopleRow role="provider" />
-        <SetupCardList cards={[...cards, CALENDAR_CARD(t)]} />
+        {hasNoProgram ? null : <StaffPeopleRow role="provider" />}
+        <SetupCardList cards={hasNoProgram ? cards : [...cards, CALENDAR_CARD(t)]} />
         <ProgramActions canBook={setup.isLive} />
       </Page>
     );
