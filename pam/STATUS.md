@@ -1398,7 +1398,8 @@ Overview redrawn, one image replaced on Member; drawn from the branch, so redraw
 
 ## Design system & Storybook · Sign in on a short phone, small targets (11 October) — on `main`
 
-Merged from `claude/pam-design-signin-short` (9d89383). Sign in's Privacy / Terms / About links flow after the content instead of
+Merged from `claude/pam-design-signin-short` (6de3cc2). Sign in's invite line is pinned and a compact mark bar appears under it once the
+hero has scrolled away (D-502; the code step's bar was already pinned). Sign in's Privacy / Terms / About links flow after the content instead of
 being pinned, so they never cover "Send me a code" at 320×568 (Iris S1, D-500); `TextLink` is 48px wide as well as tall
 (the Trips banner's "Sign", the signature sheet's "Clear"), and the policy header's "Done" too (W4). Needs Will: nothing.
 

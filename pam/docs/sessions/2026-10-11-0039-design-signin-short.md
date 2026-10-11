@@ -36,6 +36,15 @@ used everywhere.
 Not seen on a phone or in WebKit. The footer's old always-on-screen behaviour is gone on short screens by design.
 Piper: `MemberPoliciesView.tsx` gained one line (`doneButton.minWidth`).
 
+## Added later the same night: the header stays on top (D-502)
+
+Will, 00:54 UTC via Mira: Sign in's header should stay sticky. On the first step the invite line is pinned and, once the hero is
+scrolled away, a compact bar (the mark and the language switch, `AppHeader`) fades in under it, drawn over the content so the
+button gets no less room. The code step's bar was already pinned (`SubPageHeader`): left alone, and the invite line is not pinned
+there (two bars at `top: 0` would cover each other; `SubPageHeader` has no offset). Tests added to `signin-short.spec.ts`
+(6 cases; all fail on the old screen). OnboardingSlides is not touched. I wrote "D-501" in two comments before claiming: it is
+Wren's carousel pause; mine came back D-502 and I fixed it before committing (seventh time on the number rule).
+
 ## Needs a human
 
 Nothing.
