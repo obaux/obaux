@@ -23,4 +23,6 @@ export const websiteColors = {
   'icon-primary': { light: '#171717', dark: '#FAFAFA' },
   'icon-shamrock': { light: '#0B603D', dark: '#108E5A' },
   'accent-success': { light: '#0B991F', dark: '#0B991F' },
+  'text-muted-strong': { light: '#595959', dark: '#A6A6A6' },
+  'text-success': { light: '#087A18', dark: '#0B991F' },
 } as const;
