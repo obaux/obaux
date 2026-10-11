@@ -59,13 +59,20 @@ export const ADMIN_CAN_SEE = [
   /**
    * D-541 (Will, 11 October, 20:22 and 20:24: "members must be able to message a program before booking" and
    * "communicate what programs can see, even before the person books"): a member can write to a program from its
-   * page at any time, with no sign-up and no visit. Only the member starts it. Before any visit the program's lead sees
-   * the member's FIRST NAME and what they write, and nothing else about them: not a last name, a phone number, a saved
-   * place, a trip to another program, points or the last day they used Pam. The same few facts make the small card a lead
-   * sees when they tap that member: the first name and the visits planned at their own program. A program that is not
-   * linked to the member by a sign-up reads no `people_activity()` row for them either. Said to the member on
-   * `transparency.program.firstName` and `.messages` (the "A program can see:" card), on `transparency.summary.program`
-   * and on the Privacy page (`privacy.s.sharing.p2`); `program-sees-before-a-visit.test.ts` holds them together.
+   * page at any time, with no sign-up and no visit.
+   *
+   * The merge desk's rule (11 October, 20:43): messaging a program creates a CONVERSATION, not a link. A member who has
+   * only written to a program is not in its `messageable_people()` (its New message list), `people_activity()`,
+   * `provider_linked_members()` or `my_program_visits()`: so it learns no save times, no visits and no names list. It reads,
+   * in that conversation, the member's FIRST NAME (`conversation_partners()` returns a first name, a role and a program name,
+   * nothing else) and what they write, and may reply there; it reads nothing else of them: not their profile row, a last
+   * name, a phone number, a saved place, a trip to another program, points or the last day they used Pam. The small card a
+   * lead sees when they tap that member is the first name and the visits planned at their own program.
+   *
+   * Said to the member on `transparency.program.firstName` and `.messages` (the "A program can see:" card), on
+   * `transparency.summary.program` and on the Privacy page (`privacy.s.sharing.p2`);
+   * `program-sees-before-a-visit.test.ts` holds those together and `68_a_member_who_has_only_written_to_a_program_is_test.sql`
+   * holds the database to them.
    */
   'first_name_and_words_to_a_program_they_message',
   /**
@@ -195,16 +202,17 @@ export const ADMIN_CANNOT_SEE = [
   /**
    * 11 October (Mira, found the same day): the note a member keeps on their own trip (`appointments.note`, up to 200
    * characters, 20261010074045) is for them. A program's lead sees a visit's four things (first name, day and time, service,
-   * marked as there) through `my_program_visits()` and never the row itself: `appointments_provider` (0007) let a lead
-   * read whole rows, note and `attendance_method` included, and write them. That is a gap being closed, not a
-   * thing members are told is shared. Nothing member-facing says a program sees the note.
+   * marked as there) through `my_program_visits()` and should never read the row itself. Live today (20261010074241 replaced
+   * 0007's `appointments_provider`): select only, no write grant for a lead or a member, but the read is still of whole rows,
+   * `note`, `attendance_method` and `check_in_code` included. Piper narrows that read in a new migration on
+   * `claude/places-programs-im-here`, with a database test. That is a gap being closed, not a thing members are told is
+   * shared: nothing member-facing says a program sees the note.
    */
   'the_note_a_member_keeps_on_a_visit',
   /**
-   * 11 October (Mira, found the same day): signing up is something the provider path and the server write, not a member
-   * and not a lead on their own say-so. `enrollments` was writable by a member and by a lead (D-541, test 64). The member
-   * names a program they sign up with only through that path; a program therefore sees "that you signed up" only for a
-   * sign-up that happened.
+   * 11 October (Mira, found the same day): signing up is written by the provider path and the server, not by a member
+   * or by a lead on their own say-so. `enrollments` was writable by both; D-541 part 1 (migration 20261011203904, batch b20,
+   * test 64) locks it. A program therefore sees "that you signed up" only for a sign-up that happened.
    */
   'a_sign_up_written_by_the_member_or_a_lead_directly',
 ] as const;

@@ -20,6 +20,6 @@
 ## What a later session might reverse
 
 - The card is the heaviest part: Will may prefer one line in the guide's list. It cannot be a guide line (a guide does not read a message to a program), so the alternative is a separate screen, not a reworded line.
-- "A program cannot write to you first" is deliberately not said anywhere (Sage, 20:42). Today a program can open a chat with anyone enrolled with it, so as a blanket promise it is false. If D-541 makes it true for everyone and a test says so, it is Will's to add.
+- **Who can write first.** The merge desk decided the rule for everyone (11 October, 20:43): a program can write to a member first only if the member is signed up with it, or has a visit planned there that is not cancelled; otherwise only the member can start, and the program replies in that conversation. Messaging a program makes a conversation, not a link (not in `messageable_people`, `people_activity`, `provider_linked_members` or `my_program_visits`; DB test 68). The sentence "A program can write to you only after you write to them, plan a visit there or sign up with them" is **not on any screen yet**, on purpose (Sage, 20:42): it is a new promise, so it is Will's to add, once D-541's own test says it is true for everyone. "A program can never write first" must not be used: it is false.
 - The site's Messages in Pam post (`MessagesInPam.tsx`) still says a member may message "a program you joined … Nobody else can start a chat with you". It becomes false the day D-541 ships and must change in that deploy (Wren).
 
