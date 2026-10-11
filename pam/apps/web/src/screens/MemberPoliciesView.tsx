@@ -255,8 +255,11 @@ export function MemberPoliciesScreen({
     <SubPage
       title={t('memberPolicies.title')}
       subtitle={service ? `${service.name} · ${placeName}` : placeName || undefined}
-      {...(trip && total > 0 && signed === total
-        ? { backIcon: 'close' as const, backHref: tripsHref(trip), backLabel: t('trips.confirm.close') }
+      // One way out, named for where it goes (Iris's member-flow pass, W5): opened from a
+      // booked trip, the arrow goes back to Trips and there is no second "Done" to Trips;
+      // opened from a place, the arrow goes back to the place.
+      {...(trip
+        ? { backHref: tripsHref(trip), backLabel: t('nav.back.trips') }
         : { backHref: `/place/?id=${encodeURIComponent(placeId)}`, backLabel: t('nav.back.place') })}
       actions={trip ? undefined : <DoneButton steps={1} placeId={placeId} />}
       // The one button rides the foot of the screen (D-326), on every
@@ -267,9 +270,7 @@ export function MemberPoliciesScreen({
             label={t(signed === 0 ? 'memberPolicies.start' : 'memberPolicies.continue')}
             href={policyHref(placeId, placeName, firstUnsigned.id, service?.id ?? null, trip)}
           />
-        ) : trip ? (
-          <BigButton label={t('memberPolicy.finish')} href={tripsHref(trip)} />
-        ) : (
+        ) : trip ? null : (
           // All signed: the way out is the screen's one button (D-279).
           <BigButton label={t('memberPolicy.finish')} onPress={() => leaveFlow(1, placeHref(placeId))} />
         )

@@ -37,6 +37,7 @@ const bookedFor = (n: number, name: string, days: number, hour: number) => ({
   forMemberId: `dummy-m${n}`,
   forName: name,
 });
+/** A lead with no program of their own yet (D-498): Home leads with Add your program, and has no calendar or people to show. */
 export const HomeGetStarted: Story = withSetup(screen('provider', 'Home — getting started', '/'), {});
 /** An example program as a lead would send it (D-381). */
 const SENT_PROGRAM = {
