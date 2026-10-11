@@ -1178,6 +1178,11 @@ drops signatures), then `20261010042108_a_program_lead_submits_their_own_program
 
 ---
 
+## Messages & notifications · example photos stay with the examples (11 October 2026)
+
+Branch `claude/messages-example-photos-gated` (D-537). A name-matched example photo is looked up only under `examplesOn()`; a real person
+who shares an example's name gets initials and no request to the photo host.
+
 ## Messages & notifications · Arabic direction in a conversation (11 October 2026)
 
 Branch `claude/messages-thread-direction` (D-533, Iris T1/T2). `dir="auto"` on the words people wrote and on names in a
