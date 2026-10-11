@@ -1,6 +1,6 @@
 import { CompareTable } from '../components/CompareTable';
-import { Body, Lead, P, ReadMore, Section } from '../components/Prose';
-import { PRIVACY_URL } from '../lib/links';
+import { LegalLink } from '../components/LegalLink';
+import { Body, Lead, P, Section } from '../components/Prose';
 
 /**
  * Support post: What others can see (everyone; a table). Built from what Pam promises
@@ -69,7 +69,7 @@ export function WhatOthersCanSee() {
 
       <Section title="If this ever changes">
         <P>If the list ever changes, Pam will tell you first.</P>
-        <ReadMore label="Read the full privacy policy" href={PRIVACY_URL} />
+        <LegalLink kind="privacy" label="Read the full privacy policy" variant="read-more" />
       </Section>
     </Body>
   );

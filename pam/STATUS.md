@@ -965,7 +965,7 @@ Vercel status after every push (`docs/team.md`). Emails link to app.joinpam.org:
 
 ## Merge desk & platform · the night of 11 October: four batches, one migration
 
-On `main` and live: D-498 (its migration `a_place_says_whether_a_program_lead_on_pam_runs_it` applied live), D-499, D-500, D-501, D-502, D-503 (Sage's voice guide), D-504 (Foundations match the code), Piper's pick-a-service line, Lena's D-498 review, and the Principles page in line with A24, A25 and A26. Each batch ran the full checks before its push; every push was confirmed READY on Vercel for `web` and `pam-site`. Sage joined (Voice & UX copy). Open with Will: "go on Ask Pam" for the help centre; a push word in Ava's session. Log: `docs/sessions/2026-10-11-0115-merge-desk-night.md`.
+On `main` and live: D-498 (its migration `a_place_says_whether_a_program_lead_on_pam_runs_it` applied live), D-499, D-500, D-501, D-502, D-503 (Sage's voice guide), D-504 (Foundations match the code), Piper's pick-a-service line, Lena's D-498 review, and the Principles page in line with A24, A25 and A26. Each batch ran the full checks before its push; every push was confirmed READY on Vercel for `web` and `pam-site`. Sage joined (Voice & UX copy). Open with Will: "go on Ask Pam" for the help centre; a push word in Ava's session; a56 (attendance). **A28 (Will, a54):** Pam has no phone line; help goes problem → help desk → email to hello@joinpam.org. In progress in six lanes; the number is still on `main` until Dot's and Wren's changes merge. **Launch cleanup (a55):** real accounts see no example data (Trips, Messages, Profile first). Log: `docs/sessions/2026-10-11-0115-merge-desk-night.md`.
 
 ## Merge desk & platform · a failed in-app load opens the screen; texts link to app.joinpam.org (10 October)
 
@@ -1412,6 +1412,14 @@ is sent; the four alert texts are signed by Will (D-461). A STOP shows as "Texts
 recorded once `sms-inbound` is deployed (D-460); nothing queues the check-in or "someone wants to
 connect" yet. Samples file: nine texts. D-453. Text reminders' staff list (merged 10 October) names
 only the alert texts Will signed: no "introduced to your program", no "your account changes".
+
+## Design system & Storybook · a wrong code is a small alert (11 October)
+
+Branch `claude/pam-design-wrong-code-alert` (D-510). `CompactNotice` in `@pam/ui` (one row, no button) beside `Notice`; a wrong or expired sign-in code keeps the code step, empties and refocuses the boxes, and shows "That code did not work. Try again." (`signin.code.wrong`; `signin.failed.verify.*` removed). "We could not send the code" still uses the full Notice until the A28 job.
+
+## Design system & Storybook · legal pages go Back to the website (11 October)
+
+Branch `claude/pam-design-legal-back-to-site` (D-508). The website's Privacy and Terms links carry `?from=site&return=<path>`; the app's pages show "Back to the website" and go to `https://joinpam.org` + the path, only if it is a plain path on the site (no `//`, no scheme; otherwise Back to Legal as before). Tabs and the other-document link keep it. New string `nav.back.website` (six drafts for Lena). Tests: `siteReturn.test.ts`, `apps/site/test/legal-links.test.ts`, `e2e/legal-site.spec.ts`.
 
 ## Design system & Storybook · badge caption 12px (11 October) — on `main`
 
