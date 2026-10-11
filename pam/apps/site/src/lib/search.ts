@@ -1,5 +1,5 @@
 import type { SupportPost } from '../content/posts';
-import { SEARCH_PHRASES, type SearchPhrase } from '../content/search-phrases';
+import { SEARCH_PHRASES, isAnswered, type SearchPhrase } from '../content/search-phrases';
 
 /**
  * Support search, done in the page: no server, no index to build. A person types
@@ -11,12 +11,13 @@ import { SEARCH_PHRASES, type SearchPhrase } from '../content/search-phrases';
  *    "happening" finds "happen".
  * 2. A post scores for each remaining word it contains, most for the title, then
  *    its keywords, then its summary. A known phrase (`content/search-phrases.ts`)
- *    that the query says, or is part of, scores far above that, so a phrase Sage
- *    mapped to a post puts that post first.
+ *    that the query says, or is part of, scores far above that: the phrase's
+ *    `answer` post goes first, its `also` posts follow.
  * 3. Posts are ranked by score; any post that scores at all is a result.
  *
- * A phrase mapped to `null` is a known gap: `gap` is set so the page can say, in
- * plain words, that there is no article for that yet.
+ * A phrase with no published post (`answer: null`, or a draft) is a known gap:
+ * `gap` is set so the page can say, in plain words, that there is no article for
+ * that yet.
  */
 const STOP = new Set(
   (
@@ -59,13 +60,11 @@ function hasStem(haystack: readonly string[], s: string): boolean {
 
 const PHRASE_STEMS = SEARCH_PHRASES.map((p) => ({ p, stems: contentStems(p.phrase) }));
 
-/** How strongly the query is the phrase: 1 when one contains the other, else the share of the phrase's words it says. */
+/** How much the query and the phrase say the same thing: the share of their words that are shared (1 = the same words). */
 function phraseOverlap(query: readonly string[], phrase: readonly string[]): number {
   if (!query.length || !phrase.length) return 0;
-  const inQuery = phrase.filter((s) => hasStem(query, s)).length;
-  const inPhrase = query.filter((s) => hasStem(phrase, s)).length;
-  if (inQuery === phrase.length || inPhrase === query.length) return 1;
-  return inQuery / phrase.length;
+  const shared = phrase.filter((s) => hasStem(query, s)).length;
+  return shared / (phrase.length + query.length - shared);
 }
 
 const PHRASE_MIN = 0.6;
@@ -85,17 +84,23 @@ export function search(
   if (!q.length) return { posts: [], gap: null };
 
   const phraseScore = new Map<string, number>();
+  const bump = (slug: string, v: number) => phraseScore.set(slug, Math.max(phraseScore.get(slug) ?? 0, v));
   let gap: SearchPhrase | null = null;
   let gapScore = 0;
+  let answeredScore = 0;
   for (const { p, stems } of phrases) {
     const overlap = phraseOverlap(q, stems);
     if (overlap < PHRASE_MIN) continue;
     const s = 100 * overlap;
-    if (p.post) phraseScore.set(p.post, Math.max(phraseScore.get(p.post) ?? 0, s));
-    else if (s > gapScore) {
+    if (isAnswered(p) && p.answer) {
+      bump(p.answer, s);
+      answeredScore = Math.max(answeredScore, s);
+    } else if (s > gapScore) {
       gap = p;
       gapScore = s;
     }
+    // related posts follow the best one (and follow a gap's "these may be close")
+    for (const slug of p.also ?? []) bump(slug, s * 0.6);
   }
 
   const scored = posts.map((post, order) => {
@@ -119,6 +124,6 @@ export function search(
     .map((x) => x.post);
 
   // a phrase that maps to a post wins over a gap that only partly matches
-  if (gap && phraseScore.size && Math.max(...phraseScore.values()) >= gapScore) gap = null;
+  if (gap && answeredScore >= gapScore) gap = null;
   return { posts: found, gap };
 }
