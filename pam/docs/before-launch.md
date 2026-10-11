@@ -11,6 +11,27 @@ STATUS row too.
 
 ## Open
 
+- [ ] **A28: finish taking Pam's number off every place a person reads it** (Lena, 11 October 2026, D-514, D-515).
+  The app, the privacy page and the terms are done and signed (card a59). What is still open, each with an owner:
+  1. **The live texts still carry the number.** `staff_request_denied` and `access_limited_notice` say
+     "Questions? Visit joinpam.org/support" in the repo (seven languages, signed 11 October 03:37 UTC) and
+     `supabase/functions/dispatch-sms/templates.json` is regenerated, but the **live `dispatch-sms` is still the old
+     function**, which fills `{supportPhone}`. Until Nico redeploys it, those two account texts (they go today) still give
+     the number. The redeploy waits on the carrier re-filing (see *File the updated text-message registration*): decide
+     which comes first. Nico also updates `docs/sms-campaign-samples.md` and Will pastes Sage's HELP auto-reply into
+     Twilio ("Get help at joinpam.org/support or write to hello@joinpam.org. Reply STOP to stop.").
+  2. **"Reply HELP to reach a person"** (`reminders.how`, `alerts.how`, the screens the carrier reviewed) now promises more
+     than the new HELP reply gives (an address). Sage to word it; it touches the registration.
+  3. **Ava's in-app copy and delete** (a fresh sign-in code to the account's phone). The day it ships,
+     `privacy.copy.body` and `privacy.delete.body` change from "Contact Pam and ask…" to the in-app steps, and
+     the Privacy › Copy / Delete pages lose their Contact Pam button (Lena carries the words).
+  4. **The help-request line on the privacy page** (what a request sends: what the person typed, how to answer them, the
+     page and the language, no records) is written the day Nico's form works, not before.
+  5. **"Talk to someone now"** opens `/support/` until Wren's "Your safety" post exists; then it opens the post.
+  6. **The public site** still says "call Pam" in `StillStuck.tsx`, `CaseManagerAssignments`, `JoiningAsStaff`,
+     `JoiningPam`, `MessagesInPam` (it quotes the blocked-notice text and the old link), `TextsFromPam` (three places, and
+     it lists the held saved-place text as sent today), `WhoIsMyGuide` and `search-phrases.ts` (Wren).
+
 - [ ] **Visit reminders go live: put back the lines the app stopped saying** (Lena, 10 October 2026, D-474).
   Will's rule (a12): a line says only what Pam does. Until `dispatch-sms` really sends the day-before visit
   reminder, ten lines in the app say what Pam does today. The day it does (check the *live* function and

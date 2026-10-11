@@ -977,6 +977,18 @@ without it the cached, unpatched Next shipped), a Vercel redirect for document r
 `app_settings.app_url`, migration `20261010190831_texts_link_to_app_joinpam_org` (data only), **applied live**
 10 October. Emails build their link from the Edge Function setting `APP_URL`, which Will set to app.joinpam.org the same evening.
 
+## Languages & legal · A28: no phone line in the Help screen, the privacy page or the terms (11 October)
+
+Branch `claude/lena-a28-help` (D-514, D-515), Will's words signed 03:37 UTC (card a59). Get help's first row is Contact Pam and opens the help desk on the
+website (`lib/helpDesk.ts`, `SITE_URL/support/`, new tab); What we can help with has "Still stuck?" and the same row; Your safety keeps Call 911, adds a one-tap
+"Call or text 988" row and "Talk to someone now" (opens `/support/` until Wren's "Your safety" post); Privacy › Copy and Delete end in Dot's Contact Pam.
+31 "call Pam" / privacy / terms lines are Sage's signed English in place, in seven languages (`notices.ts` follows, pinned to `en.json`); `onboarding.phone.callInstead`
+removed. The two live texts that carried the number (`staff_request_denied`, `access_limited_notice`) now point to joinpam.org/support, signed with Will's hour;
+the repo's dispatcher bundle is regenerated, **the live `dispatch-sms` is not** (Nico). The promise check found three lines untrue since D-481 (the saved-place text is
+held): `flag.done.body`, `reminders.today.member`, `profile.promo.reminders.body` now say what is true, with restore lines in `docs/before-launch.md`.
+**Open:** the live texts (above), "Reply HELP to reach a person" (Sage), Ava's in-app copy/delete (the two privacy lines change then), the help-request line on the
+privacy page (the day Nico's form works), the public site's "call Pam" (Wren) — all listed in `docs/before-launch.md` › *A28*.
+
 ## Languages & legal · 10 October in one place; from now on, one batch a week (Friday)
 
 Done and on `main` today (each has its own section below): the promise sweep (D-474), Spanish "visita" (D-480), the privacy page on email and signatures (D-482, D-490: Will's three sentences, live),
