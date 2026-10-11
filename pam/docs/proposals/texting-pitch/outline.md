@@ -76,8 +76,10 @@ Same frames 1–2. Then:
 
 > **Pam:** *[Will's answer, 120 characters at most]* Reply STOP to stop texts.
 
-with an **example** of Will's words, clearly marked as an example: *"Your new number is saved. Sign in at app.joinpam.org"*
-→ on the phone: `Pam: Your new number is saved. Sign in at app.joinpam.org Reply STOP to stop texts.`
+with an **example** of Will's words, clearly marked as an example, and one he could truly send today: *"We got your message and are looking into it."*
+→ on the phone: `Pam: We got your message and are looking into it. Reply STOP to stop texts.`
+
+**The finding to say plainly (Mira, 11 October):** the most likely request — a new phone — is one Will **cannot fix inside Pam today**. There is no page or tool that moves a member's account to a new number (no admin page, no function, nothing in the app changes `profiles.phone`; the help post for it is still an open gap in `docs/help-centre-gaps.md`). He could change it in the database console, outside Pam, and he would first have to find the account (the directory lists people by name; the form does not carry an account). So the text can **acknowledge or point**; it cannot **fix**. An earlier version of this outline used an example that promised a fix; that was wrong.
 
 Notes under it: the "Pam:" start and the STOP line are Pam's (signed on a61, pending Will's signature); the words in the middle
 are Will's, one at a time.
@@ -90,7 +92,7 @@ Two screens, as built, with example data (images in this folder):
   language, their role if the site knows it. Nothing from any member record: the function reads none. *(The "Reply by text"
   link is not in it yet.)*
 - **The "Answer by text" page** — `reply-light.png` / `reply-dark.png`. The number from the link, one box, a counter
-  ("52 of 120"), one button. Only a super admin sees it; anyone else meets the closed door.
+  ("44 of 120" for the example answer), one button. Only a super admin sees it; anyone else meets the closed door.
 
 Honest notes on what the page does not do yet (for the "gaps" slide at the end): it does not show Will the **whole** text as the
 phone will show it ("Pam: …" and the STOP line). It checks his words against the same rules as the sender and says why if it
@@ -193,14 +195,22 @@ Mark every one: **idea — not built — not decided.**
 
 ## 12. The ask
 
-Card a61's four questions, each with my recommendation. "Not now" is allowed for every one.
+Card a61's four questions (as worded on the card), each with my recommendation. "Not now" is allowed for every one.
 
-1. **Forward people's text replies to hello@?** *Recommend no.* Keep the promise in D-460. Instead, anyone who replies gets one
-   fixed answer ("Pam: This number can't read replies. Write to hello@joinpam.org."), once you sign it.
-2. **One answer only, never marketing, plus one sentence about the web form in the carrier filing?** *Recommend yes* — and add a
-   cap of one text per number per day in the code.
-3. **Keep the sender's checks, and show you the reason when it refuses?** *Recommend yes.* (It already does.)
-4. **Store nothing about the person — the number in the link, a log row without words?** *Recommend yes.* (Already built so.)
+1. **If they text back, does their reply come to your inbox?** (Today Pam promises it never reads or keeps what people text it.)
+   *Recommend no.* Keep the promise in D-460. Anyone who replies gets one fixed answer instead.
+2. **Agreeing to the text:** someone who types their number into the web form is asking for one answer, nothing more. That is a
+   new way in, so the carrier filing needs one more sentence. *Recommend yes* — and add a cap of one text per number per day in
+   the code.
+3. **Your replies are checked before they go:** 120 characters at most, no emoji, none of the words the text rules keep out. A reply
+   that breaks a rule is not sent, and the page says why. *Recommend yes.* (It already does.)
+4. **Sign the two texts as worded?** The first: "Pam: " + Will's answer, with " Reply STOP to stop texts." on a first text.
+   The second, the automatic answer to a reply: "Pam: This number can't read replies. Write to hello@joinpam.org."
+   *Recommend: sign the first. Change the second before signing it.* The catch (mine): it points to an email the person may not have.
+   A draft alternative, **not signed**: "Pam: This number can't read replies. For help, go to joinpam.org/support" (72 characters),
+   which a person with no email can use. Texts are Will's to sign.
+
+**Already settled (card a61), not a question:** store nothing about the person — the number in the link, a log row without words.
 
 Two more I would add, not on a61:
 
@@ -224,7 +234,7 @@ docs/sms-setup.md (cost lines, filing), docs/sms-campaign-samples.md (sample 10 
 ### What is built, what is not (for an appendix slide if Dot wants one)
 
 Built, off: the help-request function (deployed; answers "not live" until switched on), its limit (three requests an hour per
-person), the "Answer by text" page, the support-text sender with its checks, the list of numbers that asked to stop, the log, and
+person; the database table is applied, and the check waits on Will's paste, card a62), the "Answer by text" page, the support-text sender with its checks, the list of numbers that asked to stop, the log, and
 the two draft texts (unsigned). **Not built:** the receiver that hears a STOP reply (`sms-inbound`; not deployed, so Pam's own stop list is empty until it is); the mobile-number field on the form; the "Reply by text" link in the request email;
 the fixed answer to replies; forwarding replies (and not recommended); a cap per number; a daily request counter; a check that
 measures non-Latin answers.
