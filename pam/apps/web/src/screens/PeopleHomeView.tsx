@@ -67,7 +67,6 @@ export interface PeopleHomeViewProps {
   readonly actions?: ReactNode;
   readonly onRetry: () => void;
   readonly onPick: (person: HomePerson) => void;
-  readonly supportPhone?: string | null;
   /**
    * A message button on each row (D-227, Will, 2 October), in the star's
    * place — the star moved to the person's own page. Tapping anywhere else on
@@ -130,7 +129,6 @@ export function PeopleHomeView({
   actions,
   onRetry,
   onPick,
-  supportPhone,
   message,
   floating,
 }: PeopleHomeViewProps) {

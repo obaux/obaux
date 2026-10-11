@@ -31,7 +31,7 @@ export const Support: Story = { render: () => <WebsiteWalker start="/support/" /
 export const SupportSearch: Story = {
   render: () => <WebsiteWalker start="/support/" />,
   play: async ({ canvasElement }) => {
-    const box = await within(canvasElement).findByRole('textbox', { name: 'Search Support' });
+    const box = await within(canvasElement).findByRole('combobox', { name: 'Search Support' });
     await userEvent.type(box, 'reason');
     await expect(await within(canvasElement).findByText(/1 result for/)).toBeInTheDocument();
   },
@@ -44,9 +44,39 @@ export const SupportSearch: Story = {
 export const SupportSearchOwnWords: Story = {
   render: () => <WebsiteWalker start="/support/" />,
   play: async ({ canvasElement }) => {
-    const box = await within(canvasElement).findByRole('textbox', { name: 'Search Support' });
+    const box = await within(canvasElement).findByRole('combobox', { name: 'Search Support' });
     await userEvent.type(box, 'why did my text not come');
     await expect(await within(canvasElement).findByText(/results? for/)).toBeInTheDocument();
+  },
+};
+
+/** Suggestions as you type (D-507): after two letters, the likely questions drop down under the box, each with the article that answers it. */
+export const SupportSearchSuggestions: Story = {
+  render: () => <WebsiteWalker start="/support/" />,
+  play: async ({ canvasElement }) => {
+    const box = await within(canvasElement).findByRole('combobox', { name: 'Search Support' });
+    await userEvent.type(box, 'why didn');
+    await expect(await within(document.body).findByRole('option', { name: /Why didn’t I get a code\?/ })).toBeInTheDocument();
+  },
+};
+
+/** A typing mistake is read as the word meant: "invte" finds Sending an invite. */
+export const SupportSearchTypo: Story = {
+  render: () => <WebsiteWalker start="/support/" />,
+  play: async ({ canvasElement }) => {
+    const box = await within(canvasElement).findByRole('combobox', { name: 'Search Support' });
+    await userEvent.type(box, 'invte');
+    await expect(await within(canvasElement).findByText('Sending an invite')).toBeInTheDocument();
+  },
+};
+
+/** Nothing matched, but a known question shares a word: "Did you mean…" offers it. */
+export const SupportSearchDidYouMean: Story = {
+  render: () => <WebsiteWalker start="/support/" />,
+  play: async ({ canvasElement }) => {
+    const box = await within(canvasElement).findByRole('combobox', { name: 'Search Support' });
+    await userEvent.type(box, 'probation');
+    await expect(await within(canvasElement).findByText('Did you mean:')).toBeInTheDocument();
   },
 };
 
@@ -57,9 +87,9 @@ export const SupportSearchOwnWords: Story = {
 export const SupportSearchNothingFound: Story = {
   render: () => <WebsiteWalker start="/support/" />,
   play: async ({ canvasElement }) => {
-    const box = await within(canvasElement).findByRole('textbox', { name: 'Search Support' });
+    const box = await within(canvasElement).findByRole('combobox', { name: 'Search Support' });
     await userEvent.type(box, 'zzzz');
-    await expect(await within(canvasElement).findByText(/Nothing matched/)).toBeInTheDocument();
+    await expect(await within(canvasElement).findByText(/We do not have an article for that yet/)).toBeInTheDocument();
     await expect(await within(canvasElement).findByText('Still stuck?')).toBeInTheDocument();
     await expect(await within(canvasElement).findByText('Browse by topic')).toBeInTheDocument();
   },

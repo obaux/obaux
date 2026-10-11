@@ -963,9 +963,9 @@ app.joinpam.org). Checked live: `/programs/new/` carries its own title and `og:i
 vercel.app host `/signin/index.txt` answers 200 instead of redirecting (D-495). The merge desk now checks the
 Vercel status after every push (`docs/team.md`). Emails link to app.joinpam.org: Will changed `APP_URL`.
 
-## Merge desk & platform · the night of 11 October: four batches, one migration
+## Merge desk & platform · the night of 11 October: batches b1 to b12
 
-On `main` and live: D-498 (its migration `a_place_says_whether_a_program_lead_on_pam_runs_it` applied live), D-499, D-500, D-501, D-502, D-503 (Sage's voice guide), D-504 (Foundations match the code), Piper's pick-a-service line, Lena's D-498 review, and the Principles page in line with A24, A25 and A26. Each batch ran the full checks before its push; every push was confirmed READY on Vercel for `web` and `pam-site`. Sage joined (Voice & UX copy). Open with Will: "go on Ask Pam" for the help centre; a push word in Ava's session; a56 (attendance). **A28 (Will, a54):** Pam has no phone line; help goes problem → help desk → email to hello@joinpam.org. In progress in six lanes; the number is still on `main` until Dot's and Wren's changes merge. **Launch cleanup (a55):** real accounts see no example data: Trips done (D-509); Messages, places, Explore, Saved and Profile next. On `main` since: D-508 (legal Back to the website), D-510 (wrong code stays on the code step), D-509, D-513 (dark blue alert 10%), D-516 ("Saved" tip), D-511 (no example messages; no Messages tab with nobody to message). A29: Sage signs new sentences (`docs/signed-english.md`). Next on `main`: D-519 (alerts follow texts_live; two texts lose the number in the repo), one examples gate, D-521 (help-request forward, off; its migration 20261011041940 is not live yet, for Will to paste). A59 signed 03:37; D-512 (Contact Pam) and Lena's lines wait for Wren's A28 help desk. Log: `docs/sessions/2026-10-11-0115-merge-desk-night.md`.
+On `main` and live: D-498 (its migration `a_place_says_whether_a_program_lead_on_pam_runs_it` applied live), D-499, D-500, D-501, D-502, D-503 (Sage's voice guide), D-504 (Foundations match the code), Piper's pick-a-service line, Lena's D-498 review, and the Principles page in line with A24, A25 and A26. Each batch ran the full checks before its push; every push was confirmed READY on Vercel for `web` and `pam-site`. Sage joined (Voice & UX copy). Open with Will: "go on Ask Pam" for the help centre; a push word in Ava's session; a56 (attendance). **A28 (Will, a54):** Pam has no phone line; help goes problem → help desk → email to hello@joinpam.org. In progress in six lanes; the number is still on `main` until Dot's and Wren's changes merge. **Launch cleanup (a55):** real accounts see no example data: Trips done (D-509); Messages, places, Explore, Saved and Profile next. On `main` since: D-508 (legal Back to the website), D-510 (wrong code stays on the code step), D-509, D-513 (dark blue alert 10%), D-516 ("Saved" tip), D-511 (no example messages; no Messages tab with nobody to message). A29: Sage signs new sentences (`docs/signed-english.md`). Also on `main`: D-519 (alerts follow texts_live; the two account texts lose the number in the repo, live after Will refiles), one examples gate (`examples.ts`), D-521 (the help-request forward, deployed live as v1, off; its migration 20261011041940 is for Will to paste, card a62), and **A28 in batch b12**: D-512 (Contact Pam), D-514/D-515 (Lena, seven languages), D-522/D-517 (Wren's help desk: Still stuck? is email, the form behind the switch) and D-523 (a highlight on a script-moved focus only for text boxes). Next, b13: D-518/D-520 (Profile skeletons), D-524 (Answer by text, off; migration 20261011042645), D-525 (Add my program; migration 20261011044654). Held: D-526 attendance part A, until a Privacy line Will signs ships with it. Log: `docs/sessions/2026-10-11-0115-merge-desk-night.md`.
 
 ## Merge desk & platform · a failed in-app load opens the screen; texts link to app.joinpam.org (10 October)
 
@@ -976,6 +976,18 @@ without it the cached, unpatched Next shipped), a Vercel redirect for document r
 (tabs on older builds), and `e2e/failed-load.spec.ts` (fails before the fix, passes after). Texts link to https://app.joinpam.org:
 `app_settings.app_url`, migration `20261010190831_texts_link_to_app_joinpam_org` (data only), **applied live**
 10 October. Emails build their link from the Edge Function setting `APP_URL`, which Will set to app.joinpam.org the same evening.
+
+## Languages & legal · A28: no phone line in the Help screen, the privacy page or the terms (11 October)
+
+Branch `claude/lena-a28-help` (D-514, D-515), Will's words signed 03:37 UTC (card a59). Get help's first row is Contact Pam and opens the help desk on the
+website (`lib/helpDesk.ts`, `SITE_URL/support/`, new tab); What we can help with has "Still stuck?" and the same row; Your safety keeps Call 911, adds a one-tap
+"Call or text 988" row and "Talk to someone now" (opens `/support/` until Wren's "Your safety" post); Privacy › Copy and Delete end in Dot's Contact Pam.
+31 "call Pam" / privacy / terms lines, two labels and the wrong-code alert (Sage's A29 line) are signed English in place, in seven languages (`notices.ts` follows, pinned to `en.json`);
+`onboarding.phone.callInstead` removed. The two live texts that carried the number are Nico's D-519 for the English; my six translations go on top of it once it is on `main`
+(Mira, 04:19) — **the live `dispatch-sms` is still the old function** (Nico). The promise check found three lines untrue since D-481 (the saved-place text is
+held): `flag.done.body`, `reminders.today.member`, `profile.promo.reminders.body` now say what is true (Sage signed them), with restore lines in `docs/before-launch.md`.
+**Open:** the two texts' translations (above), "Reply HELP to reach a person" (Sage), Ava's in-app copy/delete (the two privacy lines change then), the help-request line on the
+privacy page (the day Nico's form works), the public site's "call Pam" (Wren) — all listed in `docs/before-launch.md` › *A28*.
 
 ## Languages & legal · 10 October in one place; from now on, one batch a week (Friday)
 
@@ -1431,6 +1443,11 @@ recorded once `sms-inbound` is deployed (D-460); nothing queues the check-in or 
 connect" yet. Samples file: nine texts. D-453. Text reminders' staff list (merged 10 October) names
 only the alert texts Will signed: no "introduced to your program", no "your account changes".
 
+
+## Design system & Storybook · Contact Pam replaces Call Pam (11 October)
+
+Branch `claude/pam-design-contact-pam` (D-512, A28). `Notice` offers Contact Pam (a link to Help); `useSupportPhone` and all `supportPhone` props are gone; the Help screen's first row opens the website's help desk; Privacy's data pages end in Contact Pam. `place.call` is untouched. About 33 English strings still say "call Pam": for Sage and Lena.
+
 ## Design system & Storybook · a wrong code is a small alert (11 October)
 
 Branch `claude/pam-design-wrong-code-alert` (D-510). `CompactNotice` in `@pam/ui` (one row, no button) beside `Notice`; a wrong or expired sign-in code keeps the code step, empties and refocuses the boxes, and shows "That code did not work. Try again." (`signin.code.wrong`; `signin.failed.verify.*` removed). "We could not send the code" still uses the full Notice until the A28 job.
@@ -1447,6 +1464,10 @@ Branch `claude/pam-design-real-accounts-no-examples` (D-520). `ProfileSummary is
 
 Branch `claude/pam-design-real-accounts-no-examples` (D-518). The code landed on `main` first via D-511 (`lib/examples.ts`, `examplesOn()`) and Piper's gate; what is left is `e2e/no-examples-profile.spec.ts`, holding Profile, Points and Connections to it.
 
+## Design system & Storybook · Contact Pam replaces Call Pam (11 October)
+
+Branch `claude/pam-design-contact-pam` (D-512, A28). `Notice` offers Contact Pam (a link to Help); `useSupportPhone` and all `supportPhone` props are gone; the Help screen's first row opens the website's help desk; Privacy's data pages end in Contact Pam. `place.call` is untouched. About 33 English strings still say "call Pam": for Sage and Lena.
+
 ## Design system & Storybook · a Saved tip when a place is saved (11 October)
 
 Branch `claude/pam-design-saved-tooltip` (D-516). `@pam/ui/ConfirmTip`: a small "Saved" by the bookmark for about two seconds, then a fade (none with reduce-motion), also announced politely. On the place bar and every place card; unsave says nothing. Uses the existing `places.saved`.
@@ -1454,6 +1475,11 @@ Branch `claude/pam-design-saved-tooltip` (D-516). `@pam/ui/ConfirmTip`: a small 
 ## Design system & Storybook · the blue alert in dark mode is 10% (11 October)
 
 Branch `claude/pam-design-dark-info-alert` (D-513). One token, `--astryx-theme-neutral-color-status-muted-accent`, dark `#88bcff3D` → `#88bcff1A`; words 8.4:1, icon 7.3:1 on it. Light mode unchanged. Story: Foundations › Dark blue alert.
+
+## Design system & Storybook · focus ring only on text boxes (11 October)
+
+Branch `claude/pam-design-focus-text-boxes` (D-523, replaces D-411's focus line). Script-focused `tabindex=-1` non-controls, dialogs and sheets show no ring in any input mode; text boxes keep their field highlight; buttons and links ring on Tab. `e2e/focus-text-boxes.spec.ts`.
+
 ## Design system & Storybook · badge caption 12px (11 October) — on `main`
 
 Merged from `claude/pam-design-badge-caption` (3472970). The "Your badge" caption on the Profile badge tile is 12px, not 11px, following A27 (nothing under
@@ -1615,6 +1641,12 @@ fine and the fit audit was over-counting (D-448).
 ## Seven languages, messages in your own language, and text that fits (9 October) — 0.50.1 and 0.51.0, merged 9 October (PR #29)
 
 ## Website · public site and help centre (10 October) — `apps/site`, on `main`
+
+**A28 on the help site (11 October, D-522; branch).** No phone on the site: "Still stuck?" says to write to hello@joinpam.org (Sage's signed words), at the end of every post and under an empty search; the form waits for Nico's switch (off). New posts `cant-sign-in` and `your-safety` (`/support/your-safety/`, the app's "Your safety" opens it). A site test fails on "call Pam" and on any `tel:` but 911 and 988. Section labels from Sage drive the menu. Iris's findings S1, S2, W1–W6 done (`scripts/usability.mjs`: focus rings, 48px targets, `?q=`, skip link, Esc, layout shift). The "Still stuck?" form is built to Nico's contract and shows only when `help-request` answers (off: the address). Held: the blocked-conversation picture (the app still says "Call Pam" there), Sage's line for the saved-place text.
+
+**On this page menu (11 October, D-517; branch).** Every help post has a scrollspy menu: a side column from 1180px, a bar at the top on a phone, built from the post's `Section` headings (`short` label optional; Sage writes them). `scripts/scrollspy.mjs` checks every link at 320, 390 and 1280px.
+
+**Three help posts (11 October; branch, signed by Will, card a51).** `start-here`, `talking-to-pam`, `your-language`, from Sage's drafts; the search puts them first for their phrases. 16 posts live. Waiting: "Is the place told about my visit?" (unsigned).
 
 **Carousel pause/play (11 October, D-501; on `main`).** Will approved "Pause" and "Play" and asked for it subtle, tucked in a corner: a 32px see-through disc in a 48px tap target, top start corner. Lena's six languages are in. `OnboardingSlides` has a pause/play button on Sign in, About Pam and the site hero; labels are required props.
 

@@ -36,9 +36,19 @@ describe('promises of a text or a reminder (D-474)', () => {
     expect(said, 'These lines promise a reminder Pam does not send yet. Say what Pam does today.').toEqual([]);
   });
 
+  it.runIf(!VISIT_REMINDERS_LIVE_IN_APP)('the flag thank-you does not promise that people who saved the place are told', () => {
+    // The only way a saver hears a place was removed is the saved-place text, held with the others
+    // (texts_live, D-481); no bell row is made for them. Put the sentence back with the texts.
+    expect(BUNDLES.en['flag.done.body']).not.toMatch(/\bis told\b|\bwill be told\b|\bwe will (tell|text)\b/i);
+  });
+
   it('the Text reminders screen still says what is and is not sent today', () => {
     // The honest line each of the two opt-in screens carries (D-453); the lists above it say "would".
-    expect(BUNDLES.en['reminders.today.member']).toMatch(/only one/i);
+    // Texts are held until Will says go (texts_live, D-481), so the saved-place note is not sent either (A28 check).
     expect(BUNDLES.en['reminders.today.staff']).toMatch(/does not send any/i);
+    if (!VISIT_REMINDERS_LIVE_IN_APP) {
+      expect(BUNDLES.en['reminders.today.member']).toMatch(/does not send any/i);
+      expect(BUNDLES.en['profile.promo.reminders.body']).not.toMatch(/\bwe can text you\b/i);
+    }
   });
 });

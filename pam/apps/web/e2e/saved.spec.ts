@@ -170,9 +170,9 @@ test.describe('keeping a place', () => {
     await page.goto('/saved/');
 
     await expect(page.getByRole('heading', { name: 'Nothing saved yet' })).toBeVisible();
-    // A way to places, and no Call Pam button: there is nothing here support can solve.
+    // A way to places, and no Contact Pam button: there is nothing here support can solve.
     await expect(page.getByRole('link', { name: 'Show all places' })).toHaveAttribute('href', '/');
-    await expect(page.getByRole('link', { name: /Call Pam/ })).toHaveCount(0);
+    await expect(page.getByRole('link', { name: /Contact Pam/ })).toHaveCount(0);
   });
 
   test('has no WCAG A/AA violations', async ({ page }) => {

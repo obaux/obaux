@@ -27,14 +27,12 @@ export function DemoThread({
   conversationId,
   role,
   speechLanguage,
-  supportPhone,
   backHref = '/messages/',
   backLabel,
 }: {
   readonly conversationId: string;
   readonly role: Role;
   readonly speechLanguage: string;
-  readonly supportPhone: string;
   /** Where Back goes — the program's page when opened from it (D-313). */
   readonly backHref?: string;
   readonly backLabel?: string;
@@ -124,7 +122,6 @@ export function DemoThread({
         sending={false}
         sendFailed={false}
         speechLanguage={speechLanguage}
-        supportPhone={supportPhone}
       />
     </>
   );

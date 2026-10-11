@@ -67,8 +67,6 @@ export interface ExploreViewProps {
   readonly renderPlace: (place: NearbyPlace, index: number) => ReactNode;
   readonly onRetry: () => void;
   readonly onClearSearch: () => void;
-  /** E.164 support line, for the error state's call button. */
-  readonly supportPhone?: string | null;
 }
 
 const ICON = { width: 22, height: 22, 'aria-hidden': true } as const;
@@ -129,7 +127,6 @@ export function ExploreView({
   renderPlace,
   onRetry,
   onClearSearch,
-  supportPhone,
 }: ExploreViewProps) {
   const { t } = useI18n();
   const searching = query.trim() !== '';

@@ -167,6 +167,29 @@ describe('the help request forward', () => {
     }
   });
 
+  it('strips control characters and the two Unicode line separators from what a person typed', async () => {
+    const w = world();
+    const ls = String.fromCharCode(0x2028);
+    const ps = String.fromCharCode(0x2029);
+    const bell = String.fromCharCode(7);
+    const res = await w.post({ ...GOOD, message: `Line one${ls}two${ps}three${bell}\nfour`, name: `A${ls}na` });
+    expect(res.status).toBe(200);
+    const mail = w.sent[0]!;
+    expect(mail.text).toContain('Line onetwothree\nfour');
+    expect(mail.text).toContain('Ana <ana@example.org>');
+    for (const bad of [ls, ps, bell]) expect(mail.text).not.toContain(bad);
+  });
+
+  it('keeps the two line-separator escapes out of the source, which the deploy tool cannot carry', () => {
+    const source = readFileSync(
+      fileURLToPath(new URL('../../../supabase/functions/help-request/handler.ts', import.meta.url)),
+      'utf8',
+    );
+    expect(source).not.toMatch(/\\u202[89]/);
+    expect(source).not.toContain(String.fromCharCode(0x2028));
+    expect(source).not.toContain(String.fromCharCode(0x2029));
+  });
+
   it('carries the same email sender as the invite function', () => {
     const read = (path: string) => readFileSync(fileURLToPath(new URL(path, import.meta.url)), 'utf8');
     const copy = read('../../../supabase/functions/help-request/provider.ts').split('\n').slice(2).join('\n');
