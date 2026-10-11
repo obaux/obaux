@@ -97,3 +97,17 @@ test('two trips whose labels would overprint are one pin, "2 trips"', async ({ p
   await settled(page);
   await expect(page.getByText('2 trips')).toBeVisible();
 });
+
+test('New trip offers the places a real account saved, never the example ones', async ({ page }) => {
+  await signedIn(page, []);
+  await page.route('**/rest/v1/rpc/saved_places_mine*', (route) =>
+    route.fulfill(
+      json([{ id: PLACE, name: 'Riverside Job Center', lookup_name: null, category: 'workforce', address: '1234 Market St', phone: null, place_id: null, lat: 39.95, lon: -75.16 }]),
+    ),
+  );
+  await page.goto('/trips/new/');
+  await settled(page);
+  await expect(page.getByText('Riverside Job Center')).toBeVisible();
+  await expect(page.getByText(/Example /)).toHaveCount(0);
+  await expect(page.getByText('View all places to visit')).toBeVisible();
+});
