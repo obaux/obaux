@@ -57,13 +57,14 @@ Swatches show the light-mode value; the dark-mode values are in the full list be
 
 ## Dark mode
 
-In dark, **the page, cards and `background-muted` are all `#1B1B1B`.** A card is told apart from the page by
-the theme's hairline (`--shadow-low` and up draw a 1px inset edge in dark only), not by a lighter fill, and
-that is on purpose. `--color-background-surface` is the one lifted ground (`#262626`).
-What does not hold in dark is the rule above: *"`background-muted` sets a choice apart from content"*.
-Where muted is used without a shadow, a guide tile, the card behind the next trip, the today row on a place,
-the avatar, it has no edge and disappears. Proposed, and with Will for his say because it is visible
-(D-504): dark `--color-background-muted` becomes `#262626`, the surface value, so the rule holds in both modes.
+In dark, **the page and cards are `#1B1B1B`, and `--color-background-muted` is `#262626`.** A card is told
+apart from the page by the theme's hairline (`--shadow-low` and up draw a 1px inset edge in dark only), not by a
+lighter fill, and that is on purpose. Muted is the grey ground of a thing set apart (a guide tile, the card behind
+the next trip, the round back and send buttons, the avatar), so it has to be a different colour from the page: it
+is the theme's lifted ground, the same value as `--color-background-surface`. It was `#1B1B1B` until 11 October
+(D-504, Will: "yes go for it"), and those things had no shape in dark; see *Foundations › Dark muted ground* for
+before and after. Text on `#262626`: primary 15.1:1, accent 10.7, status colours 9 or more (all AAA), secondary
+5.65 (AA, as it was at 6.43 on the page).
 
 ## Every colour token
 
