@@ -257,6 +257,26 @@ const PAGES = ['/', '/support/', '/support/cant-sign-in/', '/support/your-safety
   }
 }
 
+// Iris H1 (b15): on Home, "Pause pictures" is on the first screen on a phone, and looks like a control (an icon in a pill).
+{
+  for (const [width, height] of [[320, 568], [390, 844]]) {
+    const ctx = await browser.newContext({ viewport: { width, height }, hasTouch: true });
+    const page = await ctx.newPage();
+    await page.goto(base + '/', { waitUntil: 'networkidle' });
+    const pause = page.getByRole('button', { name: /pause pictures/i });
+    const box = await pause.boundingBox();
+    if (!box) fail(`home: no Pause pictures button at ${width}x${height}`);
+    else {
+      if (box.y + box.height > height || box.y < 0) fail(`home: Pause pictures is below the first screen at ${width}x${height} (y ${Math.round(box.y)}-${Math.round(box.y + box.height)})`);
+      if (box.height < 47.5) fail(`home: Pause pictures is ${Math.round(box.height)}px tall at ${width}`);
+      if (!(await pause.locator('svg').count())) fail('home: Pause pictures has no icon');
+      const bg = await pause.evaluate((el) => getComputedStyle(el).backgroundColor);
+      if (/rgba\(0, 0, 0, 0\)|transparent/.test(bg)) fail('home: Pause pictures has no fill, so it reads as plain text');
+    }
+    await ctx.close();
+  }
+}
+
 // W3: no page jumps as it loads (layout shift under 0.1 on a cold load), at phone and desktop width. The jump was the
 // font swapping in; scripts/preload-font.mjs starts its download with the page.
 {
