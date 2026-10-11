@@ -14,9 +14,27 @@ number"). Dot, Lena, Wren and Nico build from these. English only; Lena carries 
 "Contact Pam" opens the app's Help screen, which leads to the help desk. **It must work signed out** (sign-in errors and
 a paused account show it to someone who cannot get in): signed out, it can open the help desk on the website directly.
 
-**Keys (Mira, 03:17):** the Contact Pam button is Dot's new key **`help.contact.action` = "Contact Pam"**; the rows above
-show what it replaces. The Help screen rows in §2 will move to Lena's new keys when she sends the names; the words stay.
-Error and notice bodies (§4) keep their keys and are rewritten in place.
+**Keys (Mira and Lena, 03:17–03:19):** the Contact Pam button is Dot's new key **`help.contact.action` = "Contact Pam"**.
+The Help screen rows in §2 move to Lena's new keys (table below); the words are unchanged. Error and notice bodies (§4)
+and the privacy and terms lines keep their keys and are rewritten in place. **Lena applies all of it to en.json after Will
+signs**; nobody else edits en.json for these.
+
+| Old key in §2 | Lena's new key | Words |
+|---|---|---|
+| `help.menu.call` | `help.desk.label` | Contact Pam |
+| `help.call.body` | `help.desk.body` | Our help desk answers what people ask most, in plain words. Search it in your own words. |
+| `help.closed.heading` | `help.stuck.heading` | Still stuck? |
+| `help.closed.body` | `help.stuck.body` | Write to us from the help desk. A person at Pam reads every message. |
+| `help.safety.call.heading` | `help.safety.talk.heading` | Talk to someone now |
+| `help.safety.call.body` | `help.safety.talk.body` | In crisis? Call or text 988. Someone answers day and night. |
+
+Deleted when nothing uses them (Lena): `help.call.heading`, `help.call.action`, `help.call.body`, `help.menu.call`,
+`help.closed.*`, `help.safety.call.*`.
+
+**988 needs its own tap.** The safety row says "Call or text 988" but opens the safety post. A person in crisis should
+not have to read a post to reach 988, so I recommend a second row beside it: **"Call or text 988"**, opening the phone's
+dialler for 988. The first row keeps "Talk to someone now" and opens the safety post. Will's call; Lena builds one row
+until he says.
 
 ## 2. The app's Help screen, without "Call us"
 
