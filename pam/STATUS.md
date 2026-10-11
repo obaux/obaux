@@ -1396,6 +1396,13 @@ state with a (+)) instead of the "Proposed (a22)" cards; the generator gets `dra
 mouse stepped it on again (D-494, fixed; phones were not affected). Figma: Case manager, Program lead and
 Overview redrawn, one image replaced on Member; drawn from the branch, so redraw from `main` only after it merges.
 
+## Design system & Storybook · tokens reconciled with Foundations (11 October)
+
+Branch `claude/pam-design-tokens`. Foundations now says what the code does for card radius (24px; sheets 28px), spacing (4px steps,
+half-steps inside components) and colour (all 146 tokens, generated from the theme, with a test); a decision records who was right
+for each of Wren's five items (D-504). Needs Will: two visible changes: raise the theme's body size (14px to 16px, with 3 in 4
+text elements currently under 15px), and dark `background-muted` to `#262626`.
+
 ## Design system & Storybook · Sign in on a short phone, small targets (11 October) — on `main`
 
 Merged from `claude/pam-design-signin-short` (6de3cc2). Sign in's invite line is pinned and a compact mark bar appears under it once the
