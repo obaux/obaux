@@ -28,7 +28,7 @@ the link doesn't work.
 
 ## I want to be a case manager or add my program
 - Ask a case manager you work with, or the Pam team, for an invite link. (Contact Pam, below.)
-- The link comes to your phone, and to your email too. Open it on the phone it was sent to.
+- The person who invites you sends you the link, by text or another app. Pam also emails it to you. Open it on your phone: it only works with the phone number it was made for.
 - A link works once, for one person, and lasts 30 days. If it's too old, ask for a new one.
 - More: Joining Pam as a case manager or program lead.
 
@@ -62,4 +62,4 @@ the link doesn't work.
   form (card a54) to exist before this ships. Until then, the line points at the existing help.
 - **"Already have Pam on this number? Pam finds your invite":** from `invite.who.note` ("If they sign in to Pam with it,
   Pam finds the invite even without the link").
-- "The link comes to your email too" is true for staff invites (they ask for an email), not for residents' invites.
+- Checked with Mira (03:15): Pam does not text a case manager's invite (no admin invite template; with `texts_live` off only verify_code, staff_request_*, access_limited_notice, invite_member and invite_provider go out). The inviter sends the link with "Send the link" (Sending an invite), and staff invites are emailed (`invite-email.ts`). So the post says the inviter sends it and Pam emails it.
