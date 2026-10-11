@@ -39,6 +39,11 @@ import { useFitTitle } from './fitTitle.js';
 export interface SubPageHeaderProps {
   readonly title: string;
   /**
+   * The title is data — a place's or person's name — not Pam's words: it reads in the direction of its own
+   * text, in the bar and the large title both (D-534). Leave it off for Pam's own titles.
+   */
+  readonly isTitleData?: boolean;
+  /**
    * Where back goes. Leave out both this and `onBack` only on a step that
    * cannot be undone — the end of joining, once the account exists (D-251).
    */
@@ -183,6 +188,7 @@ const styles = stylex.create({
 
 export function SubPageHeader({
   title,
+  isTitleData = false,
   backHref,
   backLabel,
   subtitle,
@@ -199,6 +205,7 @@ export function SubPageHeader({
 }: SubPageHeaderProps) {
   const [collapsed, setCollapsed] = useState(false);
   const fit = useFitTitle<HTMLHeadingElement>(title);
+  const dataDir = isTitleData ? 'auto' : undefined;
 
   useEffect(() => {
     const onScroll = () => setCollapsed(window.scrollY > COLLAPSE_AT);
@@ -223,7 +230,7 @@ export function SubPageHeader({
       <HStack gap={2} align="center" wrap="nowrap" xstyle={styles.bar}>
         {back}
         <HStack align="center" wrap="nowrap" xstyle={styles.middle}>
-          <Text dir="auto" xstyle={[styles.barTitle, styles.barTitleFade, isBarTitleShown && styles.shown]} aria-hidden="true">
+          <Text dir={dataDir} xstyle={[styles.barTitle, styles.barTitleFade, isBarTitleShown && styles.shown]} aria-hidden="true">
             {title}
           </Text>
         </HStack>
@@ -257,7 +264,7 @@ export function SubPageHeader({
       >
         {back}
         <HStack align="center" wrap="nowrap" xstyle={styles.middle}>
-          <Text dir="auto" xstyle={[styles.barTitle, collapsed && styles.shown]} aria-hidden="true">
+          <Text dir={dataDir} xstyle={[styles.barTitle, collapsed && styles.shown]} aria-hidden="true">
             {title}
           </Text>
         </HStack>
@@ -271,13 +278,13 @@ export function SubPageHeader({
         {titleAddon ? (
           // Something beside the title — an info tip (D-376).
           <HStack gap={1} align="center" wrap="nowrap" xstyle={styles.titleRow}>
-            <Heading level={1} id={titleId} ref={fit.ref} xstyle={[styles.large, sizes.title(fit.size), fit.mustBreak && styles.largeBreaks]}>
+            <Heading level={1} dir={dataDir} id={titleId} ref={fit.ref} xstyle={[styles.large, sizes.title(fit.size), fit.mustBreak && styles.largeBreaks]}>
               {title}
             </Heading>
             {titleAddon}
           </HStack>
         ) : (
-          <Heading level={1} id={titleId} ref={fit.ref} xstyle={[styles.large, sizes.title(fit.size), fit.mustBreak && styles.largeBreaks]}>
+          <Heading level={1} dir={dataDir} id={titleId} ref={fit.ref} xstyle={[styles.large, sizes.title(fit.size), fit.mustBreak && styles.largeBreaks]}>
             {title}
           </Heading>
         )}
