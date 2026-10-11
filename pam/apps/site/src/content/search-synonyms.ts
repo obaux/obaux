@@ -15,22 +15,40 @@
  *   as the first word of the group.
  */
 export const SYNONYMS: readonly (readonly string[])[] = [
+  // Signing in
   ['text', 'sms', 'texto', 'txt'],
-  ['code', 'pin', 'codigo', 'passcode'],
-  ['guide', 'case manager', 'caseworker', 'case worker', 'counselor', 'social worker'],
-  ['place', 'program', 'service', 'location', 'agency', 'organization'],
-  ['sign in', 'log in', 'login', 'signin', 'sign on', 'log on', 'iniciar sesion'],
-  ['phone number', 'cell number', 'mobile number', 'telefono'],
+  ['code', 'pin', 'codigo', 'passcode', 'verification code', 'one time code', 'otp', 'password', 'pasword'],
+  ['sign in', 'log in', 'login', 'signin', 'sign on', 'log on', 'logon', 'iniciar sesion'],
+  ['join', 'sign up', 'signup', 'register', 'enroll', 'enrol', 'create account', 'new account'],
+  ['invite', 'invitation', 'invite link'],
+  ['expired', 'too old', 'no longer works', 'timed out'],
+  // People
+  ['guide', 'case manager', 'caseworker', 'case worker', 'cm', 'counselor', 'counsellor', 'social worker',
+    'advocate', 'navigator', 'po'],
+  ['real person', 'human', 'operator'],
+  // Places and visits
+  ['place', 'program', 'service', 'location', 'agency', 'organization', 'organisation', 'center', 'centre'],
+  ['visit', 'appointment', 'trip', 'cita', 'appt', 'appoinment', 'booking'],
+  ['closed', 'shut down', 'out of business'],
+  ['policy', 'rules', 'agreement', 'waiver', 'paperwork'],
+  ['points', 'rewards', 'score'],
+  // Phone and account
+  ['phone number', 'cell number', 'mobile number', 'telefono', 'new number'],
   ['phone', 'cell', 'mobile', 'cellphone'],
-  ['call', 'ring', 'llamar'],
-  ['help', 'support', 'assist', 'ayuda'],
-  ['visit', 'appointment', 'trip', 'cita'],
-  ['delete', 'remove', 'erase', 'close account'],
-  ['account', 'profile', 'cuenta'],
+  ['account', 'profile', 'cuenta', 'my details'],
+  ['delete', 'remove', 'erase', 'close account', 'deactivate', 'leave pam'],
+  ['paused', 'suspended', 'locked'],
+  ['limited', 'restricted', 'turned off'],
+  // Language
   ['language', 'idioma', 'translate', 'translation'],
   ['spanish', 'espanol'],
-  ['unsafe', 'scared', 'threat', 'threatening', 'harass', 'harassing'],
-  ['private', 'privacy', 'confidential'],
-  ['expired', 'too old', 'no longer works'],
-  ['broken', 'not working', 'doesnt work', 'wont work', 'stopped working'],
+  // Help and safety
+  ['call', 'ring', 'llamar'],
+  ['help', 'support', 'assist', 'ayuda', 'assistance'],
+  ['unsafe', 'scared', 'threat', 'threatening', 'harass', 'harassing', 'harassment', 'danger', 'bothering', 'creepy'],
+  ['block', 'mute'],
+  ['private', 'privacy', 'confidential', 'who can see', 'tracking'],
+  // Something is wrong
+  ['broken', 'not working', 'doesnt work', 'wont work', 'stopped working', 'error', 'glitch', 'bug', 'stuck', 'frozen',
+    'blank', 'wont load', 'crash'],
 ];
