@@ -52,16 +52,54 @@ const W = 390;
 const H = 844;
 const browser = await chromium.launch({ executablePath: process.env.PLAYWRIGHT_CHROMIUM_PATH ?? '/opt/pw-browsers/chromium' });
 
+/** The first thing on the page called `name`: a button, a link, or text. */
+async function find(page, name) {
+  for (const role of ['button', 'link']) {
+    const el = page.getByRole(role, { name, exact: false });
+    if (await el.count()) return el.first();
+  }
+  return page.getByText(name, { exact: false }).first();
+}
+
+/**
+ * One step of getting a screen into the state its title says (flows.mjs `actions`):
+ *   { wait: ms }                          pause
+ *   { press: 'Enter' }                    a key
+ *   { fill: label, value }                type into a field
+ *   { click: name }                       tap a button, link or text
+ *   { drag: name, dx?: 0, dy?: -400 }     press on it, move by dx/dy pixels, let go. For a drawer
+ *                                         or a sheet with a handle (Trips' "Show more of your trips")
+ *   { scroll: name | 'page', by: 600 }    scroll that thing, or the page, down by `by` pixels (up when negative);
+ *                                         the nearest scrolling parent of a named thing is the one moved
+ */
 async function act(page, step) {
   if (step.wait) return page.waitForTimeout(step.wait);
   if (step.press) return page.keyboard.press(step.press);
   if (step.fill) return page.getByLabel(step.fill, { exact: true }).first().fill(step.value);
-  if (step.click) {
-    for (const role of ['button', 'link']) {
-      const el = page.getByRole(role, { name: step.click, exact: false });
-      if (await el.count()) return el.first().click();
-    }
-    return page.getByText(step.click, { exact: false }).first().click();
+  if (step.click) return (await find(page, step.click)).click();
+  if (step.drag) {
+    const box = await (await find(page, step.drag)).boundingBox();
+    if (!box) throw new Error(`drag: "${step.drag}" is not on the screen`);
+    const x = box.x + box.width / 2;
+    const y = box.y + box.height / 2;
+    await page.mouse.move(x, y);
+    await page.mouse.down();
+    // In small moves, so a handle that follows the pointer (and settles on the nearest stop) sees a drag.
+    await page.mouse.move(x + (step.dx ?? 0), y + (step.dy ?? 0), { steps: 12 });
+    await page.mouse.up();
+    return;
+  }
+  if (step.scroll) {
+    if (step.scroll === 'page') return page.evaluate((by) => window.scrollBy(0, by), step.by ?? 600);
+    return (await find(page, step.scroll)).evaluate((el, by) => {
+      for (let node = el; node; node = node.parentElement) {
+        if (node.scrollHeight > node.clientHeight + 1 && /auto|scroll/.test(getComputedStyle(node).overflowY)) {
+          node.scrollBy(0, by);
+          return;
+        }
+      }
+      window.scrollBy(0, by);
+    }, step.by ?? 600);
   }
 }
 

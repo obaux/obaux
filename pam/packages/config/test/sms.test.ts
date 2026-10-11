@@ -576,3 +576,15 @@ describe('a text never reveals justice involvement, in any language it is writte
     expect(body.length).toBeLessThanOrEqual(SMS_MAX_LENGTH);
   });
 });
+
+describe('the text that approves a program lead (D-496)', () => {
+  // A lead with no program yet is sent to Add your program on the live app: the longest link this text carries.
+  const LINK = 'https://app.joinpam.org/programs/new/';
+
+  it.each(['en', 'es', 'pt-BR', 'zh-CN', 'zh-HK', 'ru', 'ar'] as const)('fits one message in %s with that link', (locale) => {
+    const body = renderSms({ key: 'staff_request_approved', locale, vars: { link: LINK }, allowUnreviewed: true });
+    const gsm = locale === 'en' || locale === 'es' || locale === 'pt-BR';
+    expect(body.length, `"${body}" is ${body.length} chars`).toBeLessThanOrEqual(gsm ? SMS_MAX_LENGTH : SMS_MAX_LENGTH_UCS2);
+    expect(body).toContain(LINK);
+  });
+});

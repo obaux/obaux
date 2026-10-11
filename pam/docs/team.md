@@ -185,6 +185,8 @@ message is the one not sent.
 - **The merge desk batches:** READY branches waiting together are merged together, with
   one run of checks and one wait for CI. The Control Room is brought up to date with each
   batch, and whenever Will has something to do, not after every teammate's note.
+- **No Vercel previews.** Branches don't deploy (10 October: they used half the daily
+  deploys). Show work in Storybook, which Chromatic builds for every push.
 - **Scheduled work is quiet when there is nothing to do:** the nightly map, the Friday
   batch and the Thursday test pass end without a message if nothing changed.
 
@@ -210,7 +212,21 @@ who and what:
 ```
 
 then a few short lines (the older `PAM · <Lane> → merge desk · …` first line still
-works). The kinds:
+works).
+
+**If `send_message` is not in your tools** (some sessions don't have it; Iris and Ava found
+this on 10 October, and Ava's question sat unseen for hours), send the same note as a
+one-time Routine: `create_trigger` with `persistent_session_id`
+`session_018wn7LF7RMsHnXSAzvk6s1p` and `run_once_at` a minute or two ahead. It arrives
+the same way. Never leave a question only in your own chat.
+
+**Waiting on Will's OK.** Before a step that will stop for Will's permission (sending an
+email or a text to a real person, anything outside Pam), say so first: in your note, or,
+for the merge desk, a card on the Control Room. A session stopped on a permission prompt
+can't tell anyone it is stuck. The Control Room also shows any session that is waiting on
+Will, with a button that opens it.
+
+The kinds:
 
 | Kind | Send it when | It carries |
 |---|---|---|
@@ -252,6 +268,12 @@ works). The kinds:
 - **Copies each READY's `Screens:` line into its merge commit**, for the nightly map.
 - **Runs the whole browser suite once per merge batch** before pushing, and messages a
   lane only when it has something to do.
+- **Checks the deploy, not just CI.** After a push to `main`, it confirms Vercel built it
+  (the "Vercel – web" and "Vercel – pam-site" statuses on the commit, or the deployment
+  list) and that the change is on app.joinpam.org. Vercel's plan allows about 100 deploys a
+  day. On 10 October the team used them up and two pushes never went live, while CI was
+  green. Branch previews are off for both projects since then, so only `main` deploys. A
+  refused deploy is redeployed from `main` once a slot frees.
 - **Answers within its next turn.**
 
 Its messages arrive in your chat as a turn that starts **"From the merge desk"**.

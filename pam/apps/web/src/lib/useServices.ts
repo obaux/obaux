@@ -137,10 +137,39 @@ export function useServices(): {
       const { createClient } = await import('./supabase');
       const supabase = createClient();
       const columns = serviceColumns(service);
-      const { error } = isSavedPlace(service.id)
-        ? await supabase.from('program_services').update({ ...columns, service_id: undefined }).eq('id', service.id)
-        : await supabase.from('program_services').insert({ ...columns, sort_order: (real[service.placeId] ?? NONE).length });
-      if (error) return false;
+      // The program's services as they stand, so the other services' policies are not clobbered below.
+      if (!(service.placeId in real)) await loadProgram(service.placeId);
+      const before = real[service.placeId] ?? NONE;
+      let serviceId = service.id;
+      if (isSavedPlace(service.id)) {
+        const { error } = await supabase.from('program_services').update({ ...columns, service_id: undefined }).eq('id', service.id);
+        if (error) return false;
+      } else {
+        const { data, error } = await supabase
+          .from('program_services')
+          .insert({ ...columns, sort_order: before.length })
+          .select('id')
+          .single();
+        if (error || !data) return false;
+        serviceId = (data as { id: string }).id;
+      }
+      // Which policies are only for this service (D-313 step 2): each one that was ticked or unticked is
+      // set again with the program's other services that name it, plus this one if it is ticked now.
+      const wasFor = before.find((s) => s.id === serviceId)?.policyIds ?? [];
+      for (const policyId of new Set([...wasFor, ...service.policyIds].filter(isSavedPlace))) {
+        const on = service.policyIds.includes(policyId);
+        if (on === wasFor.includes(policyId)) continue;
+        const others = before.filter((s) => s.id !== serviceId && s.policyIds.includes(policyId)).map((s) => s.id);
+        const { error } = await supabase.rpc('set_policy_services', {
+          p_policy_id: policyId,
+          p_service_ids: on ? [...others, serviceId] : others,
+        });
+        if (error) {
+          loading.delete(service.placeId);
+          await loadProgram(service.placeId);
+          return false;
+        }
+      }
       loading.delete(service.placeId);
       await loadProgram(service.placeId);
       return true;

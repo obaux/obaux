@@ -15,6 +15,11 @@ It is generated, never drawn by hand:
 | `apps/web/scripts/user-flows.mjs` | Photographs each story and lays each flow out → `apps/web/user-flows-out/<flow>.html` and `.layout.json` |
 | `apps/web/scripts/user-flows-figma.mjs` | Turns the layouts into Figma Plugin API scripts → `user-flows-out/figma/` |
 
+A screen that is only reached by doing something on it (a drawer dragged open, a list
+scrolled) says so in its `actions`: `{ click }`, `{ fill }`, `{ press }`, `{ wait }`, and, for
+moving things, `{ drag: name, dx?, dy? }` and `{ scroll: name | 'page', by }` (see the header of
+`flows.mjs`). "Trips with a past visit" uses `drag` on the Trips drawer's handle.
+
 **Updated once a day, at about 2am Eastern**, by the design lane's nightly run, from
 the day's merges to `main` (Will, 10 October 2026: "once a day only, at 2am. Otherwise
 we run too many tokens"). It replaces the old rule that every change updated the map in

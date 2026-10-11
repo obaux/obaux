@@ -19,7 +19,7 @@ import { SignaturePad, type SignaturePadHandle } from '@pam/ui/SignaturePad';
 import { SubPage } from '@pam/ui/SubPage';
 import type { DummyPolicy } from '@pam/config/dummy-policies';
 import { DUMMY_PLACES_BY_ID } from '@pam/config/dummy-places';
-import { policiesForService, servicesFor } from '@pam/config/dummy-services';
+import { policiesForService } from '@pam/config/dummy-services';
 import { useServices } from '@/lib/useServices';
 import { useI18n } from '@/lib/i18n';
 import { usePlacePolicies } from '@/lib/usePlacePolicies';
@@ -189,8 +189,9 @@ function useShownPolicies(placeId: string, serviceId: string | null) {
   // A real place asks for what its program keeps in the database, and nothing
   // when it has put none (D-485); an example place keeps the example set.
   const { policies, asks } = usePlacePolicies().forPlace(placeId);
-  const { services } = useServices();
-  const here = servicesFor(placeId, services);
+  // `forPlace` also reads a real program's services (and which policies are only for each), on demand.
+  const { forPlace } = useServices();
+  const here = forPlace(placeId);
   const service = serviceId ? (here.find((s) => s.id === serviceId) ?? null) : null;
   const shown: readonly DummyPolicy[] = !asks
     ? []
