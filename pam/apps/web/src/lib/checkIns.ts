@@ -35,72 +35,50 @@ function write(next: Readonly<Record<string, string>>): void {
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /** Asks the database to change a real visit; false when it said no or could not be reached. */
-async function ask(door: 'check_in_visit' | 'undo_check_in', appointmentId: string): Promise<boolean> {
+async function ask(
+  door: 'check_in_visit' | 'undo_check_in',
+  appointmentId: string,
+): Promise<{ readonly ok: boolean; readonly stillMarked: boolean }> {
   try {
     const { createClient } = await import('./supabase');
-    const { error } = await createClient().rpc(door, { p_appointment_id: appointmentId });
-    return !error;
+    const { data, error } = await createClient().rpc(door, { p_appointment_id: appointmentId });
+    const row = (Array.isArray(data) ? data[0] : data) as { status?: string } | undefined;
+    return { ok: !error, stillMarked: row?.status === 'attended' };
   } catch {
-    return false;
+    return { ok: false, stillMarked: false };
   }
 }
 
 /** Marks the visit as arrived, now. Resolves false when a real visit could not be saved. */
 export async function checkIn(appointmentId: string): Promise<boolean> {
-  if (UUID.test(appointmentId) && !(await ask('check_in_visit', appointmentId))) return false;
+  if (UUID.test(appointmentId) && !(await ask('check_in_visit', appointmentId)).ok) return false;
   write({ ...readCheckIns(), [appointmentId]: new Date().toISOString() });
   return true;
 }
 
 /** Takes it back — a mistaken tap, confirmed first. Resolves false when a real visit could not be saved. */
 export async function undoCheckIn(appointmentId: string): Promise<boolean> {
-  if (UUID.test(appointmentId) && !(await ask('undo_check_in', appointmentId))) return false;
+  if (UUID.test(appointmentId)) {
+    const answer = await ask('undo_check_in', appointmentId);
+    if (!answer.ok) return false;
+    // Still marked after the undo: the mark was not the program's to take back. The screen
+    // says nothing different for it (the database answers the same either way, D-535).
+    if (answer.stillMarked) return true;
+  }
   const next = { ...readCheckIns() };
   delete next[appointmentId];
   write(next);
   return true;
 }
 
-const MEMBER_KEY = 'pam.checkins.member';
-
-/** The visits the member marked themselves (D-535): shown as marked, with no undo for the lead. */
-export function readMemberMarks(): Readonly<Record<string, true>> {
-  try {
-    const raw = sessionStorage.getItem(MEMBER_KEY);
-    return raw ? (JSON.parse(raw) as Record<string, true>) : {};
-  } catch {
-    return {};
-  }
-}
-
 /** What the database says about real visits just read: checked in where it is, not where it is not. */
-export function seedCheckIns(visits: readonly { id: string; checkedInAt: string | null; markedByMember?: boolean }[]): void {
+export function seedCheckIns(visits: readonly { id: string; checkedInAt: string | null }[]): void {
   const next = { ...readCheckIns() };
-  const own = { ...readMemberMarks() };
   for (const v of visits) {
     if (v.checkedInAt) next[v.id] = v.checkedInAt;
     else delete next[v.id];
-    if (v.markedByMember && v.checkedInAt) own[v.id] = true;
-    else delete own[v.id];
-  }
-  try {
-    sessionStorage.setItem(MEMBER_KEY, JSON.stringify(own));
-  } catch {
-    // Not kept is survivable in a demo.
   }
   write(next);
-}
-
-/** The member's own marks, re-read whenever the check-ins change. */
-export function useMemberMarks(): Readonly<Record<string, true>> {
-  const [ids, setIds] = useState<Readonly<Record<string, true>>>({});
-  useEffect(() => {
-    const read = () => setIds(readMemberMarks());
-    read();
-    window.addEventListener(CHECKINS_CHANGED, read);
-    return () => window.removeEventListener(CHECKINS_CHANGED, read);
-  }, []);
-  return ids;
 }
 
 /** The check-ins, re-read whenever one changes. Empty until the browser has run. */

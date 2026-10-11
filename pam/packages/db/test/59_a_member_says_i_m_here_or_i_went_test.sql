@@ -166,14 +166,14 @@ select test.check('...the member''s own word stands: attended, self-reported',
 select test.check('...worth 60 again', (select coalesce(sum(delta), 0) from public.points_ledger where subject_id = 'aaaaaaaa-0000-0000-0000-000000005907'), 60::bigint);
 set role authenticated;
 select set_config('request.jwt.claim.sub', :'lead1', false);
-select test.check_raises_like('undo now has nothing of the lead''s to take back',
-  $f$select * from public.undo_check_in('aaaaaaaa-0000-0000-0000-000000005907')$f$, '%NOT_A_PROGRAM_MARK%');
+select test.check('undo now has nothing of the lead''s to take back: it changes nothing and raises nothing',
+  (select points from public.undo_check_in('aaaaaaaa-0000-0000-0000-000000005907')), 0);
 select test.check('marking again restores the 40 once',
   (select points from public.check_in_visit('aaaaaaaa-0000-0000-0000-000000005907')), 40);
 select test.check('a lead''s mark on a visit the phone already proved pays nothing more',
   (select points from public.check_in_visit('aaaaaaaa-0000-0000-0000-00000000590a')), 0);
-select test.check_raises_like('...and cannot undo the member''s own proof',
-  $f$select * from public.undo_check_in('aaaaaaaa-0000-0000-0000-00000000590a')$f$, '%NOT_A_PROGRAM_MARK%');
+select test.check('...and an undo of the member''s own proof changes nothing and raises nothing',
+  (select points from public.undo_check_in('aaaaaaaa-0000-0000-0000-00000000590a')), 0);
 reset role;
 select test.check('the lead''s mark on the proven visit changed nothing about how it was marked',
   (select count(*) from public.appointments where id = 'aaaaaaaa-0000-0000-0000-00000000590a' and attendance_method = 'geofence'), 1::bigint);

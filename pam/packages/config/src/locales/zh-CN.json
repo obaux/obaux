@@ -1002,7 +1002,6 @@
   "schedule.checkin.undo.body": "对方的预约会变回未签到。",
   "schedule.checkin.undo.keep": "保留",
   "schedule.checkin.undo.confirm": "撤销签到",
-  "schedule.checkin.byMember": "{name} marked this visit themselves",
   "home.book": "新建预约",
   "book.title": "为成员预约",
   "book.intro": "给您的项目发过消息的人。先选一位，再选日期和时间。",

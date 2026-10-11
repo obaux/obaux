@@ -104,20 +104,19 @@ test('a visit the database has as checked in shows filled, and undo asks first, 
   await expect(page.getByRole('button', { name: 'Check Tanya in' })).toBeVisible();
 });
 
-test('a visit the member marked themselves shows as marked, with no undo the lead cannot have', async ({ page }) => {
+test('a visit the member marked themselves looks like any marked visit: undo asks first, says nothing different, and the circle stays', async ({ page }) => {
   await signedInLead(page, [here(new Date().toISOString())]);
-  await page.route('**/rest/v1/rpc/my_program_own_marks*', (route) => route.fulfill(json([VISIT])));
-  let undone = 0;
-  await page.route('**/rest/v1/rpc/undo_check_in*', (route) => {
-    undone += 1;
-    return route.fulfill(json([]));
-  });
+  // The database answers an undo of the member's own mark with the visit still attended (D-535).
+  await page.route('**/rest/v1/rpc/undo_check_in*', (route) =>
+    route.fulfill(json([{ appointment_id: VISIT, status: 'attended', checked_in_at: new Date().toISOString(), points: 0 }])),
+  );
   await page.goto('/');
   await settled(page);
-  const circle = page.getByRole('button', { name: 'Tanya marked this visit themselves' });
-  await expect(circle).toBeVisible();
-  await expect(circle).toBeDisabled();
-  // The lead's own undo is not offered for it.
-  await expect(page.getByRole('button', { name: /Tanya is checked in. Undo/ })).toHaveCount(0);
-  expect(undone).toBe(0);
+  await page.getByRole('button', { name: /Tanya is checked in/ }).click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Undo check-in' }).click();
+  await expect(page.getByRole('dialog')).toHaveCount(0);
+  await expect(page.getByText('We could not save that')).toHaveCount(0);
+  await expect(page.getByRole('button', { name: /Tanya is checked in/ })).toBeVisible();
+  // Nothing on the screen says who marked it.
+  await expect(page.getByText(/themselves|marked it/i)).toHaveCount(0);
 });

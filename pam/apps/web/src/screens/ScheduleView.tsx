@@ -23,7 +23,7 @@ import { DashedRule } from '@pam/ui/DashedRule';
 import { LargeTitleHeader } from '@pam/ui/LargeTitleHeader';
 import { useI18n } from '@/lib/i18n';
 import { isVerified, usePolicies } from '@/lib/usePolicies';
-import { checkIn, undoCheckIn, useCheckIns, useMemberMarks } from '@/lib/checkIns';
+import { checkIn, undoCheckIn, useCheckIns } from '@/lib/checkIns';
 import { intlLocale } from '@pam/config';
 import { ConfirmDialog } from './ConfirmDialog';
 
@@ -318,15 +318,12 @@ function CheckInButton({
   id,
   name,
   isChecked,
-  byMember = false,
   t,
   tPlain,
 }: {
   id: string;
   name: string;
   isChecked: boolean;
-  /** The member marked it themselves (D-535): marked, but not by the program, and not the program's to undo. */
-  byMember?: boolean;
   t: (key: string, vars?: Record<string, string | number>) => string;
   /** For the button's accessible name, which a screen reader speaks: no isolates (D-435). */
   tPlain: (key: string, vars?: Record<string, string | number>) => string;
@@ -343,20 +340,6 @@ function CheckInButton({
     }, 1600);
     return () => clearTimeout(timer);
   }, [isTipOpen]);
-  if (byMember) {
-    return (
-      <HStack xstyle={styles.checkWrap}>
-        <IconButton
-          label={tPlain('schedule.checkin.byMember', { name })}
-          variant="ghost"
-          isDisabled
-          aria-pressed
-          icon={<CheckIcon width={24} height={24} aria-hidden />}
-          xstyle={[styles.check, styles.checkOn]}
-        />
-      </HStack>
-    );
-  }
   return (
     <HStack xstyle={styles.checkWrap}>
       <Tooltip content={failed ? t('join.failed.title') : t('schedule.checkedIn')} isOpen={isTipOpen} placement="above">
@@ -442,7 +425,6 @@ export function ScheduleView({
   const [isFolded, setFolded] = useState(isCollapsed);
   const [stripPage, setStripPage] = useState(0);
   const checkIns = useCheckIns();
-  const memberMarks = useMemberMarks();
   const { t, tPlain, locale } = useI18n();
   const [view, setView] = useState<View>(initialView);
   const [anchor, setAnchor] = useState(() => startOfDay(today));
@@ -534,7 +516,7 @@ export function ScheduleView({
         }
         endContent={
           canCheckIn ? (
-            <CheckInButton id={a.id} name={a.firstName} isChecked={isChecked} byMember={Boolean(memberMarks[a.id])} t={t} tPlain={tPlain} />
+            <CheckInButton id={a.id} name={a.firstName} isChecked={isChecked} t={t} tPlain={tPlain} />
           ) : (
             <Avatar size="md" name={a.firstName} tooltip={false} alt="" />
           )

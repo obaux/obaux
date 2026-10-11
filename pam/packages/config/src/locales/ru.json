@@ -1059,7 +1059,6 @@
   "schedule.checkin.undo.body": "Визит снова будет без отметки о приходе.",
   "schedule.checkin.undo.keep": "Оставить",
   "schedule.checkin.undo.confirm": "Отменить отметку",
-  "schedule.checkin.byMember": "{name} marked this visit themselves",
   "home.book": "Новая запись",
   "book.title": "Записать участника на визит",
   "book.intro": "Люди, которые писали в вашу программу. Выберите человека, затем день и время.",

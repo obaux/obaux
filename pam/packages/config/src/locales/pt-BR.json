@@ -1002,7 +1002,6 @@
   "schedule.checkin.undo.body": "A visita volta a ficar sem chegada registrada.",
   "schedule.checkin.undo.keep": "Manter",
   "schedule.checkin.undo.confirm": "Desfazer registro",
-  "schedule.checkin.byMember": "{name} marked this visit themselves",
   "home.book": "Criar nova reserva",
   "book.title": "Reservar uma visita para um membro",
   "book.intro": "Pessoas que escreveram para o seu programa. Escolha uma e depois o dia e o horário.",
