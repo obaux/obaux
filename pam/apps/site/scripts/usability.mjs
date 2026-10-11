@@ -156,6 +156,12 @@ const PAGES = ['/', '/support/', '/support/cant-sign-in/', '/support/your-safety
 {
   const run = async (probe, submit) => {
     const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } });
+    // The form only asks the function from the real site's origin, so the page is served as https://joinpam.org
+    await ctx.route('https://joinpam.org/**', async (route) => {
+      const u = new URL(route.request().url());
+      const r = await fetch(base + u.pathname + u.search);
+      await route.fulfill({ status: r.status, headers: { 'content-type': r.headers.get('content-type') ?? 'text/plain' }, body: Buffer.from(await r.arrayBuffer()) });
+    });
     const page = await ctx.newPage();
     const calls = [];
     await page.route('**/functions/v1/help-request', async (route) => {
@@ -164,10 +170,53 @@ const PAGES = ['/', '/support/', '/support/cant-sign-in/', '/support/your-safety
       const [status, json] = body === '{}' ? probe : submit;
       await route.fulfill({ status, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: JSON.stringify(json) });
     });
-    await page.goto(base + '/support/start-here/', { waitUntil: 'networkidle' });
-    await page.waitForTimeout(300);
+    await page.goto('https://joinpam.org/support/start-here/', { waitUntil: 'networkidle' });
+    await page.locator('#still-stuck').scrollIntoViewIfNeeded();
+    await page.waitForTimeout(500);
     return { page, ctx, calls };
   };
+  {
+    // From localhost (CI, previews) and before the box is near the screen: no call to the function at all
+    const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } });
+    const page = await ctx.newPage();
+    let n = 0;
+    await page.route('**/functions/v1/help-request', (route) => {
+      n += 1;
+      return route.fulfill({ status: 503, body: '{}' });
+    });
+    await page.goto(base + '/support/start-here/', { waitUntil: 'networkidle' });
+    await page.locator('#still-stuck').scrollIntoViewIfNeeded();
+    await page.waitForTimeout(500);
+    if (n) fail(`help form: asked the function ${n} time(s) from a non-joinpam origin`);
+    await ctx.close();
+  }
+  {
+    // On the real origin: not before "Still stuck?" is near, and once per visit
+    const ctx = await browser.newContext({ viewport: { width: 390, height: 844 } });
+    await ctx.route('https://joinpam.org/**', async (route) => {
+      const u = new URL(route.request().url());
+      const r = await fetch(base + u.pathname + u.search);
+      await route.fulfill({ status: r.status, headers: { 'content-type': r.headers.get('content-type') ?? 'text/plain' }, body: Buffer.from(await r.arrayBuffer()) });
+    });
+    const page = await ctx.newPage();
+    let n = 0;
+    await page.route('**/functions/v1/help-request', (route) => {
+      n += 1;
+      return route.fulfill({ status: 503, contentType: 'application/json', headers: { 'access-control-allow-origin': '*' }, body: '{"live":false}' });
+    });
+    await page.goto('https://joinpam.org/support/cant-sign-in/', { waitUntil: 'networkidle' });
+    await page.waitForTimeout(300);
+    const before = n;
+    await page.locator('#still-stuck').scrollIntoViewIfNeeded();
+    await page.waitForTimeout(500);
+    if (before !== 0) fail('help form: asked the function on page load, before Still stuck? was near');
+    if (n !== 1) fail(`help form: expected one call once Still stuck? was near, got ${n}`);
+    await page.goto('https://joinpam.org/support/start-here/', { waitUntil: 'networkidle' });
+    await page.locator('#still-stuck').scrollIntoViewIfNeeded();
+    await page.waitForTimeout(500);
+    if (n !== 1) fail(`help form: asked again on the next page in the same visit (${n} calls)`);
+    await ctx.close();
+  }
   {
     const { page, ctx } = await run([503, { live: false }], [503, { live: false }]);
     if (await page.getByRole('textbox', { name: /What’s wrong/ }).count()) fail('help form: shown while the function is off');
