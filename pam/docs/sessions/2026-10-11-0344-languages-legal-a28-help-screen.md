@@ -19,7 +19,7 @@ and **D-515** (the saved-place text lines).
 - **The two live texts that carried Pam's number** (`staff_request_denied`, `access_limited_notice`) say "Questions? Visit joinpam.org/support" in seven languages, signed
   with Will's date and hour; the dispatcher bundle in the repo is regenerated. The Russian one lost the word "Pam" (67 → 63 characters): a test wants four to spare in one 70-character segment.
 - **The promise check** (item 4 of the job) found three lines untrue since D-481: `flag.done.body`, `reminders.today.member`, `profile.promo.reminders.body`. Fixed in seven languages
-  (D-515), with restore lines in `docs/before-launch.md`. "Get your texts" in the terms is true today and stays.
+  (D-515), with restore lines in `docs/before-launch.md`; Sage signed all three under A29 at about 04:10 UTC (her ledger, `claude/sage-signs` @ 38496ece). "Get your texts" in the terms is true today and stays.
 - While in those files: pt-BR "O Pam" → "Pam" (three places), zh-HK "還未會" (Cantonese) → written Chinese, zh spaces round "Pam" removed, es `help.intro` usted → tú to match the rest of
   the member's Help screen, and Dot's `help.contact.action` aligned to the bundle (pt-BR "Entrar em contato com Pam", zh-CN "联系Pam", zh-HK "聯絡Pam").
 
@@ -54,6 +54,8 @@ On `4b9cf14` (`main` b979a49 plus Dot's D-512 branch plus this):
 **Not measured:** the privacy Copy and Delete pages with the final words are inside the "privacy" and "nested pages" stories only if those match; the two live texts were measured as strings (length, segment), not sent.
 
 ## Left undone
+
+- **Sage's one changed key, `signin.code.wrong`** (A29, 04:03 UTC): "That code did not work. Check it, or tap Send again." with each language's own `signin.code.again`. Queued for after Dot's Contact Pam batch is on `main` (Mira); not in this branch.
 
 Listed with owners in `docs/before-launch.md` › *A28*: the live `dispatch-sms` (Nico), "Reply HELP to reach a person" (Sage), Ava's in-app copy/delete (the two privacy lines change then), the help-request line on the
 privacy page (the day Nico's form works), the your-safety post address (Wren), the public site's "call Pam" in eight files (Wren). A native reader for the six languages.

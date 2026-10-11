@@ -24,6 +24,11 @@ for a flagged place goes to the super admins and the savers' case managers (`not
 `terms.s.your-account.p3` ("so you can still sign in and get your texts") is **true today** and stays: the sign-in code
 and the staff-request decision are the texts that need the number and do go.
 
+**Signed by:** Sage, under A29 (Will, 03:52 UTC: Sage signs new and changed English in the app; these lines take promises *away*, so they
+do not need him), 11 October 2026, about 04:10 UTC, in her ledger (`docs/signed-english.md` on `claude/sage-signs` @ 38496ece). She asked for
+her own suggestion for the Profile card to be dropped: "Coming soon: texts about your visits and the places you saved." fits the other
+"Coming soon:" lines better.
+
 **Kept from coming back.** `promises-of-texts.test.ts` fails if `flag.done.body` says the person is told, or if the
 Text reminders line or the Profile card promise the saved-place text, while no text is live. The day texts go on,
 `docs/before-launch.md` › *Visit reminders go live* lists the English to put back for each (with "and said yes to texts",
