@@ -1386,6 +1386,11 @@ state with a (+)) instead of the "Proposed (a22)" cards; the generator gets `dra
 mouse stepped it on again (D-494, fixed; phones were not affected). Figma: Case manager, Program lead and
 Overview redrawn, one image replaced on Member; drawn from the branch, so redraw from `main` only after it merges.
 
+## Design system & Storybook · Principles page in line with A24 and A26 (11 October)
+
+Branch `claude/pam-design-principles`. Foundations › Principles (and Writing) now say seven languages (A24) and help where
+people get stuck, not on every screen (A26). Docs only.
+
 ## Design system & Storybook · legal tabs follow the reader (10 October)
 
 Branch `claude/pam-design-legal-tabs`. Privacy and Terms: the highlighted tab is the section whose heading has reached the
