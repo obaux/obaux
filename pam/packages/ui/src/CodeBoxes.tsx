@@ -1,6 +1,6 @@
 'use client';
 
-import { useId, useRef, useState } from 'react';
+import { useEffect, useId, useRef, useState, type Ref } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { HStack } from '@astryxdesign/core/HStack';
 import { Text } from '@astryxdesign/core/Text';
@@ -30,6 +30,8 @@ export interface CodeBoxesProps {
   readonly onComplete?: (code: string) => void;
   readonly isDisabled?: boolean;
   readonly id?: string;
+  /** The real field, so a screen can put the cursor back in it (a wrong code, D-509). */
+  readonly inputRef?: Ref<HTMLInputElement>;
 }
 
 const styles = stylex.create({
@@ -87,6 +89,7 @@ export function CodeBoxes({
   onComplete,
   isDisabled = false,
   id,
+  inputRef,
 }: CodeBoxesProps) {
   const ownId = useId();
   const fieldId = id ?? ownId;
@@ -94,6 +97,12 @@ export function CodeBoxes({
   const completed = useRef<string | null>(null);
   const digits = value.replace(/\D/g, '').slice(0, length);
   const active = Math.min(digits.length, length - 1);
+
+  // A code that was cleared (a wrong one) can be typed again: `onComplete` fires
+  // once per complete code, and the same six digits must count as new.
+  useEffect(() => {
+    if (digits.length < length) completed.current = null;
+  }, [digits.length, length]);
 
   return (
     <VStack gap={2} xstyle={styles.frame}>
@@ -110,6 +119,7 @@ export function CodeBoxes({
         </HStack>
         <input
           id={fieldId}
+          ref={inputRef}
           name="code"
           type="text"
           inputMode="numeric"

@@ -115,3 +115,36 @@ for (const locale of ['en', 'es', 'ar'] as const) {
     });
   }
 }
+
+/**
+ * The small wrong-code alert sits between the boxes and "Sign in" (D-510). At 320×568 it must not push the button
+ * under the Privacy and Terms links or off the tap: the button stays whole and a raw click on its centre reaches it.
+ */
+for (const locale of ['en', 'es', 'ar'] as const) {
+  test(`320×568, ${locale}: with the wrong-code alert showing, the code step's button still taps cleanly`, async ({ page }) => {
+    await open(page, locale, false);
+    await page.route('**/auth/v1/verify*', (route) =>
+      route.fulfill({ status: 403, contentType: 'application/json', body: '{"code":403,"error_code":"otp_expired","msg":"expired"}' }),
+    );
+    await page.getByRole('button').filter({ hasText: LOCALES[locale]['signin.phone.action'] }).click();
+    const field = page.getByLabel(LOCALES[locale]['signin.code.label']);
+    await field.fill('123456');
+    await expect(page.getByRole('alert').filter({ hasText: LOCALES[locale]['signin.code.wrong'] })).toBeVisible();
+
+    const button = page.getByRole('button').filter({ hasText: LOCALES[locale]['signin.code.action'] });
+    await expect(button).toBeVisible();
+    const box = (await button.boundingBox())!;
+    expect(box.y).toBeGreaterThanOrEqual(0);
+    expect(box.y + box.height).toBeLessThanOrEqual(568);
+    const centre = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+    // Nothing is over it: what is on top of its centre is the button, so a tap reaches it.
+    const onTop = await page.evaluate(
+      ({ x, y }) => document.elementFromPoint(x, y)?.closest('button')?.textContent ?? '',
+      centre,
+    );
+    expect(onTop).toContain(LOCALES[locale]['signin.code.action']);
+    // The legal links come after it, as on the first step.
+    const privacy = await page.getByRole('link', { name: LOCALES[locale]['legal.privacy'] }).first().boundingBox();
+    expect(privacy!.y).toBeGreaterThanOrEqual(box.y + box.height - 1);
+  });
+}

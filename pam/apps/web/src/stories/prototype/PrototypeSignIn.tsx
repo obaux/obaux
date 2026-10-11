@@ -20,7 +20,9 @@ export function PrototypeSignIn() {
   const params = useSearchParams();
   const invite = readInvite(params);
   const intoJoin = params?.get('next') === 'join';
-  const stand = usePreviewSignIn();
+  // `?wrong=1`: the code step just after a code that did not work (D-510).
+  const wrong = params?.get('wrong') === '1';
+  const stand = usePreviewSignIn(wrong ? { step: 'code', phone: '(215) 555-0100', error: 'verify' } : undefined);
   const flow = {
     ...stand,
     verifyCode: async () => {
@@ -33,7 +35,7 @@ export function PrototypeSignIn() {
   };
   return (
     <SignInScreen
-      preview={{ flow, phone: '(215) 555-0100', code: '123456' }}
+      preview={{ flow, phone: '(215) 555-0100', code: wrong ? '' : '123456' }}
       invite={invite}
       audience={readAudience(params)}
     />
