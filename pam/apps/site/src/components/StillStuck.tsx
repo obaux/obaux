@@ -1,13 +1,23 @@
 import * as stylex from '@stylexjs/stylex';
-import { Card } from '@astryxdesign/core/Card';
 import { Heading } from '@astryxdesign/core/Heading';
 import { VStack } from '@astryxdesign/core/VStack';
-import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
+import { website } from '../lib/website.stylex';
+import { type } from '../lib/website-type.stylex';
 import { HelpRequest } from './HelpRequest';
 
 const styles = stylex.create({
-  // A light outline, so the gray card reads as a card on the gray page.
-  card: { borderWidth: '1px', borderStyle: 'solid', borderColor: colorVars['--color-border'] },
+  // The design's "Still stuck block": a soft grey card, radius 24, 32px inside, a hairline.
+  card: {
+    padding: '32px',
+    boxSizing: 'border-box',
+    borderRadius: '24px',
+    borderWidth: '1px',
+    borderStyle: 'solid',
+    borderColor: website['--website-border-subtle'],
+    backgroundColor: website['--website-surface-muted'],
+    color: website['--website-text-primary'],
+  },
+  title: { color: website['--website-text-primary'], margin: 0 },
   // The last stop in a post's "On this page" menu.
   anchor: { scrollMarginTop: 'var(--post-scroll-offset, 24px)' },
 });
@@ -20,12 +30,12 @@ const styles = stylex.create({
 export function StillStuck() {
   return (
     <VStack id="still-stuck" data-post-section="Still stuck?" tabIndex={-1} xstyle={styles.anchor}>
-      <Card padding={6} variant="muted" xstyle={styles.card}>
+      <VStack gap={3} xstyle={styles.card}>
         <VStack gap={3} maxWidth={720}>
-          <Heading level={2}>Still stuck?</Heading>
+          <Heading level={2} xstyle={[type.heading_title24, styles.title]}>Still stuck?</Heading>
           <HelpRequest />
         </VStack>
-      </Card>
+      </VStack>
     </VStack>
   );
 }
