@@ -56,8 +56,8 @@ the link doesn't work.
 ---
 
 **When "Add my program" ships (Piper), swap in:**
-- Table row: | **Someone who runs a program** | Anyone can add a program. Sign in, then tap "Add my program" [where Piper puts it]. Pam checks every program by hand before people can find it. |
-- Section "I want to add my program": "1. Sign in to Pam. 2. Tap "Add my program" [place]. 3. Tell us what it is, where it is and how people reach you. 4. Pam checks it by hand. Your Program tab shows where it is." (the last line is `join.program.review.note`'s own promise)
+- Table row: | **Someone who runs a program** | Anyone can add a program. Sign in, then open Profile and tap "Add my program". We check it by hand, then it goes live. |
+- Section "I want to add my program": "Open Profile, tap Add my program, and tell us the name and address. We check it by hand, then it goes live. While we check, it reads "Sent to Pam, being checked"." (Piper, 03:39: a row on Profile named "Add my program")
 
 **Check before it ships:**
 - **Will, 03:22: "anyone should be able to create a program".** This replaces D-369's invite-only rule for programs. Until
@@ -70,5 +70,5 @@ the link doesn't work.
   Pam finds the invite even without the link").
 - Checked with Mira (03:15): Pam does not text a case manager's invite (no admin invite template; with `texts_live` off only verify_code, staff_request_*, access_limited_notice, invite_member and invite_provider go out). The inviter sends the link with "Send the link" (Sending an invite), and staff invites are emailed (`invite-email.ts`). So the post says the inviter sends it and Pam emails it.
 
-- "We check it by hand, then add it" is true whichever way the team adds it today (by hand, or by approving a staff
-  request, D-491). Asked Piper to confirm (Mira, 03:29).
+- "We check it by hand, then add it" is confirmed by Piper (03:39): no screen lets a super admin add a program, but the
+  team adds one through an approved staff request (D-491) or directly. "Contact" means the help desk and email (A28).
