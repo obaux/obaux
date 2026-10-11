@@ -558,7 +558,7 @@
   "privacy.s.texts.p3": "您的手机公司可能会就短信向您收费。那是您和手机公司之间的事。",
   "privacy.s.texts.title": "短信",
   "privacy.s.translation.p1": "如果一条消息是用您看不懂的语言写的，Pam会用您的语言显示它。消息下方会标注“已翻译”，您可以点按查看对方写的原文。",
-  "privacy.s.translation.p2": "为此，Pam会把这条消息的文字发送给一家翻译公司。对方只会收到文字，不会收到您的姓名、手机号码，也不会知道您在和谁聊天。对方不会保留这些文字，也不会从中学习。",
+  "privacy.s.translation.p2": "为此，Pam会把这条消息的文字发送给Claude，这是Anthropic开发的一款AI。它只会收到文字，不会收到您的姓名、手机号码，也不会知道您在和谁聊天。Anthropic会在30天内删除这些文字，并且不会用它们来训练自己的AI。如果Anthropic的安全检查标记了某条消息，Anthropic最多可能保留该消息两年。法律要求时，Anthropic也可能保留消息。",
   "privacy.s.translation.p3": "Pam会保存译文，这样就不必再次请求翻译。只有这个聊天里的人能看到译文，消息被删除时译文也会一并删除。译文可能有误。如果这条消息很重要，请向对方确认。",
   "privacy.s.translation.title": "用您的语言查看消息",
   "privacy.s.what-we-keep.p1": "您的名字、手机号码，以及您选择的语言。",

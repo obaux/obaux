@@ -179,11 +179,12 @@ describe('messages read in the reader’s language (D-423)', () => {
     }
   });
 
-  it('tells people what is sent, what is not, and what is kept', () => {
+  it('tells people what is sent, what is not, and what is kept (a70, the supplier’s own terms)', () => {
     const text = TRANSLATION_KEYS.map((k) => en[k as keyof typeof en] as string).join(' ');
     expect(text).toMatch(/sends the words/i);
     expect(text).toMatch(/not get your name, your phone number/i);
-    expect(text).toMatch(/keeps nothing/i);
+    expect(text).toMatch(/deletes the words within 30 days/i);
+    expect(text).toMatch(/up to two years/i);
     expect(text).toMatch(/Only the people in that chat/i);
     expect(text).toMatch(/can be wrong/i);
   });
