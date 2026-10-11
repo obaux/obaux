@@ -234,7 +234,9 @@ These come from the build SOP and are enforced by tests, not convention:
   `docs/amendments/A26-…`; the hero template's exception is A19).
 - **One primary action per screen.** Two primary `BigButton`s means the screen
   is doing two things (a `variant="secondary"` one beside it is fine — D-239).
-- **48px minimum touch target, 56px primary buttons (secondary the same — D-239), 16px body text on mobile (A23).**
+- **48px minimum touch target, 56px primary buttons (secondary the same — D-239). Text: the page is 16px, components
+  say their own size by role (titles 28–34, buttons and rows 17–18, reading text 16, labels 14, captions 12–13), and
+  nothing is under 12px; the exceptions are in `docs/amendments/A27-…` (it replaces A23's "nothing under 15px").**
 - Every `security definer` function sets `search_path = public, extensions`.
 - Strings go through i18n from day one. Every language Pam offers (English,
   Spanish, Brazilian Portuguese, Simplified and Traditional Chinese, Russian,
