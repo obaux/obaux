@@ -928,6 +928,13 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
+## Voice & UX copy · marketing may reach, help stays true; help-post drafts (11 October)
+
+Will: the marketing pages may say what Pam is working towards; help posts, the app and anything legal say only what's
+true today (`docs/voice.md`). Help-post drafts are in `docs/help-drafts/` on one branch each: start-here, talking-to-pam
+and your-language are approved, and Wren builds them; is-the-place-told is waiting on Will. Open FINDINGs for Lena:
+attendance isn't recorded, though the transparency screen says it is, and `language.intro` promises texts.
+
 ## Voice & UX copy · the website's own words; first copy pass in Will's component (11 October)
 
 Will chose the website's words: Residents / people looking for help, Providers / social services, Case
