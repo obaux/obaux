@@ -2037,3 +2037,7 @@ Branch `claude/places-programs-lead-added-vs-gathered` (D-498). Migration `20261
 ## Places & programs · the pick-a-service line (11 October 2026) — READY, not merged
 
 Branch `claude/places-programs-pick-a-service-line` (Will's wording, 11 October). A place with services says "Pick a service above to plan a trip." under the greyed Plan a trip until one is picked (`place.schedule.pickService`). e2e `place-pick-a-service.spec.ts`.
+
+## Places & programs · Trips launch audit (11 October 2026) — READY, not merged
+
+Branch `claude/places-programs-trips-launch` (D-509). A real account sees only its own trips: the example trips, visits and policies are for Storybook, a demo and `pam.examples` only (`lib/exampleMode.ts`). The drawn map is never drawn over a real account's empty Trips; trips whose pins would overprint are one "2 trips" pin; empty drawer: "No trips yet / Plan a visit and it shows here." e2e `trips-real-account.spec.ts`.

@@ -6,7 +6,7 @@ import { Icon } from '@astryxdesign/core/Icon';
 import { VStack } from '@astryxdesign/core/VStack';
 import { StatusCard } from '@pam/ui/PolicyStatusCard';
 import { DUMMY_PLACES_BY_ID } from '@pam/config/dummy-places';
-import { DUMMY_TRIPS } from '@pam/config/dummy-trips';
+import { exampleTrips } from '@/lib/exampleMode';
 import { useI18n } from '@/lib/i18n';
 import { readAddedTrips, TRIPS_CHANGED, withMoves } from '@/lib/addedTrips';
 import { intlLocale } from '@pam/config';
@@ -55,7 +55,7 @@ export function ThreadVisit({
         return;
       }
       const now = Date.now();
-      const next = withMoves([...DUMMY_TRIPS, ...readAddedTrips()])
+      const next = withMoves([...exampleTrips(), ...readAddedTrips()])
         .filter((trip) => trip.placeId === place.id && new Date(trip.startsAt).getTime() >= now)
         .sort((a, b) => a.startsAt.localeCompare(b.startsAt))[0];
       setVisit(next ? { id: next.id, placeId: next.placeId, startsAt: next.startsAt } : null);
