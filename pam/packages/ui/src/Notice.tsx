@@ -1,3 +1,6 @@
+'use client';
+
+import { createContext, useContext, type ReactNode } from 'react';
 import * as stylex from '@stylexjs/stylex';
 import { EmptyState } from '@astryxdesign/core/EmptyState';
 import { Card } from '@astryxdesign/core/Card';
@@ -43,6 +46,17 @@ import { NOTICES, type NoticeKey } from '@pam/config';
  * in when they need it. From Help the person is led to the help desk first, and
  * only after that to an email.
  */
+/**
+ * Where "Contact Pam" goes when a `Notice` is not told. The app puts the right place here once: Help when
+ * somebody is signed in, and the help desk on the website when they are not, because a sign-in error or a
+ * paused account shows the button to somebody who cannot get in (A28, Sage's words §1).
+ */
+const ContactHrefContext = createContext('/help/');
+
+export function ContactHrefProvider({ href, children }: { readonly href: string; readonly children: ReactNode }) {
+  return <ContactHrefContext.Provider value={href}>{children}</ContactHrefContext.Provider>;
+}
+
 export interface NoticeProps {
   notice: NoticeKey;
   /** Localised title and body, resolved by the caller through i18n. */
@@ -53,7 +67,7 @@ export interface NoticeProps {
    * Omit it to leave the action out. It opens Help (A28), never a dialler.
    */
   contactLabel?: string;
-  /** Where the support action goes. Help, unless a screen has a better page. */
+  /** Where the support action goes. Help (or the help desk when signed out), unless a screen has a better page. */
   contactHref?: string;
   /**
    * An admin's own note to this person, from `access_controls.user_facing_note`.
@@ -118,13 +132,15 @@ export function Notice({
   title,
   body,
   contactLabel,
-  contactHref = '/help/',
+  contactHref: contactHrefProp,
   userFacingNote,
   retry,
   quiet = false,
 }: NoticeProps) {
   const definition = NOTICES[notice];
   const message = userFacingNote?.trim() || body;
+  const fromApp = useContext(ContactHrefContext);
+  const contactHref = contactHrefProp ?? fromApp;
   const offersContact = definition.offersSupport && Boolean(contactLabel);
 
   const actions = (

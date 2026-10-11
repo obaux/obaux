@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import axe from 'axe-core';
-import { Notice } from '../src/Notice.js';
+import { ContactHrefProvider, Notice } from '../src/Notice.js';
 import { NOTICES } from '@pam/config';
 
 async function expectNoViolations(container: HTMLElement): Promise<void> {
@@ -143,5 +143,27 @@ describe('Notice — degrading safely', () => {
     );
     // Nobody has redeemed an invite yet. Support cannot change that.
     expect(screen.queryByRole('link', { name: /Contact/ })).not.toBeInTheDocument();
+  });
+});
+
+describe('Notice — where Contact Pam goes (A28)', () => {
+  const n = NOTICES.account_suspended;
+
+  it('goes to the place the app says, so signed out it can be the help desk', () => {
+    render(
+      <ContactHrefProvider href="https://joinpam.org/support/">
+        <Notice notice="account_suspended" title={n.title} body={n.body} contactLabel="Contact Pam" />
+      </ContactHrefProvider>,
+    );
+    expect(screen.getByRole('link', { name: /Contact Pam/ })).toHaveAttribute('href', 'https://joinpam.org/support/');
+  });
+
+  it("a screen's own contactHref wins", () => {
+    render(
+      <ContactHrefProvider href="https://joinpam.org/support/">
+        <Notice notice="account_suspended" title={n.title} body={n.body} contactLabel="Contact Pam" contactHref="/somewhere/" />
+      </ContactHrefProvider>,
+    );
+    expect(screen.getByRole('link', { name: /Contact Pam/ })).toHaveAttribute('href', '/somewhere/');
   });
 });
