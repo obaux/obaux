@@ -75,7 +75,7 @@ something fails, say what happened, that it is not their fault, and what to do.
 
 | Do | Don't |
 |---|---|
-| "This is not your fault. Try again, or call Pam and we will help." (`notice.something_went_wrong.body`) | "An error occurred. Please try again later." |
+| "This is not your fault. Try again. If it keeps happening, contact Pam." (`notice.something_went_wrong.body`, A28) | "An error occurred. Please try again later." |
 | "Taking longer than usual. Nothing is wrong on your side." (`home.setup.review.body.late`) | "Your submission is pending." |
 | "Today Pam sends only one of these … The others are coming." (`reminders.today.member`) | Promising a reminder Pam doesn't send yet |
 | "Pam is not in {city} yet." (`join.waiting.body`) | "Your area is not supported." |
@@ -89,7 +89,7 @@ them who can see what.
 | Do | Don't |
 |---|---|
 | "For someone coming home" (`about.how.member`) | Any word that labels a person by their past (see the word list) |
-| "Tell us what happened. You don't have to explain everything." (`help.safety.call.body`) | "Describe the incident in detail." |
+| "Tell us what happened. You don't have to explain everything." (the Your safety post) | "Describe the incident in detail." |
 | "Pam never tells you why someone is looking for help." (`join.privacy.provider.4`) | — |
 | "Saved. You can change this whenever you want." (`reminders.saved`) | "Settings updated." |
 
@@ -111,7 +111,7 @@ person at the desk: chattier when you walk in, quieter when you're filling in a 
 | **Welcome and done** (joined, booked, first points) | Glad for them. | A warm word ("Welcome"), the person's name, what they now have. Still no exclamation-mark cheer. | "You are in" / "Welcome, {name}." (`join.done.*`) |
 | **Empty states** | Encouraging, practical. | What will appear here, and the one way to fill it. | "Tap Save on a place and it will be here, ready when you need the address." (`saved.empty.body`) |
 | **Tasks and forms** | Calm, brief. | A question as the title, one hint, nothing else. | "What's your program called?" (`join.program.step.name`) |
-| **Errors and waiting** | Calmest. Reassuring. | Not your fault, what happened, what to do, a person to call. No jokes, ever. | "We could not send the code" + "This is not your fault…" (`signin.failed.send.*`) |
+| **Errors and waiting** | Calmest. Reassuring. | Not your fault, what happened, what to do, how to reach a person (Contact Pam). No jokes, ever. | "We could not send the code" + "This is not your fault…" (`signin.failed.send.*`) |
 | **Privacy, terms, notices, the transparency screen** | Plainest of all. Exact. | Only what is true and only what is promised. No personality, no softening that changes meaning. Lena signs the meaning. | "Not their chats, photos or documents." (`join.privacy.admin.3`) |
 
 ### The website's headline lane: short, snappy, human
@@ -171,7 +171,7 @@ information that the transparency screen doesn't say, and nothing that sounds li
 ## 4. Patterns
 
 ### Buttons
-- **A verb, then the thing:** "Send me a code", "Save my city", "Call Pam", "Ask to join".
+- **A verb, then the thing:** "Send me a code", "Save my city", "Contact Pam", "Ask to join".
 - **Two to four words.** It must still fit at 40% longer (the pseudo-language).
 - **Say what the tap does, not what the person feels:** "Book this visit", not "Let's go!".
 - The button's words match the screen's title: a screen called "Block this person?"
@@ -189,7 +189,7 @@ Title says what isn't here yet; body says what will appear and how.
 
 ### Errors
 Three parts, in this order: **what happened** (title), **not your fault + what to do**
-(body), **a person** (Call Pam). Never "error", "invalid", "failed" as a bare word,
+(body), **a way to a person** (Contact Pam). Never "error", "invalid", "failed" as a bare word,
 never a code. Tell people how to fix input with an example:
 > "That does not look like a phone number. Try again with the area code, like 215 555 0100." (`signin.phone.invalid`)
 
@@ -203,8 +203,13 @@ If something will *not* happen, say so ("Nothing else is sent unless they join",
 
 ### Help
 - Lead with the person: "Someone at Pam can help you."
-- Give the hours and that it is free (`help.call.body`). Give the after-hours way (`help.closed.*`).
-- Safety first and plain: "In danger right now? Call 911 first." (`help.safety.danger.*`)
+- **Pam has no phone line (A28).** Help goes in one order: the problem → the help desk (search and posts) → "Still
+  stuck?", which lets a person write to Pam. Never tell someone to call Pam; "Contact Pam" opens the help desk.
+- Answers first, the write-in after: "Still stuck?" sits at the end of a post or under an empty search. The one
+  exception is safety, where writing to Pam comes straight away.
+- Safety first and plain: "Call 911 first." (`help.safety.danger.body`) and "In crisis? Call or text 988."
+  Pam is not an emergency service; say so.
+- A place's own number is fine: "Call this place", "call before you go".
 - Help goes where people get stuck (A26): sign-in and joining, forms, anything failed or waiting, each step of a task.
 
 ### Waiting
@@ -227,7 +232,7 @@ A spinner, not a sentence (A10). Don't write loading copy.
 | **join** | enroll, register, sign up for | "Ask to join". |
 | **sign in** | log in | One phrase, everywhere. |
 | **text** | SMS, message (for SMS) | "Pam texts you". "Message" is for chat in the app. |
-| **call Pam** | contact support | A person, a verb. |
+| **contact Pam** | call Pam, contact support | Pam has no phone line (A28). "Contact Pam" opens the help desk, then "Still stuck?" reaches a person. |
 | **Learning, Earning, and Family Support** | — | Pam's three kinds of help, capitalised as names. |
 
 ### The app and the website use different words
@@ -309,10 +314,10 @@ Before you send words to Will:
 - [ ] One idea per sentence; can any word go?
 - [ ] Does the title ask the question (task) or say the outcome (result)?
 - [ ] Does the button start with a verb and say what the tap does?
-- [ ] Does a confirmation say what happens next? Does an error say it's not their fault, what to do, and who to call?
+- [ ] Does a confirmation say what happens next? Does an error say it's not their fault, what to do, and how to reach a person (Contact Pam, never a phone)?
 - [ ] Is every claim true today? In help, the app and anything legal it must be. On marketing pages it may be what we are working towards.
 - [ ] No justice terms, no hints at someone's past, no system words, no buzzwords.
-- [ ] Our words. App: member, case manager / your guide, program lead, program, place, visit, join, sign in, text, call Pam. Website: residents, providers, case managers / guides.
+- [ ] Our words. App: member, case manager / your guide, program lead, program, place, visit, join, sign in, text, contact Pam. Website: residents, providers, case managers / guides.
 - [ ] No idioms, no pieced-together sentences, `{placeholders}` whole, no gender.
 - [ ] Right tone for the moment: on the website and in welcomes, the headline lane (short beats, "your", a turn at the end); plainest in errors and privacy.
 - [ ] Does anything sound like watching people? Write it as guiding them.
