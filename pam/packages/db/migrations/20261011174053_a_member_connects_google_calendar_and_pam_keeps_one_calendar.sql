@@ -318,8 +318,7 @@ begin
 end;
 $$;
 
-drop trigger if exists google_cleanup_on_erase on public.profiles;
-create trigger google_cleanup_on_erase before delete on public.profiles
+create or replace trigger google_cleanup_on_erase before delete on public.profiles
   for each row execute function public.google_cleanup_on_erase();
 
 create or replace function public.google_cleanups_due(p_limit integer)
