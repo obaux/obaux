@@ -25,16 +25,16 @@ signs**; nobody else edits en.json for these.
 | `help.call.body` | `help.desk.body` | Our help desk answers what people ask most, in plain words. Search it in your own words. |
 | `help.closed.heading` | `help.stuck.heading` | Still stuck? |
 | `help.closed.body` | `help.stuck.body` | Write to us from the help desk. A person at Pam reads every message. |
-| `help.safety.call.heading` | `help.safety.talk.heading` | Talk to someone now |
-| `help.safety.call.body` | `help.safety.talk.body` | In crisis? Call or text 988. Someone answers day and night. |
+| *(new)* | `help.safety.crisis.heading` | Call or text 988 *(opens the dialler, tel:988)* |
+| *(new)* | `help.safety.crisis.body` | Someone answers day and night. |
+| `help.safety.call.heading` | `help.safety.talk.heading` | Talk to someone now *(opens the Your safety post)* |
+| `help.safety.call.body` | `help.safety.talk.body` | Tell us what happened. You don't have to explain everything. |
 
 Deleted when nothing uses them (Lena): `help.call.heading`, `help.call.action`, `help.call.body`, `help.menu.call`,
 `help.closed.*`, `help.safety.call.*`.
 
-**988 needs its own tap.** The safety row says "Call or text 988" but opens the safety post. A person in crisis should
-not have to read a post to reach 988, so I recommend a second row beside it: **"Call or text 988"**, opening the phone's
-dialler for 988. The first row keeps "Talk to someone now" and opens the safety post. Will's call; Lena builds one row
-until he says.
+**988 has its own tap** (decided by Mira, 03:25): a row "Call or text 988" opens the dialler, next to "Call 911"; "Talk to
+someone now" opens the Your safety post. Lena laid the two rows out with words that already exist; they are right.
 
 ## 2. The app's Help screen, without "Call us"
 
