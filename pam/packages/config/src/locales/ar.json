@@ -539,7 +539,7 @@
   "place.shared": "تم النسخ. الصقه في رسالة.",
   "place.website": "موقعهم الإلكتروني",
   "places.all": "الكل",
-  "places.areaLabel": "الرمز البريدي (ZIP)",
+  "places.areaLabel": "الرمز البريدي (ZIP) أو الحي",
   "places.areaNone": "لا شيء يطابق ذلك. جرب الرمز البريدي (ZIP).",
   "places.areaPrivacy": "يتذكر Pam المنطقة التي تختارها على هذا الهاتف فقط.",
   "places.areaResults": "مناطق يمكنك اختيارها",
@@ -1554,7 +1554,7 @@
   "places.kind.neighborhood": "الحي",
   "places.kind.landmark": "معلم",
   "places.kind.address": "العنوان",
-  "places.areaHint": "مثل 19107.",
+  "places.areaHint": "مثل 19107، أو Fishtown.",
   "messages.visit.label": "زيارتك، {day} الساعة {time}. اعرض المكان.",
   "points.hero.toNext": "المتبقي للوصول إلى {next}: {count}",
   "points.hero.toNext.zero": "المتبقي للوصول إلى {next}: {count}",
@@ -1731,5 +1731,9 @@
   "supportReply.send": "إرسال رسالة نصية",
   "supportReply.sent": "في قائمة الانتظار. تُرسل خلال خمس دقائق.",
   "supportReply.noNumber": "لا يوجد رقم لإرسال رسالة نصية إليه.",
-  "supportReply.failed": "لم تُرسل. حاول مرة أخرى."
+  "supportReply.failed": "لم تُرسل. حاول مرة أخرى.",
+  "legal.sources.title": "مصادر البيانات",
+  "legal.sources.neighborhoods": "تأتي أسماء الأحياء في البحث عن المنطقة من مجموعة البيانات «Philadelphia Neighborhoods» التي أعدتها Abaca Labs. وقد عدل Pam هذه المجموعة ليحتفظ بنقطة واحدة لكل حي بدلا من حدودها.",
+  "legal.sources.link": "عرض البيانات المصدر",
+  "legal.sources.licence": "الترخيص: CC BY 4.0"
 }

@@ -504,7 +504,7 @@
   "place.shared": "已复制。请粘贴到消息里。",
   "place.website": "他们的网站",
   "places.all": "全部",
-  "places.areaLabel": "邮政编码",
+  "places.areaLabel": "邮政编码或街区",
   "places.areaNone": "没有找到匹配的内容。请试试邮政编码。",
   "places.areaPrivacy": "Pam仅在这部手机上记住您选择的区域。",
   "places.areaResults": "您可以选择的区域",
@@ -1429,7 +1429,7 @@
   "places.kind.neighborhood": "街区",
   "places.kind.landmark": "地标",
   "places.kind.address": "地址",
-  "places.areaHint": "例如：19107。",
+  "places.areaHint": "例如：19107，或 Fishtown。",
   "messages.visit.label": "您的预约，{day} {time}。查看地点。",
   "points.hero.toNext": "再得{count}分可升到{next}",
   "points.hero.top": "您已经到达阶梯的顶端。",
@@ -1591,5 +1591,9 @@
   "supportReply.send": "发送短信",
   "supportReply.sent": "已排队，五分钟内发出。",
   "supportReply.noNumber": "没有可发短信的号码。",
-  "supportReply.failed": "没有发出。请重试。"
+  "supportReply.failed": "没有发出。请重试。",
+  "legal.sources.title": "数据来源",
+  "legal.sources.neighborhoods": "区域搜索中的街区名称来自 Abaca Labs 制作的“Philadelphia Neighborhoods”。Pam对其做了修改：每个街区只保留一个点，而不是边界。",
+  "legal.sources.link": "查看原始数据",
+  "legal.sources.licence": "许可协议：CC BY 4.0"
 }
