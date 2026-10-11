@@ -6,14 +6,13 @@ import { settled } from './settled';
  * Choosing where the list is measured from.
  *
  * The RPCs are stubbed, as everywhere else — this container cannot reach
- * Supabase — but the city address lookup is stubbed too, and deliberately: it
- * proves the enhancement is optional. A member whose network cannot reach
- * Philadelphia's API still gets the ZIP list.
+ * Supabase. What a member types goes to Pam's `search_areas` and nowhere else:
+ * the browser no longer asks the City of Philadelphia's API about a street
+ * address (D-536), and a test below watches for any call to it.
  */
 
 const AREAS = '**/rest/v1/rpc/search_areas*';
 const PLACES = '**/rest/v1/rpc/services_near*';
-const CARTO = 'https://phl.carto.com/**';
 
 const ZIPS = [
   { id: 'a1', kind: 'zip', label: '19104', lat: 39.963788, lon: -75.202914 },
@@ -53,7 +52,7 @@ test.describe('choosing an area', () => {
     // Tapping the area itself opens the picker: a member should not have to
     // find the pencil to discover that this is theirs to set.
     await page.getByRole('button', { name: 'Near City Hall' }).click();
-    await expect(page.getByRole('textbox', { name: 'ZIP code or address' })).toBeVisible();
+    await expect(page.getByRole('textbox', { name: 'ZIP code' })).toBeVisible();
   });
 
   test('the pencil beside it does the same thing, and says so', async ({ page }) => {
@@ -63,7 +62,7 @@ test.describe('choosing an area', () => {
     await page.goto('/places/');
 
     await page.getByRole('button', { name: 'Change the area' }).click();
-    await expect(page.getByRole('textbox', { name: 'ZIP code or address' })).toBeVisible();
+    await expect(page.getByRole('textbox', { name: 'ZIP code' })).toBeVisible();
   });
 
   test('lives in the header, so the list starts at the top of the page', async ({ page }) => {
@@ -100,36 +99,26 @@ test.describe('choosing an area', () => {
     await expect(page.getByRole('button', { name: 'Near 19122' })).toBeVisible();
   });
 
-  test('a street address still resolves when the city API answers', async ({ page }) => {
+  test('typing a street address asks only Pam: nothing goes to the City of Philadelphia (D-536)', async ({ page }) => {
     await stub(page);
-    await page.route(CARTO, (route) =>
-      route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          rows: [
-            { location: '1231-39 N BROAD ST', zip_code: '19122', lat: 39.9729, lon: -75.1586 },
-          ],
-        }),
-      }),
-    );
+    const outside: string[] = [];
+    page.on('request', (request) => {
+      const url = request.url();
+      if (/carto\.com/.test(url)) outside.push(url);
+    });
+    const asked: unknown[] = [];
+    await page.route(AREAS, (route) => {
+      asked.push(route.request().postDataJSON());
+      return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(ZIPS) });
+    });
     await page.goto('/places/');
     await page.getByRole('button', { name: 'Change the area' }).click();
-    await page.getByRole('textbox', { name: 'ZIP code or address' }).fill('1231 N Broad');
+    await page.getByRole('textbox', { name: 'ZIP code' }).fill('1234 Market');
 
-    await expect(page.getByRole('button', { name: /1231-39 N Broad St, 19122/ })).toBeVisible();
-  });
-
-  test('the ZIP list still answers when the city API does not', async ({ page }) => {
-    await stub(page);
-    await page.route(CARTO, (route) => route.abort());
-    await page.goto('/places/');
-    await page.getByRole('button', { name: 'Change the area' }).click();
-    await page.getByRole('textbox', { name: 'ZIP code or address' }).fill('1231 N Broad');
-
-    // The address lookup failed and the screen says nothing about it, because
-    // there is nothing a member can do with that. The ZIPs are still there.
+    // The ZIP list answers, from Pam's own search, and the typed text went to it as a POST body.
     await expect(page.getByRole('button', { name: /^19104/ })).toBeVisible();
+    await expect.poll(() => asked.some((body) => (body as { p_query?: string }).p_query === '1234 Market')).toBe(true);
+    expect(outside).toEqual([]);
   });
 
   test('closing without Done leaves the area as it was (D-275)', async ({ page }) => {

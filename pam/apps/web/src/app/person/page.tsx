@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense } from 'react';
+import { Suspense, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import * as stylex from '@stylexjs/stylex';
 import { VStack } from '@astryxdesign/core/VStack';
@@ -12,6 +12,7 @@ import { Avatar } from '@astryxdesign/core/Avatar';
 import { BigButton, BookmarkIcon, ConnectionsIcon, Loading, MessagesIcon, Notice, Page, SignIcon, TripsIcon } from '@pam/ui';
 import { MenuList } from '@pam/ui/MenuList';
 import { signedBy, usePolicies } from '@/lib/usePolicies';
+import { rememberPersonName } from '@/lib/personNames';
 import { ProfileSummary } from '@pam/ui/ProfileCards';
 import { TripCard } from '@pam/ui/TripCard';
 import { useRouter } from 'next/navigation';
@@ -331,6 +332,7 @@ function PersonScreen() {
 
   return (
     <Page gap={4}>
+      <RememberPersonName id={person.id} name={person.firstName ?? ''} />
       {header(t('person.profile'))}
 
       {/*
@@ -415,7 +417,7 @@ function PersonScreen() {
                       total: policies.length,
                     }),
                     icon: <SignIcon width={26} height={26} />,
-                    href: `/person/policies/?${new URLSearchParams({ id: person.id, name: person.firstName ?? '' }).toString()}`,
+                    href: `/person/policies/?${new URLSearchParams({ id: person.id }).toString()}`,
                   },
                 ]
               : []),
@@ -515,6 +517,12 @@ function PersonScreen() {
 }
 
 /** `useSearchParams` needs a Suspense boundary in an exported app (see `/place/`). */
+/** Leaves the first name in this tab for the pages about this person (D-536), so it need not ride in an address. */
+function RememberPersonName({ id, name }: { readonly id: string; readonly name: string }) {
+  useEffect(() => rememberPersonName(id, name), [id, name]);
+  return null;
+}
+
 export default function PersonPage() {
   const { t } = useI18n();
   return (
