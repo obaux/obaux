@@ -187,6 +187,14 @@ test.describe('the help path does not depend on JavaScript', () => {
     expect(html).not.toMatch(/href="tel:/);
   });
 
+  test('Your safety dials 911 and 988 and nobody else', async ({ request }) => {
+    // 911 and 988 are the lines A28 keeps. Pam has no line of its own.
+    const html = await (await request.get('/help/safety/')).text();
+    expect(html).toMatch(/href="tel:911"/);
+    expect(html).toMatch(/href="tel:988"/);
+    expect(html).not.toMatch(/href="tel:(?!911"|988")/);
+  });
+
   test('the whole path works with JavaScript disabled', async ({ browser }) => {
     const context = await browser.newContext({ javaScriptEnabled: false });
     const page = await context.newPage();

@@ -5,7 +5,7 @@ import { Card } from '@astryxdesign/core/Card';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
-import { BigButton, FlagIcon, GlobeIcon, HelpIcon, ShieldIcon } from '@pam/ui';
+import { BigButton, FlagIcon, GlobeIcon, HelpIcon, PhoneIcon, ShieldIcon } from '@pam/ui';
 import { SubPage } from '@pam/ui/SubPage';
 import { MenuList } from '@pam/ui/MenuList';
 import { useI18n } from '@/lib/i18n';
@@ -92,10 +92,11 @@ export function HelpTopicsView() {
 /**
  * Your safety (D-223, Will, 2 October: "more space and hierarchy… less
  * reading"). One card first, for the one thing that cannot wait — in danger,
- * call 911, the page's only big button. Under it, the two other situations as
- * plain rows, each a short line and one tap: a message that feels unsafe
- * (to Messages, where ⋯ › Report is), and someone to talk to (the help desk). Then
- * one quiet sentence on what reporting shares.
+ * call 911, the page's only big button. Under it, the other ways as plain
+ * rows, each a short line and one tap: call or text 988 (the dialler), a
+ * message that feels unsafe (to Messages, where ⋯ › Report is), and someone to
+ * talk to (the help desk). Then one quiet sentence on what reporting shares.
+ * No row dials Pam: Pam has no phone line (A28).
  */
 export function HelpSafetyView() {
   const { t } = useI18n();
@@ -122,6 +123,15 @@ export function HelpSafetyView() {
         <MenuList
           label={t('help.safety.more')}
           items={[
+            // Someone in crisis should not have to read a post to reach 988 (Mira, 11 October): one tap opens
+            // the dialler. 988 is a national line, not Pam (A28 keeps it, as it keeps 911).
+            {
+              id: 'crisis',
+              label: t('help.safety.crisis.heading'),
+              description: t('help.safety.crisis.body'),
+              href: 'tel:988',
+              icon: <PhoneIcon {...ICON} />,
+            },
             {
               id: 'message',
               label: t('help.safety.message.heading'),
