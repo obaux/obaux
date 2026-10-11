@@ -14,7 +14,6 @@ import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
 import { BookIcon, Notice } from '@pam/ui';
-import { useSupportPhone } from '@/lib/useSupportPhone';
 import { MenuList } from '@pam/ui/MenuList';
 import { PolicyUploadCard } from '@pam/ui/PolicyUploadCard';
 import { SubPage } from '@pam/ui/SubPage';
@@ -79,7 +78,6 @@ export function PoliciesScreen() {
   // A file that was wrong, or a policy that could not be saved: said, with what was chosen kept in mind.
   const [problem, setProblem] = useState<AddPolicyResult>('ok');
   const [busy, setBusy] = useState(false);
-  const supportPhone = useSupportPhone();
   const addFiles = async (files: readonly File[]) => {
     setBusy(true);
     setProblem('ok');
@@ -133,8 +131,7 @@ export function PoliciesScreen() {
           notice="something_went_wrong"
           title={t('policies.upload.problem.title')}
           body={t(`policies.upload.problem.${problem}`)}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
       ) : null}
 
@@ -200,7 +197,6 @@ export function PoliciesScreen() {
 export function PolicyScreen({ id }: { readonly id: string | null }) {
   const { t, tPlain, locale } = useI18n();
   const { policies, replace } = usePolicies();
-  const supportPhone = useSupportPhone();
   const [tab, setTab] = useState<'preview' | 'signed'>('preview');
   const [problem, setProblem] = useState<AddPolicyResult>('ok');
   const [busy, setBusy] = useState(false);
@@ -257,8 +253,7 @@ export function PolicyScreen({ id }: { readonly id: string | null }) {
                   notice="something_went_wrong"
                   title={t('policies.upload.problem.title')}
                   body={t(`policies.upload.problem.${problem}`)}
-                  supportPhone={supportPhone}
-                  callLabel={t('help.callSupport')}
+                  contactLabel={t('help.contact.action')}
                 />
               ) : null}
             </VStack>

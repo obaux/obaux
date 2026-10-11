@@ -54,7 +54,7 @@ export function JoiningPam() {
         />
         <P>
           If the code does not work, ask for a new one. Wait for the “Send it again” timer to finish. If no text
-          comes, read about texts below, or call Pam.
+          comes, read about texts below, or contact Pam.
         </P>
         <ReadMore label="Texts from Pam: which ones, and why one didn’t come" href="/support/texts-from-pam/" />
       </Section>

@@ -16,7 +16,6 @@ import { DUMMY_EVERYONE } from '@pam/config/dummy-people';
 import { useI18n } from '@/lib/i18n';
 import { NotIn } from '../NotIn';
 import { PersonRow } from '../PersonRow';
-import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
 import { useDirectory, setDemoView } from '@/lib/useDirectory';
 import { useRoleView } from '@/lib/useViewedRole';
@@ -63,7 +62,6 @@ function whenLastActive(iso: string | null, locale: string): string | null {
 
 export default function DirectoryPage() {
   const { t, locale } = useI18n();
-  const supportPhone = useSupportPhone();
   const { state: session } = useSession();
 
   // See admin/page.tsx: the same preview a super admin picks on Home now
@@ -152,8 +150,7 @@ export default function DirectoryPage() {
           notice={key}
           title={t(NOTICES[key].titleKey)}
           body={t(NOTICES[key].bodyKey)}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
       </Page>
     );
@@ -181,8 +178,7 @@ export default function DirectoryPage() {
           notice="service_not_available"
           title={t('directory.notSuper.title')}
           body={t('directory.notSuper.body')}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
       </Page>
     );
@@ -248,8 +244,7 @@ export default function DirectoryPage() {
           notice="no_caseload_members"
           title={t('directory.empty.title')}
           body={t('directory.empty.body')}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
       ) : null}
 
@@ -258,8 +253,7 @@ export default function DirectoryPage() {
           notice={directory.offline ? 'offline' : 'something_went_wrong'}
           title={t(NOTICES[directory.offline ? 'offline' : 'something_went_wrong'].titleKey)}
           body={t(NOTICES[directory.offline ? 'offline' : 'something_went_wrong'].bodyKey)}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
       ) : null}
 
