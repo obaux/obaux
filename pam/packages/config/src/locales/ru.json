@@ -1673,8 +1673,8 @@
   "supportReply.sent": "В очереди. Уйдёт в течение пяти минут.",
   "supportReply.noNumber": "Нет номера для SMS.",
   "supportReply.failed": "Не отправлено. Попробуйте ещё раз.",
-  "legal.sources.title": "Data sources",
-  "legal.sources.neighborhoods": "The neighborhood names in the area search come from “Philadelphia Neighborhoods”, made by Abaca Labs. Pam changed it: it keeps one point for each neighborhood, not the boundaries.",
-  "legal.sources.link": "See the source data",
-  "legal.sources.licence": "Licence: CC BY 4.0"
+  "legal.sources.title": "Источники данных",
+  "legal.sources.neighborhoods": "Названия районов в выборе местоположения взяты из набора данных «Philadelphia Neighborhoods», созданного Abaca Labs. В Pam набор изменён: для каждого района хранится одна точка, а не границы.",
+  "legal.sources.link": "Посмотреть исходные данные",
+  "legal.sources.licence": "Лицензия: CC BY 4.0"
 }

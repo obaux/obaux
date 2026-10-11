@@ -1589,8 +1589,8 @@
   "supportReply.sent": "已排队，五分钟内发出。",
   "supportReply.noNumber": "没有可发短信的号码。",
   "supportReply.failed": "没有发出。请重试。",
-  "legal.sources.title": "Data sources",
-  "legal.sources.neighborhoods": "The neighborhood names in the area search come from “Philadelphia Neighborhoods”, made by Abaca Labs. Pam changed it: it keeps one point for each neighborhood, not the boundaries.",
-  "legal.sources.link": "See the source data",
-  "legal.sources.licence": "Licence: CC BY 4.0"
+  "legal.sources.title": "数据来源",
+  "legal.sources.neighborhoods": "区域搜索中的街区名称来自 Abaca Labs 制作的“Philadelphia Neighborhoods”。Pam对其做了修改：每个街区只保留一个点，不保留边界。",
+  "legal.sources.link": "查看原始数据",
+  "legal.sources.licence": "许可协议：CC BY 4.0"
 }
