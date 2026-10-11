@@ -280,6 +280,17 @@
   that changes a shared loading state or wizard says which shared specs it ran, and the merge desk's full run
   stays the gate.
 
+- **"A sign-in code is the proof" was wrong.** The D-524 plan, and the merge desk, said
+  claim_outbound_messages carries sign-in codes. It doesn't: the app calls supabase.auth.signInWithOtp, so
+  Supabase Auth sends the code, and outbound_messages has never held a verify_code row. The function carries
+  the account texts (staff request approved or denied, and the rest). A card asking Will to sign in as proof
+  was withdrawn a minute after it went up. 20261011042645 is live as 20261011093720. All six bodies match
+  the file by md5 of prosrc, args and result are unchanged, and a rolled-back dry run claimed 0.
+- **The site's help form probes the live function on every page load.** Between 09:30 and 09:40, main CI's
+  site checks for b13 (HeadlessChrome, Microsoft IPs) made about 410 refused OPTIONS calls to help-request.
+  Each is an Edge Function invocation on the free plan, and a real visitor costs two per page view. Wren
+  will probe only from joinpam.org, only near "Still stuck?", and once per visit.
+
 ## Decisions
 
 - Will's answer on a card goes to the teammate waiting on it the same turn. If that teammate needs Will's own
