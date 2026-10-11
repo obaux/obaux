@@ -2125,6 +2125,10 @@ Branch `claude/places-programs-no-examples-places` (D-509 extended). The example
 
 Branch `claude/places-programs-add-my-program` (D-525). A member taps Add my program on Profile, answers the lead's questions, and the request goes to Pam's team (`request_staff_access`); being checked / not approved + ask again / approved (gains the provider role next to the member side, D-491). Migration `20261011044654`: no second ask while waiting or approved; a denied one reopens. Test `55_asking_again_to_add_a_program_test.sql`; e2e `add-my-program.spec.ts`.
 
+## Design system · Arabic code boxes fill from the left (11 October 2026) — READY, not merged
+
+The sign-in code's six boxes were filling from the right in Arabic (typed 1234 showed 4321); they and the hidden field are now left to right in every language, like the phone number (D-530, from Iris's research). E2E in Arabic covers typing and paste. Log: `docs/sessions/2026-10-11-1010-arabic-sign-in-code-boxes.md`.
+
 ## Design system · website-only styles (11 October 2026) — READY, not merged
 
 The website has its own colours and type, apart from the app's (D-528). In Figma (Pam — Website): a `Website` variable collection (23 colours, Light and Dark) and 32 text styles `Website/<Group>/<Name>`, bound across all pages. In `apps/site`: `lib/website.stylex.ts`, `lib/website-type.stylex.ts` and a contrast test. `packages/ui` and the app are untouched. Light-mode limits: Text/Muted not on Gray/Green/Purple; Accent/Success for icons and strokes only. Log: `docs/sessions/2026-10-11-0933-website-styles-in-figma-and-site-tokens.md`.
