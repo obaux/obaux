@@ -1517,6 +1517,47 @@ test.describe('the conversation, drawn closer (D-400, D-401)', () => {
     });
   });
 
+  test.describe('example people\'s stock photos stay with the examples (Will, a55)', () => {
+    // A real case manager who happens to be called Teresa, with no program, matches an example person.
+    const withTeresa = async (page: import('@playwright/test').Page, hosts: string[]) => {
+      await withOneConversation(page);
+      await page.route(PARTNERS, (route) =>
+        route.fulfill(json([{ conversation_id: CONVO, profile_id: OTHER, first_name: 'Teresa', role: 'admin' }])),
+      );
+      await page.route('**/*', (route) => {
+        const url = route.request().url();
+        if (url.includes('images.unsplash.com')) {
+          hosts.push(url);
+          return route.fulfill({ status: 200, contentType: 'image/png', body: Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==', 'base64') });
+        }
+        return route.fallback();
+      });
+    };
+
+    test('a real account with an example-matching name gets no photo and no request to the photo host', async ({ page }) => {
+      const requests: string[] = [];
+      await signedInAs(page, 'member');
+      await withTeresa(page, requests);
+      for (const path of ['/messages/', `/messages/thread/?id=${CONVO}`]) {
+        await page.goto(path);
+        await settled(page);
+        await expect(page.getByText('Teresa').first()).toBeVisible();
+        await expect(page.locator('img[src*="unsplash"]')).toHaveCount(0);
+      }
+      expect(requests).toEqual([]);
+    });
+
+    test('a demo account still sees the example photo', async ({ page }) => {
+      const requests: string[] = [];
+      await signedInAs(page, 'member', () => 'active', true);
+      await withTeresa(page, requests);
+      await page.goto('/messages/');
+      await settled(page);
+      await expect(page.getByText('Teresa').first()).toBeVisible();
+      await expect.poll(() => requests.length).toBeGreaterThan(0);
+    });
+  });
+
   test('the send button hugs the box\'s rounder bottom corner; the mic sits nearer its own', async ({ page }) => {
     await signedInAs(page, 'admin');
     await withOneConversation(page);
