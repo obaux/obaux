@@ -37,7 +37,7 @@ const CORS = {
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
 
-const USER_AGENT = 'Mozilla/5.0 (compatible; PamLinkPreview/1.0; +https://web-ten-umber-88.vercel.app)';
+const USER_AGENT = 'Mozilla/5.0 (compatible; PamLinkPreview/1.0; +https://joinpam.org)';
 
 function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), { status, headers: { ...CORS, 'Content-Type': 'application/json' } });
