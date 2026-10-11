@@ -6,7 +6,6 @@ import { SubPageHeader } from '@pam/ui/SubPage';
 import { NOTICES, intlLocale } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { useSession } from '@/lib/useSession';
-import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useRoleView } from '@/lib/useViewedRole';
 import { isLate, useProgramsToCheck, type ProgramToCheck } from '@/lib/programsToCheck';
 import { NotIn } from '../app/NotIn';
@@ -25,7 +24,6 @@ const ICON = { width: 26, height: 26, 'aria-hidden': true } as const;
 
 export function ProgramsToCheckScreen() {
   const { t, locale } = useI18n();
-  const supportPhone = useSupportPhone();
   const { state: session } = useSession();
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
   const { viewedRole } = useRoleView(trueRole);
@@ -61,8 +59,7 @@ export function ProgramsToCheckScreen() {
           notice="service_not_available"
           title={t('directory.notSuper.title')}
           body={t('directory.notSuper.body')}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
       </Page>
     );
@@ -98,8 +95,7 @@ export function ProgramsToCheckScreen() {
           notice={state.offline ? 'offline' : 'something_went_wrong'}
           title={t(NOTICES[state.offline ? 'offline' : 'something_went_wrong'].titleKey)}
           body={t(NOTICES[state.offline ? 'offline' : 'something_went_wrong'].bodyKey)}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
       ) : null}
 
@@ -108,8 +104,7 @@ export function ProgramsToCheckScreen() {
           notice="no_caseload_members"
           title={t('review.empty.title')}
           body={t('review.empty.body')}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
       ) : null}
 

@@ -7,7 +7,6 @@ import { LargeTitleHeader } from '@pam/ui/LargeTitleHeader';
 import { NOTICES } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
 import { useSession } from '@/lib/useSession';
-import { useSupportPhone } from '@/lib/useSupportPhone';
 import { HeaderActions } from '@/screens/HeaderActions';
 import { NotIn } from './NotIn';
 
@@ -34,7 +33,6 @@ import { NotIn } from './NotIn';
 export function TabGate({ children }: { readonly children: ReactNode }) {
   const { t } = useI18n();
   const router = useRouter();
-  const supportPhone = useSupportPhone();
   const { state: session } = useSession();
 
   useEffect(() => {
@@ -72,8 +70,7 @@ export function TabGate({ children }: { readonly children: ReactNode }) {
           notice={key}
           title={t(NOTICES[key].titleKey)}
           body={t(NOTICES[key].bodyKey)}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
         <HelpBar label={t('nav.help')} variant="block" />
       </Page>

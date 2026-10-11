@@ -40,7 +40,12 @@ export interface Deps {
 }
 
 const EMAIL = /^[^\s@<>"'`,;()[\]\\]+@[^\s@<>"'`,;()[\]\\]+\.[^\s@<>"'`,;()[\]\\]{2,}$/;
-const CONTROL = /[\u0000-\u0008\u000b\u000c\u000e-\u001f\u007f\u2028\u2029]/g;
+// Control characters and the two Unicode line separators, built from character codes: written as escapes in a
+// regex literal, the deploy tool turns the last two into real line breaks and the source stops compiling.
+const CONTROL = new RegExp(
+  `[${Array.from({ length: 32 }, (_, code) => (code === 9 || code === 10 || code === 13 ? '' : String.fromCharCode(code))).join('')}${String.fromCharCode(127, 0x2028, 0x2029)}]`,
+  'g',
+);
 
 function cors(origin: string | null): Record<string, string> {
   const headers: Record<string, string> = { Vary: 'Origin' };

@@ -8,7 +8,6 @@ import { Text } from '@astryxdesign/core/Text';
 import { AppHeader, BigButton, HelpBar, Loading, Notice, Page, PageTitle } from '@pam/ui';
 import { NOTICES } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
-import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession, signOut } from '@/lib/useSession';
 import { ProfileScreen } from '../../screens/ProfileScreen';
 
@@ -62,7 +61,6 @@ const styles = stylex.create({
 export default function AccountPage() {
   const { t } = useI18n();
   const router = useRouter();
-  const supportPhone = useSupportPhone();
   const { state: session } = useSession();
   const [busy, setBusy] = useState(false);
 
@@ -106,8 +104,7 @@ export default function AccountPage() {
           notice={key}
           title={t(NOTICES[key].titleKey)}
           body={t(NOTICES[key].bodyKey)}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
         <HelpBar label={t('nav.help')} variant="block" />
       </Page>
@@ -132,8 +129,7 @@ export default function AccountPage() {
           notice="account_suspended"
           title={t(NOTICES.account_suspended.titleKey)}
           body={t(NOTICES.account_suspended.bodyKey)}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
       ) : null}
 

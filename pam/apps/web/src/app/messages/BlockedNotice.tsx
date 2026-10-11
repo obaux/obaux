@@ -14,10 +14,8 @@ import { useI18n } from '@/lib/i18n';
  */
 export function BlockedNotice({
   by,
-  supportPhone,
 }: {
   readonly by: 'mine' | 'theirs';
-  readonly supportPhone: string;
 }) {
   const { t } = useI18n();
   return (
@@ -25,8 +23,7 @@ export function BlockedNotice({
       notice="service_not_available"
       title={t(`messages.blocked.${by}.title`)}
       body={t(`messages.blocked.${by}.body`)}
-      supportPhone={supportPhone}
-      callLabel={t('help.callSupport')}
+      contactLabel={t('help.contact.action')}
       quiet
     />
   );

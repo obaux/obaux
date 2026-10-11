@@ -8,3 +8,9 @@
  * and it lets the home page's "Keep going" card say Pam texts a reminder before a visit.
  */
 export const VISIT_REMINDERS_LIVE = false;
+
+/**
+ * Whether Pam texts you when a place you saved has closed or moved. Held with the other texts until texts go live
+ * (D-481, `texts_live` off): the Texts from Pam post lists it as "not yet" until this is true (Lena's A28 list, 11 October).
+ */
+export const PLACE_TEXTS_LIVE = false;

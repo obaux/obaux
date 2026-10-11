@@ -368,15 +368,13 @@ export default function GalleryPage() {
             notice="offline"
             title="You are not connected"
             body="Pam needs the internet for this. Try again when you have signal."
-            supportPhone="+12673095265"
-            callLabel="Call Pam for help"
+            contactLabel="Contact Pam"
           />
           <Notice
             notice="something_went_wrong"
             title="Something went wrong"
-            body="This is not your fault. Try again, or call Pam and we will help."
-            supportPhone="+12673095265"
-            callLabel="Call Pam for help"
+            body="This is not your fault. Try again, or contact Pam and we will help."
+            contactLabel="Contact Pam"
           />
         </VStack>
       </Section>

@@ -9,7 +9,6 @@ import { markSetupDone, readSentProgram, saveSentProgram } from '@/lib/programSe
 import { askToAddProgram } from '@/lib/useProgramRequest';
 import { asksForOwnProgram, resendOwnProgram, submitOwnProgram, useOwnProgram } from '@/lib/useOwnProgram';
 import { useSession } from '@/lib/useSession';
-import { useSupportPhone } from '@/lib/useSupportPhone';
 import { Notice } from '@pam/ui';
 import type { ProgramDetails } from '@/lib/useJoin';
 import { PROGRAM_STEPS, useProgramWizard } from '../app/join/ProgramWizard';
@@ -79,7 +78,6 @@ export function AddProgramView({
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState(false);
   const { state: session } = useSession();
-  const supportPhone = useSupportPhone();
   // A signed-in program lead, not a demo account: their send is saved for real.
   const isReal = mode === 'lead' && asksForOwnProgram(session) !== null;
   // Editing after Pam asked for changes sends the same submission again; it is
@@ -167,8 +165,7 @@ export function AddProgramView({
             notice="something_went_wrong"
             title={t('join.failed.title')}
             body={t('join.failed.body')}
-            supportPhone={supportPhone}
-            callLabel={t('help.callSupport')}
+            contactLabel={t('help.contact.action')}
           />
         ) : null}
         {wizard.body}

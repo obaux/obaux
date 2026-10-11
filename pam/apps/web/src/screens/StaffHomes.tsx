@@ -23,7 +23,6 @@ import { ScheduleView, type Appointment } from './ScheduleView';
 import { readAddedTrips, TRIPS_CHANGED, withMoves, type AddedTrip } from '@/lib/addedTrips';
 import { AddMenu } from './AddMenu';
 import { useI18n } from '@/lib/i18n';
-import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
 import { useCaseload } from '@/lib/useCaseload';
 import { dummyChip, statusChip } from '@/lib/caseloadLabels';
@@ -35,7 +34,6 @@ import { PeopleHomeView, type HomePerson, type PeopleState } from './PeopleHomeV
 export function CaseloadHome() {
   const { t, tPlain } = useI18n();
   const router = useRouter();
-  const supportPhone = useSupportPhone();
   const { state: caseload, refresh } = useCaseload(true);
   const examplePeople = useExamplePeople();
 
@@ -120,14 +118,12 @@ export function CaseloadHome() {
       floating={<InviteFloating />}
       onRetry={refresh}
       onPick={(person) => person.href && router.push(person.href)}
-      supportPhone={supportPhone}
       empty={
         <Notice
           notice="no_caseload_members"
           title={t('admin.caseload.empty.title')}
           body={t('admin.caseload.empty.body')}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
       }
     />
