@@ -35,7 +35,7 @@
     Three options each, all on card a47 with the chip names ("Program leads" recommended).
   - Third delivery: Pam's voice guide, `docs/voice.md` (D-503). Foundations › Writing now summarises it.
     Merged in the batch below.
-- **Batch D-500 + D-501 + D-503 (on `mira/batch-500-501`):**
+- **Batch D-500 + D-501 + D-503 (pushed 0f95b4e, deployed):**
   - Dot's Sign in on a short phone: the legal links flow after the content and never cover the button, and
     short links are 48px wide.
   - Wren's subtle carousel Pause/Play button (Will: "subtle and tucked neatly in a corner"): a 32px
@@ -50,6 +50,13 @@
   - Pause/Play → approved, subtle. Sign in's header to stay on top as you scroll → Dot, D-502.
   - Figma Home wording → "not yet".
   - The two lead lines → "Sure".
+
+- **Batch D-502 + Principles + W3 (on `mira/batch-502`):**
+  - Dot's sticky Sign in header (Will's ask): the invite line stays pinned, and a compact Pam bar fades
+    in under it once the hero scrolls away.
+  - Dot's Principles page, in line with A24 and A26. Its Writing.mdx conflicted with Sage's; Sage's page
+    was kept, with Dot's line on texts and emails added.
+  - Piper's W3: "Pick a service above to plan a trip." (Will approved it, a43).
 
 ## What was wrong, and what missed it
 
@@ -89,6 +96,8 @@
 | Batch 500/501 (1d26edb): db / web unit / config / ui / e2e (full) | 1255 ok / 94 / 1067 / 0 / 1149 passed, 18 skipped |
 | Batch: web tsc, ui build, web build, site tsc, budget, copy:status | all 0; 23.0 kB spare; all languages in step |
 | Batch + Sage's guide (fc370a5): build-storybook | passes; `foundations-writing--about` is in the index |
+| Vercel on 0f95b4e | web and pam-site production READY |
+| D-502 + D-501 together, Sign in 320×568 invited, en/ar × light/dark, scrolled 0–300px | the pause disc is on top only when unscrolled; from 40px the pinned invite line is on top of it, and from 120px it is off screen; compact bar shows with the mark at the start (right in Arabic) |
 
 ## Left undone
 
