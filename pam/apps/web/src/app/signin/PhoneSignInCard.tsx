@@ -49,6 +49,9 @@ export interface PhoneSignInCardProps {
   readonly isFlat?: boolean;
 }
 
+/** Supabase's phone codes are six digits; Sign in waits for all of them (D-532). */
+const CODE_LENGTH = 6;
+
 const styles = stylex.create({
   title: { fontSize: '28px', lineHeight: 1.2 },
   stepTitle: { fontSize: '20px', lineHeight: 1.3 },
@@ -111,6 +114,7 @@ export function PhoneSignInCard({
         <CodeBoxes
           id={codeId}
           label={t('signin.code.label')}
+          length={CODE_LENGTH}
           value={code}
           onChange={onCodeChange}
           onComplete={(full) => {
@@ -124,7 +128,7 @@ export function PhoneSignInCard({
         <BigButton
           label={busy ? t('signin.verifying') : codeAction ?? t('signin.code.action')}
           onPress={() => void verifyCode(code)}
-          isDisabled={busy || code.trim().length === 0}
+          isDisabled={busy || code.replace(/\D/g, '').length < CODE_LENGTH}
         />
         {/* Centred, Send again under the number (Will, 3 October, D-253). */}
         <VStack gap={0} align="center">

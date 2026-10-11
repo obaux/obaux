@@ -22,8 +22,9 @@ const styles = stylex.create({
   hero: {
     display: 'grid',
     alignItems: 'center',
-    gap: '32px',
-    paddingBlock: '48px',
+    // Tighter on a phone so the pictures, and the Pause control on them, are on the first screen (Iris H1).
+    gap: { default: '16px', '@media (min-width: 900px)': '32px' },
+    paddingBlock: { default: '24px', '@media (min-width: 900px)': '48px' },
     gridTemplateColumns: { default: 'minmax(0, 1fr)', '@media (min-width: 900px)': 'minmax(0, 1fr) minmax(0, 1fr)' },
   },
   h1: {
