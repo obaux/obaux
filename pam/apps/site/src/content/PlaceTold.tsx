@@ -20,6 +20,10 @@ export function PlaceTold() {
           When a program is on Pam, the people who run it see the visits planned there: your first name, the day and
           time, the service you picked, and whether they marked you as there. They do not see your last name or the rest of your profile.
         </P>
+        <P>
+          If nobody marks you as there, the visit shows to them as missed a day after it ends. If you went and it says
+          missed, tell the program. They can fix it for 14 days.
+        </P>
         <P>If you cancel the visit, they stop seeing it.</P>
       </Section>
 
