@@ -45,6 +45,7 @@ when there is something he can see or try.
 | <img src="team/dot.svg" width="40" alt=""> | **Dot** | Design Systems Lead | Design system & Storybook | `session_01A3kdir46ErR2eyjDLFdzyW` |
 | <img src="team/wren.svg" width="40" alt=""> | **Wren** | Website & Help Centre Lead | Public website | `session_012vS6F7CMTwFn3u5UG66JWz` |
 | <img src="team/iris.svg" width="40" alt=""> | **Iris** | User Research & Testing Lead | User testing & research | `session_015bSW8g1AzsnhL9F4FXvcN1` |
+| <img src="team/sage.svg" width="40" alt=""> | **Sage** | Voice & UX Copy Lead | Voice & UX copy | `session_01MbEH7WeWBTtjxAPbJPvR42` |
 | <img src="team/gus.svg" width="40" alt=""> | **Gus** | Former Platform Engineer (retired) | — | `session_01NoLKA8RJRwhyDJUe8CAZVE` |
 
 **One specialist per lane.** Will, 10 October, asked why accounts and languages each
@@ -84,6 +85,7 @@ current (`docs/control-room.md`).
 | **Design system & Storybook** (Dot) | Components, tokens, illustrations, every screen's story, the fit and accessibility audits, the Figma flow map. **The map: once a day, at about 2am Eastern** (below) | its lane |
 | **Website** (Wren) | The public site and the support centre (`pam-site`). **Weekly, on Friday** (below) | its own project |
 | **User testing & research** (Iris) | Walks each flow as the person using it and reports what gets in their way; research Will asks for. Finds, never fixes. **A first pass over every flow, then weekly, on Thursday** (below) | `docs/research/` |
+| **Voice & UX copy** (Sage) | Pam's tone of voice and the English words on screens, the website and support posts: proposes them, Will signs, the screen's lane builds. Refines the words in Will's Figma designs, beside his frames, never in them (below) | `docs/voice.md`, Storybook's Foundations › Writing |
 
 Which session is in which lane today, its id, and what it is doing and waiting on
 are on **the board** at the end of `docs/lanes.md`. The merge desk keeps it.
@@ -166,6 +168,27 @@ research." That is **Iris**, the User Research & Testing Lead.
   **one pass a week, on Thursday**, over the flows that changed that week (the nightly map
   run's READY notes list them), so its findings are ready for Friday's language and
   website batch. Anything Will asks for, when he asks.
+
+## Voice and UX copy
+
+Will, 11 October 2026: "I have UX copy needs and need to onboard someone on how to create a
+tone of voice, and create impactful, yet very human UX copy that we can use to instill
+personality on certain pages, like the website. I'm working in design in Figma but need to
+hand this over to an agent so they can refine UX copy." That is **Sage**, the Voice & UX
+Copy Lead.
+
+- **The voice guide**, `docs/voice.md`, is Sage's: who Pam writes for, its voice traits with
+  real examples, how the voice warms up on the website and calms down in tasks and errors,
+  the word list, and writing that survives seven languages. It onboards any person or agent
+  who writes for Pam. Storybook's Foundations › Writing is its summary.
+- **From Will's Figma:** Will designs in "Pam — Website" and the other files. Sage never
+  edits his frames. Sage puts refined words on a "Copy proposals" page beside them, with the
+  old words, the new ones and why, and sends a QUESTION. Will picks; nothing is built until
+  he says "build it".
+- **Who does what with the words:** Sage proposes, Will signs, the screen's lane builds
+  (Wren for the website, the app's lanes for screens), and Lena turns signed English into
+  the other six languages. Texts and emails stay Nico's; promises (privacy, terms,
+  transparency, notices) change only with Lena. No justice terms, ever.
 
 ## Keeping the team light
 

@@ -17,6 +17,7 @@ import {
   directionsHref,
   googlePlaceHref,
 } from '@pam/ui';
+import { usePlaceHasLead } from '@/lib/usePlaceHasLead';
 import { PlaceBarActions, leadMessageFor, messageHrefFor, newMessageFrom } from '../../screens/PlaceBarActions';
 import { PlaceDetailSkeleton } from '@pam/ui/Skeletons';
 import { SubPageHeader } from '@pam/ui/SubPage';
@@ -232,6 +233,8 @@ function PlaceScreen() {
   const { isSaved, save, unsave } = useSavedPlaces(signedIn, demoRole);
 
   const place = state.status === 'ready' ? state.place : null;
+  // A place with no program lead on Pam is not told about a visit (D-498).
+  const hasLead = usePlaceHasLead(place?.id, place?.name);
   const { forPlace: policiesAt } = usePlacePolicies();
   const { progress } = useMySignatures();
   const { forPlace } = useServices();
@@ -383,6 +386,8 @@ function PlaceScreen() {
   // always in reach (D-309, D-326). With a visit booked, nothing asks to
   // plan one (D-273).
   const plansVisit = (demoRole ?? trueRole) === 'member' && !visit;
+  // Said where a member plans or keeps a visit, only at a place with no lead (D-498).
+  const tellsNoLead = (demoRole ?? trueRole) === 'member' && !hasLead;
   const services = forPlace(place!.id);
   const staff = programStaffFor(place!.id);
   // How the program takes people (D-313): a visit to plan, or a schedule
@@ -502,7 +507,7 @@ function PlaceScreen() {
         addressFirst={visitWhen !== null}
         hoursHref={googleHref}
         notice={
-          visitWhen || policiesOnTop ? (
+          visitWhen || policiesOnTop || tellsNoLead ? (
             <VStack gap={3}>
               {visitWhen ? (
                 // The visit, confirmed (D-273), as a small hero (D-281): only
@@ -526,6 +531,7 @@ function PlaceScreen() {
                   <TextLink label={t('place.visit.cancel')} onClick={() => setAskingCancel(true)} />
                 </>
               ) : null}
+              {tellsNoLead ? <Banner status="info" title={t('place.noLead', { place: place!.name })} /> : null}
               {policiesOnTop ? (
                 <PolicyStatusCard
                   isDone={allSigned}
@@ -547,7 +553,7 @@ function PlaceScreen() {
         layout={visit ? 'default' : 'chooseFirst'}
         extra={
           <>
-            {isDropIn && !visit ? <DropInCard schedule={booking.schedule} /> : null}
+            {isDropIn && !visit ? <DropInCard schedule={booking.schedule} hasLead={hasLead} /> : null}
             {/* Booked: the service is in the visit card, not a picker (D-332). */}
             {visit ? null : (
               <ServiceCards services={services} selectedId={service?.id ?? null} onSelect={setPickedService} />

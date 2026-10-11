@@ -168,6 +168,15 @@ export interface ProgramSetup {
   readonly isLoading: boolean;
 }
 
+/**
+ * Whether this page is Storybook's clickable prototype, which answers every
+ * Supabase call itself (`stories/journeys/mockSupabase.ts` marks `window` once it
+ * does): whoever is signed in there is pretending.
+ */
+function isPrototype(): boolean {
+  return typeof window !== 'undefined' && (window as { __pamRealFetch?: unknown }).__pamRealFetch !== undefined;
+}
+
 export function useProgramSetup(session: SessionState): ProgramSetup {
   const [tick, setTick] = useState(0);
   useEffect(() => {
@@ -178,7 +187,10 @@ export function useProgramSetup(session: SessionState): ProgramSetup {
   void tick;
   const own = useOwnProgram(session);
   const program = own.status === 'ready' ? own.program : null;
-  const isExample = USE_DUMMY_PEOPLE && !read(FRESH) && program === null;
+  // A real program lead with no program has none to show, not the example (D-498): the example is for
+  // a demo (a super admin previewing the role) and for Storybook, where the lead is only pretending.
+  const isRealLead = session.status === 'signed-in' && session.session.role === 'provider' && !isPrototype();
+  const isExample = USE_DUMMY_PEOPLE && !read(FRESH) && program === null && !isRealLead;
   const photoUrl = session.status === 'signed-in' ? session.session.photoUrl : null;
   const sent: SentProgram | null = program
     ? { details: program.details, sentAt: program.sentAt, changes: program.changesNote }
