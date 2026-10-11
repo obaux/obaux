@@ -61,7 +61,7 @@ const WHO = [
   },
   {
     title: 'Case managers',
-    body: 'Know where your people are going, and connect them in a tap.',
+    body: 'Their plans, your guidance, in one place.',
   },
   {
     title: 'Programs',
