@@ -78,13 +78,12 @@ export const SEARCH_PHRASES: readonly SearchPhrase[] = [
   { phrase: 'cancel my appointment', who: 'resident', answer: 'planning-a-visit' },
   { phrase: 'change the time of my visit', who: 'resident', answer: 'planning-a-visit' },
   { phrase: 'where are my old visits', who: 'resident', answer: 'planning-a-visit' },
-  {
-    phrase: 'does the place know im coming',
-    who: 'resident',
-    answer: null,
-    also: ['planning-a-visit'],
-    gap: 'Is the place told about my visit? Only a place with a program lead on Pam sees it; a place from a public list is not told (D-498).',
-  },
+  { phrase: 'does the place know im coming', who: 'resident', answer: 'is-the-place-told', also: ['planning-a-visit'] },
+  { phrase: 'i showed up but they had no clue', who: 'resident', answer: 'is-the-place-told' },
+  { phrase: 'they didnt know i was coming', who: 'resident', answer: 'is-the-place-told' },
+  { phrase: 'i was not on their list', who: 'resident', answer: 'is-the-place-told' },
+  { phrase: 'they said i had no appointment', who: 'resident', answer: 'is-the-place-told' },
+  { phrase: 'they turned me away', who: 'resident', answer: 'is-the-place-told' },
   {
     phrase: 'they said i missed it',
     who: 'resident',
@@ -166,12 +165,7 @@ export const SEARCH_PHRASES: readonly SearchPhrase[] = [
     answer: null,
     gap: 'Your calendar: who is coming, by day, and checking people in when they arrive.',
   },
-  {
-    phrase: 'why wasnt i told about a visit',
-    who: 'provider',
-    answer: null,
-    gap: 'Same post as “does the place know im coming”, from the program’s side: visits show on your calendar only for a program you added.',
-  },
+  { phrase: 'why wasnt i told about a visit', who: 'provider', answer: 'is-the-place-told' },
 
   // Case managers
   { phrase: 'how do i invite someone', who: 'case manager', answer: 'sending-an-invite' },
