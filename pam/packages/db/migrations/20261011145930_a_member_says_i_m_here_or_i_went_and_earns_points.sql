@@ -36,7 +36,9 @@
 -- (still one per visit). A visit the member's phone already proved (geofence) pays
 -- nothing more. `undo_check_in` takes back only the lead's own part: the verified
 -- row (100, or 40 after a self-report), leaving the member's self-report standing;
--- it refuses to undo a visit the member marked (NOT_A_PROGRAM_MARK). Re-marking
+-- it changes nothing, and says nothing, for a visit the member marked themselves
+-- (the same answer as for any undo that has nothing of the lead's to take back, so
+-- the program's screen never tells who marked a visit). Re-marking
 -- after an undo restores the same amount once.
 --
 -- Neither the lead nor a guide is ever shown HOW a visit was marked.
@@ -292,12 +294,15 @@ begin
     raise exception 'VISIT_NOT_FOUND';
   end if;
   if visit.status = 'attended' then
-    -- Only the lead's own mark can be taken back: a member's own word or phone is theirs.
-    if visit.attendance_method <> 'provider_checkin' then
-      raise exception 'NOT_A_PROGRAM_MARK';
-    end if;
     if now() > coalesce(visit.ends_at, visit.starts_at + interval '1 hour') + interval '14 days' then
       raise exception 'OUTSIDE_THE_VISIT_WINDOW';
+    end if;
+    -- Only the lead's own mark can be taken back: a member's own word or phone is theirs. For
+    -- those the answer is the same as for a visit with nothing to undo, so a program's screen
+    -- cannot tell who marked a visit.
+    if visit.attendance_method <> 'provider_checkin' then
+      return query select visit.id, visit.status, visit.checked_in_at, 0;
+      return;
     end if;
     -- The member's self-report, if any, stands.
     if exists (

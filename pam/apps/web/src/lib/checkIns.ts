@@ -35,26 +35,36 @@ function write(next: Readonly<Record<string, string>>): void {
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
 /** Asks the database to change a real visit; false when it said no or could not be reached. */
-async function ask(door: 'check_in_visit' | 'undo_check_in', appointmentId: string): Promise<boolean> {
+async function ask(
+  door: 'check_in_visit' | 'undo_check_in',
+  appointmentId: string,
+): Promise<{ readonly ok: boolean; readonly stillMarked: boolean }> {
   try {
     const { createClient } = await import('./supabase');
-    const { error } = await createClient().rpc(door, { p_appointment_id: appointmentId });
-    return !error;
+    const { data, error } = await createClient().rpc(door, { p_appointment_id: appointmentId });
+    const row = (Array.isArray(data) ? data[0] : data) as { status?: string } | undefined;
+    return { ok: !error, stillMarked: row?.status === 'attended' };
   } catch {
-    return false;
+    return { ok: false, stillMarked: false };
   }
 }
 
 /** Marks the visit as arrived, now. Resolves false when a real visit could not be saved. */
 export async function checkIn(appointmentId: string): Promise<boolean> {
-  if (UUID.test(appointmentId) && !(await ask('check_in_visit', appointmentId))) return false;
+  if (UUID.test(appointmentId) && !(await ask('check_in_visit', appointmentId)).ok) return false;
   write({ ...readCheckIns(), [appointmentId]: new Date().toISOString() });
   return true;
 }
 
 /** Takes it back — a mistaken tap, confirmed first. Resolves false when a real visit could not be saved. */
 export async function undoCheckIn(appointmentId: string): Promise<boolean> {
-  if (UUID.test(appointmentId) && !(await ask('undo_check_in', appointmentId))) return false;
+  if (UUID.test(appointmentId)) {
+    const answer = await ask('undo_check_in', appointmentId);
+    if (!answer.ok) return false;
+    // Still marked after the undo: the mark was not the program's to take back. The screen
+    // says nothing different for it (the database answers the same either way, D-535).
+    if (answer.stillMarked) return true;
+  }
   const next = { ...readCheckIns() };
   delete next[appointmentId];
   write(next);
