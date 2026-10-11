@@ -61,6 +61,19 @@ begin
   end if;
   raise notice 'ok    part of a name finds the neighborhoods that contain it';
 
+  -- The source's sorted names are found however a resident writes them (the function matches every word, in any order).
+  select count(*) into n from public.search_areas('east germantown', 8) where label = 'Germantown, East';
+  if n <> 1 then raise exception 'FAIL  "east germantown" did not find "Germantown, East"'; end if;
+  select count(*) into n from public.search_areas('old kensington', 8) where label = 'Kensington, Old';
+  if n <> 1 then raise exception 'FAIL  "old kensington" did not find "Kensington, Old"'; end if;
+  select count(*) into n from public.search_areas('west, mount airy', 8) where label = 'Mount Airy, West';
+  if n <> 1 then raise exception 'FAIL  "west, mount airy" did not find "Mount Airy, West"'; end if;
+  select count(*) into n from public.search_areas('east germantown nowhere', 8);
+  if n <> 0 then raise exception 'FAIL  a word that is nowhere still matched'; end if;
+  select count(*) into n from public.search_areas('100%', 8);
+  if n <> 0 then raise exception 'FAIL  a percent sign matched everything'; end if;
+  raise notice 'ok    every word typed has to match, in any order';
+
   -- What was there before still answers the same.
   select count(*) into n from public.search_areas('19104', 8) where kind = 'zip';
   if n <> 1 then

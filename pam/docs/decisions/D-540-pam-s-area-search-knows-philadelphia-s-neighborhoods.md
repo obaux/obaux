@@ -35,3 +35,9 @@ neighborhood names is acceptable because it is not about a person and Pam keeps 
 
 A fuller or different list (the City's own, with sourced "Center City" / "South Philly"). Rows are public reference data; replace
 them with a new expand-only migration.
+
+## Every word, in any order (Lena's catch, 11 October)
+
+The source's names are sorted names ("Germantown, East", "Kensington, Old"), and `search_areas` matched the typed text as one piece, so
+"east germantown" found nothing. Migration `20261011203608_search_areas_by_every_word_typed` splits what is typed into words and requires
+every word somewhere in the label. The names stay as the source has them (the credit stays honest). LIKE wildcards in what is typed are escaped.
