@@ -18,7 +18,7 @@ STATUS row too.
   permission. The English, so the two places say one thing and say what Privacy says (`privacy.s.what-we-keep.p9`):
   1. iOS `NSLocationWhenInUseUsageDescription` (when-in-use only; never ask for "always"):
      *"Pam uses where you are to check you are at a place when you tap “I’m here”, and to find places near you when you
-     search. It does not keep the position your phone sends."*
+     search. It does not keep the location your phone sends."*
   2. Android: ask for precise location only at the moment of the tap (`ACCESS_FINE_LOCATION`, the check is within about
      150 metres), with the same sentence on Pam's own screen before the system prompt. Never in the background.
   3. Store privacy labels (App Store "Data used to track you / collected", Google Play "Data safety"). Piper's log check is in

@@ -27,8 +27,8 @@ describe('Privacy on “I’m here” and location (D-526 part B)', () => {
     // (its note reads “Used for this search only.”). Piper’s log check, 11 October: both are POST calls with the
     // position in the body, no latitude or longitude in any URL or log. The gateway log does keep that this account
     // made the call, from this IP address, at this time, and an IP address is a rough location — so the page claims
-    // the position, not the call (“the position your phone sends”, not “where you are”).
-    expect(EN['privacy.s.what-we-keep.p10']).toBe('When you search near you, Pam uses your phone’s position for that search and does not keep it.');
+    // the location the phone sends, not the call (“the location your phone sends”, not “where you are”).
+    expect(EN['privacy.s.what-we-keep.p10']).toBe('When you search near you, Pam uses your phone’s location for that search and does not keep it.');
     expect(EN['places.area.hereNote']).toBe('Used for this search only.');
   });
 
@@ -38,8 +38,8 @@ describe('Privacy on “I’m here” and location (D-526 part B)', () => {
     expect(p9).toMatch(/only when you tap, never in the background/);
   });
 
-  it('says what Pam keeps and that it does not keep the position the phone sends', () => {
-    expect(p9).toMatch(/Pam does not keep the position your phone sends\./);
+  it('says what Pam keeps and that it does not keep the location the phone sends', () => {
+    expect(p9).toMatch(/Pam does not keep the location your phone sends\./);
     expect(p9).not.toMatch(/does not keep where you are/); // too broad: the request log keeps the IP address and the time
     // Three ways to be marked: “I’m here” (checked against the place), “I went”, or the program. The page names all
     // three, so nobody has to guess what “how” means.
