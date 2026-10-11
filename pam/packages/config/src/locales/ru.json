@@ -1074,7 +1074,7 @@
   "trips.booked.sms": "Текст SMS: «Pam: вас записали. Место: {place}, день: {day}, время: {time}. Нажмите, чтобы посмотреть в Pam: {link}»",
   "trips.booked.example.title": "Пример записи для {name}",
   "trips.booked.example.body": "{place}, {day}, {time}. Это только пример: записи в программу нет, и никому не отправлено SMS.",
-  "trips.booked.noLead": "{place} не представлено в Pam как программа, поэтому о визите там не сообщают.",
+  "trips.booked.noLead": "Для «{place}» нет программы в Pam, поэтому о визите там не сообщают.",
   "join.booked.title": "Вас записали на визит",
   "join.booked.body": "{place}, {day}, {time}. Теперь это в разделе «Визиты».",
   "join.booked.action": "Посмотреть место",
