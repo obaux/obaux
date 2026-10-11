@@ -948,6 +948,10 @@ app.joinpam.org). Checked live: `/programs/new/` carries its own title and `og:i
 vercel.app host `/signin/index.txt` answers 200 instead of redirecting (D-495). The merge desk now checks the
 Vercel status after every push (`docs/team.md`). Emails link to app.joinpam.org: Will changed `APP_URL`.
 
+## Merge desk & platform · the night of 11 October: four batches, one migration
+
+On `main` and live: D-498 (its migration `a_place_says_whether_a_program_lead_on_pam_runs_it` applied live), D-499, D-500, D-501, D-502, D-503 (Sage's voice guide), D-504 (Foundations match the code), Piper's pick-a-service line, Lena's D-498 review, and the Principles page in line with A24, A25 and A26. Each batch ran the full checks before its push; every push was confirmed READY on Vercel for `web` and `pam-site`. Sage joined (Voice & UX copy). Open with Will: "go on Ask Pam" for the help centre; a push word in Ava's session. Log: `docs/sessions/2026-10-11-0115-merge-desk-night.md`.
+
 ## Merge desk & platform · a failed in-app load opens the screen; texts link to app.joinpam.org (10 October)
 
 Will, from his phone: an invite link opened a page of raw code. Cause: Next 15.5.25, in static export,
@@ -1396,11 +1400,24 @@ state with a (+)) instead of the "Proposed (a22)" cards; the generator gets `dra
 mouse stepped it on again (D-494, fixed; phones were not affected). Figma: Case manager, Program lead and
 Overview redrawn, one image replaced on Member; drawn from the branch, so redraw from `main` only after it merges.
 
+## Design system & Storybook · tokens reconciled with Foundations (11 October)
+
+Branch `claude/pam-design-tokens`. Foundations now says what the code does for card radius (24px; sheets 28px), spacing (4px steps,
+half-steps inside components) and colour (all 146 tokens, generated from the theme, with a test); a decision records who was right
+for each of Wren's five items (D-504). Needs Will: two visible changes: raise the theme's body size (14px to 16px, with 3 in 4
+text elements currently under 15px), and dark `background-muted` to `#262626`.
+
 ## Design system & Storybook · Sign in on a short phone, small targets (11 October) — on `main`
 
-Merged from `claude/pam-design-signin-short` (9d89383). Sign in's Privacy / Terms / About links flow after the content instead of
+Merged from `claude/pam-design-signin-short` (6de3cc2). Sign in's invite line is pinned and a compact mark bar appears under it once the
+hero has scrolled away (D-502; the code step's bar was already pinned). Sign in's Privacy / Terms / About links flow after the content instead of
 being pinned, so they never cover "Send me a code" at 320×568 (Iris S1, D-500); `TextLink` is 48px wide as well as tall
 (the Trips banner's "Sign", the signature sheet's "Clear"), and the policy header's "Done" too (W4). Needs Will: nothing.
+
+## Design system & Storybook · Principles page in line with A24 and A26 (11 October) — on `main`
+
+Merged from `claude/pam-design-principles` (98c87e9). Foundations › Principles (and Writing) now say seven languages (A24) and help where
+people get stuck, not on every screen (A26). Docs only.
 
 ## Design system & Storybook · legal tabs follow the reader (10 October)
 
@@ -1969,3 +1986,7 @@ Branch `claude/places-programs-add-program-link` (D-496). Preview picture `publi
 ## Places & programs · lead-added vs gathered programs (11 October 2026) — on `main`, live
 
 Branch `claude/places-programs-lead-added-vs-gathered` (D-498). Migration `20261011002026`: `service_has_lead` / `places_with_leads` (a place has a lead when its organisation has an active provider account). A member planning a visit at a place with no lead is told the place is not told (English signed by Will on 11 October; the other six languages are Lena's drafts). A real lead with no program sees Add your program on Home and "Add your program first" on Policies and services, not the example. Test `52_which_places_have_a_program_lead_on_pam_test.sql`; e2e `places-without-a-lead.spec.ts`. Merged as f6a245d; the migration was **applied live** on 11 October as `a_place_says_whether_a_program_lead_on_pam_runs_it` (both functions match the file by md5, search path pinned, anon cannot run them, authenticated can; advisors: nothing new).
+
+## Places & programs · the pick-a-service line (11 October 2026) — READY, not merged
+
+Branch `claude/places-programs-pick-a-service-line` (Will's wording, 11 October). A place with services says "Pick a service above to plan a trip." under the greyed Plan a trip until one is picked (`place.schedule.pickService`). e2e `place-pick-a-service.spec.ts`.

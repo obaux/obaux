@@ -24,6 +24,16 @@ in each component.
 
 Never go below 15px for something a member reads. Line height 1.4–1.5 for body text.
 
+## Where the code stands (D-504)
+
+The rule above is right and **the code does not yet meet it by default.** The theme's text roles are Astryx's dense
+desktop sizes: `--text-body-size` and `--text-label-size` are **14px**, `--text-supporting-size` **12px**, and only
+`BigButton`, `MenuList` and the other components that say so lift them to 15–18px. Counted over 70 role screens, about
+4,100 pieces of text: 1,355 are 14px, 1,224 are 13px, 425 are 12px and 1 is 11px, three in four under 15px, against
+about 1,000 at 15px or more. Much of the small text is captions, tab labels and badges that the rule does not mean; the
+rest is body copy that does. Raising the theme (body and label to 16px, supporting to 15px) fixes it at the root and is a
+visible change on every screen and in all seven languages, so it is with Will, not done here.
+
 <Typeset
   fontFamily="Figtree, system-ui, sans-serif"
   fontSizes={[34, 28, 22, 18, 17, 15]}
