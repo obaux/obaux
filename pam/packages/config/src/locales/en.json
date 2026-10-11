@@ -1560,5 +1560,7 @@
   "transparency.group.people": "Your people and messages",
   "copy.page": "Copy this page",
   "copy.done": "Copied",
-  "copy.failed": "Could not copy. Press and hold the text to copy it."
+  "copy.failed": "Could not copy. Press and hold the text to copy it.",
+  "carousel.pause": "Pause",
+  "carousel.play": "Play"
 }

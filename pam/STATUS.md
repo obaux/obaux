@@ -1503,6 +1503,8 @@ fine and the fit audit was over-counting (D-448).
 
 ## Website · public site and help centre (10 October) — `apps/site`, on `main`
 
+**Carousel pause/play (11 October, D-501; branch, waits on the six languages for `carousel.pause` / `carousel.play` and Will's sign-off of the English).** `OnboardingSlides` has a pause/play button on Sign in, About Pam and the site hero; labels are required props.
+
 **Hero carousel (11 October, D-499; branch, not yet merged).** Home's hero has the About Pam picture carousel to the right of the headline from 900px, under it on a phone. In the app, About Pam's carousel shows pictures only (`OnboardingSlides showLines={false}`); Sign in is unchanged. Figma "Pam — Website" Home has the Hero carousel component.
 
 The public site, `joinpam.org` (Vercel project `pam-site`; the app is `app.joinpam.org`), is a static
