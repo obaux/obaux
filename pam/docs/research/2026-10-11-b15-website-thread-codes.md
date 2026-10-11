@@ -148,3 +148,24 @@ English name as the page heading takes the page's right-to-left direction:
 `member-created--place-policy` "Confidentiality and disclosure" compute `rtl`.
 
 Iris
+
+---
+
+## b17 re-test: names in headings (11 October, 14:58 UTC)
+
+From `main`'s Chromatic Storybook, Arabic, 390 (the conversation bar at 320).
+
+| | Result |
+|---|---|
+| place-profile "Example Library Tech Lab" | **Pass:** `ltr` (`dir="auto"`). The page's own headings ("اختر خدمة", "عن البرنامج") stay `rtl` |
+| place-policy "Confidentiality and disclosure" | **Pass:** `ltr` |
+| Policies list title "سياسات للتوقيع" | **Pass:** `rtl` |
+| Profile card name "Marcus" | **Pass:** `ltr` |
+| Staff: a case manager's member screen "Jordan", and the member list on Home ("Marcus", "Tanya") | **Pass:** `ltr` |
+| Conversation bar (b16 behaviour) | **Pass:** a Latin name is `ltr` and an Arabic one `rtl`, each showing its own start. English bubbles are still `ltr` |
+
+**Noted, not a fail.** The case manager's Home people strip ("الشريحة 1 من 2") puts its name
+captions in the page's `rtl`. With one-word names nothing changes on screen; with a
+two-word Latin name the words would still read in order. Mention only.
+
+Iris
