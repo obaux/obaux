@@ -1,4 +1,4 @@
-# D-501 — The super admin has no role switcher, and no "See the app as"
+# D-503 — The super admin has no role switcher, and no "See the app as"
 
 **Date:** 2026-10-10/11 · **Branch:** `claude/pam-super-admin-no-switcher`
 
@@ -7,7 +7,8 @@ role switcher icon on top right of screen, since we have special storybook proto
 each journey to check how the journey is." Asked whether "See the app as" should go too,
 Will, 11 October 00:32 UTC (relayed): "remove".
 
-First claimed as D-497 offline; `main` took D-497 the same night, so this is D-501.
+First claimed as D-497 offline; `main` took D-497 the same night. D-501 and D-502 were then
+found taken on other branches (Wren's carousel, the sign-in design), so this is D-503.
 
 ## What changed
 

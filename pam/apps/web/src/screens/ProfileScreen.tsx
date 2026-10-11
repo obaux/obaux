@@ -18,7 +18,7 @@ import { useI18n } from '@/lib/i18n';
 /**
  * Profile, wired (D-217): whoever is signed in, as the role they are looking
  * at. A super admin previewing a role sees that role's example name, as the
- * old home did (D-173). "See the app as" is gone (D-501): each role's journey is
+ * old home did (D-173). "See the app as" is gone (D-503): each role's journey is
  * checked in Storybook.
  */
 export function ProfileScreen() {

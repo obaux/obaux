@@ -131,7 +131,7 @@ test.describe('everyone, for the person running Pam', () => {
 
   test('the header has no role-preview switch (Will, 10 October)', async ({ page }) => {
     // Storybook's journeys show each role now; the super admin's header lost its
-    // preview icon, and "See the app as" went with it (D-501).
+    // preview icon, and "See the app as" went with it (D-503).
     await signedInAs(page, 'super_admin');
     await page.goto('/directory/');
     await expect(page.getByRole('heading', { name: 'Everyone', exact: true })).toBeVisible();
@@ -200,7 +200,7 @@ test.describe('everyone, for the person running Pam', () => {
 
   test('a super admin\'s Profile has Everyone and no "See the app as"', async ({ page }) => {
     // Each role's screens are checked in Storybook's journeys now; the in-app
-    // preview is gone (Will, 11 October: "remove", D-501).
+    // preview is gone (Will, 11 October: "remove", D-503).
     await signedInAs(page, 'super_admin');
     await page.route('**/rest/v1/rpc/member_points*', (route) => route.fulfill(json(400)));
     await page.route('**/rest/v1/rpc/saved_places_mine*', (route) => route.fulfill(json([])));
@@ -224,7 +224,7 @@ test.describe('everyone, for the person running Pam', () => {
     });
     await page.route('**/rest/v1/rpc/saved_places_mine*', (route) => route.fulfill(json([])));
 
-    // Its screen is gone (D-501); the stored choice still exists, so it is set directly.
+    // Its screen is gone (D-503); the stored choice still exists, so it is set directly.
     await page.addInitScript(() => sessionStorage.setItem('pam.view-as', 'member'));
     await page.goto('/profile/');
     await expect(page.getByText(/400\s*Points/)).toBeVisible();
