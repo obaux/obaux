@@ -43,8 +43,6 @@ STATUS row too.
      reading p11 first: a copy elsewhere has its own retention. None exists today (Piper searched the code and package.json).
   3. `no-typed-text-in-urls.test.ts` keeps "what you search for" out of the logged URL: a new GET filter must be on an id,
      a state or a setting, and typed words go in a POST body (an rpc).
-  4. **Twilio keeps its own record of every text** (number, text, time, status). Its retention setting was not read; Will or
-     Nico to read it. Privacy says only that "the one that sends our texts" handles the information (`sharing.p3`).
 
 - [ ] **A28: finish taking Pam's number off every place a person reads it** (Lena, 11 October 2026, D-514, D-515).
   The app, the privacy page and the terms are done and signed (card a59). What is still open, each with an owner:
