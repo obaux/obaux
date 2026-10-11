@@ -24,7 +24,6 @@ import { readAddedTrips, withMoves } from '@/lib/addedTrips';
 import { asksForSavedTrips, bookTrip, isSavedPlace, moveSavedOrLocalTrip } from '@/lib/savedTrips';
 import { useTrips } from '@/lib/useTrips';
 import { useSession } from '@/lib/useSession';
-import { useSupportPhone } from '@/lib/useSupportPhone';
 import { DUMMY_TRIPS } from '@pam/config/dummy-trips';
 import { friendLink } from '@/lib/appUrl';
 import { navigate } from '@/lib/navigate';
@@ -200,7 +199,6 @@ export function NewTripView({
   // A place with no program lead on Pam is not told about the visit, so the wording stops saying it is (D-498).
   const hasLead = usePlaceHasLead(place?.id, place?.name);
   const { state: session } = useSession();
-  const supportPhone = useSupportPhone();
   // The trip is being saved, or could not be (D-454): say so rather than show it booked.
   const [isSaving, setIsSaving] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -544,8 +542,7 @@ export function NewTripView({
           notice="something_went_wrong"
           title={t('join.failed.title')}
           body={t('join.failed.body')}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
       ) : null}
       {step === 'where' ? (

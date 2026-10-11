@@ -30,7 +30,6 @@ import { useEffect, useState } from 'react';
 import { USE_DUMMY_PEOPLE } from '@pam/config/dummy-flag';
 import { useI18n } from '@/lib/i18n';
 import { HeaderBell } from '../HeaderBell';
-import { useSupportPhone } from '@/lib/useSupportPhone';
 import { usePlaces, METRES_PER_MILE } from '@/lib/usePlaces';
 import { useFlaggedPlaces } from '@/lib/useFlaggedPlaces';
 import { ReportedPlacesLazy } from './ReportedPlacesLazy';
@@ -123,7 +122,6 @@ function useDebounced(value: string, ms: number): string {
 
 function PlacesScreen() {
   const { t, locale } = useI18n();
-  const supportPhone = useSupportPhone();
   const params = useSearchParams();
   const [category, setCategory] = useState<Filter>('all');
   // `?filter=reported` is where the bell's "place was reported" row lands
@@ -242,8 +240,7 @@ function PlacesScreen() {
           notice="something_went_wrong"
           title={t('saved.failed.title')}
           body={t('saved.failed.body')}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
       ) : null}
 
@@ -310,7 +307,6 @@ function PlacesScreen() {
           useDummy={USE_DUMMY_PEOPLE}
           onResolved={refreshFlagged}
           now={now}
-          supportPhone={supportPhone}
         />
       ) : null}
 
@@ -323,8 +319,7 @@ function PlacesScreen() {
           notice="no_places_found"
           title={t(searching ? 'places.search.none.title' : NOTICES.no_places_found.titleKey)}
           body={t(searching ? 'places.search.none.body' : NOTICES.no_places_found.bodyKey)}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
       ) : null}
 
@@ -333,8 +328,7 @@ function PlacesScreen() {
           notice={state.offline ? 'offline' : 'something_went_wrong'}
           title={t(NOTICES[state.offline ? 'offline' : 'something_went_wrong'].titleKey)}
           body={t(NOTICES[state.offline ? 'offline' : 'something_went_wrong'].bodyKey)}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
       ) : null}
 

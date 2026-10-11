@@ -12,7 +12,6 @@ import { DUMMY_INTERESTED } from '@pam/config/dummy-people';
 import { useI18n } from '@/lib/i18n';
 import { NotIn } from '../NotIn';
 import { PersonRow } from '../PersonRow';
-import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
 import { useRoleView } from '@/lib/useViewedRole';
 import { RoleSwitchControl } from '../RoleSwitchControl';
@@ -37,7 +36,6 @@ const styles = stylex.create({
 
 export default function InterestedPage() {
   const { t, locale } = useI18n();
-  const supportPhone = useSupportPhone();
   const { state: session } = useSession();
 
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
@@ -107,8 +105,7 @@ export default function InterestedPage() {
           notice={key}
           title={t(NOTICES[key].titleKey)}
           body={t(NOTICES[key].bodyKey)}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
       </Page>
     );
@@ -137,8 +134,7 @@ export default function InterestedPage() {
           notice="service_not_available"
           title={t('interested.notProvider.title')}
           body={t('admin.notAdmin.body')}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
       </Page>
     );
@@ -171,8 +167,7 @@ export default function InterestedPage() {
           notice="no_caseload_members"
           title={t('interested.empty.title')}
           body={t('interested.empty.body')}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
       ) : (
         <VStack gap={3}>

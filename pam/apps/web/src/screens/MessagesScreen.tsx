@@ -8,7 +8,6 @@ import { DUMMY_ANYONE } from '@pam/config/dummy-people';
 import { useI18n } from '@/lib/i18n';
 import { usePreloadThreadView } from '@/app/messages/ThreadViewLazy';
 import { useSession } from '@/lib/useSession';
-import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useRoleView } from '@/lib/useViewedRole';
 import { useConversations } from '@/lib/useConversations';
 import { whenHappened } from '@/lib/when';
@@ -50,7 +49,6 @@ function MessagesScreenInner() {
   usePreloadThreadView();
   const { t, locale } = useI18n();
   const { state: session } = useSession();
-  const supportPhone = useSupportPhone();
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
   // A limited account reads but cannot start a message (0031): no New message,
   // and the screen says what is off and who to call (terms.s.limits.p3, D-427).
@@ -183,11 +181,11 @@ function MessagesScreenInner() {
               reported: {
                 section,
                 onSection: setSection,
-                content: <ReportedSection state={reports} previewing={previewing} supportPhone={supportPhone} />,
+                content: <ReportedSection state={reports} previewing={previewing} />,
               },
             }
           : {})}
-        {...(limited ? { limited: <LimitedNotice supportPhone={supportPhone} /> } : {})}
+        {...(limited ? { limited: <LimitedNotice /> } : {})}
         {...(canMessage && !limited ? { onNewMessage: () => setPicking(true) } : {})}
         // A member's people, one tap away (Will, 3 October, D-246): the same
         // strip a case manager's Home floats for Invite someone.

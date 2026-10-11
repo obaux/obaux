@@ -7,7 +7,7 @@ import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { Icon } from '@astryxdesign/core/Icon';
 import { Button } from './Button.js';
-import { PhoneIcon } from './icons.js';
+import { HelpIcon } from './icons.js';
 import { textLinkLook } from './TextLink.js';
 import { pam } from './tokens.stylex.js';
 import { NOTICES, type NoticeKey } from '@pam/config';
@@ -37,19 +37,24 @@ import { NOTICES, type NoticeKey } from '@pam/config';
  * else has failed is the wrong place to spend that. What Banner gave us that
  * matters — the alert role, the status colour, the icon — is a few lines here.
  *
- * The support call is a real `tel:` anchor, not a handler, so it works with no
- * JavaScript, no network and no session — which is the state someone is most
- * likely to be in when they need it.
+ * The support action is "Contact Pam" (A28: Pam has no phone line). It is a plain
+ * link to the app's Help screen, the same place the HelpBar goes, so it works with
+ * no JavaScript and no session — which is the state someone is most likely to be
+ * in when they need it. From Help the person is led to the help desk first, and
+ * only after that to an email.
  */
 export interface NoticeProps {
   notice: NoticeKey;
   /** Localised title and body, resolved by the caller through i18n. */
   title: string;
   body: string;
-  /** Pam's support line in E.164. Omit to hide the call action. */
-  supportPhone?: string | null;
-  /** Localised label for the call action, e.g. "Call Pam". */
-  callLabel?: string;
+  /**
+   * Localised label for the support action, "Contact Pam" (`help.contact.action`).
+   * Omit it to leave the action out. It opens Help (A28), never a dialler.
+   */
+  contactLabel?: string;
+  /** Where the support action goes. Help, unless a screen has a better page. */
+  contactHref?: string;
   /**
    * An admin's own note to this person, from `access_controls.user_facing_note`.
    * Shown instead of the generic body when present.
@@ -58,14 +63,14 @@ export interface NoticeProps {
    * subject sees a plain note, not the justification written about them.
    */
   userFacingNote?: string | null;
-  /** Optional extra action, e.g. "Try again". Rendered before the call button. */
+  /** Optional extra action, e.g. "Try again". Rendered before the Contact Pam button. */
   retry?: { label: string; onPress: () => void };
   /**
    * A calm card for something that is on purpose and has a reason, rather than
    * a fault (a limited account, D-432): more room round the words, the smallest
    * body text Pam allows (16px, A23) for the title and the message alike, and
-   * the call as a link, not a primary button. Everything else is the same: the
-   * `tel:` anchor, the 48px target, the alert role.
+   * the support action as a link, not a primary button. Everything else is the same:
+   * the 48px target, the alert role.
    */
   quiet?: boolean;
 }
@@ -112,14 +117,15 @@ export function Notice({
   notice,
   title,
   body,
-  supportPhone,
-  callLabel = 'Call Pam',
+  contactLabel,
+  contactHref = '/help/',
   userFacingNote,
   retry,
   quiet = false,
 }: NoticeProps) {
   const definition = NOTICES[notice];
   const message = userFacingNote?.trim() || body;
+  const offersContact = definition.offersSupport && Boolean(contactLabel);
 
   const actions = (
     <>
@@ -131,21 +137,21 @@ export function Notice({
           xstyle={styles.action}
         />
       ) : null}
-      {definition.offersSupport && supportPhone ? (
+      {offersContact ? (
         quiet ? (
           <Button
-            label={callLabel}
+            label={contactLabel ?? ""}
             variant="ghost"
-            href={`tel:${supportPhone}`}
-            icon={<PhoneIcon />}
+            href={contactHref}
+            icon={<HelpIcon />}
             xstyle={[textLinkLook.link, styles.quietCall]}
           />
         ) : (
           <Button
-            label={callLabel}
+            label={contactLabel ?? ""}
             variant="primary"
-            href={`tel:${supportPhone}`}
-            icon={<PhoneIcon />}
+            href={contactHref}
+            icon={<HelpIcon />}
             xstyle={styles.action}
           />
         )
@@ -153,7 +159,7 @@ export function Notice({
     </>
   );
 
-  const hasActions = Boolean(retry) || (definition.offersSupport && Boolean(supportPhone));
+  const hasActions = Boolean(retry) || offersContact;
 
   if (definition.kind === 'empty') {
     return (

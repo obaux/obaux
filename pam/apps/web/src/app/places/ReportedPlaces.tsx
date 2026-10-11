@@ -50,7 +50,6 @@ export function ReportedPlaces({
   useDummy,
   onResolved,
   now,
-  supportPhone,
 }: {
   readonly state: FlaggedPlacesState;
   readonly previewing: boolean;
@@ -58,7 +57,6 @@ export function ReportedPlaces({
   readonly useDummy: boolean;
   readonly onResolved: () => void;
   readonly now: Date | null;
-  readonly supportPhone: string;
 }) {
   const { t, locale } = useI18n();
   const [busy, setBusy] = useState<string | null>(null);
@@ -119,8 +117,7 @@ export function ReportedPlaces({
           notice={state.offline ? 'offline' : 'something_went_wrong'}
           title={t(NOTICES[state.offline ? 'offline' : 'something_went_wrong'].titleKey)}
           body={t(NOTICES[state.offline ? 'offline' : 'something_went_wrong'].bodyKey)}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
       ) : null}
 
@@ -129,8 +126,7 @@ export function ReportedPlaces({
           notice="something_went_wrong"
           title={t('places.reported.failed.title')}
           body={t('places.reported.failed.body')}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
       ) : null}
 

@@ -11,7 +11,6 @@ import { BigButton, Notice, Page, TextLink } from '@pam/ui';
 import { SubPageHeader } from '@pam/ui/SubPage';
 import { HelpButton } from '../../screens/HelpButton';
 import { useI18n } from '@/lib/i18n';
-import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
 import { setReminderConsent } from '@/lib/useReminderConsent';
 
@@ -59,7 +58,6 @@ const styles = stylex.create({
 export default function RemindersPage() {
   const { t } = useI18n();
   const router = useRouter();
-  const supportPhone = useSupportPhone();
   const { state: session } = useSession();
 
   /**
@@ -188,8 +186,7 @@ export default function RemindersPage() {
           notice="something_went_wrong"
           title={t('notice.something_went_wrong.title')}
           body={t('notice.something_went_wrong.body')}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
       ) : null}
 

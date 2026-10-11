@@ -19,7 +19,6 @@ import { forgetInvite, recallInvite, type Invite } from '@/lib/appUrl';
 import { readAddedTrips, withMoves } from '@/lib/addedTrips';
 import { DUMMY_TRIPS } from '@pam/config/dummy-trips';
 import { Confetti } from '@pam/ui/SuccessScreen';
-import { useSupportPhone } from '@/lib/useSupportPhone';
 import { TransparencyReading } from '@/screens/TransparencyReading';
 import { signOut, useSession } from '@/lib/useSession';
 import { usePoints } from '@/lib/usePoints';
@@ -152,7 +151,6 @@ export interface JoinPreview {
 export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview | null } = {}) {
   const { t, locale, pendingLocale, setLocale } = useI18n();
   const router = useRouter();
-  const supportPhone = useSupportPhone();
   const { state: session } = useSession();
 
   const [phase, setPhase] = useState<Phase | null>(null);
@@ -512,8 +510,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
             notice="something_went_wrong"
             title={t('join.failed.title')}
             body={t('join.failed.body')}
-            supportPhone={supportPhone}
-            callLabel={t('help.callSupport')}
+            contactLabel={t('help.contact.action')}
           />
         ) : null}
 
@@ -661,8 +658,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
                   notice={inviteProblem}
                   title={t(NOTICES[inviteProblem].titleKey)}
                   body={t(NOTICES[inviteProblem].bodyKey)}
-                  supportPhone={supportPhone}
-                  callLabel={t('help.callSupport')}
+                  contactLabel={t('help.contact.action')}
                 />
               ) : null}
 
@@ -757,8 +753,7 @@ export function JoinScreen({ preview = null }: { readonly preview?: JoinPreview 
                   notice="service_not_available"
                   title={t('join.staff.title')}
                   body={t('join.staff.body')}
-                  supportPhone={supportPhone}
-                  callLabel={t('help.callSupport')}
+                  contactLabel={t('help.contact.action')}
                 />
               </>
             )}

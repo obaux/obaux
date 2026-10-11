@@ -171,7 +171,6 @@ export interface ThreadViewProps {
   readonly blocked?: 'mine' | 'theirs' | null;
   /** BCP-47 tag for dictation, e.g. "en-US" or "es-US". */
   readonly speechLanguage: string;
-  readonly supportPhone: string;
 }
 
 /**
@@ -564,7 +563,6 @@ export function ThreadView({
   limited = false,
   blocked = null,
   speechLanguage,
-  supportPhone,
 }: ThreadViewProps) {
   const { t, tPlain, locale } = useI18n();
   const inputRef = useRef<ChatComposerInputHandle>(null);
@@ -703,9 +701,9 @@ export function ThreadView({
   };
 
   const composer = limited ? (
-    <LimitedNotice supportPhone={supportPhone} />
+    <LimitedNotice />
   ) : blocked ? (
-    <BlockedNotice by={blocked} supportPhone={supportPhone} />
+    <BlockedNotice by={blocked} />
   ) : (
     <ChatComposer
       value={draft}
@@ -992,8 +990,7 @@ export function ThreadView({
             notice="something_went_wrong"
             title={t('messages.thread.failed.title')}
             body={t('messages.thread.failed.body')}
-            supportPhone={supportPhone}
-            callLabel={t('help.callSupport')}
+            contactLabel={t('help.contact.action')}
           />
         </VStack>
       ) : null}
