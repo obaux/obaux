@@ -433,6 +433,16 @@ describe('the way in explains itself first', () => {
     render(<OnboardingSlides slides={slides} label="How Pam works" />);
     expect(screen.getByRole('region', { name: 'How Pam works' })).toBeInTheDocument();
   });
+
+  it('with the lines not drawn (About Pam), shows no words but names every picture by its line', () => {
+    // Will, 10 October: only the tabs and the pictures. The words are not
+    // lost: each picture carries its line as its accessible name.
+    render(<OnboardingSlides slides={slides} label="How Pam works" variant="inline" showLines={false} />);
+    for (const slide of slides) {
+      expect(screen.queryByText(slide.text)).not.toBeInTheDocument();
+      expect(screen.getByRole('img', { name: slide.text })).toBeInTheDocument();
+    }
+  });
 });
 
 /**

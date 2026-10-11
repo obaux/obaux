@@ -1509,6 +1509,8 @@ fine and the fit audit was over-counting (D-448).
 
 ## Website · public site and help centre (10 October) — `apps/site`, on `main`
 
+**Hero carousel (11 October, D-499; branch, not yet merged).** Home's hero has the About Pam picture carousel to the right of the headline from 900px, under it on a phone. In the app, About Pam's carousel shows pictures only (`OnboardingSlides showLines={false}`); Sign in is unchanged. Figma "Pam — Website" Home has the Hero carousel component.
+
 The public site, `joinpam.org` (Vercel project `pam-site`; the app is `app.joinpam.org`), is a static
 Next export on the app's theme (`pnpm --filter @pam/site dev|build|test`; no Supabase, no sign-in; D-433,
 D-437). **Home** and **Support**: a help-centre home with search, topics and "Start here". **Ten help
