@@ -172,7 +172,7 @@ Iris
 
 ---
 
-## b18 privacy re-test (11 October, 17:40 UTC)
+## b18 privacy re-test (11 October, 17:05 UTC)
 
 **What I tested:** `main` at `b770551`, two ways:
 - the app built locally (`pnpm --filter @pam/web build`, served from `out/`), every outside
