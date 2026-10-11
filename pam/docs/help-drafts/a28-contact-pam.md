@@ -1,5 +1,14 @@
 # A28 words: Contact Pam, the Help screen, "Still stuck?", and every "call Pam" line
 
+**Signed by Will, 11 October 2026, 03:37 UTC (Control Room card a59: "signed").** Covers everything below: Contact Pam,
+the Help screen, "Still stuck?", every rewritten string, the two texts, the HELP auto-reply and the safety rows. His
+answers to the questions at the end:
+1. **A phone number on the form: yes, shown only once texts are on.** Until then the form asks for an email only.
+2. **Checking it's really you:** deleting an account is confirmed with a fresh sign-in code (Ava builds it); the same
+   check covers getting a copy. `privacy.copy.body` and `privacy.delete.body` stay as written ("We will check that it is
+   really you").
+3. **The privacy line names hello@joinpam.org:** yes, as written.
+
 Words by Sage for Will to sign (A28, Will 11 October 03:06: "Problem -> help desk -> email forward", "take off phone
 number"). Dot, Lena, Wren and Nico build from these. English only; Lena carries the signed English into the other six.
 
@@ -66,7 +75,7 @@ Shows at the end of a post and when a search finds nothing, never first.
 - Heading: **Still stuck?**
 - Lead: **Tell us what happened. A person at Pam reads every message.**
 - Field: **What's wrong?** · hint: **In your own words. You don't need to know what to ask for.**
-- Field: **How should we answer you?** · **Your email** *(and, if Will says yes, **Or a phone number we can text**)*
+- Field: **How should we answer you?** · **Your email** · and, **only once texts are on** (Will, 03:37): **Or a phone number we can text**
 - Line under the button: **We send what you write, this page and the language you read in. Nothing else from your account.**
 - Button: **Send to Pam**
 - Sent: **Sent. Thank you.** / **A person at Pam will read it and write back.**
