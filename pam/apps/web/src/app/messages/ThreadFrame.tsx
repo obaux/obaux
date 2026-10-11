@@ -213,6 +213,7 @@ export function ThreadHeader({
   return (
     <SubPageHeader
       variant="bar"
+      isTitleData
       isBarTitleShown={!onScreen}
       title={name}
       backHref={backHref}

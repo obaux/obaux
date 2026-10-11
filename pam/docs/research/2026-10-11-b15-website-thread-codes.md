@@ -127,3 +127,24 @@ first screen.**
   keyboard types.
 
 Iris
+
+---
+
+## b16 re-test (11 October, 13:45 UTC)
+
+`main` at `4e0c32f`: the site built locally, and the app from `main`'s Chromatic Storybook.
+No sign-in, accounts or sends.
+
+| | Result |
+|---|---|
+| **T1** English messages in an Arabic thread | **Pass.** The bubbles carry `dir="auto"` and compute LTR; the final "." and "?" sit at the end of the line. Arabic text is unchanged |
+| **T2** long name in the small bar | **Pass.** At 320, scrolled: a Latin name shows "Maria Guadalupe H…", and an Arabic name shows its own start, then "…" (`dir="auto"`, `unicode-bidi: isolate`) |
+| **H1** Pause pictures | **Pass.** A 146×48 pill with a pause icon, a 1px outline and a translucent fill, in light and dark. It sits on the top corner of the picture stack and is inside the first screen: y 505–553 on 568 at 320, y 434 on 844 at 390, y 134 at 1280. It switches to "Play pictures" and is hidden under reduced motion. Tab order: the picture card, then Pause, then Residents |
+| **C1** six digits | **Pass.** Sign in stays off at 0–5 digits for Latin, Arabic-Indic and Persian digits, and the sixth digit submits by itself |
+
+**Noted, not filed (Nico's heads-up, Dot building next).** In Arabic, a place's or policy's
+English name as the page heading takes the page's right-to-left direction:
+`member-created--place-profile` "Example Library Tech Lab" and
+`member-created--place-policy` "Confidentiality and disclosure" compute `rtl`.
+
+Iris

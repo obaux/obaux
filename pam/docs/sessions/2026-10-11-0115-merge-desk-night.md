@@ -255,11 +255,60 @@
     code". The search pill's contrast pairs are now in the site's contrast test;
   - Iris's report.
 
-  Next, for Dot: a way to mark a heading's text as data (a place's, program's or person's name), so names
-  outside conversations get the same fix. Not every Heading: Pam's own headings keep the page's direction.
+- **Batch b16 pushed at 4e0c32f, live: Vercel web and pam-site READY, main CI green.** Iris re-tested T1, T2,
+  H1 and C1, and all four pass.
+- **Batch b17:** Dot's D-534, names in headings keep their own direction:
+  - `@pam/ui/DataHeading`;
+  - `SubPageHeader`'s `isTitleData`, which is off by default; the conversation passes it;
+  - used for the place and program title, a policy's title (the program's own words), the profile card's
+    name, and the names in staff lists. Pam's own headings, including "Policies", keep the page's direction;
+  - plus Iris's b16 re-test note.
+- **Batch b17 pushed at f62ba03, live, main CI green.** Iris re-tested D-534 in Arabic and all of it passes: the
+  place and policy titles are ltr, the Policies list is rtl, and staff names are ltr.
+- **Privacy findings (Lena, Piper, verified by the merge desk):**
+  - Explore sent a typed street address from the phone to phl.carto.com in a GET URL;
+  - the Trips Google map was fitted to the member's trips, which tells Google roughly where they are going;
+  - a first name was in the /person/policies URL;
+  - example staff photos (Unsplash) could reach real accounts (D-537);
+  - "Use my current location" was saved on the phone, which made hereNote and a66's p10 untrue.
+- **Batch b18 (privacy):**
+  - Piper's D-536: no call to the city; the area picker is "ZIP code" / "Like 19107." / "Pam remembers the area you pick
+    on this phone only." (Sage, seven languages); the current location is never saved and old copies are wiped on
+    load; no first name in the URL; the Trips map always opens on the whole city;
+  - Nico's D-537: example photos only where examples are on;
+  - Lena's third-party host guard: a test fails if the app or the website names an outside host that Privacy doesn't;
+  - Sage's ledger.
+- **Cards for Will:**
+  - a66 now says "the location your phone sends", after Piper's log check (the gateway keeps the IP address and the time);
+  - a67 is new: the request-records line (p11, "deleted within a week") and the Google map line;
+  - a63 now says "whether you were marked as there": a program never learns who marked a visit, or how.
+- **Built and held:**
+  - "I'm here" (D-535, 3451ecb9, tree = df4d63ce), for a63 and a66;
+  - the calendar link (D-538, 57029b02), discreet by default ("Pam visit"; name and address only if the member
+    switches them on), for its own Privacy card.
+- **Batch b18 pushed at b770551, live, main CI green.** Iris re-tested all five privacy items and they pass.
+- **Batch b19 (small):**
+  - Piper's area hint ("Like 19107." under the picker);
+  - Lena's fit-audit fix: `pnpm audit:fit` now passes `--known`, as CI does. The "13 findings" were already accepted;
+  - Lena's host guard now covers the edge functions (Twilio, Resend, translation, link preview; Google pending);
+  - Nico's link-preview User-Agent now names joinpam.org instead of an old vercel address;
+  - one merge-desk line: the guard flagged the old address as no longer named, so I dropped its entry.
+
+  link-preview is to be redeployed after the push. Card a70 asks Will to read the translation account's retention
+  setting, because Privacy says the company "keeps nothing", which nobody has checked. a69 asks whether Pam should
+  ever read a member's calendar (the finder). My advice is "not yet". The Google sync (D-539) is built, off, and
+  waits for a68.
 
 ## What was wrong, and what missed it
 
+- **I revised a decision while Piper was mid-build, three times.** On how a program's lead sees a member's own mark,
+  my 16:05, 16:09 and 16:15 messages each crossed her work. She built, reverted and rebuilt, and Lena and Sage
+  rewrote a63 twice. The final design (df4d63ce) was hers and better than any of mine. Rule: once a decision is
+  sent, wait for the builder's next message before changing it. If it must change, say "stop" first.
+- **Comments and decisions claimed more privacy than the code had.** useAreaSearch's comment and D-054 said the
+  typed address went "nowhere else" and "not to Pam's server". It went to the city (with the IP) and to Pam.
+  hereNote was signed after checking the server only, while the phone kept the position. Lena found both by
+  reading the code paths. Promises are checked against the code, phone storage included.
 - **A targeted e2e run against a stale build.** Before b16's full suite I ran the sign-in specs alone, and
   Dot's new test failed in all three projects. Playwright serves `apps/web/out`, which was still b15's build.
   After rebuilding, all 75 passed. A targeted e2e run needs `pnpm --filter @pam/web build` first. The full
@@ -387,6 +436,17 @@
 | Batch b16: sign-in e2e after rebuilding (signin-wrong-code, code-boxes-ltr, short) | 75 passed |
 | Batch b16: db / config / copy:status / ui / web unit / site tests / e2e full | 1288 ok, 0 not ok / 1094 / in step / 124 / 125 / 94 / 1433 passed, 19 skipped |
 | Batch b16: builds, budget, storybook, site a11y / usability / scrollspy | all 0; 15.3 kB spare; builds; 120 scans 0 problems / clear / 300 links 0 problems |
+| main CI on 4e0c32f (b16); Vercel web and pam-site | all four green; READY |
+| Iris's b16 re-test: T1, T2, H1, C1 | all pass |
+| Batch b17: db / config / copy:status / ui / web unit / site tests / e2e full | 1288 ok, 0 not ok / 1094 / in step / 124 / 125 / 94 / 1451 passed, 19 skipped |
+| Batch b17: builds, budget, storybook, site a11y / usability / scrollspy | all 0; 15.2 kB spare; builds; 120 scans 0 problems / clear / 300 links 0 problems |
+| main CI on f62ba03 (b17); Iris's b17 re-test | all four green, READY; all pass |
+| Gateway and Postgres logs, 25 hours (Piper, read-only) | no coordinates in any log; the gateway keeps path, status, account, IP, user agent and time |
+| Batch b18: db / config / copy:status / ui / web unit / site tests / e2e full | 1288 ok, 0 not ok / 1101 / in step / 124 / 135 / 94 / 1454 passed, 19 skipped |
+| Batch b18: builds, budget, storybook, site a11y / usability / scrollspy; host guard | all 0; 15.7 kB spare; builds; 120 scans 0 / clear / 300 links 0; 7/7 |
+| main CI on b770551 (b18); Iris's b18 re-test | all four green, READY; five of five pass |
+| Batch b19 (5ae7c49): db / config / ui / web unit / site / e2e full / storybook / site checks | 1288 ok / 1101 / 124 / 135 / 94 / 1454 passed, 19 skipped / builds / 120 scans 0, clear, 300 links 0 |
+| Batch b19 + functions guard + User-Agent + guard cleanup: config | 1106 passed |
 
 ## Left undone
 

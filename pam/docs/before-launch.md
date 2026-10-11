@@ -27,6 +27,13 @@ STATUS row too.
   4. Seven languages: the system shows the string in the phone's language, so each of the six translations goes in the
      native project's per-language strings the day those exist (signed by Will with the Privacy page, as it repeats it).
 
+- [ ] **Read Twilio's own record of every text before texts go on** (Lena for Nico, 11 October 2026, from Piper's log check; Mira).
+  Twilio keeps, for each text Pam sends, the number, the text, the time and the status. Nobody has read its retention
+  setting (Console › Messaging › Settings, or the account's data-retention page). Privacy says only that "the one that sends
+  our texts" handles the information for Pam and may not use it for anything else (`privacy.s.sharing.p3`), and nothing says
+  how long it keeps it. Do it before the first real text: if Twilio keeps them longer than a person would expect, either shorten
+  it there or say so in `privacy.s.how-long` (Sage edits, Will signs). Texts are off today (`texts_live`), so it is not urgent.
+
 - [ ] **A28: finish taking Pam's number off every place a person reads it** (Lena, 11 October 2026, D-514, D-515).
   The app, the privacy page and the terms are done and signed (card a59). What is still open, each with an owner:
   1. **The live texts still carry the number.** `staff_request_denied` and `access_limited_notice` say

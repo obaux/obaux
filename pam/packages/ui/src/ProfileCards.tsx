@@ -4,7 +4,7 @@ import { Avatar } from '@astryxdesign/core/Avatar';
 import { Card } from '@astryxdesign/core/Card';
 import { ClickableCard } from '@astryxdesign/core/ClickableCard';
 import { Divider } from '@astryxdesign/core/Divider';
-import { Heading } from '@astryxdesign/core/Heading';
+import { DataHeading } from './DataHeading.js';
 import { HStack } from '@astryxdesign/core/HStack';
 import { IconButton } from '@astryxdesign/core/IconButton';
 import { Skeleton } from '@astryxdesign/core/Skeleton';
@@ -171,9 +171,9 @@ export function ProfileSummary({
           </VStack>
           <VStack gap={0.5} align="center">
             <HStack gap={0} align="center" justify="center" wrap="nowrap">
-              <Heading level={2} xstyle={summary.name} maxLines={2}>
+              <DataHeading level={2} xstyle={summary.name} maxLines={2}>
                 {name}
-              </Heading>
+              </DataHeading>
               {nameAddon}
             </HStack>
             <Text type="supporting" xstyle={summary.role}>
