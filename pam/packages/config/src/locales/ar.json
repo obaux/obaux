@@ -1542,7 +1542,7 @@
   "places.area.title": "الموقع",
   "places.area.done": "تم",
   "places.area.useHere": "استخدام موقعي الحالي",
-  "places.area.hereNote": "يبقى على هذا الهاتف",
+  "places.area.hereNote": "يُستخدم لهذا البحث فقط.",
   "places.area.finding": "يتم تحديد موقعك…",
   "places.area.hereFailed": "تعذر تحديد موقعك. ابحث بدلا من ذلك.",
   "places.area.here": "موقعك",

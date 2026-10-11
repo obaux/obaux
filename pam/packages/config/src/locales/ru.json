@@ -1492,7 +1492,7 @@
   "places.area.title": "Местоположение",
   "places.area.done": "Готово",
   "places.area.useHere": "Использовать моё текущее местоположение",
-  "places.area.hereNote": "Остаётся на этом телефоне",
+  "places.area.hereNote": "Используется только для этого поиска.",
   "places.area.finding": "Определяем, где вы…",
   "places.area.hereFailed": "Не удалось определить, где вы. Воспользуйтесь поиском.",
   "places.area.here": "ваше местоположение",
