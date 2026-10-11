@@ -154,10 +154,19 @@ about **helping**, not watching. The case manager is a guide and a mentor; the m
 What a case manager can see is a promise to members (the transparency screen), so it is told plainly
 where members read it, in the app and the privacy page. Marketing doesn't lead with it.
 
-**Personality is never a substitute for a fact.** The website can be bold about *how*
-Pam helps; it cannot claim what Pam doesn't do (support hours, reminders that aren't
-live, features in progress). Check the app's own strings and `apps/site/src/content/flags.ts`
-before you promise anything.
+### Marketing may reach; everything else says only what's true today
+
+Will, 11 October 2026: "marketing website can be more aspirational, making exceptions to what we say. It's okay
+to say it on homepage if we're working towards it."
+
+| Where | What it may say |
+|---|---|
+| **Marketing pages**: Home, and pages that sell Pam | What Pam does today, **and what we are working towards**: a feature on its way, the support we're building. Bold is fine. Make-believe isn't: only what is really planned. |
+| **Help posts, the app, texts and emails, anything legal or a promise** (privacy, terms, the transparency screen, notices) | **Only what is true today.** Check the app's own strings and `apps/site/src/content/flags.ts` before you write it. If it isn't live, say "coming" or leave it out. |
+
+So on Home, "reminders before every visit" or "help any time" can stand if they are on the way. In a help post or
+on a screen, they wait until they are real. Two limits stay on marketing too: nothing about who can see a person's
+information that the transparency screen doesn't say, and nothing that sounds like watching people (above).
 
 ## 4. Patterns
 
@@ -301,7 +310,7 @@ Before you send words to Will:
 - [ ] Does the title ask the question (task) or say the outcome (result)?
 - [ ] Does the button start with a verb and say what the tap does?
 - [ ] Does a confirmation say what happens next? Does an error say it's not their fault, what to do, and who to call?
-- [ ] Is every claim true in the app today? (Hours, texts, reminders, languages, features.)
+- [ ] Is every claim true today? In help, the app and anything legal it must be. On marketing pages it may be what we are working towards.
 - [ ] No justice terms, no hints at someone's past, no system words, no buzzwords.
 - [ ] Our words. App: member, case manager / your guide, program lead, program, place, visit, join, sign in, text, call Pam. Website: residents, providers, case managers / guides.
 - [ ] No idioms, no pieced-together sentences, `{placeholders}` whole, no gender.
