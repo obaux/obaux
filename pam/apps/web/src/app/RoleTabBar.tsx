@@ -12,12 +12,15 @@ export function RoleTabBar({
   name = 'Marcus',
   photoUrl = null,
   role = 'member',
+  hideMessages = false,
 }: {
   readonly current: TabKey | null;
   readonly unread?: boolean;
   readonly name?: string;
   readonly photoUrl?: string | null;
   readonly role?: Role;
+  /** Nobody to message and no conversation: the Messages tab is not drawn (`useMessagingReach`). */
+  readonly hideMessages?: boolean;
 }) {
   const { t } = useI18n();
   const isHome = firstTabIsHome(role);
@@ -30,7 +33,7 @@ export function RoleTabBar({
       unreadLabel={unread ? t('tab.unread') : null}
       isHome={isHome}
       homeIcon={role === 'provider' ? 'calendar' : role === 'admin' ? 'people' : 'house'}
-      tabs={tabsFor(role)}
+      tabs={hideMessages ? tabsFor(role).filter((tab) => tab !== 'messages') : tabsFor(role)}
       labels={{
         explore: t(isHome ? 'tab.home' : 'tab.explore'),
         saved: t('tab.saved'),

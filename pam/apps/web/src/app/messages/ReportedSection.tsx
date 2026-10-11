@@ -4,7 +4,6 @@ import * as stylex from '@stylexjs/stylex';
 import { Text } from '@astryxdesign/core/Text';
 import { Loading, Notice } from '@pam/ui';
 import { NOTICES } from '@pam/config';
-import { USE_DUMMY_PEOPLE } from '@pam/config/dummy-flag';
 import { useI18n } from '@/lib/i18n';
 import type { ReportsState } from '@/lib/useReports';
 import { DummyReportsLazy } from './DummyRowsLazy';
@@ -30,14 +29,19 @@ const styles = stylex.create({
 export function ReportedSection({
   state,
   previewing,
+  examples,
   supportPhone,
 }: {
   readonly state: ReportsState;
   readonly previewing: boolean;
+  /** Whether example data may be shown at all (`useExamplesOn`): never for a real account. */
+  readonly examples: boolean;
   readonly supportPhone: string;
 }) {
   const { t } = useI18n();
-  const real = !previewing;
+  // A real account sees its real reports, a super admin previewing a role included; only a demo
+  // account or Storybook's prototype has examples to show in their place.
+  const real = !(examples && previewing);
   const emptyReal = real && state.status === 'ready' && state.reports.length === 0;
   const failure = state.status === 'error' ? (state.offline ? 'offline' : 'something_went_wrong') : null;
 
@@ -57,11 +61,11 @@ export function ReportedSection({
 
       {real && state.status === 'ready' && state.reports.length > 0 ? <ReportsList reports={state.reports} /> : null}
 
-      {emptyReal && !USE_DUMMY_PEOPLE ? (
+      {emptyReal && !examples ? (
         <Notice notice="no_caseload_members" title={t('reports.empty.title')} body={t('reports.empty.body')} />
       ) : null}
 
-      {USE_DUMMY_PEOPLE && (previewing || emptyReal) ? <DummyReportsLazy /> : null}
+      {examples && (previewing || emptyReal) ? <DummyReportsLazy /> : null}
 
       <Text type="supporting" xstyle={styles.note}>
         {t('reports.intro')}

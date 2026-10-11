@@ -965,7 +965,7 @@ Vercel status after every push (`docs/team.md`). Emails link to app.joinpam.org:
 
 ## Merge desk & platform · the night of 11 October: four batches, one migration
 
-On `main` and live: D-498 (its migration `a_place_says_whether_a_program_lead_on_pam_runs_it` applied live), D-499, D-500, D-501, D-502, D-503 (Sage's voice guide), D-504 (Foundations match the code), Piper's pick-a-service line, Lena's D-498 review, and the Principles page in line with A24, A25 and A26. Each batch ran the full checks before its push; every push was confirmed READY on Vercel for `web` and `pam-site`. Sage joined (Voice & UX copy). Open with Will: "go on Ask Pam" for the help centre; a push word in Ava's session; a56 (attendance). **A28 (Will, a54):** Pam has no phone line; help goes problem → help desk → email to hello@joinpam.org. In progress in six lanes; the number is still on `main` until Dot's and Wren's changes merge. **Launch cleanup (a55):** real accounts see no example data: Trips done (D-509); Messages, places, Explore, Saved and Profile next. On `main` since: D-508 (legal Back to the website), D-510 (wrong code stays on the code step), D-509, D-513 (dark blue alert 10%), D-516 ("Saved" tip). A59 signed 03:37; D-512 (Contact Pam) and Lena's lines wait for Wren's A28 help desk. Log: `docs/sessions/2026-10-11-0115-merge-desk-night.md`.
+On `main` and live: D-498 (its migration `a_place_says_whether_a_program_lead_on_pam_runs_it` applied live), D-499, D-500, D-501, D-502, D-503 (Sage's voice guide), D-504 (Foundations match the code), Piper's pick-a-service line, Lena's D-498 review, and the Principles page in line with A24, A25 and A26. Each batch ran the full checks before its push; every push was confirmed READY on Vercel for `web` and `pam-site`. Sage joined (Voice & UX copy). Open with Will: "go on Ask Pam" for the help centre; a push word in Ava's session; a56 (attendance). **A28 (Will, a54):** Pam has no phone line; help goes problem → help desk → email to hello@joinpam.org. In progress in six lanes; the number is still on `main` until Dot's and Wren's changes merge. **Launch cleanup (a55):** real accounts see no example data: Trips done (D-509); Messages, places, Explore, Saved and Profile next. On `main` since: D-508 (legal Back to the website), D-510 (wrong code stays on the code step), D-509, D-513 (dark blue alert 10%), D-516 ("Saved" tip), D-511 (no example messages; no Messages tab with nobody to message). A29: Sage signs new sentences (`docs/signed-english.md`). A59 signed 03:37; D-512 (Contact Pam) and Lena's lines wait for Wren's A28 help desk. Log: `docs/sessions/2026-10-11-0115-merge-desk-night.md`.
 
 ## Merge desk & platform · a failed in-app load opens the screen; texts link to app.joinpam.org (10 October)
 
@@ -1165,6 +1165,12 @@ drops signatures), then `20261010042108_a_program_lead_submits_their_own_program
   new sentence is left to the PR check.
 
 ---
+
+## Messages & notifications · no examples on real accounts (11 October 2026)
+
+Branch `claude/messages-no-examples-real-accounts` (D-511). Examples show only in Storybook and on demo accounts
+(`lib/examples.ts`). The Messages tab hides for a member or provider with no one to message; the bell moves to Home then.
+Open: member Home's example "Your next visit" (Trips lane).
 
 ## Messages & notifications · the invite email in Spam (11 October 2026)
 
