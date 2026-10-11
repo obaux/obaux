@@ -448,8 +448,8 @@ export const COLOUR_TOKENS: readonly ColourToken[] = [
   },
   {
     "name": "--color-background-muted",
-    "light": "#f1f1f1",
-    "dark": "#1b1b1b",
+    "light": "#F1F1F1",
+    "dark": "#262626",
     "group": "background"
   },
   {

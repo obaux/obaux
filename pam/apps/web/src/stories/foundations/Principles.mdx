@@ -19,8 +19,10 @@ wrong, however it looks.
    each step of a task with more than one step, and any screen that tells them to call. Screens for
    looking around (the tabs, lists, a place's page) need none: help is one tap from Profile and on
    Home (Will, 11 October, A26; it was "on every screen").
-4. **16px body text on phones** (Will, 9 October, SOP A23; it was 18px). Nothing a member has to read
-   is smaller than 15px; supporting lines are 15–17px. Token: `--pam-body-text-mobile`.
+4. **The page is 16px; nothing is under 12px** (Will, 11 October, A27; A23 had "nothing a member reads is under
+   15px"). Typed text and reading text (policies, the legal pages) are 16px, buttons and rows 17–18px, headings 20–34px.
+   Component labels are 14px and captions 12–13px. Smaller is fine for metadata, never for the only way to know what to
+   do next. Token: `--pam-body-text-mobile`. The sizes by role are on Typography.
 5. **Astryx only.** No other component library, no hand-rolled controls. Style through StyleX and
    tokens — never inline styles, never a raw hex or px where a token exists.
 6. **Never show justice terms.** Not "prisoner", "ex-offender", "inmate", or anything about a
