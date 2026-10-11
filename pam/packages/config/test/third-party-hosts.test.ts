@@ -65,11 +65,6 @@ const HOSTS: Record<string, HostEntry> = {
     privacy: { key: 'privacy.s.sharing.p5', names: /Google/ },
     pending: 'a67',
   },
-  'phl.carto.com': {
-    kind: 'loaded',
-    why: 'the City of Philadelphia’s address list, called as a street address is typed (useAreaSearch.ts)',
-    removing: 'D-535 (Mira, 11 October: the street-address lookup stops; no Privacy line for the city)',
-  },
 
   // Links a person taps: they leave Pam.
   'www.google.com': { kind: 'link', why: 'directions and search on Google Maps, opened by a tap (PlaceCard.tsx)' },
@@ -92,7 +87,6 @@ const HOSTS: Record<string, HostEntry> = {
 /** Files that ask for something themselves. Anything else that starts to must be added here, and its host above. */
 const REQUESTERS: Record<string, string> = {
   'apps/web/src/screens/TripsMap.tsx': 'the Google Maps script (maps.googleapis.com)',
-  'apps/web/src/lib/useAreaSearch.ts': 'the city’s address list (phl.carto.com), going away with D-535',
   'packages/ui/src/OnboardingSlides.tsx': 'preloads the slide pictures, which are Pam’s own',
   'apps/site/src/components/HelpRequest.tsx': 'the help form posts to Pam’s own database function (the Supabase host), behind a switch that is off (D-521)',
 };
