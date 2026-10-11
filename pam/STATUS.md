@@ -2167,3 +2167,7 @@ Sign in on the code step is off until all six digits are in (D-532). The Support
 ## Places & programs · no street-address call to the city (11 October 2026) — on `main` (b18)
 
 Branch `claude/places-programs-no-city-call` (D-536). The browser no longer asks the City of Philadelphia about a typed address; the picker says ZIP code or neighborhood; a member's first name is out of the policies address; the Google map in Trips opens on the whole city, never fitted to the pins. No migration.
+
+## Places & programs · neighborhoods in the area search (11 October 2026)
+
+D-540, branch `claude/places-programs-neighborhoods`: 159 neighborhoods (a name and one point each, CC BY 4.0, Abaca Labs, pinned source and checksum) in `areas`, found by the existing search; credit under Legal › Data sources. Migration `20261011194237_the_area_search_knows_philadelphia_s_neighborhoods` for the merge desk to apply (public reference data, expand-only). Waiting on Sage ("or neighborhood" in the picker words) and Lena (seven languages). Log: `docs/sessions/2026-10-11-1942-neighborhoods-in-the-area-search.md`.

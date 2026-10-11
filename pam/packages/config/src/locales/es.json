@@ -1588,5 +1588,9 @@
   "supportReply.send": "Enviar texto",
   "supportReply.sent": "En cola. Sale en un máximo de cinco minutos.",
   "supportReply.noNumber": "No hay número al que enviar el texto.",
-  "supportReply.failed": "No salió. Inténtelo de nuevo."
+  "supportReply.failed": "No salió. Inténtelo de nuevo.",
+  "legal.sources.title": "Data sources",
+  "legal.sources.neighborhoods": "The neighborhood names in the area search come from “Philadelphia Neighborhoods”, made by Abaca Labs. Pam changed it: it keeps one point for each neighborhood, not the boundaries.",
+  "legal.sources.link": "See the source data",
+  "legal.sources.licence": "Licence: CC BY 4.0"
 }

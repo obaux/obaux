@@ -1588,5 +1588,9 @@
   "supportReply.send": "傳送短訊",
   "supportReply.sent": "已排隊，五分鐘內傳送。",
   "supportReply.noNumber": "沒有可傳短訊的號碼。",
-  "supportReply.failed": "未能傳送。請再試一次。"
+  "supportReply.failed": "未能傳送。請再試一次。",
+  "legal.sources.title": "Data sources",
+  "legal.sources.neighborhoods": "The neighborhood names in the area search come from “Philadelphia Neighborhoods”, made by Abaca Labs. Pam changed it: it keeps one point for each neighborhood, not the boundaries.",
+  "legal.sources.link": "See the source data",
+  "legal.sources.licence": "Licence: CC BY 4.0"
 }

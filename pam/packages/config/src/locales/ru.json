@@ -1672,5 +1672,9 @@
   "supportReply.send": "Отправить SMS",
   "supportReply.sent": "В очереди. Уйдёт в течение пяти минут.",
   "supportReply.noNumber": "Нет номера для SMS.",
-  "supportReply.failed": "Не отправлено. Попробуйте ещё раз."
+  "supportReply.failed": "Не отправлено. Попробуйте ещё раз.",
+  "legal.sources.title": "Data sources",
+  "legal.sources.neighborhoods": "The neighborhood names in the area search come from “Philadelphia Neighborhoods”, made by Abaca Labs. Pam changed it: it keeps one point for each neighborhood, not the boundaries.",
+  "legal.sources.link": "See the source data",
+  "legal.sources.licence": "Licence: CC BY 4.0"
 }
