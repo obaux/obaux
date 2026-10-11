@@ -71,6 +71,12 @@
     `docs/help-centre-gaps.md` lists the gaps. An empty result shows the topics and Call Pam.
   - Sage's voice-guide update (D-505): Will's marketing words, how she works on his Figma components,
     and his "people are guided, never watched".
+- **Batch dark muted + A27:** dark `--color-background-muted` is #262626 (Will: "Yes go for it"), with a
+  before-and-after story. A27 writes the text-size rule as the app has it, with its exceptions (Will: "Leave as is.
+  Make exceptions. Update rules."). Dot corrected her own figures: 38% of text is under 15px, not 75%. Will has
+  that on card a52, together with Sign in's label and consent line at 16px.
+- **Card a50, yes:** Wren changes the website's case-manager card, and Lena changes About Pam in seven
+  languages, both to Will's line "Their plans, your guidance, in one place."
 - **Figma:** Sage wrote her lines into Will's Callout card (18:517). Will reworked them with her directly.
 - **Card a50:** "Know where your people are going" is live on the website and in About Pam, and Will
   told Sage it sounds like surveillance. The card proposes his own Figma line.
@@ -128,6 +134,8 @@
 | Vercel on 1634541 | web and pam-site production READY |
 | Batch 506: site tests / site tsc / web tsc / site build / config / copy:status / storybook | 38 passed / 0 / 0 / 0 / 0 / in step / builds |
 | Batch 506: site a11y (needs `CHROMIUM_PATH` here; without it the script exits before scanning) | 90 scans, 0 problems, the nothing-found state included |
+| Batch a27: ui / web tsc / web unit / web build / budget | 120 / 0 / 97 / 0 / 23.0 kB spare |
+| Batch a27: e2e a11y + theme (all projects, dark included) / site build / site a11y / storybook | 54 passed / 0 / 90 scans, 0 problems / builds |
 | D-502 + D-501 together, Sign in 320×568 invited, en/ar × light/dark, scrolled 0–300px | the pause disc is on top only when unscrolled; from 40px the pinned invite line is on top of it, and from 120px it is off screen; compact bar shows with the mark at the start (right in Arabic) |
 
 ## Left undone
@@ -142,7 +150,7 @@
 
 ## Needs a human
 
-- Will: card a50, the surveillance line on the website and in About Pam.
+- Will: card a51 (three help posts) and card a52 (Sign in's label and consent line at 16px).
 - Will: in Ava's session (the Control Room's "Waiting for you to unblock" strip opens it), type "push the
   switcher branch".
 - Will: "go on Ask Pam" if he wants the AI answer box over the Support posts scoped (an API key he enters,
