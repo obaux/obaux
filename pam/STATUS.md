@@ -1166,6 +1166,12 @@ drops signatures), then `20261010042108_a_program_lead_submits_their_own_program
 
 ---
 
+## Messages & notifications · no examples on real accounts (11 October 2026)
+
+Branch `claude/messages-no-examples-real-accounts` (D-511). Examples show only in Storybook and on demo accounts
+(`lib/examples.ts`). The Messages tab hides for a member or provider with no one to message; the bell moves to Home then.
+Open: member Home's example "Your next visit" (Trips lane).
+
 ## Messages & notifications · the invite email in Spam (11 October 2026)
 
 Branch `claude/messages-email-deliverability`. Docs only. The email itself has nothing a filter dislikes; the cause is the

@@ -7,13 +7,13 @@ import { Loading, Notice, Page } from '@pam/ui';
 import { SubPageHeader } from '@pam/ui/SubPage';
 import { HelpButton } from '../../screens/HelpButton';
 import { NOTICES } from '@pam/config';
-import { USE_DUMMY_PEOPLE } from '@pam/config/dummy-flag';
 import { DUMMY_INTERESTED } from '@pam/config/dummy-people';
 import { useI18n } from '@/lib/i18n';
 import { NotIn } from '../NotIn';
 import { PersonRow } from '../PersonRow';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
+import { useExamplesOn } from '@/lib/useExamplesOn';
 import { useRoleView } from '@/lib/useViewedRole';
 import { RoleSwitchControl } from '../RoleSwitchControl';
 import { whenHappened } from '@/lib/when';
@@ -39,6 +39,8 @@ export default function InterestedPage() {
   const { t, locale } = useI18n();
   const supportPhone = useSupportPhone();
   const { state: session } = useSession();
+  // Example people only where examples are allowed (lib/examples.ts); a real program sees its own.
+  const examplesOn = useExamplesOn();
 
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
   const { viewedRole, setViewAs } = useRoleView(trueRole);
@@ -148,7 +150,7 @@ export default function InterestedPage() {
     <Page gap={4}>
       <SubPageHeader
         title={t('interested.title')}
-        subtitle={USE_DUMMY_PEOPLE ? t('interested.subtitle', { count: DUMMY_INTERESTED.length }) : undefined}
+        subtitle={examplesOn ? t('interested.subtitle', { count: DUMMY_INTERESTED.length }) : undefined}
         backHref="/"
         backLabel={t('nav.back.home')}
         actions={
@@ -161,7 +163,7 @@ export default function InterestedPage() {
         }
       />
 
-      {!USE_DUMMY_PEOPLE ? (
+      {!examplesOn ? (
         // No real "who is interested" query exists yet (see the file comment),
         // so this is what an empty one says — in a program's words, not a
         // case manager's ("When someone uses an invite code from you…"). It

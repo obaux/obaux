@@ -21,9 +21,9 @@ import {
 } from '@pam/ui';
 import { SubPageHeader } from '@pam/ui/SubPage';
 import { emptyState } from '@pam/ui/emptyState';
-import { USE_DUMMY_PEOPLE } from '@pam/config/dummy-flag';
 import { isFreshAccount } from '@/lib/programSetup';
 import { DUMMY_NOTIFICATIONS } from '@pam/config/dummy-notifications';
+import { useExamplesOn } from '@/lib/useExamplesOn';
 import { useI18n } from '@/lib/i18n';
 import { NotIn } from '../NotIn';
 import { useSupportPhone } from '@/lib/useSupportPhone';
@@ -134,8 +134,10 @@ export default function NotificationsPage() {
   const unread = unreadCount(state);
   const isDemo = useDemoView(session);
 
+  // Example alerts are for Storybook and demo accounts only (lib/examples.ts).
+  const examplesOn = useExamplesOn();
   const showDummy =
-    USE_DUMMY_PEOPLE &&
+    examplesOn &&
     // Nothing yet for an account that has just signed up (D-361).
     !isFreshAccount() &&
     state.status === 'ready' &&

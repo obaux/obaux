@@ -6,6 +6,7 @@ import { DUMMY_SELF } from '@pam/config/dummy-people';
 import { useRouter } from 'next/navigation';
 import { signOut, useSession } from '@/lib/useSession';
 import { useRoleView } from '@/lib/useViewedRole';
+import { useExamplesOn } from '@/lib/useExamplesOn';
 import { usePoints } from '@/lib/usePoints';
 import { getReminderConsent } from '@/lib/useReminderConsent';
 import { useSavedPlaces } from '@/lib/useSavedPlaces';
@@ -27,6 +28,7 @@ export function ProfileScreen() {
   const signedIn = session.status === 'signed-in';
   const trueRole = signedIn ? session.session.role : null;
   const { viewedRole, demoRole } = useRoleView(trueRole);
+  const examplesOn = useExamplesOn();
   const points = usePoints(signedIn ? session.session.userId : null);
   const { state: saved } = useSavedPlaces(signedIn, demoRole);
   const [remindersOn, setRemindersOn] = useState(false);
@@ -73,7 +75,8 @@ export function ProfileScreen() {
       role={role}
       points={points ?? 0}
       savedCount={saved.status === 'ready' ? saved.places.length : 0}
-      connectionsCount={role === 'member' ? DUMMY_CONNECTIONS.length : 0}
+      // There is no real list of people who offered help yet: a real account has none to count.
+      connectionsCount={role === 'member' && examplesOn ? DUMMY_CONNECTIONS.length : 0}
       remindersOn={remindersOn}
       canViewAs={trueRole === 'super_admin'}
       canUseAs={signedIn && session.session.roles.includes('member') && session.session.roles.includes('provider')}
