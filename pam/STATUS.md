@@ -1166,6 +1166,12 @@ drops signatures), then `20261010042108_a_program_lead_submits_their_own_program
 
 ---
 
+## Messages & notifications · the help request forward (11 October 2026)
+
+Branch `claude/messages-help-request-forward` (D-521, A28). Edge function `help-request`, off behind `HELP_REQUESTS_LIVE`;
+guarded (origin, honeypot, caps, rate limit in the database, migration 20261011041940). Contract: `docs/help-request-contract.md`.
+Nothing is sent until Will says "test it". Next: the text reply.
+
 ## Messages & notifications · alerts truth and two texts without the number (11 October 2026)
 
 Branch `claude/messages-honest-alerts-and-texts` (D-519). Text alerts switches wait for `texts_live`. The denied-request and

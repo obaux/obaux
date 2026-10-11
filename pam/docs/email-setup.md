@@ -113,3 +113,15 @@ check fails; that needs Will's yes first.
   sender is first switched on it sends the requests still inside those limits: people who
   were told to check their email.
 - To see what was sent: `select requested_at, sent_at, address_removed_at, attempts, failure_reason from invite_emails order by requested_at desc limit 10;` (the address is deleted once sent, so this shows `sent_at` and `address_removed_at`, never where).
+
+
+## The help request forward (A28, D-521)
+
+The help desk's "Still stuck?" form posts to the `help-request` function, which sends one email to `hello@joinpam.org`
+with the person as reply-to. The contract is `docs/help-request-contract.md`. It is built **off**.
+
+Secrets (names only): `HELP_REQUESTS_LIVE` (`on` switches it on; anything else is off and the form shows the address),
+`RESEND_API_KEY`, `EMAIL_FROM` (the same as the invite email's), `HELP_REQUEST_SALT` (any long random string; salts the hash
+the rate limit keeps). Deploy it with **JWT verification off** (`verify_jwt: false`): the visitor has no Pam login.
+Apply migration `20261011041940` first (the limit's table and function). Nothing is sent before Will says "test it": then one
+request to `hello@joinpam.org` only, and `HELP_REQUESTS_LIVE=on` after he sees it arrive.
