@@ -9,8 +9,8 @@ import { HowTo, ShotCard } from '../components/HowTo';
  * program may START a chat with a member only if the member is signed up with it or has a visit planned
  * there that is not cancelled, and otherwise only answer a member who wrote to it; a case manager with
  * their own members; a super admin with case managers and program leads, never a member; nobody else.
- * HELD for the D-541 deploy (Lena, 11 October): publish only with Nico's branch
- * claude/messages-program-before-booking. What a program sees when a member writes to it is said by
+ * HELD (Lena, Sage 11 October): publish only when Will signs the card for "a program can start a chat with you only if…"
+ * AND Nico's D-541 part 2 (claude/messages-program-before-booking) deploys, whichever is later. What a program sees when a member writes to it is said by
  * "What others can see" and the Privacy page, not here. A message never
  * queues a text (migration 0064). Blocking is the ⋯ menu's "Block this person" (D-463, words from
  * en.json messages.block.* and messages.blocked.*). Left out on purpose: message translation
@@ -22,7 +22,7 @@ export function MessagesInPam() {
       <Lead>
         You can message your own case manager. You can also write to a program that is on Pam, even before you
         plan a visit, and they can answer you. A program can start a chat with you only if you are signed up with
-        them or have a visit planned there. Nobody else can start a chat with you.
+        them or have a visit planned there. Your own case manager can start a chat with you too. Nobody else can.
       </Lead>
 
       <Section title="Who can write to whom">
