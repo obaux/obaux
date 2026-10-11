@@ -1417,7 +1417,7 @@
   "places.area.title": "Ubicación",
   "places.area.done": "Listo",
   "places.area.useHere": "Usar mi ubicación actual",
-  "places.area.hereNote": "Se queda en este teléfono",
+  "places.area.hereNote": "Solo se usa para esta búsqueda.",
   "places.area.finding": "Buscándote…",
   "places.area.hereFailed": "No te encontramos. Busca en su lugar.",
   "places.area.here": "tu ubicación",

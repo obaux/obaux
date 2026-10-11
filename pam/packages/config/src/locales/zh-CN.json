@@ -1417,7 +1417,7 @@
   "places.area.title": "位置",
   "places.area.done": "完成",
   "places.area.useHere": "使用我当前的位置",
-  "places.area.hereNote": "只保存在这部手机上",
+  "places.area.hereNote": "仅用于本次搜索。",
   "places.area.finding": "正在定位您的位置…",
   "places.area.hereFailed": "无法确定您的位置。请改为搜索。",
   "places.area.here": "您的位置",

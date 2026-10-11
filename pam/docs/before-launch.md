@@ -11,6 +11,22 @@ STATUS row too.
 
 ## Open
 
+- [ ] **The native apps ask for location with Pam's own reason** (Lena, 11 October 2026; Mira asked for this to be listed). Pam
+  asks the phone for where it is in two places: "Use my current location" in Explore's area picker, and "I'm here" on a visit
+  (D-526 part B). In the web app the browser asks. In the iOS and Android apps the system asks, and each store wants one line
+  saying why, shown in the person's language. `apps/native` has none yet, so write them when the shell gets its location
+  permission. The English, so the two places say one thing and say what Privacy says (`privacy.s.what-we-keep.p9`):
+  1. iOS `NSLocationWhenInUseUsageDescription` (when-in-use only; never ask for "always"):
+     *"Pam uses where you are to check you are at a place when you tap “I’m here”, and to find places near you when you
+     search. It does not keep where you are."*
+  2. Android: ask for precise location only at the moment of the tap (`ACCESS_FINE_LOCATION`, the check is within about
+     150 metres), with the same sentence on Pam's own screen before the system prompt. Never in the background.
+  3. Store privacy labels (App Store "Data used to track you / collected", Google Play "Data safety"): say location is used for
+     the app's function and is **not stored**, only if Piper's log check says the position is not in any URL the API logs keep;
+     if it is, move the call to POST first. Do not write the label from this item: write it from her answer.
+  4. Seven languages: the system shows the string in the phone's language, so each of the six translations goes in the
+     native project's per-language strings the day those exist (signed by Will with the Privacy page, as it repeats it).
+
 - [ ] **A28: finish taking Pam's number off every place a person reads it** (Lena, 11 October 2026, D-514, D-515).
   The app, the privacy page and the terms are done and signed (card a59). What is still open, each with an owner:
   1. **The live texts still carry the number.** `staff_request_denied` and `access_limited_notice` say
