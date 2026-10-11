@@ -34,7 +34,10 @@ wrong silently. (Why each piece exists: D-424, D-425.)
    English stretched about 40% and wrapped in ⟦ ⟧ — a string with no closing
    bracket was cut off, and a string with no accents never went through `t()`.
    Then `pnpm --filter @pam/web build-storybook && pnpm --filter @pam/web
-   audit:fit` measures every story in every language at 320px; the
+   audit:fit` measures every story in every language at 320px, and fails only on
+   a defect that is not in `apps/web/scripts/fit-known.json` (the script passes
+   `--known` itself; before 11 October it did not, so a clean `main` exited 1 with
+   the 13 accepted findings); the
    `PAM Language fit` workflow does it for Russian, Arabic, Simplified Chinese and
    the pseudo-language on a pull request that touches copy or UI.
    Text should wrap and grow (`@pam/ui` `Button`, `Badge`, `Segment`), never be
