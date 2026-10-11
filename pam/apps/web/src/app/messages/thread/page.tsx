@@ -15,7 +15,7 @@ import { useMessageTranslations } from '@/lib/useMessageTranslations';
 import { ThreadViewLazy } from '../ThreadViewLazy';
 import { staffPhotoFor } from '@pam/config/dummy-connections';
 import { useExamplesOn } from '@/lib/useExamplesOn';
-import { ThreadFrame, ThreadHeader, ThreadTop } from '../ThreadFrame';
+import { ThreadFrame, ThreadHeader, ThreadIntro, ThreadTop } from '../ThreadFrame';
 import { DemoThreadLazy } from '../DemoThreadLazy';
 import { ThreadVisit } from '../ThreadVisit';
 import { threadLineFor } from '@/lib/threadLine';
@@ -192,21 +192,28 @@ function ThreadScreen() {
         <ThreadTop>
           <ThreadHeader
             name={title}
-            context={context}
             backHref={backHref}
             backLabel={backLabel}
             menuHref={`/messages/thread/options/?id=${encodeURIComponent(conversationId ?? '')}`}
           />
-          {/* A member's visit with this program, under the name (D-276). */}
-          {trueRole === 'member' && state.otherRole === 'provider' ? (
-            <ThreadVisit programName={state.otherProgramName ?? null} threadId={conversationId ?? ''} />
-          ) : null}
         </ThreadTop>
         <ThreadViewLazy
           messages={state.messages}
           translations={translations}
           otherName={state.otherName}
           otherPhotoUrl={staffPhotoFor(state.otherName, state.otherProgramName ?? null)}
+          intro={
+            <ThreadIntro
+              name={title}
+              photoUrl={staffPhotoFor(state.otherName, state.otherProgramName ?? null)}
+              context={context}
+            >
+              {/* A member's visit with this program, under the name (D-276). */}
+              {trueRole === 'member' && state.otherRole === 'provider' ? (
+                <ThreadVisit programName={state.otherProgramName ?? null} threadId={conversationId ?? ''} />
+              ) : null}
+            </ThreadIntro>
+          }
           onSend={send}
           sending={sending}
           sendFailed={sendFailed}

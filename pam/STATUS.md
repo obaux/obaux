@@ -1178,6 +1178,11 @@ drops signatures), then `20261010042108_a_program_lead_submits_their_own_program
 
 ---
 
+## Messages & notifications · the thread header, small bar and scrolling info (11 October 2026)
+
+Branch `claude/messages-thread-header-back` (D-529). A conversation's header is the nested-page bar alone (`SubPageHeader variant="bar"`);
+who they are (photo, name, who, the visit card) scrolls with the messages, and the bar's name fades in when it has gone under the bar.
+
 ## Messages & notifications · the help request forward (11 October 2026)
 
 Branch `claude/messages-help-request-forward` (D-521, A28). Edge function `help-request`, off behind `HELP_REQUESTS_LIVE`;
