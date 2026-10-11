@@ -1468,6 +1468,10 @@ Branch `claude/pam-design-saved-tooltip` (D-516). `@pam/ui/ConfirmTip`: a small 
 
 Branch `claude/pam-design-dark-info-alert` (D-513). One token, `--astryx-theme-neutral-color-status-muted-accent`, dark `#88bcff3D` → `#88bcff1A`; words 8.4:1, icon 7.3:1 on it. Light mode unchanged. Story: Foundations › Dark blue alert.
 
+## Design system & Storybook · focus ring only on text boxes (11 October)
+
+Branch `claude/pam-design-focus-text-boxes` (D-523, replaces D-411's focus line). Script-focused `tabindex=-1` non-controls, dialogs and sheets show no ring in any input mode; text boxes keep their field highlight; buttons and links ring on Tab. `e2e/focus-text-boxes.spec.ts`.
+
 ## Design system & Storybook · badge caption 12px (11 October) — on `main`
 
 Merged from `claude/pam-design-badge-caption` (3472970). The "Your badge" caption on the Profile badge tile is 12px, not 11px, following A27 (nothing under

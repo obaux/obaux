@@ -30,6 +30,7 @@ const markAutofocus = (element: HTMLElement | null) => {
 export const landFocus = { ref: markAutofocus, tabIndex: -1, 'data-autofocus': '' } as const;
 
 export const landFocusStyle = stylex.create({
-  // Not a control, so no focus ring: nothing on it can be pressed.
+  // Not a control, so no focus ring: nothing on it can be pressed. The global rule says the same for every
+  // `tabindex="-1"` target in every input mode (globals.css, D-523); this stays so a story without it is right too.
   quiet: { outlineStyle: 'none' },
 });
