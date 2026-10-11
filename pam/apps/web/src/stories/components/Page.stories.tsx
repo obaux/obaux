@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/nextjs';
 import { Text } from '@astryxdesign/core/Text';
 import { BigButton, HelpBar, Page, PageTitle, type PageProps } from '@pam/ui';
-import { HELP_DESK_URL } from '../../lib/helpDesk';
 import { useStoryText } from '../support/useStoryText';
 
 /**
@@ -18,8 +17,7 @@ function Screen(args: Omit<PageProps, 'children'>) {
     <Page {...args}>
       <PageTitle title={tr('help.title')} backHref="/" backLabel={tr('nav.back.home')} />
       <Text>{tr('help.intro')}</Text>
-      <Text type="supporting">{tr('help.desk.body')}</Text>
-      <BigButton label={tr('help.contact.action')} href={HELP_DESK_URL} />
+      <BigButton label={tr('help.contact.action')} href="/help/" />
       <HelpBar label={tr('nav.help')} variant="block" />
     </Page>
   );

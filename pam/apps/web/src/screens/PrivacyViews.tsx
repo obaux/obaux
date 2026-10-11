@@ -14,7 +14,6 @@ import { IconTile } from '@pam/ui/Reading';
 import { SubPage } from '@pam/ui/SubPage';
 import { TransparencyReading } from '@/screens/TransparencyReading';
 import { useI18n } from '@/lib/i18n';
-import { HELP_DESK_URL } from '@/lib/helpDesk';
 
 /**
  * What others can see — and what you can do about your data (D-213, from the
@@ -27,8 +26,8 @@ import { HELP_DESK_URL } from '@/lib/helpDesk';
  * The two actions are what the privacy policy already offers ("Ask us for a
  * copy of what we keep about you, or ask us to delete it"). Neither is
  * self-serve in Pam today, so each opens a page that says so plainly and
- * puts the way to Pam one tap away (the help desk, A28 — Pam has no phone
- * line) — not a button that pretends.
+ * puts Contact Pam one tap away (it opens Help, which leads to the help desk:
+ * Pam has no phone line, A28) — not a button that pretends.
  */
 const styles = stylex.create({
   intro: { fontSize: '18px', lineHeight: 1.5 },
@@ -97,7 +96,7 @@ export function DataCopyView() {
       backLabel={t('nav.back.privacyControls')}
     >
       <Text xstyle={styles.body}>{t('privacy.copy.body')}</Text>
-      <BigButton label={t('help.contact.action')} href={HELP_DESK_URL} />
+      <BigButton label={t('help.contact.action')} href="/help/" />
     </SubPage>
   );
 }
@@ -114,7 +113,7 @@ export function DeleteAccountView() {
       <Text type="supporting" xstyle={styles.body}>
         {t('privacy.delete.stop')}
       </Text>
-      <BigButton label={t('help.contact.action')} href={HELP_DESK_URL} variant="secondary" />
+      <BigButton label={t('help.contact.action')} href="/help/" variant="secondary" />
     </SubPage>
   );
 }
