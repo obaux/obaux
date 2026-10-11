@@ -421,6 +421,16 @@ Russian, Arabic (D-422); messages read in the reader's language (D-423).
   forwarding, a test and Will's go, D-450). Six translations each by Claude, with no native reader: promises, so the same
   native readers as below. The English says "rules" where the app says "policy"; the translations follow the app's word.
 
+- [ ] **A native reader for the calendar link screen (D-538, 11 October 2026).** The 27 `calendar.*` strings are six translations by
+  Claude with no native reader. Two things a reader must check against the real apps, in their own language, because the apps can
+  rename them: **`calendar.others`** names buttons in Google Calendar ("Other calendars" › "From URL") and Outlook ("Add calendar" ›
+  "Subscribe from web"); each translation uses what the app shows in that language, written from memory (es "Otros calendarios" ›
+  "Desde URL"; pt-BR Google Agenda "Outras agendas" › "Do URL"; ru "Другие календари" › "По URL"; ar «تقاويم أخرى» › «من عنوان URL»;
+  zh-CN “其他日历” › “通过网址”; zh-HK 「其他日曆」›「透過網址」; Outlook "Subscribe from web" is "Suscribirse desde la web", "Assinar da Web",
+  “从 Web 订阅”, 「從 Web 訂閱」, «Подписаться из Интернета», «الاشتراك من الويب»). And **"Pam visit"** stays English inside the quotes in
+  `calendar.details.hint`, because the event's text is English whatever the member's language (D-538, "Not done"): if the event text
+  is ever translated, change both together.
+
 - [ ] **A native reader for what D-465 reworded (10 October).** The last-day line on the
   transparency screen (`transparency.canSee.lastActive`), the privacy page's "What you can do"
   blocking sentence and the terms' blocking sentence now say only what is true (a guide, not a
