@@ -7,6 +7,11 @@ import { settled } from './settled';
  * plain rows. Back from Policies to sign returns to this screen, not to a
  * fresh Plan a visit at its first step.
  */
+// These walk the example places, services and policies, which a demo asks for outright; a real account has none (D-509).
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => window.sessionStorage.setItem('pam.examples', '1'));
+});
+
 test('booking ends on the green card, and Back from Policies returns to it', async ({ page }) => {
   await page.goto('/trips/new/?place=dummy-place-learning&name=Example%20Learning%20Center&category=education');
   await settled(page);

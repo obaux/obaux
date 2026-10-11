@@ -1,4 +1,5 @@
 import { DUMMY_PROGRAM_LEADS } from '@pam/config/dummy-people';
+import { examplesOn } from './examples';
 import { DUMMY_SELF_ID, dummyConversationIdBetween, dummyConversationsFor } from '@pam/config/dummy-conversations';
 
 /**
@@ -9,6 +10,8 @@ import { DUMMY_SELF_ID, dummyConversationIdBetween, dummyConversationsFor } from
  * like `messageHrefFor`; null when there is nothing new.
  */
 export function newMessageFrom(placeName: string): { href: string; count: number; preview: string } | null {
+  // A real account has no example conversation to open (lib/examples.ts).
+  if (!examplesOn()) return null;
   const lead = DUMMY_PROGRAM_LEADS.find((person) => person.orgName === placeName);
   if (!lead) return null;
   const id = dummyConversationIdBetween(DUMMY_SELF_ID.member, lead.id);

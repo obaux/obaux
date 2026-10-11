@@ -2,11 +2,11 @@
 
 import { useEffect, useState } from 'react';
 import { DUMMY_CONNECTIONS } from '@pam/config/dummy-connections';
-import { showsExamples } from '@/lib/exampleMode';
 import { DUMMY_SELF } from '@pam/config/dummy-people';
 import { useRouter } from 'next/navigation';
 import { signOut, useSession } from '@/lib/useSession';
 import { useRoleView } from '@/lib/useViewedRole';
+import { useExamplesOn } from '@/lib/useExamplesOn';
 import { usePointsState } from '@/lib/usePoints';
 import { getReminderConsent } from '@/lib/useReminderConsent';
 import { useSavedPlaces } from '@/lib/useSavedPlaces';
@@ -31,6 +31,7 @@ export function ProfileScreen() {
   const signedIn = session.status === 'signed-in';
   const trueRole = signedIn ? session.session.role : null;
   const { viewedRole, demoRole } = useRoleView(trueRole);
+  const examplesOn = useExamplesOn();
   const { points, loading: pointsLoading } = usePointsState(signedIn ? session.session.userId : null);
   const { state: saved } = useSavedPlaces(signedIn, demoRole);
   const [remindersOn, setRemindersOn] = useState(false);
@@ -68,7 +69,6 @@ export function ProfileScreen() {
   }, [signedIn, session]);
 
   const role = viewedRole ?? 'member';
-  const examples = showsExamples();
   const name =
     (demoRole ? DUMMY_SELF[demoRole]?.firstName : null) ?? (signedIn ? session.session.firstName : null) ?? '';
 
@@ -76,12 +76,11 @@ export function ProfileScreen() {
     <ProfileView
       name={name}
       role={role}
-      // Not 0 until they are known: a pulse in the number's place, so a real 0 never flashes first.
+      // Not 0 until they are known: a pulse in the number's place, so a real 0 never flashes first (D-520).
       points={pointsLoading ? null : (points ?? 0)}
       savedCount={saved.status === 'ready' ? saved.places.length : saved.status === 'loading' ? null : 0}
-      // No real query for "the people on my side" yet, so a real account has none to count (D-518); only an
-      // example (a preview, a demo account, Storybook) counts the example cast.
-      connectionsCount={role === 'member' && examples ? DUMMY_CONNECTIONS.length : 0}
+      // There is no real list of people who offered help yet: a real account has none to count.
+      connectionsCount={role === 'member' && examplesOn ? DUMMY_CONNECTIONS.length : 0}
       remindersOn={remindersOn}
       canViewAs={trueRole === 'super_admin'}
       canUseAs={signedIn && session.session.roles.includes('member') && session.session.roles.includes('provider')}
@@ -99,9 +98,9 @@ export function ProfileScreen() {
 
 /**
  * Profile while the account is still being found out (Will, 11 October: "skeleton loaders for the image, stats
- * and labels in profile hero card"): the title, then the hero card as pulses the size of the real one, and nothing
- * under it yet, because what goes there depends on who this is. A member's card (three stats) is drawn; a staff
- * account's has none, which makes it a little shorter, and that is the one thing that can move.
+ * and labels in profile hero card"; D-520): the title, then the hero card as pulses the size of the real one, and
+ * nothing under it yet, because what goes there depends on who this is. A member's card (three stats) is drawn; a
+ * staff account's has none, which makes it a little shorter, and that is the one thing that can still move.
  */
 export function ProfileLoading() {
   const { t } = useI18n();

@@ -464,21 +464,17 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
    * number, skipping the quiet-hours/STOP check every other message goes
    * through (Will, 17 September — deliberate, see `0055_staff_denied_sms.sql`
    * and DECISIONS.md). Names no role, same reason as `staff_request_approved`.
-   * Carries `{supportPhone}` because Will asked specifically that someone
-   * denied has somewhere real to ask why.
+   * Points to the help desk (A28: Pam has no phone line) because Will asked specifically that
+   * someone denied has somewhere real to ask why.
    */
   staff_request_denied: {
     key: 'staff_request_denied',
-    en: 'Pam: Your request was not approved. Questions? Call {supportPhone}.',
-    es: 'Pam: Su solicitud no fue aprobada. Preguntas? Llame al {supportPhone}.',
-    more: {
-      'pt-BR': approved('Pam: Seu pedido nao foi aprovado. Duvidas? Ligue para {supportPhone}.'),
-      'zh-CN': approved('Pam: 您的申请未获批准。有疑问请拨打 {supportPhone}。'),
-      'zh-HK': approved('Pam: 你的申請未獲批准。如有疑問請致電 {supportPhone}。'),
-      'ru': approved('Pam: Заявку не одобрили. Вопросы? Звоните {supportPhone}'),
-      'ar': approved('Pam: لم تتم الموافقة على طلبك. للاستفسار: {supportPhone}'),
-    },
-    vars: ['supportPhone'],
+    en: 'Pam: Your request was not approved. Questions? Visit joinpam.org/support',
+    // A28: Pam has no phone line. The English is Will's (a59, 11 October). The Spanish and the five
+    // later languages are Lena's to write; until they arrive Spanish carries the English and the
+    // later languages are left out, so they get English too.
+    es: 'Pam: Your request was not approved. Questions? Visit joinpam.org/support',
+    vars: [],
     reviewedBy: 'Will (Oba), 17 September 2026',
     isFirstContact: false,
   },
@@ -611,16 +607,10 @@ export const SMS_TEMPLATES: Readonly<Record<SmsTemplateKey, SmsTemplate>> = {
   },
   access_limited_notice: {
     key: 'access_limited_notice',
-    en: 'Pam: Some parts of Pam are turned off for now. Call {supportPhone} with questions.',
-    es: 'Pam: Algunas partes de Pam estan apagadas por ahora. Llame al {supportPhone} si tiene preguntas.',
-    more: {
-      'pt-BR': approved('Pam: Algumas partes do Pam estao desligadas por enquanto. Ligue para {supportPhone} se tiver duvidas.'),
-      'zh-CN': approved('Pam: Pam 的部分功能暂时关闭。有疑问请拨打 {supportPhone}。'),
-      'zh-HK': approved('Pam: Pam 部分功能暫時關閉。如有疑問請致電 {supportPhone}。'),
-      'ru': approved('Pam: Часть функций Pam пока отключена. Звоните {supportPhone}'),
-      'ar': approved('Pam: بعض ميزات Pam متوقفة الآن. اتصل بـ {supportPhone}'),
-    },
-    vars: ['supportPhone'],
+    en: 'Pam: Some parts of Pam are turned off for now. Questions? Visit joinpam.org/support',
+    // A28, as above: Spanish carries the English until Lena's translation; later languages fall back.
+    es: 'Pam: Some parts of Pam are turned off for now. Questions? Visit joinpam.org/support',
+    vars: [],
     reviewedBy: REVIEWED_BY,
     isFirstContact: false,
   },

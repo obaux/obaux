@@ -56,6 +56,8 @@ async function signedInAs(
   role: 'admin' | 'member' | 'super_admin',
   /** Read at each request, so a test can limit the account part-way through. */
   accessStatus: () => 'active' | 'limited' = () => 'active',
+  /** A demo account (0057) may see example data; a real one never does (lib/examples.ts). */
+  demo = false,
 ) {
   await seedSession(page);
   await page.route(NOTIFICATIONS, (route) => route.fulfill(json([])));
@@ -69,6 +71,7 @@ async function signedInAs(
         role,
         first_name: 'Will',
         access_status: accessStatus(),
+        is_demo: demo,
         region_id: '0195b1c0-0000-4000-8000-000000000001',
         regions: { name: 'Philadelphia' },
       }),
@@ -112,7 +115,8 @@ async function withOneConversation(page: import('@playwright/test').Page) {
       ]),
     );
   });
-  await page.route(PEOPLE, (route) => route.fulfill(json([])));
+  // Marcus is also someone this person may message: with nobody, there is no New message (and no Messages tab).
+  await page.route(PEOPLE, (route) => route.fulfill(json([{ profile_id: OTHER, first_name: 'Marcus', role: 'member' }])));
 }
 
 test.describe('the conversation list', () => {
@@ -278,9 +282,9 @@ test.describe('the conversation list', () => {
     await expect(page).toHaveURL(new RegExp(`/messages/thread/\\?id=${CONVO}`));
   });
 
-  test('a member previewing sees example conversations and who they can message', async ({ page }) => {
+  test('a demo account previewing a member sees example conversations and who they can message', async ({ page }) => {
     await page.addInitScript(() => sessionStorage.setItem('pam.view-as', 'member'));
-    await signedInAs(page, 'super_admin');
+    await signedInAs(page, 'super_admin', () => 'active', true);
     // No real conversations, so the example ones stand in.
     await page.route(MEMBERS, (route) => route.fulfill(json([])));
     await page.goto('/messages/');
@@ -784,7 +788,7 @@ test.describe('a conversation', () => {
 
   test('an example conversation renders through the same chat log, and sends nowhere', async ({ page }) => {
     await page.addInitScript(() => sessionStorage.setItem('pam.view-as', 'member'));
-    await signedInAs(page, 'super_admin');
+    await signedInAs(page, 'super_admin', () => 'active', true);
     let realWrites = 0;
     await page.route(MESSAGES, (route) => {
       realWrites += 1;
@@ -1670,7 +1674,7 @@ test.describe('the jump-to-newest button, with motion on (D-398)', () => {
 test.describe('an example person', () => {
   test('a case manager preview can message a member from their profile, into an example chat', async ({ page }) => {
     await page.addInitScript(() => sessionStorage.setItem('pam.view-as', 'admin'));
-    await signedInAs(page, 'super_admin');
+    await signedInAs(page, 'super_admin', () => 'active', true);
     await page.goto('/person/?id=dummy-m4');
     await settled(page);
 
@@ -1685,7 +1689,7 @@ test.describe('an example person', () => {
 
   test('the staff side of a conversation is the member side, flipped', async ({ page }) => {
     await page.addInitScript(() => sessionStorage.setItem('pam.view-as', 'admin'));
-    await signedInAs(page, 'super_admin');
+    await signedInAs(page, 'super_admin', () => 'active', true);
     await page.route(MEMBERS, (route) => route.fulfill(json([])));
     await page.goto('/messages/');
     await settled(page);
@@ -1736,7 +1740,7 @@ test.describe('reported messages', () => {
   });
 
   test('a super admin has Conversations and Reported, nothing to send under Reported, and a preview sees the example set', async ({ page }) => {
-    await signedInAs(page, 'super_admin');
+    await signedInAs(page, 'super_admin', () => 'active', true);
     await page.route(REPORTS, (route) => route.fulfill(json([])));
     await page.goto('/messages/');
     await settled(page);
@@ -1780,6 +1784,10 @@ test.describe('reported messages', () => {
 });
 
 test.describe('reported places (D-189)', () => {
+  // The example reports are a demo's; a real account has none (D-509).
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => window.sessionStorage.setItem('pam.examples', '1'));
+  });
   test('a case manager preview sees the example reported places and cannot decide', async ({ page }) => {
     await page.addInitScript(() => sessionStorage.setItem('pam.view-as', 'admin'));
     await signedInAs(page, 'super_admin');
@@ -1817,6 +1825,10 @@ test.describe('reported places (D-189)', () => {
 });
 
 test.describe("the bell's rows land on real screens in the new layout", () => {
+  // The example reports are a demo's; a real account has none (D-509).
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => window.sessionStorage.setItem('pam.examples', '1'));
+  });
   async function bellRow(
     page: import('@playwright/test').Page,
     row: { kind: string; subject_type: string; subject_id: string; body_vars?: Record<string, string> },
@@ -1872,5 +1884,112 @@ test.describe("the bell's rows land on real screens in the new layout", () => {
     await bellRow(page, { kind: 'staff_request_pending', subject_type: 'staff_request', subject_id: 'q1', body_vars: { name: 'Andre' } }, /Andre/);
     await expect(page).toHaveURL(/\/requests\//);
     await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
+  });
+});
+
+test.describe('a real account sees only its real things (Will, 11 October 2026)', () => {
+  const EXAMPLES = /Teresa|Sandra|Renee|Example people|People who offered help/;
+
+  test('a member with no one to message has no Messages tab, no examples, a short empty state, and the bell is on Home', async ({ page }) => {
+    await signedInAs(page, 'member');
+    await page.route(MEMBERS, (route) => route.fulfill(json([])));
+    await page.route(PEOPLE, (route) => route.fulfill(json([])));
+    await page.goto('/messages/');
+    await settled(page);
+
+    await expect(page.getByRole('heading', { level: 2, name: 'No messages yet' })).toBeVisible();
+    await expect(page.getByText(EXAMPLES)).toHaveCount(0);
+    await expect(page.getByRole('link', { name: 'People who offered help' })).toHaveCount(0);
+    // Nobody to pick, so no New message (a picker with no one in it is a dead end).
+    await expect(page.getByRole('button', { name: 'New message' })).toHaveCount(0);
+    // The Messages tab is not drawn.
+    const bar = page.getByRole('navigation', { name: 'Main' });
+    await expect(bar.getByRole('link', { name: 'Profile' })).toBeVisible();
+    await expect(bar.getByRole('link', { name: /Messages/ })).toHaveCount(0);
+
+    // Notifications are still reachable: the bell is in Home's header.
+    await page.goto('/');
+    await settled(page);
+    await expect(page.getByRole('link', { name: /Notifications/ })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Notifications/ })).toHaveAttribute('href', '/notifications/');
+  });
+
+  test('the bell shows no example alerts and the list says there is nothing', async ({ page }) => {
+    await signedInAs(page, 'member');
+    await page.route(MEMBERS, (route) => route.fulfill(json([])));
+    await page.route(PEOPLE, (route) => route.fulfill(json([])));
+    await page.goto('/notifications/');
+    await settled(page);
+    await expect(page.getByRole('link', { name: 'Notifications' })).toHaveCount(0); // the page's own header has no bell link to itself
+    await expect(page.getByText(/Place reported|saved place|points/i)).toHaveCount(0);
+    await expect(page.getByText('Example people', { exact: false })).toHaveCount(0);
+  });
+
+  test('with someone to message the tab shows, and the empty state offers New message', async ({ page }) => {
+    await signedInAs(page, 'member');
+    await page.route(MEMBERS, (route) => route.fulfill(json([])));
+    await page.route(PEOPLE, (route) => route.fulfill(json([{ profile_id: OTHER, first_name: 'Marcus', role: 'member' }])));
+    await page.goto('/messages/');
+    await settled(page);
+    const bar = page.getByRole('navigation', { name: 'Main' });
+    await expect(bar.getByRole('link', { name: /Messages/ })).toBeVisible();
+    await expect(page.getByText(EXAMPLES)).toHaveCount(0);
+    await expect(page.getByRole('heading', { level: 2, name: 'No messages yet' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'New message' }).first()).toBeVisible();
+  });
+
+  test('with one conversation the tab shows and the list is that conversation only', async ({ page }) => {
+    await signedInAs(page, 'member');
+    await withOneConversation(page);
+    await page.goto('/messages/');
+    await settled(page);
+    const bar = page.getByRole('navigation', { name: 'Main' });
+    await expect(bar.getByRole('link', { name: /Messages/ })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Marcus/ })).toBeVisible();
+    await expect(page.getByText(EXAMPLES)).toHaveCount(0);
+    await expect(page.getByRole('list').first().getByRole('listitem')).toHaveCount(1);
+  });
+
+  test('a super admin on a real account, previewing a member, sees no examples either', async ({ page }) => {
+    await page.addInitScript(() => sessionStorage.setItem('pam.view-as', 'member'));
+    await signedInAs(page, 'super_admin');
+    await page.route(MEMBERS, (route) => route.fulfill(json([])));
+    await page.route(PEOPLE, (route) => route.fulfill(json([])));
+    await page.goto('/messages/');
+    await settled(page);
+    await expect(page.getByText(EXAMPLES)).toHaveCount(0);
+    await expect(page.getByRole('heading', { level: 2, name: 'No messages yet' })).toBeVisible();
+  });
+
+  test('a case manager with no members keeps the Messages tab: the messages people reported are reviewed there', async ({ page }) => {
+    await signedInAs(page, 'admin');
+    await page.route(MEMBERS, (route) => route.fulfill(json([])));
+    await page.route(PEOPLE, (route) => route.fulfill(json([])));
+    await page.route(REPORTS, (route) => route.fulfill(json([])));
+    await page.goto('/messages/');
+    await settled(page);
+    const bar = page.getByRole('navigation', { name: 'Main' });
+    await expect(bar.getByRole('link', { name: /Messages/ })).toBeVisible();
+    await expect(page.getByRole('radio', { name: 'Reported' })).toBeVisible();
+    await expect(page.getByText(EXAMPLES)).toHaveCount(0);
+  });
+
+  test('an example conversation address on a real account is a conversation that does not exist', async ({ page }) => {
+    await signedInAs(page, 'member');
+    await page.route(MEMBERS, (route) => route.fulfill(json([])));
+    await page.goto('/messages/thread/?id=dummy-conv-dummy-m1-dummy-p1');
+    await settled(page);
+    await expect(page.getByText(/Teresa|Sandra|Example/)).toHaveCount(0);
+    await expect(page.getByRole('link', { name: /Back/ }).first()).toBeVisible();
+  });
+
+  test('a demo account still sees the examples, and keeps the Messages tab', async ({ page }) => {
+    await signedInAs(page, 'member', () => 'active', true);
+    await page.route(MEMBERS, (route) => route.fulfill(json([])));
+    await page.route(PEOPLE, (route) => route.fulfill(json([])));
+    await page.goto('/messages/');
+    await settled(page);
+    await expect(page.getByText('Example people', { exact: false })).toBeVisible();
+    await expect(page.getByRole('link', { name: /Teresa/ })).toBeVisible();
   });
 });

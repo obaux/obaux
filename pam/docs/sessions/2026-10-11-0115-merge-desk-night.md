@@ -146,6 +146,26 @@
 - **Held on purpose:** Dot's D-512 (Contact Pam in the app) waits for Wren's A28 help desk so it never leads to
   a page that still says "call Pam"; Lena's 31 signed lines follow it.
 
+- **Batch b9 pushed at b979a49 (03:57), live on web and pam-site.** With it, A29 (Will, 03:52: "let's change it so
+  every new sentence doesn't need my yes"): Sage signs new sentences; Will signs texts and emails Pam sends,
+  Privacy and Terms, and new promises. Sage started `docs/signed-english.md`, the first ledger of signed English.
+- **Batch b10 (Nico's D-511 + Sage's ledger):** real accounts see no example messages, people, alerts or
+  offers; a member or lead with nobody to message has no Messages tab, and the bell moves to Home. Full e2e:
+  1292 passed, 19 skipped.
+- **Will, 03:40–03:51:** calendars, both the link and a Google sync limited to a calendar Pam creates, plus a
+  switch to find appointments from places' own domains; skeleton loaders on the Profile hero card (Dot, D-520).
+
+- **Batch b10 pushed at 759ea83 (04:19), live.** **Batch b11:** Nico's D-519 (the Text alerts screen reads
+  `texts_live` and shows no switch as live while it is off; the two account texts lose the number in the repo,
+  live only after Will refiles), Piper's places/Explore/Saved without examples with one gate (`examples.ts`,
+  `exampleMode.ts` deleted), and Nico's D-521 (the help-request forward, built off). Full e2e 1307 passed,
+  DB 1266 ok. **D-521's migration did not apply:** `apply_migration` timed out twice at the connector with
+  nothing applied and no locks, as P4 did on 10 October. Nothing uses the table until the function is switched
+  on, so the code went to main and the migration goes to Will to paste, with the salt secret and "test it".
+- **Will, 04:17:** "Modals and section links … are highlighted … rewrite the input field rule to only mean text
+  boxes" (Dot D-523, Wren on the site). **Nico's text-reply scoping** ran into D-460 (Pam never reads people's
+  texts): card a61 asks Will whether replies are forwarded, plus the opt-in sentence and reply checks.
+
 ## What was wrong, and what missed it
 
 - **Ava won't push on the merge desk's word, and that is right.** The merge desk passed on Will's "remove" at
@@ -168,6 +188,14 @@
   and `access_limited_notice`. Nico first read them as held by `texts_live`; they are not. Account texts go out
   regardless (migration 20261010141859), and one denial has been sent. A hotfix of v23 would send words that
   differ from the registered samples, so the merge desk chose to wait for Will's refiling, and said so to Will.
+
+- **Three "show examples" switches in one hour.** Piper (D-509, `exampleMode.ts`), Nico (D-511, `examples.ts`)
+  and Dot (D-518, a second `examples.ts`, then `exampleMode.ts`) each built one, with different rules about a
+  super admin's preview and demo accounts, because their READYs and the merge desk's decision crossed in
+  flight. Decided at 03:55: one gate, Nico's `examples.ts` (prototype, demo account, the e2e hook; not a
+  super admin's preview). Piper folds hers in; Dot rebuilds on it after D-511 lands. Lesson for the merge
+  desk: when two lanes touch the same idea, name the owner of the shared piece in the first message, not
+  after the READYs arrive.
 
 ## Decisions
 

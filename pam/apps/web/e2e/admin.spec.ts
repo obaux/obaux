@@ -57,6 +57,7 @@ async function signedInAs(
   members: unknown[] = [],
   controls: unknown[] = [],
   notifications: unknown[] = [],
+  demo = false,
 ) {
   await seedSession(page);
   await page.route(NOTIFICATIONS, (route) => route.fulfill(json(notifications)));
@@ -73,6 +74,7 @@ async function signedInAs(
         id: ADMIN_ID,
         role,
         first_name: 'Will',
+        is_demo: demo,
         region_id: '0195b1c0-0000-4000-8000-000000000001',
         regions: { name: 'Philadelphia' },
       }),
@@ -105,10 +107,10 @@ test.describe('the case manager screen', () => {
     // drawing for (Will, 16 September — "make sure all pages are properly
     // showing based on the user's permissions").
     await page.addInitScript(() => sessionStorage.setItem('pam.view-as', 'admin'));
-    await signedInAs(page, 'super_admin');
+    await signedInAs(page, 'super_admin', [], [], [], true);
     await page.goto('/');
 
-    // An empty real caseload shows the example roster (Will, 16 September)
+    // An empty caseload on a demo account shows the example roster (Will, 16 September)
     // rather than the real "Nobody on your list yet" notice — either way,
     // this is the case manager's own screen, not a closed door.
     await expect(page.getByRole('heading', { name: 'Jordan' })).toBeVisible();
@@ -156,9 +158,14 @@ test.describe('the case manager screen', () => {
   test('an empty caseload explains itself', async ({ page }) => {
     await signedInAs(page, 'admin', []);
     await page.goto('/');
-    // The real "Nobody on your list yet" notice is replaced by the example
-    // roster while `USE_DUMMY_PEOPLE` is on (Will, 16 September) — labelled
-    // as an example, not left blank.
+    // A real account sees its real, empty list, never example people (Will, 11 October).
+    await expect(page.getByRole('heading', { name: 'Jordan' })).toHaveCount(0);
+    await expect(page.getByText('Example people, so you can see how this looks.')).toHaveCount(0);
+  });
+
+  test('a demo account sees the example roster, labelled', async ({ page }) => {
+    await signedInAs(page, 'admin', [], [], [], true);
+    await page.goto('/');
     await expect(page.getByRole('heading', { name: 'Jordan' })).toBeVisible();
     await expect(page.getByText('Example people, so you can see how this looks.').first()).toBeVisible();
   });
@@ -437,11 +444,19 @@ test.describe('what has happened that a case manager has to act on', () => {
     // activity. `USE_DUMMY_PEOPLE` is a build-time constant (`dummy-flag.ts`),
     // so this test cannot also exercise the real empty state without flipping
     // it and rebuilding — see that file for how to turn it off.
-    await signedInAs(page, 'admin', [], [], []);
+    await signedInAs(page, 'admin', [], [], [], true);
     await page.goto('/notifications/');
 
     await expect(page.getByText('Example Food Pantry was reported: It is closed')).toBeVisible();
     await expect(page.getByText('Examples, so you can see what this looks like.')).toBeVisible();
+  });
+
+  test('a real account never sees the example set', async ({ page }) => {
+    await signedInAs(page, 'admin', [], [], []);
+    await page.goto('/notifications/');
+    await expect(page.getByRole('heading', { name: 'Notifications' }).first()).toBeVisible();
+    await expect(page.getByText('Example Food Pantry was reported: It is closed')).toHaveCount(0);
+    await expect(page.getByText('Examples, so you can see what this looks like.')).toHaveCount(0);
   });
 
   test('has no WCAG A/AA violations', async ({ page }) => {

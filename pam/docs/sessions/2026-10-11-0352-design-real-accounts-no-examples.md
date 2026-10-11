@@ -25,3 +25,8 @@ D-518. I kept the two explicit demo modes (preview, demo view) as examples; for 
 ## Needs a human
 
 Will: whether a demo account and a super admin's preview should keep their examples.
+
+
+## Update (04:50)
+
+Main gained D-511's `lib/examples.ts` and Piper's fold of every reader onto it, including Points. I merged, took main's Points, Connections and Profile-count code, and kept only the e2e (`no-examples-profile.spec.ts`) and D-520's skeletons. D-518 is now a test record only.

@@ -35,7 +35,7 @@ import {
   type BadgeDefinition,
   type PointsReason,
 } from '@pam/config';
-import { showsExamples } from '@/lib/exampleMode';
+import { useExamplesOn } from '@/lib/useExamplesOn';
 import { DUMMY_EARNED_BADGES } from '@pam/config/dummy-badges';
 import { useI18n } from '@/lib/i18n';
 import { NotIn } from '../NotIn';
@@ -193,10 +193,9 @@ export default function PointsPage() {
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
   const { demoRole, setViewAs } = useRoleView(trueRole);
   const points = usePoints(session.status === 'signed-in' ? session.session.userId : null);
-  // Nothing awards a badge yet. The example member has earned Scholar (D-307), and only an example does:
-  // a real account earns none until something awards one (D-518, Will, 11 October: a real account sees
-  // only its real things). A preview, a demo account and Storybook are the examples.
-  const earned: readonly string[] = showsExamples() && (demoRole ?? trueRole) === 'member' ? DUMMY_EARNED_BADGES : [];
+  // Nothing awards a badge yet; the example member has earned Scholar
+  // (D-307), shown where the rest of the example data is.
+  const earned: readonly string[] = useExamplesOn() && (demoRole ?? trueRole) === 'member' ? DUMMY_EARNED_BADGES : [];
   const [celebrate, setCelebrate] = useState(false);
 
   const current = points !== null ? badgeForPoints(points) : null;

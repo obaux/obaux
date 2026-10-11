@@ -4,7 +4,8 @@
  * The database side is live and harmless: every switch is off for everyone, and nothing is sent to a
  * person who has not turned one on. But the switches are the only way to turn one on, so while this is
  * `false` each of them says "Coming soon" exactly as it did before, and nothing in the app writes the
- * `alert_*` columns. Pam sends no text before Will says go and the carrier registration is approved —
+ * `alert_*` columns. Pam sends no reminder or alert before Will says go and the carrier registration is
+ * approved (account texts, such as the sign-in code, do go out; D-481) —
  * sending ahead of approval is how a campaign gets suspended.
  *
  * **The day:** flip this to `true` in the same change that merges `claude/messages-reply-start` (the

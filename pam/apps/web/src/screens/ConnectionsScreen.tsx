@@ -4,14 +4,14 @@ import type { Locale } from '@pam/config';
 import { DUMMY_CONNECTIONS, dummyConnection, type DummyConnection } from '@pam/config/dummy-connections';
 import { DUMMY_SELF_ID, dummyConversationIdBetween } from '@pam/config/dummy-conversations';
 import { useI18n } from '@/lib/i18n';
-import { showsExamples } from '@/lib/exampleMode';
+import { useExamplesOn } from '@/lib/useExamplesOn';
 import { ConnectionsView, type Connection } from './ConnectionsView';
 
 /**
- * Connections (D-213). There is no real query yet for "the people on my side"
- * with photos and facts. Until there is, a real account sees its short empty
- * state ("No connections yet") and only an example (a super admin's preview, a
- * demo account, Storybook) sees the example cast (D-172, D-518).
+ * Connections, wired to the example set (D-213). There is no real query yet
+ * for "the people on my side" with photos and facts; until there is, a demo
+ * account and Storybook show the example cast (D-172) and a real account sees
+ * the empty state.
  *
  * The profile page behind each card is gone (D-272): the card carries the
  * message button, the program link and who connected you.
@@ -37,6 +37,8 @@ function toConnection(c: DummyConnection, locale: Locale): Connection {
 
 export function ConnectionsScreen() {
   const { locale } = useI18n();
-  const cast = showsExamples() ? DUMMY_CONNECTIONS : [];
-  return <ConnectionsView connections={cast.map((c) => toConnection(c, locale))} />;
+  // Example people are for Storybook and demo accounts only; there is no real list of people who
+  // offered help yet, so a real account gets the screen's own short empty state (lib/examples.ts).
+  const examplesOn = useExamplesOn();
+  return <ConnectionsView connections={examplesOn ? DUMMY_CONNECTIONS.map((c) => toConnection(c, locale)) : []} />;
 }

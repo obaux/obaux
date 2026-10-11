@@ -17,7 +17,7 @@ import { useI18n } from '@/lib/i18n';
 import { navigate } from '@/lib/navigate';
 import { forgetInvite, recallInvite, type Invite } from '@/lib/appUrl';
 import { readAddedTrips, withMoves } from '@/lib/addedTrips';
-import { exampleTrips } from '@/lib/exampleMode';
+import { exampleTrips } from '@/lib/exampleTrips';
 import { Confetti } from '@pam/ui/SuccessScreen';
 import { useSupportPhone } from '@/lib/useSupportPhone';
 import { TransparencyReading } from '@/screens/TransparencyReading';

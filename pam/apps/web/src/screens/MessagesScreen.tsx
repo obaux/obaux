@@ -1,7 +1,6 @@
 'use client';
 
 import { staffPhotoFor } from '@pam/config/dummy-connections';
-import { USE_DUMMY_PEOPLE } from '@pam/config/dummy-flag';
 import { isFreshAccount } from '@/lib/programSetup';
 import { dummyConversationsFor } from '@pam/config/dummy-conversations';
 import { DUMMY_ANYONE } from '@pam/config/dummy-people';
@@ -23,6 +22,7 @@ import { openConversation } from '@/lib/openConversation';
 import { readAccountLimited } from '@/lib/accountLimited';
 import { useReports } from '@/lib/useReports';
 import { useDemoView } from '@/lib/useDemoView';
+import { useExamplesOn } from '@/lib/useExamplesOn';
 import { ReportedSection } from '../app/messages/ReportedSection';
 import { HeaderActions } from './HeaderActions';
 import { FloatingAction } from '@pam/ui/FloatingAction';
@@ -59,6 +59,8 @@ function MessagesScreenInner() {
   const limited = limitedNow || (session.status === 'signed-in' && session.session.accessStatus === 'limited');
   const { viewedRole, demoRole } = useRoleView(trueRole);
   const isDemo = useDemoView(session);
+  // Examples are for Storybook and demo accounts only, never a real account (lib/examples.ts).
+  const examplesOn = useExamplesOn();
   const previewing = demoRole !== null || isDemo;
   // The super admin may message staff, to help them start (0072, D-262).
   const canMessage =
@@ -95,7 +97,7 @@ function MessagesScreenInner() {
         : [],
     [messageable, role, t],
   );
-  const pickerExamples = useMemo(() => (USE_DUMMY_PEOPLE ? dummyPickerPeople(role, t) : null), [role, t]);
+  const pickerExamples = useMemo(() => (examplesOn ? dummyPickerPeople(role, t) : null), [examplesOn, role, t]);
   const useExamplePeople = realPeople.length === 0 && pickerExamples !== null;
   const pick = useCallback(
     async (id: string): Promise<string | null> => {
@@ -136,7 +138,7 @@ function MessagesScreenInner() {
       : [];
 
   // No example conversations for an account that has just signed up (D-361).
-  const useExamples = real.length === 0 && USE_DUMMY_PEOPLE && !isFreshAccount() && state.status !== 'loading';
+  const useExamples = real.length === 0 && examplesOn && !isFreshAccount() && state.status !== 'loading';
   const examples: MessageRow[] = useExamples
     ? dummyConversationsFor(role).map((c) => {
         const other = DUMMY_ANYONE.find((p) => p.id === c.otherId) ?? null;
@@ -183,16 +185,27 @@ function MessagesScreenInner() {
               reported: {
                 section,
                 onSection: setSection,
-                content: <ReportedSection state={reports} previewing={previewing} supportPhone={supportPhone} />,
+                content: (
+                  <ReportedSection
+                    state={reports}
+                    previewing={previewing}
+                    examples={examplesOn}
+                    supportPhone={supportPhone}
+                  />
+                ),
               },
             }
           : {})}
         {...(limited ? { limited: <LimitedNotice supportPhone={supportPhone} /> } : {})}
-        {...(canMessage && !limited ? { onNewMessage: () => setPicking(true) } : {})}
+        // Nobody to message yet means nothing to pick: no button (a picker with no one in it is a dead end).
+        {...(canMessage && !limited && (useExamplePeople || realPeople.length > 0)
+          ? { onNewMessage: () => setPicking(true) }
+          : {})}
         // A member's people, one tap away (Will, 3 October, D-246): the same
         // strip a case manager's Home floats for Invite someone.
         floating={
-          role === 'member' ? (
+          // Only when real people offered: there is no real source yet, so a real account never sees it.
+          role === 'member' && examplesOn ? (
             <FloatingAction
               // One line (Will, 7 October, D-336): who they are, said once.
               label={t('messages.connections')}

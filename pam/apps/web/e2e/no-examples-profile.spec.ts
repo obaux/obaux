@@ -5,8 +5,9 @@ import { settled } from './settled';
 /**
  * A real account sees only its real things (Will, 11 October, a launch rule; D-518). On Profile, Points and Connections
  * that was the example member's Scholar badge and the example cast of two connections, shown to everybody. Now an
- * ordinary account has none, and a list that empties says so in a line. Examples stay for a super admin previewing a
- * role and for a demo (`lib/exampleMode`, D-509). Supabase is stubbed at the network.
+ * ordinary account has none, and a list that empties says so in a line. The gate is `lib/examples.ts` (D-511); this
+ * spec holds Profile, Points and Connections to it: examples stay for a demo (an `is_demo` account, or a tab that asked
+ * with `pam.examples`) and not for a super admin's preview. Supabase is stubbed at the network.
  */
 const ME = 'de3b9c2e-ec2f-403b-93e5-86e6ee75349b';
 // The Scholar tile in the badge grid: its name and, under it, earned, locked or soon.
@@ -103,11 +104,11 @@ test.describe('examples stay where they are asked for', () => {
     await expect(page.getByText('Teresa').first()).toBeVisible();
   });
 
-  test('a super admin previewing a member sees the examples', async ({ page }) => {
+  test('a super admin previewing a member sees none (D-511: a preview is not a demo)', async ({ page }) => {
     await page.addInitScript(() => sessionStorage.setItem('pam.view-as', 'member'));
     await signedIn(page, { role: 'super_admin' });
     await page.goto('/points/');
     await settled(page);
-    await expect(scholarTile(page)).toContainText('Earned');
+    await expect(scholarTile(page)).not.toContainText('Earned');
   });
 });

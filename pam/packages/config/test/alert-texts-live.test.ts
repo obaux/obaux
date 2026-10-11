@@ -38,8 +38,10 @@ describe('the Text alerts switches are held until the day (D-478)', () => {
 
   it('while it is off, no switch can be turned on and the screen writes nothing', () => {
     const view = read('../../../apps/web/src/screens/AlertsView.tsx');
-    // The four kinds are in the live set only through the flag.
+    // The four kinds are in the live set only through the flag...
     expect(view).toMatch(/ALERT_TEXTS_LIVE \? \[[^\]]*'message'[^\]]*\] : \['closed'\]/);
+    // ...and none is live, the closed-place one included, while the server's own switch is off (D-481).
+    expect(view).toMatch(/const LIVE = textsLive \? LIVE_KINDS : NONE_LIVE;/);
     // And a change returns before it writes anything for a kind that is not live.
     expect(view).toMatch(/if \(!LIVE\.has\(kind\) \|\| !userId \|\| stopped\) return;/);
   });
