@@ -1,5 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/nextjs';
-import { Notice, Page, type NoticeProps } from '@pam/ui';
+import { VStack } from '@astryxdesign/core/VStack';
+import { CompactNotice, Notice, Page, type NoticeProps } from '@pam/ui';
 import { NOTICES, type NoticeKey } from '@pam/config';
 import { useStoryText } from '../support/useStoryText';
 
@@ -121,3 +122,26 @@ export const InviteCodeExpired: Story = { args: forKey('invite_expired') };
 export const OutOfRegion: Story = { args: forKey('admin_out_of_region') };
 
 export const Spanish: Story = { args: forKey('account_limited'), globals: { locale: 'es' } };
+
+/**
+ * The small alert (D-510), for a mistake the person fixes where they are: one row,
+ * a small icon and one line, no button. The full `Notice` above is for a state they
+ * are stuck in. Same three tones. Below: the same wrong-code moment drawn both ways,
+ * which is why the sign-in code step uses the small one.
+ */
+function CompactAll() {
+  const tr = useStoryText();
+  return (
+    <VStack gap={3}>
+      <CompactNotice status="error" text={tr('signin.code.wrong') ?? ''} />
+      <CompactNotice status="warning" text={tr('signin.code.wrong') ?? ''} />
+      <CompactNotice status="info" text={tr('signin.code.wrong') ?? ''} />
+    </VStack>
+  );
+}
+
+export const Compact: StoryObj = { render: () => <CompactAll /> };
+
+export const CompactSpanish: StoryObj = { render: () => <CompactAll />, globals: { locale: 'es' } };
+
+export const CompactArabic: StoryObj = { render: () => <CompactAll />, globals: { locale: 'ar' } };

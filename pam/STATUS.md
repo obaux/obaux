@@ -1417,6 +1417,14 @@ only the alert texts Will signed: no "introduced to your program", no "your acco
 
 Branch `claude/pam-design-contact-pam` (D-512, A28). `Notice` offers Contact Pam (a link to Help); `useSupportPhone` and all `supportPhone` props are gone; the Help screen's first row opens the website's help desk; Privacy's data pages end in Contact Pam. `place.call` is untouched. About 33 English strings still say "call Pam": for Sage and Lena.
 
+## Design system & Storybook · a wrong code is a small alert (11 October)
+
+Branch `claude/pam-design-wrong-code-alert` (D-510). `CompactNotice` in `@pam/ui` (one row, no button) beside `Notice`; a wrong or expired sign-in code keeps the code step, empties and refocuses the boxes, and shows "That code did not work. Try again." (`signin.code.wrong`; `signin.failed.verify.*` removed). "We could not send the code" still uses the full Notice until the A28 job.
+
+## Design system & Storybook · legal pages go Back to the website (11 October)
+
+Branch `claude/pam-design-legal-back-to-site` (D-508). The website's Privacy and Terms links carry `?from=site&return=<path>`; the app's pages show "Back to the website" and go to `https://joinpam.org` + the path, only if it is a plain path on the site (no `//`, no scheme; otherwise Back to Legal as before). Tabs and the other-document link keep it. New string `nav.back.website` (six drafts for Lena). Tests: `siteReturn.test.ts`, `apps/site/test/legal-links.test.ts`, `e2e/legal-site.spec.ts`.
+
 ## Design system & Storybook · badge caption 12px (11 October) — on `main`
 
 Merged from `claude/pam-design-badge-caption` (3472970). The "Your badge" caption on the Profile badge tile is 12px, not 11px, following A27 (nothing under

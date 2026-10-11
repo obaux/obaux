@@ -13,6 +13,16 @@ export const PRIVACY_URL = `${APP_URL}/privacy/`;
 export const TERMS_URL = `${APP_URL}/terms/`;
 
 /**
+ * Privacy or Terms in the app, carrying the page of this site the reader came from, so the app's Back goes
+ * back to it (D-508; Will, 11 October: "the app needs to know which page it came from"). `return` is a path
+ * on this site, as the browser gives it (`/support/start-here/`); the app accepts only such a path
+ * (`apps/web/src/lib/siteReturn.ts`) and falls back to its own Back for anything else.
+ */
+export function legalUrl(kind: 'privacy' | 'terms', returnPath: string): string {
+  return `${APP_URL}/${kind}/?from=site&return=${encodeURIComponent(returnPath)}`;
+}
+
+/**
  * Where the public site itself lives, for the absolute address of its social
  * preview (a link-unfurling bot needs a full URL, not `/og/social.png`).
  * `joinpam.org` is Pam's domain (10 October; the site is the bare domain, the app is
