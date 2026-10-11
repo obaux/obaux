@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { exampleTrips } from '@/lib/exampleMode';
+import { exampleTrips } from '@/lib/exampleTrips';
 import { readAddedTrips, savedTripsStatus, TRIPS_CHANGED, withMoves, withoutCancelled, type AddedTrip, type SavedTripsStatus } from './addedTrips';
 
 /**

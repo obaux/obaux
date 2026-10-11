@@ -11,8 +11,8 @@ import { Notice } from '@pam/ui';
 import { SubPage } from '@pam/ui/SubPage';
 import { useI18n } from '@/lib/i18n';
 import { useSession } from '@/lib/useSession';
-import { useSupportPhone } from '@/lib/useSupportPhone';
 import { ALERT_TEXTS_LIVE } from '@/lib/alertTextsLive';
+import { useTextsLive } from '@/lib/useTextsLive';
 import { setReminderConsent, setTextAlert, type AlertFlags, type AlertKind } from '@/lib/useReminderConsent';
 import { HelpButton } from './HelpButton';
 import { TermInfo } from './TermInfo';
@@ -61,12 +61,15 @@ const TERM_FOR: Partial<Record<Kind, GlossaryTerm>> = { trip: 'trip' };
  * promise" — build them, and until they are built, do not offer them). A saved
  * place closing or moving (0035–0037), and the four alerts that say something
  * happened (D-478), the latter only once `ALERT_TEXTS_LIVE` is flipped on the day Will says go
- * (`lib/alertTextsLive.ts`); until then they say "coming soon" and nothing is written. A visit reminder for a member has its own screen; someone
+ * (`lib/alertTextsLive.ts`); until then they say "coming soon" and nothing is written. Even those
+ * wait for the server's own switch, `texts_live` (D-481): while it is off every switch says "coming soon",
+ * the closed-place one included, because the server holds the text (Lena's promise check, 11 October). A visit reminder for a member has its own screen; someone
  * wanting to connect has no text yet, so those two say "coming soon".
  */
-const LIVE: ReadonlySet<Kind> = new Set<Kind>(
+const LIVE_KINDS: ReadonlySet<Kind> = new Set<Kind>(
   ALERT_TEXTS_LIVE ? ['closed', 'message', 'booked', 'changed', 'trip'] : ['closed'],
 );
+const NONE_LIVE: ReadonlySet<Kind> = new Set<Kind>();
 
 /** The kinds with a switch of their own (`alert_*`). */
 const ALERT_KINDS: ReadonlySet<Kind> = new Set<Kind>(['message', 'booked', 'changed', 'trip']);
@@ -92,7 +95,8 @@ const styles = stylex.create({
 
 export function AlertsView() {
   const { t } = useI18n();
-  const supportPhone = useSupportPhone();
+  const textsLive = useTextsLive();
+  const LIVE = textsLive ? LIVE_KINDS : NONE_LIVE;
   const { state: session } = useSession();
   const userId = session.status === 'signed-in' ? session.session.userId : null;
   const role = session.status === 'signed-in' ? session.session.role : null;
@@ -214,8 +218,7 @@ export function AlertsView() {
           notice="something_went_wrong"
           title={t('notice.something_went_wrong.title')}
           body={t('notice.something_went_wrong.body')}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
       ) : null}
     </SubPage>

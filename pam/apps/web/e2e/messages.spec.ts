@@ -169,7 +169,7 @@ test.describe('the conversation list', () => {
     await expect(page.getByRole('link', { name: /Marcus/ })).toBeVisible();
     await expect(page.getByRole('button', { name: 'New message' })).toHaveCount(0);
     await expect(page.getByRole('alert').getByText('Some things are turned off')).toBeVisible();
-    await expect(page.getByRole('alert').getByRole('link', { name: /Call/ })).toHaveAttribute('href', /^tel:/);
+    await expect(page.getByRole('alert').getByRole('link', { name: /Contact Pam/ })).toHaveAttribute('href', '/help/');
 
     const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
     expect(results.violations).toEqual([]);
@@ -635,8 +635,8 @@ test.describe('a conversation', () => {
     await expect(notice.getByText(/^You cannot send messages right now\./)).toBeVisible();
     await expect(notice.getByText(/Your guide turned this off for your account\./)).toBeVisible();
     await expect(notice.getByText(/your plan/i)).toHaveCount(0);
-    const call = notice.getByRole('link', { name: /Call/ });
-    await expect(call).toHaveAttribute('href', /^tel:/);
+    const call = notice.getByRole('link', { name: /Contact Pam/ });
+    await expect(call).toHaveAttribute('href', '/help/');
     // The quiet card: body text at the smallest size (16px), and the call is a
     // link, not a filled primary button — still a 48px target.
     expect(await notice.getByText(/^You cannot send messages/).evaluate((el) => getComputedStyle(el).fontSize)).toBe('16px');
@@ -1375,6 +1375,36 @@ test.describe('the conversation, drawn closer (D-400, D-401)', () => {
     expect(Math.round(words.y - (p.y + p.height))).toBeGreaterThanOrEqual(12);
   });
 
+  for (const byKeyboard of [false, true]) {
+    test(`the photo viewer shows no ring on what it focuses (${byKeyboard ? 'keyboard' : 'mouse'}); Tab rings the close button (D-523)`, async ({ page }) => {
+      await signedInAs(page, 'admin');
+      await withOneConversation(page);
+      await withAPhoto(page);
+      await page.goto(`/messages/thread/?id=${CONVO}`);
+      await settled(page);
+      const photo = page.getByRole('button', { name: 'A photo from Marcus' });
+      if (byKeyboard) {
+        await photo.focus();
+        await page.keyboard.press('Enter');
+      } else {
+        await photo.click();
+      }
+      const dialog = page.locator('dialog.astryx-lightbox');
+      await expect(dialog).toBeVisible();
+      await expect.poll(() => dialog.evaluate((el) => document.activeElement === el)).toBe(true);
+      // Focus is put on the viewer so a screen reader lands in it; it is not a control and shows no ring.
+      expect(await dialog.evaluate((el) => getComputedStyle(el).outlineStyle)).toBe('none');
+      await page.keyboard.press('Tab');
+      const ring = await page.evaluate(() => {
+        const s = getComputedStyle(document.activeElement!);
+        return { tag: document.activeElement!.tagName.toLowerCase(), style: s.outlineStyle, width: parseFloat(s.outlineWidth) };
+      });
+      expect(ring.tag).toBe('button');
+      expect(ring.style).not.toBe('none');
+      expect(ring.width).toBeGreaterThan(0);
+    });
+  }
+
   test('a photo opens on near-black, with a round close button you can see', async ({ page }) => {
     await signedInAs(page, 'admin');
     await withOneConversation(page);
@@ -1784,6 +1814,10 @@ test.describe('reported messages', () => {
 });
 
 test.describe('reported places (D-189)', () => {
+  // The example reports are a demo's; a real account has none (D-509).
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => window.sessionStorage.setItem('pam.examples', '1'));
+  });
   test('a case manager preview sees the example reported places and cannot decide', async ({ page }) => {
     await page.addInitScript(() => sessionStorage.setItem('pam.view-as', 'admin'));
     await signedInAs(page, 'super_admin');
@@ -1821,6 +1855,10 @@ test.describe('reported places (D-189)', () => {
 });
 
 test.describe("the bell's rows land on real screens in the new layout", () => {
+  // The example reports are a demo's; a real account has none (D-509).
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => window.sessionStorage.setItem('pam.examples', '1'));
+  });
   async function bellRow(
     page: import('@playwright/test').Page,
     row: { kind: string; subject_type: string; subject_id: string; body_vars?: Record<string, string> },

@@ -8,11 +8,9 @@ import { NextTripCard } from '@pam/ui/NextTripCard';
 import { useTrips } from '@/lib/useTrips';
 import { useNextVisits, visitTagLabel } from '@/lib/useNextVisits';
 import { CategoryPicture } from './CategoryPicture';
-import { USE_DUMMY_PEOPLE } from '@pam/config/dummy-flag';
 import { categoryLabelKey, distanceLabel, intlLocale } from '@pam/config';
 import type { SearchSource } from '@astryxdesign/core/Typeahead';
 import { useI18n } from '@/lib/i18n';
-import { useSupportPhone } from '@/lib/useSupportPhone';
 import { usePlaces, searchPlaces, METRES_PER_MILE, type NearbyPlace } from '@/lib/usePlaces';
 import { useSavedPlaces } from '@/lib/useSavedPlaces';
 import { placeStatus, useNow } from '@/lib/usePlaceStatus';
@@ -90,7 +88,6 @@ const TRIP_ICONS = {
 export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'programs' } = {}) {
   const { t, tPlain, locale } = useI18n();
   const router = useRouter();
-  const supportPhone = useSupportPhone();
   const { state: session } = useSession();
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
   const { demoRole } = useRoleView(trueRole);
@@ -170,7 +167,7 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
   const nextTrip = isMember ? (allTrips.find((trip) => new Date(trip.startsAt).getTime() > Date.now()) ?? null) : null;
   // A member's visits, so a place with one carries Saved's chip and opens as
   // the Visit profile (D-305) — the same wherever the place appears.
-  const visits = useNextVisits(isMember && USE_DUMMY_PEOPLE);
+  const visits = useNextVisits(isMember);
 
   return (
     <ExploreView
@@ -262,8 +259,7 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
             notice="something_went_wrong"
             title={t('saved.failed.title')}
             body={t('saved.failed.body')}
-            supportPhone={supportPhone}
-            callLabel={t('help.callSupport')}
+            contactLabel={t('help.contact.action')}
           />
         ) : null
       }
@@ -271,7 +267,6 @@ export function ExploreScreen({ mode = 'tab' }: { readonly mode?: 'tab' | 'progr
       state={state}
       onRetry={() => setReload((n) => n + 1)}
       onClearSearch={() => setClearSignal((n) => n + 1)}
-      supportPhone={supportPhone}
       renderPlace={(place, index) => {
         const miles = distanceLabel(place.meters / METRES_PER_MILE, locale);
         const saved = isSaved(place.id);

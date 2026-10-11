@@ -26,7 +26,6 @@ import { categoryLabelKey, displayPhone, distanceLabel, NOTICES, POINTS_RULES, t
 import { DUMMY_PLACES_BY_ID, isDummyPlaceId } from '@pam/config/dummy-places';
 import { useI18n } from '@/lib/i18n';
 import { addressActionsFor } from '@/lib/addressActions';
-import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
 import { logCall } from '@/lib/logCall';
 import { useSavedPlaces } from '@/lib/useSavedPlaces';
@@ -41,7 +40,8 @@ import { countdown } from '@/lib/when';
 import { VisitCard } from '@pam/ui/VisitCard';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
-import { exampleTrips } from '@/lib/exampleMode';
+import { examplesOn } from '@/lib/examples';
+import { exampleTrips } from '@/lib/exampleTrips';
 import { readAddedTrips, TRIPS_CHANGED, withMoves, withoutCancelled } from '@/lib/addedTrips';
 import { cancelSavedOrLocalTrip } from '@/lib/savedTrips';
 import { navigate } from '@/lib/navigate';
@@ -145,7 +145,7 @@ function useServiceDetail(id: string | null): State {
     // A dummy saved place never lived in `services` — see
     // `DUMMY_PLACES_BY_ID`'s own comment for what asking the network for it
     // used to do instead.
-    if (isDummyPlaceId(id)) {
+    if (isDummyPlaceId(id) && examplesOn()) {
       const dummy = DUMMY_PLACES_BY_ID[id];
       setState(
         dummy
@@ -221,7 +221,6 @@ function useServiceDetail(id: string | null): State {
 
 function PlaceScreen() {
   const { t, tPlain, locale } = useI18n();
-  const supportPhone = useSupportPhone();
   const params = useSearchParams();
   const id = params.get('id');
   const state = useServiceDetail(id);
@@ -342,8 +341,7 @@ function PlaceScreen() {
           notice={state.status === 'missing' ? 'service_not_available' : key}
           title={state.status === 'missing' ? t('place.notFound.title') : t(NOTICES[key].titleKey)}
           body={state.status === 'missing' ? t('place.notFound.body') : t(NOTICES[key].bodyKey)}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
         <BigButton label={t('help.place.action')} href="/" />
       </Page>

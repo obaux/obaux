@@ -24,8 +24,8 @@ import { readAddedTrips, withMoves } from '@/lib/addedTrips';
 import { asksForSavedTrips, bookTrip, isSavedPlace, moveSavedOrLocalTrip } from '@/lib/savedTrips';
 import { useTrips } from '@/lib/useTrips';
 import { useSession } from '@/lib/useSession';
-import { useSupportPhone } from '@/lib/useSupportPhone';
-import { exampleTrips, showsExamples } from '@/lib/exampleMode';
+import { examplesOn } from '@/lib/examples';
+import { exampleTrips } from '@/lib/exampleTrips';
 import { useSavedPlaces } from '@/lib/useSavedPlaces';
 import { friendLink } from '@/lib/appUrl';
 import { navigate } from '@/lib/navigate';
@@ -188,7 +188,7 @@ export function NewTripView({
   // The places to pick from (D-509): the member's own saved ones; the example set only in a demo or
   // Storybook. A real account never plans a trip to a place that is only an example.
   const [examples, setExamples] = useState(false);
-  useEffect(() => setExamples(showsExamples()), []);
+  useEffect(() => setExamples(examplesOn()), []);
   const { state: savedState } = useSavedPlaces(true);
   const places = useMemo<readonly DummySavedPlace[]>(
     () =>
@@ -223,7 +223,6 @@ export function NewTripView({
   // A place with no program lead on Pam is not told about the visit, so the wording stops saying it is (D-498).
   const hasLead = usePlaceHasLead(place?.id, place?.name);
   const { state: session } = useSession();
-  const supportPhone = useSupportPhone();
   // The trip is being saved, or could not be (D-454): say so rather than show it booked.
   const [isSaving, setIsSaving] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -567,8 +566,7 @@ export function NewTripView({
           notice="something_went_wrong"
           title={t('join.failed.title')}
           body={t('join.failed.body')}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
       ) : null}
       {step === 'where' ? (
