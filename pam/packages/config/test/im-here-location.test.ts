@@ -16,9 +16,18 @@ describe('Privacy on “I’m here” and location (D-526 part B)', () => {
   const p9 = EN['privacy.s.what-we-keep.p9'] ?? '';
   const keep = PRIVACY.sections.find((s) => s.id === 'what-we-keep');
 
-  it('is a paragraph of “What we keep”, after the ones already approved', () => {
-    expect(keep?.bodyKeys.at(-1)).toBe('privacy.s.what-we-keep.p9');
-    expect(keep?.bodyKeys).toHaveLength(9);
+  it('is a paragraph of “What we keep”, after the ones already approved, and the search has its own after it', () => {
+    expect(keep?.bodyKeys.at(-2)).toBe('privacy.s.what-we-keep.p9');
+    expect(keep?.bodyKeys.at(-1)).toBe('privacy.s.what-we-keep.p10');
+    expect(keep?.bodyKeys).toHaveLength(10);
+  });
+
+  it('says the same of “Use my current location” in a search: used for the search, not kept', () => {
+    // Explore’s area picker sends the position to services_near / services_search for one query and stores nothing
+    // (its note reads “Used for this search only.”); true only while Piper’s log check finds no latitude and
+    // longitude in a URL the API logs keep — see docs/before-launch.md.
+    expect(EN['privacy.s.what-we-keep.p10']).toBe('When you search near you, Pam uses where you are for that search and does not keep it.');
+    expect(EN['places.area.hereNote']).toBe('Used for this search only.');
   });
 
   it('says when Pam asks: on a tap, once, never in the background', () => {
