@@ -1445,6 +1445,7 @@
   "place.visit.cancel.no": "保留我的到訪",
   "place.visit.cancel.failed": "未能取消這次到訪。請檢查網絡後再試一次。",
   "trips.past.title": "過去的到訪",
+  "trips.notMarked": "Not marked as arrived",
   "trips.new.saveChange": "儲存新的時間",
   "trips.new.changeTitle": "更改您的到訪",
   "trips.moved.title": "您的到訪已更改！",

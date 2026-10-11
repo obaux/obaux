@@ -25,3 +25,7 @@ Part D (member Trips line, guide marks). Visible change: `my_program_visits` alr
 ## Needs a human
 
 Mira: apply `20261011053445` after `20261011051257`. Lena: the Privacy line.
+
+## Part D, member side (same branch)
+
+Trips now keeps attended and missed visits (it used to drop everything but scheduled, so a checked-in visit would have vanished): a past visit says "Checked in" (existing string) or "Not marked as arrived" (new `trips.notMarked`, English in all seven files until Will signs, with an allow-entry in the copy test). A past visit nobody has marked yet (within the day) says nothing. `TripCard` takes an optional `mark`. Unit test and an e2e in `trips-real-account.spec.ts`.

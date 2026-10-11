@@ -1580,6 +1580,7 @@
   "place.visit.cancel.no": "الاحتفاظ بزيارتي",
   "place.visit.cancel.failed": "تعذر إلغاء تلك الزيارة. تحقق من اتصالك وحاول مرة أخرى.",
   "trips.past.title": "الزيارات السابقة",
+  "trips.notMarked": "Not marked as arrived",
   "trips.new.saveChange": "حفظ الوقت الجديد",
   "trips.new.changeTitle": "تغيير زيارتك",
   "trips.moved.title": "تم نقل زيارتك!",

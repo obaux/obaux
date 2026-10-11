@@ -32,6 +32,8 @@ export interface TripCardProps {
    * program asks for none.
    */
   readonly policies?: { readonly label: string; readonly isDone: boolean } | null;
+  /** After the visit (D-526): what the program marked — "Checked in" or "Not marked as arrived". Omitted before. */
+  readonly mark?: string | null;
 }
 
 const styles = stylex.create({
@@ -77,6 +79,7 @@ export function TripCard({
   withPhotoUrl,
   label,
   policies = null,
+  mark = null,
 }: TripCardProps) {
   return (
     <ClickableCard label={label} href={href} padding={3} xstyle={styles.card}>
@@ -92,6 +95,11 @@ export function TripCard({
             <Text type="supporting" xstyle={styles.when}>
               {when}
             </Text>
+            {mark ? (
+              <Text type="supporting" xstyle={styles.when}>
+                {mark}
+              </Text>
+            ) : null}
           </VStack>
           {withName || policies ? (
             <HStack gap={2} align="center" wrap="nowrap">

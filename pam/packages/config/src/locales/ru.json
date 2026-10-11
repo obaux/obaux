@@ -1526,6 +1526,7 @@
   "place.visit.cancel.no": "Оставить визит",
   "place.visit.cancel.failed": "Не удалось отменить визит. Проверьте подключение и попробуйте ещё раз.",
   "trips.past.title": "Прошедшие визиты",
+  "trips.notMarked": "Not marked as arrived",
   "trips.new.saveChange": "Сохранить новое время",
   "trips.new.changeTitle": "Измените ваш визит",
   "trips.moved.title": "Ваш визит перенесён!",

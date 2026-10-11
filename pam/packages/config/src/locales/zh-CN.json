@@ -1445,6 +1445,7 @@
   "place.visit.cancel.no": "保留我的预约",
   "place.visit.cancel.failed": "无法取消这次预约。请检查网络后再试一次。",
   "trips.past.title": "过去的预约",
+  "trips.notMarked": "Not marked as arrived",
   "trips.new.saveChange": "保存新的时间",
   "trips.new.changeTitle": "更改您的预约",
   "trips.moved.title": "您的预约已更改！",

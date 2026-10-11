@@ -1445,6 +1445,7 @@
   "place.visit.cancel.no": "Mantener mi visita",
   "place.visit.cancel.failed": "No pudimos cancelar esa visita. Revisa tu conexión e inténtalo de nuevo.",
   "trips.past.title": "Visitas pasadas",
+  "trips.notMarked": "Not marked as arrived",
   "trips.new.saveChange": "Guardar la nueva hora",
   "trips.new.changeTitle": "Cambia tu visita",
   "trips.moved.title": "¡Tu visita cambió!",
