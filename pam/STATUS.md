@@ -1412,8 +1412,8 @@ Overview redrawn, one image replaced on Member; drawn from the branch, so redraw
 
 Branch `claude/pam-design-tokens`. Foundations now says what the code does for card radius (24px; sheets 28px), spacing (4px steps,
 half-steps inside components) and colour (all 146 tokens, generated from the theme, with a test); a decision records who was right
-for each of Wren's five items (D-504). Needs Will: two visible changes: raise the theme's body size (14px to 16px, with 3 in 4
-text elements currently under 15px), and dark `background-muted` to `#262626`.
+for each of Wren's five items (D-504). Dark `background-muted` is `#262626` now (Will, 11 October: "yes go for it"; before and after in Storybook › Foundations ›
+Dark muted ground). Needs Will: the other visible change, raising the theme's body size (14px to 16px, with 3 in 4 text elements currently under 15px).
 
 ## Design system & Storybook · Sign in on a short phone, small targets (11 October) — on `main`
 

@@ -229,7 +229,7 @@
     --color-background-body: light-dark(#FFFFFF, #1B1B1B);
     --color-background-card: light-dark(#ffffff, #1b1b1b);
     --color-background-popover: light-dark(#ffffff, #1b1b1b);
-    --color-background-muted: light-dark(#f1f1f1, #1b1b1b);
+    --color-background-muted: light-dark(#F1F1F1, #262626);
     --color-accent: light-dark(#0F5847, #DCE068);
     --color-accent-muted: light-dark(#E7EFE6, #DCE06824);
     --color-neutral: light-dark(#0000000F, #ffffff1A);
