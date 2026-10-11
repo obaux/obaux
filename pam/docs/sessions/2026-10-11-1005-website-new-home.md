@@ -19,7 +19,7 @@
 
 ## Decisions made
 
-D-529.
+D-531.
 
 ## Verified
 
