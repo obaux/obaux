@@ -46,7 +46,7 @@ export const ADMIN_CAN_SEE = [
    * D-526 (attendance part A, 11 October 2026): the program a member plans a visit with sees that visit.
    * `my_program_visits()` returns, for the caller's OWN program only and for a program lead with an active
    * account, each visit that is not cancelled with the member's first name, the day and time, the service
-   * they picked and whether the program marked them as there (`checked_in_at`) — no last name, phone,
+   * they picked and whether the visit is marked as there (`checked_in_at`) — no last name, phone,
    * address or photo. Part C adds the label "missed": a visit still `scheduled` a day after it ends,
    * at a program with a lead on Pam, is marked missed overnight (`sweep_missed_visits()`), and
    * `my_program_visits()` returns that status; it pays and takes nothing, and nobody is texted.
@@ -56,6 +56,14 @@ export const ADMIN_CAN_SEE = [
    * It does NOT widen `member_activity_for_a_program` below: a member's trips to OTHER programs stay hidden.
    */
   'visits_planned_at_their_own_program',
+  /**
+   * D-535 ("I'm here", Piper; Mira, 11 October): a member can mark their own visit. The program's lead sees THAT the member
+   * marked it themselves (`my_program_own_marks()` returns visit ids only; the lead's screen shows "{name} marked this visit
+   * themselves", `schedule.checkin.byMember`, with no undo), not HOW: `how_a_visit_was_marked` below stays hidden. Mira kept it
+   * visible on purpose: hiding it would tell the lead the same thing by implication. Said on the Privacy page
+   * (`privacy.s.sharing.p2`), with the same words as `trips.booked.hasLead` and `place.lead.sees`.
+   */
+  'visit_marked_by_the_member_themselves',
   'points_and_level',
   /**
    * Said on the screen since D-413 (Will, 9 October: "Case manager can see
@@ -165,11 +173,11 @@ export const ADMIN_CANNOT_SEE = [
    */
   'member_activity_for_a_program',
   /**
-   * D-526 / D-535 (Mira, 11 October): a program's lead sees a visit's status (booked, there, missed), never who marked it or how.
-   * A member can mark their own visit ("I’m here", "I went"), so a visit may show as there without the lead having marked it; the
-   * lead sees only that it is there, and "undo" appears only on a mark the lead made. `my_program_visits()` returns the status and
-   * not the method. Only the member sees how, and an admin's audit row says only that a check-in happened. (Privacy p9 says what
-   * Pam keeps; `privacy.s.sharing.p2` says what a program sees; this entry is why neither says "how".)
+   * D-526 / D-535 (Mira, 11 October): a program's lead sees a visit's status (booked, there, missed) and whether the member marked
+   * it themselves (`visit_marked_by_the_member_themselves` above), never HOW: not the member's position, not "I’m here" or "I went".
+   * `my_program_visits()` returns the status and `my_program_own_marks()` visit ids only, neither the method. Only the member sees
+   * how, and an admin's audit row says only that a check-in happened. (Privacy p9 says what Pam keeps; `privacy.s.sharing.p2`
+   * says what a program sees; this entry is why neither says "how".)
    */
   'how_a_visit_was_marked',
 ] as const;
