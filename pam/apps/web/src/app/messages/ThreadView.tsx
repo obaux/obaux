@@ -908,7 +908,7 @@ export function ThreadView({
               translation && message.body ? (
                 <TranslatedBody original={message.body} translation={translation} {...(extra ? { captionStyle: extra } : {})} />
               ) : (
-                <Text xstyle={[styles.body, extra]}>{message.body ?? ''}</Text>
+                <Text dir="auto" xstyle={[styles.body, extra]}>{message.body ?? ''}</Text>
               );
             // A divider opens each day (D-389).
             const isNewDay = i === 0 || dayKey(message.createdAt) !== dayKey(messages[i - 1]!.createdAt);

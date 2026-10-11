@@ -1178,6 +1178,11 @@ drops signatures), then `20261010042108_a_program_lead_submits_their_own_program
 
 ---
 
+## Messages & notifications · Arabic direction in a conversation (11 October 2026)
+
+Branch `claude/messages-thread-direction` (D-533, Iris T1/T2). `dir="auto"` on the words people wrote and on names in a
+conversation, the pinned bar and the Messages list.
+
 ## Messages & notifications · the thread header, small bar and scrolling info (11 October 2026)
 
 Branch `claude/messages-thread-header-back` (D-529). A conversation's header is the nested-page bar alone (`SubPageHeader variant="bar"`);

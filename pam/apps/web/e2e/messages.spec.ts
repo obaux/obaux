@@ -1406,6 +1406,117 @@ test.describe('the conversation, drawn closer (D-400, D-401)', () => {
     });
   });
 
+  test.describe('in Arabic, what people wrote keeps its own direction (Iris, 11 October: T1, T2)', () => {
+    test.beforeEach(async ({ page }) => {
+      await page.addInitScript(() => localStorage.setItem('pam.locale', 'ar'));
+    });
+    const LATIN_NAME = 'Maria Guadalupe Hernández-Villanueva de la Cruz';
+    const ARABIC_NAME = 'محمد عبد الرحمن الحسيني بن عبد العزيز آل سعيد الكبير';
+    const withNameAndWords = async (page: import('@playwright/test').Page, name: string) => {
+      // The account's own language wins over the device's, so the account says Arabic too.
+      await page.route(PROFILES, (route) =>
+        route.fulfill(
+          json({
+            id: ME,
+            role: 'admin',
+            first_name: 'Will',
+            access_status: 'active',
+            preferred_language: 'ar',
+            region_id: '0195b1c0-0000-4000-8000-000000000001',
+            regions: { name: 'Philadelphia' },
+          }),
+        ),
+      );
+      await withOneConversation(page);
+      await page.route(PARTNERS, (route) =>
+        route.fulfill(json([{ conversation_id: CONVO, profile_id: OTHER, first_name: name, role: 'member' }])),
+      );
+      await page.route(MESSAGES, (route) =>
+        route.fulfill(
+          json([
+            ...Array.from({ length: 30 }, (_, i) => ({
+              id: `fill-${i}`,
+              conversation_id: CONVO,
+              sender_id: OTHER,
+              body: `Message ${i + 1}, long enough to take a line or two on a narrow phone screen.`,
+              created_at: new Date(Date.now() - (40 - i) * 60_000).toISOString(),
+            })),
+            { id: 'en-1', conversation_id: CONVO, sender_id: OTHER, body: 'Thank you. Which bus goes there?', created_at: new Date(Date.now() - 5 * 60_000).toISOString() },
+            { id: 'ar-1', conversation_id: CONVO, sender_id: OTHER, body: 'شكرا لك. أي حافلة تذهب إلى هناك؟', created_at: new Date(Date.now() - 4 * 60_000).toISOString() },
+          ]),
+        ),
+      );
+    };
+    const direction = (locator: import('@playwright/test').Locator) => locator.evaluate((el) => getComputedStyle(el).direction);
+    const scrollMessages = (page: import('@playwright/test').Page, to: 'top' | 'bottom') =>
+      page.evaluate((where) => {
+        for (const el of document.querySelectorAll('*')) {
+          if (el.scrollHeight > el.clientHeight + 4 && /auto|scroll/.test(getComputedStyle(el).overflowY)) {
+            el.scrollTop = where === 'top' ? 0 : el.scrollHeight;
+          }
+        }
+      }, to);
+
+    test('T1: an English message in an Arabic thread reads left to right, an Arabic one right to left', async ({ page }) => {
+      await signedInAs(page, 'admin');
+      await withNameAndWords(page, 'Marcus');
+      await page.goto(`/messages/thread/?id=${CONVO}`);
+      await settled(page);
+      await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
+      await scrollMessages(page, 'bottom');
+      const english = page.getByText('Thank you. Which bus goes there?');
+      const arabic = page.getByText('شكرا لك. أي حافلة تذهب إلى هناك؟');
+      await expect(english).toBeVisible();
+      expect(await direction(english)).toBe('ltr');
+      expect(await direction(arabic)).toBe('rtl');
+    });
+
+    test('T1: the last message in the list keeps its own direction too', async ({ page }) => {
+      await signedInAs(page, 'admin');
+      await withNameAndWords(page, 'Marcus');
+      await page.route(MESSAGES, (route) =>
+        route.fulfill(
+          json([{ id: 'en-2', conversation_id: CONVO, sender_id: OTHER, body: 'Class starts Monday at 10.', created_at: new Date().toISOString() }]),
+        ),
+      );
+      await page.goto('/messages/');
+      await settled(page);
+      await expect(page.locator('html')).toHaveAttribute('dir', 'rtl');
+      const preview = page.getByText('Class starts Monday at 10.');
+      await expect(preview).toBeVisible();
+      expect(await direction(preview)).toBe('ltr');
+    });
+
+    test('T2: a long Latin name keeps its start in the bar and the info, an Arabic name its own end', async ({ page }) => {
+      await signedInAs(page, 'admin');
+      await withNameAndWords(page, LATIN_NAME);
+      await page.goto(`/messages/thread/?id=${CONVO}`);
+      await settled(page);
+      const barName = page.locator('main > :first-child [aria-hidden="true"]', { hasText: 'Maria' });
+      await scrollMessages(page, 'bottom');
+      await expect.poll(async () => Number(await barName.evaluate((el) => getComputedStyle(el).opacity))).toBe(1);
+      // Left to right, so what does not fit is cut at its end, with the ellipsis: "Maria Guadalupe H…".
+      expect(await direction(barName)).toBe('ltr');
+      expect(await barName.evaluate((el) => getComputedStyle(el).textOverflow)).toBe('ellipsis');
+      expect(await barName.evaluate((el) => el.scrollWidth > el.clientWidth)).toBe(true);
+      await scrollMessages(page, 'top');
+      expect(await direction(page.getByRole('heading', { level: 1 }))).toBe('ltr');
+    });
+
+    test('T2: an Arabic name is cut at its own end', async ({ page }) => {
+      await signedInAs(page, 'admin');
+      await withNameAndWords(page, ARABIC_NAME);
+      await page.goto(`/messages/thread/?id=${CONVO}`);
+      await settled(page);
+      const barName = page.locator('main > :first-child [aria-hidden="true"]', { hasText: 'محمد' });
+      await scrollMessages(page, 'bottom');
+      await expect.poll(async () => Number(await barName.evaluate((el) => getComputedStyle(el).opacity))).toBe(1);
+      expect(await direction(barName)).toBe('rtl');
+      expect(await barName.evaluate((el) => getComputedStyle(el).textOverflow)).toBe('ellipsis');
+      expect(await direction(page.getByRole('heading', { level: 1 }).first())).toBe('rtl');
+    });
+  });
+
   test('the send button hugs the box\'s rounder bottom corner; the mic sits nearer its own', async ({ page }) => {
     await signedInAs(page, 'admin');
     await withOneConversation(page);
