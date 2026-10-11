@@ -41,16 +41,24 @@ const TAB_BAR_HEIGHT = 66;
 const NOTE_BOTTOM = 128;
 const PIN_BLOCK = 112;
 
-function useViewportHeight(): number {
-  const [height, setHeight] = useState(800);
+function useViewport(): { readonly width: number; readonly height: number } {
+  const [size, setSize] = useState({ width: 390, height: 800 });
   useEffect(() => {
-    const read = () => setHeight(window.innerHeight);
+    const read = () => setSize({ width: window.innerWidth, height: window.innerHeight });
     read();
     window.addEventListener('resize', read);
     return () => window.removeEventListener('resize', read);
   }, []);
-  return height;
+  return size;
 }
+
+// Two pins whose names would run into each other (a name is up to 120px wide and a pin ~110px tall)
+// are drawn as one, "2 trips" (D-509).
+const CLUSTER_X = 120;
+const CLUSTER_Y = 90;
+
+/** Philadelphia, where Pam is: the real map's view when there is no trip to fit (D-509). */
+const CITY = { lat: 39.9526, lng: -75.1652 };
 
 const styles = stylex.create({
   map: { position: 'absolute', inset: 0, overflow: 'hidden' },
@@ -133,7 +141,7 @@ function PreviewTripsMap({ pins: all }: { readonly pins: readonly TripPin[] }) {
   // a pin's height below the note and no lower than the drawer's edge. On a
   // phone too short for both, the note wins and the drawer, which sits on
   // top, covers the date.
-  const viewport = useViewportHeight();
+  const { width: viewportWidth, height: viewport } = useViewport();
   const mapHeight = viewport - TAB_BAR_HEIGHT;
   const drawerTop = mapHeight - (Math.round(mapHeight * 0.5) + 48);
   const highest = NOTE_BOTTOM + PIN_BLOCK;
@@ -147,13 +155,30 @@ function PreviewTripsMap({ pins: all }: { readonly pins: readonly TripPin[] }) {
         : Math.round(highest + ((maxLat - p.lat) / (maxLat - minLat)) * (lowest - highest)),
   });
 
+  // Pins that would overprint are one: placed, then merged with the first one near enough.
+  const placed: { at: { left: number; top: number }; members: TripPin[] }[] = [];
+  for (const pin of pins) {
+    const at = place(pin);
+    const near = placed.find(
+      (other) =>
+        Math.abs(((other.at.left - at.left) / 100) * viewportWidth) < CLUSTER_X && Math.abs(other.at.top - at.top) < CLUSTER_Y,
+    );
+    if (near) near.members.push(pin);
+    else placed.push({ at, members: [pin] });
+  }
+
   return (
     <VStack xstyle={[styles.map, styles.preview]} role="region" aria-label={t('trips.map.label')}>
-      <Text type="supporting" xstyle={styles.previewLabel}>
-        {t('trips.map.preview')}
-      </Text>
-      {pins.map((pin) => {
-        const at = place(pin);
+      {/* Said only when there is something drawn: with no trips this is just a quiet ground. */}
+      {pins.length > 0 ? (
+        <Text type="supporting" xstyle={styles.previewLabel}>
+          {t('trips.map.preview')}
+        </Text>
+      ) : null}
+      {placed.map(({ at, members }) => {
+        const first = members[0]!;
+        const pin: TripPin =
+          members.length > 1 ? { ...first, name: t('trips.map.many', { count: members.length }) } : first;
         return (
           <a
             key={pin.id}
@@ -270,6 +295,12 @@ function GoogleTripsMap({ pins, onFail }: { readonly pins: readonly TripPin[]; r
             icon: { url: PIN_SVG, anchor: { x: 20, y: 48 } },
           });
           marker.addListener('click', () => navigate(pin.href));
+        }
+        if (pins.length === 0) {
+          // Nothing to fit (D-509): the city, with no pins.
+          (map as unknown as { setCenter: (p: unknown) => void; setZoom: (z: number) => void }).setCenter(CITY);
+          (map as unknown as { setCenter: (p: unknown) => void; setZoom: (z: number) => void }).setZoom(12);
+          return;
         }
         // Room at the bottom for the half-open drawer.
         map.fitBounds(bounds, 80);
