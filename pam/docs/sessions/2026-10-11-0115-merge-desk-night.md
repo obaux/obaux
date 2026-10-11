@@ -121,6 +121,31 @@
   - Wren's search with Sage's everyday words (D-507, 9ac76cbe) waits for Sage's call-free posts, since it
     is stacked on them. They merge together.
 
+- **Batch b8, pushed at cac5f49 (03:34), live on web and pam-site:** Dot's D-508 (Privacy and Terms opened
+  from the website go Back to that page; the return path is checked, only joinpam.org), Dot's D-510 (a wrong
+  sign-in code stays on the code step with a one-line alert, no Call), Sage's voice guide for A28, and Iris's
+  help-site baseline (`docs/research/2026-10-11-help-site.md`: no way to reach a person, no focus ring, search
+  misses, tap targets, aria-live; all sent to Wren in order).
+- **Batch b9 (Piper's D-509 + Dot's D-513):** real accounts never see example trips, visits or policies
+  (`lib/exampleMode.ts`: Storybook, a super admin's preview or `pam.examples=1` only); an empty Trips drawer says
+  "Plan a visit and it shows here."; the blue alert in dark mode is 10%.
+- **Will's answers 03:16–03:41:**
+  - a56 go: attendance A–D after Trips, a lead's "here" pays the existing 100-point rule, no missed text.
+  - Visits outside Pam: not a guide ("not everyone has one"). An "I'm here" check-in by location at the planned
+    time (100, the geofence rule already in `points.ts`; Pam keeps only the outcome), or "Did you go?" (60).
+  - Calendars (a58): a private link for everyone; Google sync limited to a calendar Pam creates; and, as its own
+    switch, a search for appointments from the web domains of places the person has trips with. Points still
+    need "I'm here".
+  - "Anyone should be able to create a program": "Add my program" on Profile, checked once by hand
+    (`request_staff_access` and the Requests screen exist; Piper's plan approved).
+  - a57 "I can't sign in": yes. a53's post ships now, true today: "Does the place know I'm coming?"
+  - a59 signed (03:37): every "call Pam" line, the Help screen, "Still stuck?", the two texts, the HELP auto-reply
+    and the "Your safety" post. A phone number on the help form once texts are on (Nico's text reply);
+    deleting an account confirmed with a fresh sign-in code (Ava); the privacy line names hello@joinpam.org.
+  - The merge desk decided, not asked: a one-tap "Call or text 988" row on Help next to "Call 911".
+- **Held on purpose:** Dot's D-512 (Contact Pam in the app) waits for Wren's A28 help desk so it never leads to
+  a page that still says "call Pam"; Lena's 31 signed lines follow it.
+
 ## What was wrong, and what missed it
 
 - **Ava won't push on the merge desk's word, and that is right.** The merge desk passed on Will's "remove" at
@@ -137,6 +162,12 @@
   Caught before merge. Ava renumbered to D-503 offline, without pushing. Sage then claimed D-503 online at about 01:05. Ava will claim online at push time. Dot's report also records a guessed D-498 that she fixed before
   committing. The rule (claim online, then write the number) is in `docs/lanes.md`. Guessing first is still
   the habit to break.
+
+- **Two account texts still carry the phone number.** Live `dispatch-sms` is v23 (17 September, "PAM:", English
+  and Spanish), not v15 as `before-launch.md` said, and it fills "Call {supportPhone}" into `staff_request_denied`
+  and `access_limited_notice`. Nico first read them as held by `texts_live`; they are not. Account texts go out
+  regardless (migration 20261010141859), and one denial has been sent. A hotfix of v23 would send words that
+  differ from the registered samples, so the merge desk chose to wait for Will's refiling, and said so to Will.
 
 ## Decisions
 
