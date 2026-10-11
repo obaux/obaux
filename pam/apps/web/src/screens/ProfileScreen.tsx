@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { DUMMY_CONNECTIONS } from '@pam/config/dummy-connections';
+import { showsExamples } from '@/lib/examples';
 import { DUMMY_SELF } from '@pam/config/dummy-people';
 import { useRouter } from 'next/navigation';
 import { signOut, useSession } from '@/lib/useSession';
@@ -64,6 +65,7 @@ export function ProfileScreen() {
   }, [signedIn, session]);
 
   const role = viewedRole ?? 'member';
+  const examples = showsExamples({ demoRole, isDemo: signedIn && session.session.isDemo });
   const name =
     (demoRole ? DUMMY_SELF[demoRole]?.firstName : null) ?? (signedIn ? session.session.firstName : null) ?? '';
 
@@ -73,7 +75,9 @@ export function ProfileScreen() {
       role={role}
       points={points ?? 0}
       savedCount={saved.status === 'ready' ? saved.places.length : 0}
-      connectionsCount={role === 'member' ? DUMMY_CONNECTIONS.length : 0}
+      // No real query for "the people on my side" yet, so a real account has none to count (D-518); only an
+      // example (a preview, a demo account, Storybook) counts the example cast.
+      connectionsCount={role === 'member' && examples ? DUMMY_CONNECTIONS.length : 0}
       remindersOn={remindersOn}
       canViewAs={trueRole === 'super_admin'}
       canUseAs={signedIn && session.session.roles.includes('member') && session.session.roles.includes('provider')}

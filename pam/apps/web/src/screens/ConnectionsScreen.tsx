@@ -4,12 +4,16 @@ import type { Locale } from '@pam/config';
 import { DUMMY_CONNECTIONS, dummyConnection, type DummyConnection } from '@pam/config/dummy-connections';
 import { DUMMY_SELF_ID, dummyConversationIdBetween } from '@pam/config/dummy-conversations';
 import { useI18n } from '@/lib/i18n';
+import { showsExamples } from '@/lib/examples';
+import { useRoleView } from '@/lib/useViewedRole';
+import { useSession } from '@/lib/useSession';
 import { ConnectionsView, type Connection } from './ConnectionsView';
 
 /**
- * Connections, wired to the example set (D-213). There is no real query yet
- * for "the people on my side" with photos and facts; until there is, this is
- * the example cast, as every other example screen is (D-172).
+ * Connections (D-213). There is no real query yet for "the people on my side"
+ * with photos and facts. Until there is, a real account sees its short empty
+ * state ("No connections yet") and only an example (a super admin's preview, a
+ * demo account, Storybook) sees the example cast (D-172, D-518).
  *
  * The profile page behind each card is gone (D-272): the card carries the
  * message button, the program link and who connected you.
@@ -35,5 +39,10 @@ function toConnection(c: DummyConnection, locale: Locale): Connection {
 
 export function ConnectionsScreen() {
   const { locale } = useI18n();
-  return <ConnectionsView connections={DUMMY_CONNECTIONS.map((c) => toConnection(c, locale))} />;
+  const { state: session } = useSession();
+  const trueRole = session.status === 'signed-in' ? session.session.role : null;
+  const { demoRole } = useRoleView(trueRole);
+  const isDemo = session.status === 'signed-in' && session.session.isDemo;
+  const cast = showsExamples({ demoRole, isDemo }) ? DUMMY_CONNECTIONS : [];
+  return <ConnectionsView connections={cast.map((c) => toConnection(c, locale))} />;
 }
