@@ -100,7 +100,7 @@ test.describe('a member plans a visit', () => {
 });
 
 test.describe('a program lead with no program of their own', () => {
-  test('Home leads with Add your program and has no program tools', async ({ page }) => {
+  test('Home leads with Add your program and has no calendar of visits', async ({ page }) => {
     await signedIn(page, 'provider');
     await page.route('**/rest/v1/services*', (route) => route.fulfill(json([])));
     await page.goto('/');

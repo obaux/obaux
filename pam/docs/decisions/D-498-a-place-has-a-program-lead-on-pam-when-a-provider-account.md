@@ -10,8 +10,12 @@ Places get into Pam two ways: **gathered** from public lists (the city's provide
 
 **What the app does with it.**
 - A member planning or keeping a visit at a place with no lead is told, in one sentence, that it is only to help them plan and the place is not told; the words that said or implied the place knew (a note "to tell them", "booked", "so they know you're coming", "See you there") are replaced for such places. Places with a lead keep today's wording. Until the database has answered, or if it cannot, the answer is "no lead": the plainer wording says less than it could, never more than is true. An example place has a lead when the example people name it (as "Message the lead" already did).
-- A **real** program lead with no program of their own is not shown the example program (it was shown to any lead who signed in on a new tab, because the example is the default when the database has none). Home leads with Add your program, with no people row and no calendar; Policies and the service editor ask them to add their program first. A super admin previewing the role, and Storybook (which marks `window` when it answers Supabase itself), keep the example.
+- A **real** program lead with no program of their own is not shown the example program (it was shown to any lead who signed in on a new tab, because the example is the default when the database has none). Home leads with Add your program, with no calendar card (the People row stays: inviting someone works from day one, D-384); Policies and the service editor ask them to add their program first. A super admin previewing the role, and Storybook (which marks `window` when it answers Supabase itself), keep the example.
 - A booking a case manager makes for a member is still an example (nothing is saved with the program), and already says so; it needed no change.
+
+## Wording
+
+The English sentences (the plan-only line, the note label, saved not booked, the moved line, the drop-in line, the case-manager line) were reviewed by Will on 11 October 2026 ("approve", on the Control Room card). The six other languages are drafts for Lena.
 
 ## What a later session might reverse
 
