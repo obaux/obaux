@@ -28,8 +28,8 @@ STATUS row too.
   (7) LAST, set `GOOGLE_SYNC_LIVE` to `on`. (8) Try it with your own account: Profile > Calendar > Connect Google Calendar; a visit you
   plan appears in a "Pam visits" calendar within 15 minutes; move it, cancel it; turn on "Show the place's name and address"; then
   Disconnect and check the calendar is gone from Google and that **Google Account > Security > Third-party access** no longer lists Pam.
-  Also: when a member's account is erased, their Google token row goes with it, but the calendar stays in their Google account and
-  the token is not revoked (a gap to close: erase should call Disconnect first).
+  (9) Erase an account that is connected and check that within 15 minutes the "Pam visits" calendar is gone from Google and Pam no
+  longer appears under Third-party access (the erase queues the cleanup; the clock does it).
 
 - [ ] **Calendar link: someone taps it on a real phone** (Piper, 11 October 2026, D-538). (1) On an Android phone, make a link on
   Profile > Calendar and tap "Open Google Calendar on the web": it should reach Google Calendar's "add by URL" page in the

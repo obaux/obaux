@@ -24,7 +24,7 @@
 --
 -- ## The clock
 --
--- `google_sync_kick()` runs every 15 minutes. With no one connected it does NOTHING (not even a
+-- `google_sync_kick()` runs every 15 minutes. With no one connected and no cleanup waiting it does NOTHING (not even a
 -- call to the edge function). Otherwise it calls `google-sync`, which does nothing at all unless
 -- GOOGLE_SYNC_LIVE is on.
 --
@@ -278,7 +278,99 @@ as $$
   delete from public.google_connections where member_id = p_member;
 $$;
 
--- The clock: nothing at all when no one is connected.
+-- ---------------------------------------------------------------------------
+-- When an account is erased (D-443: Pam deletes it when somebody asks), Google is told too.
+--
+-- The erase is a plain delete of the profile, which Google cannot be part of. So a `before delete` trigger queues
+-- a CLEANUP: the sealed token and the calendar's id, with no name and no account id. The next run of the clock
+-- (every 15 minutes) decrypts it, deletes the "Pam visits" calendar, revokes the token and removes the cleanup.
+-- If Google cannot be reached it tries again next run, five times at most, and then lets go and says so in the audit
+-- log. The erase itself never waits for Google and never fails because of it. The audit log gets one row about the
+-- erased account, "account.google_cleanup_queued" (no token), which goes with the account's other rows after six months;
+-- the cleanup's own result is written without any account id.
+
+create table if not exists public.google_cleanups (
+  id                uuid primary key default gen_random_uuid(),
+  refresh_token_enc text not null,
+  calendar_id       text not null,
+  attempts          integer not null default 0,
+  created_at        timestamptz not null default now()
+);
+alter table public.google_cleanups enable row level security;
+alter table public.google_cleanups force row level security;
+revoke all on table public.google_cleanups from public, anon, authenticated;
+create policy google_cleanups_no_client on public.google_cleanups for select using (false);
+
+create or replace function public.google_cleanup_on_erase()
+returns trigger
+language plpgsql
+security definer
+set search_path = public, extensions
+as $$
+begin
+  if exists (select 1 from public.google_connections c where c.member_id = old.id) then
+    insert into public.google_cleanups (refresh_token_enc, calendar_id)
+    select c.refresh_token_enc, c.calendar_id from public.google_connections c where c.member_id = old.id;
+    insert into public.audit_log (actor_id, action, target_type, target_id, meta)
+    values (null, 'account.google_cleanup_queued', 'profile', old.id, '{}'::jsonb);
+  end if;
+  return old;
+end;
+$$;
+
+drop trigger if exists google_cleanup_on_erase on public.profiles;
+create trigger google_cleanup_on_erase before delete on public.profiles
+  for each row execute function public.google_cleanup_on_erase();
+
+create or replace function public.google_cleanups_due(p_limit integer)
+returns table (id uuid, refresh_token_enc text, calendar_id text)
+language sql
+stable
+security definer
+set search_path = public, extensions
+as $$
+  select c.id, c.refresh_token_enc, c.calendar_id from public.google_cleanups c
+  order by c.created_at limit greatest(least(coalesce(p_limit, 20), 100), 1);
+$$;
+
+-- After one try: both done, the cleanup goes; otherwise it is counted, and the fifth miss lets it go (and says so).
+create or replace function public.google_cleanup_done(p_id uuid, p_calendar_removed boolean, p_revoked boolean)
+returns text
+language plpgsql
+security definer
+set search_path = public, extensions
+as $$
+declare
+  tries integer;
+begin
+  if p_calendar_removed and p_revoked then
+    delete from public.google_cleanups where id = p_id;
+    insert into public.audit_log (actor_id, action, target_type, target_id, meta)
+    values (null, 'google.cleanup', 'google_cleanup', p_id, jsonb_build_object('calendar_removed', true, 'revoked', true));
+    return 'done';
+  end if;
+  update public.google_cleanups set attempts = attempts + 1 where id = p_id returning attempts into tries;
+  if tries is null then
+    return 'gone';
+  end if;
+  if tries >= 5 then
+    delete from public.google_cleanups where id = p_id;
+    insert into public.audit_log (actor_id, action, target_type, target_id, meta)
+    values (null, 'google.cleanup', 'google_cleanup', p_id,
+            jsonb_build_object('calendar_removed', p_calendar_removed, 'revoked', p_revoked, 'gave_up', true));
+    return 'gave_up';
+  end if;
+  return 'again';
+end;
+$$;
+
+revoke all on function public.google_cleanup_on_erase() from public, anon, authenticated;
+revoke all on function public.google_cleanups_due(integer) from public, anon, authenticated;
+revoke all on function public.google_cleanup_done(uuid, boolean, boolean) from public, anon, authenticated;
+grant execute on function public.google_cleanups_due(integer) to service_role;
+grant execute on function public.google_cleanup_done(uuid, boolean, boolean) to service_role;
+
+-- The clock: nothing at all when no one is connected and nothing is waiting to be cleaned up.
 create or replace function public.google_sync_kick()
 returns void
 language plpgsql
@@ -286,7 +378,8 @@ security definer
 set search_path = public, extensions
 as $$
 begin
-  if not exists (select 1 from public.google_connections where state = 'connected') then
+  if not exists (select 1 from public.google_connections where state = 'connected')
+     and not exists (select 1 from public.google_cleanups) then
     return;
   end if;
   if to_regnamespace('net') is null or to_regnamespace('vault') is null then

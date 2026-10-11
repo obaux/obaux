@@ -14,7 +14,10 @@
 //   3. The refresh token is kept encrypted with GOOGLE_TOKEN_KEY (a secret, never in the database). The access token is
 //      never kept. Nothing is logged but a status: no token, no member, no visit.
 //   4. What goes in an event is event.ts: the same as the calendar link, the same discreet default, the same setting.
-//   5. Never retry forever: a refused token breaks the connection (the member sees "Reconnect Google"); five failed runs
+//   5. An erased account is cleaned up here too: the database queues the sealed token and the calendar's id when a profile is
+//      deleted (no name, no account id), and the next run deletes the calendar and revokes the token. The erase never waits for
+//      Google; a miss is tried again next run, five times at most.
+//   6. Never retry forever: a refused token breaks the connection (the member sees "Reconnect Google"); five failed runs
 //      in a row break it; a run does at most 100 writes per member and 50 members.
 // Secrets (names only): GOOGLE_SYNC_LIVE, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, GOOGLE_TOKEN_KEY, GOOGLE_STATE_SECRET,
 // DISPATCH_SECRET (the same one the other clocks use), SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, SUPABASE_ANON_KEY (provided).
@@ -201,6 +204,8 @@ async function disconnect(deps: Deps, live: Config, member: string, origin: stri
 
 interface Counts {
   members: number;
+  cleaned: number;
+  cleanupMissed: number;
   created: number;
   changed: number;
   removed: number;
@@ -215,7 +220,7 @@ async function sync(request: Request, deps: Deps, live: Config | null): Promise<
   if (!live) return json(200, { live: false });
 
   const due = await rpc<{ member_id: string; refresh_token_enc: string; calendar_id: string }[]>(deps, 'google_connections_due', { p_limit: LIMITS.members });
-  const counts: Counts = { members: 0, created: 0, changed: 0, removed: 0, refused: 0, unwell: 0 };
+  const counts: Counts = { members: 0, cleaned: 0, cleanupMissed: 0, created: 0, changed: 0, removed: 0, refused: 0, unwell: 0 };
   for (const row of due) {
     counts.members += 1;
     try {
@@ -229,7 +234,35 @@ async function sync(request: Request, deps: Deps, live: Config | null): Promise<
       await rpc(deps, 'google_connection_mark', { p_member: row.member_id, p_ok: false, p_refused: refused }).catch(() => {});
     }
   }
+  await cleanups(deps, live, counts);
   return json(200, { live: true, ...counts });
+}
+
+/** What erasing an account left to do at Google: delete the calendar, take the token back. */
+async function cleanups(deps: Deps, live: Config, counts: Counts): Promise<void> {
+  const due = await rpc<{ id: string; refresh_token_enc: string; calendar_id: string }[]>(deps, 'google_cleanups_due', { p_limit: 20 });
+  for (const row of due) {
+    let calendarRemoved = false;
+    let revoked = false;
+    try {
+      const refresh = await unseal(row.refresh_token_enc, live.tokenKey);
+      try {
+        calendarRemoved = await deleteCalendar(deps.fetch, await accessToken(deps.fetch, live.creds, refresh), row.calendar_id);
+      } catch (error) {
+        // Google no longer honours the token (its owner took Pam's access away): there is nothing more Pam can reach or take back.
+        if (error instanceof Refused) {
+          calendarRemoved = true;
+          revoked = true;
+        }
+      }
+      if (!revoked) revoked = await revoke(deps.fetch, refresh);
+    } catch (error) {
+      quiet('cleanup', error);
+    }
+    const outcome = await rpc<string>(deps, 'google_cleanup_done', { p_id: row.id, p_calendar_removed: calendarRemoved, p_revoked: revoked });
+    if (outcome === 'done') counts.cleaned += 1;
+    else counts.cleanupMissed += 1;
+  }
 }
 
 async function syncMember(deps: Deps, live: Config, row: { member_id: string; refresh_token_enc: string; calendar_id: string }, counts: Counts): Promise<void> {

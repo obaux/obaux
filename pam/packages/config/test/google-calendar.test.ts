@@ -56,6 +56,8 @@ function world(opts: Options = {}) {
   const db = {
     connections: new Map<string, { refresh_token_enc: string; calendar_id: string; state: string; failures: number }>(),
     events: new Map<string, { appointment_id: string; event_id: string; content_hash: string }>(),
+    cleanups: new Map<string, { id: string; refresh_token_enc: string; calendar_id: string; attempts: number }>(),
+    cleanupResults: [] as { calendar: boolean; revoked: boolean }[],
     visits: opts.visits ?? [],
     showDetails: opts.showDetails ?? false,
   };
@@ -97,6 +99,16 @@ function world(opts: Options = {}) {
         case 'google_event_set':
           db.events.set(args['p_appointment'], { appointment_id: args['p_appointment'], event_id: args['p_event'], content_hash: args['p_hash'] });
           return okJson(null);
+        case 'google_cleanups_due':
+          return okJson([...db.cleanups.values()]);
+        case 'google_cleanup_done': {
+          db.cleanupResults.push({ calendar: args['p_calendar_removed'], revoked: args['p_revoked'] });
+          const done = args['p_calendar_removed'] && args['p_revoked'];
+          const row = db.cleanups.get(args['p_id']);
+          if (done || !row || row.attempts + 1 >= LIMITS.failures) db.cleanups.delete(args['p_id']);
+          else row.attempts += 1;
+          return okJson(done ? 'done' : 'again');
+        }
         case 'google_event_forget':
           db.events.delete(args['p_appointment']);
           return okJson(null);
@@ -329,7 +341,7 @@ describe('when Google says no, Pam stops: it never retries forever', () => {
     expect(refused.db.connections.get(MEMBER)!.state).toBe('broken');
     const before = refused.calls.length;
     expect(await (await refused.sync()).json()).toMatchObject({ members: 0 });
-    expect(refused.calls.length).toBe(before + 1); // only the list of who is due
+    expect(refused.calls.length).toBe(before + 2); // only the lists of who is due and what is to clean up
     expect(await (await refused.call('status')).json()).toEqual({ live: true, connected: true, state: 'broken' });
   });
 
@@ -385,6 +397,44 @@ describe('Disconnect always disconnects', () => {
     mine.db.connections.set(OTHER, { refresh_token_enc: await seal('REFRESH-O', KEY), calendar_id: 'cal-o', state: 'connected', failures: 0 });
     await mine.call('disconnect');
     expect(mine.db.connections.has(OTHER)).toBe(true);
+  });
+});
+
+describe('erasing an account tells Google too', () => {
+  const queue = async (w: ReturnType<typeof world>) =>
+    w.db.cleanups.set('clean-1', { id: 'clean-1', refresh_token_enc: await seal('REFRESH-GONE', KEY), calendar_id: 'cal-gone', attempts: 0 });
+
+  it('deletes the calendar and revokes the token for a queued cleanup, with no one connected', async () => {
+    const w = world();
+    await queue(w);
+    w.google.calendars.set('cal-gone', new Map());
+    expect(await (await w.sync()).json()).toMatchObject({ members: 0, cleaned: 1, cleanupMissed: 0 });
+    expect(w.google.deletedCalendars).toEqual(['cal-gone']);
+    expect(w.google.revoked).toEqual(['REFRESH-GONE']);
+    expect(w.db.cleanups.size).toBe(0);
+  });
+
+  it('tries again next run when Google is unwell, and the erase is not waiting for it', async () => {
+    const w = world({ refreshStatus: 500 });
+    await queue(w);
+    expect(await (await w.sync()).json()).toMatchObject({ cleaned: 0, cleanupMissed: 1 });
+    expect(w.db.cleanups.size).toBe(1);
+    expect(w.db.cleanupResults[0]).toEqual({ calendar: false, revoked: true });
+  });
+
+  it('counts a token the member already took back as done: there is nothing left to reach', async () => {
+    const w = world({ refreshStatus: 400 });
+    await queue(w);
+    expect(await (await w.sync()).json()).toMatchObject({ cleaned: 1 });
+    expect(w.db.cleanups.size).toBe(0);
+  });
+
+  it('does nothing about it while Pam is off', async () => {
+    const w = world({ env: { GOOGLE_SYNC_LIVE: undefined } });
+    await queue(w);
+    await w.sync();
+    expect(w.calls).toEqual([]);
+    expect(w.db.cleanups.size).toBe(1);
   });
 });
 

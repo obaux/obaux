@@ -6,6 +6,8 @@
 
 Migration `20261011174053`: `calendar_prefs` (the one place's-name setting, for the link and the sync), `google_connections` and `google_events` (RLS forced, deny-all policy, nothing granted), nine service-role-only functions, and `google_sync_kick()` on a 15-minute clock that does nothing when no one is connected. Edge function `google-calendar` (`handler.ts`, `google.ts`, `crypto.ts`, `event.ts`, `index.ts`): status, connect, callback, disconnect, sync. App: `useGoogleCalendar`, a Google section on the Calendar page (hidden until switched on), the place switch now serving both. 17 new strings (English in all seven files until signed). `docs/before-launch.md`: Will's checklist, no value in the repo.
 
+Erasing an account queues a Google cleanup (D-539): the calendar is deleted and the token revoked on the next run, never holding up the erase.
+
 ## What was wrong, and what missed it
 
 Nothing: Will asked for trips on members' calendars; the link is one half.
@@ -20,7 +22,7 @@ DB test 62 and the whole DB suite (test 61 changed: the setting no longer needs 
 
 ## Left undone
 
-Not built, by decision: the finder. Erasing an account does not yet Disconnect Google first. The scope name and what it permits must be confirmed against Google's own page (before-launch). Storybook/fit on this branch not yet run.
+Not built, by decision: the finder. The scope name and what it permits must be confirmed against Google's own page (before-launch). Storybook/fit on this branch not yet run.
 
 ## Needs a human
 

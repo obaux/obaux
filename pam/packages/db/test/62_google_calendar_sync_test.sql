@@ -103,6 +103,39 @@ select test.check('the row and its events go together',
 reset role;
 
 \echo ''
+\echo '--- Erasing an account tells Google too ---'
+set role service_role;
+select public.google_connection_save(:'mem2', 'ENCRYPTED-TOKEN-ERASE', 'cal-erase');
+reset role;
+select test.check('an account with no connection queues nothing when it is erased',
+  (select count(*) from public.google_cleanups), 0::bigint);
+delete from public.profiles where id = :'mem2';
+select test.check('erasing an account with a connection queues one cleanup, with the sealed token and the calendar',
+  (select count(*) from public.google_cleanups where refresh_token_enc = 'ENCRYPTED-TOKEN-ERASE' and calendar_id = 'cal-erase'), 1::bigint);
+select test.check('...the connection itself went with the account',
+  (select count(*) from public.google_connections where member_id = :'mem2'), 0::bigint);
+select test.check('...the audit log says it was queued, about the erased account, with no token in it',
+  (select count(*) from public.audit_log where action = 'account.google_cleanup_queued' and target_id = :'mem2' and meta = '{}'::jsonb), 1::bigint);
+select test.check('...and the cleanup row names no account',
+  (select count(*) from information_schema.columns where table_name = 'google_cleanups' and column_name like '%member%' or table_name = 'google_cleanups' and column_name like '%profile%'), 0::bigint);
+select test.check('the clock has something to do now',
+  (select count(*) from (select public.google_sync_kick()) x), 1::bigint);
+set role service_role;
+select test.check('the cleanup is due', (select count(*) from public.google_cleanups_due(10)), 1::bigint);
+select test.check('one miss: it will be tried again',
+  (select public.google_cleanup_done((select id from public.google_cleanups_due(1)), true, false) = 'again')::int, 1);
+select test.check('...four more misses, and it is let go', (select count(*) from public.google_cleanups_due(10)), 1::bigint);
+select public.google_cleanup_done((select id from public.google_cleanups_due(1)), false, false);
+select public.google_cleanup_done((select id from public.google_cleanups_due(1)), false, false);
+select public.google_cleanup_done((select id from public.google_cleanups_due(1)), false, false);
+select test.check('the fifth miss lets it go',
+  (select public.google_cleanup_done((select id from public.google_cleanups_due(1)), false, true) = 'gave_up')::int, 1);
+reset role;
+select test.check('...and says so in the audit log, with no account in it',
+  (select count(*) from public.audit_log where action = 'google.cleanup' and target_type = 'google_cleanup' and meta ->> 'gave_up' = 'true' and actor_id is null), 1::bigint);
+select test.check('...and nothing is left waiting', (select count(*) from public.google_cleanups), 0::bigint);
+
+\echo ''
 \echo '--- The clock does nothing when no one is connected ---'
 set role service_role;
 select public.google_connection_delete(:'mem2');
@@ -120,6 +153,8 @@ select test.check_raises('...nor call the functions', $f$select * from public.go
 select test.check_raises('...nor save a connection', $f$select public.google_connection_save('cccccccc-0000-0000-0000-000000006211', 'x', 'y')$f$);
 select test.check_raises('...nor run the clock', $f$select public.google_sync_kick()$f$);
 select test.check_raises('...nor read the settings table', $f$select * from public.calendar_prefs$f$);
+select test.check_raises('...nor the cleanups', $f$select * from public.google_cleanups$f$);
+select test.check_raises('...nor ask for them', $f$select * from public.google_cleanups_due(5)$f$);
 reset role;
 set role anon;
 select test.check_raises('nobody signed out can call one', $f$select * from public.google_sync_visits('cccccccc-0000-0000-0000-000000006211')$f$);

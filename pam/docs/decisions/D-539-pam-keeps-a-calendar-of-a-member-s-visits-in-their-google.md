@@ -27,8 +27,11 @@ A member connects Google Calendar once. Pam makes ONE secondary calendar, "Pam v
 5. Google's own policies apply to what Google holds; the member can also remove Pam under Google Account > Security > Third-party access.
 Also true: the connection is stored as long as the member is connected; Pam keeps no copy of what is in the calendar except the id of each event it wrote.
 
+## Erasing an account (D-443) tells Google too
+
+An erase is a plain delete of the profile, which Google cannot be part of. A `before delete` trigger queues a cleanup (`google_cleanups`): the sealed token and the calendar's id, with no name and no account id, and writes one audit row about the erased account, `account.google_cleanup_queued` (no token), which goes with the account's other audit rows after six months. The next 15-minute run deletes the "Pam visits" calendar, revokes the token and removes the cleanup. The erase never waits for Google and never fails because of it. If Google cannot be reached the cleanup is tried again next run, five times at most, then let go, and the audit log says so in a row with no account in it (`google.cleanup`, `gave_up`). A token the member already took back counts as done: nothing is left to reach. The clock also runs when only cleanups are waiting. Tests: DB test 62 and `google-calendar.test.ts`.
+
 ## Not done / known
 
-- When an account is erased, the token row goes with it (cascade) but the Google calendar stays and the token is not revoked. Erase should call Disconnect first (before-launch item).
 - Not built, by decision: the finder ("find my appointments from places I've planned"): a read scope on the whole calendar, a sensitive scope needing Google's verification; the plan was sent to the merge desk.
 - The event text is English whatever the member's language.
