@@ -36,7 +36,7 @@ failed once each.
 | Brand | **Oba** — the registered LLC, matching the EIN letter exactly. Pam is the campaign beneath it, not the brand. |
 | Use case | **Low Volume Mixed** — account notifications (sign-in codes) and appointment reminders |
 | Embedded links | **Yes** ← *rejected before.* Seven of the nine messages carry `{link}`, which opens Pam at `https://app.joinpam.org/` (a short link, about 22 characters, once Twilio shortens it). |
-| Embedded phone numbers | **Yes** — `staff_request_denied` ends "Call {supportPhone}" |
+| Embedded phone numbers | **No** — Pam has no phone line (A28); the two texts that carried one now say "Visit joinpam.org/support" |
 | Age-gated content | No |
 | Direct lending or loan arrangement | No |
 | Affiliate marketing | No |
@@ -148,7 +148,7 @@ actually sends is how an approved campaign gets suspended.
   keyword to a number.
 - **Opt-out message:** You will not get any more texts from Pam. Reply START to
   get them again.
-- **Help message:** Pam: Call {supportPhone} and a person will help you.
+- **Help message:** Pam: Get help at joinpam.org/support or write to hello@joinpam.org. Reply STOP to stop. *(87 characters, Will's wording, a59 of 11 October. It is set in the Twilio console, Advanced Opt-Out, not in Pam: paste it there when you refile.)*
 - **Age-gated or affiliate marketing:** No.
 
 ## The messages
@@ -177,9 +177,9 @@ changes with it. The templates stay in `sms-templates.ts`.
 
 **3. Request not approved**
 
-> Pam: Your request was not approved. Questions? Call {supportPhone}.
+> Pam: Your request was not approved. Questions? Visit joinpam.org/support
 >
-> _Spanish:_ Pam: Su solicitud no fue aprobada. Preguntas? Llame al {supportPhone}.
+> _Spanish:_ Pam: Your request was not approved. Questions? Visit joinpam.org/support *(English until the Spanish is written, A28)*
 
 **4. A saved place is no longer worth a trip**
 
