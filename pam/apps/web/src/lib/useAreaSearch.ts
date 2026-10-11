@@ -5,8 +5,9 @@ import { useEffect, useState } from 'react';
 /**
  * Where the member wants to see places from.
  *
- * One source: `search_areas` in Supabase — the city's ZIP codes, neighbourhoods
- * and a landmark, about 50 rows. It always works, and it is what somebody can
+ * One source: `search_areas` in Supabase — the city's ZIP codes and a landmark
+ * (City Hall), about 50 rows; it matches labels only, so a neighbourhood name finds
+ * nothing yet. It always works, and it is what somebody can
  * answer from memory: §10 already asks for a ZIP at onboarding.
  *
  * The typed text goes to Pam's `search_areas` as the body of a POST, which neither
@@ -89,6 +90,9 @@ export function loadOrigin(): AreaOption {
 }
 
 export function saveOrigin(origin: AreaOption): void {
+  // "Use my current location" is for this search only (D-536): the phone's position is never
+  // written down, so the next visit starts from the last area chosen, or City Hall.
+  if (origin.id === 'here') return;
   try {
     window.localStorage.setItem(STORAGE_KEY, JSON.stringify(origin));
   } catch {
