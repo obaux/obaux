@@ -38,7 +38,10 @@ describe('Privacy on “I’m here” and location (D-526 part B)', () => {
 
   it('says what Pam keeps and that it does not keep where you are', () => {
     expect(p9).toMatch(/Pam does not keep where you are\./);
-    expect(p9).toMatch(/keeps only that you were there, when, and how it was marked/);
+    // Three ways to be marked: “I’m here” (checked against the place), “I went”, or the program. The page names all
+    // three, so nobody has to guess what “how” means.
+    expect(p9).toMatch(/keeps only that you were there, when, and whether you tapped “I’m here” or “I went”, or the program marked you\./);
+    expect(p9).toMatch(/to check that you are at the place/);
   });
 
   it('gives a way to say no that costs nothing but points, and does not name the points', () => {
