@@ -2179,3 +2179,7 @@ D-540, branch `claude/places-programs-neighborhoods`: 159 neighborhoods (a name 
 ## Design system · area search named once (11 October 2026) — READY, not merged
 
 A screen reader reads the Places area search field's name once and reads "Like 19107, or Fishtown." as its description (`SearchField`: empty inner label, optional placeholder, `describedBy`). Nothing looks different. Log: `docs/sessions/` newest `area-picker-screen-reader-fix`.
+
+## Design system · search fields heard once (11 October 2026) — READY, not merged
+
+The New message sheet's search field no longer repeats its label as a placeholder. The other three search fields (Messages, Schedule, Connect) keep placeholders that add or rephrase words; see the session log. Log: `docs/sessions/` newest `search-fields-heard-once`.
