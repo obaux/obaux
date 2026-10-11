@@ -352,6 +352,11 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
     on('/rpc/log_call', () => ({ body: true })),
     on('/rpc/my_trips', () => ({ body: savedTrips })),
     on('/rpc/my_trip_services', () => ({ body: [] })),
+    // The calendar link (D-538): off, then a made-up address once made. Nothing leaves the story.
+    on('/rpc/calendar_link_status', () => ({ body: [{ is_on: false, show_details: false, made_at: null }] })),
+    on('/rpc/calendar_link_make', () => ({ body: 'storybook-example-address-not-a-real-secret' })),
+    on('/rpc/calendar_link_set_details', () => ({ body: true })),
+    on('/rpc/calendar_link_off', () => ({ body: null })),
     on('/rpc/book_trip_at_service', (_url, _method, body) => {
       const args = (body ?? {}) as { p_starts_at: string; p_note?: string | null };
       const row = savedTripRow(savedTrips.length + 1, args.p_starts_at, args.p_note ?? null);

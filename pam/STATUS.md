@@ -2147,3 +2147,7 @@ Sign in on the code step is off until all six digits are in (D-532). The Support
 ## Design system · names in headings keep their own direction (11 October 2026) — on `main`
 
 `@pam/ui/DataHeading` and `SubPageHeader isTitleData` mark a heading's text as data, so a Latin name on an Arabic page (and the reverse) reads in its own direction while Pam's own headings follow the page (D-534). On place pages, profile cards, staff person rows and the conversation bar. Log: `docs/sessions/` newest `data-headings-keep`.
+
+## Places & programs · calendar link (11 October 2026) — READY soon, own branch off main
+
+Branch `claude/places-programs-calendar-link` (D-538). A member makes a secret calendar address (Profile > Calendar); Apple, Google or Outlook follow it. Discreet by default ("Pam visit" and the time), one switch for the place's name and address, no read time kept. Migration `20261011161548`, edge function `calendar-feed` (public), test 61, e2e `calendar-link.spec.ts`. Needs Will's Privacy line.
