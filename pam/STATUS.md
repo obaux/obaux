@@ -2079,3 +2079,7 @@ Branch `claude/places-programs-attendance-a-visits` (D-526). `my_program_visits`
 ## Places & programs · attendance part B: check-in and points (11 October 2026) — READY, not merged (on top of part A)
 
 Branch `claude/places-programs-attendance-b-checkin` (D-526). `check_in_visit` / `undo_check_in` (migration `20261011051257`): own-program lead only, 100 points once per visit, undo reverses once. The lead's circle asks the database for real visits. Test `57_a_program_lead_checks_in_a_visit_test.sql`; e2e in `program-visits.spec.ts`. No new strings. Parts C–D follow.
+
+## Places & programs · attendance part C: missed visits (11 October 2026) — READY, not merged (on top of part B)
+
+Branch `claude/places-programs-attendance-c-missed` (D-526). `sweep_missed_visits()` (migration `20261011053445`), nightly 04:20 UTC: a scheduled visit at a program with a lead, 24 h after it ended, becomes missed; pays and takes nothing, no text. Test `58_the_nightly_sweep_marks_unmarked_visits_missed_test.sql`. Part D follows.
