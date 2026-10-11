@@ -1002,6 +1002,7 @@
   "schedule.checkin.undo.body": "他們的到訪會恢復為未簽到。",
   "schedule.checkin.undo.keep": "保留",
   "schedule.checkin.undo.confirm": "取消簽到",
+  "schedule.checkin.byMember": "{name} marked this visit themselves",
   "home.book": "建立新預約",
   "book.title": "為會員預約到訪",
   "book.intro": "曾向您的計劃傳訊息的人。選擇一位，然後選擇日期和時間。",

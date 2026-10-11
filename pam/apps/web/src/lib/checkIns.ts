@@ -61,14 +61,46 @@ export async function undoCheckIn(appointmentId: string): Promise<boolean> {
   return true;
 }
 
+const MEMBER_KEY = 'pam.checkins.member';
+
+/** The visits the member marked themselves (D-535): shown as marked, with no undo for the lead. */
+export function readMemberMarks(): Readonly<Record<string, true>> {
+  try {
+    const raw = sessionStorage.getItem(MEMBER_KEY);
+    return raw ? (JSON.parse(raw) as Record<string, true>) : {};
+  } catch {
+    return {};
+  }
+}
+
 /** What the database says about real visits just read: checked in where it is, not where it is not. */
-export function seedCheckIns(visits: readonly { id: string; checkedInAt: string | null }[]): void {
+export function seedCheckIns(visits: readonly { id: string; checkedInAt: string | null; markedByMember?: boolean }[]): void {
   const next = { ...readCheckIns() };
+  const own = { ...readMemberMarks() };
   for (const v of visits) {
     if (v.checkedInAt) next[v.id] = v.checkedInAt;
     else delete next[v.id];
+    if (v.markedByMember && v.checkedInAt) own[v.id] = true;
+    else delete own[v.id];
+  }
+  try {
+    sessionStorage.setItem(MEMBER_KEY, JSON.stringify(own));
+  } catch {
+    // Not kept is survivable in a demo.
   }
   write(next);
+}
+
+/** The member's own marks, re-read whenever the check-ins change. */
+export function useMemberMarks(): Readonly<Record<string, true>> {
+  const [ids, setIds] = useState<Readonly<Record<string, true>>>({});
+  useEffect(() => {
+    const read = () => setIds(readMemberMarks());
+    read();
+    window.addEventListener(CHECKINS_CHANGED, read);
+    return () => window.removeEventListener(CHECKINS_CHANGED, read);
+  }, []);
+  return ids;
 }
 
 /** The check-ins, re-read whenever one changes. Empty until the browser has run. */

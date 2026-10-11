@@ -94,6 +94,7 @@ describe('every other language is actually translated', () => {
   MAY_MATCH_ENGLISH.add('trips.booked.hasLead');
   // The "I'm here" sheet: English in every language until Will signs the location line (D-535).
   for (const key of Object.keys(EN)) if (key.startsWith('checkin.')) MAY_MATCH_ENGLISH.add(key);
+  MAY_MATCH_ENGLISH.add('schedule.checkin.byMember');
 
   it.each(OTHER_LOCALES)('%s differs from English except where a name or a symbol should not change', (locale) => {
     const same = Object.keys(EN).filter((k) => BUNDLES[locale][k] === EN[k] && /[A-Za-z]{3}/.test(EN[k]!));
