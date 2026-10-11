@@ -4,7 +4,7 @@
 
 ## What changed
 
-`useAreaSearch.ts` no longer calls `phl.carto.com`; the picker's label, hint and privacy line say ZIP code or neighborhood and drop the City-list sentence; the first name no longer travels in `/person/policies/?…&name=` (`lib/personNames.ts`). Tests: `noCityCall.test.ts`, `personNames.test.ts`, the e2e in `area-picker.spec.ts` (the two tests that stubbed the City are replaced by one that watches nothing leaves).
+`useAreaSearch.ts` no longer calls `phl.carto.com`; the picker's label, hint and privacy line say ZIP code and drop the City-list sentence; the first name no longer travels in `/person/policies/?…&name=` (`lib/personNames.ts`). Tests: `noCityCall.test.ts`, `personNames.test.ts`, the e2e in `area-picker.spec.ts` (the two tests that stubbed the City are replaced by one that watches nothing leaves).
 
 ## What was wrong, and what missed it
 
