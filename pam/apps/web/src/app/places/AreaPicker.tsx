@@ -175,6 +175,10 @@ export function AreaSearch({
             hasAutoFocus
             isSubtle
           />
+          {/* The search finds ZIP codes (and City Hall), so say what to type (D-536). */}
+          <Text type="supporting" xstyle={styles.hint}>
+            {t('places.areaHint')}
+          </Text>
 
           <MenuList
             label={t('places.areaResults')}
