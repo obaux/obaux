@@ -139,8 +139,8 @@ describe('HelpBar (§0 never dead-end)', () => {
   });
 
   it('can still go full width on a screen with room', () => {
-    render(<HelpBar label="Need help? Call Pam" variant="block" />);
-    expect(screen.getByRole('link', { name: 'Need help? Call Pam' })).toBeInTheDocument();
+    render(<HelpBar label="Need help? Contact Pam" variant="block" />);
+    expect(screen.getByRole('link', { name: 'Need help? Contact Pam' })).toBeInTheDocument();
   });
 });
 

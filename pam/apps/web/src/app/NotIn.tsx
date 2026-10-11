@@ -5,7 +5,6 @@ import { Text } from '@astryxdesign/core/Text';
 import { BigButton, Notice, TextLink } from '@pam/ui';
 import { NOTICES } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
-import { useSupportPhone } from '@/lib/useSupportPhone';
 
 /**
  * What a screen shows somebody who is not (fully) in.
@@ -36,7 +35,6 @@ const styles = stylex.create({
 
 export function NotIn({ status, title, body }: NotInProps) {
   const { t } = useI18n();
-  const supportPhone = useSupportPhone();
 
   if (status === 'no-profile') {
     return (
@@ -54,8 +52,7 @@ export function NotIn({ status, title, body }: NotInProps) {
           notice="account_suspended"
           title={t(NOTICES.account_suspended.titleKey)}
           body={t(NOTICES.account_suspended.bodyKey)}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
         <TextLink label={t('signin.signout')} href="/account/" />
       </>
@@ -68,8 +65,7 @@ export function NotIn({ status, title, body }: NotInProps) {
         notice="service_not_available"
         title={title}
         body={body}
-        supportPhone={supportPhone}
-        callLabel={t('help.callSupport')}
+        contactLabel={t('help.contact.action')}
       />
       <BigButton label={t('signin.title')} href="/signin/" />
     </>

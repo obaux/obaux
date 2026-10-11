@@ -14,7 +14,6 @@ import { IconTile } from '@pam/ui/Reading';
 import { SubPage } from '@pam/ui/SubPage';
 import { TransparencyReading } from '@/screens/TransparencyReading';
 import { useI18n } from '@/lib/i18n';
-import { useSupportPhone } from '@/lib/useSupportPhone';
 
 /**
  * What others can see — and what you can do about your data (D-213, from the
@@ -89,7 +88,6 @@ export function PrivacyControlsView() {
 
 export function DataCopyView() {
   const { t } = useI18n();
-  const supportPhone = useSupportPhone();
   return (
     <SubPage
       title={t('privacy.copy.title')}
@@ -97,17 +95,13 @@ export function DataCopyView() {
       backLabel={t('nav.back.privacyControls')}
     >
       <Text xstyle={styles.body}>{t('privacy.copy.body')}</Text>
-      <Text type="supporting" xstyle={styles.body}>
-        {t('help.call.body')}
-      </Text>
-      <BigButton label={t('help.call.action')} href={`tel:${supportPhone}`} />
+      <BigButton label={t('help.contact.action')} href="/help/" />
     </SubPage>
   );
 }
 
 export function DeleteAccountView() {
   const { t } = useI18n();
-  const supportPhone = useSupportPhone();
   return (
     <SubPage
       title={t('privacy.delete.title')}
@@ -118,7 +112,7 @@ export function DeleteAccountView() {
       <Text type="supporting" xstyle={styles.body}>
         {t('privacy.delete.stop')}
       </Text>
-      <BigButton label={t('help.call.action')} href={`tel:${supportPhone}`} variant="secondary" />
+      <BigButton label={t('help.contact.action')} href="/help/" variant="secondary" />
     </SubPage>
   );
 }

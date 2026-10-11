@@ -453,9 +453,11 @@ test.describe('the way in explains itself', () => {
     await page.getByRole('button', { name: en['signin.phone.action'] }).click();
 
     await expect(page.getByText(en['signin.failed.send.title'])).toBeVisible();
-    await expect(page.getByRole('link', { name: en['help.callSupport'] })).toHaveAttribute(
+    // Pam has no phone line (A28): the way on is Contact Pam. Signed out, it opens the help desk on the
+    // website directly (Help is a screen of the app, and this person cannot get in).
+    await expect(page.getByRole('link', { name: en['help.contact.action'] })).toHaveAttribute(
       'href',
-      /^tel:/,
+      'https://joinpam.org/support/',
     );
   });
 });

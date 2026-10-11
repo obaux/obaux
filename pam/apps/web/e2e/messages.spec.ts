@@ -169,7 +169,7 @@ test.describe('the conversation list', () => {
     await expect(page.getByRole('link', { name: /Marcus/ })).toBeVisible();
     await expect(page.getByRole('button', { name: 'New message' })).toHaveCount(0);
     await expect(page.getByRole('alert').getByText('Some things are turned off')).toBeVisible();
-    await expect(page.getByRole('alert').getByRole('link', { name: /Call/ })).toHaveAttribute('href', /^tel:/);
+    await expect(page.getByRole('alert').getByRole('link', { name: /Contact Pam/ })).toHaveAttribute('href', '/help/');
 
     const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
     expect(results.violations).toEqual([]);
@@ -635,8 +635,8 @@ test.describe('a conversation', () => {
     await expect(notice.getByText(/^You cannot send messages right now\./)).toBeVisible();
     await expect(notice.getByText(/Your guide turned this off for your account\./)).toBeVisible();
     await expect(notice.getByText(/your plan/i)).toHaveCount(0);
-    const call = notice.getByRole('link', { name: /Call/ });
-    await expect(call).toHaveAttribute('href', /^tel:/);
+    const call = notice.getByRole('link', { name: /Contact Pam/ });
+    await expect(call).toHaveAttribute('href', '/help/');
     // The quiet card: body text at the smallest size (16px), and the call is a
     // link, not a filled primary button — still a 48px target.
     expect(await notice.getByText(/^You cannot send messages/).evaluate((el) => getComputedStyle(el).fontSize)).toBe('16px');

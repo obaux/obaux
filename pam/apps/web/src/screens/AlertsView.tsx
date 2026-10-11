@@ -11,7 +11,6 @@ import { Notice } from '@pam/ui';
 import { SubPage } from '@pam/ui/SubPage';
 import { useI18n } from '@/lib/i18n';
 import { useSession } from '@/lib/useSession';
-import { useSupportPhone } from '@/lib/useSupportPhone';
 import { ALERT_TEXTS_LIVE } from '@/lib/alertTextsLive';
 import { useTextsLive } from '@/lib/useTextsLive';
 import { setReminderConsent, setTextAlert, type AlertFlags, type AlertKind } from '@/lib/useReminderConsent';
@@ -96,7 +95,6 @@ const styles = stylex.create({
 
 export function AlertsView() {
   const { t } = useI18n();
-  const supportPhone = useSupportPhone();
   const textsLive = useTextsLive();
   const LIVE = textsLive ? LIVE_KINDS : NONE_LIVE;
   const { state: session } = useSession();
@@ -220,8 +218,7 @@ export function AlertsView() {
           notice="something_went_wrong"
           title={t('notice.something_went_wrong.title')}
           body={t('notice.something_went_wrong.body')}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
       ) : null}
     </SubPage>

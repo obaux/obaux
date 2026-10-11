@@ -34,7 +34,6 @@ import { DUMMY_APPOINTMENTS } from '@pam/config/dummy-appointments';
 import { List, ListItem } from '@astryxdesign/core/List';
 import { useI18n } from '@/lib/i18n';
 import { NotIn } from '../NotIn';
-import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
 import { useRoleView } from '@/lib/useViewedRole';
 import { RoleSwitchControl } from '../RoleSwitchControl';
@@ -152,7 +151,6 @@ function whenLastActive(iso: string | null, locale: string): string | null {
 function PersonScreen() {
   const { t, tPlain, locale } = useI18n();
   const { policies } = usePolicies();
-  const supportPhone = useSupportPhone();
   const params = useSearchParams();
   const router = useRouter();
   const { state: session } = useSession();
@@ -214,8 +212,7 @@ function PersonScreen() {
           notice={key}
           title={t(NOTICES[key].titleKey)}
           body={t(NOTICES[key].bodyKey)}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
       </Page>
     );
@@ -229,8 +226,7 @@ function PersonScreen() {
           notice="service_not_available"
           title={t('person.notAllowed.title')}
           body={t('admin.notAdmin.body')}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
       </Page>
     );
@@ -263,8 +259,7 @@ function PersonScreen() {
           notice="service_not_available"
           title={t('person.notFound.title')}
           body={t('person.notFound.body')}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
         <BigButton label={t('nav.back.home')} href="/" />
       </Page>

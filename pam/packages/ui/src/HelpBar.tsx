@@ -1,6 +1,6 @@
 import * as stylex from '@stylexjs/stylex';
 import { Button } from './Button.js';
-import { PhoneIcon } from './icons.js';
+import { HelpIcon } from './icons.js';
 
 /**
  * "Help" — the persistent way out of a stuck screen (§2.4, §0).
@@ -46,7 +46,7 @@ export function HelpBar({ href = '/help/', label, variant = 'compact', xstyle }:
       label={label}
       variant="secondary"
       href={href}
-      icon={<PhoneIcon />}
+      icon={<HelpIcon />}
       xstyle={[styles.base, variant === 'block' ? styles.block : styles.compact, xstyle]}
     />
   );

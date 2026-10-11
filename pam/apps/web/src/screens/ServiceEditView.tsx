@@ -20,7 +20,6 @@ import { usePolicies } from "@/lib/usePolicies";
 import { useServices } from "@/lib/useServices";
 import { useProgramSetup } from "@/lib/programSetup";
 import { useSession } from "@/lib/useSession";
-import { useSupportPhone } from "@/lib/useSupportPhone";
 import { ConfirmDialog } from "./ConfirmDialog";
 import { HelpButton } from "./HelpButton";
 import { intlLocale } from "@pam/config";
@@ -62,7 +61,6 @@ export function ServiceEditView({
   const { policies } = usePolicies();
   const { state: session } = useSession();
   const setup = useProgramSetup(session);
-  const supportPhone = useSupportPhone();
   // A lead's real services are read on demand: ask for the own program's so one being edited is found.
   if (setup.program?.id) forPlace(setup.program.id);
   const existing = serviceId
@@ -158,8 +156,7 @@ export function ServiceEditView({
           notice="something_went_wrong"
           title={t("join.failed.title")}
           body={t("join.failed.body")}
-          supportPhone={supportPhone}
-          callLabel={t("help.callSupport")}
+          contactLabel={t('help.contact.action')}
         />
       ) : null}
 

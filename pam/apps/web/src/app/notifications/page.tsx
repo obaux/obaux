@@ -26,7 +26,6 @@ import { DUMMY_NOTIFICATIONS } from '@pam/config/dummy-notifications';
 import { useExamplesOn } from '@/lib/useExamplesOn';
 import { useI18n } from '@/lib/i18n';
 import { NotIn } from '../NotIn';
-import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
 import { useNotifications, unreadCount } from '@/lib/useNotifications';
 import { useRoleView } from '@/lib/useViewedRole';
@@ -124,7 +123,6 @@ function kindOf(kind: string, t: (key: string) => string): { title?: string; ico
 
 export default function NotificationsPage() {
   const { t, locale } = useI18n();
-  const supportPhone = useSupportPhone();
   const { state: session } = useSession();
 
   const signedIn = session.status === 'signed-in';
@@ -189,8 +187,7 @@ export default function NotificationsPage() {
             notice="something_went_wrong"
             title={t('notice.something_went_wrong.title')}
             body={t('notice.something_went_wrong.body')}
-            supportPhone={supportPhone}
-            callLabel={t('help.callSupport')}
+            contactLabel={t('help.contact.action')}
           />
         ) : null}
 

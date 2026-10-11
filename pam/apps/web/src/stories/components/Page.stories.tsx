@@ -17,8 +17,7 @@ function Screen(args: Omit<PageProps, 'children'>) {
     <Page {...args}>
       <PageTitle title={tr('help.title')} backHref="/" backLabel={tr('nav.back.home')} />
       <Text>{tr('help.intro')}</Text>
-      <Text type="supporting">{tr('help.call.body')}</Text>
-      <BigButton label={tr('help.call.action')} href="tel:+12673095265" />
+      <BigButton label={tr('help.contact.action')} href="/help/" />
       <HelpBar label={tr('nav.help')} variant="block" />
     </Page>
   );

@@ -11,7 +11,6 @@ import { SubPage } from '@pam/ui/SubPage';
 import { useI18n } from '@/lib/i18n';
 import { navigate } from '@/lib/navigate';
 import { useSession } from '@/lib/useSession';
-import { useSupportPhone } from '@/lib/useSupportPhone';
 import { createInvite, listRegions, type CreatedInvite } from '@/lib/useCaseload';
 import { NotIn } from '../app/NotIn';
 import { HelpButton } from './HelpButton';
@@ -40,7 +39,6 @@ type InviteRole = 'member' | 'provider' | 'admin';
 
 export function InviteNewView({ role }: { readonly role: string | null }) {
   const { t } = useI18n();
-  const supportPhone = useSupportPhone();
   const { state: session } = useSession();
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
   const isSuperAdmin = trueRole === 'super_admin';
@@ -98,8 +96,7 @@ export function InviteNewView({ role }: { readonly role: string | null }) {
         notice="something_went_wrong"
         title={t('admin.invite.failed.title')}
         body={t('admin.invite.failed.body')}
-        supportPhone={supportPhone}
-        callLabel={t('help.callSupport')}
+        contactLabel={t('help.contact.action')}
       />,
     );
   }
@@ -155,8 +152,7 @@ export function InviteNewView({ role }: { readonly role: string | null }) {
           notice="something_went_wrong"
           title={t('admin.invite.failed.title')}
           body={t('admin.invite.failed.body')}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
       ) : null}
     </>,

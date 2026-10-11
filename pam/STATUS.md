@@ -1431,6 +1431,10 @@ recorded once `sms-inbound` is deployed (D-460); nothing queues the check-in or 
 connect" yet. Samples file: nine texts. D-453. Text reminders' staff list (merged 10 October) names
 only the alert texts Will signed: no "introduced to your program", no "your account changes".
 
+## Design system & Storybook · Contact Pam replaces Call Pam (11 October)
+
+Branch `claude/pam-design-contact-pam` (D-512, A28). `Notice` offers Contact Pam (a link to Help); `useSupportPhone` and all `supportPhone` props are gone; the Help screen's first row opens the website's help desk; Privacy's data pages end in Contact Pam. `place.call` is untouched. About 33 English strings still say "call Pam": for Sage and Lena.
+
 ## Design system & Storybook · a wrong code is a small alert (11 October)
 
 Branch `claude/pam-design-wrong-code-alert` (D-510). `CompactNotice` in `@pam/ui` (one row, no button) beside `Notice`; a wrong or expired sign-in code keeps the code step, empties and refocuses the boxes, and shows "That code did not work. Try again." (`signin.code.wrong`; `signin.failed.verify.*` removed). "We could not send the code" still uses the full Notice until the A28 job.
