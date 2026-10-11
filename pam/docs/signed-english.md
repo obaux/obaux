@@ -25,3 +25,6 @@ sentence.
 | A28 words (`docs/help-drafts/a28-contact-pam.md`) | as written | **Will**, 2026-10-11 03:37 | Card a59, before A29. Includes texts and the HELP reply, which stay his under A29 too. |
 | Help: Texts from Pam › Texts Pam does not send yet | Pam does not text you when a place you saved closes or moves. | Sage, 2026-10-11 04:05 | Wren, behind `PLACE_TEXTS_LIVE = false`: the saved-place note is held with the other texts until texts go live (D-481). |
 | Help: On this page labels (all posts) | as listed in the Wren note of 04:05 and `claude/help-short-labels` | Sage, 2026-10-11 04:05 | Menu labels; each repeats its own heading in fewer words. |
+| `reminders.today.member` | Pam does not send any of these yet. They are coming. | Sage, 2026-10-11 04:09 | Lena's (claude/lena-a28-help). Was "Today Pam sends only one of these: a note when a place you saved closes or moves…"; that note is held with the other texts (D-481). Restore line in before-launch. |
+| `profile.promo.reminders.body` | Coming soon: texts about your visits and the places you saved. | Sage, 2026-10-11 04:09 | Lena's. Matches the other "Coming soon:" promo lines (D-474). |
+| `flag.done.body` | Somebody at Pam looks at every one of these. | Sage, 2026-10-11 04:09 | Lena's. Drops "anyone who saved it is told", which was a held text. |
