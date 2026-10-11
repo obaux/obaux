@@ -2150,4 +2150,4 @@ Sign in on the code step is off until all six digits are in (D-532). The Support
 
 ## Places & programs · no street-address call to the city (11 October 2026) — READY, own branch off main
 
-Branch `claude/places-programs-no-city-call` (D-536). The browser no longer asks the City of Philadelphia about a typed address; the picker says ZIP code or neighborhood; a member's first name is out of the policies address. No migration.
+Branch `claude/places-programs-no-city-call` (D-536). The browser no longer asks the City of Philadelphia about a typed address; the picker says ZIP code or neighborhood; a member's first name is out of the policies address; the Google map in Trips opens on the whole city, never fitted to the pins. No migration.
