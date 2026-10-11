@@ -53,7 +53,7 @@ On `4b9cf14` (`main` b979a49 plus Dot's D-512 branch plus this):
 | Every `t('…')` key in the source exists in `en.json` | yes (script) |
 | Storybook | builds |
 | Fit audit (7 languages, 320px) | 30 story-id searches (help, safety, privacy, legal, terms, reminders, alerts, profile, notice, messages, thread, blocked, limited, account, places, saved, invite, person, notifications, program, review, trips, explore, onboarding and others); 25 matched stories. Only `program` and `trips` found defects new in a language (7), all **already accepted** in `fit-known.json` (0 not accepted); none is a string I changed |
-| Browser suite, three viewports | E2E_RESULT |
+| Browser suite, three viewports | 1259 passed, 19 skipped, 6 failed on b0fbd8e: failed-load.spec (this sandbox's unpatched Next; passes after a clean install) and place.spec:255 (a stale `tel:` assertion from before D-512; the merge desk fixed it in batch b12) |
 
 **Not measured:** the privacy Copy and Delete pages with the final words are inside the "privacy" and "nested pages" stories only if those match; the two live texts were measured as strings (length, segment), not sent.
 

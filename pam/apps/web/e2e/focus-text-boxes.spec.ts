@@ -199,7 +199,8 @@ test.describe('a search box focused on arrival still shows its field highlight',
     const box = page.getByRole('searchbox').or(page.getByRole('textbox', { name: 'ZIP code or address' })).first();
     await expect(box).toBeVisible();
     await expect(box).toBeFocused();
-    expect((await focused(page)).ring).toBe(true);
+    // The field's frame is drawn once the drawer has finished opening: wait for it rather than read it at once.
+    await expect.poll(async () => (await focused(page)).ring).toBe(true);
   });
 });
 
