@@ -6,7 +6,7 @@ import { settled } from './settled';
  * A real account sees only its real things (Will, 11 October, a launch rule; D-518). On Profile, Points and Connections
  * that was the example member's Scholar badge and the example cast of two connections, shown to everybody. Now an
  * ordinary account has none, and a list that empties says so in a line. Examples stay for a super admin previewing a
- * role and for an account a super admin has put in demo view. Supabase is stubbed at the network.
+ * role and for a demo (`lib/exampleMode`, D-509). Supabase is stubbed at the network.
  */
 const ME = 'de3b9c2e-ec2f-403b-93e5-86e6ee75349b';
 // The Scholar tile in the badge grid: its name and, under it, earned, locked or soon.
@@ -90,8 +90,9 @@ test.describe('a real account has no examples', () => {
 });
 
 test.describe('examples stay where they are asked for', () => {
-  test('an account a super admin put in demo view still sees the example badge and cast', async ({ page }) => {
-    await signedIn(page, { is_demo: true });
+  test('a demo (a tab that asked for examples) still sees the example badge and cast', async ({ page }) => {
+    await page.addInitScript(() => sessionStorage.setItem('pam.examples', '1'));
+    await signedIn(page);
     await page.goto('/points/');
     await settled(page);
     await expect(scholarTile(page)).toContainText('Earned');

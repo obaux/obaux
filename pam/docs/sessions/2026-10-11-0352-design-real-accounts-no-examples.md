@@ -4,7 +4,7 @@
 
 ## What changed
 
-Will's launch rule (a real account sees only its real things). Points no longer earns the example Scholar; Profile's Connections count is 0 for a real account; Connections shows its empty state; new `lib/examples.ts` (`showsExamples`: a super admin's preview, a demo account, Storybook). D-518.
+Will's launch rule (a real account sees only its real things). Points no longer earns the example Scholar; Profile's Connections count is 0 for a real account; Connections shows its empty state; uses `lib/exampleMode` `showsExamples` (D-509: a super admin's preview, a demo tab, Storybook). D-518.
 
 ## What was wrong, and what missed it
 

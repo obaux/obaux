@@ -9,8 +9,8 @@
 - **Profile** (`ProfileScreen.tsx`): the Connections stat counted the example cast (3) for every member. A real account shows 0, as there is no real query yet for "the people on my side".
 - **Connections** (`ConnectionsScreen.tsx`): it listed the example cast (Teresa, Sandra) for every member. A real account sees the screen's own empty state, "No connections yet / When a case manager or a program takes you on, they show up here." (existing strings).
 - **Account** (`app/account/page.tsx`): nothing example in the page itself; it renders the Profile above, and a super admin's preview name stays.
-- One rule in one place, `lib/examples.ts` (`showsExamples`): examples show for **a super admin previewing a role** ("See the app as"), for **an account a super admin has put in demo view** (`isDemo`, 0057), and in **Storybook**. Every one of the three is an explicit mode, not an ordinary account. Everything else is real or empty.
-- Tests: `lib/examples.test.ts`; `e2e/no-examples-profile.spec.ts` (a real member: no earned Scholar, Connections 0, empty Connections, axe; a demo account and a super admin's preview still see them).
+- One rule, the one D-509 made in `lib/exampleMode.ts` (`showsExamples`): examples show for **a super admin previewing a role** ("See the app as"), for **a demo** (a tab that asked for them, `sessionStorage['pam.examples']`), and in **Storybook's prototype**. Each is an explicit mode, not an ordinary account. Everything else is real or empty. (I had written a second helper, `lib/examples.ts`, with an `isDemo` account rule; main gained D-509's first, so I dropped mine and use it.)
+- Tests: `e2e/no-examples-profile.spec.ts` (a real member: no earned Scholar, Connections 0, empty Connections, axe; a demo tab and a super admin's preview still see them).
 
 **Decision for Mira.** I read "show only in Storybook" as "never on a real account", and kept the two existing explicit demo modes (a super admin's preview, and an account in demo view), since they are what those features are for. If Will wants them gone too, it is one line in `showsExamples`.
 

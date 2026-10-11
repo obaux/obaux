@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { DUMMY_CONNECTIONS } from '@pam/config/dummy-connections';
-import { showsExamples } from '@/lib/examples';
+import { showsExamples } from '@/lib/exampleMode';
 import { DUMMY_SELF } from '@pam/config/dummy-people';
 import { useRouter } from 'next/navigation';
 import { signOut, useSession } from '@/lib/useSession';
@@ -65,7 +65,7 @@ export function ProfileScreen() {
   }, [signedIn, session]);
 
   const role = viewedRole ?? 'member';
-  const examples = showsExamples({ demoRole, isDemo: signedIn && session.session.isDemo });
+  const examples = showsExamples();
   const name =
     (demoRole ? DUMMY_SELF[demoRole]?.firstName : null) ?? (signedIn ? session.session.firstName : null) ?? '';
 

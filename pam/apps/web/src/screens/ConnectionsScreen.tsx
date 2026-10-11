@@ -4,9 +4,7 @@ import type { Locale } from '@pam/config';
 import { DUMMY_CONNECTIONS, dummyConnection, type DummyConnection } from '@pam/config/dummy-connections';
 import { DUMMY_SELF_ID, dummyConversationIdBetween } from '@pam/config/dummy-conversations';
 import { useI18n } from '@/lib/i18n';
-import { showsExamples } from '@/lib/examples';
-import { useRoleView } from '@/lib/useViewedRole';
-import { useSession } from '@/lib/useSession';
+import { showsExamples } from '@/lib/exampleMode';
 import { ConnectionsView, type Connection } from './ConnectionsView';
 
 /**
@@ -39,10 +37,6 @@ function toConnection(c: DummyConnection, locale: Locale): Connection {
 
 export function ConnectionsScreen() {
   const { locale } = useI18n();
-  const { state: session } = useSession();
-  const trueRole = session.status === 'signed-in' ? session.session.role : null;
-  const { demoRole } = useRoleView(trueRole);
-  const isDemo = session.status === 'signed-in' && session.session.isDemo;
-  const cast = showsExamples({ demoRole, isDemo }) ? DUMMY_CONNECTIONS : [];
+  const cast = showsExamples() ? DUMMY_CONNECTIONS : [];
   return <ConnectionsView connections={cast.map((c) => toConnection(c, locale))} />;
 }
