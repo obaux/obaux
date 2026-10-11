@@ -1377,6 +1377,12 @@ state with a (+)) instead of the "Proposed (a22)" cards; the generator gets `dra
 mouse stepped it on again (D-494, fixed; phones were not affected). Figma: Case manager, Program lead and
 Overview redrawn, one image replaced on Member; drawn from the branch, so redraw from `main` only after it merges.
 
+## Design system & Storybook · legal tabs follow the reader (10 October)
+
+Branch `claude/pam-design-legal-tabs`. Privacy and Terms: the highlighted tab is the section whose heading has reached the
+line under the bars (the top one wins), a tapped tab is held until the reader scrolls, the row of tabs moves to keep it in
+view, and a tap moves focus to the section heading (D-497). Needs Will: try it on the phone; not seen in WebKit.
+
 ## Design system & Storybook · secondary button edge (10 October)
 
 Branch `claude/pam-design-secondary-border`. A secondary Button has a light 1px ring (an inset shadow, so no
