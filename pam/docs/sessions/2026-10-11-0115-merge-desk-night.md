@@ -51,12 +51,28 @@
   - Figma Home wording → "not yet".
   - The two lead lines → "Sure".
 
-- **Batch D-502 + Principles + W3 (on `mira/batch-502`):**
+- **Batch D-502 + Principles + W3, then D-504 and Lena's two reviews (pushed together):**
   - Dot's sticky Sign in header (Will's ask): the invite line stays pinned, and a compact Pam bar fades
     in under it once the hero scrolls away.
   - Dot's Principles page, in line with A24 and A26. Its Writing.mdx conflicted with Sage's; Sage's page
     was kept, with Dot's line on texts and emails added.
   - Piper's W3: "Pick a service above to plan a trip." (Will approved it, a43).
+  - Sage's finding fixed on top: the texts-and-emails line in Writing and Principles described A24 as it
+    stood on the morning of 9 October. It now states A25: a text or email goes out in the person's own
+    language once that language is signed for it, and in English until then.
+  - Dot's D-504: Storybook's Foundations pages match the code item by item. All 146 colour tokens are
+    listed, generated from pam.css, with a test that fails if the list goes stale.
+  - Lena's review of Piper's D-498 lines: 13 strings in 5 languages. A place's name is a variable, so no
+    sentence agrees with it in gender. The meaning stays a hard "Pam does not tell this place". Lena also
+    reviewed the pick-a-service drafts and kept them as written.
+- **Will's answers after 01:20** (Control Room chat):
+  - Copy: Sage owns the copy pass. When Will asks in Figma, she writes into his component, only that
+    component. On the marketing site: Residents / people looking for help, Providers / social services,
+    Case Managers / Guides. Nothing is translated until a website change is merged.
+  - Help search (Wren and Sage): phrases people actually type mapped to posts, any-word ranking, a gaps
+    list, and no dead-end empty result. "Ask Pam", an AI answer box over the posts, waits for his go.
+  - Text size: "Leave as is. Make exceptions. Update rules." Dot writes A27 to replace A23's 15px floor.
+  - Dark mode: "Yes go for it". Muted becomes #262626, with Dot doing it next.
 
 ## What was wrong, and what missed it
 
@@ -97,18 +113,19 @@
 | Batch: web tsc, ui build, web build, site tsc, budget, copy:status | all 0; 23.0 kB spare; all languages in step |
 | Batch + Sage's guide (fc370a5): build-storybook | passes; `foundations-writing--about` is in the index |
 | Vercel on 0f95b4e | web and pam-site production READY |
+| Batch 502 (c6b928a): db / web unit / config / ui / e2e (full) / storybook | 1255 ok / 94 / 1067 / 0 / 1173 passed, 18 skipped / builds |
+| Batch 504 (on top): web tsc, web unit, config, copy:status, web build, budget | 0 / 97 passed / 1067 / in step / 0 / 23.0 kB spare |
+| Batch 504: e2e places-without-a-lead, place-pick-a-service, trip-booked, visit-change, place, a11y (all projects); storybook | 114 passed; builds |
 | D-502 + D-501 together, Sign in 320×568 invited, en/ar × light/dark, scrolled 0–300px | the pause disc is on top only when unscrolled; from 40px the pinned invite line is on top of it, and from 120px it is off screen; compact bar shows with the mark at the start (right in Arabic) |
 
 ## Left undone
 
 - **Ava:** the switcher removal is committed at 90c6d306 and not pushed. D-503 is now Sage's, so Ava claims
   online when Will gives the word. Next, the Join Pam wording (W6) as a question for Will.
-- **Dot:** D-502, Sign in's header stays on top as you scroll.
+- **Dot:** A27, the text-size rule with its exceptions; then dark muted #262626 with a before-and-after story.
 - **Piper:** Iris's W3, on a fresh branch.
-- **Lena:** review fixes on the D-498 keys.
-- **Sage:** stopped until Will answers a46 and a47.
-- **Dot, after D-502:** bring Foundations › Principles in line with A24 and A26 (Sage's finding), then
-  reconcile Wren's token list.
+- **Wren and Sage:** help-centre search (phrases, ranking, gaps list). Sage: write her lines into Will's
+  Callout card and add his marketing words to the voice guide.
 - **Lena, Friday:** two welcome slides promise example-only features (`onboarding.provider.3`,
   `onboarding.admin.2`; Sage's finding).
 
@@ -116,8 +133,7 @@
 
 - Will: in Ava's session (the Control Room's "Waiting for you to unblock" strip opens it), type "push the
   switcher branch".
-- Will: card a46, Sage's Home words. Answer yes, no or change per line, plus three choices: Philly or
-  Philadelphia, AI on the site, and one name for program staff.
-- Will: card a47, a line per audience for "Who is Pam for?" and the chip names.
+- Will: "go on Ask Pam" if he wants the AI answer box over the Support posts scoped (an API key he enters,
+  a cost per question, and the site saying answers are AI-assisted).
 - Will: whether to let sessions run some actions without a prompt. Allow rules in the repo's
   `.claude/settings.json` would do it. None were added: that is his call.
