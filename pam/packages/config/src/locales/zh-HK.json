@@ -487,6 +487,7 @@
   "place.closed": "未開放",
   "place.closedUntil": "未開放 · {time}開放",
   "place.schedule": "安排到訪",
+  "place.schedule.pickService": "請先在上面選擇一項服務，再安排到訪。",
   "place.directions": "如何前往",
   "place.flag": "這裏有問題",
   "place.hours": "開放時間",

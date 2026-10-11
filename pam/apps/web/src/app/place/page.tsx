@@ -39,6 +39,7 @@ import { useMySignatures } from '@/lib/useMySignatures';
 import { PolicyStatusCard } from '@pam/ui/PolicyStatusCard';
 import { countdown } from '@/lib/when';
 import { VisitCard } from '@pam/ui/VisitCard';
+import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { DUMMY_TRIPS } from '@pam/config/dummy-trips';
 import { readAddedTrips, TRIPS_CHANGED, withMoves, withoutCancelled } from '@/lib/addedTrips';
@@ -443,20 +444,24 @@ function PlaceScreen() {
         // Walk-ins plan a trip too (Will, D-333): a day it meets, so staff
         // see who is coming, then the same booked screen.
         plansVisit ? (
-          <BigButton
-            label={t('place.schedule')}
-            // Pick a service first, like a size before checkout (Will,
-            // D-313): the button waits until one is chosen.
-            isDisabled={services.length > 0 && !service}
-            href={`/trips/new/?${new URLSearchParams({
-              place: place!.id,
-              name: place!.name,
-              category: place!.category,
-              ...(place!.address ? { address: place!.address } : {}),
-              // The card they picked rides along (D-313): no "Which service?"
-              ...(service ? { service: service.id } : {}),
-            }).toString()}`}
-          />
+          <VStack gap={2}>
+            <BigButton
+              label={t('place.schedule')}
+              // Pick a service first, like a size before checkout (Will,
+              // D-313): the button waits until one is chosen.
+              isDisabled={services.length > 0 && !service}
+              href={`/trips/new/?${new URLSearchParams({
+                place: place!.id,
+                name: place!.name,
+                category: place!.category,
+                ...(place!.address ? { address: place!.address } : {}),
+                // The card they picked rides along (D-313): no "Which service?"
+                ...(service ? { service: service.id } : {}),
+              }).toString()}`}
+            />
+            {/* Why the button is waiting (Iris's member-flow pass, W3): said, not left grey. */}
+            {services.length > 0 && !service ? <Text type="supporting">{t('place.schedule.pickService')}</Text> : null}
+          </VStack>
         ) : footerIsDirections ? (
           // Everybody else's one action (§2.5) is how to get there, in the same
           // sticky footer rather than in the page (Will, 10 October 2026, D-440).

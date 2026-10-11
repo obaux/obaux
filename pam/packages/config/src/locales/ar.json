@@ -522,6 +522,7 @@
   "place.closed": "مغلق",
   "place.closedUntil": "مغلق · يفتح {time}",
   "place.schedule": "خطط لزيارة",
+  "place.schedule.pickService": "اختر خدمة أعلاه لتخطيط زيارة.",
   "place.directions": "طريقة الوصول",
   "place.flag": "هناك خطأ ما هنا",
   "place.hours": "ساعات العمل",
