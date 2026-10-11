@@ -14,6 +14,10 @@ number"). Dot, Lena, Wren and Nico build from these. English only; Lena carries 
 "Contact Pam" opens the app's Help screen, which leads to the help desk. **It must work signed out** (sign-in errors and
 a paused account show it to someone who cannot get in): signed out, it can open the help desk on the website directly.
 
+**Keys (Mira, 03:17):** the Contact Pam button is Dot's new key **`help.contact.action` = "Contact Pam"**; the rows above
+show what it replaces. The Help screen rows in §2 will move to Lena's new keys when she sends the names; the words stay.
+Error and notice bodies (§4) keep their keys and are rewritten in place.
+
 ## 2. The app's Help screen, without "Call us"
 
 | Key | Now | Proposed |
@@ -109,6 +113,24 @@ that go out even while `texts_live` is off (D-481). So "We will text you" is tru
 `terms.s.emergencies.*` (911, 988), `help.safety.danger.action` "Call 911", `onboarding.name.title` "What should we call
 you?", `join.program.step.name` "What's your program called?". `onboarding.admin.1` "…without chasing calls" is not a
 call to Pam (it is in the surveillance FINDING already).
+
+## 5. Two live texts that carry Pam's number (`sms-templates.ts`)
+
+They go today (account texts aren't held). Nico changes the templates; Lena carries the six translations (70
+characters in Chinese, Russian and Arabic). No role named, no emoji, "Pam:" first.
+
+| Template | Now | Proposed | Length |
+|---|---|---|---|
+| `staff_request_denied` | Pam: Your request was not approved. Questions? Call {supportPhone}. | **Pam: Your request was not approved. Questions? Visit joinpam.org/support** | 72 |
+| `access_limited_notice` | Pam: Some parts of Pam are turned off for now. Call {supportPhone} with questions. | **Pam: Some parts of Pam are turned off for now. Questions? Visit joinpam.org/support** | 83 |
+
+- Will asked (17 September) that someone denied "has somewhere real to ask why". The help desk leads to "Still stuck?"
+  and a person, so it still does.
+- Both need a person who reads them to sign again (`reviewedBy` cleared on the English change). The registered campaign
+  samples (`docs/sms-campaign-samples.md`) may need the new wording: Nico to check.
+
+## 6. Note for Will
+The help desk is English only for now. A help request written in any language still reaches you.
 
 ## Questions for Will
 1. **A phone number on the form so you can text back?** Many residents may not have, or check, an email. It needs
