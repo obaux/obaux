@@ -76,7 +76,7 @@ test.describe('agreeing to reminders', () => {
     await page.goto('/reminders/');
     await expect(page.getByText(/reminder before a visit/i)).toBeVisible();
     // No promise about how often: only what really goes out today (10 October 2026, D-453).
-    await expect(page.getByText(/Today Pam sends only one of these/i)).toBeVisible();
+    await expect(page.getByText(/Pam does not send any of these yet/i)).toBeVisible();
     await expect(page.getByText(/few messages a week/i)).toHaveCount(0);
     await expect(page.getByText(/Reply STOP/)).toBeVisible();
     await expect(page.getByText(/rates may apply/i)).toBeVisible();
@@ -453,9 +453,11 @@ test.describe('the way in explains itself', () => {
     await page.getByRole('button', { name: en['signin.phone.action'] }).click();
 
     await expect(page.getByText(en['signin.failed.send.title'])).toBeVisible();
-    await expect(page.getByRole('link', { name: en['help.callSupport'] })).toHaveAttribute(
+    // Pam has no phone line (A28): the way on is Contact Pam. Signed out, it opens the help desk on the
+    // website directly (Help is a screen of the app, and this person cannot get in).
+    await expect(page.getByRole('link', { name: en['help.contact.action'] })).toHaveAttribute(
       'href',
-      /^tel:/,
+      'https://joinpam.org/support/',
     );
   });
 });

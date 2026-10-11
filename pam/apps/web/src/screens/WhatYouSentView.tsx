@@ -14,7 +14,6 @@ import { useI18n } from '@/lib/i18n';
 import { navigate } from '@/lib/navigate';
 import { markFreshAccount, readSentProgram, startOver, useProgramSetup, type SentProgram } from '@/lib/programSetup';
 import { withdrawSubmission } from '@/lib/useOwnProgram';
-import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useSession } from '@/lib/useSession';
 import { ConfirmDialog } from './ConfirmDialog';
 import { intlLocale } from '@pam/config';
@@ -74,7 +73,6 @@ export function WhatYouSentView({ sent: given }: { readonly sent?: SentProgram |
   const sent = given ?? (setup.program ? setup.sent : readSentProgram());
   const [isAsking, setIsAsking] = useState(false);
   const [failed, setFailed] = useState(false);
-  const supportPhone = useSupportPhone();
   // Delete and start over on a program on file withdraws its send (D-462); the
   // menu offers it only when there is a send to withdraw.
   const submissionId = setup.program?.submissionId ?? null;
@@ -115,8 +113,7 @@ export function WhatYouSentView({ sent: given }: { readonly sent?: SentProgram |
           notice="something_went_wrong"
           title={t('join.failed.title')}
           body={t('join.failed.body')}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
       ) : null}
       {sent ? (

@@ -115,7 +115,7 @@ export const NOTICES: Readonly<Record<NoticeKey, NoticeDefinition>> = {
     title: 'Your account is paused',
     body:
       'You cannot sign in right now. Your guide can turn it back on. ' +
-      'Call Pam and we will help you reach them.',
+      'Contact Pam and we will help you reach them.',
     offersSupport: true,
     audience: 'member',
   }),
@@ -125,7 +125,7 @@ export const NOTICES: Readonly<Record<NoticeKey, NoticeDefinition>> = {
    * messages, but cannot send a message or start a conversation, or connect with
    * a new person. The words say that (D-427) — they used to say "messages are off",
    * which was untrue of reading — and name who to call, as `terms.s.limits.p3`
-   * promises ("Pam tells you it is off and who to call").
+   * promises ("Pam tells you it is off and who to ask").
    */
   account_limited: define({
     key: 'account_limited',
@@ -136,7 +136,7 @@ export const NOTICES: Readonly<Record<NoticeKey, NoticeDefinition>> = {
       'You cannot send messages right now. ' +
       'Your guide turned this off for your account. ' +
       'You can still read your messages. ' +
-      'Call Pam and we will help you reach your guide.',
+      'Contact Pam and we will help you reach your guide.',
     offersSupport: true,
     audience: 'member',
   }),
@@ -151,7 +151,7 @@ export const NOTICES: Readonly<Record<NoticeKey, NoticeDefinition>> = {
     kind: 'banner',
     status: 'info',
     title: 'This part is turned off for now',
-    body: 'Your guide turned this off. Call Pam if you have questions.',
+    body: 'Your guide turned this off. Contact Pam if you have questions.',
     offersSupport: true,
     audience: 'member',
   }),
@@ -217,7 +217,7 @@ export const NOTICES: Readonly<Record<NoticeKey, NoticeDefinition>> = {
     kind: 'empty',
     status: 'info',
     title: 'No places found here',
-    body: 'Try a bigger distance, or pick a different kind of help. You can also call Pam and we will look for you.',
+    body: 'Try a bigger distance, or pick a different kind of help. You can also contact Pam and we will look for you.',
     offersSupport: true,
     audience: 'member',
   }),
@@ -227,7 +227,7 @@ export const NOTICES: Readonly<Record<NoticeKey, NoticeDefinition>> = {
     kind: 'empty',
     status: 'info',
     title: 'No people to show yet',
-    body: 'Check back soon. You can also call Pam and we will help you find someone.',
+    body: 'Check back soon. You can also contact Pam and we will help you find someone.',
     offersSupport: true,
     audience: 'member',
   }),
@@ -242,7 +242,7 @@ export const NOTICES: Readonly<Record<NoticeKey, NoticeDefinition>> = {
     kind: 'empty',
     status: 'info',
     title: 'This place is not on Pam right now',
-    body: 'It may come back. Call Pam and we can help you find another place.',
+    body: 'It may come back. Contact Pam and we can help you find another place.',
     offersSupport: true,
     audience: 'member',
   }),
@@ -266,7 +266,7 @@ export const NOTICES: Readonly<Record<NoticeKey, NoticeDefinition>> = {
     kind: 'banner',
     status: 'error',
     title: 'Something went wrong',
-    body: 'This is not your fault. Try again, or call Pam and we will help.',
+    body: 'This is not your fault. Try again. If it keeps happening, contact Pam.',
     offersSupport: true,
     audience: 'member',
   }),

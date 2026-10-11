@@ -14,7 +14,6 @@ import { HelpButton } from '../../screens/HelpButton';
 import { SubPageHeader } from '@pam/ui/SubPage';
 import { SERVICE_FLAG_REASON_KEYS, type ServiceFlagReason } from '@pam/config';
 import { useI18n } from '@/lib/i18n';
-import { useSupportPhone } from '@/lib/useSupportPhone';
 
 /**
  * "Something is wrong here."
@@ -53,7 +52,6 @@ const styles = stylex.create({
 
 function FlagForm() {
   const { t } = useI18n();
-  const supportPhone = useSupportPhone();
   const params = useSearchParams();
   const serviceId = params.get('place');
 
@@ -84,8 +82,7 @@ function FlagForm() {
           notice="something_went_wrong"
           title={t('flag.missing.title')}
           body={t('flag.missing.body')}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
         <BigButton label={t('help.place.action')} href="/" />
       </Page>
@@ -137,8 +134,7 @@ function FlagForm() {
           notice="something_went_wrong"
           title={t('flag.failed.title')}
           body={t('flag.failed.body')}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
       ) : null}
 

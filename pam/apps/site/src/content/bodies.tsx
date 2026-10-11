@@ -11,6 +11,12 @@ import { PointsAndBadges } from './PointsAndBadges';
 import { SendingAnInvite } from './SendingAnInvite';
 import { SigningProgramRules } from './SigningProgramRules';
 import { StaffRequests } from './StaffRequests';
+import { StartHere } from './StartHere';
+import { TalkingToPam } from './TalkingToPam';
+import { YourLanguage } from './YourLanguage';
+import { CantSignIn } from './CantSignIn';
+import { YourSafety } from './YourSafety';
+import { PlaceTold } from './PlaceTold';
 import { TextsFromPam } from './TextsFromPam';
 import { WhatOthersCanSee } from './WhatOthersCanSee';
 import { WhoIsMyGuide } from './WhoIsMyGuide';
@@ -23,6 +29,8 @@ import { WhoIsMyGuide } from './WhoIsMyGuide';
  * lists, so nothing else needs touching.
  */
 export const BODIES: Record<string, () => JSX.Element> = {
+  'cant-sign-in': CantSignIn,
+  'your-safety': YourSafety,
   'case-manager-assignments': CaseManagerAssignments,
   'keeping-your-listing-up-to-date': KeepingYourListing,
   'who-is-my-guide': WhoIsMyGuide,
@@ -38,4 +46,8 @@ export const BODIES: Record<string, () => JSX.Element> = {
   'messages-in-pam': MessagesInPam,
   'points-and-badges': PointsAndBadges,
   'staff-requests': StaffRequests,
+  'start-here': StartHere,
+  'talking-to-pam': TalkingToPam,
+  'your-language': YourLanguage,
+  'is-the-place-told': PlaceTold,
 };

@@ -34,7 +34,7 @@ export const SEARCH_PHRASES: readonly SearchPhrase[] = [
   { phrase: 'why didnt i get a code', who: 'anyone', answer: 'texts-from-pam', also: ['joining-pam'] },
   { phrase: 'code not coming', who: 'anyone', answer: 'texts-from-pam' },
   { phrase: 'the code doesnt work', who: 'anyone', answer: 'joining-pam', also: ['texts-from-pam'] },
-  { phrase: 'cant sign in', who: 'anyone', answer: 'joining-pam', also: ['texts-from-pam'] },
+  { phrase: 'cant sign in', who: 'anyone', answer: 'cant-sign-in', also: ['joining-pam', 'texts-from-pam'] },
   { phrase: 'it says that code is too old', who: 'resident', answer: 'joining-pam', also: ['sending-an-invite'] },
   { phrase: 'my link expired', who: 'anyone', answer: 'joining-pam', also: ['sending-an-invite', 'joining-as-staff'] },
   { phrase: 'code is for a different phone', who: 'resident', answer: 'joining-pam' },
@@ -42,11 +42,15 @@ export const SEARCH_PHRASES: readonly SearchPhrase[] = [
     phrase: 'i got a new phone number',
     who: 'anyone',
     answer: null,
-    gap: 'Changing your phone number: call Pam, and what happens to your account and texts.',
+    gap: 'Changing your phone number: contact Pam, and what happens to your account.',
   },
+  { phrase: 'i lost my phone', who: 'anyone', answer: null, gap: 'Same post as “i got a new phone number”.' },
+  { phrase: 'change my number', who: 'anyone', answer: null, gap: 'Same post as “i got a new phone number”.' },
+  { phrase: 'password', who: 'anyone', answer: 'cant-sign-in', also: ['joining-pam'] },
+  { phrase: 'i forgot my password', who: 'anyone', answer: 'cant-sign-in', also: ['joining-pam'] },
 
   // Joining
-  { phrase: 'how do i join', who: 'resident', answer: 'joining-pam' },
+  { phrase: 'how do i join', who: 'resident', answer: 'cant-sign-in', also: ['joining-pam'] },
   { phrase: 'i dont have a code', who: 'resident', answer: 'joining-pam' },
   { phrase: 'pam is not in my city', who: 'resident', answer: 'joining-pam' },
   { phrase: 'how do i join as staff', who: 'case manager', answer: 'joining-as-staff' },
@@ -78,13 +82,13 @@ export const SEARCH_PHRASES: readonly SearchPhrase[] = [
   { phrase: 'cancel my appointment', who: 'resident', answer: 'planning-a-visit' },
   { phrase: 'change the time of my visit', who: 'resident', answer: 'planning-a-visit' },
   { phrase: 'where are my old visits', who: 'resident', answer: 'planning-a-visit' },
-  {
-    phrase: 'does the place know im coming',
-    who: 'resident',
-    answer: null,
-    also: ['planning-a-visit'],
-    gap: 'Is the place told about my visit? Only a place with a program lead on Pam sees it; a place from a public list is not told (D-498).',
-  },
+  { phrase: 'does the place know im coming', who: 'resident', answer: 'is-the-place-told', also: ['planning-a-visit'] },
+  { phrase: 'i showed up but they had no clue', who: 'resident', answer: 'is-the-place-told' },
+  { phrase: 'they didnt know i was coming', who: 'resident', answer: 'is-the-place-told' },
+  { phrase: 'i was not on their list', who: 'resident', answer: 'is-the-place-told' },
+  { phrase: 'they said i had no appointment', who: 'resident', answer: 'is-the-place-told' },
+  { phrase: 'no appointment', who: 'resident', answer: 'is-the-place-told' },
+  { phrase: 'they turned me away', who: 'resident', answer: 'is-the-place-told' },
   {
     phrase: 'they said i missed it',
     who: 'resident',
@@ -103,7 +107,9 @@ export const SEARCH_PHRASES: readonly SearchPhrase[] = [
   { phrase: 'someone is bothering me', who: 'anyone', answer: 'messages-in-pam' },
   { phrase: 'block someone', who: 'anyone', answer: 'messages-in-pam' },
   { phrase: 'report a message', who: 'anyone', answer: 'messages-in-pam' },
-  { phrase: 'i feel unsafe', who: 'anyone', answer: 'messages-in-pam' },
+  { phrase: 'i feel unsafe', who: 'anyone', answer: 'your-safety', also: ['messages-in-pam'] },
+  { phrase: 'i am in danger', who: 'anyone', answer: 'your-safety' },
+  { phrase: 'i am in crisis', who: 'anyone', answer: 'your-safety' },
 
   // Points
   { phrase: 'how do i get points', who: 'resident', answer: 'points-and-badges' },
@@ -114,33 +120,30 @@ export const SEARCH_PHRASES: readonly SearchPhrase[] = [
   {
     phrase: 'why is this happening',
     who: 'anyone',
-    answer: null,
-    gap: 'When something isn’t working, start here: the common reasons (a code, a link, a paused account, no connection), each with what to do, then how to call Pam.',
+    answer: 'start-here',
   },
-  { phrase: 'something went wrong', who: 'anyone', answer: null, gap: 'Same post as “why is this happening”.' },
-  { phrase: 'the page is blank', who: 'anyone', answer: null, gap: 'Same post as “why is this happening”.' },
-  { phrase: 'it wont load', who: 'anyone', answer: null, gap: 'Same post as “why is this happening”.' },
+  { phrase: 'something went wrong', who: 'anyone', answer: 'start-here' },
+  { phrase: 'the page is blank', who: 'anyone', answer: 'start-here' },
+  { phrase: 'it wont load', who: 'anyone', answer: 'start-here' },
 
   // Talking to a person, language, account
   {
     phrase: 'how do i talk to a real person',
     who: 'anyone',
-    answer: null,
-    gap: 'Talking to someone at Pam: the number, Monday to Friday 9am to 5pm, the call is free, and what to do when we are closed.',
+    answer: 'talking-to-pam',
   },
-  { phrase: 'pam phone number', who: 'anyone', answer: null, gap: 'Same post as “how do i talk to a real person”.' },
+  { phrase: 'pam phone number', who: 'anyone', answer: 'talking-to-pam' },
   {
     phrase: 'change my language',
     who: 'anyone',
-    answer: null,
-    gap: 'Using Pam in your language: the seven languages, how to switch, and that texts follow your choice.',
+    answer: 'your-language',
   },
-  { phrase: 'en español', who: 'anyone', answer: null, gap: 'Same post as “change my language”.' },
+  { phrase: 'en español', who: 'anyone', answer: 'your-language' },
   {
     phrase: 'delete my account',
     who: 'anyone',
     answer: null,
-    gap: 'Deleting your account, or getting a copy of what Pam keeps: call Pam, we check it is you.',
+    gap: 'Deleting your account, or getting a copy of what Pam keeps: contact Pam, we check it is you.',
   },
 
   // Finding places
@@ -159,7 +162,8 @@ export const SEARCH_PHRASES: readonly SearchPhrase[] = [
   },
 
   // Providers
-  { phrase: 'how do i add my program', who: 'provider', answer: 'keeping-your-listing-up-to-date', also: ['joining-as-staff', 'one-phone-two-sides'] },
+  { phrase: 'how do i add my program', who: 'provider', answer: 'cant-sign-in', also: ['keeping-your-listing-up-to-date', 'joining-as-staff', 'one-phone-two-sides'] },
+  { phrase: 'add my program', who: 'provider', answer: 'cant-sign-in', also: ['keeping-your-listing-up-to-date'] },
   { phrase: 'my program is still in review', who: 'provider', answer: 'keeping-your-listing-up-to-date' },
   { phrase: 'change our address', who: 'provider', answer: 'keeping-your-listing-up-to-date' },
   { phrase: 'use pam for myself and my program', who: 'provider', answer: 'one-phone-two-sides' },
@@ -169,12 +173,7 @@ export const SEARCH_PHRASES: readonly SearchPhrase[] = [
     answer: null,
     gap: 'Your calendar: who is coming, by day, and checking people in when they arrive.',
   },
-  {
-    phrase: 'why wasnt i told about a visit',
-    who: 'provider',
-    answer: null,
-    gap: 'Same post as “does the place know im coming”, from the program’s side: visits show on your calendar only for a program you added.',
-  },
+  { phrase: 'why wasnt i told about a visit', who: 'provider', answer: 'is-the-place-told' },
 
   // Case managers
   { phrase: 'how do i invite someone', who: 'case manager', answer: 'sending-an-invite' },
@@ -185,7 +184,9 @@ export const SEARCH_PHRASES: readonly SearchPhrase[] = [
   // Second batch (Sage, 11 October): other ways people say the same things
   { phrase: 'the code is not coming', who: 'anyone', answer: 'texts-from-pam' },
   { phrase: 'i did not get a text', who: 'anyone', answer: 'texts-from-pam' },
-  { phrase: 'i cant sign in', who: 'anyone', answer: 'joining-pam' },
+  { phrase: 'i cant sign in', who: 'anyone', answer: 'cant-sign-in', also: ['joining-pam'] },
+  { phrase: 'i cant login', who: 'anyone', answer: 'cant-sign-in', also: ['joining-pam'] },
+  { phrase: 'become a case manager', who: 'case manager', answer: 'cant-sign-in', also: ['joining-as-staff'] },
   { phrase: 'my link to join is too old', who: 'anyone', answer: 'joining-pam' },
   { phrase: 'the code is for a different phone', who: 'anyone', answer: 'joining-pam' },
   { phrase: 'what does the program see about me', who: 'anyone', answer: 'what-others-can-see' },

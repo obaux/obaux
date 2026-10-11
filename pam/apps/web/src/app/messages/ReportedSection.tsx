@@ -30,13 +30,11 @@ export function ReportedSection({
   state,
   previewing,
   examples,
-  supportPhone,
 }: {
   readonly state: ReportsState;
   readonly previewing: boolean;
   /** Whether example data may be shown at all (`useExamplesOn`): never for a real account. */
   readonly examples: boolean;
-  readonly supportPhone: string;
 }) {
   const { t } = useI18n();
   // A real account sees its real reports, a super admin previewing a role included; only a demo
@@ -54,8 +52,7 @@ export function ReportedSection({
           notice={failure}
           title={t(NOTICES[failure].titleKey)}
           body={t(NOTICES[failure].bodyKey)}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
       ) : null}
 

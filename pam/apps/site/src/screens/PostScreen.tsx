@@ -6,14 +6,26 @@ import { Link } from '@astryxdesign/core/Link';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { colorVars } from '@astryxdesign/core/theme/tokens.stylex';
+import { tap } from '../lib/tap';
 import { Frame } from '../components/Frame';
+import { PostNav } from '../components/PostNav';
 import { StillStuck } from '../components/StillStuck';
+import { STILL_STUCK, collectSections } from '../lib/sections';
 import { BODIES } from '../content/bodies';
 import { anyPostBySlug, formatDate, postBySlug } from '../content/posts';
 
 const styles = stylex.create({
+  // The post and, from 1180px, its "On this page" column beside it.
+  layout: {
+    display: 'grid',
+    gridTemplateColumns: { default: 'minmax(0, 1fr)', '@media (min-width: 1180px)': 'minmax(0, 860px) 220px' },
+    columnGap: '40px',
+    justifyContent: 'center',
+    alignItems: 'start',
+    width: '100%',
+  },
   // One centred reading column for the whole post, as on Figma Learn: header, who it is for, body.
-  column: { width: '100%', maxWidth: '920px', marginInline: 'auto' },
+  column: { width: '100%', maxWidth: '920px', marginInline: 'auto', minWidth: 0 },
   header: { alignItems: 'center', textAlign: 'center' },
   crumbs: { alignItems: 'center', justifyContent: 'center', flexWrap: 'wrap' },
   // The page you are on, as a small gray pill at the end of the path.
@@ -23,7 +35,10 @@ const styles = stylex.create({
     borderRadius: '8px',
     backgroundColor: colorVars['--color-background-gray'],
     fontWeight: 600,
+    // On a phone the title is right below, so the path stops at "Support" (it read three times at 320px).
+    display: { default: 'inline-block', '@media (max-width: 519px)': 'none' },
   },
+  arrow: { display: { default: 'inline-block', '@media (max-width: 519px)': 'none' } },
   title: { maxWidth: '24ch' },
   // "Who this is for": an outlined box under the title, like Figma's "Who can use this feature".
   meta: {
@@ -74,8 +89,12 @@ export function PostScreen({ slug, allowDraft = false }: { readonly slug: string
   const post = allowDraft ? anyPostBySlug(slug) : postBySlug(slug);
   const Body = BODIES[slug];
   if (!post || !Body) return null;
+  // The sections, read from the body's own element: the menu is in the first paint.
+  const withStuck = post.stillStuck !== false;
+  const sections = withStuck ? [...collectSections(Body(), slug), STILL_STUCK] : collectSections(Body(), slug);
   return (
     <Frame width="wide" gap={6}>
+      <div {...stylex.props(styles.layout)}>
       <VStack as="article" gap={10} xstyle={styles.column} data-page="post">
         {post.status === 'draft' ? (
           <Banner status="warning" title="Draft, not published: held until the feature ships. Not on the site, in Support or in search." />
@@ -83,8 +102,8 @@ export function PostScreen({ slug, allowDraft = false }: { readonly slug: string
         <VStack gap={6} paddingBlockStart={8}>
           <VStack gap={4} xstyle={styles.header}>
             <HStack as="nav" gap={2} xstyle={styles.crumbs} aria-label="Breadcrumb">
-              <Link href="/support/">Support</Link>
-              <Text type="supporting" aria-hidden>
+              <Link href="/support/" xstyle={tap.link}>Support</Link>
+              <Text type="supporting" aria-hidden xstyle={styles.arrow}>
                 →
               </Text>
               <Text aria-current="page" xstyle={styles.here}>
@@ -104,9 +123,12 @@ export function PostScreen({ slug, allowDraft = false }: { readonly slug: string
             <Text type="supporting">Updated {formatDate(post.updated)}</Text>
           </VStack>
         </VStack>
+        <PostNav sections={sections} variant="bar" />
         <Body />
-        <StillStuck />
+        {withStuck ? <StillStuck /> : null}
       </VStack>
+      <PostNav sections={sections} variant="side" />
+      </div>
     </Frame>
   );
 }
