@@ -52,6 +52,15 @@ const ALL: readonly SupportPost[] = [
     keywords: ['language', 'languages', 'español', 'spanish', 'portuguese', 'chinese', 'mandarin', 'cantonese', 'russian', 'arabic', 'english', 'translate', 'translation', 'switch'],
   },
   {
+    slug: 'is-the-place-told',
+    topic: 'members',
+    audience: 'residents and programs',
+    title: 'Does the place know I’m coming?',
+    summary: 'Pam does not tell a place about your visit. How to call ahead, and what to do if they did not know you were coming.',
+    updated: '2026-10-11',
+    keywords: ['told', 'know', 'expect', 'expecting', 'coming', 'showed up', 'turned away', 'appointment', 'call ahead', 'front desk', 'list', 'no clue'],
+  },
+  {
     slug: 'who-is-my-guide',
     topic: 'members',
     audience: 'members',

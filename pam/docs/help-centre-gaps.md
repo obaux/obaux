@@ -14,7 +14,6 @@ move the row here to "Done".
 | Phrase | Who is asking | What a post would need to say | Owner |
 |---|---|---|---|
 | i got a new phone number | anyone | Changing your phone number: call Pam, and what happens to your account and texts. | Sage, Wren |
-| does the place know im coming | resident | Is the place told about my visit? Only a place with a program lead on Pam sees it; a place from a public list is not told (D-498). | Sage, Wren |
 | delete my account | anyone | Deleting your account, or getting a copy of what Pam keeps: call Pam, we check it is you. | Sage, Wren |
 | where can i find food | resident | Finding a place: Explore, the kinds of help (Learning, Earning, Family Support), the map, and saving a place. | Sage, Wren |
 | find a job | resident | Same post as “where can i find food”. | Sage, Wren |
@@ -23,7 +22,6 @@ move the row here to "Done".
 | my program is still in review | provider |  | Sage, Wren |
 | change our address | provider |  | Sage, Wren |
 | who is coming to my program | provider | Your calendar: who is coming, by day, and checking people in when they arrive. | Sage, Wren |
-| why wasnt i told about a visit | provider | Same post as “does the place know im coming”, from the program’s side: visits show on your calendar only for a program you added. | Sage, Wren |
 | approve a staff request | anyone |  | Sage, Wren |
 
 ## Parked
@@ -38,6 +36,8 @@ Not written on purpose. The phrase stays in `search-phrases.ts`, so the search s
 
 | Phrase | Post | Date |
 |---|---|---|
+| does the place know im coming | is-the-place-told | 2026-10-11 |
+| why wasnt i told about a visit | is-the-place-told | 2026-10-11 |
 | why is this happening | start-here | 2026-10-11 |
 | something went wrong | start-here | 2026-10-11 |
 | the page is blank | start-here | 2026-10-11 |

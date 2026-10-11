@@ -14,6 +14,7 @@ import { StaffRequests } from './StaffRequests';
 import { StartHere } from './StartHere';
 import { TalkingToPam } from './TalkingToPam';
 import { YourLanguage } from './YourLanguage';
+import { PlaceTold } from './PlaceTold';
 import { TextsFromPam } from './TextsFromPam';
 import { WhatOthersCanSee } from './WhatOthersCanSee';
 import { WhoIsMyGuide } from './WhoIsMyGuide';
@@ -44,4 +45,5 @@ export const BODIES: Record<string, () => JSX.Element> = {
   'start-here': StartHere,
   'talking-to-pam': TalkingToPam,
   'your-language': YourLanguage,
+  'is-the-place-told': PlaceTold,
 };
