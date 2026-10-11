@@ -17,15 +17,19 @@ import { POSTS, type SupportPost } from '../content/posts';
 import { TOPICS } from '../content/topics';
 import { APP_URL } from '../lib/links';
 import { Frame } from '../components/Frame';
+import { StillStuck } from '../components/StillStuck';
+import { search } from '../lib/search';
 
 /**
  * The Support home, after the shape of Figma's help center: a banded hero with
  * the one question and a big search box; topics to browse; the articles people
  * open most; and, last, who to ask when the answer isn't here.
  *
- * Search is a filter over the posts, done in the page — there is no server, and
- * with a handful of posts none is needed. Typing replaces the sections below the
- * hero with the matches, as a help center does.
+ * Search is done in the page — there is no server, and with a handful of posts none
+ * is needed (`lib/search.ts`). It takes a person's own words ("why is this happening"),
+ * ranks the best post first, and knows the questions Pam has no post for yet. Typing
+ * replaces the sections below the hero with the matches, as a help center does; when
+ * nothing matches the page says so and keeps the topics and a way to a person.
  */
 /** The first posts are the ones people get stuck on most (the help-centre audit, D-458), so they lead. */
 const START_HERE = 6;
@@ -35,12 +39,6 @@ const styles = stylex.create({
   title: { maxWidth: '20ch' },
   search: { maxWidth: '640px' },
 });
-
-function matches(post: SupportPost, query: string): boolean {
-  const words = query.toLowerCase().split(/\s+/).filter(Boolean);
-  const hay = [post.title, post.summary, ...post.keywords].join(' ').toLowerCase();
-  return words.every((w) => hay.includes(w));
-}
 
 /**
  * A list of posts: the title as a link and the summary under it, each wrapping to as many
@@ -67,10 +65,45 @@ function PostList({ posts }: { readonly posts: readonly SupportPost[] }) {
   );
 }
 
+/** Browse by topic: one card per kind of person, each with its posts. Shown on the Support home and under a search that found nothing. */
+function Topics() {
+  return (
+      <VStack gap={4} paddingBlockStart={6}>
+        <Heading level={2}>Browse by topic</Heading>
+        <Grid columns={{ minWidth: 260 }} gap={4}>
+          {TOPICS.map((topic) => {
+            const posts = POSTS.filter((p) => p.topic === topic.id);
+            return (
+              <Card key={topic.id} padding={6} variant={posts.length ? 'default' : 'muted'}>
+                <VStack gap={2}>
+                  <Heading level={3}>{topic.title}</Heading>
+                  <Text as="p">{topic.blurb}</Text>
+                  {posts.length ? (
+                    <VStack gap={1}>
+                      {posts.map((p) => (
+                        <VStack key={p.slug} paddingBlock={1}>
+                          <Link href={`/support/${p.slug}/`} hasUnderline isStandalone>
+                            {p.title}
+                          </Link>
+                        </VStack>
+                      ))}
+                    </VStack>
+                  ) : (
+                    <Text type="supporting">Articles coming soon.</Text>
+                  )}
+                </VStack>
+              </Card>
+            );
+          })}
+        </Grid>
+      </VStack>
+  );
+}
+
 export function SupportScreen() {
   const [query, setQuery] = useState('');
   const q = query.trim();
-  const found = useMemo(() => (q ? POSTS.filter((p) => matches(p, q)) : []), [q]);
+  const { posts: found, gap } = useMemo(() => (q ? search(POSTS, q) : { posts: [], gap: null }), [q]);
 
   return (
     <>
@@ -105,45 +138,21 @@ export function SupportScreen() {
             <Heading level={2}>
               {found.length === 0 ? 'No results' : `${found.length} ${found.length === 1 ? 'result' : 'results'}`} for “{q}”
             </Heading>
+            {gap ? (
+              <Text as="p">We do not have an article for that yet. {found.length ? 'These may be close:' : 'You can ask a person below.'}</Text>
+            ) : null}
             {found.length ? (
               <PostList posts={found} />
-            ) : (
+            ) : gap ? null : (
               <Text as="p">
-                Nothing matches yet. Try a shorter word, or ask the person who invited you to Pam.
+                Nothing matched “{q}”. Try fewer or shorter words, look through the topics below, or ask a person.
               </Text>
             )}
+            {found.length === 0 ? <Topics /> : null}
           </VStack>
         ) : (
           <>
-            <VStack gap={4} paddingBlockStart={6}>
-              <Heading level={2}>Browse by topic</Heading>
-              <Grid columns={{ minWidth: 260 }} gap={4}>
-                {TOPICS.map((topic) => {
-                  const posts = POSTS.filter((p) => p.topic === topic.id);
-                  return (
-                    <Card key={topic.id} padding={6} variant={posts.length ? 'default' : 'muted'}>
-                      <VStack gap={2}>
-                        <Heading level={3}>{topic.title}</Heading>
-                        <Text as="p">{topic.blurb}</Text>
-                        {posts.length ? (
-                          <VStack gap={1}>
-                            {posts.map((p) => (
-                              <VStack key={p.slug} paddingBlock={1}>
-                                <Link href={`/support/${p.slug}/`} hasUnderline isStandalone>
-                                  {p.title}
-                                </Link>
-                              </VStack>
-                            ))}
-                          </VStack>
-                        ) : (
-                          <Text type="supporting">Articles coming soon.</Text>
-                        )}
-                      </VStack>
-                    </Card>
-                  );
-                })}
-              </Grid>
-            </VStack>
+            <Topics />
 
             <VStack gap={3}>
               <Heading level={2}>Start here</Heading>
@@ -152,18 +161,22 @@ export function SupportScreen() {
           </>
         )}
 
-        <Card padding={8} variant="muted">
-          <VStack gap={3}>
-            <Heading level={2}>Still need help?</Heading>
-            <Text as="p">
-              Ask the person who invited you to Pam, or a staff member who guides you. Inside the app,
-              the Help button is always on screen.
-            </Text>
-            <HStack>
-              <SecondaryButton label="Open Pam" href={APP_URL} />
-            </HStack>
-          </VStack>
-        </Card>
+        {q && found.length === 0 ? (
+          <StillStuck />
+        ) : (
+          <Card padding={8} variant="muted">
+            <VStack gap={3}>
+              <Heading level={2}>Still need help?</Heading>
+              <Text as="p">
+                Ask the person who invited you to Pam, or a staff member who guides you. Inside the app,
+                the Help button is always on screen.
+              </Text>
+              <HStack>
+                <SecondaryButton label="Open Pam" href={APP_URL} />
+              </HStack>
+            </VStack>
+          </Card>
+        )}
       </Frame>
     </>
   );

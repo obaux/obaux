@@ -94,6 +94,10 @@ for (const view of views) {
   await page.getByRole('textbox', { name: 'Search Support' }).fill('reason');
   await page.waitForTimeout(300);
   await scan(page, `${view.name} /support/ searching`);
+  // nothing found: the message, the topics and the way to a person (A26)
+  await page.getByRole('textbox', { name: 'Search Support' }).fill('zzzz');
+  await page.waitForTimeout(300);
+  await scan(page, `${view.name} /support/ nothing found`);
   await ctx.close();
 }
 await browser.close();

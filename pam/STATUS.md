@@ -928,6 +928,14 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
+## Voice & UX copy · the website's own words; first copy pass in Will's component (11 October)
+
+Will chose the website's words: Residents / people looking for help, Providers / social services, Case
+managers / Guides. The app keeps member, program lead and case manager (D-505, `docs/voice.md`). His
+Callout card component in Figma (18:517) now carries a line and a sentence for each chip, written in
+place at his request. Website words get translated after a website change merges, not while they're in Figma.
+Next: the help-centre search phrases with Wren.
+
 ## Voice & UX copy · Pam's voice guide; website Home proposals (11 October)
 
 A new lane (Sage, Will's brief of 11 October). **`docs/voice.md`** is how Pam sounds: who we write for, four

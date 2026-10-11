@@ -69,7 +69,7 @@ const ALL: readonly SupportPost[] = [
     title: 'What your guide, a program and others can see',
     summary: 'One table: what your guide, a program you joined and other members can see about you.',
     updated: '2026-10-10',
-    keywords: ['see', 'privacy', 'private', 'who can see', 'messages', 'points', 'visits', 'share', 'table'],
+    keywords: ['see', 'privacy', 'private', 'who can see', 'messages', 'points', 'visits', 'share', 'table', 'read my messages'],
   },
   {
     slug: 'joining-pam',
