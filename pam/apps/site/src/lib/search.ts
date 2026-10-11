@@ -21,8 +21,8 @@ import { SEARCH_PHRASES, isAnswered, type SearchPhrase } from '../content/search
  */
 const STOP = new Set(
   (
-    'a an and are as at be but by can could did do does for from get got has have how i if in is it its ' +
-    'me my of on or our should so that the their them then there these they this to us was we were what ' +
+    'a an and are as at be but by can could did do does for from get got has have how i if is it its ' +
+    'me my of or our should so that the their them then there these they this to us was we were what ' +
     'when where which who why will with would you your'
   ).split(' '),
 );
@@ -33,7 +33,8 @@ export function words(text: string): string[] {
     .toLowerCase()
     .replace(/[’']/g, '')
     .split(/[^a-z0-9]+/)
-    .filter(Boolean);
+    .filter(Boolean)
+    .map((w) => (w === 'cannot' ? 'cant' : w)); // "cannot" and "can't" are one word to a person
 }
 
 /** A light stem: enough to treat texts/text and happening/happen as one word. */
@@ -82,6 +83,7 @@ export function search(
 ): SearchResult {
   const q = contentStems(query);
   if (!q.length) return { posts: [], gap: null };
+  const rawQuery = words(query).join(' ');
 
   const phraseScore = new Map<string, number>();
   const bump = (slug: string, v: number) => phraseScore.set(slug, Math.max(phraseScore.get(slug) ?? 0, v));
@@ -115,6 +117,11 @@ export function search(
     }
     // a whole keyword the person said, in full ("sign in", "quiet hours")
     for (const k of keyStems) if (k.length > 1 && k.every((s) => hasStem(q, s))) score += 8;
+    // ...and a keyword of two or more words said in that order, small words and all: "sign in" is joining, not signing
+    for (const k of post.keywords) {
+      const kw = words(k).join(' ');
+      if (kw.includes(' ') && ` ${rawQuery} `.includes(` ${kw} `)) score += 12;
+    }
     return { post, score, order };
   });
 

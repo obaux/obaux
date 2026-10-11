@@ -25,6 +25,11 @@ describe('search takes a person’s own words', () => {
     expect(find('policy').posts.map((p) => p.slug)).toContain('signing-a-programs-rules');
   });
 
+  it('hears “cannot sign in” as the signing-in question, not the one about signing a program’s rules', () => {
+    expect(find('I cannot sign in').posts[0]?.slug).not.toBe('signing-a-programs-rules');
+    expect(find('sign in').posts[0]?.slug).not.toBe('signing-a-programs-rules');
+  });
+
   it('returns nothing, not everything, for words no post says', () => {
     expect(find('zzzz qqqq').posts).toEqual([]);
   });
