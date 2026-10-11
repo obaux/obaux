@@ -90,6 +90,8 @@ export interface MockOptions {
   readonly savedTrip?: boolean;
   /** Also a saved trip whose day has passed, so Trips shows its Past visits section. */
   readonly pastTrip?: boolean;
+  /** Also a saved trip that is on now, so its page offers "I'm here" (D-535). */
+  readonly tripNow?: boolean;
 }
 
 /** A real place of the catalogue, to plan a trip to in a story (the examples' ids are not real). */
@@ -301,7 +303,9 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
   ];
   // The member's saved trips (D-454): planning one adds it, moving one changes it, and reading answers with them.
   const savedTrips: SavedTripRow[] = options.savedTrip
-    ? [savedTripRow(1, onTheHour(4, 12), 'Bring my ID'), ...(options.pastTrip ? [savedTripRow(2, onTheHour(-3, 10))] : [])]
+    ? [savedTripRow(1, onTheHour(4, 12), 'Bring my ID'), ...(options.pastTrip ? [savedTripRow(2, onTheHour(-3, 10))] : []),
+        ...(options.tripNow ? [savedTripRow(3, new Date(Date.now() + 20 * 60_000).toISOString())] : []),
+      ]
     : [];
   const has = (part: string) => (url: string) => url.includes(part);
   const on = (part: string, answer: (url: string, method: string, body: unknown) => Answer): Route => (url, method, body) =>
@@ -352,6 +356,13 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
     on('/rpc/log_call', () => ({ body: true })),
     on('/rpc/my_trips', () => ({ body: savedTrips })),
     on('/rpc/my_trip_services', () => ({ body: [] })),
+    // "I'm here" and "I went" (D-535): the pretend database says yes. No position is ever kept.
+    on('/rpc/i_am_here', (_url, _method, body) => ({
+      body: [{ appointment_id: ((body ?? {}) as { p_appointment_id?: string }).p_appointment_id ?? null, there: true, points: 100 }],
+    })),
+    on('/rpc/i_went', (_url, _method, body) => ({
+      body: [{ appointment_id: ((body ?? {}) as { p_appointment_id?: string }).p_appointment_id ?? null, points: 60 }],
+    })),
     on('/rpc/book_trip_at_service', (_url, _method, body) => {
       const args = (body ?? {}) as { p_starts_at: string; p_note?: string | null };
       const row = savedTripRow(savedTrips.length + 1, args.p_starts_at, args.p_note ?? null);

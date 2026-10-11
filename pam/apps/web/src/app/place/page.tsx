@@ -43,7 +43,9 @@ import { VStack } from '@astryxdesign/core/VStack';
 import { examplesOn } from '@/lib/examples';
 import { exampleTrips } from '@/lib/exampleTrips';
 import { readAddedTrips, TRIPS_CHANGED, withMoves, withoutCancelled } from '@/lib/addedTrips';
-import { cancelSavedOrLocalTrip } from '@/lib/savedTrips';
+import { cancelSavedOrLocalTrip, isSavedPlace } from '@/lib/savedTrips';
+import { inMarkWindow } from '@/lib/imHere';
+import { ImHereCard } from '../../screens/ImHereCard';
 import { navigate } from '@/lib/navigate';
 import { ConfirmDialog } from '../../screens/ConfirmDialog';
 import { Banner } from '@astryxdesign/core/Banner';
@@ -242,7 +244,7 @@ function PlaceScreen() {
   // to the top of the page (D-271). Opened from a trip card, the page is
   // about that visit (D-273): its day and time instead of "Plan a trip".
   const [hasTrip, setHasTrip] = useState(false);
-  const [visit, setVisit] = useState<{ id: string; startsAt: string; serviceId: string | null } | null>(null);
+  const [visit, setVisit] = useState<{ id: string; startsAt: string; serviceId: string | null; attendance: 'attended' | 'missed' | null } | null>(null);
   // Cancel this visit (asks first): the one thing here that takes a plan away.
   const [askingCancel, setAskingCancel] = useState(false);
   const [cancelFailed, setCancelFailed] = useState(false);
@@ -263,7 +265,7 @@ function PlaceScreen() {
         .sort((a, b) => a.startsAt.localeCompare(b.startsAt));
       setHasTrip(here.length > 0);
       const found = here.find((trip) => trip.id === tripId) ?? (fromTrips ? here[0] : undefined);
-      setVisit(fromTrips && found ? { id: found.id, startsAt: found.startsAt, serviceId: found.serviceId ?? null } : null);
+      setVisit(fromTrips && found ? { id: found.id, startsAt: found.startsAt, serviceId: found.serviceId ?? null, attendance: ('attendance' in found ? found.attendance : null) ?? null } : null);
     };
     read();
     // A visit moved from here (D-281) shows its new time on the way back.
@@ -538,6 +540,10 @@ function PlaceScreen() {
                   {cancelFailed ? <Banner status="error" title={t('place.visit.cancel.failed')} /> : null}
                   <TextLink label={t('place.visit.cancel')} onClick={() => setAskingCancel(true)} />
                 </>
+              ) : null}
+              {/* "I'm here" (D-535): only a real visit, in its window, not yet marked. */}
+              {visit && isSavedPlace(visit.id) && isMemberView && !visit.attendance && inMarkWindow(visit.startsAt) ? (
+                <ImHereCard visitId={visit.id} placeName={place!.name} />
               ) : null}
               {tellsNoLead ? <Banner status="info" title={t('place.noLead', { place: place!.name })} /> : null}
               {tellsLeadSees ? <Banner status="info" title={t('place.lead.sees', { place: place!.name })} /> : null}
