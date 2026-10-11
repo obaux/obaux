@@ -1780,6 +1780,10 @@ test.describe('reported messages', () => {
 });
 
 test.describe('reported places (D-189)', () => {
+  // The example reports are a demo's; a real account has none (D-509).
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => window.sessionStorage.setItem('pam.examples', '1'));
+  });
   test('a case manager preview sees the example reported places and cannot decide', async ({ page }) => {
     await page.addInitScript(() => sessionStorage.setItem('pam.view-as', 'admin'));
     await signedInAs(page, 'super_admin');
@@ -1817,6 +1821,10 @@ test.describe('reported places (D-189)', () => {
 });
 
 test.describe("the bell's rows land on real screens in the new layout", () => {
+  // The example reports are a demo's; a real account has none (D-509).
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => window.sessionStorage.setItem('pam.examples', '1'));
+  });
   async function bellRow(
     page: import('@playwright/test').Page,
     row: { kind: string; subject_type: string; subject_id: string; body_vars?: Record<string, string> },

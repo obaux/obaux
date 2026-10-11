@@ -2033,3 +2033,7 @@ Branch `claude/places-programs-pick-a-service-line` (Will's wording, 11 October)
 ## Places & programs · Trips launch audit (11 October 2026) — READY, not merged
 
 Branch `claude/places-programs-trips-launch` (D-509). A real account sees only its own trips: the example trips, visits and policies are for Storybook, a demo and `pam.examples` only (`lib/exampleMode.ts`). The drawn map is never drawn over a real account's empty Trips; trips whose pins would overprint are one "2 trips" pin; empty drawer: "No trips yet / Plan a visit and it shows here." e2e `trips-real-account.spec.ts`.
+
+## Places & programs · places, Explore and Saved without examples (11 October 2026) — READY, not merged (on top of the Trips launch audit)
+
+Branch `claude/places-programs-no-examples-places` (D-509 extended). The example services, policies, places, reports, people and program are for a demo or Storybook only; a lead's Book for a member and Add a person use their own program. e2e `no-examples-for-real-accounts.spec.ts`; the example-walking specs opt in with `pam.examples`.
