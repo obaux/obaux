@@ -356,9 +356,6 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
     on('/rpc/log_call', () => ({ body: true })),
     on('/rpc/my_trips', () => ({ body: savedTrips })),
     on('/rpc/my_trip_services', () => ({ body: [] })),
-    // A program lead's own visits and which marks the member made (D-526, D-535): none in a story.
-    on('/rpc/my_program_visits', () => ({ body: [] })),
-    on('/rpc/my_program_own_marks', () => ({ body: [] })),
     // "I'm here" and "I went" (D-535): the pretend database says yes. No position is ever kept.
     on('/rpc/i_am_here', (_url, _method, body) => ({
       body: [{ appointment_id: ((body ?? {}) as { p_appointment_id?: string }).p_appointment_id ?? null, there: true, points: 100 }],
