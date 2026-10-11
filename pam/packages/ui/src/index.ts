@@ -31,7 +31,7 @@ export { LanguageSwitching, type LanguageSwitchingProps } from './LanguageSwitch
  * its weight anyway the one time it sat in this barrel. Import it as
  * `@pam/ui/Skeletons`.
  */
-export { Notice, type NoticeProps } from './Notice.js';
+export { Notice, CompactNotice, type NoticeProps, type CompactNoticeProps } from './Notice.js';
 export { AppHeader, type AppHeaderProps } from './AppHeader.js';
 export { AreaChip, type AreaChipProps } from './AreaChip.js';
 export { Page, type PageProps } from './Page.js';

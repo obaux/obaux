@@ -50,3 +50,11 @@ export const SUPABASE_PUBLISHABLE_KEY =
 export const APP_URL = (
   process.env['NEXT_PUBLIC_APP_URL'] ?? 'https://app.joinpam.org'
 ).replace(/\/+$/, '');
+
+/**
+ * The public website, where a legal page opened from its footer sends Back (D-508).
+ * Only ever joined with a checked path (`siteReturn.ts`), never with anything raw.
+ */
+export const SITE_URL = (
+  process.env['NEXT_PUBLIC_SITE_URL'] ?? 'https://joinpam.org'
+).replace(/\/+$/, '');

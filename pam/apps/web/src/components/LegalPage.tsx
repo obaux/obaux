@@ -31,6 +31,7 @@ import type { LegalDocument } from '@pam/config';
 import { useSearchParams } from 'next/navigation';
 import { useI18n } from '@/lib/i18n';
 import { goBack } from '@/lib/navigate';
+import { siteReturnPath, siteReturnUrl } from '@/lib/siteReturn';
 
 /**
  * A long page somebody can actually find their way around.
@@ -389,17 +390,48 @@ export function LegalPage({ doc }: { doc: LegalDocument }) {
  * or from joining, Back returns there — to the screen as it was left, the
  * number still typed — not to Legal: somebody who is not in yet has no Legal
  * to go back to. Read from `?from=`, so the page itself stays static.
+ *
+ * From the website's footer (`?from=site&return=/path`, Will, 11 October, D-508)
+ * Back goes to that page on the website. The path is checked (`siteReturnPath`);
+ * if it fails the check the page behaves as if it had not been opened from the
+ * site, so a made-up link can send nobody anywhere.
  */
-type Door = 'signin' | 'join' | null;
+type Door = { kind: 'signin' | 'join' } | { kind: 'site'; path: string } | null;
 
 function useDoor(): Door {
-  const from = useSearchParams()?.get('from');
-  return from === 'signin' || from === 'join' ? from : null;
+  const params = useSearchParams();
+  const from = params?.get('from');
+  if (from === 'signin' || from === 'join') return { kind: from };
+  if (from === 'site') {
+    const path = siteReturnPath(params?.get('return'));
+    if (path) return { kind: 'site', path };
+  }
+  return null;
+}
+
+/** What `?from=` carries on to the other document, and back to this one's tabs. */
+function doorQuery(door: Door): string {
+  if (!door) return '';
+  return door.kind === 'site'
+    ? `?from=site&return=${encodeURIComponent(door.path)}`
+    : `?from=${door.kind}`;
 }
 
 function LegalHeader({ doc, door, actions }: { doc: LegalDocument; door: Door; actions?: ReactNode }) {
   const { t } = useI18n();
-  const fallback = door === 'signin' ? '/signin/' : door === 'join' ? '/join/' : '/legal/';
+  if (door?.kind === 'site') {
+    // A different site: a plain link, no router (`ClientNav` leaves an address with a scheme to the browser).
+    return (
+      <SubPageHeader
+        title={t(doc.titleKey)}
+        titleId="top"
+        {...(actions ? { actions } : {})}
+        backHref={siteReturnUrl(door.path)}
+        backLabel={t('nav.back.website')}
+      />
+    );
+  }
+  const fallback = door?.kind === 'signin' ? '/signin/' : door?.kind === 'join' ? '/join/' : '/legal/';
   return (
     // The nested-page template (D-213).
     <SubPageHeader
@@ -408,9 +440,9 @@ function LegalHeader({ doc, door, actions }: { doc: LegalDocument; door: Door; a
       {...(actions ? { actions } : {})}
       backHref={fallback}
       backLabel={
-        door === 'signin'
+        door?.kind === 'signin'
           ? t('nav.back.signInScreen')
-          : door === 'join'
+          : door?.kind === 'join'
             ? t('nav.back.joinScreen')
             : t('nav.back.legal')
       }
@@ -430,7 +462,7 @@ function OtherDocument({ doc, door }: { doc: LegalDocument; door: Door }) {
   return (
     <TextLink
       label={doc.id === 'privacy' ? t('legal.terms') : t('legal.privacy')}
-      href={door ? `${href}?from=${door}` : href}
+      href={`${href}${doorQuery(door)}`}
     />
   );
 }

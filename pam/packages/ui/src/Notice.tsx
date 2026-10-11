@@ -193,3 +193,57 @@ export function Notice({
     </Card>
   );
 }
+
+/**
+ * The small alert (D-509): one row, a small icon and one line of words, no
+ * action. Same three tones as `Notice`, same alert role.
+ *
+ * **When to use which.** A compact alert is for a mistake the person fixes on
+ * the spot, where they already are: a wrong code, a field to correct. Whatever
+ * they must do next is the control they are already looking at, so it offers
+ * nothing of its own. `Notice` is for a state they are stuck in: the account is
+ * paused, the page cannot load, there is nobody to ask. It has a title, a
+ * reason, and somewhere to go. If you find yourself adding a button to the
+ * compact alert, you want `Notice`.
+ */
+export interface CompactNoticeProps {
+  /** The tone; the same colours as `Notice`'s `error`, `warning` and `info`. */
+  status?: 'error' | 'warning' | 'info';
+  /** One short sentence, already localised. */
+  text: string;
+  id?: string;
+}
+
+const compactStyles = stylex.create({
+  row: {
+    width: '100%',
+    boxSizing: 'border-box',
+    minHeight: '40px',
+    paddingBlock: '8px',
+    paddingInline: '12px',
+    borderInlineStartWidth: '4px',
+    borderInlineStartStyle: 'solid',
+    borderRadius: '8px',
+    backgroundColor: 'var(--color-background-sunken, transparent)',
+  },
+  text: { fontSize: '16px', lineHeight: 1.4 },
+  error: { borderInlineStartColor: 'var(--color-text-error, currentColor)' },
+  warning: { borderInlineStartColor: 'var(--color-text-warning, currentColor)' },
+  info: { borderInlineStartColor: 'var(--color-text-accent, currentColor)' },
+});
+
+export function CompactNotice({ status = 'error', text, id }: CompactNoticeProps) {
+  return (
+    <HStack
+      id={id}
+      gap={2}
+      align="center"
+      wrap="nowrap"
+      role={status === 'info' ? 'status' : 'alert'}
+      xstyle={[compactStyles.row, compactStyles[status]]}
+    >
+      <Icon icon={STATUS_ICON[status]} color={STATUS_ICON_COLOR[status]} size="sm" />
+      <Text xstyle={compactStyles.text}>{text}</Text>
+    </HStack>
+  );
+}

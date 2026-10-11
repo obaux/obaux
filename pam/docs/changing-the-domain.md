@@ -26,6 +26,9 @@ own. `lib/project.test.ts` and `lib/appUrl.test.ts` fail if `APP_URL` is ever
 3. Change the checked-in fallback in `project.ts` to the new domain too, so a
    build with nothing configured — the Capacitor app, a fresh preview — is
    right as well.
+   If the **website's** address changes, the same goes for `SITE_URL` in `project.ts`
+   (`NEXT_PUBLIC_SITE_URL`): it is where "Back to the website" on Privacy and Terms
+   goes (D-508).
 4. **Keep the old domain answering**, redirecting to the new one. Links
    already sent (an invite lasts 30 days, and an expired one can ask for a
    new one by email) carry the old

@@ -1,8 +1,7 @@
 import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
-import { ReadMore } from '../components/Prose';
-import { PRIVACY_URL } from '../lib/links';
+import { LegalLink } from '../components/LegalLink';
 
 /**
  * Support post: Case manager assignments.
@@ -43,7 +42,7 @@ export function CaseManagerAssignments() {
           always tells you when something is turned off and who to call, and you can always call Pam for
           help.
         </Text>
-        <ReadMore label="Read the privacy policy" href={PRIVACY_URL} />
+        <LegalLink kind="privacy" label="Read the privacy policy" variant="read-more" />
       </VStack>
     </VStack>
   );
