@@ -14,7 +14,7 @@ import { IconTile } from '@pam/ui/Reading';
 import { SubPage } from '@pam/ui/SubPage';
 import { TransparencyReading } from '@/screens/TransparencyReading';
 import { useI18n } from '@/lib/i18n';
-import { useSupportPhone } from '@/lib/useSupportPhone';
+import { HELP_DESK_URL } from '@/lib/helpDesk';
 
 /**
  * What others can see — and what you can do about your data (D-213, from the
@@ -27,7 +27,8 @@ import { useSupportPhone } from '@/lib/useSupportPhone';
  * The two actions are what the privacy policy already offers ("Ask us for a
  * copy of what we keep about you, or ask us to delete it"). Neither is
  * self-serve in Pam today, so each opens a page that says so plainly and
- * puts the call to Pam one tap away — not a button that pretends.
+ * puts the way to Pam one tap away (the help desk, A28 — Pam has no phone
+ * line) — not a button that pretends.
  */
 const styles = stylex.create({
   intro: { fontSize: '18px', lineHeight: 1.5 },
@@ -89,7 +90,6 @@ export function PrivacyControlsView() {
 
 export function DataCopyView() {
   const { t } = useI18n();
-  const supportPhone = useSupportPhone();
   return (
     <SubPage
       title={t('privacy.copy.title')}
@@ -97,17 +97,13 @@ export function DataCopyView() {
       backLabel={t('nav.back.privacyControls')}
     >
       <Text xstyle={styles.body}>{t('privacy.copy.body')}</Text>
-      <Text type="supporting" xstyle={styles.body}>
-        {t('help.call.body')}
-      </Text>
-      <BigButton label={t('help.call.action')} href={`tel:${supportPhone}`} />
+      <BigButton label={t('help.contact.action')} href={HELP_DESK_URL} />
     </SubPage>
   );
 }
 
 export function DeleteAccountView() {
   const { t } = useI18n();
-  const supportPhone = useSupportPhone();
   return (
     <SubPage
       title={t('privacy.delete.title')}
@@ -118,7 +114,7 @@ export function DeleteAccountView() {
       <Text type="supporting" xstyle={styles.body}>
         {t('privacy.delete.stop')}
       </Text>
-      <BigButton label={t('help.call.action')} href={`tel:${supportPhone}`} variant="secondary" />
+      <BigButton label={t('help.contact.action')} href={HELP_DESK_URL} variant="secondary" />
     </SubPage>
   );
 }

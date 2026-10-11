@@ -178,11 +178,13 @@ test.describe('Astryx theme', () => {
  * So the help path must be in the server-rendered HTML, not behind a chunk.
  */
 test.describe('the help path does not depend on JavaScript', () => {
-  test('the support number is in the help screen HTML itself', async ({ request }) => {
+  test('the way to the help desk is in the help screen HTML itself, and there is no phone number', async ({ request }) => {
     // Read straight off the wire, the way a member on a dying connection
     // receives it — not queried from a hydrated browser.
     const html = await (await request.get('/help/')).text();
-    expect(html).toMatch(/href="tel:\+\d{8,15}"/);
+    expect(html).toMatch(/href="https:\/\/[^"]+\/support\/"/);
+    // Pam has no phone line (A28): no number on the screen. 911 is on Your safety, not here.
+    expect(html).not.toMatch(/href="tel:/);
   });
 
   test('the whole path works with JavaScript disabled', async ({ browser }) => {
@@ -195,7 +197,7 @@ test.describe('the help path does not depend on JavaScript', () => {
 
     // Follow it the way a member would, with nothing hydrated.
     await help.click();
-    await expect(page.getByRole('link', { name: /Call Pam/ })).toHaveAttribute('href', /^tel:/);
+    await expect(page.locator('a[href$="/support/"]')).toBeVisible();
     // And a way back, which §0 also requires — the nested-page template's
     // round back button (D-213), a real link.
     await expect(page.getByRole('link', { name: /Back to Home/ })).toBeVisible();

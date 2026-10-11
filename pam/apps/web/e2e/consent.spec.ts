@@ -76,7 +76,7 @@ test.describe('agreeing to reminders', () => {
     await page.goto('/reminders/');
     await expect(page.getByText(/reminder before a visit/i)).toBeVisible();
     // No promise about how often: only what really goes out today (10 October 2026, D-453).
-    await expect(page.getByText(/Today Pam sends only one of these/i)).toBeVisible();
+    await expect(page.getByText(/Pam does not send any of these yet/i)).toBeVisible();
     await expect(page.getByText(/few messages a week/i)).toHaveCount(0);
     await expect(page.getByText(/Reply STOP/)).toBeVisible();
     await expect(page.getByText(/rates may apply/i)).toBeVisible();

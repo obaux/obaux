@@ -44,7 +44,11 @@ describe('promises of a text or a reminder (D-474)', () => {
 
   it('the Text reminders screen still says what is and is not sent today', () => {
     // The honest line each of the two opt-in screens carries (D-453); the lists above it say "would".
-    expect(BUNDLES.en['reminders.today.member']).toMatch(/only one/i);
+    // Texts are held until Will says go (texts_live, D-481), so the saved-place note is not sent either (A28 check).
     expect(BUNDLES.en['reminders.today.staff']).toMatch(/does not send any/i);
+    if (!VISIT_REMINDERS_LIVE_IN_APP) {
+      expect(BUNDLES.en['reminders.today.member']).toMatch(/does not send any/i);
+      expect(BUNDLES.en['profile.promo.reminders.body']).not.toMatch(/\bwe can text you\b/i);
+    }
   });
 });

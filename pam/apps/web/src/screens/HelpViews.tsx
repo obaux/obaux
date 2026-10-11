@@ -5,22 +5,25 @@ import { Card } from '@astryxdesign/core/Card';
 import { Heading } from '@astryxdesign/core/Heading';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
-import { BigButton, FlagIcon, HelpIcon, PhoneIcon, ShieldIcon } from '@pam/ui';
+import { BigButton, FlagIcon, GlobeIcon, HelpIcon, ShieldIcon } from '@pam/ui';
 import { SubPage } from '@pam/ui/SubPage';
 import { MenuList } from '@pam/ui/MenuList';
 import { useI18n } from '@/lib/i18n';
-import { useSupportPhone } from '@/lib/useSupportPhone';
+import { HELP_DESK_URL } from '@/lib/helpDesk';
+import { HelpDeskRow, useHelpDeskItem } from '@/screens/HelpDeskRow';
 
 /**
  * Get help, as a list of the kinds of help (D-213, from the reference Will
  * gave on 1 October: "there are different types of help").
  *
- * Calling Pam stays first and is the row itself — a `tel:` link, one tap,
- * with the hours under it — because it is what most people who open this
- * screen came for (§0, §2.4). The other rows open a page each, on the same
- * template. Every one of them is a plain link and static text, so the whole
- * of Get help still works with no JavaScript, no session and no database
- * (the rule this screen has had since it was built).
+ * The help desk is first and is the row itself — a link to the support centre
+ * on the website, one tap — because it is what most people who open this
+ * screen came for (§0, §2.4). Pam has no phone line (A28, Will, 11 October
+ * 2026): a person who is stuck is shown answers first, and the help desk's
+ * "Still stuck?" is the way to an email to Pam after that. The other rows open
+ * a page each, on the same template. Every one of them is a plain link and
+ * static text, so the whole of Get help still works with no JavaScript, no
+ * session and no database (the rule this screen has had since it was built).
  */
 const ICON = { width: 26, height: 26, 'aria-hidden': true } as const;
 
@@ -33,29 +36,9 @@ const styles = stylex.create({
   note: { fontSize: '15px', lineHeight: 1.5 },
 });
 
-/** Call Pam as a row — the hours under it, one tap to dial (D-216). */
-function CallPamRow({ label }: { readonly label: string }) {
-  const { t } = useI18n();
-  const supportPhone = useSupportPhone();
-  return (
-    <MenuList
-      label={label}
-      items={[
-        {
-          id: 'call',
-          label: t('help.menu.call'),
-          description: t('help.call.body'),
-          href: `tel:${supportPhone}`,
-          icon: <PhoneIcon {...ICON} />,
-        },
-      ]}
-    />
-  );
-}
-
 export function HelpView({ backHref = '/', backLabel }: { readonly backHref?: string; readonly backLabel?: string }) {
   const { t } = useI18n();
-  const supportPhone = useSupportPhone();
+  const helpDesk = useHelpDeskItem();
   return (
     <SubPage title={t('help.title')} backHref={backHref} backLabel={backLabel ?? t('nav.back.home')}>
       <Text type="supporting" xstyle={styles.intro}>
@@ -64,13 +47,7 @@ export function HelpView({ backHref = '/', backLabel }: { readonly backHref?: st
       <MenuList
         label={t('help.menu.label')}
         items={[
-          {
-            id: 'call',
-            label: t('help.menu.call'),
-            description: t('help.call.body'),
-            href: `tel:${supportPhone}`,
-            icon: <PhoneIcon {...ICON} />,
-          },
+          helpDesk,
           { id: 'topics', label: t('help.menu.topics'), href: '/help/topics/', icon: <HelpIcon {...ICON} /> },
           { id: 'safety', label: t('help.menu.safety'), href: '/help/safety/', icon: <ShieldIcon {...ICON} /> },
           { id: 'place', label: t('help.menu.place'), href: '/help/report-place/', icon: <FlagIcon {...ICON} /> },
@@ -99,14 +76,15 @@ export function HelpTopicsView() {
           </Text>
         ))}
       </VStack>
+      {/* Not everything is here: the help desk answers the rest, and its "Still stuck?" is the way to a person (A28). */}
       <VStack gap={2}>
         <Heading level={2} xstyle={styles.heading}>
-          {t('help.closed.heading')}
+          {t('help.stuck.heading')}
         </Heading>
-        <Text xstyle={styles.body}>{t('help.closed.body')}</Text>
+        <Text xstyle={styles.body}>{t('help.stuck.body')}</Text>
       </VStack>
       {/* The same row as Get help and Your safety (Will, 2 October), not a big button. */}
-      <CallPamRow label={t('help.menu.topics')} />
+      <HelpDeskRow label={t('help.menu.topics')} />
     </SubPage>
   );
 }
@@ -116,12 +94,11 @@ export function HelpTopicsView() {
  * reading"). One card first, for the one thing that cannot wait — in danger,
  * call 911, the page's only big button. Under it, the two other situations as
  * plain rows, each a short line and one tap: a message that feels unsafe
- * (to Messages, where ⋯ › Report is), and someone to talk to (calls Pam). Then
+ * (to Messages, where ⋯ › Report is), and someone to talk to (the help desk). Then
  * one quiet sentence on what reporting shares.
  */
 export function HelpSafetyView() {
   const { t } = useI18n();
-  const supportPhone = useSupportPhone();
   return (
     <SubPage title={t('help.safety.title')} backHref="/help/" backLabel={t('nav.back.help')}>
       <Card padding={6}>
@@ -153,11 +130,12 @@ export function HelpSafetyView() {
               icon: <FlagIcon {...ICON} />,
             },
             {
-              id: 'call',
-              label: t('help.safety.call.heading'),
-              description: t('help.safety.call.body'),
-              href: `tel:${supportPhone}`,
-              icon: <PhoneIcon {...ICON} />,
+              id: 'desk',
+              label: t('help.safety.talk.heading'),
+              description: t('help.safety.talk.body'),
+              href: HELP_DESK_URL,
+              isExternal: true,
+              icon: <GlobeIcon {...ICON} />,
             },
           ]}
         />
