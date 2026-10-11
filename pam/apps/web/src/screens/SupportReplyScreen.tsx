@@ -12,7 +12,6 @@ import { SubPage } from '@pam/ui/SubPage';
 import { useI18n } from '@/lib/i18n';
 import { goBack } from '@/lib/navigate';
 import { useSession } from '@/lib/useSession';
-import { useSupportPhone } from '@/lib/useSupportPhone';
 import { useRoleView } from '@/lib/useViewedRole';
 
 /**
@@ -44,7 +43,6 @@ function refusal(words: string): string | null {
 
 export function SupportReplyScreen() {
   const { t } = useI18n();
-  const supportPhone = useSupportPhone();
   const params = useSearchParams();
   const to = (params.get('to') ?? '').trim();
   const { state: session } = useSession();
@@ -84,8 +82,7 @@ export function SupportReplyScreen() {
           notice="service_not_available"
           title={t('directory.notSuper.title')}
           body={t('directory.notSuper.body')}
-          supportPhone={supportPhone}
-          callLabel={t('help.callSupport')}
+          contactLabel={t('help.contact.action')}
         />
       ) : to === '' ? (
         <Text type="supporting" xstyle={styles.to}>
