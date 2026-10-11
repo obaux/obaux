@@ -35,6 +35,7 @@ grant execute on function test.check_raises_like(text, text, text) to authentica
 \set cold    'cccccccc-0000-0000-0000-000000006705'
 \set cancel  'cccccccc-0000-0000-0000-000000006706'
 \set blk     'cccccccc-0000-0000-0000-000000006707'
+\set mblk    'cccccccc-0000-0000-0000-000000006708'
 \set lead1   'cccccccc-0000-0000-0000-000000006703'
 \set lead2   'cccccccc-0000-0000-0000-000000006704'
 \set org_a   'dddddddd-0000-0000-0000-000000006701'
@@ -49,7 +50,7 @@ select set_config('request.jwt.claim.sub', '', false);
 insert into auth.users (id, phone) values
   (:'member', '12675558671'), (:'booked', '12675558672'),
   (:'lead1', '12675558673'), (:'lead2', '12675558674'),
-  (:'cold', '12675558675'), (:'cancel', '12675558676'), (:'blk', '12675558677');
+  (:'cold', '12675558675'), (:'cancel', '12675558676'), (:'blk', '12675558677'), (:'mblk', '12675558678');
 insert into public.orgs (id, name, type, region_id) values
   (:'org_a', 'Msg Org A', 'program', :'region_north'),
   (:'org_n', 'Msg Org With Nobody', 'program', :'region_north');
@@ -58,6 +59,7 @@ insert into public.profiles (id, role, first_name, region_id, phone, access_stat
   (:'booked', 'member', 'Bo', :'region_north', '+12675558672', 'active', null),
   (:'cold', 'member', 'Cy', :'region_north', '+12675558675', 'active', null),
   (:'cancel', 'member', 'Cal', :'region_north', '+12675558676', 'active', null),
+  (:'mblk', 'member', 'Mb', :'region_north', '+12675558678', 'active', null),
   (:'blk', 'member', 'Bl', :'region_north', '+12675558677', 'active', null),
   (:'lead1', 'provider', 'Ana', :'region_north', '+12675558673', 'active', :'org_a'),
   (:'lead2', 'provider', 'Zed', :'region_north', '+12675558674', 'active', :'org_a');
@@ -68,7 +70,7 @@ insert into public.services (id, org_id, name, category, address, source, source
 insert into public.appointments (member_id, service_id, starts_at, status) values
   (:'booked', :'svc_a', now() + interval '2 days', 'scheduled'),
   (:'cancel', :'svc_a', now() + interval '3 days', 'cancelled');
-insert into public.blocks (blocker_id, blocked_id) values (:'lead1', :'blk'), (:'blk', :'lead2');
+insert into public.blocks (blocker_id, blocked_id) values (:'lead1', :'blk'), (:'blk', :'lead2'), (:'mblk', :'lead1');
 
 \echo ''
 \echo '--- Message a program before booking ---'
@@ -140,8 +142,17 @@ select test.check('a member with no tie is offered nobody to message',
   (select count(*) from public.messageable_people()), 0::bigint);
 
 select test.as_user(:'blk');
-select test.check_raises_like('a member blocked by the lead (or who blocked the other) is refused where no lead is left',
+select test.check_raises_like('a lead blocked the member: the program refuses, the member is not routed to a colleague',
   format($f$select public.message_program(%L)$f$, :'svc_a'), '%NO_PROGRAM_LEAD%');
+
+select test.as_user(:'mblk');
+insert into t67 select 'mblk', public.message_program(:'svc_a');
+select test.check('the member blocked a lead: another lead of the program is fine',
+  (select count(*) from public.conversation_members
+    where conversation_id = (select v from t67 where k = 'mblk') and profile_id = :'lead2'), 1::bigint);
+select test.check('...and never the lead they blocked',
+  (select count(*) from public.conversation_members m
+    where m.profile_id = :'lead1' and m.conversation_id in (select conversation_id from public.conversation_members where profile_id = :'mblk')), 0::bigint);
 
 reset role;
 set role anon;

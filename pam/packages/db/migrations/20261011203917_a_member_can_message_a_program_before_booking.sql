@@ -23,7 +23,8 @@
 -- block would silence one of several. The lead is the longest-standing active
 -- lead of the organisation; if the member already has a conversation with an
 -- active lead there, that one is reused; if the lead is later suspended or
--- blocks the member, the next message opens one with the next lead.
+-- blocked by the member, the next message opens one with the next lead. A block BY a
+-- lead is the program's: it refuses (NO_PROGRAM_LEAD), it is not routed round.
 
 create or replace function public.can_start_conversation(a uuid, b uuid)
 returns boolean
@@ -181,7 +182,20 @@ begin
     raise exception 'NO_PROGRAM_LEAD';
   end if;
 
-  -- The leads this member may reach: active, a provider, not blocked either way.
+  -- A lead's block is the program's: if any active lead of this org has blocked
+  -- the member, the member is not routed to a colleague (that would defeat it).
+  if exists (
+    select 1
+    from public.blocks k
+    join public.profiles l on l.id = k.blocker_id
+    join public.profile_roles r on r.profile_id = l.id and r.role = 'provider'
+    where k.blocked_id = caller and l.org_id = v_org and l.access_status = 'active'
+  ) then
+    raise exception 'NO_PROGRAM_LEAD';
+  end if;
+
+  -- The leads this member may reach: active, a provider, not someone the member
+  -- blocked (the member chose that, so another lead is fine).
   -- Prefer one they already talk to (most recent), then the longest-standing.
   select l.id into lead
   from public.profiles l
@@ -191,8 +205,7 @@ begin
     and l.id <> caller
     and not exists (
       select 1 from public.blocks k
-      where (k.blocker_id = caller and k.blocked_id = l.id)
-         or (k.blocker_id = l.id and k.blocked_id = caller)
+      where k.blocker_id = caller and k.blocked_id = l.id
     )
   order by
     (select max(c.last_message_at)
