@@ -4,9 +4,10 @@ import { USE_DUMMY_PEOPLE } from '@pam/config/dummy-flag';
  * Example people, conversations, alerts and offers are for pretending, never for a real account
  * (Will, 11 October 2026: "a real account sees only its real things, never examples").
  *
- * They show in exactly two places:
+ * They show in exactly these places:
  *   - Storybook's clickable prototype, which answers every Supabase call itself (`mockSupabase`
  *     marks `window` once it does), and the Sign in / About Pam previews; and
+ *   - a tab that asked for them outright, `sessionStorage['pam.examples'] = '1'` (the end-to-end tests that walk them); and
  *   - an account a super admin has put in the demo view (`profiles.is_demo`, 0057), which is a
  *     pretend account by its owner's choice.
  *
@@ -29,5 +30,15 @@ export function isPrototype(): boolean {
 
 /** Whether example data may be shown to whoever is looking right now. */
 export function examplesOn(): boolean {
-  return USE_DUMMY_PEOPLE && (isPrototype() || demoAccount);
+  return USE_DUMMY_PEOPLE && (isPrototype() || demoAccount || askedForExamples());
+}
+
+/** A tab that asked for the examples outright (`sessionStorage['pam.examples'] = '1'`): the end-to-end tests that walk them. */
+export function askedForExamples(): boolean {
+  if (typeof window === 'undefined') return false;
+  try {
+    return window.sessionStorage.getItem('pam.examples') === '1';
+  } catch {
+    return false;
+  }
 }

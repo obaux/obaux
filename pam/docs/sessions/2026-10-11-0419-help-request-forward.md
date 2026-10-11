@@ -29,3 +29,7 @@ Mira: apply the migration, set the secrets (`HELP_REQUEST_SALT` is new), deploy 
 ## Needs a human
 
 Will: "test it" for this function (one request to hello@joinpam.org only).
+
+## Deploy fix (11 October, after the first deploy failed at bundling)
+
+The merge desk's deploy tool turns the line-separator escapes in a regex literal into real line breaks, so `handler.ts` stopped compiling. The control-character class is now built from character codes; a test strips the characters and keeps the escapes out of the source. No other function had the pattern.

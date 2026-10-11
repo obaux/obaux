@@ -5,7 +5,7 @@ import { USE_DUMMY_PEOPLE } from '@pam/config/dummy-flag';
 import type { SessionState } from './useSession';
 import type { ProgramDetails } from './useJoin';
 import type { OwnProgram } from './ownProgram';
-import { isPrototype } from './exampleMode';
+import { examplesOn } from './examples';
 import { useOwnProgram } from './useOwnProgram';
 
 /**
@@ -181,7 +181,7 @@ export function useProgramSetup(session: SessionState): ProgramSetup {
   const program = own.status === 'ready' ? own.program : null;
   // A real program lead with no program has none to show, not the example (D-498): the example is for
   // a demo (a super admin previewing the role) and for Storybook, where the lead is only pretending.
-  const isRealLead = session.status === 'signed-in' && session.session.role === 'provider' && !isPrototype();
+  const isRealLead = session.status === 'signed-in' && session.session.role === 'provider' && !examplesOn();
   const isExample = USE_DUMMY_PEOPLE && !read(FRESH) && program === null && !isRealLead;
   const photoUrl = session.status === 'signed-in' ? session.session.photoUrl : null;
   const sent: SentProgram | null = program

@@ -18,7 +18,10 @@ import { PlusIcon } from '@pam/ui';
 import { MenuList } from '@pam/ui/MenuList';
 import { SubPage } from '@pam/ui/SubPage';
 import { readAddedTrips, TRIPS_CHANGED, withMoves } from '@/lib/addedTrips';
+import { examplesOn } from '@/lib/examples';
 import { useI18n } from '@/lib/i18n';
+import { useProgramSetup } from '@/lib/programSetup';
+import { useSession } from '@/lib/useSession';
 import { whenHappened } from '@/lib/when';
 import { HelpButton } from './HelpButton';
 import { intlLocale } from '@pam/config';
@@ -58,11 +61,11 @@ const styles = stylex.create({
   words: { minWidth: 0 },
 });
 
-const PROGRAM_PLACE_ID = 'dummy-place-learning';
+const EXAMPLE_PROGRAM_ID = 'dummy-place-learning';
 const ICON = { width: 26, height: 26, 'aria-hidden': true } as const;
 
 /** The soonest visit still ahead at this program, per person, example and booked alike. */
-function useNextVisitHere(): Readonly<Record<string, string>> {
+function useNextVisitHere(programId: string): Readonly<Record<string, string>> {
   const [next, setNext] = useState<Readonly<Record<string, string>>>({});
   useEffect(() => {
     const read = () => {
@@ -72,24 +75,35 @@ function useNextVisitHere(): Readonly<Record<string, string>> {
         if (new Date(startsAt).getTime() <= now) return;
         if (!out[personId] || startsAt < out[personId]!) out[personId] = startsAt;
       };
-      for (const a of DUMMY_APPOINTMENTS) consider(a.personId, a.startsAt);
+      if (examplesOn()) for (const a of DUMMY_APPOINTMENTS) consider(a.personId, a.startsAt);
       for (const trip of withMoves(readAddedTrips())) {
-        if (trip.forMemberId && trip.placeId === PROGRAM_PLACE_ID) consider(trip.forMemberId, trip.startsAt);
+        if (trip.forMemberId && trip.placeId === programId) consider(trip.forMemberId, trip.startsAt);
       }
       setNext(out);
     };
     read();
     window.addEventListener(TRIPS_CHANGED, read);
     return () => window.removeEventListener(TRIPS_CHANGED, read);
-  }, []);
+  }, [programId]);
   return next;
 }
 
 export function BookForMemberView() {
   const { t, locale } = useI18n();
-  const place = DUMMY_PLACES_BY_ID[PROGRAM_PLACE_ID];
-  const nextHere = useNextVisitHere();
-  const people = dummyConversationsFor('provider')
+  // The lead's own program (D-509); the example one only in a demo or Storybook, with its example people.
+  const { state: session } = useSession();
+  const setup = useProgramSetup(session);
+  const [examples, setExamples] = useState(false);
+  useEffect(() => setExamples(examplesOn()), []);
+  const own = setup.program;
+  const programId = own ? own.id : EXAMPLE_PROGRAM_ID;
+  const place = own
+    ? { name: own.details.name, category: own.details.category, address: own.details.address }
+    : examples
+      ? DUMMY_PLACES_BY_ID[EXAMPLE_PROGRAM_ID]
+      : undefined;
+  const nextHere = useNextVisitHere(programId);
+  const people = (examples ? dummyConversationsFor('provider') : [])
     .map((c) => ({ convo: c, person: DUMMY_MEMBERS.find((m) => m.id === c.otherId) }))
     .filter((x): x is { convo: (typeof x)['convo']; person: NonNullable<(typeof x)['person']> } => Boolean(x.person));
 
@@ -102,7 +116,7 @@ export function BookForMemberView() {
   };
   const hrefFor = (id: string, name: string) =>
     `/trips/new/?${new URLSearchParams({
-      place: PROGRAM_PLACE_ID,
+      place: programId,
       ...(place ? { name: place.name, category: place.category, address: place.address } : {}),
       for: id,
       forName: name,

@@ -6,7 +6,7 @@ import { Icon } from '@astryxdesign/core/Icon';
 import { VStack } from '@astryxdesign/core/VStack';
 import { StatusCard } from '@pam/ui/PolicyStatusCard';
 import { DUMMY_PLACES_BY_ID } from '@pam/config/dummy-places';
-import { exampleTrips } from '@/lib/exampleMode';
+import { exampleTrips } from '@/lib/exampleTrips';
 import { useI18n } from '@/lib/i18n';
 import { readAddedTrips, TRIPS_CHANGED, withMoves } from '@/lib/addedTrips';
 import { intlLocale } from '@pam/config';

@@ -10,6 +10,11 @@ const ME = 'de3b9c2e-ec2f-403b-93e5-86e6ee75349b';
 const json = (body: unknown) => ({ status: 200, contentType: 'application/json', body: JSON.stringify(body) });
 const LINE = 'Pick a service above to plan a trip.';
 
+// These walk the example places, which a demo asks for outright; a real account has none (D-509).
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => window.sessionStorage.setItem('pam.examples', '1'));
+});
+
 async function signedInMember(page: import('@playwright/test').Page) {
   await page.addInitScript((userId: string) => {
     const session = {
