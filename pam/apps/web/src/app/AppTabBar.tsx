@@ -8,6 +8,7 @@ import { useSession } from '@/lib/useSession';
 import { useRoleView } from '@/lib/useViewedRole';
 import { tabFor } from '@/lib/tabs';
 import { useProgramSetup } from '@/lib/programSetup';
+import { useMessagingReach } from '@/lib/useMessagingReach';
 import { RoleTabBar } from './RoleTabBar';
 import { UnreadMessagesLazy } from './UnreadMessagesLazy';
 
@@ -19,7 +20,8 @@ import { UnreadMessagesLazy } from './UnreadMessagesLazy';
  * role's bar from the next screen on. Nothing under a screen you tapped into
  * (`tabFor` is `null`), and nothing for somebody who is not signed in.
  *
- * Messages carries a dot when something is unread, from the account's own
+ * Messages is not drawn for a member or a program lead with no one to message and no conversation
+ * (Will, 11 October 2026); it appears the moment there is someone. Messages carries a dot when something is unread, from the account's own
  * conversations only — never from a preview, whose account has none to count
  * (D-171, D-172).
  */
@@ -32,6 +34,8 @@ export function AppTabBar() {
   const tab = tabFor(pathname ?? '');
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
   const { viewedRole } = useRoleView(trueRole);
+  // The Messages tab is for people who have someone to message or a conversation (useMessagingReach).
+  const reach = useMessagingReach(session.status === 'signed-in', pathname ?? '');
   if (!tab || session.status !== 'signed-in' || trueRole === null) return null;
 
   const role: Role = viewedRole ?? trueRole;
@@ -43,6 +47,9 @@ export function AppTabBar() {
       name={session.session.firstName ?? ''}
       photoUrl={session.session.photoUrl}
       unread={unread > 0}
+      // A member or a program lead with nobody to message has no Messages tab. A case manager and the super
+      // admin keep it: the messages people reported are reviewed there (D-464).
+      hideMessages={reach === false && (role === 'member' || role === 'provider')}
     />
   );
 

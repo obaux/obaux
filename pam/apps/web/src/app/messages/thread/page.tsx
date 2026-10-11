@@ -15,6 +15,7 @@ import { useBlockState } from '@/lib/blocking';
 import { useMessageTranslations } from '@/lib/useMessageTranslations';
 import { ThreadViewLazy } from '../ThreadViewLazy';
 import { staffPhotoFor } from '@pam/config/dummy-connections';
+import { useExamplesOn } from '@/lib/useExamplesOn';
 import { ThreadFrame, ThreadHeader, ThreadTop } from '../ThreadFrame';
 import { DemoThreadLazy } from '../DemoThreadLazy';
 import { ThreadVisit } from '../ThreadVisit';
@@ -67,7 +68,10 @@ function ThreadScreen() {
   const fromPlaceId = params.get('from') === 'place' ? params.get('place') : null;
   const backHref = fromPlaceId ? `/place/?id=${encodeURIComponent(fromPlaceId)}` : '/messages/';
   const backLabel = fromPlaceId ? t('nav.back.program') : t('nav.back.messages');
-  const demo = isDummyId(conversationId);
+  // An example conversation opens only where examples are allowed (Storybook, a demo account).
+  const examplesOn = useExamplesOn();
+  const exampleId = isDummyId(conversationId);
+  const demo = exampleId && examplesOn;
 
   const signedIn = session.status === 'signed-in';
   const trueRole = session.status === 'signed-in' ? session.session.role : null;
@@ -86,10 +90,10 @@ function ThreadScreen() {
   // drawn for whichever role is being previewed and touches nothing real.
   const canMessage = demo ? viewedCanMessage : realCanMessage;
 
-  const { state, send, sending, sendFailed, limited } = useThread(signedIn && realCanMessage && !demo ? conversationId : null);
+  const { state, send, sending, sendFailed, limited } = useThread(signedIn && realCanMessage && !exampleId ? conversationId : null);
 
   // Somebody blocked in this conversation (0076, D-463): the composer says so.
-  const { state: blockState } = useBlockState(signedIn && realCanMessage && !demo ? conversationId : null);
+  const { state: blockState } = useBlockState(signedIn && realCanMessage && !exampleId ? conversationId : null);
   const blocked = blockState?.iBlocked ? 'mine' : blockState?.blockedMe ? 'theirs' : null;
 
   const speechLanguage = speechLanguageFor(locale);
@@ -160,6 +164,22 @@ function ThreadScreen() {
           backLabel={backLabel}
         />
       </ThreadFrame>
+    );
+  }
+
+  // An example id on a real account is a conversation that does not exist.
+  if (exampleId && !demo) {
+    return (
+      <Page gap={4}>
+        <SubPageHeader title={t('messages.title')} backHref={backHref} backLabel={backLabel} />
+        <Notice
+          notice="service_not_available"
+          title={t('messages.thread.notFound.title')}
+          body={t('messages.thread.notFound.body')}
+          supportPhone={supportPhone}
+          callLabel={t('help.callSupport')}
+        />
+      </Page>
     );
   }
 
