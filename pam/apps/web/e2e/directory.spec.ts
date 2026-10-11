@@ -131,7 +131,7 @@ test.describe('everyone, for the person running Pam', () => {
 
   test('the header has no role-preview switch (Will, 10 October)', async ({ page }) => {
     // Storybook's journeys show each role now; the super admin's header lost its
-    // preview icon. "See the app as" on Profile still sets a preview.
+    // preview icon, and "See the app as" went with it (D-501).
     await signedInAs(page, 'super_admin');
     await page.goto('/directory/');
     await expect(page.getByRole('heading', { name: 'Everyone', exact: true })).toBeVisible();
@@ -198,25 +198,18 @@ test.describe('everyone, for the person running Pam', () => {
     expect(text, 'a phone number reached the directory').not.toMatch(/\+?\d[\d ()-]{8,}/);
   });
 
-  test('a super admin can look at the screen each role gets', async ({ page }) => {
-    // One codebase, four very different screens. A case manager reporting that
-    // "the tile is missing" is describing a screen the person running Pam has
-    // never had (Will, 14 September).
+  test('a super admin\'s Profile has Everyone and no "See the app as"', async ({ page }) => {
+    // Each role's screens are checked in Storybook's journeys now; the in-app
+    // preview is gone (Will, 11 October: "remove", D-501).
     await signedInAs(page, 'super_admin');
     await page.route('**/rest/v1/rpc/member_points*', (route) => route.fulfill(json(400)));
     await page.route('**/rest/v1/rpc/saved_places_mine*', (route) => route.fulfill(json([])));
     // Their own Home is the requests to approve; Everyone is on their Profile.
     await page.goto('/profile/');
     await expect(page.getByRole('link', { name: /Everyone/ })).toHaveAttribute('href', '/directory/');
+    await expect(page.getByRole('link', { name: /See the app as/ })).toHaveCount(0);
     await page.goto('/');
     await expect(page.getByRole('heading', { name: 'Requests', level: 1 })).toBeVisible();
-
-    // The switch lives on Profile › See the app as (D-217); the Home it chooses is drawn at once.
-    await page.goto('/view-as/');
-    await page.getByRole('button', { name: 'Case manager' }).click();
-    await page.goto('/');
-    await expect(page.getByRole('heading', { name: 'Your members', level: 1 })).toBeVisible();
-    await expect(page.getByRole('heading', { name: 'Requests', level: 1 })).toHaveCount(0);
   });
 
   test('switching the view never changes whose data is asked for', async ({ page }) => {
@@ -231,8 +224,8 @@ test.describe('everyone, for the person running Pam', () => {
     });
     await page.route('**/rest/v1/rpc/saved_places_mine*', (route) => route.fulfill(json([])));
 
-    await page.goto('/view-as/');
-    await page.getByRole('button', { name: 'Member' }).click();
+    // Its screen is gone (D-501); the stored choice still exists, so it is set directly.
+    await page.addInitScript(() => sessionStorage.setItem('pam.view-as', 'member'));
     await page.goto('/profile/');
     await expect(page.getByText(/400\s*Points/)).toBeVisible();
 

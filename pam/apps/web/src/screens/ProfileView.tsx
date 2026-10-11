@@ -49,11 +49,6 @@ export interface ProfileViewProps {
   readonly headerActions: ReactNode;
   readonly onSignOut?: () => void;
   /**
-   * A super admin's own account, whatever role it is previewing — keeps the
-   * "See the app as" row, so a preview is never a one-way door (D-217).
-   */
-  readonly canViewAs?: boolean;
-  /**
    * A member who also works at a program (D-374): the "Use Pam as" row,
    * which opens its own page. Never shown to a single-role account.
    */
@@ -78,7 +73,6 @@ export function ProfileView({
   remindersOn,
   headerActions,
   onSignOut,
-  canViewAs = false,
   canUseAs = false,
   photoUrl = null,
   onPhotoPick,
@@ -121,9 +115,6 @@ export function ProfileView({
     // a nested screen, also reached from the bell's "a place was reported" row.
     ...(role === 'admin' || role === 'super_admin'
       ? [{ id: 'reported', label: t('places.reported.title'), href: '/places/reported/', icon: <FlagIcon {...ICON} /> }]
-      : []),
-    ...(canViewAs
-      ? [{ id: 'view-as', label: t('profile.menu.viewAs'), href: '/view-as/', icon: <GlobeIcon {...ICON} /> }]
       : []),
   ];
 

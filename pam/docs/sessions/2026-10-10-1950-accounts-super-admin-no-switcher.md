@@ -13,13 +13,21 @@ journey to check how the journey is."
   request screens. `app/RoleSwitchControl.tsx` and `app/RoleSwitchLazy.tsx` are deleted;
   `setViewAs` dropped where nothing else used it; a stale comment in `HeaderBell.tsx` fixed.
 - New test in `e2e/directory.spec.ts`: the super admin's Everyone header has no switch.
-- D-497, a changelog fragment, this log, a STATUS section.
+- D-501, a changelog fragment, this log, a STATUS section.
 
 - **Later, 11 October (Iris's member flow, relayed by Mira):** W2 — sign-up step 2 ("What
   others can see") now has a Call Pam row (the support number from `app_settings`, the hours,
   one tap to dial), and `e2e/join.spec.ts` checks it. Its missing back arrow is deliberate (the
   account and the used invite exist by then, so going back to About you would fail on
   resubmit); asked, not changed. W6 — first-time words drafted for Will, not built.
+
+- **"See the app as" removed too** (Will, relayed, 11 October 00:32: "remove"): the Profile
+  row, `/view-as/`, its screen, route, story and three strings in all seven languages. The
+  stored preview stays (tests and Storybook set it). Mira's note named `set_demo_view` /
+  `demo_view` as its database side; they are the Everyone demo-view switch (D-155), a
+  different feature, still in use, untouched.
+- **Renumbered D-497 → D-501**: the offline claim collided with `main`'s own D-497, which
+  the numbering test caught after merging `main`.
 
 ## What was wrong, and what missed it
 
@@ -33,7 +41,7 @@ journey to check how the journey is."
 
 ## Decisions made
 
-- D-497 — remove the header icon; keep "See the app as", "Use Pam as" and `@pam/ui/RoleSwitch`.
+- D-501 — remove the header icon; keep "See the app as", "Use Pam as" and `@pam/ui/RoleSwitch`.
 
 ## Verified
 

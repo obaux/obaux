@@ -100,7 +100,7 @@ test.describe('the case manager screen', () => {
   });
 
   test('a super admin previewing "Case manager" sees this screen, not a closed door', async ({ page }) => {
-    // Profile › See the app as writes the choice to sessionStorage (D-108); any
+    // A preview is a choice in sessionStorage (D-108; its screen is gone, D-501); any
     // screen that reads it should agree with the header about who it is
     // drawing for (Will, 16 September — "make sure all pages are properly
     // showing based on the user's permissions").

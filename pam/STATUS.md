@@ -928,14 +928,14 @@ The database suite needs `postgresql-16`, `postgresql-16-postgis-3` and
 
 ---
 
-## Accounts & invites · no role switcher for the super admin (10 October) — local branch, not pushed
+## Accounts & invites · no role switcher or "See the app as" for the super admin; sign-up Call Pam (10–11 October) — local branch, not pushed
 
-`claude/pam-super-admin-no-switcher` (D-497). Will: the super admin no longer needs the role
-switcher icon, since Storybook has a prototype for each journey. The icon is gone from all ten
-screens that drew it; "See the app as" (Profile) and "Use Pam as" (two-role accounts, D-374)
-stay. No database change. Unit, typecheck, build and 11 browser specs (264 tests, plus the new
-regression test, which fails without the change) pass. Waiting on Will: where to push it, and
-whether "See the app as" should go too.
+`claude/pam-super-admin-no-switcher` (D-501). Will: the super admin no longer needs the role
+switcher icon (Storybook has a prototype for each journey), and "remove" for "See the app as".
+Both are gone; "Use Pam as" (two-role accounts, D-374) stays; no database change. Also Iris's
+W2: sign-up step 2 has a Call Pam row. Waiting on Will: the word to push this branch; W2's
+back arrow; W6's first-time sign-in words.
+
 ## Merge desk & platform · deploys: only `main`, and checked (10–11 October)
 
 On 10 October the web project hit Vercel's daily deploy limit: 3f0bb5e and 00bde97 were refused ("Deployment rate
