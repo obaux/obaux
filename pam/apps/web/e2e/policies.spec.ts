@@ -19,6 +19,11 @@ async function draw(page: Page) {
   await page.mouse.up();
 }
 
+// These walk the example places, services and policies, which a demo asks for outright; a real account has none (D-509).
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => window.sessionStorage.setItem('pam.examples', '1'));
+});
+
 test('the list says what is left to sign, and has no WCAG A/AA violations', async ({ page }) => {
   await page.goto(LIST);
   await settled(page);

@@ -1,6 +1,7 @@
 'use client';
 
 import { useCallback, useEffect, useState, useSyncExternalStore } from 'react';
+import { examplesOn } from './examples';
 import { DUMMY_POLICIES, type DummyPolicy } from '@pam/config/dummy-policies';
 import {
   POLICY_COLUMNS,
@@ -52,6 +53,8 @@ function write(kept: Kept): void {
 }
 
 function current(kept: Kept): readonly DummyPolicy[] {
+  // The example set is for a demo or Storybook; a real account has only what it has put in (D-509).
+  if (!examplesOn()) return [];
   return [...DUMMY_POLICIES, ...kept.added].filter((p) => !kept.removed.includes(p.id));
 }
 
@@ -166,7 +169,7 @@ export function usePolicies(): {
     () => real,
     () => real,
   );
-  const [policies, setPolicies] = useState<readonly DummyPolicy[]>(DUMMY_POLICIES);
+  const [policies, setPolicies] = useState<readonly DummyPolicy[]>([]);
 
   useEffect(() => {
     const sync = () => setPolicies(current(read()));

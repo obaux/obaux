@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { exampleTrips } from '@/lib/exampleMode';
+import { exampleTrips } from '@/lib/exampleTrips';
 import { readAddedTrips, TRIPS_CHANGED, withMoves } from './addedTrips';
 import { intlLocale } from '@pam/config';
 
