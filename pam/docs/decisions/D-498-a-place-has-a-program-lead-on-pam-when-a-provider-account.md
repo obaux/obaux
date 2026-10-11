@@ -17,6 +17,8 @@ Places get into Pam two ways: **gathered** from public lists (the city's provide
 
 The English sentences (the plan-only line, the note label, saved not booked, the moved line, the drop-in line, the case-manager line) were reviewed by Will on 11 October 2026 ("approve", on the Control Room card). The six other languages are drafts for Lena.
 
+The two lines a program lead sees before adding a program (`program.tools.needsProgram.title`, "Add your program first"; `program.tools.needsProgram.body`, "This part is for your own program. Add it, and it will be here.") were approved by Will on 11 October 2026 at 00:57 UTC ("Sure", on the Control Room card).
+
 ## What a later session might reverse
 
 Whether "has a lead" should also require the lead to have signed in (not only to be active). Whether a lead's own page should say which of their places are theirs. When bookings are really sent to leads, the sentence becomes true for places that have one and this rule is what says which.
