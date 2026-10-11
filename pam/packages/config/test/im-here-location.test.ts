@@ -24,9 +24,11 @@ describe('Privacy on “I’m here” and location (D-526 part B)', () => {
 
   it('says the same of “Use my current location” in a search: used for the search, not kept', () => {
     // Explore’s area picker sends the position to services_near / services_search for one query and stores nothing
-    // (its note reads “Used for this search only.”); true only while Piper’s log check finds no latitude and
-    // longitude in a URL the API logs keep — see docs/before-launch.md.
-    expect(EN['privacy.s.what-we-keep.p10']).toBe('When you search near you, Pam uses where you are for that search and does not keep it.');
+    // (its note reads “Used for this search only.”). Piper’s log check, 11 October: both are POST calls with the
+    // position in the body, no latitude or longitude in any URL or log. The gateway log does keep that this account
+    // made the call, from this IP address, at this time, and an IP address is a rough location — so the page claims
+    // the position, not the call (“the position your phone sends”, not “where you are”).
+    expect(EN['privacy.s.what-we-keep.p10']).toBe('When you search near you, Pam uses your phone’s position for that search and does not keep it.');
     expect(EN['places.area.hereNote']).toBe('Used for this search only.');
   });
 
@@ -36,8 +38,9 @@ describe('Privacy on “I’m here” and location (D-526 part B)', () => {
     expect(p9).toMatch(/only when you tap, never in the background/);
   });
 
-  it('says what Pam keeps and that it does not keep where you are', () => {
-    expect(p9).toMatch(/Pam does not keep where you are\./);
+  it('says what Pam keeps and that it does not keep the position the phone sends', () => {
+    expect(p9).toMatch(/Pam does not keep the position your phone sends\./);
+    expect(p9).not.toMatch(/does not keep where you are/); // too broad: the request log keeps the IP address and the time
     // Three ways to be marked: “I’m here” (checked against the place), “I went”, or the program. The page names all
     // three, so nobody has to guess what “how” means.
     expect(p9).toMatch(/keeps only that you were there, when, and who marked it: you, with “I’m here” or “I went”, or the program\./);
