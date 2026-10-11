@@ -126,7 +126,7 @@
   sign-in code stays on the code step with a one-line alert, no Call), Sage's voice guide for A28, and Iris's
   help-site baseline (`docs/research/2026-10-11-help-site.md`: no way to reach a person, no focus ring, search
   misses, tap targets, aria-live; all sent to Wren in order).
-- **Batch b9 (Piper's D-509 + Dot's D-513):** real accounts never see example trips, visits or policies
+- **Batch b9 (Piper's D-509 + Dot's D-513 + Dot's D-516):** saving a place shows a small "Saved" tip for two seconds (announced, never takes focus); real accounts never see example trips, visits or policies
   (`lib/exampleMode.ts`: Storybook, a super admin's preview or `pam.examples=1` only); an empty Trips drawer says
   "Plan a visit and it shows here."; the blue alert in dark mode is 10%.
 - **Will's answers 03:16–03:41:**
