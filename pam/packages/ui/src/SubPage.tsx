@@ -91,6 +91,12 @@ export interface SubPageHeaderProps {
    * back and the actions sit exactly where they do on every other page (D-411).
    */
   readonly variant?: 'large' | 'bar';
+  /**
+   * With `variant="bar"`: whether the name in the bar is showing. A conversation hides it while its own
+   * name is on screen below and fades it in as that name scrolls under the bar (D-526). Only opacity
+   * changes, so nothing moves; the name is out of the accessibility tree either way.
+   */
+  readonly isBarTitleShown?: boolean;
 }
 
 const COLLAPSE_AT = 48;
@@ -137,6 +143,12 @@ const styles = stylex.create({
     transitionDuration: '150ms',
   },
   shown: { opacity: 1 },
+  // The conversation's bar name arrives with Pam's own tempo (PAM_MOTION.enter: 240ms, ease-out) and
+  // at once under reduced motion.
+  barTitleFade: {
+    transitionDuration: { default: '240ms', '@media (prefers-reduced-motion: reduce)': '0ms' },
+    transitionTimingFunction: 'cubic-bezier(0.2, 0, 0, 1)',
+  },
   // 34px, stepping down for a word that will not fit (D-422, `useFitTitle`).
   // While it is being measured a word may not break, so one that is too wide
   // overflows and says so; only past the smallest step is it allowed to.
@@ -183,6 +195,7 @@ export function SubPageHeader({
   isBackFixed = false,
   hero,
   variant = 'large',
+  isBarTitleShown = true,
 }: SubPageHeaderProps) {
   const [collapsed, setCollapsed] = useState(false);
   const fit = useFitTitle<HTMLHeadingElement>(title);
@@ -210,7 +223,7 @@ export function SubPageHeader({
       <HStack gap={2} align="center" wrap="nowrap" xstyle={styles.bar}>
         {back}
         <HStack align="center" wrap="nowrap" xstyle={styles.middle}>
-          <Text xstyle={[styles.barTitle, styles.shown]} aria-hidden="true">
+          <Text xstyle={[styles.barTitle, styles.barTitleFade, isBarTitleShown && styles.shown]} aria-hidden="true">
             {title}
           </Text>
         </HStack>
