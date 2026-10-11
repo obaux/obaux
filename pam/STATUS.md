@@ -977,6 +977,17 @@ without it the cached, unpatched Next shipped), a Vercel redirect for document r
 `app_settings.app_url`, migration `20261010190831_texts_link_to_app_joinpam_org` (data only), **applied live**
 10 October. Emails build their link from the Edge Function setting `APP_URL`, which Will set to app.joinpam.org the same evening.
 
+## Languages & legal · privacy lines waiting for Will, the calendar strings and the fit audit (11 October, afternoon)
+
+Four cards for Will, each a branch that merges only after its predecessor and is red only on its own missing translations until he signs: **a63** `claude/lena-program-visits-contract`
+(a program sees "whether you were marked as there"; the contract says it never sees who marked a visit or how), **a66** `claude/lena-im-here-privacy` (p9/p10: Pam does not keep the location
+the phone sends), **a67** `claude/lena-request-log-line` (p11, the request log, "deleted within a week"; `sharing.p5`, the Trips map is Google's), **a68** `claude/lena-calendar-privacy` (`sharing.p6`,
+`what-we-keep.p12`). Six translations of each follow his signature. In b18: the host guard (`third-party-hosts.test.ts`: every outside host the code names, and Privacy must name the ones the page loads from),
+the picker words ("ZIP code", the area is remembered on the phone only), D-536's removal of the City lookup. Calendar link screen: 29 strings in six languages on Piper's D-538 branch (`claude/lena-calendar-google-lines`).
+`pnpm audit:fit` now passes `--known`; the full seven-language run on main exits 0 (13 accepted findings, none new). **Open:** the signatures; Piper's `trips.booked.hasLead` / `place.lead.sees` must say "you were marked"
+before a63 merges; the retention in p11/p12 must change before the Supabase plan goes to Team (`docs/before-launch.md`); Twilio's retention (Nico); a native reader for the calendar screen's app-menu names.
+Log: `docs/sessions/2026-10-11-1721-languages-legal-privacy-lines-calendar-strings-fit-audit.md`.
+
 ## Languages & legal · A28: no phone line in the Help screen, the privacy page or the terms (11 October)
 
 Branch `claude/lena-a28-help` (D-514, D-515), Will's words signed 03:37 UTC (card a59). Get help's first row is Contact Pam and opens the help desk on the
