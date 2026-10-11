@@ -49,7 +49,7 @@ export const HOME = {
     {
       id: 'programs',
       head: 'Your services, built around people.',
-      body: 'Residents find your program and plan a visit. They sign your policies before arriving.',
+      body: 'Residents find your program and plan a visit. They sign your policies before they visit.',
       cta: { label: 'Add your program', href: '/support/cant-sign-in/' },
       image: 'calendar',
       alt: 'A program lead’s calendar in Pam: the week by day, with each person who is coming and a check-in button.',
@@ -67,7 +67,7 @@ export const HOME = {
   callouts: [
     {
       eyebrow: 'Privacy first',
-      text: 'Before you join, Pam shows you who can see what. A text from Pam never says why you are getting help.',
+      text: 'Before you join, Pam shows you who can see what. A text from Pam never says anything about your past.',
       cta: { label: 'Read Privacy & Terms', href: 'privacy' },
     },
     {
@@ -78,7 +78,7 @@ export const HOME = {
   ],
   nav: { support: 'Get help', signIn: 'Sign in' },
   footer: {
-    links: ['Support', 'Privacy', 'Terms', 'Contact'],
+    links: ['Support', 'About Pam', 'Privacy', 'Terms', 'Contact'],
     copyright: '© 2026 Pam. All rights reserved.',
     tagline: 'City services in your pocket',
   },

@@ -35,9 +35,10 @@ const styles = stylex.create({
   },
   bubble: {
     position: 'absolute',
-    insetBlockEnd: '56px',
-    insetInlineEnd: '28px',
-    maxWidth: '200px',
+    insetBlockEnd: '28px',
+    // Over the phone's lower right, as drawn (Figma: the bubble sits inside the phone's edge).
+    insetInlineStart: 'calc(50% - 30px)',
+    maxWidth: '165px',
     paddingBlock: '6px',
     paddingInline: '12px',
     borderRadius: '14px',

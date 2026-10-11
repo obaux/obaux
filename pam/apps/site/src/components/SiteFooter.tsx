@@ -3,6 +3,7 @@ import { HStack } from '@astryxdesign/core/HStack';
 import { Text } from '@astryxdesign/core/Text';
 import { VStack } from '@astryxdesign/core/VStack';
 import { HOME } from '../content/home-copy';
+import { ABOUT_ON_HOME, aboutPath } from '../content/about';
 import { HELP_EMAIL } from '../lib/links';
 import { tap } from '../lib/tap';
 import { website } from '../lib/website.stylex';
@@ -38,6 +39,11 @@ export function SiteFooter() {
               <a href="/support/" {...stylex.props(type.label_15, styles.link, tap.link)}>
                 Support
               </a>
+              {ABOUT_ON_HOME ? (
+                <a href={aboutPath('en')} {...stylex.props(type.label_15, styles.link, tap.link)}>
+                  About Pam
+                </a>
+              ) : null}
               <FooterLegal kind="privacy" label="Privacy" />
               <FooterLegal kind="terms" label="Terms" />
               <a href={`mailto:${HELP_EMAIL}`} {...stylex.props(type.label_15, styles.link, tap.link)}>
