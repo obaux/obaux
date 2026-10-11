@@ -2118,3 +2118,7 @@ Branch `claude/places-programs-no-examples-places` (D-509 extended). The example
 ## Places & programs · Add my program (11 October 2026) — READY, not merged
 
 Branch `claude/places-programs-add-my-program` (D-525). A member taps Add my program on Profile, answers the lead's questions, and the request goes to Pam's team (`request_staff_access`); being checked / not approved + ask again / approved (gains the provider role next to the member side, D-491). Migration `20261011044654`: no second ask while waiting or approved; a denied one reopens. Test `55_asking_again_to_add_a_program_test.sql`; e2e `add-my-program.spec.ts`.
+
+## Design system · Arabic code boxes fill from the left (11 October 2026) — READY, not merged
+
+The sign-in code's six boxes were filling from the right in Arabic (typed 1234 showed 4321); they and the hidden field are now left to right in every language, like the phone number (D-530, from Iris's research). E2E in Arabic covers typing and paste. Log: `docs/sessions/2026-10-11-1010-arabic-sign-in-code-boxes.md`.

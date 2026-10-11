@@ -109,7 +109,10 @@ export function CodeBoxes({
       <Text type="supporting" xstyle={styles.label}>
         <label htmlFor={fieldId}>{label}</label>
       </Text>
-      <VStack data-pam-code="" xstyle={styles.frame}>
+      {/* dir="ltr" on the boxes and the field, like the phone number: a code is read
+          1234 in every language, so Arabic must not fill from the right (D-530).
+          The label above and any alerts keep the page's direction. */}
+      <div data-pam-code="" dir="ltr" {...stylex.props(styles.frame)}>
         <HStack gap={2} wrap="nowrap" aria-hidden xstyle={styles.row}>
           {Array.from({ length }, (_, i) => (
             <Text key={i} xstyle={[styles.box, focused && i === active && styles.boxActive]}>
@@ -142,7 +145,7 @@ export function CodeBoxes({
           }}
           {...stylex.props(styles.input)}
         />
-      </VStack>
+      </div>
     </VStack>
   );
 }
