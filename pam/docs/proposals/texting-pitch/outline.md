@@ -101,8 +101,9 @@ refuses, but it measures an Arabic or Chinese answer against the English limit o
 - **No conversation.** One text to one number. Pam does not read replies (decision D-460). If the person replies, Pam does not see
   what they wrote.
 - **One answer.** Today that is Will's discipline, not a rule in the code — the sender has no "one per number" cap (see slide 8).
-- **STOP is always honoured.** A number that replies STOP is remembered even if nobody in Pam has it, and no further support text
-  goes to it; one already waiting is cancelled.
+- **STOP stops it.** Twilio itself blocks a number that replied STOP. Pam's own stop list (which also remembers numbers nobody in
+  Pam has, and cancels a support text already waiting) fills only once the receiver for replies, `sms-inbound`, is deployed and
+  Twilio points at it. **It is not deployed yet.**
 - **Never marketing.** It is only for answering a request someone made.
 - **Nothing stored about the person.** The number travels in the link. Pam keeps a log row for each text: when, who sent it, a
   scrambled form of the number (a hash), the outcome. Never the words, never the number.
@@ -166,7 +167,7 @@ Only counts Pam can keep **without reading anything**:
 
 - Support texts sent, per week. *(the log of support texts; exists)*
 - Of those, how many were delivered, failed or cancelled. *(the queue's status; exists)*
-- How many numbers replied STOP after a support text. *(the stopped-numbers list can be matched with the log; no content)*
+- How many numbers replied STOP after a support text. *(once the reply receiver is deployed, the stopped-numbers list can be matched with the log; no content)*
 - Requests received through the form, per week. **Does not exist yet as a count:** the platform's request log shows that
   requests arrived, but nothing totals them, and the limit table forgets after a day. A daily counter with no content would be needed.
 - Time from request to answer. **Not possible without keeping the request's time with the number** — which the design avoids on
@@ -224,6 +225,6 @@ docs/sms-setup.md (cost lines, filing), docs/sms-campaign-samples.md (sample 10 
 
 Built, off: the help-request function (deployed; answers "not live" until switched on), its limit (three requests an hour per
 person), the "Answer by text" page, the support-text sender with its checks, the list of numbers that asked to stop, the log, and
-the two draft texts (unsigned). **Not built:** the mobile-number field on the form; the "Reply by text" link in the request email;
+the two draft texts (unsigned). **Not built:** the receiver that hears a STOP reply (`sms-inbound`; not deployed, so Pam's own stop list is empty until it is); the mobile-number field on the form; the "Reply by text" link in the request email;
 the fixed answer to replies; forwarding replies (and not recommended); a cap per number; a daily request counter; a check that
 measures non-Latin answers.
