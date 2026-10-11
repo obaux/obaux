@@ -2134,3 +2134,7 @@ The sign-in code's six boxes were filling from the right in Arabic (typed 1234 s
 ## Design system · website-only styles (11 October 2026) — READY, not merged
 
 The website has its own colours and type, apart from the app's (D-528). In Figma (Pam — Website): a `Website` variable collection (23 colours, Light and Dark) and 32 text styles `Website/<Group>/<Name>`, bound across all pages. In `apps/site`: `lib/website.stylex.ts`, `lib/website-type.stylex.ts` and a contrast test. `packages/ui` and the app are untouched. Light-mode limits: Text/Muted not on Gray/Green/Purple; Accent/Success for icons and strokes only. Log: `docs/sessions/2026-10-11-0933-website-styles-in-figma-and-site-tokens.md`.
+
+## Design system · b15 polish (11 October 2026) — READY, not merged
+
+Sign in on the code step is off until all six digits are in (D-532). The Support search placeholder contrast (Iris H2) was not reproduced: 5.65:1 in dark, 0 axe findings; the pairing is now in the site's contrast test. Log: `docs/sessions/` newest `b15-polish-h2-and-c1`.
