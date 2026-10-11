@@ -93,6 +93,20 @@ test.describe('a code that did not work', () => {
     await expect(page).not.toHaveURL(/\/signin\//);
   });
 
+  test('Sign in waits for all six digits (D-532): a short code is never sent to be called wrong', async ({ page }) => {
+    const attempts = await toTheCodeStep(page, '654321');
+    const field = page.getByLabel(en['signin.code.label']);
+    const signIn = page.getByRole('button', { name: en['signin.code.action'] });
+    await expect(signIn).toBeDisabled();
+    await field.pressSequentially('1');
+    await expect(signIn).toBeDisabled();
+    await field.pressSequentially('2345');
+    await expect(signIn).toBeDisabled();
+    expect(attempts()).toBe(0);
+    await field.pressSequentially('6');
+    await expect.poll(attempts).toBe(1);
+  });
+
   test('the alert goes as soon as they start typing', async ({ page }) => {
     await toTheCodeStep(page, '654321');
     const field = page.getByLabel(en['signin.code.label']);

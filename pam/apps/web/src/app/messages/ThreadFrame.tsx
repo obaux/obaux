@@ -179,11 +179,11 @@ export function ThreadIntro({
   return (
     <VStack gap={2} align="center" xstyle={intro.wrap}>
       <Avatar size="lg" name={name} {...(photoUrl ? { src: photoUrl } : {})} tooltip={false} alt="" />
-      <Heading level={1} ref={heading} xstyle={intro.name}>
+      <Heading level={1} ref={heading} dir="auto" xstyle={intro.name}>
         {name}
       </Heading>
       {context ? (
-        <Text type="supporting" xstyle={intro.line}>
+        <Text type="supporting" dir="auto" xstyle={intro.line}>
           {context}
         </Text>
       ) : null}
@@ -213,6 +213,7 @@ export function ThreadHeader({
   return (
     <SubPageHeader
       variant="bar"
+      isTitleData
       isBarTitleShown={!onScreen}
       title={name}
       backHref={backHref}
