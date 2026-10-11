@@ -590,6 +590,8 @@ function routesFor(journeyRole: JourneyRole, options: MockOptions = {}): Route[]
     // Message {name} on a caseload member's page (D-231, D-234) opens the one
     // example conversation, so the tap lands in a thread instead of the list.
     on('/rpc/open_direct_conversation', () => ({ body: CONVO_ID })),
+    // A place's Message button opens the member's conversation with the program's lead (D-541).
+    on('/rpc/message_program', () => ({ body: CONVO_ID })),
     on('/rpc/conversation_partners', () => ({ body: [partnerFor(role)] })),
     on('/rpc/conversation_block_state', () => ({
       body: [{ i_blocked: options.blocked === 'mine', blocked_me: options.blocked === 'theirs' }],

@@ -28,3 +28,21 @@ export async function openConversation(otherId: string): Promise<string | null> 
     return null;
   }
 }
+
+/**
+ * A member's message to a place's program, before or without a visit (D-541):
+ * `message_program()` opens, or reuses, the conversation with one lead of the
+ * place's organisation and returns its id. `null` when the place has nobody on
+ * Pam to answer (`NO_PROGRAM_LEAD`) or the write failed — the screen then shows
+ * Call and Website instead of a dead end.
+ */
+export async function messageProgram(serviceId: string): Promise<string | null> {
+  try {
+    const { createClient } = await import('./supabase');
+    const { data, error } = await createClient().rpc('message_program', { p_service_id: serviceId });
+    if (error || typeof data !== 'string') return null;
+    return data;
+  } catch {
+    return null;
+  }
+}
